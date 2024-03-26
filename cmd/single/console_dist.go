@@ -20,6 +20,7 @@ var consoleHandlers = map[string]handlerFunc{
 		consoleHandler.ServeHTTP(writer, request)
 	},
 	consoleRoot + "/": func(writer http.ResponseWriter, request *http.Request) {
+		writer.Header().Set("Cache-Control", "max-age=604800") // 7 days
 		consoleHandler.ServeHTTP(writer, request)
 	},
 }

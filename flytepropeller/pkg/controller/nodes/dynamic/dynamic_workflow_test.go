@@ -584,6 +584,10 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 
 type existsMetadata struct{}
 
+func (e existsMetadata) ContentMD5() string {
+	return ""
+}
+
 func (e existsMetadata) Exists() bool {
 	return false
 }

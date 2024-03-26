@@ -6,6 +6,9 @@
   },
   "tags": [
     {
+      "name": "SyncAgentService"
+    },
+    {
       "name": "AsyncAgentService"
     },
     {
@@ -19,6 +22,362 @@
     "application/json"
   ],
   "paths": {
+    "/api/v1/agent/task": {
+      "post": {
+        "summary": "CreateTask sends a task create request to the agent service.",
+        "operationId": "AsyncAgentService_CreateTask",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminCreateTaskResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "Represents a request structure to create task.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/adminCreateTaskRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AsyncAgentService"
+        ]
+      }
+    },
+    "/api/v1/agent/task/logs/{task_category.name}/{task_category.version}/{resource_meta}": {
+      "get": {
+        "summary": "GetTaskLogs returns task execution logs, if available.",
+        "operationId": "AsyncAgentService_GetTaskLogs",
+        "responses": {
+          "200": {
+            "description": "A successful response.(streaming responses)",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "$ref": "#/definitions/adminGetTaskLogsResponse"
+                },
+                "error": {
+                  "$ref": "#/definitions/googlerpcStatus"
+                }
+              },
+              "title": "Stream result of adminGetTaskLogsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "task_category.name",
+            "description": "The name of the task type.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "task_category.version",
+            "description": "The version of the task type.",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "resource_meta",
+            "description": "Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "byte"
+          },
+          {
+            "name": "task_type",
+            "description": "A predefined yet extensible Task type identifier.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "lines",
+            "description": "Number of lines to return.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "uint64"
+          },
+          {
+            "name": "token",
+            "description": "In the case of multiple pages of results, the server-provided token can be used to fetch the next page\nin a query. If there are no more results, this value will be empty.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AsyncAgentService"
+        ]
+      }
+    },
+    "/api/v1/agent/task/metrics/{task_category.name}/{task_category.version}/{resource_meta}": {
+      "get": {
+        "summary": "GetTaskMetrics returns one or more task execution metrics, if available.",
+        "description": "Errors include\n * OutOfRange if metrics are not available for the specified task time range\n * various other errors",
+        "operationId": "AsyncAgentService_GetTaskMetrics",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminGetTaskMetricsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "task_category.name",
+            "description": "The name of the task type.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "task_category.version",
+            "description": "The version of the task type.",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "resource_meta",
+            "description": "Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "byte"
+          },
+          {
+            "name": "task_type",
+            "description": "A predefined yet extensible Task type identifier.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "queries",
+            "description": "The metrics to query. If empty, will return a default set of metrics.\ne.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "start_time",
+            "description": "Start timestamp, inclusive.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "end_time",
+            "description": "End timestamp, inclusive..",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "step",
+            "description": "Query resolution step width in duration format or float number of seconds.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AsyncAgentService"
+        ]
+      }
+    },
+    "/api/v1/agent/task/stream": {
+      "post": {
+        "summary": "ExecuteTaskSync streams the create request and inputs to the agent service and streams the outputs back.",
+        "operationId": "SyncAgentService_ExecuteTaskSync",
+        "responses": {
+          "200": {
+            "description": "A successful response.(streaming responses)",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "$ref": "#/definitions/adminExecuteTaskSyncResponse"
+                },
+                "error": {
+                  "$ref": "#/definitions/googlerpcStatus"
+                }
+              },
+              "title": "Stream result of adminExecuteTaskSyncResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": " (streaming inputs)",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/adminExecuteTaskSyncRequest"
+            }
+          }
+        ],
+        "tags": [
+          "SyncAgentService"
+        ]
+      }
+    },
+    "/api/v1/agent/task/{task_category.name}/{task_category.version}/{resource_meta}": {
+      "get": {
+        "summary": "Get job status.",
+        "operationId": "AsyncAgentService_GetTask",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminGetTaskResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "task_category.name",
+            "description": "The name of the task type.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "task_category.version",
+            "description": "The version of the task type.",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "resource_meta",
+            "description": "Metadata about the resource to be pass to the agent.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "byte"
+          },
+          {
+            "name": "task_type",
+            "description": "A predefined yet extensible Task type identifier.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AsyncAgentService"
+        ]
+      }
+    },
+    "/api/v1/agent/task_executions/{task_category.name}/{task_category.version}/{resource_meta}": {
+      "delete": {
+        "summary": "Delete the task resource.",
+        "operationId": "AsyncAgentService_DeleteTask",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminDeleteTaskResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "task_category.name",
+            "description": "The name of the task type.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "task_category.version",
+            "description": "The version of the task type.",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "resource_meta",
+            "description": "Metadata about the resource to be pass to the agent.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "byte"
+          },
+          {
+            "name": "task_type",
+            "description": "A predefined yet extensible Task type identifier.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AsyncAgentService"
+        ]
+      }
+    },
     "/api/v1/agent/{name}": {
       "get": {
         "summary": "Fetch a :ref:`ref_flyteidl.admin.Agent` definition.",
@@ -245,19 +604,73 @@
             "type": "string"
           },
           "description": "SupportedTaskTypes are the types of the tasks that the agent can handle."
+        },
+        "is_sync": {
+          "type": "boolean",
+          "description": "IsSync indicates whether this agent is a sync agent. Sync agents are expected to return their\nresults synchronously when called by propeller. Given that sync agents can affect the performance\nof the system, it's important to enforce strict timeout policies.\nAn Async agent, on the other hand, is required to be able to identify jobs by an\nidentifier and query for job statuses as jobs progress."
+        },
+        "supported_task_categories": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/adminTaskCategory"
+          },
+          "description": "Supported_task_categories are the categories of the tasks that the agent can handle."
         }
       },
       "description": "A message containing the agent metadata."
+    },
+    "adminCreateRequestHeader": {
+      "type": "object",
+      "properties": {
+        "template": {
+          "$ref": "#/definitions/coreTaskTemplate",
+          "description": "Template of the task that encapsulates all the metadata of the task."
+        },
+        "output_prefix": {
+          "type": "string",
+          "title": "Prefix for where task output data will be written. (e.g. s3://my-bucket/randomstring)"
+        },
+        "task_execution_metadata": {
+          "$ref": "#/definitions/flyteidladminTaskExecutionMetadata",
+          "description": "subset of runtime task execution metadata."
+        },
+        "max_dataset_size_bytes": {
+          "type": "string",
+          "format": "int64",
+          "description": "MaxDatasetSizeBytes is the maximum size of the dataset that can be generated by the task."
+        }
+      }
+    },
+    "adminCreateTaskRequest": {
+      "type": "object",
+      "properties": {
+        "inputs": {
+          "$ref": "#/definitions/coreLiteralMap",
+          "title": "The inputs required to start the execution. All required inputs must be\nincluded in this map. If not required and not provided, defaults apply.\n+optional"
+        },
+        "template": {
+          "$ref": "#/definitions/coreTaskTemplate",
+          "description": "Template of the task that encapsulates all the metadata of the task."
+        },
+        "output_prefix": {
+          "type": "string",
+          "title": "Prefix for where task output data will be written. (e.g. s3://my-bucket/randomstring)"
+        },
+        "task_execution_metadata": {
+          "$ref": "#/definitions/flyteidladminTaskExecutionMetadata",
+          "description": "subset of runtime task execution metadata."
+        }
+      },
+      "description": "Represents a request structure to create task."
     },
     "adminCreateTaskResponse": {
       "type": "object",
       "properties": {
         "resource_meta": {
           "type": "string",
-          "format": "byte"
-        },
-        "resource": {
-          "$ref": "#/definitions/adminResource"
+          "format": "byte",
+          "description": "ResourceMeta is created by the agent. It could be a string (jobId) or a dict (more complex metadata)."
         }
       },
       "description": "Represents a create response structure."
@@ -265,6 +678,36 @@
     "adminDeleteTaskResponse": {
       "type": "object",
       "description": "Response to delete a task."
+    },
+    "adminExecuteTaskSyncRequest": {
+      "type": "object",
+      "properties": {
+        "header": {
+          "$ref": "#/definitions/adminCreateRequestHeader"
+        },
+        "inputs": {
+          "$ref": "#/definitions/coreLiteralMap"
+        }
+      }
+    },
+    "adminExecuteTaskSyncResponse": {
+      "type": "object",
+      "properties": {
+        "header": {
+          "$ref": "#/definitions/adminExecuteTaskSyncResponseHeader"
+        },
+        "outputs": {
+          "$ref": "#/definitions/coreLiteralMap"
+        }
+      }
+    },
+    "adminExecuteTaskSyncResponseHeader": {
+      "type": "object",
+      "properties": {
+        "resource": {
+          "$ref": "#/definitions/adminResource"
+        }
+      }
     },
     "adminGetAgentResponse": {
       "type": "object",
@@ -278,19 +721,35 @@
     "adminGetTaskLogsResponse": {
       "type": "object",
       "properties": {
+        "header": {
+          "$ref": "#/definitions/adminGetTaskLogsResponseHeader"
+        },
+        "body": {
+          "$ref": "#/definitions/adminGetTaskLogsResponseBody"
+        }
+      },
+      "description": "A response containing the logs for a task execution."
+    },
+    "adminGetTaskLogsResponseBody": {
+      "type": "object",
+      "properties": {
         "results": {
           "type": "array",
           "items": {
             "type": "string"
           },
           "description": "The execution log results."
-        },
+        }
+      }
+    },
+    "adminGetTaskLogsResponseHeader": {
+      "type": "object",
+      "properties": {
         "token": {
           "type": "string",
           "description": "In the case of multiple pages of results, the server-provided token can be used to fetch the next page\nin a query. If there are no more results, this value will be empty."
         }
-      },
-      "description": "A response containing the logs for a task execution."
+      }
     },
     "adminGetTaskMetricsResponse": {
       "type": "object",
@@ -311,14 +770,6 @@
       "properties": {
         "resource": {
           "$ref": "#/definitions/adminResource"
-        },
-        "log_links": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/coreTaskLog"
-          },
-          "title": "log information for the task execution"
         }
       },
       "description": "Response to get an individual task resource."
@@ -362,24 +813,38 @@
         "phase": {
           "$ref": "#/definitions/coreTaskExecutionPhase",
           "description": "The phase of the execution is used to determine the phase of the plugin's execution."
+        },
+        "custom_info": {
+          "type": "object",
+          "description": "Custom data specific to the agent."
+        }
+      }
+    },
+    "adminTaskCategory": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the task type."
+        },
+        "version": {
+          "type": "integer",
+          "format": "int32",
+          "description": "The version of the task type."
         }
       }
     },
     "coreArtifactBindingData": {
       "type": "object",
       "properties": {
-        "index": {
-          "type": "integer",
-          "format": "int64"
-        },
         "partition_key": {
           "type": "string"
         },
         "bind_to_time_partition": {
           "type": "boolean"
         },
-        "transform": {
-          "type": "string",
+        "time_transform": {
+          "$ref": "#/definitions/coreTimeTransform",
           "title": "This is only relevant in the time partition case"
         }
       },
@@ -415,6 +880,9 @@
           "type": "string"
         },
         "name": {
+          "type": "string"
+        },
+        "org": {
           "type": "string"
         }
       }
@@ -625,6 +1093,18 @@
       },
       "description": "Metadata associated with the GPU accelerator to allocate to a task. Contains\ninformation about device type, and for multi-instance GPUs, the partition size to\nuse."
     },
+    "coreGranularity": {
+      "type": "string",
+      "enum": [
+        "UNSET",
+        "MINUTE",
+        "HOUR",
+        "DAY",
+        "MONTH"
+      ],
+      "default": "UNSET",
+      "title": "- DAY: default"
+    },
     "coreIOStrategy": {
       "type": "object",
       "properties": {
@@ -754,6 +1234,9 @@
         },
         "input_binding": {
           "$ref": "#/definitions/coreInputBindingData"
+        },
+        "runtime_binding": {
+          "$ref": "#/definitions/coreRuntimeBinding"
         }
       }
     },
@@ -1004,6 +1487,9 @@
       },
       "description": "Retry strategy associated with an executable unit."
     },
+    "coreRuntimeBinding": {
+      "type": "object"
+    },
     "coreRuntimeMetadata": {
       "type": "object",
       "properties": {
@@ -1138,7 +1624,7 @@
       "properties": {
         "statement": {
           "type": "string",
-          "title": "The actual query to run, the query can have templated parameters.\nWe use Flyte's Golang templating format for Query templating.\nRefer to the templating documentation.\nhttps://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/external_services/hive/hive.html#sphx-glr-auto-integrations-external-services-hive-hive-py\nFor example,\ninsert overwrite directory '{{ .rawOutputDataPrefix }}' stored as parquet\nselect *\nfrom my_table\nwhere ds = '{{ .Inputs.ds }}'"
+          "title": "The actual query to run, the query can have templated parameters.\nWe use Flyte's Golang templating format for Query templating.\nFor example,\ninsert overwrite directory '{{ .rawOutputDataPrefix }}' stored as parquet\nselect *\nfrom my_table\nwhere ds = '{{ .Inputs.ds }}'"
         },
         "dialect": {
           "$ref": "#/definitions/SqlDialect"
@@ -1301,6 +1787,24 @@
       },
       "title": "Task Metadata"
     },
+    "coreTaskNodeOverrides": {
+      "type": "object",
+      "properties": {
+        "resources": {
+          "$ref": "#/definitions/coreResources",
+          "description": "A customizable interface to convey resources requested for a task container."
+        },
+        "extended_resources": {
+          "$ref": "#/definitions/coreExtendedResources",
+          "description": "Overrides for all non-standard resources, not captured by\nv1.ResourceRequirements, to allocate to a task."
+        },
+        "container_image": {
+          "type": "string",
+          "description": "Override for the image used by task pods."
+        }
+      },
+      "description": "Optional task node overrides that will be applied at task execution time."
+    },
     "coreTaskTemplate": {
       "type": "object",
       "properties": {
@@ -1361,6 +1865,20 @@
       "properties": {
         "value": {
           "$ref": "#/definitions/coreLabelValue"
+        },
+        "granularity": {
+          "$ref": "#/definitions/coreGranularity"
+        }
+      }
+    },
+    "coreTimeTransform": {
+      "type": "object",
+      "properties": {
+        "transform": {
+          "type": "string"
+        },
+        "op": {
+          "$ref": "#/definitions/flyteidlcoreOperator"
         }
       }
     },
@@ -1536,6 +2054,24 @@
             "type": "string"
           },
           "title": "Environment variables attached to the task execution"
+        },
+        "max_attempts": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Represents the maximum number of attempts allowed for a task.\nIf a task fails, it can be retried up to this maximum number of attempts."
+        },
+        "interruptible": {
+          "type": "boolean",
+          "description": "Indicates whether the task execution can be interrupted.\nIf set to true, the task can be stopped before completion."
+        },
+        "interruptible_failure_threshold": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Specifies the threshold for failure count at which the interruptible property\nwill take effect. If the number of consecutive task failures exceeds this threshold,\ninterruptible behavior will be activated."
+        },
+        "overrides": {
+          "$ref": "#/definitions/coreTaskNodeOverrides",
+          "description": "Overrides for specific properties of the task node.\nThese overrides can be used to customize the behavior of the task node."
         }
       },
       "description": "Represents a subset of runtime task execution metadata that are relevant to external plugins."
@@ -1566,6 +2102,14 @@
         }
       },
       "description": "A generic key value pair."
+    },
+    "flyteidlcoreOperator": {
+      "type": "string",
+      "enum": [
+        "MINUS",
+        "PLUS"
+      ],
+      "default": "MINUS"
     },
     "flyteidlcoreSchema": {
       "type": "object",

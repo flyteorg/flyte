@@ -39,7 +39,7 @@ For example
     )
 
 
-See detailed usage examples in the :std:doc:`User Guide </flytesnacks/examples/productionizing/lp_notifications>`
+See detailed usage examples in the :std:doc:`/user_guide/productionizing/notifications`
 
 Notifications can be combined with schedules to automatically alert you when a scheduled job succeeds or fails.
 

@@ -180,6 +180,11 @@ class AdminServiceStub(object):
                 request_serializer=flyteidl_dot_admin_dot_project__pb2.Project.SerializeToString,
                 response_deserializer=flyteidl_dot_admin_dot_project__pb2.ProjectUpdateResponse.FromString,
                 )
+        self.GetProject = channel.unary_unary(
+                '/flyteidl.service.AdminService/GetProject',
+                request_serializer=flyteidl_dot_admin_dot_project__pb2.ProjectGetRequest.SerializeToString,
+                response_deserializer=flyteidl_dot_admin_dot_project__pb2.Project.FromString,
+                )
         self.ListProjects = channel.unary_unary(
                 '/flyteidl.service.AdminService/ListProjects',
                 request_serializer=flyteidl_dot_admin_dot_project__pb2.ProjectListRequest.SerializeToString,
@@ -523,6 +528,13 @@ class AdminServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def GetProject(self, request, context):
+        """Fetches a :ref:`ref_flyteidl.admin.Project`
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
     def ListProjects(self, request, context):
         """Fetches a list of :ref:`ref_flyteidl.admin.Project`
         """
@@ -842,6 +854,11 @@ def add_AdminServiceServicer_to_server(servicer, server):
                     servicer.UpdateProject,
                     request_deserializer=flyteidl_dot_admin_dot_project__pb2.Project.FromString,
                     response_serializer=flyteidl_dot_admin_dot_project__pb2.ProjectUpdateResponse.SerializeToString,
+            ),
+            'GetProject': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetProject,
+                    request_deserializer=flyteidl_dot_admin_dot_project__pb2.ProjectGetRequest.FromString,
+                    response_serializer=flyteidl_dot_admin_dot_project__pb2.Project.SerializeToString,
             ),
             'ListProjects': grpc.unary_unary_rpc_method_handler(
                     servicer.ListProjects,
@@ -1482,6 +1499,23 @@ class AdminService(object):
         return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AdminService/UpdateProject',
             flyteidl_dot_admin_dot_project__pb2.Project.SerializeToString,
             flyteidl_dot_admin_dot_project__pb2.ProjectUpdateResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetProject(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AdminService/GetProject',
+            flyteidl_dot_admin_dot_project__pb2.ProjectGetRequest.SerializeToString,
+            flyteidl_dot_admin_dot_project__pb2.Project.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 

@@ -49,7 +49,7 @@ pub struct NodeExecutionEvent {
     /// by the executor of the node.
     #[prost(message, optional, tag="4")]
     pub occurred_at: ::core::option::Option<::prost_types::Timestamp>,
-    /// [To be deprecated] Specifies which task (if any) launched this node.
+    /// \[To be deprecated\] Specifies which task (if any) launched this node.
     #[prost(message, optional, tag="9")]
     pub parent_task_metadata: ::core::option::Option<ParentTaskExecutionMetadata>,
     /// Specifies the parent node of the current node execution. Node executions at level zero will not have a parent node.

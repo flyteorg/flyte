@@ -40,18 +40,21 @@ func CreateLaunchPlanModel(
 		return models.LaunchPlan{}, errors.NewFlyteAdminError(codes.Internal, "Failed to serialize launch plan closure")
 	}
 
+	var launchConditionType models.LaunchConditionType
 	scheduleType := models.LaunchPlanScheduleTypeNONE
 	if launchPlan.Spec.EntityMetadata != nil && launchPlan.Spec.EntityMetadata.Schedule != nil {
 		if launchPlan.Spec.EntityMetadata.Schedule.GetCronExpression() != "" || launchPlan.Spec.EntityMetadata.Schedule.GetCronSchedule() != nil {
 			scheduleType = models.LaunchPlanScheduleTypeCRON
+			launchConditionType = models.LaunchConditionTypeSCHED
 		} else if launchPlan.Spec.EntityMetadata.Schedule.GetRate() != nil {
 			scheduleType = models.LaunchPlanScheduleTypeRATE
+			launchConditionType = models.LaunchConditionTypeSCHED
 		}
 	}
 
 	state := int32(initState)
 
-	return models.LaunchPlan{
+	lpModel := models.LaunchPlan{
 		LaunchPlanKey: models.LaunchPlanKey{
 			Project: launchPlan.Id.Project,
 			Domain:  launchPlan.Id.Domain,
@@ -64,7 +67,11 @@ func CreateLaunchPlanModel(
 		WorkflowID:   workflowRepoID,
 		Digest:       digest,
 		ScheduleType: scheduleType,
-	}, nil
+	}
+	if launchConditionType != "" {
+		lpModel.LaunchConditionType = &launchConditionType
+	}
+	return lpModel, nil
 }
 
 // Transforms a LaunchPlanModel to a LaunchPlan

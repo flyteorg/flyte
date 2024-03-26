@@ -79,7 +79,7 @@ func dummyContainerTaskTemplateWithPodSpec(command []string, args []string) *cor
 	return taskTemplate
 }
 
-func dummyContainerTaskMetadata(resources *v1.ResourceRequirements, extendedResources *core.ExtendedResources, returnsServiceAccount bool) pluginsCore.TaskExecutionMetadata {
+func dummyContainerTaskMetadata(resources *v1.ResourceRequirements, extendedResources *core.ExtendedResources, returnsServiceAccount bool, containerImage string) pluginsCore.TaskExecutionMetadata {
 	taskMetadata := &pluginsCoreMock.TaskExecutionMetadata{}
 	taskMetadata.On("GetNamespace").Return("test-namespace")
 	taskMetadata.On("GetAnnotations").Return(map[string]string{"annotation-1": "val1"})
@@ -118,6 +118,7 @@ func dummyContainerTaskMetadata(resources *v1.ResourceRequirements, extendedReso
 	to := &pluginsCoreMock.TaskOverrides{}
 	to.On("GetResources").Return(resources)
 	to.On("GetExtendedResources").Return(extendedResources)
+	to.OnGetContainerImage().Return(containerImage)
 	taskMetadata.On("GetOverrides").Return(to)
 	taskMetadata.On("IsInterruptible").Return(true)
 	taskMetadata.On("GetEnvironmentVariables").Return(nil)
@@ -176,19 +177,19 @@ func TestContainerTaskExecutor_BuildResource(t *testing.T) {
 		{
 			name:                 "BuildResource",
 			taskTemplate:         dummyContainerTaskTemplate(command, args),
-			taskMetadata:         dummyContainerTaskMetadata(containerResourceRequirements, nil, true),
+			taskMetadata:         dummyContainerTaskMetadata(containerResourceRequirements, nil, true, ""),
 			expectServiceAccount: serviceAccount,
 		},
 		{
 			name:                 "BuildResource_PodTemplate",
 			taskTemplate:         dummyContainerTaskTemplateWithPodSpec(command, args),
-			taskMetadata:         dummyContainerTaskMetadata(containerResourceRequirements, nil, true),
+			taskMetadata:         dummyContainerTaskMetadata(containerResourceRequirements, nil, true, ""),
 			expectServiceAccount: podTemplateServiceAccount,
 		},
 		{
 			name:                 "BuildResource_SecurityContext",
 			taskTemplate:         dummyContainerTaskTemplate(command, args),
-			taskMetadata:         dummyContainerTaskMetadata(containerResourceRequirements, nil, false),
+			taskMetadata:         dummyContainerTaskMetadata(containerResourceRequirements, nil, false, ""),
 			expectServiceAccount: securityContextServiceAccount,
 		},
 	}
@@ -321,7 +322,7 @@ func TestContainerTaskExecutor_BuildResource_ExtendedResources(t *testing.T) {
 		t.Run(f.name, func(t *testing.T) {
 			taskTemplate := dummyContainerTaskTemplate([]string{"command"}, []string{"{{.Input}}"})
 			taskTemplate.ExtendedResources = f.extendedResourcesBase
-			taskMetadata := dummyContainerTaskMetadata(f.resources, f.extendedResourcesOverride, true)
+			taskMetadata := dummyContainerTaskMetadata(f.resources, f.extendedResourcesOverride, true, "")
 			taskContext := dummyContainerTaskContext(taskTemplate, taskMetadata)
 			r, err := DefaultPodPlugin.BuildResource(context.TODO(), taskContext)
 			assert.Nil(t, err)
@@ -343,11 +344,54 @@ func TestContainerTaskExecutor_BuildResource_ExtendedResources(t *testing.T) {
 	}
 }
 
+func TestContainerTaskExecutor_BuildResource_ContainerImage(t *testing.T) {
+	assert.NoError(t, flytek8sConfig.SetK8sPluginConfig(&flytek8sConfig.K8sPluginConfig{}))
+
+	fixtures := []struct {
+		name                   string
+		resources              *v1.ResourceRequirements
+		containerImageOverride string
+	}{
+		{
+			"without overrides",
+			&v1.ResourceRequirements{
+				Limits: v1.ResourceList{
+					flytek8s.ResourceNvidiaGPU: resource.MustParse("1"),
+				},
+			},
+			"",
+		},
+		{
+			"with overrides",
+			&v1.ResourceRequirements{
+				Limits: v1.ResourceList{
+					flytek8s.ResourceNvidiaGPU: resource.MustParse("1"),
+				},
+			},
+			"test-image",
+		},
+	}
+
+	for _, f := range fixtures {
+		t.Run(f.name, func(t *testing.T) {
+			taskTemplate := dummyContainerTaskTemplate([]string{"command"}, []string{"{{.Input}}"})
+			taskMetadata := dummyContainerTaskMetadata(f.resources, nil, true, f.containerImageOverride)
+			taskContext := dummyContainerTaskContext(taskTemplate, taskMetadata)
+			r, err := DefaultPodPlugin.BuildResource(context.TODO(), taskContext)
+			assert.Nil(t, err)
+			assert.NotNil(t, r)
+			_, ok := r.(*v1.Pod)
+			assert.True(t, ok)
+			assert.Equal(t, f.containerImageOverride, r.(*v1.Pod).Spec.Containers[0].Image)
+		})
+	}
+}
+
 func TestContainerTaskExecutor_GetTaskStatus(t *testing.T) {
 	command := []string{"command"}
 	args := []string{"{{.Input}}"}
 	taskTemplate := dummyContainerTaskTemplate(command, args)
-	taskMetadata := dummyContainerTaskMetadata(containerResourceRequirements, nil, true)
+	taskMetadata := dummyContainerTaskMetadata(containerResourceRequirements, nil, true, "")
 	taskCtx := dummyContainerTaskContext(taskTemplate, taskMetadata)
 
 	j := &v1.Pod{
@@ -437,7 +481,7 @@ func TestContainerTaskExecutor_GetTaskStatus_InvalidImageName(t *testing.T) {
 	command := []string{"command"}
 	args := []string{"{{.Input}}"}
 	taskTemplate := dummyContainerTaskTemplate(command, args)
-	taskMetadata := dummyContainerTaskMetadata(containerResourceRequirements, nil, true)
+	taskMetadata := dummyContainerTaskMetadata(containerResourceRequirements, nil, true, "")
 	taskCtx := dummyContainerTaskContext(taskTemplate, taskMetadata)
 
 	ctx := context.TODO()

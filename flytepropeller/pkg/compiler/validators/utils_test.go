@@ -3,6 +3,7 @@ package validators
 import (
 	"testing"
 
+	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
@@ -51,6 +52,290 @@ func TestLiteralTypeForLiterals(t *testing.T) {
 		assert.Equal(t, core.SimpleType_INTEGER.String(), lt.GetUnionType().Variants[0].GetSimple().String())
 		assert.Equal(t, core.SimpleType_STRING.String(), lt.GetUnionType().Variants[1].GetSimple().String())
 	})
+
+	t.Run("list with mixed types", func(t *testing.T) {
+		literals := &core.Literal{
+			Value: &core.Literal_Collection{
+				Collection: &core.LiteralCollection{
+					Literals: []*core.Literal{
+						{
+							Value: &core.Literal_Scalar{
+								Scalar: &core.Scalar{
+									Value: &core.Scalar_Union{
+										Union: &core.Union{
+											Value: &core.Literal{
+												Value: &core.Literal_Scalar{
+													Scalar: &core.Scalar{
+														Value: &core.Scalar_Primitive{
+															Primitive: &core.Primitive{
+																Value: &core.Primitive_Integer{
+																	Integer: 1,
+																},
+															},
+														},
+													},
+												},
+											},
+											Type: &core.LiteralType{
+												Type: &core.LiteralType_Simple{
+													Simple: core.SimpleType_INTEGER,
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+						{
+							Value: &core.Literal_Scalar{
+								Scalar: &core.Scalar{
+									Value: &core.Scalar_Union{
+										Union: &core.Union{
+											Value: &core.Literal{
+												Value: &core.Literal_Scalar{
+													Scalar: &core.Scalar{
+														Value: &core.Scalar_Primitive{
+															Primitive: &core.Primitive{
+																Value: &core.Primitive_StringValue{
+																	StringValue: "foo",
+																},
+															},
+														},
+													},
+												},
+											},
+											Type: &core.LiteralType{
+												Type: &core.LiteralType_Simple{
+													Simple: core.SimpleType_STRING,
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+
+		lt := LiteralTypeForLiteral(literals)
+
+		expectedLt := &core.LiteralType{
+			Type: &core.LiteralType_CollectionType{
+				CollectionType: &core.LiteralType{
+					Type: &core.LiteralType_UnionType{
+						UnionType: &core.UnionType{
+							Variants: []*core.LiteralType{
+								{
+									Type: &core.LiteralType_UnionType{
+										UnionType: &core.UnionType{
+											Variants: []*core.LiteralType{
+												{
+													Type: &core.LiteralType_Simple{
+														Simple: core.SimpleType_INTEGER,
+													},
+												},
+											},
+										},
+									},
+								},
+								{
+									Type: &core.LiteralType_UnionType{
+										UnionType: &core.UnionType{
+											Variants: []*core.LiteralType{
+												{
+													Type: &core.LiteralType_Simple{
+														Simple: core.SimpleType_STRING,
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+
+		assert.True(t, proto.Equal(expectedLt, lt))
+	})
+
+	t.Run("nested lists with empty list", func(t *testing.T) {
+		literals := &core.Literal{
+			Value: &core.Literal_Collection{
+				Collection: &core.LiteralCollection{
+					Literals: []*core.Literal{
+						{
+							Value: &core.Literal_Collection{
+								Collection: &core.LiteralCollection{
+									Literals: []*core.Literal{
+										{
+											Value: &core.Literal_Scalar{
+												Scalar: &core.Scalar{
+													Value: &core.Scalar_Primitive{
+														Primitive: &core.Primitive{
+															Value: &core.Primitive_StringValue{
+																StringValue: "foo",
+															},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+						{
+							Value: &core.Literal_Collection{
+								Collection: &core.LiteralCollection{},
+							},
+						},
+					},
+				},
+			},
+		}
+
+		lt := LiteralTypeForLiteral(literals)
+
+		expectedLt := &core.LiteralType{
+			Type: &core.LiteralType_CollectionType{
+				CollectionType: &core.LiteralType{
+					Type: &core.LiteralType_CollectionType{
+						CollectionType: &core.LiteralType{
+							Type: &core.LiteralType_Simple{
+								Simple: core.SimpleType_STRING,
+							},
+						},
+					},
+				},
+			},
+		}
+
+		assert.True(t, proto.Equal(expectedLt, lt))
+	})
+
+	t.Run("nested Lists with different types", func(t *testing.T) {
+		literals := &core.Literal{
+			Value: &core.Literal_Collection{
+				Collection: &core.LiteralCollection{
+					Literals: []*core.Literal{
+						{
+							Value: &core.Literal_Collection{
+								Collection: &core.LiteralCollection{
+									Literals: []*core.Literal{
+										{
+											Value: &core.Literal_Scalar{
+												Scalar: &core.Scalar{
+													Value: &core.Scalar_Union{
+														Union: &core.Union{
+															Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}},
+															Value: &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{
+																Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_Integer{Integer: 1}}}}}},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+						{
+							Value: &core.Literal_Collection{
+								Collection: &core.LiteralCollection{
+									Literals: []*core.Literal{
+										{
+											Value: &core.Literal_Scalar{
+												Scalar: &core.Scalar{
+													Value: &core.Scalar_Union{
+														Union: &core.Union{
+															Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING}},
+															Value: &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{
+																Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_StringValue{StringValue: "foo"}}}}}},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+
+		expectedLt := &core.LiteralType{
+			Type: &core.LiteralType_CollectionType{
+				CollectionType: &core.LiteralType{
+					Type: &core.LiteralType_CollectionType{
+						CollectionType: &core.LiteralType{
+							Type: &core.LiteralType_UnionType{
+								UnionType: &core.UnionType{
+									Variants: []*core.LiteralType{
+										{
+											Type: &core.LiteralType_Simple{
+												Simple: core.SimpleType_INTEGER,
+											},
+										},
+										{
+											Type: &core.LiteralType_Simple{
+												Simple: core.SimpleType_STRING,
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+
+		lt := LiteralTypeForLiteral(literals)
+
+		assert.True(t, proto.Equal(expectedLt, lt))
+	})
+
+	t.Run("empty nested listed", func(t *testing.T) {
+		literals := &core.Literal{
+			Value: &core.Literal_Collection{
+				Collection: &core.LiteralCollection{
+					Literals: []*core.Literal{
+						{
+							Value: &core.Literal_Collection{
+								Collection: &core.LiteralCollection{},
+							},
+						},
+					},
+				},
+			},
+		}
+
+		expectedLt := &core.LiteralType{
+			Type: &core.LiteralType_CollectionType{
+				CollectionType: &core.LiteralType{
+					Type: &core.LiteralType_CollectionType{
+						CollectionType: &core.LiteralType{
+							Type: &core.LiteralType_Simple{
+								Simple: core.SimpleType_NONE,
+							},
+						},
+					},
+				},
+			},
+		}
+
+		lt := LiteralTypeForLiteral(literals)
+
+		assert.True(t, proto.Equal(expectedLt, lt))
+	})
+
 }
 
 func TestJoinVariableMapsUniqueKeys(t *testing.T) {

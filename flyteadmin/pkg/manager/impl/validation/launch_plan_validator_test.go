@@ -297,7 +297,6 @@ func TestValidateSchedule_NoSchedule(t *testing.T) {
 }
 
 func TestValidateSchedule_ArgNotFixed(t *testing.T) {
-	request := testutils.GetLaunchPlanRequestWithDeprecatedCronSchedule("* * * * * *")
 	inputMap := &core.ParameterMap{
 		Parameters: map[string]*core.Parameter{
 			"foo": {
@@ -310,9 +309,24 @@ func TestValidateSchedule_ArgNotFixed(t *testing.T) {
 			},
 		},
 	}
+	t.Run("with deprecated cron expression", func(t *testing.T) {
+		request := testutils.GetLaunchPlanRequestWithDeprecatedCronSchedule("* * * * * *")
 
-	err := validateSchedule(request, inputMap)
-	assert.NotNil(t, err)
+		err := validateSchedule(request, inputMap)
+		assert.NotNil(t, err)
+	})
+	t.Run("with rate", func(t *testing.T) {
+		request := testutils.GetLaunchPlanRequestWithFixedRateSchedule(2, admin.FixedRateUnit_HOUR)
+
+		err := validateSchedule(request, inputMap)
+		assert.NotNil(t, err)
+	})
+	t.Run("with cron schedule", func(t *testing.T) {
+		request := testutils.GetLaunchPlanRequestWithCronSchedule("* * * * * *")
+
+		err := validateSchedule(request, inputMap)
+		assert.NotNil(t, err)
+	})
 }
 
 func TestValidateSchedule_KickoffTimeArgDoesNotExist(t *testing.T) {

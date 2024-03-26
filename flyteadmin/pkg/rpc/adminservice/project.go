@@ -63,3 +63,21 @@ func (m *AdminService) UpdateProject(ctx context.Context, request *admin.Project
 
 	return response, nil
 }
+
+func (m *AdminService) GetProject(ctx context.Context, request *admin.ProjectGetRequest) (*admin.Project, error) {
+	defer m.interceptPanic(ctx, request)
+	if request == nil {
+		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
+	}
+	var response *admin.Project
+	var err error
+	m.Metrics.projectEndpointMetrics.get.Time(func() {
+		response, err = m.ProjectManager.GetProject(ctx, *request)
+	})
+	if err != nil {
+		return nil, util.TransformAndRecordError(err, &m.Metrics.projectEndpointMetrics.get)
+	}
+
+	m.Metrics.projectEndpointMetrics.get.Success()
+	return response, nil
+}

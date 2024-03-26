@@ -52,6 +52,7 @@ func GetLogsForContainerInPod(ctx context.Context, logPlugin tasklog.Plugin, tas
 			TaskExecutionID:      taskExecID,
 			ExtraTemplateVars:    extraLogTemplateVars,
 			TaskTemplate:         taskTemplate,
+			HostName:             pod.Spec.Hostname,
 		},
 	)
 

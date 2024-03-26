@@ -24,7 +24,7 @@ func verifyClaims(expectedAudience sets.String, claimsRaw map[string]interface{}
 	}
 
 	if foundAudIndex < 0 {
-		return nil, fmt.Errorf("invalid audience [%v]", claims)
+		return nil, fmt.Errorf("invalid audience [%v], wanted [%v]", claims, expectedAudience)
 	}
 
 	userInfo := &service.UserInfoResponse{}

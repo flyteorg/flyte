@@ -14,6 +14,7 @@ import "flyteidl/core/security.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
+import "flyteidl/admin/matchable_resource.proto";
 
 // Request to launch an execution with the given project, domain and optionally-assigned name.
 message ExecutionCreateRequest {
@@ -221,6 +222,9 @@ message ExecutionMetadata {
 
         // This execution was recovered from another execution.
         RECOVERED = 5;
+
+        // Execution was kicked off by the artifact trigger system
+        TRIGGER = 6;
     }
     ExecutionMode mode = 1;
 
@@ -327,6 +331,9 @@ message ExecutionSpec {
 
     // Tags to be set for the execution.
     repeated string tags = 24;
+
+    // Execution cluster label to be set for the execution.
+    ExecutionClusterLabel execution_cluster_label = 25;
 }
 
 // Request to terminate an in-progress execution.  This action is irreversible.

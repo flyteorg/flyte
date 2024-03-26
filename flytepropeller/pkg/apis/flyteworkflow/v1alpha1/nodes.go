@@ -175,6 +175,8 @@ type NodeSpec struct {
 	// The value set to True means task is OK with getting interrupted
 	// +optional
 	Interruptible *bool `json:"interruptible,omitempty"`
+
+	ContainerImage string `json:"containerImage,omitempty"`
 }
 
 func (in *NodeSpec) GetName() string {
@@ -272,4 +274,8 @@ func (in *NodeSpec) IsEndNode() bool {
 
 func (in *NodeSpec) GetInputBindings() []*Binding {
 	return in.InputBindings
+}
+
+func (in *NodeSpec) GetContainerImage() string {
+	return in.ContainerImage
 }
