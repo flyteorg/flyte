@@ -28,7 +28,7 @@ In this scheme, resources are periodically evaluated and the goal is to transiti
 In our case, workflows are the resources, whose desired stated (*workflow definition*) is expressed using Flyte's SDK.  Workflows are iteratively evaluated to transition from the current state to success. During each evaluation loop, the current workflow state is established as the `phase of workflow nodes <https://docs.flyte.org/en/latest/protos/docs/core/core.html#workflowexecution-phase>`__  and subsequent tasks, and FlytePropeller performs operations to transition this state to success. 
 The operations may include scheduling (or rescheduling) node executions, evaluating dynamic or branch nodes, etc. 
 
-By using a simple yet robust mechanism, FlytePropeller can scale to manage a large number of concurrent workflows without performance degradation.
+By using a simple yet robust mechanism, FlytePropeller can scale to manage a large number of concurrent workflows without significant performance degradation.
 
 This document attempts to break down the FlytePropeller architecture by tracking workflow life cycle through each internal component. Below is a high-level illustration of the FlytePropeller architecture and a flow chart of each component's responsibilities during FlyteWorkflow execution.
 
