@@ -11,14 +11,18 @@ jupytext:
 
 ## How agent plugin service works?
 Before testing agents in the development environment, let's talk about how it works.
+
 Compare to the bigquery plugin example here's how the bigquery agent service work.
+
 Bigquery plugin
+
 ![image.png](https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/concepts/agents/plugin_life_cycle.png)
 
 The life cycle will be
 1. FlytePropeller sends request through SDK.
 
 Bigquery agent service
+
 ![image.png](https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/concepts/agents/async_agent_life_cycle.png)
 
 The life cycle will be
@@ -26,6 +30,7 @@ The life cycle will be
 2. Agent server sends request through SDK and return the query data.
 
 You can find that it is a little bit slower than the plugin example above.
+
 But it is far more easier to be implemented and still faster than writing the service in a pod task.
 
 ## How to setup Agent Service in Development Mode?
