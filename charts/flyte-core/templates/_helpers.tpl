@@ -237,4 +237,7 @@ storage:
   enable-multicontainer: {{ .Values.storage.enableMultiContainer }}
   limits:
     maxDownloadMBs: {{ .Values.storage.limits.maxDownloadMBs }}
+  cache:
+    max_size_mbs: {{ .Values.storage.cache.maxSizeMBs }}
+    target_gc_percent: {{ .Values.storage.cache.targetGCPercent }}
 {{- end }}
