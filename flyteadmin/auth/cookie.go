@@ -19,7 +19,7 @@ import (
 const (
 	// #nosec
 	accessTokenCookieName = "flyte_at"
-	// nosec
+	// #nosec
 	accessTokenCookieNameSplit = "flyte_at_1"
 	// #nosec
 	idTokenCookieName = "flyte_idt"
