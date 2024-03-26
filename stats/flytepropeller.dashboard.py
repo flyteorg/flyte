@@ -2,8 +2,9 @@ import typing
 
 from grafanalib.core import (MILLISECONDS_FORMAT, NO_FORMAT, OPS_FORMAT,
                              PERCENT_FORMAT, SECONDS_FORMAT, SHORT_FORMAT,
-                             Dashboard, DataSourceInput, Gauge, Graph, Row,
-                             Stat, Target, YAxes, YAxis, single_y_axis, BarGauge)
+                             BarGauge, Dashboard, DataSourceInput, Gauge,
+                             Graph, Row, Stat, Target, YAxes, YAxis,
+                             single_y_axis)
 
 # ------------------------------
 # For Gostats we recommend using
@@ -93,7 +94,7 @@ class FlytePropeller(object):
                 YAxis(format=SHORT_FORMAT),
             ),
         )
-    
+
     @staticmethod
     def skipped_rounds() -> Graph:
         return Graph(
@@ -110,7 +111,6 @@ class FlytePropeller(object):
                 YAxis(format=SHORT_FORMAT),
             ),
         )
-    
 
     @staticmethod
     def system_errors() -> Graph:
@@ -680,8 +680,19 @@ class FlytePropeller(object):
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr='rate(flyte:propeller:all:main_adds[5m])',
+                            expr="rate(flyte:propeller:all:main_adds[5m])",
+                            legendFormat="main",
                             refId="A",
+                        ),
+                        Target(
+                            expr="rate(flyte:propeller:all:sub_adds[5m])",
+                            legendFormat="sub",
+                            refId="B",
+                        ),
+                        Target(
+                            expr="rate(flyte:propeller:all:admin_launcher:_adds[5m])",
+                            legendFormat="admin_launcher",
+                            refId="C",
                         ),
                     ],
                     yAxes=single_y_axis(format=SHORT_FORMAT),
@@ -691,8 +702,19 @@ class FlytePropeller(object):
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr='flyte:propeller:all:main_depth',
+                            expr="flyte:propeller:all:main_depth",
+                            legendFormat="main",
                             refId="A",
+                        ),
+                        Target(
+                            expr="flyte:propeller:all:sub_depth",
+                            legendFormat="sub",
+                            refId="B",
+                        ),
+                        Target(
+                            expr="flyte:propeller:all:admin_launcher:_depth",
+                            legendFormat="admin_launcher",
+                            refId="C",
                         ),
                     ],
                     yAxes=single_y_axis(format=SHORT_FORMAT),
@@ -702,8 +724,19 @@ class FlytePropeller(object):
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr='rate(flyte:propeller:all:main_retries[5m])',
+                            expr="rate(flyte:propeller:all:main_retries[5m])",
+                            legendFormat="main",
                             refId="A",
+                        ),
+                        Target(
+                            expr="rate(flyte:propeller:all:sub_retries[5m])",
+                            legendFormat="sub",
+                            refId="B",
+                        ),
+                        Target(
+                            expr="rate(flyte:propeller:all:admin_launcher:_retries[5m])",
+                            legendFormat="admin_launcher",
+                            refId="C",
                         ),
                     ],
                     yAxes=single_y_axis(format=SHORT_FORMAT),
@@ -713,8 +746,41 @@ class FlytePropeller(object):
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr='flyte:propeller:all:main_unfinished_work_s',
+                            expr="flyte:propeller:all:main_unfinished_work_s",
+                            legendFormat="main",
                             refId="A",
+                        ),
+                        Target(
+                            expr="flyte:propeller:all:sub_unfinished_work_s",
+                            legendFormat="sub",
+                            refId="B",
+                        ),
+                        Target(
+                            expr="flyte:propeller:all:admin_launcher:_unfinished_work_s",
+                            legendFormat="admin_launcher",
+                            refId="C",
+                        ),
+                    ],
+                    yAxes=single_y_axis(format=SECONDS_FORMAT),
+                ),
+                Graph(
+                    title="Average time before item being requested from work queue",
+                    dataSource=DATASOURCE,
+                    targets=[
+                        Target(
+                            expr="flyte:propeller:all:main_work_duration_us_sum/(flyte:propeller:all:main_work_duration_us_count*1000000)",
+                            legendFormat="main",
+                            refId="A",
+                        ),
+                        Target(
+                            expr="flyte:propeller:all:sub_work_duration_us_sum/(flyte:propeller:all:sub_work_duration_us_count*1000000)",
+                            legendFormat="sub",
+                            refId="B",
+                        ),
+                        Target(
+                            expr="flyte:propeller:all:admin_launcher:_queue_latency_us_sum/(flyte:propeller:all:admin_launcher:_queue_latency_us_count*1000000)",
+                            legendFormat="admin_launcher",
+                            refId="C",
                         ),
                     ],
                     yAxes=single_y_axis(format=SECONDS_FORMAT),
