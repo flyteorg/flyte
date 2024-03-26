@@ -215,7 +215,6 @@ flytepropeller:
       cpu: 10m
       ephemeral-storage: 50Mi
       memory: 100Mi
-  cacheSizeMbs: 0
   # -- Default regex string for searching configuration files
   configPath: /etc/flyte/config/*.yaml
 
@@ -399,6 +398,8 @@ storage:
   # -- default limits being applied to storage config
   limits:
     maxDownloadMBs: 10
+  cache:
+    maxSizeMBs: 0
 
 # Database configuration(These are the values for a pgdb instance with hostname of postgres-flyte and postgres/password creds)
 db:
