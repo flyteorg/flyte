@@ -79,12 +79,16 @@ make compile
 ```
 
 5. Set up your secrets
-In the development environment, you can set up your secrets in 2 ways.
-- Add secrets in `/etc/secrets/SECRET_GROUP/SECRET_NAME`. 
+In the development environment, you can set up your secrets in local host.
+- Add secrets in `/etc/secrets/SECRET_NAME`. 
 
 Since your agent server is on your localhost, it can retrieve the secret locally.
 
-- Add secrets through `kubectl` with the following command:
+6. Test your agent task
 ```bash
-kubectl create secret generic SECRET_GROUP --from-literal=SECRET_NAME="SECRET VALUE" -n flytesnacks-development
+pyflyte run --remote agent_workflow.py agent_task
 ```
+
+:::{note}
+Please ensure you've built an image and specified it by `--image` flag or use ImageSpec to include the plugin for the task.
+:::
