@@ -1,0 +1,139 @@
+tasks:
+- container:
+    args:
+    - --task-module
+    - app.workflows.work
+    - --task-name
+    - find_odd_numbers
+    - --inputs
+    - '{{$input}}'
+    - --output-prefix
+    - '{{$outputPrefix}}'
+    command:
+    - pyflyte-execute
+    config:
+    - key: testKey1
+      value: testValue1
+    - key: testKey2
+      value: testValue2
+    - key: testKey3
+      value: testValue3
+    - key: testKey1
+      value: testValue1
+    - key: testKey2
+      value: testValue2
+    - key: testKey3
+      value: testValue3
+    - key: testKey1
+      value: testValue1
+    - key: testKey2
+      value: testValue2
+    - key: testKey3
+      value: testValue3
+    - key: testKey1
+      value: testValue1
+    - key: testKey2
+      value: testValue2
+    - key: testKey3
+      value: testValue3
+    - key: testKey1
+      value: testValue1
+    - key: testKey2
+      value: testValue2
+    - key: testKey3
+      value: testValue3
+    - key: testKey1
+      value: testValue1
+    - key: testKey2
+      value: testValue2
+    - key: testKey3
+      value: testValue3
+    - key: testKey1
+      value: testValue1
+    - key: testKey2
+      value: testValue2
+    - key: testKey3
+      value: testValue3
+    - key: testKey1
+      value: testValue1
+    - key: testKey2
+      value: testValue2
+    - key: testKey3
+      value: testValue3
+    - key: testKey1
+      value: testValue1
+    - key: testKey2
+      value: testValue2
+    - key: testKey3
+      value: testValue3
+    - key: testKey1
+      value: testValue1
+    - key: testKey2
+      value: testValue2
+    - key: testKey3
+      value: testValue3
+    - key: testKey1
+      value: testValue1
+    - key: testKey2
+      value: testValue2
+    - key: testKey3
+      value: testValue3
+    image: myflytecontainer:abc123
+    resources: {}
+  id:
+    name: app.workflows.work.find_odd_numbers
+  interface:
+    inputs:
+      variables:
+        list_of_nums:
+          type:
+            collectionType:
+              simple: INTEGER
+    outputs:
+      variables:
+        are_num_odd:
+          type:
+            collectionType:
+              simple: BOOLEAN
+  metadata:
+    discoveryVersion: "1"
+    retries: {}
+    runtime:
+      flavor: python
+      type: FLYTE_SDK
+      version: 0.0.1a0
+    timeout: 0s
+  type: python-task
+workflow:
+  id:
+    name: app-workflows-work-one-python-task-w-f
+  interface:
+    inputs: {}
+    outputs: {}
+  metadata: {}
+  nodes:
+  - id: odd-nums-task
+    inputs:
+    - binding:
+        collection:
+          bindings:
+          - scalar:
+              primitive:
+                integer: "2"
+          - scalar:
+              primitive:
+                integer: "3"
+          - scalar:
+              primitive:
+                integer: "4"
+          - scalar:
+              primitive:
+                integer: "7"
+      var: list_of_nums
+    metadata:
+      name: DEADBEEF
+      retries: {}
+      timeout: 0s
+    taskNode:
+      referenceId:
+        name: app.workflows.work.find_odd_numbers

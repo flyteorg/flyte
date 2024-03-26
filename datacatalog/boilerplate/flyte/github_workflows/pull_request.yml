@@ -1,0 +1,19 @@
+name: Pull Request
+
+on:
+  pull_request
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Push Docker Image to Github Registry
+        uses: whoan/docker-build-with-cache-action@v5
+        with:
+          username: "${{ github.actor }}"
+          password: "${{ secrets.GITHUB_TOKEN }}"
+          image_name: ${{ secrets.package_name }}
+          image_tag: ${{ github.sha }}
+          push_git_tag: true
+          registry: docker.pkg.github.com

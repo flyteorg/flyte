@@ -28,6 +28,13 @@ helm.sh/chart: {{ include "flyte.chart" . }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
 
+{{- define "flyteadmin.podLabels" -}}
+{{ include "flyteadmin.labels" . }}
+{{- with .Values.flyteadmin.podLabels }}
+{{ toYaml . }}
+{{- end }}
+{{- end -}}
+
 {{- define "flytescheduler.name" -}}
 flytescheduler
 {{- end -}}
@@ -42,6 +49,13 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{ include "flytescheduler.selectorLabels" . }}
 helm.sh/chart: {{ include "flyte.chart" . }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end -}}
+
+{{- define "flytescheduler.podLabels" -}}
+{{ include "flytescheduler.labels" . }}
+{{- with .Values.flytescheduler.podLabels }}
+{{ toYaml . }}
+{{- end }}
 {{- end -}}
 
 {{- define "flyteclusterresourcesync.name" -}}
@@ -59,6 +73,13 @@ helm.sh/chart: {{ include "flyte.chart" . }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
 
+{{- define "flyteclusterresourcesync.podLabels" -}}
+{{ include "flyteclusterresourcesync.labels" . }}
+{{- with .Values.cluster_resource_manager.podLabels }}
+{{ toYaml . }}
+{{- end }}
+{{- end -}}
+
 {{- define "datacatalog.name" -}}
 datacatalog
 {{- end -}}
@@ -74,6 +95,12 @@ helm.sh/chart: {{ include "flyte.chart" . }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
 
+{{- define "datacatalog.podLabels" -}}
+{{ include "datacatalog.labels" . }}
+{{- with .Values.datacatalog.podLabels }}
+{{ toYaml . }}
+{{- end }}
+{{- end -}}
 
 {{- define "flytepropeller.name" -}}
 flytepropeller
@@ -90,6 +117,13 @@ helm.sh/chart: {{ include "flyte.chart" . }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
 
+{{- define "flytepropeller.podLabels" -}}
+{{ include "flytepropeller.labels" . }}
+{{- with .Values.flytepropeller.podLabels }}
+{{ toYaml . }}
+{{- end }}
+{{- end -}}
+
 {{- define "flytepropeller-manager.name" -}}
 flytepropeller-manager
 {{- end -}}
@@ -103,6 +137,13 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{ include "flytepropeller-manager.selectorLabels" . }}
 helm.sh/chart: {{ include "flyte.chart" . }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end -}}
+
+{{- define "flytepropeller-manager.podLabels" -}}
+{{ include "flytepropeller-manager.labels" . }}
+{{- with .Values.flytepropeller.podLabels }}
+{{ toYaml . }}
+{{- end }}
 {{- end -}}
 
 {{- define "flyte-pod-webhook.name" -}}
@@ -123,6 +164,13 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{ include "flyteconsole.selectorLabels" . }}
 helm.sh/chart: {{ include "flyte.chart" . }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end -}}
+
+{{- define "flyteconsole.podLabels" -}}
+{{ include "flyteconsole.labels" . }}
+{{- with .Values.flyteconsole.podLabels }}
+{{ toYaml . }}
+{{- end }}
 {{- end -}}
 
 # Optional blocks for secret mount
@@ -161,7 +209,7 @@ storage:
     config:
       json: ""
       project_id: {{ .Values.storage.gcs.projectId }}
-      scopes: https://www.googleapis.com/auth/devstorage.read_write
+      scopes: https://www.googleapis.com/auth/cloud-platform
   container: {{ .Values.storage.bucketName | quote }}
 {{- else if eq .Values.storage.type "sandbox" }}
   type: minio
@@ -177,7 +225,7 @@ storage:
       region: us-east-1
   signedUrl:
     stowConfigOverride:
-      endpoint: http://localhost:30084
+      endpoint: http://minio.{{ .Release.Namespace }}.svc.cluster.local:9000
 {{- else if eq .Values.storage.type "custom" }}
 {{- with .Values.storage.custom -}}
   {{ tpl (toYaml .) $ | nindent 2 }}

@@ -1,0 +1,40 @@
+run:
+  skip-files:
+    # because we're skipping TLS verification - for now
+    - cmd/entrypoints/serve.go
+    - pkg/async/messages/sqs.go
+
+linters:
+  disable-all: true
+  enable:
+    - deadcode
+    - errcheck
+    - gas
+    - gci
+    - goconst
+    - goimports
+    - golint
+    - gosimple
+    - govet
+    - ineffassign
+    - misspell
+    - nakedret
+    - staticcheck
+    - structcheck
+    - typecheck
+    - unconvert
+    - unparam
+    - unused
+    - varcheck
+
+linters-settings:
+  gci:
+    custom-order: true
+    sections:
+      - standard
+      - default
+      - prefix(github.com/flyteorg)
+    skip-generated: true
+issues:
+  exclude:
+    - copylocks

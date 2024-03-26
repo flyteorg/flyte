@@ -1,0 +1,16 @@
+workflow:
+  id:
+    name: workflow-id-123
+    domain: development
+    project: flytesnacks
+  interface:
+    inputs:
+      variables: {}
+  nodes:
+  - id: node-1
+    gateNode:
+      signal:
+        signalId: foo
+        type:
+          simple: BOOLEAN
+        outputVariableName: o0

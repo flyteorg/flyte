@@ -1,6 +1,6 @@
 # flyte-sandbox
 
-![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.16.0](https://img.shields.io/badge/AppVersion-1.16.0-informational?style=flat-square)
+![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.16.1](https://img.shields.io/badge/AppVersion-1.16.1-informational?style=flat-square)
 
 A Helm chart for the Flyte local sandbox
 
@@ -9,8 +9,8 @@ A Helm chart for the Flyte local sandbox
 | Repository | Name | Version |
 |------------|------|---------|
 | file://../flyte-binary | flyte-binary | v0.1.10 |
-| https://charts.bitnami.com/bitnami | minio | 12.1.1 |
-| https://charts.bitnami.com/bitnami | postgresql | 12.1.9 |
+| https://charts.bitnami.com/bitnami | minio | 12.6.7 |
+| https://charts.bitnami.com/bitnami | postgresql | 12.8.1 |
 | https://helm.twun.io/ | docker-registry | 2.2.2 |
 | https://kubernetes.github.io/dashboard/ | kubernetes-dashboard | 6.0.0 |
 
@@ -31,8 +31,16 @@ A Helm chart for the Flyte local sandbox
 | flyte-binary.configuration.inline.plugins.k8s.default-env-vars[1].FLYTE_AWS_ACCESS_KEY_ID | string | `"minio"` |  |
 | flyte-binary.configuration.inline.plugins.k8s.default-env-vars[2].FLYTE_AWS_SECRET_ACCESS_KEY | string | `"miniostorage"` |  |
 | flyte-binary.configuration.inline.storage.signedURL.stowConfigOverride.endpoint | string | `"http://localhost:30002"` |  |
+| flyte-binary.configuration.inline.task_resources.defaults.cpu | string | `"500m"` |  |
+| flyte-binary.configuration.inline.task_resources.defaults.ephemeralStorage | int | `0` |  |
+| flyte-binary.configuration.inline.task_resources.defaults.gpu | int | `0` |  |
+| flyte-binary.configuration.inline.task_resources.defaults.memory | string | `"1Gi"` |  |
+| flyte-binary.configuration.inline.task_resources.limits.cpu | int | `0` |  |
+| flyte-binary.configuration.inline.task_resources.limits.ephemeralStorage | int | `0` |  |
+| flyte-binary.configuration.inline.task_resources.limits.gpu | int | `0` |  |
+| flyte-binary.configuration.inline.task_resources.limits.memory | int | `0` |  |
 | flyte-binary.configuration.inlineConfigMap | string | `"{{ include \"flyte-sandbox.configuration.inlineConfigMap\" . }}"` |  |
-| flyte-binary.configuration.logging.level | int | `6` |  |
+| flyte-binary.configuration.logging.level | int | `5` |  |
 | flyte-binary.configuration.logging.plugins.kubernetes.enabled | bool | `true` |  |
 | flyte-binary.configuration.logging.plugins.kubernetes.templateUri | string | `"http://localhost:30080/kubernetes-dashboard/#/log/{{.namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}"` |  |
 | flyte-binary.configuration.storage.metadataContainer | string | `"my-s3-bucket"` |  |
@@ -92,6 +100,10 @@ A Helm chart for the Flyte local sandbox
 | postgresql.volumePermissions.enabled | bool | `true` |  |
 | postgresql.volumePermissions.image.pullPolicy | string | `"Never"` |  |
 | postgresql.volumePermissions.image.tag | string | `"sandbox"` |  |
+| sandbox.buildkit.enabled | bool | `true` |  |
+| sandbox.buildkit.image.pullPolicy | string | `"Never"` |  |
+| sandbox.buildkit.image.repository | string | `"moby/buildkit"` |  |
+| sandbox.buildkit.image.tag | string | `"sandbox"` |  |
 | sandbox.dev | bool | `false` |  |
 | sandbox.proxy.enabled | bool | `true` |  |
 | sandbox.proxy.image.pullPolicy | string | `"Never"` |  |

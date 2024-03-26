@@ -1,0 +1,16 @@
+helmGlobals:
+  chartHome: ../../../../charts
+helmCharts:
+- name: flyte-sandbox
+  releaseName: flyte-sandbox
+  namespace: flyte
+  valuesInline:
+    flyte-binary:
+      flyteagent:
+        enabled: True
+namespace: flyte
+resources:
+- ../namespace.yaml
+
+patchesStrategicMerge:
+  - add-agent-secret-patch.yaml

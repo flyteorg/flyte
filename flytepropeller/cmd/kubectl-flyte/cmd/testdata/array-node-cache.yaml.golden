@@ -1,0 +1,91 @@
+tasks:
+- container:
+    args:
+    - "pyflyte-fast-execute"
+    - "--additional-distribution"
+    - "s3://my-s3-bucket/flytesnacks/development/SMJBJX7BQJ6MCOABLKQT5VZXVY======/script_mode.tar.gz"
+    - "--dest-dir"
+    - "/root"
+    - "--"
+    - "pyflyte-map-execute"
+    - "--inputs"
+    - "{{.input}}"
+    - "--output-prefix"
+    - "{{.outputPrefix}}"
+    - "--raw-output-data-prefix"
+    - "{{.rawOutputDataPrefix}}"
+    - "--checkpoint-path"
+    - "{{.checkpointOutputPrefix}}"
+    - "--prev-checkpoint"
+    - "{{.prevCheckpointPrefix}}"
+    - "--resolver"
+    - "MapTaskResolver"
+    - "--"
+    - "vars"
+    - ""
+    - "resolver"
+    - "flytekit.core.python_auto_container.default_task_resolver"
+    - "task-module"
+    - "map-task"
+    - "task-name"
+    - "a_mappable_task"
+    image: "array-node:ee1ba227aa95447d04bb1761691b4d97749642dc"
+    resources:
+      limits:
+        - name: 1
+          value: "1"
+        - name: 3
+          value: "500Mi"
+      requests:
+        - name: 1
+          value: "1"
+        - name: 3
+          value: "300Mi"
+  id:
+    name: task-1
+    project: flytesnacks
+    domain: development
+  metadata:
+    discoverable: true
+    discovery_version: "1.0"
+    cache_serializable: false
+  interface:
+    inputs:
+      variables:
+        a:
+          type:
+            simple: INTEGER
+    outputs:
+      variables:
+        o0:
+          type:
+            simple: STRING
+workflow:
+  id:
+    name: workflow-with-array-node
+  interface:
+    inputs:
+      variables:
+        x:
+          type:
+            collectionType:
+              simple: INTEGER
+  nodes:
+  - id: node-1
+    inputs:
+    - binding:
+        promise:
+          node_id: start-node
+          var: x
+      var: a
+    arrayNode:
+      parallelism: 1
+      node:
+        metadata:
+          retries:
+            retries: 3
+        taskNode:
+          referenceId:
+            name: task-1
+            project: flytesnacks
+            domain: development

@@ -23,6 +23,9 @@ flyteadmin:
     annotations:
       eks.amazonaws.com/role-arn: arn:aws:iam::{{ .Values.userSettings.accountNumber }}:role/iam-role-flyte
 
+  serviceMonitor:
+    enabled: false
+
   resources:
     limits:
       ephemeral-storage: 200Mi
@@ -78,6 +81,10 @@ datacatalog:
 flytepropeller:
   replicaCount: 2
   manager: false
+  serviceMonitor:
+    enabled: false
+  service:
+    enabled: false
   serviceAccount:
     # -- If the service account is created by you, make this false
     create: true
@@ -102,6 +109,12 @@ flytepropeller:
             matchLabels:
               app.kubernetes.io/name: flytepropeller
           topologyKey: kubernetes.io/hostname
+
+#
+# FLYTE_AGENT
+#
+flyteagent:
+  enabled: false
 
 #
 # FLYTECONSOLE
@@ -245,7 +258,7 @@ configmap:
     propeller:
       resourcemanager:
         type: noop
-        # Note: By default resource manager is disable for propeller, Please use `type: redis` to enaable
+        # Note: By default resource manager is disabled for propeller, Please use `type: redis` to enable
         # type: redis
         # resourceMaxQuota: 10000
         # redis:
@@ -264,6 +277,7 @@ configmap:
           - container
           - sidecar
           - k8s-array
+          - agent-service
         #          - sagemaker_hyperparameter_tuning
         #          - sagemaker_custom_training
         #          - sagemaker_training

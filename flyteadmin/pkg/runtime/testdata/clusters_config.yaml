@@ -1,0 +1,15 @@
+clusters:
+  clusterConfigs:
+  - name: "testcluster"
+    endpoint: "testcluster_endpoint"
+    auth:
+      type: "file_path"
+      tokenPath: "/path/to/testcluster/token"
+      certPath: "/path/to/testcluster/cert"
+  - name: "testcluster2"
+    endpoint: "testcluster2_endpoint"
+    enabled: true
+    auth:
+      type: "file_path"
+      tokenPath: "/path/to/testcluster2/token"
+      certPath: "/path/to/testcluster2/cert"

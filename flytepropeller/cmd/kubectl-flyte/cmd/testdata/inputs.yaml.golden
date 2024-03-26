@@ -1,0 +1,17 @@
+literals:
+  x:
+    scalar:
+      primitive:
+        integer: "2"
+  "y":
+    collection:
+      literals:
+      - scalar:
+          primitive:
+            stringValue: val1
+      - scalar:
+          primitive:
+            stringValue: val2
+      - scalar:
+          primitive:
+            stringValue: val3

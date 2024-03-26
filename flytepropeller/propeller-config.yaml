@@ -1,0 +1,113 @@
+# This is a sample configuration file.
+# Real configuration when running inside K8s (local or otherwise) lives in a ConfigMap
+propeller:
+  rawoutput-prefix: s3://my-container/test/
+  metadata-prefix: metadata/propeller/sandbox
+  workers: 1
+  workflow-reeval-duration: 10s
+  downstream-eval-duration: 5s
+  limit-namespace: "all"
+  prof-port: 11254
+  metrics-prefix: flyte
+  enable-admin-launcher: true
+  max-ttl-hours: 1
+  gc-interval: 500m
+  queue:
+    type: batch
+    queue:
+      type: bucket
+      rate: 20
+      capacity: 100
+    sub-queue:
+      type: bucket
+      rate: 100
+      capacity: 1000
+  # This config assumes using `make start` in flytesnacks repo to startup a DinD k3s container
+  kube-config: "$HOME/.flyte/k3s/k3s.yaml"
+  publish-k8s-events: true
+  workflowStore:
+    policy: "ResourceVersionCache"
+tasks:
+  task-plugins:
+    enabled-plugins:
+      - container
+      - sidecar
+      - K8S-ARRAY
+    # Uncomment to enable sagemaker plugin
+    #      - sagemaker_training
+    #      - sagemaker_hyperparameter_tuning
+    #      - sagemaker_custom_training
+    default-for-task-types:
+      - container: container
+      - container_array: K8S-ARRAY
+#      - presto: my-presto
+# Sample plugins config
+plugins:
+  # All k8s plugins default configuration
+  k8s:
+    inject-finalizer: true
+    default-annotations:
+      - annotationKey1: annotationValue1
+    resource-tolerations:
+      nvidia.com/gpu:
+        key: flyte/gpu
+        value: dedicated
+        operator: Equal
+        effect: NoSchedule
+    default-env-vars:
+      - AWS_METADATA_SERVICE_TIMEOUT: 5
+      - AWS_METADATA_SERVICE_NUM_ATTEMPTS: 20
+      - FLYTE_AWS_ENDPOINT: "http://minio.flyte:9000"
+      - FLYTE_AWS_ACCESS_KEY_ID: minio
+      - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
+    co-pilot:
+      name: "flyte-copilot-"
+      image: "ghcr.io/flyteorg/flytecopilot:v0.0.15"
+      start-timeout: "5s"
+  sagemaker:
+    roleArn: "arn:aws:iam::123456789012:role/test-development"
+    region: "us-east-1"
+    prebuiltAlgorithms:
+      - name: "XGBOOST"
+        regionalConfigs:
+          - region: "us-east-1"
+            versionConfigs:
+              - version: "0.90"
+                image: "683313688378.dkr.ecr.us-east-1.amazonaws.com/sagemaker-xgboost:0.90-2-cpu-py3"
+              - version: "1.0"
+                image: "683313688378.dkr.ecr.us-east-1.amazonaws.com/sagemaker-xgboost:1.0-1-cpu-py3"
+  # Logging configuration
+  logs:
+    kubernetes-enabled: true
+    kubernetes-url: "http://localhost:30082"
+storage:
+  type: minio
+  container: "my-s3-bucket"
+  connection:
+    access-key: minio
+    auth-type: accesskey
+    secret-key: miniostorage
+    disable-ssl: true
+    endpoint: http://localhost:30084
+    region: us-east-1
+  limits:
+    maxDownloadMBs: 10
+event:
+  type: admin
+  rate: 500
+  capacity: 1000
+admin:
+  endpoint: localhost:30081
+  insecure: true
+  defaultServiceConfig: '{"loadBalancingConfig": [{"round_robin":{}}]}'
+catalog-cache:
+  type: noop
+  endpoint: datacatalog:8089
+  insecure: true
+  default-service-config: '{"loadBalancingConfig": [{"round_robin":{}}]}'
+logger:
+  level: 5
+  show-source: true
+webhook:
+  certDir: /etc/webhook/certs
+  serviceName: flyte-pod-webhook

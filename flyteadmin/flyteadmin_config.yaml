@@ -1,0 +1,215 @@
+# This is a sample configuration file.
+# Real configuration when running inside K8s (local or otherwise) lives in a ConfigMap
+# Look in the artifacts directory in the flyte repo for what's actually run
+# https://github.com/lyft/flyte/blob/b47565c9998cde32b0b5f995981e3f3c990fa7cd/artifacts/flyteadmin.yaml#L72
+server:
+  httpPort: 8088
+  grpcPort: 8089
+  grpcServerReflection: true
+  kube-config: /Users/ytong/.flyte/sandbox/kubeconfig
+  security:
+    secure: false
+    useAuth: false
+    allowCors: true
+    allowedOrigins:
+      # Accepting all domains for Sandbox installation
+      - "*"
+    allowedHeaders:
+      - "Content-Type"
+# Okta OIdC only
+auth:
+  authorizedUris:
+    - https://localhost:8088
+    - http://flyteadmin:80
+  userAuth:
+    openId:
+      # Put the URL of the OpenID Connect provider.
+      baseUrl: https://dev-14186422.okta.com/oauth2/auskngnn7uBViQq6b5d6
+      scopes:
+        - profile
+        - openid
+        - offline_access # Uncomment if OIdC supports issuing refresh tokens.
+      # Replace with the client id created for Flyte.
+      clientId: 0oakkheteNjCMERst5d6
+# Okta OIdC and OAuth2
+#auth:
+#  authorizedUris:
+#    - https://localhost:8088
+#    - http://flyteadmin:80
+#  appAuth:
+#    authServerType: External
+#  userAuth:
+#    openId:
+#      # Put the URL of the OpenID Connect provider.
+#      baseUrl: https://dev-14186422.okta.com/oauth2/auskngnn7uBViQq6b5d6
+#      scopes:
+#        - profile
+#        - openid
+#        - offline_access # Uncomment if OIdC supports issuing refresh tokens.
+#      # Replace with the client id created for Flyte.
+#      clientId: 0oakkheteNjCMERst5d6
+flyteadmin:
+  runScheduler: false
+  roleNameKey: "iam.amazonaws.com/role"
+  metricsScope: "flyte:"
+  profilerPort: 10254
+  testing:
+    host: "http://localhost:8088"
+  # This last must be in order! For example, a file path would be prefixed with metadata/admin/...
+  metadataStoragePrefix:
+    - "metadata"
+    - "admin"
+  useOffloadedWorkflowClosure: false
+database:
+  postgres:
+    port: 30001
+    username: postgres
+    password: postgres
+    host: 127.0.0.1
+    dbname: flyte
+    options: "sslmode=disable"
+scheduler:
+  eventScheduler:
+    scheme: local
+    region: "my-region"
+    scheduleRole: "arn:aws:iam::abc123:role/my-iam-role"
+    targetName: "arn:aws:sqs:my-region:abc123:my-queue"
+    scheduleNamePrefix: "flyte"
+  workflowExecutor:
+    scheme: local
+    local:
+      adminRateLimit:
+        tps: 100 # per sec how many requests to send to admin
+        burst: 10 # burst count of request to admin
+    region: "my-region"
+    scheduleQueueName: "won't-work-locally"
+    accountId: "abc123"
+remoteData:
+  region: "my-region"
+  scheme: local
+  signedUrls:
+    durationMinutes: 3
+notifications:
+  type: local
+  region: "my-region"
+  publisher:
+    topicName: "foo"
+  processor:
+    queueName: "queue"
+    accountId: "bar"
+  emailer:
+    subject: "Notice: Execution \"{{ name }}\" has {{ phase }} in \"{{ domain }}\"."
+    sender: "flyte-notifications@example.com"
+    body: >
+      Execution \"{{ name }}\" has {{ phase }} in \"{{ domain }}\". View details at
+      <a href=\http://example.com/projects/{{ project }}/domains/{{ domain }}/executions/{{ name }}>
+      http://example.com/projects/{{ project }}/domains/{{ domain }}/executions/{{ name }}</a>. {{ error }}
+externalEvents:
+  Enable: false
+  type: gcp
+  gcp:
+    projectId: "foo"
+  eventsPublisher:
+    topicName: "bar"
+    eventTypes: all
+Logger:
+  show-source: true
+  level: 5
+storage:
+  type: stow
+  stow:
+    kind: s3
+    config:
+      region: us-east-1
+      disable_ssl: true
+      v2_signing: true
+      endpoint: http://localhost:30002
+      auth_type: accesskey
+      access_key_id: minio
+      secret_key: miniostorage
+  signedUrl:
+    stowConfigOverride:
+      endpoint: http://localhost:30002
+  cache:
+    max_size_mbs: 10
+    target_gc_percent: 100
+  container: "my-s3-bucket"
+queues:
+  executionQueues:
+    - dynamic: "gpu_dynamic"
+      attributes:
+        - gpu
+    - dynamic: "critical"
+      attributes:
+        - critical
+    - dynamic: "default"
+      attributes:
+        - defaultclusters
+  workflowConfigs:
+    - project: "my_queue_1"
+      domain: "production"
+      workflowName: "my_workflow_1"
+      tags:
+        - critical
+    - project: "production"
+      workflowName: "my_workflow_2"
+      tags:
+        - gpu
+    - project: "my_queue_3"
+      domain: "production"
+      workflowName: "my_workflow_3"
+      tags:
+        - critical
+    - tags:
+        - default
+task_resources:
+  defaults:
+    cpu: 100m
+    memory: 200Mi
+    storage: 100M
+  limits:
+    cpu: 500m
+    gpu: 1
+    memory: 300Mi
+    storage: 10G
+task_type_whitelist:
+  sparkonk8s:
+    - project: my_queue_1
+      domain: production
+    - project: my_queue_2
+      domain: production
+  qubolespark:
+    - project: my_queue_2
+domains:
+  - id: development
+    name: development
+  - id: staging
+    name: staging
+  - id: production
+    name: production
+  - id: domain
+    name: domain
+cluster_resources:
+  templatePath: pkg/clusterresource/sampletemplates
+  templateData:
+    foo:
+      value: "bar"
+    foofoo:
+      valueFrom:
+        env: SHELL
+  refresh: 3s
+qualityOfService:
+  tierExecutionValues:
+    LOW:
+      queueingBudget: 30m
+    MEDIUM:
+      queueingBudget: 10m
+    HIGH:
+      queueingBudget: 1m
+    # By default UNDEFINED has no queueing budget when it is omitted from the configuration
+  defaultTiers:
+    development: LOW
+    staging: MEDIUM
+    # by default production has an UNDEFINED tier when it is omitted from the configuration
+namespace_mapping:
+  template: "{{ project }}-{{ domain }}" # Default namespace mapping template.

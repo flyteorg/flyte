@@ -1,0 +1,34 @@
+name: Go Generate
+
+on:
+  workflow_call:
+    inputs:
+      component:
+        required: true
+        type: string
+      go-version:
+        required: true
+        type: string
+    secrets:
+      FLYTE_BOT_PAT:
+        required: true
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    name: Go Generate
+    defaults:
+      run:
+        working-directory: ${{ inputs.component }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: arduino/setup-protoc@v1
+        with:
+          repo-token: ${{ secrets.FLYTE_BOT_PAT }}
+      - uses: bufbuild/buf-setup-action@v1
+        with:
+          github_token: ${{ secrets.FLYTE_BOT_PAT }}
+      - uses: actions/setup-go@v3
+        with:
+          go-version: ${{ inputs.go-version }}
+      - name: Go generate and diff
+        run: DELTA_CHECK=true make generate

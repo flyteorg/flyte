@@ -1,0 +1,31 @@
+name: Master
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+        with:
+          fetch-depth: '0'
+      - name: Bump version and push tag
+        id: bump-version
+        uses: anothrNick/github-tag-action@1.17.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WITH_V: true
+          DEFAULT_BUMP: patch
+      - name: Push Docker Image to Github Registry
+        uses: whoan/docker-build-with-cache-action@v5
+        with:
+          username: "${{ github.actor }}"
+          password: "${{ secrets.GITHUB_TOKEN }}"
+          image_name: ${{ secrets.package_name }}
+          image_tag: latest,${{ github.sha }},${{ steps.bump-version.outputs.tag }}
+          push_git_tag: true
+          registry: docker.pkg.github.com
+          build_extra_args: "--compress=true"

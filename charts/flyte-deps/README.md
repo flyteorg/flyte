@@ -9,8 +9,8 @@ A Helm chart for Flyte dependency
 | Repository | Name | Version |
 |------------|------|---------|
 | https://charts.bitnami.com/bitnami | contour | 7.10.1 |
-| https://googlecloudplatform.github.io/spark-on-k8s-operator | sparkoperator(spark-operator) | 1.1.15 |
 | https://helm.dask.org | daskoperator(dask-kubernetes-operator) | 2022.12.0 |
+| https://kubeflow.github.io/spark-operator | sparkoperator(spark-operator) | 1.1.15 |
 | https://kubernetes.github.io/dashboard/ | kubernetes-dashboard | 4.0.2 |
 
 ### SANDBOX INSTALLATION:
@@ -44,7 +44,7 @@ helm upgrade -f values.yaml flyte .
 
 ### CONFIGURATION NOTES:
 - The docker images, their tags and other default parameters are configured in `values.yaml` file.
-- Each Flyte installation type should have separate `values-*.yaml` file: for sandbox, EKS and etc. The configuration in `values.yaml` and the choosen config `values-*.yaml` are merged when generating the deployment manifest.
+- Each Flyte installation type should have separate `values-*.yaml` file: for sandbox, EKS and etc. The configuration in `values.yaml` and the chosen config `values-*.yaml` are merged when generating the deployment manifest.
 
 ## Values
 

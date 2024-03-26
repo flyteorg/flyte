@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/flyteorg/flyte/cmd/single"
-	_ "github.com/flyteorg/flytepropeller/plugins"
+	_ "github.com/flyteorg/flyte/flytepropeller/plugins"
 	"github.com/golang/glog"
 )
 

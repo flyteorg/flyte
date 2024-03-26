@@ -45,6 +45,6 @@ helm upgrade -f values.yaml flyte .
 
 ### CONFIGURATION NOTES:
 - The docker images, their tags and other default parameters are configured in `values.yaml` file.
-- Each Flyte installation type should have separate `values-*.yaml` file: for sandbox, EKS and etc. The configuration in `values.yaml` and the choosen config `values-*.yaml` are merged when generating the deployment manifest.
+- Each Flyte installation type should have separate `values-*.yaml` file: for sandbox, EKS and etc. The configuration in `values.yaml` and the chosen config `values-*.yaml` are merged when generating the deployment manifest.
 
 {{ template "chart.valuesSection" . }}

@@ -1,0 +1,52 @@
+name: Upload flyteidl to PyPI and npm
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  deploy-to-pypi:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: flyteidl
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: "3.x"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install build twine
+      - name: Build and publish
+        env:
+          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+        run: |
+          python -m build
+          twine upload dist/*
+  deploy-to-npm:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: flyteidl
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: "12.x"
+          registry-url: "https://registry.npmjs.org"
+      - name: Set version in npm package
+        run: |
+          # from refs/tags/v1.2.3 get 1.2.3
+          VERSION=$(echo $GITHUB_REF | sed 's#.*/v##')
+          VERSION=$VERSION make update_npmversion
+        shell: bash
+      - run: |
+          npm install
+      - run: |
+          npm publish --access=public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

@@ -1,0 +1,54 @@
+{
+	"podSpec": {
+		"restartPolicy": "OnFailure",
+		"containers": [{
+			"name": "a container",
+			"image": "foo",
+			"args": ["pyflyte-execute", "--task-module", "tests.flytekit.unit.sdk.tasks.test_sidecar_tasks", "--task-name", "simple_sidecar_task", "--inputs", "{{.input}}", "--output-prefix", "{{.outputPrefix}}"],
+			"volumeMounts": [{
+				"mountPath": "some/where",
+				"name": "volume mount"
+			}],
+			"env": [{
+				"name": "FLYTE_INTERNAL_CONFIGURATION_PATH",
+				"value": "flytekit.config"
+			}, {
+				"name": "FLYTE_INTERNAL_PROJECT",
+				"value": ""
+			}, {
+				"name": "foo",
+				"value": "bar"
+			}, {
+				"name": "FLYTE_INTERNAL_DOMAIN",
+				"value": ""
+			}, {
+				"name": "FLYTE_INTERNAL_VERSION",
+				"value": ""
+			}]
+		}, {
+			"name": "another container"
+		}],
+		"volumes": [{
+			"volumeSource": {
+				"emptyDir": {
+                    "sizeLimit": {
+						"string": "10G"
+					},
+					"medium": "Memory"
+				}
+			},
+			"name": "dshm"
+		}],
+		"tolerations": [{
+		    "key": "my toleration key",
+		    "value": "my toleration value"
+        }]
+	},
+	"primaryContainerName": "a container",
+	"annotations": {
+	    "a1": "a1"
+	},
+	"labels": {
+	    "b1": "b1"
+	}
+}

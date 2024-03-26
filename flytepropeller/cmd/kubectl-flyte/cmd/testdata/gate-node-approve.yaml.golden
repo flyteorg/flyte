@@ -1,0 +1,20 @@
+workflow:
+  id:
+    name: workflow-id-123
+    domain: development
+    project: flytesnacks
+  interface:
+    inputs:
+      variables:
+        x:
+          type:
+            simple: INTEGER
+        "y":
+          type:
+            collectionType:
+              simple: STRING
+  nodes:
+  - id: node-1
+    gateNode:
+      approve:
+        signalId: foo

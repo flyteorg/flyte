@@ -37,6 +37,9 @@ data:
 {{- with .Values.configmap.namespace_config }}
   namespace_config.yaml: | {{ toYaml . | nindent 4 }}
 {{- end }}
+{{- with .Values.configmap.clusterpool_config }}
+  clusterpool_config.yaml: | {{ toYaml . | nindent 4 }}
+{{- end }}
   storage.yaml: | {{ tpl (include "storage" .) $ | nindent 4 }}
 {{- with .Values.configmap.task_resource_defaults }}
   task_resource_defaults.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
@@ -45,7 +48,21 @@ data:
   notifications.yaml: |
     notifications:
       type: {{ .Values.workflow_notifications.config.notifications.type }}
-      region: {{ tpl .Values.workflow_notifications.config.notifications.region $ }}
+      {{- if not .Values.workflow_notifications.config.notifications.aws }}
+      {{- with .Values.workflow_notifications.config.notifications.region }}
+      region: {{ tpl . $ }}
+      {{- end }}
+      {{- end }}
+      {{- if eq .Values.workflow_notifications.config.notifications.type "aws" }}
+      {{- with .Values.workflow_notifications.config.notifications.aws }}
+      aws: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+      {{- end }}
+      {{- if eq .Values.workflow_notifications.config.notifications.type "gcp" }}
+      {{- with .Values.workflow_notifications.config.notifications.gcp }}
+      gcp: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+      {{- end }}
       {{- with .Values.workflow_notifications.config.notifications.publisher }}
       publisher: {{- tpl (toYaml .) $ | nindent 8 }}
       {{- end }}

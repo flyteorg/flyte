@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package flyteadmin.models;
+option go_package = "/models";
+
+// Data about the node execution that is only referenced by FlyteAdmin and never by external callers.
+message NodeExecutionInternalData {
+    // Event version > 0 indicates that node execution events can now include populated IsParent and IsDynamic fields.
+    int32 event_version = 1;
+}

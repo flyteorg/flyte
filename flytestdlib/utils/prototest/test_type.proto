@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package flyteidl.core;
+
+option go_package = "github.com/flyteorg/flytestdlib/utils/prototest";
+
+message TestProto {
+    string string_value = 1;
+}

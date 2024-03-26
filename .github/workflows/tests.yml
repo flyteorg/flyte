@@ -1,4 +1,9 @@
 name: tests
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 on:
   push:
     branches:
@@ -13,35 +18,57 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
-          go-version: "1.19"
+          go-version: "1.21"
       - name: Compile
         run: make compile
+      - name: Run tests
+        run: make test_unit
 
   docs:
     runs-on: ubuntu-latest
     steps:
-      - name: Fetch the code
-        uses: actions/checkout@v2
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v2
+      - name: Fetch flyte code
+        uses: actions/checkout@v4
         with:
-          python-version: "3.8"
-      - name: Install dependencies
+          path: "${{ github.workspace }}/flyte"
+      - name: Fetch flytekit code
+        uses: actions/checkout@v4
+        with:
+          repository: flyteorg/flytekit
+          path: "${{ github.workspace }}/flytekit"
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          auto-update-conda: true
+          python-version: 3.9
+      - shell: bash -el {0}
+        working-directory: ${{ github.workspace }}/flyte
         run: |
-          python -m pip install --upgrade pip
-          if [ -f doc-requirements.txt ]; then pip install -r doc-requirements.txt; fi
+          conda install -c conda-forge conda-lock
+          conda-lock install -n monodocs-env monodocs-environment.lock.yaml
+      - shell: bash -el {0}
+        working-directory: ${{ github.workspace }}/flyte
+        run: |
+          conda activate monodocs-env
+          export SETUPTOOLS_SCM_PRETEND_VERSION="2.0.0"
+          pip install -e ./flyteidl
+      - shell: bash -el {0}
+        working-directory: ${{ github.workspace }}/flytekit
+        run: |
+          conda activate monodocs-env
+          pip install -e .
+          conda info
+          conda list
+          conda config --show-sources
+          conda config --show
+          printenv | sort
+      - name: Setup Graphviz
+        uses: ts-graphviz/setup-graphviz@v1
       - name: Build the documentation
-        run: make docs
-
-  generate_kustomize:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-go@v2
-        with:
-          go-version: "1.19"
-      - name: Kustomize and diff
-        run: DELTA_CHECK=true make kustomize
+        working-directory: ${{ github.workspace }}/flyte
+        shell: bash -el {0}
+        run: |
+          conda activate monodocs-env
+          make docs
 
   generate_helm:
     runs-on: ubuntu-latest
@@ -49,6 +76,6 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-go@v2
         with:
-          go-version: "1.19"
+          go-version: "1.21"
       - name: Helm and diff
         run: DELTA_CHECK=true make helm

@@ -27,30 +27,30 @@ spec:
     metadata:
       labels: {{- include "flyte-binary.selectorLabels" . | nindent 8 }}
         {{- if .Values.commonLabels }}
-        {{- tpl ( .Values.commonLabels | toYaml ) . | nindent 4 }}
+        {{- tpl ( .Values.commonLabels | toYaml ) . | nindent 8 }}
         {{- end }}
         {{- if .Values.deployment.podLabels }}
-        {{- tpl ( .Values.deployment.podLabels | toYaml ) . | nindent 4 }}
+        {{- tpl ( .Values.deployment.podLabels | toYaml ) . | nindent 8 }}
         {{- end }}
       annotations:
-        {{- if not .Values.configuration.existingConfigmap }}
+        {{- if not (include "flyte-binary.configuration.externalConfiguration" .) }}
         checksum/configuration: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/configuration-secret: {{ include (print $.Template.BasePath "/config-secret.yaml") . | sha256sum }}
         {{- end }}
-        {{- if not .Values.clusterResourceTemplates.existingConfigmap }}
+        {{- if not .Values.clusterResourceTemplates.externalConfigMap }}
         checksum/cluster-resource-templates: {{ include (print $.Template.BasePath "/cluster-resource-templates.yaml") . | sha256sum }}
-        {{- end }}
-        {{- if and .Values.configuration.database.password (not .Values.configuration.externalConfigMap) }}
-        checksum/db-password-secret: {{ include (print $.Template.BasePath "/db-password-secret.yaml") . | sha256sum }}
         {{- end }}
         {{- if .Values.configuration.auth.enabled }}
         checksum/admin-auth-secret: {{ include (print $.Template.BasePath "/admin-auth-secret.yaml") . | sha256sum }}
+        {{- if not .Values.configuration.auth.clientSecretsExternalSecretRef }}
         checksum/auth-client-secret: {{ include (print $.Template.BasePath "/auth-client-secret.yaml") . | sha256sum }}
         {{- end }}
+        {{- end }}
         {{- if .Values.commonAnnotations }}
-        {{- tpl ( .Values.commonAnnotations | toYaml ) . | nindent 4 }}
+        {{- tpl ( .Values.commonAnnotations | toYaml ) . | nindent 8 }}
         {{- end }}
         {{- if .Values.deployment.podAnnotations }}
-        {{- tpl ( .Values.deployment.podAnnotations | toYaml ) . | nindent 4 }}
+        {{- tpl ( .Values.deployment.podAnnotations | toYaml ) . | nindent 8 }}
         {{- end }}
     spec:
       {{- if .Values.deployment.extraPodSpec }}
@@ -60,9 +60,9 @@ spec:
       securityContext: {{- omit .Values.deployment.podSecurityContext "enabled" | toYaml | nindent 12 }}
       {{- end }}
       serviceAccountName: {{ include "flyte-binary.serviceAccountName" . }}
-      {{- if or .Values.deployment.initContainers (not .Values.configuration.externalConfigMap) }}
+      {{- if or .Values.deployment.initContainers (not (include "flyte-binary.configuration.externalConfiguration" .)) }}
       initContainers:
-        {{- if not .Values.configuration.externalConfigMap }}
+        {{- if not (include "flyte-binary.configuration.externalConfiguration" .) }}
         - name: wait-for-db
           {{- with .Values.deployment.waitForDB.image }}
           image: {{ printf "%s:%s" .repository .tag | quote }}
@@ -184,7 +184,7 @@ spec:
             - name: webhook
               containerPort: 9443
           {{- if .Values.deployment.startupProbe }}
-          startupProbe: {{- tpl ( .Values.deployment.customStartupProbe | toYaml ) . | nindent 12 }}
+          startupProbe: {{- tpl ( .Values.deployment.startupProbe | toYaml ) . | nindent 12 }}
           {{- end }}
           livenessProbe:
           {{- if .Values.deployment.livenessProbe }}
@@ -193,6 +193,7 @@ spec:
             httpGet:
               path: /healthcheck
               port: http
+            initialDelaySeconds: 30
           {{- end }}
           readinessProbe:
           {{- if .Values.deployment.readinessProbe }}
@@ -201,6 +202,7 @@ spec:
             httpGet:
               path: /healthcheck
               port: http
+            initialDelaySeconds: 30
           {{- end }}
           {{- if .Values.deployment.resources }}
           resources: {{- toYaml .Values.deployment.resources | nindent 12 }}
@@ -217,11 +219,6 @@ spec:
               mountPath: /etc/flyte/cluster-resource-templates
             - name: config
               mountPath: /etc/flyte/config.d
-            {{- if and .Values.configuration.database.password (not .Values.configuration.externalConfigMap) }}
-            - name: db-pass
-              mountPath: {{ include "flyte-binary.configuration.database.passwordSecretMountPath" . }}
-              subPath: {{ include "flyte-binary.configuration.database.passwordSecretMountPath" . | base }}
-            {{- end }}
             - name: state
               mountPath: /var/run/flyte
             {{- if .Values.deployment.extraVolumeMounts }}
@@ -237,44 +234,56 @@ spec:
             sources:
             - secret:
                 name: {{ include "flyte-binary.configuration.auth.adminAuthSecretName" . }}
+            {{- if .Values.configuration.auth.clientSecretsExternalSecretRef }}
+            - secret:
+                name: {{ tpl .Values.configuration.auth.clientSecretsExternalSecretRef . }}
+            {{- else }}
             - secret:
                 name: {{ include "flyte-binary.configuration.auth.clientSecretName" . }}
+            {{- end }}
         {{- end }}
         - name: cluster-resource-templates
           {{- if .Values.clusterResourceTemplates.externalConfigMap }}
           configMap:
             name: {{ tpl .Values.clusterResourceTemplates.externalConfigMap . }}
-          {{- else if .Values.clusterResourceTemplates.inlineConfigMap }}
+          {{- else }}
           projected:
             sources:
             - configMap:
                 name: {{ include "flyte-binary.clusterResourceTemplates.configMapName" . }}
+            {{- if .Values.clusterResourceTemplates.inlineConfigMap }}
             - configMap:
                 name: {{ tpl .Values.clusterResourceTemplates.inlineConfigMap . }}
-          {{- else }}
-          configMap:
-            name: {{ include "flyte-binary.clusterResourceTemplates.configMapName" . }}
+            {{- end }}
           {{- end }}
         - name: config
-          {{- if .Values.configuration.externalConfigMap }}
-          configMap:
-            name: {{ tpl .Values.configuration.externalConfigMap . }}
-          {{- else if .Values.configuration.inlineConfigMap }}
+          {{- if (include "flyte-binary.configuration.externalConfiguration" .) }}
+          projected:
+            sources:
+            {{- if .Values.configuration.externalConfigMap }}
+            - configMap:
+                name: {{ tpl .Values.configuration.externalConfigMap . }}
+            {{- end }}
+            {{- if .Values.configuration.externalSecretRef }}
+            - secret:
+                name: {{ tpl .Values.configuration.externalSecretRef . }}
+            {{- end }}
+          {{- else }}
           projected:
             sources:
             - configMap:
                 name: {{ include "flyte-binary.configuration.configMapName" . }}
+            - secret:
+                name: {{ include "flyte-binary.configuration.configSecretName" . }}
+            {{- if .Values.configuration.inlineConfigMap }}
             - configMap:
                 name: {{ tpl .Values.configuration.inlineConfigMap . }}
-          {{- else }}
-          configMap:
-            name: {{ include "flyte-binary.configuration.configMapName" . }}
+            {{- end }}
+            {{- if .Values.configuration.inlineSecretRef }}
+            - secret:
+                name: {{ tpl .Values.configuration.inlineSecretRef . }}
+            {{- end }}
           {{- end }}
-        {{- if and .Values.configuration.database.password (not .Values.configuration.externalConfigMap) }}
-        - name: db-pass
-          secret:
-            secretName: {{ include "flyte-binary.configuration.database.passwordSecretName" . }}
-        {{- end }}
         - name: state
           emptyDir: {}
         {{- if .Values.deployment.extraVolumes }}

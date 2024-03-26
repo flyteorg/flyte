@@ -1,0 +1,69 @@
+before:
+  hooks:
+    - go mod download
+builds:
+  - env:
+      - CGO_ENABLED=0
+    main: ./cli/pflags/main.go
+    binary: pflags
+    goos:
+      - linux
+      - windows
+      - darwin
+    ldflags:
+      - -s -w -X github.com/flyteorg/flytestdlib/version.Version={{.Version}} -X github.com/flyteorg/flytestdlib/version.Build={{.ShortCommit}} -X github.com/flyteorg/flytestdlib/version.BuildTime={{.Date}}
+archives:
+  - name_template: |-
+      flytestdlib_{{ .Tag }}_
+      {{- if eq .Os "darwin" }}Darwin
+      {{- else if eq .Os "linux" }}Linux
+      {{- else if eq .Os "windows" }}Windows
+      {{- else }}{{ .Os }}{{ end }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    format_overrides:
+      - goos: windows
+        format: zip
+checksum:
+  name_template: "checksums.txt"
+snapshot:
+  name_template: "{{ .Tag }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+# scoop:
+#   # Default is "https://github.com/<repo_owner>/<repo_name>/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
+#   # url_template: "http://github.mycompany.com/foo/bar/releases/{{ .Tag }}/{{ .ArtifactName }}"
+
+#   # Repository to push the app manifest to.
+#   bucket:
+#     owner: lyft
+#     name: flytestdlib
+
+#   # Git author used to commit to the repository.
+#   # Defaults are shown.
+#   commit_author:
+#     name: goreleaserbot
+#     email: goreleaser@carlosbecker.com
+
+#   # Your app's homepage.
+#   # Default is empty.
+#   homepage: "https://godoc.org/github.com/flyteorg/flytestdlib"
+
+#   # Your app's description.
+#   # Default is empty.
+#   description: "Common Go utilities (Typed-Config, PFlags, Prometheus Metrics,... more)."
+
+#   # Your app's license
+#   # Default is empty.
+#   license: Apache-2.0
+
+#   # Persist data between application updates
+#   persist:
+#   - "data"
+#   - "config.toml"

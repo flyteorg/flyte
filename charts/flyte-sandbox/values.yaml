@@ -29,13 +29,24 @@ flyte-binary:
           accessKey: minio
           secretKey: miniostorage
     logging:
-      level: 6
+      level: 5
       plugins:
         kubernetes:
           enabled: true
           templateUri: |-
             http://localhost:30080/kubernetes-dashboard/#/log/{{.namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}
     inline:
+      task_resources:
+        defaults:
+          cpu: 500m
+          ephemeralStorage: 0
+          gpu: 0
+          memory: 1Gi
+        limits:
+          cpu: 0
+          ephemeralStorage: 0
+          gpu: 0
+          memory: 0
       storage:
         signedURL:
           stowConfigOverride:
@@ -142,6 +153,12 @@ sandbox:
   # dev Routes requests to an instance of Flyte running locally on a developer's
   # development environment. This is only usable if the flyte-binary chart is disabled.
   dev: false
+  buildkit:
+    enabled: true
+    image:
+      repository: moby/buildkit
+      tag: sandbox
+      pullPolicy: Never
   proxy:
     enabled: true
     image:

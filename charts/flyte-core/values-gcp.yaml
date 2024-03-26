@@ -14,6 +14,8 @@ userSettings:
 
 flyteadmin:
   replicaCount: 1
+  serviceMonitor:
+    enabled: false
   serviceAccount:
     # -- If the service account is created by you, make this false, else a new service account will be created and the flyteadmin role will be added
     # you can change the name of this role
@@ -82,6 +84,10 @@ datacatalog:
 flytepropeller:
   replicaCount: 1
   manager: false
+  serviceMonitor:
+    enabled: false
+  service:
+    enabled: false
   serviceAccount:
     # -- If the service account is created by you, make this false, else a new service account will be created and the iam-role-flyte will be added
     # you can change the name of this role
@@ -107,6 +113,12 @@ flytepropeller:
             matchLabels:
               app.kubernetes.io/name: flytepropeller
           topologyKey: kubernetes.io/hostname
+
+#
+# FLYTE_AGENT
+#
+flyteagent:
+  enabled: false
 
 #
 # FLYTECONSOLE
@@ -280,6 +292,7 @@ configmap:
           - container
           - sidecar
           - k8s-array
+          - agent-service
         default-for-task-types:
           container: container
           sidecar: sidecar

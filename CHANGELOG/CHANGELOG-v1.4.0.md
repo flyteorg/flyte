@@ -1,7 +1,7 @@
 # Flyte 1.4 release
 
 The main features of the 1.4 release are:
-- Suport for `PodTemplate` at the task-level
+- Support for `PodTemplate` at the task-level
 - Revamped auth system in flytekit
 
 As python 3.7 [reached](https://endoflife.date/python) EOL support in December of 2022, we dropped support for that version on this release.
@@ -58,7 +58,7 @@ In https://github.com/flyteorg/flytekit/pull/1458 we introduced a new OAuth2 han
 ## New sandbox features
 In this new release `flytectl demo` brings the following new features:
 - Support for specifying extra configuration for Flyte
-- Support for specifying extra cluster resource templates for boostrapping new namespaces
+- Support for specifying extra cluster resource templates for bootstrapping new namespaces
 - Sandbox state (DB, buckets) is now persistent across restarts and upgrades
 
 ## Flyteconsole

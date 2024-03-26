@@ -1,0 +1,5 @@
+apiVersion: iam.cnrm.cloud.google.com/v1beta1
+kind: IAMServiceAccount
+metadata:
+  name: {{ namespace }}-gsa
+  namespace: {{ namespace }}

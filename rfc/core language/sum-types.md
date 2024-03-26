@@ -114,7 +114,7 @@ Currently any type can take none values ([see this comment in Propeller's source
         // ...
     }
     ```
-    - TODO: It might be necessary to accumulate the errors for each of the summands' failed binding validations to ease debugging. If that is the case, it would be preferrable to ignore errors by default and re-run the verification if no candidate was found to avoid slowing down the non-exceptional case
+    - TODO: It might be necessary to accumulate the errors for each of the summands' failed binding validations to ease debugging. If that is the case, it would be preferable to ignore errors by default and re-run the verification if no candidate was found to avoid slowing down the non-exceptional case
         - The verbosity of the resulting messages would make it very hard to read so only a broad error is collected right now. It is unclear whether the extra complexity in the code and in the output is justified
 - Implement a `typing.Union` type transformer in Python FlyteKit:
     - `get_literal_type`:

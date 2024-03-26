@@ -11,6 +11,8 @@
 
 flyteadmin:
   enabled: true
+  serviceMonitor:
+    enabled: false
   # -- Replicas count for Flyteadmin deployment
   replicaCount: 1
   image:
@@ -239,6 +241,12 @@ flytepropeller:
   clusterName: ""
   # -- Sets priorityClassName for propeller pod(s).
   priorityClassName: ""
+
+#
+# FLYTE_AGENT
+#
+flyteagent:
+  enabled: false
 
 #
 # FLYTECONSOLE SETTINGS
@@ -661,6 +669,7 @@ configmap:
           - container
           - sidecar
           - k8s-array
+          - agent-service
         default-for-task-types:
           container: container
           sidecar: sidecar

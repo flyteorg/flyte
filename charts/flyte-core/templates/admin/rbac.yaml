@@ -23,25 +23,9 @@ metadata:
   name: {{ template "flyte.namespace" . -}}-{{- template "flyteadmin.name" . }}
   labels: {{ include "flyteadmin.labels" . | nindent 4 }}
 rules:
-- apiGroups:
-  - ""
-  - flyte.lyft.com
-  - rbac.authorization.k8s.io
-  resources:
-  - configmaps
-  - flyteworkflows
-  - namespaces
-  - pods
-  - resourcequotas
-  - roles
-  - rolebindings
-  - secrets
-  - services
-  - serviceaccounts
-  - spark-role
-  verbs:
-  - '*'
-
+- apiGroups: {{ toYaml .Values.flyteadmin.serviceAccount.clusterRole.apiGroups | nindent 2 }}
+  resources: {{ toYaml .Values.flyteadmin.serviceAccount.clusterRole.resources | nindent 2 }}
+  verbs: {{ toYaml .Values.flyteadmin.serviceAccount.clusterRole.verbs | nindent 2 }}
 ---
 {{- if $.Capabilities.APIVersions.Has "rbac.authorization.k8s.io/v1" }}
 apiVersion: rbac.authorization.k8s.io/v1

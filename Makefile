@@ -1,8 +1,9 @@
 export REPOSITORY=flyte
 include boilerplate/flyte/end2end/Makefile
+include boilerplate/flyte/golang_test_targets/Makefile
 
 define PIP_COMPILE
-pip-compile $(1) --upgrade --verbose --resolver=backtracking
+pip-compile $(1) --upgrade --verbose --resolver=backtracking --annotation-style=line
 endef
 
 GIT_VERSION := $(shell git describe --always --tags)
@@ -29,13 +30,10 @@ linux_compile: cmd/single/dist
 update_boilerplate:
 	@boilerplate/update.sh
 
-.PHONY: kustomize
-kustomize:
-	KUSTOMIZE_VERSION=3.9.2 bash script/generate_kustomize.sh
-
 .PHONY: helm
 helm: ## Generate K8s Manifest from Helm Charts.
 	bash script/generate_helm.sh
+	make -C docker/sandbox-bundled manifests
 
 .PHONY: release_automation
 release_automation:
@@ -52,19 +50,19 @@ deploy_sandbox:
 install-piptools: ## Install pip-tools
 	pip install -U pip-tools
 
-.PHONY: doc-requirements.txt
-doc-requirements.txt: doc-requirements.in install-piptools
-	$(call PIP_COMPILE,doc-requirements.in)
+.PHONY: install-conda-lock
+install-conda-lock:
+	pip install conda-lock
 
-.PHONY: requirements.txt
-requirements.txt: requirements.in install-piptools
-	$(call PIP_COMPILE,requirements.in)
+.PHONY: conda-lock
+conda-lock: install-conda-lock
+	conda-lock -f monodocs-environment.yaml --without-cuda --lockfile monodocs-environment.lock.yaml
 
 .PHONY: stats
 stats:
-	@generate-dashboard -o deployment/stats/prometheus/flytepropeller-dashboard.json stats/flytepropeller_dashboard.py
-	@generate-dashboard -o deployment/stats/prometheus/flyteadmin-dashboard.json stats/flyteadmin_dashboard.py
-	@generate-dashboard -o deployment/stats/prometheus/flyteuser-dashboard.json stats/flyteuser_dashboard.py
+	@generate-dashboard -o deployment/stats/prometheus/flytepropeller-dashboard.json stats/flytepropeller.dashboard.py
+	@generate-dashboard -o deployment/stats/prometheus/flyteadmin-dashboard.json stats/flyteadmin.dashboard.py
+	@generate-dashboard -o deployment/stats/prometheus/flyteuser-dashboard.json stats/flyteuser.dashboard.py
 
 .PHONY: prepare_artifacts
 prepare_artifacts:
@@ -84,7 +82,7 @@ helm_upgrade: ## Upgrade helm charts
 
 .PHONY: docs
 docs:
-	make -C rsts clean html SPHINXOPTS=-W
+	make -C docs clean html SPHINXOPTS=-W
 
 .PHONY: help
 help: SHELL := /bin/sh
@@ -103,3 +101,23 @@ build_native_flyte:
 	docker build \
 	--build-arg FLYTECONSOLE_VERSION=$(FLYTECONSOLE_VERSION) \
 	--tag flyte-binary:native .
+
+.PHONY: go-tidy
+go-tidy:
+	go mod tidy
+	make -C datacatalog go-tidy
+	make -C flyteadmin go-tidy
+	make -C flyteidl go-tidy
+	make -C flytepropeller go-tidy
+	make -C flyteplugins go-tidy
+	make -C flytestdlib go-tidy
+	make -C flytecopilot go-tidy
+
+.PHONY: lint-helm-charts
+lint-helm-charts:
+	# This pressuposes that you have act installed
+	act pull_request -W .github/workflows/validate-helm-charts.yaml --container-architecture linux/amd64 -e charts/event.json
+
+.PHONY: clean
+clean: ## Remove the HTML files related to the Flyteconsole.
+	rm -rf cmd/single/dist

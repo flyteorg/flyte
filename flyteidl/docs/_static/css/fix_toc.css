@@ -1,0 +1,3 @@
+.sidebar-tree > :not(:first-child) {
+    display: block !important;
+}

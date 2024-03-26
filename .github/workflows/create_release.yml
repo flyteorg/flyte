@@ -7,29 +7,57 @@ on:
         required: true
 
 jobs:
-  bump-version:
-    name: bump-version
+  generate-tags:
+    name: Generate git tags
     runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.bump-version.outputs.tag }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
-          fetch-depth: "0"
+          fetch-depth: '0'
+      - uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.FLYTE_BOT_PAT }}
+          script: |
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: `refs/tags/${{ github.event.inputs.version }}`,
+              sha: context.sha
+            })
+            const components = [
+              "datacatalog",
+              "flyteadmin",
+              "flytecopilot",
+              "flyteidl",
+              "flyteplugins",
+              "flytepropeller",
+              "flytestdlib",
+            ];
+            for (const c of components) {
+              github.rest.git.createRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: `refs/tags/${c}/${{ github.event.inputs.version }}`,
+                sha: context.sha
+              })
+            }
 
-      - name: Bump version and push tag
-        id: bump-version
-        uses: anothrNick/github-tag-action@1.36.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
-          WITH_V: true
-          CUSTOM_TAG: ${{ github.event.inputs.version }}
-          RELEASE_BRANCHES: master
+  build-docker-images:
+    needs:
+      - generate-tags
+    uses: ./.github/workflows/publish-images.yml
+    with:
+      version: ${{ github.event.inputs.version }}
+      push: true
+    secrets:
+      FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
+      FLYTE_BOT_USERNAME: ${{ secrets.FLYTE_BOT_USERNAME }}
 
   publish-flyte-binary-image:
     name: Publish flyte binary image for the release version
     runs-on: ubuntu-latest
-    needs: [bump-version]
+    needs:
+      - generate-tags
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -45,24 +73,25 @@ jobs:
 
       - name: Tag image to release version
         run: |
-          for release in latest ${{ needs.bump-version.outputs.version }}; do
-            docker buildx imagetools create --tag "ghcr.io/flyteorg/flyte-binary-release:${release}" "ghcr.io/flyteorg/flyte-binary:sha-${{ github.sha }}"
+          for release in latest ${{ github.event.inputs.version }}; do
+            docker buildx imagetools create --tag "ghcr.io/${{ github.repository_owner }}/flyte-binary-release:${release}" "ghcr.io/${{ github.repository_owner }}/flyte-binary:sha-${{ github.sha }}"
           done
 
   publish-flyte-component-image:
     name: Publish flyte component image for the release version
     runs-on: ubuntu-latest
-    needs: [bump-version]
+    needs:
+      - build-docker-images
     strategy:
       matrix:
         component:
           [
-              flyteconsole,
-              flytepropeller,
-              flyteadmin,
               datacatalog,
-              flytescheduler,
+              flyteadmin,
+              flyteconsole,
               flytecopilot,
+              flytepropeller,
+              flytescheduler,
           ]
     steps:
       - name: Checkout
@@ -92,14 +121,15 @@ jobs:
 
       - name: Tag Image to release version
         run: |
-          for release in latest ${{ needs.bump-version.outputs.version }}; do
-            docker buildx imagetools create --tag "ghcr.io/flyteorg/${{ matrix.component }}-release:${release}" "ghcr.io/flyteorg/${{ matrix.component }}:${{ steps.set_version.outputs.version }}"
+          for release in latest ${{ github.event.inputs.version }}; do
+            docker buildx imagetools create --tag "ghcr.io/${{ github.repository_owner }}/${{ matrix.component }}-release:${release}" "ghcr.io/${{ github.repository_owner }}/${{ matrix.component }}:${{ steps.set_version.outputs.version }}"
           done
 
   helm-release:
     name: Flyte helm release
     runs-on: ubuntu-latest
-    needs: [bump-version]
+    needs:
+      - build-docker-images
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -116,9 +146,9 @@ jobs:
         run: |
           git config user.name "${{ github.actor }}"
           git config user.email "${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>"
-      - name: Preprare Flyte Helm Release
+      - name: Prepare Flyte Helm Release
         env:
-          VERSION: ${{ needs.bump-version.outputs.version }}
+          VERSION: ${{ github.event.inputs.version }}
           REPOSITORY: "https://flyteorg.github.io/flyte"
         run: |
           make prepare_artifacts
@@ -131,22 +161,23 @@ jobs:
   manifest-release:
     name: Flyte manifest release
     runs-on: ubuntu-latest
-    needs: [bump-version]
+    needs:
+      - build-docker-images
     steps:
       - name: Checkout
         uses: actions/checkout@v2
         with:
           fetch-depth: "0"
 
-      - name: Preprare Flyte Release
+      - name: Prepare Flyte Release
         env:
-          VERSION: ${{ needs.bump-version.outputs.version }}
+          VERSION: ${{ github.event.inputs.version }}
         run: |
           make prepare_artifacts
           git stash
 
       - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v2
+        uses: goreleaser/goreleaser-action@v5
         with:
           version: latest
           args: release --rm-dist --release-notes=CHANGELOG/CHANGELOG-${{ github.event.inputs.version }}.md

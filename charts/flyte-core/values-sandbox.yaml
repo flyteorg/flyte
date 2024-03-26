@@ -1,5 +1,7 @@
 
 flyteadmin:
+  serviceMonitor:
+    enabled: false
   service:
     annotations:
       projectcontour.io/upstream-protocol.h2c: grpc
@@ -47,7 +49,6 @@ db:
 configmap:
   console:
     CONFIG_DIR: /etc/flyte/config
-    DISABLE_AUTH: "1"
 
   # -- Task default resources configuration
   # Refer to the full [structure](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/runtime/interfaces#TaskResourceConfiguration).

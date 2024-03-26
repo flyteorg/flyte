@@ -1,0 +1,24 @@
+logger:
+  formatter:
+    type: ""
+  level: 5
+  mute: false
+  show-source: false
+storage:
+  cache:
+    max_size_mbs: 0
+    target_gc_percent: 0
+  connection:
+    access-key: minio
+    auth-type: accesskey
+    disable-ssl: true
+    endpoint: http://minio:9000
+    region: us-east-1
+    secret-key: miniostorage
+  container: ""
+  defaultHttpClient:
+    headers: null
+    timeout: 0s
+  limits:
+    maxDownloadMBs: 0
+  type: s3

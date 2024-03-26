@@ -1,0 +1,36 @@
+project_name: flytecopilot
+before:
+  hooks:
+    - go mod download
+builds:
+  - id: flytecopilot
+    env:
+      - CGO_ENABLED=0
+    main: ./main.go
+    ldflags:
+      - -s -w -X github.com/flyteorg/flytestdlib/version.Version={{.Version}} -X github.com/flyteorg/flytestdlib/version.Build={{.ShortCommit}} -X github.com/flyteorg/flytestdlib/version.BuildTime={{.Date}}
+    binary: flytecopilot
+    goos:
+      - linux
+      - windows
+      - darwin
+archives:
+  - id: flytecopilot-archive
+    name_template: |-
+      flytecopilot_{{ .Tag }}_{{ .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+    builds:
+      - flytecopilot
+    format_overrides:
+      - goos: windows
+        format: zip
+checksum:
+  name_template: 'checksums.txt'
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'

@@ -1,0 +1,67 @@
+tasks:
+- container:
+    args:
+    - testArg
+    command:
+    - execute-task
+    image: myflyteimage:latest
+    resources:
+      requests:
+      - name: CPU
+        value: "2"
+      - name: MEMORY
+        value: 2048Mi
+  id:
+    name: task-1
+  interface:
+    inputs:
+      variables:
+        x:
+          type:
+            simple: INTEGER
+        "y":
+          type:
+            collectionType:
+              simple: STRING
+- container:
+    args:
+    - testArg
+    command:
+    - execute-task
+    image: myflyteimage:latest
+  id:
+    name: task-2
+  interface:
+    inputs:
+      variables: {}
+workflow:
+  id:
+    name: workflow-with-inputs
+  interface:
+    inputs:
+      variables:
+        x:
+          type:
+            simple: INTEGER
+        "y":
+          type:
+            collectionType:
+              simple: STRING
+  nodes:
+  - id: node-1
+    inputs:
+    - binding:
+        promise:
+          var: x
+      var: x
+    - binding:
+        promise:
+          var: "y"
+      var: "y"
+    taskNode:
+      referenceId:
+        name: task-1
+  - id: node-2
+    taskNode:
+      referenceId:
+        name: task-2

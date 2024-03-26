@@ -1,0 +1,34 @@
+{
+  "branch": {
+    "if": {
+      "condition": {
+        "comparison": {
+          "operator": "GT",
+          "leftValue": {
+            "primitive": {
+              "integer": "5"
+            }
+          },
+          "rightValue": {
+            "var": "x"
+          }
+        }
+      },
+      "then": "foo1"
+    },
+    "else": "foo2"
+  },
+  "id": "foobranch",
+  "inputBindings": [
+    {
+      "binding": {
+        "promise": {
+          "nodeId": "start",
+          "var": "x"
+        }
+      },
+      "var": "x"
+    }
+  ],
+  "kind": "branch"
+}

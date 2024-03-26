@@ -1,0 +1,6 @@
+[codespell]
+skip = .git,*.pdf,*.svg,go.sum,go.mod,*requirements.txt,gen
+# some strings with unicodes, constructs like [o]utput
+ignore-regex = ".*\\0[0-9][0-9].*"|json:"[^"]*"|\b[a-z]*\[[a-z]\][a-z]*\b
+# some ad-hoc variable names etc
+ignore-words-list = te,nd,querys,ser
