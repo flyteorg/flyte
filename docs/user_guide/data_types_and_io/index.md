@@ -133,7 +133,7 @@ Here's a breakdown of these mappings:
       - Any
       - Custom transformers
       - The ``FlytePickle`` transformer is the default option, but you can also define custom transformers.
-        **For instructions on building custom type transformers, please refer to :ref:`this section <advanced_custom_types>`**.
+        For instructions on building custom type transformers, please refer to :ref:`this section <advanced_custom_types>`.
 ```
 
 ```{toctree}
