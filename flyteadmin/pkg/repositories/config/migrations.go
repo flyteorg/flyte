@@ -1293,6 +1293,22 @@ var ContinuedMigrations = []*gormigrate.Migration{
 			return tx.Table("launch_plans").Migrator().DropColumn(&models.LaunchPlan{}, "launch_condition_type")
 		},
 	},
+	{
+		ID: "pg-continue-2024-03-backfill-launch-conditions",
+		Migrate: func(tx *gorm.DB) error {
+			query := `` +
+				`UPDATE launch_plans ` +
+				`SET launch_condition_type = 'SCHED' ` +
+				`WHERE schedule_type in ('CRON', 'RATE') ` +
+				`  AND launch_condition_type is null`
+			tx.Exec(query)
+
+			return tx.Error
+		},
+		Rollback: func(tx *gorm.DB) error {
+			return nil
+		},
+	},
 }
 
 var Migrations = append(LegacyMigrations, append(NoopMigrations, append(ContinuedMigrations, UnionMigrations...)...)...)
