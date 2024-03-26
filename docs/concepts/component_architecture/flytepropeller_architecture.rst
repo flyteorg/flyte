@@ -37,15 +37,99 @@ This document attempts to break down the FlytePropeller architecture by tracking
 Components
 ==========
 
+
+FlyteAdmin is the common entry point, where initialization of FlyteWorkflow CRs may be triggered by user workflow definition executions, automatic relaunches, or periodically scheduled workflow definition executions.
+
 FlyteWorkflow CRD / K8s Integration
 -----------------------------------
 
+Workflows in Flyte are maintained as `Custom Resource Definitions (CRDs) <https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/>`__  in Kubernetes, which are stored in the backing ``etcd`` key-value store. Each workflow execution results in the creation of a new ``flyteworkflow`` CR (Custom Resource) which maintains its state for the duration of the execution. CRDs provide variable definitions to describe both resource specifications (``spec``) and status (``status``). The ``flyteworkflow`` CRD uses the ``spec`` subsection to detail the workflow DAG, embodying node dependencies, etc. 
 
-Workflows in Flyte are maintained as `Custom Resource Definitions (CRDs) <https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/>`__  in Kubernetes, which are stored in the backing ``etcd`` key-value store. Each worklfow execution results in the creation of a new ``flyteworkflow`` CR (Custom Resource) which maintains its state for the duration of the execution. CRDs provide variable definitions to describe both resource specifications (``spec``) and status (``status``). The ``flyteworkflow`` CRD uses the ``spec`` subsection to detail the workflow DAG, embodying node dependencies, etc. 
+**Example**
+
+1. Execute an `example workflow <https://docs.flyte.org/en/latest/core_use_cases/machine_learning.html#machine-learning>`__ on a remote Flyte cluster:
+
+.. code-block:: bash 
+
+   pyflyte run --remote example.py training_workflow --hyperparameters '{"C": 0.4}'
+
+2. Verify there's a new Custom Resource on the ``flytesnacks-development`` namespace (this is, the workflow belongs to the ``flytesnacks`` project and the ``development`` domain):
+
+.. code-block:: bash 
+
+   kubectl get flyteworkflows.flyte.lyft.com -n flytesnacks-development
+
+Example output:
+
+.. code-block:: bash 
+
+   NAME                   AGE
+   f7616dc75400f43e6920   3h42m 
+
+3. Describe the contents of the CR, for example the ``spec`` section:
+
+.. code-block:: bash 
+
+   kubectl describe flyteworkflows.flyte.lyft.com f7616dc75400f43e6920 -n flytesnacks-development  
+
+.. code-block:: json 
+
+    "spec": {
+        "connections": {
+            "n0": [
+                "n1"
+            ],
+            "n1": [
+                "n2"
+            ],
+            "n2": [
+                "end-node"
+            ],
+            "start-node": [
+                "n0",
+                "n2"
+            ]
+        },
 
 The status subsection tracks workflow metadata including overall workflow status, node/task phases, status/phase transition timestamps, etc.
 
-K8s exposes a powerful controller/operator API that enables entities to track creation/updates over a specific resource type. FlytePropeller uses this API to track FlyteWorkflows, meaning every time an instance of the FlyteWorkflow CR is created/updated, the FlytePropeller instance is notified. FlyteAdmin is the common entry point, where initialization of FlyteWorkflow CRs may be triggered by user workflow definition executions, automatic relaunches, or periodically scheduled workflow definition executions. However, it is conceivable to manually create FlyteWorkflow CRs, but this will have limited visibility and usability.
+.. code-block:: json 
+
+   },
+    "status": {
+        "dataDir": "gs://flyteontf-gcp-data-116223838137/metadata/propeller/flytesnacks-development-f7616dc75400f43e6920",
+        "defVersion": 1,
+        "lastUpdatedAt": "2024-03-26T16:22:16Z",
+        "nodeStatus": {
+            "end-node": {
+                "phase": 5,
+                "stoppedAt": "2024-03-26T16:22:16Z"
+            },
+            "n0": {
+                "phase": 5,
+                "stoppedAt": "2024-03-26T16:21:46Z"
+            },
+            "n1": {
+                "phase": 5,
+                "stoppedAt": "2024-03-26T16:22:02Z"
+            },
+            "n2": {
+                "phase": 5,
+                "stoppedAt": "2024-03-26T16:22:16Z"
+            },
+            "start-node": {
+                "phase": 5,
+                "stoppedAt": "2024-03-26T16:20:39Z"
+            }
+        },
+
+
+K8s exposes a powerful controller/operator API that enables entities to track creation/updates over a specific resource type. FlytePropeller uses this API to track FlyteWorkflows, meaning every time an instance of the ``flyteworkflow`` CR is created/updated, the FlytePropeller instance is notified. 
+
+.. note::
+
+    Manual creation of ``flyteworkflow`` CRs, without the intervention of ``flyteadmin``, is possible but not supported as the resulting resource will have limited visibility and usability.
+
 
 WorkQueue/WorkerPool
 ----------------------
