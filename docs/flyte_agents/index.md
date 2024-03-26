@@ -35,7 +35,7 @@ For a list of agents you can use in your tasks and example usage for each, see t
   - If the agent you need doesn't exist, follow these steps to create it.
 * - {doc}`Testing agents locally <testing_agents_locally>`
   - Whether using an existing agent or developing a new one, you can test the agent locally without needing to configure your Flyte deployment.
-* - {doc}`Testing agents in dev environment <testing_agents_in_the_development_environment>`
+* - {doc}`Testing agents in the development environment <testing_agents_in_the_development_environment>`
   - After testing agent locally, you can test the agent in dev environment to ensure it works well remotely.
 * - {doc}`Enabling agents in your Flyte deployment <enabling_agents_in_your_flyte_deployment>`
   - Once you have tested an agent locally and want to use it in production, you must configure your Flyte deployment for the agent.

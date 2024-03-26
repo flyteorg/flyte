@@ -16,7 +16,7 @@ Bigquery plugin
 ![image.png](https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/concepts/agents/plugin_life_cycle.png)
 
 The life cycle will be
-1. FlytePropeller sends request throught SDK.
+1. FlytePropeller sends request through SDK.
 
 Bigquery agent service
 ![image.png](https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/concepts/agents/async_agent_life_cycle.png)
