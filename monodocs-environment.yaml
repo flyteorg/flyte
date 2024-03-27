@@ -76,6 +76,7 @@ dependencies:
     - ray==2.6.3
     - duckdb
     - aioboto3>=12.3.0                    # aws sagemaker inference
+    - sphinx-new-tab-link
 
 platforms:
   - linux-64

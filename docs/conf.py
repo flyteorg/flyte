@@ -75,6 +75,7 @@ extensions = [
     # custom extensions
     "auto_examples",
     "import_projects",
+    "sphinx_new_tab_link"
 ]
 
 source_suffix = {
