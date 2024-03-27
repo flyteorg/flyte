@@ -91,8 +91,14 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 
 	taskCategory := admin.TaskCategory{Name: taskTemplate.Type, Version: taskTemplate.TaskTypeVersion}
 	agent, isSync := getFinalAgent(&taskCategory, p.cfg, p.agentRegistry)
-	if err != nil {
-		return nil, nil, err
+
+	secrets := make([]*admin.Secret, 0)
+	for _, secret := range taskTemplate.SecurityContext.Secrets {
+		val, err := taskCtx.SecretManager().GetForSecret(ctx, secret)
+		if err != nil {
+			return nil, nil, err
+		}
+		secrets = append(secrets, &admin.Secret{Value: val})
 	}
 
 	finalCtx, cancel := getFinalContext(ctx, "CreateTask", agent)
@@ -105,7 +111,7 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 		if err != nil {
 			return nil, nil, err
 		}
-		header := &admin.CreateRequestHeader{Template: taskTemplate, OutputPrefix: outputPrefix, TaskExecutionMetadata: &taskExecutionMetadata}
+		header := &admin.CreateRequestHeader{Template: taskTemplate, OutputPrefix: outputPrefix, TaskExecutionMetadata: &taskExecutionMetadata, Secrets: secrets}
 		return p.ExecuteTaskSync(finalCtx, client, header, inputs)
 	}
 
