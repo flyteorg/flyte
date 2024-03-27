@@ -151,7 +151,7 @@ many more ways to customize Flyte tasks:
     in other languages outside of the `flytekit` SDK language.
 * - {ref}`Backend Plugins <extend-plugin-flyte-backend>`
   - These tasks plugins require implementing a backend plugin to leverage
-    external services like Sagemaker, Snowflake, BigQuery, etc.
+    external services like SageMaker, Snowflake, BigQuery, etc.
 ```
 
 ## What's next?

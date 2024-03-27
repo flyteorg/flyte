@@ -29,7 +29,7 @@ Workflows link multiple tasks together. They can be written as Python functions,
 but it's important to distinguish tasks and workflows.
 
 A task's body executes at run-time on a Kubernetes cluster, in a Query Engine like BigQuery,
-or on hosted services like AWS Batch or Sagemaker.
+or on hosted services like AWS Batch or SageMaker.
 
 In contrast, a workflow's body doesn't perform computations; it's used to structure tasks.
 A workflow's body executes at registration time, during the workflow's registration process.
@@ -116,6 +116,7 @@ if __name__ == "__main__":
 +++ {"lines_to_next_cell": 0}
 
 To run the workflow locally, you can use the following `pyflyte run` command:
+
 ```
 pyflyte run \
   https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/workflow.py \
@@ -124,6 +125,7 @@ pyflyte run \
 
 If you want to run it remotely on the Flyte cluster,
 simply add the `--remote flag` to the `pyflyte run` command:
+
 ```
 pyflyte run --remote \
   https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/workflow.py \
@@ -138,6 +140,7 @@ However, {ref}`executing an individual task <single_task_execution>` independent
 without the confines of a workflow, offers a convenient approach for iterating on task logic effortlessly.
 
 ## Use `partial` to provide default arguments to tasks
+
 You can use the {py:func}`functools.partial` function to assign default or constant values to the parameters of your tasks.
 
 ```{code-cell}

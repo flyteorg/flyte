@@ -104,4 +104,7 @@ message ProjectGetRequest {
     // Indicates a unique project.
     // +required
     string id = 1;
+
+    // Optional, org key applied to the resource.
+    string org = 2;
 }
