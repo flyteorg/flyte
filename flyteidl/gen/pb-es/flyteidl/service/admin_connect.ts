@@ -10,7 +10,7 @@ import { Workflow, WorkflowCreateRequest, WorkflowCreateResponse, WorkflowList }
 import { ActiveLaunchPlanListRequest, ActiveLaunchPlanRequest, LaunchPlan, LaunchPlanCreateRequest, LaunchPlanCreateResponse, LaunchPlanList, LaunchPlanUpdateRequest, LaunchPlanUpdateResponse } from "../admin/launch_plan_pb.js";
 import { Execution, ExecutionCountsGetRequest, ExecutionCountsGetResponse, ExecutionCreateRequest, ExecutionCreateResponse, ExecutionList, ExecutionRecoverRequest, ExecutionRelaunchRequest, ExecutionTerminateRequest, ExecutionTerminateResponse, ExecutionUpdateRequest, ExecutionUpdateResponse, RunningExecutionsCountGetRequest, RunningExecutionsCountGetResponse, WorkflowExecutionGetDataRequest, WorkflowExecutionGetDataResponse, WorkflowExecutionGetMetricsRequest, WorkflowExecutionGetMetricsResponse, WorkflowExecutionGetRequest } from "../admin/execution_pb.js";
 import { DynamicNodeWorkflowResponse, GetDynamicNodeWorkflowRequest, NodeExecution, NodeExecutionForTaskListRequest, NodeExecutionGetDataRequest, NodeExecutionGetDataResponse, NodeExecutionGetRequest, NodeExecutionList, NodeExecutionListRequest } from "../admin/node_execution_pb.js";
-import { Project, ProjectListRequest, ProjectRegisterRequest, ProjectRegisterResponse, Projects, ProjectUpdateResponse } from "../admin/project_pb.js";
+import { Project, ProjectGetRequest, ProjectListRequest, ProjectRegisterRequest, ProjectRegisterResponse, Projects, ProjectUpdateResponse } from "../admin/project_pb.js";
 import { NodeExecutionEventRequest, NodeExecutionEventResponse, TaskExecutionEventRequest, TaskExecutionEventResponse, WorkflowExecutionEventRequest, WorkflowExecutionEventResponse } from "../admin/event_pb.js";
 import { TaskExecution, TaskExecutionGetDataRequest, TaskExecutionGetDataResponse, TaskExecutionGetRequest, TaskExecutionList, TaskExecutionListRequest } from "../admin/task_execution_pb.js";
 import { ProjectDomainAttributesDeleteRequest, ProjectDomainAttributesDeleteResponse, ProjectDomainAttributesGetRequest, ProjectDomainAttributesGetResponse, ProjectDomainAttributesUpdateRequest, ProjectDomainAttributesUpdateResponse } from "../admin/project_domain_attributes_pb.js";
@@ -363,6 +363,17 @@ export const AdminService = {
       name: "UpdateProject",
       I: Project,
       O: ProjectUpdateResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * Fetches a :ref:`ref_flyteidl.admin.Project`
+     *
+     * @generated from rpc flyteidl.service.AdminService.GetProject
+     */
+    getProject: {
+      name: "GetProject",
+      I: ProjectGetRequest,
+      O: Project,
       kind: MethodKind.Unary,
     },
     /**

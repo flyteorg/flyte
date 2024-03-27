@@ -5213,6 +5213,44 @@
       }
     },
     "/api/v1/org/projects/{org}/{id}": {
+      "get": {
+        "summary": "Fetches a :ref:`ref_flyteidl.admin.Project`",
+        "description": "Fetch a registered project.",
+        "operationId": "AdminService_GetProject2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminProject"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "description": "Indicates a unique project.\n+required",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      },
       "put": {
         "summary": "Updates an existing :ref:`ref_flyteidl.admin.Project`\nflyteidl.admin.Project should be passed but the domains property should be empty;\nit will be ignored in the handler as domains cannot be updated via this API.",
         "description": "Update a project.",
@@ -6965,6 +7003,44 @@
       }
     },
     "/api/v1/projects/{id}": {
+      "get": {
+        "summary": "Fetches a :ref:`ref_flyteidl.admin.Project`",
+        "description": "Fetch a registered project.",
+        "operationId": "AdminService_GetProject",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminProject"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Indicates a unique project.\n+required",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      },
       "put": {
         "summary": "Updates an existing :ref:`ref_flyteidl.admin.Project`\nflyteidl.admin.Project should be passed but the domains property should be empty;\nit will be ignored in the handler as domains cannot be updated via this API.",
         "description": "Update a project.",

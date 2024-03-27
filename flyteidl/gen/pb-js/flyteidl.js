@@ -43809,6 +43809,133 @@
                 return ProjectUpdateResponse;
             })();
     
+            admin.ProjectGetRequest = (function() {
+    
+                /**
+                 * Properties of a ProjectGetRequest.
+                 * @memberof flyteidl.admin
+                 * @interface IProjectGetRequest
+                 * @property {string|null} [id] ProjectGetRequest id
+                 * @property {string|null} [org] ProjectGetRequest org
+                 */
+    
+                /**
+                 * Constructs a new ProjectGetRequest.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a ProjectGetRequest.
+                 * @implements IProjectGetRequest
+                 * @constructor
+                 * @param {flyteidl.admin.IProjectGetRequest=} [properties] Properties to set
+                 */
+                function ProjectGetRequest(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * ProjectGetRequest id.
+                 * @member {string} id
+                 * @memberof flyteidl.admin.ProjectGetRequest
+                 * @instance
+                 */
+                ProjectGetRequest.prototype.id = "";
+    
+                /**
+                 * ProjectGetRequest org.
+                 * @member {string} org
+                 * @memberof flyteidl.admin.ProjectGetRequest
+                 * @instance
+                 */
+                ProjectGetRequest.prototype.org = "";
+    
+                /**
+                 * Creates a new ProjectGetRequest instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.ProjectGetRequest
+                 * @static
+                 * @param {flyteidl.admin.IProjectGetRequest=} [properties] Properties to set
+                 * @returns {flyteidl.admin.ProjectGetRequest} ProjectGetRequest instance
+                 */
+                ProjectGetRequest.create = function create(properties) {
+                    return new ProjectGetRequest(properties);
+                };
+    
+                /**
+                 * Encodes the specified ProjectGetRequest message. Does not implicitly {@link flyteidl.admin.ProjectGetRequest.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.ProjectGetRequest
+                 * @static
+                 * @param {flyteidl.admin.IProjectGetRequest} message ProjectGetRequest message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                ProjectGetRequest.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.id != null && message.hasOwnProperty("id"))
+                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.id);
+                    if (message.org != null && message.hasOwnProperty("org"))
+                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.org);
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a ProjectGetRequest message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.ProjectGetRequest
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.ProjectGetRequest} ProjectGetRequest
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                ProjectGetRequest.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.ProjectGetRequest();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.id = reader.string();
+                            break;
+                        case 2:
+                            message.org = reader.string();
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a ProjectGetRequest message.
+                 * @function verify
+                 * @memberof flyteidl.admin.ProjectGetRequest
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                ProjectGetRequest.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.id != null && message.hasOwnProperty("id"))
+                        if (!$util.isString(message.id))
+                            return "id: string expected";
+                    if (message.org != null && message.hasOwnProperty("org"))
+                        if (!$util.isString(message.org))
+                            return "org: string expected";
+                    return null;
+                };
+    
+                return ProjectGetRequest;
+            })();
+    
             admin.ProjectAttributes = (function() {
     
                 /**
@@ -52158,6 +52285,39 @@
                  * @instance
                  * @param {flyteidl.admin.IProject} request Project message or plain object
                  * @returns {Promise<flyteidl.admin.ProjectUpdateResponse>} Promise
+                 * @variation 2
+                 */
+    
+                /**
+                 * Callback as used by {@link flyteidl.service.AdminService#getProject}.
+                 * @memberof flyteidl.service.AdminService
+                 * @typedef GetProjectCallback
+                 * @type {function}
+                 * @param {Error|null} error Error, if any
+                 * @param {flyteidl.admin.Project} [response] Project
+                 */
+    
+                /**
+                 * Calls GetProject.
+                 * @function getProject
+                 * @memberof flyteidl.service.AdminService
+                 * @instance
+                 * @param {flyteidl.admin.IProjectGetRequest} request ProjectGetRequest message or plain object
+                 * @param {flyteidl.service.AdminService.GetProjectCallback} callback Node-style callback called with the error, if any, and Project
+                 * @returns {undefined}
+                 * @variation 1
+                 */
+                Object.defineProperty(AdminService.prototype.getProject = function getProject(request, callback) {
+                    return this.rpcCall(getProject, $root.flyteidl.admin.ProjectGetRequest, $root.flyteidl.admin.Project, request, callback);
+                }, "name", { value: "GetProject" });
+    
+                /**
+                 * Calls GetProject.
+                 * @function getProject
+                 * @memberof flyteidl.service.AdminService
+                 * @instance
+                 * @param {flyteidl.admin.IProjectGetRequest} request ProjectGetRequest message or plain object
+                 * @returns {Promise<flyteidl.admin.Project>} Promise
                  * @variation 2
                  */
     
