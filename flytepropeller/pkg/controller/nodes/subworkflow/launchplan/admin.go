@@ -117,8 +117,12 @@ func (a *adminLaunchPlanExecutor) Launch(ctx context.Context, launchCtx LaunchCo
 
 	// Make a copy of the labels with shard-key removed. This ensures that the shard-key is re-computed for each
 	// instead of being copied from the parent.
-	labels := launchCtx.Labels
-	delete(labels, k8s.ShardKeyLabel)
+	labels := make(map[string]string)
+	for key, value := range launchCtx.Labels {
+		if key != k8s.ShardKeyLabel {
+			labels[key] = value
+		}
+	}
 
 	req := &admin.ExecutionCreateRequest{
 		Project: executionID.Project,
