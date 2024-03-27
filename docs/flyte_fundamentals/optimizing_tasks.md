@@ -66,12 +66,13 @@ import random
 @task(retries=3)
 def compute_mean(data: List[float]) -> float:
     if random() < 0.05:
-        raise RuntimeError("Something bad happened 🔥")
+        raise FlyteRecoverableException("Something bad happened 🔥")
     return sum(data) / len(data)
 ```
 
 ```{note}
-Retries only take effect when running a task on a Flyte cluster.
+Retries only take effect when running a task on a Flyte cluster. 
+See {ref}`Fault Tolerance <fault-tolerance>` for details on the types of errors that will be retried.
 ```
 
 ## Timeouts
