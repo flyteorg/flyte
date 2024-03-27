@@ -291,4 +291,4 @@ Wait for the upgrade to complete. You can check the status of the deployment pod
 
   kubectl get pods -n flyte
 
-For Databricks agent on the Flyte cluster, see `Databricks agent <https://docs.flyte.org/en/latest/flytesnacks/examples/databricks_integration/databricks_agent.html>`_.
+For Databricks agent on the Flyte cluster, see `Databricks agent <https://docs.flyte.org/en/latest/flytesnacks/examples/databricks_agent/index.html>`_.

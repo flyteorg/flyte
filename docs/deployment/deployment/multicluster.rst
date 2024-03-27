@@ -398,11 +398,14 @@ label has to be 1.
 
 11. Verify that all Pods in the ``flyte`` namespace are ``Running``: 
 
-Example output:
-
 .. prompt:: bash $
 
-   kubectl get pods -n flyte                                                                                                                  
+   kubectl get pods -n flyte
+
+Example output:
+
+.. prompt::
+
    NAME                             READY   STATUS    RESTARTS   AGE
    datacatalog-86f6b9bf64-bp2cj     1/1     Running   0          23h
    datacatalog-86f6b9bf64-fjzcp     1/1     Running   0          23h

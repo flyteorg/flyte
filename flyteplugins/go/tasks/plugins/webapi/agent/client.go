@@ -99,6 +99,7 @@ func getFinalContext(ctx context.Context, operation string, agent *Deployment) (
 }
 
 func initializeAgentRegistry(cs *ClientSet) (Registry, error) {
+	logger.Infof(context.Background(), "Initializing agent registry")
 	agentRegistry := make(Registry)
 	cfg := GetConfig()
 	var agentDeployments []*Deployment
@@ -156,6 +157,8 @@ func initializeAgentRegistry(cs *ClientSet) (Registry, error) {
 }
 
 func initializeClients(ctx context.Context) (*ClientSet, error) {
+	logger.Infof(ctx, "Initializing agent clients")
+
 	asyncAgentClients := make(map[string]service.AsyncAgentServiceClient)
 	syncAgentClients := make(map[string]service.SyncAgentServiceClient)
 	agentMetadataClients := make(map[string]service.AgentMetadataServiceClient)

@@ -93,8 +93,7 @@ There are three different paths for deploying a Flyte cluster:
 Helm
 ====
 
-Flyte uses `Helm <https://helm.sh/>`__ as the K8s release packaging solution, though you may still see some old
-`Kustomize <https://kustomize.io/>`__ artifacts in the `flyte <https://github.com/flyteorg/flyte>`__ repo. The core Flyte
+Flyte uses `Helm <https://helm.sh/>`__ as the K8s release packaging solution. The core Flyte
 team maintains Helm charts that correspond with the latter two deployment paths.
 
 .. note::

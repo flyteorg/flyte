@@ -35,7 +35,7 @@ author = "Flyte"
 # The short X.Y version
 version = ""
 # The full version, including alpha/beta/rc tags
-release = "1.10.7"
+release = "1.11.1-b0"
 
 # -- General configuration ---------------------------------------------------
 
@@ -339,7 +339,8 @@ import_projects_config = {
     "source_regex_mapping": REPLACE_PATTERNS,
     "list_table_toc": [
        "flytesnacks/tutorials",
-        "flytesnacks/integrations",
+       "flytesnacks/integrations",
+       "flytesnacks/deprecated_integrations"
     ],
     "dev_build": bool(int(os.environ.get("MONODOCS_DEV_BUILD", 1))),
 }

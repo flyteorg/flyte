@@ -730,13 +730,11 @@ pub struct ArtifactKey {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ArtifactBindingData {
-    #[prost(uint32, tag="1")]
-    pub index: u32,
     /// This is only relevant in the time partition case
-    #[prost(string, tag="4")]
-    pub transform: ::prost::alloc::string::String,
+    #[prost(message, optional, tag="7")]
+    pub time_transform: ::core::option::Option<TimeTransform>,
     /// These two fields are only relevant in the partition value case
-    #[prost(oneof="artifact_binding_data::PartitionData", tags="2, 3")]
+    #[prost(oneof="artifact_binding_data::PartitionData", tags="5, 6")]
     pub partition_data: ::core::option::Option<artifact_binding_data::PartitionData>,
 }
 /// Nested message and enum types in `ArtifactBindingData`.
@@ -745,11 +743,19 @@ pub mod artifact_binding_data {
     #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum PartitionData {
-        #[prost(string, tag="2")]
+        #[prost(string, tag="5")]
         PartitionKey(::prost::alloc::string::String),
-        #[prost(bool, tag="3")]
+        #[prost(bool, tag="6")]
         BindToTimePartition(bool),
     }
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct TimeTransform {
+    #[prost(string, tag="1")]
+    pub transform: ::prost::alloc::string::String,
+    #[prost(enumeration="Operator", tag="2")]
+    pub op: i32,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -759,8 +765,12 @@ pub struct InputBindingData {
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
+pub struct RuntimeBinding {
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
 pub struct LabelValue {
-    #[prost(oneof="label_value::Value", tags="1, 2, 3, 4")]
+    #[prost(oneof="label_value::Value", tags="1, 2, 3, 4, 5")]
     pub value: ::core::option::Option<label_value::Value>,
 }
 /// Nested message and enum types in `LabelValue`.
@@ -778,6 +788,8 @@ pub mod label_value {
         TriggeredBinding(super::ArtifactBindingData),
         #[prost(message, tag="4")]
         InputBinding(super::InputBindingData),
+        #[prost(message, tag="5")]
+        RuntimeBinding(super::RuntimeBinding),
     }
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -791,6 +803,8 @@ pub struct Partitions {
 pub struct TimePartition {
     #[prost(message, optional, tag="1")]
     pub value: ::core::option::Option<LabelValue>,
+    #[prost(enumeration="Granularity", tag="2")]
+    pub granularity: i32,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -841,6 +855,68 @@ pub mod artifact_query {
         /// artifacts, or a partition value derived from a triggering artifact.
         #[prost(message, tag="4")]
         Binding(super::ArtifactBindingData),
+    }
+}
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+#[repr(i32)]
+pub enum Granularity {
+    Unset = 0,
+    Minute = 1,
+    Hour = 2,
+    /// default
+    Day = 3,
+    Month = 4,
+}
+impl Granularity {
+    /// String value of the enum field names used in the ProtoBuf definition.
+    ///
+    /// The values are not transformed in any way and thus are considered stable
+    /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+    pub fn as_str_name(&self) -> &'static str {
+        match self {
+            Granularity::Unset => "UNSET",
+            Granularity::Minute => "MINUTE",
+            Granularity::Hour => "HOUR",
+            Granularity::Day => "DAY",
+            Granularity::Month => "MONTH",
+        }
+    }
+    /// Creates an enum from field names used in the ProtoBuf definition.
+    pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+        match value {
+            "UNSET" => Some(Self::Unset),
+            "MINUTE" => Some(Self::Minute),
+            "HOUR" => Some(Self::Hour),
+            "DAY" => Some(Self::Day),
+            "MONTH" => Some(Self::Month),
+            _ => None,
+        }
+    }
+}
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+#[repr(i32)]
+pub enum Operator {
+    Minus = 0,
+    Plus = 1,
+}
+impl Operator {
+    /// String value of the enum field names used in the ProtoBuf definition.
+    ///
+    /// The values are not transformed in any way and thus are considered stable
+    /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+    pub fn as_str_name(&self) -> &'static str {
+        match self {
+            Operator::Minus => "MINUS",
+            Operator::Plus => "PLUS",
+        }
+    }
+    /// Creates an enum from field names used in the ProtoBuf definition.
+    pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+        match value {
+            "MINUS" => Some(Self::Minus),
+            "PLUS" => Some(Self::Plus),
+            _ => None,
+        }
     }
 }
 /// Defines a strongly typed variable.
@@ -1653,8 +1729,6 @@ pub struct K8sObjectMetadata {
 pub struct Sql {
     /// The actual query to run, the query can have templated parameters.
     /// We use Flyte's Golang templating format for Query templating.
-    /// Refer to the templating documentation.
-    /// <https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/external_services/hive/hive.html#sphx-glr-auto-integrations-external-services-hive-hive-py>
     /// For example,
     /// insert overwrite directory '{{ .rawOutputDataPrefix }}' stored as parquet
     /// select *

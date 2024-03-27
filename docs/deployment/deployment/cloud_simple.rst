@@ -112,8 +112,8 @@ hello world example:
 .. prompt:: bash $
 
    git clone https://github.com/flyteorg/flytesnacks
-   cd flytesnacks/cookbook
-   pyflyte run --remote core/flyte_basics/hello_world.py my_wf
+   cd flytesnacks/examples/basics
+   pyflyte run --remote basics/hello_world.py hello_world_wf
 
 ***********************************
 Flyte in on-premises infrastructure
