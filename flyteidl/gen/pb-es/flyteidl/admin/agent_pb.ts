@@ -172,6 +172,45 @@ export class TaskExecutionMetadata extends Message<TaskExecutionMetadata> {
 }
 
 /**
+ * @generated from message flyteidl.admin.Secret
+ */
+export class Secret extends Message<Secret> {
+  /**
+   * The value of the secret.
+   *
+   * @generated from field: string value = 1;
+   */
+  value = "";
+
+  constructor(data?: PartialMessage<Secret>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.admin.Secret";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "value", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Secret {
+    return new Secret().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Secret {
+    return new Secret().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Secret {
+    return new Secret().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: Secret | PlainMessage<Secret> | undefined, b: Secret | PlainMessage<Secret> | undefined): boolean {
+    return proto3.util.equals(Secret, a, b);
+  }
+}
+
+/**
  * Represents a request structure to create task.
  *
  * @generated from message flyteidl.admin.CreateTaskRequest
@@ -207,6 +246,13 @@ export class CreateTaskRequest extends Message<CreateTaskRequest> {
    */
   taskExecutionMetadata?: TaskExecutionMetadata;
 
+  /**
+   * Secrets required by the task.
+   *
+   * @generated from field: repeated flyteidl.admin.Secret secrets = 5;
+   */
+  secrets: Secret[] = [];
+
   constructor(data?: PartialMessage<CreateTaskRequest>) {
     super();
     proto3.util.initPartial(data, this);
@@ -219,6 +265,7 @@ export class CreateTaskRequest extends Message<CreateTaskRequest> {
     { no: 2, name: "template", kind: "message", T: TaskTemplate },
     { no: 3, name: "output_prefix", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "task_execution_metadata", kind: "message", T: TaskExecutionMetadata },
+    { no: 5, name: "secrets", kind: "message", T: Secret, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateTaskRequest {
@@ -311,6 +358,13 @@ export class CreateRequestHeader extends Message<CreateRequestHeader> {
    */
   maxDatasetSizeBytes = protoInt64.zero;
 
+  /**
+   * Secrets required by the task.
+   *
+   * @generated from field: repeated flyteidl.admin.Secret secrets = 5;
+   */
+  secrets: Secret[] = [];
+
   constructor(data?: PartialMessage<CreateRequestHeader>) {
     super();
     proto3.util.initPartial(data, this);
@@ -323,6 +377,7 @@ export class CreateRequestHeader extends Message<CreateRequestHeader> {
     { no: 2, name: "output_prefix", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "task_execution_metadata", kind: "message", T: TaskExecutionMetadata },
     { no: 4, name: "max_dataset_size_bytes", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+    { no: 5, name: "secrets", kind: "message", T: Secret, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateRequestHeader {
@@ -510,6 +565,13 @@ export class GetTaskRequest extends Message<GetTaskRequest> {
    */
   taskCategory?: TaskCategory;
 
+  /**
+   * Secrets required by the task.
+   *
+   * @generated from field: repeated flyteidl.admin.Secret secrets = 4;
+   */
+  secrets: Secret[] = [];
+
   constructor(data?: PartialMessage<GetTaskRequest>) {
     super();
     proto3.util.initPartial(data, this);
@@ -521,6 +583,7 @@ export class GetTaskRequest extends Message<GetTaskRequest> {
     { no: 1, name: "task_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "resource_meta", kind: "scalar", T: 12 /* ScalarType.BYTES */ },
     { no: 3, name: "task_category", kind: "message", T: TaskCategory },
+    { no: 4, name: "secrets", kind: "message", T: Secret, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetTaskRequest {
@@ -689,6 +752,13 @@ export class DeleteTaskRequest extends Message<DeleteTaskRequest> {
    */
   taskCategory?: TaskCategory;
 
+  /**
+   * Secrets required by the task.
+   *
+   * @generated from field: repeated flyteidl.admin.Secret secrets = 4;
+   */
+  secrets: Secret[] = [];
+
   constructor(data?: PartialMessage<DeleteTaskRequest>) {
     super();
     proto3.util.initPartial(data, this);
@@ -700,6 +770,7 @@ export class DeleteTaskRequest extends Message<DeleteTaskRequest> {
     { no: 1, name: "task_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "resource_meta", kind: "scalar", T: 12 /* ScalarType.BYTES */ },
     { no: 3, name: "task_category", kind: "message", T: TaskCategory },
+    { no: 4, name: "secrets", kind: "message", T: Secret, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeleteTaskRequest {

@@ -668,7 +668,7 @@
           "title": "client_id is the public id for the client to use. The system will not perform any pre-auth validation that the\nsecret requested matches the client_id indicated here.\n+required"
         },
         "client_secret": {
-          "$ref": "#/definitions/coreSecret",
+          "$ref": "#/definitions/flyteidlcoreSecret",
           "title": "client_secret is a reference to the secret used to authenticate the OAuth2 client.\n+required"
         }
       },
@@ -858,28 +858,6 @@
       },
       "description": "Defines schema columns and types to strongly type-validate schemas interoperability."
     },
-    "coreSecret": {
-      "type": "object",
-      "properties": {
-        "group": {
-          "type": "string",
-          "title": "The name of the secret group where to find the key referenced below. For K8s secrets, this should be the name of\nthe v1/secret object. For Confidant, this should be the Credential name. For Vault, this should be the secret name.\nFor AWS Secret Manager, this should be the name of the secret.\n+required"
-        },
-        "group_version": {
-          "type": "string",
-          "title": "The group version to fetch. This is not supported in all secret management systems. It'll be ignored for the ones\nthat do not support it.\n+optional"
-        },
-        "key": {
-          "type": "string",
-          "title": "The name of the secret to mount. This has to match an existing secret in the system. It's up to the implementation\nof the secret management system to require case sensitivity. For K8s secrets, Confidant and Vault, this should\nmatch one of the keys inside the secret. For AWS Secret Manager, it's ignored.\n+optional"
-        },
-        "mount_requirement": {
-          "$ref": "#/definitions/SecretMountType",
-          "title": "mount_requirement is optional. Indicates where the secret has to be mounted. If provided, the execution will fail\nif the underlying key management system cannot satisfy that requirement. If not provided, the default location\nwill depend on the key management system.\n+optional"
-        }
-      },
-      "description": "Secret encapsulates information about the secret a task needs to proceed. An environment variable\nFLYTE_SECRETS_ENV_PREFIX will be passed to indicate the prefix of the environment variables that will be present if\nsecrets are passed through environment variables.\nFLYTE_SECRETS_DEFAULT_DIR will be passed to indicate the prefix of the path where secrets will be mounted if secrets\nare passed through file mounts."
-    },
     "coreSecurityContext": {
       "type": "object",
       "properties": {
@@ -891,7 +869,7 @@
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/coreSecret"
+            "$ref": "#/definitions/flyteidlcoreSecret"
           },
           "description": "secrets indicate the list of secrets the task needs in order to proceed. Secrets will be mounted/passed to the\npod as it starts. If the plugin responsible for kicking of the task will not run it on a flyte cluster (e.g. AWS\nBatch), it's the responsibility of the plugin to fetch the secret (which means propeller identity will need access\nto the secret) and to pass it to the remote execution engine."
         },
@@ -1268,6 +1246,28 @@
         }
       },
       "description": "A strongly typed schema that defines the interface of data retrieved from the underlying storage medium."
+    },
+    "flyteidlcoreSecret": {
+      "type": "object",
+      "properties": {
+        "group": {
+          "type": "string",
+          "title": "The name of the secret group where to find the key referenced below. For K8s secrets, this should be the name of\nthe v1/secret object. For Confidant, this should be the Credential name. For Vault, this should be the secret name.\nFor AWS Secret Manager, this should be the name of the secret.\n+required"
+        },
+        "group_version": {
+          "type": "string",
+          "title": "The group version to fetch. This is not supported in all secret management systems. It'll be ignored for the ones\nthat do not support it.\n+optional"
+        },
+        "key": {
+          "type": "string",
+          "title": "The name of the secret to mount. This has to match an existing secret in the system. It's up to the implementation\nof the secret management system to require case sensitivity. For K8s secrets, Confidant and Vault, this should\nmatch one of the keys inside the secret. For AWS Secret Manager, it's ignored.\n+optional"
+        },
+        "mount_requirement": {
+          "$ref": "#/definitions/SecretMountType",
+          "title": "mount_requirement is optional. Indicates where the secret has to be mounted. If provided, the execution will fail\nif the underlying key management system cannot satisfy that requirement. If not provided, the default location\nwill depend on the key management system.\n+optional"
+        }
+      },
+      "description": "Secret encapsulates information about the secret a task needs to proceed. An environment variable\nFLYTE_SECRETS_ENV_PREFIX will be passed to indicate the prefix of the environment variables that will be present if\nsecrets are passed through environment variables.\nFLYTE_SECRETS_DEFAULT_DIR will be passed to indicate the prefix of the path where secrets will be mounted if secrets\nare passed through file mounts."
     },
     "flyteidlserviceState": {
       "type": "string",
