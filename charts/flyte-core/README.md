@@ -290,6 +290,7 @@ helm install gateway bitnami/contour -n flyte
 | storage.s3.secretKey | string | `""` | AWS IAM user secret access key to use for S3 bucket auth, only used if authType is set to accesskey |
 | storage.type | string | `"sandbox"` | Sets the storage type. Supported values are sandbox, s3, gcs and custom. |
 | webhook.enabled | bool | `true` | enable or disable secrets webhook |
+| webhook.priorityClassName | string | `""` | Sets priorityClassName for webhook pod |
 | webhook.resources.requests.cpu | string | `"200m"` |  |
 | webhook.resources.requests.ephemeral-storage | string | `"500Mi"` |  |
 | webhook.resources.requests.memory | string | `"500Mi"` |  |

@@ -444,6 +444,8 @@ secrets:
 webhook:
   # -- enable or disable secrets webhook
   enabled: true
+  # -- Sets priorityClassName for webhook pod
+  priorityClassName: ""
   # -- Configuration for service accounts for the webhook
   serviceAccount:
     # -- Should a service account be created for the webhook
