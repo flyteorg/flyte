@@ -232,7 +232,8 @@ configmap:
   adminServer:
     server:
       httpPort: 8088
-      grpcPort: 8089
+      grpc:
+        port: 8089
       security:
         secure: false
         useAuth: false

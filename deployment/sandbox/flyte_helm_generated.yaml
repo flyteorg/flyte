@@ -294,7 +294,8 @@ data:
       testing:
         host: http://flyteadmin
     server:
-      grpcPort: 8089
+      grpc:
+        port: 8089
       httpPort: 8088
       security:
         allowCors: true
@@ -6686,7 +6687,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "8702cc3d688d44938e6974b267f70fb01ce7fec4780de86b8f2e65f9446c711"
+        configChecksum: "88625d852360c42642190e21751f32f7dd9501ce3d479fa68b86478995ff689"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -7028,7 +7029,7 @@ spec:
         imagePullPolicy: "IfNotPresent"
         name: datacatalog
         ports:
-        - containerPort: 8088
+        - containerPort: 8080
         - containerPort: 8089
         - containerPort: 10254
         securityContext:
@@ -7077,7 +7078,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "8702cc3d688d44938e6974b267f70fb01ce7fec4780de86b8f2e65f9446c711"
+        configChecksum: "88625d852360c42642190e21751f32f7dd9501ce3d479fa68b86478995ff689"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte

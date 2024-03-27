@@ -162,7 +162,8 @@ data:
       testing:
         host: http://flyteadmin
     server:
-      grpcPort: 8089
+      grpc:
+        port: 8089
       httpPort: 8088
       security:
         allowCors: true
@@ -848,7 +849,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "2b5c85969f2bd85bb51a084f9fd72c20c3aca94be99e53cb4c4e9f78e77ebc5"
+        configChecksum: "d50d9b515795be1f4937c58f37335ec9bd505ba4c51f96caf8491fa323abb56"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -1209,7 +1210,7 @@ spec:
         imagePullPolicy: "IfNotPresent"
         name: datacatalog
         ports:
-        - containerPort: 8088
+        - containerPort: 8080
         - containerPort: 8089
         - containerPort: 10254
         securityContext:
