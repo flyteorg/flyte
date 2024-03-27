@@ -258,7 +258,7 @@ type ExecutableGateNode interface {
 
 type ExecutableArrayNode interface {
 	GetSubNodeSpec() *NodeSpec
-	GetParallelism() uint32
+	GetParallelism() int64
 	GetMinSuccesses() *uint32
 	GetMinSuccessRatio() *float32
 }

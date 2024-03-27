@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
-import { Duration, Message, proto3 } from "@bufbuild/protobuf";
+import { Duration, Message, proto3, protoInt64 } from "@bufbuild/protobuf";
 import { BooleanExpression } from "./condition_pb.js";
 import { Error, LiteralType } from "./types_pb.js";
 import { Identifier } from "./identifier_pb.js";
@@ -512,9 +512,9 @@ export class ArrayNode extends Message<ArrayNode> {
    * other failures, the actual number of currently running instances might be more. This has to
    * be a positive number if assigned. Default value is size.
    *
-   * @generated from field: uint32 parallelism = 2;
+   * @generated from field: int64 parallelism = 2;
    */
-  parallelism = 0;
+  parallelism = protoInt64.zero;
 
   /**
    * @generated from oneof flyteidl.core.ArrayNode.success_criteria
@@ -550,7 +550,7 @@ export class ArrayNode extends Message<ArrayNode> {
   static readonly typeName = "flyteidl.core.ArrayNode";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "node", kind: "message", T: Node },
-    { no: 2, name: "parallelism", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 2, name: "parallelism", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
     { no: 3, name: "min_successes", kind: "scalar", T: 13 /* ScalarType.UINT32 */, oneof: "success_criteria" },
     { no: 4, name: "min_success_ratio", kind: "scalar", T: 2 /* ScalarType.FLOAT */, oneof: "success_criteria" },
   ]);

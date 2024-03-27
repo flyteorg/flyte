@@ -2401,8 +2401,8 @@ pub struct ArrayNode {
     /// point. Note that this is an optimistic restriction and that, due to network partitioning or
     /// other failures, the actual number of currently running instances might be more. This has to
     /// be a positive number if assigned. Default value is size.
-    #[prost(uint32, tag="2")]
-    pub parallelism: u32,
+    #[prost(int64, tag="2")]
+    pub parallelism: i64,
     #[prost(oneof="array_node::SuccessCriteria", tags="3, 4")]
     pub success_criteria: ::core::option::Option<array_node::SuccessCriteria>,
 }
