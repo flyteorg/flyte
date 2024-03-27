@@ -147,6 +147,9 @@ func NewProvider(ctx context.Context, cfg config.AuthorizationServer, sm core.Se
 	if err != nil {
 		return Provider{}, fmt.Errorf("failed to read secretTokenHash file. Error: %w", err)
 	}
+	if tokenHashBase64 == "" {
+		return Provider{}, fmt.Errorf("failed to read secretTokenHash. Error: empty value")
+	}
 
 	secret, err := base64.RawStdEncoding.DecodeString(tokenHashBase64)
 	if err != nil {
@@ -158,8 +161,14 @@ func NewProvider(ctx context.Context, cfg config.AuthorizationServer, sm core.Se
 	if err != nil {
 		return Provider{}, fmt.Errorf("failed to read token signing RSA Key. Error: %w", err)
 	}
+	if privateKeyPEM == "" {
+		return Provider{}, fmt.Errorf("failed to read token signing RSA Key. Error: empty value")
+	}
 
 	block, _ := pem.Decode([]byte(privateKeyPEM))
+	if block == nil {
+		return Provider{}, fmt.Errorf("failed to decode token signing RSA Key. Error: no PEM data found")
+	}
 	privateKey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
 	if err != nil {
 		return Provider{}, fmt.Errorf("failed to parse PKCS1PrivateKey. Error: %w", err)
@@ -197,7 +206,13 @@ func NewProvider(ctx context.Context, cfg config.AuthorizationServer, sm core.Se
 	// Try to load old key to validate tokens using it to support key rotation.
 	privateKeyPEM, err = sm.Get(ctx, cfg.OldTokenSigningRSAKeySecretName)
 	if err == nil {
+		if privateKeyPEM == "" {
+			return Provider{}, fmt.Errorf("failed to read PKCS1PrivateKey. Error: empty value")
+		}
 		block, _ = pem.Decode([]byte(privateKeyPEM))
+		if block == nil {
+			return Provider{}, fmt.Errorf("failed to decode PKCS1PrivateKey. Error: no PEM data found")
+		}
 		oldPrivateKey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
 		if err != nil {
 			return Provider{}, fmt.Errorf("failed to parse PKCS1PrivateKey. Error: %w", err)
