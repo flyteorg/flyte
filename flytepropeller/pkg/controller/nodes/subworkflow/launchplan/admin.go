@@ -115,11 +115,10 @@ func (a *adminLaunchPlanExecutor) Launch(ctx context.Context, launchCtx LaunchCo
 		})
 	}
 
-	// Remove the ShardKeyLabel entry from labels so that the child launch plan can potentially run on a different
-	// flytepropeller shard.
-	logger.Warnf(ctx, "launch labels: %v", launchCtx.Labels)
-	delete(launchCtx.Labels, k8s.ShardKeyLabel)
-	logger.Warnf(ctx, "launch labels: %v", launchCtx.Labels)
+	// Make a copy of the labels with shard-key removed. This ensures that the shard-key is re-computed for each
+	// instead of being copied from the parent.
+	labels := launchCtx.Labels
+	delete(labels, k8s.ShardKeyLabel)
 
 	req := &admin.ExecutionCreateRequest{
 		Project: executionID.Project,
@@ -134,7 +133,7 @@ func (a *adminLaunchPlanExecutor) Launch(ctx context.Context, launchCtx LaunchCo
 				Principal:           launchCtx.Principal,
 				ParentNodeExecution: launchCtx.ParentNodeExecution,
 			},
-			Labels:              &admin.Labels{Values: launchCtx.Labels},
+			Labels:              &admin.Labels{Values: labels},
 			Annotations:         &admin.Annotations{Values: launchCtx.Annotations},
 			SecurityContext:     &launchCtx.SecurityContext,
 			MaxParallelism:      int32(launchCtx.MaxParallelism),
