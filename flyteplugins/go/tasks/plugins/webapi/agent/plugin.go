@@ -91,6 +91,9 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 
 	taskCategory := admin.TaskCategory{Name: taskTemplate.Type, Version: taskTemplate.TaskTypeVersion}
 	agent, isSync := getFinalAgent(&taskCategory, p.cfg, p.agentRegistry)
+	if err != nil {
+		return nil, nil, err
+	}
 
 	finalCtx, cancel := getFinalContext(ctx, "CreateTask", agent)
 	defer cancel()

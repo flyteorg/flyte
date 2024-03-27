@@ -22674,6 +22674,116 @@
                 return TaskExecutionMetadata;
             })();
     
+            admin.Secret = (function() {
+    
+                /**
+                 * Properties of a Secret.
+                 * @memberof flyteidl.admin
+                 * @interface ISecret
+                 * @property {string|null} [value] Secret value
+                 */
+    
+                /**
+                 * Constructs a new Secret.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a Secret.
+                 * @implements ISecret
+                 * @constructor
+                 * @param {flyteidl.admin.ISecret=} [properties] Properties to set
+                 */
+                function Secret(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * Secret value.
+                 * @member {string} value
+                 * @memberof flyteidl.admin.Secret
+                 * @instance
+                 */
+                Secret.prototype.value = "";
+    
+                /**
+                 * Creates a new Secret instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.Secret
+                 * @static
+                 * @param {flyteidl.admin.ISecret=} [properties] Properties to set
+                 * @returns {flyteidl.admin.Secret} Secret instance
+                 */
+                Secret.create = function create(properties) {
+                    return new Secret(properties);
+                };
+    
+                /**
+                 * Encodes the specified Secret message. Does not implicitly {@link flyteidl.admin.Secret.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.Secret
+                 * @static
+                 * @param {flyteidl.admin.ISecret} message Secret message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                Secret.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.value != null && message.hasOwnProperty("value"))
+                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.value);
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a Secret message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.Secret
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.Secret} Secret
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                Secret.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.Secret();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.value = reader.string();
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a Secret message.
+                 * @function verify
+                 * @memberof flyteidl.admin.Secret
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                Secret.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.value != null && message.hasOwnProperty("value"))
+                        if (!$util.isString(message.value))
+                            return "value: string expected";
+                    return null;
+                };
+    
+                return Secret;
+            })();
+    
             admin.CreateTaskRequest = (function() {
     
                 /**
@@ -22684,6 +22794,7 @@
                  * @property {flyteidl.core.ITaskTemplate|null} [template] CreateTaskRequest template
                  * @property {string|null} [outputPrefix] CreateTaskRequest outputPrefix
                  * @property {flyteidl.admin.ITaskExecutionMetadata|null} [taskExecutionMetadata] CreateTaskRequest taskExecutionMetadata
+                 * @property {Array.<flyteidl.admin.ISecret>|null} [secrets] CreateTaskRequest secrets
                  */
     
                 /**
@@ -22695,6 +22806,7 @@
                  * @param {flyteidl.admin.ICreateTaskRequest=} [properties] Properties to set
                  */
                 function CreateTaskRequest(properties) {
+                    this.secrets = [];
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -22734,6 +22846,14 @@
                 CreateTaskRequest.prototype.taskExecutionMetadata = null;
     
                 /**
+                 * CreateTaskRequest secrets.
+                 * @member {Array.<flyteidl.admin.ISecret>} secrets
+                 * @memberof flyteidl.admin.CreateTaskRequest
+                 * @instance
+                 */
+                CreateTaskRequest.prototype.secrets = $util.emptyArray;
+    
+                /**
                  * Creates a new CreateTaskRequest instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.CreateTaskRequest
@@ -22765,6 +22885,9 @@
                         writer.uint32(/* id 3, wireType 2 =*/26).string(message.outputPrefix);
                     if (message.taskExecutionMetadata != null && message.hasOwnProperty("taskExecutionMetadata"))
                         $root.flyteidl.admin.TaskExecutionMetadata.encode(message.taskExecutionMetadata, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+                    if (message.secrets != null && message.secrets.length)
+                        for (var i = 0; i < message.secrets.length; ++i)
+                            $root.flyteidl.admin.Secret.encode(message.secrets[i], writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
                     return writer;
                 };
     
@@ -22797,6 +22920,11 @@
                             break;
                         case 4:
                             message.taskExecutionMetadata = $root.flyteidl.admin.TaskExecutionMetadata.decode(reader, reader.uint32());
+                            break;
+                        case 5:
+                            if (!(message.secrets && message.secrets.length))
+                                message.secrets = [];
+                            message.secrets.push($root.flyteidl.admin.Secret.decode(reader, reader.uint32()));
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -22834,6 +22962,15 @@
                         var error = $root.flyteidl.admin.TaskExecutionMetadata.verify(message.taskExecutionMetadata);
                         if (error)
                             return "taskExecutionMetadata." + error;
+                    }
+                    if (message.secrets != null && message.hasOwnProperty("secrets")) {
+                        if (!Array.isArray(message.secrets))
+                            return "secrets: array expected";
+                        for (var i = 0; i < message.secrets.length; ++i) {
+                            var error = $root.flyteidl.admin.Secret.verify(message.secrets[i]);
+                            if (error)
+                                return "secrets." + error;
+                        }
                     }
                     return null;
                 };
@@ -22961,6 +23098,7 @@
                  * @property {string|null} [outputPrefix] CreateRequestHeader outputPrefix
                  * @property {flyteidl.admin.ITaskExecutionMetadata|null} [taskExecutionMetadata] CreateRequestHeader taskExecutionMetadata
                  * @property {Long|null} [maxDatasetSizeBytes] CreateRequestHeader maxDatasetSizeBytes
+                 * @property {Array.<flyteidl.admin.ISecret>|null} [secrets] CreateRequestHeader secrets
                  */
     
                 /**
@@ -22972,6 +23110,7 @@
                  * @param {flyteidl.admin.ICreateRequestHeader=} [properties] Properties to set
                  */
                 function CreateRequestHeader(properties) {
+                    this.secrets = [];
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -23011,6 +23150,14 @@
                 CreateRequestHeader.prototype.maxDatasetSizeBytes = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
     
                 /**
+                 * CreateRequestHeader secrets.
+                 * @member {Array.<flyteidl.admin.ISecret>} secrets
+                 * @memberof flyteidl.admin.CreateRequestHeader
+                 * @instance
+                 */
+                CreateRequestHeader.prototype.secrets = $util.emptyArray;
+    
+                /**
                  * Creates a new CreateRequestHeader instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.CreateRequestHeader
@@ -23042,6 +23189,9 @@
                         $root.flyteidl.admin.TaskExecutionMetadata.encode(message.taskExecutionMetadata, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
                     if (message.maxDatasetSizeBytes != null && message.hasOwnProperty("maxDatasetSizeBytes"))
                         writer.uint32(/* id 4, wireType 0 =*/32).int64(message.maxDatasetSizeBytes);
+                    if (message.secrets != null && message.secrets.length)
+                        for (var i = 0; i < message.secrets.length; ++i)
+                            $root.flyteidl.admin.Secret.encode(message.secrets[i], writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
                     return writer;
                 };
     
@@ -23074,6 +23224,11 @@
                             break;
                         case 4:
                             message.maxDatasetSizeBytes = reader.int64();
+                            break;
+                        case 5:
+                            if (!(message.secrets && message.secrets.length))
+                                message.secrets = [];
+                            message.secrets.push($root.flyteidl.admin.Secret.decode(reader, reader.uint32()));
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -23110,6 +23265,15 @@
                     if (message.maxDatasetSizeBytes != null && message.hasOwnProperty("maxDatasetSizeBytes"))
                         if (!$util.isInteger(message.maxDatasetSizeBytes) && !(message.maxDatasetSizeBytes && $util.isInteger(message.maxDatasetSizeBytes.low) && $util.isInteger(message.maxDatasetSizeBytes.high)))
                             return "maxDatasetSizeBytes: integer|Long expected";
+                    if (message.secrets != null && message.hasOwnProperty("secrets")) {
+                        if (!Array.isArray(message.secrets))
+                            return "secrets: array expected";
+                        for (var i = 0; i < message.secrets.length; ++i) {
+                            var error = $root.flyteidl.admin.Secret.verify(message.secrets[i]);
+                            if (error)
+                                return "secrets." + error;
+                        }
+                    }
                     return null;
                 };
     
@@ -23545,6 +23709,7 @@
                  * @property {string|null} [taskType] GetTaskRequest taskType
                  * @property {Uint8Array|null} [resourceMeta] GetTaskRequest resourceMeta
                  * @property {flyteidl.admin.ITaskCategory|null} [taskCategory] GetTaskRequest taskCategory
+                 * @property {Array.<flyteidl.admin.ISecret>|null} [secrets] GetTaskRequest secrets
                  */
     
                 /**
@@ -23556,6 +23721,7 @@
                  * @param {flyteidl.admin.IGetTaskRequest=} [properties] Properties to set
                  */
                 function GetTaskRequest(properties) {
+                    this.secrets = [];
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -23587,6 +23753,14 @@
                 GetTaskRequest.prototype.taskCategory = null;
     
                 /**
+                 * GetTaskRequest secrets.
+                 * @member {Array.<flyteidl.admin.ISecret>} secrets
+                 * @memberof flyteidl.admin.GetTaskRequest
+                 * @instance
+                 */
+                GetTaskRequest.prototype.secrets = $util.emptyArray;
+    
+                /**
                  * Creates a new GetTaskRequest instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.GetTaskRequest
@@ -23616,6 +23790,9 @@
                         writer.uint32(/* id 2, wireType 2 =*/18).bytes(message.resourceMeta);
                     if (message.taskCategory != null && message.hasOwnProperty("taskCategory"))
                         $root.flyteidl.admin.TaskCategory.encode(message.taskCategory, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                    if (message.secrets != null && message.secrets.length)
+                        for (var i = 0; i < message.secrets.length; ++i)
+                            $root.flyteidl.admin.Secret.encode(message.secrets[i], writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
                     return writer;
                 };
     
@@ -23646,6 +23823,11 @@
                         case 3:
                             message.taskCategory = $root.flyteidl.admin.TaskCategory.decode(reader, reader.uint32());
                             break;
+                        case 4:
+                            if (!(message.secrets && message.secrets.length))
+                                message.secrets = [];
+                            message.secrets.push($root.flyteidl.admin.Secret.decode(reader, reader.uint32()));
+                            break;
                         default:
                             reader.skipType(tag & 7);
                             break;
@@ -23675,6 +23857,15 @@
                         var error = $root.flyteidl.admin.TaskCategory.verify(message.taskCategory);
                         if (error)
                             return "taskCategory." + error;
+                    }
+                    if (message.secrets != null && message.hasOwnProperty("secrets")) {
+                        if (!Array.isArray(message.secrets))
+                            return "secrets: array expected";
+                        for (var i = 0; i < message.secrets.length; ++i) {
+                            var error = $root.flyteidl.admin.Secret.verify(message.secrets[i]);
+                            if (error)
+                                return "secrets." + error;
+                        }
                     }
                     return null;
                 };
@@ -24031,6 +24222,7 @@
                  * @property {string|null} [taskType] DeleteTaskRequest taskType
                  * @property {Uint8Array|null} [resourceMeta] DeleteTaskRequest resourceMeta
                  * @property {flyteidl.admin.ITaskCategory|null} [taskCategory] DeleteTaskRequest taskCategory
+                 * @property {Array.<flyteidl.admin.ISecret>|null} [secrets] DeleteTaskRequest secrets
                  */
     
                 /**
@@ -24042,6 +24234,7 @@
                  * @param {flyteidl.admin.IDeleteTaskRequest=} [properties] Properties to set
                  */
                 function DeleteTaskRequest(properties) {
+                    this.secrets = [];
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -24073,6 +24266,14 @@
                 DeleteTaskRequest.prototype.taskCategory = null;
     
                 /**
+                 * DeleteTaskRequest secrets.
+                 * @member {Array.<flyteidl.admin.ISecret>} secrets
+                 * @memberof flyteidl.admin.DeleteTaskRequest
+                 * @instance
+                 */
+                DeleteTaskRequest.prototype.secrets = $util.emptyArray;
+    
+                /**
                  * Creates a new DeleteTaskRequest instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.DeleteTaskRequest
@@ -24102,6 +24303,9 @@
                         writer.uint32(/* id 2, wireType 2 =*/18).bytes(message.resourceMeta);
                     if (message.taskCategory != null && message.hasOwnProperty("taskCategory"))
                         $root.flyteidl.admin.TaskCategory.encode(message.taskCategory, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                    if (message.secrets != null && message.secrets.length)
+                        for (var i = 0; i < message.secrets.length; ++i)
+                            $root.flyteidl.admin.Secret.encode(message.secrets[i], writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
                     return writer;
                 };
     
@@ -24132,6 +24336,11 @@
                         case 3:
                             message.taskCategory = $root.flyteidl.admin.TaskCategory.decode(reader, reader.uint32());
                             break;
+                        case 4:
+                            if (!(message.secrets && message.secrets.length))
+                                message.secrets = [];
+                            message.secrets.push($root.flyteidl.admin.Secret.decode(reader, reader.uint32()));
+                            break;
                         default:
                             reader.skipType(tag & 7);
                             break;
@@ -24161,6 +24370,15 @@
                         var error = $root.flyteidl.admin.TaskCategory.verify(message.taskCategory);
                         if (error)
                             return "taskCategory." + error;
+                    }
+                    if (message.secrets != null && message.hasOwnProperty("secrets")) {
+                        if (!Array.isArray(message.secrets))
+                            return "secrets: array expected";
+                        for (var i = 0; i < message.secrets.length; ++i) {
+                            var error = $root.flyteidl.admin.Secret.verify(message.secrets[i]);
+                            if (error)
+                                return "secrets." + error;
+                        }
                     }
                     return null;
                 };
