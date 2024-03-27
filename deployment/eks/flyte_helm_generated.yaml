@@ -193,7 +193,7 @@ data:
   storage.yaml: | 
     storage:
       type: s3
-      container: "<BUCKET_NAME>"
+      container: "<METADATA_BUCKET_NAME>"
       connection:
         auth-type: iam
         region: <AWS_REGION>
@@ -387,7 +387,7 @@ data:
   storage.yaml: | 
     storage:
       type: s3
-      container: "<BUCKET_NAME>"
+      container: "<METADATA_BUCKET_NAME>"
       connection:
         auth-type: iam
         region: <AWS_REGION>
@@ -503,7 +503,7 @@ data:
           rate: 100
           type: bucket
         type: batch
-      rawoutput-prefix: s3://<BUCKET_NAME>/
+      rawoutput-prefix: s3://<RAW_DATA_BUCKET_NAME>/
       workers: 40
       workflow-reeval-duration: 30s
     webhook:
@@ -534,7 +534,7 @@ data:
   storage.yaml: | 
     storage:
       type: s3
-      container: "<BUCKET_NAME>"
+      container: "<METADATA_BUCKET_NAME>"
       connection:
         auth-type: iam
         region: <AWS_REGION>
@@ -879,7 +879,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "053b20ebc40227f6ed8ddc61f5997ee7997c604158f773779f20ec61af11a2f"
+        configChecksum: "b4ef4165bf685d7192588d47908b2f286a1ce3b34abc3778dff4b7fce7c95e6"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -1197,7 +1197,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "59ef5b555bd41c3e854a315f21031c76dfa876455ff8069b989cb6c28ec1f17"
+        configChecksum: "c2a15ce5dc2fa465986d6006f93450723da58166b3ad5ee35a91cb37d5c39da"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte
@@ -1299,7 +1299,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "053b20ebc40227f6ed8ddc61f5997ee7997c604158f773779f20ec61af11a2f"
+        configChecksum: "b4ef4165bf685d7192588d47908b2f286a1ce3b34abc3778dff4b7fce7c95e6"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte
@@ -1398,7 +1398,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "6b3ace0186a0b36f4d87ebd8ef0b7114608b9ad0b63d9c1af3bb84d4d2da857"
+        configChecksum: "b052795cb8ef026899766e121c71512ec06085fe15dadce8b93c94b01814851"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -1480,7 +1480,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v1.11.0-b0
       annotations:
-        configChecksum: "6b3ace0186a0b36f4d87ebd8ef0b7114608b9ad0b63d9c1af3bb84d4d2da857"
+        configChecksum: "b052795cb8ef026899766e121c71512ec06085fe15dadce8b93c94b01814851"
     spec:
       securityContext: 
         fsGroup: 65534

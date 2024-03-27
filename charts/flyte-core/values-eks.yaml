@@ -4,7 +4,10 @@ userSettings:
   certificateArn: <CERTIFICATE_ARN>
   dbPassword: <DB_PASSWORD>
   rdsHost: <RDS_HOST>
-  bucketName: <BUCKET_NAME>
+# These two storage buckets could be the same or you could specify different buckets if required. Both keys are required.
+# Learn more https://docs.flyte.org/en/latest/concepts/data_management.html#understand-how-flyte-handles-data 
+  bucketName: <METADATA_BUCKET_NAME> 
+  rawDataBucketName: <RAW_DATA_BUCKET_NAME>  
   logGroup: <LOG_GROUP_NAME>
   redisHostUrl: <REDIS_HOST_URL>
   redisHostKey: <REDIS_HOST_KEY>
@@ -238,7 +241,7 @@ configmap:
 
   core:
     propeller:
-      rawoutput-prefix: "s3://{{ .Values.userSettings.bucketName }}/"
+      rawoutput-prefix: "s3://{{ .Values.userSettings.rawDataBucketName }}/"
       workers: 40
       gc-interval: 12h
       max-workflow-retries: 50

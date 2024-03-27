@@ -170,7 +170,7 @@ data:
           json: ""
           project_id: <PROJECT-ID>
           scopes: https://www.googleapis.com/auth/cloud-platform
-      container: "<BUCKETNAME>"
+      container: "<METADATA_BUCKET_NAME>"
       enable-multicontainer: false
       limits:
         maxDownloadMBs: 10
@@ -372,7 +372,7 @@ data:
           json: ""
           project_id: <PROJECT-ID>
           scopes: https://www.googleapis.com/auth/cloud-platform
-      container: "<BUCKETNAME>"
+      container: "<METADATA_BUCKET_NAME>"
       enable-multicontainer: false
       limits:
         maxDownloadMBs: 10
@@ -568,7 +568,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "2e169a911a8234dd42d06ca0887279093f4ed36033d0543749ce126b26b50f3"
+        configChecksum: "a9253bcb4c6383ad4113db0325b54cfe6069d9f27ceaa3b1baf68ba7ead5c67"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -886,7 +886,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "bc69ed841506b28a42ac19bd0884d483472b3d11fe85fe7e546b879aeb30a85"
+        configChecksum: "905a2a911a85dbf8d4f1dc3be24b9c4fd7bb46481db0e174274d6aea6129b4c"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte
@@ -988,7 +988,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "2e169a911a8234dd42d06ca0887279093f4ed36033d0543749ce126b26b50f3"
+        configChecksum: "a9253bcb4c6383ad4113db0325b54cfe6069d9f27ceaa3b1baf68ba7ead5c67"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte
