@@ -154,7 +154,8 @@ The WorkflowExecutor is responsible for handling high-level workflow operations.
 NodeExecutor
 ------------
 
-The NodeExecutor is executed on a single node, beginning with the workflow's start node. It traverses the workflow using a visitor pattern with a modified depth-first search (DFS), evaluating each node along the path. A few examples of node evaluation based on phase: successful nodes are skipped, unevaluated nodes are queued for processing, and failed nodes may be reattempted up to a configurable threshold. There are many configurable parameters to tune evaluation criteria including max parallelism which restricts the number of nodes which may be scheduled concurrently. Additionally, nodes may be retried to ensure recoverability on failure.  
+The NodeExecutor is executed on a single node, beginning with the workflow's start node. It traverses the workflow using a visitor pattern with a modified depth-first search (DFS), evaluating each node along the path. A few examples of node evaluation based on phase include: successful nodes are skipped, unevaluated nodes are queued for processing, and failed nodes may be reattempted up to a configurable threshold. There are many configurable parameters to tune evaluation criteria including max parallelism which restricts the number of nodes which may be scheduled concurrently. Additionally, nodes may be retried to ensure recoverability on failure.
+Go to the `Optimizing Performance section <https://docs.flyte.org/en/latest/deployment/configuration/performance.html#optimizing-performance>__` for more information on how to tune Propeller parameters.  
 
 The NodeExecutor is also responsible for linking data readers/writers to facilitate data transfer between node executions. The data transfer process occurs automatically within Flyte, using efficient K8s events rather than a polling listener pattern which incurs more overhead. Relatively small amounts of data may be passed between nodes inline, but it is more common to pass data URLs to backing storage. A component of this is writing to and checking the data cache, which facilitates the reuse of previously completed evaluations.
 
@@ -167,7 +168,7 @@ FlytePropeller includes a robust collection of NodeHandlers to support diverse e
 
   1. **Pod Task**: Create a pod in the Kubernetes cluster, execute the task, and then delete the pod.
 
-  2. **K8s Operator Backend Plugin**: Install a specific Kubernetes Operator (e.g., Spark, Ray, and Kubeflow) in the cluster, create pods by the Kubernetes Operator, execute the task, and then delete the pods.
+  2. **K8s Operator Backend Plugin**: Install a specific Kubernetes Operator (e.g., Spark, Ray, or Kubeflow) in the cluster, create pods by the Kubernetes Operator, execute the task, and then delete the pods.
 
   3. **Web API Task**: Send REST/gRPC requests to a server and return the response.
      Note: The Web API Task will not start a pod.
@@ -185,6 +186,8 @@ It should be noted that the WorkflowExecutor, NodeExecutor, and TaskHandlers sen
 FlytePlugins
 ------------
 
-Here is an overview architecture of FlytePlugins:
+Every operation that Propeller performs makes use of a plugin. The following diagram describe the different types of plugins available for Propeller and an example operation when using the Spark integration:
 
 .. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/concepts/architecture/flytepropeller_plugins_architecture.png
+
+ 
