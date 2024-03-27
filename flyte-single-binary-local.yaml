@@ -41,11 +41,9 @@ tasks:
       - container
       - sidecar
       - K8S-ARRAY
-      - ray
     default-for-task-types:
       - container: container
       - container_array: K8S-ARRAY
-      - ray: ray
 
 plugins:
   logs:

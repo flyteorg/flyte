@@ -15,8 +15,8 @@ message RayJob {
   bool shutdown_after_job_finishes = 3;
   // ttl_seconds_after_finished specifies the number of seconds after which the RayCluster will be deleted after the RayJob finishes.
   int32 ttl_seconds_after_finished = 4;
-	// RuntimeEnvYAML represents the runtime environment configuration
-	// provided as a multi-line YAML string.
+  // RuntimeEnvYAML represents the runtime environment configuration
+  // provided as a multi-line YAML string.
   string runtime_env_yaml = 5;
 }
 
