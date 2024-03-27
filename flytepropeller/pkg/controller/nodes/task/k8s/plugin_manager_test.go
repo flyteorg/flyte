@@ -190,7 +190,6 @@ func getMockTaskContext(initPhase PluginPhase, wantPhase PluginPhase) pluginsCor
 	taskExecutionContext.OnOutputWriter().Return(&dummyOutputWriter{})
 
 	taskExecutionContext.OnDataStore().Return(nil)
-	taskExecutionContext.OnMaxDatasetSizeBytes().Return(int64(0))
 	return taskExecutionContext
 }
 

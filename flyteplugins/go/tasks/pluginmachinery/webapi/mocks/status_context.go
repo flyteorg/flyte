@@ -84,38 +84,6 @@ func (_m *StatusContext) InputReader() io.InputReader {
 	return r0
 }
 
-type StatusContext_MaxDatasetSizeBytes struct {
-	*mock.Call
-}
-
-func (_m StatusContext_MaxDatasetSizeBytes) Return(_a0 int64) *StatusContext_MaxDatasetSizeBytes {
-	return &StatusContext_MaxDatasetSizeBytes{Call: _m.Call.Return(_a0)}
-}
-
-func (_m *StatusContext) OnMaxDatasetSizeBytes() *StatusContext_MaxDatasetSizeBytes {
-	c_call := _m.On("MaxDatasetSizeBytes")
-	return &StatusContext_MaxDatasetSizeBytes{Call: c_call}
-}
-
-func (_m *StatusContext) OnMaxDatasetSizeBytesMatch(matchers ...interface{}) *StatusContext_MaxDatasetSizeBytes {
-	c_call := _m.On("MaxDatasetSizeBytes", matchers...)
-	return &StatusContext_MaxDatasetSizeBytes{Call: c_call}
-}
-
-// MaxDatasetSizeBytes provides a mock function with given fields:
-func (_m *StatusContext) MaxDatasetSizeBytes() int64 {
-	ret := _m.Called()
-
-	var r0 int64
-	if rf, ok := ret.Get(0).(func() int64); ok {
-		r0 = rf()
-	} else {
-		r0 = ret.Get(0).(int64)
-	}
-
-	return r0
-}
-
 type StatusContext_OutputWriter struct {
 	*mock.Call
 }

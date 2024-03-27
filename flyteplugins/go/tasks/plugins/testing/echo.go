@@ -76,7 +76,7 @@ func (e *EchoPlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext)
 				return core.UnknownTransition, err
 			}
 
-			or := ioutils.NewRemoteFileOutputReader(ctx, tCtx.DataStore(), tCtx.OutputWriter(), tCtx.MaxDatasetSizeBytes())
+			or := ioutils.NewRemoteFileOutputReader(ctx, tCtx.DataStore(), tCtx.OutputWriter(), 0)
 			if err = tCtx.OutputWriter().Put(ctx, or); err != nil {
 				return core.UnknownTransition, err
 			}

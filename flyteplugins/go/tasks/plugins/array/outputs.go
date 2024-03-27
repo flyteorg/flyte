@@ -225,7 +225,7 @@ func AssembleFinalOutputs(ctx context.Context, assemblyQueue OutputAssembler, tC
 
 	switch w.Status() {
 	case workqueue.WorkStatusSucceeded:
-		or := ioutils.NewRemoteFileOutputReader(ctx, tCtx.DataStore(), tCtx.OutputWriter(), tCtx.MaxDatasetSizeBytes())
+		or := ioutils.NewRemoteFileOutputReader(ctx, tCtx.DataStore(), tCtx.OutputWriter(), 0)
 		if err = tCtx.OutputWriter().Put(ctx, or); err != nil {
 			return nil, err
 		}

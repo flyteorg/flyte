@@ -100,7 +100,6 @@ func createNodeContextWithVersion(phase v1alpha1.WorkflowNodePhase, n v1alpha1.E
 	nCtx.OnNodeExecutionMetadata().Return(nm)
 	nCtx.OnInputReader().Return(ir)
 	nCtx.OnCurrentAttempt().Return(uint32(1))
-	nCtx.OnMaxDatasetSizeBytes().Return(int64(1))
 	nCtx.OnNodeID().Return(n.GetID())
 	nCtx.OnEnqueueOwnerFunc().Return(nil)
 	nCtx.OnNodeStatus().Return(s)

@@ -244,7 +244,6 @@ func TestAssembleFinalOutputs(t *testing.T) {
 		tCtx := &mocks3.TaskExecutionContext{}
 		tCtx.OnTaskExecutionMetadata().Return(tMeta)
 		tCtx.OnOutputWriter().Return(ow)
-		tCtx.OnMaxDatasetSizeBytes().Return(10000)
 		tCtx.OnDataStore().Return(d)
 
 		_, err = AssembleFinalOutputs(ctx, assemblyQueue, tCtx, arrayCore.PhaseSuccess, 1, s)
@@ -368,7 +367,6 @@ func TestAssembleFinalOutputs(t *testing.T) {
 		tCtx.OnTaskReader().Return(tReader)
 		tCtx.OnOutputWriter().Return(ow)
 		tCtx.OnDataStore().Return(ds)
-		tCtx.OnMaxDatasetSizeBytes().Return(10000)
 
 		_, err = AssembleFinalOutputs(ctx, assemblyQueue, tCtx, arrayCore.PhaseSuccess, 1, s)
 		assert.NoError(t, err)

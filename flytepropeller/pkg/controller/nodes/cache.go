@@ -211,7 +211,7 @@ func (n *nodeExecutor) WriteCatalogCache(ctx context.Context, nCtx interfaces.No
 		catalogKey.Identifier.Domain, catalogKey.Identifier.Name, catalogKey.Identifier.Version)
 
 	outputPaths := ioutils.NewReadOnlyOutputFilePaths(ctx, nCtx.DataStore(), nCtx.NodeStatus().GetOutputDir())
-	outputReader := ioutils.NewRemoteFileOutputReader(ctx, nCtx.DataStore(), outputPaths, nCtx.MaxDatasetSizeBytes())
+	outputReader := ioutils.NewRemoteFileOutputReader(ctx, nCtx.DataStore(), outputPaths, 0)
 	metadata := catalog.Metadata{
 		TaskExecutionIdentifier: task.GetTaskExecutionIdentifier(nCtx),
 	}

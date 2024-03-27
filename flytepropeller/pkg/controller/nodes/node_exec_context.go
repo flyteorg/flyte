@@ -119,20 +119,19 @@ func (e nodeExecMetadata) GetLabels() map[string]string {
 }
 
 type nodeExecContext struct {
-	store               *storage.DataStore
-	tr                  interfaces.TaskReader
-	md                  interfaces.NodeExecutionMetadata
-	eventRecorder       interfaces.EventRecorder
-	inputs              io.InputReader
-	node                v1alpha1.ExecutableNode
-	nodeStatus          v1alpha1.ExecutableNodeStatus
-	maxDatasetSizeBytes int64
-	nsm                 *nodeStateManager
-	enqueueOwner        func() error
-	rawOutputPrefix     storage.DataReference
-	shardSelector       ioutils.ShardSelector
-	nl                  executors.NodeLookup
-	ic                  executors.ExecutionContext
+	store           *storage.DataStore
+	tr              interfaces.TaskReader
+	md              interfaces.NodeExecutionMetadata
+	eventRecorder   interfaces.EventRecorder
+	inputs          io.InputReader
+	node            v1alpha1.ExecutableNode
+	nodeStatus      v1alpha1.ExecutableNodeStatus
+	nsm             *nodeStateManager
+	enqueueOwner    func() error
+	rawOutputPrefix storage.DataReference
+	shardSelector   ioutils.ShardSelector
+	nl              executors.NodeLookup
+	ic              executors.ExecutionContext
 }
 
 func (e nodeExecContext) ExecutionContext() executors.ExecutionContext {
@@ -199,13 +198,9 @@ func (e nodeExecContext) NodeExecutionMetadata() interfaces.NodeExecutionMetadat
 	return e.md
 }
 
-func (e nodeExecContext) MaxDatasetSizeBytes() int64 {
-	return e.maxDatasetSizeBytes
-}
-
 func newNodeExecContext(_ context.Context, store *storage.DataStore, execContext executors.ExecutionContext, nl executors.NodeLookup,
 	node v1alpha1.ExecutableNode, nodeStatus v1alpha1.ExecutableNodeStatus, inputs io.InputReader, interruptible bool, interruptibleFailureThreshold int32,
-	maxDatasetSize int64, taskEventRecorder events.TaskEventRecorder, nodeEventRecorder events.NodeEventRecorder, tr interfaces.TaskReader, nsm *nodeStateManager,
+	taskEventRecorder events.TaskEventRecorder, nodeEventRecorder events.NodeEventRecorder, tr interfaces.TaskReader, nsm *nodeStateManager,
 	enqueueOwner func() error, rawOutputPrefix storage.DataReference, outputShardSelector ioutils.ShardSelector) *nodeExecContext {
 
 	md := nodeExecMetadata{
@@ -240,14 +235,13 @@ func newNodeExecContext(_ context.Context, store *storage.DataStore, execContext
 			taskEventRecorder: taskEventRecorder,
 			nodeEventRecorder: nodeEventRecorder,
 		},
-		maxDatasetSizeBytes: maxDatasetSize,
-		tr:                  tr,
-		nsm:                 nsm,
-		enqueueOwner:        enqueueOwner,
-		rawOutputPrefix:     rawOutputPrefix,
-		shardSelector:       outputShardSelector,
-		nl:                  nl,
-		ic:                  execContext,
+		tr:              tr,
+		nsm:             nsm,
+		enqueueOwner:    enqueueOwner,
+		rawOutputPrefix: rawOutputPrefix,
+		shardSelector:   outputShardSelector,
+		nl:              nl,
+		ic:              execContext,
 	}
 }
 
@@ -331,7 +325,6 @@ func (c *nodeExecutor) BuildNodeExecutionContext(ctx context.Context, executionC
 		),
 		interruptible,
 		c.interruptibleFailureThreshold,
-		c.maxDatasetSizeBytes,
 		c.taskRecorder,
 		c.nodeRecorder,
 		tr,
