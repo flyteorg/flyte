@@ -139,12 +139,12 @@ FlytePropeller supports concurrent execution of multiple, unique workflows using
 The WorkQueue is a FIFO queue storing workflow ID strings that require a lookup to retrieve the FlyteWorkflow CR to ensure up-to-date status. A workflow may be added to the queue in a variety of circumstances:
 
 #. A new FlyteWorkflow CR is created or an existing instance is updated
-#. The K8s Informer resyncs the FlyteWorkflow periodically (necessary to detect workflow timeouts and ensure liveness)
+#. The K8s Informer detects a workflow timeout or failed liveness check during its periodic resync operation on the FlyteWorkflow. 
 #. A FlytePropeller worker experiences an error during a processing loop
 #. The WorkflowExecutor observes a completed downstream node
 #. A NodeHandler observes state change and explicitly enqueues its owner (For example, K8s pod informer observes completion of a task)
 
-The WorkerPool is implemented as a collection of goroutines, one for each worker. Using this lightweight construct, FlytePropeller can scale to 1000s of workers on a single CPU. Workers continually poll the WorkQueue for workflows. On success, the workflow is executed (passed to WorkflowExecutor).
+The WorkerPool is implemented as a collection of ``goroutines``, one for each worker. Using this lightweight construct, FlytePropeller can scale to 1000s of workers on a single CPU. Workers continually poll the WorkQueue for workflows. On success, the workflow is passed to the WorkflowExecutor.
 
 WorkflowExecutor
 ----------------
