@@ -1,5 +1,6 @@
 export REPOSITORY=flyteadmin
 export FLYTE_SCHEDULER_REPOSITORY=flytescheduler
+export REPO_ROOT=..
 include ../boilerplate/flyte/docker_build/Makefile
 include ../boilerplate/flyte/golang_test_targets/Makefile
 include ../boilerplate/flyte/end2end/Makefile
