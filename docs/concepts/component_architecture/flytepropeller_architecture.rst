@@ -155,7 +155,8 @@ NodeExecutor
 ------------
 
 The NodeExecutor is executed on a single node, beginning with the workflow's start node. It traverses the workflow using a visitor pattern with a modified depth-first search (DFS), evaluating each node along the path. A few examples of node evaluation based on phase include: successful nodes are skipped, unevaluated nodes are queued for processing, and failed nodes may be reattempted up to a configurable threshold. There are many configurable parameters to tune evaluation criteria including max parallelism which restricts the number of nodes which may be scheduled concurrently. Additionally, nodes may be retried to ensure recoverability on failure.
-Go to the `Optimizing Performance section <https://docs.flyte.org/en/latest/deployment/configuration/performance.html#optimizing-performance>__` for more information on how to tune Propeller parameters.  
+
+Go to the `Optimizing Performance <https://docs.flyte.org/en/latest/deployment/configuration/performance.html#optimizing-performance>`__ section for more information on how to tune Propeller parameters.  
 
 The NodeExecutor is also responsible for linking data readers/writers to facilitate data transfer between node executions. The data transfer process occurs automatically within Flyte, using efficient K8s events rather than a polling listener pattern which incurs more overhead. Relatively small amounts of data may be passed between nodes inline, but it is more common to pass data URLs to backing storage. A component of this is writing to and checking the data cache, which facilitates the reuse of previously completed evaluations.
 
