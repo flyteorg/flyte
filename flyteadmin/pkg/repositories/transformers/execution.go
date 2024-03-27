@@ -128,7 +128,7 @@ func CreateExecutionModel(input CreateExecutionModelInput) (*models.Execution, e
 			Name:    input.WorkflowExecutionID.Name,
 		},
 		Spec:                  spec,
-		Phase:                 input.Phase.String(),
+		Phase:                 closure.Phase.String(),
 		Closure:               closureBytes,
 		WorkflowID:            input.WorkflowID,
 		ExecutionCreatedAt:    &input.CreatedAt,
