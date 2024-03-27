@@ -6,11 +6,11 @@
 
 .PHONY: download_tooling
 download_tooling: #download dependencies (including test deps) for the package
-	@boilerplate/flyte/golang_test_targets/download_tooling.sh
+	@../boilerplate/flyte/golang_test_targets/download_tooling.sh
 
 .PHONY: generate
 generate: download_tooling #generate go code
-	@boilerplate/flyte/golang_test_targets/go-gen.sh
+	@../boilerplate/flyte/golang_test_targets/go-gen.sh
 
 .PHONY: lint
 lint: download_tooling #lints the package for common code smells
