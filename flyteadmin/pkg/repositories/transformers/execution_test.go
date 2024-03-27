@@ -163,6 +163,7 @@ func TestCreateExecutionModel(t *testing.T) {
 		assert.Equal(t, nodeID, execution.ParentNodeExecutionID)
 		assert.Equal(t, sourceID, execution.SourceExecutionID)
 		assert.Equal(t, "launch_plan", execution.LaunchEntity)
+		assert.Equal(t, execution.Phase, core.WorkflowExecution_FAILED.String())
 		expectedSpec := execRequest.Spec
 		expectedSpec.Metadata.Principal = principal
 		expectedSpec.Metadata.SystemMetadata = &admin.SystemMetadata{
