@@ -1,6 +1,7 @@
 package task
 
 import (
+	"context"
 	"time"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -16,6 +17,7 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/common"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 // This is used by flyteadmin to indicate that map tasks now report subtask metadata individually.
@@ -29,6 +31,7 @@ func ToTransitionType(ttype pluginCore.TransitionType) handler.TransitionType {
 }
 
 func ToTaskEventPhase(p pluginCore.Phase) core.TaskExecution_Phase {
+	logger.Infof(context.Background(), "@@@ ToTaskEventPhase: [%v]", p)
 	switch p {
 	case pluginCore.PhaseQueued:
 		return core.TaskExecution_QUEUED
@@ -195,6 +198,10 @@ func ToTaskExecutionEvent(input ToTaskExecutionEventInputs) (*event.TaskExecutio
 			InputUri: input.InputReader.GetInputPath().String(),
 		}
 	}
+
+	logger.Infof(context.Background(), "@@@ ToTaskExecutionEventInputs->TaskId: [%v]", tev.TaskId)
+	logger.Infof(context.Background(), "@@@ ToTaskExecutionEventInputs->Logs: [%v]", tev.Logs)
+	logger.Infof(context.Background(), "@@@ ToTaskExecutionEventInputs->CustomInfo: [%v]", tev.CustomInfo)
 
 	return tev, nil
 }
