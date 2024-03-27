@@ -2,6 +2,7 @@
 _build/
 _bin/
 build/
+.tmp_build/
 .vscode/
 *.swp
 *.swo

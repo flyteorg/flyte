@@ -153,7 +153,20 @@ To understand how the below components interact with each other, refer to :ref:`
     * - **Purpose**: Deployment, Documentation, and Issues
     * - **Languages**: RST
 
-To build the Flyte docs locally you will need the following prerequisites:
+To build the Flyte docs locally you have two methods:
+
+Use Docker
+**********
+
+To use this method, you have to be able to run x86-64 Docker containers. If you are using an Apple Arm-based machine, you can `use Apple Rosetta 2 to run x86-64 Docker containers <https://levelup.gitconnected.com/docker-on-apple-silicon-mac-how-to-run-x86-containers-with-rosetta-2-4a679913a0d5>`__.
+
+In the ``flyteorg/flyte`` root directory you can run:
+
+* ``make dev-docs`` to build the documentation locally. The build will be in the ``docs/_build/html`` directory. See `the script <https://github.com/flyteorg/flyte/blob/master/script/local_build_docs.sh>`__ for additional environment variables that can be set.
+    * For example, to use the local flytekit source code instead of the source code from the flyteorg/flytekit repo, run ``export FLYTEKIT_LOCAL_PATH=/path/to/flytekit`` before running ``make dev-docs``.
+
+Use conda
+**********
 
 * Install ``conda``.
     *  We recommend Miniconda installed with an `official installer <https://docs.conda.io/projects/miniconda/en/latest/index.html#latest-miniconda-installer-links>`__.
