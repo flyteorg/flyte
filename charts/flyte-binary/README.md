@@ -138,6 +138,7 @@ Chart for basic single Flyte executable deployment
 | ingress.httpTls | list | `[]` |  |
 | ingress.ingressClassName | string | `""` |  |
 | ingress.labels | object | `{}` |  |
+| ingress.separateGrpcIngress | bool | `true` |  |
 | ingress.tls | list | `[]` |  |
 | nameOverride | string | `""` |  |
 | rbac.annotations | object | `{}` |  |
