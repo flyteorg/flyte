@@ -15,6 +15,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	evtErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/transformers/k8s"
 	"github.com/flyteorg/flyte/flytestdlib/cache"
 	stdErr "github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
@@ -113,6 +114,12 @@ func (a *adminLaunchPlanExecutor) Launch(ctx context.Context, launchCtx LaunchCo
 			Value: v,
 		})
 	}
+
+	// Remove the ShardKeyLabel entry from labels so that the child launch plan can potentially run on a different
+	// flytepropeller shard.
+	logger.Warnf(ctx, "launch labels: %v", launchCtx.Labels)
+	delete(launchCtx.Labels, k8s.ShardKeyLabel)
+	logger.Warnf(ctx, "launch labels: %v", launchCtx.Labels)
 
 	req := &admin.ExecutionCreateRequest{
 		Project: executionID.Project,
