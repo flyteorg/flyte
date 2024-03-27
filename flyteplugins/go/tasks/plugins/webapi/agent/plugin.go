@@ -44,6 +44,7 @@ type ResourceMetaWrapper struct {
 	OutputPrefix      string
 	AgentResourceMeta []byte
 	TaskCategory      admin.TaskCategory
+	Secrets           []admin.Secret
 }
 
 func (p Plugin) GetConfig() webapi.PluginConfig {
@@ -120,7 +121,7 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 	if err != nil {
 		return nil, nil, err
 	}
-	request := &admin.CreateTaskRequest{Inputs: inputs, Template: taskTemplate, OutputPrefix: outputPrefix, TaskExecutionMetadata: &taskExecutionMetadata}
+	request := &admin.CreateTaskRequest{Inputs: inputs, Template: taskTemplate, OutputPrefix: outputPrefix, TaskExecutionMetadata: &taskExecutionMetadata, Secrets: secrets}
 	res, err := client.CreateTask(finalCtx, request)
 	if err != nil {
 		return nil, nil, err
@@ -196,7 +197,6 @@ func (p Plugin) ExecuteTaskSync(
 func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest webapi.Resource, err error) {
 	metadata := taskCtx.ResourceMeta().(ResourceMetaWrapper)
 	agent, _ := getFinalAgent(&metadata.TaskCategory, p.cfg, p.agentRegistry)
-
 	client, err := p.getAsyncAgentClient(ctx, agent)
 	if err != nil {
 		return nil, err
@@ -204,10 +204,16 @@ func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest weba
 	finalCtx, cancel := getFinalContext(ctx, "GetTask", agent)
 	defer cancel()
 
+	secrets := make([]*admin.Secret, 0)
+	for _, s := range metadata.Secrets {
+		secrets = append(secrets, &admin.Secret{Value: s.Value})
+	}
+
 	request := &admin.GetTaskRequest{
 		TaskType:     metadata.TaskCategory.Name,
 		TaskCategory: &metadata.TaskCategory,
 		ResourceMeta: metadata.AgentResourceMeta,
+		Secrets:      secrets,
 	}
 	res, err := client.GetTask(finalCtx, request)
 	if err != nil {
@@ -237,10 +243,16 @@ func (p Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error 
 	finalCtx, cancel := getFinalContext(ctx, "DeleteTask", agent)
 	defer cancel()
 
+	secrets := make([]*admin.Secret, 0)
+	for _, s := range metadata.Secrets {
+		secrets = append(secrets, &admin.Secret{Value: s.Value})
+	}
+
 	request := &admin.DeleteTaskRequest{
 		TaskType:     metadata.TaskCategory.Name,
 		TaskCategory: &metadata.TaskCategory,
 		ResourceMeta: metadata.AgentResourceMeta,
+		Secrets:      secrets,
 	}
 	_, err = client.DeleteTask(finalCtx, request)
 	return err
