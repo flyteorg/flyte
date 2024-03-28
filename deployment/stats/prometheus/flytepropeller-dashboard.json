@@ -985,7 +985,7 @@
           "targets": [
             {
               "datasource": null,
-              "expr": "{__name__=~\"flyte:propeller:all:node:plugin:.*_failure_unlabeled\"}",
+              "expr": "sum(rate({__name__=~\"flyte:propeller:all:plugin:.*_failure_unlabeled\"}[5m]))",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -993,14 +993,14 @@
               "intervalFactor": 2,
               "legendFormat": "",
               "metric": "",
-              "query": "{__name__=~\"flyte:propeller:all:node:plugin:.*_failure_unlabeled\"}",
+              "query": "sum(rate({__name__=~\"flyte:propeller:all:plugin:.*_failure_unlabeled\"}[5m]))",
               "refId": "A",
               "step": 10,
               "target": ""
             },
             {
               "datasource": null,
-              "expr": "{__name__=~\"flyte:propeller:all:node:plugin:.*_success_unlabeled\"}",
+              "expr": "sum(rate({__name__=~\"flyte:propeller:all:plugin:.*_success_unlabeled\"}[5m]))",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -1008,7 +1008,7 @@
               "intervalFactor": 2,
               "legendFormat": "",
               "metric": "",
-              "query": "{__name__=~\"flyte:propeller:all:node:plugin:.*_success_unlabeled\"}",
+              "query": "sum(rate({__name__=~\"flyte:propeller:all:plugin:.*_success_unlabeled\"}[5m]))",
               "refId": "B",
               "step": 10,
               "target": ""
@@ -1017,7 +1017,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "Plugin Failures",
+          "title": "Plugin Failure rate",
           "tooltip": {
             "msResolution": true,
             "shared": true,
@@ -1127,7 +1127,7 @@
           "targets": [
             {
               "datasource": null,
-              "expr": "sum(rate(flyte:propeller:all:round:raw_unlabeled_ms[5m])) by (quantile)",
+              "expr": "sum(flyte:propeller:all:round:raw_unlabeled_ms) by (quantile)",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -1135,7 +1135,22 @@
               "intervalFactor": 2,
               "legendFormat": "",
               "metric": "",
-              "query": "sum(rate(flyte:propeller:all:round:raw_unlabeled_ms[5m])) by (quantile)",
+              "query": "sum(flyte:propeller:all:round:raw_unlabeled_ms) by (quantile)",
+              "refId": "A",
+              "step": 10,
+              "target": ""
+            },
+            {
+              "datasource": null,
+              "expr": "sum(flyte:propeller:all:round:raw_unlabeled_ms_sum/flyte:propeller:all:round:raw_unlabeled_ms_count) by (quantile)",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "mean",
+              "metric": "",
+              "query": "sum(flyte:propeller:all:round:raw_unlabeled_ms_sum/flyte:propeller:all:round:raw_unlabeled_ms_count) by (quantile)",
               "refId": "A",
               "step": 10,
               "target": ""
@@ -1254,7 +1269,7 @@
           "targets": [
             {
               "datasource": null,
-              "expr": "sum(rate(flyte:propeller:all:round:raw_ms[5m])) by (wf)",
+              "expr": "sum(flyte:propeller:all:round:raw_ms) by (wf)",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -1262,7 +1277,22 @@
               "intervalFactor": 2,
               "legendFormat": "",
               "metric": "",
-              "query": "sum(rate(flyte:propeller:all:round:raw_ms[5m])) by (wf)",
+              "query": "sum(flyte:propeller:all:round:raw_ms) by (wf)",
+              "refId": "A",
+              "step": 10,
+              "target": ""
+            },
+            {
+              "datasource": null,
+              "expr": "sum(fflyte:propeller:all:round:raw_ms_sum/flyte:propeller:all:round:raw_ms_count) by (quantile)",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "mean",
+              "metric": "",
+              "query": "sum(fflyte:propeller:all:round:raw_ms_sum/flyte:propeller:all:round:raw_ms_count) by (quantile)",
               "refId": "A",
               "step": 10,
               "target": ""

@@ -213,15 +213,15 @@ class FlytePropeller(object):
         TODO We need to convert the plugin names to be labels, so that prometheus can perform queries correctly
         """
         return Graph(
-            title=f"Plugin Failures",
+            title=f"Plugin Failure rate",
             dataSource=DATASOURCE,
             targets=[
                 Target(
-                    expr='{__name__=~"flyte:propeller:all:node:plugin:.*_failure_unlabeled"}',
+                    expr='sum(rate({__name__=~"flyte:propeller:all:plugin:.*_failure_unlabeled"}[5m]))',
                     refId="A",
                 ),
                 Target(
-                    expr='{__name__=~"flyte:propeller:all:node:plugin:.*_success_unlabeled"}',
+                    expr='sum(rate({__name__=~"flyte:propeller:all:plugin:.*_success_unlabeled"}[5m]))',
                     refId="B",
                 ),
             ],
