@@ -2,19 +2,19 @@ package k8s
 
 import (
 	"context"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	corev1 "k8s.io/api/core/v1"
 	"runtime/pprof"
 	"strings"
 	"sync"
 	"time"
 
-	"k8s.io/apimachinery/pkg/api/meta"
-	"k8s.io/apimachinery/pkg/runtime/schema"
-	"k8s.io/client-go/tools/cache"
-
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"sigs.k8s.io/controller-runtime/pkg/cache"
 )
 
 const resourceLevelMonitorCycleDuration = 10 * time.Second
@@ -34,7 +34,10 @@ type ResourceLevelMonitor struct {
 	Levels *labeled.Gauge
 
 	// This informer will be used to get a list of the underlying objects that we want a tally of
-	sharedInformer cache.SharedIndexInformer
+	informer cache.Informer
+
+	// This kubeClient will be used to get a list of the underlying objects that we want a tally of
+	kubeClient core.KubeClient
 
 	// The kind here will be used to differentiate all the metrics, we'll leave out group and version for now
 	gvk schema.GroupVersionKind
@@ -49,18 +52,13 @@ type ResourceLevelMonitor struct {
 // K8s resource created by a plugin will have (as yet, Flyte doesn't have any plugins that create cluster level resources and
 // it probably won't for a long time). We can't assume that all the operators and CRDs that Flyte will ever work with will have
 // the exact same set of labels or annotations or owner references. The only thing we can really count on is namespace.
-func (r *ResourceLevelMonitor) countList(ctx context.Context, objects []interface{}) map[string]int {
+func (r *ResourceLevelMonitor) countList(ctx context.Context, pods *corev1.PodList) map[string]int {
 	// Map of namespace to counts
 	counts := map[string]int{}
 
 	// Collect the object counts by namespace
-	for _, v := range objects {
-		metadata, err := meta.Accessor(v)
-		if err != nil {
-			logger.Errorf(ctx, "Error converting obj %v to an Accessor %s\n", v, err)
-			continue
-		}
-		counts[metadata.GetNamespace()]++
+	for _, pod := range pods.Items {
+		counts[pod.Namespace]++
 	}
 
 	return counts
@@ -70,8 +68,14 @@ func (r *ResourceLevelMonitor) countList(ctx context.Context, objects []interfac
 func (r *ResourceLevelMonitor) collect(ctx context.Context) {
 	// Emit gauges at the namespace layer - since these are just K8s resources, we cannot be guaranteed to have the necessary
 	// information to derive project/domain
-	objects := r.sharedInformer.GetStore().List()
-	counts := r.countList(ctx, objects)
+
+	pods := &corev1.PodList{}
+	if err := r.kubeClient.GetClient().List(ctx, pods); err != nil {
+		logger.Errorf(ctx, "Error listing objects %s\n", err)
+		return
+	}
+
+	counts := r.countList(ctx, pods)
 
 	for ns, count := range counts {
 		withNamespaceCtx := contextutils.WithNamespace(ctx, ns)
@@ -89,7 +93,7 @@ func (r *ResourceLevelMonitor) RunCollector(ctx context.Context) {
 	go func() {
 		defer ticker.Stop()
 		pprof.SetGoroutineLabels(collectorCtx)
-		r.sharedInformer.HasSynced()
+		r.informer.HasSynced()
 		logger.Infof(ctx, "K8s resource collector %s has synced", r.gvk.Kind)
 		for {
 			select {
@@ -125,8 +129,8 @@ type ResourceMonitorIndex struct {
 	stopwatches map[promutils.Scope]*labeled.StopWatch
 }
 
-func (r *ResourceMonitorIndex) GetOrCreateResourceLevelMonitor(ctx context.Context, scope promutils.Scope, si cache.SharedIndexInformer,
-	gvk schema.GroupVersionKind) *ResourceLevelMonitor {
+func (r *ResourceMonitorIndex) GetOrCreateResourceLevelMonitor(ctx context.Context, scope promutils.Scope, informer cache.Informer,
+	gvk schema.GroupVersionKind, kubeClient core.KubeClient) *ResourceLevelMonitor {
 
 	logger.Infof(ctx, "Attempting to create K8s gauge emitter for kind %s/%s", gvk.Version, gvk.Kind)
 
@@ -157,8 +161,9 @@ func (r *ResourceMonitorIndex) GetOrCreateResourceLevelMonitor(ctx context.Conte
 		Scope:          scope,
 		CollectorTimer: r.stopwatches[scope],
 		Levels:         r.gauges[scope],
-		sharedInformer: si,
+		informer:       informer,
 		gvk:            gvk,
+		kubeClient:     kubeClient,
 	}
 	r.monitors[gvk] = rm
 
