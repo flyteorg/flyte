@@ -38,6 +38,9 @@ pub struct TaskExecutionMetadata {
     /// These overrides can be used to customize the behavior of the task node.
     #[prost(message, optional, tag="10")]
     pub overrides: ::core::option::Option<super::core::TaskNodeOverrides>,
+    /// Security context for this task execution, including user to run as, secrets, and tokens
+    #[prost(message, optional, tag="11")]
+    pub security_context: ::core::option::Option<super::core::SecurityContext>,
 }
 /// Represents a request structure to create task.
 #[allow(clippy::derive_partial_eq_without_eq)]

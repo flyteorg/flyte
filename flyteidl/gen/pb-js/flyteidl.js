@@ -22387,6 +22387,7 @@
                  * @property {boolean|null} [interruptible] TaskExecutionMetadata interruptible
                  * @property {number|null} [interruptibleFailureThreshold] TaskExecutionMetadata interruptibleFailureThreshold
                  * @property {flyteidl.core.ITaskNodeOverrides|null} [overrides] TaskExecutionMetadata overrides
+                 * @property {flyteidl.core.ISecurityContext|null} [securityContext] TaskExecutionMetadata securityContext
                  */
     
                 /**
@@ -22488,6 +22489,14 @@
                 TaskExecutionMetadata.prototype.overrides = null;
     
                 /**
+                 * TaskExecutionMetadata securityContext.
+                 * @member {flyteidl.core.ISecurityContext|null|undefined} securityContext
+                 * @memberof flyteidl.admin.TaskExecutionMetadata
+                 * @instance
+                 */
+                TaskExecutionMetadata.prototype.securityContext = null;
+    
+                /**
                  * Creates a new TaskExecutionMetadata instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.TaskExecutionMetadata
@@ -22534,6 +22543,8 @@
                         writer.uint32(/* id 9, wireType 0 =*/72).int32(message.interruptibleFailureThreshold);
                     if (message.overrides != null && message.hasOwnProperty("overrides"))
                         $root.flyteidl.core.TaskNodeOverrides.encode(message.overrides, writer.uint32(/* id 10, wireType 2 =*/82).fork()).ldelim();
+                    if (message.securityContext != null && message.hasOwnProperty("securityContext"))
+                        $root.flyteidl.core.SecurityContext.encode(message.securityContext, writer.uint32(/* id 11, wireType 2 =*/90).fork()).ldelim();
                     return writer;
                 };
     
@@ -22599,6 +22610,9 @@
                             break;
                         case 10:
                             message.overrides = $root.flyteidl.core.TaskNodeOverrides.decode(reader, reader.uint32());
+                            break;
+                        case 11:
+                            message.securityContext = $root.flyteidl.core.SecurityContext.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -22667,6 +22681,11 @@
                         var error = $root.flyteidl.core.TaskNodeOverrides.verify(message.overrides);
                         if (error)
                             return "overrides." + error;
+                    }
+                    if (message.securityContext != null && message.hasOwnProperty("securityContext")) {
+                        var error = $root.flyteidl.core.SecurityContext.verify(message.securityContext);
+                        if (error)
+                            return "securityContext." + error;
                     }
                     return null;
                 };
