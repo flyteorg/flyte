@@ -115,7 +115,7 @@ AgentRegistry.register(OpenAIAgent())
 #### Sensor interface specification
 With the agent framework, you can easily build a custom sensor in Flyte to watch certain events or monitor the bucket in your workflow.
 
-BaseSensor is a specialized abstraction built on top of the agent framework in Flyte.
+To create a new sensor, extend the `[BaseSensor](https://github.com/flyteorg/flytekit/blob/master/flytekit/sensor/base_sensor.py#L43)` class and implement the `poke` method, which checks whether a specific condition is met.
 It is designed to simplify the process of adding sensors to Flyte workflows.
 
 ```python
