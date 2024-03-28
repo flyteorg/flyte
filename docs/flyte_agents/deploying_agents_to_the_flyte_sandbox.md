@@ -11,7 +11,7 @@ jupytext:
 
 After you have finished {ref}`testing an agent locally <testing_agents_locally>`, you can deploy your agent to the flyte sandbox.
 
-Here's a step by step guide to deploy your agent image to the flyte sandbox.
+Here's a step by step guide to deploy your agent to the flyte sandbox.
 
 1. Start the flyte sandbox.
 ```bash
@@ -42,11 +42,7 @@ docker push localhost:30000/flyteagent:example
 
 2. Deploy your agent image to the kubernetes cluster
 ```bash
-kubectl edit deployment flyteagent -n flyte
-```
-Search the `image` key, and replace its value to your agent image.
-```yaml
-image: localhost:30000/flyteagent:example
+kubectl set image deployment/flyteagent flyteagent=localhost:30000/flyteagent:example
 ```
 
 3. Set up your secrets
@@ -79,7 +75,7 @@ type: Opaque
 ```
 :::{note}
 Please ensure 2 things.
-1. The secret name consists only of lowercase English letters.
+1. The secret name should not include uppercase English letters.
 2. The secret value is encoded in Base64.
 :::
 
