@@ -42,6 +42,7 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/fakeplugins"
 	wfErrors "github.com/flyteorg/flyte/flytepropeller/pkg/controller/workflow/errors"
+	execStats "github.com/flyteorg/flyte/flytepropeller/pkg/controller/workflowstore"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
@@ -248,7 +249,10 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Error(t *testing.T) {
 	nodeExec, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, store, enqueueWorkflow, eventSink, adminClient, adminClient,
 		maxOutputSize, "s3://bucket", fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, handlerFactory, promutils.NewTestScope())
 	assert.NoError(t, err)
-	executor, err := NewExecutor(ctx, store, enqueueWorkflow, eventSink, recorder, "", nodeExec, eventConfig, testClusterID, promutils.NewTestScope())
+
+	execStatsHolder, err := execStats.NewExecutionStatsHolder()
+	assert.NoError(t, err)
+	executor, err := NewExecutor(ctx, store, enqueueWorkflow, eventSink, recorder, "", nodeExec, eventConfig, testClusterID, promutils.NewTestScope(), execStatsHolder)
 	assert.NoError(t, err)
 
 	assert.NoError(t, executor.Initialize(ctx))
@@ -332,7 +336,9 @@ func TestWorkflowExecutor_HandleFlyteWorkflow(t *testing.T) {
 		maxOutputSize, "s3://bucket", fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, handlerFactory, promutils.NewTestScope())
 	assert.NoError(t, err)
 
-	executor, err := NewExecutor(ctx, store, enqueueWorkflow, eventSink, recorder, "", nodeExec, eventConfig, testClusterID, promutils.NewTestScope())
+	execStatsHolder, err := execStats.NewExecutionStatsHolder()
+	assert.NoError(t, err)
+	executor, err := NewExecutor(ctx, store, enqueueWorkflow, eventSink, recorder, "", nodeExec, eventConfig, testClusterID, promutils.NewTestScope(), execStatsHolder)
 	assert.NoError(t, err)
 
 	assert.NoError(t, executor.Initialize(ctx))
@@ -396,7 +402,9 @@ func BenchmarkWorkflowExecutor(b *testing.B) {
 		maxOutputSize, "s3://bucket", fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, handlerFactory, scope)
 	assert.NoError(b, err)
 
-	executor, err := NewExecutor(ctx, store, enqueueWorkflow, eventSink, recorder, "", nodeExec, eventConfig, testClusterID, promutils.NewTestScope())
+	execStatsHolder, err := execStats.NewExecutionStatsHolder()
+	assert.NoError(b, err)
+	executor, err := NewExecutor(ctx, store, enqueueWorkflow, eventSink, recorder, "", nodeExec, eventConfig, testClusterID, promutils.NewTestScope(), execStatsHolder)
 	assert.NoError(b, err)
 
 	assert.NoError(b, executor.Initialize(ctx))
@@ -507,7 +515,10 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Failing(t *testing.T) {
 	nodeExec, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, store, enqueueWorkflow, eventSink, adminClient, adminClient,
 		maxOutputSize, "s3://bucket", fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, handlerFactory, promutils.NewTestScope())
 	assert.NoError(t, err)
-	executor, err := NewExecutor(ctx, store, enqueueWorkflow, eventSink, recorder, "", nodeExec, eventConfig, testClusterID, promutils.NewTestScope())
+
+	execStatsHolder, err := execStats.NewExecutionStatsHolder()
+	assert.NoError(t, err)
+	executor, err := NewExecutor(ctx, store, enqueueWorkflow, eventSink, recorder, "", nodeExec, eventConfig, testClusterID, promutils.NewTestScope(), execStatsHolder)
 	assert.NoError(t, err)
 
 	assert.NoError(t, executor.Initialize(ctx))
@@ -609,7 +620,9 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Events(t *testing.T) {
 	nodeExec, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, store, enqueueWorkflow, eventSink, adminClient, adminClient,
 		maxOutputSize, "s3://bucket", fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, handlerFactory, promutils.NewTestScope())
 	assert.NoError(t, err)
-	executor, err := NewExecutor(ctx, store, enqueueWorkflow, eventSink, recorder, "metadata", nodeExec, eventConfig, testClusterID, promutils.NewTestScope())
+	execStatsHolder, err := execStats.NewExecutionStatsHolder()
+	assert.NoError(t, err)
+	executor, err := NewExecutor(ctx, store, enqueueWorkflow, eventSink, recorder, "metadata", nodeExec, eventConfig, testClusterID, promutils.NewTestScope(), execStatsHolder)
 	assert.NoError(t, err)
 
 	assert.NoError(t, executor.Initialize(ctx))
@@ -684,7 +697,9 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_EventFailure(t *testing.T) {
 				Cause: errors.New("already exists"),
 			}
 		}
-		executor, err := NewExecutor(ctx, store, enqueueWorkflow, eventSink, recorder, "metadata", nodeExec, eventConfig, testClusterID, promutils.NewTestScope())
+		execStatsHolder, err := execStats.NewExecutionStatsHolder()
+		assert.NoError(t, err)
+		executor, err := NewExecutor(ctx, store, enqueueWorkflow, eventSink, recorder, "metadata", nodeExec, eventConfig, testClusterID, promutils.NewTestScope(), execStatsHolder)
 		assert.NoError(t, err)
 		w := &v1alpha1.FlyteWorkflow{}
 		assert.NoError(t, json.Unmarshal(wJSON, w))
@@ -703,7 +718,9 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_EventFailure(t *testing.T) {
 				Cause: errors.New("already exists"),
 			}
 		}
-		executor, err := NewExecutor(ctx, store, enqueueWorkflow, eventSink, recorder, "metadata", nodeExec, eventConfig, testClusterID, promutils.NewTestScope())
+		execStatsHolder, err := execStats.NewExecutionStatsHolder()
+		assert.NoError(t, err)
+		executor, err := NewExecutor(ctx, store, enqueueWorkflow, eventSink, recorder, "metadata", nodeExec, eventConfig, testClusterID, promutils.NewTestScope(), execStatsHolder)
 		assert.NoError(t, err)
 		w := &v1alpha1.FlyteWorkflow{}
 		assert.NoError(t, json.Unmarshal(wJSON, w))
@@ -719,7 +736,9 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_EventFailure(t *testing.T) {
 				Cause: errors.New("generic exists"),
 			}
 		}
-		executor, err := NewExecutor(ctx, store, enqueueWorkflow, eventSink, recorder, "metadata", nodeExec, eventConfig, testClusterID, promutils.NewTestScope())
+		execStatsHolder, err := execStats.NewExecutionStatsHolder()
+		assert.NoError(t, err)
+		executor, err := NewExecutor(ctx, store, enqueueWorkflow, eventSink, recorder, "metadata", nodeExec, eventConfig, testClusterID, promutils.NewTestScope(), execStatsHolder)
 		assert.NoError(t, err)
 		w := &v1alpha1.FlyteWorkflow{}
 		assert.NoError(t, json.Unmarshal(wJSON, w))
@@ -736,7 +755,9 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_EventFailure(t *testing.T) {
 				Cause: errors.New("incompatible cluster"),
 			}
 		}
-		executor, err := NewExecutor(ctx, store, enqueueWorkflow, eventSink, recorder, "metadata", nodeExec, eventConfig, testClusterID, promutils.NewTestScope())
+		execStatsHolder, err := execStats.NewExecutionStatsHolder()
+		assert.NoError(t, err)
+		executor, err := NewExecutor(ctx, store, enqueueWorkflow, eventSink, recorder, "metadata", nodeExec, eventConfig, testClusterID, promutils.NewTestScope(), execStatsHolder)
 		assert.NoError(t, err)
 		w := &v1alpha1.FlyteWorkflow{}
 		assert.NoError(t, json.Unmarshal(wJSON, w))

@@ -20,6 +20,38 @@ type ExecutionContext struct {
 	mock.Mock
 }
 
+type ExecutionContext_CurrentNodeExecutionCount struct {
+	*mock.Call
+}
+
+func (_m ExecutionContext_CurrentNodeExecutionCount) Return(_a0 uint32) *ExecutionContext_CurrentNodeExecutionCount {
+	return &ExecutionContext_CurrentNodeExecutionCount{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutionContext) OnCurrentNodeExecutionCount() *ExecutionContext_CurrentNodeExecutionCount {
+	c_call := _m.On("CurrentNodeExecutionCount")
+	return &ExecutionContext_CurrentNodeExecutionCount{Call: c_call}
+}
+
+func (_m *ExecutionContext) OnCurrentNodeExecutionCountMatch(matchers ...interface{}) *ExecutionContext_CurrentNodeExecutionCount {
+	c_call := _m.On("CurrentNodeExecutionCount", matchers...)
+	return &ExecutionContext_CurrentNodeExecutionCount{Call: c_call}
+}
+
+// CurrentNodeExecutionCount provides a mock function with given fields:
+func (_m *ExecutionContext) CurrentNodeExecutionCount() uint32 {
+	ret := _m.Called()
+
+	var r0 uint32
+	if rf, ok := ret.Get(0).(func() uint32); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(uint32)
+	}
+
+	return r0
+}
+
 type ExecutionContext_CurrentParallelism struct {
 	*mock.Call
 }
@@ -40,6 +72,38 @@ func (_m *ExecutionContext) OnCurrentParallelismMatch(matchers ...interface{}) *
 
 // CurrentParallelism provides a mock function with given fields:
 func (_m *ExecutionContext) CurrentParallelism() uint32 {
+	ret := _m.Called()
+
+	var r0 uint32
+	if rf, ok := ret.Get(0).(func() uint32); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(uint32)
+	}
+
+	return r0
+}
+
+type ExecutionContext_CurrentTaskExecutionCount struct {
+	*mock.Call
+}
+
+func (_m ExecutionContext_CurrentTaskExecutionCount) Return(_a0 uint32) *ExecutionContext_CurrentTaskExecutionCount {
+	return &ExecutionContext_CurrentTaskExecutionCount{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutionContext) OnCurrentTaskExecutionCount() *ExecutionContext_CurrentTaskExecutionCount {
+	c_call := _m.On("CurrentTaskExecutionCount")
+	return &ExecutionContext_CurrentTaskExecutionCount{Call: c_call}
+}
+
+func (_m *ExecutionContext) OnCurrentTaskExecutionCountMatch(matchers ...interface{}) *ExecutionContext_CurrentTaskExecutionCount {
+	c_call := _m.On("CurrentTaskExecutionCount", matchers...)
+	return &ExecutionContext_CurrentTaskExecutionCount{Call: c_call}
+}
+
+// CurrentTaskExecutionCount provides a mock function with given fields:
+func (_m *ExecutionContext) CurrentTaskExecutionCount() uint32 {
 	ret := _m.Called()
 
 	var r0 uint32
@@ -677,6 +741,38 @@ func (_m *ExecutionContext) GetTask(id string) (v1alpha1.ExecutableTask, error) 
 	return r0, r1
 }
 
+type ExecutionContext_IncrementNodeExecutionCount struct {
+	*mock.Call
+}
+
+func (_m ExecutionContext_IncrementNodeExecutionCount) Return(_a0 uint32) *ExecutionContext_IncrementNodeExecutionCount {
+	return &ExecutionContext_IncrementNodeExecutionCount{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutionContext) OnIncrementNodeExecutionCount() *ExecutionContext_IncrementNodeExecutionCount {
+	c_call := _m.On("IncrementNodeExecutionCount")
+	return &ExecutionContext_IncrementNodeExecutionCount{Call: c_call}
+}
+
+func (_m *ExecutionContext) OnIncrementNodeExecutionCountMatch(matchers ...interface{}) *ExecutionContext_IncrementNodeExecutionCount {
+	c_call := _m.On("IncrementNodeExecutionCount", matchers...)
+	return &ExecutionContext_IncrementNodeExecutionCount{Call: c_call}
+}
+
+// IncrementNodeExecutionCount provides a mock function with given fields:
+func (_m *ExecutionContext) IncrementNodeExecutionCount() uint32 {
+	ret := _m.Called()
+
+	var r0 uint32
+	if rf, ok := ret.Get(0).(func() uint32); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(uint32)
+	}
+
+	return r0
+}
+
 type ExecutionContext_IncrementParallelism struct {
 	*mock.Call
 }
@@ -697,6 +793,38 @@ func (_m *ExecutionContext) OnIncrementParallelismMatch(matchers ...interface{})
 
 // IncrementParallelism provides a mock function with given fields:
 func (_m *ExecutionContext) IncrementParallelism() uint32 {
+	ret := _m.Called()
+
+	var r0 uint32
+	if rf, ok := ret.Get(0).(func() uint32); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(uint32)
+	}
+
+	return r0
+}
+
+type ExecutionContext_IncrementTaskExecutionCount struct {
+	*mock.Call
+}
+
+func (_m ExecutionContext_IncrementTaskExecutionCount) Return(_a0 uint32) *ExecutionContext_IncrementTaskExecutionCount {
+	return &ExecutionContext_IncrementTaskExecutionCount{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutionContext) OnIncrementTaskExecutionCount() *ExecutionContext_IncrementTaskExecutionCount {
+	c_call := _m.On("IncrementTaskExecutionCount")
+	return &ExecutionContext_IncrementTaskExecutionCount{Call: c_call}
+}
+
+func (_m *ExecutionContext) OnIncrementTaskExecutionCountMatch(matchers ...interface{}) *ExecutionContext_IncrementTaskExecutionCount {
+	c_call := _m.On("IncrementTaskExecutionCount", matchers...)
+	return &ExecutionContext_IncrementTaskExecutionCount{Call: c_call}
+}
+
+// IncrementTaskExecutionCount provides a mock function with given fields:
+func (_m *ExecutionContext) IncrementTaskExecutionCount() uint32 {
 	ret := _m.Called()
 
 	var r0 uint32
