@@ -1284,7 +1284,7 @@
             },
             {
               "datasource": null,
-              "expr": "sum(fflyte:propeller:all:round:raw_ms_sum/flyte:propeller:all:round:raw_ms_count) by (quantile)",
+              "expr": "sum(flyte:propeller:all:round:raw_ms_sum/flyte:propeller:all:round:raw_ms_count) by (quantile)",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -1292,7 +1292,7 @@
               "intervalFactor": 2,
               "legendFormat": "mean",
               "metric": "",
-              "query": "sum(fflyte:propeller:all:round:raw_ms_sum/flyte:propeller:all:round:raw_ms_count) by (quantile)",
+              "query": "sum(flyte:propeller:all:round:raw_ms_sum/flyte:propeller:all:round:raw_ms_count) by (quantile)",
               "refId": "B",
               "step": 10,
               "target": ""
