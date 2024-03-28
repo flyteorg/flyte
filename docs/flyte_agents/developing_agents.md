@@ -43,10 +43,11 @@ To create a new async agent, extend the [`AsyncAgentBase`](https://github.com/fl
 
 ```python
 from typing import Optional
-from flytekit.extend.backend.base_agent import AsyncAgentBase, AgentRegistry, Resource, ResourceMeta
 from dataclasses import dataclass
 from flytekit.models.literals import LiteralMap
 from flytekit.models.task import TaskTemplate
+from flytekit.extend.backend.base_agent import AsyncAgentBase, AgentRegistry, Resource, ResourceMeta
+
 
 @dataclass
 class BigQueryMetadata(ResourceMeta):
@@ -89,12 +90,13 @@ To create a new sync agent, extend the [`SyncAgentBase`](https://github.com/flyt
 
 ```python
 from typing import Optional
-from flyteidl.core.execution_pb2 import TaskExecution
-from flytekit.extend.backend.base_agent import SyncAgentBase, AgentRegistry, Resource
-from flytekit.models.literals import LiteralMap
-from flytekit.models.task import TaskTemplate
 from flytekit import FlyteContextManager
 from flytekit.core.type_engine import TypeEngine
+from flyteidl.core.execution_pb2 import TaskExecution
+from flytekit.models.literals import LiteralMap
+from flytekit.models.task import TaskTemplate
+from flytekit.extend.backend.base_agent import SyncAgentBase, AgentRegistry, Resource
+
 
 class OpenAIAgent(SyncAgentBase):
     def __init__(self):
