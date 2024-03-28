@@ -58,7 +58,7 @@ func (c CookieManager) RetrieveAccessToken(ctx context.Context, request *http.Re
 	if err == nil && oldAccessToken != "" {
 		return oldAccessToken, nil
 	}
-	// If there is no old access token, we will retrieve the new access token
+	// If there is no old access token, we will retrieve the new splitted access token
 	accessTokenFirstHalf, err := retrieveSecureCookie(ctx, request, accessTokenCookieNameSplitFirst, c.hashKey, c.blockKey)
 	if err != nil {
 		return "", err
