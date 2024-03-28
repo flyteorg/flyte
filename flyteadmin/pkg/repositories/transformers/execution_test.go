@@ -184,7 +184,6 @@ func TestCreateExecutionModel(t *testing.T) {
 				},
 			},
 			CreatedAt:  expectedCreatedAt,
-			StartedAt:  expectedCreatedAt,
 			UpdatedAt:  expectedCreatedAt,
 			WorkflowId: workflowIdentifier,
 			StateChangeDetails: &admin.ExecutionStateChangeDetails{
@@ -251,7 +250,6 @@ func TestCreateExecutionModel(t *testing.T) {
 				},
 			},
 			CreatedAt:  expectedCreatedAt,
-			StartedAt:  expectedCreatedAt,
 			UpdatedAt:  expectedCreatedAt,
 			WorkflowId: workflowIdentifier,
 			StateChangeDetails: &admin.ExecutionStateChangeDetails{
@@ -318,7 +316,6 @@ func TestCreateExecutionModel(t *testing.T) {
 				},
 			},
 			CreatedAt:  expectedCreatedAt,
-			StartedAt:  expectedCreatedAt,
 			UpdatedAt:  expectedCreatedAt,
 			WorkflowId: workflowIdentifier,
 			StateChangeDetails: &admin.ExecutionStateChangeDetails{
