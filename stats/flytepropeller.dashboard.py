@@ -170,7 +170,7 @@ class FlytePropeller(object):
                 Target(
                     expr="sum(rate(flyte:propeller:all:round:round_time_unlabeled_ms_count[5m]))",
                     refId="D",
-                    legendFormat="other_total",
+                    legendFormat="total_streaks",
                 ),
             ],
             yAxes=YAxes(
@@ -191,7 +191,7 @@ class FlytePropeller(object):
                 ),
             ],
             yAxes=YAxes(
-                YAxis(format=OPS_FORMAT),
+                YAxis(format=NO_FORMAT),
                 YAxis(format=SHORT_FORMAT),
             ),
         )
@@ -199,7 +199,7 @@ class FlytePropeller(object):
     @staticmethod
     def enqueued_workflows() -> Graph:
         return Graph(
-            title="Enqueued Workflows",
+            title="Workflow enqueue rate",
             dataSource=DATASOURCE,
             targets=[
                 Target(
