@@ -397,7 +397,7 @@ that integrates all Flyte components into a single binary.
    # The version of each component/library used to build the single binary are defined in `go.mod`.
    sudo apt-get -y install jq # You may need to install jq
    make clean # (Optional) Run this only if you want to run the newest version of flyteconsole
-   go mod tidy
+   make go-tidy
    make compile
 
    # Step 3: Prepare a namespace template for the cluster resource controller.
@@ -447,7 +447,7 @@ The following instructions provide guidance on how to build single binary with y
    cd flyte/flyteadmin
 
    # Step 3: Now, you can build the single binary. Go back to Flyte directory.
-   go mod tidy
+   make go-tidy
    make compile
    POD_NAMESPACE=flyte ./flyte start --config flyte-single-binary-local.yaml
 
