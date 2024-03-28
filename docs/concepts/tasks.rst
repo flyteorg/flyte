@@ -72,6 +72,7 @@ Inherent Features
 -----------------
 
 .. _fault-tolerance:
+
 Fault tolerance
 ^^^^^^^^^^^^^^^
 
