@@ -91,5 +91,5 @@ task_resources:
     cpu: 500m
     memory: 500Mi
   limits:
-    cpu: 800m
-    memory: 800Mi
+    cpu: 4
+    memory: 4Gi

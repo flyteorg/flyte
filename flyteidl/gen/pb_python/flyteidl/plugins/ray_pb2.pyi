@@ -6,16 +6,18 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class RayJob(_message.Message):
-    __slots__ = ["ray_cluster", "runtime_env", "shutdown_after_job_finishes", "ttl_seconds_after_finished"]
+    __slots__ = ["ray_cluster", "runtime_env", "shutdown_after_job_finishes", "ttl_seconds_after_finished", "runtime_env_yaml"]
     RAY_CLUSTER_FIELD_NUMBER: _ClassVar[int]
     RUNTIME_ENV_FIELD_NUMBER: _ClassVar[int]
     SHUTDOWN_AFTER_JOB_FINISHES_FIELD_NUMBER: _ClassVar[int]
     TTL_SECONDS_AFTER_FINISHED_FIELD_NUMBER: _ClassVar[int]
+    RUNTIME_ENV_YAML_FIELD_NUMBER: _ClassVar[int]
     ray_cluster: RayCluster
     runtime_env: str
     shutdown_after_job_finishes: bool
     ttl_seconds_after_finished: int
-    def __init__(self, ray_cluster: _Optional[_Union[RayCluster, _Mapping]] = ..., runtime_env: _Optional[str] = ..., shutdown_after_job_finishes: bool = ..., ttl_seconds_after_finished: _Optional[int] = ...) -> None: ...
+    runtime_env_yaml: str
+    def __init__(self, ray_cluster: _Optional[_Union[RayCluster, _Mapping]] = ..., runtime_env: _Optional[str] = ..., shutdown_after_job_finishes: bool = ..., ttl_seconds_after_finished: _Optional[int] = ..., runtime_env_yaml: _Optional[str] = ...) -> None: ...
 
 class RayCluster(_message.Message):
     __slots__ = ["head_group_spec", "worker_group_spec", "enable_autoscaling"]
