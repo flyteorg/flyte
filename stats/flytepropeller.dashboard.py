@@ -154,11 +154,28 @@ class FlytePropeller(object):
     @staticmethod
     def round_success() -> Graph:
         return Graph(
-            title="Round success",
+            title="Round success rate",
             dataSource=DATASOURCE,
             targets=[
                 Target(
                     expr="sum(rate(flyte:propeller:all:round:success_count[5m]))",
+                    refId="A",
+                ),
+            ],
+            yAxes=YAxes(
+                YAxis(format=OPS_FORMAT),
+                YAxis(format=SHORT_FORMAT),
+            ),
+        )
+
+    @staticmethod
+    def round_errors() -> Graph:
+        return Graph(
+            title="Round error rate",
+            dataSource=DATASOURCE,
+            targets=[
+                Target(
+                    expr="sum(rate(flyte:propeller:all:round:error_count[5m]))",
                     refId="A",
                 ),
             ],
@@ -811,6 +828,7 @@ class FlytePropeller(object):
             panels=[
                 FlytePropeller.create_free_workers(),
                 FlytePropeller.round_success(),
+                FlytePropeller.round_errors(),
                 FlytePropeller.abort_errors(),
                 FlytePropeller.system_errors(),
                 FlytePropeller.round_panic(),
