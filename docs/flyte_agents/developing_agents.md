@@ -189,7 +189,7 @@ kubectl rollout restart deployment flytepropeller -n flyte
 
 
 ### Canary Deployment
-Agents can be deployed independently in separate environments. This decoupling of agents from the
+Agents can be deployed independently in separate environments. Decoupling agents from the
 production environment ensures that if any specific agent encounters an error or issue, it will not impact the overall production system.
 
 By running agents independently, you can thoroughly test and validate your agents in a
