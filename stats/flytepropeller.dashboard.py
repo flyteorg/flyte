@@ -34,28 +34,38 @@ class FlytePropeller(object):
         )
 
     @staticmethod
-    def round_latency_per_wf(interval: int = 1) -> Graph:
+    def round_latency_per_wf() -> Graph:
         return Graph(
             title=f"round Latency per workflow",
             dataSource=DATASOURCE,
             targets=[
                 Target(
-                    expr=f"sum(rate(flyte:propeller:all:round:raw_ms[{interval}m])) by (wf)",
+                    expr=f"sum(flyte:propeller:all:round:raw_ms) by (wf)",
                     refId="A",
+                ),
+                Target(
+                    expr=f"sum(fflyte:propeller:all:round:raw_ms_sum/flyte:propeller:all:round:raw_ms_count) by (quantile)",
+                    refId="A",
+                    legendFormat="mean",
                 ),
             ],
             yAxes=single_y_axis(format=MILLISECONDS_FORMAT),
         )
 
     @staticmethod
-    def round_latency(interval: int = 1) -> Graph:
+    def round_latency() -> Graph:
         return Graph(
             title=f"round Latency by quantile",
             dataSource=DATASOURCE,
             targets=[
                 Target(
-                    expr=f"sum(rate(flyte:propeller:all:round:raw_unlabeled_ms[{interval}m])) by (quantile)",
+                    expr=f"sum(flyte:propeller:all:round:raw_unlabeled_ms) by (quantile)",
                     refId="A",
+                ),
+                Target(
+                    expr=f"sum(flyte:propeller:all:round:raw_unlabeled_ms_sum/flyte:propeller:all:round:raw_unlabeled_ms_count) by (quantile)",
+                    refId="A",
+                    legendFormat="mean",
                 ),
             ],
             yAxes=single_y_axis(format=MILLISECONDS_FORMAT),
@@ -810,8 +820,8 @@ class FlytePropeller(object):
                 FlytePropeller.skipped_rounds(),
                 FlytePropeller.streak_length(),
                 FlytePropeller.plugin_success_vs_failures(),
-                FlytePropeller.round_latency(interval),
-                FlytePropeller.round_latency_per_wf(interval),
+                FlytePropeller.round_latency(),
+                FlytePropeller.round_latency_per_wf(),
                 FlytePropeller.workflows_per_project(),
                 FlytePropeller.enqueued_workflows(),
             ],
