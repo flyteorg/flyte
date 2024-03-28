@@ -1151,7 +1151,7 @@
               "legendFormat": "mean",
               "metric": "",
               "query": "sum(flyte:propeller:all:round:raw_unlabeled_ms_sum/flyte:propeller:all:round:raw_unlabeled_ms_count) by (quantile)",
-              "refId": "A",
+              "refId": "B",
               "step": 10,
               "target": ""
             }
@@ -1293,7 +1293,7 @@
               "legendFormat": "mean",
               "metric": "",
               "query": "sum(fflyte:propeller:all:round:raw_ms_sum/flyte:propeller:all:round:raw_ms_count) by (quantile)",
-              "refId": "A",
+              "refId": "B",
               "step": 10,
               "target": ""
             }

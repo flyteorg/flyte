@@ -45,7 +45,7 @@ class FlytePropeller(object):
                 ),
                 Target(
                     expr=f"sum(fflyte:propeller:all:round:raw_ms_sum/flyte:propeller:all:round:raw_ms_count) by (quantile)",
-                    refId="A",
+                    refId="B",
                     legendFormat="mean",
                 ),
             ],
@@ -64,7 +64,7 @@ class FlytePropeller(object):
                 ),
                 Target(
                     expr=f"sum(flyte:propeller:all:round:raw_unlabeled_ms_sum/flyte:propeller:all:round:raw_unlabeled_ms_count) by (quantile)",
-                    refId="A",
+                    refId="B",
                     legendFormat="mean",
                 ),
             ],
