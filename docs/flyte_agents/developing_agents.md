@@ -118,7 +118,6 @@ Leveraging the Agent functionality simplifies the process of integrating custom 
 
 BaseSensor is a specialized abstraction built on top of the agent framework in Flyte.
 It is designed to simplify the process of adding sensors to Flyte workflows.
-You only need to implement the poke method, which checks whether a specific condition is met
 
 ```python
 from flytekit.sensor.base_sensor import BaseSensor
