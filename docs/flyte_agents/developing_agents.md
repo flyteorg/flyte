@@ -195,7 +195,7 @@ production environment ensures that if any specific agent encounters an error or
 By running agents independently, developers and operators can thoroughly test and validate their agents in a
 controlled environment before deploying them to the production cluster.
 
-By default, all the requests will be sent to the default agent service. However,
+By default, all agent requests will be sent to the default agent service. However,
 you can route particular task requests to designated agent services by adjusting the flytepropeller configuration. 
 
 ```yaml
