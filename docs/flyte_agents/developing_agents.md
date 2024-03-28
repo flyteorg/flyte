@@ -158,7 +158,7 @@ For flytekit versions `<=v1.10.2`, use `pyflyte serve`.
 For flytekit versions `>v1.10.2`, use `pyflyte serve agent`.
 :::
 
-### 4. Deploy Your FlyteAgent
+### 4. Deploy Your Flyte agent
 
 1. Update the FlyteAgent deployment's [image](https://github.com/flyteorg/flyte/blob/master/charts/flyteagent/templates/agent/deployment.yaml#L35)
 
