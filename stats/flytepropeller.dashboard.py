@@ -36,12 +36,13 @@ class FlytePropeller(object):
     @staticmethod
     def round_latency_per_wf() -> Graph:
         return Graph(
-            title=f"round Latency per workflow",
+            title=f"Round traverse latency per workflow",
             dataSource=DATASOURCE,
             targets=[
                 Target(
                     expr=f"sum(flyte:propeller:all:round:raw_ms) by (wf)",
                     refId="A",
+                    legendFormat="{{wf}}",
                 ),
             ],
             yAxes=single_y_axis(format=MILLISECONDS_FORMAT),
@@ -50,31 +51,58 @@ class FlytePropeller(object):
     @staticmethod
     def round_latency() -> Graph:
         return Graph(
-            title=f"round Latency by quantile",
+            title=f"Round Latency",
             dataSource=DATASOURCE,
             targets=[
                 Target(
-                    expr=f"sum(flyte:propeller:all:round:raw_unlabeled_ms) by (quantile)",
+                    expr="sum(flyte:propeller:all:round:raw_unlabeled_ms) by (quantile)",
                     refId="A",
+                    legendFormat="traverse-P{{quantile}}",
                 ),
                 Target(
-                    expr=f"avg(flyte:propeller:all:round:raw_unlabeled_ms_sum/flyte:propeller:all:round:raw_unlabeled_ms_count)",
+                    expr="avg(flyte:propeller:all:round:raw_unlabeled_ms_sum/flyte:propeller:all:round:raw_unlabeled_ms_count)",
                     refId="B",
-                    legendFormat="mean",
+                    legendFormat="traverse-mean",
+                ),
+                Target(
+                    expr="sum(flyte:propeller:all:round:round_time_ms) by (quantile)",
+                    refId="C",
+                    legendFormat="total-P{{quantile}}",
+                ),
+                Target(
+                    expr="avg(flyte:propeller:all:round:round_time_unlabeled_ms_sum/flyte:propeller:all:round:round_time_unlabeled_ms_count)",
+                    refId="D",
+                    legendFormat="total-mean",
                 ),
             ],
             yAxes=single_y_axis(format=MILLISECONDS_FORMAT),
         )
 
     @staticmethod
-    def round_panic() -> Graph:
+    def error_breakdown() -> Graph:
         return Graph(
-            title="Round panic",
+            title="Error rate breakdown",
             dataSource=DATASOURCE,
             targets=[
                 Target(
-                    expr="sum(rate(flyte:propeller:all:round:panic_unlabeled[5m]))",
+                    expr="sum(rate(flyte:propeller:all:round:system_error_unlabeled[5m]))",
                     refId="A",
+                    legendFormat="system",
+                ),
+                Target(
+                    expr="sum(rate(flyte:propeller:all:round:abort_error_unlabeled[5m]))",
+                    refId="B",
+                    legendFormat="abort",
+                ),
+                Target(
+                    expr="sum(rate(flyte:propeller:all:round:panic_unlabeled[5m]))",
+                    refId="C",
+                    legendFormat="panic",
+                ),
+                Target(
+                    expr="sum(rate(flyte:propeller:all:round:not_found[5m]))",
+                    refId="D",
+                    legendFormat="abort",
                 ),
             ],
             yAxes=YAxes(
@@ -117,83 +145,32 @@ class FlytePropeller(object):
             ),
         )
 
-    @staticmethod
-    def system_errors() -> Graph:
-        return Graph(
-            title="Round system errors",
-            dataSource=DATASOURCE,
-            targets=[
-                Target(
-                    expr="sum(rate(flyte:propeller:all:round:system_error_unlabeled[5m]))",
-                    refId="A",
-                ),
-            ],
-            yAxes=YAxes(
-                YAxis(format=OPS_FORMAT),
-                YAxis(format=SHORT_FORMAT),
-            ),
-        )
-
-    @staticmethod
-    def abort_errors() -> Graph:
-        return Graph(
-            title="Round abort errors",
-            dataSource=DATASOURCE,
-            targets=[
-                Target(
-                    expr="sum(rate(flyte:propeller:all:round:abort_error_unlabeled[5m]))",
-                    refId="A",
-                ),
-            ],
-            yAxes=YAxes(
-                YAxis(format=OPS_FORMAT),
-                YAxis(format=SHORT_FORMAT),
-            ),
-        )
     
     @staticmethod
-    def round_success() -> Graph:
+    def round_rates() -> Graph:
         return Graph(
-            title="Round success rate",
+            title="Round success/error rate",
             dataSource=DATASOURCE,
             targets=[
                 Target(
                     expr="sum(rate(flyte:propeller:all:round:success_count[5m]))",
                     refId="A",
+                    legendFormat="success",
                 ),
-            ],
-            yAxes=YAxes(
-                YAxis(format=OPS_FORMAT),
-                YAxis(format=SHORT_FORMAT),
-            ),
-        )
-    
-    @staticmethod
-    def round_total() -> Graph:
-        return Graph(
-            title="Total round rate",
-            dataSource=DATASOURCE,
-            targets=[
-                Target(
-                    expr="sum(rate(flyte:propeller:all:round:round_total[5m]))",
-                    refId="A",
-                ),
-            ],
-            yAxes=YAxes(
-                YAxis(format=OPS_FORMAT),
-                YAxis(format=SHORT_FORMAT),
-            ),
-        )
-
-    @staticmethod
-    def round_errors() -> Graph:
-        return Graph(
-            title="Round error rate",
-            dataSource=DATASOURCE,
-            targets=[
                 Target(
                     expr="sum(rate(flyte:propeller:all:round:error_count[5m]))",
-                    refId="A",
+                    refId="B",
+                    legendFormat="error",
+                ),
+                Target(
+                    expr="sum(rate(flyte:propeller:all:round:round_total_ms_count[5m]))",
+                    refId="C",
+                    legendFormat="total",
+                ),
+                Target(
+                    expr="sum(rate(flyte:propeller:all:round:round_time_unlabeled_ms_count[5m]))",
+                    refId="D",
+                    legendFormat="other_total",
                 ),
             ],
             yAxes=YAxes(
@@ -246,14 +223,14 @@ class FlytePropeller(object):
             dataSource=DATASOURCE,
             targets=[
                 Target(
-                    expr='sum(rate({__name__=~"flyte:propeller:all:plugin:.*_failure_unlabeled"}[5m]))',
+                    expr='sum(rate({__name__=~"flyte:propeller:all:plugin:.*_success_unlabeled"}[5m]))',
                     refId="A",
-                    legendFormat="failure",
+                    legendFormat="success",
                 ),
                 Target(
-                    expr='sum(rate({__name__=~"flyte:propeller:all:plugin:.*_success_unlabeled"}[5m]))',
+                    expr='sum(rate({__name__=~"flyte:propeller:all:plugin:.*_failure_unlabeled"}[5m]))',
                     refId="B",
-                    legendFormat="success",
+                    legendFormat="failure",
                 ),
             ],
             yAxes=YAxes(
@@ -844,11 +821,8 @@ class FlytePropeller(object):
             collapse=collapse,
             panels=[
                 FlytePropeller.create_free_workers(),
-                FlytePropeller.round_success(),
-                FlytePropeller.round_errors(),
-                FlytePropeller.abort_errors(),
-                FlytePropeller.system_errors(),
-                FlytePropeller.round_panic(),
+                FlytePropeller.round_rates(),
+                FlytePropeller.error_breakdown(),
                 FlytePropeller.skipped_rounds(),
                 FlytePropeller.streak_length(),
                 FlytePropeller.plugin_success_vs_failures(),
