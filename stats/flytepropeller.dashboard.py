@@ -136,7 +136,24 @@ class FlytePropeller(object):
             dataSource=DATASOURCE,
             targets=[
                 Target(
-                    expr="sum(rate(flyte:propeller:all:round:abort_error[5m]))",
+                    expr="sum(rate(flyte:propeller:all:round:abort_error_unlabeled[5m]))",
+                    refId="A",
+                ),
+            ],
+            yAxes=YAxes(
+                YAxis(format=OPS_FORMAT),
+                YAxis(format=SHORT_FORMAT),
+            ),
+        )
+    
+    @staticmethod
+    def round_success() -> Graph:
+        return Graph(
+            title="Round success",
+            dataSource=DATASOURCE,
+            targets=[
+                Target(
+                    expr="sum(rate(flyte:propeller:all:round:success_count[5m]))",
                     refId="A",
                 ),
             ],
@@ -763,28 +780,6 @@ class FlytePropeller(object):
                     ],
                     yAxes=single_y_axis(format=SECONDS_FORMAT),
                 ),
-                Graph(
-                    title="Average time before item being requested from work queue",
-                    dataSource=DATASOURCE,
-                    targets=[
-                        Target(
-                            expr="flyte:propeller:all:main_work_duration_us_sum/(flyte:propeller:all:main_work_duration_us_count*1000000)",
-                            legendFormat="main",
-                            refId="A",
-                        ),
-                        Target(
-                            expr="flyte:propeller:all:sub_work_duration_us_sum/(flyte:propeller:all:sub_work_duration_us_count*1000000)",
-                            legendFormat="sub",
-                            refId="B",
-                        ),
-                        Target(
-                            expr="flyte:propeller:all:admin_launcher:_queue_latency_us_sum/(flyte:propeller:all:admin_launcher:_queue_latency_us_count*1000000)",
-                            legendFormat="admin_launcher",
-                            refId="C",
-                        ),
-                    ],
-                    yAxes=single_y_axis(format=SECONDS_FORMAT),
-                ),
             ],
         )
 
@@ -808,6 +803,7 @@ class FlytePropeller(object):
             collapse=collapse,
             panels=[
                 FlytePropeller.create_free_workers(),
+                FlytePropeller.round_success(),
                 FlytePropeller.abort_errors(),
                 FlytePropeller.system_errors(),
                 FlytePropeller.round_panic(),
