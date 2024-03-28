@@ -178,7 +178,7 @@ kubectl set image deployment/flyteagent flyteagent=ghcr.io/flyteorg/flyteagent:l
        - custom_task: agent-service
 ```
 
-3. Restart the FlytePropeller
+3. Restart FlytePropeller.
 
 ```
 kubectl rollout restart deployment flytepropeller -n flyte
