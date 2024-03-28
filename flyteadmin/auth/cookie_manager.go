@@ -53,11 +53,17 @@ func NewCookieManager(ctx context.Context, hashKeyEncoded, blockKeyEncoded strin
 }
 
 func (c CookieManager) RetrieveAccessToken(ctx context.Context, request *http.Request) (string, error) {
-	accessTokenFirstHalf, err := retrieveSecureCookie(ctx, request, accessTokenCookieName, c.hashKey, c.blockKey)
+	// If there is an old access token, we will retrieve it
+	oldAccessToken, err := retrieveSecureCookie(ctx, request, accessTokenCookieName, c.hashKey, c.blockKey)
+	if err == nil && oldAccessToken != "" {
+		return oldAccessToken, nil
+	}
+	// If there is no old access token, we will retrieve the new access token
+	accessTokenFirstHalf, err := retrieveSecureCookie(ctx, request, accessTokenCookieNameSplitFirst, c.hashKey, c.blockKey)
 	if err != nil {
 		return "", err
 	}
-	accessTokenSecondHalf, err := retrieveSecureCookie(ctx, request, accessTokenCookieNameSplit, c.hashKey, c.blockKey)
+	accessTokenSecondHalf, err := retrieveSecureCookie(ctx, request, accessTokenCookieNameSplitSecond, c.hashKey, c.blockKey)
 	if err != nil {
 		return "", err
 	}
@@ -151,18 +157,18 @@ func (c CookieManager) StoreAccessToken(ctx context.Context, accessToken string,
 	midpoint := len(accessToken) / 2
 	firstHalf := accessToken[:midpoint]
 	secondHalf := accessToken[midpoint:]
-	atCookie, err := NewSecureCookie(accessTokenCookieName, firstHalf, c.hashKey, c.blockKey, c.domain, c.getHTTPSameSitePolicy())
+	atCookieFirst, err := NewSecureCookie(accessTokenCookieNameSplitFirst, firstHalf, c.hashKey, c.blockKey, c.domain, c.getHTTPSameSitePolicy())
 	if err != nil {
 		logger.Errorf(ctx, "Error generating encrypted accesstoken cookie first half %s", err)
 		return err
 	}
-	http.SetCookie(writer, &atCookie)
-	atCookieSplit, err := NewSecureCookie(accessTokenCookieNameSplit, secondHalf, c.hashKey, c.blockKey, c.domain, c.getHTTPSameSitePolicy())
+	http.SetCookie(writer, &atCookieFirst)
+	atCookieSecond, err := NewSecureCookie(accessTokenCookieNameSplitSecond, secondHalf, c.hashKey, c.blockKey, c.domain, c.getHTTPSameSitePolicy())
 	if err != nil {
 		logger.Errorf(ctx, "Error generating encrypted accesstoken cookie second half %s", err)
 		return err
 	}
-	http.SetCookie(writer, &atCookieSplit)
+	http.SetCookie(writer, &atCookieSecond)
 	return nil
 }
 
@@ -218,7 +224,8 @@ func (c *CookieManager) getLogoutCookie(name string) *http.Cookie {
 
 func (c CookieManager) DeleteCookies(_ context.Context, writer http.ResponseWriter) {
 	http.SetCookie(writer, c.getLogoutCookie(accessTokenCookieName))
-	http.SetCookie(writer, c.getLogoutCookie(accessTokenCookieNameSplit))
+	http.SetCookie(writer, c.getLogoutCookie(accessTokenCookieNameSplitFirst))
+	http.SetCookie(writer, c.getLogoutCookie(accessTokenCookieNameSplitSecond))
 	http.SetCookie(writer, c.getLogoutCookie(refreshTokenCookieName))
 	http.SetCookie(writer, c.getLogoutCookie(idTokenCookieName))
 }

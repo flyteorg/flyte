@@ -58,8 +58,8 @@ func TestCookieManager(t *testing.T) {
 		assert.NoError(t, err)
 		fmt.Println(w.Header().Get("Set-Cookie"))
 		c := w.Result().Cookies()
-		assert.Equal(t, "flyte_at", c[0].Name)
-		assert.Equal(t, "flyte_at_1", c[1].Name)
+		assert.Equal(t, "flyte_at_1", c[0].Name)
+		assert.Equal(t, "flyte_at_2", c[1].Name)
 		assert.Equal(t, "flyte_idt", c[2].Name)
 		assert.Equal(t, "flyte_rt", c[3].Name)
 	})
@@ -139,8 +139,8 @@ func TestCookieManager(t *testing.T) {
 		assert.NoError(t, err)
 		fmt.Println(w.Header().Get("Set-Cookie"))
 		c := w.Result().Cookies()
-		assert.Equal(t, "flyte_at", c[0].Name)
-		assert.Equal(t, "flyte_at_1", c[1].Name)
+		assert.Equal(t, "flyte_at_1", c[0].Name)
+		assert.Equal(t, "flyte_at_2", c[1].Name)
 		assert.Equal(t, "flyte_idt", c[2].Name)
 		assert.Equal(t, "flyte_rt", c[3].Name)
 	})
@@ -205,22 +205,27 @@ func TestCookieManager(t *testing.T) {
 		manager.DeleteCookies(ctx, w)
 
 		cookies := w.Result().Cookies()
-		require.Equal(t, 4, len(cookies))
+		require.Equal(t, 5, len(cookies))
+
 		assert.True(t, time.Now().After(cookies[0].Expires))
 		assert.Equal(t, cookieSetting.Domain, cookies[0].Domain)
 		assert.Equal(t, accessTokenCookieName, cookies[0].Name)
 
 		assert.True(t, time.Now().After(cookies[1].Expires))
 		assert.Equal(t, cookieSetting.Domain, cookies[1].Domain)
-		assert.Equal(t, accessTokenCookieNameSplit, cookies[1].Name)
+		assert.Equal(t, accessTokenCookieNameSplitFirst, cookies[1].Name)
 
 		assert.True(t, time.Now().After(cookies[2].Expires))
 		assert.Equal(t, cookieSetting.Domain, cookies[2].Domain)
-		assert.Equal(t, refreshTokenCookieName, cookies[2].Name)
+		assert.Equal(t, accessTokenCookieNameSplitSecond, cookies[2].Name)
 
 		assert.True(t, time.Now().After(cookies[3].Expires))
 		assert.Equal(t, cookieSetting.Domain, cookies[3].Domain)
-		assert.Equal(t, idTokenCookieName, cookies[3].Name)
+		assert.Equal(t, refreshTokenCookieName, cookies[3].Name)
+
+		assert.True(t, time.Now().After(cookies[4].Expires))
+		assert.Equal(t, cookieSetting.Domain, cookies[4].Domain)
+		assert.Equal(t, idTokenCookieName, cookies[4].Name)
 	})
 
 	t.Run("get_http_same_site_policy", func(t *testing.T) {

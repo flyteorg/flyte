@@ -20,7 +20,9 @@ const (
 	// #nosec
 	accessTokenCookieName = "flyte_at"
 	// #nosec
-	accessTokenCookieNameSplit = "flyte_at_1"
+	accessTokenCookieNameSplitFirst = "flyte_at_1"
+	// #nosec
+	accessTokenCookieNameSplitSecond = "flyte_at_2"
 	// #nosec
 	idTokenCookieName = "flyte_idt"
 	// #nosec
