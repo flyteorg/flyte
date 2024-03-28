@@ -192,7 +192,7 @@ kubectl rollout restart deployment flytepropeller -n flyte
 Agents can be deployed independently in separate environments. This decoupling of agents from the
 production environment ensures that if any specific agent encounters an error or issue, it will not impact the overall production system.
 
-By running agents independently, developers and operators can thoroughly test and validate their agents in a
+By running agents independently, you can thoroughly test and validate your agents in a
 controlled environment before deploying them to the production cluster.
 
 By default, all agent requests will be sent to the default agent service. However,
