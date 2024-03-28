@@ -75,7 +75,6 @@ func CreateExecutionModel(input CreateExecutionModelInput) (*models.Execution, e
 	}
 	createdAt := timestamppb.New(input.CreatedAt)
 	closure := admin.ExecutionClosure{
-		Phase:         core.WorkflowExecution_UNDEFINED,
 		CreatedAt:     createdAt,
 		UpdatedAt:     createdAt,
 		Notifications: input.Notifications,
