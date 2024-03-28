@@ -196,7 +196,7 @@ By running agents independently, developers and operators can thoroughly test an
 controlled environment before deploying them to the production cluster.
 
 By default, all the requests will be sent to the default agent service. However,
-you are still able to route particular task requests to designated agent services by adjusting the flytepropeller configuration. 
+you can route particular task requests to designated agent services by adjusting the flytepropeller configuration. 
 
 ```yaml
  plugins:
