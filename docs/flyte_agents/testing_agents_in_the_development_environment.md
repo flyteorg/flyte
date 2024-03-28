@@ -12,9 +12,9 @@ jupytext:
 ## How agent plugin service works?
 Before testing agents in the development environment, let's talk about how it works.
 
-Compare to the bigquery plugin example here's how the bigquery agent service work.
+Compared to the bigquery backend plugin, Flyte agent is running in a separate deployment instead of inside the Flytepropeller.
 
-Bigquery plugin
+Bigquery backend plugin (Inside Flytepropeller)
 
 ![image.png](https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/concepts/agents/plugin_life_cycle.png)
 
@@ -29,9 +29,9 @@ The life cycle will be
 1. FlytePlugins send grpc request to the agent server.
 2. Agent server sends request through SDK and return the query data.
 
-You can find that it is a little bit slower than the plugin example above.
+Hence, to test the agent server locally, it's necessary to run both the single binary and agent server at the same time.
 
-But it is far more easier to be implemented and still faster than writing the service in a pod task.
+Flytepropeller will be able to send the requests to your local agent server.
 
 ## How to setup Agent Service in Development Mode?
 Let's develop the powerful agent service!
