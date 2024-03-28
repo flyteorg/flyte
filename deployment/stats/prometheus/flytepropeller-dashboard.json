@@ -894,7 +894,7 @@
           "yaxes": [
             {
               "decimals": null,
-              "format": "ops",
+              "format": "none",
               "label": null,
               "logBase": 1,
               "max": null,
@@ -991,7 +991,7 @@
               "instant": false,
               "interval": "",
               "intervalFactor": 2,
-              "legendFormat": "",
+              "legendFormat": "failure",
               "metric": "",
               "query": "sum(rate({__name__=~\"flyte:propeller:all:plugin:.*_failure_unlabeled\"}[5m]))",
               "refId": "A",
@@ -1006,7 +1006,7 @@
               "instant": false,
               "interval": "",
               "intervalFactor": 2,
-              "legendFormat": "",
+              "legendFormat": "success",
               "metric": "",
               "query": "sum(rate({__name__=~\"flyte:propeller:all:plugin:.*_success_unlabeled\"}[5m]))",
               "refId": "B",
@@ -1017,7 +1017,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "Plugin Failure rate",
+          "title": "Plugin Success/Failure rate",
           "tooltip": {
             "msResolution": true,
             "shared": true,
@@ -1142,7 +1142,7 @@
             },
             {
               "datasource": null,
-              "expr": "sum(flyte:propeller:all:round:raw_unlabeled_ms_sum/flyte:propeller:all:round:raw_unlabeled_ms_count) by (quantile)",
+              "expr": "avg(flyte:propeller:all:round:raw_unlabeled_ms_sum/flyte:propeller:all:round:raw_unlabeled_ms_count)",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -1150,7 +1150,7 @@
               "intervalFactor": 2,
               "legendFormat": "mean",
               "metric": "",
-              "query": "sum(flyte:propeller:all:round:raw_unlabeled_ms_sum/flyte:propeller:all:round:raw_unlabeled_ms_count) by (quantile)",
+              "query": "avg(flyte:propeller:all:round:raw_unlabeled_ms_sum/flyte:propeller:all:round:raw_unlabeled_ms_count)",
               "refId": "B",
               "step": 10,
               "target": ""
@@ -1279,21 +1279,6 @@
               "metric": "",
               "query": "sum(flyte:propeller:all:round:raw_ms) by (wf)",
               "refId": "A",
-              "step": 10,
-              "target": ""
-            },
-            {
-              "datasource": null,
-              "expr": "sum(flyte:propeller:all:round:raw_ms_sum/flyte:propeller:all:round:raw_ms_count) by (quantile)",
-              "format": "time_series",
-              "hide": false,
-              "instant": false,
-              "interval": "",
-              "intervalFactor": 2,
-              "legendFormat": "mean",
-              "metric": "",
-              "query": "sum(flyte:propeller:all:round:raw_ms_sum/flyte:propeller:all:round:raw_ms_count) by (quantile)",
-              "refId": "B",
               "step": 10,
               "target": ""
             }
@@ -3740,7 +3725,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "node event recording count",
+          "title": "node event recording rate",
           "tooltip": {
             "msResolution": true,
             "shared": true,
@@ -3759,7 +3744,7 @@
           "yaxes": [
             {
               "decimals": null,
-              "format": "none",
+              "format": "ops",
               "label": null,
               "logBase": 1,
               "max": null,
@@ -4019,7 +4004,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "wf event recording count",
+          "title": "wf event recording rate",
           "tooltip": {
             "msResolution": true,
             "shared": true,
@@ -4038,7 +4023,7 @@
           "yaxes": [
             {
               "decimals": null,
-              "format": "none",
+              "format": "ops",
               "label": null,
               "logBase": 1,
               "max": null,
@@ -4146,7 +4131,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "node event recording latency success",
+          "title": "node event recording latency",
           "tooltip": {
             "msResolution": true,
             "shared": true,
@@ -4288,7 +4273,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "node event recording count",
+          "title": "node event recording rate",
           "tooltip": {
             "msResolution": true,
             "shared": true,
@@ -4307,7 +4292,7 @@
           "yaxes": [
             {
               "decimals": null,
-              "format": "none",
+              "format": "ops",
               "label": null,
               "logBase": 1,
               "max": null,
@@ -4557,7 +4542,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "task event recording count",
+          "title": "task event recording rate",
           "tooltip": {
             "msResolution": true,
             "shared": true,
@@ -4576,7 +4561,7 @@
           "yaxes": [
             {
               "decimals": null,
-              "format": "none",
+              "format": "ops",
               "label": null,
               "logBase": 1,
               "max": null,
@@ -4811,7 +4796,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "Dynamic workflow build count",
+          "title": "Dynamic workflow build rate",
           "tooltip": {
             "msResolution": true,
             "shared": true,
@@ -4830,7 +4815,7 @@
           "yaxes": [
             {
               "decimals": null,
-              "format": "none",
+              "format": "ops",
               "label": null,
               "logBase": 1,
               "max": null,
@@ -6361,7 +6346,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "etcD writes",
+          "title": "etcD write rate",
           "tooltip": {
             "msResolution": true,
             "shared": true,
@@ -6380,7 +6365,7 @@
           "yaxes": [
             {
               "decimals": null,
-              "format": "none",
+              "format": "ops",
               "label": null,
               "logBase": 1,
               "max": null,
@@ -6488,7 +6473,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "etcD write conflicts",
+          "title": "etcD write conflict rate",
           "tooltip": {
             "msResolution": true,
             "shared": true,
@@ -6507,7 +6492,7 @@
           "yaxes": [
             {
               "decimals": null,
-              "format": "none",
+              "format": "ops",
               "label": null,
               "logBase": 1,
               "max": null,
@@ -6615,7 +6600,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "etcD write fail",
+          "title": "etcD write failure rate",
           "tooltip": {
             "msResolution": true,
             "shared": true,
@@ -6634,7 +6619,7 @@
           "yaxes": [
             {
               "decimals": null,
-              "format": "none",
+              "format": "ops",
               "label": null,
               "logBase": 1,
               "max": null,
@@ -6742,7 +6727,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "etcD write too large",
+          "title": "etcD write too large rate",
           "tooltip": {
             "msResolution": true,
             "shared": true,
@@ -6761,7 +6746,7 @@
           "yaxes": [
             {
               "decimals": null,
-              "format": "none",
+              "format": "ops",
               "label": null,
               "logBase": 1,
               "max": null,

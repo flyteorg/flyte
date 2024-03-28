@@ -43,11 +43,6 @@ class FlytePropeller(object):
                     expr=f"sum(flyte:propeller:all:round:raw_ms) by (wf)",
                     refId="A",
                 ),
-                Target(
-                    expr=f"sum(flyte:propeller:all:round:raw_ms_sum/flyte:propeller:all:round:raw_ms_count) by (quantile)",
-                    refId="B",
-                    legendFormat="mean",
-                ),
             ],
             yAxes=single_y_axis(format=MILLISECONDS_FORMAT),
         )
@@ -63,7 +58,7 @@ class FlytePropeller(object):
                     refId="A",
                 ),
                 Target(
-                    expr=f"sum(flyte:propeller:all:round:raw_unlabeled_ms_sum/flyte:propeller:all:round:raw_unlabeled_ms_count) by (quantile)",
+                    expr=f"avg(flyte:propeller:all:round:raw_unlabeled_ms_sum/flyte:propeller:all:round:raw_unlabeled_ms_count)",
                     refId="B",
                     legendFormat="mean",
                 ),
@@ -100,7 +95,7 @@ class FlytePropeller(object):
                 ),
             ],
             yAxes=YAxes(
-                YAxis(format=OPS_FORMAT),
+                YAxis(format=NO_FORMAT),
                 YAxis(format=SHORT_FORMAT),
             ),
         )
@@ -213,16 +208,18 @@ class FlytePropeller(object):
         TODO We need to convert the plugin names to be labels, so that prometheus can perform queries correctly
         """
         return Graph(
-            title=f"Plugin Failure rate",
+            title=f"Plugin Success/Failure rate",
             dataSource=DATASOURCE,
             targets=[
                 Target(
                     expr='sum(rate({__name__=~"flyte:propeller:all:plugin:.*_failure_unlabeled"}[5m]))',
                     refId="A",
+                    legendFormat="failure",
                 ),
                 Target(
                     expr='sum(rate({__name__=~"flyte:propeller:all:plugin:.*_success_unlabeled"}[5m]))',
                     refId="B",
+                    legendFormat="success",
                 ),
             ],
             yAxes=YAxes(
@@ -441,7 +438,7 @@ class FlytePropeller(object):
                 yAxes=single_y_axis(format=MILLISECONDS_FORMAT),
             ),
             Graph(
-                title="Dynamic workflow build count",
+                title="Dynamic workflow build rate",
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
@@ -449,7 +446,7 @@ class FlytePropeller(object):
                         refId="A",
                     ),
                 ],
-                yAxes=single_y_axis(format=NO_FORMAT),
+                yAxes=single_y_axis(format=OPS_FORMAT),
             ),
         ]
 
@@ -468,7 +465,7 @@ class FlytePropeller(object):
                 yAxes=single_y_axis(format=MILLISECONDS_FORMAT),
             ),
             Graph(
-                title="task event recording count",
+                title="task event recording rate",
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
@@ -482,7 +479,7 @@ class FlytePropeller(object):
                         refId="B",
                     ),
                 ],
-                yAxes=single_y_axis(format=NO_FORMAT),
+                yAxes=single_y_axis(format=OPS_FORMAT),
             ),
         ]
 
@@ -490,7 +487,7 @@ class FlytePropeller(object):
     def node_event_recording() -> typing.List[Graph]:
         return [
             Graph(
-                title="node event recording latency success",
+                title="node event recording latency",
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
@@ -501,7 +498,7 @@ class FlytePropeller(object):
                 yAxes=single_y_axis(format=MILLISECONDS_FORMAT),
             ),
             Graph(
-                title="node event recording count",
+                title="node event recording rate",
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
@@ -515,7 +512,7 @@ class FlytePropeller(object):
                         refId="B",
                     ),
                 ],
-                yAxes=single_y_axis(format=NO_FORMAT),
+                yAxes=single_y_axis(format=OPS_FORMAT),
             ),
         ]
 
@@ -534,7 +531,7 @@ class FlytePropeller(object):
                 yAxes=single_y_axis(format=MILLISECONDS_FORMAT),
             ),
             Graph(
-                title="wf event recording count",
+                title="wf event recording rate",
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
@@ -548,7 +545,7 @@ class FlytePropeller(object):
                         refId="B",
                     ),
                 ],
-                yAxes=single_y_axis(format=NO_FORMAT),
+                yAxes=single_y_axis(format=OPS_FORMAT),
             ),
         ]
 
@@ -589,7 +586,7 @@ class FlytePropeller(object):
                     yAxes=single_y_axis(format=MILLISECONDS_FORMAT),
                 ),
                 Graph(
-                    title="etcD writes",
+                    title="etcD write rate",
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
@@ -597,10 +594,10 @@ class FlytePropeller(object):
                             refId="A",
                         ),
                     ],
-                    yAxes=single_y_axis(format=NO_FORMAT),
+                    yAxes=single_y_axis(format=OPS_FORMAT),
                 ),
                 Graph(
-                    title="etcD write conflicts",
+                    title="etcD write conflict rate",
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
@@ -608,10 +605,10 @@ class FlytePropeller(object):
                             refId="A",
                         ),
                     ],
-                    yAxes=single_y_axis(format=NO_FORMAT),
+                    yAxes=single_y_axis(format=OPS_FORMAT),
                 ),
                 Graph(
-                    title="etcD write fail",
+                    title="etcD write failure rate",
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
@@ -619,10 +616,10 @@ class FlytePropeller(object):
                             refId="A",
                         ),
                     ],
-                    yAxes=single_y_axis(format=NO_FORMAT),
+                    yAxes=single_y_axis(format=OPS_FORMAT),
                 ),
                 Graph(
-                    title="etcD write too large",
+                    title="etcD write too large rate",
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
@@ -630,7 +627,7 @@ class FlytePropeller(object):
                             refId="A",
                         ),
                     ],
-                    yAxes=single_y_axis(format=NO_FORMAT),
+                    yAxes=single_y_axis(format=OPS_FORMAT),
                 ),
             ],
         )
@@ -674,7 +671,7 @@ class FlytePropeller(object):
     @staticmethod
     def node_errors() -> Graph:
         return Graph(
-            title="node event recording count",
+            title="node event recording rate",
             dataSource=DATASOURCE,
             targets=[
                 Target(
@@ -693,7 +690,7 @@ class FlytePropeller(object):
                     refId="C",
                 ),
             ],
-            yAxes=single_y_axis(format=NO_FORMAT),
+            yAxes=single_y_axis(format=OPS_FORMAT),
         )
 
     @staticmethod
