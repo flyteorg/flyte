@@ -167,6 +167,23 @@ class FlytePropeller(object):
                 YAxis(format=SHORT_FORMAT),
             ),
         )
+    
+    @staticmethod
+    def round_total() -> Graph:
+        return Graph(
+            title="Total round rate",
+            dataSource=DATASOURCE,
+            targets=[
+                Target(
+                    expr="sum(rate(flyte:propeller:all:round:round_total[5m]))",
+                    refId="A",
+                ),
+            ],
+            yAxes=YAxes(
+                YAxis(format=OPS_FORMAT),
+                YAxis(format=SHORT_FORMAT),
+            ),
+        )
 
     @staticmethod
     def round_errors() -> Graph:
