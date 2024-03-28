@@ -33,7 +33,7 @@ Hence, to test the agent server locally, it's necessary to run both the single b
 
 Flytepropeller will be able to send the requests to your local agent server.
 
-## How to setup Agent Service in Development Mode?
+## How to set up agent service in development mode?
 Let's develop the powerful agent service!
 
 1. Use the dev mode through flytectl.
@@ -70,7 +70,7 @@ plugins:
   # Registered Task Types
   agent-service:
     defaultAgent:
-      endpoint: "dns:///localhost:8000" # your grpc agent server port
+      endpoint: "localhost:8000" # your grpc agent server port
       insecure: true
       timeouts:
         GetTask: 10s
@@ -84,10 +84,10 @@ make compile
 ```
 
 5. Set up your secrets
-In the development environment, you can set up your secrets in local host.
+In the development environment, you can set up your secrets in local machine.
 - Add secrets in `/etc/secrets/SECRET_NAME`. 
 
-Since your agent server is on your localhost, it can retrieve the secret locally.
+Since your agent server is running locally rather than within Kubernetes, it can retrieve the secret from your local file system.
 
 6. Test your agent task
 ```bash
