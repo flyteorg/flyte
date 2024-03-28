@@ -112,13 +112,13 @@ class FlytePropeller(object):
         )
 
     @staticmethod
-    def streak_length() -> Graph:
+    def streak_rate() -> Graph:
         return Graph(
-            title="Avg streak length",
+            title="Streak rate",
             dataSource=DATASOURCE,
             targets=[
                 Target(
-                    expr="avg(flyte:propeller:all:round:streak_length_unlabeled)",
+                    expr="sum(rate(flyte:propeller:all:round:streak_length_unlabeled[5m]))",
                     refId="A",
                 ),
             ],
@@ -824,7 +824,7 @@ class FlytePropeller(object):
                 FlytePropeller.round_rates(),
                 FlytePropeller.error_breakdown(),
                 FlytePropeller.skipped_rounds(),
-                FlytePropeller.streak_length(),
+                FlytePropeller.streak_rate(),
                 FlytePropeller.plugin_success_vs_failures(),
                 FlytePropeller.round_latency(),
                 FlytePropeller.round_latency_per_wf(),

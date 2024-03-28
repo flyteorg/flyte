@@ -274,7 +274,7 @@
               "instant": false,
               "interval": "",
               "intervalFactor": 2,
-              "legendFormat": "other_total",
+              "legendFormat": "total_streaks",
               "metric": "",
               "query": "sum(rate(flyte:propeller:all:round:round_time_unlabeled_ms_count[5m]))",
               "refId": "D",
@@ -694,7 +694,7 @@
           "targets": [
             {
               "datasource": null,
-              "expr": "avg(flyte:propeller:all:round:streak_length_unlabeled)",
+              "expr": "sum(rate(flyte:propeller:all:round:streak_length_unlabeled[5m]))",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -702,7 +702,7 @@
               "intervalFactor": 2,
               "legendFormat": "",
               "metric": "",
-              "query": "avg(flyte:propeller:all:round:streak_length_unlabeled)",
+              "query": "sum(rate(flyte:propeller:all:round:streak_length_unlabeled[5m]))",
               "refId": "A",
               "step": 10,
               "target": ""
@@ -711,7 +711,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "Avg streak length",
+          "title": "Streak rate",
           "tooltip": {
             "msResolution": true,
             "shared": true,
@@ -1298,7 +1298,7 @@
           "yaxes": [
             {
               "decimals": null,
-              "format": "ops",
+              "format": "none",
               "label": null,
               "logBase": 1,
               "max": null,
@@ -1406,7 +1406,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "Enqueued Workflows",
+          "title": "Workflow enqueue rate",
           "tooltip": {
             "msResolution": true,
             "shared": true,
