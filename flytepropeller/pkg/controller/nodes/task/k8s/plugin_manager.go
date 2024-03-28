@@ -16,8 +16,8 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/scheme"
-	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
+	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
@@ -641,11 +641,11 @@ func NewPluginManager(ctx context.Context, iCtx pluginsCore.SetupContext, entry 
 	}
 
 	// Construct the collector that will emit a gauge indicating current levels of the resource that this K8s plugin operates on
-	pluginInformer, err := getPluginSharedInformer(ctx, kubeClient, entry.ResourceToWatch)
+	pluginInformer, err := getPluginInformer(ctx, kubeClient, entry.ResourceToWatch)
 	if err != nil {
 		return nil, err
 	}
-	rm := monitorIndex.GetOrCreateResourceLevelMonitor(ctx, metricsScope, pluginInformer, gvk)
+	rm := monitorIndex.GetOrCreateResourceLevelMonitor(ctx, metricsScope, pluginInformer, gvk, kubeClient)
 	// Start the poller and gauge emitter
 	rm.RunCollectorOnce(ctx)
 
@@ -668,16 +668,10 @@ func getPluginGvk(resourceToWatch runtime.Object) (schema.GroupVersionKind, erro
 	return kinds[0], nil
 }
 
-func getPluginSharedInformer(ctx context.Context, kubeClient pluginsCore.KubeClient, resourceToWatch client.Object) (cache.SharedIndexInformer, error) {
+func getPluginInformer(ctx context.Context, kubeClient pluginsCore.KubeClient, resourceToWatch client.Object) (cache.Informer, error) {
 	i, err := kubeClient.GetCache().GetInformer(ctx, resourceToWatch)
 	if err != nil {
 		return nil, errors.Wrapf(errors.PluginInitializationFailed, err, "Error getting informer for %s", reflect.TypeOf(i))
 	}
-
-	si, casted := i.(cache.SharedIndexInformer)
-	if !casted {
-		return nil, errors.Errorf(errors.PluginInitializationFailed, "wrong type. Actual: %v", reflect.TypeOf(i))
-	}
-
-	return si, nil
+	return i, nil
 }
