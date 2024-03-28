@@ -617,7 +617,6 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 		TaskID:              taskModel.ID,
 		WorkflowID:          workflowModel.ID,
 		// The execution is not considered running until the propeller sends a specific event saying so.
-		Phase:                 core.WorkflowExecution_UNDEFINED,
 		CreatedAt:             m._clock.Now(),
 		Notifications:         notificationsSettings,
 		WorkflowIdentifier:    workflow.Id,
@@ -1006,7 +1005,6 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		LaunchPlanID:        launchPlanModel.ID,
 		WorkflowID:          launchPlanModel.WorkflowID,
 		// The execution is not considered running until the propeller sends a specific event saying so.
-		Phase:                 core.WorkflowExecution_UNDEFINED,
 		CreatedAt:             m._clock.Now(),
 		Notifications:         notificationsSettings,
 		WorkflowIdentifier:    workflow.Id,
