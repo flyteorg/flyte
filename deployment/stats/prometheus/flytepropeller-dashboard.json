@@ -274,7 +274,7 @@
               "instant": false,
               "interval": "",
               "intervalFactor": 2,
-              "legendFormat": "total-including-streaks",
+              "legendFormat": "total-including-streak-rounds",
               "metric": "",
               "query": "sum(rate(flyte:propeller:all:round:round_time_unlabeled_ms_count[5m]))",
               "refId": "D",
@@ -1025,7 +1025,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "Round Latency",
+          "title": "Round Latency (includes streak rounds)",
           "tooltip": {
             "msResolution": true,
             "shared": true,

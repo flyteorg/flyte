@@ -51,7 +51,7 @@ class FlytePropeller(object):
     @staticmethod
     def round_latency() -> Graph:
         return Graph(
-            title=f"Round Latency",
+            title=f"Round Latency (includes streak rounds)",
             dataSource=DATASOURCE,
             targets=[
                 Target(
@@ -170,7 +170,7 @@ class FlytePropeller(object):
                 Target(
                     expr="sum(rate(flyte:propeller:all:round:round_time_unlabeled_ms_count[5m]))",
                     refId="D",
-                    legendFormat="total-including-streaks",
+                    legendFormat="total-including-streak-rounds",
                 ),
             ],
             yAxes=YAxes(
