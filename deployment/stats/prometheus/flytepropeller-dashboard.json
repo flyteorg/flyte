@@ -274,7 +274,7 @@
               "instant": false,
               "interval": "",
               "intervalFactor": 2,
-              "legendFormat": "total_streaks",
+              "legendFormat": "total-including-streaks",
               "metric": "",
               "query": "sum(rate(flyte:propeller:all:round:round_time_unlabeled_ms_count[5m]))",
               "refId": "D",

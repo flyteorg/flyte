@@ -170,7 +170,7 @@ class FlytePropeller(object):
                 Target(
                     expr="sum(rate(flyte:propeller:all:round:round_time_unlabeled_ms_count[5m]))",
                     refId="D",
-                    legendFormat="total_streaks",
+                    legendFormat="total-including-streaks",
                 ),
             ],
             yAxes=YAxes(
