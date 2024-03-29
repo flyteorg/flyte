@@ -4,7 +4,8 @@
 # https://github.com/lyft/flyte/blob/b47565c9998cde32b0b5f995981e3f3c990fa7cd/artifacts/flyteadmin.yaml#L72
 server:
   httpPort: 8088
-  grpcPort: 8089
+  grpc:
+    port: 8089
   grpcServerReflection: true
   kube-config: /Users/ytong/.flyte/sandbox/kubeconfig
   security:

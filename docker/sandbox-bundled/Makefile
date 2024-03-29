@@ -3,6 +3,7 @@ mkdir -p images/tar/$(1)
 
 docker buildx build \
 	--build-arg FLYTECONSOLE_VERSION=$(FLYTECONSOLE_VERSION) \
+	--builder flyte-sandbox \
 	--platform linux/$(1) \
 	--tag flyte-binary:sandbox \
 	--output type=docker,dest=images/tar/$(1)/flyte-binary.tar \
@@ -10,9 +11,17 @@ docker buildx build \
 
 endef
 
+.PHONY: create_builder
+create_builder:
+	[ -n "$(shell docker buildx ls | awk '/^flyte-sandbox / {print $$1}')" ] || \
+		docker buildx create --name flyte-sandbox \
+		--driver docker-container --driver-opt image=moby/buildkit:master \
+		--buildkitd-flags '--allow-insecure-entitlement security.insecure' \
+		--platform linux/arm64,linux/amd64
+
 .PHONY: flyte
 flyte: FLYTECONSOLE_VERSION := latest
-flyte:
+flyte: create_builder
 	$(foreach arch,amd64 arm64,$(call FLYTE_BINARY_BUILD,$(arch)))
 
 .PHONY: dep_update
@@ -22,7 +31,7 @@ dep_update:
 	helm dependency update ../../charts/flyte-sandbox
 
 .PHONY: manifests
-manifests:
+manifests: dep_update
 	mkdir -p manifests
 	kustomize build \
 		--enable-helm \
@@ -39,11 +48,6 @@ manifests:
 
 .PHONY: build
 build: flyte dep_update manifests
-	[ -n "$(shell docker buildx ls | awk '/^flyte-sandbox / {print $$1}')" ] || \
-		docker buildx create --name flyte-sandbox \
-		--driver docker-container --driver-opt image=moby/buildkit:master \
-		--buildkitd-flags '--allow-insecure-entitlement security.insecure' \
-		--platform linux/arm64,linux/amd64
 	docker buildx build --builder flyte-sandbox --allow security.insecure --load \
 		--tag flyte-sandbox:latest .
 

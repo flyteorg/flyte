@@ -147,7 +147,7 @@ common:
       kubernetes.io/ingress.class: alb
       alb.ingress.kubernetes.io/tags: service_instance=production
       alb.ingress.kubernetes.io/scheme: internet-facing
-      alb.ingress.kubernetes.io/target-type: ip 
+      alb.ingress.kubernetes.io/target-type: ip
       # -- This is the certificate arn of the cert imported in AWS certificate manager.
       alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.userSettings.certificateArn }}"
       alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
@@ -216,7 +216,8 @@ configmap:
   adminServer:
     server:
       httpPort: 8088
-      grpcPort: 8089
+      grpc:
+        port: 8089
       security:
         secure: false
         useAuth: false
@@ -277,6 +278,7 @@ configmap:
           - container
           - sidecar
           - k8s-array
+          - agent-service
         #          - sagemaker_hyperparameter_tuning
         #          - sagemaker_custom_training
         #          - sagemaker_training

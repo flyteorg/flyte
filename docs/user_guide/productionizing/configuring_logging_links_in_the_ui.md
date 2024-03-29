@@ -105,7 +105,7 @@ Flytepropeller pod would be created as:
 :::
 
 This code snippet will output two logs per task that use the log plugin.
-However, not all task types use the log plugin; for example, the SageMaker plugin uses the log output provided by Sagemaker, and the Snowflake plugin will use a link to the snowflake console.
+However, not all task types use the log plugin; for example, the Snowflake plugin will use a link to the Snowflake console.
 
 ## Datadog integration
 
@@ -128,7 +128,7 @@ If you're using environment variables, use the following config:
 DD_LOGS_ENABLED: "false"
 DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL: "true"
 DD_LOGS_CONFIG_K8S_CONTAINER_USE_FILE: "true"
-DD_CONTAINER_EXCLUDE_LOGS: "name:datadog-agent"  # This is to avoid tracking logs produced by the datadog agent itself
+DD_CONTAINER_EXCLUDE_LOGS: "name:datadog-agent" # This is to avoid tracking logs produced by the datadog agent itself
 ```
 
 :::{warning}

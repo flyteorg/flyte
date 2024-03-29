@@ -20,7 +20,7 @@ cmd/single/dist:
 .PHONY: compile
 compile: cmd/single/dist
 	go build -tags console -v -o flyte -ldflags=$(LD_FLAGS) ./cmd/
-	mv ./flyte ${GOPATH}/bin || echo "Skipped copying 'flyte' to ${GOPATH}/bin"
+	mv ./flyte ${GOPATH}/bin/ || echo "Skipped copying 'flyte' to ${GOPATH}/bin"
 
 .PHONY: linux_compile
 linux_compile: cmd/single/dist
@@ -29,10 +29,6 @@ linux_compile: cmd/single/dist
 .PHONY: update_boilerplate
 update_boilerplate:
 	@boilerplate/update.sh
-
-.PHONY: kustomize
-kustomize:
-	KUSTOMIZE_VERSION=3.9.2 bash script/generate_kustomize.sh
 
 .PHONY: helm
 helm: ## Generate K8s Manifest from Helm Charts.
@@ -116,3 +112,12 @@ go-tidy:
 	make -C flyteplugins go-tidy
 	make -C flytestdlib go-tidy
 	make -C flytecopilot go-tidy
+
+.PHONY: lint-helm-charts
+lint-helm-charts:
+	# This pressuposes that you have act installed
+	act pull_request -W .github/workflows/validate-helm-charts.yaml --container-architecture linux/amd64 -e charts/event.json
+
+.PHONY: clean
+clean: ## Remove the HTML files related to the Flyteconsole.
+	rm -rf cmd/single/dist

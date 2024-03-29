@@ -23,7 +23,8 @@ export class RayJob extends Message<RayJob> {
    * runtime_env is base64 encoded.
    * Ray runtime environments: https://docs.ray.io/en/latest/ray-core/handling-dependencies.html#runtime-environments
    *
-   * @generated from field: string runtime_env = 2;
+   * @generated from field: string runtime_env = 2 [deprecated = true];
+   * @deprecated
    */
   runtimeEnv = "";
 
@@ -41,6 +42,14 @@ export class RayJob extends Message<RayJob> {
    */
   ttlSecondsAfterFinished = 0;
 
+  /**
+   * RuntimeEnvYAML represents the runtime environment configuration
+   * provided as a multi-line YAML string.
+   *
+   * @generated from field: string runtime_env_yaml = 5;
+   */
+  runtimeEnvYaml = "";
+
   constructor(data?: PartialMessage<RayJob>) {
     super();
     proto3.util.initPartial(data, this);
@@ -53,6 +62,7 @@ export class RayJob extends Message<RayJob> {
     { no: 2, name: "runtime_env", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "shutdown_after_job_finishes", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 4, name: "ttl_seconds_after_finished", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 5, name: "runtime_env_yaml", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RayJob {

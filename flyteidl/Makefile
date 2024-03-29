@@ -34,10 +34,6 @@ build_python:
 install-piptools:
 	pip install -U pip-tools
 
-.PHONY: doc-requirements.txt
-doc-requirements.txt: doc-requirements.in install-piptools
-	$(call PIP_COMPILE,doc-requirements.in)
-
 PLACEHOLDER_NPM := \"version\": \"0.0.0-develop\"
 
 .PHONY: update_npmversion

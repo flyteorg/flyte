@@ -35,7 +35,7 @@ author = "Flyte"
 # The short X.Y version
 version = ""
 # The full version, including alpha/beta/rc tags
-release = "1.10.7"
+release = "1.11.1-b0"
 
 # -- General configuration ---------------------------------------------------
 
@@ -75,6 +75,7 @@ extensions = [
     # custom extensions
     "auto_examples",
     "import_projects",
+    "sphinx_new_tab_link"
 ]
 
 source_suffix = {

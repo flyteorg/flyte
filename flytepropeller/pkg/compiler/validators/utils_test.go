@@ -1,9 +1,9 @@
 package validators
 
 import (
-	"github.com/golang/protobuf/proto"
 	"testing"
 
+	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
