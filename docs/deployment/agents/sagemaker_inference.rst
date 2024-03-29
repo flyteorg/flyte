@@ -67,37 +67,12 @@ Specify agent configuration
                 - boto
                 - sagemaker-endpoint
 
-Add the AWS credentials
------------------------
+AWS credentials
+---------------
 
-1. Install the flyteagent pod using helm:
-
-.. code-block::
-
-  helm repo add flyteorg https://flyteorg.github.io/flyte
-  helm install flyteagent flyteorg/flyteagent --namespace flyte
-
-2. Get the base64 value of your AWS credentials:
-
-.. code-block::
-  
-  echo -n "<AWS_CREDENTIAL>" | base64
-
-3. Edit the flyteagent secret:
-
-.. code-block:: bash
-  
-  kubectl edit secret flyteagent -n flyte
-
-.. code-block:: yaml
-  :emphasize-lines: 3-5
-
-  apiVersion: v1
-  data:
-    aws-access-key: <BASE64_ENCODED_AWS_ACCESS_KEY>
-    aws-secret-access-key: <BASE64_ENCODED_AWS_SECRET_ACCESS_KEY>
-    aws-session-token: <BASE64_ENCODED_AWS_SESSION_TOKEN>
-  kind: Secret
+When running the code locally, you can set AWS credentials as
+`environment variables <https://boto3.amazonaws.com/v1/documentation/api/latest/guide/credentials.html#environment-variables>`__.
+When running on a production AWS cluster, the IAM role is used by default. Ensure that it has the `AmazonSageMakerFullAccess` policy attached.
 
 Upgrade the Flyte Helm release
 ------------------------------
