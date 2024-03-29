@@ -10,7 +10,7 @@ require (
 	github.com/aws/aws-sdk-go v1.44.2
 	github.com/benbjohnson/clock v1.3.0
 	github.com/cloudevents/sdk-go/binding/format/protobuf/v2 v2.8.0
-	github.com/cloudevents/sdk-go/v2 v2.8.0
+	github.com/cloudevents/sdk-go/v2 v2.15.2
 	github.com/coreos/go-oidc/v3 v3.6.0
 	github.com/evanphx/json-patch v5.6.0+incompatible
 	github.com/flyteorg/flyte/flyteidl v0.0.0-00010101000000-000000000000
@@ -210,7 +210,7 @@ require (
 	github.com/imdario/mergo v0.3.13 // indirect
 	github.com/prometheus/common v0.44.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	go.uber.org/zap v1.25.0 // indirect
+	go.uber.org/zap v1.27.0 // indirect
 	k8s.io/klog/v2 v2.100.1 // indirect
 	k8s.io/kube-openapi v0.0.0-20230717233707-2695361300d9 // indirect
 	k8s.io/utils v0.0.0-20230406110748-d93618cff8a2 // indirect
