@@ -55,7 +55,7 @@ require (
 	google.golang.org/api v0.155.0
 	google.golang.org/genproto v0.0.0-20240123012728-ef4313101c80
 	google.golang.org/grpc v1.62.1
-	google.golang.org/protobuf v1.32.0
+	google.golang.org/protobuf v1.33.0
 	gorm.io/driver/mysql v1.4.4
 	gorm.io/driver/postgres v1.5.3
 	gorm.io/driver/sqlite v1.5.4
