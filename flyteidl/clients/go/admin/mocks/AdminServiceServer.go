@@ -835,6 +835,47 @@ func (_m *AdminServiceServer) GetNodeExecutionData(_a0 context.Context, _a1 *adm
 	return r0, r1
 }
 
+type AdminServiceServer_GetOverrideAttributes struct {
+	*mock.Call
+}
+
+func (_m AdminServiceServer_GetOverrideAttributes) Return(_a0 *admin.OverrideAttributesGetResponse, _a1 error) *AdminServiceServer_GetOverrideAttributes {
+	return &AdminServiceServer_GetOverrideAttributes{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminServiceServer) OnGetOverrideAttributes(_a0 context.Context, _a1 *admin.OverrideAttributesGetRequest) *AdminServiceServer_GetOverrideAttributes {
+	c_call := _m.On("GetOverrideAttributes", _a0, _a1)
+	return &AdminServiceServer_GetOverrideAttributes{Call: c_call}
+}
+
+func (_m *AdminServiceServer) OnGetOverrideAttributesMatch(matchers ...interface{}) *AdminServiceServer_GetOverrideAttributes {
+	c_call := _m.On("GetOverrideAttributes", matchers...)
+	return &AdminServiceServer_GetOverrideAttributes{Call: c_call}
+}
+
+// GetOverrideAttributes provides a mock function with given fields: _a0, _a1
+func (_m *AdminServiceServer) GetOverrideAttributes(_a0 context.Context, _a1 *admin.OverrideAttributesGetRequest) (*admin.OverrideAttributesGetResponse, error) {
+	ret := _m.Called(_a0, _a1)
+
+	var r0 *admin.OverrideAttributesGetResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.OverrideAttributesGetRequest) *admin.OverrideAttributesGetResponse); ok {
+		r0 = rf(_a0, _a1)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.OverrideAttributesGetResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.OverrideAttributesGetRequest) error); ok {
+		r1 = rf(_a0, _a1)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type AdminServiceServer_GetProject struct {
 	*mock.Call
 }
@@ -2098,6 +2139,47 @@ func (_m *AdminServiceServer) UpdateNamedEntity(_a0 context.Context, _a1 *admin.
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, *admin.NamedEntityUpdateRequest) error); ok {
+		r1 = rf(_a0, _a1)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type AdminServiceServer_UpdateOverrideAttributes struct {
+	*mock.Call
+}
+
+func (_m AdminServiceServer_UpdateOverrideAttributes) Return(_a0 *admin.OverrideAttributesUpdateResponse, _a1 error) *AdminServiceServer_UpdateOverrideAttributes {
+	return &AdminServiceServer_UpdateOverrideAttributes{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminServiceServer) OnUpdateOverrideAttributes(_a0 context.Context, _a1 *admin.OverrideAttributesUpdateRequest) *AdminServiceServer_UpdateOverrideAttributes {
+	c_call := _m.On("UpdateOverrideAttributes", _a0, _a1)
+	return &AdminServiceServer_UpdateOverrideAttributes{Call: c_call}
+}
+
+func (_m *AdminServiceServer) OnUpdateOverrideAttributesMatch(matchers ...interface{}) *AdminServiceServer_UpdateOverrideAttributes {
+	c_call := _m.On("UpdateOverrideAttributes", matchers...)
+	return &AdminServiceServer_UpdateOverrideAttributes{Call: c_call}
+}
+
+// UpdateOverrideAttributes provides a mock function with given fields: _a0, _a1
+func (_m *AdminServiceServer) UpdateOverrideAttributes(_a0 context.Context, _a1 *admin.OverrideAttributesUpdateRequest) (*admin.OverrideAttributesUpdateResponse, error) {
+	ret := _m.Called(_a0, _a1)
+
+	var r0 *admin.OverrideAttributesUpdateResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.OverrideAttributesUpdateRequest) *admin.OverrideAttributesUpdateResponse); ok {
+		r0 = rf(_a0, _a1)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.OverrideAttributesUpdateResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.OverrideAttributesUpdateRequest) error); ok {
 		r1 = rf(_a0, _a1)
 	} else {
 		r1 = ret.Error(1)

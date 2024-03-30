@@ -977,6 +977,54 @@ func (_m *AdminServiceClient) GetNodeExecutionData(ctx context.Context, in *admi
 	return r0, r1
 }
 
+type AdminServiceClient_GetOverrideAttributes struct {
+	*mock.Call
+}
+
+func (_m AdminServiceClient_GetOverrideAttributes) Return(_a0 *admin.OverrideAttributesGetResponse, _a1 error) *AdminServiceClient_GetOverrideAttributes {
+	return &AdminServiceClient_GetOverrideAttributes{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminServiceClient) OnGetOverrideAttributes(ctx context.Context, in *admin.OverrideAttributesGetRequest, opts ...grpc.CallOption) *AdminServiceClient_GetOverrideAttributes {
+	c_call := _m.On("GetOverrideAttributes", ctx, in, opts)
+	return &AdminServiceClient_GetOverrideAttributes{Call: c_call}
+}
+
+func (_m *AdminServiceClient) OnGetOverrideAttributesMatch(matchers ...interface{}) *AdminServiceClient_GetOverrideAttributes {
+	c_call := _m.On("GetOverrideAttributes", matchers...)
+	return &AdminServiceClient_GetOverrideAttributes{Call: c_call}
+}
+
+// GetOverrideAttributes provides a mock function with given fields: ctx, in, opts
+func (_m *AdminServiceClient) GetOverrideAttributes(ctx context.Context, in *admin.OverrideAttributesGetRequest, opts ...grpc.CallOption) (*admin.OverrideAttributesGetResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *admin.OverrideAttributesGetResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.OverrideAttributesGetRequest, ...grpc.CallOption) *admin.OverrideAttributesGetResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.OverrideAttributesGetResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.OverrideAttributesGetRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type AdminServiceClient_GetProject struct {
 	*mock.Call
 }
@@ -2457,6 +2505,54 @@ func (_m *AdminServiceClient) UpdateNamedEntity(ctx context.Context, in *admin.N
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, *admin.NamedEntityUpdateRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type AdminServiceClient_UpdateOverrideAttributes struct {
+	*mock.Call
+}
+
+func (_m AdminServiceClient_UpdateOverrideAttributes) Return(_a0 *admin.OverrideAttributesUpdateResponse, _a1 error) *AdminServiceClient_UpdateOverrideAttributes {
+	return &AdminServiceClient_UpdateOverrideAttributes{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminServiceClient) OnUpdateOverrideAttributes(ctx context.Context, in *admin.OverrideAttributesUpdateRequest, opts ...grpc.CallOption) *AdminServiceClient_UpdateOverrideAttributes {
+	c_call := _m.On("UpdateOverrideAttributes", ctx, in, opts)
+	return &AdminServiceClient_UpdateOverrideAttributes{Call: c_call}
+}
+
+func (_m *AdminServiceClient) OnUpdateOverrideAttributesMatch(matchers ...interface{}) *AdminServiceClient_UpdateOverrideAttributes {
+	c_call := _m.On("UpdateOverrideAttributes", matchers...)
+	return &AdminServiceClient_UpdateOverrideAttributes{Call: c_call}
+}
+
+// UpdateOverrideAttributes provides a mock function with given fields: ctx, in, opts
+func (_m *AdminServiceClient) UpdateOverrideAttributes(ctx context.Context, in *admin.OverrideAttributesUpdateRequest, opts ...grpc.CallOption) (*admin.OverrideAttributesUpdateResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *admin.OverrideAttributesUpdateResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.OverrideAttributesUpdateRequest, ...grpc.CallOption) *admin.OverrideAttributesUpdateResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.OverrideAttributesUpdateResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.OverrideAttributesUpdateRequest, ...grpc.CallOption) error); ok {
 		r1 = rf(ctx, in, opts...)
 	} else {
 		r1 = ret.Error(1)

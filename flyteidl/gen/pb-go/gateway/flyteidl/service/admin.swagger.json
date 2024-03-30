@@ -2317,6 +2317,125 @@
         ]
       }
     },
+    "/api/v1/org/override_attributes/{id.org}/{id.project}/{id.domain}": {
+      "get": {
+        "summary": "Fetch a unified project attribute.",
+        "operationId": "AdminService_GetOverrideAttributes2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminOverrideAttributesGetResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.org",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.project",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.domain",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/override_attributes": {
+      "post": {
+        "summary": "Update a unified project attribute.",
+        "operationId": "AdminService_UpdateOverrideAttributes",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminOverrideAttributesUpdateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/adminOverrideAttributesUpdateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/override_attributes/{id.project}/{id.domain}": {
+      "get": {
+        "summary": "Fetch a unified project attribute.",
+        "operationId": "AdminService_GetOverrideAttributes",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminOverrideAttributesGetResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.project",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.domain",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.org",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
     "/api/v1/project_attributes/{attributes.project}": {
       "put": {
         "summary": "Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` at the project level",
@@ -4513,6 +4632,35 @@
       },
       "description": "Annotation values to be applied to an execution resource.\nIn the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined\nto specify how to merge annotations defined at registration and execution time."
     },
+    "adminAttributes": {
+      "type": "object",
+      "properties": {
+        "task_resource_attributes": {
+          "$ref": "#/definitions/adminTaskResourceAttributes"
+        },
+        "cluster_resource_attributes": {
+          "$ref": "#/definitions/adminClusterResourceAttributes"
+        },
+        "execution_queue_attributes": {
+          "$ref": "#/definitions/adminExecutionQueueAttributes"
+        },
+        "execution_cluster_label": {
+          "$ref": "#/definitions/adminExecutionClusterLabel"
+        },
+        "quality_of_service": {
+          "$ref": "#/definitions/coreQualityOfService"
+        },
+        "plugin_overrides": {
+          "$ref": "#/definitions/adminPluginOverrides"
+        },
+        "workflow_execution_config": {
+          "$ref": "#/definitions/adminWorkflowExecutionConfig"
+        },
+        "cluster_assignment": {
+          "$ref": "#/definitions/adminClusterAssignment"
+        }
+      }
+    },
     "adminAuth": {
       "type": "object",
       "properties": {
@@ -5691,6 +5839,45 @@
         }
       }
     },
+    "adminOverrideAttributesGetResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/adminprojectID"
+        },
+        "version": {
+          "type": "string"
+        },
+        "project_domain_attributes": {
+          "$ref": "#/definitions/adminAttributes",
+          "title": "Everything set at the project-domain level"
+        },
+        "project_attributes": {
+          "$ref": "#/definitions/adminAttributes",
+          "title": "Everything set at the project level"
+        },
+        "global_attributes": {
+          "$ref": "#/definitions/adminAttributes",
+          "title": "Everything set at the global application level"
+        }
+      }
+    },
+    "adminOverrideAttributesUpdateRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/adminprojectID"
+        },
+        "attribute": {
+          "$ref": "#/definitions/adminAttributes",
+          "title": "Everything set at the project-domain level"
+        }
+      }
+    },
+    "adminOverrideAttributesUpdateResponse": {
+      "type": "object",
+      "description": "Purposefully empty, may be populated in the future."
+    },
     "adminPagerDutyNotification": {
       "type": "object",
       "properties": {
@@ -6450,6 +6637,20 @@
         }
       },
       "description": "Represents a structure that encapsulates the specification of the workflow."
+    },
+    "adminprojectID": {
+      "type": "object",
+      "properties": {
+        "project": {
+          "type": "string"
+        },
+        "domain": {
+          "type": "string"
+        },
+        "org": {
+          "type": "string"
+        }
+      }
     },
     "coreAlias": {
       "type": "object",

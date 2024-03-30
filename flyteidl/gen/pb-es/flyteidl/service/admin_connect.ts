@@ -19,6 +19,7 @@ import { WorkflowAttributesDeleteRequest, WorkflowAttributesDeleteResponse, Work
 import { ListMatchableAttributesRequest, ListMatchableAttributesResponse } from "../admin/matchable_resource_pb.js";
 import { GetVersionRequest, GetVersionResponse } from "../admin/version_pb.js";
 import { DescriptionEntity, DescriptionEntityList, DescriptionEntityListRequest } from "../admin/description_entity_pb.js";
+import { OverrideAttributesGetRequest, OverrideAttributesGetResponse, OverrideAttributesUpdateRequest, OverrideAttributesUpdateResponse } from "../admin/override_attributes_pb.js";
 
 /**
  * The following defines an RPC service that is also served over HTTP via grpc-gateway.
@@ -636,6 +637,28 @@ export const AdminService = {
       name: "GetExecutionMetrics",
       I: WorkflowExecutionGetMetricsRequest,
       O: WorkflowExecutionGetMetricsResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * Fetch a unified project attribute.
+     *
+     * @generated from rpc flyteidl.service.AdminService.GetOverrideAttributes
+     */
+    getOverrideAttributes: {
+      name: "GetOverrideAttributes",
+      I: OverrideAttributesGetRequest,
+      O: OverrideAttributesGetResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * Update a unified project attribute.
+     *
+     * @generated from rpc flyteidl.service.AdminService.UpdateOverrideAttributes
+     */
+    updateOverrideAttributes: {
+      name: "UpdateOverrideAttributes",
+      I: OverrideAttributesUpdateRequest,
+      O: OverrideAttributesUpdateResponse,
       kind: MethodKind.Unary,
     },
   }

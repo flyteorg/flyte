@@ -2,6 +2,7 @@ package common
 
 import (
 	"context"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"time"
 
 	errrs "github.com/pkg/errors"
@@ -34,6 +35,35 @@ func OffloadLiteralMapWithRetryDelayAndAttempts(ctx context.Context, storageClie
 
 	err = async.RetryOnSpecificErrors(attempts, retryDelay, func() error {
 		err = storageClient.WriteProtobuf(ctx, uri, storage.Options{}, literalMap)
+		return err
+	}, isRetryableError)
+
+	if err != nil {
+		return "", errors.NewFlyteAdminErrorf(codes.Internal, "Failed to write protobuf for [%+v] with err: %v", nestedKeys, err)
+	}
+
+	return uri, nil
+}
+
+func OffloadOverrideAttributesDocument(ctx context.Context, storageClient *storage.DataStore, document *admin.Document, nestedKeys ...string) (storage.DataReference, error) {
+	return OffloadOverrideAttributesDocumentWithRetryDelayAndAttempts(ctx, storageClient, document, async.RetryDelay, 5, nestedKeys...)
+}
+
+func OffloadOverrideAttributesDocumentWithRetryDelayAndAttempts(ctx context.Context, storageClient *storage.DataStore, document *admin.Document, retryDelay time.Duration, attempts int, nestedKeys ...string) (storage.DataReference, error) {
+	if document == nil {
+		document = &admin.Document{}
+	}
+	nestedKeyReference := []string{
+		shared.OverrideAttributesDocument,
+	}
+	nestedKeyReference = append(nestedKeyReference, nestedKeys...)
+	uri, err := storageClient.ConstructReference(ctx, storageClient.GetBaseContainerFQN(ctx), nestedKeyReference...)
+	if err != nil {
+		return "", errors.NewFlyteAdminErrorf(codes.Internal, "Failed to construct data reference for [%+v] with err: %v", nestedKeys, err)
+	}
+
+	err = async.RetryOnSpecificErrors(attempts, retryDelay, func() error {
+		err = storageClient.WriteProtobuf(ctx, uri, storage.Options{}, document)
 		return err
 	}, isRetryableError)
 

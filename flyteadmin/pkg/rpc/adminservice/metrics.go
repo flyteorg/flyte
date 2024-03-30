@@ -108,6 +108,13 @@ type descriptionEntityEndpointMetrics struct {
 	list   util.RequestMetrics
 }
 
+type overrideAttributesMetrics struct {
+	scope promutils.Scope
+
+	get    util.RequestMetrics
+	update util.RequestMetrics
+}
+
 type AdminMetrics struct {
 	Scope        promutils.Scope
 	PanicCounter prometheus.Counter
@@ -125,6 +132,7 @@ type AdminMetrics struct {
 	taskExecutionEndpointMetrics           taskExecutionEndpointMetrics
 	workflowEndpointMetrics                workflowEndpointMetrics
 	descriptionEntityMetrics               descriptionEntityEndpointMetrics
+	overrideAttributesMetrics              overrideAttributesMetrics
 }
 
 func InitMetrics(adminScope promutils.Scope) AdminMetrics {
@@ -228,6 +236,12 @@ func InitMetrics(adminScope promutils.Scope) AdminMetrics {
 			create: util.NewRequestMetrics(adminScope, "create_description_entity"),
 			get:    util.NewRequestMetrics(adminScope, "get_description_entity"),
 			list:   util.NewRequestMetrics(adminScope, "list_description_entity"),
+		},
+
+		overrideAttributesMetrics: overrideAttributesMetrics{
+			scope:  adminScope,
+			get:    util.NewRequestMetrics(adminScope, "get_override_attributes"),
+			update: util.NewRequestMetrics(adminScope, "update_override_attributes"),
 		},
 	}
 }

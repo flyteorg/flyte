@@ -33,6 +33,7 @@ const (
 	Attributes            = "attributes"
 	MatchingAttributes    = "matching_attributes"
 	// Parent of a node execution in the node executions table
-	ParentID        = "parent_id"
-	WorkflowClosure = "workflow_closure"
+	ParentID                   = "parent_id"
+	WorkflowClosure            = "workflow_closure"
+	OverrideAttributesDocument = "override_attributes_document"
 )

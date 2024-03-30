@@ -133,3 +133,15 @@ func ValidateListAllMatchableAttributesRequest(request admin.ListMatchableAttrib
 	}
 	return nil
 }
+
+func ValidateOverrideAttributesRequest(request admin.OverrideAttributesGetRequest) error {
+	if err := ValidateEmptyStringField(request.Id.Project, shared.Project); err != nil {
+		return err
+	}
+	return ValidateEmptyStringField(request.Id.Domain, shared.Domain)
+}
+
+func ValidateOverrideAttributesUpdateRequest(request admin.OverrideAttributesUpdateRequest) error {
+	// TODO
+	return nil
+}

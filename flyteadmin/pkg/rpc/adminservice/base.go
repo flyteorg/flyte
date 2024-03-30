@@ -42,6 +42,7 @@ type AdminService struct {
 	DescriptionEntityManager interfaces.DescriptionEntityInterface
 	MetricsManager           interfaces.MetricsInterface
 	Metrics                  AdminMetrics
+	OverrideAttributeManager interfaces.OverrideAttributesInterface
 }
 
 // Intercepts all admin requests to handle panics during execution.

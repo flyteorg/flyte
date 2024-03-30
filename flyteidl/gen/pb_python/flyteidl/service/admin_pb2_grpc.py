@@ -9,6 +9,7 @@ from flyteidl.admin import execution_pb2 as flyteidl_dot_admin_dot_execution__pb
 from flyteidl.admin import launch_plan_pb2 as flyteidl_dot_admin_dot_launch__plan__pb2
 from flyteidl.admin import matchable_resource_pb2 as flyteidl_dot_admin_dot_matchable__resource__pb2
 from flyteidl.admin import node_execution_pb2 as flyteidl_dot_admin_dot_node__execution__pb2
+from flyteidl.admin import override_attributes_pb2 as flyteidl_dot_admin_dot_override__attributes__pb2
 from flyteidl.admin import project_attributes_pb2 as flyteidl_dot_admin_dot_project__attributes__pb2
 from flyteidl.admin import project_domain_attributes_pb2 as flyteidl_dot_admin_dot_project__domain__attributes__pb2
 from flyteidl.admin import project_pb2 as flyteidl_dot_admin_dot_project__pb2
@@ -304,6 +305,16 @@ class AdminServiceStub(object):
                 '/flyteidl.service.AdminService/GetExecutionMetrics',
                 request_serializer=flyteidl_dot_admin_dot_execution__pb2.WorkflowExecutionGetMetricsRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_admin_dot_execution__pb2.WorkflowExecutionGetMetricsResponse.FromString,
+                )
+        self.GetOverrideAttributes = channel.unary_unary(
+                '/flyteidl.service.AdminService/GetOverrideAttributes',
+                request_serializer=flyteidl_dot_admin_dot_override__attributes__pb2.OverrideAttributesGetRequest.SerializeToString,
+                response_deserializer=flyteidl_dot_admin_dot_override__attributes__pb2.OverrideAttributesGetResponse.FromString,
+                )
+        self.UpdateOverrideAttributes = channel.unary_unary(
+                '/flyteidl.service.AdminService/UpdateOverrideAttributes',
+                request_serializer=flyteidl_dot_admin_dot_override__attributes__pb2.OverrideAttributesUpdateRequest.SerializeToString,
+                response_deserializer=flyteidl_dot_admin_dot_override__attributes__pb2.OverrideAttributesUpdateResponse.FromString,
                 )
 
 
@@ -702,6 +713,20 @@ class AdminServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def GetOverrideAttributes(self, request, context):
+        """Fetch a unified project attribute.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def UpdateOverrideAttributes(self, request, context):
+        """Update a unified project attribute.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_AdminServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -979,6 +1004,16 @@ def add_AdminServiceServicer_to_server(servicer, server):
                     servicer.GetExecutionMetrics,
                     request_deserializer=flyteidl_dot_admin_dot_execution__pb2.WorkflowExecutionGetMetricsRequest.FromString,
                     response_serializer=flyteidl_dot_admin_dot_execution__pb2.WorkflowExecutionGetMetricsResponse.SerializeToString,
+            ),
+            'GetOverrideAttributes': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetOverrideAttributes,
+                    request_deserializer=flyteidl_dot_admin_dot_override__attributes__pb2.OverrideAttributesGetRequest.FromString,
+                    response_serializer=flyteidl_dot_admin_dot_override__attributes__pb2.OverrideAttributesGetResponse.SerializeToString,
+            ),
+            'UpdateOverrideAttributes': grpc.unary_unary_rpc_method_handler(
+                    servicer.UpdateOverrideAttributes,
+                    request_deserializer=flyteidl_dot_admin_dot_override__attributes__pb2.OverrideAttributesUpdateRequest.FromString,
+                    response_serializer=flyteidl_dot_admin_dot_override__attributes__pb2.OverrideAttributesUpdateResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -1924,5 +1959,39 @@ class AdminService(object):
         return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AdminService/GetExecutionMetrics',
             flyteidl_dot_admin_dot_execution__pb2.WorkflowExecutionGetMetricsRequest.SerializeToString,
             flyteidl_dot_admin_dot_execution__pb2.WorkflowExecutionGetMetricsResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetOverrideAttributes(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AdminService/GetOverrideAttributes',
+            flyteidl_dot_admin_dot_override__attributes__pb2.OverrideAttributesGetRequest.SerializeToString,
+            flyteidl_dot_admin_dot_override__attributes__pb2.OverrideAttributesGetResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def UpdateOverrideAttributes(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AdminService/UpdateOverrideAttributes',
+            flyteidl_dot_admin_dot_override__attributes__pb2.OverrideAttributesUpdateRequest.SerializeToString,
+            flyteidl_dot_admin_dot_override__attributes__pb2.OverrideAttributesUpdateResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

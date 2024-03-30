@@ -19,6 +19,7 @@ import "flyteidl/admin/task_execution.proto";
 import "flyteidl/admin/version.proto";
 import "flyteidl/admin/common.proto";
 import "flyteidl/admin/description_entity.proto";
+import "flyteidl/admin/override_attributes.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
 
@@ -656,4 +657,22 @@ service AdminService {
       description: "Retrieve metrics from an existing workflow execution."
     };
   };
+
+  // Fetch a unified project attribute.
+  rpc GetOverrideAttributes (flyteidl.admin.OverrideAttributesGetRequest) returns (flyteidl.admin.OverrideAttributesGetResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/override_attributes/{id.project}/{id.domain}"
+      additional_bindings {
+        get: "/api/v1/org/override_attributes/{id.org}/{id.project}/{id.domain}"
+      }
+    };
+  }
+
+  // Update a unified project attribute.
+  rpc UpdateOverrideAttributes (flyteidl.admin.OverrideAttributesUpdateRequest) returns (flyteidl.admin.OverrideAttributesUpdateResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/override_attributes"
+      body: "*"
+    };
+  }
 }
