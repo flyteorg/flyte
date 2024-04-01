@@ -7,7 +7,7 @@ import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialM
 import { Duration, Message, proto3, protoInt64, Struct, Timestamp } from "@bufbuild/protobuf";
 import { TaskExecutionIdentifier } from "../core/identifier_pb.js";
 import { TaskNodeOverrides } from "../core/workflow_pb.js";
-import { SecurityContext } from "../core/security_pb.js";
+import { Identity } from "../core/security_pb.js";
 import { LiteralMap } from "../core/literals_pb.js";
 import { TaskTemplate } from "../core/tasks_pb.js";
 import { TaskExecution_Phase, TaskLog } from "../core/execution_pb.js";
@@ -57,12 +57,12 @@ proto3.util.setEnumType(State, "flyteidl.admin.State", [
 /**
  * Represents a subset of runtime task execution metadata that are relevant to external plugins.
  *
+ * ID of the task execution
+ *
  * @generated from message flyteidl.admin.TaskExecutionMetadata
  */
 export class TaskExecutionMetadata extends Message<TaskExecutionMetadata> {
   /**
-   * ID of the task execution
-   *
    * @generated from field: flyteidl.core.TaskExecutionIdentifier task_execution_id = 1;
    */
   taskExecutionId?: TaskExecutionIdentifier;
@@ -136,11 +136,11 @@ export class TaskExecutionMetadata extends Message<TaskExecutionMetadata> {
   overrides?: TaskNodeOverrides;
 
   /**
-   * Security context for this task execution, including user to run as, secrets, and tokens
+   * Identity of user running this task execution
    *
-   * @generated from field: flyteidl.core.SecurityContext security_context = 11;
+   * @generated from field: flyteidl.core.Identity identity = 11;
    */
-  securityContext?: SecurityContext;
+  identity?: Identity;
 
   constructor(data?: PartialMessage<TaskExecutionMetadata>) {
     super();
@@ -160,7 +160,7 @@ export class TaskExecutionMetadata extends Message<TaskExecutionMetadata> {
     { no: 8, name: "interruptible", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 9, name: "interruptible_failure_threshold", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 10, name: "overrides", kind: "message", T: TaskNodeOverrides },
-    { no: 11, name: "security_context", kind: "message", T: SecurityContext },
+    { no: 11, name: "identity", kind: "message", T: Identity },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TaskExecutionMetadata {

@@ -22387,7 +22387,7 @@
                  * @property {boolean|null} [interruptible] TaskExecutionMetadata interruptible
                  * @property {number|null} [interruptibleFailureThreshold] TaskExecutionMetadata interruptibleFailureThreshold
                  * @property {flyteidl.core.ITaskNodeOverrides|null} [overrides] TaskExecutionMetadata overrides
-                 * @property {flyteidl.core.ISecurityContext|null} [securityContext] TaskExecutionMetadata securityContext
+                 * @property {flyteidl.core.IIdentity|null} [identity] TaskExecutionMetadata identity
                  */
     
                 /**
@@ -22489,12 +22489,12 @@
                 TaskExecutionMetadata.prototype.overrides = null;
     
                 /**
-                 * TaskExecutionMetadata securityContext.
-                 * @member {flyteidl.core.ISecurityContext|null|undefined} securityContext
+                 * TaskExecutionMetadata identity.
+                 * @member {flyteidl.core.IIdentity|null|undefined} identity
                  * @memberof flyteidl.admin.TaskExecutionMetadata
                  * @instance
                  */
-                TaskExecutionMetadata.prototype.securityContext = null;
+                TaskExecutionMetadata.prototype.identity = null;
     
                 /**
                  * Creates a new TaskExecutionMetadata instance using the specified properties.
@@ -22543,8 +22543,8 @@
                         writer.uint32(/* id 9, wireType 0 =*/72).int32(message.interruptibleFailureThreshold);
                     if (message.overrides != null && message.hasOwnProperty("overrides"))
                         $root.flyteidl.core.TaskNodeOverrides.encode(message.overrides, writer.uint32(/* id 10, wireType 2 =*/82).fork()).ldelim();
-                    if (message.securityContext != null && message.hasOwnProperty("securityContext"))
-                        $root.flyteidl.core.SecurityContext.encode(message.securityContext, writer.uint32(/* id 11, wireType 2 =*/90).fork()).ldelim();
+                    if (message.identity != null && message.hasOwnProperty("identity"))
+                        $root.flyteidl.core.Identity.encode(message.identity, writer.uint32(/* id 11, wireType 2 =*/90).fork()).ldelim();
                     return writer;
                 };
     
@@ -22612,7 +22612,7 @@
                             message.overrides = $root.flyteidl.core.TaskNodeOverrides.decode(reader, reader.uint32());
                             break;
                         case 11:
-                            message.securityContext = $root.flyteidl.core.SecurityContext.decode(reader, reader.uint32());
+                            message.identity = $root.flyteidl.core.Identity.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -22682,10 +22682,10 @@
                         if (error)
                             return "overrides." + error;
                     }
-                    if (message.securityContext != null && message.hasOwnProperty("securityContext")) {
-                        var error = $root.flyteidl.core.SecurityContext.verify(message.securityContext);
+                    if (message.identity != null && message.hasOwnProperty("identity")) {
+                        var error = $root.flyteidl.core.Identity.verify(message.identity);
                         if (error)
-                            return "securityContext." + error;
+                            return "identity." + error;
                     }
                     return null;
                 };

@@ -9156,8 +9156,8 @@ export namespace flyteidl {
             /** TaskExecutionMetadata overrides */
             overrides?: (flyteidl.core.ITaskNodeOverrides|null);
 
-            /** TaskExecutionMetadata securityContext */
-            securityContext?: (flyteidl.core.ISecurityContext|null);
+            /** TaskExecutionMetadata identity */
+            identity?: (flyteidl.core.IIdentity|null);
         }
 
         /** Represents a TaskExecutionMetadata. */
@@ -9199,8 +9199,8 @@ export namespace flyteidl {
             /** TaskExecutionMetadata overrides. */
             public overrides?: (flyteidl.core.ITaskNodeOverrides|null);
 
-            /** TaskExecutionMetadata securityContext. */
-            public securityContext?: (flyteidl.core.ISecurityContext|null);
+            /** TaskExecutionMetadata identity. */
+            public identity?: (flyteidl.core.IIdentity|null);
 
             /**
              * Creates a new TaskExecutionMetadata instance using the specified properties.
