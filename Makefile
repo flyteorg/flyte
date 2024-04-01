@@ -20,7 +20,7 @@ cmd/single/dist:
 .PHONY: compile
 compile: cmd/single/dist
 	go build -tags console -v -o flyte -ldflags=$(LD_FLAGS) ./cmd/
-	mv ./flyte ${GOPATH}/bin || echo "Skipped copying 'flyte' to ${GOPATH}/bin"
+	mv ./flyte ${GOPATH}/bin/ || echo "Skipped copying 'flyte' to ${GOPATH}/bin"
 
 .PHONY: linux_compile
 linux_compile: cmd/single/dist
@@ -56,7 +56,9 @@ install-conda-lock:
 
 .PHONY: conda-lock
 conda-lock: install-conda-lock
-	conda-lock -f monodocs-environment.yaml --without-cuda --lockfile monodocs-environment.lock.yaml
+	conda-lock -f monodocs-environment.yaml --without-cuda \
+		--lockfile monodocs-environment.lock.yaml \
+		--platform=osx-64 --platform=osx-arm64 --platform=linux-64
 
 .PHONY: stats
 stats:

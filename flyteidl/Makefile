@@ -1,7 +1,6 @@
-#!/bin/bash
-
 export REPOSITORY=flyteidl
-include boilerplate/flyte/golang_test_targets/Makefile
+export REPO_ROOT=..
+include ../boilerplate/flyte/golang_test_targets/Makefile
 
 define PIP_COMPILE
 pip-compile $(1) --upgrade --verbose
@@ -40,7 +39,3 @@ PLACEHOLDER_NPM := \"version\": \"0.0.0-develop\"
 update_npmversion:
 	grep "$(PLACEHOLDER_NPM)" "package.json"
 	sed -i "s/$(PLACEHOLDER_NPM)/\"version\":  \"${VERSION}\"/g" "package.json"
-
-.PHONY: go-tidy
-go-tidy:
-	go mod tidy

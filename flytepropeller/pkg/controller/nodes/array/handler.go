@@ -505,7 +505,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 				}
 			}
 		case v1alpha1.NodeKindWorkflow:
-			// TODO - to support launchplans we will need to process the output interface variables here 
+			// TODO - to support launchplans we will need to process the output interface variables here
 			fallthrough
 		default:
 			logger.Warnf(ctx, "ArrayNode does not support pre-populating outputLiteral collections for node kind '%s'", arrayNode.GetSubNodeSpec().GetKind())
