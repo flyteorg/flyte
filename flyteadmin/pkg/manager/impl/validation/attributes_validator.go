@@ -134,7 +134,7 @@ func ValidateListAllMatchableAttributesRequest(request admin.ListMatchableAttrib
 	return nil
 }
 
-func ValidateOverrideAttributesRequest(request admin.OverrideAttributesGetRequest) error {
+func ValidateOverrideAttributesGetRequest(request admin.OverrideAttributesGetRequest) error {
 	if err := ValidateEmptyStringField(request.Id.Project, shared.Project); err != nil {
 		return err
 	}

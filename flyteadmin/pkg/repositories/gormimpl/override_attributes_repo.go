@@ -15,11 +15,36 @@ type OverrideAttributesRepo struct {
 
 func (r *OverrideAttributesRepo) GetActive(ctx context.Context) (models.OverrideAttributes, error) {
 	var overrideAttributes models.OverrideAttributes
-	err := r.db.Where(&models.OverrideAttributes{
+	timer := r.metrics.GetDuration.Start()
+	tx := r.db.Where(&models.OverrideAttributes{
 		Active: true,
-	}).First(&overrideAttributes).Error
-	if err != nil {
-		return models.OverrideAttributes{}, r.errorTransformer.ToFlyteAdminError(err)
+	}).First(&overrideAttributes)
+	timer.Stop()
+	// TODO: what if the table is empty?
+	if tx.Error != nil {
+		return models.OverrideAttributes{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
 	}
 	return overrideAttributes, nil
+}
+
+func (r *OverrideAttributesRepo) EraseActive(ctx context.Context) error {
+	timer := r.metrics.GetDuration.Start()
+	tx := r.db.Model(&models.OverrideAttributes{}).Where(&models.OverrideAttributes{
+		Active: true,
+	}).Update("active", false)
+	timer.Stop()
+	if tx.Error != nil {
+		return r.errorTransformer.ToFlyteAdminError(tx.Error)
+	}
+	return nil
+}
+
+func (r *OverrideAttributesRepo) Create(ctx context.Context, input models.OverrideAttributes) error {
+	timer := r.metrics.CreateDuration.Start()
+	tx := r.db.Create(&input)
+	timer.Stop()
+	if tx.Error != nil {
+		return r.errorTransformer.ToFlyteAdminError(tx.Error)
+	}
+	return nil
 }
