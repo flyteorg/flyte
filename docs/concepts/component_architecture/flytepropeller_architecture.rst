@@ -15,7 +15,7 @@ Introduction
 A Flyte :ref:`workflow <divedeep-workflows>` is represented as a Directed Acyclic Graph (DAG) of interconnected Nodes. Flyte supports a robust collection of Node types to ensure diverse functionality.
 
 - ``TaskNodes`` support a plugin system to externally add system integrations.
-- ``BranchNodes`` allow altering the Control flow during runtime; pruning downstream evaluation paths based on input. 
+- ``BranchNodes`` allow altering the control flow during runtime; pruning downstream evaluation paths based on input. 
 - ``DynamicNodes`` add nodes to the DAG.
 - ``WorkflowNodes`` allow embedding workflows within each other.
 
@@ -38,7 +38,7 @@ Components
 ==========
 
 
-FlyteAdmin is the common entry point, where initialization of FlyteWorkflow CRs may be triggered by user workflow definition executions, automatic relaunches, or periodically scheduled workflow definition executions.
+FlyteAdmin is the common entry point, where initialization of FlyteWorkflow Custom Resources may be triggered by user workflow definition executions, automatic relaunches, or periodically scheduled workflow definition executions.
 
 FlyteWorkflow CRD / K8s Integration
 -----------------------------------
@@ -66,7 +66,7 @@ Example output:
    NAME                   AGE
    f7616dc75400f43e6920   3h42m 
 
-3. Describe the contents of the CR, for example the ``spec`` section:
+3. Describe the contents of the Custom Resource, for example the ``spec`` section:
 
 .. code-block:: bash 
 
@@ -95,7 +95,6 @@ The status subsection tracks workflow metadata including overall workflow status
 
 .. code-block:: json 
 
-   },
     "status": {
         "dataDir": "gs://flyteontf-gcp-data-116223838137/metadata/propeller/flytesnacks-development-f7616dc75400f43e6920",
         "defVersion": 1,
@@ -142,7 +141,7 @@ The WorkQueue is a FIFO queue storing workflow ID strings that require a lookup 
 #. The K8s Informer detects a workflow timeout or failed liveness check during its periodic resync operation on the FlyteWorkflow. 
 #. A FlytePropeller worker experiences an error during a processing loop
 #. The WorkflowExecutor observes a completed downstream node
-#. A NodeHandler observes state change and explicitly enqueues its owner (For example, K8s pod informer observes completion of a task)
+#. A NodeHandler observes state change and explicitly enqueues its owner. (For example, K8s pod informer observes completion of a task.)
 
 The WorkerPool is implemented as a collection of ``goroutines``, one for each worker. Using this lightweight construct, FlytePropeller can scale to 1000s of workers on a single CPU. Workers continually poll the WorkQueue for workflows. On success, the workflow is passed to the WorkflowExecutor.
 
@@ -154,7 +153,13 @@ The WorkflowExecutor is responsible for handling high-level workflow operations.
 NodeExecutor
 ------------
 
-The NodeExecutor is executed on a single node, beginning with the workflow's start node. It traverses the workflow using a visitor pattern with a modified depth-first search (DFS), evaluating each node along the path. A few examples of node evaluation based on phase include: successful nodes are skipped, unevaluated nodes are queued for processing, and failed nodes may be reattempted up to a configurable threshold. There are many configurable parameters to tune evaluation criteria including max parallelism which restricts the number of nodes which may be scheduled concurrently. Additionally, nodes may be retried to ensure recoverability on failure.
+The NodeExecutor is executed on a single node, beginning with the workflow's start node. It traverses the workflow using a visitor pattern with a modified depth-first search (DFS), evaluating each node along the path. A few examples of node evaluation based on phase include: 
+
+* Successful nodes are skipped
+* Unevaluated nodes are queued for processing
+* Failed nodes may be reattempted up to a configurable threshold. 
+
+There are many configurable parameters to tune evaluation criteria including max parallelism which restricts the number of nodes which may be scheduled concurrently. Additionally, nodes may be retried to ensure recoverability on failure.
 
 Go to the `Optimizing Performance <https://docs.flyte.org/en/latest/deployment/configuration/performance.html#optimizing-performance>`__ section for more information on how to tune Propeller parameters.  
 
