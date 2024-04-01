@@ -5,7 +5,7 @@ Configure Kubernetes Plugins
 
 .. tags:: Kubernetes, Integration, Spark, AWS, GCP, Advanced
 
-This guide help you configure the Flyte plugins that provision resources on Kubernetes.
+This guide will help you configure the Flyte plugins that provision resources on Kubernetes.
 The steps are defined in terms of the `deployment method <https://docs.flyte.org/en/latest/deployment/deployment/index.html#flyte-deployment-paths>`__ you used to install Flyte.
 
 Install the Kubernetes operator
@@ -59,7 +59,7 @@ Select the integration you need and follow the steps to install the correspondin
               
     See :ref:`deployment-configuration-general` for more information about Pod templates in Flyte.
     You can set the scheduler name in the Pod template passed to the ``@task`` decorator. However, to prevent the
-    two different schedulers from competing for resources, it is recommended to set the scheduler name in the pod template
+    two different schedulers from competing for resources, we recommend setting the scheduler name in the pod template
     in the ``flyte`` namespace which is applied to all tasks. Non distributed training tasks can be scheduled by the
     gang scheduler as well.
 
@@ -436,7 +436,7 @@ Specify plugin configuration
                 
               2. (Optional) The Spark operator supports Kubernetes ResourceQuota enforcement. If you plan to use it, 
                  set `per-Task resource requests <https://docs.flyte.org/en/latest/user_guide/productionizing/customizing_task_resources.html#customizing-task-resources>`__ that fit into the quota for each project-namespace. A Task without resource requests
-                 or limits will be rejected by the K8s scheduler as described `in the docs <https://kubernetes.io/docs/concepts/policy/resource-quotas/>`__.
+                 or limits will be rejected by the K8s scheduler as described `in the Kubernetes docs <https://kubernetes.io/docs/concepts/policy/resource-quotas/>`__.
                  The following is a sample configuration you can add to your Helm chart values, adjusting the resources to match your needs:
 
                  .. code-block:: yaml
