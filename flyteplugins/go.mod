@@ -30,7 +30,7 @@ require (
 	golang.org/x/oauth2 v0.16.0
 	google.golang.org/api v0.155.0
 	google.golang.org/grpc v1.62.1
-	google.golang.org/protobuf v1.32.0
+	google.golang.org/protobuf v1.33.0
 	gopkg.in/yaml.v2 v2.4.0
 	gotest.tools v2.2.0+incompatible
 	k8s.io/api v0.28.4
