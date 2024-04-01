@@ -3,7 +3,9 @@ package gormimpl
 import (
 	"context"
 	adminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"gorm.io/gorm"
 )
 
@@ -47,4 +49,15 @@ func (r *OverrideAttributesRepo) Create(ctx context.Context, input models.Overri
 		return r.errorTransformer.ToFlyteAdminError(tx.Error)
 	}
 	return nil
+}
+
+// Returns an instance of OverrideAttributesRepoInterface
+func NewOverrideAttributesRepo(
+	db *gorm.DB, errorTransformer adminErrors.ErrorTransformer, scope promutils.Scope) interfaces.OverrideAttributesInterface {
+	metrics := newMetrics(scope)
+	return &OverrideAttributesRepo{
+		db:               db,
+		errorTransformer: errorTransformer,
+		metrics:          metrics,
+	}
 }

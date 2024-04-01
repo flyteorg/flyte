@@ -15,24 +15,29 @@ import (
 
 type OverrideAttributesManager struct {
 	db            repositoryInterfaces.Repository
-	config        runtimeInterfaces.ApplicationConfiguration
+	config        runtimeInterfaces.Configuration
 	storageClient *storage.DataStore
 }
 
 func (m *OverrideAttributesManager) GetOverrideAttributes(
 	ctx context.Context, request admin.OverrideAttributesGetRequest) (
 	*admin.OverrideAttributesGetResponse, error) {
+	// Validate the request
 	if err := validation.ValidateOverrideAttributesGetRequest(request); err != nil {
 		return nil, err
 	}
-	attributes, err := m.db.OverrideAttributesRepo().GetActive(ctx)
+
+	// Get the active override attributes
+	overrideAttributes, err := m.db.OverrideAttributesRepo().GetActive(ctx)
 	if err != nil {
 		return nil, err
 	}
 	document := &admin.Document{}
-	if err := m.storageClient.ReadProtobuf(ctx, attributes.DocumentLocation, document); err != nil {
+	if err := m.storageClient.ReadProtobuf(ctx, overrideAttributes.DocumentLocation, document); err != nil {
 		return nil, err
 	}
+
+	// Return the override attributes of different scopes
 	return &admin.OverrideAttributesGetResponse{
 		GlobalAttributes:        getAttributeOfDocument(document, request.Id.Org, "", ""),
 		ProjectAttributes:       getAttributeOfDocument(document, request.Id.Org, request.Id.Project, ""),
@@ -43,18 +48,19 @@ func (m *OverrideAttributesManager) GetOverrideAttributes(
 func (m *OverrideAttributesManager) UpdateOverrideAttributes(
 	ctx context.Context, request admin.OverrideAttributesUpdateRequest) (
 	*admin.OverrideAttributesUpdateResponse, error) {
+	// Validate the request
 	if err := validation.ValidateOverrideAttributesUpdateRequest(request); err != nil {
 		return nil, err
 	}
 
 	// Get the active override attributes
-	attributes, err := m.db.OverrideAttributesRepo().GetActive(ctx)
+	overrideAttributes, err := m.db.OverrideAttributesRepo().GetActive(ctx)
 	if err != nil {
 		return nil, err
 
 	}
 	document := &admin.Document{}
-	if err := m.storageClient.ReadProtobuf(ctx, attributes.DocumentLocation, document); err != nil {
+	if err := m.storageClient.ReadProtobuf(ctx, overrideAttributes.DocumentLocation, document); err != nil {
 		return nil, err
 	}
 
@@ -79,6 +85,7 @@ func (m *OverrideAttributesManager) UpdateOverrideAttributes(
 	return &admin.OverrideAttributesUpdateResponse{}, nil
 }
 
+// This function is used to get the attributes of a document based on the org, project, and domain.
 func getAttributeOfDocument(document *admin.Document, org, project, domain string) *admin.Attributes {
 	documentKey := encodeDocumentKey(org, project, domain, "", "")
 	if attributes, ok := document.AttributesMap[documentKey]; ok {
@@ -87,19 +94,22 @@ func getAttributeOfDocument(document *admin.Document, org, project, domain strin
 	return nil
 }
 
+// This function is used to update the attributes of a document based on the org, project, and domain.
 func updateAttributeOfDocument(document *admin.Document, org, project, domain string, attributes *admin.Attributes) {
 	documentKey := encodeDocumentKey(org, project, domain, "", "")
 	document.AttributesMap[documentKey] = attributes
-
 }
 
+// This function is used to encode the document key based on the org, project, domain, workflow, and launch plan.
 func encodeDocumentKey(org, project, domain, workflow, launch_plan string) string {
+	// TODO: This is a temporary solution to encode the document key. We need to come up with a better solution.
 	return org + "/" + project + "/" + domain + "/" + workflow + "/" + launch_plan
 }
 
-func NewOverrideAttributesManager(db repositoryInterfaces.Repository, config runtimeInterfaces.ApplicationConfiguration) interfaces.OverrideAttributesInterface {
+func NewOverrideAttributesManager(db repositoryInterfaces.Repository, config runtimeInterfaces.Configuration, storageClient *storage.DataStore) interfaces.OverrideAttributesInterface {
 	return &OverrideAttributesManager{
-		db:     db,
-		config: config,
+		db:            db,
+		config:        config,
+		storageClient: storageClient,
 	}
 }
