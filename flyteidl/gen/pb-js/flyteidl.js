@@ -42737,7 +42737,7 @@
                  * @memberof flyteidl.admin
                  * @interface IOverrideAttributesUpdateRequest
                  * @property {flyteidl.admin.IprojectID|null} [id] OverrideAttributesUpdateRequest id
-                 * @property {flyteidl.admin.IAttributes|null} [attribute] OverrideAttributesUpdateRequest attribute
+                 * @property {flyteidl.admin.IAttributes|null} [attributes] OverrideAttributesUpdateRequest attributes
                  */
     
                 /**
@@ -42764,12 +42764,12 @@
                 OverrideAttributesUpdateRequest.prototype.id = null;
     
                 /**
-                 * OverrideAttributesUpdateRequest attribute.
-                 * @member {flyteidl.admin.IAttributes|null|undefined} attribute
+                 * OverrideAttributesUpdateRequest attributes.
+                 * @member {flyteidl.admin.IAttributes|null|undefined} attributes
                  * @memberof flyteidl.admin.OverrideAttributesUpdateRequest
                  * @instance
                  */
-                OverrideAttributesUpdateRequest.prototype.attribute = null;
+                OverrideAttributesUpdateRequest.prototype.attributes = null;
     
                 /**
                  * Creates a new OverrideAttributesUpdateRequest instance using the specified properties.
@@ -42797,8 +42797,8 @@
                         writer = $Writer.create();
                     if (message.id != null && message.hasOwnProperty("id"))
                         $root.flyteidl.admin.projectID.encode(message.id, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-                    if (message.attribute != null && message.hasOwnProperty("attribute"))
-                        $root.flyteidl.admin.Attributes.encode(message.attribute, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    if (message.attributes != null && message.hasOwnProperty("attributes"))
+                        $root.flyteidl.admin.Attributes.encode(message.attributes, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
                     return writer;
                 };
     
@@ -42824,7 +42824,7 @@
                             message.id = $root.flyteidl.admin.projectID.decode(reader, reader.uint32());
                             break;
                         case 2:
-                            message.attribute = $root.flyteidl.admin.Attributes.decode(reader, reader.uint32());
+                            message.attributes = $root.flyteidl.admin.Attributes.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -42850,10 +42850,10 @@
                         if (error)
                             return "id." + error;
                     }
-                    if (message.attribute != null && message.hasOwnProperty("attribute")) {
-                        var error = $root.flyteidl.admin.Attributes.verify(message.attribute);
+                    if (message.attributes != null && message.hasOwnProperty("attributes")) {
+                        var error = $root.flyteidl.admin.Attributes.verify(message.attributes);
                         if (error)
-                            return "attribute." + error;
+                            return "attributes." + error;
                     }
                     return null;
                 };
@@ -42961,7 +42961,7 @@
                  * @memberof flyteidl.admin
                  * @interface IDocument
                  * @property {string|null} [version] Document version
-                 * @property {Object.<string,flyteidl.admin.IOrgDocument>|null} [orgDocuments] Document orgDocuments
+                 * @property {Object.<string,flyteidl.admin.IAttributes>|null} [attributesMap] Document attributesMap
                  */
     
                 /**
@@ -42973,7 +42973,7 @@
                  * @param {flyteidl.admin.IDocument=} [properties] Properties to set
                  */
                 function Document(properties) {
-                    this.orgDocuments = {};
+                    this.attributesMap = {};
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -42989,12 +42989,12 @@
                 Document.prototype.version = "";
     
                 /**
-                 * Document orgDocuments.
-                 * @member {Object.<string,flyteidl.admin.IOrgDocument>} orgDocuments
+                 * Document attributesMap.
+                 * @member {Object.<string,flyteidl.admin.IAttributes>} attributesMap
                  * @memberof flyteidl.admin.Document
                  * @instance
                  */
-                Document.prototype.orgDocuments = $util.emptyObject;
+                Document.prototype.attributesMap = $util.emptyObject;
     
                 /**
                  * Creates a new Document instance using the specified properties.
@@ -43022,10 +43022,10 @@
                         writer = $Writer.create();
                     if (message.version != null && message.hasOwnProperty("version"))
                         writer.uint32(/* id 1, wireType 2 =*/10).string(message.version);
-                    if (message.orgDocuments != null && message.hasOwnProperty("orgDocuments"))
-                        for (var keys = Object.keys(message.orgDocuments), i = 0; i < keys.length; ++i) {
-                            writer.uint32(/* id 2, wireType 2 =*/18).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]);
-                            $root.flyteidl.admin.OrgDocument.encode(message.orgDocuments[keys[i]], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim().ldelim();
+                    if (message.attributesMap != null && message.hasOwnProperty("attributesMap"))
+                        for (var keys = Object.keys(message.attributesMap), i = 0; i < keys.length; ++i) {
+                            writer.uint32(/* id 3, wireType 2 =*/26).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]);
+                            $root.flyteidl.admin.Attributes.encode(message.attributesMap[keys[i]], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim().ldelim();
                         }
                     return writer;
                 };
@@ -43051,13 +43051,13 @@
                         case 1:
                             message.version = reader.string();
                             break;
-                        case 2:
+                        case 3:
                             reader.skip().pos++;
-                            if (message.orgDocuments === $util.emptyObject)
-                                message.orgDocuments = {};
+                            if (message.attributesMap === $util.emptyObject)
+                                message.attributesMap = {};
                             key = reader.string();
                             reader.pos++;
-                            message.orgDocuments[key] = $root.flyteidl.admin.OrgDocument.decode(reader, reader.uint32());
+                            message.attributesMap[key] = $root.flyteidl.admin.Attributes.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -43081,814 +43081,20 @@
                     if (message.version != null && message.hasOwnProperty("version"))
                         if (!$util.isString(message.version))
                             return "version: string expected";
-                    if (message.orgDocuments != null && message.hasOwnProperty("orgDocuments")) {
-                        if (!$util.isObject(message.orgDocuments))
-                            return "orgDocuments: object expected";
-                        var key = Object.keys(message.orgDocuments);
+                    if (message.attributesMap != null && message.hasOwnProperty("attributesMap")) {
+                        if (!$util.isObject(message.attributesMap))
+                            return "attributesMap: object expected";
+                        var key = Object.keys(message.attributesMap);
                         for (var i = 0; i < key.length; ++i) {
-                            var error = $root.flyteidl.admin.OrgDocument.verify(message.orgDocuments[key[i]]);
+                            var error = $root.flyteidl.admin.Attributes.verify(message.attributesMap[key[i]]);
                             if (error)
-                                return "orgDocuments." + error;
+                                return "attributesMap." + error;
                         }
                     }
                     return null;
                 };
     
                 return Document;
-            })();
-    
-            admin.OrgDocument = (function() {
-    
-                /**
-                 * Properties of an OrgDocument.
-                 * @memberof flyteidl.admin
-                 * @interface IOrgDocument
-                 * @property {Object.<string,flyteidl.admin.IProjectDocument>|null} [projectDocuments] OrgDocument projectDocuments
-                 */
-    
-                /**
-                 * Constructs a new OrgDocument.
-                 * @memberof flyteidl.admin
-                 * @classdesc Represents an OrgDocument.
-                 * @implements IOrgDocument
-                 * @constructor
-                 * @param {flyteidl.admin.IOrgDocument=} [properties] Properties to set
-                 */
-                function OrgDocument(properties) {
-                    this.projectDocuments = {};
-                    if (properties)
-                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
-                                this[keys[i]] = properties[keys[i]];
-                }
-    
-                /**
-                 * OrgDocument projectDocuments.
-                 * @member {Object.<string,flyteidl.admin.IProjectDocument>} projectDocuments
-                 * @memberof flyteidl.admin.OrgDocument
-                 * @instance
-                 */
-                OrgDocument.prototype.projectDocuments = $util.emptyObject;
-    
-                /**
-                 * Creates a new OrgDocument instance using the specified properties.
-                 * @function create
-                 * @memberof flyteidl.admin.OrgDocument
-                 * @static
-                 * @param {flyteidl.admin.IOrgDocument=} [properties] Properties to set
-                 * @returns {flyteidl.admin.OrgDocument} OrgDocument instance
-                 */
-                OrgDocument.create = function create(properties) {
-                    return new OrgDocument(properties);
-                };
-    
-                /**
-                 * Encodes the specified OrgDocument message. Does not implicitly {@link flyteidl.admin.OrgDocument.verify|verify} messages.
-                 * @function encode
-                 * @memberof flyteidl.admin.OrgDocument
-                 * @static
-                 * @param {flyteidl.admin.IOrgDocument} message OrgDocument message or plain object to encode
-                 * @param {$protobuf.Writer} [writer] Writer to encode to
-                 * @returns {$protobuf.Writer} Writer
-                 */
-                OrgDocument.encode = function encode(message, writer) {
-                    if (!writer)
-                        writer = $Writer.create();
-                    if (message.projectDocuments != null && message.hasOwnProperty("projectDocuments"))
-                        for (var keys = Object.keys(message.projectDocuments), i = 0; i < keys.length; ++i) {
-                            writer.uint32(/* id 1, wireType 2 =*/10).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]);
-                            $root.flyteidl.admin.ProjectDocument.encode(message.projectDocuments[keys[i]], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim().ldelim();
-                        }
-                    return writer;
-                };
-    
-                /**
-                 * Decodes an OrgDocument message from the specified reader or buffer.
-                 * @function decode
-                 * @memberof flyteidl.admin.OrgDocument
-                 * @static
-                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-                 * @param {number} [length] Message length if known beforehand
-                 * @returns {flyteidl.admin.OrgDocument} OrgDocument
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                OrgDocument.decode = function decode(reader, length) {
-                    if (!(reader instanceof $Reader))
-                        reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.OrgDocument(), key;
-                    while (reader.pos < end) {
-                        var tag = reader.uint32();
-                        switch (tag >>> 3) {
-                        case 1:
-                            reader.skip().pos++;
-                            if (message.projectDocuments === $util.emptyObject)
-                                message.projectDocuments = {};
-                            key = reader.string();
-                            reader.pos++;
-                            message.projectDocuments[key] = $root.flyteidl.admin.ProjectDocument.decode(reader, reader.uint32());
-                            break;
-                        default:
-                            reader.skipType(tag & 7);
-                            break;
-                        }
-                    }
-                    return message;
-                };
-    
-                /**
-                 * Verifies an OrgDocument message.
-                 * @function verify
-                 * @memberof flyteidl.admin.OrgDocument
-                 * @static
-                 * @param {Object.<string,*>} message Plain object to verify
-                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
-                 */
-                OrgDocument.verify = function verify(message) {
-                    if (typeof message !== "object" || message === null)
-                        return "object expected";
-                    if (message.projectDocuments != null && message.hasOwnProperty("projectDocuments")) {
-                        if (!$util.isObject(message.projectDocuments))
-                            return "projectDocuments: object expected";
-                        var key = Object.keys(message.projectDocuments);
-                        for (var i = 0; i < key.length; ++i) {
-                            var error = $root.flyteidl.admin.ProjectDocument.verify(message.projectDocuments[key[i]]);
-                            if (error)
-                                return "projectDocuments." + error;
-                        }
-                    }
-                    return null;
-                };
-    
-                return OrgDocument;
-            })();
-    
-            admin.ProjectDocument = (function() {
-    
-                /**
-                 * Properties of a ProjectDocument.
-                 * @memberof flyteidl.admin
-                 * @interface IProjectDocument
-                 * @property {Object.<string,flyteidl.admin.IProjectDomainDocument>|null} [projectDomainDocuments] ProjectDocument projectDomainDocuments
-                 */
-    
-                /**
-                 * Constructs a new ProjectDocument.
-                 * @memberof flyteidl.admin
-                 * @classdesc Represents a ProjectDocument.
-                 * @implements IProjectDocument
-                 * @constructor
-                 * @param {flyteidl.admin.IProjectDocument=} [properties] Properties to set
-                 */
-                function ProjectDocument(properties) {
-                    this.projectDomainDocuments = {};
-                    if (properties)
-                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
-                                this[keys[i]] = properties[keys[i]];
-                }
-    
-                /**
-                 * ProjectDocument projectDomainDocuments.
-                 * @member {Object.<string,flyteidl.admin.IProjectDomainDocument>} projectDomainDocuments
-                 * @memberof flyteidl.admin.ProjectDocument
-                 * @instance
-                 */
-                ProjectDocument.prototype.projectDomainDocuments = $util.emptyObject;
-    
-                /**
-                 * Creates a new ProjectDocument instance using the specified properties.
-                 * @function create
-                 * @memberof flyteidl.admin.ProjectDocument
-                 * @static
-                 * @param {flyteidl.admin.IProjectDocument=} [properties] Properties to set
-                 * @returns {flyteidl.admin.ProjectDocument} ProjectDocument instance
-                 */
-                ProjectDocument.create = function create(properties) {
-                    return new ProjectDocument(properties);
-                };
-    
-                /**
-                 * Encodes the specified ProjectDocument message. Does not implicitly {@link flyteidl.admin.ProjectDocument.verify|verify} messages.
-                 * @function encode
-                 * @memberof flyteidl.admin.ProjectDocument
-                 * @static
-                 * @param {flyteidl.admin.IProjectDocument} message ProjectDocument message or plain object to encode
-                 * @param {$protobuf.Writer} [writer] Writer to encode to
-                 * @returns {$protobuf.Writer} Writer
-                 */
-                ProjectDocument.encode = function encode(message, writer) {
-                    if (!writer)
-                        writer = $Writer.create();
-                    if (message.projectDomainDocuments != null && message.hasOwnProperty("projectDomainDocuments"))
-                        for (var keys = Object.keys(message.projectDomainDocuments), i = 0; i < keys.length; ++i) {
-                            writer.uint32(/* id 1, wireType 2 =*/10).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]);
-                            $root.flyteidl.admin.ProjectDomainDocument.encode(message.projectDomainDocuments[keys[i]], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim().ldelim();
-                        }
-                    return writer;
-                };
-    
-                /**
-                 * Decodes a ProjectDocument message from the specified reader or buffer.
-                 * @function decode
-                 * @memberof flyteidl.admin.ProjectDocument
-                 * @static
-                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-                 * @param {number} [length] Message length if known beforehand
-                 * @returns {flyteidl.admin.ProjectDocument} ProjectDocument
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                ProjectDocument.decode = function decode(reader, length) {
-                    if (!(reader instanceof $Reader))
-                        reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.ProjectDocument(), key;
-                    while (reader.pos < end) {
-                        var tag = reader.uint32();
-                        switch (tag >>> 3) {
-                        case 1:
-                            reader.skip().pos++;
-                            if (message.projectDomainDocuments === $util.emptyObject)
-                                message.projectDomainDocuments = {};
-                            key = reader.string();
-                            reader.pos++;
-                            message.projectDomainDocuments[key] = $root.flyteidl.admin.ProjectDomainDocument.decode(reader, reader.uint32());
-                            break;
-                        default:
-                            reader.skipType(tag & 7);
-                            break;
-                        }
-                    }
-                    return message;
-                };
-    
-                /**
-                 * Verifies a ProjectDocument message.
-                 * @function verify
-                 * @memberof flyteidl.admin.ProjectDocument
-                 * @static
-                 * @param {Object.<string,*>} message Plain object to verify
-                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
-                 */
-                ProjectDocument.verify = function verify(message) {
-                    if (typeof message !== "object" || message === null)
-                        return "object expected";
-                    if (message.projectDomainDocuments != null && message.hasOwnProperty("projectDomainDocuments")) {
-                        if (!$util.isObject(message.projectDomainDocuments))
-                            return "projectDomainDocuments: object expected";
-                        var key = Object.keys(message.projectDomainDocuments);
-                        for (var i = 0; i < key.length; ++i) {
-                            var error = $root.flyteidl.admin.ProjectDomainDocument.verify(message.projectDomainDocuments[key[i]]);
-                            if (error)
-                                return "projectDomainDocuments." + error;
-                        }
-                    }
-                    return null;
-                };
-    
-                return ProjectDocument;
-            })();
-    
-            admin.ProjectDomainDocument = (function() {
-    
-                /**
-                 * Properties of a ProjectDomainDocument.
-                 * @memberof flyteidl.admin
-                 * @interface IProjectDomainDocument
-                 * @property {Object.<string,flyteidl.admin.IWorkflowDocument>|null} [workflowDocuments] ProjectDomainDocument workflowDocuments
-                 */
-    
-                /**
-                 * Constructs a new ProjectDomainDocument.
-                 * @memberof flyteidl.admin
-                 * @classdesc Represents a ProjectDomainDocument.
-                 * @implements IProjectDomainDocument
-                 * @constructor
-                 * @param {flyteidl.admin.IProjectDomainDocument=} [properties] Properties to set
-                 */
-                function ProjectDomainDocument(properties) {
-                    this.workflowDocuments = {};
-                    if (properties)
-                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
-                                this[keys[i]] = properties[keys[i]];
-                }
-    
-                /**
-                 * ProjectDomainDocument workflowDocuments.
-                 * @member {Object.<string,flyteidl.admin.IWorkflowDocument>} workflowDocuments
-                 * @memberof flyteidl.admin.ProjectDomainDocument
-                 * @instance
-                 */
-                ProjectDomainDocument.prototype.workflowDocuments = $util.emptyObject;
-    
-                /**
-                 * Creates a new ProjectDomainDocument instance using the specified properties.
-                 * @function create
-                 * @memberof flyteidl.admin.ProjectDomainDocument
-                 * @static
-                 * @param {flyteidl.admin.IProjectDomainDocument=} [properties] Properties to set
-                 * @returns {flyteidl.admin.ProjectDomainDocument} ProjectDomainDocument instance
-                 */
-                ProjectDomainDocument.create = function create(properties) {
-                    return new ProjectDomainDocument(properties);
-                };
-    
-                /**
-                 * Encodes the specified ProjectDomainDocument message. Does not implicitly {@link flyteidl.admin.ProjectDomainDocument.verify|verify} messages.
-                 * @function encode
-                 * @memberof flyteidl.admin.ProjectDomainDocument
-                 * @static
-                 * @param {flyteidl.admin.IProjectDomainDocument} message ProjectDomainDocument message or plain object to encode
-                 * @param {$protobuf.Writer} [writer] Writer to encode to
-                 * @returns {$protobuf.Writer} Writer
-                 */
-                ProjectDomainDocument.encode = function encode(message, writer) {
-                    if (!writer)
-                        writer = $Writer.create();
-                    if (message.workflowDocuments != null && message.hasOwnProperty("workflowDocuments"))
-                        for (var keys = Object.keys(message.workflowDocuments), i = 0; i < keys.length; ++i) {
-                            writer.uint32(/* id 1, wireType 2 =*/10).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]);
-                            $root.flyteidl.admin.WorkflowDocument.encode(message.workflowDocuments[keys[i]], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim().ldelim();
-                        }
-                    return writer;
-                };
-    
-                /**
-                 * Decodes a ProjectDomainDocument message from the specified reader or buffer.
-                 * @function decode
-                 * @memberof flyteidl.admin.ProjectDomainDocument
-                 * @static
-                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-                 * @param {number} [length] Message length if known beforehand
-                 * @returns {flyteidl.admin.ProjectDomainDocument} ProjectDomainDocument
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                ProjectDomainDocument.decode = function decode(reader, length) {
-                    if (!(reader instanceof $Reader))
-                        reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.ProjectDomainDocument(), key;
-                    while (reader.pos < end) {
-                        var tag = reader.uint32();
-                        switch (tag >>> 3) {
-                        case 1:
-                            reader.skip().pos++;
-                            if (message.workflowDocuments === $util.emptyObject)
-                                message.workflowDocuments = {};
-                            key = reader.string();
-                            reader.pos++;
-                            message.workflowDocuments[key] = $root.flyteidl.admin.WorkflowDocument.decode(reader, reader.uint32());
-                            break;
-                        default:
-                            reader.skipType(tag & 7);
-                            break;
-                        }
-                    }
-                    return message;
-                };
-    
-                /**
-                 * Verifies a ProjectDomainDocument message.
-                 * @function verify
-                 * @memberof flyteidl.admin.ProjectDomainDocument
-                 * @static
-                 * @param {Object.<string,*>} message Plain object to verify
-                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
-                 */
-                ProjectDomainDocument.verify = function verify(message) {
-                    if (typeof message !== "object" || message === null)
-                        return "object expected";
-                    if (message.workflowDocuments != null && message.hasOwnProperty("workflowDocuments")) {
-                        if (!$util.isObject(message.workflowDocuments))
-                            return "workflowDocuments: object expected";
-                        var key = Object.keys(message.workflowDocuments);
-                        for (var i = 0; i < key.length; ++i) {
-                            var error = $root.flyteidl.admin.WorkflowDocument.verify(message.workflowDocuments[key[i]]);
-                            if (error)
-                                return "workflowDocuments." + error;
-                        }
-                    }
-                    return null;
-                };
-    
-                return ProjectDomainDocument;
-            })();
-    
-            admin.WorkflowDocument = (function() {
-    
-                /**
-                 * Properties of a WorkflowDocument.
-                 * @memberof flyteidl.admin
-                 * @interface IWorkflowDocument
-                 * @property {Object.<string,flyteidl.admin.ILaunchPlanDocument>|null} [launchPlanDocuments] WorkflowDocument launchPlanDocuments
-                 */
-    
-                /**
-                 * Constructs a new WorkflowDocument.
-                 * @memberof flyteidl.admin
-                 * @classdesc Represents a WorkflowDocument.
-                 * @implements IWorkflowDocument
-                 * @constructor
-                 * @param {flyteidl.admin.IWorkflowDocument=} [properties] Properties to set
-                 */
-                function WorkflowDocument(properties) {
-                    this.launchPlanDocuments = {};
-                    if (properties)
-                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
-                                this[keys[i]] = properties[keys[i]];
-                }
-    
-                /**
-                 * WorkflowDocument launchPlanDocuments.
-                 * @member {Object.<string,flyteidl.admin.ILaunchPlanDocument>} launchPlanDocuments
-                 * @memberof flyteidl.admin.WorkflowDocument
-                 * @instance
-                 */
-                WorkflowDocument.prototype.launchPlanDocuments = $util.emptyObject;
-    
-                /**
-                 * Creates a new WorkflowDocument instance using the specified properties.
-                 * @function create
-                 * @memberof flyteidl.admin.WorkflowDocument
-                 * @static
-                 * @param {flyteidl.admin.IWorkflowDocument=} [properties] Properties to set
-                 * @returns {flyteidl.admin.WorkflowDocument} WorkflowDocument instance
-                 */
-                WorkflowDocument.create = function create(properties) {
-                    return new WorkflowDocument(properties);
-                };
-    
-                /**
-                 * Encodes the specified WorkflowDocument message. Does not implicitly {@link flyteidl.admin.WorkflowDocument.verify|verify} messages.
-                 * @function encode
-                 * @memberof flyteidl.admin.WorkflowDocument
-                 * @static
-                 * @param {flyteidl.admin.IWorkflowDocument} message WorkflowDocument message or plain object to encode
-                 * @param {$protobuf.Writer} [writer] Writer to encode to
-                 * @returns {$protobuf.Writer} Writer
-                 */
-                WorkflowDocument.encode = function encode(message, writer) {
-                    if (!writer)
-                        writer = $Writer.create();
-                    if (message.launchPlanDocuments != null && message.hasOwnProperty("launchPlanDocuments"))
-                        for (var keys = Object.keys(message.launchPlanDocuments), i = 0; i < keys.length; ++i) {
-                            writer.uint32(/* id 1, wireType 2 =*/10).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]);
-                            $root.flyteidl.admin.LaunchPlanDocument.encode(message.launchPlanDocuments[keys[i]], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim().ldelim();
-                        }
-                    return writer;
-                };
-    
-                /**
-                 * Decodes a WorkflowDocument message from the specified reader or buffer.
-                 * @function decode
-                 * @memberof flyteidl.admin.WorkflowDocument
-                 * @static
-                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-                 * @param {number} [length] Message length if known beforehand
-                 * @returns {flyteidl.admin.WorkflowDocument} WorkflowDocument
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                WorkflowDocument.decode = function decode(reader, length) {
-                    if (!(reader instanceof $Reader))
-                        reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.WorkflowDocument(), key;
-                    while (reader.pos < end) {
-                        var tag = reader.uint32();
-                        switch (tag >>> 3) {
-                        case 1:
-                            reader.skip().pos++;
-                            if (message.launchPlanDocuments === $util.emptyObject)
-                                message.launchPlanDocuments = {};
-                            key = reader.string();
-                            reader.pos++;
-                            message.launchPlanDocuments[key] = $root.flyteidl.admin.LaunchPlanDocument.decode(reader, reader.uint32());
-                            break;
-                        default:
-                            reader.skipType(tag & 7);
-                            break;
-                        }
-                    }
-                    return message;
-                };
-    
-                /**
-                 * Verifies a WorkflowDocument message.
-                 * @function verify
-                 * @memberof flyteidl.admin.WorkflowDocument
-                 * @static
-                 * @param {Object.<string,*>} message Plain object to verify
-                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
-                 */
-                WorkflowDocument.verify = function verify(message) {
-                    if (typeof message !== "object" || message === null)
-                        return "object expected";
-                    if (message.launchPlanDocuments != null && message.hasOwnProperty("launchPlanDocuments")) {
-                        if (!$util.isObject(message.launchPlanDocuments))
-                            return "launchPlanDocuments: object expected";
-                        var key = Object.keys(message.launchPlanDocuments);
-                        for (var i = 0; i < key.length; ++i) {
-                            var error = $root.flyteidl.admin.LaunchPlanDocument.verify(message.launchPlanDocuments[key[i]]);
-                            if (error)
-                                return "launchPlanDocuments." + error;
-                        }
-                    }
-                    return null;
-                };
-    
-                return WorkflowDocument;
-            })();
-    
-            admin.LaunchPlanDocument = (function() {
-    
-                /**
-                 * Properties of a LaunchPlanDocument.
-                 * @memberof flyteidl.admin
-                 * @interface ILaunchPlanDocument
-                 * @property {flyteidl.admin.IAttributes|null} [attributes] LaunchPlanDocument attributes
-                 */
-    
-                /**
-                 * Constructs a new LaunchPlanDocument.
-                 * @memberof flyteidl.admin
-                 * @classdesc Represents a LaunchPlanDocument.
-                 * @implements ILaunchPlanDocument
-                 * @constructor
-                 * @param {flyteidl.admin.ILaunchPlanDocument=} [properties] Properties to set
-                 */
-                function LaunchPlanDocument(properties) {
-                    if (properties)
-                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
-                                this[keys[i]] = properties[keys[i]];
-                }
-    
-                /**
-                 * LaunchPlanDocument attributes.
-                 * @member {flyteidl.admin.IAttributes|null|undefined} attributes
-                 * @memberof flyteidl.admin.LaunchPlanDocument
-                 * @instance
-                 */
-                LaunchPlanDocument.prototype.attributes = null;
-    
-                /**
-                 * Creates a new LaunchPlanDocument instance using the specified properties.
-                 * @function create
-                 * @memberof flyteidl.admin.LaunchPlanDocument
-                 * @static
-                 * @param {flyteidl.admin.ILaunchPlanDocument=} [properties] Properties to set
-                 * @returns {flyteidl.admin.LaunchPlanDocument} LaunchPlanDocument instance
-                 */
-                LaunchPlanDocument.create = function create(properties) {
-                    return new LaunchPlanDocument(properties);
-                };
-    
-                /**
-                 * Encodes the specified LaunchPlanDocument message. Does not implicitly {@link flyteidl.admin.LaunchPlanDocument.verify|verify} messages.
-                 * @function encode
-                 * @memberof flyteidl.admin.LaunchPlanDocument
-                 * @static
-                 * @param {flyteidl.admin.ILaunchPlanDocument} message LaunchPlanDocument message or plain object to encode
-                 * @param {$protobuf.Writer} [writer] Writer to encode to
-                 * @returns {$protobuf.Writer} Writer
-                 */
-                LaunchPlanDocument.encode = function encode(message, writer) {
-                    if (!writer)
-                        writer = $Writer.create();
-                    if (message.attributes != null && message.hasOwnProperty("attributes"))
-                        $root.flyteidl.admin.Attributes.encode(message.attributes, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-                    return writer;
-                };
-    
-                /**
-                 * Decodes a LaunchPlanDocument message from the specified reader or buffer.
-                 * @function decode
-                 * @memberof flyteidl.admin.LaunchPlanDocument
-                 * @static
-                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-                 * @param {number} [length] Message length if known beforehand
-                 * @returns {flyteidl.admin.LaunchPlanDocument} LaunchPlanDocument
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                LaunchPlanDocument.decode = function decode(reader, length) {
-                    if (!(reader instanceof $Reader))
-                        reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.LaunchPlanDocument();
-                    while (reader.pos < end) {
-                        var tag = reader.uint32();
-                        switch (tag >>> 3) {
-                        case 1:
-                            message.attributes = $root.flyteidl.admin.Attributes.decode(reader, reader.uint32());
-                            break;
-                        default:
-                            reader.skipType(tag & 7);
-                            break;
-                        }
-                    }
-                    return message;
-                };
-    
-                /**
-                 * Verifies a LaunchPlanDocument message.
-                 * @function verify
-                 * @memberof flyteidl.admin.LaunchPlanDocument
-                 * @static
-                 * @param {Object.<string,*>} message Plain object to verify
-                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
-                 */
-                LaunchPlanDocument.verify = function verify(message) {
-                    if (typeof message !== "object" || message === null)
-                        return "object expected";
-                    if (message.attributes != null && message.hasOwnProperty("attributes")) {
-                        var error = $root.flyteidl.admin.Attributes.verify(message.attributes);
-                        if (error)
-                            return "attributes." + error;
-                    }
-                    return null;
-                };
-    
-                return LaunchPlanDocument;
-            })();
-    
-            admin.DocumentID = (function() {
-    
-                /**
-                 * Properties of a DocumentID.
-                 * @memberof flyteidl.admin
-                 * @interface IDocumentID
-                 * @property {string|null} [org] DocumentID org
-                 * @property {string|null} [domain] DocumentID domain
-                 * @property {string|null} [project] DocumentID project
-                 * @property {string|null} [workflow] DocumentID workflow
-                 * @property {string|null} [launchPlan] DocumentID launchPlan
-                 */
-    
-                /**
-                 * Constructs a new DocumentID.
-                 * @memberof flyteidl.admin
-                 * @classdesc Represents a DocumentID.
-                 * @implements IDocumentID
-                 * @constructor
-                 * @param {flyteidl.admin.IDocumentID=} [properties] Properties to set
-                 */
-                function DocumentID(properties) {
-                    if (properties)
-                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
-                                this[keys[i]] = properties[keys[i]];
-                }
-    
-                /**
-                 * DocumentID org.
-                 * @member {string} org
-                 * @memberof flyteidl.admin.DocumentID
-                 * @instance
-                 */
-                DocumentID.prototype.org = "";
-    
-                /**
-                 * DocumentID domain.
-                 * @member {string} domain
-                 * @memberof flyteidl.admin.DocumentID
-                 * @instance
-                 */
-                DocumentID.prototype.domain = "";
-    
-                /**
-                 * DocumentID project.
-                 * @member {string} project
-                 * @memberof flyteidl.admin.DocumentID
-                 * @instance
-                 */
-                DocumentID.prototype.project = "";
-    
-                /**
-                 * DocumentID workflow.
-                 * @member {string} workflow
-                 * @memberof flyteidl.admin.DocumentID
-                 * @instance
-                 */
-                DocumentID.prototype.workflow = "";
-    
-                /**
-                 * DocumentID launchPlan.
-                 * @member {string} launchPlan
-                 * @memberof flyteidl.admin.DocumentID
-                 * @instance
-                 */
-                DocumentID.prototype.launchPlan = "";
-    
-                /**
-                 * Creates a new DocumentID instance using the specified properties.
-                 * @function create
-                 * @memberof flyteidl.admin.DocumentID
-                 * @static
-                 * @param {flyteidl.admin.IDocumentID=} [properties] Properties to set
-                 * @returns {flyteidl.admin.DocumentID} DocumentID instance
-                 */
-                DocumentID.create = function create(properties) {
-                    return new DocumentID(properties);
-                };
-    
-                /**
-                 * Encodes the specified DocumentID message. Does not implicitly {@link flyteidl.admin.DocumentID.verify|verify} messages.
-                 * @function encode
-                 * @memberof flyteidl.admin.DocumentID
-                 * @static
-                 * @param {flyteidl.admin.IDocumentID} message DocumentID message or plain object to encode
-                 * @param {$protobuf.Writer} [writer] Writer to encode to
-                 * @returns {$protobuf.Writer} Writer
-                 */
-                DocumentID.encode = function encode(message, writer) {
-                    if (!writer)
-                        writer = $Writer.create();
-                    if (message.org != null && message.hasOwnProperty("org"))
-                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.org);
-                    if (message.domain != null && message.hasOwnProperty("domain"))
-                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.domain);
-                    if (message.project != null && message.hasOwnProperty("project"))
-                        writer.uint32(/* id 3, wireType 2 =*/26).string(message.project);
-                    if (message.workflow != null && message.hasOwnProperty("workflow"))
-                        writer.uint32(/* id 4, wireType 2 =*/34).string(message.workflow);
-                    if (message.launchPlan != null && message.hasOwnProperty("launchPlan"))
-                        writer.uint32(/* id 5, wireType 2 =*/42).string(message.launchPlan);
-                    return writer;
-                };
-    
-                /**
-                 * Decodes a DocumentID message from the specified reader or buffer.
-                 * @function decode
-                 * @memberof flyteidl.admin.DocumentID
-                 * @static
-                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-                 * @param {number} [length] Message length if known beforehand
-                 * @returns {flyteidl.admin.DocumentID} DocumentID
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                DocumentID.decode = function decode(reader, length) {
-                    if (!(reader instanceof $Reader))
-                        reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.DocumentID();
-                    while (reader.pos < end) {
-                        var tag = reader.uint32();
-                        switch (tag >>> 3) {
-                        case 1:
-                            message.org = reader.string();
-                            break;
-                        case 2:
-                            message.domain = reader.string();
-                            break;
-                        case 3:
-                            message.project = reader.string();
-                            break;
-                        case 4:
-                            message.workflow = reader.string();
-                            break;
-                        case 5:
-                            message.launchPlan = reader.string();
-                            break;
-                        default:
-                            reader.skipType(tag & 7);
-                            break;
-                        }
-                    }
-                    return message;
-                };
-    
-                /**
-                 * Verifies a DocumentID message.
-                 * @function verify
-                 * @memberof flyteidl.admin.DocumentID
-                 * @static
-                 * @param {Object.<string,*>} message Plain object to verify
-                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
-                 */
-                DocumentID.verify = function verify(message) {
-                    if (typeof message !== "object" || message === null)
-                        return "object expected";
-                    if (message.org != null && message.hasOwnProperty("org"))
-                        if (!$util.isString(message.org))
-                            return "org: string expected";
-                    if (message.domain != null && message.hasOwnProperty("domain"))
-                        if (!$util.isString(message.domain))
-                            return "domain: string expected";
-                    if (message.project != null && message.hasOwnProperty("project"))
-                        if (!$util.isString(message.project))
-                            return "project: string expected";
-                    if (message.workflow != null && message.hasOwnProperty("workflow"))
-                        if (!$util.isString(message.workflow))
-                            return "workflow: string expected";
-                    if (message.launchPlan != null && message.hasOwnProperty("launchPlan"))
-                        if (!$util.isString(message.launchPlan))
-                            return "launchPlan: string expected";
-                    return null;
-                };
-    
-                return DocumentID;
             })();
     
             admin.Domain = (function() {

@@ -253,9 +253,9 @@ export class OverrideAttributesUpdateRequest extends Message<OverrideAttributesU
   /**
    * Everything set at the project-domain level
    *
-   * @generated from field: flyteidl.admin.Attributes attribute = 2;
+   * @generated from field: flyteidl.admin.Attributes attributes = 2;
    */
-  attribute?: Attributes;
+  attributes?: Attributes;
 
   constructor(data?: PartialMessage<OverrideAttributesUpdateRequest>) {
     super();
@@ -266,7 +266,7 @@ export class OverrideAttributesUpdateRequest extends Message<OverrideAttributesU
   static readonly typeName = "flyteidl.admin.OverrideAttributesUpdateRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "id", kind: "message", T: projectID },
-    { no: 2, name: "attribute", kind: "message", T: Attributes },
+    { no: 2, name: "attributes", kind: "message", T: Attributes },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): OverrideAttributesUpdateRequest {
@@ -329,9 +329,9 @@ export class Document extends Message<Document> {
   version = "";
 
   /**
-   * @generated from field: map<string, flyteidl.admin.OrgDocument> org_documents = 2;
+   * @generated from field: map<string, flyteidl.admin.Attributes> attributesMap = 3;
    */
-  orgDocuments: { [key: string]: OrgDocument } = {};
+  attributesMap: { [key: string]: Attributes } = {};
 
   constructor(data?: PartialMessage<Document>) {
     super();
@@ -342,7 +342,7 @@ export class Document extends Message<Document> {
   static readonly typeName = "flyteidl.admin.Document";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "org_documents", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: OrgDocument} },
+    { no: 3, name: "attributesMap", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: Attributes} },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Document {
@@ -359,252 +359,6 @@ export class Document extends Message<Document> {
 
   static equals(a: Document | PlainMessage<Document> | undefined, b: Document | PlainMessage<Document> | undefined): boolean {
     return proto3.util.equals(Document, a, b);
-  }
-}
-
-/**
- * @generated from message flyteidl.admin.OrgDocument
- */
-export class OrgDocument extends Message<OrgDocument> {
-  /**
-   * @generated from field: map<string, flyteidl.admin.ProjectDocument> project_documents = 1;
-   */
-  projectDocuments: { [key: string]: ProjectDocument } = {};
-
-  constructor(data?: PartialMessage<OrgDocument>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "flyteidl.admin.OrgDocument";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "project_documents", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: ProjectDocument} },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): OrgDocument {
-    return new OrgDocument().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): OrgDocument {
-    return new OrgDocument().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): OrgDocument {
-    return new OrgDocument().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: OrgDocument | PlainMessage<OrgDocument> | undefined, b: OrgDocument | PlainMessage<OrgDocument> | undefined): boolean {
-    return proto3.util.equals(OrgDocument, a, b);
-  }
-}
-
-/**
- * @generated from message flyteidl.admin.ProjectDocument
- */
-export class ProjectDocument extends Message<ProjectDocument> {
-  /**
-   * @generated from field: map<string, flyteidl.admin.ProjectDomainDocument> project_domain_documents = 1;
-   */
-  projectDomainDocuments: { [key: string]: ProjectDomainDocument } = {};
-
-  constructor(data?: PartialMessage<ProjectDocument>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "flyteidl.admin.ProjectDocument";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "project_domain_documents", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: ProjectDomainDocument} },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ProjectDocument {
-    return new ProjectDocument().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ProjectDocument {
-    return new ProjectDocument().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ProjectDocument {
-    return new ProjectDocument().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: ProjectDocument | PlainMessage<ProjectDocument> | undefined, b: ProjectDocument | PlainMessage<ProjectDocument> | undefined): boolean {
-    return proto3.util.equals(ProjectDocument, a, b);
-  }
-}
-
-/**
- * @generated from message flyteidl.admin.ProjectDomainDocument
- */
-export class ProjectDomainDocument extends Message<ProjectDomainDocument> {
-  /**
-   * @generated from field: map<string, flyteidl.admin.WorkflowDocument> workflow_documents = 1;
-   */
-  workflowDocuments: { [key: string]: WorkflowDocument } = {};
-
-  constructor(data?: PartialMessage<ProjectDomainDocument>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "flyteidl.admin.ProjectDomainDocument";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "workflow_documents", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: WorkflowDocument} },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ProjectDomainDocument {
-    return new ProjectDomainDocument().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ProjectDomainDocument {
-    return new ProjectDomainDocument().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ProjectDomainDocument {
-    return new ProjectDomainDocument().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: ProjectDomainDocument | PlainMessage<ProjectDomainDocument> | undefined, b: ProjectDomainDocument | PlainMessage<ProjectDomainDocument> | undefined): boolean {
-    return proto3.util.equals(ProjectDomainDocument, a, b);
-  }
-}
-
-/**
- * @generated from message flyteidl.admin.WorkflowDocument
- */
-export class WorkflowDocument extends Message<WorkflowDocument> {
-  /**
-   * @generated from field: map<string, flyteidl.admin.LaunchPlanDocument> launch_plan_documents = 1;
-   */
-  launchPlanDocuments: { [key: string]: LaunchPlanDocument } = {};
-
-  constructor(data?: PartialMessage<WorkflowDocument>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "flyteidl.admin.WorkflowDocument";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "launch_plan_documents", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: LaunchPlanDocument} },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): WorkflowDocument {
-    return new WorkflowDocument().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): WorkflowDocument {
-    return new WorkflowDocument().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): WorkflowDocument {
-    return new WorkflowDocument().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: WorkflowDocument | PlainMessage<WorkflowDocument> | undefined, b: WorkflowDocument | PlainMessage<WorkflowDocument> | undefined): boolean {
-    return proto3.util.equals(WorkflowDocument, a, b);
-  }
-}
-
-/**
- * @generated from message flyteidl.admin.LaunchPlanDocument
- */
-export class LaunchPlanDocument extends Message<LaunchPlanDocument> {
-  /**
-   * @generated from field: flyteidl.admin.Attributes attributes = 1;
-   */
-  attributes?: Attributes;
-
-  constructor(data?: PartialMessage<LaunchPlanDocument>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "flyteidl.admin.LaunchPlanDocument";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "attributes", kind: "message", T: Attributes },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): LaunchPlanDocument {
-    return new LaunchPlanDocument().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): LaunchPlanDocument {
-    return new LaunchPlanDocument().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): LaunchPlanDocument {
-    return new LaunchPlanDocument().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: LaunchPlanDocument | PlainMessage<LaunchPlanDocument> | undefined, b: LaunchPlanDocument | PlainMessage<LaunchPlanDocument> | undefined): boolean {
-    return proto3.util.equals(LaunchPlanDocument, a, b);
-  }
-}
-
-/**
- * @generated from message flyteidl.admin.DocumentID
- */
-export class DocumentID extends Message<DocumentID> {
-  /**
-   * @generated from field: string org = 1;
-   */
-  org = "";
-
-  /**
-   * @generated from field: string domain = 2;
-   */
-  domain = "";
-
-  /**
-   * @generated from field: string project = 3;
-   */
-  project = "";
-
-  /**
-   * @generated from field: string workflow = 4;
-   */
-  workflow = "";
-
-  /**
-   * @generated from field: string launch_plan = 5;
-   */
-  launchPlan = "";
-
-  constructor(data?: PartialMessage<DocumentID>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "flyteidl.admin.DocumentID";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "org", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "domain", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "project", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "workflow", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 5, name: "launch_plan", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DocumentID {
-    return new DocumentID().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DocumentID {
-    return new DocumentID().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DocumentID {
-    return new DocumentID().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: DocumentID | PlainMessage<DocumentID> | undefined, b: DocumentID | PlainMessage<DocumentID> | undefined): boolean {
-    return proto3.util.equals(DocumentID, a, b);
   }
 }
 

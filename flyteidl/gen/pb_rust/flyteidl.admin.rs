@@ -2504,7 +2504,7 @@ pub struct OverrideAttributesUpdateRequest {
     pub id: ::core::option::Option<ProjectId>,
     /// Everything set at the project-domain level
     #[prost(message, optional, tag="2")]
-    pub attribute: ::core::option::Option<Attributes>,
+    pub attributes: ::core::option::Option<Attributes>,
 }
 /// Purposefully empty, may be populated in the future.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -2516,52 +2516,8 @@ pub struct OverrideAttributesUpdateResponse {
 pub struct Document {
     #[prost(string, tag="1")]
     pub version: ::prost::alloc::string::String,
-    #[prost(map="string, message", tag="2")]
-    pub org_documents: ::std::collections::HashMap<::prost::alloc::string::String, OrgDocument>,
-}
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct OrgDocument {
-    #[prost(map="string, message", tag="1")]
-    pub project_documents: ::std::collections::HashMap<::prost::alloc::string::String, ProjectDocument>,
-}
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct ProjectDocument {
-    #[prost(map="string, message", tag="1")]
-    pub project_domain_documents: ::std::collections::HashMap<::prost::alloc::string::String, ProjectDomainDocument>,
-}
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct ProjectDomainDocument {
-    #[prost(map="string, message", tag="1")]
-    pub workflow_documents: ::std::collections::HashMap<::prost::alloc::string::String, WorkflowDocument>,
-}
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct WorkflowDocument {
-    #[prost(map="string, message", tag="1")]
-    pub launch_plan_documents: ::std::collections::HashMap<::prost::alloc::string::String, LaunchPlanDocument>,
-}
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct LaunchPlanDocument {
-    #[prost(message, optional, tag="1")]
-    pub attributes: ::core::option::Option<Attributes>,
-}
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct DocumentId {
-    #[prost(string, tag="1")]
-    pub org: ::prost::alloc::string::String,
-    #[prost(string, tag="2")]
-    pub domain: ::prost::alloc::string::String,
-    #[prost(string, tag="3")]
-    pub project: ::prost::alloc::string::String,
-    #[prost(string, tag="4")]
-    pub workflow: ::prost::alloc::string::String,
-    #[prost(string, tag="5")]
-    pub launch_plan: ::prost::alloc::string::String,
+    #[prost(map="string, message", tag="3")]
+    pub attributes_map: ::std::collections::HashMap<::prost::alloc::string::String, Attributes>,
 }
 /// Namespace within a project commonly used to differentiate between different service instances.
 /// e.g. "production", "development", etc.

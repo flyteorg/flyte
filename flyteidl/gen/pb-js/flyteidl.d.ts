@@ -17676,8 +17676,8 @@ export namespace flyteidl {
             /** OverrideAttributesUpdateRequest id */
             id?: (flyteidl.admin.IprojectID|null);
 
-            /** OverrideAttributesUpdateRequest attribute */
-            attribute?: (flyteidl.admin.IAttributes|null);
+            /** OverrideAttributesUpdateRequest attributes */
+            attributes?: (flyteidl.admin.IAttributes|null);
         }
 
         /** Represents an OverrideAttributesUpdateRequest. */
@@ -17692,8 +17692,8 @@ export namespace flyteidl {
             /** OverrideAttributesUpdateRequest id. */
             public id?: (flyteidl.admin.IprojectID|null);
 
-            /** OverrideAttributesUpdateRequest attribute. */
-            public attribute?: (flyteidl.admin.IAttributes|null);
+            /** OverrideAttributesUpdateRequest attributes. */
+            public attributes?: (flyteidl.admin.IAttributes|null);
 
             /**
              * Creates a new OverrideAttributesUpdateRequest instance using the specified properties.
@@ -17780,8 +17780,8 @@ export namespace flyteidl {
             /** Document version */
             version?: (string|null);
 
-            /** Document orgDocuments */
-            orgDocuments?: ({ [k: string]: flyteidl.admin.IOrgDocument }|null);
+            /** Document attributesMap */
+            attributesMap?: ({ [k: string]: flyteidl.admin.IAttributes }|null);
         }
 
         /** Represents a Document. */
@@ -17796,8 +17796,8 @@ export namespace flyteidl {
             /** Document version. */
             public version: string;
 
-            /** Document orgDocuments. */
-            public orgDocuments: { [k: string]: flyteidl.admin.IOrgDocument };
+            /** Document attributesMap. */
+            public attributesMap: { [k: string]: flyteidl.admin.IAttributes };
 
             /**
              * Creates a new Document instance using the specified properties.
@@ -17826,342 +17826,6 @@ export namespace flyteidl {
 
             /**
              * Verifies a Document message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of an OrgDocument. */
-        interface IOrgDocument {
-
-            /** OrgDocument projectDocuments */
-            projectDocuments?: ({ [k: string]: flyteidl.admin.IProjectDocument }|null);
-        }
-
-        /** Represents an OrgDocument. */
-        class OrgDocument implements IOrgDocument {
-
-            /**
-             * Constructs a new OrgDocument.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.admin.IOrgDocument);
-
-            /** OrgDocument projectDocuments. */
-            public projectDocuments: { [k: string]: flyteidl.admin.IProjectDocument };
-
-            /**
-             * Creates a new OrgDocument instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns OrgDocument instance
-             */
-            public static create(properties?: flyteidl.admin.IOrgDocument): flyteidl.admin.OrgDocument;
-
-            /**
-             * Encodes the specified OrgDocument message. Does not implicitly {@link flyteidl.admin.OrgDocument.verify|verify} messages.
-             * @param message OrgDocument message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.admin.IOrgDocument, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes an OrgDocument message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns OrgDocument
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.OrgDocument;
-
-            /**
-             * Verifies an OrgDocument message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a ProjectDocument. */
-        interface IProjectDocument {
-
-            /** ProjectDocument projectDomainDocuments */
-            projectDomainDocuments?: ({ [k: string]: flyteidl.admin.IProjectDomainDocument }|null);
-        }
-
-        /** Represents a ProjectDocument. */
-        class ProjectDocument implements IProjectDocument {
-
-            /**
-             * Constructs a new ProjectDocument.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.admin.IProjectDocument);
-
-            /** ProjectDocument projectDomainDocuments. */
-            public projectDomainDocuments: { [k: string]: flyteidl.admin.IProjectDomainDocument };
-
-            /**
-             * Creates a new ProjectDocument instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns ProjectDocument instance
-             */
-            public static create(properties?: flyteidl.admin.IProjectDocument): flyteidl.admin.ProjectDocument;
-
-            /**
-             * Encodes the specified ProjectDocument message. Does not implicitly {@link flyteidl.admin.ProjectDocument.verify|verify} messages.
-             * @param message ProjectDocument message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.admin.IProjectDocument, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a ProjectDocument message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns ProjectDocument
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.ProjectDocument;
-
-            /**
-             * Verifies a ProjectDocument message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a ProjectDomainDocument. */
-        interface IProjectDomainDocument {
-
-            /** ProjectDomainDocument workflowDocuments */
-            workflowDocuments?: ({ [k: string]: flyteidl.admin.IWorkflowDocument }|null);
-        }
-
-        /** Represents a ProjectDomainDocument. */
-        class ProjectDomainDocument implements IProjectDomainDocument {
-
-            /**
-             * Constructs a new ProjectDomainDocument.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.admin.IProjectDomainDocument);
-
-            /** ProjectDomainDocument workflowDocuments. */
-            public workflowDocuments: { [k: string]: flyteidl.admin.IWorkflowDocument };
-
-            /**
-             * Creates a new ProjectDomainDocument instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns ProjectDomainDocument instance
-             */
-            public static create(properties?: flyteidl.admin.IProjectDomainDocument): flyteidl.admin.ProjectDomainDocument;
-
-            /**
-             * Encodes the specified ProjectDomainDocument message. Does not implicitly {@link flyteidl.admin.ProjectDomainDocument.verify|verify} messages.
-             * @param message ProjectDomainDocument message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.admin.IProjectDomainDocument, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a ProjectDomainDocument message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns ProjectDomainDocument
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.ProjectDomainDocument;
-
-            /**
-             * Verifies a ProjectDomainDocument message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a WorkflowDocument. */
-        interface IWorkflowDocument {
-
-            /** WorkflowDocument launchPlanDocuments */
-            launchPlanDocuments?: ({ [k: string]: flyteidl.admin.ILaunchPlanDocument }|null);
-        }
-
-        /** Represents a WorkflowDocument. */
-        class WorkflowDocument implements IWorkflowDocument {
-
-            /**
-             * Constructs a new WorkflowDocument.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.admin.IWorkflowDocument);
-
-            /** WorkflowDocument launchPlanDocuments. */
-            public launchPlanDocuments: { [k: string]: flyteidl.admin.ILaunchPlanDocument };
-
-            /**
-             * Creates a new WorkflowDocument instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns WorkflowDocument instance
-             */
-            public static create(properties?: flyteidl.admin.IWorkflowDocument): flyteidl.admin.WorkflowDocument;
-
-            /**
-             * Encodes the specified WorkflowDocument message. Does not implicitly {@link flyteidl.admin.WorkflowDocument.verify|verify} messages.
-             * @param message WorkflowDocument message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.admin.IWorkflowDocument, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a WorkflowDocument message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns WorkflowDocument
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.WorkflowDocument;
-
-            /**
-             * Verifies a WorkflowDocument message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a LaunchPlanDocument. */
-        interface ILaunchPlanDocument {
-
-            /** LaunchPlanDocument attributes */
-            attributes?: (flyteidl.admin.IAttributes|null);
-        }
-
-        /** Represents a LaunchPlanDocument. */
-        class LaunchPlanDocument implements ILaunchPlanDocument {
-
-            /**
-             * Constructs a new LaunchPlanDocument.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.admin.ILaunchPlanDocument);
-
-            /** LaunchPlanDocument attributes. */
-            public attributes?: (flyteidl.admin.IAttributes|null);
-
-            /**
-             * Creates a new LaunchPlanDocument instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns LaunchPlanDocument instance
-             */
-            public static create(properties?: flyteidl.admin.ILaunchPlanDocument): flyteidl.admin.LaunchPlanDocument;
-
-            /**
-             * Encodes the specified LaunchPlanDocument message. Does not implicitly {@link flyteidl.admin.LaunchPlanDocument.verify|verify} messages.
-             * @param message LaunchPlanDocument message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.admin.ILaunchPlanDocument, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a LaunchPlanDocument message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns LaunchPlanDocument
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.LaunchPlanDocument;
-
-            /**
-             * Verifies a LaunchPlanDocument message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a DocumentID. */
-        interface IDocumentID {
-
-            /** DocumentID org */
-            org?: (string|null);
-
-            /** DocumentID domain */
-            domain?: (string|null);
-
-            /** DocumentID project */
-            project?: (string|null);
-
-            /** DocumentID workflow */
-            workflow?: (string|null);
-
-            /** DocumentID launchPlan */
-            launchPlan?: (string|null);
-        }
-
-        /** Represents a DocumentID. */
-        class DocumentID implements IDocumentID {
-
-            /**
-             * Constructs a new DocumentID.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.admin.IDocumentID);
-
-            /** DocumentID org. */
-            public org: string;
-
-            /** DocumentID domain. */
-            public domain: string;
-
-            /** DocumentID project. */
-            public project: string;
-
-            /** DocumentID workflow. */
-            public workflow: string;
-
-            /** DocumentID launchPlan. */
-            public launchPlan: string;
-
-            /**
-             * Creates a new DocumentID instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns DocumentID instance
-             */
-            public static create(properties?: flyteidl.admin.IDocumentID): flyteidl.admin.DocumentID;
-
-            /**
-             * Encodes the specified DocumentID message. Does not implicitly {@link flyteidl.admin.DocumentID.verify|verify} messages.
-             * @param message DocumentID message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.admin.IDocumentID, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a DocumentID message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns DocumentID
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.DocumentID;
-
-            /**
-             * Verifies a DocumentID message.
              * @param message Plain object to verify
              * @returns `null` if valid, otherwise the reason why it is not
              */

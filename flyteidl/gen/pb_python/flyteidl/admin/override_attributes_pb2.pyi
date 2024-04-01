@@ -59,100 +59,28 @@ class OverrideAttributesGetResponse(_message.Message):
     def __init__(self, id: _Optional[_Union[projectID, _Mapping]] = ..., version: _Optional[str] = ..., project_domain_attributes: _Optional[_Union[Attributes, _Mapping]] = ..., project_attributes: _Optional[_Union[Attributes, _Mapping]] = ..., global_attributes: _Optional[_Union[Attributes, _Mapping]] = ...) -> None: ...
 
 class OverrideAttributesUpdateRequest(_message.Message):
-    __slots__ = ["id", "attribute"]
+    __slots__ = ["id", "attributes"]
     ID_FIELD_NUMBER: _ClassVar[int]
-    ATTRIBUTE_FIELD_NUMBER: _ClassVar[int]
+    ATTRIBUTES_FIELD_NUMBER: _ClassVar[int]
     id: projectID
-    attribute: Attributes
-    def __init__(self, id: _Optional[_Union[projectID, _Mapping]] = ..., attribute: _Optional[_Union[Attributes, _Mapping]] = ...) -> None: ...
+    attributes: Attributes
+    def __init__(self, id: _Optional[_Union[projectID, _Mapping]] = ..., attributes: _Optional[_Union[Attributes, _Mapping]] = ...) -> None: ...
 
 class OverrideAttributesUpdateResponse(_message.Message):
     __slots__ = []
     def __init__(self) -> None: ...
 
 class Document(_message.Message):
-    __slots__ = ["version", "org_documents"]
-    class OrgDocumentsEntry(_message.Message):
+    __slots__ = ["version", "attributesMap"]
+    class AttributesMapEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
         VALUE_FIELD_NUMBER: _ClassVar[int]
         key: str
-        value: OrgDocument
-        def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[OrgDocument, _Mapping]] = ...) -> None: ...
+        value: Attributes
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[Attributes, _Mapping]] = ...) -> None: ...
     VERSION_FIELD_NUMBER: _ClassVar[int]
-    ORG_DOCUMENTS_FIELD_NUMBER: _ClassVar[int]
+    ATTRIBUTESMAP_FIELD_NUMBER: _ClassVar[int]
     version: str
-    org_documents: _containers.MessageMap[str, OrgDocument]
-    def __init__(self, version: _Optional[str] = ..., org_documents: _Optional[_Mapping[str, OrgDocument]] = ...) -> None: ...
-
-class OrgDocument(_message.Message):
-    __slots__ = ["project_documents"]
-    class ProjectDocumentsEntry(_message.Message):
-        __slots__ = ["key", "value"]
-        KEY_FIELD_NUMBER: _ClassVar[int]
-        VALUE_FIELD_NUMBER: _ClassVar[int]
-        key: str
-        value: ProjectDocument
-        def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[ProjectDocument, _Mapping]] = ...) -> None: ...
-    PROJECT_DOCUMENTS_FIELD_NUMBER: _ClassVar[int]
-    project_documents: _containers.MessageMap[str, ProjectDocument]
-    def __init__(self, project_documents: _Optional[_Mapping[str, ProjectDocument]] = ...) -> None: ...
-
-class ProjectDocument(_message.Message):
-    __slots__ = ["project_domain_documents"]
-    class ProjectDomainDocumentsEntry(_message.Message):
-        __slots__ = ["key", "value"]
-        KEY_FIELD_NUMBER: _ClassVar[int]
-        VALUE_FIELD_NUMBER: _ClassVar[int]
-        key: str
-        value: ProjectDomainDocument
-        def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[ProjectDomainDocument, _Mapping]] = ...) -> None: ...
-    PROJECT_DOMAIN_DOCUMENTS_FIELD_NUMBER: _ClassVar[int]
-    project_domain_documents: _containers.MessageMap[str, ProjectDomainDocument]
-    def __init__(self, project_domain_documents: _Optional[_Mapping[str, ProjectDomainDocument]] = ...) -> None: ...
-
-class ProjectDomainDocument(_message.Message):
-    __slots__ = ["workflow_documents"]
-    class WorkflowDocumentsEntry(_message.Message):
-        __slots__ = ["key", "value"]
-        KEY_FIELD_NUMBER: _ClassVar[int]
-        VALUE_FIELD_NUMBER: _ClassVar[int]
-        key: str
-        value: WorkflowDocument
-        def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[WorkflowDocument, _Mapping]] = ...) -> None: ...
-    WORKFLOW_DOCUMENTS_FIELD_NUMBER: _ClassVar[int]
-    workflow_documents: _containers.MessageMap[str, WorkflowDocument]
-    def __init__(self, workflow_documents: _Optional[_Mapping[str, WorkflowDocument]] = ...) -> None: ...
-
-class WorkflowDocument(_message.Message):
-    __slots__ = ["launch_plan_documents"]
-    class LaunchPlanDocumentsEntry(_message.Message):
-        __slots__ = ["key", "value"]
-        KEY_FIELD_NUMBER: _ClassVar[int]
-        VALUE_FIELD_NUMBER: _ClassVar[int]
-        key: str
-        value: LaunchPlanDocument
-        def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[LaunchPlanDocument, _Mapping]] = ...) -> None: ...
-    LAUNCH_PLAN_DOCUMENTS_FIELD_NUMBER: _ClassVar[int]
-    launch_plan_documents: _containers.MessageMap[str, LaunchPlanDocument]
-    def __init__(self, launch_plan_documents: _Optional[_Mapping[str, LaunchPlanDocument]] = ...) -> None: ...
-
-class LaunchPlanDocument(_message.Message):
-    __slots__ = ["attributes"]
-    ATTRIBUTES_FIELD_NUMBER: _ClassVar[int]
-    attributes: Attributes
-    def __init__(self, attributes: _Optional[_Union[Attributes, _Mapping]] = ...) -> None: ...
-
-class DocumentID(_message.Message):
-    __slots__ = ["org", "domain", "project", "workflow", "launch_plan"]
-    ORG_FIELD_NUMBER: _ClassVar[int]
-    DOMAIN_FIELD_NUMBER: _ClassVar[int]
-    PROJECT_FIELD_NUMBER: _ClassVar[int]
-    WORKFLOW_FIELD_NUMBER: _ClassVar[int]
-    LAUNCH_PLAN_FIELD_NUMBER: _ClassVar[int]
-    org: str
-    domain: str
-    project: str
-    workflow: str
-    launch_plan: str
-    def __init__(self, org: _Optional[str] = ..., domain: _Optional[str] = ..., project: _Optional[str] = ..., workflow: _Optional[str] = ..., launch_plan: _Optional[str] = ...) -> None: ...
+    attributesMap: _containers.MessageMap[str, Attributes]
+    def __init__(self, version: _Optional[str] = ..., attributesMap: _Optional[_Mapping[str, Attributes]] = ...) -> None: ...

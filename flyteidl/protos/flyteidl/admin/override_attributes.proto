@@ -57,7 +57,7 @@ message OverrideAttributesUpdateRequest {
   projectID id = 1;
 
   // Everything set at the project-domain level
-  Attributes attribute = 2;
+  Attributes attributes = 2;
 }
 
 message OverrideAttributesUpdateResponse {
@@ -66,33 +66,5 @@ message OverrideAttributesUpdateResponse {
 
 message Document {
   string version = 1;
-  map<string, OrgDocument> org_documents = 2;
-}
-
-message OrgDocument {
-  map<string, ProjectDocument> project_documents = 1;
-}
-
-message ProjectDocument {
-  map<string, ProjectDomainDocument> project_domain_documents = 1;
-}
-
-message ProjectDomainDocument {
-  map<string, WorkflowDocument> workflow_documents = 1;
-}
-
-message WorkflowDocument {
-  map<string, LaunchPlanDocument> launch_plan_documents = 1;
-}
-
-message LaunchPlanDocument {
-  Attributes attributes = 1;
-}
-
-message DocumentID {
-  string org = 1;
-  string domain = 2;
-  string project = 3;
-  string workflow = 4;
-  string launch_plan = 5;
+  map<string, Attributes> attributesMap = 3;
 }

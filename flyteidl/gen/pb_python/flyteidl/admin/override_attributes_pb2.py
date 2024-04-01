@@ -16,7 +16,7 @@ from flyteidl.core import execution_pb2 as flyteidl_dot_core_dot_execution__pb2
 from flyteidl.admin import cluster_assignment_pb2 as flyteidl_dot_admin_dot_cluster__assignment__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n(flyteidl/admin/override_attributes.proto\x12\x0e\x66lyteidl.admin\x1a\'flyteidl/admin/matchable_resource.proto\x1a\x1d\x66lyteidl/core/execution.proto\x1a\'flyteidl/admin/cluster_assignment.proto\"O\n\tprojectID\x12\x18\n\x07project\x18\x01 \x01(\tR\x07project\x12\x16\n\x06\x64omain\x18\x02 \x01(\tR\x06\x64omain\x12\x10\n\x03org\x18\x03 \x01(\tR\x03org\"\xf2\x05\n\nAttributes\x12`\n\x18task_resource_attributes\x18\x01 \x01(\x0b\x32&.flyteidl.admin.TaskResourceAttributesR\x16taskResourceAttributes\x12i\n\x1b\x63luster_resource_attributes\x18\x02 \x01(\x0b\x32).flyteidl.admin.ClusterResourceAttributesR\x19\x63lusterResourceAttributes\x12\x66\n\x1a\x65xecution_queue_attributes\x18\x03 \x01(\x0b\x32(.flyteidl.admin.ExecutionQueueAttributesR\x18\x65xecutionQueueAttributes\x12]\n\x17\x65xecution_cluster_label\x18\x04 \x01(\x0b\x32%.flyteidl.admin.ExecutionClusterLabelR\x15\x65xecutionClusterLabel\x12M\n\x12quality_of_service\x18\x05 \x01(\x0b\x32\x1f.flyteidl.core.QualityOfServiceR\x10qualityOfService\x12J\n\x10plugin_overrides\x18\x06 \x01(\x0b\x32\x1f.flyteidl.admin.PluginOverridesR\x0fpluginOverrides\x12\x63\n\x19workflow_execution_config\x18\x07 \x01(\x0b\x32\'.flyteidl.admin.WorkflowExecutionConfigR\x17workflowExecutionConfig\x12P\n\x12\x63luster_assignment\x18\x08 \x01(\x0b\x32!.flyteidl.admin.ClusterAssignmentR\x11\x63lusterAssignment\"I\n\x1cOverrideAttributesGetRequest\x12)\n\x02id\x18\x01 \x01(\x0b\x32\x19.flyteidl.admin.projectIDR\x02id\"\xd0\x02\n\x1dOverrideAttributesGetResponse\x12)\n\x02id\x18\x01 \x01(\x0b\x32\x19.flyteidl.admin.projectIDR\x02id\x12\x18\n\x07version\x18\x02 \x01(\tR\x07version\x12V\n\x19project_domain_attributes\x18\x03 \x01(\x0b\x32\x1a.flyteidl.admin.AttributesR\x17projectDomainAttributes\x12I\n\x12project_attributes\x18\x04 \x01(\x0b\x32\x1a.flyteidl.admin.AttributesR\x11projectAttributes\x12G\n\x11global_attributes\x18\x05 \x01(\x0b\x32\x1a.flyteidl.admin.AttributesR\x10globalAttributes\"\x86\x01\n\x1fOverrideAttributesUpdateRequest\x12)\n\x02id\x18\x01 \x01(\x0b\x32\x19.flyteidl.admin.projectIDR\x02id\x12\x38\n\tattribute\x18\x02 \x01(\x0b\x32\x1a.flyteidl.admin.AttributesR\tattribute\"\"\n OverrideAttributesUpdateResponse\"\xd3\x01\n\x08\x44ocument\x12\x18\n\x07version\x18\x01 \x01(\tR\x07version\x12O\n\rorg_documents\x18\x02 \x03(\x0b\x32*.flyteidl.admin.Document.OrgDocumentsEntryR\x0corgDocuments\x1a\\\n\x11OrgDocumentsEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x31\n\x05value\x18\x02 \x01(\x0b\x32\x1b.flyteidl.admin.OrgDocumentR\x05value:\x02\x38\x01\"\xd3\x01\n\x0bOrgDocument\x12^\n\x11project_documents\x18\x01 \x03(\x0b\x32\x31.flyteidl.admin.OrgDocument.ProjectDocumentsEntryR\x10projectDocuments\x1a\x64\n\x15ProjectDocumentsEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x35\n\x05value\x18\x02 \x01(\x0b\x32\x1f.flyteidl.admin.ProjectDocumentR\x05value:\x02\x38\x01\"\xfa\x01\n\x0fProjectDocument\x12u\n\x18project_domain_documents\x18\x01 \x03(\x0b\x32;.flyteidl.admin.ProjectDocument.ProjectDomainDocumentsEntryR\x16projectDomainDocuments\x1ap\n\x1bProjectDomainDocumentsEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12;\n\x05value\x18\x02 \x01(\x0b\x32%.flyteidl.admin.ProjectDomainDocumentR\x05value:\x02\x38\x01\"\xec\x01\n\x15ProjectDomainDocument\x12k\n\x12workflow_documents\x18\x01 \x03(\x0b\x32<.flyteidl.admin.ProjectDomainDocument.WorkflowDocumentsEntryR\x11workflowDocuments\x1a\x66\n\x16WorkflowDocumentsEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x36\n\x05value\x18\x02 \x01(\x0b\x32 .flyteidl.admin.WorkflowDocumentR\x05value:\x02\x38\x01\"\xed\x01\n\x10WorkflowDocument\x12m\n\x15launch_plan_documents\x18\x01 \x03(\x0b\x32\x39.flyteidl.admin.WorkflowDocument.LaunchPlanDocumentsEntryR\x13launchPlanDocuments\x1aj\n\x18LaunchPlanDocumentsEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x38\n\x05value\x18\x02 \x01(\x0b\x32\".flyteidl.admin.LaunchPlanDocumentR\x05value:\x02\x38\x01\"P\n\x12LaunchPlanDocument\x12:\n\nattributes\x18\x01 \x01(\x0b\x32\x1a.flyteidl.admin.AttributesR\nattributes\"\x8d\x01\n\nDocumentID\x12\x10\n\x03org\x18\x01 \x01(\tR\x03org\x12\x16\n\x06\x64omain\x18\x02 \x01(\tR\x06\x64omain\x12\x18\n\x07project\x18\x03 \x01(\tR\x07project\x12\x1a\n\x08workflow\x18\x04 \x01(\tR\x08workflow\x12\x1f\n\x0blaunch_plan\x18\x05 \x01(\tR\nlaunchPlanB\xc3\x01\n\x12\x63om.flyteidl.adminB\x17OverrideAttributesProtoP\x01Z;github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin\xa2\x02\x03\x46\x41X\xaa\x02\x0e\x46lyteidl.Admin\xca\x02\x0e\x46lyteidl\\Admin\xe2\x02\x1a\x46lyteidl\\Admin\\GPBMetadata\xea\x02\x0f\x46lyteidl::Adminb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n(flyteidl/admin/override_attributes.proto\x12\x0e\x66lyteidl.admin\x1a\'flyteidl/admin/matchable_resource.proto\x1a\x1d\x66lyteidl/core/execution.proto\x1a\'flyteidl/admin/cluster_assignment.proto\"O\n\tprojectID\x12\x18\n\x07project\x18\x01 \x01(\tR\x07project\x12\x16\n\x06\x64omain\x18\x02 \x01(\tR\x06\x64omain\x12\x10\n\x03org\x18\x03 \x01(\tR\x03org\"\xf2\x05\n\nAttributes\x12`\n\x18task_resource_attributes\x18\x01 \x01(\x0b\x32&.flyteidl.admin.TaskResourceAttributesR\x16taskResourceAttributes\x12i\n\x1b\x63luster_resource_attributes\x18\x02 \x01(\x0b\x32).flyteidl.admin.ClusterResourceAttributesR\x19\x63lusterResourceAttributes\x12\x66\n\x1a\x65xecution_queue_attributes\x18\x03 \x01(\x0b\x32(.flyteidl.admin.ExecutionQueueAttributesR\x18\x65xecutionQueueAttributes\x12]\n\x17\x65xecution_cluster_label\x18\x04 \x01(\x0b\x32%.flyteidl.admin.ExecutionClusterLabelR\x15\x65xecutionClusterLabel\x12M\n\x12quality_of_service\x18\x05 \x01(\x0b\x32\x1f.flyteidl.core.QualityOfServiceR\x10qualityOfService\x12J\n\x10plugin_overrides\x18\x06 \x01(\x0b\x32\x1f.flyteidl.admin.PluginOverridesR\x0fpluginOverrides\x12\x63\n\x19workflow_execution_config\x18\x07 \x01(\x0b\x32\'.flyteidl.admin.WorkflowExecutionConfigR\x17workflowExecutionConfig\x12P\n\x12\x63luster_assignment\x18\x08 \x01(\x0b\x32!.flyteidl.admin.ClusterAssignmentR\x11\x63lusterAssignment\"I\n\x1cOverrideAttributesGetRequest\x12)\n\x02id\x18\x01 \x01(\x0b\x32\x19.flyteidl.admin.projectIDR\x02id\"\xd0\x02\n\x1dOverrideAttributesGetResponse\x12)\n\x02id\x18\x01 \x01(\x0b\x32\x19.flyteidl.admin.projectIDR\x02id\x12\x18\n\x07version\x18\x02 \x01(\tR\x07version\x12V\n\x19project_domain_attributes\x18\x03 \x01(\x0b\x32\x1a.flyteidl.admin.AttributesR\x17projectDomainAttributes\x12I\n\x12project_attributes\x18\x04 \x01(\x0b\x32\x1a.flyteidl.admin.AttributesR\x11projectAttributes\x12G\n\x11global_attributes\x18\x05 \x01(\x0b\x32\x1a.flyteidl.admin.AttributesR\x10globalAttributes\"\x88\x01\n\x1fOverrideAttributesUpdateRequest\x12)\n\x02id\x18\x01 \x01(\x0b\x32\x19.flyteidl.admin.projectIDR\x02id\x12:\n\nattributes\x18\x02 \x01(\x0b\x32\x1a.flyteidl.admin.AttributesR\nattributes\"\"\n OverrideAttributesUpdateResponse\"\xd5\x01\n\x08\x44ocument\x12\x18\n\x07version\x18\x01 \x01(\tR\x07version\x12Q\n\rattributesMap\x18\x03 \x03(\x0b\x32+.flyteidl.admin.Document.AttributesMapEntryR\rattributesMap\x1a\\\n\x12\x41ttributesMapEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x30\n\x05value\x18\x02 \x01(\x0b\x32\x1a.flyteidl.admin.AttributesR\x05value:\x02\x38\x01\x42\xc3\x01\n\x12\x63om.flyteidl.adminB\x17OverrideAttributesProtoP\x01Z;github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin\xa2\x02\x03\x46\x41X\xaa\x02\x0e\x46lyteidl.Admin\xca\x02\x0e\x46lyteidl\\Admin\xe2\x02\x1a\x46lyteidl\\Admin\\GPBMetadata\xea\x02\x0f\x46lyteidl::Adminb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -25,16 +25,8 @@ if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
   DESCRIPTOR._serialized_options = b'\n\022com.flyteidl.adminB\027OverrideAttributesProtoP\001Z;github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin\242\002\003FAX\252\002\016Flyteidl.Admin\312\002\016Flyteidl\\Admin\342\002\032Flyteidl\\Admin\\GPBMetadata\352\002\017Flyteidl::Admin'
-  _DOCUMENT_ORGDOCUMENTSENTRY._options = None
-  _DOCUMENT_ORGDOCUMENTSENTRY._serialized_options = b'8\001'
-  _ORGDOCUMENT_PROJECTDOCUMENTSENTRY._options = None
-  _ORGDOCUMENT_PROJECTDOCUMENTSENTRY._serialized_options = b'8\001'
-  _PROJECTDOCUMENT_PROJECTDOMAINDOCUMENTSENTRY._options = None
-  _PROJECTDOCUMENT_PROJECTDOMAINDOCUMENTSENTRY._serialized_options = b'8\001'
-  _PROJECTDOMAINDOCUMENT_WORKFLOWDOCUMENTSENTRY._options = None
-  _PROJECTDOMAINDOCUMENT_WORKFLOWDOCUMENTSENTRY._serialized_options = b'8\001'
-  _WORKFLOWDOCUMENT_LAUNCHPLANDOCUMENTSENTRY._options = None
-  _WORKFLOWDOCUMENT_LAUNCHPLANDOCUMENTSENTRY._serialized_options = b'8\001'
+  _DOCUMENT_ATTRIBUTESMAPENTRY._options = None
+  _DOCUMENT_ATTRIBUTESMAPENTRY._serialized_options = b'8\001'
   _globals['_PROJECTID']._serialized_start=173
   _globals['_PROJECTID']._serialized_end=252
   _globals['_ATTRIBUTES']._serialized_start=255
@@ -44,31 +36,11 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['_OVERRIDEATTRIBUTESGETRESPONSE']._serialized_start=1087
   _globals['_OVERRIDEATTRIBUTESGETRESPONSE']._serialized_end=1423
   _globals['_OVERRIDEATTRIBUTESUPDATEREQUEST']._serialized_start=1426
-  _globals['_OVERRIDEATTRIBUTESUPDATEREQUEST']._serialized_end=1560
-  _globals['_OVERRIDEATTRIBUTESUPDATERESPONSE']._serialized_start=1562
-  _globals['_OVERRIDEATTRIBUTESUPDATERESPONSE']._serialized_end=1596
-  _globals['_DOCUMENT']._serialized_start=1599
-  _globals['_DOCUMENT']._serialized_end=1810
-  _globals['_DOCUMENT_ORGDOCUMENTSENTRY']._serialized_start=1718
-  _globals['_DOCUMENT_ORGDOCUMENTSENTRY']._serialized_end=1810
-  _globals['_ORGDOCUMENT']._serialized_start=1813
-  _globals['_ORGDOCUMENT']._serialized_end=2024
-  _globals['_ORGDOCUMENT_PROJECTDOCUMENTSENTRY']._serialized_start=1924
-  _globals['_ORGDOCUMENT_PROJECTDOCUMENTSENTRY']._serialized_end=2024
-  _globals['_PROJECTDOCUMENT']._serialized_start=2027
-  _globals['_PROJECTDOCUMENT']._serialized_end=2277
-  _globals['_PROJECTDOCUMENT_PROJECTDOMAINDOCUMENTSENTRY']._serialized_start=2165
-  _globals['_PROJECTDOCUMENT_PROJECTDOMAINDOCUMENTSENTRY']._serialized_end=2277
-  _globals['_PROJECTDOMAINDOCUMENT']._serialized_start=2280
-  _globals['_PROJECTDOMAINDOCUMENT']._serialized_end=2516
-  _globals['_PROJECTDOMAINDOCUMENT_WORKFLOWDOCUMENTSENTRY']._serialized_start=2414
-  _globals['_PROJECTDOMAINDOCUMENT_WORKFLOWDOCUMENTSENTRY']._serialized_end=2516
-  _globals['_WORKFLOWDOCUMENT']._serialized_start=2519
-  _globals['_WORKFLOWDOCUMENT']._serialized_end=2756
-  _globals['_WORKFLOWDOCUMENT_LAUNCHPLANDOCUMENTSENTRY']._serialized_start=2650
-  _globals['_WORKFLOWDOCUMENT_LAUNCHPLANDOCUMENTSENTRY']._serialized_end=2756
-  _globals['_LAUNCHPLANDOCUMENT']._serialized_start=2758
-  _globals['_LAUNCHPLANDOCUMENT']._serialized_end=2838
-  _globals['_DOCUMENTID']._serialized_start=2841
-  _globals['_DOCUMENTID']._serialized_end=2982
+  _globals['_OVERRIDEATTRIBUTESUPDATEREQUEST']._serialized_end=1562
+  _globals['_OVERRIDEATTRIBUTESUPDATERESPONSE']._serialized_start=1564
+  _globals['_OVERRIDEATTRIBUTESUPDATERESPONSE']._serialized_end=1598
+  _globals['_DOCUMENT']._serialized_start=1601
+  _globals['_DOCUMENT']._serialized_end=1814
+  _globals['_DOCUMENT_ATTRIBUTESMAPENTRY']._serialized_start=1722
+  _globals['_DOCUMENT_ATTRIBUTESMAPENTRY']._serialized_end=1814
 # @@protoc_insertion_point(module_scope)

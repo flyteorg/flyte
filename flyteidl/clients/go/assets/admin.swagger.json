@@ -5868,7 +5868,7 @@
         "id": {
           "$ref": "#/definitions/adminprojectID"
         },
-        "attribute": {
+        "attributes": {
           "$ref": "#/definitions/adminAttributes",
           "title": "Everything set at the project-domain level"
         }
