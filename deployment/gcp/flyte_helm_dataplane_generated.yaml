@@ -137,7 +137,7 @@ data:
           rate: 100
           type: bucket
         type: batch
-      rawoutput-prefix: gs://<BUCKETNAME>/
+      rawoutput-prefix: gs://<RAW_DATA_BUCKET_NAME>/
       workers: 40
       workflow-reeval-duration: 30s
     webhook:
@@ -174,7 +174,7 @@ data:
           json: ""
           project_id: <PROJECT-ID>
           scopes: https://www.googleapis.com/auth/cloud-platform
-      container: "<BUCKETNAME>"
+      container: "<METADATA_BUCKET_NAME>"
       enable-multicontainer: false
       limits:
         maxDownloadMBs: 10

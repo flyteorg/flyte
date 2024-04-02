@@ -11,7 +11,8 @@ jupytext:
 
 You can test agents locally without running the backend server, making agent development easier.
 
-To test an agent locally, create a class for the agent task that inherits from [AsyncAgentExecutorMixin](https://github.com/flyteorg/flytekit/blob/master/flytekit/extend/backend/base_agent.py#L155). This mixin can handle both asynchronous tasks and synchronous tasks and allows flytekit to mimic FlytePropeller's behavior in calling the agent.
+To test an agent locally, create a class for the agent task that inherits from `SyncAgentExecutorMixin` or `AsyncAgentExecutorMixin`.
+These mixins can handle synchronous and asynchronous tasks, respectively, and allow flytekit to mimic FlytePropeller's behavior in calling the agent.
 
 ## BigQuery example
 
@@ -24,11 +25,14 @@ For example, you need to set the `GOOGLE_APPLICATION_CREDENTIALS` environment va
 
 ```
 
-Add `AsyncAgentExecutorMixin` to this class to tell flytekit to use the agent to run the task.
+Add `AsyncAgentExecutorMixin` or `SyncAgentExecutorMixin` to the class to tell flytekit to use the agent to run the task.
 ```python
 class BigQueryTask(AsyncAgentExecutorMixin, SQLTask[BigQueryConfig]):
-    def __init__(self, name: str, **kwargs):
-        ...
+    ...
+
+class ChatGPTTask(SyncAgentExecutorMixin, PythonTask):
+    ...
+
 ```
 
 Flytekit will automatically use the agent to run the task in the local execution.
@@ -47,6 +51,10 @@ You can run the above example task locally and test the agent with the following
 ```bash
 pyflyte run bigquery_task.py bigquery_doge_coin --version 10
 ```
+
+You can also run a BigQuery task in your Python interpreter to test the agent locally.
+
+![](https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/concepts/agents/bigquery_task.png)
 
 ## Databricks example
 To test the Databricks agent, copy the following code to a file called `databricks_task.py`, modifying as needed.
@@ -77,3 +85,4 @@ The Spark task will run locally if the `raw-output-data-prefix` is not set.
 pyflyte run --raw-output-data-prefix s3://my-s3-bucket/databricks databricks_task.py hello_spark
 ```
 
+![](https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/concepts/agents/spark_task.png)
