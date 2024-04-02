@@ -29,7 +29,10 @@ func createDefaultExecutionStatsHolder() (*ExecutionStatsHolder, error) {
 	if err != nil {
 		return nil, err
 	}
-	esh.AddOrUpdateEntry("exec2", SingleExecutionStats{ActiveNodeCount: 3, ActiveTaskCount: 6})
+	err = esh.AddOrUpdateEntry("exec2", SingleExecutionStats{ActiveNodeCount: 3, ActiveTaskCount: 6})
+	if err != nil {
+		return nil, err
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +89,8 @@ func TestConcurrentAccess(t *testing.T) {
 		go func(id int) {
 			defer wg.Done()
 			execID := fmt.Sprintf("exec%d", id)
-			esh.AddOrUpdateEntry(execID, SingleExecutionStats{ActiveNodeCount: uint32(id), ActiveTaskCount: uint32(id * 2)})
+			err := esh.AddOrUpdateEntry(execID, SingleExecutionStats{ActiveNodeCount: uint32(id), ActiveTaskCount: uint32(id * 2)})
+			assert.NoError(t, err)
 		}(i)
 	}
 
