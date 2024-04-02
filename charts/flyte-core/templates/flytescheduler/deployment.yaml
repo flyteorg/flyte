@@ -48,7 +48,7 @@ spec:
         volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 8 }}
         - mountPath: /etc/flyte/config
           name: config-volume
-        {{- if .Values.secrets.adminOauthClientCredentials.mount }}
+        {{- if .Values.secrets.adminOauthClientCredentials.enabled }}
         - name: auth
           mountPath: /etc/secrets/
         {{- end }}
@@ -78,7 +78,7 @@ spec:
         volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 8 }}
         - mountPath: /etc/flyte/config
           name: config-volume
-        {{- if .Values.secrets.adminOauthClientCredentials.mount }}
+        {{- if .Values.secrets.adminOauthClientCredentials.enabled }}
         - name: auth
           mountPath: /etc/secrets/
         {{- end }}
@@ -95,7 +95,7 @@ spec:
       - configMap:
           name: flyte-scheduler-config
         name: config-volume
-      {{- if .Values.secrets.adminOauthClientCredentials.mount }}
+      {{- if .Values.secrets.adminOauthClientCredentials.enabled }}
       - name: auth
         secret:
           secretName: flyte-secret-auth

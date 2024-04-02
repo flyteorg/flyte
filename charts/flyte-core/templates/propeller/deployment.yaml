@@ -82,7 +82,7 @@ spec:
         volumeMounts:
         - name: config-volume
           mountPath: /etc/flyte/config
-        {{- if .Values.secrets.adminOauthClientCredentials.mount }}
+        {{- if .Values.secrets.adminOauthClientCredentials.enabled }}
         - name: auth
           mountPath: /etc/secrets/
         {{- end }}
@@ -100,7 +100,7 @@ spec:
       - configMap:
           name: flyte-propeller-config
         name: config-volume
-      {{- if .Values.secrets.adminOauthClientCredentials.mount }}
+      {{- if .Values.secrets.adminOauthClientCredentials.enabled }}
       - name: auth
         secret:
           secretName: flyte-secret-auth
