@@ -554,7 +554,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "b6087931f4457971d5fcd17d64491188322ffc2f86e31f943b142c76edb9e67"
+        configChecksum: "5ce6f593fb92c9a6fd183825231d187471b5f10fe948f601f6d5b56edd02b51"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -974,7 +974,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "b6087931f4457971d5fcd17d64491188322ffc2f86e31f943b142c76edb9e67"
+        configChecksum: "5ce6f593fb92c9a6fd183825231d187471b5f10fe948f601f6d5b56edd02b51"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte
