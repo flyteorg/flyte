@@ -1174,7 +1174,6 @@ ray (`ray.Config`_)
         disable-usage-stats: "true"
   enableUsageStats: false
   includeDashboard: true
-  kubeRayCrdVersion: v1alpha1
   logs:
     cloudwatch-enabled: false
     cloudwatch-log-group: ""
@@ -3576,18 +3575,6 @@ Enable usage stats for ray jobs. These stats are submitted to usage-stats.ray.io
 .. code-block:: yaml
 
   "false"
-  
-
-kubeRayCrdVersion (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-Version of the Ray CRD to use when creating RayClusters or RayJobs.
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  v1alpha1
   
 
 serviceAccount (string)
