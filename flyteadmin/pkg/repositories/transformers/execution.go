@@ -35,7 +35,6 @@ type CreateExecutionModelInput struct {
 	LaunchPlanID          uint
 	WorkflowID            uint
 	TaskID                uint
-	Phase                 core.WorkflowExecution_Phase
 	CreatedAt             time.Time
 	Notifications         []*admin.Notification
 	WorkflowIdentifier    *core.Identifier
@@ -77,7 +76,6 @@ func CreateExecutionModel(input CreateExecutionModelInput) (*models.Execution, e
 	}
 	createdAt := timestamppb.New(input.CreatedAt)
 	closure := admin.ExecutionClosure{
-		Phase:         input.Phase,
 		CreatedAt:     createdAt,
 		UpdatedAt:     createdAt,
 		Notifications: input.Notifications,
@@ -87,9 +85,6 @@ func CreateExecutionModel(input CreateExecutionModelInput) (*models.Execution, e
 			Principal:  requestSpec.Metadata.Principal,
 			OccurredAt: createdAt,
 		},
-	}
-	if input.Phase == core.WorkflowExecution_RUNNING {
-		closure.StartedAt = createdAt
 	}
 	if input.Error != nil {
 		closure.Phase = core.WorkflowExecution_FAILED
@@ -130,7 +125,7 @@ func CreateExecutionModel(input CreateExecutionModelInput) (*models.Execution, e
 			Org:     input.WorkflowExecutionID.GetOrg(),
 		},
 		Spec:                  spec,
-		Phase:                 input.Phase.String(),
+		Phase:                 closure.Phase.String(),
 		Closure:               closureBytes,
 		WorkflowID:            input.WorkflowID,
 		ExecutionCreatedAt:    &input.CreatedAt,

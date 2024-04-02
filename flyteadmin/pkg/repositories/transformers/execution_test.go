@@ -73,7 +73,7 @@ func TestCreateExecutionModel(t *testing.T) {
 		},
 	}
 	namespace := "ns"
-	t.Run("running", func(t *testing.T) {
+	t.Run("successful execution", func(t *testing.T) {
 		execution, err := CreateExecutionModel(CreateExecutionModelInput{
 			WorkflowExecutionID: core.WorkflowExecutionIdentifier{
 				Project: "project",
@@ -84,7 +84,6 @@ func TestCreateExecutionModel(t *testing.T) {
 			RequestSpec:           execRequest.Spec,
 			LaunchPlanID:          lpID,
 			WorkflowID:            wfID,
-			Phase:                 core.WorkflowExecution_RUNNING,
 			CreatedAt:             createdAt,
 			WorkflowIdentifier:    workflowIdentifier,
 			ParentNodeExecutionID: nodeID,
@@ -107,6 +106,7 @@ func TestCreateExecutionModel(t *testing.T) {
 		assert.Equal(t, nodeID, execution.ParentNodeExecutionID)
 		assert.Equal(t, sourceID, execution.SourceExecutionID)
 		assert.Equal(t, "launch_plan", execution.LaunchEntity)
+		assert.Equal(t, execution.Phase, core.WorkflowExecution_UNDEFINED.String())
 		expectedSpec := execRequest.Spec
 		expectedSpec.Metadata.Principal = principal
 		expectedSpec.Metadata.SystemMetadata = &admin.SystemMetadata{
@@ -120,9 +120,8 @@ func TestCreateExecutionModel(t *testing.T) {
 
 		expectedCreatedAt, _ := ptypes.TimestampProto(createdAt)
 		expectedClosure, _ := proto.Marshal(&admin.ExecutionClosure{
-			Phase:      core.WorkflowExecution_RUNNING,
+			Phase:      core.WorkflowExecution_UNDEFINED,
 			CreatedAt:  expectedCreatedAt,
-			StartedAt:  expectedCreatedAt,
 			UpdatedAt:  expectedCreatedAt,
 			WorkflowId: workflowIdentifier,
 			StateChangeDetails: &admin.ExecutionStateChangeDetails{
@@ -145,7 +144,6 @@ func TestCreateExecutionModel(t *testing.T) {
 			RequestSpec:           execRequest.Spec,
 			LaunchPlanID:          lpID,
 			WorkflowID:            wfID,
-			Phase:                 core.WorkflowExecution_RUNNING,
 			CreatedAt:             createdAt,
 			WorkflowIdentifier:    workflowIdentifier,
 			ParentNodeExecutionID: nodeID,
@@ -169,6 +167,7 @@ func TestCreateExecutionModel(t *testing.T) {
 		assert.Equal(t, nodeID, execution.ParentNodeExecutionID)
 		assert.Equal(t, sourceID, execution.SourceExecutionID)
 		assert.Equal(t, "launch_plan", execution.LaunchEntity)
+		assert.Equal(t, core.WorkflowExecution_FAILED.String(), execution.Phase)
 		expectedSpec := execRequest.Spec
 		expectedSpec.Metadata.Principal = principal
 		expectedSpec.Metadata.SystemMetadata = &admin.SystemMetadata{
@@ -191,7 +190,6 @@ func TestCreateExecutionModel(t *testing.T) {
 				},
 			},
 			CreatedAt:  expectedCreatedAt,
-			StartedAt:  expectedCreatedAt,
 			UpdatedAt:  expectedCreatedAt,
 			WorkflowId: workflowIdentifier,
 			StateChangeDetails: &admin.ExecutionStateChangeDetails{
@@ -214,7 +212,6 @@ func TestCreateExecutionModel(t *testing.T) {
 			RequestSpec:           execRequest.Spec,
 			LaunchPlanID:          lpID,
 			WorkflowID:            wfID,
-			Phase:                 core.WorkflowExecution_RUNNING,
 			CreatedAt:             createdAt,
 			WorkflowIdentifier:    workflowIdentifier,
 			ParentNodeExecutionID: nodeID,
@@ -238,6 +235,7 @@ func TestCreateExecutionModel(t *testing.T) {
 		assert.Equal(t, nodeID, execution.ParentNodeExecutionID)
 		assert.Equal(t, sourceID, execution.SourceExecutionID)
 		assert.Equal(t, "launch_plan", execution.LaunchEntity)
+		assert.Equal(t, core.WorkflowExecution_FAILED.String(), execution.Phase)
 		expectedSpec := execRequest.Spec
 		expectedSpec.Metadata.Principal = principal
 		expectedSpec.Metadata.SystemMetadata = &admin.SystemMetadata{
@@ -260,7 +258,6 @@ func TestCreateExecutionModel(t *testing.T) {
 				},
 			},
 			CreatedAt:  expectedCreatedAt,
-			StartedAt:  expectedCreatedAt,
 			UpdatedAt:  expectedCreatedAt,
 			WorkflowId: workflowIdentifier,
 			StateChangeDetails: &admin.ExecutionStateChangeDetails{
@@ -283,7 +280,6 @@ func TestCreateExecutionModel(t *testing.T) {
 			RequestSpec:           execRequest.Spec,
 			LaunchPlanID:          lpID,
 			WorkflowID:            wfID,
-			Phase:                 core.WorkflowExecution_RUNNING,
 			CreatedAt:             createdAt,
 			WorkflowIdentifier:    workflowIdentifier,
 			ParentNodeExecutionID: nodeID,
@@ -307,6 +303,7 @@ func TestCreateExecutionModel(t *testing.T) {
 		assert.Equal(t, nodeID, execution.ParentNodeExecutionID)
 		assert.Equal(t, sourceID, execution.SourceExecutionID)
 		assert.Equal(t, "launch_plan", execution.LaunchEntity)
+		assert.Equal(t, core.WorkflowExecution_FAILED.String(), execution.Phase)
 		expectedSpec := execRequest.Spec
 		expectedSpec.Metadata.Principal = principal
 		expectedSpec.Metadata.SystemMetadata = &admin.SystemMetadata{
@@ -329,7 +326,6 @@ func TestCreateExecutionModel(t *testing.T) {
 				},
 			},
 			CreatedAt:  expectedCreatedAt,
-			StartedAt:  expectedCreatedAt,
 			UpdatedAt:  expectedCreatedAt,
 			WorkflowId: workflowIdentifier,
 			StateChangeDetails: &admin.ExecutionStateChangeDetails{
