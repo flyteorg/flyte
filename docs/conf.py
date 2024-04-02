@@ -35,7 +35,7 @@ author = "Flyte"
 # The short X.Y version
 version = ""
 # The full version, including alpha/beta/rc tags
-release = "1.11.1-b0"
+release = "1.11.1-b1"
 
 # -- General configuration ---------------------------------------------------
 
@@ -187,6 +187,7 @@ html_theme_options = {
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
 html_css_files = ["custom.css", "flyte.css", "algolia.css"]
+html_js_files = ["custom.js"]
 
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.
