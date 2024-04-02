@@ -20,6 +20,7 @@ class FlytePropeller(object):
     def create_free_workers() -> Graph:
         return Graph(
             title="Free workers count",
+            description="The number of golang goroutines available to accept new work from the main workqueue. Each worker can process one item from the workqueue at a time.",
             dataSource=DATASOURCE,
             targets=[
                 Target(
@@ -37,6 +38,7 @@ class FlytePropeller(object):
     def round_latency_per_wf() -> Graph:
         return Graph(
             title=f"Round traverse latency per workflow",
+            description="Round latency by workflow name. When there are streaks within one round each iteration is measured separately.",
             dataSource=DATASOURCE,
             targets=[
                 Target(
@@ -52,6 +54,7 @@ class FlytePropeller(object):
     def round_latency() -> Graph:
         return Graph(
             title=f"Round Latency (includes streak rounds)",
+            description="Round latency breakdown. When there are streaks within one round each iteration is measured separately.",
             dataSource=DATASOURCE,
             targets=[
                 Target(
@@ -82,6 +85,7 @@ class FlytePropeller(object):
     def error_breakdown() -> Graph:
         return Graph(
             title="Error rate breakdown",
+            description="Error rates for each type of failure that may occur as propeller is traversing the workflow DAG.",
             dataSource=DATASOURCE,
             targets=[
                 Target(
@@ -104,6 +108,11 @@ class FlytePropeller(object):
                     refId="D",
                     legendFormat="abort",
                 ),
+                Target(
+                    expr="sum(rate(flyte:propeller:all:round:skipped[5m]))",
+                    refId="E",
+                    legendFormat="skipped",
+                ),
             ],
             yAxes=YAxes(
                 YAxis(format=OPS_FORMAT),
@@ -115,6 +124,7 @@ class FlytePropeller(object):
     def streak_rate() -> Graph:
         return Graph(
             title="Streak rate",
+            description="Streaks are when propeller iterates over the same workflow multiple times in a single round. This is an optimisation technique.",
             dataSource=DATASOURCE,
             targets=[
                 Target(
@@ -127,29 +137,12 @@ class FlytePropeller(object):
                 YAxis(format=SHORT_FORMAT),
             ),
         )
-
-    @staticmethod
-    def skipped_rounds() -> Graph:
-        return Graph(
-            title="Round skip rate",
-            dataSource=DATASOURCE,
-            targets=[
-                Target(
-                    expr="sum(rate(flyte:propeller:all:round:skipped[5m]))",
-                    refId="A",
-                ),
-            ],
-            yAxes=YAxes(
-                YAxis(format=OPS_FORMAT),
-                YAxis(format=SHORT_FORMAT),
-            ),
-        )
-
     
     @staticmethod
     def round_rates() -> Graph:
         return Graph(
             title="Round success/error rate",
+            description="Round success, error and total rates. Also includes total rate including streaks within a single round. The streak rate graph should match the difference between the totals with and without streaks.",
             dataSource=DATASOURCE,
             targets=[
                 Target(
@@ -170,7 +163,7 @@ class FlytePropeller(object):
                 Target(
                     expr="sum(rate(flyte:propeller:all:round:round_time_unlabeled_ms_count[5m]))",
                     refId="D",
-                    legendFormat="total-including-streak-rounds",
+                    legendFormat="total-including-streaks",
                 ),
             ],
             yAxes=YAxes(
@@ -183,6 +176,7 @@ class FlytePropeller(object):
     def workflows_per_project() -> Graph:
         return Graph(
             title=f"Running Workflows per project",
+            description="Count of currently running workflows running per project",
             dataSource=DATASOURCE,
             targets=[
                 Target(
@@ -200,6 +194,7 @@ class FlytePropeller(object):
     def enqueued_workflows() -> Graph:
         return Graph(
             title="Workflow enqueue rate",
+            description="Rate at which workflows are being enqueued by flytepropeller. These enqueues all pass through the sub-queue before going back into the main queue.",
             dataSource=DATASOURCE,
             targets=[
                 Target(
@@ -220,6 +215,7 @@ class FlytePropeller(object):
         """
         return Graph(
             title=f"Plugin Success/Failure rate",
+            description="Success vs failure rate for the various plugins used for each node e.g. k8s plugin or spark plugin.",
             dataSource=DATASOURCE,
             targets=[
                 Target(
@@ -415,6 +411,7 @@ class FlytePropeller(object):
     def admin_launcher_cache() -> Graph:
         return Graph(
             title="Admin Launcher cache hit/miss rate",
+            description="Cache hit rate when admin launcher is queried for the status of a workflow. Admin launcher will asynchnously update status of workflows in the cache.",
             dataSource=DATASOURCE,
             targets=[
                 Target(
@@ -712,64 +709,67 @@ class FlytePropeller(object):
             panels=[
                 Graph(
                     title="Add rate to queue",
+                    description="Rate at which items are actually added to the queue. If an item is already on the queue attempting to add it will be a no-op. Usually there is also rate limiting that will delay items from being added to the queue.",
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr="rate(flyte:propeller:all:main_adds[5m])",
+                            expr="sum(rate(flyte:propeller:all:main_adds[5m]))",
                             legendFormat="main",
                             refId="A",
                         ),
                         Target(
-                            expr="rate(flyte:propeller:all:sub_adds[5m])",
+                            expr="sum(rate(flyte:propeller:all:sub_adds[5m]))",
                             legendFormat="sub",
                             refId="B",
                         ),
                         Target(
-                            expr="rate(flyte:propeller:all:admin_launcher:_adds[5m])",
+                            expr="sum(rate(flyte:propeller:all:admin_launcher:_adds[5m]))",
                             legendFormat="admin_launcher",
                             refId="C",
                         ),
                     ],
-                    yAxes=single_y_axis(format=SHORT_FORMAT),
+                    yAxes=single_y_axis(format=OPS_FORMAT),
+                ),
+                Graph(
+                    title="Add rate before rate limiting and deduplication",
+                    dataSource=DATASOURCE,
+                    description="Tracks every rate limited add synchronously before rate limiting delays or deduplication",
+                    targets=[
+                        Target(
+                            expr="sum(rate(flyte:propeller:all:main_retries[5m]))",
+                            legendFormat="main",
+                            refId="A",
+                        ),
+                        Target(
+                            expr="sum(rate(flyte:propeller:all:sub_retries[5m]))",
+                            legendFormat="sub",
+                            refId="B",
+                        ),
+                        Target(
+                            expr="sum(rate(flyte:propeller:all:admin_launcher:_retries[5m]))",
+                            legendFormat="admin_launcher",
+                            refId="C",
+                        ),
+                    ],
+                    yAxes=single_y_axis(format=OPS_FORMAT),
                 ),
                 Graph(
                     title="Unprocessed Queue depth",
+                    description="The number of items that are currently in the queue but have not been processed yet.",
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr="flyte:propeller:all:main_depth",
+                            expr="sum(flyte:propeller:all:main_depth)",
                             legendFormat="main",
                             refId="A",
                         ),
                         Target(
-                            expr="flyte:propeller:all:sub_depth",
+                            expr="sum(flyte:propeller:all:sub_depth)",
                             legendFormat="sub",
                             refId="B",
                         ),
                         Target(
-                            expr="flyte:propeller:all:admin_launcher:_depth",
-                            legendFormat="admin_launcher",
-                            refId="C",
-                        ),
-                    ],
-                    yAxes=single_y_axis(format=SHORT_FORMAT),
-                ),
-                Graph(
-                    title="Item retries rate",
-                    dataSource=DATASOURCE,
-                    targets=[
-                        Target(
-                            expr="rate(flyte:propeller:all:main_retries[5m])",
-                            legendFormat="main",
-                            refId="A",
-                        ),
-                        Target(
-                            expr="rate(flyte:propeller:all:sub_retries[5m])",
-                            legendFormat="sub",
-                            refId="B",
-                        ),
-                        Target(
-                            expr="rate(flyte:propeller:all:admin_launcher:_retries[5m])",
+                            expr="sum(flyte:propeller:all:admin_launcher:_depth)",
                             legendFormat="admin_launcher",
                             refId="C",
                         ),
@@ -778,20 +778,21 @@ class FlytePropeller(object):
                 ),
                 Graph(
                     title="Seconds of unfinished work in progress",
+                    description="Sum of the current in progress time of every in progress item in the queue.",
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr="flyte:propeller:all:main_unfinished_work_s",
+                            expr="sum(flyte:propeller:all:main_unfinished_work_s)",
                             legendFormat="main",
                             refId="A",
                         ),
                         Target(
-                            expr="flyte:propeller:all:sub_unfinished_work_s",
+                            expr="sum(flyte:propeller:all:sub_unfinished_work_s)",
                             legendFormat="sub",
                             refId="B",
                         ),
                         Target(
-                            expr="flyte:propeller:all:admin_launcher:_unfinished_work_s",
+                            expr="sum(flyte:propeller:all:admin_launcher:_unfinished_work_s)",
                             legendFormat="admin_launcher",
                             refId="C",
                         ),
@@ -823,7 +824,6 @@ class FlytePropeller(object):
                 FlytePropeller.create_free_workers(),
                 FlytePropeller.round_rates(),
                 FlytePropeller.error_breakdown(),
-                FlytePropeller.skipped_rounds(),
                 FlytePropeller.streak_rate(),
                 FlytePropeller.plugin_success_vs_failures(),
                 FlytePropeller.round_latency(),
