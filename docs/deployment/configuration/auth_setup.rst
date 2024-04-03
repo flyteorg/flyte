@@ -617,14 +617,14 @@ Follow the steps in this section to configure `flyteadmin` to use an external au
       .. code-block:: yaml
 
          secrets:
-         adminOauthClientCredentials:
-            enabled: true
-            clientSecret: <client secret>
-            clientId: <client id>
+           adminOauthClientCredentials:
+             enabled: true
+             clientSecret: <client secret>
+             clientId: <client id>
          ---
          configmap:
-         admin:
-            admin:
+           admin:
+             admin:
                endpoint: <admin endpoint>
                insecure: true
                clientId: <client id>
@@ -633,28 +633,30 @@ Follow the steps in this section to configure `flyteadmin` to use an external au
                - api://<client id>/.default
                useAudienceFromAdmin: true
          ---
-         auth:
-            appAuth:
-               authServerType: External
-               externalAuthServer:
-                  baseUrl: https://login.microsoftonline.com/<tenant id>/v2.0/
-                  metadataUrl: .well-known/openid-configuration
-                  AllowedAudience:
-                     - api://<client id>
-               thirdPartyConfig:
-                  flyteClient:
+         configmap:
+           adminServer:
+             auth:
+               appAuth:
+                 authServerType: External
+                 externalAuthServer:
+                   baseUrl: https://login.microsoftonline.com/<tenant id>/v2.0/
+                   metadataUrl: .well-known/openid-configuration
+                   AllowedAudience:
+                   - api://<client id>
+                 thirdPartyConfig:
+                   flyteClient:
                      clientId: <client id>
                      redirectUri: http://localhost:53593/callback
                      scopes:
                      - api://<client id>/<custom-scope>
 
-            userAuth:
-               openId:
-                  baseUrl: https://login.microsoftonline.com/<tenant id>/v2.0
-                  scopes:
-                     - openid
-                     - profile
-                  clientId: <client id>
+               userAuth:
+                 openId:
+                 baseUrl: https://login.microsoftonline.com/<tenant id>/v2.0
+                 scopes:
+                 - openid
+                 - profile
+                 clientId: <client id>
 
 .. note::
 
