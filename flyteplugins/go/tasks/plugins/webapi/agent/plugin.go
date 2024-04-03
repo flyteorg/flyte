@@ -94,12 +94,14 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 	agent, isSync := getFinalAgent(&taskCategory, p.cfg, p.agentRegistry)
 
 	secrets := make([]*admin.Secret, 0)
-	for _, secret := range taskTemplate.SecurityContext.Secrets {
-		val, err := taskCtx.SecretManager().GetForSecret(ctx, secret)
-		if err != nil {
-			return nil, nil, err
+	if taskTemplate.SecurityContext != nil {
+		for _, secret := range taskTemplate.SecurityContext.Secrets {
+			val, err := taskCtx.SecretManager().GetForSecret(ctx, secret)
+			if err != nil {
+				return nil, nil, err
+			}
+			secrets = append(secrets, &admin.Secret{Value: val})
 		}
-		secrets = append(secrets, &admin.Secret{Value: val})
 	}
 
 	finalCtx, cancel := getFinalContext(ctx, "CreateTask", agent)
@@ -121,7 +123,13 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 	if err != nil {
 		return nil, nil, err
 	}
-	request := &admin.CreateTaskRequest{Inputs: inputs, Template: taskTemplate, OutputPrefix: outputPrefix, TaskExecutionMetadata: &taskExecutionMetadata, Secrets: secrets}
+	request := &admin.CreateTaskRequest{
+		Inputs:                inputs,
+		Template:              taskTemplate,
+		OutputPrefix:          outputPrefix,
+		TaskExecutionMetadata: &taskExecutionMetadata,
+		Secrets:               secrets,
+	}
 	res, err := client.CreateTask(finalCtx, request)
 	if err != nil {
 		return nil, nil, err
