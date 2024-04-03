@@ -558,42 +558,43 @@ Follow the steps in this section to configure `flyteadmin` to use an external au
       .. code-block:: yaml
 
          configmap:
-           auth:
-             appAuth:
+           adminServer:
+             auth:
+               appAuth:
 
-               authServerType: External
+                 authServerType: External
 
-               # 2. Optional: Set external auth server baseUrl if different from OpenId baseUrl.
-               externalAuthServer:
-               # baseUrl: https://<keycloak-url>/auth/realms/<keycloak-realm> # Uncomment for Keycloak and update with your installation host and realm name
-               # baseUrl: https://login.microsoftonline.com/<tenant-id>/oauth2/v2.0/authorize # Uncomment for Azure AD
-               # For Okta, use the Issuer URI of the custom auth server:
-                 baseUrl: https://dev-<org-id>.okta.com/oauth2/<auth-server-id>
+                 # 2. Optional: Set external auth server baseUrl if different from OpenId baseUrl.
+                 externalAuthServer:
+                 # baseUrl: https://<keycloak-url>/auth/realms/<keycloak-realm> # Uncomment for Keycloak and update with your installation host and realm name
+                 # baseUrl: https://login.microsoftonline.com/<tenant-id>/oauth2/v2.0/authorize # Uncomment for Azure AD
+                 # For Okta, use the Issuer URI of the custom auth server:
+                   baseUrl: https://dev-<org-id>.okta.com/oauth2/<auth-server-id>
 
-                 metadataUrl: .well-known/openid-configuration
+                   metadataUrl: .well-known/openid-configuration
 
-               thirdPartyConfig:
-                  flyteClient:
-                     # 3. Replace with a new Native/Public Client ID provisioned in the custom authorization server.
-                     clientId: flytectl
-                     # This should not change
-                     redirectUri: http://localhost:53593/callback
-                     # 4. "all" is a required scope and must be configured in the custom authorization server.
-                     scopes:
-                     - offline
-                     - all
+                 thirdPartyConfig:
+                    flyteClient:
+                       # 3. Replace with a new Native/Public Client ID provisioned in the custom authorization server.
+                       clientId: flytectl
+                       # This should not change
+                       redirectUri: http://localhost:53593/callback
+                       # 4. "all" is a required scope and must be configured in the custom authorization server.
+                       scopes:
+                       - offline
+                       - all
 
-             userAuth:
-               openId:
-               # baseUrl: https://<keycloak-url>/auth/realms/<keycloak-realm> # Uncomment for Keycloak and update with your installation host and realm name
-               # baseUrl: https://login.microsoftonline.com/<tenant-id>/oauth2/v2.0/authorize # Uncomment for Azure AD
-               # For Okta, use the Issuer URI of the custom auth server:
-                 baseUrl: https://dev-<org-id>.okta.com/oauth2/<auth-server-id>
-                 scopes:
-                 - profile
-                 - openid
-                 # - offline_access # Uncomment if OIdC supports issuing refresh tokens.
-                 clientId: <client id>
+               userAuth:
+                 openId:
+                 # baseUrl: https://<keycloak-url>/auth/realms/<keycloak-realm> # Uncomment for Keycloak and update with your installation host and realm name
+                 # baseUrl: https://login.microsoftonline.com/<tenant-id>/oauth2/v2.0/authorize # Uncomment for Azure AD
+                 # For Okta, use the Issuer URI of the custom auth server:
+                   baseUrl: https://dev-<org-id>.okta.com/oauth2/<auth-server-id>
+                   scopes:
+                   - profile
+                   - openid
+                   # - offline_access # Uncomment if OIdC supports issuing refresh tokens.
+                   clientId: <client id>
 
 
          secrets:
