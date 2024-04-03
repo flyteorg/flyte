@@ -347,6 +347,7 @@ func getFinalAgent(taskCategory *admin.TaskCategory, cfg *Config, agentRegistry 
 
 func buildTaskExecutionMetadata(taskExecutionMetadata core.TaskExecutionMetadata) admin.TaskExecutionMetadata {
 	taskExecutionID := taskExecutionMetadata.GetTaskExecutionID().GetID()
+
 	return admin.TaskExecutionMetadata{
 		TaskExecutionId:      &taskExecutionID,
 		Namespace:            taskExecutionMetadata.GetNamespace(),
@@ -354,6 +355,7 @@ func buildTaskExecutionMetadata(taskExecutionMetadata core.TaskExecutionMetadata
 		Annotations:          taskExecutionMetadata.GetAnnotations(),
 		K8SServiceAccount:    taskExecutionMetadata.GetK8sServiceAccount(),
 		EnvironmentVariables: taskExecutionMetadata.GetEnvironmentVariables(),
+		Identity:             taskExecutionMetadata.GetSecurityContext().RunAs,
 	}
 }
 
