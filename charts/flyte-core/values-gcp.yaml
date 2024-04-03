@@ -6,9 +6,9 @@ userSettings:
   dbHost: <CLOUD-SQL-IP>
   dbPassword: <DBPASSWORD>
 # These two storage buckets could be the same or you could specify different buckets if required. Both keys are required.
-# Learn more https://docs.flyte.org/en/latest/concepts/data_management.html#understand-how-flyte-handles-data 
-  bucketName: <METADATA_BUCKET_NAME> 
-  rawDataBucketName: <RAW_DATA_BUCKET_NAME> 
+# Learn more https://docs.flyte.org/en/latest/concepts/data_management.html#understand-how-flyte-handles-data
+  bucketName: <METADATA_BUCKET_NAME>
+  rawDataBucketName: <RAW_DATA_BUCKET_NAME>
   hostName: <HOSTNAME>
 
 #
@@ -35,7 +35,7 @@ flyteadmin:
       ephemeral-storage: 2Gi
       memory: 1G
   service:
-    annotations:
+    grpcAnnotations:
       # Required for the ingress to properly route grpc traffic to grpc port
       cloud.google.com/app-protocols: '{"grpc":"HTTP2"}'
   affinity:

@@ -1,95 +1,24 @@
 {{- define "grpcRoutes" -}}
-{{- $grpcPort := 81 -}}
-{{- if eq .Values.configmap.adminServer.server.security.secure true -}}
-  {{- $grpcPort = 80 -}}
-{{- end }}
 # NOTE: Port 81 in flyteadmin is the GRPC server port for FlyteAdmin.
-- path: /flyteidl.service.SignalService
+{{- $paths := (include "flyteadmin.ingress.grpcPaths" .) | fromYamlArray }}
+{{- range $path := $paths }}
+- path: {{ $path }}
+  {{- if semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion }}
   pathType: ImplementationSpecific
-  backend:
-    service:
-      name: flyteadmin
-      port:
-        number: {{ $grpcPort }}
-- path: /flyteidl.service.SignalService/*
-  pathType: ImplementationSpecific
-  backend:
-    service:
-      name: flyteadmin
-      port:
-        number: {{ $grpcPort }}
-- path: /flyteidl.service.AdminService
-  pathType: ImplementationSpecific
-  backend:
-    service:
-      name: flyteadmin
-      port:
-        number: {{ $grpcPort }}
-- path: /flyteidl.service.AdminService/*
-  pathType: ImplementationSpecific
-  backend:
-    service:
-      name: flyteadmin
-      port:
-        number: {{ $grpcPort }}
-- path: /flyteidl.service.DataProxyService
-  pathType: ImplementationSpecific
-  backend:
-    service:
-      name: flyteadmin
-      port:
-        number: {{ $grpcPort }}
-- path: /flyteidl.service.DataProxyService/*
-  pathType: ImplementationSpecific
-  backend:
-    service:
-      name: flyteadmin
-      port:
-        number: {{ $grpcPort }}
-- path: /flyteidl.service.AuthMetadataService
-  pathType: ImplementationSpecific
-  backend:
-    service:
-      name: flyteadmin
-      port:
-        number: {{ $grpcPort }}
-- path: /flyteidl.service.AuthMetadataService/*
-  pathType: ImplementationSpecific
-  backend:
-    service:
-      name: flyteadmin
-      port:
-        number: {{ $grpcPort }}
-- path: /flyteidl.service.IdentityService
-  pathType: ImplementationSpecific
-  backend:
-    service:
-      name: flyteadmin
-      port:
-        number: {{ $grpcPort }}
-- path: /flyteidl.service.IdentityService/*
-  pathType: ImplementationSpecific
-  backend:
-    service:
-      name: flyteadmin
-      port:
-        number: {{ $grpcPort }}
-- path: /grpc.health.v1.Health
-  pathType: ImplementationSpecific
-  backend:
-    service:
-      name: flyteadmin
-      port:
-        number: {{ $grpcPort }}
-- path: /grpc.health.v1.Health/*
-  pathType: ImplementationSpecific
-  backend:
-    service:
-      name: flyteadmin
-      port:
-        number: {{ $grpcPort }}
   {{- end }}
-  {{- if .Values.common.ingress.enabled }}
+  backend:
+    {{- if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion }}
+    service:
+      name: {{ include "flyteadmin.service.grpc.name" $ }}
+      port:
+        number: {{ include "flyteadmin.service.grpc.port" $ }}
+    {{- else }}
+    serviceName: {{ include "flyteadmin.service.grpc.name" $ }}
+    servicePort: {{ include "flyteadmin.service.grpc.port" $ }}
+    {{- end }}
+{{- end }}
+{{- end }}
+{{- if .Values.common.ingress.enabled }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:

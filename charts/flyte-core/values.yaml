@@ -50,8 +50,11 @@ flyteadmin:
     - flyteexamples
   # -- Service settings for Flyteadmin
   service:
-    annotations:
-      projectcontour.io/upstream-protocol.h2c: grpc
+    annotations: {}
+    httpAnnotations: {}
+    grpcAnnotations: {}
+      # projectcontour.io/upstream-protocol.h2c: grpc
+      # traefik.ingress.kubernetes.io/service.serversscheme: h2c
     type: ClusterIP
     loadBalancerSourceRanges: []
   # -- Configuration for service accounts for FlyteAdmin

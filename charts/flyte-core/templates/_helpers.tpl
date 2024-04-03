@@ -35,6 +35,45 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 {{- end -}}
 
+{{- define "flyteadmin.service.grpc.name" -}}
+{{- if .Values.common.ingress.separateGrpcIngress }}
+{{- printf "%s-grpc" ( include "flyteadmin.name" . ) -}}
+{{- else }}
+{{- template "flyteadmin.name" . -}}
+{{- end}}
+{{- end -}}
+
+{{- define "flyteadmin.service.grpc.port" -}}
+{{- if eq .Values.configmap.adminServer.server.security.secure true -}}
+80
+{{- else -}}
+81
+{{- end }}
+{{- end -}}
+
+{{- define "flyteadmin.service.http.port" -}}
+80
+{{- end -}}
+
+
+{{/*
+Get the Flyte service GRPC paths.
+*/}}
+{{- define "flyteadmin.ingress.grpcPaths" -}}
+- /flyteidl.service.AdminService
+- /flyteidl.service.AdminService/*
+- /flyteidl.service.AuthMetadataService
+- /flyteidl.service.AuthMetadataService/*
+- /flyteidl.service.DataProxyService
+- /flyteidl.service.DataProxyService/*
+- /flyteidl.service.IdentityService
+- /flyteidl.service.IdentityService/*
+- /flyteidl.service.SignalService
+- /flyteidl.service.SignalService/*
+- /grpc.health.v1.Health
+- /grpc.health.v1.Health/*
+{{- end -}}
+
 {{- define "flytescheduler.name" -}}
 flytescheduler
 {{- end -}}

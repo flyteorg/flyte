@@ -52,7 +52,7 @@ flyteadmin:
     - flyteexamples
   # -- Service settings for Flyteadmin
   service:
-    annotations:
+    grpcAnnotations:
       projectcontour.io/upstream-protocol.h2c: grpc
     type: ClusterIP
     loadBalancerSourceRanges: []

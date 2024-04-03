@@ -1,17 +1,17 @@
-{{- if .Values.flyteadmin.enabled }}
+{{- if and .Values.flyteadmin.enabled .Values.common.ingress.separateGrpcIngress }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "flyteadmin.name" . }}
+  name: {{ include "flyteadmin.service.grpc.name" .}}
   namespace: {{ template "flyte.namespace" . }}
   labels: {{ include "flyteadmin.labels" . | nindent 4 }}
-  {{- if or .Values.flyteadmin.service.annotations .Values.flyteadmin.service.httpAnnotations }}
+  {{- if or .Values.flyteadmin.service.annotations .Values.flyteadmin.service.grpcAnnotations }}
   annotations:
     {{- if .Values.flyteadmin.service.annotations }}
     {{- tpl ( .Values.flyteadmin.service.annotations | toYaml ) . | nindent 4 }}
     {{- end }}
-    {{- if .Values.flyteadmin.service.httpAnnotations }}
-    {{- tpl ( .Values.flyteadmin.service.httpAnnotations | toYaml ) . | nindent 4 }}
+    {{- if .Values.flyteadmin.service.grpcAnnotations }}
+    {{- tpl ( .Values.flyteadmin.service.grpcAnnotations | toYaml ) . | nindent 4 }}
     {{- end }}
   {{- end }}
 spec:
@@ -23,21 +23,9 @@ spec:
     {{ . }}
   {{- end }}
   ports:
-    - name: http
-      port: {{ include "flyteadmin.service.http.port" . }}
-      protocol: TCP
-      targetPort: http
-    - name: redoc
-      protocol: TCP
-      port: 87
-      targetPort: 8087
-    - name: http-metrics
-      protocol: TCP
-      port: 10254
-    {{- if not .Values.common.ingress.separateGrpcIngress }}
     - name: grpc
       port: {{ include "flyteadmin.service.grpc.port" . }}
+      protocol: TCP
       targetPort: grpc
-    {{- end }}
   selector: {{ include "flyteadmin.selectorLabels" . | nindent 4 }}
 {{- end }}

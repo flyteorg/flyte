@@ -151,9 +151,12 @@ spec:
         imagePullPolicy: "{{ .Values.flyteadmin.image.pullPolicy }}"
         name: flyteadmin
         ports:
-        - containerPort: {{ .Values.configmap.adminServer.server.httpPort }}
-        - containerPort: {{ .Values.configmap.adminServer.server.grpc.port }}
-        - containerPort: {{ .Values.configmap.adminServer.flyteadmin.profilerPort }}
+        - name: http
+          containerPort: {{ .Values.configmap.adminServer.server.httpPort }}
+        - name: grpc
+          containerPort: {{ .Values.configmap.adminServer.server.grpc.port }}
+        - name: profiler
+          containerPort: {{ .Values.configmap.adminServer.flyteadmin.profilerPort }}
         readinessProbe:
           exec:
             command: [ "sh", "-c", "reply=$(curl -s -o /dev/null -w %{http_code} http://127.0.0.1:8088/healthcheck); if [ \"$reply\" -lt 200 -o \"$reply\" -ge 400 ]; then exit 1; fi;","grpc_health_probe", "-addr=:8089"]

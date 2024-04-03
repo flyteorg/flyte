@@ -3,7 +3,7 @@ flyteadmin:
   serviceMonitor:
     enabled: false
   service:
-    annotations:
+    grpcAnnotations:
       projectcontour.io/upstream-protocol.h2c: grpc
     type: ClusterIP
     loadBalancerSourceRanges: []
