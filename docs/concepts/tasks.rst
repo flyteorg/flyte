@@ -71,6 +71,8 @@ types in the system. Flyte has a set of defined, battle-tested task types. It al
 Inherent Features
 -----------------
 
+.. _fault-tolerance:
+
 Fault tolerance
 ^^^^^^^^^^^^^^^
 

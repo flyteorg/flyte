@@ -9155,6 +9155,9 @@ export namespace flyteidl {
 
             /** TaskExecutionMetadata overrides */
             overrides?: (flyteidl.core.ITaskNodeOverrides|null);
+
+            /** TaskExecutionMetadata identity */
+            identity?: (flyteidl.core.IIdentity|null);
         }
 
         /** Represents a TaskExecutionMetadata. */
@@ -9195,6 +9198,9 @@ export namespace flyteidl {
 
             /** TaskExecutionMetadata overrides. */
             public overrides?: (flyteidl.core.ITaskNodeOverrides|null);
+
+            /** TaskExecutionMetadata identity. */
+            public identity?: (flyteidl.core.IIdentity|null);
 
             /**
              * Creates a new TaskExecutionMetadata instance using the specified properties.
@@ -17823,6 +17829,9 @@ export namespace flyteidl {
 
             /** ProjectGetRequest id */
             id?: (string|null);
+
+            /** ProjectGetRequest org */
+            org?: (string|null);
         }
 
         /** Represents a ProjectGetRequest. */
@@ -17836,6 +17845,9 @@ export namespace flyteidl {
 
             /** ProjectGetRequest id. */
             public id: string;
+
+            /** ProjectGetRequest org. */
+            public org: string;
 
             /**
              * Creates a new ProjectGetRequest instance using the specified properties.

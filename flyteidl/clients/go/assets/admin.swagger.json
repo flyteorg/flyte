@@ -2745,6 +2745,13 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [

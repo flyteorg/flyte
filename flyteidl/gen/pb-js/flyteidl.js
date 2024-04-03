@@ -22387,6 +22387,7 @@
                  * @property {boolean|null} [interruptible] TaskExecutionMetadata interruptible
                  * @property {number|null} [interruptibleFailureThreshold] TaskExecutionMetadata interruptibleFailureThreshold
                  * @property {flyteidl.core.ITaskNodeOverrides|null} [overrides] TaskExecutionMetadata overrides
+                 * @property {flyteidl.core.IIdentity|null} [identity] TaskExecutionMetadata identity
                  */
     
                 /**
@@ -22488,6 +22489,14 @@
                 TaskExecutionMetadata.prototype.overrides = null;
     
                 /**
+                 * TaskExecutionMetadata identity.
+                 * @member {flyteidl.core.IIdentity|null|undefined} identity
+                 * @memberof flyteidl.admin.TaskExecutionMetadata
+                 * @instance
+                 */
+                TaskExecutionMetadata.prototype.identity = null;
+    
+                /**
                  * Creates a new TaskExecutionMetadata instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.TaskExecutionMetadata
@@ -22534,6 +22543,8 @@
                         writer.uint32(/* id 9, wireType 0 =*/72).int32(message.interruptibleFailureThreshold);
                     if (message.overrides != null && message.hasOwnProperty("overrides"))
                         $root.flyteidl.core.TaskNodeOverrides.encode(message.overrides, writer.uint32(/* id 10, wireType 2 =*/82).fork()).ldelim();
+                    if (message.identity != null && message.hasOwnProperty("identity"))
+                        $root.flyteidl.core.Identity.encode(message.identity, writer.uint32(/* id 11, wireType 2 =*/90).fork()).ldelim();
                     return writer;
                 };
     
@@ -22599,6 +22610,9 @@
                             break;
                         case 10:
                             message.overrides = $root.flyteidl.core.TaskNodeOverrides.decode(reader, reader.uint32());
+                            break;
+                        case 11:
+                            message.identity = $root.flyteidl.core.Identity.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -22667,6 +22681,11 @@
                         var error = $root.flyteidl.core.TaskNodeOverrides.verify(message.overrides);
                         if (error)
                             return "overrides." + error;
+                    }
+                    if (message.identity != null && message.hasOwnProperty("identity")) {
+                        var error = $root.flyteidl.core.Identity.verify(message.identity);
+                        if (error)
+                            return "identity." + error;
                     }
                     return null;
                 };
@@ -43038,6 +43057,7 @@
                  * @memberof flyteidl.admin
                  * @interface IProjectGetRequest
                  * @property {string|null} [id] ProjectGetRequest id
+                 * @property {string|null} [org] ProjectGetRequest org
                  */
     
                 /**
@@ -43062,6 +43082,14 @@
                  * @instance
                  */
                 ProjectGetRequest.prototype.id = "";
+    
+                /**
+                 * ProjectGetRequest org.
+                 * @member {string} org
+                 * @memberof flyteidl.admin.ProjectGetRequest
+                 * @instance
+                 */
+                ProjectGetRequest.prototype.org = "";
     
                 /**
                  * Creates a new ProjectGetRequest instance using the specified properties.
@@ -43089,6 +43117,8 @@
                         writer = $Writer.create();
                     if (message.id != null && message.hasOwnProperty("id"))
                         writer.uint32(/* id 1, wireType 2 =*/10).string(message.id);
+                    if (message.org != null && message.hasOwnProperty("org"))
+                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.org);
                     return writer;
                 };
     
@@ -43113,6 +43143,9 @@
                         case 1:
                             message.id = reader.string();
                             break;
+                        case 2:
+                            message.org = reader.string();
+                            break;
                         default:
                             reader.skipType(tag & 7);
                             break;
@@ -43135,6 +43168,9 @@
                     if (message.id != null && message.hasOwnProperty("id"))
                         if (!$util.isString(message.id))
                             return "id: string expected";
+                    if (message.org != null && message.hasOwnProperty("org"))
+                        if (!$util.isString(message.org))
+                            return "org: string expected";
                     return null;
                 };
     
