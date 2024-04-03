@@ -230,7 +230,6 @@ func (p *Propeller) Handle(ctx context.Context, namespace, name string) error {
 	}
 
 	streak := 0
-	defer p.metrics.StreakLength.Add(ctx, float64(streak))
 
 	maxLength := p.cfg.MaxStreakLength
 	if maxLength <= 0 {
@@ -239,16 +238,15 @@ func (p *Propeller) Handle(ctx context.Context, namespace, name string) error {
 
 	for streak = 0; streak < maxLength; streak++ {
 		w, err = p.streak(ctx, w, wfClosureCrdFields)
-		if err != nil {
-			return err
-		} else if w == nil {
+		if err != nil || w == nil {
 			break
 		}
 
 		logger.Infof(ctx, "FastFollow Enabled. Detected State change, we will try another round. StreakLength [%d]", streak)
 	}
 	logger.Infof(ctx, "Streak ended at [%d]/Max: [%d]", streak, maxLength)
-	return nil
+	p.metrics.StreakLength.Add(ctx, float64(streak))
+	return err
 }
 
 // parseWorkflowClosureCrdFields attempts to retrieve offloaded static workflow closure data from the specified
