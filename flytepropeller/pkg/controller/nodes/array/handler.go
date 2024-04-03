@@ -271,6 +271,10 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 
 		nodeExecutionRequests := make([]*nodeExecutionRequest, 0, availableParallelism)
 		for i, nodePhaseUint64 := range arrayNodeState.SubNodePhases.GetItems() {
+			if availableParallelism == 0 {
+				break
+			}
+
 			nodePhase := v1alpha1.NodePhase(nodePhaseUint64)
 			taskPhase := int(arrayNodeState.SubNodeTaskPhases.GetItem(i))
 
@@ -315,9 +319,6 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 				nCtx.ExecutionContext().IncrementParallelism()
 			}
 			availableParallelism--
-			if availableParallelism == 0 {
-				break
-			}
 		}
 
 		workerErrorCollector := errorcollector.NewErrorMessageCollector()
