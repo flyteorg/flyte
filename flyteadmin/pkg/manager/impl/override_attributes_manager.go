@@ -18,6 +18,7 @@ type OverrideAttributesManager struct {
 	db            repositoryInterfaces.Repository
 	config        runtimeInterfaces.Configuration
 	storageClient *storage.DataStore
+	cache         *admin.Document
 }
 
 func (m *OverrideAttributesManager) GetOverrideAttributes(
@@ -29,16 +30,33 @@ func (m *OverrideAttributesManager) GetOverrideAttributes(
 	}
 
 	// Get the active override attributes
-	overrideAttributes, err := m.db.OverrideAttributesRepo().GetActive(ctx)
+	activeOverrideAttributes, err := m.db.OverrideAttributesRepo().GetActive(ctx)
 	if err != nil {
 		return nil, err
 	}
 
+	// If the cache is not nil and the version of the cache is the same as the active override attributes, return the cache
+	if m.cache != nil && m.cache.GetVersion() == activeOverrideAttributes.Version {
+		return &admin.OverrideAttributesGetResponse{
+			Id: &admin.ProjectID{
+				Project: request.GetId().GetProject(),
+				Domain:  request.GetId().GetDomain(),
+			},
+			Version:                 m.cache.GetVersion(),
+			GlobalAttributes:        getAttributeOfDocument(m.cache, "", ""),
+			ProjectAttributes:       getAttributeOfDocument(m.cache, request.Id.Project, ""),
+			ProjectDomainAttributes: getAttributeOfDocument(m.cache, request.Id.Project, request.Id.Domain),
+		}, nil
+	}
+
 	// TODO: Handle the case where the document location is empty
 	document := &admin.Document{}
-	if err := m.storageClient.ReadProtobuf(ctx, overrideAttributes.DocumentLocation, document); err != nil {
+	if err := m.storageClient.ReadProtobuf(ctx, activeOverrideAttributes.DocumentLocation, document); err != nil {
 		return nil, err
 	}
+
+	// Cache the document
+	m.cache = document
 
 	// Return the override attributes of different scopes
 	return &admin.OverrideAttributesGetResponse{
@@ -67,7 +85,6 @@ func (m *OverrideAttributesManager) UpdateOverrideAttributes(
 	overrideAttributes, err := m.db.OverrideAttributesRepo().GetActive(ctx)
 	if err != nil {
 		return nil, err
-
 	}
 
 	// TODO: Handle the case where the document location is empty
@@ -147,5 +164,6 @@ func NewOverrideAttributesManager(db repositoryInterfaces.Repository, config run
 		db:            db,
 		config:        config,
 		storageClient: storageClient,
+		cache:         nil,
 	}
 }
