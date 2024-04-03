@@ -2,6 +2,7 @@ package gormimpl
 
 import (
 	"context"
+	"errors"
 	adminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
@@ -23,7 +24,9 @@ func (r *OverrideAttributesRepo) GetActive(ctx context.Context) (models.Override
 	}).First(&overrideAttributes)
 	timer.Stop()
 	// TODO: what if the table is empty?
-	if tx.Error != nil {
+	if tx.Error != nil && errors.Is(tx.Error, gorm.ErrRecordNotFound) {
+		return models.OverrideAttributes{}, adminErrors.GetSingletonMissingEntityError("active override attributes")
+	} else if tx.Error != nil {
 		return models.OverrideAttributes{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
 	}
 	return overrideAttributes, nil

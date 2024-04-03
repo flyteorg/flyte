@@ -1220,6 +1220,24 @@ var ContinuedMigrations = []*gormigrate.Migration{
 			return tx.Table("launch_plans").Migrator().DropColumn(&models.LaunchPlan{}, "launch_condition_type")
 		},
 	},
+	{
+		ID: "pg-continue-2024-04-override-attributes",
+		Migrate: func(tx *gorm.DB) error {
+			type OverrideAttributes struct {
+				ID               uint       `gorm:"index;autoIncrement;not null"`
+				CreatedAt        time.Time  `gorm:"type:time"`
+				UpdatedAt        time.Time  `gorm:"type:time"`
+				DeletedAt        *time.Time `gorm:"index"`
+				Version          string     `gorm:"primary_key" valid:"length(0|255)"`
+				DocumentLocation storage.DataReference
+				Active           bool `gorm:"index:idx_override_attributes_active"`
+			}
+			return tx.AutoMigrate(&OverrideAttributes{})
+		},
+		Rollback: func(tx *gorm.DB) error {
+			return tx.Migrator().DropTable(&models.OverrideAttributes{})
+		},
+	},
 }
 
 var m = append(LegacyMigrations, NoopMigrations...)

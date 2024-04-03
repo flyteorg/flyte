@@ -2,7 +2,6 @@ package common
 
 import (
 	"context"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"time"
 
 	errrs "github.com/pkg/errors"
@@ -12,6 +11,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/shared"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )

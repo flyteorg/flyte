@@ -135,13 +135,19 @@ func ValidateListAllMatchableAttributesRequest(request admin.ListMatchableAttrib
 }
 
 func ValidateOverrideAttributesGetRequest(request admin.OverrideAttributesGetRequest) error {
-	if err := ValidateEmptyStringField(request.Id.Project, shared.Project); err != nil {
-		return err
+	if request.Id == nil {
+		return shared.GetMissingArgumentError(shared.ID)
 	}
-	return ValidateEmptyStringField(request.Id.Domain, shared.Domain)
+	// project and domain can be empty strings
+	return nil
 }
 
 func ValidateOverrideAttributesUpdateRequest(request admin.OverrideAttributesUpdateRequest) error {
-	// TODO
+	if request.Id == nil {
+		return shared.GetMissingArgumentError(shared.ID)
+	}
+	if request.Attributes == nil {
+		return shared.GetMissingArgumentError(shared.Attributes)
+	}
 	return nil
 }

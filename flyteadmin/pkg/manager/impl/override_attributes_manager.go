@@ -2,6 +2,7 @@ package impl
 
 import (
 	"context"
+	"crypto/rand"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/validation"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
@@ -10,7 +11,7 @@ import (
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
-	"time"
+	"math/big"
 )
 
 type OverrideAttributesManager struct {
@@ -32,6 +33,8 @@ func (m *OverrideAttributesManager) GetOverrideAttributes(
 	if err != nil {
 		return nil, err
 	}
+
+	// TODO: Handle the case where the document location is empty
 	document := &admin.Document{}
 	if err := m.storageClient.ReadProtobuf(ctx, overrideAttributes.DocumentLocation, document); err != nil {
 		return nil, err
@@ -39,15 +42,22 @@ func (m *OverrideAttributesManager) GetOverrideAttributes(
 
 	// Return the override attributes of different scopes
 	return &admin.OverrideAttributesGetResponse{
-		GlobalAttributes:        getAttributeOfDocument(document, request.Id.Org, "", ""),
-		ProjectAttributes:       getAttributeOfDocument(document, request.Id.Org, request.Id.Project, ""),
-		ProjectDomainAttributes: getAttributeOfDocument(document, request.Id.Org, request.Id.Project, request.Id.Domain),
+		Id: &admin.ProjectID{
+			Project: request.GetId().GetProject(),
+			Domain:  request.GetId().GetDomain(),
+		},
+		Version:                 document.GetVersion(),
+		GlobalAttributes:        getAttributeOfDocument(document, "", ""),
+		ProjectAttributes:       getAttributeOfDocument(document, request.Id.Project, ""),
+		ProjectDomainAttributes: getAttributeOfDocument(document, request.Id.Project, request.Id.Domain),
 	}, nil
 }
 
 func (m *OverrideAttributesManager) UpdateOverrideAttributes(
 	ctx context.Context, request admin.OverrideAttributesUpdateRequest) (
 	*admin.OverrideAttributesUpdateResponse, error) {
+	// TODO: These should be done in a transaction
+
 	// Validate the request
 	if err := validation.ValidateOverrideAttributesUpdateRequest(request); err != nil {
 		return nil, err
@@ -59,18 +69,29 @@ func (m *OverrideAttributesManager) UpdateOverrideAttributes(
 		return nil, err
 
 	}
+
+	// TODO: Handle the case where the document location is empty
 	document := &admin.Document{}
 	if err := m.storageClient.ReadProtobuf(ctx, overrideAttributes.DocumentLocation, document); err != nil {
 		return nil, err
 	}
 
 	// Update the document with the new attributes
-	updateAttributeOfDocument(document, request.Id.Org, request.Id.Project, request.Id.Domain, request.Attributes)
+	updateAttributeOfDocument(document, request.Id.Project, request.Id.Domain, request.Attributes)
+
+	// Generate a new version for the document
+	generatedVersion, err := GenerateRandomString(10)
+	if err != nil {
+		return nil, err
+	}
+	document.Version = generatedVersion
 
 	// Offload the updated document
-	updatedDocumentLocation, err := common.OffloadOverrideAttributesDocument(ctx, m.storageClient, document)
+	updatedDocumentLocation, err := common.OffloadOverrideAttributesDocument(ctx, m.storageClient, document, generatedVersion)
+
 	createOverrideAttributesInput := models.OverrideAttributes{
-		Version:          time.Now(),
+		// random generate a string as version
+		Version:          generatedVersion,
 		Active:           true,
 		DocumentLocation: updatedDocumentLocation,
 	}
@@ -85,25 +106,40 @@ func (m *OverrideAttributesManager) UpdateOverrideAttributes(
 	return &admin.OverrideAttributesUpdateResponse{}, nil
 }
 
-// This function is used to get the attributes of a document based on the org, project, and domain.
-func getAttributeOfDocument(document *admin.Document, org, project, domain string) *admin.Attributes {
-	documentKey := encodeDocumentKey(org, project, domain, "", "")
+// TODO: Check if this function is implemented already
+func GenerateRandomString(length int) (string, error) {
+	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	var result string
+	charsetLength := big.NewInt(int64(len(charset)))
+	for i := 0; i < length; i++ {
+		randomNumber, err := rand.Int(rand.Reader, charsetLength)
+		if err != nil {
+			return "", err // Return the error if there was a problem generating the random number.
+		}
+		result += string(charset[randomNumber.Int64()])
+	}
+	return result, nil
+}
+
+// This function is used to get the attributes of a document based on the project, and domain.
+func getAttributeOfDocument(document *admin.Document, project, domain string) *admin.Attributes {
+	documentKey := encodeDocumentKey(project, domain, "")
 	if attributes, ok := document.AttributesMap[documentKey]; ok {
 		return attributes
 	}
 	return nil
 }
 
-// This function is used to update the attributes of a document based on the org, project, and domain.
-func updateAttributeOfDocument(document *admin.Document, org, project, domain string, attributes *admin.Attributes) {
-	documentKey := encodeDocumentKey(org, project, domain, "", "")
+// This function is used to update the attributes of a document based on the project, and domain.
+func updateAttributeOfDocument(document *admin.Document, project, domain string, attributes *admin.Attributes) {
+	documentKey := encodeDocumentKey(project, domain, "")
 	document.AttributesMap[documentKey] = attributes
 }
 
 // This function is used to encode the document key based on the org, project, domain, workflow, and launch plan.
-func encodeDocumentKey(org, project, domain, workflow, launch_plan string) string {
+func encodeDocumentKey(project, domain, workflow string) string {
 	// TODO: This is a temporary solution to encode the document key. We need to come up with a better solution.
-	return org + "/" + project + "/" + domain + "/" + workflow + "/" + launch_plan
+	return project + "/" + domain + "/" + workflow
 }
 
 func NewOverrideAttributesManager(db repositoryInterfaces.Repository, config runtimeInterfaces.Configuration, storageClient *storage.DataStore) interfaces.OverrideAttributesInterface {
