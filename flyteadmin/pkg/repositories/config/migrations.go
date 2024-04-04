@@ -1221,21 +1221,21 @@ var ContinuedMigrations = []*gormigrate.Migration{
 		},
 	},
 	{
-		ID: "pg-continue-2024-04-override-attributes",
+		ID: "pg-continue-2024-04-configuration",
 		Migrate: func(tx *gorm.DB) error {
-			type OverrideAttributes struct {
+			type Configuration struct {
 				ID               uint       `gorm:"index;autoIncrement;not null"`
 				CreatedAt        time.Time  `gorm:"type:time"`
 				UpdatedAt        time.Time  `gorm:"type:time"`
 				DeletedAt        *time.Time `gorm:"index"`
 				Version          string     `gorm:"primary_key" valid:"length(0|255)"`
 				DocumentLocation storage.DataReference
-				Active           bool `gorm:"index:idx_override_attributes_active"`
+				Active           bool `gorm:"index:idx_configuration_active"`
 			}
-			return tx.AutoMigrate(&OverrideAttributes{})
+			return tx.AutoMigrate(&Configuration{})
 		},
 		Rollback: func(tx *gorm.DB) error {
-			return tx.Migrator().DropTable(&models.OverrideAttributes{})
+			return tx.Migrator().DropTable(&models.Configuration{})
 		},
 	},
 }

@@ -45,16 +45,16 @@ func OffloadLiteralMapWithRetryDelayAndAttempts(ctx context.Context, storageClie
 	return uri, nil
 }
 
-func OffloadOverrideAttributesDocument(ctx context.Context, storageClient *storage.DataStore, document *admin.Document, nestedKeys ...string) (storage.DataReference, error) {
-	return OffloadOverrideAttributesDocumentWithRetryDelayAndAttempts(ctx, storageClient, document, async.RetryDelay, 5, nestedKeys...)
+func OffloadConfigurationDocument(ctx context.Context, storageClient *storage.DataStore, document *admin.ConfigurationDocument, nestedKeys ...string) (storage.DataReference, error) {
+	return OffloadConfigurationDocumentWithRetryDelayAndAttempts(ctx, storageClient, document, async.RetryDelay, 5, nestedKeys...)
 }
 
-func OffloadOverrideAttributesDocumentWithRetryDelayAndAttempts(ctx context.Context, storageClient *storage.DataStore, document *admin.Document, retryDelay time.Duration, attempts int, nestedKeys ...string) (storage.DataReference, error) {
+func OffloadConfigurationDocumentWithRetryDelayAndAttempts(ctx context.Context, storageClient *storage.DataStore, document *admin.ConfigurationDocument, retryDelay time.Duration, attempts int, nestedKeys ...string) (storage.DataReference, error) {
 	if document == nil {
-		document = &admin.Document{}
+		document = &admin.ConfigurationDocument{}
 	}
 	nestedKeyReference := []string{
-		shared.OverrideAttributesDocument,
+		shared.Configuration,
 	}
 	nestedKeyReference = append(nestedKeyReference, nestedKeys...)
 	uri, err := storageClient.ConstructReference(ctx, storageClient.GetBaseContainerFQN(ctx), nestedKeyReference...)

@@ -6,7 +6,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
-type OverrideAttributesInterface interface {
-	GetOverrideAttributes(ctx context.Context, request admin.OverrideAttributesGetRequest) (*admin.OverrideAttributesGetResponse, error)
-	UpdateOverrideAttributes(ctx context.Context, request admin.OverrideAttributesUpdateRequest) (*admin.OverrideAttributesUpdateResponse, error)
+type ConfigurationInterface interface {
+	GetConfiguration(ctx context.Context, request admin.ConfigurationGetRequest) (*admin.ConfigurationGetResponse, error)
+	UpdateConfiguration(ctx context.Context, request admin.ConfigurationUpdateRequest) (*admin.ConfigurationUpdateResponse, error)
 }

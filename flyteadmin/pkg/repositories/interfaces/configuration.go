@@ -8,5 +8,5 @@ import (
 
 type ConfigurationInterface interface {
 	GetActive(ctx context.Context) (models.Configuration, error)
-	EraseActiveAndCreate(ctx context.Context, activeVersion string, input models.Configuration) error
+	EraseActiveAndCreate(ctx context.Context, versionToUpdate string, newConfiguration models.Configuration) error
 }

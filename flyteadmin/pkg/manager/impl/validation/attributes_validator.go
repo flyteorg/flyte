@@ -134,20 +134,31 @@ func ValidateListAllMatchableAttributesRequest(request admin.ListMatchableAttrib
 	return nil
 }
 
-func ValidateOverrideAttributesGetRequest(request admin.OverrideAttributesGetRequest) error {
+func ValidateConfigurationGetRequest(request admin.ConfigurationGetRequest) error {
 	if request.Id == nil {
 		return shared.GetMissingArgumentError(shared.ID)
 	}
-	// project and domain can be empty strings
-	return nil
+	if err := ValidateEmptyStringField(request.Id.Project, shared.Project); err != nil {
+		return err
+	}
+	return ValidateEmptyStringField(request.Id.Domain, shared.Domain)
 }
 
-func ValidateOverrideAttributesUpdateRequest(request admin.OverrideAttributesUpdateRequest) error {
+func ValidateConfigurationUpdateRequest(request admin.ConfigurationUpdateRequest) error {
 	if request.Id == nil {
 		return shared.GetMissingArgumentError(shared.ID)
 	}
-	if request.Attributes == nil {
-		return shared.GetMissingArgumentError(shared.Attributes)
+	if err := ValidateEmptyStringField(request.Id.Project, shared.Project); err != nil {
+		return err
+	}
+	if err := ValidateEmptyStringField(request.Id.Domain, shared.Domain); err != nil {
+		return err
+	}
+	if err := ValidateEmptyStringField(request.Id.Domain, shared.Version); err != nil {
+		return err
+	}
+	if request.Configuration == nil {
+		return shared.GetMissingArgumentError(shared.Configuration)
 	}
 	return nil
 }

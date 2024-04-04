@@ -14,44 +14,44 @@ import (
 	"math/big"
 )
 
-type OverrideAttributesManager struct {
+type ConfigurationManager struct {
 	db            repositoryInterfaces.Repository
 	config        runtimeInterfaces.Configuration
 	storageClient *storage.DataStore
-	cache         *admin.Document
+	cache         *admin.ConfigurationDocument
 }
 
-func (m *OverrideAttributesManager) GetOverrideAttributes(
-	ctx context.Context, request admin.OverrideAttributesGetRequest) (
-	*admin.OverrideAttributesGetResponse, error) {
+func (m *ConfigurationManager) GetConfiguration(
+	ctx context.Context, request admin.ConfigurationGetRequest) (
+	*admin.ConfigurationGetResponse, error) {
 	// Validate the request
-	if err := validation.ValidateOverrideAttributesGetRequest(request); err != nil {
+	if err := validation.ValidateConfigurationGetRequest(request); err != nil {
 		return nil, err
 	}
 
 	// Get the active override attributes
-	activeOverrideAttributes, err := m.db.OverrideAttributesRepo().GetActive(ctx)
+	activeConfiguration, err := m.db.ConfigurationRepo().GetActive(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	// If the cache is not nil and the version of the cache is the same as the active override attributes, return the cache
-	if m.cache != nil && m.cache.GetVersion() == activeOverrideAttributes.Version {
-		return &admin.OverrideAttributesGetResponse{
+	if m.cache != nil && m.cache.GetVersion() == activeConfiguration.Version {
+		return &admin.ConfigurationGetResponse{
 			Id: &admin.ProjectID{
 				Project: request.GetId().GetProject(),
 				Domain:  request.GetId().GetDomain(),
 			},
-			Version:                 m.cache.GetVersion(),
-			GlobalAttributes:        getAttributeOfDocument(m.cache, "", ""),
-			ProjectAttributes:       getAttributeOfDocument(m.cache, request.Id.Project, ""),
-			ProjectDomainAttributes: getAttributeOfDocument(m.cache, request.Id.Project, request.Id.Domain),
+			Version:                    m.cache.GetVersion(),
+			GlobalConfiguration:        getConfigurationFromDocument(m.cache, "", ""),
+			ProjectConfiguration:       getConfigurationFromDocument(m.cache, request.Id.Project, ""),
+			ProjectDomainConfiguration: getConfigurationFromDocument(m.cache, request.Id.Project, request.Id.Domain),
 		}, nil
 	}
 
 	// TODO: Handle the case where the document location is empty
-	document := &admin.Document{}
-	if err := m.storageClient.ReadProtobuf(ctx, activeOverrideAttributes.DocumentLocation, document); err != nil {
+	document := &admin.ConfigurationDocument{}
+	if err := m.storageClient.ReadProtobuf(ctx, activeConfiguration.DocumentLocation, document); err != nil {
 		return nil, err
 	}
 
@@ -59,40 +59,40 @@ func (m *OverrideAttributesManager) GetOverrideAttributes(
 	m.cache = document
 
 	// Return the override attributes of different scopes
-	return &admin.OverrideAttributesGetResponse{
+	return &admin.ConfigurationGetResponse{
 		Id: &admin.ProjectID{
 			Project: request.GetId().GetProject(),
 			Domain:  request.GetId().GetDomain(),
 		},
-		Version:                 document.GetVersion(),
-		GlobalAttributes:        getAttributeOfDocument(document, "", ""),
-		ProjectAttributes:       getAttributeOfDocument(document, request.Id.Project, ""),
-		ProjectDomainAttributes: getAttributeOfDocument(document, request.Id.Project, request.Id.Domain),
+		Version:                    document.GetVersion(),
+		GlobalConfiguration:        getConfigurationFromDocument(document, "", ""),
+		ProjectConfiguration:       getConfigurationFromDocument(document, request.Id.Project, ""),
+		ProjectDomainConfiguration: getConfigurationFromDocument(document, request.Id.Project, request.Id.Domain),
 	}, nil
 }
 
-func (m *OverrideAttributesManager) UpdateOverrideAttributes(
-	ctx context.Context, request admin.OverrideAttributesUpdateRequest) (
-	*admin.OverrideAttributesUpdateResponse, error) {
+func (m *ConfigurationManager) UpdateConfiguration(
+	ctx context.Context, request admin.ConfigurationUpdateRequest) (
+	*admin.ConfigurationUpdateResponse, error) {
 	// Validate the request
-	if err := validation.ValidateOverrideAttributesUpdateRequest(request); err != nil {
+	if err := validation.ValidateConfigurationUpdateRequest(request); err != nil {
 		return nil, err
 	}
 
 	// Get the active override attributes
-	overrideAttributes, err := m.db.OverrideAttributesRepo().GetActive(ctx)
+	configuration, err := m.db.ConfigurationRepo().GetActive(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	// TODO: Handle the case where the document location is empty
-	document := &admin.Document{}
-	if err := m.storageClient.ReadProtobuf(ctx, overrideAttributes.DocumentLocation, document); err != nil {
+	document := &admin.ConfigurationDocument{}
+	if err := m.storageClient.ReadProtobuf(ctx, configuration.DocumentLocation, document); err != nil {
 		return nil, err
 	}
 
 	// Update the document with the new attributes
-	updateAttributeOfDocument(document, request.Id.Project, request.Id.Domain, request.Attributes)
+	updateConfigurationToDocument(document, request.Id.Project, request.Id.Domain, request.Configuration)
 
 	// Generate a new version for the document
 	generatedVersion, err := GenerateRandomString(10)
@@ -102,9 +102,9 @@ func (m *OverrideAttributesManager) UpdateOverrideAttributes(
 	document.Version = generatedVersion
 
 	// Offload the updated document
-	updatedDocumentLocation, err := common.OffloadOverrideAttributesDocument(ctx, m.storageClient, document, generatedVersion)
+	updatedDocumentLocation, err := common.OffloadConfigurationDocument(ctx, m.storageClient, document, generatedVersion)
 
-	createOverrideAttributesInput := models.OverrideAttributes{
+	newConfiguration := models.Configuration{
 		// random generate a string as version
 		Version:          generatedVersion,
 		Active:           true,
@@ -112,10 +112,10 @@ func (m *OverrideAttributesManager) UpdateOverrideAttributes(
 	}
 
 	// Erase the active override attributes and create the new one
-	if err := m.db.OverrideAttributesRepo().EraseActiveAndCreate(ctx, overrideAttributes.Version, createOverrideAttributesInput); err != nil {
+	if err := m.db.ConfigurationRepo().EraseActiveAndCreate(ctx, request.VersionToUpdate, newConfiguration); err != nil {
 		return nil, err
 	}
-	return &admin.OverrideAttributesUpdateResponse{}, nil
+	return &admin.ConfigurationUpdateResponse{}, nil
 }
 
 // TODO: Check if this function is implemented already
@@ -134,18 +134,18 @@ func GenerateRandomString(length int) (string, error) {
 }
 
 // This function is used to get the attributes of a document based on the project, and domain.
-func getAttributeOfDocument(document *admin.Document, project, domain string) *admin.Attributes {
+func getConfigurationFromDocument(document *admin.ConfigurationDocument, project, domain string) *admin.Configuration {
 	documentKey := encodeDocumentKey(project, domain, "")
-	if attributes, ok := document.AttributesMap[documentKey]; ok {
+	if attributes, ok := document.Configurations[documentKey]; ok {
 		return attributes
 	}
 	return nil
 }
 
 // This function is used to update the attributes of a document based on the project, and domain.
-func updateAttributeOfDocument(document *admin.Document, project, domain string, attributes *admin.Attributes) {
+func updateConfigurationToDocument(document *admin.ConfigurationDocument, project, domain string, attributes *admin.Configuration) {
 	documentKey := encodeDocumentKey(project, domain, "")
-	document.AttributesMap[documentKey] = attributes
+	document.Configurations[documentKey] = attributes
 }
 
 // This function is used to encode the document key based on the org, project, domain, workflow, and launch plan.
@@ -154,8 +154,8 @@ func encodeDocumentKey(project, domain, workflow string) string {
 	return project + "/" + domain + "/" + workflow
 }
 
-func NewOverrideAttributesManager(db repositoryInterfaces.Repository, config runtimeInterfaces.Configuration, storageClient *storage.DataStore) interfaces.OverrideAttributesInterface {
-	return &OverrideAttributesManager{
+func NewConfigurationManager(db repositoryInterfaces.Repository, config runtimeInterfaces.Configuration, storageClient *storage.DataStore) interfaces.ConfigurationInterface {
+	return &ConfigurationManager{
 		db:            db,
 		config:        config,
 		storageClient: storageClient,

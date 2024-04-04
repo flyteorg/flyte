@@ -10,55 +10,69 @@ import (
 	"gorm.io/gorm"
 )
 
-type OverrideAttributesRepo struct {
+type ConfigurationRepo struct {
 	db               *gorm.DB
 	errorTransformer adminErrors.ErrorTransformer
 	metrics          gormMetrics
 }
 
-func (r *OverrideAttributesRepo) GetActive(ctx context.Context) (models.OverrideAttributes, error) {
-	var overrideAttributes models.OverrideAttributes
+func (r *ConfigurationRepo) GetActive(ctx context.Context) (models.Configuration, error) {
+	var configuration models.Configuration
 	timer := r.metrics.GetDuration.Start()
-	tx := r.db.Where(&models.OverrideAttributes{
+	tx := r.db.Where(&models.Configuration{
 		Active: true,
-	}).First(&overrideAttributes)
+	}).First(&configuration)
 	timer.Stop()
 	// TODO: what if the table is empty?
 	if tx.Error != nil && errors.Is(tx.Error, gorm.ErrRecordNotFound) {
-		return models.OverrideAttributes{}, adminErrors.GetSingletonMissingEntityError("active override attributes")
+		return models.Configuration{}, adminErrors.GetSingletonMissingEntityError("configuration")
 	} else if tx.Error != nil {
-		return models.OverrideAttributes{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
+		return models.Configuration{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
 	}
-	return overrideAttributes, nil
+	return configuration, nil
 }
 
-func (r *OverrideAttributesRepo) EraseActive(ctx context.Context) error {
-	timer := r.metrics.GetDuration.Start()
-	tx := r.db.Model(&models.OverrideAttributes{}).Where(&models.OverrideAttributes{
-		Active: true,
-	}).Update("active", false)
-	timer.Stop()
-	if tx.Error != nil {
-		return r.errorTransformer.ToFlyteAdminError(tx.Error)
-	}
-	return nil
-}
-
-func (r *OverrideAttributesRepo) Create(ctx context.Context, input models.OverrideAttributes) error {
+func (r *ConfigurationRepo) EraseActiveAndCreate(ctx context.Context, versionToUpdate string, newConfiguration models.Configuration) error {
 	timer := r.metrics.CreateDuration.Start()
-	tx := r.db.Create(&input)
+	err := r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		// Check if the active override attributes are outdated
+		var configuration models.Configuration
+		err := tx.Where(&models.Configuration{
+			Active:  true,
+			Version: versionToUpdate,
+		}).First(&configuration).Error
+		if err != nil {
+			return err
+		}
+
+		// Erase the active override attributes
+		err = tx.Model(&models.Configuration{}).Where(&models.Configuration{
+			Active:  true,
+			Version: versionToUpdate,
+		}).Update("active", false).Error
+		if err != nil {
+			return err
+		}
+
+		// Create the new override attributes
+		err = tx.Create(&newConfiguration).Error
+		if err != nil {
+			return err
+		}
+		return nil
+	})
 	timer.Stop()
-	if tx.Error != nil {
-		return r.errorTransformer.ToFlyteAdminError(tx.Error)
+	if err != nil {
+		return r.errorTransformer.ToFlyteAdminError(err)
 	}
 	return nil
 }
 
-// Returns an instance of OverrideAttributesRepoInterface
-func NewOverrideAttributesRepo(
-	db *gorm.DB, errorTransformer adminErrors.ErrorTransformer, scope promutils.Scope) interfaces.OverrideAttributesInterface {
+// Returns an instance of ConfigurationRepoInterface
+func NewConfigurationRepo(
+	db *gorm.DB, errorTransformer adminErrors.ErrorTransformer, scope promutils.Scope) interfaces.ConfigurationInterface {
 	metrics := newMetrics(scope)
-	return &OverrideAttributesRepo{
+	return &ConfigurationRepo{
 		db:               db,
 		errorTransformer: errorTransformer,
 		metrics:          metrics,

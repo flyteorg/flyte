@@ -42,7 +42,7 @@ type AdminService struct {
 	DescriptionEntityManager interfaces.DescriptionEntityInterface
 	MetricsManager           interfaces.MetricsInterface
 	Metrics                  AdminMetrics
-	OverrideAttributeManager interfaces.OverrideAttributesInterface
+	ConfigurationManager     interfaces.ConfigurationInterface
 }
 
 // Intercepts all admin requests to handle panics during execution.
@@ -160,7 +160,7 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 		adminScope.NewSubScope("node_execution_manager"), urlData, eventPublisher, cloudEventPublisher, nodeExecutionEventWriter)
 	taskExecutionManager := manager.NewTaskExecutionManager(repo, configuration, dataStorageClient,
 		adminScope.NewSubScope("task_execution_manager"), urlData, eventPublisher, cloudEventPublisher)
-	overrideAttributesManager := manager.NewOverrideAttributesManager(repo, configuration, dataStorageClient)
+	configurationManager := manager.NewConfigurationManager(repo, configuration, dataStorageClient)
 
 	logger.Info(ctx, "Initializing a new AdminService")
 	return &AdminService{
@@ -174,7 +174,7 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 		VersionManager:           versionManager,
 		NodeExecutionManager:     nodeExecutionManager,
 		TaskExecutionManager:     taskExecutionManager,
-		OverrideAttributeManager: overrideAttributesManager,
+		ConfigurationManager:     configurationManager,
 		ProjectManager:           manager.NewProjectManager(repo, configuration),
 		ResourceManager:          resources.NewResourceManager(repo, configuration.ApplicationConfiguration()),
 		MetricsManager: manager.NewMetricsManager(workflowManager, executionManager, nodeExecutionManager,

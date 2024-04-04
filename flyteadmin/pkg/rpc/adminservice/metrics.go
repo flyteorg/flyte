@@ -108,7 +108,7 @@ type descriptionEntityEndpointMetrics struct {
 	list   util.RequestMetrics
 }
 
-type overrideAttributesMetrics struct {
+type configurationMetrics struct {
 	scope promutils.Scope
 
 	get    util.RequestMetrics
@@ -132,7 +132,7 @@ type AdminMetrics struct {
 	taskExecutionEndpointMetrics           taskExecutionEndpointMetrics
 	workflowEndpointMetrics                workflowEndpointMetrics
 	descriptionEntityMetrics               descriptionEntityEndpointMetrics
-	overrideAttributesMetrics              overrideAttributesMetrics
+	configurationMetrics                   configurationMetrics
 }
 
 func InitMetrics(adminScope promutils.Scope) AdminMetrics {
@@ -238,10 +238,10 @@ func InitMetrics(adminScope promutils.Scope) AdminMetrics {
 			list:   util.NewRequestMetrics(adminScope, "list_description_entity"),
 		},
 
-		overrideAttributesMetrics: overrideAttributesMetrics{
+		configurationMetrics: configurationMetrics{
 			scope:  adminScope,
-			get:    util.NewRequestMetrics(adminScope, "get_override_attributes"),
-			update: util.NewRequestMetrics(adminScope, "update_override_attributes"),
+			get:    util.NewRequestMetrics(adminScope, "get_configuration"),
+			update: util.NewRequestMetrics(adminScope, "update_configuration"),
 		},
 	}
 }
