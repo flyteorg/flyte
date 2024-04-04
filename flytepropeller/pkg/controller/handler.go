@@ -230,7 +230,7 @@ func (p *Propeller) Handle(ctx context.Context, namespace, name string) error {
 	}
 
 	streak := 0
-	defer func() { p.metrics.StreakLength.Add(ctx, float64(streak)) }()  
+	defer func() { p.metrics.StreakLength.Add(ctx, float64(streak)) }()
 
 	maxLength := p.cfg.MaxStreakLength
 	if maxLength <= 0 {
