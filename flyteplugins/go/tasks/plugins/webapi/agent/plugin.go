@@ -93,14 +93,14 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 	taskCategory := admin.TaskCategory{Name: taskTemplate.Type, Version: taskTemplate.TaskTypeVersion}
 	agent, isSync := getFinalAgent(&taskCategory, p.cfg, p.agentRegistry)
 
-	secrets := make([]*admin.Secret, 0)
+	secrets := make([]admin.Secret, 0)
 	if taskTemplate.SecurityContext != nil {
 		for _, secret := range taskTemplate.SecurityContext.Secrets {
 			val, err := taskCtx.SecretManager().GetForSecret(ctx, secret)
 			if err != nil {
 				return nil, nil, err
 			}
-			secrets = append(secrets, &admin.Secret{Value: val})
+			secrets = append(secrets, admin.Secret{Value: val})
 		}
 	}
 
@@ -114,7 +114,7 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 		if err != nil {
 			return nil, nil, err
 		}
-		header := &admin.CreateRequestHeader{Template: taskTemplate, OutputPrefix: outputPrefix, TaskExecutionMetadata: &taskExecutionMetadata, Secrets: secrets}
+		header := &admin.CreateRequestHeader{Template: taskTemplate, OutputPrefix: outputPrefix, TaskExecutionMetadata: &taskExecutionMetadata, Secrets: secretPtr(secrets)}
 		return p.ExecuteTaskSync(finalCtx, client, header, inputs)
 	}
 
@@ -128,7 +128,7 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 		Template:              taskTemplate,
 		OutputPrefix:          outputPrefix,
 		TaskExecutionMetadata: &taskExecutionMetadata,
-		Secrets:               secrets,
+		Secrets:               secretPtr(secrets),
 	}
 	res, err := client.CreateTask(finalCtx, request)
 	if err != nil {
@@ -139,6 +139,7 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 		OutputPrefix:      outputPrefix,
 		AgentResourceMeta: res.GetResourceMeta(),
 		TaskCategory:      taskCategory,
+		Secrets:           secrets,
 	}, nil, nil
 }
 
@@ -212,16 +213,11 @@ func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest weba
 	finalCtx, cancel := getFinalContext(ctx, "GetTask", agent)
 	defer cancel()
 
-	secrets := make([]*admin.Secret, 0)
-	for _, s := range metadata.Secrets {
-		secrets = append(secrets, &admin.Secret{Value: s.Value})
-	}
-
 	request := &admin.GetTaskRequest{
 		TaskType:     metadata.TaskCategory.Name,
 		TaskCategory: &metadata.TaskCategory,
 		ResourceMeta: metadata.AgentResourceMeta,
-		Secrets:      secrets,
+		Secrets:      secretPtr(metadata.Secrets),
 	}
 	res, err := client.GetTask(finalCtx, request)
 	if err != nil {
@@ -251,16 +247,11 @@ func (p Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error 
 	finalCtx, cancel := getFinalContext(ctx, "DeleteTask", agent)
 	defer cancel()
 
-	secrets := make([]*admin.Secret, 0)
-	for _, s := range metadata.Secrets {
-		secrets = append(secrets, &admin.Secret{Value: s.Value})
-	}
-
 	request := &admin.DeleteTaskRequest{
 		TaskType:     metadata.TaskCategory.Name,
 		TaskCategory: &metadata.TaskCategory,
 		ResourceMeta: metadata.AgentResourceMeta,
-		Secrets:      secrets,
+		Secrets:      secretPtr(metadata.Secrets),
 	}
 	_, err = client.DeleteTask(finalCtx, request)
 	return err
@@ -342,6 +333,14 @@ func (p Plugin) getAsyncAgentClient(ctx context.Context, agent *Deployment) (ser
 		p.cs.asyncAgentClients[agent.Endpoint] = client
 	}
 	return client, nil
+}
+
+func secretPtr(secrets []admin.Secret) []*admin.Secret {
+	res := make([]*admin.Secret, 0)
+	for _, s := range secrets {
+		res = append(res, &s)
+	}
+	return res
 }
 
 func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, outputs *flyteIdl.LiteralMap) error {
