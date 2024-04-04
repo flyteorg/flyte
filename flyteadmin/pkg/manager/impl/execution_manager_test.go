@@ -54,8 +54,9 @@ import (
 )
 
 const (
-	principal = "principal"
-	rawOutput = "raw_output"
+	principal             = "principal"
+	rawOutput             = "raw_output"
+	executionClusterLabel = "execution_cluster_label"
 )
 
 var spec = testutils.GetExecutionRequest().Spec
@@ -383,6 +384,7 @@ func TestCreateExecution(t *testing.T) {
 	}
 	request.Spec.RawOutputDataConfig = &admin.RawOutputDataConfig{OutputLocationPrefix: rawOutput}
 	request.Spec.ClusterAssignment = &clusterAssignment
+	request.Spec.ExecutionClusterLabel = &admin.ExecutionClusterLabel{Value: executionClusterLabel}
 
 	identity, err := auth.NewIdentityContext("", principal, "", time.Now(), sets.NewString(), nil, nil)
 	assert.NoError(t, err)

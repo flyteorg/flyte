@@ -42,9 +42,12 @@ To create a new async agent, extend the [`AsyncAgentBase`](https://github.com/fl
 - `delete`: Invoking this method will send a request to delete the corresponding job.
 
 ```python
-from flytekit.extend.backend.base_agent import AsyncAgentBase, AgentRegistry, Resource
-from flytekit import StructuredDataset
+from typing import Optional
 from dataclasses import dataclass
+from flytekit.models.literals import LiteralMap
+from flytekit.models.task import TaskTemplate
+from flytekit.extend.backend.base_agent import AsyncAgentBase, AgentRegistry, Resource, ResourceMeta
+
 
 @dataclass
 class BigQueryMetadata(ResourceMeta):
@@ -60,21 +63,20 @@ class BigQueryAgent(AsyncAgentBase):
     def create(
         self,
         task_template: TaskTemplate,
-        inputs: typing.Optional[LiteralMap] = None,
+        inputs: Optional[LiteralMap] = None,
         **kwargs,
     ) -> BigQueryMetadata:
-        # Submit the job to BigQuery here.
-        return BigQueryMetadata(job_id=job_id, outputs={"o0": StructuredDataset(uri=result_table_uri))}
+        job_id = submit_bigquery_job(inputs)
+        return BigQueryMetadata(job_id=job_id)
 
     def get(self, resource_meta: BigQueryMetadata, **kwargs) -> Resource:
-        # Get the job status from BigQuery.
-        return Resource(phase=res.phase)
+        phase, outputs = get_job_status(resource_meta.job_id)
+        return Resource(phase=phase, outputs=outputs)
 
     def delete(self, resource_meta: BigQueryMetadata, **kwargs):
-        # Delete the job from BigQuery.
-        ...
+        cancel_bigquery_job(resource_meta.job_id)
 
-# To register the custom agent
+# To register the bigquery agent
 AgentRegistry.register(BigQueryAgent())
 ```
 
@@ -87,7 +89,14 @@ To create a new sync agent, extend the [`SyncAgentBase`](https://github.com/flyt
 - `do`: This method is used to execute the synchronous task, and the worker in Flyte will be blocked until the method returns.
 
 ```python
+from typing import Optional
+from flytekit import FlyteContextManager
+from flytekit.core.type_engine import TypeEngine
+from flyteidl.core.execution_pb2 import TaskExecution
+from flytekit.models.literals import LiteralMap
+from flytekit.models.task import TaskTemplate
 from flytekit.extend.backend.base_agent import SyncAgentBase, AgentRegistry, Resource
+
 
 class OpenAIAgent(SyncAgentBase):
     def __init__(self):
@@ -97,11 +106,30 @@ class OpenAIAgent(SyncAgentBase):
         # Convert the literal map to python value.
         ctx = FlyteContextManager.current_context()
         python_inputs = TypeEngine.literal_map_to_kwargs(ctx, inputs, literal_types=task_template.interface.inputs)
-        # Call the OpenAI API here.
-        return Resource(phase=phaseTaskExecution.SUCCEEDED, outputs={"o0": "Hello world!"})
+        response = ask_chatgpt_question(python_inputs)
+        return Resource(phase=TaskExecution.SUCCEEDED, outputs={"o0": response})
 
 AgentRegistry.register(OpenAIAgent())
 ```
+
+#### Sensor interface specification
+With the agent framework, you can easily build a custom sensor in Flyte to watch certain events or monitor the bucket in your workflow.
+
+To create a new sensor, extend the `[BaseSensor](https://github.com/flyteorg/flytekit/blob/master/flytekit/sensor/base_sensor.py#L43)` class and implement the `poke` method, which checks whether a specific condition is met.
+
+```python
+from flytekit.sensor.base_sensor import BaseSensor
+import s3fs
+
+class FileSensor(BaseSensor):
+    def __init__(self):
+        super().__init__(task_type="file_sensor")
+
+    def poke(self, path: str) -> bool:
+        fs = s3fs.S3FileSystem()
+        return fs.exists(path)
+```
+
 
 ### 2. Test the agent locally
 
@@ -130,9 +158,14 @@ For flytekit versions `<=v1.10.2`, use `pyflyte serve`.
 For flytekit versions `>v1.10.2`, use `pyflyte serve agent`.
 :::
 
-### 4. Update FlyteAgent
+### 4. Deploy Your Flyte agent
 
 1. Update the FlyteAgent deployment's [image](https://github.com/flyteorg/flyte/blob/master/charts/flyteagent/templates/agent/deployment.yaml#L35)
+
+```bash
+kubectl set image deployment/flyteagent flyteagent=ghcr.io/flyteorg/flyteagent:latest
+```
+
 2. Update the FlytePropeller configmap.
 
 ```YAML
@@ -143,7 +176,26 @@ For flytekit versions `>v1.10.2`, use `pyflyte serve agent`.
      default-for-task-types:
        - bigquery_query_job_task: agent-service
        - custom_task: agent-service
+```
 
+3. Restart FlytePropeller.
+
+```
+kubectl rollout restart deployment flytepropeller -n flyte
+```
+
+
+### Canary deployment
+Agents can be deployed independently in separate environments. Decoupling agents from the
+production environment ensures that if any specific agent encounters an error or issue, it will not impact the overall production system.
+
+By running agents independently, you can thoroughly test and validate your agents in a
+controlled environment before deploying them to the production cluster.
+
+By default, all agent requests will be sent to the default agent service. However,
+you can route particular task requests to designated agent services by adjusting the flytepropeller configuration. 
+
+```yaml
  plugins:
    agent-service:
      supportedTaskTypes:
@@ -168,11 +220,4 @@ For flytekit versions `>v1.10.2`, use `pyflyte serve agent`.
      agentForTaskTypes:
        # It will override the default agent for custom_task, which means propeller will send the request to this agent.
        - custom_task: custom_agent
- ```
-
-3. Restart the FlytePropeller
-
 ```
-kubectl rollout restart deployment flytepropeller -n flyte
-```
-

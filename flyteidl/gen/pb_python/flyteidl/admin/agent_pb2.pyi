@@ -4,6 +4,7 @@ from flyteidl.core import workflow_pb2 as _workflow_pb2
 from flyteidl.core import identifier_pb2 as _identifier_pb2
 from flyteidl.core import execution_pb2 as _execution_pb2
 from flyteidl.core import metrics_pb2 as _metrics_pb2
+from flyteidl.core import security_pb2 as _security_pb2
 from google.protobuf import duration_pb2 as _duration_pb2
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from google.protobuf import struct_pb2 as _struct_pb2
@@ -29,7 +30,7 @@ RUNNING: State
 SUCCEEDED: State
 
 class TaskExecutionMetadata(_message.Message):
-    __slots__ = ["task_execution_id", "namespace", "labels", "annotations", "k8s_service_account", "environment_variables", "max_attempts", "interruptible", "interruptible_failure_threshold", "overrides"]
+    __slots__ = ["task_execution_id", "namespace", "labels", "annotations", "k8s_service_account", "environment_variables", "max_attempts", "interruptible", "interruptible_failure_threshold", "overrides", "identity"]
     class LabelsEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -61,6 +62,7 @@ class TaskExecutionMetadata(_message.Message):
     INTERRUPTIBLE_FIELD_NUMBER: _ClassVar[int]
     INTERRUPTIBLE_FAILURE_THRESHOLD_FIELD_NUMBER: _ClassVar[int]
     OVERRIDES_FIELD_NUMBER: _ClassVar[int]
+    IDENTITY_FIELD_NUMBER: _ClassVar[int]
     task_execution_id: _identifier_pb2.TaskExecutionIdentifier
     namespace: str
     labels: _containers.ScalarMap[str, str]
@@ -71,7 +73,8 @@ class TaskExecutionMetadata(_message.Message):
     interruptible: bool
     interruptible_failure_threshold: int
     overrides: _workflow_pb2.TaskNodeOverrides
-    def __init__(self, task_execution_id: _Optional[_Union[_identifier_pb2.TaskExecutionIdentifier, _Mapping]] = ..., namespace: _Optional[str] = ..., labels: _Optional[_Mapping[str, str]] = ..., annotations: _Optional[_Mapping[str, str]] = ..., k8s_service_account: _Optional[str] = ..., environment_variables: _Optional[_Mapping[str, str]] = ..., max_attempts: _Optional[int] = ..., interruptible: bool = ..., interruptible_failure_threshold: _Optional[int] = ..., overrides: _Optional[_Union[_workflow_pb2.TaskNodeOverrides, _Mapping]] = ...) -> None: ...
+    identity: _security_pb2.Identity
+    def __init__(self, task_execution_id: _Optional[_Union[_identifier_pb2.TaskExecutionIdentifier, _Mapping]] = ..., namespace: _Optional[str] = ..., labels: _Optional[_Mapping[str, str]] = ..., annotations: _Optional[_Mapping[str, str]] = ..., k8s_service_account: _Optional[str] = ..., environment_variables: _Optional[_Mapping[str, str]] = ..., max_attempts: _Optional[int] = ..., interruptible: bool = ..., interruptible_failure_threshold: _Optional[int] = ..., overrides: _Optional[_Union[_workflow_pb2.TaskNodeOverrides, _Mapping]] = ..., identity: _Optional[_Union[_security_pb2.Identity, _Mapping]] = ...) -> None: ...
 
 class Secret(_message.Message):
     __slots__ = ["value"]

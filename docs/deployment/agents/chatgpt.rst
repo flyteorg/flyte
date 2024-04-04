@@ -94,7 +94,7 @@ Add the OpenAI API token
 
         apiVersion: v1
         data:
-          flyte_openai_access_token: <BASE64_ENCODED_OPENAI_API_TOKEN>
+          flyte_openai_api_key: <BASE64_ENCODED_OPENAI_API_TOKEN>
         kind: Secret
         metadata:
           annotations:

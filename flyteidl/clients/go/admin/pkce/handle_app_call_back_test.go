@@ -7,11 +7,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/oauth"
-
 	"github.com/stretchr/testify/assert"
 	testhttp "github.com/stretchr/testify/http"
 	"golang.org/x/oauth2"
+
+	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/oauth"
 )
 
 var (

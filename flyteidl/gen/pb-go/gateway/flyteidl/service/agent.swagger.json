@@ -2026,8 +2026,7 @@
       "type": "object",
       "properties": {
         "task_execution_id": {
-          "$ref": "#/definitions/coreTaskExecutionIdentifier",
-          "title": "ID of the task execution"
+          "$ref": "#/definitions/coreTaskExecutionIdentifier"
         },
         "namespace": {
           "type": "string",
@@ -2075,9 +2074,13 @@
         "overrides": {
           "$ref": "#/definitions/coreTaskNodeOverrides",
           "description": "Overrides for specific properties of the task node.\nThese overrides can be used to customize the behavior of the task node."
+        },
+        "identity": {
+          "$ref": "#/definitions/coreIdentity",
+          "title": "Identity of user running this task execution"
         }
       },
-      "description": "Represents a subset of runtime task execution metadata that are relevant to external plugins."
+      "description": "Represents a subset of runtime task execution metadata that are relevant to external plugins.\n\nID of the task execution"
     },
     "flyteidlcoreEnumType": {
       "type": "object",
