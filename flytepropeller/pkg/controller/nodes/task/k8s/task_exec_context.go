@@ -5,6 +5,7 @@ import (
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils/secrets"
+	k8sUtils "github.com/flyteorg/flyte/flytepropeller/pkg/utils"
 )
 
 const executionIdentityVariable = "execution-identity"
@@ -60,7 +61,8 @@ func newTaskExecutionMetadata(tCtx pluginsCore.TaskExecutionMetadata, taskTmpl *
 
 	id := tCtx.GetSecurityContext().RunAs.ExecutionIdentity
 	if len(id) > 0 {
-		injectLabels[executionIdentityVariable] = id
+		sanitizedID := k8sUtils.SanitizeLabelValue(id)
+		injectLabels[executionIdentityVariable] = sanitizedID
 	}
 
 	return TaskExecutionMetadata{

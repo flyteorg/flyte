@@ -56,11 +56,12 @@ func (e K8sWorkflowExecutor) Execute(ctx context.Context, data interfaces.Execut
 	}
 
 	executionTargetSpec := executioncluster.ExecutionTargetSpec{
-		Project:     data.ExecutionID.Project,
-		Domain:      data.ExecutionID.Domain,
-		Workflow:    data.ReferenceWorkflowName,
-		LaunchPlan:  data.ReferenceWorkflowName,
-		ExecutionID: data.ExecutionID.Name,
+		Project:               data.ExecutionID.Project,
+		Domain:                data.ExecutionID.Domain,
+		Workflow:              data.ReferenceWorkflowName,
+		LaunchPlan:            data.ReferenceWorkflowName,
+		ExecutionID:           data.ExecutionID.Name,
+		ExecutionClusterLabel: data.ExecutionParameters.ExecutionClusterLabel,
 	}
 	targetCluster, err := e.executionCluster.GetTarget(ctx, &executionTargetSpec)
 	if err != nil {

@@ -118,4 +118,4 @@ Wait for the upgrade to complete. You can check the status of the deployment pod
 
   kubectl get pods -n flyte
 
-For MMCloud agent on the Flyte cluster, see `MMCloud agent <https://docs.flyte.org/en/latest/flytesnacks/examples/mmcloud_integration/mmcloud_agent.html>`_.
+For MMCloud agent on the Flyte cluster, see `MMCloud agent <https://docs.flyte.org/en/latest/flytesnacks/examples/mmcloud_agent/index.html>`_.

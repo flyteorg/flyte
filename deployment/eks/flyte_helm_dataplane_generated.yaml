@@ -94,7 +94,7 @@ data:
     plugins:
       k8s:
         co-pilot:
-          image: cr.flyte.org/flyteorg/flytecopilot:v1.10.7
+          image: cr.flyte.org/flyteorg/flytecopilot:v1.11.1-b1
           name: flyte-copilot-
           start-timeout: 30s
   core.yaml: | 
@@ -137,7 +137,7 @@ data:
           rate: 100
           type: bucket
         type: batch
-      rawoutput-prefix: s3://<BUCKET_NAME>/
+      rawoutput-prefix: s3://<RAW_DATA_BUCKET_NAME>/
       workers: 40
       workflow-reeval-duration: 30s
     webhook:
@@ -154,6 +154,7 @@ data:
         - container
         - sidecar
         - k8s-array
+        - agent-service
   k8s.yaml: | 
     plugins:
       k8s:
@@ -167,7 +168,7 @@ data:
   storage.yaml: | 
     storage:
       type: s3
-      container: "<BUCKET_NAME>"
+      container: "<METADATA_BUCKET_NAME>"
       connection:
         auth-type: iam
         region: <AWS_REGION>
@@ -427,7 +428,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "305d6f36301e10e952435f597dbe6700381a43c496a3be2cca60c175439fc9a"
+        configChecksum: "e7a065fd96ff8a6564199b17e054fac2da37f402b421e20fbe2160fc43f11cc"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -453,7 +454,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: "cr.flyte.org/flyteorg/flytepropeller:v1.10.7"
+        image: "cr.flyte.org/flyteorg/flytepropeller:v1.11.1-b1"
         imagePullPolicy: "IfNotPresent"
         name: flytepropeller
         ports:
@@ -507,9 +508,9 @@ spec:
       labels:
         app: flyte-pod-webhook
         app.kubernetes.io/name: flyte-pod-webhook
-        app.kubernetes.io/version: v1.10.7
+        app.kubernetes.io/version: v1.11.1-b1
       annotations:
-        configChecksum: "305d6f36301e10e952435f597dbe6700381a43c496a3be2cca60c175439fc9a"
+        configChecksum: "e7a065fd96ff8a6564199b17e054fac2da37f402b421e20fbe2160fc43f11cc"
     spec:
       securityContext: 
         fsGroup: 65534
@@ -521,7 +522,7 @@ spec:
       serviceAccountName: flyte-pod-webhook
       initContainers:
       - name: generate-secrets
-        image: "cr.flyte.org/flyteorg/flytepropeller:v1.10.7"
+        image: "cr.flyte.org/flyteorg/flytepropeller:v1.11.1-b1"
         imagePullPolicy: "IfNotPresent"
         command:
           - flytepropeller
@@ -548,7 +549,7 @@ spec:
             mountPath: /etc/flyte/config
       containers:
         - name: webhook
-          image: "cr.flyte.org/flyteorg/flytepropeller:v1.10.7"
+          image: "cr.flyte.org/flyteorg/flytepropeller:v1.11.1-b1"
           imagePullPolicy: "IfNotPresent"
           command:
             - flytepropeller
@@ -571,6 +572,11 @@ spec:
             allowPrivilegeEscalation: false
             capabilities:
               drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 200m
+              ephemeral-storage: 500Mi
+              memory: 500Mi
           volumeMounts:
             - name: config-volume
               mountPath: /etc/flyte/config

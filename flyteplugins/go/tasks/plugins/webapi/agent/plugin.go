@@ -4,13 +4,13 @@ import (
 	"context"
 	"encoding/gob"
 	"fmt"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"time"
 
 	"golang.org/x/exp/maps"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	flyteIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	pluginErrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
@@ -347,6 +347,7 @@ func getFinalAgent(taskCategory *admin.TaskCategory, cfg *Config, agentRegistry 
 
 func buildTaskExecutionMetadata(taskExecutionMetadata core.TaskExecutionMetadata) admin.TaskExecutionMetadata {
 	taskExecutionID := taskExecutionMetadata.GetTaskExecutionID().GetID()
+
 	return admin.TaskExecutionMetadata{
 		TaskExecutionId:      &taskExecutionID,
 		Namespace:            taskExecutionMetadata.GetNamespace(),
@@ -354,6 +355,7 @@ func buildTaskExecutionMetadata(taskExecutionMetadata core.TaskExecutionMetadata
 		Annotations:          taskExecutionMetadata.GetAnnotations(),
 		K8SServiceAccount:    taskExecutionMetadata.GetK8sServiceAccount(),
 		EnvironmentVariables: taskExecutionMetadata.GetEnvironmentVariables(),
+		Identity:             taskExecutionMetadata.GetSecurityContext().RunAs,
 	}
 }
 

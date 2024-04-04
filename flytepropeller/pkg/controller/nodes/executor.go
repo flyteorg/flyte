@@ -801,7 +801,7 @@ func isTimeoutExpired(queuedAt *metav1.Time, timeout time.Duration) bool {
 	return false
 }
 
-func (c *nodeExecutor) isEligibleForRetry(nCtx interfaces.NodeExecutionContext, nodeStatus v1alpha1.ExecutableNodeStatus, err *core.ExecutionError) (currentAttempt, maxAttempts uint32, isEligible bool) {
+func (c *nodeExecutor) isEligibleForRetry(nCtx interfaces.NodeExecutionContext, nodeStatus v1alpha1.ExecutableNodeStatus, err *core.ExecutionError) (currentAttempt uint32, maxAttempts uint32, isEligible bool) {
 	if config.GetConfig().NodeConfig.IgnoreRetryCause {
 		currentAttempt = nodeStatus.GetAttempts() + 1
 	} else {

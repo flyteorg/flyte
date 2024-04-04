@@ -76,3 +76,11 @@ class ProjectRegisterResponse(_message.Message):
 class ProjectUpdateResponse(_message.Message):
     __slots__ = []
     def __init__(self) -> None: ...
+
+class ProjectGetRequest(_message.Message):
+    __slots__ = ["id", "org"]
+    ID_FIELD_NUMBER: _ClassVar[int]
+    ORG_FIELD_NUMBER: _ClassVar[int]
+    id: str
+    org: str
+    def __init__(self, id: _Optional[str] = ..., org: _Optional[str] = ...) -> None: ...

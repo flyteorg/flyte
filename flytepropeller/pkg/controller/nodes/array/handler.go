@@ -478,7 +478,39 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			gatherOutputsRequests = append(gatherOutputsRequests, gatherOutputsRequest)
 		}
 
+		// attempt best effort at initializing outputLiterals with output variable names. currently
+		// only TaskNode and WorkflowNode contain node interfaces.
 		outputLiterals := make(map[string]*idlcore.Literal)
+
+		switch arrayNode.GetSubNodeSpec().GetKind() {
+		case v1alpha1.NodeKindTask:
+			taskID := *arrayNode.GetSubNodeSpec().TaskRef
+			taskNode, err := nCtx.ExecutionContext().GetTask(taskID)
+			if err != nil {
+				return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(idlcore.ExecutionError_SYSTEM,
+					errors.BadSpecificationError, fmt.Sprintf("failed to find ArrayNode subNode task with id: '%s'", taskID), nil)), nil
+			}
+
+			if outputs := taskNode.CoreTask().GetInterface().GetOutputs(); outputs != nil {
+				for name := range outputs.Variables {
+					outputLiteral := &idlcore.Literal{
+						Value: &idlcore.Literal_Collection{
+							Collection: &idlcore.LiteralCollection{
+								Literals: make([]*idlcore.Literal, 0, len(arrayNodeState.SubNodePhases.GetItems())),
+							},
+						},
+					}
+
+					outputLiterals[name] = outputLiteral
+				}
+			}
+		case v1alpha1.NodeKindWorkflow:
+			// TODO - to support launchplans we will need to process the output interface variables here
+			fallthrough
+		default:
+			logger.Warnf(ctx, "ArrayNode does not support pre-populating outputLiteral collections for node kind '%s'", arrayNode.GetSubNodeSpec().GetKind())
+		}
+
 		workerErrorCollector := errorcollector.NewErrorMessageCollector()
 		for i, gatherOutputsRequest := range gatherOutputsRequests {
 			outputResponse := <-gatherOutputsRequest.responseChannel

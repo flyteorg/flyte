@@ -260,14 +260,15 @@ The fully supported set of filter functions are
 
 - contains  
 - gt (greater than) 
-- gte (greter than or equal to) 
+- gte (greater than or equal to)
 - lt (less than)  
 - lte (less than or equal to) 
 - eq (equal)  
 - ne (not equal)  
-- value_in (for repeated sets of values)  
+- value_in (value in repeated sets of values)
+- value_not_in (value not in repeated sets of values)
 
-"value_in" is a special case where multiple values are passed to the filter expression. For example:: 
+"value_in" and "value_not_in" are special cases where multiple values are passed to the filter expression. For example::
 
  value_in(phase, RUNNING;SUCCEEDED;FAILED)  
 

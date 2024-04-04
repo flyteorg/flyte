@@ -1,4 +1,0 @@
-resources:
-  - auth_secret.yaml
-  - deployment.yaml
-  - rbac.yaml

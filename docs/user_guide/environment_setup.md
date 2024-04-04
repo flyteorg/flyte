@@ -141,7 +141,7 @@ flytectl get workflows \
     --domain development \
     --version <version> \
     -o doturl \
-    basics.workflow.simple_wf
+    workflow.simple_wf
 ```
 
 To view workflow as a `strict digraph` on the command line:
@@ -152,7 +152,7 @@ flytectl get workflows \
     --domain development \
     --version <version> \
     -o dot \
-    basics.workflow.simple_wf
+    workflow.simple_wf
 ```
 
 Replace `<version>` with the version obtained from the console UI,

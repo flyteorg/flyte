@@ -151,7 +151,7 @@ To understand how the below components interact with each other, refer to :ref:`
 
     * - `Repo <https://github.com/flyteorg/flyte>`__
     * - **Purpose**: Deployment, Documentation, and Issues
-    * - **Languages**: Kustomize & RST
+    * - **Languages**: RST
 
 To build the Flyte docs locally you will need the following prerequisites:
 
@@ -194,7 +194,7 @@ The resulting ``html`` files will be in ``docs/_build/html``. You can view them 
         * Run the following commands:
            * ``make generate``
            * ``make test_unit``
-           * ``make link``
+           * ``make lint``
         * To compile, run ``make compile``
 
 ``flyteadmin``
@@ -262,7 +262,7 @@ The resulting ``html`` files will be in ``docs/_build/html``. You can view them 
         * Run the following commands:
             * ``make generate``
             * ``make test_unit``
-            * ``make link``
+            * ``make lint``
 
 ``flytestdlib``
 ***************
@@ -342,13 +342,13 @@ How to setup dev environment for flyteidl, flyteadmin, flyteplugins, flytepropel
 
 .. code:: shell
 
-   # Step1: Install the latest version of flytectl
+   # Step 1: Install the latest version of flytectl
    curl -sL https://ctl.flyte.org/install | bash
    # flyteorg/flytectl info checking GitHub for latest tag
    # flyteorg/flytectl info found version: 0.6.39 for v0.6.39/Linux/x86_64
    # flyteorg/flytectl info installed ./bin/flytectl
 
-   # Step2: Export flytectl path based on the previous log "flyteorg/flytectl info installed ./bin/flytectl"
+   # Step 2: Export flytectl path based on the previous log "flyteorg/flytectl info installed ./bin/flytectl"
    export PATH=$PATH:/home/ubuntu/bin # replace with your path
 
 **2. Build a k3s cluster that runs minio and postgres Pods.**
@@ -360,7 +360,7 @@ How to setup dev environment for flyteidl, flyteadmin, flyteplugins, flytepropel
 
 .. code:: shell
 
-   # Step1: Start k3s cluster, create Pods for postgres and minio. Note: We cannot access Flyte UI yet! but we can access the minio console now.
+   # Step 1: Start k3s cluster, create Pods for postgres and minio. Note: We cannot access Flyte UI yet! but we can access the minio console now.
    flytectl demo start --dev
    # 👨‍💻 Flyte is ready! Flyte UI is available at http://localhost:30080/console 🚀 🚀 🎉
    # ❇️ Run the following command to export demo environment variables for accessing flytectl
@@ -368,10 +368,10 @@ How to setup dev environment for flyteidl, flyteadmin, flyteplugins, flytepropel
    # 🐋 Flyte sandbox ships with a Docker registry. Tag and push custom workflow images to localhost:30000
    # 📂 The Minio API is hosted on localhost:30002. Use http://localhost:30080/minio/login for Minio console
 
-   # Step2: Export FLYTECTL_CONFIG as the previous log indicated.
+   # Step 2: Export FLYTECTL_CONFIG as the previous log indicated.
    FLYTECTL_CONFIG=/home/ubuntu/.flyte/config-sandbox.yaml
 
-   # Step3: The kubeconfig will be automatically copied to the user's main kubeconfig (default is `/.kube/config`) with "flyte-sandbox" as the context name.
+   # Step 3: The kubeconfig will be automatically copied to the user's main kubeconfig (default is `/.kube/config`) with "flyte-sandbox" as the context name.
    # Check that we can access the K3s cluster. Verify that postgres and minio are running.
    kubectl get pod -n flyte
    # NAME                                                  READY   STATUS    RESTARTS   AGE
@@ -389,25 +389,18 @@ that integrates all Flyte components into a single binary.
 
 .. code:: shell
 
-   # Step1: Clone flyte repo
+   # Step 1: Clone flyte repo
    git clone https://github.com/flyteorg/flyte.git
    cd flyte
 
-   # Step2: Build a single binary that bundles all the Flyte components.
+   # Step 2: Build a single binary that bundles all the Flyte components.
    # The version of each component/library used to build the single binary are defined in `go.mod`.
    sudo apt-get -y install jq # You may need to install jq
-   go mod tidy
+   make clean # (Optional) Run this only if you want to run the newest version of flyteconsole
+   make go-tidy
    make compile
 
-   # Step3: Edit the config file: ./flyte-single-binary-local.yaml.
-   # Replace occurrences of $HOME with the actual path of your home directory.
-   sedi=(-i)
-   case "$(uname)" in
-     Darwin*) sedi=(-i "")
-   esac
-   sed "${sedi[@]}" -e "s|\$HOME|${HOME}|g" flyte-single-binary-local.yaml
-
-   # Step 4: Prepare a namespace template for the cluster resource controller.
+   # Step 3: Prepare a namespace template for the cluster resource controller.
    # The configuration file "flyte-single-binary-local.yaml" has an entry named cluster_resources.templatePath.
    # This entry needs to direct to a directory containing the templates for the cluster resource controller to use.
    # We will now create a simple template that allows the automatic creation of required namespaces for projects.
@@ -419,7 +412,7 @@ that integrates all Flyte components into a single binary.
    metadata:
      name: '{{ namespace }}'" > $HOME/.flyte/sandbox/cluster-resource-templates/namespace.yaml
 
-   # Step5: Running the single binary.
+   # Step 4: Running the single binary.
    # The POD_NAMESPACE environment variable is necessary for the webhook to function correctly.
    # You may encounter an error due to `ERROR: duplicate key value violates unique constraint`. Running the command again will solve the problem.
    POD_NAMESPACE=flyte ./flyte start --config flyte-single-binary-local.yaml
@@ -438,7 +431,7 @@ The following instructions provide guidance on how to build single binary with y
 
 .. code:: shell
 
-   # Step1: Install Go. Flyte uses Go 1.19, so make sure to switch to Go 1.19.
+   # Step 1: Install Go. Flyte uses Go 1.19, so make sure to switch to Go 1.19.
    export PATH=$PATH:$(go env GOPATH)/bin
    go install golang.org/dl/go1.19@latest
    go1.19 download
@@ -450,11 +443,11 @@ The following instructions provide guidance on how to build single binary with y
    go install golang.org/x/tools/cmd/goimports@latest
    export PATH=$(go env GOPATH)/bin:$PATH
 
-   # Step2: Go to the {flyteadmin} repository, modify the source code accordingly.
+   # Step 2: Go to the {flyteadmin} repository, modify the source code accordingly.
    cd flyte/flyteadmin
 
-   # Step3: Now, you can build the single binary. Go back to Flyte directory.
-   go mod tidy
+   # Step 3: Now, you can build the single binary. Go back to Flyte directory.
+   make go-tidy
    make compile
    POD_NAMESPACE=flyte ./flyte start --config flyte-single-binary-local.yaml
 
@@ -463,10 +456,10 @@ The following instructions provide guidance on how to build single binary with y
 
 .. code:: shell
 
-   # Step1: Install flytekit
+   # Step 1: Install flytekit
    pip install flytekit && export PATH=$PATH:/home/ubuntu/.local/bin
 
-   # Step2: Run a hello world example
+   # Step 2: Run a hello world example
    pyflyte run --remote https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/hello_world.py  hello_world_wf
    # Go to http://localhost:30080/console/projects/flytesnacks/domains/development/executions/fd63f88a55fed4bba846 to see execution in the console.
    # You can go to the [flytesnacks repository](https://github.com/flyteorg/flytesnacks) to see more useful examples.
@@ -495,16 +488,16 @@ If not, we can start backends with a single command.
 
 .. code:: shell
 
-   # Step1: Install the latest version of flytectl, a portable and lightweight command-line interface to work with Flyte.
+   # Step 1: Install the latest version of flytectl, a portable and lightweight command-line interface to work with Flyte.
    curl -sL https://ctl.flyte.org/install | bash
    # flyteorg/flytectl info checking GitHub for latest tag
    # flyteorg/flytectl info found version: 0.6.39 for v0.6.39/Linux/x86_64
    # flyteorg/flytectl info installed ./bin/flytectl
 
-   # Step2: Export flytectl path based on the previous log "flyteorg/flytectl info installed ./bin/flytectl"
+   # Step 2: Export flytectl path based on the previous log "flyteorg/flytectl info installed ./bin/flytectl"
    export PATH=$PATH:/home/ubuntu/bin # replace with your path
 
-   # Step3: Starts the Flyte demo cluster. This will setup a k3s cluster running minio, postgres Pods, and all Flyte components: flyteadmin, flyteplugins, flytepropeller, etc.
+   # Step 3: Starts the Flyte demo cluster. This will setup a k3s cluster running minio, postgres Pods, and all Flyte components: flyteadmin, flyteplugins, flytepropeller, etc.
    # See https://docs.flyte.org/en/latest/flytectl/gen/flytectl_demo_start.html for more details.
    flytectl demo start
    # 👨‍💻 Flyte is ready! Flyte UI is available at http://localhost:30080/console 🚀 🚀 🎉
@@ -518,7 +511,7 @@ If not, we can start backends with a single command.
 
 .. code:: shell
 
-   # Step1: Build a virtual environment for developing Flytekit. This will allow your local changes to take effect when the same Python interpreter runs `import flytekit`.
+   # Step 1: Build a virtual environment for developing Flytekit. This will allow your local changes to take effect when the same Python interpreter runs `import flytekit`.
    git clone https://github.com/flyteorg/flytekit.git # replace with your own repo
    cd flytekit
    virtualenv ~/.virtualenvs/flytekit
@@ -544,11 +537,11 @@ If not, we can start backends with a single command.
    pip install -e .
    # Now you can use all plugins, but the performance is slow.
 
-   # Step2: Modify the source code for flytekit, then run unit tests and lint.
+   # Step 2: Modify the source code for flytekit, then run unit tests and lint.
    make lint
    make test
 
-   # Step3: Run a hello world sample to test locally
+   # Step 3: Run a hello world sample to test locally
    pyflyte run https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/hello_world.py hello_world_wf
    # Running hello_world_wf() hello world
 
@@ -578,19 +571,19 @@ the Flyte cluster, and finally submit the workflow.
 
 .. code:: shell
 
-   # Step1: Ensure you have pushed your changes to the remote repo
+   # Step 1: Ensure you have pushed your changes to the remote repo
    # In the flytekit folder
    git add . && git commit -s -m "develop" && git push
 
-   # Step2: Build the image
+   # Step 2: Build the image
    # In the flytekit folder
    export FLYTE_INTERNAL_IMAGE="localhost:30000/flytekit:demo" # replace with your own image name and tag
    docker build --no-cache -t  "${FLYTE_INTERNAL_IMAGE}" -f ./Dockerfile .
 
-   # Step3: Push the image to the Flyte cluster
+   # Step 3: Push the image to the Flyte cluster
    docker push ${FLYTE_INTERNAL_IMAGE}
 
-   # Step4: Submit a hello world workflow to the Flyte cluster
+   # Step 4: Submit a hello world workflow to the Flyte cluster
    cd flytesnacks
    pyflyte run --image ${FLYTE_INTERNAL_IMAGE} --remote https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/hello_world.py hello_world_wf
    # Go to http://localhost:30080/console/projects/flytesnacks/domains/development/executions/f5c17e1b5640c4336bf8 to see execution in the console.
@@ -611,35 +604,35 @@ Depending on your needs, refer to one of the following guides to setup up the Fl
 
 .. code:: shell
 
-   # Step1: Clone the repo and navigate to the Flyteconsole folder
+   # Step 1: Clone the repo and navigate to the Flyteconsole folder
    git clone https://github.com/flyteorg/flyteconsole.git
    cd flyteconsole
 
-   # Step2: Install Node.js 18. Refer to https://github.com/nodesource/distributions/blob/master/README.md#using-ubuntu-2.
+   # Step 2: Install Node.js 18. Refer to https://github.com/nodesource/distributions/blob/master/README.md#using-ubuntu-2.
    curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash - &&\
    sudo apt-get install -y nodejs
 
-   # Step3: Install yarn. Refer to https://classic.yarnpkg.com/lang/en/docs/install/#debian-stable.
+   # Step 3: Install yarn. Refer to https://classic.yarnpkg.com/lang/en/docs/install/#debian-stable.
    curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
    echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
    sudo apt update && sudo apt install yarn
 
-   # Step4: Add environment variables
+   # Step 4: Add environment variables
    export BASE_URL=/console
    export ADMIN_API_URL=http://localhost:30080
    export DISABLE_AUTH=1
    export ADMIN_API_USE_SSL="http"
 
-   # Step5: Generate SSL certificate
+   # Step 5: Generate SSL certificate
    # Note, since we will use HTTP, SSL is not required. However, missing an SSL certificate will cause an error when starting Flyteconsole.
    make generate_ssl
 
-   # Step6: Install node packages
+   # Step 6: Install node packages
    yarn install
    yarn build:types # It is fine if seeing error `Property 'at' does not exist on type 'string[]'`
    yarn run build:prod
 
-   # Step7: Start flyteconsole
+   # Step 7: Start flyteconsole
    yarn start
 
 **3. Install the Chrome plugin:** `Moesif Origin & CORS Changer <https://chrome.google.com/webstore/detail/moesif-origin-cors-change/digfbfaphojjndkpccljibejjbppifbc>`__.
@@ -692,11 +685,11 @@ FlyteAdmin and datacatalog use postgres to store persistent records, and you can
 
 .. code:: shell
 
-    # Step1: Install the PostgreSQL client.
+    # Step 1: Install the PostgreSQL client.
     sudo apt-get update
     sudo apt-get install postgresql-client
 
-    # Step2: Connect to the PostgreSQL server. The password is "postgres".
+    # Step 2: Connect to the PostgreSQL server. The password is "postgres".
     psql -h localhost -p 30001 -U postgres -d flyte
 
 
