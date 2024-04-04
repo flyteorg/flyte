@@ -45,7 +45,7 @@ func (m *cacheOutputBlobStore) Delete(ctx context.Context, uri string) error {
 	return nil
 }
 
-func NewCacheOutputStore(store *storage.DataStore, storagePrefix storage.DataReference) interfaces.CacheOutputBlobStore {
+func NewCacheOutputBlobStore(store *storage.DataStore, storagePrefix storage.DataReference) interfaces.CacheOutputBlobStore {
 	return &cacheOutputBlobStore{
 		store:         store,
 		storagePrefix: storagePrefix,

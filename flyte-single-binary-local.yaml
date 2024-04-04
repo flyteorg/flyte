@@ -12,8 +12,9 @@ flyteadmin:
 
 catalog-cache:
   endpoint: localhost:8081
+  cache-endpoint: localhost:8091
   insecure: true
-  type: datacatalog
+  type: cacheservice
 
 cluster_resources:
   standaloneDeployment: false

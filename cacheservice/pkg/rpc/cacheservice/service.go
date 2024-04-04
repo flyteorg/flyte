@@ -18,6 +18,7 @@ import (
 	"github.com/flyteorg/flyte/cacheservice/pkg/config"
 	"github.com/flyteorg/flyte/cacheservice/pkg/manager/impl"
 	"github.com/flyteorg/flyte/cacheservice/pkg/manager/interfaces"
+	"github.com/flyteorg/flyte/cacheservice/pkg/repositories"
 	"github.com/flyteorg/flyte/cacheservice/pkg/runtime"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/cacheservice"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
@@ -80,12 +81,13 @@ func NewCacheServiceServer() *CacheService {
 		panic(err)
 	}
 
-	outputStore := impl.NewCacheOutputStore(dataStorageClient, storagePrefix)
-	dataStore := impl.NewCacheDataStore(ctx, cacheServiceConfig)
-	reservationStore := impl.NewReservationDataStore(ctx, cacheServiceConfig)
+	outputStore := impl.NewCacheOutputBlobStore(dataStorageClient, storagePrefix)
+	// TODO - @pvditt this should prolly not be handled here
+	pgDbConfigValues := configProvider.ApplicationConfiguration().GetDbConfig()
+	repos := repositories.GetRepositories(ctx, cacheServiceConfig, *pgDbConfigValues, cacheServiceScope)
 
 	return &CacheService{
-		CacheManager: impl.NewCacheManager(outputStore, dataStore, reservationStore, cacheServiceConfig.MaxInlineSizeBytes, cacheServiceScope.NewSubScope("cache"),
+		CacheManager: impl.NewCacheManager(outputStore, repos.CachedOutputRepo(), repos.ReservationRepo(), cacheServiceConfig.MaxInlineSizeBytes, cacheServiceScope.NewSubScope("cache"),
 			time.Duration(cacheServiceConfig.HeartbeatGracePeriodMultiplier), cacheServiceConfig.MaxReservationHeartbeat.Duration),
 	}
 }

@@ -1,7 +1,11 @@
 package entrypoints
 
 import (
+	"context"
+
 	"github.com/spf13/cobra"
+
+	"github.com/flyteorg/flyte/cacheservice/pkg/repositories"
 )
 
 var parentMigrateCmd = &cobra.Command{
@@ -9,12 +13,13 @@ var parentMigrateCmd = &cobra.Command{
 	Short: "This command controls migration behavior for the Flyte cacheservice database. Please choose a subcommand.",
 }
 
-// This runs all the migrations. This is a placeholder for now as cache service does not have any migrations
+// This runs all the migrations for sql databases
 var migrateCmd = &cobra.Command{
 	Use:   "run",
 	Short: "This command will run all the migrations for the database",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return nil
+		ctx := context.Background()
+		return repositories.Migrate(ctx)
 	},
 }
 

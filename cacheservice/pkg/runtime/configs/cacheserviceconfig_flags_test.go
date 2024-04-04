@@ -176,7 +176,7 @@ func TestCacheServiceConfig_SetFlags(t *testing.T) {
 
 			cmdFlags.Set("data-store-type", testValue)
 			if vString, err := cmdFlags.GetString("data-store-type"); err == nil {
-				testDecodeJson_CacheServiceConfig(t, fmt.Sprintf("%v", vString), &actual.DataStoreType)
+				testDecodeJson_CacheServiceConfig(t, fmt.Sprintf("%v", vString), &actual.OutputDataStoreType)
 
 			} else {
 				assert.FailNow(t, err.Error())

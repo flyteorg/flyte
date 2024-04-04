@@ -7,7 +7,7 @@ import (
 	"google.golang.org/grpc/codes"
 
 	"github.com/flyteorg/flyte/cacheservice/pkg/errors"
-	"github.com/flyteorg/flyte/cacheservice/repositories/models"
+	"github.com/flyteorg/flyte/cacheservice/pkg/repositories/models"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/cacheservice"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
@@ -38,7 +38,9 @@ func CreateCachedOutputModel(ctx context.Context, key string, cachedOutput *cach
 	}
 
 	return &models.CachedOutput{
-		ID:            key,
+		BaseModel: models.BaseModel{
+			ID: key,
+		},
 		OutputURI:     cachedOutput.GetOutputUri(),
 		OutputLiteral: outputLiteralBytes,
 		Identifier: models.Identifier{

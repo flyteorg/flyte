@@ -1,4 +1,4 @@
-package impl
+package clients
 
 import (
 	"context"
@@ -13,50 +13,14 @@ import (
 	"google.golang.org/grpc/codes"
 
 	"github.com/flyteorg/flyte/cacheservice/pkg/errors"
-	"github.com/flyteorg/flyte/cacheservice/pkg/manager/interfaces"
+	"github.com/flyteorg/flyte/cacheservice/pkg/repositories/interfaces"
+	"github.com/flyteorg/flyte/cacheservice/pkg/repositories/models"
 	"github.com/flyteorg/flyte/cacheservice/pkg/runtime/configs"
-	"github.com/flyteorg/flyte/cacheservice/repositories/models"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 var (
-	_ interfaces.CacheDataStoreClient = &memClient{}
-)
-
-type memClient struct {
-	cacheMap *map[string]*models.CachedOutput
-}
-
-// Get returns the cached output for the given key. It returns an error if the key does not exist.
-func (c *memClient) Get(ctx context.Context, key string) (*models.CachedOutput, error) {
-	cache := *c.cacheMap
-	if value, exists := cache[key]; exists {
-		return value, nil
-	}
-
-	return nil, errors.NewNotFoundError("output", key)
-}
-
-// Put will always set the value for the given key. It will overwrite the existing value if it exists.
-func (c *memClient) Put(ctx context.Context, key string, cachedOutput *models.CachedOutput) error {
-	cache := *c.cacheMap
-	cache[key] = cachedOutput
-	return nil
-}
-
-// Delete is an idempotent operation. It will not return an error if the key does not exist.
-func (c *memClient) Delete(ctx context.Context, key string) error {
-	cache := *c.cacheMap
-	if _, exists := cache[key]; exists {
-		delete(cache, key)
-		return nil
-	}
-
-	return errors.NewNotFoundError("output", key)
-}
-
-var (
-	_ interfaces.CacheDataStoreClient = &dynamoClient{}
+	_ interfaces.CachedOutputRepo = &dynamoClient{}
 )
 
 type dynamoClient struct {
@@ -129,8 +93,21 @@ func (c *dynamoClient) Delete(ctx context.Context, key string) error {
 	return nil
 }
 
+func NewDynamoCachedOutputRepo(ctx context.Context, serviceConfig configs.CacheServiceConfig) interfaces.CachedOutputRepo {
+	cfg, err := awsConfig.LoadDefaultConfig(context.TODO(),
+		awsConfig.WithRegion(serviceConfig.AwsRegion),
+	)
+	if err != nil {
+		panic("unable to load AWS config to connect to Dynamo" + err.Error())
+	}
+	return &dynamoClient{
+		DynamoDbClient: dynamodb.NewFromConfig(cfg),
+		TableName:      "cache",
+	}
+}
+
 var (
-	_ interfaces.CacheDataStoreClient = &redisClient{}
+	_ interfaces.CachedOutputRepo = &redisClient{}
 )
 
 type redisClient struct {
@@ -186,41 +163,20 @@ func (r *redisClient) Delete(ctx context.Context, key string) error {
 	return nil
 }
 
-func NewCacheDataStore(ctx context.Context, serviceConfig configs.CacheServiceConfig) interfaces.CacheDataStoreClient {
-	clientType := serviceConfig.DataStoreType
+func NewRedisCachedOutputRepo(ctx context.Context, serviceConfig configs.CacheServiceConfig) interfaces.CachedOutputRepo {
+	rdb := redis.NewClient(
+		&redis.Options{
+			Addr:     serviceConfig.RedisAddress,
+			Username: serviceConfig.RedisUsername,
+			Password: serviceConfig.RedisPassword,
+		})
 
-	switch clientType {
-	case configs.Mem:
-		cacheMap := make(map[string]*models.CachedOutput)
-		return &memClient{cacheMap: &cacheMap}
-	case configs.DynamoDB:
-		cfg, err := awsConfig.LoadDefaultConfig(context.TODO(),
-			awsConfig.WithRegion(serviceConfig.AwsRegion),
-		)
-		if err != nil {
-			panic("unable to load AWS config to connect to Dynamo" + err.Error())
-		}
-		return &dynamoClient{
-			DynamoDbClient: dynamodb.NewFromConfig(cfg),
-			TableName:      "cache",
-		}
-	case configs.Redis:
-		rdb := redis.NewClient(
-			&redis.Options{
-				Addr:     serviceConfig.RedisAddress,
-				Username: serviceConfig.RedisUsername,
-				Password: serviceConfig.RedisPassword,
-			})
-
-		_, err := rdb.Ping(ctx).Result()
-		if err != nil {
-			panic("failed to connect to redis " + err.Error())
-		}
-
-		return &redisClient{
-			RedisClient: rdb,
-		}
+	_, err := rdb.Ping(ctx).Result()
+	if err != nil {
+		panic("failed to connect to redis " + err.Error())
 	}
 
-	panic("unsupported cache data store type")
+	return &redisClient{
+		RedisClient: rdb,
+	}
 }

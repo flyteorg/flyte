@@ -15,7 +15,8 @@ import (
 	"github.com/flyteorg/flyte/cacheservice/pkg/errors"
 	"github.com/flyteorg/flyte/cacheservice/pkg/manager/interfaces"
 	"github.com/flyteorg/flyte/cacheservice/pkg/manager/mocks"
-	"github.com/flyteorg/flyte/cacheservice/repositories/models"
+	repoMocks "github.com/flyteorg/flyte/cacheservice/pkg/repositories/mocks"
+	"github.com/flyteorg/flyte/cacheservice/pkg/repositories/models"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/cacheservice"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -91,7 +92,7 @@ func TestCacheManager_Get(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			mockDataStore := &mocks.CacheDataStoreClient{}
+			mockDataStore := &repoMocks.CachedOutputRepo{}
 			mockDataStore.OnGetMatch(
 				ctx,
 				mock.MatchedBy(func(o string) bool {
@@ -99,7 +100,7 @@ func TestCacheManager_Get(t *testing.T) {
 					return true
 				})).Return(tc.mockDataStoreReturn, tc.mockDataStoreError)
 
-			m := NewCacheManager(&mocks.CacheOutputBlobStore{}, mockDataStore, &mocks.ReservationDataStoreClient{}, 1024, mockScope.NewTestScope(), time.Duration(1), time.Duration(1))
+			m := NewCacheManager(&mocks.CacheOutputBlobStore{}, mockDataStore, &repoMocks.ReservationRepo{}, 1024, mockScope.NewTestScope(), time.Duration(1), time.Duration(1))
 
 			response, err := m.Get(ctx, tc.mockRequest)
 
@@ -373,7 +374,7 @@ func TestCacheManager_Put(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			mockDataStore := &mocks.CacheDataStoreClient{}
+			mockDataStore := &repoMocks.CachedOutputRepo{}
 			mockDataStore.OnGetMatch(
 				ctx,
 				mock.MatchedBy(matchKeyFunc),
@@ -395,7 +396,7 @@ func TestCacheManager_Put(t *testing.T) {
 				mock.MatchedBy(tc.outputDeleteMatchOutputFunc),
 			).Return(tc.outputDeleteError)
 
-			m := NewCacheManager(mockOutputStore, mockDataStore, &mocks.ReservationDataStoreClient{}, tc.maxSizeBytes, mockScope.NewTestScope(), time.Duration(1), time.Duration(1))
+			m := NewCacheManager(mockOutputStore, mockDataStore, &repoMocks.ReservationRepo{}, tc.maxSizeBytes, mockScope.NewTestScope(), time.Duration(1), time.Duration(1))
 
 			_, err := m.Put(ctx, tc.mockRequest)
 
@@ -431,9 +432,9 @@ func TestCacheManager_GetOrExtendReservation(t *testing.T) {
 		expectError             bool
 		expectedErrorStatusCode codes.Code
 		deleteError             error
-		getReturn               *models.Reservation
+		getReturn               *models.CacheReservation
 		getError                error
-		getReturn1              *models.Reservation
+		getReturn1              *models.CacheReservation
 		getError1               error
 		createError             error
 		updateError             error
@@ -499,7 +500,7 @@ func TestCacheManager_GetOrExtendReservation(t *testing.T) {
 			},
 			getReturn: nil,
 			getError:  errors.NewNotFoundError("reservation", sampleKey),
-			getReturn1: &models.Reservation{
+			getReturn1: &models.CacheReservation{
 				Key:       sampleKey,
 				OwnerID:   sampleOwner1,
 				ExpiresAt: now.Add(time.Hour),
@@ -517,7 +518,7 @@ func TestCacheManager_GetOrExtendReservation(t *testing.T) {
 				OwnerId:           sampleOwner,
 				HeartbeatInterval: sampleHeartBeatInterval,
 			},
-			getReturn: &models.Reservation{
+			getReturn: &models.CacheReservation{
 				Key:       sampleKey,
 				OwnerID:   sampleOwner1,
 				ExpiresAt: now.Add(-time.Hour),
@@ -535,7 +536,7 @@ func TestCacheManager_GetOrExtendReservation(t *testing.T) {
 				OwnerId:           sampleOwner,
 				HeartbeatInterval: sampleHeartBeatInterval,
 			},
-			getReturn: &models.Reservation{
+			getReturn: &models.CacheReservation{
 				Key:       sampleKey,
 				OwnerID:   sampleOwner,
 				ExpiresAt: now.Add(time.Hour),
@@ -553,7 +554,7 @@ func TestCacheManager_GetOrExtendReservation(t *testing.T) {
 				OwnerId:           sampleOwner,
 				HeartbeatInterval: sampleHeartBeatInterval,
 			},
-			getReturn: &models.Reservation{
+			getReturn: &models.CacheReservation{
 				Key:       sampleKey,
 				OwnerID:   sampleOwner1,
 				ExpiresAt: now.Add(time.Hour),
@@ -570,7 +571,7 @@ func TestCacheManager_GetOrExtendReservation(t *testing.T) {
 	for _, tc := range testCases {
 		requestKey := fmt.Sprintf("%s:%s", "reservation", tc.mockRequest.Key)
 		t.Run(tc.name, func(t *testing.T) {
-			mockReservationStoreClient := &mocks.ReservationDataStoreClient{}
+			mockReservationStoreClient := &repoMocks.ReservationRepo{}
 			mockReservationStoreClient.OnGetMatch(
 				ctx,
 				mock.MatchedBy(func(o string) bool {
@@ -585,7 +586,7 @@ func TestCacheManager_GetOrExtendReservation(t *testing.T) {
 				})).Return(tc.getReturn1, tc.getError1)
 			mockReservationStoreClient.OnCreateMatch(
 				ctx,
-				mock.MatchedBy(func(reservation *models.Reservation) bool {
+				mock.MatchedBy(func(reservation *models.CacheReservation) bool {
 					assert.Equal(t, requestKey, reservation.Key)
 					assert.Equal(t, tc.expectedExpiresAtCall, reservation.ExpiresAt)
 					return true
@@ -594,7 +595,7 @@ func TestCacheManager_GetOrExtendReservation(t *testing.T) {
 			).Return(tc.createError)
 			mockReservationStoreClient.OnUpdateMatch(
 				ctx,
-				mock.MatchedBy(func(reservation *models.Reservation) bool {
+				mock.MatchedBy(func(reservation *models.CacheReservation) bool {
 					assert.Equal(t, requestKey, reservation.Key)
 					assert.Equal(t, tc.expectedExpiresAtCall, reservation.ExpiresAt)
 					return true
@@ -602,7 +603,7 @@ func TestCacheManager_GetOrExtendReservation(t *testing.T) {
 				mock.Anything,
 			).Return(tc.updateError)
 
-			m := NewCacheManager(&mocks.CacheOutputBlobStore{}, &mocks.CacheDataStoreClient{}, mockReservationStoreClient, 0, mockScope.NewTestScope(), heartbeatGracePeriodMultiplier, maxHeartBeatInterval)
+			m := NewCacheManager(&mocks.CacheOutputBlobStore{}, &repoMocks.CachedOutputRepo{}, mockReservationStoreClient, 0, mockScope.NewTestScope(), heartbeatGracePeriodMultiplier, maxHeartBeatInterval)
 
 			reservation, err := m.GetOrExtendReservation(ctx, tc.mockRequest, now)
 			if tc.expectError {
@@ -680,7 +681,7 @@ func TestCacheManager_ReleaseReservation(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			requestKey := fmt.Sprintf("%s:%s", "reservation", tc.mockRequest.Key)
 
-			mockReservationStoreClient := &mocks.ReservationDataStoreClient{}
+			mockReservationStoreClient := &repoMocks.ReservationRepo{}
 			mockReservationStoreClient.OnDeleteMatch(
 				ctx,
 				mock.MatchedBy(func(key string) bool {
@@ -692,7 +693,7 @@ func TestCacheManager_ReleaseReservation(t *testing.T) {
 				}),
 			).Return(tc.deleteError)
 
-			m := NewCacheManager(&mocks.CacheOutputBlobStore{}, &mocks.CacheDataStoreClient{}, mockReservationStoreClient, 0, mockScope.NewTestScope(), time.Duration(1), time.Duration(1))
+			m := NewCacheManager(&mocks.CacheOutputBlobStore{}, &repoMocks.CachedOutputRepo{}, mockReservationStoreClient, 0, mockScope.NewTestScope(), time.Duration(1), time.Duration(1))
 
 			reservation, err := m.ReleaseReservation(ctx, tc.mockRequest)
 			if tc.expectError {

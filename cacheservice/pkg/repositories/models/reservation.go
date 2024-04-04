@@ -4,8 +4,8 @@ import (
 	"time"
 )
 
-type Reservation struct {
-	Key       string
+type CacheReservation struct {
+	Key       string `gorm:"primary_key"`
 	OwnerID   string
 	ExpiresAt time.Time
 }

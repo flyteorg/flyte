@@ -55,7 +55,7 @@ func (cfg CacheServiceConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "profiler-port"), defaultConfig.ProfilerPort, "Port that the profiling service is listening on.")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "heartbeat-grace-period-multiplier"), defaultConfig.HeartbeatGracePeriodMultiplier, "Number of heartbeats before a reservation expires without an extension.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "max-reservation-heartbeat"), defaultConfig.MaxReservationHeartbeat.String(), "The maximum available reservation extension heartbeat interval.")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "data-store-type"), defaultConfig.DataStoreType, "Cache storage implementation to use")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "data-store-type"), defaultConfig.OutputDataStoreType, "Cache storage implementation to use")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "reservation-data-store-type"), defaultConfig.ReservationDataStoreType, "Reservation storage implementation to use")
 	cmdFlags.Int64(fmt.Sprintf("%v%v", prefix, "maxInlineSizeBytes"), defaultConfig.MaxInlineSizeBytes, "The maximum size that an output literal will be stored in line. Default 0 means everything will be offloaded to blob storage.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "aws-region"), defaultConfig.AwsRegion, "Region to connect to.")

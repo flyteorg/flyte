@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/codes"
 
-	"github.com/flyteorg/flyte/cacheservice/repositories/models"
+	"github.com/flyteorg/flyte/cacheservice/pkg/repositories/models"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/cacheservice"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -63,7 +63,9 @@ func TestCreateCachedOutputModel(t *testing.T) {
 			cachedOutput: validOutputLiterals,
 			expectError:  false,
 			expectedOutput: &models.CachedOutput{
-				ID:                 sampleKey,
+				BaseModel: models.BaseModel{
+					ID: sampleKey,
+				},
 				OutputURI:          "",
 				OutputLiteral:      sampleOutputLiteralBytes,
 				Identifier:         models.Identifier{},
@@ -76,7 +78,9 @@ func TestCreateCachedOutputModel(t *testing.T) {
 			cachedOutput: validOutputKeyMap,
 			expectError:  false,
 			expectedOutput: &models.CachedOutput{
-				ID:                 sampleKey,
+				BaseModel: models.BaseModel{
+					ID: sampleKey,
+				},
 				OutputURI:          sampleURI,
 				OutputLiteral:      nil,
 				Identifier:         models.Identifier{},

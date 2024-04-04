@@ -17,6 +17,7 @@ import (
 	ctrlWebhook "sigs.k8s.io/controller-runtime/pkg/webhook"
 
 	cacheserviceConfig "github.com/flyteorg/flyte/cacheservice/pkg/config"
+	cacheserviceRepo "github.com/flyteorg/flyte/cacheservice/pkg/repositories"
 	"github.com/flyteorg/flyte/cacheservice/pkg/rpc/cacheservice"
 	datacatalogConfig "github.com/flyteorg/flyte/datacatalog/pkg/config"
 	datacatalogRepo "github.com/flyteorg/flyte/datacatalog/pkg/repositories"
@@ -54,6 +55,10 @@ func startDataCatalog(ctx context.Context, _ DataCatalog) error {
 }
 
 func startCacheService(ctx context.Context, _ CacheService) error {
+	if err := cacheserviceRepo.Migrate(ctx); err != nil {
+		return err
+	}
+
 	cacheCfg := cacheserviceConfig.GetConfig()
 	return cacheservice.ServeInsecure(ctx, cacheCfg)
 }
@@ -206,8 +211,9 @@ var startCmd = &cobra.Command{
 		cfg := GetConfig()
 
 		for _, serviceName := range []string{otelutils.AdminClientTracer, otelutils.AdminGormTracer, otelutils.AdminServerTracer,
-			otelutils.BlobstoreClientTracer, otelutils.CacheServiceClientTracer, otelutils.DataCatalogClientTracer,
-			otelutils.DataCatalogGormTracer, otelutils.DataCatalogServerTracer, otelutils.FlytePropellerTracer, otelutils.K8sClientTracer} {
+			otelutils.BlobstoreClientTracer, otelutils.CacheServiceClientTracer, otelutils.CacheServiceGormTracer,
+			otelutils.CacheServiceServerTracer, otelutils.DataCatalogClientTracer, otelutils.DataCatalogGormTracer,
+			otelutils.DataCatalogServerTracer, otelutils.FlytePropellerTracer, otelutils.K8sClientTracer} {
 			if err := otelutils.RegisterTracerProvider(serviceName, otelutils.GetConfig()); err != nil {
 				logger.Errorf(ctx, "Failed to create otel tracer provider. %v", err)
 				return err

@@ -12,8 +12,9 @@ import (
 	"github.com/flyteorg/flyte/cacheservice/pkg/errors"
 	"github.com/flyteorg/flyte/cacheservice/pkg/manager/impl/validators"
 	"github.com/flyteorg/flyte/cacheservice/pkg/manager/interfaces"
-	"github.com/flyteorg/flyte/cacheservice/repositories/models"
-	"github.com/flyteorg/flyte/cacheservice/repositories/transformers"
+	repoInterfaces "github.com/flyteorg/flyte/cacheservice/pkg/repositories/interfaces"
+	"github.com/flyteorg/flyte/cacheservice/pkg/repositories/models"
+	"github.com/flyteorg/flyte/cacheservice/pkg/repositories/transformers"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/cacheservice"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
@@ -49,8 +50,8 @@ type cacheMetrics struct {
 
 type cacheManager struct {
 	outputStore                    interfaces.CacheOutputBlobStore
-	dataStore                      interfaces.CacheDataStoreClient
-	reservationStore               interfaces.ReservationDataStoreClient
+	dataStore                      repoInterfaces.CachedOutputRepo
+	reservationStore               repoInterfaces.ReservationRepo
 	systemMetrics                  cacheMetrics
 	maxInlineSizeBytes             int64
 	heartbeatGracePeriodMultiplier time.Duration
@@ -111,6 +112,7 @@ func (m *cacheManager) Put(ctx context.Context, request *cacheservice.PutCacheRe
 		return nil, errors.NewCacheServiceErrorf(codes.Internal, "Failed to create cached output model, err: %v", err)
 	}
 
+	// TODO - @pvditt - can do this in single transaction w/ postgres client - move logic to client (still need to delete blob)
 	cachedOutput, err := m.dataStore.Get(ctx, request.Key)
 	var notFound bool
 	if err != nil {
@@ -208,7 +210,7 @@ func (m *cacheManager) GetOrExtendReservation(ctx context.Context, request *cach
 		heartbeatInterval = request.GetHeartbeatInterval().AsDuration()
 	}
 
-	newReservation := &models.Reservation{
+	newReservation := &models.CacheReservation{
 		Key:       resKey,
 		OwnerID:   request.OwnerId,
 		ExpiresAt: now.Add(heartbeatInterval * m.heartbeatGracePeriodMultiplier),
@@ -219,7 +221,7 @@ func (m *cacheManager) GetOrExtendReservation(ctx context.Context, request *cach
 		if reservationModel.ExpiresAt.Before(now) || reservationModel.OwnerID == request.OwnerId {
 			storeError = m.reservationStore.Update(ctx, newReservation, now)
 		} else {
-			logger.Debugf(ctx, "Reservation: %+v is held by %s", reservationModel.Key, reservationModel.OwnerID)
+			logger.Debugf(ctx, "CacheReservation: %+v is held by %s", reservationModel.Key, reservationModel.OwnerID)
 			reservation := transformers.FromReservationModel(ctx, reservationModel)
 			return &cacheservice.GetOrExtendReservationResponse{Reservation: reservation}, nil
 		}
@@ -229,7 +231,7 @@ func (m *cacheManager) GetOrExtendReservation(ctx context.Context, request *cach
 
 	if storeError != nil {
 		if status.Code(storeError) == codes.AlreadyExists {
-			logger.Debugf(ctx, "Reservation: %+v already exists", newReservation.Key)
+			logger.Debugf(ctx, "CacheReservation: %+v already exists", newReservation.Key)
 			newReservation, err = m.reservationStore.Get(ctx, resKey)
 			if err != nil {
 				logger.Errorf(ctx, "Failed to Get reservation in reservation store, err: %v", err)
@@ -265,7 +267,7 @@ func (m *cacheManager) ReleaseReservation(ctx context.Context, request *cacheser
 	err = m.reservationStore.Delete(ctx, resKey, request.OwnerId)
 	if err != nil {
 		if status.Code(err) == codes.NotFound {
-			logger.Debugf(ctx, "Reservation with key %v and owner %v not found", request.Key, request.OwnerId)
+			logger.Debugf(ctx, "CacheReservation with key %v and owner %v not found", request.Key, request.OwnerId)
 			m.systemMetrics.notFoundCounter.Inc(ctx)
 			return &cacheservice.ReleaseReservationResponse{}, nil
 		}
@@ -278,7 +280,7 @@ func (m *cacheManager) ReleaseReservation(ctx context.Context, request *cacheser
 	return &cacheservice.ReleaseReservationResponse{}, nil
 }
 
-func NewCacheManager(outputStore interfaces.CacheOutputBlobStore, dataStore interfaces.CacheDataStoreClient, reservationStore interfaces.ReservationDataStoreClient, maxInlineSizeBytes int64, cacheScope promutils.Scope,
+func NewCacheManager(outputStore interfaces.CacheOutputBlobStore, dataStore repoInterfaces.CachedOutputRepo, reservationStore repoInterfaces.ReservationRepo, maxInlineSizeBytes int64, cacheScope promutils.Scope,
 	heartbeatGracePeriodMultiplier time.Duration, maxHeartbeatInterval time.Duration) interfaces.CacheManager {
 	cacheMetrics := cacheMetrics{
 		scope:                            cacheScope,

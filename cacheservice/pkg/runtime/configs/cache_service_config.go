@@ -10,8 +10,7 @@ type DataStoreType = string
 
 const (
 	Mem      DataStoreType = "mem"
-	DynamoDB DataStoreType = "dynamodb"
-	Redis    DataStoreType = "redis"
+	Postgres DataStoreType = "postgres"
 )
 
 //go:generate pflags CacheServiceConfig --default-var=defaultConfig
@@ -22,8 +21,8 @@ var defaultConfig = &CacheServiceConfig{
 	ProfilerPort:                   10254,
 	HeartbeatGracePeriodMultiplier: 3,
 	MaxReservationHeartbeat:        config.Duration{Duration: time.Second * 10},
-	DataStoreType:                  Mem,
-	ReservationDataStoreType:       Mem,
+	OutputDataStoreType:            Postgres,
+	ReservationDataStoreType:       Postgres,
 	MaxInlineSizeBytes:             0,
 	AwsRegion:                      "us-west-2",
 	RedisAddress:                   "localhost:6379",
@@ -38,7 +37,7 @@ type CacheServiceConfig struct {
 	ProfilerPort                   int             `json:"profiler-port" pflag:",Port that the profiling service is listening on."`
 	HeartbeatGracePeriodMultiplier int             `json:"heartbeat-grace-period-multiplier" pflag:",Number of heartbeats before a reservation expires without an extension."`
 	MaxReservationHeartbeat        config.Duration `json:"max-reservation-heartbeat" pflag:",The maximum available reservation extension heartbeat interval."`
-	DataStoreType                  DataStoreType   `json:"data-store-type" pflag:",Cache storage implementation to use"`
+	OutputDataStoreType            DataStoreType   `json:"data-store-type" pflag:",Cache storage implementation to use"`
 	ReservationDataStoreType       DataStoreType   `json:"reservation-data-store-type" pflag:",Reservation storage implementation to use"`
 	MaxInlineSizeBytes             int64           `json:"maxInlineSizeBytes" pflag:",The maximum size that an output literal will be stored in line. Default 0 means everything will be offloaded to blob storage."`
 	AwsRegion                      string          `json:"aws-region" pflag:",Region to connect to."`
