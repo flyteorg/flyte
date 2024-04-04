@@ -194,7 +194,7 @@ The resulting ``html`` files will be in ``docs/_build/html``. You can view them 
         * Run the following commands:
            * ``make generate``
            * ``make test_unit``
-           * ``make link``
+           * ``make lint``
         * To compile, run ``make compile``
 
 ``flyteadmin``
@@ -262,7 +262,7 @@ The resulting ``html`` files will be in ``docs/_build/html``. You can view them 
         * Run the following commands:
             * ``make generate``
             * ``make test_unit``
-            * ``make link``
+            * ``make lint``
 
 ``flytestdlib``
 ***************
