@@ -74,7 +74,7 @@ spec:
             {{- end }}
             {{- end }}
         {{- end }}
-        {{- if and (.Values.cluster_resource_manager.enabled) (not .Values.cluster_resource_manager.standalone_deploy) }}
+        {{- if and (.Values.cluster_resource_manager.enabled) (not .Values.cluster_resource_manager.standaloneDeployment) }}
         - command:
           - flyteadmin
           - --config
