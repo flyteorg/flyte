@@ -2,19 +2,20 @@ package k8s
 
 import (
 	"context"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	corev1 "k8s.io/api/core/v1"
 	"runtime/pprof"
 	"strings"
 	"sync"
 	"time"
 
+	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"sigs.k8s.io/controller-runtime/pkg/cache"
+
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
-	"k8s.io/apimachinery/pkg/runtime/schema"
-	"sigs.k8s.io/controller-runtime/pkg/cache"
 )
 
 const resourceLevelMonitorCycleDuration = 10 * time.Second
@@ -52,7 +53,7 @@ type ResourceLevelMonitor struct {
 // K8s resource created by a plugin will have (as yet, Flyte doesn't have any plugins that create cluster level resources and
 // it probably won't for a long time). We can't assume that all the operators and CRDs that Flyte will ever work with will have
 // the exact same set of labels or annotations or owner references. The only thing we can really count on is namespace.
-func (r *ResourceLevelMonitor) countList(ctx context.Context, pods *corev1.PodList) map[string]int {
+func (r *ResourceLevelMonitor) countList(pods *corev1.PodList) map[string]int {
 	// Map of namespace to counts
 	counts := map[string]int{}
 
@@ -62,6 +63,13 @@ func (r *ResourceLevelMonitor) countList(ctx context.Context, pods *corev1.PodLi
 	}
 
 	return counts
+}
+
+func (r *ResourceLevelMonitor) setLevels(ctx context.Context, counts map[string]int) {
+	for ns, count := range counts {
+		withNamespaceCtx := contextutils.WithNamespace(ctx, ns)
+		r.Levels.Set(withNamespaceCtx, float64(count))
+	}
 }
 
 // The context here is expected to already have a value for the KindKey
@@ -75,12 +83,9 @@ func (r *ResourceLevelMonitor) collect(ctx context.Context) {
 		return
 	}
 
-	counts := r.countList(ctx, pods)
+	counts := r.countList(pods)
 
-	for ns, count := range counts {
-		withNamespaceCtx := contextutils.WithNamespace(ctx, ns)
-		r.Levels.Set(withNamespaceCtx, float64(count))
-	}
+	r.setLevels(ctx, counts)
 }
 
 func (r *ResourceLevelMonitor) RunCollector(ctx context.Context) {

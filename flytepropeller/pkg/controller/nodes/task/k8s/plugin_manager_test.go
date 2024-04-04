@@ -994,7 +994,7 @@ func TestResourceManagerConstruction(t *testing.T) {
 	si, err := getPluginInformer(ctx, fakeKubeClient, &v1.Pod{})
 	assert.NotNil(t, si)
 	assert.NoError(t, err)
-	rm := index.GetOrCreateResourceLevelMonitor(ctx, scope, si, gvk)
+	rm := index.GetOrCreateResourceLevelMonitor(ctx, scope, si, gvk, fakeKubeClient)
 	assert.NotNil(t, rm)
 }
 
