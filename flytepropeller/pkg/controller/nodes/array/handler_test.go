@@ -120,6 +120,10 @@ func createNodeExecutionContext(dataStore *storage.DataStore, eventRecorder inte
 		},
 		nil,
 	)
+	executionContext.OnIncrementNodeExecutionCount().Return(1)
+	executionContext.OnIncrementTaskExecutionCount().Return(1)
+	executionContext.OnCurrentNodeExecutionCount().Return(1)
+	executionContext.OnCurrentTaskExecutionCount().Return(1)
 	nCtx.OnExecutionContext().Return(executionContext)
 
 	// EventsRecorder
