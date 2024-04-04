@@ -2393,7 +2393,7 @@
         ]
       }
     },
-    "/api/v1/org/override_attributes/{id.org}/{id.project}/{id.domain}": {
+    "/api/v1/org/configuration/{id.org}/{id.project}/{id.domain}": {
       "get": {
         "summary": "Fetch a unified project attribute.",
         "operationId": "AdminService_GetConfiguration2",
