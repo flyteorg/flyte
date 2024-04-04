@@ -752,6 +752,10 @@
         "add_content_md5_metadata": {
           "type": "boolean",
           "description": "If true, the data proxy will add content_md5 to the metadata to the signed URL and\nit will force clients to add this metadata to the object.\nThis make sure dataproxy is backward compatible with the old flytekit."
+        },
+        "org": {
+          "type": "string",
+          "description": "Optional, org key applied to the resource."
         }
       },
       "description": "CreateUploadLocationRequest specified request for the CreateUploadLocation API.\nThe implementation in data proxy service will create the s3 location with some server side configured prefixes,\nand then:\n  - project/domain/(a deterministic str representation of the content_md5)/filename (if present); OR\n  - project/domain/filename_root (if present)/filename (if present)."

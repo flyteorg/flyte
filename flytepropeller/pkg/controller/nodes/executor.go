@@ -182,6 +182,15 @@ func (c *recursiveNodeExecutor) RecursiveNodeHandler(ctx context.Context, execCo
 	nodeStatus := nl.GetNodeExecutionStatus(ctx, currentNode.GetID())
 	nodePhase := nodeStatus.GetPhase()
 
+	if nodePhase == v1alpha1.NodePhaseRunning && execContext != nil {
+		execContext.IncrementNodeExecutionCount()
+		if currentNode.GetKind() == v1alpha1.NodeKindTask {
+			execContext.IncrementTaskExecutionCount()
+		}
+		logger.Debugf(currentNodeCtx, "recursive handler - node execution count [%v], task execution count [%v], phase [%v], ",
+			execContext.CurrentNodeExecutionCount(), execContext.CurrentTaskExecutionCount(), nodePhase.String())
+	}
+
 	if canHandleNode(nodePhase) {
 		// TODO Follow up Pull Request,
 		// 1. Rename this method to DAGTraversalHandleNode (accepts a DAGStructure along-with) the remaining arguments
@@ -287,6 +296,7 @@ func (c *recursiveNodeExecutor) handleDownstream(ctx context.Context, execContex
 			}), nil
 		}
 
+		logger.Debugf(ctx, "downstream handler starting node id %v, ", downstreamNode.GetID())
 		state, err := c.RecursiveNodeHandler(ctx, execContext, dag, nl, downstreamNode)
 		if err != nil {
 			return interfaces.NodeStatusUndefined, err

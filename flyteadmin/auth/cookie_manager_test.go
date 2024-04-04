@@ -10,6 +10,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/golang-jwt/jwt"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/oauth2"
@@ -57,9 +58,10 @@ func TestCookieManager(t *testing.T) {
 		assert.NoError(t, err)
 		fmt.Println(w.Header().Get("Set-Cookie"))
 		c := w.Result().Cookies()
-		assert.Equal(t, "flyte_at", c[0].Name)
-		assert.Equal(t, "flyte_idt", c[1].Name)
-		assert.Equal(t, "flyte_rt", c[2].Name)
+		assert.Equal(t, "flyte_at_1", c[0].Name)
+		assert.Equal(t, "flyte_at_2", c[1].Name)
+		assert.Equal(t, "flyte_idt", c[2].Name)
+		assert.Equal(t, "flyte_rt", c[3].Name)
 	})
 
 	t.Run("set_token_nil", func(t *testing.T) {
@@ -68,6 +70,79 @@ func TestCookieManager(t *testing.T) {
 		err = manager.SetTokenCookies(ctx, w, nil)
 
 		assert.EqualError(t, err, "[EMPTY_OAUTH_TOKEN] Attempting to set cookies with nil token")
+	})
+
+	t.Run("set_long_token_cookies", func(t *testing.T) {
+		ctx := context.Background()
+		// These were generated for unit testing only.
+		hashKeyEncoded := "wG4pE1ccdw/pHZ2ml8wrD5VJkOtLPmBpWbKHmezWXktGaFbRoAhXidWs8OpbA3y7N8vyZhz1B1E37+tShWC7gA" //nolint:goconst
+		blockKeyEncoded := "afyABVgGOvWJFxVyOvCWCupoTn6BkNl4SOHmahho16Q"                                           //nolint:goconst
+		cookieSetting := config.CookieSettings{
+			SameSitePolicy: config.SameSiteDefaultMode,
+			Domain:         "default",
+		}
+		manager, err := NewCookieManager(ctx, hashKeyEncoded, blockKeyEncoded, cookieSetting)
+		assert.NoError(t, err)
+		longString := "asdfkjashdfkljqwpeuqwoieuiposdasdfasdfsdfcuzxcvjzvjlasfuo9qwuoiqwueoqoieulkszcjvhlkshcvlkasdhflkashfqoiwaskldfjhasdfljk" +
+			"aklsdjflkasdfhlkjasdhfklhfjkasdhfkasdhfjasdfhasldkfjhaskldfhaklsdfhlasjdfhalksjdfhlskdqoiweuqioweuqioweuqoiew" +
+			"aklsdjfqwoieuioqwerupweiruoqpweurpqweuropqweurpqweurpoqwuetopqweuropqwuerpoqwuerpoqweuropqweurpoqweyitoqpwety"
+		// These were generated for unit testing only.
+		tokenData := jwt.MapClaims{
+			"iss":                "https://login.microsoftonline.com/72f988bf-86f1-41af-91ab-2d7cd011db47/v2.0",
+			"aio":                "AXQAi/8UAAAAvfR1B135YmjOZGtNGTM/fgvUY0ugwwk2NWCjmNglWR9v+b5sI3cCSGXOp1Zw96qUNb1dm0jqBHHYDKQtc4UplZAtFULbitt3x2KYdigeS5tXl0yNIeMiYsA/1Dpd43xg9sXAtLU3+iZetXiDasdfkpsaldg==",
+			"sub":                "subject",
+			"aud":                "audience",
+			"exp":                1677642301,
+			"nbf":                1677641001,
+			"iat":                1677641001,
+			"jti":                "a-unique-identifier",
+			"user_id":            "123456",
+			"username":           "john_doe",
+			"preferred_username": "john_doe",
+			"given_name":         "John",
+			"family_name":        "Doe",
+			"email":              "john.doe@example.com",
+			"scope":              "read write",
+			"role":               "user",
+			"is_active":          true,
+			"is_verified":        true,
+			"client_id":          "client123",
+			"custom_field1":      longString,
+			"custom_field2":      longString,
+			"custom_field3":      longString,
+			"custom_field4":      longString,
+			"custom_field5":      longString,
+			"custom_field6":      []string{longString, longString},
+			"additional_field1":  "extra_value1",
+			"additional_field2":  "extra_value2",
+		}
+		secretKey := []byte("tJL6Wr2JUsxLyNezPQh1J6zn6wSoDAhgRYSDkaMuEHy75VikiB8wg25WuR96gdMpookdlRvh7SnRvtjQN9b5m4zJCMpSRcJ5DuXl4mcd7Cg3Zp1C5")
+		rawToken := jwt.NewWithClaims(jwt.SigningMethodHS256, tokenData)
+		tokenString, err := rawToken.SignedString(secretKey)
+		if err != nil {
+			fmt.Println("Error:", err)
+			return
+		}
+		token := &oauth2.Token{
+			AccessToken:  tokenString,
+			RefreshToken: "refresh",
+		}
+
+		token = token.WithExtra(map[string]interface{}{
+			"id_token": "id token",
+		})
+
+		w := httptest.NewRecorder()
+		_, err = http.NewRequest("GET", "/api/v1/projects", nil)
+		assert.NoError(t, err)
+		err = manager.SetTokenCookies(ctx, w, token)
+		assert.NoError(t, err)
+		fmt.Println(w.Header().Get("Set-Cookie"))
+		c := w.Result().Cookies()
+		assert.Equal(t, "flyte_at_1", c[0].Name)
+		assert.Equal(t, "flyte_at_2", c[1].Name)
+		assert.Equal(t, "flyte_idt", c[2].Name)
+		assert.Equal(t, "flyte_rt", c[3].Name)
 	})
 
 	t.Run("set_token_cookies_wrong_key", func(t *testing.T) {
@@ -130,16 +205,27 @@ func TestCookieManager(t *testing.T) {
 		manager.DeleteCookies(ctx, w)
 
 		cookies := w.Result().Cookies()
-		require.Equal(t, 3, len(cookies))
+		require.Equal(t, 5, len(cookies))
+
 		assert.True(t, time.Now().After(cookies[0].Expires))
 		assert.Equal(t, cookieSetting.Domain, cookies[0].Domain)
 		assert.Equal(t, accessTokenCookieName, cookies[0].Name)
+
 		assert.True(t, time.Now().After(cookies[1].Expires))
 		assert.Equal(t, cookieSetting.Domain, cookies[1].Domain)
-		assert.Equal(t, refreshTokenCookieName, cookies[1].Name)
-		assert.True(t, time.Now().After(cookies[1].Expires))
-		assert.Equal(t, cookieSetting.Domain, cookies[1].Domain)
-		assert.Equal(t, idTokenCookieName, cookies[2].Name)
+		assert.Equal(t, accessTokenCookieNameSplitFirst, cookies[1].Name)
+
+		assert.True(t, time.Now().After(cookies[2].Expires))
+		assert.Equal(t, cookieSetting.Domain, cookies[2].Domain)
+		assert.Equal(t, accessTokenCookieNameSplitSecond, cookies[2].Name)
+
+		assert.True(t, time.Now().After(cookies[3].Expires))
+		assert.Equal(t, cookieSetting.Domain, cookies[3].Domain)
+		assert.Equal(t, refreshTokenCookieName, cookies[3].Name)
+
+		assert.True(t, time.Now().After(cookies[4].Expires))
+		assert.Equal(t, cookieSetting.Domain, cookies[4].Domain)
+		assert.Equal(t, idTokenCookieName, cookies[4].Name)
 	})
 
 	t.Run("get_http_same_site_policy", func(t *testing.T) {

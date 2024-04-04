@@ -38,6 +38,7 @@ var (
 		ID: "foo",
 		ArrayNode: &v1alpha1.ArrayNodeSpec{
 			SubNodeSpec: &v1alpha1.NodeSpec{
+				Kind:    v1alpha1.NodeKindTask,
 				TaskRef: &taskRef,
 			},
 		},
@@ -125,6 +126,10 @@ func createNodeExecutionContext(dataStore *storage.DataStore, eventRecorder inte
 	)
 	executionContext.OnCurrentParallelism().Return(currentParallelism)
 	executionContext.On("IncrementParallelism").Run(func(args mock.Arguments) {}).Return(currentParallelism)
+	executionContext.OnIncrementNodeExecutionCount().Return(1)
+	executionContext.OnIncrementTaskExecutionCount().Return(1)
+	executionContext.OnCurrentNodeExecutionCount().Return(1)
+	executionContext.OnCurrentTaskExecutionCount().Return(1)
 	nCtx.OnExecutionContext().Return(executionContext)
 
 	// EventsRecorder
@@ -897,6 +902,14 @@ func TestHandleArrayNodePhaseSucceeding(t *testing.T) {
 				v1alpha1.NodePhaseSucceeded,
 				v1alpha1.NodePhaseFailed,
 			},
+			expectedArrayNodePhase:  v1alpha1.ArrayNodePhaseSucceeding,
+			expectedTransitionPhase: handler.EPhaseSuccess,
+		},
+		{
+			name:                    "SuccessEmptyInput",
+			outputValues:            []*int{},
+			outputVariable:          "foo",
+			subNodePhases:           []v1alpha1.NodePhase{},
 			expectedArrayNodePhase:  v1alpha1.ArrayNodePhaseSucceeding,
 			expectedTransitionPhase: handler.EPhaseSuccess,
 		},

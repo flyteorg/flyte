@@ -21,13 +21,13 @@ func (_m ItemWrapper_GetID) Return(_a0 string) *ItemWrapper_GetID {
 }
 
 func (_m *ItemWrapper) OnGetID() *ItemWrapper_GetID {
-	c := _m.On("GetID")
-	return &ItemWrapper_GetID{Call: c}
+	c_call := _m.On("GetID")
+	return &ItemWrapper_GetID{Call: c_call}
 }
 
 func (_m *ItemWrapper) OnGetIDMatch(matchers ...interface{}) *ItemWrapper_GetID {
-	c := _m.On("GetID", matchers...)
-	return &ItemWrapper_GetID{Call: c}
+	c_call := _m.On("GetID", matchers...)
+	return &ItemWrapper_GetID{Call: c_call}
 }
 
 // GetID provides a mock function with given fields:
@@ -53,13 +53,13 @@ func (_m ItemWrapper_GetItem) Return(_a0 cache.Item) *ItemWrapper_GetItem {
 }
 
 func (_m *ItemWrapper) OnGetItem() *ItemWrapper_GetItem {
-	c := _m.On("GetItem")
-	return &ItemWrapper_GetItem{Call: c}
+	c_call := _m.On("GetItem")
+	return &ItemWrapper_GetItem{Call: c_call}
 }
 
 func (_m *ItemWrapper) OnGetItemMatch(matchers ...interface{}) *ItemWrapper_GetItem {
-	c := _m.On("GetItem", matchers...)
-	return &ItemWrapper_GetItem{Call: c}
+	c_call := _m.On("GetItem", matchers...)
+	return &ItemWrapper_GetItem{Call: c_call}
 }
 
 // GetItem provides a mock function with given fields:

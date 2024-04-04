@@ -227,6 +227,9 @@ func getTaskContext(t *testing.T) *pluginCoreMocks.TaskExecutionContext {
 	tMeta.OnGetAnnotations().Return(map[string]string{"foo": "bar"})
 	tMeta.OnGetK8sServiceAccount().Return("k8s-account")
 	tMeta.OnGetEnvironmentVariables().Return(map[string]string{"foo": "bar"})
+	tMeta.OnGetSecurityContext().Return(flyteIdlCore.SecurityContext{
+		RunAs: &flyteIdlCore.Identity{ExecutionIdentity: "execution-identity"},
+	})
 	resourceManager := &pluginCoreMocks.ResourceManager{}
 	resourceManager.OnAllocateResourceMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(pluginCore.AllocationStatusGranted, nil)
 	resourceManager.OnReleaseResourceMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)

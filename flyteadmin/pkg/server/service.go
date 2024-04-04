@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
-	"google.golang.org/protobuf/encoding/protojson"
 	"net"
 	"net/http"
 	"strings"
@@ -24,6 +23,7 @@ import (
 	"google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/reflection"
+	"google.golang.org/protobuf/encoding/protojson"
 	"k8s.io/apimachinery/pkg/util/rand"
 
 	"github.com/flyteorg/flyte/flyteadmin/auth"
@@ -210,8 +210,8 @@ func newHTTPServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 	// the application/json content type.
 	gwmuxOptions = append(gwmuxOptions, runtime.WithMarshalerOption("application/json", &runtime.JSONPb{
 		MarshalOptions: protojson.MarshalOptions{
-			UseProtoNames: true,
-			EmitUnpopulated: true,
+			UseProtoNames:     true,
+			EmitUnpopulated:   true,
 			EmitDefaultValues: true,
 		},
 	}))
