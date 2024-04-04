@@ -19,7 +19,7 @@ import { WorkflowAttributesDeleteRequest, WorkflowAttributesDeleteResponse, Work
 import { ListMatchableAttributesRequest, ListMatchableAttributesResponse } from "../admin/matchable_resource_pb.js";
 import { GetVersionRequest, GetVersionResponse } from "../admin/version_pb.js";
 import { DescriptionEntity, DescriptionEntityList, DescriptionEntityListRequest } from "../admin/description_entity_pb.js";
-import { OverrideAttributesGetRequest, OverrideAttributesGetResponse, OverrideAttributesUpdateRequest, OverrideAttributesUpdateResponse } from "../admin/override_attributes_pb.js";
+import { ConfigurationGetRequest, ConfigurationGetResponse, ConfigurationUpdateRequest, ConfigurationUpdateResponse } from "../admin/configuration_pb.js";
 
 /**
  * The following defines an RPC service that is also served over HTTP via grpc-gateway.
@@ -642,23 +642,23 @@ export const AdminService = {
     /**
      * Fetch a unified project attribute.
      *
-     * @generated from rpc flyteidl.service.AdminService.GetOverrideAttributes
+     * @generated from rpc flyteidl.service.AdminService.GetConfiguration
      */
-    getOverrideAttributes: {
-      name: "GetOverrideAttributes",
-      I: OverrideAttributesGetRequest,
-      O: OverrideAttributesGetResponse,
+    getConfiguration: {
+      name: "GetConfiguration",
+      I: ConfigurationGetRequest,
+      O: ConfigurationGetResponse,
       kind: MethodKind.Unary,
     },
     /**
      * Update a unified project attribute.
      *
-     * @generated from rpc flyteidl.service.AdminService.UpdateOverrideAttributes
+     * @generated from rpc flyteidl.service.AdminService.UpdateConfiguration
      */
-    updateOverrideAttributes: {
-      name: "UpdateOverrideAttributes",
-      I: OverrideAttributesUpdateRequest,
-      O: OverrideAttributesUpdateResponse,
+    updateConfiguration: {
+      name: "UpdateConfiguration",
+      I: ConfigurationUpdateRequest,
+      O: ConfigurationUpdateResponse,
       kind: MethodKind.Unary,
     },
   }

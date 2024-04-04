@@ -74,8 +74,6 @@ func (m *OverrideAttributesManager) GetOverrideAttributes(
 func (m *OverrideAttributesManager) UpdateOverrideAttributes(
 	ctx context.Context, request admin.OverrideAttributesUpdateRequest) (
 	*admin.OverrideAttributesUpdateResponse, error) {
-	// TODO: These should be done in a transaction
-
 	// Validate the request
 	if err := validation.ValidateOverrideAttributesUpdateRequest(request); err != nil {
 		return nil, err
@@ -114,10 +112,7 @@ func (m *OverrideAttributesManager) UpdateOverrideAttributes(
 	}
 
 	// Erase the active override attributes and create the new one
-	if err := m.db.OverrideAttributesRepo().EraseActive(ctx); err != nil {
-		return nil, err
-	}
-	if err := m.db.OverrideAttributesRepo().Create(ctx, createOverrideAttributesInput); err != nil {
+	if err := m.db.OverrideAttributesRepo().EraseActiveAndCreate(ctx, overrideAttributes.Version, createOverrideAttributesInput); err != nil {
 		return nil, err
 	}
 	return &admin.OverrideAttributesUpdateResponse{}, nil

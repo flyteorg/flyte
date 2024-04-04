@@ -75,8 +75,8 @@ const (
 	AdminService_GetDescriptionEntity_FullMethodName          = "/flyteidl.service.AdminService/GetDescriptionEntity"
 	AdminService_ListDescriptionEntities_FullMethodName       = "/flyteidl.service.AdminService/ListDescriptionEntities"
 	AdminService_GetExecutionMetrics_FullMethodName           = "/flyteidl.service.AdminService/GetExecutionMetrics"
-	AdminService_GetOverrideAttributes_FullMethodName         = "/flyteidl.service.AdminService/GetOverrideAttributes"
-	AdminService_UpdateOverrideAttributes_FullMethodName      = "/flyteidl.service.AdminService/UpdateOverrideAttributes"
+	AdminService_GetConfiguration_FullMethodName              = "/flyteidl.service.AdminService/GetConfiguration"
+	AdminService_UpdateConfiguration_FullMethodName           = "/flyteidl.service.AdminService/UpdateConfiguration"
 )
 
 // AdminServiceClient is the client API for AdminService service.
@@ -199,9 +199,9 @@ type AdminServiceClient interface {
 	// Fetches runtime metrics for a :ref:`ref_flyteidl.admin.Execution`.
 	GetExecutionMetrics(ctx context.Context, in *admin.WorkflowExecutionGetMetricsRequest, opts ...grpc.CallOption) (*admin.WorkflowExecutionGetMetricsResponse, error)
 	// Fetch a unified project attribute.
-	GetOverrideAttributes(ctx context.Context, in *admin.OverrideAttributesGetRequest, opts ...grpc.CallOption) (*admin.OverrideAttributesGetResponse, error)
+	GetConfiguration(ctx context.Context, in *admin.ConfigurationGetRequest, opts ...grpc.CallOption) (*admin.ConfigurationGetResponse, error)
 	// Update a unified project attribute.
-	UpdateOverrideAttributes(ctx context.Context, in *admin.OverrideAttributesUpdateRequest, opts ...grpc.CallOption) (*admin.OverrideAttributesUpdateResponse, error)
+	UpdateConfiguration(ctx context.Context, in *admin.ConfigurationUpdateRequest, opts ...grpc.CallOption) (*admin.ConfigurationUpdateResponse, error)
 }
 
 type adminServiceClient struct {
@@ -707,18 +707,18 @@ func (c *adminServiceClient) GetExecutionMetrics(ctx context.Context, in *admin.
 	return out, nil
 }
 
-func (c *adminServiceClient) GetOverrideAttributes(ctx context.Context, in *admin.OverrideAttributesGetRequest, opts ...grpc.CallOption) (*admin.OverrideAttributesGetResponse, error) {
-	out := new(admin.OverrideAttributesGetResponse)
-	err := c.cc.Invoke(ctx, AdminService_GetOverrideAttributes_FullMethodName, in, out, opts...)
+func (c *adminServiceClient) GetConfiguration(ctx context.Context, in *admin.ConfigurationGetRequest, opts ...grpc.CallOption) (*admin.ConfigurationGetResponse, error) {
+	out := new(admin.ConfigurationGetResponse)
+	err := c.cc.Invoke(ctx, AdminService_GetConfiguration_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *adminServiceClient) UpdateOverrideAttributes(ctx context.Context, in *admin.OverrideAttributesUpdateRequest, opts ...grpc.CallOption) (*admin.OverrideAttributesUpdateResponse, error) {
-	out := new(admin.OverrideAttributesUpdateResponse)
-	err := c.cc.Invoke(ctx, AdminService_UpdateOverrideAttributes_FullMethodName, in, out, opts...)
+func (c *adminServiceClient) UpdateConfiguration(ctx context.Context, in *admin.ConfigurationUpdateRequest, opts ...grpc.CallOption) (*admin.ConfigurationUpdateResponse, error) {
+	out := new(admin.ConfigurationUpdateResponse)
+	err := c.cc.Invoke(ctx, AdminService_UpdateConfiguration_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -845,9 +845,9 @@ type AdminServiceServer interface {
 	// Fetches runtime metrics for a :ref:`ref_flyteidl.admin.Execution`.
 	GetExecutionMetrics(context.Context, *admin.WorkflowExecutionGetMetricsRequest) (*admin.WorkflowExecutionGetMetricsResponse, error)
 	// Fetch a unified project attribute.
-	GetOverrideAttributes(context.Context, *admin.OverrideAttributesGetRequest) (*admin.OverrideAttributesGetResponse, error)
+	GetConfiguration(context.Context, *admin.ConfigurationGetRequest) (*admin.ConfigurationGetResponse, error)
 	// Update a unified project attribute.
-	UpdateOverrideAttributes(context.Context, *admin.OverrideAttributesUpdateRequest) (*admin.OverrideAttributesUpdateResponse, error)
+	UpdateConfiguration(context.Context, *admin.ConfigurationUpdateRequest) (*admin.ConfigurationUpdateResponse, error)
 }
 
 // UnimplementedAdminServiceServer should be embedded to have forward compatible implementations.
@@ -1019,11 +1019,11 @@ func (UnimplementedAdminServiceServer) ListDescriptionEntities(context.Context, 
 func (UnimplementedAdminServiceServer) GetExecutionMetrics(context.Context, *admin.WorkflowExecutionGetMetricsRequest) (*admin.WorkflowExecutionGetMetricsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetExecutionMetrics not implemented")
 }
-func (UnimplementedAdminServiceServer) GetOverrideAttributes(context.Context, *admin.OverrideAttributesGetRequest) (*admin.OverrideAttributesGetResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetOverrideAttributes not implemented")
+func (UnimplementedAdminServiceServer) GetConfiguration(context.Context, *admin.ConfigurationGetRequest) (*admin.ConfigurationGetResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetConfiguration not implemented")
 }
-func (UnimplementedAdminServiceServer) UpdateOverrideAttributes(context.Context, *admin.OverrideAttributesUpdateRequest) (*admin.OverrideAttributesUpdateResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateOverrideAttributes not implemented")
+func (UnimplementedAdminServiceServer) UpdateConfiguration(context.Context, *admin.ConfigurationUpdateRequest) (*admin.ConfigurationUpdateResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateConfiguration not implemented")
 }
 
 // UnsafeAdminServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -2027,38 +2027,38 @@ func _AdminService_GetExecutionMetrics_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AdminService_GetOverrideAttributes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(admin.OverrideAttributesGetRequest)
+func _AdminService_GetConfiguration_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(admin.ConfigurationGetRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AdminServiceServer).GetOverrideAttributes(ctx, in)
+		return srv.(AdminServiceServer).GetConfiguration(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: AdminService_GetOverrideAttributes_FullMethodName,
+		FullMethod: AdminService_GetConfiguration_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AdminServiceServer).GetOverrideAttributes(ctx, req.(*admin.OverrideAttributesGetRequest))
+		return srv.(AdminServiceServer).GetConfiguration(ctx, req.(*admin.ConfigurationGetRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AdminService_UpdateOverrideAttributes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(admin.OverrideAttributesUpdateRequest)
+func _AdminService_UpdateConfiguration_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(admin.ConfigurationUpdateRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AdminServiceServer).UpdateOverrideAttributes(ctx, in)
+		return srv.(AdminServiceServer).UpdateConfiguration(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: AdminService_UpdateOverrideAttributes_FullMethodName,
+		FullMethod: AdminService_UpdateConfiguration_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AdminServiceServer).UpdateOverrideAttributes(ctx, req.(*admin.OverrideAttributesUpdateRequest))
+		return srv.(AdminServiceServer).UpdateConfiguration(ctx, req.(*admin.ConfigurationUpdateRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -2291,12 +2291,12 @@ var AdminService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _AdminService_GetExecutionMetrics_Handler,
 		},
 		{
-			MethodName: "GetOverrideAttributes",
-			Handler:    _AdminService_GetOverrideAttributes_Handler,
+			MethodName: "GetConfiguration",
+			Handler:    _AdminService_GetConfiguration_Handler,
 		},
 		{
-			MethodName: "UpdateOverrideAttributes",
-			Handler:    _AdminService_UpdateOverrideAttributes_Handler,
+			MethodName: "UpdateConfiguration",
+			Handler:    _AdminService_UpdateConfiguration_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

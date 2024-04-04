@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "flyteidl/admin/override_attributes.proto",
+    "title": "flyteidl/admin/configuration.proto",
     "version": "version not set"
   },
   "consumes": [

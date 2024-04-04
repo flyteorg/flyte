@@ -19,7 +19,7 @@ import "flyteidl/admin/task_execution.proto";
 import "flyteidl/admin/version.proto";
 import "flyteidl/admin/common.proto";
 import "flyteidl/admin/description_entity.proto";
-import "flyteidl/admin/override_attributes.proto";
+import "flyteidl/admin/configuration.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
 
@@ -659,19 +659,19 @@ service AdminService {
   };
 
   // Fetch a unified project attribute.
-  rpc GetOverrideAttributes (flyteidl.admin.OverrideAttributesGetRequest) returns (flyteidl.admin.OverrideAttributesGetResponse) {
+  rpc GetConfiguration (flyteidl.admin.ConfigurationGetRequest) returns (flyteidl.admin.ConfigurationGetResponse) {
     option (google.api.http) = {
-      get: "/api/v1/override_attributes/{id.project}/{id.domain}"
+      get: "/api/v1/configuration/{id.project}/{id.domain}"
       additional_bindings {
-        get: "/api/v1/org/override_attributes/{id.org}/{id.project}/{id.domain}"
+        get: "/api/v1/org/configuration/{id.org}/{id.project}/{id.domain}"
       }
     };
   }
 
   // Update a unified project attribute.
-  rpc UpdateOverrideAttributes (flyteidl.admin.OverrideAttributesUpdateRequest) returns (flyteidl.admin.OverrideAttributesUpdateResponse) {
+  rpc UpdateConfiguration (flyteidl.admin.ConfigurationUpdateRequest) returns (flyteidl.admin.ConfigurationUpdateResponse) {
     option (google.api.http) = {
-      post: "/api/v1/override_attributes"
+      post: "/api/v1/configuration"
       body: "*"
     };
   }

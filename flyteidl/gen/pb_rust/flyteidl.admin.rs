@@ -810,230 +810,6 @@ impl NamedEntityState {
         }
     }
 }
-/// DescriptionEntity contains detailed description for the task/workflow.
-/// Documentation could provide insight into the algorithms, business use case, etc.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct DescriptionEntity {
-    /// id represents the unique identifier of the description entity.
-    #[prost(message, optional, tag="1")]
-    pub id: ::core::option::Option<super::core::Identifier>,
-    /// One-liner overview of the entity.
-    #[prost(string, tag="2")]
-    pub short_description: ::prost::alloc::string::String,
-    /// Full user description with formatting preserved.
-    #[prost(message, optional, tag="3")]
-    pub long_description: ::core::option::Option<Description>,
-    /// Optional link to source code used to define this entity.
-    #[prost(message, optional, tag="4")]
-    pub source_code: ::core::option::Option<SourceCode>,
-    /// User-specified tags. These are arbitrary and can be used for searching
-    /// filtering and discovering tasks.
-    #[prost(string, repeated, tag="5")]
-    pub tags: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
-}
-/// Full user description with formatting preserved. This can be rendered
-/// by clients, such as the console or command line tools with in-tact
-/// formatting.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct Description {
-    /// Format of the long description
-    #[prost(enumeration="DescriptionFormat", tag="3")]
-    pub format: i32,
-    /// Optional link to an icon for the entity
-    #[prost(string, tag="4")]
-    pub icon_link: ::prost::alloc::string::String,
-    #[prost(oneof="description::Content", tags="1, 2")]
-    pub content: ::core::option::Option<description::Content>,
-}
-/// Nested message and enum types in `Description`.
-pub mod description {
-    #[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Oneof)]
-    pub enum Content {
-        /// long description - no more than 4KB
-        #[prost(string, tag="1")]
-        Value(::prost::alloc::string::String),
-        /// if the description sizes exceed some threshold we can offload the entire
-        /// description proto altogether to an external data store, like S3 rather than store inline in the db
-        #[prost(string, tag="2")]
-        Uri(::prost::alloc::string::String),
-    }
-}
-/// Link to source code used to define this entity
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct SourceCode {
-    #[prost(string, tag="1")]
-    pub link: ::prost::alloc::string::String,
-}
-/// Represents a list of DescriptionEntities returned from the admin.
-/// See :ref:`ref_flyteidl.admin.DescriptionEntity` for more details
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct DescriptionEntityList {
-    /// A list of DescriptionEntities returned based on the request.
-    #[prost(message, repeated, tag="1")]
-    pub description_entities: ::prost::alloc::vec::Vec<DescriptionEntity>,
-    /// In the case of multiple pages of results, the server-provided token can be used to fetch the next page
-    /// in a query. If there are no more results, this value will be empty.
-    #[prost(string, tag="2")]
-    pub token: ::prost::alloc::string::String,
-}
-/// Represents a request structure to retrieve a list of DescriptionEntities.
-/// See :ref:`ref_flyteidl.admin.DescriptionEntity` for more details
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct DescriptionEntityListRequest {
-    /// Identifies the specific type of resource that this identifier corresponds to.
-    #[prost(enumeration="super::core::ResourceType", tag="1")]
-    pub resource_type: i32,
-    /// The identifier for the description entity.
-    /// +required
-    #[prost(message, optional, tag="2")]
-    pub id: ::core::option::Option<NamedEntityIdentifier>,
-    /// Indicates the number of resources to be returned.
-    /// +required
-    #[prost(uint32, tag="3")]
-    pub limit: u32,
-    /// In the case of multiple pages of results, the server-provided token can be used to fetch the next page
-    /// in a query.
-    /// +optional
-    #[prost(string, tag="4")]
-    pub token: ::prost::alloc::string::String,
-    /// Indicates a list of filters passed as string.
-    /// More info on constructing filters : <Link>
-    /// +optional
-    #[prost(string, tag="5")]
-    pub filters: ::prost::alloc::string::String,
-    /// Sort ordering for returned list.
-    /// +optional
-    #[prost(message, optional, tag="6")]
-    pub sort_by: ::core::option::Option<Sort>,
-}
-/// The format of the long description
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
-#[repr(i32)]
-pub enum DescriptionFormat {
-    Unknown = 0,
-    Markdown = 1,
-    Html = 2,
-    /// python default documentation - comments is rst
-    Rst = 3,
-}
-impl DescriptionFormat {
-    /// String value of the enum field names used in the ProtoBuf definition.
-    ///
-    /// The values are not transformed in any way and thus are considered stable
-    /// (if the ProtoBuf definition does not change) and safe for programmatic use.
-    pub fn as_str_name(&self) -> &'static str {
-        match self {
-            DescriptionFormat::Unknown => "DESCRIPTION_FORMAT_UNKNOWN",
-            DescriptionFormat::Markdown => "DESCRIPTION_FORMAT_MARKDOWN",
-            DescriptionFormat::Html => "DESCRIPTION_FORMAT_HTML",
-            DescriptionFormat::Rst => "DESCRIPTION_FORMAT_RST",
-        }
-    }
-    /// Creates an enum from field names used in the ProtoBuf definition.
-    pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
-        match value {
-            "DESCRIPTION_FORMAT_UNKNOWN" => Some(Self::Unknown),
-            "DESCRIPTION_FORMAT_MARKDOWN" => Some(Self::Markdown),
-            "DESCRIPTION_FORMAT_HTML" => Some(Self::Html),
-            "DESCRIPTION_FORMAT_RST" => Some(Self::Rst),
-            _ => None,
-        }
-    }
-}
-/// Indicates that a sent event was not used to update execution state due to
-/// the referenced execution already being terminated (and therefore ineligible
-/// for further state transitions).
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct EventErrorAlreadyInTerminalState {
-    /// +required
-    #[prost(string, tag="1")]
-    pub current_phase: ::prost::alloc::string::String,
-}
-/// Indicates an event was rejected because it came from a different cluster than 
-/// is on record as running the execution.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct EventErrorIncompatibleCluster {
-    /// The cluster which has been recorded as processing the execution.
-    /// +required
-    #[prost(string, tag="1")]
-    pub cluster: ::prost::alloc::string::String,
-}
-/// Indicates why a sent event was not used to update execution.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct EventFailureReason {
-    /// +required
-    #[prost(oneof="event_failure_reason::Reason", tags="1, 2")]
-    pub reason: ::core::option::Option<event_failure_reason::Reason>,
-}
-/// Nested message and enum types in `EventFailureReason`.
-pub mod event_failure_reason {
-    /// +required
-    #[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Oneof)]
-    pub enum Reason {
-        #[prost(message, tag="1")]
-        AlreadyInTerminalState(super::EventErrorAlreadyInTerminalState),
-        #[prost(message, tag="2")]
-        IncompatibleCluster(super::EventErrorIncompatibleCluster),
-    }
-}
-/// Request to send a notification that a workflow execution event has occurred.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct WorkflowExecutionEventRequest {
-    /// Unique ID for this request that can be traced between services
-    #[prost(string, tag="1")]
-    pub request_id: ::prost::alloc::string::String,
-    /// Details about the event that occurred.
-    #[prost(message, optional, tag="2")]
-    pub event: ::core::option::Option<super::event::WorkflowExecutionEvent>,
-}
-/// Purposefully empty, may be populated in the future.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct WorkflowExecutionEventResponse {
-}
-/// Request to send a notification that a node execution event has occurred.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct NodeExecutionEventRequest {
-    /// Unique ID for this request that can be traced between services
-    #[prost(string, tag="1")]
-    pub request_id: ::prost::alloc::string::String,
-    /// Details about the event that occurred.
-    #[prost(message, optional, tag="2")]
-    pub event: ::core::option::Option<super::event::NodeExecutionEvent>,
-}
-/// Purposefully empty, may be populated in the future.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct NodeExecutionEventResponse {
-}
-/// Request to send a notification that a task execution event has occurred.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct TaskExecutionEventRequest {
-    /// Unique ID for this request that can be traced between services
-    #[prost(string, tag="1")]
-    pub request_id: ::prost::alloc::string::String,
-    /// Details about the event that occurred.
-    #[prost(message, optional, tag="2")]
-    pub event: ::core::option::Option<super::event::TaskExecutionEvent>,
-}
-/// Purposefully empty, may be populated in the future.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct TaskExecutionEventResponse {
-}
 /// Defines a set of overridable task resource attributes set during task registration.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1292,6 +1068,307 @@ impl MatchableResource {
             _ => None,
         }
     }
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ProjectId {
+    #[prost(string, tag="1")]
+    pub project: ::prost::alloc::string::String,
+    #[prost(string, tag="2")]
+    pub domain: ::prost::alloc::string::String,
+    #[prost(string, tag="3")]
+    pub org: ::prost::alloc::string::String,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct Configuration {
+    #[prost(message, optional, tag="1")]
+    pub task_resource_attributes: ::core::option::Option<TaskResourceAttributes>,
+    #[prost(message, optional, tag="2")]
+    pub cluster_resource_attributes: ::core::option::Option<ClusterResourceAttributes>,
+    #[prost(message, optional, tag="3")]
+    pub execution_queue_attributes: ::core::option::Option<ExecutionQueueAttributes>,
+    #[prost(message, optional, tag="4")]
+    pub execution_cluster_label: ::core::option::Option<ExecutionClusterLabel>,
+    #[prost(message, optional, tag="5")]
+    pub quality_of_service: ::core::option::Option<super::core::QualityOfService>,
+    #[prost(message, optional, tag="6")]
+    pub plugin_overrides: ::core::option::Option<PluginOverrides>,
+    #[prost(message, optional, tag="7")]
+    pub workflow_execution_config: ::core::option::Option<WorkflowExecutionConfig>,
+    #[prost(message, optional, tag="8")]
+    pub cluster_assignment: ::core::option::Option<ClusterAssignment>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ConfigurationGetRequest {
+    #[prost(message, optional, tag="1")]
+    pub id: ::core::option::Option<ProjectId>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ConfigurationGetResponse {
+    #[prost(message, optional, tag="1")]
+    pub id: ::core::option::Option<ProjectId>,
+    #[prost(string, tag="2")]
+    pub version: ::prost::alloc::string::String,
+    /// Everything set at the project-domain level
+    #[prost(message, optional, tag="3")]
+    pub project_domain_configuration: ::core::option::Option<Configuration>,
+    /// Everything set at the project level
+    #[prost(message, optional, tag="4")]
+    pub project_configuration: ::core::option::Option<Configuration>,
+    /// Everything set at the global application level
+    #[prost(message, optional, tag="5")]
+    pub global_configuration: ::core::option::Option<Configuration>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ConfigurationUpdateRequest {
+    #[prost(message, optional, tag="1")]
+    pub id: ::core::option::Option<ProjectId>,
+    #[prost(string, tag="2")]
+    pub version_to_update: ::prost::alloc::string::String,
+    /// Everything set at the project-domain level
+    #[prost(message, optional, tag="3")]
+    pub configuration: ::core::option::Option<Configuration>,
+}
+/// Purposefully empty, may be populated in the future.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ConfigurationUpdateResponse {
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ConfigurationDocument {
+    #[prost(string, tag="1")]
+    pub version: ::prost::alloc::string::String,
+    #[prost(map="string, message", tag="3")]
+    pub configurations: ::std::collections::HashMap<::prost::alloc::string::String, Configuration>,
+}
+/// DescriptionEntity contains detailed description for the task/workflow.
+/// Documentation could provide insight into the algorithms, business use case, etc.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct DescriptionEntity {
+    /// id represents the unique identifier of the description entity.
+    #[prost(message, optional, tag="1")]
+    pub id: ::core::option::Option<super::core::Identifier>,
+    /// One-liner overview of the entity.
+    #[prost(string, tag="2")]
+    pub short_description: ::prost::alloc::string::String,
+    /// Full user description with formatting preserved.
+    #[prost(message, optional, tag="3")]
+    pub long_description: ::core::option::Option<Description>,
+    /// Optional link to source code used to define this entity.
+    #[prost(message, optional, tag="4")]
+    pub source_code: ::core::option::Option<SourceCode>,
+    /// User-specified tags. These are arbitrary and can be used for searching
+    /// filtering and discovering tasks.
+    #[prost(string, repeated, tag="5")]
+    pub tags: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+}
+/// Full user description with formatting preserved. This can be rendered
+/// by clients, such as the console or command line tools with in-tact
+/// formatting.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct Description {
+    /// Format of the long description
+    #[prost(enumeration="DescriptionFormat", tag="3")]
+    pub format: i32,
+    /// Optional link to an icon for the entity
+    #[prost(string, tag="4")]
+    pub icon_link: ::prost::alloc::string::String,
+    #[prost(oneof="description::Content", tags="1, 2")]
+    pub content: ::core::option::Option<description::Content>,
+}
+/// Nested message and enum types in `Description`.
+pub mod description {
+    #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum Content {
+        /// long description - no more than 4KB
+        #[prost(string, tag="1")]
+        Value(::prost::alloc::string::String),
+        /// if the description sizes exceed some threshold we can offload the entire
+        /// description proto altogether to an external data store, like S3 rather than store inline in the db
+        #[prost(string, tag="2")]
+        Uri(::prost::alloc::string::String),
+    }
+}
+/// Link to source code used to define this entity
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct SourceCode {
+    #[prost(string, tag="1")]
+    pub link: ::prost::alloc::string::String,
+}
+/// Represents a list of DescriptionEntities returned from the admin.
+/// See :ref:`ref_flyteidl.admin.DescriptionEntity` for more details
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct DescriptionEntityList {
+    /// A list of DescriptionEntities returned based on the request.
+    #[prost(message, repeated, tag="1")]
+    pub description_entities: ::prost::alloc::vec::Vec<DescriptionEntity>,
+    /// In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+    /// in a query. If there are no more results, this value will be empty.
+    #[prost(string, tag="2")]
+    pub token: ::prost::alloc::string::String,
+}
+/// Represents a request structure to retrieve a list of DescriptionEntities.
+/// See :ref:`ref_flyteidl.admin.DescriptionEntity` for more details
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct DescriptionEntityListRequest {
+    /// Identifies the specific type of resource that this identifier corresponds to.
+    #[prost(enumeration="super::core::ResourceType", tag="1")]
+    pub resource_type: i32,
+    /// The identifier for the description entity.
+    /// +required
+    #[prost(message, optional, tag="2")]
+    pub id: ::core::option::Option<NamedEntityIdentifier>,
+    /// Indicates the number of resources to be returned.
+    /// +required
+    #[prost(uint32, tag="3")]
+    pub limit: u32,
+    /// In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+    /// in a query.
+    /// +optional
+    #[prost(string, tag="4")]
+    pub token: ::prost::alloc::string::String,
+    /// Indicates a list of filters passed as string.
+    /// More info on constructing filters : <Link>
+    /// +optional
+    #[prost(string, tag="5")]
+    pub filters: ::prost::alloc::string::String,
+    /// Sort ordering for returned list.
+    /// +optional
+    #[prost(message, optional, tag="6")]
+    pub sort_by: ::core::option::Option<Sort>,
+}
+/// The format of the long description
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+#[repr(i32)]
+pub enum DescriptionFormat {
+    Unknown = 0,
+    Markdown = 1,
+    Html = 2,
+    /// python default documentation - comments is rst
+    Rst = 3,
+}
+impl DescriptionFormat {
+    /// String value of the enum field names used in the ProtoBuf definition.
+    ///
+    /// The values are not transformed in any way and thus are considered stable
+    /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+    pub fn as_str_name(&self) -> &'static str {
+        match self {
+            DescriptionFormat::Unknown => "DESCRIPTION_FORMAT_UNKNOWN",
+            DescriptionFormat::Markdown => "DESCRIPTION_FORMAT_MARKDOWN",
+            DescriptionFormat::Html => "DESCRIPTION_FORMAT_HTML",
+            DescriptionFormat::Rst => "DESCRIPTION_FORMAT_RST",
+        }
+    }
+    /// Creates an enum from field names used in the ProtoBuf definition.
+    pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+        match value {
+            "DESCRIPTION_FORMAT_UNKNOWN" => Some(Self::Unknown),
+            "DESCRIPTION_FORMAT_MARKDOWN" => Some(Self::Markdown),
+            "DESCRIPTION_FORMAT_HTML" => Some(Self::Html),
+            "DESCRIPTION_FORMAT_RST" => Some(Self::Rst),
+            _ => None,
+        }
+    }
+}
+/// Indicates that a sent event was not used to update execution state due to
+/// the referenced execution already being terminated (and therefore ineligible
+/// for further state transitions).
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct EventErrorAlreadyInTerminalState {
+    /// +required
+    #[prost(string, tag="1")]
+    pub current_phase: ::prost::alloc::string::String,
+}
+/// Indicates an event was rejected because it came from a different cluster than 
+/// is on record as running the execution.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct EventErrorIncompatibleCluster {
+    /// The cluster which has been recorded as processing the execution.
+    /// +required
+    #[prost(string, tag="1")]
+    pub cluster: ::prost::alloc::string::String,
+}
+/// Indicates why a sent event was not used to update execution.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct EventFailureReason {
+    /// +required
+    #[prost(oneof="event_failure_reason::Reason", tags="1, 2")]
+    pub reason: ::core::option::Option<event_failure_reason::Reason>,
+}
+/// Nested message and enum types in `EventFailureReason`.
+pub mod event_failure_reason {
+    /// +required
+    #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum Reason {
+        #[prost(message, tag="1")]
+        AlreadyInTerminalState(super::EventErrorAlreadyInTerminalState),
+        #[prost(message, tag="2")]
+        IncompatibleCluster(super::EventErrorIncompatibleCluster),
+    }
+}
+/// Request to send a notification that a workflow execution event has occurred.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct WorkflowExecutionEventRequest {
+    /// Unique ID for this request that can be traced between services
+    #[prost(string, tag="1")]
+    pub request_id: ::prost::alloc::string::String,
+    /// Details about the event that occurred.
+    #[prost(message, optional, tag="2")]
+    pub event: ::core::option::Option<super::event::WorkflowExecutionEvent>,
+}
+/// Purposefully empty, may be populated in the future.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct WorkflowExecutionEventResponse {
+}
+/// Request to send a notification that a node execution event has occurred.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct NodeExecutionEventRequest {
+    /// Unique ID for this request that can be traced between services
+    #[prost(string, tag="1")]
+    pub request_id: ::prost::alloc::string::String,
+    /// Details about the event that occurred.
+    #[prost(message, optional, tag="2")]
+    pub event: ::core::option::Option<super::event::NodeExecutionEvent>,
+}
+/// Purposefully empty, may be populated in the future.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct NodeExecutionEventResponse {
+}
+/// Request to send a notification that a task execution event has occurred.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct TaskExecutionEventRequest {
+    /// Unique ID for this request that can be traced between services
+    #[prost(string, tag="1")]
+    pub request_id: ::prost::alloc::string::String,
+    /// Details about the event that occurred.
+    #[prost(message, optional, tag="2")]
+    pub event: ::core::option::Option<super::event::TaskExecutionEvent>,
+}
+/// Purposefully empty, may be populated in the future.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct TaskExecutionEventResponse {
 }
 /// Request to launch an execution with the given project, domain and optionally-assigned name.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -2443,81 +2520,6 @@ pub struct EmailMessage {
     /// This populates the BODY field.
     #[prost(string, tag="4")]
     pub body: ::prost::alloc::string::String,
-}
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct ProjectId {
-    #[prost(string, tag="1")]
-    pub project: ::prost::alloc::string::String,
-    #[prost(string, tag="2")]
-    pub domain: ::prost::alloc::string::String,
-    #[prost(string, tag="3")]
-    pub org: ::prost::alloc::string::String,
-}
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct Attributes {
-    #[prost(message, optional, tag="1")]
-    pub task_resource_attributes: ::core::option::Option<TaskResourceAttributes>,
-    #[prost(message, optional, tag="2")]
-    pub cluster_resource_attributes: ::core::option::Option<ClusterResourceAttributes>,
-    #[prost(message, optional, tag="3")]
-    pub execution_queue_attributes: ::core::option::Option<ExecutionQueueAttributes>,
-    #[prost(message, optional, tag="4")]
-    pub execution_cluster_label: ::core::option::Option<ExecutionClusterLabel>,
-    #[prost(message, optional, tag="5")]
-    pub quality_of_service: ::core::option::Option<super::core::QualityOfService>,
-    #[prost(message, optional, tag="6")]
-    pub plugin_overrides: ::core::option::Option<PluginOverrides>,
-    #[prost(message, optional, tag="7")]
-    pub workflow_execution_config: ::core::option::Option<WorkflowExecutionConfig>,
-    #[prost(message, optional, tag="8")]
-    pub cluster_assignment: ::core::option::Option<ClusterAssignment>,
-}
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct OverrideAttributesGetRequest {
-    #[prost(message, optional, tag="1")]
-    pub id: ::core::option::Option<ProjectId>,
-}
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct OverrideAttributesGetResponse {
-    #[prost(message, optional, tag="1")]
-    pub id: ::core::option::Option<ProjectId>,
-    #[prost(string, tag="2")]
-    pub version: ::prost::alloc::string::String,
-    /// Everything set at the project-domain level
-    #[prost(message, optional, tag="3")]
-    pub project_domain_attributes: ::core::option::Option<Attributes>,
-    /// Everything set at the project level
-    #[prost(message, optional, tag="4")]
-    pub project_attributes: ::core::option::Option<Attributes>,
-    /// Everything set at the global application level
-    #[prost(message, optional, tag="5")]
-    pub global_attributes: ::core::option::Option<Attributes>,
-}
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct OverrideAttributesUpdateRequest {
-    #[prost(message, optional, tag="1")]
-    pub id: ::core::option::Option<ProjectId>,
-    /// Everything set at the project-domain level
-    #[prost(message, optional, tag="2")]
-    pub attributes: ::core::option::Option<Attributes>,
-}
-/// Purposefully empty, may be populated in the future.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct OverrideAttributesUpdateResponse {
-}
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct Document {
-    #[prost(string, tag="1")]
-    pub version: ::prost::alloc::string::String,
-    #[prost(map="string, message", tag="3")]
-    pub attributes_map: ::std::collections::HashMap<::prost::alloc::string::String, Attributes>,
 }
 /// Namespace within a project commonly used to differentiate between different service instances.
 /// e.g. "production", "development", etc.

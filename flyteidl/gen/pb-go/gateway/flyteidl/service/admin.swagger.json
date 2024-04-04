@@ -308,6 +308,82 @@
         ]
       }
     },
+    "/api/v1/configuration": {
+      "post": {
+        "summary": "Update a unified project attribute.",
+        "operationId": "AdminService_UpdateConfiguration",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminConfigurationUpdateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/adminConfigurationUpdateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/configuration/{id.project}/{id.domain}": {
+      "get": {
+        "summary": "Fetch a unified project attribute.",
+        "operationId": "AdminService_GetConfiguration",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminConfigurationGetResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.project",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.domain",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.org",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
     "/api/v1/data/executions/{id.project}/{id.domain}/{id.name}": {
       "get": {
         "summary": "Fetches input and output data for a :ref:`ref_flyteidl.admin.Execution`.",
@@ -2320,12 +2396,12 @@
     "/api/v1/org/override_attributes/{id.org}/{id.project}/{id.domain}": {
       "get": {
         "summary": "Fetch a unified project attribute.",
-        "operationId": "AdminService_GetOverrideAttributes2",
+        "operationId": "AdminService_GetConfiguration2",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/adminOverrideAttributesGetResponse"
+              "$ref": "#/definitions/adminConfigurationGetResponse"
             }
           },
           "default": {
@@ -2352,82 +2428,6 @@
             "name": "id.domain",
             "in": "path",
             "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "AdminService"
-        ]
-      }
-    },
-    "/api/v1/override_attributes": {
-      "post": {
-        "summary": "Update a unified project attribute.",
-        "operationId": "AdminService_UpdateOverrideAttributes",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/adminOverrideAttributesUpdateResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/googlerpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/adminOverrideAttributesUpdateRequest"
-            }
-          }
-        ],
-        "tags": [
-          "AdminService"
-        ]
-      }
-    },
-    "/api/v1/override_attributes/{id.project}/{id.domain}": {
-      "get": {
-        "summary": "Fetch a unified project attribute.",
-        "operationId": "AdminService_GetOverrideAttributes",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/adminOverrideAttributesGetResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/googlerpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id.project",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id.domain",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id.org",
-            "in": "query",
-            "required": false,
             "type": "string"
           }
         ],
@@ -4632,35 +4632,6 @@
       },
       "description": "Annotation values to be applied to an execution resource.\nIn the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined\nto specify how to merge annotations defined at registration and execution time."
     },
-    "adminAttributes": {
-      "type": "object",
-      "properties": {
-        "task_resource_attributes": {
-          "$ref": "#/definitions/adminTaskResourceAttributes"
-        },
-        "cluster_resource_attributes": {
-          "$ref": "#/definitions/adminClusterResourceAttributes"
-        },
-        "execution_queue_attributes": {
-          "$ref": "#/definitions/adminExecutionQueueAttributes"
-        },
-        "execution_cluster_label": {
-          "$ref": "#/definitions/adminExecutionClusterLabel"
-        },
-        "quality_of_service": {
-          "$ref": "#/definitions/coreQualityOfService"
-        },
-        "plugin_overrides": {
-          "$ref": "#/definitions/adminPluginOverrides"
-        },
-        "workflow_execution_config": {
-          "$ref": "#/definitions/adminWorkflowExecutionConfig"
-        },
-        "cluster_assignment": {
-          "$ref": "#/definitions/adminClusterAssignment"
-        }
-      }
-    },
     "adminAuth": {
       "type": "object",
       "properties": {
@@ -4709,6 +4680,77 @@
           "description": "Custom resource attributes which will be applied in cluster resource creation (e.g. quotas).\nMap keys are the *case-sensitive* names of variables in templatized resource files.\nMap values should be the custom values which get substituted during resource creation."
         }
       }
+    },
+    "adminConfiguration": {
+      "type": "object",
+      "properties": {
+        "task_resource_attributes": {
+          "$ref": "#/definitions/adminTaskResourceAttributes"
+        },
+        "cluster_resource_attributes": {
+          "$ref": "#/definitions/adminClusterResourceAttributes"
+        },
+        "execution_queue_attributes": {
+          "$ref": "#/definitions/adminExecutionQueueAttributes"
+        },
+        "execution_cluster_label": {
+          "$ref": "#/definitions/adminExecutionClusterLabel"
+        },
+        "quality_of_service": {
+          "$ref": "#/definitions/coreQualityOfService"
+        },
+        "plugin_overrides": {
+          "$ref": "#/definitions/adminPluginOverrides"
+        },
+        "workflow_execution_config": {
+          "$ref": "#/definitions/adminWorkflowExecutionConfig"
+        },
+        "cluster_assignment": {
+          "$ref": "#/definitions/adminClusterAssignment"
+        }
+      }
+    },
+    "adminConfigurationGetResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/adminprojectID"
+        },
+        "version": {
+          "type": "string"
+        },
+        "project_domain_configuration": {
+          "$ref": "#/definitions/adminConfiguration",
+          "title": "Everything set at the project-domain level"
+        },
+        "project_configuration": {
+          "$ref": "#/definitions/adminConfiguration",
+          "title": "Everything set at the project level"
+        },
+        "global_configuration": {
+          "$ref": "#/definitions/adminConfiguration",
+          "title": "Everything set at the global application level"
+        }
+      }
+    },
+    "adminConfigurationUpdateRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/adminprojectID"
+        },
+        "version_to_update": {
+          "type": "string"
+        },
+        "configuration": {
+          "$ref": "#/definitions/adminConfiguration",
+          "title": "Everything set at the project-domain level"
+        }
+      }
+    },
+    "adminConfigurationUpdateResponse": {
+      "type": "object",
+      "description": "Purposefully empty, may be populated in the future."
     },
     "adminCronSchedule": {
       "type": "object",
@@ -5838,45 +5880,6 @@
           }
         }
       }
-    },
-    "adminOverrideAttributesGetResponse": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "$ref": "#/definitions/adminprojectID"
-        },
-        "version": {
-          "type": "string"
-        },
-        "project_domain_attributes": {
-          "$ref": "#/definitions/adminAttributes",
-          "title": "Everything set at the project-domain level"
-        },
-        "project_attributes": {
-          "$ref": "#/definitions/adminAttributes",
-          "title": "Everything set at the project level"
-        },
-        "global_attributes": {
-          "$ref": "#/definitions/adminAttributes",
-          "title": "Everything set at the global application level"
-        }
-      }
-    },
-    "adminOverrideAttributesUpdateRequest": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "$ref": "#/definitions/adminprojectID"
-        },
-        "attributes": {
-          "$ref": "#/definitions/adminAttributes",
-          "title": "Everything set at the project-domain level"
-        }
-      }
-    },
-    "adminOverrideAttributesUpdateResponse": {
-      "type": "object",
-      "description": "Purposefully empty, may be populated in the future."
     },
     "adminPagerDutyNotification": {
       "type": "object",
