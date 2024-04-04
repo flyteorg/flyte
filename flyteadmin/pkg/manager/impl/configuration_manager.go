@@ -80,14 +80,14 @@ func (m *ConfigurationManager) UpdateConfiguration(
 	}
 
 	// Get the active override attributes
-	configuration, err := m.db.ConfigurationRepo().GetActive(ctx)
+	activeConfiguration, err := m.db.ConfigurationRepo().GetActive(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	// TODO: Handle the case where the document location is empty
 	document := &admin.ConfigurationDocument{}
-	if err := m.storageClient.ReadProtobuf(ctx, configuration.DocumentLocation, document); err != nil {
+	if err := m.storageClient.ReadProtobuf(ctx, activeConfiguration.DocumentLocation, document); err != nil {
 		return nil, err
 	}
 
@@ -112,7 +112,13 @@ func (m *ConfigurationManager) UpdateConfiguration(
 	}
 
 	// Erase the active override attributes and create the new one
-	if err := m.db.ConfigurationRepo().EraseActiveAndCreate(ctx, request.VersionToUpdate, newConfiguration); err != nil {
+	var versionToUpdate string
+	if request.VersionToUpdate != "" {
+		versionToUpdate = request.VersionToUpdate
+	} else {
+		versionToUpdate = activeConfiguration.Version
+	}
+	if err := m.db.ConfigurationRepo().EraseActiveAndCreate(ctx, versionToUpdate, newConfiguration); err != nil {
 		return nil, err
 	}
 	return &admin.ConfigurationUpdateResponse{}, nil
