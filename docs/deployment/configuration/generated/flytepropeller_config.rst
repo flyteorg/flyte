@@ -671,6 +671,42 @@ The max bucket size for event recording tokens.
   "1000"
   
 
+max-retries (uint)
+------------------------------------------------------------------------------------------------------------------------
+
+The max number of retries for event recording.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "5"
+  
+
+base-scalar (int)
+------------------------------------------------------------------------------------------------------------------------
+
+The base/scalar backoff duration in milliseconds for event recording retries.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "100"
+  
+
+backoff-jitter (float64)
+------------------------------------------------------------------------------------------------------------------------
+
+The jitter factor for event recording retries.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "0.1"
+  
+
 Section: logger
 ========================================================================================================================
 
