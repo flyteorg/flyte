@@ -73,8 +73,10 @@ Select the integration you need and follow the steps to install the correspondin
       
     To install the Kuberay operator, run the following command:
   
-        helm install kuberay-operator kuberay/kuberay-operator --version 1.0.0
-  
+    .. code-block:: bash
+
+       helm install kuberay-operator kuberay/kuberay-operator --namespace ray-system --version 1.1.0 --create-namespace
+
   .. group-tab:: Spark
   
     To add the Spark Helm repository, run the following commands:
@@ -270,18 +272,6 @@ Specify plugin configuration
                      - container: container
                      - container_array: k8s-array
                      - ray: ray
-           rbac:
-             extraRules:
-               - apiGroups:
-               - "ray.io"
-               resources:
-               - rayjob
-               verbs:
-               - create
-               - get
-               - list
-               - patch
-               - update
 
       .. group-tab:: Flyte core
     
@@ -1036,9 +1026,3 @@ Wait for the upgrade to complete. You can check the status of the deployment pod
   kubectl get pods -n flyte
 
 Once all the components are up and running, go to the `examples section <https://docs.flyte.org/en/latest/flytesnacks/integrations.html#native-backend-plugins>`__ to learn more about how to use Flyte backend plugins.
-
-
-
-
-
-
