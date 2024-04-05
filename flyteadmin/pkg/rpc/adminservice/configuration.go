@@ -19,12 +19,12 @@ func (m *AdminService) GetConfiguration(ctx context.Context, request *admin.Conf
 
 	var response *admin.ConfigurationGetResponse
 	var err error
-	m.Metrics.configurationMetrics.get.Time(func() {
+	m.Metrics.configurationEndpointMetrics.get.Time(func() {
 		response, err = m.ConfigurationManager.
 			GetConfiguration(ctx, *request)
 	})
 	if err != nil {
-		return nil, util.TransformAndRecordError(err, &m.Metrics.configurationMetrics.get)
+		return nil, util.TransformAndRecordError(err, &m.Metrics.configurationEndpointMetrics.get)
 	}
 
 	return response, nil
@@ -39,11 +39,11 @@ func (m *AdminService) UpdateConfiguration(ctx context.Context, request *admin.C
 
 	var response *admin.ConfigurationUpdateResponse
 	var err error
-	m.Metrics.configurationMetrics.update.Time(func() {
+	m.Metrics.configurationEndpointMetrics.update.Time(func() {
 		response, err = m.ConfigurationManager.UpdateConfiguration(ctx, *request)
 	})
 	if err != nil {
-		return nil, util.TransformAndRecordError(err, &m.Metrics.configurationMetrics.update)
+		return nil, util.TransformAndRecordError(err, &m.Metrics.configurationEndpointMetrics.update)
 	}
 
 	return response, nil

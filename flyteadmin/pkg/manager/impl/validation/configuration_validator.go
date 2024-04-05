@@ -19,12 +19,6 @@ func ValidateConfigurationUpdateRequest(request admin.ConfigurationUpdateRequest
 	if request.Id == nil {
 		return shared.GetMissingArgumentError(shared.ID)
 	}
-	if err := ValidateEmptyStringField(request.Id.Project, shared.Project); err != nil {
-		return err
-	}
-	if err := ValidateEmptyStringField(request.Id.Domain, shared.Domain); err != nil {
-		return err
-	}
 	if request.Configuration == nil {
 		return shared.GetMissingArgumentError(shared.Configuration)
 	}

@@ -2,6 +2,7 @@ package adminservice
 
 import (
 	"context"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/transformers"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -79,6 +80,15 @@ func (m *AdminService) UpdateProjectDomainAttributes(ctx context.Context, reques
 		return nil, util.TransformAndRecordError(err, &m.Metrics.projectDomainAttributesEndpointMetrics.update)
 	}
 
+	// Update configuration as well
+	configurationUpdateRequest := transformers.FromProjectDomainAttributesUpdateRequest(request)
+	m.Metrics.configurationEndpointMetrics.update.Time(func() {
+		_, err = m.ConfigurationManager.UpdateConfiguration(ctx, *configurationUpdateRequest)
+	})
+	if err != nil {
+		return nil, util.TransformAndRecordError(err, &m.Metrics.configurationEndpointMetrics.update)
+	}
+
 	return response, nil
 }
 
@@ -132,6 +142,15 @@ func (m *AdminService) UpdateProjectAttributes(ctx context.Context, request *adm
 	})
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.projectAttributesEndpointMetrics.get)
+	}
+
+	// Update configuration as well
+	configurationUpdateRequest := transformers.FromProjectAttributesUpdateRequest(request)
+	m.Metrics.configurationEndpointMetrics.update.Time(func() {
+		_, err = m.ConfigurationManager.UpdateConfiguration(ctx, *configurationUpdateRequest)
+	})
+	if err != nil {
+		return nil, util.TransformAndRecordError(err, &m.Metrics.configurationEndpointMetrics.update)
 	}
 
 	return response, nil

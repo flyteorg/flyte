@@ -108,7 +108,7 @@ type descriptionEntityEndpointMetrics struct {
 	list   util.RequestMetrics
 }
 
-type configurationMetrics struct {
+type configurationEndpointMetrics struct {
 	scope promutils.Scope
 
 	get    util.RequestMetrics
@@ -132,7 +132,7 @@ type AdminMetrics struct {
 	taskExecutionEndpointMetrics           taskExecutionEndpointMetrics
 	workflowEndpointMetrics                workflowEndpointMetrics
 	descriptionEntityMetrics               descriptionEntityEndpointMetrics
-	configurationMetrics                   configurationMetrics
+	configurationEndpointMetrics           configurationEndpointMetrics
 }
 
 func InitMetrics(adminScope promutils.Scope) AdminMetrics {
@@ -238,7 +238,7 @@ func InitMetrics(adminScope promutils.Scope) AdminMetrics {
 			list:   util.NewRequestMetrics(adminScope, "list_description_entity"),
 		},
 
-		configurationMetrics: configurationMetrics{
+		configurationEndpointMetrics: configurationEndpointMetrics{
 			scope:  adminScope,
 			get:    util.NewRequestMetrics(adminScope, "get_configuration"),
 			update: util.NewRequestMetrics(adminScope, "update_configuration"),
