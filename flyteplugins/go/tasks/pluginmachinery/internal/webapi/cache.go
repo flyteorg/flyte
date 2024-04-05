@@ -2,8 +2,9 @@ package webapi
 
 import (
 	"context"
-
+	"golang.org/x/time/rate"
 	"k8s.io/client-go/util/workqueue"
+	"time"
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
@@ -161,6 +162,7 @@ func ToPluginPhase(s core.Phase) (Phase, error) {
 }
 
 func NewResourceCache(ctx context.Context, name string, client Client, cfg webapi.CachingConfig,
+	rateCfg webapi.RateLimiterConfig,
 	scope promutils.Scope) (ResourceCache, error) {
 
 	q := ResourceCache{
@@ -169,7 +171,10 @@ func NewResourceCache(ctx context.Context, name string, client Client, cfg webap
 	}
 
 	autoRefreshCache, err := cache.NewAutoRefreshCache(name, q.SyncResource,
-		workqueue.DefaultControllerRateLimiter(), cfg.ResyncInterval.Duration, cfg.Workers, cfg.Size,
+		workqueue.NewMaxOfRateLimiter(
+			workqueue.NewItemExponentialFailureRateLimiter(5*time.Millisecond, 1000*time.Second),
+			&workqueue.BucketRateLimiter{Limiter: rate.NewLimiter(rate.Limit(rateCfg.QPS), rateCfg.Burst)},
+		), cfg.ResyncInterval.Duration, cfg.Workers, cfg.Size,
 		scope.NewSubScope("cache"))
 
 	if err != nil {
