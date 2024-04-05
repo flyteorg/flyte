@@ -40,3 +40,5 @@ docs/_src
 docs/_projects
 docs/api
 docs/tests
+flyteidl/clients/go/admin/pkce/*.html
+!flyteidl/clients/go/admin/pkce/callback.html

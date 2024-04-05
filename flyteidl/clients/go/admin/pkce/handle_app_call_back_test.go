@@ -2,16 +2,19 @@ package pkce
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
 	"testing"
 
-	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/oauth"
-
 	"github.com/stretchr/testify/assert"
 	testhttp "github.com/stretchr/testify/http"
+	"github.com/stretchr/testify/require"
 	"golang.org/x/oauth2"
+
+	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/oauth"
 )
 
 var (
@@ -102,7 +105,7 @@ func TestHandleAppCallBackCsrfAttach(t *testing.T) {
 	select {
 	case errorValue = <-errorChannel:
 		assert.NotNil(t, errorValue)
-		assert.True(t, strings.Contains(rw.Output, "Sorry we can't serve your request"))
+		assert.True(t, strings.Contains(rw.Output, "Sorry, we can't serve your request"))
 		assert.Equal(t, errors.New("possibly a csrf attack"), errorValue)
 	case <-tokenChannel:
 		assert.Fail(t, "received a token for a failed test")
@@ -129,5 +132,46 @@ func TestHandleAppCallBackFailedTokenExchange(t *testing.T) {
 		assert.True(t, strings.Contains(errorValue.Error(), "error while exchanging auth code due"))
 	case <-tokenChannel:
 		assert.Fail(t, "received a token for a failed test")
+	}
+}
+
+// Test_RenderCallbackPage simply generates all possible callback HTML pages
+// that can be manually opened and viewed in browser
+func Test_RenderCallbackPage(t *testing.T) {
+	tCases := []struct {
+		name string
+		data callbackData
+	}{
+		{
+			name: "error",
+			data: callbackData{Error: "fail", ErrorDescription: "desc", ErrorHint: "hint"},
+		},
+		{
+			name: "no_code",
+			data: callbackData{NoCode: true},
+		},
+		{
+			name: "wrong_state",
+			data: callbackData{WrongState: true},
+		},
+		{
+			name: "access_token_error",
+			data: callbackData{AccessTokenError: "fail"},
+		},
+		{
+			name: "success",
+			data: callbackData{},
+		},
+	}
+	for _, tCase := range tCases {
+		t.Run(tCase.name, func(t *testing.T) {
+			f, err := os.Create(fmt.Sprintf("%s.html", tCase.name))
+			require.NoError(t, err)
+			defer f.Close()
+
+			err = callbackTemplate.Execute(f, tCase.data)
+
+			assert.NoError(t, err)
+		})
 	}
 }
