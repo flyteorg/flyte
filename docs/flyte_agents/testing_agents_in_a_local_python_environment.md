@@ -7,9 +7,9 @@ jupytext:
 ---
 
 (testing_agents_locally)=
-# Testing agents locally
+# Testing agents in a local Python environment
 
-You can test agents locally without running the backend server, making agent development easier.
+You can test agents locally without running the backend server.
 
 To test an agent locally, create a class for the agent task that inherits from `SyncAgentExecutorMixin` or `AsyncAgentExecutorMixin`.
 These mixins can handle synchronous and asynchronous tasks, respectively, and allow flytekit to mimic FlytePropeller's behavior in calling the agent.
