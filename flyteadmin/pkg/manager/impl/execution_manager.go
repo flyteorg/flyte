@@ -996,8 +996,10 @@ func (m *ExecutionManager) launchExecution(
 				inputsForQueryTemplating[k] = v
 			}
 		}
-		for k, v := range launchPlan.Spec.FixedInputs.Literals {
-			inputsForQueryTemplating[k] = v
+		if launchPlan.Spec.FixedInputs != nil {
+			for k, v := range launchPlan.Spec.FixedInputs.Literals {
+				inputsForQueryTemplating[k] = v
+			}
 		}
 		logger.Debugf(ctx, "Inputs for query templating: [%+v]", inputsForQueryTemplating)
 

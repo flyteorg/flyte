@@ -80,3 +80,24 @@ func TestGetExpectedOutputs(t *testing.T) {
 	assert.EqualValues(t, outputs.Variables["foo"].GetType().GetType(),
 		provider.GetExpectedOutputs().Variables["foo"].GetType().GetType())
 }
+
+func TestNilFixedInputs(t *testing.T) {
+	launchPlanStatus := admin.LaunchPlanClosure{
+		ExpectedInputs:  &inputs,
+		ExpectedOutputs: &outputs,
+	}
+	spec := admin.LaunchPlanSpec{
+		FixedInputs: nil,
+	}
+	launchPlanStatusBytes, _ := proto.Marshal(&launchPlanStatus)
+	specBytes, _ := proto.Marshal(&spec)
+	provider, err := NewLaunchPlanInterfaceProvider(
+		models.LaunchPlan{
+			Closure: launchPlanStatusBytes,
+			Spec:    specBytes,
+		}, launchPlanIdentifier)
+	if err != nil {
+		t.Fatalf("Failed to initialize LaunchPlanInterfaceProvider for test with err %v", err)
+	}
+	assert.Equal(t, core.LiteralMap{}, *provider.GetFixedInputs())
+}

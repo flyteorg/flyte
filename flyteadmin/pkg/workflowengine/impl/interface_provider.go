@@ -51,10 +51,14 @@ func NewLaunchPlanInterfaceProvider(launchPlan models.LaunchPlan, identifier cor
 		logger.Errorf(context.TODO(), "Failed to transform launch plan: %v", err)
 		return &LaunchPlanInterfaceProvider{}, err
 	}
+	fixedInputs := core.LiteralMap{}
+	if spec.FixedInputs != nil {
+		fixedInputs = *spec.FixedInputs
+	}
 	return &LaunchPlanInterfaceProvider{
 		identifier:      &identifier,
 		expectedInputs:  *closure.ExpectedInputs,
-		fixedInputs:     *spec.FixedInputs,
+		fixedInputs:     fixedInputs,
 		expectedOutputs: *closure.ExpectedOutputs,
 	}, nil
 }
