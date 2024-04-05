@@ -6,12 +6,15 @@ import (
 	"os"
 
 	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/exporters/jaeger"
+	"go.opentelemetry.io/otel/exporters/jaeger" // nolint:staticcheck
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
 	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
 	"go.opentelemetry.io/otel/sdk/resource"
 	"go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.24.0"
 	rawtrace "go.opentelemetry.io/otel/trace"
+	"go.opentelemetry.io/otel/trace/noop"
 
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/version"
@@ -33,14 +36,15 @@ const (
 )
 
 var tracerProviders = make(map[string]*trace.TracerProvider)
-var noopTracerProvider = rawtrace.NewNoopTracerProvider()
+var noopTracerProvider = noop.NewTracerProvider()
 
 func RegisterTracerProvider(serviceName string, config *Config) error {
 	if config == nil {
 		return nil
 	}
 
-	var opts []trace.TracerProviderOption
+	var exporter trace.SpanExporter
+	var err error
 	switch config.ExporterType {
 	case NoopExporter:
 		return nil
@@ -51,18 +55,16 @@ func RegisterTracerProvider(serviceName string, config *Config) error {
 			return err
 		}
 
-		exporter, err := stdouttrace.New(
+		exporter, err = stdouttrace.New(
 			stdouttrace.WithWriter(f),
 			stdouttrace.WithPrettyPrint(),
 		)
 		if err != nil {
 			return err
 		}
-
-		opts = append(opts, trace.WithBatcher(exporter))
 	case JaegerExporter:
 		// configure jaeger exporter
-		exporter, err := jaeger.New(
+		exporter, err = jaeger.New(
 			jaeger.WithCollectorEndpoint(
 				jaeger.WithEndpoint(config.JaegerConfig.Endpoint),
 			),
@@ -70,8 +72,22 @@ func RegisterTracerProvider(serviceName string, config *Config) error {
 		if err != nil {
 			return err
 		}
-
-		opts = append(opts, trace.WithBatcher(exporter))
+	case OtlpGrpcExporter:
+		exporter, err = otlptracegrpc.New(
+			context.Background(),
+			otlptracegrpc.WithEndpointURL(config.OtlpGrpcConfig.Endpoint),
+		)
+		if err != nil {
+			return err
+		}
+	case OtlpHttpExporter:
+		exporter, err = otlptracehttp.New(
+			context.Background(),
+			otlptracehttp.WithEndpointURL(config.OtlpHttpConfig.Endpoint),
+		)
+		if err != nil {
+			return err
+		}
 	default:
 		return fmt.Errorf("unknown otel exporter type [%v]", config.ExporterType)
 	}
@@ -88,9 +104,22 @@ func RegisterTracerProvider(serviceName string, config *Config) error {
 		return err
 	}
 
-	opts = append(opts, trace.WithResource(telemetryResource))
-	tracerProvider := trace.NewTracerProvider(opts...)
+	var sampler trace.Sampler
+	switch config.SamplerConfig.ParentSampler {
+	case AlwaysSample:
+		sampler = trace.ParentBased(trace.AlwaysSample())
+	case TraceIDRatioBased:
+		sampler = trace.ParentBased(trace.TraceIDRatioBased(config.SamplerConfig.TraceIDRatio))
+	default:
+		return fmt.Errorf("unknown otel sampler type [%v]", config.SamplerConfig.ParentSampler)
+	}
 
+	opts := []trace.TracerProviderOption{
+		trace.WithBatcher(exporter),
+		trace.WithResource(telemetryResource),
+		trace.WithSampler(sampler),
+	}
+	tracerProvider := trace.NewTracerProvider(opts...)
 	tracerProviders[serviceName] = tracerProvider
 	return nil
 }

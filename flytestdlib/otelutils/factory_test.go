@@ -24,6 +24,9 @@ func TestRegisterTracerProvider(t *testing.T) {
 			Filename: "/dev/null",
 		},
 		JaegerConfig: JaegerConfig{},
+		SamplerConfig: SamplerConfig{
+			ParentSampler: AlwaysSample,
+		},
 	}
 	err = RegisterTracerProvider(serviceName, &fullConfig)
 	assert.Nil(t, err)
