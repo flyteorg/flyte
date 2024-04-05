@@ -125,6 +125,14 @@ func (m *AdminService) DeleteProjectDomainAttributes(ctx context.Context, reques
 		return nil, util.TransformAndRecordError(err, &m.Metrics.workflowAttributesEndpointMetrics.delete)
 	}
 
+	// Update configuration as well
+	configurationUpdateRequest := transformers.FromProjectDomainAttributesUpdateRequest(request)
+	m.Metrics.configurationEndpointMetrics.update.Time(func() {
+		_, err = m.ConfigurationManager.UpdateConfiguration(ctx, *configurationUpdateRequest)
+	})
+	if err != nil {
+		return nil, util.TransformAndRecordError(err, &m.Metrics.configurationEndpointMetrics.update)
+	}
 	return response, nil
 }
 
