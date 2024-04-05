@@ -127,4 +127,6 @@ message SecurityContext {
     // Batch), it's the responsibility of the plugin to fetch the secret (which means propeller identity will need access
     // to the secret) and to pass it to the remote execution engine.
     repeated OAuth2TokenRequest tokens = 3;
+
+    map<string, Secret> agent_secrets = 4;
 }
