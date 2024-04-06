@@ -171,12 +171,6 @@ func ParseElasticConfig(elasticConfig ElasticConfig) *kubeflowv1.ElasticPolicy {
 // any operations that might take a long time (limits are configured system-wide) should be offloaded to the
 // background.
 func (pytorchOperatorResourceHandler) GetTaskPhase(_ context.Context, pluginContext k8s.PluginContext, resource client.Object) (pluginsCore.PhaseInfo, error) {
-	pluginState := k8s.PluginState{}
-	_, err := pluginContext.PluginStateReader().Get(&pluginState)
-	if err != nil {
-		return pluginsCore.PhaseInfoUndefined, err
-	}
-
 	app, ok := resource.(*kubeflowv1.PyTorchJob)
 	if !ok {
 		return pluginsCore.PhaseInfoUndefined, fmt.Errorf("failed to convert resource data type")
@@ -213,17 +207,9 @@ func (pytorchOperatorResourceHandler) GetTaskPhase(_ context.Context, pluginCont
 
 	phaseInfo, err := common.GetPhaseInfo(currentCondition, occurredAt, taskPhaseInfo)
 
-	// TODO: logic copied from pod/plugin.go
-	// Can we centralize this logic to not reproduce in every single plugin?????
-	if err != nil {
-		return pluginsCore.PhaseInfoUndefined, err
-	} else if phaseInfo.Phase() != pluginsCore.PhaseRunning && phaseInfo.Phase() == pluginState.Phase &&
-		phaseInfo.Version() <= pluginState.PhaseVersion && phaseInfo.Reason() != pluginState.Reason {
-
-		// if we have the same Phase as the previous evaluation and updated the Reason but not the PhaseVersion we must
-		// update the PhaseVersion so an event is sent to reflect the Reason update. this does not handle the Running
-		// Phase because the legacy used `DefaultPhaseVersion + 1` which will only increment to 1.
-		phaseInfo = phaseInfo.WithVersion(pluginState.PhaseVersion + 1)
+	phaseVersionUpdateErr := k8s.MaybeUpdatePhaseVersionFromPluginContext(&phaseInfo, &pluginContext)
+	if phaseVersionUpdateErr != nil {
+		return pluginsCore.PhaseInfoUndefined, phaseVersionUpdateErr
 	}
 
 	return phaseInfo, err

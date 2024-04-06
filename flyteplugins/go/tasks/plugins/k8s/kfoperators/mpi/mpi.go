@@ -186,7 +186,14 @@ func (mpiOperatorResourceHandler) GetTaskPhase(_ context.Context, pluginContext 
 		CustomInfo: statusDetails,
 	}
 
-	return common.GetMPIPhaseInfo(currentCondition, occurredAt, taskPhaseInfo)
+	phaseInfo, err := common.GetPhaseInfo(currentCondition, occurredAt, taskPhaseInfo)
+
+	phaseVersionUpdateErr := k8s.MaybeUpdatePhaseVersionFromPluginContext(&phaseInfo, &pluginContext)
+	if phaseVersionUpdateErr != nil {
+		return pluginsCore.PhaseInfoUndefined, phaseVersionUpdateErr
+	}
+
+	return phaseInfo, err
 }
 
 func init() {
