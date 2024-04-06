@@ -25,13 +25,13 @@ type GormRepo struct {
 	workflowRepo                 interfaces.WorkflowRepoInterface
 	resourceRepo                 interfaces.ResourceRepoInterface
 	descriptionEntityRepo        interfaces.DescriptionEntityRepoInterface
-	configurationRepo            interfaces.ConfigurationInterface
+	configurationRepo            interfaces.ConfigurationRepoInterface
 	schedulableEntityRepo        schedulerInterfaces.SchedulableEntityRepoInterface
 	scheduleEntitiesSnapshotRepo schedulerInterfaces.ScheduleEntitiesSnapShotRepoInterface
 	signalRepo                   interfaces.SignalRepoInterface
 }
 
-func (r *GormRepo) ConfigurationRepo() interfaces.ConfigurationInterface {
+func (r *GormRepo) ConfigurationRepo() interfaces.ConfigurationRepoInterface {
 	return r.configurationRepo
 }
 

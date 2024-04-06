@@ -2,11 +2,11 @@ package adminservice
 
 import (
 	"context"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/transformers"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/transformers"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/rpc/adminservice/util"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
@@ -126,7 +126,7 @@ func (m *AdminService) DeleteProjectDomainAttributes(ctx context.Context, reques
 	}
 
 	// Update configuration as well
-	configurationUpdateRequest := transformers.FromProjectDomainAttributesUpdateRequest(request)
+	configurationUpdateRequest := transformers.FromProjectDomainAttributesDeleteRequest(request)
 	m.Metrics.configurationEndpointMetrics.update.Time(func() {
 		_, err = m.ConfigurationManager.UpdateConfiguration(ctx, *configurationUpdateRequest)
 	})

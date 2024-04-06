@@ -3,6 +3,8 @@ package impl
 import (
 	"context"
 	"crypto/rand"
+	"math/big"
+
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/validation"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
@@ -11,7 +13,6 @@ import (
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
-	"math/big"
 )
 
 type ConfigurationManager struct {
@@ -103,6 +104,10 @@ func (m *ConfigurationManager) UpdateConfiguration(
 
 	// Offload the updated document
 	updatedDocumentLocation, err := common.OffloadConfigurationDocument(ctx, m.storageClient, document, generatedVersion)
+
+	if err != nil {
+		return nil, err
+	}
 
 	newConfiguration := models.Configuration{
 		// random generate a string as version

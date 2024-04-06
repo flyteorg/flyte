@@ -22,7 +22,7 @@ type Repository interface {
 	TaskExecutionRepo() TaskExecutionRepoInterface
 	NamedEntityRepo() NamedEntityRepoInterface
 	DescriptionEntityRepo() DescriptionEntityRepoInterface
-	ConfigurationRepo() ConfigurationInterface
+	ConfigurationRepo() ConfigurationRepoInterface
 	SchedulableEntityRepo() schedulerInterfaces.SchedulableEntityRepoInterface
 	ScheduleEntitiesSnapshotRepo() schedulerInterfaces.ScheduleEntitiesSnapShotRepoInterface
 	SignalRepo() SignalRepoInterface

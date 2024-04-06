@@ -3,11 +3,13 @@ package gormimpl
 import (
 	"context"
 	"errors"
+
+	"gorm.io/gorm"
+
 	adminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"gorm.io/gorm"
 )
 
 type ConfigurationRepo struct {
@@ -70,7 +72,7 @@ func (r *ConfigurationRepo) EraseActiveAndCreate(ctx context.Context, versionToU
 
 // Returns an instance of ConfigurationRepoInterface
 func NewConfigurationRepo(
-	db *gorm.DB, errorTransformer adminErrors.ErrorTransformer, scope promutils.Scope) interfaces.ConfigurationInterface {
+	db *gorm.DB, errorTransformer adminErrors.ErrorTransformer, scope promutils.Scope) interfaces.ConfigurationRepoInterface {
 	metrics := newMetrics(scope)
 	return &ConfigurationRepo{
 		db:               db,
