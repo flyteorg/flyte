@@ -236,16 +236,21 @@ func (plugin) GetTaskPhaseWithLogs(ctx context.Context, pluginContext k8s.Plugin
 
 	if err != nil {
 		return pluginsCore.PhaseInfoUndefined, err
-	} else if phaseInfo.Phase() != pluginsCore.PhaseRunning && phaseInfo.Phase() == pluginState.Phase &&
-		phaseInfo.Version() <= pluginState.PhaseVersion && phaseInfo.Reason() != pluginState.Reason {
-
-		// if we have the same Phase as the previous evaluation and updated the Reason but not the PhaseVersion we must
-		// update the PhaseVersion so an event is sent to reflect the Reason update. this does not handle the Running
-		// Phase because the legacy used `DefaultPhaseVersion + 1` which will only increment to 1.
-		phaseInfo = phaseInfo.WithVersion(pluginState.PhaseVersion + 1)
 	}
 
+	maybeUpdatePhaseVersion(&phaseInfo, &pluginState)
 	return phaseInfo, err
+}
+
+// if we have the same Phase as the previous evaluation and updated the Reason but not the PhaseVersion we must
+// update the PhaseVersion so an event is sent to reflect the Reason update. this does not handle the Running
+// Phase because the legacy used `DefaultPhaseVersion + 1` which will only increment to 1.
+func maybeUpdatePhaseVersion(phaseInfo *pluginsCore.PhaseInfo, pluginState *k8s.PluginState) {
+	if phaseInfo.Phase() != pluginsCore.PhaseRunning && phaseInfo.Phase() == pluginState.Phase &&
+		phaseInfo.Version() <= pluginState.PhaseVersion && phaseInfo.Reason() != pluginState.Reason {
+
+		*phaseInfo = phaseInfo.WithVersion(pluginState.PhaseVersion + 1)
+	}
 }
 
 func (plugin) GetProperties() k8s.PluginProperties {
