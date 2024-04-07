@@ -479,7 +479,7 @@ func (sparkResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s.
 
 	phaseVersionUpdateErr := k8s.MaybeUpdatePhaseVersionFromPluginContext(&phaseInfo, &pluginContext)
 	if phaseVersionUpdateErr != nil {
-		return pluginsCore.PhaseInfoUndefined, phaseVersionUpdateErr
+		return phaseInfo, phaseVersionUpdateErr
 	}
 
 	return phaseInfo, nil

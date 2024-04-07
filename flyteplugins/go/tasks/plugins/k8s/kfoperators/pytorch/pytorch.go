@@ -209,7 +209,7 @@ func (pytorchOperatorResourceHandler) GetTaskPhase(_ context.Context, pluginCont
 
 	phaseVersionUpdateErr := k8s.MaybeUpdatePhaseVersionFromPluginContext(&phaseInfo, &pluginContext)
 	if phaseVersionUpdateErr != nil {
-		return pluginsCore.PhaseInfoUndefined, phaseVersionUpdateErr
+		return phaseInfo, phaseVersionUpdateErr
 	}
 
 	return phaseInfo, err
