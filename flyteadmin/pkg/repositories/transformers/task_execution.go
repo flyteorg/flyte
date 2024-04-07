@@ -379,8 +379,9 @@ func filterLogsByPhase(logs []*core.TaskLog, phase core.TaskExecution_Phase) []*
 		if common.IsTaskExecutionTerminal(phase) && l.HideOnceFinished {
 			continue
 		}
-		// Some plugins like e.g. Dask start with core.TaskExecution_INITIALIZING once the CRD has been created
-		// even though the underlying pods are pending.
+		// Some plugins like e.g. Dask, Ray start with or very quickly transition to core.TaskExecution_INITIALIZING
+		// once the CR has been created even though the underlying pods are still pending. We thus treat queued and
+		// initializing the same here.
 		if (phase == core.TaskExecution_QUEUED || phase == core.TaskExecution_INITIALIZING) && !l.ShowWhilePending {
 			continue
 		}
