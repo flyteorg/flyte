@@ -83,7 +83,7 @@ Select the integration you need and follow the steps to install the correspondin
   
     .. code-block:: bash
   
-       helm repo add spark-operator https://googlecloudplatform.github.io/spark-on-k8s-operator
+       helm repo add spark-operator https://kubeflow.github.io/spark-operator
   
     To install the Spark operator, run the following command:
   
