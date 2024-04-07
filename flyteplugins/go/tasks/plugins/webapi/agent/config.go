@@ -13,7 +13,7 @@ var (
 	defaultConfig = Config{
 		WebAPI: webapi.PluginConfig{
 			ResourceQuotas: map[core.ResourceNamespace]int{
-				"default": 1,
+				"default": 1000,
 			},
 			ReadRateLimiter: webapi.RateLimiterConfig{
 				Burst: 100,
