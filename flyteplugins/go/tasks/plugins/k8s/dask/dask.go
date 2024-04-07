@@ -291,12 +291,6 @@ func (p daskResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s
 		OccurredAt: &occurredAt,
 	}
 
-	// There is a short period between the `DaskJob` resource being created and `Status.JobStatus` being set by the `dask-operator`.
-	// In that period, the `JobStatus` will be an empty string. We're treating this as Initializing/Queuing.
-	// isQueued := status == "" ||
-	// 	status == daskAPI.DaskJobCreated ||
-	// 	status == daskAPI.DaskJobClusterCreated
-
 	taskExecID := pluginContext.TaskExecutionMetadata().GetTaskExecutionID()
 	o, err := logPlugin.GetTaskLogs(
 		tasklog.Input{
