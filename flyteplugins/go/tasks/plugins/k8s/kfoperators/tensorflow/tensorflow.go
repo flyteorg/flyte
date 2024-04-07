@@ -180,7 +180,7 @@ func (tensorflowOperatorResourceHandler) GetTaskPhase(_ context.Context, pluginC
 
 	phaseVersionUpdateErr := k8s.MaybeUpdatePhaseVersionFromPluginContext(&phaseInfo, &pluginContext)
 	if phaseVersionUpdateErr != nil {
-		return pluginsCore.PhaseInfoUndefined, phaseVersionUpdateErr
+		return phaseInfo, phaseVersionUpdateErr
 	}
 
 	return phaseInfo, err
