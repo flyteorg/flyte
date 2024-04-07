@@ -322,39 +322,12 @@ func (sparkResourceHandler) BuildIdentityResource(ctx context.Context, taskCtx p
 }
 
 func getEventInfoForSpark(pluginContext k8s.PluginContext, sj *sparkOp.SparkApplication) (*pluginsCore.TaskInfo, error) {
-	state := sj.Status.AppState.State
-	isQueued := state == sparkOp.NewState ||
-		state == sparkOp.PendingSubmissionState ||
-		state == sparkOp.SubmittedState
-
 	sparkConfig := GetSparkConfig()
 	taskLogs := make([]*core.TaskLog, 0, 3)
 	taskExecID := pluginContext.TaskExecutionMetadata().GetTaskExecutionID()
 
-	if !isQueued {
-		if sj.Status.DriverInfo.PodName != "" {
-			p, err := logs.InitializeLogPlugins(&sparkConfig.LogConfig.Mixed)
-			if err != nil {
-				return nil, err
-			}
-
-			if p != nil {
-				o, err := p.GetTaskLogs(tasklog.Input{
-					PodName:         sj.Status.DriverInfo.PodName,
-					Namespace:       sj.Namespace,
-					LogName:         "(Driver Logs)",
-					TaskExecutionID: taskExecID,
-				})
-
-				if err != nil {
-					return nil, err
-				}
-
-				taskLogs = append(taskLogs, o.TaskLogs...)
-			}
-		}
-
-		p, err := logs.InitializeLogPlugins(&sparkConfig.LogConfig.User)
+	if sj.Status.DriverInfo.PodName != "" {
+		p, err := logs.InitializeLogPlugins(&sparkConfig.LogConfig.Mixed)
 		if err != nil {
 			return nil, err
 		}
@@ -363,27 +336,7 @@ func getEventInfoForSpark(pluginContext k8s.PluginContext, sj *sparkOp.SparkAppl
 			o, err := p.GetTaskLogs(tasklog.Input{
 				PodName:         sj.Status.DriverInfo.PodName,
 				Namespace:       sj.Namespace,
-				LogName:         "(User Logs)",
-				TaskExecutionID: taskExecID,
-			})
-
-			if err != nil {
-				return nil, err
-			}
-
-			taskLogs = append(taskLogs, o.TaskLogs...)
-		}
-
-		p, err = logs.InitializeLogPlugins(&sparkConfig.LogConfig.System)
-		if err != nil {
-			return nil, err
-		}
-
-		if p != nil {
-			o, err := p.GetTaskLogs(tasklog.Input{
-				PodName:         sj.Name,
-				Namespace:       sj.Namespace,
-				LogName:         "(System Logs)",
+				LogName:         "(Driver Logs)",
 				TaskExecutionID: taskExecID,
 			})
 
@@ -395,7 +348,47 @@ func getEventInfoForSpark(pluginContext k8s.PluginContext, sj *sparkOp.SparkAppl
 		}
 	}
 
-	p, err := logs.InitializeLogPlugins(&sparkConfig.LogConfig.AllUser)
+	p, err := logs.InitializeLogPlugins(&sparkConfig.LogConfig.User)
+	if err != nil {
+		return nil, err
+	}
+
+	if p != nil {
+		o, err := p.GetTaskLogs(tasklog.Input{
+			PodName:         sj.Status.DriverInfo.PodName,
+			Namespace:       sj.Namespace,
+			LogName:         "(User Logs)",
+			TaskExecutionID: taskExecID,
+		})
+
+		if err != nil {
+			return nil, err
+		}
+
+		taskLogs = append(taskLogs, o.TaskLogs...)
+	}
+
+	p, err = logs.InitializeLogPlugins(&sparkConfig.LogConfig.System)
+	if err != nil {
+		return nil, err
+	}
+
+	if p != nil {
+		o, err := p.GetTaskLogs(tasklog.Input{
+			PodName:         sj.Name,
+			Namespace:       sj.Namespace,
+			LogName:         "(System Logs)",
+			TaskExecutionID: taskExecID,
+		})
+
+		if err != nil {
+			return nil, err
+		}
+
+		taskLogs = append(taskLogs, o.TaskLogs...)
+	}
+
+	p, err = logs.InitializeLogPlugins(&sparkConfig.LogConfig.AllUser)
 	if err != nil {
 		return nil, err
 	}
@@ -464,21 +457,32 @@ func (sparkResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s.
 	}
 
 	occurredAt := time.Now()
+
+	var phaseInfo pluginsCore.PhaseInfo
+
 	switch app.Status.AppState.State {
 	case sparkOp.NewState:
-		return pluginsCore.PhaseInfoQueuedWithTaskInfo(occurredAt, pluginsCore.DefaultPhaseVersion, "job queued", info), nil
+		phaseInfo = pluginsCore.PhaseInfoQueuedWithTaskInfo(occurredAt, pluginsCore.DefaultPhaseVersion, "job queued", info)
 	case sparkOp.SubmittedState, sparkOp.PendingSubmissionState:
-		return pluginsCore.PhaseInfoInitializing(occurredAt, pluginsCore.DefaultPhaseVersion, "job submitted", info), nil
+		phaseInfo = pluginsCore.PhaseInfoInitializing(occurredAt, pluginsCore.DefaultPhaseVersion, "job submitted", info)
 	case sparkOp.FailedSubmissionState:
 		reason := fmt.Sprintf("Spark Job  Submission Failed with Error: %s", app.Status.AppState.ErrorMessage)
-		return pluginsCore.PhaseInfoRetryableFailure(errors.DownstreamSystemError, reason, info), nil
+		phaseInfo = pluginsCore.PhaseInfoRetryableFailure(errors.DownstreamSystemError, reason, info)
 	case sparkOp.FailedState:
 		reason := fmt.Sprintf("Spark Job Failed with Error: %s", app.Status.AppState.ErrorMessage)
-		return pluginsCore.PhaseInfoRetryableFailure(errors.DownstreamSystemError, reason, info), nil
+		phaseInfo = pluginsCore.PhaseInfoRetryableFailure(errors.DownstreamSystemError, reason, info)
 	case sparkOp.CompletedState:
-		return pluginsCore.PhaseInfoSuccess(info), nil
+		phaseInfo = pluginsCore.PhaseInfoSuccess(info)
+	default:
+		phaseInfo = pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, info)
 	}
-	return pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, info), nil
+
+	phaseVersionUpdateErr := k8s.MaybeUpdatePhaseVersionFromPluginContext(&phaseInfo, &pluginContext)
+	if phaseVersionUpdateErr != nil {
+		return pluginsCore.PhaseInfoUndefined, phaseVersionUpdateErr
+	}
+
+	return phaseInfo, nil
 }
 
 func init() {
