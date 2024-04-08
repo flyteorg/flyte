@@ -792,89 +792,88 @@ spec:
           #   path: /*
           #   pathType: ImplementationSpecific
           #
-          
           # NOTE: Port 81 in flyteadmin is the GRPC server port for FlyteAdmin.
-          - path: /flyteidl.service.SignalService
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: flyteadmin
-                port:
-                  number: 81
-          - path: /flyteidl.service.SignalService/*
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: flyteadmin
-                port:
-                  number: 81
           - path: /flyteidl.service.AdminService
             pathType: ImplementationSpecific
             backend:
               service:
-                name: flyteadmin
+                name: flyteadmin-grpc
                 port:
                   number: 81
           - path: /flyteidl.service.AdminService/*
             pathType: ImplementationSpecific
             backend:
               service:
-                name: flyteadmin
-                port:
-                  number: 81
-          - path: /flyteidl.service.DataProxyService
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: flyteadmin
-                port:
-                  number: 81
-          - path: /flyteidl.service.DataProxyService/*
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: flyteadmin
+                name: flyteadmin-grpc
                 port:
                   number: 81
           - path: /flyteidl.service.AuthMetadataService
             pathType: ImplementationSpecific
             backend:
               service:
-                name: flyteadmin
+                name: flyteadmin-grpc
                 port:
                   number: 81
           - path: /flyteidl.service.AuthMetadataService/*
             pathType: ImplementationSpecific
             backend:
               service:
-                name: flyteadmin
+                name: flyteadmin-grpc
+                port:
+                  number: 81
+          - path: /flyteidl.service.DataProxyService
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: flyteadmin-grpc
+                port:
+                  number: 81
+          - path: /flyteidl.service.DataProxyService/*
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: flyteadmin-grpc
                 port:
                   number: 81
           - path: /flyteidl.service.IdentityService
             pathType: ImplementationSpecific
             backend:
               service:
-                name: flyteadmin
+                name: flyteadmin-grpc
                 port:
                   number: 81
           - path: /flyteidl.service.IdentityService/*
             pathType: ImplementationSpecific
             backend:
               service:
-                name: flyteadmin
+                name: flyteadmin-grpc
+                port:
+                  number: 81
+          - path: /flyteidl.service.SignalService
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: flyteadmin-grpc
+                port:
+                  number: 81
+          - path: /flyteidl.service.SignalService/*
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: flyteadmin-grpc
                 port:
                   number: 81
           - path: /grpc.health.v1.Health
             pathType: ImplementationSpecific
             backend:
               service:
-                name: flyteadmin
+                name: flyteadmin-grpc
                 port:
                   number: 81
           - path: /grpc.health.v1.Health/*
             pathType: ImplementationSpecific
             backend:
               service:
-                name: flyteadmin
+                name: flyteadmin-grpc
                 port:
                   number: 81

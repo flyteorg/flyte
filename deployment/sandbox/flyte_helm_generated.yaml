@@ -6131,7 +6131,7 @@ metadata:
     app.kubernetes.io/instance: flyte
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
-  annotations: 
+  annotations:
     projectcontour.io/upstream-protocol.h2c: grpc
 spec:
   type: ClusterIP
@@ -6139,11 +6139,7 @@ spec:
     - name: http
       port: 80
       protocol: TCP
-      targetPort: 8088
-    - name: grpc
-      port: 81
-      protocol: TCP
-      targetPort: 8089
+      targetPort: http
     - name: redoc
       protocol: TCP
       port: 87
@@ -6151,6 +6147,9 @@ spec:
     - name: http-metrics
       protocol: TCP
       port: 10254
+    - name: grpc
+      port: 81
+      targetPort: grpc
   selector: 
     app.kubernetes.io/name: flyteadmin
     app.kubernetes.io/instance: flyte
@@ -6792,9 +6791,12 @@ spec:
         imagePullPolicy: "IfNotPresent"
         name: flyteadmin
         ports:
-        - containerPort: 8088
-        - containerPort: 8089
-        - containerPort: 10254
+        - name: http
+          containerPort: 8088
+        - name: grpc
+          containerPort: 8089
+        - name: profiler
+          containerPort: 10254
         readinessProbe:
           exec:
             command: [ "sh", "-c", "reply=$(curl -s -o /dev/null -w %{http_code} http://127.0.0.1:8088/healthcheck); if [ \"$reply\" -lt 200 -o \"$reply\" -ge 400 ]; then exit 1; fi;","grpc_health_probe", "-addr=:8089"]
@@ -7769,22 +7771,7 @@ spec:
                 name: flyteadmin
                 port:
                   number: 80
-          
           # NOTE: Port 81 in flyteadmin is the GRPC server port for FlyteAdmin.
-          - path: /flyteidl.service.SignalService
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: flyteadmin
-                port:
-                  number: 81
-          - path: /flyteidl.service.SignalService/*
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: flyteadmin
-                port:
-                  number: 81
           - path: /flyteidl.service.AdminService
             pathType: ImplementationSpecific
             backend:
@@ -7793,20 +7780,6 @@ spec:
                 port:
                   number: 81
           - path: /flyteidl.service.AdminService/*
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: flyteadmin
-                port:
-                  number: 81
-          - path: /flyteidl.service.DataProxyService
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: flyteadmin
-                port:
-                  number: 81
-          - path: /flyteidl.service.DataProxyService/*
             pathType: ImplementationSpecific
             backend:
               service:
@@ -7827,6 +7800,20 @@ spec:
                 name: flyteadmin
                 port:
                   number: 81
+          - path: /flyteidl.service.DataProxyService
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: flyteadmin
+                port:
+                  number: 81
+          - path: /flyteidl.service.DataProxyService/*
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: flyteadmin
+                port:
+                  number: 81
           - path: /flyteidl.service.IdentityService
             pathType: ImplementationSpecific
             backend:
@@ -7835,6 +7822,20 @@ spec:
                 port:
                   number: 81
           - path: /flyteidl.service.IdentityService/*
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: flyteadmin
+                port:
+                  number: 81
+          - path: /flyteidl.service.SignalService
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: flyteadmin
+                port:
+                  number: 81
+          - path: /flyteidl.service.SignalService/*
             pathType: ImplementationSpecific
             backend:
               service:
