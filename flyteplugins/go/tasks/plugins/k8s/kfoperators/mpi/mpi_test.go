@@ -118,7 +118,7 @@ func dummyMPITaskTemplate(id string, args ...interface{}) *core.TaskTemplate {
 	}
 }
 
-func dummyMPITaskContext(taskTemplate *core.TaskTemplate, resources *corev1.ResourceRequirements, extendedResources *core.ExtendedResources) pluginsCore.TaskExecutionContext {
+func dummyMPITaskContext(taskTemplate *core.TaskTemplate, resources *corev1.ResourceRequirements, extendedResources *core.ExtendedResources, pluginState k8s.PluginState) pluginsCore.TaskExecutionContext {
 	taskCtx := &mocks.TaskExecutionContext{}
 	inputReader := &pluginIOMocks.InputReader{}
 	inputReader.OnGetInputPrefixPath().Return("/input/prefix")
@@ -172,11 +172,10 @@ func dummyMPITaskContext(taskTemplate *core.TaskTemplate, resources *corev1.Reso
 	taskExecutionMetadata.OnGetEnvironmentVariables().Return(nil)
 	taskCtx.OnTaskExecutionMetadata().Return(taskExecutionMetadata)
 
-	inputState := k8s.PluginState{}
 	pluginStateReaderMock := mocks.PluginStateReader{}
-	pluginStateReaderMock.On("Get", mock.AnythingOfType(reflect.TypeOf(&inputState).String())).Return(
+	pluginStateReaderMock.On("Get", mock.AnythingOfType(reflect.TypeOf(&pluginState).String())).Return(
 		func(v interface{}) uint8 {
-			*(v.(*k8s.PluginState)) = inputState
+			*(v.(*k8s.PluginState)) = pluginState
 			return 0
 		},
 		func(v interface{}) error {
@@ -289,7 +288,7 @@ func dummyMPIJobResource(mpiResourceHandler mpiOperatorResourceHandler,
 
 	mpiObj := dummyMPICustomObj(workers, launcher, slots)
 	taskTemplate := dummyMPITaskTemplate(mpiID, mpiObj)
-	resource, err := mpiResourceHandler.BuildResource(context.TODO(), dummyMPITaskContext(taskTemplate, resourceRequirements, nil))
+	resource, err := mpiResourceHandler.BuildResource(context.TODO(), dummyMPITaskContext(taskTemplate, resourceRequirements, nil, k8s.PluginState{}))
 	if err != nil {
 		panic(err)
 	}
@@ -316,7 +315,7 @@ func TestBuildResourceMPI(t *testing.T) {
 	mpiObj := dummyMPICustomObj(100, 50, 1)
 	taskTemplate := dummyMPITaskTemplate(mpiID2, mpiObj)
 
-	resource, err := mpiResourceHandler.BuildResource(context.TODO(), dummyMPITaskContext(taskTemplate, resourceRequirements, nil))
+	resource, err := mpiResourceHandler.BuildResource(context.TODO(), dummyMPITaskContext(taskTemplate, resourceRequirements, nil, k8s.PluginState{}))
 	assert.NoError(t, err)
 	assert.NotNil(t, resource)
 
@@ -352,13 +351,13 @@ func TestBuildResourceMPIForWrongInput(t *testing.T) {
 	mpiObj := dummyMPICustomObj(0, 0, 1)
 	taskTemplate := dummyMPITaskTemplate(mpiID, mpiObj)
 
-	_, err := mpiResourceHandler.BuildResource(context.TODO(), dummyMPITaskContext(taskTemplate, resourceRequirements, nil))
+	_, err := mpiResourceHandler.BuildResource(context.TODO(), dummyMPITaskContext(taskTemplate, resourceRequirements, nil, k8s.PluginState{}))
 	assert.Error(t, err)
 
 	mpiObj = dummyMPICustomObj(1, 1, 1)
 	taskTemplate = dummyMPITaskTemplate(mpiID2, mpiObj)
 
-	resource, err := mpiResourceHandler.BuildResource(context.TODO(), dummyMPITaskContext(taskTemplate, resourceRequirements, nil))
+	resource, err := mpiResourceHandler.BuildResource(context.TODO(), dummyMPITaskContext(taskTemplate, resourceRequirements, nil, k8s.PluginState{}))
 	app, ok := resource.(*kubeflowv1.MPIJob)
 	assert.Nil(t, err)
 	assert.Equal(t, true, ok)
@@ -472,7 +471,7 @@ func TestBuildResourceMPIExtendedResources(t *testing.T) {
 			mpiObj := dummyMPICustomObj(100, 50, 1)
 			taskTemplate := dummyMPITaskTemplate(mpiID2, mpiObj)
 			taskTemplate.ExtendedResources = f.extendedResourcesBase
-			taskContext := dummyMPITaskContext(taskTemplate, f.resources, f.extendedResourcesOverride)
+			taskContext := dummyMPITaskContext(taskTemplate, f.resources, f.extendedResourcesOverride, k8s.PluginState{})
 			mpiResourceHandler := mpiOperatorResourceHandler{}
 			r, err := mpiResourceHandler.BuildResource(context.TODO(), taskContext)
 			assert.Nil(t, err)
@@ -504,7 +503,7 @@ func TestGetTaskPhase(t *testing.T) {
 		return dummyMPIJobResource(mpiResourceHandler, 2, 1, 1, conditionType)
 	}
 
-	taskCtx := dummyMPITaskContext(dummyMPITaskTemplate("", dummyMPICustomObj(2, 1, 1)), resourceRequirements, nil)
+	taskCtx := dummyMPITaskContext(dummyMPITaskTemplate("", dummyMPICustomObj(2, 1, 1)), resourceRequirements, nil, k8s.PluginState{})
 	taskPhase, err := mpiResourceHandler.GetTaskPhase(ctx, taskCtx, dummyMPIJobResourceCreator(mpiOp.JobCreated))
 	assert.NoError(t, err)
 	assert.Equal(t, pluginsCore.PhaseQueued, taskPhase.Phase())
@@ -536,6 +535,23 @@ func TestGetTaskPhase(t *testing.T) {
 	assert.Nil(t, err)
 }
 
+func TestGetTaskPhaseIncreasePhaseVersion(t *testing.T) {
+	mpiResourceHandler := mpiOperatorResourceHandler{}
+	ctx := context.TODO()
+
+	pluginState := k8s.PluginState{
+		Phase:        pluginsCore.PhaseQueued,
+		PhaseVersion: pluginsCore.DefaultPhaseVersion,
+		Reason:       "task submitted to K8s",
+	}
+	taskCtx := dummyMPITaskContext(dummyMPITaskTemplate("", dummyMPICustomObj(2, 1, 1)), resourceRequirements, nil, pluginState)
+
+	taskPhase, err := mpiResourceHandler.GetTaskPhase(ctx, taskCtx, dummyMPIJobResource(mpiResourceHandler, 2, 1, 1, mpiOp.JobCreated))
+
+	assert.NoError(t, err)
+	assert.Equal(t, taskPhase.Version(), pluginsCore.DefaultPhaseVersion+1)
+}
+
 func TestGetLogs(t *testing.T) {
 	assert.NoError(t, logs.SetLogConfig(&logs.LogConfig{
 		IsKubernetesEnabled: true,
@@ -548,7 +564,7 @@ func TestGetLogs(t *testing.T) {
 
 	mpiResourceHandler := mpiOperatorResourceHandler{}
 	mpiJob := dummyMPIJobResource(mpiResourceHandler, workers, launcher, slots, mpiOp.JobRunning)
-	taskCtx := dummyMPITaskContext(dummyMPITaskTemplate("", dummyMPICustomObj(workers, launcher, slots)), resourceRequirements, nil)
+	taskCtx := dummyMPITaskContext(dummyMPITaskTemplate("", dummyMPICustomObj(workers, launcher, slots)), resourceRequirements, nil, k8s.PluginState{})
 	jobLogs, err := common.GetLogs(taskCtx, common.MPITaskType, mpiJob.ObjectMeta, false, workers, launcher, 0, 0)
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(jobLogs))
@@ -581,7 +597,7 @@ func TestReplicaCounts(t *testing.T) {
 			mpiObj := dummyMPICustomObj(test.workerReplicaCount, test.launcherReplicaCount, 1)
 			taskTemplate := dummyMPITaskTemplate(mpiID2, mpiObj)
 
-			resource, err := mpiResourceHandler.BuildResource(context.TODO(), dummyMPITaskContext(taskTemplate, resourceRequirements, nil))
+			resource, err := mpiResourceHandler.BuildResource(context.TODO(), dummyMPITaskContext(taskTemplate, resourceRequirements, nil, k8s.PluginState{}))
 			if test.expectError {
 				assert.Error(t, err)
 				assert.Nil(t, resource)
@@ -667,7 +683,7 @@ func TestBuildResourceMPIV1(t *testing.T) {
 	taskTemplate := dummyMPITaskTemplate(mpiID2, taskConfig)
 	taskTemplate.TaskTypeVersion = 1
 
-	resource, err := mpiResourceHandler.BuildResource(context.TODO(), dummyMPITaskContext(taskTemplate, resourceRequirements, nil))
+	resource, err := mpiResourceHandler.BuildResource(context.TODO(), dummyMPITaskContext(taskTemplate, resourceRequirements, nil, k8s.PluginState{}))
 	assert.NoError(t, err)
 	assert.NotNil(t, resource)
 
@@ -719,7 +735,7 @@ func TestBuildResourceMPIV1WithOnlyWorkerReplica(t *testing.T) {
 	taskTemplate := dummyMPITaskTemplate(mpiID2, taskConfig)
 	taskTemplate.TaskTypeVersion = 1
 
-	resource, err := mpiResourceHandler.BuildResource(context.TODO(), dummyMPITaskContext(taskTemplate, resourceRequirements, nil))
+	resource, err := mpiResourceHandler.BuildResource(context.TODO(), dummyMPITaskContext(taskTemplate, resourceRequirements, nil, k8s.PluginState{}))
 	assert.NoError(t, err)
 	assert.NotNil(t, resource)
 
@@ -782,7 +798,7 @@ func TestBuildResourceMPIV1ResourceTolerations(t *testing.T) {
 	taskTemplate := dummyMPITaskTemplate(mpiID2, taskConfig)
 	taskTemplate.TaskTypeVersion = 1
 
-	resource, err := mpiResourceHandler.BuildResource(context.TODO(), dummyMPITaskContext(taskTemplate, resourceRequirements, nil))
+	resource, err := mpiResourceHandler.BuildResource(context.TODO(), dummyMPITaskContext(taskTemplate, resourceRequirements, nil, k8s.PluginState{}))
 	assert.NoError(t, err)
 	assert.NotNil(t, resource)
 
@@ -797,7 +813,7 @@ func TestGetReplicaCount(t *testing.T) {
 	mpiResourceHandler := mpiOperatorResourceHandler{}
 	tfObj := dummyMPICustomObj(1, 1, 0)
 	taskTemplate := dummyMPITaskTemplate("the job", tfObj)
-	resource, err := mpiResourceHandler.BuildResource(context.TODO(), dummyMPITaskContext(taskTemplate, resourceRequirements, nil))
+	resource, err := mpiResourceHandler.BuildResource(context.TODO(), dummyMPITaskContext(taskTemplate, resourceRequirements, nil, k8s.PluginState{}))
 	assert.NoError(t, err)
 	assert.NotNil(t, resource)
 	MPIJob, ok := resource.(*kubeflowv1.MPIJob)
