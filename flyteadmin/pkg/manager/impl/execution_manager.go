@@ -750,11 +750,15 @@ func (m *ExecutionManager) getStringFromInput(ctx context.Context, inputBinding 
 		p := inputVal.GetScalar().GetPrimitive()
 		switch p.GetValue().(type) {
 		case *core.Primitive_Integer:
-			strVal = p.GetStringValue()
+			strVal = fmt.Sprintf("%d", p.GetInteger())
 		case *core.Primitive_Datetime:
 			t := time.Unix(p.GetDatetime().Seconds, int64(p.GetDatetime().Nanos))
 			t = t.In(time.UTC)
-			strVal = t.Format("2006-01-02")
+			if t.Hour() == 0 && t.Minute() == 0 && t.Second() == 0 {
+				strVal = t.Format("2006-01-02")
+			} else {
+				strVal = t.Format("2006-01-02T15:04:05Z07:00")
+			}
 		case *core.Primitive_StringValue:
 			strVal = p.GetStringValue()
 		case *core.Primitive_FloatValue:

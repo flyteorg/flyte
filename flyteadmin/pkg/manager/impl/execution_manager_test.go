@@ -6035,3 +6035,45 @@ func TestQueryTemplate(t *testing.T) {
 		assert.Error(t, err)
 	})
 }
+
+func TestLiteralParsing(t *testing.T) {
+	ctx := context.Background()
+
+	aDate := time.Date(
+		2063, 4, 5, 00, 00, 00, 0, time.UTC)
+	aTime := time.Date(
+		2063, 4, 5, 15, 42, 00, 0, time.UTC)
+
+	rawInputs := map[string]interface{}{
+		"aStr":   "hello world",
+		"anInt":  1,
+		"aFloat": 6.62607015e-34,
+		"aDate":  aDate,
+		"aTime":  aTime,
+		"aBool":  true,
+	}
+
+	otherInputs, err := coreutils.MakeLiteralMap(rawInputs)
+	assert.NoError(t, err)
+
+	m := ExecutionManager{}
+	testCases := []struct {
+		varName        string
+		expectedString string
+	}{
+		{"aStr", "hello world"},
+		{"anInt", "1"},
+		{"aFloat", "0.00"},
+		{"aDate", "2063-04-05"},
+		{"aTime", "2063-04-05T15:42:00Z"},
+		{"aBool", "true"},
+	}
+	for _, tc := range testCases {
+		t.Run(fmt.Sprintf("Parse %s", tc.varName), func(t *testing.T) {
+			binding := core.InputBindingData{Var: tc.varName}
+			strVal, err := m.getStringFromInput(ctx, binding, otherInputs.Literals)
+			assert.NoError(t, err)
+			assert.Equal(t, tc.expectedString, strVal)
+		})
+	}
+}
