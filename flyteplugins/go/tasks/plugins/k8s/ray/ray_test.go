@@ -2,6 +2,7 @@ package ray
 
 import (
 	"context"
+	"reflect"
 	"testing"
 	"time"
 
@@ -702,6 +703,20 @@ func newPluginContext() k8s.PluginContext {
 	tskCtx := &mocks.TaskExecutionMetadata{}
 	tskCtx.OnGetTaskExecutionID().Return(taskExecID)
 	plg.OnTaskExecutionMetadata().Return(tskCtx)
+
+	inputState := k8s.PluginState{}
+	pluginStateReaderMock := mocks.PluginStateReader{}
+	pluginStateReaderMock.On("Get", mock.AnythingOfType(reflect.TypeOf(&inputState).String())).Return(
+		func(v interface{}) uint8 {
+			*(v.(*k8s.PluginState)) = inputState
+			return 0
+		},
+		func(v interface{}) error {
+			return nil
+		})
+
+	plg.OnPluginStateReader().Return(&pluginStateReaderMock)
+
 	return plg
 }
 

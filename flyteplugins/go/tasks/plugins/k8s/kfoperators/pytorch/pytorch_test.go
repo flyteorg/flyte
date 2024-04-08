@@ -3,6 +3,7 @@ package pytorch
 import (
 	"context"
 	"fmt"
+	"reflect"
 	"testing"
 	"time"
 
@@ -176,6 +177,19 @@ func dummyPytorchTaskContext(taskTemplate *core.TaskTemplate, resources *corev1.
 	taskExecutionMetadata.OnGetPlatformResources().Return(&corev1.ResourceRequirements{})
 	taskExecutionMetadata.OnGetEnvironmentVariables().Return(nil)
 	taskCtx.OnTaskExecutionMetadata().Return(taskExecutionMetadata)
+
+	inputState := k8s.PluginState{}
+	pluginStateReaderMock := mocks.PluginStateReader{}
+	pluginStateReaderMock.On("Get", mock.AnythingOfType(reflect.TypeOf(&inputState).String())).Return(
+		func(v interface{}) uint8 {
+			*(v.(*k8s.PluginState)) = inputState
+			return 0
+		},
+		func(v interface{}) error {
+			return nil
+		})
+
+	taskCtx.OnPluginStateReader().Return(&pluginStateReaderMock)
 	return taskCtx
 }
 
