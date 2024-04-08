@@ -75,12 +75,12 @@ The following piece of code also shows how the check is integrated into existing
 func (m *AdminService) GetWorkflow(ctx context.Context, request *admin.ObjectGetRequest) (*admin.Workflow, error) {
 	defer m.interceptPanic(ctx, request)
 
+    if request == nil {
+        return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
+    }
+	
 	if ProjectAccessPermitted(ctx, request.GetId().Project) {
 		return nil, status.Errorf(codes.PermissionDenied, "Access denied for project %s.", request.GetId().Project)
-	}
-
-	if request == nil {
-		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
 ```
 
