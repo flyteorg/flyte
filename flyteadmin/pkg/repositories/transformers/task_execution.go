@@ -372,6 +372,12 @@ func mergeMetadata(existing, latest *event.TaskExecutionMetadata) *event.TaskExe
 	return existing
 }
 
+func filterExternalResourceLogsByPhase(externalResources []*event.ExternalResourceInfo, phase core.TaskExecution_Phase) {
+	for _, externalResource := range externalResources {
+		externalResource.Logs = filterLogsByPhase(externalResource.Logs, phase)
+	}
+}
+
 func filterLogsByPhase(logs []*core.TaskLog, phase core.TaskExecution_Phase) []*core.TaskLog {
 	filteredLogs := make([]*core.TaskLog, 0, len(logs))
 
@@ -403,6 +409,7 @@ func UpdateTaskExecutionModel(ctx context.Context, request *admin.TaskExecutionE
 		return errors.NewFlyteAdminErrorf(codes.Internal,
 			"failed to unmarshal task execution closure with error: %+v", err)
 	}
+	isPhaseChange := taskExecutionModel.Phase != request.Event.Phase.String()
 	existingTaskPhase := taskExecutionModel.Phase
 	taskExecutionModel.Phase = request.Event.Phase.String()
 	taskExecutionModel.PhaseVersion = request.Event.PhaseVersion
@@ -460,6 +467,11 @@ func UpdateTaskExecutionModel(ctx context.Context, request *admin.TaskExecutionE
 		return errors.NewFlyteAdminErrorf(codes.Internal, "failed to merge task event custom_info with error: %v", err)
 	}
 	taskExecutionClosure.Metadata = mergeMetadata(taskExecutionClosure.Metadata, request.Event.Metadata)
+
+	if isPhaseChange {
+		filterExternalResourceLogsByPhase(taskExecutionClosure.Metadata.ExternalResources, request.Event.Phase)
+	}
+
 	if request.Event.EventVersion > taskExecutionClosure.EventVersion {
 		taskExecutionClosure.EventVersion = request.Event.EventVersion
 	}
