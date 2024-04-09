@@ -135,8 +135,8 @@ func initializeAdminClientFromConfig(ctx context.Context, config *Config) (clien
 	tracerProvider := otelutils.GetTracerProvider(otelutils.AdminClientTracer)
 
 	grpcOptions := []grpcRetry.CallOption{
-		grpcRetry.WithBackoff(grpcRetry.BackoffExponentialWithJitter(time.Duration(config.BackoffScalar)*time.Millisecond, config.BackoffJitter)),
-		grpcRetry.WithMax(config.MaxRetries),
+		grpcRetry.WithBackoff(grpcRetry.BackoffExponentialWithJitter(time.Duration(config.BackoffScalar)*time.Millisecond, config.GetBackoffJitter(ctx))),
+		grpcRetry.WithMax(uint(config.MaxRetries)),
 	}
 
 	opt := grpc.WithChainUnaryInterceptor(
