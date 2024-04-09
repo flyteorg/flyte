@@ -85,6 +85,30 @@ Use Published Dashboards to Monitor Flyte Deployment
 
 Flyte Backend is written in Golang and exposes stats using Prometheus. The stats are labeled with workflow, task, project & domain, wherever appropriate.
 
+
+To consume the dashboards, it's recommended to install and configure the Prometheus operator as described in `their docs <https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/user-guides/getting-started.md>`__.
+This is especially true if you plan to use the `Service Monitor` provided by the `flyte-core <https://github.com/flyteorg/flyte/blob/master/charts/flyte-core/templates/propeller/service-monitor.yaml>`__ Helm chart.
+
+.. note::
+
+   Configure the Prometheus instance to use `ServiceMonitor` in namespaces other than `default` by configuring the following keys for the `prometheus` resources:
+
+.. code-block:: yaml
+
+   spec:
+    serviceMonitorSelector: {}
+    serviceMonitorNamespaceSelector: {}
+
+.. note::
+
+   The above example configuration lets Prometheus use any `ServiceMonitor` in any namespace in the cluster. Adjust the configuration to reduce the scope if needed.
+
+Once you have installed and configured the Prometheus operator, enable the Service Monitors in the Helm chart by configuring the following keys in your `values` file:
+
+a. 
+
+
+
 The dashboards are divided into two types:
 
 - **User-facing dashboards**: Dashboards that can be used to triage/investigate/observe performance and characteristics of workflows and tasks.
