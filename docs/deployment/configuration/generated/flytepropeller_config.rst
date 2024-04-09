@@ -608,6 +608,42 @@ Use the same gRPC credentials option as the flyteadmin client
   "false"
   
 
+max-retries (int)
+------------------------------------------------------------------------------------------------------------------------
+
+The max number of retries for event recording.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "5"
+  
+
+base-scalar (int)
+------------------------------------------------------------------------------------------------------------------------
+
+The base/scalar backoff duration in milliseconds for event recording retries.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "100"
+  
+
+backoff-jitter (string)
+------------------------------------------------------------------------------------------------------------------------
+
+A string representation of a floating point number between 0 and 1 specifying the jitter factor for event recording retries.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "0.1"
+  
+
 default-service-config (string)
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -671,7 +707,7 @@ The max bucket size for event recording tokens.
   "1000"
   
 
-max-retries (uint)
+max-retries (int)
 ------------------------------------------------------------------------------------------------------------------------
 
 The max number of retries for event recording.
@@ -695,10 +731,10 @@ The base/scalar backoff duration in milliseconds for event recording retries.
   "100"
   
 
-backoff-jitter (float64)
+backoff-jitter (string)
 ------------------------------------------------------------------------------------------------------------------------
 
-The jitter factor for event recording retries.
+A string representation of a floating point number between 0 and 1 specifying the jitter factor for event recording retries.
 
 **Default Value**: 
 
