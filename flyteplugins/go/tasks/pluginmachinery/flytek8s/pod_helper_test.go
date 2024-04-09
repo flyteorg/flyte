@@ -1631,25 +1631,49 @@ func TestDemystifyFailure(t *testing.T) {
 	})
 
 	t.Run("GKE kubelet graceful node shutdown", func(t *testing.T) {
+		containerReason := "some reason"
 		phaseInfo, err := DemystifyFailure(v1.PodStatus{
 			Message: "Pod Node is in progress of shutting down, not admitting any new pods",
 			Reason:  "Shutdown",
+			ContainerStatuses: []v1.ContainerStatus{
+				{
+					LastTerminationState: v1.ContainerState{
+						Terminated: &v1.ContainerStateTerminated{
+							Reason:   containerReason,
+							ExitCode: SIGKILL,
+						},
+					},
+				},
+			},
 		}, pluginsCore.TaskInfo{})
 		assert.Nil(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
 		assert.Equal(t, "Interrupted", phaseInfo.Err().Code)
 		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().Kind)
+		assert.Contains(t, phaseInfo.Err().Message, containerReason)
 	})
 
 	t.Run("GKE kubelet graceful node shutdown", func(t *testing.T) {
+		containerReason := "some reason"
 		phaseInfo, err := DemystifyFailure(v1.PodStatus{
 			Message: "Foobar",
 			Reason:  "Terminated",
+			ContainerStatuses: []v1.ContainerStatus{
+				{
+					LastTerminationState: v1.ContainerState{
+						Terminated: &v1.ContainerStateTerminated{
+							Reason:   containerReason,
+							ExitCode: SIGKILL,
+						},
+					},
+				},
+			},
 		}, pluginsCore.TaskInfo{})
 		assert.Nil(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
 		assert.Equal(t, "Interrupted", phaseInfo.Err().Code)
 		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().Kind)
+		assert.Contains(t, phaseInfo.Err().Message, containerReason)
 	})
 }
 

@@ -4506,7 +4506,7 @@ export namespace flyteidl {
             node?: (flyteidl.core.INode|null);
 
             /** ArrayNode parallelism */
-            parallelism?: (number|null);
+            parallelism?: (Long|null);
 
             /** ArrayNode minSuccesses */
             minSuccesses?: (number|null);
@@ -4528,7 +4528,7 @@ export namespace flyteidl {
             public node?: (flyteidl.core.INode|null);
 
             /** ArrayNode parallelism. */
-            public parallelism: number;
+            public parallelism: Long;
 
             /** ArrayNode minSuccesses. */
             public minSuccesses: number;
@@ -9155,6 +9155,9 @@ export namespace flyteidl {
 
             /** TaskExecutionMetadata overrides */
             overrides?: (flyteidl.core.ITaskNodeOverrides|null);
+
+            /** TaskExecutionMetadata identity */
+            identity?: (flyteidl.core.IIdentity|null);
         }
 
         /** Represents a TaskExecutionMetadata. */
@@ -9195,6 +9198,9 @@ export namespace flyteidl {
 
             /** TaskExecutionMetadata overrides. */
             public overrides?: (flyteidl.core.ITaskNodeOverrides|null);
+
+            /** TaskExecutionMetadata identity. */
+            public identity?: (flyteidl.core.IIdentity|null);
 
             /**
              * Creates a new TaskExecutionMetadata instance using the specified properties.

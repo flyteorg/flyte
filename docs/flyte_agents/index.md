@@ -18,32 +18,34 @@ You can create different agent services that host different agents, e.g., a prod
 :class: with-shadow
 :::
 
-(using_agents_in_tasks)=
-## Using agents in tasks
-
-If you need to connect to an external service in your workflow, we recommend using the corresponding agent rather than a web API plugin. Agents are designed to be scalable and can handle large workloads efficiently, and decrease load on FlytePropeller, since they run outside of it. You can also test agents locally without having to change the Flyte backend configuration, streamlining development.
-
-For a list of agents you can use in your tasks and example usage for each, see the [Integrations](https://docs.flyte.org/en/latest/flytesnacks/integrations.html#flyte-agents) documentation.
-
 ## Table of contents
 
 ```{list-table}
 :header-rows: 0
 :widths: 20 30
 
-* - {doc}`Developing agents <developing_agents>`
-  - If the agent you need doesn't exist, follow these steps to create it.
-* - {doc}`Testing agents locally <testing_agents_locally>`
-  - Whether using an existing agent or developing a new one, you can test the agent locally without needing to configure your Flyte deployment.
+* - {doc}`Testing agents locally <testing_agents_in_a_local_python_environment>`
+  - Whether using an {ref}`existing agent <flyte_agents>` or developing a new one, you can quickly test the agent in local Python environment without needing to configure your Flyte deployment.
 * - {doc}`Enabling agents in your Flyte deployment <enabling_agents_in_your_flyte_deployment>`
-  - Once you have tested an agent locally and want to use it in production, you must configure your Flyte deployment for the agent.
+  - After you have tested an {ref}`existing agent <flyte_agents>` in a local Python environment, you must configure your Flyte deployment for the agent to use it in production.
+* - {doc}`Developing agents <developing_agents>`
+  - If the agent you need doesn't exist, follow these steps to create a new agent.
+* - {doc}`Testing agents in a local development cluster <testing_agents_in_a_local_development_cluster>`
+  - After developing your new agent and testing it in a local Python environment, you can test it in a local development cluster to ensure it works well remotely.
+* - {doc}`Deploying agents to the Flyte sandbox <deploying_agents_to_the_flyte_sandbox>`
+  - Once you have tested your new agent in a local development cluster and want to use it in production, you should test it in the Flyte sandbox.
+* - {doc}`Implementing the agent metadata service <implementing_the_agent_metadata_service>`
+  - If you want to develop an agent server in a language other than Python (e.g., Rust or Java), you must implement the agent metadata service in your agent server.
 ```
 
 ```{toctree}
 :maxdepth: -1
 :hidden:
 
-developing_agents
-testing_agents_locally
+testing_agents_in_a_local_python_environment
 enabling_agents_in_your_flyte_deployment
+developing_agents
+testing_agents_in_a_local_development_cluster
+deploying_agents_to_the_flyte_sandbox
+implementing_the_agent_metadata_service
 ```

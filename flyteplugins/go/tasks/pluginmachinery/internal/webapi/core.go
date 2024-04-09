@@ -191,7 +191,7 @@ func createRemotePlugin(pluginEntry webapi.PluginEntry, c clock.Clock) core.Plug
 			}
 
 			resourceCache, err := NewResourceCache(ctx, pluginEntry.ID, p, p.GetConfig().Caching,
-				iCtx.MetricsScope().NewSubScope("cache"))
+				p.GetConfig().ReadRateLimiter, iCtx.MetricsScope().NewSubScope("cache"))
 
 			if err != nil {
 				return nil, err

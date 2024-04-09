@@ -10808,7 +10808,7 @@
                  * @memberof flyteidl.core
                  * @interface IArrayNode
                  * @property {flyteidl.core.INode|null} [node] ArrayNode node
-                 * @property {number|null} [parallelism] ArrayNode parallelism
+                 * @property {Long|null} [parallelism] ArrayNode parallelism
                  * @property {number|null} [minSuccesses] ArrayNode minSuccesses
                  * @property {number|null} [minSuccessRatio] ArrayNode minSuccessRatio
                  */
@@ -10838,11 +10838,11 @@
     
                 /**
                  * ArrayNode parallelism.
-                 * @member {number} parallelism
+                 * @member {Long} parallelism
                  * @memberof flyteidl.core.ArrayNode
                  * @instance
                  */
-                ArrayNode.prototype.parallelism = 0;
+                ArrayNode.prototype.parallelism = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
     
                 /**
                  * ArrayNode minSuccesses.
@@ -10901,7 +10901,7 @@
                     if (message.node != null && message.hasOwnProperty("node"))
                         $root.flyteidl.core.Node.encode(message.node, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
                     if (message.parallelism != null && message.hasOwnProperty("parallelism"))
-                        writer.uint32(/* id 2, wireType 0 =*/16).uint32(message.parallelism);
+                        writer.uint32(/* id 2, wireType 0 =*/16).int64(message.parallelism);
                     if (message.minSuccesses != null && message.hasOwnProperty("minSuccesses"))
                         writer.uint32(/* id 3, wireType 0 =*/24).uint32(message.minSuccesses);
                     if (message.minSuccessRatio != null && message.hasOwnProperty("minSuccessRatio"))
@@ -10931,7 +10931,7 @@
                             message.node = $root.flyteidl.core.Node.decode(reader, reader.uint32());
                             break;
                         case 2:
-                            message.parallelism = reader.uint32();
+                            message.parallelism = reader.int64();
                             break;
                         case 3:
                             message.minSuccesses = reader.uint32();
@@ -10965,8 +10965,8 @@
                             return "node." + error;
                     }
                     if (message.parallelism != null && message.hasOwnProperty("parallelism"))
-                        if (!$util.isInteger(message.parallelism))
-                            return "parallelism: integer expected";
+                        if (!$util.isInteger(message.parallelism) && !(message.parallelism && $util.isInteger(message.parallelism.low) && $util.isInteger(message.parallelism.high)))
+                            return "parallelism: integer|Long expected";
                     if (message.minSuccesses != null && message.hasOwnProperty("minSuccesses")) {
                         properties.successCriteria = 1;
                         if (!$util.isInteger(message.minSuccesses))
@@ -22387,6 +22387,7 @@
                  * @property {boolean|null} [interruptible] TaskExecutionMetadata interruptible
                  * @property {number|null} [interruptibleFailureThreshold] TaskExecutionMetadata interruptibleFailureThreshold
                  * @property {flyteidl.core.ITaskNodeOverrides|null} [overrides] TaskExecutionMetadata overrides
+                 * @property {flyteidl.core.IIdentity|null} [identity] TaskExecutionMetadata identity
                  */
     
                 /**
@@ -22488,6 +22489,14 @@
                 TaskExecutionMetadata.prototype.overrides = null;
     
                 /**
+                 * TaskExecutionMetadata identity.
+                 * @member {flyteidl.core.IIdentity|null|undefined} identity
+                 * @memberof flyteidl.admin.TaskExecutionMetadata
+                 * @instance
+                 */
+                TaskExecutionMetadata.prototype.identity = null;
+    
+                /**
                  * Creates a new TaskExecutionMetadata instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.TaskExecutionMetadata
@@ -22534,6 +22543,8 @@
                         writer.uint32(/* id 9, wireType 0 =*/72).int32(message.interruptibleFailureThreshold);
                     if (message.overrides != null && message.hasOwnProperty("overrides"))
                         $root.flyteidl.core.TaskNodeOverrides.encode(message.overrides, writer.uint32(/* id 10, wireType 2 =*/82).fork()).ldelim();
+                    if (message.identity != null && message.hasOwnProperty("identity"))
+                        $root.flyteidl.core.Identity.encode(message.identity, writer.uint32(/* id 11, wireType 2 =*/90).fork()).ldelim();
                     return writer;
                 };
     
@@ -22599,6 +22610,9 @@
                             break;
                         case 10:
                             message.overrides = $root.flyteidl.core.TaskNodeOverrides.decode(reader, reader.uint32());
+                            break;
+                        case 11:
+                            message.identity = $root.flyteidl.core.Identity.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -22667,6 +22681,11 @@
                         var error = $root.flyteidl.core.TaskNodeOverrides.verify(message.overrides);
                         if (error)
                             return "overrides." + error;
+                    }
+                    if (message.identity != null && message.hasOwnProperty("identity")) {
+                        var error = $root.flyteidl.core.Identity.verify(message.identity);
+                        if (error)
+                            return "identity." + error;
                     }
                     return null;
                 };
