@@ -52,6 +52,27 @@ type FeatureGates struct {
 	EnableArtifacts bool `json:"enableArtifacts" pflag:",Enable artifacts feature."`
 }
 
+type ProjectAttributesMode int
+
+const (
+	ProjectAttributesMode_LEGACY ProjectAttributesMode = iota
+	ProjectAttributesMode_CONFIGURATION
+)
+
+type ProjectAttributesSource int
+
+const (
+	ProjectAttributesSource_RESOURCE = iota
+	ProjectAttributesSource_CONFIGURATION
+)
+
+type ProjectAttributesConfig struct {
+	// The mode to use for project attributes
+	Mode ProjectAttributesMode
+	// The source to use for project attributes
+	Source ProjectAttributesSource
+}
+
 // ApplicationConfig is the base configuration to start admin
 type ApplicationConfig struct {
 	// The RoleName key inserted as an annotation (https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/)
@@ -103,6 +124,8 @@ type ApplicationConfig struct {
 	Envs map[string]string `json:"envs,omitempty"`
 
 	FeatureGates FeatureGates `json:"featureGates" pflag:",Enable experimental features."`
+
+	ProjectAttributesConfig ProjectAttributesConfig `json:"projectAttributesConfig"`
 }
 
 func (a *ApplicationConfig) GetRoleNameKey() string {

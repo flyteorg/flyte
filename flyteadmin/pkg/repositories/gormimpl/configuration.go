@@ -12,52 +12,52 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
-type ConfigurationRepo struct {
+type ConfigurationDocumentRepo struct {
 	db               *gorm.DB
 	errorTransformer adminErrors.ErrorTransformer
 	metrics          gormMetrics
 }
 
-func (r *ConfigurationRepo) GetActive(ctx context.Context) (models.Configuration, error) {
-	var configuration models.Configuration
+func (r *ConfigurationDocumentRepo) GetActive(ctx context.Context) (models.ConfigurationDocument, error) {
+	var configuration models.ConfigurationDocument
 	timer := r.metrics.GetDuration.Start()
-	tx := r.db.Where(&models.Configuration{
+	tx := r.db.Where(&models.ConfigurationDocument{
 		Active: true,
 	}).First(&configuration)
 	timer.Stop()
 	// TODO: what if the table is empty?
 	if tx.Error != nil && errors.Is(tx.Error, gorm.ErrRecordNotFound) {
-		return models.Configuration{}, adminErrors.GetSingletonMissingEntityError("configuration")
+		return models.ConfigurationDocument{}, adminErrors.GetSingletonMissingEntityError("configuration")
 	} else if tx.Error != nil {
-		return models.Configuration{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
+		return models.ConfigurationDocument{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
 	}
 	return configuration, nil
 }
 
-func (r *ConfigurationRepo) EraseActiveAndCreate(ctx context.Context, versionToUpdate string, newConfiguration models.Configuration) error {
+func (r *ConfigurationDocumentRepo) Update(ctx context.Context, input *interfaces.UpdateConfigurationInput) error {
 	timer := r.metrics.CreateDuration.Start()
 	err := r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		// Check if the active override attributes are outdated
-		var configuration models.Configuration
-		err := tx.Where(&models.Configuration{
+		var configuration models.ConfigurationDocument
+		err := tx.Where(&models.ConfigurationDocument{
 			Active:  true,
-			Version: versionToUpdate,
+			Version: input.VersionToUpdate,
 		}).First(&configuration).Error
 		if err != nil {
 			return err
 		}
 
 		// Erase the active override attributes
-		err = tx.Model(&models.Configuration{}).Where(&models.Configuration{
+		err = tx.Model(&models.ConfigurationDocument{}).Where(&models.ConfigurationDocument{
 			Active:  true,
-			Version: versionToUpdate,
+			Version: input.VersionToUpdate,
 		}).Update("active", false).Error
 		if err != nil {
 			return err
 		}
 
 		// Create the new override attributes
-		err = tx.Create(&newConfiguration).Error
+		err = tx.Create(input.NewConfiguration).Error
 		if err != nil {
 			return err
 		}
@@ -70,11 +70,11 @@ func (r *ConfigurationRepo) EraseActiveAndCreate(ctx context.Context, versionToU
 	return nil
 }
 
-// Returns an instance of ConfigurationRepoInterface
+// Returns an instance of ConfigurationDocumentRepoInterface
 func NewConfigurationRepo(
-	db *gorm.DB, errorTransformer adminErrors.ErrorTransformer, scope promutils.Scope) interfaces.ConfigurationRepoInterface {
+	db *gorm.DB, errorTransformer adminErrors.ErrorTransformer, scope promutils.Scope) interfaces.ConfigurationDocumentRepoInterface {
 	metrics := newMetrics(scope)
-	return &ConfigurationRepo{
+	return &ConfigurationDocumentRepo{
 		db:               db,
 		errorTransformer: errorTransformer,
 		metrics:          metrics,

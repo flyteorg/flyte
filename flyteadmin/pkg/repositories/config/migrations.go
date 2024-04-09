@@ -1235,7 +1235,7 @@ var ContinuedMigrations = []*gormigrate.Migration{
 			return tx.AutoMigrate(&Configuration{})
 		},
 		Rollback: func(tx *gorm.DB) error {
-			return tx.Migrator().DropTable(&models.Configuration{})
+			return tx.Migrator().DropTable(&models.ConfigurationDocument{})
 		},
 	},
 }

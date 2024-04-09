@@ -10,14 +10,14 @@ import (
 type MockConfigurationRepo struct {
 }
 
-func (r *MockConfigurationRepo) GetActive(ctx context.Context) (models.Configuration, error) {
-	return models.Configuration{}, nil
+func (r *MockConfigurationRepo) GetActive(ctx context.Context) (models.ConfigurationDocument, error) {
+	return models.ConfigurationDocument{}, nil
 }
 
-func (r *MockConfigurationRepo) EraseActiveAndCreate(ctx context.Context, versionToUpdate string, newConfiguration models.Configuration) error {
+func (r *MockConfigurationRepo) EraseActiveAndCreate(ctx context.Context, versionToUpdate string, newConfiguration models.ConfigurationDocument) error {
 	return nil
 }
 
-func NewMockConfigurationRepo() interfaces.ConfigurationRepoInterface {
+func NewMockConfigurationRepo() interfaces.ConfigurationDocumentRepoInterface {
 	return &MockConfigurationRepo{}
 }

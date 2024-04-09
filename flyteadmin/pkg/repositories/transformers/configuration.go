@@ -1,6 +1,7 @@
 package transformers
 
 import (
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
@@ -82,4 +83,14 @@ func FromProjectAttributesUpdateRequest(request *admin.ProjectAttributesUpdateRe
 		},
 		Configuration: GetConfigurationFromMatchingAttributes(request.Attributes.MatchingAttributes),
 	}
+}
+
+// transform models.Resource to admin.ConfigurationDocument
+func FromResourceModelToConfiguration(resource models.Resource) *admin.Configuration {
+	matchableResource, err := FromResourceModelToMatchableAttributes(resource)
+	if err != nil {
+		return &admin.Configuration{}
+	}
+	configuration := GetConfigurationFromMatchingAttributes(matchableResource.GetAttributes())
+	return configuration
 }

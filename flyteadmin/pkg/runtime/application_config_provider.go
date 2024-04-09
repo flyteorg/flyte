@@ -33,6 +33,10 @@ var flyteAdminConfig = config.MustRegisterSection(flyteAdmin, &interfaces.Applic
 	MaxParallelism:              25,
 	K8SServiceAccount:           "",
 	UseOffloadedWorkflowClosure: false,
+	ProjectAttributesConfig: interfaces.ProjectAttributesConfig{
+		Mode:   interfaces.ProjectAttributesMode_CONFIGURATION,
+		Source: interfaces.ProjectAttributesSource_CONFIGURATION,
+	},
 })
 
 var schedulerConfig = config.MustRegisterSection(scheduler, &interfaces.SchedulerConfig{

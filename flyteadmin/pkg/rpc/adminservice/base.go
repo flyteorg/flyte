@@ -43,6 +43,7 @@ type AdminService struct {
 	MetricsManager           interfaces.MetricsInterface
 	Metrics                  AdminMetrics
 	ConfigurationManager     interfaces.ConfigurationInterface
+	Config                   runtimeIfaces.Configuration
 }
 
 // Intercepts all admin requests to handle panics during execution.
@@ -180,5 +181,6 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 		MetricsManager: manager.NewMetricsManager(workflowManager, executionManager, nodeExecutionManager,
 			taskExecutionManager, adminScope.NewSubScope("metrics_manager")),
 		Metrics: InitMetrics(adminScope),
+		Config:  configuration,
 	}
 }

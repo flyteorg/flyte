@@ -4,7 +4,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
-type Configuration struct {
+type ConfigurationDocument struct {
 	BaseModel
 	Version          string
 	DocumentLocation storage.DataReference

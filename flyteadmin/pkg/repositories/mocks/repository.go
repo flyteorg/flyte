@@ -21,7 +21,7 @@ type MockRepository struct {
 	taskExecutionRepo             interfaces.TaskExecutionRepoInterface
 	namedEntityRepo               interfaces.NamedEntityRepoInterface
 	descriptionEntityRepo         interfaces.DescriptionEntityRepoInterface
-	configurationRepo             interfaces.ConfigurationRepoInterface
+	configurationRepo             interfaces.ConfigurationDocumentRepoInterface
 	schedulableEntityRepo         sIface.SchedulableEntityRepoInterface
 	schedulableEntitySnapshotRepo sIface.ScheduleEntitiesSnapShotRepoInterface
 	signalRepo                    interfaces.SignalRepoInterface
@@ -87,7 +87,7 @@ func (r *MockRepository) DescriptionEntityRepo() interfaces.DescriptionEntityRep
 	return r.descriptionEntityRepo
 }
 
-func (r *MockRepository) ConfigurationRepo() interfaces.ConfigurationRepoInterface {
+func (r *MockRepository) ConfigurationDocumentRepo() interfaces.ConfigurationDocumentRepoInterface {
 	return r.configurationRepo
 }
 
