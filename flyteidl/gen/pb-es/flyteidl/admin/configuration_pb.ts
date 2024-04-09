@@ -10,9 +10,9 @@ import { QualityOfService } from "../core/execution_pb.js";
 import { ClusterAssignment } from "./cluster_assignment_pb.js";
 
 /**
- * @generated from message flyteidl.admin.projectID
+ * @generated from message flyteidl.admin.configurationID
  */
-export class projectID extends Message<projectID> {
+export class configurationID extends Message<configurationID> {
   /**
    * @generated from field: string project = 1;
    */
@@ -24,37 +24,43 @@ export class projectID extends Message<projectID> {
   domain = "";
 
   /**
-   * @generated from field: string org = 3;
+   * @generated from field: string workflow = 3;
+   */
+  workflow = "";
+
+  /**
+   * @generated from field: string org = 4;
    */
   org = "";
 
-  constructor(data?: PartialMessage<projectID>) {
+  constructor(data?: PartialMessage<configurationID>) {
     super();
     proto3.util.initPartial(data, this);
   }
 
   static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "flyteidl.admin.projectID";
+  static readonly typeName = "flyteidl.admin.configurationID";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "project", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "domain", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "org", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "workflow", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "org", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): projectID {
-    return new projectID().fromBinary(bytes, options);
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): configurationID {
+    return new configurationID().fromBinary(bytes, options);
   }
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): projectID {
-    return new projectID().fromJson(jsonValue, options);
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): configurationID {
+    return new configurationID().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): projectID {
-    return new projectID().fromJsonString(jsonString, options);
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): configurationID {
+    return new configurationID().fromJsonString(jsonString, options);
   }
 
-  static equals(a: projectID | PlainMessage<projectID> | undefined, b: projectID | PlainMessage<projectID> | undefined): boolean {
-    return proto3.util.equals(projectID, a, b);
+  static equals(a: configurationID | PlainMessage<configurationID> | undefined, b: configurationID | PlainMessage<configurationID> | undefined): boolean {
+    return proto3.util.equals(configurationID, a, b);
   }
 }
 
@@ -142,9 +148,9 @@ export class Configuration extends Message<Configuration> {
  */
 export class ConfigurationGetRequest extends Message<ConfigurationGetRequest> {
   /**
-   * @generated from field: flyteidl.admin.projectID id = 1;
+   * @generated from field: flyteidl.admin.configurationID id = 1;
    */
-  id?: projectID;
+  id?: configurationID;
 
   constructor(data?: PartialMessage<ConfigurationGetRequest>) {
     super();
@@ -154,7 +160,7 @@ export class ConfigurationGetRequest extends Message<ConfigurationGetRequest> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "flyteidl.admin.ConfigurationGetRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "id", kind: "message", T: projectID },
+    { no: 1, name: "id", kind: "message", T: configurationID },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ConfigurationGetRequest {
@@ -179,9 +185,9 @@ export class ConfigurationGetRequest extends Message<ConfigurationGetRequest> {
  */
 export class ConfigurationGetResponse extends Message<ConfigurationGetResponse> {
   /**
-   * @generated from field: flyteidl.admin.projectID id = 1;
+   * @generated from field: flyteidl.admin.configurationID id = 1;
    */
-  id?: projectID;
+  id?: configurationID;
 
   /**
    * @generated from field: string version = 2;
@@ -217,7 +223,7 @@ export class ConfigurationGetResponse extends Message<ConfigurationGetResponse> 
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "flyteidl.admin.ConfigurationGetResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "id", kind: "message", T: projectID },
+    { no: 1, name: "id", kind: "message", T: configurationID },
     { no: 2, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "project_domain_configuration", kind: "message", T: Configuration },
     { no: 4, name: "project_configuration", kind: "message", T: Configuration },
@@ -246,11 +252,13 @@ export class ConfigurationGetResponse extends Message<ConfigurationGetResponse> 
  */
 export class ConfigurationUpdateRequest extends Message<ConfigurationUpdateRequest> {
   /**
-   * @generated from field: flyteidl.admin.projectID id = 1;
+   * @generated from field: flyteidl.admin.configurationID id = 1;
    */
-  id?: projectID;
+  id?: configurationID;
 
   /**
+   * +optional
+   *
    * @generated from field: string version_to_update = 2;
    */
   versionToUpdate = "";
@@ -270,7 +278,7 @@ export class ConfigurationUpdateRequest extends Message<ConfigurationUpdateReque
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "flyteidl.admin.ConfigurationUpdateRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "id", kind: "message", T: projectID },
+    { no: 1, name: "id", kind: "message", T: configurationID },
     { no: 2, name: "version_to_update", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "configuration", kind: "message", T: Configuration },
   ]);

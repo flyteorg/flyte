@@ -373,6 +373,12 @@
             "type": "string"
           },
           {
+            "name": "id.workflow",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
             "name": "id.org",
             "in": "query",
             "required": false,
@@ -2428,6 +2434,12 @@
             "name": "id.domain",
             "in": "path",
             "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.workflow",
+            "in": "query",
+            "required": false,
             "type": "string"
           }
         ],
@@ -4714,7 +4726,7 @@
       "type": "object",
       "properties": {
         "id": {
-          "$ref": "#/definitions/adminprojectID"
+          "$ref": "#/definitions/adminconfigurationID"
         },
         "version": {
           "type": "string"
@@ -4737,10 +4749,11 @@
       "type": "object",
       "properties": {
         "id": {
-          "$ref": "#/definitions/adminprojectID"
+          "$ref": "#/definitions/adminconfigurationID"
         },
         "version_to_update": {
-          "type": "string"
+          "type": "string",
+          "title": "+optional"
         },
         "configuration": {
           "$ref": "#/definitions/adminConfiguration",
@@ -6641,13 +6654,16 @@
       },
       "description": "Represents a structure that encapsulates the specification of the workflow."
     },
-    "adminprojectID": {
+    "adminconfigurationID": {
       "type": "object",
       "properties": {
         "project": {
           "type": "string"
         },
         "domain": {
+          "type": "string"
+        },
+        "workflow": {
           "type": "string"
         },
         "org": {

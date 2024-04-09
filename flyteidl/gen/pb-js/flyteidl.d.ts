@@ -12143,64 +12143,70 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
-        /** Properties of a projectID. */
-        interface IprojectID {
+        /** Properties of a configurationID. */
+        interface IconfigurationID {
 
-            /** projectID project */
+            /** configurationID project */
             project?: (string|null);
 
-            /** projectID domain */
+            /** configurationID domain */
             domain?: (string|null);
 
-            /** projectID org */
+            /** configurationID workflow */
+            workflow?: (string|null);
+
+            /** configurationID org */
             org?: (string|null);
         }
 
-        /** Represents a projectID. */
-        class projectID implements IprojectID {
+        /** Represents a configurationID. */
+        class configurationID implements IconfigurationID {
 
             /**
-             * Constructs a new projectID.
+             * Constructs a new configurationID.
              * @param [properties] Properties to set
              */
-            constructor(properties?: flyteidl.admin.IprojectID);
+            constructor(properties?: flyteidl.admin.IconfigurationID);
 
-            /** projectID project. */
+            /** configurationID project. */
             public project: string;
 
-            /** projectID domain. */
+            /** configurationID domain. */
             public domain: string;
 
-            /** projectID org. */
+            /** configurationID workflow. */
+            public workflow: string;
+
+            /** configurationID org. */
             public org: string;
 
             /**
-             * Creates a new projectID instance using the specified properties.
+             * Creates a new configurationID instance using the specified properties.
              * @param [properties] Properties to set
-             * @returns projectID instance
+             * @returns configurationID instance
              */
-            public static create(properties?: flyteidl.admin.IprojectID): flyteidl.admin.projectID;
+            public static create(properties?: flyteidl.admin.IconfigurationID): flyteidl.admin.configurationID;
 
             /**
-             * Encodes the specified projectID message. Does not implicitly {@link flyteidl.admin.projectID.verify|verify} messages.
-             * @param message projectID message or plain object to encode
+             * Encodes the specified configurationID message. Does not implicitly {@link flyteidl.admin.configurationID.verify|verify} messages.
+             * @param message configurationID message or plain object to encode
              * @param [writer] Writer to encode to
              * @returns Writer
              */
-            public static encode(message: flyteidl.admin.IprojectID, writer?: $protobuf.Writer): $protobuf.Writer;
+            public static encode(message: flyteidl.admin.IconfigurationID, writer?: $protobuf.Writer): $protobuf.Writer;
 
             /**
-             * Decodes a projectID message from the specified reader or buffer.
+             * Decodes a configurationID message from the specified reader or buffer.
              * @param reader Reader or buffer to decode from
              * @param [length] Message length if known beforehand
-             * @returns projectID
+             * @returns configurationID
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.projectID;
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.configurationID;
 
             /**
-             * Verifies a projectID message.
+             * Verifies a configurationID message.
              * @param message Plain object to verify
              * @returns `null` if valid, otherwise the reason why it is not
              */
@@ -12305,7 +12311,7 @@ export namespace flyteidl {
         interface IConfigurationGetRequest {
 
             /** ConfigurationGetRequest id */
-            id?: (flyteidl.admin.IprojectID|null);
+            id?: (flyteidl.admin.IconfigurationID|null);
         }
 
         /** Represents a ConfigurationGetRequest. */
@@ -12318,7 +12324,7 @@ export namespace flyteidl {
             constructor(properties?: flyteidl.admin.IConfigurationGetRequest);
 
             /** ConfigurationGetRequest id. */
-            public id?: (flyteidl.admin.IprojectID|null);
+            public id?: (flyteidl.admin.IconfigurationID|null);
 
             /**
              * Creates a new ConfigurationGetRequest instance using the specified properties.
@@ -12357,7 +12363,7 @@ export namespace flyteidl {
         interface IConfigurationGetResponse {
 
             /** ConfigurationGetResponse id */
-            id?: (flyteidl.admin.IprojectID|null);
+            id?: (flyteidl.admin.IconfigurationID|null);
 
             /** ConfigurationGetResponse version */
             version?: (string|null);
@@ -12382,7 +12388,7 @@ export namespace flyteidl {
             constructor(properties?: flyteidl.admin.IConfigurationGetResponse);
 
             /** ConfigurationGetResponse id. */
-            public id?: (flyteidl.admin.IprojectID|null);
+            public id?: (flyteidl.admin.IconfigurationID|null);
 
             /** ConfigurationGetResponse version. */
             public version: string;
@@ -12433,7 +12439,7 @@ export namespace flyteidl {
         interface IConfigurationUpdateRequest {
 
             /** ConfigurationUpdateRequest id */
-            id?: (flyteidl.admin.IprojectID|null);
+            id?: (flyteidl.admin.IconfigurationID|null);
 
             /** ConfigurationUpdateRequest versionToUpdate */
             versionToUpdate?: (string|null);
@@ -12452,7 +12458,7 @@ export namespace flyteidl {
             constructor(properties?: flyteidl.admin.IConfigurationUpdateRequest);
 
             /** ConfigurationUpdateRequest id. */
-            public id?: (flyteidl.admin.IprojectID|null);
+            public id?: (flyteidl.admin.IconfigurationID|null);
 
             /** ConfigurationUpdateRequest versionToUpdate. */
             public versionToUpdate: string;

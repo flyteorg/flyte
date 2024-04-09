@@ -8,15 +8,17 @@ from typing import ClassVar as _ClassVar, Mapping as _Mapping, Optional as _Opti
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
-class projectID(_message.Message):
-    __slots__ = ["project", "domain", "org"]
+class configurationID(_message.Message):
+    __slots__ = ["project", "domain", "workflow", "org"]
     PROJECT_FIELD_NUMBER: _ClassVar[int]
     DOMAIN_FIELD_NUMBER: _ClassVar[int]
+    WORKFLOW_FIELD_NUMBER: _ClassVar[int]
     ORG_FIELD_NUMBER: _ClassVar[int]
     project: str
     domain: str
+    workflow: str
     org: str
-    def __init__(self, project: _Optional[str] = ..., domain: _Optional[str] = ..., org: _Optional[str] = ...) -> None: ...
+    def __init__(self, project: _Optional[str] = ..., domain: _Optional[str] = ..., workflow: _Optional[str] = ..., org: _Optional[str] = ...) -> None: ...
 
 class Configuration(_message.Message):
     __slots__ = ["task_resource_attributes", "cluster_resource_attributes", "execution_queue_attributes", "execution_cluster_label", "quality_of_service", "plugin_overrides", "workflow_execution_config", "cluster_assignment"]
@@ -41,8 +43,8 @@ class Configuration(_message.Message):
 class ConfigurationGetRequest(_message.Message):
     __slots__ = ["id"]
     ID_FIELD_NUMBER: _ClassVar[int]
-    id: projectID
-    def __init__(self, id: _Optional[_Union[projectID, _Mapping]] = ...) -> None: ...
+    id: configurationID
+    def __init__(self, id: _Optional[_Union[configurationID, _Mapping]] = ...) -> None: ...
 
 class ConfigurationGetResponse(_message.Message):
     __slots__ = ["id", "version", "project_domain_configuration", "project_configuration", "global_configuration"]
@@ -51,22 +53,22 @@ class ConfigurationGetResponse(_message.Message):
     PROJECT_DOMAIN_CONFIGURATION_FIELD_NUMBER: _ClassVar[int]
     PROJECT_CONFIGURATION_FIELD_NUMBER: _ClassVar[int]
     GLOBAL_CONFIGURATION_FIELD_NUMBER: _ClassVar[int]
-    id: projectID
+    id: configurationID
     version: str
     project_domain_configuration: Configuration
     project_configuration: Configuration
     global_configuration: Configuration
-    def __init__(self, id: _Optional[_Union[projectID, _Mapping]] = ..., version: _Optional[str] = ..., project_domain_configuration: _Optional[_Union[Configuration, _Mapping]] = ..., project_configuration: _Optional[_Union[Configuration, _Mapping]] = ..., global_configuration: _Optional[_Union[Configuration, _Mapping]] = ...) -> None: ...
+    def __init__(self, id: _Optional[_Union[configurationID, _Mapping]] = ..., version: _Optional[str] = ..., project_domain_configuration: _Optional[_Union[Configuration, _Mapping]] = ..., project_configuration: _Optional[_Union[Configuration, _Mapping]] = ..., global_configuration: _Optional[_Union[Configuration, _Mapping]] = ...) -> None: ...
 
 class ConfigurationUpdateRequest(_message.Message):
     __slots__ = ["id", "version_to_update", "configuration"]
     ID_FIELD_NUMBER: _ClassVar[int]
     VERSION_TO_UPDATE_FIELD_NUMBER: _ClassVar[int]
     CONFIGURATION_FIELD_NUMBER: _ClassVar[int]
-    id: projectID
+    id: configurationID
     version_to_update: str
     configuration: Configuration
-    def __init__(self, id: _Optional[_Union[projectID, _Mapping]] = ..., version_to_update: _Optional[str] = ..., configuration: _Optional[_Union[Configuration, _Mapping]] = ...) -> None: ...
+    def __init__(self, id: _Optional[_Union[configurationID, _Mapping]] = ..., version_to_update: _Optional[str] = ..., configuration: _Optional[_Union[Configuration, _Mapping]] = ...) -> None: ...
 
 class ConfigurationUpdateResponse(_message.Message):
     __slots__ = []

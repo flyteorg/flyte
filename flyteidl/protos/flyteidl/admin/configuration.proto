@@ -8,12 +8,14 @@ import "flyteidl/admin/matchable_resource.proto";
 import "flyteidl/core/execution.proto";
 import "flyteidl/admin/cluster_assignment.proto";
 
-message projectID {
+message configurationID {
   string project = 1;
 
   string domain = 2;
 
-  string org = 3;
+  string workflow = 3;
+
+  string org = 4;
 }
 
 message Configuration {
@@ -35,11 +37,11 @@ message Configuration {
 }
 
 message ConfigurationGetRequest {
-  projectID id = 1;
+  configurationID id = 1;
 }
 
 message ConfigurationGetResponse {
-  projectID id = 1;
+  configurationID id = 1;
 
   string version = 2;
 
@@ -54,7 +56,7 @@ message ConfigurationGetResponse {
 }
 
 message ConfigurationUpdateRequest {
-  projectID id = 1;
+  configurationID id = 1;
 
   //+optional
   string version_to_update = 2;

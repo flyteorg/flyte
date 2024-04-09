@@ -39,7 +39,7 @@ func (m *ConfigurationManager) GetConfiguration(
 	// If the cache is not nil and the version of the cache is the same as the active override attributes, return the cache
 	if m.cache != nil && m.cache.GetVersion() == activeConfiguration.Version {
 		return &admin.ConfigurationGetResponse{
-			Id: &admin.ProjectID{
+			Id: &admin.ConfigurationID{
 				Project: request.GetId().GetProject(),
 				Domain:  request.GetId().GetDomain(),
 			},
@@ -61,7 +61,7 @@ func (m *ConfigurationManager) GetConfiguration(
 
 	// Return the override attributes of different scopes
 	return &admin.ConfigurationGetResponse{
-		Id: &admin.ProjectID{
+		Id: &admin.ConfigurationID{
 			Project: request.GetId().GetProject(),
 			Domain:  request.GetId().GetDomain(),
 		},
@@ -144,72 +144,6 @@ func (m *ConfigurationManager) UpdateConfiguration(
 	return &admin.ConfigurationUpdateResponse{}, nil
 }
 
-// Get configuration document for update
-func (m *ConfigurationManager) GetUpdateInput(ctx context.Context, inputConfiguration *admin.Configuration, project, domain, workflow, launchPlan string) (*repositoryInterfaces.UpdateConfigurationInput, error) {
-	// Get the active configuration document
-	activeConfigurationDocumentModel, err := m.db.ConfigurationDocumentRepo().GetActive(ctx)
-	if err != nil {
-		return nil, err
-	}
-	var activeConfigurationDocument *admin.ConfigurationDocument
-	// If the cache is not nil and the version of the cache is the same as the active override attributes, use the cache
-	if m.cache != nil && m.cache.GetVersion() == activeConfigurationDocument.Version {
-		activeConfigurationDocument = m.cache
-	} else {
-		// TODO: Handle the case where the document location is empty
-		if err := m.storageClient.ReadProtobuf(ctx, activeConfigurationDocumentModel.DocumentLocation, activeConfigurationDocument); err != nil {
-			return nil, err
-		}
-	}
-
-	currentConfiguration := getConfigurationFromDocument(activeConfigurationDocument, project, domain, workflow, launchPlan)
-	if currentConfiguration == nil {
-		currentConfiguration = &admin.Configuration{}
-	}
-	mergedConfiguration := mergeConfiguration(inputConfiguration, currentConfiguration)
-
-	// Update the document with the new attributes
-	updateConfigurationToDocument(activeConfigurationDocument, project, domain, workflow, launchPlan, mergedConfiguration)
-
-	// Generate a new version for the document
-	generatedVersion, err := GenerateRandomString(10)
-	if err != nil {
-		return nil, err
-	}
-	activeConfigurationDocument.Version = generatedVersion
-
-	// Offload the updated document
-	updatedDocumentLocation, err := common.OffloadConfigurationDocument(ctx, m.storageClient, activeConfigurationDocument, generatedVersion)
-
-	if err != nil {
-		return nil, err
-	}
-
-	newConfiguration := models.ConfigurationDocument{
-		// random generate a string as version
-		Version:          generatedVersion,
-		Active:           true,
-		DocumentLocation: updatedDocumentLocation,
-	}
-
-	return &repositoryInterfaces.UpdateConfigurationInput{
-		VersionToUpdate:  activeConfigurationDocument.Version,
-		NewConfiguration: &newConfiguration,
-	}, nil
-}
-
-func getGlobalConfigurationFromDocument(document *admin.ConfigurationDocument) *admin.Configuration {
-	return getConfigurationFromDocument(document, "", "", "", "")
-}
-
-func getProjectConfigurationFromDocument(document *admin.ConfigurationDocument, project string) *admin.Configuration {
-	return getConfigurationFromDocument(document, project, "", "", "")
-}
-
-func getProjectDomainConfigurationFromDocument(document *admin.ConfigurationDocument, project, domain string) *admin.Configuration {
-	return getConfigurationFromDocument(document, project, domain, "", "")
-}
-
 // Merge two configurations
 func mergeConfiguration(incomingConfiguration, currentConfiguration *admin.Configuration) *admin.Configuration {
 	var mergedConfiguration admin.Configuration
@@ -262,6 +196,18 @@ func mergeConfiguration(incomingConfiguration, currentConfiguration *admin.Confi
 		mergedConfiguration.ClusterAssignment = currentConfiguration.GetClusterAssignment()
 	}
 	return &mergedConfiguration
+}
+
+func getGlobalConfigurationFromDocument(document *admin.ConfigurationDocument) *admin.Configuration {
+	return getConfigurationFromDocument(document, "", "", "", "")
+}
+
+func getProjectConfigurationFromDocument(document *admin.ConfigurationDocument, project string) *admin.Configuration {
+	return getConfigurationFromDocument(document, project, "", "", "")
+}
+
+func getProjectDomainConfigurationFromDocument(document *admin.ConfigurationDocument, project, domain string) *admin.Configuration {
+	return getConfigurationFromDocument(document, project, domain, "", "")
 }
 
 // TODO: Check if this function is implemented already

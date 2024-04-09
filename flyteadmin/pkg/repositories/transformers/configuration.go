@@ -56,7 +56,7 @@ func GetConfigurationFromMatchableResource(matchableResource admin.MatchableReso
 // transform ProjectDomainAttributesUpdateRequest to ConfigurationUpdateRequest
 func FromProjectDomainAttributesUpdateRequest(request *admin.ProjectDomainAttributesUpdateRequest) *admin.ConfigurationUpdateRequest {
 	return &admin.ConfigurationUpdateRequest{
-		Id: &admin.ProjectID{
+		Id: &admin.ConfigurationID{
 			Project: request.Attributes.Project,
 			Domain:  request.Attributes.Domain,
 		},
@@ -67,7 +67,7 @@ func FromProjectDomainAttributesUpdateRequest(request *admin.ProjectDomainAttrib
 // transform ProjectDomainAttributesDeleteRequest to ConfigurationUpdateRequest
 func FromProjectDomainAttributesDeleteRequest(request *admin.ProjectDomainAttributesDeleteRequest) *admin.ConfigurationUpdateRequest {
 	return &admin.ConfigurationUpdateRequest{
-		Id: &admin.ProjectID{
+		Id: &admin.ConfigurationID{
 			Project: request.Project,
 			Domain:  request.Domain,
 		},
@@ -78,7 +78,7 @@ func FromProjectDomainAttributesDeleteRequest(request *admin.ProjectDomainAttrib
 // transform ProjectAttributesUpdateRequest to ConfigurationUpdateRequest
 func FromProjectAttributesUpdateRequest(request *admin.ProjectAttributesUpdateRequest) *admin.ConfigurationUpdateRequest {
 	return &admin.ConfigurationUpdateRequest{
-		Id: &admin.ProjectID{
+		Id: &admin.ConfigurationID{
 			Project: request.Attributes.Project,
 		},
 		Configuration: GetConfigurationFromMatchingAttributes(request.Attributes.MatchingAttributes),

@@ -1071,12 +1071,14 @@ impl MatchableResource {
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct ProjectId {
+pub struct ConfigurationId {
     #[prost(string, tag="1")]
     pub project: ::prost::alloc::string::String,
     #[prost(string, tag="2")]
     pub domain: ::prost::alloc::string::String,
     #[prost(string, tag="3")]
+    pub workflow: ::prost::alloc::string::String,
+    #[prost(string, tag="4")]
     pub org: ::prost::alloc::string::String,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -1103,13 +1105,13 @@ pub struct Configuration {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ConfigurationGetRequest {
     #[prost(message, optional, tag="1")]
-    pub id: ::core::option::Option<ProjectId>,
+    pub id: ::core::option::Option<ConfigurationId>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ConfigurationGetResponse {
     #[prost(message, optional, tag="1")]
-    pub id: ::core::option::Option<ProjectId>,
+    pub id: ::core::option::Option<ConfigurationId>,
     #[prost(string, tag="2")]
     pub version: ::prost::alloc::string::String,
     /// Everything set at the project-domain level
@@ -1126,7 +1128,8 @@ pub struct ConfigurationGetResponse {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ConfigurationUpdateRequest {
     #[prost(message, optional, tag="1")]
-    pub id: ::core::option::Option<ProjectId>,
+    pub id: ::core::option::Option<ConfigurationId>,
+    /// +optional
     #[prost(string, tag="2")]
     pub version_to_update: ::prost::alloc::string::String,
     /// Everything set at the project-domain level

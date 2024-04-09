@@ -29491,26 +29491,27 @@
                 return FlyteURLs;
             })();
     
-            admin.projectID = (function() {
+            admin.configurationID = (function() {
     
                 /**
-                 * Properties of a projectID.
+                 * Properties of a configurationID.
                  * @memberof flyteidl.admin
-                 * @interface IprojectID
-                 * @property {string|null} [project] projectID project
-                 * @property {string|null} [domain] projectID domain
-                 * @property {string|null} [org] projectID org
+                 * @interface IconfigurationID
+                 * @property {string|null} [project] configurationID project
+                 * @property {string|null} [domain] configurationID domain
+                 * @property {string|null} [workflow] configurationID workflow
+                 * @property {string|null} [org] configurationID org
                  */
     
                 /**
-                 * Constructs a new projectID.
+                 * Constructs a new configurationID.
                  * @memberof flyteidl.admin
-                 * @classdesc Represents a projectID.
-                 * @implements IprojectID
+                 * @classdesc Represents a configurationID.
+                 * @implements IconfigurationID
                  * @constructor
-                 * @param {flyteidl.admin.IprojectID=} [properties] Properties to set
+                 * @param {flyteidl.admin.IconfigurationID=} [properties] Properties to set
                  */
-                function projectID(properties) {
+                function configurationID(properties) {
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -29518,77 +29519,87 @@
                 }
     
                 /**
-                 * projectID project.
+                 * configurationID project.
                  * @member {string} project
-                 * @memberof flyteidl.admin.projectID
+                 * @memberof flyteidl.admin.configurationID
                  * @instance
                  */
-                projectID.prototype.project = "";
+                configurationID.prototype.project = "";
     
                 /**
-                 * projectID domain.
+                 * configurationID domain.
                  * @member {string} domain
-                 * @memberof flyteidl.admin.projectID
+                 * @memberof flyteidl.admin.configurationID
                  * @instance
                  */
-                projectID.prototype.domain = "";
+                configurationID.prototype.domain = "";
     
                 /**
-                 * projectID org.
+                 * configurationID workflow.
+                 * @member {string} workflow
+                 * @memberof flyteidl.admin.configurationID
+                 * @instance
+                 */
+                configurationID.prototype.workflow = "";
+    
+                /**
+                 * configurationID org.
                  * @member {string} org
-                 * @memberof flyteidl.admin.projectID
+                 * @memberof flyteidl.admin.configurationID
                  * @instance
                  */
-                projectID.prototype.org = "";
+                configurationID.prototype.org = "";
     
                 /**
-                 * Creates a new projectID instance using the specified properties.
+                 * Creates a new configurationID instance using the specified properties.
                  * @function create
-                 * @memberof flyteidl.admin.projectID
+                 * @memberof flyteidl.admin.configurationID
                  * @static
-                 * @param {flyteidl.admin.IprojectID=} [properties] Properties to set
-                 * @returns {flyteidl.admin.projectID} projectID instance
+                 * @param {flyteidl.admin.IconfigurationID=} [properties] Properties to set
+                 * @returns {flyteidl.admin.configurationID} configurationID instance
                  */
-                projectID.create = function create(properties) {
-                    return new projectID(properties);
+                configurationID.create = function create(properties) {
+                    return new configurationID(properties);
                 };
     
                 /**
-                 * Encodes the specified projectID message. Does not implicitly {@link flyteidl.admin.projectID.verify|verify} messages.
+                 * Encodes the specified configurationID message. Does not implicitly {@link flyteidl.admin.configurationID.verify|verify} messages.
                  * @function encode
-                 * @memberof flyteidl.admin.projectID
+                 * @memberof flyteidl.admin.configurationID
                  * @static
-                 * @param {flyteidl.admin.IprojectID} message projectID message or plain object to encode
+                 * @param {flyteidl.admin.IconfigurationID} message configurationID message or plain object to encode
                  * @param {$protobuf.Writer} [writer] Writer to encode to
                  * @returns {$protobuf.Writer} Writer
                  */
-                projectID.encode = function encode(message, writer) {
+                configurationID.encode = function encode(message, writer) {
                     if (!writer)
                         writer = $Writer.create();
                     if (message.project != null && message.hasOwnProperty("project"))
                         writer.uint32(/* id 1, wireType 2 =*/10).string(message.project);
                     if (message.domain != null && message.hasOwnProperty("domain"))
                         writer.uint32(/* id 2, wireType 2 =*/18).string(message.domain);
+                    if (message.workflow != null && message.hasOwnProperty("workflow"))
+                        writer.uint32(/* id 3, wireType 2 =*/26).string(message.workflow);
                     if (message.org != null && message.hasOwnProperty("org"))
-                        writer.uint32(/* id 3, wireType 2 =*/26).string(message.org);
+                        writer.uint32(/* id 4, wireType 2 =*/34).string(message.org);
                     return writer;
                 };
     
                 /**
-                 * Decodes a projectID message from the specified reader or buffer.
+                 * Decodes a configurationID message from the specified reader or buffer.
                  * @function decode
-                 * @memberof flyteidl.admin.projectID
+                 * @memberof flyteidl.admin.configurationID
                  * @static
                  * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
                  * @param {number} [length] Message length if known beforehand
-                 * @returns {flyteidl.admin.projectID} projectID
+                 * @returns {flyteidl.admin.configurationID} configurationID
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                projectID.decode = function decode(reader, length) {
+                configurationID.decode = function decode(reader, length) {
                     if (!(reader instanceof $Reader))
                         reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.projectID();
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.configurationID();
                     while (reader.pos < end) {
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
@@ -29599,6 +29610,9 @@
                             message.domain = reader.string();
                             break;
                         case 3:
+                            message.workflow = reader.string();
+                            break;
+                        case 4:
                             message.org = reader.string();
                             break;
                         default:
@@ -29610,14 +29624,14 @@
                 };
     
                 /**
-                 * Verifies a projectID message.
+                 * Verifies a configurationID message.
                  * @function verify
-                 * @memberof flyteidl.admin.projectID
+                 * @memberof flyteidl.admin.configurationID
                  * @static
                  * @param {Object.<string,*>} message Plain object to verify
                  * @returns {string|null} `null` if valid, otherwise the reason why it is not
                  */
-                projectID.verify = function verify(message) {
+                configurationID.verify = function verify(message) {
                     if (typeof message !== "object" || message === null)
                         return "object expected";
                     if (message.project != null && message.hasOwnProperty("project"))
@@ -29626,13 +29640,16 @@
                     if (message.domain != null && message.hasOwnProperty("domain"))
                         if (!$util.isString(message.domain))
                             return "domain: string expected";
+                    if (message.workflow != null && message.hasOwnProperty("workflow"))
+                        if (!$util.isString(message.workflow))
+                            return "workflow: string expected";
                     if (message.org != null && message.hasOwnProperty("org"))
                         if (!$util.isString(message.org))
                             return "org: string expected";
                     return null;
                 };
     
-                return projectID;
+                return configurationID;
             })();
     
             admin.Configuration = (function() {
@@ -29886,7 +29903,7 @@
                  * Properties of a ConfigurationGetRequest.
                  * @memberof flyteidl.admin
                  * @interface IConfigurationGetRequest
-                 * @property {flyteidl.admin.IprojectID|null} [id] ConfigurationGetRequest id
+                 * @property {flyteidl.admin.IconfigurationID|null} [id] ConfigurationGetRequest id
                  */
     
                 /**
@@ -29906,7 +29923,7 @@
     
                 /**
                  * ConfigurationGetRequest id.
-                 * @member {flyteidl.admin.IprojectID|null|undefined} id
+                 * @member {flyteidl.admin.IconfigurationID|null|undefined} id
                  * @memberof flyteidl.admin.ConfigurationGetRequest
                  * @instance
                  */
@@ -29937,7 +29954,7 @@
                     if (!writer)
                         writer = $Writer.create();
                     if (message.id != null && message.hasOwnProperty("id"))
-                        $root.flyteidl.admin.projectID.encode(message.id, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                        $root.flyteidl.admin.configurationID.encode(message.id, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
                     return writer;
                 };
     
@@ -29960,7 +29977,7 @@
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
                         case 1:
-                            message.id = $root.flyteidl.admin.projectID.decode(reader, reader.uint32());
+                            message.id = $root.flyteidl.admin.configurationID.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -29982,7 +29999,7 @@
                     if (typeof message !== "object" || message === null)
                         return "object expected";
                     if (message.id != null && message.hasOwnProperty("id")) {
-                        var error = $root.flyteidl.admin.projectID.verify(message.id);
+                        var error = $root.flyteidl.admin.configurationID.verify(message.id);
                         if (error)
                             return "id." + error;
                     }
@@ -29998,7 +30015,7 @@
                  * Properties of a ConfigurationGetResponse.
                  * @memberof flyteidl.admin
                  * @interface IConfigurationGetResponse
-                 * @property {flyteidl.admin.IprojectID|null} [id] ConfigurationGetResponse id
+                 * @property {flyteidl.admin.IconfigurationID|null} [id] ConfigurationGetResponse id
                  * @property {string|null} [version] ConfigurationGetResponse version
                  * @property {flyteidl.admin.IConfiguration|null} [projectDomainConfiguration] ConfigurationGetResponse projectDomainConfiguration
                  * @property {flyteidl.admin.IConfiguration|null} [projectConfiguration] ConfigurationGetResponse projectConfiguration
@@ -30022,7 +30039,7 @@
     
                 /**
                  * ConfigurationGetResponse id.
-                 * @member {flyteidl.admin.IprojectID|null|undefined} id
+                 * @member {flyteidl.admin.IconfigurationID|null|undefined} id
                  * @memberof flyteidl.admin.ConfigurationGetResponse
                  * @instance
                  */
@@ -30085,7 +30102,7 @@
                     if (!writer)
                         writer = $Writer.create();
                     if (message.id != null && message.hasOwnProperty("id"))
-                        $root.flyteidl.admin.projectID.encode(message.id, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                        $root.flyteidl.admin.configurationID.encode(message.id, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
                     if (message.version != null && message.hasOwnProperty("version"))
                         writer.uint32(/* id 2, wireType 2 =*/18).string(message.version);
                     if (message.projectDomainConfiguration != null && message.hasOwnProperty("projectDomainConfiguration"))
@@ -30116,7 +30133,7 @@
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
                         case 1:
-                            message.id = $root.flyteidl.admin.projectID.decode(reader, reader.uint32());
+                            message.id = $root.flyteidl.admin.configurationID.decode(reader, reader.uint32());
                             break;
                         case 2:
                             message.version = reader.string();
@@ -30150,7 +30167,7 @@
                     if (typeof message !== "object" || message === null)
                         return "object expected";
                     if (message.id != null && message.hasOwnProperty("id")) {
-                        var error = $root.flyteidl.admin.projectID.verify(message.id);
+                        var error = $root.flyteidl.admin.configurationID.verify(message.id);
                         if (error)
                             return "id." + error;
                     }
@@ -30184,7 +30201,7 @@
                  * Properties of a ConfigurationUpdateRequest.
                  * @memberof flyteidl.admin
                  * @interface IConfigurationUpdateRequest
-                 * @property {flyteidl.admin.IprojectID|null} [id] ConfigurationUpdateRequest id
+                 * @property {flyteidl.admin.IconfigurationID|null} [id] ConfigurationUpdateRequest id
                  * @property {string|null} [versionToUpdate] ConfigurationUpdateRequest versionToUpdate
                  * @property {flyteidl.admin.IConfiguration|null} [configuration] ConfigurationUpdateRequest configuration
                  */
@@ -30206,7 +30223,7 @@
     
                 /**
                  * ConfigurationUpdateRequest id.
-                 * @member {flyteidl.admin.IprojectID|null|undefined} id
+                 * @member {flyteidl.admin.IconfigurationID|null|undefined} id
                  * @memberof flyteidl.admin.ConfigurationUpdateRequest
                  * @instance
                  */
@@ -30253,7 +30270,7 @@
                     if (!writer)
                         writer = $Writer.create();
                     if (message.id != null && message.hasOwnProperty("id"))
-                        $root.flyteidl.admin.projectID.encode(message.id, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                        $root.flyteidl.admin.configurationID.encode(message.id, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
                     if (message.versionToUpdate != null && message.hasOwnProperty("versionToUpdate"))
                         writer.uint32(/* id 2, wireType 2 =*/18).string(message.versionToUpdate);
                     if (message.configuration != null && message.hasOwnProperty("configuration"))
@@ -30280,7 +30297,7 @@
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
                         case 1:
-                            message.id = $root.flyteidl.admin.projectID.decode(reader, reader.uint32());
+                            message.id = $root.flyteidl.admin.configurationID.decode(reader, reader.uint32());
                             break;
                         case 2:
                             message.versionToUpdate = reader.string();
@@ -30308,7 +30325,7 @@
                     if (typeof message !== "object" || message === null)
                         return "object expected";
                     if (message.id != null && message.hasOwnProperty("id")) {
-                        var error = $root.flyteidl.admin.projectID.verify(message.id);
+                        var error = $root.flyteidl.admin.configurationID.verify(message.id);
                         if (error)
                             return "id." + error;
                     }
