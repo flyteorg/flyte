@@ -799,16 +799,8 @@ func (m *ExecutionManager) fillInTemplateArgs(ctx context.Context, query core.Ar
 			return query, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "id doesn't have key")
 		}
 		var project, domain string
-		if ak.GetProject() == "" {
-			project = contextutils.Value(ctx, contextutils.ProjectKey)
-		} else {
-			project = ak.GetProject()
-		}
-		if ak.GetDomain() == "" {
-			domain = contextutils.Value(ctx, contextutils.DomainKey)
-		} else {
-			domain = ak.GetDomain()
-		}
+		project = contextutils.Value(ctx, contextutils.ProjectKey)
+		domain = contextutils.Value(ctx, contextutils.DomainKey)
 
 		var partitions map[string]*core.LabelValue
 

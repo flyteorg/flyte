@@ -5,7 +5,6 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3, Timestamp } from "@bufbuild/protobuf";
-import { Identifier } from "./identifier_pb.js";
 
 /**
  * @generated from enum flyteidl.core.Granularity
@@ -625,54 +624,6 @@ export class ArtifactQuery extends Message<ArtifactQuery> {
 
   static equals(a: ArtifactQuery | PlainMessage<ArtifactQuery> | undefined, b: ArtifactQuery | PlainMessage<ArtifactQuery> | undefined): boolean {
     return proto3.util.equals(ArtifactQuery, a, b);
-  }
-}
-
-/**
- * @generated from message flyteidl.core.Trigger
- */
-export class Trigger extends Message<Trigger> {
-  /**
-   * This will be set to a launch plan type, but note that this is different than the actual launch plan type.
-   *
-   * @generated from field: flyteidl.core.Identifier trigger_id = 1;
-   */
-  triggerId?: Identifier;
-
-  /**
-   * These are partial artifact IDs that will be triggered on
-   * Consider making these ArtifactQuery instead.
-   *
-   * @generated from field: repeated flyteidl.core.ArtifactID triggers = 2;
-   */
-  triggers: ArtifactID[] = [];
-
-  constructor(data?: PartialMessage<Trigger>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "flyteidl.core.Trigger";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "trigger_id", kind: "message", T: Identifier },
-    { no: 2, name: "triggers", kind: "message", T: ArtifactID, repeated: true },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Trigger {
-    return new Trigger().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Trigger {
-    return new Trigger().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Trigger {
-    return new Trigger().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: Trigger | PlainMessage<Trigger> | undefined, b: Trigger | PlainMessage<Trigger> | undefined): boolean {
-    return proto3.util.equals(Trigger, a, b);
   }
 }
 

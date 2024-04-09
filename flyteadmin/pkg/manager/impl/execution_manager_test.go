@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"strings"
 	"testing"
 	"time"
@@ -5968,6 +5969,12 @@ func TestQueryTemplate(t *testing.T) {
 		Name:    "testname",
 	}
 
+	akNameOnly := &core.ArtifactKey{
+		Project: "",
+		Domain:  "",
+		Name:    "testname",
+	}
+
 	t.Run("test all present, nothing to fill in", func(t *testing.T) {
 		pMap := map[string]*core.LabelValue{
 			"partition1": {Value: &core.LabelValue_StaticValue{StaticValue: "my value"}},
@@ -5978,7 +5985,7 @@ func TestQueryTemplate(t *testing.T) {
 		q := core.ArtifactQuery{
 			Identifier: &core.ArtifactQuery_ArtifactId{
 				ArtifactId: &core.ArtifactID{
-					ArtifactKey:   ak,
+					ArtifactKey:   akNameOnly,
 					Partitions:    p,
 					TimePartition: nil,
 				},
@@ -5986,6 +5993,12 @@ func TestQueryTemplate(t *testing.T) {
 		}
 
 		filledQuery, err := m.fillInTemplateArgs(ctx, q, otherInputs.Literals)
+		assert.NoError(t, err)
+		assert.True(t, proto.Equal(&q, &filledQuery))
+
+		q.GetArtifactId().ArtifactKey = ak
+		ctx = contextutils.WithProjectDomain(ctx, "project", "domain")
+		filledQuery, err = m.fillInTemplateArgs(ctx, q, otherInputs.Literals)
 		assert.NoError(t, err)
 		assert.True(t, proto.Equal(&q, &filledQuery))
 	})

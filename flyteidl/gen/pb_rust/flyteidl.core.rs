@@ -857,17 +857,6 @@ pub mod artifact_query {
         Binding(super::ArtifactBindingData),
     }
 }
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct Trigger {
-    /// This will be set to a launch plan type, but note that this is different than the actual launch plan type.
-    #[prost(message, optional, tag="1")]
-    pub trigger_id: ::core::option::Option<Identifier>,
-    /// These are partial artifact IDs that will be triggered on
-    /// Consider making these ArtifactQuery instead.
-    #[prost(message, repeated, tag="2")]
-    pub triggers: ::prost::alloc::vec::Vec<ArtifactId>,
-}
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]
 pub enum Granularity {

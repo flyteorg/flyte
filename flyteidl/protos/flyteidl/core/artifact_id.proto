@@ -110,12 +110,3 @@ message ArtifactQuery {
     ArtifactBindingData binding = 4;
   }
 }
-
-message Trigger {
-  // This will be set to a launch plan type, but note that this is different than the actual launch plan type.
-  Identifier trigger_id = 1;
-
-  // These are partial artifact IDs that will be triggered on
-  // Consider making these ArtifactQuery instead.
-  repeated core.ArtifactID triggers = 2;
-}
