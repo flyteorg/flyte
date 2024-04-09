@@ -85,14 +85,14 @@ Use Published Dashboards to Monitor Flyte Deployment
 
 Flyte Backend is written in Golang and exposes stats using Prometheus. The stats are labeled with workflow, task, project & domain, wherever appropriate.
 
-Both `flyteadmin` and `flytepropeller` are instrumented to expose metrics. To visualize these metrics, Flyte provides three Grafana dashboards, each with a different focus:
+Both ``flyteadmin`` and ``flytepropeller`` are instrumented to expose metrics. To visualize these metrics, Flyte provides three Grafana dashboards, each with a different focus:
 
 - **User-facing dashboards**: Dashboards that can be used to triage/investigate/observe performance and characteristics of workflows and tasks.
   The user-facing dashboard is published under ID `13980 <https://grafana.com/grafana/dashboards/13980>`__ in the Grafana marketplace.
 
 - **System Dashboards**: Dashboards that are useful for the system maintainer to investigate the status and performance of their Flyte deployments. These are further divided into:
         - `DataPlane/FlytePropeller <https://grafana.com/grafana/dashboards/13979>`__: execution engine status and performance.
-        - `ControlPlane/Flyteadmin<https://grafana.com/grafana/dashboards/13981>`__: API-level monitoring.
+        - `ControlPlane/Flyteadmin <https://grafana.com/grafana/dashboards/13981>`__: API-level monitoring.
 
 The corresponding JSON files for each dashboard are also located at ``deployment/stats/prometheus``.
 
@@ -106,7 +106,7 @@ This is especially true if you plan to use the Service Monitors provided by the 
 
 .. note::
 
-   Configure the Prometheus instance to use Service Monitors in the namespace where Flyte is running, configuring the following keys in the ``prometheus`` resource:
+   Enable the Prometheus instance to use Service Monitors in the namespace where Flyte is running, configuring the following keys in the ``prometheus`` resource:
 
 .. code-block:: yaml
 
@@ -118,7 +118,7 @@ This is especially true if you plan to use the Service Monitors provided by the 
 
    The above example configuration lets Prometheus use any ``ServiceMonitor`` in any namespace in the cluster. Adjust the configuration to reduce the scope if needed.
 
-Once you have installed and configured the Prometheus operator, enable the Service Monitors in the Helm chart by configuring the following keys in your `values` file:
+Once you have installed and configured the Prometheus operator, enable the Service Monitors in the Helm chart by configuring the following keys in your ``values`` file:
 
 .. code-block:: yaml
 
