@@ -87,18 +87,26 @@ Flyte Backend is written in Golang and exposes stats using Prometheus. The stats
 
 Both `flyteadmin` and `flytepropeller` are instrumented to expose metrics. To visualize these metrics, Flyte provides three Grafana dashboards, each with a different focus:
 
-- User: overview of workflow execution status
-- Flyte Propeller: execution engine performance and status
-- Flyte Admin: API-level Monitoring
+- **User-facing dashboards**: Dashboards that can be used to triage/investigate/observe performance and characteristics of workflows and tasks.
+  The user-facing dashboard is published under ID `13980 <https://grafana.com/grafana/dashboards/13980>`__ in the Grafana marketplace.
 
-You can `generate the dashboards <https://github.com/flyteorg/flyte/tree/master/stats#developing-stats>`__, with the resulting JSON files located at `deployment/stats/prometheus`; or download them from the `Grafana marketplace <https://grafana.com/grafana/dashboards/?search=flyte>`__.
+- **System Dashboards**: Dashboards that are useful for the system maintainer to investigate the status and performance of their Flyte deployments. These are further divided into:
+        - `DataPlane/FlytePropeller <https://grafana.com/grafana/dashboards/13979>`__: execution engine status and performance.
+        - `ControlPlane/Flyteadmin<https://grafana.com/grafana/dashboards/13981>`__: API-level monitoring.
 
-To consume the dashboards, it's recommended to install and configure the Prometheus operator as described in `their docs <https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/user-guides/getting-started.md>`__.
-This is especially true if you plan to use the `Service Monitor` provided by the `flyte-core <https://github.com/flyteorg/flyte/blob/master/charts/flyte-core/templates/propeller/service-monitor.yaml>`__ Helm chart.
+The corresponding JSON files for each dashboard are also located at ``deployment/stats/prometheus``.
 
 .. note::
 
-   Configure the Prometheus instance to use `ServiceMonitor` in namespaces other than `default` by configuring the following keys for the `prometheus` resources:
+    The above mentioned are basic dashboards and do no include all the metrics exposed by Flyte.
+    Feel free to use the scripts provided `here <https://github.com/flyteorg/flyte/tree/master/stats>`__ to improve and -hopefully- contribute the improved dashboards.
+
+To consume the dashboards, it's recommended to install and configure the Prometheus operator as described in `their docs <https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/user-guides/getting-started.md>`__.
+This is especially true if you plan to use the Service Monitors provided by the `flyte-core <https://github.com/flyteorg/flyte/blob/master/charts/flyte-core/templates/propeller/service-monitor.yaml>`__ Helm chart.
+
+.. note::
+
+   Configure the Prometheus instance to use Service Monitors in the namespace where Flyte is running, configuring the following keys in the ``prometheus`` resource:
 
 .. code-block:: yaml
 
@@ -108,23 +116,23 @@ This is especially true if you plan to use the `Service Monitor` provided by the
 
 .. note::
 
-   The above example configuration lets Prometheus use any `ServiceMonitor` in any namespace in the cluster. Adjust the configuration to reduce the scope if needed.
+   The above example configuration lets Prometheus use any ``ServiceMonitor`` in any namespace in the cluster. Adjust the configuration to reduce the scope if needed.
 
 Once you have installed and configured the Prometheus operator, enable the Service Monitors in the Helm chart by configuring the following keys in your `values` file:
 
-a. 
+.. code-block:: yaml
 
+   flyteadmin:
+     serviceMonitor:
+       enabled: true
+   
+   flytepropeller:
+     serviceMonitor:
+       enabled: true
 
+.. note::
 
-The dashboards are divided into two types:
+   By default, the ``ServiceMonitor`` is configured with a ``scrapeTimeout`` of 30s and and ``interval`` of 60s. You can customize these values if needed.
 
-- **User-facing dashboards**: Dashboards that can be used to triage/investigate/observe performance and characteristics of workflows and tasks.
-  The user-facing dashboard is published under Grafana marketplace ID `13980 <https://grafana.com/grafana/dashboards/13980>`__.
+With the above configuration in place you should be able to import the dashboards in your Grafana instance.
 
-- **System Dashboards**: Dashboards that are useful for the system maintainer to maintain their Flyte deployments. These are further divided into:
-        - DataPlane/FlytePropeller dashboards published @ `13979 <https://grafana.com/grafana/dashboards/13979>`__
-        - ControlPlane/Flyteadmin dashboards published @ `13981 <https://grafana.com/grafana/dashboards/13981>`__
-
-The above mentioned are basic dashboards and do no include all the metrics exposed by Flyte.
-Please help us improve the dashboards by contributing to them 🙏.
-Refer to the build scripts `here <https://github.com/flyteorg/flyte/tree/master/stats>`__.
