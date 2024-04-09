@@ -85,6 +85,13 @@ Use Published Dashboards to Monitor Flyte Deployment
 
 Flyte Backend is written in Golang and exposes stats using Prometheus. The stats are labeled with workflow, task, project & domain, wherever appropriate.
 
+Both `flyteadmin` and `flytepropeller` are instrumented to expose metrics. To visualize these metrics, Flyte provides three Grafana dashboards, each with a different focus:
+
+- User: overview of workflow execution status
+- Flyte Propeller: execution engine performance and status
+- Flyte Admin: API-level Monitoring
+
+You can `generate the dashboards <https://github.com/flyteorg/flyte/tree/master/stats#developing-stats>`__, with the resulting JSON files located at `deployment/stats/prometheus`; or download them from the `Grafana marketplace <https://grafana.com/grafana/dashboards/?search=flyte>`__.
 
 To consume the dashboards, it's recommended to install and configure the Prometheus operator as described in `their docs <https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/user-guides/getting-started.md>`__.
 This is especially true if you plan to use the `Service Monitor` provided by the `flyte-core <https://github.com/flyteorg/flyte/blob/master/charts/flyte-core/templates/propeller/service-monitor.yaml>`__ Helm chart.
