@@ -98,10 +98,10 @@ The corresponding JSON files for each dashboard are also located at ``deployment
 
 .. note::
 
-    The above mentioned are basic dashboards and do no include all the metrics exposed by Flyte.
+    The dashboards are basic dashboards and do not include all the metrics exposed by Flyte.
     Feel free to use the scripts provided `here <https://github.com/flyteorg/flyte/tree/master/stats>`__ to improve and -hopefully- contribute the improved dashboards.
 
-To consume the dashboards, it's recommended to install and configure the Prometheus operator as described in `their docs <https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/user-guides/getting-started.md>`__.
+To consume the dashboards, we recommend installing and configuring the Prometheus operator as described in `their docs <https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/user-guides/getting-started.md>`__.
 This is especially true if you plan to use the Service Monitors provided by the `flyte-core <https://github.com/flyteorg/flyte/blob/master/charts/flyte-core/templates/propeller/service-monitor.yaml>`__ Helm chart.
 
 .. note::
