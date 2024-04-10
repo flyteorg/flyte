@@ -20,11 +20,23 @@ func (m *AdminService) UpdateWorkflowAttributes(ctx context.Context, request *ad
 	}
 	var response *admin.WorkflowAttributesUpdateResponse
 	var err error
-	m.Metrics.workflowAttributesEndpointMetrics.update.Time(func() {
-		response, err = m.ResourceManager.UpdateWorkflowAttributes(ctx, *request)
-	})
-	if err != nil {
-		return nil, util.TransformAndRecordError(err, &m.Metrics.workflowAttributesEndpointMetrics.update)
+	if m.Config.ApplicationConfiguration().GetTopLevelConfig().ProjectAttributesConfig.Mode == runtime.ProjectAttributesMode_LEGACY {
+		// Legacy mode, update resource table
+		m.Metrics.workflowAttributesEndpointMetrics.update.Time(func() {
+			response, err = m.ResourceManager.UpdateWorkflowAttributes(ctx, *request)
+		})
+		if err != nil {
+			return nil, util.TransformAndRecordError(err, &m.Metrics.workflowAttributesEndpointMetrics.update)
+		}
+	} else {
+		// Configuration mode, update configuration table
+		configurationUpdateRequest := transformers.FromWorkflowAttributesUpdateRequest(request)
+		m.Metrics.configurationEndpointMetrics.update.Time(func() {
+			_, err = m.ConfigurationManager.UpdateConfiguration(ctx, *configurationUpdateRequest, true)
+		})
+		if err != nil {
+			return nil, util.TransformAndRecordError(err, &m.Metrics.configurationEndpointMetrics.update)
+		}
 	}
 
 	return response, nil
@@ -38,13 +50,29 @@ func (m *AdminService) GetWorkflowAttributes(ctx context.Context, request *admin
 	}
 	var response *admin.WorkflowAttributesGetResponse
 	var err error
-	m.Metrics.workflowAttributesEndpointMetrics.get.Time(func() {
-		response, err = m.ResourceManager.GetWorkflowAttributes(ctx, *request)
-	})
-	if err != nil {
-		return nil, util.TransformAndRecordError(err, &m.Metrics.workflowAttributesEndpointMetrics.get)
+	if m.Config.ApplicationConfiguration().GetTopLevelConfig().ProjectAttributesConfig.Mode == runtime.ProjectAttributesMode_LEGACY {
+		// Legacy mode, use resource table
+		m.Metrics.workflowAttributesEndpointMetrics.get.Time(func() {
+			response, err = m.ResourceManager.GetWorkflowAttributes(ctx, *request)
+		})
+		if err != nil {
+			return nil, util.TransformAndRecordError(err, &m.Metrics.workflowAttributesEndpointMetrics.get)
+		}
+	} else {
+		// Configuration mode, use configuration table
+		configurationGetResponse := &admin.ConfigurationGetResponse{}
+		configurationGetRequest := transformers.FromWorkflowAttributesGetRequest(request)
+		m.Metrics.configurationEndpointMetrics.get.Time(func() {
+			configurationGetResponse, err = m.ConfigurationManager.GetConfiguration(ctx, *configurationGetRequest)
+		})
+		if err != nil {
+			return nil, util.TransformAndRecordError(err, &m.Metrics.configurationEndpointMetrics.get)
+		}
+		response, err = transformers.ToWorkflowAttributesGetResponse(configurationGetResponse, request.GetResourceType())
+		if err != nil {
+			return nil, util.TransformAndRecordError(err, &m.Metrics.configurationEndpointMetrics.get)
+		}
 	}
-
 	return response, nil
 }
 
@@ -56,11 +84,23 @@ func (m *AdminService) DeleteWorkflowAttributes(ctx context.Context, request *ad
 	}
 	var response *admin.WorkflowAttributesDeleteResponse
 	var err error
-	m.Metrics.workflowAttributesEndpointMetrics.delete.Time(func() {
-		response, err = m.ResourceManager.DeleteWorkflowAttributes(ctx, *request)
-	})
-	if err != nil {
-		return nil, util.TransformAndRecordError(err, &m.Metrics.workflowAttributesEndpointMetrics.delete)
+	if m.Config.ApplicationConfiguration().GetTopLevelConfig().ProjectAttributesConfig.Mode == runtime.ProjectAttributesMode_LEGACY {
+		// Legacy mode, update resource table
+		m.Metrics.workflowAttributesEndpointMetrics.delete.Time(func() {
+			response, err = m.ResourceManager.DeleteWorkflowAttributes(ctx, *request)
+		})
+		if err != nil {
+			return nil, util.TransformAndRecordError(err, &m.Metrics.workflowAttributesEndpointMetrics.delete)
+		}
+	} else {
+		// Configuration mode, update configuration table
+		configurationUpdateRequest := transformers.FromWorkflowAttributesDeleteRequest(request)
+		m.Metrics.configurationEndpointMetrics.update.Time(func() {
+			_, err = m.ConfigurationManager.UpdateConfiguration(ctx, *configurationUpdateRequest, true)
+		})
+		if err != nil {
+			return nil, util.TransformAndRecordError(err, &m.Metrics.configurationEndpointMetrics.update)
+		}
 	}
 
 	return response, nil
@@ -103,11 +143,28 @@ func (m *AdminService) GetProjectDomainAttributes(ctx context.Context, request *
 	}
 	var response *admin.ProjectDomainAttributesGetResponse
 	var err error
-	m.Metrics.workflowAttributesEndpointMetrics.get.Time(func() {
-		response, err = m.ResourceManager.GetProjectDomainAttributes(ctx, *request)
-	})
-	if err != nil {
-		return nil, util.TransformAndRecordError(err, &m.Metrics.workflowAttributesEndpointMetrics.get)
+	if m.Config.ApplicationConfiguration().GetTopLevelConfig().ProjectAttributesConfig.Mode == runtime.ProjectAttributesMode_LEGACY {
+		// Legacy mode, use resource table
+		m.Metrics.workflowAttributesEndpointMetrics.get.Time(func() {
+			response, err = m.ResourceManager.GetProjectDomainAttributes(ctx, *request)
+		})
+		if err != nil {
+			return nil, util.TransformAndRecordError(err, &m.Metrics.workflowAttributesEndpointMetrics.get)
+		}
+	} else {
+		// Configuration mode, use configuration table
+		configurationGetResponse := &admin.ConfigurationGetResponse{}
+		configurationGetRequest := transformers.FromProjectDomainAttributesGetRequest(request)
+		m.Metrics.configurationEndpointMetrics.get.Time(func() {
+			configurationGetResponse, err = m.ConfigurationManager.GetConfiguration(ctx, *configurationGetRequest)
+		})
+		if err != nil {
+			return nil, util.TransformAndRecordError(err, &m.Metrics.configurationEndpointMetrics.get)
+		}
+		response, err = transformers.ToProjectDomainAttributesGetResponse(configurationGetResponse, request.GetResourceType())
+		if err != nil {
+			return nil, util.TransformAndRecordError(err, &m.Metrics.configurationEndpointMetrics.get)
+		}
 	}
 
 	return response, nil
@@ -122,6 +179,7 @@ func (m *AdminService) DeleteProjectDomainAttributes(ctx context.Context, reques
 	var response *admin.ProjectDomainAttributesDeleteResponse
 	var err error
 	if m.Config.ApplicationConfiguration().GetTopLevelConfig().ProjectAttributesConfig.Mode == runtime.ProjectAttributesMode_LEGACY {
+		// Legacy mode, update resource table
 		m.Metrics.workflowAttributesEndpointMetrics.delete.Time(func() {
 			response, err = m.ResourceManager.DeleteProjectDomainAttributes(ctx, *request)
 		})
@@ -129,6 +187,7 @@ func (m *AdminService) DeleteProjectDomainAttributes(ctx context.Context, reques
 			return nil, util.TransformAndRecordError(err, &m.Metrics.workflowAttributesEndpointMetrics.delete)
 		}
 	} else {
+		// Configuration mode, update configuration table
 		configurationUpdateRequest := transformers.FromProjectDomainAttributesDeleteRequest(request)
 		m.Metrics.configurationEndpointMetrics.update.Time(func() {
 			_, err = m.ConfigurationManager.UpdateConfiguration(ctx, *configurationUpdateRequest, true)
@@ -151,6 +210,7 @@ func (m *AdminService) UpdateProjectAttributes(ctx context.Context, request *adm
 	var response *admin.ProjectAttributesUpdateResponse
 	var err error
 	if m.Config.ApplicationConfiguration().GetTopLevelConfig().ProjectAttributesConfig.Mode == runtime.ProjectAttributesMode_LEGACY {
+		// Legacy mode, update resource table
 		m.Metrics.projectAttributesEndpointMetrics.get.Time(func() {
 			response, err = m.ResourceManager.UpdateProjectAttributes(ctx, *request)
 		})
@@ -158,7 +218,7 @@ func (m *AdminService) UpdateProjectAttributes(ctx context.Context, request *adm
 			return nil, util.TransformAndRecordError(err, &m.Metrics.projectAttributesEndpointMetrics.get)
 		}
 	} else {
-		// Update configuration as well
+		// Configuration mode, update configuration table
 		configurationUpdateRequest := transformers.FromProjectAttributesUpdateRequest(request)
 		m.Metrics.configurationEndpointMetrics.update.Time(func() {
 			_, err = m.ConfigurationManager.UpdateConfiguration(ctx, *configurationUpdateRequest, true)
@@ -179,11 +239,28 @@ func (m *AdminService) GetProjectAttributes(ctx context.Context, request *admin.
 	}
 	var response *admin.ProjectAttributesGetResponse
 	var err error
-	m.Metrics.projectAttributesEndpointMetrics.get.Time(func() {
-		response, err = m.ResourceManager.GetProjectAttributes(ctx, *request)
-	})
-	if err != nil {
-		return nil, util.TransformAndRecordError(err, &m.Metrics.projectAttributesEndpointMetrics.get)
+	if m.Config.ApplicationConfiguration().GetTopLevelConfig().ProjectAttributesConfig.Mode == runtime.ProjectAttributesMode_LEGACY {
+		// Legacy mode, use resource table
+		m.Metrics.projectAttributesEndpointMetrics.get.Time(func() {
+			response, err = m.ResourceManager.GetProjectAttributes(ctx, *request)
+		})
+		if err != nil {
+			return nil, util.TransformAndRecordError(err, &m.Metrics.projectAttributesEndpointMetrics.get)
+		}
+	} else {
+		// Configuration mode, use configuration table
+		configurationGetResponse := &admin.ConfigurationGetResponse{}
+		configurationGetRequest := transformers.FromProjectAttributesGetRequest(request)
+		m.Metrics.configurationEndpointMetrics.get.Time(func() {
+			configurationGetResponse, err = m.ConfigurationManager.GetConfiguration(ctx, *configurationGetRequest)
+		})
+		if err != nil {
+			return nil, util.TransformAndRecordError(err, &m.Metrics.configurationEndpointMetrics.get)
+		}
+		response, err = transformers.ToProjectAttributesGetResponse(configurationGetResponse, request.GetResourceType())
+		if err != nil {
+			return nil, util.TransformAndRecordError(err, &m.Metrics.configurationEndpointMetrics.get)
+		}
 	}
 
 	return response, nil
@@ -198,11 +275,23 @@ func (m *AdminService) DeleteProjectAttributes(ctx context.Context, request *adm
 	}
 	var response *admin.ProjectAttributesDeleteResponse
 	var err error
-	m.Metrics.projectAttributesEndpointMetrics.delete.Time(func() {
-		response, err = m.ResourceManager.DeleteProjectAttributes(ctx, *request)
-	})
-	if err != nil {
-		return nil, util.TransformAndRecordError(err, &m.Metrics.projectAttributesEndpointMetrics.delete)
+	if m.Config.ApplicationConfiguration().GetTopLevelConfig().ProjectAttributesConfig.Mode == runtime.ProjectAttributesMode_LEGACY {
+		// Legacy mode, update resource table
+		m.Metrics.projectAttributesEndpointMetrics.delete.Time(func() {
+			response, err = m.ResourceManager.DeleteProjectAttributes(ctx, *request)
+		})
+		if err != nil {
+			return nil, util.TransformAndRecordError(err, &m.Metrics.projectAttributesEndpointMetrics.delete)
+		}
+	} else {
+		// Configuration mode, use configuration table
+		configurationUpdateRequest := transformers.FromProjectAttributesDeleteRequest(request)
+		m.Metrics.configurationEndpointMetrics.update.Time(func() {
+			_, err = m.ConfigurationManager.UpdateConfiguration(ctx, *configurationUpdateRequest, true)
+		})
+		if err != nil {
+			return nil, util.TransformAndRecordError(err, &m.Metrics.configurationEndpointMetrics.update)
+		}
 	}
 
 	return response, nil

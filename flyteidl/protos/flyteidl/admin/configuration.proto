@@ -45,14 +45,17 @@ message ConfigurationGetResponse {
 
   string version = 2;
 
+  // Everything set at the project-domain-workflow level
+  Configuration workflow_configuration = 3;
+
   // Everything set at the project-domain level
-  Configuration project_domain_configuration = 3;
+  Configuration project_domain_configuration = 4;
 
   // Everything set at the project level
-  Configuration project_configuration = 4;
+  Configuration project_configuration = 5;
 
   // Everything set at the global application level
-  Configuration global_configuration = 5;
+  Configuration global_configuration = 6;
 }
 
 message ConfigurationUpdateRequest {

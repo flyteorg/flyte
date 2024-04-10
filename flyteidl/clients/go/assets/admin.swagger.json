@@ -4731,6 +4731,10 @@
         "version": {
           "type": "string"
         },
+        "workflow_configuration": {
+          "$ref": "#/definitions/adminConfiguration",
+          "title": "Everything set at the project-domain-workflow level"
+        },
         "project_domain_configuration": {
           "$ref": "#/definitions/adminConfiguration",
           "title": "Everything set at the project-domain level"

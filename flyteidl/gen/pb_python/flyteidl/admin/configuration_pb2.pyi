@@ -47,18 +47,20 @@ class ConfigurationGetRequest(_message.Message):
     def __init__(self, id: _Optional[_Union[configurationID, _Mapping]] = ...) -> None: ...
 
 class ConfigurationGetResponse(_message.Message):
-    __slots__ = ["id", "version", "project_domain_configuration", "project_configuration", "global_configuration"]
+    __slots__ = ["id", "version", "workflow_configuration", "project_domain_configuration", "project_configuration", "global_configuration"]
     ID_FIELD_NUMBER: _ClassVar[int]
     VERSION_FIELD_NUMBER: _ClassVar[int]
+    WORKFLOW_CONFIGURATION_FIELD_NUMBER: _ClassVar[int]
     PROJECT_DOMAIN_CONFIGURATION_FIELD_NUMBER: _ClassVar[int]
     PROJECT_CONFIGURATION_FIELD_NUMBER: _ClassVar[int]
     GLOBAL_CONFIGURATION_FIELD_NUMBER: _ClassVar[int]
     id: configurationID
     version: str
+    workflow_configuration: Configuration
     project_domain_configuration: Configuration
     project_configuration: Configuration
     global_configuration: Configuration
-    def __init__(self, id: _Optional[_Union[configurationID, _Mapping]] = ..., version: _Optional[str] = ..., project_domain_configuration: _Optional[_Union[Configuration, _Mapping]] = ..., project_configuration: _Optional[_Union[Configuration, _Mapping]] = ..., global_configuration: _Optional[_Union[Configuration, _Mapping]] = ...) -> None: ...
+    def __init__(self, id: _Optional[_Union[configurationID, _Mapping]] = ..., version: _Optional[str] = ..., workflow_configuration: _Optional[_Union[Configuration, _Mapping]] = ..., project_domain_configuration: _Optional[_Union[Configuration, _Mapping]] = ..., project_configuration: _Optional[_Union[Configuration, _Mapping]] = ..., global_configuration: _Optional[_Union[Configuration, _Mapping]] = ...) -> None: ...
 
 class ConfigurationUpdateRequest(_message.Message):
     __slots__ = ["id", "version_to_update", "configuration"]

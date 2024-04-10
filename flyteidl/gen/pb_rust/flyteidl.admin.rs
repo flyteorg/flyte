@@ -1114,14 +1114,17 @@ pub struct ConfigurationGetResponse {
     pub id: ::core::option::Option<ConfigurationId>,
     #[prost(string, tag="2")]
     pub version: ::prost::alloc::string::String,
-    /// Everything set at the project-domain level
+    /// Everything set at the project-domain-workflow level
     #[prost(message, optional, tag="3")]
+    pub workflow_configuration: ::core::option::Option<Configuration>,
+    /// Everything set at the project-domain level
+    #[prost(message, optional, tag="4")]
     pub project_domain_configuration: ::core::option::Option<Configuration>,
     /// Everything set at the project level
-    #[prost(message, optional, tag="4")]
+    #[prost(message, optional, tag="5")]
     pub project_configuration: ::core::option::Option<Configuration>,
     /// Everything set at the global application level
-    #[prost(message, optional, tag="5")]
+    #[prost(message, optional, tag="6")]
     pub global_configuration: ::core::option::Option<Configuration>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]

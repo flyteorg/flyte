@@ -30017,6 +30017,7 @@
                  * @interface IConfigurationGetResponse
                  * @property {flyteidl.admin.IconfigurationID|null} [id] ConfigurationGetResponse id
                  * @property {string|null} [version] ConfigurationGetResponse version
+                 * @property {flyteidl.admin.IConfiguration|null} [workflowConfiguration] ConfigurationGetResponse workflowConfiguration
                  * @property {flyteidl.admin.IConfiguration|null} [projectDomainConfiguration] ConfigurationGetResponse projectDomainConfiguration
                  * @property {flyteidl.admin.IConfiguration|null} [projectConfiguration] ConfigurationGetResponse projectConfiguration
                  * @property {flyteidl.admin.IConfiguration|null} [globalConfiguration] ConfigurationGetResponse globalConfiguration
@@ -30052,6 +30053,14 @@
                  * @instance
                  */
                 ConfigurationGetResponse.prototype.version = "";
+    
+                /**
+                 * ConfigurationGetResponse workflowConfiguration.
+                 * @member {flyteidl.admin.IConfiguration|null|undefined} workflowConfiguration
+                 * @memberof flyteidl.admin.ConfigurationGetResponse
+                 * @instance
+                 */
+                ConfigurationGetResponse.prototype.workflowConfiguration = null;
     
                 /**
                  * ConfigurationGetResponse projectDomainConfiguration.
@@ -30105,12 +30114,14 @@
                         $root.flyteidl.admin.configurationID.encode(message.id, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
                     if (message.version != null && message.hasOwnProperty("version"))
                         writer.uint32(/* id 2, wireType 2 =*/18).string(message.version);
+                    if (message.workflowConfiguration != null && message.hasOwnProperty("workflowConfiguration"))
+                        $root.flyteidl.admin.Configuration.encode(message.workflowConfiguration, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
                     if (message.projectDomainConfiguration != null && message.hasOwnProperty("projectDomainConfiguration"))
-                        $root.flyteidl.admin.Configuration.encode(message.projectDomainConfiguration, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                        $root.flyteidl.admin.Configuration.encode(message.projectDomainConfiguration, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
                     if (message.projectConfiguration != null && message.hasOwnProperty("projectConfiguration"))
-                        $root.flyteidl.admin.Configuration.encode(message.projectConfiguration, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+                        $root.flyteidl.admin.Configuration.encode(message.projectConfiguration, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
                     if (message.globalConfiguration != null && message.hasOwnProperty("globalConfiguration"))
-                        $root.flyteidl.admin.Configuration.encode(message.globalConfiguration, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
+                        $root.flyteidl.admin.Configuration.encode(message.globalConfiguration, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
                     return writer;
                 };
     
@@ -30139,12 +30150,15 @@
                             message.version = reader.string();
                             break;
                         case 3:
-                            message.projectDomainConfiguration = $root.flyteidl.admin.Configuration.decode(reader, reader.uint32());
+                            message.workflowConfiguration = $root.flyteidl.admin.Configuration.decode(reader, reader.uint32());
                             break;
                         case 4:
-                            message.projectConfiguration = $root.flyteidl.admin.Configuration.decode(reader, reader.uint32());
+                            message.projectDomainConfiguration = $root.flyteidl.admin.Configuration.decode(reader, reader.uint32());
                             break;
                         case 5:
+                            message.projectConfiguration = $root.flyteidl.admin.Configuration.decode(reader, reader.uint32());
+                            break;
+                        case 6:
                             message.globalConfiguration = $root.flyteidl.admin.Configuration.decode(reader, reader.uint32());
                             break;
                         default:
@@ -30174,6 +30188,11 @@
                     if (message.version != null && message.hasOwnProperty("version"))
                         if (!$util.isString(message.version))
                             return "version: string expected";
+                    if (message.workflowConfiguration != null && message.hasOwnProperty("workflowConfiguration")) {
+                        var error = $root.flyteidl.admin.Configuration.verify(message.workflowConfiguration);
+                        if (error)
+                            return "workflowConfiguration." + error;
+                    }
                     if (message.projectDomainConfiguration != null && message.hasOwnProperty("projectDomainConfiguration")) {
                         var error = $root.flyteidl.admin.Configuration.verify(message.projectDomainConfiguration);
                         if (error)

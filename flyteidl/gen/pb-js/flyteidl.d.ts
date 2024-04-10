@@ -12368,6 +12368,9 @@ export namespace flyteidl {
             /** ConfigurationGetResponse version */
             version?: (string|null);
 
+            /** ConfigurationGetResponse workflowConfiguration */
+            workflowConfiguration?: (flyteidl.admin.IConfiguration|null);
+
             /** ConfigurationGetResponse projectDomainConfiguration */
             projectDomainConfiguration?: (flyteidl.admin.IConfiguration|null);
 
@@ -12392,6 +12395,9 @@ export namespace flyteidl {
 
             /** ConfigurationGetResponse version. */
             public version: string;
+
+            /** ConfigurationGetResponse workflowConfiguration. */
+            public workflowConfiguration?: (flyteidl.admin.IConfiguration|null);
 
             /** ConfigurationGetResponse projectDomainConfiguration. */
             public projectDomainConfiguration?: (flyteidl.admin.IConfiguration|null);

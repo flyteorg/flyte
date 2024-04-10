@@ -161,7 +161,7 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 		adminScope.NewSubScope("node_execution_manager"), urlData, eventPublisher, cloudEventPublisher, nodeExecutionEventWriter)
 	taskExecutionManager := manager.NewTaskExecutionManager(repo, configuration, dataStorageClient,
 		adminScope.NewSubScope("task_execution_manager"), urlData, eventPublisher, cloudEventPublisher)
-	configurationManager := manager.NewConfigurationManager(repo, configuration, dataStorageClient)
+	configurationManager := manager.NewConfigurationManager(repo, configuration.ApplicationConfiguration(), dataStorageClient)
 
 	logger.Info(ctx, "Initializing a new AdminService")
 	return &AdminService{

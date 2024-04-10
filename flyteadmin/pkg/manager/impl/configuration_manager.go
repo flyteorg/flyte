@@ -3,6 +3,7 @@ package impl
 import (
 	"context"
 	"crypto/rand"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/transformers"
 	"math/big"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
@@ -17,20 +18,34 @@ import (
 
 type ConfigurationManager struct {
 	db            repositoryInterfaces.Repository
-	config        runtimeInterfaces.Configuration
+	config        runtimeInterfaces.ApplicationConfiguration
 	storageClient *storage.DataStore
 	cache         *admin.ConfigurationDocument
 }
 
-func (m *ConfigurationManager) GetConfiguration(
-	ctx context.Context, request admin.ConfigurationGetRequest) (
-	*admin.ConfigurationGetResponse, error) {
-	// Validate the request
-	if err := validation.ValidateConfigurationGetRequest(request); err != nil {
-		return nil, err
+func prepareConfigurationGetResponse(document *admin.ConfigurationDocument, id *admin.ConfigurationID) *admin.ConfigurationGetResponse {
+	response := &admin.ConfigurationGetResponse{
+		Id: &admin.ConfigurationID{
+			Project: id.GetProject(),
+			Domain:  id.GetDomain(),
+		},
+		Version:             document.GetVersion(),
+		GlobalConfiguration: getGlobalConfigurationFromDocument(document),
 	}
+	if id.Project != "" {
+		response.ProjectConfiguration = getProjectConfigurationFromDocument(document, id.Project)
+	}
+	if id.Domain != "" {
+		response.ProjectDomainConfiguration = getProjectDomainConfigurationFromDocument(document, id.Project, id.Domain)
+	}
+	if id.Workflow != "" {
+		response.WorkflowConfiguration = getWorkflowConfigurationFromDocument(document, id.Project, id.Domain, id.Workflow)
+	}
+	return response
+}
 
-	// Get the active override attributes
+func (m *ConfigurationManager) GetActiveDocument(ctx context.Context) (*admin.ConfigurationDocument, error) {
+	// Get the active configuration
 	activeConfiguration, err := m.db.ConfigurationDocumentRepo().GetActive(ctx)
 	if err != nil {
 		return nil, err
@@ -38,16 +53,7 @@ func (m *ConfigurationManager) GetConfiguration(
 
 	// If the cache is not nil and the version of the cache is the same as the active override attributes, return the cache
 	if m.cache != nil && m.cache.GetVersion() == activeConfiguration.Version {
-		return &admin.ConfigurationGetResponse{
-			Id: &admin.ConfigurationID{
-				Project: request.GetId().GetProject(),
-				Domain:  request.GetId().GetDomain(),
-			},
-			Version:                    m.cache.GetVersion(),
-			GlobalConfiguration:        getGlobalConfigurationFromDocument(m.cache),
-			ProjectConfiguration:       getProjectConfigurationFromDocument(m.cache, request.Id.Project),
-			ProjectDomainConfiguration: getProjectDomainConfigurationFromDocument(m.cache, request.Id.Project, request.Id.Domain),
-		}, nil
+		return m.cache, nil
 	}
 
 	// TODO: Handle the case where the document location is empty
@@ -59,17 +65,26 @@ func (m *ConfigurationManager) GetConfiguration(
 	// Cache the document
 	m.cache = document
 
-	// Return the override attributes of different scopes
-	return &admin.ConfigurationGetResponse{
-		Id: &admin.ConfigurationID{
-			Project: request.GetId().GetProject(),
-			Domain:  request.GetId().GetDomain(),
-		},
-		Version:                    document.GetVersion(),
-		GlobalConfiguration:        getGlobalConfigurationFromDocument(m.cache),
-		ProjectConfiguration:       getProjectConfigurationFromDocument(m.cache, request.Id.Project),
-		ProjectDomainConfiguration: getProjectDomainConfigurationFromDocument(m.cache, request.Id.Project, request.Id.Domain),
-	}, nil
+	return document, nil
+}
+
+func (m *ConfigurationManager) GetConfiguration(
+	ctx context.Context, request admin.ConfigurationGetRequest) (
+	*admin.ConfigurationGetResponse, error) {
+	// Validate the request
+	if err := validation.ValidateConfigurationGetRequest(request); err != nil {
+		return nil, err
+	}
+
+	// Get the active document
+	activeDocument, err := m.GetActiveDocument(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	// Return the configurations of different scopes
+	response := prepareConfigurationGetResponse(activeDocument, request.GetId())
+	return response, nil
 }
 
 func (m *ConfigurationManager) UpdateConfiguration(
@@ -81,30 +96,29 @@ func (m *ConfigurationManager) UpdateConfiguration(
 	}
 
 	// Get the active override attributes
-	activeConfigurationDocument, err := m.db.ConfigurationDocumentRepo().GetActive(ctx)
+	document, err := m.GetActiveDocument(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	// TODO: Handle the case where the document location is empty
-	// TODO: Use cache
-	document := &admin.ConfigurationDocument{}
-	if err := m.storageClient.ReadProtobuf(ctx, activeConfigurationDocument.DocumentLocation, document); err != nil {
-		return nil, err
+	// Set the version to update
+	var versionToUpdate string
+	if request.VersionToUpdate != "" {
+		versionToUpdate = request.VersionToUpdate
+	} else {
+		versionToUpdate = document.Version
 	}
+
+	currentConfiguration := getConfigurationFromDocumentWithID(document, request.Id)
 
 	// If mergeActive is true, merge the incoming configuration with the active configuration
 	if mergeActive {
-		currentConfiguration := getConfigurationFromDocument(document, request.Id.Project, request.Id.Domain, "", "")
-		if currentConfiguration == nil {
-			currentConfiguration = &admin.Configuration{}
-		}
 		mergedConfiguration := mergeConfiguration(request.Configuration, currentConfiguration)
 		request.Configuration = mergedConfiguration
 	}
 
 	// Update the document with the new attributes
-	updateConfigurationToDocument(document, request.Id.Project, request.Id.Domain, "", "", request.Configuration)
+	updateConfigurationToDocument(document, request.Id.Project, request.Id.Domain, request.Id.Workflow, "", request.Configuration)
 
 	// Generate a new version for the document
 	generatedVersion, err := GenerateRandomString(10)
@@ -120,7 +134,7 @@ func (m *ConfigurationManager) UpdateConfiguration(
 		return nil, err
 	}
 
-	newConfiguration := models.ConfigurationDocument{
+	newDocument := models.ConfigurationDocument{
 		// random generate a string as version
 		Version:          generatedVersion,
 		Active:           true,
@@ -128,20 +142,163 @@ func (m *ConfigurationManager) UpdateConfiguration(
 	}
 
 	// Erase the active override attributes and create the new one
-	var versionToUpdate string
-	if request.VersionToUpdate != "" {
-		versionToUpdate = request.VersionToUpdate
-	} else {
-		versionToUpdate = activeConfigurationDocument.Version
-	}
 	input := &repositoryInterfaces.UpdateConfigurationInput{
 		VersionToUpdate:  versionToUpdate,
-		NewConfiguration: &newConfiguration,
+		NewConfiguration: &newDocument,
 	}
 	if err := m.db.ConfigurationDocumentRepo().Update(ctx, input); err != nil {
 		return nil, err
 	}
 	return &admin.ConfigurationUpdateResponse{}, nil
+}
+
+// For backward compatibility
+func (m *ConfigurationManager) GetProjectAttributes(
+	ctx context.Context, request admin.ProjectAttributesGetRequest) (
+	*admin.ProjectAttributesGetResponse, error) {
+	if err := validation.ValidateProjectAttributesGetRequest(ctx, m.db, request); err != nil {
+		return nil, err
+	}
+	// Get the active document
+	activeDocument, err := m.GetActiveDocument(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	projectConfiguration := getProjectConfigurationFromDocument(activeDocument, request.Project)
+	projectAttributesGetResponse, err := transformers.ToProjectAttributesGetResponse(projectConfiguration, &request)
+	if err != nil {
+		return nil, err
+	}
+	return projectAttributesGetResponse, nil
+}
+
+func (m *ConfigurationManager) UpdateProjectAttributes(
+	ctx context.Context, request admin.ProjectAttributesUpdateRequest) (
+	*admin.ProjectAttributesUpdateResponse, error) {
+	var err error
+	if _, err = validation.ValidateProjectAttributesUpdateRequest(ctx, m.db, request); err != nil {
+		return nil, err
+	}
+	configurationUpdateRequest := transformers.FromProjectAttributesUpdateRequest(&request)
+	_, err = m.UpdateConfiguration(ctx, *configurationUpdateRequest, true)
+	if err != nil {
+		return nil, err
+	}
+	return &admin.ProjectAttributesUpdateResponse{}, nil
+}
+
+func (m *ConfigurationManager) DeleteProjectAttributes(
+	ctx context.Context, request admin.ProjectAttributesDeleteRequest) (
+	*admin.ProjectAttributesDeleteResponse, error) {
+	if err := validation.ValidateProjectAttributesDeleteRequest(ctx, m.db, request); err != nil {
+		return nil, err
+	}
+	configurationUpdateRequest := transformers.FromProjectAttributesDeleteRequest(&request)
+	_, err := m.UpdateConfiguration(ctx, *configurationUpdateRequest, true)
+	if err != nil {
+		return nil, err
+	}
+	return &admin.ProjectAttributesDeleteResponse{}, nil
+}
+
+func (m *ConfigurationManager) GetProjectDomainAttributes(
+	ctx context.Context, request admin.ProjectDomainAttributesGetRequest) (
+	*admin.ProjectDomainAttributesGetResponse, error) {
+	if err := validation.ValidateProjectDomainAttributesGetRequest(ctx, m.db, m.config, request); err != nil {
+		return nil, err
+	}
+	// Get the active document
+	activeDocument, err := m.GetActiveDocument(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	projectDomainConfiguration := getProjectDomainConfigurationFromDocument(activeDocument, request.Project, request.Domain)
+	projectDomainAttributesGetResponse, err := transformers.ToProjectDomainAttributesGetResponse(projectDomainConfiguration, &request)
+	if err != nil {
+		return nil, err
+	}
+	return projectDomainAttributesGetResponse, nil
+}
+
+func (m *ConfigurationManager) UpdateProjectDomainAttributes(
+	ctx context.Context, request admin.ProjectDomainAttributesUpdateRequest) (
+	*admin.ProjectDomainAttributesUpdateResponse, error) {
+	var err error
+	if _, err = validation.ValidateProjectDomainAttributesUpdateRequest(ctx, m.db, m.config, request); err != nil {
+		return nil, err
+	}
+	configurationUpdateRequest := transformers.FromProjectDomainAttributesUpdateRequest(&request)
+	_, err = m.UpdateConfiguration(ctx, *configurationUpdateRequest, true)
+	if err != nil {
+		return nil, err
+	}
+	return &admin.ProjectDomainAttributesUpdateResponse{}, nil
+}
+
+func (m *ConfigurationManager) DeleteProjectDomainAttributes(
+	ctx context.Context, request admin.ProjectDomainAttributesDeleteRequest) (
+	*admin.ProjectDomainAttributesDeleteResponse, error) {
+	if err := validation.ValidateProjectDomainAttributesDeleteRequest(ctx, m.db, m.config, request); err != nil {
+		return nil, err
+	}
+	configurationDeleteRequest := transformers.FromProjectDomainAttributesDeleteRequest(&request)
+	_, err := m.UpdateConfiguration(ctx, *configurationDeleteRequest, true)
+	if err != nil {
+		return nil, err
+	}
+	return &admin.ProjectDomainAttributesDeleteResponse{}, nil
+}
+
+func (m *ConfigurationManager) GetWorkflowAttributes(
+	ctx context.Context, request admin.WorkflowAttributesGetRequest) (
+	*admin.WorkflowAttributesGetResponse, error) {
+	if err := validation.ValidateWorkflowAttributesGetRequest(ctx, m.db, m.config, request); err != nil {
+		return nil, err
+	}
+
+	// Get the active document
+	activeDocument, err := m.GetActiveDocument(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	workflowConfiguration := getWorkflowConfigurationFromDocument(activeDocument, request.Project, request.Domain, request.Workflow)
+	workflowAttributesGetResponse, err := transformers.ToWorkflowAttributesGetResponse(workflowConfiguration, &request)
+	if err != nil {
+		return nil, err
+	}
+	return workflowAttributesGetResponse, nil
+}
+
+func (m *ConfigurationManager) UpdateWorkflowAttributes(
+	ctx context.Context, request admin.WorkflowAttributesUpdateRequest) (
+	*admin.WorkflowAttributesUpdateResponse, error) {
+	var err error
+	if _, err = validation.ValidateWorkflowAttributesUpdateRequest(ctx, m.db, m.config, request); err != nil {
+		return nil, err
+	}
+	configurationUpdateRequest := transformers.FromWorkflowAttributesUpdateRequest(&request)
+	_, err = m.UpdateConfiguration(ctx, *configurationUpdateRequest, true)
+	if err != nil {
+		return nil, err
+	}
+	return &admin.WorkflowAttributesUpdateResponse{}, nil
+}
+
+func (m *ConfigurationManager) DeleteWorkflowAttributes(
+	ctx context.Context, request admin.WorkflowAttributesDeleteRequest) (
+	*admin.WorkflowAttributesDeleteResponse, error) {
+	if err := validation.ValidateWorkflowAttributesDeleteRequest(ctx, m.db, m.config, request); err != nil {
+		return nil, err
+	}
+	configurationUpdateRequest := transformers.FromWorkflowAttributesDeleteRequest(&request)
+	_, err := m.UpdateConfiguration(ctx, *configurationUpdateRequest, true)
+	if err != nil {
+		return nil, err
+	}
+	return &admin.WorkflowAttributesDeleteResponse{}, nil
 }
 
 // Merge two configurations
@@ -210,6 +367,14 @@ func getProjectDomainConfigurationFromDocument(document *admin.ConfigurationDocu
 	return getConfigurationFromDocument(document, project, domain, "", "")
 }
 
+func getWorkflowConfigurationFromDocument(document *admin.ConfigurationDocument, project, domain, workflow string) *admin.Configuration {
+	return getConfigurationFromDocument(document, project, domain, workflow, "")
+}
+
+func getConfigurationFromDocumentWithID(document *admin.ConfigurationDocument, id *admin.ConfigurationID) *admin.Configuration {
+	return getConfigurationFromDocument(document, id.Project, id.Domain, id.Workflow, "")
+}
+
 // TODO: Check if this function is implemented already
 func GenerateRandomString(length int) (string, error) {
 	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -225,6 +390,19 @@ func GenerateRandomString(length int) (string, error) {
 	return result, nil
 }
 
+func getConfigurationFromGetResponse(response *admin.ConfigurationGetResponse, id *admin.ConfigurationID) *admin.Configuration {
+	if id.Workflow != "" {
+		return response.WorkflowConfiguration
+	}
+	if id.Domain != "" {
+		return response.ProjectDomainConfiguration
+	}
+	if id.Project != "" {
+		return response.ProjectConfiguration
+	}
+	return response.GlobalConfiguration
+}
+
 // This function is used to get the attributes of a document based on the project, and domain.
 func getConfigurationFromDocument(document *admin.ConfigurationDocument, project, domain, workflow, launchPlan string) *admin.Configuration {
 	documentKey := encodeDocumentKey(project, domain, workflow, launchPlan)
@@ -236,7 +414,7 @@ func getConfigurationFromDocument(document *admin.ConfigurationDocument, project
 
 // This function is used to update the attributes of a document based on the project, and domain.
 func updateConfigurationToDocument(document *admin.ConfigurationDocument, project, domain, workflow, launchPlan string, attributes *admin.Configuration) {
-	documentKey := encodeDocumentKey(project, domain, "", "")
+	documentKey := encodeDocumentKey(project, domain, workflow, launchPlan)
 	document.Configurations[documentKey] = attributes
 }
 
@@ -246,7 +424,7 @@ func encodeDocumentKey(project, domain, workflow, launchPlan string) string {
 	return project + "/" + domain + "/" + workflow + "/" + launchPlan
 }
 
-func NewConfigurationManager(db repositoryInterfaces.Repository, config runtimeInterfaces.Configuration, storageClient *storage.DataStore) interfaces.ConfigurationInterface {
+func NewConfigurationManager(db repositoryInterfaces.Repository, config runtimeInterfaces.ApplicationConfiguration, storageClient *storage.DataStore) interfaces.ConfigurationInterface {
 	return &ConfigurationManager{
 		db:            db,
 		config:        config,

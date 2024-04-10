@@ -9,10 +9,8 @@ func ValidateConfigurationGetRequest(request admin.ConfigurationGetRequest) erro
 	if request.Id == nil {
 		return shared.GetMissingArgumentError(shared.ID)
 	}
-	if err := ValidateEmptyStringField(request.Id.Project, shared.Project); err != nil {
-		return err
-	}
-	return ValidateEmptyStringField(request.Id.Domain, shared.Domain)
+	// project is required, domain and workflow are optional
+	return ValidateEmptyStringField(request.Id.Project, shared.Project)
 }
 
 func ValidateConfigurationUpdateRequest(request admin.ConfigurationUpdateRequest) error {

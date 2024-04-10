@@ -195,23 +195,30 @@ export class ConfigurationGetResponse extends Message<ConfigurationGetResponse> 
   version = "";
 
   /**
+   * Everything set at the project-domain-workflow level
+   *
+   * @generated from field: flyteidl.admin.Configuration workflow_configuration = 3;
+   */
+  workflowConfiguration?: Configuration;
+
+  /**
    * Everything set at the project-domain level
    *
-   * @generated from field: flyteidl.admin.Configuration project_domain_configuration = 3;
+   * @generated from field: flyteidl.admin.Configuration project_domain_configuration = 4;
    */
   projectDomainConfiguration?: Configuration;
 
   /**
    * Everything set at the project level
    *
-   * @generated from field: flyteidl.admin.Configuration project_configuration = 4;
+   * @generated from field: flyteidl.admin.Configuration project_configuration = 5;
    */
   projectConfiguration?: Configuration;
 
   /**
    * Everything set at the global application level
    *
-   * @generated from field: flyteidl.admin.Configuration global_configuration = 5;
+   * @generated from field: flyteidl.admin.Configuration global_configuration = 6;
    */
   globalConfiguration?: Configuration;
 
@@ -225,9 +232,10 @@ export class ConfigurationGetResponse extends Message<ConfigurationGetResponse> 
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "id", kind: "message", T: configurationID },
     { no: 2, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "project_domain_configuration", kind: "message", T: Configuration },
-    { no: 4, name: "project_configuration", kind: "message", T: Configuration },
-    { no: 5, name: "global_configuration", kind: "message", T: Configuration },
+    { no: 3, name: "workflow_configuration", kind: "message", T: Configuration },
+    { no: 4, name: "project_domain_configuration", kind: "message", T: Configuration },
+    { no: 5, name: "project_configuration", kind: "message", T: Configuration },
+    { no: 6, name: "global_configuration", kind: "message", T: Configuration },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ConfigurationGetResponse {
