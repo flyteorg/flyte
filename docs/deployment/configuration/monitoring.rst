@@ -101,12 +101,13 @@ The corresponding JSON files for each dashboard are also located at ``deployment
     The dashboards are basic dashboards and do not include all the metrics exposed by Flyte.
     Feel free to use the scripts provided `here <https://github.com/flyteorg/flyte/tree/master/stats>`__ to improve and -hopefully- contribute the improved dashboards.
 
-To consume the dashboards, we recommend installing and configuring the Prometheus operator as described in `their docs <https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/user-guides/getting-started.md>`__.
+How to use the dashboards
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+1. We recommend installing and configuring the Prometheus operator as described in `their docs <https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/user-guides/getting-started.md>`__.
 This is especially true if you plan to use the Service Monitors provided by the `flyte-core <https://github.com/flyteorg/flyte/blob/master/charts/flyte-core/templates/propeller/service-monitor.yaml>`__ Helm chart.
 
-.. note::
-
-   Enable the Prometheus instance to use Service Monitors in the namespace where Flyte is running, configuring the following keys in the ``prometheus`` resource:
+2. Enable the Prometheus instance to use Service Monitors in the namespace where Flyte is running, configuring the following keys in the ``prometheus`` resource:
 
 .. code-block:: yaml
 
@@ -118,7 +119,7 @@ This is especially true if you plan to use the Service Monitors provided by the 
 
    The above example configuration lets Prometheus use any ``ServiceMonitor`` in any namespace in the cluster. Adjust the configuration to reduce the scope if needed.
 
-Once you have installed and configured the Prometheus operator, enable the Service Monitors in the Helm chart by configuring the following keys in your ``values`` file:
+3. Once you have installed and configured the Prometheus operator, enable the Service Monitors in the Helm chart by configuring the following keys in your ``values`` file:
 
 .. code-block:: yaml
 
