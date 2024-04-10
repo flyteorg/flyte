@@ -75,14 +75,6 @@ Enable the MMCloud agent by adding the following config to the relevant YAML fil
       - mmcloud_task
       agentForTaskTypes:
       - mmcloud_task: mmcloud-agent
-      defaultAgent:
-        defaultTimeout: 10s
-        endpoint: dns:///flyteagent.flyte.svc.cluster.local:8000
-        insecure: true
-        timeouts:
-          CreateTask: 10s
-          GetTask: 10s
-          DeleteTask: 10s
 
 Substitute ``<AGENT_ENDPOINT>`` with the endpoint of your MMCloud agent.
 

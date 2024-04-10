@@ -66,14 +66,6 @@ Specify agent configuration
                 supportedTaskTypes:
                 - boto
                 - sagemaker-endpoint
-                defaultAgent:
-                  defaultTimeout: 10s
-                  endpoint: dns:///flyteagent.flyte.svc.cluster.local:8000
-                  insecure: true
-                  timeouts:
-                    CreateTask: 10s
-                    GetTask: 10s
-                    DeleteTask: 10s
 
 AWS credentials
 ---------------

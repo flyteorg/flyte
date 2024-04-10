@@ -57,7 +57,7 @@ tasks:
       - sidecar
       - K8S-ARRAY
     default-for-task-types:
-      - bigquery_query_job_task: agent-service
+      - sensor: agent-service
       - container: container
       - container_array: K8S-ARRAY
 ```
@@ -69,9 +69,10 @@ plugins:
       endpoint: "localhost:8000" # your grpc agent server port
       insecure: true
       timeouts:
-        CreateTask: 10s
-        GetTask: 10s
-        DeleteTask: 10s
+        CreateTask: 5s
+        GetTask: 5s
+        DeleteTask: 5s
+        ExecuteTaskSync: 10s
       defaultTimeout: 10s
 ```
 

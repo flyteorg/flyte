@@ -102,14 +102,6 @@ Enable the sensor agent by adding the following config to the relevant YAML file
               agent-service:
                 supportedTaskTypes:
                 - sensor
-                defaultAgent:
-                  defaultTimeout: 10s
-                  endpoint: dns:///flyteagent.flyte.svc.cluster.local:8000
-                  insecure: true
-                  timeouts:
-                    CreateTask: 10s
-                    GetTask: 10s
-                    DeleteTask: 10s
 
 
 Upgrade the deployment

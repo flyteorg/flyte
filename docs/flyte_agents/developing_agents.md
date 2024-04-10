@@ -184,10 +184,7 @@ kubectl set image deployment/flyteagent flyteagent=ghcr.io/flyteorg/flyteagent:l
 kubectl rollout restart deployment flytepropeller -n flyte
 ```
 
-### 5. 
-
-
-### Canary deployment
+### 5. Canary deployment
 
 Agents can be deployed independently in separate environments. Decoupling agents from the
 production environment ensures that if any specific agent encounters an error or issue, it will not impact the overall production system.
@@ -202,7 +199,7 @@ you can route particular task requests to designated agent services by adjusting
  plugins:
    agent-service:
      supportedTaskTypes:
-       - bigquery_query_job_task
+       - sensor
        - default_task
        - custom_task
      # By default, all requests will be sent to the default agent.
@@ -210,7 +207,12 @@ you can route particular task requests to designated agent services by adjusting
        endpoint: "dns:///flyteagent.flyte.svc.cluster.local:8000"
        insecure: true
        timeouts:
-         GetTask: 10s
+         # CreateTask, GetTask and DeleteTask are for async agents.
+         # ExecuteTaskSync is for sync agents.
+         CreateTask: 5s
+         GetTask: 5s
+         DeleteTask: 5s
+         ExecuteTaskSync: 10s
        defaultTimeout: 10s
      agents:
        custom_agent:
