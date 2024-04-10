@@ -199,7 +199,7 @@ you can route particular task requests to designated agent services by adjusting
  plugins:
    agent-service:
      supportedTaskTypes:
-       - sensor
+       - bigquery_query_job_task
        - default_task
        - custom_task
      # By default, all requests will be sent to the default agent.
