@@ -30,6 +30,16 @@ func TestOAuth2ClientConfig(t *testing.T) {
 			url:                 "https://flyte.com/custom-subpath/console",
 			expectedRedirectURL: "https://flyte.com/custom-subpath/callback",
 		},
+		{
+			name:                "complex publicUrl",
+			url:                 "https://flyte.com/login?redirect_url=https://flyte.com/console/select-project",
+			expectedRedirectURL: "https://flyte.com/callback",
+		},
+		{
+			name:                "complex publicUrl with custom subpath",
+			url:                 "https://flyte.com/custom-subpath/login?redirect_url=https://flyte.com/custom-subpath/console/select-project",
+			expectedRedirectURL: "https://flyte.com/custom-subpath/callback",
+		},
 	}
 
 	for _, tt := range tests {
