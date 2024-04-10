@@ -75,6 +75,14 @@ Specify agent configuration
               agent-service:
                 supportedTaskTypes:
                 - bigquery_query_job_task
+                defaultAgent:
+                  defaultTimeout: 10s
+                  endpoint: dns:///flyteagent.flyte.svc.cluster.local:8000
+                  insecure: true
+                  timeouts:
+                    CreateTask: 5s
+                    GetTask: 5s
+                    DeleteTask: 5s
 
 Ensure that the propeller has the correct service account for BigQuery.
 

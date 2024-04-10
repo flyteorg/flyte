@@ -44,6 +44,14 @@ Specify agent configuration
           agent-service:
             supportedTaskTypes:
             - snowflake
+            defaultAgent:
+              defaultTimeout: 10s
+              endpoint: dns:///flyteagent.flyte.svc.cluster.local:8000
+              insecure: true
+              timeouts:
+                CreateTask: 5s
+                GetTask: 5s
+                DeleteTask: 5s
 
     .. group-tab:: Flyte core
 
