@@ -255,7 +255,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 
 		availableParallelism := 0
 		// using the workflow's parallelism if the array node parallelism is not set
-		useWorkflowParallelism := int(arrayNode.GetParallelism()) == -1
+		useWorkflowParallelism := arrayNode.GetParallelism() == nil
 		if useWorkflowParallelism {
 			// greedily take all available slots
 			// TODO: This will need to be re-evaluated if we want to support dynamics & sub_workflows
@@ -263,7 +263,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			maxParallelism := nCtx.ExecutionContext().GetExecutionConfig().MaxParallelism
 			availableParallelism = int(maxParallelism - currentParallelism)
 		} else {
-			availableParallelism = int(arrayNode.GetParallelism())
+			availableParallelism = int(*arrayNode.GetParallelism())
 			if availableParallelism == 0 {
 				availableParallelism = len(arrayNodeState.SubNodePhases.GetItems())
 			}

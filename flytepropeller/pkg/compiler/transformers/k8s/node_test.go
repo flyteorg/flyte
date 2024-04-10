@@ -296,7 +296,9 @@ func TestBuildNodeSpec(t *testing.T) {
 						},
 					},
 				},
-				Parallelism: 10,
+				ParallelismOption: &core.ArrayNode_Parallelism{
+					Parallelism: 10,
+				},
 				SuccessCriteria: &core.ArrayNode_MinSuccessRatio{
 					MinSuccessRatio: 0.5,
 				},
