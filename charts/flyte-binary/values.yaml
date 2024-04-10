@@ -166,7 +166,7 @@ configuration:
       endpoint: "dns:///flyteagent.flyte.svc.cluster.local:8000"
       insecure: true
       timeouts:
-        GetTask: 5s
+        GetTask: 10s
       defaultTimeout: 10s
     supportedTaskTypes:
       - default_task

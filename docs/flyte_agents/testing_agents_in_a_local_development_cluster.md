@@ -69,9 +69,9 @@ plugins:
       endpoint: "localhost:8000" # your grpc agent server port
       insecure: true
       timeouts:
-        CreateTask: 5s
-        GetTask: 5s
-        DeleteTask: 5s
+        CreateTask: 10s
+        GetTask: 10s
+        DeleteTask: 10s
       defaultTimeout: 10s
 ```
 

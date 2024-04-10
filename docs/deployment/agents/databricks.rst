@@ -210,9 +210,9 @@ Specify agent configuration
                 endpoint: dns:///flyteagent.flyte.svc.cluster.local:8000
                 insecure: true
                 timeouts:
-                  CreateTask: 5s
-                  GetTask: 5s
-                  DeleteTask: 5s
+                  CreateTask: 10s
+                  GetTask: 10s
+                  DeleteTask: 10s
 
 Add the Databricks access token
 -------------------------------

@@ -210,7 +210,7 @@ you can route particular task requests to designated agent services by adjusting
        endpoint: "dns:///flyteagent.flyte.svc.cluster.local:8000"
        insecure: true
        timeouts:
-         GetTask: 5s
+         GetTask: 10s
        defaultTimeout: 10s
      agents:
        custom_agent:
@@ -218,7 +218,7 @@ you can route particular task requests to designated agent services by adjusting
          insecure: false
          defaultServiceConfig: '{"loadBalancingConfig": [{"round_robin":{}}]}'
          timeouts:
-           GetTask: 5s
+           GetTask: 10s
          defaultTimeout: 10s
      agentForTaskTypes:
        # It will override the default agent for custom_task, which means propeller will send the request to this agent.
