@@ -47,6 +47,12 @@ spec:
             {{- tpl (toYaml .) $ | nindent 12 }}
             {{- end }}
             {{- end }}
+          {{- if .Values.flyteadmin.envFrom }}
+          envFrom:
+            {{- with .Values.flyteadmin.envFrom -}}
+            {{- tpl (toYaml .) $ | nindent 12 }}
+            {{- end }}
+            {{- end }}
         {{- if .Values.flyteadmin.initialProjects }}
         - command:
           - flyteadmin
