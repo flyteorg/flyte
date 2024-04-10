@@ -220,7 +220,7 @@ you can route particular task requests to designated agent services by adjusting
          insecure: false
          defaultServiceConfig: '{"loadBalancingConfig": [{"round_robin":{}}]}'
          timeouts:
-           GetTask: 10s
+           GetTask: 5s
          defaultTimeout: 10s
      agentForTaskTypes:
        # It will override the default agent for custom_task, which means propeller will send the request to this agent.
