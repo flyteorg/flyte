@@ -92,12 +92,11 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 	taskCategory := admin.TaskCategory{Name: taskTemplate.Type, Version: taskTemplate.TaskTypeVersion}
 	agent, isSync := getFinalAgent(&taskCategory, p.cfg, p.agentRegistry)
 
-	finalCtx, cancel := getFinalContext(ctx, "CreateTask", agent)
-	defer cancel()
-
 	taskExecutionMetadata := buildTaskExecutionMetadata(taskCtx.TaskExecutionMetadata())
 
 	if isSync {
+		finalCtx, cancel := getFinalContext(ctx, "ExecuteTaskSync", agent)
+		defer cancel()
 		client, err := p.getSyncAgentClient(ctx, agent)
 		if err != nil {
 			return nil, nil, err
@@ -105,6 +104,9 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 		header := &admin.CreateRequestHeader{Template: taskTemplate, OutputPrefix: outputPrefix, TaskExecutionMetadata: &taskExecutionMetadata}
 		return p.ExecuteTaskSync(finalCtx, client, header, inputs)
 	}
+
+	finalCtx, cancel := getFinalContext(ctx, "CreateTask", agent)
+	defer cancel()
 
 	// Use async agent client
 	client, err := p.getAsyncAgentClient(ctx, agent)
