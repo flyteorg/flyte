@@ -10808,7 +10808,7 @@
                  * @memberof flyteidl.core
                  * @interface IArrayNode
                  * @property {flyteidl.core.INode|null} [node] ArrayNode node
-                 * @property {Long|null} [parallelism] ArrayNode parallelism
+                 * @property {number|null} [parallelism] ArrayNode parallelism
                  * @property {number|null} [minSuccesses] ArrayNode minSuccesses
                  * @property {number|null} [minSuccessRatio] ArrayNode minSuccessRatio
                  */
@@ -10838,11 +10838,11 @@
     
                 /**
                  * ArrayNode parallelism.
-                 * @member {Long} parallelism
+                 * @member {number} parallelism
                  * @memberof flyteidl.core.ArrayNode
                  * @instance
                  */
-                ArrayNode.prototype.parallelism = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
+                ArrayNode.prototype.parallelism = 0;
     
                 /**
                  * ArrayNode minSuccesses.
@@ -10862,6 +10862,17 @@
     
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
+    
+                /**
+                 * ArrayNode parallelismOption.
+                 * @member {"parallelism"|undefined} parallelismOption
+                 * @memberof flyteidl.core.ArrayNode
+                 * @instance
+                 */
+                Object.defineProperty(ArrayNode.prototype, "parallelismOption", {
+                    get: $util.oneOfGetter($oneOfFields = ["parallelism"]),
+                    set: $util.oneOfSetter($oneOfFields)
+                });
     
                 /**
                  * ArrayNode successCriteria.
@@ -10901,7 +10912,7 @@
                     if (message.node != null && message.hasOwnProperty("node"))
                         $root.flyteidl.core.Node.encode(message.node, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
                     if (message.parallelism != null && message.hasOwnProperty("parallelism"))
-                        writer.uint32(/* id 2, wireType 0 =*/16).int64(message.parallelism);
+                        writer.uint32(/* id 2, wireType 0 =*/16).uint32(message.parallelism);
                     if (message.minSuccesses != null && message.hasOwnProperty("minSuccesses"))
                         writer.uint32(/* id 3, wireType 0 =*/24).uint32(message.minSuccesses);
                     if (message.minSuccessRatio != null && message.hasOwnProperty("minSuccessRatio"))
@@ -10931,7 +10942,7 @@
                             message.node = $root.flyteidl.core.Node.decode(reader, reader.uint32());
                             break;
                         case 2:
-                            message.parallelism = reader.int64();
+                            message.parallelism = reader.uint32();
                             break;
                         case 3:
                             message.minSuccesses = reader.uint32();
@@ -10964,9 +10975,11 @@
                         if (error)
                             return "node." + error;
                     }
-                    if (message.parallelism != null && message.hasOwnProperty("parallelism"))
-                        if (!$util.isInteger(message.parallelism) && !(message.parallelism && $util.isInteger(message.parallelism.low) && $util.isInteger(message.parallelism.high)))
-                            return "parallelism: integer|Long expected";
+                    if (message.parallelism != null && message.hasOwnProperty("parallelism")) {
+                        properties.parallelismOption = 1;
+                        if (!$util.isInteger(message.parallelism))
+                            return "parallelism: integer expected";
+                    }
                     if (message.minSuccesses != null && message.hasOwnProperty("minSuccesses")) {
                         properties.successCriteria = 1;
                         if (!$util.isInteger(message.minSuccesses))
