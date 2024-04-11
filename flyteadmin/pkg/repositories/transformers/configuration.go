@@ -3,57 +3,53 @@ package transformers
 import (
 	flyteErrs "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"google.golang.org/grpc/codes"
 )
 
 var attributeNotFoundError = flyteErrs.NewFlyteAdminErrorf(codes.NotFound, "attribute not found")
 
-// get the real type of matching attributes
-func GetConfigurationFromMatchingAttributes(matchingAttributes *admin.MatchingAttributes) *admin.Configuration {
+func updateMatchingAttributesInConfiguration(matchingAttributes *admin.MatchingAttributes, configuration *admin.Configuration) *admin.Configuration {
 	switch x := matchingAttributes.GetTarget().(type) {
 	case *admin.MatchingAttributes_TaskResourceAttributes:
-		return &admin.Configuration{TaskResourceAttributes: x.TaskResourceAttributes}
+		configuration.TaskResourceAttributes = x.TaskResourceAttributes
 	case *admin.MatchingAttributes_ClusterResourceAttributes:
-		return &admin.Configuration{ClusterResourceAttributes: x.ClusterResourceAttributes}
+		configuration.ClusterResourceAttributes = x.ClusterResourceAttributes
 	case *admin.MatchingAttributes_ExecutionQueueAttributes:
-		return &admin.Configuration{ExecutionQueueAttributes: x.ExecutionQueueAttributes}
+		configuration.ExecutionQueueAttributes = x.ExecutionQueueAttributes
 	case *admin.MatchingAttributes_ExecutionClusterLabel:
-		return &admin.Configuration{ExecutionClusterLabel: x.ExecutionClusterLabel}
+		configuration.ExecutionClusterLabel = x.ExecutionClusterLabel
 	case *admin.MatchingAttributes_QualityOfService:
-		return &admin.Configuration{QualityOfService: x.QualityOfService}
+		configuration.QualityOfService = x.QualityOfService
 	case *admin.MatchingAttributes_PluginOverrides:
-		return &admin.Configuration{PluginOverrides: x.PluginOverrides}
+		configuration.PluginOverrides = x.PluginOverrides
 	case *admin.MatchingAttributes_WorkflowExecutionConfig:
-		return &admin.Configuration{WorkflowExecutionConfig: x.WorkflowExecutionConfig}
+		configuration.WorkflowExecutionConfig = x.WorkflowExecutionConfig
 	case *admin.MatchingAttributes_ClusterAssignment:
-		return &admin.Configuration{ClusterAssignment: x.ClusterAssignment}
-	default:
-		return &admin.Configuration{}
+		configuration.ClusterAssignment = x.ClusterAssignment
 	}
+	return configuration
 }
 
-func GetConfigurationFromMatchableResource(matchableResource admin.MatchableResource) *admin.Configuration {
-	switch matchableResource {
+func deleteMatchableResourceFromConfiguration(resourceType admin.MatchableResource, configuration *admin.Configuration) *admin.Configuration {
+	switch resourceType {
 	case admin.MatchableResource_TASK_RESOURCE:
-		return &admin.Configuration{TaskResourceAttributes: &admin.TaskResourceAttributes{}}
+		configuration.TaskResourceAttributes = nil
 	case admin.MatchableResource_CLUSTER_RESOURCE:
-		return &admin.Configuration{ClusterResourceAttributes: &admin.ClusterResourceAttributes{}}
+		configuration.ClusterResourceAttributes = nil
 	case admin.MatchableResource_EXECUTION_QUEUE:
-		return &admin.Configuration{ExecutionQueueAttributes: &admin.ExecutionQueueAttributes{}}
+		configuration.ExecutionQueueAttributes = nil
 	case admin.MatchableResource_EXECUTION_CLUSTER_LABEL:
-		return &admin.Configuration{ExecutionClusterLabel: &admin.ExecutionClusterLabel{}}
+		configuration.ExecutionClusterLabel = nil
 	case admin.MatchableResource_QUALITY_OF_SERVICE_SPECIFICATION:
-		return &admin.Configuration{QualityOfService: &core.QualityOfService{}}
+		configuration.QualityOfService = nil
 	case admin.MatchableResource_PLUGIN_OVERRIDE:
-		return &admin.Configuration{PluginOverrides: &admin.PluginOverrides{}}
+		configuration.PluginOverrides = nil
 	case admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG:
-		return &admin.Configuration{WorkflowExecutionConfig: &admin.WorkflowExecutionConfig{}}
+		configuration.WorkflowExecutionConfig = nil
 	case admin.MatchableResource_CLUSTER_ASSIGNMENT:
-		return &admin.Configuration{ClusterAssignment: &admin.ClusterAssignment{}}
-	default:
-		return &admin.Configuration{}
+		configuration.ClusterAssignment = nil
 	}
+	return configuration
 }
 
 func GetMatchingAttributesFromConfiguration(configuration *admin.Configuration, resourceType admin.MatchableResource) (*admin.MatchingAttributes, error) {
@@ -107,37 +103,30 @@ func GetMatchingAttributesFromConfiguration(configuration *admin.Configuration, 
 }
 
 // FromWorkflowAttributesUpdateRequest transform WorkflowAttributesUpdateRequest to ConfigurationUpdateRequest
-func FromWorkflowAttributesUpdateRequest(request *admin.WorkflowAttributesUpdateRequest) *admin.ConfigurationUpdateRequest {
+func FromWorkflowAttributesUpdateRequest(request *admin.WorkflowAttributesUpdateRequest, configuration *admin.Configuration, version string) *admin.ConfigurationUpdateRequest {
+	newConfiguration := updateMatchingAttributesInConfiguration(request.Attributes.MatchingAttributes, configuration)
 	return &admin.ConfigurationUpdateRequest{
 		Id: &admin.ConfigurationID{
 			Project:  request.Attributes.Project,
 			Domain:   request.Attributes.Domain,
 			Workflow: request.Attributes.Workflow,
 		},
-		Configuration: GetConfigurationFromMatchingAttributes(request.Attributes.MatchingAttributes),
+		VersionToUpdate: version,
+		Configuration:   newConfiguration,
 	}
 }
 
 // FromWorkflowAttributesDeleteRequest transform WorkflowAttributesDeleteRequest to ConfigurationUpdateRequest
-func FromWorkflowAttributesDeleteRequest(request *admin.WorkflowAttributesDeleteRequest) *admin.ConfigurationUpdateRequest {
+func FromWorkflowAttributesDeleteRequest(request *admin.WorkflowAttributesDeleteRequest, configuration *admin.Configuration, version string) *admin.ConfigurationUpdateRequest {
+	newConfiguration := deleteMatchableResourceFromConfiguration(request.GetResourceType(), configuration)
 	return &admin.ConfigurationUpdateRequest{
 		Id: &admin.ConfigurationID{
 			Project:  request.Project,
 			Domain:   request.Domain,
 			Workflow: request.Workflow,
 		},
-		Configuration: GetConfigurationFromMatchableResource(request.GetResourceType()),
-	}
-}
-
-// FromWorkflowAttributesGetRequest transform WorkflowAttributesGetRequest to ConfigurationGetRequest
-func FromWorkflowAttributesGetRequest(request *admin.WorkflowAttributesGetRequest) *admin.ConfigurationGetRequest {
-	return &admin.ConfigurationGetRequest{
-		Id: &admin.ConfigurationID{
-			Project:  request.Project,
-			Domain:   request.Domain,
-			Workflow: request.Workflow,
-		},
+		VersionToUpdate: version,
+		Configuration:   newConfiguration,
 	}
 }
 
@@ -157,34 +146,28 @@ func ToWorkflowAttributesGetResponse(configuration *admin.Configuration, request
 }
 
 // FromProjectDomainAttributesUpdateRequest transform ProjectDomainAttributesUpdateRequest to ConfigurationUpdateRequest
-func FromProjectDomainAttributesUpdateRequest(request *admin.ProjectDomainAttributesUpdateRequest) *admin.ConfigurationUpdateRequest {
+func FromProjectDomainAttributesUpdateRequest(request *admin.ProjectDomainAttributesUpdateRequest, configuration *admin.Configuration, version string) *admin.ConfigurationUpdateRequest {
+	newConfiguration := updateMatchingAttributesInConfiguration(request.Attributes.MatchingAttributes, configuration)
 	return &admin.ConfigurationUpdateRequest{
 		Id: &admin.ConfigurationID{
 			Project: request.Attributes.Project,
 			Domain:  request.Attributes.Domain,
 		},
-		Configuration: GetConfigurationFromMatchingAttributes(request.Attributes.MatchingAttributes),
+		VersionToUpdate: version,
+		Configuration:   newConfiguration,
 	}
 }
 
 // FromProjectDomainAttributesDeleteRequest transform ProjectDomainAttributesDeleteRequest to ConfigurationUpdateRequest
-func FromProjectDomainAttributesDeleteRequest(request *admin.ProjectDomainAttributesDeleteRequest) *admin.ConfigurationUpdateRequest {
+func FromProjectDomainAttributesDeleteRequest(request *admin.ProjectDomainAttributesDeleteRequest, configuration *admin.Configuration, version string) *admin.ConfigurationUpdateRequest {
+	newConfiguration := deleteMatchableResourceFromConfiguration(request.GetResourceType(), configuration)
 	return &admin.ConfigurationUpdateRequest{
 		Id: &admin.ConfigurationID{
 			Project: request.Project,
 			Domain:  request.Domain,
 		},
-		Configuration: GetConfigurationFromMatchableResource(request.GetResourceType()),
-	}
-}
-
-// FromProjectDomainAttributesGetRequest transform ProjectDomainAttributesGetRequest to ConfigurationGetRequest
-func FromProjectDomainAttributesGetRequest(request *admin.ProjectDomainAttributesGetRequest) *admin.ConfigurationGetRequest {
-	return &admin.ConfigurationGetRequest{
-		Id: &admin.ConfigurationID{
-			Project: request.Project,
-			Domain:  request.Domain,
-		},
+		VersionToUpdate: version,
+		Configuration:   newConfiguration,
 	}
 }
 
@@ -204,37 +187,32 @@ func ToProjectDomainAttributesGetResponse(configuration *admin.Configuration, re
 }
 
 // FromProjectAttributesUpdateRequest transform ProjectAttributesUpdateRequest to ConfigurationUpdateRequest
-func FromProjectAttributesUpdateRequest(request *admin.ProjectAttributesUpdateRequest) *admin.ConfigurationUpdateRequest {
+func FromProjectAttributesUpdateRequest(request *admin.ProjectAttributesUpdateRequest, configuration *admin.Configuration, version string) *admin.ConfigurationUpdateRequest {
+	newConfiguration := updateMatchingAttributesInConfiguration(request.Attributes.MatchingAttributes, configuration)
 	return &admin.ConfigurationUpdateRequest{
 		Id: &admin.ConfigurationID{
 			Project: request.Attributes.Project,
 		},
-		Configuration: GetConfigurationFromMatchingAttributes(request.Attributes.MatchingAttributes),
+		VersionToUpdate: version,
+		Configuration:   newConfiguration,
 	}
 }
 
 // FromProjectAttributesDeleteRequest transform ProjectAttributesDeleteRequest to ConfigurationUpdateRequest
-func FromProjectAttributesDeleteRequest(request *admin.ProjectAttributesDeleteRequest) *admin.ConfigurationUpdateRequest {
+func FromProjectAttributesDeleteRequest(request *admin.ProjectAttributesDeleteRequest, configuration *admin.Configuration, version string) *admin.ConfigurationUpdateRequest {
+	newConfiguration := deleteMatchableResourceFromConfiguration(request.GetResourceType(), configuration)
 	return &admin.ConfigurationUpdateRequest{
 		Id: &admin.ConfigurationID{
 			Project: request.Project,
 		},
-		Configuration: GetConfigurationFromMatchableResource(request.GetResourceType()),
-	}
-}
-
-// FromProjectAttributesGetRequest transform ProjectAttributesGetRequest to ConfigurationGetRequest
-func FromProjectAttributesGetRequest(request *admin.ProjectAttributesGetRequest) *admin.ConfigurationGetRequest {
-	return &admin.ConfigurationGetRequest{
-		Id: &admin.ConfigurationID{
-			Project: request.Project,
-		},
+		VersionToUpdate: version,
+		Configuration:   newConfiguration,
 	}
 }
 
 // ToProjectAttributesGetResponse transform ConfigurationGetResponse to ProjectAttributesGetResponse
 func ToProjectAttributesGetResponse(configuration *admin.Configuration, request *admin.ProjectAttributesGetRequest) (*admin.ProjectAttributesGetResponse, error) {
-	matchingAttributes, err := GetMatchingAttributesFromConfiguration(configuration, request.GetResourceType()
+	matchingAttributes, err := GetMatchingAttributesFromConfiguration(configuration, request.GetResourceType())
 	if err != nil {
 		return nil, err
 	}

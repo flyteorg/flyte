@@ -33,9 +33,9 @@ var flyteAdminConfig = config.MustRegisterSection(flyteAdmin, &interfaces.Applic
 	MaxParallelism:              25,
 	K8SServiceAccount:           "",
 	UseOffloadedWorkflowClosure: false,
-	ProjectAttributesConfig: interfaces.ProjectAttributesConfig{
-		Mode:   interfaces.ProjectAttributesMode_CONFIGURATION,
-		Source: interfaces.ProjectAttributesSource_CONFIGURATION,
+	ResourceAttributesConfig: interfaces.ResourceAttributesConfig{
+		Mode:   interfaces.ResourceAttributesMode_CONFIGURATION,
+		Source: interfaces.ResourceAttributesSource_CONFIGURATION,
 	},
 })
 

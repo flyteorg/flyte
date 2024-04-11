@@ -338,11 +338,9 @@ type ConfigurationUpdateRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id *ConfigurationID `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	// +optional
-	VersionToUpdate string `protobuf:"bytes,2,opt,name=version_to_update,json=versionToUpdate,proto3" json:"version_to_update,omitempty"`
-	// Everything set at the project-domain level
-	Configuration *Configuration `protobuf:"bytes,3,opt,name=configuration,proto3" json:"configuration,omitempty"`
+	Id              *ConfigurationID `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	VersionToUpdate string           `protobuf:"bytes,2,opt,name=version_to_update,json=versionToUpdate,proto3" json:"version_to_update,omitempty"`
+	Configuration   *Configuration   `protobuf:"bytes,3,opt,name=configuration,proto3" json:"configuration,omitempty"`
 }
 
 func (x *ConfigurationUpdateRequest) Reset() {

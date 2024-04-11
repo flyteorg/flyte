@@ -265,15 +265,11 @@ export class ConfigurationUpdateRequest extends Message<ConfigurationUpdateReque
   id?: configurationID;
 
   /**
-   * +optional
-   *
    * @generated from field: string version_to_update = 2;
    */
   versionToUpdate = "";
 
   /**
-   * Everything set at the project-domain level
-   *
    * @generated from field: flyteidl.admin.Configuration configuration = 3;
    */
   configuration?: Configuration;

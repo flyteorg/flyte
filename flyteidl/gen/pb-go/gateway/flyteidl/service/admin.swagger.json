@@ -4756,12 +4756,10 @@
           "$ref": "#/definitions/adminconfigurationID"
         },
         "version_to_update": {
-          "type": "string",
-          "title": "+optional"
+          "type": "string"
         },
         "configuration": {
-          "$ref": "#/definitions/adminConfiguration",
-          "title": "Everything set at the project-domain level"
+          "$ref": "#/definitions/adminConfiguration"
         }
       }
     },

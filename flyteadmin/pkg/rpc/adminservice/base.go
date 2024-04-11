@@ -3,6 +3,7 @@ package adminservice
 import (
 	"context"
 	"fmt"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/configurations"
 	"runtime/debug"
 
 	"github.com/golang/protobuf/proto"
@@ -161,7 +162,14 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 		adminScope.NewSubScope("node_execution_manager"), urlData, eventPublisher, cloudEventPublisher, nodeExecutionEventWriter)
 	taskExecutionManager := manager.NewTaskExecutionManager(repo, configuration, dataStorageClient,
 		adminScope.NewSubScope("task_execution_manager"), urlData, eventPublisher, cloudEventPublisher)
-	configurationManager := manager.NewConfigurationManager(repo, configuration.ApplicationConfiguration(), dataStorageClient)
+	configurationManager := configurations.NewConfigurationManager(repo, configuration.ApplicationConfiguration(), dataStorageClient)
+
+	var resourceManager interfaces.ResourceInterface
+	if configuration.ApplicationConfiguration().GetTopLevelConfig().ResourceAttributesConfig.Mode == runtimeIfaces.ResourceAttributesMode_CONFIGURATION {
+		resourceManager = resources.NewConfigurationResourceManager(repo, configuration.ApplicationConfiguration(), configurationManager)
+	} else {
+		resourceManager = resources.NewResourceManager(repo, configuration.ApplicationConfiguration())
+	}
 
 	logger.Info(ctx, "Initializing a new AdminService")
 	return &AdminService{
@@ -177,7 +185,7 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 		TaskExecutionManager:     taskExecutionManager,
 		ConfigurationManager:     configurationManager,
 		ProjectManager:           manager.NewProjectManager(repo, configuration),
-		ResourceManager:          resources.NewResourceManager(repo, configuration.ApplicationConfiguration()),
+		ResourceManager:          resourceManager,
 		MetricsManager: manager.NewMetricsManager(workflowManager, executionManager, nodeExecutionManager,
 			taskExecutionManager, adminScope.NewSubScope("metrics_manager")),
 		Metrics: InitMetrics(adminScope),

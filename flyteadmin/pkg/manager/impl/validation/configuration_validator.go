@@ -9,17 +9,27 @@ func ValidateConfigurationGetRequest(request admin.ConfigurationGetRequest) erro
 	if request.Id == nil {
 		return shared.GetMissingArgumentError(shared.ID)
 	}
-	// project is required, domain and workflow are optional
-	return ValidateEmptyStringField(request.Id.Project, shared.Project)
+	if request.Id.Workflow != "" && (request.Id.Project == "" || request.Id.Domain == "") {
+		return shared.GetInvalidArgumentError(shared.ID)
+	}
+	if request.Id.Domain != "" && request.Id.Project == "" {
+		return shared.GetInvalidArgumentError(shared.ID)
+	}
+	return nil
 }
 
 func ValidateConfigurationUpdateRequest(request admin.ConfigurationUpdateRequest) error {
 	if request.Id == nil {
 		return shared.GetMissingArgumentError(shared.ID)
 	}
+	if request.Id.Workflow != "" && (request.Id.Project == "" || request.Id.Domain == "") {
+		return shared.GetInvalidArgumentError(shared.ID)
+	}
+	if request.Id.Domain != "" && request.Id.Project == "" {
+		return shared.GetInvalidArgumentError(shared.ID)
+	}
 	if request.Configuration == nil {
 		return shared.GetMissingArgumentError(shared.Configuration)
 	}
-	// version is optional
-	return nil
+	return ValidateVersion(request.VersionToUpdate)
 }

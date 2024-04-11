@@ -40,7 +40,7 @@ func (m *AdminService) UpdateConfiguration(ctx context.Context, request *admin.C
 	var response *admin.ConfigurationUpdateResponse
 	var err error
 	m.Metrics.configurationEndpointMetrics.update.Time(func() {
-		response, err = m.ConfigurationManager.UpdateConfiguration(ctx, *request, false)
+		response, err = m.ConfigurationManager.UpdateConfiguration(ctx, *request)
 	})
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.configurationEndpointMetrics.update)

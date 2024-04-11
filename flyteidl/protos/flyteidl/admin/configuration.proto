@@ -61,9 +61,8 @@ message ConfigurationGetResponse {
 message ConfigurationUpdateRequest {
   configurationID id = 1;
 
-  //+optional
   string version_to_update = 2;
-  // Everything set at the project-domain level
+
   Configuration configuration = 3;
 }
 

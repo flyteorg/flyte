@@ -1132,10 +1132,8 @@ pub struct ConfigurationGetResponse {
 pub struct ConfigurationUpdateRequest {
     #[prost(message, optional, tag="1")]
     pub id: ::core::option::Option<ConfigurationId>,
-    /// +optional
     #[prost(string, tag="2")]
     pub version_to_update: ::prost::alloc::string::String,
-    /// Everything set at the project-domain level
     #[prost(message, optional, tag="3")]
     pub configuration: ::core::option::Option<Configuration>,
 }

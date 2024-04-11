@@ -52,25 +52,25 @@ type FeatureGates struct {
 	EnableArtifacts bool `json:"enableArtifacts" pflag:",Enable artifacts feature."`
 }
 
-type ProjectAttributesMode int
+type ResourceAttributesMode int
 
 const (
-	ProjectAttributesMode_LEGACY ProjectAttributesMode = iota
-	ProjectAttributesMode_CONFIGURATION
+	ResourceAttributesMode_LEGACY ResourceAttributesMode = iota
+	ResourceAttributesMode_CONFIGURATION
 )
 
-type ProjectAttributesSource int
+type ResourceAttributesSource int
 
 const (
-	ProjectAttributesSource_RESOURCE = iota
-	ProjectAttributesSource_CONFIGURATION
+	ResourceAttributesSource_RESOURCE = iota
+	ResourceAttributesSource_CONFIGURATION
 )
 
-type ProjectAttributesConfig struct {
+type ResourceAttributesConfig struct {
 	// The mode to use for project attributes
-	Mode ProjectAttributesMode
+	Mode ResourceAttributesMode
 	// The source to use for project attributes
-	Source ProjectAttributesSource
+	Source ResourceAttributesSource
 }
 
 // ApplicationConfig is the base configuration to start admin
@@ -125,7 +125,7 @@ type ApplicationConfig struct {
 
 	FeatureGates FeatureGates `json:"featureGates" pflag:",Enable experimental features."`
 
-	ProjectAttributesConfig ProjectAttributesConfig `json:"projectAttributesConfig"`
+	ResourceAttributesConfig ResourceAttributesConfig `json:"projectAttributesConfig"`
 }
 
 func (a *ApplicationConfig) GetRoleNameKey() string {
