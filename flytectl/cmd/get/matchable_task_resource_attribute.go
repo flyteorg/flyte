@@ -2,7 +2,6 @@ package get
 
 import (
 	"context"
-
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flytectl/cmd/config"
 	sconfig "github.com/flyteorg/flytectl/cmd/config/subcommand"
@@ -44,7 +43,7 @@ Example: content of tra.yaml:
 
 ::
 
- flytectl get task-resource-attribute --attrFile tra.yaml
+ flytectl get -p flytesnacks -d development task-resource-attribute --attrFile tra.yaml
 
 
 .. code-block:: yaml
