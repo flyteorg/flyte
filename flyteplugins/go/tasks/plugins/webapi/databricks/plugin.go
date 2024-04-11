@@ -234,10 +234,14 @@ func (p Plugin) sendRequest(method string, databricksJob map[string]interface{},
 		return nil, err
 	}
 	var data map[string]interface{}
-	err = json.Unmarshal(responseBody, &data)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse response with err: [%v]", err)
+
+	if responseBody != nil && len(responseBody) != 0 {
+		err = json.Unmarshal(responseBody, &data)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse response with err: [%v]", err)
+		}
 	}
+
 	if resp.StatusCode != http.StatusOK {
 		message := ""
 		if v, ok := data["message"]; ok {
