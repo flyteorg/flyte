@@ -172,7 +172,7 @@ settings are needed for the cluster.
 For more information on why this task contains these fields check
 ``TaskTemplate`` in `FlyteIDL
 repository <https://github.com/flyteorg/flyteidl/blob/master/protos/flyteidl/core/tasks.proto#L102>`__.
-I strongly advice you to take a look at the data structures in this file
+I strongly advise you to take a look at the data structures in this file
 as they provide good insight in the interfaces used all across Flyte’s
 codebases.
 
