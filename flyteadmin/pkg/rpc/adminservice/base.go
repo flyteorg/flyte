@@ -3,7 +3,6 @@ package adminservice
 import (
 	"context"
 	"fmt"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/configurations"
 	"runtime/debug"
 
 	"github.com/golang/protobuf/proto"
@@ -15,6 +14,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/data"
 	executionCluster "github.com/flyteorg/flyte/flyteadmin/pkg/executioncluster/impl"
 	manager "github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/configurations"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/resources"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories"
@@ -165,7 +165,7 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 	configurationManager := configurations.NewConfigurationManager(repo, configuration, dataStorageClient)
 
 	var resourceManager interfaces.ResourceInterface
-	if configuration.ApplicationConfiguration().GetTopLevelConfig().ResourceAttributesConfig.Mode == runtimeIfaces.ResourceAttributesMode_CONFIGURATION {
+	if configuration.ApplicationConfiguration().GetTopLevelConfig().ResourceAttributesConfig.Mode == runtimeIfaces.ResourceAttributesModeConfiguration {
 		resourceManager = resources.NewConfigurationResourceManager(repo, configuration.ApplicationConfiguration(), configurationManager)
 	} else {
 		resourceManager = resources.NewResourceManager(repo, configuration.ApplicationConfiguration())

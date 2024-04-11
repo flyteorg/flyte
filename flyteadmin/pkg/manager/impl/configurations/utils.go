@@ -2,8 +2,9 @@ package configurations
 
 import (
 	"crypto/rand"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"math/big"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
 func GetGlobalConfigurationFromDocument(document *admin.ConfigurationDocument) *admin.Configuration {

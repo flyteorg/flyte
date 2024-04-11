@@ -2,6 +2,7 @@ package configurations
 
 import (
 	"context"
+
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/validation"
@@ -205,7 +206,7 @@ func NewConfigurationManager(db repositoryInterfaces.Repository, config runtimeI
 			Configurations: make(map[string]*admin.Configuration),
 		}
 		updateConfigurationToDocument(document, collectGlobalConfiguration(config), "", "", "")
-		
+
 		updatedDocumentLocation, err := common.OffloadConfigurationDocument(ctx, configurationManager.storageClient, document, generatedVersion)
 		if err != nil {
 			panic(err)

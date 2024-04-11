@@ -55,15 +55,15 @@ type FeatureGates struct {
 type ResourceAttributesMode int
 
 const (
-	ResourceAttributesMode_LEGACY ResourceAttributesMode = iota
-	ResourceAttributesMode_CONFIGURATION
+	ResourceAttributesModeLegacy ResourceAttributesMode = iota
+	ResourceAttributesModeConfiguration
 )
 
 type ResourceAttributesSource int
 
 const (
-	ResourceAttributesSource_RESOURCE = iota
-	ResourceAttributesSource_CONFIGURATION
+	ResourceAttributesSourceResource = iota
+	ResourceAttributesSourceConfiguration
 )
 
 type ResourceAttributesConfig struct {
