@@ -2,7 +2,7 @@ package v1alpha1
 
 type ArrayNodeSpec struct {
 	SubNodeSpec     *NodeSpec
-	Parallelism     int64
+	Parallelism     *uint32
 	MinSuccesses    *uint32
 	MinSuccessRatio *float32
 }
@@ -11,7 +11,7 @@ func (a *ArrayNodeSpec) GetSubNodeSpec() *NodeSpec {
 	return a.SubNodeSpec
 }
 
-func (a *ArrayNodeSpec) GetParallelism() int64 {
+func (a *ArrayNodeSpec) GetParallelism() *uint32 {
 	return a.Parallelism
 }
 
