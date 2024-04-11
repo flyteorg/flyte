@@ -56,3 +56,8 @@ data:
   agent_service.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}
 {{- end }}
+{{- if .Values.configmap.plugins_yaml_enabled }}
+{{- /* Intentionally not using with .Values.configmap.plugins since
+       we want to be able to render empty plugins.yaml */}}
+  plugins.yaml: | {{ tpl (toYaml .Values.configmap.plugins) $ | nindent 4 }}
+{{- end }}

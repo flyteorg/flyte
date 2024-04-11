@@ -836,6 +836,12 @@ configmap:
         # -- One option is to enable cloudwatch logging for EKS, update the region and log group accordingly
         cloudwatch-enabled: false
 
+  # Hack to force overwriting of plugins.yaml if true
+  # -- Control the contents of plugins.yaml if true
+  plugins_yaml_enabled: false
+  # -- General plugins config. You should prefer other config files if possible.
+  plugins: {}
+
 # ----------------------------------------------------------------
 # Optional Modules
 # Flyte built extensions that enable various additional features in Flyte.
