@@ -82,7 +82,7 @@ def multi_wf(l: typing.List[int], chunk: int) -> typing.List[int]:
     return level1(l=l, chunk=chunk)
 ```
 
-Overrides let you add additional arguments to the launchplan you are looping over in the dynamic. Here we add caching:
+Overrides let you add additional arguments to the launch plan you are looping over in the dynamic. Here we add caching:
 
 ```python
 @workflow
