@@ -432,6 +432,8 @@ data:
         disabled: false
         seedProjects:
         - flytesnacks
+      cacheservice:
+        disabled: false
       dataCatalog:
         disabled: false
       propeller:
@@ -796,7 +798,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: cnEwdENTUm90bnRoUnhzRQ==
+  haSharedSecret: dW9OYmZCdXBEeEpPa1BwSw==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1194,7 +1196,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: 6fd9b172465e3089fcc59f738b92b8dc4d8939360c19de8ee65f68b0e7422035
-        checksum/configuration: b032d29b66f3f7a0bf2d60c66deead17d7f5c990743ada4ac02679f8416f48d5
+        checksum/configuration: df18e2879e3e5c8c81a1328c0fdb264998e2e3afe18ab2055060cb44336c7ecd
         checksum/configuration-secret: 09216ffaa3d29e14f88b1f30af580d02a2a5e014de4d750b7f275cc07ed4e914
       labels:
         app.kubernetes.io/component: flyte-binary
@@ -1360,7 +1362,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 623b2f28f1a032701661182d8abe2689d92cfb9cc1a0f914a0c5795a2e36b26a
+        checksum/secret: 233ca5ac597039840a63c63e8a6c14ccd5692f18db0bfbf42967c983a2c85a5a
       labels:
         app: docker-registry
         release: flyte-sandbox
