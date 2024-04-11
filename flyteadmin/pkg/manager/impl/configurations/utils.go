@@ -7,19 +7,19 @@ import (
 )
 
 func GetGlobalConfigurationFromDocument(document *admin.ConfigurationDocument) *admin.Configuration {
-	return getConfigurationFromDocument(document, "", "", "", "")
+	return getConfigurationFromDocument(document, "", "", "")
 }
 
 func GetProjectConfigurationFromDocument(document *admin.ConfigurationDocument, project string) *admin.Configuration {
-	return getConfigurationFromDocument(document, project, "", "", "")
+	return getConfigurationFromDocument(document, project, "", "")
 }
 
 func GetProjectDomainConfigurationFromDocument(document *admin.ConfigurationDocument, project, domain string) *admin.Configuration {
-	return getConfigurationFromDocument(document, project, domain, "", "")
+	return getConfigurationFromDocument(document, project, domain, "")
 }
 
 func GetWorkflowConfigurationFromDocument(document *admin.ConfigurationDocument, project, domain, workflow string) *admin.Configuration {
-	return getConfigurationFromDocument(document, project, domain, workflow, "")
+	return getConfigurationFromDocument(document, project, domain, workflow)
 }
 
 // TODO: Check if this function is implemented already
@@ -38,8 +38,8 @@ func GenerateRandomString(length int) (string, error) {
 }
 
 // This function is used to get the attributes of a document based on the project, and domain.
-func getConfigurationFromDocument(document *admin.ConfigurationDocument, project, domain, workflow, launchPlan string) *admin.Configuration {
-	documentKey := encodeDocumentKey(project, domain, workflow, launchPlan)
+func getConfigurationFromDocument(document *admin.ConfigurationDocument, project, domain, workflow string) *admin.Configuration {
+	documentKey := encodeDocumentKey(project, domain, workflow)
 	if _, ok := document.Configurations[documentKey]; !ok {
 		document.Configurations[documentKey] = &admin.Configuration{}
 	}
@@ -47,13 +47,13 @@ func getConfigurationFromDocument(document *admin.ConfigurationDocument, project
 }
 
 // This function is used to update the attributes of a document based on the project, and domain.
-func updateConfigurationToDocument(document *admin.ConfigurationDocument, project, domain, workflow, launchPlan string, attributes *admin.Configuration) {
-	documentKey := encodeDocumentKey(project, domain, workflow, launchPlan)
-	document.Configurations[documentKey] = attributes
+func updateConfigurationToDocument(document *admin.ConfigurationDocument, configuration *admin.Configuration, project, domain, workflow string) {
+	documentKey := encodeDocumentKey(project, domain, workflow)
+	document.Configurations[documentKey] = configuration
 }
 
 // This function is used to encode the document key based on the org, project, domain, workflow, and launch plan.
-func encodeDocumentKey(project, domain, workflow, launchPlan string) string {
+func encodeDocumentKey(project, domain, workflow string) string {
 	// TODO: This is a temporary solution to encode the document key. We need to come up with a better solution.
-	return project + "/" + domain + "/" + workflow + "/" + launchPlan
+	return project + "/" + domain + "/" + workflow
 }

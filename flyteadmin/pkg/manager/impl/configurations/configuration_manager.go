@@ -3,6 +3,7 @@ package configurations
 import (
 	"context"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/validation"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
 	repositoryInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
@@ -14,7 +15,7 @@ import (
 
 type ConfigurationManager struct {
 	db            repositoryInterfaces.Repository
-	config        runtimeInterfaces.ApplicationConfiguration
+	config        runtimeInterfaces.Configuration
 	storageClient *storage.DataStore
 	cache         *admin.ConfigurationDocument
 }
@@ -98,7 +99,7 @@ func (m *ConfigurationManager) UpdateConfiguration(
 	}
 
 	// Update the document with the new attributes
-	updateConfigurationToDocument(document, request.Id.Project, request.Id.Domain, request.Id.Workflow, "", request.Configuration)
+	updateConfigurationToDocument(document, request.Configuration, request.Id.Project, request.Id.Domain, request.Id.Workflow)
 
 	// Generate a new version for the document
 	generatedVersion, err := GenerateRandomString(10)
@@ -123,8 +124,8 @@ func (m *ConfigurationManager) UpdateConfiguration(
 
 	// Erase the active override attributes and create the new one
 	input := &repositoryInterfaces.UpdateConfigurationInput{
-		VersionToUpdate:  request.VersionToUpdate,
-		NewConfiguration: &newDocument,
+		VersionToUpdate:          request.VersionToUpdate,
+		NewConfigurationDocument: &newDocument,
 	}
 	if err := m.db.ConfigurationDocumentRepo().Update(ctx, input); err != nil {
 		return nil, err
@@ -132,11 +133,103 @@ func (m *ConfigurationManager) UpdateConfiguration(
 	return &admin.ConfigurationUpdateResponse{}, nil
 }
 
-func NewConfigurationManager(db repositoryInterfaces.Repository, config runtimeInterfaces.ApplicationConfiguration, storageClient *storage.DataStore) interfaces.ConfigurationInterface {
-	return &ConfigurationManager{
+func collectGlobalConfiguration(config runtimeInterfaces.Configuration) *admin.Configuration {
+	// Task resource attributes
+	taskResourceAttributesConfig := config.TaskResourceConfiguration()
+	defaultCPU := taskResourceAttributesConfig.GetDefaults().CPU
+	defaultGPU := taskResourceAttributesConfig.GetDefaults().GPU
+	defaultMemory := taskResourceAttributesConfig.GetDefaults().Memory
+	defaultEphemeralStorage := taskResourceAttributesConfig.GetDefaults().EphemeralStorage
+	limitCPU := taskResourceAttributesConfig.GetLimits().CPU
+	limitGPU := taskResourceAttributesConfig.GetLimits().GPU
+	limitMemory := taskResourceAttributesConfig.GetLimits().Memory
+	limitEphemeralStorage := taskResourceAttributesConfig.GetLimits().EphemeralStorage
+	taskResourceAttributes := admin.TaskResourceAttributes{
+		Defaults: &admin.TaskResourceSpec{
+			Cpu:              defaultCPU.String(),
+			Gpu:              defaultGPU.String(),
+			Memory:           defaultMemory.String(),
+			EphemeralStorage: defaultEphemeralStorage.String(),
+		},
+		Limits: &admin.TaskResourceSpec{
+			Cpu:              limitCPU.String(),
+			Gpu:              limitGPU.String(),
+			Memory:           limitMemory.String(),
+			EphemeralStorage: limitEphemeralStorage.String(),
+		},
+	}
+
+	// Workflow execution configuration
+	topLevelConfig := config.ApplicationConfiguration().GetTopLevelConfig()
+	workflowExecutionConfig := admin.WorkflowExecutionConfig{
+		MaxParallelism:      topLevelConfig.GetMaxParallelism(),
+		SecurityContext:     topLevelConfig.GetSecurityContext(),
+		RawOutputDataConfig: topLevelConfig.GetRawOutputDataConfig(),
+		Labels:              topLevelConfig.GetLabels(),
+		Annotations:         topLevelConfig.GetAnnotations(),
+		Interruptible:       topLevelConfig.GetInterruptible(),
+		OverwriteCache:      topLevelConfig.GetOverwriteCache(),
+		Envs:                topLevelConfig.GetEnvs(),
+	}
+	executionClusterLabel := admin.ExecutionClusterLabel{
+		Value: config.ClusterConfiguration().GetDefaultExecutionLabel(),
+	}
+	return &admin.Configuration{
+		TaskResourceAttributes:    &taskResourceAttributes,
+		ClusterResourceAttributes: nil,
+		ExecutionQueueAttributes:  nil,
+		ExecutionClusterLabel:     &executionClusterLabel,
+		QualityOfService:          nil,
+		PluginOverrides:           nil,
+		WorkflowExecutionConfig:   &workflowExecutionConfig,
+		ClusterAssignment:         nil,
+	}
+}
+
+func NewConfigurationManager(db repositoryInterfaces.Repository, config runtimeInterfaces.Configuration, storageClient *storage.DataStore) interfaces.ConfigurationInterface {
+	configurationManager := &ConfigurationManager{
 		db:            db,
 		config:        config,
 		storageClient: storageClient,
 		cache:         nil,
 	}
+	ctx := context.Background()
+	activeDocument, err := configurationManager.GetActiveDocument(ctx)
+	if err != nil && errors.IsDoesNotExistError(err) {
+		generatedVersion, err := GenerateRandomString(10)
+		if err != nil {
+			panic(err)
+		}
+		document := &admin.ConfigurationDocument{
+			Version:        generatedVersion,
+			Configurations: make(map[string]*admin.Configuration),
+		}
+		updateConfigurationToDocument(document, collectGlobalConfiguration(config), "", "", "")
+		
+		updatedDocumentLocation, err := common.OffloadConfigurationDocument(ctx, configurationManager.storageClient, document, generatedVersion)
+		if err != nil {
+			panic(err)
+		}
+		err = configurationManager.db.ConfigurationDocumentRepo().Create(ctx, &models.ConfigurationDocument{
+			Version:          generatedVersion,
+			Active:           true,
+			DocumentLocation: updatedDocumentLocation,
+		})
+		if err != nil {
+			panic(err)
+		}
+		return configurationManager
+	}
+	if err != nil {
+		panic(err)
+	}
+	_, err = configurationManager.UpdateConfiguration(ctx, admin.ConfigurationUpdateRequest{
+		Id:              &admin.ConfigurationID{},
+		VersionToUpdate: activeDocument.GetVersion(),
+		Configuration:   collectGlobalConfiguration(config),
+	})
+	if err != nil {
+		panic(err)
+	}
+	return configurationManager
 }

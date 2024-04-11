@@ -162,7 +162,7 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 		adminScope.NewSubScope("node_execution_manager"), urlData, eventPublisher, cloudEventPublisher, nodeExecutionEventWriter)
 	taskExecutionManager := manager.NewTaskExecutionManager(repo, configuration, dataStorageClient,
 		adminScope.NewSubScope("task_execution_manager"), urlData, eventPublisher, cloudEventPublisher)
-	configurationManager := configurations.NewConfigurationManager(repo, configuration.ApplicationConfiguration(), dataStorageClient)
+	configurationManager := configurations.NewConfigurationManager(repo, configuration, dataStorageClient)
 
 	var resourceManager interfaces.ResourceInterface
 	if configuration.ApplicationConfiguration().GetTopLevelConfig().ResourceAttributesConfig.Mode == runtimeIfaces.ResourceAttributesMode_CONFIGURATION {

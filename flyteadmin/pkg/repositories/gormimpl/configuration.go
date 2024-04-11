@@ -34,20 +34,31 @@ func (r *ConfigurationDocumentRepo) GetActive(ctx context.Context) (models.Confi
 	return configuration, nil
 }
 
+func (r *ConfigurationDocumentRepo) Create(ctx context.Context, input *models.ConfigurationDocument) error {
+	timer := r.metrics.CreateDuration.Start()
+	err := r.db.Create(input).Error
+	timer.Stop()
+	if err != nil {
+		return r.errorTransformer.ToFlyteAdminError(err)
+	}
+	return nil
+}
+
 func (r *ConfigurationDocumentRepo) Update(ctx context.Context, input *interfaces.UpdateConfigurationInput) error {
 	timer := r.metrics.CreateDuration.Start()
 	err := r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		// Check if the active override attributes are outdated
+		// Check if the active configuration document is outdated
 		var configuration models.ConfigurationDocument
 		err := tx.Where(&models.ConfigurationDocument{
 			Active:  true,
 			Version: input.VersionToUpdate,
 		}).First(&configuration).Error
+
 		if err != nil {
 			return err
 		}
 
-		// Erase the active override attributes
+		// Erase the active configuration document
 		err = tx.Model(&models.ConfigurationDocument{}).Where(&models.ConfigurationDocument{
 			Active:  true,
 			Version: input.VersionToUpdate,
@@ -56,8 +67,8 @@ func (r *ConfigurationDocumentRepo) Update(ctx context.Context, input *interface
 			return err
 		}
 
-		// Create the new override attributes
-		err = tx.Create(input.NewConfiguration).Error
+		// Create the new configuration document
+		err = tx.Create(input.NewConfigurationDocument).Error
 		if err != nil {
 			return err
 		}

@@ -34,8 +34,8 @@ var flyteAdminConfig = config.MustRegisterSection(flyteAdmin, &interfaces.Applic
 	K8SServiceAccount:           "",
 	UseOffloadedWorkflowClosure: false,
 	ResourceAttributesConfig: interfaces.ResourceAttributesConfig{
-		Mode:   interfaces.ResourceAttributesMode_CONFIGURATION,
-		Source: interfaces.ResourceAttributesSource_CONFIGURATION,
+		Mode:   interfaces.ResourceAttributesMode_LEGACY,
+		Source: interfaces.ResourceAttributesSource_RESOURCE,
 	},
 })
 
