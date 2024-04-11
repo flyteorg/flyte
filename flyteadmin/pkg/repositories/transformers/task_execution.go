@@ -468,7 +468,7 @@ func UpdateTaskExecutionModel(ctx context.Context, request *admin.TaskExecutionE
 	}
 	taskExecutionClosure.Metadata = mergeMetadata(taskExecutionClosure.Metadata, request.Event.Metadata)
 
-	if isPhaseChange {
+	if isPhaseChange && taskExecutionClosure.Metadata != nil && len(taskExecutionClosure.Metadata.ExternalResources) > 0 {
 		filterExternalResourceLogsByPhase(taskExecutionClosure.Metadata.ExternalResources, request.Event.Phase)
 	}
 
