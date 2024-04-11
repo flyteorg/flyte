@@ -263,9 +263,15 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 	taskInfo := createTaskInfo(exec.RunID, jobID, exec.DatabricksInstance)
 	switch lifeCycleState {
 	// Job response format. https://docs.databricks.com/en/workflows/jobs/jobs-2.0-api.html#runlifecyclestate
+	case "QUEUED":
+		return core.PhaseInfoQueued(time.Now(), core.DefaultPhaseVersion, message), nil
 	case "PENDING":
 		return core.PhaseInfoInitializing(time.Now(), core.DefaultPhaseVersion, message, taskInfo), nil
 	case "RUNNING":
+		fallthrough
+	case "BLOCKED":
+		fallthrough
+	case "WAITING_FOR_RETRY":
 		fallthrough
 	case "TERMINATING":
 		return core.PhaseInfoRunning(core.DefaultPhaseVersion, taskInfo), nil
