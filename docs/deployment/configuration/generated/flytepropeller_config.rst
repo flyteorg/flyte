@@ -4553,7 +4553,7 @@ config.Config (resourcemanager)
 type (string)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-Which resource manager to use
+Which resource manager to use, redis or noop. Default is noop.
 
 **Default Value**: 
 
