@@ -1,8 +1,8 @@
 # ---------------------------------------------------------------------
 # Core System settings
 # This section consists of Core components of Flyte and their deployment
-# settings. This includes FlyteAdmin service, Datacatalog, FlytePropeller and
-# Flyteconsole
+# settings. This includes FlyteAdmin service, Datacatalog, FlytePropeller,
+## Flyteconsole, and CacheService
 # ---------------------------------------------------------------------
 
 #
@@ -188,6 +188,60 @@ datacatalog:
   extraArgs: {}
   # -- Sets priorityClassName for datacatalog pod(s).
   priorityClassName: ""
+
+#
+# CACHESERVICE SETTINGS
+#
+
+cacheservice:
+  enabled: true
+  # -- Replicas count for Cacheservice deployment
+  replicaCount: 1
+  image:
+    # -- Docker image for Cacheservice deployment
+    repository: cr.flyte.org/flyteorg/cacheservice # CACHESERVICE_IMAGE
+    # -- Docker image tag
+    tag: v1.0.1 # CACHESERVICE_TAG
+    # -- Docker image pull policy
+    pullPolicy: IfNotPresent
+  # -- Default resources requests and limits for Cacheservice deployment
+  resources:
+    limits:
+      cpu: 500m
+      ephemeral-storage: 100Mi
+      memory: 500Mi
+    requests:
+      cpu: 10m
+      ephemeral-storage: 50Mi
+      memory: 50Mi
+  # -- Default regex string for searching configuration files
+  configPath: /etc/cacheservice/config/*.yaml
+  # -- Service settings for Cacheservice
+  service:
+    annotations:
+      projectcontour.io/upstream-protocol.h2c: grpc
+    type: NodePort
+  # -- Configuration for service accounts for Cacheservice
+  serviceAccount:
+    # -- Should a service account be created for Cacheservice
+    create: true
+    # -- Annotations for ServiceAccount attached to Cacheservice pods
+    annotations: {}
+    # -- ImagePullSecrets to automatically assign to the service account
+    imagePullSecrets: []
+  # -- Annotations for Cacheservice pods
+  podAnnotations: {}
+  # -- nodeSelector for Cacheservice deployment
+  nodeSelector: {}
+  # -- tolerations for Cacheservice deployment
+  tolerations: []
+  # -- affinity for Cacheservice deployment
+  affinity: {}
+  # -- Appends extra command line arguments to the main command
+  extraArgs: {}
+  # -- Sets priorityClassName for cacheservice pod(s).
+  priorityClassName: ""
+
 
 #
 # FLYTEPROPELLER SETTINGS
@@ -567,6 +621,20 @@ configmap:
       grpcPort: 8089
       httpPort: 8080
       grpcServerReflection: true
+
+  # -- Cacheservice server config
+  cacheserviceServer:
+    cacheservice:
+      storage-prefix: cached_outputs
+      metrics-scope: cacheservice
+      profiler-port: 10254
+      heartbeat-grace-period-multiplier: 3
+      max-reservation-heartbeat: 30s
+    cache-server:
+      grpcPort: 8091
+      httpPort: 8090
+      grpcServerReflection: true
+
 
   # -- Task default resources configuration
   # Refer to the full [structure](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/runtime/interfaces#TaskResourceConfiguration).

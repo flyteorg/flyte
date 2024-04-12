@@ -13,6 +13,9 @@ workflow_scheduler:
 flytescheduler:
   enabled: false
 
+cacheservice:
+  enabled: false
+
 datacatalog:
   enabled: false
 

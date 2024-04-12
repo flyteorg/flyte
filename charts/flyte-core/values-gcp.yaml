@@ -78,6 +78,41 @@ datacatalog:
           topologyKey: kubernetes.io/hostname
 
 #
+# CACHESERVICE
+#
+
+cacheservice:
+  replicaCount: 1
+  serviceAccount:
+    # -- If the service account is created by you, make this false, else a new service account will be created and the iam-role-flyte will be added
+    # you can change the name of this role
+    create: true
+    annotations:
+      # Needed for gcp workload identity to function
+      # https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
+      iam.gke.io/gcp-service-account: gsa-cacheservice@{{ .Values.userSettings.googleProjectId }}.iam.gserviceaccount.com
+  resources:
+    limits:
+      cpu: 500m
+      ephemeral-storage: 2Gi
+    requests:
+      cpu: 50m
+      ephemeral-storage: 2Gi
+      memory: 200Mi
+  service:
+    annotations:
+      # Required for the ingress to properly route grpc traffic to grpc port
+      cloud.google.com/app-protocols: '{"grpc":"HTTP2"}'
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: cacheservice
+          topologyKey: kubernetes.io/hostname
+
+
+#
 # FLYTEPROPELLER
 #
 

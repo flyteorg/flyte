@@ -30,6 +30,9 @@ flyte-core-components:
   dataCatalog:
     # disabled Disables datacatalog
     disabled: false
+  cacheservice:
+    # disabled Disables cacheservice
+    disabled: false
 
 # configuration Specify configuration for Flyte
 configuration:

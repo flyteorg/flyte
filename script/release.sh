@@ -7,6 +7,7 @@ FLYTECONSOLE_TAG=$(curl --silent "https://api.github.com/repos/flyteorg/flytecon
 
 # bump latest release of flyte component in kustomize
 grep -rlZ "newTag:[^P]*# FLYTEADMIN_TAG" ./kustomize/overlays | xargs -I {} sed -i "s/newTag:[^P]*# FLYTEADMIN_TAG/newTag: ${VERSION} # FLYTEADMIN_TAG/g" {}
+grep -rlZ "newTag:[^P]*# CACHESERVICE_TAG" ./kustomize/overlays | xargs -I {} sed -i "s/newTag:[^P]*# CACHESERVICE_TAG/newTag: ${VERSION} # CACHESERVICE_TAG/g" {}
 grep -rlZ "newTag:[^P]*# DATACATALOG_TAG" ./kustomize/overlays | xargs -I {} sed -i "s/newTag:[^P]*# DATACATALOG_TAG/newTag: ${VERSION} # DATACATALOG_TAG/g" {}
 grep -rlZ "newTag:[^P]*# FLYTECONSOLE_TAG" ./kustomize/overlays | xargs -I {} sed -i "s/newTag:[^P]*# FLYTECONSOLE_TAG/newTag: ${FLYTECONSOLE_TAG} # FLYTECONSOLE_TAG/g" {}
 grep -rlZ "newTag:[^P]*# FLYTEPROPELLER_TAG" ./kustomize/overlays | xargs -I {} sed -i "s/newTag:[^P]*# FLYTEPROPELLER_TAG/newTag: ${VERSION} # FLYTEPROPELLER_TAG/g" {}
@@ -17,6 +18,9 @@ sed -i "s,tag:[^P]*# FLYTEADMIN_TAG,tag: ${VERSION} # FLYTEADMIN_TAG," ./charts/
 
 sed -i "s,tag:[^P]*# FLYTESCHEDULER_TAG,tag: ${VERSION} # FLYTESCHEDULER_TAG," ./charts/flyte/values.yaml
 sed -i "s,tag:[^P]*# FLYTESCHEDULER_TAG,tag: ${VERSION} # FLYTESCHEDULER_TAG," ./charts/flyte-core/values.yaml
+
+sed -i "s,tag:[^P]*# CACHESERVICE_TAG,tag: ${VERSION} # CACHESERVICE_TAG," ./charts/flyte/values.yaml
+sed -i "s,tag:[^P]*# CACHESERVICE_TAG,tag: ${VERSION} # CACHESERVICE_TAG," ./charts/flyte-core/values.yaml
 
 sed -i "s,tag:[^P]*# DATACATALOG_TAG,tag: ${VERSION} # DATACATALOG_TAG," ./charts/flyte/values.yaml
 sed -i "s,tag:[^P]*# DATACATALOG_TAG,tag: ${VERSION} # DATACATALOG_TAG," ./charts/flyte-core/values.yaml

@@ -47,5 +47,6 @@ $GOBIN/$COMMAND config docs >> "${OUTPUT_PATH}"
 
 output_config "Admin" flyteadmin flyteadmin
 output_config "Propeller" flytepropeller flytepropeller
+output_config "Cacheservice" flytecacheservice cacheservice
 output_config "Datacatalog" flytedatacatalog datacatalog
 output_config "Scheduler" flytescheduler scheduler

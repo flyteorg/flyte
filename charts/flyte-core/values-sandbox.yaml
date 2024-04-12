@@ -14,6 +14,12 @@ datacatalog:
       projectcontour.io/upstream-protocol.h2c: grpc
     type: NodePort
 
+cacheservice:
+  service:
+    annotations:
+      projectcontour.io/upstream-protocol.h2c: grpc
+    type: NodePort
+
 flyteconsole:
   ga:
     enabled: true

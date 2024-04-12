@@ -118,6 +118,7 @@ Chart for basic single Flyte executable deployment
 | flyte-core-components.admin.disableScheduler | bool | `false` |  |
 | flyte-core-components.admin.disabled | bool | `false` |  |
 | flyte-core-components.admin.seedProjects[0] | string | `"flytesnacks"` |  |
+| flyte-core-components.cacheservice.disabled | bool | `false` |  |
 | flyte-core-components.dataCatalog.disabled | bool | `false` |  |
 | flyte-core-components.propeller.disableWebhook | bool | `false` |  |
 | flyte-core-components.propeller.disabled | bool | `false` |  |

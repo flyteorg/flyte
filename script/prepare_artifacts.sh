@@ -40,6 +40,11 @@ sed -i "s,tag:[^P]*# FLYTESCHEDULER_TAG,tag: ${VERSION} # FLYTESCHEDULER_TAG," .
 sed -i "s,repository:[^P]*# FLYTESCHEDULER_IMAGE,repository: cr.flyte.org/flyteorg/flytescheduler-release # FLYTESCHEDULER_IMAGE," ./charts/flyte/values.yaml
 sed -i "s,repository:[^P]*# FLYTESCHEDULER_IMAGE,repository: cr.flyte.org/flyteorg/flytescheduler-release # FLYTESCHEDULER_IMAGE," ./charts/flyte-core/values.yaml
 
+sed -i "s,tag:[^P]*# CACHESERVICE_TAG,tag: ${VERSION} # CACHESERVICE_TAG," ./charts/flyte/values.yaml
+sed -i "s,tag:[^P]*# CACHESERVICE_TAG,tag: ${VERSION} # CACHESERVICE_TAG," ./charts/flyte-core/values.yaml
+sed -i "s,repository:[^P]*# CACHESERVICE_IMAGE,repository: cr.flyte.org/flyteorg/cacheservice-release # CACHESERVICE_IMAGE," ./charts/flyte/values.yaml
+sed -i "s,repository:[^P]*# CACHESERVICE_IMAGE,repository: cr.flyte.org/flyteorg/cacheservice-release # CACHESERVICE_IMAGE," ./charts/flyte-core/values.yaml
+
 sed -i "s,tag:[^P]*# DATACATALOG_TAG,tag: ${VERSION} # DATACATALOG_TAG," ./charts/flyte/values.yaml
 sed -i "s,tag:[^P]*# DATACATALOG_TAG,tag: ${VERSION} # DATACATALOG_TAG," ./charts/flyte-core/values.yaml
 sed -i "s,repository:[^P]*# DATACATALOG_IMAGE,repository: cr.flyte.org/flyteorg/datacatalog-release # DATACATALOG_IMAGE," ./charts/flyte/values.yaml

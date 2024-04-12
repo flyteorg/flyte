@@ -13,6 +13,20 @@ metadata:
   annotations: 
     iam.gke.io/gcp-service-account: gsa-flyteadmin@<PROJECT-ID>.iam.gserviceaccount.com
 ---
+# Source: flyte-core/templates/cacheservice/rbac.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cacheservice
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: cacheservice
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-core-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+  annotations: 
+    iam.gke.io/gcp-service-account: gsa-cacheservice@<PROJECT-ID>.iam.gserviceaccount.com
+---
 # Source: flyte-core/templates/datacatalog/rbac.yaml
 apiVersion: v1
 kind: ServiceAccount
@@ -215,6 +229,46 @@ data:
       refreshInterval: 5m
       standaloneDeployment: false
       templatePath: /etc/flyte/clusterresource/templates
+---
+# Source: flyte-core/templates/cacheservice/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cacheservice-config
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: cacheservice
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-core-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+data:
+  server.yaml: | 
+    cache-server:
+      grpcPort: 8089
+      grpcServerReflection: true
+      httpPort: 8080
+    cacheservice:
+      heartbeat-grace-period-multiplier: 3
+      max-reservation-heartbeat: 30s
+      metrics-scope: cacheservice
+      profiler-port: 10254
+      storage-prefix: cached_outputs
+  storage.yaml: | 
+    storage:
+      type: stow
+      stow:
+        kind: google
+        config:
+          json: ""
+          project_id: <PROJECT-ID>
+          scopes: https://www.googleapis.com/auth/cloud-platform
+      container: "<BUCKETNAME>"
+      enable-multicontainer: false
+      limits:
+        maxDownloadMBs: 10
+      cache:
+        max_size_mbs: 0
+        target_gc_percent: 70
 ---
 # Source: flyte-core/templates/clusterresourcesync/cluster_resource_configmap.yaml
 apiVersion: v1
@@ -503,6 +557,35 @@ spec:
     app.kubernetes.io/name: flyteadmin
     app.kubernetes.io/instance: flyte
 ---
+# Source: flyte-core/templates/cacheservice/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: cacheservice
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: cacheservice
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-core-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+  annotations: 
+    cloud.google.com/app-protocols: '{"grpc":"HTTP2"}'
+    projectcontour.io/upstream-protocol.h2c: grpc
+spec:
+  type: NodePort
+  ports:
+  - name: http
+    port: 88
+    protocol: TCP
+    targetPort: 8088
+  - name: grpc
+    port: 89
+    protocol: TCP
+    targetPort: 8089
+  selector: 
+    app.kubernetes.io/name: cacheservice
+    app.kubernetes.io/instance: flyte
+---
 # Source: flyte-core/templates/console/service.yaml
 apiVersion: v1
 kind: Service
@@ -747,6 +830,108 @@ spec:
           - labelSelector:
               matchLabels:
                 app.kubernetes.io/name: flyteadmin
+            topologyKey: kubernetes.io/hostname
+---
+# Source: flyte-core/templates/cacheservice/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cacheservice
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: cacheservice
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-core-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels: 
+      app.kubernetes.io/name: cacheservice
+      app.kubernetes.io/instance: flyte
+  template:
+    metadata:
+      annotations:
+        configChecksum: "fb916fdef64346df3bb6ed2d5ecf0d2da67b32b4d80c83fcb15eecb5c66a113"
+      labels: 
+        app.kubernetes.io/name: cacheservice
+        app.kubernetes.io/instance: flyte
+        helm.sh/chart: flyte-core-v0.1.10
+        app.kubernetes.io/managed-by: Helm
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        fsGroup: 1001
+        runAsUser: 1001
+        fsGroupChangePolicy: "OnRootMismatch"
+        seLinuxOptions:
+          type: spc_t
+      initContainers:
+      - command:
+        - cacheservice
+        - --config
+        - /etc/cacheservice/config/*.yaml
+        - migrate
+        - run
+        image: "cr.flyte.org/flyteorg/cacheservice:v1.10.7"
+        imagePullPolicy: "IfNotPresent"
+        name: run-migrations
+        volumeMounts:
+        - mountPath: /etc/db
+          name: db-pass
+        - mountPath: /etc/cacheservice/config
+          name: config-volume
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+      containers:
+      - command:
+        - cacheservice
+        - --config
+        - /etc/cacheservice/config/*.yaml
+        - serve
+        image: "cr.flyte.org/flyteorg/cacheservice:v1.10.7"
+        imagePullPolicy: "IfNotPresent"
+        name: cacheservice
+        ports:
+        - containerPort: 8088
+        - containerPort: 8089
+        - containerPort: 10254
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+        resources:
+          limits:
+            cpu: 500m
+            ephemeral-storage: 2Gi
+            memory: 500Mi
+          requests:
+            cpu: 50m
+            ephemeral-storage: 2Gi
+            memory: 200Mi
+        volumeMounts:
+        - mountPath: /etc/db
+          name: db-pass
+        - mountPath: /etc/cacheservice/config
+          name: config-volume
+      serviceAccountName: cacheservice
+      volumes:
+      - name: db-pass
+        secret:
+          secretName: db-pass
+      - emptyDir: {}
+        name: shared-data
+      - configMap:
+          name: cacheservice-config
+        name: config-volume
+      affinity: 
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchLabels:
+                app.kubernetes.io/name: cacheservice
             topologyKey: kubernetes.io/hostname
 ---
 # Source: flyte-core/templates/clusterresourcesync/deployment.yaml

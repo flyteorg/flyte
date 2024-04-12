@@ -55,6 +55,29 @@ helm install gateway bitnami/contour -n flyte
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| cacheservice.additionalContainers | list | `[]` | Appends additional containers to the deployment spec. May include template values. |
+| cacheservice.additionalVolumeMounts | list | `[]` | Appends additional volume mounts to the main container's spec. May include template values. |
+| cacheservice.additionalVolumes | list | `[]` | Appends additional volumes to the deployment spec. May include template values. |
+| cacheservice.affinity | object | `{}` | affinity for Cacheservice deployment |
+| cacheservice.configPath | string | `"/etc/cacheservice/config/*.yaml"` | Default regex string for searching configuration files |
+| cacheservice.enabled | bool | `true` |  |
+| cacheservice.extraArgs | object | `{}` | Appends extra command line arguments to the main command |
+| cacheservice.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
+| cacheservice.image.repository | string | `"cr.flyte.org/flyteorg/cacheservice"` | Docker image for Cacheservice deployment |
+| cacheservice.image.tag | string | `"v1.10.7"` | Docker image tag |
+| cacheservice.nodeSelector | object | `{}` | nodeSelector for Cacheservice deployment |
+| cacheservice.podAnnotations | object | `{}` | Annotations for Cacheservice pods |
+| cacheservice.podEnv | object | `{}` | Additional Cacheservice container environment variables |
+| cacheservice.podLabels | object | `{}` | Labels for Cacheservice pods |
+| cacheservice.priorityClassName | string | `""` | Sets priorityClassName for cacheservice pod(s). |
+| cacheservice.replicaCount | int | `1` | Replicas count for Cacheservice deployment |
+| cacheservice.resources | object | `{"limits":{"cpu":"500m","ephemeral-storage":"100Mi","memory":"500Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"50Mi"}}` | Default resources requests and limits for Cacheservice deployment |
+| cacheservice.service | object | `{"annotations":{"projectcontour.io/upstream-protocol.h2c":"grpc"},"type":"NodePort"}` | Service settings for Cacheservice |
+| cacheservice.serviceAccount | object | `{"annotations":{},"create":true,"imagePullSecrets":[]}` | Configuration for service accounts for Cacheservice |
+| cacheservice.serviceAccount.annotations | object | `{}` | Annotations for ServiceAccount attached to Cacheservice pods |
+| cacheservice.serviceAccount.create | bool | `true` | Should a service account be created for Cacheservice |
+| cacheservice.serviceAccount.imagePullSecrets | list | `[]` | ImagePullSecrets to automatically assign to the service account |
+| cacheservice.tolerations | list | `[]` | tolerations for Cacheservice deployment |
 | cloud_events.aws.region | string | `"us-east-2"` |  |
 | cloud_events.enable | bool | `false` |  |
 | cloud_events.eventsPublisher.eventTypes[0] | string | `"all"` |  |
@@ -91,6 +114,7 @@ helm install gateway bitnami/contour -n flyte
 | configmap.adminServer.auth | object | `{"appAuth":{"thirdPartyConfig":{"flyteClient":{"clientId":"flytectl","redirectUri":"http://localhost:53593/callback","scopes":["offline","all"]}}},"authorizedUris":["https://localhost:30081","http://flyteadmin:80","http://flyteadmin.flyte.svc.cluster.local:80"],"userAuth":{"openId":{"baseUrl":"https://accounts.google.com","clientId":"657465813211-6eog7ek7li5k7i7fvgv2921075063hpe.apps.googleusercontent.com","scopes":["profile","openid"]}}}` | Authentication configuration |
 | configmap.adminServer.server.security.secure | bool | `false` | Controls whether to serve requests over SSL/TLS. |
 | configmap.adminServer.server.security.useAuth | bool | `false` | Controls whether to enforce authentication. Follow the guide in https://docs.flyte.org/ on how to setup authentication. |
+| configmap.cacheserviceServer | object | `{"cache-server":{"grpcPort":8089,"grpcServerReflection":true,"httpPort":8080},"cacheservice":{"heartbeat-grace-period-multiplier":3,"max-reservation-heartbeat":"30s","metrics-scope":"cacheservice","profiler-port":10254,"storage-prefix":"cached_outputs"}}` | Cacheservice server config |
 | configmap.catalog | object | `{"catalog-cache":{"endpoint":"datacatalog:89","insecure":true,"type":"datacatalog"}}` | Catalog Client configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/catalog#Config) Additional advanced Catalog configuration [here](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/pluginmachinery/catalog#Config) |
 | configmap.clusters.clusterConfigs | list | `[]` |  |
 | configmap.clusters.labelClusterMap | object | `{}` |  |

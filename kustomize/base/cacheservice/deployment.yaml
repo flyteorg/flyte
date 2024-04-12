@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cacheservice
+  namespace: flyte
+  labels:
+    app: cacheservice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cacheservice
+  template:
+    metadata:
+      labels:
+        app: cacheservice
+        app.kubernetes.io/name: cacheservice
+        app.kubernetes.io/version: 0.3.0
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "10254"
+        prometheus.io/path: "/metrics"
+    spec:
+      securityContext:
+        fsGroup: 65534
+        runAsUser: 1001
+        fsGroupChangePolicy: "Always"
+      serviceAccountName: cacheservice
+      volumes:
+      - name: shared-data
+        emptyDir: {}
+      - name: config-volume
+        configMap:
+          name: cacheservice-config
+      - name: db-pass
+        secret:
+          secretName: db-pass
+      initContainers:
+      - name: run-migrations
+        image: cacheservice:v0.3.0
+        imagePullPolicy: IfNotPresent
+        command: ["cacheservice", "--config", "/etc/cacheservice/config/*.yaml", "migrate", "run"]
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/cacheservice/config
+        - name: db-pass
+          mountPath: /etc/db
+      containers:
+      - name: cacheservice
+        image: cacheservice:v0.3.0
+        imagePullPolicy: IfNotPresent
+        command: ["cacheservice", "--config", "/etc/cacheservice/config/*.yaml", "serve"]
+        ports:
+        - containerPort: 8088
+        - containerPort: 8089
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/cacheservice/config
+        - name: db-pass
+          mountPath: /etc/db

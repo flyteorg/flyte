@@ -1,0 +1,19 @@
+{{- if .Values.cacheservice.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cacheservice-config
+  namespace: {{ template "flyte.namespace" . }}
+  labels: {{ include "cacheservice.labels" . | nindent 4 }}
+data:
+{{- with .Values.db.cacheservice }}
+  db.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
+{{- end }}
+{{- with .Values.configmap.logger }}
+  logger.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
+{{- end }}
+{{- with .Values.configmap.cacheserviceServer }}
+  server.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
+{{- end }}
+  storage.yaml: | {{ tpl (include "storage" .) $ | nindent 4 }}
+{{- end }}

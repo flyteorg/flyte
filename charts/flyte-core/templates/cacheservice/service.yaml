@@ -1,0 +1,25 @@
+{{- if .Values.cacheservice.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "cacheservice.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+  labels: {{ include "cacheservice.labels" . | nindent 4 }}
+  {{- with .Values.cacheservice.service.annotations }}
+  annotations: {{ tpl (toYaml .) $ | nindent 4 }}
+  {{- end }}
+spec:
+  {{- with .Values.cacheservice.service.type}}
+  type: {{ . }}
+  {{- end }}
+  ports:
+  - name: http
+    port: 88
+    protocol: TCP
+    targetPort: 8088
+  - name: grpc
+    port: 89
+    protocol: TCP
+    targetPort: 8089
+  selector: {{ include "cacheservice.selectorLabels" . | nindent 4 }}
+{{- end }}

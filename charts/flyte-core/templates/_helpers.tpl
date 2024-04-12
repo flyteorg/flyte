@@ -102,6 +102,28 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 {{- end -}}
 
+{{- define "cacheservice.name" -}}
+cacheservice
+{{- end -}}
+
+{{- define "cacheservice.selectorLabels" -}}
+app.kubernetes.io/name: {{ template "cacheservice.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end -}}
+
+{{- define "cacheservice.labels" -}}
+{{ include "cacheservice.selectorLabels" . }}
+helm.sh/chart: {{ include "flyte.chart" . }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end -}}
+
+{{- define "cacheservice.podLabels" -}}
+{{ include "cacheservice.labels" . }}
+{{- with .Values.cacheservice.podLabels }}
+{{ toYaml . }}
+{{- end }}
+{{- end -}}
+
 {{- define "flyteagent.name" -}}
 flyteagent
 {{- end -}}
