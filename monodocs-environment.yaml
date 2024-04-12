@@ -8,13 +8,12 @@ dependencies:
   - furo
   - flytekit>=1.10.2
   - gitpython
-  - ipython!=8.7.0
   - graphviz
   - jupytext
   - myst-nb
   - psycopg2-binary
   - recommonmark
-  - sphinx==4.5.0
+  - sphinx
   - sphinx-prompt
   - sphinx-click
   - sphinx-autoapi
@@ -23,9 +22,9 @@ dependencies:
   - sphinx_fontawesome
   - sphinx-panels
   - sphinxcontrib-mermaid
-  - sphinxcontrib-youtube==1.2.0
+  - sphinxcontrib-youtube
   - sphinx-tabs
-  - sphinx-tags==0.2.1
+  - sphinx-tags
 
   # Packages for Plugin docs
   # Package name                Plugin needing it
