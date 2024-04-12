@@ -532,7 +532,7 @@ flyte:
             container: container
             sidecar: sidecar
             container_array: k8s-array
-            bigquery_query_job_task: agent-service
+            sensor: agent-service
 
 
     # -- Kubernetes specific Flyte configuration
