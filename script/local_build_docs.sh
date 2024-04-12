@@ -16,7 +16,7 @@ set -eo pipefail
 DOCKER_ENV=()
 DOCKER_VOLUME_MAPPING=("-v" "./docs:/docs")
 DOCKER_PORT_MAPPING=()
-BUILD_CMD=("sphinx-build" "-M" "html" "." "_build")
+BUILD_CMD=("sphinx-build" "-M" "html" "." "_build" "-W")
 
 if [ -n "$DEV_DOCS_WATCH" ]; then
   DOCKER_PORT_MAPPING+=("-p" "8000:8000")
