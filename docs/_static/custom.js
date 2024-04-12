@@ -30,7 +30,7 @@ function scrollToActive() {
     if (!isNaN(storedScrollTop)) {
       // If we've got a saved scroll position, just use that
       sidebar.scrollTop = storedScrollTop;
-      console.log("[PST]: Scrolled sidebar using stored browser position...");
+      console.log("Scrolled sidebar using stored browser position...");
     } else {
       // Otherwise, calculate a position to scroll to based on the lowest `active` link
       var sidebarNav = document.querySelector(".sidebar-scroll");
@@ -45,7 +45,7 @@ function scrollToActive() {
         if (latest_active.getBoundingClientRect().y > window.innerHeight * 0.5) {
           let buffer = 0.25; // Buffer so we have some space above the scrolled item
           sidebar.scrollTop = offset - sidebar.clientHeight * buffer;
-          console.log("[PST]: Scrolled sidebar using last active link...");
+          console.log("Scrolled sidebar using last active link...");
         }
       }
     }
@@ -54,7 +54,7 @@ function scrollToActive() {
       // sidebar is hidden by default, so we need to make it visible
       // after scrolling. This prevents the scrollbar from jittering when
       // the page loads.
-      console.log("[PST]: Sidebar is now visible...")
+      console.log("Sidebar is now visible...")
       sidebar.style.visibility = "visible";
     }, 10);
 
