@@ -60,7 +60,7 @@ func (i AWSSecretManagerInjector) Type() config.SecretManagerType {
 
 func (i AWSSecretManagerInjector) Inject(ctx context.Context, secret *core.Secret, p *corev1.Pod) (newP *corev1.Pod, injected bool, err error) {
 	if len(secret.Group) == 0 || len(secret.Key) == 0 {
-		return nil, false, fmt.Errorf("AWS Secrets Webhook require both key and group to be set. "+
+		return p, false, fmt.Errorf("AWS Secrets Webhook require both key and group to be set. "+
 			"Secret: [%v]", secret)
 	}
 

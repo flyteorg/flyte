@@ -221,7 +221,8 @@ func NewPodMutator(ctx context.Context, cfg *config.Config, scheme *runtime.Sche
 		cfg:     cfg,
 		Mutators: []MutatorConfig{
 			{
-				Mutator: secretsMutator,
+				Mutator:  secretsMutator,
+				Required: true,
 			},
 		},
 	}, nil

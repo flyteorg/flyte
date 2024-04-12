@@ -38,9 +38,7 @@ func TestEmbeddedSecretManagerInjector_Inject(t *testing.T) {
 		Project: gcpProject,
 	}, gcpClient)
 
-	injector := NewEmbeddedSecretManagerInjector(config.EmbeddedSecretManagerConfig{
-		Enabled: true,
-	}, gcpSecretsFetcher)
+	injector := NewEmbeddedSecretManagerInjector(config.EmbeddedSecretManagerConfig{}, gcpSecretsFetcher)
 
 	inputSecret := &core.Secret{
 		Key: secretIDKey,

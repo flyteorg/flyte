@@ -115,7 +115,7 @@ func (i EmbeddedSecretManagerInjector) lookUpSecret(ctx context.Context, secret 
 }
 func (i EmbeddedSecretManagerInjector) Inject(ctx context.Context, secret *core.Secret, p *corev1.Pod) (newP *corev1.Pod, injected bool, err error) {
 	if len(secret.Key) == 0 {
-		return nil, false, fmt.Errorf("EmbeddedSecretManager requires key to be set. "+
+		return p, false, fmt.Errorf("EmbeddedSecretManager requires key to be set. "+
 			"Secret: [%v]", secret)
 	}
 

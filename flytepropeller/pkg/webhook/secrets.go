@@ -2,6 +2,8 @@ package webhook
 
 import (
 	"context"
+	"errors"
+	"fmt"
 
 	corev1 "k8s.io/api/core/v1"
 
@@ -20,8 +22,11 @@ const (
 )
 
 type SecretsMutator struct {
-	cfg       *config.Config
-	injectors []SecretsInjector
+	// Secret manager types in order that they should be used.
+	enabledSecretManagerTypes []config.SecretManagerType
+
+	// It is expected that this map contains a key for every element in enabledSecretManagerTypes.
+	injectors map[config.SecretManagerType]SecretsInjector
 }
 
 type SecretsInjector interface {
@@ -33,55 +38,106 @@ func (s SecretsMutator) ID() string {
 	return "secrets"
 }
 
-func (s *SecretsMutator) Mutate(ctx context.Context, p *corev1.Pod) (newP *corev1.Pod, injected bool, err error) {
-	secrets, err := secretUtils.UnmarshalStringMapToSecrets(p.GetAnnotations())
+func (s *SecretsMutator) Mutate(ctx context.Context, pod *corev1.Pod) (*corev1.Pod, bool /* injected */, error) {
+	secrets, err := secretUtils.UnmarshalStringMapToSecrets(pod.GetAnnotations())
 	if err != nil {
-		return p, false, err
+		return pod, false, fmt.Errorf("failed to unmarshal secrets from pod annotations: %w", err)
 	}
 
 	for _, secret := range secrets {
-		for _, injector := range s.injectors {
-			if injector.Type() != config.SecretManagerTypeGlobal && injector.Type() != s.cfg.SecretManagerType {
-				logger.Infof(ctx, "Skipping SecretManager [%v] since it's not enabled.", injector.Type())
-				continue
+		mutatedPod, injected, err := s.injectSecret(ctx, secret, pod)
+		if !injected {
+			if err == nil {
+				err = fmt.Errorf("none of the secret managers injected secret [%v]", secret)
+			} else {
+				err = fmt.Errorf("none of the secret managers injected secret [%v]: %w", secret, err)
 			}
-
-			p, injected, err = injector.Inject(ctx, secret, p)
-			if err != nil {
-				logger.Infof(ctx, "Failed to inject a secret using injector [%v]. Error: %v", injector.Type(), err)
-			} else if injected {
-				break
-			}
+			return pod, false, err
 		}
 
+		pod = mutatedPod
+	}
+
+	return pod, len(secrets) > 0, nil
+}
+
+func (s *SecretsMutator) injectSecret(ctx context.Context, secret *core.Secret, pod *corev1.Pod) (*corev1.Pod, bool /*injected*/, error) {
+	errs := make([]error, 0)
+
+	logger.Debugf(ctx, "Injecting secret [%v].", secret)
+
+	for _, secretManagerType := range s.enabledSecretManagerTypes {
+		injector := s.injectors[secretManagerType]
+
+		mutatedPod, injected, err := injector.Inject(ctx, secret, pod)
+		logger.Debugf(
+			ctx,
+			"injection result with injector type [%v]: injected = [%v], error = [%v].",
+			injector.Type(), injected, err)
+
 		if err != nil {
-			return p, false, err
+			errs = append(errs, err)
+			continue
+		}
+		if injected {
+			return mutatedPod, true, nil
 		}
 	}
 
-	return p, injected, nil
+	return pod, false, errors.Join(errs...)
 }
 
-// NewSecretsMutator creates a new SecretsMutator with all available plugins. Depending on the selected plugins in the
-// config, only the global plugin and one other plugin can be enabled.
+// NewSecretsMutator creates a new SecretsMutator with all available plugins.
 func NewSecretsMutator(ctx context.Context, cfg *config.Config, _ promutils.Scope) (*SecretsMutator, error) {
-	var embeddedSecretsManager SecretsInjector
-	if cfg.EmbeddedSecretManagerConfig.Enabled {
-		secretFetcher, err := NewSecretFetcherManager(ctx, cfg.EmbeddedSecretManagerConfig)
+	enabledSecretManagerTypes := []config.SecretManagerType{
+		config.SecretManagerTypeGlobal,
+	}
+	if len(cfg.SecretManagerTypes) != 0 {
+		enabledSecretManagerTypes = append(enabledSecretManagerTypes, cfg.SecretManagerTypes...)
+	} else {
+		enabledSecretManagerTypes = append(enabledSecretManagerTypes, cfg.SecretManagerType)
+	}
+
+	injectors := make(map[config.SecretManagerType]SecretsInjector, len(enabledSecretManagerTypes))
+	globalSecretManagerConfig := secretmanager.GetConfig()
+	for _, secretManagerType := range enabledSecretManagerTypes {
+		injector, err := newSecretManager(ctx, secretManagerType, cfg, globalSecretManagerConfig)
 		if err != nil {
 			return nil, err
 		}
-		embeddedSecretsManager = NewEmbeddedSecretManagerInjector(cfg.EmbeddedSecretManagerConfig, secretFetcher)
+		injectors[secretManagerType] = injector
 	}
+
 	return &SecretsMutator{
-		cfg: cfg,
-		injectors: []SecretsInjector{
-			NewGlobalSecrets(secretmanager.NewFileEnvSecretManager(secretmanager.GetConfig())),
-			NewK8sSecretsInjector(),
-			NewAWSSecretManagerInjector(cfg.AWSSecretManagerConfig),
-			NewGCPSecretManagerInjector(cfg.GCPSecretManagerConfig),
-			NewVaultSecretManagerInjector(cfg.VaultSecretManagerConfig),
-			embeddedSecretsManager,
-		},
+		enabledSecretManagerTypes,
+		injectors,
 	}, nil
+}
+
+func newSecretManager(
+	ctx context.Context,
+	secretManagerType config.SecretManagerType,
+	webhookConfig *config.Config,
+	globalSecretManagerConfig *secretmanager.Config,
+) (SecretsInjector, error) {
+	switch secretManagerType {
+	case config.SecretManagerTypeGlobal:
+		return NewGlobalSecrets(secretmanager.NewFileEnvSecretManager(globalSecretManagerConfig)), nil
+	case config.SecretManagerTypeK8s:
+		return NewK8sSecretsInjector(), nil
+	case config.SecretManagerTypeAWS:
+		return NewAWSSecretManagerInjector(webhookConfig.AWSSecretManagerConfig), nil
+	case config.SecretManagerTypeGCP:
+		return NewGCPSecretManagerInjector(webhookConfig.GCPSecretManagerConfig), nil
+	case config.SecretManagerTypeVault:
+		return NewVaultSecretManagerInjector(webhookConfig.VaultSecretManagerConfig), nil
+	case config.SecretManagerTypeEmbedded:
+		secretFetcher, err := NewSecretFetcherManager(ctx, webhookConfig.EmbeddedSecretManagerConfig)
+		if err != nil {
+			return nil, err
+		}
+		return NewEmbeddedSecretManagerInjector(webhookConfig.EmbeddedSecretManagerConfig, secretFetcher), nil
+	default:
+		return nil, fmt.Errorf("unrecognized secret manager type [%v]", secretManagerType)
+	}
 }

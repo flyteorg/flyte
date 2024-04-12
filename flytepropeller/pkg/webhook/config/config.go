@@ -97,14 +97,16 @@ const (
 )
 
 type Config struct {
-	MetricsPrefix               string                      `json:"metrics-prefix" pflag:",An optional prefix for all published metrics."`
-	CertDir                     string                      `json:"certDir" pflag:",Certificate directory to use to write generated certs. Defaults to /etc/webhook/certs/"`
-	LocalCert                   bool                        `json:"localCert" pflag:",write certs locally. Defaults to false"`
-	ListenPort                  int                         `json:"listenPort" pflag:",The port to use to listen to webhook calls. Defaults to 9443"`
-	ServiceName                 string                      `json:"serviceName" pflag:",The name of the webhook service."`
-	ServicePort                 int32                       `json:"servicePort" pflag:",The port on the service that hosting webhook."`
-	SecretName                  string                      `json:"secretName" pflag:",Secret name to write generated certs to."`
-	SecretManagerType           SecretManagerType           `json:"secretManagerType" pflag:"-,Secret manager type to use if secrets are not found in global secrets."`
+	MetricsPrefix string `json:"metrics-prefix" pflag:",An optional prefix for all published metrics."`
+	CertDir       string `json:"certDir" pflag:",Certificate directory to use to write generated certs. Defaults to /etc/webhook/certs/"`
+	LocalCert     bool   `json:"localCert" pflag:",write certs locally. Defaults to false"`
+	ListenPort    int    `json:"listenPort" pflag:",The port to use to listen to webhook calls. Defaults to 9443"`
+	ServiceName   string `json:"serviceName" pflag:",The name of the webhook service."`
+	ServicePort   int32  `json:"servicePort" pflag:",The port on the service that hosting webhook."`
+	SecretName    string `json:"secretName" pflag:",Secret name to write generated certs to."`
+	// Deprecated: use SecretManagerTypes instead.
+	SecretManagerType           SecretManagerType           `json:"secretManagerType" pflag:"-,Deprecated. Secret manager type to use if secrets are not found in global secrets. Ignored if secretManagerTypes is set."`
+	SecretManagerTypes          []SecretManagerType         `json:"secretManagerTypes" pflag:"-,List of secret manager types to use if secrets are not found in global secrets. In order of preference. Overrides secretManagerType if set."`
 	AWSSecretManagerConfig      AWSSecretManagerConfig      `json:"awsSecretManager" pflag:",AWS Secret Manager config."`
 	GCPSecretManagerConfig      GCPSecretManagerConfig      `json:"gcpSecretManager" pflag:",GCP Secret Manager config."`
 	VaultSecretManagerConfig    VaultSecretManagerConfig    `json:"vaultSecretManager" pflag:",Vault Secret Manager config."`
@@ -120,7 +122,6 @@ const (
 )
 
 type EmbeddedSecretManagerConfig struct {
-	Enabled   bool                      `json:"enabled" pflag:",Enable secret manager service"`
 	Type      EmbeddedSecretManagerType `json:"type" pflags:"-,Type of embedded secret manager to initialize"`
 	AWSConfig AWSConfig                 `json:"awsConfig" pflag:",Config for AWS settings"`
 	GCPConfig GCPConfig                 `json:"gcpConfig" pflag:",Config for GCP settings"`

@@ -36,7 +36,10 @@ func TestSecretsWebhook_Mutate(t *testing.T) {
 		mutator.OnType().Return(config.SecretManagerTypeGlobal)
 
 		m := SecretsMutator{
-			injectors: []SecretsInjector{mutator},
+			enabledSecretManagerTypes: []config.SecretManagerType{config.SecretManagerTypeGlobal},
+			injectors: map[config.SecretManagerType]SecretsInjector{
+				config.SecretManagerTypeGlobal: mutator,
+			},
 		}
 
 		_, changed, err := m.Mutate(context.Background(), podWithAnnotations.DeepCopy())
@@ -50,7 +53,10 @@ func TestSecretsWebhook_Mutate(t *testing.T) {
 		mutator.OnType().Return(config.SecretManagerTypeGlobal)
 
 		m := SecretsMutator{
-			injectors: []SecretsInjector{mutator},
+			enabledSecretManagerTypes: []config.SecretManagerType{config.SecretManagerTypeGlobal},
+			injectors: map[config.SecretManagerType]SecretsInjector{
+				config.SecretManagerTypeGlobal: mutator,
+			},
 		}
 
 		_, changed, err := m.Mutate(context.Background(), podWithAnnotations.DeepCopy())
