@@ -1,9 +1,13 @@
 package v1alpha1
 
 import (
+	"bytes"
+
+	"github.com/golang/protobuf/jsonpb"
 	"k8s.io/apimachinery/pkg/api/resource"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 // This contains an OutputLocationPrefix. When running against AWS, this should be something of the form
@@ -35,6 +39,8 @@ type ExecutionConfig struct {
 	OverwriteCache bool
 	// Defines a map of environment variable name / value pairs that are applied to all tasks.
 	EnvironmentVariables map[string]string
+	// ExecutionEnvAssignments defines execution environment assignments to be set for the execution.
+	ExecutionEnvAssignments []ExecutionEnvAssignment
 }
 
 type TaskPluginOverride struct {
@@ -58,4 +64,23 @@ type TaskResources struct {
 	Requests TaskResourceSpec
 	// A hard limit, a task cannot consume resources greater than the limit specifies.
 	Limits TaskResourceSpec
+}
+
+// ExecutionEnvAssignment is a wrapper around core.ExecutionEnvAssignment to define
+// and assign an execution environment to a collection of workflow nodes.
+type ExecutionEnvAssignment struct {
+	*core.ExecutionEnvAssignment
+}
+
+func (in *ExecutionEnvAssignment) MarshalJSON() ([]byte, error) {
+	var buf bytes.Buffer
+	if err := marshaler.Marshal(&buf, in.ExecutionEnvAssignment); err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
+}
+
+func (in *ExecutionEnvAssignment) UnmarshalJSON(b []byte) error {
+	in.ExecutionEnvAssignment = &core.ExecutionEnvAssignment{}
+	return jsonpb.Unmarshal(bytes.NewReader(b), in.ExecutionEnvAssignment)
 }

@@ -15,6 +15,7 @@ WORKDIR /go/src/github.com/flyteorg/flytepropeller
 
 COPY cacheservice ../cacheservice
 COPY datacatalog ../datacatalog
+COPY fasttask ../fasttask
 COPY flyteadmin ../flyteadmin
 COPY flytecopilot ../flytecopilot
 COPY flyteidl ../flyteidl

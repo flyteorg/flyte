@@ -12,6 +12,7 @@ WORKDIR /flyteorg/build
 
 COPY cacheservice cacheservice
 COPY datacatalog datacatalog
+COPY fasttask fasttask
 COPY flyteadmin flyteadmin
 COPY flytecopilot flytecopilot
 COPY flyteidl flyteidl

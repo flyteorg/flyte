@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package fasttask;
+
+option go_package = "pb/";
+
+import "google/protobuf/struct.proto";
+
+message TaskStatus {
+    string taskId = 1;
+    string namespace = 2;
+    string workflowId = 3;
+    int32 phase = 4;
+    string reason = 5;
+}
+
+message Capacity {
+    int32 executionCount = 1;
+    int32 executionLimit = 2;
+    int32 backlogCount = 3;
+    int32 backlogLimit = 4;
+}
+
+message HeartbeatRequest {
+    string workerId = 1;
+    string queueId = 2;
+    Capacity capacity = 3;
+    repeated TaskStatus taskStatuses = 4;
+}
+
+message HeartbeatResponse {
+    string taskId = 1;
+    string namespace = 2;
+    string workflowId = 3;
+    repeated string cmd = 4;
+
+    enum Operation {
+        ACK = 0;
+        ASSIGN = 1;
+        DELETE = 2;
+    }
+
+    Operation operation = 5;
+}
+
+service FastTask {
+    rpc Heartbeat(stream HeartbeatRequest) returns (stream HeartbeatResponse);
+}
+
+message FastTaskEnvironment {
+    string queue_id = 1;
+}
+
+message FastTaskEnvironmentSpec {
+    int32 backlog_length = 1;
+    int32 parallelism = 2;
+    bytes pod_template_spec = 3;
+    string primary_container_name = 4;
+    int32 replica_count = 5;
+    oneof termination_criteria {
+        int32 ttl_seconds = 6;
+    }
+}

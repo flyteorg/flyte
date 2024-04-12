@@ -27,4 +27,6 @@ type WorkflowExecutionConfigInterface interface {
 	GetOverwriteCache() bool
 	// GetEnvs defines environment variables to be set for the execution.
 	GetEnvs() *admin.Envs
+	// GetExecutionEnvAssignments defines execution environment assignments to be set for the execution.
+	GetExecutionEnvAssignments() []*core.ExecutionEnvAssignment
 }

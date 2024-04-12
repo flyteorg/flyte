@@ -7,6 +7,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	pluginscore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/flytepropeller/events"
@@ -70,4 +71,7 @@ type NodeExecutionContext interface {
 	// TODO We should not need to pass NodeStatus, we probably only need it for DataDir, which should actually be sent using an OutputWriter interface
 	// Deprecated
 	NodeStatus() v1alpha1.ExecutableNodeStatus
+
+	// GetExecutionEnvClient returns the execution environment client.
+	GetExecutionEnvClient() pluginscore.ExecutionEnvClient
 }

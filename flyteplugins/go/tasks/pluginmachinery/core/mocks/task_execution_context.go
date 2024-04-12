@@ -120,6 +120,40 @@ func (_m *TaskExecutionContext) EventsRecorder() core.EventsRecorder {
 	return r0
 }
 
+type TaskExecutionContext_GetExecutionEnvClient struct {
+	*mock.Call
+}
+
+func (_m TaskExecutionContext_GetExecutionEnvClient) Return(_a0 core.ExecutionEnvClient) *TaskExecutionContext_GetExecutionEnvClient {
+	return &TaskExecutionContext_GetExecutionEnvClient{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *TaskExecutionContext) OnGetExecutionEnvClient() *TaskExecutionContext_GetExecutionEnvClient {
+	c_call := _m.On("GetExecutionEnvClient")
+	return &TaskExecutionContext_GetExecutionEnvClient{Call: c_call}
+}
+
+func (_m *TaskExecutionContext) OnGetExecutionEnvClientMatch(matchers ...interface{}) *TaskExecutionContext_GetExecutionEnvClient {
+	c_call := _m.On("GetExecutionEnvClient", matchers...)
+	return &TaskExecutionContext_GetExecutionEnvClient{Call: c_call}
+}
+
+// GetExecutionEnvClient provides a mock function with given fields:
+func (_m *TaskExecutionContext) GetExecutionEnvClient() core.ExecutionEnvClient {
+	ret := _m.Called()
+
+	var r0 core.ExecutionEnvClient
+	if rf, ok := ret.Get(0).(func() core.ExecutionEnvClient); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(core.ExecutionEnvClient)
+		}
+	}
+
+	return r0
+}
+
 type TaskExecutionContext_InputReader struct {
 	*mock.Call
 }

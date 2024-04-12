@@ -17,6 +17,7 @@ WORKDIR /app/flyte
 
 COPY cacheservice cacheservice
 COPY datacatalog datacatalog
+COPY fasttask fastask
 COPY flyteadmin flyteadmin
 COPY flytecopilot flytecopilot
 COPY flyteidl flyteidl

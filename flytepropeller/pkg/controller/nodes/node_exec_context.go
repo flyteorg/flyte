@@ -5,13 +5,18 @@ import (
 	"fmt"
 	"strconv"
 
+	"slices"
+
+	_struct "github.com/golang/protobuf/ptypes/struct"
 	"github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/types"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
+	pluginscore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	pluginsutils "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/flytepropeller/events"
 	eventsErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
@@ -133,6 +138,7 @@ type nodeExecContext struct {
 	shardSelector       ioutils.ShardSelector
 	nl                  executors.NodeLookup
 	ic                  executors.ExecutionContext
+	executionEnvClient  pluginscore.ExecutionEnvClient
 }
 
 func (e nodeExecContext) ExecutionContext() executors.ExecutionContext {
@@ -203,10 +209,16 @@ func (e nodeExecContext) MaxDatasetSizeBytes() int64 {
 	return e.maxDatasetSizeBytes
 }
 
+// GetExecutionEnvClient returns the execution environment client.
+func (e nodeExecContext) GetExecutionEnvClient() pluginscore.ExecutionEnvClient {
+	return e.executionEnvClient
+}
+
 func newNodeExecContext(_ context.Context, store *storage.DataStore, execContext executors.ExecutionContext, nl executors.NodeLookup,
 	node v1alpha1.ExecutableNode, nodeStatus v1alpha1.ExecutableNodeStatus, inputs io.InputReader, interruptible bool, interruptibleFailureThreshold int32,
 	maxDatasetSize int64, taskEventRecorder events.TaskEventRecorder, nodeEventRecorder events.NodeEventRecorder, tr interfaces.TaskReader, nsm *nodeStateManager,
-	enqueueOwner func() error, rawOutputPrefix storage.DataReference, outputShardSelector ioutils.ShardSelector) *nodeExecContext {
+	enqueueOwner func() error, rawOutputPrefix storage.DataReference, outputShardSelector ioutils.ShardSelector,
+	executionEnvClient pluginscore.ExecutionEnvClient) *nodeExecContext {
 
 	md := nodeExecMetadata{
 		Meta: execContext,
@@ -248,6 +260,7 @@ func newNodeExecContext(_ context.Context, store *storage.DataStore, execContext
 		shardSelector:       outputShardSelector,
 		nl:                  nl,
 		ic:                  execContext,
+		executionEnvClient:  executionEnvClient,
 	}
 }
 
@@ -275,7 +288,25 @@ func (c *nodeExecutor) BuildNodeExecutionContext(ctx context.Context, executionC
 		if err != nil {
 			return nil, err
 		}
-		tr = taskReader{TaskTemplate: tk.CoreTask()}
+		taskTemplate := tk.CoreTask()
+
+		// if this task has been specifically assigned an execution environment, we override the
+		// necessary fields to ensure desired execution.
+		for _, executionEnvAssignment := range executionContext.GetExecutionConfig().ExecutionEnvAssignments {
+			if slices.Contains(executionEnvAssignment.NodeIds, currentNodeID) {
+				taskTemplateCopy := *taskTemplate
+
+				environment := &_struct.Struct{}
+				if err := pluginsutils.MarshalStruct(executionEnvAssignment.ExecutionEnv, environment); err != nil {
+					return nil, fmt.Errorf("unable to marshal ExecutionEnv [%v], Err: [%v]", executionEnvAssignment.ExecutionEnv, err.Error())
+				}
+				taskTemplate.Custom = environment
+				taskTemplateCopy.Type = executionEnvAssignment.GetTaskType()
+
+				taskTemplate = &taskTemplateCopy
+			}
+		}
+		tr = taskReader{TaskTemplate: taskTemplate}
 	}
 
 	workflowEnqueuer := func() error {
@@ -339,5 +370,6 @@ func (c *nodeExecutor) BuildNodeExecutionContext(ctx context.Context, executionC
 		workflowEnqueuer,
 		rawOutputPrefix,
 		c.shardSelector,
+		c.executionEnvClient,
 	), nil
 }

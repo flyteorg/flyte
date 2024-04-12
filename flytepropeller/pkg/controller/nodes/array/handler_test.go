@@ -12,7 +12,8 @@ import (
 	idlcore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	pluginmocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	plugincoremocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	pluginiomocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	eventmocks "github.com/flyteorg/flyte/flytepropeller/events/mocks"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
@@ -56,11 +57,12 @@ func createArrayNodeHandler(ctx context.Context, t *testing.T, nodeHandler inter
 	mockKubeClient := execmocks.NewFakeKubeClient()
 	mockRecoveryClient := &recoverymocks.Client{}
 	mockSignalClient := &gatemocks.SignalServiceClient{}
+	mockExecutionEnvClient := &plugincoremocks.ExecutionEnvClient{}
 	noopCatalogClient := catalog.NOOPCatalog{}
 
 	// create node executor
-	nodeExecutor, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, dataStore, enqueueWorkflowFunc, mockEventSink, adminClient,
-		adminClient, 10, "s3://bucket/", mockKubeClient, noopCatalogClient, mockRecoveryClient, eventConfig, "clusterID", mockSignalClient, mockHandlerFactory, scope)
+	nodeExecutor, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, dataStore, enqueueWorkflowFunc, mockEventSink, adminClient, adminClient, 10,
+		"s3://bucket/", mockKubeClient, noopCatalogClient, mockRecoveryClient, eventConfig, "clusterID", mockSignalClient, mockHandlerFactory, mockExecutionEnvClient, scope)
 	assert.NoError(t, err)
 
 	// return ArrayNodeHandler
@@ -126,7 +128,7 @@ func createNodeExecutionContext(dataStore *storage.DataStore, eventRecorder inte
 	nCtx.OnEventsRecorder().Return(eventRecorder)
 
 	// InputReader
-	inputFilePaths := &pluginmocks.InputFilePaths{}
+	inputFilePaths := &pluginiomocks.InputFilePaths{}
 	inputFilePaths.OnGetInputPath().Return(storage.DataReference("s3://bucket/input"))
 	nCtx.OnInputReader().Return(
 		newStaticInputReader(

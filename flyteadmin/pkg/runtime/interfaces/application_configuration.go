@@ -188,6 +188,12 @@ func (a *ApplicationConfig) GetEnvs() *admin.Envs {
 	}
 }
 
+// GetExecutionEnvAssignments is required to satisfy the ExecutionConfig interface. However, it
+// does not make sense to expose this at the application level so we always return nil.
+func (a *ApplicationConfig) GetExecutionEnvAssignments() []*core.ExecutionEnvAssignment {
+	return nil
+}
+
 // GetAsWorkflowExecutionConfig returns the WorkflowExecutionConfig as extracted from this object
 func (a *ApplicationConfig) GetAsWorkflowExecutionConfig() admin.WorkflowExecutionConfig {
 	// These values should always be set as their fallback values equals to their zero value or nil,

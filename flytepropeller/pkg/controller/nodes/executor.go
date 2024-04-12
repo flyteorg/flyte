@@ -33,6 +33,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
+	pluginscore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/flytepropeller/events"
 	eventsErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
@@ -483,6 +484,7 @@ type nodeExecutor struct {
 	defaultExecutionDeadline        time.Duration
 	enqueueWorkflow                 v1alpha1.EnqueueWorkflow
 	eventConfig                     *config.EventConfig
+	executionEnvClient              pluginscore.ExecutionEnvClient
 	interruptibleFailureThreshold   int32
 	maxDatasetSizeBytes             int64
 	maxNodeRetriesForSystemFailures uint32
@@ -1445,7 +1447,7 @@ func replaceRemotePrefix(ctx context.Context, s string) string {
 func NewExecutor(ctx context.Context, nodeConfig config.NodeConfig, store *storage.DataStore, enQWorkflow v1alpha1.EnqueueWorkflow, eventSink events.EventSink,
 	workflowLauncher launchplan.Executor, launchPlanReader launchplan.Reader, maxDatasetSize int64, defaultRawOutputPrefix storage.DataReference, kubeClient executors.Client,
 	cacheClient catalog.Client, recoveryClient recovery.Client, eventConfig *config.EventConfig, clusterID string, signalClient service.SignalServiceClient,
-	nodeHandlerFactory interfaces.HandlerFactory, scope promutils.Scope) (interfaces.Node, error) {
+	nodeHandlerFactory interfaces.HandlerFactory, executionEnvClient pluginscore.ExecutionEnvClient, scope promutils.Scope) (interfaces.Node, error) {
 
 	// TODO we may want to make this configurable.
 	shardSelector, err := ioutils.NewBase36PrefixShardSelector(ctx)
@@ -1496,6 +1498,7 @@ func NewExecutor(ctx context.Context, nodeConfig config.NodeConfig, store *stora
 		defaultExecutionDeadline:        nodeConfig.DefaultDeadlines.DefaultNodeExecutionDeadline.Duration,
 		enqueueWorkflow:                 enQWorkflow,
 		eventConfig:                     eventConfig,
+		executionEnvClient:              executionEnvClient,
 		interruptibleFailureThreshold:   nodeConfig.InterruptibleFailureThreshold,
 		maxDatasetSizeBytes:             maxDatasetSize,
 		maxNodeRetriesForSystemFailures: uint32(nodeConfig.MaxNodeRetriesOnSystemFailures),

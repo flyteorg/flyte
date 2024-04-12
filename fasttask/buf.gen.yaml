@@ -1,0 +1,10 @@
+version: v1
+plugins:
+  - plugin: buf.build/protocolbuffers/go:v1.28.1
+    out: plugin
+  - plugin: buf.build/grpc/go:v1.3.0
+    out: plugin
+  - plugin: buf.build/community/neoeinstein-prost:v0.2.3
+    out: worker/src/pb
+  - plugin: buf.build/community/neoeinstein-tonic:v0.3.0
+    out: worker/src/pb

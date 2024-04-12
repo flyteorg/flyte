@@ -345,5 +345,10 @@ func MergeIntoExecConfig(workflowExecConfig admin.WorkflowExecutionConfig, spec 
 		workflowExecConfig.Envs = spec.GetEnvs()
 	}
 
+	if (workflowExecConfig.GetExecutionEnvAssignments() == nil || len(workflowExecConfig.GetExecutionEnvAssignments()) == 0) &&
+		(spec.GetExecutionEnvAssignments() != nil && len(spec.GetExecutionEnvAssignments()) > 0) {
+		workflowExecConfig.ExecutionEnvAssignments = spec.GetExecutionEnvAssignments()
+	}
+
 	return workflowExecConfig
 }

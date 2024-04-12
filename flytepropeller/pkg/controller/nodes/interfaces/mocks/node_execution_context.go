@@ -3,7 +3,9 @@
 package mocks
 
 import (
+	core "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	executors "github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
+
 	interfaces "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
 
 	io "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
@@ -218,6 +220,40 @@ func (_m *NodeExecutionContext) ExecutionContext() executors.ExecutionContext {
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(executors.ExecutionContext)
+		}
+	}
+
+	return r0
+}
+
+type NodeExecutionContext_GetExecutionEnvClient struct {
+	*mock.Call
+}
+
+func (_m NodeExecutionContext_GetExecutionEnvClient) Return(_a0 core.ExecutionEnvClient) *NodeExecutionContext_GetExecutionEnvClient {
+	return &NodeExecutionContext_GetExecutionEnvClient{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *NodeExecutionContext) OnGetExecutionEnvClient() *NodeExecutionContext_GetExecutionEnvClient {
+	c_call := _m.On("GetExecutionEnvClient")
+	return &NodeExecutionContext_GetExecutionEnvClient{Call: c_call}
+}
+
+func (_m *NodeExecutionContext) OnGetExecutionEnvClientMatch(matchers ...interface{}) *NodeExecutionContext_GetExecutionEnvClient {
+	c_call := _m.On("GetExecutionEnvClient", matchers...)
+	return &NodeExecutionContext_GetExecutionEnvClient{Call: c_call}
+}
+
+// GetExecutionEnvClient provides a mock function with given fields:
+func (_m *NodeExecutionContext) GetExecutionEnvClient() core.ExecutionEnvClient {
+	ret := _m.Called()
+
+	var r0 core.ExecutionEnvClient
+	if rf, ok := ret.Get(0).(func() core.ExecutionEnvClient); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(core.ExecutionEnvClient)
 		}
 	}
 

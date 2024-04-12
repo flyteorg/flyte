@@ -1409,6 +1409,9 @@ pub struct ExecutionSpec {
     /// Tags to be set for the execution.
     #[prost(string, repeated, tag="24")]
     pub tags: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    /// Execution environment assignments to be set for the execution.
+    #[prost(message, repeated, tag="25")]
+    pub execution_env_assignments: ::prost::alloc::vec::Vec<super::core::ExecutionEnvAssignment>,
     #[prost(oneof="execution_spec::NotificationOverrides", tags="5, 6")]
     pub notification_overrides: ::core::option::Option<execution_spec::NotificationOverrides>,
 }
@@ -1821,6 +1824,9 @@ pub struct LaunchPlanSpec {
     /// Environment variables to be set for the execution.
     #[prost(message, optional, tag="21")]
     pub envs: ::core::option::Option<Envs>,
+    /// Execution environment assignments to be set for the execution.
+    #[prost(message, repeated, tag="22")]
+    pub execution_env_assignments: ::prost::alloc::vec::Vec<super::core::ExecutionEnvAssignment>,
 }
 /// Values computed by the flyte platform after launch plan registration.
 /// These include expected_inputs required to be present in a CreateExecutionRequest
@@ -2081,6 +2087,9 @@ pub struct WorkflowExecutionConfig {
     /// Environment variables to be set for the execution.
     #[prost(message, optional, tag="8")]
     pub envs: ::core::option::Option<Envs>,
+    /// Execution environment assignments to be set for the execution.
+    #[prost(message, repeated, tag="9")]
+    pub execution_env_assignments: ::prost::alloc::vec::Vec<super::core::ExecutionEnvAssignment>,
 }
 /// Generic container for encapsulating all types of the above attributes messages.
 #[allow(clippy::derive_partial_eq_without_eq)]

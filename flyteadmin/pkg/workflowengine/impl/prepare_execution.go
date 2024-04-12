@@ -73,6 +73,13 @@ func addExecutionOverrides(taskPluginOverrides []*admin.PluginOverride,
 			}
 			executionConfig.EnvironmentVariables = envs
 		}
+
+		for _, executionEnvAssignment := range workflowExecutionConfig.GetExecutionEnvAssignments() {
+			executionEnvAssignment := *executionEnvAssignment
+			executionConfig.ExecutionEnvAssignments = append(executionConfig.ExecutionEnvAssignments, v1alpha1.ExecutionEnvAssignment{
+				ExecutionEnvAssignment: &executionEnvAssignment,
+			})
+		}
 	}
 	if taskResources != nil {
 		var requests = v1alpha1.TaskResourceSpec{}

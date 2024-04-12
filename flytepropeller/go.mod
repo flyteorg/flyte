@@ -30,6 +30,7 @@ require (
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.8.4
+	github.com/unionai/flyte/fasttask/plugin v0.0.0-00010101000000-000000000000
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.47.0
 	go.opentelemetry.io/otel v1.24.0
 	go.opentelemetry.io/otel/trace v1.24.0
@@ -167,6 +168,7 @@ replace (
 	github.com/flyteorg/flyte/flyteidl => ../flyteidl
 	github.com/flyteorg/flyte/flyteplugins => ../flyteplugins
 	github.com/flyteorg/flyte/flytestdlib => ../flytestdlib
+	github.com/unionai/flyte/fasttask/plugin => ../fasttask/plugin
 	k8s.io/api => k8s.io/api v0.28.2
 	k8s.io/apimachinery => k8s.io/apimachinery v0.28.2
 	k8s.io/client-go => k8s.io/client-go v0.28.2

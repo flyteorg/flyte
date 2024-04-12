@@ -25,6 +25,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
 	pluginCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	pluginsmocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/flytepropeller/events"
 	eventsErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
@@ -51,10 +52,11 @@ import (
 )
 
 var (
-	testScope      = promutils.NewScope("test_wfexec")
-	fakeKubeClient = executorMocks.NewFakeKubeClient()
-	mockClientset  = k8sfake.NewSimpleClientset()
-	signalClient   = &gateMocks.SignalServiceClient{}
+	testScope          = promutils.NewScope("test_wfexec")
+	fakeKubeClient     = executorMocks.NewFakeKubeClient()
+	mockClientset      = k8sfake.NewSimpleClientset()
+	signalClient       = &gateMocks.SignalServiceClient{}
+	executionEnvClient = &pluginsmocks.ExecutionEnvClient{}
 )
 
 const (
@@ -245,10 +247,11 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Error(t *testing.T) {
 	handlerFactory, err := factory.NewHandlerFactory(ctx, adminClient, adminClient, fakeKubeClient, mockClientset, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, promutils.NewTestScope())
 	assert.NoError(t, err)
 
-	nodeExec, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, store, enqueueWorkflow, eventSink, adminClient, adminClient,
-		maxOutputSize, "s3://bucket", fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, handlerFactory, promutils.NewTestScope())
+	nodeExec, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, store, enqueueWorkflow, eventSink, adminClient, adminClient, maxOutputSize, "s3://bucket",
+		fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, handlerFactory, executionEnvClient, promutils.NewTestScope())
 	assert.NoError(t, err)
-	executor, err := NewExecutor(ctx, store, enqueueWorkflow, eventSink, recorder, "", nodeExec, eventConfig, testClusterID, promutils.NewTestScope())
+	executor, err := NewExecutor(ctx, store, enqueueWorkflow, eventSink, recorder, "",
+		nodeExec, eventConfig, testClusterID, executionEnvClient, promutils.NewTestScope())
 	assert.NoError(t, err)
 
 	assert.NoError(t, executor.Initialize(ctx))
@@ -328,11 +331,12 @@ func TestWorkflowExecutor_HandleFlyteWorkflow(t *testing.T) {
 	handlerFactory, err := factory.NewHandlerFactory(ctx, adminClient, adminClient, fakeKubeClient, mockClientset, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, promutils.NewTestScope())
 	assert.NoError(t, err)
 
-	nodeExec, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, store, enqueueWorkflow, eventSink, adminClient, adminClient,
-		maxOutputSize, "s3://bucket", fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, handlerFactory, promutils.NewTestScope())
+	nodeExec, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, store, enqueueWorkflow, eventSink, adminClient, adminClient, maxOutputSize, "s3://bucket",
+		fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, handlerFactory, executionEnvClient, promutils.NewTestScope())
 	assert.NoError(t, err)
 
-	executor, err := NewExecutor(ctx, store, enqueueWorkflow, eventSink, recorder, "", nodeExec, eventConfig, testClusterID, promutils.NewTestScope())
+	executor, err := NewExecutor(ctx, store, enqueueWorkflow, eventSink, recorder, "",
+		nodeExec, eventConfig, testClusterID, executionEnvClient, promutils.NewTestScope())
 	assert.NoError(t, err)
 
 	assert.NoError(t, executor.Initialize(ctx))
@@ -392,11 +396,12 @@ func BenchmarkWorkflowExecutor(b *testing.B) {
 	recoveryClient := &recoveryMocks.Client{}
 	adminClient := launchplan.NewFailFastLaunchPlanExecutor()
 	handlerFactory := &nodemocks.HandlerFactory{}
-	nodeExec, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, store, enqueueWorkflow, eventSink, adminClient, adminClient,
-		maxOutputSize, "s3://bucket", fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, handlerFactory, scope)
+	nodeExec, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, store, enqueueWorkflow, eventSink, adminClient, adminClient, maxOutputSize, "s3://bucket",
+		fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, handlerFactory, executionEnvClient, scope)
 	assert.NoError(b, err)
 
-	executor, err := NewExecutor(ctx, store, enqueueWorkflow, eventSink, recorder, "", nodeExec, eventConfig, testClusterID, promutils.NewTestScope())
+	executor, err := NewExecutor(ctx, store, enqueueWorkflow, eventSink, recorder, "",
+		nodeExec, eventConfig, testClusterID, executionEnvClient, promutils.NewTestScope())
 	assert.NoError(b, err)
 
 	assert.NoError(b, executor.Initialize(ctx))
@@ -504,10 +509,11 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Failing(t *testing.T) {
 	handlerFactory.OnSetupMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
 	handlerFactory.OnGetHandlerMatch(mock.Anything).Return(h, nil)
 
-	nodeExec, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, store, enqueueWorkflow, eventSink, adminClient, adminClient,
-		maxOutputSize, "s3://bucket", fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, handlerFactory, promutils.NewTestScope())
+	nodeExec, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, store, enqueueWorkflow, eventSink, adminClient, adminClient, maxOutputSize, "s3://bucket",
+		fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, handlerFactory, executionEnvClient, promutils.NewTestScope())
 	assert.NoError(t, err)
-	executor, err := NewExecutor(ctx, store, enqueueWorkflow, eventSink, recorder, "", nodeExec, eventConfig, testClusterID, promutils.NewTestScope())
+	executor, err := NewExecutor(ctx, store, enqueueWorkflow, eventSink, recorder, "",
+		nodeExec, eventConfig, testClusterID, executionEnvClient, promutils.NewTestScope())
 	assert.NoError(t, err)
 
 	assert.NoError(t, executor.Initialize(ctx))
@@ -606,10 +612,11 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Events(t *testing.T) {
 	handlerFactory, err := factory.NewHandlerFactory(ctx, adminClient, adminClient, fakeKubeClient, mockClientset, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, promutils.NewTestScope())
 	assert.NoError(t, err)
 
-	nodeExec, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, store, enqueueWorkflow, eventSink, adminClient, adminClient,
-		maxOutputSize, "s3://bucket", fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, handlerFactory, promutils.NewTestScope())
+	nodeExec, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, store, enqueueWorkflow, eventSink, adminClient, adminClient, maxOutputSize, "s3://bucket",
+		fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, handlerFactory, executionEnvClient, promutils.NewTestScope())
 	assert.NoError(t, err)
-	executor, err := NewExecutor(ctx, store, enqueueWorkflow, eventSink, recorder, "metadata", nodeExec, eventConfig, testClusterID, promutils.NewTestScope())
+	executor, err := NewExecutor(ctx, store, enqueueWorkflow, eventSink, recorder, "metadata",
+		nodeExec, eventConfig, testClusterID, executionEnvClient, promutils.NewTestScope())
 	assert.NoError(t, err)
 
 	assert.NoError(t, executor.Initialize(ctx))
@@ -672,8 +679,8 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_EventFailure(t *testing.T) {
 	handlerFactory := &nodemocks.HandlerFactory{}
 	handlerFactory.OnSetupMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
 	handlerFactory.OnGetHandlerMatch(mock.Anything).Return(h, nil)
-	nodeExec, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, store, enqueueWorkflow, nodeEventSink, adminClient, adminClient,
-		maxOutputSize, "s3://bucket", fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, handlerFactory, promutils.NewTestScope())
+	nodeExec, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, store, enqueueWorkflow, nodeEventSink, adminClient, adminClient, maxOutputSize, "s3://bucket",
+		fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, handlerFactory, executionEnvClient, promutils.NewTestScope())
 	assert.NoError(t, err)
 
 	t.Run("EventAlreadyInTerminalStateError", func(t *testing.T) {
@@ -684,7 +691,8 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_EventFailure(t *testing.T) {
 				Cause: errors.New("already exists"),
 			}
 		}
-		executor, err := NewExecutor(ctx, store, enqueueWorkflow, eventSink, recorder, "metadata", nodeExec, eventConfig, testClusterID, promutils.NewTestScope())
+		executor, err := NewExecutor(ctx, store, enqueueWorkflow, eventSink, recorder, "metadata",
+			nodeExec, eventConfig, testClusterID, executionEnvClient, promutils.NewTestScope())
 		assert.NoError(t, err)
 		w := &v1alpha1.FlyteWorkflow{}
 		assert.NoError(t, json.Unmarshal(wJSON, w))
@@ -703,7 +711,8 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_EventFailure(t *testing.T) {
 				Cause: errors.New("already exists"),
 			}
 		}
-		executor, err := NewExecutor(ctx, store, enqueueWorkflow, eventSink, recorder, "metadata", nodeExec, eventConfig, testClusterID, promutils.NewTestScope())
+		executor, err := NewExecutor(ctx, store, enqueueWorkflow, eventSink, recorder, "metadata",
+			nodeExec, eventConfig, testClusterID, executionEnvClient, promutils.NewTestScope())
 		assert.NoError(t, err)
 		w := &v1alpha1.FlyteWorkflow{}
 		assert.NoError(t, json.Unmarshal(wJSON, w))
@@ -719,7 +728,8 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_EventFailure(t *testing.T) {
 				Cause: errors.New("generic exists"),
 			}
 		}
-		executor, err := NewExecutor(ctx, store, enqueueWorkflow, eventSink, recorder, "metadata", nodeExec, eventConfig, testClusterID, promutils.NewTestScope())
+		executor, err := NewExecutor(ctx, store, enqueueWorkflow, eventSink, recorder, "metadata",
+			nodeExec, eventConfig, testClusterID, executionEnvClient, promutils.NewTestScope())
 		assert.NoError(t, err)
 		w := &v1alpha1.FlyteWorkflow{}
 		assert.NoError(t, json.Unmarshal(wJSON, w))
@@ -736,7 +746,8 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_EventFailure(t *testing.T) {
 				Cause: errors.New("incompatible cluster"),
 			}
 		}
-		executor, err := NewExecutor(ctx, store, enqueueWorkflow, eventSink, recorder, "metadata", nodeExec, eventConfig, testClusterID, promutils.NewTestScope())
+		executor, err := NewExecutor(ctx, store, enqueueWorkflow, eventSink, recorder, "metadata",
+			nodeExec, eventConfig, testClusterID, executionEnvClient, promutils.NewTestScope())
 		assert.NoError(t, err)
 		w := &v1alpha1.FlyteWorkflow{}
 		assert.NoError(t, json.Unmarshal(wJSON, w))
