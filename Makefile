@@ -91,15 +91,15 @@ docs:
 $(TMP_BUILD_DIR):
 	mkdir $@
 
-$(TMP_BUILD_DIR)/conda-lock-image: Dockerfile.conda-lock | $(TMP_BUILD_DIR)
-	docker buildx build --load --platform=linux/amd64 --build-arg USER_UID=$$(id -u) --build-arg USER_GID=$$(id -g) -t flyte-conda-lock:latest -f Dockerfile.conda-lock .
+$(TMP_BUILD_DIR)/conda-lock-image: docs/Dockerfile.conda-lock | $(TMP_BUILD_DIR)
+	docker buildx build --load --platform=linux/amd64 --build-arg USER_UID=$$(id -u) --build-arg USER_GID=$$(id -g) -t flyte-conda-lock:latest -f docs/Dockerfile.conda-lock .
 	touch $(TMP_BUILD_DIR)/conda-lock-image
 
 monodocs-environment.lock.yaml: monodocs-environment.yaml $(TMP_BUILD_DIR)/conda-lock-image
 	docker run --platform=linux/amd64 --rm --pull never -v ./:/flyte flyte-conda-lock:latest lock --file monodocs-environment.yaml --lockfile monodocs-environment.lock.yaml
 
-$(TMP_BUILD_DIR)/dev-docs-image: Dockerfile.docs monodocs-environment.lock.yaml | $(TMP_BUILD_DIR)
-	docker buildx build --load --platform=linux/amd64 --build-arg USER_UID=$$(id -u) --build-arg USER_GID=$$(id -g) -t flyte-dev-docs:latest -f Dockerfile.docs .
+$(TMP_BUILD_DIR)/dev-docs-image: docs/Dockerfile.docs monodocs-environment.lock.yaml | $(TMP_BUILD_DIR)
+	docker buildx build --load --platform=linux/amd64 --build-arg USER_UID=$$(id -u) --build-arg USER_GID=$$(id -g) -t flyte-dev-docs:latest -f docs/Dockerfile.docs .
 	touch $(TMP_BUILD_DIR)/dev-docs-image
 
 # Build docs in docker container for local development
