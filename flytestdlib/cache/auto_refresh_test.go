@@ -35,7 +35,7 @@ func (t terminalCacheItem) IsTerminal() bool {
 	return true
 }
 
-func syncFakeItem(ctx context.Context, batch Batch) ([]ItemSyncResponse, error) {
+func syncFakeItem(_ context.Context, batch Batch) ([]ItemSyncResponse, error) {
 	items := make([]ItemSyncResponse, 0, len(batch))
 	for _, obj := range batch {
 		item := obj.GetItem().(fakeCacheItem)
