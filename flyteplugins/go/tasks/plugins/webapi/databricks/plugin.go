@@ -235,7 +235,7 @@ func (p Plugin) sendRequest(method string, databricksJob map[string]interface{},
 	}
 	var data map[string]interface{}
 
-	if responseBody != nil && len(responseBody) != 0 {
+	if len(responseBody) != 0 {
 		err = json.Unmarshal(responseBody, &data)
 		if err != nil {
 			return nil, fmt.Errorf("failed to parse response with err: [%v]", err)
