@@ -57,8 +57,7 @@ install-conda-lock:
 .PHONY: conda-lock
 conda-lock: install-conda-lock
 	conda-lock -f monodocs-environment.yaml --without-cuda \
-		--lockfile monodocs-environment.lock.yaml \
-		--platform=osx-64 --platform=osx-arm64 --platform=linux-64
+		--lockfile monodocs-environment.lock.yaml
 
 .PHONY: stats
 stats:
