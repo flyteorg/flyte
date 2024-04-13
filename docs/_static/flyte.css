@@ -10,6 +10,7 @@ h6 {
 
 .sidebar-scroll {
   scroll-behavior: auto;
+  visibility: hidden;
 }
 
 .sidebar-tree ul:first-child li:not(:last-child) {
