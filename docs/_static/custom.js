@@ -102,3 +102,10 @@ function main() {
 }
 
 document.addEventListener('DOMContentLoaded', main);
+window.addEventListener('keydown', (event) => {
+  if (event.code === "Escape") {
+    // make sure to prevent default behavior with escape key so that algolia
+    // modal can be closed properly.
+    event.preventDefault();
+  }
+});
