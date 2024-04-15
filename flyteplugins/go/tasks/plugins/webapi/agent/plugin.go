@@ -40,6 +40,10 @@ type ResourceWrapper struct {
 	LogLinks []*flyteIdl.TaskLog
 }
 
+func (r ResourceWrapper) IsTerminal() bool {
+	return r.Phase == flyteIdl.TaskExecution_SUCCEEDED || r.Phase == flyteIdl.TaskExecution_FAILED || r.Phase == flyteIdl.TaskExecution_ABORTED
+}
+
 type ResourceMetaWrapper struct {
 	OutputPrefix      string
 	AgentResourceMeta []byte

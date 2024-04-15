@@ -49,7 +49,12 @@ type CacheItem struct {
 }
 
 func (c CacheItem) IsTerminal() bool {
-	return c.State.Phase.IsTerminal()
+	resourceStatus := false
+	if resource, ok := c.Resource.(interface{ IsTerminal() bool }); ok {
+		resourceStatus = resource.IsTerminal()
+		logger.Infof(context.Background(), "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk [%v]", resourceStatus)
+	}
+	return resourceStatus || c.State.Phase.IsTerminal()
 }
 
 // This basically grab an updated status from Client and store it in the cache
@@ -80,7 +85,7 @@ func (q *ResourceCache) SyncResource(ctx context.Context, batch cache.Batch) (
 		logger.Debugf(ctx, "Sync loop - processing resource with cache key [%s]",
 			resource.GetID())
 
-		if cacheItem.State.Phase.IsTerminal() {
+		if cacheItem.IsTerminal() {
 			logger.Debugf(ctx, "Sync loop - resource cache key [%v] in terminal state [%s]",
 				resource.GetID())
 			resp = append(resp, cache.ItemSyncResponse{
