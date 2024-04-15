@@ -3,6 +3,8 @@ package cache
 import (
 	"context"
 	"fmt"
+	"golang.org/x/exp/slices"
+	"strings"
 	"sync"
 	"time"
 
@@ -251,8 +253,14 @@ func (w *autoRefresh) enqueueBatches(ctx context.Context) error {
 	}
 
 	for _, batch := range batches {
-		b := batch
-		w.workqueue.Add(&b)
+
+		var batchIDs []string
+		for i, _ := range batch {
+			batchIDs = append(batchIDs, batch[i].GetID())
+		}
+		slices.Sort(batchIDs)
+		logger.Infof(ctx, "Enqueuing batch [%v]", strings.Join(batchIDs, ","))
+		w.workqueue.Add(strings.Join(batchIDs, ","))
 	}
 
 	return nil
@@ -290,20 +298,21 @@ func (w *autoRefresh) sync(ctx context.Context) (err error) {
 		case <-ctx.Done():
 			return nil
 		default:
-			batch, shutdown := w.workqueue.Get()
+			itemID, shutdown := w.workqueue.Get()
 			if shutdown {
 				logger.Debugf(ctx, "Shutting down worker")
 				return nil
 			}
-
+			batchIDs := strings.Split(itemID.(string), ",")
+			logger.Infof(ctx, "Processing batch [%v]", strings.Join(batchIDs, ","))
 			// Since we create batches every time we sync, we will just remove the item from the queue here
 			// regardless of whether it succeeded the sync or not.
-			w.workqueue.Forget(batch)
-			w.workqueue.Done(batch)
+			w.workqueue.Forget(itemID)
+			w.workqueue.Done(itemID)
 
-			newBatch := make(Batch, 0, len(*batch.(*Batch)))
-			for _, b := range *batch.(*Batch) {
-				itemID := b.GetID()
+			newBatch := make(Batch, 0, len(batchIDs))
+			for _, id := range batchIDs {
+				itemID := id
 				item, ok := w.lruMap.Get(itemID)
 				if !ok {
 					logger.Debugf(ctx, "item with id [%v] not found in cache", itemID)
@@ -313,7 +322,7 @@ func (w *autoRefresh) sync(ctx context.Context) (err error) {
 					logger.Debugf(ctx, "item with id [%v] is terminal", itemID)
 					continue
 				}
-				newBatch = append(newBatch, b)
+				newBatch = append(newBatch, itemWrapper{id: itemID, item: item.(Item)})
 			}
 			if len(newBatch) == 0 {
 				continue
