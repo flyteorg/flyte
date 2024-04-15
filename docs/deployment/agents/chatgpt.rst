@@ -38,6 +38,12 @@ Specify agent configuration
           agent-service:
             supportedTaskTypes:
             - chatgpt
+            # Configuring the timeout is optional.
+            # Tasks like using ChatGPT with a large model might require a longer time, 
+            # so we have the option to adjust the timeout setting here.
+            defaultAgent:
+              timeouts:
+                ExecuteTaskSync: 10s
 
     .. group-tab:: Flyte core
 
@@ -66,6 +72,12 @@ Specify agent configuration
               agent-service:
                 supportedTaskTypes:
                 - chatgpt
+                # Configuring the timeout is optional.
+                # Tasks like using ChatGPT with a large model might require a longer time, 
+                # so we have the option to adjust the timeout setting here.
+                defaultAgent:
+                  timeouts:
+                    ExecuteTaskSync: 10s
 
 Add the OpenAI API token
 -------------------------------
