@@ -35,6 +35,5 @@ spec:
     {{- with .Values.flyteadmin.service.additionalPorts -}}
     {{ tpl (toYaml .) $ | nindent 4 }}
     {{- end }}
-    {{- end }}
   selector: {{ include "flyteadmin.selectorLabels" . | nindent 4 }}
 {{- end }}

@@ -24,6 +24,5 @@ spec:
   {{- with .Values.datacatalog.service.additionalPorts -}}
   {{ tpl (toYaml .) $ | nindent 4 }}
   {{- end }}
-  {{- end }}
   selector: {{ include "datacatalog.selectorLabels" . | nindent 4 }}
 {{- end }}
