@@ -85,9 +85,13 @@ def multi_wf(l: typing.List[int], chunk: int) -> typing.List[int]:
 Overrides let you add additional arguments to the launchplan you are looping over in the dynamic. Here we add caching:
 
 ```python
+@task
+def increment(num: int) -> int:
+    return num + 1
+
 @workflow
 def child(num: int) -> int:
-  return num + 1
+    return increment(num=num)
 
 child_lp = LaunchPlan.get_or_create(child)
 
