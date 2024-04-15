@@ -167,6 +167,6 @@ if __name__ == "__main__":
 To trigger a task that accepts a dataclass as an input with `pyflyte run`, you can provide a JSON file as an input:
 ```
 pyflyte run \
-  https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/data_types_and_io/data_types_and_io/dataclass.py \
+  https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/data_types_and_io/data_types_and_io/dataclass.py \
   add --x dataclass_input.json --y dataclass_input.json
 ```

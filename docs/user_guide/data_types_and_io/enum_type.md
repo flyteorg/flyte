@@ -87,7 +87,7 @@ def coffee_maker_enum(coffee_enum: Coffee) -> str:
 You can send a string to the `coffee_maker_enum` workflow during its execution, like this:
 ```
 pyflyte run \
-  https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/data_types_and_io/data_types_and_io/enum_type.py \
+  https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/data_types_and_io/data_types_and_io/enum_type.py \
   coffee_maker_enum --coffee_enum="latte"
 ```
 
