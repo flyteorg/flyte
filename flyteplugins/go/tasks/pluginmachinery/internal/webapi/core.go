@@ -99,6 +99,13 @@ func (c CorePlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) 
 }
 
 func (c CorePlugin) Abort(ctx context.Context, tCtx core.TaskExecutionContext) error {
+	cacheItemID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
+	err := c.cache.DeleteDelayed(cacheItemID)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to delete resource [%v] from cache. Error: %v", cacheItemID, err)
+		return err
+	}
+
 	incomingState, err := c.unmarshalState(ctx, tCtx.PluginStateReader())
 	if err != nil {
 		return err
@@ -108,8 +115,7 @@ func (c CorePlugin) Abort(ctx context.Context, tCtx core.TaskExecutionContext) e
 
 	err = c.p.Delete(ctx, newPluginContext(incomingState.ResourceMeta, nil, "Aborted", tCtx))
 	if err != nil {
-		logger.Errorf(ctx, "Failed to abort some resources [%v]. Error: %v",
-			tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), err)
+		logger.Errorf(ctx, "Failed to abort some resources [%v]. Error: %v", cacheItemID, err)
 		return err
 	}
 
