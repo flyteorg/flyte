@@ -253,14 +253,13 @@ func (w *autoRefresh) enqueueBatches(ctx context.Context) error {
 	}
 
 	for _, batch := range batches {
-
 		var batchIDs []string
 		for i, _ := range batch {
 			batchIDs = append(batchIDs, batch[i].GetID())
 		}
 		slices.Sort(batchIDs)
 		logger.Infof(ctx, "Enqueuing batch [%v]", strings.Join(batchIDs, ","))
-		w.workqueue.Add(strings.Join(batchIDs, ","))
+		w.workqueue.AddRateLimited(strings.Join(batchIDs, ","))
 	}
 
 	return nil
