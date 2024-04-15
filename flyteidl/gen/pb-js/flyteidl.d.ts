@@ -4506,7 +4506,7 @@ export namespace flyteidl {
             node?: (flyteidl.core.INode|null);
 
             /** ArrayNode parallelism */
-            parallelism?: (Long|null);
+            parallelism?: (number|null);
 
             /** ArrayNode minSuccesses */
             minSuccesses?: (number|null);
@@ -4528,13 +4528,16 @@ export namespace flyteidl {
             public node?: (flyteidl.core.INode|null);
 
             /** ArrayNode parallelism. */
-            public parallelism: Long;
+            public parallelism: number;
 
             /** ArrayNode minSuccesses. */
             public minSuccesses: number;
 
             /** ArrayNode minSuccessRatio. */
             public minSuccessRatio: number;
+
+            /** ArrayNode parallelismOption. */
+            public parallelismOption?: "parallelism";
 
             /** ArrayNode successCriteria. */
             public successCriteria?: ("minSuccesses"|"minSuccessRatio");

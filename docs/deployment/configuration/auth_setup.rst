@@ -346,8 +346,12 @@ Apply OIDC Configuration
 
          secrets:
            adminOauthClientCredentials:
-          # -- If enabled is true, helm will create and manage `flyte-secret-auth` and populate it with `clientSecret`.
-          # If enabled is false, it's up to the user to create `flyte-secret-auth`
+           # If enabled is true, and `clientSecret` is specified, helm will create and mount `flyte-secret-auth`.
+           # If enabled is true, and `clientSecret` is null, it's up to the user to create `flyte-secret-auth` as described in
+           # https://docs.flyte.org/en/latest/deployment/cluster_config/auth_setup.html#oauth2-authorization-server
+           # and helm will mount `flyte-secret-auth`.
+           # If enabled is false, auth is not turned on.
+           # Note: Unsupported combination: enabled.false and clientSecret.someValue
              enabled: true
            # Use the non-encoded version of the random password
              clientSecret: "<your-random-password>"
@@ -677,7 +681,8 @@ Alternatively, you can instruct Helm not to create and manage the secret for ``f
 
    secrets:
      adminOauthClientCredentials:
-       enabled: false #set to false
+       enabled: true # enable mounting the flyte-secret-auth secret to the flytepropeller.
+       clientSecret: null # disable Helm from creating the flyte-secret-auth secret.
        # Replace with the client_id provided by provided by your IdP for flytepropeller.
        clientId: <client_id>
 
