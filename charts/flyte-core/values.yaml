@@ -54,6 +54,8 @@ flyteadmin:
       projectcontour.io/upstream-protocol.h2c: grpc
     type: ClusterIP
     loadBalancerSourceRanges: []
+    # -- Appends additional ports to the service spec.
+    additionalPorts: []
   # -- Configuration for service accounts for FlyteAdmin
   serviceAccount:
     # -- Should a service account be created for flyteadmin
@@ -228,6 +230,8 @@ datacatalog:
     annotations:
       projectcontour.io/upstream-protocol.h2c: grpc
     type: NodePort
+    # -- Appends additional ports to the service spec.
+    additionalPorts: []
   # -- Configuration for service accounts for Datacatalog
   serviceAccount:
     # -- Should a service account be created for Datacatalog
@@ -356,6 +360,8 @@ flytepropeller:
   service:
     # -- If enabled create the flytepropeller service
     enabled: false
+    # -- Appends additional ports to the service spec.
+    additionalPorts: []
 
   # -- Settings for flytepropeller service monitor
   serviceMonitor:
