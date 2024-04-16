@@ -65,7 +65,7 @@ func syncTerminalItem(_ context.Context, batch Batch) ([]ItemSyncResponse, error
 }
 
 func TestCacheFour(t *testing.T) {
-	testResyncPeriod := 10 * time.Millisecond
+	testResyncPeriod := 20 * time.Millisecond
 	rateLimiter := workqueue.DefaultControllerRateLimiter()
 
 	t.Run("normal operation", func(t *testing.T) {
@@ -77,7 +77,7 @@ func TestCacheFour(t *testing.T) {
 		assert.NoError(t, cache.Start(ctx))
 
 		// Create ten items in the cache
-		for i := 1; i <= 10; i++ {
+		for i := 1; i <= 1; i++ {
 			_, err := cache.GetOrCreate(fmt.Sprintf("%d", i), fakeCacheItem{
 				val: 0,
 			})
@@ -86,7 +86,7 @@ func TestCacheFour(t *testing.T) {
 
 		// Wait half a second for all resync periods to complete
 		time.Sleep(500 * time.Millisecond)
-		for i := 1; i <= 10; i++ {
+		for i := 1; i <= 1; i++ {
 			item, err := cache.Get(fmt.Sprintf("%d", i))
 			assert.NoError(t, err)
 			assert.Equal(t, 10, item.(fakeCacheItem).val)

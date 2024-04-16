@@ -3,8 +3,6 @@ package cache
 import (
 	"context"
 	"fmt"
-	"golang.org/x/exp/slices"
-	"strings"
 	"sync"
 	"time"
 
@@ -106,6 +104,19 @@ func (i itemWrapper) GetItem() Item {
 	return i.item
 }
 
+//type empty struct{}
+//type set map[string]empty
+//
+//type lruMap struct {
+//	*lru.Cache
+//	// Things that are currently being processed are in the processing set.
+//	processing set
+//}
+//
+//func (l *lruMap) isDirty(key string) bool {
+//
+//}
+
 // Thread-safe general purpose auto-refresh cache that watches for updates asynchronously for the keys after they are added to
 // the cache. An item can be inserted only once.
 //
@@ -118,6 +129,7 @@ type autoRefresh struct {
 	syncCb          SyncFunc
 	createBatchesCb CreateBatchesFunc
 	lruMap          *lru.Cache
+	isProcessing    *syncSet
 	toDelete        *syncSet
 	syncPeriod      time.Duration
 	workqueue       workqueue.RateLimitingInterface
@@ -238,7 +250,7 @@ func (w *autoRefresh) enqueueBatches(ctx context.Context) error {
 		// If not ok, it means evicted between the item was evicted between getting the keys and this update loop
 		// which is fine, we can just ignore.
 		if value, ok := w.lruMap.Peek(k); ok {
-			if item, ok := value.(Item); !ok || (ok && !item.IsTerminal()) {
+			if item, ok := value.(Item); !ok || (ok && !item.IsTerminal() && !w.isProcessing.Contains(k)) {
 				snapshot = append(snapshot, itemWrapper{
 					id:   k.(ItemID),
 					item: value.(Item),
@@ -253,13 +265,13 @@ func (w *autoRefresh) enqueueBatches(ctx context.Context) error {
 	}
 
 	for _, batch := range batches {
-		var batchIDs []string
-		for i, _ := range batch {
-			batchIDs = append(batchIDs, batch[i].GetID())
+		b := batch
+		w.workqueue.AddRateLimited(&b)
+		logger.Infof(ctx, "Processing batch [%v]", &b)
+		logger.Infof(ctx, "workqueue.NumRequeues [%v]", w.workqueue.NumRequeues(&b))
+		for i, _ := range b {
+			w.isProcessing.Insert(b[i].GetID())
 		}
-		slices.Sort(batchIDs)
-		logger.Infof(ctx, "Enqueuing batch [%v]", strings.Join(batchIDs, ","))
-		w.workqueue.AddRateLimited(strings.Join(batchIDs, ","))
 	}
 
 	return nil
@@ -297,21 +309,21 @@ func (w *autoRefresh) sync(ctx context.Context) (err error) {
 		case <-ctx.Done():
 			return nil
 		default:
-			itemID, shutdown := w.workqueue.Get()
+			batch, shutdown := w.workqueue.Get()
 			if shutdown {
 				logger.Debugf(ctx, "Shutting down worker")
 				return nil
 			}
-			batchIDs := strings.Split(itemID.(string), ",")
-			logger.Infof(ctx, "Processing batch [%v]", strings.Join(batchIDs, ","))
+			logger.Infof(ctx, "Processing batch [%v]", batch)
 			// Since we create batches every time we sync, we will just remove the item from the queue here
 			// regardless of whether it succeeded the sync or not.
-			w.workqueue.Forget(itemID)
-			w.workqueue.Done(itemID)
+			w.workqueue.Forget(batch)
+			w.workqueue.Done(batch)
 
-			newBatch := make(Batch, 0, len(batchIDs))
-			for _, id := range batchIDs {
-				itemID := id
+			newBatch := make(Batch, 0, len(*batch.(*Batch)))
+			for _, b := range *batch.(*Batch) {
+				itemID := b.GetID()
+				w.isProcessing.Remove(itemID)
 				item, ok := w.lruMap.Get(itemID)
 				if !ok {
 					logger.Debugf(ctx, "item with id [%v] not found in cache", itemID)
@@ -321,7 +333,7 @@ func (w *autoRefresh) sync(ctx context.Context) (err error) {
 					logger.Debugf(ctx, "item with id [%v] is terminal", itemID)
 					continue
 				}
-				newBatch = append(newBatch, itemWrapper{id: itemID, item: item.(Item)})
+				newBatch = append(newBatch, b)
 			}
 			if len(newBatch) == 0 {
 				continue
@@ -371,6 +383,7 @@ func NewAutoRefreshBatchedCache(name string, createBatches CreateBatchesFunc, sy
 		createBatchesCb: createBatches,
 		syncCb:          syncCb,
 		lruMap:          lruCache,
+		isProcessing:    newSyncSet(),
 		toDelete:        newSyncSet(),
 		syncPeriod:      resyncPeriod,
 		workqueue:       workqueue.NewNamedRateLimitingQueue(syncRateLimiter, scope.CurrentScope()),

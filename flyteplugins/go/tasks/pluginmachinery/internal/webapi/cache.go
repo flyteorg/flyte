@@ -44,7 +44,6 @@ type ResourceCache struct {
 // A wrapper for each item in the cache.
 type CacheItem struct {
 	State
-
 	Resource webapi.Resource
 }
 
@@ -52,7 +51,6 @@ func (c CacheItem) IsTerminal() bool {
 	resourceStatus := false
 	if resource, ok := c.Resource.(interface{ IsTerminal() bool }); ok {
 		resourceStatus = resource.IsTerminal()
-		logger.Infof(context.Background(), "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk [%v]", resourceStatus)
 	}
 	return resourceStatus || c.State.Phase.IsTerminal()
 }
