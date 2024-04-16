@@ -1,10 +1,10 @@
 ## Tracking issue
 <!--
-If your PR fixes an open issue, use `Closes flyteorg/flyte#999` to link your PR with the issue.
-Example: Closes flyteorg/flyte#999
+If your PR fixes an open issue, use `Closes #999` to link your PR with the issue.
+Example: Closes #999
 
-If your PR is related to an issue or PR, use `Related to flyteorg/flyte#999` to link your PR.
-Example: Related to flyteorg/flyte#999
+If your PR is related to an issue or PR, use `Related to #999` to link your PR.
+Example: Related to #999
 
 Remove this section if not applicable
 -->
