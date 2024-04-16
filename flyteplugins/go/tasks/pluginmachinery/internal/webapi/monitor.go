@@ -38,16 +38,7 @@ func monitor(ctx context.Context, tCtx core.TaskExecutionContext, p Client, cach
 			}
 			return state, core.PhaseInfoFailure(errors.CacheFailed, cacheItem.ErrorMessage, nil), nil
 		}
-		if cacheItem.Phase == PhaseResourcesCreated {
-			resource, err := p.Get(ctx, newPluginContext(cacheItem.ResourceMeta, nil, "", tCtx))
-			if err != nil {
-				logger.Errorf(ctx, "Failed to get resource. Error: %v", err)
-				return state, core.PhaseInfoRetryableFailure("Failed", err.Error(), nil), nil
-			}
-			cacheItem.Resource = resource
-		} else {
-			return state, core.PhaseInfoQueued(time.Now(), core.DefaultPhaseVersion, "job submitted"), nil
-		}
+		return state, core.PhaseInfoQueued(time.Now(), core.DefaultPhaseVersion, "job submitted"), nil
 	}
 
 	newPhase, err := p.Status(ctx, newPluginContext(cacheItem.ResourceMeta, cacheItem.Resource, "", tCtx))
