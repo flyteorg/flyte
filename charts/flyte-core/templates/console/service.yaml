@@ -16,6 +16,7 @@ spec:
   - name: http
     port: 80
     protocol: TCP
+    appProtocol: TCP
     targetPort: 8080
     {{- if .Values.flyteconsole.serviceMonitor.enabled  }}
   - name: http-metrics

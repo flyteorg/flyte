@@ -570,6 +570,7 @@ common:
     # --- Ingress annotations applied to both HTTP and GRPC ingresses.
     annotations:
       nginx.ingress.kubernetes.io/app-root: /console
+      nginx.ingress.kubernetes.io/service-upstream: "true"
     # --- albSSLRedirect adds a special route for ssl redirect. Only useful in combination with the AWS LoadBalancer Controller.
     albSSLRedirect: false
     # --- Ingress hostname
