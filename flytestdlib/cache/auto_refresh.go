@@ -104,19 +104,6 @@ func (i itemWrapper) GetItem() Item {
 	return i.item
 }
 
-//type empty struct{}
-//type set map[string]empty
-//
-//type lruMap struct {
-//	*lru.Cache
-//	// Things that are currently being processed are in the processing set.
-//	processing set
-//}
-//
-//func (l *lruMap) isDirty(key string) bool {
-//
-//}
-
 // Thread-safe general purpose auto-refresh cache that watches for updates asynchronously for the keys after they are added to
 // the cache. An item can be inserted only once.
 //
