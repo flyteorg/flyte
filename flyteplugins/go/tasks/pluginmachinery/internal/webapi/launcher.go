@@ -49,5 +49,5 @@ func launch(ctx context.Context, p webapi.AsyncPlugin, tCtx core.TaskExecutionCo
 		return nil, core.PhaseInfo{}, err
 	}
 
-	return state, core.PhaseInfoQueued(time.Now(), 2, "launched"), nil
+	return state, core.PhaseInfoQueued(time.Now(), core.DefaultPhaseVersion, "launched"), nil
 }

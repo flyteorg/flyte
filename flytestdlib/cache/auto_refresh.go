@@ -213,7 +213,8 @@ func (w *autoRefresh) GetOrCreate(id ItemID, item Item) (Item, error) {
 	w.lruMap.Add(id, item)
 	w.metrics.CacheMiss.Inc()
 
-	// It will fix
+	// It fixes cold start issue in the AutoRefreshCache by adding the item to the workqueue when it is created.
+	// This way, the item will be processed without waiting for the next sync cycle (30s by default).
 	batch := make([]ItemWrapper, 0, 1)
 	batch = append(batch, itemWrapper{id: id, item: item})
 	w.workqueue.AddRateLimited(&batch)
