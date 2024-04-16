@@ -48,11 +48,12 @@ type CacheItem struct {
 }
 
 func (c CacheItem) IsTerminal() bool {
-	resourceStatus := false
-	if resource, ok := c.Resource.(interface{ IsTerminal() bool }); ok {
-		resourceStatus = resource.IsTerminal()
+	if c.Resource != nil {
+		if resource, ok := c.Resource.(interface{ IsTerminal() bool }); ok {
+			return resource.IsTerminal()
+		}
 	}
-	return resourceStatus || c.State.Phase.IsTerminal()
+	return c.State.Phase.IsTerminal()
 }
 
 // This basically grab an updated status from Client and store it in the cache
