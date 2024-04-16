@@ -9,13 +9,17 @@
 Flytekit offers a mechanism for chaining Flyte entities using the `>>` operator.
 This is particularly valuable when chaining tasks and subworkflows without the need for data flow between the entities.
 
+```{note}
+To clone and run the example code on this page, see the [Flytesnacks repo][adv-comp].
+```
+
 ## Tasks
 
 Let's establish a sequence where `t1()` occurs after `t0()`, and `t2()` follows `t1()`.
  
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/chain_entities.py
-:caption: advanced_composition/advanced_composition/chain_entities.py
-:lines: 3-32
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/chain_entities.py
+:caption: chain_entities.py
+:lines: 1-30
 ```
 
 (chain_subworkflow)=
@@ -23,22 +27,22 @@ Let's establish a sequence where `t1()` occurs after `t0()`, and `t2()` follows 
 
 Just like tasks, you can chain {ref}`subworkflows <subworkflow>`.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/chain_entities.py
-:caption: advanced_composition/advanced_composition/chain_entities.py
-:lines: 36-51
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/chain_entities.py
+:caption: chain_entities.py
+:lines: 34-49
 ```
 
 To run the provided workflows on the Flyte cluster, use the following commands:
 
 ```
 pyflyte run --remote \
-  https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/chain_entities.py \
+  https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/chain_entities.py \
   chain_tasks_wf
 ```
 
 ```
 pyflyte run --remote \
-  https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/chain_entities.py \
+  https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/chain_entities.py \
   chain_workflows_wf
 ```
 
@@ -46,3 +50,5 @@ pyflyte run --remote \
 Chaining tasks and subworkflows is not supported in local environments.
 Follow the progress of this issue [here](https://github.com/flyteorg/flyte/issues/4080).
 :::
+
+[adv-comp]: https://github.com/flyteorg/flytesnacks/tree/master/example_code/advanced_composition

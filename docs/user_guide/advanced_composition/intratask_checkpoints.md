@@ -1,22 +1,3 @@
----
-jupytext:
-  cell_metadata_filter: all
-  formats: md:myst
-  main_language: python
-  notebook_metadata_filter: all
-  text_representation:
-    extension: .md
-    format_name: myst
-    format_version: 0.13
-    jupytext_version: 1.16.1
-kernelspec:
-  display_name: Python 3
-  language: python
-  name: python3
----
-
-+++ {"lines_to_next_cell": 0}
-
 # Intratask checkpoints
 
 ```{eval-rst}
@@ -66,40 +47,17 @@ like Keras, PyTorch, Scikit-learn, and big-data frameworks such as Spark and Fli
 
 To begin, import the necessary libraries and set the number of task retries to `3`.
 
-```{code-cell}
-from flytekit import current_context, task, workflow
-from flytekit.exceptions.user import FlyteRecoverableException
-
-RETRIES = 3
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/checkpoint.py
+:caption: checkpoint.py
+:lines: 1-4
 ```
-
-+++ {"lines_to_next_cell": 0}
 
 We define a task to iterate precisely `n_iterations`, checkpoint its state, and recover from simulated failures.
 
-```{code-cell}
-@task(retries=RETRIES)
-def use_checkpoint(n_iterations: int) -> int:
-    cp = current_context().checkpoint
-    prev = cp.read()
-
-    start = 0
-    if prev:
-        start = int(prev.decode())
-
-    # Create a failure interval to simulate failures across 'n' iterations and then succeed after configured retries
-    failure_interval = n_iterations // RETRIES
-    index = 0
-    for index in range(start, n_iterations):
-        # Simulate a deterministic failure for demonstration. Showcasing how it eventually completes within the given retries
-        if index > start and index % failure_interval == 0:
-            raise FlyteRecoverableException(f"Failed at iteration {index}, failure_interval {failure_interval}.")
-        # Save progress state. It is also entirely possible to save state every few intervals
-        cp.write(f"{index + 1}".encode())
-    return index
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/checkpoint.py
+:caption: checkpoint.py
+:pyobject: use_checkpoint
 ```
-
-+++ {"lines_to_next_cell": 0}
 
 The checkpoint system offers additional APIs, documented in the code accessible at
 [checkpointer code](https://github.com/flyteorg/flytekit/blob/master/flytekit/core/checkpointer.py).
@@ -107,23 +65,16 @@ The checkpoint system offers additional APIs, documented in the code accessible 
 Create a workflow that invokes the task.
 The task will automatically undergo retries in the event of a  {ref}`FlyteRecoverableException <flytekit:exception_handling>`.
 
-```{code-cell}
-@workflow
-def checkpointing_example(n_iterations: int) -> int:
-    return use_checkpoint(n_iterations=n_iterations)
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/checkpoint.py
+:caption: checkpoint.py
+:pyobject: checkpointing_example
 ```
-
-+++ {"lines_to_next_cell": 0}
 
 The local checkpoint is not utilized here because retries are not supported.
 
-```{code-cell}
-if __name__ == "__main__":
-    try:
-        checkpointing_example(n_iterations=10)
-    except RuntimeError as e:  # noqa : F841
-        # Since no retries are performed, an exception is expected when run locally
-        pass
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/checkpoint.py
+:caption: checkpoint.py
+:lines: 37-42
 ```
 
 ## Run the example on the Flyte cluster
@@ -132,6 +83,6 @@ To run the provided workflow on the Flyte cluster, use the following command:
 
 ```
 pyflyte run --remote \
-  https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/checkpoint.py \
+  https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/checkpoint.py \
   checkpointing_example --n_iterations 10
 ```
