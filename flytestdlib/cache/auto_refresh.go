@@ -308,7 +308,6 @@ func (w *autoRefresh) sync(ctx context.Context) (err error) {
 				logger.Debugf(ctx, "Shutting down worker")
 				return nil
 			}
-			logger.Infof(ctx, "Processing batch [%v]", batch)
 			// Since we create batches every time we sync, we will just remove the item from the queue here
 			// regardless of whether it succeeded the sync or not.
 			w.workqueue.Forget(batch)
