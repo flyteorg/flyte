@@ -212,6 +212,13 @@ func (w *autoRefresh) GetOrCreate(id ItemID, item Item) (Item, error) {
 
 	w.lruMap.Add(id, item)
 	w.metrics.CacheMiss.Inc()
+
+	// It will fix
+	batch := make([]ItemWrapper, 0, 1)
+	batch = append(batch, itemWrapper{id: id, item: item})
+	w.workqueue.AddRateLimited(&batch)
+	w.isProcessing.Insert(id)
+	logger.Infof(context.Background(), "Added item with id [%v] to workqueue", id)
 	return item, nil
 }
 
