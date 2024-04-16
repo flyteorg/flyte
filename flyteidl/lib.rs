@@ -1,6 +1,3 @@
-pub mod datacatalog {
-    include!("gen/pb_rust/datacatalog.rs");
-}
 pub mod flyteidl {
 
     pub mod admin {
