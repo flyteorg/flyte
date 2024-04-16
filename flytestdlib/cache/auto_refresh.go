@@ -116,12 +116,14 @@ type autoRefresh struct {
 	syncCb          SyncFunc
 	createBatchesCb CreateBatchesFunc
 	lruMap          *lru.Cache
-	isProcessing    *syncSet
-	toDelete        *syncSet
-	syncPeriod      time.Duration
-	workqueue       workqueue.RateLimitingInterface
-	parallelizm     int
-	lock            sync.RWMutex
+	// Items that are currently being processed are in the processing set.
+	// It will prevent the same item from being processed multiple times by different workers.
+	Processing  *syncSet
+	toDelete    *syncSet
+	syncPeriod  time.Duration
+	workqueue   workqueue.RateLimitingInterface
+	parallelizm int
+	lock        sync.RWMutex
 }
 
 func getEvictionFunction(counter prometheus.Counter) func(key interface{}, value interface{}) {
@@ -218,8 +220,7 @@ func (w *autoRefresh) GetOrCreate(id ItemID, item Item) (Item, error) {
 	batch := make([]ItemWrapper, 0, 1)
 	batch = append(batch, itemWrapper{id: id, item: item})
 	w.workqueue.AddRateLimited(&batch)
-	w.isProcessing.Insert(id)
-	logger.Infof(context.Background(), "Added item with id [%v] to workqueue", id)
+	w.Processing.Insert(id)
 	return item, nil
 }
 
@@ -245,7 +246,7 @@ func (w *autoRefresh) enqueueBatches(ctx context.Context) error {
 		// If not ok, it means evicted between the item was evicted between getting the keys and this update loop
 		// which is fine, we can just ignore.
 		if value, ok := w.lruMap.Peek(k); ok {
-			if item, ok := value.(Item); !ok || (ok && !item.IsTerminal() && !w.isProcessing.Contains(k)) {
+			if item, ok := value.(Item); !ok || (ok && !item.IsTerminal() && !w.Processing.Contains(k)) {
 				snapshot = append(snapshot, itemWrapper{
 					id:   k.(ItemID),
 					item: value.(Item),
@@ -262,10 +263,8 @@ func (w *autoRefresh) enqueueBatches(ctx context.Context) error {
 	for _, batch := range batches {
 		b := batch
 		w.workqueue.AddRateLimited(&b)
-		logger.Infof(ctx, "Processing batch [%v]", &b)
-		logger.Infof(ctx, "workqueue.NumRequeues [%v]", w.workqueue.NumRequeues(&b))
 		for i, _ := range b {
-			w.isProcessing.Insert(b[i].GetID())
+			w.Processing.Insert(b[i].GetID())
 		}
 	}
 
@@ -318,7 +317,7 @@ func (w *autoRefresh) sync(ctx context.Context) (err error) {
 			newBatch := make(Batch, 0, len(*batch.(*Batch)))
 			for _, b := range *batch.(*Batch) {
 				itemID := b.GetID()
-				w.isProcessing.Remove(itemID)
+				w.Processing.Remove(itemID)
 				item, ok := w.lruMap.Get(itemID)
 				if !ok {
 					logger.Debugf(ctx, "item with id [%v] not found in cache", itemID)
@@ -378,7 +377,7 @@ func NewAutoRefreshBatchedCache(name string, createBatches CreateBatchesFunc, sy
 		createBatchesCb: createBatches,
 		syncCb:          syncCb,
 		lruMap:          lruCache,
-		isProcessing:    newSyncSet(),
+		Processing:      newSyncSet(),
 		toDelete:        newSyncSet(),
 		syncPeriod:      resyncPeriod,
 		workqueue:       workqueue.NewNamedRateLimitingQueue(syncRateLimiter, scope.CurrentScope()),

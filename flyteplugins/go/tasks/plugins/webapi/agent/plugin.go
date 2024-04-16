@@ -40,6 +40,7 @@ type ResourceWrapper struct {
 	LogLinks []*flyteIdl.TaskLog
 }
 
+// IsTerminal is used to avoid making network calls to the agent service if the resource is already in a terminal state.
 func (r ResourceWrapper) IsTerminal() bool {
 	return r.Phase == flyteIdl.TaskExecution_SUCCEEDED || r.Phase == flyteIdl.TaskExecution_FAILED || r.Phase == flyteIdl.TaskExecution_ABORTED
 }
