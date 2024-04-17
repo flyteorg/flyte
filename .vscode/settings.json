@@ -1,0 +1,7 @@
+{
+    "go.formatTool": "goimports",
+    "go.lintTool": "golangci-lint",
+    "gopls": {
+        "formatting.local": "github.com/flyteorg"
+    },
+}

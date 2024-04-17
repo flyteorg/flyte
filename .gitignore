@@ -2,7 +2,6 @@
 _build/
 _bin/
 build/
-.vscode/
 *.swp
 *.swo
 .DS_Store
