@@ -183,7 +183,7 @@ Get the Flyte service GRPC paths.
 - /flyteidl.service.AdminService
 - /flyteidl.service.AdminService/*
 - /flyteidl.service.AuthMetadataService
-- /flyteidl.service.AuthMetadataService/
+- /flyteidl.service.AuthMetadataService/*
 - /flyteidl.service.DataProxyService
 - /flyteidl.service.DataProxyService/*
 - /flyteidl.service.IdentityService

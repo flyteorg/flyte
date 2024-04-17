@@ -50,7 +50,7 @@ func (Config) mustMarshalJSON(v json.Marshaler) string {
 // flags is json-name.json-sub-name... etc.
 func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags := pflag.NewFlagSet("Config", pflag.ExitOnError)
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "type"), defaultConfig.Type, "Which resource manager to use")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "type"), defaultConfig.Type, " Which resource manager to use,  redis or noop. Default is noop.")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "resourceMaxQuota"), defaultConfig.ResourceMaxQuota, "Global limit for concurrent Qubole queries")
 	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "redis.hostPaths"), defaultConfig.RedisConfig.HostPaths, "Redis hosts locations.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "redis.primaryName"), defaultConfig.RedisConfig.PrimaryName, "Redis primary name,  fill in only if you are connecting to a redis sentinel cluster.")

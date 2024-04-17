@@ -252,13 +252,29 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		arrayNodeState.Phase = v1alpha1.ArrayNodePhaseExecuting
 	case v1alpha1.ArrayNodePhaseExecuting:
 		// process array node subNodes
-		currentParallelism := int(arrayNode.GetParallelism())
-		if currentParallelism == 0 {
-			currentParallelism = len(arrayNodeState.SubNodePhases.GetItems())
+
+		availableParallelism := 0
+		// using the workflow's parallelism if the array node parallelism is not set
+		useWorkflowParallelism := arrayNode.GetParallelism() == nil
+		if useWorkflowParallelism {
+			// greedily take all available slots
+			// TODO: This will need to be re-evaluated if we want to support dynamics & sub_workflows
+			currentParallelism := nCtx.ExecutionContext().CurrentParallelism()
+			maxParallelism := nCtx.ExecutionContext().GetExecutionConfig().MaxParallelism
+			availableParallelism = int(maxParallelism - currentParallelism)
+		} else {
+			availableParallelism = int(*arrayNode.GetParallelism())
+			if availableParallelism == 0 {
+				availableParallelism = len(arrayNodeState.SubNodePhases.GetItems())
+			}
 		}
 
-		nodeExecutionRequests := make([]*nodeExecutionRequest, 0, currentParallelism)
+		nodeExecutionRequests := make([]*nodeExecutionRequest, 0, availableParallelism)
 		for i, nodePhaseUint64 := range arrayNodeState.SubNodePhases.GetItems() {
+			if availableParallelism == 0 {
+				break
+			}
+
 			nodePhase := v1alpha1.NodePhase(nodePhaseUint64)
 			taskPhase := int(arrayNodeState.SubNodeTaskPhases.GetItem(i))
 
@@ -298,11 +314,11 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 
 			// TODO - this is a naive implementation of parallelism, if we want to support more
 			// complex subNodes (ie. dynamics / subworkflows) we need to revisit this so that
-			// parallelism is handled during subNode evaluations.
-			currentParallelism--
-			if currentParallelism == 0 {
-				break
+			// parallelism is handled during subNode evaluations + avoid deadlocks
+			if useWorkflowParallelism {
+				nCtx.ExecutionContext().IncrementParallelism()
 			}
+			availableParallelism--
 		}
 
 		workerErrorCollector := errorcollector.NewErrorMessageCollector()

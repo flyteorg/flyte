@@ -851,9 +851,11 @@ func DemystifyFailure(status v1.PodStatus, info pluginsCore.TaskInfo) (pluginsCo
 	//     }
 	// }
 	//
+
+	var isSystemError bool
 	// In some versions of GKE the reason can also be "Terminated"
 	if code == "Shutdown" || code == "Terminated" {
-		return pluginsCore.PhaseInfoSystemRetryableFailure(Interrupted, message, &info), nil
+		isSystemError = true
 	}
 
 	//
@@ -887,6 +889,11 @@ func DemystifyFailure(status v1.PodStatus, info pluginsCore.TaskInfo) (pluginsCo
 			}
 		}
 	}
+
+	if isSystemError {
+		return pluginsCore.PhaseInfoSystemRetryableFailure(Interrupted, message, &info), nil
+	}
+
 	return pluginsCore.PhaseInfoRetryableFailure(code, message, &info), nil
 }
 

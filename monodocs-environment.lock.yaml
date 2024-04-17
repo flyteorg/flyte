@@ -17783,7 +17783,7 @@ package:
   category: main
   optional: false
 - name: pillow
-  version: 10.2.0
+  version: 10.3.0
   manager: conda
   platform: linux-64
   dependencies:
@@ -17795,14 +17795,14 @@ package:
     libwebp-base: '>=1.3.2,<2.0a0'
     libxcb: '>=1.15,<1.16.0a0'
     libzlib: '>=1.2.13,<1.3.0a0'
-    openjpeg: '>=2.5.0,<3.0a0'
+    openjpeg: '>=2.5.2,<3.0a0'
     python: '>=3.9,<3.10.0a0'
     python_abi: 3.9.*
     tk: '>=8.6.13,<8.7.0a0'
-  url: https://conda.anaconda.org/conda-forge/linux-64/pillow-10.2.0-py39had0adad_0.conda
+  url: https://conda.anaconda.org/conda-forge/linux-64/pillow-10.3.0-py39h90c7501_0.conda
   hash:
-    md5: 2972754dc054bb079d1d121918b5126f
-    sha256: 6936d54f9830ac66bee7b26187eb2297d80febe110e978cd9ae6a54e62ec6aaf
+    md5: 1e3b6af9592be71ce19f0a6aae05d97b
+    sha256: 1fa684d3f431f98a3e10f972025fc63fc81882e775059b358f5ff58cc46a951d
   category: main
   optional: false
 - name: pillow
@@ -17817,7 +17817,7 @@ package:
     libwebp-base: '>=1.3.2,<2.0a0'
     libxcb: '>=1.15,<1.16.0a0'
     libzlib: '>=1.2.13,<1.3.0a0'
-    openjpeg: '>=2.5.0,<3.0a0'
+    openjpeg: '>=2.5.2,<3.0a0'
     python: '>=3.9,<3.10.0a0'
     python_abi: 3.9.*
     tk: '>=8.6.13,<8.7.0a0'
@@ -17828,7 +17828,7 @@ package:
   category: main
   optional: false
 - name: pillow
-  version: 10.2.0
+  version: 10.3.0
   manager: conda
   platform: osx-arm64
   dependencies:
@@ -17843,10 +17843,10 @@ package:
     python: '>=3.9,<3.10.0a0'
     python_abi: 3.9.*
     tk: '>=8.6.13,<8.7.0a0'
-  url: https://conda.anaconda.org/conda-forge/osx-arm64/pillow-10.2.0-py39h755f0b7_0.conda
+  url: https://conda.anaconda.org/conda-forge/osx-arm64/pillow-10.3.0-py39h3352c98_0.conda
   hash:
-    md5: 9309cdb83d6c1617a58e57b61c556105
-    sha256: 0e91b5467c3994760832fca4a45ed084853061b5c42a8015da4e19fed7e5b7aa
+    md5: ae81c249c46d2c8e37770a72f7568aaa
+    sha256: ec1a6fed0b5e114c79ecdbe195f1a1c9ace94ccb61379e59781afb68cba0f463
   category: main
   optional: false
 - name: pip
@@ -26031,15 +26031,15 @@ package:
   category: main
   optional: false
 - name: xyzservices
-  version: 2023.10.1
+  version: 2024.4.0
   manager: conda
   platform: linux-64
   dependencies:
     python: '>=3.8'
-  url: https://conda.anaconda.org/conda-forge/noarch/xyzservices-2023.10.1-pyhd8ed1ab_0.conda
+  url: https://conda.anaconda.org/conda-forge/noarch/xyzservices-2024.4.0-pyhd8ed1ab_0.conda
   hash:
-    md5: 1e0d85c0e2fef9539218da185b285f54
-    sha256: da655e2e0a742fddefeeaf2dd828b62a1820a3755d13341e1a555a10fcb9cf81
+    md5: 93dffc47dadbe36a1a644f3f50d4979d
+    sha256: 4e095631b52a78bbd9b53f28eb79b0c8f448d9509cf0451e99c2f3f85576f114
   category: main
   optional: false
 - name: xyzservices
@@ -26055,15 +26055,15 @@ package:
   category: main
   optional: false
 - name: xyzservices
-  version: 2023.10.1
+  version: 2024.4.0
   manager: conda
   platform: osx-arm64
   dependencies:
     python: '>=3.8'
-  url: https://conda.anaconda.org/conda-forge/noarch/xyzservices-2023.10.1-pyhd8ed1ab_0.conda
+  url: https://conda.anaconda.org/conda-forge/noarch/xyzservices-2024.4.0-pyhd8ed1ab_0.conda
   hash:
-    md5: 1e0d85c0e2fef9539218da185b285f54
-    sha256: da655e2e0a742fddefeeaf2dd828b62a1820a3755d13341e1a555a10fcb9cf81
+    md5: 93dffc47dadbe36a1a644f3f50d4979d
+    sha256: 4e095631b52a78bbd9b53f28eb79b0c8f448d9509cf0451e99c2f3f85576f114
   category: main
   optional: false
 - name: xz

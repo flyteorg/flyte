@@ -131,9 +131,9 @@ class FileSensor(BaseSensor):
 ```
 
 
-### 2. Test the agent locally
+### 2. Test the agent
 
-See {doc}`"Testing agents locally" <testing_agents_locally>` to test your agent locally.
+You can test your agent in a {ref}`local Python environment <testing_agents_locally>` or in a {ref}<local development cluster `testing_agents_in_a_local_development_cluster`>.
 
 ### 3. Build a new Docker image
 
@@ -166,7 +166,7 @@ For flytekit versions `>v1.10.2`, use `pyflyte serve agent`.
 kubectl set image deployment/flyteagent flyteagent=ghcr.io/flyteorg/flyteagent:latest
 ```
 
-2. Update the FlytePropeller configmap.
+2. Update the FlytePropeller configmap:
 
 ```YAML
  tasks:
@@ -178,14 +178,14 @@ kubectl set image deployment/flyteagent flyteagent=ghcr.io/flyteorg/flyteagent:l
        - custom_task: agent-service
 ```
 
-3. Restart FlytePropeller.
+3. Restart FlytePropeller:
 
 ```
 kubectl rollout restart deployment flytepropeller -n flyte
 ```
 
+### 5. Canary deployment
 
-### Canary deployment
 Agents can be deployed independently in separate environments. Decoupling agents from the
 production environment ensures that if any specific agent encounters an error or issue, it will not impact the overall production system.
 
@@ -193,7 +193,7 @@ By running agents independently, you can thoroughly test and validate your agent
 controlled environment before deploying them to the production cluster.
 
 By default, all agent requests will be sent to the default agent service. However,
-you can route particular task requests to designated agent services by adjusting the flytepropeller configuration. 
+you can route particular task requests to designated agent services by adjusting the FlytePropeller configuration. 
 
 ```yaml
  plugins:
@@ -207,7 +207,12 @@ you can route particular task requests to designated agent services by adjusting
        endpoint: "dns:///flyteagent.flyte.svc.cluster.local:8000"
        insecure: true
        timeouts:
+         # CreateTask, GetTask and DeleteTask are for async agents.
+         # ExecuteTaskSync is for sync agents.
+         CreateTask: 5s
          GetTask: 5s
+         DeleteTask: 5s
+         ExecuteTaskSync: 10s
        defaultTimeout: 10s
      agents:
        custom_agent:

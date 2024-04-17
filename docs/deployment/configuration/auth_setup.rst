@@ -346,8 +346,12 @@ Apply OIDC Configuration
 
          secrets:
            adminOauthClientCredentials:
-          # -- If enabled is true, helm will create and manage `flyte-secret-auth` and populate it with `clientSecret`.
-          # If enabled is false, it's up to the user to create `flyte-secret-auth`
+           # If enabled is true, and `clientSecret` is specified, helm will create and mount `flyte-secret-auth`.
+           # If enabled is true, and `clientSecret` is null, it's up to the user to create `flyte-secret-auth` as described in
+           # https://docs.flyte.org/en/latest/deployment/cluster_config/auth_setup.html#oauth2-authorization-server
+           # and helm will mount `flyte-secret-auth`.
+           # If enabled is false, auth is not turned on.
+           # Note: Unsupported combination: enabled.false and clientSecret.someValue
              enabled: true
            # Use the non-encoded version of the random password
              clientSecret: "<your-random-password>"
@@ -558,42 +562,43 @@ Follow the steps in this section to configure `flyteadmin` to use an external au
       .. code-block:: yaml
 
          configmap:
-           auth:
-             appAuth:
+           adminServer:
+             auth:
+               appAuth:
 
-               authServerType: External
+                 authServerType: External
 
-               # 2. Optional: Set external auth server baseUrl if different from OpenId baseUrl.
-               externalAuthServer:
-               # baseUrl: https://<keycloak-url>/auth/realms/<keycloak-realm> # Uncomment for Keycloak and update with your installation host and realm name
-               # baseUrl: https://login.microsoftonline.com/<tenant-id>/oauth2/v2.0/authorize # Uncomment for Azure AD
-               # For Okta, use the Issuer URI of the custom auth server:
-                 baseUrl: https://dev-<org-id>.okta.com/oauth2/<auth-server-id>
+                 # 2. Optional: Set external auth server baseUrl if different from OpenId baseUrl.
+                 externalAuthServer:
+                 # baseUrl: https://<keycloak-url>/auth/realms/<keycloak-realm> # Uncomment for Keycloak and update with your installation host and realm name
+                 # baseUrl: https://login.microsoftonline.com/<tenant-id>/oauth2/v2.0/authorize # Uncomment for Azure AD
+                 # For Okta, use the Issuer URI of the custom auth server:
+                   baseUrl: https://dev-<org-id>.okta.com/oauth2/<auth-server-id>
 
-                 metadataUrl: .well-known/openid-configuration
+                   metadataUrl: .well-known/openid-configuration
 
-               thirdPartyConfig:
-                  flyteClient:
-                     # 3. Replace with a new Native/Public Client ID provisioned in the custom authorization server.
-                     clientId: flytectl
-                     # This should not change
-                     redirectUri: http://localhost:53593/callback
-                     # 4. "all" is a required scope and must be configured in the custom authorization server.
-                     scopes:
-                     - offline
-                     - all
+                 thirdPartyConfig:
+                    flyteClient:
+                       # 3. Replace with a new Native/Public Client ID provisioned in the custom authorization server.
+                       clientId: flytectl
+                       # This should not change
+                       redirectUri: http://localhost:53593/callback
+                       # 4. "all" is a required scope and must be configured in the custom authorization server.
+                       scopes:
+                       - offline
+                       - all
 
-             userAuth:
-               openId:
-               # baseUrl: https://<keycloak-url>/auth/realms/<keycloak-realm> # Uncomment for Keycloak and update with your installation host and realm name
-               # baseUrl: https://login.microsoftonline.com/<tenant-id>/oauth2/v2.0/authorize # Uncomment for Azure AD
-               # For Okta, use the Issuer URI of the custom auth server:
-                 baseUrl: https://dev-<org-id>.okta.com/oauth2/<auth-server-id>
-                 scopes:
-                 - profile
-                 - openid
-                 # - offline_access # Uncomment if OIdC supports issuing refresh tokens.
-                 clientId: <client id>
+               userAuth:
+                 openId:
+                 # baseUrl: https://<keycloak-url>/auth/realms/<keycloak-realm> # Uncomment for Keycloak and update with your installation host and realm name
+                 # baseUrl: https://login.microsoftonline.com/<tenant-id>/oauth2/v2.0/authorize # Uncomment for Azure AD
+                 # For Okta, use the Issuer URI of the custom auth server:
+                   baseUrl: https://dev-<org-id>.okta.com/oauth2/<auth-server-id>
+                   scopes:
+                   - profile
+                   - openid
+                   # - offline_access # Uncomment if OIdC supports issuing refresh tokens.
+                   clientId: <client id>
 
 
          secrets:
@@ -616,14 +621,14 @@ Follow the steps in this section to configure `flyteadmin` to use an external au
       .. code-block:: yaml
 
          secrets:
-         adminOauthClientCredentials:
-            enabled: true
-            clientSecret: <client secret>
-            clientId: <client id>
+           adminOauthClientCredentials:
+             enabled: true
+             clientSecret: <client secret>
+             clientId: <client id>
          ---
          configmap:
-         admin:
-            admin:
+           admin:
+             admin:
                endpoint: <admin endpoint>
                insecure: true
                clientId: <client id>
@@ -632,28 +637,30 @@ Follow the steps in this section to configure `flyteadmin` to use an external au
                - api://<client id>/.default
                useAudienceFromAdmin: true
          ---
-         auth:
-            appAuth:
-               authServerType: External
-               externalAuthServer:
-                  baseUrl: https://login.microsoftonline.com/<tenant id>/v2.0/
-                  metadataUrl: .well-known/openid-configuration
-                  AllowedAudience:
-                     - api://<client id>
-               thirdPartyConfig:
-                  flyteClient:
+         configmap:
+           adminServer:
+             auth:
+               appAuth:
+                 authServerType: External
+                 externalAuthServer:
+                   baseUrl: https://login.microsoftonline.com/<tenant id>/v2.0/
+                   metadataUrl: .well-known/openid-configuration
+                   AllowedAudience:
+                   - api://<client id>
+                 thirdPartyConfig:
+                   flyteClient:
                      clientId: <client id>
                      redirectUri: http://localhost:53593/callback
                      scopes:
                      - api://<client id>/<custom-scope>
 
-            userAuth:
-               openId:
-                  baseUrl: https://login.microsoftonline.com/<tenant id>/v2.0
-                  scopes:
-                     - openid
-                     - profile
-                  clientId: <client id>
+               userAuth:
+                 openId:
+                 baseUrl: https://login.microsoftonline.com/<tenant id>/v2.0
+                 scopes:
+                 - openid
+                 - profile
+                 clientId: <client id>
 
 .. note::
 
@@ -674,7 +681,8 @@ Alternatively, you can instruct Helm not to create and manage the secret for ``f
 
    secrets:
      adminOauthClientCredentials:
-       enabled: false #set to false
+       enabled: true # enable mounting the flyte-secret-auth secret to the flytepropeller.
+       clientSecret: null # disable Helm from creating the flyte-secret-auth secret.
        # Replace with the client_id provided by provided by your IdP for flytepropeller.
        clientId: <client_id>
 

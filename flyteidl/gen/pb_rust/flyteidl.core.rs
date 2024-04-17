@@ -2417,17 +2417,23 @@ pub struct ArrayNode {
     /// node is the sub-node that will be executed for each element in the array.
     #[prost(message, optional, boxed, tag="1")]
     pub node: ::core::option::Option<::prost::alloc::boxed::Box<Node>>,
-    /// parallelism defines the minimum number of instances to bring up concurrently at any given
-    /// point. Note that this is an optimistic restriction and that, due to network partitioning or
-    /// other failures, the actual number of currently running instances might be more. This has to
-    /// be a positive number if assigned. Default value is size.
-    #[prost(uint32, tag="2")]
-    pub parallelism: u32,
+    #[prost(oneof="array_node::ParallelismOption", tags="2")]
+    pub parallelism_option: ::core::option::Option<array_node::ParallelismOption>,
     #[prost(oneof="array_node::SuccessCriteria", tags="3, 4")]
     pub success_criteria: ::core::option::Option<array_node::SuccessCriteria>,
 }
 /// Nested message and enum types in `ArrayNode`.
 pub mod array_node {
+    #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum ParallelismOption {
+        /// parallelism defines the minimum number of instances to bring up concurrently at any given
+        /// point. Note that this is an optimistic restriction and that, due to network partitioning or
+        /// other failures, the actual number of currently running instances might be more. This has to
+        /// be a positive number if assigned. Default value is size.
+        #[prost(uint32, tag="2")]
+        Parallelism(u32),
+    }
     #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum SuccessCriteria {
