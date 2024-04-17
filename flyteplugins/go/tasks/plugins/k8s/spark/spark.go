@@ -322,6 +322,7 @@ func (sparkResourceHandler) BuildIdentityResource(ctx context.Context, taskCtx p
 }
 
 func getEventInfoForSpark(pluginContext k8s.PluginContext, sj *sparkOp.SparkApplication) (*pluginsCore.TaskInfo, error) {
+
 	sparkConfig := GetSparkConfig()
 	taskLogs := make([]*core.TaskLog, 0, 3)
 	taskExecID := pluginContext.TaskExecutionMetadata().GetTaskExecutionID()
@@ -405,9 +406,13 @@ func getEventInfoForSpark(pluginContext k8s.PluginContext, sj *sparkOp.SparkAppl
 			return nil, err
 		}
 
+		// "All user" logs are shown already in the queuing and initializing phase.
+		for _, log := range o.TaskLogs {
+			log.ShowWhilePending = true
+		}
+
 		taskLogs = append(taskLogs, o.TaskLogs...)
 	}
-
 	customInfoMap := make(map[string]string)
 
 	// Spark UI.
