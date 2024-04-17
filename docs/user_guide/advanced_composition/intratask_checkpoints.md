@@ -45,35 +45,39 @@ It's important to note that Flyte currently offers the low-level API for checkpo
 Future integrations aim to incorporate higher-level checkpointing APIs from popular training frameworks
 like Keras, PyTorch, Scikit-learn, and big-data frameworks such as Spark and Flink, enhancing their fault-tolerance capabilities.
 
-To begin, import the necessary libraries and set the number of task retries to `3`.
+```{note}
+To clone and run the example code on this page, see the [Flytesnacks repo][adv-comp].
+```
+
+To begin, import the necessary libraries and set the number of task retries to `3`:
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/checkpoint.py
-:caption: checkpoint.py
+:caption: advanced_composition/checkpoint.py
 :lines: 1-4
 ```
 
-We define a task to iterate precisely `n_iterations`, checkpoint its state, and recover from simulated failures.
+We define a task to iterate precisely `n_iterations`, checkpoint its state, and recover from simulated failures:
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/checkpoint.py
-:caption: checkpoint.py
+:caption: advanced_composition/checkpoint.py
 :pyobject: use_checkpoint
 ```
 
 The checkpoint system offers additional APIs, documented in the code accessible at
 [checkpointer code](https://github.com/flyteorg/flytekit/blob/master/flytekit/core/checkpointer.py).
 
-Create a workflow that invokes the task.
+Create a workflow that invokes the task:
 The task will automatically undergo retries in the event of a  {ref}`FlyteRecoverableException <flytekit:exception_handling>`.
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/checkpoint.py
-:caption: checkpoint.py
+:caption: advanced_composition/checkpoint.py
 :pyobject: checkpointing_example
 ```
 
-The local checkpoint is not utilized here because retries are not supported.
+The local checkpoint is not utilized here because retries are not supported:
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/checkpoint.py
-:caption: checkpoint.py
+:caption: advanced_composition/checkpoint.py
 :lines: 37-42
 ```
 
@@ -86,3 +90,5 @@ pyflyte run --remote \
   https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/checkpoint.py \
   checkpointing_example --n_iterations 10
 ```
+
+[adv-comp]: https://github.com/flyteorg/flytesnacks/tree/master/example_code/advanced_composition/advanced_composition

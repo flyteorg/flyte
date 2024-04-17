@@ -18,10 +18,14 @@ Consequently, all nodes of a subworkflow adhere to the overall constraints impos
 Consider this scenario: when workflow `A` is integrated as a subworkflow of workflow `B`,
 running workflow `B` results in the entire graph of workflow `A` being duplicated into workflow `B` at the point of invocation.
 
-Here's an example illustrating the calculation of slope, intercept and the corresponding y-value.
+```{note}
+To clone and run the example code on this page, see the [Flytesnacks repo][adv-comp].
+```
+
+Here's an example illustrating the calculation of slope, intercept and the corresponding y-value:
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/subworkflow.py
-:caption: subworkflow.py
+:caption: advanced_composition/subworkflow.py
 :lines: 1-35
 ```
 
@@ -31,23 +35,23 @@ Subsequently, the `regression_line_wf` triggers `slope_intercept_wf` and then co
 To execute the workflow locally, use the following:
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/subworkflow.py
-:caption: subworkflow.py
+:caption: advanced_composition/subworkflow.py
 :lines: 39-40
 ```
 
 It's possible to nest a workflow that contains a subworkflow within another workflow.
 Workflows can be easily constructed from other workflows, even if they function as standalone entities.
-Each workflow in this module has the capability to exist and run independently.
+Each workflow in this module has the capability to exist and run independently:
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/subworkflow.py
-:caption: subworkflow.py
+:caption: advanced_composition/subworkflow.py
 :pyobject: nested_regression_line_wf
 ```
 
-You can run the nested workflow locally as well.
+You can run the nested workflow locally as well:
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/subworkflow.py
-:caption: subworkflow.py
+:caption: advanced_composition/subworkflow.py
 :lines: 52-53
 ```
 
@@ -68,7 +72,7 @@ external workflows may offer a way to distribute the workload of a workflow acro
 Here's an example that illustrates the concept of external workflows:
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/subworkflow.py
-:caption: subworkflow.py
+:caption: advanced_composition/subworkflow.py
 :lines: 61-71
 ```
 
@@ -82,7 +86,7 @@ In the console screenshot above, note that the launch plan execution ID differs 
 You can run a workflow containing an external workflow locally as follows:
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/subworkflow.py
-:caption: subworkflow.py
+:caption: advanced_composition/subworkflow.py
 :lines: 75-76
 ```
 
@@ -107,3 +111,5 @@ pyflyte run --remote \
   https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/subworkflow.py \
   nested_regression_line_lp
 ```
+
+[adv-comp]: https://github.com/flyteorg/flytesnacks/tree/master/example_code/advanced_composition/advanced_composition

@@ -13,13 +13,13 @@ it's important to note that they are restricted to specific binary and logical o
 and are applicable only to primitive values.
 
 ```{note}
-To clone and run the example code on this page, see the Flytesnacks repo.
+To clone and run the example code on this page, see the [Flytesnacks repo][adv-comp].
 ```
 
 To begin, import the necessary libraries.
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/conditional.py
-:caption: conditional.py
+:caption: advanced_composition/conditional.py
 :lines: 1-3
 ```
 
@@ -30,7 +30,7 @@ In this example, we introduce two tasks, `calculate_circle_circumference` and
 falls within the fraction range (0-1) or not.
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/conditional.py
-:caption: conditional.py
+:caption: advanced_composition/conditional.py
 :lines: 11-37
 ```
 
@@ -41,7 +41,7 @@ It's important to note that any `conditional` statement in Flyte is expected to 
 meaning that all possible branches must be accounted for.
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/conditional.py
-:caption: conditional.py
+:caption: advanced_composition/conditional.py
 :pyobject: shape_properties_with_multiple_branches
 ```
 
@@ -56,7 +56,7 @@ a convention also observed in other libraries.
 Here, we write a task that consumes the output returned by a `conditional`.
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/conditional.py
-:caption: conditional.py
+:caption: advanced_composition/conditional.py
 :lines: 66-81
 ```
 
@@ -67,7 +67,7 @@ but unary operations are not supported directly. Instead, use the `is_true`,
 `is_false` and `is_none` methods on the result.
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/conditional.py
-:caption: conditional.py
+:caption: advanced_composition/conditional.py
 :lines: 89-119
 ```
 
@@ -80,7 +80,7 @@ Inputs and outputs are automatically encapsulated in a special object known as {
 You can directly pass a boolean to a workflow.
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/conditional.py
-:caption: conditional.py
+:caption: advanced_composition/conditional.py
 :pyobject: boolean_input_wf
 ```
 
@@ -93,7 +93,7 @@ This special object enables it to exhibit additional behavior.
 You can run the workflows locally as follows:
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/conditional.py
-:caption: conditional.py
+:caption: advanced_composition/conditional.py
 :lines: 129-135
 ```
 
@@ -103,7 +103,7 @@ You can nest conditional sections arbitrarily inside other conditional sections.
 However, these nested sections can only be in the `then` part of a `conditional` block.
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/conditional.py
-:caption: conditional.py
+:caption: advanced_composition/conditional.py
 :lines: 142-164
 ```
 
@@ -113,14 +113,14 @@ Let's write a fun workflow that triggers the `calculate_circle_circumference` ta
 and alternatively, runs the `calculate_circle_area` task in the event of a "tail" outcome.
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/conditional.py
-:caption: conditional.py
+:caption: advanced_composition/conditional.py
 :pyobject: consume_task_output
 ```
 
 You can run the workflow locally as follows:
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/conditional.py
-:caption: conditional.py
+:caption: advanced_composition/conditional.py
 :lines: 181-188
 ```
 
@@ -169,3 +169,5 @@ pyflyte run --remote \
   https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/conditional.py \
   consume_task_output --radius 0.4 --seed 7
 ```
+
+[adv-comp]: https://github.com/flyteorg/flytesnacks/tree/master/example_code/advanced_composition

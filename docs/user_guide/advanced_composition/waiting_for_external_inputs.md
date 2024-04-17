@@ -40,7 +40,7 @@ you might want to use it, for example, if you want to simulate a delay in
 your workflow to mock out the behavior of some long-running computation.
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/waiting_for_external_inputs.py
-:caption: waiting_for_external_inputs.py
+:caption: advanced_composition/waiting_for_external_inputs.py
 :lines: 1-20
 ```
 
@@ -58,6 +58,10 @@ You can learn more about the `>>` chaining operator
 Now that you have a general sense of how this works, let's move onto the
 {func}`~flytekit.wait_for_input` workflow node.
 
+```{note}
+To clone and run the example code on this page, see the [Flytesnacks repo][adv-comp].
+```
+
 ## Supply external inputs with `wait_for_input`
 
 With the {py:func}`~flytekit.wait_for_input` node, you can pause a
@@ -68,7 +72,7 @@ this by defining a `wait_for_input` node that takes a `str` input and
 finalizes the report:
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/waiting_for_external_inputs.py
-:caption: waiting_for_external_inputs.py
+:caption: advanced_composition/waiting_for_external_inputs.py
 :lines: 24-49
 ```
 
@@ -100,7 +104,7 @@ report-publishing use case, suppose that we want to block the publishing of
 a report for some reason (e.g. if they don't appear to be valid):
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/waiting_for_external_inputs.py
-:caption: waiting_for_external_inputs.py
+:caption: advanced_composition/waiting_for_external_inputs.py
 :lines: 53-64
 ```
 
@@ -113,7 +117,7 @@ it to a subsequent task. Let's create a version of our report-publishing
 workflow where the approval happens after `create_report`:
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/waiting_for_external_inputs.py
-:caption: waiting_for_external_inputs.py
+:caption: advanced_composition/waiting_for_external_inputs.py
 :pyobject: approval_as_promise_wf
 ```
 
@@ -126,7 +130,7 @@ To illustrate this, let's extend the report-publishing use case so that we
 produce an "invalid report" output in case we don't approve the final report:
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/waiting_for_external_inputs.py
-:caption: waiting_for_external_inputs.py
+:caption: advanced_composition/waiting_for_external_inputs.py
 :lines: 88-114
 ```
 
@@ -196,3 +200,5 @@ remote.set_signal("title-input", execution.id.name, "my report")
 # node is in the `signals` list above
 remote.set_signal("review-passes", execution.id.name, True)
 ```
+
+[adv-comp]: https://github.com/flyteorg/flytesnacks/tree/master/example_code/advanced_composition/advanced_composition

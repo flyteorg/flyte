@@ -18,7 +18,7 @@ To clone and run the example code on this page, see the [Flytesnacks repo][adv-c
 Let's establish a sequence where `t1()` occurs after `t0()`, and `t2()` follows `t1()`.
  
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/chain_entities.py
-:caption: chain_entities.py
+:caption: advanced_composition/chain_entities.py
 :lines: 1-30
 ```
 
@@ -28,7 +28,7 @@ Let's establish a sequence where `t1()` occurs after `t0()`, and `t2()` follows 
 Just like tasks, you can chain {ref}`subworkflows <subworkflow>`.
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/chain_entities.py
-:caption: chain_entities.py
+:caption: advanced_composition/chain_entities.py
 :lines: 34-49
 ```
 
@@ -51,4 +51,4 @@ Chaining tasks and subworkflows is not supported in local environments.
 Follow the progress of this issue [here](https://github.com/flyteorg/flyte/issues/4080).
 :::
 
-[adv-comp]: https://github.com/flyteorg/flytesnacks/tree/master/example_code/advanced_composition
+[adv-comp]: https://github.com/flyteorg/flytesnacks/tree/master/example_code/advanced_composition/advanced_composition

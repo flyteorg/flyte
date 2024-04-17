@@ -17,17 +17,21 @@ Map tasks find utility in diverse scenarios, such as:
 
 The following examples demonstrate how to use map tasks with both single and multiple inputs.
 
-To begin, import the required libraries.
+```{note}
+To clone and run the example code on this page, see the [Flytesnacks repo][adv-comp].
+```
+
+To begin, import the required libraries:
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/map_task.py
-:caption: map_task.py
+:caption: advanced_composition/map_task.py
 :lines: 1
 ```
 
-Here's a simple workflow that uses {py:func}`map_task <flytekit:flytekit.map_task>`.
+Here's a simple workflow that uses {py:func}`map_task <flytekit:flytekit.map_task>`:
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/map_task.py
-:caption: map_task.py
+:caption: advanced_composition/map_task.py
 :lines: 4-19
 ```
 
@@ -43,7 +47,7 @@ def map_workflow_with_resource_overrides(data: list[int] = [10, 12, 11, 10, 13, 
     return map_task(detect_anomalies)(data_point=data).with_overrides(requests=Resources(mem="2Gi"))
 ```
 
-You can use {py:class}`~flytekit.TaskMetadata` to set attributes such as `cache`, `cache_version`, `interruptible`, `retries` and `timeout`.
+You can use {py:class}`~flytekit.TaskMetadata` to set attributes such as `cache`, `cache_version`, `interruptible`, `retries` and `timeout`:
 ```python
 from flytekit import TaskMetadata
 
@@ -57,10 +61,8 @@ def map_workflow_with_metadata(data: list[int] = [10, 12, 11, 10, 13, 12, 100, 1
 
 You can also configure `concurrency` and `min_success_ratio` for a map task:
 - `concurrency` limits the number of mapped tasks that can run in parallel to the specified batch size.
-If the input size exceeds the concurrency value, multiple batches will run serially until all inputs are processed.
-If left unspecified, it implies unbounded concurrency.
-- `min_success_ratio` determines the minimum fraction of total jobs that must complete successfully before terminating
-the map task and marking it as successful.
+If the input size exceeds the concurrency value, multiple batches will run serially until all inputs are processed. If left unspecified, it implies unbounded concurrency.
+- `min_success_ratio` determines the minimum fraction of total jobs that must complete successfully before terminating the map task and marking it as successful.
 
 ```python
 @workflow
@@ -71,57 +73,51 @@ def map_workflow_with_additional_params(data: list[int] = [10, 12, 11, 10, 13, 1
 A map task internally uses a compression algorithm (bitsets) to handle every Flyte workflow node’s metadata,
 which would have otherwise been in the order of 100s of bytes.
 
-When defining a map task, avoid calling other tasks in it. Flyte
-can't accurately register tasks that call other tasks. While Flyte
-will correctly execute a task that calls other tasks, it will not be
-able to give full performance advantages. This is
-especially true for map tasks.
+When defining a map task, avoid calling other tasks in it. Flyte can't accurately register tasks that call other tasks. While Flyte will correctly execute a task that calls other tasks, it will not be able to give full performance advantages. This is especially true for map tasks.
 
-In this example, the map task `suboptimal_mappable_task` would not
-give you the best performance.
+In this example, the map task `suboptimal_mappable_task` would not give you the best performance:
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/map_task.py
-:caption: map_task.py
+:caption: advanced_composition/map_task.py
 :lines: 31-40
 ```
 
 By default, the map task utilizes the Kubernetes array plugin for execution.
 However, map tasks can also be run on alternate execution backends.
 For example, you can configure the map task to run on
-[AWS Batch](https://docs.flyte.org/en/latest/deployment/plugin_setup/aws/batch.html#deployment-plugin-setup-aws-array),
-a provisioned service that offers scalability for handling large-scale tasks.
+[AWS Batch](https://docs.flyte.org/en/latest/deployment/plugin_setup/aws/batch.html#deployment-plugin-setup-aws-array), a provisioned service that offers scalability for handling large-scale tasks.
 
 ## Map a task with multiple inputs
 
 You might need to map a task with multiple inputs.
 
-For instance, consider a task that requires three inputs.
+For instance, consider a task that requires three inputs:
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/map_task.py
-:caption: map_task.py
+:caption: advanced_composition/map_task.py
 :pyobject: multi_input_task
 ```
 
 You may want to map this task with only the ``quantity`` input, while keeping the other inputs unchanged.
 Since a map task accepts only one input, you can achieve this by partially binding values to the map task.
-This can be done using the {py:func}`functools.partial` function.
+This can be done using the {py:func}`functools.partial` function:
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/map_task.py
-:caption: map_task.py
+:caption: advanced_composition/map_task.py
 :lines: 52-58
 ```
 
-Another possibility is to bind the outputs of a task to partials.
+Another possibility is to bind the outputs of a task to partials:
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/map_task.py
-:caption: map_task.py
+:caption: advanced_composition/map_task.py
 :lines: 63-72
 ```
 
-You can also provide multiple lists as input to a ``map_task``.
+You can also provide multiple lists as input to a `map_task`:
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/map_task.py
-:caption: map_task.py
+:caption: advanced_composition/map_task.py
 :pyobject: map_workflow_with_lists
 ```
 
@@ -204,3 +200,5 @@ In contrast to map tasks, an ArrayNode provides the following enhancements:
 - **Multiple input values**. Subtasks can be defined with multiple input values, enhancing their versatility.
 
 We expect the performance of ArrayNode map tasks to compare closely to standard map tasks.
+
+[adv-comp]: https://github.com/flyteorg/flytesnacks/tree/master/example_code/advanced_composition/advanced_composition

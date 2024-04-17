@@ -41,8 +41,12 @@ the python constructs that you're familiar with via the `asyncio` API. To
 understand what this looks like, let's define a very basic eager workflow
 using the `@eager` decorator.
 
+```{note}
+To clone and run the example code on this page, see the [Flytesnacks repo][adv-comp].
+```
+
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/eager_workflows.py
-:caption: eager_workflows.py
+:caption: advanced_composition/eager_workflows.py
 :lines: 1-21
 ```
 
@@ -113,7 +117,7 @@ task and subworkflow outputs as Python values and do operations on them just
 like you would in any other Python function. Let's look at another example:
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/eager_workflows.py
-:caption: eager_workflows.py
+:caption: advanced_composition/eager_workflows.py
 :pyobject: another_eager_workflow
 ```
 
@@ -128,7 +132,7 @@ Python conditionals in your eager workflows. Let's look at a more complicated
 example:
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/eager_workflows.py
-:caption: eager_workflows.py
+:caption: advanced_composition/eager_workflows.py
 :lines: 36-53
 ```
 
@@ -141,7 +145,7 @@ to check if `out` is negative, but we're also using the `gt_100` task in the
 You can also gather the outputs of multiple tasks or subworkflows into a list:
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/eager_workflows.py
-:caption: eager_workflows.py
+:caption: advanced_composition/eager_workflows.py
 :lines: 58-69
 ```
 
@@ -150,7 +154,7 @@ You can also gather the outputs of multiple tasks or subworkflows into a list:
 You can also invoke static workflows from within an eager workflow:
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/eager_workflows.py
-:caption: eager_workflows.py
+:caption: advanced_composition/eager_workflows.py
 :lines: 74-84
 ```
 
@@ -159,7 +163,7 @@ You can also invoke static workflows from within an eager workflow:
 You can have nest eager subworkflows inside a parent eager workflow:
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/eager_workflows.py
-:caption: eager_workflows.py
+:caption: advanced_composition/eager_workflows.py
 :lines: 89-97
 ```
 
@@ -168,7 +172,7 @@ You can have nest eager subworkflows inside a parent eager workflow:
 You can also catch exceptions in eager workflows through `EagerException`:
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/eager_workflows.py
-:caption: eager_workflows.py
+:caption: advanced_composition/eager_workflows.py
 :lines: 102-117
 ```
 
@@ -192,7 +196,7 @@ You can execute eager workflows locally by simply calling them like a regular
 `async` function:
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/eager_workflows.py
-:caption: eager_workflows.py
+:caption: advanced_composition/eager_workflows.py
 :lines: 123-125
 ```
 
@@ -241,7 +245,7 @@ When using a sandbox cluster started with `flytectl demo start`, however, the
 default sandbox configuration does not require key-based authentication.
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/eager_workflows.py
-:caption: eager_workflows.py
+:caption: advanced_composition/eager_workflows.py
 :lines: 130-145
 ```
 
@@ -353,3 +357,5 @@ of promises and materialized values:
 | `@workflow` | Compiled at compile-time | All inputs and intermediary outputs are promises | Type errors caught at compile-time | Constrained by Flyte DSL |
 | `@dynamic` | Compiled at run-time | Inputs are materialized, but outputs of all Flyte entities are Promises | More flexible than `@workflow`, e.g. can do Python operations on inputs | Can't use a lot of Python constructs (e.g. try/except) |
 | `@eager` | Never compiled | Everything is materialized! | Can effectively use all Python constructs via `asyncio` syntax | No compile-time benefits, this is the wild west 🏜 |
+
+[adv-comp]: https://github.com/flyteorg/flytesnacks/tree/master/example_code/advanced_composition/advanced_composition

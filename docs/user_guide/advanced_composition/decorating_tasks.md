@@ -11,17 +11,21 @@ You can easily change how tasks behave by using decorators to wrap your task fun
 In order to make sure that your decorated function contains all the type annotation and docstring
 information that Flyte needs, you will need to use the built-in {py:func}`~functools.wraps` decorator.
 
+```{note}
+To clone and run the example code on this page, see the [Flytesnacks repo][adv-comp].
+```
+
 To begin, import the required dependencies.
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/decorating_tasks.py
-:caption: decorating_tasks.py
+:caption: advanced_composition/decorating_tasks.py
 :lines: 1-4
 ```
 
 Create a logger to monitor the execution's progress.
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/decorating_tasks.py
-:caption: decorating_tasks.py
+:caption: advanced_composition/decorating_tasks.py
 :lines: 7
 ```
 
@@ -30,7 +34,7 @@ Create a logger to monitor the execution's progress.
 We define a decorator that logs the input and output details for a decorated task.
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/decorating_tasks.py
-:caption: decorating_tasks.py
+:caption: advanced_composition/decorating_tasks.py
 :pyobject: log_io
 ```
 
@@ -41,7 +45,7 @@ The order of invoking the decorators is important. `@task` should always be the 
 :::
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/decorating_tasks.py
-:caption: decorating_tasks.py
+:caption: advanced_composition/decorating_tasks.py
 :pyobject: t1
 ```
 
@@ -55,7 +59,7 @@ We define a decorator that verifies if the output from the decorated function is
 If this assumption is violated, it raises a `ValueError` exception.
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/decorating_tasks.py
-:caption: decorating_tasks.py
+:caption: advanced_composition/decorating_tasks.py
 :pyobject: validate_output
 ```
 
@@ -66,14 +70,14 @@ The output of the `validate_output` task uses {py:func}`~functools.partial` to i
 We define a function that uses both the logging and validator decorators.
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/decorating_tasks.py
-:caption: decorating_tasks.py
+:caption: advanced_composition/decorating_tasks.py
 :pyobject: t2
 ```
 
 Finally, we compose a workflow that calls `t1` and `t2`.
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/decorating_tasks.py
-:caption: decorating_tasks.py
+:caption: advanced_composition/decorating_tasks.py
 :lines: 53-59
 ```
 
@@ -92,4 +96,4 @@ In this example, you learned how to modify the behavior of tasks via function de
 example creating custom types, custom tasks or backend plugins,
 see {ref}`Extending Flyte <plugins_extend>`.
 
-
+[adv-comp]: https://github.com/flyteorg/flytesnacks/tree/master/example_code/advanced_composition/advanced_composition

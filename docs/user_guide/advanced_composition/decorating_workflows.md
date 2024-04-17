@@ -9,20 +9,22 @@
 The behavior of workflows can be modified in a light-weight fashion by using the built-in {py:func}`~functools.wraps`
 decorator pattern, similar to using decorators to
 {ref}`customize task behavior <decorating_tasks>`. However, unlike in the case of
-tasks, we need to do a little extra work to make sure that the DAG underlying the workflow executes tasks in the
-correct order.
+tasks, we need to do a little extra work to make sure that the DAG underlying the workflow executes tasks in the correct order.
 
 ## Setup-teardown pattern
 
 The main use case of decorating `@workflow`-decorated functions is to establish a setup-teardown pattern to execute task
 before and after your main workflow logic. This is useful when integrating with other external services
-like [wandb](https://wandb.ai/site) or [clearml](https://clear.ml/), which enable you to track metrics of model
-training runs.
+like [wandb](https://wandb.ai/site) or [clearml](https://clear.ml/), which enable you to track metrics of model training runs.
+
+```{note}
+To clone and run the example code on this page, see the [Flytesnacks repo][adv-comp].
+```
 
 To begin, import the necessary libraries.
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/decorating_workflows.py
-:caption: decorating_workflows.py
+:caption: advanced_composition/decorating_workflows.py
 :lines: 1-6
 ```
 
@@ -31,7 +33,7 @@ Let's define the tasks we need for setup and teardown. In this example, we use t
 beginning of our workflow and finish at the end.
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/decorating_workflows.py
-:caption: decorating_workflows.py
+:caption: advanced_composition/decorating_workflows.py
 :lines: 9-21
 ```
 
@@ -44,7 +46,7 @@ external service and Flyte.
 We create a decorator that we want to use to wrap our workflow function.
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/decorating_workflows.py
-:caption: decorating_workflows.py
+:caption: advanced_composition/decorating_workflows.py
 :pyobject: setup_teardown
 ```
 
@@ -65,14 +67,14 @@ There are a few key pieces to note in the `setup_teardown` decorator above:
 We define two tasks that will constitute the workflow.
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/decorating_workflows.py
-:caption: decorating_workflows.py
+:caption: advanced_composition/decorating_workflows.py
 :lines: 63-70
 ```
 
 And then create our decorated workflow:
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/decorating_workflows.py
-:caption: decorating_workflows.py
+:caption: advanced_composition/decorating_workflows.py
 :lines: 74-82
 ```
 
@@ -89,3 +91,5 @@ pyflyte run --remote \
 To define workflows imperatively, refer to {ref}`this example <imperative_workflow>`,
 and to learn more about how to extend Flyte at a deeper level, for example creating custom types, custom tasks or
 backend plugins, see {ref}`Extending Flyte <plugins_extend>`.
+
+[adv-comp]: https://github.com/flyteorg/flytesnacks/tree/master/example_code/advanced_composition/advanced_composition
