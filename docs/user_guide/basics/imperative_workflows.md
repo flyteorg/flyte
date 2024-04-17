@@ -17,30 +17,30 @@ in textual form (perhaps during a transition from a legacy system).
 In such scenarios, you want to orchestrate these tasks.
 This is where Flyte's imperative workflows come into play, allowing you to programmatically construct workflows.
 
-To begin, import the necessary dependencies.
+To begin, import the necessary dependencies:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/basics/basics/imperative_workflow.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/imperative_workflow.py
 :caption: imperative_workflow.py
 :lines: 1
 ```
 
-We import the `slope` and `intercept` tasks from the `workflow.py` file.
+We import the `slope` and `intercept` tasks from the `workflow.py` file:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/basics/basics/imperative_workflow.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/imperative_workflow.py
 :caption: imperative_workflow.py
 :lines: 4
 ```
 
-Create an imperative workflow.
+Create an imperative workflow:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/basics/basics/imperative_workflow.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/imperative_workflow.py
 :caption: imperative_workflow.py
-:pyobject: imperative_wf
+:lines: 7
 ```
 
-Add the workflow inputs to the imperative workflow.
+Add the workflow inputs to the imperative workflow:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/basics/basics/imperative_workflow.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/imperative_workflow.py
 :caption: imperative_workflow.py
 :lines: 11-12
 ```
@@ -50,30 +50,30 @@ If you want to assign default values to the workflow inputs,
 you can create a {ref}`launch plan <launch_plan>`.
 :::
 
-Add the tasks that need to be triggered from within the workflow.
+Add the tasks that need to be triggered from within the workflow:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/basics/basics/imperative_workflow.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/imperative_workflow.py
 :caption: imperative_workflow.py
 :lines: 16-19
 ```
 
-Lastly, add the workflow output.
+Lastly, add the workflow output:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/basics/basics/imperative_workflow.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/imperative_workflow.py
 :caption: imperative_workflow.py
 :lines: 23
 ```
 
 You can execute the workflow locally as follows:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/basics/basics/imperative_workflow.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/imperative_workflow.py
 :caption: imperative_workflow.py
 :lines: 27-28
 ```
 
 :::{note}
 You also have the option to provide a list of inputs and
-retrieve a list of outputs from the workflow.
+retrieve a list of outputs from the workflow:
 
 ```python
 wf_input_y = imperative_wf.add_workflow_input("y", list[str])

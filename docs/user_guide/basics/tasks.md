@@ -95,7 +95,7 @@ the values for the corresponding parameters.
 To run it locally, you can use the following `pyflyte run` command:
 ```
 pyflyte run \
-  https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/basics/basics/task.py \
+  https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/task.py \
   slope --x '[-3,0,3]' --y '[7,4,-2]'
 ```
 
@@ -103,6 +103,6 @@ If you want to run it remotely on the Flyte cluster,
 simply add the `--remote flag` to the `pyflyte run` command:
 ```
 pyflyte run --remote \
-  https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/basics/basics/task.py \
+  https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/task.py \
   slope --x '[-3,0,3]' --y '[7,4,-2]'
 ```

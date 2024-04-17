@@ -23,56 +23,56 @@ in the project's flytekit configuration (such as user role).
 
 To begin, import the necessary libraries.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/basics/basics/launch_plan.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/launch_plan.py
 :caption: launch_plan.py
 :lines: 1
 ```
 
 We import the workflow from the `workflow.py` file for which we're going to create a launch plan.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/basics/basics/launch_plan.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/launch_plan.py
 :caption: launch_plan.py
 :lines: 5
 ```
 
 Create a default launch plan with no inputs during serialization.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/basics/basics/launch_plan.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/launch_plan.py
 :caption: launch_plan.py
 :lines: 8
 ```
 
 You can run the launch plan locally as follows:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/basics/basics/launch_plan.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/launch_plan.py
 :caption: launch_plan.py
 :lines: 11
 ```
 
 Create a launch plan and specify the default inputs.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/basics/basics/launch_plan.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/launch_plan.py
 :caption: launch_plan.py
 :lines: 14-16
 ```
 
 You can trigger the launch plan locally as follows:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/basics/basics/launch_plan.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/launch_plan.py
 :caption: launch_plan.py
 :lines: 19
 ```
 
 You can override the defaults as follows:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/basics/basics/launch_plan.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/launch_plan.py
 :caption: launch_plan.py
 :lines: 22
 ```
 
 It's possible to lock launch plan inputs, preventing them from being overridden during execution.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/basics/basics/launch_plan.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/launch_plan.py
 :caption: launch_plan.py
 :lines: 25-27
 ```

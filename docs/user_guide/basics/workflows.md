@@ -119,7 +119,7 @@ To run the workflow locally, you can use the following `pyflyte run` command:
 
 ```
 pyflyte run \
-  https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/basics/basics/workflow.py \
+  https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/workflow.py \
   simple_wf --x '[-3,0,3]' --y '[7,4,-2]'
 ```
 
@@ -128,7 +128,7 @@ simply add the `--remote flag` to the `pyflyte run` command:
 
 ```
 pyflyte run --remote \
-  https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/basics/basics/workflow.py \
+  https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/workflow.py \
   simple_wf --x '[-3,0,3]' --y '[7,4,-2]'
 ```
 
