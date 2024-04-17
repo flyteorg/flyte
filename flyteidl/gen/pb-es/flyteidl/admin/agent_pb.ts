@@ -181,45 +181,6 @@ export class TaskExecutionMetadata extends Message<TaskExecutionMetadata> {
 }
 
 /**
- * @generated from message flyteidl.admin.Secret
- */
-export class Secret extends Message<Secret> {
-  /**
-   * The value of the secret.
-   *
-   * @generated from field: string value = 1;
-   */
-  value = "";
-
-  constructor(data?: PartialMessage<Secret>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "flyteidl.admin.Secret";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "value", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Secret {
-    return new Secret().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Secret {
-    return new Secret().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Secret {
-    return new Secret().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: Secret | PlainMessage<Secret> | undefined, b: Secret | PlainMessage<Secret> | undefined): boolean {
-    return proto3.util.equals(Secret, a, b);
-  }
-}
-
-/**
  * Represents a request structure to create task.
  *
  * @generated from message flyteidl.admin.CreateTaskRequest

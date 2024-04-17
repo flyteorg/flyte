@@ -56,11 +56,6 @@ message TaskExecutionMetadata {
   core.Identity identity = 11;
 }
 
-message Secret {
-  // The value of the secret.
-  string value = 1;
-}
-
 // Represents a request structure to create task.
 message CreateTaskRequest {
   // The inputs required to start the execution. All required inputs must be

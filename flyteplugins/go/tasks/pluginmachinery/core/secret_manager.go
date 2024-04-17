@@ -1,8 +1,6 @@
 package core
 
-import (
-	"context"
-)
+import "context"
 
 //go:generate mockery -all -output=./mocks -case=underscore
 

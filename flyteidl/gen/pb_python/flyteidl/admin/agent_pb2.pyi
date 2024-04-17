@@ -76,12 +76,6 @@ class TaskExecutionMetadata(_message.Message):
     identity: _security_pb2.Identity
     def __init__(self, task_execution_id: _Optional[_Union[_identifier_pb2.TaskExecutionIdentifier, _Mapping]] = ..., namespace: _Optional[str] = ..., labels: _Optional[_Mapping[str, str]] = ..., annotations: _Optional[_Mapping[str, str]] = ..., k8s_service_account: _Optional[str] = ..., environment_variables: _Optional[_Mapping[str, str]] = ..., max_attempts: _Optional[int] = ..., interruptible: bool = ..., interruptible_failure_threshold: _Optional[int] = ..., overrides: _Optional[_Union[_workflow_pb2.TaskNodeOverrides, _Mapping]] = ..., identity: _Optional[_Union[_security_pb2.Identity, _Mapping]] = ...) -> None: ...
 
-class Secret(_message.Message):
-    __slots__ = ["value"]
-    VALUE_FIELD_NUMBER: _ClassVar[int]
-    value: str
-    def __init__(self, value: _Optional[str] = ...) -> None: ...
-
 class CreateTaskRequest(_message.Message):
     __slots__ = ["inputs", "template", "output_prefix", "task_execution_metadata", "connection"]
     INPUTS_FIELD_NUMBER: _ClassVar[int]

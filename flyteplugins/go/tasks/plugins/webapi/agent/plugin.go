@@ -211,6 +211,7 @@ func (p Plugin) ExecuteTaskSync(
 func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest webapi.Resource, err error) {
 	metadata := taskCtx.ResourceMeta().(ResourceMetaWrapper)
 	agent, _ := getFinalAgent(&metadata.TaskCategory, p.cfg, p.agentRegistry)
+
 	client, err := p.getAsyncAgentClient(ctx, agent)
 	if err != nil {
 		return nil, err

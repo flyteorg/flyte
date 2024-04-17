@@ -225,54 +225,6 @@ func (x *TaskExecutionMetadata) GetIdentity() *core.Identity {
 	return nil
 }
 
-type Secret struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	// The value of the secret.
-	Value string `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty"`
-}
-
-func (x *Secret) Reset() {
-	*x = Secret{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_flyteidl_admin_agent_proto_msgTypes[1]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *Secret) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Secret) ProtoMessage() {}
-
-func (x *Secret) ProtoReflect() protoreflect.Message {
-	mi := &file_flyteidl_admin_agent_proto_msgTypes[1]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Secret.ProtoReflect.Descriptor instead.
-func (*Secret) Descriptor() ([]byte, []int) {
-	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{1}
-}
-
-func (x *Secret) GetValue() string {
-	if x != nil {
-		return x.Value
-	}
-	return ""
-}
-
 // Represents a request structure to create task.
 type CreateTaskRequest struct {
 	state         protoimpl.MessageState
@@ -296,7 +248,7 @@ type CreateTaskRequest struct {
 func (x *CreateTaskRequest) Reset() {
 	*x = CreateTaskRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_flyteidl_admin_agent_proto_msgTypes[2]
+		mi := &file_flyteidl_admin_agent_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -309,7 +261,7 @@ func (x *CreateTaskRequest) String() string {
 func (*CreateTaskRequest) ProtoMessage() {}
 
 func (x *CreateTaskRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_flyteidl_admin_agent_proto_msgTypes[2]
+	mi := &file_flyteidl_admin_agent_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -322,7 +274,7 @@ func (x *CreateTaskRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateTaskRequest.ProtoReflect.Descriptor instead.
 func (*CreateTaskRequest) Descriptor() ([]byte, []int) {
-	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{2}
+	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *CreateTaskRequest) GetInputs() *core.LiteralMap {
@@ -373,7 +325,7 @@ type CreateTaskResponse struct {
 func (x *CreateTaskResponse) Reset() {
 	*x = CreateTaskResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_flyteidl_admin_agent_proto_msgTypes[3]
+		mi := &file_flyteidl_admin_agent_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -386,7 +338,7 @@ func (x *CreateTaskResponse) String() string {
 func (*CreateTaskResponse) ProtoMessage() {}
 
 func (x *CreateTaskResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_flyteidl_admin_agent_proto_msgTypes[3]
+	mi := &file_flyteidl_admin_agent_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -399,7 +351,7 @@ func (x *CreateTaskResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateTaskResponse.ProtoReflect.Descriptor instead.
 func (*CreateTaskResponse) Descriptor() ([]byte, []int) {
-	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{3}
+	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *CreateTaskResponse) GetResourceMeta() []byte {
@@ -429,7 +381,7 @@ type CreateRequestHeader struct {
 func (x *CreateRequestHeader) Reset() {
 	*x = CreateRequestHeader{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_flyteidl_admin_agent_proto_msgTypes[4]
+		mi := &file_flyteidl_admin_agent_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -442,7 +394,7 @@ func (x *CreateRequestHeader) String() string {
 func (*CreateRequestHeader) ProtoMessage() {}
 
 func (x *CreateRequestHeader) ProtoReflect() protoreflect.Message {
-	mi := &file_flyteidl_admin_agent_proto_msgTypes[4]
+	mi := &file_flyteidl_admin_agent_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -455,7 +407,7 @@ func (x *CreateRequestHeader) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateRequestHeader.ProtoReflect.Descriptor instead.
 func (*CreateRequestHeader) Descriptor() ([]byte, []int) {
-	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{4}
+	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *CreateRequestHeader) GetTemplate() *core.TaskTemplate {
@@ -508,7 +460,7 @@ type ExecuteTaskSyncRequest struct {
 func (x *ExecuteTaskSyncRequest) Reset() {
 	*x = ExecuteTaskSyncRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_flyteidl_admin_agent_proto_msgTypes[5]
+		mi := &file_flyteidl_admin_agent_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -521,7 +473,7 @@ func (x *ExecuteTaskSyncRequest) String() string {
 func (*ExecuteTaskSyncRequest) ProtoMessage() {}
 
 func (x *ExecuteTaskSyncRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_flyteidl_admin_agent_proto_msgTypes[5]
+	mi := &file_flyteidl_admin_agent_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -534,7 +486,7 @@ func (x *ExecuteTaskSyncRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ExecuteTaskSyncRequest.ProtoReflect.Descriptor instead.
 func (*ExecuteTaskSyncRequest) Descriptor() ([]byte, []int) {
-	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{5}
+	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{4}
 }
 
 func (m *ExecuteTaskSyncRequest) GetPart() isExecuteTaskSyncRequest_Part {
@@ -585,7 +537,7 @@ type ExecuteTaskSyncResponseHeader struct {
 func (x *ExecuteTaskSyncResponseHeader) Reset() {
 	*x = ExecuteTaskSyncResponseHeader{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_flyteidl_admin_agent_proto_msgTypes[6]
+		mi := &file_flyteidl_admin_agent_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -598,7 +550,7 @@ func (x *ExecuteTaskSyncResponseHeader) String() string {
 func (*ExecuteTaskSyncResponseHeader) ProtoMessage() {}
 
 func (x *ExecuteTaskSyncResponseHeader) ProtoReflect() protoreflect.Message {
-	mi := &file_flyteidl_admin_agent_proto_msgTypes[6]
+	mi := &file_flyteidl_admin_agent_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -611,7 +563,7 @@ func (x *ExecuteTaskSyncResponseHeader) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ExecuteTaskSyncResponseHeader.ProtoReflect.Descriptor instead.
 func (*ExecuteTaskSyncResponseHeader) Descriptor() ([]byte, []int) {
-	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{6}
+	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *ExecuteTaskSyncResponseHeader) GetResource() *Resource {
@@ -639,7 +591,7 @@ type ExecuteTaskSyncResponse struct {
 func (x *ExecuteTaskSyncResponse) Reset() {
 	*x = ExecuteTaskSyncResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_flyteidl_admin_agent_proto_msgTypes[7]
+		mi := &file_flyteidl_admin_agent_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -652,7 +604,7 @@ func (x *ExecuteTaskSyncResponse) String() string {
 func (*ExecuteTaskSyncResponse) ProtoMessage() {}
 
 func (x *ExecuteTaskSyncResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_flyteidl_admin_agent_proto_msgTypes[7]
+	mi := &file_flyteidl_admin_agent_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -665,7 +617,7 @@ func (x *ExecuteTaskSyncResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ExecuteTaskSyncResponse.ProtoReflect.Descriptor instead.
 func (*ExecuteTaskSyncResponse) Descriptor() ([]byte, []int) {
-	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{7}
+	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{6}
 }
 
 func (m *ExecuteTaskSyncResponse) GetRes() isExecuteTaskSyncResponse_Res {
@@ -726,7 +678,7 @@ type GetTaskRequest struct {
 func (x *GetTaskRequest) Reset() {
 	*x = GetTaskRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_flyteidl_admin_agent_proto_msgTypes[8]
+		mi := &file_flyteidl_admin_agent_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -739,7 +691,7 @@ func (x *GetTaskRequest) String() string {
 func (*GetTaskRequest) ProtoMessage() {}
 
 func (x *GetTaskRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_flyteidl_admin_agent_proto_msgTypes[8]
+	mi := &file_flyteidl_admin_agent_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -752,7 +704,7 @@ func (x *GetTaskRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetTaskRequest.ProtoReflect.Descriptor instead.
 func (*GetTaskRequest) Descriptor() ([]byte, []int) {
-	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{8}
+	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{7}
 }
 
 // Deprecated: Marked as deprecated in flyteidl/admin/agent.proto.
@@ -796,7 +748,7 @@ type GetTaskResponse struct {
 func (x *GetTaskResponse) Reset() {
 	*x = GetTaskResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_flyteidl_admin_agent_proto_msgTypes[9]
+		mi := &file_flyteidl_admin_agent_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -809,7 +761,7 @@ func (x *GetTaskResponse) String() string {
 func (*GetTaskResponse) ProtoMessage() {}
 
 func (x *GetTaskResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_flyteidl_admin_agent_proto_msgTypes[9]
+	mi := &file_flyteidl_admin_agent_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -822,7 +774,7 @@ func (x *GetTaskResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetTaskResponse.ProtoReflect.Descriptor instead.
 func (*GetTaskResponse) Descriptor() ([]byte, []int) {
-	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{9}
+	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *GetTaskResponse) GetResource() *Resource {
@@ -858,7 +810,7 @@ type Resource struct {
 func (x *Resource) Reset() {
 	*x = Resource{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_flyteidl_admin_agent_proto_msgTypes[10]
+		mi := &file_flyteidl_admin_agent_proto_msgTypes[9]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -871,7 +823,7 @@ func (x *Resource) String() string {
 func (*Resource) ProtoMessage() {}
 
 func (x *Resource) ProtoReflect() protoreflect.Message {
-	mi := &file_flyteidl_admin_agent_proto_msgTypes[10]
+	mi := &file_flyteidl_admin_agent_proto_msgTypes[9]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -884,7 +836,7 @@ func (x *Resource) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Resource.ProtoReflect.Descriptor instead.
 func (*Resource) Descriptor() ([]byte, []int) {
-	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{10}
+	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{9}
 }
 
 // Deprecated: Marked as deprecated in flyteidl/admin/agent.proto.
@@ -951,7 +903,7 @@ type DeleteTaskRequest struct {
 func (x *DeleteTaskRequest) Reset() {
 	*x = DeleteTaskRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_flyteidl_admin_agent_proto_msgTypes[11]
+		mi := &file_flyteidl_admin_agent_proto_msgTypes[10]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -964,7 +916,7 @@ func (x *DeleteTaskRequest) String() string {
 func (*DeleteTaskRequest) ProtoMessage() {}
 
 func (x *DeleteTaskRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_flyteidl_admin_agent_proto_msgTypes[11]
+	mi := &file_flyteidl_admin_agent_proto_msgTypes[10]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -977,7 +929,7 @@ func (x *DeleteTaskRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteTaskRequest.ProtoReflect.Descriptor instead.
 func (*DeleteTaskRequest) Descriptor() ([]byte, []int) {
-	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{11}
+	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{10}
 }
 
 // Deprecated: Marked as deprecated in flyteidl/admin/agent.proto.
@@ -1019,7 +971,7 @@ type DeleteTaskResponse struct {
 func (x *DeleteTaskResponse) Reset() {
 	*x = DeleteTaskResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_flyteidl_admin_agent_proto_msgTypes[12]
+		mi := &file_flyteidl_admin_agent_proto_msgTypes[11]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1032,7 +984,7 @@ func (x *DeleteTaskResponse) String() string {
 func (*DeleteTaskResponse) ProtoMessage() {}
 
 func (x *DeleteTaskResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_flyteidl_admin_agent_proto_msgTypes[12]
+	mi := &file_flyteidl_admin_agent_proto_msgTypes[11]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1045,7 +997,7 @@ func (x *DeleteTaskResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteTaskResponse.ProtoReflect.Descriptor instead.
 func (*DeleteTaskResponse) Descriptor() ([]byte, []int) {
-	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{12}
+	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{11}
 }
 
 // A message containing the agent metadata.
@@ -1073,7 +1025,7 @@ type Agent struct {
 func (x *Agent) Reset() {
 	*x = Agent{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_flyteidl_admin_agent_proto_msgTypes[13]
+		mi := &file_flyteidl_admin_agent_proto_msgTypes[12]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1086,7 +1038,7 @@ func (x *Agent) String() string {
 func (*Agent) ProtoMessage() {}
 
 func (x *Agent) ProtoReflect() protoreflect.Message {
-	mi := &file_flyteidl_admin_agent_proto_msgTypes[13]
+	mi := &file_flyteidl_admin_agent_proto_msgTypes[12]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1099,7 +1051,7 @@ func (x *Agent) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Agent.ProtoReflect.Descriptor instead.
 func (*Agent) Descriptor() ([]byte, []int) {
-	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{13}
+	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *Agent) GetName() string {
@@ -1145,7 +1097,7 @@ type TaskCategory struct {
 func (x *TaskCategory) Reset() {
 	*x = TaskCategory{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_flyteidl_admin_agent_proto_msgTypes[14]
+		mi := &file_flyteidl_admin_agent_proto_msgTypes[13]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1158,7 +1110,7 @@ func (x *TaskCategory) String() string {
 func (*TaskCategory) ProtoMessage() {}
 
 func (x *TaskCategory) ProtoReflect() protoreflect.Message {
-	mi := &file_flyteidl_admin_agent_proto_msgTypes[14]
+	mi := &file_flyteidl_admin_agent_proto_msgTypes[13]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1171,7 +1123,7 @@ func (x *TaskCategory) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TaskCategory.ProtoReflect.Descriptor instead.
 func (*TaskCategory) Descriptor() ([]byte, []int) {
-	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{14}
+	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *TaskCategory) GetName() string {
@@ -1201,7 +1153,7 @@ type GetAgentRequest struct {
 func (x *GetAgentRequest) Reset() {
 	*x = GetAgentRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_flyteidl_admin_agent_proto_msgTypes[15]
+		mi := &file_flyteidl_admin_agent_proto_msgTypes[14]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1214,7 +1166,7 @@ func (x *GetAgentRequest) String() string {
 func (*GetAgentRequest) ProtoMessage() {}
 
 func (x *GetAgentRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_flyteidl_admin_agent_proto_msgTypes[15]
+	mi := &file_flyteidl_admin_agent_proto_msgTypes[14]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1227,7 +1179,7 @@ func (x *GetAgentRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAgentRequest.ProtoReflect.Descriptor instead.
 func (*GetAgentRequest) Descriptor() ([]byte, []int) {
-	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{15}
+	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *GetAgentRequest) GetName() string {
@@ -1249,7 +1201,7 @@ type GetAgentResponse struct {
 func (x *GetAgentResponse) Reset() {
 	*x = GetAgentResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_flyteidl_admin_agent_proto_msgTypes[16]
+		mi := &file_flyteidl_admin_agent_proto_msgTypes[15]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1262,7 +1214,7 @@ func (x *GetAgentResponse) String() string {
 func (*GetAgentResponse) ProtoMessage() {}
 
 func (x *GetAgentResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_flyteidl_admin_agent_proto_msgTypes[16]
+	mi := &file_flyteidl_admin_agent_proto_msgTypes[15]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1275,7 +1227,7 @@ func (x *GetAgentResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAgentResponse.ProtoReflect.Descriptor instead.
 func (*GetAgentResponse) Descriptor() ([]byte, []int) {
-	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{16}
+	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *GetAgentResponse) GetAgent() *Agent {
@@ -1295,7 +1247,7 @@ type ListAgentsRequest struct {
 func (x *ListAgentsRequest) Reset() {
 	*x = ListAgentsRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_flyteidl_admin_agent_proto_msgTypes[17]
+		mi := &file_flyteidl_admin_agent_proto_msgTypes[16]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1308,7 +1260,7 @@ func (x *ListAgentsRequest) String() string {
 func (*ListAgentsRequest) ProtoMessage() {}
 
 func (x *ListAgentsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_flyteidl_admin_agent_proto_msgTypes[17]
+	mi := &file_flyteidl_admin_agent_proto_msgTypes[16]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1321,7 +1273,7 @@ func (x *ListAgentsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListAgentsRequest.ProtoReflect.Descriptor instead.
 func (*ListAgentsRequest) Descriptor() ([]byte, []int) {
-	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{17}
+	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{16}
 }
 
 // A response containing a list of agents.
@@ -1336,7 +1288,7 @@ type ListAgentsResponse struct {
 func (x *ListAgentsResponse) Reset() {
 	*x = ListAgentsResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_flyteidl_admin_agent_proto_msgTypes[18]
+		mi := &file_flyteidl_admin_agent_proto_msgTypes[17]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1349,7 +1301,7 @@ func (x *ListAgentsResponse) String() string {
 func (*ListAgentsResponse) ProtoMessage() {}
 
 func (x *ListAgentsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_flyteidl_admin_agent_proto_msgTypes[18]
+	mi := &file_flyteidl_admin_agent_proto_msgTypes[17]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1362,7 +1314,7 @@ func (x *ListAgentsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListAgentsResponse.ProtoReflect.Descriptor instead.
 func (*ListAgentsResponse) Descriptor() ([]byte, []int) {
-	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{18}
+	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *ListAgentsResponse) GetAgents() []*Agent {
@@ -1400,7 +1352,7 @@ type GetTaskMetricsRequest struct {
 func (x *GetTaskMetricsRequest) Reset() {
 	*x = GetTaskMetricsRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_flyteidl_admin_agent_proto_msgTypes[19]
+		mi := &file_flyteidl_admin_agent_proto_msgTypes[18]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1413,7 +1365,7 @@ func (x *GetTaskMetricsRequest) String() string {
 func (*GetTaskMetricsRequest) ProtoMessage() {}
 
 func (x *GetTaskMetricsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_flyteidl_admin_agent_proto_msgTypes[19]
+	mi := &file_flyteidl_admin_agent_proto_msgTypes[18]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1426,7 +1378,7 @@ func (x *GetTaskMetricsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetTaskMetricsRequest.ProtoReflect.Descriptor instead.
 func (*GetTaskMetricsRequest) Descriptor() ([]byte, []int) {
-	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{19}
+	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{18}
 }
 
 // Deprecated: Marked as deprecated in flyteidl/admin/agent.proto.
@@ -1492,7 +1444,7 @@ type GetTaskMetricsResponse struct {
 func (x *GetTaskMetricsResponse) Reset() {
 	*x = GetTaskMetricsResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_flyteidl_admin_agent_proto_msgTypes[20]
+		mi := &file_flyteidl_admin_agent_proto_msgTypes[19]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1505,7 +1457,7 @@ func (x *GetTaskMetricsResponse) String() string {
 func (*GetTaskMetricsResponse) ProtoMessage() {}
 
 func (x *GetTaskMetricsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_flyteidl_admin_agent_proto_msgTypes[20]
+	mi := &file_flyteidl_admin_agent_proto_msgTypes[19]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1518,7 +1470,7 @@ func (x *GetTaskMetricsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetTaskMetricsResponse.ProtoReflect.Descriptor instead.
 func (*GetTaskMetricsResponse) Descriptor() ([]byte, []int) {
-	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{20}
+	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *GetTaskMetricsResponse) GetResults() []*core.ExecutionMetricResult {
@@ -1552,7 +1504,7 @@ type GetTaskLogsRequest struct {
 func (x *GetTaskLogsRequest) Reset() {
 	*x = GetTaskLogsRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_flyteidl_admin_agent_proto_msgTypes[21]
+		mi := &file_flyteidl_admin_agent_proto_msgTypes[20]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1565,7 +1517,7 @@ func (x *GetTaskLogsRequest) String() string {
 func (*GetTaskLogsRequest) ProtoMessage() {}
 
 func (x *GetTaskLogsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_flyteidl_admin_agent_proto_msgTypes[21]
+	mi := &file_flyteidl_admin_agent_proto_msgTypes[20]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1578,7 +1530,7 @@ func (x *GetTaskLogsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetTaskLogsRequest.ProtoReflect.Descriptor instead.
 func (*GetTaskLogsRequest) Descriptor() ([]byte, []int) {
-	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{21}
+	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{20}
 }
 
 // Deprecated: Marked as deprecated in flyteidl/admin/agent.proto.
@@ -1630,7 +1582,7 @@ type GetTaskLogsResponseHeader struct {
 func (x *GetTaskLogsResponseHeader) Reset() {
 	*x = GetTaskLogsResponseHeader{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_flyteidl_admin_agent_proto_msgTypes[22]
+		mi := &file_flyteidl_admin_agent_proto_msgTypes[21]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1643,7 +1595,7 @@ func (x *GetTaskLogsResponseHeader) String() string {
 func (*GetTaskLogsResponseHeader) ProtoMessage() {}
 
 func (x *GetTaskLogsResponseHeader) ProtoReflect() protoreflect.Message {
-	mi := &file_flyteidl_admin_agent_proto_msgTypes[22]
+	mi := &file_flyteidl_admin_agent_proto_msgTypes[21]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1656,7 +1608,7 @@ func (x *GetTaskLogsResponseHeader) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetTaskLogsResponseHeader.ProtoReflect.Descriptor instead.
 func (*GetTaskLogsResponseHeader) Descriptor() ([]byte, []int) {
-	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{22}
+	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *GetTaskLogsResponseHeader) GetToken() string {
@@ -1678,7 +1630,7 @@ type GetTaskLogsResponseBody struct {
 func (x *GetTaskLogsResponseBody) Reset() {
 	*x = GetTaskLogsResponseBody{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_flyteidl_admin_agent_proto_msgTypes[23]
+		mi := &file_flyteidl_admin_agent_proto_msgTypes[22]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1691,7 +1643,7 @@ func (x *GetTaskLogsResponseBody) String() string {
 func (*GetTaskLogsResponseBody) ProtoMessage() {}
 
 func (x *GetTaskLogsResponseBody) ProtoReflect() protoreflect.Message {
-	mi := &file_flyteidl_admin_agent_proto_msgTypes[23]
+	mi := &file_flyteidl_admin_agent_proto_msgTypes[22]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1704,7 +1656,7 @@ func (x *GetTaskLogsResponseBody) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetTaskLogsResponseBody.ProtoReflect.Descriptor instead.
 func (*GetTaskLogsResponseBody) Descriptor() ([]byte, []int) {
-	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{23}
+	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *GetTaskLogsResponseBody) GetResults() []string {
@@ -1730,7 +1682,7 @@ type GetTaskLogsResponse struct {
 func (x *GetTaskLogsResponse) Reset() {
 	*x = GetTaskLogsResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_flyteidl_admin_agent_proto_msgTypes[24]
+		mi := &file_flyteidl_admin_agent_proto_msgTypes[23]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1743,7 +1695,7 @@ func (x *GetTaskLogsResponse) String() string {
 func (*GetTaskLogsResponse) ProtoMessage() {}
 
 func (x *GetTaskLogsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_flyteidl_admin_agent_proto_msgTypes[24]
+	mi := &file_flyteidl_admin_agent_proto_msgTypes[23]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1756,7 +1708,7 @@ func (x *GetTaskLogsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetTaskLogsResponse.ProtoReflect.Descriptor instead.
 func (*GetTaskLogsResponse) Descriptor() ([]byte, []int) {
-	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{24}
+	return file_flyteidl_admin_agent_proto_rawDescGZIP(), []int{23}
 }
 
 func (m *GetTaskLogsResponse) GetPart() isGetTaskLogsResponse_Part {
@@ -1878,9 +1830,7 @@ var file_flyteidl_admin_agent_proto_rawDesc = []byte{
 	0x65, 0x6e, 0x74, 0x56, 0x61, 0x72, 0x69, 0x61, 0x62, 0x6c, 0x65, 0x73, 0x45, 0x6e, 0x74, 0x72,
 	0x79, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03,
 	0x6b, 0x65, 0x79, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x02, 0x20, 0x01,
-	0x28, 0x09, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x3a, 0x02, 0x38, 0x01, 0x22, 0x1e, 0x0a,
-	0x06, 0x53, 0x65, 0x63, 0x72, 0x65, 0x74, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65,
-	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x22, 0xbe, 0x02,
+	0x28, 0x09, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x3a, 0x02, 0x38, 0x01, 0x22, 0xbe, 0x02,
 	0x0a, 0x11, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x54, 0x61, 0x73, 0x6b, 0x52, 0x65, 0x71, 0x75,
 	0x65, 0x73, 0x74, 0x12, 0x31, 0x0a, 0x06, 0x69, 0x6e, 0x70, 0x75, 0x74, 0x73, 0x18, 0x01, 0x20,
 	0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x2e, 0x63,
@@ -2122,90 +2072,89 @@ func file_flyteidl_admin_agent_proto_rawDescGZIP() []byte {
 }
 
 var file_flyteidl_admin_agent_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_flyteidl_admin_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 28)
+var file_flyteidl_admin_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 27)
 var file_flyteidl_admin_agent_proto_goTypes = []interface{}{
 	(State)(0),                            // 0: flyteidl.admin.State
 	(*TaskExecutionMetadata)(nil),         // 1: flyteidl.admin.TaskExecutionMetadata
-	(*Secret)(nil),                        // 2: flyteidl.admin.Secret
-	(*CreateTaskRequest)(nil),             // 3: flyteidl.admin.CreateTaskRequest
-	(*CreateTaskResponse)(nil),            // 4: flyteidl.admin.CreateTaskResponse
-	(*CreateRequestHeader)(nil),           // 5: flyteidl.admin.CreateRequestHeader
-	(*ExecuteTaskSyncRequest)(nil),        // 6: flyteidl.admin.ExecuteTaskSyncRequest
-	(*ExecuteTaskSyncResponseHeader)(nil), // 7: flyteidl.admin.ExecuteTaskSyncResponseHeader
-	(*ExecuteTaskSyncResponse)(nil),       // 8: flyteidl.admin.ExecuteTaskSyncResponse
-	(*GetTaskRequest)(nil),                // 9: flyteidl.admin.GetTaskRequest
-	(*GetTaskResponse)(nil),               // 10: flyteidl.admin.GetTaskResponse
-	(*Resource)(nil),                      // 11: flyteidl.admin.Resource
-	(*DeleteTaskRequest)(nil),             // 12: flyteidl.admin.DeleteTaskRequest
-	(*DeleteTaskResponse)(nil),            // 13: flyteidl.admin.DeleteTaskResponse
-	(*Agent)(nil),                         // 14: flyteidl.admin.Agent
-	(*TaskCategory)(nil),                  // 15: flyteidl.admin.TaskCategory
-	(*GetAgentRequest)(nil),               // 16: flyteidl.admin.GetAgentRequest
-	(*GetAgentResponse)(nil),              // 17: flyteidl.admin.GetAgentResponse
-	(*ListAgentsRequest)(nil),             // 18: flyteidl.admin.ListAgentsRequest
-	(*ListAgentsResponse)(nil),            // 19: flyteidl.admin.ListAgentsResponse
-	(*GetTaskMetricsRequest)(nil),         // 20: flyteidl.admin.GetTaskMetricsRequest
-	(*GetTaskMetricsResponse)(nil),        // 21: flyteidl.admin.GetTaskMetricsResponse
-	(*GetTaskLogsRequest)(nil),            // 22: flyteidl.admin.GetTaskLogsRequest
-	(*GetTaskLogsResponseHeader)(nil),     // 23: flyteidl.admin.GetTaskLogsResponseHeader
-	(*GetTaskLogsResponseBody)(nil),       // 24: flyteidl.admin.GetTaskLogsResponseBody
-	(*GetTaskLogsResponse)(nil),           // 25: flyteidl.admin.GetTaskLogsResponse
-	nil,                                   // 26: flyteidl.admin.TaskExecutionMetadata.LabelsEntry
-	nil,                                   // 27: flyteidl.admin.TaskExecutionMetadata.AnnotationsEntry
-	nil,                                   // 28: flyteidl.admin.TaskExecutionMetadata.EnvironmentVariablesEntry
-	(*core.TaskExecutionIdentifier)(nil),  // 29: flyteidl.core.TaskExecutionIdentifier
-	(*core.TaskNodeOverrides)(nil),        // 30: flyteidl.core.TaskNodeOverrides
-	(*core.Identity)(nil),                 // 31: flyteidl.core.Identity
-	(*core.LiteralMap)(nil),               // 32: flyteidl.core.LiteralMap
-	(*core.TaskTemplate)(nil),             // 33: flyteidl.core.TaskTemplate
-	(*core.Connection)(nil),               // 34: flyteidl.core.Connection
-	(*core.TaskLog)(nil),                  // 35: flyteidl.core.TaskLog
-	(core.TaskExecution_Phase)(0),         // 36: flyteidl.core.TaskExecution.Phase
-	(*structpb.Struct)(nil),               // 37: google.protobuf.Struct
-	(*timestamppb.Timestamp)(nil),         // 38: google.protobuf.Timestamp
-	(*durationpb.Duration)(nil),           // 39: google.protobuf.Duration
-	(*core.ExecutionMetricResult)(nil),    // 40: flyteidl.core.ExecutionMetricResult
+	(*CreateTaskRequest)(nil),             // 2: flyteidl.admin.CreateTaskRequest
+	(*CreateTaskResponse)(nil),            // 3: flyteidl.admin.CreateTaskResponse
+	(*CreateRequestHeader)(nil),           // 4: flyteidl.admin.CreateRequestHeader
+	(*ExecuteTaskSyncRequest)(nil),        // 5: flyteidl.admin.ExecuteTaskSyncRequest
+	(*ExecuteTaskSyncResponseHeader)(nil), // 6: flyteidl.admin.ExecuteTaskSyncResponseHeader
+	(*ExecuteTaskSyncResponse)(nil),       // 7: flyteidl.admin.ExecuteTaskSyncResponse
+	(*GetTaskRequest)(nil),                // 8: flyteidl.admin.GetTaskRequest
+	(*GetTaskResponse)(nil),               // 9: flyteidl.admin.GetTaskResponse
+	(*Resource)(nil),                      // 10: flyteidl.admin.Resource
+	(*DeleteTaskRequest)(nil),             // 11: flyteidl.admin.DeleteTaskRequest
+	(*DeleteTaskResponse)(nil),            // 12: flyteidl.admin.DeleteTaskResponse
+	(*Agent)(nil),                         // 13: flyteidl.admin.Agent
+	(*TaskCategory)(nil),                  // 14: flyteidl.admin.TaskCategory
+	(*GetAgentRequest)(nil),               // 15: flyteidl.admin.GetAgentRequest
+	(*GetAgentResponse)(nil),              // 16: flyteidl.admin.GetAgentResponse
+	(*ListAgentsRequest)(nil),             // 17: flyteidl.admin.ListAgentsRequest
+	(*ListAgentsResponse)(nil),            // 18: flyteidl.admin.ListAgentsResponse
+	(*GetTaskMetricsRequest)(nil),         // 19: flyteidl.admin.GetTaskMetricsRequest
+	(*GetTaskMetricsResponse)(nil),        // 20: flyteidl.admin.GetTaskMetricsResponse
+	(*GetTaskLogsRequest)(nil),            // 21: flyteidl.admin.GetTaskLogsRequest
+	(*GetTaskLogsResponseHeader)(nil),     // 22: flyteidl.admin.GetTaskLogsResponseHeader
+	(*GetTaskLogsResponseBody)(nil),       // 23: flyteidl.admin.GetTaskLogsResponseBody
+	(*GetTaskLogsResponse)(nil),           // 24: flyteidl.admin.GetTaskLogsResponse
+	nil,                                   // 25: flyteidl.admin.TaskExecutionMetadata.LabelsEntry
+	nil,                                   // 26: flyteidl.admin.TaskExecutionMetadata.AnnotationsEntry
+	nil,                                   // 27: flyteidl.admin.TaskExecutionMetadata.EnvironmentVariablesEntry
+	(*core.TaskExecutionIdentifier)(nil),  // 28: flyteidl.core.TaskExecutionIdentifier
+	(*core.TaskNodeOverrides)(nil),        // 29: flyteidl.core.TaskNodeOverrides
+	(*core.Identity)(nil),                 // 30: flyteidl.core.Identity
+	(*core.LiteralMap)(nil),               // 31: flyteidl.core.LiteralMap
+	(*core.TaskTemplate)(nil),             // 32: flyteidl.core.TaskTemplate
+	(*core.Connection)(nil),               // 33: flyteidl.core.Connection
+	(*core.TaskLog)(nil),                  // 34: flyteidl.core.TaskLog
+	(core.TaskExecution_Phase)(0),         // 35: flyteidl.core.TaskExecution.Phase
+	(*structpb.Struct)(nil),               // 36: google.protobuf.Struct
+	(*timestamppb.Timestamp)(nil),         // 37: google.protobuf.Timestamp
+	(*durationpb.Duration)(nil),           // 38: google.protobuf.Duration
+	(*core.ExecutionMetricResult)(nil),    // 39: flyteidl.core.ExecutionMetricResult
 }
 var file_flyteidl_admin_agent_proto_depIdxs = []int32{
-	29, // 0: flyteidl.admin.TaskExecutionMetadata.task_execution_id:type_name -> flyteidl.core.TaskExecutionIdentifier
-	26, // 1: flyteidl.admin.TaskExecutionMetadata.labels:type_name -> flyteidl.admin.TaskExecutionMetadata.LabelsEntry
-	27, // 2: flyteidl.admin.TaskExecutionMetadata.annotations:type_name -> flyteidl.admin.TaskExecutionMetadata.AnnotationsEntry
-	28, // 3: flyteidl.admin.TaskExecutionMetadata.environment_variables:type_name -> flyteidl.admin.TaskExecutionMetadata.EnvironmentVariablesEntry
-	30, // 4: flyteidl.admin.TaskExecutionMetadata.overrides:type_name -> flyteidl.core.TaskNodeOverrides
-	31, // 5: flyteidl.admin.TaskExecutionMetadata.identity:type_name -> flyteidl.core.Identity
-	32, // 6: flyteidl.admin.CreateTaskRequest.inputs:type_name -> flyteidl.core.LiteralMap
-	33, // 7: flyteidl.admin.CreateTaskRequest.template:type_name -> flyteidl.core.TaskTemplate
+	28, // 0: flyteidl.admin.TaskExecutionMetadata.task_execution_id:type_name -> flyteidl.core.TaskExecutionIdentifier
+	25, // 1: flyteidl.admin.TaskExecutionMetadata.labels:type_name -> flyteidl.admin.TaskExecutionMetadata.LabelsEntry
+	26, // 2: flyteidl.admin.TaskExecutionMetadata.annotations:type_name -> flyteidl.admin.TaskExecutionMetadata.AnnotationsEntry
+	27, // 3: flyteidl.admin.TaskExecutionMetadata.environment_variables:type_name -> flyteidl.admin.TaskExecutionMetadata.EnvironmentVariablesEntry
+	29, // 4: flyteidl.admin.TaskExecutionMetadata.overrides:type_name -> flyteidl.core.TaskNodeOverrides
+	30, // 5: flyteidl.admin.TaskExecutionMetadata.identity:type_name -> flyteidl.core.Identity
+	31, // 6: flyteidl.admin.CreateTaskRequest.inputs:type_name -> flyteidl.core.LiteralMap
+	32, // 7: flyteidl.admin.CreateTaskRequest.template:type_name -> flyteidl.core.TaskTemplate
 	1,  // 8: flyteidl.admin.CreateTaskRequest.task_execution_metadata:type_name -> flyteidl.admin.TaskExecutionMetadata
-	34, // 9: flyteidl.admin.CreateTaskRequest.connection:type_name -> flyteidl.core.Connection
-	33, // 10: flyteidl.admin.CreateRequestHeader.template:type_name -> flyteidl.core.TaskTemplate
+	33, // 9: flyteidl.admin.CreateTaskRequest.connection:type_name -> flyteidl.core.Connection
+	32, // 10: flyteidl.admin.CreateRequestHeader.template:type_name -> flyteidl.core.TaskTemplate
 	1,  // 11: flyteidl.admin.CreateRequestHeader.task_execution_metadata:type_name -> flyteidl.admin.TaskExecutionMetadata
-	34, // 12: flyteidl.admin.CreateRequestHeader.connection:type_name -> flyteidl.core.Connection
-	5,  // 13: flyteidl.admin.ExecuteTaskSyncRequest.header:type_name -> flyteidl.admin.CreateRequestHeader
-	32, // 14: flyteidl.admin.ExecuteTaskSyncRequest.inputs:type_name -> flyteidl.core.LiteralMap
-	11, // 15: flyteidl.admin.ExecuteTaskSyncResponseHeader.resource:type_name -> flyteidl.admin.Resource
-	7,  // 16: flyteidl.admin.ExecuteTaskSyncResponse.header:type_name -> flyteidl.admin.ExecuteTaskSyncResponseHeader
-	32, // 17: flyteidl.admin.ExecuteTaskSyncResponse.outputs:type_name -> flyteidl.core.LiteralMap
-	15, // 18: flyteidl.admin.GetTaskRequest.task_category:type_name -> flyteidl.admin.TaskCategory
-	34, // 19: flyteidl.admin.GetTaskRequest.connection:type_name -> flyteidl.core.Connection
-	11, // 20: flyteidl.admin.GetTaskResponse.resource:type_name -> flyteidl.admin.Resource
+	33, // 12: flyteidl.admin.CreateRequestHeader.connection:type_name -> flyteidl.core.Connection
+	4,  // 13: flyteidl.admin.ExecuteTaskSyncRequest.header:type_name -> flyteidl.admin.CreateRequestHeader
+	31, // 14: flyteidl.admin.ExecuteTaskSyncRequest.inputs:type_name -> flyteidl.core.LiteralMap
+	10, // 15: flyteidl.admin.ExecuteTaskSyncResponseHeader.resource:type_name -> flyteidl.admin.Resource
+	6,  // 16: flyteidl.admin.ExecuteTaskSyncResponse.header:type_name -> flyteidl.admin.ExecuteTaskSyncResponseHeader
+	31, // 17: flyteidl.admin.ExecuteTaskSyncResponse.outputs:type_name -> flyteidl.core.LiteralMap
+	14, // 18: flyteidl.admin.GetTaskRequest.task_category:type_name -> flyteidl.admin.TaskCategory
+	33, // 19: flyteidl.admin.GetTaskRequest.connection:type_name -> flyteidl.core.Connection
+	10, // 20: flyteidl.admin.GetTaskResponse.resource:type_name -> flyteidl.admin.Resource
 	0,  // 21: flyteidl.admin.Resource.state:type_name -> flyteidl.admin.State
-	32, // 22: flyteidl.admin.Resource.outputs:type_name -> flyteidl.core.LiteralMap
-	35, // 23: flyteidl.admin.Resource.log_links:type_name -> flyteidl.core.TaskLog
-	36, // 24: flyteidl.admin.Resource.phase:type_name -> flyteidl.core.TaskExecution.Phase
-	37, // 25: flyteidl.admin.Resource.custom_info:type_name -> google.protobuf.Struct
-	15, // 26: flyteidl.admin.DeleteTaskRequest.task_category:type_name -> flyteidl.admin.TaskCategory
-	34, // 27: flyteidl.admin.DeleteTaskRequest.connection:type_name -> flyteidl.core.Connection
-	15, // 28: flyteidl.admin.Agent.supported_task_categories:type_name -> flyteidl.admin.TaskCategory
-	14, // 29: flyteidl.admin.GetAgentResponse.agent:type_name -> flyteidl.admin.Agent
-	14, // 30: flyteidl.admin.ListAgentsResponse.agents:type_name -> flyteidl.admin.Agent
-	38, // 31: flyteidl.admin.GetTaskMetricsRequest.start_time:type_name -> google.protobuf.Timestamp
-	38, // 32: flyteidl.admin.GetTaskMetricsRequest.end_time:type_name -> google.protobuf.Timestamp
-	39, // 33: flyteidl.admin.GetTaskMetricsRequest.step:type_name -> google.protobuf.Duration
-	15, // 34: flyteidl.admin.GetTaskMetricsRequest.task_category:type_name -> flyteidl.admin.TaskCategory
-	40, // 35: flyteidl.admin.GetTaskMetricsResponse.results:type_name -> flyteidl.core.ExecutionMetricResult
-	15, // 36: flyteidl.admin.GetTaskLogsRequest.task_category:type_name -> flyteidl.admin.TaskCategory
-	23, // 37: flyteidl.admin.GetTaskLogsResponse.header:type_name -> flyteidl.admin.GetTaskLogsResponseHeader
-	24, // 38: flyteidl.admin.GetTaskLogsResponse.body:type_name -> flyteidl.admin.GetTaskLogsResponseBody
+	31, // 22: flyteidl.admin.Resource.outputs:type_name -> flyteidl.core.LiteralMap
+	34, // 23: flyteidl.admin.Resource.log_links:type_name -> flyteidl.core.TaskLog
+	35, // 24: flyteidl.admin.Resource.phase:type_name -> flyteidl.core.TaskExecution.Phase
+	36, // 25: flyteidl.admin.Resource.custom_info:type_name -> google.protobuf.Struct
+	14, // 26: flyteidl.admin.DeleteTaskRequest.task_category:type_name -> flyteidl.admin.TaskCategory
+	33, // 27: flyteidl.admin.DeleteTaskRequest.connection:type_name -> flyteidl.core.Connection
+	14, // 28: flyteidl.admin.Agent.supported_task_categories:type_name -> flyteidl.admin.TaskCategory
+	13, // 29: flyteidl.admin.GetAgentResponse.agent:type_name -> flyteidl.admin.Agent
+	13, // 30: flyteidl.admin.ListAgentsResponse.agents:type_name -> flyteidl.admin.Agent
+	37, // 31: flyteidl.admin.GetTaskMetricsRequest.start_time:type_name -> google.protobuf.Timestamp
+	37, // 32: flyteidl.admin.GetTaskMetricsRequest.end_time:type_name -> google.protobuf.Timestamp
+	38, // 33: flyteidl.admin.GetTaskMetricsRequest.step:type_name -> google.protobuf.Duration
+	14, // 34: flyteidl.admin.GetTaskMetricsRequest.task_category:type_name -> flyteidl.admin.TaskCategory
+	39, // 35: flyteidl.admin.GetTaskMetricsResponse.results:type_name -> flyteidl.core.ExecutionMetricResult
+	14, // 36: flyteidl.admin.GetTaskLogsRequest.task_category:type_name -> flyteidl.admin.TaskCategory
+	22, // 37: flyteidl.admin.GetTaskLogsResponse.header:type_name -> flyteidl.admin.GetTaskLogsResponseHeader
+	23, // 38: flyteidl.admin.GetTaskLogsResponse.body:type_name -> flyteidl.admin.GetTaskLogsResponseBody
 	39, // [39:39] is the sub-list for method output_type
 	39, // [39:39] is the sub-list for method input_type
 	39, // [39:39] is the sub-list for extension type_name
@@ -2232,18 +2181,6 @@ func file_flyteidl_admin_agent_proto_init() {
 			}
 		}
 		file_flyteidl_admin_agent_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Secret); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_flyteidl_admin_agent_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*CreateTaskRequest); i {
 			case 0:
 				return &v.state
@@ -2255,7 +2192,7 @@ func file_flyteidl_admin_agent_proto_init() {
 				return nil
 			}
 		}
-		file_flyteidl_admin_agent_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+		file_flyteidl_admin_agent_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*CreateTaskResponse); i {
 			case 0:
 				return &v.state
@@ -2267,7 +2204,7 @@ func file_flyteidl_admin_agent_proto_init() {
 				return nil
 			}
 		}
-		file_flyteidl_admin_agent_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+		file_flyteidl_admin_agent_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*CreateRequestHeader); i {
 			case 0:
 				return &v.state
@@ -2279,7 +2216,7 @@ func file_flyteidl_admin_agent_proto_init() {
 				return nil
 			}
 		}
-		file_flyteidl_admin_agent_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+		file_flyteidl_admin_agent_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ExecuteTaskSyncRequest); i {
 			case 0:
 				return &v.state
@@ -2291,7 +2228,7 @@ func file_flyteidl_admin_agent_proto_init() {
 				return nil
 			}
 		}
-		file_flyteidl_admin_agent_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+		file_flyteidl_admin_agent_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ExecuteTaskSyncResponseHeader); i {
 			case 0:
 				return &v.state
@@ -2303,7 +2240,7 @@ func file_flyteidl_admin_agent_proto_init() {
 				return nil
 			}
 		}
-		file_flyteidl_admin_agent_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+		file_flyteidl_admin_agent_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ExecuteTaskSyncResponse); i {
 			case 0:
 				return &v.state
@@ -2315,7 +2252,7 @@ func file_flyteidl_admin_agent_proto_init() {
 				return nil
 			}
 		}
-		file_flyteidl_admin_agent_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+		file_flyteidl_admin_agent_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*GetTaskRequest); i {
 			case 0:
 				return &v.state
@@ -2327,7 +2264,7 @@ func file_flyteidl_admin_agent_proto_init() {
 				return nil
 			}
 		}
-		file_flyteidl_admin_agent_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
+		file_flyteidl_admin_agent_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*GetTaskResponse); i {
 			case 0:
 				return &v.state
@@ -2339,7 +2276,7 @@ func file_flyteidl_admin_agent_proto_init() {
 				return nil
 			}
 		}
-		file_flyteidl_admin_agent_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
+		file_flyteidl_admin_agent_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Resource); i {
 			case 0:
 				return &v.state
@@ -2351,7 +2288,7 @@ func file_flyteidl_admin_agent_proto_init() {
 				return nil
 			}
 		}
-		file_flyteidl_admin_agent_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
+		file_flyteidl_admin_agent_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*DeleteTaskRequest); i {
 			case 0:
 				return &v.state
@@ -2363,7 +2300,7 @@ func file_flyteidl_admin_agent_proto_init() {
 				return nil
 			}
 		}
-		file_flyteidl_admin_agent_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
+		file_flyteidl_admin_agent_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*DeleteTaskResponse); i {
 			case 0:
 				return &v.state
@@ -2375,7 +2312,7 @@ func file_flyteidl_admin_agent_proto_init() {
 				return nil
 			}
 		}
-		file_flyteidl_admin_agent_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
+		file_flyteidl_admin_agent_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Agent); i {
 			case 0:
 				return &v.state
@@ -2387,7 +2324,7 @@ func file_flyteidl_admin_agent_proto_init() {
 				return nil
 			}
 		}
-		file_flyteidl_admin_agent_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
+		file_flyteidl_admin_agent_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*TaskCategory); i {
 			case 0:
 				return &v.state
@@ -2399,7 +2336,7 @@ func file_flyteidl_admin_agent_proto_init() {
 				return nil
 			}
 		}
-		file_flyteidl_admin_agent_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
+		file_flyteidl_admin_agent_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*GetAgentRequest); i {
 			case 0:
 				return &v.state
@@ -2411,7 +2348,7 @@ func file_flyteidl_admin_agent_proto_init() {
 				return nil
 			}
 		}
-		file_flyteidl_admin_agent_proto_msgTypes[16].Exporter = func(v interface{}, i int) interface{} {
+		file_flyteidl_admin_agent_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*GetAgentResponse); i {
 			case 0:
 				return &v.state
@@ -2423,7 +2360,7 @@ func file_flyteidl_admin_agent_proto_init() {
 				return nil
 			}
 		}
-		file_flyteidl_admin_agent_proto_msgTypes[17].Exporter = func(v interface{}, i int) interface{} {
+		file_flyteidl_admin_agent_proto_msgTypes[16].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ListAgentsRequest); i {
 			case 0:
 				return &v.state
@@ -2435,7 +2372,7 @@ func file_flyteidl_admin_agent_proto_init() {
 				return nil
 			}
 		}
-		file_flyteidl_admin_agent_proto_msgTypes[18].Exporter = func(v interface{}, i int) interface{} {
+		file_flyteidl_admin_agent_proto_msgTypes[17].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ListAgentsResponse); i {
 			case 0:
 				return &v.state
@@ -2447,7 +2384,7 @@ func file_flyteidl_admin_agent_proto_init() {
 				return nil
 			}
 		}
-		file_flyteidl_admin_agent_proto_msgTypes[19].Exporter = func(v interface{}, i int) interface{} {
+		file_flyteidl_admin_agent_proto_msgTypes[18].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*GetTaskMetricsRequest); i {
 			case 0:
 				return &v.state
@@ -2459,7 +2396,7 @@ func file_flyteidl_admin_agent_proto_init() {
 				return nil
 			}
 		}
-		file_flyteidl_admin_agent_proto_msgTypes[20].Exporter = func(v interface{}, i int) interface{} {
+		file_flyteidl_admin_agent_proto_msgTypes[19].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*GetTaskMetricsResponse); i {
 			case 0:
 				return &v.state
@@ -2471,7 +2408,7 @@ func file_flyteidl_admin_agent_proto_init() {
 				return nil
 			}
 		}
-		file_flyteidl_admin_agent_proto_msgTypes[21].Exporter = func(v interface{}, i int) interface{} {
+		file_flyteidl_admin_agent_proto_msgTypes[20].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*GetTaskLogsRequest); i {
 			case 0:
 				return &v.state
@@ -2483,7 +2420,7 @@ func file_flyteidl_admin_agent_proto_init() {
 				return nil
 			}
 		}
-		file_flyteidl_admin_agent_proto_msgTypes[22].Exporter = func(v interface{}, i int) interface{} {
+		file_flyteidl_admin_agent_proto_msgTypes[21].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*GetTaskLogsResponseHeader); i {
 			case 0:
 				return &v.state
@@ -2495,7 +2432,7 @@ func file_flyteidl_admin_agent_proto_init() {
 				return nil
 			}
 		}
-		file_flyteidl_admin_agent_proto_msgTypes[23].Exporter = func(v interface{}, i int) interface{} {
+		file_flyteidl_admin_agent_proto_msgTypes[22].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*GetTaskLogsResponseBody); i {
 			case 0:
 				return &v.state
@@ -2507,7 +2444,7 @@ func file_flyteidl_admin_agent_proto_init() {
 				return nil
 			}
 		}
-		file_flyteidl_admin_agent_proto_msgTypes[24].Exporter = func(v interface{}, i int) interface{} {
+		file_flyteidl_admin_agent_proto_msgTypes[23].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*GetTaskLogsResponse); i {
 			case 0:
 				return &v.state
@@ -2520,15 +2457,15 @@ func file_flyteidl_admin_agent_proto_init() {
 			}
 		}
 	}
-	file_flyteidl_admin_agent_proto_msgTypes[5].OneofWrappers = []interface{}{
+	file_flyteidl_admin_agent_proto_msgTypes[4].OneofWrappers = []interface{}{
 		(*ExecuteTaskSyncRequest_Header)(nil),
 		(*ExecuteTaskSyncRequest_Inputs)(nil),
 	}
-	file_flyteidl_admin_agent_proto_msgTypes[7].OneofWrappers = []interface{}{
+	file_flyteidl_admin_agent_proto_msgTypes[6].OneofWrappers = []interface{}{
 		(*ExecuteTaskSyncResponse_Header)(nil),
 		(*ExecuteTaskSyncResponse_Outputs)(nil),
 	}
-	file_flyteidl_admin_agent_proto_msgTypes[24].OneofWrappers = []interface{}{
+	file_flyteidl_admin_agent_proto_msgTypes[23].OneofWrappers = []interface{}{
 		(*GetTaskLogsResponse_Header)(nil),
 		(*GetTaskLogsResponse_Body)(nil),
 	}
@@ -2538,7 +2475,7 @@ func file_flyteidl_admin_agent_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_flyteidl_admin_agent_proto_rawDesc,
 			NumEnums:      1,
-			NumMessages:   28,
+			NumMessages:   27,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

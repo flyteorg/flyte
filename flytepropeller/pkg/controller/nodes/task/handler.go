@@ -3,7 +3,6 @@ package task
 import (
 	"context"
 	"fmt"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/connectionmanager"
 	"runtime/debug"
 	"time"
 
@@ -28,6 +27,7 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/config"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/connectionmanager"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/resourcemanager"
 	rmConfig "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/resourcemanager/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/secretmanager"

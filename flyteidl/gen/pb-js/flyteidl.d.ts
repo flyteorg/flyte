@@ -9308,58 +9308,6 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
-        /** Properties of a Secret. */
-        interface ISecret {
-
-            /** Secret value */
-            value?: (string|null);
-        }
-
-        /** Represents a Secret. */
-        class Secret implements ISecret {
-
-            /**
-             * Constructs a new Secret.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.admin.ISecret);
-
-            /** Secret value. */
-            public value: string;
-
-            /**
-             * Creates a new Secret instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns Secret instance
-             */
-            public static create(properties?: flyteidl.admin.ISecret): flyteidl.admin.Secret;
-
-            /**
-             * Encodes the specified Secret message. Does not implicitly {@link flyteidl.admin.Secret.verify|verify} messages.
-             * @param message Secret message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.admin.ISecret, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a Secret message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns Secret
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.Secret;
-
-            /**
-             * Verifies a Secret message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
         /** Properties of a CreateTaskRequest. */
         interface ICreateTaskRequest {
 

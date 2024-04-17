@@ -43,13 +43,6 @@ pub struct TaskExecutionMetadata {
     #[prost(message, optional, tag="11")]
     pub identity: ::core::option::Option<super::core::Identity>,
 }
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct Secret {
-    /// The value of the secret.
-    #[prost(string, tag="1")]
-    pub value: ::prost::alloc::string::String,
-}
 /// Represents a request structure to create task.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
