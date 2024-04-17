@@ -7089,6 +7089,70 @@ export namespace flyteidl {
             }
         }
 
+        /** Properties of a Connection. */
+        interface IConnection {
+
+            /** Connection name */
+            name?: (string|null);
+
+            /** Connection secrets */
+            secrets?: ({ [k: string]: string }|null);
+
+            /** Connection config */
+            config?: ({ [k: string]: string }|null);
+        }
+
+        /** Represents a Connection. */
+        class Connection implements IConnection {
+
+            /**
+             * Constructs a new Connection.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.IConnection);
+
+            /** Connection name. */
+            public name: string;
+
+            /** Connection secrets. */
+            public secrets: { [k: string]: string };
+
+            /** Connection config. */
+            public config: { [k: string]: string };
+
+            /**
+             * Creates a new Connection instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns Connection instance
+             */
+            public static create(properties?: flyteidl.core.IConnection): flyteidl.core.Connection;
+
+            /**
+             * Encodes the specified Connection message. Does not implicitly {@link flyteidl.core.Connection.verify|verify} messages.
+             * @param message Connection message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.IConnection, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a Connection message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns Connection
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.Connection;
+
+            /**
+             * Verifies a Connection message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a OAuth2Client. */
         interface IOAuth2Client {
 
@@ -7312,6 +7376,9 @@ export namespace flyteidl {
 
             /** SecurityContext tokens */
             tokens?: (flyteidl.core.IOAuth2TokenRequest[]|null);
+
+            /** SecurityContext connection */
+            connection?: (string|null);
         }
 
         /** Represents a SecurityContext. */
@@ -7331,6 +7398,9 @@ export namespace flyteidl {
 
             /** SecurityContext tokens. */
             public tokens: flyteidl.core.IOAuth2TokenRequest[];
+
+            /** SecurityContext connection. */
+            public connection: string;
 
             /**
              * Creates a new SecurityContext instance using the specified properties.
@@ -9302,8 +9372,8 @@ export namespace flyteidl {
             /** CreateTaskRequest taskExecutionMetadata */
             taskExecutionMetadata?: (flyteidl.admin.ITaskExecutionMetadata|null);
 
-            /** CreateTaskRequest secrets */
-            secrets?: (flyteidl.admin.ISecret[]|null);
+            /** CreateTaskRequest connection */
+            connection?: (flyteidl.core.IConnection|null);
         }
 
         /** Represents a CreateTaskRequest. */
@@ -9327,8 +9397,8 @@ export namespace flyteidl {
             /** CreateTaskRequest taskExecutionMetadata. */
             public taskExecutionMetadata?: (flyteidl.admin.ITaskExecutionMetadata|null);
 
-            /** CreateTaskRequest secrets. */
-            public secrets: flyteidl.admin.ISecret[];
+            /** CreateTaskRequest connection. */
+            public connection?: (flyteidl.core.IConnection|null);
 
             /**
              * Creates a new CreateTaskRequest instance using the specified properties.
@@ -9430,8 +9500,8 @@ export namespace flyteidl {
             /** CreateRequestHeader maxDatasetSizeBytes */
             maxDatasetSizeBytes?: (Long|null);
 
-            /** CreateRequestHeader secrets */
-            secrets?: (flyteidl.admin.ISecret[]|null);
+            /** CreateRequestHeader connection */
+            connection?: (flyteidl.core.IConnection|null);
         }
 
         /** Represents a CreateRequestHeader. */
@@ -9455,8 +9525,8 @@ export namespace flyteidl {
             /** CreateRequestHeader maxDatasetSizeBytes. */
             public maxDatasetSizeBytes: Long;
 
-            /** CreateRequestHeader secrets. */
-            public secrets: flyteidl.admin.ISecret[];
+            /** CreateRequestHeader connection. */
+            public connection?: (flyteidl.core.IConnection|null);
 
             /**
              * Creates a new CreateRequestHeader instance using the specified properties.
@@ -9677,8 +9747,8 @@ export namespace flyteidl {
             /** GetTaskRequest taskCategory */
             taskCategory?: (flyteidl.admin.ITaskCategory|null);
 
-            /** GetTaskRequest secrets */
-            secrets?: (flyteidl.admin.ISecret[]|null);
+            /** GetTaskRequest connection */
+            connection?: (flyteidl.core.IConnection|null);
         }
 
         /** Represents a GetTaskRequest. */
@@ -9699,8 +9769,8 @@ export namespace flyteidl {
             /** GetTaskRequest taskCategory. */
             public taskCategory?: (flyteidl.admin.ITaskCategory|null);
 
-            /** GetTaskRequest secrets. */
-            public secrets: flyteidl.admin.ISecret[];
+            /** GetTaskRequest connection. */
+            public connection?: (flyteidl.core.IConnection|null);
 
             /**
              * Creates a new GetTaskRequest instance using the specified properties.
@@ -9881,8 +9951,8 @@ export namespace flyteidl {
             /** DeleteTaskRequest taskCategory */
             taskCategory?: (flyteidl.admin.ITaskCategory|null);
 
-            /** DeleteTaskRequest secrets */
-            secrets?: (flyteidl.admin.ISecret[]|null);
+            /** DeleteTaskRequest connection */
+            connection?: (flyteidl.core.IConnection|null);
         }
 
         /** Represents a DeleteTaskRequest. */
@@ -9903,8 +9973,8 @@ export namespace flyteidl {
             /** DeleteTaskRequest taskCategory. */
             public taskCategory?: (flyteidl.admin.ITaskCategory|null);
 
-            /** DeleteTaskRequest secrets. */
-            public secrets: flyteidl.admin.ISecret[];
+            /** DeleteTaskRequest connection. */
+            public connection?: (flyteidl.core.IConnection|null);
 
             /**
              * Creates a new DeleteTaskRequest instance using the specified properties.

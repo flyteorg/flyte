@@ -45,6 +45,18 @@ message Secret {
     MountType mount_requirement = 4;
 }
 
+message Connection {
+    // The name of the connection.
+    // +required
+    string name = 1;
+
+    // The credentials to use for the connection, such as API keys, OAuth2 tokens, etc.
+    map<string, string> secrets = 2;
+
+    // The configuration to use for the connection, such as the endpoint, account name, etc.
+    map<string, string> config = 3;
+}
+
 // OAuth2Client encapsulates OAuth2 Client Credentials to be used when making calls on behalf of that task.
 message OAuth2Client {
     // client_id is the public id for the client to use. The system will not perform any pre-auth validation that the
@@ -128,5 +140,9 @@ message SecurityContext {
     // to the secret) and to pass it to the remote execution engine.
     repeated OAuth2TokenRequest tokens = 3;
 
-    map<string, Secret> agent_secrets = 4;
+    // The name of the connection.
+    // Flyte will use the default connection in the project-domain settings, but users
+    // still be able to override it by specifying the connection in the task decorator.
+    // +optional
+    string connection = 4;
 }

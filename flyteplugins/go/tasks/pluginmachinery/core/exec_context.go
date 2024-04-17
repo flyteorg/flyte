@@ -31,6 +31,9 @@ type TaskExecutionContext interface {
 	// Returns a secret manager that can retrieve configured secrets for this plugin
 	SecretManager() SecretManager
 
+	// Returns a connection manager that can retrieve configured connections for the plugin
+	ConnectionManager() ConnectionManager
+
 	// Returns a method that allows a plugin to indicate that the task has a new update and can be invoked again to check for updates
 	TaskRefreshIndicator() SignalAsync
 

@@ -44,7 +44,7 @@ type ResourceMetaWrapper struct {
 	OutputPrefix      string
 	AgentResourceMeta []byte
 	TaskCategory      admin.TaskCategory
-	Secrets           []admin.Secret
+	Connection        flyteIdl.Connection
 }
 
 func (p Plugin) GetConfig() webapi.PluginConfig {
@@ -93,14 +93,12 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 	taskCategory := admin.TaskCategory{Name: taskTemplate.Type, Version: taskTemplate.TaskTypeVersion}
 	agent, isSync := getFinalAgent(&taskCategory, p.cfg, p.agentRegistry)
 
-	secrets := make([]admin.Secret, 0)
+	var connection *flyteIdl.Connection
 	if taskTemplate.SecurityContext != nil {
-		for _, secret := range taskTemplate.SecurityContext.Secrets {
-			val, err := taskCtx.SecretManager().GetForSecret(ctx, secret)
-			if err != nil {
-				return nil, nil, err
-			}
-			secrets = append(secrets, admin.Secret{Value: val})
+		connection, err = taskCtx.ConnectionManager().Get(ctx, taskTemplate.SecurityContext.Connection)
+		if err != nil {
+			logger.Errorf(ctx, "Failed to get connection with error: %v", err)
+			return nil, nil, err
 		}
 	}
 
@@ -114,7 +112,12 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 		if err != nil {
 			return nil, nil, err
 		}
-		header := &admin.CreateRequestHeader{Template: taskTemplate, OutputPrefix: outputPrefix, TaskExecutionMetadata: &taskExecutionMetadata, Secrets: secretPtr(secrets)}
+		header := &admin.CreateRequestHeader{
+			Template:              taskTemplate,
+			OutputPrefix:          outputPrefix,
+			TaskExecutionMetadata: &taskExecutionMetadata,
+			Connection:            connection,
+		}
 		return p.ExecuteTaskSync(finalCtx, client, header, inputs)
 	}
 
@@ -128,7 +131,7 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 		Template:              taskTemplate,
 		OutputPrefix:          outputPrefix,
 		TaskExecutionMetadata: &taskExecutionMetadata,
-		Secrets:               secretPtr(secrets),
+		Connection:            connection,
 	}
 	res, err := client.CreateTask(finalCtx, request)
 	if err != nil {
@@ -139,7 +142,7 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 		OutputPrefix:      outputPrefix,
 		AgentResourceMeta: res.GetResourceMeta(),
 		TaskCategory:      taskCategory,
-		Secrets:           secrets,
+		Connection:        *connection,
 	}, nil, nil
 }
 
@@ -217,7 +220,7 @@ func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest weba
 		TaskType:     metadata.TaskCategory.Name,
 		TaskCategory: &metadata.TaskCategory,
 		ResourceMeta: metadata.AgentResourceMeta,
-		Secrets:      secretPtr(metadata.Secrets),
+		Connection:   &metadata.Connection,
 	}
 	res, err := client.GetTask(finalCtx, request)
 	if err != nil {
@@ -251,7 +254,7 @@ func (p Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error 
 		TaskType:     metadata.TaskCategory.Name,
 		TaskCategory: &metadata.TaskCategory,
 		ResourceMeta: metadata.AgentResourceMeta,
-		Secrets:      secretPtr(metadata.Secrets),
+		Connection:   &metadata.Connection,
 	}
 	_, err = client.DeleteTask(finalCtx, request)
 	return err
@@ -333,14 +336,6 @@ func (p Plugin) getAsyncAgentClient(ctx context.Context, agent *Deployment) (ser
 		p.cs.asyncAgentClients[agent.Endpoint] = client
 	}
 	return client, nil
-}
-
-func secretPtr(secrets []admin.Secret) []*admin.Secret {
-	res := make([]*admin.Secret, 0)
-	for _, s := range secrets {
-		res = append(res, &s)
-	}
-	return res
 }
 
 func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, outputs *flyteIdl.LiteralMap) error {

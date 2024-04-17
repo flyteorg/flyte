@@ -54,6 +54,9 @@ type TaskExecutionContextReader interface {
 	// Returns a secret manager that can retrieve configured secrets for this plugin
 	SecretManager() pluginsCore.SecretManager
 
+	// Returns a connection manager that can retrieve configured connections for the plugin
+	ConnectionManager() pluginsCore.ConnectionManager
+
 	// Returns a TaskReader, to retrieve the task details
 	TaskReader() pluginsCore.TaskReader
 

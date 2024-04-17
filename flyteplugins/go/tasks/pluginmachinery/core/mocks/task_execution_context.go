@@ -18,6 +18,11 @@ type TaskExecutionContext struct {
 	mock.Mock
 }
 
+func (_m *TaskExecutionContext) ConnectionManager() core.ConnectionManager {
+	//TODO implement me
+	panic("implement me")
+}
+
 type TaskExecutionContext_Catalog struct {
 	*mock.Call
 }

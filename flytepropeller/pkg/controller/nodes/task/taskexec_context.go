@@ -101,6 +101,7 @@ type taskExecutionContext struct {
 	ow  *ioutils.BufferedOutputWriter
 	ber *bufferedEventRecorder
 	sm  pluginCore.SecretManager
+	cm  pluginCore.ConnectionManager
 	c   pluginCatalog.AsyncClient
 }
 
@@ -150,6 +151,10 @@ func (t *taskExecutionContext) PluginStateWriter() pluginCore.PluginStateWriter 
 
 func (t taskExecutionContext) SecretManager() pluginCore.SecretManager {
 	return t.sm
+}
+
+func (t *taskExecutionContext) ConnectionManager() pluginCore.ConnectionManager {
+	return t.cm
 }
 
 // Validates and assigns a single resource by examining the default requests and max limit with the static resource value

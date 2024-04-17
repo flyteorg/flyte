@@ -119,6 +119,62 @@ proto3.util.setEnumType(Secret_MountType, "flyteidl.core.Secret.MountType", [
 ]);
 
 /**
+ * @generated from message flyteidl.core.Connection
+ */
+export class Connection extends Message<Connection> {
+  /**
+   * The name of the connection.
+   * +required
+   *
+   * @generated from field: string name = 1;
+   */
+  name = "";
+
+  /**
+   * The credentials to use for the connection, such as API keys, OAuth2 tokens, etc.
+   *
+   * @generated from field: map<string, string> secrets = 2;
+   */
+  secrets: { [key: string]: string } = {};
+
+  /**
+   * The configuration to use for the connection, such as the endpoint, account name, etc.
+   *
+   * @generated from field: map<string, string> config = 3;
+   */
+  config: { [key: string]: string } = {};
+
+  constructor(data?: PartialMessage<Connection>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.core.Connection";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "secrets", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
+    { no: 3, name: "config", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Connection {
+    return new Connection().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Connection {
+    return new Connection().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Connection {
+    return new Connection().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: Connection | PlainMessage<Connection> | undefined, b: Connection | PlainMessage<Connection> | undefined): boolean {
+    return proto3.util.equals(Connection, a, b);
+  }
+}
+
+/**
  * OAuth2Client encapsulates OAuth2 Client Credentials to be used when making calls on behalf of that task.
  *
  * @generated from message flyteidl.core.OAuth2Client
@@ -374,6 +430,16 @@ export class SecurityContext extends Message<SecurityContext> {
    */
   tokens: OAuth2TokenRequest[] = [];
 
+  /**
+   * The name of the connection.
+   * Flyte will use the default connection in the project-domain settings, but users
+   * still be able to override it by specifying the connection in the task decorator.
+   * +optional
+   *
+   * @generated from field: string connection = 4;
+   */
+  connection = "";
+
   constructor(data?: PartialMessage<SecurityContext>) {
     super();
     proto3.util.initPartial(data, this);
@@ -385,6 +451,7 @@ export class SecurityContext extends Message<SecurityContext> {
     { no: 1, name: "run_as", kind: "message", T: Identity },
     { no: 2, name: "secrets", kind: "message", T: Secret, repeated: true },
     { no: 3, name: "tokens", kind: "message", T: OAuth2TokenRequest, repeated: true },
+    { no: 4, name: "connection", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SecurityContext {
