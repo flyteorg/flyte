@@ -2,26 +2,36 @@ package connectionmanager
 
 import (
 	"context"
+	"fmt"
+	"os"
+
 	flyteidl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
-// Env Var Lookup based on Prefix + SecretGroup + _ + SecretKey
-const envVarLookupFormatter = "%s%s_%s"
+// FileEnvConnectionManager allows retrieving secrets mounted to this process through Env Vars or Files.
+type FileEnvConnectionManager struct{}
 
-// FileEnvSecretManager allows retrieving secrets mounted to this process through Env Vars or Files.
-type FileEnvConnectionManager struct {
-	secretPath string
-	envPrefix  string
-}
-
+// Get retrieves a secret from the environment of the running process or from a file.
 func (f FileEnvConnectionManager) Get(ctx context.Context, key string) (*flyteidl.Connection, error) {
-	// TODO: Read connection from config map
-	return &flyteidl.Connection{}, nil
+	cfg := GetConfig()
+	connection := cfg.Connection[key]
+	secret := make(map[string]string)
+	for k, v := range connection.Secrets {
+		// TODO: Read the secret from a local file
+		v, ok := os.LookupEnv(v)
+		if !ok {
+			return nil, fmt.Errorf("secret not found in env [%s]", v)
+		}
+		secret[k] = v
+	}
+	config := make(map[string]string)
+	for k, v := range connection.Configs {
+		config[k] = v
+	}
+
+	return &flyteidl.Connection{Secrets: secret, Config: config}, nil
 }
 
-func NewFileEnvConnectionManager(cfg *Config) FileEnvConnectionManager {
-	return FileEnvConnectionManager{
-		secretPath: cfg.SecretFilePrefix,
-		envPrefix:  cfg.EnvironmentPrefix,
-	}
+func NewFileEnvConnectionManager() FileEnvConnectionManager {
+	return FileEnvConnectionManager{}
 }
