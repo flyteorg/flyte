@@ -97,7 +97,7 @@ func TestGetEventInfo(t *testing.T) {
 			},
 		},
 	}))
-	taskCtx := dummySparkTaskContext(dummySparkTaskTemplateContainer("blah-1", dummySparkConf), false)
+	taskCtx := dummySparkTaskContext(dummySparkTaskTemplateContainer("blah-1", dummySparkConf), false, k8s.PluginState{})
 	info, err := getEventInfoForSpark(taskCtx, dummySparkApplication(sj.RunningState))
 	assert.NoError(t, err)
 	assert.Len(t, info.Logs, 6)
@@ -172,7 +172,7 @@ func TestGetTaskPhase(t *testing.T) {
 	sparkResourceHandler := sparkResourceHandler{}
 
 	ctx := context.TODO()
-	taskCtx := dummySparkTaskContext(dummySparkTaskTemplateContainer("", dummySparkConf), false)
+	taskCtx := dummySparkTaskContext(dummySparkTaskTemplateContainer("", dummySparkConf), false, k8s.PluginState{})
 	taskPhase, err := sparkResourceHandler.GetTaskPhase(ctx, taskCtx, dummySparkApplication(sj.NewState))
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Phase(), pluginsCore.PhaseQueued)
@@ -232,6 +232,24 @@ func TestGetTaskPhase(t *testing.T) {
 	assert.Equal(t, taskPhase.Phase(), pluginsCore.PhaseRetryableFailure)
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, err)
+}
+
+func TestGetTaskPhaseIncreasePhaseVersion(t *testing.T) {
+	sparkResourceHandler := sparkResourceHandler{}
+	ctx := context.TODO()
+
+	pluginState := k8s.PluginState{
+		Phase:        pluginsCore.PhaseInitializing,
+		PhaseVersion: pluginsCore.DefaultPhaseVersion,
+		Reason:       "task submitted to K8s",
+	}
+
+	taskCtx := dummySparkTaskContext(dummySparkTaskTemplateContainer("", dummySparkConf), false, pluginState)
+
+	taskPhase, err := sparkResourceHandler.GetTaskPhase(ctx, taskCtx, dummySparkApplication(sj.SubmittedState))
+
+	assert.NoError(t, err)
+	assert.Equal(t, taskPhase.Version(), pluginsCore.DefaultPhaseVersion+1)
 }
 
 func dummySparkApplication(state sj.ApplicationStateType) *sj.SparkApplication {
@@ -353,7 +371,7 @@ func dummySparkTaskTemplatePod(id string, sparkConf map[string]string, podSpec *
 	}
 }
 
-func dummySparkTaskContext(taskTemplate *core.TaskTemplate, interruptible bool) pluginsCore.TaskExecutionContext {
+func dummySparkTaskContext(taskTemplate *core.TaskTemplate, interruptible bool, pluginState k8s.PluginState) pluginsCore.TaskExecutionContext {
 	taskCtx := &mocks.TaskExecutionContext{}
 	inputReader := &pluginIOMocks.InputReader{}
 	inputReader.OnGetInputPrefixPath().Return("/input/prefix")
@@ -413,11 +431,10 @@ func dummySparkTaskContext(taskTemplate *core.TaskTemplate, interruptible bool) 
 	taskExecutionMetadata.On("GetK8sServiceAccount").Return("new-val")
 	taskCtx.On("TaskExecutionMetadata").Return(taskExecutionMetadata)
 
-	inputState := k8s.PluginState{}
 	pluginStateReaderMock := mocks.PluginStateReader{}
-	pluginStateReaderMock.On("Get", mock.AnythingOfType(reflect.TypeOf(&inputState).String())).Return(
+	pluginStateReaderMock.On("Get", mock.AnythingOfType(reflect.TypeOf(&pluginState).String())).Return(
 		func(v interface{}) uint8 {
-			*(v.(*k8s.PluginState)) = inputState
+			*(v.(*k8s.PluginState)) = pluginState
 			return 0
 		},
 		func(v interface{}) error {
@@ -576,7 +593,7 @@ func TestBuildResourceContainer(t *testing.T) {
 
 	defaultConfig := defaultPluginConfig()
 	assert.NoError(t, config.SetK8sPluginConfig(defaultConfig))
-	resource, err := sparkResourceHandler.BuildResource(context.TODO(), dummySparkTaskContext(taskTemplate, true))
+	resource, err := sparkResourceHandler.BuildResource(context.TODO(), dummySparkTaskContext(taskTemplate, true, k8s.PluginState{}))
 	assert.Nil(t, err)
 
 	assert.NotNil(t, resource)
@@ -724,7 +741,7 @@ func TestBuildResourceContainer(t *testing.T) {
 	dummyConfWithRequest["spark.kubernetes.executor.request.cores"] = "4"
 
 	taskTemplate = dummySparkTaskTemplateContainer("blah-1", dummyConfWithRequest)
-	resource, err = sparkResourceHandler.BuildResource(context.TODO(), dummySparkTaskContext(taskTemplate, false))
+	resource, err = sparkResourceHandler.BuildResource(context.TODO(), dummySparkTaskContext(taskTemplate, false, k8s.PluginState{}))
 	assert.Nil(t, err)
 	assert.NotNil(t, resource)
 	sparkApp, ok = resource.(*sj.SparkApplication)
@@ -734,7 +751,7 @@ func TestBuildResourceContainer(t *testing.T) {
 	assert.Equal(t, dummyConfWithRequest["spark.kubernetes.executor.request.cores"], sparkApp.Spec.SparkConf["spark.kubernetes.executor.limit.cores"])
 
 	// Case 3: Interruptible False
-	resource, err = sparkResourceHandler.BuildResource(context.TODO(), dummySparkTaskContext(taskTemplate, false))
+	resource, err = sparkResourceHandler.BuildResource(context.TODO(), dummySparkTaskContext(taskTemplate, false, k8s.PluginState{}))
 	assert.Nil(t, err)
 	assert.NotNil(t, resource)
 	sparkApp, ok = resource.(*sj.SparkApplication)
@@ -782,7 +799,7 @@ func TestBuildResourceContainer(t *testing.T) {
 
 	// Case 4: Invalid Spark Task-Template
 	taskTemplate.Custom = nil
-	resource, err = sparkResourceHandler.BuildResource(context.TODO(), dummySparkTaskContext(taskTemplate, false))
+	resource, err = sparkResourceHandler.BuildResource(context.TODO(), dummySparkTaskContext(taskTemplate, false, k8s.PluginState{}))
 	assert.NotNil(t, err)
 	assert.Nil(t, resource)
 }
@@ -802,7 +819,7 @@ func TestBuildResourcePodTemplate(t *testing.T) {
 	taskTemplate.GetK8SPod()
 	sparkResourceHandler := sparkResourceHandler{}
 
-	taskCtx := dummySparkTaskContext(taskTemplate, true)
+	taskCtx := dummySparkTaskContext(taskTemplate, true, k8s.PluginState{})
 	resource, err := sparkResourceHandler.BuildResource(context.TODO(), taskCtx)
 
 	assert.Nil(t, err)
