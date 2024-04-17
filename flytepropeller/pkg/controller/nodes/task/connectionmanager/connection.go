@@ -14,7 +14,10 @@ type FileEnvConnectionManager struct{}
 // Get retrieves a secret from the environment of the running process or from a file.
 func (f FileEnvConnectionManager) Get(ctx context.Context, key string) (*flyteidl.Connection, error) {
 	cfg := GetConfig()
-	connection := cfg.Connection[key]
+	connection, ok := cfg.Connection[key]
+	if !ok {
+		return nil, fmt.Errorf("connection not found [%s]", key)
+	}
 	secret := make(map[string]string)
 	for k, v := range connection.Secrets {
 		// TODO: Read the secret from a local file

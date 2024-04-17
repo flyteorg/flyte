@@ -7,7 +7,16 @@ import "github.com/flyteorg/flyte/flytestdlib/config"
 const SectionKey = "connections"
 
 var (
-	defaultConfig = &Config{}
+	defaultConfig = &Config{
+		Connection: map[string]Connection{
+			"chatgpt": {
+				Secrets: map[string]string{
+					// You need to export an environment variable with the key FLYTE_CHATGPT_API_KEY
+					"openai_api_key": "FLYTE_OPENAI_API_KEY",
+				},
+			},
+		},
+	}
 
 	section = config.MustRegisterSection(SectionKey, defaultConfig)
 )

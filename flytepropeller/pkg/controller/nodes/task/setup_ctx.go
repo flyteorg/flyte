@@ -10,12 +10,17 @@ import (
 
 type setupContext struct {
 	interfaces.SetupContext
-	kubeClient    pluginCore.KubeClient
-	secretManager pluginCore.SecretManager
+	kubeClient        pluginCore.KubeClient
+	secretManager     pluginCore.SecretManager
+	connectionManager pluginCore.ConnectionManager
 }
 
 func (s setupContext) SecretManager() pluginCore.SecretManager {
 	return s.secretManager
+}
+
+func (s setupContext) ConnectionManager() pluginCore.ConnectionManager {
+	return s.connectionManager
 }
 
 func (s setupContext) KubeClient() pluginCore.KubeClient {
@@ -32,9 +37,10 @@ func (s setupContext) EnqueueOwner() pluginCore.EnqueueOwner {
 func (t *Handler) newSetupContext(sCtx interfaces.SetupContext) *setupContext {
 
 	return &setupContext{
-		SetupContext:  sCtx,
-		kubeClient:    t.kubeClient,
-		secretManager: t.secretManager,
+		SetupContext:      sCtx,
+		kubeClient:        t.kubeClient,
+		secretManager:     t.secretManager,
+		connectionManager: t.connectionManager,
 	}
 }
 

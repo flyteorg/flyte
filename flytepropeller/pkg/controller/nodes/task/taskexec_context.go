@@ -317,5 +317,6 @@ func (t *Handler) newTaskExecutionContext(ctx context.Context, nCtx interfaces.N
 		ber: newBufferedEventRecorder(),
 		c:   t.asyncCatalog,
 		sm:  t.secretManager,
+		cm:  t.connectionManager,
 	}, nil
 }
