@@ -46,7 +46,7 @@ Future integrations aim to incorporate higher-level checkpointing APIs from popu
 like Keras, PyTorch, Scikit-learn, and big-data frameworks such as Spark and Flink, enhancing their fault-tolerance capabilities.
 
 ```{note}
-To clone and run the example code on this page, see the [Flytesnacks repo][adv-comp].
+To clone and run the example code on this page, see the [Flytesnacks repo][flytesnacks].
 ```
 
 To begin, import the necessary libraries and set the number of task retries to `3`:
@@ -91,4 +91,4 @@ pyflyte run --remote \
   checkpointing_example --n_iterations 10
 ```
 
-[adv-comp]: https://github.com/flyteorg/flytesnacks/tree/master/examples/advanced_composition/advanced_composition
+[flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/advanced_composition/

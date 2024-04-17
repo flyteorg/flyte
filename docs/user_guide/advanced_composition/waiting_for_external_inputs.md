@@ -39,6 +39,10 @@ Though this type of node may not be used often in a production setting,
 you might want to use it, for example, if you want to simulate a delay in
 your workflow to mock out the behavior of some long-running computation.
 
+```{note}
+To clone and run the example code on this page, see the [Flytesnacks repo][flytesnacks].
+```
+
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/waiting_for_external_inputs.py
 :caption: advanced_composition/waiting_for_external_inputs.py
 :lines: 1-20
@@ -59,7 +63,7 @@ Now that you have a general sense of how this works, let's move onto the
 {func}`~flytekit.wait_for_input` workflow node.
 
 ```{note}
-To clone and run the example code on this page, see the [Flytesnacks repo][adv-comp].
+To clone and run the example code on this page, see the [Flytesnacks repo][flytesnacks].
 ```
 
 ## Supply external inputs with `wait_for_input`
@@ -201,4 +205,4 @@ remote.set_signal("title-input", execution.id.name, "my report")
 remote.set_signal("review-passes", execution.id.name, True)
 ```
 
-[adv-comp]: https://github.com/flyteorg/flytesnacks/tree/master/examples/advanced_composition/advanced_composition
+[flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/advanced_composition/

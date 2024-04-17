@@ -35,7 +35,7 @@ Dynamic workflows become essential when you require:
 This example utilizes dynamic workflow to count the common characters between any two strings.
 
 ```{note}
-To clone and run the example code on this page, see the [Flytesnacks repo][adv-comp].
+To clone and run the example code on this page, see the [Flytesnacks repo][flytesnacks].
 ```
 
 To begin, we import the required libraries.
@@ -224,4 +224,4 @@ pyflyte run --remote \
   merge_sort --numbers '[1813, 3105, 3260, 2634, 383, 7037, 3291, 2403, 315, 7164]' --numbers_count 10
 ```
 
-[adv-comp]: https://github.com/flyteorg/flytesnacks/tree/master/examples/advanced_composition/advanced_composition
+[flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/advanced_composition/

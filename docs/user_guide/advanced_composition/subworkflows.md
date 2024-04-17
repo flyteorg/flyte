@@ -19,7 +19,7 @@ Consider this scenario: when workflow `A` is integrated as a subworkflow of work
 running workflow `B` results in the entire graph of workflow `A` being duplicated into workflow `B` at the point of invocation.
 
 ```{note}
-To clone and run the example code on this page, see the [Flytesnacks repo][adv-comp].
+To clone and run the example code on this page, see the [Flytesnacks repo][flytesnacks].
 ```
 
 Here's an example illustrating the calculation of slope, intercept and the corresponding y-value:
@@ -112,4 +112,4 @@ pyflyte run --remote \
   nested_regression_line_lp
 ```
 
-[adv-comp]: https://github.com/flyteorg/flytesnacks/tree/master/examples/advanced_composition/advanced_composition
+[flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/advanced_composition/

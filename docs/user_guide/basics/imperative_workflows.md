@@ -17,31 +17,35 @@ in textual form (perhaps during a transition from a legacy system).
 In such scenarios, you want to orchestrate these tasks.
 This is where Flyte's imperative workflows come into play, allowing you to programmatically construct workflows.
 
+```{note}
+To clone and run the example code on this page, see the [Flytesnacks repo][flytesnacks].
+```
+
 To begin, import the necessary dependencies:
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/imperative_workflow.py
-:caption: imperative_workflow.py
+:caption: basics/imperative_workflow.py
 :lines: 1
 ```
 
 We import the `slope` and `intercept` tasks from the `workflow.py` file:
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/imperative_workflow.py
-:caption: imperative_workflow.py
+:caption: basics/imperative_workflow.py
 :lines: 4
 ```
 
 Create an imperative workflow:
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/imperative_workflow.py
-:caption: imperative_workflow.py
+:caption: basics/imperative_workflow.py
 :lines: 7
 ```
 
 Add the workflow inputs to the imperative workflow:
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/imperative_workflow.py
-:caption: imperative_workflow.py
+:caption: basics/imperative_workflow.py
 :lines: 11-12
 ```
 
@@ -53,21 +57,21 @@ you can create a {ref}`launch plan <launch_plan>`.
 Add the tasks that need to be triggered from within the workflow:
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/imperative_workflow.py
-:caption: imperative_workflow.py
+:caption: basics/imperative_workflow.py
 :lines: 16-19
 ```
 
 Lastly, add the workflow output:
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/imperative_workflow.py
-:caption: imperative_workflow.py
+:caption: basics/imperative_workflow.py
 :lines: 23
 ```
 
 You can execute the workflow locally as follows:
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/imperative_workflow.py
-:caption: imperative_workflow.py
+:caption: basics/imperative_workflow.py
 :lines: 27-28
 ```
 
@@ -88,3 +92,5 @@ wf.add_workflow_output(
 )
 ```
 :::
+
+[flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/basics/

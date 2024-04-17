@@ -13,7 +13,7 @@ it's important to note that they are restricted to specific binary and logical o
 and are applicable only to primitive values.
 
 ```{note}
-To clone and run the example code on this page, see the [Flytesnacks repo][adv-comp].
+To clone and run the example code on this page, see the [Flytesnacks repo][flytesnacks].
 ```
 
 To begin, import the necessary libraries.
@@ -170,4 +170,4 @@ pyflyte run --remote \
   consume_task_output --radius 0.4 --seed 7
 ```
 
-[adv-comp]: https://github.com/flyteorg/flytesnacks/tree/master/examples/advanced_composition
+[flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/advanced_composition

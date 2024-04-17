@@ -42,7 +42,7 @@ understand what this looks like, let's define a very basic eager workflow
 using the `@eager` decorator.
 
 ```{note}
-To clone and run the example code on this page, see the [Flytesnacks repo][adv-comp].
+To clone and run the example code on this page, see the [Flytesnacks repo][flytesnacks].
 ```
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/eager_workflows.py
@@ -358,4 +358,4 @@ of promises and materialized values:
 | `@dynamic` | Compiled at run-time | Inputs are materialized, but outputs of all Flyte entities are Promises | More flexible than `@workflow`, e.g. can do Python operations on inputs | Can't use a lot of Python constructs (e.g. try/except) |
 | `@eager` | Never compiled | Everything is materialized! | Can effectively use all Python constructs via `asyncio` syntax | No compile-time benefits, this is the wild west 🏜 |
 
-[adv-comp]: https://github.com/flyteorg/flytesnacks/tree/master/examples/advanced_composition/advanced_composition
+[flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/advanced_composition/

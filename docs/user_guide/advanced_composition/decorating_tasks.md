@@ -12,7 +12,7 @@ In order to make sure that your decorated function contains all the type annotat
 information that Flyte needs, you will need to use the built-in {py:func}`~functools.wraps` decorator.
 
 ```{note}
-To clone and run the example code on this page, see the [Flytesnacks repo][adv-comp].
+To clone and run the example code on this page, see the [Flytesnacks repo][flytesnacks].
 ```
 
 To begin, import the required dependencies.
@@ -96,4 +96,4 @@ In this example, you learned how to modify the behavior of tasks via function de
 example creating custom types, custom tasks or backend plugins,
 see {ref}`Extending Flyte <plugins_extend>`.
 
-[adv-comp]: https://github.com/flyteorg/flytesnacks/tree/master/examples/advanced_composition/advanced_composition
+[flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/advanced_composition/

@@ -16,24 +16,28 @@ and you wish to assign a distinct name to each of them.
 
 The following example illustrates the process of assigning names to outputs for both a task and a workflow.
 
-To begin, import the required dependencies.
+```{note}
+To clone and run the example code on this page, see the [Flytesnacks repo][flytesnacks].
+```
+
+To begin, import the required dependencies:
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/named_outputs.py
-:caption: named_outputs.py
+:caption: basics/named_outputs.py
 :lines: 1-3
 ```
 
-Define a `NamedTuple` and assign it as an output to a task.
+Define a `NamedTuple` and assign it as an output to a task:
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/named_outputs.py
-:caption: named_outputs.py
+:caption: basics/named_outputs.py
 :lines: 6-14
 ```
 
-Likewise, assign a `NamedTuple` to the output of `intercept` task.
+Likewise, assign a `NamedTuple` to the output of `intercept` task:
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/named_outputs.py
-:caption: named_outputs.py
+:caption: basics/named_outputs.py
 :lines: 18-26
 ```
 
@@ -52,17 +56,19 @@ Additionally, you can also have the workflow return a `NamedTuple` as an output.
 
 :::{note}
 Remember that we are extracting individual task execution outputs by dereferencing them.
-This is necessary because `NamedTuple`s function as tuples and require this dereferencing.
+This is necessary because `NamedTuple`s function as tuples and require this dereferencing:
 :::
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/named_outputs.py
-:caption: named_outputs.py
+:caption: basics/named_outputs.py
 :lines: 32-39
 ```
 
 You can run the workflow locally as follows:
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/named_outputs.py
-:caption: named_outputs.py
+:caption: basics/named_outputs.py
 :lines: 43-44
 ```
+
+[flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/basics/

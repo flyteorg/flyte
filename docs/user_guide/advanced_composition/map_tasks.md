@@ -18,7 +18,7 @@ Map tasks find utility in diverse scenarios, such as:
 The following examples demonstrate how to use map tasks with both single and multiple inputs.
 
 ```{note}
-To clone and run the example code on this page, see the [Flytesnacks repo][adv-comp].
+To clone and run the example code on this page, see the [Flytesnacks repo][flytesnacks].
 ```
 
 To begin, import the required libraries:
@@ -201,4 +201,4 @@ In contrast to map tasks, an ArrayNode provides the following enhancements:
 
 We expect the performance of ArrayNode map tasks to compare closely to standard map tasks.
 
-[adv-comp]: https://github.com/flyteorg/flytesnacks/tree/master/examples/advanced_composition/advanced_composition
+[flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/advanced_composition/

@@ -18,7 +18,7 @@ before and after your main workflow logic. This is useful when integrating with 
 like [wandb](https://wandb.ai/site) or [clearml](https://clear.ml/), which enable you to track metrics of model training runs.
 
 ```{note}
-To clone and run the example code on this page, see the [Flytesnacks repo][adv-comp].
+To clone and run the example code on this page, see the [Flytesnacks repo][flytesnacks].
 ```
 
 To begin, import the necessary libraries.
@@ -92,4 +92,4 @@ To define workflows imperatively, refer to {ref}`this example <imperative_workfl
 and to learn more about how to extend Flyte at a deeper level, for example creating custom types, custom tasks or
 backend plugins, see {ref}`Extending Flyte <plugins_extend>`.
 
-[adv-comp]: https://github.com/flyteorg/flytesnacks/tree/master/examples/advanced_composition/advanced_composition
+[flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/advanced_composition/

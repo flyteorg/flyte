@@ -9,17 +9,21 @@ Flyte enables the use of docstrings to document your code.
 Docstrings are stored in [FlyteAdmin](https://docs.flyte.org/en/latest/concepts/admin.html)
 and displayed on the UI.
 
+```{note}
+To clone and run the example code on this page, see the [Flytesnacks repo][flytesnacks].
+```
+
 To begin, import the relevant libraries:
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/documenting_workflows.py
-:caption: documenting_workflows.py
+:caption: basics/documenting_workflows.py
 :lines: 1-3
 ```
 
 We import the `slope` and `intercept` tasks from the `workflow.py` file.
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/documenting_workflows.py
-:caption: documenting_workflows.py
+:caption: basics/documenting_workflows.py
 :lines: 6
 ```
 
@@ -32,7 +36,7 @@ The subsequent section provides a comprehensive explanation.
 The last part of the docstring outlines the parameters and return type.
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/documenting_workflows.py
-:caption: documenting_workflows.py
+:caption: basics/documenting_workflows.py
 :pyobject: sphinx_docstring_wf
 ```
 
@@ -46,7 +50,7 @@ The third section of the docstring details all parameters along with their respe
 The final section of the docstring explains the return type and its associated data type.
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/documenting_workflows.py
-:caption: documenting_workflows.py
+:caption: basics/documenting_workflows.py
 :pyobject: numpy_docstring_wf
 ```
 
@@ -60,7 +64,7 @@ The third segment of the docstring outlines the parameters and return type,
 including their respective data types.
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/documenting_workflows.py
-:caption: documenting_workflows.py
+:caption: basics/documenting_workflows.py
 :pyobject: google_docstring_wf
 ```
 
@@ -76,3 +80,5 @@ Here are two screenshots showcasing how the description appears on the UI:
 :alt: Long description
 :class: with-shadow
 :::
+
+[flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/basics

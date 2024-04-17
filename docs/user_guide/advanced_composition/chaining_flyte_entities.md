@@ -10,7 +10,7 @@ Flytekit offers a mechanism for chaining Flyte entities using the `>>` operator.
 This is particularly valuable when chaining tasks and subworkflows without the need for data flow between the entities.
 
 ```{note}
-To clone and run the example code on this page, see the [Flytesnacks repo][adv-comp].
+To clone and run the example code on this page, see the [Flytesnacks repo][flytesnacks].
 ```
 
 ## Tasks
@@ -51,4 +51,4 @@ Chaining tasks and subworkflows is not supported in local environments.
 Follow the progress of this issue [here](https://github.com/flyteorg/flyte/issues/4080).
 :::
 
-[adv-comp]: https://github.com/flyteorg/flytesnacks/tree/master/examples/advanced_composition/advanced_composition
+[flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/advanced_composition/
