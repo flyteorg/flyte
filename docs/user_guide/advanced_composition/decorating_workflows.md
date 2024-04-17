@@ -23,7 +23,7 @@ To clone and run the example code on this page, see the [Flytesnacks repo][adv-c
 
 To begin, import the necessary libraries.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/decorating_workflows.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/decorating_workflows.py
 :caption: advanced_composition/decorating_workflows.py
 :lines: 1-6
 ```
@@ -32,7 +32,7 @@ Let's define the tasks we need for setup and teardown. In this example, we use t
 {py:class}`unittest.mock.MagicMock` class to create a fake external service that we want to initialize at the
 beginning of our workflow and finish at the end.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/decorating_workflows.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/decorating_workflows.py
 :caption: advanced_composition/decorating_workflows.py
 :lines: 9-21
 ```
@@ -45,7 +45,7 @@ external service and Flyte.
 
 We create a decorator that we want to use to wrap our workflow function.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/decorating_workflows.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/decorating_workflows.py
 :caption: advanced_composition/decorating_workflows.py
 :pyobject: setup_teardown
 ```
@@ -66,14 +66,14 @@ There are a few key pieces to note in the `setup_teardown` decorator above:
 
 We define two tasks that will constitute the workflow.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/decorating_workflows.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/decorating_workflows.py
 :caption: advanced_composition/decorating_workflows.py
 :lines: 63-70
 ```
 
 And then create our decorated workflow:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/decorating_workflows.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/decorating_workflows.py
 :caption: advanced_composition/decorating_workflows.py
 :lines: 74-82
 ```
@@ -84,7 +84,7 @@ To run the provided workflow on the Flyte cluster, use the following command:
 
 ```
 pyflyte run --remote \
-  https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/decorating_workflows.py \
+  https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/decorating_workflows.py \
   decorating_workflow --x 10.0
 ```
 
@@ -92,4 +92,4 @@ To define workflows imperatively, refer to {ref}`this example <imperative_workfl
 and to learn more about how to extend Flyte at a deeper level, for example creating custom types, custom tasks or
 backend plugins, see {ref}`Extending Flyte <plugins_extend>`.
 
-[adv-comp]: https://github.com/flyteorg/flytesnacks/tree/master/example_code/advanced_composition/advanced_composition
+[adv-comp]: https://github.com/flyteorg/flytesnacks/tree/master/examples/advanced_composition/advanced_composition

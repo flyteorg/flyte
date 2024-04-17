@@ -23,14 +23,14 @@ To clone and run the example code on this page, see the [Flytesnacks repo][adv-c
 
 To begin, import the required libraries:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/map_task.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/map_task.py
 :caption: advanced_composition/map_task.py
 :lines: 1
 ```
 
 Here's a simple workflow that uses {py:func}`map_task <flytekit:flytekit.map_task>`:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/map_task.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/map_task.py
 :caption: advanced_composition/map_task.py
 :lines: 4-19
 ```
@@ -77,7 +77,7 @@ When defining a map task, avoid calling other tasks in it. Flyte can't accuratel
 
 In this example, the map task `suboptimal_mappable_task` would not give you the best performance:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/map_task.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/map_task.py
 :caption: advanced_composition/map_task.py
 :lines: 31-40
 ```
@@ -93,7 +93,7 @@ You might need to map a task with multiple inputs.
 
 For instance, consider a task that requires three inputs:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/map_task.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/map_task.py
 :caption: advanced_composition/map_task.py
 :pyobject: multi_input_task
 ```
@@ -102,21 +102,21 @@ You may want to map this task with only the ``quantity`` input, while keeping th
 Since a map task accepts only one input, you can achieve this by partially binding values to the map task.
 This can be done using the {py:func}`functools.partial` function:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/map_task.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/map_task.py
 :caption: advanced_composition/map_task.py
 :lines: 52-58
 ```
 
 Another possibility is to bind the outputs of a task to partials:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/map_task.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/map_task.py
 :caption: advanced_composition/map_task.py
 :lines: 63-72
 ```
 
 You can also provide multiple lists as input to a `map_task`:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/map_task.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/map_task.py
 :caption: advanced_composition/map_task.py
 :pyobject: map_workflow_with_lists
 ```
@@ -131,31 +131,31 @@ To run the provided workflows on the Flyte cluster, use the following commands:
 
 ```
 pyflyte run --remote \
-  https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/map_task.py \
+  https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/map_task.py \
   map_workflow
 ```
 
 ```
 pyflyte run --remote \
-  https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/map_task.py \
+  https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/map_task.py \
   map_workflow_with_additional_params
 ```
 
 ```
 pyflyte run --remote \
-  https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/map_task.py \
+  https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/map_task.py \
   multiple_inputs_map_workflow
 ```
 
 ```
 pyflyte run --remote \
-  https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/map_task.py \
+  https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/map_task.py \
   map_workflow_partial_with_task_output
 ```
 
 ```
 pyflyte run --remote \
-  https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/advanced_composition/advanced_composition/map_task.py \
+  https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/map_task.py \
   map_workflow_with_lists
 ```
 
@@ -201,4 +201,4 @@ In contrast to map tasks, an ArrayNode provides the following enhancements:
 
 We expect the performance of ArrayNode map tasks to compare closely to standard map tasks.
 
-[adv-comp]: https://github.com/flyteorg/flytesnacks/tree/master/example_code/advanced_composition/advanced_composition
+[adv-comp]: https://github.com/flyteorg/flytesnacks/tree/master/examples/advanced_composition/advanced_composition
