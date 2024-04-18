@@ -113,32 +113,7 @@ For example, in order to cache the result of calls to `bar`, you can rewrite the
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/development_lifecycle/development_lifecycle/task_cache.py
 :caption: development_lifecycle/task_cache.py
-:lines:
-```
-
-```python
-def hash_pandas_dataframe(df: pandas.DataFrame) -> str:
-    return str(pandas.util.hash_pandas_object(df))
-
-
-@task
-def foo_1(  # noqa: F811
-    a: int, b: str  # noqa: F821
-) -> Annotated[pandas.DataFrame, HashMethod(hash_pandas_dataframe)]:  # noqa: F821  # noqa: F821
-    df = pandas.DataFrame(...)  # noqa: F821
-    ...
-    return df
-
-
-@task(cache=True, cache_version="1.0")  # noqa: F811
-def bar_1(df: pandas.DataFrame) -> int:  # noqa: F811
-    ...  # noqa: F811
-
-
-@workflow
-def wf_1(a: int, b: str):  # noqa: F811
-    df = foo(a=a, b=b)  # noqa: F811
-    v = bar(df=df)  # noqa: F841
+:lines: 64-85
 ```
 
 Note how the output of task `foo` is annotated with an object of type `HashMethod`. Essentially, it represents a function that produces a hash that is used as part of the cache key calculation in calling the task `bar`.
