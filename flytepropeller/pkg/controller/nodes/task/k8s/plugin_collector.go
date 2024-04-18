@@ -2,7 +2,6 @@ package k8s
 
 import (
 	"context"
-	"fmt"
 	"runtime/pprof"
 	"strings"
 	"sync"
@@ -34,9 +33,7 @@ type ResourceLevelMonitor struct {
 	// to monitor current levels.
 	Levels *labeled.Gauge
 
-	// This informer will be used to get a list of the underlying objects that we want a tally of
-	//sharedInformer cache.SharedIndexInformer
-
+	// cache is used to retrieve the object lists
 	cache cache.Cache
 
 	// The kind here will be used to differentiate all the metrics, we'll leave out group and version for now
@@ -48,79 +45,30 @@ type ResourceLevelMonitor struct {
 	once sync.Once
 }
 
-// The reason that we use namespace as the one and only thing to cut by is because it's the feature that we are sure that any
-// K8s resource created by a plugin will have (as yet, Flyte doesn't have any plugins that create cluster level resources and
-// it probably won't for a long time). We can't assume that all the operators and CRDs that Flyte will ever work with will have
-// the exact same set of labels or annotations or owner references. The only thing we can really count on is namespace.
-/*func (r *ResourceLevelMonitor) countList(ctx context.Context, objects []interface{}) map[string]int {
-	// Map of namespace to counts
-	counts := map[string]int{}
-
-	// Collect the object counts by namespace
-	for _, v := range objects {
-		metadata, err := meta.Accessor(v)
-		if err != nil {
-			logger.Errorf(ctx, "Error converting obj %v to an Accessor %s\n", v, err)
-			continue
-		}
-		counts[metadata.GetNamespace()]++
-	}
-
-	return counts
-}*/
-func (r *ResourceLevelMonitor) countList(ctx context.Context, objects []metav1.ObjectMeta) map[string]int {
-	// Map of namespace to counts
-	counts := map[string]int{}
-
-	// Collect the object counts by namespace
-	for _, objectMeta := range objects {
-		/*metadata, err := meta.Accessor(v)
-		if err != nil {
-			logger.Errorf(ctx, "Error converting obj %v to an Accessor %s\n", v, err)
-			continue
-		}*/
-		counts[objectMeta.GetNamespace()]++
-	}
-
-	return counts
-}
-
 // The context here is expected to already have a value for the KindKey
 func (r *ResourceLevelMonitor) collect(ctx context.Context) {
 	// Emit gauges at the namespace layer - since these are just K8s resources, we cannot be guaranteed to have the necessary
 	// information to derive project/domain
-	//objects := r.sharedInformer.GetStore().List()
-
-	/*list := v1.List{
-		TypeMeta: metav1.TypeMeta{
-			Kind:       r.gvk.Kind,
-			APIVersion: r.gvk.GroupVersion().String(),
-		},
-	}*/
 	list := metav1.PartialObjectMetadataList{
 		TypeMeta: metav1.TypeMeta{
-			Kind:       r.gvk.Kind, // TODO t.gvk.GroupKind().String()?
-			APIVersion: r.gvk.Version, // TODO  is this right?
+			Kind:       r.gvk.Kind,
+			APIVersion: r.gvk.Version,
 		},
 	}
 	if err := r.cache.List(ctx, &list); err != nil {
-		// TODO @hamersaw - handle
+		logger.Warnf(ctx, "failed to list objects for %s.%s: %v", r.gvk.Kind, r.gvk.Version, err)
+		return
 	}
 
-	//objects := make([]client.Object, 0)
-	/*for _, item := range list.Items {
-		objects = append(objects, item)
-	}*/
-
-	objectMetas := make([]metav1.ObjectMeta, 0)
+	// aggregate the object counts by namespace
+	namespaceCounts := map[string]int{}
 	for _, item := range list.Items {
-		objectMetas = append(objectMetas, item.ObjectMeta)
+		namespaceCounts[item.GetNamespace()]++
 	}
-	counts := r.countList(ctx, objectMetas)
 
-	for ns, count := range counts {
-		fmt.Printf("HAMERSAW - %s.%s ns:%s, count:%d\n", r.gvk.Kind, r.gvk.Version, ns, count)
-		withNamespaceCtx := contextutils.WithNamespace(ctx, ns)
+	// emit namespace object count metrics
+	for namespace, count := range namespaceCounts {
+		withNamespaceCtx := contextutils.WithNamespace(ctx, namespace)
 		r.Levels.Set(withNamespaceCtx, float64(count))
 	}
 }
@@ -135,7 +83,6 @@ func (r *ResourceLevelMonitor) RunCollector(ctx context.Context) {
 	go func() {
 		defer ticker.Stop()
 		pprof.SetGoroutineLabels(collectorCtx)
-		//r.sharedInformer.HasSynced()
 		r.cache.WaitForCacheSync(collectorCtx)
 		logger.Infof(ctx, "K8s resource collector %s has synced", r.gvk.Kind)
 		for {
@@ -172,7 +119,6 @@ type ResourceMonitorIndex struct {
 	stopwatches map[promutils.Scope]*labeled.StopWatch
 }
 
-//func (r *ResourceMonitorIndex) GetOrCreateResourceLevelMonitor(ctx context.Context, scope promutils.Scope, si cache.SharedIndexInformer,
 func (r *ResourceMonitorIndex) GetOrCreateResourceLevelMonitor(ctx context.Context, scope promutils.Scope, cache cache.Cache,
 	gvk schema.GroupVersionKind) *ResourceLevelMonitor {
 
@@ -205,7 +151,6 @@ func (r *ResourceMonitorIndex) GetOrCreateResourceLevelMonitor(ctx context.Conte
 		Scope:          scope,
 		CollectorTimer: r.stopwatches[scope],
 		Levels:         r.gauges[scope],
-		//sharedInformer: si,
 		cache:          cache,
 		gvk:            gvk,
 	}
