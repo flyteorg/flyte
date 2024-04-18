@@ -126,6 +126,7 @@ Task executions can be cached across different versions of the task because a ch
 The flytekit package uses the [diskcache](https://github.com/grantjenks/python-diskcache) package, specifically [diskcache.Cache](http://www.grantjenks.com/docs/diskcache/tutorial.html#cache), to aid in the memoization of task executions. The results of local task executions are stored under `~/.flyte/local-cache/` and cache keys are composed of **Cache Version**, **Task Signature**, and **Task Input Values**.
 
 Similar to the remote case, a local cache entry for a task will be invalidated if either the `cache_version` or the task signature is modified. In addition, the local cache can also be emptied by running the following command: `pyflyte local-cache clear`, which essentially obliterates the contents of the `~/.flyte/local-cache/` directory.
+To disable the local cache, you can set the `local.cache_enabled` config option (e.g. through setting the environment variable `FLYTE_LOCAL_CACHE_ENABELED=False`).
 
 :::{note}
 The format used by the store is opaque and not meant to be inspectable.
