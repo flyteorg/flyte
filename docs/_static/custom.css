@@ -38,12 +38,12 @@ table {
 }
 
 .sidebar-container, .toc-drawer {
-    width: 25em;
+    width: 22em;
     padding-right: 0;
 }
 
 @media (max-width: 82em) {
     .toc-drawer {
-        right: -25em;
+        right: -22em;
     }
 }
