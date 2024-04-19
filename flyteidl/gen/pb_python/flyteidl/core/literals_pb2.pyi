@@ -199,7 +199,9 @@ class KeyValuePair(_message.Message):
     def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
 
 class RetryStrategy(_message.Message):
-    __slots__ = ["retries"]
+    __slots__ = ["retries", "retry_delay"]
     RETRIES_FIELD_NUMBER: _ClassVar[int]
+    RETRY_DELAY_FIELD_NUMBER: _ClassVar[int]
     retries: int
-    def __init__(self, retries: _Optional[int] = ...) -> None: ...
+    retry_delay: _duration_pb2.Duration
+    def __init__(self, retries: _Optional[int] = ..., retry_delay: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ...) -> None: ...

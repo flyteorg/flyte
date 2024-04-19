@@ -8,6 +8,7 @@ import (
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	durationpb "google.golang.org/protobuf/types/known/durationpb"
 )
 
 func refInt(i int) *int {
@@ -18,20 +19,46 @@ func refStr(s string) *string {
 	return &s
 }
 
-func computeRetryStrategy(n *core.Node, t *core.TaskTemplate) *v1alpha1.RetryStrategy {
-	if n.GetMetadata() != nil && n.GetMetadata().GetRetries() != nil && n.GetMetadata().GetRetries().Retries != 0 {
-		return &v1alpha1.RetryStrategy{
-			MinAttempts: refInt(int(n.GetMetadata().GetRetries().Retries + 1)),
+func computeRetryStrategy(n *core.Node, t *core.TaskTemplate) (*v1alpha1.RetryStrategy, error) {
+	getRetryDelay := func(d *durationpb.Duration) (*v1.Duration, error) {
+		if d == nil {
+			return nil, nil
+		}
+		dur, err := ptypes.Duration(d)
+		if err != nil {
+			return nil, err
+		}
+		return &v1.Duration{Duration: dur}, nil
+	}
+	if n.GetMetadata() != nil && n.GetMetadata().GetRetries() != nil {
+		retries := n.GetMetadata().GetRetries()
+		if retries.Retries != 0 {
+			retryDelay, err := getRetryDelay(retries.RetryDelay)
+			if err != nil {
+				return nil, err
+			}
+			return &v1alpha1.RetryStrategy{
+				MinAttempts: refInt(int(retries.Retries + 1)),
+				RetryDelay:  retryDelay,
+			}, nil
 		}
 	}
 
-	if t != nil && t.GetMetadata() != nil && t.GetMetadata().GetRetries() != nil && t.GetMetadata().GetRetries().Retries != 0 {
-		return &v1alpha1.RetryStrategy{
-			MinAttempts: refInt(int(t.GetMetadata().GetRetries().Retries + 1)),
+	if t != nil && t.GetMetadata() != nil && t.GetMetadata().GetRetries() != nil {
+		retries := t.GetMetadata().GetRetries()
+		if retries.Retries != 0 {
+			retryDelay, err := getRetryDelay(retries.RetryDelay)
+			if err != nil {
+				return nil, err
+			}
+			return &v1alpha1.RetryStrategy{
+				MinAttempts: refInt(int(retries.Retries + 1)),
+				RetryDelay:  retryDelay,
+			}, nil
 		}
 	}
 
-	return nil
+	return nil, nil
 }
 
 func computeDeadline(n *core.Node) (*v1.Duration, error) {

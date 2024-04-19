@@ -3912,6 +3912,9 @@ export namespace flyteidl {
 
             /** RetryStrategy retries */
             retries?: (number|null);
+
+            /** RetryStrategy retryDelay */
+            retryDelay?: (google.protobuf.IDuration|null);
         }
 
         /** Represents a RetryStrategy. */
@@ -3925,6 +3928,9 @@ export namespace flyteidl {
 
             /** RetryStrategy retries. */
             public retries: number;
+
+            /** RetryStrategy retryDelay. */
+            public retryDelay?: (google.protobuf.IDuration|null);
 
             /**
              * Creates a new RetryStrategy instance using the specified properties.

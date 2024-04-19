@@ -1002,6 +1002,13 @@ export class RetryStrategy extends Message<RetryStrategy> {
    */
   retries = 0;
 
+  /**
+   * Delay between retries.
+   *
+   * @generated from field: google.protobuf.Duration retry_delay = 6;
+   */
+  retryDelay?: Duration;
+
   constructor(data?: PartialMessage<RetryStrategy>) {
     super();
     proto3.util.initPartial(data, this);
@@ -1011,6 +1018,7 @@ export class RetryStrategy extends Message<RetryStrategy> {
   static readonly typeName = "flyteidl.core.RetryStrategy";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 5, name: "retries", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 6, name: "retry_delay", kind: "message", T: Duration },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RetryStrategy {

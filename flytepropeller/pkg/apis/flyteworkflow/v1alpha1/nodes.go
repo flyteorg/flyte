@@ -69,7 +69,8 @@ type RetryStrategy struct {
 	// fail to write the attempt information and end up retrying again.
 	// Also `0` and `1` both mean at least one attempt will be done. 0 is a degenerate case.
 	MinAttempts *int `json:"minAttempts"`
-	// TODO Add retrydelay?
+	
+	RetryDelay *v1.Duration `json:"retryDelay,omitempty"`
 }
 
 type Alias struct {
