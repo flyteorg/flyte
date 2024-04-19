@@ -4596,7 +4596,7 @@
           "bars": false,
           "cacheTimeout": null,
           "datasource": "${DS_PROM}",
-          "description": "Cache hit rate when admin launcher is queried for the status of a workflow. Admin launcher will asynchnously update status of workflows in the cache.",
+          "description": "Cache hit rate when admin launcher is queried for the status of a workflow. Admin launcher will update status of workflows in the cache on a polling interval.",
           "editable": true,
           "error": false,
           "fieldConfig": {

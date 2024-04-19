@@ -410,7 +410,7 @@ class FlytePropeller(object):
     def admin_launcher_cache() -> Graph:
         return Graph(
             title="Admin Launcher cache hit/miss rate",
-            description="Cache hit rate when admin launcher is queried for the status of a workflow. Admin launcher will asynchnously update status of workflows in the cache.",
+            description="Cache hit rate when admin launcher is queried for the status of a workflow. Admin launcher will update status of workflows in the cache on a polling interval.",
             dataSource=DATASOURCE,
             targets=[
                 Target(
