@@ -332,6 +332,23 @@ Specify plugin configuration
                         - development:
                           - defaultIamRole:
                               value: <FLYTE_IAM_USER_ARN>
+                      plugins:
+                        spark:
+                        # Edit the Spark configuration as you see fit
+                          spark-config-default:
+                            - spark.driver.cores: "1"
+                            - spark.hadoop.fs.s3a.aws.credentials.provider: "com.amazonaws.auth.DefaultAWSCredentialsProviderChain"
+                            - spark.kubernetes.allocation.batch.size: "50"
+                            - spark.hadoop.fs.s3a.acl.default: "BucketOwnerFullControl"
+                            - spark.hadoop.fs.s3n.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+                            - spark.hadoop.fs.AbstractFileSystem.s3n.impl: "org.apache.hadoop.fs.s3a.S3A"
+                            - spark.hadoop.fs.s3.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+                            - spark.hadoop.fs.AbstractFileSystem.s3.impl: "org.apache.hadoop.fs.s3a.S3A"
+                            - spark.hadoop.fs.s3a.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+                            - spark.hadoop.fs.AbstractFileSystem.s3a.impl: "org.apache.hadoop.fs.s3a.S3A"
+                            - spark.network.timeout: 600s
+                            - spark.executorEnv.KUBERNETES_REQUEST_TIMEOUT: 100000
+                            - spark.executor.heartbeatInterval: 60s
                   clusterResourceTemplates:
                     inline:
                       #This section automates the creation of the project-domain namespaces
@@ -406,23 +423,6 @@ Specify plugin configuration
                             - kind: ServiceAccount
                               name: spark
                               namespace: "{{ namespace }}"
-                      plugins:
-                        spark:
-                        # Edit the Spark configuration as you see fit
-                          spark-config-default:
-                            - spark.driver.cores: "1"
-                            - spark.hadoop.fs.s3a.aws.credentials.provider: "com.amazonaws.auth.DefaultAWSCredentialsProviderChain"
-                            - spark.kubernetes.allocation.batch.size: "50"
-                            - spark.hadoop.fs.s3a.acl.default: "BucketOwnerFullControl"
-                            - spark.hadoop.fs.s3n.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
-                            - spark.hadoop.fs.AbstractFileSystem.s3n.impl: "org.apache.hadoop.fs.s3a.S3A"
-                            - spark.hadoop.fs.s3.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
-                            - spark.hadoop.fs.AbstractFileSystem.s3.impl: "org.apache.hadoop.fs.s3a.S3A"
-                            - spark.hadoop.fs.s3a.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
-                            - spark.hadoop.fs.AbstractFileSystem.s3a.impl: "org.apache.hadoop.fs.s3a.S3A"
-                            - spark.network.timeout: 600s
-                            - spark.executorEnv.KUBERNETES_REQUEST_TIMEOUT: 100000
-                            - spark.executor.heartbeatInterval: 60s
                 
               2. (Optional) The Spark operator supports Kubernetes ResourceQuota enforcement. If you plan to use it, 
                  set `per-Task resource requests <https://docs.flyte.org/en/latest/user_guide/productionizing/customizing_task_resources.html#customizing-task-resources>`__ that fit into the quota for each project-namespace. A Task without resource requests
@@ -498,6 +498,21 @@ Specify plugin configuration
                         - development:
                           - gsa:
                               value: <GoogleServiceAccount-EMAIL>
+                      plugins:
+                        spark:
+                        # Edit the Spark configuration as you see fit
+                          spark-config-default:
+                            - spark.eventLog.enabled: "true"
+                            - spark.eventLog.dir: "{{ .Values.userSettings.bucketName }}/spark-events"
+                            - spark.driver.cores: "1"
+                            - spark.executorEnv.HTTP2_DISABLE: "true"
+                            - spark.hadoop.fs.AbstractFileSystem.gs.impl: com.google.cloud.hadoop.fs.gcs.GoogleHadoopFS
+                            - spark.kubernetes.allocation.batch.size: "50"
+                            - spark.kubernetes.driverEnv.HTTP2_DISABLE: "true"
+                            - spark.network.timeout: 600s
+                            - spark.executorEnv.KUBERNETES_REQUEST_TIMEOUT: 100000
+                            - spark.executor.heartbeatInterval: 60s
+
                   clusterResourceTemplates:
                     inline:
                       #This section automates the creation of the project-domain namespaces
@@ -572,21 +587,7 @@ Specify plugin configuration
                             - kind: ServiceAccount
                               name: spark
                               namespace: "{{ namespace }}"
-                      plugins:
-                        spark:
-                        # Edit the Spark configuration as you see fit
-                          spark-config-default:
-                            - spark.eventLog.enabled: "true"
-                            - spark.eventLog.dir: "{{ .Values.userSettings.bucketName }}/spark-events"
-                            - spark.driver.cores: "1"
-                            - spark.executorEnv.HTTP2_DISABLE: "true"
-                            - spark.hadoop.fs.AbstractFileSystem.gs.impl: com.google.cloud.hadoop.fs.gcs.GoogleHadoopFS
-                            - spark.kubernetes.allocation.batch.size: "50"
-                            - spark.kubernetes.driverEnv.HTTP2_DISABLE: "true"
-                            - spark.network.timeout: 600s
-                            - spark.executorEnv.KUBERNETES_REQUEST_TIMEOUT: 100000
-                            - spark.executor.heartbeatInterval: 60s
-               
+
         .. group-tab:: flyte-core
 
           .. tabs:: 

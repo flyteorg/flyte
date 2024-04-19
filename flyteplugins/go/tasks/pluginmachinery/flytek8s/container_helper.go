@@ -226,6 +226,7 @@ func BuildRawContainer(ctx context.Context, tCtx pluginscore.TaskExecutionContex
 		Env:                      ToK8sEnvVar(taskContainer.GetEnv()),
 		TerminationMessagePolicy: v1.TerminationMessageFallbackToLogsOnError,
 		Resources:                *res,
+		ImagePullPolicy:          config.GetK8sPluginConfig().ImagePullPolicy,
 	}
 
 	return container, nil
