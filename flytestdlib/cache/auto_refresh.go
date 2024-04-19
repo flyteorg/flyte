@@ -118,7 +118,7 @@ type autoRefresh struct {
 	lruMap          *lru.Cache
 	// Items that are currently being processed are in the processing set.
 	// It will prevent the same item from being processed multiple times by different workers.
-	Processing  *syncSet
+	processing  *syncSet
 	toDelete    *syncSet
 	syncPeriod  time.Duration
 	workqueue   workqueue.RateLimitingInterface
@@ -220,7 +220,7 @@ func (w *autoRefresh) GetOrCreate(id ItemID, item Item) (Item, error) {
 	batch := make([]ItemWrapper, 0, 1)
 	batch = append(batch, itemWrapper{id: id, item: item})
 	w.workqueue.AddRateLimited(&batch)
-	w.Processing.Insert(id)
+	w.processing.Insert(id)
 	return item, nil
 }
 
@@ -246,7 +246,7 @@ func (w *autoRefresh) enqueueBatches(ctx context.Context) error {
 		// If not ok, it means evicted between the item was evicted between getting the keys and this update loop
 		// which is fine, we can just ignore.
 		if value, ok := w.lruMap.Peek(k); ok {
-			if item, ok := value.(Item); !ok || (ok && !item.IsTerminal() && !w.Processing.Contains(k)) {
+			if item, ok := value.(Item); !ok || (ok && !item.IsTerminal() && !w.processing.Contains(k)) {
 				snapshot = append(snapshot, itemWrapper{
 					id:   k.(ItemID),
 					item: value.(Item),
@@ -264,7 +264,7 @@ func (w *autoRefresh) enqueueBatches(ctx context.Context) error {
 		b := batch
 		w.workqueue.AddRateLimited(&b)
 		for i := 1; i < len(b); i++ {
-			w.Processing.Insert(b[i].GetID())
+			w.processing.Insert(b[i].GetID())
 		}
 	}
 
@@ -316,7 +316,7 @@ func (w *autoRefresh) sync(ctx context.Context) (err error) {
 			newBatch := make(Batch, 0, len(*batch.(*Batch)))
 			for _, b := range *batch.(*Batch) {
 				itemID := b.GetID()
-				w.Processing.Remove(itemID)
+				w.processing.Remove(itemID)
 				item, ok := w.lruMap.Get(itemID)
 				if !ok {
 					logger.Debugf(ctx, "item with id [%v] not found in cache", itemID)
@@ -376,7 +376,7 @@ func NewAutoRefreshBatchedCache(name string, createBatches CreateBatchesFunc, sy
 		createBatchesCb: createBatches,
 		syncCb:          syncCb,
 		lruMap:          lruCache,
-		Processing:      newSyncSet(),
+		processing:      newSyncSet(),
 		toDelete:        newSyncSet(),
 		syncPeriod:      resyncPeriod,
 		workqueue:       workqueue.NewNamedRateLimitingQueue(syncRateLimiter, scope.CurrentScope()),
