@@ -132,7 +132,7 @@
           "yaxes": [
             {
               "decimals": null,
-              "format": "ops",
+              "format": "none",
               "label": null,
               "logBase": 1,
               "max": null,
@@ -446,7 +446,7 @@
               "instant": false,
               "interval": "",
               "intervalFactor": 2,
-              "legendFormat": "abort",
+              "legendFormat": "not-found",
               "metric": "",
               "query": "sum(rate(flyte:propeller:all:round:not_found[5m]))",
               "refId": "D",
@@ -618,7 +618,7 @@
           "yaxes": [
             {
               "decimals": null,
-              "format": "none",
+              "format": "ops",
               "label": null,
               "logBase": 1,
               "max": null,
@@ -2256,7 +2256,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "Failures from metastore",
+          "title": "Metastore failure rate",
           "tooltip": {
             "msResolution": true,
             "shared": true,
@@ -2890,7 +2890,7 @@
               "instant": false,
               "interval": "",
               "intervalFactor": 2,
-              "legendFormat": "proto-fetch",
+              "legendFormat": "proto-fetch-P{{quantile}}",
               "metric": "",
               "query": "sum(flyte:propeller:all:metastore:proto_fetch_ms) by (quantile, wf)",
               "refId": "A",
@@ -2905,7 +2905,7 @@
               "instant": false,
               "interval": "",
               "intervalFactor": 2,
-              "legendFormat": "remote-fetch",
+              "legendFormat": "remote-fetch-P{{quantile}}",
               "metric": "",
               "query": "sum(flyte:propeller:all:metastore:remote_fetch_ms) by (quantile, wf)",
               "refId": "B",
@@ -3468,7 +3468,7 @@
               "instant": false,
               "interval": "",
               "intervalFactor": 2,
-              "legendFormat": "user error",
+              "legendFormat": "unknown error",
               "metric": "",
               "query": "sum(rate(flyte:propeller:all:node:perma_unknown_error_duration_unlabeled_ms[5m]))",
               "refId": "C",
@@ -3479,7 +3479,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "node event recording rate",
+          "title": "node event recording error rate breakdown",
           "tooltip": {
             "msResolution": true,
             "shared": true,
@@ -4001,7 +4001,7 @@
               "instant": false,
               "interval": "",
               "intervalFactor": 2,
-              "legendFormat": "success",
+              "legendFormat": "success-{{wf}}",
               "metric": "",
               "query": "sum(rate(flyte:propeller:all:node:event_recording:success_duration_ms_count[5m])) by (wf)",
               "refId": "A",
@@ -4016,7 +4016,7 @@
               "instant": false,
               "interval": "",
               "intervalFactor": 2,
-              "legendFormat": "failure",
+              "legendFormat": "failure-{{wf}}",
               "metric": "",
               "query": "sum(rate(flyte:propeller:all:node:event_recording:failure_duration_ms_count[5m])) by (wf)",
               "refId": "B",
@@ -4270,7 +4270,7 @@
               "instant": false,
               "interval": "",
               "intervalFactor": 2,
-              "legendFormat": "success wf",
+              "legendFormat": "success-{{wf}}",
               "metric": "",
               "query": "sum(rate(flyte:propeller:all:task:event_recording:success_duration_ms_count[5m])) by (wf)",
               "refId": "A",
@@ -4285,7 +4285,7 @@
               "instant": false,
               "interval": "",
               "intervalFactor": 2,
-              "legendFormat": "failure",
+              "legendFormat": "failure-{{wf}}",
               "metric": "",
               "query": "sum(rate(flyte:propeller:all:task:event_recording:failure_duration_ms_count[5m])) by (wf)",
               "refId": "B",
@@ -6618,7 +6618,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "Update events from informer",
+          "title": "Update event rate from informer",
           "tooltip": {
             "msResolution": true,
             "shared": true,
@@ -6637,7 +6637,7 @@
           "yaxes": [
             {
               "decimals": null,
-              "format": "short",
+              "format": "ops",
               "label": null,
               "logBase": 1,
               "max": null,
@@ -6745,7 +6745,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "Update events dropped becacuse they have the same resource version",
+          "title": "Update events drop rate becacuse they have the same resource version",
           "tooltip": {
             "msResolution": true,
             "shared": true,
@@ -6764,7 +6764,7 @@
           "yaxes": [
             {
               "decimals": null,
-              "format": "short",
+              "format": "ops",
               "label": null,
               "logBase": 1,
               "max": null,
@@ -6901,7 +6901,7 @@
           "yaxes": [
             {
               "decimals": null,
-              "format": "short",
+              "format": "ops",
               "label": null,
               "logBase": 1,
               "max": null,
@@ -7028,7 +7028,7 @@
           "yaxes": [
             {
               "decimals": null,
-              "format": "short",
+              "format": "ops",
               "label": null,
               "logBase": 1,
               "max": null,
@@ -7155,7 +7155,7 @@
           "yaxes": [
             {
               "decimals": null,
-              "format": "short",
+              "format": "ops",
               "label": null,
               "logBase": 1,
               "max": null,

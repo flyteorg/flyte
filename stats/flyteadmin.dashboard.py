@@ -210,6 +210,7 @@ class FlyteAdmin(object):
     def grpc_latency_row() -> Graph:
         return Row(
             title="GRPC latency metrics",
+            collapse=True,
             panels=[
                 BarGauge(
                     title="All GRPC calls latency",

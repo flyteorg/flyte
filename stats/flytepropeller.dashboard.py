@@ -28,7 +28,7 @@ class FlytePropeller(object):
                 ),
             ],
             yAxes=YAxes(
-                YAxis(format=OPS_FORMAT),
+                YAxis(format=NO_FORMAT),
                 YAxis(format=SHORT_FORMAT),
             ),
         )
@@ -105,7 +105,7 @@ class FlytePropeller(object):
                 Target(
                     expr="sum(rate(flyte:propeller:all:round:not_found[5m]))",
                     refId="D",
-                    legendFormat="abort",
+                    legendFormat="not-found",
                 ),
                 Target(
                     expr="sum(rate(flyte:propeller:all:round:skipped[5m]))",
@@ -132,7 +132,7 @@ class FlytePropeller(object):
                 ),
             ],
             yAxes=YAxes(
-                YAxis(format=NO_FORMAT),
+                YAxis(format=OPS_FORMAT),
                 YAxis(format=SHORT_FORMAT),
             ),
         )
@@ -284,7 +284,7 @@ class FlytePropeller(object):
     def metastore_failures():
         # Copy counts sum(rate(flyte:propeller:all:metastore:copy:overall_unlabeled_ms_count[5m]))
         return Graph(
-            title=f"Failures from metastore",
+            title=f"Metastore failure rate",
             dataSource=DATASOURCE,
             targets=[
                 Target(
@@ -392,12 +392,12 @@ class FlytePropeller(object):
                     targets=[
                         Target(
                             expr="sum(flyte:propeller:all:metastore:proto_fetch_ms) by (quantile, wf)",
-                            legendFormat="proto-fetch",
+                            legendFormat="proto-fetch-P{{quantile}}",
                             refId="A",
                         ),
                         Target(
                             expr="sum(flyte:propeller:all:metastore:remote_fetch_ms) by (quantile, wf)",
-                            legendFormat="remote-fetch",
+                            legendFormat="remote-fetch-P{{quantile}}",
                             refId="B",
                         ),
                     ],
@@ -477,12 +477,12 @@ class FlytePropeller(object):
                 targets=[
                     Target(
                         expr=f"sum(rate(flyte:propeller:all:task:event_recording:success_duration_ms_count[5m])) by (wf)",
-                        legendFormat="success wf",
+                        legendFormat="success-{{wf}}",
                         refId="A",
                     ),
                     Target(
                         expr=f"sum(rate(flyte:propeller:all:task:event_recording:failure_duration_ms_count[5m])) by (wf)",
-                        legendFormat="failure",
+                        legendFormat="failure-{{wf}}",
                         refId="B",
                     ),
                 ],
@@ -510,12 +510,12 @@ class FlytePropeller(object):
                 targets=[
                     Target(
                         expr=f"sum(rate(flyte:propeller:all:node:event_recording:success_duration_ms_count[5m])) by (wf)",
-                        legendFormat="success",
+                        legendFormat="success-{{wf}}",
                         refId="A",
                     ),
                     Target(
                         expr=f"sum(rate(flyte:propeller:all:node:event_recording:failure_duration_ms_count[5m])) by (wf)",
-                        legendFormat="failure",
+                        legendFormat="failure-{{wf}}",
                         refId="B",
                     ),
                 ],
@@ -678,7 +678,7 @@ class FlytePropeller(object):
     @staticmethod
     def node_errors() -> Graph:
         return Graph(
-            title="node event recording rate",
+            title="node event recording error rate breakdown",
             dataSource=DATASOURCE,
             targets=[
                 Target(
@@ -693,7 +693,7 @@ class FlytePropeller(object):
                 ),
                 Target(
                     expr=f"sum(rate(flyte:propeller:all:node:perma_unknown_error_duration_unlabeled_ms[5m]))",
-                    legendFormat="user error",
+                    legendFormat="unknown error",
                     refId="C",
                 ),
             ],
@@ -887,7 +887,7 @@ class FlytePropeller(object):
             collapse=collapse,
             panels=[
                 Graph(
-                    title=f"Update events from informer",
+                    title=f"Update event rate from informer",
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
@@ -895,10 +895,10 @@ class FlytePropeller(object):
                             refId="A",
                         ),
                     ],
-                    yAxes=single_y_axis(format=SHORT_FORMAT),
+                    yAxes=single_y_axis(format=OPS_FORMAT),
                 ),
                 Graph(
-                    title=f"Update events dropped becacuse they have the same resource version",
+                    title=f"Update events drop rate becacuse they have the same resource version",
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
@@ -906,7 +906,7 @@ class FlytePropeller(object):
                             refId="A",
                         ),
                     ],
-                    yAxes=single_y_axis(format=SHORT_FORMAT),
+                    yAxes=single_y_axis(format=OPS_FORMAT),
                 ),
             ],
         )
@@ -979,7 +979,7 @@ class FlytePropeller(object):
                             refId="A",
                         ),
                     ],
-                    yAxes=single_y_axis(format=SHORT_FORMAT),
+                    yAxes=single_y_axis(format=OPS_FORMAT),
                 ),
                 Graph(
                     title="Evict workflows rate",
@@ -990,7 +990,7 @@ class FlytePropeller(object):
                             refId="A",
                         ),
                     ],
-                    yAxes=single_y_axis(format=SHORT_FORMAT),
+                    yAxes=single_y_axis(format=OPS_FORMAT),
                 ),
                 Graph(
                     title="Workflow redundant updates rate",
@@ -1001,7 +1001,7 @@ class FlytePropeller(object):
                             refId="A",
                         ),
                     ],
-                    yAxes=single_y_axis(format=SHORT_FORMAT),
+                    yAxes=single_y_axis(format=OPS_FORMAT),
                 ),
             ],
         )
