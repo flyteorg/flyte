@@ -53,7 +53,7 @@ dependencies:
   - tensorflow>=2.13.0          # onnxtensorflow
   - scikit-learn                # scikit-learn
   - dask[distributed]           # dask
-  - mlflow==2.7.0               # mlflow
+  - mlflow>=2.10.0              # mlflow
   - snowflake-connector-python  # snowflake
   - vaex-core                   # vaex
   - openai                      # chatgpt

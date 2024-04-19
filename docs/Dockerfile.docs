@@ -16,6 +16,6 @@ SHELL ["conda", "run", "-n", "monodocs-env", "/bin/bash", "-c"]
 RUN python -m pip install sphinx-autobuild
 RUN python -m pip install ./flyteidl
 
-WORKDIR docs
+WORKDIR /flyte/docs
 USER ${USER_UID}
 ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "monodocs-env"]

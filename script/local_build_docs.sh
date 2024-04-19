@@ -14,7 +14,7 @@ set -eo pipefail
 #   FLYTEKIT_LOCAL_PATH=$(realpath ../flytekit) ./script/local_build_docs.sh
 
 DOCKER_ENV=()
-DOCKER_VOLUME_MAPPING=("-v" "./docs:/docs")
+DOCKER_VOLUME_MAPPING=("-v" ".:/flyte")
 DOCKER_PORT_MAPPING=()
 BUILD_CMD=("sphinx-build" "-M" "html" "." "_build" "-W")
 
