@@ -334,7 +334,7 @@ func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, outputs *fly
 		opReader = ioutils.NewInMemoryOutputReader(outputs, nil, nil)
 	} else {
 		logger.Debugf(ctx, "AgentDeployment didn't return any output, assuming file based outputs.")
-		opReader = ioutils.NewRemoteFileOutputReader(ctx, taskCtx.DataStore(), taskCtx.OutputWriter(), taskCtx.MaxDatasetSizeBytes())
+		opReader = ioutils.NewRemoteFileOutputReader(ctx, taskCtx.DataStore(), taskCtx.OutputWriter(), 0)
 	}
 	return taskCtx.OutputWriter().Put(ctx, opReader)
 }

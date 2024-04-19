@@ -118,7 +118,6 @@ func createNodeContext(phase v1alpha1.BranchNodePhase, childNodeID *v1alpha1.Nod
 	tmpDataStore, _ := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
 	nCtx.OnDataStore().Return(tmpDataStore)
 	nCtx.OnCurrentAttempt().Return(uint32(1))
-	nCtx.OnMaxDatasetSizeBytes().Return(int64(1))
 	nCtx.OnNodeStatus().Return(ns)
 
 	nCtx.OnNodeID().Return("n1")

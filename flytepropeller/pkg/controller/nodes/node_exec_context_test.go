@@ -107,7 +107,7 @@ func Test_NodeContext(t *testing.T) {
 	s, _ := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
 	p := parentInfo{}
 	execContext := executors.NewExecutionContext(w1, nil, nil, p, nil)
-	nCtx := newNodeExecContext(context.TODO(), s, execContext, w1, getTestNodeSpec(nil), nil, nil, false, 0, 2, nil, nil, TaskReader{}, nil, nil, "s3://bucket", ioutils.NewConstantShardSelector([]string{"x"}))
+	nCtx := newNodeExecContext(context.TODO(), s, execContext, w1, getTestNodeSpec(nil), nil, nil, false, 0, nil, nil, TaskReader{}, nil, nil, "s3://bucket", ioutils.NewConstantShardSelector([]string{"x"}))
 	assert.Equal(t, "id", nCtx.NodeExecutionMetadata().GetLabels()["node-id"])
 	assert.Equal(t, "false", nCtx.NodeExecutionMetadata().GetLabels()["interruptible"])
 	assert.Equal(t, "task-name", nCtx.NodeExecutionMetadata().GetLabels()["task-name"])
@@ -127,7 +127,6 @@ func Test_NodeContextDefault(t *testing.T) {
 
 	nodeExecutor := nodeExecutor{
 		interruptibleFailureThreshold: 0,
-		maxDatasetSizeBytes:           0,
 		defaultDataSandbox:            "s3://bucket-a",
 		store:                         dataStore,
 		shardSelector:                 ioutils.NewConstantShardSelector([]string{"x"}),
@@ -152,7 +151,6 @@ func Test_NodeContextDefaultInterruptible(t *testing.T) {
 	dataStore, _ := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, scope.NewSubScope("dataStore"))
 	nodeExecutor := nodeExecutor{
 		interruptibleFailureThreshold: 10,
-		maxDatasetSizeBytes:           0,
 		defaultDataSandbox:            "s3://bucket-a",
 		store:                         dataStore,
 		shardSelector:                 ioutils.NewConstantShardSelector([]string{"x"}),
@@ -414,7 +412,6 @@ func Test_NodeContext_IsInterruptible(t *testing.T) {
 			nodeExecutor := nodeExecutor{
 				interruptibleFailureThreshold:   tt.interruptibleFailureThreshold,
 				maxNodeRetriesForSystemFailures: tt.maxSystemFailures,
-				maxDatasetSizeBytes:             0,
 				defaultDataSandbox:              "s3://bucket-a",
 				store:                           dataStore,
 				shardSelector:                   ioutils.NewConstantShardSelector([]string{"x"}),

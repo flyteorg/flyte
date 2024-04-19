@@ -492,7 +492,6 @@ type nodeExecutor struct {
 	enqueueWorkflow                 v1alpha1.EnqueueWorkflow
 	eventConfig                     *config.EventConfig
 	interruptibleFailureThreshold   int32
-	maxDatasetSizeBytes             int64
 	maxNodeRetriesForSystemFailures uint32
 	metrics                         *nodeMetrics
 	nodeRecorder                    events.NodeEventRecorder
@@ -1399,7 +1398,7 @@ func (c *nodeExecutor) HandleNode(ctx context.Context, dag executors.DAGStructur
 }
 
 func NewExecutor(ctx context.Context, nodeConfig config.NodeConfig, store *storage.DataStore, enQWorkflow v1alpha1.EnqueueWorkflow, eventSink events.EventSink,
-	workflowLauncher launchplan.Executor, launchPlanReader launchplan.Reader, maxDatasetSize int64, defaultRawOutputPrefix storage.DataReference, kubeClient executors.Client,
+	workflowLauncher launchplan.Executor, launchPlanReader launchplan.Reader, defaultRawOutputPrefix storage.DataReference, kubeClient executors.Client,
 	catalogClient catalog.Client, recoveryClient recovery.Client, eventConfig *config.EventConfig, clusterID string, signalClient service.SignalServiceClient,
 	nodeHandlerFactory interfaces.HandlerFactory, scope promutils.Scope) (interfaces.Node, error) {
 
@@ -1453,7 +1452,6 @@ func NewExecutor(ctx context.Context, nodeConfig config.NodeConfig, store *stora
 		enqueueWorkflow:                 enQWorkflow,
 		eventConfig:                     eventConfig,
 		interruptibleFailureThreshold:   nodeConfig.InterruptibleFailureThreshold,
-		maxDatasetSizeBytes:             maxDatasetSize,
 		maxNodeRetriesForSystemFailures: uint32(nodeConfig.MaxNodeRetriesOnSystemFailures),
 		metrics:                         metrics,
 		nodeRecorder:                    events.NewNodeEventRecorder(eventSink, nodeScope, store),

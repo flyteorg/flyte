@@ -61,7 +61,7 @@ func createArrayNodeHandler(ctx context.Context, t *testing.T, nodeHandler inter
 
 	// create node executor
 	nodeExecutor, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, dataStore, enqueueWorkflowFunc, mockEventSink, adminClient,
-		adminClient, 10, "s3://bucket/", mockKubeClient, noopCatalogClient, mockRecoveryClient, eventConfig, "clusterID", mockSignalClient, mockHandlerFactory, scope)
+		adminClient, "s3://bucket/", mockKubeClient, noopCatalogClient, mockRecoveryClient, eventConfig, "clusterID", mockSignalClient, mockHandlerFactory, scope)
 	assert.NoError(t, err)
 
 	// return ArrayNodeHandler
@@ -79,7 +79,6 @@ func createNodeExecutionContext(dataStore *storage.DataStore, eventRecorder inte
 	currentParallelism uint32, maxParallelism uint32) interfaces.NodeExecutionContext {
 
 	nCtx := &mocks.NodeExecutionContext{}
-	nCtx.OnMaxDatasetSizeBytes().Return(9999999)
 	nCtx.OnCurrentAttempt().Return(uint32(0))
 
 	// ContextualNodeLookup
