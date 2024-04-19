@@ -209,28 +209,33 @@ class FlyteAdmin(object):
         return rows
 
     @staticmethod
-    def grpc_latency_histogram() -> Graph:
-        return BarGauge(
-            title="All GRPC calls latency",
-            calc="sum",
-            dataSource=DATASOURCE,
-            targets=[
-                Target(
-                    expr="sum by(le) (rate(grpc_server_handling_seconds_bucket[5m]))",
-                    refId="A",
-                    format="heatmap",
-                    legendFormat=r"{{le}}",
-                ),
-            ],
-            displayMode="gradient",
-            orientation="vertical",
-            max=200,
+    def grpc_latency_row() -> Graph:
+        return Row(
+            title="GRPC latency metrics",
+            panels=[
+                BarGauge(
+                    title="All GRPC calls latency",
+                    calc="sum",
+                    dataSource=DATASOURCE,
+                    targets=[
+                        Target(
+                            expr="sum by(le) (rate(grpc_server_handling_seconds_bucket[5m]))",
+                            refId="A",
+                            format="heatmap",
+                            legendFormat=r"{{le}}",
+                        ),
+                    ],
+                    displayMode="gradient",
+                    orientation="vertical",
+                    max=200,
+                )
+            ]
         )
 
     @staticmethod
     def create_all_rows(interval: int = 5) -> typing.List[Row]:
         rows = []
-        rows.extend([Row([FlyteAdmin.grpc_latency_histogram()])])
+        rows.extend([FlyteAdmin.grpc_latency_row()])
         rows.extend(FlyteAdmin.create_all_entity_db_rows(collapse=True, interval=interval))
         rows.extend(FlyteAdmin.create_all_apis(interval))
         return rows

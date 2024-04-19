@@ -137,8 +137,8 @@
         }
       ],
       "repeat": null,
-      "showTitle": false,
-      "title": "New row"
+      "showTitle": true,
+      "title": "GRPC latency metrics"
     },
     {
       "collapse": true,
