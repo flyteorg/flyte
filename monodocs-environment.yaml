@@ -76,6 +76,7 @@ dependencies:
     - ray==2.6.3
     - duckdb
     - aioboto3>=12.3.0                    # aws sagemaker inference
+    - databricks-cli              # mlflow
 
 platforms:
   - linux-64
