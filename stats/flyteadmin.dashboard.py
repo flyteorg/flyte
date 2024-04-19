@@ -1,10 +1,8 @@
 import typing
-from grafanalib.core import (
-    Alert, AlertCondition, Dashboard, Graph,
-    GreaterThan, OP_AND, OPS_FORMAT, Row, RTYPE_SUM, SECONDS_FORMAT,
-    SHORT_FORMAT, single_y_axis, Target, TimeRange, YAxes, YAxis, 
-    DataSourceInput, MILLISECONDS_FORMAT, BarGauge
-)
+
+from grafanalib.core import (MILLISECONDS_FORMAT, OPS_FORMAT, SHORT_FORMAT,
+                             BarGauge, Dashboard, DataSourceInput, Graph, Row,
+                             Target, YAxes, YAxis, single_y_axis)
 
 # ------------------------------
 # For Gostats we recommend using

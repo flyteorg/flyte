@@ -2,9 +2,8 @@ import typing
 
 from grafanalib.core import (MILLISECONDS_FORMAT, NO_FORMAT, OPS_FORMAT,
                              PERCENT_FORMAT, SECONDS_FORMAT, SHORT_FORMAT,
-                             BarGauge, Dashboard, DataSourceInput, Gauge,
-                             Graph, Row, Stat, Target, YAxes, YAxis,
-                             single_y_axis)
+                             BarGauge, Dashboard, DataSourceInput, Graph, Row,
+                             Target, YAxes, YAxis, single_y_axis)
 
 # ------------------------------
 # For Gostats we recommend using
@@ -137,7 +136,7 @@ class FlytePropeller(object):
                 YAxis(format=SHORT_FORMAT),
             ),
         )
-    
+
     @staticmethod
     def round_rates() -> Graph:
         return Graph(
