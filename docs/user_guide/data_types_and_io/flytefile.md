@@ -68,4 +68,14 @@ You can run the workflow locally as follows:
 :lines: 75-95
 ```
 
+You can enable type validation if you have the `python-magic` package installed.
+
+```{code-block}
+pip install  python-magic
+```
+
+:::{note}
+Currently, type validation is only supported on the `Mac OS` and `Linux` platforms.
+:::
+
 [flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/data_types_and_io/
