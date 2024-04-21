@@ -70,14 +70,20 @@ You can run the workflow locally as follows:
 
 You can enable type validation if you have the [python-magic](https://pypi.org/project/python-magic/) package installed.
 
-`OSX`
-```{code-block}
-brew install libmagic
-```
+```{eval-rst}
+.. tabs::
 
-`Debian/Ubuntu`
-```{code-block}
-sudo apt-get install libmagic1
+  .. group-tab:: Mac OS
+
+    .. code-block:: bash
+
+      brew install libmagic
+
+  .. group-tab:: Linux
+
+    .. code-block:: bash
+
+      sudo apt-get install libmagic1
 ```
 
 :::{note}
