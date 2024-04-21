@@ -235,6 +235,7 @@ before you submit your workflow, you will need to inform `envd` how to push the 
 This can be done via:
 
 ```
+pip install flytekitplugins-envd
 envd context create --name flyte-sandbox --builder tcp --builder-address localhost:30003 --use
 ```
 
