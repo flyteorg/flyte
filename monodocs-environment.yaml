@@ -14,16 +14,16 @@ dependencies:
   - myst-nb
   - psycopg2-binary
   - recommonmark
-  - sphinx==4.5.0
+  - sphinx
   - sphinx-prompt
   - sphinx-click
   - sphinx-autoapi
   - sphinx-copybutton
   - sphinx-issues
   - sphinx_fontawesome
-  - sphinx-panels
+  - sphinx-design
   - sphinxcontrib-mermaid
-  - sphinxcontrib-youtube==1.2.0
+  - sphinxcontrib-youtube
   - sphinx-tabs
   - sphinx-tags==0.2.1
 
@@ -76,6 +76,7 @@ dependencies:
     - ray==2.6.3
     - duckdb
     - aioboto3>=12.3.0                    # aws sagemaker inference
+    - databricks-cli              # mlflow
 
 platforms:
   - linux-64

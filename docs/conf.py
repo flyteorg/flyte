@@ -66,7 +66,7 @@ extensions = [
     "sphinxext.remoteliteralinclude",
     "sphinx_issues",
     "sphinx_click",
-    "sphinx_panels",
+    "sphinx_design",
     "sphinxcontrib.mermaid",
     "sphinxcontrib.video",
     "sphinxcontrib.youtube",
@@ -141,7 +141,6 @@ exclude_patterns = [
     "protos/index.rst",
     "api/flytekit/_templates/**",
     "api/flytekit/index.rst",
-    "reference/index.rst",
 ]
 
 # -- Options for HTML output -------------------------------------------------
