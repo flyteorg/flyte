@@ -71,7 +71,7 @@ You can run the workflow locally as follows:
 You can enable type validation if you have the `python-magic` package installed.
 
 ```{code-block}
-pip install  python-magic
+pip install python-magic
 ```
 
 :::{note}
