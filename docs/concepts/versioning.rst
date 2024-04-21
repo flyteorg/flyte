@@ -30,7 +30,9 @@ Versioning is required to:
 
 .. admonition:: Note
 
-    Please note that Flyte currently only supports DNS subdomain names, as defined in Kubernetes specifications. For example, version identifiers like "0:1" that contain colons are not permitted.
+    Please note that Flyte currently does not support the use of colons in specifying versions. 
+    
+    For instance, using "0:1" as a version number is not permitted.
 
 Operational Benefits of Completely Versioned Workflows/Pipelines
 -------------------------------------------------------------------
