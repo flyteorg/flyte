@@ -28,6 +28,12 @@ Versioning is required to:
 - Execute multiple experiments in production, which may use different training or data processing algorithms.
 - Understand how a specific system evolved and answer questions related to the effectiveness of a specific strategy.
 
+.. admonition:: Note
+
+    Please note that Flyte currently does not support the use of colons in specifying versions. 
+    
+    For instance, using "0:1" as a version number is not permitted.
+
 Operational Benefits of Completely Versioned Workflows/Pipelines
 -------------------------------------------------------------------
 
