@@ -68,10 +68,16 @@ You can run the workflow locally as follows:
 :lines: 75-95
 ```
 
-You can enable type validation if you have the `python-magic` package installed.
+You can enable type validation if you have the [python-magic](https://pypi.org/project/python-magic/) package installed.
 
+OSX
 ```{code-block}
-pip install python-magic
+brew install libmagic
+```
+
+Debian/Ubuntu
+```{code-block}
+sudo apt-get install libmagic1
 ```
 
 :::{note}
