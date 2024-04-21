@@ -21,29 +21,31 @@ Installation
 
 Flytectl is a Golang binary that can be installed on any platform supported by Golang.
 
-.. tabbed:: OSX
+.. tab-set::
 
-  .. prompt:: bash $
+    .. tab-item:: OSX
 
-      brew install flyteorg/homebrew-tap/flytectl
+      .. prompt:: bash $
 
-  *Upgrade* existing installation using the following command:
+          brew install flyteorg/homebrew-tap/flytectl
 
-  .. prompt:: bash $
+      *Upgrade* existing installation using the following command:
 
-      flytectl upgrade
+      .. prompt:: bash $
 
-.. tabbed:: Other Operating systems
+          flytectl upgrade
 
-  .. prompt:: bash $
+    .. tab-item:: Other Operating systems
 
-      curl -sL https://ctl.flyte.org/install | bash
+      .. prompt:: bash $
 
-  *Upgrade* existing installation using the following command:
+          curl -sL https://ctl.flyte.org/install | bash
 
-  .. prompt:: bash $
+      *Upgrade* existing installation using the following command:
 
-      flytectl upgrade
+      .. prompt:: bash $
+
+          flytectl upgrade
 
 **Test** if Flytectl is installed correctly (your Flytectl version should be > 0.2.0) using the following command:
 
@@ -66,50 +68,52 @@ The full list of available configurable options can be found by running ``flytec
 
     Currently, the Project ``-p``, Domain ``-d``, and Output ``-o`` flags cannot be used in the config file.
 
-.. tabbed:: Local Flyte Sandbox
+.. tab-set::
 
-    Automatically configured for you by ``flytectl sandbox`` command.
+    .. tab-item:: Local Flyte Sandbox
 
-    .. code-block:: yaml
+        Automatically configured for you by ``flytectl sandbox`` command.
 
-        admin:
-          # For GRPC endpoints you might want to use dns:///flyte.myexample.com
-          endpoint: dns:///localhost:30081
-          insecure: true # Set to false to enable TLS/SSL connection (not recommended except on local sandbox deployment).
-          authType: Pkce # authType: Pkce # if using authentication or just drop this.
+        .. code-block:: yaml
 
-.. tabbed:: AWS Configuration
+            admin:
+              # For GRPC endpoints you might want to use dns:///flyte.myexample.com
+              endpoint: dns:///localhost:30081
+              insecure: true # Set to false to enable TLS/SSL connection (not recommended except on local sandbox deployment).
+              authType: Pkce # authType: Pkce # if using authentication or just drop this.
 
-    .. code-block:: yaml
+    .. tab-item:: AWS Configuration
 
-        admin:
-          # For GRPC endpoints you might want to use dns:///flyte.myexample.com
-          endpoint: dns:///<replace-me>
-          authType: Pkce # authType: Pkce # if using authentication or just drop this.
-          insecure: true # insecure: True # Set to true if the endpoint isn't accessible through TLS/SSL connection (not recommended except on local sandbox deployment)
+        .. code-block:: yaml
 
-.. tabbed:: GCS Configuration
+            admin:
+              # For GRPC endpoints you might want to use dns:///flyte.myexample.com
+              endpoint: dns:///<replace-me>
+              authType: Pkce # authType: Pkce # if using authentication or just drop this.
+              insecure: true # insecure: True # Set to true if the endpoint isn't accessible through TLS/SSL connection (not recommended except on local sandbox deployment)
 
-    .. code-block:: yaml
+    .. tab-item:: GCS Configuration
 
-        admin:
-          # For GRPC endpoints you might want to use dns:///flyte.myexample.com
-          endpoint: dns:///<replace-me>
-          authType: Pkce # authType: Pkce # if using authentication or just drop this.
-          insecure: false # insecure: True # Set to true if the endpoint isn't accessible through TLS/SSL connection (not recommended except on local sandbox deployment)
+        .. code-block:: yaml
 
-.. tabbed:: Others
+            admin:
+              # For GRPC endpoints you might want to use dns:///flyte.myexample.com
+              endpoint: dns:///<replace-me>
+              authType: Pkce # authType: Pkce # if using authentication or just drop this.
+              insecure: false # insecure: True # Set to true if the endpoint isn't accessible through TLS/SSL connection (not recommended except on local sandbox deployment)
 
-    For other supported storage backends like Oracle, Azure, etc., refer to the configuration structure `here <https://pkg.go.dev/github.com/flyteorg/flyte/flytestdlib/storage#Config>`__.
+    .. tab-item:: Others
 
-    Place the config file in ``$HOME/.flyte`` directory with the name config.yaml.
-    This file is typically searched in:
+        For other supported storage backends like Oracle, Azure, etc., refer to the configuration structure `here <https://pkg.go.dev/github.com/flyteorg/flyte/flytestdlib/storage#Config>`__.
 
-    * ``$HOME/.flyte``
-    * currDir from where you run flytectl
-    * ``/etc/flyte/config``
-    
-    You can also pass the file name in the command line using ``--config <config-file-path>``.
+        Place the config file in ``$HOME/.flyte`` directory with the name config.yaml.
+        This file is typically searched in:
+
+        * ``$HOME/.flyte``
+        * currDir from where you run flytectl
+        * ``/etc/flyte/config``
+
+        You can also pass the file name in the command line using ``--config <config-file-path>``.
 
 
 .. toctree::
