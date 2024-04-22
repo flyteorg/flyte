@@ -96,7 +96,10 @@ extlinks = {
 
 # redirects
 redirects = {
-    "/flytesnacks/examples/bigquery_plugin/index": "../../deprecated_integrations/bigquery_plugin/index.html"
+    "flytesnacks/examples/bigquery_plugin/index": "../../../deprecated_integrations/bigquery_plugin/index.html",
+    "flytesnacks/examples/databricks_plugin/index": "../../../deprecated_integrations/databricks_plugin/index.html",
+    "flytesnacks/examples/mmcloud_plugin/index": "../../../deprecated_integrations/mmcloud_plugin/index.html",
+    "flytesnacks/examples/snowflake_plugin/index": "../../../deprecated_integrations/snowflake_plugin/index.html",
 }
 
 
