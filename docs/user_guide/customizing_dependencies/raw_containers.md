@@ -47,7 +47,7 @@ correspond to the declared input variables. All data returned by the tasks are c
 One of the benefits of raw container tasks is that Flytekit does not need to be installed in the target container.
 
 :::{note}
-Raw containers cannot be run locally at the moment.
+Raw containers can be run locally when flytekit version >= 1.11.0.
 :::
 
 ## Scripts
