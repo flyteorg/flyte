@@ -75,14 +75,6 @@
     {%- block extra_styles -%}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3" />
     <link rel="preconnect" href="https://WLG0MZB58Q-dsn.algolia.net" crossorigin />
-
-    <!-- RunLLM Configuration -->
-    <script defer id="runllm-widget-script" type="module" src='https://cdn.jsdelivr.net/npm/@runllm/search-widget@0.0.2/dist/run-llm-search-widget.es.js'
-      runllm-server-address="https://api.runllm.com" runllm-assistant-id="60" runllm-position="BOTTOM_RIGHT"
-      runllm-keyboard-shortcut="Mod+k"
-      version="0.0.2"
-      runllm-slack-community-url="https://flyte-org.slack.com/join/shared_invite/zt-2eq2fgs5f-UGUWnMYVB9agervilmlyaw#/shared-invite/email"
-      runllm-name="RunLLM" />
     {%- endblock extra_styles -%}
 
     {%- endblock styles -%}
@@ -106,6 +98,13 @@
         }
       });
     </script>
+    <!-- RunLLM Configuration -->
+    <script defer id="runllm-widget-script" type="module" src='https://cdn.jsdelivr.net/npm/@runllm/search-widget@0.0.2/dist/run-llm-search-widget.es.js'
+      runllm-server-address="https://api.runllm.com" runllm-assistant-id="60" runllm-position="BOTTOM_RIGHT"
+      runllm-keyboard-shortcut="Mod+k"
+      version="0.0.2"
+      runllm-slack-community-url="https://flyte-org.slack.com/join/shared_invite/zt-2eq2fgs5f-UGUWnMYVB9agervilmlyaw#/shared-invite/email"
+      runllm-name="RunLLM" />
   </head>
   <body>
     {% block body %}
