@@ -62,6 +62,7 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.extlinks",
     "sphinx-prompt",
+    "sphinx_reredirects",
     "sphinx_copybutton",
     "sphinxext.remoteliteralinclude",
     "sphinx_issues",
@@ -91,6 +92,11 @@ extlinks = {
     "idl": ("https://github.com/flyteorg/flyteidl/tree/v0.14.1/%s", ""),
     "admin": ("https://github.com/flyteorg/flyteadmin/tree/master/%s", ""),
     "cookbook": ("https://flytecookbook.readthedocs.io/en/latest/", None),
+}
+
+# redirects
+redirects = {
+    "/flytesnacks/examples/bigquery_plugin/index": "../../deprecated_integrations/bigquery_plugin/index.html"
 }
 
 
