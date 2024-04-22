@@ -121,7 +121,7 @@ func (c CorePlugin) Finalize(ctx context.Context, tCtx core.TaskExecutionContext
 	err := c.cache.DeleteDelayed(cacheItemID)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to delete resource [%v] from cache. Error: %v", cacheItemID, err)
-		return err
+		return fmt.Errorf("failed to delete resource [%v] from cache. Error: %v", cacheItemID, err)
 	}
 
 	if len(c.p.GetConfig().ResourceQuotas) == 0 {
