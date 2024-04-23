@@ -251,14 +251,17 @@ You can run the code locally as follows:
 :lines: 151-155
 ```
 
-[flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/data_types_and_io/
-
 ### The nested typed columns
 
-Most storage formats have support for nested field structures today (Avro, parquet, bq) and so is StructuredDatasets.
+Like most storage formats (e.g. Avro, Parquet, and BigQuery), StructuredDataset support nested field structures.
 
+:::{note}
+Nested field StructuredDataset should be run  when flytekit version > 1.11.0.
+:::
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/data_types_and_io/data_types_and_io/structured_dataset.py
 :caption: data_types_and_io/structured_dataset.py
 :lines: 158-296
 ```
+
+[flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/data_types_and_io/
