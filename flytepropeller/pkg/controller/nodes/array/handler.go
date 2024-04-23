@@ -252,58 +252,16 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		arrayNodeState.Phase = v1alpha1.ArrayNodePhaseExecuting
 	case v1alpha1.ArrayNodePhaseExecuting:
 		// process array node subNodes
-
-		/*incrementParallelism := false
-		parallelism := -1
-		if arrayNode.GetParallelism() != nil && *arrayNode.GetParallelism() > 0 {
-			// if parallelism is not defaulted - use it
-			parallelism = int(*arrayNode.GetParallelism())
-		} else {
-			// otherwise use either workflow or unlimited
-			parallelismBehavior := config.GetConfig().ArrayNode.DefaultParallelismBehavior
-			if parallelismBehavior == config.ParallelismBehaviorWorkflow || (arrayNode.GetParallelism() == nil && parallelismBehavior == config.ParallelismBehaviorConfigured) {
-				incrementParallelism = true
-				parallelism = int(nCtx.ExecutionContext().MaxParallelism() - nCtx.ExecutionContext().CurrentParallelism())
-
-			} else if parallelismBehavior == config.ParallelismBehaviorUnlimited
-				|| (arrayNode.GetParallelism() != nil && arrayNode.GetParallelism() == 0 && parallelismBehavior == config.ParallelismBehaviorConfigured) {
-
-				parallelism = len(arrayNodeState.SubNodePhases.GetItems())
-			} else {
-				// TODO - unsupported ArrayNode parallelism behavior?
-			}
-		}*/
-
 		remainingWorkflowParallelism := int(nCtx.ExecutionContext().GetExecutionConfig().MaxParallelism - nCtx.ExecutionContext().CurrentParallelism())
-		incrementWorkflowParallelism, maxParallelism := identifyParallelism(arrayNode.GetParallelism(),
+		incrementWorkflowParallelism, maxParallelism := inferParallelism(ctx, arrayNode.GetParallelism(),
 			config.GetConfig().ArrayNode.DefaultParallelismBehavior, remainingWorkflowParallelism, len(arrayNodeState.SubNodePhases.GetItems()))
 
-		/*availableParallelism := 0
-		// using the workflow's parallelism if the array node parallelism is not set
-		useWorkflowParallelism := arrayNode.GetParallelism() == nil
-		if useWorkflowParallelism {
-			// greedily take all available slots
-			// TODO: This will need to be re-evaluated if we want to support dynamics & sub_workflows
-			currentParallelism := nCtx.ExecutionContext().CurrentParallelism()
-			maxParallelism := nCtx.ExecutionContext().GetExecutionConfig().MaxParallelism
-			availableParallelism = int(maxParallelism - currentParallelism)
-		} else {
-			availableParallelism = int(*arrayNode.GetParallelism())
-			if availableParallelism == 0 {
-				availableParallelism = len(arrayNodeState.SubNodePhases.GetItems())
-			}
-		}*/
-
-		//nodeExecutionRequests := make([]*nodeExecutionRequest, 0, availableParallelism)
 		nodeExecutionRequests := make([]*nodeExecutionRequest, 0, maxParallelism)
 		currentParallelism := 0
 		for i, nodePhaseUint64 := range arrayNodeState.SubNodePhases.GetItems() {
 			if currentParallelism >= maxParallelism {
 				break
 			}
-			/*if availableParallelism == 0 {
-				break
-			}*/
 
 			nodePhase := v1alpha1.NodePhase(nodePhaseUint64)
 			taskPhase := int(arrayNodeState.SubNodeTaskPhases.GetItem(i))
@@ -345,10 +303,6 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			// TODO - this is a naive implementation of parallelism, if we want to support more
 			// complex subNodes (ie. dynamics / subworkflows) we need to revisit this so that
 			// parallelism is handled during subNode evaluations + avoid deadlocks
-			/*if useWorkflowParallelism {
-				nCtx.ExecutionContext().IncrementParallelism()
-			}*/
-			//availableParallelism--
 			if incrementWorkflowParallelism {
 				nCtx.ExecutionContext().IncrementParallelism()
 			}
@@ -453,7 +407,8 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			arrayNodeState.Phase = v1alpha1.ArrayNodePhaseSucceeding
 		}
 
-		// TODO @hamersaw - docs
+		// if incrementWorkflowParallelism is not set then we need to increment the parallelism by one
+		// to indicate that the overall ArrayNode is still running
 		if !incrementWorkflowParallelism && arrayNodeState.Phase == v1alpha1.ArrayNodePhaseExecuting {
 			nCtx.ExecutionContext().IncrementParallelism()
 		}

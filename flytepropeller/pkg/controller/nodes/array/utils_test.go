@@ -1,6 +1,7 @@
 package array
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -35,7 +36,8 @@ func TestAppendLiteral(t *testing.T) {
 	}
 }
 
-func TestIdentifyParallelism(t *testing.T) {
+func TestInferParallelism(t *testing.T) {
+	ctx := context.TODO()
 	zero := uint32(0)
 	one := uint32(1)
 
@@ -133,11 +135,9 @@ func TestIdentifyParallelism(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			increment, maxParallelism := identifyParallelism(tt.parallelism, tt.parallelismBehavior, tt.remainingParallelism, tt.arrayNodeSize)
+			increment, maxParallelism := inferParallelism(ctx, tt.parallelism, tt.parallelismBehavior, tt.remainingParallelism, tt.arrayNodeSize)
 			assert.Equal(t, tt.expectedIncrement, increment)
 			assert.Equal(t, tt.expectedMaxParallelism, maxParallelism)
 		})
 	}
-
-	//func identifyParallelism(parallelism *uint32, parallelismBehavior string, remainingWorkflowParallelism, arrayNodeSize int) (bool, int) {
 }

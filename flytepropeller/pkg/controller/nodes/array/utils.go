@@ -12,6 +12,7 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/codex"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/k8s"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
@@ -63,20 +64,21 @@ func constructOutputReferences(ctx context.Context, nCtx interfaces.NodeExecutio
 	return subDataDir, subOutputDir, nil
 }
 
-func identifyParallelism(parallelism *uint32, parallelismBehavior string, remainingWorkflowParallelism, arrayNodeSize int) (bool, int) {
+func inferParallelism(ctx context.Context, parallelism *uint32, parallelismBehavior string, remainingWorkflowParallelism, arrayNodeSize int) (bool, int) {
 	if parallelism != nil && *parallelism > 0 {
 		// if parallelism is not defaulted - use it
 		return false, int(*parallelism)
-	} else if parallelismBehavior == config.ParallelismBehaviorWorkflow || (parallelism == nil && parallelismBehavior == config.ParallelismBehaviorConfigured) {
+	} else if parallelismBehavior == config.ParallelismBehaviorWorkflow || (parallelism == nil && parallelismBehavior == config.ParallelismBehaviorHybrid) {
 		// if workflow level parallelism
 		return true, remainingWorkflowParallelism
 	} else if parallelismBehavior == config.ParallelismBehaviorUnlimited ||
-		(parallelism != nil && *parallelism == 0 && parallelismBehavior == config.ParallelismBehaviorConfigured) {
+		(parallelism != nil && *parallelism == 0 && parallelismBehavior == config.ParallelismBehaviorHybrid) {
 		// if unlimited parallelism
 		return false, arrayNodeSize
 	}
 
-	// TODO @hamersaw - log unreachable? defaulting to unlimited parallelism
+	logger.Warnf(ctx, "unable to infer ArrayNode parallelism configuration for parallelism:%v behavior:%v, defaulting to unlimited parallelism",
+		parallelism, parallelismBehavior)
 	return false, arrayNodeSize
 }
 

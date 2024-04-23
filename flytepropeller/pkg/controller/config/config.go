@@ -261,13 +261,22 @@ type EventConfig struct {
 	FallbackToOutputReference bool            `json:"fallback-to-output-reference" pflag:",Whether output data should be sent by reference when it is too large to be sent inline in execution events."`
 }
 
-// TODO @hamersaw - docs
+// ParallelismBehavior defines how ArrayNode should handle subNode parallelism by default
 type ParallelismBehavior = string
 
 const (
-	ParallelismBehaviorConfigured ParallelismBehavior = "configured"
-	ParallelismBehaviorUnlimited  ParallelismBehavior = "unlimited"
-	ParallelismBehaviorWorkflow   ParallelismBehavior = "workflow"
+	// ParallelismBehaviorHybrid means that ArrayNode will adhere to the parallelism defined in the
+	// ArrayNode exactly. This means `nil` will use the workflow parallelism, and 0 will have
+	// unlimited parallelism.
+	ParallelismBehaviorHybrid ParallelismBehavior = "hybrid"
+
+	// ParallelismBehaviorUnlimited means that ArrayNode subNodes will be evaluated with unlimited
+	// parallelism for both nil and 0.
+	ParallelismBehaviorUnlimited ParallelismBehavior = "unlimited"
+
+	// ParallelismBehaviorWorkflow means that ArrayNode subNodes will be evaluated using the
+	// configured workflow parallelism for both nil and 0.
+	ParallelismBehaviorWorkflow ParallelismBehavior = "workflow"
 )
 
 type ArrayNodeConfig struct {

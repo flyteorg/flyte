@@ -464,7 +464,7 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 
 	// setting default parallelism behavior on ArrayNode to "configured" to test the largest scope of functionality
 	flyteConfig := config.GetConfig()
-	flyteConfig.ArrayNode.DefaultParallelismBehavior = config.ParallelismBehaviorConfigured
+	flyteConfig.ArrayNode.DefaultParallelismBehavior = config.ParallelismBehaviorHybrid
 
 	minSuccessRatio := float32(0.5)
 
