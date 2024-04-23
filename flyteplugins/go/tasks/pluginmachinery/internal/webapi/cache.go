@@ -44,11 +44,15 @@ type ResourceCache struct {
 // A wrapper for each item in the cache.
 type CacheItem struct {
 	State
-
 	Resource webapi.Resource
 }
 
 func (c CacheItem) IsTerminal() bool {
+	if c.Resource != nil {
+		if resource, ok := c.Resource.(interface{ IsTerminal() bool }); ok {
+			return resource.IsTerminal()
+		}
+	}
 	return c.State.Phase.IsTerminal()
 }
 
@@ -80,7 +84,7 @@ func (q *ResourceCache) SyncResource(ctx context.Context, batch cache.Batch) (
 		logger.Debugf(ctx, "Sync loop - processing resource with cache key [%s]",
 			resource.GetID())
 
-		if cacheItem.State.Phase.IsTerminal() {
+		if cacheItem.IsTerminal() {
 			logger.Debugf(ctx, "Sync loop - resource cache key [%v] in terminal state [%s]",
 				resource.GetID())
 			resp = append(resp, cache.ItemSyncResponse{
