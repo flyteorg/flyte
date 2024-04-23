@@ -462,7 +462,7 @@ func uint32Ptr(v uint32) *uint32 {
 func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 	ctx := context.Background()
 
-	// setting default parallelism behavior on ArrayNode to "configured" to test the largest scope of functionality
+	// setting default parallelism behavior on ArrayNode to "hybrid" to test the largest scope of functionality
 	flyteConfig := config.GetConfig()
 	flyteConfig.ArrayNode.DefaultParallelismBehavior = config.ParallelismBehaviorHybrid
 
