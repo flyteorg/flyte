@@ -6,11 +6,40 @@ Optimizing Performance
 
 .. tags:: Infrastructure, Kubernetes, Advanced
 
-.. tip:: Before getting started, it is always important to measure the performance. Flyte project publishes and manages some grafana templates as described in - :ref:`deployment-configuration-monitoring`.
+.. tip:: Before getting started, it is always important to measure the performance. Flyte project publishes some grafana templates as described in - :ref:`deployment-configuration-monitoring`.
 
 The video below contains an overview of the Flyte architecture, what is meant by "performance", details of one loop in FlytePropeller, and a demo of the Grafana Labs dashboard.
 
 ..  youtube:: FJ-rG9lZDhY 
+
+Introduction
+============
+
+Before getting started, let's revisit the lifecycle of a workflow execution. The following diagram aims to summarize the process by focusing on the main steps. More details can be found in the `FlytePropeller Architecture <https://docs.flyte.org/en/latest/concepts/component_architecture/flytepropeller_architecture.html>`__ section.
+
+<INSERT_EXCALIDRAW_DIAGRAM>
+
+There are some base design attributes and assumptions that Flytepropeller applies:
+
+a. Every workflow execution is independent and can be performed by a completeley distinct process.
+b. When a workflow definition is compiled, the resulting DAG structure is traversed by the controller and the goal is to transition each task to Success.
+This is not typically achieved on its full on the first attempt (either due to timeouts or to failures) so Propeller evaluates again the remaining steps. 
+That iterative process is what we call in this document an "evaluation loop".
+
+
+Summarized steps of a workflow execution
+_________________________________________
+
+The following description is centered in the ``Worker``: the independent, lightweight and idempotent process that interacts with all the components in the Propeller controller to drive executions. 
+It's implemented as a ``goroutine``, and illustrated here as a hard-working gopher which:
+
+1. Pulls from the ``WorkQueue`` and loads what it needs to do the job: the workflow specification (desired state) and the previously recorded execution status.
+2. Observes the actual state by querying the Kubernetes API (or the Informer cache).
+3. Calculates the difference between desired and observed state, and triggers an effect to reconcile both states (eg. Launch/kill a Pod), interacting with the Propeller executors to process Inputs, Outputs and Offloaded data as indicated in the workflow spec.
+4. Keeps a local copy of the execution status, besides what the K8s API stores in ``etcd``.
+5. Informs the control plane and, hence, the user.
+
+
 
 Scaling up FlytePropeller
 ==========================
