@@ -271,11 +271,13 @@ const (
 	ParallelismBehaviorHybrid ParallelismBehavior = "hybrid"
 
 	// ParallelismBehaviorUnlimited means that ArrayNode subNodes will be evaluated with unlimited
-	// parallelism for both nil and 0.
+	// parallelism for both nil and 0. If a non-default (ie. nil / zero) parallelism is set, then
+	// ArrayNode will adhere to that value.
 	ParallelismBehaviorUnlimited ParallelismBehavior = "unlimited"
 
 	// ParallelismBehaviorWorkflow means that ArrayNode subNodes will be evaluated using the
-	// configured workflow parallelism for both nil and 0.
+	// configured workflow parallelism for both nil and 0. If a non-default (ie. nil / zero)
+	// parallelism is set, then ArrayNode will adhere to that value.
 	ParallelismBehaviorWorkflow ParallelismBehavior = "workflow"
 )
 
