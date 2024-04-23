@@ -260,5 +260,5 @@ Most storage formats have support for nested field structures today (Avro, parqu
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/data_types_and_io/data_types_and_io/structured_dataset.py
 :caption: data_types_and_io/structured_dataset.py
-:lines: 158-293
+:lines: 158-296
 ```
