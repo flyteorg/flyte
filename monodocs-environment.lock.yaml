@@ -4580,16 +4580,15 @@ package:
   category: main
   optional: false
 - name: docutils
-  version: 0.20.1
+  version: 0.21.1
   manager: conda
   platform: linux-64
   dependencies:
-    python: '>=3.9,<3.10.0a0'
-    python_abi: 3.9.*
-  url: https://conda.anaconda.org/conda-forge/linux-64/docutils-0.20.1-py39hf3d152e_3.conda
+    python: '>=3.9'
+  url: https://conda.anaconda.org/conda-forge/noarch/docutils-0.21.1-pyhd8ed1ab_0.conda
   hash:
-    md5: 09a48956e1c155907fd0d626f3e80f2e
-    sha256: fe2b7316146a73a33fd16c637e6e82c2638e91d1b8c95560b9c477a6f3082b6d
+    md5: 04ffd8609a7483e8b262aa0f121e7360
+    sha256: 8daf725f2a8e77f5f7069b59b5d09e3a39cf99f038ed321a7bcdc1a26b4fd4a0
   category: main
   optional: false
 - name: docutils
@@ -4606,16 +4605,15 @@ package:
   category: main
   optional: false
 - name: docutils
-  version: 0.20.1
+  version: 0.21.1
   manager: conda
   platform: osx-arm64
   dependencies:
-    python: '>=3.9,<3.10.0a0'
-    python_abi: 3.9.*
-  url: https://conda.anaconda.org/conda-forge/osx-arm64/docutils-0.20.1-py39h2804cbe_3.conda
+    python: '>=3.9'
+  url: https://conda.anaconda.org/conda-forge/noarch/docutils-0.21.1-pyhd8ed1ab_0.conda
   hash:
-    md5: 70e347b3f092848cf7eb473b3ee3a72b
-    sha256: ab092e0c2f4084e0b7e38893a05e81d807a07a6a4a965bec027c39e4147672b7
+    md5: 04ffd8609a7483e8b262aa0f121e7360
+    sha256: 8daf725f2a8e77f5f7069b59b5d09e3a39cf99f038ed321a7bcdc1a26b4fd4a0
   category: main
   optional: false
 - name: entrypoints
@@ -10455,7 +10453,7 @@ package:
   category: main
   optional: false
 - name: jupyterlab_server
-  version: 2.26.0
+  version: 2.27.1
   manager: conda
   platform: linux-64
   dependencies:
@@ -10468,10 +10466,10 @@ package:
     packaging: '>=21.3'
     python: '>=3.8'
     requests: '>=2.31'
-  url: https://conda.anaconda.org/conda-forge/noarch/jupyterlab_server-2.26.0-pyhd8ed1ab_0.conda
+  url: https://conda.anaconda.org/conda-forge/noarch/jupyterlab_server-2.27.1-pyhd8ed1ab_0.conda
   hash:
-    md5: bd9f28ac8833e63eeadb69aa1341f269
-    sha256: 1c90175218cdc910857423d5ffc356edba54d24a438ee1761fcd7f277270689f
+    md5: d97923b777ce837cf67e7858ac600834
+    sha256: 64d7713782482a28fedd590537ff8edd737a2c736c8384366fb20a83273d233c
   category: main
   optional: false
 - name: jupyterlab_server
@@ -10495,7 +10493,7 @@ package:
   category: main
   optional: false
 - name: jupyterlab_server
-  version: 2.26.0
+  version: 2.27.1
   manager: conda
   platform: osx-arm64
   dependencies:
@@ -10508,10 +10506,10 @@ package:
     packaging: '>=21.3'
     python: '>=3.8'
     requests: '>=2.31'
-  url: https://conda.anaconda.org/conda-forge/noarch/jupyterlab_server-2.26.0-pyhd8ed1ab_0.conda
+  url: https://conda.anaconda.org/conda-forge/noarch/jupyterlab_server-2.27.1-pyhd8ed1ab_0.conda
   hash:
-    md5: bd9f28ac8833e63eeadb69aa1341f269
-    sha256: 1c90175218cdc910857423d5ffc356edba54d24a438ee1761fcd7f277270689f
+    md5: d97923b777ce837cf67e7858ac600834
+    sha256: 64d7713782482a28fedd590537ff8edd737a2c736c8384366fb20a83273d233c
   category: main
   optional: false
 - name: jupyterlab_widgets
@@ -16196,21 +16194,21 @@ package:
   category: main
   optional: false
 - name: myst-parser
-  version: 2.0.0
+  version: 3.0.0
   manager: conda
   platform: linux-64
   dependencies:
-    docutils: '>=0.16,<0.21'
+    docutils: '>=0.18,<0.22'
     jinja2: ''
     markdown-it-py: '>=3.0.0,<4.0.0'
     mdit-py-plugins: '>=0.4,<1'
     python: '>=3.8'
     pyyaml: ''
     sphinx: '>=6,<8'
-  url: https://conda.anaconda.org/conda-forge/noarch/myst-parser-2.0.0-pyhd8ed1ab_0.conda
+  url: https://conda.anaconda.org/conda-forge/noarch/myst-parser-3.0.0-pyhd8ed1ab_0.conda
   hash:
-    md5: 70699181909e468875f12076e1b0a8a9
-    sha256: 59cdc52d9875f623a4df82896d80f304e436138f8410cbef969a7e4452c6bab7
+    md5: f1c4e83ce8a51be898f8a8bf69bb7e45
+    sha256: 4b2fb9ef27234e54e95a347368c2e72eb31e5e66f39c4b4198c5da312d783d28
   category: main
   optional: false
 - name: myst-parser
@@ -16232,21 +16230,21 @@ package:
   category: main
   optional: false
 - name: myst-parser
-  version: 2.0.0
+  version: 3.0.0
   manager: conda
   platform: osx-arm64
   dependencies:
-    docutils: '>=0.16,<0.21'
+    docutils: '>=0.18,<0.22'
     jinja2: ''
     markdown-it-py: '>=3.0.0,<4.0.0'
     mdit-py-plugins: '>=0.4,<1'
     python: '>=3.8'
     pyyaml: ''
     sphinx: '>=6,<8'
-  url: https://conda.anaconda.org/conda-forge/noarch/myst-parser-2.0.0-pyhd8ed1ab_0.conda
+  url: https://conda.anaconda.org/conda-forge/noarch/myst-parser-3.0.0-pyhd8ed1ab_0.conda
   hash:
-    md5: 70699181909e468875f12076e1b0a8a9
-    sha256: 59cdc52d9875f623a4df82896d80f304e436138f8410cbef969a7e4452c6bab7
+    md5: f1c4e83ce8a51be898f8a8bf69bb7e45
+    sha256: 4b2fb9ef27234e54e95a347368c2e72eb31e5e66f39c4b4198c5da312d783d28
   category: main
   optional: false
 - name: nbclient
