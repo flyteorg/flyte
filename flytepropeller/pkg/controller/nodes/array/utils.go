@@ -7,6 +7,8 @@ import (
 
 	idlcore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/codex"
@@ -65,4 +67,24 @@ func constructOutputReferences(ctx context.Context, nCtx interfaces.NodeExecutio
 func isTerminalNodePhase(nodePhase v1alpha1.NodePhase) bool {
 	return nodePhase == v1alpha1.NodePhaseSucceeded || nodePhase == v1alpha1.NodePhaseFailed || nodePhase == v1alpha1.NodePhaseTimedOut ||
 		nodePhase == v1alpha1.NodePhaseSkipped || nodePhase == v1alpha1.NodePhaseRecovered
+}
+
+func computeParallelism(_ context.Context, nCtx interfaces.NodeExecutionContext,
+	arrayNodeState *handler.ArrayNodeState, parallelism *uint32, parallelismBehavior string) (bool, int) {
+
+	if parallelism != nil && *parallelism > 0 {
+		// if parallelism is not defaulted - use it
+		return false, int(*parallelism)
+	} else {
+		// otherwise use either workflow or unlimited
+		if parallelismBehavior == config.ParallelismBehaviorWorkflow || (parallelism == nil && parallelismBehavior == config.ParallelismBehaviorConfigured) {
+			return true, int(nCtx.ExecutionContext().GetExecutionConfig().MaxParallelism - nCtx.ExecutionContext().CurrentParallelism())
+		} else if parallelismBehavior == config.ParallelismBehaviorUnlimited ||
+			(parallelism != nil && *parallelism == 0 && parallelismBehavior == config.ParallelismBehaviorConfigured) {
+			return false, len(arrayNodeState.SubNodePhases.GetItems())
+		}
+	}
+
+	// TODO @hamersaw - log unreachable?
+	return false, len(arrayNodeState.SubNodePhases.GetItems())
 }

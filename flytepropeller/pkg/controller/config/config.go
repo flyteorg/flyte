@@ -115,8 +115,12 @@ var (
 		},
 		ClusterID:                "propeller",
 		CreateFlyteWorkflowCRD:   false,
-		ArrayNodeEventVersion:    0,
 		NodeExecutionWorkerCount: 8,
+		ArrayNode: ArrayNodeConfig{
+			EventVersion:               0,
+			//DefaultParallelismBehavior: ParallelismBehaviorUnlimited,
+			DefaultParallelismBehavior: ParallelismBehaviorConfigured,
+		},
 	}
 )
 
@@ -156,8 +160,8 @@ type Config struct {
 	ExcludeDomainLabel       []string             `json:"exclude-domain-label" pflag:",Exclude the specified domain label from the k8s FlyteWorkflow CRD label selector"`
 	ClusterID                string               `json:"cluster-id" pflag:",Unique cluster id running this flytepropeller instance with which to annotate execution events"`
 	CreateFlyteWorkflowCRD   bool                 `json:"create-flyteworkflow-crd" pflag:",Enable creation of the FlyteWorkflow CRD on startup"`
-	ArrayNodeEventVersion    int                  `json:"array-node-event-version" pflag:",ArrayNode eventing version. 0 => legacy (drop-in replacement for maptask), 1 => new"`
 	NodeExecutionWorkerCount int                  `json:"node-execution-worker-count" pflag:",Number of workers to evaluate node executions, currently only used for array nodes"`
+	ArrayNode                ArrayNodeConfig      `json:"array-node-config,omitempty" pflag:",Configuration for array nodes"`
 }
 
 // KubeClientConfig contains the configuration used by flytepropeller to configure its internal Kubernetes Client.
@@ -256,6 +260,20 @@ const (
 type EventConfig struct {
 	RawOutputPolicy           RawOutputPolicy `json:"raw-output-policy" pflag:",How output data should be passed along in execution events."`
 	FallbackToOutputReference bool            `json:"fallback-to-output-reference" pflag:",Whether output data should be sent by reference when it is too large to be sent inline in execution events."`
+}
+
+// TODO @hamersaw - docs
+type ParallelismBehavior = string
+
+const (
+	ParallelismBehaviorConfigured ParallelismBehavior = "configured"
+	ParallelismBehaviorUnlimited  ParallelismBehavior = "unlimited"
+	ParallelismBehaviorWorkflow   ParallelismBehavior = "workflow"
+)
+
+type ArrayNodeConfig struct {
+	EventVersion               int                 `json:"event-version" pflag:",ArrayNode eventing version. 0 => legacy (drop-in replacement for maptask), 1 => new"`
+	DefaultParallelismBehavior ParallelismBehavior `json:"default-parallelism-behavior" pflag:",Default parallelism behavior for array nodes"`
 }
 
 // GetConfig extracts the Configuration from the global config module in flytestdlib and returns the corresponding type-casted object.
