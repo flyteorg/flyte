@@ -274,8 +274,9 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			}
 		}*/
 
-		incrementWorkflowParallelism, maxParallelism := computeParallelism(ctx, nCtx, &arrayNodeState,
-			arrayNode.GetParallelism(), config.GetConfig().ArrayNode.DefaultParallelismBehavior)
+		remainingWorkflowParallelism := int(nCtx.ExecutionContext().GetExecutionConfig().MaxParallelism - nCtx.ExecutionContext().CurrentParallelism())
+		incrementWorkflowParallelism, maxParallelism := identifyParallelism(arrayNode.GetParallelism(),
+			config.GetConfig().ArrayNode.DefaultParallelismBehavior, remainingWorkflowParallelism, len(arrayNodeState.SubNodePhases.GetItems()))
 
 		/*availableParallelism := 0
 		// using the workflow's parallelism if the array node parallelism is not set
@@ -352,11 +353,6 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 				nCtx.ExecutionContext().IncrementParallelism()
 			}
 			currentParallelism++
-		}
-
-		// TODO @hamersaw - docs
-		if !incrementWorkflowParallelism {
-			nCtx.ExecutionContext().IncrementParallelism()
 		}
 
 		workerErrorCollector := errorcollector.NewErrorMessageCollector()
@@ -455,6 +451,11 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		} else if successCount >= minSuccesses && runningCount == 0 {
 			// wait until all tasks have completed before declaring success
 			arrayNodeState.Phase = v1alpha1.ArrayNodePhaseSucceeding
+		}
+
+		// TODO @hamersaw - docs
+		if !incrementWorkflowParallelism && arrayNodeState.Phase == v1alpha1.ArrayNodePhaseExecuting {
+			nCtx.ExecutionContext().IncrementParallelism()
 		}
 	case v1alpha1.ArrayNodePhaseFailing:
 		if err := a.Abort(ctx, nCtx, "ArrayNodeFailing"); err != nil {

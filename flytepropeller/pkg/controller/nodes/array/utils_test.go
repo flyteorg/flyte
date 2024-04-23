@@ -34,3 +34,110 @@ func TestAppendLiteral(t *testing.T) {
 		assert.Equal(t, 2, len(collection.Collection.Literals))
 	}
 }
+
+func TestIdentifyParallelism(t *testing.T) {
+	zero := uint32(0)
+	one := uint32(1)
+
+	tests := []struct {
+		name                   string
+		parallelism            *uint32
+		parallelismBehavior    string
+		remainingParallelism   int
+		arrayNodeSize          int
+		expectedIncrement      bool
+		expectedMaxParallelism int
+	}{
+		{
+			name:                   "NilParallelismWorkflowBehavior",
+			parallelism:            nil,
+			parallelismBehavior:    "workflow",
+			remainingParallelism:   2,
+			arrayNodeSize:          3,
+			expectedIncrement:      true,
+			expectedMaxParallelism: 2,
+		},
+		{
+			name:                   "NilParallelismConfiguredBehavior",
+			parallelism:            nil,
+			parallelismBehavior:    "configured",
+			remainingParallelism:   2,
+			arrayNodeSize:          3,
+			expectedIncrement:      true,
+			expectedMaxParallelism: 2,
+		},
+		{
+			name:                   "NilParallelismUnlimitedBehavior",
+			parallelism:            nil,
+			parallelismBehavior:    "unlimited",
+			remainingParallelism:   2,
+			arrayNodeSize:          3,
+			expectedIncrement:      false,
+			expectedMaxParallelism: 3,
+		},
+		{
+			name:                   "ZeroParallelismWorkflowBehavior",
+			parallelism:            &zero,
+			parallelismBehavior:    "workflow",
+			remainingParallelism:   2,
+			arrayNodeSize:          3,
+			expectedIncrement:      true,
+			expectedMaxParallelism: 2,
+		},
+		{
+			name:                   "ZeroParallelismConfiguredBehavior",
+			parallelism:            &zero,
+			parallelismBehavior:    "configured",
+			remainingParallelism:   2,
+			arrayNodeSize:          3,
+			expectedIncrement:      false,
+			expectedMaxParallelism: 3,
+		},
+		{
+			name:                   "ZeroParallelismUnlimitedBehavior",
+			parallelism:            &zero,
+			parallelismBehavior:    "unlimited",
+			remainingParallelism:   2,
+			arrayNodeSize:          3,
+			expectedIncrement:      false,
+			expectedMaxParallelism: 3,
+		},
+		{
+			name:                   "OneParallelismWorkflowBehavior",
+			parallelism:            &one,
+			parallelismBehavior:    "workflow",
+			remainingParallelism:   2,
+			arrayNodeSize:          3,
+			expectedIncrement:      false,
+			expectedMaxParallelism: 1,
+		},
+		{
+			name:                   "OneParallelismConfiguredBehavior",
+			parallelism:            &one,
+			parallelismBehavior:    "configured",
+			remainingParallelism:   2,
+			arrayNodeSize:          3,
+			expectedIncrement:      false,
+			expectedMaxParallelism: 1,
+		},
+		{
+			name:                   "OneParallelismUnlimitedBehavior",
+			parallelism:            &one,
+			parallelismBehavior:    "unlimited",
+			remainingParallelism:   2,
+			arrayNodeSize:          3,
+			expectedIncrement:      false,
+			expectedMaxParallelism: 1,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			increment, maxParallelism := identifyParallelism(tt.parallelism, tt.parallelismBehavior, tt.remainingParallelism, tt.arrayNodeSize)
+			assert.Equal(t, tt.expectedIncrement, increment)
+			assert.Equal(t, tt.expectedMaxParallelism, maxParallelism)
+		})
+	}
+
+	//func identifyParallelism(parallelism *uint32, parallelismBehavior string, remainingWorkflowParallelism, arrayNodeSize int) (bool, int) {
+}

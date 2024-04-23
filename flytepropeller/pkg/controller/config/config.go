@@ -118,8 +118,7 @@ var (
 		NodeExecutionWorkerCount: 8,
 		ArrayNode: ArrayNodeConfig{
 			EventVersion:               0,
-			//DefaultParallelismBehavior: ParallelismBehaviorUnlimited,
-			DefaultParallelismBehavior: ParallelismBehaviorConfigured,
+			DefaultParallelismBehavior: ParallelismBehaviorUnlimited,
 		},
 	}
 )
