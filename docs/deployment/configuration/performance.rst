@@ -27,8 +27,8 @@ This is not typically achieved on its full on the first attempt (either due to t
 That iterative process is what we call in this document an "evaluation loop".
 
 
-Summarized steps of a workflow execution
-_________________________________________
+Summarized steps in a workflow execution
+========================================
 
 The following description is centered in the ``Worker``: the independent, lightweight and idempotent process that interacts with all the components in the Propeller controller to drive executions. 
 It's implemented as a ``goroutine``, and illustrated here as a hard-working gopher which:
@@ -39,7 +39,33 @@ It's implemented as a ``goroutine``, and illustrated here as a hard-working goph
 4. Keeps a local copy of the execution status, besides what the K8s API stores in ``etcd``.
 5. Informs the control plane and, hence, the user.
 
+Optimizing performance on each stage
+------------------------------------
 
+1. Worker, the WorkQueue and evaluation loop 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :widths: 25 25 50 100
+   :header-rows: 1
+
+   * - Metric
+     - Alerting factor
+     - Configuration parameter
+     - Default value
+   * - ``flyte:propeller:all:free_workers_count``
+     - Flyte Propeller Dashboard
+     - A low number of free workers results in higher overall latency for each workflow evaluation round.
+     - ``plugins.workqueue.config``
+     - ``10``
+   * - ``sum(rate(flyte:propeller:all:round:raw_ms[5m])) by (wf)``
+     - Flyte Propeller Dashboard
+     - Round Latency for each workflow eval loop increases
+     - Flyte propeller is taking more time to process each workflow
+   * - ``sum(rate(flyte:propeller:all:main_depth[5m]))``
+     - Flyte Propeller Dashboard
+     - Workflows take longer to start or slow
+     - The processing queue depth is long and is taking long to drain
 
 Scaling up FlytePropeller
 ==========================
@@ -55,26 +81,7 @@ FlytePropeller will automatically slow down, without losing correctness.
 Signs of slowdown
 ------------------
 
-.. list-table:: Important metrics to look out for in Prometheus dashboard
-   :widths: 25 25 50 100
-   :header-rows: 1
 
-   * - Metric
-     - Dashboard
-     - Alerting factor
-     - Effect
-   * - ``flyte:propeller:all:free_workers_count``
-     - Flyte Propeller Dashboard
-     - Number of free-workers in all FlytePropeller instances are very low.
-     - This will increase overall latency for Each workflow propagation
-   * - ``sum(rate(flyte:propeller:all:round:raw_ms[5m])) by (wf)``
-     - Flyte Propeller Dashboard
-     - Round Latency for Each workflow increases
-     - Flyte propeller is taking more time to process each workflow
-   * - ``sum(rate(flyte:propeller:all:main_depth[5m]))``
-     - Flyte Propeller Dashboard
-     - Workflows take longer to start or slow
-     - The processing queue depth is long and is taking long to drain
 
 For each of the metrics above you can dig deeper into the cause for this spike in latency. All of them are mostly related to one latency and should be correlated - ``The Round latency!``.
 The round-latency is the time it takes for FlytePropeller to to perform a single iteration of workflow evaluation. To understand this, you have to understand the :ref:`divedeep-execution-timeline`. Once you understand this, continue reading on.
