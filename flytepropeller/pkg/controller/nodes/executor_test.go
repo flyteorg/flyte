@@ -3101,8 +3101,15 @@ func Test_replaceRemotePathsForMap(t *testing.T) {
 			},
 		},
 	}
+	nodeExecutor := &nodeExecutor{
+		metrics: &nodeMetrics{
+			acceleratedInputCount: labeled.Counter{
+				CounterVec: prometheus.NewCounterVec(prometheus.CounterOpts{}, []string{}),
+			},
+		},
+	}
 
-	replaceRemotePathsForMap(ctx, input)
+	nodeExecutor.replaceRemotePathsForMap(ctx, input)
 
 	assert.Equal(t, expected, input)
 }
