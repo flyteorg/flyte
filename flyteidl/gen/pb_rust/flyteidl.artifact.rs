@@ -383,4 +383,30 @@ pub struct GetCardResponse {
     #[prost(message, optional, tag="1")]
     pub card: ::core::option::Option<Card>,
 }
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetTriggeringArtifactsRequest {
+    #[prost(message, repeated, tag="1")]
+    pub executions: ::prost::alloc::vec::Vec<super::core::WorkflowExecutionIdentifier>,
+}
+/// Keys can only be primitive types. This key is a json string
+/// representation of the workflow execution identifier
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetTriggeringArtifactsResponse {
+    #[prost(map="string, message", tag="1")]
+    pub artifacts: ::std::collections::HashMap<::prost::alloc::string::String, super::core::ArtifactId>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetTriggeredExecutionsByArtifactRequest {
+    #[prost(message, optional, tag="1")]
+    pub artifact_id: ::core::option::Option<super::core::ArtifactId>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetTriggeredExecutionsByArtifactResponse {
+    #[prost(message, repeated, tag="1")]
+    pub executions: ::prost::alloc::vec::Vec<super::core::WorkflowExecutionIdentifier>,
+}
 // @@protoc_insertion_point(module)

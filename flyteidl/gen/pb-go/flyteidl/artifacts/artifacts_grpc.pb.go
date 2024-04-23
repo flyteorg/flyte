@@ -19,20 +19,22 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	ArtifactRegistry_CreateArtifact_FullMethodName        = "/flyteidl.artifact.ArtifactRegistry/CreateArtifact"
-	ArtifactRegistry_GetArtifact_FullMethodName           = "/flyteidl.artifact.ArtifactRegistry/GetArtifact"
-	ArtifactRegistry_SearchArtifacts_FullMethodName       = "/flyteidl.artifact.ArtifactRegistry/SearchArtifacts"
-	ArtifactRegistry_CreateTrigger_FullMethodName         = "/flyteidl.artifact.ArtifactRegistry/CreateTrigger"
-	ArtifactRegistry_ActivateTrigger_FullMethodName       = "/flyteidl.artifact.ArtifactRegistry/ActivateTrigger"
-	ArtifactRegistry_DeactivateTrigger_FullMethodName     = "/flyteidl.artifact.ArtifactRegistry/DeactivateTrigger"
-	ArtifactRegistry_DeactivateAllTriggers_FullMethodName = "/flyteidl.artifact.ArtifactRegistry/DeactivateAllTriggers"
-	ArtifactRegistry_GetCard_FullMethodName               = "/flyteidl.artifact.ArtifactRegistry/GetCard"
-	ArtifactRegistry_AddTag_FullMethodName                = "/flyteidl.artifact.ArtifactRegistry/AddTag"
-	ArtifactRegistry_RegisterProducer_FullMethodName      = "/flyteidl.artifact.ArtifactRegistry/RegisterProducer"
-	ArtifactRegistry_RegisterConsumer_FullMethodName      = "/flyteidl.artifact.ArtifactRegistry/RegisterConsumer"
-	ArtifactRegistry_SetExecutionInputs_FullMethodName    = "/flyteidl.artifact.ArtifactRegistry/SetExecutionInputs"
-	ArtifactRegistry_FindByWorkflowExec_FullMethodName    = "/flyteidl.artifact.ArtifactRegistry/FindByWorkflowExec"
-	ArtifactRegistry_ListUsage_FullMethodName             = "/flyteidl.artifact.ArtifactRegistry/ListUsage"
+	ArtifactRegistry_CreateArtifact_FullMethodName                   = "/flyteidl.artifact.ArtifactRegistry/CreateArtifact"
+	ArtifactRegistry_GetArtifact_FullMethodName                      = "/flyteidl.artifact.ArtifactRegistry/GetArtifact"
+	ArtifactRegistry_SearchArtifacts_FullMethodName                  = "/flyteidl.artifact.ArtifactRegistry/SearchArtifacts"
+	ArtifactRegistry_CreateTrigger_FullMethodName                    = "/flyteidl.artifact.ArtifactRegistry/CreateTrigger"
+	ArtifactRegistry_ActivateTrigger_FullMethodName                  = "/flyteidl.artifact.ArtifactRegistry/ActivateTrigger"
+	ArtifactRegistry_DeactivateTrigger_FullMethodName                = "/flyteidl.artifact.ArtifactRegistry/DeactivateTrigger"
+	ArtifactRegistry_DeactivateAllTriggers_FullMethodName            = "/flyteidl.artifact.ArtifactRegistry/DeactivateAllTriggers"
+	ArtifactRegistry_GetCard_FullMethodName                          = "/flyteidl.artifact.ArtifactRegistry/GetCard"
+	ArtifactRegistry_AddTag_FullMethodName                           = "/flyteidl.artifact.ArtifactRegistry/AddTag"
+	ArtifactRegistry_RegisterProducer_FullMethodName                 = "/flyteidl.artifact.ArtifactRegistry/RegisterProducer"
+	ArtifactRegistry_RegisterConsumer_FullMethodName                 = "/flyteidl.artifact.ArtifactRegistry/RegisterConsumer"
+	ArtifactRegistry_SetExecutionInputs_FullMethodName               = "/flyteidl.artifact.ArtifactRegistry/SetExecutionInputs"
+	ArtifactRegistry_FindByWorkflowExec_FullMethodName               = "/flyteidl.artifact.ArtifactRegistry/FindByWorkflowExec"
+	ArtifactRegistry_ListUsage_FullMethodName                        = "/flyteidl.artifact.ArtifactRegistry/ListUsage"
+	ArtifactRegistry_GetTriggeringArtifacts_FullMethodName           = "/flyteidl.artifact.ArtifactRegistry/GetTriggeringArtifacts"
+	ArtifactRegistry_GetTriggeredExecutionsByArtifact_FullMethodName = "/flyteidl.artifact.ArtifactRegistry/GetTriggeredExecutionsByArtifact"
 )
 
 // ArtifactRegistryClient is the client API for ArtifactRegistry service.
@@ -53,6 +55,8 @@ type ArtifactRegistryClient interface {
 	SetExecutionInputs(ctx context.Context, in *ExecutionInputsRequest, opts ...grpc.CallOption) (*ExecutionInputsResponse, error)
 	FindByWorkflowExec(ctx context.Context, in *FindByWorkflowExecRequest, opts ...grpc.CallOption) (*SearchArtifactsResponse, error)
 	ListUsage(ctx context.Context, in *ListUsageRequest, opts ...grpc.CallOption) (*ListUsageResponse, error)
+	GetTriggeringArtifacts(ctx context.Context, in *GetTriggeringArtifactsRequest, opts ...grpc.CallOption) (*GetTriggeringArtifactsResponse, error)
+	GetTriggeredExecutionsByArtifact(ctx context.Context, in *GetTriggeredExecutionsByArtifactRequest, opts ...grpc.CallOption) (*GetTriggeredExecutionsByArtifactResponse, error)
 }
 
 type artifactRegistryClient struct {
@@ -189,6 +193,24 @@ func (c *artifactRegistryClient) ListUsage(ctx context.Context, in *ListUsageReq
 	return out, nil
 }
 
+func (c *artifactRegistryClient) GetTriggeringArtifacts(ctx context.Context, in *GetTriggeringArtifactsRequest, opts ...grpc.CallOption) (*GetTriggeringArtifactsResponse, error) {
+	out := new(GetTriggeringArtifactsResponse)
+	err := c.cc.Invoke(ctx, ArtifactRegistry_GetTriggeringArtifacts_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *artifactRegistryClient) GetTriggeredExecutionsByArtifact(ctx context.Context, in *GetTriggeredExecutionsByArtifactRequest, opts ...grpc.CallOption) (*GetTriggeredExecutionsByArtifactResponse, error) {
+	out := new(GetTriggeredExecutionsByArtifactResponse)
+	err := c.cc.Invoke(ctx, ArtifactRegistry_GetTriggeredExecutionsByArtifact_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ArtifactRegistryServer is the server API for ArtifactRegistry service.
 // All implementations should embed UnimplementedArtifactRegistryServer
 // for forward compatibility
@@ -207,6 +229,8 @@ type ArtifactRegistryServer interface {
 	SetExecutionInputs(context.Context, *ExecutionInputsRequest) (*ExecutionInputsResponse, error)
 	FindByWorkflowExec(context.Context, *FindByWorkflowExecRequest) (*SearchArtifactsResponse, error)
 	ListUsage(context.Context, *ListUsageRequest) (*ListUsageResponse, error)
+	GetTriggeringArtifacts(context.Context, *GetTriggeringArtifactsRequest) (*GetTriggeringArtifactsResponse, error)
+	GetTriggeredExecutionsByArtifact(context.Context, *GetTriggeredExecutionsByArtifactRequest) (*GetTriggeredExecutionsByArtifactResponse, error)
 }
 
 // UnimplementedArtifactRegistryServer should be embedded to have forward compatible implementations.
@@ -254,6 +278,12 @@ func (UnimplementedArtifactRegistryServer) FindByWorkflowExec(context.Context, *
 }
 func (UnimplementedArtifactRegistryServer) ListUsage(context.Context, *ListUsageRequest) (*ListUsageResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListUsage not implemented")
+}
+func (UnimplementedArtifactRegistryServer) GetTriggeringArtifacts(context.Context, *GetTriggeringArtifactsRequest) (*GetTriggeringArtifactsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetTriggeringArtifacts not implemented")
+}
+func (UnimplementedArtifactRegistryServer) GetTriggeredExecutionsByArtifact(context.Context, *GetTriggeredExecutionsByArtifactRequest) (*GetTriggeredExecutionsByArtifactResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetTriggeredExecutionsByArtifact not implemented")
 }
 
 // UnsafeArtifactRegistryServer may be embedded to opt out of forward compatibility for this service.
@@ -519,6 +549,42 @@ func _ArtifactRegistry_ListUsage_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ArtifactRegistry_GetTriggeringArtifacts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetTriggeringArtifactsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArtifactRegistryServer).GetTriggeringArtifacts(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArtifactRegistry_GetTriggeringArtifacts_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArtifactRegistryServer).GetTriggeringArtifacts(ctx, req.(*GetTriggeringArtifactsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ArtifactRegistry_GetTriggeredExecutionsByArtifact_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetTriggeredExecutionsByArtifactRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArtifactRegistryServer).GetTriggeredExecutionsByArtifact(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArtifactRegistry_GetTriggeredExecutionsByArtifact_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArtifactRegistryServer).GetTriggeredExecutionsByArtifact(ctx, req.(*GetTriggeredExecutionsByArtifactRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ArtifactRegistry_ServiceDesc is the grpc.ServiceDesc for ArtifactRegistry service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -581,6 +647,14 @@ var ArtifactRegistry_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListUsage",
 			Handler:    _ArtifactRegistry_ListUsage_Handler,
+		},
+		{
+			MethodName: "GetTriggeringArtifacts",
+			Handler:    _ArtifactRegistry_GetTriggeringArtifacts_Handler,
+		},
+		{
+			MethodName: "GetTriggeredExecutionsByArtifact",
+			Handler:    _ArtifactRegistry_GetTriggeredExecutionsByArtifact_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

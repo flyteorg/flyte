@@ -1603,3 +1603,154 @@ export class GetCardResponse extends Message<GetCardResponse> {
   }
 }
 
+/**
+ * @generated from message flyteidl.artifact.GetTriggeringArtifactsRequest
+ */
+export class GetTriggeringArtifactsRequest extends Message<GetTriggeringArtifactsRequest> {
+  /**
+   * @generated from field: repeated flyteidl.core.WorkflowExecutionIdentifier executions = 1;
+   */
+  executions: WorkflowExecutionIdentifier[] = [];
+
+  constructor(data?: PartialMessage<GetTriggeringArtifactsRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.artifact.GetTriggeringArtifactsRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "executions", kind: "message", T: WorkflowExecutionIdentifier, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetTriggeringArtifactsRequest {
+    return new GetTriggeringArtifactsRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetTriggeringArtifactsRequest {
+    return new GetTriggeringArtifactsRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetTriggeringArtifactsRequest {
+    return new GetTriggeringArtifactsRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GetTriggeringArtifactsRequest | PlainMessage<GetTriggeringArtifactsRequest> | undefined, b: GetTriggeringArtifactsRequest | PlainMessage<GetTriggeringArtifactsRequest> | undefined): boolean {
+    return proto3.util.equals(GetTriggeringArtifactsRequest, a, b);
+  }
+}
+
+/**
+ * Keys can only be primitive types. This key is a json string
+ * representation of the workflow execution identifier
+ *
+ * @generated from message flyteidl.artifact.GetTriggeringArtifactsResponse
+ */
+export class GetTriggeringArtifactsResponse extends Message<GetTriggeringArtifactsResponse> {
+  /**
+   * @generated from field: map<string, flyteidl.core.ArtifactID> artifacts = 1;
+   */
+  artifacts: { [key: string]: ArtifactID } = {};
+
+  constructor(data?: PartialMessage<GetTriggeringArtifactsResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.artifact.GetTriggeringArtifactsResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "artifacts", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: ArtifactID} },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetTriggeringArtifactsResponse {
+    return new GetTriggeringArtifactsResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetTriggeringArtifactsResponse {
+    return new GetTriggeringArtifactsResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetTriggeringArtifactsResponse {
+    return new GetTriggeringArtifactsResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GetTriggeringArtifactsResponse | PlainMessage<GetTriggeringArtifactsResponse> | undefined, b: GetTriggeringArtifactsResponse | PlainMessage<GetTriggeringArtifactsResponse> | undefined): boolean {
+    return proto3.util.equals(GetTriggeringArtifactsResponse, a, b);
+  }
+}
+
+/**
+ * @generated from message flyteidl.artifact.GetTriggeredExecutionsByArtifactRequest
+ */
+export class GetTriggeredExecutionsByArtifactRequest extends Message<GetTriggeredExecutionsByArtifactRequest> {
+  /**
+   * @generated from field: flyteidl.core.ArtifactID artifact_id = 1;
+   */
+  artifactId?: ArtifactID;
+
+  constructor(data?: PartialMessage<GetTriggeredExecutionsByArtifactRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.artifact.GetTriggeredExecutionsByArtifactRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "artifact_id", kind: "message", T: ArtifactID },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetTriggeredExecutionsByArtifactRequest {
+    return new GetTriggeredExecutionsByArtifactRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetTriggeredExecutionsByArtifactRequest {
+    return new GetTriggeredExecutionsByArtifactRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetTriggeredExecutionsByArtifactRequest {
+    return new GetTriggeredExecutionsByArtifactRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GetTriggeredExecutionsByArtifactRequest | PlainMessage<GetTriggeredExecutionsByArtifactRequest> | undefined, b: GetTriggeredExecutionsByArtifactRequest | PlainMessage<GetTriggeredExecutionsByArtifactRequest> | undefined): boolean {
+    return proto3.util.equals(GetTriggeredExecutionsByArtifactRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message flyteidl.artifact.GetTriggeredExecutionsByArtifactResponse
+ */
+export class GetTriggeredExecutionsByArtifactResponse extends Message<GetTriggeredExecutionsByArtifactResponse> {
+  /**
+   * @generated from field: repeated flyteidl.core.WorkflowExecutionIdentifier executions = 1;
+   */
+  executions: WorkflowExecutionIdentifier[] = [];
+
+  constructor(data?: PartialMessage<GetTriggeredExecutionsByArtifactResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.artifact.GetTriggeredExecutionsByArtifactResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "executions", kind: "message", T: WorkflowExecutionIdentifier, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetTriggeredExecutionsByArtifactResponse {
+    return new GetTriggeredExecutionsByArtifactResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetTriggeredExecutionsByArtifactResponse {
+    return new GetTriggeredExecutionsByArtifactResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetTriggeredExecutionsByArtifactResponse {
+    return new GetTriggeredExecutionsByArtifactResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GetTriggeredExecutionsByArtifactResponse | PlainMessage<GetTriggeredExecutionsByArtifactResponse> | undefined, b: GetTriggeredExecutionsByArtifactResponse | PlainMessage<GetTriggeredExecutionsByArtifactResponse> | undefined): boolean {
+    return proto3.util.equals(GetTriggeredExecutionsByArtifactResponse, a, b);
+  }
+}
+

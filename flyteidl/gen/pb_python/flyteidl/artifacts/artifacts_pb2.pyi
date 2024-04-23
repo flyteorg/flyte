@@ -314,3 +314,34 @@ class GetCardResponse(_message.Message):
     CARD_FIELD_NUMBER: _ClassVar[int]
     card: Card
     def __init__(self, card: _Optional[_Union[Card, _Mapping]] = ...) -> None: ...
+
+class GetTriggeringArtifactsRequest(_message.Message):
+    __slots__ = ["executions"]
+    EXECUTIONS_FIELD_NUMBER: _ClassVar[int]
+    executions: _containers.RepeatedCompositeFieldContainer[_identifier_pb2.WorkflowExecutionIdentifier]
+    def __init__(self, executions: _Optional[_Iterable[_Union[_identifier_pb2.WorkflowExecutionIdentifier, _Mapping]]] = ...) -> None: ...
+
+class GetTriggeringArtifactsResponse(_message.Message):
+    __slots__ = ["artifacts"]
+    class ArtifactsEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: _artifact_id_pb2.ArtifactID
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[_artifact_id_pb2.ArtifactID, _Mapping]] = ...) -> None: ...
+    ARTIFACTS_FIELD_NUMBER: _ClassVar[int]
+    artifacts: _containers.MessageMap[str, _artifact_id_pb2.ArtifactID]
+    def __init__(self, artifacts: _Optional[_Mapping[str, _artifact_id_pb2.ArtifactID]] = ...) -> None: ...
+
+class GetTriggeredExecutionsByArtifactRequest(_message.Message):
+    __slots__ = ["artifact_id"]
+    ARTIFACT_ID_FIELD_NUMBER: _ClassVar[int]
+    artifact_id: _artifact_id_pb2.ArtifactID
+    def __init__(self, artifact_id: _Optional[_Union[_artifact_id_pb2.ArtifactID, _Mapping]] = ...) -> None: ...
+
+class GetTriggeredExecutionsByArtifactResponse(_message.Message):
+    __slots__ = ["executions"]
+    EXECUTIONS_FIELD_NUMBER: _ClassVar[int]
+    executions: _containers.RepeatedCompositeFieldContainer[_identifier_pb2.WorkflowExecutionIdentifier]
+    def __init__(self, executions: _Optional[_Iterable[_Union[_identifier_pb2.WorkflowExecutionIdentifier, _Mapping]]] = ...) -> None: ...

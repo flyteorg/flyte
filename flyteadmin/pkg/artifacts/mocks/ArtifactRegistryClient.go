@@ -449,6 +449,102 @@ func (_m *ArtifactRegistryClient) GetCard(ctx context.Context, in *artifacts.Get
 	return r0, r1
 }
 
+type ArtifactRegistryClient_GetTriggeredExecutionsByArtifact struct {
+	*mock.Call
+}
+
+func (_m ArtifactRegistryClient_GetTriggeredExecutionsByArtifact) Return(_a0 *artifacts.GetTriggeredExecutionsByArtifactResponse, _a1 error) *ArtifactRegistryClient_GetTriggeredExecutionsByArtifact {
+	return &ArtifactRegistryClient_GetTriggeredExecutionsByArtifact{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *ArtifactRegistryClient) OnGetTriggeredExecutionsByArtifact(ctx context.Context, in *artifacts.GetTriggeredExecutionsByArtifactRequest, opts ...grpc.CallOption) *ArtifactRegistryClient_GetTriggeredExecutionsByArtifact {
+	c_call := _m.On("GetTriggeredExecutionsByArtifact", ctx, in, opts)
+	return &ArtifactRegistryClient_GetTriggeredExecutionsByArtifact{Call: c_call}
+}
+
+func (_m *ArtifactRegistryClient) OnGetTriggeredExecutionsByArtifactMatch(matchers ...interface{}) *ArtifactRegistryClient_GetTriggeredExecutionsByArtifact {
+	c_call := _m.On("GetTriggeredExecutionsByArtifact", matchers...)
+	return &ArtifactRegistryClient_GetTriggeredExecutionsByArtifact{Call: c_call}
+}
+
+// GetTriggeredExecutionsByArtifact provides a mock function with given fields: ctx, in, opts
+func (_m *ArtifactRegistryClient) GetTriggeredExecutionsByArtifact(ctx context.Context, in *artifacts.GetTriggeredExecutionsByArtifactRequest, opts ...grpc.CallOption) (*artifacts.GetTriggeredExecutionsByArtifactResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *artifacts.GetTriggeredExecutionsByArtifactResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *artifacts.GetTriggeredExecutionsByArtifactRequest, ...grpc.CallOption) *artifacts.GetTriggeredExecutionsByArtifactResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*artifacts.GetTriggeredExecutionsByArtifactResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *artifacts.GetTriggeredExecutionsByArtifactRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type ArtifactRegistryClient_GetTriggeringArtifacts struct {
+	*mock.Call
+}
+
+func (_m ArtifactRegistryClient_GetTriggeringArtifacts) Return(_a0 *artifacts.GetTriggeringArtifactsResponse, _a1 error) *ArtifactRegistryClient_GetTriggeringArtifacts {
+	return &ArtifactRegistryClient_GetTriggeringArtifacts{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *ArtifactRegistryClient) OnGetTriggeringArtifacts(ctx context.Context, in *artifacts.GetTriggeringArtifactsRequest, opts ...grpc.CallOption) *ArtifactRegistryClient_GetTriggeringArtifacts {
+	c_call := _m.On("GetTriggeringArtifacts", ctx, in, opts)
+	return &ArtifactRegistryClient_GetTriggeringArtifacts{Call: c_call}
+}
+
+func (_m *ArtifactRegistryClient) OnGetTriggeringArtifactsMatch(matchers ...interface{}) *ArtifactRegistryClient_GetTriggeringArtifacts {
+	c_call := _m.On("GetTriggeringArtifacts", matchers...)
+	return &ArtifactRegistryClient_GetTriggeringArtifacts{Call: c_call}
+}
+
+// GetTriggeringArtifacts provides a mock function with given fields: ctx, in, opts
+func (_m *ArtifactRegistryClient) GetTriggeringArtifacts(ctx context.Context, in *artifacts.GetTriggeringArtifactsRequest, opts ...grpc.CallOption) (*artifacts.GetTriggeringArtifactsResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *artifacts.GetTriggeringArtifactsResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *artifacts.GetTriggeringArtifactsRequest, ...grpc.CallOption) *artifacts.GetTriggeringArtifactsResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*artifacts.GetTriggeringArtifactsResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *artifacts.GetTriggeringArtifactsRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type ArtifactRegistryClient_ListUsage struct {
 	*mock.Call
 }

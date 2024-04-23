@@ -238,6 +238,70 @@
         ]
       }
     },
+    "/artifacts/api/v1/triggered_executions": {
+      "post": {
+        "operationId": "ArtifactRegistry_GetTriggeredExecutionsByArtifact",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/artifactGetTriggeredExecutionsByArtifactResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/artifactGetTriggeredExecutionsByArtifactRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ArtifactRegistry"
+        ]
+      }
+    },
+    "/artifacts/api/v1/triggering_artifacts": {
+      "post": {
+        "operationId": "ArtifactRegistry_GetTriggeringArtifacts",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/artifactGetTriggeringArtifactsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/artifactGetTriggeringArtifactsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ArtifactRegistry"
+        ]
+      }
+    },
     "/artifacts/api/v1/usage/{artifact_id.artifact_key.project}/{artifact_id.artifact_key.domain}/{artifact_id.artifact_key.name}/{artifact_id.version}": {
       "get": {
         "operationId": "ArtifactRegistry_ListUsage",
@@ -954,6 +1018,50 @@
           "$ref": "#/definitions/artifactCard"
         }
       }
+    },
+    "artifactGetTriggeredExecutionsByArtifactRequest": {
+      "type": "object",
+      "properties": {
+        "artifact_id": {
+          "$ref": "#/definitions/coreArtifactID"
+        }
+      }
+    },
+    "artifactGetTriggeredExecutionsByArtifactResponse": {
+      "type": "object",
+      "properties": {
+        "executions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/coreWorkflowExecutionIdentifier"
+          }
+        }
+      }
+    },
+    "artifactGetTriggeringArtifactsRequest": {
+      "type": "object",
+      "properties": {
+        "executions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/coreWorkflowExecutionIdentifier"
+          }
+        }
+      }
+    },
+    "artifactGetTriggeringArtifactsResponse": {
+      "type": "object",
+      "properties": {
+        "artifacts": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/coreArtifactID"
+          }
+        }
+      },
+      "title": "Keys can only be primitive types. This key is a json string\nrepresentation of the workflow execution identifier"
     },
     "artifactListUsageResponse": {
       "type": "object",

@@ -84,6 +84,16 @@ class ArtifactRegistryStub(object):
                 request_serializer=flyteidl_dot_artifacts_dot_artifacts__pb2.ListUsageRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_artifacts_dot_artifacts__pb2.ListUsageResponse.FromString,
                 )
+        self.GetTriggeringArtifacts = channel.unary_unary(
+                '/flyteidl.artifact.ArtifactRegistry/GetTriggeringArtifacts',
+                request_serializer=flyteidl_dot_artifacts_dot_artifacts__pb2.GetTriggeringArtifactsRequest.SerializeToString,
+                response_deserializer=flyteidl_dot_artifacts_dot_artifacts__pb2.GetTriggeringArtifactsResponse.FromString,
+                )
+        self.GetTriggeredExecutionsByArtifact = channel.unary_unary(
+                '/flyteidl.artifact.ArtifactRegistry/GetTriggeredExecutionsByArtifact',
+                request_serializer=flyteidl_dot_artifacts_dot_artifacts__pb2.GetTriggeredExecutionsByArtifactRequest.SerializeToString,
+                response_deserializer=flyteidl_dot_artifacts_dot_artifacts__pb2.GetTriggeredExecutionsByArtifactResponse.FromString,
+                )
 
 
 class ArtifactRegistryServicer(object):
@@ -173,6 +183,18 @@ class ArtifactRegistryServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def GetTriggeringArtifacts(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetTriggeredExecutionsByArtifact(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_ArtifactRegistryServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -245,6 +267,16 @@ def add_ArtifactRegistryServicer_to_server(servicer, server):
                     servicer.ListUsage,
                     request_deserializer=flyteidl_dot_artifacts_dot_artifacts__pb2.ListUsageRequest.FromString,
                     response_serializer=flyteidl_dot_artifacts_dot_artifacts__pb2.ListUsageResponse.SerializeToString,
+            ),
+            'GetTriggeringArtifacts': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetTriggeringArtifacts,
+                    request_deserializer=flyteidl_dot_artifacts_dot_artifacts__pb2.GetTriggeringArtifactsRequest.FromString,
+                    response_serializer=flyteidl_dot_artifacts_dot_artifacts__pb2.GetTriggeringArtifactsResponse.SerializeToString,
+            ),
+            'GetTriggeredExecutionsByArtifact': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetTriggeredExecutionsByArtifact,
+                    request_deserializer=flyteidl_dot_artifacts_dot_artifacts__pb2.GetTriggeredExecutionsByArtifactRequest.FromString,
+                    response_serializer=flyteidl_dot_artifacts_dot_artifacts__pb2.GetTriggeredExecutionsByArtifactResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -491,5 +523,39 @@ class ArtifactRegistry(object):
         return grpc.experimental.unary_unary(request, target, '/flyteidl.artifact.ArtifactRegistry/ListUsage',
             flyteidl_dot_artifacts_dot_artifacts__pb2.ListUsageRequest.SerializeToString,
             flyteidl_dot_artifacts_dot_artifacts__pb2.ListUsageResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetTriggeringArtifacts(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl.artifact.ArtifactRegistry/GetTriggeringArtifacts',
+            flyteidl_dot_artifacts_dot_artifacts__pb2.GetTriggeringArtifactsRequest.SerializeToString,
+            flyteidl_dot_artifacts_dot_artifacts__pb2.GetTriggeringArtifactsResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetTriggeredExecutionsByArtifact(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl.artifact.ArtifactRegistry/GetTriggeredExecutionsByArtifact',
+            flyteidl_dot_artifacts_dot_artifacts__pb2.GetTriggeredExecutionsByArtifactRequest.SerializeToString,
+            flyteidl_dot_artifacts_dot_artifacts__pb2.GetTriggeredExecutionsByArtifactResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
