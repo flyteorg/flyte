@@ -48,7 +48,7 @@ custom-built Spark container. This container also facilitates the execution of s
 To use Spark, the image should employ a base image provided by Databricks,
 and the workflow code must be copied to `/databricks/driver`.
 
-```{literalinclude} ../../../examples/databricks_plugin/Dockerfile
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/databricks_plugin/Dockerfile
 :language: docker
 :emphasize-lines: 1,7-8,20
 ```

@@ -86,7 +86,7 @@ CMD pyflyte serve agent --port 8000
 
 ## Example usage
 
-For a usage example, see the {ref}`Memory Machine Cloud example <mmcloud_plugin_example>` page.
+For a usage example, see the {doc}`Memory Machine Cloud example<mmcloud_plugin_example>` page.
 
 
 

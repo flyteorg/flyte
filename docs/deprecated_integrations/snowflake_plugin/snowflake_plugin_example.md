@@ -6,9 +6,9 @@ This example shows how to use the `SnowflakeTask` to execute a query in Snowflak
 To clone and run the example code on this page, see the [Flytesnacks repo][flytesnacks].
 ```
 
-To begin, import the required libraries.
+To begin, import the required libraries:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/snowflake_plugin/snowflake_plugin_example.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/snowflake_plugin/snowflake_plugin/snowflake_plugin_example.py
 :caption: snowflake_plugin/snowflake_plugin_example.py
 :lines: 1-2
 ```
@@ -16,7 +16,7 @@ To begin, import the required libraries.
 Instantiate a {py:class}`~flytekitplugins.snowflake.SnowflakeTask` to execute a query.
 Incorporate {py:class}`~flytekitplugins.snowflake.SnowflakeConfig` within the task to define the appropriate configuration.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/snowflake_plugin/snowflake_plugin_example.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/snowflake_plugin/snowflake_plugin/snowflake_plugin_example.py
 :caption: snowflake_plugin/snowflake_plugin_example.py
 :lines: 5-16
 ```
@@ -54,7 +54,7 @@ The data adheres to the following schema:
 Let us explore how we can parameterize our query to filter results for a specific country.
 This country will be provided as user input, using a nation key to specify it.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/snowflake_plugin/snowflake_plugin_example.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/snowflake_plugin/snowflake_plugin/snowflake_plugin_example.py
 :caption: snowflake_plugin/snowflake_plugin_example.py
 :lines: 19-35
 ```
@@ -64,7 +64,7 @@ To review the query results, access the Snowflake console at:
 
 You can also execute the task and workflow locally.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/snowflake_plugin/snowflake_plugin_example.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/snowflake_plugin/snowflake_plugin/snowflake_plugin_example.py
 :caption: snowflake_plugin/snowflake_plugin_example.py
 :lines: 42-44
 ```

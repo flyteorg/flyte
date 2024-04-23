@@ -22,7 +22,7 @@ This plugin is purely a spec. Since SQL is completely portable, there is no need
 
 ## Example usage
 
-For a usage example, see the {doc}`BigQuery example query<bigquery_plugin_example>` page.
+For a usage example, see the {ref}`BigQuery example query<bigquery_plugin_example>` page.
 
 ## Flyte deployment configuration
 
