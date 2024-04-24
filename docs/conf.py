@@ -94,6 +94,18 @@ extlinks = {
     "cookbook": ("https://flytecookbook.readthedocs.io/en/latest/", None),
 }
 
+# redirects
+redirects = {
+    "flytesnacks/examples/bigquery_plugin/index": "../../../deprecated_integrations/bigquery_plugin/index.html",
+    "flytesnacks/examples/bigquery_plugin/bigquery_plugin_example": "../../../deprecated_integrations/bigquery_plugin/biquery_plugin_example.html",
+    "flytesnacks/examples/databricks_plugin/index": "../../../deprecated_integrations/databricks_plugin/index.html",
+    "flytesnacks/examples/databricks_plugin/databricks_plugin_example": "../../../deprecated_integrations/databricks_plugin/databricks_plugin_example.html",
+    "flytesnacks/examples/mmcloud_plugin/index": "../../../deprecated_integrations/mmcloud_plugin/index.html",
+    "flytesnacks/examples/mmcloud_plugin/mmcloud_plugin_example": "../../../deprecated_integrations/mmcloud_plugin/mmcloud_plugin_example.html",
+    "flytesnacks/examples/snowflake_plugin/index": "../../../deprecated_integrations/snowflake_plugin/index.html",
+    "flytesnacks/examples/snowflake_plugin/snowflake_plugin_example": "../../../deprecated_integrations/snowflake_plugin/snowflake_plugin_example.html",
+}
+
 
 autosummary_generate = True
 suppress_warnings = ["autosectionlabel.*", "myst.header"]
@@ -341,8 +353,7 @@ import_projects_config = {
     "source_regex_mapping": REPLACE_PATTERNS,
     "list_table_toc": [
        "flytesnacks/tutorials",
-       "flytesnacks/integrations",
-       "flytesnacks/deprecated_integrations"
+       "flytesnacks/integrations"
     ],
     "dev_build": bool(int(os.environ.get("MONODOCS_DEV_BUILD", 1))),
 }
@@ -372,9 +383,6 @@ import_projects = [
                 "flytesnacks/auto_examples",
                 "flytesnacks/_build",
                 "flytesnacks/_tags",
-                "flytesnacks/getting_started",
-                "flytesnacks/userguide.md",
-                "flytesnacks/environment_setup.md",
                 "flytesnacks/index.md",
                 "examples/advanced_composition",
                 "examples/basics",
@@ -384,14 +392,10 @@ import_projects = [
                 "examples/extending",
                 "examples/productionizing",
                 "examples/testing",
-                "flytesnacks/examples/advanced_composition",
-                "flytesnacks/examples/basics",
-                "flytesnacks/examples/customizing_dependencies",
-                "flytesnacks/examples/data_types_and_io",
-                "flytesnacks/examples/development_lifecycle",
-                "flytesnacks/examples/extending",
-                "flytesnacks/examples/productionizing",
-                "flytesnacks/examples/testing",
+                "examples/bigquery_plugin",
+                "examples/databricks_plugin",
+                "examples/mmcloud_plugin",
+                "examples/snowflake_plugin",
             ]
         ],
         "local": flytesnacks_local_path is not None,
