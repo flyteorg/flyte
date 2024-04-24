@@ -176,6 +176,16 @@ In the ``flyteorg/flyte`` root directory you can run ``make dev-docs`` to build 
 
 For example, to use the local flytekit source code instead of the source code from the ``flyteorg/flytekit`` repo, run ``export FLYTEKIT_LOCAL_PATH=/path/to/flytekit`` before running ``make dev-docs``.
 
+**Alternative conda setup steps**
+
+* Install ``conda``.
+    *  We recommend Miniconda installed with an `official installer <https://docs.conda.io/projects/miniconda/en/latest/index.html#latest-miniconda-installer-links>`__.
+* Install `conda-lock <https://github.com/conda/conda-lock>`__.
+* In the ``flyteorg/flyte`` root directory run:
+    * ``conda-lock install --name monodocs-env monodocs-environment.lock.yaml``
+    * ``conda activate monodocs-env``
+    * ``pip install ./flyteidl``
+
 ``flyteidl``
 ************
 
