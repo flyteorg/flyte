@@ -65,6 +65,31 @@ func GetDB(ctx context.Context, dbConfig *DbConfig, logConfig *logger.Config) (
 	return gormDb, setupDbConnectionPool(ctx, gormDb, dbConfig)
 }
 
+// GetReadOnlyDB uses the dbConfig to create gorm DB object for the read replica passed via the config
+func GetReadOnlyDB(ctx context.Context, dbConfig *DbConfig, logConfig *logger.Config) (*gorm.DB, error) {
+	if dbConfig == nil {
+		panic("Cannot initialize database repository from empty db config")
+	}
+
+	if dbConfig.Postgres.IsEmpty() || dbConfig.Postgres.ReadReplicaHost == "" {
+		return nil, fmt.Errorf("read replica host not provided in db config")
+	}
+
+	gormConfig := &gorm.Config{
+		Logger:                                   GetGormLogger(ctx, logConfig),
+		DisableForeignKeyConstraintWhenMigrating: false,
+	}
+
+	var gormDb *gorm.DB
+	var err error
+	gormDb, err = CreatePostgresReadOnlyDbConnection(ctx, gormConfig, dbConfig.Postgres)
+	if err != nil {
+		return nil, err
+	}
+
+	return gormDb, nil
+}
+
 func setupDbConnectionPool(ctx context.Context, gormDb *gorm.DB, dbConfig *DbConfig) error {
 	genericDb, err := gormDb.DB()
 	if err != nil {
