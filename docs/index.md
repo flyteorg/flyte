@@ -138,6 +138,7 @@ Introduction <introduction>
 Quickstart guide <quickstart_guide>
 Getting started <getting_started/index>
 Core concepts <core_concepts/index>
+Data types and I/O <data_types_and_io/index>
 Flyte fundamentals <flyte_fundamentals/index>
 Flyte agents <flyte_agents/index>
 Core use cases <core_use_cases/index>

@@ -123,7 +123,16 @@ redirects = {
     "user_guide/advanced_composition/decorating_workflows": "../../core_concepts/workflows/decorating_workflows.html",
     "user_guide/advanced_composition/eager_workflows": "../../core_concepts/workflows/eager_workflows.html",
     "user_guide/advanced_composition/dynamic_workflows": "../../core_concepts/workflows/dynamic_workflows.html",
-    "user_guide/advanced_composition/subworkflows": "../../core_concepts/workflows/subworkflows.html"
+    "user_guide/advanced_composition/subworkflows": "../../core_concepts/workflows/subworkflows.html",
+    "user_guide/data_types_and_io/index": "../../data_types_and_io/index.html",
+    "user_guide/data_types_and_io/accessing_attributes": "../../data_types_and_io/accessing_attributes.html",
+    "user_guide/data_types_and_io/dataclass": "../../data_types_and_io/dataclass.html",
+    "user_guide/data_types_and_io/enum_type": "../../data_types_and_io/enum_type.html",
+    "user_guide/data_types_and_io/flytedirectory": "../../data_types_and_io/flytedirectory.html",
+    "user_guide/data_types_and_io/flytefile": "../../data_types_and_io/flytefile.html",
+    "user_guide/data_types_and_io/pickle_type": "../../data_types_and_io/pickle_type.html",
+    "user_guide/data_types_and_io/pytorch_type": "../../data_types_and_io/pytorch_type.html",
+    "user_guide/data_types_and_io/structureddataset": "../../data_types_and_io/structureddataset.html"
 }
 
 

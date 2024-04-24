@@ -37,8 +37,6 @@ Want to contribute or update an example? Check out the {doc}`Contribution Guide 
 
 * - {doc}`🌳 Environment Setup <environment_setup>`
   - Set up a development environment to run the examples in the user guide.
-* - {doc}`⌨️ Data Types and IO <data_types_and_io/index>`
-  - Improve pipeline robustness with Flyte's portable and extensible type system.
 * - {doc}`🔮 Advanced Composition <advanced_composition/index>`
   - Implement conditionals, nested and dynamic workflows, map tasks and even recursion!
 * - {doc}`🧩 Customizing Dependencies <customizing_dependencies/index>`
@@ -59,7 +57,6 @@ Want to contribute or update an example? Check out the {doc}`Contribution Guide 
 :hidden:
 
 environment_setup
-data_types_and_io/index
 advanced_composition/index
 customizing_dependencies/index
 development_lifecycle/index
