@@ -240,7 +240,3 @@ envd context create --name flyte-sandbox --builder tcp --builder-address localho
 ```
 
 You will also need to update your `ImageSpec` instances to set `registry="localhost:30000"`.
-
-## What's next?
-
-Try out the examples in the {doc}`Basics <basics/index>` section.

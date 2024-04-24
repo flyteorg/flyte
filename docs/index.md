@@ -137,6 +137,7 @@ Have questions or need support? The best way to reach us is through Slack:
 Introduction <introduction>
 Quickstart guide <quickstart_guide>
 Getting started <getting_started/index>
+Core concepts <core_concepts/index>
 Flyte fundamentals <flyte_fundamentals/index>
 Flyte agents <flyte_agents/index>
 Core use cases <core_use_cases/index>

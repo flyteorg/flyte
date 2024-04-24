@@ -13,13 +13,7 @@ dynamic workflows, map tasks, gate nodes and more.
 
 conditionals
 chaining_flyte_entities
-subworkflows
-dynamic_workflows
-map_tasks
 nested_parallelization
-eager_workflows
-decorating_tasks
-decorating_workflows
 intratask_checkpoints
 waiting_for_external_inputs
 ```

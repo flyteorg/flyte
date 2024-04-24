@@ -110,6 +110,20 @@ redirects = {
     "getting_started_with_workflow_development/flyte_project_components": "../getting_started/flyte_project_components.html",
     "getting_started_with_workflow_development/installing_development_tools": "../getting_started/installing_development_tools.html",
     "getting_started_with_workflow_development/running_a_workflow_locally": "../getting_started/running_a_workflow_locally.html",
+    "user_guide/basics/index": "../../core_concepts/index.html",
+    "user_guide/basics/documenting_workflows": "../../core_concepts/workflows/documenting_workflows.html",
+    "user_guide/basics/imperative_workflows": "../../core_concepts/workflows/imperative_workflows.html",
+    "user_guide/basics/tasks": "../../core_concepts/tasks/index.html",
+    "user_guide/basics/workflows": "../../core_concepts/workflows/index.html",
+    "user_guide/basics/launch_plans": "../../core_concepts/launch_plans/index.html",
+    "user_guide/basics/hello_world": "../../quickstart_guide.html",
+    "user_guide/basics/named_outputs": "../../core_concepts/tasks/named_outputs.html",
+    "user_guide/advanced_composition/decorating_tasks": "../../core_concepts/tasks/decorating_tasks.html",
+    "user_guide/advanced_composition/map_tasks": "../../core_concepts/tasks/map_tasks.html",
+    "user_guide/advanced_composition/decorating_workflows": "../../core_concepts/workflows/decorating_workflows.html",
+    "user_guide/advanced_composition/eager_workflows": "../../core_concepts/workflows/eager_workflows.html",
+    "user_guide/advanced_composition/dynamic_workflows": "../../core_concepts/workflows/dynamic_workflows.html",
+    "user_guide/advanced_composition/subworkflows": "../../core_concepts/workflows/subworkflows.html"
 }
 
 

@@ -106,4 +106,13 @@ You can use the {py:func}`functools.partial` function to assign default or const
 :lines: 39-45
 ```
 
+```{toctree}
+decorating_workflows
+documenting_workflows
+imperative_workflows
+dynamic_workflows
+eager_workflows
+subworkflows
+```
+
 [flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/basics/
