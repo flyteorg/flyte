@@ -106,10 +106,10 @@ redirects = {
     "flytesnacks/examples/snowflake_plugin/index": "../../../deprecated_integrations/snowflake_plugin/index.html",
     "flytesnacks/examples/snowflake_plugin/snowflake_plugin_example": "../../../deprecated_integrations/snowflake_plugin/snowflake_plugin_example.html",
     "getting_started_with_workflow_development/index": "getting_started/index.html",
-    "getting_started_with_workflow_development/creating_a_flyte_project": "getting_started/creating_a_flyte_project.html",
-    "getting_started_with_workflow_development/flyte_project_components": "getting_started/flyte_project_components.html",
-    "getting_started_with_workflow_development/installing_development_tools": "getting_started/installing_development_tools.html",
-    "getting_started_with_workflow_development/running_a_workflow_locally": "getting_started/running_a_workflow_locally.html",
+    "getting_started_with_workflow_development/creating_a_flyte_project": "../getting_started/creating_a_flyte_project.html",
+    "getting_started_with_workflow_development/flyte_project_components": "../getting_started/flyte_project_components.html",
+    "getting_started_with_workflow_development/installing_development_tools": "../getting_started/installing_development_tools.html",
+    "getting_started_with_workflow_development/running_a_workflow_locally": "../getting_started/running_a_workflow_locally.html",
 }
 
 
