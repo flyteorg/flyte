@@ -158,7 +158,7 @@ func IsMaxParallelismAchieved(ctx context.Context, currentNode v1alpha1.Executab
 		return false
 	}
 
-	if currentNode.GetKind() == v1alpha1.NodeKindTask ||
+	if currentNode.GetKind() == v1alpha1.NodeKindTask || currentNode.GetKind() == v1alpha1.NodeKindArray ||
 		(currentNode.GetKind() == v1alpha1.NodeKindWorkflow && currentNode.GetWorkflowNode() != nil && currentNode.GetWorkflowNode().GetLaunchPlanRefID() != nil) {
 		// If we are queued, let us see if we can proceed within the node parallelism bounds
 		if execContext.CurrentParallelism() >= maxParallelism {
