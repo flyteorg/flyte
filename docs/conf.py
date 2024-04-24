@@ -67,6 +67,7 @@ extensions = [
     "sphinx_issues",
     "sphinx_click",
     "sphinx_design",
+    "sphinx_reredirects",
     "sphinxcontrib.mermaid",
     "sphinxcontrib.video",
     "sphinxcontrib.youtube",
