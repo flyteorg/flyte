@@ -96,6 +96,7 @@ extlinks = {
 
 # redirects
 redirects = {
+    "flytesnacks/deprecated_integrations": "../deprecated_integrations/index.html",
     "flytesnacks/examples/bigquery_plugin/index": "../../../deprecated_integrations/bigquery_plugin/index.html",
     "flytesnacks/examples/bigquery_plugin/bigquery_plugin_example": "../../../deprecated_integrations/bigquery_plugin/biquery_plugin_example.html",
     "flytesnacks/examples/databricks_plugin/index": "../../../deprecated_integrations/databricks_plugin/index.html",
@@ -143,6 +144,7 @@ exclude_patterns = [
     "flytesnacks/feature_engineering.md",
     "flytesnacks/flyte_lab.md",
     "flytesnacks/ml_training.md",
+    "flytesnacks/deprecated_integrations.md",
     "flytesnacks/README.md",
     "flytekit/**/README.md",
     "flytekit/_templates/**",
