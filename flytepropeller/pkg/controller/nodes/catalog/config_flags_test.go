@@ -197,28 +197,28 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_max-per-retry-timeout", func(t *testing.T) {
+	t.Run("Test_base-scalar", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
-			testValue := defaultConfig.MaxPerRetryTimeout.String()
+			testValue := "1"
 
-			cmdFlags.Set("max-per-retry-timeout", testValue)
-			if vString, err := cmdFlags.GetString("max-per-retry-timeout"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.MaxPerRetryTimeout)
+			cmdFlags.Set("base-scalar", testValue)
+			if vInt, err := cmdFlags.GetInt("base-scalar"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.BackoffScalar)
 
 			} else {
 				assert.FailNow(t, err.Error())
 			}
 		})
 	})
-	t.Run("Test_backoff-scalar", func(t *testing.T) {
+	t.Run("Test_backoff-jitter", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
 
-			cmdFlags.Set("backoff-scalar", testValue)
-			if vInt, err := cmdFlags.GetInt("backoff-scalar"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.BackOffScalar)
+			cmdFlags.Set("backoff-jitter", testValue)
+			if vString, err := cmdFlags.GetString("backoff-jitter"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.BackoffJitter)
 
 			} else {
 				assert.FailNow(t, err.Error())

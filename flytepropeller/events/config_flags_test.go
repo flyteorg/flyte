@@ -155,4 +155,46 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_max-retries", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("max-retries", testValue)
+			if vInt, err := cmdFlags.GetInt("max-retries"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.MaxRetries)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_base-scalar", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("base-scalar", testValue)
+			if vInt, err := cmdFlags.GetInt("base-scalar"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.BackoffScalar)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_backoff-jitter", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("backoff-jitter", testValue)
+			if vString, err := cmdFlags.GetString("backoff-jitter"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.BackoffJitter)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }

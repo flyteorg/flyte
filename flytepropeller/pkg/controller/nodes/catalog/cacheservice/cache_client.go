@@ -215,17 +215,16 @@ func (c *CacheClient) Put(ctx context.Context, key catalog.Key, reader io.Output
 }
 
 func NewCacheClient(ctx context.Context, dataStore *storage.DataStore, endpoint string, insecureConnection bool, maxCacheAge time.Duration,
-	useAdminAuth bool, maxRetries int, maxPerRetryTimeout time.Duration, backOffScalar int, inlineCache bool, defaultServiceConfig string, authOpt ...grpc.DialOption) (*CacheClient, error) {
+	useAdminAuth bool, maxRetries uint, backoffScalar int, backoffJitter float64, inlineCache bool, defaultServiceConfig string, authOpt ...grpc.DialOption) (*CacheClient, error) {
 	var opts []grpc.DialOption
 	if useAdminAuth && authOpt != nil {
 		opts = append(opts, authOpt...)
 	}
 
-	grpcOptions := []grpcRetry.CallOption{
-		grpcRetry.WithBackoff(grpcRetry.BackoffLinear(time.Duration(backOffScalar) * time.Millisecond)),
+    grpcOptions := []grpcRetry.CallOption{
+		grpcRetry.WithBackoff(grpcRetry.BackoffExponentialWithJitter(time.Duration(backoffScalar)*time.Millisecond, backoffJitter)),
 		grpcRetry.WithCodes(codes.DeadlineExceeded, codes.Unavailable, codes.Canceled),
-		grpcRetry.WithMax(uint(maxRetries)),
-		grpcRetry.WithPerRetryTimeout(maxPerRetryTimeout),
+		grpcRetry.WithMax(maxRetries),
 	}
 
 	if insecureConnection {
