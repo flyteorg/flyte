@@ -252,13 +252,17 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		arrayNodeState.Phase = v1alpha1.ArrayNodePhaseExecuting
 	case v1alpha1.ArrayNodePhaseExecuting:
 		// process array node subNodes
-		currentParallelism := int(arrayNode.GetParallelism())
-		if currentParallelism == 0 {
-			currentParallelism = len(arrayNodeState.SubNodePhases.GetItems())
-		}
+		remainingWorkflowParallelism := int(nCtx.ExecutionContext().GetExecutionConfig().MaxParallelism - nCtx.ExecutionContext().CurrentParallelism())
+		incrementWorkflowParallelism, maxParallelism := inferParallelism(ctx, arrayNode.GetParallelism(),
+			config.GetConfig().ArrayNode.DefaultParallelismBehavior, remainingWorkflowParallelism, len(arrayNodeState.SubNodePhases.GetItems()))
 
-		nodeExecutionRequests := make([]*nodeExecutionRequest, 0, currentParallelism)
+		nodeExecutionRequests := make([]*nodeExecutionRequest, 0, maxParallelism)
+		currentParallelism := 0
 		for i, nodePhaseUint64 := range arrayNodeState.SubNodePhases.GetItems() {
+			if currentParallelism >= maxParallelism {
+				break
+			}
+
 			nodePhase := v1alpha1.NodePhase(nodePhaseUint64)
 			taskPhase := int(arrayNodeState.SubNodeTaskPhases.GetItem(i))
 
@@ -298,11 +302,11 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 
 			// TODO - this is a naive implementation of parallelism, if we want to support more
 			// complex subNodes (ie. dynamics / subworkflows) we need to revisit this so that
-			// parallelism is handled during subNode evaluations.
-			currentParallelism--
-			if currentParallelism == 0 {
-				break
+			// parallelism is handled during subNode evaluations + avoid deadlocks
+			if incrementWorkflowParallelism {
+				nCtx.ExecutionContext().IncrementParallelism()
 			}
+			currentParallelism++
 		}
 
 		workerErrorCollector := errorcollector.NewErrorMessageCollector()
@@ -401,6 +405,12 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		} else if successCount >= minSuccesses && runningCount == 0 {
 			// wait until all tasks have completed before declaring success
 			arrayNodeState.Phase = v1alpha1.ArrayNodePhaseSucceeding
+		}
+
+		// if incrementWorkflowParallelism is not set then we need to increment the parallelism by one
+		// to indicate that the overall ArrayNode is still running
+		if !incrementWorkflowParallelism && arrayNodeState.Phase == v1alpha1.ArrayNodePhaseExecuting {
+			nCtx.ExecutionContext().IncrementParallelism()
 		}
 	case v1alpha1.ArrayNodePhaseFailing:
 		if err := a.Abort(ctx, nCtx, "ArrayNodeFailing"); err != nil {

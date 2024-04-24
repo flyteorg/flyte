@@ -4536,6 +4536,9 @@ export namespace flyteidl {
             /** ArrayNode minSuccessRatio. */
             public minSuccessRatio: number;
 
+            /** ArrayNode parallelismOption. */
+            public parallelismOption?: "parallelism";
+
             /** ArrayNode successCriteria. */
             public successCriteria?: ("minSuccesses"|"minSuccessRatio");
 

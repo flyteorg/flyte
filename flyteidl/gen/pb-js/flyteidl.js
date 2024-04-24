@@ -10864,6 +10864,17 @@
                 var $oneOfFields;
     
                 /**
+                 * ArrayNode parallelismOption.
+                 * @member {"parallelism"|undefined} parallelismOption
+                 * @memberof flyteidl.core.ArrayNode
+                 * @instance
+                 */
+                Object.defineProperty(ArrayNode.prototype, "parallelismOption", {
+                    get: $util.oneOfGetter($oneOfFields = ["parallelism"]),
+                    set: $util.oneOfSetter($oneOfFields)
+                });
+    
+                /**
                  * ArrayNode successCriteria.
                  * @member {"minSuccesses"|"minSuccessRatio"|undefined} successCriteria
                  * @memberof flyteidl.core.ArrayNode
@@ -10964,9 +10975,11 @@
                         if (error)
                             return "node." + error;
                     }
-                    if (message.parallelism != null && message.hasOwnProperty("parallelism"))
+                    if (message.parallelism != null && message.hasOwnProperty("parallelism")) {
+                        properties.parallelismOption = 1;
                         if (!$util.isInteger(message.parallelism))
                             return "parallelism: integer expected";
+                    }
                     if (message.minSuccesses != null && message.hasOwnProperty("minSuccesses")) {
                         properties.successCriteria = 1;
                         if (!$util.isInteger(message.minSuccesses))

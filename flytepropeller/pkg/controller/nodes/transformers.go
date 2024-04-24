@@ -180,6 +180,9 @@ func ToNodeExecutionEvent(nodeExecID *core.NodeExecutionIdentifier,
 	} else if node.GetKind() == v1alpha1.NodeKindArray {
 		nev.IsParent = true
 		nev.IsArray = true
+		if config.GetConfig().ArrayNode.EventVersion == 1 {
+			nev.IsParent = true
+		}
 	} else if dynamicNodePhase != v1alpha1.DynamicNodePhaseNone {
 		nev.IsDynamic = true
 		if nev.GetTaskNodeMetadata() != nil && nev.GetTaskNodeMetadata().DynamicWorkflow != nil {
