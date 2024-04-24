@@ -62,7 +62,6 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.extlinks",
     "sphinx-prompt",
-    "sphinx_reredirects",
     "sphinx_copybutton",
     "sphinxext.remoteliteralinclude",
     "sphinx_issues",
