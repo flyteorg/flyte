@@ -72,7 +72,19 @@ func (e *eventWatcher) OnUpdate(_, newObj interface{}) {
 }
 
 func (e *eventWatcher) OnDelete(obj interface{}) {
-	event := obj.(*eventsv1.Event)
+	event, casted := obj.(*eventsv1.Event)
+	if !casted {
+		unknown, casted := obj.(cache.DeletedFinalStateUnknown)
+		if !casted {
+			logger.Warnf(context.Background(), "Unknown object type [%T] in OnDelete", obj)
+		} else {
+			logger.Warnf(context.Background(), "Deleted object of unknown key [%v] type [%T] in OnDelete",
+				unknown.Key, unknown.Obj)
+		}
+
+		return
+	}
+
 	objectNsName := types.NamespacedName{Namespace: event.Regarding.Namespace, Name: event.Regarding.Name}
 	eventNsName := types.NamespacedName{Namespace: event.Namespace, Name: event.Name}
 	v, _ := e.objectCache.LoadOrStore(objectNsName, &objectEvents{})
