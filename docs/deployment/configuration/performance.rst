@@ -17,9 +17,9 @@ a. Every workflow execution is independent and can be performed by a completeley
 b. When a workflow definition is compiled, the resulting DAG structure is traversed by the controller and the goal is to gracefully transition each task to Success.
 c. Node executions are performed by various FlytePlugins; a diverse collection of operations spanning Kubernetes and other remote services. FlytePropeller is only responsible for effectively monitoring and managing these executions.
 
-In the following sections you will learn how Flyte takes care of the correct and reliably execution of workflows through multiple stages, and what strategies you could apply to help the system handle increasing load efficiently.
+In the following sections you will learn how Flyte takes care of the correct and reliably execution of workflows through multiple stages, and what strategies you could apply to help the system efficiently handle increasing load.
 
-Summarized steps in a workflow execution
+Summarized steps of a workflow execution
 ========================================
 
 Before getting started, let's revisit the lifecycle of a workflow execution. The following diagram aims to summarize the process by focusing on the main steps. 
@@ -28,17 +28,17 @@ More details can be found in the `FlytePropeller Architecture <https://docs.flyt
 <INSERT_EXCALIDRAW_DIAGRAM>
 
 
-The following description is centered in the ``Worker``: the independent, lightweight and idempotent process that interacts with all the components in the Propeller controller to drive executions. 
+The following description is centered in the ``Worker``; the independent, lightweight and idempotent process that interacts with all the components in the Propeller controller to drive executions. 
 It's implemented as a ``goroutine``, and illustrated here as a hard-working gopher which:
 
 1. Pulls from the ``WorkQueue`` and loads what it needs to do the job: the workflow specification (desired state) and the previously recorded execution status.
 2. Observes the actual state by querying the Kubernetes API (or the Informer cache).
 3. Calculates the difference between desired and observed state, and triggers an effect to reconcile both states (eg. Launch/kill a Pod, handle failures, schedule a node execution, etc), interacting with the Propeller executors to process Inputs, Outputs and Offloaded data as indicated in the workflow spec.
 4. Keeps a local copy of the execution status, besides what the K8s API stores in ``etcd``.
-5. Informs the control plane and, hence, the user.
+5. Reports status to the control plane and, hence, to the user.
 
-While there are multiple metrics that could indicate a slow down in execution performance, the ``round_latency``, or the time it takes for FlytePropeller to perform a single iteration of workflow evaluationis typically the "golden signal". 
-is the 
+While there are multiple metrics that could indicate a slow down in execution performance, ``round_latency`` -or the time it takes for FlytePropeller to perform a single iteration of workflow evaluation- is typically the "golden signal". 
+The following sections should help you optimize that metric.
 
 Optimizing performance on each stage
 ------------------------------------
@@ -46,16 +46,31 @@ Optimizing performance on each stage
 1. Worker, the WorkQueue and evaluation loop 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+.. list-table:: Important Properties
+   :widths: 25 25 25 50
+   :header-rows: 1
+* - Property
+     - Description
+     - Relevant metric
+     - Rule of thumb
+     - Configuration parameter
+   * - ``workers``
+     - Number of processes that can work concurrently. Also implies number of workflows that can be executed in parallel. Since FlytePropeller uses ``goroutines``, it can accomodate significantly more processes than the number of physical cores.
+     - ``flyte:propeller:all:free_workers_count``: a low number results in higher overall latency for each workflow evaluation round.
+     - Larger the number, implies more workflows can be evaluated in parallel. But it should depend on number of CPU cores assigned to FlytePropeller and evaluated against the cost of context switching. A number around 500 - 800 with 4-8 CPU cores usually works fine.
+     - ``plugins.workqueue.config.workers`` (default: ``10``) 
+     
+
+
 .. list-table::
    :widths: 25 25 50 100
    :header-rows: 1
-
    * - Metric
      - Alerting factor
      - Configuration parameter
      - Default value
    * - ``flyte:propeller:all:free_workers_count``
-     - A low number of free workers results in higher overall latency for each workflow evaluation round.
+     - 
      - ``plugins.workqueue.config.workers``
      - ``10``
    * - ``sum(rate(flyte:propeller:all:round:raw_ms[5m])) by (wf)``
@@ -108,10 +123,6 @@ Let us first look at various config properties that can be set and would impact 
      - Section
      - Rule of thumb
      - Description
-   * - ``workers``
-     - propeller
-     - Larger the number, implies more workflows can be evaluated in parallel. But it should depend on number of CPU cores assigned to FlytePropeller and evaluated against the cost of context switching. A number usually < 500 - 800 with 4-8 cpu cores works fine.
-     - Number of `logical threads` workers, that can work concurrently. Also implies number of workflows that can be executed in parallel. Since FlytePropeller uses go-routines, it can run way  more than number of physical cores.
    * - ``workflow-reeval-duration``
      - propeller
      - lower the number - lower latency, lower throughput (low throughput is because the same workflow will be evaluated more times)
