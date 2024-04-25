@@ -81,7 +81,7 @@ contribute its architecture and design. You can also access the
     and core use cases.
 * - {doc}`📖 User Guide <user_guide/index>`
   - A comprehensive view of Flyte's functionality for data and ML practitioners.
-* - {doc}`📚 Tutorials <flytesnacks/tutorials>`
+* - {doc}`📚 Tutorials <tutorials/index>`
   - End-to-end examples of Flyte for data/feature engineering, machine learning,
     bioinformatics, and more.
 * - {doc}`🔌 Integrations <flytesnacks/integrations>`
@@ -138,8 +138,10 @@ Introduction <introduction>
 Quickstart guide <quickstart_guide>
 Getting started with workflow development <getting_started_with_workflow_development/index>
 Flyte fundamentals <flyte_fundamentals/index>
+User guide <user_guide/index>
 Flyte agents <flyte_agents/index>
 Core use cases <core_use_cases/index>
+Tutorials <tutorials/index>
 ```
 
 ```{toctree}
@@ -148,8 +150,6 @@ Core use cases <core_use_cases/index>
 :name: examples-guides
 :hidden:
 
-User Guide <user_guide/index>
-Tutorials <flytesnacks/tutorials>
 Integrations <flytesnacks/integrations>
 Deprecated integrations <deprecated_integrations/index>
 ```
@@ -201,7 +201,7 @@ latch sdk <https://docs.latch.bio/>
 
 Community Resources <community/index>
 community/contribute
-Contributing Examples <flytesnacks/contribute>
+Contributing Examples <contribute>
 community/roadmap
 Frequently Asked Questions <https://github.com/flyteorg/flyte/discussions/categories/q-a>
 community/troubleshoot
