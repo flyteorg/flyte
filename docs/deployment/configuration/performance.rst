@@ -70,17 +70,26 @@ Optimizing performance on each stage
 2. Query observed state
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-The Kube client config controls the request throughput from FlytePropeller to the Kube API server. These requests may include creating/monitoring Pods or creating/updating FlyteWorkflow CRDs to track workflow execution. The default configuration (provided by k8s) contains very steep rate-limiting, and therefore FlytePropeller provides a default configuration that offers better performance. However, if your workload involves larger scales (e.g., >5k fanout dynamic or map tasks, >8k concurrent workflows, etc.,) the Kube client config rate limiting may still contribute to a noticeable drop in performance. Increasing the ``qps`` and ``burst`` values may help alleviate back pressure and improve FlytePropeller performance. An example of Kube-client-config is as follows:
+The Kube client config controls the request throughput from FlytePropeller to the Kube API server. These requests may include creating/monitoring Pods or creating/updating FlyteWorkflow CRDs to track workflow execution. 
+The `default configuration provided by K8s <https://pkg.go.dev/sigs.k8s.io/controller-runtime/pkg/client/config#GetConfigWithContext>`__ contains very conservative rate-limiting, and therefore FlytePropeller provides a default configuration that may offer better performance. 
+However, if your workload involves larger scales (e.g., >5k fanout dynamic or map tasks, >8k concurrent workflows, etc.,) the kube-client rate limiting config may still contribute to a noticeable drop in performance. 
+Increasing the ``qps`` and ``burst`` values may help alleviate back pressure and improve FlytePropeller performance. The default kube-client config applied to Propeller is as follows:
 
 .. code-block:: yaml
 
     propeller:
-        kube-client-config:
-            qps: 100 # Refers to max rate of requests to KubeAPI server
-            burst: 50 # refers to max burst rate to Kube API server
-            timeout: 30s # Refers to timeout when talking with kubeapi server
+      kube-client-config:
+        qps: 100 # Refers to max rate of requests (queries per second) to kube-apiserver
+        burst: 25 # refers to max burst rate. 
+        timeout: 30s # Refers to timeout when talking with the kube-apiserver
 
-It is worth noting that the Kube API server tends to throttle requests transparently. This means that while tweaking performance by increasing the allowed frequency of Kube API server requests (e.g., increasing FlytePropeller workers or relaxing Kube client config rate-limiting), there may be steep performance decreases for no apparent reason. Looking at the Kube API server request queue metrics in these cases can assist in identifying whether throttling is to blame. Unfortunately, there is no one-size-fits-all solution here, and customizing these parameters for your workload will require trial and error.
+.. note::
+
+   In the previous configuration, the kube-apiserver will accept 100 queries before blocking any query. Every second, 25 more queries will be accepted. A query blocked for 30s will timeout.
+
+It is worth noting that the Kube API server tends to throttle requests transparently. This means that while tweaking performance by increasing the allowed frequency of API requests (e.g., increasing FlytePropeller workers or relaxing Kube client config rate-limiting), there may be steep performance decreases for no apparent reason. 
+While it's possible to easily monitor Kube API saturation using system-level metrics like CPU, memory and network usage; it's recommended to look at kube-apiserver-specific metrics like ``workqueue_depth`` which can assist in identifying whether throttling is to blame. Unfortunately, there is no one-size-fits-all solution here, and customizing these parameters for your workload will require trial and error.
+
 
 Optimizing round latency
 -------------------------
