@@ -18,8 +18,6 @@ use cases.
 * - {doc}`🔀 Tasks, workflows and launch plans <tasks_workflows_and_launch_plans>`
   - Create tasks as building blocks, compose them into workflows, and schedule
     them with launch plans.
-* - {doc}`🗄 Registering workflows <registering_workflows>`
-  - Develop and deploy workflows to a local Flyte demo cluster.
 * - {doc}`⏱ Running and scheduling workflows <running_and_scheduling_workflows>`
   - Execute workflows programmatically and schedule them as cron jobs.
 * - {doc}`📊 Visualizing task input and output <visualizing_task_input_and_output>`
@@ -43,7 +41,6 @@ cluster, see the {ref}`Deployment Guide <deployment>`.
 :hidden:
 
 tasks_workflows_and_launch_plans
-registering_workflows
 running_and_scheduling_workflows
 visualizing_task_input_and_output
 optimizing_tasks
