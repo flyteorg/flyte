@@ -15,29 +15,34 @@ The video below contains an overview of the Flyte architecture, what is meant by
 Introduction
 ============
 
-Before getting started, let's revisit the lifecycle of a workflow execution. The following diagram aims to summarize the process by focusing on the main steps. More details can be found in the `FlytePropeller Architecture <https://docs.flyte.org/en/latest/concepts/component_architecture/flytepropeller_architecture.html>`__ section.
-
-<INSERT_EXCALIDRAW_DIAGRAM>
-
-There are some base design attributes and assumptions that Flytepropeller applies:
+There are some base design attributes and assumptions that FlytePropeller applies:
 
 a. Every workflow execution is independent and can be performed by a completeley distinct process.
-b. When a workflow definition is compiled, the resulting DAG structure is traversed by the controller and the goal is to transition each task to Success.
-This is not typically achieved on its full on the first attempt (either due to timeouts or to failures) so Propeller evaluates again the remaining steps. 
-That iterative process is what we call in this document an "evaluation loop".
+b. When a workflow definition is compiled, the resulting DAG structure is traversed by the controller and the goal is to gracefully transition each task to Success.
+c. Node executions are performed by various FlytePlugins; a diverse collection of operations spanning Kubernetes and other remote services. FlytePropeller is only responsible for effectively monitoring and managing these executions.
 
+In the following sections you will learn how Flyte takes care of the correct and reliably execution of workflows through multiple stages, and what strategies you could apply to help the system handle increasing load efficiently.
 
 Summarized steps in a workflow execution
 ========================================
+
+Before getting started, let's revisit the lifecycle of a workflow execution. The following diagram aims to summarize the process by focusing on the main steps. 
+More details can be found in the `FlytePropeller Architecture <https://docs.flyte.org/en/latest/concepts/component_architecture/flytepropeller_architecture.html>`__ and :ref:`divedeep-execution-timeline` sections.
+
+<INSERT_EXCALIDRAW_DIAGRAM>
+
 
 The following description is centered in the ``Worker``: the independent, lightweight and idempotent process that interacts with all the components in the Propeller controller to drive executions. 
 It's implemented as a ``goroutine``, and illustrated here as a hard-working gopher which:
 
 1. Pulls from the ``WorkQueue`` and loads what it needs to do the job: the workflow specification (desired state) and the previously recorded execution status.
 2. Observes the actual state by querying the Kubernetes API (or the Informer cache).
-3. Calculates the difference between desired and observed state, and triggers an effect to reconcile both states (eg. Launch/kill a Pod), interacting with the Propeller executors to process Inputs, Outputs and Offloaded data as indicated in the workflow spec.
+3. Calculates the difference between desired and observed state, and triggers an effect to reconcile both states (eg. Launch/kill a Pod, handle failures, schedule a node execution, etc), interacting with the Propeller executors to process Inputs, Outputs and Offloaded data as indicated in the workflow spec.
 4. Keeps a local copy of the execution status, besides what the K8s API stores in ``etcd``.
 5. Informs the control plane and, hence, the user.
+
+While there are multiple metrics that could indicate a slow down in execution performance, the ``round_latency``, or the time it takes for FlytePropeller to perform a single iteration of workflow evaluationis typically the "golden signal". 
+is the 
 
 Optimizing performance on each stage
 ------------------------------------
@@ -54,37 +59,32 @@ Optimizing performance on each stage
      - Configuration parameter
      - Default value
    * - ``flyte:propeller:all:free_workers_count``
-     - Flyte Propeller Dashboard
      - A low number of free workers results in higher overall latency for each workflow evaluation round.
-     - ``plugins.workqueue.config``
+     - ``plugins.workqueue.config.workers``
      - ``10``
    * - ``sum(rate(flyte:propeller:all:round:raw_ms[5m])) by (wf)``
-     - Flyte Propeller Dashboard
-     - Round Latency for each workflow eval loop increases
-     - Flyte propeller is taking more time to process each workflow
+     - A higher number means Flyte propeller is taking more time to process each workflow
+     - N/A
+     - N/A
    * - ``sum(rate(flyte:propeller:all:main_depth[5m]))``
-     - Flyte Propeller Dashboard
-     - Workflows take longer to start or slow
-     - The processing queue depth is long and is taking long to drain
+     - The processing queue depth is long and is taking long to drain, causing longer start times for executions
+     - ``plugins.workqueue.config.maxItems``
+     - ``10000``
 
-Scaling up FlytePropeller
-==========================
-`FlytePropeller <https://pkg.go.dev/github.com/flyteorg/FlytePropeller>`_ is the core engine of Flyte that executes the workflows for Flyte.
-It is designed as a `Kubernetes Controller <https://kubernetes.io/docs/concepts/architecture/controller/>`_, where the desired state is specified as a FlyteWorkflow `Custom Resource <https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/>`_.
+2. Query observed state
+^^^^^^^^^^^^^^^^^^^^^^^
 
-One of the base assumptions of FlytePropeller is that every workflow is independent and can be executed by a completely distinct process, without a need for communication with other processes. Meanwhile, one workflow tracks the dependencies between tasks using a DAG structure and hence constantly needs synchronization.
-Currently, FlytePropeller executes Workflows by using an event loop to periodically track and amend the execution status. Within each iteration, a single thread requests the state of Workflow nodes and performs operations (i.e., scheduling node executions, handling failures, etc) to gracefully transition a Workflow from the observed state to the desired state (i.e., Success). Consequently, actual node executions are performed by various FlytePlugins, a diverse collection of operations spanning k8s and other remote services, and FlytePropeller is only responsible for effectively monitoring and managing these executions.
+The Kube client config controls the request throughput from FlytePropeller to the Kube API server. These requests may include creating/monitoring Pods or creating/updating FlyteWorkflow CRDs to track workflow execution. The default configuration (provided by k8s) contains very steep rate-limiting, and therefore FlytePropeller provides a default configuration that offers better performance. However, if your workload involves larger scales (e.g., >5k fanout dynamic or map tasks, >8k concurrent workflows, etc.,) the Kube client config rate limiting may still contribute to a noticeable drop in performance. Increasing the ``qps`` and ``burst`` values may help alleviate back pressure and improve FlytePropeller performance. An example of Kube-client-config is as follows:
 
-FlytePropeller has a lot of knobs that can be tweaked for performance. The default configuration is usually adequate for small to medium sized installations of Flyte, that are running about 500 workflows concurrently with no noticeable overhead. In the case when the number of workflows increases,
-FlytePropeller will automatically slow down, without losing correctness.
+.. code-block:: yaml
 
-Signs of slowdown
-------------------
+    propeller:
+        kube-client-config:
+            qps: 100 # Refers to max rate of requests to KubeAPI server
+            burst: 50 # refers to max burst rate to Kube API server
+            timeout: 30s # Refers to timeout when talking with kubeapi server
 
-
-
-For each of the metrics above you can dig deeper into the cause for this spike in latency. All of them are mostly related to one latency and should be correlated - ``The Round latency!``.
-The round-latency is the time it takes for FlytePropeller to to perform a single iteration of workflow evaluation. To understand this, you have to understand the :ref:`divedeep-execution-timeline`. Once you understand this, continue reading on.
+It is worth noting that the Kube API server tends to throttle requests transparently. This means that while tweaking performance by increasing the allowed frequency of Kube API server requests (e.g., increasing FlytePropeller workers or relaxing Kube client config rate-limiting), there may be steep performance decreases for no apparent reason. Looking at the Kube API server request queue metrics in these cases can assist in identifying whether throttling is to blame. Unfortunately, there is no one-size-fits-all solution here, and customizing these parameters for your workload will require trial and error.
 
 Optimizing round latency
 -------------------------
@@ -147,20 +147,11 @@ Let us first look at various config properties that can be set and would impact 
 
 In the above table the 2 most important configs are ``workers`` and ``kube-client-config``.
 
-The Kube client config controls the request throughput from FlytePropeller to the Kube API server. These requests may include creating/monitoring Pods or creating/updating FlyteWorkflow CRDs to track workflow execution. The default configuration (provided by k8s) contains very steep rate-limiting, and therefore FlytePropeller provides a default configuration that offers better performance. However, if your workload involves larger scales (e.g., >5k fanout dynamic or map tasks, >8k concurrent workflows, etc.,) the Kube client config rate limiting may still contribute to a noticeable drop in performance. Increasing the ``qps`` and ``burst`` values may help alleviate back pressure and improve FlytePropeller performance. An example of Kube-client-config is as follows:
-
-.. code-block:: yaml
-
-    propeller:
-        kube-client-config:
-            qps: 100 # Refers to max rate of requests to KubeAPI server
-            burst: 50 # refers to max burst rate to Kube API server
-            timeout: 30s # Refers to timeout when talking with kubeapi server
 
 
 .. note:: As you increase the number of workers in FlytePropeller it is important to increase the number of cpu's given to FlytePropeller pod.
 
-It is worth noting that the Kube API server tends to throttle requests transparently. This means that while tweaking performance by increasing the allowed frequency of Kube API server requests (e.g., increasing FlytePropeller workers or relaxing Kube client config rate-limiting), there may be steep performance decreases for no apparent reason. Looking at the Kube API server request queue metrics in these cases can assist in identifying whether throttling is to blame. Unfortunately, there is no one-size-fits-all solution here, and customizing these parameters for your workload will require trial and error.
+
 
 Another area of slowdown could be the size of the input-output cache that FlytePropeller maintains in-memory. This can be configured, while configuring
 the storage for FlytePropeller. Rule of thumb, for FlytePropeller with x memory limit, allocate x/2 to the cache
