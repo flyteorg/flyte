@@ -18,7 +18,11 @@ Incorporate {py:class}`~flytekitplugins.snowflake.SnowflakeConfig` within the ta
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/snowflake_plugin/snowflake_plugin/snowflake_plugin_example.py
 :caption: snowflake_plugin/snowflake_plugin_example.py
+<<<<<<< HEAD
 :lines: 5-16
+=======
+:lines: 4-15
+>>>>>>> master
 ```
 
 :::{note}
@@ -56,7 +60,11 @@ This country will be provided as user input, using a nation key to specify it.
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/snowflake_plugin/snowflake_plugin/snowflake_plugin_example.py
 :caption: snowflake_plugin/snowflake_plugin_example.py
+<<<<<<< HEAD
 :lines: 19-35
+=======
+:lines: 18-34
+>>>>>>> master
 ```
 
 To review the query results, access the Snowflake console at:
@@ -66,7 +74,11 @@ You can also execute the task and workflow locally.
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/snowflake_plugin/snowflake_plugin/snowflake_plugin_example.py
 :caption: snowflake_plugin/snowflake_plugin_example.py
+<<<<<<< HEAD
 :lines: 42-44
+=======
+:lines: 41-43
+>>>>>>> master
 ```
 
 [flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/snowflake_plugin
