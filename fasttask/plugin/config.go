@@ -20,7 +20,7 @@ var (
 		EnvDetectOrphanInterval:       config.Duration{Duration: time.Second * 60},
 		EnvGCInterval:                 config.Duration{Duration: time.Second * 5},
 		EnvRepairInterval:             config.Duration{Duration: time.Second * 10},
-		GracePeriodStatusNotFound:     config.Duration{Duration: time.Second * 15},
+		GracePeriodStatusNotFound:     config.Duration{Duration: time.Second * 90},
 		GracePeriodWorkersUnavailable: config.Duration{Duration: time.Second * 30},
 		HeartbeatBufferSize:	       512,
 		Image:                         "flyteorg/fasttask:latest",

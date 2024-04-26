@@ -42,15 +42,15 @@ pub struct BridgeArgs {
     fasttask_url: String,
     #[arg(short, long, value_name = "QUEUE_ID", default_value = "foo", help = "fasttask queue to listen on for tasks")]
     queue_id: String,
-    #[arg(short = 'i', long, value_name = "HEARTBEAT_INTERVAL_SECONDS", default_value = "5", help = "interval in seconds to send heartbeat to fasttask service")]
+    #[arg(short = 'i', long, value_name = "HEARTBEAT_INTERVAL_SECONDS", default_value = "10", help = "interval in seconds to send heartbeat to fasttask service")]
     heartbeat_interval_seconds: u64,
-    #[arg(short, long, value_name = "TASK_STATUS_REPORT_INTERVAL_SECONDS", default_value = "5", help = "interval in seconds to buffer task status for heartbeat")]
+    #[arg(short, long, value_name = "TASK_STATUS_REPORT_INTERVAL_SECONDS", default_value = "10", help = "interval in seconds to buffer task status for heartbeat")]
     task_status_report_interval_seconds: u64,
-    #[arg(short, long, value_name = "LAST_ACK_GRACE_PERIOD_SECONDS", default_value = "10", help = "grace period in seconds to wait for last ack before killing task")]
+    #[arg(short, long, value_name = "LAST_ACK_GRACE_PERIOD_SECONDS", default_value = "90", help = "grace period in seconds to wait for last ack before killing task")]
     last_ack_grace_period_seconds: u64,
     #[arg(short, long, value_name = "PARALLELISM", default_value = "1", help = "number of tasks to run in parallel")]
     parallelism: usize,
-    #[arg(short, long, value_name = "BACKLOG_LENGTH", default_value = "0", help = "number of tasks to buffer before dropping assignments")]
+    #[arg(short, long, value_name = "BACKLOG_LENGTH", default_value = "5", help = "number of tasks to buffer before dropping assignments")]
     backlog_length: usize,
     #[arg(short='r', long, value_name = "FAST_REGISTER_DIR_OVERRIDE", default_value = "/root", help = "directory to decompress flyte fast registration files")]
     fast_register_dir_override: String,
