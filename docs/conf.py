@@ -166,6 +166,7 @@ exclude_patterns = [
     "_src/**",
     "examples/**",
     "flytesnacks/index.md",
+    "flytesnacks/bioinformatics_examples.md",
     "flytesnacks/README.md",
     "flytekit/**/README.md",
     "flytekit/_templates/**",
