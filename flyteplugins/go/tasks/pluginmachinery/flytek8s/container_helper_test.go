@@ -237,17 +237,35 @@ func TestApplyResourceOverrides_OverrideGpu(t *testing.T) {
 	gpuRequest := resource.MustParse("1")
 	overrides := ApplyResourceOverrides(v1.ResourceRequirements{
 		Requests: v1.ResourceList{
-			resourceGPU: gpuRequest,
+			ResourceNvidiaGPU: gpuRequest,
 		},
 	}, v1.ResourceRequirements{}, assignIfUnset)
 	assert.EqualValues(t, gpuRequest, overrides.Requests[ResourceNvidiaGPU])
 
 	overrides = ApplyResourceOverrides(v1.ResourceRequirements{
 		Limits: v1.ResourceList{
-			resourceGPU: gpuRequest,
+			ResourceNvidiaGPU: gpuRequest,
 		},
 	}, v1.ResourceRequirements{}, assignIfUnset)
 	assert.EqualValues(t, gpuRequest, overrides.Limits[ResourceNvidiaGPU])
+}
+
+func TestSanitizeGPUResourceRequirements(t *testing.T) {
+	gpuRequest := resource.MustParse("4")
+	requirements := v1.ResourceRequirements{
+		Requests: v1.ResourceList{
+			resourceGPU: gpuRequest,
+		},
+	}
+
+	expectedRequirements := v1.ResourceRequirements{
+		Requests: v1.ResourceList{
+			ResourceNvidiaGPU: gpuRequest,
+		},
+	}
+
+	SanitizeGPUResourceRequirements(&requirements)
+	assert.EqualValues(t, expectedRequirements, requirements)
 }
 
 func TestMergeResources_EmptyIn(t *testing.T) {
@@ -601,6 +619,42 @@ func TestAddFlyteCustomizationsToContainer_Resources(t *testing.T) {
 		assert.True(t, container.Resources.Limits.Cpu().Equal(resource.MustParse("10")))
 		assert.True(t, container.Resources.Requests.Memory().Equal(resource.MustParse("2")))
 		assert.True(t, container.Resources.Limits.Memory().Equal(resource.MustParse("2")))
+	})
+	t.Run("ensure gpu resource overriding works for tasks with pod templates", func(t *testing.T) {
+		container := &v1.Container{
+			Command: []string{
+				"{{ .Input }}",
+			},
+			Args: []string{
+				"{{ .OutputPrefix }}",
+			},
+			Resources: v1.ResourceRequirements{
+				Requests: v1.ResourceList{
+					resourceGPU: resource.MustParse("2"), // Tasks with pod templates request resource via the "gpu" key
+				},
+				Limits: v1.ResourceList{
+					resourceGPU: resource.MustParse("2"),
+				},
+			},
+		}
+
+		overrideRequests := v1.ResourceList{
+			ResourceNvidiaGPU: resource.MustParse("4"), // Resource overrides specify the "nvidia.com/gpu" key
+		}
+
+		overrideLimits := v1.ResourceList{
+			ResourceNvidiaGPU: resource.MustParse("4"),
+		}
+
+		templateParameters := getTemplateParametersForTest(&v1.ResourceRequirements{
+			Requests: overrideRequests,
+			Limits:   overrideLimits,
+		}, &v1.ResourceRequirements{})
+
+		err := AddFlyteCustomizationsToContainer(context.TODO(), templateParameters, ResourceCustomizationModeMergeExistingResources, container)
+		assert.NoError(t, err)
+		assert.Equal(t, container.Resources.Requests[ResourceNvidiaGPU], overrideRequests[ResourceNvidiaGPU])
+		assert.Equal(t, container.Resources.Limits[ResourceNvidiaGPU], overrideLimits[ResourceNvidiaGPU])
 	})
 }
 
