@@ -56,7 +56,7 @@ from flytekit.types.file import PythonPickledFile
 
 +++ {"lines_to_next_cell": 0}
 
-We'll re-use certain classes and functions from the
+We'll reuse certain classes and functions from the
 {ref}`single node and gpu tutorial <pytorch_single_node_and_gpu>`
 such as the `Net` model architecture, `Hyperparameters`, and `log_test_predictions`.
 

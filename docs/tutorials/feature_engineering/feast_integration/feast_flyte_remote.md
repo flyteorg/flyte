@@ -147,7 +147,7 @@ repo_config = synced_execution.node_executions["n0"].outputs["o0"]
 
 ## 05. Generate predictions
 
-Re-use the `predict` function from the workflow to generate predictions — Flytekit will automatically manage the IO for you!
+Reuse the `predict` function from the workflow to generate predictions — Flytekit will automatically manage the IO for you!
 
 +++
 

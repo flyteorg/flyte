@@ -175,7 +175,7 @@ def convert_timestamp_column(dataframe: pd.DataFrame, timestamp_column: str) -> 
 
 +++ {"lines_to_next_cell": 0}
 
-Define `store_offline` and `load_historical_features` tasks to store and retrieve the historial features, respectively.
+Define `store_offline` and `load_historical_features` tasks to store and retrieve the historical features, respectively.
 
 ```{eval-rst}
 .. list-table:: Decoding the ``Feast`` Jargon
