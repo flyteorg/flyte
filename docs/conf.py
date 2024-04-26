@@ -130,7 +130,14 @@ redirects = {
     "flytesnacks/examples/nlp_processing/index": "../../../tutorials/model_training/nlp_processing/index.html",
     "flytesnacks/examples/nlp_processing/word2vec_and_lda": "../../../tutorials/model_training/nlp_processing/word2vec_and_lda.html",
     "flytesnacks/examples/pima_diabetes/index": "../../../tutorials/model_training/pima_diabetes/index.html",
-    "flytesnacks/examples/pima_diabetes/diabetes": "../../../tutorials/model_training/pima_diabetes/diabetes.html"
+    "flytesnacks/examples/pima_diabetes/diabetes": "../../../tutorials/model_training/pima_diabetes/diabetes.html",
+    "projects/cookbook/en/latest/index": "../../../../index.html",
+    "projects/cookbook/en/latest/tutorials": "../../../../tutorials/index.html",
+    "projects/cookbook/en/latest/ml_training": "../../../../tutorials/model_training/index.html",
+    "projects/cookbook/en/latest/feature_engineering": "../../../../tutorials/feature_engineering/index.html",
+    "projects/cookbook/en/latest/bioinformatics_examples": "../../../../tutorials/bioinformatics/index.html",
+    "projects/cookbook/en/latest/flyte_lab": "../../../../tutorials/flyte_lab/index.html",
+    "projects/cookbook/en/latest/userguide": "../../../../user_guide/index.html",
 }
 
 
@@ -171,7 +178,8 @@ exclude_patterns = [
     "flytesnacks/flyte_lab.md",
     "flytesnacks/ml_training.md",
     "flytesnacks/weather_forecasting.md",
-    "flytesnacks/contribute/md",
+    "flytesnacks/contribute.md",
+    "flytesnacks/tutorials.md",
     "flytesnacks/README.md",
     "flytekit/**/README.md",
     "flytekit/_templates/**",
