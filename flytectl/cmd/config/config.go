@@ -19,9 +19,10 @@ var (
 
 // Config hold configration for flytectl flag
 type Config struct {
-	Project string `json:"project" pflag:",Specifies the project to work on."`
-	Domain  string `json:"domain" pflag:",Specifies the domain to work on."`
-	Output  string `json:"output" pflag:",Specifies the output type."`
+	Project     string `json:"project" pflag:",Specifies the project to work on."`
+	Domain      string `json:"domain" pflag:",Specifies the domain to work on."`
+	Output      string `json:"output" pflag:",Specifies the output type."`
+	Interactive bool   `json:"interactive" pflag:",Set this to trigger bubbletea interface."`
 }
 
 // OutputFormat will return output formate

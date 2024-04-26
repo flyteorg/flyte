@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
 	"testing"
 	"time"
 
@@ -53,7 +54,7 @@ func TestJSONToTable(t *testing.T) {
 	b, err := json.Marshal(j)
 	assert.NoError(t, err)
 	p := Printer{}
-	assert.NoError(t, p.JSONToTable(b, []Column{
+	assert.NoError(t, p.JSONToTable(os.Stdout, b, []Column{
 		{"A", "$.a", &trunc},
 		{"S", "$.s.y", nil},
 	}))

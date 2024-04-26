@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/url"
 	"os"
 	"sort"
@@ -112,7 +113,7 @@ func projectColumns(rows []interface{}, column []Column) [][]string {
 	return responses
 }
 
-func (p Printer) JSONToTable(jsonRows []byte, columns []Column) error {
+func (p Printer) JSONToTable(w io.Writer, jsonRows []byte, columns []Column) error {
 	var rawRows []interface{}
 	if err := json.Unmarshal(jsonRows, &rawRows); err != nil {
 		return errors.Wrapf("JSONUnmarshalFailure", err, "failed to unmarshal into []interface{} from json")
@@ -122,7 +123,7 @@ func (p Printer) JSONToTable(jsonRows []byte, columns []Column) error {
 	}
 	rows := projectColumns(rawRows, columns)
 
-	printer := tableprinter.New(os.Stdout)
+	printer := tableprinter.New(w)
 	// TODO make this configurable
 	printer.AutoWrapText = false
 	printer.BorderLeft = true
@@ -141,7 +142,9 @@ func (p Printer) JSONToTable(jsonRows []byte, columns []Column) error {
 	if r := printer.Render(headers, rows, positions, true); r == -1 {
 		return fmt.Errorf("failed to render table")
 	}
-	fmt.Printf("%d rows\n", len(rows))
+	if w == os.Stdout {
+		fmt.Printf("%d rows\n", len(rows))
+	}
 	return nil
 }
 
@@ -155,7 +158,7 @@ func (p Printer) PrintInterface(format OutputFormat, columns []Column, v interfa
 	case OutputFormatJSON, OutputFormatYAML:
 		return printJSONYaml(format, v)
 	default: // Print table
-		return p.JSONToTable(jsonRows, columns)
+		return p.JSONToTable(os.Stdout, jsonRows, columns)
 	}
 }
 
@@ -285,7 +288,7 @@ func (p Printer) Print(format OutputFormat, columns []Column, messages ...proto.
 		if err != nil {
 			return errors.Wrapf("ProtoToJSONFailure", err, "failed to marshal proto messages")
 		}
-		return p.JSONToTable(rows, columns)
+		return p.JSONToTable(os.Stdout, rows, columns)
 	}
 	return nil
 }

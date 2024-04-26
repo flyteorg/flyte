@@ -9,6 +9,9 @@ import (
 	"github.com/flyteorg/flytectl/cmd/config"
 	"github.com/flyteorg/flytectl/cmd/config/subcommand/execution"
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
+
+	"github.com/flyteorg/flytectl/pkg/bubbletea"
+	"github.com/flyteorg/flytectl/pkg/filters"
 	"github.com/flyteorg/flytectl/pkg/printer"
 
 	"github.com/golang/protobuf/proto"
@@ -111,6 +114,16 @@ func ExecutionToProtoMessages(l []*admin.Execution) []proto.Message {
 	return messages
 }
 
+func getCallBack(ctx context.Context, cmdCtx cmdCore.CommandContext) bubbletea.DataCallback {
+	return func(filter filters.Filters) []proto.Message {
+		executionList, err := cmdCtx.AdminFetcherExt().ListExecution(ctx, config.GetConfig().Project, config.GetConfig().Domain, filter)
+		if err != nil {
+			return nil
+		}
+		return ExecutionToProtoMessages(executionList.Executions)
+	}
+}
+
 func getExecutionFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
 	adminPrinter := printer.Printer{}
 	var executions []*admin.Execution
@@ -146,6 +159,12 @@ func getExecutionFunc(ctx context.Context, args []string, cmdCtx cmdCore.Command
 		return err
 	}
 	logger.Infof(ctx, "Retrieved %v executions", len(executionList.Executions))
+
+	if config.GetConfig().Interactive {
+		bubbletea.Paginator(executionColumns, getCallBack(ctx, cmdCtx))
+		return nil
+	}
+
 	return adminPrinter.Print(config.GetConfig().MustOutputFormat(), executionColumns,
 		ExecutionToProtoMessages(executionList.Executions)...)
 }

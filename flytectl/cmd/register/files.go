@@ -162,7 +162,7 @@ func Register(ctx context.Context, args []string, cfg *config.Config, cmdCtx cmd
 
 	payload, _ := json.Marshal(registerResults)
 	registerPrinter := printer.Printer{}
-	_ = registerPrinter.JSONToTable(payload, projectColumns)
+	_ = registerPrinter.JSONToTable(os.Stdout, payload, projectColumns)
 	if tmpDir != "" {
 		if _err := os.RemoveAll(tmpDir); _err != nil {
 			logger.Errorf(ctx, "unable to delete temp dir %v due to %v", tmpDir, _err)
