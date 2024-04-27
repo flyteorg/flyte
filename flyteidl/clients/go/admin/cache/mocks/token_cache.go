@@ -53,6 +53,16 @@ func (_m *TokenCache) GetToken() (*oauth2.Token, error) {
 	return r0, r1
 }
 
+// Lock provides a mock function with given fields:
+func (_m *TokenCache) Lock() {
+	_m.Called()
+}
+
+// Purge provides a mock function with given fields:
+func (_m *TokenCache) Purge() {
+	_m.Called()
+}
+
 type TokenCache_SaveToken struct {
 	*mock.Call
 }
@@ -83,4 +93,9 @@ func (_m *TokenCache) SaveToken(token *oauth2.Token) error {
 	}
 
 	return r0
+}
+
+// Unlock provides a mock function with given fields:
+func (_m *TokenCache) Unlock() {
+	_m.Called()
 }
