@@ -48,6 +48,9 @@ func MaterializeCredentials(ctx context.Context, cfg *Config, tokenCache cache.T
 
 	wrappedTokenSource := NewCustomHeaderTokenSource(tokenSource, cfg.UseInsecureConnection, authorizationMetadataKey)
 	perRPCCredentials.Store(wrappedTokenSource)
+	// Clear the token cache so that subsequent calls will get a fresh token
+	tokenCache.Purge()
+
 	return nil
 }
 
@@ -168,6 +171,7 @@ func NewProxyAuthInterceptor(cfg *Config, proxyCredentialsFuture *PerRPCCredenti
 			}
 			return invoker(ctx, method, req, reply, cc, opts...)
 		}
+
 		return err
 	}
 }

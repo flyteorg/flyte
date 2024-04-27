@@ -9,6 +9,12 @@ type TokenCache interface {
 	// SaveToken saves the token securely to cache.
 	SaveToken(token *oauth2.Token) error
 
-	// Retrieves the token from the cache.
+	// GetToken retrieves the token from the cache.
 	GetToken() (*oauth2.Token, error)
+
+	// Purge the token from the cache.
+	Purge()
+
+	Lock()
+	Unlock()
 }

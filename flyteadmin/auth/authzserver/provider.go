@@ -111,6 +111,10 @@ func (p Provider) ValidateAccessToken(ctx context.Context, expectedAudience, tok
 	})
 
 	if err != nil {
+		realError := err.(*jwtgo.ValidationError).Inner.(*jwtgo.ValidationError)
+		if realError.Errors&jwtgo.ValidationErrorExpired != 0 {
+			// token has expired
+		}
 		return nil, err
 	}
 
