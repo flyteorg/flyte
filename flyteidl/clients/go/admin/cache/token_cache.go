@@ -15,6 +15,9 @@ type TokenCache interface {
 	// Purge the token from the cache.
 	Purge()
 
+	// Lock the cache.
 	Lock()
+
+	// Unlock the cache.
 	Unlock()
 }
