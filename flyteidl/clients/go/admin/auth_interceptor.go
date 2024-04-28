@@ -48,8 +48,6 @@ func MaterializeCredentials(ctx context.Context, cfg *Config, tokenCache cache.T
 
 	wrappedTokenSource := NewCustomHeaderTokenSource(tokenSource, cfg.UseInsecureConnection, authorizationMetadataKey)
 	perRPCCredentials.Store(wrappedTokenSource)
-	// Clear the token cache so that subsequent calls will get a fresh token
-	tokenCache.Purge()
 
 	return nil
 }
@@ -138,6 +136,7 @@ func NewAuthInterceptor(cfg *Config, tokenCache cache.TokenCache, credentialsFut
 	return func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
 		ctx = setHTTPClientContext(ctx, cfg, proxyCredentialsFuture)
 
+		t, _ := tokenCache.GetToken()
 		err := invoker(ctx, method, req, reply, cc, opts...)
 		if err != nil {
 			logger.Debugf(ctx, "Request failed due to [%v]. If it's an unauthenticated error, we will attempt to establish an authenticated context.", err)
@@ -145,6 +144,14 @@ func NewAuthInterceptor(cfg *Config, tokenCache cache.TokenCache, credentialsFut
 			if st, ok := status.FromError(err); ok {
 				// If the error we receive from executing the request expects
 				if shouldAttemptToAuthenticate(st.Code()) {
+					tokenCache.Lock()
+					defer tokenCache.Unlock()
+					t2, _ := tokenCache.GetToken()
+					if t == t2 {
+						// Clear the token cache so that subsequent calls will get a fresh token
+						tokenCache.Purge()
+					}
+
 					logger.Debugf(ctx, "Request failed due to [%v]. Attempting to establish an authenticated connection and trying again.", st.Code())
 					newErr := MaterializeCredentials(ctx, cfg, tokenCache, credentialsFuture, proxyCredentialsFuture)
 					if newErr != nil {
