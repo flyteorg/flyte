@@ -225,6 +225,9 @@ func (s *customTokenSource) Token() (*oauth2.Token, error) {
 		return token, nil
 	}
 
+	s.tokenCache.Lock()
+	defer s.tokenCache.Unlock()
+
 	// Check again here in case another goroutine has already updated the token
 	if token, err := s.tokenCache.GetToken(); err == nil && token.Valid() {
 		return token, nil

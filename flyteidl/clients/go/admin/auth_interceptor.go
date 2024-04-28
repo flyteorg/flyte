@@ -144,8 +144,6 @@ func NewAuthInterceptor(cfg *Config, tokenCache cache.TokenCache, credentialsFut
 			if st, ok := status.FromError(err); ok {
 				// If the error we receive from executing the request expects
 				if shouldAttemptToAuthenticate(st.Code()) {
-					tokenCache.Lock()
-					defer tokenCache.Unlock()
 					t2, _ := tokenCache.GetToken()
 					if t == t2 {
 						// Clear the token cache so that subsequent calls will get a fresh token
