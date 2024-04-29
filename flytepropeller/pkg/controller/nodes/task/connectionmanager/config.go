@@ -2,8 +2,6 @@ package connectionmanager
 
 import "github.com/flyteorg/flyte/flytestdlib/config"
 
-//go:generate pflags Config --default-var defaultConfig
-
 const SectionKey = "connections"
 
 var (
