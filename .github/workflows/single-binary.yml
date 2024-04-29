@@ -16,7 +16,7 @@ jobs:
   test-bootstrap:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-go@v3
         with:
           go-version: "1.21"
@@ -38,7 +38,7 @@ jobs:
     needs: [test-bootstrap]
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Setup Golang caches
         uses: actions/cache@v3
         with:
@@ -132,7 +132,7 @@ jobs:
           FLYTESNACKS_VERSION="$(curl --silent https://api.github.com/repos/flyteorg/flytesnacks/releases/latest | jq -r .tag_name)"
           echo "FLYTESNACKS_VERSION=${FLYTESNACKS_VERSION}" >> ${GITHUB_ENV}
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - uses: actions/download-artifact@v3
         with:
           name: single-binary-image
@@ -177,7 +177,7 @@ jobs:
           pip install flytekit flytekitplugins-deck-standard
           pip freeze
       - name: Checkout flytesnacks
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: flyteorg/flytesnacks
           path: flytesnacks
@@ -205,7 +205,7 @@ jobs:
     needs: [build-and-push-single-binary-image]
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - uses: actions/download-artifact@v3
         with:
           name: single-binary-image

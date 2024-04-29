@@ -3,9 +3,9 @@ package connectionmanager
 import (
 	"context"
 	"fmt"
-	flyteidl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-
 	"os"
+
+	flyteidl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 // FileEnvConnectionManager allows retrieving secrets mounted to this process through Env Vars or Files.
