@@ -10,7 +10,7 @@ on:
         required: true
         type: string
     secrets:
-      FLYTE_BOT_PAT:
+      CODECOV_TOKEN:
         required: true
 jobs:
   tests:
