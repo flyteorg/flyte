@@ -14,7 +14,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Fetch the code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: "0"
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
@@ -31,11 +33,13 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: "${{ github.workspace }}/flyte"
+          fetch-depth: "0"
       - name: Fetch flytekit code
         uses: actions/checkout@v4
         with:
           repository: flyteorg/flytekit
           path: "${{ github.workspace }}/flytekit"
+          fetch-depth: "0"
       - uses: conda-incubator/setup-miniconda@v3
         with:
           auto-update-conda: true
@@ -74,7 +78,9 @@ jobs:
   generate_helm:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: "0"
       - uses: actions/setup-go@v2
         with:
           go-version: "1.21"
