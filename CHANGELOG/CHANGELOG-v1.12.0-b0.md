@@ -9,7 +9,7 @@
 * Match flytekit versions used to register and run functional tests by @eapolinario in https://github.com/flyteorg/flyte/pull/5059
 * integration test config by @troychiu in https://github.com/flyteorg/flyte/pull/5058
 * Add org as an optional request param to dataproxy CreateUploadLocation by @katrogan in https://github.com/flyteorg/flyte/pull/5060
-* Add k8s env froms by @neilisaur in https://github.com/flyteorg/flyte/pull/4969
+* Add k8s env from by @neilisaur in https://github.com/flyteorg/flyte/pull/4969
 * Implement GetProject endpoint in FlyteAdmin by @RRap0so in https://github.com/flyteorg/flyte/pull/4825
 * Prepopulate ArrayNode output literals with TaskNode interface output variables by @hamersaw in https://github.com/flyteorg/flyte/pull/5080
 * [House Keeping] deprecate MaxDatasetSizeBytes propeller config in favor of GetLimitMegabytes storage config by @pvditt in https://github.com/flyteorg/flyte/pull/4852
@@ -119,7 +119,7 @@
 * [Docs] add envd plugin installation command to the environment setup guide by @Future-Outlier in https://github.com/flyteorg/flyte/pull/5257
 * [Docs] add colon rule in version by @Future-Outlier in https://github.com/flyteorg/flyte/pull/5258
 * [easy] [Docs] Raw Container Local Execution by @Future-Outlier in https://github.com/flyteorg/flyte/pull/5262
-* [Docs] add validation file tpye by @jasonlai1218 in https://github.com/flyteorg/flyte/pull/5259
+* [Docs] add validation file type by @jasonlai1218 in https://github.com/flyteorg/flyte/pull/5259
 * WebAPI plugins optimization by @pingsutw in https://github.com/flyteorg/flyte/pull/5237
 * fix(webapi): Ensure cache deletion on abort workflow by @pingsutw in https://github.com/flyteorg/flyte/pull/5235
 * RunLLM Widget Configuration by @agiron123 in https://github.com/flyteorg/flyte/pull/5266
