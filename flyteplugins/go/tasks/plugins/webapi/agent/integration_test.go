@@ -91,20 +91,26 @@ func TestEndToEnd(t *testing.T) {
 		plugin, err := pluginEntry.LoadPlugin(context.TODO(), newFakeSetupContext("sync task"))
 		assert.NoError(t, err)
 
-		template.Type = "openai"
-		template.Interface = &flyteIdlCore.TypedInterface{
-			Outputs: &flyteIdlCore.VariableMap{
-				Variables: map[string]*flyteIdlCore.Variable{
-					"x": {Type: &flyteIdlCore.LiteralType{
-						Type: &flyteIdlCore.LiteralType_Simple{
-							Simple: flyteIdlCore.SimpleType_INTEGER,
+		template := flyteIdlCore.TaskTemplate{
+			Type:   "openai",
+			Custom: st,
+			Target: &flyteIdlCore.TaskTemplate_Container{
+				Container: &flyteIdlCore.Container{Args: []string{"pyflyte-fast-execute", "--output-prefix", "/tmp/123"}},
+			},
+			Interface: &flyteIdlCore.TypedInterface{
+				Outputs: &flyteIdlCore.VariableMap{
+					Variables: map[string]*flyteIdlCore.Variable{
+						"x": {Type: &flyteIdlCore.LiteralType{
+							Type: &flyteIdlCore.LiteralType_Simple{
+								Simple: flyteIdlCore.SimpleType_INTEGER,
+							},
 						},
-					},
+						},
 					},
 				},
 			},
+			SecurityContext: &flyteIdlCore.SecurityContext{Connection: "openai"},
 		}
-		template.SecurityContext = &flyteIdlCore.SecurityContext{Connection: "openai"}
 
 		expectedOutputs, err := coreutils.MakeLiteralMap(map[string]interface{}{"x": 1})
 		assert.NoError(t, err)
@@ -339,9 +345,14 @@ func newFakeSetupContext(name string) *pluginCoreMocks.SetupContext {
 	fakeResourceRegistrar.On("RegisterResourceQuota", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 	labeled.SetMetricKeys(contextutils.NamespaceKey)
 
+	connection := flyteIdlCore.Connection{Secrets: map[string]string{"OPENAI_API_KEY": "123"}}
+	connectionManager := pluginCoreMocks.ConnectionManager{}
+	connectionManager.OnGet(context.Background(), mock.Anything).Return(connection, nil)
+
 	fakeSetupContext := pluginCoreMocks.SetupContext{}
 	fakeSetupContext.OnMetricsScope().Return(promutils.NewScope(name))
 	fakeSetupContext.OnResourceRegistrar().Return(&fakeResourceRegistrar)
+	fakeSetupContext.OnConnectionManager().Return(&connectionManager)
 
 	return &fakeSetupContext
 }
