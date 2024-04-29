@@ -27,8 +27,8 @@ func (t *TokenCacheInMemoryProvider) GetToken() (*oauth2.Token, error) {
 	return tkn.(*oauth2.Token), nil
 }
 
-func (t *TokenCacheInMemoryProvider) Purge() {
-	t.token.Store(nil)
+func (t *TokenCacheInMemoryProvider) PurgeIfEquals(existing *oauth2.Token) (bool, error) {
+	return t.token.CompareAndSwap(existing, nil), nil
 }
 
 func (t *TokenCacheInMemoryProvider) Lock() {

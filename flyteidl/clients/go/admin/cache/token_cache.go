@@ -12,8 +12,8 @@ type TokenCache interface {
 	// GetToken retrieves the token from the cache.
 	GetToken() (*oauth2.Token, error)
 
-	// Purge the token from the cache.
-	Purge()
+	// PurgeIfEquals purges the token from the cache.
+	PurgeIfEquals(t *oauth2.Token) (bool, error)
 
 	// Lock the cache.
 	Lock()
