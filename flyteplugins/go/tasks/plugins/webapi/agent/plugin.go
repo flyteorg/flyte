@@ -93,7 +93,7 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 	taskCategory := admin.TaskCategory{Name: taskTemplate.Type, Version: taskTemplate.TaskTypeVersion}
 	agent, isSync := getFinalAgent(&taskCategory, p.cfg, p.agentRegistry)
 
-	var connection *flyteIdl.Connection
+	var connection flyteIdl.Connection
 	if taskTemplate.SecurityContext != nil {
 		connection, err = taskCtx.ConnectionManager().Get(ctx, taskTemplate.SecurityContext.Connection)
 		if err != nil {
@@ -115,7 +115,7 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 			Template:              taskTemplate,
 			OutputPrefix:          outputPrefix,
 			TaskExecutionMetadata: &taskExecutionMetadata,
-			Connection:            connection,
+			Connection:            &connection,
 		}
 		return p.ExecuteTaskSync(finalCtx, client, header, inputs)
 	}
@@ -133,7 +133,7 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 		Template:              taskTemplate,
 		OutputPrefix:          outputPrefix,
 		TaskExecutionMetadata: &taskExecutionMetadata,
-		Connection:            connection,
+		Connection:            &connection,
 	}
 	res, err := client.CreateTask(finalCtx, request)
 	if err != nil {
@@ -144,7 +144,7 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 		OutputPrefix:      outputPrefix,
 		AgentResourceMeta: res.GetResourceMeta(),
 		TaskCategory:      taskCategory,
-		Connection:        *connection,
+		Connection:        connection,
 	}, nil, nil
 }
 
