@@ -2630,6 +2630,7 @@ k8s (`config.K8sPluginConfig`_)
   gpu-unpartitioned-node-selector-requirement: null
   gpu-unpartitioned-toleration: null
   image-pull-backoff-grace-period: 3m0s
+  image-pull-policy: ""
   inject-finalizer: false
   interruptible-node-selector: null
   interruptible-node-selector-requirement: null
@@ -2963,6 +2964,16 @@ image-pull-backoff-grace-period (`config.Duration`_)
 .. code-block:: yaml
 
   3m0s
+  
+
+image-pull-policy (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
   
 
 pod-pending-timeout (`config.Duration`_)
@@ -3720,18 +3731,6 @@ Enable creation of the FlyteWorkflow CRD on startup
   "false"
   
 
-array-node-event-version (int)
-------------------------------------------------------------------------------------------------------------------------
-
-ArrayNode eventing version. 0 => legacy (drop-in replacement for maptask), 1 => new
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  "0"
-  
-
 node-execution-worker-count (int)
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -3742,6 +3741,46 @@ Number of workers to evaluate node executions, currently only used for array nod
 .. code-block:: yaml
 
   "8"
+  
+
+array-node-config (`config.ArrayNodeConfig`_)
+------------------------------------------------------------------------------------------------------------------------
+
+Configuration for array nodes
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  default-parallelism-behavior: unlimited
+  event-version: 0
+  
+
+config.ArrayNodeConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+event-version (int)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+ArrayNode eventing version. 0 => legacy (drop-in replacement for maptask), 1 => new
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "0"
+  
+
+default-parallelism-behavior (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Default parallelism behavior for array nodes
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  unlimited
   
 
 config.CompositeQueueConfig
