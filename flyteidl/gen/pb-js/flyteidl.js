@@ -17152,9 +17152,8 @@
                  * Properties of a Connection.
                  * @memberof flyteidl.core
                  * @interface IConnection
-                 * @property {string|null} [name] Connection name
                  * @property {Object.<string,string>|null} [secrets] Connection secrets
-                 * @property {Object.<string,string>|null} [config] Connection config
+                 * @property {Object.<string,string>|null} [configs] Connection configs
                  */
     
                 /**
@@ -17167,20 +17166,12 @@
                  */
                 function Connection(properties) {
                     this.secrets = {};
-                    this.config = {};
+                    this.configs = {};
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
                                 this[keys[i]] = properties[keys[i]];
                 }
-    
-                /**
-                 * Connection name.
-                 * @member {string} name
-                 * @memberof flyteidl.core.Connection
-                 * @instance
-                 */
-                Connection.prototype.name = "";
     
                 /**
                  * Connection secrets.
@@ -17191,12 +17182,12 @@
                 Connection.prototype.secrets = $util.emptyObject;
     
                 /**
-                 * Connection config.
-                 * @member {Object.<string,string>} config
+                 * Connection configs.
+                 * @member {Object.<string,string>} configs
                  * @memberof flyteidl.core.Connection
                  * @instance
                  */
-                Connection.prototype.config = $util.emptyObject;
+                Connection.prototype.configs = $util.emptyObject;
     
                 /**
                  * Creates a new Connection instance using the specified properties.
@@ -17222,14 +17213,12 @@
                 Connection.encode = function encode(message, writer) {
                     if (!writer)
                         writer = $Writer.create();
-                    if (message.name != null && message.hasOwnProperty("name"))
-                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.name);
                     if (message.secrets != null && message.hasOwnProperty("secrets"))
                         for (var keys = Object.keys(message.secrets), i = 0; i < keys.length; ++i)
-                            writer.uint32(/* id 2, wireType 2 =*/18).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]).uint32(/* id 2, wireType 2 =*/18).string(message.secrets[keys[i]]).ldelim();
-                    if (message.config != null && message.hasOwnProperty("config"))
-                        for (var keys = Object.keys(message.config), i = 0; i < keys.length; ++i)
-                            writer.uint32(/* id 3, wireType 2 =*/26).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]).uint32(/* id 2, wireType 2 =*/18).string(message.config[keys[i]]).ldelim();
+                            writer.uint32(/* id 1, wireType 2 =*/10).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]).uint32(/* id 2, wireType 2 =*/18).string(message.secrets[keys[i]]).ldelim();
+                    if (message.configs != null && message.hasOwnProperty("configs"))
+                        for (var keys = Object.keys(message.configs), i = 0; i < keys.length; ++i)
+                            writer.uint32(/* id 2, wireType 2 =*/18).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]).uint32(/* id 2, wireType 2 =*/18).string(message.configs[keys[i]]).ldelim();
                     return writer;
                 };
     
@@ -17252,9 +17241,6 @@
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
                         case 1:
-                            message.name = reader.string();
-                            break;
-                        case 2:
                             reader.skip().pos++;
                             if (message.secrets === $util.emptyObject)
                                 message.secrets = {};
@@ -17262,13 +17248,13 @@
                             reader.pos++;
                             message.secrets[key] = reader.string();
                             break;
-                        case 3:
+                        case 2:
                             reader.skip().pos++;
-                            if (message.config === $util.emptyObject)
-                                message.config = {};
+                            if (message.configs === $util.emptyObject)
+                                message.configs = {};
                             key = reader.string();
                             reader.pos++;
-                            message.config[key] = reader.string();
+                            message.configs[key] = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -17289,9 +17275,6 @@
                 Connection.verify = function verify(message) {
                     if (typeof message !== "object" || message === null)
                         return "object expected";
-                    if (message.name != null && message.hasOwnProperty("name"))
-                        if (!$util.isString(message.name))
-                            return "name: string expected";
                     if (message.secrets != null && message.hasOwnProperty("secrets")) {
                         if (!$util.isObject(message.secrets))
                             return "secrets: object expected";
@@ -17300,13 +17283,13 @@
                             if (!$util.isString(message.secrets[key[i]]))
                                 return "secrets: string{k:string} expected";
                     }
-                    if (message.config != null && message.hasOwnProperty("config")) {
-                        if (!$util.isObject(message.config))
-                            return "config: object expected";
-                        var key = Object.keys(message.config);
+                    if (message.configs != null && message.hasOwnProperty("configs")) {
+                        if (!$util.isObject(message.configs))
+                            return "configs: object expected";
+                        var key = Object.keys(message.configs);
                         for (var i = 0; i < key.length; ++i)
-                            if (!$util.isString(message.config[key[i]]))
-                                return "config: string{k:string} expected";
+                            if (!$util.isString(message.configs[key[i]]))
+                                return "configs: string{k:string} expected";
                     }
                     return null;
                 };

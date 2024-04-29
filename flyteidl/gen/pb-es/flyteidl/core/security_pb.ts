@@ -123,26 +123,18 @@ proto3.util.setEnumType(Secret_MountType, "flyteidl.core.Secret.MountType", [
  */
 export class Connection extends Message<Connection> {
   /**
-   * The name of the connection.
-   * +required
-   *
-   * @generated from field: string name = 1;
-   */
-  name = "";
-
-  /**
    * The credentials to use for the connection, such as API keys, OAuth2 tokens, etc.
    *
-   * @generated from field: map<string, string> secrets = 2;
+   * @generated from field: map<string, string> secrets = 1;
    */
   secrets: { [key: string]: string } = {};
 
   /**
    * The configuration to use for the connection, such as the endpoint, account name, etc.
    *
-   * @generated from field: map<string, string> config = 3;
+   * @generated from field: map<string, string> configs = 2;
    */
-  config: { [key: string]: string } = {};
+  configs: { [key: string]: string } = {};
 
   constructor(data?: PartialMessage<Connection>) {
     super();
@@ -152,9 +144,8 @@ export class Connection extends Message<Connection> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "flyteidl.core.Connection";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "secrets", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
-    { no: 3, name: "config", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
+    { no: 1, name: "secrets", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
+    { no: 2, name: "configs", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Connection {

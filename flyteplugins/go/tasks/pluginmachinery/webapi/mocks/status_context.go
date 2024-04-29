@@ -16,6 +16,40 @@ type StatusContext struct {
 	mock.Mock
 }
 
+type StatusContext_ConnectionManager struct {
+	*mock.Call
+}
+
+func (_m StatusContext_ConnectionManager) Return(_a0 core.ConnectionManager) *StatusContext_ConnectionManager {
+	return &StatusContext_ConnectionManager{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *StatusContext) OnConnectionManager() *StatusContext_ConnectionManager {
+	c_call := _m.On("ConnectionManager")
+	return &StatusContext_ConnectionManager{Call: c_call}
+}
+
+func (_m *StatusContext) OnConnectionManagerMatch(matchers ...interface{}) *StatusContext_ConnectionManager {
+	c_call := _m.On("ConnectionManager", matchers...)
+	return &StatusContext_ConnectionManager{Call: c_call}
+}
+
+// ConnectionManager provides a mock function with given fields:
+func (_m *StatusContext) ConnectionManager() core.ConnectionManager {
+	ret := _m.Called()
+
+	var r0 core.ConnectionManager
+	if rf, ok := ret.Get(0).(func() core.ConnectionManager); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(core.ConnectionManager)
+		}
+	}
+
+	return r0
+}
+
 type StatusContext_DataStore struct {
 	*mock.Call
 }

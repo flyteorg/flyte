@@ -46,15 +46,11 @@ message Secret {
 }
 
 message Connection {
-    // The name of the connection.
-    // +required
-    string name = 1;
-
     // The credentials to use for the connection, such as API keys, OAuth2 tokens, etc.
-    map<string, string> secrets = 2;
+    map<string, string> secrets = 1;
 
     // The configuration to use for the connection, such as the endpoint, account name, etc.
-    map<string, string> config = 3;
+    map<string, string> configs = 2;
 }
 
 // OAuth2Client encapsulates OAuth2 Client Credentials to be used when making calls on behalf of that task.

@@ -7095,14 +7095,11 @@ export namespace flyteidl {
         /** Properties of a Connection. */
         interface IConnection {
 
-            /** Connection name */
-            name?: (string|null);
-
             /** Connection secrets */
             secrets?: ({ [k: string]: string }|null);
 
-            /** Connection config */
-            config?: ({ [k: string]: string }|null);
+            /** Connection configs */
+            configs?: ({ [k: string]: string }|null);
         }
 
         /** Represents a Connection. */
@@ -7114,14 +7111,11 @@ export namespace flyteidl {
              */
             constructor(properties?: flyteidl.core.IConnection);
 
-            /** Connection name. */
-            public name: string;
-
             /** Connection secrets. */
             public secrets: { [k: string]: string };
 
-            /** Connection config. */
-            public config: { [k: string]: string };
+            /** Connection configs. */
+            public configs: { [k: string]: string };
 
             /**
              * Creates a new Connection instance using the specified properties.

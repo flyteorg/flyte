@@ -14,6 +14,40 @@ type TaskExecutionContextReader struct {
 	mock.Mock
 }
 
+type TaskExecutionContextReader_ConnectionManager struct {
+	*mock.Call
+}
+
+func (_m TaskExecutionContextReader_ConnectionManager) Return(_a0 core.ConnectionManager) *TaskExecutionContextReader_ConnectionManager {
+	return &TaskExecutionContextReader_ConnectionManager{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *TaskExecutionContextReader) OnConnectionManager() *TaskExecutionContextReader_ConnectionManager {
+	c_call := _m.On("ConnectionManager")
+	return &TaskExecutionContextReader_ConnectionManager{Call: c_call}
+}
+
+func (_m *TaskExecutionContextReader) OnConnectionManagerMatch(matchers ...interface{}) *TaskExecutionContextReader_ConnectionManager {
+	c_call := _m.On("ConnectionManager", matchers...)
+	return &TaskExecutionContextReader_ConnectionManager{Call: c_call}
+}
+
+// ConnectionManager provides a mock function with given fields:
+func (_m *TaskExecutionContextReader) ConnectionManager() core.ConnectionManager {
+	ret := _m.Called()
+
+	var r0 core.ConnectionManager
+	if rf, ok := ret.Get(0).(func() core.ConnectionManager); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(core.ConnectionManager)
+		}
+	}
+
+	return r0
+}
+
 type TaskExecutionContextReader_InputReader struct {
 	*mock.Call
 }

@@ -27,7 +27,7 @@ class Secret(_message.Message):
     def __init__(self, group: _Optional[str] = ..., group_version: _Optional[str] = ..., key: _Optional[str] = ..., mount_requirement: _Optional[_Union[Secret.MountType, str]] = ...) -> None: ...
 
 class Connection(_message.Message):
-    __slots__ = ["name", "secrets", "config"]
+    __slots__ = ["secrets", "configs"]
     class SecretsEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -35,20 +35,18 @@ class Connection(_message.Message):
         key: str
         value: str
         def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
-    class ConfigEntry(_message.Message):
+    class ConfigsEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
         VALUE_FIELD_NUMBER: _ClassVar[int]
         key: str
         value: str
         def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
-    NAME_FIELD_NUMBER: _ClassVar[int]
     SECRETS_FIELD_NUMBER: _ClassVar[int]
-    CONFIG_FIELD_NUMBER: _ClassVar[int]
-    name: str
+    CONFIGS_FIELD_NUMBER: _ClassVar[int]
     secrets: _containers.ScalarMap[str, str]
-    config: _containers.ScalarMap[str, str]
-    def __init__(self, name: _Optional[str] = ..., secrets: _Optional[_Mapping[str, str]] = ..., config: _Optional[_Mapping[str, str]] = ...) -> None: ...
+    configs: _containers.ScalarMap[str, str]
+    def __init__(self, secrets: _Optional[_Mapping[str, str]] = ..., configs: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class OAuth2Client(_message.Message):
     __slots__ = ["client_id", "client_secret"]

@@ -1063,16 +1063,12 @@ pub mod secret {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Connection {
-    /// The name of the connection.
-    /// +required
-    #[prost(string, tag="1")]
-    pub name: ::prost::alloc::string::String,
     /// The credentials to use for the connection, such as API keys, OAuth2 tokens, etc.
-    #[prost(map="string, string", tag="2")]
+    #[prost(map="string, string", tag="1")]
     pub secrets: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
     /// The configuration to use for the connection, such as the endpoint, account name, etc.
-    #[prost(map="string, string", tag="3")]
-    pub config: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
+    #[prost(map="string, string", tag="2")]
+    pub configs: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
 }
 /// OAuth2Client encapsulates OAuth2 Client Credentials to be used when making calls on behalf of that task.
 #[allow(clippy::derive_partial_eq_without_eq)]
