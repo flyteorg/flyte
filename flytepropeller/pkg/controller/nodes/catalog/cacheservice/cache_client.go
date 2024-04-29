@@ -221,7 +221,7 @@ func NewCacheClient(ctx context.Context, dataStore *storage.DataStore, endpoint 
 		opts = append(opts, authOpt...)
 	}
 
-    grpcOptions := []grpcRetry.CallOption{
+	grpcOptions := []grpcRetry.CallOption{
 		grpcRetry.WithBackoff(grpcRetry.BackoffExponentialWithJitter(time.Duration(backoffScalar)*time.Millisecond, backoffJitter)),
 		grpcRetry.WithCodes(codes.DeadlineExceeded, codes.Unavailable, codes.Canceled),
 		grpcRetry.WithMax(maxRetries),

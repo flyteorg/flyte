@@ -43,27 +43,40 @@ func GenerateCacheKey(ctx context.Context, key catalog.Key) (string, error) {
 	return cacheKey, nil
 }
 
-// GenerateCacheMetadata creates a cache metadata to identify the source of a cache entry
+// GenerateCacheMetadata creates cache metadata to identify the source of a cache entry
 func GenerateCacheMetadata(key catalog.Key, metadata catalog.Metadata) *cacheservice.Metadata {
-	if metadata.TaskExecutionIdentifier == nil {
+	if metadata.TaskExecutionIdentifier != nil {
 		return &cacheservice.Metadata{
 			SourceIdentifier: &key.Identifier,
+			KeyMap: &cacheservice.KeyMapMetadata{
+				Values: map[string]string{
+					datacatalog.TaskVersionKey:     metadata.TaskExecutionIdentifier.TaskId.GetVersion(),
+					datacatalog.ExecProjectKey:     metadata.TaskExecutionIdentifier.NodeExecutionId.GetExecutionId().GetProject(),
+					datacatalog.ExecDomainKey:      metadata.TaskExecutionIdentifier.NodeExecutionId.GetExecutionId().GetDomain(),
+					datacatalog.ExecNameKey:        metadata.TaskExecutionIdentifier.NodeExecutionId.GetExecutionId().GetName(),
+					datacatalog.ExecNodeIDKey:      metadata.TaskExecutionIdentifier.NodeExecutionId.GetNodeId(),
+					datacatalog.ExecTaskAttemptKey: strconv.Itoa(int(metadata.TaskExecutionIdentifier.GetRetryAttempt())),
+					datacatalog.ExecOrgKey:         metadata.TaskExecutionIdentifier.GetNodeExecutionId().GetExecutionId().GetOrg(),
+				},
+			},
+		}
+	} else if metadata.NodeExecutionIdentifier != nil {
+		return &cacheservice.Metadata{
+			SourceIdentifier: &key.Identifier,
+			KeyMap: &cacheservice.KeyMapMetadata{
+				Values: map[string]string{
+					datacatalog.ExecProjectKey: metadata.NodeExecutionIdentifier.GetExecutionId().GetProject(),
+					datacatalog.ExecDomainKey:  metadata.NodeExecutionIdentifier.GetExecutionId().GetDomain(),
+					datacatalog.ExecNameKey:    metadata.NodeExecutionIdentifier.GetExecutionId().GetName(),
+					datacatalog.ExecNodeIDKey:  metadata.NodeExecutionIdentifier.GetNodeId(),
+					datacatalog.ExecOrgKey:     metadata.NodeExecutionIdentifier.GetExecutionId().GetOrg(),
+				},
+			},
 		}
 	}
 
 	return &cacheservice.Metadata{
 		SourceIdentifier: &key.Identifier,
-		KeyMap: &cacheservice.KeyMapMetadata{
-			Values: map[string]string{
-				datacatalog.TaskVersionKey:     metadata.TaskExecutionIdentifier.TaskId.GetVersion(),
-				datacatalog.ExecProjectKey:     metadata.TaskExecutionIdentifier.NodeExecutionId.GetExecutionId().GetProject(),
-				datacatalog.ExecDomainKey:      metadata.TaskExecutionIdentifier.NodeExecutionId.GetExecutionId().GetDomain(),
-				datacatalog.ExecNameKey:        metadata.TaskExecutionIdentifier.NodeExecutionId.GetExecutionId().GetName(),
-				datacatalog.ExecNodeIDKey:      metadata.TaskExecutionIdentifier.NodeExecutionId.GetNodeId(),
-				datacatalog.ExecTaskAttemptKey: strconv.Itoa(int(metadata.TaskExecutionIdentifier.GetRetryAttempt())),
-				datacatalog.ExecOrgKey:         metadata.TaskExecutionIdentifier.GetNodeExecutionId().GetExecutionId().GetOrg(),
-			},
-		},
 	}
 }
 
