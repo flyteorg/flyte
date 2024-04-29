@@ -70,7 +70,7 @@ func (f FileEnvSecretManager) GetForSecret(ctx context.Context, secret *coreIdl.
 		return "", err
 	}
 
-	logger.Debugf(ctx, "reading secrets from filePath [%s]", secretFile)
+	logger.Debugf(ctx, "reading secretssss from filePath [%s]", secretFile)
 	b, err := ioutil.ReadFile(secretFile)
 	if err != nil {
 		return "", err
