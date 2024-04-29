@@ -3,16 +3,19 @@ package connectionmanager
 import (
 	"context"
 	"fmt"
-	"os"
-
 	flyteidl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	pluginCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/secretmanager"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 // FileEnvConnectionManager allows retrieving secrets mounted to this process through Env Vars or Files.
-type FileEnvConnectionManager struct{}
+type FileEnvConnectionManager struct {
+	secretManager pluginCore.SecretManager
+}
 
 // Get retrieves a secret from the environment of the running process or from a file.
-func (f FileEnvConnectionManager) Get(_ context.Context, key string) (flyteidl.Connection, error) {
+func (f FileEnvConnectionManager) Get(ctx context.Context, key string) (flyteidl.Connection, error) {
 	cfg := GetConfig()
 	connection, ok := cfg.Connection[key]
 	if !ok {
@@ -20,21 +23,19 @@ func (f FileEnvConnectionManager) Get(_ context.Context, key string) (flyteidl.C
 	}
 	secret := make(map[string]string)
 	for k, v := range connection.Secrets {
-		// TODO: Read the secret from a local file
-		val, ok := os.LookupEnv(v)
-		if !ok {
-			return flyteidl.Connection{}, fmt.Errorf("secret not found in env [%s]", v)
+		val, err := f.secretManager.Get(ctx, v)
+		if err != nil {
+			logger.Errorf(ctx, "failed to get secret [%s] for connection [%s] with error: %v", v, k, err)
+			return flyteidl.Connection{}, err
 		}
 		secret[k] = val
 	}
-	config := make(map[string]string)
-	for k, v := range connection.Configs {
-		config[k] = v
-	}
 
-	return flyteidl.Connection{Secrets: secret, Configs: config}, nil
+	return flyteidl.Connection{Secrets: secret, Configs: connection.Configs}, nil
 }
 
 func NewFileEnvConnectionManager() FileEnvConnectionManager {
-	return FileEnvConnectionManager{}
+	return FileEnvConnectionManager{
+		secretManager: secretmanager.NewFileEnvSecretManager(secretmanager.GetConfig()),
+	}
 }

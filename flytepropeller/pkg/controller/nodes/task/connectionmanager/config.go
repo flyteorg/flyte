@@ -19,6 +19,10 @@ type Config struct {
 	Connection map[string]Connection `json:"connection" pflag:", the connection that saves the secrets and configs"`
 }
 
+func SetConfig(cfg *Config) error {
+	return section.SetConfig(cfg)
+}
+
 func GetConfig() *Config {
 	return section.GetConfig().(*Config)
 }

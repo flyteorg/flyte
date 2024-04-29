@@ -104,6 +104,8 @@ func TestEndToEnd(t *testing.T) {
 				},
 			},
 		}
+		template.SecurityContext = &flyteIdlCore.SecurityContext{Connection: "openai"}
+
 		expectedOutputs, err := coreutils.MakeLiteralMap(map[string]interface{}{"x": 1})
 		assert.NoError(t, err)
 		phase := tests.RunPluginEndToEndTest(t, plugin, &template, inputs, expectedOutputs, nil, iter)
