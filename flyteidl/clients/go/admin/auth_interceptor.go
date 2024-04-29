@@ -136,7 +136,15 @@ func NewAuthInterceptor(cfg *Config, tokenCache cache.TokenCache, credentialsFut
 	return func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
 		ctx = setHTTPClientContext(ctx, cfg, proxyCredentialsFuture)
 
+		// If there is already a token in the cache (e.g. key-ring), we should use it immediately...
 		t, _ := tokenCache.GetToken()
+		if t != nil {
+			err := MaterializeCredentials(ctx, cfg, tokenCache, credentialsFuture, proxyCredentialsFuture)
+			if err != nil {
+				return fmt.Errorf("failed to materialize credentials. Error: %v", err)
+			}
+		}
+
 		err := invoker(ctx, method, req, reply, cc, opts...)
 		if err != nil {
 			logger.Debugf(ctx, "Request failed due to [%v]. If it's an unauthenticated error, we will attempt to establish an authenticated context.", err)
@@ -144,16 +152,20 @@ func NewAuthInterceptor(cfg *Config, tokenCache cache.TokenCache, credentialsFut
 			if st, ok := status.FromError(err); ok {
 				// If the error we receive from executing the request expects
 				if shouldAttemptToAuthenticate(st.Code()) {
-					t2, _ := tokenCache.GetToken()
-					if t == t2 {
-						// Clear the token cache so that subsequent calls will get a fresh token
-						tokenCache.Purge()
+					tokenCache.Lock()
+					defer tokenCache.Unlock()
+					purged, err := tokenCache.PurgeIfEquals(t)
+					if err != nil && err.Error() != "secret not found in keyring" {
+						logger.Errorf(ctx, "Failed to purge cache. Error [%v]", err)
+						return fmt.Errorf("failed to purge cache. Error: %w", err)
 					}
 
-					logger.Debugf(ctx, "Request failed due to [%v]. Attempting to establish an authenticated connection and trying again.", st.Code())
-					newErr := MaterializeCredentials(ctx, cfg, tokenCache, credentialsFuture, proxyCredentialsFuture)
-					if newErr != nil {
-						return fmt.Errorf("authentication error! Original Error: %v, Auth Error: %w", err, newErr)
+					if purged {
+						logger.Debugf(ctx, "Request failed due to [%v]. Attempting to establish an authenticated connection and trying again.", st.Code())
+						newErr := MaterializeCredentials(ctx, cfg, tokenCache, credentialsFuture, proxyCredentialsFuture)
+						if newErr != nil {
+							return fmt.Errorf("authentication error! Original Error: %v, Auth Error: %w", err, newErr)
+						}
 					}
 
 					return invoker(ctx, method, req, reply, cc, opts...)
