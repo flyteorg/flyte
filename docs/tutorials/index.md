@@ -69,7 +69,7 @@ The open-source repository of machine learning projects using Flyte.
 :header-rows: 0
 :widths: 20 30
 
-* - {doc}`Weather forecasting <flytelab/weather_forecasting>`
+* - {doc}`Weather forecasting <flyte_lab/weather_forecasting>`
   - Build an online weather forecasting application.
 ```
 
@@ -80,5 +80,5 @@ The open-source repository of machine learning projects using Flyte.
 model_training/index
 feature_engineering/index
 bioinformatics/index
-flytelab/index
+flyte_lab/index
 ```
