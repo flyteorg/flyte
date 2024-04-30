@@ -3,6 +3,7 @@ package connectionmanager
 import (
 	"context"
 	"fmt"
+
 	flyteidl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	pluginCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/secretmanager"
