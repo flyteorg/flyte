@@ -261,7 +261,7 @@ Nested field StructuredDataset should be run when flytekit version > 1.11.0.
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/data_types_and_io/data_types_and_io/structured_dataset.py
 :caption: data_types_and_io/structured_dataset.py
-:lines: 158-296
+:lines: 159-269
 ```
 
 [flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/data_types_and_io/
