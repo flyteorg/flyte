@@ -21,8 +21,6 @@ jobs:
         working-directory: ${{ inputs.component }}
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: "0"
       - uses: arduino/setup-protoc@v1
         with:
           repo-token: ${{ secrets.FLYTE_BOT_PAT }}

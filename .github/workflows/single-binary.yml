@@ -17,8 +17,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: "0"
       - uses: actions/setup-go@v3
         with:
           go-version: "1.21"
@@ -41,8 +39,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: "0"
       - name: Setup Golang caches
         uses: actions/cache@v3
         with:
@@ -137,8 +133,6 @@ jobs:
           echo "FLYTESNACKS_VERSION=${FLYTESNACKS_VERSION}" >> ${GITHUB_ENV}
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: "0"
       - uses: actions/download-artifact@v3
         with:
           name: single-binary-image
@@ -188,7 +182,6 @@ jobs:
           repository: flyteorg/flytesnacks
           path: flytesnacks
           ref: ${{ env.FLYTESNACKS_VERSION }}
-          fetch-depth: "0"
       - name: Register specific tests
         run: |
           flytekit_version=$(pip show flytekit | grep -i version | awk '{ print $2 }')
@@ -213,8 +206,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: "0"
       - uses: actions/download-artifact@v3
         with:
           name: single-binary-image
