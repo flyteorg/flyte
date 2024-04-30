@@ -4,7 +4,7 @@ import (
 	"html/template"
 	"os"
 
-	f "github.com/flyteorg/flytectl/pkg/filesystemutils"
+	f "github.com/flyteorg/flyte/flytectl/pkg/filesystemutils"
 )
 
 const (

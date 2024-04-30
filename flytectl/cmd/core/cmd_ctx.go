@@ -5,8 +5,8 @@ import (
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin"
 
+	"github.com/flyteorg/flyte/flytectl/pkg/ext"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
-	"github.com/flyteorg/flytectl/pkg/ext"
 )
 
 type CommandContext struct {

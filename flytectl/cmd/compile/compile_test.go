@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
-	config "github.com/flyteorg/flytectl/cmd/config/subcommand/compile"
-	cmdCore "github.com/flyteorg/flytectl/cmd/core"
-	u "github.com/flyteorg/flytectl/cmd/testutils"
+	config "github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/compile"
+	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
+	u "github.com/flyteorg/flyte/flytectl/cmd/testutils"
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 )

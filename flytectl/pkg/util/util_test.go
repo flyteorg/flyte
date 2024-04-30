@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/flyteorg/flytectl/pkg/docker"
+	"github.com/flyteorg/flyte/flytectl/pkg/docker"
 
 	"github.com/stretchr/testify/assert"
 )

@@ -20,10 +20,10 @@ import (
 	"github.com/docker/docker/pkg/jsonmessage"
 	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/docker/go-connections/nat"
-	"github.com/flyteorg/flytectl/clierrors"
-	"github.com/flyteorg/flytectl/cmd/config/subcommand/docker"
-	cmdUtil "github.com/flyteorg/flytectl/pkg/commandutils"
-	f "github.com/flyteorg/flytectl/pkg/filesystemutils"
+	"github.com/flyteorg/flyte/flytectl/clierrors"
+	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/docker"
+	cmdUtil "github.com/flyteorg/flyte/flytectl/pkg/commandutils"
+	f "github.com/flyteorg/flyte/flytectl/pkg/filesystemutils"
 	"github.com/moby/term"
 )
 

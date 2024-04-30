@@ -1,6 +1,6 @@
 package sandbox
 
-import "github.com/flyteorg/flytectl/pkg/docker"
+import "github.com/flyteorg/flyte/flytectl/pkg/docker"
 
 // Config holds configuration flags for sandbox command.
 type Config struct {

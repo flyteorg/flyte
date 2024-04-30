@@ -4,8 +4,8 @@ import (
 	"context"
 	"os"
 
+	"github.com/flyteorg/flyte/flytectl/cmd"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/flyteorg/flytectl/cmd"
 )
 
 func main() {

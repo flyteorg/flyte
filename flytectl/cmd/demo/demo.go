@@ -1,8 +1,8 @@
 package demo
 
 import (
-	sandboxCmdConfig "github.com/flyteorg/flytectl/cmd/config/subcommand/sandbox"
-	cmdcore "github.com/flyteorg/flytectl/cmd/core"
+	sandboxCmdConfig "github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/sandbox"
+	cmdcore "github.com/flyteorg/flyte/flytectl/cmd/core"
 	"github.com/spf13/cobra"
 )
 

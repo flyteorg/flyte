@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 
+	sconfig "github.com/flyteorg/flyte/flytectl/cmd/config/subcommand"
+	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/taskresourceattribute"
+	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-	sconfig "github.com/flyteorg/flytectl/cmd/config/subcommand"
-	"github.com/flyteorg/flytectl/cmd/config/subcommand/taskresourceattribute"
-	cmdCore "github.com/flyteorg/flytectl/cmd/core"
 )
 
 const (

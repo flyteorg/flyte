@@ -6,9 +6,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/flyteorg/flyte/flytectl/pkg/github/mocks"
+	"github.com/flyteorg/flyte/flytectl/pkg/platformutil"
 	stdlibversion "github.com/flyteorg/flyte/flytestdlib/version"
-	"github.com/flyteorg/flytectl/pkg/github/mocks"
-	"github.com/flyteorg/flytectl/pkg/platformutil"
 	"github.com/google/go-github/v42/github"
 
 	"github.com/stretchr/testify/assert"

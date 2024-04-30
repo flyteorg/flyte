@@ -4,12 +4,12 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/flyteorg/flyte/flytectl/cmd/config"
+	sconfig "github.com/flyteorg/flyte/flytectl/cmd/config/subcommand"
+	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/workflowexecutionconfig"
+	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flytectl/cmd/config"
-	sconfig "github.com/flyteorg/flytectl/cmd/config/subcommand"
-	"github.com/flyteorg/flytectl/cmd/config/subcommand/workflowexecutionconfig"
-	cmdCore "github.com/flyteorg/flytectl/cmd/core"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

@@ -7,7 +7,7 @@ import (
 
 	admin "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 
-	filters "github.com/flyteorg/flytectl/pkg/filters"
+	filters "github.com/flyteorg/flyte/flytectl/pkg/filters"
 
 	mock "github.com/stretchr/testify/mock"
 

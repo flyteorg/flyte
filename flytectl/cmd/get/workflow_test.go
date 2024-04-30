@@ -4,22 +4,22 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/flyteorg/flytectl/cmd/testutils"
+	"github.com/flyteorg/flyte/flytectl/cmd/testutils"
 
-	"github.com/flyteorg/flytectl/cmd/config"
-	"github.com/flyteorg/flytectl/pkg/filters"
-	"github.com/flyteorg/flytectl/pkg/printer"
+	"github.com/flyteorg/flyte/flytectl/cmd/config"
+	"github.com/flyteorg/flyte/flytectl/pkg/filters"
+	"github.com/flyteorg/flyte/flytectl/pkg/printer"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
+	"github.com/flyteorg/flyte/flytectl/pkg/ext/mocks"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flytectl/pkg/ext/mocks"
 
-	"github.com/flyteorg/flytectl/cmd/config/subcommand/workflow"
+	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/workflow"
 )
 
 var (

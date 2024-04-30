@@ -1,7 +1,7 @@
 package execution
 
 import (
-	"github.com/flyteorg/flytectl/pkg/filters"
+	"github.com/flyteorg/flyte/flytectl/pkg/filters"
 )
 
 //go:generate pflags Config --default-var DefaultConfig --bind-default-var

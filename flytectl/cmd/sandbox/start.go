@@ -3,9 +3,9 @@ package sandbox
 import (
 	"context"
 
-	sandboxCmdConfig "github.com/flyteorg/flytectl/cmd/config/subcommand/sandbox"
-	cmdCore "github.com/flyteorg/flytectl/cmd/core"
-	"github.com/flyteorg/flytectl/pkg/sandbox"
+	sandboxCmdConfig "github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/sandbox"
+	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
+	"github.com/flyteorg/flyte/flytectl/pkg/sandbox"
 )
 
 const (
