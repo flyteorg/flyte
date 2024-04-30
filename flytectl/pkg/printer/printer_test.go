@@ -193,7 +193,7 @@ func TestPrint(t *testing.T) {
 	workflows = []*admin.Workflow{}
 	err = p.Print(OutputFormat(3), lp, WorkflowToProtoMessages(workflows)...)
 	assert.NotNil(t, err)
-	assert.Equal(t, fmt.Errorf("atleast one workflow required for visualization"), err)
+	assert.Equal(t, fmt.Errorf("at least one workflow required for visualization"), err)
 	var badCompiledTasks []*core.CompiledTask
 	badCompiledTasks = append(badCompiledTasks, &core.CompiledTask{
 		Template: &core.TaskTemplate{},

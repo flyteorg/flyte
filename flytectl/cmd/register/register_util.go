@@ -145,7 +145,7 @@ func reorderUnMarshalFuncs(fname string) []unMarshalFunc {
 		indexStr := match[fnameRegex.SubexpIndex("index")]
 		index, err := strconv.Atoi(indexStr)
 		if err != nil {
-			panic(fmt.Sprintf("unexpected error when coverting [%s] to int, file name [%s]", indexStr, fname))
+			panic(fmt.Sprintf("unexpected error when converting [%s] to int, file name [%s]", indexStr, fname))
 		}
 
 		var reordered []unMarshalFunc
@@ -601,7 +601,7 @@ func readAndCopyArchive(src io.Reader, tempDir string, unarchivedFiles []string)
 		case err != nil:
 			return unarchivedFiles, err
 		}
-		// Location to untar. FilePath couldnt be used here due to,
+		// Location to untar. FilePath couldn't be used here due to,
 		// G305: File traversal when extracting zip archive
 		target := tempDir + "/" + header.Name
 		if header.Typeflag == tar.TypeDir {

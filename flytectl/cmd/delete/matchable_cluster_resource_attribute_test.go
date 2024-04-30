@@ -36,10 +36,10 @@ func TestDeleteClusterResourceAttributes(t *testing.T) {
 		deleteClusterResourceAttributeSetup()
 		// No args implying project domain attribute deletion
 		s.DeleterExt.OnDeleteProjectDomainAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
-			mock.Anything).Return(fmt.Errorf("failed to delte project domain attributes"))
+			mock.Anything).Return(fmt.Errorf("failed to delete project domain attributes"))
 		err := deleteClusterResourceAttributes(s.Ctx, []string{}, s.CmdCtx)
 		assert.NotNil(t, err)
-		assert.Equal(t, fmt.Errorf("failed to delte project domain attributes"), err)
+		assert.Equal(t, fmt.Errorf("failed to delete project domain attributes"), err)
 		s.DeleterExt.AssertCalled(t, "DeleteProjectDomainAttributes",
 			s.Ctx, config.GetConfig().Project, config.GetConfig().Domain, admin.MatchableResource_CLUSTER_RESOURCE)
 	})

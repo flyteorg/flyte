@@ -270,7 +270,7 @@ func (p Printer) Print(format OutputFormat, columns []Column, messages ...proto.
 			}
 		}
 		if len(workflows) == 0 {
-			return fmt.Errorf("atleast one workflow required for visualization")
+			return fmt.Errorf("at least one workflow required for visualization")
 		}
 		workflow := workflows[0]
 		graphStr, err := visualize.RenderWorkflow(workflow.Closure.CompiledWorkflow)

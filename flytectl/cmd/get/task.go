@@ -193,7 +193,7 @@ func FetchTaskForName(ctx context.Context, fetcher ext.AdminFetcherExtInterface,
 		}
 	}
 	if taskConfig.DefaultConfig.ExecFile != "" {
-		// There would be atleast one task object when code reaches here and hence the length assertion is not required.
+		// There would be at least one task object when code reaches here and hence the length assertion is not required.
 		task = tasks[0]
 		// Only write the first task from the tasks object.
 		if err = CreateAndWriteExecConfigForTask(task, taskConfig.DefaultConfig.ExecFile); err != nil {

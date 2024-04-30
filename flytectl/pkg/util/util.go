@@ -133,7 +133,7 @@ func SendRequest(method, url string, option io.Reader) (*http.Response, error) {
 		return nil, err
 	}
 	if response.StatusCode != 200 {
-		return nil, fmt.Errorf("someting goes wrong while sending request to %s. Got status code %v", url, response.StatusCode)
+		return nil, fmt.Errorf("something goes wrong while sending request to %s. Got status code %v", url, response.StatusCode)
 	}
 	return response, nil
 }

@@ -235,7 +235,7 @@ func FetchLPForName(ctx context.Context, fetcher ext.AdminFetcherExtInterface, n
 		}
 	}
 	if launchplan.DefaultConfig.ExecFile != "" {
-		// There would be atleast one launchplan object when code reaches here and hence the length
+		// There would be at least one launchplan object when code reaches here and hence the length
 		// assertion is not required.
 		lp = launchPlans[0]
 		// Only write the first task from the tasks object.
