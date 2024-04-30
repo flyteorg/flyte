@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/flyteorg/flytectl/pkg/pkce"
 	"net/http"
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/cache"
@@ -21,7 +22,9 @@ const ProxyAuthorizationHeader = "proxy-authorization"
 
 // MaterializeCredentials will attempt to build a TokenSource given the anonymously available information exposed by the server.
 // Once established, it'll invoke PerRPCCredentialsFuture.Store() on perRPCCredentials to populate it with the appropriate values.
-func MaterializeCredentials(ctx context.Context, cfg *Config, tokenCache cache.TokenCache, perRPCCredentials *PerRPCCredentialsFuture, proxyCredentialsFuture *PerRPCCredentialsFuture) error {
+func MaterializeCredentials(ctx context.Context, cfg *Config, tokenCache cache.TokenCache,
+	perRPCCredentials *PerRPCCredentialsFuture, proxyCredentialsFuture *PerRPCCredentialsFuture) error {
+
 	authMetadataClient, err := InitializeAuthMetadataClient(ctx, cfg, proxyCredentialsFuture)
 	if err != nil {
 		return fmt.Errorf("failed to initialized Auth Metadata Client. Error: %w", err)
@@ -43,7 +46,12 @@ func MaterializeCredentials(ctx context.Context, cfg *Config, tokenCache cache.T
 
 	tokenSource, err := tokenSourceProvider.GetTokenSource(ctx)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to get token source. Error: %w", err)
+	}
+
+	_, err = tokenSource.Token()
+	if err != nil {
+		return fmt.Errorf("failed to issue token. Error: %w", err)
 	}
 
 	wrappedTokenSource := NewCustomHeaderTokenSource(tokenSource, cfg.UseInsecureConnection, authorizationMetadataKey)
@@ -152,20 +160,26 @@ func NewAuthInterceptor(cfg *Config, tokenCache cache.TokenCache, credentialsFut
 			if st, ok := status.FromError(err); ok {
 				// If the error we receive from executing the request expects
 				if shouldAttemptToAuthenticate(st.Code()) {
-					tokenCache.Lock()
-					defer tokenCache.Unlock()
-					purged, err := tokenCache.PurgeIfEquals(t)
-					if err != nil && err.Error() != "secret not found in keyring" {
-						logger.Errorf(ctx, "Failed to purge cache. Error [%v]", err)
-						return fmt.Errorf("failed to purge cache. Error: %w", err)
-					}
+					err = func() error {
+						tokenCache.Lock()
+						defer tokenCache.Unlock()
+						_, err := tokenCache.PurgeIfEquals(t)
+						if err != nil && !errors.Is(err, pkce.ErrNotFound) {
+							logger.Errorf(ctx, "Failed to purge cache. Error [%v]", err)
+							return fmt.Errorf("failed to purge cache. Error: %w", err)
+						}
 
-					if purged {
 						logger.Debugf(ctx, "Request failed due to [%v]. Attempting to establish an authenticated connection and trying again.", st.Code())
 						newErr := MaterializeCredentials(ctx, cfg, tokenCache, credentialsFuture, proxyCredentialsFuture)
 						if newErr != nil {
 							return fmt.Errorf("authentication error! Original Error: %v, Auth Error: %w", err, newErr)
 						}
+
+						return nil
+					}()
+
+					if err != nil {
+						return err
 					}
 
 					return invoker(ctx, method, req, reply, cc, opts...)
