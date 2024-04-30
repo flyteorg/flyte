@@ -256,7 +256,7 @@ You can run the code locally as follows:
 Like most storage formats (e.g. Avro, Parquet, and BigQuery), StructuredDataset support nested field structures.
 
 :::{note}
-Nested field StructuredDataset should be run  when flytekit version > 1.11.0.
+Nested field StructuredDataset should be run when flytekit version > 1.11.0.
 :::
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/data_types_and_io/data_types_and_io/structured_dataset.py
