@@ -6,6 +6,8 @@ require (
 	github.com/apoorvam/goterminal v0.0.0-20180523175556-614d345c47e5
 	github.com/avast/retry-go v3.0.0+incompatible
 	github.com/awalterschulze/gographviz v2.0.3+incompatible
+	github.com/charmbracelet/bubbles v0.18.0
+	github.com/charmbracelet/bubbletea v0.25.0
 	github.com/disiqueira/gotree v1.0.0
 	github.com/docker/docker v20.10.7+incompatible
 	github.com/docker/go-connections v0.4.0
@@ -36,7 +38,7 @@ require (
 	github.com/zalando/go-keyring v0.1.1
 	golang.org/x/oauth2 v0.7.0
 	golang.org/x/text v0.9.0
-	google.golang.org/grpc v1.56.1
+	google.golang.org/grpc v1.56.3
 	google.golang.org/protobuf v1.30.0
 	gopkg.in/yaml.v3 v3.0.1
 	gotest.tools v2.2.0+incompatible
@@ -70,9 +72,6 @@ require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
-	github.com/charmbracelet/bubbles v0.18.0 // indirect
-	github.com/charmbracelet/bubbletea v0.25.0 // indirect
-	github.com/charmbracelet/lipgloss v0.10.0 // indirect
 	github.com/containerd/console v1.0.4-0.20230313162750-1ae8d489ac81 // indirect
 	github.com/containerd/containerd v1.5.10 // indirect
 	github.com/coocood/freecache v1.1.1 // indirect
