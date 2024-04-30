@@ -4,9 +4,10 @@ import (
 	"context"
 	"testing"
 
-	coreMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+
+	coreMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 )
 
 func TestConnectionManager(t *testing.T) {
