@@ -1,0 +1,15 @@
+[package]
+name = "flyteidl"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+prost = "0.12.3"
+prost-types = "0.12.3"
+tonic = "0.11.0"
+
+[lib]
+name = "flyteidl"
+path = "lib.rs"

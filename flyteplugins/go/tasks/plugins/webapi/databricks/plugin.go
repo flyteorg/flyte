@@ -282,12 +282,14 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 				return core.PhaseInfoFailure(string(rune(http.StatusInternalServerError)), "failed to write output", taskInfo), nil
 			}
 			return core.PhaseInfoSuccess(taskInfo), nil
+		} else if resultState == "FAILED" {
+			return core.PhaseInfoRetryableFailure("job failed", message, taskInfo), nil
 		}
 		return core.PhaseInfoFailure(pluginErrors.TaskFailedWithError, message, taskInfo), nil
 	case "SKIPPED":
 		return core.PhaseInfoFailure(string(rune(http.StatusConflict)), message, taskInfo), nil
 	case "INTERNAL_ERROR":
-		return core.PhaseInfoFailure(string(rune(http.StatusInternalServerError)), message, taskInfo), nil
+		return core.PhaseInfoRetryableFailure(string(rune(http.StatusInternalServerError)), message, taskInfo), nil
 	}
 	return core.PhaseInfoUndefined, pluginErrors.Errorf(pluginsCore.SystemErrorCode, "unknown execution phase [%v].", lifeCycleState)
 }
@@ -302,7 +304,7 @@ func writeOutput(ctx context.Context, taskCtx webapi.StatusContext) error {
 		return nil
 	}
 
-	outputReader := ioutils.NewRemoteFileOutputReader(ctx, taskCtx.DataStore(), taskCtx.OutputWriter(), taskCtx.MaxDatasetSizeBytes())
+	outputReader := ioutils.NewRemoteFileOutputReader(ctx, taskCtx.DataStore(), taskCtx.OutputWriter(), 0)
 	return taskCtx.OutputWriter().Put(ctx, outputReader)
 }
 

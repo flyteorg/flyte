@@ -61,7 +61,7 @@ jobs:
       component: ${{ matrix.component }}
       go-version: ${{ needs.unpack-envvars.outputs.go-version }}
     secrets:
-      FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
   docker-build:
     strategy:
       fail-fast: false

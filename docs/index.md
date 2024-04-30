@@ -151,7 +151,7 @@ Core use cases <core_use_cases/index>
 User Guide <user_guide/index>
 Tutorials <flytesnacks/tutorials>
 Integrations <flytesnacks/integrations>
-Deprecated integrations <flytesnacks/deprecated_integrations>
+Deprecated integrations <deprecated_integrations/index>
 ```
 
 ```{toctree}

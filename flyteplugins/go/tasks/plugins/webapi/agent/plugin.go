@@ -40,6 +40,11 @@ type ResourceWrapper struct {
 	LogLinks []*flyteIdl.TaskLog
 }
 
+// IsTerminal is used to avoid making network calls to the agent service if the resource is already in a terminal state.
+func (r ResourceWrapper) IsTerminal() bool {
+	return r.Phase == flyteIdl.TaskExecution_SUCCEEDED || r.Phase == flyteIdl.TaskExecution_FAILED || r.Phase == flyteIdl.TaskExecution_ABORTED
+}
+
 type ResourceMetaWrapper struct {
 	OutputPrefix      string
 	AgentResourceMeta []byte
@@ -358,7 +363,7 @@ func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, outputs *fly
 		opReader = ioutils.NewInMemoryOutputReader(outputs, nil, nil)
 	} else {
 		logger.Debugf(ctx, "AgentDeployment didn't return any output, assuming file based outputs.")
-		opReader = ioutils.NewRemoteFileOutputReader(ctx, taskCtx.DataStore(), taskCtx.OutputWriter(), taskCtx.MaxDatasetSizeBytes())
+		opReader = ioutils.NewRemoteFileOutputReader(ctx, taskCtx.DataStore(), taskCtx.OutputWriter(), 0)
 	}
 	return taskCtx.OutputWriter().Put(ctx, opReader)
 }

@@ -247,7 +247,6 @@ func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *i
 	tCtx.OnCatalog().Return(cat)
 	tCtx.OnEventsRecorder().Return(eRecorder)
 	tCtx.OnResourceManager().Return(resourceManager)
-	tCtx.OnMaxDatasetSizeBytes().Return(1000000)
 	tCtx.OnSecretManager().Return(secretManager)
 	tCtx.OnConnectionManager().Return(connectionManager)
 
