@@ -7,7 +7,6 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/cache"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/flyteorg/flytectl/pkg/pkce"
 	"golang.org/x/oauth2"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -166,7 +165,7 @@ func NewAuthInterceptor(cfg *Config, tokenCache cache.TokenCache, credentialsFut
 
 						defer tokenCache.Unlock()
 						_, err := tokenCache.PurgeIfEquals(t)
-						if err != nil && !errors.Is(err, pkce.ErrNotFound) {
+						if err != nil && !errors.Is(err, cache.ErrNotFound) {
 							logger.Errorf(ctx, "Failed to purge cache. Error [%v]", err)
 							return fmt.Errorf("failed to purge cache. Error: %w", err)
 						}

@@ -1,8 +1,15 @@
 package cache
 
-import "golang.org/x/oauth2"
+import (
+	"fmt"
+	"golang.org/x/oauth2"
+)
 
 //go:generate mockery -all -case=underscore
+
+var (
+	ErrNotFound = fmt.Errorf("secret not found in keyring")
+)
 
 // TokenCache defines the interface needed to cache and retrieve oauth tokens.
 type TokenCache interface {

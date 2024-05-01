@@ -357,7 +357,7 @@ func (s *StowStore) CreateSignedURL(ctx context.Context, reference DataReference
 		return SignedURLResponse{}, err
 	}
 
-	urlStr, err := c.PreSignRequest(ctx, properties.Scope, key, stow.PresignRequestParams{
+	resp, err := c.PreSignRequest(ctx, properties.Scope, key, stow.PresignRequestParams{
 		ExpiresIn:  properties.ExpiresIn,
 		ContentMD5: properties.ContentMD5,
 	})
@@ -366,7 +366,7 @@ func (s *StowStore) CreateSignedURL(ctx context.Context, reference DataReference
 		return SignedURLResponse{}, err
 	}
 
-	urlVal, err := url.Parse(urlStr)
+	urlVal, err := url.Parse(resp.Url)
 	if err != nil {
 		return SignedURLResponse{}, err
 	}
