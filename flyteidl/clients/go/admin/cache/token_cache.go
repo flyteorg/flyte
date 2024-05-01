@@ -18,6 +18,15 @@ type TokenCache interface {
 	// Lock the cache.
 	Lock()
 
+	// TryLock tries to lock the cache.
+	TryLock() bool
+
 	// Unlock the cache.
 	Unlock()
+
+	// CondWait waits for the condition to be true.
+	CondWait()
+
+	// CondSignal signals the condition.
+	CondSignal()
 }

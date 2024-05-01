@@ -11,6 +11,7 @@ import (
 type TokenCacheInMemoryProvider struct {
 	token atomic.Value
 	mu    *sync.Mutex
+	cond  *sync.Cond
 }
 
 func (t *TokenCacheInMemoryProvider) SaveToken(token *oauth2.Token) error {
@@ -35,13 +36,28 @@ func (t *TokenCacheInMemoryProvider) Lock() {
 	t.mu.Lock()
 }
 
+func (t *TokenCacheInMemoryProvider) TryLock() bool {
+	return t.mu.TryLock()
+}
+
 func (t *TokenCacheInMemoryProvider) Unlock() {
 	t.mu.Unlock()
+}
+
+// CondWait waits for the condition to be true.
+func (t *TokenCacheInMemoryProvider) CondWait() {
+	t.cond.Wait()
+}
+
+// CondSignal signals the condition.
+func (t *TokenCacheInMemoryProvider) CondSignal() {
+	t.cond.Signal()
 }
 
 func NewTokenCacheInMemoryProvider() *TokenCacheInMemoryProvider {
 	return &TokenCacheInMemoryProvider{
 		mu:    &sync.Mutex{},
 		token: atomic.Value{},
+		cond:  sync.NewCond(&sync.Mutex{}),
 	}
 }

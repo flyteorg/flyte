@@ -4,16 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/flyteorg/flytectl/pkg/pkce"
-	"net/http"
-
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/cache"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flytectl/pkg/pkce"
 	"golang.org/x/oauth2"
-
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"net/http"
 
 	"google.golang.org/grpc"
 )
@@ -161,7 +159,11 @@ func NewAuthInterceptor(cfg *Config, tokenCache cache.TokenCache, credentialsFut
 				// If the error we receive from executing the request expects
 				if shouldAttemptToAuthenticate(st.Code()) {
 					err = func() error {
-						tokenCache.Lock()
+						if !tokenCache.TryLock() {
+							tokenCache.CondWait()
+							return nil
+						}
+
 						defer tokenCache.Unlock()
 						_, err := tokenCache.PurgeIfEquals(t)
 						if err != nil && !errors.Is(err, pkce.ErrNotFound) {
@@ -175,6 +177,7 @@ func NewAuthInterceptor(cfg *Config, tokenCache cache.TokenCache, credentialsFut
 							return fmt.Errorf("authentication error! Original Error: %v, Auth Error: %w", err, newErr)
 						}
 
+						tokenCache.CondSignal()
 						return nil
 					}()
 
