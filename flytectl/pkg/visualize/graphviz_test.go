@@ -432,7 +432,7 @@ func TestConstructNode(t *testing.T) {
 		mockGraph := &mocks.Graphvizer{}
 
 		// Verify the attributes
-		mockGraph.OnAddSubGraphMatch(mock.Anything, SubgraphPrefix+"id", mock.Anything).Return(nil)
+		mockGraph.OnAddSubGraphMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
 		mockGraph.OnAddNodeMatch(mock.Anything, mock.Anything, mock.Anything).Return(fmt.Errorf("unable to add node"))
 		mockGraph.OnGetNodeMatch(mock.Anything).Return(nil)
 
