@@ -3,10 +3,12 @@ package transformers
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/flyteorg/flyte/cacheservice/pkg/repositories/models"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
@@ -107,6 +109,8 @@ func TestCreateCachedOutputModel(t *testing.T) {
 func TestFromCachedOutputModel(t *testing.T) {
 	ctx := context.Background()
 
+	createdAt := time.Date(2024, time.January, 1, 0, 0, 0, 0, time.UTC)
+
 	tests := []struct {
 		name              string
 		cachedOutputModel *models.CachedOutput
@@ -118,6 +122,9 @@ func TestFromCachedOutputModel(t *testing.T) {
 			cachedOutputModel: &models.CachedOutput{
 				OutputLiteral: []byte{},
 				Identifier:    models.Identifier{},
+				BaseModel: models.BaseModel{
+					CreatedAt: createdAt,
+				},
 			},
 			expectError: false,
 		},
@@ -126,6 +133,9 @@ func TestFromCachedOutputModel(t *testing.T) {
 			cachedOutputModel: &models.CachedOutput{
 				OutputURI:  "some-uri",
 				Identifier: models.Identifier{},
+				BaseModel: models.BaseModel{
+					CreatedAt: createdAt,
+				},
 			},
 			expectError: false,
 		},
@@ -140,6 +150,7 @@ func TestFromCachedOutputModel(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 				assert.NotNil(t, result)
+				assert.EqualValues(t, timestamppb.New(createdAt), result.Metadata.CreatedAt)
 			}
 		})
 	}
