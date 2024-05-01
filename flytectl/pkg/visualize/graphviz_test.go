@@ -432,7 +432,7 @@ func TestConstructNode(t *testing.T) {
 		mockGraph := &mocks.Graphvizer{}
 
 		// Verify the attributes
-		mockGraph.OnAddSubGraphMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
+		mockGraph.OnAddSubGraphMatch(mock.Anything, SubgraphPrefix+"id", mock.Anything).Return(nil)
 		mockGraph.OnAddNodeMatch(mock.Anything, mock.Anything, mock.Anything).Return(fmt.Errorf("unable to add node"))
 		mockGraph.OnGetNodeMatch(mock.Anything).Return(nil)
 
@@ -442,8 +442,6 @@ func TestConstructNode(t *testing.T) {
 		}
 		sbwfNodes := []*core.Node{subwfNode}
 
-		gb.subWf["project:\"dummyProject\" domain:\"dummyDomain\" name:\"dummyName\" version:\"dummyVersion\""] =
-			&core.CompiledWorkflow{Template: &core.WorkflowTemplate{Nodes: sbwfNodes}}
 		flyteNode := &core.Node{
 			Id: "id",
 			Metadata: &core.NodeMetadata{
@@ -462,6 +460,10 @@ func TestConstructNode(t *testing.T) {
 				},
 			},
 		}
+		// Since this code depends on the string representation of a protobuf message, we do not
+		// use a fix string to compare the error message.
+		gb.subWf[flyteNode.GetWorkflowNode().GetSubWorkflowRef().String()] =
+			&core.CompiledWorkflow{Template: &core.WorkflowTemplate{Nodes: sbwfNodes}}
 		resultWorkflowNode, err := gb.constructNode("", "", mockGraph, flyteNode)
 		assert.NotNil(t, err)
 		assert.Equal(t, fmt.Errorf("unable to add node"), err)
