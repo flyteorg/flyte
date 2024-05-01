@@ -2,6 +2,7 @@ package cacheservice
 
 import (
 	"context"
+	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -11,6 +12,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/catalog/datacatalog"
 )
 
 func TestGenerateCachedTaskKey(t *testing.T) {
@@ -115,6 +117,78 @@ func TestGenerateCachedTaskKey(t *testing.T) {
 				assert.NoError(t, err)
 				assert.Equal(t, tc.expectedKey, taskKey)
 			}
+		})
+	}
+}
+
+func TestGenerateCacheMetadata(t *testing.T) {
+
+	tID := &core.TaskExecutionIdentifier{
+		TaskId: &core.Identifier{
+			ResourceType: core.ResourceType_TASK,
+			Name:         "x",
+			Project:      "project",
+			Domain:       "development",
+			Version:      "ver",
+		},
+		NodeExecutionId: &core.NodeExecutionIdentifier{
+			ExecutionId: &core.WorkflowExecutionIdentifier{
+				Name:    "wf",
+				Project: "p1",
+				Domain:  "d1",
+			},
+			NodeId: "n",
+		},
+		RetryAttempt: 1,
+	}
+	nID := &core.NodeExecutionIdentifier{
+		NodeId: "n",
+		ExecutionId: &core.WorkflowExecutionIdentifier{
+			Name:    "wf",
+			Project: "p1",
+			Domain:  "d1",
+			Org:     "org",
+		},
+	}
+
+	testCases := []struct {
+		name     string
+		key      catalog.Key
+		metadata catalog.Metadata
+		expected map[string]string
+	}{
+		{
+			name:     "task execution identifier",
+			key:      catalog.Key{},
+			metadata: catalog.Metadata{TaskExecutionIdentifier: tID},
+			expected: map[string]string{
+				datacatalog.ExecTaskAttemptKey: strconv.Itoa(int(tID.RetryAttempt)),
+				datacatalog.ExecProjectKey:     tID.NodeExecutionId.ExecutionId.Project,
+				datacatalog.ExecDomainKey:      tID.NodeExecutionId.ExecutionId.Domain,
+				datacatalog.ExecNodeIDKey:      tID.NodeExecutionId.NodeId,
+				datacatalog.ExecNameKey:        tID.NodeExecutionId.ExecutionId.Name,
+				datacatalog.ExecOrgKey:         tID.NodeExecutionId.ExecutionId.Org,
+				datacatalog.TaskVersionKey:     tID.TaskId.Version,
+			},
+		},
+		{
+			name:     "node execution identifier",
+			key:      catalog.Key{},
+			metadata: catalog.Metadata{NodeExecutionIdentifier: nID},
+			expected: map[string]string{
+				datacatalog.ExecNodeIDKey:  nID.NodeId,
+				datacatalog.ExecDomainKey:  nID.ExecutionId.Domain,
+				datacatalog.ExecNameKey:    nID.ExecutionId.Name,
+				datacatalog.ExecProjectKey: nID.ExecutionId.Project,
+				datacatalog.ExecOrgKey:     nID.ExecutionId.Org,
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			meta := GenerateCacheMetadata(tc.key, tc.metadata)
+			assert.Equal(t, tc.expected, meta.KeyMap.Values)
 		})
 	}
 }

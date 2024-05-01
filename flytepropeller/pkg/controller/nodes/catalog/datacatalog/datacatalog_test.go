@@ -186,6 +186,9 @@ func TestCatalog_Get(t *testing.T) {
 			Id:       datasetID,
 			Metadata: GetDatasetMetadataForSource(taskID),
 		}
+		sampleMetadata := catalog.Metadata{
+			TaskExecutionIdentifier: taskID,
+		}
 
 		mockClient.On("GetDataset",
 			ctx,
@@ -199,7 +202,7 @@ func TestCatalog_Get(t *testing.T) {
 			Id:       "test-artifact",
 			Dataset:  sampleDataSet.Id,
 			Data:     []*datacatalog.ArtifactData{sampleArtifactData},
-			Metadata: GetArtifactMetadataForSource(taskID),
+			Metadata: GetArtifactMetadataForSource(sampleMetadata),
 			Tags: []*datacatalog.Tag{
 				{
 					Name:       "x",

@@ -200,20 +200,30 @@ func GetDatasetMetadataForSource(taskExecutionID *core.TaskExecutionIdentifier) 
 	}
 }
 
-func GetArtifactMetadataForSource(taskExecutionID *core.TaskExecutionIdentifier) *datacatalog.Metadata {
-	if taskExecutionID == nil {
-		return &datacatalog.Metadata{}
+func GetArtifactMetadataForSource(metadata catalog.Metadata) *datacatalog.Metadata {
+	if metadata.TaskExecutionIdentifier != nil {
+		return &datacatalog.Metadata{
+			KeyMap: map[string]string{
+				ExecProjectKey:     metadata.TaskExecutionIdentifier.NodeExecutionId.GetExecutionId().GetProject(),
+				ExecDomainKey:      metadata.TaskExecutionIdentifier.NodeExecutionId.GetExecutionId().GetDomain(),
+				ExecNameKey:        metadata.TaskExecutionIdentifier.NodeExecutionId.GetExecutionId().GetName(),
+				ExecNodeIDKey:      metadata.TaskExecutionIdentifier.NodeExecutionId.GetNodeId(),
+				ExecTaskAttemptKey: strconv.Itoa(int(metadata.TaskExecutionIdentifier.GetRetryAttempt())),
+				ExecOrgKey:         metadata.TaskExecutionIdentifier.GetNodeExecutionId().GetExecutionId().GetOrg(),
+			},
+		}
+	} else if metadata.NodeExecutionIdentifier != nil {
+		return &datacatalog.Metadata{
+			KeyMap: map[string]string{
+				ExecProjectKey: metadata.NodeExecutionIdentifier.GetExecutionId().GetProject(),
+				ExecDomainKey:  metadata.NodeExecutionIdentifier.GetExecutionId().GetDomain(),
+				ExecNameKey:    metadata.NodeExecutionIdentifier.GetExecutionId().GetName(),
+				ExecNodeIDKey:  metadata.NodeExecutionIdentifier.GetNodeId(),
+				ExecOrgKey:     metadata.NodeExecutionIdentifier.GetExecutionId().GetOrg(),
+			},
+		}
 	}
-	return &datacatalog.Metadata{
-		KeyMap: map[string]string{
-			ExecProjectKey:     taskExecutionID.NodeExecutionId.GetExecutionId().GetProject(),
-			ExecDomainKey:      taskExecutionID.NodeExecutionId.GetExecutionId().GetDomain(),
-			ExecNameKey:        taskExecutionID.NodeExecutionId.GetExecutionId().GetName(),
-			ExecNodeIDKey:      taskExecutionID.NodeExecutionId.GetNodeId(),
-			ExecTaskAttemptKey: strconv.Itoa(int(taskExecutionID.GetRetryAttempt())),
-			ExecOrgKey:         taskExecutionID.GetNodeExecutionId().GetExecutionId().GetOrg(),
-		},
-	}
+	return &datacatalog.Metadata{}
 }
 
 // GetSourceFromMetadata returns the Source TaskExecutionIdentifier from the catalog metadata

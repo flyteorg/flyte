@@ -224,7 +224,7 @@ func (m *CatalogClient) CreateArtifact(ctx context.Context, key catalog.Key, dat
 		Id:       string(uuid.NewUUID()),
 		Dataset:  datasetID,
 		Data:     artifactDataList,
-		Metadata: GetArtifactMetadataForSource(metadata.TaskExecutionIdentifier),
+		Metadata: GetArtifactMetadataForSource(metadata),
 	}
 
 	createArtifactRequest := &datacatalog.CreateArtifactRequest{Artifact: cachedArtifact}
@@ -286,7 +286,7 @@ func (m *CatalogClient) UpdateArtifact(ctx context.Context, key catalog.Key, dat
 		Dataset:     datasetID,
 		QueryHandle: &datacatalog.UpdateArtifactRequest_TagName{TagName: tagName},
 		Data:        artifactDataList,
-		Metadata:    GetArtifactMetadataForSource(metadata.TaskExecutionIdentifier),
+		Metadata:    GetArtifactMetadataForSource(metadata),
 	}
 	resp, err := m.client.UpdateArtifact(ctx, updateArtifactRequest)
 	if err != nil {
@@ -300,7 +300,7 @@ func (m *CatalogClient) UpdateArtifact(ctx context.Context, key catalog.Key, dat
 		ArtifactId: resp.GetArtifactId(),
 	}
 
-	source, err := GetSourceFromMetadata(GetDatasetMetadataForSource(metadata.TaskExecutionIdentifier), GetArtifactMetadataForSource(metadata.TaskExecutionIdentifier), key.Identifier)
+	source, err := GetSourceFromMetadata(GetDatasetMetadataForSource(metadata.TaskExecutionIdentifier), GetArtifactMetadataForSource(metadata), key.Identifier)
 	if err != nil {
 		return catalog.Status{}, fmt.Errorf("failed to get source from metadata. Error: %w", err)
 	}

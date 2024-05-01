@@ -5,6 +5,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/flyteorg/flyte/cacheservice/pkg/errors"
 	"github.com/flyteorg/flyte/cacheservice/pkg/repositories/models"
@@ -63,6 +64,8 @@ func FromCachedOutputModel(ctx context.Context, cachedOutputModel *models.Cached
 		return nil, errors.NewCacheServiceErrorf(codes.Internal, "Failed to unmarshal output metadata with error %v", err)
 	}
 
+	createdAt := timestamppb.New(cachedOutputModel.CreatedAt)
+
 	if cachedOutputModel.OutputLiteral != nil {
 		outputLiteral := &core.LiteralMap{}
 		err := proto.Unmarshal(cachedOutputModel.OutputLiteral, outputLiteral)
@@ -82,7 +85,8 @@ func FromCachedOutputModel(ctx context.Context, cachedOutputModel *models.Cached
 					Version:      cachedOutputModel.Identifier.Version,
 					Org:          cachedOutputModel.Identifier.Org,
 				},
-				KeyMap: &keyMapMetadata,
+				KeyMap:    &keyMapMetadata,
+				CreatedAt: createdAt,
 			},
 		}, nil
 	}
@@ -98,7 +102,8 @@ func FromCachedOutputModel(ctx context.Context, cachedOutputModel *models.Cached
 				Version:      cachedOutputModel.Identifier.Version,
 				Org:          cachedOutputModel.Identifier.Org,
 			},
-			KeyMap: &keyMapMetadata,
+			KeyMap:    &keyMapMetadata,
+			CreatedAt: createdAt,
 		},
 	}, nil
 }

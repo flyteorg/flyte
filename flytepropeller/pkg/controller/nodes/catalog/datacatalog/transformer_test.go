@@ -147,7 +147,7 @@ func TestGetOrDefault(t *testing.T) {
 
 func TestGetArtifactMetadataForSource(t *testing.T) {
 	type args struct {
-		taskExecutionID *core.TaskExecutionIdentifier
+		metadata catalog.Metadata
 	}
 
 	tID := &core.TaskExecutionIdentifier{
@@ -168,6 +168,15 @@ func TestGetArtifactMetadataForSource(t *testing.T) {
 		},
 		RetryAttempt: 1,
 	}
+	nID := &core.NodeExecutionIdentifier{
+		NodeId: "n",
+		ExecutionId: &core.WorkflowExecutionIdentifier{
+			Name:    "wf",
+			Project: "p1",
+			Domain:  "d1",
+			Org:     "org",
+		},
+	}
 
 	tests := []struct {
 		name string
@@ -175,7 +184,7 @@ func TestGetArtifactMetadataForSource(t *testing.T) {
 		want map[string]string
 	}{
 		{"nil TaskExec", args{}, nil},
-		{"TaskExec", args{tID}, map[string]string{
+		{"TaskExec", args{catalog.Metadata{TaskExecutionIdentifier: tID}}, map[string]string{
 			ExecTaskAttemptKey: strconv.Itoa(int(tID.RetryAttempt)),
 			ExecProjectKey:     tID.NodeExecutionId.ExecutionId.Project,
 			ExecDomainKey:      tID.NodeExecutionId.ExecutionId.Domain,
@@ -183,10 +192,17 @@ func TestGetArtifactMetadataForSource(t *testing.T) {
 			ExecNameKey:        tID.NodeExecutionId.ExecutionId.Name,
 			ExecOrgKey:         tID.NodeExecutionId.ExecutionId.Org,
 		}},
+		{"NodeExec", args{catalog.Metadata{NodeExecutionIdentifier: nID}}, map[string]string{
+			ExecNodeIDKey:  nID.NodeId,
+			ExecDomainKey:  nID.ExecutionId.Domain,
+			ExecNameKey:    nID.ExecutionId.Name,
+			ExecProjectKey: nID.ExecutionId.Project,
+			ExecOrgKey:     nID.ExecutionId.Org,
+		}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := GetArtifactMetadataForSource(tt.args.taskExecutionID); !reflect.DeepEqual(got.KeyMap, tt.want) {
+			if got := GetArtifactMetadataForSource(tt.args.metadata); !reflect.DeepEqual(got.KeyMap, tt.want) {
 				t.Errorf("GetMetadataForSource() = %v, want %v", got.KeyMap, tt.want)
 			}
 		})
@@ -270,7 +286,7 @@ func TestGetSourceFromMetadata(t *testing.T) {
 			RetryAttempt: 0,
 		}},
 		// Completely available
-		{"latest", args{datasetMd: GetDatasetMetadataForSource(&tID).KeyMap, artifactMd: GetArtifactMetadataForSource(&tID).KeyMap, currentID: currentTaskID}, &tID},
+		{"latest", args{datasetMd: GetDatasetMetadataForSource(&tID).KeyMap, artifactMd: GetArtifactMetadataForSource(catalog.Metadata{TaskExecutionIdentifier: &tID}).KeyMap, currentID: currentTaskID}, &tID},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
