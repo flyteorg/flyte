@@ -8,6 +8,7 @@ import (
 
 	"github.com/flyteorg/flyte/flytectl/pkg/visualize/mocks"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 
 	graphviz "github.com/awalterschulze/gographviz"
 	"github.com/golang/protobuf/jsonpb"
@@ -422,7 +423,7 @@ func TestConstructNode(t *testing.T) {
 		}
 		resultWorkflowNode, err := gb.constructNode("", "", mockGraph, flyteNode)
 		assert.NotNil(t, err)
-		assert.Equal(t, fmt.Errorf("subworkfow [project:\"dummyProject\" domain:\"dummyDomain\" name:\"dummyName\" version:\"dummyVersion\"] not found"), err)
+		utils.AssertEqualWithSanitizedRegex(t, "subworkfow [project:\"dummyProject\" domain:\"dummyDomain\" name:\"dummyName\" version:\"dummyVersion\"] not found", err.Error())
 		assert.Nil(t, resultWorkflowNode)
 	})
 
