@@ -214,7 +214,7 @@ func TestPrint(t *testing.T) {
 	err = p.Print(OutputFormat(3), lp, WorkflowToProtoMessages(workflows)...)
 	assert.NotNil(t, err)
 
-	assert.Equal(t, fmt.Errorf("no template found in the workflow task template:<> "), errors.Unwrap(err))
+	assert.Equal(t, fmt.Errorf("no template found in the workflow task template:{}"), errors.Unwrap(err))
 
 	badWorkflow2 := &admin.Workflow{
 		Id: &core.Identifier{
@@ -252,7 +252,7 @@ func TestPrint(t *testing.T) {
 	workflows = []*admin.Workflow{badWorkflow3}
 	err = p.Print(OutputFormat(3), lp, WorkflowToProtoMessages(workflows)...)
 	assert.NotNil(t, err)
-	assert.Equal(t, fmt.Errorf("no template found in the sub workflow template:<> "), errors.Unwrap(err))
+	assert.Equal(t, fmt.Errorf("no template found in the sub workflow template:{}"), errors.Unwrap(err))
 }
 
 func TestGetTruncatedLine(t *testing.T) {

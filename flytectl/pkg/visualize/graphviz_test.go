@@ -422,7 +422,7 @@ func TestConstructNode(t *testing.T) {
 		}
 		resultWorkflowNode, err := gb.constructNode("", "", mockGraph, flyteNode)
 		assert.NotNil(t, err)
-		assert.Equal(t, fmt.Errorf("subworkfow [project:\"dummyProject\" domain:\"dummyDomain\" name:\"dummyName\" version:\"dummyVersion\" ] not found"), err)
+		assert.Equal(t, fmt.Errorf("subworkfow [project:\"dummyProject\" domain:\"dummyDomain\" name:\"dummyName\" version:\"dummyVersion\"] not found"), err)
 		assert.Nil(t, resultWorkflowNode)
 	})
 
@@ -441,7 +441,7 @@ func TestConstructNode(t *testing.T) {
 		}
 		sbwfNodes := []*core.Node{subwfNode}
 
-		gb.subWf["project:\"dummyProject\" domain:\"dummyDomain\" name:\"dummyName\" version:\"dummyVersion\" "] =
+		gb.subWf["project:\"dummyProject\" domain:\"dummyDomain\" name:\"dummyName\" version:\"dummyVersion\""] =
 			&core.CompiledWorkflow{Template: &core.WorkflowTemplate{Nodes: sbwfNodes}}
 		flyteNode := &core.Node{
 			Id: "id",

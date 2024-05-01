@@ -27,13 +27,14 @@ const (
 	flyte                   = "flyte"
 	flytectl                = "flytectl"
 	sandboxSupportedVersion = "v0.10.0"
-	flytectlRepository      = "github.com/flyteorg/flyte/flytectl"
-	commonMessage           = "\n A new release of flytectl is available: %s → %s \n"
-	brewMessage             = "To upgrade, run: brew update && brew upgrade flytectl \n"
-	linuxMessage            = "To upgrade, run: flytectl upgrade \n"
-	darwinMessage           = "To upgrade, run: flytectl upgrade \n"
-	releaseURL              = "https://github.com/flyteorg/flyte/flytectl/releases/tag/%s \n"
-	brewInstallDirectory    = "/Cellar/flytectl"
+	// TODO - change this to the monorepo name after we have a successful release
+	flytectlRepository   = "github.com/flyteorg/flytectl"
+	commonMessage        = "\n A new release of flytectl is available: %s → %s \n"
+	brewMessage          = "To upgrade, run: brew update && brew upgrade flytectl \n"
+	linuxMessage         = "To upgrade, run: flytectl upgrade \n"
+	darwinMessage        = "To upgrade, run: flytectl upgrade \n"
+	releaseURL           = "https://github.com/flyteorg/flyte/flytectl/releases/tag/%s \n"
+	brewInstallDirectory = "/Cellar/flytectl"
 )
 
 var Client GHRepoService
