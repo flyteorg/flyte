@@ -154,17 +154,15 @@ func getExecutionFunc(ctx context.Context, args []string, cmdCtx cmdCore.Command
 		return adminPrinter.Print(config.GetConfig().MustOutputFormat(), executionColumns,
 			ExecutionToProtoMessages(executions)...)
 	}
+	if config.GetConfig().Interactive {
+		err := bubbletea.Paginator(executionColumns, getCallBack(ctx, cmdCtx), execution.DefaultConfig.Filter)
+		return err
+	}
 	executionList, err := cmdCtx.AdminFetcherExt().ListExecution(ctx, config.GetConfig().Project, config.GetConfig().Domain, execution.DefaultConfig.Filter)
 	if err != nil {
 		return err
 	}
 	logger.Infof(ctx, "Retrieved %v executions", len(executionList.Executions))
-
-	if config.GetConfig().Interactive {
-		bubbletea.Paginator(executionColumns, getCallBack(ctx, cmdCtx))
-		return nil
-	}
-
 	return adminPrinter.Print(config.GetConfig().MustOutputFormat(), executionColumns,
 		ExecutionToProtoMessages(executionList.Executions)...)
 }
