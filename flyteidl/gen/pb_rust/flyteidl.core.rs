@@ -3023,6 +3023,50 @@ pub struct ErrorDocument {
     #[prost(message, optional, tag="1")]
     pub error: ::core::option::Option<ContainerError>,
 }
+/// ExecutionEnvAssignment is a message that is used to assign an execution environment to a set of
+/// nodes.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ExecutionEnvAssignment {
+    /// node_ids is a list of node ids that are being assigned the execution environment.
+    #[prost(string, repeated, tag="1")]
+    pub node_ids: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    /// task_type is the type of task that is being assigned. This is used to override which Flyte
+    /// plugin will be used during execution.
+    #[prost(string, tag="2")]
+    pub task_type: ::prost::alloc::string::String,
+    /// execution_env is the environment that is being assigned to the nodes.
+    #[prost(message, optional, tag="3")]
+    pub execution_env: ::core::option::Option<ExecutionEnv>,
+}
+/// ExecutionEnv is a message that is used to specify the execution environment.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ExecutionEnv {
+    /// id is a unique identifier for the execution environment.
+    #[prost(string, tag="1")]
+    pub id: ::prost::alloc::string::String,
+    /// type is the type of the execution environment.
+    #[prost(string, tag="2")]
+    pub r#type: ::prost::alloc::string::String,
+    /// environment is a oneof field that can be used to specify the environment in different ways.
+    #[prost(oneof="execution_env::Environment", tags="3, 4")]
+    pub environment: ::core::option::Option<execution_env::Environment>,
+}
+/// Nested message and enum types in `ExecutionEnv`.
+pub mod execution_env {
+    /// environment is a oneof field that can be used to specify the environment in different ways.
+    #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum Environment {
+        /// extant is a reference to an existing environment.
+        #[prost(message, tag="3")]
+        Extant(::prost_types::Struct),
+        /// spec is a specification of the environment.
+        #[prost(message, tag="4")]
+        Spec(::prost_types::Struct),
+    }
+}
 /// Defines an enclosed package of workflow and tasks it references.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
