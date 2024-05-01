@@ -26,4 +26,4 @@ jobs:
         uses: codespell-project/actions-codespell@v2
         with:
           skip: "*.pb,monodocs-environment.lock.yaml"
-          ignore_words_list: crate
+          ignore_words_list: crate,lightyear,fo
