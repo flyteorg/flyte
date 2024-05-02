@@ -34,7 +34,8 @@ func newModel(initMsg []proto.Message) pageModel {
 	p := paginator.New()
 	p.PerPage = msgPerPage
 	p.Page = int(filter.Page) - 1
-	p.SetTotalPages(sumBatchLengths())
+	// Set the upper bound of the page number
+	p.SetTotalPages(getLastMsgIdx())
 
 	s := spinner.New()
 	s.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("56"))
@@ -54,6 +55,8 @@ func (m pageModel) Init() tea.Cmd {
 func (m pageModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
+	case error:
+		return m, tea.Quit
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "q", "esc", "ctrl+c":
@@ -95,7 +98,8 @@ func (m pageModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			fetchingBackward = false
 		}
-		m.paginator.SetTotalPages(sumBatchLengths())
+		// Set the upper bound of the page number
+		m.paginator.SetTotalPages(getLastMsgIdx())
 		return m, nil
 	}
 
@@ -150,7 +154,10 @@ func Paginator(_listHeader []printer.Column, _callback DataCallback, _filter fil
 
 	var msg []proto.Message
 	for i := firstBatchIndex; i < lastBatchIndex+1; i++ {
-		newMessages := getMessageList(i)
+		newMessages, err := getMessageList(i)
+		if err != nil {
+			return err
+		}
 		if int(filter.Page)-(firstBatchIndex*pagePerBatch) > int(math.Ceil(float64(len(newMessages))/msgPerPage)) {
 			return fmt.Errorf("the specified page has no data, please enter a valid page number")
 		}
@@ -160,6 +167,10 @@ func Paginator(_listHeader []printer.Column, _callback DataCallback, _filter fil
 	p := tea.NewProgram(newModel(msg))
 	if _, err := p.Run(); err != nil {
 		log.Fatal(err)
+	}
+
+	if errMsg != nil {
+		return errMsg
 	}
 
 	return nil

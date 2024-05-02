@@ -115,12 +115,12 @@ func ExecutionToProtoMessages(l []*admin.Execution) []proto.Message {
 }
 
 func getCallBack(ctx context.Context, cmdCtx cmdCore.CommandContext) bubbletea.DataCallback {
-	return func(filter filters.Filters) []proto.Message {
+	return func(filter filters.Filters) ([]proto.Message, error) {
 		executionList, err := cmdCtx.AdminFetcherExt().ListExecution(ctx, config.GetConfig().Project, config.GetConfig().Domain, filter)
 		if err != nil {
-			return nil
+			return nil, err
 		}
-		return ExecutionToProtoMessages(executionList.Executions)
+		return ExecutionToProtoMessages(executionList.Executions), nil
 	}
 }
 

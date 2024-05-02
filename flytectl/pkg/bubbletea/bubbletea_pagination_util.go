@@ -15,7 +15,7 @@ import (
 	"github.com/golang/protobuf/proto"
 )
 
-type DataCallback func(filter filters.Filters) []proto.Message
+type DataCallback func(filter filters.Filters) ([]proto.Message, error)
 
 type printTableProto struct{ proto.Message }
 
@@ -52,6 +52,8 @@ var (
 	batchLen = make(map[int]int)
 	// Avoid fetching back and forward at the same time
 	mutex sync.Mutex
+	// Used to catch error happened while running paginator
+	errMsg error = nil
 )
 
 func (p printTableProto) MarshalJSON() ([]byte, error) {
@@ -106,7 +108,7 @@ func getTable(m *pageModel) (string, error) {
 	return buf.String(), nil
 }
 
-func getMessageList(batchIndex int) []proto.Message {
+func getMessageList(batchIndex int) ([]proto.Message, error) {
 	mutex.Lock()
 	spin = true
 	defer func() {
@@ -114,22 +116,30 @@ func getMessageList(batchIndex int) []proto.Message {
 		mutex.Unlock()
 	}()
 
-	msg := callback(filters.Filters{
+	msg, err := callback(filters.Filters{
 		Limit:  msgPerBatch,
 		Page:   int32(batchIndex + 1),
 		SortBy: filter.SortBy,
 		Asc:    filter.Asc,
 	})
+	if err != nil {
+		return nil, err
+	}
 
 	batchLen[batchIndex] = len(msg)
 
-	return msg
+	return msg, nil
 }
 
 func fetchDataCmd(batchIndex int, fetchDirection direction) tea.Cmd {
 	return func() tea.Msg {
+		newItems, err := getMessageList(batchIndex)
+		if err != nil {
+			errMsg = err
+			return err
+		}
 		msg := newDataMsg{
-			newItems:       getMessageList(batchIndex),
+			newItems:       newItems,
 			batchIndex:     batchIndex,
 			fetchDirection: fetchDirection,
 		}
@@ -137,7 +147,7 @@ func fetchDataCmd(batchIndex int, fetchDirection direction) tea.Cmd {
 	}
 }
 
-func sumBatchLengths() int {
+func getLastMsgIdx() int {
 	sum := 0
 	for i := 0; i < lastBatchIndex+1; i++ {
 		length, ok := batchLen[i]
