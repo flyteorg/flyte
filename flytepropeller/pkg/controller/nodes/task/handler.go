@@ -912,7 +912,7 @@ func New(ctx context.Context, kubeClient executors.Client, kubeClientset kuberne
 		asyncCatalog:      async,
 		resourceManager:   nil,
 		secretManager:     secretmanager.NewFileEnvSecretManager(secretmanager.GetConfig()),
-		connectionManager: connectionmanager.NewFileEnvConnectionManager(),
+		connectionManager: connectionmanager.NewConnectionManager(connectionmanager.GetConfig()),
 		cfg:               cfg,
 		eventConfig:       eventConfig,
 		clusterID:         clusterID,

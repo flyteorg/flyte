@@ -16,7 +16,8 @@ type Connection struct {
 }
 
 type Config struct {
-	Connection map[string]Connection `json:"connection" pflag:", the connection that saves the secrets and configs"`
+	Type       connectionManager     `json:"type" pflag:", the type of the connection."`
+	Connection map[string]Connection `json:"connection" pflag:", the connection that saves the secrets and configs."`
 }
 
 func SetConfig(cfg *Config) error {

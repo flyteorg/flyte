@@ -10,6 +10,21 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
+type connectionManager string
+
+const (
+	noop    connectionManager = "noop"
+	fileEnv connectionManager = "fileEnv"
+)
+
+type NoopConnectionManager struct{}
+
+// Get returns an empty connection.
+func (n NoopConnectionManager) Get(ctx context.Context, key string) (flyteidl.Connection, error) {
+	logger.Debugf(ctx, "NoopConnectionManager Get called with key [%s]", key)
+	return flyteidl.Connection{}, nil
+}
+
 // FileEnvConnectionManager allows retrieving secrets mounted to this process through Env Vars or Files.
 type FileEnvConnectionManager struct {
 	secretManager pluginCore.SecretManager
@@ -35,8 +50,15 @@ func (f FileEnvConnectionManager) Get(ctx context.Context, key string) (flyteidl
 	return flyteidl.Connection{Secrets: secret, Configs: connection.Configs}, nil
 }
 
-func NewFileEnvConnectionManager() FileEnvConnectionManager {
-	return FileEnvConnectionManager{
-		secretManager: secretmanager.NewFileEnvSecretManager(secretmanager.GetConfig()),
+func NewConnectionManager(config *Config) ConnectionManager {
+	switch config.Type {
+	case fileEnv:
+		return FileEnvConnectionManager{
+			secretManager: secretmanager.NewFileEnvSecretManager(secretmanager.GetConfig()),
+		}
+	case noop:
+		fallthrough
+	default:
+		return NoopConnectionManager{}
 	}
 }
