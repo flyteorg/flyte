@@ -6,7 +6,7 @@ import (
 
 	"github.com/flyteorg/flyte/flytestdlib/config"
 
-	"github.com/flyteorg/flytectl/pkg/printer"
+	"github.com/flyteorg/flyte/flytectl/pkg/printer"
 )
 
 var (

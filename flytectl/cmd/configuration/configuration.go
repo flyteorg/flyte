@@ -8,14 +8,14 @@ import (
 	"os"
 	"strings"
 
-	"github.com/flyteorg/flytectl/pkg/util"
+	"github.com/flyteorg/flyte/flytectl/pkg/util"
 
-	"github.com/flyteorg/flytectl/pkg/configutil"
+	"github.com/flyteorg/flyte/flytectl/pkg/configutil"
 
+	initConfig "github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/config"
+	cmdcore "github.com/flyteorg/flyte/flytectl/cmd/core"
+	cmdUtil "github.com/flyteorg/flyte/flytectl/pkg/commandutils"
 	"github.com/flyteorg/flyte/flytestdlib/config/viper"
-	initConfig "github.com/flyteorg/flytectl/cmd/config/subcommand/config"
-	cmdcore "github.com/flyteorg/flytectl/cmd/core"
-	cmdUtil "github.com/flyteorg/flytectl/pkg/commandutils"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
 	"github.com/spf13/cobra"
 )

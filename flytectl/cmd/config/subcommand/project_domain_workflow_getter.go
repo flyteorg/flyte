@@ -1,6 +1,6 @@
 package subcommand
 
-import rootConfig "github.com/flyteorg/flytectl/cmd/config"
+import rootConfig "github.com/flyteorg/flyte/flytectl/cmd/config"
 
 // ProjectDomainWorkflowGetter defines a interface for getting the project domain workflow.
 type ProjectDomainWorkflowGetter interface {

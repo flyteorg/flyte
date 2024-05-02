@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/flyteorg/flyte/flytectl/clierrors"
+	"github.com/flyteorg/flyte/flytectl/cmd/config"
+	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/execution"
+	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
+	cmdUtil "github.com/flyteorg/flyte/flytectl/pkg/commandutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flytectl/clierrors"
-	"github.com/flyteorg/flytectl/cmd/config"
-	"github.com/flyteorg/flytectl/cmd/config/subcommand/execution"
-	cmdCore "github.com/flyteorg/flytectl/cmd/core"
-	cmdUtil "github.com/flyteorg/flytectl/pkg/commandutils"
 )
 
 const (

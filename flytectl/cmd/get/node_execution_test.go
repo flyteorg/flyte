@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flytectl/cmd/testutils"
+	"github.com/flyteorg/flyte/flytectl/cmd/testutils"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"

@@ -4,15 +4,15 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/flyteorg/flyte/flytectl/cmd/config"
+	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/execution"
+	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/flyteorg/flytectl/cmd/config"
-	"github.com/flyteorg/flytectl/cmd/config/subcommand/execution"
-	cmdCore "github.com/flyteorg/flytectl/cmd/core"
 
-	"github.com/flyteorg/flytectl/pkg/bubbletea"
-	"github.com/flyteorg/flytectl/pkg/filters"
-	"github.com/flyteorg/flytectl/pkg/printer"
+	"github.com/flyteorg/flyte/flytectl/pkg/bubbletea"
+	"github.com/flyteorg/flyte/flytectl/pkg/filters"
+	"github.com/flyteorg/flyte/flytectl/pkg/printer"
 
 	"github.com/golang/protobuf/proto"
 )

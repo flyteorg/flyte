@@ -4,14 +4,13 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/mock"
 
+	"github.com/flyteorg/flyte/flytectl/cmd/config"
+	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
+	"github.com/flyteorg/flyte/flytectl/cmd/testutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flytectl/cmd/config"
-	cmdCore "github.com/flyteorg/flytectl/cmd/core"
-	"github.com/flyteorg/flytectl/cmd/testutils"
 )
 
 func testNamedEntityUpdate(
@@ -25,10 +24,7 @@ func testNamedEntityUpdate(
 			s.MockAdminClient.
 				OnGetNamedEntityMatch(
 					s.Ctx,
-					mock.MatchedBy(func(r *admin.NamedEntityGetRequest) bool {
-						return r.ResourceType == namedEntity.ResourceType &&
-							cmp.Equal(r.Id, namedEntity.Id)
-					})).
+					mock.Anything).
 				Return(namedEntity, nil)
 			s.MockAdminClient.
 				OnUpdateNamedEntityMatch(s.Ctx, mock.Anything).

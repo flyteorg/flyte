@@ -14,11 +14,12 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/flyteorg/flyte/flytectl/cmd/config"
+	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
+	extMocks "github.com/flyteorg/flyte/flytectl/pkg/ext/mocks"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/mocks"
-	"github.com/flyteorg/flytectl/cmd/config"
-	cmdCore "github.com/flyteorg/flytectl/cmd/core"
-	extMocks "github.com/flyteorg/flytectl/pkg/ext/mocks"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 const projectValue = "dummyProject"
@@ -108,7 +109,7 @@ func (s *TestStruct) TearDownAndVerify(t *testing.T, expectedLog string) {
 		panic(fmt.Errorf("could not read from test context reader: %w", err))
 	}
 
-	assert.Equal(t, sanitizeString(expectedLog), sanitizeString(buf.String()))
+	utils.AssertEqualWithSanitizedRegex(t, sanitizeString(expectedLog), sanitizeString(buf.String()))
 }
 
 func (s *TestStruct) TearDownAndVerifyContains(t *testing.T, expectedLog string) {

@@ -3,11 +3,11 @@ package demo
 import (
 	"testing"
 
-	"github.com/flyteorg/flytectl/cmd/testutils"
+	"github.com/flyteorg/flyte/flytectl/cmd/testutils"
 
 	"github.com/docker/docker/api/types"
-	"github.com/flyteorg/flytectl/pkg/docker"
-	"github.com/flyteorg/flytectl/pkg/docker/mocks"
+	"github.com/flyteorg/flyte/flytectl/pkg/docker"
+	"github.com/flyteorg/flyte/flytectl/pkg/docker/mocks"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -12,17 +12,17 @@ import (
 	"testing"
 	"time"
 
-	f "github.com/flyteorg/flytectl/pkg/filesystemutils"
+	f "github.com/flyteorg/flyte/flytectl/pkg/filesystemutils"
 
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/volume"
-	"github.com/flyteorg/flytectl/pkg/docker/mocks"
+	"github.com/flyteorg/flyte/flytectl/pkg/docker/mocks"
 
 	"github.com/stretchr/testify/mock"
 
 	"github.com/docker/docker/api/types"
-	"github.com/flyteorg/flytectl/cmd/config/subcommand/docker"
+	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/docker"
 	"github.com/stretchr/testify/assert"
 )
 

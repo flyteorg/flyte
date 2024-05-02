@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	cmdCore "github.com/flyteorg/flytectl/cmd/core"
-	"github.com/flyteorg/flytectl/pkg/docker"
+	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
+	"github.com/flyteorg/flyte/flytectl/pkg/docker"
 )
 
 const (

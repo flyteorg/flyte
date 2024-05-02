@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 
-	cmdUtil "github.com/flyteorg/flytectl/pkg/commandutils"
+	cmdUtil "github.com/flyteorg/flyte/flytectl/pkg/commandutils"
 	"sigs.k8s.io/yaml"
 )
 

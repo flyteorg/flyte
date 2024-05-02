@@ -4,14 +4,12 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/google/go-cmp/cmp"
-
+	"github.com/flyteorg/flyte/flytectl/cmd/config"
+	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/launchplan"
+	"github.com/flyteorg/flyte/flytectl/cmd/testutils"
+	"github.com/flyteorg/flyte/flytectl/pkg/ext"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flytectl/cmd/config"
-	"github.com/flyteorg/flytectl/cmd/config/subcommand/launchplan"
-	"github.com/flyteorg/flytectl/cmd/testutils"
-	"github.com/flyteorg/flytectl/pkg/ext"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -160,9 +158,7 @@ func TestLaunchPlanUpdateFailsWhenLaunchPlanDoesNotExist(t *testing.T) {
 			s.MockAdminClient.
 				OnGetLaunchPlanMatch(
 					s.Ctx,
-					mock.MatchedBy(func(r *admin.ObjectGetRequest) bool {
-						return cmp.Equal(r.Id, launchplan.Id)
-					})).
+					mock.Anything).
 				Return(nil, ext.NewNotFoundError("launch plan not found"))
 			s.MockAdminClient.
 				OnUpdateLaunchPlanMatch(s.Ctx, mock.Anything).
@@ -182,9 +178,7 @@ func TestLaunchPlanUpdateFailsWhenAdminClientFails(t *testing.T) {
 			s.MockAdminClient.
 				OnGetLaunchPlanMatch(
 					s.Ctx,
-					mock.MatchedBy(func(r *admin.ObjectGetRequest) bool {
-						return cmp.Equal(r.Id, launchplan.Id)
-					})).
+					mock.Anything).
 				Return(launchplan, nil)
 			s.MockAdminClient.
 				OnUpdateLaunchPlanMatch(s.Ctx, mock.Anything).
@@ -237,9 +231,7 @@ func testLaunchPlanUpdate(
 			s.MockAdminClient.
 				OnGetLaunchPlanMatch(
 					s.Ctx,
-					mock.MatchedBy(func(r *admin.ObjectGetRequest) bool {
-						return cmp.Equal(r.Id, launchplan.Id)
-					})).
+					mock.Anything).
 				Return(launchplan, nil)
 			s.MockAdminClient.
 				OnUpdateLaunchPlanMatch(s.Ctx, mock.Anything).

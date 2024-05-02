@@ -3,7 +3,7 @@ package config
 import (
 	"testing"
 
-	"github.com/flyteorg/flytectl/pkg/printer"
+	"github.com/flyteorg/flyte/flytectl/pkg/printer"
 	"github.com/stretchr/testify/assert"
 )
 

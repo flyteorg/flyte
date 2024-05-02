@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/bubbles/paginator"
-	"github.com/flyteorg/flytectl/pkg/printer"
+	"github.com/flyteorg/flyte/flytectl/pkg/printer"
 	"github.com/golang/protobuf/proto"
 
 	tea "github.com/charmbracelet/bubbletea"

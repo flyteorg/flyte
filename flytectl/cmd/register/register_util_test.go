@@ -12,9 +12,9 @@ import (
 	"strings"
 	"testing"
 
+	ghMocks "github.com/flyteorg/flyte/flytectl/pkg/github/mocks"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/mocks"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
-	ghMocks "github.com/flyteorg/flytectl/pkg/github/mocks"
 
 	"github.com/flyteorg/flyte/flytestdlib/utils"
 
@@ -27,8 +27,8 @@ import (
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 
+	rconfig "github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/register"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-	rconfig "github.com/flyteorg/flytectl/cmd/config/subcommand/register"
 
 	"github.com/google/go-github/v42/github"
 	"github.com/stretchr/testify/assert"

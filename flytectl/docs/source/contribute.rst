@@ -13,8 +13,8 @@ Docs are generated using Sphinx and are available at [flytectl.rtfd.io](https://
 To update the documentation, follow these steps:
 
 1. Install the requirements by running ``pip install -r doc-requirements.txt`` in the root folder.
-2. Make modifications in the `cmd <https://github.com/flyteorg/flytectl/tree/master/cmd>`__ folder.
-3. Run ``make gendocs`` from within the `docs <https://github.com/flyteorg/flytectl/tree/master/docs>`__ folder.
+2. Make modifications in the `cmd <https://github.com/flyteorg/flyte/flytectl/tree/master/cmd>`__ folder.
+3. Run ``make gendocs`` from within the `docs <https://github.com/flyteorg/flyte/flytectl/tree/master/docs>`__ folder.
 4. Open html files produced by Sphinx in your browser to verify if the changes look as expected (html files can be found in the ``docs/build/html`` folder).
 
 💻 Contribute Code
@@ -26,7 +26,7 @@ To update the documentation, follow these steps:
 4. Run the command you want to test in the terminal.
 5. If you want to update the command (add additional options, change existing options, etc.):
 
-   * Navigate to `cmd <https://github.com/flyteorg/flytectl/tree/master/cmd>`__ directory
+   * Navigate to `cmd <https://github.com/flyteorg/flyte/flytectl/tree/master/cmd>`__ directory
    * Each sub-directory points to a command, e.g., ``create`` points to ``flytectl create ...``
    * Here are the directories you can navigate to:
 

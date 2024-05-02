@@ -3,14 +3,14 @@ package get
 import (
 	"context"
 
+	workflowconfig "github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/workflow"
+	"github.com/flyteorg/flyte/flytectl/pkg/ext"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
-	workflowconfig "github.com/flyteorg/flytectl/cmd/config/subcommand/workflow"
-	"github.com/flyteorg/flytectl/pkg/ext"
 	"github.com/golang/protobuf/proto"
 
-	"github.com/flyteorg/flytectl/cmd/config"
-	cmdCore "github.com/flyteorg/flytectl/cmd/core"
-	"github.com/flyteorg/flytectl/pkg/printer"
+	"github.com/flyteorg/flyte/flytectl/cmd/config"
+	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
+	"github.com/flyteorg/flyte/flytectl/pkg/printer"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )

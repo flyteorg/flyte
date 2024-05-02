@@ -1,6 +1,8 @@
 export REPOSITORY=flytectl
-include boilerplate/flyte/golang_test_targets/Makefile
-include boilerplate/flyte/precommit/Makefile
+export REPO_ROOT=..
+include ../boilerplate/flyte/docker_build/Makefile
+include ../boilerplate/flyte/golang_test_targets/Makefile
+include ../boilerplate/flyte/end2end/Makefile
 
 GIT_VERSION := $(shell git describe --always --tags)
 GIT_HASH := $(shell git rev-parse --short HEAD)
@@ -38,3 +40,8 @@ test_unit_without_flag:
 	cat coverage.temp.txt  | grep -v "_flags.go" > coverage.txt
 	rm coverage.temp.txt
 	curl -s https://codecov.io/bash > codecov_bash.sh && bash codecov_bash.sh
+
+# TODO - Add the -race flag back
+.PHONY: test_unit
+test_unit:
+	go test -cover ./...

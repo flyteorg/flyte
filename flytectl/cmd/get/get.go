@@ -1,18 +1,18 @@
 package get
 
 import (
-	"github.com/flyteorg/flytectl/cmd/config/subcommand/clusterresourceattribute"
-	"github.com/flyteorg/flytectl/cmd/config/subcommand/execution"
-	"github.com/flyteorg/flytectl/cmd/config/subcommand/executionclusterlabel"
-	"github.com/flyteorg/flytectl/cmd/config/subcommand/executionqueueattribute"
-	"github.com/flyteorg/flytectl/cmd/config/subcommand/launchplan"
-	pluginoverride "github.com/flyteorg/flytectl/cmd/config/subcommand/plugin_override"
-	"github.com/flyteorg/flytectl/cmd/config/subcommand/project"
-	"github.com/flyteorg/flytectl/cmd/config/subcommand/task"
-	"github.com/flyteorg/flytectl/cmd/config/subcommand/taskresourceattribute"
-	"github.com/flyteorg/flytectl/cmd/config/subcommand/workflow"
-	"github.com/flyteorg/flytectl/cmd/config/subcommand/workflowexecutionconfig"
-	cmdcore "github.com/flyteorg/flytectl/cmd/core"
+	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/clusterresourceattribute"
+	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/execution"
+	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/executionclusterlabel"
+	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/executionqueueattribute"
+	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/launchplan"
+	pluginoverride "github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/plugin_override"
+	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/project"
+	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/task"
+	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/taskresourceattribute"
+	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/workflow"
+	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/workflowexecutionconfig"
+	cmdcore "github.com/flyteorg/flyte/flytectl/cmd/core"
 
 	"github.com/spf13/cobra"
 )

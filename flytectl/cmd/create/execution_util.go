@@ -12,8 +12,8 @@ import (
 	"github.com/google/uuid"
 	"sigs.k8s.io/yaml"
 
-	cmdCore "github.com/flyteorg/flytectl/cmd/core"
-	cmdGet "github.com/flyteorg/flytectl/cmd/get"
+	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
+	cmdGet "github.com/flyteorg/flyte/flytectl/cmd/get"
 )
 
 func createExecutionRequestForWorkflow(ctx context.Context, workflowName, project, domain string,

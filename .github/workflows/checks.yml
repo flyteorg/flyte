@@ -34,6 +34,7 @@ jobs:
           - flyteadmin
           # TODO(monorepo): Enable lint flytecopilot
           # - flytecopilot
+          - flytectl
           - flyteidl
           - flyteplugins
           - flytepropeller
@@ -53,6 +54,7 @@ jobs:
           - datacatalog
           - flyteadmin
           - flytecopilot
+          - flytectl
           - flyteplugins
           - flytepropeller
           - flytestdlib
@@ -74,7 +76,7 @@ jobs:
     name: Docker Build Images
     uses: ./.github/workflows/component_docker_build.yml
     with:
-       component: ${{ matrix.component }}
+      component: ${{ matrix.component }}
 
   # TODO(monorepo): these tests are broken. They never test an actual change.
   # endtoend:
@@ -113,6 +115,7 @@ jobs:
           - datacatalog
           - flyteadmin
           - flytecopilot
+          - flytectl
           - flytepropeller
     uses: ./.github/workflows/go_generate.yml
     with:

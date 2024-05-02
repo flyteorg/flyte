@@ -28,3 +28,9 @@ linters:
     - unparam
     - unused
     - varcheck
+linters-settings:
+  gci:
+    skip-generated: true
+issues:
+  exclude:
+    - copylocks
