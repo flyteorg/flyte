@@ -123,12 +123,12 @@ func (m *cacheManager) Put(ctx context.Context, request *cacheservice.PutCacheRe
 		notFound = true
 	}
 	if !notFound && cachedOutput != nil {
-		if !request.Overwrite {
+		if request.Overwrite == nil || !request.Overwrite.Overwrite {
 			m.systemMetrics.alreadyExistsCount.Inc(ctx)
 			logger.Errorf(ctx, "Output with key %v already exists", request.Key)
 			return nil, errors.NewCacheServiceErrorf(codes.AlreadyExists, "Output with key %v already exists", request.Key)
 		}
-		if cachedOutput.OutputURI != "" {
+		if cachedOutput.OutputURI != "" && request.Overwrite.DeleteBlob {
 			err = m.outputStore.Delete(ctx, cachedOutput.OutputURI)
 			if err != nil {
 				logger.Errorf(ctx, "Failed to delete output in blob store before overwriting, err: %v", err)

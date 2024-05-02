@@ -163,7 +163,10 @@ func TestCacheManager_Put(t *testing.T) {
 					},
 					Metadata: validMetadata,
 				},
-				Overwrite: false,
+				Overwrite: &cacheservice.OverwriteOutput{
+					Overwrite:  false,
+					DeleteBlob: false,
+				},
 			},
 			dataGetReturn: nil,
 			dataGetError:  notFoundError,
@@ -183,7 +186,10 @@ func TestCacheManager_Put(t *testing.T) {
 					},
 					Metadata: validMetadata,
 				},
-				Overwrite: false,
+				Overwrite: &cacheservice.OverwriteOutput{
+					Overwrite:  false,
+					DeleteBlob: false,
+				},
 			},
 			dataGetReturn: nil,
 			dataGetError:  notFoundError,
@@ -292,7 +298,10 @@ func TestCacheManager_Put(t *testing.T) {
 					},
 					Metadata: validMetadata,
 				},
-				Overwrite: false,
+				Overwrite: &cacheservice.OverwriteOutput{
+					Overwrite:  false,
+					DeleteBlob: false,
+				},
 			},
 			dataGetReturn:           &models.CachedOutput{},
 			dataGetError:            nil,
@@ -300,7 +309,7 @@ func TestCacheManager_Put(t *testing.T) {
 			expectedErrorStatusCode: codes.AlreadyExists,
 		},
 		{
-			name: "output exists, overwrite, success",
+			name: "output exists, overwrite unset, error",
 			mockRequest: &cacheservice.PutCacheRequest{
 				Key: sampleKey,
 				Output: &cacheservice.CachedOutput{
@@ -309,7 +318,26 @@ func TestCacheManager_Put(t *testing.T) {
 					},
 					Metadata: validMetadata,
 				},
-				Overwrite: true,
+			},
+			dataGetReturn:           &models.CachedOutput{},
+			dataGetError:            nil,
+			expectError:             true,
+			expectedErrorStatusCode: codes.AlreadyExists,
+		},
+		{
+			name: "output exists, overwrite + delete, success",
+			mockRequest: &cacheservice.PutCacheRequest{
+				Key: sampleKey,
+				Output: &cacheservice.CachedOutput{
+					Output: &cacheservice.CachedOutput_OutputUri{
+						OutputUri: sampleOutputURI,
+					},
+					Metadata: validMetadata,
+				},
+				Overwrite: &cacheservice.OverwriteOutput{
+					Overwrite:  true,
+					DeleteBlob: true,
+				},
 			},
 			dataGetReturn: &models.CachedOutput{
 				OutputURI: sampleOutputURI,
@@ -328,7 +356,7 @@ func TestCacheManager_Put(t *testing.T) {
 			expectOutputDelete: true,
 		},
 		{
-			name: "output exists, overwrite fails, error",
+			name: "output exists, overwrite + no delete, success",
 			mockRequest: &cacheservice.PutCacheRequest{
 				Key: sampleKey,
 				Output: &cacheservice.CachedOutput{
@@ -337,7 +365,38 @@ func TestCacheManager_Put(t *testing.T) {
 					},
 					Metadata: validMetadata,
 				},
-				Overwrite: true,
+				Overwrite: &cacheservice.OverwriteOutput{
+					Overwrite:  true,
+					DeleteBlob: false,
+				},
+			},
+			dataGetReturn: &models.CachedOutput{
+				OutputURI: sampleOutputURI,
+			},
+			dataGetError: nil,
+			dataPutMatchOutputFunc: func(cachedOutput *models.CachedOutput) bool {
+				return assert.EqualValues(t, sampleOutputURI, cachedOutput.OutputURI) && assert.Nil(t, cachedOutput.OutputLiteral)
+			},
+			outputDeleteError:  nil,
+			outputCreateError:  nil,
+			dataPutError:       nil,
+			expectError:        false,
+			expectOutputDelete: false,
+		},
+		{
+			name: "output exists, delete fails, error",
+			mockRequest: &cacheservice.PutCacheRequest{
+				Key: sampleKey,
+				Output: &cacheservice.CachedOutput{
+					Output: &cacheservice.CachedOutput_OutputUri{
+						OutputUri: sampleOutputURI,
+					},
+					Metadata: validMetadata,
+				},
+				Overwrite: &cacheservice.OverwriteOutput{
+					Overwrite:  true,
+					DeleteBlob: true,
+				},
 			},
 			dataGetReturn: &models.CachedOutput{
 				OutputURI: sampleOutputURI,
@@ -364,7 +423,10 @@ func TestCacheManager_Put(t *testing.T) {
 					},
 					Metadata: validMetadata,
 				},
-				Overwrite: false,
+				Overwrite: &cacheservice.OverwriteOutput{
+					Overwrite:  false,
+					DeleteBlob: false,
+				},
 			},
 			dataGetReturn:           nil,
 			dataGetError:            errors.NewCacheServiceError(codes.Internal, "get output error"),

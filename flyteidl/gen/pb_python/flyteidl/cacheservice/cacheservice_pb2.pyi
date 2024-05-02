@@ -58,6 +58,14 @@ class GetCacheResponse(_message.Message):
     output: CachedOutput
     def __init__(self, output: _Optional[_Union[CachedOutput, _Mapping]] = ...) -> None: ...
 
+class OverwriteOutput(_message.Message):
+    __slots__ = ["overwrite", "delete_blob"]
+    OVERWRITE_FIELD_NUMBER: _ClassVar[int]
+    DELETE_BLOB_FIELD_NUMBER: _ClassVar[int]
+    overwrite: bool
+    delete_blob: bool
+    def __init__(self, overwrite: bool = ..., delete_blob: bool = ...) -> None: ...
+
 class PutCacheRequest(_message.Message):
     __slots__ = ["key", "output", "overwrite"]
     KEY_FIELD_NUMBER: _ClassVar[int]
@@ -65,8 +73,8 @@ class PutCacheRequest(_message.Message):
     OVERWRITE_FIELD_NUMBER: _ClassVar[int]
     key: str
     output: CachedOutput
-    overwrite: bool
-    def __init__(self, key: _Optional[str] = ..., output: _Optional[_Union[CachedOutput, _Mapping]] = ..., overwrite: bool = ...) -> None: ...
+    overwrite: OverwriteOutput
+    def __init__(self, key: _Optional[str] = ..., output: _Optional[_Union[CachedOutput, _Mapping]] = ..., overwrite: _Optional[_Union[OverwriteOutput, _Mapping]] = ...) -> None: ...
 
 class PutCacheResponse(_message.Message):
     __slots__ = []

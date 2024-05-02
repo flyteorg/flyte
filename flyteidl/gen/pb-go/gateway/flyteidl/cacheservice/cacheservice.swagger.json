@@ -108,6 +108,19 @@
       },
       "title": "Additional metadata as key-value pairs"
     },
+    "cacheserviceOverwriteOutput": {
+      "type": "object",
+      "properties": {
+        "overwrite": {
+          "type": "boolean",
+          "title": "Overwrite flag"
+        },
+        "delete_blob": {
+          "type": "boolean",
+          "title": "Delete existing blob"
+        }
+      }
+    },
     "cacheservicePutCacheResponse": {
       "type": "object",
       "description": "Response message of cache store/update operation.\n\nEmpty, success indicated by no errors"

@@ -73,13 +73,18 @@ message GetCacheResponse {
   CachedOutput output = 1; // Cached output
 }
 
+message OverwriteOutput {
+  bool overwrite = 1; // Overwrite flag
+  bool delete_blob = 2; // Delete existing blob
+}
+
 /*
  * Request to store/update cached data by key.
  */
 message PutCacheRequest {
   string key = 1; // Cache key
   CachedOutput output = 2; // Output to cache
-  bool overwrite = 3; // Overwrite flag
+  OverwriteOutput overwrite = 3; // Overwrite flag if exists
 }
 
 /*

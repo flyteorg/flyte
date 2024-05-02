@@ -68,6 +68,16 @@ pub struct GetCacheResponse {
     #[prost(message, optional, tag="1")]
     pub output: ::core::option::Option<CachedOutput>,
 }
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct OverwriteOutput {
+    /// Overwrite flag
+    #[prost(bool, tag="1")]
+    pub overwrite: bool,
+    /// Delete existing blob
+    #[prost(bool, tag="2")]
+    pub delete_blob: bool,
+}
 ///
 /// Request to store/update cached data by key.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -79,9 +89,9 @@ pub struct PutCacheRequest {
     /// Output to cache
     #[prost(message, optional, tag="2")]
     pub output: ::core::option::Option<CachedOutput>,
-    /// Overwrite flag
-    #[prost(bool, tag="3")]
-    pub overwrite: bool,
+    /// Overwrite flag if exists
+    #[prost(message, optional, tag="3")]
+    pub overwrite: ::core::option::Option<OverwriteOutput>,
 }
 ///
 /// Response message of cache store/update operation.

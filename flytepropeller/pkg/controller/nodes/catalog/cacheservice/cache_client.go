@@ -162,7 +162,10 @@ func (c *CacheClient) put(ctx context.Context, key catalog.Key, reader io.Output
 				},
 				Metadata: GenerateCacheMetadata(key, metadata),
 			},
-			Overwrite: overwrite,
+			Overwrite: &cacheservice.OverwriteOutput{
+				Overwrite:  overwrite,
+				DeleteBlob: false,
+			},
 		}
 	} else {
 		remoteFileOutputReader, ok := reader.(ioutils.RemoteFileOutputReader)
@@ -189,7 +192,10 @@ func (c *CacheClient) put(ctx context.Context, key catalog.Key, reader io.Output
 				},
 				Metadata: GenerateCacheMetadata(key, metadata),
 			},
-			Overwrite: overwrite,
+			Overwrite: &cacheservice.OverwriteOutput{
+				Overwrite:  overwrite,
+				DeleteBlob: false,
+			},
 		}
 	}
 

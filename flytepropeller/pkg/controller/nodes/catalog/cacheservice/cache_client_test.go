@@ -404,7 +404,8 @@ func TestCache_Put(t *testing.T) {
 				ctx,
 				mock.MatchedBy(func(o *cacheservice.PutCacheRequest) bool {
 					assert.EqualValues(t, sampleCacheKey, o.Key)
-					assert.EqualValues(t, false, o.Overwrite)
+					assert.EqualValues(t, false, o.Overwrite.Overwrite)
+					assert.EqualValues(t, false, o.Overwrite.DeleteBlob)
 					if tc.inlineCache {
 						_, ok := o.Output.Output.(*cacheservice.CachedOutput_OutputLiterals)
 						assert.True(t, ok, "Expected output to be of type *cacheservice.CachedOutput_OutputLiterals")
@@ -444,7 +445,8 @@ func TestCache_Put(t *testing.T) {
 			ctx,
 			mock.MatchedBy(func(o *cacheservice.PutCacheRequest) bool {
 				assert.EqualValues(t, sampleCacheKey, o.Key)
-				assert.EqualValues(t, true, o.Overwrite)
+				assert.EqualValues(t, true, o.Overwrite.Overwrite)
+				assert.EqualValues(t, false, o.Overwrite.DeleteBlob)
 				return true
 			}),
 		).Return(&cacheservice.PutCacheResponse{}, nil)

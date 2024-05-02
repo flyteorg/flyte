@@ -266,6 +266,53 @@ export class GetCacheResponse extends Message<GetCacheResponse> {
 }
 
 /**
+ * @generated from message flyteidl.cacheservice.OverwriteOutput
+ */
+export class OverwriteOutput extends Message<OverwriteOutput> {
+  /**
+   * Overwrite flag
+   *
+   * @generated from field: bool overwrite = 1;
+   */
+  overwrite = false;
+
+  /**
+   * Delete existing blob
+   *
+   * @generated from field: bool delete_blob = 2;
+   */
+  deleteBlob = false;
+
+  constructor(data?: PartialMessage<OverwriteOutput>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.cacheservice.OverwriteOutput";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "overwrite", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 2, name: "delete_blob", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): OverwriteOutput {
+    return new OverwriteOutput().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): OverwriteOutput {
+    return new OverwriteOutput().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): OverwriteOutput {
+    return new OverwriteOutput().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: OverwriteOutput | PlainMessage<OverwriteOutput> | undefined, b: OverwriteOutput | PlainMessage<OverwriteOutput> | undefined): boolean {
+    return proto3.util.equals(OverwriteOutput, a, b);
+  }
+}
+
+/**
  *
  * Request to store/update cached data by key.
  *
@@ -287,11 +334,11 @@ export class PutCacheRequest extends Message<PutCacheRequest> {
   output?: CachedOutput;
 
   /**
-   * Overwrite flag
+   * Overwrite flag if exists
    *
-   * @generated from field: bool overwrite = 3;
+   * @generated from field: flyteidl.cacheservice.OverwriteOutput overwrite = 3;
    */
-  overwrite = false;
+  overwrite?: OverwriteOutput;
 
   constructor(data?: PartialMessage<PutCacheRequest>) {
     super();
@@ -303,7 +350,7 @@ export class PutCacheRequest extends Message<PutCacheRequest> {
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "output", kind: "message", T: CachedOutput },
-    { no: 3, name: "overwrite", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 3, name: "overwrite", kind: "message", T: OverwriteOutput },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): PutCacheRequest {
