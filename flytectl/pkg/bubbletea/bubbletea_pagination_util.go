@@ -19,6 +19,19 @@ type DataCallback func(filter filters.Filters) []proto.Message
 
 type printTableProto struct{ proto.Message }
 
+type direction int
+
+type newDataMsg struct {
+	newItems       []proto.Message
+	batchIndex     int
+	fetchDirection direction
+}
+
+const (
+	forward direction = iota
+	backward
+)
+
 const (
 	msgPerBatch       = 100 // Please set msgPerBatch as a multiple of msgPerPage
 	msgPerPage        = 10
@@ -35,7 +48,8 @@ var (
 	// Record the index of the first and last batch that is in cache
 	firstBatchIndex int
 	lastBatchIndex  int
-	batchLen        = make(map[int]int)
+	// Record numbers of messages in each batch
+	batchLen = make(map[int]int)
 	// Avoid fetching back and forward at the same time
 	mutex sync.Mutex
 )
@@ -112,19 +126,6 @@ func getMessageList(batchIndex int) []proto.Message {
 	return msg
 }
 
-type direction int
-
-const (
-	forward direction = iota
-	backward
-)
-
-type newDataMsg struct {
-	newItems       []proto.Message
-	batchIndex     int
-	fetchDirection direction
-}
-
 func fetchDataCmd(batchIndex int, fetchDirection direction) tea.Cmd {
 	return func() tea.Msg {
 		msg := newDataMsg{
@@ -136,7 +137,7 @@ func fetchDataCmd(batchIndex int, fetchDirection direction) tea.Cmd {
 	}
 }
 
-func getLocalLastPage() int {
+func sumBatchLengths() int {
 	sum := 0
 	for i := 0; i < lastBatchIndex+1; i++ {
 		length, ok := batchLen[i]

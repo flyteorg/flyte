@@ -34,7 +34,7 @@ func newModel(initMsg []proto.Message) pageModel {
 	p := paginator.New()
 	p.PerPage = msgPerPage
 	p.Page = int(filter.Page) - 1
-	p.SetTotalPages(getLocalLastPage())
+	p.SetTotalPages(sumBatchLengths())
 
 	s := spinner.New()
 	s.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("56"))
@@ -95,11 +95,12 @@ func (m pageModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			fetchingBackward = false
 		}
-		m.paginator.SetTotalPages(getLocalLastPage())
+		m.paginator.SetTotalPages(sumBatchLengths())
 		return m, nil
 	}
 
 	m.paginator, _ = m.paginator.Update(msg)
+
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch {
