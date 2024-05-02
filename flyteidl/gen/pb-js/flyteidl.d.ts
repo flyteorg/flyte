@@ -7575,6 +7575,143 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of an ExecutionEnvAssignment. */
+        interface IExecutionEnvAssignment {
+
+            /** ExecutionEnvAssignment nodeIds */
+            nodeIds?: (string[]|null);
+
+            /** ExecutionEnvAssignment taskType */
+            taskType?: (string|null);
+
+            /** ExecutionEnvAssignment executionEnv */
+            executionEnv?: (flyteidl.core.IExecutionEnv|null);
+        }
+
+        /** Represents an ExecutionEnvAssignment. */
+        class ExecutionEnvAssignment implements IExecutionEnvAssignment {
+
+            /**
+             * Constructs a new ExecutionEnvAssignment.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.IExecutionEnvAssignment);
+
+            /** ExecutionEnvAssignment nodeIds. */
+            public nodeIds: string[];
+
+            /** ExecutionEnvAssignment taskType. */
+            public taskType: string;
+
+            /** ExecutionEnvAssignment executionEnv. */
+            public executionEnv?: (flyteidl.core.IExecutionEnv|null);
+
+            /**
+             * Creates a new ExecutionEnvAssignment instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ExecutionEnvAssignment instance
+             */
+            public static create(properties?: flyteidl.core.IExecutionEnvAssignment): flyteidl.core.ExecutionEnvAssignment;
+
+            /**
+             * Encodes the specified ExecutionEnvAssignment message. Does not implicitly {@link flyteidl.core.ExecutionEnvAssignment.verify|verify} messages.
+             * @param message ExecutionEnvAssignment message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.IExecutionEnvAssignment, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an ExecutionEnvAssignment message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ExecutionEnvAssignment
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.ExecutionEnvAssignment;
+
+            /**
+             * Verifies an ExecutionEnvAssignment message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of an ExecutionEnv. */
+        interface IExecutionEnv {
+
+            /** ExecutionEnv id */
+            id?: (string|null);
+
+            /** ExecutionEnv type */
+            type?: (string|null);
+
+            /** ExecutionEnv extant */
+            extant?: (google.protobuf.IStruct|null);
+
+            /** ExecutionEnv spec */
+            spec?: (google.protobuf.IStruct|null);
+        }
+
+        /** Represents an ExecutionEnv. */
+        class ExecutionEnv implements IExecutionEnv {
+
+            /**
+             * Constructs a new ExecutionEnv.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.IExecutionEnv);
+
+            /** ExecutionEnv id. */
+            public id: string;
+
+            /** ExecutionEnv type. */
+            public type: string;
+
+            /** ExecutionEnv extant. */
+            public extant?: (google.protobuf.IStruct|null);
+
+            /** ExecutionEnv spec. */
+            public spec?: (google.protobuf.IStruct|null);
+
+            /** ExecutionEnv environment. */
+            public environment?: ("extant"|"spec");
+
+            /**
+             * Creates a new ExecutionEnv instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ExecutionEnv instance
+             */
+            public static create(properties?: flyteidl.core.IExecutionEnv): flyteidl.core.ExecutionEnv;
+
+            /**
+             * Encodes the specified ExecutionEnv message. Does not implicitly {@link flyteidl.core.ExecutionEnv.verify|verify} messages.
+             * @param message ExecutionEnv message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.IExecutionEnv, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an ExecutionEnv message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ExecutionEnv
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.ExecutionEnv;
+
+            /**
+             * Verifies an ExecutionEnv message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a Span. */
         interface ISpan {
 
