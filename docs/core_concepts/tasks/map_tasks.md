@@ -5,9 +5,9 @@
 ```{eval-rst}
 .. tags:: Intermediate
 ```
-
-Using a map task in Flyte allows for the execution of a pod task or a regular task across a series of inputs within a single workflow node.
-This capability eliminates the need to create individual nodes for each instance, leading to substantial performance improvements.
+If you need to parallelize a task, you can use the {py:func}`~flytekit.map_task`
+construct. A mappable task is one that takes in a single argument and produces
+some output. Using a map task in Flyte allows for the execution of a pod task or a regular task across a series of inputs within a single workflow node. This capability eliminates the need to create individual nodes for each instance, leading to substantial performance improvements.
 
 Map tasks find utility in diverse scenarios, such as:
 

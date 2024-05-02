@@ -148,4 +148,5 @@ accessing_attributes
 pytorch_type
 enum_type
 pickle_type
+accelerated_datasets
 ```

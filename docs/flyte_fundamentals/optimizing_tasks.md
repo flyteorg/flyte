@@ -95,57 +95,6 @@ def compute_mean(data: List[float]) -> float:
 Notice that the `timeout` argument takes a built-in Python
 {py:class}`~datetime.timedelta` object.
 
-## Map tasks
-
-If you need to parallelize a task, you can use the {py:func}`~flytekit.map_task`
-construct. A mappable task is one that takes in a single argument and produces
-some output.
-
-In this example, we partition our data into chunks so that we can horizontally
-scale our workload:
-
-```{code-cell} ipython3
-import math
-from typing import Tuple
-
-from flytekit import map_task
-
-
-@task
-def sum_and_length(data: List[float]) -> List[float]:
-    """Return the sum and length of a dataset of numbers."""
-    return [sum(data), float(len(data))]
-
-
-@task
-def prepare_partitions(data: List[float], n_partitions: int) -> List[List[float]]:
-    """Create partitions from the full dataset."""
-    size = math.ceil(len(data) / n_partitions)
-    return [data[size * i: size * (i + 1)] for i in range(n_partitions)]
-
-@task
-def reduce(results: List[List[float]]) -> float:
-    """Combine results from the map task."""
-    total, length = 0.0, 0.0
-    for sub_total, sub_length in results:
-        total += sub_total
-        length += sub_length
-    return total / length
-
-
-@workflow
-def parallelized_compute_mean(data: List[float], n_partitions: int = 10) -> float:
-    """An embarrassingly parallel implementation to compute the mean from data."""
-    partitioned_data = prepare_partitions(data=data, n_partitions=n_partitions)
-
-    # use map_task to apply the sum_and_length task to the partitions
-    results = map_task(sum_and_length)(data=partitioned_data)
-    return reduce(results=results)
-
-
-parallelized_compute_mean(data=[float(x) for x in range(10_000)])
-```
-
 ## Resource allocation
 
 As one of the core features of Flyte, workflows can be composed of tasks that

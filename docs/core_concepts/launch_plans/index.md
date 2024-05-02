@@ -90,4 +90,11 @@ You can employ default and fixed inputs in conjunction in a launch plan.
 Launch plans can also be used to run workflows on a specific cadence.
 For more information, refer to the {ref}`scheduling_launch_plan` documentation.
 
+```{toctree}
+:maxdepth: 1
+:hidden:
+
+running_launch_plans
+```
+
 [flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/basics/
