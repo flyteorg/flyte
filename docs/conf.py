@@ -132,7 +132,13 @@ redirects = {
     "user_guide/data_types_and_io/flytefile": "../../data_types_and_io/flytefile.html",
     "user_guide/data_types_and_io/pickle_type": "../../data_types_and_io/pickle_type.html",
     "user_guide/data_types_and_io/pytorch_type": "../../data_types_and_io/pytorch_type.html",
-    "user_guide/data_types_and_io/structureddataset": "../../data_types_and_io/structureddataset.html"
+    "user_guide/data_types_and_io/structureddataset": "../../data_types_and_io/structureddataset.html",
+    "user_guide/testing/index": "../../development_cycle/testing",
+    "user_guide/testing/mocking_tasks": "../../development_cycle/testing",
+    "flyte_fundamentals/index": "../core_concepts/index.html",
+    "flyte_fundamentals/registering_workflows": "../development_cycle/registering_workflows.html",
+    "flyte_fundamentals/tasks_workflows_and_launch_plans": "../core_concepts/index.html",
+    "flyte_fundamentals/optimizing_tasks": "../core_concepts/tasks/index.html"
 }
 
 

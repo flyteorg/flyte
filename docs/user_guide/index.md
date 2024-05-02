@@ -60,7 +60,6 @@ environment_setup
 advanced_composition/index
 customizing_dependencies/index
 development_lifecycle/index
-testing/index
 productionizing/index
 extending/index
 ```

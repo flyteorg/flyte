@@ -1,4 +1,12 @@
-# Mocking tasks
+(testing)=
+
+# Testing
+
+The `flytekit` python SDK provides a few utilities for making it easier to test
+your tasks and workflows in your test suite. For more details, you can also refer
+to the {py:mod}`~flytekit.testing` module in the API reference.
+
+## Mocking tasks
 
 A lot of the tasks that you write you can run locally, but some of them you will not be able to, usually because they are tasks that depend on a third-party only available on the backend. Hive tasks are a common example, as most users will not have access to the service that executes Hive queries from their development environment. However, it's still useful to be able to locally run a workflow that calls such a task. In these instances, flytekit provides a couple of utilities to help navigate this.
 

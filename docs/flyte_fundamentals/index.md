@@ -40,9 +40,7 @@ cluster, see the {ref}`Deployment Guide <deployment>`.
 :maxdepth: -1
 :hidden:
 
-tasks_workflows_and_launch_plans
 running_and_scheduling_workflows
 visualizing_task_input_and_output
-optimizing_tasks
 extending_flyte
 ```
