@@ -133,6 +133,7 @@ redirects = {
     "user_guide/data_types_and_io/pickle_type": "../../data_types_and_io/pickle_type.html",
     "user_guide/data_types_and_io/pytorch_type": "../../data_types_and_io/pytorch_type.html",
     "user_guide/data_types_and_io/structureddataset": "../../data_types_and_io/structureddataset.html",
+    "user_guide/development_lifecycle/index": "../../development_cycle/index.html",
     "user_guide/testing/index": "../../development_cycle/testing",
     "user_guide/testing/mocking_tasks": "../../development_cycle/testing",
     "flyte_fundamentals/index": "../core_concepts/index.html",
