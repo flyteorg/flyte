@@ -34207,7 +34207,7 @@
                             writer.uint32(/* id 24, wireType 2 =*/194).string(message.tags[i]);
                     if (message.executionEnvAssignments != null && message.executionEnvAssignments.length)
                         for (var i = 0; i < message.executionEnvAssignments.length; ++i)
-                            $root.flyteidl.core.ExecutionEnvAssignment.encode(message.executionEnvAssignments[i], writer.uint32(/* id 25, wireType 2 =*/202).fork()).ldelim();
+                            $root.flyteidl.core.ExecutionEnvAssignment.encode(message.executionEnvAssignments[i], writer.uint32(/* id 26, wireType 2 =*/210).fork()).ldelim();
                     return writer;
                 };
     
@@ -34282,7 +34282,7 @@
                                 message.tags = [];
                             message.tags.push(reader.string());
                             break;
-                        case 25:
+                        case 26:
                             if (!(message.executionEnvAssignments && message.executionEnvAssignments.length))
                                 message.executionEnvAssignments = [];
                             message.executionEnvAssignments.push($root.flyteidl.core.ExecutionEnvAssignment.decode(reader, reader.uint32()));

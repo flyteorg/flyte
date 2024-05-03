@@ -132,7 +132,7 @@ message WorkflowExecutionConfig {
 
   // Environment variables to be set for the execution.
   Envs envs = 8;
- 
+
   // Execution environment assignments to be set for the execution.
   repeated core.ExecutionEnvAssignment execution_env_assignments = 9;
 }
