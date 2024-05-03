@@ -55,7 +55,7 @@ Optimizing performance at each stage
      - Impact on performance
      - Configuration parameter
    * - ``workers``
-     - Number of processes that can work concurrently. Also implies number of workflows that can be executed in parallel. Since FlytePropeller uses ``goroutines``, it can accomodate significantly more processes than the number of physical cores.
+     - Number of processes that can work concurrently. Also implies number of workflows that can be executed in parallel. Since FlytePropeller uses ``goroutines``, it can accommodate significantly more processes than the number of physical cores.
      - ``flyte:propeller:all:free_workers_count``: a low number may result in higher overall latency for each workflow evaluation round.
      - Larger the number, implies more workflows can be evaluated in parallel. But it should depend on number of CPU cores assigned to FlytePropeller and evaluated against the cost of context switching. A number around 500 - 800 with 4-8 CPU cores usually works fine.
      - ``plugins.workqueue.config.workers`` (default: ``10``) 
@@ -127,23 +127,24 @@ While it's possible to easily monitor Kube API saturation using system-level met
      - ``propeller.workflow-reeval-duration``. Default value: ``10s``.
    * - ``downstream-eval-duration`` 
      - Interval at which the system checks for updates on the execution status of downstream tasks within a workflow. This setting is crucial for workflows where tasks are interdependent, as it determines how quickly Flyte reacts to changes or completions of tasks that other tasks depend on.
-     - A shorter interval makes Flyte check more frequently for task updates, which can lead to quicker workflow progression if tasks complete faster than anticipated, at the cost of higher system load and reduced througput.  Conversely, a higher value reduces the frequency of checks, which can decrease system load but may delay the progression of workflows, as the system reacts slower to task completions.
+     - A shorter interval makes Flyte check more frequently for task updates, which can lead to quicker workflow progression if tasks complete faster than anticipated, at the cost of higher system load and reduced throughput.  Conversely, a higher value reduces the frequency of checks, which can decrease system load but may delay the progression of workflows, as the system reacts slower to task completions.
      - ``propeller.downstream-eval-duration``. Default value: ``5s``.
    * - ``max-streak-length``
      -  Maximum number of consecutive evaluation rounds that one propeller worker can use for one workflow. 
      -  A large ``max-streak-length`` value can lead to faster completion times for workflows that benefit from continuous processing, especially cached or computationally intensive workflows; at the cost of overall lower throughput and higher latency as workers would be spending most of their time on a few workflows. If set to `1`, the worker adds the workflowID back to the WorkQueue immediately after a single evaluation loop is completed and waits for another worker to pick it up before processing again, effectively prioritizing "hot workflows".
-     -  ``propeller.max-streak-length``. Default value: ``8``.
-   
-   
-   
-   * - ``storage.cache``
-     - propeller
-     - This config is used to configure the write-through cache used by FlytePropeller on top of the metastore
-     - FlytePropeller uses the configure blob-store (can be changed to something more performant in the future) to optimize read and write latency, for all metadata IO operations. Metadata refers to the input and output pointers
+     -  ``propeller.max-streak-length``. Default value: ``8`` . 
+   * - ``max-size_mbs``
+     - Max size of the write-through in-memory cache that FlytePropeller can use to store Inputs/Outputs metadata for faster read operations. 
+     - A too-small cache might lead to frequent cache misses, reducing the effectiveness of the cache and increasing latency. Conversely, a too-large cache might consume too much memory, potentially affecting the performance of other components. We recommend monitoring cache performance metrics such as `hit rates and miss rates <https://github.com/flyteorg/flyte/blob/8cc96177e7447d9630a1186215a8c8ad3d34d4a2/deployment/stats/prometheus/flytepropeller-dashboard.json#L1140>`__. These metrics can help determine if the cache size needs to be adjusted for optimal performance.
+     - ``storage.cache.max-size_mbs``. Default value: ``0`` (disabled).
+   * - ``backoff.max-duration``
+     - Maximum back-off interval in case of resource-quota errors.
+     - A higher value will ensure retries do not happen too frequently, which could overwhelm resources or overload the Kubernetes API server at the cost of overall latency.
+     - ``tasks.backoff.max-duration``. Default value: ``20s``.
 
 
 4. Record executions status
-^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 
