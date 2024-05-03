@@ -34005,6 +34005,7 @@
                  * @property {flyteidl.admin.IEnvs|null} [envs] ExecutionSpec envs
                  * @property {Array.<string>|null} [tags] ExecutionSpec tags
                  * @property {flyteidl.admin.IExecutionClusterLabel|null} [executionClusterLabel] ExecutionSpec executionClusterLabel
+                 * @property {Array.<flyteidl.core.IExecutionEnvAssignment>|null} [executionEnvAssignments] ExecutionSpec executionEnvAssignments
                  */
     
                 /**
@@ -34017,6 +34018,7 @@
                  */
                 function ExecutionSpec(properties) {
                     this.tags = [];
+                    this.executionEnvAssignments = [];
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -34167,6 +34169,14 @@
                  */
                 ExecutionSpec.prototype.executionClusterLabel = null;
     
+                /**
+                 * ExecutionSpec executionEnvAssignments.
+                 * @member {Array.<flyteidl.core.IExecutionEnvAssignment>} executionEnvAssignments
+                 * @memberof flyteidl.admin.ExecutionSpec
+                 * @instance
+                 */
+                ExecutionSpec.prototype.executionEnvAssignments = $util.emptyArray;
+    
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
     
@@ -34242,6 +34252,9 @@
                             writer.uint32(/* id 24, wireType 2 =*/194).string(message.tags[i]);
                     if (message.executionClusterLabel != null && message.hasOwnProperty("executionClusterLabel"))
                         $root.flyteidl.admin.ExecutionClusterLabel.encode(message.executionClusterLabel, writer.uint32(/* id 25, wireType 2 =*/202).fork()).ldelim();
+                    if (message.executionEnvAssignments != null && message.executionEnvAssignments.length)
+                        for (var i = 0; i < message.executionEnvAssignments.length; ++i)
+                            $root.flyteidl.core.ExecutionEnvAssignment.encode(message.executionEnvAssignments[i], writer.uint32(/* id 26, wireType 2 =*/210).fork()).ldelim();
                     return writer;
                 };
     
@@ -34318,6 +34331,11 @@
                             break;
                         case 25:
                             message.executionClusterLabel = $root.flyteidl.admin.ExecutionClusterLabel.decode(reader, reader.uint32());
+                            break;
+                        case 26:
+                            if (!(message.executionEnvAssignments && message.executionEnvAssignments.length))
+                                message.executionEnvAssignments = [];
+                            message.executionEnvAssignments.push($root.flyteidl.core.ExecutionEnvAssignment.decode(reader, reader.uint32()));
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -34431,6 +34449,15 @@
                         var error = $root.flyteidl.admin.ExecutionClusterLabel.verify(message.executionClusterLabel);
                         if (error)
                             return "executionClusterLabel." + error;
+                    }
+                    if (message.executionEnvAssignments != null && message.hasOwnProperty("executionEnvAssignments")) {
+                        if (!Array.isArray(message.executionEnvAssignments))
+                            return "executionEnvAssignments: array expected";
+                        for (var i = 0; i < message.executionEnvAssignments.length; ++i) {
+                            var error = $root.flyteidl.core.ExecutionEnvAssignment.verify(message.executionEnvAssignments[i]);
+                            if (error)
+                                return "executionEnvAssignments." + error;
+                        }
                     }
                     return null;
                 };
@@ -36564,6 +36591,7 @@
                  * @property {google.protobuf.IBoolValue|null} [interruptible] WorkflowExecutionConfig interruptible
                  * @property {boolean|null} [overwriteCache] WorkflowExecutionConfig overwriteCache
                  * @property {flyteidl.admin.IEnvs|null} [envs] WorkflowExecutionConfig envs
+                 * @property {Array.<flyteidl.core.IExecutionEnvAssignment>|null} [executionEnvAssignments] WorkflowExecutionConfig executionEnvAssignments
                  */
     
                 /**
@@ -36575,6 +36603,7 @@
                  * @param {flyteidl.admin.IWorkflowExecutionConfig=} [properties] Properties to set
                  */
                 function WorkflowExecutionConfig(properties) {
+                    this.executionEnvAssignments = [];
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -36646,6 +36675,14 @@
                 WorkflowExecutionConfig.prototype.envs = null;
     
                 /**
+                 * WorkflowExecutionConfig executionEnvAssignments.
+                 * @member {Array.<flyteidl.core.IExecutionEnvAssignment>} executionEnvAssignments
+                 * @memberof flyteidl.admin.WorkflowExecutionConfig
+                 * @instance
+                 */
+                WorkflowExecutionConfig.prototype.executionEnvAssignments = $util.emptyArray;
+    
+                /**
                  * Creates a new WorkflowExecutionConfig instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.WorkflowExecutionConfig
@@ -36685,6 +36722,9 @@
                         writer.uint32(/* id 7, wireType 0 =*/56).bool(message.overwriteCache);
                     if (message.envs != null && message.hasOwnProperty("envs"))
                         $root.flyteidl.admin.Envs.encode(message.envs, writer.uint32(/* id 8, wireType 2 =*/66).fork()).ldelim();
+                    if (message.executionEnvAssignments != null && message.executionEnvAssignments.length)
+                        for (var i = 0; i < message.executionEnvAssignments.length; ++i)
+                            $root.flyteidl.core.ExecutionEnvAssignment.encode(message.executionEnvAssignments[i], writer.uint32(/* id 9, wireType 2 =*/74).fork()).ldelim();
                     return writer;
                 };
     
@@ -36729,6 +36769,11 @@
                             break;
                         case 8:
                             message.envs = $root.flyteidl.admin.Envs.decode(reader, reader.uint32());
+                            break;
+                        case 9:
+                            if (!(message.executionEnvAssignments && message.executionEnvAssignments.length))
+                                message.executionEnvAssignments = [];
+                            message.executionEnvAssignments.push($root.flyteidl.core.ExecutionEnvAssignment.decode(reader, reader.uint32()));
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -36784,6 +36829,15 @@
                         var error = $root.flyteidl.admin.Envs.verify(message.envs);
                         if (error)
                             return "envs." + error;
+                    }
+                    if (message.executionEnvAssignments != null && message.hasOwnProperty("executionEnvAssignments")) {
+                        if (!Array.isArray(message.executionEnvAssignments))
+                            return "executionEnvAssignments: array expected";
+                        for (var i = 0; i < message.executionEnvAssignments.length; ++i) {
+                            var error = $root.flyteidl.core.ExecutionEnvAssignment.verify(message.executionEnvAssignments[i]);
+                            if (error)
+                                return "executionEnvAssignments." + error;
+                        }
                     }
                     return null;
                 };
@@ -38218,6 +38272,7 @@
                  * @property {google.protobuf.IBoolValue|null} [interruptible] LaunchPlanSpec interruptible
                  * @property {boolean|null} [overwriteCache] LaunchPlanSpec overwriteCache
                  * @property {flyteidl.admin.IEnvs|null} [envs] LaunchPlanSpec envs
+                 * @property {Array.<flyteidl.core.IExecutionEnvAssignment>|null} [executionEnvAssignments] LaunchPlanSpec executionEnvAssignments
                  */
     
                 /**
@@ -38229,6 +38284,7 @@
                  * @param {flyteidl.admin.ILaunchPlanSpec=} [properties] Properties to set
                  */
                 function LaunchPlanSpec(properties) {
+                    this.executionEnvAssignments = [];
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -38364,6 +38420,14 @@
                 LaunchPlanSpec.prototype.envs = null;
     
                 /**
+                 * LaunchPlanSpec executionEnvAssignments.
+                 * @member {Array.<flyteidl.core.IExecutionEnvAssignment>} executionEnvAssignments
+                 * @memberof flyteidl.admin.LaunchPlanSpec
+                 * @instance
+                 */
+                LaunchPlanSpec.prototype.executionEnvAssignments = $util.emptyArray;
+    
+                /**
                  * Creates a new LaunchPlanSpec instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.LaunchPlanSpec
@@ -38419,6 +38483,9 @@
                         writer.uint32(/* id 20, wireType 0 =*/160).bool(message.overwriteCache);
                     if (message.envs != null && message.hasOwnProperty("envs"))
                         $root.flyteidl.admin.Envs.encode(message.envs, writer.uint32(/* id 21, wireType 2 =*/170).fork()).ldelim();
+                    if (message.executionEnvAssignments != null && message.executionEnvAssignments.length)
+                        for (var i = 0; i < message.executionEnvAssignments.length; ++i)
+                            $root.flyteidl.core.ExecutionEnvAssignment.encode(message.executionEnvAssignments[i], writer.uint32(/* id 22, wireType 2 =*/178).fork()).ldelim();
                     return writer;
                 };
     
@@ -38487,6 +38554,11 @@
                             break;
                         case 21:
                             message.envs = $root.flyteidl.admin.Envs.decode(reader, reader.uint32());
+                            break;
+                        case 22:
+                            if (!(message.executionEnvAssignments && message.executionEnvAssignments.length))
+                                message.executionEnvAssignments = [];
+                            message.executionEnvAssignments.push($root.flyteidl.core.ExecutionEnvAssignment.decode(reader, reader.uint32()));
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -38580,6 +38652,15 @@
                         var error = $root.flyteidl.admin.Envs.verify(message.envs);
                         if (error)
                             return "envs." + error;
+                    }
+                    if (message.executionEnvAssignments != null && message.hasOwnProperty("executionEnvAssignments")) {
+                        if (!Array.isArray(message.executionEnvAssignments))
+                            return "executionEnvAssignments: array expected";
+                        for (var i = 0; i < message.executionEnvAssignments.length; ++i) {
+                            var error = $root.flyteidl.core.ExecutionEnvAssignment.verify(message.executionEnvAssignments[i]);
+                            if (error)
+                                return "executionEnvAssignments." + error;
+                        }
                     }
                     return null;
                 };
