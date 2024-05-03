@@ -70,6 +70,11 @@ func Setup() (s TestStruct) {
 	return s
 }
 
+func (s *TestStruct) RestoreStandardFileDescriptors() {
+	os.Stdout = s.StdOut
+	os.Stderr = s.Stderr
+}
+
 func SetupWithExt() (s TestStruct) {
 	s.Ctx = context.Background()
 	s.Reader, s.Writer, s.Err = os.Pipe()
