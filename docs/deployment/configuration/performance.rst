@@ -43,8 +43,8 @@ Optimizing ``round_latency`` is one of the main goals of the recommendations pro
 Optimizing performance at each stage
 ------------------------------------
 
-1. Worker, the WorkQueue and evaluation loop 
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+1. Worker, the WorkQueue and the evaluation loop 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. list-table:: Important Properties
    :widths: 25 50 25 50 25
@@ -63,28 +63,8 @@ Optimizing performance at each stage
      - 
      - ``sum(rate(flyte:propeller:all:main_depth[5m]))``
      - A growing trend indicates the processing queue depth is long and is taking longer to drain, delaying start time for executions
-     
-
-
-.. list-table::
-   :widths: 25 25 50 100
-   :header-rows: 1
-   * - Metric
-     - Alerting factor
-     - Configuration parameter
-     - Default value
-   * - ``flyte:propeller:all:free_workers_count``
-     - 
-     - ``plugins.workqueue.config.workers``
-     - ``10``
-   * - ``sum(rate(flyte:propeller:all:round:raw_ms[5m])) by (wf)``
-     - A higher number means Flyte propeller is taking more time to process each workflow
-     - N/A
-     - N/A
-   * - 
-     - 
      - ``plugins.workqueue.config.maxItems``
-     - ``10000``
+     - 
 
 2. Query observed state
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -109,7 +89,6 @@ Increasing the ``qps`` and ``burst`` values may help alleviate back pressure and
 It is worth noting that the Kube API server tends to throttle requests transparently. This means that even increasing the allowed frequency of API requests (e.g., increasing FlytePropeller workers or relaxing Kube client config rate-limiting), there may be steep performance decreases for no apparent reason. 
 While it's possible to easily monitor Kube API saturation using system-level metrics like CPU, memory and network usage; it's recommended to look at kube-apiserver-specific metrics like ``workqueue_depth`` which can assist in identifying whether throttling is to blame. Unfortunately, there is no one-size-fits-all solution here, and customizing these parameters for your workload will require trial and error.
 `Learn more about Kubernetes metrics <https://kubernetes.io/docs/reference/instrumentation/metrics/>`__
-
 
 3. Evaluate the DAG and reconcile state as needed
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -146,55 +125,34 @@ While it's possible to easily monitor Kube API saturation using system-level met
 4. Record executions status
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
-
-Optimize FlytePropeller configuration
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Usually round-latency can be resolved by adjusting FlytePropeller config specified `here <https://pkg.go.dev/github.com/flyteorg/FlytePropeller@v0.10.3/pkg/controller/config>`_ or sometimes adjusting the global defaults for your deployment or per workflow-execution.
-Let us first look at various config properties that can be set and would impact the performance of one round in Flyte and should be tweaked
-
 .. list-table:: Important Properties
-   :widths: 25 25 25 50
+   :widths: 25 50 25 50 25
    :header-rows: 1
-
-   * - Property
-     - Section
-     - Rule of thumb
+* - Property
      - Description
-   * - ``workflow-reeval-duration``
-     - propeller
-     - lower the number - lower latency and higher throughput (low throughput is because the same workflow will be evaluated more times)
-     - period at which, given no external signal, a workflow should be re-evaluated by Flyte propellers reval loop
-   * - ``downstream-eval-duration``
-     - propeller
-     - lower the number - lower latency and lower throughput (low throughput is because the same workflow will be evaluated more times)
-     - This indicates how often are external events like pods completion etc recorded.
-   * - ``max-streak-length``
-     - propeller
-     - higher the number lower the latency for end to end workflow, especially for cached workflows
-     - number of consecutive rounds to try with one workflow - prioritize a hot workflow over others.
-   * - ``kube-client-config``
-     - propeller
-     - This is how you can control the number of requests ceiling that FlytePropeller can initiate to KubeAPI. This is usual the #1 bottle neck
-     - this configures the kubernetes client used by FlytePropeller
+     - Impact on performance
+     - Configuration parameter
    * - ``workflowStore.policy``
      - propeller
      - This config uses a trick in etcD to minimize number of redundant loops in FlytePropeller, thus improving free slots
      - Use this to configure how FlytePropeller should evaluate workflows, the default is usually a good choice
-   * - ``storage.cache``
-     - propeller
-     - This config is used to configure the write-through cache used by FlytePropeller on top of the metastore
-     - FlytePropeller uses the configure blob-store (can be changed to something more performant in the future) to optimize read and write latency, for all metadata IO operations. Metadata refers to the input and output pointers
+
+
+5. Report status to the control plane
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. list-table:: Important Properties
+   :widths: 25 50 25 50 25
+   :header-rows: 1
+* - Property
+     - Description
+     - Impact on performance
+     - Configuration parameter
    * - ``admin-launcher.tps``, ``admin-launcher.cacheSize``, ``admin-launcher.workers``
      - propeller
      - This config is used to configure the max rate and launch-plans that FlytePropeller can launch against FlyteAdmin
      - It is essential to limit the number of writes from FlytePropeller to flyteadmin to prevent brown-outs or request throttling at the server. Also the cache reduces number of calls to the server.
-   * - ``tasks.backoff.max-duration``
-     - propeller
-     - This config is used to configure the maximum back-off interval in case of resource-quota errors
-     - FlytePropeller will automatically back-off when k8s or other services request it to slowdown or when desired quotas are met.
-   
+
    
 
    * - ``max-parallelism``
