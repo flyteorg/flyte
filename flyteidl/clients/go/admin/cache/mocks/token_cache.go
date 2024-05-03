@@ -12,6 +12,16 @@ type TokenCache struct {
 	mock.Mock
 }
 
+// CondSignal provides a mock function with given fields:
+func (_m *TokenCache) CondSignal() {
+	_m.Called()
+}
+
+// CondWait provides a mock function with given fields:
+func (_m *TokenCache) CondWait() {
+	_m.Called()
+}
+
 type TokenCache_GetToken struct {
 	*mock.Call
 }
@@ -53,6 +63,50 @@ func (_m *TokenCache) GetToken() (*oauth2.Token, error) {
 	return r0, r1
 }
 
+// Lock provides a mock function with given fields:
+func (_m *TokenCache) Lock() {
+	_m.Called()
+}
+
+type TokenCache_PurgeIfEquals struct {
+	*mock.Call
+}
+
+func (_m TokenCache_PurgeIfEquals) Return(_a0 bool, _a1 error) *TokenCache_PurgeIfEquals {
+	return &TokenCache_PurgeIfEquals{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *TokenCache) OnPurgeIfEquals(t *oauth2.Token) *TokenCache_PurgeIfEquals {
+	c_call := _m.On("PurgeIfEquals", t)
+	return &TokenCache_PurgeIfEquals{Call: c_call}
+}
+
+func (_m *TokenCache) OnPurgeIfEqualsMatch(matchers ...interface{}) *TokenCache_PurgeIfEquals {
+	c_call := _m.On("PurgeIfEquals", matchers...)
+	return &TokenCache_PurgeIfEquals{Call: c_call}
+}
+
+// PurgeIfEquals provides a mock function with given fields: t
+func (_m *TokenCache) PurgeIfEquals(t *oauth2.Token) (bool, error) {
+	ret := _m.Called(t)
+
+	var r0 bool
+	if rf, ok := ret.Get(0).(func(*oauth2.Token) bool); ok {
+		r0 = rf(t)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(*oauth2.Token) error); ok {
+		r1 = rf(t)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type TokenCache_SaveToken struct {
 	*mock.Call
 }
@@ -83,4 +137,41 @@ func (_m *TokenCache) SaveToken(token *oauth2.Token) error {
 	}
 
 	return r0
+}
+
+type TokenCache_TryLock struct {
+	*mock.Call
+}
+
+func (_m TokenCache_TryLock) Return(_a0 bool) *TokenCache_TryLock {
+	return &TokenCache_TryLock{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *TokenCache) OnTryLock() *TokenCache_TryLock {
+	c_call := _m.On("TryLock")
+	return &TokenCache_TryLock{Call: c_call}
+}
+
+func (_m *TokenCache) OnTryLockMatch(matchers ...interface{}) *TokenCache_TryLock {
+	c_call := _m.On("TryLock", matchers...)
+	return &TokenCache_TryLock{Call: c_call}
+}
+
+// TryLock provides a mock function with given fields:
+func (_m *TokenCache) TryLock() bool {
+	ret := _m.Called()
+
+	var r0 bool
+	if rf, ok := ret.Get(0).(func() bool); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	return r0
+}
+
+// Unlock provides a mock function with given fields:
+func (_m *TokenCache) Unlock() {
+	_m.Called()
 }

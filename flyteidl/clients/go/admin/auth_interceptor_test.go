@@ -113,10 +113,12 @@ func newAuthMetadataServer(t testing.TB, port int, impl service.AuthMetadataServ
 }
 
 func Test_newAuthInterceptor(t *testing.T) {
+	c := &mocks.TokenCache{}
+	c.On("GetToken").Return(nil)
 	t.Run("Other Error", func(t *testing.T) {
 		f := NewPerRPCCredentialsFuture()
 		p := NewPerRPCCredentialsFuture()
-		interceptor := NewAuthInterceptor(&Config{}, &mocks.TokenCache{}, f, p)
+		interceptor := NewAuthInterceptor(&Config{}, c, f, p)
 		otherError := func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, opts ...grpc.CallOption) error {
 			return status.New(codes.Canceled, "").Err()
 		}
@@ -149,11 +151,13 @@ func Test_newAuthInterceptor(t *testing.T) {
 
 		f := NewPerRPCCredentialsFuture()
 		p := NewPerRPCCredentialsFuture()
+		c := &mocks.TokenCache{}
+		c.On("Purge").Return()
 		interceptor := NewAuthInterceptor(&Config{
 			Endpoint:              config.URL{URL: *u},
 			UseInsecureConnection: true,
 			AuthType:              AuthTypeClientSecret,
-		}, &mocks.TokenCache{}, f, p)
+		}, c, f, p)
 		unauthenticated := func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, opts ...grpc.CallOption) error {
 			return status.New(codes.Unauthenticated, "").Err()
 		}
@@ -240,6 +244,8 @@ func Test_newAuthInterceptor(t *testing.T) {
 
 func TestMaterializeCredentials(t *testing.T) {
 	port := rand.IntnRange(10000, 60000)
+	c := &mocks.TokenCache{}
+	c.On("Purge").Return()
 	t.Run("No oauth2 metadata endpoint or Public client config lookup", func(t *testing.T) {
 		m := &adminMocks.AuthMetadataServiceServer{}
 		m.OnGetOAuth2MetadataMatch(mock.Anything, mock.Anything).Return(nil, errors.New("unexpected call to get oauth2 metadata"))
@@ -263,7 +269,7 @@ func TestMaterializeCredentials(t *testing.T) {
 			Scopes:                []string{"all"},
 			Audience:              "http://localhost:30081",
 			AuthorizationHeader:   "authorization",
-		}, &mocks.TokenCache{}, f, p)
+		}, c, f, p)
 		assert.NoError(t, err)
 	})
 	t.Run("Failed to fetch client metadata", func(t *testing.T) {
@@ -288,7 +294,7 @@ func TestMaterializeCredentials(t *testing.T) {
 			AuthType:              AuthTypeClientSecret,
 			TokenURL:              fmt.Sprintf("http://localhost:%d/api/v1/token", port),
 			Scopes:                []string{"all"},
-		}, &mocks.TokenCache{}, f, p)
+		}, c, f, p)
 		assert.EqualError(t, err, "failed to fetch client metadata. Error: rpc error: code = Unknown desc = expected err")
 	})
 }
