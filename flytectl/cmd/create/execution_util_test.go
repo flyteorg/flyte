@@ -48,6 +48,8 @@ func createExecutionUtilSetup() {
 
 func TestCreateExecutionForRelaunch(t *testing.T) {
 	s := setup()
+	defer s.TearDown()
+
 	createExecutionUtilSetup()
 	s.MockAdminClient.OnRelaunchExecutionMatch(s.Ctx, relaunchRequest).Return(executionCreateResponse, nil)
 	err := relaunchExecution(s.Ctx, "execName", config.GetConfig().Project, config.GetConfig().Domain, s.CmdCtx, executionConfig, "")
@@ -56,6 +58,8 @@ func TestCreateExecutionForRelaunch(t *testing.T) {
 
 func TestCreateExecutionForRelaunchNotFound(t *testing.T) {
 	s := setup()
+	defer s.TearDown()
+
 	createExecutionUtilSetup()
 	s.MockAdminClient.OnRelaunchExecutionMatch(s.Ctx, relaunchRequest).Return(nil, errors.New("unknown execution"))
 	err := relaunchExecution(s.Ctx, "execName", config.GetConfig().Project, config.GetConfig().Domain, s.CmdCtx, executionConfig, "")
@@ -66,6 +70,8 @@ func TestCreateExecutionForRelaunchNotFound(t *testing.T) {
 
 func TestCreateExecutionForRecovery(t *testing.T) {
 	s := setup()
+	defer s.TearDown()
+
 	createExecutionUtilSetup()
 	s.MockAdminClient.OnRecoverExecutionMatch(s.Ctx, recoverRequest).Return(executionCreateResponse, nil)
 	err := recoverExecution(s.Ctx, "execName", config.GetConfig().Project, config.GetConfig().Domain, s.CmdCtx, executionConfig, "")
@@ -74,6 +80,8 @@ func TestCreateExecutionForRecovery(t *testing.T) {
 
 func TestCreateExecutionForRecoveryNotFound(t *testing.T) {
 	s := setup()
+	defer s.TearDown()
+
 	createExecutionUtilSetup()
 	s.MockAdminClient.OnRecoverExecutionMatch(s.Ctx, recoverRequest).Return(nil, errors.New("unknown execution"))
 	err := recoverExecution(s.Ctx, "execName", config.GetConfig().Project, config.GetConfig().Domain, s.CmdCtx, executionConfig, "")
@@ -84,6 +92,8 @@ func TestCreateExecutionForRecoveryNotFound(t *testing.T) {
 func TestCreateExecutionRequestForWorkflow(t *testing.T) {
 	t.Run("successful", func(t *testing.T) {
 		s := setup()
+		defer s.TearDown()
+
 		createExecutionUtilSetup()
 		launchPlan := &admin.LaunchPlan{}
 		s.FetcherExt.OnFetchLPVersionMatch(s.Ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(launchPlan, nil)
@@ -93,6 +103,8 @@ func TestCreateExecutionRequestForWorkflow(t *testing.T) {
 	})
 	t.Run("successful with envs", func(t *testing.T) {
 		s := setup()
+		defer s.TearDown()
+
 		createExecutionUtilSetup()
 		launchPlan := &admin.LaunchPlan{}
 		s.FetcherExt.OnFetchLPVersionMatch(s.Ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(launchPlan, nil)
@@ -105,6 +117,8 @@ func TestCreateExecutionRequestForWorkflow(t *testing.T) {
 	})
 	t.Run("successful with empty envs", func(t *testing.T) {
 		s := setup()
+		defer s.TearDown()
+
 		createExecutionUtilSetup()
 		launchPlan := &admin.LaunchPlan{}
 		s.FetcherExt.OnFetchLPVersionMatch(s.Ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(launchPlan, nil)
@@ -117,6 +131,8 @@ func TestCreateExecutionRequestForWorkflow(t *testing.T) {
 	})
 	t.Run("failed literal conversion", func(t *testing.T) {
 		s := setup()
+		defer s.TearDown()
+
 		createExecutionUtilSetup()
 		launchPlan := &admin.LaunchPlan{
 			Spec: &admin.LaunchPlanSpec{
@@ -133,6 +149,8 @@ func TestCreateExecutionRequestForWorkflow(t *testing.T) {
 	})
 	t.Run("failed fetch", func(t *testing.T) {
 		s := setup()
+		defer s.TearDown()
+
 		createExecutionUtilSetup()
 		s.FetcherExt.OnFetchLPVersionMatch(s.Ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
 		execCreateRequest, err := createExecutionRequestForWorkflow(s.Ctx, "wfName", config.GetConfig().Project, config.GetConfig().Domain, s.CmdCtx, executionConfig, "")
@@ -142,6 +160,8 @@ func TestCreateExecutionRequestForWorkflow(t *testing.T) {
 	})
 	t.Run("with security context", func(t *testing.T) {
 		s := setup()
+		defer s.TearDown()
+
 		createExecutionUtilSetup()
 		executionConfig.KubeServiceAcct = "default"
 		launchPlan := &admin.LaunchPlan{}
@@ -157,6 +177,8 @@ func TestCreateExecutionRequestForWorkflow(t *testing.T) {
 func TestCreateExecutionRequestForTask(t *testing.T) {
 	t.Run("successful", func(t *testing.T) {
 		s := setup()
+		defer s.TearDown()
+
 		createExecutionUtilSetup()
 		task := &admin.Task{
 			Id: &core.Identifier{
@@ -170,6 +192,8 @@ func TestCreateExecutionRequestForTask(t *testing.T) {
 	})
 	t.Run("successful with envs", func(t *testing.T) {
 		s := setup()
+		defer s.TearDown()
+
 		createExecutionUtilSetup()
 		task := &admin.Task{
 			Id: &core.Identifier{
@@ -186,6 +210,8 @@ func TestCreateExecutionRequestForTask(t *testing.T) {
 	})
 	t.Run("successful with empty envs", func(t *testing.T) {
 		s := setup()
+		defer s.TearDown()
+
 		createExecutionUtilSetup()
 		task := &admin.Task{
 			Id: &core.Identifier{
@@ -202,6 +228,8 @@ func TestCreateExecutionRequestForTask(t *testing.T) {
 	})
 	t.Run("failed literal conversion", func(t *testing.T) {
 		s := setup()
+		defer s.TearDown()
+
 		createExecutionUtilSetup()
 		task := &admin.Task{
 			Closure: &admin.TaskClosure{
@@ -226,6 +254,8 @@ func TestCreateExecutionRequestForTask(t *testing.T) {
 	})
 	t.Run("failed fetch", func(t *testing.T) {
 		s := setup()
+		defer s.TearDown()
+
 		createExecutionUtilSetup()
 		s.FetcherExt.OnFetchTaskVersionMatch(s.Ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
 		execCreateRequest, err := createExecutionRequestForTask(s.Ctx, "taskName", config.GetConfig().Project, config.GetConfig().Domain, s.CmdCtx, executionConfig, "")
@@ -235,6 +265,8 @@ func TestCreateExecutionRequestForTask(t *testing.T) {
 	})
 	t.Run("with security context", func(t *testing.T) {
 		s := setup()
+		defer s.TearDown()
+
 		createExecutionUtilSetup()
 		executionConfig.KubeServiceAcct = "default"
 		task := &admin.Task{
@@ -271,6 +303,8 @@ func Test_resolveOverrides(t *testing.T) {
 
 func TestCreateExecutionForRelaunchOverwritingCache(t *testing.T) {
 	s := setup()
+	defer s.TearDown()
+
 	createExecutionUtilSetup()
 	executionConfig.OverwriteCache = true
 	relaunchRequest.OverwriteCache = true // ensure request has overwriteCache param set

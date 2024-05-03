@@ -42,6 +42,7 @@ type TestStruct struct {
 	Stderr          *os.File
 }
 
+// Make sure to call TearDown after using this function
 func Setup() (s TestStruct) {
 	s.Ctx = context.Background()
 	s.Reader, s.Writer, s.Err = os.Pipe()
@@ -70,32 +71,9 @@ func Setup() (s TestStruct) {
 	return s
 }
 
-func SetupWithExt() (s TestStruct) {
-	s.Ctx = context.Background()
-	s.Reader, s.Writer, s.Err = os.Pipe()
-	if s.Err != nil {
-		panic(s.Err)
-	}
-	s.StdOut = os.Stdout
-	s.Stderr = os.Stderr
-	os.Stdout = s.Writer
-	os.Stderr = s.Writer
-	log.SetOutput(s.Writer)
-	s.MockClient = admin.InitializeMockClientset()
-	s.FetcherExt = new(extMocks.AdminFetcherExtInterface)
-	s.UpdaterExt = new(extMocks.AdminUpdaterExtInterface)
-	s.DeleterExt = new(extMocks.AdminDeleterExtInterface)
-	s.FetcherExt.OnAdminServiceClient().Return(s.MockClient.AdminClient())
-	s.UpdaterExt.OnAdminServiceClient().Return(s.MockClient.AdminClient())
-	s.DeleterExt.OnAdminServiceClient().Return(s.MockClient.AdminClient())
-	s.MockAdminClient = s.MockClient.AdminClient().(*mocks.AdminServiceClient)
-	s.MockOutStream = s.Writer
-	s.CmdCtx = cmdCore.NewCommandContextWithExt(s.MockClient, s.FetcherExt, s.UpdaterExt, s.DeleterExt, s.MockOutStream)
-	config.GetConfig().Project = projectValue
-	config.GetConfig().Domain = domainValue
-	config.GetConfig().Output = output
-
-	return s
+func (s *TestStruct) TearDown() {
+	os.Stdout = s.StdOut
+	os.Stderr = s.Stderr
 }
 
 // TearDownAndVerify TODO: Change this to verify log lines from context

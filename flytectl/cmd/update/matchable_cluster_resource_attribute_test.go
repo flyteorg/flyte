@@ -402,6 +402,8 @@ func testWorkflowClusterResourceAttributeUpdateWithMockSetup(
 	asserter func(s *testutils.TestStruct, err error),
 ) {
 	s := testutils.Setup()
+	defer s.TearDown()
+
 	clusterresourceattribute.DefaultUpdateConfig = &clusterresourceattribute.AttrUpdateConfig{}
 	target := newTestWorkflowClusterResourceAttribute()
 
@@ -411,6 +413,7 @@ func testWorkflowClusterResourceAttributeUpdateWithMockSetup(
 
 	if setup != nil {
 		setup(&s, clusterresourceattribute.DefaultUpdateConfig, target)
+		defer s.TearDown()
 	}
 
 	err := updateClusterResourceAttributesFunc(s.Ctx, nil, s.CmdCtx)
@@ -467,6 +470,8 @@ func testProjectClusterResourceAttributeUpdateWithMockSetup(
 	asserter func(s *testutils.TestStruct, err error),
 ) {
 	s := testutils.Setup()
+	defer s.TearDown()
+
 	clusterresourceattribute.DefaultUpdateConfig = &clusterresourceattribute.AttrUpdateConfig{}
 	target := newTestProjectClusterResourceAttribute()
 
@@ -476,6 +481,7 @@ func testProjectClusterResourceAttributeUpdateWithMockSetup(
 
 	if setup != nil {
 		setup(&s, clusterresourceattribute.DefaultUpdateConfig, target)
+		defer s.TearDown()
 	}
 
 	err := updateClusterResourceAttributesFunc(s.Ctx, nil, s.CmdCtx)
@@ -539,6 +545,7 @@ func testProjectDomainClusterResourceAttributeUpdateWithMockSetup(
 
 	if setup != nil {
 		setup(&s, clusterresourceattribute.DefaultUpdateConfig, target)
+		defer s.TearDown()
 	}
 
 	err := updateClusterResourceAttributesFunc(s.Ctx, nil, s.CmdCtx)

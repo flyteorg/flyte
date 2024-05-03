@@ -99,6 +99,8 @@ func getWorkflowSetup() {
 func TestGetWorkflowFuncWithError(t *testing.T) {
 	t.Run("failure fetch latest", func(t *testing.T) {
 		s := setup()
+		defer s.TearDown()
+
 		getWorkflowSetup()
 		mockFetcher := new(mocks.AdminFetcherExtInterface)
 		workflow.DefaultConfig.Latest = true
@@ -109,6 +111,8 @@ func TestGetWorkflowFuncWithError(t *testing.T) {
 
 	t.Run("failure fetching version ", func(t *testing.T) {
 		s := setup()
+		defer s.TearDown()
+
 		getWorkflowSetup()
 		mockFetcher := new(mocks.AdminFetcherExtInterface)
 		workflow.DefaultConfig.Version = "v1"
@@ -120,6 +124,8 @@ func TestGetWorkflowFuncWithError(t *testing.T) {
 
 	t.Run("failure fetching all version ", func(t *testing.T) {
 		s := setup()
+		defer s.TearDown()
+
 		getWorkflowSetup()
 		mockFetcher := new(mocks.AdminFetcherExtInterface)
 		mockFetcher.OnFetchAllVerOfWorkflowMatch(mock.Anything, mock.Anything, mock.Anything,
@@ -129,7 +135,9 @@ func TestGetWorkflowFuncWithError(t *testing.T) {
 	})
 
 	t.Run("failure fetching ", func(t *testing.T) {
-		s := testutils.SetupWithExt()
+		s := testutils.Setup()
+		defer s.TearDown()
+
 		getWorkflowSetup()
 		workflow.DefaultConfig.Latest = true
 		args := []string{"workflowName"}
@@ -141,6 +149,8 @@ func TestGetWorkflowFuncWithError(t *testing.T) {
 
 	t.Run("fetching all workflow success", func(t *testing.T) {
 		s := setup()
+		defer s.TearDown()
+
 		getWorkflowSetup()
 		var args []string
 		s.FetcherExt.OnFetchAllWorkflowsMatch(mock.Anything, mock.Anything,
@@ -151,6 +161,8 @@ func TestGetWorkflowFuncWithError(t *testing.T) {
 
 	t.Run("fetching all workflow error", func(t *testing.T) {
 		s := setup()
+		defer s.TearDown()
+
 		getWorkflowSetup()
 		var args []string
 		s.FetcherExt.OnFetchAllWorkflowsMatch(mock.Anything, mock.Anything,
@@ -162,7 +174,9 @@ func TestGetWorkflowFuncWithError(t *testing.T) {
 }
 
 func TestGetWorkflowFuncLatestWithTable(t *testing.T) {
-	s := testutils.SetupWithExt()
+	s := testutils.Setup()
+	defer s.TearDown()
+
 	getWorkflowSetup()
 	workflow.DefaultConfig.Latest = true
 	workflow.DefaultConfig.Filter = filters.Filters{}
@@ -181,7 +195,9 @@ func TestGetWorkflowFuncLatestWithTable(t *testing.T) {
 }
 
 func TestListWorkflowFuncWithTable(t *testing.T) {
-	s := testutils.SetupWithExt()
+	s := testutils.Setup()
+	defer s.TearDown()
+
 	getWorkflowSetup()
 	workflow.DefaultConfig.Filter = filters.Filters{}
 	config.GetConfig().Output = printer.OutputFormatTABLE.String()

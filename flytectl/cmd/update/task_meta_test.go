@@ -180,6 +180,8 @@ func TestTaskMetadataUpdateFailsWhenAdminClientFails(t *testing.T) {
 
 func TestTaskMetadataUpdateRequiresTaskName(t *testing.T) {
 	s := testutils.Setup()
+	defer s.TearDown()
+
 	config := &NamedEntityConfig{}
 
 	err := getUpdateTaskFunc(config)(s.Ctx, nil, s.CmdCtx)

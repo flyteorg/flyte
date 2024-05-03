@@ -176,6 +176,8 @@ func TestExecutionUpdateFailsWhenAdminClientFails(t *testing.T) {
 
 func TestExecutionUpdateRequiresExecutionName(t *testing.T) {
 	s := testutils.Setup()
+	defer s.TearDown()
+
 	err := updateExecutionFunc(s.Ctx, nil, s.CmdCtx)
 
 	assert.ErrorContains(t, err, "execution name wasn't passed")
@@ -205,6 +207,8 @@ func testExecutionUpdateWithMockSetup(
 	asserter func(s *testutils.TestStruct, err error),
 ) {
 	s := testutils.Setup()
+	defer s.TearDown()
+
 	target := newTestExecution()
 
 	if mockSetup != nil {
@@ -214,6 +218,7 @@ func testExecutionUpdateWithMockSetup(
 	execution.UConfig = &execution.UpdateConfig{}
 	if setup != nil {
 		setup(&s, execution.UConfig, target)
+		defer s.TearDown()
 	}
 
 	args := []string{target.Id.Name}

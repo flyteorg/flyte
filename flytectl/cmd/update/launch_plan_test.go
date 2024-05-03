@@ -198,6 +198,8 @@ func TestLaunchPlanUpdateFailsWhenAdminClientFails(t *testing.T) {
 
 func TestLaunchPlanUpdateRequiresLaunchPlanName(t *testing.T) {
 	s := testutils.Setup()
+	defer s.TearDown()
+
 	launchplan.UConfig = &launchplan.UpdateConfig{}
 
 	launchplan.UConfig.Version = testutils.RandomName(2)
@@ -211,6 +213,8 @@ func TestLaunchPlanUpdateRequiresLaunchPlanName(t *testing.T) {
 
 func TestLaunchPlanUpdateRequiresLaunchPlanVersion(t *testing.T) {
 	s := testutils.Setup()
+	defer s.TearDown()
+
 	launchplan.UConfig = &launchplan.UpdateConfig{}
 
 	name := testutils.RandomName(12)
@@ -248,6 +252,8 @@ func testLaunchPlanUpdateWithMockSetup(
 	asserter func(s *testutils.TestStruct, err error),
 ) {
 	s := testutils.Setup()
+	defer s.TearDown()
+
 	target := newTestLaunchPlan()
 
 	if mockSetup != nil {
@@ -257,6 +263,7 @@ func testLaunchPlanUpdateWithMockSetup(
 	launchplan.UConfig = &launchplan.UpdateConfig{}
 	if setup != nil {
 		setup(&s, launchplan.UConfig, target)
+		defer s.TearDown()
 	}
 
 	args := []string{target.Id.Name}

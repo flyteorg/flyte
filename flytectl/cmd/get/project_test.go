@@ -53,7 +53,9 @@ func getProjectSetup() {
 }
 
 func TestListProjectFunc(t *testing.T) {
-	s := testutils.SetupWithExt()
+	s := testutils.Setup()
+	defer s.TearDown()
+
 	getProjectSetup()
 	project.DefaultConfig.Filter = filters.Filters{}
 	s.MockAdminClient.OnListProjectsMatch(s.Ctx, resourceListRequestProject).Return(projectListResponse, nil)
@@ -65,7 +67,9 @@ func TestListProjectFunc(t *testing.T) {
 }
 
 func TestGetProjectFunc(t *testing.T) {
-	s := testutils.SetupWithExt()
+	s := testutils.Setup()
+	defer s.TearDown()
+
 	getProjectSetup()
 	argsProject = []string{}
 
@@ -78,7 +82,9 @@ func TestGetProjectFunc(t *testing.T) {
 }
 
 func TestGetProjectFuncError(t *testing.T) {
-	s := testutils.SetupWithExt()
+	s := testutils.Setup()
+	defer s.TearDown()
+
 	getProjectSetup()
 	project.DefaultConfig.Filter = filters.Filters{
 		FieldSelector: "hello=",

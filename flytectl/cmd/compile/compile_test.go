@@ -31,6 +31,7 @@ func TestCompileCommand(t *testing.T) {
 	compileCfg.File = "testdata/valid-package.tgz"
 	var setup = u.Setup
 	s := setup()
+	defer s.TearDown()
 	compileCmd := CreateCompileCommand()["compile"]
 	err := compileCmd.CmdFunc(context.Background(), []string{}, s.CmdCtx)
 	assert.Nil(t, err, "compiling via cmd returns err")

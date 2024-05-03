@@ -49,7 +49,9 @@ func TestGetExecutionQueueAttributes(t *testing.T) {
 		},
 	}
 	t.Run("successful get project domain attribute", func(t *testing.T) {
-		s := testutils.SetupWithExt()
+		s := testutils.Setup()
+		defer s.TearDown()
+
 		getExecutionQueueAttributeSetup()
 		// No args implying project domain attribute deletion
 		s.FetcherExt.OnFetchProjectDomainAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
@@ -61,7 +63,9 @@ func TestGetExecutionQueueAttributes(t *testing.T) {
 		s.TearDownAndVerify(t, `{"project":"dummyProject","domain":"dummyDomain","tags":["foo","bar"]}`)
 	})
 	t.Run("successful get project domain attribute and write to file", func(t *testing.T) {
-		s := testutils.SetupWithExt()
+		s := testutils.Setup()
+		defer s.TearDown()
+
 		getExecutionQueueAttributeSetup()
 		executionqueueattribute.DefaultFetchConfig.AttrFile = testDataTempFile
 		// No args implying project domain attribute deletion
@@ -74,7 +78,9 @@ func TestGetExecutionQueueAttributes(t *testing.T) {
 		s.TearDownAndVerify(t, `wrote the config to file temp-output-file`)
 	})
 	t.Run("successful get project domain attribute and write to file failure", func(t *testing.T) {
-		s := testutils.SetupWithExt()
+		s := testutils.Setup()
+		defer s.TearDown()
+
 		getExecutionQueueAttributeSetup()
 		executionqueueattribute.DefaultFetchConfig.AttrFile = testDataNotExistentTempFile
 		// No args implying project domain attribute deletion
@@ -88,7 +94,9 @@ func TestGetExecutionQueueAttributes(t *testing.T) {
 		s.TearDownAndVerify(t, ``)
 	})
 	t.Run("failed get project domain attribute", func(t *testing.T) {
-		s := testutils.SetupWithExt()
+		s := testutils.Setup()
+		defer s.TearDown()
+
 		getExecutionQueueAttributeSetup()
 		// No args implying project domain attribute deletion
 		s.FetcherExt.OnFetchProjectDomainAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
@@ -101,7 +109,9 @@ func TestGetExecutionQueueAttributes(t *testing.T) {
 		s.TearDownAndVerify(t, ``)
 	})
 	t.Run("successful get workflow attribute", func(t *testing.T) {
-		s := testutils.SetupWithExt()
+		s := testutils.Setup()
+		defer s.TearDown()
+
 		getExecutionQueueAttributeSetup()
 		args := []string{"workflow"}
 		s.FetcherExt.OnFetchWorkflowAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
@@ -114,7 +124,9 @@ func TestGetExecutionQueueAttributes(t *testing.T) {
 		s.TearDownAndVerify(t, `{"project":"dummyProject","domain":"dummyDomain","workflow":"workflow","tags":["foo","bar"]}`)
 	})
 	t.Run("failed get workflow attribute", func(t *testing.T) {
-		s := testutils.SetupWithExt()
+		s := testutils.Setup()
+		defer s.TearDown()
+
 		getExecutionQueueAttributeSetup()
 		args := []string{"workflow"}
 		s.FetcherExt.OnFetchWorkflowAttributesMatch(mock.Anything, mock.Anything, mock.Anything,

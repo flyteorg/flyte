@@ -42,6 +42,8 @@ func testNamedEntityUpdateWithMockSetup(
 	asserter func(s *testutils.TestStruct, err error),
 ) {
 	s := testutils.Setup()
+	defer s.TearDown()
+
 	config := &NamedEntityConfig{}
 	target := newTestNamedEntity(resourceType)
 
@@ -51,6 +53,7 @@ func testNamedEntityUpdateWithMockSetup(
 
 	if setup != nil {
 		setup(&s, config, target)
+		defer s.TearDown()
 	}
 
 	updateMetadataFactory := getUpdateMetadataFactory(resourceType)

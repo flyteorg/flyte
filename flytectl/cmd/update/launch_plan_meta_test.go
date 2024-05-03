@@ -180,6 +180,8 @@ func TestLaunchPlanMetadataUpdateFailsWhenAdminClientFails(t *testing.T) {
 
 func TestLaunchPlanMetadataUpdateRequiresLaunchPlanName(t *testing.T) {
 	s := testutils.Setup()
+	defer s.TearDown()
+
 	config := &NamedEntityConfig{}
 
 	err := getUpdateLPMetaFunc(config)(s.Ctx, nil, s.CmdCtx)
