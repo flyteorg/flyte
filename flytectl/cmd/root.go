@@ -18,6 +18,7 @@ import (
 	"github.com/flyteorg/flyte/flytectl/cmd/update"
 	"github.com/flyteorg/flyte/flytectl/cmd/upgrade"
 	"github.com/flyteorg/flyte/flytectl/cmd/version"
+	"github.com/flyteorg/flyte/flytectl/pkg/bubbletea"
 	f "github.com/flyteorg/flyte/flytectl/pkg/filesystemutils"
 	"github.com/flyteorg/flyte/flytectl/pkg/printer"
 	stdConfig "github.com/flyteorg/flyte/flytestdlib/config"
@@ -101,6 +102,8 @@ Additional help topics:{{range .Commands}}{{if .IsAdditionalHelpTopicCommand}}
 
 Use "{{.CommandPath}} [command] --help" for more information about a command.{{end}}
 `)
+	bubbletea.ShowCmdList(rootCmd)
+	fmt.Println(rootCmd.Args)
 
 	return rootCmd
 }
@@ -158,5 +161,6 @@ func GenReSTTree(cmd *cobra.Command, dir string) error {
 }
 
 func ExecuteCmd() error {
-	return newRootCmd().Execute()
+	newRootCmd()
+	return nil
 }
