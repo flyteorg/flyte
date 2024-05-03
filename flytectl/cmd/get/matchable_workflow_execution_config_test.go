@@ -50,6 +50,8 @@ func TestGetWorkflowExecutionConfig(t *testing.T) {
 	}
 	t.Run("successful get project domain attribute", func(t *testing.T) {
 		s := testutils.SetupWithExt()
+		defer s.RestoreStandardFileDescriptors()
+
 		getWorkflowExecutionConfigSetup()
 		// No args implying project domain attribute deletion
 		s.FetcherExt.OnFetchProjectDomainAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
@@ -62,6 +64,8 @@ func TestGetWorkflowExecutionConfig(t *testing.T) {
 	})
 	t.Run("successful get project domain attribute and write to file", func(t *testing.T) {
 		s := testutils.SetupWithExt()
+		defer s.RestoreStandardFileDescriptors()
+
 		getWorkflowExecutionConfigSetup()
 		workflowexecutionconfig.DefaultFetchConfig.AttrFile = testDataTempFile
 		// No args implying project domain attribute deletion
@@ -75,6 +79,8 @@ func TestGetWorkflowExecutionConfig(t *testing.T) {
 	})
 	t.Run("successful get project domain attribute and write to file failure", func(t *testing.T) {
 		s := testutils.SetupWithExt()
+		defer s.RestoreStandardFileDescriptors()
+
 		getWorkflowExecutionConfigSetup()
 		workflowexecutionconfig.DefaultFetchConfig.AttrFile = testDataNotExistentTempFile
 		// No args implying project domain attribute deletion
@@ -89,6 +95,8 @@ func TestGetWorkflowExecutionConfig(t *testing.T) {
 	})
 	t.Run("failed get project domain attribute", func(t *testing.T) {
 		s := testutils.SetupWithExt()
+		defer s.RestoreStandardFileDescriptors()
+
 		getWorkflowExecutionConfigSetup()
 		// No args implying project domain attribute deletion
 		s.FetcherExt.OnFetchProjectDomainAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
@@ -102,6 +110,8 @@ func TestGetWorkflowExecutionConfig(t *testing.T) {
 	})
 	t.Run("successful get workflow attribute", func(t *testing.T) {
 		s := testutils.SetupWithExt()
+		defer s.RestoreStandardFileDescriptors()
+
 		getWorkflowExecutionConfigSetup()
 		args := []string{"workflow"}
 		s.FetcherExt.OnFetchWorkflowAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
@@ -115,6 +125,8 @@ func TestGetWorkflowExecutionConfig(t *testing.T) {
 	})
 	t.Run("failed get workflow attribute", func(t *testing.T) {
 		s := testutils.SetupWithExt()
+		defer s.RestoreStandardFileDescriptors()
+
 		getWorkflowExecutionConfigSetup()
 		args := []string{"workflow"}
 		s.FetcherExt.OnFetchWorkflowAttributesMatch(mock.Anything, mock.Anything, mock.Anything,

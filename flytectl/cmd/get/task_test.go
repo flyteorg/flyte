@@ -177,6 +177,8 @@ func getTaskSetup() {
 func TestGetTaskFuncWithError(t *testing.T) {
 	t.Run("failure fetch latest", func(t *testing.T) {
 		s := setup()
+		defer s.RestoreStandardFileDescriptors()
+
 		getTaskSetup()
 		mockFetcher := new(mocks.AdminFetcherExtInterface)
 		taskConfig.DefaultConfig.Latest = true
@@ -189,6 +191,8 @@ func TestGetTaskFuncWithError(t *testing.T) {
 
 	t.Run("failure fetching version ", func(t *testing.T) {
 		s := setup()
+		defer s.RestoreStandardFileDescriptors()
+
 		getTaskSetup()
 		mockFetcher := new(mocks.AdminFetcherExtInterface)
 		taskConfig.DefaultConfig.Version = "v1"
@@ -201,6 +205,8 @@ func TestGetTaskFuncWithError(t *testing.T) {
 
 	t.Run("failure fetching all version ", func(t *testing.T) {
 		s := setup()
+		defer s.RestoreStandardFileDescriptors()
+
 		getTaskSetup()
 		mockFetcher := new(mocks.AdminFetcherExtInterface)
 		taskConfig.DefaultConfig.Filter = filters.Filters{}
@@ -212,6 +218,8 @@ func TestGetTaskFuncWithError(t *testing.T) {
 
 	t.Run("failure fetching ", func(t *testing.T) {
 		s := setup()
+		defer s.RestoreStandardFileDescriptors()
+
 		getLaunchPlanSetup()
 		s.MockAdminClient.OnListTasksMatch(s.Ctx, resourceListRequestTask).Return(nil, fmt.Errorf("error fetching all version"))
 		s.MockAdminClient.OnGetTaskMatch(s.Ctx, objectGetRequestTask).Return(nil, fmt.Errorf("error fetching task"))
@@ -224,6 +232,8 @@ func TestGetTaskFuncWithError(t *testing.T) {
 
 	t.Run("failure fetching list task", func(t *testing.T) {
 		s := setup()
+		defer s.RestoreStandardFileDescriptors()
+
 		getLaunchPlanSetup()
 		taskConfig.DefaultConfig.Filter = filters.Filters{}
 		argsTask = []string{}
@@ -239,6 +249,8 @@ func TestGetTaskFuncWithError(t *testing.T) {
 
 func TestGetTaskFunc(t *testing.T) {
 	s := testutils.SetupWithExt()
+	defer s.RestoreStandardFileDescriptors()
+
 	getTaskSetup()
 	taskConfig.DefaultConfig.Filter = filters.Filters{}
 	s.MockAdminClient.OnListTasksMatch(s.Ctx, resourceListRequestTask).Return(taskListResponse, nil)
@@ -324,6 +336,8 @@ func TestGetTaskFunc(t *testing.T) {
 
 func TestGetTaskFuncWithTable(t *testing.T) {
 	s := testutils.SetupWithExt()
+	defer s.RestoreStandardFileDescriptors()
+
 	getTaskSetup()
 	taskConfig.DefaultConfig.Filter = filters.Filters{}
 	s.MockAdminClient.OnListTasksMatch(s.Ctx, resourceListRequestTask).Return(taskListResponse, nil)
@@ -348,6 +362,8 @@ func TestGetTaskFuncWithTable(t *testing.T) {
 
 func TestGetTaskFuncLatest(t *testing.T) {
 	s := testutils.SetupWithExt()
+	defer s.RestoreStandardFileDescriptors()
+
 	getTaskSetup()
 	taskConfig.DefaultConfig.Filter = filters.Filters{}
 	s.MockAdminClient.OnListTasksMatch(s.Ctx, resourceListRequestTask).Return(taskListResponse, nil)
@@ -397,6 +413,8 @@ func TestGetTaskFuncLatest(t *testing.T) {
 
 func TestGetTaskWithVersion(t *testing.T) {
 	s := testutils.SetupWithExt()
+	defer s.RestoreStandardFileDescriptors()
+
 	getTaskSetup()
 	taskConfig.DefaultConfig.Filter = filters.Filters{}
 	s.MockAdminClient.OnListTasksMatch(s.Ctx, resourceListRequestTask).Return(taskListResponse, nil)
@@ -447,6 +465,8 @@ func TestGetTaskWithVersion(t *testing.T) {
 
 func TestGetTasks(t *testing.T) {
 	s := testutils.SetupWithExt()
+	defer s.RestoreStandardFileDescriptors()
+
 	getTaskSetup()
 	taskConfig.DefaultConfig.Filter = filters.Filters{}
 	s.MockAdminClient.OnListTasksMatch(s.Ctx, resourceListRequestTask).Return(taskListResponse, nil)
@@ -460,6 +480,8 @@ func TestGetTasks(t *testing.T) {
 
 func TestGetTasksFilters(t *testing.T) {
 	s := testutils.SetupWithExt()
+	defer s.RestoreStandardFileDescriptors()
+
 	getTaskSetup()
 	taskConfig.DefaultConfig.Filter = filters.Filters{
 		FieldSelector: "task.name=task1,task.version=v1",
@@ -483,6 +505,8 @@ func TestGetTasksFilters(t *testing.T) {
 
 func TestGetTaskWithExecFile(t *testing.T) {
 	s := testutils.SetupWithExt()
+	defer s.RestoreStandardFileDescriptors()
+
 	getTaskSetup()
 	s.MockAdminClient.OnListTasksMatch(s.Ctx, resourceListRequestTask).Return(taskListResponse, nil)
 	s.MockAdminClient.OnGetTaskMatch(s.Ctx, objectGetRequestTask).Return(task2, nil)
