@@ -41,6 +41,8 @@ func createProjectSetup() {
 }
 func TestCreateProjectFunc(t *testing.T) {
 	s := setup()
+	defer s.RestoreStandardFileDescriptors()
+
 	createProjectSetup()
 	defer s.TearDownAndVerify(t, "project created successfully.")
 	defer s.RestoreStandardFileDescriptors()
@@ -56,6 +58,8 @@ func TestCreateProjectFunc(t *testing.T) {
 
 func TestEmptyProjectID(t *testing.T) {
 	s := setup()
+	defer s.RestoreStandardFileDescriptors()
+
 	createProjectSetup()
 	defer s.TearDownAndVerify(t, "")
 	defer s.RestoreStandardFileDescriptors()
@@ -68,6 +72,8 @@ func TestEmptyProjectID(t *testing.T) {
 
 func TestEmptyProjectName(t *testing.T) {
 	s := setup()
+	defer s.RestoreStandardFileDescriptors()
+
 	createProjectSetup()
 	defer s.TearDownAndVerify(t, "")
 	defer s.RestoreStandardFileDescriptors()

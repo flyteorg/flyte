@@ -32,8 +32,7 @@ func (s *createSuite) SetupTest() {
 }
 
 func (s *createSuite) TearDownTest() {
-	// TODO re-enable this
-	// s.RestoreStandardFileDescriptors()
+	defer s.RestoreStandardFileDescriptors()
 	orig := s.originalExecConfig
 	executionConfig = &orig
 	s.MockAdminClient.AssertExpectations(s.T())

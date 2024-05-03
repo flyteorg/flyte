@@ -265,6 +265,8 @@ func TestCreateExecutionRequestForTask(t *testing.T) {
 	})
 	t.Run("with security context", func(t *testing.T) {
 		s := setup()
+		defer s.RestoreStandardFileDescriptors()
+
 		createExecutionUtilSetup()
 		executionConfig.KubeServiceAcct = "default"
 		task := &admin.Task{
