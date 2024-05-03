@@ -53,7 +53,7 @@ func TestSandboxClusterExecWithoutCmd(t *testing.T) {
 	mockDocker := &mocks.Docker{}
 	reader := bufio.NewReader(strings.NewReader("test"))
 	s := testutils.Setup()
-	defer s.RestoreStandardFileDescriptors()
+	defer s.TearDown()
 
 	ctx := s.Ctx
 

@@ -42,7 +42,7 @@ type TestStruct struct {
 	Stderr          *os.File
 }
 
-// Make sure to call RestoreStandardFileDescriptors after using this function
+// Make sure to call TearDown after using this function
 func Setup() (s TestStruct) {
 	s.Ctx = context.Background()
 	s.Reader, s.Writer, s.Err = os.Pipe()
@@ -71,7 +71,7 @@ func Setup() (s TestStruct) {
 	return s
 }
 
-func (s *TestStruct) RestoreStandardFileDescriptors() {
+func (s *TestStruct) TearDown() {
 	os.Stdout = s.StdOut
 	os.Stderr = s.Stderr
 }

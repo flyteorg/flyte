@@ -180,7 +180,7 @@ func TestTaskMetadataUpdateFailsWhenAdminClientFails(t *testing.T) {
 
 func TestTaskMetadataUpdateRequiresTaskName(t *testing.T) {
 	s := testutils.Setup()
-	defer s.RestoreStandardFileDescriptors()
+	defer s.TearDown()
 
 	config := &NamedEntityConfig{}
 

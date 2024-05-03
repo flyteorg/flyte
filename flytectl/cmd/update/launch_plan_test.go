@@ -198,7 +198,7 @@ func TestLaunchPlanUpdateFailsWhenAdminClientFails(t *testing.T) {
 
 func TestLaunchPlanUpdateRequiresLaunchPlanName(t *testing.T) {
 	s := testutils.Setup()
-	defer s.RestoreStandardFileDescriptors()
+	defer s.TearDown()
 
 	launchplan.UConfig = &launchplan.UpdateConfig{}
 
@@ -213,7 +213,7 @@ func TestLaunchPlanUpdateRequiresLaunchPlanName(t *testing.T) {
 
 func TestLaunchPlanUpdateRequiresLaunchPlanVersion(t *testing.T) {
 	s := testutils.Setup()
-	defer s.RestoreStandardFileDescriptors()
+	defer s.TearDown()
 
 	launchplan.UConfig = &launchplan.UpdateConfig{}
 
@@ -252,7 +252,7 @@ func testLaunchPlanUpdateWithMockSetup(
 	asserter func(s *testutils.TestStruct, err error),
 ) {
 	s := testutils.Setup()
-	defer s.RestoreStandardFileDescriptors()
+	defer s.TearDown()
 
 	target := newTestLaunchPlan()
 
@@ -263,7 +263,7 @@ func testLaunchPlanUpdateWithMockSetup(
 	launchplan.UConfig = &launchplan.UpdateConfig{}
 	if setup != nil {
 		setup(&s, launchplan.UConfig, target)
-		defer s.RestoreStandardFileDescriptors()
+		defer s.TearDown()
 	}
 
 	args := []string{target.Id.Name}

@@ -411,7 +411,7 @@ func testWorkflowExecutionQueueAttributeUpdateWithMockSetup(
 
 	if setup != nil {
 		setup(&s, executionqueueattribute.DefaultUpdateConfig, target)
-		defer s.RestoreStandardFileDescriptors()
+		defer s.TearDown()
 	}
 
 	err := updateExecutionQueueAttributesFunc(s.Ctx, nil, s.CmdCtx)
@@ -468,7 +468,7 @@ func testProjectExecutionQueueAttributeUpdateWithMockSetup(
 	asserter func(s *testutils.TestStruct, err error),
 ) {
 	s := testutils.Setup()
-	defer s.RestoreStandardFileDescriptors()
+	defer s.TearDown()
 
 	executionqueueattribute.DefaultUpdateConfig = &executionqueueattribute.AttrUpdateConfig{}
 	target := newTestProjectExecutionQueueAttribute()
@@ -479,7 +479,7 @@ func testProjectExecutionQueueAttributeUpdateWithMockSetup(
 
 	if setup != nil {
 		setup(&s, executionqueueattribute.DefaultUpdateConfig, target)
-		defer s.RestoreStandardFileDescriptors()
+		defer s.TearDown()
 	}
 
 	err := updateExecutionQueueAttributesFunc(s.Ctx, nil, s.CmdCtx)
@@ -543,7 +543,7 @@ func testProjectDomainExecutionQueueAttributeUpdateWithMockSetup(
 
 	if setup != nil {
 		setup(&s, executionqueueattribute.DefaultUpdateConfig, target)
-		defer s.RestoreStandardFileDescriptors()
+		defer s.TearDown()
 	}
 
 	err := updateExecutionQueueAttributesFunc(s.Ctx, nil, s.CmdCtx)

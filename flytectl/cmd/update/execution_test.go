@@ -176,7 +176,7 @@ func TestExecutionUpdateFailsWhenAdminClientFails(t *testing.T) {
 
 func TestExecutionUpdateRequiresExecutionName(t *testing.T) {
 	s := testutils.Setup()
-	defer s.RestoreStandardFileDescriptors()
+	defer s.TearDown()
 
 	err := updateExecutionFunc(s.Ctx, nil, s.CmdCtx)
 
@@ -207,7 +207,7 @@ func testExecutionUpdateWithMockSetup(
 	asserter func(s *testutils.TestStruct, err error),
 ) {
 	s := testutils.Setup()
-	defer s.RestoreStandardFileDescriptors()
+	defer s.TearDown()
 
 	target := newTestExecution()
 
@@ -218,7 +218,7 @@ func testExecutionUpdateWithMockSetup(
 	execution.UConfig = &execution.UpdateConfig{}
 	if setup != nil {
 		setup(&s, execution.UConfig, target)
-		defer s.RestoreStandardFileDescriptors()
+		defer s.TearDown()
 	}
 
 	args := []string{target.Id.Name}

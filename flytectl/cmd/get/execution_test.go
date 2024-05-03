@@ -32,7 +32,7 @@ func getExecutionSetup() {
 func TestListExecutionFunc(t *testing.T) {
 	getExecutionSetup()
 	s := setup()
-	defer s.RestoreStandardFileDescriptors()
+	defer s.TearDown()
 
 	executionResponse := &admin.Execution{
 		Id: &core.WorkflowExecutionIdentifier{
@@ -95,7 +95,7 @@ func TestListExecutionFuncWithError(t *testing.T) {
 		},
 	}
 	s := setup()
-	defer s.RestoreStandardFileDescriptors()
+	defer s.TearDown()
 
 	s.FetcherExt.OnListExecutionMatch(s.Ctx, mock.Anything, mock.Anything, mock.Anything).Return(nil, errors.New("executions NotFound"))
 	err := getExecutionFunc(s.Ctx, []string{}, s.CmdCtx)
@@ -132,7 +132,7 @@ func TestGetExecutionFunc(t *testing.T) {
 	}
 	args := []string{executionNameValue}
 	s := setup()
-	defer s.RestoreStandardFileDescriptors()
+	defer s.TearDown()
 
 	s.FetcherExt.OnFetchExecutionMatch(s.Ctx, mock.Anything, mock.Anything, mock.Anything).Return(executionResponse, nil)
 	err := getExecutionFunc(s.Ctx, args, s.CmdCtx)
@@ -142,7 +142,7 @@ func TestGetExecutionFunc(t *testing.T) {
 
 func TestGetExecutionFuncForDetails(t *testing.T) {
 	s := testutils.Setup()
-	defer s.RestoreStandardFileDescriptors()
+	defer s.TearDown()
 	getExecutionSetup()
 	ctx := s.Ctx
 	mockCmdCtx := s.CmdCtx
@@ -159,7 +159,7 @@ func TestGetExecutionFuncForDetails(t *testing.T) {
 func TestGetExecutionFuncWithIOData(t *testing.T) {
 	t.Run("successful inputs outputs", func(t *testing.T) {
 		s := testutils.Setup()
-		defer s.RestoreStandardFileDescriptors()
+		defer s.TearDown()
 
 		getExecutionSetup()
 		ctx := s.Ctx
@@ -225,7 +225,7 @@ func TestGetExecutionFuncWithIOData(t *testing.T) {
 	})
 	t.Run("fetch data error from admin", func(t *testing.T) {
 		s := testutils.Setup()
-		defer s.RestoreStandardFileDescriptors()
+		defer s.TearDown()
 
 		getExecutionSetup()
 		ctx := s.Ctx
@@ -267,7 +267,7 @@ func TestGetExecutionFuncWithIOData(t *testing.T) {
 		args := []string{dummyExec}
 		for _, tt := range tests {
 			s := testutils.Setup()
-			defer s.RestoreStandardFileDescriptors()
+			defer s.TearDown()
 
 			config.GetConfig().Output = tt.outputFormat
 			execution.DefaultConfig.NodeID = tt.nodeID
@@ -368,7 +368,7 @@ func TestGetExecutionFuncWithError(t *testing.T) {
 
 	args := []string{executionNameValue}
 	s := testutils.Setup()
-	defer s.RestoreStandardFileDescriptors()
+	defer s.TearDown()
 
 	s.FetcherExt.OnFetchExecutionMatch(s.Ctx, mock.Anything, mock.Anything, mock.Anything).Return(nil, errors.New("execution NotFound"))
 	err := getExecutionFunc(s.Ctx, args, s.CmdCtx)

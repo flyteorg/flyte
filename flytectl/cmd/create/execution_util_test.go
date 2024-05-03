@@ -48,7 +48,7 @@ func createExecutionUtilSetup() {
 
 func TestCreateExecutionForRelaunch(t *testing.T) {
 	s := setup()
-	defer s.RestoreStandardFileDescriptors()
+	defer s.TearDown()
 
 	createExecutionUtilSetup()
 	s.MockAdminClient.OnRelaunchExecutionMatch(s.Ctx, relaunchRequest).Return(executionCreateResponse, nil)
@@ -58,7 +58,7 @@ func TestCreateExecutionForRelaunch(t *testing.T) {
 
 func TestCreateExecutionForRelaunchNotFound(t *testing.T) {
 	s := setup()
-	defer s.RestoreStandardFileDescriptors()
+	defer s.TearDown()
 
 	createExecutionUtilSetup()
 	s.MockAdminClient.OnRelaunchExecutionMatch(s.Ctx, relaunchRequest).Return(nil, errors.New("unknown execution"))
@@ -70,7 +70,7 @@ func TestCreateExecutionForRelaunchNotFound(t *testing.T) {
 
 func TestCreateExecutionForRecovery(t *testing.T) {
 	s := setup()
-	defer s.RestoreStandardFileDescriptors()
+	defer s.TearDown()
 
 	createExecutionUtilSetup()
 	s.MockAdminClient.OnRecoverExecutionMatch(s.Ctx, recoverRequest).Return(executionCreateResponse, nil)
@@ -80,7 +80,7 @@ func TestCreateExecutionForRecovery(t *testing.T) {
 
 func TestCreateExecutionForRecoveryNotFound(t *testing.T) {
 	s := setup()
-	defer s.RestoreStandardFileDescriptors()
+	defer s.TearDown()
 
 	createExecutionUtilSetup()
 	s.MockAdminClient.OnRecoverExecutionMatch(s.Ctx, recoverRequest).Return(nil, errors.New("unknown execution"))
@@ -92,7 +92,7 @@ func TestCreateExecutionForRecoveryNotFound(t *testing.T) {
 func TestCreateExecutionRequestForWorkflow(t *testing.T) {
 	t.Run("successful", func(t *testing.T) {
 		s := setup()
-		defer s.RestoreStandardFileDescriptors()
+		defer s.TearDown()
 
 		createExecutionUtilSetup()
 		launchPlan := &admin.LaunchPlan{}
@@ -103,7 +103,7 @@ func TestCreateExecutionRequestForWorkflow(t *testing.T) {
 	})
 	t.Run("successful with envs", func(t *testing.T) {
 		s := setup()
-		defer s.RestoreStandardFileDescriptors()
+		defer s.TearDown()
 
 		createExecutionUtilSetup()
 		launchPlan := &admin.LaunchPlan{}
@@ -117,7 +117,7 @@ func TestCreateExecutionRequestForWorkflow(t *testing.T) {
 	})
 	t.Run("successful with empty envs", func(t *testing.T) {
 		s := setup()
-		defer s.RestoreStandardFileDescriptors()
+		defer s.TearDown()
 
 		createExecutionUtilSetup()
 		launchPlan := &admin.LaunchPlan{}
@@ -131,7 +131,7 @@ func TestCreateExecutionRequestForWorkflow(t *testing.T) {
 	})
 	t.Run("failed literal conversion", func(t *testing.T) {
 		s := setup()
-		defer s.RestoreStandardFileDescriptors()
+		defer s.TearDown()
 
 		createExecutionUtilSetup()
 		launchPlan := &admin.LaunchPlan{
@@ -149,7 +149,7 @@ func TestCreateExecutionRequestForWorkflow(t *testing.T) {
 	})
 	t.Run("failed fetch", func(t *testing.T) {
 		s := setup()
-		defer s.RestoreStandardFileDescriptors()
+		defer s.TearDown()
 
 		createExecutionUtilSetup()
 		s.FetcherExt.OnFetchLPVersionMatch(s.Ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
@@ -160,7 +160,7 @@ func TestCreateExecutionRequestForWorkflow(t *testing.T) {
 	})
 	t.Run("with security context", func(t *testing.T) {
 		s := setup()
-		defer s.RestoreStandardFileDescriptors()
+		defer s.TearDown()
 
 		createExecutionUtilSetup()
 		executionConfig.KubeServiceAcct = "default"
@@ -177,7 +177,7 @@ func TestCreateExecutionRequestForWorkflow(t *testing.T) {
 func TestCreateExecutionRequestForTask(t *testing.T) {
 	t.Run("successful", func(t *testing.T) {
 		s := setup()
-		defer s.RestoreStandardFileDescriptors()
+		defer s.TearDown()
 
 		createExecutionUtilSetup()
 		task := &admin.Task{
@@ -192,7 +192,7 @@ func TestCreateExecutionRequestForTask(t *testing.T) {
 	})
 	t.Run("successful with envs", func(t *testing.T) {
 		s := setup()
-		defer s.RestoreStandardFileDescriptors()
+		defer s.TearDown()
 
 		createExecutionUtilSetup()
 		task := &admin.Task{
@@ -210,7 +210,7 @@ func TestCreateExecutionRequestForTask(t *testing.T) {
 	})
 	t.Run("successful with empty envs", func(t *testing.T) {
 		s := setup()
-		defer s.RestoreStandardFileDescriptors()
+		defer s.TearDown()
 
 		createExecutionUtilSetup()
 		task := &admin.Task{
@@ -228,7 +228,7 @@ func TestCreateExecutionRequestForTask(t *testing.T) {
 	})
 	t.Run("failed literal conversion", func(t *testing.T) {
 		s := setup()
-		defer s.RestoreStandardFileDescriptors()
+		defer s.TearDown()
 
 		createExecutionUtilSetup()
 		task := &admin.Task{
@@ -254,7 +254,7 @@ func TestCreateExecutionRequestForTask(t *testing.T) {
 	})
 	t.Run("failed fetch", func(t *testing.T) {
 		s := setup()
-		defer s.RestoreStandardFileDescriptors()
+		defer s.TearDown()
 
 		createExecutionUtilSetup()
 		s.FetcherExt.OnFetchTaskVersionMatch(s.Ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
@@ -265,7 +265,7 @@ func TestCreateExecutionRequestForTask(t *testing.T) {
 	})
 	t.Run("with security context", func(t *testing.T) {
 		s := setup()
-		defer s.RestoreStandardFileDescriptors()
+		defer s.TearDown()
 
 		createExecutionUtilSetup()
 		executionConfig.KubeServiceAcct = "default"
@@ -303,7 +303,7 @@ func Test_resolveOverrides(t *testing.T) {
 
 func TestCreateExecutionForRelaunchOverwritingCache(t *testing.T) {
 	s := setup()
-	defer s.RestoreStandardFileDescriptors()
+	defer s.TearDown()
 
 	createExecutionUtilSetup()
 	executionConfig.OverwriteCache = true

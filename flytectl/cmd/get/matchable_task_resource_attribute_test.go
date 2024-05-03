@@ -57,7 +57,7 @@ func TestGetTaskResourceAttributes(t *testing.T) {
 	}
 	t.Run("successful get project domain attribute", func(t *testing.T) {
 		s := testutils.Setup()
-		defer s.RestoreStandardFileDescriptors()
+		defer s.TearDown()
 
 		getTaskResourceAttributeSetup()
 		// No args implying project domain attribute deletion
@@ -71,7 +71,7 @@ func TestGetTaskResourceAttributes(t *testing.T) {
 	})
 	t.Run("successful get project domain attribute and write to file", func(t *testing.T) {
 		s := testutils.Setup()
-		defer s.RestoreStandardFileDescriptors()
+		defer s.TearDown()
 
 		getTaskResourceAttributeSetup()
 		taskresourceattribute.DefaultFetchConfig.AttrFile = testDataTempFile
@@ -86,7 +86,7 @@ func TestGetTaskResourceAttributes(t *testing.T) {
 	})
 	t.Run("successful get project domain attribute and write to file failure", func(t *testing.T) {
 		s := testutils.Setup()
-		defer s.RestoreStandardFileDescriptors()
+		defer s.TearDown()
 
 		getTaskResourceAttributeSetup()
 		taskresourceattribute.DefaultFetchConfig.AttrFile = testDataNotExistentTempFile
@@ -102,7 +102,7 @@ func TestGetTaskResourceAttributes(t *testing.T) {
 	})
 	t.Run("failed get project domain attribute", func(t *testing.T) {
 		s := testutils.Setup()
-		defer s.RestoreStandardFileDescriptors()
+		defer s.TearDown()
 
 		getTaskResourceAttributeSetup()
 		// No args implying project domain attribute deletion
@@ -117,7 +117,7 @@ func TestGetTaskResourceAttributes(t *testing.T) {
 	})
 	t.Run("successful get workflow attribute", func(t *testing.T) {
 		s := testutils.Setup()
-		defer s.RestoreStandardFileDescriptors()
+		defer s.TearDown()
 
 		getTaskResourceAttributeSetup()
 		args := []string{"workflow"}
@@ -132,7 +132,7 @@ func TestGetTaskResourceAttributes(t *testing.T) {
 	})
 	t.Run("failed get workflow attribute", func(t *testing.T) {
 		s := testutils.Setup()
-		defer s.RestoreStandardFileDescriptors()
+		defer s.TearDown()
 
 		getTaskResourceAttributeSetup()
 		args := []string{"workflow"}

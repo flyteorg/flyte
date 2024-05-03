@@ -62,7 +62,7 @@ func TestGetPluginOverride(t *testing.T) {
 	}
 	t.Run("successful get project domain attribute", func(t *testing.T) {
 		s := testutils.Setup()
-		defer s.RestoreStandardFileDescriptors()
+		defer s.TearDown()
 
 		getPluginOverrideSetup()
 		// No args implying project domain attribute deletion
@@ -76,7 +76,7 @@ func TestGetPluginOverride(t *testing.T) {
 	})
 	t.Run("successful get project domain attribute and write to file", func(t *testing.T) {
 		s := testutils.Setup()
-		defer s.RestoreStandardFileDescriptors()
+		defer s.TearDown()
 
 		getPluginOverrideSetup()
 		pluginoverride.DefaultFetchConfig.AttrFile = testDataTempFile
@@ -91,7 +91,7 @@ func TestGetPluginOverride(t *testing.T) {
 	})
 	t.Run("successful get project domain attribute and write to file failure", func(t *testing.T) {
 		s := testutils.Setup()
-		defer s.RestoreStandardFileDescriptors()
+		defer s.TearDown()
 
 		getPluginOverrideSetup()
 		pluginoverride.DefaultFetchConfig.AttrFile = testDataNotExistentTempFile
@@ -107,7 +107,7 @@ func TestGetPluginOverride(t *testing.T) {
 	})
 	t.Run("failed get project domain attribute", func(t *testing.T) {
 		s := testutils.Setup()
-		defer s.RestoreStandardFileDescriptors()
+		defer s.TearDown()
 
 		getPluginOverrideSetup()
 		// No args implying project domain attribute deletion
@@ -122,7 +122,7 @@ func TestGetPluginOverride(t *testing.T) {
 	})
 	t.Run("successful get workflow attribute", func(t *testing.T) {
 		s := testutils.Setup()
-		defer s.RestoreStandardFileDescriptors()
+		defer s.TearDown()
 
 		getPluginOverrideSetup()
 		args := []string{"workflow"}
@@ -136,7 +136,7 @@ func TestGetPluginOverride(t *testing.T) {
 	})
 	t.Run("failed get workflow attribute", func(t *testing.T) {
 		s := testutils.Setup()
-		defer s.RestoreStandardFileDescriptors()
+		defer s.TearDown()
 
 		getPluginOverrideSetup()
 		args := []string{"workflow"}
