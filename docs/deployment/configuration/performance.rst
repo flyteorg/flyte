@@ -6,7 +6,7 @@ Optimizing Performance
 
 .. tags:: Infrastructure, Kubernetes, Advanced
 
-.. tip:: Before getting started, it is always important to measure the performance. Flyte project publishes some grafana templates as described in - :ref:`deployment-configuration-monitoring`.
+.. tip:: Before getting started, it is always important to measure the performance. Flyte project publishes Grafana dashboard templates as described in - :ref:`deployment-configuration-monitoring`.
 
 Introduction
 ============
@@ -17,15 +17,15 @@ a. Every workflow execution is independent and can be performed by a completeley
 b. When a workflow definition is compiled, the resulting DAG structure is traversed by the controller and the goal is to gracefully transition each task to Success.
 c. Node executions are performed by various FlytePlugins; a diverse collection of operations spanning Kubernetes and other remote services. FlytePropeller is only responsible for effectively monitoring and managing these executions.
 
-In the following sections you will learn how Flyte takes care of the correct and reliably execution of workflows through multiple stages, and what strategies you could apply to help the system efficiently handle increasing load.
+In the following sections you will learn how Flyte takes care of the correct and reliable execution of workflows through multiple stages, and what strategies you can apply to help the system efficiently handle increasing load.
 
 Summarized steps of a workflow execution
 ========================================
 
-Before getting started, let's revisit the lifecycle of a workflow execution. The following diagram aims to summarize the process by focusing on the main steps. 
+Let's revisit the lifecycle of a workflow execution. The following diagram aims to summarize the process by focusing on the main steps. 
 More details can be found in the `FlytePropeller Architecture <https://docs.flyte.org/en/latest/concepts/component_architecture/flytepropeller_architecture.html>`__ and :ref:`divedeep-execution-timeline` sections.
 
-<INSERT_EXCALIDRAW_DIAGRAM>
+.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/configuration/perf_optimization/propeller-perf-lifecycle-01.png
 
 
 The following description is centered in the ``Worker``; the independent, lightweight and idempotent process that interacts with all the components in the Propeller controller to drive executions. 
@@ -37,28 +37,32 @@ It's implemented as a ``goroutine``, and illustrated here as a hard-working goph
 4. Keeps a local copy of the execution status, besides what the K8s API stores in ``etcd``.
 5. Reports status to the control plane and, hence, to the user.
 
-While there are multiple metrics that could indicate a slow down in execution performance, ``round_latency`` -or the time it takes for FlytePropeller to perform a single iteration of workflow evaluation- is typically the "golden signal". 
-The following sections should help you optimize that metric.
+While there are multiple metrics that could indicate a slow down in execution performance, ``round_latency`` -or the time it takes FlytePropeller to perform a single iteration of workflow evaluation- is typically the "golden signal". 
+Optimizing ``round_latency`` is one of the main goals of the recommendations provided in the following sections.
 
-Optimizing performance on each stage
+Optimizing performance at each stage
 ------------------------------------
 
 1. Worker, the WorkQueue and evaluation loop 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. list-table:: Important Properties
-   :widths: 25 25 25 50
+   :widths: 25 50 25 50 25
    :header-rows: 1
 * - Property
      - Description
      - Relevant metric
-     - Rule of thumb
+     - Impact on performance
      - Configuration parameter
    * - ``workers``
      - Number of processes that can work concurrently. Also implies number of workflows that can be executed in parallel. Since FlytePropeller uses ``goroutines``, it can accomodate significantly more processes than the number of physical cores.
-     - ``flyte:propeller:all:free_workers_count``: a low number results in higher overall latency for each workflow evaluation round.
+     - ``flyte:propeller:all:free_workers_count``: a low number may result in higher overall latency for each workflow evaluation round.
      - Larger the number, implies more workflows can be evaluated in parallel. But it should depend on number of CPU cores assigned to FlytePropeller and evaluated against the cost of context switching. A number around 500 - 800 with 4-8 CPU cores usually works fine.
      - ``plugins.workqueue.config.workers`` (default: ``10``) 
+   * - Workqueue depth
+     - 
+     - ``sum(rate(flyte:propeller:all:main_depth[5m]))``
+     - A growing trend indicates the processing queue depth is long and is taking longer to drain, delaying start time for executions
      
 
 
@@ -77,8 +81,8 @@ Optimizing performance on each stage
      - A higher number means Flyte propeller is taking more time to process each workflow
      - N/A
      - N/A
-   * - ``sum(rate(flyte:propeller:all:main_depth[5m]))``
-     - The processing queue depth is long and is taking long to drain, causing longer start times for executions
+   * - 
+     - 
      - ``plugins.workqueue.config.maxItems``
      - ``10000``
 
@@ -86,7 +90,7 @@ Optimizing performance on each stage
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 The Kube client config controls the request throughput from FlytePropeller to the Kube API server. These requests may include creating/monitoring Pods or creating/updating FlyteWorkflow CRDs to track workflow execution. 
-The `default configuration provided by K8s <https://pkg.go.dev/sigs.k8s.io/controller-runtime/pkg/client/config#GetConfigWithContext>`__ contains very conservative rate-limiting, and therefore FlytePropeller provides a default configuration that may offer better performance. 
+The `default configuration provided by K8s <https://pkg.go.dev/sigs.k8s.io/controller-runtime/pkg/client/config#GetConfigWithContext>`__ results in very conservative rate-limiting. FlytePropeller provides a default configuration that may offer better performance. 
 However, if your workload involves larger scales (e.g., >5k fanout dynamic or map tasks, >8k concurrent workflows, etc.,) the kube-client rate limiting config may still contribute to a noticeable drop in performance. 
 Increasing the ``qps`` and ``burst`` values may help alleviate back pressure and improve FlytePropeller performance. The default kube-client config applied to Propeller is as follows:
 
@@ -102,12 +106,46 @@ Increasing the ``qps`` and ``burst`` values may help alleviate back pressure and
 
    In the previous configuration, the kube-apiserver will accept 100 queries before blocking any query. Every second, 25 more queries will be accepted. A query blocked for 30s will timeout.
 
-It is worth noting that the Kube API server tends to throttle requests transparently. This means that while tweaking performance by increasing the allowed frequency of API requests (e.g., increasing FlytePropeller workers or relaxing Kube client config rate-limiting), there may be steep performance decreases for no apparent reason. 
+It is worth noting that the Kube API server tends to throttle requests transparently. This means that even increasing the allowed frequency of API requests (e.g., increasing FlytePropeller workers or relaxing Kube client config rate-limiting), there may be steep performance decreases for no apparent reason. 
 While it's possible to easily monitor Kube API saturation using system-level metrics like CPU, memory and network usage; it's recommended to look at kube-apiserver-specific metrics like ``workqueue_depth`` which can assist in identifying whether throttling is to blame. Unfortunately, there is no one-size-fits-all solution here, and customizing these parameters for your workload will require trial and error.
+`Learn more about Kubernetes metrics <https://kubernetes.io/docs/reference/instrumentation/metrics/>`__
 
 
-Optimizing round latency
--------------------------
+3. Evaluate the DAG and reconcile state as needed
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. list-table:: Important Properties
+   :widths: 25 50 25 50 25
+   :header-rows: 1
+* - Property
+     - Description
+     - Impact on performance
+     - Configuration parameter
+   * - ``workflow-reeval-duration``
+     - Interval at which the system re-evaluates the state of a workflow when no external events have triggered a state change. This periodic re-evaluation helps in progressing workflows that may be waiting on conditions or timeouts to be met.
+     - A shorter duration means workflows are checked more frequently, which can lead to quicker progression through workflow steps but at the cost of increased load on the system. Conversely, a longer duration reduces system load but may delay the progression of workflows.
+     - ``propeller.workflow-reeval-duration``. Default value: ``10s``.
+   * - ``downstream-eval-duration`` 
+     - Interval at which the system checks for updates on the execution status of downstream tasks within a workflow. This setting is crucial for workflows where tasks are interdependent, as it determines how quickly Flyte reacts to changes or completions of tasks that other tasks depend on.
+     - A shorter interval makes Flyte check more frequently for task updates, which can lead to quicker workflow progression if tasks complete faster than anticipated, at the cost of higher system load and reduced througput.  Conversely, a higher value reduces the frequency of checks, which can decrease system load but may delay the progression of workflows, as the system reacts slower to task completions.
+     - ``propeller.downstream-eval-duration``. Default value: ``5s``.
+   * - ``max-streak-length``
+     -  Maximum number of consecutive evaluation rounds that one propeller worker can use for one workflow. 
+     -  A large ``max-streak-length`` value can lead to faster completion times for workflows that benefit from continuous processing, especially cached or computationally intensive workflows; at the cost of overall lower throughput and higher latency as workers would be spending most of their time on a few workflows. If set to `1`, the worker adds the workflowID back to the WorkQueue immediately after a single evaluation loop is completed and waits for another worker to pick it up before processing again, effectively prioritizing "hot workflows".
+     -  ``propeller.max-streak-length``. Default value: ``8``.
+   
+   
+   
+   * - ``storage.cache``
+     - propeller
+     - This config is used to configure the write-through cache used by FlytePropeller on top of the metastore
+     - FlytePropeller uses the configure blob-store (can be changed to something more performant in the future) to optimize read and write latency, for all metadata IO operations. Metadata refers to the input and output pointers
+
+
+4. Record executions status
+^^^^^^^^^^^^^^^^^^^^^
+
+
 
 Optimize FlytePropeller configuration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -125,8 +163,8 @@ Let us first look at various config properties that can be set and would impact 
      - Description
    * - ``workflow-reeval-duration``
      - propeller
-     - lower the number - lower latency, lower throughput (low throughput is because the same workflow will be evaluated more times)
-     - frequency at which, given no external signal, a workflow should be re-evaluated by Flyte propellers reval loop
+     - lower the number - lower latency and higher throughput (low throughput is because the same workflow will be evaluated more times)
+     - period at which, given no external signal, a workflow should be re-evaluated by Flyte propellers reval loop
    * - ``downstream-eval-duration``
      - propeller
      - lower the number - lower latency and lower throughput (low throughput is because the same workflow will be evaluated more times)
@@ -155,6 +193,9 @@ Let us first look at various config properties that can be set and would impact 
      - propeller
      - This config is used to configure the maximum back-off interval in case of resource-quota errors
      - FlytePropeller will automatically back-off when k8s or other services request it to slowdown or when desired quotas are met.
+   
+   
+
    * - ``max-parallelism``
      - admin, per workflow, per execution
      - Refer to examples and documentation below
