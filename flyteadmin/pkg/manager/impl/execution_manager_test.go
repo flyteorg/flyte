@@ -4059,29 +4059,19 @@ func TestGetExecutionData_LegacyModel(t *testing.T) {
 	r := plugins.NewRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), storageClient, mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil))
+
 	dataResponse, err := execManager.GetExecutionData(context.Background(), admin.WorkflowExecutionGetDataRequest{
 		Id: &executionIdentifier,
 	})
-	assert.Nil(t, err)
-	assert.True(t, proto.Equal(&admin.WorkflowExecutionGetDataResponse{
-		Outputs: &admin.UrlBlob{
-			Url:   "outputs",
-			Bytes: 200,
-		},
-		Inputs: &admin.UrlBlob{
-			Url:   "inputs",
-			Bytes: 200,
-		},
-		FullInputs: &core.LiteralMap{
-			Literals: map[string]*core.Literal{
-				"foo": testutils.MakeStringLiteral("foo-value-1"),
-			},
-		},
-		FullOutputs: &core.LiteralMap{},
-	}, dataResponse))
+
+	assert.EqualError(t, err, "could not find value in storage [s3://bucket/output_uri]")
+	assert.Empty(t, dataResponse)
+
 	var inputs core.LiteralMap
-	err = storageClient.ReadProtobuf(context.Background(), storage.DataReference("s3://bucket/metadata/project/domain/name/inputs"), &inputs)
-	assert.Nil(t, err)
+
+	err = storageClient.ReadProtobuf(context.Background(), "s3://bucket/metadata/project/domain/name/inputs", &inputs)
+
+	assert.NoError(t, err)
 	assert.True(t, proto.Equal(&inputs, closure.ComputedInputs))
 }
 

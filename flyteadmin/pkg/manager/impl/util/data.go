@@ -18,8 +18,7 @@ import (
 )
 
 const (
-	OutputsFile = "outputs.pb"
-	DeckFile    = "deck.html"
+	DeckFile = "deck.html"
 )
 
 type GetObjectRequest struct {
@@ -75,13 +74,8 @@ func GetInputs(ctx context.Context,
 		} else {
 			err = readFromDataPlane(ctx, objectStore, cluster, project, domain, inputURI, &fullInputs)
 		}
-		if err != nil {
-			// If we fail to read the protobuf from the remote store, we shouldn't fail the request altogether.
-			// Instead we return the signed URL blob so that the client can use that to fetch the input data.
-			logger.Warningf(ctx, "Failed to read inputs from URI [%s] with err: %v", inputURI, err)
-		}
 	}
-	return &fullInputs, &inputsURLBlob, nil
+	return &fullInputs, &inputsURLBlob, err
 }
 
 // ExecutionClosure defines common methods in NodeExecutionClosure and TaskExecutionClosure used to return output data.
@@ -155,14 +149,9 @@ func GetOutputs(ctx context.Context,
 		} else {
 			err = readFromDataPlane(ctx, objectStore, cluster, project, domain, closure.GetOutputUri(), fullOutputs)
 		}
-		if err != nil {
-			// If we fail to read the protobuf from the remote store, we shouldn't fail the request altogether.
-			// Instead we return the signed URL blob so that the client can use that to fetch the output data.
-			logger.Warningf(ctx, "Failed to read outputs from URI [%s] with err: %v", closure.GetOutputUri(), err)
-		}
 	}
 
-	return fullOutputs, &outputsURLBlob, nil
+	return fullOutputs, &outputsURLBlob, err
 }
 
 func IsLocalURI(ctx context.Context, store *storage.DataStore, uri string) bool {

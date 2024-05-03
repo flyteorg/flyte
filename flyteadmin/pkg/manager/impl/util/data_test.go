@@ -2,6 +2,7 @@ package util
 
 import (
 	"context"
+	"errors"
 	"testing"
 
 	"github.com/golang/protobuf/proto"
@@ -193,6 +194,31 @@ func TestGetInputs(t *testing.T) {
 		assert.Empty(t, inputURLBlob)
 		store.AssertExpectations(t)
 	})
+
+	t.Run("should fail if store fails", func(t *testing.T) {
+		remoteDataConfig.SignedURL = interfaces.SignedURL{Enabled: false}
+		store := &objectStoreMock{}
+		expectedErr := errors.New("call failed")
+		store.
+			On("GetObject", GetObjectRequest{
+				Cluster: clusterName,
+				Project: project,
+				Domain:  domain,
+				Prefix:  "/foo/bar",
+			}).
+			Return(GetObjectResponse{}, expectedErr).
+			Once()
+
+		ctx := context.TODO()
+		inputURI := "s3://wrong/foo/bar"
+
+		fullInputs, inputURLBlob, err := GetInputs(ctx, mockRemoteURL, &remoteDataConfig, mockStorage, clusterName, project, domain, inputURI, store)
+
+		assert.EqualError(t, err, "failed to fetch object: call failed")
+		assert.Empty(t, fullInputs)
+		assert.Empty(t, inputURLBlob)
+		store.AssertExpectations(t)
+	})
 }
 
 func TestGetOutputs(t *testing.T) {
@@ -266,6 +292,33 @@ func TestGetOutputs(t *testing.T) {
 
 		assert.NoError(t, err)
 		assert.True(t, proto.Equal(fullOutputs, testLiteralMap))
+		assert.Empty(t, outputURLBlob)
+		store.AssertExpectations(t)
+	})
+
+	t.Run("should fail if store fails", func(t *testing.T) {
+		remoteDataConfig.SignedURL = interfaces.SignedURL{Enabled: false}
+		store := &objectStoreMock{}
+		expectedErr := errors.New("call failed")
+		store.
+			On("GetObject", GetObjectRequest{
+				Cluster: clusterName,
+				Project: project,
+				Domain:  domain,
+				Prefix:  "/foo/bar",
+			}).
+			Return(GetObjectResponse{}, expectedErr).
+			Once()
+		testClosure := &admin.NodeExecutionClosure{
+			OutputResult: &admin.NodeExecutionClosure_OutputUri{
+				OutputUri: "s3://wrong/foo/bar",
+			},
+		}
+
+		fullOutputs, outputURLBlob, err := GetOutputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorage, testClosure, clusterName, project, domain, store)
+
+		assert.EqualError(t, err, "failed to fetch object: call failed")
+		assert.Empty(t, fullOutputs)
 		assert.Empty(t, outputURLBlob)
 		store.AssertExpectations(t)
 	})

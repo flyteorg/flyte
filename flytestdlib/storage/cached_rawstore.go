@@ -81,11 +81,12 @@ func (s *cachedRawStore) ReadRaw(ctx context.Context, reference DataReference) (
 
 	err = s.cache.Set(key, b, 0)
 	if err != nil {
-		logger.Debugf(ctx, "Failed to Cache the metadata")
+		s.metrics.CacheWriteError.Inc()
 		err = errors.Wrapf(ErrFailedToWriteCache, err, "Failed to Cache the metadata")
+		logger.Warn(ctx, err.Error())
 	}
 
-	return ioutils.NewBytesReadCloser(b), err
+	return ioutils.NewBytesReadCloser(b), nil
 }
 
 // WriteRaw stores a raw byte array.
@@ -104,9 +105,10 @@ func (s *cachedRawStore) WriteRaw(ctx context.Context, reference DataReference, 
 	if err != nil {
 		s.metrics.CacheWriteError.Inc()
 		err = errors.Wrapf(ErrFailedToWriteCache, err, "Failed to Cache the metadata")
+		logger.Warn(ctx, err.Error())
 	}
 
-	return err
+	return nil
 }
 
 // Delete removes the referenced data from the cache as well as underlying store.

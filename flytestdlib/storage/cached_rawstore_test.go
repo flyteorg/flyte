@@ -201,10 +201,10 @@ func TestCachedRawStore(t *testing.T) {
 		readCalled = false
 		err := cStore.WriteRaw(ctx, bigK, int64(len(bigD)), Options{}, bytes.NewReader(bigD))
 		assert.True(t, writeCalled)
-		assert.True(t, IsFailedWriteToCache(err))
+		assert.NoError(t, err)
 
 		o, err := cStore.ReadRaw(ctx, bigK)
-		assert.True(t, IsFailedWriteToCache(err))
+		assert.NoError(t, err)
 		b, err := ioutil.ReadAll(o)
 		assert.NoError(t, err)
 		assert.Equal(t, bigD, b)
