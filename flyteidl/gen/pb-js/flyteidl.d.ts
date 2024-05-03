@@ -14077,6 +14077,9 @@ export namespace flyteidl {
 
             /** ExecutionSpec executionClusterLabel */
             executionClusterLabel?: (flyteidl.admin.IExecutionClusterLabel|null);
+
+            /** ExecutionSpec executionEnvAssignments */
+            executionEnvAssignments?: (flyteidl.core.IExecutionEnvAssignment[]|null);
         }
 
         /** Represents an ExecutionSpec. */
@@ -14141,6 +14144,9 @@ export namespace flyteidl {
 
             /** ExecutionSpec executionClusterLabel. */
             public executionClusterLabel?: (flyteidl.admin.IExecutionClusterLabel|null);
+
+            /** ExecutionSpec executionEnvAssignments. */
+            public executionEnvAssignments: flyteidl.core.IExecutionEnvAssignment[];
 
             /** ExecutionSpec notificationOverrides. */
             public notificationOverrides?: ("notifications"|"disableAll");
@@ -15141,6 +15147,9 @@ export namespace flyteidl {
 
             /** WorkflowExecutionConfig envs */
             envs?: (flyteidl.admin.IEnvs|null);
+
+            /** WorkflowExecutionConfig executionEnvAssignments */
+            executionEnvAssignments?: (flyteidl.core.IExecutionEnvAssignment[]|null);
         }
 
         /** Represents a WorkflowExecutionConfig. */
@@ -15175,6 +15184,9 @@ export namespace flyteidl {
 
             /** WorkflowExecutionConfig envs. */
             public envs?: (flyteidl.admin.IEnvs|null);
+
+            /** WorkflowExecutionConfig executionEnvAssignments. */
+            public executionEnvAssignments: flyteidl.core.IExecutionEnvAssignment[];
 
             /**
              * Creates a new WorkflowExecutionConfig instance using the specified properties.
@@ -15838,6 +15850,9 @@ export namespace flyteidl {
 
             /** LaunchPlanSpec envs */
             envs?: (flyteidl.admin.IEnvs|null);
+
+            /** LaunchPlanSpec executionEnvAssignments */
+            executionEnvAssignments?: (flyteidl.core.IExecutionEnvAssignment[]|null);
         }
 
         /** Represents a LaunchPlanSpec. */
@@ -15896,6 +15911,9 @@ export namespace flyteidl {
 
             /** LaunchPlanSpec envs. */
             public envs?: (flyteidl.admin.IEnvs|null);
+
+            /** LaunchPlanSpec executionEnvAssignments. */
+            public executionEnvAssignments: flyteidl.core.IExecutionEnvAssignment[];
 
             /**
              * Creates a new LaunchPlanSpec instance using the specified properties.
