@@ -53,7 +53,7 @@ func getProjectSetup() {
 }
 
 func TestListProjectFunc(t *testing.T) {
-	s := testutils.SetupWithExt()
+	s := testutils.Setup()
 	defer s.RestoreStandardFileDescriptors()
 
 	getProjectSetup()
@@ -67,7 +67,7 @@ func TestListProjectFunc(t *testing.T) {
 }
 
 func TestGetProjectFunc(t *testing.T) {
-	s := testutils.SetupWithExt()
+	s := testutils.Setup()
 	defer s.RestoreStandardFileDescriptors()
 
 	getProjectSetup()
@@ -82,7 +82,7 @@ func TestGetProjectFunc(t *testing.T) {
 }
 
 func TestGetProjectFuncError(t *testing.T) {
-	s := testutils.SetupWithExt()
+	s := testutils.Setup()
 	defer s.RestoreStandardFileDescriptors()
 
 	getProjectSetup()

@@ -49,7 +49,7 @@ func TestGetClusterResourceAttributes(t *testing.T) {
 		},
 	}
 	t.Run("successful get project domain attribute", func(t *testing.T) {
-		s := testutils.SetupWithExt()
+		s := testutils.Setup()
 		defer s.RestoreStandardFileDescriptors()
 
 		getClusterResourceAttributeSetup()
@@ -63,7 +63,7 @@ func TestGetClusterResourceAttributes(t *testing.T) {
 		s.TearDownAndVerify(t, `{"project":"dummyProject","domain":"dummyDomain","attributes":{"foo":"bar"}}`)
 	})
 	t.Run("successful get project domain attribute and write to file", func(t *testing.T) {
-		s := testutils.SetupWithExt()
+		s := testutils.Setup()
 		defer s.RestoreStandardFileDescriptors()
 
 		getClusterResourceAttributeSetup()
@@ -78,7 +78,7 @@ func TestGetClusterResourceAttributes(t *testing.T) {
 		s.TearDownAndVerify(t, `wrote the config to file temp-output-file`)
 	})
 	t.Run("successful get project domain attribute and write to file failure", func(t *testing.T) {
-		s := testutils.SetupWithExt()
+		s := testutils.Setup()
 		defer s.RestoreStandardFileDescriptors()
 
 		getClusterResourceAttributeSetup()
@@ -94,7 +94,7 @@ func TestGetClusterResourceAttributes(t *testing.T) {
 		s.TearDownAndVerify(t, ``)
 	})
 	t.Run("failed get project domain attribute", func(t *testing.T) {
-		s := testutils.SetupWithExt()
+		s := testutils.Setup()
 		defer s.RestoreStandardFileDescriptors()
 
 		getClusterResourceAttributeSetup()
@@ -109,7 +109,7 @@ func TestGetClusterResourceAttributes(t *testing.T) {
 		s.TearDownAndVerify(t, ``)
 	})
 	t.Run("successful get workflow attribute", func(t *testing.T) {
-		s := testutils.SetupWithExt()
+		s := testutils.Setup()
 		defer s.RestoreStandardFileDescriptors()
 
 		getClusterResourceAttributeSetup()
@@ -124,7 +124,7 @@ func TestGetClusterResourceAttributes(t *testing.T) {
 		s.TearDownAndVerify(t, `{"project":"dummyProject","domain":"dummyDomain","workflow":"workflow","attributes":{"foo":"bar"}}`)
 	})
 	t.Run("failed get workflow attribute", func(t *testing.T) {
-		s := testutils.SetupWithExt()
+		s := testutils.Setup()
 		defer s.RestoreStandardFileDescriptors()
 
 		getClusterResourceAttributeSetup()

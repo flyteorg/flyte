@@ -308,7 +308,7 @@ func TestGetLaunchPlanFuncLatest(t *testing.T) {
 }
 
 func TestGetLaunchPlanWithVersion(t *testing.T) {
-	s := testutils.SetupWithExt()
+	s := testutils.Setup()
 	defer s.RestoreStandardFileDescriptors()
 	getLaunchPlanSetup()
 	launchplan.DefaultConfig.Version = "v2"
@@ -357,7 +357,7 @@ func TestGetLaunchPlans(t *testing.T) {
 }
 
 func TestGetLaunchPlansWithExecFile(t *testing.T) {
-	s := testutils.SetupWithExt()
+	s := testutils.Setup()
 	defer s.RestoreStandardFileDescriptors()
 	getLaunchPlanSetup()
 	s.MockAdminClient.OnListLaunchPlansMatch(s.Ctx, resourceListRequest).Return(launchPlanListResponse, nil)
@@ -393,7 +393,7 @@ workflow: launchplan1
 }
 
 func TestGetLaunchPlanTableFunc(t *testing.T) {
-	s := testutils.SetupWithExt()
+	s := testutils.Setup()
 	defer s.RestoreStandardFileDescriptors()
 	getLaunchPlanSetup()
 	s.MockAdminClient.OnListLaunchPlansMatch(s.Ctx, resourceGetRequest).Return(launchPlanListResponse, nil)

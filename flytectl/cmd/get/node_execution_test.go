@@ -160,7 +160,7 @@ func createDummyTaskExecutionForNode(nodeID string, taskID string) *admin.TaskEx
 
 func TestGetExecutionDetails(t *testing.T) {
 	t.Run("successful get details default view", func(t *testing.T) {
-		s := testutils.SetupWithExt()
+		s := testutils.Setup()
 		defer s.RestoreStandardFileDescriptors()
 
 		ctx := s.Ctx
@@ -228,7 +228,7 @@ func TestGetExecutionDetails(t *testing.T) {
 	})
 
 	t.Run("successful get details default view for node-id", func(t *testing.T) {
-		s := testutils.SetupWithExt()
+		s := testutils.Setup()
 		defer s.RestoreStandardFileDescriptors()
 
 		ctx := s.Ctx
@@ -293,7 +293,7 @@ func TestGetExecutionDetails(t *testing.T) {
 	})
 
 	t.Run("failure task exec fetch", func(t *testing.T) {
-		s := testutils.SetupWithExt()
+		s := testutils.Setup()
 		defer s.RestoreStandardFileDescriptors()
 
 		ctx := s.Ctx

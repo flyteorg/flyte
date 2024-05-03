@@ -248,7 +248,7 @@ func TestGetTaskFuncWithError(t *testing.T) {
 }
 
 func TestGetTaskFunc(t *testing.T) {
-	s := testutils.SetupWithExt()
+	s := testutils.Setup()
 	defer s.RestoreStandardFileDescriptors()
 
 	getTaskSetup()
@@ -335,7 +335,7 @@ func TestGetTaskFunc(t *testing.T) {
 }
 
 func TestGetTaskFuncWithTable(t *testing.T) {
-	s := testutils.SetupWithExt()
+	s := testutils.Setup()
 	defer s.RestoreStandardFileDescriptors()
 
 	getTaskSetup()
@@ -361,7 +361,7 @@ func TestGetTaskFuncWithTable(t *testing.T) {
 }
 
 func TestGetTaskFuncLatest(t *testing.T) {
-	s := testutils.SetupWithExt()
+	s := testutils.Setup()
 	defer s.RestoreStandardFileDescriptors()
 
 	getTaskSetup()
@@ -412,7 +412,7 @@ func TestGetTaskFuncLatest(t *testing.T) {
 }
 
 func TestGetTaskWithVersion(t *testing.T) {
-	s := testutils.SetupWithExt()
+	s := testutils.Setup()
 	defer s.RestoreStandardFileDescriptors()
 
 	getTaskSetup()
@@ -464,7 +464,7 @@ func TestGetTaskWithVersion(t *testing.T) {
 }
 
 func TestGetTasks(t *testing.T) {
-	s := testutils.SetupWithExt()
+	s := testutils.Setup()
 	defer s.RestoreStandardFileDescriptors()
 
 	getTaskSetup()
@@ -479,7 +479,7 @@ func TestGetTasks(t *testing.T) {
 }
 
 func TestGetTasksFilters(t *testing.T) {
-	s := testutils.SetupWithExt()
+	s := testutils.Setup()
 	defer s.RestoreStandardFileDescriptors()
 
 	getTaskSetup()
@@ -504,7 +504,7 @@ func TestGetTasksFilters(t *testing.T) {
 }
 
 func TestGetTaskWithExecFile(t *testing.T) {
-	s := testutils.SetupWithExt()
+	s := testutils.Setup()
 	defer s.RestoreStandardFileDescriptors()
 
 	getTaskSetup()

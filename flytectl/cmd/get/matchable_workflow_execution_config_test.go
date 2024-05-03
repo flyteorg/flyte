@@ -49,7 +49,7 @@ func TestGetWorkflowExecutionConfig(t *testing.T) {
 		},
 	}
 	t.Run("successful get project domain attribute", func(t *testing.T) {
-		s := testutils.SetupWithExt()
+		s := testutils.Setup()
 		defer s.RestoreStandardFileDescriptors()
 
 		getWorkflowExecutionConfigSetup()
@@ -63,7 +63,7 @@ func TestGetWorkflowExecutionConfig(t *testing.T) {
 		s.TearDownAndVerify(t, `{"project":"dummyProject","domain":"dummyDomain","max_parallelism":5}`)
 	})
 	t.Run("successful get project domain attribute and write to file", func(t *testing.T) {
-		s := testutils.SetupWithExt()
+		s := testutils.Setup()
 		defer s.RestoreStandardFileDescriptors()
 
 		getWorkflowExecutionConfigSetup()
@@ -78,7 +78,7 @@ func TestGetWorkflowExecutionConfig(t *testing.T) {
 		s.TearDownAndVerify(t, `wrote the config to file temp-output-file`)
 	})
 	t.Run("successful get project domain attribute and write to file failure", func(t *testing.T) {
-		s := testutils.SetupWithExt()
+		s := testutils.Setup()
 		defer s.RestoreStandardFileDescriptors()
 
 		getWorkflowExecutionConfigSetup()
@@ -94,7 +94,7 @@ func TestGetWorkflowExecutionConfig(t *testing.T) {
 		s.TearDownAndVerify(t, ``)
 	})
 	t.Run("failed get project domain attribute", func(t *testing.T) {
-		s := testutils.SetupWithExt()
+		s := testutils.Setup()
 		defer s.RestoreStandardFileDescriptors()
 
 		getWorkflowExecutionConfigSetup()
@@ -109,7 +109,7 @@ func TestGetWorkflowExecutionConfig(t *testing.T) {
 		s.TearDownAndVerify(t, ``)
 	})
 	t.Run("successful get workflow attribute", func(t *testing.T) {
-		s := testutils.SetupWithExt()
+		s := testutils.Setup()
 		defer s.RestoreStandardFileDescriptors()
 
 		getWorkflowExecutionConfigSetup()
@@ -124,7 +124,7 @@ func TestGetWorkflowExecutionConfig(t *testing.T) {
 		s.TearDownAndVerify(t, `{"project":"dummyProject","domain":"dummyDomain","workflow":"workflow","max_parallelism":5}`)
 	})
 	t.Run("failed get workflow attribute", func(t *testing.T) {
-		s := testutils.SetupWithExt()
+		s := testutils.Setup()
 		defer s.RestoreStandardFileDescriptors()
 
 		getWorkflowExecutionConfigSetup()

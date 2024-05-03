@@ -135,7 +135,7 @@ func TestGetWorkflowFuncWithError(t *testing.T) {
 	})
 
 	t.Run("failure fetching ", func(t *testing.T) {
-		s := testutils.SetupWithExt()
+		s := testutils.Setup()
 		defer s.RestoreStandardFileDescriptors()
 
 		getWorkflowSetup()
@@ -174,7 +174,7 @@ func TestGetWorkflowFuncWithError(t *testing.T) {
 }
 
 func TestGetWorkflowFuncLatestWithTable(t *testing.T) {
-	s := testutils.SetupWithExt()
+	s := testutils.Setup()
 	defer s.RestoreStandardFileDescriptors()
 
 	getWorkflowSetup()
@@ -195,7 +195,7 @@ func TestGetWorkflowFuncLatestWithTable(t *testing.T) {
 }
 
 func TestListWorkflowFuncWithTable(t *testing.T) {
-	s := testutils.SetupWithExt()
+	s := testutils.Setup()
 	defer s.RestoreStandardFileDescriptors()
 
 	getWorkflowSetup()

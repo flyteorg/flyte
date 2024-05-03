@@ -141,7 +141,7 @@ func TestGetExecutionFunc(t *testing.T) {
 }
 
 func TestGetExecutionFuncForDetails(t *testing.T) {
-	s := testutils.SetupWithExt()
+	s := testutils.Setup()
 	defer s.RestoreStandardFileDescriptors()
 	getExecutionSetup()
 	ctx := s.Ctx
@@ -158,7 +158,7 @@ func TestGetExecutionFuncForDetails(t *testing.T) {
 
 func TestGetExecutionFuncWithIOData(t *testing.T) {
 	t.Run("successful inputs outputs", func(t *testing.T) {
-		s := testutils.SetupWithExt()
+		s := testutils.Setup()
 		defer s.RestoreStandardFileDescriptors()
 
 		getExecutionSetup()
@@ -224,7 +224,7 @@ func TestGetExecutionFuncWithIOData(t *testing.T) {
 		assert.Nil(t, err)
 	})
 	t.Run("fetch data error from admin", func(t *testing.T) {
-		s := testutils.SetupWithExt()
+		s := testutils.Setup()
 		defer s.RestoreStandardFileDescriptors()
 
 		getExecutionSetup()
@@ -266,7 +266,7 @@ func TestGetExecutionFuncWithIOData(t *testing.T) {
 
 		args := []string{dummyExec}
 		for _, tt := range tests {
-			s := testutils.SetupWithExt()
+			s := testutils.Setup()
 			defer s.RestoreStandardFileDescriptors()
 
 			config.GetConfig().Output = tt.outputFormat
@@ -367,7 +367,7 @@ func TestGetExecutionFuncWithError(t *testing.T) {
 	}
 
 	args := []string{executionNameValue}
-	s := testutils.SetupWithExt()
+	s := testutils.Setup()
 	defer s.RestoreStandardFileDescriptors()
 
 	s.FetcherExt.OnFetchExecutionMatch(s.Ctx, mock.Anything, mock.Anything, mock.Anything).Return(nil, errors.New("execution NotFound"))
