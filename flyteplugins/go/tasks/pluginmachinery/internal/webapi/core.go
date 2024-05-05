@@ -21,7 +21,7 @@ const (
 	minCacheSize       = 10
 	maxCacheSize       = 500000
 	minWorkers         = 1
-	maxWorkers         = 100
+	maxWorkers         = 10000
 	minSyncDuration    = 5 * time.Second
 	maxSyncDuration    = time.Hour
 	minBurst           = 5
