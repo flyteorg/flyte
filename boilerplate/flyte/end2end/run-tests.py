@@ -22,10 +22,12 @@ def execute_workflow(
     workflow_name,
     inputs,
     cluster_pool_name: Optional[str] = None,
+    wait: bool = False,
 ):
     print(f"Fetching workflow={workflow_name} and version={version}")
     wf = remote.fetch_workflow(name=workflow_name, version=version)
-    return remote.execute(wf, inputs=inputs, wait=False, cluster_pool=cluster_pool_name)
+    print(f"Executing workflow={workflow_name} and version={version}")
+    return remote.execute(wf, inputs=inputs, wait=wait, cluster_pool=cluster_pool_name)
 
 
 def executions_finished(
@@ -64,6 +66,7 @@ def schedule_workflow_groups(
     terminate_workflow_on_failure: bool,
     parsed_manifest: List[dict],
     cluster_pool_name: Optional[str] = None,
+    parallel: bool = True,
 ) -> Dict[str, bool]:
     """
     Schedule workflows executions for all workflow groups and return True if all executions succeed, otherwise
@@ -79,7 +82,7 @@ def schedule_workflow_groups(
         if workflow_group_item:
             workflows = workflow_group_item[0]["examples"]
         executions_by_wfgroup[wf_group] = [
-            execute_workflow(remote, tag, workflow[0], workflow[1], cluster_pool_name)
+            execute_workflow(remote, tag, workflow[0], workflow[1], cluster_pool_name, not parallel)
             for workflow in workflows
         ]
 
@@ -135,6 +138,7 @@ def run(
     test_project_name: str,
     test_project_domain: str,
     cluster_pool_name: Optional[str] = None,
+    parallel: bool = True,
 ) -> List[Dict[str, str]]:
     remote = FlyteRemote(
         Config.auto(config_file=config_file_path),
@@ -182,6 +186,7 @@ def run(
         terminate_workflow_on_failure,
         parsed_manifest,
         cluster_pool_name,
+        parallel
     )
 
     for workflow_group, succeeded in results_by_wfgroup.items():
@@ -241,6 +246,12 @@ def run(
     is_flag=False,
     help="Name of domain in project to run functional tests on",
 )
+@click.option(
+    "--parallel",
+    is_flag=True,
+    default=False,
+    help="Run tests in parallel if set to True",
+)
 @click.argument(
     "cluster_pool_name",
     required=False,
@@ -255,6 +266,7 @@ def cli(
     terminate_workflow_on_failure,
     test_project_name,
     test_project_domain,
+    parallel,
     cluster_pool_name,
 ):
     print(f"return_non_zero_on_failure={return_non_zero_on_failure}")
@@ -266,6 +278,7 @@ def cli(
         test_project_name,
         test_project_domain,
         cluster_pool_name,
+        parallel
     )
 
     # Write a json object in its own line describing the result of this run to stdout
