@@ -16,7 +16,7 @@ jobs:
   test-bootstrap:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-go@v3
         with:
           go-version: "1.21"
@@ -38,7 +38,7 @@ jobs:
     needs: [test-bootstrap]
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Setup Golang caches
         uses: actions/cache@v3
         with:
@@ -132,7 +132,7 @@ jobs:
           FLYTESNACKS_VERSION="$(curl --silent https://api.github.com/repos/flyteorg/flytesnacks/releases/latest | jq -r .tag_name)"
           echo "FLYTESNACKS_VERSION=${FLYTESNACKS_VERSION}" >> ${GITHUB_ENV}
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - uses: actions/download-artifact@v3
         with:
           name: single-binary-image
@@ -156,7 +156,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.11"
+          python-version: "3.12"
       - uses: unionai/flytectl-setup-action@v0.0.1
       - name: Setup sandbox
         run: |
@@ -177,21 +177,21 @@ jobs:
           pip install flytekit flytekitplugins-deck-standard
           pip freeze
       - name: Checkout flytesnacks
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: flyteorg/flytesnacks
           path: flytesnacks
-          # TODO: Enable this once refactored version produces a release tag
-          # ref: ${{ env.FLYTESNACKS_VERSION }}
+          ref: ${{ env.FLYTESNACKS_VERSION }}
       - name: Register specific tests
         run: |
+          flytekit_version=$(pip show flytekit | grep -i version | awk '{ print $2 }')
           while read -r line;
           do
               pyflyte --config ./boilerplate/flyte/end2end/functional-test-config.yaml \
                   register \
                   --project flytesnacks \
                   --domain development \
-                  --image cr.flyte.org/flyteorg/flytekit:py3.11-latest \
+                  --image cr.flyte.org/flyteorg/flytekit:py3.12-${flytekit_version} \
                   --version ${{ env.FLYTESNACKS_VERSION }} \
                   flytesnacks/$line;
           done < flytesnacks/flyte_tests.txt
@@ -205,7 +205,7 @@ jobs:
     needs: [build-and-push-single-binary-image]
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - uses: actions/download-artifact@v3
         with:
           name: single-binary-image

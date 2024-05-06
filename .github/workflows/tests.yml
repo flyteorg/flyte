@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Fetch the code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
@@ -44,6 +44,7 @@ jobs:
         working-directory: ${{ github.workspace }}/flyte
         run: |
           conda install -c conda-forge conda-lock
+          cat monodocs-environment.lock.yaml
           conda-lock install -n monodocs-env monodocs-environment.lock.yaml
       - shell: bash -el {0}
         working-directory: ${{ github.workspace }}/flyte
@@ -70,20 +71,10 @@ jobs:
           conda activate monodocs-env
           make docs
 
-  generate_kustomize:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-go@v2
-        with:
-          go-version: "1.21"
-      - name: Kustomize and diff
-        run: DELTA_CHECK=true make kustomize
-
   generate_helm:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: actions/setup-go@v2
         with:
           go-version: "1.21"

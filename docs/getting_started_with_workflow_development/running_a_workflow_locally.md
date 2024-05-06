@@ -69,7 +69,8 @@ Flyte supports any [OCI-compatible](https://opencontainers.org/) container techn
 
 You must install `flytectl` to start and configure a local Flyte cluster, as well as register workflows to a local or remote Flyte cluster.
 
-````{tabbed} macOS
+::::{tab-set}
+:::{tab-item} macOS
 To use Homebrew, on the command line, run the following:
 
 ```{prompt} bash $
@@ -83,9 +84,9 @@ curl -sL https://ctl.flyte.org/install | sudo bash -s -- -b /usr/local/bin
 ```
 
 To download manually, see the [flytectl releases](https://github.com/flyteorg/flytectl/releases).
-````
+:::
 
-````{tabbed} Linux
+:::{tab-item} Linux
 To use `curl`, on the command line, run the following:
 
 ```{prompt} bash $
@@ -93,9 +94,9 @@ curl -sL https://ctl.flyte.org/install | sudo bash -s -- -b /usr/local/bin
 ```
 
 To download manually, see the [flytectl releases](https://github.com/flyteorg/flytectl/releases).
-````
+:::
 
-````{tabbed} Windows
+:::{tab-item} Windows
 To use `curl`, in a Linux shell (such as [WSL](https://learn.microsoft.com/en-us/windows/wsl/install)), on the command line, run the following:
 
 ```{prompt} bash $
@@ -103,7 +104,8 @@ curl -sL https://ctl.flyte.org/install | sudo bash -s -- -b /usr/local/bin
 ```
 
 To download manually, see the [flytectl releases](https://github.com/flyteorg/flytectl/releases).
-````
+:::
+::::
 
 ### Steps
 

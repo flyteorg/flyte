@@ -154,38 +154,6 @@ func (_m *TaskExecutionContext) InputReader() io.InputReader {
 	return r0
 }
 
-type TaskExecutionContext_MaxDatasetSizeBytes struct {
-	*mock.Call
-}
-
-func (_m TaskExecutionContext_MaxDatasetSizeBytes) Return(_a0 int64) *TaskExecutionContext_MaxDatasetSizeBytes {
-	return &TaskExecutionContext_MaxDatasetSizeBytes{Call: _m.Call.Return(_a0)}
-}
-
-func (_m *TaskExecutionContext) OnMaxDatasetSizeBytes() *TaskExecutionContext_MaxDatasetSizeBytes {
-	c_call := _m.On("MaxDatasetSizeBytes")
-	return &TaskExecutionContext_MaxDatasetSizeBytes{Call: c_call}
-}
-
-func (_m *TaskExecutionContext) OnMaxDatasetSizeBytesMatch(matchers ...interface{}) *TaskExecutionContext_MaxDatasetSizeBytes {
-	c_call := _m.On("MaxDatasetSizeBytes", matchers...)
-	return &TaskExecutionContext_MaxDatasetSizeBytes{Call: c_call}
-}
-
-// MaxDatasetSizeBytes provides a mock function with given fields:
-func (_m *TaskExecutionContext) MaxDatasetSizeBytes() int64 {
-	ret := _m.Called()
-
-	var r0 int64
-	if rf, ok := ret.Get(0).(func() int64); ok {
-		r0 = rf()
-	} else {
-		r0 = ret.Get(0).(int64)
-	}
-
-	return r0
-}
-
 type TaskExecutionContext_OutputWriter struct {
 	*mock.Call
 }

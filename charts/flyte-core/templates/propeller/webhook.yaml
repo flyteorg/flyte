@@ -39,6 +39,9 @@ spec:
       securityContext: {{ tpl (toYaml .) $ | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ template "flyte-pod-webhook.name" . }}
+      {{- if .Values.webhook.priorityClassName }}
+      priorityClassName: {{ .Values.webhook.priorityClassName }}
+      {{- end }}
 {{- if .Values.webhook.enabled }}
       initContainers:
       - name: generate-secrets

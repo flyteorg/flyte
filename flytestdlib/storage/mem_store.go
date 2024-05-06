@@ -19,9 +19,10 @@ type InMemoryStore struct {
 }
 
 type MemoryMetadata struct {
-	exists bool
-	size   int64
-	etag   string
+	exists     bool
+	size       int64
+	etag       string
+	contentMD5 string
 }
 
 func (m MemoryMetadata) Size() int64 {
@@ -34,6 +35,10 @@ func (m MemoryMetadata) Exists() bool {
 
 func (m MemoryMetadata) Etag() string {
 	return m.etag
+}
+
+func (m MemoryMetadata) ContentMD5() string {
+	return m.contentMD5
 }
 
 func (s *InMemoryStore) Head(ctx context.Context, reference DataReference) (Metadata, error) {

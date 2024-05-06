@@ -252,13 +252,17 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		arrayNodeState.Phase = v1alpha1.ArrayNodePhaseExecuting
 	case v1alpha1.ArrayNodePhaseExecuting:
 		// process array node subNodes
-		currentParallelism := int(arrayNode.GetParallelism())
-		if currentParallelism == 0 {
-			currentParallelism = len(arrayNodeState.SubNodePhases.GetItems())
-		}
+		remainingWorkflowParallelism := int(nCtx.ExecutionContext().GetExecutionConfig().MaxParallelism - nCtx.ExecutionContext().CurrentParallelism())
+		incrementWorkflowParallelism, maxParallelism := inferParallelism(ctx, arrayNode.GetParallelism(),
+			config.GetConfig().ArrayNode.DefaultParallelismBehavior, remainingWorkflowParallelism, len(arrayNodeState.SubNodePhases.GetItems()))
 
-		nodeExecutionRequests := make([]*nodeExecutionRequest, 0, currentParallelism)
+		nodeExecutionRequests := make([]*nodeExecutionRequest, 0, maxParallelism)
+		currentParallelism := 0
 		for i, nodePhaseUint64 := range arrayNodeState.SubNodePhases.GetItems() {
+			if currentParallelism >= maxParallelism {
+				break
+			}
+
 			nodePhase := v1alpha1.NodePhase(nodePhaseUint64)
 			taskPhase := int(arrayNodeState.SubNodeTaskPhases.GetItem(i))
 
@@ -298,11 +302,11 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 
 			// TODO - this is a naive implementation of parallelism, if we want to support more
 			// complex subNodes (ie. dynamics / subworkflows) we need to revisit this so that
-			// parallelism is handled during subNode evaluations.
-			currentParallelism--
-			if currentParallelism == 0 {
-				break
+			// parallelism is handled during subNode evaluations + avoid deadlocks
+			if incrementWorkflowParallelism {
+				nCtx.ExecutionContext().IncrementParallelism()
 			}
+			currentParallelism++
 		}
 
 		workerErrorCollector := errorcollector.NewErrorMessageCollector()
@@ -402,6 +406,12 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			// wait until all tasks have completed before declaring success
 			arrayNodeState.Phase = v1alpha1.ArrayNodePhaseSucceeding
 		}
+
+		// if incrementWorkflowParallelism is not set then we need to increment the parallelism by one
+		// to indicate that the overall ArrayNode is still running
+		if !incrementWorkflowParallelism && arrayNodeState.Phase == v1alpha1.ArrayNodePhaseExecuting {
+			nCtx.ExecutionContext().IncrementParallelism()
+		}
 	case v1alpha1.ArrayNodePhaseFailing:
 		if err := a.Abort(ctx, nCtx, "ArrayNodeFailing"); err != nil {
 			return handler.UnknownTransition, err
@@ -469,7 +479,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 				// checkpoint paths are not computed here because this function is only called when writing
 				// existing cached outputs. if this functionality changes this will need to be revisited.
 				outputPaths := ioutils.NewCheckpointRemoteFilePaths(ctx, nCtx.DataStore(), subOutputDir, ioutils.NewRawOutputPaths(ctx, subDataDir), "")
-				reader := ioutils.NewRemoteFileOutputReader(ctx, nCtx.DataStore(), outputPaths, nCtx.MaxDatasetSizeBytes())
+				reader := ioutils.NewRemoteFileOutputReader(ctx, nCtx.DataStore(), outputPaths, 0)
 
 				gatherOutputsRequest.reader = &reader
 				a.gatherOutputsRequestChannel <- gatherOutputsRequest
@@ -478,7 +488,39 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			gatherOutputsRequests = append(gatherOutputsRequests, gatherOutputsRequest)
 		}
 
+		// attempt best effort at initializing outputLiterals with output variable names. currently
+		// only TaskNode and WorkflowNode contain node interfaces.
 		outputLiterals := make(map[string]*idlcore.Literal)
+
+		switch arrayNode.GetSubNodeSpec().GetKind() {
+		case v1alpha1.NodeKindTask:
+			taskID := *arrayNode.GetSubNodeSpec().TaskRef
+			taskNode, err := nCtx.ExecutionContext().GetTask(taskID)
+			if err != nil {
+				return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(idlcore.ExecutionError_SYSTEM,
+					errors.BadSpecificationError, fmt.Sprintf("failed to find ArrayNode subNode task with id: '%s'", taskID), nil)), nil
+			}
+
+			if outputs := taskNode.CoreTask().GetInterface().GetOutputs(); outputs != nil {
+				for name := range outputs.Variables {
+					outputLiteral := &idlcore.Literal{
+						Value: &idlcore.Literal_Collection{
+							Collection: &idlcore.LiteralCollection{
+								Literals: make([]*idlcore.Literal, 0, len(arrayNodeState.SubNodePhases.GetItems())),
+							},
+						},
+					}
+
+					outputLiterals[name] = outputLiteral
+				}
+			}
+		case v1alpha1.NodeKindWorkflow:
+			// TODO - to support launchplans we will need to process the output interface variables here
+			fallthrough
+		default:
+			logger.Warnf(ctx, "ArrayNode does not support pre-populating outputLiteral collections for node kind '%s'", arrayNode.GetSubNodeSpec().GetKind())
+		}
+
 		workerErrorCollector := errorcollector.NewErrorMessageCollector()
 		for i, gatherOutputsRequest := range gatherOutputsRequests {
 			outputResponse := <-gatherOutputsRequest.responseChannel

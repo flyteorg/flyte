@@ -507,14 +507,20 @@ export class ArrayNode extends Message<ArrayNode> {
   node?: Node;
 
   /**
-   * parallelism defines the minimum number of instances to bring up concurrently at any given
-   * point. Note that this is an optimistic restriction and that, due to network partitioning or
-   * other failures, the actual number of currently running instances might be more. This has to
-   * be a positive number if assigned. Default value is size.
-   *
-   * @generated from field: uint32 parallelism = 2;
+   * @generated from oneof flyteidl.core.ArrayNode.parallelism_option
    */
-  parallelism = 0;
+  parallelismOption: {
+    /**
+     * parallelism defines the minimum number of instances to bring up concurrently at any given
+     * point. Note that this is an optimistic restriction and that, due to network partitioning or
+     * other failures, the actual number of currently running instances might be more. This has to
+     * be a positive number if assigned. Default value is size.
+     *
+     * @generated from field: uint32 parallelism = 2;
+     */
+    value: number;
+    case: "parallelism";
+  } | { case: undefined; value?: undefined } = { case: undefined };
 
   /**
    * @generated from oneof flyteidl.core.ArrayNode.success_criteria
@@ -550,7 +556,7 @@ export class ArrayNode extends Message<ArrayNode> {
   static readonly typeName = "flyteidl.core.ArrayNode";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "node", kind: "message", T: Node },
-    { no: 2, name: "parallelism", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 2, name: "parallelism", kind: "scalar", T: 13 /* ScalarType.UINT32 */, oneof: "parallelism_option" },
     { no: 3, name: "min_successes", kind: "scalar", T: 13 /* ScalarType.UINT32 */, oneof: "success_criteria" },
     { no: 4, name: "min_success_ratio", kind: "scalar", T: 2 /* ScalarType.FLOAT */, oneof: "success_criteria" },
   ]);

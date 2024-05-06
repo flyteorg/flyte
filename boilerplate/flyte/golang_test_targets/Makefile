@@ -6,11 +6,11 @@
 
 .PHONY: download_tooling
 download_tooling: #download dependencies (including test deps) for the package
-	@boilerplate/flyte/golang_test_targets/download_tooling.sh
+	@../boilerplate/flyte/golang_test_targets/download_tooling.sh
 
 .PHONY: generate
 generate: download_tooling #generate go code
-	@boilerplate/flyte/golang_test_targets/go-gen.sh
+	@../boilerplate/flyte/golang_test_targets/go-gen.sh
 
 .PHONY: lint
 lint: download_tooling #lints the package for common code smells
@@ -50,8 +50,11 @@ test_unit_cover:
 test_unit_visual:
 	go test ./... -coverprofile /tmp/cover.out -covermode=count
 	go tool cover -html=/tmp/cover.out
-	
+
 .PHONY: test_unit_codecov
 test_unit_codecov:
 	go test ./... -race -coverprofile=coverage.txt -covermode=atomic
-	curl -s https://codecov.io/bash > codecov_bash.sh && bash codecov_bash.sh
+
+.PHONY: go-tidy
+go-tidy:
+	go mod tidy

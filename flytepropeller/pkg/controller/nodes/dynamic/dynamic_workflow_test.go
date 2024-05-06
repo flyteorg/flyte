@@ -94,7 +94,6 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 		nCtx.OnInputReader().Return(ir)
 		nCtx.OnCurrentAttempt().Return(uint32(1))
 		nCtx.OnTaskReader().Return(tr)
-		nCtx.OnMaxDatasetSizeBytes().Return(int64(1))
 		nCtx.OnNodeID().Return("n1")
 		nCtx.OnEnqueueOwnerFunc().Return(func() error { return nil })
 		nCtx.OnDataStore().Return(dataStore)
@@ -583,6 +582,10 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 }
 
 type existsMetadata struct{}
+
+func (e existsMetadata) ContentMD5() string {
+	return ""
+}
 
 func (e existsMetadata) Exists() bool {
 	return false

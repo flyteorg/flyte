@@ -39,6 +39,10 @@ spec:
         ports:
         - containerPort: {{ .Values.ports.containerPort }}
           name: {{ .Values.ports.name }}
+        readinessProbe:
+        {{- with .Values.readinessProbe -}}
+          {{ tpl (toYaml .) $ | nindent 10 }}
+        {{- end }}
         securityContext:
           {{- toYaml .Values.securityContext | nindent 12 }}
         resources: {{- toYaml .Values.resources | nindent 10 }}

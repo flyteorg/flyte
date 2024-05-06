@@ -4,13 +4,13 @@ import (
 	"context"
 	"encoding/gob"
 	"fmt"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"time"
 
 	"golang.org/x/exp/maps"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	flyteIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	pluginErrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
@@ -38,6 +38,11 @@ type ResourceWrapper struct {
 	Outputs  *flyteIdl.LiteralMap
 	Message  string
 	LogLinks []*flyteIdl.TaskLog
+}
+
+// IsTerminal is used to avoid making network calls to the agent service if the resource is already in a terminal state.
+func (r ResourceWrapper) IsTerminal() bool {
+	return r.Phase == flyteIdl.TaskExecution_SUCCEEDED || r.Phase == flyteIdl.TaskExecution_FAILED || r.Phase == flyteIdl.TaskExecution_ABORTED
 }
 
 type ResourceMetaWrapper struct {
@@ -92,12 +97,11 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 	taskCategory := admin.TaskCategory{Name: taskTemplate.Type, Version: taskTemplate.TaskTypeVersion}
 	agent, isSync := getFinalAgent(&taskCategory, p.cfg, p.agentRegistry)
 
-	finalCtx, cancel := getFinalContext(ctx, "CreateTask", agent)
-	defer cancel()
-
 	taskExecutionMetadata := buildTaskExecutionMetadata(taskCtx.TaskExecutionMetadata())
 
 	if isSync {
+		finalCtx, cancel := getFinalContext(ctx, "ExecuteTaskSync", agent)
+		defer cancel()
 		client, err := p.getSyncAgentClient(ctx, agent)
 		if err != nil {
 			return nil, nil, err
@@ -105,6 +109,9 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 		header := &admin.CreateRequestHeader{Template: taskTemplate, OutputPrefix: outputPrefix, TaskExecutionMetadata: &taskExecutionMetadata}
 		return p.ExecuteTaskSync(finalCtx, client, header, inputs)
 	}
+
+	finalCtx, cancel := getFinalContext(ctx, "CreateTask", agent)
+	defer cancel()
 
 	// Use async agent client
 	client, err := p.getAsyncAgentClient(ctx, agent)
@@ -332,7 +339,7 @@ func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, outputs *fly
 		opReader = ioutils.NewInMemoryOutputReader(outputs, nil, nil)
 	} else {
 		logger.Debugf(ctx, "AgentDeployment didn't return any output, assuming file based outputs.")
-		opReader = ioutils.NewRemoteFileOutputReader(ctx, taskCtx.DataStore(), taskCtx.OutputWriter(), taskCtx.MaxDatasetSizeBytes())
+		opReader = ioutils.NewRemoteFileOutputReader(ctx, taskCtx.DataStore(), taskCtx.OutputWriter(), 0)
 	}
 	return taskCtx.OutputWriter().Put(ctx, opReader)
 }
@@ -347,6 +354,7 @@ func getFinalAgent(taskCategory *admin.TaskCategory, cfg *Config, agentRegistry 
 
 func buildTaskExecutionMetadata(taskExecutionMetadata core.TaskExecutionMetadata) admin.TaskExecutionMetadata {
 	taskExecutionID := taskExecutionMetadata.GetTaskExecutionID().GetID()
+
 	return admin.TaskExecutionMetadata{
 		TaskExecutionId:      &taskExecutionID,
 		Namespace:            taskExecutionMetadata.GetNamespace(),
@@ -354,6 +362,7 @@ func buildTaskExecutionMetadata(taskExecutionMetadata core.TaskExecutionMetadata
 		Annotations:          taskExecutionMetadata.GetAnnotations(),
 		K8SServiceAccount:    taskExecutionMetadata.GetK8sServiceAccount(),
 		EnvironmentVariables: taskExecutionMetadata.GetEnvironmentVariables(),
+		Identity:             taskExecutionMetadata.GetSecurityContext().RunAs,
 	}
 }
 
