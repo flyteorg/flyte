@@ -34,13 +34,7 @@ jobs:
       - name: Create Sandbox Cluster
         run: |
           flytectl config init
-          flytectl demo start --source=$(pwd) --image ghcr.io/${{ github.repository_owner }}/flyte-sandbox-bundled:latest
-      - name: Prime docker cache
-        run: |
-          flytectl demo exec -- docker load -i /root/snapshot-datacatalog.tar
-          flytectl demo exec -- docker load -i /root/snapshot-flyteadmin.tar
-          flytectl demo exec -- docker load -i /root/snapshot-flytecopilot.tar
-          flytectl demo exec -- docker load -i /root/snapshot-flytepropeller.tar
+          flytectl demo start --source=$(pwd) --image ghcr.io/${{ github.repository_owner }}/flyte-sandbox-bundled:latest --disable-agent
       - name: Setup Flytekit
         run: |
           python -m pip install --upgrade pip
