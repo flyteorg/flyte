@@ -7,10 +7,6 @@ on:
         description: "Priorities of tests to register (comma-separated)"
         required: true
         type: string
-      cache_key:
-        description: "Cache key for docker image"
-        required: true
-        type: string
 jobs:
   endtoend:
     name: End to End tests

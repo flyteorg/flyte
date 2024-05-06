@@ -78,16 +78,6 @@ jobs:
     with:
       component: ${{ matrix.component }}
 
-  endtoend:
-    name: End2End Test
-    needs: [ docker-build ]
-    if: ${{ github.event_name != 'pull_request' }}
-    uses: ./.github/workflows/end2end.yml
-    with:
-      # Reusing the output of the matrix is ok as they are essentially writing the same value (i.e. the directory artifacts are written + run id)
-      cache_key: ${{ needs.docker-build.outputs.cache_key }}
-      priorities: "P0"
-
   integration:
     name: Integration Test
     needs:
