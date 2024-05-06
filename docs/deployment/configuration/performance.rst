@@ -22,13 +22,12 @@ In the following sections you will learn how Flyte takes care of the correct and
 Summarized steps of a workflow execution
 ========================================
 
-Let's revisit the lifecycle of a workflow execution. The following diagram aims to summarize the process by focusing on the main steps. 
-More details can be found in the `FlytePropeller Architecture <https://docs.flyte.org/en/latest/concepts/component_architecture/flytepropeller_architecture.html>`__ and :ref:`divedeep-execution-timeline` sections.
+Let's revisit the lifecycle of a workflow execution. 
+The following diagram aims to summarize the process described in the `FlytePropeller Architecture <https://docs.flyte.org/en/latest/concepts/component_architecture/flytepropeller_architecture.html>`__ and :ref:`divedeep-execution-timeline` sections, focusing on the main steps. 
 
 .. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/configuration/perf_optimization/propeller-perf-lifecycle-01.png
 
-
-The following description is centered in the ``Worker``; the independent, lightweight and idempotent process that interacts with all the components in the Propeller controller to drive executions. 
+The ``Worker`` is the independent, lightweight and idempotent process that interacts with all the components in the Propeller controller to drive executions. 
 It's implemented as a ``goroutine``, and illustrated here as a hard-working gopher which:
 
 1. Pulls from the ``WorkQueue`` and loads what it needs to do the job: the workflow specification (desired state) and the previously recorded execution status.
@@ -40,8 +39,8 @@ It's implemented as a ``goroutine``, and illustrated here as a hard-working goph
 While there are multiple metrics that could indicate a slow down in execution performance, ``round_latency`` -or the time it takes FlytePropeller to perform a single iteration of workflow evaluation- is typically the "golden signal". 
 Optimizing ``round_latency`` is one of the main goals of the recommendations provided in the following sections.
 
-Optimizing performance at each stage
-------------------------------------
+Performance tuning at each stage
+--------------------------------
 
 1. Worker, the WorkQueue and the evaluation loop 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -49,7 +48,8 @@ Optimizing performance at each stage
 .. list-table:: Important Properties
    :widths: 25 50 25 50 25
    :header-rows: 1
-* - Property
+
+   * - Property
      - Description
      - Relevant metric
      - Impact on performance
@@ -58,13 +58,12 @@ Optimizing performance at each stage
      - Number of processes that can work concurrently. Also implies number of workflows that can be executed in parallel. Since FlytePropeller uses ``goroutines``, it can accommodate significantly more processes than the number of physical cores.
      - ``flyte:propeller:all:free_workers_count``: a low number may result in higher overall latency for each workflow evaluation round.
      - Larger the number, implies more workflows can be evaluated in parallel. But it should depend on number of CPU cores assigned to FlytePropeller and evaluated against the cost of context switching. A number around 500 - 800 with 4-8 CPU cores usually works fine.
-     - ``plugins.workqueue.config.workers`` (default: ``10``) 
+     - ``plugins.workqueue.config.workers`` Default value: ``10``. 
    * - Workqueue depth
-     - 
+     - Current number of workflow IDs in the queue awaiting processing
      - ``sum(rate(flyte:propeller:all:main_depth[5m]))``
-     - A growing trend indicates the processing queue depth is long and is taking longer to drain, delaying start time for executions
-     - ``plugins.workqueue.config.maxItems``
-     - 
+     - A growing trend indicates the processing queue depth is long and is taking longer to drain, delaying start time for executions.
+     - ``plugins.workqueue.config.maxItems``. Default value: ``10000``
 
 2. Query observed state
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -84,7 +83,7 @@ Increasing the ``qps`` and ``burst`` values may help alleviate back pressure and
 
 .. note::
 
-   In the previous configuration, the kube-apiserver will accept 100 queries before blocking any query. Every second, 25 more queries will be accepted. A query blocked for 30s will timeout.
+   In the previous configuration, the kube-apiserver will accept ``100`` queries before blocking any query. Every second, ``25`` more queries will be accepted. A query blocked for ``30s`` will timeout.
 
 It is worth noting that the Kube API server tends to throttle requests transparently. This means that even increasing the allowed frequency of API requests (e.g., increasing FlytePropeller workers or relaxing Kube client config rate-limiting), there may be steep performance decreases for no apparent reason. 
 While it's possible to easily monitor Kube API saturation using system-level metrics like CPU, memory and network usage; it's recommended to look at kube-apiserver-specific metrics like ``workqueue_depth`` which can assist in identifying whether throttling is to blame. Unfortunately, there is no one-size-fits-all solution here, and customizing these parameters for your workload will require trial and error.
@@ -96,7 +95,8 @@ While it's possible to easily monitor Kube API saturation using system-level met
 .. list-table:: Important Properties
    :widths: 25 50 25 50 25
    :header-rows: 1
-* - Property
+
+   * - Property
      - Description
      - Impact on performance
      - Configuration parameter
@@ -122,20 +122,59 @@ While it's possible to easily monitor Kube API saturation using system-level met
      - ``tasks.backoff.max-duration``. Default value: ``20s``.
 
 
-4. Record executions status
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+4. Update execution status
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. list-table:: Important Properties
    :widths: 25 50 25 50 25
    :header-rows: 1
-* - Property
+
+   * - Property
      - Description
      - Impact on performance
      - Configuration parameter
-   * - ``workflowStore.policy``
-     - propeller
-     - This config uses a trick in etcD to minimize number of redundant loops in FlytePropeller, thus improving free slots
-     - Use this to configure how FlytePropeller should evaluate workflows, the default is usually a good choice
+   * - ``workflowStore Policy``
+     - Specifies the strategy for workflow storage management.
+     - This config uses a trick in etcD to minimize number of redundant loops in FlytePropeller, thus improving free slots.
+     - ``propeller.workflowStore.policy``. Default value: ``ResourceVersionCache``.
+
+While the default value is generally preferred, a further explanation is needed so you can make informed decisions.
+
+Kubernetes stores the definition and state of all the resources under its management on ``etcd``, a fast, distributed and consistent key-value store.
+Every resource has a ``resourceVersion`` field representing the version of that resource as stored in ``etcd``. 
+
+Example:
+
+.. code:block:: bash
+
+   kubectl get datacatalog-589586b67f-l6v58 -n flyte -o yaml
+
+Sample ouput (excerpt):
+
+.. code:block:: yaml
+
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      annotations:
+        configChecksum: 8a85687bab6130de3ff20c16d72709b096e492afc6cf98bc5113cb2c34b7199
+      ...
+      labels:
+        app.kubernetes.io/instance: flyte-core
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: datacatalog
+        helm.sh/chart: flyte-core-v1.12.0
+      name: datacatalog-589586b67f-l6v58
+      namespace: flyte
+    ...
+      resourceVersion: "1055227"
+
+Every time a resource (e.g. a Pod, a flyteworkflow CR, etc.) is modified, this counter is incremented.
+As ``etcd`` is a key-value store, it needs a way to manage writes from multiple clients (controllers in this case) and doing so
+in a way that maintains consistency and performance.
+That's why, in addition to using ``Revisions`` (implemented in Kubernetes as ``Resource Version``)
+
+
 
 
 5. Report status to the control plane
