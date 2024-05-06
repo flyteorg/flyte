@@ -64,19 +64,6 @@ jobs:
       go-version: ${{ needs.unpack-envvars.outputs.go-version }}
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-  docker-build:
-    strategy:
-      fail-fast: false
-      matrix:
-        component:
-          - datacatalog
-          - flyteadmin
-          - flytecopilot
-          - flytepropeller
-    name: Docker Build Images
-    uses: ./.github/workflows/component_docker_build.yml
-    with:
-      component: ${{ matrix.component }}
 
   # TODO(monorepo): these tests are broken. They never test an actual change.
   # endtoend:
