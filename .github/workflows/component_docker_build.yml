@@ -43,6 +43,7 @@ jobs:
         run: |
           docker build -t ${{ github.repository_owner }}/${{ inputs.component }}:builder --target builder --cache-from=${{ github.repository_owner }}/${{ inputs.component }}:builder --file Dockerfile.${{ inputs.component }} .
           docker build -t ${{ github.repository_owner }}/${{ inputs.component }}:latest --cache-from=${{ github.repository_owner }}/${{ inputs.component }}:builder --file Dockerfile.${{ inputs.component }} .
+
       - name: Tag and cache docker image
         run: |
           mkdir -p /tmp/tmp/docker-images-${{ inputs.component }} && docker save ${{ github.repository_owner }}/${{ inputs.component }}:builder -o /tmp/tmp/docker-images-${{ inputs.component }}/snapshot-builder-${{ inputs.component }}.tar && docker save ${{ github.repository_owner }}/${{ inputs.component }}:latest -o /tmp/tmp/docker-images-${{ inputs.component }}/snapshot-${{ inputs.component }}.tar
