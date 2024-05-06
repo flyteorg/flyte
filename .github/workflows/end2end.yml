@@ -18,6 +18,7 @@ jobs:
     env:
       FLYTESNACKS_VERSION: ""
     steps:
+      - uses: insightsengineering/disk-space-reclaimer@v1
       - name: Set latest Flytesnacks release
         if: ${{ env.FLYTESNACKS_VERSION == '' }}
         run: |
