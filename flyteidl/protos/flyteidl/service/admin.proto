@@ -273,6 +273,7 @@ service AdminService {
       put: "/api/v1/launch_plans/{id.project}/{id.domain}/{id.name}/{id.version}"
       additional_bindings {
         put: "/api/v1/org/launch_plans/{id.org}/{id.project}/{id.domain}/{id.name}/{id.version}"
+        body: "*"
       }
       body: "*"
     };

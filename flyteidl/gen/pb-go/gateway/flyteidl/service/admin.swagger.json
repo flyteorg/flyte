@@ -4206,31 +4206,12 @@
             "type": "string"
           },
           {
-            "name": "id.resource_type",
-            "description": "Identifies the specific type of resource that this identifier corresponds to.\n\n - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects.\nEventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects \nin a similar manner to other Flyte objects",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "enum": [
-              "UNSPECIFIED",
-              "TASK",
-              "WORKFLOW",
-              "LAUNCH_PLAN",
-              "DATASET"
-            ],
-            "default": "UNSPECIFIED"
-          },
-          {
-            "name": "state",
-            "description": "Desired state to apply to the launch plan.\n+required.",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "enum": [
-              "INACTIVE",
-              "ACTIVE"
-            ],
-            "default": "INACTIVE"
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AdminServiceUpdateLaunchPlanBody"
+            }
           }
         ],
         "tags": [
@@ -8926,10 +8907,6 @@
             "resource_type": {
               "$ref": "#/definitions/coreResourceType",
               "description": "Identifies the specific type of resource that this identifier corresponds to."
-            },
-            "org": {
-              "type": "string",
-              "description": "Optional, org key applied to the resource."
             }
           },
           "description": "Identifier of launch plan for which to change state.\n+required.",
