@@ -64,34 +64,19 @@ jobs:
       go-version: ${{ needs.unpack-envvars.outputs.go-version }}
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-  docker-build:
+
+  flyteadmin-int-tests-image-build:
     strategy:
       fail-fast: false
-      matrix:
-        component:
-          - datacatalog
-          - flyteadmin
-          - flytecopilot
-          - flytepropeller
-    name: Docker Build Images
+    name: flyteadmin integration tests image 
     uses: ./.github/workflows/component_docker_build.yml
     with:
-      component: ${{ matrix.component }}
+      component: flyteadmin
 
-  # TODO(monorepo): these tests are broken. They never test an actual change.
-  # endtoend:
-  #   name: End2End Test
-  #   needs: [ docker-build ]
-  #   uses: ./.github/workflows/end2end.yml
-  #   with:
-  #     # Reusing the output of the matrix is ok as they are essentially writing the same value (i.e. the directory artifacts are written + run id)
-  #     cache_key: ${{ needs.docker-build.outputs.cache_key }}
-  #     priorities: "P0"
-
-  integration:
+  flyteadmin-integration-tests:
     name: Integration Test
     needs:
-      - docker-build
+      - flyteadmin-int-tests-image-build
       - unpack-envvars
     strategy:
       fail-fast: false
@@ -101,7 +86,7 @@ jobs:
     uses: ./.github/workflows/integration.yml
     with:
       component: ${{ matrix.component }}
-      cache_key: ${{ needs.docker-build.outputs.cache_key }}
+      cache_key: ${{ needs.flyteadmin-int-tests-image-build.outputs.cache_key }}
       go-version: ${{ needs.unpack-envvars.outputs.go-version }}
 
   generate:
@@ -123,3 +108,12 @@ jobs:
       go-version: ${{ needs.unpack-envvars.outputs.go-version }}
     secrets:
       FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
+
+  build_docker_images:
+    name: Build Images
+    uses: ./.github/workflows/publish-images.yml
+    with:
+      push: false
+    secrets:
+      FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
+      FLYTE_BOT_USERNAME: ${{ secrets.FLYTE_BOT_USERNAME }}
