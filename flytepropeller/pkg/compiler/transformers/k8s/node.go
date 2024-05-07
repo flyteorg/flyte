@@ -15,7 +15,6 @@ import (
 
 // Gets the compiled subgraph if this node contains an inline-declared coreWorkflow. Otherwise nil.
 func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.CompileErrors) ([]*v1alpha1.NodeSpec, bool) {
-	logger.Errorf(context.Background(), "Entering Node Spec!!!!!!!!")
 	if n == nil {
 		errs.Collect(errors.NewValueRequiredErr("root", "node"))
 		return nil, !errs.HasErrors()
