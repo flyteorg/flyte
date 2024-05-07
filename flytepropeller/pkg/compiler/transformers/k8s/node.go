@@ -1,8 +1,6 @@
 package k8s
 
 import (
-	"context"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"strings"
 
 	"github.com/go-test/deep"

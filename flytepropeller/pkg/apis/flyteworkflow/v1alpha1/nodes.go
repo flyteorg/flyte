@@ -117,7 +117,6 @@ func (in *ExtendedResources) DeepCopyInto(out *ExtendedResources) {
 	// Once we figure out the autogenerate story we can replace this
 }
 
-//go:generate mockery -name ExecutableNode -output=mocks
 type NodeSpec struct {
 	ID            NodeID                        `json:"id"`
 	Name          string                        `json:"name,omitempty"`

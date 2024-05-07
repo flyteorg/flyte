@@ -50,7 +50,6 @@ func newTaskExecutionMetadata(tCtx pluginsCore.TaskExecutionMetadata, taskTmpl *
 	var err error
 	secretsMap := make(map[string]string)
 	injectLabels := make(map[string]string)
-	// TODO: Why it couldn't get anything???
 	if tCtx.GetOverrides().GetOverrideSecurityContext() != nil {
 		if len(tCtx.GetOverrides().GetOverrideSecurityContext().GetSecrets()) > 0 {
 			secretsMap, err = secrets.MarshalSecretsToMapStrings(tCtx.GetOverrides().GetOverrideSecurityContext().GetSecrets())
