@@ -7,11 +7,9 @@ toolchain go1.21.3
 require (
 	github.com/flyteorg/flyte/flytestdlib v0.0.0-00010101000000-000000000000
 	github.com/go-test/deep v1.0.7
-	github.com/golang/glog v1.1.2
 	github.com/golang/protobuf v1.5.3
 	github.com/grpc-ecosystem/go-grpc-middleware v1.1.0
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
-	github.com/grpc-ecosystem/grpc-gateway v1.16.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.19.0
 	github.com/jinzhu/copier v0.3.5
 	github.com/mitchellh/mapstructure v1.5.0
@@ -19,13 +17,13 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.8.4
-	golang.org/x/net v0.20.0
+	golang.org/x/net v0.24.0
 	golang.org/x/oauth2 v0.15.0
-	google.golang.org/api v0.149.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20240102182953-50ed04b92917
 	google.golang.org/grpc v1.61.1
 	google.golang.org/protobuf v1.32.0
 	k8s.io/apimachinery v0.28.2
+	k8s.io/client-go v0.28.1
 )
 
 require (
@@ -98,13 +96,14 @@ require (
 	go.opentelemetry.io/otel/sdk v1.24.0 // indirect
 	go.opentelemetry.io/otel/trace v1.24.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.1.0 // indirect
-	golang.org/x/crypto v0.18.0 // indirect
+	golang.org/x/crypto v0.22.0 // indirect
 	golang.org/x/exp v0.0.0-20220722155223-a9213eeb770e // indirect
-	golang.org/x/sync v0.5.0 // indirect
-	golang.org/x/sys v0.17.0 // indirect
-	golang.org/x/term v0.16.0 // indirect
+	golang.org/x/sync v0.7.0 // indirect
+	golang.org/x/sys v0.19.0 // indirect
+	golang.org/x/term v0.19.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
+	google.golang.org/api v0.149.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
 	google.golang.org/genproto v0.0.0-20231212172506-995d672761c0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240102182953-50ed04b92917 // indirect
@@ -112,7 +111,6 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	k8s.io/api v0.28.2 // indirect
-	k8s.io/client-go v0.28.1 // indirect
 	k8s.io/klog/v2 v2.100.1 // indirect
 	k8s.io/kube-openapi v0.0.0-20230717233707-2695361300d9 // indirect
 	k8s.io/utils v0.0.0-20230406110748-d93618cff8a2 // indirect
