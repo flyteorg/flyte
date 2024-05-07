@@ -138,7 +138,9 @@ While it's possible to easily monitor Kube API saturation using system-level met
      - This config uses a trick in etcD to minimize number of redundant loops in FlytePropeller, thus improving free slots.
      - ``propeller.workflowStore.policy``. Default value: ``ResourceVersionCache``.
 
-While the default value is generally preferred, a further explanation is needed so you can make informed decisions.
+While the default value is generally the best option, a further explanation is needed so you can make informed decisions.
+
+**ResourceVersionCache**
 
 Kubernetes stores the definition and state of all the resources under its management on ``etcd``, a fast, distributed and consistent key-value store.
 Every resource has a ``resourceVersion`` field representing the version of that resource as stored in ``etcd``. 
@@ -170,9 +172,20 @@ Sample ouput (excerpt):
       resourceVersion: "1055227"
 
 Every time a resource (e.g. a Pod, a flyteworkflow CR, etc.) is modified, this counter is incremented.
-As ``etcd`` is a key-value store, it needs a way to manage writes from multiple clients (controllers in this case) and doing so
+As ``etcd`` is a distributed key-value store, it needs a way to manage writes from multiple clients (controllers in this case) and doing so
 in a way that maintains consistency and performance.
-That's why, in addition to using ``Revisions`` (implemented in Kubernetes as ``Resource Version``)
+That's why, in addition to using ``Revisions`` (implemented in Kubernetes as ``Resource Version``), ``etcd`` also prevents clients from writing if they're using
+an outdated ``ResourceVersion``; something that could happen after a temporary client disconnection or whenever a status replication from the Kubernetes API to 
+the Informer cache hasn't completed yet. Poorly handled by a controller, this could result into kube-server and FlytePropeller worker overload by repeatedly attempting to complete outdated (or "stale") writes.
+
+FlytePropeller handles these situations by keeping a record of the last known ``ResourceVersion``. In the event that ``etcd`` denies a write operation due to an outdated version, FlytePropeller continues the Workflow
+evaluation loop, waiting for the Informer cache to become consistent. This mechanism, enabled by default and known as ``ResourceVersionCache``, prevents from both overloading the K8s API and wasting ``workers`` resources on invalid operations.
+
+If ``max-streak-length`` is enabled, instead of waiting for the Informer cache to become consistent during the evaluation loop, FlytePropeller runs multiple evaluation loops using its in-memory copy of the ``ResourceVersion`` and corresponding Resource state, as long 
+as there are mutations in any of the resources associated with a particular workflow. When the ``max-streak-length`` limit is reached, the evaluation loop is completed and, if further evaluation is required, the cycle will start again by trying to get the most recent ``Resource Version`` as stored in ``etcd``.
+
+
+a. 
 
 
 
@@ -211,17 +224,6 @@ In the above table the 2 most important configs are ``workers`` and ``kube-clien
 Another area of slowdown could be the size of the input-output cache that FlytePropeller maintains in-memory. This can be configured, while configuring
 the storage for FlytePropeller. Rule of thumb, for FlytePropeller with x memory limit, allocate x/2 to the cache
 
-Learn: max-streak-length & ResourceVersionCaching
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Kubernetes controllers often use Informer caches, rather than reading data directly from KubeAPI. This is to prevent excessive requests to KubeAPI server. The caches are eventually consistent, i.e., every write by the controller is eventually replicated to the cache, but there can be time periods, when the cache lags.
-Since FlytePropeller, runs Workflow evaluations as an event loop, which is triggered by any changes to one of the resources that a workflow spawned.
-It is possible that a Workflow will be evaluated, even when the last write has not yet propagated to the Informer cache. EtcD also does not allow stale writes, i.e., writes with an object that is older than the object that was written. This is maintained using a server side vector-clock - called the resource version.
-Stale writes are writes when the evaluation resulted in a mutation of an object that is older than the object recorded in etcD.
-These stale writes often lead to conflicts and hence increase load on the KubeAPI server and on FlytePropeller as the workers are busy writing stale objects repeatedly.
-
-To prevent this duplication and redundancy, FlytePropeller employs a trick. For every write, it records the last known version number in the database and then tries to wait for the change to propagate to the informer cache.
-
-If `max-streaks` are enabled then instead of waiting for the informer cache to be refreshed, FlytePropeller uses its own inmemory copy to run multiple rounds as long as mutations occur or the max-streak-length configuration is met. This reduces the latency of cache propagation, which can be order of seconds.
 
 Worst case workflows: Poison Pills & max-parallelism
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
