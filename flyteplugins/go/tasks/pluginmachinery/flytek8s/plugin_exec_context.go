@@ -31,6 +31,10 @@ func (to *pluginTaskOverrides) GetContainerImage() string {
 	return to.TaskOverrides.GetContainerImage()
 }
 
+func (to *pluginTaskOverrides) GetOverrideSecurityContext() *core.SecurityContext {
+	return to.TaskOverrides.GetOverrideSecurityContext()
+}
+
 type pluginTaskExecutionMetadata struct {
 	pluginsCore.TaskExecutionMetadata
 	interruptible *bool

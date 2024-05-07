@@ -117,6 +117,7 @@ func (in *ExtendedResources) DeepCopyInto(out *ExtendedResources) {
 	// Once we figure out the autogenerate story we can replace this
 }
 
+//go:generate mockery -name ExecutableNode -output=mocks
 type NodeSpec struct {
 	ID            NodeID                        `json:"id"`
 	Name          string                        `json:"name,omitempty"`
@@ -177,6 +178,8 @@ type NodeSpec struct {
 	Interruptible *bool `json:"interruptible,omitempty"`
 
 	ContainerImage string `json:"containerImage,omitempty"`
+
+	OverrideSecurityContext *core.SecurityContext `json:"overrideSecurityContext,omitempty" protobuf:"bytes,27,opt,name=overrideSecurityContext"`
 }
 
 func (in *NodeSpec) GetName() string {
@@ -278,4 +281,8 @@ func (in *NodeSpec) GetInputBindings() []*Binding {
 
 func (in *NodeSpec) GetContainerImage() string {
 	return in.ContainerImage
+}
+
+func (in *NodeSpec) GetOverrideSecurityContext() *core.SecurityContext {
+	return in.OverrideSecurityContext
 }

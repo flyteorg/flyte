@@ -452,6 +452,40 @@ func (_m *ExecutableNode) GetOutputAlias() []v1alpha1.Alias {
 	return r0
 }
 
+type ExecutableNode_GetOverrideSecurityContext struct {
+	*mock.Call
+}
+
+func (_m ExecutableNode_GetOverrideSecurityContext) Return(_a0 *core.SecurityContext) *ExecutableNode_GetOverrideSecurityContext {
+	return &ExecutableNode_GetOverrideSecurityContext{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutableNode) OnGetOverrideSecurityContext() *ExecutableNode_GetOverrideSecurityContext {
+	c_call := _m.On("GetOverrideSecurityContext")
+	return &ExecutableNode_GetOverrideSecurityContext{Call: c_call}
+}
+
+func (_m *ExecutableNode) OnGetOverrideSecurityContextMatch(matchers ...interface{}) *ExecutableNode_GetOverrideSecurityContext {
+	c_call := _m.On("GetOverrideSecurityContext", matchers...)
+	return &ExecutableNode_GetOverrideSecurityContext{Call: c_call}
+}
+
+// GetOverrideSecurityContext provides a mock function with given fields:
+func (_m *ExecutableNode) GetOverrideSecurityContext() *core.SecurityContext {
+	ret := _m.Called()
+
+	var r0 *core.SecurityContext
+	if rf, ok := ret.Get(0).(func() *core.SecurityContext); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*core.SecurityContext)
+		}
+	}
+
+	return r0
+}
+
 type ExecutableNode_GetResources struct {
 	*mock.Call
 }

@@ -5066,6 +5066,9 @@ export namespace flyteidl {
 
             /** TaskNodeOverrides containerImage */
             containerImage?: (string|null);
+
+            /** TaskNodeOverrides overrideSecurityContext */
+            overrideSecurityContext?: (flyteidl.core.ISecurityContext|null);
         }
 
         /** Represents a TaskNodeOverrides. */
@@ -5085,6 +5088,9 @@ export namespace flyteidl {
 
             /** TaskNodeOverrides containerImage. */
             public containerImage: string;
+
+            /** TaskNodeOverrides overrideSecurityContext. */
+            public overrideSecurityContext?: (flyteidl.core.ISecurityContext|null);
 
             /**
              * Creates a new TaskNodeOverrides instance using the specified properties.

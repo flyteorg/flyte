@@ -9,10 +9,13 @@ import (
 )
 
 // TaskOverrides interface to expose any overrides that have been set for this task (like resource overrides etc)
+//
+//go:generate mockery -name TaskOverrides -case underscore
 type TaskOverrides interface {
 	GetResources() *v1.ResourceRequirements
 	GetExtendedResources() *core.ExtendedResources
 	GetContainerImage() string
+	GetOverrideSecurityContext() *core.SecurityContext
 	GetConfig() *v1.ConfigMap
 }
 

@@ -2665,6 +2665,9 @@ pub struct TaskNodeOverrides {
     /// Override for the image used by task pods.
     #[prost(string, tag="3")]
     pub container_image: ::prost::alloc::string::String,
+    /// Override for the security context of the task pod.
+    #[prost(message, optional, tag="4")]
+    pub override_security_context: ::core::option::Option<SecurityContext>,
 }
 /// A structure that uniquely identifies a launch plan in the system.
 #[allow(clippy::derive_partial_eq_without_eq)]

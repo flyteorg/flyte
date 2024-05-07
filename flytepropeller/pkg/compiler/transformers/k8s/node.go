@@ -1,6 +1,8 @@
 package k8s
 
 import (
+	"context"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"strings"
 
 	"github.com/go-test/deep"
@@ -15,6 +17,7 @@ import (
 
 // Gets the compiled subgraph if this node contains an inline-declared coreWorkflow. Otherwise nil.
 func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.CompileErrors) ([]*v1alpha1.NodeSpec, bool) {
+	logger.Errorf(context.Background(), "Entering Node Spec!!!!!!!!")
 	if n == nil {
 		errs.Collect(errors.NewValueRequiredErr("root", "node"))
 		return nil, !errs.HasErrors()
@@ -31,6 +34,7 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 	var resources *core.Resources
 	var extendedResources *v1alpha1.ExtendedResources
 	var containerImage string
+	var overrideSecurityContext *core.SecurityContext
 	if n.GetTaskNode() != nil {
 		taskID := n.GetTaskNode().GetReferenceId().String()
 		// TODO: Use task index for quick lookup
@@ -59,6 +63,10 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 
 			if len(overrides.GetContainerImage()) > 0 {
 				containerImage = overrides.GetContainerImage()
+			}
+
+			if overrides.GetOverrideSecurityContext() != nil {
+				overrideSecurityContext = overrides.GetOverrideSecurityContext()
 			}
 		}
 	}
@@ -91,17 +99,18 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 	}
 
 	nodeSpec := &v1alpha1.NodeSpec{
-		ID:                n.GetId(),
-		Name:              name,
-		RetryStrategy:     computeRetryStrategy(n, task),
-		ExecutionDeadline: timeout,
-		Resources:         res,
-		ExtendedResources: extendedResources,
-		OutputAliases:     toAliasValueArray(n.GetOutputAliases()),
-		InputBindings:     toBindingValueArray(n.GetInputs()),
-		ActiveDeadline:    activeDeadline,
-		Interruptible:     interruptible,
-		ContainerImage:    containerImage,
+		ID:                      n.GetId(),
+		Name:                    name,
+		RetryStrategy:           computeRetryStrategy(n, task),
+		ExecutionDeadline:       timeout,
+		Resources:               res,
+		ExtendedResources:       extendedResources,
+		OutputAliases:           toAliasValueArray(n.GetOutputAliases()),
+		InputBindings:           toBindingValueArray(n.GetInputs()),
+		ActiveDeadline:          activeDeadline,
+		Interruptible:           interruptible,
+		ContainerImage:          containerImage,
+		OverrideSecurityContext: overrideSecurityContext,
 	}
 
 	switch v := n.GetTarget().(type) {

@@ -12276,6 +12276,7 @@
                  * @property {flyteidl.core.IResources|null} [resources] TaskNodeOverrides resources
                  * @property {flyteidl.core.IExtendedResources|null} [extendedResources] TaskNodeOverrides extendedResources
                  * @property {string|null} [containerImage] TaskNodeOverrides containerImage
+                 * @property {flyteidl.core.ISecurityContext|null} [overrideSecurityContext] TaskNodeOverrides overrideSecurityContext
                  */
     
                 /**
@@ -12318,6 +12319,14 @@
                 TaskNodeOverrides.prototype.containerImage = "";
     
                 /**
+                 * TaskNodeOverrides overrideSecurityContext.
+                 * @member {flyteidl.core.ISecurityContext|null|undefined} overrideSecurityContext
+                 * @memberof flyteidl.core.TaskNodeOverrides
+                 * @instance
+                 */
+                TaskNodeOverrides.prototype.overrideSecurityContext = null;
+    
+                /**
                  * Creates a new TaskNodeOverrides instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.core.TaskNodeOverrides
@@ -12347,6 +12356,8 @@
                         $root.flyteidl.core.ExtendedResources.encode(message.extendedResources, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
                     if (message.containerImage != null && message.hasOwnProperty("containerImage"))
                         writer.uint32(/* id 3, wireType 2 =*/26).string(message.containerImage);
+                    if (message.overrideSecurityContext != null && message.hasOwnProperty("overrideSecurityContext"))
+                        $root.flyteidl.core.SecurityContext.encode(message.overrideSecurityContext, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
                     return writer;
                 };
     
@@ -12376,6 +12387,9 @@
                             break;
                         case 3:
                             message.containerImage = reader.string();
+                            break;
+                        case 4:
+                            message.overrideSecurityContext = $root.flyteidl.core.SecurityContext.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -12409,6 +12423,11 @@
                     if (message.containerImage != null && message.hasOwnProperty("containerImage"))
                         if (!$util.isString(message.containerImage))
                             return "containerImage: string expected";
+                    if (message.overrideSecurityContext != null && message.hasOwnProperty("overrideSecurityContext")) {
+                        var error = $root.flyteidl.core.SecurityContext.verify(message.overrideSecurityContext);
+                        if (error)
+                            return "overrideSecurityContext." + error;
+                    }
                     return null;
                 };
     
