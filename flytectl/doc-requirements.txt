@@ -25,7 +25,7 @@ docutils==0.17.1
     #   sphinx-panels
 furo @ git+https://github.com/flyteorg/furo@main
     # via -r doc-requirements.in
-idna==3.6
+idna==3.7
     # via requests
 imagesize==1.4.1
     # via sphinx
@@ -109,4 +109,3 @@ urllib3==2.1.0
     # via requests
 zipp==3.17.0
     # via importlib-metadata
-setuptools>=65.5.1 # not directly required, pinned by Snyk to avoid a vulnerability
