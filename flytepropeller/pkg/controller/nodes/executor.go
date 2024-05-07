@@ -1476,6 +1476,7 @@ func NewExecutor(ctx context.Context, nodeConfig config.NodeConfig, store *stora
 		InterruptibleNodesRunning:      labeled.NewCounter("interruptible_nodes_running", "number of interruptible nodes running", nodeScope),
 		InterruptibleNodesTerminated:   labeled.NewCounter("interruptible_nodes_terminated", "number of interruptible nodes finished running", nodeScope),
 		ResolutionFailure:              labeled.NewCounter("input_resolve_fail", "Indicates failure in resolving node inputs", nodeScope),
+		acceleratedInputCount:          labeled.NewCounter("accelerated_input_count", "Number of accelerated inputs", nodeScope, labeled.EmitUnlabeledMetric),
 		TransitionLatency:              labeled.NewStopWatch("transition_latency", "Measures the latency between the last parent node stoppedAt time and current node's queued time.", time.Millisecond, nodeScope, labeled.EmitUnlabeledMetric),
 		QueuingLatency:                 labeled.NewStopWatch("queueing_latency", "Measures the latency between the time a node's been queued to the time the handler reported the executable moved to running state", time.Millisecond, nodeScope, labeled.EmitUnlabeledMetric),
 		NodeExecutionTime:              labeled.NewStopWatch("node_exec_latency", "Measures the time taken to execute one node, a node can be complex so it may encompass sub-node latency.", time.Microsecond, nodeScope, labeled.EmitUnlabeledMetric),
@@ -1490,7 +1491,6 @@ func NewExecutor(ctx context.Context, nodeConfig config.NodeConfig, store *stora
 		reservationGetSuccessCount:     labeled.NewCounter("reservation_get_success_count", "Reservation GetOrExtend success count", scope),
 		reservationReleaseFailureCount: labeled.NewCounter("reservation_release_failure_count", "Reservation Release failure count", scope),
 		reservationReleaseSuccessCount: labeled.NewCounter("reservation_release_success_count", "Reservation Release success count", scope),
-		acceleratedInputCount:          labeled.NewCounter("accelerated_input_count", "Number of accelerated inputs", scope),
 	}
 
 	nodeExecutor := &nodeExecutor{
