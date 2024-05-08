@@ -199,7 +199,6 @@ Other supported options for ``workflowStore.policy`` are described below:
    * - Property
      - Description
      - Impact on performance
-     - Configuration parameter
    * - ``admin-launcher.tps``, ``admin-launcher.cacheSize``, ``admin-launcher.workers`` 
      - Configure the maximum rate and number of launchplans that FlytePropeller can launch against FlyteAdmin.
      - It is important to limit the number of writes from FlytePropeller to FlyteAdmin to prevent brown-outs or request throttling at the server. Also a bigger cache size, reduces number of calls to the server.
