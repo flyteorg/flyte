@@ -83,7 +83,7 @@ Increasing the ``qps`` and ``burst`` values may help alleviate back pressure and
 
 .. note::
 
-   In the previous configuration, the kube-apiserver will accept ``100`` queries before blocking any query. Every second, ``25`` more queries will be accepted. A query blocked for ``30s`` will timeout.
+   In the previous example, the kube-apiserver will accept ``100`` queries before blocking any query. Every second, ``25`` more queries will be accepted. A query blocked for ``30s`` will timeout.
 
 It is worth noting that the Kube API server tends to throttle requests transparently. This means that even increasing the allowed frequency of API requests (e.g., increasing FlytePropeller workers or relaxing Kube client config rate-limiting), there may be steep performance decreases for no apparent reason. 
 While it's possible to easily monitor Kube API saturation using system-level metrics like CPU, memory and network usage; it's recommended to look at kube-apiserver-specific metrics like ``workqueue_depth`` which can assist in identifying whether throttling is to blame. Unfortunately, there is no one-size-fits-all solution here, and customizing these parameters for your workload will require trial and error.
@@ -110,7 +110,7 @@ While it's possible to easily monitor Kube API saturation using system-level met
      - ``propeller.downstream-eval-duration``. Default value: ``5s``.
    * - ``max-streak-length``
      -  Maximum number of consecutive evaluation rounds that one propeller worker can use for one workflow. 
-     -  A large ``max-streak-length`` value can lead to faster completion times for workflows that benefit from continuous processing, especially cached or computationally intensive workflows; at the cost of overall lower throughput and higher latency as workers would be spending most of their time on a few workflows. If set to `1`, the worker adds the workflowID back to the WorkQueue immediately after a single evaluation loop is completed and waits for another worker to pick it up before processing again, effectively prioritizing "hot workflows".
+     -  A large value can lead to faster completion times for workflows that benefit from continuous processing, especially cached or computationally intensive workflows, but at the cost of lower throughput and higher latency as workers would be spending most of their time on a few workflows. If set to ``1``, the worker adds the workflowID back to the WorkQueue immediately after a single evaluation loop is completed, and waits for another worker to pick it up before processing again, effectively prioritizing fast-changing or "hot" workflows.
      -  ``propeller.max-streak-length``. Default value: ``8`` . 
    * - ``max-size_mbs``
      - Max size of the write-through in-memory cache that FlytePropeller can use to store Inputs/Outputs metadata for faster read operations. 
@@ -147,13 +147,13 @@ Every resource has a ``resourceVersion`` field representing the version of that 
 
 Example:
 
-.. code:block:: bash
+.. code-block:: bash
 
    kubectl get datacatalog-589586b67f-l6v58 -n flyte -o yaml
 
 Sample output (excerpt):
 
-.. code:block:: yaml
+.. code-block:: yaml
 
     apiVersion: v1
     kind: Pod
@@ -189,7 +189,6 @@ Other supported options for ``workflowStore.policy`` are described below:
 - ``PassThrough``: directly interacts with the underlying Kubernetes clientset or shared informer cache for workflow operations.
 - ``TrackTerminated``: Specifically tracks terminated workflows.
 
-
 5. Report status to the control plane
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -200,27 +199,18 @@ Other supported options for ``workflowStore.policy`` are described below:
      - Description
      - Impact on performance
      - Configuration parameter
-   * - ``admin-launcher.tps``, ``admin-launcher.cacheSize``, ``admin-launcher.workers``
-     - propeller
-     - This config is used to configure the max rate and launch-plans that FlytePropeller can launch against FlyteAdmin
-     - It is essential to limit the number of writes from FlytePropeller to flyteadmin to prevent brown-outs or request throttling at the server. Also the cache reduces number of calls to the server.
-
-   
-
-   * - ``max-parallelism``
-     - admin, per workflow, per execution
-     - Refer to examples and documentation below
-     - docs below
-
-
+   * - ``admin-launcher.tps``, ``admin-launcher.cacheSize``, ``admin-launcher.workers`` 
+     - Configure the maximum rate and number of launchplans that FlytePropeller can launch against FlyteAdmin.
+     - It is important to limit the number of writes from FlytePropeller to FlyteAdmin to prevent brown-outs or request throttling at the server. Also a bigger cache size, reduces number of calls to the server.
 
 Concurrency vs parallelism
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-The worst case for FlytePropeller is workflows that have an extremely large fan-out. This is because FlytePropeller implements a greedy traversal algorithm, that tries to evaluate the entire unblocked nodes within a workflow in every round.
-A solution for this is to limit the maximum number of nodes that can be evaluated. This can be done by setting max-parallelism for an execution.
-This can done in multiple ways
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-#. Platform default: This allows to set platform-wide defaults for maximum concurrency within a Workflow execution. This can be overridden per Launch plan or per execution.
+While FlytePropeller is designed to handle concurrency efficiently, using the mechanisms described in this section; parallel executions -not only concurrent, but evaluated at the same time-, pose an additional challenge, especially with workflows that have an extremely large fan-out. 
+This is because FlytePropeller implements a greedy traversal algorithm, that tries to evaluate the entire unblocked nodes within a workflow in every round.
+A way to mitigate the potential performance impact is to limit the maximum number of nodes that can be evaluated simultaneously. This can be done by setting ``max-parallelism`` using any of the following methods:
+
+a. Platform default: This allows to set platform-wide defaults for maximum parallelism within a Workflow execution evaluation loop. This can be overridden per Launch plan or per execution.
    The default `maxParallelism is configured to be 25 <https://github.com/flyteorg/flyteadmin/blob/master/pkg/runtime/application_config_provider.go#L40>`_.
    It can be overridden with this config block in flyteadmin
 
@@ -229,7 +219,7 @@ This can done in multiple ways
        flyteadmin:
           maxParallelism: 25
 
-#. Default for a specific launch plan. For any launch plan, the maxParallelism value can be changed or altered. This can be done using :py:meth:`flytekit.LaunchPlan.get_or_create` or the :std:ref:`ref_flyteidl.admin.LaunchPlanCreateRequest`
+b. Default for a specific launch plan. For any launch plan, the ``max_parallelism`` value can be changed using :py:meth:`flytekit.LaunchPlan.get_or_create` or the :std:ref:`ref_flyteidl.admin.LaunchPlanCreateRequest`
    **Flytekit Example**
 
    .. code-block:: python
@@ -240,31 +230,26 @@ This can done in multiple ways
          max_parallelism=30,
        )
 
-#. Specify for an execution. For any specific execution the max-parallelism can be overridden. This can be done using flytectl (and soon flyteconsole). Refer to :std:ref:`flyteCtl docs <flytectl:flytectl_create_execution>`
-
-
+#. Specify for an execution. ``max-parallelism`` can be overridden using ``pyflyte run --max-parallelism`` or setting it in the UI.
 
 
 Scaling out FlyteAdmin
 =======================
-FlyteAdmin is a stateless service. Often time before needing to scale FlyteAdmin, you need to scale the backing database. Check out the FlyteAdmin Dashboard to see signs of latency degradation and increase the size of backing postgres instance.
-FlyteAdmin is a stateless service and its replicas (in the kubernetes deployment) can be simply increased to allow higher throughput.
+FlyteAdmin is a stateless service. Often time before needing to scale FlyteAdmin, you need to scale the backing database. 
+Check out the `FlyteAdmin Dashboard <https://github.com/flyteorg/flyte/blob/master/deployment/stats/prometheus/flyteadmin-dashboard.json>`__  to see signs of database or API latency degradation.
+PostgreSQL scaling techniques like connection pooling can help alleviate pressure on the database instance.
+If needed, change the number of replicas of the FlyteAdmin K8s deployment to allow higher throughput.
 
 Scaling out Datacatalog
 ========================
-Datacatalog is a stateless service. Often time before needing to scale Datacatalog, you need to scale the backing database. Check out the Datacatalog Dashboard to see signs of latency degradation and increase the size of backing postgres instance.
-Datacatalog is a stateless service and its replicas (in the kubernetes deployment) can be simply increased to allow higher throughput.
+Datacatalog is a stateless service and it connects to the same database as FlyteAdmin, so the recommendations to scale out the backing PostgreSQL database also apply here.
 
 Scaling out FlytePropeller
 ===========================
 
-Manual scale-out
-----------------
-FlytePropeller can be run manually per namespace. This is not a recommended solution as it is harder to deploy, but if your organization can deploy and maintain multiple copies of FlytePropeller, you can use this.
-
 Sharded scale-out
 -------------------
-FlytePropeller Manager is a new component introduced as part of `this RFC <https://github.com/flyteorg/flyte/blob/master/rfc/system/1483-flytepropeller-horizontal-scaling.md>`_ to facilitate horizontal scaling of FlytePropeller through sharding. Effectively, the Manager is responsible for maintaining liveness and proper configuration over a collection of FlytePropeller instances. This scheme uses k8s label selectors to deterministically assign FlyteWorkflow CRD responsibilities to FlytePropeller instances, effectively distributing processing load over the shards.
+FlytePropeller Manager is a new component introduced to facilitate horizontal scaling of FlytePropeller through sharding. Effectively, the Manager is responsible for maintaining liveness and proper configuration over a collection of FlytePropeller instances. This scheme uses K8s label selectors to deterministically assign FlyteWorkflow CRD responsibilities to FlytePropeller instances, effectively distributing processing load over the shards.
 
 Deployment of FlytePropeller Manager requires k8s configuration updates including a modified FlytePropeller Deployment and a new PodTemplate defining managed FlytePropeller instances. The easiest way to apply these updates is by setting the "flytepropeller.manager" value to "true" in the `helm deployment <https://docs.flyte.org/en/latest/deployment/overview.html#usage-of-helm>`_ and setting the manager config at "configmap.core.manager".
 
