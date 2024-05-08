@@ -166,3 +166,5 @@ There are many ways to get involved in Flyte, including:
 ## License
 
 Flyte is available under the Apache License 2.0. Use it wisely.
+
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=65df87cf-549c-4711-b01c-ee9e966c931c" />
