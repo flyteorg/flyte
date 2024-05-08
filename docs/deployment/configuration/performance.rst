@@ -193,7 +193,7 @@ Other supported options for ``workflowStore.policy`` are described below:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. list-table:: Important Properties
-   :widths: 25 50 25 50 25
+   :widths: 25 50 50
    :header-rows: 1
 
    * - Property
