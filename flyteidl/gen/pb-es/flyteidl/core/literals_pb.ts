@@ -254,6 +254,43 @@ export class Binary extends Message<Binary> {
 }
 
 /**
+ * @generated from message flyteidl.core.Json
+ */
+export class Json extends Message<Json> {
+  /**
+   * @generated from field: string value = 1;
+   */
+  value = "";
+
+  constructor(data?: PartialMessage<Json>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.core.Json";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "value", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Json {
+    return new Json().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Json {
+    return new Json().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Json {
+    return new Json().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: Json | PlainMessage<Json> | undefined, b: Json | PlainMessage<Json> | undefined): boolean {
+    return proto3.util.equals(Json, a, b);
+  }
+}
+
+/**
  * A strongly typed schema that defines the interface of data retrieved from the underlying storage medium.
  *
  * @generated from message flyteidl.core.Schema
@@ -495,6 +532,12 @@ export class Scalar extends Message<Scalar> {
      */
     value: Union;
     case: "union";
+  } | {
+    /**
+     * @generated from field: flyteidl.core.Json json = 10;
+     */
+    value: Json;
+    case: "json";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   constructor(data?: PartialMessage<Scalar>) {
@@ -514,6 +557,7 @@ export class Scalar extends Message<Scalar> {
     { no: 7, name: "generic", kind: "message", T: Struct, oneof: "value" },
     { no: 8, name: "structured_dataset", kind: "message", T: StructuredDataset, oneof: "value" },
     { no: 9, name: "union", kind: "message", T: Union, oneof: "value" },
+    { no: 10, name: "json", kind: "message", T: Json, oneof: "value" },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Scalar {
