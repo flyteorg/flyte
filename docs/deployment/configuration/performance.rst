@@ -42,8 +42,8 @@ Optimizing ``round_latency`` is one of the main goals of the recommendations pro
 Performance tuning at each stage
 --------------------------------
 
-1. Worker, the WorkQueue and the evaluation loop 
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+1. Workers, the WorkQueue and the evaluation loop 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. list-table:: Important Properties
    :widths: 25 50 25 50 25
@@ -56,8 +56,8 @@ Performance tuning at each stage
      - Configuration parameter
    * - ``workers``
      - Number of processes that can work concurrently. Also implies number of workflows that can be executed in parallel. Since FlytePropeller uses ``goroutines``, it can accommodate significantly more processes than the number of physical cores.
-     - ``flyte:propeller:all:free_workers_count``: a low number may result in higher overall latency for each workflow evaluation round.
-     - Larger the number, implies more workflows can be evaluated in parallel. But it should depend on number of CPU cores assigned to FlytePropeller and evaluated against the cost of context switching. A number around 500 - 800 with 4-8 CPU cores usually works fine.
+     - ``flyte:propeller:all:free_workers_count``
+     -  A low number may result in higher overall latency for each workflow evaluation round. Larger the number, implies more workflows can be evaluated in parallel. But it should depend on number of CPU cores assigned to FlytePropeller and evaluated against the cost of context switching. A number around 500 - 800 with 4-8 CPU cores usually works fine.
      - ``plugins.workqueue.config.workers`` Default value: ``10``. 
    * - Workqueue depth
      - Current number of workflow IDs in the queue awaiting processing
@@ -93,7 +93,7 @@ While it's possible to easily monitor Kube API saturation using system-level met
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. list-table:: Important Properties
-   :widths: 25 50 25 50 25
+   :widths: 25 50 50 25
    :header-rows: 1
 
    * - Property
@@ -114,7 +114,7 @@ While it's possible to easily monitor Kube API saturation using system-level met
      -  ``propeller.max-streak-length``. Default value: ``8`` . 
    * - ``max-size_mbs``
      - Max size of the write-through in-memory cache that FlytePropeller can use to store Inputs/Outputs metadata for faster read operations. 
-     - A too-small cache might lead to frequent cache misses, reducing the effectiveness of the cache and increasing latency. Conversely, a too-large cache might consume too much memory, potentially affecting the performance of other components. We recommend monitoring cache performance metrics such as `hit rates and miss rates <https://github.com/flyteorg/flyte/blob/8cc96177e7447d9630a1186215a8c8ad3d34d4a2/deployment/stats/prometheus/flytepropeller-dashboard.json#L1140>`__. These metrics can help determine if the cache size needs to be adjusted for optimal performance.
+     - A too-small cache might lead to frequent cache misses, reducing the effectiveness of the cache and increasing latency. Conversely, a too-large cache might consume too much memory, potentially affecting the performance of other components. We recommend monitoring cache performance metrics such as `hit rates and miss rates <https://github.com/flyteorg/flyte/blob/8cc96177e7447d9630a1186215a8c8ad3d34d4a2/deployment/stats/prometheus/flytepropeller-dashboard.json#L1140>`__. These metrics can help determine if the cache size needs to be adjusted for optimal performance. 
      - ``storage.cache.max-size_mbs``. Default value: ``0`` (disabled).
    * - ``backoff.max-duration``
      - Maximum back-off interval in case of resource-quota errors.
@@ -126,7 +126,7 @@ While it's possible to easily monitor Kube API saturation using system-level met
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. list-table:: Important Properties
-   :widths: 25 50 25 50 25
+   :widths: 25 50 50 25
    :header-rows: 1
 
    * - Property
@@ -138,9 +138,9 @@ While it's possible to easily monitor Kube API saturation using system-level met
      - This config uses a trick in etcD to minimize number of redundant loops in FlytePropeller, thus improving free slots.
      - ``propeller.workflowStore.policy``. Default value: ``ResourceVersionCache``.
 
-While the default value is generally the best option, a further explanation is needed so you can make informed decisions.
+**How ResourceVersionCache works?**
 
-**ResourceVersionCache**
+.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/configuration/perf_optimization/resourceversion-01.png 
 
 Kubernetes stores the definition and state of all the resources under its management on ``etcd``, a fast, distributed and consistent key-value store.
 Every resource has a ``resourceVersion`` field representing the version of that resource as stored in ``etcd``. 
@@ -151,15 +151,13 @@ Example:
 
    kubectl get datacatalog-589586b67f-l6v58 -n flyte -o yaml
 
-Sample ouput (excerpt):
+Sample output (excerpt):
 
 .. code:block:: yaml
 
     apiVersion: v1
     kind: Pod
     metadata:
-      annotations:
-        configChecksum: 8a85687bab6130de3ff20c16d72709b096e492afc6cf98bc5113cb2c34b7199
       ...
       labels:
         app.kubernetes.io/instance: flyte-core
@@ -172,22 +170,24 @@ Sample ouput (excerpt):
       resourceVersion: "1055227"
 
 Every time a resource (e.g. a Pod, a flyteworkflow CR, etc.) is modified, this counter is incremented.
-As ``etcd`` is a distributed key-value store, it needs a way to manage writes from multiple clients (controllers in this case) and doing so
+As ``etcd`` is a distributed key-value store, it needs a way to manage writes from multiple clients (controllers in this case)
 in a way that maintains consistency and performance.
 That's why, in addition to using ``Revisions`` (implemented in Kubernetes as ``Resource Version``), ``etcd`` also prevents clients from writing if they're using
 an outdated ``ResourceVersion``; something that could happen after a temporary client disconnection or whenever a status replication from the Kubernetes API to 
-the Informer cache hasn't completed yet. Poorly handled by a controller, this could result into kube-server and FlytePropeller worker overload by repeatedly attempting to complete outdated (or "stale") writes.
+the Informer cache hasn't completed yet. Poorly handled by a controller, this could result into kube-server and FlytePropeller worker overload by repeatedly attempting to perform outdated (or "stale") writes.
 
 FlytePropeller handles these situations by keeping a record of the last known ``ResourceVersion``. In the event that ``etcd`` denies a write operation due to an outdated version, FlytePropeller continues the Workflow
 evaluation loop, waiting for the Informer cache to become consistent. This mechanism, enabled by default and known as ``ResourceVersionCache``, prevents from both overloading the K8s API and wasting ``workers`` resources on invalid operations.
+It also mitigates the impact of cache propagation latency, which can be order of seconds.
 
 If ``max-streak-length`` is enabled, instead of waiting for the Informer cache to become consistent during the evaluation loop, FlytePropeller runs multiple evaluation loops using its in-memory copy of the ``ResourceVersion`` and corresponding Resource state, as long 
-as there are mutations in any of the resources associated with a particular workflow. When the ``max-streak-length`` limit is reached, the evaluation loop is completed and, if further evaluation is required, the cycle will start again by trying to get the most recent ``Resource Version`` as stored in ``etcd``.
+as there are mutations in any of the resources associated with that particular workflow. When the ``max-streak-length`` limit is reached, the evaluation loop is done and, if further evaluation is required, the cycle will start again by trying to get the most recent ``Resource Version`` as stored in ``etcd``.
 
+Other supported options for ``workflowStore.policy`` are described below:
 
-a. 
-
-
+- ``InMemory``: utilizes an in-memory store for workflows, primarily for testing purposes.
+- ``PassThrough``: directly interacts with the underlying Kubernetes clientset or shared informer cache for workflow operations.
+- ``TrackTerminated``: Specifically tracks terminated workflows.
 
 
 5. Report status to the control plane
@@ -213,19 +213,8 @@ a.
      - docs below
 
 
-In the above table the 2 most important configs are ``workers`` and ``kube-client-config``.
 
-
-
-.. note:: As you increase the number of workers in FlytePropeller it is important to increase the number of cpu's given to FlytePropeller pod.
-
-
-
-Another area of slowdown could be the size of the input-output cache that FlytePropeller maintains in-memory. This can be configured, while configuring
-the storage for FlytePropeller. Rule of thumb, for FlytePropeller with x memory limit, allocate x/2 to the cache
-
-
-Worst case workflows: Poison Pills & max-parallelism
+Concurrency vs parallelism
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 The worst case for FlytePropeller is workflows that have an extremely large fan-out. This is because FlytePropeller implements a greedy traversal algorithm, that tries to evaluate the entire unblocked nodes within a workflow in every round.
 A solution for this is to limit the maximum number of nodes that can be evaluated. This can be done by setting max-parallelism for an execution.
