@@ -17,73 +17,97 @@ Having Flyte projects isolated from each other is a security feature to prevent 
 
 ## 3 Proposed Implementation
 
-The Flyte operators can enable or disable the project isolation feature. When enabled, Flyte will evaluate the identity token issued by the IDP and extract the values of a configured claim. The user can then 
+The Flyte operators can enable or disable the project isolation feature. When enabled, Flyte will evaluate the access and identity token issued by the IDP and also information returned from the user info endpoint of the OIDC provider and extract the values of a configured claim. The user can then 
 access a project if the claim value matches the project. If the project isolation feature is enabled and the claim value does not match any project, the user is denied access to all projects. So it is a whitelist mechanism.
 
 The only external interfaces of Flyte is the API that is being used by the Flyte console, the flytectl cli and pyflyte. So it is sufficient to add a check if the user interacting with the API for a certain project has the required permission.
 
-Since the API endpoints are very different from one another, the check needs to be implemented in each endpoint. Because of the different formats of the endpoint holding the project it will be hard to define a middleware centrally, which performs the check.
+Since the API endpoints are very different from one another, the check needs to be implemented in each endpoint.
 
 The mapping between claim value and project to authorize can be configured in the following way and put in the Helm chart of the Flyte deployment:
 
 ```yaml
-auth:
-  project-authorization:
-    enabled: true
-    claim: "entitlements"
-    mapping:
-      project1: "project1"
-      project2: "project2"
+            auth:
+              projectAuthorization:
+                enabled: true
+                projectSets:
+                  user_project1:
+                    - project1
+                  user_project2:
+                    - project2
+                  admin:
+                    - project1
+                    - project2
+                    - project3
+                userAuth:
+                  claim: entitlements
+                appAuth:
+                  mappings:
+                    - clientID: flytepropeller
+                      projectSets:
+                        - "admin"
 ```
 
-The identity token is evaluated by Flyte already and data can be accessed in the Flyte code. The following example golang code shows how the project isolation can be implemented in the Flyte code:
+The Access Token, Identity Token and User Infor Endpoint is evaluated by Flyte already and data can be accessed in the Flyte code. The following example golang code shows how the project isolation can be implemented in a central middleware:
 
 
 ```go
-package auth
+func AuthorizationInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+    projectID := inferProjectIDFromAdminRequest(info.FullMethod, req)
+    if projectID != "" {
+        identityContext := IdentityContextFromContext(ctx)
+        projects, err := eligibleProjectsByIdentity(identityContext)
+        if err != nil {
+            errMsg := fmt.Sprintf("Failed to authorize user %s due to error: %v", identityContext.UserID(), err)
+            logger.Debugf(ctx, errMsg)
+            return ctx, status.Errorf(codes.Unauthenticated, errMsg)
+        }
+        logger.Debugf(ctx, "Found eligible projects for user %s: %+q", identityContext.UserID(), projects)
+        if _, ok := projects[projectID]; ok {
+            return handler(ctx, req)
+        }
+        // User doesn't seem to be authorized to access or create current project
+        errMsg := fmt.Sprintf("User %s not permitted to access project %s", identityContext.UserID(), projectID)
+        logger.Debugf(ctx, errMsg)
+        return ctx, status.Errorf(codes.Unauthenticated, errMsg)
+    }
+    return handler(ctx, req)
+}
+```
+The part with most code involved is to extract the project id from the request. Since the request objects do not have a common structure, the extraction logic of the project id needs to be implemented for each and every endpoint:
 
-import (
-	"context"
-	"github.com/flyteorg/flyte/flyteadmin/auth/config"
-)
+```go
+// Method to request type mapping is based on flyteidl/gen/pb-go/flyteidl/service/admin_grpc.pb.go
+var methods = map[string]func(req interface{}) string{
+    service.AdminService_CreateTask_FullMethodName: func (req interface{}) string {
+        request, _ := req.(*admin.TaskCreateRequest)
+        return request.GetId().GetProject()
+    },
+    service.AdminService_GetTask_FullMethodName: func (req interface{}) string {
+        request, _ := req.(*admin.ObjectGetRequest)
+        return request.GetId().GetProject()
+    },
+    service.AdminService_ListTaskIds_FullMethodName: func (req interface{}) string {
+        request, _ := req.(*admin.NamedEntityIdentifierListRequest)
+        return request.GetProject()
+    },
+	service.AdminService_ListTasks_FullMethodName: func (req interface{}) string {
+    request, _ := req.(*admin.ResourceListRequest)
+    return request.GetId().GetProject()
+    }
+	// more endpoints to add in the real implementation
+}
 
-func ProjectAccessPermitted(ctx context.Context, project string) bool {
-	authConfig := config.GetConfig()
-
-	if authConfig.ProjectAuth.isEnabled() {
-		identityContext := IdentityContextFromContext(ctx)
-
-		claimValues := identityContext.UserInfo().GetAdditionalClaims().GetFields()[authConfig.ProjectAuth.Claim].GetListValue().GetValues()
-
-		for claimValue := range claimValues {
-			if claimValue.GetStringValue() == authConfig.ProjectAuth.mapping[project] {
-				return true
-			}
-		}
-		
-		return false
-	} else {
-		return true
-	}
-
+func inferProjectIDFromAdminRequest(fullMethod string, req interface{}) string {
+    method := methods[fullMethod]
+    if method != nil {
+        return method(req)
+    }
+    return ""
 }
 ```
 
-The following piece of code also shows how the check is integrated into existing API endpoints:
-
-```go
-func (m *AdminService) GetWorkflow(ctx context.Context, request *admin.ObjectGetRequest) (*admin.Workflow, error) {
-	defer m.interceptPanic(ctx, request)
-
-    if request == nil {
-        return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
-    }
-	
-	if ProjectAccessPermitted(ctx, request.GetId().Project) {
-		return nil, status.Errorf(codes.PermissionDenied, "Access denied for project %s.", request.GetId().Project)
-	}
-```
-
+There is a risk that for a newly added endpoint adding the project extraction logic is forgotten. Technically it was not possible to find a solution that could automate adding the project extraction logic for each endpoint.
 
 ## 4 Metrics & Dashboards
 
