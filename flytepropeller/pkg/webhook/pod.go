@@ -41,46 +41,81 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils/secrets"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/webhook/config"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
-const webhookName = "flyte-pod-webhook.flyte.org"
+const (
+	secretsWebhookName     = "flyte-pod-webhook.flyte.org" // #nosec G101
+	unionWebhookNameDomain = "union.ai"
+)
 
-// PodMutator implements controller-runtime WebHook interface.
-type PodMutator struct {
-	decoder  *admission.Decoder
-	cfg      *config.Config
-	Mutators []MutatorConfig
+var (
+	admissionRegistrationRules = []admissionregistrationv1.RuleWithOperations{
+		{
+			Operations: []admissionregistrationv1.OperationType{
+				admissionregistrationv1.Create,
+			},
+			Rule: admissionregistrationv1.Rule{
+				APIGroups:   []string{"*"},
+				APIVersions: []string{"v1"},
+				Resources:   []string{"pods"},
+			},
+		},
+	}
+	admissionRegistrationVersions = []string{
+		"v1",
+		"v1beta1",
+	}
+	admissionRegistrationFailurePolicy = admissionregistrationv1.Fail
+	admissionRegistrationSideEffects   = admissionregistrationv1.SideEffectClassNoneOnDryRun
+)
+
+// PodCreationWebhookConfig maps one to one to Kubernetes MutatingWebhookConfiguration
+// but specifically tagetting Pod creation. Kubernetes MutatingWebhookConfiguration supports
+// multiple webhooks. This class is responsible for converting Union specific configuration into a
+// Kubernetes MutatingWebhookConfiguration with potentially multiple webhooks.
+type PodCreationWebhookConfig struct {
+	cfg          *config.Config
+	httpHandlers []httpHandler
+	caBytes      []byte
 }
 
-type MutatorConfig struct {
-	Mutator  Mutator
-	Required bool
+// Internal struct type to consolidate handling of the HTTP layer.
+// Every http handler shares the same decode, encoding logic but has a different Mutator.
+type httpHandler struct {
+	decoder *admission.Decoder
+	mutator PodMutator
+	// The unique name of the Mutating Webhook
+	mutatingWebhookName string
+	// The complete URI Path to register webhook with.
+	path string
 }
 
-type Mutator interface {
+// PodMutator contains the business logic for a unique type of mutation or validation.
+type PodMutator interface {
 	ID() string
-	Mutate(ctx context.Context, p *corev1.Pod) (newP *corev1.Pod, changed bool, err error)
+	// Conducts the act of mutating the pod.
+	Mutate(ctx context.Context, p *corev1.Pod) (newP *corev1.Pod, changed bool, err *admission.Response)
+	// Defines how to select which Pods to apply the webhook to.
+	LabelSelector() *metav1.LabelSelector
 }
 
-func (pm PodMutator) Handle(ctx context.Context, request admission.Request) admission.Response {
+func (h httpHandler) Handle(ctx context.Context, request admission.Request) admission.Response {
 	// Get the object in the request
 	obj := &corev1.Pod{}
-	err := pm.decoder.Decode(request, obj)
+	err := h.decoder.Decode(request, obj)
 	if err != nil {
 		return admission.Errored(http.StatusBadRequest, err)
 	}
 
-	newObj, changed, err := pm.Mutate(ctx, obj)
-	if err != nil {
-		return admission.Errored(http.StatusBadRequest, err)
+	newObj, changed, admissionError := h.mutator.Mutate(ctx, obj)
+	if admissionError != nil {
+		return *admissionError
 	}
 
 	if changed {
@@ -96,59 +131,44 @@ func (pm PodMutator) Handle(ctx context.Context, request admission.Request) admi
 	return admission.Allowed("No changes")
 }
 
-func (pm PodMutator) Mutate(ctx context.Context, p *corev1.Pod) (newP *corev1.Pod, changed bool, err error) {
-	newP = p
-	for _, m := range pm.Mutators {
-		tempP := newP
-		tempChanged := false
-		tempP, tempChanged, err = m.Mutator.Mutate(ctx, tempP)
-		if err != nil {
-			if m.Required {
-				err = fmt.Errorf("failed to mutate using [%v]. Since it's a required mutator, failing early. Error: %v", m.Mutator.ID(), err)
-				logger.Info(ctx, err)
-				return p, false, err
-			}
-
-			logger.Infof(ctx, "Failed to mutate using [%v]. Since it's not a required mutator, skipping. Error: %v", m.Mutator.ID(), err)
-			continue
-		}
-
-		newP = tempP
-		if tempChanged {
-			changed = true
-		}
+func (pm PodCreationWebhookConfig) Register(ctx context.Context, registerer HTTPHookRegistererIface) error {
+	for _, httpHandler := range pm.httpHandlers {
+		wh := &admission.Webhook{Handler: httpHandler}
+		logger.Infof(ctx, "Registering path [%v]", httpHandler.path)
+		registerer.Register(httpHandler.path, wh)
 	}
-
-	return newP, changed, nil
-}
-
-func (pm PodMutator) Register(ctx context.Context, mgr manager.Manager) error {
-	wh := &admission.Webhook{
-		Handler: pm,
-	}
-
-	mutatePath := getPodMutatePath()
-	logger.Infof(ctx, "Registering path [%v]", mutatePath)
-	mgr.GetWebhookServer().Register(mutatePath, wh)
 	return nil
 }
 
-func (pm PodMutator) GetMutatePath() string {
-	return getPodMutatePath()
-}
-
-func getPodMutatePath() string {
+func getPodMutatePath(subpath string) string {
 	pod := flytek8s.BuildIdentityPod()
-	return generateMutatePath(pod.GroupVersionKind())
+	return generateMutatePath(pod.GroupVersionKind(), subpath)
 }
 
-func generateMutatePath(gvk schema.GroupVersionKind) string {
+func generateMutatePath(gvk schema.GroupVersionKind, subpath string) string {
 	return "/mutate-" + strings.Replace(gvk.Group, ".", "-", -1) + "-" +
-		gvk.Version + "-" + strings.ToLower(gvk.Kind)
+		gvk.Version + "-" + strings.ToLower(gvk.Kind) + "/" + subpath
 }
 
-func (pm PodMutator) CreateMutationWebhookConfiguration(namespace string) (*admissionregistrationv1.MutatingWebhookConfiguration, error) {
-	caBytes, err := os.ReadFile(filepath.Join(pm.cfg.ExpandCertDir(), "ca.crt"))
+func (pm PodCreationWebhookConfig) CreateMutationWebhookConfiguration(namespace string) (*admissionregistrationv1.MutatingWebhookConfiguration, error) {
+	webhooks := make([]admissionregistrationv1.MutatingWebhook, 0, len(pm.httpHandlers))
+	for _, httpHandler := range pm.httpHandlers {
+		webhooks = append(webhooks, pm.getMutatingWebhook(namespace, httpHandler))
+	}
+
+	mutateConfig := &admissionregistrationv1.MutatingWebhookConfiguration{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      pm.cfg.ServiceName,
+			Namespace: namespace,
+		},
+		Webhooks: webhooks,
+	}
+
+	return mutateConfig, nil
+}
+
+func NewPodCreationWebhookConfig(ctx context.Context, cfg *config.Config, scheme *runtime.Scheme, scope promutils.Scope) (*PodCreationWebhookConfig, error) {
+	caBytes, err := os.ReadFile(filepath.Join(cfg.ExpandCertDir(), "ca.crt"))
 	if err != nil {
 		// ca.crt is optional. If not provided, API Server will assume the webhook is serving SSL using a certificate
 		// issued by a known Cert Authority.
@@ -159,71 +179,97 @@ func (pm PodMutator) CreateMutationWebhookConfiguration(namespace string) (*admi
 		}
 	}
 
-	path := pm.GetMutatePath()
-	fail := admissionregistrationv1.Fail
-	sideEffects := admissionregistrationv1.SideEffectClassNoneOnDryRun
-
-	mutateConfig := &admissionregistrationv1.MutatingWebhookConfiguration{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      pm.cfg.ServiceName,
-			Namespace: namespace,
-		},
-
-		Webhooks: []admissionregistrationv1.MutatingWebhook{
-			{
-				Name: webhookName,
-				ClientConfig: admissionregistrationv1.WebhookClientConfig{
-					CABundle: caBytes, // CA bundle created earlier
-					Service: &admissionregistrationv1.ServiceReference{
-						Name:      pm.cfg.ServiceName,
-						Namespace: namespace,
-						Path:      &path,
-						Port:      &pm.cfg.ServicePort,
-					},
-				},
-				Rules: []admissionregistrationv1.RuleWithOperations{
-					{
-						Operations: []admissionregistrationv1.OperationType{
-							admissionregistrationv1.Create,
-						},
-						Rule: admissionregistrationv1.Rule{
-							APIGroups:   []string{"*"},
-							APIVersions: []string{"v1"},
-							Resources:   []string{"pods"},
-						},
-					},
-				},
-				FailurePolicy: &fail,
-				SideEffects:   &sideEffects,
-				AdmissionReviewVersions: []string{
-					"v1",
-					"v1beta1",
-				},
-				ObjectSelector: &metav1.LabelSelector{
-					MatchLabels: map[string]string{
-						secrets.PodLabel: secrets.PodLabelValue,
-					},
-				},
-			}},
-	}
-
-	return mutateConfig, nil
-}
-
-func NewPodMutator(ctx context.Context, cfg *config.Config, scheme *runtime.Scheme, scope promutils.Scope) (*PodMutator, error) {
 	secretsMutator, err := NewSecretsMutator(ctx, cfg, scope.NewSubScope("secrets"))
 	if err != nil {
 		return nil, err
 	}
 
-	return &PodMutator{
-		decoder: admission.NewDecoder(scheme),
-		cfg:     cfg,
-		Mutators: []MutatorConfig{
-			{
-				Mutator:  secretsMutator,
-				Required: true,
+	decoder := admission.NewDecoder(scheme)
+
+	httpHandlers := []httpHandler{
+		{
+			decoder:             decoder,
+			mutator:             secretsMutator,
+			mutatingWebhookName: secretsWebhookName,
+			path:                getPodMutatePath(secretsMutator.ID()),
+		},
+	}
+
+	if cfg.ImageBuilderConfig != nil {
+		imageBuilderMutator := NewImageBuilderMutator(cfg.ImageBuilderConfig.HostnameReplacement, cfg.ImageBuilderConfig.LabelSelector, scope.NewSubScope("image-builder"))
+		httpHandlers = append(httpHandlers, httpHandler{
+			decoder:             decoder,
+			mutator:             imageBuilderMutator,
+			mutatingWebhookName: getMutatingWebhookName(imageBuilderMutator.ID()),
+			path:                getPodMutatePath(imageBuilderMutator.ID()),
+		})
+	}
+
+	err = verifyHTTPHandlers(ctx, httpHandlers)
+	if err != nil {
+		return nil, err
+	}
+
+	return &PodCreationWebhookConfig{
+		cfg:          cfg,
+		httpHandlers: httpHandlers,
+		caBytes:      caBytes,
+	}, nil
+}
+
+func getMutatingWebhookName(id string) string {
+	return fmt.Sprintf("%s-webhook.%s", id, unionWebhookNameDomain)
+}
+
+func (pm PodCreationWebhookConfig) getMutatingWebhook(namespace string, httpHandler httpHandler) admissionregistrationv1.MutatingWebhook {
+	return admissionregistrationv1.MutatingWebhook{
+		Name: httpHandler.mutatingWebhookName,
+		ClientConfig: admissionregistrationv1.WebhookClientConfig{
+			CABundle: pm.caBytes, // CA bundle created earlier
+			Service: &admissionregistrationv1.ServiceReference{
+				Name:      pm.cfg.ServiceName,
+				Namespace: namespace,
+				Path:      &httpHandler.path,
+				Port:      &pm.cfg.ServicePort,
 			},
 		},
-	}, nil
+		Rules:                   admissionRegistrationRules,
+		FailurePolicy:           &admissionRegistrationFailurePolicy,
+		SideEffects:             &admissionRegistrationSideEffects,
+		AdmissionReviewVersions: admissionRegistrationVersions,
+		ObjectSelector:          httpHandler.mutator.LabelSelector(),
+	}
+}
+
+// Verify that there aren't any duplicate webhook names or URI paths.
+func verifyHTTPHandlers(ctx context.Context, httpHandlers []httpHandler) error {
+	webhookNameOccurrences := make(map[string]bool)
+	pathOccurrences := make(map[string]bool)
+
+	duplicateWebhookNames := make([]string, 0)
+	duplicatePaths := make([]string, 0)
+
+	for _, handler := range httpHandlers {
+		if webhookNameOccurrences[handler.mutatingWebhookName] {
+			duplicateWebhookNames = append(duplicateWebhookNames, handler.mutatingWebhookName)
+		}
+		webhookNameOccurrences[handler.mutatingWebhookName] = true
+		if pathOccurrences[handler.path] {
+			duplicatePaths = append(duplicatePaths, handler.path)
+		}
+		pathOccurrences[handler.path] = true
+	}
+
+	e := ""
+	if len(duplicateWebhookNames) > 0 {
+		e += fmt.Sprintf("Duplicate webhook names found: [%v]. ", strings.Join(duplicateWebhookNames, ","))
+	}
+	if len(duplicatePaths) > 0 {
+		e += fmt.Sprintf("Duplicate paths found: [%v]", strings.Join(duplicatePaths, ","))
+	}
+	if len(e) > 0 {
+		logger.Errorf(ctx, "Invalid webhook configuration: %v", e)
+		return fmt.Errorf("Invalid webhook configuration: %v", e)
+	}
+	return nil
 }

@@ -3,9 +3,8 @@ package nodes
 import (
 	"context"
 	"fmt"
-	"strconv"
-
 	"slices"
+	"strconv"
 
 	_struct "github.com/golang/protobuf/ptypes/struct"
 	"github.com/pkg/errors"

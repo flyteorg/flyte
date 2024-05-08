@@ -4,8 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
 
 	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	secretUtils "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils/secrets"
@@ -19,6 +22,7 @@ const (
 	SecretPathDefaultDirEnvVar = "FLYTE_SECRETS_DEFAULT_DIR" // #nosec
 	SecretPathFilePrefixEnvVar = "FLYTE_SECRETS_FILE_PREFIX" // #nosec
 	SecretEnvVarPrefix         = "FLYTE_SECRETS_ENV_PREFIX"  // #nosec
+	SecretsID                  = "secrets"
 )
 
 type SecretsMutator struct {
@@ -35,13 +39,14 @@ type SecretsInjector interface {
 }
 
 func (s SecretsMutator) ID() string {
-	return "secrets"
+	return SecretsID
 }
 
-func (s *SecretsMutator) Mutate(ctx context.Context, pod *corev1.Pod) (*corev1.Pod, bool /* injected */, error) {
+func (s *SecretsMutator) Mutate(ctx context.Context, pod *corev1.Pod) (newP *corev1.Pod, podChanged bool, errResponse *admission.Response) {
 	secrets, err := secretUtils.UnmarshalStringMapToSecrets(pod.GetAnnotations())
 	if err != nil {
-		return pod, false, fmt.Errorf("failed to unmarshal secrets from pod annotations: %w", err)
+		admissionError := admission.Errored(http.StatusBadRequest, fmt.Errorf("failed to unmarshal secrets from pod annotations: %w", err))
+		return pod, false, &admissionError
 	}
 
 	for _, secret := range secrets {
@@ -52,13 +57,22 @@ func (s *SecretsMutator) Mutate(ctx context.Context, pod *corev1.Pod) (*corev1.P
 			} else {
 				err = fmt.Errorf("none of the secret managers injected secret [%v]: %w", secret, err)
 			}
-			return pod, false, err
+			admissionError := admission.Errored(http.StatusBadRequest, err)
+			return pod, false, &admissionError
 		}
 
 		pod = mutatedPod
 	}
 
 	return pod, len(secrets) > 0, nil
+}
+
+func (s *SecretsMutator) LabelSelector() *metav1.LabelSelector {
+	return &metav1.LabelSelector{
+		MatchLabels: map[string]string{
+			secretUtils.PodLabel: secretUtils.PodLabelValue,
+		},
+	}
 }
 
 func (s *SecretsMutator) injectSecret(ctx context.Context, secret *core.Secret, pod *corev1.Pod) (*corev1.Pod, bool /*injected*/, error) {

@@ -1,7 +1,6 @@
 package k8s
 
 import (
-	"k8s.io/client-go/tools/cache"
 	"testing"
 	"time"
 
@@ -10,6 +9,7 @@ import (
 	eventsv1 "k8s.io/api/events/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/client-go/tools/cache"
 )
 
 func TestEventWatcher_OnAdd(t *testing.T) {

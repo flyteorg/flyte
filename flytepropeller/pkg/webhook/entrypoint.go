@@ -54,7 +54,7 @@ func RunWebhook(ctx context.Context, propellerCfg *config.Config, cfg *config2.C
 
 	webhookScope := (*scope).NewSubScope("webhook")
 
-	secretsWebhook, err := NewPodMutator(ctx, cfg, mgr.GetScheme(), webhookScope)
+	secretsWebhook, err := NewPodCreationWebhookConfig(ctx, cfg, mgr.GetScheme(), webhookScope)
 	if err != nil {
 		return err
 	}
@@ -65,7 +65,7 @@ func RunWebhook(ctx context.Context, propellerCfg *config.Config, cfg *config2.C
 		return err
 	}
 
-	err = secretsWebhook.Register(ctx, mgr)
+	err = secretsWebhook.Register(ctx, K8sRuntimeHTTPHookRegisterer{mgr: mgr})
 	if err != nil {
 		logger.Fatalf(ctx, "Failed to register webhook with manager. Error: %v", err)
 	}
@@ -76,7 +76,7 @@ func RunWebhook(ctx context.Context, propellerCfg *config.Config, cfg *config2.C
 	return nil
 }
 
-func createMutationConfig(ctx context.Context, kubeClient *kubernetes.Clientset, webhookObj *PodMutator, defaultNamespace string) error {
+func createMutationConfig(ctx context.Context, kubeClient *kubernetes.Clientset, webhookObj *PodCreationWebhookConfig, defaultNamespace string) error {
 	shouldAddOwnerRef := true
 	podName, found := os.LookupEnv(PodNameEnvVar)
 	if !found {

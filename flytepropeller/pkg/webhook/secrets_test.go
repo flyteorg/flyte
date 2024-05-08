@@ -8,8 +8,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
+	secretUtils "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils/secrets"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/webhook/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/webhook/mocks"
 )
@@ -18,7 +20,7 @@ func TestSecretsWebhook_Mutate(t *testing.T) {
 	t.Run("No injectors", func(t *testing.T) {
 		m := SecretsMutator{}
 		_, changed, err := m.Mutate(context.Background(), &corev1.Pod{})
-		assert.NoError(t, err)
+		assert.Nil(t, err)
 		assert.False(t, changed)
 	})
 
@@ -43,7 +45,7 @@ func TestSecretsWebhook_Mutate(t *testing.T) {
 		}
 
 		_, changed, err := m.Mutate(context.Background(), podWithAnnotations.DeepCopy())
-		assert.Error(t, err)
+		assert.NotNil(t, err)
 		assert.False(t, changed)
 	})
 
@@ -60,7 +62,17 @@ func TestSecretsWebhook_Mutate(t *testing.T) {
 		}
 
 		_, changed, err := m.Mutate(context.Background(), podWithAnnotations.DeepCopy())
-		assert.NoError(t, err)
+		assert.Nil(t, err)
 		assert.True(t, changed)
 	})
+}
+
+func TestSecrets_LabelSelector(t *testing.T) {
+	m := SecretsMutator{}
+	expected := metav1.LabelSelector{
+		MatchLabels: map[string]string{
+			secretUtils.PodLabel: secretUtils.PodLabelValue,
+		},
+	}
+	assert.Equal(t, expected, *m.LabelSelector())
 }
