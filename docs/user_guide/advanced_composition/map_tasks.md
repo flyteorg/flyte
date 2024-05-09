@@ -58,6 +58,7 @@ def map_workflow_with_metadata(data: list[int] = [10, 12, 11, 10, 13, 12, 100, 1
         data_point=data
     )
 ```
+When `cache` and `cache_version` are used in `TaskMetadata` for a map task, the cache hits occur on individual tasks being mapped over, rather than the parent map task operation. This means that if one input item in a list changes, each previously executed task is read from cache and only the task for the changed item is actually executed, rather than the task being re-executed for every item.  Note that this has the same effect as adding `cache` and `cache_version` in the `@task` decorator for a task being mapped over.
 
 You can also configure `concurrency` and `min_success_ratio` for a map task:
 - `concurrency` limits the number of mapped tasks that can run in parallel to the specified batch size.
