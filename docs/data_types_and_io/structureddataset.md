@@ -237,7 +237,7 @@ You can now use `numpy.ndarray` to deserialize the parquet file to NumPy and ser
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/data_types_and_io/data_types_and_io/structured_dataset.py
 :caption: data_types_and_io/structured_dataset.py
-:lines: 134-147
+:lines: 134-149
 ```
 
 :::{note}
@@ -248,7 +248,20 @@ You can run the code locally as follows:
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/data_types_and_io/data_types_and_io/structured_dataset.py
 :caption: data_types_and_io/structured_dataset.py
-:lines: 151-155
+:lines: 153-157
+```
+
+### The nested typed columns
+
+Like most storage formats (e.g. Avro, Parquet, and BigQuery), StructuredDataset support nested field structures.
+
+:::{note}
+Nested field StructuredDataset should be run when flytekit version > 1.11.0.
+:::
+
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/data_types_and_io/data_types_and_io/structured_dataset.py
+:caption: data_types_and_io/structured_dataset.py
+:lines: 159-270
 ```
 
 [flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/data_types_and_io/
