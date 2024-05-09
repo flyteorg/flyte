@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"sync"
 
+	tea "github.com/charmbracelet/bubbletea"
 	"github.com/flyteorg/flyte/flytectl/pkg/filters"
 	"github.com/flyteorg/flyte/flytectl/pkg/printer"
 
@@ -13,34 +15,49 @@ import (
 	"github.com/golang/protobuf/proto"
 )
 
-type DataCallback func(filter filters.Filters) []proto.Message
+type DataCallback func(filter filters.Filters) ([]proto.Message, error)
 
-type PrintableProto struct{ proto.Message }
+type printTableProto struct{ proto.Message }
+
+type direction int
+
+type newDataMsg struct {
+	newItems       []proto.Message
+	batchIndex     int
+	fetchDirection direction
+}
 
 const (
-	msgPerBatch  = 100 // Please set msgPerBatch as a multiple of msgPerPage
-	msgPerPage   = 10
-	pagePerBatch = msgPerBatch / msgPerPage
+	forward direction = iota
+	backward
+)
+
+const (
+	msgPerBatch       = 100 // Please set msgPerBatch as a multiple of msgPerPage
+	msgPerPage        = 10
+	pagePerBatch      = msgPerBatch / msgPerPage
+	prefetchThreshold = pagePerBatch - 1
+	localBatchLimit   = 10 // Please set localBatchLimit at least 2
 )
 
 var (
-	// Used for indexing local stored rows
-	localPageIndex int
-	// Recording batch index fetched from admin
-	firstBatchIndex int32 = 1
-	lastBatchIndex  int32 = 10
-	batchLen              = make(map[int32]int)
 	// Callback function used to fetch data from the module that called bubbletea pagination.
-	callback DataCallback
-	// The header of the table
+	callback   DataCallback
 	listHeader []printer.Column
-
-	marshaller = jsonpb.Marshaler{
-		Indent: "\t",
-	}
+	filter     filters.Filters
+	// Record the index of the first and last batch that is in cache
+	firstBatchIndex int
+	lastBatchIndex  int
+	// Record numbers of messages in each batch
+	batchLen = make(map[int]int)
+	// Avoid fetching back and forward at the same time
+	mutex sync.Mutex
+	// Used to catch error happened while running paginator
+	errMsg error = nil
 )
 
-func (p PrintableProto) MarshalJSON() ([]byte, error) {
+func (p printTableProto) MarshalJSON() ([]byte, error) {
+	marshaller := jsonpb.Marshaler{Indent: "\t"}
 	buf := new(bytes.Buffer)
 	err := marshaller.Marshal(buf, p.Message)
 	if err != nil {
@@ -49,28 +66,35 @@ func (p PrintableProto) MarshalJSON() ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func min(a, b int) int {
+func _max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}
+
+func _min(a, b int) int {
 	if a < b {
 		return a
 	}
 	return b
 }
 
-func getSliceBounds(idx int, length int) (start int, end int) {
-	start = idx * msgPerPage
-	end = min(idx*msgPerPage+msgPerPage, length)
+func getSliceBounds(m *pageModel) (start int, end int) {
+	start = (m.paginator.Page - firstBatchIndex*pagePerBatch) * msgPerPage
+	end = _min(start+msgPerPage, len(*m.items))
 	return start, end
 }
 
 func getTable(m *pageModel) (string, error) {
-	start, end := getSliceBounds(localPageIndex, len(m.items))
-	curShowMessage := m.items[start:end]
-	printableMessages := make([]*PrintableProto, 0, len(curShowMessage))
+	start, end := getSliceBounds(m)
+	curShowMessage := (*m.items)[start:end]
+	printTableMessages := make([]*printTableProto, 0, len(curShowMessage))
 	for _, m := range curShowMessage {
-		printableMessages = append(printableMessages, &PrintableProto{Message: m})
+		printTableMessages = append(printTableMessages, &printTableProto{Message: m})
 	}
 
-	jsonRows, err := json.Marshal(printableMessages)
+	jsonRows, err := json.Marshal(printTableMessages)
 	if err != nil {
 		return "", fmt.Errorf("failed to marshal proto messages")
 	}
@@ -84,53 +108,54 @@ func getTable(m *pageModel) (string, error) {
 	return buf.String(), nil
 }
 
-func getMessageList(batchIndex int32) []proto.Message {
-	msg := callback(filters.Filters{
+func getMessageList(batchIndex int) ([]proto.Message, error) {
+	mutex.Lock()
+	spin = true
+	defer func() {
+		spin = false
+		mutex.Unlock()
+	}()
+
+	msg, err := callback(filters.Filters{
 		Limit:  msgPerBatch,
-		Page:   batchIndex,
-		SortBy: "created_at",
-		Asc:    false,
+		Page:   int32(batchIndex + 1),
+		SortBy: filter.SortBy,
+		Asc:    filter.Asc,
 	})
+	if err != nil {
+		return nil, err
+	}
+
 	batchLen[batchIndex] = len(msg)
 
-	return msg
+	return msg, nil
 }
 
-func countTotalPages() int {
+func fetchDataCmd(batchIndex int, fetchDirection direction) tea.Cmd {
+	return func() tea.Msg {
+		newItems, err := getMessageList(batchIndex)
+		if err != nil {
+			errMsg = err
+			return err
+		}
+		msg := newDataMsg{
+			newItems:       newItems,
+			batchIndex:     batchIndex,
+			fetchDirection: fetchDirection,
+		}
+		return msg
+	}
+}
+
+func getLastMsgIdx() int {
 	sum := 0
-	for _, l := range batchLen {
-		sum += l
+	for i := 0; i < lastBatchIndex+1; i++ {
+		length, ok := batchLen[i]
+		if ok {
+			sum += length
+		} else {
+			sum += msgPerBatch
+		}
 	}
 	return sum
-}
-
-// Only (lastBatchIndex-firstBatchIndex)*msgPerBatch of rows are stored in local memory.
-// When user tries to get rows out of this range, this function will be triggered.
-func preFetchBatch(m *pageModel) {
-	localPageIndex = m.paginator.Page - int(firstBatchIndex-1)*pagePerBatch
-
-	// Triggers when user is at the last local page
-	if localPageIndex+1 == len(m.items)/msgPerPage {
-		newMessages := getMessageList(lastBatchIndex + 1)
-		m.paginator.SetTotalPages(countTotalPages())
-		if len(newMessages) != 0 {
-			lastBatchIndex++
-			m.items = append(m.items, newMessages...)
-			m.items = m.items[batchLen[firstBatchIndex]:] // delete the msgs in the "firstBatchIndex" batch
-			localPageIndex -= batchLen[firstBatchIndex] / msgPerPage
-			firstBatchIndex++
-		}
-		return
-	}
-	// Triggers when user is at the first local page
-	if localPageIndex == 0 && firstBatchIndex > 1 {
-		newMessages := getMessageList(firstBatchIndex - 1)
-		m.paginator.SetTotalPages(countTotalPages())
-		firstBatchIndex--
-		m.items = append(newMessages, m.items...)
-		m.items = m.items[:len(m.items)-batchLen[lastBatchIndex]] // delete the msgs in the "lastBatchIndex" batch
-		localPageIndex += batchLen[firstBatchIndex] / msgPerPage
-		lastBatchIndex--
-		return
-	}
 }
