@@ -6,7 +6,7 @@ Optimizing Performance
 
 .. tags:: Infrastructure, Kubernetes, Advanced
 
-.. tip:: Before getting started, it is always important to measure the performance. Flyte project publishes Grafana dashboard templates as described in - :ref:`deployment-configuration-monitoring`.
+.. tip:: Before getting started, it is always important to measure the performance. Consider using the Grafana dashboard templates as described in :ref:`deployment-configuration-monitoring`.
 
 Introduction
 ============
@@ -135,7 +135,7 @@ While it's possible to easily monitor Kube API saturation using system-level met
      - Configuration parameter
    * - ``workflowStore Policy``
      - Specifies the strategy for workflow storage management.
-     - This config uses a trick in etcD to minimize number of redundant loops in FlytePropeller, thus improving free slots.
+     - The default policy is designed to leverage ``etcd`` features to reduce latency. 
      - ``propeller.workflowStore.policy``. Default value: ``ResourceVersionCache``.
 
 **How ResourceVersionCache works?**
@@ -166,11 +166,11 @@ Sample output (excerpt):
         helm.sh/chart: flyte-core-v1.12.0
       name: datacatalog-589586b67f-l6v58
       namespace: flyte
-    ...
+      ...
       resourceVersion: "1055227"
 
 Every time a resource (e.g. a Pod, a flyteworkflow CR, etc.) is modified, this counter is incremented.
-As ``etcd`` is a distributed key-value store, it needs a way to manage writes from multiple clients (controllers in this case)
+As ``etcd`` is a distributed key-value store, it needs to manage writes from multiple clients (controllers in this case)
 in a way that maintains consistency and performance.
 That's why, in addition to using ``Revisions`` (implemented in Kubernetes as ``Resource Version``), ``etcd`` also prevents clients from writing if they're using
 an outdated ``ResourceVersion``; something that could happen after a temporary client disconnection or whenever a status replication from the Kubernetes API to 
@@ -187,7 +187,7 @@ Other supported options for ``workflowStore.policy`` are described below:
 
 - ``InMemory``: utilizes an in-memory store for workflows, primarily for testing purposes.
 - ``PassThrough``: directly interacts with the underlying Kubernetes clientset or shared informer cache for workflow operations.
-- ``TrackTerminated``: Specifically tracks terminated workflows.
+- ``TrackTerminated``: specifically tracks terminated workflows.
 
 5. Report status to the control plane
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -204,9 +204,9 @@ Other supported options for ``workflowStore.policy`` are described below:
      - It is important to limit the number of writes from FlytePropeller to FlyteAdmin to prevent brown-outs or request throttling at the server. Also a bigger cache size, reduces number of calls to the server.
 
 Concurrency vs parallelism
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+==========================
 
-While FlytePropeller is designed to handle concurrency efficiently, using the mechanisms described in this section; parallel executions -not only concurrent, but evaluated at the same time-, pose an additional challenge, especially with workflows that have an extremely large fan-out. 
+While FlytePropeller is designed to efficiently handle concurrency using the mechanisms described in this section; parallel executions -not only concurrent, but evaluated at the same time-, pose an additional challenge, especially with workflows that have an extremely large fan-out. 
 This is because FlytePropeller implements a greedy traversal algorithm, that tries to evaluate the entire unblocked nodes within a workflow in every round.
 A way to mitigate the potential performance impact is to limit the maximum number of nodes that can be evaluated simultaneously. This can be done by setting ``max-parallelism`` using any of the following methods:
 
@@ -230,7 +230,7 @@ b. Default for a specific launch plan. For any launch plan, the ``max_parallelis
          max_parallelism=30,
        )
 
-#. Specify for an execution. ``max-parallelism`` can be overridden using ``pyflyte run --max-parallelism`` or setting it in the UI.
+#. Specify for an execution. ``max-parallelism`` can be overridden using ``pyflyte run --max-parallelism`` or by setting it in the UI.
 
 
 Scaling out FlyteAdmin
@@ -269,7 +269,7 @@ The Hash Shard Strategy, denoted by ``type: Hash`` in the configuration below, u
             type: Hash     # use the "hash" shard strategy
             shard-count: 4 # the total number of shards
  
-The Project and Domain Shard Strategies, denoted by ``type: project`` and ``type: domain`` respectively, use the FlyteWorkflow project and domain metadata to shard FlyteWorkflows. These Shard Strategies are configured using a ``per-shard-mapping`` option, which is a list of IDs. Each element in the ``per-shard-mapping`` list defines a new shard, and the ID list assigns responsibility for the specified IDs to that shard. A shard configured as a single wildcard ID (i.e. "*") is responsible for all IDs that are not covered by other shards. Only a single shard may be configured with a wildcard ID and, on that shard, there must be only one ID, namely the wildcard.
+The Project and Domain Shard Strategies, denoted by ``type: project`` and ``type: domain`` respectively, use the FlyteWorkflow project and domain metadata to shard FlyteWorkflows. These Shard Strategies are configured using a ``per-shard-mapping`` option, which is a list of IDs. Each element in the ``per-shard-mapping`` list defines a new shard, and the ID list assigns responsibility for the specified IDs to that shard. A shard configured as a single wildcard ID (i.e. ``*``) is responsible for all IDs that are not covered by other shards. Only a single shard may be configured with a wildcard ID and, on that shard, there must be only one ID, namely the wildcard.
 
 .. code-block:: yaml
 
@@ -306,7 +306,7 @@ The Project and Domain Shard Strategies, denoted by ``type: project`` and ``type
  
 Multi-Cluster mode
 ===================
-Flyte supports adding multiple K8s dataplane clusters by default. Each dataplane cluster has one or more FlytePropellers running in them, and flyteadmin manages the routing and assigning of workloads to these clusters.
+If the K8s cluster itself becomes a performance bottleneck, Flyte supports adding multiple K8s dataplane clusters by default. Each dataplane cluster has one or more FlytePropellers running in them, and flyteadmin manages the routing and assigning of workloads to these clusters.
 
 
 Improving etcd Performance
