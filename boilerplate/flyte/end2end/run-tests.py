@@ -17,11 +17,11 @@ MAX_ATTEMPTS = 200
 
 
 def execute_workflow(
-        remote: FlyteRemote,
-        version,
-        workflow_name,
-        inputs,
-        cluster_pool_name: Optional[str] = None,
+    remote: FlyteRemote,
+    version,
+    workflow_name,
+    inputs,
+    cluster_pool_name: Optional[str] = None,
 ):
     print(f"Fetching workflow={workflow_name} and version={version}")
     wf = remote.fetch_workflow(name=workflow_name, version=version)
@@ -29,7 +29,7 @@ def execute_workflow(
 
 
 def executions_finished(
-        executions_by_wfgroup: Dict[str, List[FlyteWorkflowExecution]]
+    executions_by_wfgroup: Dict[str, List[FlyteWorkflowExecution]]
 ) -> bool:
     for executions in executions_by_wfgroup.values():
         if not all([execution.is_done for execution in executions]):
@@ -38,7 +38,7 @@ def executions_finished(
 
 
 def sync_executions(
-        remote: FlyteRemote, executions_by_wfgroup: Dict[str, List[FlyteWorkflowExecution]]
+    remote: FlyteRemote, executions_by_wfgroup: Dict[str, List[FlyteWorkflowExecution]]
 ):
     try:
         for executions in executions_by_wfgroup.values():
@@ -58,12 +58,12 @@ def report_executions(executions_by_wfgroup: Dict[str, List[FlyteWorkflowExecuti
 
 
 def schedule_workflow_groups(
-        tag: str,
-        workflow_groups: List[str],
-        remote: FlyteRemote,
-        terminate_workflow_on_failure: bool,
-        parsed_manifest: List[dict],
-        cluster_pool_name: Optional[str] = None,
+    tag: str,
+    workflow_groups: List[str],
+    remote: FlyteRemote,
+    terminate_workflow_on_failure: bool,
+    parsed_manifest: List[dict],
+    cluster_pool_name: Optional[str] = None,
 ) -> Dict[str, bool]:
     """
     Schedule workflows executions for all workflow groups and return True if all executions succeed, otherwise
@@ -88,7 +88,7 @@ def schedule_workflow_groups(
     # Wait for all executions to finish
     attempt = 0
     while attempt == 0 or (
-            not executions_finished(executions_by_wfgroup) and attempt < MAX_ATTEMPTS
+        not executions_finished(executions_by_wfgroup) and attempt < MAX_ATTEMPTS
     ):
         attempt += 1
         print(
@@ -130,13 +130,13 @@ def valid(workflow_group, parsed_manifest):
 
 
 def run(
-        flytesnacks_release_tag: str,
-        priorities: List[str],
-        config_file_path,
-        terminate_workflow_on_failure: bool,
-        test_project_name: str,
-        test_project_domain: str,
-        cluster_pool_name: Optional[str] = None,
+    flytesnacks_release_tag: str,
+    priorities: List[str],
+    config_file_path,
+    terminate_workflow_on_failure: bool,
+    test_project_name: str,
+    test_project_domain: str,
+    cluster_pool_name: Optional[str] = None,
 ) -> List[Dict[str, str]]:
     remote = FlyteRemote(
         Config.auto(config_file=config_file_path),
@@ -250,14 +250,14 @@ def run(
     default=None,
 )
 def cli(
-        flytesnacks_release_tag,
-        priorities,
-        config_file,
-        return_non_zero_on_failure,
-        terminate_workflow_on_failure,
-        test_project_name,
-        test_project_domain,
-        cluster_pool_name,
+    flytesnacks_release_tag,
+    priorities,
+    config_file,
+    return_non_zero_on_failure,
+    terminate_workflow_on_failure,
+    test_project_name,
+    test_project_domain,
+    cluster_pool_name,
 ):
     print(f"return_non_zero_on_failure={return_non_zero_on_failure}")
     results = run(
