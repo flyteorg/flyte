@@ -8,6 +8,7 @@ require (
 	github.com/awalterschulze/gographviz v2.0.3+incompatible
 	github.com/charmbracelet/bubbles v0.18.0
 	github.com/charmbracelet/bubbletea v0.25.0
+	github.com/charmbracelet/lipgloss v0.10.0
 	github.com/disiqueira/gotree v1.0.0
 	github.com/docker/docker v26.1.5+incompatible
 	github.com/docker/go-connections v0.4.0

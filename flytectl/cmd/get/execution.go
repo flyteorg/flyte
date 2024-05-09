@@ -115,12 +115,12 @@ func ExecutionToProtoMessages(l []*admin.Execution) []proto.Message {
 }
 
 func getCallBack(ctx context.Context, cmdCtx cmdCore.CommandContext) bubbletea.DataCallback {
-	return func(filter filters.Filters) []proto.Message {
+	return func(filter filters.Filters) ([]proto.Message, error) {
 		executionList, err := cmdCtx.AdminFetcherExt().ListExecution(ctx, config.GetConfig().Project, config.GetConfig().Domain, filter)
 		if err != nil {
-			return nil
+			return nil, err
 		}
-		return ExecutionToProtoMessages(executionList.Executions)
+		return ExecutionToProtoMessages(executionList.Executions), nil
 	}
 }
 
@@ -154,17 +154,15 @@ func getExecutionFunc(ctx context.Context, args []string, cmdCtx cmdCore.Command
 		return adminPrinter.Print(config.GetConfig().MustOutputFormat(), executionColumns,
 			ExecutionToProtoMessages(executions)...)
 	}
+	if config.GetConfig().Interactive {
+		err := bubbletea.Paginator(executionColumns, getCallBack(ctx, cmdCtx), execution.DefaultConfig.Filter)
+		return err
+	}
 	executionList, err := cmdCtx.AdminFetcherExt().ListExecution(ctx, config.GetConfig().Project, config.GetConfig().Domain, execution.DefaultConfig.Filter)
 	if err != nil {
 		return err
 	}
 	logger.Infof(ctx, "Retrieved %v executions", len(executionList.Executions))
-
-	if config.GetConfig().Interactive {
-		bubbletea.Paginator(executionColumns, getCallBack(ctx, cmdCtx))
-		return nil
-	}
-
 	return adminPrinter.Print(config.GetConfig().MustOutputFormat(), executionColumns,
 		ExecutionToProtoMessages(executionList.Executions)...)
 }
