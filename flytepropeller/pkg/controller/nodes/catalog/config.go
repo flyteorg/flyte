@@ -104,7 +104,7 @@ func NewCacheClient(ctx context.Context, dataStore *storage.DataStore, authOpt .
 		if err != nil {
 			return nil, err
 		}
-		return cacheservice.NewFallbackClient(cacheClient, catalogClient)
+		return cacheservice.NewFallbackClient(cacheClient, catalogClient, dataStore)
 	case DataCatalogType:
 		return datacatalog.NewDataCatalog(ctx, catalogConfig.Endpoint, catalogConfig.Insecure,
 			catalogConfig.MaxCacheAge.Duration, catalogConfig.UseAdminAuth, catalogConfig.DefaultServiceConfig,

@@ -11,7 +11,9 @@ import (
 	catalogIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 var (
@@ -21,6 +23,7 @@ var (
 type FallbackClient struct {
 	cacheClient   catalog.Client
 	catalogClient catalog.Client
+	dataStore     *storage.DataStore
 }
 
 func (c *FallbackClient) GetOrExtendReservation(ctx context.Context, key catalog.Key, ownerID string, heartbeatInterval time.Duration) (*catalogIdl.Reservation, error) {
@@ -29,6 +32,32 @@ func (c *FallbackClient) GetOrExtendReservation(ctx context.Context, key catalog
 
 func (c *FallbackClient) ReleaseReservation(ctx context.Context, key catalog.Key, ownerID string) error {
 	return c.cacheClient.ReleaseReservation(ctx, key, ownerID)
+}
+
+func (c *FallbackClient) generateFileOutputReader(ctx context.Context, key catalog.Key, catalogEntry catalog.Entry) (ioutils.RemoteFileOutputReader, error) {
+	cacheKey, err := GenerateCacheKey(ctx, key)
+	if err != nil {
+		return ioutils.RemoteFileOutputReader{}, err
+	}
+
+	reference, err := c.dataStore.ConstructReference(ctx, c.dataStore.GetBaseContainerFQN(ctx), "cached_outputs", cacheKey)
+	if err != nil {
+		return ioutils.RemoteFileOutputReader{}, err
+	}
+
+	outputPath := ioutils.NewReadOnlyOutputFilePaths(ctx, c.dataStore, reference)
+	outputs, ee, err := catalogEntry.GetOutputs().Read(ctx)
+	if err != nil || ee != nil {
+		return ioutils.RemoteFileOutputReader{}, err
+	}
+
+	err = c.dataStore.WriteProtobuf(ctx, outputPath.GetOutputPath(), storage.Options{}, outputs)
+	if err != nil {
+		return ioutils.RemoteFileOutputReader{}, err
+	}
+
+	outputReader := ioutils.NewRemoteFileOutputReader(ctx, c.dataStore, outputPath, int64(999999999))
+	return outputReader, nil
 }
 
 func (c *FallbackClient) Get(ctx context.Context, key catalog.Key) (catalog.Entry, error) {
@@ -56,9 +85,15 @@ func (c *FallbackClient) Get(ctx context.Context, key catalog.Key) (catalog.Entr
 		metadata.TaskExecutionIdentifier = catalogEntry.GetStatus().GetMetadata().GetSourceTaskExecution()
 	}
 
-	_, err = c.cacheClient.Put(ctx, key, catalogEntry.GetOutputs(), metadata)
+	outputReader, err := c.generateFileOutputReader(ctx, key, catalogEntry)
 	if err != nil {
-		logger.Warnf(ctx, "Failed to cache entry for key [%s], err: %v", key, err)
+		logger.Warnf(ctx, "Failed to generate output reader for key [%s] when falling back, err: %v", key, err)
+		return catalogEntry, nil
+	}
+
+	_, err = c.cacheClient.Put(ctx, key, outputReader, metadata)
+	if err != nil {
+		logger.Warnf(ctx, "Failed to cache entry for key [%s] when falling back, err: %v", key, err)
 	}
 
 	return catalogEntry, nil
@@ -72,9 +107,10 @@ func (c *FallbackClient) Put(ctx context.Context, key catalog.Key, reader io.Out
 	return c.cacheClient.Put(ctx, key, reader, metadata)
 }
 
-func NewFallbackClient(cacheClient catalog.Client, catalogClient catalog.Client) (*FallbackClient, error) {
+func NewFallbackClient(cacheClient catalog.Client, catalogClient catalog.Client, dataStore *storage.DataStore) (*FallbackClient, error) {
 	return &FallbackClient{
 		cacheClient:   cacheClient,
 		catalogClient: catalogClient,
+		dataStore:     dataStore,
 	}, nil
 }

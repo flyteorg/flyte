@@ -13,12 +13,16 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
 	catalogmocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog/mocks"
 	mocks2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
+	storageMocks "github.com/flyteorg/flyte/flytestdlib/storage/mocks"
 )
 
 func TestFallBack_Get(t *testing.T) {
 	ctx := context.Background()
 
-	mockEntry := catalog.NewCatalogEntry(&mocks2.OutputReader{}, catalog.NewStatus(core.CatalogCacheStatus_CACHE_POPULATED, &core.CatalogMetadata{}))
+	mockOutputReader := &mocks2.OutputReader{}
+	mockOutputReader.On("Read", mock.Anything).Return(&core.LiteralMap{}, nil, nil)
+	mockEntry := catalog.NewCatalogEntry(mockOutputReader, catalog.NewStatus(core.CatalogCacheStatus_CACHE_POPULATED, &core.CatalogMetadata{}))
 
 	testCases := []struct {
 		name                       string
@@ -26,6 +30,7 @@ func TestFallBack_Get(t *testing.T) {
 		mockCatalogClientGetError  error
 		mockCatalogClientGetEntry  catalog.Entry
 		mockCacheServicePurError   error
+		generateFileOutputReader   error
 		expectCatalogClientGetCall bool
 		expectCacheServicePutCall  bool
 		expectError                bool
@@ -75,9 +80,20 @@ func TestFallBack_Get(t *testing.T) {
 			name:                       "cache client put error",
 			mockCacheServiceGetError:   status.Error(codes.NotFound, "not found"),
 			mockCatalogClientGetError:  nil,
+			mockCatalogClientGetEntry:  mockEntry,
 			mockCacheServicePurError:   status.Error(codes.Internal, "put error"),
 			expectCatalogClientGetCall: true,
 			expectCacheServicePutCall:  true,
+			expectError:                false,
+		},
+		{
+			name:                       "generateFileOutputReader error",
+			mockCacheServiceGetError:   status.Error(codes.NotFound, "not found"),
+			mockCatalogClientGetError:  nil,
+			mockCatalogClientGetEntry:  mockEntry,
+			generateFileOutputReader:   status.Error(codes.Internal, "generateFileOutputReader error"),
+			expectCatalogClientGetCall: true,
+			expectCacheServicePutCall:  false,
 			expectError:                false,
 		},
 	}
@@ -102,7 +118,17 @@ func TestFallBack_Get(t *testing.T) {
 				mock.Anything,
 			).Return(tc.mockCatalogClientGetEntry, tc.mockCatalogClientGetError)
 
-			fallbackClient, err := NewFallbackClient(mockCacheClient, mockCatalogClient)
+			mockPBStore := &storageMocks.ComposedProtobufStore{}
+			mockPBStore.On("GetBaseContainerFQN", ctx).Return(storage.DataReference("test"))
+			mockPBStore.On("WriteProtobuf", ctx, mock.Anything, mock.Anything, mock.Anything).Return(tc.generateFileOutputReader)
+			mockReferenceConstructor := &storageMocks.ReferenceConstructor{}
+			mockReferenceConstructor.On("ConstructReference", ctx, mock.Anything, mock.Anything, mock.Anything).Return(storage.DataReference("test"), nil)
+			store := &storage.DataStore{
+				ComposedProtobufStore: mockPBStore,
+				ReferenceConstructor:  mockReferenceConstructor,
+			}
+
+			fallbackClient, err := NewFallbackClient(mockCacheClient, mockCatalogClient, store)
 			assert.NoError(t, err)
 
 			entry, err := fallbackClient.Get(ctx, catalog.Key{})
