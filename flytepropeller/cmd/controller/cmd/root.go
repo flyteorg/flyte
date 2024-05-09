@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"runtime"
+	"strings"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/spf13/cobra"
@@ -128,13 +129,12 @@ func executeRootCmd(baseCtx context.Context, cfg *config2.Config) error {
 	}
 
 	// Add the propeller subscope because the MetricsPrefix only has "flyte:" to get uniform collection of metrics.
-	propellerScope := promutils.NewScope(cfg.MetricsPrefix).NewSubScope("propeller").NewSubScope(cfg.LimitNamespace)
-	limitNamespace := ""
-	var namespaceConfigs map[string]cache.Config
+	propellerScope := promutils.NewScope(cfg.MetricsPrefix).NewSubScope("propeller").NewSubScope(strings.Replace(cfg.LimitNamespace, ",", "-", -1))
+	namespaceConfigs := make(map[string]cache.Config)
 	if cfg.LimitNamespace != defaultNamespace {
-		limitNamespace = cfg.LimitNamespace
-		namespaceConfigs = map[string]cache.Config{
-			limitNamespace: {},
+		limitNamespaces := strings.Split(cfg.LimitNamespace, ",")
+		for _, limitNamespace := range limitNamespaces {
+			namespaceConfigs[limitNamespace] = cache.Config{}
 		}
 	}
 

@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"golang.org/x/sync/errgroup"
@@ -96,10 +97,11 @@ func runWebhook(origContext context.Context, propellerCfg *config.Config, cfg *w
 	}
 
 	webhookScope := promutils.NewScope(cfg.MetricsPrefix).NewSubScope("webhook")
-	var namespaceConfigs map[string]cache.Config
+	namespaceConfigs := make(map[string]cache.Config)
 	if propellerCfg.LimitNamespace != defaultNamespace {
-		namespaceConfigs = map[string]cache.Config{
-			propellerCfg.LimitNamespace: {},
+		limitNamespaces := strings.Split(propellerCfg.LimitNamespace, ",")
+		for _, limitNamespace := range limitNamespaces {
+			namespaceConfigs[limitNamespace] = cache.Config{}
 		}
 	}
 
