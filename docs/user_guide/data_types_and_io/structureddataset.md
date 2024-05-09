@@ -237,7 +237,7 @@ You can now use `numpy.ndarray` to deserialize the parquet file to NumPy and ser
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/data_types_and_io/data_types_and_io/structured_dataset.py
 :caption: data_types_and_io/structured_dataset.py
-:lines: 134-147
+:lines: 134-149
 ```
 
 :::{note}
