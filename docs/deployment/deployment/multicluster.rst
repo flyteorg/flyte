@@ -199,13 +199,20 @@ the first cluster only.
             insecure: false #enables secure communication over SSL. Requires a signed certificate
         catalog:
           catalog-cache:
-            endpoint: <your-Ingress-FQDN>:443
+            endpoint: <your-datacatalog-address>
             insecure: false 
 
 .. note:: 
 
    This step is needed so the ``flytepropeller`` instance in the data plane cluster is able to send notifications
-   back to the ``flyteadmin`` service in the control plane. The ``catalog`` service runs in the control plane and is used when caching is enabled.
+   back to the ``flyteadmin`` service in the control plane.
+
+   The ``catalog`` service runs in the control plane and is used when caching is enabled. Note that ``catalog`` is
+   not exposed via the ingress by default and does not have its own authentication mechanism. The ``catalog`` service
+   in the control plane cluster can for instance be made available to the ``flytepropeller`` services in the data plane
+   clusters with an internal load balancer service (see e.g. `GKE documentation <https://cloud.google.com/kubernetes-engine/docs/how-to/internal-load-balancing#create>`_
+   or `AWS Load Balancer Controller <https://kubernetes-sigs.github.io/aws-load-balancer-controller/latest/guide/service/nlb/>`_).
+   if the clusters use the same VPC network.
 
 3. Install Flyte data plane Helm chart:
 
