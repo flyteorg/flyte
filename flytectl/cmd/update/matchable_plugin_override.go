@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 
+	sconfig "github.com/flyteorg/flyte/flytectl/cmd/config/subcommand"
+	pluginoverride "github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/plugin_override"
+	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-	sconfig "github.com/flyteorg/flytectl/cmd/config/subcommand"
-	pluginoverride "github.com/flyteorg/flytectl/cmd/config/subcommand/plugin_override"
-	cmdCore "github.com/flyteorg/flytectl/cmd/core"
 )
 
 const (

@@ -2,7 +2,7 @@ name: Upload flyteidl to PyPI and npm
 
 on:
   release:
-    types: [created]
+    types: [published]
 
 jobs:
   deploy-to-pypi:

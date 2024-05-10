@@ -7,13 +7,13 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/mocks"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 
+	"github.com/flyteorg/flyte/flytectl/cmd/config"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
-	"github.com/flyteorg/flytectl/cmd/config"
 
+	rconfig "github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/register"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	rconfig "github.com/flyteorg/flytectl/cmd/config/subcommand/register"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )

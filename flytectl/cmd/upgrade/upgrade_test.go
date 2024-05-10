@@ -4,16 +4,16 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/flyteorg/flytectl/cmd/testutils"
+	"github.com/flyteorg/flyte/flytectl/cmd/testutils"
 
-	"github.com/flyteorg/flytectl/pkg/github"
-	"github.com/flyteorg/flytectl/pkg/util"
+	"github.com/flyteorg/flyte/flytectl/pkg/github"
+	"github.com/flyteorg/flyte/flytectl/pkg/util"
 
-	"github.com/flyteorg/flytectl/pkg/platformutil"
+	"github.com/flyteorg/flyte/flytectl/pkg/platformutil"
 
 	stdlibversion "github.com/flyteorg/flyte/flytestdlib/version"
 
-	cmdCore "github.com/flyteorg/flytectl/cmd/core"
+	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 )

@@ -8,16 +8,16 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/flyteorg/flytectl/cmd/testutils"
+	"github.com/flyteorg/flyte/flytectl/cmd/testutils"
 
 	admin2 "github.com/flyteorg/flyte/flyteidl/clients/go/admin"
 
-	cmdCore "github.com/flyteorg/flytectl/cmd/core"
+	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/docker/docker/api/types"
-	"github.com/flyteorg/flytectl/pkg/docker"
-	"github.com/flyteorg/flytectl/pkg/docker/mocks"
+	"github.com/flyteorg/flyte/flytectl/pkg/docker"
+	"github.com/flyteorg/flyte/flytectl/pkg/docker/mocks"
 	"github.com/stretchr/testify/mock"
 )
 

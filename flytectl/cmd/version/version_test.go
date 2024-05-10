@@ -8,16 +8,16 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/flyteorg/flytectl/cmd/testutils"
+	"github.com/flyteorg/flyte/flytectl/cmd/testutils"
 
 	admin2 "github.com/flyteorg/flyte/flyteidl/clients/go/admin"
 
 	"github.com/spf13/cobra"
 
+	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/mocks"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	stdlibversion "github.com/flyteorg/flyte/flytestdlib/version"
-	cmdCore "github.com/flyteorg/flytectl/cmd/core"
 	"github.com/stretchr/testify/assert"
 )
 

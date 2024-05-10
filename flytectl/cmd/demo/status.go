@@ -3,10 +3,10 @@ package demo
 import (
 	"context"
 
-	"github.com/flyteorg/flytectl/pkg/sandbox"
+	"github.com/flyteorg/flyte/flytectl/pkg/sandbox"
 
-	cmdCore "github.com/flyteorg/flytectl/cmd/core"
-	"github.com/flyteorg/flytectl/pkg/docker"
+	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
+	"github.com/flyteorg/flyte/flytectl/pkg/docker"
 )
 
 const (

@@ -22,21 +22,21 @@ import (
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 
-	g "github.com/flyteorg/flytectl/pkg/github"
+	g "github.com/flyteorg/flyte/flytectl/pkg/github"
 
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flyte/flytestdlib/utils"
 
+	"github.com/flyteorg/flyte/flytectl/cmd/config"
+	rconfig "github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/register"
+	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
+	"github.com/flyteorg/flyte/flytectl/pkg/printer"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
-	"github.com/flyteorg/flytectl/cmd/config"
-	rconfig "github.com/flyteorg/flytectl/cmd/config/subcommand/register"
-	cmdCore "github.com/flyteorg/flytectl/cmd/core"
-	"github.com/flyteorg/flytectl/pkg/printer"
 	"github.com/google/go-github/v42/github"
 
 	"github.com/golang/protobuf/jsonpb"

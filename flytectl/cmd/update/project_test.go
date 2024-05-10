@@ -8,10 +8,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/flyteorg/flytectl/cmd/config"
-	"github.com/flyteorg/flytectl/cmd/config/subcommand/project"
-	"github.com/flyteorg/flytectl/cmd/testutils"
-	"github.com/flyteorg/flytectl/pkg/ext"
+	"github.com/flyteorg/flyte/flytectl/cmd/config"
+	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/project"
+	"github.com/flyteorg/flyte/flytectl/cmd/testutils"
+	"github.com/flyteorg/flyte/flytectl/pkg/ext"
 )
 
 func TestProjectCanBeActivated(t *testing.T) {

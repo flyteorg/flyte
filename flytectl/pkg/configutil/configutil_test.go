@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	f "github.com/flyteorg/flytectl/pkg/filesystemutils"
+	f "github.com/flyteorg/flyte/flytectl/pkg/filesystemutils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

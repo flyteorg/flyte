@@ -6,11 +6,11 @@ import (
 
 	"github.com/docker/docker/api/types"
 	"github.com/enescakir/emoji"
-	sandboxCmdConfig "github.com/flyteorg/flytectl/cmd/config/subcommand/sandbox"
-	"github.com/flyteorg/flytectl/pkg/configutil"
-	"github.com/flyteorg/flytectl/pkg/docker"
-	"github.com/flyteorg/flytectl/pkg/k8s"
-	"github.com/flyteorg/flytectl/pkg/util"
+	sandboxCmdConfig "github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/sandbox"
+	"github.com/flyteorg/flyte/flytectl/pkg/configutil"
+	"github.com/flyteorg/flyte/flytectl/pkg/docker"
+	"github.com/flyteorg/flyte/flytectl/pkg/k8s"
+	"github.com/flyteorg/flyte/flytectl/pkg/util"
 )
 
 func Teardown(ctx context.Context, cli docker.Docker, teardownFlags *sandboxCmdConfig.TeardownFlags) error {

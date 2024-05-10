@@ -6,9 +6,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/flyteorg/flyte/flytectl/pkg/github/mocks"
+	"github.com/flyteorg/flyte/flytectl/pkg/platformutil"
 	stdlibversion "github.com/flyteorg/flyte/flytestdlib/version"
-	"github.com/flyteorg/flytectl/pkg/github/mocks"
-	"github.com/flyteorg/flytectl/pkg/platformutil"
 	"github.com/google/go-github/v42/github"
 
 	"github.com/stretchr/testify/assert"
@@ -181,7 +181,7 @@ func TestGetUpgradeMessage(t *testing.T) {
 	stdlibversion.Version = "v0.2.10"
 	message, err := GetUpgradeMessage(version, darwin)
 	assert.Nil(t, err)
-	assert.Equal(t, 157, len(message))
+	assert.Equal(t, 163, len(message))
 
 	version = "v0.2.09"
 	message, err = GetUpgradeMessage(version, darwin)
@@ -196,10 +196,10 @@ func TestGetUpgradeMessage(t *testing.T) {
 	version = "v0.2.20"
 	message, err = GetUpgradeMessage(version, windows)
 	assert.Nil(t, err)
-	assert.Equal(t, 157, len(message))
+	assert.Equal(t, 163, len(message))
 
 	version = "v0.2.20"
 	message, err = GetUpgradeMessage(version, linux)
 	assert.Nil(t, err)
-	assert.Equal(t, 157, len(message))
+	assert.Equal(t, 163, len(message))
 }

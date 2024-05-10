@@ -6,14 +6,14 @@ import (
 	"fmt"
 	"runtime"
 
-	"github.com/flyteorg/flytectl/pkg/github"
+	"github.com/flyteorg/flyte/flytectl/pkg/github"
 
-	"github.com/flyteorg/flytectl/pkg/platformutil"
+	"github.com/flyteorg/flyte/flytectl/pkg/platformutil"
 
+	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	stdlibversion "github.com/flyteorg/flyte/flytestdlib/version"
-	cmdCore "github.com/flyteorg/flytectl/cmd/core"
 	"github.com/spf13/cobra"
 )
 

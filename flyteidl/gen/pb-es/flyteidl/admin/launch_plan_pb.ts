@@ -11,6 +11,7 @@ import { LiteralMap } from "../core/literals_pb.js";
 import { Annotations, AuthRole, Envs, Labels, NamedEntityIdentifier, Notification, RawOutputDataConfig, Sort } from "./common_pb.js";
 import { SecurityContext } from "../core/security_pb.js";
 import { QualityOfService } from "../core/execution_pb.js";
+import { ExecutionEnvAssignment } from "../core/execution_envs_pb.js";
 import { Schedule } from "./schedule_pb.js";
 
 /**
@@ -412,6 +413,13 @@ export class LaunchPlanSpec extends Message<LaunchPlanSpec> {
    */
   envs?: Envs;
 
+  /**
+   * Execution environment assignments to be set for the execution.
+   *
+   * @generated from field: repeated flyteidl.core.ExecutionEnvAssignment execution_env_assignments = 22;
+   */
+  executionEnvAssignments: ExecutionEnvAssignment[] = [];
+
   constructor(data?: PartialMessage<LaunchPlanSpec>) {
     super();
     proto3.util.initPartial(data, this);
@@ -436,6 +444,7 @@ export class LaunchPlanSpec extends Message<LaunchPlanSpec> {
     { no: 19, name: "interruptible", kind: "message", T: BoolValue },
     { no: 20, name: "overwrite_cache", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 21, name: "envs", kind: "message", T: Envs },
+    { no: 22, name: "execution_env_assignments", kind: "message", T: ExecutionEnvAssignment, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): LaunchPlanSpec {

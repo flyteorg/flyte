@@ -5027,6 +5027,14 @@
         "execution_cluster_label": {
           "$ref": "#/definitions/adminExecutionClusterLabel",
           "description": "Execution cluster label to be set for the execution."
+        },
+        "execution_env_assignments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/coreExecutionEnvAssignment"
+          },
+          "description": "Execution environment assignments to be set for the execution."
         }
       },
       "description": "An ExecutionSpec encompasses all data used to launch this execution. The Spec does not change over the lifetime\nof an execution as it progresses across phase changes."
@@ -5295,6 +5303,14 @@
         "envs": {
           "$ref": "#/definitions/adminEnvs",
           "description": "Environment variables to be set for the execution."
+        },
+        "execution_env_assignments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/coreExecutionEnvAssignment"
+          },
+          "description": "Execution environment assignments to be set for the execution."
         }
       },
       "description": "User-provided launch plan definition and configuration values."
@@ -6357,6 +6373,14 @@
         "envs": {
           "$ref": "#/definitions/adminEnvs",
           "description": "Environment variables to be set for the execution."
+        },
+        "execution_env_assignments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/coreExecutionEnvAssignment"
+          },
+          "description": "Execution environment assignments to be set for the execution."
         }
       },
       "description": "Adds defaults for customizable workflow-execution specifications and overrides."
@@ -7013,6 +7037,49 @@
         }
       },
       "description": "Represents an error thrown from a node."
+    },
+    "coreExecutionEnv": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "id is a unique identifier for the execution environment."
+        },
+        "type": {
+          "type": "string",
+          "description": "type is the type of the execution environment."
+        },
+        "extant": {
+          "type": "object",
+          "description": "extant is a reference to an existing environment."
+        },
+        "spec": {
+          "type": "object",
+          "description": "spec is a specification of the environment."
+        }
+      },
+      "description": "ExecutionEnv is a message that is used to specify the execution environment."
+    },
+    "coreExecutionEnvAssignment": {
+      "type": "object",
+      "properties": {
+        "node_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "node_ids is a list of node ids that are being assigned the execution environment."
+        },
+        "task_type": {
+          "type": "string",
+          "description": "task_type is the type of task that is being assigned. This is used to override which Flyte\nplugin will be used during execution."
+        },
+        "execution_env": {
+          "$ref": "#/definitions/coreExecutionEnv",
+          "description": "execution_env is the environment that is being assigned to the nodes."
+        }
+      },
+      "description": "ExecutionEnvAssignment is a message that is used to assign an execution environment to a set of\nnodes."
     },
     "coreExecutionError": {
       "type": "object",

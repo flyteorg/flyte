@@ -7,10 +7,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
+	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/clusterresourceattribute"
+	"github.com/flyteorg/flyte/flytectl/cmd/testutils"
+	"github.com/flyteorg/flyte/flytectl/pkg/ext"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flytectl/cmd/config/subcommand/clusterresourceattribute"
-	"github.com/flyteorg/flytectl/cmd/testutils"
-	"github.com/flyteorg/flytectl/pkg/ext"
 )
 
 const (
@@ -402,6 +402,8 @@ func testWorkflowClusterResourceAttributeUpdateWithMockSetup(
 	asserter func(s *testutils.TestStruct, err error),
 ) {
 	s := testutils.Setup()
+	defer s.TearDown()
+
 	clusterresourceattribute.DefaultUpdateConfig = &clusterresourceattribute.AttrUpdateConfig{}
 	target := newTestWorkflowClusterResourceAttribute()
 
@@ -411,6 +413,7 @@ func testWorkflowClusterResourceAttributeUpdateWithMockSetup(
 
 	if setup != nil {
 		setup(&s, clusterresourceattribute.DefaultUpdateConfig, target)
+		defer s.TearDown()
 	}
 
 	err := updateClusterResourceAttributesFunc(s.Ctx, nil, s.CmdCtx)
@@ -467,6 +470,8 @@ func testProjectClusterResourceAttributeUpdateWithMockSetup(
 	asserter func(s *testutils.TestStruct, err error),
 ) {
 	s := testutils.Setup()
+	defer s.TearDown()
+
 	clusterresourceattribute.DefaultUpdateConfig = &clusterresourceattribute.AttrUpdateConfig{}
 	target := newTestProjectClusterResourceAttribute()
 
@@ -476,6 +481,7 @@ func testProjectClusterResourceAttributeUpdateWithMockSetup(
 
 	if setup != nil {
 		setup(&s, clusterresourceattribute.DefaultUpdateConfig, target)
+		defer s.TearDown()
 	}
 
 	err := updateClusterResourceAttributesFunc(s.Ctx, nil, s.CmdCtx)
@@ -539,6 +545,7 @@ func testProjectDomainClusterResourceAttributeUpdateWithMockSetup(
 
 	if setup != nil {
 		setup(&s, clusterresourceattribute.DefaultUpdateConfig, target)
+		defer s.TearDown()
 	}
 
 	err := updateClusterResourceAttributesFunc(s.Ctx, nil, s.CmdCtx)

@@ -10,10 +10,10 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/flyteorg/flyte/flytectl/pkg/visualize"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/errors"
-	"github.com/flyteorg/flytectl/pkg/visualize"
 
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"

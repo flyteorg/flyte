@@ -6,7 +6,7 @@ import (
 	"sort"
 	"testing"
 
-	u "github.com/flyteorg/flytectl/cmd/testutils"
+	u "github.com/flyteorg/flyte/flytectl/cmd/testutils"
 	"github.com/stretchr/testify/assert"
 )
 

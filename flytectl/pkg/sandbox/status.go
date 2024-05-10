@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/enescakir/emoji"
-	"github.com/flyteorg/flytectl/pkg/docker"
+	"github.com/flyteorg/flyte/flytectl/pkg/docker"
 )
 
 func PrintStatus(ctx context.Context, cli docker.Docker) error {

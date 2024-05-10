@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
-	config "github.com/flyteorg/flytectl/cmd/config/subcommand/compile"
-	cmdCore "github.com/flyteorg/flytectl/cmd/core"
-	u "github.com/flyteorg/flytectl/cmd/testutils"
+	config "github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/compile"
+	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
+	u "github.com/flyteorg/flyte/flytectl/cmd/testutils"
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 )
@@ -31,6 +31,7 @@ func TestCompileCommand(t *testing.T) {
 	compileCfg.File = "testdata/valid-package.tgz"
 	var setup = u.Setup
 	s := setup()
+	defer s.TearDown()
 	compileCmd := CreateCompileCommand()["compile"]
 	err := compileCmd.CmdFunc(context.Background(), []string{}, s.CmdCtx)
 	assert.Nil(t, err, "compiling via cmd returns err")

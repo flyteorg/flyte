@@ -3,9 +3,9 @@ package get
 import (
 	"context"
 
+	sconfig "github.com/flyteorg/flyte/flytectl/cmd/config/subcommand"
+	"github.com/flyteorg/flyte/flytectl/pkg/ext"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-	sconfig "github.com/flyteorg/flytectl/cmd/config/subcommand"
-	"github.com/flyteorg/flytectl/pkg/ext"
 )
 
 func FetchAndUnDecorateMatchableAttr(ctx context.Context, project, domain, workflowName string,

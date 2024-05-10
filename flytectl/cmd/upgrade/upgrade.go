@@ -8,17 +8,17 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/flyteorg/flytectl/pkg/util"
+	"github.com/flyteorg/flyte/flytectl/pkg/util"
 
 	stdlibversion "github.com/flyteorg/flyte/flytestdlib/version"
 
-	"github.com/flyteorg/flytectl/pkg/github"
+	"github.com/flyteorg/flyte/flytectl/pkg/github"
 
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/mouuff/go-rocket-update/pkg/updater"
 
-	cmdCore "github.com/flyteorg/flytectl/cmd/core"
-	"github.com/flyteorg/flytectl/pkg/platformutil"
+	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
+	"github.com/flyteorg/flyte/flytectl/pkg/platformutil"
 	"github.com/spf13/cobra"
 )
 

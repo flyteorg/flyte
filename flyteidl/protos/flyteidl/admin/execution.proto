@@ -7,6 +7,7 @@ import "flyteidl/admin/cluster_assignment.proto";
 import "flyteidl/admin/common.proto";
 import "flyteidl/core/literals.proto";
 import "flyteidl/core/execution.proto";
+import "flyteidl/core/execution_envs.proto";
 import "flyteidl/core/artifact_id.proto";
 import "flyteidl/core/identifier.proto";
 import "flyteidl/core/metrics.proto";
@@ -334,6 +335,9 @@ message ExecutionSpec {
 
     // Execution cluster label to be set for the execution.
     ExecutionClusterLabel execution_cluster_label = 25;
+
+    // Execution environment assignments to be set for the execution.
+    repeated core.ExecutionEnvAssignment execution_env_assignments = 26;
 }
 
 // Request to terminate an in-progress execution.  This action is irreversible.

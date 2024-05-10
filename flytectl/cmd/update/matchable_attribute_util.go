@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"os"
 
+	sconfig "github.com/flyteorg/flyte/flytectl/cmd/config/subcommand"
+	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
+	cmdUtil "github.com/flyteorg/flyte/flytectl/pkg/commandutils"
+	"github.com/flyteorg/flyte/flytectl/pkg/ext"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-	sconfig "github.com/flyteorg/flytectl/cmd/config/subcommand"
-	cmdCore "github.com/flyteorg/flytectl/cmd/core"
-	cmdUtil "github.com/flyteorg/flytectl/pkg/commandutils"
-	"github.com/flyteorg/flytectl/pkg/ext"
 )
 
 func DecorateAndUpdateMatchableAttr(
