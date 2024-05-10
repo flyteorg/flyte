@@ -3,6 +3,7 @@ package task
 import (
 	"bytes"
 	"context"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"strconv"
 	"strings"
 
@@ -65,11 +66,12 @@ func (te taskExecutionID) GetGeneratedNameWith(minLength, maxLength int) (string
 
 type taskExecutionMetadata struct {
 	interfaces.NodeExecutionMetadata
-	taskExecID           taskExecutionID
-	o                    pluginCore.TaskOverrides
-	maxAttempts          uint32
-	platformResources    *v1.ResourceRequirements
-	environmentVariables map[string]string
+	taskExecID                taskExecutionID
+	o                         pluginCore.TaskOverrides
+	maxAttempts               uint32
+	platformResources         *v1.ResourceRequirements
+	environmentVariables      map[string]string
+	externalResourceAttribute *admin.ExternalResourceAttributes
 }
 
 func (t taskExecutionMetadata) GetTaskExecutionID() pluginCore.TaskExecutionID {
@@ -92,6 +94,10 @@ func (t taskExecutionMetadata) GetEnvironmentVariables() map[string]string {
 	return t.environmentVariables
 }
 
+func (t taskExecutionMetadata) GetExternalResourceAttributes() *admin.ExternalResourceAttributes {
+	return t.externalResourceAttribute
+}
+
 type taskExecutionContext struct {
 	interfaces.NodeExecutionContext
 	tm  taskExecutionMetadata
@@ -101,7 +107,6 @@ type taskExecutionContext struct {
 	ow  *ioutils.BufferedOutputWriter
 	ber *bufferedEventRecorder
 	sm  pluginCore.SecretManager
-	cm  pluginCore.ConnectionManager
 	c   pluginCatalog.AsyncClient
 }
 
@@ -151,10 +156,6 @@ func (t *taskExecutionContext) PluginStateWriter() pluginCore.PluginStateWriter 
 
 func (t taskExecutionContext) SecretManager() pluginCore.SecretManager {
 	return t.sm
-}
-
-func (t *taskExecutionContext) ConnectionManager() pluginCore.ConnectionManager {
-	return t.cm
 }
 
 // Validates and assigns a single resource by examining the default requests and max limit with the static resource value
@@ -211,7 +212,20 @@ func convertTaskResourcesToRequirements(taskResources v1alpha1.TaskResources) *v
 			utils.ResourceNvidiaGPU:     taskResources.Limits.GPU,
 		},
 	}
+}
 
+func convertExternalResourceAttribute(externalResourceAttribute v1alpha1.ExternalResourceAttributes) *admin.ExternalResourceAttributes {
+	connections := make(map[string]*core.Connection)
+	for k, v := range externalResourceAttribute.Connections {
+		connections[k] = &core.Connection{
+			Secrets: v.Secrets,
+			Configs: v.Configs,
+		}
+	}
+
+	return &admin.ExternalResourceAttributes{
+		Connections: connections,
+	}
 }
 
 // ComputeRawOutputPrefix constructs the output directory, where raw outputs of a task can be stored by the task. FlytePropeller may not have
@@ -304,10 +318,11 @@ func (t *Handler) newTaskExecutionContext(ctx context.Context, nCtx interfaces.N
 				id:           id,
 				uniqueNodeID: currentNodeUniqueID,
 			},
-			o:                    nCtx.Node(),
-			maxAttempts:          maxAttempts,
-			platformResources:    convertTaskResourcesToRequirements(nCtx.ExecutionContext().GetExecutionConfig().TaskResources),
-			environmentVariables: nCtx.ExecutionContext().GetExecutionConfig().EnvironmentVariables,
+			o:                         nCtx.Node(),
+			maxAttempts:               maxAttempts,
+			platformResources:         convertTaskResourcesToRequirements(nCtx.ExecutionContext().GetExecutionConfig().TaskResources),
+			environmentVariables:      nCtx.ExecutionContext().GetExecutionConfig().EnvironmentVariables,
+			externalResourceAttribute: convertExternalResourceAttribute(nCtx.ExecutionContext().GetExecutionConfig().ExternalResourceAttribute),
 		},
 		rm: resourcemanager.GetTaskResourceManager(
 			t.resourceManager, resourceNamespacePrefix, id),
@@ -317,6 +332,5 @@ func (t *Handler) newTaskExecutionContext(ctx context.Context, nCtx interfaces.N
 		ber: newBufferedEventRecorder(),
 		c:   t.asyncCatalog,
 		sm:  t.secretManager,
-		cm:  t.connectionManager,
 	}, nil
 }

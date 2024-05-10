@@ -34250,6 +34250,7 @@
                  * @property {Array.<string>|null} [tags] ExecutionSpec tags
                  * @property {flyteidl.admin.IExecutionClusterLabel|null} [executionClusterLabel] ExecutionSpec executionClusterLabel
                  * @property {Array.<flyteidl.core.IExecutionEnvAssignment>|null} [executionEnvAssignments] ExecutionSpec executionEnvAssignments
+                 * @property {flyteidl.admin.IExternalResourceAttributes|null} [externalResourceAttributes] ExecutionSpec externalResourceAttributes
                  */
     
                 /**
@@ -34421,6 +34422,14 @@
                  */
                 ExecutionSpec.prototype.executionEnvAssignments = $util.emptyArray;
     
+                /**
+                 * ExecutionSpec externalResourceAttributes.
+                 * @member {flyteidl.admin.IExternalResourceAttributes|null|undefined} externalResourceAttributes
+                 * @memberof flyteidl.admin.ExecutionSpec
+                 * @instance
+                 */
+                ExecutionSpec.prototype.externalResourceAttributes = null;
+    
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
     
@@ -34499,6 +34508,8 @@
                     if (message.executionEnvAssignments != null && message.executionEnvAssignments.length)
                         for (var i = 0; i < message.executionEnvAssignments.length; ++i)
                             $root.flyteidl.core.ExecutionEnvAssignment.encode(message.executionEnvAssignments[i], writer.uint32(/* id 26, wireType 2 =*/210).fork()).ldelim();
+                    if (message.externalResourceAttributes != null && message.hasOwnProperty("externalResourceAttributes"))
+                        $root.flyteidl.admin.ExternalResourceAttributes.encode(message.externalResourceAttributes, writer.uint32(/* id 27, wireType 2 =*/218).fork()).ldelim();
                     return writer;
                 };
     
@@ -34580,6 +34591,9 @@
                             if (!(message.executionEnvAssignments && message.executionEnvAssignments.length))
                                 message.executionEnvAssignments = [];
                             message.executionEnvAssignments.push($root.flyteidl.core.ExecutionEnvAssignment.decode(reader, reader.uint32()));
+                            break;
+                        case 27:
+                            message.externalResourceAttributes = $root.flyteidl.admin.ExternalResourceAttributes.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -34702,6 +34716,11 @@
                             if (error)
                                 return "executionEnvAssignments." + error;
                         }
+                    }
+                    if (message.externalResourceAttributes != null && message.hasOwnProperty("externalResourceAttributes")) {
+                        var error = $root.flyteidl.admin.ExternalResourceAttributes.verify(message.externalResourceAttributes);
+                        if (error)
+                            return "externalResourceAttributes." + error;
                     }
                     return null;
                 };
@@ -35857,6 +35876,7 @@
              * @property {number} PLUGIN_OVERRIDE=5 PLUGIN_OVERRIDE value
              * @property {number} WORKFLOW_EXECUTION_CONFIG=6 WORKFLOW_EXECUTION_CONFIG value
              * @property {number} CLUSTER_ASSIGNMENT=7 CLUSTER_ASSIGNMENT value
+             * @property {number} EXTERNAL_RESOURCE=8 EXTERNAL_RESOURCE value
              */
             admin.MatchableResource = (function() {
                 var valuesById = {}, values = Object.create(valuesById);
@@ -35868,6 +35888,7 @@
                 values[valuesById[5] = "PLUGIN_OVERRIDE"] = 5;
                 values[valuesById[6] = "WORKFLOW_EXECUTION_CONFIG"] = 6;
                 values[valuesById[7] = "CLUSTER_ASSIGNMENT"] = 7;
+                values[valuesById[8] = "EXTERNAL_RESOURCE"] = 8;
                 return values;
             })();
     
@@ -37089,6 +37110,132 @@
                 return WorkflowExecutionConfig;
             })();
     
+            admin.ExternalResourceAttributes = (function() {
+    
+                /**
+                 * Properties of an ExternalResourceAttributes.
+                 * @memberof flyteidl.admin
+                 * @interface IExternalResourceAttributes
+                 * @property {Object.<string,flyteidl.core.IConnection>|null} [connections] ExternalResourceAttributes connections
+                 */
+    
+                /**
+                 * Constructs a new ExternalResourceAttributes.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents an ExternalResourceAttributes.
+                 * @implements IExternalResourceAttributes
+                 * @constructor
+                 * @param {flyteidl.admin.IExternalResourceAttributes=} [properties] Properties to set
+                 */
+                function ExternalResourceAttributes(properties) {
+                    this.connections = {};
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * ExternalResourceAttributes connections.
+                 * @member {Object.<string,flyteidl.core.IConnection>} connections
+                 * @memberof flyteidl.admin.ExternalResourceAttributes
+                 * @instance
+                 */
+                ExternalResourceAttributes.prototype.connections = $util.emptyObject;
+    
+                /**
+                 * Creates a new ExternalResourceAttributes instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.ExternalResourceAttributes
+                 * @static
+                 * @param {flyteidl.admin.IExternalResourceAttributes=} [properties] Properties to set
+                 * @returns {flyteidl.admin.ExternalResourceAttributes} ExternalResourceAttributes instance
+                 */
+                ExternalResourceAttributes.create = function create(properties) {
+                    return new ExternalResourceAttributes(properties);
+                };
+    
+                /**
+                 * Encodes the specified ExternalResourceAttributes message. Does not implicitly {@link flyteidl.admin.ExternalResourceAttributes.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.ExternalResourceAttributes
+                 * @static
+                 * @param {flyteidl.admin.IExternalResourceAttributes} message ExternalResourceAttributes message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                ExternalResourceAttributes.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.connections != null && message.hasOwnProperty("connections"))
+                        for (var keys = Object.keys(message.connections), i = 0; i < keys.length; ++i) {
+                            writer.uint32(/* id 1, wireType 2 =*/10).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]);
+                            $root.flyteidl.core.Connection.encode(message.connections[keys[i]], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim().ldelim();
+                        }
+                    return writer;
+                };
+    
+                /**
+                 * Decodes an ExternalResourceAttributes message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.ExternalResourceAttributes
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.ExternalResourceAttributes} ExternalResourceAttributes
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                ExternalResourceAttributes.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.ExternalResourceAttributes(), key;
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            reader.skip().pos++;
+                            if (message.connections === $util.emptyObject)
+                                message.connections = {};
+                            key = reader.string();
+                            reader.pos++;
+                            message.connections[key] = $root.flyteidl.core.Connection.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies an ExternalResourceAttributes message.
+                 * @function verify
+                 * @memberof flyteidl.admin.ExternalResourceAttributes
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                ExternalResourceAttributes.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.connections != null && message.hasOwnProperty("connections")) {
+                        if (!$util.isObject(message.connections))
+                            return "connections: object expected";
+                        var key = Object.keys(message.connections);
+                        for (var i = 0; i < key.length; ++i) {
+                            var error = $root.flyteidl.core.Connection.verify(message.connections[key[i]]);
+                            if (error)
+                                return "connections." + error;
+                        }
+                    }
+                    return null;
+                };
+    
+                return ExternalResourceAttributes;
+            })();
+    
             admin.MatchingAttributes = (function() {
     
                 /**
@@ -37103,6 +37250,7 @@
                  * @property {flyteidl.admin.IPluginOverrides|null} [pluginOverrides] MatchingAttributes pluginOverrides
                  * @property {flyteidl.admin.IWorkflowExecutionConfig|null} [workflowExecutionConfig] MatchingAttributes workflowExecutionConfig
                  * @property {flyteidl.admin.IClusterAssignment|null} [clusterAssignment] MatchingAttributes clusterAssignment
+                 * @property {flyteidl.admin.IExternalResourceAttributes|null} [externalResourceAttributes] MatchingAttributes externalResourceAttributes
                  */
     
                 /**
@@ -37184,17 +37332,25 @@
                  */
                 MatchingAttributes.prototype.clusterAssignment = null;
     
+                /**
+                 * MatchingAttributes externalResourceAttributes.
+                 * @member {flyteidl.admin.IExternalResourceAttributes|null|undefined} externalResourceAttributes
+                 * @memberof flyteidl.admin.MatchingAttributes
+                 * @instance
+                 */
+                MatchingAttributes.prototype.externalResourceAttributes = null;
+    
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
     
                 /**
                  * MatchingAttributes target.
-                 * @member {"taskResourceAttributes"|"clusterResourceAttributes"|"executionQueueAttributes"|"executionClusterLabel"|"qualityOfService"|"pluginOverrides"|"workflowExecutionConfig"|"clusterAssignment"|undefined} target
+                 * @member {"taskResourceAttributes"|"clusterResourceAttributes"|"executionQueueAttributes"|"executionClusterLabel"|"qualityOfService"|"pluginOverrides"|"workflowExecutionConfig"|"clusterAssignment"|"externalResourceAttributes"|undefined} target
                  * @memberof flyteidl.admin.MatchingAttributes
                  * @instance
                  */
                 Object.defineProperty(MatchingAttributes.prototype, "target", {
-                    get: $util.oneOfGetter($oneOfFields = ["taskResourceAttributes", "clusterResourceAttributes", "executionQueueAttributes", "executionClusterLabel", "qualityOfService", "pluginOverrides", "workflowExecutionConfig", "clusterAssignment"]),
+                    get: $util.oneOfGetter($oneOfFields = ["taskResourceAttributes", "clusterResourceAttributes", "executionQueueAttributes", "executionClusterLabel", "qualityOfService", "pluginOverrides", "workflowExecutionConfig", "clusterAssignment", "externalResourceAttributes"]),
                     set: $util.oneOfSetter($oneOfFields)
                 });
     
@@ -37238,6 +37394,8 @@
                         $root.flyteidl.admin.WorkflowExecutionConfig.encode(message.workflowExecutionConfig, writer.uint32(/* id 7, wireType 2 =*/58).fork()).ldelim();
                     if (message.clusterAssignment != null && message.hasOwnProperty("clusterAssignment"))
                         $root.flyteidl.admin.ClusterAssignment.encode(message.clusterAssignment, writer.uint32(/* id 8, wireType 2 =*/66).fork()).ldelim();
+                    if (message.externalResourceAttributes != null && message.hasOwnProperty("externalResourceAttributes"))
+                        $root.flyteidl.admin.ExternalResourceAttributes.encode(message.externalResourceAttributes, writer.uint32(/* id 9, wireType 2 =*/74).fork()).ldelim();
                     return writer;
                 };
     
@@ -37282,6 +37440,9 @@
                             break;
                         case 8:
                             message.clusterAssignment = $root.flyteidl.admin.ClusterAssignment.decode(reader, reader.uint32());
+                            break;
+                        case 9:
+                            message.externalResourceAttributes = $root.flyteidl.admin.ExternalResourceAttributes.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -37379,6 +37540,16 @@
                             var error = $root.flyteidl.admin.ClusterAssignment.verify(message.clusterAssignment);
                             if (error)
                                 return "clusterAssignment." + error;
+                        }
+                    }
+                    if (message.externalResourceAttributes != null && message.hasOwnProperty("externalResourceAttributes")) {
+                        if (properties.target === 1)
+                            return "target: multiple values";
+                        properties.target = 1;
+                        {
+                            var error = $root.flyteidl.admin.ExternalResourceAttributes.verify(message.externalResourceAttributes);
+                            if (error)
+                                return "externalResourceAttributes." + error;
                         }
                     }
                     return null;
@@ -37711,6 +37882,7 @@
                         case 5:
                         case 6:
                         case 7:
+                        case 8:
                             break;
                         }
                     if (message.org != null && message.hasOwnProperty("org"))
@@ -44352,6 +44524,7 @@
                         case 5:
                         case 6:
                         case 7:
+                        case 8:
                             break;
                         }
                     if (message.org != null && message.hasOwnProperty("org"))
@@ -44619,6 +44792,7 @@
                         case 5:
                         case 6:
                         case 7:
+                        case 8:
                             break;
                         }
                     if (message.org != null && message.hasOwnProperty("org"))
@@ -45252,6 +45426,7 @@
                         case 5:
                         case 6:
                         case 7:
+                        case 8:
                             break;
                         }
                     if (message.org != null && message.hasOwnProperty("org"))
@@ -45536,6 +45711,7 @@
                         case 5:
                         case 6:
                         case 7:
+                        case 8:
                             break;
                         }
                     if (message.org != null && message.hasOwnProperty("org"))
@@ -50770,6 +50946,7 @@
                         case 5:
                         case 6:
                         case 7:
+                        case 8:
                             break;
                         }
                     if (message.org != null && message.hasOwnProperty("org"))
@@ -51071,6 +51248,7 @@
                         case 5:
                         case 6:
                         case 7:
+                        case 8:
                             break;
                         }
                     if (message.org != null && message.hasOwnProperty("org"))

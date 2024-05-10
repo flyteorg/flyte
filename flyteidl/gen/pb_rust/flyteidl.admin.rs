@@ -1187,11 +1187,20 @@ pub struct WorkflowExecutionConfig {
     #[prost(message, repeated, tag="9")]
     pub execution_env_assignments: ::prost::alloc::vec::Vec<super::core::ExecutionEnvAssignment>,
 }
+/// ExternalResourceAttributes is a message that encapsulates all the attributes
+/// that are required to connect to external resources or services.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ExternalResourceAttributes {
+    /// Connections here is used by the agent to connect to external systems.
+    #[prost(map="string, message", tag="1")]
+    pub connections: ::std::collections::HashMap<::prost::alloc::string::String, super::core::Connection>,
+}
 /// Generic container for encapsulating all types of the above attributes messages.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct MatchingAttributes {
-    #[prost(oneof="matching_attributes::Target", tags="1, 2, 3, 4, 5, 6, 7, 8")]
+    #[prost(oneof="matching_attributes::Target", tags="1, 2, 3, 4, 5, 6, 7, 8, 9")]
     pub target: ::core::option::Option<matching_attributes::Target>,
 }
 /// Nested message and enum types in `MatchingAttributes`.
@@ -1215,6 +1224,8 @@ pub mod matching_attributes {
         WorkflowExecutionConfig(super::WorkflowExecutionConfig),
         #[prost(message, tag="8")]
         ClusterAssignment(super::ClusterAssignment),
+        #[prost(message, tag="9")]
+        ExternalResourceAttributes(super::ExternalResourceAttributes),
     }
 }
 /// Represents a custom set of attributes applied for either a domain (and optional org); a domain and project (and optional org);
@@ -1279,6 +1290,8 @@ pub enum MatchableResource {
     WorkflowExecutionConfig = 6,
     /// Controls how to select an available cluster on which this execution should run.
     ClusterAssignment = 7,
+    /// Configures the task connection to be used by the agent to connect to external systems.
+    ExternalResource = 8,
 }
 impl MatchableResource {
     /// String value of the enum field names used in the ProtoBuf definition.
@@ -1295,6 +1308,7 @@ impl MatchableResource {
             MatchableResource::PluginOverride => "PLUGIN_OVERRIDE",
             MatchableResource::WorkflowExecutionConfig => "WORKFLOW_EXECUTION_CONFIG",
             MatchableResource::ClusterAssignment => "CLUSTER_ASSIGNMENT",
+            MatchableResource::ExternalResource => "EXTERNAL_RESOURCE",
         }
     }
     /// Creates an enum from field names used in the ProtoBuf definition.
@@ -1308,6 +1322,7 @@ impl MatchableResource {
             "PLUGIN_OVERRIDE" => Some(Self::PluginOverride),
             "WORKFLOW_EXECUTION_CONFIG" => Some(Self::WorkflowExecutionConfig),
             "CLUSTER_ASSIGNMENT" => Some(Self::ClusterAssignment),
+            "EXTERNAL_RESOURCE" => Some(Self::ExternalResource),
             _ => None,
         }
     }
@@ -1693,6 +1708,9 @@ pub struct ExecutionSpec {
     /// Execution environment assignments to be set for the execution.
     #[prost(message, repeated, tag="26")]
     pub execution_env_assignments: ::prost::alloc::vec::Vec<super::core::ExecutionEnvAssignment>,
+    /// The connection to use for the execution.
+    #[prost(message, optional, tag="27")]
+    pub external_resource_attributes: ::core::option::Option<ExternalResourceAttributes>,
     #[prost(oneof="execution_spec::NotificationOverrides", tags="5, 6")]
     pub notification_overrides: ::core::option::Option<execution_spec::NotificationOverrides>,
 }

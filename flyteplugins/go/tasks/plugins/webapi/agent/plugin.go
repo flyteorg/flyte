@@ -65,6 +65,7 @@ func (p Plugin) ResourceRequirements(_ context.Context, _ webapi.TaskExecutionCo
 
 func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextReader) (webapi.ResourceMeta,
 	webapi.Resource, error) {
+
 	taskTemplate, err := taskCtx.TaskReader().Read(ctx)
 	if err != nil {
 		return nil, nil, err
@@ -98,13 +99,22 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 	taskCategory := admin.TaskCategory{Name: taskTemplate.Type, Version: taskTemplate.TaskTypeVersion}
 	agent, isSync := getFinalAgent(&taskCategory, p.cfg, p.agentRegistry)
 
-	var connection flyteIdl.Connection
-	if taskTemplate.SecurityContext != nil {
-		connection, err = taskCtx.ConnectionManager().Get(ctx, taskTemplate.SecurityContext.Connection)
-		if err != nil {
-			logger.Errorf(ctx, "Failed to get connection with error: %v", err)
-			return nil, nil, err
+	connection := flyteIdl.Connection{}
+	if taskTemplate.SecurityContext != nil && taskTemplate.SecurityContext.Connection != "" {
+		conn, ok := taskCtx.TaskExecutionMetadata().GetExternalResourceAttributes().GetConnections()[taskTemplate.SecurityContext.Connection]
+		if ok {
+			for k, v := range conn.GetSecrets() {
+				secretVal, err := taskCtx.SecretManager().Get(ctx, v)
+				if err != nil {
+					logger.Errorf(ctx, "Failed to get secret with error: %v", err)
+					return nil, nil, err
+				}
+				conn.Secrets[k] = secretVal
+			}
+		} else {
+			return nil, nil, fmt.Errorf("connection [%s] not found in the task execution metadata", taskTemplate.SecurityContext.Connection)
 		}
+		connection = *conn
 	}
 
 	taskExecutionMetadata := buildTaskExecutionMetadata(taskCtx.TaskExecutionMetadata())

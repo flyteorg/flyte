@@ -18,20 +18,20 @@ type TaskResources struct {
 }
 
 type ExecutionParameters struct {
-	Inputs                *core.LiteralMap
-	AcceptedAt            time.Time
-	Labels                map[string]string
-	Annotations           map[string]string
-	TaskPluginOverrides   []*admin.PluginOverride
-	ExecutionConfig       *admin.WorkflowExecutionConfig
-	RecoveryExecution     *core.WorkflowExecutionIdentifier
-	TaskResources         *TaskResources
-	EventVersion          int
-	RoleNameKey           string
-	RawOutputDataConfig   *admin.RawOutputDataConfig
-	ClusterAssignment     *admin.ClusterAssignment
-	ExecutionClusterLabel *admin.ExecutionClusterLabel
-	Connection            []*core.Connection
+	Inputs                     *core.LiteralMap
+	AcceptedAt                 time.Time
+	Labels                     map[string]string
+	Annotations                map[string]string
+	TaskPluginOverrides        []*admin.PluginOverride
+	ExecutionConfig            *admin.WorkflowExecutionConfig
+	RecoveryExecution          *core.WorkflowExecutionIdentifier
+	TaskResources              *TaskResources
+	EventVersion               int
+	RoleNameKey                string
+	RawOutputDataConfig        *admin.RawOutputDataConfig
+	ClusterAssignment          *admin.ClusterAssignment
+	ExecutionClusterLabel      *admin.ExecutionClusterLabel
+	ExternalResourceAttributes *admin.ExternalResourceAttributes
 }
 
 // ExecutionData includes all parameters required to create an execution CRD object.

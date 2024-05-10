@@ -14168,6 +14168,9 @@ export namespace flyteidl {
 
             /** ExecutionSpec executionEnvAssignments */
             executionEnvAssignments?: (flyteidl.core.IExecutionEnvAssignment[]|null);
+
+            /** ExecutionSpec externalResourceAttributes */
+            externalResourceAttributes?: (flyteidl.admin.IExternalResourceAttributes|null);
         }
 
         /** Represents an ExecutionSpec. */
@@ -14235,6 +14238,9 @@ export namespace flyteidl {
 
             /** ExecutionSpec executionEnvAssignments. */
             public executionEnvAssignments: flyteidl.core.IExecutionEnvAssignment[];
+
+            /** ExecutionSpec externalResourceAttributes. */
+            public externalResourceAttributes?: (flyteidl.admin.IExternalResourceAttributes|null);
 
             /** ExecutionSpec notificationOverrides. */
             public notificationOverrides?: ("notifications"|"disableAll");
@@ -14791,7 +14797,8 @@ export namespace flyteidl {
             QUALITY_OF_SERVICE_SPECIFICATION = 4,
             PLUGIN_OVERRIDE = 5,
             WORKFLOW_EXECUTION_CONFIG = 6,
-            CLUSTER_ASSIGNMENT = 7
+            CLUSTER_ASSIGNMENT = 7,
+            EXTERNAL_RESOURCE = 8
         }
 
         /** Properties of a TaskResourceSpec. */
@@ -15309,6 +15316,58 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of an ExternalResourceAttributes. */
+        interface IExternalResourceAttributes {
+
+            /** ExternalResourceAttributes connections */
+            connections?: ({ [k: string]: flyteidl.core.IConnection }|null);
+        }
+
+        /** Represents an ExternalResourceAttributes. */
+        class ExternalResourceAttributes implements IExternalResourceAttributes {
+
+            /**
+             * Constructs a new ExternalResourceAttributes.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IExternalResourceAttributes);
+
+            /** ExternalResourceAttributes connections. */
+            public connections: { [k: string]: flyteidl.core.IConnection };
+
+            /**
+             * Creates a new ExternalResourceAttributes instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ExternalResourceAttributes instance
+             */
+            public static create(properties?: flyteidl.admin.IExternalResourceAttributes): flyteidl.admin.ExternalResourceAttributes;
+
+            /**
+             * Encodes the specified ExternalResourceAttributes message. Does not implicitly {@link flyteidl.admin.ExternalResourceAttributes.verify|verify} messages.
+             * @param message ExternalResourceAttributes message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IExternalResourceAttributes, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an ExternalResourceAttributes message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ExternalResourceAttributes
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.ExternalResourceAttributes;
+
+            /**
+             * Verifies an ExternalResourceAttributes message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a MatchingAttributes. */
         interface IMatchingAttributes {
 
@@ -15335,6 +15394,9 @@ export namespace flyteidl {
 
             /** MatchingAttributes clusterAssignment */
             clusterAssignment?: (flyteidl.admin.IClusterAssignment|null);
+
+            /** MatchingAttributes externalResourceAttributes */
+            externalResourceAttributes?: (flyteidl.admin.IExternalResourceAttributes|null);
         }
 
         /** Represents a MatchingAttributes. */
@@ -15370,8 +15432,11 @@ export namespace flyteidl {
             /** MatchingAttributes clusterAssignment. */
             public clusterAssignment?: (flyteidl.admin.IClusterAssignment|null);
 
+            /** MatchingAttributes externalResourceAttributes. */
+            public externalResourceAttributes?: (flyteidl.admin.IExternalResourceAttributes|null);
+
             /** MatchingAttributes target. */
-            public target?: ("taskResourceAttributes"|"clusterResourceAttributes"|"executionQueueAttributes"|"executionClusterLabel"|"qualityOfService"|"pluginOverrides"|"workflowExecutionConfig"|"clusterAssignment");
+            public target?: ("taskResourceAttributes"|"clusterResourceAttributes"|"executionQueueAttributes"|"executionClusterLabel"|"qualityOfService"|"pluginOverrides"|"workflowExecutionConfig"|"clusterAssignment"|"externalResourceAttributes");
 
             /**
              * Creates a new MatchingAttributes instance using the specified properties.

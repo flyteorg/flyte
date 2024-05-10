@@ -231,10 +231,6 @@ func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *i
 	secretManager := &coreMocks.SecretManager{}
 	secretManager.OnGet(ctx, mock.Anything).Return("fake-token", nil)
 
-	connection := idlCore.Connection{Secrets: map[string]string{"OPENAI_API_KEY": "123"}}
-	connectionManager := &coreMocks.ConnectionManager{}
-	connectionManager.OnGet(ctx, mock.Anything).Return(connection, nil)
-
 	tCtx := &coreMocks.TaskExecutionContext{}
 	tCtx.OnInputReader().Return(inputReader)
 	tCtx.OnTaskRefreshIndicator().Return(func(ctx context.Context) {})
@@ -248,7 +244,6 @@ func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *i
 	tCtx.OnEventsRecorder().Return(eRecorder)
 	tCtx.OnResourceManager().Return(resourceManager)
 	tCtx.OnSecretManager().Return(secretManager)
-	tCtx.OnConnectionManager().Return(connectionManager)
 
 	trns := pluginCore.DoTransition(pluginCore.PhaseInfoQueued(time.Now(), 0, ""))
 	for !trns.Info().Phase().IsTerminal() {

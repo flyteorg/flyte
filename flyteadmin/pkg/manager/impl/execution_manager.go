@@ -421,6 +421,37 @@ func (m *ExecutionManager) getClusterAssignment(ctx context.Context, request *ad
 	}, nil
 }
 
+func (m *ExecutionManager) getExternalResourceAttributes(ctx context.Context, request *admin.ExecutionCreateRequest) (
+	*admin.ExternalResourceAttributes, error) {
+	if request.Spec.ExternalResourceAttributes != nil {
+		return request.Spec.ExternalResourceAttributes, nil
+	}
+
+	resource, err := m.resourceManager.GetResource(ctx, interfaces.ResourceRequest{
+		Project:      request.Project,
+		Domain:       request.Domain,
+		ResourceType: admin.MatchableResource_EXTERNAL_RESOURCE,
+	})
+	if err != nil && !errors.IsDoesNotExistError(err) {
+		logger.Errorf(ctx, "Failed to get external resource with error: %v", err)
+		return nil, err
+	}
+	if resource != nil && resource.Attributes.GetExternalResourceAttributes() != nil {
+		return resource.Attributes.GetExternalResourceAttributes(), nil
+	}
+
+	externalResource := m.config.ExternalResourceConfiguration().GetExternalResource()
+	connections := make(map[string]*core.Connection)
+	for key, connection := range externalResource.Connections {
+		connections[key] = &core.Connection{
+			Secrets: connection.Secrets,
+			Configs: connection.Configs,
+		}
+	}
+
+	return &admin.ExternalResourceAttributes{Connections: connections}, nil
+}
+
 func (m *ExecutionManager) launchSingleTaskExecution(
 	ctx context.Context, request admin.ExecutionCreateRequest, requestedAt time.Time) (
 	context.Context, *models.Execution, error) {
@@ -951,23 +982,29 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		return nil, nil, err
 	}
 
+	externalResourceAttribute, err := m.getExternalResourceAttributes(ctx, &request)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	var executionClusterLabel *admin.ExecutionClusterLabel
 	if requestSpec.ExecutionClusterLabel != nil {
 		executionClusterLabel = requestSpec.ExecutionClusterLabel
 	}
 
 	executionParameters := workflowengineInterfaces.ExecutionParameters{
-		Inputs:                executionInputs,
-		AcceptedAt:            requestedAt,
-		Labels:                labels,
-		Annotations:           annotations,
-		ExecutionConfig:       executionConfig,
-		TaskResources:         &platformTaskResources,
-		EventVersion:          m.config.ApplicationConfiguration().GetTopLevelConfig().EventVersion,
-		RoleNameKey:           m.config.ApplicationConfiguration().GetTopLevelConfig().RoleNameKey,
-		RawOutputDataConfig:   rawOutputDataConfig,
-		ClusterAssignment:     clusterAssignment,
-		ExecutionClusterLabel: executionClusterLabel,
+		Inputs:                     executionInputs,
+		AcceptedAt:                 requestedAt,
+		Labels:                     labels,
+		Annotations:                annotations,
+		ExecutionConfig:            executionConfig,
+		TaskResources:              &platformTaskResources,
+		EventVersion:               m.config.ApplicationConfiguration().GetTopLevelConfig().EventVersion,
+		RoleNameKey:                m.config.ApplicationConfiguration().GetTopLevelConfig().RoleNameKey,
+		RawOutputDataConfig:        rawOutputDataConfig,
+		ClusterAssignment:          clusterAssignment,
+		ExecutionClusterLabel:      executionClusterLabel,
+		ExternalResourceAttributes: externalResourceAttribute,
 	}
 
 	overrides, err := m.addPluginOverrides(ctx, &workflowExecutionID, launchPlan.GetSpec().WorkflowId.Name, launchPlan.Id.Name)

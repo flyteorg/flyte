@@ -27,7 +27,6 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/config"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/connectionmanager"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/resourcemanager"
 	rmConfig "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/resourcemanager/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/secretmanager"
@@ -185,23 +184,22 @@ type taskType = string
 type pluginID = string
 
 type Handler struct {
-	catalog           catalog.Client
-	asyncCatalog      catalog.AsyncClient
-	defaultPlugins    map[pluginCore.TaskType]pluginCore.Plugin
-	pluginsForType    map[pluginCore.TaskType]map[pluginID]pluginCore.Plugin
-	taskMetricsMap    map[MetricKey]*taskMetrics
-	defaultPlugin     pluginCore.Plugin
-	metrics           *metrics
-	pluginRegistry    PluginRegistryIface
-	kubeClient        pluginCore.KubeClient
-	kubeClientset     kubernetes.Interface
-	secretManager     pluginCore.SecretManager
-	connectionManager pluginCore.ConnectionManager
-	resourceManager   resourcemanager.BaseResourceManager
-	cfg               *config.Config
-	pluginScope       promutils.Scope
-	eventConfig       *controllerConfig.EventConfig
-	clusterID         string
+	catalog         catalog.Client
+	asyncCatalog    catalog.AsyncClient
+	defaultPlugins  map[pluginCore.TaskType]pluginCore.Plugin
+	pluginsForType  map[pluginCore.TaskType]map[pluginID]pluginCore.Plugin
+	taskMetricsMap  map[MetricKey]*taskMetrics
+	defaultPlugin   pluginCore.Plugin
+	metrics         *metrics
+	pluginRegistry  PluginRegistryIface
+	kubeClient      pluginCore.KubeClient
+	kubeClientset   kubernetes.Interface
+	secretManager   pluginCore.SecretManager
+	resourceManager resourcemanager.BaseResourceManager
+	cfg             *config.Config
+	pluginScope     promutils.Scope
+	eventConfig     *controllerConfig.EventConfig
+	clusterID       string
 }
 
 func (t *Handler) FinalizeRequired() bool {
@@ -905,16 +903,15 @@ func New(ctx context.Context, kubeClient executors.Client, kubeClientset kuberne
 			pluginQueueLatency:     labeled.NewStopWatch("plugin_queue_latency", "Time spent by plugin in queued phase", time.Microsecond, scope),
 			scope:                  scope,
 		},
-		pluginScope:       scope.NewSubScope("plugin"),
-		kubeClient:        kubeClient,
-		kubeClientset:     kubeClientset,
-		catalog:           client,
-		asyncCatalog:      async,
-		resourceManager:   nil,
-		secretManager:     secretmanager.NewFileEnvSecretManager(secretmanager.GetConfig()),
-		connectionManager: connectionmanager.NewConnectionManager(connectionmanager.GetConfig()),
-		cfg:               cfg,
-		eventConfig:       eventConfig,
-		clusterID:         clusterID,
+		pluginScope:     scope.NewSubScope("plugin"),
+		kubeClient:      kubeClient,
+		kubeClientset:   kubeClientset,
+		catalog:         client,
+		asyncCatalog:    async,
+		resourceManager: nil,
+		secretManager:   secretmanager.NewFileEnvSecretManager(secretmanager.GetConfig()),
+		cfg:             cfg,
+		eventConfig:     eventConfig,
+		clusterID:       clusterID,
 	}, nil
 }

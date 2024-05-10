@@ -36,6 +36,9 @@ enum MatchableResource {
 
   // Controls how to select an available cluster on which this execution should run.
   CLUSTER_ASSIGNMENT = 7;
+
+  // Configures the task connection to be used by the agent to connect to external systems.
+  EXTERNAL_RESOURCE = 8;
 }
 
 // Defines a set of overridable task resource attributes set during task registration.
