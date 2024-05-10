@@ -394,6 +394,10 @@ data:
                                               route:
                                                   cluster: flyte_grpc
                                             - match:
+                                                  prefix: "/user"
+                                              route:
+                                                  cluster: usercluster
+                                            - match:
                                                   prefix: "/flyteidl.service.SignalService"
                                               route:
                                                   cluster: flyte_grpc
@@ -420,6 +424,19 @@ data:
                                     typed_config:
                                       "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
         clusters:
+            - name: usercluster
+              connect_timeout: 0.25s
+              type: STRICT_DNS
+              lb_policy: ROUND_ROBIN
+              load_assignment:
+                  cluster_name: usercluster
+                  endpoints:
+                      - lb_endpoints:
+                            - endpoint:
+                                  address:
+                                      socket_address:
+                                          address: flyte-sandbox-local
+                                          port_value: 15605
             - name: flyte
               connect_timeout: 0.25s
               type: STRICT_DNS
@@ -499,7 +516,7 @@ metadata:
 ---
 apiVersion: v1
 data:
-  haSharedSecret: WW9ab3EzN0sycjZrYmYxaw==
+  haSharedSecret: RWtNMVdtWTFXTXJmNk9sSA==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -605,6 +622,9 @@ subsets:
   - name: webhook
     port: 9443
     protocol: TCP
+  - name: user
+    port: 15605
+    protocol: TCP
 ---
 apiVersion: v1
 kind: Service
@@ -674,6 +694,9 @@ spec:
     protocol: TCP
   - name: webhook
     port: 9443
+    protocol: TCP
+  - name: user
+    port: 15605
     protocol: TCP
 ---
 apiVersion: v1
@@ -934,7 +957,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 9d9bc246a2339e714b527427e4357b28dc7ebb9e4cccb0fba84577bb6a0a4333
+        checksum/secret: bf4045c77a7699d01853a23fc29a4b33ffb2033d4d9f4b2a3e397043e35feca2
       labels:
         app: docker-registry
         release: flyte-sandbox

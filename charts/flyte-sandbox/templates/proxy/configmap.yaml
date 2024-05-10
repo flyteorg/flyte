@@ -105,6 +105,10 @@ data:
                                               route:
                                                   cluster: flyte_grpc
                                             - match:
+                                                  prefix: "/user"
+                                              route:
+                                                  cluster: usercluster
+                                            - match:
                                                   prefix: "/flyteidl.service.SignalService"
                                               route:
                                                   cluster: flyte_grpc
@@ -137,6 +141,23 @@ data:
                                       "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
         clusters:
             {{- if or ( index .Values "flyte-binary" "enabled" ) .Values.sandbox.dev }}
+            - name: usercluster
+              connect_timeout: 0.25s
+              type: STRICT_DNS
+              lb_policy: ROUND_ROBIN
+              load_assignment:
+                  cluster_name: usercluster
+                  endpoints:
+                      - lb_endpoints:
+                            - endpoint:
+                                  address:
+                                      socket_address:
+                                          {{- if index .Values "flyte-binary" "enabled" }}
+                                          address: {{ include "flyte-binary.service.http.name" .}}
+                                          {{- else }}
+                                          address: {{ include "flyte-sandbox.localHeadlessService" . }}
+                                          {{- end }}
+                                          port_value: 15605
             - name: flyte
               connect_timeout: 0.25s
               type: STRICT_DNS

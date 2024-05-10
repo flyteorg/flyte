@@ -687,6 +687,10 @@ data:
                                               route:
                                                   cluster: flyte_grpc
                                             - match:
+                                                  prefix: "/user"
+                                              route:
+                                                  cluster: usercluster
+                                            - match:
                                                   prefix: "/flyteidl.service.SignalService"
                                               route:
                                                   cluster: flyte_grpc
@@ -713,6 +717,19 @@ data:
                                     typed_config:
                                       "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
         clusters:
+            - name: usercluster
+              connect_timeout: 0.25s
+              type: STRICT_DNS
+              lb_policy: ROUND_ROBIN
+              load_assignment:
+                  cluster_name: usercluster
+                  endpoints:
+                      - lb_endpoints:
+                            - endpoint:
+                                  address:
+                                      socket_address:
+                                          address: flyte-sandbox-http
+                                          port_value: 15605
             - name: flyte
               connect_timeout: 0.25s
               type: STRICT_DNS
@@ -816,7 +833,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: ckFCVGU3Y0M3Z0NWeVJhbw==
+  haSharedSecret: dG9adVpZcTdMaFdMZnUwOQ==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1412,7 +1429,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: d563e28ff21175650cb1ea90edc1dd85af7b789c802d6ff1a5b47aed4ef5bbb7
+        checksum/secret: 7abcee4167dd22380b3ac6dfd238393f2f05f5759ac8cdef6f0d16812f536769
       labels:
         app: docker-registry
         release: flyte-sandbox
