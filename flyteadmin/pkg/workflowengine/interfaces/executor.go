@@ -31,6 +31,7 @@ type ExecutionParameters struct {
 	RawOutputDataConfig   *admin.RawOutputDataConfig
 	ClusterAssignment     *admin.ClusterAssignment
 	ExecutionClusterLabel *admin.ExecutionClusterLabel
+	Connection            []*core.Connection
 }
 
 // ExecutionData includes all parameters required to create an execution CRD object.

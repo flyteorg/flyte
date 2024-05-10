@@ -23,6 +23,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: "0"
       - id: load-docker-cache
         name: Load Docker Cache
         uses: actions/cache@v3
