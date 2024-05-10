@@ -143,6 +143,7 @@ func GetDemoPorts() (map[nat.Port]struct{}, map[nat.Port][]nat.PortBinding, erro
 		"0.0.0.0:30001:30001", // Postgres Port
 		"0.0.0.0:30002:30002", // Minio API Port (use HTTP port for minio console)
 		"0.0.0.0:30003:30003", // Buildkit Port
+		"0.0.0.0:15605:15605", // User Port
 	})
 }
 
