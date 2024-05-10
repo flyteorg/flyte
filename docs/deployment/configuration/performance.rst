@@ -13,11 +13,11 @@ Introduction
 
 There are some base design attributes and assumptions that FlytePropeller applies:
 
-a. Every workflow execution is independent and can be performed by a completeley distinct process.
-b. When a workflow definition is compiled, the resulting DAG structure is traversed by the controller and the goal is to gracefully transition each task to Success.
-c. Node executions are performed by various FlytePlugins; a diverse collection of operations spanning Kubernetes and other remote services. FlytePropeller is only responsible for effectively monitoring and managing these executions.
+- Every workflow execution is independent and can be performed by a completeley distinct process.
+- When a workflow definition is compiled, the resulting DAG structure is traversed by the controller and the goal is to gracefully transition each task to ``Success``.
+- Task executions are performed by various FlytePlugins; which perform operations on Kubernetes and other remote services as declared in the workflow definition. FlytePropeller is only responsible for effectively monitoring and managing these executions.
 
-In the following sections you will learn how Flyte takes care of the correct and reliable execution of workflows through multiple stages, and what strategies you can apply to help the system efficiently handle increasing load.
+In the following sections you will learn how Flyte takes care of the correct and reliable execution of workflows through multiple stages and what strategies you can apply to help the system efficiently handle increasing load.
 
 Summarized steps of a workflow execution
 ========================================
@@ -27,7 +27,7 @@ The following diagram aims to summarize the process described in the `FlytePrope
 
 .. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/configuration/perf_optimization/propeller-perf-lifecycle-01.png
 
-The ``Worker`` is the independent, lightweight and idempotent process that interacts with all the components in the Propeller controller to drive executions. 
+The ``Worker`` is the independent, lightweight, and idempotent process that interacts with all the components in the Propeller controller to drive executions. 
 It's implemented as a ``goroutine``, and illustrated here as a hard-working gopher which:
 
 1. Pulls from the ``WorkQueue`` and loads what it needs to do the job: the workflow specification (desired state) and the previously recorded execution status.
@@ -71,19 +71,19 @@ Performance tuning at each stage
 The Kube client config controls the request throughput from FlytePropeller to the Kube API server. These requests may include creating/monitoring Pods or creating/updating FlyteWorkflow CRDs to track workflow execution. 
 The `default configuration provided by K8s <https://pkg.go.dev/sigs.k8s.io/controller-runtime/pkg/client/config#GetConfigWithContext>`__ results in very conservative rate-limiting. FlytePropeller provides a default configuration that may offer better performance. 
 However, if your workload involves larger scales (e.g., >5k fanout dynamic or map tasks, >8k concurrent workflows, etc.,) the kube-client rate limiting config may still contribute to a noticeable drop in performance. 
-Increasing the ``qps`` and ``burst`` values may help alleviate back pressure and improve FlytePropeller performance. The default kube-client config applied to Propeller is as follows:
+Increasing the ``qps`` and ``burst`` values may help alleviate back pressure and improve FlytePropeller performance. The following is an example kube-client config applied to Propeller:
 
 .. code-block:: yaml
 
     propeller:
       kube-client-config:
         qps: 100 # Refers to max rate of requests (queries per second) to kube-apiserver
-        burst: 25 # refers to max burst rate. 
+        burst: 120 # refers to max burst rate. 
         timeout: 30s # Refers to timeout when talking with the kube-apiserver
 
 .. note::
 
-   In the previous example, the kube-apiserver will accept ``100`` queries before blocking any query. Every second, ``25`` more queries will be accepted. A query blocked for ``30s`` will timeout.
+   In the previous example, the kube-apiserver will accept ``100`` queries per second, temporariliy admitting up to ``120`` before blocking any subsequent query. A query blocked for ``30s`` will timeout.
 
 It is worth noting that the Kube API server tends to throttle requests transparently. This means that even increasing the allowed frequency of API requests (e.g., increasing FlytePropeller workers or relaxing Kube client config rate-limiting), there may be steep performance decreases for no apparent reason. 
 While it's possible to easily monitor Kube API saturation using system-level metrics like CPU, memory and network usage; it's recommended to look at kube-apiserver-specific metrics like ``workqueue_depth`` which can assist in identifying whether throttling is to blame. Unfortunately, there is no one-size-fits-all solution here, and customizing these parameters for your workload will require trial and error.
@@ -255,7 +255,7 @@ Deployment of FlytePropeller Manager requires K8s configuration updates includin
 
 Flyte provides a variety of Shard Strategies to configure how FlyteWorkflows are sharded among managed FlytePropeller instances. These include ``hash``, which uses consistent hashing to load-balance evaluation over shards, and ``project`` / ``domain``, which map the respective IDs to specific managed FlytePropeller instances. Below we include examples of Helm configurations for each of the existing Shard Strategies.
 
-The Hash Shard Strategy, denoted by ``type: Hash`` in the configuration below, uses consistent hashing to evenly distribute FlyteWorkflows over managed FlytePropeller instances. This configuration requires a ``shard-count`` variable which defines the number of managed FlytePropeller instances. You may change the shard count without impacting existing workflows. Note that changing the ``shard-count`` is a manual step, it is not auto-scaling.
+The hash shard Strategy, denoted by ``type: Hash`` in the configuration below, uses consistent hashing to evenly distribute Flyte workflows over managed FlytePropeller instances. This configuration requires a ``shard-count`` variable, which defines the number of managed FlytePropeller instances. You may change the shard count without impacting existing workflows. Note that changing the ``shard-count`` is a manual step; it is not auto-scaling.
 
 .. code-block:: yaml
 
@@ -269,7 +269,7 @@ The Hash Shard Strategy, denoted by ``type: Hash`` in the configuration below, u
             type: Hash     # use the "hash" shard strategy
             shard-count: 4 # the total number of shards
  
-The Project and Domain Shard Strategies, denoted by ``type: project`` and ``type: domain`` respectively, use the FlyteWorkflow project and domain metadata to shard FlyteWorkflows. These Shard Strategies are configured using a ``per-shard-mapping`` option, which is a list of IDs. Each element in the ``per-shard-mapping`` list defines a new shard, and the ID list assigns responsibility for the specified IDs to that shard. A shard configured as a single wildcard ID (i.e. ``*``) is responsible for all IDs that are not covered by other shards. Only a single shard may be configured with a wildcard ID and, on that shard, there must be only one ID, namely the wildcard.
+The project and domain shard strategies, denoted by ``type: project`` and ``type: domain`` respectively, use the Flyte workflow project and domain metadata to shard Flyte workflows. These shard strategies are configured using a ``per-shard-mapping`` option, which is a list of IDs. Each element in the ``per-shard-mapping`` list defines a new shard, and the ID list assigns responsibility for the specified IDs to that shard. A shard configured as a single wildcard ID (i.e. ``*``) is responsible for all IDs that are not covered by other shards. Only a single shard may be configured with a wildcard ID and, on that shard, there must be only one ID, namely the wildcard.
 
 .. code-block:: yaml
 
@@ -306,7 +306,8 @@ The Project and Domain Shard Strategies, denoted by ``type: project`` and ``type
  
 Multi-Cluster mode
 ===================
-If the K8s cluster itself becomes a performance bottleneck, Flyte supports adding multiple K8s dataplane clusters by default. Each dataplane cluster has one or more FlytePropellers running in them, and flyteadmin manages the routing and assigning of workloads to these clusters.
+
+If the K8s cluster itself becomes a performance bottleneck, Flyte supports adding multiple K8s dataplane clusters by default. Each dataplane cluster has one or more FlytePropellers running in it, and flyteadmin manages the routing and assigning of workloads to these clusters.
 
 
 Improving etcd Performance
@@ -315,8 +316,8 @@ Improving etcd Performance
 Offloading Static Workflow Information from CRD
 -----------------------------------------------
 
-Flyte uses a K8s CRD (Custom Resource Definition) to store and track workflow executions. This resource includes the workflow definition, for example tasks and subworkflows that are involved and the dependencies between nodes. It also includes the execution status of the workflow. The latter information (ie. runtime status) is dynamic, and changes during the workflow's execution as nodes transition phases and the workflow execution progresses. However, the former information (ie. workflow definition) remains static, meaning it will never change and is only consulted to retrieve node definitions and workflow dependencies.
+Flyte uses a K8s CRD (Custom Resource Definition) to store and track workflow executions. This resource includes the workflow definition, the tasks and subworkflows that are involved, and the dependencies between nodes. It also includes the execution status of the workflow. The latter information (i.e. runtime status) is dynamic, and changes during the workflow's execution as nodes transition phases and the workflow execution progresses. However, the former information (i.e. workflow definition) remains static, meaning it will never change and is only consulted to retrieve node definitions and workflow dependencies.
 
-CRDs are stored within ``etcd``, which requires a complete rewrite of the value data every time a single field changes. Consequently, the read / write performance of ``etcd``, as with all key-value stores, is strongly correlated with the size of the data. In Flyte's case, to guarantee only-once execution of nodes we need to persist workflow state by updating the CRD at every node phase change. As the size of a workflow increases this means we are frequently rewriting a large CRD. In addition to poor read / write performance in ``etcd``, these updates may be restricted by a hard limit on the overall CRD size.
+CRDs are stored within ``etcd``, which requires a complete rewrite of the value data every time a single field changes. Consequently, the read / write performance of ``etcd``, as with all key-value stores, is strongly correlated with the size of the data. In Flyte's case, to guarantee only-once execution of nodes, we need to persist workflow state by updating the CRD at every node phase change. As the size of a workflow increases this means we are frequently rewriting a large CRD. In addition to poor read / write performance in ``etcd``, these updates may be restricted by a hard limit on the overall CRD size.
 
 To counter the challenges of large FlyteWorkflow CRDs, Flyte includes a configuration option to offload the static portions of the CRD (ie. workflow / task / subworkflow definitions and node dependencies) to the S3-compliant blobstore. This functionality can be enabled by setting the ``useOffloadedWorkflowClosure`` option to ``true`` in the `FlyteAdmin configuration <https://docs.flyte.org/en/latest/deployment/cluster_config/flyteadmin_config.html#useoffloadedworkflowclosure-bool>`_. When set, the FlyteWorkflow CRD will populate a ``WorkflowClosureReference`` field on the CRD with the location of the static data and FlytePropeller will read this information (through a cache) during each workflow evaluation. One important note is that currently this setting requires FlyteAdmin and FlytePropeller to have access to the same blobstore since FlyteAdmin only specifies a blobstore location in the CRD.
