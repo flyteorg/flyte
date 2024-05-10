@@ -145,6 +145,7 @@ data:
               connect_timeout: 0.25s
               type: STRICT_DNS
               lb_policy: ROUND_ROBIN
+              http2_protocol_options: {}
               load_assignment:
                   cluster_name: usercluster
                   endpoints:

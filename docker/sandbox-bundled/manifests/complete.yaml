@@ -701,6 +701,7 @@ data:
               connect_timeout: 0.25s
               type: STRICT_DNS
               lb_policy: ROUND_ROBIN
+              http2_protocol_options: {}
               load_assignment:
                   cluster_name: usercluster
                   endpoints:
@@ -813,7 +814,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: emhJV2YxNVU2d09YZFBabg==
+  haSharedSecret: UzROY0FsYTMzOWlSNng4UA==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1377,7 +1378,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 262ffc0bb69eaf594e294b4794b023a868b41e17fe1222c87b94238a8400c0bf
+        checksum/secret: 4832960a875ede43c551c4798f83599a40d69b25785b386241be2e4e9a4f7975
       labels:
         app: docker-registry
         release: flyte-sandbox
