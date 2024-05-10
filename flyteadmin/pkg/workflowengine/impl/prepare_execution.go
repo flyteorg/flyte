@@ -108,7 +108,7 @@ func addExecutionOverrides(taskPluginOverrides []*admin.PluginOverride,
 		}
 	}
 
-	if externalResource.GetConnections() != nil {
+	if externalResource != nil && externalResource.GetConnections() != nil {
 		connections := make(map[string]v1alpha1.Connection)
 		for name, connection := range externalResource.GetConnections() {
 			connections[name] = v1alpha1.Connection{

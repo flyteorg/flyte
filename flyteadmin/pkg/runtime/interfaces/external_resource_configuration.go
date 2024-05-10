@@ -1,6 +1,6 @@
 package interfaces
 
-//go:generate mockery -name ClusterPoolAssignmentConfiguration -output=mocks -case=underscore
+//go:generate mockery -name ExternalResourceConfiguration -output=mocks -case=underscore
 
 type Connection struct {
 	Secrets map[string]string `json:"secrets"`
