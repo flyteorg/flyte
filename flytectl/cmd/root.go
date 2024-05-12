@@ -102,7 +102,6 @@ Additional help topics:{{range .Commands}}{{if .IsAdditionalHelpTopicCommand}}
 Use "{{.CommandPath}} [command] --help" for more information about a command.{{end}}
 `)
 	bubbletea.ShowCmdList(rootCmd)
-	fmt.Println(rootCmd.Args)
 
 	return rootCmd
 }
@@ -160,6 +159,5 @@ func GenReSTTree(cmd *cobra.Command, dir string) error {
 }
 
 func ExecuteCmd() error {
-	newRootCmd()
-	return nil
+	return newRootCmd().Execute()
 }
