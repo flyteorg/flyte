@@ -77,7 +77,8 @@ func (m listModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		case "enter":
 			item, _ := m.list.SelectedItem().(item)
-			m, err := genListModel(m, string(item))
+			newArgs = append(newArgs, string(item))
+			err := genListModel(&m, string(item))
 			if err != nil || m.quitting {
 				return m, tea.Quit
 			}
@@ -113,30 +114,42 @@ func genList(items []list.Item, title string) list.Model {
 	return l
 }
 
-func ShowCmdList(_rootCmd *cobra.Command) error {
+func ShowCmdList(_rootCmd *cobra.Command) {
 	rootCmd = _rootCmd
 
-	currentCmd, run, err := ifRunBubbleTea(*rootCmd)
+	currentCmd, run, err := ifRunBubbleTea()
 	if err != nil {
-		return err
+		return
 	}
+	// if !currentCmd.Runnable() {
+	// 	return
+	// }
 	if !run {
-		return nil
+		return
 	}
 
 	InitCommandFlagMap()
 
-	items := generateSubCmdItems(currentCmd)
-
-	l := genList(items, "")
-	m := listModel{list: l}
-	if _, err := tea.NewProgram(m).Run(); err != nil {
-		fmt.Println("Error running program:", err)
-		os.Exit(1)
+	cmdName := strings.Fields(currentCmd.Use)[0]
+	nameToCommand[cmdName] = Command{
+		Cmd:   currentCmd,
+		Name:  cmdName,
+		Short: currentCmd.Short,
 	}
 
-	fmt.Println(newArgs)
-	rootCmd.SetArgs(newArgs)
+	var m listModel
+	if err := genListModel(&m, cmdName); err != nil {
+		return
+	}
 
-	return nil
+	if !m.quitting {
+		if _, err := tea.NewProgram(m).Run(); err != nil {
+			fmt.Println("Error running program:", err)
+			os.Exit(1)
+		}
+	}
+
+	// fmt.Println(append(newArgs, existingFlags...))
+	// exist flags need to be append at last, so if any user input is wrong, it can be caught in the main logic
+	rootCmd.SetArgs(append(newArgs, existingFlags...))
 }

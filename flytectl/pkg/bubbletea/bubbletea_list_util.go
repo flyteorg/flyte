@@ -22,13 +22,14 @@ type Command struct {
 }
 
 var (
-	rootCmd *cobra.Command
-	newArgs []string
-	flags   []string
+	rootCmd       *cobra.Command
+	newArgs       []string
+	isCommand     = true
+	unhandleflags []string
+	existingFlags []string
 )
 var (
-	DOMAIN_NAME   = [3]string{"development", "staging", "production"}
-	isCommand     = true
+	domainName    = [3]string{"development", "staging", "production"}
 	nameToCommand = map[string]Command{}
 )
 
@@ -50,14 +51,13 @@ func generateSubCmdItems(cmd *cobra.Command) []list.Item {
 }
 
 // Generate list.Model for domain names
-func genDomainListModel(m listModel) (listModel, error) {
+func genDomainListModel(m *listModel) {
 	items := []list.Item{}
-	for _, domain := range DOMAIN_NAME {
+	for _, domain := range domainName {
 		items = append(items, item(domain))
 	}
 
 	m.list = genList(items, "Please choose one of the domains")
-	return m, nil
 }
 
 // Get the "get" "project" cobra.Command item
@@ -83,7 +83,10 @@ func extractGetProjectCmd() *cobra.Command {
 // Get all the project names from the configured endpoint
 func getProjects(getProjectCmd *cobra.Command) ([]string, error) {
 	ctx := context.Background()
-	rootCmd.PersistentPreRunE(rootCmd, []string{})
+	err := rootCmd.PersistentPreRunE(rootCmd, []string{})
+	if err != nil {
+		return nil, err
+	}
 	adminCfg := admin.GetConfig(ctx)
 
 	clientSet, err := admin.ClientSetBuilder().WithConfig(admin.GetConfig(ctx)).
@@ -110,11 +113,11 @@ func getProjects(getProjectCmd *cobra.Command) ([]string, error) {
 }
 
 // Generate list.Model for project names from the configured endpoint
-func genProjectListModel(m listModel) (listModel, error) {
+func genProjectListModel(m *listModel) error {
 	getProjectCmd := extractGetProjectCmd()
 	projects, err := getProjects(getProjectCmd)
 	if err != nil {
-		return m, err
+		return err
 	}
 
 	items := []list.Item{}
@@ -124,71 +127,84 @@ func genProjectListModel(m listModel) (listModel, error) {
 
 	m.list = genList(items, "Please choose one of the projects")
 
-	return m, nil
+	return nil
 }
 
 // Generate list.Model of options for different flags
-func genFlagListModel(m listModel, f string) (listModel, error) {
+func genFlagListModel(m *listModel) error {
+	f := unhandleflags[0]
+	newArgs = append(newArgs, f)
+	unhandleflags = unhandleflags[1:]
+	// TODO check if some flags are already input as arguments by user
 	var err error
 
 	switch f {
 	case "-p":
-		m, err = genProjectListModel(m)
+		err = genProjectListModel(m)
 	case "-d":
-		m, err = genDomainListModel(m)
+		genDomainListModel(m)
 	}
 
-	return m, err
+	return err
 }
 
 // Generate list.Model of subcommands from a given command
-func genCmdListModel(m listModel, c string) listModel {
-	if len(nameToCommand[c].Cmd.Commands()) == 0 {
-		return m
-	}
+func genCmdListModel(m *listModel, c *cobra.Command) {
+	// if len(nameToCommand[c].Cmd.Commands()) == 0 {
+	// 	return m
+	// }
 
-	items := generateSubCmdItems(nameToCommand[c].Cmd)
+	items := generateSubCmdItems(c)
 	l := genList(items, "")
 	m.list = l
 
-	return m
 }
 
 // Generate list.Model after user chose one of the item
-func genListModel(m listModel, item string) (listModel, error) {
-	newArgs = append(newArgs, item)
+func genListModel(m *listModel, item string) error {
 
+	// Still in the stage of handling subcommands
 	if isCommand {
-		m = genCmdListModel(m, item)
 		var ok bool
-		if flags, ok = commandFlagMap[sliceToString(newArgs)]; ok { // If found in commandFlagMap means last command
-			isCommand = false
-		} else {
-			return m, nil
+		// check if we reach a runnable command
+		if unhandleflags, ok = commandFlagMap[sliceToString(newArgs)]; !ok {
+			genCmdListModel(m, nameToCommand[item].Cmd)
+			return nil
 		}
+		isCommand = false
 	}
-	// TODO check if some flags are already input as arguments by user
-	if len(flags) > 0 {
-		nextFlag := flags[0]
-		flags = flags[1:]
-		newArgs = append(newArgs, nextFlag)
-		var err error
-		m, err = genFlagListModel(m, nextFlag)
-		if err != nil {
-			return m, err
-		}
-	} else {
+
+	// Handled all flags, quit.
+	if len(unhandleflags) == 0 {
 		m.quitting = true
-		return m, nil
+		return nil
 	}
-	return m, nil
+
+	// Still have flags to handle
+	err := genFlagListModel(m)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
-func ifRunBubbleTea(_rootCmd cobra.Command) (*cobra.Command, bool, error) {
-	cmd, flags, err := _rootCmd.Find(os.Args[1:])
+func ifRunBubbleTea() (*cobra.Command, bool, error) {
+	cmd, flags, err := rootCmd.Find(os.Args[1:])
 	if err != nil {
 		return cmd, false, err
 	}
+
+	err = rootCmd.ParseFlags(flags)
+	if err != nil {
+		return cmd, false, err
+	}
+
+	if ok, err := rootCmd.Flags().GetBool("interactive"); !ok || err != nil {
+		return cmd, false, nil
+	}
+
+	existingFlags = flags
 
 	tempCmd := cmd
 	for tempCmd.HasParent() {
@@ -196,34 +212,5 @@ func ifRunBubbleTea(_rootCmd cobra.Command) (*cobra.Command, bool, error) {
 		tempCmd = tempCmd.Parent()
 	}
 
-	for _, flag := range flags {
-		if flag == "-i" || flag == "--interactive" {
-			return cmd, true, nil
-		}
-	}
-
-	return cmd, false, nil
+	return cmd, true, nil
 }
-
-// func isValidCommand(curArg string, cmd *cobra.Command) (*cobra.Command, bool) {
-// 	for _, subCmd := range cmd.Commands() {
-// 		if subCmd.Use == curArg {
-// 			return subCmd, true
-// 		}
-// 	}
-// 	return nil, false
-// }
-
-// func findSubCmdItems(cmd *cobra.Command, inputArgs []string) ([]list.Item, error) {
-// 	if len(inputArgs) == 0 {
-// 		return generateSubCmdItems(cmd), nil
-// 	}
-
-// 	curArg := inputArgs[0]
-// 	subCmd, isValid := isValidCommand(curArg, cmd)
-// 	if !isValid {
-// 		return nil, fmt.Errorf("not a valid argument: %v", curArg)
-// 	}
-
-// 	return findSubCmdItems(subCmd, inputArgs[1:])
-// }
