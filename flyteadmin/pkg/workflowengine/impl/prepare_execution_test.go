@@ -95,7 +95,7 @@ func TestAddExecutionOverrides(t *testing.T) {
 			},
 		}
 		workflow := &v1alpha1.FlyteWorkflow{}
-		addExecutionOverrides(overrides, nil, nil, nil, workflow)
+		addExecutionOverrides(overrides, nil, nil, nil, nil, workflow)
 		assert.EqualValues(t, workflow.ExecutionConfig.TaskPluginImpls, map[string]v1alpha1.TaskPluginOverride{
 			"taskType1": {
 				PluginIDs:             []string{"Plugin1", "Plugin2"},
@@ -108,7 +108,7 @@ func TestAddExecutionOverrides(t *testing.T) {
 			MaxParallelism: 100,
 		}
 		workflow := &v1alpha1.FlyteWorkflow{}
-		addExecutionOverrides(nil, workflowExecutionConfig, nil, nil, workflow)
+		addExecutionOverrides(nil, workflowExecutionConfig, nil, nil, nil, workflow)
 		assert.EqualValues(t, workflow.ExecutionConfig.MaxParallelism, uint32(100))
 	})
 	t.Run("recovery execution", func(t *testing.T) {
@@ -118,7 +118,7 @@ func TestAddExecutionOverrides(t *testing.T) {
 			Name:    "n",
 		}
 		workflow := &v1alpha1.FlyteWorkflow{}
-		addExecutionOverrides(nil, nil, recoveryExecutionID, nil, workflow)
+		addExecutionOverrides(nil, nil, recoveryExecutionID, nil, nil, workflow)
 		assert.True(t, proto.Equal(recoveryExecutionID, workflow.ExecutionConfig.RecoveryExecution.WorkflowExecutionIdentifier))
 	})
 	t.Run("task resources", func(t *testing.T) {
@@ -134,7 +134,7 @@ func TestAddExecutionOverrides(t *testing.T) {
 				EphemeralStorage: resource.MustParse("1Gi"),
 				GPU:              resource.MustParse("1"),
 			},
-		}, workflow)
+		}, nil, workflow)
 		assert.EqualValues(t, v1alpha1.TaskResourceSpec{
 			CPU:    resource.MustParse("1"),
 			Memory: resource.MustParse("100Gi"),
@@ -152,7 +152,7 @@ func TestAddExecutionOverrides(t *testing.T) {
 			Interruptible: &wrappers.BoolValue{Value: true},
 		}
 		workflow := &v1alpha1.FlyteWorkflow{}
-		addExecutionOverrides(nil, workflowExecutionConfig, nil, nil, workflow)
+		addExecutionOverrides(nil, workflowExecutionConfig, nil, nil, nil, workflow)
 		assert.NotNil(t, workflow.ExecutionConfig.Interruptible)
 		assert.True(t, *workflow.ExecutionConfig.Interruptible)
 	})
@@ -161,7 +161,7 @@ func TestAddExecutionOverrides(t *testing.T) {
 			OverwriteCache: true,
 		}
 		workflow := &v1alpha1.FlyteWorkflow{}
-		addExecutionOverrides(nil, workflowExecutionConfig, nil, nil, workflow)
+		addExecutionOverrides(nil, workflowExecutionConfig, nil, nil, nil, workflow)
 		assert.True(t, workflow.ExecutionConfig.OverwriteCache)
 	})
 	t.Run("Override environment variables", func(t *testing.T) {
@@ -169,7 +169,7 @@ func TestAddExecutionOverrides(t *testing.T) {
 			Envs: &admin.Envs{Values: []*core.KeyValuePair{{Key: "key", Value: "value"}}},
 		}
 		workflow := &v1alpha1.FlyteWorkflow{}
-		addExecutionOverrides(nil, workflowExecutionConfig, nil, nil, workflow)
+		addExecutionOverrides(nil, workflowExecutionConfig, nil, nil, nil, workflow)
 		assert.Equal(t, workflow.ExecutionConfig.EnvironmentVariables, map[string]string{"key": "value"})
 	})
 }
