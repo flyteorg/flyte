@@ -84,6 +84,10 @@ func (p *MockConfigurationProvider) ExternalResourceConfiguration() interfaces.E
 	return p.externalResourceConfiguration
 }
 
+func (p *MockConfigurationProvider) AddExternalResourceConfiguration(cfg interfaces.ExternalResourceConfiguration) {
+	p.externalResourceConfiguration = cfg
+}
+
 func NewMockConfigurationProvider(
 	applicationConfiguration interfaces.ApplicationConfiguration,
 	queueConfiguration interfaces.QueueConfiguration,
