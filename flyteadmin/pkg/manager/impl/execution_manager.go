@@ -852,6 +852,7 @@ func (m *ExecutionManager) fillInTemplateArgs(ctx context.Context, query core.Ar
 						Project: project,
 						Domain:  domain,
 						Name:    ak.GetName(),
+						Org:     ak.GetOrg(),
 					},
 					Partitions: &core.Partitions{
 						Value: partitions,
@@ -865,7 +866,7 @@ func (m *ExecutionManager) fillInTemplateArgs(ctx context.Context, query core.Ar
 }
 
 // ResolveParameterMapArtifacts will go through the parameter map, and resolve any artifact queries.
-func (m *ExecutionManager) ResolveParameterMapArtifacts(ctx context.Context, inputs *core.ParameterMap, inputsForQueryTemplating map[string]*core.Literal) (*core.ParameterMap, []*core.ArtifactID, error) {
+func (m *ExecutionManager) ResolveParameterMapArtifacts(ctx context.Context, inputs *core.ParameterMap, inputsForQueryTemplating map[string]*core.Literal, executionOrg string) (*core.ParameterMap, []*core.ArtifactID, error) {
 
 	// only top level replace for now. Need to make this recursive
 	var artifactIDs []*core.ArtifactID
@@ -874,6 +875,7 @@ func (m *ExecutionManager) ResolveParameterMapArtifacts(ctx context.Context, inp
 	}
 	outputs := map[string]*core.Parameter{}
 
+	// copy ghHandle into request
 	for k, v := range inputs.Parameters {
 		if inputsForQueryTemplating != nil {
 			if _, ok := inputsForQueryTemplating[k]; ok {
@@ -894,6 +896,10 @@ func (m *ExecutionManager) ResolveParameterMapArtifacts(ctx context.Context, inp
 			if err != nil {
 				logger.Errorf(ctx, "Failed to fill in template args for [%s] [%v]", k, err)
 				return nil, nil, err
+			}
+
+			if filledInQuery.GetArtifactId().GetArtifactKey() != nil {
+				filledInQuery.GetArtifactId().GetArtifactKey().Org = executionOrg
 			}
 			req := &artifactsIdl.GetArtifactRequest{
 				Query:   &filledInQuery,
@@ -1006,7 +1012,7 @@ func (m *ExecutionManager) launchExecution(
 		// and so we can fill in template args.
 		// ArtifactIDs are also returned for lineage purposes.
 		ctxPD := contextutils.WithProjectDomain(ctx, request.Project, request.Domain)
-		lpExpectedInputs, usedArtifactIDs, err = m.ResolveParameterMapArtifacts(ctxPD, launchPlan.Closure.ExpectedInputs, inputsForQueryTemplating)
+		lpExpectedInputs, usedArtifactIDs, err = m.ResolveParameterMapArtifacts(ctxPD, launchPlan.Closure.ExpectedInputs, inputsForQueryTemplating, request.Org)
 		if err != nil {
 			logger.Errorf(ctx, "Error looking up launch plan closure parameter map: %v", err)
 			return nil, nil, err
