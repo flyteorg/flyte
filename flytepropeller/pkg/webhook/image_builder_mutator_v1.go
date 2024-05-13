@@ -31,7 +31,24 @@ const (
 	v1UnionPublicPart = unionPathReplacement + "/" // Any publicly accessible image
 
 	ImageBuilderV1ID = "image-builder"
+
+	promVersionLabelKey       = "version"
+	promTypeLabelKey          = "type"
+	promPublicTypeLabelValue  = "public"
+	promOrgTypeLabelValue     = "org"
+	promUnversionedLabelValue = "none"
+	promV1LabelValue          = "v1"
 )
+
+type versionedCounters struct {
+	Unversioned prometheus.CounterVec
+	V1          prometheus.CounterVec
+}
+
+type replacementMetrics struct {
+	PublicImages versionedCounters
+	OrgImages    versionedCounters
+}
 
 type metrics struct {
 	Scope                         promutils.Scope
@@ -40,6 +57,7 @@ type metrics struct {
 	Failures                      prometheus.Counter
 	V1ContainerValidationAttempts prometheus.Counter
 	V1ContainerValidationFailures prometheus.Counter
+	Replaced                      replacementMetrics
 }
 
 type ImageBuilderMutatorV1 struct {
@@ -48,8 +66,10 @@ type ImageBuilderMutatorV1 struct {
 	labelSelector       metav1.LabelSelector
 
 	// Prefixes used as replacement sources
-	initialUnionPublicPrefixes []string // For union public images
-	initialOrgPrefixes         []string // For Org based images
+	initialV1UnionPublicPrefixes          []string // For Org based images with v1 URI format
+	initialUnversionedUnionPublicPrefixes []string // For union public images
+	initialV1OrgPrefixes                  []string // For Org based images with v1 URI format
+	initialUnversionedOrgPrefixes         []string // For Org based images with legacy unversioned format
 
 	// Prefixes to be used for replacing hostnames
 	targetPublicPrefix string
@@ -89,11 +109,22 @@ func (i *ImageBuilderMutatorV1) LabelSelector() *metav1.LabelSelector {
 }
 
 func newMetrics(scope promutils.Scope) metrics {
+	replacementCounterBase := *scope.MustNewCounterVec("replacements", "Number of image replacements", promVersionLabelKey, promTypeLabelKey)
 	return metrics{
-		Scope:                         scope,
-		RoundTime:                     scope.MustNewStopWatch("round_time", "Time taken to complete a round of image builder mutator", time.Millisecond),
-		Attempts:                      scope.MustNewCounter("attempts", "Number of Image Builder webhook mutation attempts"),
-		Failures:                      scope.MustNewCounter("failures", "Number of Image Builder webhook mutation failures"),
+		Scope:     scope,
+		RoundTime: scope.MustNewStopWatch("round_time", "Time taken to complete a round of image builder mutator", time.Millisecond),
+		Attempts:  scope.MustNewCounter("attempts", "Number of Image Builder webhook mutation attempts"),
+		Failures:  scope.MustNewCounter("failures", "Number of Image Builder webhook mutation failures"),
+		Replaced: replacementMetrics{
+			PublicImages: versionedCounters{
+				Unversioned: *replacementCounterBase.MustCurryWith(prometheus.Labels{promVersionLabelKey: promUnversionedLabelValue, promTypeLabelKey: promPublicTypeLabelValue}),
+				V1:          *replacementCounterBase.MustCurryWith(prometheus.Labels{promVersionLabelKey: promV1LabelValue, promTypeLabelKey: promPublicTypeLabelValue}),
+			},
+			OrgImages: versionedCounters{
+				Unversioned: *replacementCounterBase.MustCurryWith(prometheus.Labels{promVersionLabelKey: promUnversionedLabelValue, promTypeLabelKey: promOrgTypeLabelValue}),
+				V1:          *replacementCounterBase.MustCurryWith(prometheus.Labels{promVersionLabelKey: promV1LabelValue, promTypeLabelKey: promOrgTypeLabelValue}),
+			},
+		},
 		V1ContainerValidationAttempts: scope.MustNewCounter("v1_container_validation_attempts", "Number of attempts to validate image URI format for a specific container"),
 		V1ContainerValidationFailures: scope.MustNewCounter("v1_container_validation_failures", "Number of failures to validate image URI format for a specific container"),
 	}
@@ -110,18 +141,39 @@ func replaceByPrefix(c *corev1.Container, prefix string, replacementPrefix strin
 
 // Replaces hostnames in the container image names
 // Adheres to version 1 URI format, assumes versionless URIs are version 1 and valid.
-func (i ImageBuilderMutatorV1) replaceV1Hostname(c *corev1.Container) bool {
-	for _, prefix := range i.initialUnionPublicPrefixes {
+func (i ImageBuilderMutatorV1) replaceV1Hostname(ctx context.Context, c *corev1.Container) bool {
+	originalImage := c.Image
+	for _, prefix := range i.initialV1UnionPublicPrefixes {
 		containerChanged := replaceByPrefix(c, prefix, i.targetPublicPrefix)
 		if containerChanged {
+			i.metrics.Replaced.PublicImages.V1.WithLabelValues().Inc()
+			return true
+		}
+	}
+
+	for _, prefix := range i.initialUnversionedUnionPublicPrefixes {
+		containerChanged := replaceByPrefix(c, prefix, i.targetPublicPrefix)
+		if containerChanged {
+			i.metrics.Replaced.PublicImages.Unversioned.WithLabelValues().Inc()
+			logger.Warnf(ctx, "Container named %s still using unversioned, public image %s", c.Name, originalImage)
 			return true
 		}
 	}
 
 	// If the image is not a publicly accessible image, assume it is an org based image
-	for _, prefix := range i.initialOrgPrefixes {
+	for _, prefix := range i.initialV1OrgPrefixes {
 		containerChanged := replaceByPrefix(c, prefix, i.targetOrgPrefix)
 		if containerChanged {
+			i.metrics.Replaced.OrgImages.V1.WithLabelValues().Inc()
+			return true
+		}
+	}
+
+	for _, prefix := range i.initialUnversionedOrgPrefixes {
+		containerChanged := replaceByPrefix(c, prefix, i.targetOrgPrefix)
+		if containerChanged {
+			i.metrics.Replaced.OrgImages.Unversioned.WithLabelValues().Inc()
+			logger.Warnf(ctx, "Container named %s still using unversioned, org specific image %s", c.Name, originalImage)
 			return true
 		}
 	}
@@ -165,7 +217,7 @@ func (i ImageBuilderMutatorV1) replaceHostnames(ctx context.Context, podName str
 		logger.Debugf(ctx, "%v - Replacing hostname [%v] with [%v]", label, hr.Existing, hr.Replacement)
 		originalImage := container.Image
 
-		containerChanged := i.replaceV1Hostname(&container)
+		containerChanged := i.replaceV1Hostname(ctx, &container)
 		if !i.hostnameReplacement.DisableVerification {
 			canUse := i.verifyV1Prefix(ctx, container.Image, hr.Replacement, podNameSpace)
 			if !canUse {
@@ -199,16 +251,24 @@ func NewImageBuilderMutator(hostnameReplacement config.HostnameReplacement, labe
 		hostnameReplacement: hostnameReplacement,
 		metrics:             newMetrics(scope),
 		labelSelector:       labelSelector,
-		initialUnionPublicPrefixes: []string{
+		initialV1UnionPublicPrefixes: []string{
 			// Versioned URI formats first
 			fmt.Sprintf("%s/%s/%s/", hostnameReplacement.Existing, version1URIPart, unionaiOrgPlaceholder),
+		},
+		initialUnversionedUnionPublicPrefixes: []string{
 			// Legacy non-versioned URI formats
 			fmt.Sprintf("%s/%s/", hostnameReplacement.Existing, unionaiOrgPlaceholder),
 		},
-		initialOrgPrefixes: []string{
-			// Versioned URI formats first
+		initialV1OrgPrefixes: []string{
+			// Scenario: Both Unionai SDK and Build-image task updated to include version.
+			// Does not monkey patch replace existing hostname.
 			fmt.Sprintf("%s/%s", hostnameReplacement.Existing, version1URIPart),
-			// Legacy non-versioned URI formats
+
+			// Scenario: Unionai SDK not updated and Build-image task updated to include version.
+			// Build image task updated with versioned URI format
+			fmt.Sprintf("%s/orgs/%s", hostnameReplacement.Replacement, version1URIPart),
+		},
+		initialUnversionedOrgPrefixes: []string{
 			hostnameReplacement.Existing,
 		},
 		targetPublicPrefix: fmt.Sprintf("%s/%s/", hostnameReplacement.Replacement, unionPathReplacement),

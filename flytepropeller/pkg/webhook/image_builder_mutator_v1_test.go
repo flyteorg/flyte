@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/prometheus/client_golang/prometheus"
 	promtestutil "github.com/prometheus/client_golang/prometheus/testutil"
 	"github.com/stretchr/testify/assert"
 	corev1 "k8s.io/api/core/v1"
@@ -36,6 +37,7 @@ var (
 		fmt.Sprintf("%s/orgs/prefix-%s/image", replacementHostname, org),
 		fmt.Sprintf("%s/orgs/%s/image", replacementHostname, otherOrg),
 	}
+	emptyLabels = prometheus.Labels{}
 )
 
 func defaultTestImageBuilderMutator() *ImageBuilderMutatorV1 {
@@ -43,6 +45,18 @@ func defaultTestImageBuilderMutator() *ImageBuilderMutatorV1 {
 		Existing:    existingHostname,
 		Replacement: replacementHostname,
 	}, unusedLabelSelector, promutils.NewTestScope())
+}
+
+func extractReplacedMetric(c prometheus.CounterVec) int {
+	return int(promtestutil.ToFloat64(c.With(emptyLabels)))
+}
+
+func retrieveReplacedMetrics(m *ImageBuilderMutatorV1) (unversionedPublicImages int, v1PublicImages int, unversionedOrgImages int, v1OrgImages int) {
+	unversionedPublicImagesReplaced := extractReplacedMetric(m.metrics.Replaced.PublicImages.Unversioned)
+	v1PublicImagesReplaced := extractReplacedMetric(m.metrics.Replaced.PublicImages.V1)
+	unversionedOrgImagesReplaced := extractReplacedMetric(m.metrics.Replaced.OrgImages.Unversioned)
+	v1OrgImagesReplaced := extractReplacedMetric(m.metrics.Replaced.OrgImages.V1)
+	return unversionedPublicImagesReplaced, v1PublicImagesReplaced, unversionedOrgImagesReplaced, v1OrgImagesReplaced
 }
 
 func TestImageBuilderWebhook_Mutate(t *testing.T) {
@@ -94,6 +108,11 @@ func TestImageBuilderWebhook_Mutate(t *testing.T) {
 			assert.Equal(t, 0, int(promtestutil.ToFloat64(m.metrics.Failures)))
 			assert.Equal(t, 1, int(promtestutil.ToFloat64(m.metrics.V1ContainerValidationAttempts)))
 			assert.Equal(t, 0, int(promtestutil.ToFloat64(m.metrics.V1ContainerValidationFailures)))
+			unversionedPublicImagesReplaced, v1PublicImagesReplaced, unversionedOrgImagesReplaced, v1OrgImagesReplaced := retrieveReplacedMetrics(m)
+			assert.Equal(t, 0, unversionedPublicImagesReplaced)
+			assert.Equal(t, 0, v1PublicImagesReplaced)
+			assert.Equal(t, 0, unversionedOrgImagesReplaced)
+			assert.Equal(t, 0, v1OrgImagesReplaced)
 		}
 	})
 
@@ -129,6 +148,11 @@ func TestImageBuilderWebhook_Mutate(t *testing.T) {
 		assert.Equal(t, 0, int(promtestutil.ToFloat64(m.metrics.Failures)))
 		assert.Equal(t, 2, int(promtestutil.ToFloat64(m.metrics.V1ContainerValidationAttempts)))
 		assert.Equal(t, 0, int(promtestutil.ToFloat64(m.metrics.V1ContainerValidationFailures)))
+		unversionedPublicImagesReplaced, v1PublicImagesReplaced, unversionedOrgImagesReplaced, v1OrgImagesReplaced := retrieveReplacedMetrics(m)
+		assert.Equal(t, 1, unversionedPublicImagesReplaced)
+		assert.Equal(t, 0, v1PublicImagesReplaced)
+		assert.Equal(t, 0, unversionedOrgImagesReplaced)
+		assert.Equal(t, 0, v1OrgImagesReplaced)
 	})
 
 	t.Run("Replaces hostname for versioned union public images", func(t *testing.T) {
@@ -163,9 +187,54 @@ func TestImageBuilderWebhook_Mutate(t *testing.T) {
 		assert.Equal(t, 0, int(promtestutil.ToFloat64(m.metrics.Failures)))
 		assert.Equal(t, 2, int(promtestutil.ToFloat64(m.metrics.V1ContainerValidationAttempts)))
 		assert.Equal(t, 0, int(promtestutil.ToFloat64(m.metrics.V1ContainerValidationFailures)))
+		unversionedPublicImagesReplaced, v1PublicImagesReplaced, unversionedOrgImagesReplaced, v1OrgImagesReplaced := retrieveReplacedMetrics(m)
+		assert.Equal(t, 0, unversionedPublicImagesReplaced)
+		assert.Equal(t, 1, v1PublicImagesReplaced)
+		assert.Equal(t, 0, unversionedOrgImagesReplaced)
+		assert.Equal(t, 0, v1OrgImagesReplaced)
 	})
 
-	t.Run("Replaces hostname for pre-versioned org specific image", func(t *testing.T) {
+	t.Run("Preserves hostname org images with older unionai SDK and build-image task versions", func(t *testing.T) {
+		m := defaultTestImageBuilderMutator()
+		// In this scenario, unionai SDK is assumed to do the replacement and no version number gets applied
+		existingImage := fmt.Sprintf("%s/orgs/%s/image", replacementHostname, org)
+		expectedImage := existingImage
+		otherImage := differentImage
+		pod := corev1.Pod{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: org,
+			},
+			Spec: corev1.PodSpec{
+				Containers: []corev1.Container{
+					{
+						Name:  "testcontainer1",
+						Image: existingImage,
+					},
+					{
+						Name:  "testcontainer2",
+						Image: otherImage,
+					},
+				},
+			},
+		}
+		returnedPod, changed, err := m.Mutate(context.Background(), &pod)
+		assert.Nil(t, err)
+		assert.False(t, changed)
+		assert.Equal(t, &pod, returnedPod)
+		assert.Equal(t, expectedImage, returnedPod.Spec.Containers[0].Image)
+		assert.Equal(t, otherImage, returnedPod.Spec.Containers[1].Image)
+		assert.Equal(t, 1, int(promtestutil.ToFloat64(m.metrics.Attempts)))
+		assert.Equal(t, 0, int(promtestutil.ToFloat64(m.metrics.Failures)))
+		assert.Equal(t, 2, int(promtestutil.ToFloat64(m.metrics.V1ContainerValidationAttempts)))
+		assert.Equal(t, 0, int(promtestutil.ToFloat64(m.metrics.V1ContainerValidationFailures)))
+		unversionedPublicImagesReplaced, v1PublicImagesReplaced, unversionedOrgImagesReplaced, v1OrgImagesReplaced := retrieveReplacedMetrics(m)
+		assert.Equal(t, 0, unversionedPublicImagesReplaced)
+		assert.Equal(t, 0, v1PublicImagesReplaced)
+		assert.Equal(t, 0, unversionedOrgImagesReplaced)
+		assert.Equal(t, 0, v1OrgImagesReplaced)
+	})
+
+	t.Run("Replaces hostname org images with newer unionai SDK and older build-image task version", func(t *testing.T) {
 		m := defaultTestImageBuilderMutator()
 		existingImage := fmt.Sprintf("%s/%s/image", existingHostname, org)
 		expectedImage := fmt.Sprintf("%s/orgs/%s/image", replacementHostname, org)
@@ -197,9 +266,94 @@ func TestImageBuilderWebhook_Mutate(t *testing.T) {
 		assert.Equal(t, 0, int(promtestutil.ToFloat64(m.metrics.Failures)))
 		assert.Equal(t, 2, int(promtestutil.ToFloat64(m.metrics.V1ContainerValidationAttempts)))
 		assert.Equal(t, 0, int(promtestutil.ToFloat64(m.metrics.V1ContainerValidationFailures)))
+		unversionedPublicImagesReplaced, v1PublicImagesReplaced, unversionedOrgImagesReplaced, v1OrgImagesReplaced := retrieveReplacedMetrics(m)
+		assert.Equal(t, 0, unversionedPublicImagesReplaced)
+		assert.Equal(t, 0, v1PublicImagesReplaced)
+		assert.Equal(t, 1, unversionedOrgImagesReplaced)
+		assert.Equal(t, 0, v1OrgImagesReplaced)
 	})
 
-	t.Run("Replaces hostname for versioned org specific image", func(t *testing.T) {
+	t.Run("Replaces hostname org images with older unionai SDK and newer build-image task version", func(t *testing.T) {
+		m := defaultTestImageBuilderMutator()
+		// In this scenario, unionai SDK does hostname replacing and i
+		existingImage := fmt.Sprintf("%s/orgs/v1/%s/image", replacementHostname, org)
+		expectedImage := fmt.Sprintf("%s/orgs/%s/image", replacementHostname, org)
+		otherImage := differentImage
+		pod := corev1.Pod{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: org,
+			},
+			Spec: corev1.PodSpec{
+				Containers: []corev1.Container{
+					{
+						Name:  "testcontainer1",
+						Image: existingImage,
+					},
+					{
+						Name:  "testcontainer2",
+						Image: otherImage,
+					},
+				},
+			},
+		}
+		returnedPod, changed, err := m.Mutate(context.Background(), &pod)
+		assert.Nil(t, err)
+		assert.True(t, changed)
+		assert.Equal(t, &pod, returnedPod)
+		assert.Equal(t, expectedImage, returnedPod.Spec.Containers[0].Image)
+		assert.Equal(t, otherImage, returnedPod.Spec.Containers[1].Image)
+		assert.Equal(t, 1, int(promtestutil.ToFloat64(m.metrics.Attempts)))
+		assert.Equal(t, 0, int(promtestutil.ToFloat64(m.metrics.Failures)))
+		assert.Equal(t, 2, int(promtestutil.ToFloat64(m.metrics.V1ContainerValidationAttempts)))
+		assert.Equal(t, 0, int(promtestutil.ToFloat64(m.metrics.V1ContainerValidationFailures)))
+		unversionedPublicImagesReplaced, v1PublicImagesReplaced, unversionedOrgImagesReplaced, v1OrgImagesReplaced := retrieveReplacedMetrics(m)
+		assert.Equal(t, 0, unversionedPublicImagesReplaced)
+		assert.Equal(t, 0, v1PublicImagesReplaced)
+		assert.Equal(t, 0, unversionedOrgImagesReplaced)
+		assert.Equal(t, 1, v1OrgImagesReplaced)
+	})
+
+	t.Run("Replaces hostname org images with newer unionai SDK and older build-image task version", func(t *testing.T) {
+		m := defaultTestImageBuilderMutator()
+		// In this scenario, unionai SDK does not do any hostname replacement.
+		existingImage := fmt.Sprintf("%s/%s/image", existingHostname, org)
+		expectedImage := fmt.Sprintf("%s/orgs/%s/image", replacementHostname, org)
+		otherImage := differentImage
+		pod := corev1.Pod{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: org,
+			},
+			Spec: corev1.PodSpec{
+				Containers: []corev1.Container{
+					{
+						Name:  "testcontainer1",
+						Image: existingImage,
+					},
+					{
+						Name:  "testcontainer2",
+						Image: otherImage,
+					},
+				},
+			},
+		}
+		returnedPod, changed, err := m.Mutate(context.Background(), &pod)
+		assert.Nil(t, err)
+		assert.True(t, changed)
+		assert.Equal(t, &pod, returnedPod)
+		assert.Equal(t, expectedImage, returnedPod.Spec.Containers[0].Image)
+		assert.Equal(t, otherImage, returnedPod.Spec.Containers[1].Image)
+		assert.Equal(t, 1, int(promtestutil.ToFloat64(m.metrics.Attempts)))
+		assert.Equal(t, 0, int(promtestutil.ToFloat64(m.metrics.Failures)))
+		assert.Equal(t, 2, int(promtestutil.ToFloat64(m.metrics.V1ContainerValidationAttempts)))
+		assert.Equal(t, 0, int(promtestutil.ToFloat64(m.metrics.V1ContainerValidationFailures)))
+		unversionedPublicImagesReplaced, v1PublicImagesReplaced, unversionedOrgImagesReplaced, v1OrgImagesReplaced := retrieveReplacedMetrics(m)
+		assert.Equal(t, 0, unversionedPublicImagesReplaced)
+		assert.Equal(t, 0, v1PublicImagesReplaced)
+		assert.Equal(t, 1, unversionedOrgImagesReplaced)
+		assert.Equal(t, 0, v1OrgImagesReplaced)
+	})
+
+	t.Run("Replaces hostname org images with newer unionai SDK and build-image task version", func(t *testing.T) {
 		m := defaultTestImageBuilderMutator()
 		existingImage := fmt.Sprintf("%s/%s/%s/image", existingHostname, version1URIPart, org)
 		expectedImage := fmt.Sprintf("%s/orgs/%s/image", replacementHostname, org)
@@ -231,6 +385,11 @@ func TestImageBuilderWebhook_Mutate(t *testing.T) {
 		assert.Equal(t, 0, int(promtestutil.ToFloat64(m.metrics.Failures)))
 		assert.Equal(t, 2, int(promtestutil.ToFloat64(m.metrics.V1ContainerValidationAttempts)))
 		assert.Equal(t, 0, int(promtestutil.ToFloat64(m.metrics.V1ContainerValidationFailures)))
+		unversionedPublicImagesReplaced, v1PublicImagesReplaced, unversionedOrgImagesReplaced, v1OrgImagesReplaced := retrieveReplacedMetrics(m)
+		assert.Equal(t, 0, unversionedPublicImagesReplaced)
+		assert.Equal(t, 0, v1PublicImagesReplaced)
+		assert.Equal(t, 0, unversionedOrgImagesReplaced)
+		assert.Equal(t, 1, v1OrgImagesReplaced)
 	})
 
 	t.Run("Replaces multiple hostname match occurrence", func(t *testing.T) {
@@ -280,6 +439,11 @@ func TestImageBuilderWebhook_Mutate(t *testing.T) {
 		assert.Equal(t, 0, int(promtestutil.ToFloat64(m.metrics.Failures)))
 		assert.Equal(t, 4, int(promtestutil.ToFloat64(m.metrics.V1ContainerValidationAttempts)))
 		assert.Equal(t, 0, int(promtestutil.ToFloat64(m.metrics.V1ContainerValidationFailures)))
+		unversionedPublicImagesReplaced, v1PublicImagesReplaced, unversionedOrgImagesReplaced, v1OrgImagesReplaced := retrieveReplacedMetrics(m)
+		assert.Equal(t, 0, unversionedPublicImagesReplaced)
+		assert.Equal(t, 0, v1PublicImagesReplaced)
+		assert.Equal(t, len(expectedImages), unversionedOrgImagesReplaced)
+		assert.Equal(t, 0, v1OrgImagesReplaced)
 	})
 
 	t.Run("Rejects different organization", func(t *testing.T) {
@@ -309,6 +473,11 @@ func TestImageBuilderWebhook_Mutate(t *testing.T) {
 		assert.Equal(t, 1, int(promtestutil.ToFloat64(m.metrics.Failures)))
 		assert.Equal(t, 1, int(promtestutil.ToFloat64(m.metrics.V1ContainerValidationAttempts)))
 		assert.Equal(t, 1, int(promtestutil.ToFloat64(m.metrics.V1ContainerValidationFailures)))
+		unversionedPublicImagesReplaced, v1PublicImagesReplaced, unversionedOrgImagesReplaced, v1OrgImagesReplaced := retrieveReplacedMetrics(m)
+		assert.Equal(t, 0, unversionedPublicImagesReplaced)
+		assert.Equal(t, 0, v1PublicImagesReplaced)
+		assert.Equal(t, 0, unversionedOrgImagesReplaced)
+		assert.Equal(t, 0, v1OrgImagesReplaced)
 	})
 
 	t.Run("Rejects unauthorized paths", func(t *testing.T) {
@@ -337,6 +506,11 @@ func TestImageBuilderWebhook_Mutate(t *testing.T) {
 			assert.Equal(t, 1, int(promtestutil.ToFloat64(m.metrics.Failures)))
 			assert.Equal(t, 1, int(promtestutil.ToFloat64(m.metrics.V1ContainerValidationAttempts)))
 			assert.Equal(t, 1, int(promtestutil.ToFloat64(m.metrics.V1ContainerValidationFailures)))
+			unversionedPublicImagesReplaced, v1PublicImagesReplaced, unversionedOrgImagesReplaced, v1OrgImagesReplaced := retrieveReplacedMetrics(m)
+			assert.Equal(t, 0, unversionedPublicImagesReplaced)
+			assert.Equal(t, 0, v1PublicImagesReplaced)
+			assert.Equal(t, 1, unversionedOrgImagesReplaced)
+			assert.Equal(t, 0, v1OrgImagesReplaced)
 		}
 	})
 
@@ -369,6 +543,11 @@ func TestImageBuilderWebhook_Mutate(t *testing.T) {
 			assert.Equal(t, 0, int(promtestutil.ToFloat64(m.metrics.Failures)), fmt.Sprintf("Expected 0 failures for %s", unVerifiedImageName))
 			assert.Equal(t, 0, int(promtestutil.ToFloat64(m.metrics.V1ContainerValidationAttempts)), fmt.Sprintf("Expected 1 attempt for %s", unVerifiedImageName))
 			assert.Equal(t, 0, int(promtestutil.ToFloat64(m.metrics.V1ContainerValidationFailures)), fmt.Sprintf("Expected 0 failures for %s", unVerifiedImageName))
+			unversionedPublicImagesReplaced, v1PublicImagesReplaced, unversionedOrgImagesReplaced, v1OrgImagesReplaced := retrieveReplacedMetrics(m)
+			assert.Equal(t, 0, unversionedPublicImagesReplaced)
+			assert.Equal(t, 0, v1PublicImagesReplaced)
+			assert.Equal(t, 1, unversionedOrgImagesReplaced)
+			assert.Equal(t, 0, v1OrgImagesReplaced)
 		}
 	})
 
@@ -411,6 +590,11 @@ func TestImageBuilderWebhook_Mutate(t *testing.T) {
 			assert.Equal(t, 0, int(promtestutil.ToFloat64(m.metrics.Failures)), fmt.Sprintf("Expected 0 failures for %s", unVerifiedImageName))
 			assert.Equal(t, 0, int(promtestutil.ToFloat64(m.metrics.V1ContainerValidationAttempts)), fmt.Sprintf("Expected 1 attempt for %s", unVerifiedImageName))
 			assert.Equal(t, 0, int(promtestutil.ToFloat64(m.metrics.V1ContainerValidationFailures)), fmt.Sprintf("Expected 0 failures for %s", unVerifiedImageName))
+			unversionedPublicImagesReplaced, v1PublicImagesReplaced, unversionedOrgImagesReplaced, v1OrgImagesReplaced := retrieveReplacedMetrics(m)
+			assert.Equal(t, 0, unversionedPublicImagesReplaced)
+			assert.Equal(t, 0, v1PublicImagesReplaced)
+			assert.Equal(t, 0, unversionedOrgImagesReplaced)
+			assert.Equal(t, 0, v1OrgImagesReplaced)
 		}
 	})
 }
