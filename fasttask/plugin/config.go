@@ -12,7 +12,7 @@ import (
 //go:generate pflags Config --default-var=defaultConfig
 
 var (
-	defaultCPU = resource.MustParse("500m")
+	defaultCPU    = resource.MustParse("500m")
 	defaultMemory = resource.MustParse("128Mi")
 	defaultConfig = &Config{
 		CallbackURI:                   "http://host.k3d.internal:15605",
@@ -22,12 +22,12 @@ var (
 		EnvRepairInterval:             config.Duration{Duration: time.Second * 10},
 		GracePeriodStatusNotFound:     config.Duration{Duration: time.Second * 90},
 		GracePeriodWorkersUnavailable: config.Duration{Duration: time.Second * 30},
-		HeartbeatBufferSize:	       512,
+		HeartbeatBufferSize:           512,
 		Image:                         "flyteorg/fasttask:latest",
 		InitContainerCPU:              defaultCPU,
 		InitContainerMemory:           defaultMemory,
 		NonceLength:                   12,
-		TaskStatusBufferSize:	       512,
+		TaskStatusBufferSize:          512,
 	}
 
 	configSection = pluginsConfig.MustRegisterSubSection("fasttask", defaultConfig)
@@ -54,6 +54,6 @@ func GetConfig() *Config {
 }
 
 // This method should be used for unit testing only
-func setConfig(cfg *Config) error {
+func setConfig(cfg *Config) error { //nolint:unused
 	return configSection.SetConfig(cfg)
 }

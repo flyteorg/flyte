@@ -1,0 +1,14 @@
+linters:
+  enable:
+  - gci
+  - protogetter
+
+linters-settings:
+  gci:
+    custom-order: true
+    sections:
+    - standard
+    - default
+    - prefix(github.com/flyteorg)
+    - prefix(github.com/unionai)
+    skip-generated: true

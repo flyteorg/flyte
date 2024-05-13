@@ -10,18 +10,19 @@ import (
 	"sync"
 	"time"
 
-	"k8s.io/api/core/v1"
+	_struct "github.com/golang/protobuf/ptypes/struct"
+	v1 "k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	_struct "github.com/golang/protobuf/ptypes/struct"
 
 	flyteerrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+
 	"github.com/unionai/flyte/fasttask/plugin/pb"
 )
 
@@ -85,7 +86,7 @@ func (i *InMemoryEnvBuilder) Create(ctx context.Context, executionEnvID string, 
 
 	if err := isValidEnvironmentSpec(fastTaskEnvironmentSpec); err != nil {
 		return nil, flyteerrors.Errorf(flyteerrors.BadTaskSpecification,
-			"detected invalid FastTaskEnvironmentSpec [%v], Err: [%v]", fastTaskEnvironmentSpec.PodTemplateSpec, err)
+			"detected invalid FastTaskEnvironmentSpec [%v], Err: [%v]", fastTaskEnvironmentSpec.GetPodTemplateSpec(), err)
 	}
 
 	logger.Debug(ctx, "creating environment '%s'", executionEnvID)
@@ -127,7 +128,7 @@ func (i *InMemoryEnvBuilder) Create(ctx context.Context, executionEnvID string, 
 	}
 
 	podNames := make([]string, 0)
-	for replica := len(env.replicas); replica < int(fastTaskEnvironmentSpec.ReplicaCount); replica++ {
+	for replica := len(env.replicas); replica < int(fastTaskEnvironmentSpec.GetReplicaCount()); replica++ {
 		nonceBytes := make([]byte, (GetConfig().NonceLength+1)/2)
 		if _, err := i.randSource.Read(nonceBytes); err != nil {
 			return nil, err
@@ -157,9 +158,9 @@ func (i *InMemoryEnvBuilder) Create(ctx context.Context, executionEnvID string, 
 // created using the given FastTaskEnvironmentSpec.
 func (i *InMemoryEnvBuilder) createPod(ctx context.Context, fastTaskEnvironmentSpec *pb.FastTaskEnvironmentSpec, executionEnvID, podName string) error {
 	podTemplateSpec := &v1.PodTemplateSpec{}
-	if err := json.Unmarshal(fastTaskEnvironmentSpec.PodTemplateSpec, podTemplateSpec); err != nil {
+	if err := json.Unmarshal(fastTaskEnvironmentSpec.GetPodTemplateSpec(), podTemplateSpec); err != nil {
 		return flyteerrors.Errorf(flyteerrors.BadTaskSpecification,
-			"unable to unmarshal PodTemplateSpec [%v], Err: [%v]", fastTaskEnvironmentSpec.PodTemplateSpec, err.Error())
+			"unable to unmarshal PodTemplateSpec [%v], Err: [%v]", fastTaskEnvironmentSpec.GetPodTemplateSpec(), err.Error())
 	}
 
 	podSpec := &podTemplateSpec.Spec
@@ -167,9 +168,9 @@ func (i *InMemoryEnvBuilder) createPod(ctx context.Context, fastTaskEnvironmentS
 
 	// identify the primary container
 	primaryContainerIndex := -1
-	if len(fastTaskEnvironmentSpec.PrimaryContainerName) > 0 {
+	if len(fastTaskEnvironmentSpec.GetPrimaryContainerName()) > 0 {
 		for index, container := range podSpec.Containers {
-			if container.Name == fastTaskEnvironmentSpec.PrimaryContainerName {
+			if container.Name == fastTaskEnvironmentSpec.GetPrimaryContainerName() {
 				primaryContainerIndex = index
 				break
 			}
@@ -238,29 +239,29 @@ func (i *InMemoryEnvBuilder) createPod(ctx context.Context, fastTaskEnvironmentS
 		GetConfig().CallbackURI,
 	}
 
-	if fastTaskEnvironmentSpec.BacklogLength > 0 {
-		container.Args = append(container.Args, "--backlog-length", fmt.Sprintf("%d", fastTaskEnvironmentSpec.BacklogLength))
+	if fastTaskEnvironmentSpec.GetBacklogLength() > 0 {
+		container.Args = append(container.Args, "--backlog-length", fmt.Sprintf("%d", fastTaskEnvironmentSpec.GetBacklogLength()))
 	}
-	if fastTaskEnvironmentSpec.Parallelism > 0 {
-		container.Args = append(container.Args, "--parallelism", fmt.Sprintf("%d", fastTaskEnvironmentSpec.Parallelism))
+	if fastTaskEnvironmentSpec.GetParallelism() > 0 {
+		container.Args = append(container.Args, "--parallelism", fmt.Sprintf("%d", fastTaskEnvironmentSpec.GetParallelism()))
 	}
 
 	container.VolumeMounts = append(container.VolumeMounts, v1.VolumeMount{
-		Name:		"workdir",
-		MountPath:	"/tmp",
+		Name:      "workdir",
+		MountPath: "/tmp",
 	})
 
 	// use kubeclient to create worker
 	return i.kubeClient.GetClient().Create(ctx, &v1.Pod{
 		ObjectMeta: *objectMeta,
-		Spec: *podSpec,
+		Spec:       *podSpec,
 	})
 }
 
 // deletePod deletes the pod with the given name and namespace.
 func (i *InMemoryEnvBuilder) deletePod(ctx context.Context, name types.NamespacedName) error {
 	objectMeta := metav1.ObjectMeta{
-		Name: name.Name,
+		Name:      name.Name,
 		Namespace: name.Namespace,
 	}
 
@@ -331,20 +332,20 @@ func (i *InMemoryEnvBuilder) gcEnvironments(ctx context.Context) error {
 
 		// if the environment has a ttlSeconds termination criteria then check if it has expired
 		if ttlCriteria, ok := environment.spec.GetTerminationCriteria().(*pb.FastTaskEnvironmentSpec_TtlSeconds); ok {
-			if environment.state == TOMBSTONED || now_seconds - environment.lastAccessedAt.Unix() >= int64(ttlCriteria.TtlSeconds) {
+			if environment.state == TOMBSTONED || now_seconds-environment.lastAccessedAt.Unix() >= int64(ttlCriteria.TtlSeconds) {
 				environment.state = TOMBSTONED
 
 				podTemplateSpec := &v1.PodTemplateSpec{}
-				if err := json.Unmarshal(environment.spec.PodTemplateSpec, podTemplateSpec); err != nil {
+				if err := json.Unmarshal(environment.spec.GetPodTemplateSpec(), podTemplateSpec); err != nil {
 					return flyteerrors.Errorf(flyteerrors.BadTaskSpecification,
-						"unable to unmarshal PodTemplateSpec [%v], Err: [%v]", environment.spec.PodTemplateSpec, err.Error())
+						"unable to unmarshal PodTemplateSpec [%v], Err: [%v]", environment.spec.GetPodTemplateSpec(), err.Error())
 				}
 
 				podNames := make([]types.NamespacedName, 0)
 				for _, podName := range environment.replicas {
 					podNames = append(podNames,
 						types.NamespacedName{
-							Name: podName,
+							Name:      podName,
 							Namespace: podTemplateSpec.Namespace,
 						})
 				}
@@ -400,15 +401,15 @@ func (i *InMemoryEnvBuilder) repairEnvironments(ctx context.Context) error {
 		}
 
 		podTemplateSpec := &v1.PodTemplateSpec{}
-		if err := json.Unmarshal(environment.spec.PodTemplateSpec, podTemplateSpec); err != nil {
+		if err := json.Unmarshal(environment.spec.GetPodTemplateSpec(), podTemplateSpec); err != nil {
 			return flyteerrors.Errorf(flyteerrors.BadTaskSpecification,
-				"unable to unmarshal PodTemplateSpec [%v], Err: [%v]", environment.spec.PodTemplateSpec, err.Error())
+				"unable to unmarshal PodTemplateSpec [%v], Err: [%v]", environment.spec.GetPodTemplateSpec(), err.Error())
 		}
 
 		podNames := make([]string, 0)
 		for index, podName := range environment.replicas {
 			err := i.kubeClient.GetCache().Get(ctx, types.NamespacedName{
-				Name: podName,
+				Name:      podName,
 				Namespace: podTemplateSpec.Namespace,
 			}, pod)
 
@@ -466,8 +467,7 @@ func (i *InMemoryEnvBuilder) repairEnvironments(ctx context.Context) error {
 // execution type label.
 func (i *InMemoryEnvBuilder) detectOrphanedEnvironments(ctx context.Context, k8sReader client.Reader) error {
 	// retrieve all pods with fast task execution type label
-	var matchingLabelsOption client.MatchingLabels
-	matchingLabelsOption = make(map[string]string)
+	matchingLabelsOption := client.MatchingLabels{}
 	matchingLabelsOption[EXECUTION_ENV_TYPE] = fastTaskType
 
 	podList := &v1.PodList{}
@@ -526,7 +526,7 @@ func (i *InMemoryEnvBuilder) detectOrphanedEnvironments(ctx context.Context, k8s
 				lastAccessedAt: time.Now(),
 				extant:         nil,
 				replicas:       make([]string, 0),
-				spec:           &pb.FastTaskEnvironmentSpec{
+				spec: &pb.FastTaskEnvironmentSpec{
 					PodTemplateSpec: podTemplateSpecBytes,
 					TerminationCriteria: &pb.FastTaskEnvironmentSpec_TtlSeconds{
 						TtlSeconds: int32(ttlSeconds),

@@ -8,8 +8,8 @@ import (
 	"net"
 	"time"
 
-	"k8s.io/api/core/v1"
 	"google.golang.org/grpc"
+	v1 "k8s.io/api/core/v1"
 
 	idlcore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	flyteerrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
@@ -19,10 +19,12 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
+
 	"github.com/unionai/flyte/fasttask/plugin/pb"
 )
 
 const fastTaskType = "fast-task"
+
 var statusUpdateNotFoundError = errors.New("StatusUpdateNotFound")
 
 type Phase int
@@ -66,7 +68,7 @@ func (p *Plugin) getExecutionEnv(ctx context.Context, tCtx core.TaskExecutionCon
 	}
 
 	executionEnv := &idlcore.ExecutionEnv{}
-	if err := utils.UnmarshalStruct(taskTemplate.Custom, executionEnv); err != nil {
+	if err := utils.UnmarshalStruct(taskTemplate.GetCustom(), executionEnv); err != nil {
 		return nil, flyteerrors.Wrapf(flyteerrors.BadTaskSpecification, err, "failed to unmarshal environment")
 	}
 
@@ -75,7 +77,7 @@ func (p *Plugin) getExecutionEnv(ctx context.Context, tCtx core.TaskExecutionCon
 		executionEnvClient := tCtx.GetExecutionEnvClient()
 
 		// if environment already exists then return it
-		if environment := executionEnvClient.Get(ctx, executionEnv.Id); environment != nil {
+		if environment := executionEnvClient.Get(ctx, executionEnv.GetId()); environment != nil {
 			fastTaskEnvironment := &pb.FastTaskEnvironment{}
 			if err := utils.UnmarshalStruct(environment, fastTaskEnvironment); err != nil {
 				return nil, flyteerrors.Wrapf(flyteerrors.BadTaskSpecification, err, "failed to unmarshal environment client")
@@ -93,7 +95,7 @@ func (p *Plugin) getExecutionEnv(ctx context.Context, tCtx core.TaskExecutionCon
 		}
 
 		// if podTemplateSpec is not popualated - then generate from tCtx
-		if len(fastTaskEnvironmentSpec.PodTemplateSpec) == 0 {
+		if len(fastTaskEnvironmentSpec.GetPodTemplateSpec()) == 0 {
 			podSpec, objectMeta, primaryContainerName, err := flytek8s.ToK8sPodSpec(ctx, tCtx)
 			if err != nil {
 				return nil, flyteerrors.Wrapf(flyteerrors.BadTaskSpecification, err, "failed to create environment")
@@ -120,7 +122,7 @@ func (p *Plugin) getExecutionEnv(ctx context.Context, tCtx core.TaskExecutionCon
 			fastTaskEnvironmentSpec.PrimaryContainerName = primaryContainerName
 		}
 
-		environment, err := executionEnvClient.Create(ctx, executionEnv.Id, environmentSpec)
+		environment, err := executionEnvClient.Create(ctx, executionEnv.GetId(), environmentSpec)
 		if err != nil {
 			return nil, flyteerrors.Wrapf(flyteerrors.BadTaskSpecification, err, "failed to create environment")
 		}
@@ -189,7 +191,7 @@ func (p *Plugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (co
 
 		// offer the work to the queue
 		ownerID := tCtx.TaskExecutionMetadata().GetOwnerID()
-		workerID, err := p.fastTaskService.OfferOnQueue(ctx, fastTaskEnvironment.QueueId, taskID, ownerID.Namespace, ownerID.Name, command)
+		workerID, err := p.fastTaskService.OfferOnQueue(ctx, fastTaskEnvironment.GetQueueId(), taskID, ownerID.Namespace, ownerID.Name, command)
 		if err != nil {
 			return core.UnknownTransition, err
 		}
@@ -206,7 +208,7 @@ func (p *Plugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (co
 			}
 
 			// fail if no worker available within grace period
-			if time.Now().Sub(pluginState.LastUpdated) > GetConfig().GracePeriodWorkersUnavailable.Duration {
+			if time.Since(pluginState.LastUpdated) > GetConfig().GracePeriodWorkersUnavailable.Duration {
 				phaseInfo = core.PhaseInfoSystemFailure("unknown", "timed out waiting for worker availability", nil)
 			} else {
 				phaseInfo = core.PhaseInfoNotReady(time.Now(), core.DefaultPhaseVersion, "no workers available")
@@ -214,7 +216,7 @@ func (p *Plugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (co
 		}
 	case PhaseRunning:
 		// check the task status
-		phase, reason, err := p.fastTaskService.CheckStatus(ctx, taskID, fastTaskEnvironment.QueueId, pluginState.WorkerID)
+		phase, reason, err := p.fastTaskService.CheckStatus(ctx, taskID, fastTaskEnvironment.GetQueueId(), pluginState.WorkerID)
 
 		now := time.Now()
 		if err != nil && !errors.Is(err, statusUpdateNotFoundError) {
@@ -229,9 +231,9 @@ func (p *Plugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (co
 			}
 
 			// gather outputs if they exist
-			if taskTemplate.Interface != nil && taskTemplate.Interface.Outputs != nil && taskTemplate.Interface.Outputs.Variables != nil {
+			if taskTemplate.GetInterface() != nil && taskTemplate.GetInterface().GetOutputs() != nil && taskTemplate.GetInterface().GetOutputs().GetVariables() != nil {
 				outputReader := ioutils.NewRemoteFileOutputReader(ctx, tCtx.DataStore(), tCtx.OutputWriter(), tCtx.MaxDatasetSizeBytes())
-				tCtx.OutputWriter().Put(ctx, outputReader)
+				err = tCtx.OutputWriter().Put(ctx, outputReader)
 				if err != nil {
 					return core.UnknownTransition, err
 				}
@@ -260,6 +262,7 @@ func (p *Plugin) Abort(ctx context.Context, tCtx core.TaskExecutionContext) erro
 	// active executions. this is performed in the `Finalize` function which is _always_ called
 	// during any abort. if this logic changes, we will need to add a call to
 	// `fastTaskService.Cleanup` to ensure proper abort here.
+	// TODO: add this since the service may now hold pending tasks without a worker up
 	return nil
 }
 
@@ -281,7 +284,7 @@ func (p *Plugin) Finalize(ctx context.Context, tCtx core.TaskExecutionContext) e
 		return err
 	}
 
-	return p.fastTaskService.Cleanup(ctx, taskID, fastTaskEnvironment.QueueId, pluginState.WorkerID)
+	return p.fastTaskService.Cleanup(ctx, taskID, fastTaskEnvironment.GetQueueId(), pluginState.WorkerID)
 }
 
 // init registers the plugin with the plugin machinery.
@@ -290,7 +293,7 @@ func init() {
 		core.PluginEntry{
 			ID:                  fastTaskType,
 			RegisteredTaskTypes: []core.TaskType{fastTaskType},
-			LoadPlugin:          func(ctx context.Context, iCtx core.SetupContext) (core.Plugin, error) {
+			LoadPlugin: func(ctx context.Context, iCtx core.SetupContext) (core.Plugin, error) {
 				// open tcp listener
 				listener, err := net.Listen("tcp", GetConfig().Endpoint)
 				if err != nil {

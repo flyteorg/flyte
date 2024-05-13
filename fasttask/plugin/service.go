@@ -12,6 +12,7 @@ import (
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+
 	"github.com/unionai/flyte/fasttask/plugin/pb"
 )
 
@@ -27,15 +28,15 @@ type FastTaskService struct {
 
 // Queue is a collection of Workers that are capable of executing similar tasks.
 type Queue struct {
-	lock sync.RWMutex
+	lock    sync.RWMutex
 	workers map[string]*Worker
 }
 
 // Worker represents a fasttask worker.
 type Worker struct {
-	workerID       string
-	capacity       *pb.Capacity
-	responseChan   chan<- *pb.HeartbeatResponse
+	workerID     string
+	capacity     *pb.Capacity
+	responseChan chan<- *pb.HeartbeatResponse
 }
 
 // workerTaskStatus represents the status of a task as reported by a worker.
@@ -52,7 +53,7 @@ func (f *FastTaskService) Heartbeat(stream pb.FastTask_HeartbeatServer) error {
 	// recv initial heartbeat request
 	heartbeatRequest, err := stream.Recv()
 	if heartbeatRequest != nil {
-		workerID = heartbeatRequest.WorkerId
+		workerID = heartbeatRequest.GetWorkerId()
 	}
 
 	if err == io.EOF || heartbeatRequest == nil {
@@ -68,18 +69,18 @@ func (f *FastTaskService) Heartbeat(stream pb.FastTask_HeartbeatServer) error {
 	responseChan := make(chan *pb.HeartbeatResponse, GetConfig().HeartbeatBufferSize)
 	worker := &Worker{
 		workerID:     workerID,
-		capacity:     heartbeatRequest.Capacity,
+		capacity:     heartbeatRequest.GetCapacity(),
 		responseChan: responseChan,
 	}
 
 	// register worker with queue
 	f.queuesLock.Lock()
-	queue, exists := f.queues[heartbeatRequest.QueueId]
+	queue, exists := f.queues[heartbeatRequest.GetQueueId()]
 	if !exists {
 		queue = &Queue{
 			workers: make(map[string]*Worker),
 		}
-		f.queues[heartbeatRequest.QueueId] = queue
+		f.queues[heartbeatRequest.GetQueueId()] = queue
 	}
 	f.queuesLock.Unlock()
 
@@ -90,12 +91,12 @@ func (f *FastTaskService) Heartbeat(stream pb.FastTask_HeartbeatServer) error {
 	// cleanup worker on exit
 	defer func() {
 		f.queuesLock.Lock()
-		queue, exists := f.queues[heartbeatRequest.QueueId]
+		queue, exists := f.queues[heartbeatRequest.GetQueueId()]
 		if exists {
 			queue.lock.Lock()
 			delete(queue.workers, workerID)
 			if len(queue.workers) == 0 {
-				delete(f.queues, heartbeatRequest.QueueId)
+				delete(f.queues, heartbeatRequest.GetQueueId())
 			}
 			queue.lock.Unlock()
 		}
@@ -121,7 +122,7 @@ func (f *FastTaskService) Heartbeat(stream pb.FastTask_HeartbeatServer) error {
 		heartbeatRequest, err := stream.Recv()
 		if err == io.EOF || heartbeatRequest == nil {
 			logger.Debugf(context.Background(), "heartbeat stream closed for worker %s", workerID)
-			break;
+			break
 		} else if err != nil {
 			logger.Warnf(context.Background(), "failed to recv heartbeat request %+v", err)
 			continue
@@ -129,16 +130,16 @@ func (f *FastTaskService) Heartbeat(stream pb.FastTask_HeartbeatServer) error {
 
 		// update worker capacity
 		queue.lock.Lock()
-		worker.capacity = heartbeatRequest.Capacity
+		worker.capacity = heartbeatRequest.GetCapacity()
 		queue.lock.Unlock()
 
-		for _, taskStatus := range heartbeatRequest.TaskStatuses {
+		for _, taskStatus := range heartbeatRequest.GetTaskStatuses() {
 			// if the taskContext exists then send the taskStatus to the statusChannel
 			// if it does not exist, then this plugin has restarted and we rely on the `CheckStatus` to create a new TaskContext.
 			// this is because if `CheckStatus` is called, then the task is active and will be cleaned up on completion. If we
 			// created it here, then a worker could be reporting a status for a task that has already completed and the TaskContext
 			// cleanup would require a separate GC process.
-			if taskStatusChannelResult, exists := f.taskStatusChannels.Load(taskStatus.TaskId); exists {
+			if taskStatusChannelResult, exists := f.taskStatusChannels.Load(taskStatus.GetTaskId()); exists {
 				taskStatusChannel := taskStatusChannelResult.(chan *workerTaskStatus)
 				taskStatusChannel <- &workerTaskStatus{
 					workerID:   worker.workerID,
@@ -147,15 +148,15 @@ func (f *FastTaskService) Heartbeat(stream pb.FastTask_HeartbeatServer) error {
 			}
 
 			// if taskStatus is complete then enqueueOwner for fast feedback
-			phase := core.Phase(taskStatus.Phase)
+			phase := core.Phase(taskStatus.GetPhase())
 			if phase == core.PhaseSuccess || phase == core.PhaseRetryableFailure {
 				ownerID := types.NamespacedName{
-					Namespace: taskStatus.Namespace,
-					Name:      taskStatus.WorkflowId,
+					Namespace: taskStatus.GetNamespace(),
+					Name:      taskStatus.GetWorkflowId(),
 				}
 
 				if err := f.enqueueOwner(ownerID); err != nil {
-					logger.Warnf(context.Background(), "failed to enqueue owner for task %s: %+v", taskStatus.TaskId, err)
+					logger.Warnf(context.Background(), "failed to enqueue owner for task %s: %+v", taskStatus.GetTaskId(), err)
 				}
 			}
 		}
@@ -182,11 +183,11 @@ func (f *FastTaskService) OfferOnQueue(ctx context.Context, queueID, taskID, nam
 	preferredWorkers := make([]*Worker, 0)
 	acceptedWorkers := make([]*Worker, 0)
 	for _, worker := range queue.workers {
-		if worker.capacity.ExecutionLimit - worker.capacity.ExecutionCount > 0 {
+		if worker.capacity.GetExecutionLimit()-worker.capacity.GetExecutionCount() > 0 {
 			preferredWorkers = append(preferredWorkers, worker)
-		} else if worker.capacity.BacklogLimit - worker.capacity.BacklogCount > 0 {
+		} else if worker.capacity.GetBacklogLimit()-worker.capacity.GetBacklogCount() > 0 {
 			acceptedWorkers = append(acceptedWorkers, worker)
-		} 
+		}
 	}
 
 	var worker *Worker
@@ -236,7 +237,7 @@ Loop:
 				latestWorkerTaskStatus = x
 			}
 		default:
-			break Loop;
+			break Loop
 		}
 	}
 
@@ -245,14 +246,14 @@ Loop:
 	}
 
 	taskStatus := latestWorkerTaskStatus.taskStatus
-	phase := core.Phase(taskStatus.Phase)
+	phase := core.Phase(taskStatus.GetPhase())
 
 	// if not completed need to send ACK on taskID to worker
 	if phase != core.PhaseSuccess && phase != core.PhaseRetryableFailure {
 		f.queuesLock.RLock()
 		defer f.queuesLock.RUnlock()
 
-		queue, _ := f.queues[queueID]
+		queue := f.queues[queueID]
 		queue.lock.RLock()
 		defer queue.lock.RUnlock()
 
@@ -264,7 +265,7 @@ Loop:
 		}
 	}
 
-	return phase, taskStatus.Reason, nil
+	return phase, taskStatus.GetReason(), nil
 }
 
 // Cleanup is used to indicate a task is no longer being tracked by the worker and delete the
@@ -274,7 +275,7 @@ func (f *FastTaskService) Cleanup(ctx context.Context, taskID, queueID, workerID
 	f.queuesLock.RLock()
 	defer f.queuesLock.RUnlock()
 
-	queue, _ := f.queues[queueID]
+	queue := f.queues[queueID]
 	queue.lock.RLock()
 	defer queue.lock.RUnlock()
 

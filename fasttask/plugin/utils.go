@@ -20,8 +20,8 @@ func isValidEnvironmentSpec(fastTaskEnvironmentSpec *pb.FastTaskEnvironmentSpec)
 	}
 
 	podTemplateSpec := &v1.PodTemplateSpec{}
-	if err := json.Unmarshal(fastTaskEnvironmentSpec.PodTemplateSpec, podTemplateSpec); err != nil {
-		return fmt.Errorf("unable to unmarshal PodTemplateSpec [%v], Err: [%v]", fastTaskEnvironmentSpec.PodTemplateSpec, err.Error())
+	if err := json.Unmarshal(fastTaskEnvironmentSpec.GetPodTemplateSpec(), podTemplateSpec); err != nil {
+		return fmt.Errorf("unable to unmarshal PodTemplateSpec [%v], Err: [%v]", fastTaskEnvironmentSpec.GetPodTemplateSpec(), err.Error())
 	}
 
 	if fastTaskEnvironmentSpec.GetReplicaCount() <= 0 {
