@@ -17,6 +17,7 @@ type MockConfigurationProvider struct {
 	namespaceMappingConfiguration       interfaces.NamespaceMappingConfiguration
 	qualityOfServiceConfiguration       interfaces.QualityOfServiceConfiguration
 	clusterPoolAssignmentConfiguration  interfaces.ClusterPoolAssignmentConfiguration
+	externalResourceConfiguration       interfaces.ExternalResourceConfiguration
 }
 
 func (p *MockConfigurationProvider) ApplicationConfiguration() interfaces.ApplicationConfiguration {
@@ -77,6 +78,10 @@ func (p *MockConfigurationProvider) ClusterPoolAssignmentConfiguration() interfa
 
 func (p *MockConfigurationProvider) AddClusterPoolAssignmentConfiguration(cfg interfaces.ClusterPoolAssignmentConfiguration) {
 	p.clusterPoolAssignmentConfiguration = cfg
+}
+
+func (p *MockConfigurationProvider) ExternalResourceConfiguration() interfaces.ExternalResourceConfiguration {
+	return p.externalResourceConfiguration
 }
 
 func NewMockConfigurationProvider(
