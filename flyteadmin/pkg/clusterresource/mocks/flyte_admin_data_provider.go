@@ -15,6 +15,47 @@ type FlyteAdminDataProvider struct {
 	mock.Mock
 }
 
+type FlyteAdminDataProvider_GetArchivedProjects struct {
+	*mock.Call
+}
+
+func (_m FlyteAdminDataProvider_GetArchivedProjects) Return(_a0 *admin.Projects, _a1 error) *FlyteAdminDataProvider_GetArchivedProjects {
+	return &FlyteAdminDataProvider_GetArchivedProjects{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *FlyteAdminDataProvider) OnGetArchivedProjects(ctx context.Context) *FlyteAdminDataProvider_GetArchivedProjects {
+	c_call := _m.On("GetArchivedProjects", ctx)
+	return &FlyteAdminDataProvider_GetArchivedProjects{Call: c_call}
+}
+
+func (_m *FlyteAdminDataProvider) OnGetArchivedProjectsMatch(matchers ...interface{}) *FlyteAdminDataProvider_GetArchivedProjects {
+	c_call := _m.On("GetArchivedProjects", matchers...)
+	return &FlyteAdminDataProvider_GetArchivedProjects{Call: c_call}
+}
+
+// GetArchivedProjects provides a mock function with given fields: ctx
+func (_m *FlyteAdminDataProvider) GetArchivedProjects(ctx context.Context) (*admin.Projects, error) {
+	ret := _m.Called(ctx)
+
+	var r0 *admin.Projects
+	if rf, ok := ret.Get(0).(func(context.Context) *admin.Projects); ok {
+		r0 = rf(ctx)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.Projects)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type FlyteAdminDataProvider_GetClusterResourceAttributes struct {
 	*mock.Call
 }

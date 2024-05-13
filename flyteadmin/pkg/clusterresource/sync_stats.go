@@ -6,6 +6,7 @@ type ResourceSyncStats struct {
 	Updated      int
 	AlreadyThere int
 	Errored      int
+	Deleted      int
 }
 
 // Add adds the values of the other ResourceSyncStats to this one
@@ -14,4 +15,5 @@ func (m *ResourceSyncStats) Add(other ResourceSyncStats) {
 	m.Updated += other.Updated
 	m.AlreadyThere += other.AlreadyThere
 	m.Errored += other.Errored
+	m.Deleted += other.Deleted
 }
