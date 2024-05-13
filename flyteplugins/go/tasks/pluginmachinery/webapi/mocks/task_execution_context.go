@@ -16,40 +16,6 @@ type TaskExecutionContext struct {
 	mock.Mock
 }
 
-type TaskExecutionContext_ConnectionManager struct {
-	*mock.Call
-}
-
-func (_m TaskExecutionContext_ConnectionManager) Return(_a0 core.ConnectionManager) *TaskExecutionContext_ConnectionManager {
-	return &TaskExecutionContext_ConnectionManager{Call: _m.Call.Return(_a0)}
-}
-
-func (_m *TaskExecutionContext) OnConnectionManager() *TaskExecutionContext_ConnectionManager {
-	c_call := _m.On("ConnectionManager")
-	return &TaskExecutionContext_ConnectionManager{Call: c_call}
-}
-
-func (_m *TaskExecutionContext) OnConnectionManagerMatch(matchers ...interface{}) *TaskExecutionContext_ConnectionManager {
-	c_call := _m.On("ConnectionManager", matchers...)
-	return &TaskExecutionContext_ConnectionManager{Call: c_call}
-}
-
-// ConnectionManager provides a mock function with given fields:
-func (_m *TaskExecutionContext) ConnectionManager() core.ConnectionManager {
-	ret := _m.Called()
-
-	var r0 core.ConnectionManager
-	if rf, ok := ret.Get(0).(func() core.ConnectionManager); ok {
-		r0 = rf()
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(core.ConnectionManager)
-		}
-	}
-
-	return r0
-}
-
 type TaskExecutionContext_DataStore struct {
 	*mock.Call
 }
