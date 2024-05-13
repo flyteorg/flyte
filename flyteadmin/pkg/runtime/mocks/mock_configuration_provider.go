@@ -99,6 +99,9 @@ func NewMockConfigurationProvider(
 	mockClusterPoolAssignmentConfiguration := &ifaceMocks.ClusterPoolAssignmentConfiguration{}
 	mockClusterPoolAssignmentConfiguration.OnGetClusterPoolAssignments().Return(make(map[string]interfaces.ClusterPoolAssignment))
 
+	mockExternalResourceConfiguration := &ifaceMocks.ExternalResourceConfiguration{}
+	mockExternalResourceConfiguration.OnGetExternalResource().Return(interfaces.ExternalResource{})
+
 	return &MockConfigurationProvider{
 		applicationConfiguration:           applicationConfiguration,
 		queueConfiguration:                 queueConfiguration,
@@ -108,5 +111,6 @@ func NewMockConfigurationProvider(
 		namespaceMappingConfiguration:      namespaceMappingConfiguration,
 		qualityOfServiceConfiguration:      mockQualityOfServiceConfiguration,
 		clusterPoolAssignmentConfiguration: mockClusterPoolAssignmentConfiguration,
+		externalResourceConfiguration:      mockExternalResourceConfiguration,
 	}
 }

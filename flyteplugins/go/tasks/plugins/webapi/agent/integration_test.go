@@ -345,14 +345,9 @@ func newFakeSetupContext(name string) *pluginCoreMocks.SetupContext {
 	fakeResourceRegistrar.On("RegisterResourceQuota", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 	labeled.SetMetricKeys(contextutils.NamespaceKey)
 
-	connection := flyteIdlCore.Connection{Secrets: map[string]string{"OPENAI_API_KEY": "123"}}
-	connectionManager := pluginCoreMocks.ConnectionManager{}
-	connectionManager.OnGet(context.Background(), mock.Anything).Return(connection, nil)
-
 	fakeSetupContext := pluginCoreMocks.SetupContext{}
 	fakeSetupContext.OnMetricsScope().Return(promutils.NewScope(name))
 	fakeSetupContext.OnResourceRegistrar().Return(&fakeResourceRegistrar)
-	fakeSetupContext.OnConnectionManager().Return(&connectionManager)
 
 	return &fakeSetupContext
 }
