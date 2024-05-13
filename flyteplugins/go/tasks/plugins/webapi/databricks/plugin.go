@@ -127,8 +127,11 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 		}
 	}
 	databricksJob[sparkPythonTask] = map[string]interface{}{pythonFile: p.cfg.EntrypointFile, parameters: modifiedArgs}
-
-	data, err := p.sendRequest(create, databricksJob, token, "")
+	databricksInstance := p.cfg.DatabricksInstance
+	if sparkJob.DatabricksInstance != "" {
+		databricksInstance = sparkJob.DatabricksInstance
+	}
+	data, err := p.sendRequest(create, databricksJob, token, "", databricksInstance)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -138,12 +141,12 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 	}
 	runID := fmt.Sprintf("%.0f", data["run_id"])
 
-	return ResourceMetaWrapper{runID, p.cfg.DatabricksInstance, token}, nil, nil
+	return ResourceMetaWrapper{runID, databricksInstance, token}, nil, nil
 }
 
 func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest webapi.Resource, err error) {
 	exec := taskCtx.ResourceMeta().(ResourceMetaWrapper)
-	res, err := p.sendRequest(get, nil, exec.Token, exec.RunID)
+	res, err := p.sendRequest(get, nil, exec.Token, exec.RunID, exec.DatabricksInstance)
 	if err != nil {
 		return nil, err
 	}
@@ -175,7 +178,7 @@ func (p Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error 
 		return nil
 	}
 	exec := taskCtx.ResourceMeta().(ResourceMetaWrapper)
-	_, err := p.sendRequest(cancel, nil, exec.Token, exec.RunID)
+	_, err := p.sendRequest(cancel, nil, exec.Token, exec.RunID, exec.DatabricksInstance)
 	if err != nil {
 		return err
 	}
@@ -184,11 +187,11 @@ func (p Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error 
 	return nil
 }
 
-func (p Plugin) sendRequest(method string, databricksJob map[string]interface{}, token string, runID string) (map[string]interface{}, error) {
+func (p Plugin) sendRequest(method string, databricksJob map[string]interface{}, token, runID, databricksInstance string) (map[string]interface{}, error) {
 	var databricksURL string
 	// for mocking/testing purposes
 	if p.cfg.databricksEndpoint == "" {
-		databricksURL = fmt.Sprintf("https://%v%v", p.cfg.DatabricksInstance, databricksAPI)
+		databricksURL = fmt.Sprintf("https://%v%v", databricksInstance, databricksAPI)
 	} else {
 		databricksURL = fmt.Sprintf("%v%v", p.cfg.databricksEndpoint, databricksAPI)
 	}

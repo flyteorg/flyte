@@ -73,7 +73,7 @@ func TestSendRequest(t *testing.T) {
 	}
 
 	t.Run("create a Databricks job", func(t *testing.T) {
-		data, err := plugin.sendRequest(create, databricksJob, token, "")
+		data, err := plugin.sendRequest(create, databricksJob, token, "", plugin.cfg.DatabricksInstance)
 		assert.NotNil(t, data)
 		assert.Equal(t, "someID", data["id"])
 		assert.Equal(t, "someData", data["data"])
@@ -88,7 +88,7 @@ func TestSendRequest(t *testing.T) {
 				Body:       ioutils.NewBytesReadCloser([]byte(`{"message":"failed"}`)),
 			}, nil
 		}}
-		data, err := plugin.sendRequest(create, databricksJob, token, "")
+		data, err := plugin.sendRequest(create, databricksJob, token, "", plugin.cfg.DatabricksInstance)
 		assert.Nil(t, data)
 		assert.Equal(t, err.Error(), "failed to create Databricks job with error [failed]")
 	})
@@ -98,7 +98,7 @@ func TestSendRequest(t *testing.T) {
 			assert.Equal(t, req.Method, http.MethodPost)
 			return nil, errors.New("failed to send request")
 		}}
-		data, err := plugin.sendRequest(create, databricksJob, token, "")
+		data, err := plugin.sendRequest(create, databricksJob, token, "", plugin.cfg.DatabricksInstance)
 		assert.Nil(t, data)
 		assert.Equal(t, err.Error(), "failed to send request to Databricks platform with err: [failed to send request]")
 	})
@@ -111,7 +111,7 @@ func TestSendRequest(t *testing.T) {
 				Body:       ioutils.NewBytesReadCloser([]byte(`123`)),
 			}, nil
 		}}
-		data, err := plugin.sendRequest(create, databricksJob, token, "")
+		data, err := plugin.sendRequest(create, databricksJob, token, "", plugin.cfg.DatabricksInstance)
 		assert.Nil(t, data)
 		assert.Equal(t, err.Error(), "failed to parse response with err: [json: cannot unmarshal number into Go value of type map[string]interface {}]")
 	})
@@ -124,7 +124,7 @@ func TestSendRequest(t *testing.T) {
 				Body:       ioutils.NewBytesReadCloser([]byte(`{"message":"ok"}`)),
 			}, nil
 		}}
-		data, err := plugin.sendRequest(get, databricksJob, token, "")
+		data, err := plugin.sendRequest(get, databricksJob, token, "", plugin.cfg.DatabricksInstance)
 		assert.NotNil(t, data)
 		assert.Nil(t, err)
 	})
@@ -137,7 +137,7 @@ func TestSendRequest(t *testing.T) {
 				Body:       ioutils.NewBytesReadCloser([]byte(`{"message":"ok"}`)),
 			}, nil
 		}}
-		data, err := plugin.sendRequest(cancel, databricksJob, token, "")
+		data, err := plugin.sendRequest(cancel, databricksJob, token, "", plugin.cfg.DatabricksInstance)
 		assert.NotNil(t, data)
 		assert.Nil(t, err)
 	})
