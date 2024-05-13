@@ -3,6 +3,7 @@ package tests
 import (
 	"context"
 	"encoding/json"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -171,6 +172,12 @@ func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *i
 	tMeta.OnGetPlatformResources().Return(&v1.ResourceRequirements{})
 	tMeta.OnGetInterruptibleFailureThreshold().Return(2)
 	tMeta.OnGetEnvironmentVariables().Return(nil)
+	tMeta.OnGetExternalResourceAttributes().Return(&admin.ExternalResourceAttributes{Connections: map[string]*idlCore.Connection{
+		"openai": {
+			Secrets: map[string]string{"key": "value"},
+			Configs: map[string]string{"key": "value"},
+		},
+	}})
 
 	catClient := &catalogMocks.Client{}
 	catData := sync.Map{}
