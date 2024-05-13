@@ -3,6 +3,7 @@
 import grpc
 
 from flyteidl.admin import common_pb2 as flyteidl_dot_admin_dot_common__pb2
+from flyteidl.admin import configuration_pb2 as flyteidl_dot_admin_dot_configuration__pb2
 from flyteidl.admin import description_entity_pb2 as flyteidl_dot_admin_dot_description__entity__pb2
 from flyteidl.admin import event_pb2 as flyteidl_dot_admin_dot_event__pb2
 from flyteidl.admin import execution_pb2 as flyteidl_dot_admin_dot_execution__pb2
@@ -314,6 +315,16 @@ class AdminServiceStub(object):
                 '/flyteidl.service.AdminService/GetRunningExecutionsCount',
                 request_serializer=flyteidl_dot_admin_dot_execution__pb2.RunningExecutionsCountGetRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_admin_dot_execution__pb2.RunningExecutionsCountGetResponse.FromString,
+                )
+        self.GetConfiguration = channel.unary_unary(
+                '/flyteidl.service.AdminService/GetConfiguration',
+                request_serializer=flyteidl_dot_admin_dot_configuration__pb2.ConfigurationGetRequest.SerializeToString,
+                response_deserializer=flyteidl_dot_admin_dot_configuration__pb2.ConfigurationGetResponse.FromString,
+                )
+        self.UpdateProjectDomainConfiguration = channel.unary_unary(
+                '/flyteidl.service.AdminService/UpdateProjectDomainConfiguration',
+                request_serializer=flyteidl_dot_admin_dot_configuration__pb2.ConfigurationUpdateRequest.SerializeToString,
+                response_deserializer=flyteidl_dot_admin_dot_configuration__pb2.ConfigurationUpdateResponse.FromString,
                 )
 
 
@@ -725,6 +736,21 @@ class AdminServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def GetConfiguration(self, request, context):
+        """Fetch a unified project attribute.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def UpdateProjectDomainConfiguration(self, request, context):
+        """Update a unified project attribute.
+        Requests will fail for stale values of version_to_update
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_AdminServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -1012,6 +1038,16 @@ def add_AdminServiceServicer_to_server(servicer, server):
                     servicer.GetRunningExecutionsCount,
                     request_deserializer=flyteidl_dot_admin_dot_execution__pb2.RunningExecutionsCountGetRequest.FromString,
                     response_serializer=flyteidl_dot_admin_dot_execution__pb2.RunningExecutionsCountGetResponse.SerializeToString,
+            ),
+            'GetConfiguration': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetConfiguration,
+                    request_deserializer=flyteidl_dot_admin_dot_configuration__pb2.ConfigurationGetRequest.FromString,
+                    response_serializer=flyteidl_dot_admin_dot_configuration__pb2.ConfigurationGetResponse.SerializeToString,
+            ),
+            'UpdateProjectDomainConfiguration': grpc.unary_unary_rpc_method_handler(
+                    servicer.UpdateProjectDomainConfiguration,
+                    request_deserializer=flyteidl_dot_admin_dot_configuration__pb2.ConfigurationUpdateRequest.FromString,
+                    response_serializer=flyteidl_dot_admin_dot_configuration__pb2.ConfigurationUpdateResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -1991,5 +2027,39 @@ class AdminService(object):
         return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AdminService/GetRunningExecutionsCount',
             flyteidl_dot_admin_dot_execution__pb2.RunningExecutionsCountGetRequest.SerializeToString,
             flyteidl_dot_admin_dot_execution__pb2.RunningExecutionsCountGetResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetConfiguration(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AdminService/GetConfiguration',
+            flyteidl_dot_admin_dot_configuration__pb2.ConfigurationGetRequest.SerializeToString,
+            flyteidl_dot_admin_dot_configuration__pb2.ConfigurationGetResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def UpdateProjectDomainConfiguration(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AdminService/UpdateProjectDomainConfiguration',
+            flyteidl_dot_admin_dot_configuration__pb2.ConfigurationUpdateRequest.SerializeToString,
+            flyteidl_dot_admin_dot_configuration__pb2.ConfigurationUpdateResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

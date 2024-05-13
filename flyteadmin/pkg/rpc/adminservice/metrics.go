@@ -110,6 +110,13 @@ type descriptionEntityEndpointMetrics struct {
 	list   util.RequestMetrics
 }
 
+type configurationEndpointMetrics struct {
+	scope promutils.Scope
+
+	get    util.RequestMetrics
+	update util.RequestMetrics
+}
+
 type AdminMetrics struct {
 	Scope        promutils.Scope
 	PanicCounter prometheus.Counter
@@ -127,6 +134,7 @@ type AdminMetrics struct {
 	taskExecutionEndpointMetrics           taskExecutionEndpointMetrics
 	workflowEndpointMetrics                workflowEndpointMetrics
 	descriptionEntityMetrics               descriptionEntityEndpointMetrics
+	configurationEndpointMetrics           configurationEndpointMetrics
 }
 
 func InitMetrics(adminScope promutils.Scope) AdminMetrics {
@@ -232,6 +240,12 @@ func InitMetrics(adminScope promutils.Scope) AdminMetrics {
 			create: util.NewRequestMetrics(adminScope, "create_description_entity"),
 			get:    util.NewRequestMetrics(adminScope, "get_description_entity"),
 			list:   util.NewRequestMetrics(adminScope, "list_description_entity"),
+		},
+
+		configurationEndpointMetrics: configurationEndpointMetrics{
+			scope:  adminScope,
+			get:    util.NewRequestMetrics(adminScope, "get_configuration"),
+			update: util.NewRequestMetrics(adminScope, "update_configuration"),
 		},
 	}
 }

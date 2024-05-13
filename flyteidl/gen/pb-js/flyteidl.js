@@ -29829,6 +29829,4469 @@
                 return FlyteURLs;
             })();
     
+            admin.ConfigurationID = (function() {
+    
+                /**
+                 * Properties of a ConfigurationID.
+                 * @memberof flyteidl.admin
+                 * @interface IConfigurationID
+                 * @property {string|null} [org] ConfigurationID org
+                 * @property {string|null} [domain] ConfigurationID domain
+                 * @property {string|null} [project] ConfigurationID project
+                 * @property {string|null} [workflow] ConfigurationID workflow
+                 */
+    
+                /**
+                 * Constructs a new ConfigurationID.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a ConfigurationID.
+                 * @implements IConfigurationID
+                 * @constructor
+                 * @param {flyteidl.admin.IConfigurationID=} [properties] Properties to set
+                 */
+                function ConfigurationID(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * ConfigurationID org.
+                 * @member {string} org
+                 * @memberof flyteidl.admin.ConfigurationID
+                 * @instance
+                 */
+                ConfigurationID.prototype.org = "";
+    
+                /**
+                 * ConfigurationID domain.
+                 * @member {string} domain
+                 * @memberof flyteidl.admin.ConfigurationID
+                 * @instance
+                 */
+                ConfigurationID.prototype.domain = "";
+    
+                /**
+                 * ConfigurationID project.
+                 * @member {string} project
+                 * @memberof flyteidl.admin.ConfigurationID
+                 * @instance
+                 */
+                ConfigurationID.prototype.project = "";
+    
+                /**
+                 * ConfigurationID workflow.
+                 * @member {string} workflow
+                 * @memberof flyteidl.admin.ConfigurationID
+                 * @instance
+                 */
+                ConfigurationID.prototype.workflow = "";
+    
+                /**
+                 * Creates a new ConfigurationID instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.ConfigurationID
+                 * @static
+                 * @param {flyteidl.admin.IConfigurationID=} [properties] Properties to set
+                 * @returns {flyteidl.admin.ConfigurationID} ConfigurationID instance
+                 */
+                ConfigurationID.create = function create(properties) {
+                    return new ConfigurationID(properties);
+                };
+    
+                /**
+                 * Encodes the specified ConfigurationID message. Does not implicitly {@link flyteidl.admin.ConfigurationID.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.ConfigurationID
+                 * @static
+                 * @param {flyteidl.admin.IConfigurationID} message ConfigurationID message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                ConfigurationID.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.org != null && message.hasOwnProperty("org"))
+                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.org);
+                    if (message.domain != null && message.hasOwnProperty("domain"))
+                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.domain);
+                    if (message.project != null && message.hasOwnProperty("project"))
+                        writer.uint32(/* id 3, wireType 2 =*/26).string(message.project);
+                    if (message.workflow != null && message.hasOwnProperty("workflow"))
+                        writer.uint32(/* id 4, wireType 2 =*/34).string(message.workflow);
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a ConfigurationID message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.ConfigurationID
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.ConfigurationID} ConfigurationID
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                ConfigurationID.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.ConfigurationID();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.org = reader.string();
+                            break;
+                        case 2:
+                            message.domain = reader.string();
+                            break;
+                        case 3:
+                            message.project = reader.string();
+                            break;
+                        case 4:
+                            message.workflow = reader.string();
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a ConfigurationID message.
+                 * @function verify
+                 * @memberof flyteidl.admin.ConfigurationID
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                ConfigurationID.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.org != null && message.hasOwnProperty("org"))
+                        if (!$util.isString(message.org))
+                            return "org: string expected";
+                    if (message.domain != null && message.hasOwnProperty("domain"))
+                        if (!$util.isString(message.domain))
+                            return "domain: string expected";
+                    if (message.project != null && message.hasOwnProperty("project"))
+                        if (!$util.isString(message.project))
+                            return "project: string expected";
+                    if (message.workflow != null && message.hasOwnProperty("workflow"))
+                        if (!$util.isString(message.workflow))
+                            return "workflow: string expected";
+                    return null;
+                };
+    
+                return ConfigurationID;
+            })();
+    
+            /**
+             * AttributesSource enum.
+             * @name flyteidl.admin.AttributesSource
+             * @enum {string}
+             * @property {number} SOURCE_UNSPECIFIED=0 SOURCE_UNSPECIFIED value
+             * @property {number} GLOBAL=1 GLOBAL value
+             * @property {number} DOMAIN=2 DOMAIN value
+             * @property {number} PROJECT=3 PROJECT value
+             * @property {number} PROJECT_DOMAIN=4 PROJECT_DOMAIN value
+             */
+            admin.AttributesSource = (function() {
+                var valuesById = {}, values = Object.create(valuesById);
+                values[valuesById[0] = "SOURCE_UNSPECIFIED"] = 0;
+                values[valuesById[1] = "GLOBAL"] = 1;
+                values[valuesById[2] = "DOMAIN"] = 2;
+                values[valuesById[3] = "PROJECT"] = 3;
+                values[valuesById[4] = "PROJECT_DOMAIN"] = 4;
+                return values;
+            })();
+    
+            admin.TaskResourceAttributesWithSource = (function() {
+    
+                /**
+                 * Properties of a TaskResourceAttributesWithSource.
+                 * @memberof flyteidl.admin
+                 * @interface ITaskResourceAttributesWithSource
+                 * @property {flyteidl.admin.AttributesSource|null} [source] TaskResourceAttributesWithSource source
+                 * @property {flyteidl.admin.ITaskResourceAttributes|null} [value] TaskResourceAttributesWithSource value
+                 */
+    
+                /**
+                 * Constructs a new TaskResourceAttributesWithSource.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a TaskResourceAttributesWithSource.
+                 * @implements ITaskResourceAttributesWithSource
+                 * @constructor
+                 * @param {flyteidl.admin.ITaskResourceAttributesWithSource=} [properties] Properties to set
+                 */
+                function TaskResourceAttributesWithSource(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * TaskResourceAttributesWithSource source.
+                 * @member {flyteidl.admin.AttributesSource} source
+                 * @memberof flyteidl.admin.TaskResourceAttributesWithSource
+                 * @instance
+                 */
+                TaskResourceAttributesWithSource.prototype.source = 0;
+    
+                /**
+                 * TaskResourceAttributesWithSource value.
+                 * @member {flyteidl.admin.ITaskResourceAttributes|null|undefined} value
+                 * @memberof flyteidl.admin.TaskResourceAttributesWithSource
+                 * @instance
+                 */
+                TaskResourceAttributesWithSource.prototype.value = null;
+    
+                /**
+                 * Creates a new TaskResourceAttributesWithSource instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.TaskResourceAttributesWithSource
+                 * @static
+                 * @param {flyteidl.admin.ITaskResourceAttributesWithSource=} [properties] Properties to set
+                 * @returns {flyteidl.admin.TaskResourceAttributesWithSource} TaskResourceAttributesWithSource instance
+                 */
+                TaskResourceAttributesWithSource.create = function create(properties) {
+                    return new TaskResourceAttributesWithSource(properties);
+                };
+    
+                /**
+                 * Encodes the specified TaskResourceAttributesWithSource message. Does not implicitly {@link flyteidl.admin.TaskResourceAttributesWithSource.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.TaskResourceAttributesWithSource
+                 * @static
+                 * @param {flyteidl.admin.ITaskResourceAttributesWithSource} message TaskResourceAttributesWithSource message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                TaskResourceAttributesWithSource.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.source != null && message.hasOwnProperty("source"))
+                        writer.uint32(/* id 1, wireType 0 =*/8).int32(message.source);
+                    if (message.value != null && message.hasOwnProperty("value"))
+                        $root.flyteidl.admin.TaskResourceAttributes.encode(message.value, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a TaskResourceAttributesWithSource message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.TaskResourceAttributesWithSource
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.TaskResourceAttributesWithSource} TaskResourceAttributesWithSource
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                TaskResourceAttributesWithSource.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.TaskResourceAttributesWithSource();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.source = reader.int32();
+                            break;
+                        case 2:
+                            message.value = $root.flyteidl.admin.TaskResourceAttributes.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a TaskResourceAttributesWithSource message.
+                 * @function verify
+                 * @memberof flyteidl.admin.TaskResourceAttributesWithSource
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                TaskResourceAttributesWithSource.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.source != null && message.hasOwnProperty("source"))
+                        switch (message.source) {
+                        default:
+                            return "source: enum value expected";
+                        case 0:
+                        case 1:
+                        case 2:
+                        case 3:
+                        case 4:
+                            break;
+                        }
+                    if (message.value != null && message.hasOwnProperty("value")) {
+                        var error = $root.flyteidl.admin.TaskResourceAttributes.verify(message.value);
+                        if (error)
+                            return "value." + error;
+                    }
+                    return null;
+                };
+    
+                return TaskResourceAttributesWithSource;
+            })();
+    
+            admin.ClusterResourceAttributesWithSource = (function() {
+    
+                /**
+                 * Properties of a ClusterResourceAttributesWithSource.
+                 * @memberof flyteidl.admin
+                 * @interface IClusterResourceAttributesWithSource
+                 * @property {flyteidl.admin.AttributesSource|null} [source] ClusterResourceAttributesWithSource source
+                 * @property {flyteidl.admin.IClusterResourceAttributes|null} [value] ClusterResourceAttributesWithSource value
+                 */
+    
+                /**
+                 * Constructs a new ClusterResourceAttributesWithSource.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a ClusterResourceAttributesWithSource.
+                 * @implements IClusterResourceAttributesWithSource
+                 * @constructor
+                 * @param {flyteidl.admin.IClusterResourceAttributesWithSource=} [properties] Properties to set
+                 */
+                function ClusterResourceAttributesWithSource(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * ClusterResourceAttributesWithSource source.
+                 * @member {flyteidl.admin.AttributesSource} source
+                 * @memberof flyteidl.admin.ClusterResourceAttributesWithSource
+                 * @instance
+                 */
+                ClusterResourceAttributesWithSource.prototype.source = 0;
+    
+                /**
+                 * ClusterResourceAttributesWithSource value.
+                 * @member {flyteidl.admin.IClusterResourceAttributes|null|undefined} value
+                 * @memberof flyteidl.admin.ClusterResourceAttributesWithSource
+                 * @instance
+                 */
+                ClusterResourceAttributesWithSource.prototype.value = null;
+    
+                /**
+                 * Creates a new ClusterResourceAttributesWithSource instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.ClusterResourceAttributesWithSource
+                 * @static
+                 * @param {flyteidl.admin.IClusterResourceAttributesWithSource=} [properties] Properties to set
+                 * @returns {flyteidl.admin.ClusterResourceAttributesWithSource} ClusterResourceAttributesWithSource instance
+                 */
+                ClusterResourceAttributesWithSource.create = function create(properties) {
+                    return new ClusterResourceAttributesWithSource(properties);
+                };
+    
+                /**
+                 * Encodes the specified ClusterResourceAttributesWithSource message. Does not implicitly {@link flyteidl.admin.ClusterResourceAttributesWithSource.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.ClusterResourceAttributesWithSource
+                 * @static
+                 * @param {flyteidl.admin.IClusterResourceAttributesWithSource} message ClusterResourceAttributesWithSource message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                ClusterResourceAttributesWithSource.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.source != null && message.hasOwnProperty("source"))
+                        writer.uint32(/* id 1, wireType 0 =*/8).int32(message.source);
+                    if (message.value != null && message.hasOwnProperty("value"))
+                        $root.flyteidl.admin.ClusterResourceAttributes.encode(message.value, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a ClusterResourceAttributesWithSource message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.ClusterResourceAttributesWithSource
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.ClusterResourceAttributesWithSource} ClusterResourceAttributesWithSource
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                ClusterResourceAttributesWithSource.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.ClusterResourceAttributesWithSource();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.source = reader.int32();
+                            break;
+                        case 2:
+                            message.value = $root.flyteidl.admin.ClusterResourceAttributes.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a ClusterResourceAttributesWithSource message.
+                 * @function verify
+                 * @memberof flyteidl.admin.ClusterResourceAttributesWithSource
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                ClusterResourceAttributesWithSource.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.source != null && message.hasOwnProperty("source"))
+                        switch (message.source) {
+                        default:
+                            return "source: enum value expected";
+                        case 0:
+                        case 1:
+                        case 2:
+                        case 3:
+                        case 4:
+                            break;
+                        }
+                    if (message.value != null && message.hasOwnProperty("value")) {
+                        var error = $root.flyteidl.admin.ClusterResourceAttributes.verify(message.value);
+                        if (error)
+                            return "value." + error;
+                    }
+                    return null;
+                };
+    
+                return ClusterResourceAttributesWithSource;
+            })();
+    
+            admin.ExecutionQueueAttributesWithSource = (function() {
+    
+                /**
+                 * Properties of an ExecutionQueueAttributesWithSource.
+                 * @memberof flyteidl.admin
+                 * @interface IExecutionQueueAttributesWithSource
+                 * @property {flyteidl.admin.AttributesSource|null} [source] ExecutionQueueAttributesWithSource source
+                 * @property {flyteidl.admin.IExecutionQueueAttributes|null} [value] ExecutionQueueAttributesWithSource value
+                 */
+    
+                /**
+                 * Constructs a new ExecutionQueueAttributesWithSource.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents an ExecutionQueueAttributesWithSource.
+                 * @implements IExecutionQueueAttributesWithSource
+                 * @constructor
+                 * @param {flyteidl.admin.IExecutionQueueAttributesWithSource=} [properties] Properties to set
+                 */
+                function ExecutionQueueAttributesWithSource(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * ExecutionQueueAttributesWithSource source.
+                 * @member {flyteidl.admin.AttributesSource} source
+                 * @memberof flyteidl.admin.ExecutionQueueAttributesWithSource
+                 * @instance
+                 */
+                ExecutionQueueAttributesWithSource.prototype.source = 0;
+    
+                /**
+                 * ExecutionQueueAttributesWithSource value.
+                 * @member {flyteidl.admin.IExecutionQueueAttributes|null|undefined} value
+                 * @memberof flyteidl.admin.ExecutionQueueAttributesWithSource
+                 * @instance
+                 */
+                ExecutionQueueAttributesWithSource.prototype.value = null;
+    
+                /**
+                 * Creates a new ExecutionQueueAttributesWithSource instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.ExecutionQueueAttributesWithSource
+                 * @static
+                 * @param {flyteidl.admin.IExecutionQueueAttributesWithSource=} [properties] Properties to set
+                 * @returns {flyteidl.admin.ExecutionQueueAttributesWithSource} ExecutionQueueAttributesWithSource instance
+                 */
+                ExecutionQueueAttributesWithSource.create = function create(properties) {
+                    return new ExecutionQueueAttributesWithSource(properties);
+                };
+    
+                /**
+                 * Encodes the specified ExecutionQueueAttributesWithSource message. Does not implicitly {@link flyteidl.admin.ExecutionQueueAttributesWithSource.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.ExecutionQueueAttributesWithSource
+                 * @static
+                 * @param {flyteidl.admin.IExecutionQueueAttributesWithSource} message ExecutionQueueAttributesWithSource message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                ExecutionQueueAttributesWithSource.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.source != null && message.hasOwnProperty("source"))
+                        writer.uint32(/* id 1, wireType 0 =*/8).int32(message.source);
+                    if (message.value != null && message.hasOwnProperty("value"))
+                        $root.flyteidl.admin.ExecutionQueueAttributes.encode(message.value, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes an ExecutionQueueAttributesWithSource message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.ExecutionQueueAttributesWithSource
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.ExecutionQueueAttributesWithSource} ExecutionQueueAttributesWithSource
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                ExecutionQueueAttributesWithSource.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.ExecutionQueueAttributesWithSource();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.source = reader.int32();
+                            break;
+                        case 2:
+                            message.value = $root.flyteidl.admin.ExecutionQueueAttributes.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies an ExecutionQueueAttributesWithSource message.
+                 * @function verify
+                 * @memberof flyteidl.admin.ExecutionQueueAttributesWithSource
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                ExecutionQueueAttributesWithSource.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.source != null && message.hasOwnProperty("source"))
+                        switch (message.source) {
+                        default:
+                            return "source: enum value expected";
+                        case 0:
+                        case 1:
+                        case 2:
+                        case 3:
+                        case 4:
+                            break;
+                        }
+                    if (message.value != null && message.hasOwnProperty("value")) {
+                        var error = $root.flyteidl.admin.ExecutionQueueAttributes.verify(message.value);
+                        if (error)
+                            return "value." + error;
+                    }
+                    return null;
+                };
+    
+                return ExecutionQueueAttributesWithSource;
+            })();
+    
+            admin.ExecutionClusterLabelWithSource = (function() {
+    
+                /**
+                 * Properties of an ExecutionClusterLabelWithSource.
+                 * @memberof flyteidl.admin
+                 * @interface IExecutionClusterLabelWithSource
+                 * @property {flyteidl.admin.AttributesSource|null} [source] ExecutionClusterLabelWithSource source
+                 * @property {flyteidl.admin.IExecutionClusterLabel|null} [value] ExecutionClusterLabelWithSource value
+                 */
+    
+                /**
+                 * Constructs a new ExecutionClusterLabelWithSource.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents an ExecutionClusterLabelWithSource.
+                 * @implements IExecutionClusterLabelWithSource
+                 * @constructor
+                 * @param {flyteidl.admin.IExecutionClusterLabelWithSource=} [properties] Properties to set
+                 */
+                function ExecutionClusterLabelWithSource(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * ExecutionClusterLabelWithSource source.
+                 * @member {flyteidl.admin.AttributesSource} source
+                 * @memberof flyteidl.admin.ExecutionClusterLabelWithSource
+                 * @instance
+                 */
+                ExecutionClusterLabelWithSource.prototype.source = 0;
+    
+                /**
+                 * ExecutionClusterLabelWithSource value.
+                 * @member {flyteidl.admin.IExecutionClusterLabel|null|undefined} value
+                 * @memberof flyteidl.admin.ExecutionClusterLabelWithSource
+                 * @instance
+                 */
+                ExecutionClusterLabelWithSource.prototype.value = null;
+    
+                /**
+                 * Creates a new ExecutionClusterLabelWithSource instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.ExecutionClusterLabelWithSource
+                 * @static
+                 * @param {flyteidl.admin.IExecutionClusterLabelWithSource=} [properties] Properties to set
+                 * @returns {flyteidl.admin.ExecutionClusterLabelWithSource} ExecutionClusterLabelWithSource instance
+                 */
+                ExecutionClusterLabelWithSource.create = function create(properties) {
+                    return new ExecutionClusterLabelWithSource(properties);
+                };
+    
+                /**
+                 * Encodes the specified ExecutionClusterLabelWithSource message. Does not implicitly {@link flyteidl.admin.ExecutionClusterLabelWithSource.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.ExecutionClusterLabelWithSource
+                 * @static
+                 * @param {flyteidl.admin.IExecutionClusterLabelWithSource} message ExecutionClusterLabelWithSource message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                ExecutionClusterLabelWithSource.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.source != null && message.hasOwnProperty("source"))
+                        writer.uint32(/* id 1, wireType 0 =*/8).int32(message.source);
+                    if (message.value != null && message.hasOwnProperty("value"))
+                        $root.flyteidl.admin.ExecutionClusterLabel.encode(message.value, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes an ExecutionClusterLabelWithSource message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.ExecutionClusterLabelWithSource
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.ExecutionClusterLabelWithSource} ExecutionClusterLabelWithSource
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                ExecutionClusterLabelWithSource.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.ExecutionClusterLabelWithSource();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.source = reader.int32();
+                            break;
+                        case 2:
+                            message.value = $root.flyteidl.admin.ExecutionClusterLabel.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies an ExecutionClusterLabelWithSource message.
+                 * @function verify
+                 * @memberof flyteidl.admin.ExecutionClusterLabelWithSource
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                ExecutionClusterLabelWithSource.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.source != null && message.hasOwnProperty("source"))
+                        switch (message.source) {
+                        default:
+                            return "source: enum value expected";
+                        case 0:
+                        case 1:
+                        case 2:
+                        case 3:
+                        case 4:
+                            break;
+                        }
+                    if (message.value != null && message.hasOwnProperty("value")) {
+                        var error = $root.flyteidl.admin.ExecutionClusterLabel.verify(message.value);
+                        if (error)
+                            return "value." + error;
+                    }
+                    return null;
+                };
+    
+                return ExecutionClusterLabelWithSource;
+            })();
+    
+            admin.QualityOfServiceWithSource = (function() {
+    
+                /**
+                 * Properties of a QualityOfServiceWithSource.
+                 * @memberof flyteidl.admin
+                 * @interface IQualityOfServiceWithSource
+                 * @property {flyteidl.admin.AttributesSource|null} [source] QualityOfServiceWithSource source
+                 * @property {flyteidl.core.IQualityOfService|null} [value] QualityOfServiceWithSource value
+                 */
+    
+                /**
+                 * Constructs a new QualityOfServiceWithSource.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a QualityOfServiceWithSource.
+                 * @implements IQualityOfServiceWithSource
+                 * @constructor
+                 * @param {flyteidl.admin.IQualityOfServiceWithSource=} [properties] Properties to set
+                 */
+                function QualityOfServiceWithSource(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * QualityOfServiceWithSource source.
+                 * @member {flyteidl.admin.AttributesSource} source
+                 * @memberof flyteidl.admin.QualityOfServiceWithSource
+                 * @instance
+                 */
+                QualityOfServiceWithSource.prototype.source = 0;
+    
+                /**
+                 * QualityOfServiceWithSource value.
+                 * @member {flyteidl.core.IQualityOfService|null|undefined} value
+                 * @memberof flyteidl.admin.QualityOfServiceWithSource
+                 * @instance
+                 */
+                QualityOfServiceWithSource.prototype.value = null;
+    
+                /**
+                 * Creates a new QualityOfServiceWithSource instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.QualityOfServiceWithSource
+                 * @static
+                 * @param {flyteidl.admin.IQualityOfServiceWithSource=} [properties] Properties to set
+                 * @returns {flyteidl.admin.QualityOfServiceWithSource} QualityOfServiceWithSource instance
+                 */
+                QualityOfServiceWithSource.create = function create(properties) {
+                    return new QualityOfServiceWithSource(properties);
+                };
+    
+                /**
+                 * Encodes the specified QualityOfServiceWithSource message. Does not implicitly {@link flyteidl.admin.QualityOfServiceWithSource.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.QualityOfServiceWithSource
+                 * @static
+                 * @param {flyteidl.admin.IQualityOfServiceWithSource} message QualityOfServiceWithSource message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                QualityOfServiceWithSource.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.source != null && message.hasOwnProperty("source"))
+                        writer.uint32(/* id 1, wireType 0 =*/8).int32(message.source);
+                    if (message.value != null && message.hasOwnProperty("value"))
+                        $root.flyteidl.core.QualityOfService.encode(message.value, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a QualityOfServiceWithSource message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.QualityOfServiceWithSource
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.QualityOfServiceWithSource} QualityOfServiceWithSource
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                QualityOfServiceWithSource.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.QualityOfServiceWithSource();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.source = reader.int32();
+                            break;
+                        case 2:
+                            message.value = $root.flyteidl.core.QualityOfService.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a QualityOfServiceWithSource message.
+                 * @function verify
+                 * @memberof flyteidl.admin.QualityOfServiceWithSource
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                QualityOfServiceWithSource.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.source != null && message.hasOwnProperty("source"))
+                        switch (message.source) {
+                        default:
+                            return "source: enum value expected";
+                        case 0:
+                        case 1:
+                        case 2:
+                        case 3:
+                        case 4:
+                            break;
+                        }
+                    if (message.value != null && message.hasOwnProperty("value")) {
+                        var error = $root.flyteidl.core.QualityOfService.verify(message.value);
+                        if (error)
+                            return "value." + error;
+                    }
+                    return null;
+                };
+    
+                return QualityOfServiceWithSource;
+            })();
+    
+            admin.PluginOverridesWithSource = (function() {
+    
+                /**
+                 * Properties of a PluginOverridesWithSource.
+                 * @memberof flyteidl.admin
+                 * @interface IPluginOverridesWithSource
+                 * @property {flyteidl.admin.AttributesSource|null} [source] PluginOverridesWithSource source
+                 * @property {flyteidl.admin.IPluginOverrides|null} [value] PluginOverridesWithSource value
+                 */
+    
+                /**
+                 * Constructs a new PluginOverridesWithSource.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a PluginOverridesWithSource.
+                 * @implements IPluginOverridesWithSource
+                 * @constructor
+                 * @param {flyteidl.admin.IPluginOverridesWithSource=} [properties] Properties to set
+                 */
+                function PluginOverridesWithSource(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * PluginOverridesWithSource source.
+                 * @member {flyteidl.admin.AttributesSource} source
+                 * @memberof flyteidl.admin.PluginOverridesWithSource
+                 * @instance
+                 */
+                PluginOverridesWithSource.prototype.source = 0;
+    
+                /**
+                 * PluginOverridesWithSource value.
+                 * @member {flyteidl.admin.IPluginOverrides|null|undefined} value
+                 * @memberof flyteidl.admin.PluginOverridesWithSource
+                 * @instance
+                 */
+                PluginOverridesWithSource.prototype.value = null;
+    
+                /**
+                 * Creates a new PluginOverridesWithSource instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.PluginOverridesWithSource
+                 * @static
+                 * @param {flyteidl.admin.IPluginOverridesWithSource=} [properties] Properties to set
+                 * @returns {flyteidl.admin.PluginOverridesWithSource} PluginOverridesWithSource instance
+                 */
+                PluginOverridesWithSource.create = function create(properties) {
+                    return new PluginOverridesWithSource(properties);
+                };
+    
+                /**
+                 * Encodes the specified PluginOverridesWithSource message. Does not implicitly {@link flyteidl.admin.PluginOverridesWithSource.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.PluginOverridesWithSource
+                 * @static
+                 * @param {flyteidl.admin.IPluginOverridesWithSource} message PluginOverridesWithSource message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                PluginOverridesWithSource.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.source != null && message.hasOwnProperty("source"))
+                        writer.uint32(/* id 1, wireType 0 =*/8).int32(message.source);
+                    if (message.value != null && message.hasOwnProperty("value"))
+                        $root.flyteidl.admin.PluginOverrides.encode(message.value, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a PluginOverridesWithSource message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.PluginOverridesWithSource
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.PluginOverridesWithSource} PluginOverridesWithSource
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                PluginOverridesWithSource.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.PluginOverridesWithSource();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.source = reader.int32();
+                            break;
+                        case 2:
+                            message.value = $root.flyteidl.admin.PluginOverrides.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a PluginOverridesWithSource message.
+                 * @function verify
+                 * @memberof flyteidl.admin.PluginOverridesWithSource
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                PluginOverridesWithSource.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.source != null && message.hasOwnProperty("source"))
+                        switch (message.source) {
+                        default:
+                            return "source: enum value expected";
+                        case 0:
+                        case 1:
+                        case 2:
+                        case 3:
+                        case 4:
+                            break;
+                        }
+                    if (message.value != null && message.hasOwnProperty("value")) {
+                        var error = $root.flyteidl.admin.PluginOverrides.verify(message.value);
+                        if (error)
+                            return "value." + error;
+                    }
+                    return null;
+                };
+    
+                return PluginOverridesWithSource;
+            })();
+    
+            admin.WorkflowExecutionConfigWithSource = (function() {
+    
+                /**
+                 * Properties of a WorkflowExecutionConfigWithSource.
+                 * @memberof flyteidl.admin
+                 * @interface IWorkflowExecutionConfigWithSource
+                 * @property {flyteidl.admin.AttributesSource|null} [source] WorkflowExecutionConfigWithSource source
+                 * @property {flyteidl.admin.IWorkflowExecutionConfig|null} [value] WorkflowExecutionConfigWithSource value
+                 */
+    
+                /**
+                 * Constructs a new WorkflowExecutionConfigWithSource.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a WorkflowExecutionConfigWithSource.
+                 * @implements IWorkflowExecutionConfigWithSource
+                 * @constructor
+                 * @param {flyteidl.admin.IWorkflowExecutionConfigWithSource=} [properties] Properties to set
+                 */
+                function WorkflowExecutionConfigWithSource(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * WorkflowExecutionConfigWithSource source.
+                 * @member {flyteidl.admin.AttributesSource} source
+                 * @memberof flyteidl.admin.WorkflowExecutionConfigWithSource
+                 * @instance
+                 */
+                WorkflowExecutionConfigWithSource.prototype.source = 0;
+    
+                /**
+                 * WorkflowExecutionConfigWithSource value.
+                 * @member {flyteidl.admin.IWorkflowExecutionConfig|null|undefined} value
+                 * @memberof flyteidl.admin.WorkflowExecutionConfigWithSource
+                 * @instance
+                 */
+                WorkflowExecutionConfigWithSource.prototype.value = null;
+    
+                /**
+                 * Creates a new WorkflowExecutionConfigWithSource instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.WorkflowExecutionConfigWithSource
+                 * @static
+                 * @param {flyteidl.admin.IWorkflowExecutionConfigWithSource=} [properties] Properties to set
+                 * @returns {flyteidl.admin.WorkflowExecutionConfigWithSource} WorkflowExecutionConfigWithSource instance
+                 */
+                WorkflowExecutionConfigWithSource.create = function create(properties) {
+                    return new WorkflowExecutionConfigWithSource(properties);
+                };
+    
+                /**
+                 * Encodes the specified WorkflowExecutionConfigWithSource message. Does not implicitly {@link flyteidl.admin.WorkflowExecutionConfigWithSource.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.WorkflowExecutionConfigWithSource
+                 * @static
+                 * @param {flyteidl.admin.IWorkflowExecutionConfigWithSource} message WorkflowExecutionConfigWithSource message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                WorkflowExecutionConfigWithSource.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.source != null && message.hasOwnProperty("source"))
+                        writer.uint32(/* id 1, wireType 0 =*/8).int32(message.source);
+                    if (message.value != null && message.hasOwnProperty("value"))
+                        $root.flyteidl.admin.WorkflowExecutionConfig.encode(message.value, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a WorkflowExecutionConfigWithSource message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.WorkflowExecutionConfigWithSource
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.WorkflowExecutionConfigWithSource} WorkflowExecutionConfigWithSource
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                WorkflowExecutionConfigWithSource.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.WorkflowExecutionConfigWithSource();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.source = reader.int32();
+                            break;
+                        case 2:
+                            message.value = $root.flyteidl.admin.WorkflowExecutionConfig.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a WorkflowExecutionConfigWithSource message.
+                 * @function verify
+                 * @memberof flyteidl.admin.WorkflowExecutionConfigWithSource
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                WorkflowExecutionConfigWithSource.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.source != null && message.hasOwnProperty("source"))
+                        switch (message.source) {
+                        default:
+                            return "source: enum value expected";
+                        case 0:
+                        case 1:
+                        case 2:
+                        case 3:
+                        case 4:
+                            break;
+                        }
+                    if (message.value != null && message.hasOwnProperty("value")) {
+                        var error = $root.flyteidl.admin.WorkflowExecutionConfig.verify(message.value);
+                        if (error)
+                            return "value." + error;
+                    }
+                    return null;
+                };
+    
+                return WorkflowExecutionConfigWithSource;
+            })();
+    
+            admin.ClusterAssignmentWithSource = (function() {
+    
+                /**
+                 * Properties of a ClusterAssignmentWithSource.
+                 * @memberof flyteidl.admin
+                 * @interface IClusterAssignmentWithSource
+                 * @property {flyteidl.admin.AttributesSource|null} [source] ClusterAssignmentWithSource source
+                 * @property {flyteidl.admin.IClusterAssignment|null} [value] ClusterAssignmentWithSource value
+                 */
+    
+                /**
+                 * Constructs a new ClusterAssignmentWithSource.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a ClusterAssignmentWithSource.
+                 * @implements IClusterAssignmentWithSource
+                 * @constructor
+                 * @param {flyteidl.admin.IClusterAssignmentWithSource=} [properties] Properties to set
+                 */
+                function ClusterAssignmentWithSource(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * ClusterAssignmentWithSource source.
+                 * @member {flyteidl.admin.AttributesSource} source
+                 * @memberof flyteidl.admin.ClusterAssignmentWithSource
+                 * @instance
+                 */
+                ClusterAssignmentWithSource.prototype.source = 0;
+    
+                /**
+                 * ClusterAssignmentWithSource value.
+                 * @member {flyteidl.admin.IClusterAssignment|null|undefined} value
+                 * @memberof flyteidl.admin.ClusterAssignmentWithSource
+                 * @instance
+                 */
+                ClusterAssignmentWithSource.prototype.value = null;
+    
+                /**
+                 * Creates a new ClusterAssignmentWithSource instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.ClusterAssignmentWithSource
+                 * @static
+                 * @param {flyteidl.admin.IClusterAssignmentWithSource=} [properties] Properties to set
+                 * @returns {flyteidl.admin.ClusterAssignmentWithSource} ClusterAssignmentWithSource instance
+                 */
+                ClusterAssignmentWithSource.create = function create(properties) {
+                    return new ClusterAssignmentWithSource(properties);
+                };
+    
+                /**
+                 * Encodes the specified ClusterAssignmentWithSource message. Does not implicitly {@link flyteidl.admin.ClusterAssignmentWithSource.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.ClusterAssignmentWithSource
+                 * @static
+                 * @param {flyteidl.admin.IClusterAssignmentWithSource} message ClusterAssignmentWithSource message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                ClusterAssignmentWithSource.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.source != null && message.hasOwnProperty("source"))
+                        writer.uint32(/* id 1, wireType 0 =*/8).int32(message.source);
+                    if (message.value != null && message.hasOwnProperty("value"))
+                        $root.flyteidl.admin.ClusterAssignment.encode(message.value, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a ClusterAssignmentWithSource message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.ClusterAssignmentWithSource
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.ClusterAssignmentWithSource} ClusterAssignmentWithSource
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                ClusterAssignmentWithSource.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.ClusterAssignmentWithSource();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.source = reader.int32();
+                            break;
+                        case 2:
+                            message.value = $root.flyteidl.admin.ClusterAssignment.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a ClusterAssignmentWithSource message.
+                 * @function verify
+                 * @memberof flyteidl.admin.ClusterAssignmentWithSource
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                ClusterAssignmentWithSource.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.source != null && message.hasOwnProperty("source"))
+                        switch (message.source) {
+                        default:
+                            return "source: enum value expected";
+                        case 0:
+                        case 1:
+                        case 2:
+                        case 3:
+                        case 4:
+                            break;
+                        }
+                    if (message.value != null && message.hasOwnProperty("value")) {
+                        var error = $root.flyteidl.admin.ClusterAssignment.verify(message.value);
+                        if (error)
+                            return "value." + error;
+                    }
+                    return null;
+                };
+    
+                return ClusterAssignmentWithSource;
+            })();
+    
+            admin.ConfigurationWithSource = (function() {
+    
+                /**
+                 * Properties of a ConfigurationWithSource.
+                 * @memberof flyteidl.admin
+                 * @interface IConfigurationWithSource
+                 * @property {flyteidl.admin.ITaskResourceAttributesWithSource|null} [taskResourceAttributes] ConfigurationWithSource taskResourceAttributes
+                 * @property {flyteidl.admin.IClusterResourceAttributesWithSource|null} [clusterResourceAttributes] ConfigurationWithSource clusterResourceAttributes
+                 * @property {flyteidl.admin.IExecutionQueueAttributesWithSource|null} [executionQueueAttributes] ConfigurationWithSource executionQueueAttributes
+                 * @property {flyteidl.admin.IExecutionClusterLabelWithSource|null} [executionClusterLabel] ConfigurationWithSource executionClusterLabel
+                 * @property {flyteidl.admin.IQualityOfServiceWithSource|null} [qualityOfService] ConfigurationWithSource qualityOfService
+                 * @property {flyteidl.admin.IPluginOverridesWithSource|null} [pluginOverrides] ConfigurationWithSource pluginOverrides
+                 * @property {flyteidl.admin.IWorkflowExecutionConfigWithSource|null} [workflowExecutionConfig] ConfigurationWithSource workflowExecutionConfig
+                 * @property {flyteidl.admin.IClusterAssignmentWithSource|null} [clusterAssignment] ConfigurationWithSource clusterAssignment
+                 */
+    
+                /**
+                 * Constructs a new ConfigurationWithSource.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a ConfigurationWithSource.
+                 * @implements IConfigurationWithSource
+                 * @constructor
+                 * @param {flyteidl.admin.IConfigurationWithSource=} [properties] Properties to set
+                 */
+                function ConfigurationWithSource(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * ConfigurationWithSource taskResourceAttributes.
+                 * @member {flyteidl.admin.ITaskResourceAttributesWithSource|null|undefined} taskResourceAttributes
+                 * @memberof flyteidl.admin.ConfigurationWithSource
+                 * @instance
+                 */
+                ConfigurationWithSource.prototype.taskResourceAttributes = null;
+    
+                /**
+                 * ConfigurationWithSource clusterResourceAttributes.
+                 * @member {flyteidl.admin.IClusterResourceAttributesWithSource|null|undefined} clusterResourceAttributes
+                 * @memberof flyteidl.admin.ConfigurationWithSource
+                 * @instance
+                 */
+                ConfigurationWithSource.prototype.clusterResourceAttributes = null;
+    
+                /**
+                 * ConfigurationWithSource executionQueueAttributes.
+                 * @member {flyteidl.admin.IExecutionQueueAttributesWithSource|null|undefined} executionQueueAttributes
+                 * @memberof flyteidl.admin.ConfigurationWithSource
+                 * @instance
+                 */
+                ConfigurationWithSource.prototype.executionQueueAttributes = null;
+    
+                /**
+                 * ConfigurationWithSource executionClusterLabel.
+                 * @member {flyteidl.admin.IExecutionClusterLabelWithSource|null|undefined} executionClusterLabel
+                 * @memberof flyteidl.admin.ConfigurationWithSource
+                 * @instance
+                 */
+                ConfigurationWithSource.prototype.executionClusterLabel = null;
+    
+                /**
+                 * ConfigurationWithSource qualityOfService.
+                 * @member {flyteidl.admin.IQualityOfServiceWithSource|null|undefined} qualityOfService
+                 * @memberof flyteidl.admin.ConfigurationWithSource
+                 * @instance
+                 */
+                ConfigurationWithSource.prototype.qualityOfService = null;
+    
+                /**
+                 * ConfigurationWithSource pluginOverrides.
+                 * @member {flyteidl.admin.IPluginOverridesWithSource|null|undefined} pluginOverrides
+                 * @memberof flyteidl.admin.ConfigurationWithSource
+                 * @instance
+                 */
+                ConfigurationWithSource.prototype.pluginOverrides = null;
+    
+                /**
+                 * ConfigurationWithSource workflowExecutionConfig.
+                 * @member {flyteidl.admin.IWorkflowExecutionConfigWithSource|null|undefined} workflowExecutionConfig
+                 * @memberof flyteidl.admin.ConfigurationWithSource
+                 * @instance
+                 */
+                ConfigurationWithSource.prototype.workflowExecutionConfig = null;
+    
+                /**
+                 * ConfigurationWithSource clusterAssignment.
+                 * @member {flyteidl.admin.IClusterAssignmentWithSource|null|undefined} clusterAssignment
+                 * @memberof flyteidl.admin.ConfigurationWithSource
+                 * @instance
+                 */
+                ConfigurationWithSource.prototype.clusterAssignment = null;
+    
+                /**
+                 * Creates a new ConfigurationWithSource instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.ConfigurationWithSource
+                 * @static
+                 * @param {flyteidl.admin.IConfigurationWithSource=} [properties] Properties to set
+                 * @returns {flyteidl.admin.ConfigurationWithSource} ConfigurationWithSource instance
+                 */
+                ConfigurationWithSource.create = function create(properties) {
+                    return new ConfigurationWithSource(properties);
+                };
+    
+                /**
+                 * Encodes the specified ConfigurationWithSource message. Does not implicitly {@link flyteidl.admin.ConfigurationWithSource.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.ConfigurationWithSource
+                 * @static
+                 * @param {flyteidl.admin.IConfigurationWithSource} message ConfigurationWithSource message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                ConfigurationWithSource.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.taskResourceAttributes != null && message.hasOwnProperty("taskResourceAttributes"))
+                        $root.flyteidl.admin.TaskResourceAttributesWithSource.encode(message.taskResourceAttributes, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.clusterResourceAttributes != null && message.hasOwnProperty("clusterResourceAttributes"))
+                        $root.flyteidl.admin.ClusterResourceAttributesWithSource.encode(message.clusterResourceAttributes, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    if (message.executionQueueAttributes != null && message.hasOwnProperty("executionQueueAttributes"))
+                        $root.flyteidl.admin.ExecutionQueueAttributesWithSource.encode(message.executionQueueAttributes, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                    if (message.executionClusterLabel != null && message.hasOwnProperty("executionClusterLabel"))
+                        $root.flyteidl.admin.ExecutionClusterLabelWithSource.encode(message.executionClusterLabel, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+                    if (message.qualityOfService != null && message.hasOwnProperty("qualityOfService"))
+                        $root.flyteidl.admin.QualityOfServiceWithSource.encode(message.qualityOfService, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
+                    if (message.pluginOverrides != null && message.hasOwnProperty("pluginOverrides"))
+                        $root.flyteidl.admin.PluginOverridesWithSource.encode(message.pluginOverrides, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
+                    if (message.workflowExecutionConfig != null && message.hasOwnProperty("workflowExecutionConfig"))
+                        $root.flyteidl.admin.WorkflowExecutionConfigWithSource.encode(message.workflowExecutionConfig, writer.uint32(/* id 7, wireType 2 =*/58).fork()).ldelim();
+                    if (message.clusterAssignment != null && message.hasOwnProperty("clusterAssignment"))
+                        $root.flyteidl.admin.ClusterAssignmentWithSource.encode(message.clusterAssignment, writer.uint32(/* id 8, wireType 2 =*/66).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a ConfigurationWithSource message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.ConfigurationWithSource
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.ConfigurationWithSource} ConfigurationWithSource
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                ConfigurationWithSource.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.ConfigurationWithSource();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.taskResourceAttributes = $root.flyteidl.admin.TaskResourceAttributesWithSource.decode(reader, reader.uint32());
+                            break;
+                        case 2:
+                            message.clusterResourceAttributes = $root.flyteidl.admin.ClusterResourceAttributesWithSource.decode(reader, reader.uint32());
+                            break;
+                        case 3:
+                            message.executionQueueAttributes = $root.flyteidl.admin.ExecutionQueueAttributesWithSource.decode(reader, reader.uint32());
+                            break;
+                        case 4:
+                            message.executionClusterLabel = $root.flyteidl.admin.ExecutionClusterLabelWithSource.decode(reader, reader.uint32());
+                            break;
+                        case 5:
+                            message.qualityOfService = $root.flyteidl.admin.QualityOfServiceWithSource.decode(reader, reader.uint32());
+                            break;
+                        case 6:
+                            message.pluginOverrides = $root.flyteidl.admin.PluginOverridesWithSource.decode(reader, reader.uint32());
+                            break;
+                        case 7:
+                            message.workflowExecutionConfig = $root.flyteidl.admin.WorkflowExecutionConfigWithSource.decode(reader, reader.uint32());
+                            break;
+                        case 8:
+                            message.clusterAssignment = $root.flyteidl.admin.ClusterAssignmentWithSource.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a ConfigurationWithSource message.
+                 * @function verify
+                 * @memberof flyteidl.admin.ConfigurationWithSource
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                ConfigurationWithSource.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.taskResourceAttributes != null && message.hasOwnProperty("taskResourceAttributes")) {
+                        var error = $root.flyteidl.admin.TaskResourceAttributesWithSource.verify(message.taskResourceAttributes);
+                        if (error)
+                            return "taskResourceAttributes." + error;
+                    }
+                    if (message.clusterResourceAttributes != null && message.hasOwnProperty("clusterResourceAttributes")) {
+                        var error = $root.flyteidl.admin.ClusterResourceAttributesWithSource.verify(message.clusterResourceAttributes);
+                        if (error)
+                            return "clusterResourceAttributes." + error;
+                    }
+                    if (message.executionQueueAttributes != null && message.hasOwnProperty("executionQueueAttributes")) {
+                        var error = $root.flyteidl.admin.ExecutionQueueAttributesWithSource.verify(message.executionQueueAttributes);
+                        if (error)
+                            return "executionQueueAttributes." + error;
+                    }
+                    if (message.executionClusterLabel != null && message.hasOwnProperty("executionClusterLabel")) {
+                        var error = $root.flyteidl.admin.ExecutionClusterLabelWithSource.verify(message.executionClusterLabel);
+                        if (error)
+                            return "executionClusterLabel." + error;
+                    }
+                    if (message.qualityOfService != null && message.hasOwnProperty("qualityOfService")) {
+                        var error = $root.flyteidl.admin.QualityOfServiceWithSource.verify(message.qualityOfService);
+                        if (error)
+                            return "qualityOfService." + error;
+                    }
+                    if (message.pluginOverrides != null && message.hasOwnProperty("pluginOverrides")) {
+                        var error = $root.flyteidl.admin.PluginOverridesWithSource.verify(message.pluginOverrides);
+                        if (error)
+                            return "pluginOverrides." + error;
+                    }
+                    if (message.workflowExecutionConfig != null && message.hasOwnProperty("workflowExecutionConfig")) {
+                        var error = $root.flyteidl.admin.WorkflowExecutionConfigWithSource.verify(message.workflowExecutionConfig);
+                        if (error)
+                            return "workflowExecutionConfig." + error;
+                    }
+                    if (message.clusterAssignment != null && message.hasOwnProperty("clusterAssignment")) {
+                        var error = $root.flyteidl.admin.ClusterAssignmentWithSource.verify(message.clusterAssignment);
+                        if (error)
+                            return "clusterAssignment." + error;
+                    }
+                    return null;
+                };
+    
+                return ConfigurationWithSource;
+            })();
+    
+            admin.Configuration = (function() {
+    
+                /**
+                 * Properties of a Configuration.
+                 * @memberof flyteidl.admin
+                 * @interface IConfiguration
+                 * @property {flyteidl.admin.ITaskResourceAttributes|null} [taskResourceAttributes] Configuration taskResourceAttributes
+                 * @property {flyteidl.admin.IClusterResourceAttributes|null} [clusterResourceAttributes] Configuration clusterResourceAttributes
+                 * @property {flyteidl.admin.IExecutionQueueAttributes|null} [executionQueueAttributes] Configuration executionQueueAttributes
+                 * @property {flyteidl.admin.IExecutionClusterLabel|null} [executionClusterLabel] Configuration executionClusterLabel
+                 * @property {flyteidl.core.IQualityOfService|null} [qualityOfService] Configuration qualityOfService
+                 * @property {flyteidl.admin.IPluginOverrides|null} [pluginOverrides] Configuration pluginOverrides
+                 * @property {flyteidl.admin.IWorkflowExecutionConfig|null} [workflowExecutionConfig] Configuration workflowExecutionConfig
+                 * @property {flyteidl.admin.IClusterAssignment|null} [clusterAssignment] Configuration clusterAssignment
+                 */
+    
+                /**
+                 * Constructs a new Configuration.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a Configuration.
+                 * @implements IConfiguration
+                 * @constructor
+                 * @param {flyteidl.admin.IConfiguration=} [properties] Properties to set
+                 */
+                function Configuration(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * Configuration taskResourceAttributes.
+                 * @member {flyteidl.admin.ITaskResourceAttributes|null|undefined} taskResourceAttributes
+                 * @memberof flyteidl.admin.Configuration
+                 * @instance
+                 */
+                Configuration.prototype.taskResourceAttributes = null;
+    
+                /**
+                 * Configuration clusterResourceAttributes.
+                 * @member {flyteidl.admin.IClusterResourceAttributes|null|undefined} clusterResourceAttributes
+                 * @memberof flyteidl.admin.Configuration
+                 * @instance
+                 */
+                Configuration.prototype.clusterResourceAttributes = null;
+    
+                /**
+                 * Configuration executionQueueAttributes.
+                 * @member {flyteidl.admin.IExecutionQueueAttributes|null|undefined} executionQueueAttributes
+                 * @memberof flyteidl.admin.Configuration
+                 * @instance
+                 */
+                Configuration.prototype.executionQueueAttributes = null;
+    
+                /**
+                 * Configuration executionClusterLabel.
+                 * @member {flyteidl.admin.IExecutionClusterLabel|null|undefined} executionClusterLabel
+                 * @memberof flyteidl.admin.Configuration
+                 * @instance
+                 */
+                Configuration.prototype.executionClusterLabel = null;
+    
+                /**
+                 * Configuration qualityOfService.
+                 * @member {flyteidl.core.IQualityOfService|null|undefined} qualityOfService
+                 * @memberof flyteidl.admin.Configuration
+                 * @instance
+                 */
+                Configuration.prototype.qualityOfService = null;
+    
+                /**
+                 * Configuration pluginOverrides.
+                 * @member {flyteidl.admin.IPluginOverrides|null|undefined} pluginOverrides
+                 * @memberof flyteidl.admin.Configuration
+                 * @instance
+                 */
+                Configuration.prototype.pluginOverrides = null;
+    
+                /**
+                 * Configuration workflowExecutionConfig.
+                 * @member {flyteidl.admin.IWorkflowExecutionConfig|null|undefined} workflowExecutionConfig
+                 * @memberof flyteidl.admin.Configuration
+                 * @instance
+                 */
+                Configuration.prototype.workflowExecutionConfig = null;
+    
+                /**
+                 * Configuration clusterAssignment.
+                 * @member {flyteidl.admin.IClusterAssignment|null|undefined} clusterAssignment
+                 * @memberof flyteidl.admin.Configuration
+                 * @instance
+                 */
+                Configuration.prototype.clusterAssignment = null;
+    
+                /**
+                 * Creates a new Configuration instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.Configuration
+                 * @static
+                 * @param {flyteidl.admin.IConfiguration=} [properties] Properties to set
+                 * @returns {flyteidl.admin.Configuration} Configuration instance
+                 */
+                Configuration.create = function create(properties) {
+                    return new Configuration(properties);
+                };
+    
+                /**
+                 * Encodes the specified Configuration message. Does not implicitly {@link flyteidl.admin.Configuration.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.Configuration
+                 * @static
+                 * @param {flyteidl.admin.IConfiguration} message Configuration message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                Configuration.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.taskResourceAttributes != null && message.hasOwnProperty("taskResourceAttributes"))
+                        $root.flyteidl.admin.TaskResourceAttributes.encode(message.taskResourceAttributes, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.clusterResourceAttributes != null && message.hasOwnProperty("clusterResourceAttributes"))
+                        $root.flyteidl.admin.ClusterResourceAttributes.encode(message.clusterResourceAttributes, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    if (message.executionQueueAttributes != null && message.hasOwnProperty("executionQueueAttributes"))
+                        $root.flyteidl.admin.ExecutionQueueAttributes.encode(message.executionQueueAttributes, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                    if (message.executionClusterLabel != null && message.hasOwnProperty("executionClusterLabel"))
+                        $root.flyteidl.admin.ExecutionClusterLabel.encode(message.executionClusterLabel, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+                    if (message.qualityOfService != null && message.hasOwnProperty("qualityOfService"))
+                        $root.flyteidl.core.QualityOfService.encode(message.qualityOfService, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
+                    if (message.pluginOverrides != null && message.hasOwnProperty("pluginOverrides"))
+                        $root.flyteidl.admin.PluginOverrides.encode(message.pluginOverrides, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
+                    if (message.workflowExecutionConfig != null && message.hasOwnProperty("workflowExecutionConfig"))
+                        $root.flyteidl.admin.WorkflowExecutionConfig.encode(message.workflowExecutionConfig, writer.uint32(/* id 7, wireType 2 =*/58).fork()).ldelim();
+                    if (message.clusterAssignment != null && message.hasOwnProperty("clusterAssignment"))
+                        $root.flyteidl.admin.ClusterAssignment.encode(message.clusterAssignment, writer.uint32(/* id 8, wireType 2 =*/66).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a Configuration message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.Configuration
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.Configuration} Configuration
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                Configuration.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.Configuration();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.taskResourceAttributes = $root.flyteidl.admin.TaskResourceAttributes.decode(reader, reader.uint32());
+                            break;
+                        case 2:
+                            message.clusterResourceAttributes = $root.flyteidl.admin.ClusterResourceAttributes.decode(reader, reader.uint32());
+                            break;
+                        case 3:
+                            message.executionQueueAttributes = $root.flyteidl.admin.ExecutionQueueAttributes.decode(reader, reader.uint32());
+                            break;
+                        case 4:
+                            message.executionClusterLabel = $root.flyteidl.admin.ExecutionClusterLabel.decode(reader, reader.uint32());
+                            break;
+                        case 5:
+                            message.qualityOfService = $root.flyteidl.core.QualityOfService.decode(reader, reader.uint32());
+                            break;
+                        case 6:
+                            message.pluginOverrides = $root.flyteidl.admin.PluginOverrides.decode(reader, reader.uint32());
+                            break;
+                        case 7:
+                            message.workflowExecutionConfig = $root.flyteidl.admin.WorkflowExecutionConfig.decode(reader, reader.uint32());
+                            break;
+                        case 8:
+                            message.clusterAssignment = $root.flyteidl.admin.ClusterAssignment.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a Configuration message.
+                 * @function verify
+                 * @memberof flyteidl.admin.Configuration
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                Configuration.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.taskResourceAttributes != null && message.hasOwnProperty("taskResourceAttributes")) {
+                        var error = $root.flyteidl.admin.TaskResourceAttributes.verify(message.taskResourceAttributes);
+                        if (error)
+                            return "taskResourceAttributes." + error;
+                    }
+                    if (message.clusterResourceAttributes != null && message.hasOwnProperty("clusterResourceAttributes")) {
+                        var error = $root.flyteidl.admin.ClusterResourceAttributes.verify(message.clusterResourceAttributes);
+                        if (error)
+                            return "clusterResourceAttributes." + error;
+                    }
+                    if (message.executionQueueAttributes != null && message.hasOwnProperty("executionQueueAttributes")) {
+                        var error = $root.flyteidl.admin.ExecutionQueueAttributes.verify(message.executionQueueAttributes);
+                        if (error)
+                            return "executionQueueAttributes." + error;
+                    }
+                    if (message.executionClusterLabel != null && message.hasOwnProperty("executionClusterLabel")) {
+                        var error = $root.flyteidl.admin.ExecutionClusterLabel.verify(message.executionClusterLabel);
+                        if (error)
+                            return "executionClusterLabel." + error;
+                    }
+                    if (message.qualityOfService != null && message.hasOwnProperty("qualityOfService")) {
+                        var error = $root.flyteidl.core.QualityOfService.verify(message.qualityOfService);
+                        if (error)
+                            return "qualityOfService." + error;
+                    }
+                    if (message.pluginOverrides != null && message.hasOwnProperty("pluginOverrides")) {
+                        var error = $root.flyteidl.admin.PluginOverrides.verify(message.pluginOverrides);
+                        if (error)
+                            return "pluginOverrides." + error;
+                    }
+                    if (message.workflowExecutionConfig != null && message.hasOwnProperty("workflowExecutionConfig")) {
+                        var error = $root.flyteidl.admin.WorkflowExecutionConfig.verify(message.workflowExecutionConfig);
+                        if (error)
+                            return "workflowExecutionConfig." + error;
+                    }
+                    if (message.clusterAssignment != null && message.hasOwnProperty("clusterAssignment")) {
+                        var error = $root.flyteidl.admin.ClusterAssignment.verify(message.clusterAssignment);
+                        if (error)
+                            return "clusterAssignment." + error;
+                    }
+                    return null;
+                };
+    
+                return Configuration;
+            })();
+    
+            admin.ConfigurationGetRequest = (function() {
+    
+                /**
+                 * Properties of a ConfigurationGetRequest.
+                 * @memberof flyteidl.admin
+                 * @interface IConfigurationGetRequest
+                 * @property {flyteidl.admin.IConfigurationID|null} [id] ConfigurationGetRequest id
+                 */
+    
+                /**
+                 * Constructs a new ConfigurationGetRequest.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a ConfigurationGetRequest.
+                 * @implements IConfigurationGetRequest
+                 * @constructor
+                 * @param {flyteidl.admin.IConfigurationGetRequest=} [properties] Properties to set
+                 */
+                function ConfigurationGetRequest(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * ConfigurationGetRequest id.
+                 * @member {flyteidl.admin.IConfigurationID|null|undefined} id
+                 * @memberof flyteidl.admin.ConfigurationGetRequest
+                 * @instance
+                 */
+                ConfigurationGetRequest.prototype.id = null;
+    
+                /**
+                 * Creates a new ConfigurationGetRequest instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.ConfigurationGetRequest
+                 * @static
+                 * @param {flyteidl.admin.IConfigurationGetRequest=} [properties] Properties to set
+                 * @returns {flyteidl.admin.ConfigurationGetRequest} ConfigurationGetRequest instance
+                 */
+                ConfigurationGetRequest.create = function create(properties) {
+                    return new ConfigurationGetRequest(properties);
+                };
+    
+                /**
+                 * Encodes the specified ConfigurationGetRequest message. Does not implicitly {@link flyteidl.admin.ConfigurationGetRequest.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.ConfigurationGetRequest
+                 * @static
+                 * @param {flyteidl.admin.IConfigurationGetRequest} message ConfigurationGetRequest message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                ConfigurationGetRequest.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.id != null && message.hasOwnProperty("id"))
+                        $root.flyteidl.admin.ConfigurationID.encode(message.id, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a ConfigurationGetRequest message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.ConfigurationGetRequest
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.ConfigurationGetRequest} ConfigurationGetRequest
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                ConfigurationGetRequest.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.ConfigurationGetRequest();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.id = $root.flyteidl.admin.ConfigurationID.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a ConfigurationGetRequest message.
+                 * @function verify
+                 * @memberof flyteidl.admin.ConfigurationGetRequest
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                ConfigurationGetRequest.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.id != null && message.hasOwnProperty("id")) {
+                        var error = $root.flyteidl.admin.ConfigurationID.verify(message.id);
+                        if (error)
+                            return "id." + error;
+                    }
+                    return null;
+                };
+    
+                return ConfigurationGetRequest;
+            })();
+    
+            admin.ConfigurationGetResponse = (function() {
+    
+                /**
+                 * Properties of a ConfigurationGetResponse.
+                 * @memberof flyteidl.admin
+                 * @interface IConfigurationGetResponse
+                 * @property {flyteidl.admin.IConfigurationID|null} [id] ConfigurationGetResponse id
+                 * @property {string|null} [version] ConfigurationGetResponse version
+                 * @property {flyteidl.admin.IConfigurationWithSource|null} [configuration] ConfigurationGetResponse configuration
+                 */
+    
+                /**
+                 * Constructs a new ConfigurationGetResponse.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a ConfigurationGetResponse.
+                 * @implements IConfigurationGetResponse
+                 * @constructor
+                 * @param {flyteidl.admin.IConfigurationGetResponse=} [properties] Properties to set
+                 */
+                function ConfigurationGetResponse(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * ConfigurationGetResponse id.
+                 * @member {flyteidl.admin.IConfigurationID|null|undefined} id
+                 * @memberof flyteidl.admin.ConfigurationGetResponse
+                 * @instance
+                 */
+                ConfigurationGetResponse.prototype.id = null;
+    
+                /**
+                 * ConfigurationGetResponse version.
+                 * @member {string} version
+                 * @memberof flyteidl.admin.ConfigurationGetResponse
+                 * @instance
+                 */
+                ConfigurationGetResponse.prototype.version = "";
+    
+                /**
+                 * ConfigurationGetResponse configuration.
+                 * @member {flyteidl.admin.IConfigurationWithSource|null|undefined} configuration
+                 * @memberof flyteidl.admin.ConfigurationGetResponse
+                 * @instance
+                 */
+                ConfigurationGetResponse.prototype.configuration = null;
+    
+                /**
+                 * Creates a new ConfigurationGetResponse instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.ConfigurationGetResponse
+                 * @static
+                 * @param {flyteidl.admin.IConfigurationGetResponse=} [properties] Properties to set
+                 * @returns {flyteidl.admin.ConfigurationGetResponse} ConfigurationGetResponse instance
+                 */
+                ConfigurationGetResponse.create = function create(properties) {
+                    return new ConfigurationGetResponse(properties);
+                };
+    
+                /**
+                 * Encodes the specified ConfigurationGetResponse message. Does not implicitly {@link flyteidl.admin.ConfigurationGetResponse.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.ConfigurationGetResponse
+                 * @static
+                 * @param {flyteidl.admin.IConfigurationGetResponse} message ConfigurationGetResponse message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                ConfigurationGetResponse.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.id != null && message.hasOwnProperty("id"))
+                        $root.flyteidl.admin.ConfigurationID.encode(message.id, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.version != null && message.hasOwnProperty("version"))
+                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.version);
+                    if (message.configuration != null && message.hasOwnProperty("configuration"))
+                        $root.flyteidl.admin.ConfigurationWithSource.encode(message.configuration, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a ConfigurationGetResponse message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.ConfigurationGetResponse
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.ConfigurationGetResponse} ConfigurationGetResponse
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                ConfigurationGetResponse.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.ConfigurationGetResponse();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.id = $root.flyteidl.admin.ConfigurationID.decode(reader, reader.uint32());
+                            break;
+                        case 2:
+                            message.version = reader.string();
+                            break;
+                        case 3:
+                            message.configuration = $root.flyteidl.admin.ConfigurationWithSource.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a ConfigurationGetResponse message.
+                 * @function verify
+                 * @memberof flyteidl.admin.ConfigurationGetResponse
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                ConfigurationGetResponse.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.id != null && message.hasOwnProperty("id")) {
+                        var error = $root.flyteidl.admin.ConfigurationID.verify(message.id);
+                        if (error)
+                            return "id." + error;
+                    }
+                    if (message.version != null && message.hasOwnProperty("version"))
+                        if (!$util.isString(message.version))
+                            return "version: string expected";
+                    if (message.configuration != null && message.hasOwnProperty("configuration")) {
+                        var error = $root.flyteidl.admin.ConfigurationWithSource.verify(message.configuration);
+                        if (error)
+                            return "configuration." + error;
+                    }
+                    return null;
+                };
+    
+                return ConfigurationGetResponse;
+            })();
+    
+            admin.ConfigurationUpdateRequest = (function() {
+    
+                /**
+                 * Properties of a ConfigurationUpdateRequest.
+                 * @memberof flyteidl.admin
+                 * @interface IConfigurationUpdateRequest
+                 * @property {flyteidl.admin.IConfigurationID|null} [id] ConfigurationUpdateRequest id
+                 * @property {string|null} [versionToUpdate] ConfigurationUpdateRequest versionToUpdate
+                 * @property {flyteidl.admin.IConfiguration|null} [configuration] ConfigurationUpdateRequest configuration
+                 */
+    
+                /**
+                 * Constructs a new ConfigurationUpdateRequest.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a ConfigurationUpdateRequest.
+                 * @implements IConfigurationUpdateRequest
+                 * @constructor
+                 * @param {flyteidl.admin.IConfigurationUpdateRequest=} [properties] Properties to set
+                 */
+                function ConfigurationUpdateRequest(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * ConfigurationUpdateRequest id.
+                 * @member {flyteidl.admin.IConfigurationID|null|undefined} id
+                 * @memberof flyteidl.admin.ConfigurationUpdateRequest
+                 * @instance
+                 */
+                ConfigurationUpdateRequest.prototype.id = null;
+    
+                /**
+                 * ConfigurationUpdateRequest versionToUpdate.
+                 * @member {string} versionToUpdate
+                 * @memberof flyteidl.admin.ConfigurationUpdateRequest
+                 * @instance
+                 */
+                ConfigurationUpdateRequest.prototype.versionToUpdate = "";
+    
+                /**
+                 * ConfigurationUpdateRequest configuration.
+                 * @member {flyteidl.admin.IConfiguration|null|undefined} configuration
+                 * @memberof flyteidl.admin.ConfigurationUpdateRequest
+                 * @instance
+                 */
+                ConfigurationUpdateRequest.prototype.configuration = null;
+    
+                /**
+                 * Creates a new ConfigurationUpdateRequest instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.ConfigurationUpdateRequest
+                 * @static
+                 * @param {flyteidl.admin.IConfigurationUpdateRequest=} [properties] Properties to set
+                 * @returns {flyteidl.admin.ConfigurationUpdateRequest} ConfigurationUpdateRequest instance
+                 */
+                ConfigurationUpdateRequest.create = function create(properties) {
+                    return new ConfigurationUpdateRequest(properties);
+                };
+    
+                /**
+                 * Encodes the specified ConfigurationUpdateRequest message. Does not implicitly {@link flyteidl.admin.ConfigurationUpdateRequest.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.ConfigurationUpdateRequest
+                 * @static
+                 * @param {flyteidl.admin.IConfigurationUpdateRequest} message ConfigurationUpdateRequest message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                ConfigurationUpdateRequest.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.id != null && message.hasOwnProperty("id"))
+                        $root.flyteidl.admin.ConfigurationID.encode(message.id, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.versionToUpdate != null && message.hasOwnProperty("versionToUpdate"))
+                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.versionToUpdate);
+                    if (message.configuration != null && message.hasOwnProperty("configuration"))
+                        $root.flyteidl.admin.Configuration.encode(message.configuration, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a ConfigurationUpdateRequest message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.ConfigurationUpdateRequest
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.ConfigurationUpdateRequest} ConfigurationUpdateRequest
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                ConfigurationUpdateRequest.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.ConfigurationUpdateRequest();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.id = $root.flyteidl.admin.ConfigurationID.decode(reader, reader.uint32());
+                            break;
+                        case 2:
+                            message.versionToUpdate = reader.string();
+                            break;
+                        case 3:
+                            message.configuration = $root.flyteidl.admin.Configuration.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a ConfigurationUpdateRequest message.
+                 * @function verify
+                 * @memberof flyteidl.admin.ConfigurationUpdateRequest
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                ConfigurationUpdateRequest.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.id != null && message.hasOwnProperty("id")) {
+                        var error = $root.flyteidl.admin.ConfigurationID.verify(message.id);
+                        if (error)
+                            return "id." + error;
+                    }
+                    if (message.versionToUpdate != null && message.hasOwnProperty("versionToUpdate"))
+                        if (!$util.isString(message.versionToUpdate))
+                            return "versionToUpdate: string expected";
+                    if (message.configuration != null && message.hasOwnProperty("configuration")) {
+                        var error = $root.flyteidl.admin.Configuration.verify(message.configuration);
+                        if (error)
+                            return "configuration." + error;
+                    }
+                    return null;
+                };
+    
+                return ConfigurationUpdateRequest;
+            })();
+    
+            admin.ConfigurationUpdateResponse = (function() {
+    
+                /**
+                 * Properties of a ConfigurationUpdateResponse.
+                 * @memberof flyteidl.admin
+                 * @interface IConfigurationUpdateResponse
+                 * @property {flyteidl.admin.IConfigurationID|null} [id] ConfigurationUpdateResponse id
+                 * @property {string|null} [version] ConfigurationUpdateResponse version
+                 * @property {flyteidl.admin.IConfigurationWithSource|null} [configuration] ConfigurationUpdateResponse configuration
+                 */
+    
+                /**
+                 * Constructs a new ConfigurationUpdateResponse.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a ConfigurationUpdateResponse.
+                 * @implements IConfigurationUpdateResponse
+                 * @constructor
+                 * @param {flyteidl.admin.IConfigurationUpdateResponse=} [properties] Properties to set
+                 */
+                function ConfigurationUpdateResponse(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * ConfigurationUpdateResponse id.
+                 * @member {flyteidl.admin.IConfigurationID|null|undefined} id
+                 * @memberof flyteidl.admin.ConfigurationUpdateResponse
+                 * @instance
+                 */
+                ConfigurationUpdateResponse.prototype.id = null;
+    
+                /**
+                 * ConfigurationUpdateResponse version.
+                 * @member {string} version
+                 * @memberof flyteidl.admin.ConfigurationUpdateResponse
+                 * @instance
+                 */
+                ConfigurationUpdateResponse.prototype.version = "";
+    
+                /**
+                 * ConfigurationUpdateResponse configuration.
+                 * @member {flyteidl.admin.IConfigurationWithSource|null|undefined} configuration
+                 * @memberof flyteidl.admin.ConfigurationUpdateResponse
+                 * @instance
+                 */
+                ConfigurationUpdateResponse.prototype.configuration = null;
+    
+                /**
+                 * Creates a new ConfigurationUpdateResponse instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.ConfigurationUpdateResponse
+                 * @static
+                 * @param {flyteidl.admin.IConfigurationUpdateResponse=} [properties] Properties to set
+                 * @returns {flyteidl.admin.ConfigurationUpdateResponse} ConfigurationUpdateResponse instance
+                 */
+                ConfigurationUpdateResponse.create = function create(properties) {
+                    return new ConfigurationUpdateResponse(properties);
+                };
+    
+                /**
+                 * Encodes the specified ConfigurationUpdateResponse message. Does not implicitly {@link flyteidl.admin.ConfigurationUpdateResponse.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.ConfigurationUpdateResponse
+                 * @static
+                 * @param {flyteidl.admin.IConfigurationUpdateResponse} message ConfigurationUpdateResponse message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                ConfigurationUpdateResponse.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.id != null && message.hasOwnProperty("id"))
+                        $root.flyteidl.admin.ConfigurationID.encode(message.id, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.version != null && message.hasOwnProperty("version"))
+                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.version);
+                    if (message.configuration != null && message.hasOwnProperty("configuration"))
+                        $root.flyteidl.admin.ConfigurationWithSource.encode(message.configuration, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a ConfigurationUpdateResponse message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.ConfigurationUpdateResponse
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.ConfigurationUpdateResponse} ConfigurationUpdateResponse
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                ConfigurationUpdateResponse.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.ConfigurationUpdateResponse();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.id = $root.flyteidl.admin.ConfigurationID.decode(reader, reader.uint32());
+                            break;
+                        case 2:
+                            message.version = reader.string();
+                            break;
+                        case 3:
+                            message.configuration = $root.flyteidl.admin.ConfigurationWithSource.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a ConfigurationUpdateResponse message.
+                 * @function verify
+                 * @memberof flyteidl.admin.ConfigurationUpdateResponse
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                ConfigurationUpdateResponse.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.id != null && message.hasOwnProperty("id")) {
+                        var error = $root.flyteidl.admin.ConfigurationID.verify(message.id);
+                        if (error)
+                            return "id." + error;
+                    }
+                    if (message.version != null && message.hasOwnProperty("version"))
+                        if (!$util.isString(message.version))
+                            return "version: string expected";
+                    if (message.configuration != null && message.hasOwnProperty("configuration")) {
+                        var error = $root.flyteidl.admin.ConfigurationWithSource.verify(message.configuration);
+                        if (error)
+                            return "configuration." + error;
+                    }
+                    return null;
+                };
+    
+                return ConfigurationUpdateResponse;
+            })();
+    
+            admin.ConfigurationDocument = (function() {
+    
+                /**
+                 * Properties of a ConfigurationDocument.
+                 * @memberof flyteidl.admin
+                 * @interface IConfigurationDocument
+                 * @property {string|null} [version] ConfigurationDocument version
+                 * @property {Object.<string,flyteidl.admin.IConfiguration>|null} [configurations] ConfigurationDocument configurations
+                 */
+    
+                /**
+                 * Constructs a new ConfigurationDocument.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a ConfigurationDocument.
+                 * @implements IConfigurationDocument
+                 * @constructor
+                 * @param {flyteidl.admin.IConfigurationDocument=} [properties] Properties to set
+                 */
+                function ConfigurationDocument(properties) {
+                    this.configurations = {};
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * ConfigurationDocument version.
+                 * @member {string} version
+                 * @memberof flyteidl.admin.ConfigurationDocument
+                 * @instance
+                 */
+                ConfigurationDocument.prototype.version = "";
+    
+                /**
+                 * ConfigurationDocument configurations.
+                 * @member {Object.<string,flyteidl.admin.IConfiguration>} configurations
+                 * @memberof flyteidl.admin.ConfigurationDocument
+                 * @instance
+                 */
+                ConfigurationDocument.prototype.configurations = $util.emptyObject;
+    
+                /**
+                 * Creates a new ConfigurationDocument instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.ConfigurationDocument
+                 * @static
+                 * @param {flyteidl.admin.IConfigurationDocument=} [properties] Properties to set
+                 * @returns {flyteidl.admin.ConfigurationDocument} ConfigurationDocument instance
+                 */
+                ConfigurationDocument.create = function create(properties) {
+                    return new ConfigurationDocument(properties);
+                };
+    
+                /**
+                 * Encodes the specified ConfigurationDocument message. Does not implicitly {@link flyteidl.admin.ConfigurationDocument.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.ConfigurationDocument
+                 * @static
+                 * @param {flyteidl.admin.IConfigurationDocument} message ConfigurationDocument message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                ConfigurationDocument.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.version != null && message.hasOwnProperty("version"))
+                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.version);
+                    if (message.configurations != null && message.hasOwnProperty("configurations"))
+                        for (var keys = Object.keys(message.configurations), i = 0; i < keys.length; ++i) {
+                            writer.uint32(/* id 3, wireType 2 =*/26).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]);
+                            $root.flyteidl.admin.Configuration.encode(message.configurations[keys[i]], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim().ldelim();
+                        }
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a ConfigurationDocument message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.ConfigurationDocument
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.ConfigurationDocument} ConfigurationDocument
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                ConfigurationDocument.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.ConfigurationDocument(), key;
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.version = reader.string();
+                            break;
+                        case 3:
+                            reader.skip().pos++;
+                            if (message.configurations === $util.emptyObject)
+                                message.configurations = {};
+                            key = reader.string();
+                            reader.pos++;
+                            message.configurations[key] = $root.flyteidl.admin.Configuration.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a ConfigurationDocument message.
+                 * @function verify
+                 * @memberof flyteidl.admin.ConfigurationDocument
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                ConfigurationDocument.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.version != null && message.hasOwnProperty("version"))
+                        if (!$util.isString(message.version))
+                            return "version: string expected";
+                    if (message.configurations != null && message.hasOwnProperty("configurations")) {
+                        if (!$util.isObject(message.configurations))
+                            return "configurations: object expected";
+                        var key = Object.keys(message.configurations);
+                        for (var i = 0; i < key.length; ++i) {
+                            var error = $root.flyteidl.admin.Configuration.verify(message.configurations[key[i]]);
+                            if (error)
+                                return "configurations." + error;
+                        }
+                    }
+                    return null;
+                };
+    
+                return ConfigurationDocument;
+            })();
+    
+            /**
+             * MatchableResource enum.
+             * @name flyteidl.admin.MatchableResource
+             * @enum {string}
+             * @property {number} TASK_RESOURCE=0 TASK_RESOURCE value
+             * @property {number} CLUSTER_RESOURCE=1 CLUSTER_RESOURCE value
+             * @property {number} EXECUTION_QUEUE=2 EXECUTION_QUEUE value
+             * @property {number} EXECUTION_CLUSTER_LABEL=3 EXECUTION_CLUSTER_LABEL value
+             * @property {number} QUALITY_OF_SERVICE_SPECIFICATION=4 QUALITY_OF_SERVICE_SPECIFICATION value
+             * @property {number} PLUGIN_OVERRIDE=5 PLUGIN_OVERRIDE value
+             * @property {number} WORKFLOW_EXECUTION_CONFIG=6 WORKFLOW_EXECUTION_CONFIG value
+             * @property {number} CLUSTER_ASSIGNMENT=7 CLUSTER_ASSIGNMENT value
+             */
+            admin.MatchableResource = (function() {
+                var valuesById = {}, values = Object.create(valuesById);
+                values[valuesById[0] = "TASK_RESOURCE"] = 0;
+                values[valuesById[1] = "CLUSTER_RESOURCE"] = 1;
+                values[valuesById[2] = "EXECUTION_QUEUE"] = 2;
+                values[valuesById[3] = "EXECUTION_CLUSTER_LABEL"] = 3;
+                values[valuesById[4] = "QUALITY_OF_SERVICE_SPECIFICATION"] = 4;
+                values[valuesById[5] = "PLUGIN_OVERRIDE"] = 5;
+                values[valuesById[6] = "WORKFLOW_EXECUTION_CONFIG"] = 6;
+                values[valuesById[7] = "CLUSTER_ASSIGNMENT"] = 7;
+                return values;
+            })();
+    
+            admin.TaskResourceSpec = (function() {
+    
+                /**
+                 * Properties of a TaskResourceSpec.
+                 * @memberof flyteidl.admin
+                 * @interface ITaskResourceSpec
+                 * @property {string|null} [cpu] TaskResourceSpec cpu
+                 * @property {string|null} [gpu] TaskResourceSpec gpu
+                 * @property {string|null} [memory] TaskResourceSpec memory
+                 * @property {string|null} [storage] TaskResourceSpec storage
+                 * @property {string|null} [ephemeralStorage] TaskResourceSpec ephemeralStorage
+                 */
+    
+                /**
+                 * Constructs a new TaskResourceSpec.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a TaskResourceSpec.
+                 * @implements ITaskResourceSpec
+                 * @constructor
+                 * @param {flyteidl.admin.ITaskResourceSpec=} [properties] Properties to set
+                 */
+                function TaskResourceSpec(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * TaskResourceSpec cpu.
+                 * @member {string} cpu
+                 * @memberof flyteidl.admin.TaskResourceSpec
+                 * @instance
+                 */
+                TaskResourceSpec.prototype.cpu = "";
+    
+                /**
+                 * TaskResourceSpec gpu.
+                 * @member {string} gpu
+                 * @memberof flyteidl.admin.TaskResourceSpec
+                 * @instance
+                 */
+                TaskResourceSpec.prototype.gpu = "";
+    
+                /**
+                 * TaskResourceSpec memory.
+                 * @member {string} memory
+                 * @memberof flyteidl.admin.TaskResourceSpec
+                 * @instance
+                 */
+                TaskResourceSpec.prototype.memory = "";
+    
+                /**
+                 * TaskResourceSpec storage.
+                 * @member {string} storage
+                 * @memberof flyteidl.admin.TaskResourceSpec
+                 * @instance
+                 */
+                TaskResourceSpec.prototype.storage = "";
+    
+                /**
+                 * TaskResourceSpec ephemeralStorage.
+                 * @member {string} ephemeralStorage
+                 * @memberof flyteidl.admin.TaskResourceSpec
+                 * @instance
+                 */
+                TaskResourceSpec.prototype.ephemeralStorage = "";
+    
+                /**
+                 * Creates a new TaskResourceSpec instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.TaskResourceSpec
+                 * @static
+                 * @param {flyteidl.admin.ITaskResourceSpec=} [properties] Properties to set
+                 * @returns {flyteidl.admin.TaskResourceSpec} TaskResourceSpec instance
+                 */
+                TaskResourceSpec.create = function create(properties) {
+                    return new TaskResourceSpec(properties);
+                };
+    
+                /**
+                 * Encodes the specified TaskResourceSpec message. Does not implicitly {@link flyteidl.admin.TaskResourceSpec.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.TaskResourceSpec
+                 * @static
+                 * @param {flyteidl.admin.ITaskResourceSpec} message TaskResourceSpec message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                TaskResourceSpec.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.cpu != null && message.hasOwnProperty("cpu"))
+                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.cpu);
+                    if (message.gpu != null && message.hasOwnProperty("gpu"))
+                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.gpu);
+                    if (message.memory != null && message.hasOwnProperty("memory"))
+                        writer.uint32(/* id 3, wireType 2 =*/26).string(message.memory);
+                    if (message.storage != null && message.hasOwnProperty("storage"))
+                        writer.uint32(/* id 4, wireType 2 =*/34).string(message.storage);
+                    if (message.ephemeralStorage != null && message.hasOwnProperty("ephemeralStorage"))
+                        writer.uint32(/* id 5, wireType 2 =*/42).string(message.ephemeralStorage);
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a TaskResourceSpec message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.TaskResourceSpec
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.TaskResourceSpec} TaskResourceSpec
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                TaskResourceSpec.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.TaskResourceSpec();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.cpu = reader.string();
+                            break;
+                        case 2:
+                            message.gpu = reader.string();
+                            break;
+                        case 3:
+                            message.memory = reader.string();
+                            break;
+                        case 4:
+                            message.storage = reader.string();
+                            break;
+                        case 5:
+                            message.ephemeralStorage = reader.string();
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a TaskResourceSpec message.
+                 * @function verify
+                 * @memberof flyteidl.admin.TaskResourceSpec
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                TaskResourceSpec.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.cpu != null && message.hasOwnProperty("cpu"))
+                        if (!$util.isString(message.cpu))
+                            return "cpu: string expected";
+                    if (message.gpu != null && message.hasOwnProperty("gpu"))
+                        if (!$util.isString(message.gpu))
+                            return "gpu: string expected";
+                    if (message.memory != null && message.hasOwnProperty("memory"))
+                        if (!$util.isString(message.memory))
+                            return "memory: string expected";
+                    if (message.storage != null && message.hasOwnProperty("storage"))
+                        if (!$util.isString(message.storage))
+                            return "storage: string expected";
+                    if (message.ephemeralStorage != null && message.hasOwnProperty("ephemeralStorage"))
+                        if (!$util.isString(message.ephemeralStorage))
+                            return "ephemeralStorage: string expected";
+                    return null;
+                };
+    
+                return TaskResourceSpec;
+            })();
+    
+            admin.TaskResourceAttributes = (function() {
+    
+                /**
+                 * Properties of a TaskResourceAttributes.
+                 * @memberof flyteidl.admin
+                 * @interface ITaskResourceAttributes
+                 * @property {flyteidl.admin.ITaskResourceSpec|null} [defaults] TaskResourceAttributes defaults
+                 * @property {flyteidl.admin.ITaskResourceSpec|null} [limits] TaskResourceAttributes limits
+                 */
+    
+                /**
+                 * Constructs a new TaskResourceAttributes.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a TaskResourceAttributes.
+                 * @implements ITaskResourceAttributes
+                 * @constructor
+                 * @param {flyteidl.admin.ITaskResourceAttributes=} [properties] Properties to set
+                 */
+                function TaskResourceAttributes(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * TaskResourceAttributes defaults.
+                 * @member {flyteidl.admin.ITaskResourceSpec|null|undefined} defaults
+                 * @memberof flyteidl.admin.TaskResourceAttributes
+                 * @instance
+                 */
+                TaskResourceAttributes.prototype.defaults = null;
+    
+                /**
+                 * TaskResourceAttributes limits.
+                 * @member {flyteidl.admin.ITaskResourceSpec|null|undefined} limits
+                 * @memberof flyteidl.admin.TaskResourceAttributes
+                 * @instance
+                 */
+                TaskResourceAttributes.prototype.limits = null;
+    
+                /**
+                 * Creates a new TaskResourceAttributes instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.TaskResourceAttributes
+                 * @static
+                 * @param {flyteidl.admin.ITaskResourceAttributes=} [properties] Properties to set
+                 * @returns {flyteidl.admin.TaskResourceAttributes} TaskResourceAttributes instance
+                 */
+                TaskResourceAttributes.create = function create(properties) {
+                    return new TaskResourceAttributes(properties);
+                };
+    
+                /**
+                 * Encodes the specified TaskResourceAttributes message. Does not implicitly {@link flyteidl.admin.TaskResourceAttributes.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.TaskResourceAttributes
+                 * @static
+                 * @param {flyteidl.admin.ITaskResourceAttributes} message TaskResourceAttributes message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                TaskResourceAttributes.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.defaults != null && message.hasOwnProperty("defaults"))
+                        $root.flyteidl.admin.TaskResourceSpec.encode(message.defaults, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.limits != null && message.hasOwnProperty("limits"))
+                        $root.flyteidl.admin.TaskResourceSpec.encode(message.limits, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a TaskResourceAttributes message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.TaskResourceAttributes
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.TaskResourceAttributes} TaskResourceAttributes
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                TaskResourceAttributes.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.TaskResourceAttributes();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.defaults = $root.flyteidl.admin.TaskResourceSpec.decode(reader, reader.uint32());
+                            break;
+                        case 2:
+                            message.limits = $root.flyteidl.admin.TaskResourceSpec.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a TaskResourceAttributes message.
+                 * @function verify
+                 * @memberof flyteidl.admin.TaskResourceAttributes
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                TaskResourceAttributes.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.defaults != null && message.hasOwnProperty("defaults")) {
+                        var error = $root.flyteidl.admin.TaskResourceSpec.verify(message.defaults);
+                        if (error)
+                            return "defaults." + error;
+                    }
+                    if (message.limits != null && message.hasOwnProperty("limits")) {
+                        var error = $root.flyteidl.admin.TaskResourceSpec.verify(message.limits);
+                        if (error)
+                            return "limits." + error;
+                    }
+                    return null;
+                };
+    
+                return TaskResourceAttributes;
+            })();
+    
+            admin.ClusterResourceAttributes = (function() {
+    
+                /**
+                 * Properties of a ClusterResourceAttributes.
+                 * @memberof flyteidl.admin
+                 * @interface IClusterResourceAttributes
+                 * @property {Object.<string,string>|null} [attributes] ClusterResourceAttributes attributes
+                 */
+    
+                /**
+                 * Constructs a new ClusterResourceAttributes.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a ClusterResourceAttributes.
+                 * @implements IClusterResourceAttributes
+                 * @constructor
+                 * @param {flyteidl.admin.IClusterResourceAttributes=} [properties] Properties to set
+                 */
+                function ClusterResourceAttributes(properties) {
+                    this.attributes = {};
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * ClusterResourceAttributes attributes.
+                 * @member {Object.<string,string>} attributes
+                 * @memberof flyteidl.admin.ClusterResourceAttributes
+                 * @instance
+                 */
+                ClusterResourceAttributes.prototype.attributes = $util.emptyObject;
+    
+                /**
+                 * Creates a new ClusterResourceAttributes instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.ClusterResourceAttributes
+                 * @static
+                 * @param {flyteidl.admin.IClusterResourceAttributes=} [properties] Properties to set
+                 * @returns {flyteidl.admin.ClusterResourceAttributes} ClusterResourceAttributes instance
+                 */
+                ClusterResourceAttributes.create = function create(properties) {
+                    return new ClusterResourceAttributes(properties);
+                };
+    
+                /**
+                 * Encodes the specified ClusterResourceAttributes message. Does not implicitly {@link flyteidl.admin.ClusterResourceAttributes.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.ClusterResourceAttributes
+                 * @static
+                 * @param {flyteidl.admin.IClusterResourceAttributes} message ClusterResourceAttributes message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                ClusterResourceAttributes.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.attributes != null && message.hasOwnProperty("attributes"))
+                        for (var keys = Object.keys(message.attributes), i = 0; i < keys.length; ++i)
+                            writer.uint32(/* id 1, wireType 2 =*/10).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]).uint32(/* id 2, wireType 2 =*/18).string(message.attributes[keys[i]]).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a ClusterResourceAttributes message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.ClusterResourceAttributes
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.ClusterResourceAttributes} ClusterResourceAttributes
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                ClusterResourceAttributes.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.ClusterResourceAttributes(), key;
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            reader.skip().pos++;
+                            if (message.attributes === $util.emptyObject)
+                                message.attributes = {};
+                            key = reader.string();
+                            reader.pos++;
+                            message.attributes[key] = reader.string();
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a ClusterResourceAttributes message.
+                 * @function verify
+                 * @memberof flyteidl.admin.ClusterResourceAttributes
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                ClusterResourceAttributes.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.attributes != null && message.hasOwnProperty("attributes")) {
+                        if (!$util.isObject(message.attributes))
+                            return "attributes: object expected";
+                        var key = Object.keys(message.attributes);
+                        for (var i = 0; i < key.length; ++i)
+                            if (!$util.isString(message.attributes[key[i]]))
+                                return "attributes: string{k:string} expected";
+                    }
+                    return null;
+                };
+    
+                return ClusterResourceAttributes;
+            })();
+    
+            admin.ExecutionQueueAttributes = (function() {
+    
+                /**
+                 * Properties of an ExecutionQueueAttributes.
+                 * @memberof flyteidl.admin
+                 * @interface IExecutionQueueAttributes
+                 * @property {Array.<string>|null} [tags] ExecutionQueueAttributes tags
+                 */
+    
+                /**
+                 * Constructs a new ExecutionQueueAttributes.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents an ExecutionQueueAttributes.
+                 * @implements IExecutionQueueAttributes
+                 * @constructor
+                 * @param {flyteidl.admin.IExecutionQueueAttributes=} [properties] Properties to set
+                 */
+                function ExecutionQueueAttributes(properties) {
+                    this.tags = [];
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * ExecutionQueueAttributes tags.
+                 * @member {Array.<string>} tags
+                 * @memberof flyteidl.admin.ExecutionQueueAttributes
+                 * @instance
+                 */
+                ExecutionQueueAttributes.prototype.tags = $util.emptyArray;
+    
+                /**
+                 * Creates a new ExecutionQueueAttributes instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.ExecutionQueueAttributes
+                 * @static
+                 * @param {flyteidl.admin.IExecutionQueueAttributes=} [properties] Properties to set
+                 * @returns {flyteidl.admin.ExecutionQueueAttributes} ExecutionQueueAttributes instance
+                 */
+                ExecutionQueueAttributes.create = function create(properties) {
+                    return new ExecutionQueueAttributes(properties);
+                };
+    
+                /**
+                 * Encodes the specified ExecutionQueueAttributes message. Does not implicitly {@link flyteidl.admin.ExecutionQueueAttributes.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.ExecutionQueueAttributes
+                 * @static
+                 * @param {flyteidl.admin.IExecutionQueueAttributes} message ExecutionQueueAttributes message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                ExecutionQueueAttributes.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.tags != null && message.tags.length)
+                        for (var i = 0; i < message.tags.length; ++i)
+                            writer.uint32(/* id 1, wireType 2 =*/10).string(message.tags[i]);
+                    return writer;
+                };
+    
+                /**
+                 * Decodes an ExecutionQueueAttributes message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.ExecutionQueueAttributes
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.ExecutionQueueAttributes} ExecutionQueueAttributes
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                ExecutionQueueAttributes.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.ExecutionQueueAttributes();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            if (!(message.tags && message.tags.length))
+                                message.tags = [];
+                            message.tags.push(reader.string());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies an ExecutionQueueAttributes message.
+                 * @function verify
+                 * @memberof flyteidl.admin.ExecutionQueueAttributes
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                ExecutionQueueAttributes.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.tags != null && message.hasOwnProperty("tags")) {
+                        if (!Array.isArray(message.tags))
+                            return "tags: array expected";
+                        for (var i = 0; i < message.tags.length; ++i)
+                            if (!$util.isString(message.tags[i]))
+                                return "tags: string[] expected";
+                    }
+                    return null;
+                };
+    
+                return ExecutionQueueAttributes;
+            })();
+    
+            admin.ExecutionClusterLabel = (function() {
+    
+                /**
+                 * Properties of an ExecutionClusterLabel.
+                 * @memberof flyteidl.admin
+                 * @interface IExecutionClusterLabel
+                 * @property {string|null} [value] ExecutionClusterLabel value
+                 */
+    
+                /**
+                 * Constructs a new ExecutionClusterLabel.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents an ExecutionClusterLabel.
+                 * @implements IExecutionClusterLabel
+                 * @constructor
+                 * @param {flyteidl.admin.IExecutionClusterLabel=} [properties] Properties to set
+                 */
+                function ExecutionClusterLabel(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * ExecutionClusterLabel value.
+                 * @member {string} value
+                 * @memberof flyteidl.admin.ExecutionClusterLabel
+                 * @instance
+                 */
+                ExecutionClusterLabel.prototype.value = "";
+    
+                /**
+                 * Creates a new ExecutionClusterLabel instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.ExecutionClusterLabel
+                 * @static
+                 * @param {flyteidl.admin.IExecutionClusterLabel=} [properties] Properties to set
+                 * @returns {flyteidl.admin.ExecutionClusterLabel} ExecutionClusterLabel instance
+                 */
+                ExecutionClusterLabel.create = function create(properties) {
+                    return new ExecutionClusterLabel(properties);
+                };
+    
+                /**
+                 * Encodes the specified ExecutionClusterLabel message. Does not implicitly {@link flyteidl.admin.ExecutionClusterLabel.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.ExecutionClusterLabel
+                 * @static
+                 * @param {flyteidl.admin.IExecutionClusterLabel} message ExecutionClusterLabel message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                ExecutionClusterLabel.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.value != null && message.hasOwnProperty("value"))
+                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.value);
+                    return writer;
+                };
+    
+                /**
+                 * Decodes an ExecutionClusterLabel message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.ExecutionClusterLabel
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.ExecutionClusterLabel} ExecutionClusterLabel
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                ExecutionClusterLabel.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.ExecutionClusterLabel();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.value = reader.string();
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies an ExecutionClusterLabel message.
+                 * @function verify
+                 * @memberof flyteidl.admin.ExecutionClusterLabel
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                ExecutionClusterLabel.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.value != null && message.hasOwnProperty("value"))
+                        if (!$util.isString(message.value))
+                            return "value: string expected";
+                    return null;
+                };
+    
+                return ExecutionClusterLabel;
+            })();
+    
+            admin.PluginOverride = (function() {
+    
+                /**
+                 * Properties of a PluginOverride.
+                 * @memberof flyteidl.admin
+                 * @interface IPluginOverride
+                 * @property {string|null} [taskType] PluginOverride taskType
+                 * @property {Array.<string>|null} [pluginId] PluginOverride pluginId
+                 * @property {flyteidl.admin.PluginOverride.MissingPluginBehavior|null} [missingPluginBehavior] PluginOverride missingPluginBehavior
+                 */
+    
+                /**
+                 * Constructs a new PluginOverride.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a PluginOverride.
+                 * @implements IPluginOverride
+                 * @constructor
+                 * @param {flyteidl.admin.IPluginOverride=} [properties] Properties to set
+                 */
+                function PluginOverride(properties) {
+                    this.pluginId = [];
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * PluginOverride taskType.
+                 * @member {string} taskType
+                 * @memberof flyteidl.admin.PluginOverride
+                 * @instance
+                 */
+                PluginOverride.prototype.taskType = "";
+    
+                /**
+                 * PluginOverride pluginId.
+                 * @member {Array.<string>} pluginId
+                 * @memberof flyteidl.admin.PluginOverride
+                 * @instance
+                 */
+                PluginOverride.prototype.pluginId = $util.emptyArray;
+    
+                /**
+                 * PluginOverride missingPluginBehavior.
+                 * @member {flyteidl.admin.PluginOverride.MissingPluginBehavior} missingPluginBehavior
+                 * @memberof flyteidl.admin.PluginOverride
+                 * @instance
+                 */
+                PluginOverride.prototype.missingPluginBehavior = 0;
+    
+                /**
+                 * Creates a new PluginOverride instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.PluginOverride
+                 * @static
+                 * @param {flyteidl.admin.IPluginOverride=} [properties] Properties to set
+                 * @returns {flyteidl.admin.PluginOverride} PluginOverride instance
+                 */
+                PluginOverride.create = function create(properties) {
+                    return new PluginOverride(properties);
+                };
+    
+                /**
+                 * Encodes the specified PluginOverride message. Does not implicitly {@link flyteidl.admin.PluginOverride.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.PluginOverride
+                 * @static
+                 * @param {flyteidl.admin.IPluginOverride} message PluginOverride message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                PluginOverride.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.taskType != null && message.hasOwnProperty("taskType"))
+                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.taskType);
+                    if (message.pluginId != null && message.pluginId.length)
+                        for (var i = 0; i < message.pluginId.length; ++i)
+                            writer.uint32(/* id 2, wireType 2 =*/18).string(message.pluginId[i]);
+                    if (message.missingPluginBehavior != null && message.hasOwnProperty("missingPluginBehavior"))
+                        writer.uint32(/* id 4, wireType 0 =*/32).int32(message.missingPluginBehavior);
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a PluginOverride message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.PluginOverride
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.PluginOverride} PluginOverride
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                PluginOverride.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.PluginOverride();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.taskType = reader.string();
+                            break;
+                        case 2:
+                            if (!(message.pluginId && message.pluginId.length))
+                                message.pluginId = [];
+                            message.pluginId.push(reader.string());
+                            break;
+                        case 4:
+                            message.missingPluginBehavior = reader.int32();
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a PluginOverride message.
+                 * @function verify
+                 * @memberof flyteidl.admin.PluginOverride
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                PluginOverride.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.taskType != null && message.hasOwnProperty("taskType"))
+                        if (!$util.isString(message.taskType))
+                            return "taskType: string expected";
+                    if (message.pluginId != null && message.hasOwnProperty("pluginId")) {
+                        if (!Array.isArray(message.pluginId))
+                            return "pluginId: array expected";
+                        for (var i = 0; i < message.pluginId.length; ++i)
+                            if (!$util.isString(message.pluginId[i]))
+                                return "pluginId: string[] expected";
+                    }
+                    if (message.missingPluginBehavior != null && message.hasOwnProperty("missingPluginBehavior"))
+                        switch (message.missingPluginBehavior) {
+                        default:
+                            return "missingPluginBehavior: enum value expected";
+                        case 0:
+                        case 1:
+                            break;
+                        }
+                    return null;
+                };
+    
+                /**
+                 * MissingPluginBehavior enum.
+                 * @name flyteidl.admin.PluginOverride.MissingPluginBehavior
+                 * @enum {string}
+                 * @property {number} FAIL=0 FAIL value
+                 * @property {number} USE_DEFAULT=1 USE_DEFAULT value
+                 */
+                PluginOverride.MissingPluginBehavior = (function() {
+                    var valuesById = {}, values = Object.create(valuesById);
+                    values[valuesById[0] = "FAIL"] = 0;
+                    values[valuesById[1] = "USE_DEFAULT"] = 1;
+                    return values;
+                })();
+    
+                return PluginOverride;
+            })();
+    
+            admin.PluginOverrides = (function() {
+    
+                /**
+                 * Properties of a PluginOverrides.
+                 * @memberof flyteidl.admin
+                 * @interface IPluginOverrides
+                 * @property {Array.<flyteidl.admin.IPluginOverride>|null} [overrides] PluginOverrides overrides
+                 */
+    
+                /**
+                 * Constructs a new PluginOverrides.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a PluginOverrides.
+                 * @implements IPluginOverrides
+                 * @constructor
+                 * @param {flyteidl.admin.IPluginOverrides=} [properties] Properties to set
+                 */
+                function PluginOverrides(properties) {
+                    this.overrides = [];
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * PluginOverrides overrides.
+                 * @member {Array.<flyteidl.admin.IPluginOverride>} overrides
+                 * @memberof flyteidl.admin.PluginOverrides
+                 * @instance
+                 */
+                PluginOverrides.prototype.overrides = $util.emptyArray;
+    
+                /**
+                 * Creates a new PluginOverrides instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.PluginOverrides
+                 * @static
+                 * @param {flyteidl.admin.IPluginOverrides=} [properties] Properties to set
+                 * @returns {flyteidl.admin.PluginOverrides} PluginOverrides instance
+                 */
+                PluginOverrides.create = function create(properties) {
+                    return new PluginOverrides(properties);
+                };
+    
+                /**
+                 * Encodes the specified PluginOverrides message. Does not implicitly {@link flyteidl.admin.PluginOverrides.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.PluginOverrides
+                 * @static
+                 * @param {flyteidl.admin.IPluginOverrides} message PluginOverrides message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                PluginOverrides.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.overrides != null && message.overrides.length)
+                        for (var i = 0; i < message.overrides.length; ++i)
+                            $root.flyteidl.admin.PluginOverride.encode(message.overrides[i], writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a PluginOverrides message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.PluginOverrides
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.PluginOverrides} PluginOverrides
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                PluginOverrides.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.PluginOverrides();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            if (!(message.overrides && message.overrides.length))
+                                message.overrides = [];
+                            message.overrides.push($root.flyteidl.admin.PluginOverride.decode(reader, reader.uint32()));
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a PluginOverrides message.
+                 * @function verify
+                 * @memberof flyteidl.admin.PluginOverrides
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                PluginOverrides.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.overrides != null && message.hasOwnProperty("overrides")) {
+                        if (!Array.isArray(message.overrides))
+                            return "overrides: array expected";
+                        for (var i = 0; i < message.overrides.length; ++i) {
+                            var error = $root.flyteidl.admin.PluginOverride.verify(message.overrides[i]);
+                            if (error)
+                                return "overrides." + error;
+                        }
+                    }
+                    return null;
+                };
+    
+                return PluginOverrides;
+            })();
+    
+            admin.WorkflowExecutionConfig = (function() {
+    
+                /**
+                 * Properties of a WorkflowExecutionConfig.
+                 * @memberof flyteidl.admin
+                 * @interface IWorkflowExecutionConfig
+                 * @property {number|null} [maxParallelism] WorkflowExecutionConfig maxParallelism
+                 * @property {flyteidl.core.ISecurityContext|null} [securityContext] WorkflowExecutionConfig securityContext
+                 * @property {flyteidl.admin.IRawOutputDataConfig|null} [rawOutputDataConfig] WorkflowExecutionConfig rawOutputDataConfig
+                 * @property {flyteidl.admin.ILabels|null} [labels] WorkflowExecutionConfig labels
+                 * @property {flyteidl.admin.IAnnotations|null} [annotations] WorkflowExecutionConfig annotations
+                 * @property {google.protobuf.IBoolValue|null} [interruptible] WorkflowExecutionConfig interruptible
+                 * @property {boolean|null} [overwriteCache] WorkflowExecutionConfig overwriteCache
+                 * @property {flyteidl.admin.IEnvs|null} [envs] WorkflowExecutionConfig envs
+                 * @property {Array.<flyteidl.core.IExecutionEnvAssignment>|null} [executionEnvAssignments] WorkflowExecutionConfig executionEnvAssignments
+                 */
+    
+                /**
+                 * Constructs a new WorkflowExecutionConfig.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a WorkflowExecutionConfig.
+                 * @implements IWorkflowExecutionConfig
+                 * @constructor
+                 * @param {flyteidl.admin.IWorkflowExecutionConfig=} [properties] Properties to set
+                 */
+                function WorkflowExecutionConfig(properties) {
+                    this.executionEnvAssignments = [];
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * WorkflowExecutionConfig maxParallelism.
+                 * @member {number} maxParallelism
+                 * @memberof flyteidl.admin.WorkflowExecutionConfig
+                 * @instance
+                 */
+                WorkflowExecutionConfig.prototype.maxParallelism = 0;
+    
+                /**
+                 * WorkflowExecutionConfig securityContext.
+                 * @member {flyteidl.core.ISecurityContext|null|undefined} securityContext
+                 * @memberof flyteidl.admin.WorkflowExecutionConfig
+                 * @instance
+                 */
+                WorkflowExecutionConfig.prototype.securityContext = null;
+    
+                /**
+                 * WorkflowExecutionConfig rawOutputDataConfig.
+                 * @member {flyteidl.admin.IRawOutputDataConfig|null|undefined} rawOutputDataConfig
+                 * @memberof flyteidl.admin.WorkflowExecutionConfig
+                 * @instance
+                 */
+                WorkflowExecutionConfig.prototype.rawOutputDataConfig = null;
+    
+                /**
+                 * WorkflowExecutionConfig labels.
+                 * @member {flyteidl.admin.ILabels|null|undefined} labels
+                 * @memberof flyteidl.admin.WorkflowExecutionConfig
+                 * @instance
+                 */
+                WorkflowExecutionConfig.prototype.labels = null;
+    
+                /**
+                 * WorkflowExecutionConfig annotations.
+                 * @member {flyteidl.admin.IAnnotations|null|undefined} annotations
+                 * @memberof flyteidl.admin.WorkflowExecutionConfig
+                 * @instance
+                 */
+                WorkflowExecutionConfig.prototype.annotations = null;
+    
+                /**
+                 * WorkflowExecutionConfig interruptible.
+                 * @member {google.protobuf.IBoolValue|null|undefined} interruptible
+                 * @memberof flyteidl.admin.WorkflowExecutionConfig
+                 * @instance
+                 */
+                WorkflowExecutionConfig.prototype.interruptible = null;
+    
+                /**
+                 * WorkflowExecutionConfig overwriteCache.
+                 * @member {boolean} overwriteCache
+                 * @memberof flyteidl.admin.WorkflowExecutionConfig
+                 * @instance
+                 */
+                WorkflowExecutionConfig.prototype.overwriteCache = false;
+    
+                /**
+                 * WorkflowExecutionConfig envs.
+                 * @member {flyteidl.admin.IEnvs|null|undefined} envs
+                 * @memberof flyteidl.admin.WorkflowExecutionConfig
+                 * @instance
+                 */
+                WorkflowExecutionConfig.prototype.envs = null;
+    
+                /**
+                 * WorkflowExecutionConfig executionEnvAssignments.
+                 * @member {Array.<flyteidl.core.IExecutionEnvAssignment>} executionEnvAssignments
+                 * @memberof flyteidl.admin.WorkflowExecutionConfig
+                 * @instance
+                 */
+                WorkflowExecutionConfig.prototype.executionEnvAssignments = $util.emptyArray;
+    
+                /**
+                 * Creates a new WorkflowExecutionConfig instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.WorkflowExecutionConfig
+                 * @static
+                 * @param {flyteidl.admin.IWorkflowExecutionConfig=} [properties] Properties to set
+                 * @returns {flyteidl.admin.WorkflowExecutionConfig} WorkflowExecutionConfig instance
+                 */
+                WorkflowExecutionConfig.create = function create(properties) {
+                    return new WorkflowExecutionConfig(properties);
+                };
+    
+                /**
+                 * Encodes the specified WorkflowExecutionConfig message. Does not implicitly {@link flyteidl.admin.WorkflowExecutionConfig.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.WorkflowExecutionConfig
+                 * @static
+                 * @param {flyteidl.admin.IWorkflowExecutionConfig} message WorkflowExecutionConfig message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                WorkflowExecutionConfig.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.maxParallelism != null && message.hasOwnProperty("maxParallelism"))
+                        writer.uint32(/* id 1, wireType 0 =*/8).int32(message.maxParallelism);
+                    if (message.securityContext != null && message.hasOwnProperty("securityContext"))
+                        $root.flyteidl.core.SecurityContext.encode(message.securityContext, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    if (message.rawOutputDataConfig != null && message.hasOwnProperty("rawOutputDataConfig"))
+                        $root.flyteidl.admin.RawOutputDataConfig.encode(message.rawOutputDataConfig, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                    if (message.labels != null && message.hasOwnProperty("labels"))
+                        $root.flyteidl.admin.Labels.encode(message.labels, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+                    if (message.annotations != null && message.hasOwnProperty("annotations"))
+                        $root.flyteidl.admin.Annotations.encode(message.annotations, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
+                    if (message.interruptible != null && message.hasOwnProperty("interruptible"))
+                        $root.google.protobuf.BoolValue.encode(message.interruptible, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
+                    if (message.overwriteCache != null && message.hasOwnProperty("overwriteCache"))
+                        writer.uint32(/* id 7, wireType 0 =*/56).bool(message.overwriteCache);
+                    if (message.envs != null && message.hasOwnProperty("envs"))
+                        $root.flyteidl.admin.Envs.encode(message.envs, writer.uint32(/* id 8, wireType 2 =*/66).fork()).ldelim();
+                    if (message.executionEnvAssignments != null && message.executionEnvAssignments.length)
+                        for (var i = 0; i < message.executionEnvAssignments.length; ++i)
+                            $root.flyteidl.core.ExecutionEnvAssignment.encode(message.executionEnvAssignments[i], writer.uint32(/* id 9, wireType 2 =*/74).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a WorkflowExecutionConfig message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.WorkflowExecutionConfig
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.WorkflowExecutionConfig} WorkflowExecutionConfig
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                WorkflowExecutionConfig.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.WorkflowExecutionConfig();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.maxParallelism = reader.int32();
+                            break;
+                        case 2:
+                            message.securityContext = $root.flyteidl.core.SecurityContext.decode(reader, reader.uint32());
+                            break;
+                        case 3:
+                            message.rawOutputDataConfig = $root.flyteidl.admin.RawOutputDataConfig.decode(reader, reader.uint32());
+                            break;
+                        case 4:
+                            message.labels = $root.flyteidl.admin.Labels.decode(reader, reader.uint32());
+                            break;
+                        case 5:
+                            message.annotations = $root.flyteidl.admin.Annotations.decode(reader, reader.uint32());
+                            break;
+                        case 6:
+                            message.interruptible = $root.google.protobuf.BoolValue.decode(reader, reader.uint32());
+                            break;
+                        case 7:
+                            message.overwriteCache = reader.bool();
+                            break;
+                        case 8:
+                            message.envs = $root.flyteidl.admin.Envs.decode(reader, reader.uint32());
+                            break;
+                        case 9:
+                            if (!(message.executionEnvAssignments && message.executionEnvAssignments.length))
+                                message.executionEnvAssignments = [];
+                            message.executionEnvAssignments.push($root.flyteidl.core.ExecutionEnvAssignment.decode(reader, reader.uint32()));
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a WorkflowExecutionConfig message.
+                 * @function verify
+                 * @memberof flyteidl.admin.WorkflowExecutionConfig
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                WorkflowExecutionConfig.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.maxParallelism != null && message.hasOwnProperty("maxParallelism"))
+                        if (!$util.isInteger(message.maxParallelism))
+                            return "maxParallelism: integer expected";
+                    if (message.securityContext != null && message.hasOwnProperty("securityContext")) {
+                        var error = $root.flyteidl.core.SecurityContext.verify(message.securityContext);
+                        if (error)
+                            return "securityContext." + error;
+                    }
+                    if (message.rawOutputDataConfig != null && message.hasOwnProperty("rawOutputDataConfig")) {
+                        var error = $root.flyteidl.admin.RawOutputDataConfig.verify(message.rawOutputDataConfig);
+                        if (error)
+                            return "rawOutputDataConfig." + error;
+                    }
+                    if (message.labels != null && message.hasOwnProperty("labels")) {
+                        var error = $root.flyteidl.admin.Labels.verify(message.labels);
+                        if (error)
+                            return "labels." + error;
+                    }
+                    if (message.annotations != null && message.hasOwnProperty("annotations")) {
+                        var error = $root.flyteidl.admin.Annotations.verify(message.annotations);
+                        if (error)
+                            return "annotations." + error;
+                    }
+                    if (message.interruptible != null && message.hasOwnProperty("interruptible")) {
+                        var error = $root.google.protobuf.BoolValue.verify(message.interruptible);
+                        if (error)
+                            return "interruptible." + error;
+                    }
+                    if (message.overwriteCache != null && message.hasOwnProperty("overwriteCache"))
+                        if (typeof message.overwriteCache !== "boolean")
+                            return "overwriteCache: boolean expected";
+                    if (message.envs != null && message.hasOwnProperty("envs")) {
+                        var error = $root.flyteidl.admin.Envs.verify(message.envs);
+                        if (error)
+                            return "envs." + error;
+                    }
+                    if (message.executionEnvAssignments != null && message.hasOwnProperty("executionEnvAssignments")) {
+                        if (!Array.isArray(message.executionEnvAssignments))
+                            return "executionEnvAssignments: array expected";
+                        for (var i = 0; i < message.executionEnvAssignments.length; ++i) {
+                            var error = $root.flyteidl.core.ExecutionEnvAssignment.verify(message.executionEnvAssignments[i]);
+                            if (error)
+                                return "executionEnvAssignments." + error;
+                        }
+                    }
+                    return null;
+                };
+    
+                return WorkflowExecutionConfig;
+            })();
+    
+            admin.MatchingAttributes = (function() {
+    
+                /**
+                 * Properties of a MatchingAttributes.
+                 * @memberof flyteidl.admin
+                 * @interface IMatchingAttributes
+                 * @property {flyteidl.admin.ITaskResourceAttributes|null} [taskResourceAttributes] MatchingAttributes taskResourceAttributes
+                 * @property {flyteidl.admin.IClusterResourceAttributes|null} [clusterResourceAttributes] MatchingAttributes clusterResourceAttributes
+                 * @property {flyteidl.admin.IExecutionQueueAttributes|null} [executionQueueAttributes] MatchingAttributes executionQueueAttributes
+                 * @property {flyteidl.admin.IExecutionClusterLabel|null} [executionClusterLabel] MatchingAttributes executionClusterLabel
+                 * @property {flyteidl.core.IQualityOfService|null} [qualityOfService] MatchingAttributes qualityOfService
+                 * @property {flyteidl.admin.IPluginOverrides|null} [pluginOverrides] MatchingAttributes pluginOverrides
+                 * @property {flyteidl.admin.IWorkflowExecutionConfig|null} [workflowExecutionConfig] MatchingAttributes workflowExecutionConfig
+                 * @property {flyteidl.admin.IClusterAssignment|null} [clusterAssignment] MatchingAttributes clusterAssignment
+                 */
+    
+                /**
+                 * Constructs a new MatchingAttributes.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a MatchingAttributes.
+                 * @implements IMatchingAttributes
+                 * @constructor
+                 * @param {flyteidl.admin.IMatchingAttributes=} [properties] Properties to set
+                 */
+                function MatchingAttributes(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * MatchingAttributes taskResourceAttributes.
+                 * @member {flyteidl.admin.ITaskResourceAttributes|null|undefined} taskResourceAttributes
+                 * @memberof flyteidl.admin.MatchingAttributes
+                 * @instance
+                 */
+                MatchingAttributes.prototype.taskResourceAttributes = null;
+    
+                /**
+                 * MatchingAttributes clusterResourceAttributes.
+                 * @member {flyteidl.admin.IClusterResourceAttributes|null|undefined} clusterResourceAttributes
+                 * @memberof flyteidl.admin.MatchingAttributes
+                 * @instance
+                 */
+                MatchingAttributes.prototype.clusterResourceAttributes = null;
+    
+                /**
+                 * MatchingAttributes executionQueueAttributes.
+                 * @member {flyteidl.admin.IExecutionQueueAttributes|null|undefined} executionQueueAttributes
+                 * @memberof flyteidl.admin.MatchingAttributes
+                 * @instance
+                 */
+                MatchingAttributes.prototype.executionQueueAttributes = null;
+    
+                /**
+                 * MatchingAttributes executionClusterLabel.
+                 * @member {flyteidl.admin.IExecutionClusterLabel|null|undefined} executionClusterLabel
+                 * @memberof flyteidl.admin.MatchingAttributes
+                 * @instance
+                 */
+                MatchingAttributes.prototype.executionClusterLabel = null;
+    
+                /**
+                 * MatchingAttributes qualityOfService.
+                 * @member {flyteidl.core.IQualityOfService|null|undefined} qualityOfService
+                 * @memberof flyteidl.admin.MatchingAttributes
+                 * @instance
+                 */
+                MatchingAttributes.prototype.qualityOfService = null;
+    
+                /**
+                 * MatchingAttributes pluginOverrides.
+                 * @member {flyteidl.admin.IPluginOverrides|null|undefined} pluginOverrides
+                 * @memberof flyteidl.admin.MatchingAttributes
+                 * @instance
+                 */
+                MatchingAttributes.prototype.pluginOverrides = null;
+    
+                /**
+                 * MatchingAttributes workflowExecutionConfig.
+                 * @member {flyteidl.admin.IWorkflowExecutionConfig|null|undefined} workflowExecutionConfig
+                 * @memberof flyteidl.admin.MatchingAttributes
+                 * @instance
+                 */
+                MatchingAttributes.prototype.workflowExecutionConfig = null;
+    
+                /**
+                 * MatchingAttributes clusterAssignment.
+                 * @member {flyteidl.admin.IClusterAssignment|null|undefined} clusterAssignment
+                 * @memberof flyteidl.admin.MatchingAttributes
+                 * @instance
+                 */
+                MatchingAttributes.prototype.clusterAssignment = null;
+    
+                // OneOf field names bound to virtual getters and setters
+                var $oneOfFields;
+    
+                /**
+                 * MatchingAttributes target.
+                 * @member {"taskResourceAttributes"|"clusterResourceAttributes"|"executionQueueAttributes"|"executionClusterLabel"|"qualityOfService"|"pluginOverrides"|"workflowExecutionConfig"|"clusterAssignment"|undefined} target
+                 * @memberof flyteidl.admin.MatchingAttributes
+                 * @instance
+                 */
+                Object.defineProperty(MatchingAttributes.prototype, "target", {
+                    get: $util.oneOfGetter($oneOfFields = ["taskResourceAttributes", "clusterResourceAttributes", "executionQueueAttributes", "executionClusterLabel", "qualityOfService", "pluginOverrides", "workflowExecutionConfig", "clusterAssignment"]),
+                    set: $util.oneOfSetter($oneOfFields)
+                });
+    
+                /**
+                 * Creates a new MatchingAttributes instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.MatchingAttributes
+                 * @static
+                 * @param {flyteidl.admin.IMatchingAttributes=} [properties] Properties to set
+                 * @returns {flyteidl.admin.MatchingAttributes} MatchingAttributes instance
+                 */
+                MatchingAttributes.create = function create(properties) {
+                    return new MatchingAttributes(properties);
+                };
+    
+                /**
+                 * Encodes the specified MatchingAttributes message. Does not implicitly {@link flyteidl.admin.MatchingAttributes.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.MatchingAttributes
+                 * @static
+                 * @param {flyteidl.admin.IMatchingAttributes} message MatchingAttributes message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                MatchingAttributes.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.taskResourceAttributes != null && message.hasOwnProperty("taskResourceAttributes"))
+                        $root.flyteidl.admin.TaskResourceAttributes.encode(message.taskResourceAttributes, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.clusterResourceAttributes != null && message.hasOwnProperty("clusterResourceAttributes"))
+                        $root.flyteidl.admin.ClusterResourceAttributes.encode(message.clusterResourceAttributes, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    if (message.executionQueueAttributes != null && message.hasOwnProperty("executionQueueAttributes"))
+                        $root.flyteidl.admin.ExecutionQueueAttributes.encode(message.executionQueueAttributes, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                    if (message.executionClusterLabel != null && message.hasOwnProperty("executionClusterLabel"))
+                        $root.flyteidl.admin.ExecutionClusterLabel.encode(message.executionClusterLabel, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+                    if (message.qualityOfService != null && message.hasOwnProperty("qualityOfService"))
+                        $root.flyteidl.core.QualityOfService.encode(message.qualityOfService, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
+                    if (message.pluginOverrides != null && message.hasOwnProperty("pluginOverrides"))
+                        $root.flyteidl.admin.PluginOverrides.encode(message.pluginOverrides, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
+                    if (message.workflowExecutionConfig != null && message.hasOwnProperty("workflowExecutionConfig"))
+                        $root.flyteidl.admin.WorkflowExecutionConfig.encode(message.workflowExecutionConfig, writer.uint32(/* id 7, wireType 2 =*/58).fork()).ldelim();
+                    if (message.clusterAssignment != null && message.hasOwnProperty("clusterAssignment"))
+                        $root.flyteidl.admin.ClusterAssignment.encode(message.clusterAssignment, writer.uint32(/* id 8, wireType 2 =*/66).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a MatchingAttributes message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.MatchingAttributes
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.MatchingAttributes} MatchingAttributes
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                MatchingAttributes.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.MatchingAttributes();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.taskResourceAttributes = $root.flyteidl.admin.TaskResourceAttributes.decode(reader, reader.uint32());
+                            break;
+                        case 2:
+                            message.clusterResourceAttributes = $root.flyteidl.admin.ClusterResourceAttributes.decode(reader, reader.uint32());
+                            break;
+                        case 3:
+                            message.executionQueueAttributes = $root.flyteidl.admin.ExecutionQueueAttributes.decode(reader, reader.uint32());
+                            break;
+                        case 4:
+                            message.executionClusterLabel = $root.flyteidl.admin.ExecutionClusterLabel.decode(reader, reader.uint32());
+                            break;
+                        case 5:
+                            message.qualityOfService = $root.flyteidl.core.QualityOfService.decode(reader, reader.uint32());
+                            break;
+                        case 6:
+                            message.pluginOverrides = $root.flyteidl.admin.PluginOverrides.decode(reader, reader.uint32());
+                            break;
+                        case 7:
+                            message.workflowExecutionConfig = $root.flyteidl.admin.WorkflowExecutionConfig.decode(reader, reader.uint32());
+                            break;
+                        case 8:
+                            message.clusterAssignment = $root.flyteidl.admin.ClusterAssignment.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a MatchingAttributes message.
+                 * @function verify
+                 * @memberof flyteidl.admin.MatchingAttributes
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                MatchingAttributes.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    var properties = {};
+                    if (message.taskResourceAttributes != null && message.hasOwnProperty("taskResourceAttributes")) {
+                        properties.target = 1;
+                        {
+                            var error = $root.flyteidl.admin.TaskResourceAttributes.verify(message.taskResourceAttributes);
+                            if (error)
+                                return "taskResourceAttributes." + error;
+                        }
+                    }
+                    if (message.clusterResourceAttributes != null && message.hasOwnProperty("clusterResourceAttributes")) {
+                        if (properties.target === 1)
+                            return "target: multiple values";
+                        properties.target = 1;
+                        {
+                            var error = $root.flyteidl.admin.ClusterResourceAttributes.verify(message.clusterResourceAttributes);
+                            if (error)
+                                return "clusterResourceAttributes." + error;
+                        }
+                    }
+                    if (message.executionQueueAttributes != null && message.hasOwnProperty("executionQueueAttributes")) {
+                        if (properties.target === 1)
+                            return "target: multiple values";
+                        properties.target = 1;
+                        {
+                            var error = $root.flyteidl.admin.ExecutionQueueAttributes.verify(message.executionQueueAttributes);
+                            if (error)
+                                return "executionQueueAttributes." + error;
+                        }
+                    }
+                    if (message.executionClusterLabel != null && message.hasOwnProperty("executionClusterLabel")) {
+                        if (properties.target === 1)
+                            return "target: multiple values";
+                        properties.target = 1;
+                        {
+                            var error = $root.flyteidl.admin.ExecutionClusterLabel.verify(message.executionClusterLabel);
+                            if (error)
+                                return "executionClusterLabel." + error;
+                        }
+                    }
+                    if (message.qualityOfService != null && message.hasOwnProperty("qualityOfService")) {
+                        if (properties.target === 1)
+                            return "target: multiple values";
+                        properties.target = 1;
+                        {
+                            var error = $root.flyteidl.core.QualityOfService.verify(message.qualityOfService);
+                            if (error)
+                                return "qualityOfService." + error;
+                        }
+                    }
+                    if (message.pluginOverrides != null && message.hasOwnProperty("pluginOverrides")) {
+                        if (properties.target === 1)
+                            return "target: multiple values";
+                        properties.target = 1;
+                        {
+                            var error = $root.flyteidl.admin.PluginOverrides.verify(message.pluginOverrides);
+                            if (error)
+                                return "pluginOverrides." + error;
+                        }
+                    }
+                    if (message.workflowExecutionConfig != null && message.hasOwnProperty("workflowExecutionConfig")) {
+                        if (properties.target === 1)
+                            return "target: multiple values";
+                        properties.target = 1;
+                        {
+                            var error = $root.flyteidl.admin.WorkflowExecutionConfig.verify(message.workflowExecutionConfig);
+                            if (error)
+                                return "workflowExecutionConfig." + error;
+                        }
+                    }
+                    if (message.clusterAssignment != null && message.hasOwnProperty("clusterAssignment")) {
+                        if (properties.target === 1)
+                            return "target: multiple values";
+                        properties.target = 1;
+                        {
+                            var error = $root.flyteidl.admin.ClusterAssignment.verify(message.clusterAssignment);
+                            if (error)
+                                return "clusterAssignment." + error;
+                        }
+                    }
+                    return null;
+                };
+    
+                return MatchingAttributes;
+            })();
+    
+            admin.MatchableAttributesConfiguration = (function() {
+    
+                /**
+                 * Properties of a MatchableAttributesConfiguration.
+                 * @memberof flyteidl.admin
+                 * @interface IMatchableAttributesConfiguration
+                 * @property {flyteidl.admin.IMatchingAttributes|null} [attributes] MatchableAttributesConfiguration attributes
+                 * @property {string|null} [domain] MatchableAttributesConfiguration domain
+                 * @property {string|null} [project] MatchableAttributesConfiguration project
+                 * @property {string|null} [workflow] MatchableAttributesConfiguration workflow
+                 * @property {string|null} [launchPlan] MatchableAttributesConfiguration launchPlan
+                 * @property {string|null} [org] MatchableAttributesConfiguration org
+                 */
+    
+                /**
+                 * Constructs a new MatchableAttributesConfiguration.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a MatchableAttributesConfiguration.
+                 * @implements IMatchableAttributesConfiguration
+                 * @constructor
+                 * @param {flyteidl.admin.IMatchableAttributesConfiguration=} [properties] Properties to set
+                 */
+                function MatchableAttributesConfiguration(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * MatchableAttributesConfiguration attributes.
+                 * @member {flyteidl.admin.IMatchingAttributes|null|undefined} attributes
+                 * @memberof flyteidl.admin.MatchableAttributesConfiguration
+                 * @instance
+                 */
+                MatchableAttributesConfiguration.prototype.attributes = null;
+    
+                /**
+                 * MatchableAttributesConfiguration domain.
+                 * @member {string} domain
+                 * @memberof flyteidl.admin.MatchableAttributesConfiguration
+                 * @instance
+                 */
+                MatchableAttributesConfiguration.prototype.domain = "";
+    
+                /**
+                 * MatchableAttributesConfiguration project.
+                 * @member {string} project
+                 * @memberof flyteidl.admin.MatchableAttributesConfiguration
+                 * @instance
+                 */
+                MatchableAttributesConfiguration.prototype.project = "";
+    
+                /**
+                 * MatchableAttributesConfiguration workflow.
+                 * @member {string} workflow
+                 * @memberof flyteidl.admin.MatchableAttributesConfiguration
+                 * @instance
+                 */
+                MatchableAttributesConfiguration.prototype.workflow = "";
+    
+                /**
+                 * MatchableAttributesConfiguration launchPlan.
+                 * @member {string} launchPlan
+                 * @memberof flyteidl.admin.MatchableAttributesConfiguration
+                 * @instance
+                 */
+                MatchableAttributesConfiguration.prototype.launchPlan = "";
+    
+                /**
+                 * MatchableAttributesConfiguration org.
+                 * @member {string} org
+                 * @memberof flyteidl.admin.MatchableAttributesConfiguration
+                 * @instance
+                 */
+                MatchableAttributesConfiguration.prototype.org = "";
+    
+                /**
+                 * Creates a new MatchableAttributesConfiguration instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.MatchableAttributesConfiguration
+                 * @static
+                 * @param {flyteidl.admin.IMatchableAttributesConfiguration=} [properties] Properties to set
+                 * @returns {flyteidl.admin.MatchableAttributesConfiguration} MatchableAttributesConfiguration instance
+                 */
+                MatchableAttributesConfiguration.create = function create(properties) {
+                    return new MatchableAttributesConfiguration(properties);
+                };
+    
+                /**
+                 * Encodes the specified MatchableAttributesConfiguration message. Does not implicitly {@link flyteidl.admin.MatchableAttributesConfiguration.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.MatchableAttributesConfiguration
+                 * @static
+                 * @param {flyteidl.admin.IMatchableAttributesConfiguration} message MatchableAttributesConfiguration message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                MatchableAttributesConfiguration.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.attributes != null && message.hasOwnProperty("attributes"))
+                        $root.flyteidl.admin.MatchingAttributes.encode(message.attributes, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.domain != null && message.hasOwnProperty("domain"))
+                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.domain);
+                    if (message.project != null && message.hasOwnProperty("project"))
+                        writer.uint32(/* id 3, wireType 2 =*/26).string(message.project);
+                    if (message.workflow != null && message.hasOwnProperty("workflow"))
+                        writer.uint32(/* id 4, wireType 2 =*/34).string(message.workflow);
+                    if (message.launchPlan != null && message.hasOwnProperty("launchPlan"))
+                        writer.uint32(/* id 5, wireType 2 =*/42).string(message.launchPlan);
+                    if (message.org != null && message.hasOwnProperty("org"))
+                        writer.uint32(/* id 6, wireType 2 =*/50).string(message.org);
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a MatchableAttributesConfiguration message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.MatchableAttributesConfiguration
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.MatchableAttributesConfiguration} MatchableAttributesConfiguration
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                MatchableAttributesConfiguration.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.MatchableAttributesConfiguration();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.attributes = $root.flyteidl.admin.MatchingAttributes.decode(reader, reader.uint32());
+                            break;
+                        case 2:
+                            message.domain = reader.string();
+                            break;
+                        case 3:
+                            message.project = reader.string();
+                            break;
+                        case 4:
+                            message.workflow = reader.string();
+                            break;
+                        case 5:
+                            message.launchPlan = reader.string();
+                            break;
+                        case 6:
+                            message.org = reader.string();
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a MatchableAttributesConfiguration message.
+                 * @function verify
+                 * @memberof flyteidl.admin.MatchableAttributesConfiguration
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                MatchableAttributesConfiguration.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.attributes != null && message.hasOwnProperty("attributes")) {
+                        var error = $root.flyteidl.admin.MatchingAttributes.verify(message.attributes);
+                        if (error)
+                            return "attributes." + error;
+                    }
+                    if (message.domain != null && message.hasOwnProperty("domain"))
+                        if (!$util.isString(message.domain))
+                            return "domain: string expected";
+                    if (message.project != null && message.hasOwnProperty("project"))
+                        if (!$util.isString(message.project))
+                            return "project: string expected";
+                    if (message.workflow != null && message.hasOwnProperty("workflow"))
+                        if (!$util.isString(message.workflow))
+                            return "workflow: string expected";
+                    if (message.launchPlan != null && message.hasOwnProperty("launchPlan"))
+                        if (!$util.isString(message.launchPlan))
+                            return "launchPlan: string expected";
+                    if (message.org != null && message.hasOwnProperty("org"))
+                        if (!$util.isString(message.org))
+                            return "org: string expected";
+                    return null;
+                };
+    
+                return MatchableAttributesConfiguration;
+            })();
+    
+            admin.ListMatchableAttributesRequest = (function() {
+    
+                /**
+                 * Properties of a ListMatchableAttributesRequest.
+                 * @memberof flyteidl.admin
+                 * @interface IListMatchableAttributesRequest
+                 * @property {flyteidl.admin.MatchableResource|null} [resourceType] ListMatchableAttributesRequest resourceType
+                 * @property {string|null} [org] ListMatchableAttributesRequest org
+                 */
+    
+                /**
+                 * Constructs a new ListMatchableAttributesRequest.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a ListMatchableAttributesRequest.
+                 * @implements IListMatchableAttributesRequest
+                 * @constructor
+                 * @param {flyteidl.admin.IListMatchableAttributesRequest=} [properties] Properties to set
+                 */
+                function ListMatchableAttributesRequest(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * ListMatchableAttributesRequest resourceType.
+                 * @member {flyteidl.admin.MatchableResource} resourceType
+                 * @memberof flyteidl.admin.ListMatchableAttributesRequest
+                 * @instance
+                 */
+                ListMatchableAttributesRequest.prototype.resourceType = 0;
+    
+                /**
+                 * ListMatchableAttributesRequest org.
+                 * @member {string} org
+                 * @memberof flyteidl.admin.ListMatchableAttributesRequest
+                 * @instance
+                 */
+                ListMatchableAttributesRequest.prototype.org = "";
+    
+                /**
+                 * Creates a new ListMatchableAttributesRequest instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.ListMatchableAttributesRequest
+                 * @static
+                 * @param {flyteidl.admin.IListMatchableAttributesRequest=} [properties] Properties to set
+                 * @returns {flyteidl.admin.ListMatchableAttributesRequest} ListMatchableAttributesRequest instance
+                 */
+                ListMatchableAttributesRequest.create = function create(properties) {
+                    return new ListMatchableAttributesRequest(properties);
+                };
+    
+                /**
+                 * Encodes the specified ListMatchableAttributesRequest message. Does not implicitly {@link flyteidl.admin.ListMatchableAttributesRequest.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.ListMatchableAttributesRequest
+                 * @static
+                 * @param {flyteidl.admin.IListMatchableAttributesRequest} message ListMatchableAttributesRequest message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                ListMatchableAttributesRequest.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.resourceType != null && message.hasOwnProperty("resourceType"))
+                        writer.uint32(/* id 1, wireType 0 =*/8).int32(message.resourceType);
+                    if (message.org != null && message.hasOwnProperty("org"))
+                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.org);
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a ListMatchableAttributesRequest message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.ListMatchableAttributesRequest
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.ListMatchableAttributesRequest} ListMatchableAttributesRequest
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                ListMatchableAttributesRequest.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.ListMatchableAttributesRequest();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.resourceType = reader.int32();
+                            break;
+                        case 2:
+                            message.org = reader.string();
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a ListMatchableAttributesRequest message.
+                 * @function verify
+                 * @memberof flyteidl.admin.ListMatchableAttributesRequest
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                ListMatchableAttributesRequest.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.resourceType != null && message.hasOwnProperty("resourceType"))
+                        switch (message.resourceType) {
+                        default:
+                            return "resourceType: enum value expected";
+                        case 0:
+                        case 1:
+                        case 2:
+                        case 3:
+                        case 4:
+                        case 5:
+                        case 6:
+                        case 7:
+                            break;
+                        }
+                    if (message.org != null && message.hasOwnProperty("org"))
+                        if (!$util.isString(message.org))
+                            return "org: string expected";
+                    return null;
+                };
+    
+                return ListMatchableAttributesRequest;
+            })();
+    
+            admin.ListMatchableAttributesResponse = (function() {
+    
+                /**
+                 * Properties of a ListMatchableAttributesResponse.
+                 * @memberof flyteidl.admin
+                 * @interface IListMatchableAttributesResponse
+                 * @property {Array.<flyteidl.admin.IMatchableAttributesConfiguration>|null} [configurations] ListMatchableAttributesResponse configurations
+                 */
+    
+                /**
+                 * Constructs a new ListMatchableAttributesResponse.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a ListMatchableAttributesResponse.
+                 * @implements IListMatchableAttributesResponse
+                 * @constructor
+                 * @param {flyteidl.admin.IListMatchableAttributesResponse=} [properties] Properties to set
+                 */
+                function ListMatchableAttributesResponse(properties) {
+                    this.configurations = [];
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * ListMatchableAttributesResponse configurations.
+                 * @member {Array.<flyteidl.admin.IMatchableAttributesConfiguration>} configurations
+                 * @memberof flyteidl.admin.ListMatchableAttributesResponse
+                 * @instance
+                 */
+                ListMatchableAttributesResponse.prototype.configurations = $util.emptyArray;
+    
+                /**
+                 * Creates a new ListMatchableAttributesResponse instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.ListMatchableAttributesResponse
+                 * @static
+                 * @param {flyteidl.admin.IListMatchableAttributesResponse=} [properties] Properties to set
+                 * @returns {flyteidl.admin.ListMatchableAttributesResponse} ListMatchableAttributesResponse instance
+                 */
+                ListMatchableAttributesResponse.create = function create(properties) {
+                    return new ListMatchableAttributesResponse(properties);
+                };
+    
+                /**
+                 * Encodes the specified ListMatchableAttributesResponse message. Does not implicitly {@link flyteidl.admin.ListMatchableAttributesResponse.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.ListMatchableAttributesResponse
+                 * @static
+                 * @param {flyteidl.admin.IListMatchableAttributesResponse} message ListMatchableAttributesResponse message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                ListMatchableAttributesResponse.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.configurations != null && message.configurations.length)
+                        for (var i = 0; i < message.configurations.length; ++i)
+                            $root.flyteidl.admin.MatchableAttributesConfiguration.encode(message.configurations[i], writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a ListMatchableAttributesResponse message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.ListMatchableAttributesResponse
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.ListMatchableAttributesResponse} ListMatchableAttributesResponse
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                ListMatchableAttributesResponse.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.ListMatchableAttributesResponse();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            if (!(message.configurations && message.configurations.length))
+                                message.configurations = [];
+                            message.configurations.push($root.flyteidl.admin.MatchableAttributesConfiguration.decode(reader, reader.uint32()));
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a ListMatchableAttributesResponse message.
+                 * @function verify
+                 * @memberof flyteidl.admin.ListMatchableAttributesResponse
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                ListMatchableAttributesResponse.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.configurations != null && message.hasOwnProperty("configurations")) {
+                        if (!Array.isArray(message.configurations))
+                            return "configurations: array expected";
+                        for (var i = 0; i < message.configurations.length; ++i) {
+                            var error = $root.flyteidl.admin.MatchableAttributesConfiguration.verify(message.configurations[i]);
+                            if (error)
+                                return "configurations." + error;
+                        }
+                    }
+                    return null;
+                };
+    
+                return ListMatchableAttributesResponse;
+            })();
+    
             admin.DescriptionEntity = (function() {
     
                 /**
@@ -38642,2003 +43105,6 @@
                 };
     
                 return Schedule;
-            })();
-    
-            /**
-             * MatchableResource enum.
-             * @name flyteidl.admin.MatchableResource
-             * @enum {string}
-             * @property {number} TASK_RESOURCE=0 TASK_RESOURCE value
-             * @property {number} CLUSTER_RESOURCE=1 CLUSTER_RESOURCE value
-             * @property {number} EXECUTION_QUEUE=2 EXECUTION_QUEUE value
-             * @property {number} EXECUTION_CLUSTER_LABEL=3 EXECUTION_CLUSTER_LABEL value
-             * @property {number} QUALITY_OF_SERVICE_SPECIFICATION=4 QUALITY_OF_SERVICE_SPECIFICATION value
-             * @property {number} PLUGIN_OVERRIDE=5 PLUGIN_OVERRIDE value
-             * @property {number} WORKFLOW_EXECUTION_CONFIG=6 WORKFLOW_EXECUTION_CONFIG value
-             * @property {number} CLUSTER_ASSIGNMENT=7 CLUSTER_ASSIGNMENT value
-             */
-            admin.MatchableResource = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
-                values[valuesById[0] = "TASK_RESOURCE"] = 0;
-                values[valuesById[1] = "CLUSTER_RESOURCE"] = 1;
-                values[valuesById[2] = "EXECUTION_QUEUE"] = 2;
-                values[valuesById[3] = "EXECUTION_CLUSTER_LABEL"] = 3;
-                values[valuesById[4] = "QUALITY_OF_SERVICE_SPECIFICATION"] = 4;
-                values[valuesById[5] = "PLUGIN_OVERRIDE"] = 5;
-                values[valuesById[6] = "WORKFLOW_EXECUTION_CONFIG"] = 6;
-                values[valuesById[7] = "CLUSTER_ASSIGNMENT"] = 7;
-                return values;
-            })();
-    
-            admin.TaskResourceSpec = (function() {
-    
-                /**
-                 * Properties of a TaskResourceSpec.
-                 * @memberof flyteidl.admin
-                 * @interface ITaskResourceSpec
-                 * @property {string|null} [cpu] TaskResourceSpec cpu
-                 * @property {string|null} [gpu] TaskResourceSpec gpu
-                 * @property {string|null} [memory] TaskResourceSpec memory
-                 * @property {string|null} [storage] TaskResourceSpec storage
-                 * @property {string|null} [ephemeralStorage] TaskResourceSpec ephemeralStorage
-                 */
-    
-                /**
-                 * Constructs a new TaskResourceSpec.
-                 * @memberof flyteidl.admin
-                 * @classdesc Represents a TaskResourceSpec.
-                 * @implements ITaskResourceSpec
-                 * @constructor
-                 * @param {flyteidl.admin.ITaskResourceSpec=} [properties] Properties to set
-                 */
-                function TaskResourceSpec(properties) {
-                    if (properties)
-                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
-                                this[keys[i]] = properties[keys[i]];
-                }
-    
-                /**
-                 * TaskResourceSpec cpu.
-                 * @member {string} cpu
-                 * @memberof flyteidl.admin.TaskResourceSpec
-                 * @instance
-                 */
-                TaskResourceSpec.prototype.cpu = "";
-    
-                /**
-                 * TaskResourceSpec gpu.
-                 * @member {string} gpu
-                 * @memberof flyteidl.admin.TaskResourceSpec
-                 * @instance
-                 */
-                TaskResourceSpec.prototype.gpu = "";
-    
-                /**
-                 * TaskResourceSpec memory.
-                 * @member {string} memory
-                 * @memberof flyteidl.admin.TaskResourceSpec
-                 * @instance
-                 */
-                TaskResourceSpec.prototype.memory = "";
-    
-                /**
-                 * TaskResourceSpec storage.
-                 * @member {string} storage
-                 * @memberof flyteidl.admin.TaskResourceSpec
-                 * @instance
-                 */
-                TaskResourceSpec.prototype.storage = "";
-    
-                /**
-                 * TaskResourceSpec ephemeralStorage.
-                 * @member {string} ephemeralStorage
-                 * @memberof flyteidl.admin.TaskResourceSpec
-                 * @instance
-                 */
-                TaskResourceSpec.prototype.ephemeralStorage = "";
-    
-                /**
-                 * Creates a new TaskResourceSpec instance using the specified properties.
-                 * @function create
-                 * @memberof flyteidl.admin.TaskResourceSpec
-                 * @static
-                 * @param {flyteidl.admin.ITaskResourceSpec=} [properties] Properties to set
-                 * @returns {flyteidl.admin.TaskResourceSpec} TaskResourceSpec instance
-                 */
-                TaskResourceSpec.create = function create(properties) {
-                    return new TaskResourceSpec(properties);
-                };
-    
-                /**
-                 * Encodes the specified TaskResourceSpec message. Does not implicitly {@link flyteidl.admin.TaskResourceSpec.verify|verify} messages.
-                 * @function encode
-                 * @memberof flyteidl.admin.TaskResourceSpec
-                 * @static
-                 * @param {flyteidl.admin.ITaskResourceSpec} message TaskResourceSpec message or plain object to encode
-                 * @param {$protobuf.Writer} [writer] Writer to encode to
-                 * @returns {$protobuf.Writer} Writer
-                 */
-                TaskResourceSpec.encode = function encode(message, writer) {
-                    if (!writer)
-                        writer = $Writer.create();
-                    if (message.cpu != null && message.hasOwnProperty("cpu"))
-                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.cpu);
-                    if (message.gpu != null && message.hasOwnProperty("gpu"))
-                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.gpu);
-                    if (message.memory != null && message.hasOwnProperty("memory"))
-                        writer.uint32(/* id 3, wireType 2 =*/26).string(message.memory);
-                    if (message.storage != null && message.hasOwnProperty("storage"))
-                        writer.uint32(/* id 4, wireType 2 =*/34).string(message.storage);
-                    if (message.ephemeralStorage != null && message.hasOwnProperty("ephemeralStorage"))
-                        writer.uint32(/* id 5, wireType 2 =*/42).string(message.ephemeralStorage);
-                    return writer;
-                };
-    
-                /**
-                 * Decodes a TaskResourceSpec message from the specified reader or buffer.
-                 * @function decode
-                 * @memberof flyteidl.admin.TaskResourceSpec
-                 * @static
-                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-                 * @param {number} [length] Message length if known beforehand
-                 * @returns {flyteidl.admin.TaskResourceSpec} TaskResourceSpec
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                TaskResourceSpec.decode = function decode(reader, length) {
-                    if (!(reader instanceof $Reader))
-                        reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.TaskResourceSpec();
-                    while (reader.pos < end) {
-                        var tag = reader.uint32();
-                        switch (tag >>> 3) {
-                        case 1:
-                            message.cpu = reader.string();
-                            break;
-                        case 2:
-                            message.gpu = reader.string();
-                            break;
-                        case 3:
-                            message.memory = reader.string();
-                            break;
-                        case 4:
-                            message.storage = reader.string();
-                            break;
-                        case 5:
-                            message.ephemeralStorage = reader.string();
-                            break;
-                        default:
-                            reader.skipType(tag & 7);
-                            break;
-                        }
-                    }
-                    return message;
-                };
-    
-                /**
-                 * Verifies a TaskResourceSpec message.
-                 * @function verify
-                 * @memberof flyteidl.admin.TaskResourceSpec
-                 * @static
-                 * @param {Object.<string,*>} message Plain object to verify
-                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
-                 */
-                TaskResourceSpec.verify = function verify(message) {
-                    if (typeof message !== "object" || message === null)
-                        return "object expected";
-                    if (message.cpu != null && message.hasOwnProperty("cpu"))
-                        if (!$util.isString(message.cpu))
-                            return "cpu: string expected";
-                    if (message.gpu != null && message.hasOwnProperty("gpu"))
-                        if (!$util.isString(message.gpu))
-                            return "gpu: string expected";
-                    if (message.memory != null && message.hasOwnProperty("memory"))
-                        if (!$util.isString(message.memory))
-                            return "memory: string expected";
-                    if (message.storage != null && message.hasOwnProperty("storage"))
-                        if (!$util.isString(message.storage))
-                            return "storage: string expected";
-                    if (message.ephemeralStorage != null && message.hasOwnProperty("ephemeralStorage"))
-                        if (!$util.isString(message.ephemeralStorage))
-                            return "ephemeralStorage: string expected";
-                    return null;
-                };
-    
-                return TaskResourceSpec;
-            })();
-    
-            admin.TaskResourceAttributes = (function() {
-    
-                /**
-                 * Properties of a TaskResourceAttributes.
-                 * @memberof flyteidl.admin
-                 * @interface ITaskResourceAttributes
-                 * @property {flyteidl.admin.ITaskResourceSpec|null} [defaults] TaskResourceAttributes defaults
-                 * @property {flyteidl.admin.ITaskResourceSpec|null} [limits] TaskResourceAttributes limits
-                 */
-    
-                /**
-                 * Constructs a new TaskResourceAttributes.
-                 * @memberof flyteidl.admin
-                 * @classdesc Represents a TaskResourceAttributes.
-                 * @implements ITaskResourceAttributes
-                 * @constructor
-                 * @param {flyteidl.admin.ITaskResourceAttributes=} [properties] Properties to set
-                 */
-                function TaskResourceAttributes(properties) {
-                    if (properties)
-                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
-                                this[keys[i]] = properties[keys[i]];
-                }
-    
-                /**
-                 * TaskResourceAttributes defaults.
-                 * @member {flyteidl.admin.ITaskResourceSpec|null|undefined} defaults
-                 * @memberof flyteidl.admin.TaskResourceAttributes
-                 * @instance
-                 */
-                TaskResourceAttributes.prototype.defaults = null;
-    
-                /**
-                 * TaskResourceAttributes limits.
-                 * @member {flyteidl.admin.ITaskResourceSpec|null|undefined} limits
-                 * @memberof flyteidl.admin.TaskResourceAttributes
-                 * @instance
-                 */
-                TaskResourceAttributes.prototype.limits = null;
-    
-                /**
-                 * Creates a new TaskResourceAttributes instance using the specified properties.
-                 * @function create
-                 * @memberof flyteidl.admin.TaskResourceAttributes
-                 * @static
-                 * @param {flyteidl.admin.ITaskResourceAttributes=} [properties] Properties to set
-                 * @returns {flyteidl.admin.TaskResourceAttributes} TaskResourceAttributes instance
-                 */
-                TaskResourceAttributes.create = function create(properties) {
-                    return new TaskResourceAttributes(properties);
-                };
-    
-                /**
-                 * Encodes the specified TaskResourceAttributes message. Does not implicitly {@link flyteidl.admin.TaskResourceAttributes.verify|verify} messages.
-                 * @function encode
-                 * @memberof flyteidl.admin.TaskResourceAttributes
-                 * @static
-                 * @param {flyteidl.admin.ITaskResourceAttributes} message TaskResourceAttributes message or plain object to encode
-                 * @param {$protobuf.Writer} [writer] Writer to encode to
-                 * @returns {$protobuf.Writer} Writer
-                 */
-                TaskResourceAttributes.encode = function encode(message, writer) {
-                    if (!writer)
-                        writer = $Writer.create();
-                    if (message.defaults != null && message.hasOwnProperty("defaults"))
-                        $root.flyteidl.admin.TaskResourceSpec.encode(message.defaults, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-                    if (message.limits != null && message.hasOwnProperty("limits"))
-                        $root.flyteidl.admin.TaskResourceSpec.encode(message.limits, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
-                    return writer;
-                };
-    
-                /**
-                 * Decodes a TaskResourceAttributes message from the specified reader or buffer.
-                 * @function decode
-                 * @memberof flyteidl.admin.TaskResourceAttributes
-                 * @static
-                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-                 * @param {number} [length] Message length if known beforehand
-                 * @returns {flyteidl.admin.TaskResourceAttributes} TaskResourceAttributes
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                TaskResourceAttributes.decode = function decode(reader, length) {
-                    if (!(reader instanceof $Reader))
-                        reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.TaskResourceAttributes();
-                    while (reader.pos < end) {
-                        var tag = reader.uint32();
-                        switch (tag >>> 3) {
-                        case 1:
-                            message.defaults = $root.flyteidl.admin.TaskResourceSpec.decode(reader, reader.uint32());
-                            break;
-                        case 2:
-                            message.limits = $root.flyteidl.admin.TaskResourceSpec.decode(reader, reader.uint32());
-                            break;
-                        default:
-                            reader.skipType(tag & 7);
-                            break;
-                        }
-                    }
-                    return message;
-                };
-    
-                /**
-                 * Verifies a TaskResourceAttributes message.
-                 * @function verify
-                 * @memberof flyteidl.admin.TaskResourceAttributes
-                 * @static
-                 * @param {Object.<string,*>} message Plain object to verify
-                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
-                 */
-                TaskResourceAttributes.verify = function verify(message) {
-                    if (typeof message !== "object" || message === null)
-                        return "object expected";
-                    if (message.defaults != null && message.hasOwnProperty("defaults")) {
-                        var error = $root.flyteidl.admin.TaskResourceSpec.verify(message.defaults);
-                        if (error)
-                            return "defaults." + error;
-                    }
-                    if (message.limits != null && message.hasOwnProperty("limits")) {
-                        var error = $root.flyteidl.admin.TaskResourceSpec.verify(message.limits);
-                        if (error)
-                            return "limits." + error;
-                    }
-                    return null;
-                };
-    
-                return TaskResourceAttributes;
-            })();
-    
-            admin.ClusterResourceAttributes = (function() {
-    
-                /**
-                 * Properties of a ClusterResourceAttributes.
-                 * @memberof flyteidl.admin
-                 * @interface IClusterResourceAttributes
-                 * @property {Object.<string,string>|null} [attributes] ClusterResourceAttributes attributes
-                 */
-    
-                /**
-                 * Constructs a new ClusterResourceAttributes.
-                 * @memberof flyteidl.admin
-                 * @classdesc Represents a ClusterResourceAttributes.
-                 * @implements IClusterResourceAttributes
-                 * @constructor
-                 * @param {flyteidl.admin.IClusterResourceAttributes=} [properties] Properties to set
-                 */
-                function ClusterResourceAttributes(properties) {
-                    this.attributes = {};
-                    if (properties)
-                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
-                                this[keys[i]] = properties[keys[i]];
-                }
-    
-                /**
-                 * ClusterResourceAttributes attributes.
-                 * @member {Object.<string,string>} attributes
-                 * @memberof flyteidl.admin.ClusterResourceAttributes
-                 * @instance
-                 */
-                ClusterResourceAttributes.prototype.attributes = $util.emptyObject;
-    
-                /**
-                 * Creates a new ClusterResourceAttributes instance using the specified properties.
-                 * @function create
-                 * @memberof flyteidl.admin.ClusterResourceAttributes
-                 * @static
-                 * @param {flyteidl.admin.IClusterResourceAttributes=} [properties] Properties to set
-                 * @returns {flyteidl.admin.ClusterResourceAttributes} ClusterResourceAttributes instance
-                 */
-                ClusterResourceAttributes.create = function create(properties) {
-                    return new ClusterResourceAttributes(properties);
-                };
-    
-                /**
-                 * Encodes the specified ClusterResourceAttributes message. Does not implicitly {@link flyteidl.admin.ClusterResourceAttributes.verify|verify} messages.
-                 * @function encode
-                 * @memberof flyteidl.admin.ClusterResourceAttributes
-                 * @static
-                 * @param {flyteidl.admin.IClusterResourceAttributes} message ClusterResourceAttributes message or plain object to encode
-                 * @param {$protobuf.Writer} [writer] Writer to encode to
-                 * @returns {$protobuf.Writer} Writer
-                 */
-                ClusterResourceAttributes.encode = function encode(message, writer) {
-                    if (!writer)
-                        writer = $Writer.create();
-                    if (message.attributes != null && message.hasOwnProperty("attributes"))
-                        for (var keys = Object.keys(message.attributes), i = 0; i < keys.length; ++i)
-                            writer.uint32(/* id 1, wireType 2 =*/10).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]).uint32(/* id 2, wireType 2 =*/18).string(message.attributes[keys[i]]).ldelim();
-                    return writer;
-                };
-    
-                /**
-                 * Decodes a ClusterResourceAttributes message from the specified reader or buffer.
-                 * @function decode
-                 * @memberof flyteidl.admin.ClusterResourceAttributes
-                 * @static
-                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-                 * @param {number} [length] Message length if known beforehand
-                 * @returns {flyteidl.admin.ClusterResourceAttributes} ClusterResourceAttributes
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                ClusterResourceAttributes.decode = function decode(reader, length) {
-                    if (!(reader instanceof $Reader))
-                        reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.ClusterResourceAttributes(), key;
-                    while (reader.pos < end) {
-                        var tag = reader.uint32();
-                        switch (tag >>> 3) {
-                        case 1:
-                            reader.skip().pos++;
-                            if (message.attributes === $util.emptyObject)
-                                message.attributes = {};
-                            key = reader.string();
-                            reader.pos++;
-                            message.attributes[key] = reader.string();
-                            break;
-                        default:
-                            reader.skipType(tag & 7);
-                            break;
-                        }
-                    }
-                    return message;
-                };
-    
-                /**
-                 * Verifies a ClusterResourceAttributes message.
-                 * @function verify
-                 * @memberof flyteidl.admin.ClusterResourceAttributes
-                 * @static
-                 * @param {Object.<string,*>} message Plain object to verify
-                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
-                 */
-                ClusterResourceAttributes.verify = function verify(message) {
-                    if (typeof message !== "object" || message === null)
-                        return "object expected";
-                    if (message.attributes != null && message.hasOwnProperty("attributes")) {
-                        if (!$util.isObject(message.attributes))
-                            return "attributes: object expected";
-                        var key = Object.keys(message.attributes);
-                        for (var i = 0; i < key.length; ++i)
-                            if (!$util.isString(message.attributes[key[i]]))
-                                return "attributes: string{k:string} expected";
-                    }
-                    return null;
-                };
-    
-                return ClusterResourceAttributes;
-            })();
-    
-            admin.ExecutionQueueAttributes = (function() {
-    
-                /**
-                 * Properties of an ExecutionQueueAttributes.
-                 * @memberof flyteidl.admin
-                 * @interface IExecutionQueueAttributes
-                 * @property {Array.<string>|null} [tags] ExecutionQueueAttributes tags
-                 */
-    
-                /**
-                 * Constructs a new ExecutionQueueAttributes.
-                 * @memberof flyteidl.admin
-                 * @classdesc Represents an ExecutionQueueAttributes.
-                 * @implements IExecutionQueueAttributes
-                 * @constructor
-                 * @param {flyteidl.admin.IExecutionQueueAttributes=} [properties] Properties to set
-                 */
-                function ExecutionQueueAttributes(properties) {
-                    this.tags = [];
-                    if (properties)
-                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
-                                this[keys[i]] = properties[keys[i]];
-                }
-    
-                /**
-                 * ExecutionQueueAttributes tags.
-                 * @member {Array.<string>} tags
-                 * @memberof flyteidl.admin.ExecutionQueueAttributes
-                 * @instance
-                 */
-                ExecutionQueueAttributes.prototype.tags = $util.emptyArray;
-    
-                /**
-                 * Creates a new ExecutionQueueAttributes instance using the specified properties.
-                 * @function create
-                 * @memberof flyteidl.admin.ExecutionQueueAttributes
-                 * @static
-                 * @param {flyteidl.admin.IExecutionQueueAttributes=} [properties] Properties to set
-                 * @returns {flyteidl.admin.ExecutionQueueAttributes} ExecutionQueueAttributes instance
-                 */
-                ExecutionQueueAttributes.create = function create(properties) {
-                    return new ExecutionQueueAttributes(properties);
-                };
-    
-                /**
-                 * Encodes the specified ExecutionQueueAttributes message. Does not implicitly {@link flyteidl.admin.ExecutionQueueAttributes.verify|verify} messages.
-                 * @function encode
-                 * @memberof flyteidl.admin.ExecutionQueueAttributes
-                 * @static
-                 * @param {flyteidl.admin.IExecutionQueueAttributes} message ExecutionQueueAttributes message or plain object to encode
-                 * @param {$protobuf.Writer} [writer] Writer to encode to
-                 * @returns {$protobuf.Writer} Writer
-                 */
-                ExecutionQueueAttributes.encode = function encode(message, writer) {
-                    if (!writer)
-                        writer = $Writer.create();
-                    if (message.tags != null && message.tags.length)
-                        for (var i = 0; i < message.tags.length; ++i)
-                            writer.uint32(/* id 1, wireType 2 =*/10).string(message.tags[i]);
-                    return writer;
-                };
-    
-                /**
-                 * Decodes an ExecutionQueueAttributes message from the specified reader or buffer.
-                 * @function decode
-                 * @memberof flyteidl.admin.ExecutionQueueAttributes
-                 * @static
-                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-                 * @param {number} [length] Message length if known beforehand
-                 * @returns {flyteidl.admin.ExecutionQueueAttributes} ExecutionQueueAttributes
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                ExecutionQueueAttributes.decode = function decode(reader, length) {
-                    if (!(reader instanceof $Reader))
-                        reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.ExecutionQueueAttributes();
-                    while (reader.pos < end) {
-                        var tag = reader.uint32();
-                        switch (tag >>> 3) {
-                        case 1:
-                            if (!(message.tags && message.tags.length))
-                                message.tags = [];
-                            message.tags.push(reader.string());
-                            break;
-                        default:
-                            reader.skipType(tag & 7);
-                            break;
-                        }
-                    }
-                    return message;
-                };
-    
-                /**
-                 * Verifies an ExecutionQueueAttributes message.
-                 * @function verify
-                 * @memberof flyteidl.admin.ExecutionQueueAttributes
-                 * @static
-                 * @param {Object.<string,*>} message Plain object to verify
-                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
-                 */
-                ExecutionQueueAttributes.verify = function verify(message) {
-                    if (typeof message !== "object" || message === null)
-                        return "object expected";
-                    if (message.tags != null && message.hasOwnProperty("tags")) {
-                        if (!Array.isArray(message.tags))
-                            return "tags: array expected";
-                        for (var i = 0; i < message.tags.length; ++i)
-                            if (!$util.isString(message.tags[i]))
-                                return "tags: string[] expected";
-                    }
-                    return null;
-                };
-    
-                return ExecutionQueueAttributes;
-            })();
-    
-            admin.ExecutionClusterLabel = (function() {
-    
-                /**
-                 * Properties of an ExecutionClusterLabel.
-                 * @memberof flyteidl.admin
-                 * @interface IExecutionClusterLabel
-                 * @property {string|null} [value] ExecutionClusterLabel value
-                 */
-    
-                /**
-                 * Constructs a new ExecutionClusterLabel.
-                 * @memberof flyteidl.admin
-                 * @classdesc Represents an ExecutionClusterLabel.
-                 * @implements IExecutionClusterLabel
-                 * @constructor
-                 * @param {flyteidl.admin.IExecutionClusterLabel=} [properties] Properties to set
-                 */
-                function ExecutionClusterLabel(properties) {
-                    if (properties)
-                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
-                                this[keys[i]] = properties[keys[i]];
-                }
-    
-                /**
-                 * ExecutionClusterLabel value.
-                 * @member {string} value
-                 * @memberof flyteidl.admin.ExecutionClusterLabel
-                 * @instance
-                 */
-                ExecutionClusterLabel.prototype.value = "";
-    
-                /**
-                 * Creates a new ExecutionClusterLabel instance using the specified properties.
-                 * @function create
-                 * @memberof flyteidl.admin.ExecutionClusterLabel
-                 * @static
-                 * @param {flyteidl.admin.IExecutionClusterLabel=} [properties] Properties to set
-                 * @returns {flyteidl.admin.ExecutionClusterLabel} ExecutionClusterLabel instance
-                 */
-                ExecutionClusterLabel.create = function create(properties) {
-                    return new ExecutionClusterLabel(properties);
-                };
-    
-                /**
-                 * Encodes the specified ExecutionClusterLabel message. Does not implicitly {@link flyteidl.admin.ExecutionClusterLabel.verify|verify} messages.
-                 * @function encode
-                 * @memberof flyteidl.admin.ExecutionClusterLabel
-                 * @static
-                 * @param {flyteidl.admin.IExecutionClusterLabel} message ExecutionClusterLabel message or plain object to encode
-                 * @param {$protobuf.Writer} [writer] Writer to encode to
-                 * @returns {$protobuf.Writer} Writer
-                 */
-                ExecutionClusterLabel.encode = function encode(message, writer) {
-                    if (!writer)
-                        writer = $Writer.create();
-                    if (message.value != null && message.hasOwnProperty("value"))
-                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.value);
-                    return writer;
-                };
-    
-                /**
-                 * Decodes an ExecutionClusterLabel message from the specified reader or buffer.
-                 * @function decode
-                 * @memberof flyteidl.admin.ExecutionClusterLabel
-                 * @static
-                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-                 * @param {number} [length] Message length if known beforehand
-                 * @returns {flyteidl.admin.ExecutionClusterLabel} ExecutionClusterLabel
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                ExecutionClusterLabel.decode = function decode(reader, length) {
-                    if (!(reader instanceof $Reader))
-                        reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.ExecutionClusterLabel();
-                    while (reader.pos < end) {
-                        var tag = reader.uint32();
-                        switch (tag >>> 3) {
-                        case 1:
-                            message.value = reader.string();
-                            break;
-                        default:
-                            reader.skipType(tag & 7);
-                            break;
-                        }
-                    }
-                    return message;
-                };
-    
-                /**
-                 * Verifies an ExecutionClusterLabel message.
-                 * @function verify
-                 * @memberof flyteidl.admin.ExecutionClusterLabel
-                 * @static
-                 * @param {Object.<string,*>} message Plain object to verify
-                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
-                 */
-                ExecutionClusterLabel.verify = function verify(message) {
-                    if (typeof message !== "object" || message === null)
-                        return "object expected";
-                    if (message.value != null && message.hasOwnProperty("value"))
-                        if (!$util.isString(message.value))
-                            return "value: string expected";
-                    return null;
-                };
-    
-                return ExecutionClusterLabel;
-            })();
-    
-            admin.PluginOverride = (function() {
-    
-                /**
-                 * Properties of a PluginOverride.
-                 * @memberof flyteidl.admin
-                 * @interface IPluginOverride
-                 * @property {string|null} [taskType] PluginOverride taskType
-                 * @property {Array.<string>|null} [pluginId] PluginOverride pluginId
-                 * @property {flyteidl.admin.PluginOverride.MissingPluginBehavior|null} [missingPluginBehavior] PluginOverride missingPluginBehavior
-                 */
-    
-                /**
-                 * Constructs a new PluginOverride.
-                 * @memberof flyteidl.admin
-                 * @classdesc Represents a PluginOverride.
-                 * @implements IPluginOverride
-                 * @constructor
-                 * @param {flyteidl.admin.IPluginOverride=} [properties] Properties to set
-                 */
-                function PluginOverride(properties) {
-                    this.pluginId = [];
-                    if (properties)
-                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
-                                this[keys[i]] = properties[keys[i]];
-                }
-    
-                /**
-                 * PluginOverride taskType.
-                 * @member {string} taskType
-                 * @memberof flyteidl.admin.PluginOverride
-                 * @instance
-                 */
-                PluginOverride.prototype.taskType = "";
-    
-                /**
-                 * PluginOverride pluginId.
-                 * @member {Array.<string>} pluginId
-                 * @memberof flyteidl.admin.PluginOverride
-                 * @instance
-                 */
-                PluginOverride.prototype.pluginId = $util.emptyArray;
-    
-                /**
-                 * PluginOverride missingPluginBehavior.
-                 * @member {flyteidl.admin.PluginOverride.MissingPluginBehavior} missingPluginBehavior
-                 * @memberof flyteidl.admin.PluginOverride
-                 * @instance
-                 */
-                PluginOverride.prototype.missingPluginBehavior = 0;
-    
-                /**
-                 * Creates a new PluginOverride instance using the specified properties.
-                 * @function create
-                 * @memberof flyteidl.admin.PluginOverride
-                 * @static
-                 * @param {flyteidl.admin.IPluginOverride=} [properties] Properties to set
-                 * @returns {flyteidl.admin.PluginOverride} PluginOverride instance
-                 */
-                PluginOverride.create = function create(properties) {
-                    return new PluginOverride(properties);
-                };
-    
-                /**
-                 * Encodes the specified PluginOverride message. Does not implicitly {@link flyteidl.admin.PluginOverride.verify|verify} messages.
-                 * @function encode
-                 * @memberof flyteidl.admin.PluginOverride
-                 * @static
-                 * @param {flyteidl.admin.IPluginOverride} message PluginOverride message or plain object to encode
-                 * @param {$protobuf.Writer} [writer] Writer to encode to
-                 * @returns {$protobuf.Writer} Writer
-                 */
-                PluginOverride.encode = function encode(message, writer) {
-                    if (!writer)
-                        writer = $Writer.create();
-                    if (message.taskType != null && message.hasOwnProperty("taskType"))
-                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.taskType);
-                    if (message.pluginId != null && message.pluginId.length)
-                        for (var i = 0; i < message.pluginId.length; ++i)
-                            writer.uint32(/* id 2, wireType 2 =*/18).string(message.pluginId[i]);
-                    if (message.missingPluginBehavior != null && message.hasOwnProperty("missingPluginBehavior"))
-                        writer.uint32(/* id 4, wireType 0 =*/32).int32(message.missingPluginBehavior);
-                    return writer;
-                };
-    
-                /**
-                 * Decodes a PluginOverride message from the specified reader or buffer.
-                 * @function decode
-                 * @memberof flyteidl.admin.PluginOverride
-                 * @static
-                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-                 * @param {number} [length] Message length if known beforehand
-                 * @returns {flyteidl.admin.PluginOverride} PluginOverride
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                PluginOverride.decode = function decode(reader, length) {
-                    if (!(reader instanceof $Reader))
-                        reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.PluginOverride();
-                    while (reader.pos < end) {
-                        var tag = reader.uint32();
-                        switch (tag >>> 3) {
-                        case 1:
-                            message.taskType = reader.string();
-                            break;
-                        case 2:
-                            if (!(message.pluginId && message.pluginId.length))
-                                message.pluginId = [];
-                            message.pluginId.push(reader.string());
-                            break;
-                        case 4:
-                            message.missingPluginBehavior = reader.int32();
-                            break;
-                        default:
-                            reader.skipType(tag & 7);
-                            break;
-                        }
-                    }
-                    return message;
-                };
-    
-                /**
-                 * Verifies a PluginOverride message.
-                 * @function verify
-                 * @memberof flyteidl.admin.PluginOverride
-                 * @static
-                 * @param {Object.<string,*>} message Plain object to verify
-                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
-                 */
-                PluginOverride.verify = function verify(message) {
-                    if (typeof message !== "object" || message === null)
-                        return "object expected";
-                    if (message.taskType != null && message.hasOwnProperty("taskType"))
-                        if (!$util.isString(message.taskType))
-                            return "taskType: string expected";
-                    if (message.pluginId != null && message.hasOwnProperty("pluginId")) {
-                        if (!Array.isArray(message.pluginId))
-                            return "pluginId: array expected";
-                        for (var i = 0; i < message.pluginId.length; ++i)
-                            if (!$util.isString(message.pluginId[i]))
-                                return "pluginId: string[] expected";
-                    }
-                    if (message.missingPluginBehavior != null && message.hasOwnProperty("missingPluginBehavior"))
-                        switch (message.missingPluginBehavior) {
-                        default:
-                            return "missingPluginBehavior: enum value expected";
-                        case 0:
-                        case 1:
-                            break;
-                        }
-                    return null;
-                };
-    
-                /**
-                 * MissingPluginBehavior enum.
-                 * @name flyteidl.admin.PluginOverride.MissingPluginBehavior
-                 * @enum {string}
-                 * @property {number} FAIL=0 FAIL value
-                 * @property {number} USE_DEFAULT=1 USE_DEFAULT value
-                 */
-                PluginOverride.MissingPluginBehavior = (function() {
-                    var valuesById = {}, values = Object.create(valuesById);
-                    values[valuesById[0] = "FAIL"] = 0;
-                    values[valuesById[1] = "USE_DEFAULT"] = 1;
-                    return values;
-                })();
-    
-                return PluginOverride;
-            })();
-    
-            admin.PluginOverrides = (function() {
-    
-                /**
-                 * Properties of a PluginOverrides.
-                 * @memberof flyteidl.admin
-                 * @interface IPluginOverrides
-                 * @property {Array.<flyteidl.admin.IPluginOverride>|null} [overrides] PluginOverrides overrides
-                 */
-    
-                /**
-                 * Constructs a new PluginOverrides.
-                 * @memberof flyteidl.admin
-                 * @classdesc Represents a PluginOverrides.
-                 * @implements IPluginOverrides
-                 * @constructor
-                 * @param {flyteidl.admin.IPluginOverrides=} [properties] Properties to set
-                 */
-                function PluginOverrides(properties) {
-                    this.overrides = [];
-                    if (properties)
-                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
-                                this[keys[i]] = properties[keys[i]];
-                }
-    
-                /**
-                 * PluginOverrides overrides.
-                 * @member {Array.<flyteidl.admin.IPluginOverride>} overrides
-                 * @memberof flyteidl.admin.PluginOverrides
-                 * @instance
-                 */
-                PluginOverrides.prototype.overrides = $util.emptyArray;
-    
-                /**
-                 * Creates a new PluginOverrides instance using the specified properties.
-                 * @function create
-                 * @memberof flyteidl.admin.PluginOverrides
-                 * @static
-                 * @param {flyteidl.admin.IPluginOverrides=} [properties] Properties to set
-                 * @returns {flyteidl.admin.PluginOverrides} PluginOverrides instance
-                 */
-                PluginOverrides.create = function create(properties) {
-                    return new PluginOverrides(properties);
-                };
-    
-                /**
-                 * Encodes the specified PluginOverrides message. Does not implicitly {@link flyteidl.admin.PluginOverrides.verify|verify} messages.
-                 * @function encode
-                 * @memberof flyteidl.admin.PluginOverrides
-                 * @static
-                 * @param {flyteidl.admin.IPluginOverrides} message PluginOverrides message or plain object to encode
-                 * @param {$protobuf.Writer} [writer] Writer to encode to
-                 * @returns {$protobuf.Writer} Writer
-                 */
-                PluginOverrides.encode = function encode(message, writer) {
-                    if (!writer)
-                        writer = $Writer.create();
-                    if (message.overrides != null && message.overrides.length)
-                        for (var i = 0; i < message.overrides.length; ++i)
-                            $root.flyteidl.admin.PluginOverride.encode(message.overrides[i], writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-                    return writer;
-                };
-    
-                /**
-                 * Decodes a PluginOverrides message from the specified reader or buffer.
-                 * @function decode
-                 * @memberof flyteidl.admin.PluginOverrides
-                 * @static
-                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-                 * @param {number} [length] Message length if known beforehand
-                 * @returns {flyteidl.admin.PluginOverrides} PluginOverrides
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                PluginOverrides.decode = function decode(reader, length) {
-                    if (!(reader instanceof $Reader))
-                        reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.PluginOverrides();
-                    while (reader.pos < end) {
-                        var tag = reader.uint32();
-                        switch (tag >>> 3) {
-                        case 1:
-                            if (!(message.overrides && message.overrides.length))
-                                message.overrides = [];
-                            message.overrides.push($root.flyteidl.admin.PluginOverride.decode(reader, reader.uint32()));
-                            break;
-                        default:
-                            reader.skipType(tag & 7);
-                            break;
-                        }
-                    }
-                    return message;
-                };
-    
-                /**
-                 * Verifies a PluginOverrides message.
-                 * @function verify
-                 * @memberof flyteidl.admin.PluginOverrides
-                 * @static
-                 * @param {Object.<string,*>} message Plain object to verify
-                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
-                 */
-                PluginOverrides.verify = function verify(message) {
-                    if (typeof message !== "object" || message === null)
-                        return "object expected";
-                    if (message.overrides != null && message.hasOwnProperty("overrides")) {
-                        if (!Array.isArray(message.overrides))
-                            return "overrides: array expected";
-                        for (var i = 0; i < message.overrides.length; ++i) {
-                            var error = $root.flyteidl.admin.PluginOverride.verify(message.overrides[i]);
-                            if (error)
-                                return "overrides." + error;
-                        }
-                    }
-                    return null;
-                };
-    
-                return PluginOverrides;
-            })();
-    
-            admin.WorkflowExecutionConfig = (function() {
-    
-                /**
-                 * Properties of a WorkflowExecutionConfig.
-                 * @memberof flyteidl.admin
-                 * @interface IWorkflowExecutionConfig
-                 * @property {number|null} [maxParallelism] WorkflowExecutionConfig maxParallelism
-                 * @property {flyteidl.core.ISecurityContext|null} [securityContext] WorkflowExecutionConfig securityContext
-                 * @property {flyteidl.admin.IRawOutputDataConfig|null} [rawOutputDataConfig] WorkflowExecutionConfig rawOutputDataConfig
-                 * @property {flyteidl.admin.ILabels|null} [labels] WorkflowExecutionConfig labels
-                 * @property {flyteidl.admin.IAnnotations|null} [annotations] WorkflowExecutionConfig annotations
-                 * @property {google.protobuf.IBoolValue|null} [interruptible] WorkflowExecutionConfig interruptible
-                 * @property {boolean|null} [overwriteCache] WorkflowExecutionConfig overwriteCache
-                 * @property {flyteidl.admin.IEnvs|null} [envs] WorkflowExecutionConfig envs
-                 * @property {Array.<flyteidl.core.IExecutionEnvAssignment>|null} [executionEnvAssignments] WorkflowExecutionConfig executionEnvAssignments
-                 */
-    
-                /**
-                 * Constructs a new WorkflowExecutionConfig.
-                 * @memberof flyteidl.admin
-                 * @classdesc Represents a WorkflowExecutionConfig.
-                 * @implements IWorkflowExecutionConfig
-                 * @constructor
-                 * @param {flyteidl.admin.IWorkflowExecutionConfig=} [properties] Properties to set
-                 */
-                function WorkflowExecutionConfig(properties) {
-                    this.executionEnvAssignments = [];
-                    if (properties)
-                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
-                                this[keys[i]] = properties[keys[i]];
-                }
-    
-                /**
-                 * WorkflowExecutionConfig maxParallelism.
-                 * @member {number} maxParallelism
-                 * @memberof flyteidl.admin.WorkflowExecutionConfig
-                 * @instance
-                 */
-                WorkflowExecutionConfig.prototype.maxParallelism = 0;
-    
-                /**
-                 * WorkflowExecutionConfig securityContext.
-                 * @member {flyteidl.core.ISecurityContext|null|undefined} securityContext
-                 * @memberof flyteidl.admin.WorkflowExecutionConfig
-                 * @instance
-                 */
-                WorkflowExecutionConfig.prototype.securityContext = null;
-    
-                /**
-                 * WorkflowExecutionConfig rawOutputDataConfig.
-                 * @member {flyteidl.admin.IRawOutputDataConfig|null|undefined} rawOutputDataConfig
-                 * @memberof flyteidl.admin.WorkflowExecutionConfig
-                 * @instance
-                 */
-                WorkflowExecutionConfig.prototype.rawOutputDataConfig = null;
-    
-                /**
-                 * WorkflowExecutionConfig labels.
-                 * @member {flyteidl.admin.ILabels|null|undefined} labels
-                 * @memberof flyteidl.admin.WorkflowExecutionConfig
-                 * @instance
-                 */
-                WorkflowExecutionConfig.prototype.labels = null;
-    
-                /**
-                 * WorkflowExecutionConfig annotations.
-                 * @member {flyteidl.admin.IAnnotations|null|undefined} annotations
-                 * @memberof flyteidl.admin.WorkflowExecutionConfig
-                 * @instance
-                 */
-                WorkflowExecutionConfig.prototype.annotations = null;
-    
-                /**
-                 * WorkflowExecutionConfig interruptible.
-                 * @member {google.protobuf.IBoolValue|null|undefined} interruptible
-                 * @memberof flyteidl.admin.WorkflowExecutionConfig
-                 * @instance
-                 */
-                WorkflowExecutionConfig.prototype.interruptible = null;
-    
-                /**
-                 * WorkflowExecutionConfig overwriteCache.
-                 * @member {boolean} overwriteCache
-                 * @memberof flyteidl.admin.WorkflowExecutionConfig
-                 * @instance
-                 */
-                WorkflowExecutionConfig.prototype.overwriteCache = false;
-    
-                /**
-                 * WorkflowExecutionConfig envs.
-                 * @member {flyteidl.admin.IEnvs|null|undefined} envs
-                 * @memberof flyteidl.admin.WorkflowExecutionConfig
-                 * @instance
-                 */
-                WorkflowExecutionConfig.prototype.envs = null;
-    
-                /**
-                 * WorkflowExecutionConfig executionEnvAssignments.
-                 * @member {Array.<flyteidl.core.IExecutionEnvAssignment>} executionEnvAssignments
-                 * @memberof flyteidl.admin.WorkflowExecutionConfig
-                 * @instance
-                 */
-                WorkflowExecutionConfig.prototype.executionEnvAssignments = $util.emptyArray;
-    
-                /**
-                 * Creates a new WorkflowExecutionConfig instance using the specified properties.
-                 * @function create
-                 * @memberof flyteidl.admin.WorkflowExecutionConfig
-                 * @static
-                 * @param {flyteidl.admin.IWorkflowExecutionConfig=} [properties] Properties to set
-                 * @returns {flyteidl.admin.WorkflowExecutionConfig} WorkflowExecutionConfig instance
-                 */
-                WorkflowExecutionConfig.create = function create(properties) {
-                    return new WorkflowExecutionConfig(properties);
-                };
-    
-                /**
-                 * Encodes the specified WorkflowExecutionConfig message. Does not implicitly {@link flyteidl.admin.WorkflowExecutionConfig.verify|verify} messages.
-                 * @function encode
-                 * @memberof flyteidl.admin.WorkflowExecutionConfig
-                 * @static
-                 * @param {flyteidl.admin.IWorkflowExecutionConfig} message WorkflowExecutionConfig message or plain object to encode
-                 * @param {$protobuf.Writer} [writer] Writer to encode to
-                 * @returns {$protobuf.Writer} Writer
-                 */
-                WorkflowExecutionConfig.encode = function encode(message, writer) {
-                    if (!writer)
-                        writer = $Writer.create();
-                    if (message.maxParallelism != null && message.hasOwnProperty("maxParallelism"))
-                        writer.uint32(/* id 1, wireType 0 =*/8).int32(message.maxParallelism);
-                    if (message.securityContext != null && message.hasOwnProperty("securityContext"))
-                        $root.flyteidl.core.SecurityContext.encode(message.securityContext, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
-                    if (message.rawOutputDataConfig != null && message.hasOwnProperty("rawOutputDataConfig"))
-                        $root.flyteidl.admin.RawOutputDataConfig.encode(message.rawOutputDataConfig, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
-                    if (message.labels != null && message.hasOwnProperty("labels"))
-                        $root.flyteidl.admin.Labels.encode(message.labels, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
-                    if (message.annotations != null && message.hasOwnProperty("annotations"))
-                        $root.flyteidl.admin.Annotations.encode(message.annotations, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
-                    if (message.interruptible != null && message.hasOwnProperty("interruptible"))
-                        $root.google.protobuf.BoolValue.encode(message.interruptible, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
-                    if (message.overwriteCache != null && message.hasOwnProperty("overwriteCache"))
-                        writer.uint32(/* id 7, wireType 0 =*/56).bool(message.overwriteCache);
-                    if (message.envs != null && message.hasOwnProperty("envs"))
-                        $root.flyteidl.admin.Envs.encode(message.envs, writer.uint32(/* id 8, wireType 2 =*/66).fork()).ldelim();
-                    if (message.executionEnvAssignments != null && message.executionEnvAssignments.length)
-                        for (var i = 0; i < message.executionEnvAssignments.length; ++i)
-                            $root.flyteidl.core.ExecutionEnvAssignment.encode(message.executionEnvAssignments[i], writer.uint32(/* id 9, wireType 2 =*/74).fork()).ldelim();
-                    return writer;
-                };
-    
-                /**
-                 * Decodes a WorkflowExecutionConfig message from the specified reader or buffer.
-                 * @function decode
-                 * @memberof flyteidl.admin.WorkflowExecutionConfig
-                 * @static
-                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-                 * @param {number} [length] Message length if known beforehand
-                 * @returns {flyteidl.admin.WorkflowExecutionConfig} WorkflowExecutionConfig
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                WorkflowExecutionConfig.decode = function decode(reader, length) {
-                    if (!(reader instanceof $Reader))
-                        reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.WorkflowExecutionConfig();
-                    while (reader.pos < end) {
-                        var tag = reader.uint32();
-                        switch (tag >>> 3) {
-                        case 1:
-                            message.maxParallelism = reader.int32();
-                            break;
-                        case 2:
-                            message.securityContext = $root.flyteidl.core.SecurityContext.decode(reader, reader.uint32());
-                            break;
-                        case 3:
-                            message.rawOutputDataConfig = $root.flyteidl.admin.RawOutputDataConfig.decode(reader, reader.uint32());
-                            break;
-                        case 4:
-                            message.labels = $root.flyteidl.admin.Labels.decode(reader, reader.uint32());
-                            break;
-                        case 5:
-                            message.annotations = $root.flyteidl.admin.Annotations.decode(reader, reader.uint32());
-                            break;
-                        case 6:
-                            message.interruptible = $root.google.protobuf.BoolValue.decode(reader, reader.uint32());
-                            break;
-                        case 7:
-                            message.overwriteCache = reader.bool();
-                            break;
-                        case 8:
-                            message.envs = $root.flyteidl.admin.Envs.decode(reader, reader.uint32());
-                            break;
-                        case 9:
-                            if (!(message.executionEnvAssignments && message.executionEnvAssignments.length))
-                                message.executionEnvAssignments = [];
-                            message.executionEnvAssignments.push($root.flyteidl.core.ExecutionEnvAssignment.decode(reader, reader.uint32()));
-                            break;
-                        default:
-                            reader.skipType(tag & 7);
-                            break;
-                        }
-                    }
-                    return message;
-                };
-    
-                /**
-                 * Verifies a WorkflowExecutionConfig message.
-                 * @function verify
-                 * @memberof flyteidl.admin.WorkflowExecutionConfig
-                 * @static
-                 * @param {Object.<string,*>} message Plain object to verify
-                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
-                 */
-                WorkflowExecutionConfig.verify = function verify(message) {
-                    if (typeof message !== "object" || message === null)
-                        return "object expected";
-                    if (message.maxParallelism != null && message.hasOwnProperty("maxParallelism"))
-                        if (!$util.isInteger(message.maxParallelism))
-                            return "maxParallelism: integer expected";
-                    if (message.securityContext != null && message.hasOwnProperty("securityContext")) {
-                        var error = $root.flyteidl.core.SecurityContext.verify(message.securityContext);
-                        if (error)
-                            return "securityContext." + error;
-                    }
-                    if (message.rawOutputDataConfig != null && message.hasOwnProperty("rawOutputDataConfig")) {
-                        var error = $root.flyteidl.admin.RawOutputDataConfig.verify(message.rawOutputDataConfig);
-                        if (error)
-                            return "rawOutputDataConfig." + error;
-                    }
-                    if (message.labels != null && message.hasOwnProperty("labels")) {
-                        var error = $root.flyteidl.admin.Labels.verify(message.labels);
-                        if (error)
-                            return "labels." + error;
-                    }
-                    if (message.annotations != null && message.hasOwnProperty("annotations")) {
-                        var error = $root.flyteidl.admin.Annotations.verify(message.annotations);
-                        if (error)
-                            return "annotations." + error;
-                    }
-                    if (message.interruptible != null && message.hasOwnProperty("interruptible")) {
-                        var error = $root.google.protobuf.BoolValue.verify(message.interruptible);
-                        if (error)
-                            return "interruptible." + error;
-                    }
-                    if (message.overwriteCache != null && message.hasOwnProperty("overwriteCache"))
-                        if (typeof message.overwriteCache !== "boolean")
-                            return "overwriteCache: boolean expected";
-                    if (message.envs != null && message.hasOwnProperty("envs")) {
-                        var error = $root.flyteidl.admin.Envs.verify(message.envs);
-                        if (error)
-                            return "envs." + error;
-                    }
-                    if (message.executionEnvAssignments != null && message.hasOwnProperty("executionEnvAssignments")) {
-                        if (!Array.isArray(message.executionEnvAssignments))
-                            return "executionEnvAssignments: array expected";
-                        for (var i = 0; i < message.executionEnvAssignments.length; ++i) {
-                            var error = $root.flyteidl.core.ExecutionEnvAssignment.verify(message.executionEnvAssignments[i]);
-                            if (error)
-                                return "executionEnvAssignments." + error;
-                        }
-                    }
-                    return null;
-                };
-    
-                return WorkflowExecutionConfig;
-            })();
-    
-            admin.MatchingAttributes = (function() {
-    
-                /**
-                 * Properties of a MatchingAttributes.
-                 * @memberof flyteidl.admin
-                 * @interface IMatchingAttributes
-                 * @property {flyteidl.admin.ITaskResourceAttributes|null} [taskResourceAttributes] MatchingAttributes taskResourceAttributes
-                 * @property {flyteidl.admin.IClusterResourceAttributes|null} [clusterResourceAttributes] MatchingAttributes clusterResourceAttributes
-                 * @property {flyteidl.admin.IExecutionQueueAttributes|null} [executionQueueAttributes] MatchingAttributes executionQueueAttributes
-                 * @property {flyteidl.admin.IExecutionClusterLabel|null} [executionClusterLabel] MatchingAttributes executionClusterLabel
-                 * @property {flyteidl.core.IQualityOfService|null} [qualityOfService] MatchingAttributes qualityOfService
-                 * @property {flyteidl.admin.IPluginOverrides|null} [pluginOverrides] MatchingAttributes pluginOverrides
-                 * @property {flyteidl.admin.IWorkflowExecutionConfig|null} [workflowExecutionConfig] MatchingAttributes workflowExecutionConfig
-                 * @property {flyteidl.admin.IClusterAssignment|null} [clusterAssignment] MatchingAttributes clusterAssignment
-                 */
-    
-                /**
-                 * Constructs a new MatchingAttributes.
-                 * @memberof flyteidl.admin
-                 * @classdesc Represents a MatchingAttributes.
-                 * @implements IMatchingAttributes
-                 * @constructor
-                 * @param {flyteidl.admin.IMatchingAttributes=} [properties] Properties to set
-                 */
-                function MatchingAttributes(properties) {
-                    if (properties)
-                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
-                                this[keys[i]] = properties[keys[i]];
-                }
-    
-                /**
-                 * MatchingAttributes taskResourceAttributes.
-                 * @member {flyteidl.admin.ITaskResourceAttributes|null|undefined} taskResourceAttributes
-                 * @memberof flyteidl.admin.MatchingAttributes
-                 * @instance
-                 */
-                MatchingAttributes.prototype.taskResourceAttributes = null;
-    
-                /**
-                 * MatchingAttributes clusterResourceAttributes.
-                 * @member {flyteidl.admin.IClusterResourceAttributes|null|undefined} clusterResourceAttributes
-                 * @memberof flyteidl.admin.MatchingAttributes
-                 * @instance
-                 */
-                MatchingAttributes.prototype.clusterResourceAttributes = null;
-    
-                /**
-                 * MatchingAttributes executionQueueAttributes.
-                 * @member {flyteidl.admin.IExecutionQueueAttributes|null|undefined} executionQueueAttributes
-                 * @memberof flyteidl.admin.MatchingAttributes
-                 * @instance
-                 */
-                MatchingAttributes.prototype.executionQueueAttributes = null;
-    
-                /**
-                 * MatchingAttributes executionClusterLabel.
-                 * @member {flyteidl.admin.IExecutionClusterLabel|null|undefined} executionClusterLabel
-                 * @memberof flyteidl.admin.MatchingAttributes
-                 * @instance
-                 */
-                MatchingAttributes.prototype.executionClusterLabel = null;
-    
-                /**
-                 * MatchingAttributes qualityOfService.
-                 * @member {flyteidl.core.IQualityOfService|null|undefined} qualityOfService
-                 * @memberof flyteidl.admin.MatchingAttributes
-                 * @instance
-                 */
-                MatchingAttributes.prototype.qualityOfService = null;
-    
-                /**
-                 * MatchingAttributes pluginOverrides.
-                 * @member {flyteidl.admin.IPluginOverrides|null|undefined} pluginOverrides
-                 * @memberof flyteidl.admin.MatchingAttributes
-                 * @instance
-                 */
-                MatchingAttributes.prototype.pluginOverrides = null;
-    
-                /**
-                 * MatchingAttributes workflowExecutionConfig.
-                 * @member {flyteidl.admin.IWorkflowExecutionConfig|null|undefined} workflowExecutionConfig
-                 * @memberof flyteidl.admin.MatchingAttributes
-                 * @instance
-                 */
-                MatchingAttributes.prototype.workflowExecutionConfig = null;
-    
-                /**
-                 * MatchingAttributes clusterAssignment.
-                 * @member {flyteidl.admin.IClusterAssignment|null|undefined} clusterAssignment
-                 * @memberof flyteidl.admin.MatchingAttributes
-                 * @instance
-                 */
-                MatchingAttributes.prototype.clusterAssignment = null;
-    
-                // OneOf field names bound to virtual getters and setters
-                var $oneOfFields;
-    
-                /**
-                 * MatchingAttributes target.
-                 * @member {"taskResourceAttributes"|"clusterResourceAttributes"|"executionQueueAttributes"|"executionClusterLabel"|"qualityOfService"|"pluginOverrides"|"workflowExecutionConfig"|"clusterAssignment"|undefined} target
-                 * @memberof flyteidl.admin.MatchingAttributes
-                 * @instance
-                 */
-                Object.defineProperty(MatchingAttributes.prototype, "target", {
-                    get: $util.oneOfGetter($oneOfFields = ["taskResourceAttributes", "clusterResourceAttributes", "executionQueueAttributes", "executionClusterLabel", "qualityOfService", "pluginOverrides", "workflowExecutionConfig", "clusterAssignment"]),
-                    set: $util.oneOfSetter($oneOfFields)
-                });
-    
-                /**
-                 * Creates a new MatchingAttributes instance using the specified properties.
-                 * @function create
-                 * @memberof flyteidl.admin.MatchingAttributes
-                 * @static
-                 * @param {flyteidl.admin.IMatchingAttributes=} [properties] Properties to set
-                 * @returns {flyteidl.admin.MatchingAttributes} MatchingAttributes instance
-                 */
-                MatchingAttributes.create = function create(properties) {
-                    return new MatchingAttributes(properties);
-                };
-    
-                /**
-                 * Encodes the specified MatchingAttributes message. Does not implicitly {@link flyteidl.admin.MatchingAttributes.verify|verify} messages.
-                 * @function encode
-                 * @memberof flyteidl.admin.MatchingAttributes
-                 * @static
-                 * @param {flyteidl.admin.IMatchingAttributes} message MatchingAttributes message or plain object to encode
-                 * @param {$protobuf.Writer} [writer] Writer to encode to
-                 * @returns {$protobuf.Writer} Writer
-                 */
-                MatchingAttributes.encode = function encode(message, writer) {
-                    if (!writer)
-                        writer = $Writer.create();
-                    if (message.taskResourceAttributes != null && message.hasOwnProperty("taskResourceAttributes"))
-                        $root.flyteidl.admin.TaskResourceAttributes.encode(message.taskResourceAttributes, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-                    if (message.clusterResourceAttributes != null && message.hasOwnProperty("clusterResourceAttributes"))
-                        $root.flyteidl.admin.ClusterResourceAttributes.encode(message.clusterResourceAttributes, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
-                    if (message.executionQueueAttributes != null && message.hasOwnProperty("executionQueueAttributes"))
-                        $root.flyteidl.admin.ExecutionQueueAttributes.encode(message.executionQueueAttributes, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
-                    if (message.executionClusterLabel != null && message.hasOwnProperty("executionClusterLabel"))
-                        $root.flyteidl.admin.ExecutionClusterLabel.encode(message.executionClusterLabel, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
-                    if (message.qualityOfService != null && message.hasOwnProperty("qualityOfService"))
-                        $root.flyteidl.core.QualityOfService.encode(message.qualityOfService, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
-                    if (message.pluginOverrides != null && message.hasOwnProperty("pluginOverrides"))
-                        $root.flyteidl.admin.PluginOverrides.encode(message.pluginOverrides, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
-                    if (message.workflowExecutionConfig != null && message.hasOwnProperty("workflowExecutionConfig"))
-                        $root.flyteidl.admin.WorkflowExecutionConfig.encode(message.workflowExecutionConfig, writer.uint32(/* id 7, wireType 2 =*/58).fork()).ldelim();
-                    if (message.clusterAssignment != null && message.hasOwnProperty("clusterAssignment"))
-                        $root.flyteidl.admin.ClusterAssignment.encode(message.clusterAssignment, writer.uint32(/* id 8, wireType 2 =*/66).fork()).ldelim();
-                    return writer;
-                };
-    
-                /**
-                 * Decodes a MatchingAttributes message from the specified reader or buffer.
-                 * @function decode
-                 * @memberof flyteidl.admin.MatchingAttributes
-                 * @static
-                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-                 * @param {number} [length] Message length if known beforehand
-                 * @returns {flyteidl.admin.MatchingAttributes} MatchingAttributes
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                MatchingAttributes.decode = function decode(reader, length) {
-                    if (!(reader instanceof $Reader))
-                        reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.MatchingAttributes();
-                    while (reader.pos < end) {
-                        var tag = reader.uint32();
-                        switch (tag >>> 3) {
-                        case 1:
-                            message.taskResourceAttributes = $root.flyteidl.admin.TaskResourceAttributes.decode(reader, reader.uint32());
-                            break;
-                        case 2:
-                            message.clusterResourceAttributes = $root.flyteidl.admin.ClusterResourceAttributes.decode(reader, reader.uint32());
-                            break;
-                        case 3:
-                            message.executionQueueAttributes = $root.flyteidl.admin.ExecutionQueueAttributes.decode(reader, reader.uint32());
-                            break;
-                        case 4:
-                            message.executionClusterLabel = $root.flyteidl.admin.ExecutionClusterLabel.decode(reader, reader.uint32());
-                            break;
-                        case 5:
-                            message.qualityOfService = $root.flyteidl.core.QualityOfService.decode(reader, reader.uint32());
-                            break;
-                        case 6:
-                            message.pluginOverrides = $root.flyteidl.admin.PluginOverrides.decode(reader, reader.uint32());
-                            break;
-                        case 7:
-                            message.workflowExecutionConfig = $root.flyteidl.admin.WorkflowExecutionConfig.decode(reader, reader.uint32());
-                            break;
-                        case 8:
-                            message.clusterAssignment = $root.flyteidl.admin.ClusterAssignment.decode(reader, reader.uint32());
-                            break;
-                        default:
-                            reader.skipType(tag & 7);
-                            break;
-                        }
-                    }
-                    return message;
-                };
-    
-                /**
-                 * Verifies a MatchingAttributes message.
-                 * @function verify
-                 * @memberof flyteidl.admin.MatchingAttributes
-                 * @static
-                 * @param {Object.<string,*>} message Plain object to verify
-                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
-                 */
-                MatchingAttributes.verify = function verify(message) {
-                    if (typeof message !== "object" || message === null)
-                        return "object expected";
-                    var properties = {};
-                    if (message.taskResourceAttributes != null && message.hasOwnProperty("taskResourceAttributes")) {
-                        properties.target = 1;
-                        {
-                            var error = $root.flyteidl.admin.TaskResourceAttributes.verify(message.taskResourceAttributes);
-                            if (error)
-                                return "taskResourceAttributes." + error;
-                        }
-                    }
-                    if (message.clusterResourceAttributes != null && message.hasOwnProperty("clusterResourceAttributes")) {
-                        if (properties.target === 1)
-                            return "target: multiple values";
-                        properties.target = 1;
-                        {
-                            var error = $root.flyteidl.admin.ClusterResourceAttributes.verify(message.clusterResourceAttributes);
-                            if (error)
-                                return "clusterResourceAttributes." + error;
-                        }
-                    }
-                    if (message.executionQueueAttributes != null && message.hasOwnProperty("executionQueueAttributes")) {
-                        if (properties.target === 1)
-                            return "target: multiple values";
-                        properties.target = 1;
-                        {
-                            var error = $root.flyteidl.admin.ExecutionQueueAttributes.verify(message.executionQueueAttributes);
-                            if (error)
-                                return "executionQueueAttributes." + error;
-                        }
-                    }
-                    if (message.executionClusterLabel != null && message.hasOwnProperty("executionClusterLabel")) {
-                        if (properties.target === 1)
-                            return "target: multiple values";
-                        properties.target = 1;
-                        {
-                            var error = $root.flyteidl.admin.ExecutionClusterLabel.verify(message.executionClusterLabel);
-                            if (error)
-                                return "executionClusterLabel." + error;
-                        }
-                    }
-                    if (message.qualityOfService != null && message.hasOwnProperty("qualityOfService")) {
-                        if (properties.target === 1)
-                            return "target: multiple values";
-                        properties.target = 1;
-                        {
-                            var error = $root.flyteidl.core.QualityOfService.verify(message.qualityOfService);
-                            if (error)
-                                return "qualityOfService." + error;
-                        }
-                    }
-                    if (message.pluginOverrides != null && message.hasOwnProperty("pluginOverrides")) {
-                        if (properties.target === 1)
-                            return "target: multiple values";
-                        properties.target = 1;
-                        {
-                            var error = $root.flyteidl.admin.PluginOverrides.verify(message.pluginOverrides);
-                            if (error)
-                                return "pluginOverrides." + error;
-                        }
-                    }
-                    if (message.workflowExecutionConfig != null && message.hasOwnProperty("workflowExecutionConfig")) {
-                        if (properties.target === 1)
-                            return "target: multiple values";
-                        properties.target = 1;
-                        {
-                            var error = $root.flyteidl.admin.WorkflowExecutionConfig.verify(message.workflowExecutionConfig);
-                            if (error)
-                                return "workflowExecutionConfig." + error;
-                        }
-                    }
-                    if (message.clusterAssignment != null && message.hasOwnProperty("clusterAssignment")) {
-                        if (properties.target === 1)
-                            return "target: multiple values";
-                        properties.target = 1;
-                        {
-                            var error = $root.flyteidl.admin.ClusterAssignment.verify(message.clusterAssignment);
-                            if (error)
-                                return "clusterAssignment." + error;
-                        }
-                    }
-                    return null;
-                };
-    
-                return MatchingAttributes;
-            })();
-    
-            admin.MatchableAttributesConfiguration = (function() {
-    
-                /**
-                 * Properties of a MatchableAttributesConfiguration.
-                 * @memberof flyteidl.admin
-                 * @interface IMatchableAttributesConfiguration
-                 * @property {flyteidl.admin.IMatchingAttributes|null} [attributes] MatchableAttributesConfiguration attributes
-                 * @property {string|null} [domain] MatchableAttributesConfiguration domain
-                 * @property {string|null} [project] MatchableAttributesConfiguration project
-                 * @property {string|null} [workflow] MatchableAttributesConfiguration workflow
-                 * @property {string|null} [launchPlan] MatchableAttributesConfiguration launchPlan
-                 * @property {string|null} [org] MatchableAttributesConfiguration org
-                 */
-    
-                /**
-                 * Constructs a new MatchableAttributesConfiguration.
-                 * @memberof flyteidl.admin
-                 * @classdesc Represents a MatchableAttributesConfiguration.
-                 * @implements IMatchableAttributesConfiguration
-                 * @constructor
-                 * @param {flyteidl.admin.IMatchableAttributesConfiguration=} [properties] Properties to set
-                 */
-                function MatchableAttributesConfiguration(properties) {
-                    if (properties)
-                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
-                                this[keys[i]] = properties[keys[i]];
-                }
-    
-                /**
-                 * MatchableAttributesConfiguration attributes.
-                 * @member {flyteidl.admin.IMatchingAttributes|null|undefined} attributes
-                 * @memberof flyteidl.admin.MatchableAttributesConfiguration
-                 * @instance
-                 */
-                MatchableAttributesConfiguration.prototype.attributes = null;
-    
-                /**
-                 * MatchableAttributesConfiguration domain.
-                 * @member {string} domain
-                 * @memberof flyteidl.admin.MatchableAttributesConfiguration
-                 * @instance
-                 */
-                MatchableAttributesConfiguration.prototype.domain = "";
-    
-                /**
-                 * MatchableAttributesConfiguration project.
-                 * @member {string} project
-                 * @memberof flyteidl.admin.MatchableAttributesConfiguration
-                 * @instance
-                 */
-                MatchableAttributesConfiguration.prototype.project = "";
-    
-                /**
-                 * MatchableAttributesConfiguration workflow.
-                 * @member {string} workflow
-                 * @memberof flyteidl.admin.MatchableAttributesConfiguration
-                 * @instance
-                 */
-                MatchableAttributesConfiguration.prototype.workflow = "";
-    
-                /**
-                 * MatchableAttributesConfiguration launchPlan.
-                 * @member {string} launchPlan
-                 * @memberof flyteidl.admin.MatchableAttributesConfiguration
-                 * @instance
-                 */
-                MatchableAttributesConfiguration.prototype.launchPlan = "";
-    
-                /**
-                 * MatchableAttributesConfiguration org.
-                 * @member {string} org
-                 * @memberof flyteidl.admin.MatchableAttributesConfiguration
-                 * @instance
-                 */
-                MatchableAttributesConfiguration.prototype.org = "";
-    
-                /**
-                 * Creates a new MatchableAttributesConfiguration instance using the specified properties.
-                 * @function create
-                 * @memberof flyteidl.admin.MatchableAttributesConfiguration
-                 * @static
-                 * @param {flyteidl.admin.IMatchableAttributesConfiguration=} [properties] Properties to set
-                 * @returns {flyteidl.admin.MatchableAttributesConfiguration} MatchableAttributesConfiguration instance
-                 */
-                MatchableAttributesConfiguration.create = function create(properties) {
-                    return new MatchableAttributesConfiguration(properties);
-                };
-    
-                /**
-                 * Encodes the specified MatchableAttributesConfiguration message. Does not implicitly {@link flyteidl.admin.MatchableAttributesConfiguration.verify|verify} messages.
-                 * @function encode
-                 * @memberof flyteidl.admin.MatchableAttributesConfiguration
-                 * @static
-                 * @param {flyteidl.admin.IMatchableAttributesConfiguration} message MatchableAttributesConfiguration message or plain object to encode
-                 * @param {$protobuf.Writer} [writer] Writer to encode to
-                 * @returns {$protobuf.Writer} Writer
-                 */
-                MatchableAttributesConfiguration.encode = function encode(message, writer) {
-                    if (!writer)
-                        writer = $Writer.create();
-                    if (message.attributes != null && message.hasOwnProperty("attributes"))
-                        $root.flyteidl.admin.MatchingAttributes.encode(message.attributes, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-                    if (message.domain != null && message.hasOwnProperty("domain"))
-                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.domain);
-                    if (message.project != null && message.hasOwnProperty("project"))
-                        writer.uint32(/* id 3, wireType 2 =*/26).string(message.project);
-                    if (message.workflow != null && message.hasOwnProperty("workflow"))
-                        writer.uint32(/* id 4, wireType 2 =*/34).string(message.workflow);
-                    if (message.launchPlan != null && message.hasOwnProperty("launchPlan"))
-                        writer.uint32(/* id 5, wireType 2 =*/42).string(message.launchPlan);
-                    if (message.org != null && message.hasOwnProperty("org"))
-                        writer.uint32(/* id 6, wireType 2 =*/50).string(message.org);
-                    return writer;
-                };
-    
-                /**
-                 * Decodes a MatchableAttributesConfiguration message from the specified reader or buffer.
-                 * @function decode
-                 * @memberof flyteidl.admin.MatchableAttributesConfiguration
-                 * @static
-                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-                 * @param {number} [length] Message length if known beforehand
-                 * @returns {flyteidl.admin.MatchableAttributesConfiguration} MatchableAttributesConfiguration
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                MatchableAttributesConfiguration.decode = function decode(reader, length) {
-                    if (!(reader instanceof $Reader))
-                        reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.MatchableAttributesConfiguration();
-                    while (reader.pos < end) {
-                        var tag = reader.uint32();
-                        switch (tag >>> 3) {
-                        case 1:
-                            message.attributes = $root.flyteidl.admin.MatchingAttributes.decode(reader, reader.uint32());
-                            break;
-                        case 2:
-                            message.domain = reader.string();
-                            break;
-                        case 3:
-                            message.project = reader.string();
-                            break;
-                        case 4:
-                            message.workflow = reader.string();
-                            break;
-                        case 5:
-                            message.launchPlan = reader.string();
-                            break;
-                        case 6:
-                            message.org = reader.string();
-                            break;
-                        default:
-                            reader.skipType(tag & 7);
-                            break;
-                        }
-                    }
-                    return message;
-                };
-    
-                /**
-                 * Verifies a MatchableAttributesConfiguration message.
-                 * @function verify
-                 * @memberof flyteidl.admin.MatchableAttributesConfiguration
-                 * @static
-                 * @param {Object.<string,*>} message Plain object to verify
-                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
-                 */
-                MatchableAttributesConfiguration.verify = function verify(message) {
-                    if (typeof message !== "object" || message === null)
-                        return "object expected";
-                    if (message.attributes != null && message.hasOwnProperty("attributes")) {
-                        var error = $root.flyteidl.admin.MatchingAttributes.verify(message.attributes);
-                        if (error)
-                            return "attributes." + error;
-                    }
-                    if (message.domain != null && message.hasOwnProperty("domain"))
-                        if (!$util.isString(message.domain))
-                            return "domain: string expected";
-                    if (message.project != null && message.hasOwnProperty("project"))
-                        if (!$util.isString(message.project))
-                            return "project: string expected";
-                    if (message.workflow != null && message.hasOwnProperty("workflow"))
-                        if (!$util.isString(message.workflow))
-                            return "workflow: string expected";
-                    if (message.launchPlan != null && message.hasOwnProperty("launchPlan"))
-                        if (!$util.isString(message.launchPlan))
-                            return "launchPlan: string expected";
-                    if (message.org != null && message.hasOwnProperty("org"))
-                        if (!$util.isString(message.org))
-                            return "org: string expected";
-                    return null;
-                };
-    
-                return MatchableAttributesConfiguration;
-            })();
-    
-            admin.ListMatchableAttributesRequest = (function() {
-    
-                /**
-                 * Properties of a ListMatchableAttributesRequest.
-                 * @memberof flyteidl.admin
-                 * @interface IListMatchableAttributesRequest
-                 * @property {flyteidl.admin.MatchableResource|null} [resourceType] ListMatchableAttributesRequest resourceType
-                 * @property {string|null} [org] ListMatchableAttributesRequest org
-                 */
-    
-                /**
-                 * Constructs a new ListMatchableAttributesRequest.
-                 * @memberof flyteidl.admin
-                 * @classdesc Represents a ListMatchableAttributesRequest.
-                 * @implements IListMatchableAttributesRequest
-                 * @constructor
-                 * @param {flyteidl.admin.IListMatchableAttributesRequest=} [properties] Properties to set
-                 */
-                function ListMatchableAttributesRequest(properties) {
-                    if (properties)
-                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
-                                this[keys[i]] = properties[keys[i]];
-                }
-    
-                /**
-                 * ListMatchableAttributesRequest resourceType.
-                 * @member {flyteidl.admin.MatchableResource} resourceType
-                 * @memberof flyteidl.admin.ListMatchableAttributesRequest
-                 * @instance
-                 */
-                ListMatchableAttributesRequest.prototype.resourceType = 0;
-    
-                /**
-                 * ListMatchableAttributesRequest org.
-                 * @member {string} org
-                 * @memberof flyteidl.admin.ListMatchableAttributesRequest
-                 * @instance
-                 */
-                ListMatchableAttributesRequest.prototype.org = "";
-    
-                /**
-                 * Creates a new ListMatchableAttributesRequest instance using the specified properties.
-                 * @function create
-                 * @memberof flyteidl.admin.ListMatchableAttributesRequest
-                 * @static
-                 * @param {flyteidl.admin.IListMatchableAttributesRequest=} [properties] Properties to set
-                 * @returns {flyteidl.admin.ListMatchableAttributesRequest} ListMatchableAttributesRequest instance
-                 */
-                ListMatchableAttributesRequest.create = function create(properties) {
-                    return new ListMatchableAttributesRequest(properties);
-                };
-    
-                /**
-                 * Encodes the specified ListMatchableAttributesRequest message. Does not implicitly {@link flyteidl.admin.ListMatchableAttributesRequest.verify|verify} messages.
-                 * @function encode
-                 * @memberof flyteidl.admin.ListMatchableAttributesRequest
-                 * @static
-                 * @param {flyteidl.admin.IListMatchableAttributesRequest} message ListMatchableAttributesRequest message or plain object to encode
-                 * @param {$protobuf.Writer} [writer] Writer to encode to
-                 * @returns {$protobuf.Writer} Writer
-                 */
-                ListMatchableAttributesRequest.encode = function encode(message, writer) {
-                    if (!writer)
-                        writer = $Writer.create();
-                    if (message.resourceType != null && message.hasOwnProperty("resourceType"))
-                        writer.uint32(/* id 1, wireType 0 =*/8).int32(message.resourceType);
-                    if (message.org != null && message.hasOwnProperty("org"))
-                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.org);
-                    return writer;
-                };
-    
-                /**
-                 * Decodes a ListMatchableAttributesRequest message from the specified reader or buffer.
-                 * @function decode
-                 * @memberof flyteidl.admin.ListMatchableAttributesRequest
-                 * @static
-                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-                 * @param {number} [length] Message length if known beforehand
-                 * @returns {flyteidl.admin.ListMatchableAttributesRequest} ListMatchableAttributesRequest
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                ListMatchableAttributesRequest.decode = function decode(reader, length) {
-                    if (!(reader instanceof $Reader))
-                        reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.ListMatchableAttributesRequest();
-                    while (reader.pos < end) {
-                        var tag = reader.uint32();
-                        switch (tag >>> 3) {
-                        case 1:
-                            message.resourceType = reader.int32();
-                            break;
-                        case 2:
-                            message.org = reader.string();
-                            break;
-                        default:
-                            reader.skipType(tag & 7);
-                            break;
-                        }
-                    }
-                    return message;
-                };
-    
-                /**
-                 * Verifies a ListMatchableAttributesRequest message.
-                 * @function verify
-                 * @memberof flyteidl.admin.ListMatchableAttributesRequest
-                 * @static
-                 * @param {Object.<string,*>} message Plain object to verify
-                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
-                 */
-                ListMatchableAttributesRequest.verify = function verify(message) {
-                    if (typeof message !== "object" || message === null)
-                        return "object expected";
-                    if (message.resourceType != null && message.hasOwnProperty("resourceType"))
-                        switch (message.resourceType) {
-                        default:
-                            return "resourceType: enum value expected";
-                        case 0:
-                        case 1:
-                        case 2:
-                        case 3:
-                        case 4:
-                        case 5:
-                        case 6:
-                        case 7:
-                            break;
-                        }
-                    if (message.org != null && message.hasOwnProperty("org"))
-                        if (!$util.isString(message.org))
-                            return "org: string expected";
-                    return null;
-                };
-    
-                return ListMatchableAttributesRequest;
-            })();
-    
-            admin.ListMatchableAttributesResponse = (function() {
-    
-                /**
-                 * Properties of a ListMatchableAttributesResponse.
-                 * @memberof flyteidl.admin
-                 * @interface IListMatchableAttributesResponse
-                 * @property {Array.<flyteidl.admin.IMatchableAttributesConfiguration>|null} [configurations] ListMatchableAttributesResponse configurations
-                 */
-    
-                /**
-                 * Constructs a new ListMatchableAttributesResponse.
-                 * @memberof flyteidl.admin
-                 * @classdesc Represents a ListMatchableAttributesResponse.
-                 * @implements IListMatchableAttributesResponse
-                 * @constructor
-                 * @param {flyteidl.admin.IListMatchableAttributesResponse=} [properties] Properties to set
-                 */
-                function ListMatchableAttributesResponse(properties) {
-                    this.configurations = [];
-                    if (properties)
-                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
-                                this[keys[i]] = properties[keys[i]];
-                }
-    
-                /**
-                 * ListMatchableAttributesResponse configurations.
-                 * @member {Array.<flyteidl.admin.IMatchableAttributesConfiguration>} configurations
-                 * @memberof flyteidl.admin.ListMatchableAttributesResponse
-                 * @instance
-                 */
-                ListMatchableAttributesResponse.prototype.configurations = $util.emptyArray;
-    
-                /**
-                 * Creates a new ListMatchableAttributesResponse instance using the specified properties.
-                 * @function create
-                 * @memberof flyteidl.admin.ListMatchableAttributesResponse
-                 * @static
-                 * @param {flyteidl.admin.IListMatchableAttributesResponse=} [properties] Properties to set
-                 * @returns {flyteidl.admin.ListMatchableAttributesResponse} ListMatchableAttributesResponse instance
-                 */
-                ListMatchableAttributesResponse.create = function create(properties) {
-                    return new ListMatchableAttributesResponse(properties);
-                };
-    
-                /**
-                 * Encodes the specified ListMatchableAttributesResponse message. Does not implicitly {@link flyteidl.admin.ListMatchableAttributesResponse.verify|verify} messages.
-                 * @function encode
-                 * @memberof flyteidl.admin.ListMatchableAttributesResponse
-                 * @static
-                 * @param {flyteidl.admin.IListMatchableAttributesResponse} message ListMatchableAttributesResponse message or plain object to encode
-                 * @param {$protobuf.Writer} [writer] Writer to encode to
-                 * @returns {$protobuf.Writer} Writer
-                 */
-                ListMatchableAttributesResponse.encode = function encode(message, writer) {
-                    if (!writer)
-                        writer = $Writer.create();
-                    if (message.configurations != null && message.configurations.length)
-                        for (var i = 0; i < message.configurations.length; ++i)
-                            $root.flyteidl.admin.MatchableAttributesConfiguration.encode(message.configurations[i], writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-                    return writer;
-                };
-    
-                /**
-                 * Decodes a ListMatchableAttributesResponse message from the specified reader or buffer.
-                 * @function decode
-                 * @memberof flyteidl.admin.ListMatchableAttributesResponse
-                 * @static
-                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-                 * @param {number} [length] Message length if known beforehand
-                 * @returns {flyteidl.admin.ListMatchableAttributesResponse} ListMatchableAttributesResponse
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                ListMatchableAttributesResponse.decode = function decode(reader, length) {
-                    if (!(reader instanceof $Reader))
-                        reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.ListMatchableAttributesResponse();
-                    while (reader.pos < end) {
-                        var tag = reader.uint32();
-                        switch (tag >>> 3) {
-                        case 1:
-                            if (!(message.configurations && message.configurations.length))
-                                message.configurations = [];
-                            message.configurations.push($root.flyteidl.admin.MatchableAttributesConfiguration.decode(reader, reader.uint32()));
-                            break;
-                        default:
-                            reader.skipType(tag & 7);
-                            break;
-                        }
-                    }
-                    return message;
-                };
-    
-                /**
-                 * Verifies a ListMatchableAttributesResponse message.
-                 * @function verify
-                 * @memberof flyteidl.admin.ListMatchableAttributesResponse
-                 * @static
-                 * @param {Object.<string,*>} message Plain object to verify
-                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
-                 */
-                ListMatchableAttributesResponse.verify = function verify(message) {
-                    if (typeof message !== "object" || message === null)
-                        return "object expected";
-                    if (message.configurations != null && message.hasOwnProperty("configurations")) {
-                        if (!Array.isArray(message.configurations))
-                            return "configurations: array expected";
-                        for (var i = 0; i < message.configurations.length; ++i) {
-                            var error = $root.flyteidl.admin.MatchableAttributesConfiguration.verify(message.configurations[i]);
-                            if (error)
-                                return "configurations." + error;
-                        }
-                    }
-                    return null;
-                };
-    
-                return ListMatchableAttributesResponse;
             })();
     
             admin.NodeExecutionGetRequest = (function() {
@@ -53473,6 +55939,72 @@
                  * @instance
                  * @param {flyteidl.admin.IRunningExecutionsCountGetRequest} request RunningExecutionsCountGetRequest message or plain object
                  * @returns {Promise<flyteidl.admin.RunningExecutionsCountGetResponse>} Promise
+                 * @variation 2
+                 */
+    
+                /**
+                 * Callback as used by {@link flyteidl.service.AdminService#getConfiguration}.
+                 * @memberof flyteidl.service.AdminService
+                 * @typedef GetConfigurationCallback
+                 * @type {function}
+                 * @param {Error|null} error Error, if any
+                 * @param {flyteidl.admin.ConfigurationGetResponse} [response] ConfigurationGetResponse
+                 */
+    
+                /**
+                 * Calls GetConfiguration.
+                 * @function getConfiguration
+                 * @memberof flyteidl.service.AdminService
+                 * @instance
+                 * @param {flyteidl.admin.IConfigurationGetRequest} request ConfigurationGetRequest message or plain object
+                 * @param {flyteidl.service.AdminService.GetConfigurationCallback} callback Node-style callback called with the error, if any, and ConfigurationGetResponse
+                 * @returns {undefined}
+                 * @variation 1
+                 */
+                Object.defineProperty(AdminService.prototype.getConfiguration = function getConfiguration(request, callback) {
+                    return this.rpcCall(getConfiguration, $root.flyteidl.admin.ConfigurationGetRequest, $root.flyteidl.admin.ConfigurationGetResponse, request, callback);
+                }, "name", { value: "GetConfiguration" });
+    
+                /**
+                 * Calls GetConfiguration.
+                 * @function getConfiguration
+                 * @memberof flyteidl.service.AdminService
+                 * @instance
+                 * @param {flyteidl.admin.IConfigurationGetRequest} request ConfigurationGetRequest message or plain object
+                 * @returns {Promise<flyteidl.admin.ConfigurationGetResponse>} Promise
+                 * @variation 2
+                 */
+    
+                /**
+                 * Callback as used by {@link flyteidl.service.AdminService#updateProjectDomainConfiguration}.
+                 * @memberof flyteidl.service.AdminService
+                 * @typedef UpdateProjectDomainConfigurationCallback
+                 * @type {function}
+                 * @param {Error|null} error Error, if any
+                 * @param {flyteidl.admin.ConfigurationUpdateResponse} [response] ConfigurationUpdateResponse
+                 */
+    
+                /**
+                 * Calls UpdateProjectDomainConfiguration.
+                 * @function updateProjectDomainConfiguration
+                 * @memberof flyteidl.service.AdminService
+                 * @instance
+                 * @param {flyteidl.admin.IConfigurationUpdateRequest} request ConfigurationUpdateRequest message or plain object
+                 * @param {flyteidl.service.AdminService.UpdateProjectDomainConfigurationCallback} callback Node-style callback called with the error, if any, and ConfigurationUpdateResponse
+                 * @returns {undefined}
+                 * @variation 1
+                 */
+                Object.defineProperty(AdminService.prototype.updateProjectDomainConfiguration = function updateProjectDomainConfiguration(request, callback) {
+                    return this.rpcCall(updateProjectDomainConfiguration, $root.flyteidl.admin.ConfigurationUpdateRequest, $root.flyteidl.admin.ConfigurationUpdateResponse, request, callback);
+                }, "name", { value: "UpdateProjectDomainConfiguration" });
+    
+                /**
+                 * Calls UpdateProjectDomainConfiguration.
+                 * @function updateProjectDomainConfiguration
+                 * @memberof flyteidl.service.AdminService
+                 * @instance
+                 * @param {flyteidl.admin.IConfigurationUpdateRequest} request ConfigurationUpdateRequest message or plain object
+                 * @returns {Promise<flyteidl.admin.ConfigurationUpdateResponse>} Promise
                  * @variation 2
                  */
     

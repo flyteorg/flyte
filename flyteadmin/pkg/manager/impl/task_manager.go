@@ -13,7 +13,6 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/artifacts"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/resources"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/util"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/validation"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
@@ -284,14 +283,14 @@ func NewTaskManager(
 	db repoInterfaces.Repository,
 	config runtimeInterfaces.Configuration, compiler workflowengine.Compiler,
 	scope promutils.Scope,
-	artifactRegistry *artifacts.ArtifactRegistry) interfaces.TaskInterface {
+	artifactRegistry *artifacts.ArtifactRegistry, resourceManager interfaces.ResourceInterface) interfaces.TaskInterface {
 
 	metrics := taskMetrics{
 		Scope:            scope,
 		ClosureSizeBytes: scope.MustNewSummary("closure_size_bytes", "size in bytes of serialized task closure"),
 		Registered:       labeled.NewCounter("num_registered", "count of registered tasks", scope),
 	}
-	resourceManager := resources.NewResourceManager(db, config.ApplicationConfiguration())
+
 	return &TaskManager{
 		db:               db,
 		config:           config,

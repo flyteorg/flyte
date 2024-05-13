@@ -20,63 +20,65 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	AdminService_CreateTask_FullMethodName                    = "/flyteidl.service.AdminService/CreateTask"
-	AdminService_GetTask_FullMethodName                       = "/flyteidl.service.AdminService/GetTask"
-	AdminService_ListTaskIds_FullMethodName                   = "/flyteidl.service.AdminService/ListTaskIds"
-	AdminService_ListTasks_FullMethodName                     = "/flyteidl.service.AdminService/ListTasks"
-	AdminService_CreateWorkflow_FullMethodName                = "/flyteidl.service.AdminService/CreateWorkflow"
-	AdminService_GetWorkflow_FullMethodName                   = "/flyteidl.service.AdminService/GetWorkflow"
-	AdminService_ListWorkflowIds_FullMethodName               = "/flyteidl.service.AdminService/ListWorkflowIds"
-	AdminService_ListWorkflows_FullMethodName                 = "/flyteidl.service.AdminService/ListWorkflows"
-	AdminService_CreateLaunchPlan_FullMethodName              = "/flyteidl.service.AdminService/CreateLaunchPlan"
-	AdminService_GetLaunchPlan_FullMethodName                 = "/flyteidl.service.AdminService/GetLaunchPlan"
-	AdminService_GetActiveLaunchPlan_FullMethodName           = "/flyteidl.service.AdminService/GetActiveLaunchPlan"
-	AdminService_ListActiveLaunchPlans_FullMethodName         = "/flyteidl.service.AdminService/ListActiveLaunchPlans"
-	AdminService_ListLaunchPlanIds_FullMethodName             = "/flyteidl.service.AdminService/ListLaunchPlanIds"
-	AdminService_ListLaunchPlans_FullMethodName               = "/flyteidl.service.AdminService/ListLaunchPlans"
-	AdminService_UpdateLaunchPlan_FullMethodName              = "/flyteidl.service.AdminService/UpdateLaunchPlan"
-	AdminService_CreateExecution_FullMethodName               = "/flyteidl.service.AdminService/CreateExecution"
-	AdminService_RelaunchExecution_FullMethodName             = "/flyteidl.service.AdminService/RelaunchExecution"
-	AdminService_RecoverExecution_FullMethodName              = "/flyteidl.service.AdminService/RecoverExecution"
-	AdminService_GetExecution_FullMethodName                  = "/flyteidl.service.AdminService/GetExecution"
-	AdminService_UpdateExecution_FullMethodName               = "/flyteidl.service.AdminService/UpdateExecution"
-	AdminService_GetExecutionData_FullMethodName              = "/flyteidl.service.AdminService/GetExecutionData"
-	AdminService_ListExecutions_FullMethodName                = "/flyteidl.service.AdminService/ListExecutions"
-	AdminService_TerminateExecution_FullMethodName            = "/flyteidl.service.AdminService/TerminateExecution"
-	AdminService_GetNodeExecution_FullMethodName              = "/flyteidl.service.AdminService/GetNodeExecution"
-	AdminService_GetDynamicNodeWorkflow_FullMethodName        = "/flyteidl.service.AdminService/GetDynamicNodeWorkflow"
-	AdminService_ListNodeExecutions_FullMethodName            = "/flyteidl.service.AdminService/ListNodeExecutions"
-	AdminService_ListNodeExecutionsForTask_FullMethodName     = "/flyteidl.service.AdminService/ListNodeExecutionsForTask"
-	AdminService_GetNodeExecutionData_FullMethodName          = "/flyteidl.service.AdminService/GetNodeExecutionData"
-	AdminService_RegisterProject_FullMethodName               = "/flyteidl.service.AdminService/RegisterProject"
-	AdminService_UpdateProject_FullMethodName                 = "/flyteidl.service.AdminService/UpdateProject"
-	AdminService_GetProject_FullMethodName                    = "/flyteidl.service.AdminService/GetProject"
-	AdminService_ListProjects_FullMethodName                  = "/flyteidl.service.AdminService/ListProjects"
-	AdminService_CreateWorkflowEvent_FullMethodName           = "/flyteidl.service.AdminService/CreateWorkflowEvent"
-	AdminService_CreateNodeEvent_FullMethodName               = "/flyteidl.service.AdminService/CreateNodeEvent"
-	AdminService_CreateTaskEvent_FullMethodName               = "/flyteidl.service.AdminService/CreateTaskEvent"
-	AdminService_GetTaskExecution_FullMethodName              = "/flyteidl.service.AdminService/GetTaskExecution"
-	AdminService_ListTaskExecutions_FullMethodName            = "/flyteidl.service.AdminService/ListTaskExecutions"
-	AdminService_GetTaskExecutionData_FullMethodName          = "/flyteidl.service.AdminService/GetTaskExecutionData"
-	AdminService_UpdateProjectDomainAttributes_FullMethodName = "/flyteidl.service.AdminService/UpdateProjectDomainAttributes"
-	AdminService_GetProjectDomainAttributes_FullMethodName    = "/flyteidl.service.AdminService/GetProjectDomainAttributes"
-	AdminService_DeleteProjectDomainAttributes_FullMethodName = "/flyteidl.service.AdminService/DeleteProjectDomainAttributes"
-	AdminService_UpdateProjectAttributes_FullMethodName       = "/flyteidl.service.AdminService/UpdateProjectAttributes"
-	AdminService_GetProjectAttributes_FullMethodName          = "/flyteidl.service.AdminService/GetProjectAttributes"
-	AdminService_DeleteProjectAttributes_FullMethodName       = "/flyteidl.service.AdminService/DeleteProjectAttributes"
-	AdminService_UpdateWorkflowAttributes_FullMethodName      = "/flyteidl.service.AdminService/UpdateWorkflowAttributes"
-	AdminService_GetWorkflowAttributes_FullMethodName         = "/flyteidl.service.AdminService/GetWorkflowAttributes"
-	AdminService_DeleteWorkflowAttributes_FullMethodName      = "/flyteidl.service.AdminService/DeleteWorkflowAttributes"
-	AdminService_ListMatchableAttributes_FullMethodName       = "/flyteidl.service.AdminService/ListMatchableAttributes"
-	AdminService_ListNamedEntities_FullMethodName             = "/flyteidl.service.AdminService/ListNamedEntities"
-	AdminService_GetNamedEntity_FullMethodName                = "/flyteidl.service.AdminService/GetNamedEntity"
-	AdminService_UpdateNamedEntity_FullMethodName             = "/flyteidl.service.AdminService/UpdateNamedEntity"
-	AdminService_GetVersion_FullMethodName                    = "/flyteidl.service.AdminService/GetVersion"
-	AdminService_GetDescriptionEntity_FullMethodName          = "/flyteidl.service.AdminService/GetDescriptionEntity"
-	AdminService_ListDescriptionEntities_FullMethodName       = "/flyteidl.service.AdminService/ListDescriptionEntities"
-	AdminService_GetExecutionMetrics_FullMethodName           = "/flyteidl.service.AdminService/GetExecutionMetrics"
-	AdminService_GetExecutionCounts_FullMethodName            = "/flyteidl.service.AdminService/GetExecutionCounts"
-	AdminService_GetRunningExecutionsCount_FullMethodName     = "/flyteidl.service.AdminService/GetRunningExecutionsCount"
+	AdminService_CreateTask_FullMethodName                       = "/flyteidl.service.AdminService/CreateTask"
+	AdminService_GetTask_FullMethodName                          = "/flyteidl.service.AdminService/GetTask"
+	AdminService_ListTaskIds_FullMethodName                      = "/flyteidl.service.AdminService/ListTaskIds"
+	AdminService_ListTasks_FullMethodName                        = "/flyteidl.service.AdminService/ListTasks"
+	AdminService_CreateWorkflow_FullMethodName                   = "/flyteidl.service.AdminService/CreateWorkflow"
+	AdminService_GetWorkflow_FullMethodName                      = "/flyteidl.service.AdminService/GetWorkflow"
+	AdminService_ListWorkflowIds_FullMethodName                  = "/flyteidl.service.AdminService/ListWorkflowIds"
+	AdminService_ListWorkflows_FullMethodName                    = "/flyteidl.service.AdminService/ListWorkflows"
+	AdminService_CreateLaunchPlan_FullMethodName                 = "/flyteidl.service.AdminService/CreateLaunchPlan"
+	AdminService_GetLaunchPlan_FullMethodName                    = "/flyteidl.service.AdminService/GetLaunchPlan"
+	AdminService_GetActiveLaunchPlan_FullMethodName              = "/flyteidl.service.AdminService/GetActiveLaunchPlan"
+	AdminService_ListActiveLaunchPlans_FullMethodName            = "/flyteidl.service.AdminService/ListActiveLaunchPlans"
+	AdminService_ListLaunchPlanIds_FullMethodName                = "/flyteidl.service.AdminService/ListLaunchPlanIds"
+	AdminService_ListLaunchPlans_FullMethodName                  = "/flyteidl.service.AdminService/ListLaunchPlans"
+	AdminService_UpdateLaunchPlan_FullMethodName                 = "/flyteidl.service.AdminService/UpdateLaunchPlan"
+	AdminService_CreateExecution_FullMethodName                  = "/flyteidl.service.AdminService/CreateExecution"
+	AdminService_RelaunchExecution_FullMethodName                = "/flyteidl.service.AdminService/RelaunchExecution"
+	AdminService_RecoverExecution_FullMethodName                 = "/flyteidl.service.AdminService/RecoverExecution"
+	AdminService_GetExecution_FullMethodName                     = "/flyteidl.service.AdminService/GetExecution"
+	AdminService_UpdateExecution_FullMethodName                  = "/flyteidl.service.AdminService/UpdateExecution"
+	AdminService_GetExecutionData_FullMethodName                 = "/flyteidl.service.AdminService/GetExecutionData"
+	AdminService_ListExecutions_FullMethodName                   = "/flyteidl.service.AdminService/ListExecutions"
+	AdminService_TerminateExecution_FullMethodName               = "/flyteidl.service.AdminService/TerminateExecution"
+	AdminService_GetNodeExecution_FullMethodName                 = "/flyteidl.service.AdminService/GetNodeExecution"
+	AdminService_GetDynamicNodeWorkflow_FullMethodName           = "/flyteidl.service.AdminService/GetDynamicNodeWorkflow"
+	AdminService_ListNodeExecutions_FullMethodName               = "/flyteidl.service.AdminService/ListNodeExecutions"
+	AdminService_ListNodeExecutionsForTask_FullMethodName        = "/flyteidl.service.AdminService/ListNodeExecutionsForTask"
+	AdminService_GetNodeExecutionData_FullMethodName             = "/flyteidl.service.AdminService/GetNodeExecutionData"
+	AdminService_RegisterProject_FullMethodName                  = "/flyteidl.service.AdminService/RegisterProject"
+	AdminService_UpdateProject_FullMethodName                    = "/flyteidl.service.AdminService/UpdateProject"
+	AdminService_GetProject_FullMethodName                       = "/flyteidl.service.AdminService/GetProject"
+	AdminService_ListProjects_FullMethodName                     = "/flyteidl.service.AdminService/ListProjects"
+	AdminService_CreateWorkflowEvent_FullMethodName              = "/flyteidl.service.AdminService/CreateWorkflowEvent"
+	AdminService_CreateNodeEvent_FullMethodName                  = "/flyteidl.service.AdminService/CreateNodeEvent"
+	AdminService_CreateTaskEvent_FullMethodName                  = "/flyteidl.service.AdminService/CreateTaskEvent"
+	AdminService_GetTaskExecution_FullMethodName                 = "/flyteidl.service.AdminService/GetTaskExecution"
+	AdminService_ListTaskExecutions_FullMethodName               = "/flyteidl.service.AdminService/ListTaskExecutions"
+	AdminService_GetTaskExecutionData_FullMethodName             = "/flyteidl.service.AdminService/GetTaskExecutionData"
+	AdminService_UpdateProjectDomainAttributes_FullMethodName    = "/flyteidl.service.AdminService/UpdateProjectDomainAttributes"
+	AdminService_GetProjectDomainAttributes_FullMethodName       = "/flyteidl.service.AdminService/GetProjectDomainAttributes"
+	AdminService_DeleteProjectDomainAttributes_FullMethodName    = "/flyteidl.service.AdminService/DeleteProjectDomainAttributes"
+	AdminService_UpdateProjectAttributes_FullMethodName          = "/flyteidl.service.AdminService/UpdateProjectAttributes"
+	AdminService_GetProjectAttributes_FullMethodName             = "/flyteidl.service.AdminService/GetProjectAttributes"
+	AdminService_DeleteProjectAttributes_FullMethodName          = "/flyteidl.service.AdminService/DeleteProjectAttributes"
+	AdminService_UpdateWorkflowAttributes_FullMethodName         = "/flyteidl.service.AdminService/UpdateWorkflowAttributes"
+	AdminService_GetWorkflowAttributes_FullMethodName            = "/flyteidl.service.AdminService/GetWorkflowAttributes"
+	AdminService_DeleteWorkflowAttributes_FullMethodName         = "/flyteidl.service.AdminService/DeleteWorkflowAttributes"
+	AdminService_ListMatchableAttributes_FullMethodName          = "/flyteidl.service.AdminService/ListMatchableAttributes"
+	AdminService_ListNamedEntities_FullMethodName                = "/flyteidl.service.AdminService/ListNamedEntities"
+	AdminService_GetNamedEntity_FullMethodName                   = "/flyteidl.service.AdminService/GetNamedEntity"
+	AdminService_UpdateNamedEntity_FullMethodName                = "/flyteidl.service.AdminService/UpdateNamedEntity"
+	AdminService_GetVersion_FullMethodName                       = "/flyteidl.service.AdminService/GetVersion"
+	AdminService_GetDescriptionEntity_FullMethodName             = "/flyteidl.service.AdminService/GetDescriptionEntity"
+	AdminService_ListDescriptionEntities_FullMethodName          = "/flyteidl.service.AdminService/ListDescriptionEntities"
+	AdminService_GetExecutionMetrics_FullMethodName              = "/flyteidl.service.AdminService/GetExecutionMetrics"
+	AdminService_GetExecutionCounts_FullMethodName               = "/flyteidl.service.AdminService/GetExecutionCounts"
+	AdminService_GetRunningExecutionsCount_FullMethodName        = "/flyteidl.service.AdminService/GetRunningExecutionsCount"
+	AdminService_GetConfiguration_FullMethodName                 = "/flyteidl.service.AdminService/GetConfiguration"
+	AdminService_UpdateProjectDomainConfiguration_FullMethodName = "/flyteidl.service.AdminService/UpdateProjectDomainConfiguration"
 )
 
 // AdminServiceClient is the client API for AdminService service.
@@ -201,6 +203,11 @@ type AdminServiceClient interface {
 	// Fetch the count of :ref:`ref_flyteidl.admin.Execution`.
 	GetExecutionCounts(ctx context.Context, in *admin.ExecutionCountsGetRequest, opts ...grpc.CallOption) (*admin.ExecutionCountsGetResponse, error)
 	GetRunningExecutionsCount(ctx context.Context, in *admin.RunningExecutionsCountGetRequest, opts ...grpc.CallOption) (*admin.RunningExecutionsCountGetResponse, error)
+	// Fetch a unified project attribute.
+	GetConfiguration(ctx context.Context, in *admin.ConfigurationGetRequest, opts ...grpc.CallOption) (*admin.ConfigurationGetResponse, error)
+	// Update a unified project attribute.
+	// Requests will fail for stale values of version_to_update
+	UpdateProjectDomainConfiguration(ctx context.Context, in *admin.ConfigurationUpdateRequest, opts ...grpc.CallOption) (*admin.ConfigurationUpdateResponse, error)
 }
 
 type adminServiceClient struct {
@@ -724,6 +731,24 @@ func (c *adminServiceClient) GetRunningExecutionsCount(ctx context.Context, in *
 	return out, nil
 }
 
+func (c *adminServiceClient) GetConfiguration(ctx context.Context, in *admin.ConfigurationGetRequest, opts ...grpc.CallOption) (*admin.ConfigurationGetResponse, error) {
+	out := new(admin.ConfigurationGetResponse)
+	err := c.cc.Invoke(ctx, AdminService_GetConfiguration_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *adminServiceClient) UpdateProjectDomainConfiguration(ctx context.Context, in *admin.ConfigurationUpdateRequest, opts ...grpc.CallOption) (*admin.ConfigurationUpdateResponse, error) {
+	out := new(admin.ConfigurationUpdateResponse)
+	err := c.cc.Invoke(ctx, AdminService_UpdateProjectDomainConfiguration_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AdminServiceServer is the server API for AdminService service.
 // All implementations should embed UnimplementedAdminServiceServer
 // for forward compatibility
@@ -846,6 +871,11 @@ type AdminServiceServer interface {
 	// Fetch the count of :ref:`ref_flyteidl.admin.Execution`.
 	GetExecutionCounts(context.Context, *admin.ExecutionCountsGetRequest) (*admin.ExecutionCountsGetResponse, error)
 	GetRunningExecutionsCount(context.Context, *admin.RunningExecutionsCountGetRequest) (*admin.RunningExecutionsCountGetResponse, error)
+	// Fetch a unified project attribute.
+	GetConfiguration(context.Context, *admin.ConfigurationGetRequest) (*admin.ConfigurationGetResponse, error)
+	// Update a unified project attribute.
+	// Requests will fail for stale values of version_to_update
+	UpdateProjectDomainConfiguration(context.Context, *admin.ConfigurationUpdateRequest) (*admin.ConfigurationUpdateResponse, error)
 }
 
 // UnimplementedAdminServiceServer should be embedded to have forward compatible implementations.
@@ -1022,6 +1052,12 @@ func (UnimplementedAdminServiceServer) GetExecutionCounts(context.Context, *admi
 }
 func (UnimplementedAdminServiceServer) GetRunningExecutionsCount(context.Context, *admin.RunningExecutionsCountGetRequest) (*admin.RunningExecutionsCountGetResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetRunningExecutionsCount not implemented")
+}
+func (UnimplementedAdminServiceServer) GetConfiguration(context.Context, *admin.ConfigurationGetRequest) (*admin.ConfigurationGetResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetConfiguration not implemented")
+}
+func (UnimplementedAdminServiceServer) UpdateProjectDomainConfiguration(context.Context, *admin.ConfigurationUpdateRequest) (*admin.ConfigurationUpdateResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateProjectDomainConfiguration not implemented")
 }
 
 // UnsafeAdminServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -2061,6 +2097,42 @@ func _AdminService_GetRunningExecutionsCount_Handler(srv interface{}, ctx contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AdminService_GetConfiguration_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(admin.ConfigurationGetRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdminServiceServer).GetConfiguration(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AdminService_GetConfiguration_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdminServiceServer).GetConfiguration(ctx, req.(*admin.ConfigurationGetRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AdminService_UpdateProjectDomainConfiguration_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(admin.ConfigurationUpdateRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdminServiceServer).UpdateProjectDomainConfiguration(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AdminService_UpdateProjectDomainConfiguration_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdminServiceServer).UpdateProjectDomainConfiguration(ctx, req.(*admin.ConfigurationUpdateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AdminService_ServiceDesc is the grpc.ServiceDesc for AdminService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -2295,6 +2367,14 @@ var AdminService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetRunningExecutionsCount",
 			Handler:    _AdminService_GetRunningExecutionsCount_Handler,
+		},
+		{
+			MethodName: "GetConfiguration",
+			Handler:    _AdminService_GetConfiguration_Handler,
+		},
+		{
+			MethodName: "UpdateProjectDomainConfiguration",
+			Handler:    _AdminService_UpdateProjectDomainConfiguration_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

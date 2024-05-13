@@ -1,0 +1,181 @@
+syntax = "proto3";
+
+package flyteidl.admin;
+
+option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin";
+
+import "flyteidl/admin/matchable_resource.proto";
+import "flyteidl/core/execution.proto";
+import "flyteidl/admin/cluster_assignment.proto";
+
+
+// Identifier for a configuration.
+message ConfigurationID {
+  // Name of the org the configuration belongs to.
+  // +optional
+  string org = 1;
+
+  // Name of the domain the configuration belongs to.
+  // +optional
+  string domain = 2;
+
+  // Name of the project the configuration belongs to.
+  // +optional
+  string project = 3;
+
+  // Name of the workflow the configuration belongs to.
+  // +optional
+  string workflow = 4;
+}
+
+// The source of an attribute. We may have other sources in the future.
+enum AttributesSource {
+  // The source is unspecified.
+  SOURCE_UNSPECIFIED = 0;
+
+  // The configuration is a global configuration.
+  GLOBAL = 1;
+
+  // The configuration is a domain configuration.
+  DOMAIN = 2;
+
+  // The configuration is a project configuration.
+  PROJECT = 3;
+
+  // The configuration is a project-domain configuration.
+  PROJECT_DOMAIN = 4;
+}
+
+message TaskResourceAttributesWithSource {
+  AttributesSource source = 1;
+  TaskResourceAttributes value = 2;
+}
+
+message ClusterResourceAttributesWithSource {
+  AttributesSource source = 1;
+  ClusterResourceAttributes value = 2;
+}
+
+message ExecutionQueueAttributesWithSource {
+  AttributesSource source = 1;
+  ExecutionQueueAttributes value = 2;
+}
+
+message ExecutionClusterLabelWithSource {
+  AttributesSource source = 1;
+  ExecutionClusterLabel value = 2;
+}
+
+message QualityOfServiceWithSource {
+  AttributesSource source = 1;
+  core.QualityOfService value = 2;
+}
+
+message PluginOverridesWithSource {
+  AttributesSource source = 1;
+  PluginOverrides value = 2;
+}
+
+message WorkflowExecutionConfigWithSource {
+  AttributesSource source = 1;
+  WorkflowExecutionConfig value = 2;
+}
+
+message ClusterAssignmentWithSource {
+  AttributesSource source = 1;
+  ClusterAssignment value = 2;
+}
+
+// Configuration with source information.
+message ConfigurationWithSource {
+  TaskResourceAttributesWithSource task_resource_attributes = 1;
+
+  ClusterResourceAttributesWithSource cluster_resource_attributes = 2;
+
+  ExecutionQueueAttributesWithSource execution_queue_attributes = 3;
+
+  ExecutionClusterLabelWithSource execution_cluster_label = 4;
+
+  QualityOfServiceWithSource quality_of_service = 5;
+
+  PluginOverridesWithSource plugin_overrides = 6;
+
+  WorkflowExecutionConfigWithSource workflow_execution_config = 7;
+
+  ClusterAssignmentWithSource cluster_assignment = 8;
+}
+
+// Configuration is a collection of attributes that can be applied to a project or a workflow.
+message Configuration {
+  TaskResourceAttributes task_resource_attributes = 1;
+
+  ClusterResourceAttributes cluster_resource_attributes = 2;
+
+  ExecutionQueueAttributes execution_queue_attributes = 3;
+
+  ExecutionClusterLabel execution_cluster_label = 4;
+
+  core.QualityOfService quality_of_service = 5;
+
+  PluginOverrides plugin_overrides = 6;
+
+  WorkflowExecutionConfig workflow_execution_config = 7;
+
+  ClusterAssignment cluster_assignment = 8;
+}
+
+// Request to get a configuration.
+message ConfigurationGetRequest {
+  // Identifier of the configuration to get.
+  // +required
+  ConfigurationID id = 1;
+}
+
+// Response of a configuration get request.
+message ConfigurationGetResponse {
+  // Identifier of the configuration.
+  ConfigurationID id = 1;
+
+  // Version of the configuration.
+  string version = 2;
+
+  // Configuration with source information.
+  ConfigurationWithSource configuration = 3;
+}
+
+// Request to update a configuration.
+message ConfigurationUpdateRequest {
+  // Identifier of the configuration to update.
+  // +required
+  ConfigurationID id = 1;
+
+  // Version of the configuration to update, which should to be the version of the currently active document.
+  // +required
+  string version_to_update = 2;
+
+  // Configuration to update.
+  // +required
+  Configuration configuration = 3;
+}
+
+// Response of a configuration update request.
+message ConfigurationUpdateResponse {
+  // Identifier of the updated configuration.
+  ConfigurationID id = 1;
+
+  // Version of the updated configuration.
+  string version = 2;
+
+  // Updated configuration with source information.
+  ConfigurationWithSource configuration = 3;
+}
+
+message ConfigurationDocument {
+  // Version of the configuration document.
+  string version = 1;
+
+  // All configurations in the document.
+  // The key is the string serialized ConfigurationID with (https://pkg.go.dev/github.com/golang/protobuf/jsonpb#Marshaler.Marshal).
+  map<string, Configuration> configurations = 3;
+}
+

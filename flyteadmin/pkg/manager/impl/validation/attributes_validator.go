@@ -38,6 +38,38 @@ func validateMatchingAttributes(attributes *admin.MatchingAttributes, identifier
 		"Unrecognized matching attributes type for request %s", identifier)
 }
 
+func ValidateProjectAttributesUpdateRequest(ctx context.Context,
+	db repositoryInterfaces.Repository,
+	request admin.ProjectAttributesUpdateRequest) (
+	admin.MatchableResource, error) {
+
+	if request.Attributes == nil {
+		return defaultMatchableResource, shared.GetMissingArgumentError(shared.Attributes)
+	}
+	if err := ValidateProjectExistsAndActive(ctx, db, request.Attributes.Project, request.Attributes.Org); err != nil {
+		return defaultMatchableResource, err
+	}
+
+	return validateMatchingAttributes(request.Attributes.MatchingAttributes, request.Attributes.Project)
+}
+
+func ValidateProjectAttributesGetRequest(ctx context.Context, db repositoryInterfaces.Repository,
+	request admin.ProjectAttributesGetRequest) error {
+	if err := ValidateProjectExistsAndActive(ctx, db, request.Project, request.Org); err != nil {
+		return err
+	}
+	return nil
+}
+
+func ValidateProjectAttributesDeleteRequest(ctx context.Context,
+	db repositoryInterfaces.Repository,
+	request admin.ProjectAttributesDeleteRequest) error {
+	if err := ValidateProjectExistsAndActive(ctx, db, request.Project, request.Org); err != nil {
+		return err
+	}
+	return nil
+}
+
 func ValidateProjectDomainAttributesUpdateRequest(ctx context.Context,
 	db repositoryInterfaces.Repository, config runtimeInterfaces.ApplicationConfiguration,
 	request admin.ProjectDomainAttributesUpdateRequest) (
@@ -51,21 +83,6 @@ func ValidateProjectDomainAttributesUpdateRequest(ctx context.Context,
 
 	return validateMatchingAttributes(request.Attributes.MatchingAttributes,
 		fmt.Sprintf("%s-%s", request.Attributes.Project, request.Attributes.Domain))
-}
-
-func ValidateProjectAttributesUpdateRequest(ctx context.Context,
-	db repositoryInterfaces.Repository,
-	request admin.ProjectAttributesUpdateRequest) (
-	admin.MatchableResource, error) {
-
-	if request.Attributes == nil {
-		return defaultMatchableResource, shared.GetMissingArgumentError(shared.Attributes)
-	}
-	if err := ValidateProjectForUpdate(ctx, db, request.Attributes.Project, request.Attributes.Org); err != nil {
-		return defaultMatchableResource, err
-	}
-
-	return validateMatchingAttributes(request.Attributes.MatchingAttributes, request.Attributes.Project)
 }
 
 func ValidateProjectDomainAttributesGetRequest(ctx context.Context, db repositoryInterfaces.Repository,

@@ -52,6 +52,13 @@ type FeatureGates struct {
 	EnableArtifacts bool `json:"enableArtifacts" pflag:",Enable artifacts feature."`
 }
 
+type ResourceAttributesMode int
+
+const (
+	ResourceAttributesModeResource ResourceAttributesMode = iota
+	ResourceAttributesModeConfiguration
+)
+
 // ApplicationConfig is the base configuration to start admin
 type ApplicationConfig struct {
 	// The RoleName key inserted as an annotation (https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/)
@@ -103,6 +110,8 @@ type ApplicationConfig struct {
 	Envs map[string]string `json:"envs,omitempty"`
 
 	FeatureGates FeatureGates `json:"featureGates" pflag:",Enable experimental features."`
+
+	ResourceAttributesMode ResourceAttributesMode `json:"resourceAttributesMode"`
 }
 
 func (a *ApplicationConfig) GetRoleNameKey() string {
@@ -586,6 +595,8 @@ type Domain struct {
 }
 
 type DomainsConfig = []Domain
+
+//go:generate mockery -name ApplicationConfiguration -output=../mocks -case=underscore
 
 // Defines the interface to return top-level config structs necessary to start up a flyteadmin application.
 type ApplicationConfiguration interface {

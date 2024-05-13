@@ -15,6 +15,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/data"
 	executionCluster "github.com/flyteorg/flyte/flyteadmin/pkg/executioncluster/impl"
 	manager "github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/configurations"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/resources"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories"
@@ -45,6 +46,7 @@ type AdminService struct {
 	MetricsManager           interfaces.MetricsInterface
 	Metrics                  AdminMetrics
 	Artifacts                *artifacts.ArtifactRegistry
+	ConfigurationManager     interfaces.ConfigurationInterface
 }
 
 // Intercepts all admin requests to handle panics during execution.
@@ -84,12 +86,20 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 	dbScope := adminScope.NewSubScope("database")
 	repo := repositories.NewGormRepo(
 		db, errors.NewPostgresErrorTransformer(adminScope.NewSubScope("errors")), dbScope)
+
+	configurationManager, err := configurations.NewConfigurationManager(ctx, repo, configuration, dataStorageClient, configurations.ShouldBootstrapOrUpdateDefault)
+	if err != nil {
+		logger.Fatal(ctx, err)
+	}
+	resourceManager := resources.ConfigureResourceManager(repo, configuration.ApplicationConfiguration(), configurationManager)
+
 	execCluster := executionCluster.GetExecutionCluster(
 		adminScope.NewSubScope("executor").NewSubScope("cluster"),
 		kubeConfig,
 		master,
 		configuration,
-		repo)
+		resourceManager,
+	)
 	workflowBuilder := workflowengineImpl.NewFlyteWorkflowBuilder(
 		adminScope.NewSubScope("builder").NewSubScope("flytepropeller"))
 	workflowExecutor := workflowengineImpl.NewK8sWorkflowExecutor(configuration, execCluster, workflowBuilder, dataStorageClient)
@@ -149,7 +159,7 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 
 	executionManager := manager.NewExecutionManager(repo, pluginRegistry, configuration, dataStorageClient,
 		adminScope.NewSubScope("execution_manager"), adminScope.NewSubScope("user_execution_metrics"),
-		publisher, urlData, workflowManager, namedEntityManager, eventPublisher, cloudEventPublisher, executionEventWriter, artifactRegistry)
+		publisher, urlData, workflowManager, namedEntityManager, eventPublisher, cloudEventPublisher, executionEventWriter, artifactRegistry, resourceManager)
 	versionManager := manager.NewVersionManager()
 
 	scheduledWorkflowExecutor := workflowScheduler.GetWorkflowExecutor(executionManager, launchPlanManager)
@@ -172,7 +182,7 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 	logger.Info(ctx, "Initializing a new AdminService")
 	return &AdminService{
 		TaskManager: manager.NewTaskManager(repo, configuration, workflowengineImpl.NewCompiler(),
-			adminScope.NewSubScope("task_manager"), artifactRegistry),
+			adminScope.NewSubScope("task_manager"), artifactRegistry, resourceManager),
 		WorkflowManager:          workflowManager,
 		LaunchPlanManager:        launchPlanManager,
 		ExecutionManager:         executionManager,
@@ -181,8 +191,9 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 		VersionManager:           versionManager,
 		NodeExecutionManager:     nodeExecutionManager,
 		TaskExecutionManager:     taskExecutionManager,
+		ConfigurationManager:     configurationManager,
 		ProjectManager:           manager.NewProjectManager(repo, configuration),
-		ResourceManager:          resources.NewResourceManager(repo, configuration.ApplicationConfiguration()),
+		ResourceManager:          resourceManager,
 		MetricsManager: manager.NewMetricsManager(workflowManager, executionManager, nodeExecutionManager,
 			taskExecutionManager, adminScope.NewSubScope("metrics_manager")),
 		Metrics:   InitMetrics(adminScope),

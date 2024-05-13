@@ -6,6 +6,7 @@ const (
 	Org                   = "org"
 	Project               = "project"
 	Domain                = "domain"
+	Workflow              = "workflow"
 	Name                  = "name"
 	ID                    = "id"
 	Version               = "version"
@@ -40,4 +41,5 @@ const (
 	StartedAt          = "started_at"
 	ExecutionCreatedAt = "execution_created_at"
 	ExecutionUpdatedAt = "execution_updated_at"
+	Configuration      = "configuration"
 )

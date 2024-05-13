@@ -545,6 +545,54 @@ func (_m *AdminServiceClient) GetActiveLaunchPlan(ctx context.Context, in *admin
 	return r0, r1
 }
 
+type AdminServiceClient_GetConfiguration struct {
+	*mock.Call
+}
+
+func (_m AdminServiceClient_GetConfiguration) Return(_a0 *admin.ConfigurationGetResponse, _a1 error) *AdminServiceClient_GetConfiguration {
+	return &AdminServiceClient_GetConfiguration{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminServiceClient) OnGetConfiguration(ctx context.Context, in *admin.ConfigurationGetRequest, opts ...grpc.CallOption) *AdminServiceClient_GetConfiguration {
+	c_call := _m.On("GetConfiguration", ctx, in, opts)
+	return &AdminServiceClient_GetConfiguration{Call: c_call}
+}
+
+func (_m *AdminServiceClient) OnGetConfigurationMatch(matchers ...interface{}) *AdminServiceClient_GetConfiguration {
+	c_call := _m.On("GetConfiguration", matchers...)
+	return &AdminServiceClient_GetConfiguration{Call: c_call}
+}
+
+// GetConfiguration provides a mock function with given fields: ctx, in, opts
+func (_m *AdminServiceClient) GetConfiguration(ctx context.Context, in *admin.ConfigurationGetRequest, opts ...grpc.CallOption) (*admin.ConfigurationGetResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *admin.ConfigurationGetResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.ConfigurationGetRequest, ...grpc.CallOption) *admin.ConfigurationGetResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.ConfigurationGetResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.ConfigurationGetRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type AdminServiceClient_GetDescriptionEntity struct {
 	*mock.Call
 }
@@ -2697,6 +2745,54 @@ func (_m *AdminServiceClient) UpdateProjectDomainAttributes(ctx context.Context,
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, *admin.ProjectDomainAttributesUpdateRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type AdminServiceClient_UpdateProjectDomainConfiguration struct {
+	*mock.Call
+}
+
+func (_m AdminServiceClient_UpdateProjectDomainConfiguration) Return(_a0 *admin.ConfigurationUpdateResponse, _a1 error) *AdminServiceClient_UpdateProjectDomainConfiguration {
+	return &AdminServiceClient_UpdateProjectDomainConfiguration{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminServiceClient) OnUpdateProjectDomainConfiguration(ctx context.Context, in *admin.ConfigurationUpdateRequest, opts ...grpc.CallOption) *AdminServiceClient_UpdateProjectDomainConfiguration {
+	c_call := _m.On("UpdateProjectDomainConfiguration", ctx, in, opts)
+	return &AdminServiceClient_UpdateProjectDomainConfiguration{Call: c_call}
+}
+
+func (_m *AdminServiceClient) OnUpdateProjectDomainConfigurationMatch(matchers ...interface{}) *AdminServiceClient_UpdateProjectDomainConfiguration {
+	c_call := _m.On("UpdateProjectDomainConfiguration", matchers...)
+	return &AdminServiceClient_UpdateProjectDomainConfiguration{Call: c_call}
+}
+
+// UpdateProjectDomainConfiguration provides a mock function with given fields: ctx, in, opts
+func (_m *AdminServiceClient) UpdateProjectDomainConfiguration(ctx context.Context, in *admin.ConfigurationUpdateRequest, opts ...grpc.CallOption) (*admin.ConfigurationUpdateResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *admin.ConfigurationUpdateResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.ConfigurationUpdateRequest, ...grpc.CallOption) *admin.ConfigurationUpdateResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.ConfigurationUpdateResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.ConfigurationUpdateRequest, ...grpc.CallOption) error); ok {
 		r1 = rf(ctx, in, opts...)
 	} else {
 		r1 = ret.Error(1)

@@ -6,23 +6,59 @@ package tests
 import (
 	"context"
 	"fmt"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/runtime"
+	runtimeIfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"gorm.io/gorm"
 	"testing"
-
-	"github.com/golang/protobuf/proto"
-	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/golang/protobuf/proto"
+	"github.com/stretchr/testify/assert"
 )
 
-var matchingAttributes = &admin.MatchingAttributes{
+var matchingTaskResourceAttributes = &admin.MatchingAttributes{
 	Target: &admin.MatchingAttributes_TaskResourceAttributes{
 		TaskResourceAttributes: &admin.TaskResourceAttributes{
 			Defaults: &admin.TaskResourceSpec{
 				Cpu: "1",
 			},
+			Limits: &admin.TaskResourceSpec{
+				Cpu: "2",
+			},
 		},
 	},
+}
+
+var matchingExecutionQueueAttributes = &admin.MatchingAttributes{
+	Target: &admin.MatchingAttributes_ExecutionQueueAttributes{
+		ExecutionQueueAttributes: &admin.ExecutionQueueAttributes{
+			Tags: []string{
+				"4", "5", "6",
+			},
+		},
+	},
+}
+
+func rollbackToDefaultConfiguration(db *gorm.DB) {
+	ctx := context.Background()
+	var defaultConfiguration models.ConfigurationDocumentMetadata
+	err := db.Order("created_at asc").First(&defaultConfiguration).Error
+	if err != nil {
+		logger.Fatalf(ctx, "Error fetching default configuration %v", err)
+	}
+	err = db.Where("id != ?", defaultConfiguration.ID).Delete(&models.ConfigurationDocumentMetadata{}).Error
+	if err != nil {
+		logger.Fatalf(ctx, "Error deleting configurations %v", err)
+	}
+	err = db.Model(&models.ConfigurationDocumentMetadata{}).Where(&models.ConfigurationDocumentMetadata{
+		Version: defaultConfiguration.Version,
+	}).Update("active", true).Error
+	if err != nil {
+		logger.Fatalf(ctx, "Error updating default configuration %v", err)
+	}
 }
 
 func TestUpdateClusterResourceAttributes(t *testing.T) {
@@ -41,7 +77,13 @@ func TestUpdateClusterResourceAttributes(t *testing.T) {
 	defer conn.Close()
 	db, err := repositories.GetDB(ctx, getDbConfig(), getLoggerConfig())
 	assert.Nil(t, err)
-	truncateTableForTesting(db, "resources")
+	configuration := runtime.NewConfigurationProvider()
+	if configuration.ApplicationConfiguration().GetTopLevelConfig().ResourceAttributesMode == runtimeIfaces.ResourceAttributesModeConfiguration {
+		rollbackToDefaultConfiguration(db)
+	} else {
+		truncateTableForTesting(db, "resources")
+	}
+
 	sqlDB, err := db.DB()
 	assert.Nil(t, err)
 	err = sqlDB.Close()
@@ -132,7 +174,12 @@ func TestUpdateProjectDomainAttributes(t *testing.T) {
 	defer conn.Close()
 	db, err := repositories.GetDB(ctx, getDbConfig(), getLoggerConfig())
 	assert.Nil(t, err)
-	truncateTableForTesting(db, "resources")
+	configuration := runtime.NewConfigurationProvider()
+	if configuration.ApplicationConfiguration().GetTopLevelConfig().ResourceAttributesMode == runtimeIfaces.ResourceAttributesModeConfiguration {
+		rollbackToDefaultConfiguration(db)
+	} else {
+		truncateTableForTesting(db, "resources")
+	}
 	sqlDB, err := db.DB()
 	assert.Nil(t, err)
 	err = sqlDB.Close()
@@ -142,7 +189,7 @@ func TestUpdateProjectDomainAttributes(t *testing.T) {
 		Attributes: &admin.ProjectDomainAttributes{
 			Project:            "admintests",
 			Domain:             "development",
-			MatchingAttributes: matchingAttributes,
+			MatchingAttributes: matchingTaskResourceAttributes,
 		},
 	}
 
@@ -161,7 +208,7 @@ func TestUpdateProjectDomainAttributes(t *testing.T) {
 		Attributes: &admin.ProjectDomainAttributes{
 			Project:            "admintests",
 			Domain:             "development",
-			MatchingAttributes: matchingAttributes,
+			MatchingAttributes: matchingTaskResourceAttributes,
 		},
 	}, response))
 
@@ -170,6 +217,9 @@ func TestUpdateProjectDomainAttributes(t *testing.T) {
 			TaskResourceAttributes: &admin.TaskResourceAttributes{
 				Defaults: &admin.TaskResourceSpec{
 					Cpu: "1",
+				},
+				Limits: &admin.TaskResourceSpec{
+					Cpu: "2",
 				},
 			},
 		},
@@ -215,7 +265,7 @@ func TestUpdateProjectDomainAttributes(t *testing.T) {
 			Project:            "admintests",
 			Domain:             "development",
 			Workflow:           "",
-			MatchingAttributes: matchingAttributes,
+			MatchingAttributes: matchingTaskResourceAttributes,
 		},
 	}, workflowResponse))
 
@@ -244,7 +294,12 @@ func TestUpdateWorkflowAttributes(t *testing.T) {
 
 	db, err := repositories.GetDB(ctx, getDbConfig(), getLoggerConfig())
 	assert.Nil(t, err)
-	truncateTableForTesting(db, "resources")
+	configuration := runtime.NewConfigurationProvider()
+	if configuration.ApplicationConfiguration().GetTopLevelConfig().ResourceAttributesMode == runtimeIfaces.ResourceAttributesModeConfiguration {
+		rollbackToDefaultConfiguration(db)
+	} else {
+		truncateTableForTesting(db, "resources")
+	}
 	sqlDB, err := db.DB()
 	assert.Nil(t, err)
 	err = sqlDB.Close()
@@ -255,7 +310,7 @@ func TestUpdateWorkflowAttributes(t *testing.T) {
 			Project:            "admintests",
 			Domain:             "development",
 			Workflow:           "workflow",
-			MatchingAttributes: matchingAttributes,
+			MatchingAttributes: matchingTaskResourceAttributes,
 		},
 	}
 
@@ -276,7 +331,7 @@ func TestUpdateWorkflowAttributes(t *testing.T) {
 			Project:            "admintests",
 			Domain:             "development",
 			Workflow:           "workflow",
-			MatchingAttributes: matchingAttributes,
+			MatchingAttributes: matchingTaskResourceAttributes,
 		},
 	}, response))
 
@@ -305,32 +360,71 @@ func TestListAllMatchableAttributes(t *testing.T) {
 
 	db, err := repositories.GetDB(ctx, getDbConfig(), getLoggerConfig())
 	assert.Nil(t, err)
-	truncateTableForTesting(db, "resources")
+	configuration := runtime.NewConfigurationProvider()
+	if configuration.ApplicationConfiguration().GetTopLevelConfig().ResourceAttributesMode == runtimeIfaces.ResourceAttributesModeConfiguration {
+		rollbackToDefaultConfiguration(db)
+	} else {
+		truncateTableForTesting(db, "resources")
+	}
 	sqlDB, err := db.DB()
 	assert.Nil(t, err)
 	err = sqlDB.Close()
 	assert.Nil(t, err)
 
-	req := admin.ProjectDomainAttributesUpdateRequest{
+	_, err = client.UpdateProjectDomainAttributes(ctx, &admin.ProjectDomainAttributesUpdateRequest{
 		Attributes: &admin.ProjectDomainAttributes{
 			Project:            "admintests",
 			Domain:             "development",
-			MatchingAttributes: matchingAttributes,
+			MatchingAttributes: matchingTaskResourceAttributes,
 		},
-	}
+	})
+	assert.Nil(t, err)
 
-	_, err = client.UpdateProjectDomainAttributes(ctx, &req)
+	_, err = client.UpdateWorkflowAttributes(ctx, &admin.WorkflowAttributesUpdateRequest{
+		Attributes: &admin.WorkflowAttributes{
+			Project:            "admintests",
+			Domain:             "development",
+			Workflow:           "workflow",
+			MatchingAttributes: matchingTaskResourceAttributes,
+		},
+	})
+	assert.Nil(t, err)
+
+	_, err = client.UpdateProjectAttributes(ctx, &admin.ProjectAttributesUpdateRequest{
+		Attributes: &admin.ProjectAttributes{
+			Project:            "admintests",
+			MatchingAttributes: matchingTaskResourceAttributes,
+		},
+	})
+	assert.Nil(t, err)
+
+	_, err = client.UpdateProjectAttributes(ctx, &admin.ProjectAttributesUpdateRequest{
+		Attributes: &admin.ProjectAttributes{
+			Project:            "admintests",
+			MatchingAttributes: matchingExecutionQueueAttributes,
+		},
+	})
 	assert.Nil(t, err)
 
 	response, err := client.ListMatchableAttributes(ctx, &admin.ListMatchableAttributesRequest{
 		ResourceType: admin.MatchableResource_TASK_RESOURCE,
 	})
 	assert.Nil(t, err)
-	assert.Len(t, response.Configurations, 1)
+	assert.Len(t, response.Configurations, 3)
 	assert.True(t, proto.Equal(&admin.MatchableAttributesConfiguration{
 		Project:    "admintests",
 		Domain:     "development",
-		Attributes: matchingAttributes,
+		Workflow:   "workflow",
+		Attributes: matchingTaskResourceAttributes,
 	}, response.Configurations[0]))
+	assert.True(t, proto.Equal(&admin.MatchableAttributesConfiguration{
+		Project:    "admintests",
+		Domain:     "development",
+		Attributes: matchingTaskResourceAttributes,
+	}, response.Configurations[1]))
+	assert.True(t, proto.Equal(&admin.MatchableAttributesConfiguration{
+		Project:    "admintests",
+		Attributes: matchingTaskResourceAttributes,
+	}, response.Configurations[2]))
 
 }

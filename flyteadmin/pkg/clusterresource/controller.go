@@ -42,6 +42,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/executioncluster"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/executioncluster/impl"
 	executionclusterIfaces "github.com/flyteorg/flyte/flyteadmin/pkg/executioncluster/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/configurations"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/resources"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories"
 	errors2 "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
@@ -51,6 +52,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 const namespaceVariable = "namespace"
@@ -711,7 +713,18 @@ func NewClusterResourceControllerFromConfig(ctx context.Context, scope promutils
 		repo := repositories.NewGormRepo(
 			db, errors2.NewPostgresErrorTransformer(dbScope.NewSubScope("errors")), dbScope)
 
-		adminDataProvider = impl2.NewDatabaseAdminDataProvider(repo, configuration, resources.NewResourceManager(repo, configuration.ApplicationConfiguration()))
+		dataStorageClient, err := storage.NewDataStore(storage.GetConfig(), scope.NewSubScope("storage"))
+		if err != nil {
+			logger.Errorf(ctx, "Failed to create data storage client: %v", err)
+			return nil, err
+		}
+		configurationManager, err := configurations.NewConfigurationManager(ctx, repo, configuration, dataStorageClient, configurations.ShouldNotBootstrapOrUpdateDefault)
+		if err != nil {
+			logger.Errorf(ctx, "Failed to create configuration manager: %v", err)
+			return nil, err
+		}
+		resourceManager := resources.ConfigureResourceManager(repo, configuration.ApplicationConfiguration(), configurationManager)
+		adminDataProvider = impl2.NewDatabaseAdminDataProvider(repo, configuration, resourceManager)
 	}
 
 	return NewClusterResourceController(adminDataProvider, listTargetsProvider, scope), nil

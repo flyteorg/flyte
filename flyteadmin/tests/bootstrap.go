@@ -103,6 +103,7 @@ func truncateAllTablesForTestingOnly() {
 	db.Exec(TruncateSchedulableEntitiesSnapshots)
 	db.Exec(TruncateAdminTags)
 	db.Exec(TruncateExecutionAdminTags)
+	rollbackToDefaultConfiguration(db)
 }
 
 func populateWorkflowExecutionForTestingOnly(project, domain, name string) {

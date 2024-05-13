@@ -24,7 +24,6 @@ import (
 	dataInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/data/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/executions"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/resources"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/shared"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/util"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/validation"
@@ -2107,9 +2106,9 @@ func NewExecutionManager(db repositoryInterfaces.Repository, pluginRegistry *plu
 	publisher notificationInterfaces.Publisher, urlData dataInterfaces.RemoteURLInterface,
 	workflowManager interfaces.WorkflowInterface, namedEntityManager interfaces.NamedEntityInterface,
 	eventPublisher notificationInterfaces.Publisher, cloudEventPublisher cloudeventInterfaces.Publisher,
-	eventWriter eventWriter.WorkflowExecutionEventWriter, artifactRegistry *artifacts.ArtifactRegistry) interfaces.ExecutionInterface {
+	eventWriter eventWriter.WorkflowExecutionEventWriter, artifactRegistry *artifacts.ArtifactRegistry, resourceManager interfaces.ResourceInterface) interfaces.ExecutionInterface {
 
-	queueAllocator := executions.NewQueueAllocator(config, db)
+	queueAllocator := executions.NewQueueAllocator(config, db, resourceManager)
 	systemMetrics := newExecutionSystemMetrics(systemScope)
 
 	userMetrics := executionUserMetrics{
@@ -2122,7 +2121,6 @@ func NewExecutionManager(db repositoryInterfaces.Repository, pluginRegistry *plu
 			"size in bytes of serialized execution outputs"),
 	}
 
-	resourceManager := resources.NewResourceManager(db, config.ApplicationConfiguration())
 	return &ExecutionManager{
 		db:                        db,
 		config:                    config,

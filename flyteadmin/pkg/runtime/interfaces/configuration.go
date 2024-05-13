@@ -1,5 +1,7 @@
 package interfaces
 
+//go:generate mockery -name=Configuration -output=../mocks -case=underscore
+
 // Interface for getting parsed values from a configuration file
 type Configuration interface {
 	ApplicationConfiguration() ApplicationConfiguration

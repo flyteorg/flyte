@@ -1,4 +1,3 @@
-{{- if .Values.cluster_resource_manager.enabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -10,4 +9,3 @@ data:
   {{ .key }}.yaml: | {{ .value | nindent 4 }}
 {{- end }}
 
-{{- end }}

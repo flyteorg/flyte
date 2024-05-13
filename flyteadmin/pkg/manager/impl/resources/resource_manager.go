@@ -256,7 +256,7 @@ func (m *ResourceManager) GetProjectAttributes(ctx context.Context, request admi
 func (m *ResourceManager) DeleteProjectAttributes(ctx context.Context, request admin.ProjectAttributesDeleteRequest) (
 	*admin.ProjectAttributesDeleteResponse, error) {
 
-	if err := validation.ValidateProjectForUpdate(ctx, m.db, request.Project, request.Org); err != nil {
+	if err := validation.ValidateProjectAttributesDeleteRequest(ctx, m.db, request); err != nil {
 		return nil, err
 	}
 	if err := m.db.ResourceRepo().Delete(

@@ -10,6 +10,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/config"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/runtime"
+	runtimeIfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
@@ -41,10 +42,21 @@ func withDB(ctx context.Context, do func(db *gorm.DB) error) error {
 	return do(db)
 }
 
+func combineConditionalMigrations(migrations []*gormigrate.Migration) []*gormigrate.Migration {
+	topLevelConfig := runtime.NewConfigurationProvider().ApplicationConfiguration().GetTopLevelConfig()
+	if topLevelConfig.ResourceAttributesMode == runtimeIfaces.ResourceAttributesModeConfiguration {
+		migrations = append(migrations, config.ResourcesToConfigurationsMigration)
+	} else if topLevelConfig.ResourceAttributesMode == runtimeIfaces.ResourceAttributesModeResource {
+		migrations = append(migrations, config.ConfigurationsToResourcesMigration)
+	}
+	return migrations
+}
+
 // Migrate runs all configured migrations
 func Migrate(ctx context.Context) error {
+	migrations := combineConditionalMigrations(config.Migrations)
 	return withDB(ctx, func(db *gorm.DB) error {
-		m := gormigrate.New(db, gormigrate.DefaultOptions, config.Migrations)
+		m := gormigrate.New(db, gormigrate.DefaultOptions, migrations)
 		if err := m.Migrate(); err != nil {
 			return fmt.Errorf("database migration failed: %v", err)
 		}
@@ -55,8 +67,9 @@ func Migrate(ctx context.Context) error {
 
 // Rollback rolls back the last migration
 func Rollback(ctx context.Context) error {
+	migrations := combineConditionalMigrations(config.Migrations)
 	return withDB(ctx, func(db *gorm.DB) error {
-		m := gormigrate.New(db, gormigrate.DefaultOptions, config.Migrations)
+		m := gormigrate.New(db, gormigrate.DefaultOptions, migrations)
 		err := m.RollbackLast()
 		if err != nil {
 			return fmt.Errorf("could not rollback latest migration: %v", err)

@@ -91,7 +91,7 @@ func TestValidateTaskInvalidProjectAndDomain(t *testing.T) {
 	request := testutils.GetValidTaskRequest()
 	err := ValidateTask(context.Background(), request, testutils.GetRepoWithDefaultProjectAndErr(errors.New("foo")),
 		getMockTaskResources(), mockWhitelistConfigProvider, taskApplicationConfigProvider)
-	assert.EqualError(t, err, "failed to validate that project [project] and domain [domain] are registered, err: [foo]")
+	assert.EqualError(t, err, "failed to validate that project [project] is registered, err: [foo]")
 }
 
 func TestValidateTaskEmptyDomain(t *testing.T) {

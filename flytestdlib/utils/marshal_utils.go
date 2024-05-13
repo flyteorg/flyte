@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
@@ -12,6 +13,7 @@ import (
 )
 
 var jsonPbMarshaler = jsonpb.Marshaler{}
+var jsonPbUnmarshaler = jsonpb.Unmarshaler{}
 
 // UnmarshalStructToPb unmarshals a proto struct into a proto message using jsonPb marshaler.
 func UnmarshalStructToPb(structObj *structpb.Struct, msg proto.Message) error {
@@ -57,6 +59,10 @@ func MarshalPbToStruct(in proto.Message) (out *structpb.Struct, err error) {
 // MarshalPbToString marshals a proto message using jsonPb marshaler to string.
 func MarshalPbToString(msg proto.Message) (string, error) {
 	return jsonPbMarshaler.MarshalToString(msg)
+}
+
+func UnmarshalStringToPb(s string, msg proto.Message) error {
+	return jsonPbUnmarshaler.Unmarshal(strings.NewReader(s), msg)
 }
 
 // MarshalObjToStruct marshals obj into a struct. Will use jsonPb if input is a proto message, otherwise, it'll use json

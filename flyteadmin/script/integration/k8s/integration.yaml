@@ -396,6 +396,12 @@ spec:
           command: ['sh', '-c',
               'until pg_isready -h postgres -p 5432;
           do echo waiting for database; sleep 2; done;']
+        - name: check-minio-ready
+          image: busybox:1.28
+          command: [ 'sh', '-c', "until nslookup minio.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for minio; sleep 2; done" ]
+        - name: upload-dummy-to-minio # we need to upload a dummy file to minio to avoid the issue that the first write to the bucket disappears
+          image: minio/mc:latest
+          command: [ 'sh', '-c', 'mc config host add minio http://minio:9000 minio miniostorage && mc mb minio/flyte && echo "dummy" > /tmp/dummy.txt && mc cp /tmp/dummy.txt minio/flyte' ]
         - name: run-migrations
           image: flyteadmin:test
           imagePullPolicy: IfNotPresent

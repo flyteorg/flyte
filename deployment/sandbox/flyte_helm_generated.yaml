@@ -473,6 +473,28 @@ metadata:
     helm.sh/chart: flyte-v0.1.10
     app.kubernetes.io/managed-by: Helm
 data:
+  storage.yaml: | 
+    storage:
+      type: minio
+      container: "my-s3-bucket"
+      stow:
+        kind: s3
+        config:
+          access_key_id: minio
+          auth_type: accesskey
+          secret_key: miniostorage
+          disable_ssl: true
+          endpoint: http://minio.flyte.svc.cluster.local:9000
+          region: us-east-1
+      signedUrl:
+        stowConfigOverride:
+          endpoint: http://localhost:30084
+      enable-multicontainer: false
+      limits:
+        maxDownloadMBs: 10
+      cache:
+        max_size_mbs: 0
+        target_gc_percent: 70
   cluster_resources.yaml: | 
     cluster_resources:
       customData:
@@ -6933,6 +6955,8 @@ spec:
                 name: flyte-admin-base-config
             - configMap:
                 name: flyte-admin-clusters-config
+            - configMap:
+                name: flyte-clusterresourcesync-config
         name: clusters-config-volume
       - configMap:
           name: clusterresource-template
@@ -7052,7 +7076,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "475154c41cdb06999025ab796aa1264fa3d235df51ac088a39c89c7ce300408"
+        configChecksum: "90e40ffc285c31977149f7c22127efe1e5a1927ec2da5e521e56f23c42a8b9d"
       labels: 
         app.kubernetes.io/name: flyteclusterresourcesync
         app.kubernetes.io/instance: flyte

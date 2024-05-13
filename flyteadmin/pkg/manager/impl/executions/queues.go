@@ -5,7 +5,6 @@ import (
 	"math/rand"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/resources"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
 	repoInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
@@ -106,11 +105,11 @@ func (q *queueAllocatorImpl) GetQueue(ctx context.Context, identifier core.Ident
 	return singleQueueConfiguration{}
 }
 
-func NewQueueAllocator(config runtimeInterfaces.Configuration, db repoInterfaces.Repository) QueueAllocator {
+func NewQueueAllocator(config runtimeInterfaces.Configuration, db repoInterfaces.Repository, resourceManager interfaces.ResourceInterface) QueueAllocator {
 	queueAllocator := queueAllocatorImpl{
 		config:          config,
 		db:              db,
-		resourceManager: resources.NewResourceManager(db, config.ApplicationConfiguration()),
+		resourceManager: resourceManager,
 	}
 	return &queueAllocator
 }

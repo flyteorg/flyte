@@ -315,6 +315,19 @@ metadata:
     helm.sh/chart: flyte-core-v0.1.10
     app.kubernetes.io/managed-by: Helm
 data:
+  storage.yaml: | 
+    storage:
+      type: s3
+      container: "<BUCKET_NAME>"
+      connection:
+        auth-type: iam
+        region: <AWS_REGION>
+      enable-multicontainer: false
+      limits:
+        maxDownloadMBs: 10
+      cache:
+        max_size_mbs: 1024
+        target_gc_percent: 70
   cluster_resources.yaml: | 
     cluster_resources:
       customData:
@@ -798,6 +811,8 @@ spec:
                 name: flyte-admin-base-config
             - configMap:
                 name: flyte-admin-clusters-config
+            - configMap:
+                name: flyte-clusterresourcesync-config
         name: clusters-config-volume
       - configMap:
           name: clusterresource-template
@@ -935,7 +950,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "55ce597c10b17ef6e891f0c9242b17aafb3d7b4e4e414d0a5078d71ad9c804f"
+        configChecksum: "51efe6c46d532e1c15d779a67f23f203b3355a54f8fecf3aff28baee83efade"
       labels: 
         app.kubernetes.io/name: flyteclusterresourcesync
         app.kubernetes.io/instance: flyte

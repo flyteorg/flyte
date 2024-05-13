@@ -24,7 +24,6 @@ func (m *AdminService) UpdateWorkflowAttributes(ctx context.Context, request *ad
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.workflowAttributesEndpointMetrics.update)
 	}
-
 	return response, nil
 }
 
@@ -42,7 +41,6 @@ func (m *AdminService) GetWorkflowAttributes(ctx context.Context, request *admin
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.workflowAttributesEndpointMetrics.get)
 	}
-
 	return response, nil
 }
 
@@ -60,7 +58,6 @@ func (m *AdminService) DeleteWorkflowAttributes(ctx context.Context, request *ad
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.workflowAttributesEndpointMetrics.delete)
 	}
-
 	return response, nil
 }
 
@@ -78,7 +75,6 @@ func (m *AdminService) UpdateProjectDomainAttributes(ctx context.Context, reques
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.projectDomainAttributesEndpointMetrics.update)
 	}
-
 	return response, nil
 }
 
@@ -114,7 +110,6 @@ func (m *AdminService) DeleteProjectDomainAttributes(ctx context.Context, reques
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.workflowAttributesEndpointMetrics.delete)
 	}
-
 	return response, nil
 }
 
@@ -133,7 +128,6 @@ func (m *AdminService) UpdateProjectAttributes(ctx context.Context, request *adm
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.projectAttributesEndpointMetrics.get)
 	}
-
 	return response, nil
 }
 
@@ -152,7 +146,6 @@ func (m *AdminService) GetProjectAttributes(ctx context.Context, request *admin.
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.projectAttributesEndpointMetrics.get)
 	}
-
 	return response, nil
 }
 
@@ -171,7 +164,6 @@ func (m *AdminService) DeleteProjectAttributes(ctx context.Context, request *adm
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.projectAttributesEndpointMetrics.delete)
 	}
-
 	return response, nil
 }
 

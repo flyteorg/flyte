@@ -1,17 +1,27 @@
 package config
 
 import (
+	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"time"
 
 	"github.com/go-gormigrate/gormigrate/v2"
+	"github.com/golang/protobuf/proto"
 	"gorm.io/gorm"
 
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
+	flyteErrors "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/util"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/transformers"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/runtime"
 	schedulerModels "github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/models"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
@@ -1309,9 +1319,200 @@ var ContinuedMigrations = []*gormigrate.Migration{
 			return nil
 		},
 	},
+	{
+		ID: "pg-continue-2024-04-configuration-document-metadata",
+		Migrate: func(tx *gorm.DB) error {
+			type ConfigurationDocumentMetadata struct {
+				ID               uint       `gorm:"index;autoIncrement;not null"`
+				CreatedAt        time.Time  `gorm:"type:time"`
+				UpdatedAt        time.Time  `gorm:"type:time"`
+				DeletedAt        *time.Time `gorm:"index"`
+				Version          string     `gorm:"not null" valid:"length(0|255)"`
+				DocumentLocation storage.DataReference
+				Active           bool
+			}
+			err := tx.AutoMigrate(&ConfigurationDocumentMetadata{})
+			if err != nil {
+				return err
+			}
+			// check if index exist before creating one
+			if !tx.Migrator().HasIndex(&ConfigurationDocumentMetadata{}, "idx_configuration_document_metadata_active") {
+				return tx.Exec("CREATE INDEX idx_configuration_document_metadata_active ON configuration_document_metadata (active) WHERE active = TRUE;").Error
+			}
+			return nil
+		},
+		Rollback: func(tx *gorm.DB) error {
+			return tx.Migrator().DropTable("configuration_document_metadata")
+		},
+	},
+}
+
+var ResourcesToConfigurationsMigration = &gormigrate.Migration{
+	ID: "pg-continue-2024-04-resources-to-configurations",
+	Migrate: func(tx *gorm.DB) error {
+		ctx := context.Background()
+		var resources []models.Resource
+		if err := tx.Find(&resources).Error; err != nil {
+			return err
+		}
+
+		configurationsMap := make(map[string]*admin.Configuration)
+		for _, resource := range resources {
+			if resource.LaunchPlan != "" {
+				logger.Errorf(ctx, "This should not happen. Skipping resource %+v as it is a launch plan.", resource)
+				continue
+			}
+			key, err := util.EncodeConfigurationDocumentKey(ctx, &admin.ConfigurationID{
+				Org:      resource.Org,
+				Project:  resource.Project,
+				Domain:   resource.Domain,
+				Workflow: resource.Workflow,
+			})
+			if err != nil {
+				return err
+			}
+			if _, ok := configurationsMap[key]; !ok {
+				configurationsMap[key] = &admin.Configuration{}
+			}
+			var attributes admin.MatchingAttributes
+			err = proto.Unmarshal(resource.Attributes, &attributes)
+			if err != nil {
+				return err
+			}
+			configurationsMap[key], err = transformers.UpdateMatchingAttributesInConfiguration(&attributes, configurationsMap[key])
+			if err != nil {
+				return err
+			}
+		}
+		configurationDocument := &admin.ConfigurationDocument{
+			Configurations: configurationsMap,
+		}
+		var err error
+		configurationDocument.Version, err = util.GetConfigurationDocumentStringDigest(ctx, *configurationDocument)
+		if err != nil {
+			logger.Errorf(ctx, "failed to generate version for document %+v:, error: %v", configurationDocument.Configurations, err)
+			return err
+		}
+		logger.Debugf(ctx, "generated version %s for document", configurationDocument.Version)
+
+		dataStorageClient, err := getStorageClientForMigration()
+		if err != nil {
+			logger.Errorf(ctx, "failed to get storage client: %v", err)
+			return err
+		}
+		documentLocation, err := common.OffloadConfigurationDocument(context.Background(), dataStorageClient, configurationDocument, configurationDocument.Version)
+		if err != nil {
+			return err
+		}
+
+		configurationDocumentMetadata := models.ConfigurationDocumentMetadata{
+			Version:          configurationDocument.Version,
+			Active:           true,
+			DocumentLocation: documentLocation,
+		}
+		if err := tx.Session(&gorm.Session{AllowGlobalUpdate: true}).Delete(&models.ConfigurationDocumentMetadata{}).Error; err != nil {
+			return err
+		}
+		return tx.Create(&configurationDocumentMetadata).Error
+	},
+	Rollback: func(tx *gorm.DB) error {
+		return tx.Session(&gorm.Session{AllowGlobalUpdate: true}).Delete(&models.ConfigurationDocumentMetadata{}).Error
+	},
+}
+
+var ConfigurationsToResourcesMigration = &gormigrate.Migration{
+	ID: "pg-continue-2024-04-configurations-to-resources",
+	Migrate: func(tx *gorm.DB) error {
+		ctx := context.Background()
+		var configurationDocumentMetadata models.ConfigurationDocumentMetadata
+		err := tx.Where(&models.ConfigurationDocumentMetadata{
+			Active: true,
+		}).Take(&configurationDocumentMetadata).Error
+		if err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				logger.Debugf(ctx, "no active configuration document in configuration table, simply truncating resources table")
+				return tx.Session(&gorm.Session{AllowGlobalUpdate: true}).Delete(&models.Resource{}).Error
+			}
+			return err
+		}
+
+		dataStorageClient, err := getStorageClientForMigration()
+		if err != nil {
+			return err
+		}
+		document := &admin.ConfigurationDocument{}
+		if err := dataStorageClient.ReadProtobuf(ctx, configurationDocumentMetadata.DocumentLocation, document); err != nil {
+			return err
+		}
+
+		resources := make([]models.Resource, 0)
+		for level, configuration := range document.Configurations {
+			id, err := util.DecodeConfigurationDocumentKey(ctx, level)
+			if err != nil {
+				return err
+			}
+
+			// If the project is empty, the configuration is a default one (domain or global). We can skip it.
+			if id.Project == "" {
+				continue
+			}
+			for resourceTypeString, resourceType := range admin.MatchableResource_value {
+				attributes, err := transformers.GetMatchingAttributesFromConfiguration(configuration, admin.MatchableResource(resourceType))
+				if err != nil {
+					if flyteErrors.IsDoesNotExistError(err) {
+						continue
+					}
+					return err
+				}
+				bytes, err := proto.Marshal(attributes)
+				if err != nil {
+					return err
+				}
+
+				var priority models.ResourcePriority
+				if id.Workflow != "" {
+					priority = models.ResourcePriorityWorkflowLevel
+				} else if id.Domain != "" {
+					priority = models.ResourcePriorityProjectDomainLevel
+				} else {
+					priority = models.ResourcePriorityProjectLevel
+				}
+				resource := models.Resource{
+					Project:      id.Project,
+					Domain:       id.Domain,
+					Workflow:     id.Workflow,
+					ResourceType: resourceTypeString,
+					Priority:     priority,
+					Attributes:   bytes,
+					Org:          id.Org,
+				}
+				resources = append(resources, resource)
+			}
+		}
+		if err := tx.Session(&gorm.Session{AllowGlobalUpdate: true}).Delete(&models.Resource{}).Error; err != nil {
+			return err
+		}
+		if len(resources) != 0 {
+			return tx.Create(&resources).Error
+		}
+		return nil
+	},
+	Rollback: func(tx *gorm.DB) error {
+		return tx.Session(&gorm.Session{AllowGlobalUpdate: true}).Delete(&models.Resource{}).Error
+	},
 }
 
 var Migrations = append(LegacyMigrations, append(NoopMigrations, append(ContinuedMigrations, UnionMigrations...)...)...)
+
+func getStorageClientForMigration() (*storage.DataStore, error) {
+	configuration := runtime.NewConfigurationProvider()
+	adminScope := promutils.NewScope(configuration.ApplicationConfiguration().GetTopLevelConfig().GetMetricsScope()).NewSubScope("migration")
+	dataStorageClient, err := storage.NewDataStore(storage.GetConfig(), adminScope.NewSubScope("storage"))
+	if err != nil {
+		return nil, err
+	}
+	return dataStorageClient, nil
+}
 
 func alterTableColumnType(db *sql.DB, columnName, columnType string) error {
 	var err error

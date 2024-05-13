@@ -12,6 +12,7 @@ import (
 	repositoryInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 const projectID = "project_id"
@@ -74,31 +75,13 @@ func ValidateProject(project admin.Project) error {
 // Validates that a specified project and domain combination has been registered and exists in the db.
 func ValidateProjectAndDomain(
 	ctx context.Context, db repositoryInterfaces.Repository, config runtimeInterfaces.ApplicationConfiguration, projectID, domainID, org string) error {
-	project, err := db.ProjectRepo().Get(ctx, projectID, org)
-	if err != nil {
-		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
-			"failed to validate that project [%s] and domain [%s]%s are registered, err: [%+v]",
-			projectID, domainID, getOrgForErrorMsg(org), err)
+	if err := ValidateProjectExistsAndActive(ctx, db, projectID, org); err != nil {
+		return err
 	}
-	if *project.State != int32(admin.Project_ACTIVE) {
-		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
-			"project [%s] is not active", projectID)
-	}
-	var validDomain bool
-	domains := config.GetDomainsConfig()
-	for _, domain := range *domains {
-		if domain.ID == domainID {
-			validDomain = true
-			break
-		}
-	}
-	if !validDomain {
-		return errors.NewFlyteAdminErrorf(codes.InvalidArgument, "domain [%s] is unrecognized by system", domainID)
-	}
-	return nil
+	return ValidateDomainExists(ctx, config, domainID)
 }
 
-func ValidateProjectForUpdate(
+func ValidateProjectExistsAndActive(
 	ctx context.Context, db repositoryInterfaces.Repository, projectID, org string) error {
 
 	project, err := db.ProjectRepo().Get(ctx, projectID, org)
@@ -124,6 +107,22 @@ func ValidateProjectExists(
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 			"failed to validate that project [%s]%s exists, err: [%+v]",
 			projectID, getOrgForErrorMsg(org), err)
+	}
+	return nil
+}
+
+func ValidateDomainExists(ctx context.Context, config runtimeInterfaces.ApplicationConfiguration, domainID string) error {
+	var validDomain bool
+	domains := config.GetDomainsConfig()
+	for _, domain := range *domains {
+		if domain.ID == domainID {
+			validDomain = true
+			break
+		}
+	}
+	if !validDomain {
+		logger.Errorf(ctx, "domain [%s] is unrecognized by system", domainID)
+		return errors.NewFlyteAdminErrorf(codes.InvalidArgument, "domain [%s] is unrecognized by system", domainID)
 	}
 	return nil
 }

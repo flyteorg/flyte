@@ -29,6 +29,8 @@ type Options struct {
 	Metadata map[string]interface{}
 }
 
+//go:generate mockery -name Metadata -output=./mocks -case=underscore
+
 // Metadata is a placeholder for data reference metadata.
 type Metadata interface {
 	Exists() bool

@@ -19,6 +19,7 @@ import "flyteidl/admin/task_execution.proto";
 import "flyteidl/admin/version.proto";
 import "flyteidl/admin/common.proto";
 import "flyteidl/admin/description_entity.proto";
+import "flyteidl/admin/configuration.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
 
@@ -867,6 +868,29 @@ service AdminService {
       get: "/api/v1/running_count/executions/{project}/{domain}"
       additional_bindings {
         get: "/api/v1/org/running_count/executions/{org}/{project}/{domain}"
+      }
+    };
+  }
+
+  // Fetch a unified project attribute.
+  rpc GetConfiguration (flyteidl.admin.ConfigurationGetRequest) returns (flyteidl.admin.ConfigurationGetResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/configuration/{id.project}/{id.domain}"
+      additional_bindings {
+        get: "/api/v1/org/configuration/{id.org}/{id.project}/{id.domain}"
+      }
+    };
+  }
+
+  // Update a unified project attribute.
+  // Requests will fail for stale values of version_to_update
+  rpc UpdateProjectDomainConfiguration (flyteidl.admin.ConfigurationUpdateRequest) returns (flyteidl.admin.ConfigurationUpdateResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/configuration/{id.project}/{id.domain}"
+      body: "*"
+      additional_bindings {
+        post: "/api/v1/org/configuration/{id.org}/{id.project}/{id.domain}"
+        body: "*"
       }
     };
   }

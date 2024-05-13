@@ -200,6 +200,8 @@ spec:
                 name: flyte-admin-base-config
             - configMap:
                 name: flyte-admin-clusters-config
+            - configMap:
+                name: flyte-clusterresourcesync-config
         name: clusters-config-volume
       {{- if .Values.cluster_resource_manager.enabled }}
       - configMap:

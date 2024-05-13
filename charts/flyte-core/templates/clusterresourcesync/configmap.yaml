@@ -1,4 +1,3 @@
-{{- if .Values.cluster_resource_manager.enabled }}
 
 apiVersion: v1
 kind: ConfigMap
@@ -7,6 +6,7 @@ metadata:
   namespace: {{ template "flyte.namespace" . }}
   labels: {{ include "flyteadmin.labels" . | nindent 4 }}
 data:
+  storage.yaml: | {{ tpl (include "storage" .) $ | nindent 4 }}
   {{- with .Values.cluster_resource_manager.config }}
   cluster_resources.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
   {{- end }}
@@ -35,4 +35,3 @@ data:
       {{- tpl (toYaml .) $ | nindent 6 }}
   {{- end }}
 
-  {{- end }}

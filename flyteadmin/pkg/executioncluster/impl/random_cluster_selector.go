@@ -9,9 +9,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/executioncluster"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/executioncluster/interfaces"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/resources"
 	managerInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
-	repositoryInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	runtime "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
@@ -148,8 +146,7 @@ func (s RandomClusterSelector) GetTarget(ctx context.Context, spec *executionclu
 	return &execTarget, nil
 }
 
-func NewRandomClusterSelector(listTargets interfaces.ListTargetsInterface, config runtime.Configuration,
-	db repositoryInterfaces.Repository) (interfaces.ClusterInterface, error) {
+func NewRandomClusterSelector(listTargets interfaces.ListTargetsInterface, config runtime.Configuration, resourceManager managerInterfaces.ResourceInterface) (interfaces.ClusterInterface, error) {
 
 	defaultExecutionLabel := config.ClusterConfiguration().GetDefaultExecutionLabel()
 
@@ -163,7 +160,7 @@ func NewRandomClusterSelector(listTargets interfaces.ListTargetsInterface, confi
 	}
 	return &RandomClusterSelector{
 		labelWeightedRandomMap:   labelWeightedRandomMap,
-		resourceManager:          resources.NewResourceManager(db, config.ApplicationConfiguration()),
+		resourceManager:          resourceManager,
 		equalWeightedAllClusters: equalWeightedAllClusters,
 		ListTargetsInterface:     listTargets,
 		defaultExecutionLabel:    defaultExecutionLabel,

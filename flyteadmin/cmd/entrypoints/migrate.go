@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/cobra"
 	_ "gorm.io/driver/postgres" // Required to import database driver.
 
+	runtimeConfig "github.com/flyteorg/flyte/flyteadmin/pkg/runtime"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/server"
 )
 
@@ -20,6 +21,8 @@ var migrateCmd = &cobra.Command{
 	Short: "This command will run all the migrations for the database",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		ctx := context.Background()
+		cfg := runtimeConfig.NewConfigurationProvider()
+		server.SetMetricKeys(cfg.ApplicationConfiguration().GetTopLevelConfig())
 		return server.Migrate(ctx)
 	},
 }

@@ -128,7 +128,7 @@ func TestValidateProjectDomainAttributesUpdateRequest(t *testing.T) {
 				Domain: "development",
 			}})
 	assert.Equal(t,
-		"failed to validate that project [] and domain [development] are registered, err: [missing project]",
+		"failed to validate that project [] is registered, err: [missing project]",
 		err.Error())
 
 	matchableResource, err := ValidateProjectDomainAttributesUpdateRequest(context.Background(),
@@ -162,7 +162,7 @@ func TestValidateProjectDomainAttributesGetRequest(t *testing.T) {
 		attributesApplicationConfigProvider, admin.ProjectDomainAttributesGetRequest{
 			Domain: "development",
 		})
-	assert.Equal(t, "failed to validate that project [] and domain [development] are registered, err: [missing project]",
+	assert.Equal(t, "failed to validate that project [] is registered, err: [missing project]",
 		err.Error())
 
 	assert.Nil(t, ValidateProjectDomainAttributesGetRequest(context.Background(),
@@ -185,7 +185,7 @@ func TestValidateProjectDomainAttributesDeleteRequest(t *testing.T) {
 			Domain: "development",
 		})
 	assert.Equal(t,
-		"failed to validate that project [] and domain [development] are registered, err: [missing project]",
+		"failed to validate that project [] is registered, err: [missing project]",
 		err.Error())
 
 	assert.Nil(t, ValidateProjectDomainAttributesDeleteRequest(context.Background(),
@@ -215,7 +215,7 @@ func TestValidateWorkflowAttributesUpdateRequest(t *testing.T) {
 				Domain: "development",
 			}})
 	assert.Equal(t,
-		"failed to validate that project [] and domain [development] are registered, err: [missing project]",
+		"failed to validate that project [] is registered, err: [missing project]",
 		err.Error())
 
 	_, err = ValidateWorkflowAttributesUpdateRequest(context.Background(),
@@ -258,7 +258,7 @@ func TestValidateWorkflowAttributesGetRequest(t *testing.T) {
 			Domain: "development",
 		})
 	assert.Equal(t,
-		"failed to validate that project [] and domain [development] are registered, err: [missing project]",
+		"failed to validate that project [] is registered, err: [missing project]",
 		err.Error())
 
 	err = ValidateWorkflowAttributesGetRequest(context.Background(),
@@ -290,7 +290,7 @@ func TestValidateWorkflowAttributesDeleteRequest(t *testing.T) {
 			Domain: "development",
 		})
 	assert.Equal(t,
-		"failed to validate that project [] and domain [development] are registered, err: [missing project]",
+		"failed to validate that project [] is registered, err: [missing project]",
 		err.Error())
 
 	err = ValidateWorkflowAttributesDeleteRequest(context.Background(),

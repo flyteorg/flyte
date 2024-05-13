@@ -6,17 +6,16 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/executioncluster"
 	interfaces2 "github.com/flyteorg/flyte/flyteadmin/pkg/executioncluster/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/executioncluster/mocks"
-	repo_interface "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
-	repo_mock "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/mocks"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
+	managerMocks "github.com/flyteorg/flyte/flyteadmin/pkg/manager/mocks"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/runtime"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flytestdlib/config"
@@ -48,47 +47,43 @@ func initTestConfig(fileName string) error {
 	return configAccessor.UpdateConfig(context.Background())
 }
 
+func getMockResourceManagerForRandomClusterSelector() interfaces.ResourceInterface {
+	mockResourceManager := new(managerMocks.ResourceInterface)
+	mockResourceManager.On("GetResource", mock.Anything, mock.MatchedBy(func(request interfaces.ResourceRequest) bool {
+		return request.Project == "" && request.ResourceType == admin.MatchableResource_EXECUTION_CLUSTER_LABEL
+	})).Return(nil, errors.NewFlyteAdminErrorf(codes.NotFound, "foo"))
+	mockResourceManager.On("GetResource", mock.Anything, mock.MatchedBy(func(request interfaces.ResourceRequest) bool {
+		return request.Project == testProject && request.Domain == testDomain && request.ResourceType == admin.MatchableResource_EXECUTION_CLUSTER_LABEL
+	})).Return(&interfaces.ResourceResponse{
+		ResourceType: admin.MatchableResource_EXECUTION_CLUSTER_LABEL.String(),
+		Attributes: &admin.MatchingAttributes{
+			Target: &admin.MatchingAttributes_ExecutionClusterLabel{
+				ExecutionClusterLabel: &admin.ExecutionClusterLabel{
+					Value: "test",
+				},
+			},
+		},
+	}, nil)
+	mockResourceManager.On("GetResource", mock.Anything, mock.MatchedBy(func(request interfaces.ResourceRequest) bool {
+		return request.ResourceType == admin.MatchableResource_EXECUTION_CLUSTER_LABEL
+	})).Return(&interfaces.ResourceResponse{
+		ResourceType: admin.MatchableResource_EXECUTION_CLUSTER_LABEL.String(),
+		Attributes: &admin.MatchingAttributes{
+			Target: &admin.MatchingAttributes_ExecutionClusterLabel{
+				ExecutionClusterLabel: &admin.ExecutionClusterLabel{
+					Value: "all",
+				},
+			},
+		},
+	}, nil)
+	return mockResourceManager
+}
+
 func getRandomClusterSelectorForTest(t *testing.T) interfaces2.ClusterInterface {
 	err := initTestConfig(clusterConfig1)
 	assert.NoError(t, err)
 
-	db := repo_mock.NewMockRepository()
-	db.ResourceRepo().(*repo_mock.MockResourceRepo).GetFunction = func(ctx context.Context, ID repo_interface.ResourceID) (resource models.Resource, e error) {
-		assert.Equal(t, "EXECUTION_CLUSTER_LABEL", ID.ResourceType)
-		if ID.Project == "" {
-			return models.Resource{}, errors.NewFlyteAdminErrorf(codes.NotFound,
-				"Resource [%+v] not found", ID)
-		}
-		response := models.Resource{
-			Project:      ID.Project,
-			Domain:       ID.Domain,
-			Workflow:     ID.Workflow,
-			ResourceType: ID.ResourceType,
-			LaunchPlan:   ID.LaunchPlan,
-		}
-		if ID.Project == testProject && ID.Domain == testDomain {
-			matchingAttributes := &admin.MatchingAttributes{
-				Target: &admin.MatchingAttributes_ExecutionClusterLabel{
-					ExecutionClusterLabel: &admin.ExecutionClusterLabel{
-						Value: "test",
-					},
-				},
-			}
-			marshalledMatchingAttributes, _ := proto.Marshal(matchingAttributes)
-			response.Attributes = marshalledMatchingAttributes
-		} else {
-			matchingAttributes := &admin.MatchingAttributes{
-				Target: &admin.MatchingAttributes_ExecutionClusterLabel{
-					ExecutionClusterLabel: &admin.ExecutionClusterLabel{
-						Value: "all",
-					},
-				},
-			}
-			marshalledMatchingAttributes, _ := proto.Marshal(matchingAttributes)
-			response.Attributes = marshalledMatchingAttributes
-		}
-		return response, nil
-	}
+	mockResourceManager := getMockResourceManagerForRandomClusterSelector()
 	configProvider := runtime.NewConfigurationProvider()
 	listTargetsProvider := mocks.ListTargetsInterface{}
 	validTargets := map[string]*executioncluster.ExecutionTarget{
@@ -116,42 +111,36 @@ func getRandomClusterSelectorForTest(t *testing.T) interfaces2.ClusterInterface 
 	}
 	listTargetsProvider.OnGetValidTargets().Return(validTargets)
 	listTargetsProvider.OnGetAllTargets().Return(targets)
-	randomCluster, err := NewRandomClusterSelector(&listTargetsProvider, configProvider, db)
+	randomCluster, err := NewRandomClusterSelector(&listTargetsProvider, configProvider, mockResourceManager)
 	assert.NoError(t, err)
 	return randomCluster
+}
+
+func getMockResourceManagerForRandomClusterSelectorWithDefault() interfaces.ResourceInterface {
+	mockResourceManager := new(managerMocks.ResourceInterface)
+	mockResourceManager.On("GetResource", mock.Anything, mock.MatchedBy(func(request interfaces.ResourceRequest) bool {
+		return request.Project == testProject && request.Domain == testDomain && request.ResourceType.String() == "EXECUTION_CLUSTER_LABEL"
+	})).Return(&interfaces.ResourceResponse{
+		ResourceType: admin.MatchableResource_EXECUTION_CLUSTER_LABEL.String(),
+		Attributes: &admin.MatchingAttributes{
+			Target: &admin.MatchingAttributes_ExecutionClusterLabel{
+				ExecutionClusterLabel: &admin.ExecutionClusterLabel{
+					Value: "two",
+				},
+			},
+		},
+	}, nil)
+	mockResourceManager.On("GetResource", mock.Anything, mock.MatchedBy(func(request interfaces.ResourceRequest) bool {
+		return request.ResourceType == admin.MatchableResource_EXECUTION_CLUSTER_LABEL
+	})).Return(nil, errors.NewFlyteAdminErrorf(codes.NotFound, "foo"))
+	return mockResourceManager
 }
 
 func getRandomClusterSelectorWithDefaultLabelForTest(t *testing.T, configFile string) interfaces2.ClusterInterface {
 	err := initTestConfig(configFile)
 	assert.NoError(t, err)
 
-	db := repo_mock.NewMockRepository()
-	db.ResourceRepo().(*repo_mock.MockResourceRepo).GetFunction = func(ctx context.Context, ID repo_interface.ResourceID) (resource models.Resource, e error) {
-		assert.Equal(t, "EXECUTION_CLUSTER_LABEL", ID.ResourceType)
-		if ID.Project == "" {
-			return models.Resource{}, errors.NewFlyteAdminErrorf(codes.NotFound,
-				"Resource [%+v] not found", ID)
-		}
-		response := models.Resource{
-			Project:      ID.Project,
-			Domain:       ID.Domain,
-			Workflow:     ID.Workflow,
-			ResourceType: ID.ResourceType,
-			LaunchPlan:   ID.LaunchPlan,
-		}
-		if ID.Project == testProject && ID.Domain == testDomain {
-			matchingAttributes := &admin.MatchingAttributes{
-				Target: &admin.MatchingAttributes_ExecutionClusterLabel{
-					ExecutionClusterLabel: &admin.ExecutionClusterLabel{
-						Value: "two",
-					},
-				},
-			}
-			marshalledMatchingAttributes, _ := proto.Marshal(matchingAttributes)
-			response.Attributes = marshalledMatchingAttributes
-		}
-		return response, nil
-	}
+	mockResourceManager := getMockResourceManagerForRandomClusterSelectorWithDefault()
 	configProvider := runtime.NewConfigurationProvider()
 	listTargetsProvider := mocks.ListTargetsInterface{}
 	validTargets := map[string]*executioncluster.ExecutionTarget{
@@ -184,7 +173,7 @@ func getRandomClusterSelectorWithDefaultLabelForTest(t *testing.T, configFile st
 	}
 	listTargetsProvider.OnGetValidTargets().Return(validTargets)
 	listTargetsProvider.OnGetAllTargets().Return(targets)
-	randomCluster, err := NewRandomClusterSelector(&listTargetsProvider, configProvider, db)
+	randomCluster, err := NewRandomClusterSelector(&listTargetsProvider, configProvider, mockResourceManager)
 	assert.NoError(t, err)
 	return randomCluster
 }
@@ -195,6 +184,8 @@ func TestRandomClusterSelectorGetTarget(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, testCluster1, target.ID)
 	assert.False(t, target.Enabled)
+
+	cluster = getRandomClusterSelectorForTest(t)
 	target, err = cluster.GetTarget(context.Background(), &executioncluster.ExecutionTargetSpec{TargetID: testCluster2})
 	assert.Nil(t, err)
 	assert.Equal(t, testCluster2, target.ID)

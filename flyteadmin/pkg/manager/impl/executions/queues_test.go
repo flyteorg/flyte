@@ -4,14 +4,14 @@ import (
 	"context"
 	"testing"
 
-	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
+	managerInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
+	managerMocks "github.com/flyteorg/flyte/flyteadmin/pkg/manager/mocks"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/mocks"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	runtimeMocks "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/mocks"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
@@ -21,6 +21,7 @@ import (
 const testProject = "project"
 const testDomain = "domain"
 const testWorkflow = "name"
+const UNMATCHED = "UNMATCHED"
 
 func TestGetQueue(t *testing.T) {
 	executionQueues := []runtimeInterfaces.ExecutionQueue{
@@ -30,62 +31,63 @@ func TestGetQueue(t *testing.T) {
 		},
 	}
 	db := mocks.NewMockRepository()
-	db.ResourceRepo().(*mocks.MockResourceRepo).GetFunction = func(ctx context.Context, ID interfaces.ResourceID) (resource models.Resource, e error) {
-		response := models.Resource{
-			Project:      ID.Project,
-			Domain:       ID.Domain,
-			Workflow:     ID.Workflow,
-			ResourceType: ID.ResourceType,
-		}
-		if ID.Project == testProject && ID.Domain == testDomain && ID.Workflow == testWorkflow {
-			matchingAttributes := &admin.MatchingAttributes{
-				Target: &admin.MatchingAttributes_ExecutionQueueAttributes{
-					ExecutionQueueAttributes: &admin.ExecutionQueueAttributes{
-						Tags: []string{"attribute"},
-					},
+	mockResourceManager := new(managerMocks.ResourceInterface)
+	mockResourceManager.On("GetResource", context.Background(), mock.MatchedBy(func(request managerInterfaces.ResourceRequest) bool {
+		return request.Project == testProject && request.Domain == testDomain && request.Workflow == testWorkflow && request.ResourceType == admin.MatchableResource_EXECUTION_QUEUE
+	})).Return(&managerInterfaces.ResourceResponse{
+		Project:      testProject,
+		Domain:       testDomain,
+		Workflow:     testWorkflow,
+		ResourceType: admin.MatchableResource_EXECUTION_QUEUE.String(),
+		Attributes: &admin.MatchingAttributes{
+			Target: &admin.MatchingAttributes_ExecutionQueueAttributes{
+				ExecutionQueueAttributes: &admin.ExecutionQueueAttributes{
+					Tags: []string{"attribute"},
 				},
-			}
-			marshalledMatchingAttributes, _ := proto.Marshal(matchingAttributes)
-			response.Attributes = marshalledMatchingAttributes
-		} else {
-			matchingAttributes := &admin.MatchingAttributes{
-				Target: &admin.MatchingAttributes_ExecutionQueueAttributes{
-					ExecutionQueueAttributes: &admin.ExecutionQueueAttributes{
-						Tags: []string{"another attribute"},
-					},
+			},
+		},
+	}, nil)
+	mockResourceManager.On("GetResource", context.Background(), mock.MatchedBy(func(request managerInterfaces.ResourceRequest) bool {
+		return request.ResourceType == admin.MatchableResource_EXECUTION_QUEUE
+	})).Return(&managerInterfaces.ResourceResponse{
+		Project:      testProject,
+		Domain:       testDomain,
+		Workflow:     testWorkflow,
+		ResourceType: admin.MatchableResource_EXECUTION_QUEUE.String(),
+		Attributes: &admin.MatchingAttributes{
+			Target: &admin.MatchingAttributes_ExecutionQueueAttributes{
+				ExecutionQueueAttributes: &admin.ExecutionQueueAttributes{
+					Tags: []string{"another attribute"},
 				},
-			}
-			marshalledMatchingAttributes, _ := proto.Marshal(matchingAttributes)
-			response.Attributes = marshalledMatchingAttributes
-		}
-		return response, nil
-	}
+			},
+		},
+	}, nil)
 
 	queueAllocator := NewQueueAllocator(runtimeMocks.NewMockConfigurationProvider(
 		nil, runtimeMocks.NewMockQueueConfigurationProvider(executionQueues, nil),
-		nil, nil, nil, nil), db)
+		nil, nil, nil, nil), db, mockResourceManager)
 	queueConfig := singleQueueConfiguration{
 		DynamicQueue: "queue dynamic",
 	}
 	assert.Equal(t, queueConfig, queueAllocator.GetQueue(context.Background(), core.Identifier{
-		Project: "project",
-		Domain:  "domain",
-		Name:    "name",
+		Project: testProject,
+		Domain:  testDomain,
+		Name:    testWorkflow,
 	}))
 	assert.EqualValues(t, singleQueueConfiguration{}, queueAllocator.GetQueue(context.Background(), core.Identifier{
-		Project: "project",
-		Domain:  "domain",
-		Name:    "name2",
+		Project: testProject,
+		Domain:  testDomain,
+		Name:    UNMATCHED,
 	}))
 	assert.EqualValues(t, singleQueueConfiguration{}, queueAllocator.GetQueue(context.Background(), core.Identifier{
-		Project: "project",
-		Domain:  "domain2",
-		Name:    "name",
+		Project: testProject,
+		Domain:  UNMATCHED,
+		Name:    testWorkflow,
 	}))
 	assert.EqualValues(t, singleQueueConfiguration{}, queueAllocator.GetQueue(context.Background(), core.Identifier{
-		Project: "project2",
-		Domain:  "domain",
-		Name:    "name",
+		Project: UNMATCHED,
+		Domain:  testDomain,
+		Name:    testWorkflow,
 	}))
 }
 
@@ -114,93 +116,86 @@ func TestGetQueueDefaults(t *testing.T) {
 		},
 	}
 	db := mocks.NewMockRepository()
-	db.ResourceRepo().(*mocks.MockResourceRepo).GetFunction = func(ctx context.Context, ID interfaces.ResourceID) (resource models.Resource, e error) {
-		if ID.Project == testProject && ID.Domain == testDomain && ID.Workflow == "workflow" &&
-			ID.ResourceType == admin.MatchableResource_EXECUTION_QUEUE.String() {
-			matchingAttributes := &admin.MatchingAttributes{
-				Target: &admin.MatchingAttributes_ExecutionQueueAttributes{
-					ExecutionQueueAttributes: &admin.ExecutionQueueAttributes{
-						Tags: []string{"attr3"},
-					},
+	mockResourceManager := new(managerMocks.ResourceInterface)
+	mockResourceManager.On("GetResource", context.Background(), mock.MatchedBy(func(request managerInterfaces.ResourceRequest) bool {
+		return request.Project == testProject && request.Domain == testDomain && request.Workflow == testWorkflow && request.ResourceType == admin.MatchableResource_EXECUTION_QUEUE
+	})).Return(&managerInterfaces.ResourceResponse{
+		Project:      testProject,
+		Domain:       testDomain,
+		Workflow:     testWorkflow,
+		ResourceType: admin.MatchableResource_EXECUTION_QUEUE.String(),
+		Attributes: &admin.MatchingAttributes{
+			Target: &admin.MatchingAttributes_ExecutionQueueAttributes{
+				ExecutionQueueAttributes: &admin.ExecutionQueueAttributes{
+					Tags: []string{"attr3"},
 				},
-			}
-			marshalledMatchingAttributes, _ := proto.Marshal(matchingAttributes)
-			return models.Resource{
-				Project:      ID.Project,
-				Domain:       ID.Domain,
-				Workflow:     ID.Workflow,
-				ResourceType: ID.ResourceType,
-				Attributes:   marshalledMatchingAttributes,
-			}, nil
-		}
-		if ID.Project == testProject && ID.Domain == testDomain && ID.ResourceType == admin.MatchableResource_EXECUTION_QUEUE.String() {
-			matchingAttributes := &admin.MatchingAttributes{
-				Target: &admin.MatchingAttributes_ExecutionQueueAttributes{
-					ExecutionQueueAttributes: &admin.ExecutionQueueAttributes{
-						Tags: []string{"attr2"},
-					},
+			},
+		},
+	}, nil)
+	mockResourceManager.On("GetResource", context.Background(), mock.MatchedBy(func(request managerInterfaces.ResourceRequest) bool {
+		return request.Project == testProject && request.Domain == testDomain && request.ResourceType == admin.MatchableResource_EXECUTION_QUEUE
+	})).Return(&managerInterfaces.ResourceResponse{
+		Project:      testProject,
+		Domain:       testDomain,
+		ResourceType: admin.MatchableResource_EXECUTION_QUEUE.String(),
+		Attributes: &admin.MatchingAttributes{
+			Target: &admin.MatchingAttributes_ExecutionQueueAttributes{
+				ExecutionQueueAttributes: &admin.ExecutionQueueAttributes{
+					Tags: []string{"attr2"},
 				},
-			}
-			marshalledMatchingAttributes, _ := proto.Marshal(matchingAttributes)
-			return models.Resource{
-				Project:      ID.Project,
-				Domain:       ID.Domain,
-				ResourceType: ID.ResourceType,
-				Attributes:   marshalledMatchingAttributes,
-			}, nil
-		}
-
-		if ID.Project == testProject && ID.ResourceType == admin.MatchableResource_EXECUTION_QUEUE.String() {
-			matchingAttributes := &admin.MatchingAttributes{
-				Target: &admin.MatchingAttributes_ExecutionQueueAttributes{
-					ExecutionQueueAttributes: &admin.ExecutionQueueAttributes{
-						Tags: []string{"attr1"},
-					},
+			},
+		},
+	}, nil)
+	mockResourceManager.On("GetResource", context.Background(), mock.MatchedBy(func(request managerInterfaces.ResourceRequest) bool {
+		return request.Project == testProject && request.ResourceType == admin.MatchableResource_EXECUTION_QUEUE
+	})).Return(&managerInterfaces.ResourceResponse{
+		Project:      testProject,
+		ResourceType: admin.MatchableResource_EXECUTION_QUEUE.String(),
+		Attributes: &admin.MatchingAttributes{
+			Target: &admin.MatchingAttributes_ExecutionQueueAttributes{
+				ExecutionQueueAttributes: &admin.ExecutionQueueAttributes{
+					Tags: []string{"attr1"},
 				},
-			}
-			marshalledMatchingAttributes, _ := proto.Marshal(matchingAttributes)
-			return models.Resource{
-				Project:      ID.Project,
-				ResourceType: ID.ResourceType,
-				Attributes:   marshalledMatchingAttributes,
-			}, nil
-		}
-		return models.Resource{}, errors.NewFlyteAdminError(codes.NotFound, "foo")
-	}
+			},
+		},
+	}, nil)
+	mockResourceManager.On("GetResource", context.Background(), mock.MatchedBy(func(request managerInterfaces.ResourceRequest) bool {
+		return request.ResourceType == admin.MatchableResource_EXECUTION_QUEUE
+	})).Return(&managerInterfaces.ResourceResponse{}, errors.NewFlyteAdminError(codes.NotFound, "foo"))
 
 	queueAllocator := NewQueueAllocator(runtimeMocks.NewMockConfigurationProvider(
 		nil, runtimeMocks.NewMockQueueConfigurationProvider(executionQueues, workflowConfigs), nil,
-		nil, nil, nil), db)
+		nil, nil, nil), db, mockResourceManager)
 	assert.Equal(t, singleQueueConfiguration{
 		DynamicQueue: "default dynamic",
 	}, queueAllocator.GetQueue(
 		context.Background(), core.Identifier{
-			Project: "unmatched",
-			Domain:  "domain",
-			Name:    "workflow",
+			Project: UNMATCHED,
+			Domain:  testDomain,
+			Name:    testWorkflow,
 		}))
 	assert.EqualValues(t, singleQueueConfiguration{
 		DynamicQueue: "queue1 dynamic",
 	}, queueAllocator.GetQueue(
 		context.Background(), core.Identifier{
-			Project: "project",
-			Domain:  "UNMATCHED",
-			Name:    "workflow",
+			Project: testProject,
+			Domain:  UNMATCHED,
+			Name:    testWorkflow,
 		}))
 	assert.EqualValues(t, singleQueueConfiguration{
 		DynamicQueue: "queue2 dynamic",
 	}, queueAllocator.GetQueue(
 		context.Background(), core.Identifier{
-			Project: "project",
-			Domain:  "domain",
-			Name:    "UNMATCHED",
+			Project: testProject,
+			Domain:  testDomain,
+			Name:    UNMATCHED,
 		}))
 	assert.Equal(t, singleQueueConfiguration{
 		DynamicQueue: "queue3 dynamic",
 	}, queueAllocator.GetQueue(
 		context.Background(), core.Identifier{
-			Project: "project",
-			Domain:  "domain",
-			Name:    "workflow",
+			Project: testProject,
+			Domain:  testDomain,
+			Name:    testWorkflow,
 		}))
 }

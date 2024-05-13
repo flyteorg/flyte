@@ -291,7 +291,7 @@ func TestValidateProjectAndDomainError(t *testing.T) {
 	err := ValidateProjectAndDomain(context.Background(), mockRepo, testutils.GetApplicationConfigWithDefaultDomains(),
 		"flyte-project-id", "domain", "org")
 	assert.EqualError(t, err,
-		"failed to validate that project [flyte-project-id] and domain [domain] and org 'org' are registered, err: [foo]")
+		"failed to validate that project [flyte-project-id] and org 'org' is registered, err: [foo]")
 }
 
 func TestValidateProjectAndDomainNotFound(t *testing.T) {
@@ -302,7 +302,7 @@ func TestValidateProjectAndDomainNotFound(t *testing.T) {
 	}
 	err := ValidateProjectAndDomain(context.Background(), mockRepo, testutils.GetApplicationConfigWithDefaultDomains(),
 		"flyte-project", "domain", "org")
-	assert.EqualError(t, err, "failed to validate that project [flyte-project] and domain [domain] and org 'org' are registered, err: [project [flyte-project] not found]")
+	assert.EqualError(t, err, "failed to validate that project [flyte-project] and org 'org' is registered, err: [project [flyte-project] not found]")
 }
 
 func TestValidateProjectDb(t *testing.T) {
@@ -314,7 +314,7 @@ func TestValidateProjectDb(t *testing.T) {
 			activeState := int32(admin.Project_ACTIVE)
 			return models.Project{State: &activeState}, nil
 		}
-		err := ValidateProjectForUpdate(context.Background(), mockRepo, "flyte-project-id", "org")
+		err := ValidateProjectExistsAndActive(context.Background(), mockRepo, "flyte-project-id", "org")
 
 		assert.Nil(t, err)
 	})
@@ -325,7 +325,7 @@ func TestValidateProjectDb(t *testing.T) {
 
 			return models.Project{}, errors.New("missing")
 		}
-		err := ValidateProjectForUpdate(context.Background(), mockRepo, "flyte-project-id", "org")
+		err := ValidateProjectExistsAndActive(context.Background(), mockRepo, "flyte-project-id", "org")
 		assert.Error(t, err)
 	})
 
@@ -335,7 +335,7 @@ func TestValidateProjectDb(t *testing.T) {
 			state := int32(admin.Project_ARCHIVED)
 			return models.Project{State: &state}, nil
 		}
-		err := ValidateProjectForUpdate(context.Background(), mockRepo, "flyte-project-id", "org")
+		err := ValidateProjectExistsAndActive(context.Background(), mockRepo, "flyte-project-id", "org")
 		assert.Error(t, err)
 	})
 }

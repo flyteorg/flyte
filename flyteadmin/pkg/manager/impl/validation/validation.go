@@ -33,6 +33,13 @@ func ValidateEmptyStringField(field, fieldName string) error {
 	return nil
 }
 
+func ValidateNonemptyStringField(field, fieldName string) error {
+	if field != "" {
+		return shared.GetInvalidArgumentError(fieldName)
+	}
+	return nil
+}
+
 // ValidateMaxLengthStringField Validates that a string field does not exceed a certain character count
 func ValidateMaxLengthStringField(field string, fieldName string, limit int) error {
 	if len(field) > limit {

@@ -21,6 +21,7 @@ type MockRepository struct {
 	taskExecutionRepo             interfaces.TaskExecutionRepoInterface
 	namedEntityRepo               interfaces.NamedEntityRepoInterface
 	descriptionEntityRepo         interfaces.DescriptionEntityRepoInterface
+	configurationRepo             interfaces.ConfigurationRepoInterface
 	schedulableEntityRepo         sIface.SchedulableEntityRepoInterface
 	schedulableEntitySnapshotRepo sIface.ScheduleEntitiesSnapShotRepoInterface
 	signalRepo                    interfaces.SignalRepoInterface
@@ -86,6 +87,10 @@ func (r *MockRepository) DescriptionEntityRepo() interfaces.DescriptionEntityRep
 	return r.descriptionEntityRepo
 }
 
+func (r *MockRepository) ConfigurationRepo() interfaces.ConfigurationRepoInterface {
+	return r.configurationRepo
+}
+
 func (r *MockRepository) SignalRepo() interfaces.SignalRepoInterface {
 	return r.signalRepo
 }
@@ -102,6 +107,7 @@ func NewMockRepository() interfaces.Repository {
 		taskExecutionRepo:             NewMockTaskExecutionRepo(),
 		namedEntityRepo:               NewMockNamedEntityRepo(),
 		descriptionEntityRepo:         NewMockDescriptionEntityRepo(),
+		configurationRepo:             &ConfigurationRepoInterface{},
 		ExecutionEventRepoIface:       &ExecutionEventRepoInterface{},
 		NodeExecutionEventRepoIface:   &NodeExecutionEventRepoInterface{},
 		schedulableEntityRepo:         &sMocks.SchedulableEntityRepoInterface{},

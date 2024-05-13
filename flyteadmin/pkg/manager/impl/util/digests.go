@@ -58,3 +58,18 @@ func GetWorkflowDigest(ctx context.Context, workflowClosure *core.CompiledWorkfl
 
 	return workflowDigest, nil
 }
+
+// Returns a unique string digest for equivalent project configuration document
+// To avoid digest inconsistencies, the version field is removed and the configuration document is cleaned up before hashing
+func GetConfigurationDocumentStringDigest(ctx context.Context, configDoc admin.ConfigurationDocument) (string, error) {
+	configDoc.Version = ""
+	digest, err := pbhash.ComputeHashString(ctx, &configDoc)
+	if err != nil {
+		logger.Warningf(ctx, "failed to hash configuration [%+v] to string digest with err %v",
+			configDoc, err)
+		return "", errors.NewFlyteAdminErrorf(codes.Internal,
+			"failed to hash configuration [%+v] to string digest with err %v", configDoc, err)
+	}
+
+	return digest, nil
+}
