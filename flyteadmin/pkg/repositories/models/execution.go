@@ -72,6 +72,15 @@ type AdminTag struct {
 	Name string `gorm:"index:,unique;size:255"`
 }
 
+type ExecutionTag struct {
+	gorm.Model
+	ExecutionKey
+	// The key of the tag.
+	Key string `gorm:"primary_key" valid:"length(0|255)"`
+	// The value of the tag.
+	Value string `gorm:"uniqueIndex" valid:"length(0|255)"`
+}
+
 func (b *AdminTag) BeforeCreate(tx *gorm.DB) (err error) {
 	tx.Statement.AddClause(clause.OnConflict{
 		Columns:   []clause.Column{{Name: "name"}},            // key column

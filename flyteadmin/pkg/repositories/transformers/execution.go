@@ -111,10 +111,6 @@ func CreateExecutionModel(input CreateExecutionModelInput) (*models.Execution, e
 	}
 
 	activeExecution := int32(admin.ExecutionState_EXECUTION_ACTIVE)
-	tags := make([]models.AdminTag, len(input.RequestSpec.Tags))
-	for i, tag := range input.RequestSpec.Tags {
-		tags[i] = models.AdminTag{Name: tag}
-	}
 
 	executionModel := &models.Execution{
 		ExecutionKey: models.ExecutionKey{
@@ -136,7 +132,6 @@ func CreateExecutionModel(input CreateExecutionModelInput) (*models.Execution, e
 		User:                  requestSpec.Metadata.Principal,
 		State:                 &activeExecution,
 		LaunchEntity:          strings.ToLower(input.LaunchEntity.String()),
-		Tags:                  tags,
 	}
 	// A reference launch entity can be one of either or a task OR launch plan. Traditionally, workflows are executed
 	// with a reference launch plan which is why this behavior is the default below.
@@ -150,6 +145,24 @@ func CreateExecutionModel(input CreateExecutionModelInput) (*models.Execution, e
 	}
 
 	return executionModel, nil
+}
+
+// CreateExecutionTagModel transforms a ExecutionCreateRequest to a ExecutionTag model
+func CreateExecutionTagModel(input CreateExecutionModelInput) ([]*models.ExecutionTag, error) {
+	tags := make([]*models.ExecutionTag, 0, len(input.RequestSpec.Labels.Values))
+	for k, v := range input.RequestSpec.Labels.Values {
+		tags = append(tags, &models.ExecutionTag{
+			ExecutionKey: models.ExecutionKey{
+				Project: input.WorkflowExecutionID.Project,
+				Domain:  input.WorkflowExecutionID.Domain,
+				Name:    input.WorkflowExecutionID.Name,
+			},
+			Key:   k,
+			Value: v,
+		})
+	}
+
+	return tags, nil
 }
 
 func reassignCluster(ctx context.Context, cluster string, executionID *core.WorkflowExecutionIdentifier, execution *models.Execution) error {

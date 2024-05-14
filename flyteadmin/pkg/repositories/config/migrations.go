@@ -1182,6 +1182,39 @@ var NoopMigrations = []*gormigrate.Migration{
 			return tx.AutoMigrate(&Execution{})
 		},
 	},
+	{
+		ID: "test-8",
+		Migrate: func(tx *gorm.DB) error {
+			type ExecutionTag struct {
+				gorm.Model
+				ExecutionKey
+				// The key of the tag.
+				Key string `gorm:"primary_key" valid:"length(0|255)"`
+				// The value of the tag.
+				Value string `gorm:"uniqueIndex" valid:"length(0|255)"`
+			}
+
+			var sourceData []models.Execution
+			tx.Find(&sourceData)
+			println("kkkkkkkkkkkkkkkkkkkkkksourceData", sourceData[0].Tags)
+
+			var sourceData2 []models.AdminTag
+			tx.Find(&sourceData2)
+			println("kkkkkkkkkkkkkkkkkkkkkksourceData", sourceData2[0].Name)
+
+			// Insert data into the destination table
+			for _, source := range sourceData {
+				for _, tag := range source.Tags {
+					println("tag.Name [%v]", tag.Name)
+					destination := ExecutionTag{Key: tag.Name}
+					tx.Create(&destination)
+				}
+			}
+
+			// tx = tx.Model(&AdminTag{})
+			return tx.AutoMigrate(&ExecutionTag{})
+		},
+	},
 }
 
 // ContinuedMigrations - Above are a series of migrations labeled as no-op migrations. These are migrations that we
