@@ -1,5 +1,10 @@
-# Automatically request docs team for docs PR review
-/docs/          @neverett @ppiegaze
-
 # Default owner for all files, unless otherwise overridden below
 * @unionai/cloud-eng
+
+# Docs
+/docs/ @neverett @ppiegaze
+
+# EXO
+/fasttask/ @unionai/exo
+/flyteplugins/ @unionai/exo
+/flytepropeller/ @unionai/exo
