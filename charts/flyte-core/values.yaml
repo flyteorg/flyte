@@ -171,7 +171,7 @@ flytescheduler:
   # -- Annotations for Flytescheduler pods
   podAnnotations: {}
   # -- Additional Flytescheduler container environment variables
-  podEnv: {}
+  podEnv: []
   # -- Labels for Flytescheduler pods
   podLabels: {}
   # -- nodeSelector for Flytescheduler deployment
@@ -243,7 +243,7 @@ datacatalog:
   # -- Annotations for Datacatalog pods
   podAnnotations: {}
   # -- Additional Datacatalog container environment variables
-  podEnv: {}
+  podEnv: []
   # -- Labels for Datacatalog pods
   podLabels: {}
   # -- nodeSelector for Datacatalog deployment
@@ -329,7 +329,7 @@ flytepropeller:
   # -- Annotations for Flytepropeller pods
   podAnnotations: {}
   # -- Additional Flytepropeller container environment variables
-  podEnv: {}
+  podEnv: []
   # -- Labels for Flytepropeller pods
   podLabels: {}
   # -- nodeSelector for Flytepropeller deployment
@@ -926,7 +926,7 @@ cluster_resource_manager:
   # -- Annotations for ClusterResource pods
   podAnnotations: {}
   # -- Additional ClusterResource container environment variables
-  podEnv: {}
+  podEnv: []
   # -- Labels for ClusterResource pods
   podLabels: {}
   # -- nodeSelector for ClusterResource deployment
