@@ -1,7 +1,5 @@
 # Waiting for external inputs
 
-*New in Flyte 1.3.0*
-
 There are use cases where you may want a workflow execution to pause, only to continue
 when some time has passed or when it receives some inputs that are external to
 the workflow execution inputs. You can think of these as execution-time inputs,

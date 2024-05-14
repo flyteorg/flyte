@@ -351,3 +351,33 @@ To terminate an execution, use the `terminate` method:
 execution = remote.fetch_execution(name="fb22e306a0d91e1c6000", project="flytesnacks", domain="development")
 remote.terminate(execution, cause="Code needs to be updated")
 ```
+
+----
+
+## Fetching inputs and outputs of an execution (TODO merge in)
+
+By default, {py:meth}`FlyteRemote.execute <flytekit.remote.remote.FlyteRemote.execute>`
+is non-blocking, but you can also pass in `wait=True` to make it synchronously
+wait for the task or workflow to complete.
+
+Print out the Flyte console URL corresponding to your execution with:
+
+```{code-block} python
+print(f"Execution url: {remote.generate_console_url(execution)}")
+```
+
+Synchronize the state of the Flyte execution object with the remote state during
+execution with the {py:meth}`~flytekit.remote.remote.FlyteRemote.sync` method:
+
+```{code-block} python
+synced_execution = remote.sync(execution)
+print(synced_execution.inputs)  # print out the inputs
+```
+
+You can also wait for the execution after you've launched it and access the
+outputs:
+
+```{code-block} python
+completed_execution = remote.wait(execution)
+print(completed_execution.outputs)  # print out the outputs
+```

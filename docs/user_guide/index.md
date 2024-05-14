@@ -37,18 +37,8 @@ Want to contribute or update an example? Check out the {doc}`Contribution Guide 
 
 * - {doc}`🌳 Environment Setup <environment_setup>`
   - Set up a development environment to run the examples in the user guide.
-* - {doc}`🔮 Advanced Composition <advanced_composition/index>`
-  - Implement conditionals, nested and dynamic workflows, map tasks and even recursion!
-* - {doc}`🧩 Customizing Dependencies <customizing_dependencies/index>`
-  - Provide custom dependencies to run your Flyte entities.
-* - {doc}`🏡 Development Lifecycle <development_lifecycle/index>`
-  - Develop and test locally on the demo cluster.
-* - {doc}`⚗️ Testing <testing/index>`
-  - Test tasks and workflows with Flyte's testing utilities.
 * - {doc}`🚢 Productionizing <productionizing/index>`
   - Ship and configure your machine learning pipelines on a production Flyte installation.
-* - {doc}`🏗 Extending <extending/index>`
-  - Define custom plugins that aren't currently supported in the Flyte ecosystem.
 ```
 
 ```{toctree}
@@ -57,9 +47,5 @@ Want to contribute or update an example? Check out the {doc}`Contribution Guide 
 :hidden:
 
 environment_setup
-advanced_composition/index
-customizing_dependencies/index
-development_lifecycle/index
 productionizing/index
-extending/index
 ```

@@ -108,8 +108,11 @@ You can use the {py:func}`functools.partial` function to assign default or const
 
 ```{toctree}
 decorating_workflows
+running_workflows
 documenting_workflows
 imperative_workflows
+conditionals
+chaining_flyte_entities
 dynamic_workflows
 eager_workflows
 subworkflows

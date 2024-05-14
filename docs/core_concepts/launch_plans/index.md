@@ -95,6 +95,10 @@ For more information, refer to the {ref}`scheduling_launch_plan` documentation.
 :hidden:
 
 running_launch_plans
+notifications
+schedules
+reference_launch_plans
+workflow_labels_and_annotations
 ```
 
 [flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/basics/

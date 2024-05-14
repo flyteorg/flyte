@@ -91,10 +91,14 @@ pyflyte run --remote \
 
 task_parameters
 decorating_tasks
+running_tasks
 task_caching
+caching
+cache_serializing
 named_outputs
 shell_tasks
 map_tasks
+reference_tasks
 task_software_environment/index
 task_hardware_environment/index
 ```

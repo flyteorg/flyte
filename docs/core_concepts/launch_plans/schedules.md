@@ -1,6 +1,6 @@
 (scheduling_launch_plan)=
 
-# Schedules
+# Schedules (TK - copy in schedules doc from Union docs and merge content from other doc below)
 
 ```{eval-rst}
 .. tags:: Basic
@@ -152,3 +152,127 @@ scheduler:
 - **accountId**: Your AWS [account id](https://docs.aws.amazon.com/IAM/latest/UserGuide/console_account-alias.html#FindingYourAWSId).
 
 [flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/productionizing/
+
+
+## Scheduling a launch plan
+
+Finally, you can create a {py:class}`~flytekit.LaunchPlan` that's scheduled
+to run at a particular cadence by specifying the `schedule` argument:
+
+```{code-block} python
+from flytekit import LaunchPlan, CronSchedule
+
+from workflows.example import wf
+
+
+launch_plan = LaunchPlan.get_or_create(
+    wf,
+    name="wf_launchplan",
+    # run this launchplan every minute
+    schedule=CronSchedule(schedule="*/1 * * * *"),
+    default_inputs={"name": "Elmo"},
+)
+```
+
+You can also specify a fixed-rate interval:
+
+```{code-block} python
+from datetime import timedelta
+from flytekit import FixedRate
+
+
+launch_plan = LaunchPlan.get_or_create(
+    wf,
+    name="wf_launchplan",
+    schedule=FixedRate(duration=timedelta(minutes=1)),
+    default_inputs={"name": "Elmo"},
+)
+```
+
+### Passing in the scheduled kick-off time
+
+Suppose that your workflow is parameterized to take in a `datetime` argument,
+which determines how the workflow is executed (e.g. reading in data using the
+current date).
+
+You can specify a `kickoff_time_input_arg` in the schedule so that it
+automatically passes the cron schedule kick-off time into the workflow:
+
+```{code-cell} ipython
+from datetime import datetime
+from flytekit import workflow, LaunchPlan, CronSchedule
+
+
+@workflow
+def process_data_wf(kickoff_time: datetime):
+    # read data and process it based on kickoff_time
+    ...
+
+process_data_lp = LaunchPlan.get_or_create(
+    process_data_wf,
+    name="process_data_lp",
+    schedule=CronSchedule(
+        schedule="*/1 * * * *",
+        kickoff_time_input_arg="kickoff_time",
+    )
+)
+```
+
+### Registering launch plans
+
+Any of the methods described in the {doc}`registering_workflows` guide will register
+a launchplan as long as it's defined in any of the Python modules that you
+want to register to a Flyte backend.
+
+### Activating a schedule
+
+Once you've registered your launch plan, You can use the `FlyteRemote` client or
+the `flytectl` CLI to activate the schedule:
+
+:::::{tabs}
+
+::::{group-tab} `FlyteRemote`
+
+:::{code-block}
+launchplan_id = remote.fetch_launch_plan(name="process_data_lp").id
+remote.client.update_launch_plan(launchplan_id, "ACTIVE")
+:::
+
+::::
+
+::::{group-tab} `flytectl`
+
+:::{code-block} bash
+flytectl update launchplan -p flyteexamples -d development \
+ process_data_lp --version <VERSION> --activate
+:::
+
+::::
+
+:::::
+
+### Deactivating a schedule
+
+Similarly, you can deactivate a launchplan with:
+
+:::::{tabs}
+
+::::{group-tab} `FlyteRemote`
+
+:::{code-block}
+launchplan_id = remote.fetch_launch_plan(name="process_data_lp").id
+remote.client.update_launch_plan(launchplan_id, "INACTIVE")
+:::
+
+::::
+
+::::{group-tab} `flytectl`
+
+:::{code-block} bash
+flytectl update launchplan -p flyteexamples -d development \
+ process_data_lp --version <VERSION> --archive
+:::
+
+::::
+
+:::::

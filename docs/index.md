@@ -139,21 +139,21 @@ Quickstart guide <quickstart_guide>
 Getting started <getting_started/index>
 Core concepts <core_concepts/index>
 Data types and I/O <data_types_and_io/index>
-Development cycle <development_cycle/index>
-Flyte fundamentals <flyte_fundamentals/index>
-Flyte agents <flyte_agents/index>
+Flyte programming <flyte_programming/index>
+Flyte development cycle <flyte_development_cycle/index>
+Extending Flyte <extending_flyte/index>
 Core use cases <core_use_cases/index>
+Tutorials <flytesnacks/tutorials>
 ```
 
 ```{toctree}
 :maxdepth: 1
-:caption: Examples
-:name: examples-guides
+:caption: Integrations
+:name: integrations-guides
 :hidden:
 
-User Guide <user_guide/index>
-Tutorials <flytesnacks/tutorials>
 Integrations <flytesnacks/integrations>
+Flyte agents <flyte_agents/index>
 Deprecated integrations <deprecated_integrations/index>
 ```
 
