@@ -275,14 +275,15 @@ func (f *FastTaskService) Cleanup(ctx context.Context, taskID, queueID, workerID
 	f.queuesLock.RLock()
 	defer f.queuesLock.RUnlock()
 
-	queue := f.queues[queueID]
-	queue.lock.RLock()
-	defer queue.lock.RUnlock()
+	if queue, exists := f.queues[queueID]; exists {
+		queue.lock.RLock()
+		defer queue.lock.RUnlock()
 
-	if worker, exists := queue.workers[workerID]; exists {
-		worker.responseChan <- &pb.HeartbeatResponse{
-			TaskId:    taskID,
-			Operation: pb.HeartbeatResponse_DELETE,
+		if worker, exists := queue.workers[workerID]; exists {
+			worker.responseChan <- &pb.HeartbeatResponse{
+				TaskId:    taskID,
+				Operation: pb.HeartbeatResponse_DELETE,
+			}
 		}
 	}
 

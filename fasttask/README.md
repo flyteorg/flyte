@@ -13,5 +13,7 @@ FastTask is a Flyte plugin to execute tasks quickly using a persistent, external
     export FLYTE_AWS_ACCESS_KEY_ID=minio
     export FLYTE_AWS_SECRET_ACCESS_KEY=miniostorage
     export FLYTE_AWS_ENDPOINT=http://localhost:30084
+
+    ./target/debug/worker bridge --queue-id=bar --fast-register-dir-override /tmp/fasttask-test
 ## build fast task worker image
     docker build -t hamersaw/fasttask:<tag> -f Dockerfile .
