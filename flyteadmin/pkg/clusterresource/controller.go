@@ -11,16 +11,11 @@ import (
 	"path/filepath"
 	"runtime/debug"
 	"strings"
-	"sync"
 
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/samber/lo"
-	"golang.org/x/exp/maps"
-	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	corev1 "k8s.io/api/core/v1"
-	k8_api_err "k8s.io/apimachinery/pkg/api/errors"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -38,7 +33,6 @@ import (
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/restmapper"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	impl2 "github.com/flyteorg/flyte/flyteadmin/pkg/clusterresource/impl"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/clusterresource/interfaces"
@@ -68,9 +62,6 @@ const templateVariableFormat = "{{ %s }}"
 const replaceAllInstancesOfString = -1
 const noChange = "{}"
 
-var deleteImmediately = int64(0)
-var deleteForeground = metav1.DeletePropagationForeground
-
 // The clusterresource Controller manages applying desired templatized kubernetes resource files as resources
 // in the execution kubernetes cluster.
 type Controller interface {
@@ -81,12 +72,9 @@ type Controller interface {
 type controllerMetrics struct {
 	Scope                           promutils.Scope
 	SyncStarted                     prometheus.Counter
-	SyncsCompleted                  prometheus.Counter
 	KubernetesResourcesCreated      prometheus.Counter
 	KubernetesResourcesCreateErrors prometheus.Counter
-	KubernetesNamespaceDeleteErrors prometheus.Counter
 	ResourcesAdded                  prometheus.Counter
-	NamespacesDeleted               prometheus.Counter
 	ResourceAddErrors               prometheus.Counter
 	TemplateReadErrors              prometheus.Counter
 	TemplateDecodeErrors            prometheus.Counter
@@ -108,25 +96,19 @@ type controller struct {
 	metrics                controllerMetrics
 	lastAppliedTemplateDir string
 	// Map of [namespace -> [templateFileName -> last modified time]]
-	appliedNamespaceTemplateChecksums sync.Map
-	adminDataProvider                 interfaces.FlyteAdminDataProvider
-	listTargets                       executionclusterIfaces.ListTargetsInterface
+	appliedTemplates  NamespaceCache
+	adminDataProvider interfaces.FlyteAdminDataProvider
+	listTargets       executionclusterIfaces.ListTargetsInterface
 }
 
 // templateAlreadyApplied checks if there is an applied template with the same checksum
-func (c *controller) templateAlreadyApplied(ctx context.Context, namespace NamespaceName, templateFilename string, checksum [16]byte) bool {
-	namespaceTemplateChecksumsVal, ok := c.appliedNamespaceTemplateChecksums.Load(namespace)
+func (c *controller) templateAlreadyApplied(namespace NamespaceName, templateFilename string, checksum [16]byte) bool {
+	namespacedAppliedTemplates, ok := c.appliedTemplates[namespace]
 	if !ok {
 		// There is no record of this namespace altogether.
 		return false
 	}
-
-	namespacedAppliedTemplateChecksums, ok := namespaceTemplateChecksumsVal.(TemplateChecksums)
-	if !ok {
-		logger.Errorf(ctx, "unexpected type for namespace '%s' in appliedTemplates map: %t", namespace, namespaceTemplateChecksumsVal)
-		return false
-	}
-	appliedChecksum, ok := namespacedAppliedTemplateChecksums[templateFilename]
+	appliedChecksum, ok := namespacedAppliedTemplates[templateFilename]
 	if !ok {
 		// There is no record of this file having ever been applied.
 		return false
@@ -136,20 +118,11 @@ func (c *controller) templateAlreadyApplied(ctx context.Context, namespace Names
 }
 
 // setTemplateChecksum records the latest checksum for the template file
-func (c *controller) setTemplateChecksum(ctx context.Context, namespace NamespaceName, templateFilename string, checksum [16]byte) {
-	namespaceTemplateChecksumsVal, ok := c.appliedNamespaceTemplateChecksums.Load(namespace)
-	if !ok {
-		c.appliedNamespaceTemplateChecksums.Store(namespace, TemplateChecksums{templateFilename: checksum})
-		return
+func (c *controller) setTemplateChecksum(namespace NamespaceName, templateFilename string, checksum [16]byte) {
+	if _, ok := c.appliedTemplates[namespace]; !ok {
+		c.appliedTemplates[namespace] = make(TemplateChecksums)
 	}
-
-	namespacedAppliedTemplateChecksums, ok := namespaceTemplateChecksumsVal.(TemplateChecksums)
-	if !ok {
-		logger.Errorf(ctx, "unexpected type for namespace '%s' in appliedTemplates map: %t", namespace, namespaceTemplateChecksumsVal)
-		return
-	}
-	namespacedAppliedTemplateChecksums[templateFilename] = checksum
-	c.appliedNamespaceTemplateChecksums.Store(namespace, namespacedAppliedTemplateChecksums)
+	c.appliedTemplates[namespace][templateFilename] = checksum
 }
 
 // Given a map of templatized variable names -> data source, this function produces an output that maps the same
@@ -304,12 +277,11 @@ func prepareDynamicCreate(target executioncluster.ExecutionTarget, config string
 //  2. create the resource on the kubernetes cluster and cache successful outcomes
 func (c *controller) syncNamespace(ctx context.Context, project *admin.Project, domain *admin.Domain,
 	namespace NamespaceName, templateValues, customTemplateValues templateValuesType) (ResourceSyncStats, error) {
-	logger.Debugf(ctx, "syncing namespace: '%s' for project '%s' and domain '%s' and org '%s'", namespace, project.Id, domain.Id, project.Org)
 	templateDir := c.config.ClusterResourceConfiguration().GetTemplatePath()
 	if c.lastAppliedTemplateDir != templateDir {
 		// Invalidate all caches
 		c.lastAppliedTemplateDir = templateDir
-		c.appliedNamespaceTemplateChecksums = sync.Map{}
+		c.appliedTemplates = make(NamespaceCache)
 	}
 	templateFiles, err := ioutil.ReadDir(templateDir)
 	if err != nil {
@@ -321,7 +293,6 @@ func (c *controller) syncNamespace(ctx context.Context, project *admin.Project, 
 	collectedErrs := make([]error, 0)
 	stats := ResourceSyncStats{}
 	for _, templateFile := range templateFiles {
-		templateFile := templateFile
 		templateFileName := templateFile.Name()
 		if filepath.Ext(templateFileName) != ".yaml" {
 			// nothing to do.
@@ -338,7 +309,7 @@ func (c *controller) syncNamespace(ctx context.Context, project *admin.Project, 
 		}
 
 		checksum := md5.Sum([]byte(k8sManifest)) // #nosec
-		if c.templateAlreadyApplied(ctx, namespace, templateFileName, checksum) {
+		if c.templateAlreadyApplied(namespace, templateFileName, checksum) {
 			// nothing to do.
 			logger.Debugf(ctx, "syncing namespace [%s]: templateFile [%s] already applied, nothing to do.", namespace, templateFile.Name())
 			stats.AlreadyThere++
@@ -357,8 +328,8 @@ func (c *controller) syncNamespace(ctx context.Context, project *admin.Project, 
 				continue
 			}
 
-			logger.Debugf(ctx, "Attempting to create resource [%+v] in cluster [%v] for namespace [%s] and templateFileName: %+v",
-				dynamicObj.obj.GetKind(), target.ID, namespace, templateFileName)
+			logger.Debugf(ctx, "Attempting to create resource [%+v] in cluster [%v] for namespace [%s]",
+				dynamicObj.obj.GetKind(), target.ID, namespace)
 
 			dr := getDynamicResourceInterface(dynamicObj.mapping, target.DynamicClient, namespace)
 			_, err = dr.Create(ctx, dynamicObj.obj, metav1.CreateOptions{})
@@ -403,7 +374,6 @@ func (c *controller) syncNamespace(ctx context.Context, project *admin.Project, 
 						logger.Infof(ctx, "Resource [%+v] in namespace [%s] is not modified",
 							dynamicObj.obj.GetKind(), namespace)
 						stats.AlreadyThere++
-						c.setTemplateChecksum(ctx, namespace, templateFileName, checksum)
 						continue
 					}
 
@@ -421,7 +391,7 @@ func (c *controller) syncNamespace(ctx context.Context, project *admin.Project, 
 					stats.Updated++
 					logger.Debugf(ctx, "Successfully updated resource [%+v] in namespace [%s]",
 						dynamicObj.obj.GetKind(), namespace)
-					c.setTemplateChecksum(ctx, namespace, templateFileName, checksum)
+					c.setTemplateChecksum(namespace, templateFileName, checksum)
 				} else {
 					// Some error other than AlreadyExists was raised when we tried to Create the k8s object.
 					c.metrics.KubernetesResourcesCreateErrors.Inc()
@@ -438,64 +408,15 @@ func (c *controller) syncNamespace(ctx context.Context, project *admin.Project, 
 				logger.Debugf(ctx, "Created resource [%+v] for namespace [%s] in kubernetes",
 					dynamicObj.obj.GetKind(), namespace)
 				c.metrics.KubernetesResourcesCreated.Inc()
-				c.setTemplateChecksum(ctx, namespace, templateFileName, checksum)
+				c.setTemplateChecksum(namespace, templateFileName, checksum)
 			}
 		}
 	}
 	if len(collectedErrs) > 0 {
 		return stats, errors.NewCollectedFlyteAdminError(codes.Internal, collectedErrs)
 	}
+
 	return stats, nil
-}
-
-func (c *controller) deleteNamespace(ctx context.Context, project *admin.Project, domain *admin.Domain,
-	namespace NamespaceName) (ResourceSyncStats, error) {
-	logger.Debugf(ctx, "attempting to delete namespace: '%s' for project '%s' and domain '%s' and org '%s'",
-		namespace, project.Id, domain.Id, project.Org)
-	collectedErrs := make([]error, 0)
-	_, mapHasVal := c.appliedNamespaceTemplateChecksums.Load(namespace)
-	if !mapHasVal {
-		logger.Debugf(ctx, "namespace: '%s' for project '%s' and domain '%s' and org '%s' is already recorded as deleted",
-			namespace, project.Id, domain.Id, project.Org)
-		return ResourceSyncStats{}, nil
-	}
-	for _, target := range c.listTargets.GetValidTargets() {
-		ns := &corev1.Namespace{
-			ObjectMeta: metav1.ObjectMeta{
-				Name: namespace,
-			},
-		}
-		err := target.Client.Delete(context.Background(), ns, &client.DeleteOptions{
-			GracePeriodSeconds: &deleteImmediately,
-			PropagationPolicy:  &deleteForeground,
-		})
-		if err != nil {
-			if k8_api_err.IsNotFound(err) || k8_api_err.IsGone(err) {
-				logger.Debugf(ctx, "namespace: '%s' for project '%s' and domain '%s' and org '%s' is already deleted",
-					namespace, project.Id, domain.Id, project.Org)
-				continue
-			}
-
-			c.metrics.KubernetesNamespaceDeleteErrors.Inc()
-			logger.Errorf(ctx, "failed to delete namespace [%s] for project [%s] and domain [%s] and org [%s] with err: %v",
-				namespace, project.Id, domain.Id, project.Org, err)
-			collectedErrs = append(collectedErrs, err)
-			continue
-		}
-		logger.Infof(ctx, "successfully deleted namespace [%s] for project [%s] and domain [%s] and org [%s]", namespace, project.Id, domain.Id, project.Org)
-		c.metrics.NamespacesDeleted.Inc()
-	}
-
-	// Now clean up internal state that tracks this formerly active namespace
-	c.appliedNamespaceTemplateChecksums.Delete(namespace)
-
-	if len(collectedErrs) > 0 {
-		return ResourceSyncStats{}, errors.NewCollectedFlyteAdminError(codes.Internal, collectedErrs)
-	}
-
-	return ResourceSyncStats{
-		Deleted: 1,
-	}, nil
 }
 
 var metadataAccessor = meta.NewAccessor()
@@ -640,113 +561,6 @@ func (c *controller) createPatch(gvk schema.GroupVersionKind, currentObj *unstru
 	return patch, patchType, nil
 }
 
-type syncNamespaceProcessor = func(ctx context.Context, project *admin.Project, domain *admin.Domain,
-	namespace NamespaceName) (ResourceSyncStats, error)
-
-// newSyncNamespacer returns a closure that can be used to sync a namespace with the given default template values and domain-specific template values
-func (c *controller) newSyncNamespacer(templateValues templateValuesType, domainTemplateValues map[string]templateValuesType) syncNamespaceProcessor {
-	return func(ctx context.Context, project *admin.Project, domain *admin.Domain,
-		namespace NamespaceName) (ResourceSyncStats, error) {
-		logger.Debugf(ctx, "sync namespacer is processing namespace: '%s' for project '%s' and domain '%s' and org '%s'",
-			namespace, project.Id, domain.Id, project.Org)
-		customTemplateValues, err := c.getCustomTemplateValues(
-			ctx, project.Org, project.Id, domain.Id, domainTemplateValues[domain.Id])
-		if err != nil {
-			logger.Errorf(ctx, "Failed to get custom template values for %s with err: %v", namespace, err)
-			return ResourceSyncStats{}, err
-		}
-
-		// syncNamespace actually mutates the templateValues, so we copy it for safe concurrent access.
-		templateValuesCopy := maps.Clone(templateValues)
-		newStats, err := c.syncNamespace(ctx, project, domain, namespace, templateValuesCopy, customTemplateValues)
-		if err != nil {
-			logger.Warningf(ctx, "Failed to create cluster resources for namespace [%s] with err: %v", namespace, err)
-			c.metrics.ResourceAddErrors.Inc()
-			return ResourceSyncStats{}, err
-		}
-		c.metrics.ResourcesAdded.Inc()
-		logger.Debugf(ctx, "successfully created kubernetes resources for '%s' for project '%s' and domain '%s' and org '%s'",
-			namespace, project.Id, domain.Id, project.Org)
-		return newStats, nil
-	}
-}
-
-// processProjects accepts a generic project processor and applies it to all projects in the input list,
-// optionally batching and parallelizing their processing for greater perf.
-func (c *controller) processProjects(ctx context.Context, stats ResourceSyncStats, projects []*admin.Project, processor syncNamespaceProcessor) (ResourceSyncStats, error) {
-	if len(projects) == 0 {
-		// Nothing to do
-		return stats, nil
-	}
-
-	if c.config.ClusterResourceConfiguration().GetUnionProjectSyncConfig().BatchSize == 0 {
-		logger.Debugf(ctx, "processing projects serially")
-		for _, project := range projects {
-			for _, domain := range project.Domains {
-				namespace := common.GetNamespaceName(c.config.NamespaceMappingConfiguration().GetNamespaceTemplate(), project.Org, project.Id, domain.Name)
-				newStats, err := processor(ctx, project, domain, namespace)
-				if err != nil {
-					return stats, err
-				}
-				stats.Add(newStats)
-				logger.Infof(ctx, "Completed cluster resource creation loop for namespace [%s] with stats: [%+v]", namespace, newStats)
-			}
-		}
-		return stats, nil
-	}
-
-	logger.Debugf(ctx, "processing projects in parallel with batch size: %d", c.config.ClusterResourceConfiguration().GetUnionProjectSyncConfig().BatchSize)
-	statsEntries := make([]ResourceSyncStats, len(projects)*len(projects[0].Domains))
-
-	batchSize := c.config.ClusterResourceConfiguration().GetUnionProjectSyncConfig().BatchSize
-	for i := 0; i < len(projects); i += batchSize {
-		logger.Debugf(ctx, "processing projects batch {%d...%d}", i, i+batchSize)
-		processProjectsGroup, processProjectsCtx := errgroup.WithContext(ctx)
-		for _, project := range projects[i:min(i+batchSize, len(projects))] {
-			var lastFormattedNamespace NamespaceName
-			for domainIdx, domain := range project.Domains {
-				// redefine variables for loop closure
-				i := i
-				org := project.Org
-				project := project
-				domain := domain
-				domainIdx := domainIdx
-				namespace := common.GetNamespaceName(c.config.NamespaceMappingConfiguration().GetNamespaceTemplate(), org, project.Id, domain.Id)
-				if lastFormattedNamespace == namespace {
-					// This is a case where the namespace isn't customized based on project + domain + org, but rather project + org only
-					continue
-				}
-				lastFormattedNamespace = namespace
-
-				processProjectsGroup.Go(func() error {
-					resourceStats, err := processor(processProjectsCtx, project, domain, namespace)
-					if err != nil {
-						logger.Warningf(ctx, "failed to create cluster resources for namespace [%s] with err: %v", namespace, err)
-						c.metrics.ResourceAddErrors.Inc()
-						// we don't error out here, in order to not block other namespaces from being synced
-					} else {
-						c.metrics.ResourcesAdded.Inc()
-						statsEntries[i+domainIdx] = resourceStats
-						logger.Debugf(ctx, "Completed cluster resource creation loop for namespace [%s] with stats: [%+v]", namespace, resourceStats)
-					}
-
-					return nil
-				})
-			}
-		}
-		if err := processProjectsGroup.Wait(); err != nil {
-			logger.Warningf(ctx, "failed to process projects batch {%d...%d} when syncing namespaces with: %v",
-				i, i+batchSize, err)
-		}
-		logger.Debugf(ctx, "processed projects batch {%d...%d} when syncing namespaces", i, i+batchSize)
-	}
-	statsSummary := lo.Reduce(statsEntries, func(existing ResourceSyncStats, item ResourceSyncStats, _ int) ResourceSyncStats {
-		existing.Add(item)
-		return existing
-	}, ResourceSyncStats{})
-	return statsSummary, nil
-}
-
 func (c *controller) Sync(ctx context.Context) error {
 	defer func() {
 		if err := recover(); err != nil {
@@ -757,7 +571,6 @@ func (c *controller) Sync(ctx context.Context) error {
 	c.metrics.SyncStarted.Inc()
 	logger.Debugf(ctx, "Running an invocation of ClusterResource Sync")
 
-	// First handle ensuring k8s resources for active projects
 	projects, err := c.adminDataProvider.GetProjects(ctx)
 	if err != nil {
 		return err
@@ -775,31 +588,38 @@ func (c *controller) Sync(ctx context.Context) error {
 	}
 
 	stats := ResourceSyncStats{}
-	syncNamespaceProcessorFunc := c.newSyncNamespacer(templateValues, domainTemplateValues)
-	stats, err = c.processProjects(ctx, stats, projects.GetProjects(), syncNamespaceProcessorFunc)
-	if err != nil {
-		logger.Warningf(ctx, "Failed to process projects when syncing namespaces: %v", err)
-		return err
+
+	for _, project := range projects.Projects {
+		for _, domain := range project.Domains {
+			namespace := common.GetNamespaceName(c.config.NamespaceMappingConfiguration().GetNamespaceTemplate(), project.Org, project.Id, domain.Name)
+			customTemplateValues, err := c.getCustomTemplateValues(
+				ctx, project.Org, project.Id, domain.Id, domainTemplateValues[domain.Id])
+			if err != nil {
+				logger.Errorf(ctx, "Failed to get custom template values for %s with err: %v", namespace, err)
+				errs = append(errs, err)
+			}
+
+			newStats, err := c.syncNamespace(ctx, project, domain, namespace, templateValues, customTemplateValues)
+			if err != nil {
+				logger.Warningf(ctx, "Failed to create cluster resources for namespace [%s] with err: %v", namespace, err)
+				c.metrics.ResourceAddErrors.Inc()
+				errs = append(errs, err)
+			} else {
+				c.metrics.ResourcesAdded.Inc()
+				logger.Debugf(ctx, "Successfully created kubernetes resources for [%s]", namespace)
+				stats.Add(newStats)
+			}
+
+			logger.Infof(ctx, "Completed cluster resource creation loop for namespace [%s] with stats: [%+v]", namespace, newStats)
+		}
 	}
 
-	// Second, handle deleting k8s namespaces for archived projects
-	archivedProjects, err := c.adminDataProvider.GetArchivedProjects(ctx)
-	if err != nil {
-		logger.Warningf(ctx, "failed to get archived projects: %v", err)
-		return err
-	}
-	stats, err = c.processProjects(ctx, stats, archivedProjects.GetProjects(), c.deleteNamespace)
-	if err != nil {
-		logger.Warningf(ctx, "Failed to process projects when deleting namespaces: %v", err)
-		return err
-	}
 	logger.Infof(ctx, "Completed cluster resource creation loop with stats: [%+v]", stats)
 
 	if len(errs) > 0 {
 		return errors.NewCollectedFlyteAdminError(codes.Internal, errs)
 	}
 
-	c.metrics.SyncsCompleted.Inc()
 	return nil
 }
 
@@ -822,15 +642,12 @@ func newMetrics(scope promutils.Scope) controllerMetrics {
 		Scope: scope,
 		SyncStarted: scope.MustNewCounter("k8s_resource_syncs",
 			"overall count of the number of invocations of the resource controller 'sync' method"),
-		SyncsCompleted: scope.MustNewCounter("sync_success", "overall count of successful invocations of the resource controller 'sync' method"),
 		KubernetesResourcesCreated: scope.MustNewCounter("k8s_resources_created",
 			"overall count of successfully created resources in kubernetes"),
 		KubernetesResourcesCreateErrors: scope.MustNewCounter("k8s_resource_create_errors",
 			"overall count of errors encountered attempting to create resources in kubernetes"),
-		KubernetesNamespaceDeleteErrors: scope.MustNewCounter("k8s_namespace_delete_errors", "overall count of errors encountered attempting to delete namespaces in kubernetes"),
 		ResourcesAdded: scope.MustNewCounter("resources_added",
 			"overall count of successfully added resources for namespaces"),
-		NamespacesDeleted: scope.MustNewCounter("namespaces_deleted", "overall count of successfully deleted namespaces"),
 		ResourceAddErrors: scope.MustNewCounter("resource_add_errors",
 			"overall count of errors encountered creating resources for namespaces"),
 		TemplateReadErrors: scope.MustNewCounter("template_read_errors",
@@ -856,6 +673,7 @@ func NewClusterResourceController(adminDataProvider interfaces.FlyteAdminDataPro
 		listTargets:       listTargets,
 		poller:            make(chan struct{}),
 		metrics:           newMetrics(scope),
+		appliedTemplates:  make(map[string]TemplateChecksums),
 	}
 }
 

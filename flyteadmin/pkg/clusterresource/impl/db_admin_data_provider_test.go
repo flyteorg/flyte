@@ -106,7 +106,7 @@ func TestGetProjects(t *testing.T) {
 		mockRepo.(*repoMocks.MockRepository).ProjectRepoIface = &repoMocks.MockProjectRepo{
 			ListProjectsFunction: func(ctx context.Context, input repoInterfaces.ListResourceInput) ([]models.Project, error) {
 				assert.Len(t, input.InlineFilters, 1)
-				assert.Equal(t, input.SortParameter.GetGormOrderExpr(), "updated_at desc")
+				assert.Equal(t, input.SortParameter.GetGormOrderExpr(), "created_at desc")
 				return []models.Project{
 					{
 						Identifier: "flytesnacks",

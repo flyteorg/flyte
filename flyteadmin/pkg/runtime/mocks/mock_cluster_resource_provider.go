@@ -33,14 +33,6 @@ func (c MockClusterResourceConfiguration) IsStandaloneDeployment() bool {
 	return c.StandaloneDeployment
 }
 
-func (c MockClusterResourceConfiguration) GetArchiveProjectConfig() interfaces.UnionProjectSyncConfig {
-	return interfaces.UnionProjectSyncConfig{}
-}
-
-func (c MockClusterResourceConfiguration) GetUnionProjectSyncConfig() interfaces.UnionProjectSyncConfig {
-	return interfaces.UnionProjectSyncConfig{}
-}
-
 func NewMockClusterResourceConfiguration() interfaces.ClusterResourceConfiguration {
 	return &MockClusterResourceConfiguration{}
 }

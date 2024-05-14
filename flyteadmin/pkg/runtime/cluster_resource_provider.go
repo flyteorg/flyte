@@ -16,9 +16,6 @@ var clusterResourceConfig = config.MustRegisterSection(clusterResourceKey, &inte
 		Duration: time.Minute,
 	},
 	CustomData: make(map[interfaces.DomainName]interfaces.TemplateData),
-	UnionProjectSyncConfig: interfaces.UnionProjectSyncConfig{
-		BatchSize: 10,
-	},
 })
 
 // Implementation of an interfaces.ClusterResourceConfiguration
@@ -42,10 +39,6 @@ func (p *ClusterResourceConfigurationProvider) GetCustomTemplateData() map[inter
 
 func (p *ClusterResourceConfigurationProvider) IsStandaloneDeployment() bool {
 	return clusterResourceConfig.GetConfig().(*interfaces.ClusterResourceConfig).StandaloneDeployment
-}
-
-func (p *ClusterResourceConfigurationProvider) GetUnionProjectSyncConfig() interfaces.UnionProjectSyncConfig {
-	return clusterResourceConfig.GetConfig().(*interfaces.ClusterResourceConfig).UnionProjectSyncConfig
 }
 
 func NewClusterResourceConfigurationProvider() interfaces.ClusterResourceConfiguration {

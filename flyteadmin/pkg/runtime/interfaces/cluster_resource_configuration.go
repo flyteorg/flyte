@@ -20,11 +20,6 @@ type DomainName = string
 
 type TemplateData = map[string]DataSource
 
-type UnionProjectSyncConfig struct {
-	CleanupNamespace bool `json:"cleanupNamespace" pflag:", Whether to clean up resources associated with archived projects"`
-	BatchSize        int  `json:"batchSize" pflag:", How many projects to process in parallel (use 0 for serial processing)"`
-}
-
 type ClusterResourceConfig struct {
 	TemplatePath string `json:"templatePath"`
 	// TemplateData maps template keys e.g. my_super_secret_password to a data source
@@ -47,9 +42,8 @@ type ClusterResourceConfig struct {
 		    foo:
 		      value: "baz"
 	*/
-	CustomData             map[DomainName]TemplateData `json:"customData"`
-	StandaloneDeployment   bool                        `json:"standaloneDeployment" pflag:", Whether the cluster resource sync is running in a standalone deployment and should call flyteadmin service endpoints"`
-	UnionProjectSyncConfig UnionProjectSyncConfig      `json:"unionProjectSyncConfig"`
+	CustomData           map[DomainName]TemplateData `json:"customData"`
+	StandaloneDeployment bool                        `json:"standaloneDeployment" pflag:", Whether the cluster resource sync is running in a standalone deployment and should call flyteadmin service endpoints"`
 }
 
 type ClusterResourceConfiguration interface {
@@ -58,5 +52,4 @@ type ClusterResourceConfiguration interface {
 	GetRefreshInterval() time.Duration
 	GetCustomTemplateData() map[DomainName]TemplateData
 	IsStandaloneDeployment() bool
-	GetUnionProjectSyncConfig() UnionProjectSyncConfig
 }

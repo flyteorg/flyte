@@ -89,8 +89,7 @@ func TestServiceGetProjects(t *testing.T) {
 	t.Run("happy case", func(t *testing.T) {
 		mockAdmin := mocks.AdminServiceClient{}
 		mockAdmin.OnListProjectsMatch(ctx, mock.MatchedBy(func(req *admin.ProjectListRequest) bool {
-			res := req.Limit == 100 && req.Filters == "ne(state,1)" && req.SortBy.Key == "updated_at"
-			return res
+			return req.Limit == 100 && req.Filters == "ne(state,1)" && req.SortBy.Key == "created_at"
 		})).Return(&admin.Projects{
 			Projects: []*admin.Project{
 				{
@@ -111,7 +110,7 @@ func TestServiceGetProjects(t *testing.T) {
 	t.Run("admin error", func(t *testing.T) {
 		mockAdmin := mocks.AdminServiceClient{}
 		mockAdmin.OnListProjectsMatch(ctx, mock.MatchedBy(func(req *admin.ProjectListRequest) bool {
-			return req.Limit == 100 && req.Filters == "ne(state,1)" && req.SortBy.Key == "updated_at"
+			return req.Limit == 100 && req.Filters == "ne(state,1)" && req.SortBy.Key == "created_at"
 		})).Return(nil, errFoo)
 		provider := serviceAdminProvider{
 			adminClient: &mockAdmin,

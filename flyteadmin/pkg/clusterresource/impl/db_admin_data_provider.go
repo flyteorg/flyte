@@ -12,10 +12,6 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
-const (
-	stateColumn = "state"
-)
-
 // Implementation of an interfaces.FlyteAdminDataProvider which fetches data directly from the provided database connection.
 type dbAdminProvider struct {
 	db              repositoryInterfaces.Repository
@@ -51,20 +47,11 @@ func (p dbAdminProvider) getDomains() []*admin.Domain {
 	return domains
 }
 
-func (p dbAdminProvider) getProjects(ctx context.Context, useActiveProjectsFilter bool) (projectsList *admin.Projects, err error) {
-	var filter common.InlineFilter
-	if useActiveProjectsFilter {
-		filter, err = common.NewSingleValueFilter(common.Project, common.NotEqual, stateColumn, int32(admin.Project_ARCHIVED))
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		filter, err = common.NewSingleValueFilter(common.Project, common.Equal, stateColumn, int32(admin.Project_ARCHIVED))
-		if err != nil {
-			return nil, err
-		}
+func (p dbAdminProvider) GetProjects(ctx context.Context) (*admin.Projects, error) {
+	filter, err := common.NewSingleValueFilter(common.Project, common.NotEqual, "state", int32(admin.Project_ARCHIVED))
+	if err != nil {
+		return nil, err
 	}
-
 	projectModels, err := p.db.ProjectRepo().List(ctx, repositoryInterfaces.ListResourceInput{
 		SortParameter: descCreatedAtSortDBParam,
 		InlineFilters: []common.InlineFilter{filter},
@@ -76,14 +63,6 @@ func (p dbAdminProvider) getProjects(ctx context.Context, useActiveProjectsFilte
 	return &admin.Projects{
 		Projects: projects,
 	}, nil
-}
-
-func (p dbAdminProvider) GetProjects(ctx context.Context) (*admin.Projects, error) {
-	return p.getProjects(ctx, getActiveProjects)
-}
-
-func (p dbAdminProvider) GetArchivedProjects(ctx context.Context) (*admin.Projects, error) {
-	return p.getProjects(ctx, getArchivedProjects)
 }
 
 func NewDatabaseAdminDataProvider(db repositoryInterfaces.Repository, config runtimeInterfaces.Configuration, resourceManager managerInterfaces.ResourceInterface) interfaces.FlyteAdminDataProvider {
