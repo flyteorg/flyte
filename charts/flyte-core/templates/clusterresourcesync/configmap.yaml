@@ -34,5 +34,4 @@ data:
     clusters:
       {{- tpl (toYaml .) $ | nindent 6 }}
   {{- end }}
-
-  {{- end }}
+{{- end }}

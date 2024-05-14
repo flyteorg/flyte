@@ -399,10 +399,18 @@ flyteconsole:
   service:
     annotations: {}
     type: ClusterIP
+  # -- Configuration for service accounts for FlyteConsole
+  serviceAccount:
+    # -- Should a service account be created for the console
+    create: true
+    # -- Annotations for ServiceAccount attached to the console
+    annotations: {}
+    # -- ImagePullSecrets to automatically assign to the service console
+    imagePullSecrets: []
   # -- Annotations for Flyteconsole pods
   podAnnotations: {}
   # -- Additional Flyteconsole container environment variables
-  podEnv: {}
+  podEnv: []
   # -- Labels for Flyteconsole pods
   podLabels: {}
   # -- nodeSelector for Flyteconsole deployment
@@ -903,8 +911,18 @@ cluster_resource_manager:
   # -- Enables the Cluster resource manager component
   enabled: true
   standaloneDeployment: false
+  # nameOverride String to override flyteclusterresourcesync.name template
+  nameOverride:
   # -- Service account name to run with
   service_account_name: flyteadmin
+  # -- Configuration for service accounts for ClusterResource, will ignore service_account_name if set
+  serviceAccount:
+    # -- Should a service account be created for the ClusterResource
+    create: true
+    # -- Annotations for ServiceAccount attached to the ClusterResource
+    annotations: { }
+    # -- ImagePullSecrets to automatically assign to the service ClusterResource
+    imagePullSecrets: [ ]
   # -- Annotations for ClusterResource pods
   podAnnotations: {}
   # -- Additional ClusterResource container environment variables

@@ -59,6 +59,7 @@ spec:
         volumeMounts:
         - mountPath: /srv/flyte
           name: shared-data
+      serviceAccountName: {{ template "flyteconsole.name" . }}
       volumes:
       - emptyDir: {}
         name: shared-data

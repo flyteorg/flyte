@@ -1,0 +1,16 @@
+{{- if .Values.cluster_resource_manager.enabled }}
+{{- if .Values.cluster_resource_manager.serviceAccount.create }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ template "flyteclusterresourcesync.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+  labels: {{ include "flyteclusterresourcesync.labels" . | nindent 4 }}
+  {{- with .Values.cluster_resource_manager.serviceAccount.annotations }}
+  annotations: {{ tpl (toYaml .) $ | nindent 4 }}
+  {{- end}}
+{{- with .Values.cluster_resource_manager.serviceAccount.imagePullSecrets }}
+imagePullSecrets: {{ tpl (toYaml .) $ | nindent 2 }}
+{{- end }}
+{{- end }}
+{{- end }}
