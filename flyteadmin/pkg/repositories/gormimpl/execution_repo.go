@@ -25,7 +25,7 @@ type ExecutionRepo struct {
 func (r *ExecutionRepo) Create(ctx context.Context, input models.Execution, executionTagModel []*models.ExecutionTag) error {
 	timer := r.metrics.CreateDuration.Start()
 	err := r.db.WithContext(ctx).Transaction(func(_ *gorm.DB) error {
-		if executionTagModel != nil {
+		if executionTagModel != nil && len(executionTagModel) > 0 {
 			tx := r.db.WithContext(ctx).Omit("id").Create(executionTagModel)
 			if tx.Error != nil {
 				return r.errorTransformer.ToFlyteAdminError(tx.Error)
