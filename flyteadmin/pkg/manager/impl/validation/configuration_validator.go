@@ -9,17 +9,27 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
-func ValidateConfigurationGetRequest(ctx context.Context, db repositoryInterfaces.Repository, config runtimeInterfaces.ApplicationConfiguration, request admin.ConfigurationGetRequest) error {
+func ValidateConfigurationGetRequest(request admin.ConfigurationGetRequest) error {
 	if request.Id == nil {
 		return shared.GetMissingArgumentError(shared.ID)
 	}
-	// Get request should only have org (optional), project, and domain set
+	return nil
+}
+
+func ValidateProjectDomainConfigurationGetRequest(ctx context.Context, db repositoryInterfaces.Repository, config runtimeInterfaces.ApplicationConfiguration, request admin.ConfigurationGetRequest) error {
+	// Get project domain configuration request should only have org (optional), project, and domain set
 	if err := ValidateNonemptyStringField(request.Id.Workflow, shared.Workflow); err != nil {
 		return err
 	}
 	if err := ValidateProjectExists(ctx, db, request.Id.Project, request.Id.Org); err != nil {
 		return err
 	}
+	return ValidateDomainExists(ctx, config, request.Id.Domain)
+}
+
+func ValidateDefaultConfigurationGetRequest(ctx context.Context, config runtimeInterfaces.ApplicationConfiguration, request admin.ConfigurationGetRequest) error {
+	// Only when the request id exists and only has org (optional) and domain set, this validation would be applicable.
+	// So, we only have to check if the domain exists.
 	return ValidateDomainExists(ctx, config, request.Id.Domain)
 }
 

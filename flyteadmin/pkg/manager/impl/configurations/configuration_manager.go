@@ -83,7 +83,22 @@ func (m *ConfigurationManager) GetConfiguration(
 	ctx context.Context, request admin.ConfigurationGetRequest) (
 	*admin.ConfigurationGetResponse, error) {
 	// Validate the request
-	if err := validation.ValidateConfigurationGetRequest(ctx, m.db, m.config.ApplicationConfiguration(), request); err != nil {
+	if err := validation.ValidateConfigurationGetRequest(request); err != nil {
+		return nil, err
+	}
+	if request.Id.Domain != "" && request.Id.Project == "" && request.Id.Workflow == "" {
+		logger.Debugf(ctx, "getting default configuration")
+		return m.getDefaultConfiguration(ctx, request)
+	}
+	logger.Debugf(ctx, "getting project domain configuration")
+	return m.getProjectDomainConfiguration(ctx, request)
+}
+
+func (m *ConfigurationManager) getProjectDomainConfiguration(
+	ctx context.Context, request admin.ConfigurationGetRequest) (
+	*admin.ConfigurationGetResponse, error) {
+	// Validate the request
+	if err := validation.ValidateProjectDomainConfigurationGetRequest(ctx, m.db, m.config.ApplicationConfiguration(), request); err != nil {
 		return nil, err
 	}
 
@@ -103,6 +118,33 @@ func (m *ConfigurationManager) GetConfiguration(
 		Id:            request.GetId(),
 		Version:       activeDocument.GetVersion(),
 		Configuration: configurationWithSource,
+	}
+	return response, nil
+}
+
+func (m *ConfigurationManager) getDefaultConfiguration(
+	ctx context.Context, request admin.ConfigurationGetRequest) (
+	*admin.ConfigurationGetResponse, error) {
+	// Validate the request
+	if err := validation.ValidateDefaultConfigurationGetRequest(ctx, m.config.ApplicationConfiguration(), request); err != nil {
+		return nil, err
+	}
+
+	// Get the active document
+	activeDocument, err := m.GetReadOnlyActiveDocument(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	defaultConfigurationWithSource, err := util.GetDefaultConfigurationWithSource(ctx, &activeDocument, request.GetId().GetDomain())
+	if err != nil {
+		return nil, err
+	}
+
+	response := &admin.ConfigurationGetResponse{
+		Id:            request.GetId(),
+		Version:       activeDocument.GetVersion(),
+		Configuration: defaultConfigurationWithSource,
 	}
 	return response, nil
 }

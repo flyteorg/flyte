@@ -308,6 +308,59 @@
         ]
       }
     },
+    "/api/v1/configuration/{id.domain}": {
+      "get": {
+        "summary": "Fetch a unified project attribute.",
+        "operationId": "AdminService_GetConfiguration3",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminConfigurationGetResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.domain",
+            "description": "Name of the domain the configuration belongs to.\n+optional",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.org",
+            "description": "Name of the org the configuration belongs to.\n+optional",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "id.project",
+            "description": "Name of the project the configuration belongs to.\n+optional",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "id.workflow",
+            "description": "Name of the workflow the configuration belongs to.\n+optional",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
     "/api/v1/configuration/{id.project}/{id.domain}": {
       "get": {
         "summary": "Fetch a unified project attribute.",
@@ -2753,6 +2806,59 @@
               "ASCENDING"
             ],
             "default": "DESCENDING"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/org/configuration/{id.org}/{id.domain}": {
+      "get": {
+        "summary": "Fetch a unified project attribute.",
+        "operationId": "AdminService_GetConfiguration4",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminConfigurationGetResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.org",
+            "description": "Name of the org the configuration belongs to.\n+optional",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.domain",
+            "description": "Name of the domain the configuration belongs to.\n+optional",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.project",
+            "description": "Name of the project the configuration belongs to.\n+optional",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "id.workflow",
+            "description": "Name of the workflow the configuration belongs to.\n+optional",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [

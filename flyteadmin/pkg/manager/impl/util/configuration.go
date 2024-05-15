@@ -130,6 +130,22 @@ func GetConfigurationWithSource(ctx context.Context, document *admin.Configurati
 	return configuration, nil
 }
 
+func GetDefaultConfigurationWithSource(ctx context.Context, document *admin.ConfigurationDocument, domain string) (*admin.ConfigurationWithSource, error) {
+	domainConfiguration, err := GetConfigurationFromDocument(ctx, document, &admin.ConfigurationID{
+		Domain: domain,
+	})
+	if err != nil {
+		return nil, err
+	}
+	globalConfiguration, err := GetConfigurationFromDocument(ctx, document, &admin.ConfigurationID{})
+	if err != nil {
+		return nil, err
+	}
+	configuration := AddConfigurationSource(&domainConfiguration, admin.AttributesSource_DOMAIN)
+	configuration = MergeConfigurations(configuration, AddConfigurationSource(&globalConfiguration, admin.AttributesSource_GLOBAL))
+	return configuration, nil
+}
+
 func GetConfigurationFromDocument(ctx context.Context, document *admin.ConfigurationDocument, id *admin.ConfigurationID) (admin.Configuration, error) {
 	logger.Debugf(ctx, "Getting configuration for org: %s, project: %s, domain: %s, workflow: %s", id.Org, id.Project, id.Domain, id.Workflow)
 	documentKey, err := EncodeConfigurationDocumentKey(ctx, id)

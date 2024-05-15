@@ -304,6 +304,135 @@ func TestGetConfiguration(t *testing.T) {
 	}))
 }
 
+func TestGetDefaultConfiguration(t *testing.T) {
+	ctx := context.Background()
+	db := mocks.NewMockRepository()
+	mockConfig := &runtimeMocks.Configuration{}
+	mockPBStore := &storageMocks.ComposedProtobufStore{}
+	mockStorage := &storage.DataStore{
+		ComposedProtobufStore: mockPBStore,
+		ReferenceConstructor:  &storageMocks.ReferenceConstructor{},
+	}
+	configurationManager, err := NewConfigurationManager(ctx, db, mockConfig, mockStorage, ShouldNotBootstrapOrUpdateDefault)
+	assert.Nil(t, err)
+	// Mock repo
+	db.ConfigurationRepo().(*mocks.ConfigurationRepoInterface).On("GetActive", mock.Anything).Return(models.ConfigurationDocumentMetadata{
+		Version:          "v1",
+		DocumentLocation: s3Path,
+		Active:           true,
+	}, nil)
+	// Mock config
+	applicationConfig := &runtimeMocks.ApplicationConfiguration{}
+	applicationConfig.On("GetDomainsConfig").Return(&runtimeInterfaces.DomainsConfig{
+		runtimeInterfaces.Domain{
+			ID:   "domain",
+			Name: "domain",
+		},
+	})
+	mockConfig.On("ApplicationConfiguration").Return(applicationConfig)
+	// Mock store
+	mockPBStore.On("ReadProtobuf", mock.Anything, mock.MatchedBy(func(reference storage.DataReference) bool {
+		return reference.String() == s3Path
+	}), mock.AnythingOfType("*admin.ConfigurationDocument")).Return(nil).Run(func(args mock.Arguments) {
+		args.Get(2).(proto.Message).(*admin.ConfigurationDocument).Version = "v1"
+		configurations := make(map[string]*admin.Configuration)
+		projectDomainKey, err := util.EncodeConfigurationDocumentKey(ctx, &admin.ConfigurationID{
+			Org:     "org",
+			Project: "project",
+			Domain:  "domain",
+		})
+		assert.Nil(t, err)
+		configurations[projectDomainKey] = &admin.Configuration{
+			TaskResourceAttributes: &admin.TaskResourceAttributes{
+				Defaults: &admin.TaskResourceSpec{
+					Cpu: "1",
+					Gpu: "2",
+				},
+			},
+		}
+		projectKey, err := util.EncodeConfigurationDocumentKey(ctx, &admin.ConfigurationID{
+			Org:     "org",
+			Project: "project",
+		})
+		assert.Nil(t, err)
+		configurations[projectKey] = &admin.Configuration{
+			TaskResourceAttributes: &admin.TaskResourceAttributes{
+				Defaults: &admin.TaskResourceSpec{
+					Cpu: "5",
+					Gpu: "6",
+				},
+			},
+			WorkflowExecutionConfig: &admin.WorkflowExecutionConfig{
+				MaxParallelism: 1,
+			},
+		}
+		domainKey, err := util.EncodeConfigurationDocumentKey(ctx, &admin.ConfigurationID{
+			Domain: "domain",
+		})
+		assert.Nil(t, err)
+		configurations[domainKey] = &admin.Configuration{
+			WorkflowExecutionConfig: &admin.WorkflowExecutionConfig{
+				MaxParallelism: 2,
+			},
+		}
+		globalKey, err := util.EncodeConfigurationDocumentKey(ctx, &admin.ConfigurationID{})
+		assert.Nil(t, err)
+		configurations[globalKey] = &admin.Configuration{
+			TaskResourceAttributes: &admin.TaskResourceAttributes{
+				Defaults: &admin.TaskResourceSpec{
+					Cpu: "7",
+					Gpu: "8",
+				},
+			},
+			ExecutionQueueAttributes: &admin.ExecutionQueueAttributes{
+				Tags: []string{
+					"foo", "bar", "baz",
+				},
+			},
+		}
+		args.Get(2).(proto.Message).(*admin.ConfigurationDocument).Configurations = configurations
+	})
+
+	response, err := configurationManager.GetConfiguration(ctx, admin.ConfigurationGetRequest{
+		Id: &admin.ConfigurationID{
+			Domain: "domain",
+		},
+	})
+	assert.Nil(t, err)
+	db.ConfigurationRepo().(*mocks.ConfigurationRepoInterface).AssertExpectations(t)
+	applicationConfig.AssertExpectations(t)
+	mockPBStore.AssertExpectations(t)
+	assert.True(t, proto.Equal(response, &admin.ConfigurationGetResponse{
+		Id:      &admin.ConfigurationID{Domain: "domain"},
+		Version: "v1",
+		Configuration: &admin.ConfigurationWithSource{
+			TaskResourceAttributes: &admin.TaskResourceAttributesWithSource{
+				Source: admin.AttributesSource_GLOBAL,
+				Value: &admin.TaskResourceAttributes{
+					Defaults: &admin.TaskResourceSpec{
+						Cpu: "7",
+						Gpu: "8",
+					},
+				},
+			},
+			WorkflowExecutionConfig: &admin.WorkflowExecutionConfigWithSource{
+				Source: admin.AttributesSource_DOMAIN,
+				Value: &admin.WorkflowExecutionConfig{
+					MaxParallelism: 2,
+				},
+			},
+			ExecutionQueueAttributes: &admin.ExecutionQueueAttributesWithSource{
+				Source: admin.AttributesSource_GLOBAL,
+				Value: &admin.ExecutionQueueAttributes{
+					Tags: []string{
+						"foo", "bar", "baz",
+					},
+				},
+			},
+		},
+	}))
+}
+
 func TestUpdateProjectDomainConfiguration(t *testing.T) {
 	ctx := context.Background()
 	db := mocks.NewMockRepository()

@@ -82,6 +82,57 @@ func TestConfiguration(t *testing.T) {
 	assert.True(t, proto.Equal(expectedConfiguration, updatedConfiguration.Configuration))
 }
 
+func TestDefaultConfiguration(t *testing.T) {
+	ctx := context.Background()
+	client, conn := GetTestAdminServiceClient()
+	defer conn.Close()
+	db, err := repositories.GetDB(ctx, getDbConfig(), getLoggerConfig())
+	assert.Nil(t, err)
+	rollbackToDefaultConfiguration(db)
+	sqlDB, err := db.DB()
+	assert.Nil(t, err)
+	err = sqlDB.Close()
+	assert.Nil(t, err)
+
+	configurationId := &admin.ConfigurationID{
+		Project: "admintests",
+		Domain:  "development",
+	}
+	defaultConfiguration, err := client.GetConfiguration(ctx, &admin.ConfigurationGetRequest{
+		Id: &admin.ConfigurationID{
+			Domain: "development",
+		},
+	})
+	assert.Nil(t, err)
+	assert.NotNil(t, defaultConfiguration)
+	assert.Equal(t, "development", defaultConfiguration.Id.Domain)
+
+	currentConfiguration, err := client.GetConfiguration(ctx, &admin.ConfigurationGetRequest{
+		Id: configurationId,
+	})
+	assert.Nil(t, err)
+	assert.NotNil(t, currentConfiguration)
+	assert.True(t, proto.Equal(configurationId, currentConfiguration.Id))
+
+	assert.Equal(t, defaultConfiguration.Configuration, currentConfiguration.Configuration)
+
+	updatedConfiguration, err := client.UpdateProjectDomainConfiguration(ctx, &admin.ConfigurationUpdateRequest{
+		Id:              configurationId,
+		VersionToUpdate: currentConfiguration.Version,
+		Configuration: &admin.Configuration{
+			TaskResourceAttributes: taskResourceAttributes,
+		},
+	})
+	assert.Nil(t, err)
+	assert.NotNil(t, updatedConfiguration)
+	assert.True(t, proto.Equal(configurationId, updatedConfiguration.Id))
+	defaultConfiguration.Configuration.TaskResourceAttributes = &admin.TaskResourceAttributesWithSource{
+		Source: admin.AttributesSource_PROJECT_DOMAIN,
+		Value:  taskResourceAttributes,
+	}
+	assert.True(t, proto.Equal(defaultConfiguration.Configuration, updatedConfiguration.Configuration))
+}
+
 func TestConcurrentConfiguration(t *testing.T) {
 	for round := 0; round < 10; round++ {
 		ctx := context.Background()

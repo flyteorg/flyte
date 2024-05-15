@@ -879,6 +879,12 @@ service AdminService {
       additional_bindings {
         get: "/api/v1/org/configuration/{id.org}/{id.project}/{id.domain}"
       }
+      additional_bindings {
+        get: "/api/v1/configuration/{id.domain}"
+      }
+      additional_bindings {
+        get: "/api/v1/org/configuration/{id.org}/{id.domain}"
+      }
     };
   }
 
