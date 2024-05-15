@@ -5,6 +5,7 @@ import (
 	v12 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
@@ -53,4 +54,5 @@ type TaskExecutionMetadata interface {
 	GetPlatformResources() *v1.ResourceRequirements
 	GetInterruptibleFailureThreshold() int32
 	GetEnvironmentVariables() map[string]string
+	GetExternalResourceAttributes() *admin.ExternalResourceAttributes
 }

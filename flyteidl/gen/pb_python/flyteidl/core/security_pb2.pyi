@@ -26,6 +26,28 @@ class Secret(_message.Message):
     mount_requirement: Secret.MountType
     def __init__(self, group: _Optional[str] = ..., group_version: _Optional[str] = ..., key: _Optional[str] = ..., mount_requirement: _Optional[_Union[Secret.MountType, str]] = ...) -> None: ...
 
+class Connection(_message.Message):
+    __slots__ = ["secrets", "configs"]
+    class SecretsEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
+    class ConfigsEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
+    SECRETS_FIELD_NUMBER: _ClassVar[int]
+    CONFIGS_FIELD_NUMBER: _ClassVar[int]
+    secrets: _containers.ScalarMap[str, str]
+    configs: _containers.ScalarMap[str, str]
+    def __init__(self, secrets: _Optional[_Mapping[str, str]] = ..., configs: _Optional[_Mapping[str, str]] = ...) -> None: ...
+
 class OAuth2Client(_message.Message):
     __slots__ = ["client_id", "client_secret"]
     CLIENT_ID_FIELD_NUMBER: _ClassVar[int]
@@ -65,11 +87,13 @@ class OAuth2TokenRequest(_message.Message):
     def __init__(self, name: _Optional[str] = ..., type: _Optional[_Union[OAuth2TokenRequest.Type, str]] = ..., client: _Optional[_Union[OAuth2Client, _Mapping]] = ..., idp_discovery_endpoint: _Optional[str] = ..., token_endpoint: _Optional[str] = ...) -> None: ...
 
 class SecurityContext(_message.Message):
-    __slots__ = ["run_as", "secrets", "tokens"]
+    __slots__ = ["run_as", "secrets", "tokens", "connectionRef"]
     RUN_AS_FIELD_NUMBER: _ClassVar[int]
     SECRETS_FIELD_NUMBER: _ClassVar[int]
     TOKENS_FIELD_NUMBER: _ClassVar[int]
+    CONNECTIONREF_FIELD_NUMBER: _ClassVar[int]
     run_as: Identity
     secrets: _containers.RepeatedCompositeFieldContainer[Secret]
     tokens: _containers.RepeatedCompositeFieldContainer[OAuth2TokenRequest]
-    def __init__(self, run_as: _Optional[_Union[Identity, _Mapping]] = ..., secrets: _Optional[_Iterable[_Union[Secret, _Mapping]]] = ..., tokens: _Optional[_Iterable[_Union[OAuth2TokenRequest, _Mapping]]] = ...) -> None: ...
+    connectionRef: str
+    def __init__(self, run_as: _Optional[_Union[Identity, _Mapping]] = ..., secrets: _Optional[_Iterable[_Union[Secret, _Mapping]]] = ..., tokens: _Optional[_Iterable[_Union[OAuth2TokenRequest, _Mapping]]] = ..., connectionRef: _Optional[str] = ...) -> None: ...

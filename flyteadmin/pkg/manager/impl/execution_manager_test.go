@@ -5492,6 +5492,93 @@ func TestGetClusterAssignment(t *testing.T) {
 	})
 }
 
+func TestGetExternalResourceAttribute(t *testing.T) {
+	externalResourceAttribute := &admin.ExternalResourceAttributes{
+		Connections: map[string]*core.Connection{
+			"conn1": {
+				Secrets: map[string]string{"key1": "value1"},
+				Configs: map[string]string{"key2": "value2"},
+			},
+		},
+	}
+	resourceManager := managerMocks.MockResourceManager{}
+	resourceManager.GetResourceFunc = func(ctx context.Context,
+		request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
+		assert.EqualValues(t, request, managerInterfaces.ResourceRequest{
+			Project:      workflowIdentifier.Project,
+			Domain:       workflowIdentifier.Domain,
+			ResourceType: admin.MatchableResource_EXTERNAL_RESOURCE,
+		})
+		return &managerInterfaces.ResourceResponse{
+			Attributes: &admin.MatchingAttributes{
+				Target: &admin.MatchingAttributes_ExternalResourceAttributes{
+					ExternalResourceAttributes: externalResourceAttribute,
+				},
+			},
+		}, nil
+	}
+
+	executionManager := ExecutionManager{resourceManager: &resourceManager}
+
+	t.Run("value from db", func(t *testing.T) {
+		era, err := executionManager.getExternalResourceAttributes(context.TODO(), &admin.ExecutionCreateRequest{
+			Project: workflowIdentifier.Project,
+			Domain:  workflowIdentifier.Domain,
+			Spec:    &admin.ExecutionSpec{},
+		})
+		assert.NoError(t, err)
+		assert.True(t, proto.Equal(era, externalResourceAttribute))
+	})
+	t.Run("value from request", func(t *testing.T) {
+		reqExternalResourceAttribute := &admin.ExternalResourceAttributes{
+			Connections: map[string]*core.Connection{
+				"conn2": {
+					Secrets: map[string]string{"key1": "value1"},
+					Configs: map[string]string{"key2": "value2"},
+				},
+			},
+		}
+		era, err := executionManager.getExternalResourceAttributes(context.TODO(), &admin.ExecutionCreateRequest{
+			Project: workflowIdentifier.Project,
+			Domain:  workflowIdentifier.Domain,
+			Spec: &admin.ExecutionSpec{
+				ExternalResourceAttributes: reqExternalResourceAttribute,
+			},
+		})
+		assert.NoError(t, err)
+		assert.True(t, proto.Equal(era, reqExternalResourceAttribute))
+	})
+	t.Run("value from config", func(t *testing.T) {
+		name := "conn3"
+		connections := map[string]runtimeInterfaces.Connection{
+			name: {
+				Secrets: map[string]string{"key1": "value1"},
+				Configs: map[string]string{"key2": "value2"},
+			},
+		}
+		externalResourceProvider := &runtimeIFaceMocks.ExternalResourceConfiguration{}
+		externalResourceProvider.OnGetExternalResource().Return(runtimeInterfaces.ExternalResource{
+			Connections: connections,
+		})
+		mockConfig := getMockExecutionsConfigProvider()
+		mockConfig.(*runtimeMocks.MockConfigurationProvider).AddExternalResourceConfiguration(externalResourceProvider)
+
+		executionManager := ExecutionManager{
+			resourceManager: &managerMocks.MockResourceManager{},
+			config:          mockConfig,
+		}
+
+		era, err := executionManager.getExternalResourceAttributes(context.TODO(), &admin.ExecutionCreateRequest{
+			Project: workflowIdentifier.Project,
+			Domain:  workflowIdentifier.Domain,
+			Spec:    &admin.ExecutionSpec{},
+		})
+		assert.NoError(t, err)
+		assert.Equal(t, connections[name].Secrets, era.GetConnections()[name].Secrets)
+		assert.Equal(t, connections[name].Configs, era.GetConnections()[name].Configs)
+	})
+}
+
 func TestResolvePermissions(t *testing.T) {
 	assumableIamRole := "role"
 	k8sServiceAccount := "sa"

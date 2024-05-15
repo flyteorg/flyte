@@ -119,6 +119,56 @@ proto3.util.setEnumType(Secret_MountType, "flyteidl.core.Secret.MountType", [
 ]);
 
 /**
+ * @generated from message flyteidl.core.Connection
+ */
+export class Connection extends Message<Connection> {
+  /**
+   * The credentials to use for the connection, such as API keys, OAuth2 tokens, etc.
+   * The key is the name of the secret, and it's defined in the flytekit.
+   * flytekit uses the key to locate the desired secret within the map.
+   *
+   * @generated from field: map<string, string> secrets = 1;
+   */
+  secrets: { [key: string]: string } = {};
+
+  /**
+   * The configuration to use for the connection, such as the endpoint, account name, etc.
+   * The key is the name of the config, and it's defined in the flytekit.
+   *
+   * @generated from field: map<string, string> configs = 2;
+   */
+  configs: { [key: string]: string } = {};
+
+  constructor(data?: PartialMessage<Connection>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.core.Connection";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "secrets", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
+    { no: 2, name: "configs", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Connection {
+    return new Connection().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Connection {
+    return new Connection().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Connection {
+    return new Connection().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: Connection | PlainMessage<Connection> | undefined, b: Connection | PlainMessage<Connection> | undefined): boolean {
+    return proto3.util.equals(Connection, a, b);
+  }
+}
+
+/**
  * OAuth2Client encapsulates OAuth2 Client Credentials to be used when making calls on behalf of that task.
  *
  * @generated from message flyteidl.core.OAuth2Client
@@ -374,6 +424,19 @@ export class SecurityContext extends Message<SecurityContext> {
    */
   tokens: OAuth2TokenRequest[] = [];
 
+  /**
+   * The name of the connection.
+   * The connection is defined in the externalResourceAttributes or flyteadmin configmap.
+   * The connection config take precedence in the following order:
+   * 1. connection in the externalResourceAttributes in the project-domain settings.
+   * 2. connection in the externalResourceAttributes in the project settings.
+   * 3. connection in the flyteadmin configmap.
+   * +optional
+   *
+   * @generated from field: string connectionRef = 4;
+   */
+  connectionRef = "";
+
   constructor(data?: PartialMessage<SecurityContext>) {
     super();
     proto3.util.initPartial(data, this);
@@ -385,6 +448,7 @@ export class SecurityContext extends Message<SecurityContext> {
     { no: 1, name: "run_as", kind: "message", T: Identity },
     { no: 2, name: "secrets", kind: "message", T: Secret, repeated: true },
     { no: 3, name: "tokens", kind: "message", T: OAuth2TokenRequest, repeated: true },
+    { no: 4, name: "connectionRef", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SecurityContext {

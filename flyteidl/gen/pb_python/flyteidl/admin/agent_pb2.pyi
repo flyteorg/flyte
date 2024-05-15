@@ -77,16 +77,18 @@ class TaskExecutionMetadata(_message.Message):
     def __init__(self, task_execution_id: _Optional[_Union[_identifier_pb2.TaskExecutionIdentifier, _Mapping]] = ..., namespace: _Optional[str] = ..., labels: _Optional[_Mapping[str, str]] = ..., annotations: _Optional[_Mapping[str, str]] = ..., k8s_service_account: _Optional[str] = ..., environment_variables: _Optional[_Mapping[str, str]] = ..., max_attempts: _Optional[int] = ..., interruptible: bool = ..., interruptible_failure_threshold: _Optional[int] = ..., overrides: _Optional[_Union[_workflow_pb2.TaskNodeOverrides, _Mapping]] = ..., identity: _Optional[_Union[_security_pb2.Identity, _Mapping]] = ...) -> None: ...
 
 class CreateTaskRequest(_message.Message):
-    __slots__ = ["inputs", "template", "output_prefix", "task_execution_metadata"]
+    __slots__ = ["inputs", "template", "output_prefix", "task_execution_metadata", "connection"]
     INPUTS_FIELD_NUMBER: _ClassVar[int]
     TEMPLATE_FIELD_NUMBER: _ClassVar[int]
     OUTPUT_PREFIX_FIELD_NUMBER: _ClassVar[int]
     TASK_EXECUTION_METADATA_FIELD_NUMBER: _ClassVar[int]
+    CONNECTION_FIELD_NUMBER: _ClassVar[int]
     inputs: _literals_pb2.LiteralMap
     template: _tasks_pb2.TaskTemplate
     output_prefix: str
     task_execution_metadata: TaskExecutionMetadata
-    def __init__(self, inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., template: _Optional[_Union[_tasks_pb2.TaskTemplate, _Mapping]] = ..., output_prefix: _Optional[str] = ..., task_execution_metadata: _Optional[_Union[TaskExecutionMetadata, _Mapping]] = ...) -> None: ...
+    connection: _security_pb2.Connection
+    def __init__(self, inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., template: _Optional[_Union[_tasks_pb2.TaskTemplate, _Mapping]] = ..., output_prefix: _Optional[str] = ..., task_execution_metadata: _Optional[_Union[TaskExecutionMetadata, _Mapping]] = ..., connection: _Optional[_Union[_security_pb2.Connection, _Mapping]] = ...) -> None: ...
 
 class CreateTaskResponse(_message.Message):
     __slots__ = ["resource_meta"]
@@ -95,16 +97,18 @@ class CreateTaskResponse(_message.Message):
     def __init__(self, resource_meta: _Optional[bytes] = ...) -> None: ...
 
 class CreateRequestHeader(_message.Message):
-    __slots__ = ["template", "output_prefix", "task_execution_metadata", "max_dataset_size_bytes"]
+    __slots__ = ["template", "output_prefix", "task_execution_metadata", "max_dataset_size_bytes", "connection"]
     TEMPLATE_FIELD_NUMBER: _ClassVar[int]
     OUTPUT_PREFIX_FIELD_NUMBER: _ClassVar[int]
     TASK_EXECUTION_METADATA_FIELD_NUMBER: _ClassVar[int]
     MAX_DATASET_SIZE_BYTES_FIELD_NUMBER: _ClassVar[int]
+    CONNECTION_FIELD_NUMBER: _ClassVar[int]
     template: _tasks_pb2.TaskTemplate
     output_prefix: str
     task_execution_metadata: TaskExecutionMetadata
     max_dataset_size_bytes: int
-    def __init__(self, template: _Optional[_Union[_tasks_pb2.TaskTemplate, _Mapping]] = ..., output_prefix: _Optional[str] = ..., task_execution_metadata: _Optional[_Union[TaskExecutionMetadata, _Mapping]] = ..., max_dataset_size_bytes: _Optional[int] = ...) -> None: ...
+    connection: _security_pb2.Connection
+    def __init__(self, template: _Optional[_Union[_tasks_pb2.TaskTemplate, _Mapping]] = ..., output_prefix: _Optional[str] = ..., task_execution_metadata: _Optional[_Union[TaskExecutionMetadata, _Mapping]] = ..., max_dataset_size_bytes: _Optional[int] = ..., connection: _Optional[_Union[_security_pb2.Connection, _Mapping]] = ...) -> None: ...
 
 class ExecuteTaskSyncRequest(_message.Message):
     __slots__ = ["header", "inputs"]
@@ -129,14 +133,16 @@ class ExecuteTaskSyncResponse(_message.Message):
     def __init__(self, header: _Optional[_Union[ExecuteTaskSyncResponseHeader, _Mapping]] = ..., outputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ...) -> None: ...
 
 class GetTaskRequest(_message.Message):
-    __slots__ = ["task_type", "resource_meta", "task_category"]
+    __slots__ = ["task_type", "resource_meta", "task_category", "connection"]
     TASK_TYPE_FIELD_NUMBER: _ClassVar[int]
     RESOURCE_META_FIELD_NUMBER: _ClassVar[int]
     TASK_CATEGORY_FIELD_NUMBER: _ClassVar[int]
+    CONNECTION_FIELD_NUMBER: _ClassVar[int]
     task_type: str
     resource_meta: bytes
     task_category: TaskCategory
-    def __init__(self, task_type: _Optional[str] = ..., resource_meta: _Optional[bytes] = ..., task_category: _Optional[_Union[TaskCategory, _Mapping]] = ...) -> None: ...
+    connection: _security_pb2.Connection
+    def __init__(self, task_type: _Optional[str] = ..., resource_meta: _Optional[bytes] = ..., task_category: _Optional[_Union[TaskCategory, _Mapping]] = ..., connection: _Optional[_Union[_security_pb2.Connection, _Mapping]] = ...) -> None: ...
 
 class GetTaskResponse(_message.Message):
     __slots__ = ["resource"]
@@ -161,14 +167,16 @@ class Resource(_message.Message):
     def __init__(self, state: _Optional[_Union[State, str]] = ..., outputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., message: _Optional[str] = ..., log_links: _Optional[_Iterable[_Union[_execution_pb2.TaskLog, _Mapping]]] = ..., phase: _Optional[_Union[_execution_pb2.TaskExecution.Phase, str]] = ..., custom_info: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ...) -> None: ...
 
 class DeleteTaskRequest(_message.Message):
-    __slots__ = ["task_type", "resource_meta", "task_category"]
+    __slots__ = ["task_type", "resource_meta", "task_category", "connection"]
     TASK_TYPE_FIELD_NUMBER: _ClassVar[int]
     RESOURCE_META_FIELD_NUMBER: _ClassVar[int]
     TASK_CATEGORY_FIELD_NUMBER: _ClassVar[int]
+    CONNECTION_FIELD_NUMBER: _ClassVar[int]
     task_type: str
     resource_meta: bytes
     task_category: TaskCategory
-    def __init__(self, task_type: _Optional[str] = ..., resource_meta: _Optional[bytes] = ..., task_category: _Optional[_Union[TaskCategory, _Mapping]] = ...) -> None: ...
+    connection: _security_pb2.Connection
+    def __init__(self, task_type: _Optional[str] = ..., resource_meta: _Optional[bytes] = ..., task_category: _Optional[_Union[TaskCategory, _Mapping]] = ..., connection: _Optional[_Union[_security_pb2.Connection, _Mapping]] = ...) -> None: ...
 
 class DeleteTaskResponse(_message.Message):
     __slots__ = []

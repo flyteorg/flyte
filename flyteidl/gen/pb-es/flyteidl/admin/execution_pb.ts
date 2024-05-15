@@ -12,7 +12,7 @@ import { Annotations, AuthRole, Envs, Labels, Notification, RawOutputDataConfig,
 import { ArtifactID } from "../core/artifact_id_pb.js";
 import { SecurityContext } from "../core/security_pb.js";
 import { ClusterAssignment } from "./cluster_assignment_pb.js";
-import { ExecutionClusterLabel } from "./matchable_resource_pb.js";
+import { ExecutionClusterLabel, ExternalResourceAttributes } from "./matchable_resource_pb.js";
 import { ExecutionEnvAssignment } from "../core/execution_envs_pb.js";
 import { Span } from "../core/metrics_pb.js";
 
@@ -1131,6 +1131,13 @@ export class ExecutionSpec extends Message<ExecutionSpec> {
    */
   executionEnvAssignments: ExecutionEnvAssignment[] = [];
 
+  /**
+   * The connection to use for the execution.
+   *
+   * @generated from field: flyteidl.admin.ExternalResourceAttributes external_resource_attributes = 27;
+   */
+  externalResourceAttributes?: ExternalResourceAttributes;
+
   constructor(data?: PartialMessage<ExecutionSpec>) {
     super();
     proto3.util.initPartial(data, this);
@@ -1158,6 +1165,7 @@ export class ExecutionSpec extends Message<ExecutionSpec> {
     { no: 24, name: "tags", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 25, name: "execution_cluster_label", kind: "message", T: ExecutionClusterLabel },
     { no: 26, name: "execution_env_assignments", kind: "message", T: ExecutionEnvAssignment, repeated: true },
+    { no: 27, name: "external_resource_attributes", kind: "message", T: ExternalResourceAttributes },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExecutionSpec {

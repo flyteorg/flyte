@@ -19,6 +19,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/rand"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	idlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
 	catalogMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog/mocks"
@@ -171,6 +172,12 @@ func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *i
 	tMeta.OnGetPlatformResources().Return(&v1.ResourceRequirements{})
 	tMeta.OnGetInterruptibleFailureThreshold().Return(2)
 	tMeta.OnGetEnvironmentVariables().Return(nil)
+	tMeta.OnGetExternalResourceAttributes().Return(&admin.ExternalResourceAttributes{Connections: map[string]*idlCore.Connection{
+		"openai": {
+			Secrets: map[string]string{"key": "value"},
+			Configs: map[string]string{"key": "value"},
+		},
+	}})
 
 	catClient := &catalogMocks.Client{}
 	catData := sync.Map{}
