@@ -4,7 +4,6 @@ OpenAI Batch Agent
 ==================
 
 This guide provides an overview of how to set up the OpenAI Batch agent in your Flyte deployment.
-Please note that you have to set up the OpenAI API key in the agent server to run the Batch tasks.
 
 Specify agent configuration
 ---------------------------
