@@ -1,3 +1,9 @@
+project_name: flytectl
+
+monorepo:
+  tag_prefix: flytectl/
+  dir: flytectl
+
 before:
   hooks:
     - go mod download
