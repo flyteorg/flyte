@@ -24,3 +24,4 @@ jobs:
           args: release --rm-dist -f flytectl/.goreleaser.yml
         env:
           GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
+          GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
