@@ -1064,9 +1064,12 @@ pub mod secret {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Connection {
     /// The credentials to use for the connection, such as API keys, OAuth2 tokens, etc.
+    /// The key is the name of the secret, and it's defined in the flytekit.
+    /// flytekit uses the key to locate the desired secret within the map.
     #[prost(map="string, string", tag="1")]
     pub secrets: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
     /// The configuration to use for the connection, such as the endpoint, account name, etc.
+    /// The key is the name of the config, and it's defined in the flytekit.
     #[prost(map="string, string", tag="2")]
     pub configs: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
 }
@@ -1184,11 +1187,14 @@ pub struct SecurityContext {
     #[prost(message, repeated, tag="3")]
     pub tokens: ::prost::alloc::vec::Vec<OAuth2TokenRequest>,
     /// The name of the connection.
-    /// Flyte will use the default connection in the project-domain settings, but users
-    /// still be able to override it by specifying the connection in the task decorator.
+    /// The connection is defined in the externalResourceAttributes or flyteadmin configmap.
+    /// The connection config take precedence in the following order:
+    /// 1. connection in the externalResourceAttributes in the project-domain settings.
+    /// 2. connection in the externalResourceAttributes in the project settings.
+    /// 3. connection in the flyteadmin configmap.
     /// +optional
     #[prost(string, tag="4")]
-    pub connection: ::prost::alloc::string::String,
+    pub connection_ref: ::prost::alloc::string::String,
 }
 /// A customizable interface to convey resources requested for a container. This can be interpreted differently for different
 /// container engines.

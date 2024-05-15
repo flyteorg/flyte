@@ -124,6 +124,8 @@ proto3.util.setEnumType(Secret_MountType, "flyteidl.core.Secret.MountType", [
 export class Connection extends Message<Connection> {
   /**
    * The credentials to use for the connection, such as API keys, OAuth2 tokens, etc.
+   * The key is the name of the secret, and it's defined in the flytekit.
+   * flytekit uses the key to locate the desired secret within the map.
    *
    * @generated from field: map<string, string> secrets = 1;
    */
@@ -131,6 +133,7 @@ export class Connection extends Message<Connection> {
 
   /**
    * The configuration to use for the connection, such as the endpoint, account name, etc.
+   * The key is the name of the config, and it's defined in the flytekit.
    *
    * @generated from field: map<string, string> configs = 2;
    */
@@ -423,13 +426,16 @@ export class SecurityContext extends Message<SecurityContext> {
 
   /**
    * The name of the connection.
-   * Flyte will use the default connection in the project-domain settings, but users
-   * still be able to override it by specifying the connection in the task decorator.
+   * The connection is defined in the externalResourceAttributes or flyteadmin configmap.
+   * The connection config take precedence in the following order:
+   * 1. connection in the externalResourceAttributes in the project-domain settings.
+   * 2. connection in the externalResourceAttributes in the project settings.
+   * 3. connection in the flyteadmin configmap.
    * +optional
    *
-   * @generated from field: string connection = 4;
+   * @generated from field: string connectionRef = 4;
    */
-  connection = "";
+  connectionRef = "";
 
   constructor(data?: PartialMessage<SecurityContext>) {
     super();
@@ -442,7 +448,7 @@ export class SecurityContext extends Message<SecurityContext> {
     { no: 1, name: "run_as", kind: "message", T: Identity },
     { no: 2, name: "secrets", kind: "message", T: Secret, repeated: true },
     { no: 3, name: "tokens", kind: "message", T: OAuth2TokenRequest, repeated: true },
-    { no: 4, name: "connection", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "connectionRef", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SecurityContext {

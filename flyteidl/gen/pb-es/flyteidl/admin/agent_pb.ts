@@ -217,7 +217,9 @@ export class CreateTaskRequest extends Message<CreateTaskRequest> {
   taskExecutionMetadata?: TaskExecutionMetadata;
 
   /**
-   * Connection required by the task.
+   * Connection (secret and config) required by the agent.
+   * Agent will use the secret and config in the taskTemplate if it's None.
+   * +optional
    *
    * @generated from field: flyteidl.core.Connection connection = 5;
    */
@@ -329,7 +331,9 @@ export class CreateRequestHeader extends Message<CreateRequestHeader> {
   maxDatasetSizeBytes = protoInt64.zero;
 
   /**
-   * Connection required by the task.
+   * Connection (secret and config) required by the agent.
+   * Agent will use the secret and config in the taskTemplate if it's None.
+   * +optional
    *
    * @generated from field: flyteidl.core.Connection connection = 5;
    */
@@ -536,7 +540,9 @@ export class GetTaskRequest extends Message<GetTaskRequest> {
   taskCategory?: TaskCategory;
 
   /**
-   * Connection required by the task.
+   * Connection (secret and config) required by the agent.
+   * Agent will use the secret and config in the taskTemplate if it's None.
+   * +optional
    *
    * @generated from field: flyteidl.core.Connection connection = 5;
    */
@@ -723,7 +729,9 @@ export class DeleteTaskRequest extends Message<DeleteTaskRequest> {
   taskCategory?: TaskCategory;
 
   /**
-   * Connection required by the task.
+   * Connection (secret and config) required by the agent.
+   * Agent will use the secret and config in the taskTemplate if it's None.
+   * +optional
    *
    * @generated from field: flyteidl.core.Connection connection = 5;
    */

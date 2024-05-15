@@ -47,9 +47,12 @@ message Secret {
 
 message Connection {
     // The credentials to use for the connection, such as API keys, OAuth2 tokens, etc.
+    // The key is the name of the secret, and it's defined in the flytekit.
+    // flytekit uses the key to locate the desired secret within the map.
     map<string, string> secrets = 1;
 
     // The configuration to use for the connection, such as the endpoint, account name, etc.
+    // The key is the name of the config, and it's defined in the flytekit.
     map<string, string> configs = 2;
 }
 
@@ -137,8 +140,11 @@ message SecurityContext {
     repeated OAuth2TokenRequest tokens = 3;
 
     // The name of the connection.
-    // Flyte will use the default connection in the project-domain settings, but users
-    // still be able to override it by specifying the connection in the task decorator.
+    // The connection is defined in the externalResourceAttributes or flyteadmin configmap.
+    // The connection config take precedence in the following order:
+    // 1. connection in the externalResourceAttributes in the project-domain settings.
+    // 2. connection in the externalResourceAttributes in the project settings.
+    // 3. connection in the flyteadmin configmap.
     // +optional
-    string connection = 4;
+    string connectionRef = 4;
 }

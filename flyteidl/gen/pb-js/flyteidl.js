@@ -17794,7 +17794,7 @@
                  * @property {flyteidl.core.IIdentity|null} [runAs] SecurityContext runAs
                  * @property {Array.<flyteidl.core.ISecret>|null} [secrets] SecurityContext secrets
                  * @property {Array.<flyteidl.core.IOAuth2TokenRequest>|null} [tokens] SecurityContext tokens
-                 * @property {string|null} [connection] SecurityContext connection
+                 * @property {string|null} [connectionRef] SecurityContext connectionRef
                  */
     
                 /**
@@ -17839,12 +17839,12 @@
                 SecurityContext.prototype.tokens = $util.emptyArray;
     
                 /**
-                 * SecurityContext connection.
-                 * @member {string} connection
+                 * SecurityContext connectionRef.
+                 * @member {string} connectionRef
                  * @memberof flyteidl.core.SecurityContext
                  * @instance
                  */
-                SecurityContext.prototype.connection = "";
+                SecurityContext.prototype.connectionRef = "";
     
                 /**
                  * Creates a new SecurityContext instance using the specified properties.
@@ -17878,8 +17878,8 @@
                     if (message.tokens != null && message.tokens.length)
                         for (var i = 0; i < message.tokens.length; ++i)
                             $root.flyteidl.core.OAuth2TokenRequest.encode(message.tokens[i], writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
-                    if (message.connection != null && message.hasOwnProperty("connection"))
-                        writer.uint32(/* id 4, wireType 2 =*/34).string(message.connection);
+                    if (message.connectionRef != null && message.hasOwnProperty("connectionRef"))
+                        writer.uint32(/* id 4, wireType 2 =*/34).string(message.connectionRef);
                     return writer;
                 };
     
@@ -17915,7 +17915,7 @@
                             message.tokens.push($root.flyteidl.core.OAuth2TokenRequest.decode(reader, reader.uint32()));
                             break;
                         case 4:
-                            message.connection = reader.string();
+                            message.connectionRef = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -17959,9 +17959,9 @@
                                 return "tokens." + error;
                         }
                     }
-                    if (message.connection != null && message.hasOwnProperty("connection"))
-                        if (!$util.isString(message.connection))
-                            return "connection: string expected";
+                    if (message.connectionRef != null && message.hasOwnProperty("connectionRef"))
+                        if (!$util.isString(message.connectionRef))
+                            return "connectionRef: string expected";
                     return null;
                 };
     

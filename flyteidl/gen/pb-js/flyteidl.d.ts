@@ -7374,8 +7374,8 @@ export namespace flyteidl {
             /** SecurityContext tokens */
             tokens?: (flyteidl.core.IOAuth2TokenRequest[]|null);
 
-            /** SecurityContext connection */
-            connection?: (string|null);
+            /** SecurityContext connectionRef */
+            connectionRef?: (string|null);
         }
 
         /** Represents a SecurityContext. */
@@ -7396,8 +7396,8 @@ export namespace flyteidl {
             /** SecurityContext tokens. */
             public tokens: flyteidl.core.IOAuth2TokenRequest[];
 
-            /** SecurityContext connection. */
-            public connection: string;
+            /** SecurityContext connectionRef. */
+            public connectionRef: string;
 
             /**
              * Creates a new SecurityContext instance using the specified properties.

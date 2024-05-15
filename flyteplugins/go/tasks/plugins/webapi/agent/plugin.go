@@ -100,8 +100,8 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 	agent, isSync := getFinalAgent(&taskCategory, p.cfg, p.agentRegistry)
 
 	connection := flyteIdl.Connection{}
-	if taskTemplate.SecurityContext != nil && taskTemplate.SecurityContext.Connection != "" {
-		conn, ok := taskCtx.TaskExecutionMetadata().GetExternalResourceAttributes().GetConnections()[taskTemplate.SecurityContext.Connection]
+	if taskTemplate.SecurityContext != nil && taskTemplate.SecurityContext.GetConnectionRef() != "" {
+		conn, ok := taskCtx.TaskExecutionMetadata().GetExternalResourceAttributes().GetConnections()[taskTemplate.SecurityContext.GetConnectionRef()]
 		if ok {
 			for k, v := range conn.GetSecrets() {
 				secretVal, err := taskCtx.SecretManager().Get(ctx, v)
@@ -112,7 +112,7 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 				conn.Secrets[k] = secretVal
 			}
 		} else {
-			return nil, nil, fmt.Errorf("connection [%s] not found in the task execution metadata", taskTemplate.SecurityContext.Connection)
+			return nil, nil, fmt.Errorf("connection [%s] not found in the task execution metadata", taskTemplate.SecurityContext.GetConnectionRef())
 		}
 		connection = *conn
 	}
