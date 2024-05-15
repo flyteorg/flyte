@@ -1412,7 +1412,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: d563e28ff21175650cb1ea90edc1dd85af7b789c802d6ff1a5b47aed4ef5bbb7
+        checksum/secret: 9303f5d6e01a1eb3aab5a0fdc685b9b8e6111313b089811f3ab850a93e53d705
       labels:
         app: docker-registry
         release: flyte-sandbox
