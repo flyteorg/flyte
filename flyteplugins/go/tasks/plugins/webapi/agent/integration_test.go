@@ -109,7 +109,7 @@ func TestEndToEnd(t *testing.T) {
 					},
 				},
 			},
-			SecurityContext: &flyteIdlCore.SecurityContext{Connection: "openai"},
+			SecurityContext: &flyteIdlCore.SecurityContext{ConnectionRef: "openai"},
 		}
 
 		expectedOutputs, err := coreutils.MakeLiteralMap(map[string]interface{}{"x": 1})
