@@ -95,12 +95,12 @@ func sandboxSetup() {
 	mockDocker = &mocks.Docker{}
 	errCh := make(chan error)
 	sandboxCmdConfig.DefaultConfig.Version = "v0.19.1"
-	bodyStatus := make(chan container.ContainerWaitOKBody)
+	bodyStatus := make(chan container.WaitResponse)
 	githubMock = &ghMocks.GHRepoService{}
 	sandboxCmdConfig.DefaultConfig.Image = "dummyimage"
-	mockDocker.OnVolumeList(ctx, filters.NewArgs(filters.KeyValuePair{Key: "name", Value: fmt.Sprintf("^%s$", docker.FlyteSandboxVolumeName)})).Return(volume.VolumeListOKBody{Volumes: []*types.Volume{}}, nil)
-	mockDocker.OnVolumeCreate(ctx, volume.VolumeCreateBody{Name: docker.FlyteSandboxVolumeName}).Return(types.Volume{Name: docker.FlyteSandboxVolumeName}, nil)
-	mockDocker.OnContainerCreateMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(container.ContainerCreateCreatedBody{
+	mockDocker.OnVolumeList(ctx, volume.ListOptions{Filters: filters.NewArgs(filters.KeyValuePair{Key: "name", Value: fmt.Sprintf("^%s$", docker.FlyteSandboxVolumeName)})}).Return(volume.ListResponse{Volumes: []*volume.Volume{}}, nil)
+	mockDocker.OnVolumeCreate(ctx, volume.CreateOptions{Name: docker.FlyteSandboxVolumeName}).Return(volume.Volume{Name: docker.FlyteSandboxVolumeName}, nil)
+	mockDocker.OnContainerCreateMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(container.CreateResponse{
 		ID: "Hello",
 	}, nil)
 
@@ -139,8 +139,8 @@ func TestStartFunc(t *testing.T) {
 			Timestamps: true,
 			Follow:     true,
 		}).Return(nil, nil)
-		mockDocker.OnVolumeList(ctx, filters.NewArgs(filters.KeyValuePair{Key: mock.Anything, Value: mock.Anything})).Return(volume.VolumeListOKBody{Volumes: []*types.Volume{}}, nil)
-		mockDocker.OnVolumeCreate(ctx, volume.VolumeCreateBody{Name: mock.Anything}).Return(types.Volume{}, nil)
+		mockDocker.OnVolumeList(ctx, volume.ListOptions{Filters: filters.NewArgs(filters.KeyValuePair{Key: mock.Anything, Value: mock.Anything})}).Return(volume.ListResponse{Volumes: []*volume.Volume{}}, nil)
+		mockDocker.OnVolumeCreate(ctx, volume.CreateOptions{Name: mock.Anything}).Return(volume.Volume{}, nil)
 		_, err := startSandbox(ctx, mockDocker, githubMock, dummyReader(), config, sandboxImageName, defaultImagePrefix, exposedPorts, portBindings, util.SandBoxConsolePort)
 		assert.Nil(t, err)
 	})

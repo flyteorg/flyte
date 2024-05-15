@@ -197,7 +197,7 @@ func TestStartContainer(t *testing.T) {
 			PortBindings: p2,
 			Privileged:   true,
 			ExtraHosts:   ExtraHosts,
-		}, nil, nil, mock.Anything).Return(container.ContainerCreateCreatedBody{
+		}, nil, nil, mock.Anything).Return(container.CreateResponse{
 			ID: "Hello",
 		}, nil)
 		mockDocker.OnContainerStart(ctx, "Hello", types.ContainerStartOptions{}).Return(nil)
@@ -227,7 +227,7 @@ func TestStartContainer(t *testing.T) {
 			PortBindings: p2,
 			Privileged:   true,
 			ExtraHosts:   ExtraHosts,
-		}, nil, nil, mock.Anything).Return(container.ContainerCreateCreatedBody{
+		}, nil, nil, mock.Anything).Return(container.CreateResponse{
 			ID: "Hello",
 		}, nil)
 		mockDocker.OnContainerStart(ctx, "Hello", types.ContainerStartOptions{}).Return(nil)
@@ -254,7 +254,7 @@ func TestStartContainer(t *testing.T) {
 			PortBindings: p2,
 			Privileged:   true,
 			ExtraHosts:   ExtraHosts,
-		}, nil, nil, mock.Anything).Return(container.ContainerCreateCreatedBody{
+		}, nil, nil, mock.Anything).Return(container.CreateResponse{
 			ID: "",
 		}, fmt.Errorf("error"))
 		mockDocker.OnContainerStart(ctx, "Hello", types.ContainerStartOptions{}).Return(nil)
@@ -280,7 +280,7 @@ func TestStartContainer(t *testing.T) {
 			PortBindings: p2,
 			Privileged:   true,
 			ExtraHosts:   ExtraHosts,
-		}, nil, nil, mock.Anything).Return(container.ContainerCreateCreatedBody{
+		}, nil, nil, mock.Anything).Return(container.CreateResponse{
 			ID: "Hello",
 		}, nil)
 		mockDocker.OnContainerStart(ctx, "Hello", types.ContainerStartOptions{}).Return(fmt.Errorf("error"))
@@ -415,9 +415,9 @@ func TestGetOrCreateVolume(t *testing.T) {
 	t.Run("VolumeExists", func(t *testing.T) {
 		ctx := context.Background()
 		mockDocker := &mocks.Docker{}
-		expected := &types.Volume{Name: "test"}
+		expected := &volume.Volume{Name: "test"}
 
-		mockDocker.OnVolumeList(ctx, filters.NewArgs(filters.KeyValuePair{Key: "name", Value: "^test$"})).Return(volume.VolumeListOKBody{Volumes: []*types.Volume{expected}}, nil)
+		mockDocker.OnVolumeList(ctx, volume.ListOptions{Filters: filters.NewArgs(filters.KeyValuePair{Key: "name", Value: "^test$"})}).Return(volume.ListResponse{Volumes: []*volume.Volume{expected}}, nil)
 		actual, err := GetOrCreateVolume(ctx, mockDocker, "test", false)
 		assert.Equal(t, expected, actual, "volumes should match")
 		assert.Nil(t, err)
@@ -425,10 +425,10 @@ func TestGetOrCreateVolume(t *testing.T) {
 	t.Run("VolumeDoesNotExist", func(t *testing.T) {
 		ctx := context.Background()
 		mockDocker := &mocks.Docker{}
-		expected := types.Volume{Name: "test"}
+		expected := volume.Volume{Name: "test"}
 
-		mockDocker.OnVolumeList(ctx, filters.NewArgs(filters.KeyValuePair{Key: "name", Value: "^test$"})).Return(volume.VolumeListOKBody{Volumes: []*types.Volume{}}, nil)
-		mockDocker.OnVolumeCreate(ctx, volume.VolumeCreateBody{Name: "test"}).Return(expected, nil)
+		mockDocker.OnVolumeList(ctx, volume.ListOptions{Filters: filters.NewArgs(filters.KeyValuePair{Key: "name", Value: "^test$"})}).Return(volume.ListResponse{Volumes: []*volume.Volume{}}, nil)
+		mockDocker.OnVolumeCreate(ctx, volume.CreateOptions{Name: "test"}).Return(expected, nil)
 		actual, err := GetOrCreateVolume(ctx, mockDocker, "test", false)
 		assert.Equal(t, expected, *actual, "volumes should match")
 		assert.Nil(t, err)
@@ -477,7 +477,7 @@ func TestCopyFile(t *testing.T) {
 		mockDocker := &mocks.Docker{}
 		mockDocker.OnContainerCreate(
 			ctx, &container.Config{Image: image}, &container.HostConfig{}, nil, nil, containerName).Return(
-			container.ContainerCreateCreatedBody{ID: containerName}, nil)
+			container.CreateResponse{ID: containerName}, nil)
 		mockDocker.OnContainerStatPath(ctx, containerName, "some source").Return(types.ContainerPathStat{}, nil)
 		mockDocker.OnCopyFromContainer(ctx, containerName, "some source").Return(reader, types.ContainerPathStat{}, nil)
 		mockDocker.OnContainerRemove(ctx, containerName, types.ContainerRemoveOptions{Force: true}).Return(nil)
@@ -500,7 +500,7 @@ func TestCopyFile(t *testing.T) {
 		mockDocker := &mocks.Docker{}
 		mockDocker.OnContainerCreate(
 			ctx, &container.Config{Image: image}, &container.HostConfig{}, nil, nil, containerName).Return(
-			container.ContainerCreateCreatedBody{ID: containerName}, nil)
+			container.CreateResponse{ID: containerName}, nil)
 		mockDocker.OnContainerStatPath(ctx, containerName, "some source").Return(types.ContainerPathStat{}, myErr)
 		mockDocker.OnContainerRemove(ctx, containerName, types.ContainerRemoveOptions{Force: true}).Return(nil)
 		assert.Nil(t, err)
