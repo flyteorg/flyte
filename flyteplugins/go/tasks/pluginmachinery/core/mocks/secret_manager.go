@@ -5,6 +5,8 @@ package mocks
 import (
 	context "context"
 
+	flyteidlcore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -45,6 +47,45 @@ func (_m *SecretManager) Get(ctx context.Context, key string) (string, error) {
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
 		r1 = rf(ctx, key)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type SecretManager_GetForSecret struct {
+	*mock.Call
+}
+
+func (_m SecretManager_GetForSecret) Return(_a0 string, _a1 error) *SecretManager_GetForSecret {
+	return &SecretManager_GetForSecret{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *SecretManager) OnGetForSecret(ctx context.Context, secret *flyteidlcore.Secret) *SecretManager_GetForSecret {
+	c_call := _m.On("GetForSecret", ctx, secret)
+	return &SecretManager_GetForSecret{Call: c_call}
+}
+
+func (_m *SecretManager) OnGetForSecretMatch(matchers ...interface{}) *SecretManager_GetForSecret {
+	c_call := _m.On("GetForSecret", matchers...)
+	return &SecretManager_GetForSecret{Call: c_call}
+}
+
+// GetForSecret provides a mock function with given fields: ctx, secret
+func (_m *SecretManager) GetForSecret(ctx context.Context, secret *flyteidlcore.Secret) (string, error) {
+	ret := _m.Called(ctx, secret)
+
+	var r0 string
+	if rf, ok := ret.Get(0).(func(context.Context, *flyteidlcore.Secret) string); ok {
+		r0 = rf(ctx, secret)
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *flyteidlcore.Secret) error); ok {
+		r1 = rf(ctx, secret)
 	} else {
 		r1 = ret.Error(1)
 	}

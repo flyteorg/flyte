@@ -7092,6 +7092,64 @@ export namespace flyteidl {
             }
         }
 
+        /** Properties of a Connection. */
+        interface IConnection {
+
+            /** Connection secrets */
+            secrets?: ({ [k: string]: string }|null);
+
+            /** Connection configs */
+            configs?: ({ [k: string]: string }|null);
+        }
+
+        /** Represents a Connection. */
+        class Connection implements IConnection {
+
+            /**
+             * Constructs a new Connection.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.IConnection);
+
+            /** Connection secrets. */
+            public secrets: { [k: string]: string };
+
+            /** Connection configs. */
+            public configs: { [k: string]: string };
+
+            /**
+             * Creates a new Connection instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns Connection instance
+             */
+            public static create(properties?: flyteidl.core.IConnection): flyteidl.core.Connection;
+
+            /**
+             * Encodes the specified Connection message. Does not implicitly {@link flyteidl.core.Connection.verify|verify} messages.
+             * @param message Connection message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.IConnection, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a Connection message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns Connection
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.Connection;
+
+            /**
+             * Verifies a Connection message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a OAuth2Client. */
         interface IOAuth2Client {
 
@@ -7315,6 +7373,9 @@ export namespace flyteidl {
 
             /** SecurityContext tokens */
             tokens?: (flyteidl.core.IOAuth2TokenRequest[]|null);
+
+            /** SecurityContext connectionRef */
+            connectionRef?: (string|null);
         }
 
         /** Represents a SecurityContext. */
@@ -7334,6 +7395,9 @@ export namespace flyteidl {
 
             /** SecurityContext tokens. */
             public tokens: flyteidl.core.IOAuth2TokenRequest[];
+
+            /** SecurityContext connectionRef. */
+            public connectionRef: string;
 
             /**
              * Creates a new SecurityContext instance using the specified properties.
@@ -9389,6 +9453,9 @@ export namespace flyteidl {
 
             /** CreateTaskRequest taskExecutionMetadata */
             taskExecutionMetadata?: (flyteidl.admin.ITaskExecutionMetadata|null);
+
+            /** CreateTaskRequest connection */
+            connection?: (flyteidl.core.IConnection|null);
         }
 
         /** Represents a CreateTaskRequest. */
@@ -9411,6 +9478,9 @@ export namespace flyteidl {
 
             /** CreateTaskRequest taskExecutionMetadata. */
             public taskExecutionMetadata?: (flyteidl.admin.ITaskExecutionMetadata|null);
+
+            /** CreateTaskRequest connection. */
+            public connection?: (flyteidl.core.IConnection|null);
 
             /**
              * Creates a new CreateTaskRequest instance using the specified properties.
@@ -9511,6 +9581,9 @@ export namespace flyteidl {
 
             /** CreateRequestHeader maxDatasetSizeBytes */
             maxDatasetSizeBytes?: (Long|null);
+
+            /** CreateRequestHeader connection */
+            connection?: (flyteidl.core.IConnection|null);
         }
 
         /** Represents a CreateRequestHeader. */
@@ -9533,6 +9606,9 @@ export namespace flyteidl {
 
             /** CreateRequestHeader maxDatasetSizeBytes. */
             public maxDatasetSizeBytes: Long;
+
+            /** CreateRequestHeader connection. */
+            public connection?: (flyteidl.core.IConnection|null);
 
             /**
              * Creates a new CreateRequestHeader instance using the specified properties.
@@ -9752,6 +9828,9 @@ export namespace flyteidl {
 
             /** GetTaskRequest taskCategory */
             taskCategory?: (flyteidl.admin.ITaskCategory|null);
+
+            /** GetTaskRequest connection */
+            connection?: (flyteidl.core.IConnection|null);
         }
 
         /** Represents a GetTaskRequest. */
@@ -9771,6 +9850,9 @@ export namespace flyteidl {
 
             /** GetTaskRequest taskCategory. */
             public taskCategory?: (flyteidl.admin.ITaskCategory|null);
+
+            /** GetTaskRequest connection. */
+            public connection?: (flyteidl.core.IConnection|null);
 
             /**
              * Creates a new GetTaskRequest instance using the specified properties.
@@ -9950,6 +10032,9 @@ export namespace flyteidl {
 
             /** DeleteTaskRequest taskCategory */
             taskCategory?: (flyteidl.admin.ITaskCategory|null);
+
+            /** DeleteTaskRequest connection */
+            connection?: (flyteidl.core.IConnection|null);
         }
 
         /** Represents a DeleteTaskRequest. */
@@ -9969,6 +10054,9 @@ export namespace flyteidl {
 
             /** DeleteTaskRequest taskCategory. */
             public taskCategory?: (flyteidl.admin.ITaskCategory|null);
+
+            /** DeleteTaskRequest connection. */
+            public connection?: (flyteidl.core.IConnection|null);
 
             /**
              * Creates a new DeleteTaskRequest instance using the specified properties.
@@ -14080,6 +14168,9 @@ export namespace flyteidl {
 
             /** ExecutionSpec executionEnvAssignments */
             executionEnvAssignments?: (flyteidl.core.IExecutionEnvAssignment[]|null);
+
+            /** ExecutionSpec externalResourceAttributes */
+            externalResourceAttributes?: (flyteidl.admin.IExternalResourceAttributes|null);
         }
 
         /** Represents an ExecutionSpec. */
@@ -14147,6 +14238,9 @@ export namespace flyteidl {
 
             /** ExecutionSpec executionEnvAssignments. */
             public executionEnvAssignments: flyteidl.core.IExecutionEnvAssignment[];
+
+            /** ExecutionSpec externalResourceAttributes. */
+            public externalResourceAttributes?: (flyteidl.admin.IExternalResourceAttributes|null);
 
             /** ExecutionSpec notificationOverrides. */
             public notificationOverrides?: ("notifications"|"disableAll");
@@ -14703,7 +14797,8 @@ export namespace flyteidl {
             QUALITY_OF_SERVICE_SPECIFICATION = 4,
             PLUGIN_OVERRIDE = 5,
             WORKFLOW_EXECUTION_CONFIG = 6,
-            CLUSTER_ASSIGNMENT = 7
+            CLUSTER_ASSIGNMENT = 7,
+            EXTERNAL_RESOURCE = 8
         }
 
         /** Properties of a TaskResourceSpec. */
@@ -15221,6 +15316,58 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of an ExternalResourceAttributes. */
+        interface IExternalResourceAttributes {
+
+            /** ExternalResourceAttributes connections */
+            connections?: ({ [k: string]: flyteidl.core.IConnection }|null);
+        }
+
+        /** Represents an ExternalResourceAttributes. */
+        class ExternalResourceAttributes implements IExternalResourceAttributes {
+
+            /**
+             * Constructs a new ExternalResourceAttributes.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IExternalResourceAttributes);
+
+            /** ExternalResourceAttributes connections. */
+            public connections: { [k: string]: flyteidl.core.IConnection };
+
+            /**
+             * Creates a new ExternalResourceAttributes instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ExternalResourceAttributes instance
+             */
+            public static create(properties?: flyteidl.admin.IExternalResourceAttributes): flyteidl.admin.ExternalResourceAttributes;
+
+            /**
+             * Encodes the specified ExternalResourceAttributes message. Does not implicitly {@link flyteidl.admin.ExternalResourceAttributes.verify|verify} messages.
+             * @param message ExternalResourceAttributes message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IExternalResourceAttributes, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an ExternalResourceAttributes message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ExternalResourceAttributes
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.ExternalResourceAttributes;
+
+            /**
+             * Verifies an ExternalResourceAttributes message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a MatchingAttributes. */
         interface IMatchingAttributes {
 
@@ -15247,6 +15394,9 @@ export namespace flyteidl {
 
             /** MatchingAttributes clusterAssignment */
             clusterAssignment?: (flyteidl.admin.IClusterAssignment|null);
+
+            /** MatchingAttributes externalResourceAttributes */
+            externalResourceAttributes?: (flyteidl.admin.IExternalResourceAttributes|null);
         }
 
         /** Represents a MatchingAttributes. */
@@ -15282,8 +15432,11 @@ export namespace flyteidl {
             /** MatchingAttributes clusterAssignment. */
             public clusterAssignment?: (flyteidl.admin.IClusterAssignment|null);
 
+            /** MatchingAttributes externalResourceAttributes. */
+            public externalResourceAttributes?: (flyteidl.admin.IExternalResourceAttributes|null);
+
             /** MatchingAttributes target. */
-            public target?: ("taskResourceAttributes"|"clusterResourceAttributes"|"executionQueueAttributes"|"executionClusterLabel"|"qualityOfService"|"pluginOverrides"|"workflowExecutionConfig"|"clusterAssignment");
+            public target?: ("taskResourceAttributes"|"clusterResourceAttributes"|"executionQueueAttributes"|"executionClusterLabel"|"qualityOfService"|"pluginOverrides"|"workflowExecutionConfig"|"clusterAssignment"|"externalResourceAttributes");
 
             /**
              * Creates a new MatchingAttributes instance using the specified properties.

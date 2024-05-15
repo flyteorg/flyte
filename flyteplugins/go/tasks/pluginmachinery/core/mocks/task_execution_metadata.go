@@ -3,7 +3,9 @@
 package mocks
 
 import (
+	admin "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	core "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+
 	corev1 "k8s.io/api/core/v1"
 
 	flyteidlcore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -82,6 +84,40 @@ func (_m *TaskExecutionMetadata) GetEnvironmentVariables() map[string]string {
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(map[string]string)
+		}
+	}
+
+	return r0
+}
+
+type TaskExecutionMetadata_GetExternalResourceAttributes struct {
+	*mock.Call
+}
+
+func (_m TaskExecutionMetadata_GetExternalResourceAttributes) Return(_a0 *admin.ExternalResourceAttributes) *TaskExecutionMetadata_GetExternalResourceAttributes {
+	return &TaskExecutionMetadata_GetExternalResourceAttributes{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *TaskExecutionMetadata) OnGetExternalResourceAttributes() *TaskExecutionMetadata_GetExternalResourceAttributes {
+	c_call := _m.On("GetExternalResourceAttributes")
+	return &TaskExecutionMetadata_GetExternalResourceAttributes{Call: c_call}
+}
+
+func (_m *TaskExecutionMetadata) OnGetExternalResourceAttributesMatch(matchers ...interface{}) *TaskExecutionMetadata_GetExternalResourceAttributes {
+	c_call := _m.On("GetExternalResourceAttributes", matchers...)
+	return &TaskExecutionMetadata_GetExternalResourceAttributes{Call: c_call}
+}
+
+// GetExternalResourceAttributes provides a mock function with given fields:
+func (_m *TaskExecutionMetadata) GetExternalResourceAttributes() *admin.ExternalResourceAttributes {
+	ret := _m.Called()
+
+	var r0 *admin.ExternalResourceAttributes
+	if rf, ok := ret.Get(0).(func() *admin.ExternalResourceAttributes); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.ExternalResourceAttributes)
 		}
 	}
 
