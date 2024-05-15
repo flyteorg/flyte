@@ -9,6 +9,7 @@ import (
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/rpc/adminservice/util"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 func (m *AdminService) CreateExecution(
@@ -139,6 +140,10 @@ func (m *AdminService) GetExecutionData(
 		return nil, util.TransformAndRecordError(err, &m.Metrics.executionEndpointMetrics.getData)
 	}
 	m.Metrics.executionEndpointMetrics.getData.Success()
+	// DEBUG: CASE-643
+	if response.GetFullOutputs().GetLiterals() == nil || len(response.GetFullOutputs().GetLiterals()) == 0 {
+		logger.Debugf(ctx, "GetExecutionData().FullOutputs empty for execution %v. FullOutputs: %v. Outputs: %v", request.GetId(), response.GetFullOutputs(), response.GetOutputs())
+	}
 	return response, nil
 }
 

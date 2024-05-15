@@ -210,6 +210,10 @@ func (l *launchPlanHandler) CheckLaunchPlanStatus(ctx context.Context, nCtx inte
 
 			oInfo = &handler.OutputInfo{OutputURI: outputFile}
 		}
+		// DEBUG: CASE-643
+		if outputs.GetLiterals() == nil || len(outputs.GetLiterals()) == 0 {
+			logger.Debugf(ctx, "GetStatus() outputs empty for execution %v. Closure: %v. Outputs: %v", childID, wfStatusClosure, outputs)
+		}
 
 		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoSuccess(&handler.ExecutionInfo{
 			WorkflowNodeInfo: &handler.WorkflowNodeInfo{LaunchedWorkflowID: childID},
