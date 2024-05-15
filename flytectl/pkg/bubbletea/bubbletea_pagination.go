@@ -169,8 +169,8 @@ func Paginator(_listHeader []printer.Column, _callback DataCallback, _filter fil
 		log.Fatal(err)
 	}
 
-	if errMsg != nil {
-		return errMsg
+	if pageErrMsg != nil {
+		return pageErrMsg
 	}
 
 	return nil

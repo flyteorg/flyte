@@ -53,7 +53,7 @@ var (
 	// Avoid fetching back and forward at the same time
 	mutex sync.Mutex
 	// Used to catch error happened while running paginator
-	errMsg error = nil
+	pageErrMsg error = nil
 )
 
 func (p printTableProto) MarshalJSON() ([]byte, error) {
@@ -135,7 +135,7 @@ func fetchDataCmd(batchIndex int, fetchDirection direction) tea.Cmd {
 	return func() tea.Msg {
 		newItems, err := getMessageList(batchIndex)
 		if err != nil {
-			errMsg = err
+			pageErrMsg = err
 			return err
 		}
 		msg := newDataMsg{

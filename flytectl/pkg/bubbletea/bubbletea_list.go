@@ -80,6 +80,7 @@ func (m listModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			newArgs = append(newArgs, string(item))
 			err := genListModel(&m, string(item))
 			if err != nil || m.quitting {
+				listErrMsg = err
 				return m, tea.Quit
 			}
 			return m, nil
@@ -149,7 +150,11 @@ func ShowCmdList(_rootCmd *cobra.Command) {
 		}
 	}
 
+	if listErrMsg != nil {
+		fmt.Println(listErrMsg)
+	}
+
 	// fmt.Println(append(newArgs, existingFlags...))
-	// exist flags need to be append at last, so if any user input is wrong, it can be caught in the main logic
+	// Originally existed flags need to be append at last, so if any user input is wrong, it can be caught in the main logic
 	rootCmd.SetArgs(append(newArgs, existingFlags...))
 }

@@ -25,8 +25,9 @@ var (
 	rootCmd       *cobra.Command
 	newArgs       []string
 	isCommand     = true
-	unhandleflags []string
+	unhandleFlags []string
 	existingFlags []string
+	listErrMsg    error = nil
 )
 var (
 	domainName    = [3]string{"development", "staging", "production"}
@@ -132,28 +133,31 @@ func genProjectListModel(m *listModel) error {
 
 // Generate list.Model of options for different flags
 func genFlagListModel(m *listModel) error {
-	f := unhandleflags[0]
-	newArgs = append(newArgs, f)
-	unhandleflags = unhandleflags[1:]
-	// TODO check if some flags are already input as arguments by user
-	var err error
+	var i int
+	var flag string
+	for i, flag = range unhandleFlags {
+		if !rootCmd.Flags().ShorthandLookup(strings.TrimPrefix(flag, "-")).Changed {
+			break
+		}
+	}
+	newArgs = append(newArgs, unhandleFlags[i])
+	unhandleFlags = unhandleFlags[i+1:]
 
-	switch f {
+	switch flag {
 	case "-p":
-		err = genProjectListModel(m)
+		err := genProjectListModel(m)
+		if err != nil {
+			return err
+		}
 	case "-d":
 		genDomainListModel(m)
 	}
 
-	return err
+	return nil
 }
 
 // Generate list.Model of subcommands from a given command
 func genCmdListModel(m *listModel, c *cobra.Command) {
-	// if len(nameToCommand[c].Cmd.Commands()) == 0 {
-	// 	return m
-	// }
-
 	items := generateSubCmdItems(c)
 	l := genList(items, "")
 	m.list = l
@@ -162,12 +166,11 @@ func genCmdListModel(m *listModel, c *cobra.Command) {
 
 // Generate list.Model after user chose one of the item
 func genListModel(m *listModel, item string) error {
-
 	// Still in the stage of handling subcommands
 	if isCommand {
 		var ok bool
 		// check if we reach a runnable command
-		if unhandleflags, ok = commandFlagMap[sliceToString(newArgs)]; !ok {
+		if unhandleFlags, ok = commandFlagMap[sliceToString(newArgs)]; !ok {
 			genCmdListModel(m, nameToCommand[item].Cmd)
 			return nil
 		}
@@ -175,7 +178,7 @@ func genListModel(m *listModel, item string) error {
 	}
 
 	// Handled all flags, quit.
-	if len(unhandleflags) == 0 {
+	if len(unhandleFlags) == 0 {
 		m.quitting = true
 		return nil
 	}
