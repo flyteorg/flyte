@@ -17,7 +17,7 @@ There are some base design attributes and assumptions that FlytePropeller applie
 - When a workflow definition is compiled, the resulting DAG structure is traversed by the controller and the goal is to gracefully transition each task to ``Success``.
 - Task executions are performed by various FlytePlugins; which perform operations on Kubernetes and other remote services as declared in the workflow definition. FlytePropeller is only responsible for effectively monitoring and managing these executions.
 
-In the following sections you will learn how Flyte takes care of the correct and reliable execution of workflows through multiple stages and what strategies you can apply to help the system efficiently handle increasing load.
+In the following sections you will learn how Flyte ensures the correct and reliable execution of workflows through multiple stages, and what strategies you can apply to help the system efficiently handle increasing load.
 
 Summarized steps of a workflow execution
 ========================================
@@ -36,7 +36,8 @@ It's implemented as a ``goroutine``, and illustrated here as a hard-working goph
 4. Keeps a local copy of the execution status, besides what the K8s API stores in ``etcd``.
 5. Reports status to the control plane and, hence, to the user.
 
-While there are multiple metrics that could indicate a slow down in execution performance, ``round_latency`` -or the time it takes FlytePropeller to perform a single iteration of workflow evaluation- is typically the "golden signal". 
+This process is known as the "evaluation loop".
+While there are multiple metrics that could indicate a slow down in execution performance, ``round_latency`` -or the time it takes FlytePropeller to complete a single evaluation loop- is typically the "golden signal". 
 Optimizing ``round_latency`` is one of the main goals of the recommendations provided in the following sections.
 
 Performance tuning at each stage
@@ -122,7 +123,7 @@ While it's possible to easily monitor Kube API saturation using system-level met
      - ``tasks.backoff.max-duration``. Default value: ``20s``.
 
 
-4. Update execution status
+4. Record execution status
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. list-table:: Important Properties
@@ -138,11 +139,11 @@ While it's possible to easily monitor Kube API saturation using system-level met
      - The default policy is designed to leverage ``etcd`` features to reduce latency. 
      - ``propeller.workflowStore.policy``. Default value: ``ResourceVersionCache``.
 
-**How ResourceVersionCache works?**
+**How ``ResourceVersionCache`` works?**
 
 .. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/configuration/perf_optimization/resourceversion-01.png 
 
-Kubernetes stores the definition and state of all the resources under its management on ``etcd``, a fast, distributed and consistent key-value store.
+Kubernetes stores the definition and state of all the resources under its management on ``etcd``: a fast, distributed and consistent key-value store.
 Every resource has a ``resourceVersion`` field representing the version of that resource as stored in ``etcd``. 
 
 Example:
