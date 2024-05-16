@@ -364,7 +364,6 @@ import_projects_config = {
 # is useful for building the docs in the CI/CD of the corresponding repos.
 flytesnacks_local_path = os.environ.get("FLYTESNACKS_LOCAL_PATH", None)
 flytekit_local_path = os.environ.get("FLYTEKIT_LOCAL_PATH", None)
-flytectl_local_path = os.environ.get("FLYTECTL_LOCAL_PATH", None)
 
 flytesnacks_path = flytesnacks_local_path or "_projects/flytesnacks"
 flytekit_path = flytekit_local_path or "_projects/api/flytekit"
@@ -417,10 +416,10 @@ import_projects = [
     },
     {
         "name": "flytectl",
-        "source": flytectl_local_path or "https://github.com/flyteorg/flytectl",
+        "source": "../flytectl",
         "docs_path": "docs/source",
         "dest": "flytectl",
-        "local": flytectl_local_path is not None,
+        "local": True,
     },
     {
         "name": "flyteidl",
