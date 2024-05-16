@@ -2,7 +2,8 @@
 
 set -ex
 
-FLYTEKIT_TAG=$(curl --silent "https://api.github.com/repos/flyteorg/flytekit/releases/latest" | jq -r .tag_name | sed 's/^v//')
+# NOTE: Flyte and flytekit should be released at the same time. If not, Flyte chart will use a flyteagent image that does not exist.
+FLYTEKIT_TAG=$(echo "${VERSION}" | sed 's/^v//')
 FLYTECONSOLE_TAG=$(curl --silent "https://api.github.com/repos/flyteorg/flyteconsole/releases/latest" | jq -r .tag_name)
 
 # bump latest release of flyte component in helm
