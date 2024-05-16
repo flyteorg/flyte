@@ -433,7 +433,7 @@ export class SecurityContext extends Message<SecurityContext> {
    * 3. connection in the flyteadmin configmap.
    * +optional
    *
-   * @generated from field: string connectionRef = 4;
+   * @generated from field: string connection_ref = 4;
    */
   connectionRef = "";
 
@@ -448,7 +448,7 @@ export class SecurityContext extends Message<SecurityContext> {
     { no: 1, name: "run_as", kind: "message", T: Identity },
     { no: 2, name: "secrets", kind: "message", T: Secret, repeated: true },
     { no: 3, name: "tokens", kind: "message", T: OAuth2TokenRequest, repeated: true },
-    { no: 4, name: "connectionRef", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "connection_ref", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SecurityContext {

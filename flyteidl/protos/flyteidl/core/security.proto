@@ -146,5 +146,5 @@ message SecurityContext {
     // 2. connection in the externalResourceAttributes in the project settings.
     // 3. connection in the flyteadmin configmap.
     // +optional
-    string connectionRef = 4;
+    string connection_ref = 4;
 }
