@@ -1,6 +1,7 @@
 package upgrade
 
 import (
+	"fmt"
 	"sort"
 	"testing"
 
@@ -45,7 +46,6 @@ func TestUpgradeCommand(t *testing.T) {
 }
 
 func TestUpgrade(t *testing.T) {
-	t.Skip("Skipping due to https://github.com/flyteorg/flyte/issues/5372")
 	_ = util.WriteIntoFile([]byte("data"), tempExt)
 	stdlibversion.Version = version
 	github.FlytectlReleaseConfig.OverrideExecutable = tempExt
@@ -105,7 +105,6 @@ func TestIsUpgradeable(t *testing.T) {
 }
 
 func TestSelfUpgrade(t *testing.T) {
-	t.Skip("Skipping due to https://github.com/flyteorg/flyte/issues/5372")
 	stdlibversion.Version = version
 	github.FlytectlReleaseConfig.OverrideExecutable = tempExt
 	goos = platformutil.Linux
@@ -135,7 +134,6 @@ func TestSelfUpgradeError(t *testing.T) {
 }
 
 func TestSelfUpgradeRollback(t *testing.T) {
-	t.Skip("Skipping due to https://github.com/flyteorg/flyte/issues/5372")
 	stdlibversion.Version = version
 	github.FlytectlReleaseConfig.OverrideExecutable = tempExt
 	goos = platformutil.Linux
@@ -177,4 +175,8 @@ func TestSelfUpgradeRollback(t *testing.T) {
 		assert.Nil(t, selfUpgrade(s.Ctx, args, s.CmdCtx))
 	})
 
+}
+
+func TestMain(_ *testing.M) {
+	fmt.Println("Skipping due to https://github.com/flyteorg/flyte/issues/5372")
 }
