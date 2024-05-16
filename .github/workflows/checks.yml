@@ -32,6 +32,7 @@ jobs:
         component:
           - cacheservice
           - datacatalog
+          - fasttask/plugin
           - flyteadmin
           # TODO(monorepo): Enable lint flytecopilot
           # - flytecopilot
@@ -53,6 +54,7 @@ jobs:
         component:
           - cacheservice
           - datacatalog
+          - fasttask/plugin
           - flyteadmin
           - flytecopilot
           - flyteplugins
@@ -113,6 +115,7 @@ jobs:
         component:
           - cacheservice
           - datacatalog
+          - fasttask/plugin
           - flyteadmin
           - flytecopilot
           - flytepropeller
