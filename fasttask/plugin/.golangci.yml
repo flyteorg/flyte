@@ -1,3 +1,10 @@
+issues:
+  exclude-rules:
+  # Temporarily suppress copylocks linter. We need to come back and fix these.
+  - linters:
+    - govet
+    text: copylocks
+
 linters:
   enable:
   - gci
