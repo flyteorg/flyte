@@ -18,13 +18,22 @@ import (
 	"github.com/unionai/flyte/fasttask/plugin/pb"
 )
 
+var maxPendingOwnersPerQueue = 100
+
 // FastTaskService is a gRPC service that manages assignment and management of task executions with
 // respect to fasttask workers.
 type FastTaskService struct {
 	pb.UnimplementedFastTaskServer
-	enqueueOwner       core.EnqueueOwner
-	queues             map[string]*Queue
-	queuesLock         sync.RWMutex
+	enqueueOwner core.EnqueueOwner
+
+	queues     map[string]*Queue
+	queuesLock sync.RWMutex
+
+	// A map of pending owners by queue. When a new worker becomes available, use this to enqueue owners for reevaluation.
+	// Note, this is an optimistic approach and may not include all pending owners.
+	pendingTaskOwners     map[string]map[string]types.NamespacedName // map[queueID]map[taskID]ownerID
+	pendingTaskOwnersLock sync.RWMutex
+
 	taskStatusChannels sync.Map // map[string]chan *WorkerTaskStatus
 	metrics            metrics
 }
@@ -107,33 +116,11 @@ func (f *FastTaskService) Heartbeat(stream pb.FastTask_HeartbeatServer) error {
 	}
 
 	// register worker with queue
-	f.queuesLock.Lock()
-	queue, exists := f.queues[heartbeatRequest.GetQueueId()]
-	if !exists {
-		queue = &Queue{
-			workers: make(map[string]*Worker),
-		}
-		f.queues[heartbeatRequest.GetQueueId()] = queue
-	}
-	f.queuesLock.Unlock()
-
-	queue.lock.Lock()
-	queue.workers[workerID] = worker
-	queue.lock.Unlock()
+	queue := f.addWorkerToQueue(heartbeatRequest.GetQueueId(), worker)
 
 	// cleanup worker on exit
 	defer func() {
-		f.queuesLock.Lock()
-		queue, exists := f.queues[heartbeatRequest.GetQueueId()]
-		if exists {
-			queue.lock.Lock()
-			delete(queue.workers, workerID)
-			if len(queue.workers) == 0 {
-				delete(f.queues, heartbeatRequest.GetQueueId())
-			}
-			queue.lock.Unlock()
-		}
-		f.queuesLock.Unlock()
+		f.removeWorkerFromQueue(heartbeatRequest.GetQueueId(), workerID)
 	}()
 
 	// start go routine to handle heartbeat responses
@@ -149,6 +136,9 @@ func (f *FastTaskService) Heartbeat(stream pb.FastTask_HeartbeatServer) error {
 			}
 		}
 	}()
+
+	// new worker available, enqueue owners
+	f.enqueuePendingOwners(heartbeatRequest.GetQueueId())
 
 	// handle heartbeat requests
 	for {
@@ -198,6 +188,100 @@ func (f *FastTaskService) Heartbeat(stream pb.FastTask_HeartbeatServer) error {
 	return nil
 }
 
+func (f *FastTaskService) addWorkerToQueue(queueID string, worker *Worker) *Queue {
+	f.queuesLock.Lock()
+	defer f.queuesLock.Unlock()
+
+	queue, exists := f.queues[queueID]
+	if !exists {
+		queue = &Queue{
+			workers: make(map[string]*Worker),
+		}
+		f.queues[queueID] = queue
+	}
+
+	queue.lock.Lock()
+	defer queue.lock.Unlock()
+
+	queue.workers[worker.workerID] = worker
+	return queue
+}
+
+func (f *FastTaskService) removeWorkerFromQueue(queueID, workerID string) {
+	f.queuesLock.Lock()
+	defer f.queuesLock.Unlock()
+
+	queue, exists := f.queues[queueID]
+	if !exists {
+		return
+	}
+
+	queue.lock.Lock()
+	defer queue.lock.Unlock()
+
+	delete(queue.workers, workerID)
+	if len(queue.workers) == 0 {
+		delete(f.queues, queueID)
+	}
+}
+
+// addPendingOwner adds to the pending owners list for the queue, if not already full
+func (f *FastTaskService) addPendingOwner(queueID, taskID string, ownerID types.NamespacedName) {
+	f.pendingTaskOwnersLock.Lock()
+	defer f.pendingTaskOwnersLock.Unlock()
+
+	owners, exists := f.pendingTaskOwners[queueID]
+	if !exists {
+		owners = make(map[string]types.NamespacedName)
+		f.pendingTaskOwners[queueID] = owners
+	}
+
+	if len(owners) >= maxPendingOwnersPerQueue {
+		return
+	}
+	owners[taskID] = ownerID
+}
+
+// removePendingOwner removes the pending owner from the list if still there
+func (f *FastTaskService) removePendingOwner(queueID, taskID string) {
+	f.pendingTaskOwnersLock.Lock()
+	defer f.pendingTaskOwnersLock.Unlock()
+
+	owners, exists := f.pendingTaskOwners[queueID]
+	if !exists {
+		return
+	}
+
+	delete(owners, taskID)
+	if len(owners) == 0 {
+		delete(f.pendingTaskOwners, queueID)
+	}
+}
+
+// enqueuePendingOwners drains the pending owners list for the queue and enqueues them for reevaluation
+func (f *FastTaskService) enqueuePendingOwners(queueID string) {
+	f.pendingTaskOwnersLock.Lock()
+	defer f.pendingTaskOwnersLock.Unlock()
+
+	owners, exists := f.pendingTaskOwners[queueID]
+	if !exists {
+		return
+	}
+
+	enqueued := make(map[types.NamespacedName]bool)
+	for _, ownerID := range owners {
+		if _, ok := enqueued[ownerID]; ok {
+			continue
+		}
+		if err := f.enqueueOwner(ownerID); err != nil {
+			logger.Warnf(context.Background(), "failed to enqueue owner %s: %+v", ownerID, err)
+		}
+		enqueued[ownerID] = true
+	}
+
+	delete(f.pendingTaskOwners, queueID)
+}
+
 // OfferOnQueue offers a task to a worker on a specific queue. If no workers are available, an
 // empty string is returned.
 func (f *FastTaskService) OfferOnQueue(ctx context.Context, queueID, taskID, namespace, workflowID string, cmd []string) (string, error) {
@@ -206,6 +290,7 @@ func (f *FastTaskService) OfferOnQueue(ctx context.Context, queueID, taskID, nam
 
 	queue, exists := f.queues[queueID]
 	if !exists {
+		f.addPendingOwner(queueID, taskID, types.NamespacedName{Namespace: namespace, Name: workflowID})
 		f.metrics.taskNoWorkersAvailable.Inc()
 		return "", nil // no workers available
 	}
@@ -232,8 +317,11 @@ func (f *FastTaskService) OfferOnQueue(ctx context.Context, queueID, taskID, nam
 		worker = acceptedWorkers[rand.Intn(len(acceptedWorkers))]
 		worker.capacity.BacklogCount++
 	} else {
+		// No workers available. Note, we do not add to pending owners at this time as we are optimizing for the worker
+		// startup case. Theworker backlog should be sufficient to keep the worker busy without needing to proactively
+		// enqueue owners when capacity becomes available.
 		f.metrics.taskNoCapacityAvailable.Inc()
-		return "", nil // no workers available
+		return "", nil
 	}
 
 	// send assign message to worker
@@ -325,6 +413,10 @@ func (f *FastTaskService) Cleanup(ctx context.Context, taskID, queueID, workerID
 
 	// delete task context
 	f.taskStatusChannels.Delete(taskID)
+
+	// remove pending owner
+	f.removePendingOwner(queueID, taskID)
+
 	return nil
 }
 
@@ -332,8 +424,9 @@ func (f *FastTaskService) Cleanup(ctx context.Context, taskID, queueID, workerID
 func NewFastTaskService(enqueueOwner core.EnqueueOwner) *FastTaskService {
 	scope := promutils.NewScope("fasttask")
 	svc := &FastTaskService{
-		enqueueOwner: enqueueOwner,
-		queues:       make(map[string]*Queue),
+		enqueueOwner:      enqueueOwner,
+		queues:            make(map[string]*Queue),
+		pendingTaskOwners: make(map[string]map[string]types.NamespacedName),
 		metrics: metrics{
 			taskNoWorkersAvailable:  scope.MustNewCounter("task_no_workers_available", "Count of task assignment attempts with no workers available"),
 			taskNoCapacityAvailable: scope.MustNewCounter("task_no_capacity_available", "Count of task assignment attempts with no capacity available"),

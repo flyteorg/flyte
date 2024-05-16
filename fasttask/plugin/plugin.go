@@ -262,7 +262,6 @@ func (p *Plugin) Abort(ctx context.Context, tCtx core.TaskExecutionContext) erro
 	// active executions. this is performed in the `Finalize` function which is _always_ called
 	// during any abort. if this logic changes, we will need to add a call to
 	// `fastTaskService.Cleanup` to ensure proper abort here.
-	// TODO: add this since the service may now hold pending tasks without a worker up
 	return nil
 }
 
