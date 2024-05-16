@@ -155,7 +155,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - uses: unionai/flytectl-setup-action@v0.0.1
+      - uses: unionai/flytectl-setup-action@v0.0.3
       - name: Setup sandbox
         run: |
           mkdir -p ~/.flyte/sandbox
