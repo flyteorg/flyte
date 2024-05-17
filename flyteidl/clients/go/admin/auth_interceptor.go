@@ -176,7 +176,7 @@ func NewAuthInterceptor(cfg *Config, tokenCache cache.TokenCache, credentialsFut
 							return fmt.Errorf("authentication error! Original Error: %v, Auth Error: %w", err, newErr)
 						}
 
-						tokenCache.CondSignal()
+						tokenCache.CondBroadcast()
 						return nil
 					}()
 

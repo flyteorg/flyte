@@ -34,6 +34,6 @@ type TokenCache interface {
 	// CondWait waits for the condition to be true.
 	CondWait()
 
-	// CondSignal signals the condition.
-	CondSignal()
+	// CondSignalCondBroadcast signals the condition.
+	CondBroadcast()
 }

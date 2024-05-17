@@ -49,9 +49,9 @@ func (t *TokenCacheInMemoryProvider) CondWait() {
 	t.cond.Wait()
 }
 
-// CondSignal signals the condition.
-func (t *TokenCacheInMemoryProvider) CondSignal() {
-	t.cond.Signal()
+// CondBroadcast signals the condition.
+func (t *TokenCacheInMemoryProvider) CondBroadcast() {
+	t.cond.Broadcast()
 }
 
 func NewTokenCacheInMemoryProvider() *TokenCacheInMemoryProvider {
