@@ -19,6 +19,14 @@ var disabledStatus = catalog.NewStatus(core.CatalogCacheStatus_CACHE_DISABLED, n
 type NOOPCatalog struct {
 }
 
+func (n NOOPCatalog) GetReservationCache(ownerID string) catalog.ReservationCache {
+	return catalog.ReservationCache{}
+}
+
+func (n NOOPCatalog) UpdateReservationCache(ownerID string, entry catalog.ReservationCache) {
+
+}
+
 func (n NOOPCatalog) Get(_ context.Context, _ catalog.Key) (catalog.Entry, error) {
 	return catalog.NewCatalogEntry(nil, disabledStatus), nil
 }

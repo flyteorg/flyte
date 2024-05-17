@@ -1088,17 +1088,16 @@ func (c *nodeExecutor) handleQueuedOrRunningNode(ctx context.Context, nCtx inter
 		if cacheSerializable && !nCtx.ExecutionContext().GetExecutionConfig().OverwriteCache &&
 			(cacheStatus == nil || (cacheStatus.GetCacheStatus() != core.CatalogCacheStatus_CACHE_HIT)) {
 
-			entry, err := c.GetOrExtendCatalogReservation(ctx, nCtx, cacheHandler, config.GetConfig().WorkflowReEval.Duration)
+			reservationStatus, err := c.GetOrExtendCatalogReservation(ctx, nCtx, cacheHandler, config.GetConfig().WorkflowReEval.Duration)
 			if err != nil {
 				logger.Errorf(ctx, "failed to check for catalog reservation with err '%s'", err.Error())
 				return interfaces.NodeStatusUndefined, err
 			}
 
-			status := entry.GetStatus()
-			catalogReservationStatus = &status
-			if status == core.CatalogReservation_RESERVATION_ACQUIRED && currentPhase == v1alpha1.NodePhaseQueued {
+			catalogReservationStatus = &reservationStatus
+			if reservationStatus == core.CatalogReservation_RESERVATION_ACQUIRED && currentPhase == v1alpha1.NodePhaseQueued {
 				logger.Infof(ctx, "acquired cache reservation")
-			} else if status == core.CatalogReservation_RESERVATION_EXISTS {
+			} else if reservationStatus == core.CatalogReservation_RESERVATION_EXISTS {
 				// if reservation is held by another owner we stay in the queued phase
 				p = handler.PhaseInfoQueued(cacheSerializedReason, nil)
 			}

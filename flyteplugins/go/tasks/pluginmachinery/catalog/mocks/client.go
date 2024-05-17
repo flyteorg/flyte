@@ -101,6 +101,38 @@ func (_m *Client) GetOrExtendReservation(ctx context.Context, key catalog.Key, o
 	return r0, r1
 }
 
+type Client_GetReservationCache struct {
+	*mock.Call
+}
+
+func (_m Client_GetReservationCache) Return(_a0 catalog.ReservationCache) *Client_GetReservationCache {
+	return &Client_GetReservationCache{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *Client) OnGetReservationCache(ownerID string) *Client_GetReservationCache {
+	c_call := _m.On("GetReservationCache", ownerID)
+	return &Client_GetReservationCache{Call: c_call}
+}
+
+func (_m *Client) OnGetReservationCacheMatch(matchers ...interface{}) *Client_GetReservationCache {
+	c_call := _m.On("GetReservationCache", matchers...)
+	return &Client_GetReservationCache{Call: c_call}
+}
+
+// GetReservationCache provides a mock function with given fields: ownerID
+func (_m *Client) GetReservationCache(ownerID string) catalog.ReservationCache {
+	ret := _m.Called(ownerID)
+
+	var r0 catalog.ReservationCache
+	if rf, ok := ret.Get(0).(func(string) catalog.ReservationCache); ok {
+		r0 = rf(ownerID)
+	} else {
+		r0 = ret.Get(0).(catalog.ReservationCache)
+	}
+
+	return r0
+}
+
 type Client_Put struct {
 	*mock.Call
 }
@@ -209,4 +241,9 @@ func (_m *Client) Update(ctx context.Context, key catalog.Key, reader io.OutputR
 	}
 
 	return r0, r1
+}
+
+// UpdateReservationCache provides a mock function with given fields: ownerID, entry
+func (_m *Client) UpdateReservationCache(ownerID string, entry catalog.ReservationCache) {
+	_m.Called(ownerID, entry)
 }

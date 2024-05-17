@@ -21,10 +21,11 @@ const ConfigSectionKey = "catalog-cache"
 
 var (
 	defaultConfig = Config{
-		Type:          NoOpDiscoveryType,
-		MaxRetries:    5,
-		BackoffScalar: 100,
-		BackoffJitter: "0.1",
+		Type:                    NoOpDiscoveryType,
+		MaxRetries:              5,
+		BackoffScalar:           100,
+		BackoffJitter:           "0.1",
+		ReservationMaxCacheSize: 10000,
 	}
 
 	configSection = config.MustRegisterSectionWithUpdates(ConfigSectionKey, &defaultConfig, func(ctx context.Context, newValue config.Config) {
@@ -48,16 +49,17 @@ const (
 )
 
 type Config struct {
-	Type          DiscoveryType   `json:"type" pflag:"\"noop\", Catalog Implementation to use"`
-	Endpoint      string          `json:"endpoint" pflag:"\"\", Endpoint for catalog service"`
-	CacheEndpoint string          `json:"cache-endpoint" pflag:"\"\", Endpoint for cache service"`
-	Insecure      bool            `json:"insecure" pflag:"false, Use insecure grpc connection"`
-	MaxCacheAge   config.Duration `json:"max-cache-age" pflag:", Cache entries past this age will incur cache miss. 0 means cache never expires"`
-	UseAdminAuth  bool            `json:"use-admin-auth" pflag:"false, Use the same gRPC credentials option as the flyteadmin client"`
-	MaxRetries    int             `json:"max-retries" pflag:",The max number of retries for event recording."`
-	BackoffScalar int             `json:"base-scalar" pflag:",The base/scalar backoff duration in milliseconds for event recording retries."`
-	BackoffJitter string          `json:"backoff-jitter" pflag:",A string representation of a floating point number between 0 and 1 specifying the jitter factor for event recording retries."`
-	InlineCache   bool            `json:"inline-cache" pflag:"false, Attempt to use in-line cache"`
+	Type                    DiscoveryType   `json:"type" pflag:"\"noop\", Catalog Implementation to use"`
+	Endpoint                string          `json:"endpoint" pflag:"\"\", Endpoint for catalog service"`
+	CacheEndpoint           string          `json:"cache-endpoint" pflag:"\"\", Endpoint for cache service"`
+	Insecure                bool            `json:"insecure" pflag:"false, Use insecure grpc connection"`
+	MaxCacheAge             config.Duration `json:"max-cache-age" pflag:", Cache entries past this age will incur cache miss. 0 means cache never expires"`
+	UseAdminAuth            bool            `json:"use-admin-auth" pflag:"false, Use the same gRPC credentials option as the flyteadmin client"`
+	MaxRetries              int             `json:"max-retries" pflag:",The max number of retries for event recording."`
+	BackoffScalar           int             `json:"base-scalar" pflag:",The base/scalar backoff duration in milliseconds for event recording retries."`
+	BackoffJitter           string          `json:"backoff-jitter" pflag:",A string representation of a floating point number between 0 and 1 specifying the jitter factor for event recording retries."`
+	InlineCache             bool            `json:"inline-cache" pflag:"false, Attempt to use in-line cache"`
+	ReservationMaxCacheSize int             `json:"reservation-cache-size" pflag:", The max size of the reservation cache"`
 
 	// Set the gRPC service config formatted as a json string https://github.com/grpc/grpc/blob/master/doc/service_config.md
 	// eg. {"loadBalancingConfig": [{"round_robin":{}}], "methodConfig": [{"name":[{"service": "foo", "method": "bar"}, {"service": "baz"}], "timeout": "1.000000001s"}]}
@@ -89,18 +91,19 @@ func NewCacheClient(ctx context.Context, dataStore *storage.DataStore, authOpt .
 		return cacheservice.NewCacheClient(ctx, dataStore, catalogConfig.CacheEndpoint, catalogConfig.Insecure,
 			catalogConfig.MaxCacheAge.Duration, catalogConfig.UseAdminAuth, uint(catalogConfig.MaxRetries),
 			catalogConfig.BackoffScalar, catalogConfig.GetBackoffJitter(ctx), catalogConfig.InlineCache,
-			catalogConfig.DefaultServiceConfig, authOpt...)
+			catalogConfig.DefaultServiceConfig, catalogConfig.ReservationMaxCacheSize, authOpt...)
 	case FallbackType:
 		cacheClient, err := cacheservice.NewCacheClient(ctx, dataStore, catalogConfig.CacheEndpoint, catalogConfig.Insecure,
 			catalogConfig.MaxCacheAge.Duration, catalogConfig.UseAdminAuth, uint(catalogConfig.MaxRetries),
 			catalogConfig.BackoffScalar, catalogConfig.GetBackoffJitter(ctx), catalogConfig.InlineCache,
-			catalogConfig.DefaultServiceConfig, authOpt...)
+			catalogConfig.DefaultServiceConfig, catalogConfig.ReservationMaxCacheSize, authOpt...)
 		if err != nil {
 			return nil, err
 		}
 		catalogClient, err := datacatalog.NewDataCatalog(ctx, catalogConfig.Endpoint, catalogConfig.Insecure,
 			catalogConfig.MaxCacheAge.Duration, catalogConfig.UseAdminAuth, catalogConfig.DefaultServiceConfig,
-			uint(catalogConfig.MaxRetries), catalogConfig.BackoffScalar, catalogConfig.GetBackoffJitter(ctx), authOpt...)
+			uint(catalogConfig.MaxRetries), catalogConfig.BackoffScalar, catalogConfig.GetBackoffJitter(ctx),
+			catalogConfig.ReservationMaxCacheSize, authOpt...)
 		if err != nil {
 			return nil, err
 		}
@@ -108,7 +111,8 @@ func NewCacheClient(ctx context.Context, dataStore *storage.DataStore, authOpt .
 	case DataCatalogType:
 		return datacatalog.NewDataCatalog(ctx, catalogConfig.Endpoint, catalogConfig.Insecure,
 			catalogConfig.MaxCacheAge.Duration, catalogConfig.UseAdminAuth, catalogConfig.DefaultServiceConfig,
-			uint(catalogConfig.MaxRetries), catalogConfig.BackoffScalar, catalogConfig.GetBackoffJitter(ctx), authOpt...)
+			uint(catalogConfig.MaxRetries), catalogConfig.BackoffScalar, catalogConfig.GetBackoffJitter(ctx),
+			catalogConfig.ReservationMaxCacheSize, authOpt...)
 	case NoOpDiscoveryType, "":
 		return NOOPCatalog{}, nil
 	}

@@ -31,6 +31,11 @@ type Key struct {
 	InputReader          io.InputReader
 }
 
+type ReservationCache struct {
+	Timestamp         time.Time
+	ReservationStatus core.CatalogReservation_Status
+}
+
 func (k Key) String() string {
 	return fmt.Sprintf("%v:%v", k.Identifier, k.CacheVersion)
 }
@@ -139,6 +144,10 @@ type Client interface {
 	Update(ctx context.Context, key Key, reader io.OutputReader, metadata Metadata) (Status, error)
 	// ReleaseReservation releases an acquired reservation for the given key and owner ID.
 	ReleaseReservation(ctx context.Context, key Key, ownerID string) error
+	// GetReservationCache checks the reservation cache for the given owner ID
+	GetReservationCache(ownerID string) ReservationCache
+	// UpdateReservationCache updates the reservation cache for the given owner ID
+	UpdateReservationCache(ownerID string, entry ReservationCache)
 }
 
 func IsNotFound(err error) bool {

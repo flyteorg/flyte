@@ -2740,6 +2740,8 @@ func TestNodeExecutor_RecursiveNodeHandler_Cache(t *testing.T) {
 				Return(pluginscatalog.NewCatalogEntry(nil, pluginscatalog.NewStatus(test.cacheStatus, nil)), nil)
 			catalogClient.OnGetOrExtendReservationMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 				Return(&datacatalog.Reservation{OwnerId: test.cacheReservationOwnerID}, nil)
+			catalogClient.OnGetReservationCache(mock.Anything).Return(pluginscatalog.ReservationCache{})
+			catalogClient.On("UpdateReservationCache", mock.Anything, mock.Anything).Return()
 
 			mockHandler := &nodemocks.CacheableNodeHandler{}
 			mockHandler.OnIsCacheableMatch(

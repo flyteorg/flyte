@@ -171,37 +171,46 @@ func (n *nodeExecutor) CheckCatalogCache(ctx context.Context, nCtx interfaces.No
 // cacheable and cache serializable. If the reservation already exists for this owner, the
 // reservation is extended.
 func (n *nodeExecutor) GetOrExtendCatalogReservation(ctx context.Context, nCtx interfaces.NodeExecutionContext,
-	cacheHandler interfaces.CacheableNodeHandler, heartbeatInterval time.Duration) (catalog.ReservationEntry, error) {
+	cacheHandler interfaces.CacheableNodeHandler, heartbeatInterval time.Duration) (core.CatalogReservation_Status, error) {
 
 	catalogKey, err := getCatalogKeyWithOverrides(ctx, nCtx, cacheHandler)
 	if err != nil {
-		return catalog.NewReservationEntryStatus(core.CatalogReservation_RESERVATION_DISABLED),
-			errors.Wrapf(err, "failed to initialize the catalogKey")
+		return core.CatalogReservation_RESERVATION_DISABLED, errors.Wrapf(err, "failed to initialize the catalogKey")
 	}
 
 	ownerID, err := computeCatalogReservationOwnerID(nCtx)
 	if err != nil {
-		return catalog.NewReservationEntryStatus(core.CatalogReservation_RESERVATION_DISABLED),
-			errors.Wrapf(err, "failed to initialize the cache reservation ownerID")
+		return core.CatalogReservation_RESERVATION_DISABLED, errors.Wrapf(err, "failed to initialize the cache reservation ownerID")
+	}
+
+	// TODO - pvditt - set multiplier via config ie (cfg.Multiplier - 1) * heartbeatInterval
+	evalInterval := heartbeatInterval
+	// Optimization to avoid checking the reservation status every loop
+	entry := n.cache.GetReservationCache(ownerID)
+	if !entry.Timestamp.IsZero() {
+		if time.Since(entry.Timestamp) < evalInterval {
+			return entry.ReservationStatus, nil
+		}
 	}
 
 	reservation, err := n.cache.GetOrExtendReservation(ctx, catalogKey, ownerID, heartbeatInterval)
 	if err != nil {
 		n.metrics.reservationGetFailureCount.Inc(ctx)
 		logger.Errorf(ctx, "Catalog Failure: reservation get or extend failed. err: %v", err.Error())
-		return catalog.NewReservationEntryStatus(core.CatalogReservation_RESERVATION_FAILURE), err
+		return core.CatalogReservation_RESERVATION_FAILURE, err
 	}
 
-	var status core.CatalogReservation_Status
+	var reservationStatus core.CatalogReservation_Status
 	if reservation.OwnerId == ownerID {
-		status = core.CatalogReservation_RESERVATION_ACQUIRED
+		reservationStatus = core.CatalogReservation_RESERVATION_ACQUIRED
 	} else {
-		status = core.CatalogReservation_RESERVATION_EXISTS
+		reservationStatus = core.CatalogReservation_RESERVATION_EXISTS
 	}
+
+	n.cache.UpdateReservationCache(ownerID, catalog.ReservationCache{Timestamp: time.Now(), ReservationStatus: reservationStatus})
 
 	n.metrics.reservationGetSuccessCount.Inc(ctx)
-	return catalog.NewReservationEntry(reservation.ExpiresAt.AsTime(),
-		reservation.HeartbeatInterval.AsDuration(), reservation.OwnerId, status), nil
+	return reservationStatus, nil
 }
 
 // ReleaseCatalogReservation attempts to release an artifact reservation if the task is cacheable

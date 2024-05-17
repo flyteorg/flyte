@@ -26,6 +26,14 @@ type FallbackClient struct {
 	dataStore     *storage.DataStore
 }
 
+func (c *FallbackClient) GetReservationCache(ownerID string) catalog.ReservationCache {
+	return c.cacheClient.GetReservationCache(ownerID)
+}
+
+func (c *FallbackClient) UpdateReservationCache(ownerID string, entry catalog.ReservationCache) {
+	c.cacheClient.UpdateReservationCache(ownerID, entry)
+}
+
 func (c *FallbackClient) GetOrExtendReservation(ctx context.Context, key catalog.Key, ownerID string, heartbeatInterval time.Duration) (*catalogIdl.Reservation, error) {
 	return c.cacheClient.GetOrExtendReservation(ctx, key, ownerID, heartbeatInterval)
 }

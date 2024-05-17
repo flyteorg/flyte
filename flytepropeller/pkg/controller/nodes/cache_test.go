@@ -300,20 +300,54 @@ func TestGetCatalogKeyWithOverrides(t *testing.T) {
 }
 
 func TestGetOrExtendCatalogReservation(t *testing.T) {
+
+	heartBeatInterval := time.Second * 30
 	tests := []struct {
 		name                      string
 		reservationOwnerID        string
 		expectedReservationStatus core.CatalogReservation_Status
+		reservationCacheStatus    catalog.ReservationCache
+		notExpectClientCall       bool
 	}{
 		{
-			"Acquired",
-			"bar-foo-1-baz-0",
-			core.CatalogReservation_RESERVATION_ACQUIRED,
+			name:                      "Acquired",
+			reservationOwnerID:        "bar-foo-1-baz-0",
+			expectedReservationStatus: core.CatalogReservation_RESERVATION_ACQUIRED,
+			reservationCacheStatus:    catalog.ReservationCache{},
 		},
 		{
-			"Exists",
-			"some-other-owner",
-			core.CatalogReservation_RESERVATION_EXISTS,
+			name:                      "Exists",
+			reservationOwnerID:        "some-other-owner",
+			expectedReservationStatus: core.CatalogReservation_RESERVATION_EXISTS,
+			reservationCacheStatus:    catalog.ReservationCache{},
+		},
+		{
+			name: "Cache hit - acquired",
+			reservationCacheStatus: catalog.ReservationCache{
+				Timestamp:         time.Now(),
+				ReservationStatus: core.CatalogReservation_RESERVATION_ACQUIRED,
+			},
+			expectedReservationStatus: core.CatalogReservation_RESERVATION_ACQUIRED,
+			notExpectClientCall:       true,
+		},
+		{
+			name: "Cache hit - exists",
+			reservationCacheStatus: catalog.ReservationCache{
+				Timestamp:         time.Now(),
+				ReservationStatus: core.CatalogReservation_RESERVATION_EXISTS,
+			},
+			expectedReservationStatus: core.CatalogReservation_RESERVATION_EXISTS,
+			notExpectClientCall:       true,
+		},
+		{
+			name:               "Cache expired",
+			reservationOwnerID: "bar-foo-1-baz-0",
+			reservationCacheStatus: catalog.ReservationCache{
+				Timestamp:         time.Now().Add(-3 * heartBeatInterval),
+				ReservationStatus: core.CatalogReservation_RESERVATION_EXISTS,
+			},
+			expectedReservationStatus: core.CatalogReservation_RESERVATION_ACQUIRED,
+			notExpectClientCall:       false,
 		},
 	}
 
@@ -343,6 +377,8 @@ func TestGetOrExtendCatalogReservation(t *testing.T) {
 				},
 				nil,
 			)
+			catalogClient.OnGetReservationCache(mock.Anything).Return(test.reservationCacheStatus)
+			catalogClient.On("UpdateReservationCache", mock.Anything, mock.Anything).Return()
 
 			nodeExecutor := &nodeExecutor{
 				cache:   catalogClient,
@@ -351,11 +387,17 @@ func TestGetOrExtendCatalogReservation(t *testing.T) {
 			nCtx := setupCacheableNodeExecutionContext(nil, &core.TaskTemplate{})
 
 			// execute catalog cache check
-			reservationEntry, err := nodeExecutor.GetOrExtendCatalogReservation(context.TODO(), nCtx, cacheableHandler, time.Second*30)
+			reservationStatus, err := nodeExecutor.GetOrExtendCatalogReservation(context.TODO(), nCtx, cacheableHandler, heartBeatInterval)
 			assert.NoError(t, err)
 
 			// validate the result cache entry status
-			assert.Equal(t, test.expectedReservationStatus, reservationEntry.GetStatus())
+			assert.Equal(t, test.expectedReservationStatus, reservationStatus)
+
+			if test.notExpectClientCall {
+				catalogClient.AssertNotCalled(t, "GetOrExtendReservation", mock.Anything, mock.Anything, mock.Anything, mock.Anything)
+			} else {
+				catalogClient.AssertCalled(t, "GetOrExtendReservation", mock.Anything, mock.Anything, mock.Anything, mock.Anything)
+			}
 		})
 	}
 }

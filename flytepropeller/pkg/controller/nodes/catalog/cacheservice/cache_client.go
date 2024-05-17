@@ -9,6 +9,7 @@ import (
 	"github.com/golang/protobuf/ptypes"
 	grpcRetry "github.com/grpc-ecosystem/go-grpc-middleware/retry"
 	grpcPrometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
+	lru "github.com/hashicorp/golang-lru"
 	"github.com/pkg/errors"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.opentelemetry.io/otel/propagation"
@@ -37,6 +38,7 @@ type CacheClient struct {
 	store       *storage.DataStore
 	maxCacheAge time.Duration
 	inlineCache bool
+	lruMap      *lru.Cache
 }
 
 func (c *CacheClient) GetOrExtendReservation(ctx context.Context, key catalog.Key, ownerID string, heartbeatInterval time.Duration) (*catalogIdl.Reservation, error) {
@@ -220,8 +222,21 @@ func (c *CacheClient) Put(ctx context.Context, key catalog.Key, reader io.Output
 	return c.put(ctx, key, reader, metadata, false)
 }
 
+func (c *CacheClient) GetReservationCache(ownerID string) catalog.ReservationCache {
+	if val, ok := c.lruMap.Get(ownerID); ok {
+		return val.(catalog.ReservationCache)
+	}
+
+	return catalog.ReservationCache{}
+}
+
+func (c *CacheClient) UpdateReservationCache(ownerID string, entry catalog.ReservationCache) {
+	c.lruMap.Add(ownerID, entry)
+}
+
 func NewCacheClient(ctx context.Context, dataStore *storage.DataStore, endpoint string, insecureConnection bool, maxCacheAge time.Duration,
-	useAdminAuth bool, maxRetries uint, backoffScalar int, backoffJitter float64, inlineCache bool, defaultServiceConfig string, authOpt ...grpc.DialOption) (*CacheClient, error) {
+	useAdminAuth bool, maxRetries uint, backoffScalar int, backoffJitter float64, inlineCache bool, defaultServiceConfig string,
+	reservationMaxCacheSize int, authOpt ...grpc.DialOption) (*CacheClient, error) {
 	var opts []grpc.DialOption
 	if useAdminAuth && authOpt != nil {
 		opts = append(opts, authOpt...)
@@ -267,11 +282,18 @@ func NewCacheClient(ctx context.Context, dataStore *storage.DataStore, endpoint 
 	}
 	client := cacheservice.NewCacheServiceClient(clientConn)
 
+	var evictionFunction func(key interface{}, value interface{})
+	lruCache, err := lru.NewWithEvict(reservationMaxCacheSize, evictionFunction)
+	if err != nil {
+		return nil, err
+	}
+
 	return &CacheClient{
 		client:      client,
 		store:       dataStore,
 		maxCacheAge: maxCacheAge,
 		inlineCache: inlineCache,
+		lruMap:      lruCache,
 	}, nil
 
 }

@@ -9,6 +9,7 @@ import (
 	"github.com/golang/protobuf/ptypes"
 	grpcRetry "github.com/grpc-ecosystem/go-grpc-middleware/retry"
 	grpcPrometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
+	lru "github.com/hashicorp/golang-lru"
 	"github.com/pkg/errors"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.opentelemetry.io/otel/propagation"
@@ -35,6 +36,7 @@ var (
 type CatalogClient struct {
 	client      datacatalog.DataCatalogClient
 	maxCacheAge time.Duration
+	lruMap      *lru.Cache
 }
 
 // GetDataset retrieves a dataset that is associated with the task represented by the provided catalog.Key.
@@ -443,9 +445,22 @@ func (m *CatalogClient) ReleaseReservation(ctx context.Context, key catalog.Key,
 	return nil
 }
 
+func (m *CatalogClient) GetReservationCache(ownerID string) catalog.ReservationCache {
+	if val, ok := m.lruMap.Get(ownerID); ok {
+		return val.(catalog.ReservationCache)
+	}
+
+	return catalog.ReservationCache{}
+}
+
+func (m *CatalogClient) UpdateReservationCache(ownerID string, entry catalog.ReservationCache) {
+	m.lruMap.Add(ownerID, entry)
+}
+
 // NewDataCatalog creates a new Datacatalog client for task execution caching
 func NewDataCatalog(ctx context.Context, endpoint string, insecureConnection bool, maxCacheAge time.Duration,
-	useAdminAuth bool, defaultServiceConfig string, maxRetries uint, backoffScalar int, backoffJitter float64, authOpt ...grpc.DialOption) (*CatalogClient, error) {
+	useAdminAuth bool, defaultServiceConfig string, maxRetries uint, backoffScalar int, backoffJitter float64,
+	reservationMaxCacheSize int, authOpt ...grpc.DialOption) (*CatalogClient, error) {
 	var opts []grpc.DialOption
 	if useAdminAuth && authOpt != nil {
 		opts = append(opts, authOpt...)
@@ -492,8 +507,15 @@ func NewDataCatalog(ctx context.Context, endpoint string, insecureConnection boo
 
 	client := datacatalog.NewDataCatalogClient(clientConn)
 
+	var evictionFunction func(key interface{}, value interface{})
+	lruCache, err := lru.NewWithEvict(reservationMaxCacheSize, evictionFunction)
+	if err != nil {
+		return nil, err
+	}
+
 	return &CatalogClient{
 		client:      client,
 		maxCacheAge: maxCacheAge,
+		lruMap:      lruCache,
 	}, nil
 }

@@ -60,6 +60,7 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "base-scalar"), defaultConfig.BackoffScalar, "The base/scalar backoff duration in milliseconds for event recording retries.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "backoff-jitter"), defaultConfig.BackoffJitter, "A string representation of a floating point number between 0 and 1 specifying the jitter factor for event recording retries.")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "inline-cache"), defaultConfig.InlineCache, " Attempt to use in-line cache")
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "reservation-cache-size"), defaultConfig.ReservationMaxCacheSize, " The max size of the reservation cache")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "default-service-config"), defaultConfig.DefaultServiceConfig, " Set the default service config for the catalog gRPC client")
 	return cmdFlags
 }
