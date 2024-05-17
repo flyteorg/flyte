@@ -482,6 +482,13 @@ webhook:
       cpu: 200m
       ephemeral-storage: 500Mi
       memory: 500Mi
+  
+  # -- nodeSelector for Webhook deployment
+  nodeSelector: {}
+  # -- tolerations for Webhook deployment
+  tolerations: []
+  # -- affinity for Webhook deployment
+  affinity: {}
 
 # ------------------------------------------------
 #
@@ -913,6 +920,10 @@ cluster_resource_manager:
   podLabels: {}
   # -- nodeSelector for ClusterResource deployment
   nodeSelector: {}
+  # -- tolerations for ClusterResource deployment
+  tolerations: []
+  # -- affinity for ClusterResource deployment
+  affinity: {}
   # -- Resources for ClusterResource deployment
   resources: {}
   # -- Configmap for ClusterResource parameters
