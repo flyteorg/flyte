@@ -78,4 +78,10 @@ spec:
       {{- with .Values.cluster_resource_manager.nodeSelector }}
       nodeSelector: {{ tpl (toYaml .) $ | nindent 8 }}
       {{- end }}
+      {{- with .Values.cluster_resource_manager.affinity }}
+      affinity: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+      {{- with .Values.cluster_resource_manager.tolerations }}
+      tolerations: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
   {{- end }}
