@@ -1,0 +1,129 @@
+######################
+Protocol Documentation
+######################
+
+{{range .Files}}
+{{$file_name := .Name}}
+
+.. _ref_{{.Name}}:
+
+{{.Name}}
+==================================================================
+
+{{.Description}}
+
+{{range .Messages}}
+
+.. _ref_{{.FullName}}:
+
+{{.LongName}}
+------------------------------------------------------------------
+
+{{.Description}}
+
+{{if .HasFields}}
+
+.. csv-table:: {{.LongName}} type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+{{range .Fields }}
+   "{{.Name}}", ":ref:`ref_{{.FullType}}`", "{{.Label}}", "{{if (index .Options "deprecated"|default false)}}**Deprecated.** {{end}}{{nobr .Description}}{{if .DefaultValue}} Default: {{.DefaultValue}}{{end}}"
+{{- end}}
+{{end}}
+
+
+{{if .HasExtensions}}
+
+.. csv-table:: {{.LongName}} type extensions
+   :header: "Extension", "Type", "Base", "Number", "Description"
+   :widths: auto
+{{range .Extensions }}
+   "{{.Name}}", "{{.LongType}}", "{{.ContainingLongType}}", "{{.Number}}", "{{nobr .Description}}{{if .DefaultValue}} Default: {{.DefaultValue}}{{end}}"
+{{- end}}
+{{end}}
+
+{{end}}
+..
+   end messages
+
+{{range .Enums}}
+
+.. _ref_{{.FullName}}:
+
+{{.LongName}}
+------------------------------------------------------------------
+
+{{.Description}}
+
+.. csv-table:: Enum {{.LongName}} values
+   :header: "Name", "Number", "Description"
+   :widths: auto
+{{range .Values }}
+   "{{.Name}}", "{{.Number}}", "{{nobr .Description}}"
+{{- end}}
+
+{{end}}
+..
+   end enums
+
+{{if .HasExtensions}}
+
+.. _ref_{{$file_name}}_extensions:
+
+File-level Extensions
+--------------------------------------------------------------------------------
+
+.. csv-table:: {{.Name}} file-level Extensions
+   :header: "Extension", "Type", "Base", "Number", "Description"
+   :widths: auto
+{{range .Extensions}}
+   "{{.Name}}", "{{.LongType}}", "{{.ContainingLongType}}", "{{.Number}}", "{{nobr .Description}}{{if .DefaultValue}} Default: `{{.DefaultValue}}`{{end}}"
+{{- end}}
+{{end}}
+..
+   end HasExtensions
+
+{{range .Services}}
+
+.. _ref_{{.FullName}}:
+
+{{.Name}}
+------------------------------------------------------------------
+
+{{.Description}}
+
+.. csv-table:: {{.Name}} service methods
+   :header: "Method Name", "Request Type", "Response Type", "Description"
+   :widths: auto
+{{range .Methods}}
+   "{{.Name}}", ":ref:`ref_{{.RequestFullType}}`{{if .RequestStreaming}} stream{{end}}", ":ref:`ref_{{.ResponseFullType}}`{{if .ResponseStreaming}} stream{{end}}", "{{nobr .Description}}"
+{{- end}}
+{{end}}
+..
+   end services
+
+{{end}}
+
+.. _ref_scala_types:
+
+Scalar Value Types
+==================
+
+{{range .Scalars}}
+
+.. _ref_{{.ProtoType}}:
+
+{{.ProtoType}}
+-----------------------------
+
+{{.Notes}}
+
+.. csv-table:: {{.ProtoType}} language representation
+   :header: ".proto Type", "C++", "Java", "Python", "Go", "C#", "PHP", "Ruby"
+   :widths: auto
+
+   "{{.ProtoType}}", "{{.CppType}}", "{{.JavaType}}", "{{.PythonType}}", "{{.GoType}}", "{{.CSharp}}", "{{.PhpType}}", "{{.RubyType}}"
+
+{{end}}
+..
+   end scalars

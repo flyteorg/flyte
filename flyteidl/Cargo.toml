@@ -9,6 +9,10 @@ description = "Core Interface Definition for Flyte"
 readme = "README.md"
 keywords = ["ai", "ml", "orchestration"]
 categories = ["science", "science::bioinformatics"]
+include = [
+    "**/*.rs",
+    "Cargo.toml",
+]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
