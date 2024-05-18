@@ -77,7 +77,7 @@ func (m listModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		case "enter":
 			item, _ := m.list.SelectedItem().(item)
-			newArgs = append(newArgs, string(item))
+			args = append(args, string(item))
 			err := genListModel(&m, string(item))
 			if err != nil || m.quitting {
 				listErrMsg = err
@@ -101,6 +101,7 @@ func (m listModel) View() string {
 
 func genList(items []list.Item, title string) list.Model {
 	l := list.New(items, itemDelegate{}, defaultWidth, listHeight)
+
 	l.SetShowTitle(false)
 	l.SetShowStatusBar(false)
 	l.SetFilteringEnabled(false)
@@ -119,13 +120,7 @@ func ShowCmdList(_rootCmd *cobra.Command) {
 	rootCmd = _rootCmd
 
 	currentCmd, run, err := ifRunBubbleTea()
-	if err != nil {
-		return
-	}
-	// if !currentCmd.Runnable() {
-	// 	return
-	// }
-	if !run {
+	if err != nil || !run {
 		return
 	}
 
@@ -152,9 +147,10 @@ func ShowCmdList(_rootCmd *cobra.Command) {
 
 	if listErrMsg != nil {
 		fmt.Println(listErrMsg)
+		os.Exit(1)
 	}
 
 	// fmt.Println(append(newArgs, existingFlags...))
 	// Originally existed flags need to be append at last, so if any user input is wrong, it can be caught in the main logic
-	rootCmd.SetArgs(append(newArgs, existingFlags...))
+	rootCmd.SetArgs(append(args, existingFlags...))
 }

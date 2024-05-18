@@ -23,7 +23,7 @@ type Command struct {
 
 var (
 	rootCmd       *cobra.Command
-	newArgs       []string
+	args          []string
 	isCommand     = true
 	unhandleFlags []string
 	existingFlags []string
@@ -133,14 +133,21 @@ func genProjectListModel(m *listModel) error {
 
 // Generate list.Model of options for different flags
 func genFlagListModel(m *listModel) error {
-	var i int
-	var flag string
-	for i, flag = range unhandleFlags {
-		if !rootCmd.Flags().ShorthandLookup(strings.TrimPrefix(flag, "-")).Changed {
+	i := 0
+	// If flag already specified by user, skip.
+	for i < len(unhandleFlags) {
+		if !rootCmd.Flags().ShorthandLookup(strings.TrimPrefix(unhandleFlags[i], "-")).Changed {
 			break
 		}
+		i++
 	}
-	newArgs = append(newArgs, unhandleFlags[i])
+	if i == len(unhandleFlags) {
+		m.quitting = true
+		return nil
+	}
+
+	flag := unhandleFlags[i]
+	args = append(args, flag)
 	unhandleFlags = unhandleFlags[i+1:]
 
 	switch flag {
@@ -170,7 +177,7 @@ func genListModel(m *listModel, item string) error {
 	if isCommand {
 		var ok bool
 		// check if we reach a runnable command
-		if unhandleFlags, ok = commandFlagMap[sliceToString(newArgs)]; !ok {
+		if unhandleFlags, ok = commandFlagMap[sliceToString(args)]; !ok {
 			genCmdListModel(m, nameToCommand[item].Cmd)
 			return nil
 		}
@@ -197,6 +204,7 @@ func ifRunBubbleTea() (*cobra.Command, bool, error) {
 	if err != nil {
 		return cmd, false, err
 	}
+	existingFlags = flags
 
 	err = rootCmd.ParseFlags(flags)
 	if err != nil {
@@ -207,11 +215,9 @@ func ifRunBubbleTea() (*cobra.Command, bool, error) {
 		return cmd, false, nil
 	}
 
-	existingFlags = flags
-
 	tempCmd := cmd
 	for tempCmd.HasParent() {
-		newArgs = append([]string{tempCmd.Use}, newArgs...)
+		args = append([]string{tempCmd.Use}, args...)
 		tempCmd = tempCmd.Parent()
 	}
 
