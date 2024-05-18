@@ -20,7 +20,7 @@ lint: download_tooling #lints the package for common code smells
 # skips 'vendor'
 .PHONY: goimports
 goimports:
-	@boilerplate/flyte/golang_test_targets/goimports
+	@../boilerplate/flyte/golang_test_targets/goimports
 
 .PHONY: mod_download
 mod_download: #download dependencies (including test deps) for the package

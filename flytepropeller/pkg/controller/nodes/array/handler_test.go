@@ -62,7 +62,7 @@ func createArrayNodeHandler(ctx context.Context, t *testing.T, nodeHandler inter
 	noopCatalogClient := catalog.NOOPCatalog{}
 
 	// create node executor
-	nodeExecutor, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, dataStore, enqueueWorkflowFunc, mockEventSink, adminClient, adminClient, 10,
+	nodeExecutor, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, dataStore, enqueueWorkflowFunc, mockEventSink, adminClient, adminClient,
 		"s3://bucket/", mockKubeClient, noopCatalogClient, mockRecoveryClient, eventConfig, "clusterID", mockSignalClient, mockHandlerFactory, mockExecutionEnvClient, scope)
 	assert.NoError(t, err)
 

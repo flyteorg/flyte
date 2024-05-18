@@ -59,7 +59,7 @@ func newInvalidMockProvider(ctx context.Context, t *testing.T, secrets auth.Secr
 	sm.OnGet(ctx, config.SecretNameOldTokenSigningRSAKey).Return(buf.String(), nil)
 
 	invalidFunc()
-	p, err := NewProvider(ctx, config.DefaultConfig.AppAuth.SelfAuthServer, sm)
+	p, err := NewProvider(ctx, config.DefaultConfig.AppAuth.SelfAuthServer, sm, promutils.NewTestScope())
 	assert.Error(t, err)
 	assert.ErrorContains(t, err, errorContains)
 	assert.Equal(t, Provider{}, p)

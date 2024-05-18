@@ -3,12 +3,12 @@ package nodes
 import (
 	"context"
 	"fmt"
-	"slices"
+	"slices" // nolint:gci
 	"strconv"
 
 	_struct "github.com/golang/protobuf/ptypes/struct"
 	"github.com/pkg/errors"
-	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/apimachinery/pkg/types" // nolint:gci
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"

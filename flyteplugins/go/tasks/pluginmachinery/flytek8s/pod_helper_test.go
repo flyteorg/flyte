@@ -1054,7 +1054,7 @@ func TestToK8sPod(t *testing.T) {
 		cfg.AcceleratedInputs.VolumePath = "/test/path"
 		cfg.AcceleratedInputs.LocalPathPrefix = "/test/local"
 		defer func() { cfg.AcceleratedInputs.Enabled = false }()
-		x := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{}, nil)
+		x := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{}, nil, "")
 
 		p, _, _, err := ToK8sPodSpec(ctx, x)
 

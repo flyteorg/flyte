@@ -16,7 +16,7 @@ type rawFile = []byte
 
 type InMemoryStore struct {
 	copyImpl
-	cache map[DataReference]rawFile
+	cache   map[DataReference]rawFile
 	rwMutex sync.RWMutex
 }
 
