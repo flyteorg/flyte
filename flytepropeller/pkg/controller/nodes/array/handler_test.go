@@ -81,7 +81,6 @@ func createNodeExecutionContext(dataStore *storage.DataStore, eventRecorder inte
 	currentParallelism uint32, maxParallelism uint32) interfaces.NodeExecutionContext {
 
 	nCtx := &mocks.NodeExecutionContext{}
-	nCtx.OnMaxDatasetSizeBytes().Return(9999999)
 	nCtx.OnCurrentAttempt().Return(uint32(0))
 
 	// ContextualNodeLookup
@@ -128,6 +127,10 @@ func createNodeExecutionContext(dataStore *storage.DataStore, eventRecorder inte
 	)
 	executionContext.OnCurrentParallelism().Return(currentParallelism)
 	executionContext.On("IncrementParallelism").Run(func(args mock.Arguments) {}).Return(currentParallelism)
+	executionContext.OnIncrementNodeExecutionCount().Return(1)
+	executionContext.OnIncrementTaskExecutionCount().Return(1)
+	executionContext.OnCurrentNodeExecutionCount().Return(1)
+	executionContext.OnCurrentTaskExecutionCount().Return(1)
 	nCtx.OnExecutionContext().Return(executionContext)
 
 	// EventsRecorder

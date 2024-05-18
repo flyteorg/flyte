@@ -12275,6 +12275,7 @@
                  * @interface ITaskNodeOverrides
                  * @property {flyteidl.core.IResources|null} [resources] TaskNodeOverrides resources
                  * @property {flyteidl.core.IExtendedResources|null} [extendedResources] TaskNodeOverrides extendedResources
+                 * @property {string|null} [containerImage] TaskNodeOverrides containerImage
                  */
     
                 /**
@@ -12309,6 +12310,14 @@
                 TaskNodeOverrides.prototype.extendedResources = null;
     
                 /**
+                 * TaskNodeOverrides containerImage.
+                 * @member {string} containerImage
+                 * @memberof flyteidl.core.TaskNodeOverrides
+                 * @instance
+                 */
+                TaskNodeOverrides.prototype.containerImage = "";
+    
+                /**
                  * Creates a new TaskNodeOverrides instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.core.TaskNodeOverrides
@@ -12336,6 +12345,8 @@
                         $root.flyteidl.core.Resources.encode(message.resources, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
                     if (message.extendedResources != null && message.hasOwnProperty("extendedResources"))
                         $root.flyteidl.core.ExtendedResources.encode(message.extendedResources, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    if (message.containerImage != null && message.hasOwnProperty("containerImage"))
+                        writer.uint32(/* id 3, wireType 2 =*/26).string(message.containerImage);
                     return writer;
                 };
     
@@ -12362,6 +12373,9 @@
                             break;
                         case 2:
                             message.extendedResources = $root.flyteidl.core.ExtendedResources.decode(reader, reader.uint32());
+                            break;
+                        case 3:
+                            message.containerImage = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -12392,6 +12406,9 @@
                         if (error)
                             return "extendedResources." + error;
                     }
+                    if (message.containerImage != null && message.hasOwnProperty("containerImage"))
+                        if (!$util.isString(message.containerImage))
+                            return "containerImage: string expected";
                     return null;
                 };
     
@@ -22725,6 +22742,7 @@
                  * @property {boolean|null} [interruptible] TaskExecutionMetadata interruptible
                  * @property {number|null} [interruptibleFailureThreshold] TaskExecutionMetadata interruptibleFailureThreshold
                  * @property {flyteidl.core.ITaskNodeOverrides|null} [overrides] TaskExecutionMetadata overrides
+                 * @property {flyteidl.core.IIdentity|null} [identity] TaskExecutionMetadata identity
                  */
     
                 /**
@@ -22826,6 +22844,14 @@
                 TaskExecutionMetadata.prototype.overrides = null;
     
                 /**
+                 * TaskExecutionMetadata identity.
+                 * @member {flyteidl.core.IIdentity|null|undefined} identity
+                 * @memberof flyteidl.admin.TaskExecutionMetadata
+                 * @instance
+                 */
+                TaskExecutionMetadata.prototype.identity = null;
+    
+                /**
                  * Creates a new TaskExecutionMetadata instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.TaskExecutionMetadata
@@ -22872,6 +22898,8 @@
                         writer.uint32(/* id 9, wireType 0 =*/72).int32(message.interruptibleFailureThreshold);
                     if (message.overrides != null && message.hasOwnProperty("overrides"))
                         $root.flyteidl.core.TaskNodeOverrides.encode(message.overrides, writer.uint32(/* id 10, wireType 2 =*/82).fork()).ldelim();
+                    if (message.identity != null && message.hasOwnProperty("identity"))
+                        $root.flyteidl.core.Identity.encode(message.identity, writer.uint32(/* id 11, wireType 2 =*/90).fork()).ldelim();
                     return writer;
                 };
     
@@ -22937,6 +22965,9 @@
                             break;
                         case 10:
                             message.overrides = $root.flyteidl.core.TaskNodeOverrides.decode(reader, reader.uint32());
+                            break;
+                        case 11:
+                            message.identity = $root.flyteidl.core.Identity.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -23005,6 +23036,11 @@
                         var error = $root.flyteidl.core.TaskNodeOverrides.verify(message.overrides);
                         if (error)
                             return "overrides." + error;
+                    }
+                    if (message.identity != null && message.hasOwnProperty("identity")) {
+                        var error = $root.flyteidl.core.Identity.verify(message.identity);
+                        if (error)
+                            return "identity." + error;
                     }
                     return null;
                 };
@@ -38431,6 +38467,7 @@
                  * @property {boolean|null} [overwriteCache] ExecutionSpec overwriteCache
                  * @property {flyteidl.admin.IEnvs|null} [envs] ExecutionSpec envs
                  * @property {Array.<string>|null} [tags] ExecutionSpec tags
+                 * @property {flyteidl.admin.IExecutionClusterLabel|null} [executionClusterLabel] ExecutionSpec executionClusterLabel
                  * @property {Array.<flyteidl.core.IExecutionEnvAssignment>|null} [executionEnvAssignments] ExecutionSpec executionEnvAssignments
                  */
     
@@ -38588,6 +38625,14 @@
                 ExecutionSpec.prototype.tags = $util.emptyArray;
     
                 /**
+                 * ExecutionSpec executionClusterLabel.
+                 * @member {flyteidl.admin.IExecutionClusterLabel|null|undefined} executionClusterLabel
+                 * @memberof flyteidl.admin.ExecutionSpec
+                 * @instance
+                 */
+                ExecutionSpec.prototype.executionClusterLabel = null;
+    
+                /**
                  * ExecutionSpec executionEnvAssignments.
                  * @member {Array.<flyteidl.core.IExecutionEnvAssignment>} executionEnvAssignments
                  * @memberof flyteidl.admin.ExecutionSpec
@@ -38668,6 +38713,8 @@
                     if (message.tags != null && message.tags.length)
                         for (var i = 0; i < message.tags.length; ++i)
                             writer.uint32(/* id 24, wireType 2 =*/194).string(message.tags[i]);
+                    if (message.executionClusterLabel != null && message.hasOwnProperty("executionClusterLabel"))
+                        $root.flyteidl.admin.ExecutionClusterLabel.encode(message.executionClusterLabel, writer.uint32(/* id 25, wireType 2 =*/202).fork()).ldelim();
                     if (message.executionEnvAssignments != null && message.executionEnvAssignments.length)
                         for (var i = 0; i < message.executionEnvAssignments.length; ++i)
                             $root.flyteidl.core.ExecutionEnvAssignment.encode(message.executionEnvAssignments[i], writer.uint32(/* id 26, wireType 2 =*/210).fork()).ldelim();
@@ -38744,6 +38791,9 @@
                             if (!(message.tags && message.tags.length))
                                 message.tags = [];
                             message.tags.push(reader.string());
+                            break;
+                        case 25:
+                            message.executionClusterLabel = $root.flyteidl.admin.ExecutionClusterLabel.decode(reader, reader.uint32());
                             break;
                         case 26:
                             if (!(message.executionEnvAssignments && message.executionEnvAssignments.length))
@@ -38857,6 +38907,11 @@
                         for (var i = 0; i < message.tags.length; ++i)
                             if (!$util.isString(message.tags[i]))
                                 return "tags: string[] expected";
+                    }
+                    if (message.executionClusterLabel != null && message.hasOwnProperty("executionClusterLabel")) {
+                        var error = $root.flyteidl.admin.ExecutionClusterLabel.verify(message.executionClusterLabel);
+                        if (error)
+                            return "executionClusterLabel." + error;
                     }
                     if (message.executionEnvAssignments != null && message.hasOwnProperty("executionEnvAssignments")) {
                         if (!Array.isArray(message.executionEnvAssignments))
@@ -57182,6 +57237,7 @@
                  * @property {string|null} [signedUrl] CreateUploadLocationResponse signedUrl
                  * @property {string|null} [nativeUrl] CreateUploadLocationResponse nativeUrl
                  * @property {google.protobuf.ITimestamp|null} [expiresAt] CreateUploadLocationResponse expiresAt
+                 * @property {Object.<string,string>|null} [headers] CreateUploadLocationResponse headers
                  */
     
                 /**
@@ -57193,6 +57249,7 @@
                  * @param {flyteidl.service.ICreateUploadLocationResponse=} [properties] Properties to set
                  */
                 function CreateUploadLocationResponse(properties) {
+                    this.headers = {};
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -57224,6 +57281,14 @@
                 CreateUploadLocationResponse.prototype.expiresAt = null;
     
                 /**
+                 * CreateUploadLocationResponse headers.
+                 * @member {Object.<string,string>} headers
+                 * @memberof flyteidl.service.CreateUploadLocationResponse
+                 * @instance
+                 */
+                CreateUploadLocationResponse.prototype.headers = $util.emptyObject;
+    
+                /**
                  * Creates a new CreateUploadLocationResponse instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.service.CreateUploadLocationResponse
@@ -57253,6 +57318,9 @@
                         writer.uint32(/* id 2, wireType 2 =*/18).string(message.nativeUrl);
                     if (message.expiresAt != null && message.hasOwnProperty("expiresAt"))
                         $root.google.protobuf.Timestamp.encode(message.expiresAt, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                    if (message.headers != null && message.hasOwnProperty("headers"))
+                        for (var keys = Object.keys(message.headers), i = 0; i < keys.length; ++i)
+                            writer.uint32(/* id 4, wireType 2 =*/34).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]).uint32(/* id 2, wireType 2 =*/18).string(message.headers[keys[i]]).ldelim();
                     return writer;
                 };
     
@@ -57270,7 +57338,7 @@
                 CreateUploadLocationResponse.decode = function decode(reader, length) {
                     if (!(reader instanceof $Reader))
                         reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.service.CreateUploadLocationResponse();
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.service.CreateUploadLocationResponse(), key;
                     while (reader.pos < end) {
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
@@ -57282,6 +57350,14 @@
                             break;
                         case 3:
                             message.expiresAt = $root.google.protobuf.Timestamp.decode(reader, reader.uint32());
+                            break;
+                        case 4:
+                            reader.skip().pos++;
+                            if (message.headers === $util.emptyObject)
+                                message.headers = {};
+                            key = reader.string();
+                            reader.pos++;
+                            message.headers[key] = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -57312,6 +57388,14 @@
                         var error = $root.google.protobuf.Timestamp.verify(message.expiresAt);
                         if (error)
                             return "expiresAt." + error;
+                    }
+                    if (message.headers != null && message.hasOwnProperty("headers")) {
+                        if (!$util.isObject(message.headers))
+                            return "headers: object expected";
+                        var key = Object.keys(message.headers);
+                        for (var i = 0; i < key.length; ++i)
+                            if (!$util.isString(message.headers[key[i]]))
+                                return "headers: string{k:string} expected";
                     }
                     return null;
                 };

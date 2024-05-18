@@ -305,7 +305,7 @@ func TestGetLogoutHandler(t *testing.T) {
 		GetLogoutEndpointHandler(ctx, &authCtx, r)(w, req)
 
 		assert.Equal(t, http.StatusOK, w.Code)
-		require.Len(t, w.Result().Cookies(), 3)
+		require.Len(t, w.Result().Cookies(), 5)
 		authCtx.AssertExpectations(t)
 	})
 
@@ -323,7 +323,7 @@ func TestGetLogoutHandler(t *testing.T) {
 
 		assert.Equal(t, http.StatusTemporaryRedirect, w.Code)
 		authCtx.AssertExpectations(t)
-		require.Len(t, w.Result().Cookies(), 3)
+		require.Len(t, w.Result().Cookies(), 5)
 	})
 
 	t.Run("with_hook_with_redirect", func(t *testing.T) {
@@ -349,7 +349,7 @@ func TestGetLogoutHandler(t *testing.T) {
 		GetLogoutEndpointHandler(ctx, &authCtx, r)(w, req)
 
 		assert.Equal(t, http.StatusTemporaryRedirect, w.Code)
-		require.Len(t, w.Result().Cookies(), 3)
+		require.Len(t, w.Result().Cookies(), 5)
 		authCtx.AssertExpectations(t)
 		hook.AssertExpectations(t)
 	})
@@ -399,15 +399,19 @@ func TestGetHTTPRequestCookieToMetadataHandler(t *testing.T) {
 	req, err := http.NewRequest("GET", "/api/v1/projects", nil)
 	assert.NoError(t, err)
 
-	accessTokenCookie, err := NewSecureCookie(accessTokenCookieName, "a.b.c", cookieManager.hashKey, cookieManager.blockKey, "localhost", http.SameSiteDefaultMode)
+	accessTokenCookie, err := NewSecureCookie(accessTokenCookieNameSplitFirst, "a.b.c", cookieManager.hashKey, cookieManager.blockKey, "localhost", http.SameSiteDefaultMode)
 	assert.NoError(t, err)
 	req.AddCookie(&accessTokenCookie)
 
-	idCookie, err := NewSecureCookie(idTokenCookieName, "a.b.c", cookieManager.hashKey, cookieManager.blockKey, "localhost", http.SameSiteDefaultMode)
+	accessTokenCookieSplit, err := NewSecureCookie(accessTokenCookieNameSplitSecond, ".d.e.f", cookieManager.hashKey, cookieManager.blockKey, "localhost", http.SameSiteDefaultMode)
+	assert.NoError(t, err)
+	req.AddCookie(&accessTokenCookieSplit)
+
+	idCookie, err := NewSecureCookie(idTokenCookieName, "a.b.c.d.e.f", cookieManager.hashKey, cookieManager.blockKey, "localhost", http.SameSiteDefaultMode)
 	assert.NoError(t, err)
 	req.AddCookie(&idCookie)
 
-	assert.Equal(t, "IDToken a.b.c", handler(ctx, req)["authorization"][0])
+	assert.Equal(t, "IDToken a.b.c.d.e.f", handler(ctx, req)["authorization"][0])
 }
 
 func TestGetHTTPMetadataTaggingHandler(t *testing.T) {

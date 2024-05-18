@@ -6,6 +6,7 @@ package tests
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"gorm.io/gorm"
 
@@ -19,9 +20,19 @@ const insertExecutionQueryStr = `INSERT INTO "executions" ` +
 	`("execution_org", "execution_project","execution_domain","execution_name","phase","launch_plan_id","workflow_id","execution_created_at") ` +
 	`VALUES ('', '%s', '%s', '%s', '%s', '%d', '%d', '%s')`
 
+const integrationTestConfigEnvVar = "USE_INTEGRATION_TEST_CONFIG"
+
 var adminScope = promutils.NewScope("flyteadmin")
 
 func getDbConfig() *database.DbConfig {
+	if os.Getenv(integrationTestConfigEnvVar) == "True" {
+		return getIntegrationDbConfig()
+	} else {
+		return getSandboxDbConfig()
+	}
+}
+
+func getIntegrationDbConfig() *database.DbConfig {
 	return &database.DbConfig{
 		Postgres: database.PostgresConfig{
 			Host:   "postgres",
@@ -32,13 +43,15 @@ func getDbConfig() *database.DbConfig {
 	}
 }
 
-func getLocalDbConfig() *database.DbConfig {
+// Run `flytectl demo start` to start the sandbox
+func getSandboxDbConfig() *database.DbConfig {
 	return &database.DbConfig{
 		Postgres: database.PostgresConfig{
-			Host:   "localhost",
-			Port:   5432,
-			DbName: "flyteadmin",
-			User:   "postgres",
+			Host:     "localhost",
+			Port:     30001,
+			DbName:   "flyte",
+			Password: "postgres",
+			User:     "postgres",
 		},
 	}
 }

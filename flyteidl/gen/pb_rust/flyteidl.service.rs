@@ -85,6 +85,9 @@ pub struct CreateUploadLocationResponse {
     /// ExpiresAt defines when will the signed URL expires.
     #[prost(message, optional, tag="3")]
     pub expires_at: ::core::option::Option<::prost_types::Timestamp>,
+    /// Data proxy generates these headers for client, and they have to add these headers to the request when uploading the file.
+    #[prost(map="string, string", tag="4")]
+    pub headers: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
 }
 /// CreateUploadLocationRequest specified request for the CreateUploadLocation API.
 /// The implementation in data proxy service will create the s3 location with some server side configured prefixes,
@@ -405,4 +408,5 @@ pub struct UserInfoResponse {
     #[prost(message, optional, tag="8")]
     pub additional_claims: ::core::option::Option<::prost_types::Struct>,
 }
+include!("flyteidl.service.tonic.rs");
 // @@protoc_insertion_point(module)

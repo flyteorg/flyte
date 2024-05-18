@@ -20,14 +20,23 @@ ARTIFACT_TYPE_UNDEFINED: ArtifactType
 ARTIFACT_TYPE_DECK: ArtifactType
 
 class CreateUploadLocationResponse(_message.Message):
-    __slots__ = ["signed_url", "native_url", "expires_at"]
+    __slots__ = ["signed_url", "native_url", "expires_at", "headers"]
+    class HeadersEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
     SIGNED_URL_FIELD_NUMBER: _ClassVar[int]
     NATIVE_URL_FIELD_NUMBER: _ClassVar[int]
     EXPIRES_AT_FIELD_NUMBER: _ClassVar[int]
+    HEADERS_FIELD_NUMBER: _ClassVar[int]
     signed_url: str
     native_url: str
     expires_at: _timestamp_pb2.Timestamp
-    def __init__(self, signed_url: _Optional[str] = ..., native_url: _Optional[str] = ..., expires_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
+    headers: _containers.ScalarMap[str, str]
+    def __init__(self, signed_url: _Optional[str] = ..., native_url: _Optional[str] = ..., expires_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., headers: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class CreateUploadLocationRequest(_message.Message):
     __slots__ = ["project", "domain", "filename", "expires_in", "content_md5", "filename_root", "add_content_md5_metadata", "org"]

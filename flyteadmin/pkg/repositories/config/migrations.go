@@ -27,6 +27,7 @@ import (
 
 // TODO: add a way to get these list of tables directly from the gorm loaded models
 var (
+	// Tables are ordererd by creation. Migration code relies on this ordering.
 	tables = []string{"execution_events", "executions", "launch_plans", "named_entity_metadata",
 		"node_execution_events", "node_executions", "projects", "resources", "schedulable_entities",
 		"schedule_entities_snapshots", "task_executions", "tasks", "workflows", "description_entities"}
@@ -357,6 +358,7 @@ var LegacyMigrations = []*gormigrate.Migration{
 
 	// For any new table, Please use the following pattern due to a bug
 	// in the postgres gorm layer https://github.com/go-gorm/postgres/issues/65
+	// The 13th table in tables was created before this migration.
 	{
 		ID: "2022-01-11-id-to-bigint",
 		Migrate: func(tx *gorm.DB) error {
@@ -364,14 +366,14 @@ var LegacyMigrations = []*gormigrate.Migration{
 			if err != nil {
 				return err
 			}
-			return alterTableColumnType(db, "id", "bigint")
+			return alterTableColumnType(db, "id", "bigint", tables[:13])
 		},
 		Rollback: func(tx *gorm.DB) error {
 			db, err := tx.DB()
 			if err != nil {
 				return err
 			}
-			return alterTableColumnType(db, "id", "int")
+			return alterTableColumnType(db, "id", "int", tables[:13])
 		},
 	},
 
@@ -1514,7 +1516,7 @@ func getStorageClientForMigration() (*storage.DataStore, error) {
 	return dataStorageClient, nil
 }
 
-func alterTableColumnType(db *sql.DB, columnName, columnType string) error {
+func alterTableColumnType(db *sql.DB, columnName, columnType string, tables []string) error {
 	var err error
 	for _, table := range tables {
 		if _, err = db.Exec(fmt.Sprintf(`ALTER TABLE IF EXISTS %s ALTER COLUMN "%s" TYPE %s`, table, columnName,

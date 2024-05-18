@@ -187,6 +187,15 @@ func (c *recursiveNodeExecutor) RecursiveNodeHandler(ctx context.Context, execCo
 	nodeStatus := nl.GetNodeExecutionStatus(ctx, currentNode.GetID())
 	nodePhase := nodeStatus.GetPhase()
 
+	if nodePhase == v1alpha1.NodePhaseRunning && execContext != nil {
+		execContext.IncrementNodeExecutionCount()
+		if currentNode.GetKind() == v1alpha1.NodeKindTask {
+			execContext.IncrementTaskExecutionCount()
+		}
+		logger.Debugf(currentNodeCtx, "recursive handler - node execution count [%v], task execution count [%v], phase [%v], ",
+			execContext.CurrentNodeExecutionCount(), execContext.CurrentTaskExecutionCount(), nodePhase.String())
+	}
+
 	if canHandleNode(nodePhase) {
 		// TODO Follow up Pull Request,
 		// 1. Rename this method to DAGTraversalHandleNode (accepts a DAGStructure along-with) the remaining arguments
@@ -292,6 +301,7 @@ func (c *recursiveNodeExecutor) handleDownstream(ctx context.Context, execContex
 			}), nil
 		}
 
+		logger.Debugf(ctx, "downstream handler starting node id %v, ", downstreamNode.GetID())
 		state, err := c.RecursiveNodeHandler(ctx, execContext, dag, nl, downstreamNode)
 		if err != nil {
 			return interfaces.NodeStatusUndefined, err
@@ -488,7 +498,6 @@ type nodeExecutor struct {
 	eventConfig                     *config.EventConfig
 	executionEnvClient              pluginscore.ExecutionEnvClient
 	interruptibleFailureThreshold   int32
-	maxDatasetSizeBytes             int64
 	maxNodeRetriesForSystemFailures uint32
 	metrics                         *nodeMetrics
 	nodeRecorder                    events.NodeEventRecorder
@@ -800,7 +809,7 @@ func isTimeoutExpired(queuedAt *metav1.Time, timeout time.Duration) bool {
 	return false
 }
 
-func (c *nodeExecutor) isEligibleForRetry(nCtx interfaces.NodeExecutionContext, nodeStatus v1alpha1.ExecutableNodeStatus, err *core.ExecutionError) (currentAttempt, maxAttempts uint32, isEligible bool) {
+func (c *nodeExecutor) isEligibleForRetry(nCtx interfaces.NodeExecutionContext, nodeStatus v1alpha1.ExecutableNodeStatus, err *core.ExecutionError) (currentAttempt uint32, maxAttempts uint32, isEligible bool) {
 	if config.GetConfig().NodeConfig.IgnoreRetryCause {
 		currentAttempt = nodeStatus.GetAttempts() + 1
 	} else {
@@ -1447,7 +1456,7 @@ func (c *nodeExecutor) replaceRemotePrefix(ctx context.Context, s string) string
 }
 
 func NewExecutor(ctx context.Context, nodeConfig config.NodeConfig, store *storage.DataStore, enQWorkflow v1alpha1.EnqueueWorkflow, eventSink events.EventSink,
-	workflowLauncher launchplan.Executor, launchPlanReader launchplan.Reader, maxDatasetSize int64, defaultRawOutputPrefix storage.DataReference, kubeClient executors.Client,
+	workflowLauncher launchplan.Executor, launchPlanReader launchplan.Reader, defaultRawOutputPrefix storage.DataReference, kubeClient executors.Client,
 	cacheClient catalog.Client, recoveryClient recovery.Client, eventConfig *config.EventConfig, clusterID string, signalClient service.SignalServiceClient,
 	nodeHandlerFactory interfaces.HandlerFactory, executionEnvClient pluginscore.ExecutionEnvClient, scope promutils.Scope) (interfaces.Node, error) {
 
@@ -1503,7 +1512,6 @@ func NewExecutor(ctx context.Context, nodeConfig config.NodeConfig, store *stora
 		eventConfig:                     eventConfig,
 		executionEnvClient:              executionEnvClient,
 		interruptibleFailureThreshold:   nodeConfig.InterruptibleFailureThreshold,
-		maxDatasetSizeBytes:             maxDatasetSize,
 		maxNodeRetriesForSystemFailures: uint32(nodeConfig.MaxNodeRetriesOnSystemFailures),
 		metrics:                         metrics,
 		nodeRecorder:                    events.NewNodeEventRecorder(eventSink, nodeScope, store),

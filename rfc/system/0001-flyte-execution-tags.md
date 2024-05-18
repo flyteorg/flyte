@@ -32,7 +32,7 @@ As a User I want to
 
 We propose to solve the problem of discovery by supporting arbitrary metadata association with an entity. This is similar to concept of “tags” as in AWS.
 The tags are represented as plain string.
-We'll add tags to [ExecutionCreateRequest](https://docs.flyte.org/projects/flyteidl/en/latest/protos/docs/admin/admin.html#executioncreaterequest)  -> [ExecutionSpec](https://docs.flyte.org/projects/flyteidl/en/latest/protos/docs/admin/admin.html#executionspec).
+We'll add tags to [ExecutionCreateRequest](https://docs.flyte.org/en/latest/protos/docs/admin/admin.html#executioncreaterequest)  -> [ExecutionSpec](https://docs.flyte.org/en/latest/protos/docs/admin/admin.html#executionspec).
 
 The resultant tags will be persisted in the database, instead of being applied to the
 execution in Kubernetes. We'll create two new tables in the flyteadmin database.

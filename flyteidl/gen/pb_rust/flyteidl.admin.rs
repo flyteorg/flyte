@@ -1,9 +1,10 @@
 // @generated
 /// Represents a subset of runtime task execution metadata that are relevant to external plugins.
+///
+/// ID of the task execution
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct TaskExecutionMetadata {
-    /// ID of the task execution
     #[prost(message, optional, tag="1")]
     pub task_execution_id: ::core::option::Option<super::core::TaskExecutionIdentifier>,
     /// k8s namespace where the task is executed in
@@ -38,6 +39,9 @@ pub struct TaskExecutionMetadata {
     /// These overrides can be used to customize the behavior of the task node.
     #[prost(message, optional, tag="10")]
     pub overrides: ::core::option::Option<super::core::TaskNodeOverrides>,
+    /// Identity of user running this task execution
+    #[prost(message, optional, tag="11")]
+    pub identity: ::core::option::Option<super::core::Identity>,
 }
 /// Represents a request structure to create task.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -1904,6 +1908,9 @@ pub struct ExecutionSpec {
     /// Tags to be set for the execution.
     #[prost(string, repeated, tag="24")]
     pub tags: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    /// Execution cluster label to be set for the execution.
+    #[prost(message, optional, tag="25")]
+    pub execution_cluster_label: ::core::option::Option<ExecutionClusterLabel>,
     /// Execution environment assignments to be set for the execution.
     #[prost(message, repeated, tag="26")]
     pub execution_env_assignments: ::prost::alloc::vec::Vec<super::core::ExecutionEnvAssignment>,

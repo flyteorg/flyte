@@ -2,6 +2,7 @@ package launchplan
 
 import (
 	"context"
+	"reflect"
 	"testing"
 	"time"
 
@@ -174,10 +175,14 @@ func TestAdminLaunchPlanExecutor_Launch(t *testing.T) {
 			ctx,
 			mock.MatchedBy(func(o *admin.ExecutionCreateRequest) bool {
 				return o.Project == "p" && o.Domain == "d" && o.Name == "n" && o.Spec.Inputs == nil &&
-					o.Spec.Metadata.Mode == admin.ExecutionMetadata_CHILD_WORKFLOW
+					o.Spec.Metadata.Mode == admin.ExecutionMetadata_CHILD_WORKFLOW &&
+					reflect.DeepEqual(o.Spec.Labels.Values, map[string]string{"foo": "bar"}) // Ensure shard-key was removed.
 			}),
 		).Return(nil, nil)
 		assert.NoError(t, err)
+
+		var labels = map[string]string{"foo": "bar", "shard-key": "1"}
+
 		err = exec.Launch(ctx,
 			LaunchContext{
 				ParentNodeExecution: &core.NodeExecutionIdentifier{
@@ -188,6 +193,7 @@ func TestAdminLaunchPlanExecutor_Launch(t *testing.T) {
 						Name:    "w",
 					},
 				},
+				Labels: labels,
 			},
 			id,
 			&core.LaunchPlanTemplate{
@@ -197,6 +203,8 @@ func TestAdminLaunchPlanExecutor_Launch(t *testing.T) {
 			"",
 		)
 		assert.NoError(t, err)
+		// Ensure we haven't mutated the state of the parent workflow.
+		assert.True(t, reflect.DeepEqual(labels, map[string]string{"foo": "bar", "shard-key": "1"}))
 	})
 
 	t.Run("happy recover", func(t *testing.T) {

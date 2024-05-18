@@ -18,13 +18,9 @@ spec:
         {{- end }}
       labels: {{ include "datacatalog.podLabels" . | nindent 8 }}
     spec:
-      securityContext:
-        runAsNonRoot: true
-        fsGroup: 1001
-        runAsUser: 1001
-        fsGroupChangePolicy: "OnRootMismatch"
-        seLinuxOptions:
-          type: spc_t
+      {{- with .Values.datacatalog.securityContext }}
+      securityContext: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
       {{- if .Values.datacatalog.priorityClassName }}
       priorityClassName: {{ .Values.datacatalog.priorityClassName }}
       {{- end }}
@@ -70,8 +66,8 @@ spec:
         imagePullPolicy: "{{ .Values.datacatalog.image.pullPolicy }}"
         name: datacatalog
         ports:
-        - containerPort: 8088
-        - containerPort: 8089
+        - containerPort: {{ .Values.configmap.datacatalogServer.application.httpPort }}
+        - containerPort: {{ .Values.configmap.datacatalogServer.application.grpcPort }}
         - containerPort: {{ index .Values.configmap.datacatalogServer.datacatalog "profiler-port" }}
         securityContext:
           allowPrivilegeEscalation: false

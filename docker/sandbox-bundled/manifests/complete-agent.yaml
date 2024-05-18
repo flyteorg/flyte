@@ -468,7 +468,7 @@ data:
         stackdriver-enabled: false
       k8s:
         co-pilot:
-          image: "cr.flyte.org/flyteorg/flytecopilot:v1.11.0-b1"
+          image: "cr.flyte.org/flyteorg/flytecopilot:v1.12.0"
       k8s-array:
         logs:
           config:
@@ -816,7 +816,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: VTg5RFBvY205cXRtcEVFbw==
+  haSharedSecret: ckFCVGU3Y0M3Z0NWeVJhbw==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1246,7 +1246,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: 6fd9b172465e3089fcc59f738b92b8dc4d8939360c19de8ee65f68b0e7422035
-        checksum/configuration: 286b381aca83e796ac69572dba6d2071241be79d4f00f3c2af55415a95157efd
+        checksum/configuration: 7a203bc250735c74447690b0ebd40c6d87c08f9c9ca55852ce2ee5bfa63c61b0
         checksum/configuration-secret: 09216ffaa3d29e14f88b1f30af580d02a2a5e014de4d750b7f275cc07ed4e914
       labels:
         app.kubernetes.io/component: flyte-binary
@@ -1412,7 +1412,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: b8339a7b42c1e04b994b517d4ddd749074787df4a0eaef9e1aa2181988aea2d7
+        checksum/secret: d563e28ff21175650cb1ea90edc1dd85af7b789c802d6ff1a5b47aed4ef5bbb7
       labels:
         app: docker-registry
         release: flyte-sandbox
@@ -1755,12 +1755,17 @@ spec:
           value: minio
         - name: FLYTE_AWS_SECRET_ACCESS_KEY
           value: miniostorage
-        image: ghcr.io/flyteorg/flyteagent:1.10.3
+        image: ghcr.io/flyteorg/flyteagent:1.11.0
         imagePullPolicy: IfNotPresent
         name: flyteagent
         ports:
         - containerPort: 8000
           name: agent-grpc
+        readinessProbe:
+          grpc:
+            port: 8000
+          initialDelaySeconds: 1
+          periodSeconds: 3
         resources:
           limits:
             cpu: 500m

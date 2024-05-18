@@ -5063,6 +5063,9 @@ export namespace flyteidl {
 
             /** TaskNodeOverrides extendedResources */
             extendedResources?: (flyteidl.core.IExtendedResources|null);
+
+            /** TaskNodeOverrides containerImage */
+            containerImage?: (string|null);
         }
 
         /** Represents a TaskNodeOverrides. */
@@ -5079,6 +5082,9 @@ export namespace flyteidl {
 
             /** TaskNodeOverrides extendedResources. */
             public extendedResources?: (flyteidl.core.IExtendedResources|null);
+
+            /** TaskNodeOverrides containerImage. */
+            public containerImage: string;
 
             /**
              * Creates a new TaskNodeOverrides instance using the specified properties.
@@ -9289,6 +9295,9 @@ export namespace flyteidl {
 
             /** TaskExecutionMetadata overrides */
             overrides?: (flyteidl.core.ITaskNodeOverrides|null);
+
+            /** TaskExecutionMetadata identity */
+            identity?: (flyteidl.core.IIdentity|null);
         }
 
         /** Represents a TaskExecutionMetadata. */
@@ -9329,6 +9338,9 @@ export namespace flyteidl {
 
             /** TaskExecutionMetadata overrides. */
             public overrides?: (flyteidl.core.ITaskNodeOverrides|null);
+
+            /** TaskExecutionMetadata identity. */
+            public identity?: (flyteidl.core.IIdentity|null);
 
             /**
              * Creates a new TaskExecutionMetadata instance using the specified properties.
@@ -15912,6 +15924,9 @@ export namespace flyteidl {
             /** ExecutionSpec tags */
             tags?: (string[]|null);
 
+            /** ExecutionSpec executionClusterLabel */
+            executionClusterLabel?: (flyteidl.admin.IExecutionClusterLabel|null);
+
             /** ExecutionSpec executionEnvAssignments */
             executionEnvAssignments?: (flyteidl.core.IExecutionEnvAssignment[]|null);
         }
@@ -15975,6 +15990,9 @@ export namespace flyteidl {
 
             /** ExecutionSpec tags. */
             public tags: string[];
+
+            /** ExecutionSpec executionClusterLabel. */
+            public executionClusterLabel?: (flyteidl.admin.IExecutionClusterLabel|null);
 
             /** ExecutionSpec executionEnvAssignments. */
             public executionEnvAssignments: flyteidl.core.IExecutionEnvAssignment[];
@@ -24391,6 +24409,9 @@ export namespace flyteidl {
 
             /** CreateUploadLocationResponse expiresAt */
             expiresAt?: (google.protobuf.ITimestamp|null);
+
+            /** CreateUploadLocationResponse headers */
+            headers?: ({ [k: string]: string }|null);
         }
 
         /** Represents a CreateUploadLocationResponse. */
@@ -24410,6 +24431,9 @@ export namespace flyteidl {
 
             /** CreateUploadLocationResponse expiresAt. */
             public expiresAt?: (google.protobuf.ITimestamp|null);
+
+            /** CreateUploadLocationResponse headers. */
+            public headers: { [k: string]: string };
 
             /**
              * Creates a new CreateUploadLocationResponse instance using the specified properties.

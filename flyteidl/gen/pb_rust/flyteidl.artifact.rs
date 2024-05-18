@@ -409,4 +409,5 @@ pub struct GetTriggeredExecutionsByArtifactResponse {
     #[prost(message, repeated, tag="1")]
     pub executions: ::prost::alloc::vec::Vec<super::core::WorkflowExecutionIdentifier>,
 }
+include!("flyteidl.artifact.tonic.rs");
 // @@protoc_insertion_point(module)

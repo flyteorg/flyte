@@ -13,7 +13,7 @@ requires-python = ">=3.8,<3.13"
 dependencies = [
     'googleapis-common-protos',
     'protoc-gen-openapiv2',
-    'protobuf>=4.21.1,<5.0.0',
+    'protobuf>=4.21.1',
 ]
 classifiers = [
     "Intended Audience :: Science/Research",

@@ -9,6 +9,38 @@ type ControlFlow struct {
 	mock.Mock
 }
 
+type ControlFlow_CurrentNodeExecutionCount struct {
+	*mock.Call
+}
+
+func (_m ControlFlow_CurrentNodeExecutionCount) Return(_a0 uint32) *ControlFlow_CurrentNodeExecutionCount {
+	return &ControlFlow_CurrentNodeExecutionCount{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ControlFlow) OnCurrentNodeExecutionCount() *ControlFlow_CurrentNodeExecutionCount {
+	c_call := _m.On("CurrentNodeExecutionCount")
+	return &ControlFlow_CurrentNodeExecutionCount{Call: c_call}
+}
+
+func (_m *ControlFlow) OnCurrentNodeExecutionCountMatch(matchers ...interface{}) *ControlFlow_CurrentNodeExecutionCount {
+	c_call := _m.On("CurrentNodeExecutionCount", matchers...)
+	return &ControlFlow_CurrentNodeExecutionCount{Call: c_call}
+}
+
+// CurrentNodeExecutionCount provides a mock function with given fields:
+func (_m *ControlFlow) CurrentNodeExecutionCount() uint32 {
+	ret := _m.Called()
+
+	var r0 uint32
+	if rf, ok := ret.Get(0).(func() uint32); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(uint32)
+	}
+
+	return r0
+}
+
 type ControlFlow_CurrentParallelism struct {
 	*mock.Call
 }
@@ -41,6 +73,70 @@ func (_m *ControlFlow) CurrentParallelism() uint32 {
 	return r0
 }
 
+type ControlFlow_CurrentTaskExecutionCount struct {
+	*mock.Call
+}
+
+func (_m ControlFlow_CurrentTaskExecutionCount) Return(_a0 uint32) *ControlFlow_CurrentTaskExecutionCount {
+	return &ControlFlow_CurrentTaskExecutionCount{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ControlFlow) OnCurrentTaskExecutionCount() *ControlFlow_CurrentTaskExecutionCount {
+	c_call := _m.On("CurrentTaskExecutionCount")
+	return &ControlFlow_CurrentTaskExecutionCount{Call: c_call}
+}
+
+func (_m *ControlFlow) OnCurrentTaskExecutionCountMatch(matchers ...interface{}) *ControlFlow_CurrentTaskExecutionCount {
+	c_call := _m.On("CurrentTaskExecutionCount", matchers...)
+	return &ControlFlow_CurrentTaskExecutionCount{Call: c_call}
+}
+
+// CurrentTaskExecutionCount provides a mock function with given fields:
+func (_m *ControlFlow) CurrentTaskExecutionCount() uint32 {
+	ret := _m.Called()
+
+	var r0 uint32
+	if rf, ok := ret.Get(0).(func() uint32); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(uint32)
+	}
+
+	return r0
+}
+
+type ControlFlow_IncrementNodeExecutionCount struct {
+	*mock.Call
+}
+
+func (_m ControlFlow_IncrementNodeExecutionCount) Return(_a0 uint32) *ControlFlow_IncrementNodeExecutionCount {
+	return &ControlFlow_IncrementNodeExecutionCount{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ControlFlow) OnIncrementNodeExecutionCount() *ControlFlow_IncrementNodeExecutionCount {
+	c_call := _m.On("IncrementNodeExecutionCount")
+	return &ControlFlow_IncrementNodeExecutionCount{Call: c_call}
+}
+
+func (_m *ControlFlow) OnIncrementNodeExecutionCountMatch(matchers ...interface{}) *ControlFlow_IncrementNodeExecutionCount {
+	c_call := _m.On("IncrementNodeExecutionCount", matchers...)
+	return &ControlFlow_IncrementNodeExecutionCount{Call: c_call}
+}
+
+// IncrementNodeExecutionCount provides a mock function with given fields:
+func (_m *ControlFlow) IncrementNodeExecutionCount() uint32 {
+	ret := _m.Called()
+
+	var r0 uint32
+	if rf, ok := ret.Get(0).(func() uint32); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(uint32)
+	}
+
+	return r0
+}
+
 type ControlFlow_IncrementParallelism struct {
 	*mock.Call
 }
@@ -61,6 +157,38 @@ func (_m *ControlFlow) OnIncrementParallelismMatch(matchers ...interface{}) *Con
 
 // IncrementParallelism provides a mock function with given fields:
 func (_m *ControlFlow) IncrementParallelism() uint32 {
+	ret := _m.Called()
+
+	var r0 uint32
+	if rf, ok := ret.Get(0).(func() uint32); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(uint32)
+	}
+
+	return r0
+}
+
+type ControlFlow_IncrementTaskExecutionCount struct {
+	*mock.Call
+}
+
+func (_m ControlFlow_IncrementTaskExecutionCount) Return(_a0 uint32) *ControlFlow_IncrementTaskExecutionCount {
+	return &ControlFlow_IncrementTaskExecutionCount{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ControlFlow) OnIncrementTaskExecutionCount() *ControlFlow_IncrementTaskExecutionCount {
+	c_call := _m.On("IncrementTaskExecutionCount")
+	return &ControlFlow_IncrementTaskExecutionCount{Call: c_call}
+}
+
+func (_m *ControlFlow) OnIncrementTaskExecutionCountMatch(matchers ...interface{}) *ControlFlow_IncrementTaskExecutionCount {
+	c_call := _m.On("IncrementTaskExecutionCount", matchers...)
+	return &ControlFlow_IncrementTaskExecutionCount{Call: c_call}
+}
+
+// IncrementTaskExecutionCount provides a mock function with given fields:
+func (_m *ControlFlow) IncrementTaskExecutionCount() uint32 {
 	ret := _m.Called()
 
 	var r0 uint32

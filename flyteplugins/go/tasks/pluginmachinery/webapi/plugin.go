@@ -72,9 +72,6 @@ type TaskExecutionContext interface {
 
 	// Provides the raw datastore to enable persisting outputs.
 	DataStore() *storage.DataStore
-
-	// Returns the max allowed dataset size that the outputwriter will accept
-	MaxDatasetSizeBytes() int64
 }
 
 type GetContext interface {

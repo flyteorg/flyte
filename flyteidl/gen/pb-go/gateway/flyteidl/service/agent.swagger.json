@@ -1624,7 +1624,7 @@
       "properties": {
         "statement": {
           "type": "string",
-          "title": "The actual query to run, the query can have templated parameters.\nWe use Flyte's Golang templating format for Query templating.\nRefer to the templating documentation.\nhttps://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/external_services/hive/hive.html#sphx-glr-auto-integrations-external-services-hive-hive-py\nFor example,\ninsert overwrite directory '{{ .rawOutputDataPrefix }}' stored as parquet\nselect *\nfrom my_table\nwhere ds = '{{ .Inputs.ds }}'"
+          "title": "The actual query to run, the query can have templated parameters.\nWe use Flyte's Golang templating format for Query templating.\nFor example,\ninsert overwrite directory '{{ .rawOutputDataPrefix }}' stored as parquet\nselect *\nfrom my_table\nwhere ds = '{{ .Inputs.ds }}'"
         },
         "dialect": {
           "$ref": "#/definitions/SqlDialect"
@@ -1797,6 +1797,10 @@
         "extended_resources": {
           "$ref": "#/definitions/coreExtendedResources",
           "description": "Overrides for all non-standard resources, not captured by\nv1.ResourceRequirements, to allocate to a task."
+        },
+        "container_image": {
+          "type": "string",
+          "description": "Override for the image used by task pods."
         }
       },
       "description": "Optional task node overrides that will be applied at task execution time."
@@ -2019,8 +2023,7 @@
       "type": "object",
       "properties": {
         "task_execution_id": {
-          "$ref": "#/definitions/coreTaskExecutionIdentifier",
-          "title": "ID of the task execution"
+          "$ref": "#/definitions/coreTaskExecutionIdentifier"
         },
         "namespace": {
           "type": "string",
@@ -2068,9 +2071,13 @@
         "overrides": {
           "$ref": "#/definitions/coreTaskNodeOverrides",
           "description": "Overrides for specific properties of the task node.\nThese overrides can be used to customize the behavior of the task node."
+        },
+        "identity": {
+          "$ref": "#/definitions/coreIdentity",
+          "title": "Identity of user running this task execution"
         }
       },
-      "description": "Represents a subset of runtime task execution metadata that are relevant to external plugins."
+      "description": "Represents a subset of runtime task execution metadata that are relevant to external plugins.\n\nID of the task execution"
     },
     "flyteidlcoreEnumType": {
       "type": "object",

@@ -29,7 +29,7 @@ Our proposed implementation consists of two parts, which - while related to one 
 
 ### Cache eviction override for a single execution
 
-Similar to the `interruptible` override flag provided for a single execution of a workflow or task, we propose adding a flag (e.g. `cache_override`) to evict the cached output of an execution and force its calculation to be performed (and cached) again.  
+Similar to the `interruptible` override flag provided for a single execution of a workflow or task, we propose adding a flag (e.g. `cache_override`) to evict the cached output of an execution and force its calculation to be performed (and cached) again.
 This cleanup would be performed automatically by Flyte during the execution of a new workflow or task, returning the updated results:
 
 ![cache eviction flowchart](https://i.imgur.com/0NeoYGy.png)
@@ -47,7 +47,7 @@ The following Flyte components would need to support this change:
 
 #### `datacatalog`
 
-`datacatalog` needs to support the eviction of its cache entries, removing them from both its database as well as the underlying blob storage.  
+`datacatalog` needs to support the eviction of its cache entries, removing them from both its database as well as the underlying blob storage.
 All major cloud providers currently supported should provide sufficient functionality in their SDK/CLI.
 
 Current reservations need to be respected - if the requesting executor is not the current owner, we potentially need to wait until the previous reservation has been released or synchronize access to ensure we're not running into race conditions with simultaneous executions.
@@ -70,7 +70,7 @@ Similar to the `interruptible` override currently available, we propose to add a
 
 #### `flytekit`
 
-We should extend the [`flytekit.remote`](https://docs.flyte.org/projects/flytekit/en/latest/remote.html#remote-access) functionality to support setting the `skip_cache` flag for a single execution.
+We should extend the [`flytekit.remote`](https://docs.flyte.org/en/latest/api/flytekit/remote.html#remote-access) functionality to support setting the `skip_cache` flag for a single execution.
 
 #### `flytectl`
 
@@ -112,7 +112,7 @@ Whilst our main intent for this `AdminService` extension is for automated/script
 
 #### `flytekit`
 
-[`flytekit.remote`](https://docs.flyte.org/projects/flytekit/en/latest/remote.html#remote-access) could be extended to support eviction of a task/workflow's cached results remotely.
+[`flytekit.remote`](https://docs.flyte.org/en/latest/api/flytekit/remote.html#remote-access) could be extended to support eviction of a task/workflow's cached results remotely.
 
 #### `flytectl`
 
@@ -132,8 +132,8 @@ As the implementation of this API extension could potentially lead to additional
 
 ## 5 Drawbacks
 
-The proposed cache eviction changes introduces a slight overhead in execution preparation in case an eviction has been requested since a reservation must be acquired and the stored data has to be removed from `datacatalog` and its underlying blob storage.  
-Depending on the size of the cached outputs and the blob storage speed, this might induce increased scheduling times for tasks, although no performance impact should occur if no cache eviction is performed.  
+The proposed cache eviction changes introduces a slight overhead in execution preparation in case an eviction has been requested since a reservation must be acquired and the stored data has to be removed from `datacatalog` and its underlying blob storage.
+Depending on the size of the cached outputs and the blob storage speed, this might induce increased scheduling times for tasks, although no performance impact should occur if no cache eviction is performed.
 In order to minimize the execution startup delay, cache eviction could be postponed until the task executed successfully, only requiring a quick check beforehand and ensuring the actual computation can start as soon as possible.
 
 We do not anticipate any noticeable impact by the API extension for `flyteadmin` during regular executions, however evicting all cached outputs of a large workflow could introduce some strain on `flyteadmin`/`datacatalog` during processing.
@@ -158,9 +158,9 @@ The potential for malicious exploitation is deemed non-existent as no access to 
 3. Which Flyte tools (`flyteconsole`/`flytectl`) should support the proposed `AdminService` API extension for `flyteadmin`, if any?
     - **RESOLVED**: `flytectl`, `flytekit.remote`, `flyteconsole`
 4. Should we support automatic eviction of cached results on workflow archival (opt-out via `flyteconsole`)?
-5. Should we evict [Infratask Checkpoints](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/control_flow/checkpoint.html) from the cache as well since they might return cached results? If so, should we evict them from the backend side or pass the `cache_override` flag along to `flytekit`/its `Checkpointer` to skip any available entries?
-    - **RESOLVED**: not for the initial implementation. Infratask checkpoints are only relevant for consecutive retries of a task - their results would not be considered when launching another execution with a `cache_override` flag set. 
+5. Should we evict [Intratask Checkpoints](https://docs.flyte.org/en/latest/user_guide/advanced_composition/intratask_checkpoints.html) from the cache as well since they might return cached results? If so, should we evict them from the backend side or pass the `cache_override` flag along to `flytekit`/its `Checkpointer` to skip any available entries?
+    - **RESOLVED**: not for the initial implementation. Intratask checkpoints are only relevant for consecutive retries of a task - their results would not be considered when launching another execution with a `cache_override` flag set.
 
 ## 9 Conclusion
 
-At the time of writing, Flyte does not provide any functionality to clean up its cache, especially in a targeted, selective manner. This proposal introduces a way for users to control caching behaviour and potentially cut down on computational costs of task re-runs. Whilst the backend portion is relatively clear already, some questions still remain open, especially for the frontend components.
+At the time of writing, Flyte does not provide any functionality to clean up its cache, especially in a targeted, selective manner. This proposal introduces a way for users to control caching behavior and potentially cut down on computational costs of task re-runs. Whilst the backend portion is relatively clear already, some questions still remain open, especially for the frontend components.
