@@ -5,6 +5,7 @@ go 1.21
 require (
 	cloud.google.com/go/iam v1.1.5
 	cloud.google.com/go/storage v1.36.0
+	github.com/IBM/sarama v1.40.1
 	github.com/NYTimes/gizmo v1.3.6
 	github.com/Selvatico/go-mocket v1.0.7
 	github.com/Shopify/sarama v1.26.4
@@ -81,7 +82,6 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/internal v1.3.0 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v1.2.0 // indirect
 	github.com/AzureAD/microsoft-authentication-library-for-go v1.2.0 // indirect
-	github.com/IBM/sarama v1.40.1 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20200428143746-21a406dcc535 // indirect
 	github.com/benlaurie/objecthash v0.0.0-20180202135721-d1e3d6079fc1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
