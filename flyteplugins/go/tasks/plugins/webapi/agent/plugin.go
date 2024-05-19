@@ -7,7 +7,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
 	"k8s.io/apimachinery/pkg/util/wait"
 
@@ -101,9 +100,6 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 
 	taskCategory := admin.TaskCategory{Name: taskTemplate.Type, Version: taskTemplate.TaskTypeVersion}
 	agent, isSync := getFinalAgent(&taskCategory, p.cfg)
-
-	finalCtx, cancel := getFinalContext(ctx, "CreateTask", agent)
-	defer cancel()
 
 	taskExecutionMetadata := buildTaskExecutionMetadata(taskCtx.TaskExecutionMetadata())
 
