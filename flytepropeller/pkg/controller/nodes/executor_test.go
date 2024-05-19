@@ -1504,7 +1504,8 @@ func Test_nodeExecutor_timeout(t *testing.T) {
 	ns.OnGetSystemFailures().Return(0)
 	ns.On("ClearLastAttemptStartedAt").Return()
 
-	for _, tt := range tests {
+	for i := range tests {
+		tt := tests[i]
 		t.Run(tt.name, func(t *testing.T) {
 			c := &nodeExecutor{defaultActiveDeadline: time.Second, defaultExecutionDeadline: time.Second}
 			handlerReturn := func() (handler.Transition, error) {

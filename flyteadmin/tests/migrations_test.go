@@ -6,12 +6,13 @@ package tests
 import (
 	"context"
 	"fmt"
+	"sort"
+	"testing"
+
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
-	"sort"
-	"testing"
 )
 
 // This file is used to test the migration from resource to configuration and configuration to resource.

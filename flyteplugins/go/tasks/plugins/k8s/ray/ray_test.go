@@ -630,7 +630,8 @@ func TestInjectLogsSidecar(t *testing.T) {
 		},
 	}
 
-	for _, p := range params {
+	for i := range params {
+		p := params[i]
 		t.Run(p.name, func(t *testing.T) {
 			assert.NoError(t, SetConfig(&Config{
 				LogsSidecar: p.logsSidecarCfg,
@@ -836,7 +837,8 @@ func TestGetEventInfo_LogTemplates(t *testing.T) {
 		},
 	}
 
-	for _, tc := range testCases {
+	for i := range testCases {
+		tc := testCases[i]
 		t.Run(tc.name, func(t *testing.T) {
 			ti, err := getEventInfoForRayJob(
 				logs.LogConfig{Templates: []tasklog.TemplateLogPlugin{tc.logPlugin}},
@@ -935,7 +937,8 @@ func TestGetEventInfo_LogTemplates_V1(t *testing.T) {
 		},
 	}
 
-	for _, tc := range testCases {
+	for i := range testCases {
+		tc := testCases[i]
 		t.Run(tc.name, func(t *testing.T) {
 			ti, err := getEventInfoForRayJob(
 				logs.LogConfig{Templates: []tasklog.TemplateLogPlugin{tc.logPlugin}},
@@ -990,7 +993,8 @@ func TestGetEventInfo_DashboardURL(t *testing.T) {
 		},
 	}
 
-	for _, tc := range testCases {
+	for i := range testCases {
+		tc := testCases[i]
 		t.Run(tc.name, func(t *testing.T) {
 			assert.NoError(t, SetConfig(&Config{DashboardURLTemplate: &tc.dashboardURLTemplate}))
 			ti, err := getEventInfoForRayJob(logs.LogConfig{}, pluginCtx, &tc.rayJob)
@@ -1042,7 +1046,8 @@ func TestGetEventInfo_DashboardURL_V1(t *testing.T) {
 		},
 	}
 
-	for _, tc := range testCases {
+	for i := range testCases {
+		tc := testCases[i]
 		t.Run(tc.name, func(t *testing.T) {
 			assert.NoError(t, SetConfig(&Config{DashboardURLTemplate: &tc.dashboardURLTemplate}))
 			ti, err := getEventInfoForRayJob(logs.LogConfig{}, pluginCtx, &tc.rayJob)

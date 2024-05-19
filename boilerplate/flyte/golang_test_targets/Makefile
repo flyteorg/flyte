@@ -6,21 +6,21 @@
 
 .PHONY: download_tooling
 download_tooling: #download dependencies (including test deps) for the package
-	@../boilerplate/flyte/golang_test_targets/download_tooling.sh
+	@${REPO_ROOT}/boilerplate/flyte/golang_test_targets/download_tooling.sh
 
 .PHONY: generate
 generate: download_tooling #generate go code
-	@../boilerplate/flyte/golang_test_targets/go-gen.sh
+	@${REPO_ROOT}/boilerplate/flyte/golang_test_targets/go-gen.sh
 
 .PHONY: lint
 lint: download_tooling #lints the package for common code smells
-	GL_DEBUG=linters_output,env golangci-lint run --deadline=5m --exclude deprecated -v
+	GL_DEBUG=linters_output,env golangci-lint run --timeout=5m --exclude deprecated -v
 
 # If code is failing goimports linter, this will fix.
 # skips 'vendor'
 .PHONY: goimports
 goimports:
-	@../boilerplate/flyte/golang_test_targets/goimports
+	@${REPO_ROOT}/boilerplate/flyte/golang_test_targets/goimports
 
 .PHONY: mod_download
 mod_download: #download dependencies (including test deps) for the package

@@ -6,4 +6,4 @@
 # TO OPT OUT OF UPDATES, SEE https://github.com/flyteorg/boilerplate/blob/master/Readme.rst
 
 goimports -w $(find . -type f -name '*.go' -not -path "./vendor/*" -not -path "./pkg/client/*" -not -path "./boilerplate/*")
-GL_DEBUG=linters_output,env golangci-lint run --deadline=5m --exclude deprecated -v --fix
+GL_DEBUG=linters_output,env golangci-lint run --timeout=5m --exclude deprecated -v --fix
