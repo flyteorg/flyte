@@ -13,9 +13,10 @@ import (
 
 	stdlibversion "github.com/flyteorg/flyte/flytestdlib/version"
 
-	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
+
+	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
 )
 
 var (
