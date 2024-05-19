@@ -267,24 +267,6 @@ func TestCache_Get(t *testing.T) {
 	}
 }
 
-type MockStoreMetadata struct {
-	exists bool
-	size   int64
-	etag   string
-}
-
-func (m MockStoreMetadata) Size() int64 {
-	return m.size
-}
-
-func (m MockStoreMetadata) Exists() bool {
-	return m.exists
-}
-
-func (m MockStoreMetadata) Etag() string {
-	return m.etag
-}
-
 func TestCache_Put(t *testing.T) {
 	ctx := context.Background()
 
@@ -303,15 +285,23 @@ func TestCache_Put(t *testing.T) {
 	mockOutputReaderErr := &mocks2.OutputReader{}
 	mockOutputReaderErr.On("Read", mock.Anything).Return(nil, nil, errors.New("test error"))
 
+	mockMetadataExists := &storageMocks.Metadata{}
+	mockMetadataExists.On("Exists").Return(true)
+	mockMetadataExists.On("Size").Return(int64(1))
+
+	mockMetadataNotExists := &storageMocks.Metadata{}
+	mockMetadataNotExists.On("Exists").Return(false)
+	mockMetadataExists.On("Size").Return(int64(0))
+
 	opath := &pluginsIOMock.OutputFilePaths{}
 	opath.On("GetOutputPath").Return(storage.DataReference("s3://some-bucket/some-key"))
 
 	composedProtobufStoreExists := &storageMocks.ComposedProtobufStore{}
-	composedProtobufStoreExists.On("Head", mock.Anything, mock.Anything).Return(MockStoreMetadata{exists: true}, nil)
+	composedProtobufStoreExists.On("Head", mock.Anything, mock.Anything).Return(mockMetadataExists, nil)
 	mockRemoteFileOutputReader := ioutils.NewRemoteFileOutputReader(ctx, composedProtobufStoreExists, opath, 0)
 
 	composedProtobufStoreNotExists := &storageMocks.ComposedProtobufStore{}
-	composedProtobufStoreNotExists.On("Head", mock.Anything, mock.Anything).Return(MockStoreMetadata{exists: false}, nil)
+	composedProtobufStoreNotExists.On("Head", mock.Anything, mock.Anything).Return(mockMetadataNotExists, nil)
 	mockRemoteFileOutputReaderErr := ioutils.NewRemoteFileOutputReader(ctx, composedProtobufStoreNotExists, opath, 0)
 
 	mockMetadata := catalog.Metadata{

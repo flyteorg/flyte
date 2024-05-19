@@ -9,6 +9,38 @@ type Metadata struct {
 	mock.Mock
 }
 
+type Metadata_ContentMD5 struct {
+	*mock.Call
+}
+
+func (_m Metadata_ContentMD5) Return(_a0 string) *Metadata_ContentMD5 {
+	return &Metadata_ContentMD5{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *Metadata) OnContentMD5() *Metadata_ContentMD5 {
+	c_call := _m.On("ContentMD5")
+	return &Metadata_ContentMD5{Call: c_call}
+}
+
+func (_m *Metadata) OnContentMD5Match(matchers ...interface{}) *Metadata_ContentMD5 {
+	c_call := _m.On("ContentMD5", matchers...)
+	return &Metadata_ContentMD5{Call: c_call}
+}
+
+// ContentMD5 provides a mock function with given fields:
+func (_m *Metadata) ContentMD5() string {
+	ret := _m.Called()
+
+	var r0 string
+	if rf, ok := ret.Get(0).(func() string); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	return r0
+}
+
 type Metadata_Etag struct {
 	*mock.Call
 }
