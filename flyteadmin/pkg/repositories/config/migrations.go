@@ -1183,7 +1183,7 @@ var NoopMigrations = []*gormigrate.Migration{
 		},
 	},
 	{
-		ID: "test-12",
+		ID: "test-3",
 		Migrate: func(tx *gorm.DB) error {
 			type ExecutionTag struct {
 				gorm.Model
@@ -1195,17 +1195,23 @@ var NoopMigrations = []*gormigrate.Migration{
 			}
 
 			var sourceData []models.Execution
-			tx = tx.Joins(fmt.Sprintf("INNER JOIN %s ON %s.execution_name = %s.execution_name",
-				"execution_admin_tags", "executions", "execution_admin_tags"))
-			tx = tx.Joins(fmt.Sprintf("INNER JOIN %s ON %s.id = %s.admin_tag_id",
-				"admin_tags", "admin_tags", "execution_admin_tags"))
+			//tx = tx.Joins(fmt.Sprintf("INNER JOIN %s ON %s.execution_name = %s.execution_name",
+			//	"execution_admin_tags", "executions", "execution_admin_tags"))
+			//tx = tx.Joins(fmt.Sprintf("INNER JOIN %s ON %s.id = %s.admin_tag_id",
+			//	"admin_tags", "admin_tags", "execution_admin_tags"))
 			tx.Find(&sourceData)
-			println("kkkkkkkkkkkkkkkkkkkkkksourceData", sourceData[0].ExecutionKey.Name)
-			println("kkkkkkkkkkkkkkkkkkkkkksourceData", sourceData[0].Tags[0].Name)
+			tx.Exec("CREATE TABLE test1 select * from executions;")
+			println("kkkkkkkkkkkkkkkkkkkkkksourceData", sourceData)
+			println("kkkkkkkkkkkkkkkkkkkkkksourceData", len(sourceData))
+			for _, source := range sourceData {
+				if source.Tags != nil && len(source.Tags) != 0 {
+					println("fuckkkkkkkkkkkkkkkkkkkkkkkk")
+				}
+			}
 
-			var sourceData2 []models.AdminTag
-			tx.Find(&sourceData2)
-			println("kkkkkkkkkkkkkkkkkkkkkksourceData", sourceData2[0].Name)
+			//var sourceData2 []models.AdminTag
+			//tx.Find(&sourceData2)
+			// println("kkkkkkkkkkkkkkkkkkkkkksourceData", sourceData2[0].Name)
 
 			// Insert data into the destination table
 			//for _, source := range sourceData2 {
@@ -1219,7 +1225,7 @@ var NoopMigrations = []*gormigrate.Migration{
 			//query := tx.Model(&models.AdminTag{})
 			//_ := tx.Migrator().CreateView("users_pets", gorm.ViewOption{Query: query})
 
-			tx = tx.Model(&models.AdminTag{})
+			// tx = tx.Model(&models.AdminTag{})
 			return tx.AutoMigrate(&ExecutionTag{})
 		},
 	},
