@@ -1183,50 +1183,17 @@ var NoopMigrations = []*gormigrate.Migration{
 		},
 	},
 	{
-		ID: "test-3",
+		ID: "2024-5-20-execution-tags",
 		Migrate: func(tx *gorm.DB) error {
-			type ExecutionTag struct {
-				gorm.Model
-				ExecutionKey
-				// The key of the tag.
-				Key string `gorm:"primary_key" valid:"length(0|255)"`
-				// The value of the tag.
-				Value string `gorm:"uniqueIndex" valid:"length(0|255)"`
-			}
-
-			var sourceData []models.Execution
-			//tx = tx.Joins(fmt.Sprintf("INNER JOIN %s ON %s.execution_name = %s.execution_name",
-			//	"execution_admin_tags", "executions", "execution_admin_tags"))
-			//tx = tx.Joins(fmt.Sprintf("INNER JOIN %s ON %s.id = %s.admin_tag_id",
-			//	"admin_tags", "admin_tags", "execution_admin_tags"))
-			tx.Find(&sourceData)
-			tx.Exec("CREATE TABLE test1 select * from executions;")
-			println("kkkkkkkkkkkkkkkkkkkkkksourceData", sourceData)
-			println("kkkkkkkkkkkkkkkkkkkkkksourceData", len(sourceData))
-			for _, source := range sourceData {
-				if source.Tags != nil && len(source.Tags) != 0 {
-					println("fuckkkkkkkkkkkkkkkkkkkkkkkk")
-				}
-			}
-
-			//var sourceData2 []models.AdminTag
-			//tx.Find(&sourceData2)
-			// println("kkkkkkkkkkkkkkkkkkkkkksourceData", sourceData2[0].Name)
-
-			// Insert data into the destination table
-			//for _, source := range sourceData2 {
-			//	for _, tag := range source.Tags {
-			//		println("tag.Name [%v]", tag.Name)
-			//		destination := ExecutionTag{Key: tag.Name}
-			//		tx.Create(&destination)
-			//	}
-			//}
-
-			//query := tx.Model(&models.AdminTag{})
-			//_ := tx.Migrator().CreateView("users_pets", gorm.ViewOption{Query: query})
-
-			// tx = tx.Model(&models.AdminTag{})
-			return tx.AutoMigrate(&ExecutionTag{})
+			// Deprecate execution_admin_tags and admin_tags tables, and create a new table execution_tags
+			// to store tags associated with executions.
+			sql := "CREATE TABLE execution_tags as select execution_project, execution_domain, execution_name," +
+				" created_at, updated_at, deleted_at, name as key, null as value from execution_admin_tags" +
+				" INNER JOIN admin_tags a on execution_admin_tags.admin_tag_id = a.id;"
+			return tx.Exec(sql).Error
+		},
+		Rollback: func(tx *gorm.DB) error {
+			return tx.Migrator().DropTable("execution_tags")
 		},
 	},
 }
