@@ -179,7 +179,7 @@ func ToNodeExecutionEvent(nodeExecID *core.NodeExecutionIdentifier,
 		nev.IsParent = true
 	} else if node.GetKind() == v1alpha1.NodeKindArray {
 		nev.IsArray = true
-		if config.GetConfig().ArrayNodeEventVersion == 1 {
+		if config.GetConfig().ArrayNode.EventVersion == 1 {
 			nev.IsParent = true
 		}
 	} else if dynamicNodePhase != v1alpha1.DynamicNodePhaseNone {

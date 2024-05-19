@@ -78,7 +78,7 @@ spec:
         - pyflyte
         - serve
         - agent
-        image: "ghcr.io/flyteorg/flyteagent:1.10.7"
+        image: "ghcr.io/flyteorg/flyteagent:1.11.0"
         imagePullPolicy: "IfNotPresent"
         name: flyteagent
         volumeMounts:
@@ -87,6 +87,11 @@ spec:
         ports:
         - containerPort: 8000
           name: agent-grpc
+        readinessProbe:
+          grpc:
+            port: 8000
+          initialDelaySeconds: 1
+          periodSeconds: 3
         securityContext:
             allowPrivilegeEscalation: false
         resources:

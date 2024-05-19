@@ -608,6 +608,42 @@ Use the same gRPC credentials option as the flyteadmin client
   "false"
   
 
+max-retries (int)
+------------------------------------------------------------------------------------------------------------------------
+
+The max number of retries for event recording.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "5"
+  
+
+base-scalar (int)
+------------------------------------------------------------------------------------------------------------------------
+
+The base/scalar backoff duration in milliseconds for event recording retries.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "100"
+  
+
+backoff-jitter (string)
+------------------------------------------------------------------------------------------------------------------------
+
+A string representation of a floating point number between 0 and 1 specifying the jitter factor for event recording retries.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "0.1"
+  
+
 default-service-config (string)
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -669,6 +705,42 @@ The max bucket size for event recording tokens.
 .. code-block:: yaml
 
   "1000"
+  
+
+max-retries (int)
+------------------------------------------------------------------------------------------------------------------------
+
+The max number of retries for event recording.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "5"
+  
+
+base-scalar (int)
+------------------------------------------------------------------------------------------------------------------------
+
+The base/scalar backoff duration in milliseconds for event recording retries.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "100"
+  
+
+backoff-jitter (string)
+------------------------------------------------------------------------------------------------------------------------
+
+A string representation of a floating point number between 0 and 1 specifying the jitter factor for event recording retries.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "0.1"
   
 
 Section: logger
@@ -1015,6 +1087,8 @@ k8s (`config.K8sPluginConfig`_)
   default-annotations:
     cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
   default-cpus: "1"
+  default-env-from-configmaps: null
+  default-env-from-secrets: null
   default-env-vars: null
   default-env-vars-from-env: null
   default-labels: null
@@ -1034,6 +1108,7 @@ k8s (`config.K8sPluginConfig`_)
   gpu-unpartitioned-node-selector-requirement: null
   gpu-unpartitioned-toleration: null
   image-pull-backoff-grace-period: 3m0s
+  image-pull-policy: ""
   inject-finalizer: false
   interruptible-node-selector: null
   interruptible-node-selector-requirement: null
@@ -1172,7 +1247,6 @@ ray (`ray.Config`_)
         disable-usage-stats: "true"
   enableUsageStats: false
   includeDashboard: true
-  kubeRayCrdVersion: v1alpha1
   logs:
     cloudwatch-enabled: false
     cloudwatch-log-group: ""
@@ -2188,6 +2262,26 @@ default-env-vars-from-env (map[string]string)
   null
   
 
+default-env-from-configmaps ([]string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
+default-env-from-secrets ([]string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
 default-cpus (`resource.Quantity`_)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -2365,6 +2459,16 @@ image-pull-backoff-grace-period (`config.Duration`_)
 .. code-block:: yaml
 
   3m0s
+  
+
+image-pull-policy (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
   
 
 pod-pending-timeout (`config.Duration`_)
@@ -3556,18 +3660,6 @@ Enable usage stats for ray jobs. These stats are submitted to usage-stats.ray.io
   "false"
   
 
-kubeRayCrdVersion (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-Version of the Ray CRD to use when creating RayClusters or RayJobs.
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  v1alpha1
-  
-
 serviceAccount (string)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -4166,13 +4258,13 @@ Enable events publishing to K8s events API.
 max-output-size-bytes (int64)
 ------------------------------------------------------------------------------------------------------------------------
 
-Maximum size of outputs per task
+Deprecated! Use storage.limits.maxDownloadMBs instead
 
 **Default Value**: 
 
 .. code-block:: yaml
 
-  "10485760"
+  "-1"
   
 
 enable-grpc-latency-metrics (bool)
@@ -4342,18 +4434,6 @@ Enable creation of the FlyteWorkflow CRD on startup
   "false"
   
 
-array-node-event-version (int)
-------------------------------------------------------------------------------------------------------------------------
-
-ArrayNode eventing version. 0 => legacy (drop-in replacement for maptask), 1 => new
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  "0"
-  
-
 node-execution-worker-count (int)
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -4364,6 +4444,19 @@ Number of workers to evaluate node executions, currently only used for array nod
 .. code-block:: yaml
 
   "8"
+  
+
+array-node-config (`config.ArrayNodeConfig`_)
+------------------------------------------------------------------------------------------------------------------------
+
+Configuration for array nodes
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  default-parallelism-behavior: unlimited
+  event-version: 0
   
 
 admin-launcher (`launchplan.AdminConfig`_)
@@ -4404,6 +4497,33 @@ workflowstore (`workflowstore.Config`_)
 .. code-block:: yaml
 
   policy: ResourceVersionCache
+  
+
+config.ArrayNodeConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+event-version (int)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+ArrayNode eventing version. 0 => legacy (drop-in replacement for maptask), 1 => new
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "0"
+  
+
+default-parallelism-behavior (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Default parallelism behavior for array nodes
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  unlimited
   
 
 config.CompositeQueueConfig
@@ -4544,7 +4664,7 @@ config.Config (resourcemanager)
 type (string)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-Which resource manager to use
+Which resource manager to use, redis or noop. Default is noop.
 
 **Default Value**: 
 

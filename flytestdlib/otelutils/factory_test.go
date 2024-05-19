@@ -23,8 +23,7 @@ func TestRegisterTracerProvider(t *testing.T) {
 		FileConfig: FileConfig{
 			Filename: "/dev/null",
 		},
-		JaegerConfig: JaegerConfig{
-		},
+		JaegerConfig: JaegerConfig{},
 	}
 	err = RegisterTracerProvider(serviceName, &fullConfig)
 	assert.Nil(t, err)

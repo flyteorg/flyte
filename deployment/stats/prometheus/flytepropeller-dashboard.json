@@ -32,7 +32,7 @@
           "bars": false,
           "cacheTimeout": null,
           "datasource": "${DS_PROM}",
-          "description": null,
+          "description": "The number of golang goroutines available to accept new work from the main workqueue. Each worker can process one item from the workqueue at a time.",
           "editable": true,
           "error": false,
           "fieldConfig": {
@@ -132,7 +132,7 @@
           "yaxes": [
             {
               "decimals": null,
-              "format": "ops",
+              "format": "none",
               "label": null,
               "logBase": 1,
               "max": null,
@@ -159,7 +159,7 @@
           "bars": false,
           "cacheTimeout": null,
           "datasource": "${DS_PROM}",
-          "description": null,
+          "description": "Round success, error and total rates. Also includes total rate including streaks within a single round. The streak rate graph should match the difference between the totals with and without streaks.",
           "editable": true,
           "error": false,
           "fieldConfig": {
@@ -223,16 +223,61 @@
           "targets": [
             {
               "datasource": null,
-              "expr": "sum(rate(flyte:propeller:all:round:abort_error[5m]))",
+              "expr": "sum(rate(flyte:propeller:all:round:success_count[5m]))",
               "format": "time_series",
               "hide": false,
               "instant": false,
               "interval": "",
               "intervalFactor": 2,
-              "legendFormat": "",
+              "legendFormat": "success",
               "metric": "",
-              "query": "sum(rate(flyte:propeller:all:round:abort_error[5m]))",
+              "query": "sum(rate(flyte:propeller:all:round:success_count[5m]))",
               "refId": "A",
+              "step": 10,
+              "target": ""
+            },
+            {
+              "datasource": null,
+              "expr": "sum(rate(flyte:propeller:all:round:error_count[5m]))",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "error",
+              "metric": "",
+              "query": "sum(rate(flyte:propeller:all:round:error_count[5m]))",
+              "refId": "B",
+              "step": 10,
+              "target": ""
+            },
+            {
+              "datasource": null,
+              "expr": "sum(rate(flyte:propeller:all:round:round_total_ms_count[5m]))",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "total",
+              "metric": "",
+              "query": "sum(rate(flyte:propeller:all:round:round_total_ms_count[5m]))",
+              "refId": "C",
+              "step": 10,
+              "target": ""
+            },
+            {
+              "datasource": null,
+              "expr": "sum(rate(flyte:propeller:all:round:round_time_unlabeled_ms_count[5m]))",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "total-including-streaks",
+              "metric": "",
+              "query": "sum(rate(flyte:propeller:all:round:round_time_unlabeled_ms_count[5m]))",
+              "refId": "D",
               "step": 10,
               "target": ""
             }
@@ -240,7 +285,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "System errors",
+          "title": "Round success/error rate",
           "tooltip": {
             "msResolution": true,
             "shared": true,
@@ -286,7 +331,7 @@
           "bars": false,
           "cacheTimeout": null,
           "datasource": "${DS_PROM}",
-          "description": null,
+          "description": "Error rates for each type of failure that may occur as propeller is traversing the workflow DAG.",
           "editable": true,
           "error": false,
           "fieldConfig": {
@@ -350,16 +395,76 @@
           "targets": [
             {
               "datasource": null,
-              "expr": "sum(deriv(flyte:propeller:all:round:system_error_unlabeled[5m]))",
+              "expr": "sum(rate(flyte:propeller:all:round:system_error_unlabeled[5m]))",
               "format": "time_series",
               "hide": false,
               "instant": false,
               "interval": "",
               "intervalFactor": 2,
-              "legendFormat": "",
+              "legendFormat": "system",
               "metric": "",
-              "query": "sum(deriv(flyte:propeller:all:round:system_error_unlabeled[5m]))",
+              "query": "sum(rate(flyte:propeller:all:round:system_error_unlabeled[5m]))",
               "refId": "A",
+              "step": 10,
+              "target": ""
+            },
+            {
+              "datasource": null,
+              "expr": "sum(rate(flyte:propeller:all:round:abort_error_unlabeled[5m]))",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "abort",
+              "metric": "",
+              "query": "sum(rate(flyte:propeller:all:round:abort_error_unlabeled[5m]))",
+              "refId": "B",
+              "step": 10,
+              "target": ""
+            },
+            {
+              "datasource": null,
+              "expr": "sum(rate(flyte:propeller:all:round:panic_unlabeled[5m]))",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "panic",
+              "metric": "",
+              "query": "sum(rate(flyte:propeller:all:round:panic_unlabeled[5m]))",
+              "refId": "C",
+              "step": 10,
+              "target": ""
+            },
+            {
+              "datasource": null,
+              "expr": "sum(rate(flyte:propeller:all:round:not_found[5m]))",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "not-found",
+              "metric": "",
+              "query": "sum(rate(flyte:propeller:all:round:not_found[5m]))",
+              "refId": "D",
+              "step": 10,
+              "target": ""
+            },
+            {
+              "datasource": null,
+              "expr": "sum(rate(flyte:propeller:all:round:skipped[5m]))",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "skipped",
+              "metric": "",
+              "query": "sum(rate(flyte:propeller:all:round:skipped[5m]))",
+              "refId": "E",
               "step": 10,
               "target": ""
             }
@@ -367,7 +472,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "System errors",
+          "title": "Error rate breakdown",
           "tooltip": {
             "msResolution": true,
             "shared": true,
@@ -413,7 +518,7 @@
           "bars": false,
           "cacheTimeout": null,
           "datasource": "${DS_PROM}",
-          "description": null,
+          "description": "Streaks are when propeller iterates over the same workflow multiple times in a single round. This is an optimisation technique.",
           "editable": true,
           "error": false,
           "fieldConfig": {
@@ -477,7 +582,7 @@
           "targets": [
             {
               "datasource": null,
-              "expr": "{__name__=~\"flyte:propeller:all:node:plugin:.*_failure_unlabeled\"}",
+              "expr": "sum(rate(flyte:propeller:all:round:streak_length_unlabeled[5m]))",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -485,23 +590,8 @@
               "intervalFactor": 2,
               "legendFormat": "",
               "metric": "",
-              "query": "{__name__=~\"flyte:propeller:all:node:plugin:.*_failure_unlabeled\"}",
+              "query": "sum(rate(flyte:propeller:all:round:streak_length_unlabeled[5m]))",
               "refId": "A",
-              "step": 10,
-              "target": ""
-            },
-            {
-              "datasource": null,
-              "expr": "{__name__=~\"flyte:propeller:all:node:plugin:.*_success_unlabeled\"}",
-              "format": "time_series",
-              "hide": false,
-              "instant": false,
-              "interval": "",
-              "intervalFactor": 2,
-              "legendFormat": "",
-              "metric": "",
-              "query": "{__name__=~\"flyte:propeller:all:node:plugin:.*_success_unlabeled\"}",
-              "refId": "B",
               "step": 10,
               "target": ""
             }
@@ -509,7 +599,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "Plugin Failures",
+          "title": "Streak rate",
           "tooltip": {
             "msResolution": true,
             "shared": true,
@@ -555,7 +645,7 @@
           "bars": false,
           "cacheTimeout": null,
           "datasource": "${DS_PROM}",
-          "description": null,
+          "description": "Success vs failure rate for the various plugins used for each node e.g. k8s plugin or spark plugin.",
           "editable": true,
           "error": false,
           "fieldConfig": {
@@ -619,16 +709,31 @@
           "targets": [
             {
               "datasource": null,
-              "expr": "sum(rate(flyte:propeller:all:round:raw_unlabeled_ms[5m])) by (quantile)",
+              "expr": "sum(rate({__name__=~\"flyte:propeller:all:plugin:.*_success_unlabeled\"}[5m]))",
               "format": "time_series",
               "hide": false,
               "instant": false,
               "interval": "",
               "intervalFactor": 2,
-              "legendFormat": "",
+              "legendFormat": "success",
               "metric": "",
-              "query": "sum(rate(flyte:propeller:all:round:raw_unlabeled_ms[5m])) by (quantile)",
+              "query": "sum(rate({__name__=~\"flyte:propeller:all:plugin:.*_success_unlabeled\"}[5m]))",
               "refId": "A",
+              "step": 10,
+              "target": ""
+            },
+            {
+              "datasource": null,
+              "expr": "sum(rate({__name__=~\"flyte:propeller:all:plugin:.*_failure_unlabeled\"}[5m]))",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "failure",
+              "metric": "",
+              "query": "sum(rate({__name__=~\"flyte:propeller:all:plugin:.*_failure_unlabeled\"}[5m]))",
+              "refId": "B",
               "step": 10,
               "target": ""
             }
@@ -636,7 +741,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "round Latency by quantile",
+          "title": "Plugin Success/Failure rate",
           "tooltip": {
             "msResolution": true,
             "shared": true,
@@ -655,7 +760,7 @@
           "yaxes": [
             {
               "decimals": null,
-              "format": "ms",
+              "format": "ops",
               "label": null,
               "logBase": 1,
               "max": null,
@@ -682,7 +787,7 @@
           "bars": false,
           "cacheTimeout": null,
           "datasource": "${DS_PROM}",
-          "description": null,
+          "description": "Round latency breakdown. When there are streaks within one round each iteration is measured separately.",
           "editable": true,
           "error": false,
           "fieldConfig": {
@@ -746,16 +851,61 @@
           "targets": [
             {
               "datasource": null,
-              "expr": "sum(rate(flyte:propeller:all:round:raw_ms[5m])) by (wf)",
+              "expr": "sum(flyte:propeller:all:round:raw_unlabeled_ms) by (quantile)",
               "format": "time_series",
               "hide": false,
               "instant": false,
               "interval": "",
               "intervalFactor": 2,
-              "legendFormat": "",
+              "legendFormat": "traverse-P{{quantile}}",
               "metric": "",
-              "query": "sum(rate(flyte:propeller:all:round:raw_ms[5m])) by (wf)",
+              "query": "sum(flyte:propeller:all:round:raw_unlabeled_ms) by (quantile)",
               "refId": "A",
+              "step": 10,
+              "target": ""
+            },
+            {
+              "datasource": null,
+              "expr": "avg(flyte:propeller:all:round:raw_unlabeled_ms_sum/flyte:propeller:all:round:raw_unlabeled_ms_count)",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "traverse-mean",
+              "metric": "",
+              "query": "avg(flyte:propeller:all:round:raw_unlabeled_ms_sum/flyte:propeller:all:round:raw_unlabeled_ms_count)",
+              "refId": "B",
+              "step": 10,
+              "target": ""
+            },
+            {
+              "datasource": null,
+              "expr": "sum(flyte:propeller:all:round:round_time_ms) by (quantile)",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "total-P{{quantile}}",
+              "metric": "",
+              "query": "sum(flyte:propeller:all:round:round_time_ms) by (quantile)",
+              "refId": "C",
+              "step": 10,
+              "target": ""
+            },
+            {
+              "datasource": null,
+              "expr": "avg(flyte:propeller:all:round:round_time_unlabeled_ms_sum/flyte:propeller:all:round:round_time_unlabeled_ms_count)",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "total-mean",
+              "metric": "",
+              "query": "avg(flyte:propeller:all:round:round_time_unlabeled_ms_sum/flyte:propeller:all:round:round_time_unlabeled_ms_count)",
+              "refId": "D",
               "step": 10,
               "target": ""
             }
@@ -763,7 +913,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "round Latency per workflow",
+          "title": "Round Latency (includes streak rounds)",
           "tooltip": {
             "msResolution": true,
             "shared": true,
@@ -809,7 +959,7 @@
           "bars": false,
           "cacheTimeout": null,
           "datasource": "${DS_PROM}",
-          "description": null,
+          "description": "Round latency by workflow name. When there are streaks within one round each iteration is measured separately.",
           "editable": true,
           "error": false,
           "fieldConfig": {
@@ -873,15 +1023,15 @@
           "targets": [
             {
               "datasource": null,
-              "expr": "sum(rate(flyte:propeller:all:round:panic_unlabeled[5m]))",
+              "expr": "sum(flyte:propeller:all:round:raw_ms) by (wf)",
               "format": "time_series",
               "hide": false,
               "instant": false,
               "interval": "",
               "intervalFactor": 2,
-              "legendFormat": "",
+              "legendFormat": "{{wf}}",
               "metric": "",
-              "query": "sum(rate(flyte:propeller:all:round:panic_unlabeled[5m]))",
+              "query": "sum(flyte:propeller:all:round:raw_ms) by (wf)",
               "refId": "A",
               "step": 10,
               "target": ""
@@ -890,7 +1040,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "Round panic",
+          "title": "Round traverse latency per workflow",
           "tooltip": {
             "msResolution": true,
             "shared": true,
@@ -909,7 +1059,7 @@
           "yaxes": [
             {
               "decimals": null,
-              "format": "ops",
+              "format": "ms",
               "label": null,
               "logBase": 1,
               "max": null,
@@ -936,7 +1086,7 @@
           "bars": false,
           "cacheTimeout": null,
           "datasource": "${DS_PROM}",
-          "description": null,
+          "description": "Count of currently running workflows running per project",
           "editable": true,
           "error": false,
           "fieldConfig": {
@@ -1036,6 +1186,133 @@
           "yaxes": [
             {
               "decimals": null,
+              "format": "none",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "decimals": null,
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": 0
+          }
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "cacheTimeout": null,
+          "datasource": "${DS_PROM}",
+          "description": "Rate at which workflows are being enqueued by flytepropeller. These enqueues all pass through the sub-queue before going back into the main queue.",
+          "editable": true,
+          "error": false,
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": {
+                "mode": "absolute",
+                "steps": []
+              }
+            }
+          },
+          "fill": 1,
+          "grid": {
+            "threshold1": null,
+            "threshold1Color": "rgba(216, 200, 27, 0.27)",
+            "threshold2": null,
+            "threshold2Color": "rgba(234, 112, 112, 0.22)"
+          },
+          "gridPos": null,
+          "height": null,
+          "hideTimeOverride": false,
+          "id": 9,
+          "interval": null,
+          "isNew": true,
+          "legend": {
+            "alignAsTable": false,
+            "avg": false,
+            "current": false,
+            "hideEmpty": false,
+            "hideZero": false,
+            "max": false,
+            "min": false,
+            "rightSide": false,
+            "show": true,
+            "sideWidth": null,
+            "sort": null,
+            "sortDesc": false,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 2,
+          "links": [],
+          "maxDataPoints": 100,
+          "maxPerRow": null,
+          "minSpan": null,
+          "nullPointMode": "connected",
+          "options": {
+            "alertThreshold": true,
+            "dataLinks": []
+          },
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "repeat": null,
+          "repeatDirection": null,
+          "seriesOverrides": [],
+          "span": 2,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "datasource": null,
+              "expr": "sum by(type) (rate(flyte:propeller:all:wf_enqueue[5m]))",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "",
+              "metric": "",
+              "query": "sum by(type) (rate(flyte:propeller:all:wf_enqueue[5m]))",
+              "refId": "A",
+              "step": 10,
+              "target": ""
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Workflow enqueue rate",
+          "tooltip": {
+            "msResolution": true,
+            "shared": true,
+            "sort": 0,
+            "value_type": "cumulative"
+          },
+          "transformations": [],
+          "transparent": false,
+          "type": "graph",
+          "xaxis": {
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "decimals": null,
               "format": "ops",
               "label": null,
               "logBase": 1,
@@ -1062,6 +1339,644 @@
       "repeat": null,
       "showTitle": true,
       "title": "Core metrics"
+    },
+    {
+      "collapse": false,
+      "editable": true,
+      "height": "250px",
+      "panels": [
+        {
+          "aliasColors": {},
+          "bars": false,
+          "cacheTimeout": null,
+          "datasource": "${DS_PROM}",
+          "description": "Rate at which items are actually added to the queue. If an item is already on the queue attempting to add it will be a no-op. Usually there is also rate limiting that will delay items from being added to the queue.",
+          "editable": true,
+          "error": false,
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": {
+                "mode": "absolute",
+                "steps": []
+              }
+            }
+          },
+          "fill": 1,
+          "grid": {
+            "threshold1": null,
+            "threshold1Color": "rgba(216, 200, 27, 0.27)",
+            "threshold2": null,
+            "threshold2Color": "rgba(234, 112, 112, 0.22)"
+          },
+          "gridPos": null,
+          "height": null,
+          "hideTimeOverride": false,
+          "id": 10,
+          "interval": null,
+          "isNew": true,
+          "legend": {
+            "alignAsTable": false,
+            "avg": false,
+            "current": false,
+            "hideEmpty": false,
+            "hideZero": false,
+            "max": false,
+            "min": false,
+            "rightSide": false,
+            "show": true,
+            "sideWidth": null,
+            "sort": null,
+            "sortDesc": false,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 2,
+          "links": [],
+          "maxDataPoints": 100,
+          "maxPerRow": null,
+          "minSpan": null,
+          "nullPointMode": "connected",
+          "options": {
+            "alertThreshold": true,
+            "dataLinks": []
+          },
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "repeat": null,
+          "repeatDirection": null,
+          "seriesOverrides": [],
+          "span": 3,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "datasource": null,
+              "expr": "sum(rate(flyte:propeller:all:main_adds[5m]))",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "main",
+              "metric": "",
+              "query": "sum(rate(flyte:propeller:all:main_adds[5m]))",
+              "refId": "A",
+              "step": 10,
+              "target": ""
+            },
+            {
+              "datasource": null,
+              "expr": "sum(rate(flyte:propeller:all:sub_adds[5m]))",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "sub",
+              "metric": "",
+              "query": "sum(rate(flyte:propeller:all:sub_adds[5m]))",
+              "refId": "B",
+              "step": 10,
+              "target": ""
+            },
+            {
+              "datasource": null,
+              "expr": "sum(rate(flyte:propeller:all:admin_launcher:_adds[5m]))",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "admin_launcher",
+              "metric": "",
+              "query": "sum(rate(flyte:propeller:all:admin_launcher:_adds[5m]))",
+              "refId": "C",
+              "step": 10,
+              "target": ""
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Add rate to queue",
+          "tooltip": {
+            "msResolution": true,
+            "shared": true,
+            "sort": 0,
+            "value_type": "cumulative"
+          },
+          "transformations": [],
+          "transparent": false,
+          "type": "graph",
+          "xaxis": {
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "decimals": null,
+              "format": "ops",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "decimals": null,
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": 0
+          }
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "cacheTimeout": null,
+          "datasource": "${DS_PROM}",
+          "description": "Tracks every rate limited add synchronously before rate limiting delays or deduplication",
+          "editable": true,
+          "error": false,
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": {
+                "mode": "absolute",
+                "steps": []
+              }
+            }
+          },
+          "fill": 1,
+          "grid": {
+            "threshold1": null,
+            "threshold1Color": "rgba(216, 200, 27, 0.27)",
+            "threshold2": null,
+            "threshold2Color": "rgba(234, 112, 112, 0.22)"
+          },
+          "gridPos": null,
+          "height": null,
+          "hideTimeOverride": false,
+          "id": 11,
+          "interval": null,
+          "isNew": true,
+          "legend": {
+            "alignAsTable": false,
+            "avg": false,
+            "current": false,
+            "hideEmpty": false,
+            "hideZero": false,
+            "max": false,
+            "min": false,
+            "rightSide": false,
+            "show": true,
+            "sideWidth": null,
+            "sort": null,
+            "sortDesc": false,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 2,
+          "links": [],
+          "maxDataPoints": 100,
+          "maxPerRow": null,
+          "minSpan": null,
+          "nullPointMode": "connected",
+          "options": {
+            "alertThreshold": true,
+            "dataLinks": []
+          },
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "repeat": null,
+          "repeatDirection": null,
+          "seriesOverrides": [],
+          "span": 3,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "datasource": null,
+              "expr": "sum(rate(flyte:propeller:all:main_retries[5m]))",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "main",
+              "metric": "",
+              "query": "sum(rate(flyte:propeller:all:main_retries[5m]))",
+              "refId": "A",
+              "step": 10,
+              "target": ""
+            },
+            {
+              "datasource": null,
+              "expr": "sum(rate(flyte:propeller:all:sub_retries[5m]))",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "sub",
+              "metric": "",
+              "query": "sum(rate(flyte:propeller:all:sub_retries[5m]))",
+              "refId": "B",
+              "step": 10,
+              "target": ""
+            },
+            {
+              "datasource": null,
+              "expr": "sum(rate(flyte:propeller:all:admin_launcher:_retries[5m]))",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "admin_launcher",
+              "metric": "",
+              "query": "sum(rate(flyte:propeller:all:admin_launcher:_retries[5m]))",
+              "refId": "C",
+              "step": 10,
+              "target": ""
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Add rate before rate limiting and deduplication",
+          "tooltip": {
+            "msResolution": true,
+            "shared": true,
+            "sort": 0,
+            "value_type": "cumulative"
+          },
+          "transformations": [],
+          "transparent": false,
+          "type": "graph",
+          "xaxis": {
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "decimals": null,
+              "format": "ops",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "decimals": null,
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": 0
+          }
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "cacheTimeout": null,
+          "datasource": "${DS_PROM}",
+          "description": "The number of items that are currently in the queue but have not been processed yet.",
+          "editable": true,
+          "error": false,
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": {
+                "mode": "absolute",
+                "steps": []
+              }
+            }
+          },
+          "fill": 1,
+          "grid": {
+            "threshold1": null,
+            "threshold1Color": "rgba(216, 200, 27, 0.27)",
+            "threshold2": null,
+            "threshold2Color": "rgba(234, 112, 112, 0.22)"
+          },
+          "gridPos": null,
+          "height": null,
+          "hideTimeOverride": false,
+          "id": 12,
+          "interval": null,
+          "isNew": true,
+          "legend": {
+            "alignAsTable": false,
+            "avg": false,
+            "current": false,
+            "hideEmpty": false,
+            "hideZero": false,
+            "max": false,
+            "min": false,
+            "rightSide": false,
+            "show": true,
+            "sideWidth": null,
+            "sort": null,
+            "sortDesc": false,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 2,
+          "links": [],
+          "maxDataPoints": 100,
+          "maxPerRow": null,
+          "minSpan": null,
+          "nullPointMode": "connected",
+          "options": {
+            "alertThreshold": true,
+            "dataLinks": []
+          },
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "repeat": null,
+          "repeatDirection": null,
+          "seriesOverrides": [],
+          "span": 3,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "datasource": null,
+              "expr": "sum(flyte:propeller:all:main_depth)",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "main",
+              "metric": "",
+              "query": "sum(flyte:propeller:all:main_depth)",
+              "refId": "A",
+              "step": 10,
+              "target": ""
+            },
+            {
+              "datasource": null,
+              "expr": "sum(flyte:propeller:all:sub_depth)",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "sub",
+              "metric": "",
+              "query": "sum(flyte:propeller:all:sub_depth)",
+              "refId": "B",
+              "step": 10,
+              "target": ""
+            },
+            {
+              "datasource": null,
+              "expr": "sum(flyte:propeller:all:admin_launcher:_depth)",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "admin_launcher",
+              "metric": "",
+              "query": "sum(flyte:propeller:all:admin_launcher:_depth)",
+              "refId": "C",
+              "step": 10,
+              "target": ""
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Unprocessed Queue depth",
+          "tooltip": {
+            "msResolution": true,
+            "shared": true,
+            "sort": 0,
+            "value_type": "cumulative"
+          },
+          "transformations": [],
+          "transparent": false,
+          "type": "graph",
+          "xaxis": {
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "decimals": null,
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "decimals": null,
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": 0
+          }
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "cacheTimeout": null,
+          "datasource": "${DS_PROM}",
+          "description": "Sum of the current in progress time of every in progress item in the queue.",
+          "editable": true,
+          "error": false,
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": {
+                "mode": "absolute",
+                "steps": []
+              }
+            }
+          },
+          "fill": 1,
+          "grid": {
+            "threshold1": null,
+            "threshold1Color": "rgba(216, 200, 27, 0.27)",
+            "threshold2": null,
+            "threshold2Color": "rgba(234, 112, 112, 0.22)"
+          },
+          "gridPos": null,
+          "height": null,
+          "hideTimeOverride": false,
+          "id": 13,
+          "interval": null,
+          "isNew": true,
+          "legend": {
+            "alignAsTable": false,
+            "avg": false,
+            "current": false,
+            "hideEmpty": false,
+            "hideZero": false,
+            "max": false,
+            "min": false,
+            "rightSide": false,
+            "show": true,
+            "sideWidth": null,
+            "sort": null,
+            "sortDesc": false,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 2,
+          "links": [],
+          "maxDataPoints": 100,
+          "maxPerRow": null,
+          "minSpan": null,
+          "nullPointMode": "connected",
+          "options": {
+            "alertThreshold": true,
+            "dataLinks": []
+          },
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "repeat": null,
+          "repeatDirection": null,
+          "seriesOverrides": [],
+          "span": 3,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "datasource": null,
+              "expr": "sum(flyte:propeller:all:main_unfinished_work_s)",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "main",
+              "metric": "",
+              "query": "sum(flyte:propeller:all:main_unfinished_work_s)",
+              "refId": "A",
+              "step": 10,
+              "target": ""
+            },
+            {
+              "datasource": null,
+              "expr": "sum(flyte:propeller:all:sub_unfinished_work_s)",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "sub",
+              "metric": "",
+              "query": "sum(flyte:propeller:all:sub_unfinished_work_s)",
+              "refId": "B",
+              "step": 10,
+              "target": ""
+            },
+            {
+              "datasource": null,
+              "expr": "sum(flyte:propeller:all:admin_launcher:_unfinished_work_s)",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "admin_launcher",
+              "metric": "",
+              "query": "sum(flyte:propeller:all:admin_launcher:_unfinished_work_s)",
+              "refId": "C",
+              "step": 10,
+              "target": ""
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Seconds of unfinished work in progress",
+          "tooltip": {
+            "msResolution": true,
+            "shared": true,
+            "sort": 0,
+            "value_type": "cumulative"
+          },
+          "transformations": [],
+          "transparent": false,
+          "type": "graph",
+          "xaxis": {
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "decimals": null,
+              "format": "s",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "decimals": null,
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": 0
+          }
+        }
+      ],
+      "repeat": null,
+      "showTitle": true,
+      "title": "FlytePropeller Queue metrics"
     },
     {
       "collapse": true,
@@ -1094,7 +2009,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 9,
+          "id": 14,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -1221,7 +2136,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 10,
+          "id": 15,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -1341,7 +2256,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "Failures from metastore",
+          "title": "Metastore failure rate",
           "tooltip": {
             "msResolution": true,
             "shared": true,
@@ -1418,7 +2333,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 11,
+          "id": 16,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -1545,7 +2460,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 12,
+          "id": 17,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -1672,7 +2587,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 13,
+          "id": 18,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -1799,7 +2714,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 14,
+          "id": 19,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -1926,7 +2841,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 15,
+          "id": 20,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -1975,7 +2890,7 @@
               "instant": false,
               "interval": "",
               "intervalFactor": 2,
-              "legendFormat": "proto-fetch",
+              "legendFormat": "proto-fetch-P{{quantile}}",
               "metric": "",
               "query": "sum(flyte:propeller:all:metastore:proto_fetch_ms) by (quantile, wf)",
               "refId": "A",
@@ -1990,7 +2905,7 @@
               "instant": false,
               "interval": "",
               "intervalFactor": 2,
-              "legendFormat": "remote-fetch",
+              "legendFormat": "remote-fetch-P{{quantile}}",
               "metric": "",
               "query": "sum(flyte:propeller:all:metastore:remote_fetch_ms) by (quantile, wf)",
               "refId": "B",
@@ -2078,7 +2993,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 16,
+          "id": 21,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -2205,7 +3120,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 17,
+          "id": 22,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -2332,7 +3247,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 18,
+          "id": 23,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -2474,7 +3389,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 19,
+          "id": 24,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -2553,7 +3468,7 @@
               "instant": false,
               "interval": "",
               "intervalFactor": 2,
-              "legendFormat": "user error",
+              "legendFormat": "unknown error",
               "metric": "",
               "query": "sum(rate(flyte:propeller:all:node:perma_unknown_error_duration_unlabeled_ms[5m]))",
               "refId": "C",
@@ -2564,7 +3479,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "node event recording count",
+          "title": "node event recording error rate breakdown",
           "tooltip": {
             "msResolution": true,
             "shared": true,
@@ -2583,7 +3498,7 @@
           "yaxes": [
             {
               "decimals": null,
-              "format": "none",
+              "format": "ops",
               "label": null,
               "logBase": 1,
               "max": null,
@@ -2641,7 +3556,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 20,
+          "id": 25,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -2768,7 +3683,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 21,
+          "id": 26,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -2843,7 +3758,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "wf event recording count",
+          "title": "wf event recording rate",
           "tooltip": {
             "msResolution": true,
             "shared": true,
@@ -2862,7 +3777,7 @@
           "yaxes": [
             {
               "decimals": null,
-              "format": "none",
+              "format": "ops",
               "label": null,
               "logBase": 1,
               "max": null,
@@ -2910,7 +3825,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 22,
+          "id": 27,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -2970,7 +3885,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "node event recording latency success",
+          "title": "node event recording latency",
           "tooltip": {
             "msResolution": true,
             "shared": true,
@@ -3037,7 +3952,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 23,
+          "id": 28,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -3086,7 +4001,7 @@
               "instant": false,
               "interval": "",
               "intervalFactor": 2,
-              "legendFormat": "success",
+              "legendFormat": "success-{{wf}}",
               "metric": "",
               "query": "sum(rate(flyte:propeller:all:node:event_recording:success_duration_ms_count[5m])) by (wf)",
               "refId": "A",
@@ -3101,7 +4016,7 @@
               "instant": false,
               "interval": "",
               "intervalFactor": 2,
-              "legendFormat": "failure",
+              "legendFormat": "failure-{{wf}}",
               "metric": "",
               "query": "sum(rate(flyte:propeller:all:node:event_recording:failure_duration_ms_count[5m])) by (wf)",
               "refId": "B",
@@ -3112,7 +4027,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "node event recording count",
+          "title": "node event recording rate",
           "tooltip": {
             "msResolution": true,
             "shared": true,
@@ -3131,7 +4046,7 @@
           "yaxes": [
             {
               "decimals": null,
-              "format": "none",
+              "format": "ops",
               "label": null,
               "logBase": 1,
               "max": null,
@@ -3179,7 +4094,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 24,
+          "id": 29,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -3306,7 +4221,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 25,
+          "id": 30,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -3355,7 +4270,7 @@
               "instant": false,
               "interval": "",
               "intervalFactor": 2,
-              "legendFormat": "success wf",
+              "legendFormat": "success-{{wf}}",
               "metric": "",
               "query": "sum(rate(flyte:propeller:all:task:event_recording:success_duration_ms_count[5m])) by (wf)",
               "refId": "A",
@@ -3370,7 +4285,7 @@
               "instant": false,
               "interval": "",
               "intervalFactor": 2,
-              "legendFormat": "failure",
+              "legendFormat": "failure-{{wf}}",
               "metric": "",
               "query": "sum(rate(flyte:propeller:all:task:event_recording:failure_duration_ms_count[5m])) by (wf)",
               "refId": "B",
@@ -3381,7 +4296,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "task event recording count",
+          "title": "task event recording rate",
           "tooltip": {
             "msResolution": true,
             "shared": true,
@@ -3400,7 +4315,7 @@
           "yaxes": [
             {
               "decimals": null,
-              "format": "none",
+              "format": "ops",
               "label": null,
               "logBase": 1,
               "max": null,
@@ -3448,7 +4363,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 26,
+          "id": 31,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -3575,7 +4490,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 27,
+          "id": 32,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -3635,7 +4550,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "Dynamic workflow build count",
+          "title": "Dynamic workflow build rate",
           "tooltip": {
             "msResolution": true,
             "shared": true,
@@ -3654,7 +4569,7 @@
           "yaxes": [
             {
               "decimals": null,
-              "format": "none",
+              "format": "ops",
               "label": null,
               "logBase": 1,
               "max": null,
@@ -3681,7 +4596,7 @@
           "bars": false,
           "cacheTimeout": null,
           "datasource": "${DS_PROM}",
-          "description": null,
+          "description": "Cache hit rate when admin launcher is queried for the status of a workflow. Admin launcher will update status of workflows in the cache on a polling interval.",
           "editable": true,
           "error": false,
           "fieldConfig": {
@@ -3702,7 +4617,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 28,
+          "id": 33,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -3777,7 +4692,1151 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "Admin Launcher cache",
+          "title": "Admin Launcher cache hit/miss rate",
+          "tooltip": {
+            "msResolution": true,
+            "shared": true,
+            "sort": 0,
+            "value_type": "cumulative"
+          },
+          "transformations": [],
+          "transparent": false,
+          "type": "graph",
+          "xaxis": {
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "decimals": null,
+              "format": "ops",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "decimals": null,
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": 0
+          }
+        }
+      ],
+      "repeat": null,
+      "showTitle": true,
+      "title": "Perf metrics"
+    },
+    {
+      "collapse": true,
+      "editable": true,
+      "height": "250px",
+      "panels": [
+        {
+          "cacheTimeout": null,
+          "datasource": "${DS_PROM}",
+          "description": null,
+          "editable": true,
+          "error": false,
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "index": 0,
+                    "line": true,
+                    "op": "gt",
+                    "value": "null",
+                    "yaxis": "left"
+                  },
+                  {
+                    "color": "red",
+                    "index": 1,
+                    "line": true,
+                    "op": "gt",
+                    "value": 80.0,
+                    "yaxis": "left"
+                  }
+                ]
+              }
+            }
+          },
+          "gridPos": null,
+          "height": null,
+          "hideTimeOverride": false,
+          "id": 34,
+          "interval": null,
+          "links": [],
+          "maxDataPoints": 100,
+          "maxPerRow": null,
+          "minSpan": null,
+          "options": {
+            "displayMode": "gradient",
+            "fieldOptions": {
+              "calcs": [
+                "sum"
+              ],
+              "defaults": {
+                "decimals": null,
+                "links": [],
+                "max": 200,
+                "min": 0,
+                "title": null,
+                "unit": "none"
+              },
+              "limit": null,
+              "mappings": [],
+              "override": {},
+              "thresholds": [
+                {
+                  "color": "green",
+                  "index": 0,
+                  "line": true,
+                  "op": "gt",
+                  "value": "null",
+                  "yaxis": "left"
+                },
+                {
+                  "color": "red",
+                  "index": 1,
+                  "line": true,
+                  "op": "gt",
+                  "value": 80.0,
+                  "yaxis": "left"
+                }
+              ],
+              "values": false
+            },
+            "orientation": "vertical",
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true
+          },
+          "repeat": null,
+          "repeatDirection": null,
+          "span": 12,
+          "targets": [
+            {
+              "datasource": null,
+              "expr": "sum by(le) (rate(grpc_client_handling_seconds_bucket[5m]))",
+              "format": "heatmap",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "{{le}}",
+              "metric": "",
+              "query": "sum by(le) (rate(grpc_client_handling_seconds_bucket[5m]))",
+              "refId": "A",
+              "step": 10,
+              "target": ""
+            }
+          ],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "All GRPC calls latency",
+          "transformations": [],
+          "transparent": false,
+          "type": "bargauge"
+        }
+      ],
+      "repeat": null,
+      "showTitle": true,
+      "title": "GRPC latency metrics"
+    },
+    {
+      "collapse": false,
+      "editable": true,
+      "height": "250px",
+      "panels": [
+        {
+          "aliasColors": {},
+          "bars": false,
+          "cacheTimeout": null,
+          "datasource": "${DS_PROM}",
+          "description": null,
+          "editable": true,
+          "error": false,
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": {
+                "mode": "absolute",
+                "steps": []
+              }
+            }
+          },
+          "fill": 1,
+          "grid": {
+            "threshold1": null,
+            "threshold1Color": "rgba(216, 200, 27, 0.27)",
+            "threshold2": null,
+            "threshold2Color": "rgba(234, 112, 112, 0.22)"
+          },
+          "gridPos": null,
+          "height": null,
+          "hideTimeOverride": false,
+          "id": 35,
+          "interval": null,
+          "isNew": true,
+          "legend": {
+            "alignAsTable": false,
+            "avg": false,
+            "current": false,
+            "hideEmpty": false,
+            "hideZero": false,
+            "max": false,
+            "min": false,
+            "rightSide": false,
+            "show": true,
+            "sideWidth": null,
+            "sort": null,
+            "sortDesc": false,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 2,
+          "links": [],
+          "maxDataPoints": 100,
+          "maxPerRow": null,
+          "minSpan": null,
+          "nullPointMode": "connected",
+          "options": {
+            "alertThreshold": true,
+            "dataLinks": []
+          },
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "repeat": null,
+          "repeatDirection": null,
+          "seriesOverrides": [],
+          "span": 2,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "datasource": null,
+              "expr": "sum(flyte:propeller:all:workflow:acceptance_latency_ms) by (wf)",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "",
+              "metric": "",
+              "query": "sum(flyte:propeller:all:workflow:acceptance_latency_ms) by (wf)",
+              "refId": "A",
+              "step": 10,
+              "target": ""
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Workflow acceptance latency per workflow",
+          "tooltip": {
+            "msResolution": true,
+            "shared": true,
+            "sort": 0,
+            "value_type": "cumulative"
+          },
+          "transformations": [],
+          "transparent": false,
+          "type": "graph",
+          "xaxis": {
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "decimals": null,
+              "format": "ms",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "decimals": null,
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": 0
+          }
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "cacheTimeout": null,
+          "datasource": "${DS_PROM}",
+          "description": null,
+          "editable": true,
+          "error": false,
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": {
+                "mode": "absolute",
+                "steps": []
+              }
+            }
+          },
+          "fill": 1,
+          "grid": {
+            "threshold1": null,
+            "threshold1Color": "rgba(216, 200, 27, 0.27)",
+            "threshold2": null,
+            "threshold2Color": "rgba(234, 112, 112, 0.22)"
+          },
+          "gridPos": null,
+          "height": null,
+          "hideTimeOverride": false,
+          "id": 36,
+          "interval": null,
+          "isNew": true,
+          "legend": {
+            "alignAsTable": false,
+            "avg": false,
+            "current": false,
+            "hideEmpty": false,
+            "hideZero": false,
+            "max": false,
+            "min": false,
+            "rightSide": false,
+            "show": true,
+            "sideWidth": null,
+            "sort": null,
+            "sortDesc": false,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 2,
+          "links": [],
+          "maxDataPoints": 100,
+          "maxPerRow": null,
+          "minSpan": null,
+          "nullPointMode": "connected",
+          "options": {
+            "alertThreshold": true,
+            "dataLinks": []
+          },
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "repeat": null,
+          "repeatDirection": null,
+          "seriesOverrides": [],
+          "span": 2,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "datasource": null,
+              "expr": "sum(flyte:propeller:all:workflow:acceptance_latency_unlabeled_ms) by (quantile)",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "",
+              "metric": "",
+              "query": "sum(flyte:propeller:all:workflow:acceptance_latency_unlabeled_ms) by (quantile)",
+              "refId": "A",
+              "step": 10,
+              "target": ""
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Workflow acceptance latency by quantile",
+          "tooltip": {
+            "msResolution": true,
+            "shared": true,
+            "sort": 0,
+            "value_type": "cumulative"
+          },
+          "transformations": [],
+          "transparent": false,
+          "type": "graph",
+          "xaxis": {
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "decimals": null,
+              "format": "ms",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "decimals": null,
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": 0
+          }
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "cacheTimeout": null,
+          "datasource": "${DS_PROM}",
+          "description": null,
+          "editable": true,
+          "error": false,
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": {
+                "mode": "absolute",
+                "steps": []
+              }
+            }
+          },
+          "fill": 1,
+          "grid": {
+            "threshold1": null,
+            "threshold1Color": "rgba(216, 200, 27, 0.27)",
+            "threshold2": null,
+            "threshold2Color": "rgba(234, 112, 112, 0.22)"
+          },
+          "gridPos": null,
+          "height": null,
+          "hideTimeOverride": false,
+          "id": 37,
+          "interval": null,
+          "isNew": true,
+          "legend": {
+            "alignAsTable": false,
+            "avg": false,
+            "current": false,
+            "hideEmpty": false,
+            "hideZero": false,
+            "max": false,
+            "min": false,
+            "rightSide": false,
+            "show": true,
+            "sideWidth": null,
+            "sort": null,
+            "sortDesc": false,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 2,
+          "links": [],
+          "maxDataPoints": 100,
+          "maxPerRow": null,
+          "minSpan": null,
+          "nullPointMode": "connected",
+          "options": {
+            "alertThreshold": true,
+            "dataLinks": []
+          },
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "repeat": null,
+          "repeatDirection": null,
+          "seriesOverrides": [],
+          "span": 2,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "datasource": null,
+              "expr": "sum(flyte:propeller:all:node:transition_latency_ms) by (wf)",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "",
+              "metric": "",
+              "query": "sum(flyte:propeller:all:node:transition_latency_ms) by (wf)",
+              "refId": "A",
+              "step": 10,
+              "target": ""
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Node transition latency per workflow",
+          "tooltip": {
+            "msResolution": true,
+            "shared": true,
+            "sort": 0,
+            "value_type": "cumulative"
+          },
+          "transformations": [],
+          "transparent": false,
+          "type": "graph",
+          "xaxis": {
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "decimals": null,
+              "format": "ms",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "decimals": null,
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": 0
+          }
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "cacheTimeout": null,
+          "datasource": "${DS_PROM}",
+          "description": null,
+          "editable": true,
+          "error": false,
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": {
+                "mode": "absolute",
+                "steps": []
+              }
+            }
+          },
+          "fill": 1,
+          "grid": {
+            "threshold1": null,
+            "threshold1Color": "rgba(216, 200, 27, 0.27)",
+            "threshold2": null,
+            "threshold2Color": "rgba(234, 112, 112, 0.22)"
+          },
+          "gridPos": null,
+          "height": null,
+          "hideTimeOverride": false,
+          "id": 38,
+          "interval": null,
+          "isNew": true,
+          "legend": {
+            "alignAsTable": false,
+            "avg": false,
+            "current": false,
+            "hideEmpty": false,
+            "hideZero": false,
+            "max": false,
+            "min": false,
+            "rightSide": false,
+            "show": true,
+            "sideWidth": null,
+            "sort": null,
+            "sortDesc": false,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 2,
+          "links": [],
+          "maxDataPoints": 100,
+          "maxPerRow": null,
+          "minSpan": null,
+          "nullPointMode": "connected",
+          "options": {
+            "alertThreshold": true,
+            "dataLinks": []
+          },
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "repeat": null,
+          "repeatDirection": null,
+          "seriesOverrides": [],
+          "span": 2,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "datasource": null,
+              "expr": "sum(flyte:propeller:all:node:transition_latency_unlabeled_ms) by (quantile)",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "",
+              "metric": "",
+              "query": "sum(flyte:propeller:all:node:transition_latency_unlabeled_ms) by (quantile)",
+              "refId": "A",
+              "step": 10,
+              "target": ""
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Node transition latency by quantile",
+          "tooltip": {
+            "msResolution": true,
+            "shared": true,
+            "sort": 0,
+            "value_type": "cumulative"
+          },
+          "transformations": [],
+          "transparent": false,
+          "type": "graph",
+          "xaxis": {
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "decimals": null,
+              "format": "ms",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "decimals": null,
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": 0
+          }
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "cacheTimeout": null,
+          "datasource": "${DS_PROM}",
+          "description": null,
+          "editable": true,
+          "error": false,
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": {
+                "mode": "absolute",
+                "steps": []
+              }
+            }
+          },
+          "fill": 1,
+          "grid": {
+            "threshold1": null,
+            "threshold1Color": "rgba(216, 200, 27, 0.27)",
+            "threshold2": null,
+            "threshold2Color": "rgba(234, 112, 112, 0.22)"
+          },
+          "gridPos": null,
+          "height": null,
+          "hideTimeOverride": false,
+          "id": 39,
+          "interval": null,
+          "isNew": true,
+          "legend": {
+            "alignAsTable": false,
+            "avg": false,
+            "current": false,
+            "hideEmpty": false,
+            "hideZero": false,
+            "max": false,
+            "min": false,
+            "rightSide": false,
+            "show": true,
+            "sideWidth": null,
+            "sort": null,
+            "sortDesc": false,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 2,
+          "links": [],
+          "maxDataPoints": 100,
+          "maxPerRow": null,
+          "minSpan": null,
+          "nullPointMode": "connected",
+          "options": {
+            "alertThreshold": true,
+            "dataLinks": []
+          },
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "repeat": null,
+          "repeatDirection": null,
+          "seriesOverrides": [],
+          "span": 2,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "datasource": null,
+              "expr": "sum(flyte:propeller:all:node:queueing_latency_ms) by (wf)",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "",
+              "metric": "",
+              "query": "sum(flyte:propeller:all:node:queueing_latency_ms) by (wf)",
+              "refId": "A",
+              "step": 10,
+              "target": ""
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Node queueing latency per workflow",
+          "tooltip": {
+            "msResolution": true,
+            "shared": true,
+            "sort": 0,
+            "value_type": "cumulative"
+          },
+          "transformations": [],
+          "transparent": false,
+          "type": "graph",
+          "xaxis": {
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "decimals": null,
+              "format": "ms",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "decimals": null,
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": 0
+          }
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "cacheTimeout": null,
+          "datasource": "${DS_PROM}",
+          "description": null,
+          "editable": true,
+          "error": false,
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": {
+                "mode": "absolute",
+                "steps": []
+              }
+            }
+          },
+          "fill": 1,
+          "grid": {
+            "threshold1": null,
+            "threshold1Color": "rgba(216, 200, 27, 0.27)",
+            "threshold2": null,
+            "threshold2Color": "rgba(234, 112, 112, 0.22)"
+          },
+          "gridPos": null,
+          "height": null,
+          "hideTimeOverride": false,
+          "id": 40,
+          "interval": null,
+          "isNew": true,
+          "legend": {
+            "alignAsTable": false,
+            "avg": false,
+            "current": false,
+            "hideEmpty": false,
+            "hideZero": false,
+            "max": false,
+            "min": false,
+            "rightSide": false,
+            "show": true,
+            "sideWidth": null,
+            "sort": null,
+            "sortDesc": false,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 2,
+          "links": [],
+          "maxDataPoints": 100,
+          "maxPerRow": null,
+          "minSpan": null,
+          "nullPointMode": "connected",
+          "options": {
+            "alertThreshold": true,
+            "dataLinks": []
+          },
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "repeat": null,
+          "repeatDirection": null,
+          "seriesOverrides": [],
+          "span": 2,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "datasource": null,
+              "expr": "sum(flyte:propeller:all:node:queueing_latency_unlabeled_ms) by (quantile)",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "",
+              "metric": "",
+              "query": "sum(flyte:propeller:all:node:queueing_latency_unlabeled_ms) by (quantile)",
+              "refId": "A",
+              "step": 10,
+              "target": ""
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Node queueing latency by quantile",
+          "tooltip": {
+            "msResolution": true,
+            "shared": true,
+            "sort": 0,
+            "value_type": "cumulative"
+          },
+          "transformations": [],
+          "transparent": false,
+          "type": "graph",
+          "xaxis": {
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "decimals": null,
+              "format": "ms",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "decimals": null,
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": 0
+          }
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "cacheTimeout": null,
+          "datasource": "${DS_PROM}",
+          "description": null,
+          "editable": true,
+          "error": false,
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": {
+                "mode": "absolute",
+                "steps": []
+              }
+            }
+          },
+          "fill": 1,
+          "grid": {
+            "threshold1": null,
+            "threshold1Color": "rgba(216, 200, 27, 0.27)",
+            "threshold2": null,
+            "threshold2Color": "rgba(234, 112, 112, 0.22)"
+          },
+          "gridPos": null,
+          "height": null,
+          "hideTimeOverride": false,
+          "id": 41,
+          "interval": null,
+          "isNew": true,
+          "legend": {
+            "alignAsTable": false,
+            "avg": false,
+            "current": false,
+            "hideEmpty": false,
+            "hideZero": false,
+            "max": false,
+            "min": false,
+            "rightSide": false,
+            "show": true,
+            "sideWidth": null,
+            "sort": null,
+            "sortDesc": false,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 2,
+          "links": [],
+          "maxDataPoints": 100,
+          "maxPerRow": null,
+          "minSpan": null,
+          "nullPointMode": "connected",
+          "options": {
+            "alertThreshold": true,
+            "dataLinks": []
+          },
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "repeat": null,
+          "repeatDirection": null,
+          "seriesOverrides": [],
+          "span": 2,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "datasource": null,
+              "expr": "sum(flyte:propeller:all:workflow:completion_latency_ms) by (wf)",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "",
+              "metric": "",
+              "query": "sum(flyte:propeller:all:workflow:completion_latency_ms) by (wf)",
+              "refId": "A",
+              "step": 10,
+              "target": ""
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Workflow completion latency per workflow",
+          "tooltip": {
+            "msResolution": true,
+            "shared": true,
+            "sort": 0,
+            "value_type": "cumulative"
+          },
+          "transformations": [],
+          "transparent": false,
+          "type": "graph",
+          "xaxis": {
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "decimals": null,
+              "format": "ms",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "decimals": null,
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": 0
+          }
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "cacheTimeout": null,
+          "datasource": "${DS_PROM}",
+          "description": null,
+          "editable": true,
+          "error": false,
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": {
+                "mode": "absolute",
+                "steps": []
+              }
+            }
+          },
+          "fill": 1,
+          "grid": {
+            "threshold1": null,
+            "threshold1Color": "rgba(216, 200, 27, 0.27)",
+            "threshold2": null,
+            "threshold2Color": "rgba(234, 112, 112, 0.22)"
+          },
+          "gridPos": null,
+          "height": null,
+          "hideTimeOverride": false,
+          "id": 42,
+          "interval": null,
+          "isNew": true,
+          "legend": {
+            "alignAsTable": false,
+            "avg": false,
+            "current": false,
+            "hideEmpty": false,
+            "hideZero": false,
+            "max": false,
+            "min": false,
+            "rightSide": false,
+            "show": true,
+            "sideWidth": null,
+            "sort": null,
+            "sortDesc": false,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 2,
+          "links": [],
+          "maxDataPoints": 100,
+          "maxPerRow": null,
+          "minSpan": null,
+          "nullPointMode": "connected",
+          "options": {
+            "alertThreshold": true,
+            "dataLinks": []
+          },
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "repeat": null,
+          "repeatDirection": null,
+          "seriesOverrides": [],
+          "span": 2,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "datasource": null,
+              "expr": "sum(flyte:propeller:all:workflow:completion_latency_unlabeled_ms) by (quantile)",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "",
+              "metric": "",
+              "query": "sum(flyte:propeller:all:workflow:completion_latency_unlabeled_ms) by (quantile)",
+              "refId": "A",
+              "step": 10,
+              "target": ""
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Workflow completion latency by quantile",
           "tooltip": {
             "msResolution": true,
             "shared": true,
@@ -3821,7 +5880,7 @@
       ],
       "repeat": null,
       "showTitle": true,
-      "title": "Perf metrics"
+      "title": "Workflow latencies"
     },
     {
       "collapse": false,
@@ -3854,7 +5913,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 29,
+          "id": 43,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -3981,7 +6040,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 30,
+          "id": 44,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -4041,7 +6100,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "etcD writes",
+          "title": "etcD write rate",
           "tooltip": {
             "msResolution": true,
             "shared": true,
@@ -4060,7 +6119,7 @@
           "yaxes": [
             {
               "decimals": null,
-              "format": "none",
+              "format": "ops",
               "label": null,
               "logBase": 1,
               "max": null,
@@ -4108,7 +6167,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 31,
+          "id": 45,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -4168,7 +6227,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "etcD write conflicts",
+          "title": "etcD write conflict rate",
           "tooltip": {
             "msResolution": true,
             "shared": true,
@@ -4187,7 +6246,7 @@
           "yaxes": [
             {
               "decimals": null,
-              "format": "none",
+              "format": "ops",
               "label": null,
               "logBase": 1,
               "max": null,
@@ -4235,7 +6294,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 32,
+          "id": 46,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -4295,7 +6354,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "etcD write fail",
+          "title": "etcD write failure rate",
           "tooltip": {
             "msResolution": true,
             "shared": true,
@@ -4314,7 +6373,134 @@
           "yaxes": [
             {
               "decimals": null,
-              "format": "none",
+              "format": "ops",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "decimals": null,
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": 0
+          }
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "cacheTimeout": null,
+          "datasource": "${DS_PROM}",
+          "description": null,
+          "editable": true,
+          "error": false,
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": {
+                "mode": "absolute",
+                "steps": []
+              }
+            }
+          },
+          "fill": 1,
+          "grid": {
+            "threshold1": null,
+            "threshold1Color": "rgba(216, 200, 27, 0.27)",
+            "threshold2": null,
+            "threshold2Color": "rgba(234, 112, 112, 0.22)"
+          },
+          "gridPos": null,
+          "height": null,
+          "hideTimeOverride": false,
+          "id": 47,
+          "interval": null,
+          "isNew": true,
+          "legend": {
+            "alignAsTable": false,
+            "avg": false,
+            "current": false,
+            "hideEmpty": false,
+            "hideZero": false,
+            "max": false,
+            "min": false,
+            "rightSide": false,
+            "show": true,
+            "sideWidth": null,
+            "sort": null,
+            "sortDesc": false,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 2,
+          "links": [],
+          "maxDataPoints": 100,
+          "maxPerRow": null,
+          "minSpan": null,
+          "nullPointMode": "connected",
+          "options": {
+            "alertThreshold": true,
+            "dataLinks": []
+          },
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "repeat": null,
+          "repeatDirection": null,
+          "seriesOverrides": [],
+          "span": 3,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "datasource": null,
+              "expr": "sum(rate(flyte:propeller:all:wf_too_large[5m]))",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "",
+              "metric": "",
+              "query": "sum(rate(flyte:propeller:all:wf_too_large[5m]))",
+              "refId": "A",
+              "step": 10,
+              "target": ""
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "etcD write too large rate",
+          "tooltip": {
+            "msResolution": true,
+            "shared": true,
+            "sort": 0,
+            "value_type": "cumulative"
+          },
+          "transformations": [],
+          "transparent": false,
+          "type": "graph",
+          "xaxis": {
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "decimals": null,
+              "format": "ops",
               "label": null,
               "logBase": 1,
               "max": null,
@@ -4372,7 +6558,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 33,
+          "id": 48,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -4409,13 +6595,13 @@
           "repeat": null,
           "repeatDirection": null,
           "seriesOverrides": [],
-          "span": 2,
+          "span": 6,
           "stack": false,
           "steppedLine": false,
           "targets": [
             {
               "datasource": null,
-              "expr": "sum(rate(flyte:propeller:all:main_adds[5m]))",
+              "expr": "sum(rate(flyte:propeller:all:node:container:container:informer_update[5m]))",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -4423,7 +6609,7 @@
               "intervalFactor": 2,
               "legendFormat": "",
               "metric": "",
-              "query": "sum(rate(flyte:propeller:all:main_adds[5m]))",
+              "query": "sum(rate(flyte:propeller:all:node:container:container:informer_update[5m]))",
               "refId": "A",
               "step": 10,
               "target": ""
@@ -4432,7 +6618,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "WF Adds to main queue",
+          "title": "Update event rate from informer",
           "tooltip": {
             "msResolution": true,
             "shared": true,
@@ -4451,7 +6637,7 @@
           "yaxes": [
             {
               "decimals": null,
-              "format": "short",
+              "format": "ops",
               "label": null,
               "logBase": 1,
               "max": null,
@@ -4499,7 +6685,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 34,
+          "id": 49,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -4536,13 +6722,13 @@
           "repeat": null,
           "repeatDirection": null,
           "seriesOverrides": [],
-          "span": 2,
+          "span": 6,
           "stack": false,
           "steppedLine": false,
           "targets": [
             {
               "datasource": null,
-              "expr": "sum(rate(flyte:propeller:all:main_depth[5m]))",
+              "expr": "sum(rate(flyte:propeller:all:node:container:container:informer_update_dropped[5m]))",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -4550,7 +6736,7 @@
               "intervalFactor": 2,
               "legendFormat": "",
               "metric": "",
-              "query": "sum(rate(flyte:propeller:all:main_depth[5m]))",
+              "query": "sum(rate(flyte:propeller:all:node:container:container:informer_update_dropped[5m]))",
               "refId": "A",
               "step": 10,
               "target": ""
@@ -4559,7 +6745,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "Unprocessed Queue depth",
+          "title": "Update events drop rate becacuse they have the same resource version",
           "tooltip": {
             "msResolution": true,
             "shared": true,
@@ -4578,515 +6764,7 @@
           "yaxes": [
             {
               "decimals": null,
-              "format": "short",
-              "label": null,
-              "logBase": 1,
-              "max": null,
-              "min": null,
-              "show": true
-            },
-            {
-              "decimals": null,
-              "format": "short",
-              "label": null,
-              "logBase": 1,
-              "max": null,
-              "min": null,
-              "show": true
-            }
-          ],
-          "yaxis": {
-            "align": false,
-            "alignLevel": 0
-          }
-        },
-        {
-          "aliasColors": {},
-          "bars": false,
-          "cacheTimeout": null,
-          "datasource": "${DS_PROM}",
-          "description": null,
-          "editable": true,
-          "error": false,
-          "fieldConfig": {
-            "defaults": {
-              "thresholds": {
-                "mode": "absolute",
-                "steps": []
-              }
-            }
-          },
-          "fill": 1,
-          "grid": {
-            "threshold1": null,
-            "threshold1Color": "rgba(216, 200, 27, 0.27)",
-            "threshold2": null,
-            "threshold2Color": "rgba(234, 112, 112, 0.22)"
-          },
-          "gridPos": null,
-          "height": null,
-          "hideTimeOverride": false,
-          "id": 35,
-          "interval": null,
-          "isNew": true,
-          "legend": {
-            "alignAsTable": false,
-            "avg": false,
-            "current": false,
-            "hideEmpty": false,
-            "hideZero": false,
-            "max": false,
-            "min": false,
-            "rightSide": false,
-            "show": true,
-            "sideWidth": null,
-            "sort": null,
-            "sortDesc": false,
-            "total": false,
-            "values": false
-          },
-          "lines": true,
-          "linewidth": 2,
-          "links": [],
-          "maxDataPoints": 100,
-          "maxPerRow": null,
-          "minSpan": null,
-          "nullPointMode": "connected",
-          "options": {
-            "alertThreshold": true,
-            "dataLinks": []
-          },
-          "percentage": false,
-          "pointradius": 5,
-          "points": false,
-          "renderer": "flot",
-          "repeat": null,
-          "repeatDirection": null,
-          "seriesOverrides": [],
-          "span": 2,
-          "stack": false,
-          "steppedLine": false,
-          "targets": [
-            {
-              "datasource": null,
-              "expr": "sum(rate(flyte:propeller:all:main_retries[5m]))",
-              "format": "time_series",
-              "hide": false,
-              "instant": false,
-              "interval": "",
-              "intervalFactor": 2,
-              "legendFormat": "",
-              "metric": "",
-              "query": "sum(rate(flyte:propeller:all:main_retries[5m]))",
-              "refId": "A",
-              "step": 10,
-              "target": ""
-            }
-          ],
-          "thresholds": [],
-          "timeFrom": null,
-          "timeShift": null,
-          "title": "Item retries",
-          "tooltip": {
-            "msResolution": true,
-            "shared": true,
-            "sort": 0,
-            "value_type": "cumulative"
-          },
-          "transformations": [],
-          "transparent": false,
-          "type": "graph",
-          "xaxis": {
-            "mode": "time",
-            "name": null,
-            "show": true,
-            "values": []
-          },
-          "yaxes": [
-            {
-              "decimals": null,
-              "format": "short",
-              "label": null,
-              "logBase": 1,
-              "max": null,
-              "min": null,
-              "show": true
-            },
-            {
-              "decimals": null,
-              "format": "short",
-              "label": null,
-              "logBase": 1,
-              "max": null,
-              "min": null,
-              "show": true
-            }
-          ],
-          "yaxis": {
-            "align": false,
-            "alignLevel": 0
-          }
-        },
-        {
-          "aliasColors": {},
-          "bars": false,
-          "cacheTimeout": null,
-          "datasource": "${DS_PROM}",
-          "description": null,
-          "editable": true,
-          "error": false,
-          "fieldConfig": {
-            "defaults": {
-              "thresholds": {
-                "mode": "absolute",
-                "steps": []
-              }
-            }
-          },
-          "fill": 1,
-          "grid": {
-            "threshold1": null,
-            "threshold1Color": "rgba(216, 200, 27, 0.27)",
-            "threshold2": null,
-            "threshold2Color": "rgba(234, 112, 112, 0.22)"
-          },
-          "gridPos": null,
-          "height": null,
-          "hideTimeOverride": false,
-          "id": 36,
-          "interval": null,
-          "isNew": true,
-          "legend": {
-            "alignAsTable": false,
-            "avg": false,
-            "current": false,
-            "hideEmpty": false,
-            "hideZero": false,
-            "max": false,
-            "min": false,
-            "rightSide": false,
-            "show": true,
-            "sideWidth": null,
-            "sort": null,
-            "sortDesc": false,
-            "total": false,
-            "values": false
-          },
-          "lines": true,
-          "linewidth": 2,
-          "links": [],
-          "maxDataPoints": 100,
-          "maxPerRow": null,
-          "minSpan": null,
-          "nullPointMode": "connected",
-          "options": {
-            "alertThreshold": true,
-            "dataLinks": []
-          },
-          "percentage": false,
-          "pointradius": 5,
-          "points": false,
-          "renderer": "flot",
-          "repeat": null,
-          "repeatDirection": null,
-          "seriesOverrides": [],
-          "span": 2,
-          "stack": false,
-          "steppedLine": false,
-          "targets": [
-            {
-              "datasource": null,
-              "expr": "flyte:propeller:all:main_unfinished_work_s",
-              "format": "time_series",
-              "hide": false,
-              "instant": false,
-              "interval": "",
-              "intervalFactor": 2,
-              "legendFormat": "",
-              "metric": "",
-              "query": "flyte:propeller:all:main_unfinished_work_s",
-              "refId": "A",
-              "step": 10,
-              "target": ""
-            }
-          ],
-          "thresholds": [],
-          "timeFrom": null,
-          "timeShift": null,
-          "title": "Seconds of unfinished work in progress",
-          "tooltip": {
-            "msResolution": true,
-            "shared": true,
-            "sort": 0,
-            "value_type": "cumulative"
-          },
-          "transformations": [],
-          "transparent": false,
-          "type": "graph",
-          "xaxis": {
-            "mode": "time",
-            "name": null,
-            "show": true,
-            "values": []
-          },
-          "yaxes": [
-            {
-              "decimals": null,
-              "format": "s",
-              "label": null,
-              "logBase": 1,
-              "max": null,
-              "min": null,
-              "show": true
-            },
-            {
-              "decimals": null,
-              "format": "short",
-              "label": null,
-              "logBase": 1,
-              "max": null,
-              "min": null,
-              "show": true
-            }
-          ],
-          "yaxis": {
-            "align": false,
-            "alignLevel": 0
-          }
-        },
-        {
-          "aliasColors": {},
-          "bars": false,
-          "cacheTimeout": null,
-          "datasource": "${DS_PROM}",
-          "description": null,
-          "editable": true,
-          "error": false,
-          "fieldConfig": {
-            "defaults": {
-              "thresholds": {
-                "mode": "absolute",
-                "steps": []
-              }
-            }
-          },
-          "fill": 1,
-          "grid": {
-            "threshold1": null,
-            "threshold1Color": "rgba(216, 200, 27, 0.27)",
-            "threshold2": null,
-            "threshold2Color": "rgba(234, 112, 112, 0.22)"
-          },
-          "gridPos": null,
-          "height": null,
-          "hideTimeOverride": false,
-          "id": 37,
-          "interval": null,
-          "isNew": true,
-          "legend": {
-            "alignAsTable": false,
-            "avg": false,
-            "current": false,
-            "hideEmpty": false,
-            "hideZero": false,
-            "max": false,
-            "min": false,
-            "rightSide": false,
-            "show": true,
-            "sideWidth": null,
-            "sort": null,
-            "sortDesc": false,
-            "total": false,
-            "values": false
-          },
-          "lines": true,
-          "linewidth": 2,
-          "links": [],
-          "maxDataPoints": 100,
-          "maxPerRow": null,
-          "minSpan": null,
-          "nullPointMode": "connected",
-          "options": {
-            "alertThreshold": true,
-            "dataLinks": []
-          },
-          "percentage": false,
-          "pointradius": 5,
-          "points": false,
-          "renderer": "flot",
-          "repeat": null,
-          "repeatDirection": null,
-          "seriesOverrides": [],
-          "span": 2,
-          "stack": false,
-          "steppedLine": false,
-          "targets": [
-            {
-              "datasource": null,
-              "expr": "sum(rate(flyte:propeller:all:main_work_duration_us_sum[5m]) / rate(flyte:propeller:all:main_work_duration_us_count[5m]))",
-              "format": "time_series",
-              "hide": false,
-              "instant": false,
-              "interval": "",
-              "intervalFactor": 2,
-              "legendFormat": "",
-              "metric": "",
-              "query": "sum(rate(flyte:propeller:all:main_work_duration_us_sum[5m]) / rate(flyte:propeller:all:main_work_duration_us_count[5m]))",
-              "refId": "A",
-              "step": 10,
-              "target": ""
-            }
-          ],
-          "thresholds": [],
-          "timeFrom": null,
-          "timeShift": null,
-          "title": "Workqueue work average duration",
-          "tooltip": {
-            "msResolution": true,
-            "shared": true,
-            "sort": 0,
-            "value_type": "cumulative"
-          },
-          "transformations": [],
-          "transparent": false,
-          "type": "graph",
-          "xaxis": {
-            "mode": "time",
-            "name": null,
-            "show": true,
-            "values": []
-          },
-          "yaxes": [
-            {
-              "decimals": null,
-              "format": "s",
-              "label": null,
-              "logBase": 1,
-              "max": null,
-              "min": null,
-              "show": true
-            },
-            {
-              "decimals": null,
-              "format": "short",
-              "label": null,
-              "logBase": 1,
-              "max": null,
-              "min": null,
-              "show": true
-            }
-          ],
-          "yaxis": {
-            "align": false,
-            "alignLevel": 0
-          }
-        },
-        {
-          "aliasColors": {},
-          "bars": false,
-          "cacheTimeout": null,
-          "datasource": "${DS_PROM}",
-          "description": null,
-          "editable": true,
-          "error": false,
-          "fieldConfig": {
-            "defaults": {
-              "thresholds": {
-                "mode": "absolute",
-                "steps": []
-              }
-            }
-          },
-          "fill": 1,
-          "grid": {
-            "threshold1": null,
-            "threshold1Color": "rgba(216, 200, 27, 0.27)",
-            "threshold2": null,
-            "threshold2Color": "rgba(234, 112, 112, 0.22)"
-          },
-          "gridPos": null,
-          "height": null,
-          "hideTimeOverride": false,
-          "id": 38,
-          "interval": null,
-          "isNew": true,
-          "legend": {
-            "alignAsTable": false,
-            "avg": false,
-            "current": false,
-            "hideEmpty": false,
-            "hideZero": false,
-            "max": false,
-            "min": false,
-            "rightSide": false,
-            "show": true,
-            "sideWidth": null,
-            "sort": null,
-            "sortDesc": false,
-            "total": false,
-            "values": false
-          },
-          "lines": true,
-          "linewidth": 2,
-          "links": [],
-          "maxDataPoints": 100,
-          "maxPerRow": null,
-          "minSpan": null,
-          "nullPointMode": "connected",
-          "options": {
-            "alertThreshold": true,
-            "dataLinks": []
-          },
-          "percentage": false,
-          "pointradius": 5,
-          "points": false,
-          "renderer": "flot",
-          "repeat": null,
-          "repeatDirection": null,
-          "seriesOverrides": [],
-          "span": 2,
-          "stack": false,
-          "steppedLine": false,
-          "targets": [
-            {
-              "datasource": null,
-              "expr": "sum(rate(flyte:propeller:all:main_queue_latency_us_sum[5m]) / rate(flyte:propeller:all:main_queue_latency_us_count[5m]))",
-              "format": "time_series",
-              "hide": false,
-              "instant": false,
-              "interval": "",
-              "intervalFactor": 2,
-              "legendFormat": "",
-              "metric": "",
-              "query": "sum(rate(flyte:propeller:all:main_queue_latency_us_sum[5m]) / rate(flyte:propeller:all:main_queue_latency_us_count[5m]))",
-              "refId": "A",
-              "step": 10,
-              "target": ""
-            }
-          ],
-          "thresholds": [],
-          "timeFrom": null,
-          "timeShift": null,
-          "title": "Duration for which an item stays in queue - avg",
-          "tooltip": {
-            "msResolution": true,
-            "shared": true,
-            "sort": 0,
-            "value_type": "cumulative"
-          },
-          "transformations": [],
-          "transparent": false,
-          "type": "graph",
-          "xaxis": {
-            "mode": "time",
-            "name": null,
-            "show": true,
-            "values": []
-          },
-          "yaxes": [
-            {
-              "decimals": null,
-              "format": "s",
+              "format": "ops",
               "label": null,
               "logBase": 1,
               "max": null,
@@ -5111,7 +6789,916 @@
       ],
       "repeat": null,
       "showTitle": true,
-      "title": "FlytePropeller Queue metrics"
+      "title": "K8s Pod Informer stats"
+    },
+    {
+      "collapse": true,
+      "editable": true,
+      "height": "250px",
+      "panels": [
+        {
+          "aliasColors": {},
+          "bars": false,
+          "cacheTimeout": null,
+          "datasource": "${DS_PROM}",
+          "description": null,
+          "editable": true,
+          "error": false,
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": {
+                "mode": "absolute",
+                "steps": []
+              }
+            }
+          },
+          "fill": 1,
+          "grid": {
+            "threshold1": null,
+            "threshold1Color": "rgba(216, 200, 27, 0.27)",
+            "threshold2": null,
+            "threshold2Color": "rgba(234, 112, 112, 0.22)"
+          },
+          "gridPos": null,
+          "height": null,
+          "hideTimeOverride": false,
+          "id": 50,
+          "interval": null,
+          "isNew": true,
+          "legend": {
+            "alignAsTable": false,
+            "avg": false,
+            "current": false,
+            "hideEmpty": false,
+            "hideZero": false,
+            "max": false,
+            "min": false,
+            "rightSide": false,
+            "show": true,
+            "sideWidth": null,
+            "sort": null,
+            "sortDesc": false,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 2,
+          "links": [],
+          "maxDataPoints": 100,
+          "maxPerRow": null,
+          "minSpan": null,
+          "nullPointMode": "connected",
+          "options": {
+            "alertThreshold": true,
+            "dataLinks": []
+          },
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "repeat": null,
+          "repeatDirection": null,
+          "seriesOverrides": [],
+          "span": 4,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "datasource": null,
+              "expr": "sum(rate(flyte:propeller:all:wf_stale_unlabeled[5m])) by (quantile)",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "",
+              "metric": "",
+              "query": "sum(rate(flyte:propeller:all:wf_stale_unlabeled[5m])) by (quantile)",
+              "refId": "A",
+              "step": 10,
+              "target": ""
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Stale workflows rate",
+          "tooltip": {
+            "msResolution": true,
+            "shared": true,
+            "sort": 0,
+            "value_type": "cumulative"
+          },
+          "transformations": [],
+          "transparent": false,
+          "type": "graph",
+          "xaxis": {
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "decimals": null,
+              "format": "ops",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "decimals": null,
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": 0
+          }
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "cacheTimeout": null,
+          "datasource": "${DS_PROM}",
+          "description": null,
+          "editable": true,
+          "error": false,
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": {
+                "mode": "absolute",
+                "steps": []
+              }
+            }
+          },
+          "fill": 1,
+          "grid": {
+            "threshold1": null,
+            "threshold1Color": "rgba(216, 200, 27, 0.27)",
+            "threshold2": null,
+            "threshold2Color": "rgba(234, 112, 112, 0.22)"
+          },
+          "gridPos": null,
+          "height": null,
+          "hideTimeOverride": false,
+          "id": 51,
+          "interval": null,
+          "isNew": true,
+          "legend": {
+            "alignAsTable": false,
+            "avg": false,
+            "current": false,
+            "hideEmpty": false,
+            "hideZero": false,
+            "max": false,
+            "min": false,
+            "rightSide": false,
+            "show": true,
+            "sideWidth": null,
+            "sort": null,
+            "sortDesc": false,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 2,
+          "links": [],
+          "maxDataPoints": 100,
+          "maxPerRow": null,
+          "minSpan": null,
+          "nullPointMode": "connected",
+          "options": {
+            "alertThreshold": true,
+            "dataLinks": []
+          },
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "repeat": null,
+          "repeatDirection": null,
+          "seriesOverrides": [],
+          "span": 4,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "datasource": null,
+              "expr": "sum(rate(flyte:propeller:all:wf_stale_unlabeled[5m])) by (quantile)",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "",
+              "metric": "",
+              "query": "sum(rate(flyte:propeller:all:wf_stale_unlabeled[5m])) by (quantile)",
+              "refId": "A",
+              "step": 10,
+              "target": ""
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Evict workflows rate",
+          "tooltip": {
+            "msResolution": true,
+            "shared": true,
+            "sort": 0,
+            "value_type": "cumulative"
+          },
+          "transformations": [],
+          "transparent": false,
+          "type": "graph",
+          "xaxis": {
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "decimals": null,
+              "format": "ops",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "decimals": null,
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": 0
+          }
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "cacheTimeout": null,
+          "datasource": "${DS_PROM}",
+          "description": null,
+          "editable": true,
+          "error": false,
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": {
+                "mode": "absolute",
+                "steps": []
+              }
+            }
+          },
+          "fill": 1,
+          "grid": {
+            "threshold1": null,
+            "threshold1Color": "rgba(216, 200, 27, 0.27)",
+            "threshold2": null,
+            "threshold2Color": "rgba(234, 112, 112, 0.22)"
+          },
+          "gridPos": null,
+          "height": null,
+          "hideTimeOverride": false,
+          "id": 52,
+          "interval": null,
+          "isNew": true,
+          "legend": {
+            "alignAsTable": false,
+            "avg": false,
+            "current": false,
+            "hideEmpty": false,
+            "hideZero": false,
+            "max": false,
+            "min": false,
+            "rightSide": false,
+            "show": true,
+            "sideWidth": null,
+            "sort": null,
+            "sortDesc": false,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 2,
+          "links": [],
+          "maxDataPoints": 100,
+          "maxPerRow": null,
+          "minSpan": null,
+          "nullPointMode": "connected",
+          "options": {
+            "alertThreshold": true,
+            "dataLinks": []
+          },
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "repeat": null,
+          "repeatDirection": null,
+          "seriesOverrides": [],
+          "span": 4,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "datasource": null,
+              "expr": "sum(rate(flyte:propeller:all:wf_redundant_unlabeled[5m])) by (quantile)",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "",
+              "metric": "",
+              "query": "sum(rate(flyte:propeller:all:wf_redundant_unlabeled[5m])) by (quantile)",
+              "refId": "A",
+              "step": 10,
+              "target": ""
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Workflow redundant updates rate",
+          "tooltip": {
+            "msResolution": true,
+            "shared": true,
+            "sort": 0,
+            "value_type": "cumulative"
+          },
+          "transformations": [],
+          "transparent": false,
+          "type": "graph",
+          "xaxis": {
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "decimals": null,
+              "format": "ops",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "decimals": null,
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": 0
+          }
+        }
+      ],
+      "repeat": null,
+      "showTitle": true,
+      "title": "Workflow store"
+    },
+    {
+      "collapse": true,
+      "editable": true,
+      "height": "250px",
+      "panels": [
+        {
+          "aliasColors": {},
+          "bars": false,
+          "cacheTimeout": null,
+          "datasource": "${DS_PROM}",
+          "description": null,
+          "editable": true,
+          "error": false,
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": {
+                "mode": "absolute",
+                "steps": []
+              }
+            }
+          },
+          "fill": 1,
+          "grid": {
+            "threshold1": null,
+            "threshold1Color": "rgba(216, 200, 27, 0.27)",
+            "threshold2": null,
+            "threshold2Color": "rgba(234, 112, 112, 0.22)"
+          },
+          "gridPos": null,
+          "height": null,
+          "hideTimeOverride": false,
+          "id": 53,
+          "interval": null,
+          "isNew": true,
+          "legend": {
+            "alignAsTable": false,
+            "avg": false,
+            "current": false,
+            "hideEmpty": false,
+            "hideZero": false,
+            "max": false,
+            "min": false,
+            "rightSide": false,
+            "show": true,
+            "sideWidth": null,
+            "sort": null,
+            "sortDesc": false,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 2,
+          "links": [],
+          "maxDataPoints": 100,
+          "maxPerRow": null,
+          "minSpan": null,
+          "nullPointMode": "connected",
+          "options": {
+            "alertThreshold": true,
+            "dataLinks": []
+          },
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "repeat": null,
+          "repeatDirection": null,
+          "seriesOverrides": [],
+          "span": 3,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "datasource": null,
+              "expr": "sum(flyte:propeller:all:gc_success)",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "",
+              "metric": "",
+              "query": "sum(flyte:propeller:all:gc_success)",
+              "refId": "A",
+              "step": 10,
+              "target": ""
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Namespace successful garbage collections",
+          "tooltip": {
+            "msResolution": true,
+            "shared": true,
+            "sort": 0,
+            "value_type": "cumulative"
+          },
+          "transformations": [],
+          "transparent": false,
+          "type": "graph",
+          "xaxis": {
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "decimals": null,
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "decimals": null,
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": 0
+          }
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "cacheTimeout": null,
+          "datasource": "${DS_PROM}",
+          "description": null,
+          "editable": true,
+          "error": false,
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": {
+                "mode": "absolute",
+                "steps": []
+              }
+            }
+          },
+          "fill": 1,
+          "grid": {
+            "threshold1": null,
+            "threshold1Color": "rgba(216, 200, 27, 0.27)",
+            "threshold2": null,
+            "threshold2Color": "rgba(234, 112, 112, 0.22)"
+          },
+          "gridPos": null,
+          "height": null,
+          "hideTimeOverride": false,
+          "id": 54,
+          "interval": null,
+          "isNew": true,
+          "legend": {
+            "alignAsTable": false,
+            "avg": false,
+            "current": false,
+            "hideEmpty": false,
+            "hideZero": false,
+            "max": false,
+            "min": false,
+            "rightSide": false,
+            "show": true,
+            "sideWidth": null,
+            "sort": null,
+            "sortDesc": false,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 2,
+          "links": [],
+          "maxDataPoints": 100,
+          "maxPerRow": null,
+          "minSpan": null,
+          "nullPointMode": "connected",
+          "options": {
+            "alertThreshold": true,
+            "dataLinks": []
+          },
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "repeat": null,
+          "repeatDirection": null,
+          "seriesOverrides": [],
+          "span": 3,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "datasource": null,
+              "expr": "sum(flyte:propeller:all:gc_failure)",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "",
+              "metric": "",
+              "query": "sum(flyte:propeller:all:gc_failure)",
+              "refId": "A",
+              "step": 10,
+              "target": ""
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Namespace failed garbage collections",
+          "tooltip": {
+            "msResolution": true,
+            "shared": true,
+            "sort": 0,
+            "value_type": "cumulative"
+          },
+          "transformations": [],
+          "transparent": false,
+          "type": "graph",
+          "xaxis": {
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "decimals": null,
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "decimals": null,
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": 0
+          }
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "cacheTimeout": null,
+          "datasource": "${DS_PROM}",
+          "description": null,
+          "editable": true,
+          "error": false,
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": {
+                "mode": "absolute",
+                "steps": []
+              }
+            }
+          },
+          "fill": 1,
+          "grid": {
+            "threshold1": null,
+            "threshold1Color": "rgba(216, 200, 27, 0.27)",
+            "threshold2": null,
+            "threshold2Color": "rgba(234, 112, 112, 0.22)"
+          },
+          "gridPos": null,
+          "height": null,
+          "hideTimeOverride": false,
+          "id": 55,
+          "interval": null,
+          "isNew": true,
+          "legend": {
+            "alignAsTable": false,
+            "avg": false,
+            "current": false,
+            "hideEmpty": false,
+            "hideZero": false,
+            "max": false,
+            "min": false,
+            "rightSide": false,
+            "show": true,
+            "sideWidth": null,
+            "sort": null,
+            "sortDesc": false,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 2,
+          "links": [],
+          "maxDataPoints": 100,
+          "maxPerRow": null,
+          "minSpan": null,
+          "nullPointMode": "connected",
+          "options": {
+            "alertThreshold": true,
+            "dataLinks": []
+          },
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "repeat": null,
+          "repeatDirection": null,
+          "seriesOverrides": [],
+          "span": 3,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "datasource": null,
+              "expr": "sum(flyte:propeller:all:gc_latency_ms_count)",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "",
+              "metric": "",
+              "query": "sum(flyte:propeller:all:gc_latency_ms_count)",
+              "refId": "A",
+              "step": 10,
+              "target": ""
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Total completed garbage collection rounds",
+          "tooltip": {
+            "msResolution": true,
+            "shared": true,
+            "sort": 0,
+            "value_type": "cumulative"
+          },
+          "transformations": [],
+          "transparent": false,
+          "type": "graph",
+          "xaxis": {
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "decimals": null,
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "decimals": null,
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": 0
+          }
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "cacheTimeout": null,
+          "datasource": "${DS_PROM}",
+          "description": null,
+          "editable": true,
+          "error": false,
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": {
+                "mode": "absolute",
+                "steps": []
+              }
+            }
+          },
+          "fill": 1,
+          "grid": {
+            "threshold1": null,
+            "threshold1Color": "rgba(216, 200, 27, 0.27)",
+            "threshold2": null,
+            "threshold2Color": "rgba(234, 112, 112, 0.22)"
+          },
+          "gridPos": null,
+          "height": null,
+          "hideTimeOverride": false,
+          "id": 56,
+          "interval": null,
+          "isNew": true,
+          "legend": {
+            "alignAsTable": false,
+            "avg": false,
+            "current": false,
+            "hideEmpty": false,
+            "hideZero": false,
+            "max": false,
+            "min": false,
+            "rightSide": false,
+            "show": true,
+            "sideWidth": null,
+            "sort": null,
+            "sortDesc": false,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 2,
+          "links": [],
+          "maxDataPoints": 100,
+          "maxPerRow": null,
+          "minSpan": null,
+          "nullPointMode": "connected",
+          "options": {
+            "alertThreshold": true,
+            "dataLinks": []
+          },
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "repeat": null,
+          "repeatDirection": null,
+          "seriesOverrides": [],
+          "span": 3,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "datasource": null,
+              "expr": "sum(flyte:propeller:all:gc_latency_ms_sum) / sum(flyte:propeller:all:gc_latency_ms_count)",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "",
+              "metric": "",
+              "query": "sum(flyte:propeller:all:gc_latency_ms_sum) / sum(flyte:propeller:all:gc_latency_ms_count)",
+              "refId": "A",
+              "step": 10,
+              "target": ""
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Average garbage collection round duration",
+          "tooltip": {
+            "msResolution": true,
+            "shared": true,
+            "sort": 0,
+            "value_type": "cumulative"
+          },
+          "transformations": [],
+          "transparent": false,
+          "type": "graph",
+          "xaxis": {
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "decimals": null,
+              "format": "ms",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "decimals": null,
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": 0
+          }
+        }
+      ],
+      "repeat": null,
+      "showTitle": true,
+      "title": "Workflow garbage collection"
     }
   ],
   "schemaVersion": 12,

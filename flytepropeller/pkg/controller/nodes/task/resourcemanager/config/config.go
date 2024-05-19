@@ -27,7 +27,7 @@ var (
 
 // Configs for Resource Manager
 type Config struct {
-	Type             Type        `json:"type" pflag:"noop,Which resource manager to use"`
+	Type             Type        `json:"type" pflag:"noop, Which resource manager to use, redis or noop. Default is noop."`
 	ResourceMaxQuota int         `json:"resourceMaxQuota" pflag:",Global limit for concurrent Qubole queries"`
 	RedisConfig      RedisConfig `json:"redis" pflag:",Config for Redis resourcemanager."`
 }

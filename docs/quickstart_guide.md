@@ -4,15 +4,15 @@
 In this guide, you will create and run a Flyte workflow in a local Python environment to generate the output "Hello, world!"
 
 ````{dropdown} Try Flyte in your browser
-:title: text-muted
 :animate: fade-in-slide-down
 
-```{link-button} https://sandbox.union.ai/
----
-classes: try-hosted-flyte btn-warning btn-block
-text: Hosted Flyte sandbox
----
+```{button-link} https://sandbox.union.ai/
+:expand:
+:color: warning
+
+Hosted Flyte sandbox
 ```
+
 ```{div} text-muted
 *Courtesy of [Union.ai](https://www.union.ai/)*
 ```

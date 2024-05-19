@@ -3,8 +3,10 @@ package events
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/golang/protobuf/proto"
+	grpcRetry "github.com/grpc-ecosystem/go-grpc-middleware/retry"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.opentelemetry.io/otel/propagation"
 	"golang.org/x/time/rate"
@@ -128,15 +130,23 @@ func IDFromMessage(message proto.Message) ([]byte, error) {
 	return []byte(id), nil
 }
 
-func initializeAdminClientFromConfig(ctx context.Context) (client service.AdminServiceClient, err error) {
+func initializeAdminClientFromConfig(ctx context.Context, config *Config) (client service.AdminServiceClient, err error) {
 	cfg := admin2.GetConfig(ctx)
 	tracerProvider := otelutils.GetTracerProvider(otelutils.AdminClientTracer)
-	opt := grpc.WithUnaryInterceptor(
+
+	grpcOptions := []grpcRetry.CallOption{
+		grpcRetry.WithBackoff(grpcRetry.BackoffExponentialWithJitter(time.Duration(config.BackoffScalar)*time.Millisecond, config.GetBackoffJitter(ctx))),
+		grpcRetry.WithMax(uint(config.MaxRetries)),
+	}
+
+	opt := grpc.WithChainUnaryInterceptor(
 		otelgrpc.UnaryClientInterceptor(
 			otelgrpc.WithTracerProvider(tracerProvider),
 			otelgrpc.WithPropagators(propagation.TraceContext{}),
 		),
+		grpcRetry.UnaryClientInterceptor(grpcOptions...),
 	)
+
 	clients, err := admin2.NewClientsetBuilder().WithDialOptions(opt).WithConfig(cfg).Build(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize clientset. Error: %w", err)
@@ -152,7 +162,7 @@ func ConstructEventSink(ctx context.Context, config *Config, scope promutils.Sco
 	case EventSinkFile:
 		return NewFileSink(config.FilePath)
 	case EventSinkAdmin:
-		adminClient, err := initializeAdminClientFromConfig(ctx)
+		adminClient, err := initializeAdminClientFromConfig(ctx, config)
 		if err != nil {
 			return nil, err
 		}

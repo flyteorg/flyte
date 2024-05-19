@@ -2720,6 +2720,44 @@
       }
     },
     "/api/v1/projects/{id}": {
+      "get": {
+        "summary": "Fetches a :ref:`ref_flyteidl.admin.Project`",
+        "description": "Fetch a registered project.",
+        "operationId": "AdminService_GetProject",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminProject"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Indicates a unique project.\n+required",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      },
       "put": {
         "summary": "Updates an existing :ref:`ref_flyteidl.admin.Project`\nflyteidl.admin.Project should be passed but the domains property should be empty;\nit will be ignored in the handler as domains cannot be updated via this API.",
         "description": "Update a project.",
@@ -4985,6 +5023,10 @@
             "type": "string"
           },
           "description": "Tags to be set for the execution."
+        },
+        "execution_cluster_label": {
+          "$ref": "#/definitions/adminExecutionClusterLabel",
+          "description": "Execution cluster label to be set for the execution."
         }
       },
       "description": "An ExecutionSpec encompasses all data used to launch this execution. The Spec does not change over the lifetime\nof an execution as it progresses across phase changes."
@@ -7908,7 +7950,7 @@
       "properties": {
         "statement": {
           "type": "string",
-          "title": "The actual query to run, the query can have templated parameters.\nWe use Flyte's Golang templating format for Query templating.\nRefer to the templating documentation.\nhttps://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/external_services/hive/hive.html#sphx-glr-auto-integrations-external-services-hive-hive-py\nFor example,\ninsert overwrite directory '{{ .rawOutputDataPrefix }}' stored as parquet\nselect *\nfrom my_table\nwhere ds = '{{ .Inputs.ds }}'"
+          "title": "The actual query to run, the query can have templated parameters.\nWe use Flyte's Golang templating format for Query templating.\nFor example,\ninsert overwrite directory '{{ .rawOutputDataPrefix }}' stored as parquet\nselect *\nfrom my_table\nwhere ds = '{{ .Inputs.ds }}'"
         },
         "dialect": {
           "$ref": "#/definitions/SqlDialect"

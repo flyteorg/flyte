@@ -113,7 +113,7 @@ func GetExecutionEnvVars(id pluginsCore.TaskExecutionID) []v1.EnvVar {
 	return envVars
 }
 
-func DecorateEnvVars(ctx context.Context, envVars []v1.EnvVar, taskEnvironmentVariables map[string]string, id pluginsCore.TaskExecutionID) []v1.EnvVar {
+func DecorateEnvVars(ctx context.Context, envVars []v1.EnvVar, taskEnvironmentVariables map[string]string, id pluginsCore.TaskExecutionID) ([]v1.EnvVar, []v1.EnvFromSource) {
 	envVars = append(envVars, GetContextEnvVars(ctx)...)
 	envVars = append(envVars, GetExecutionEnvVars(id)...)
 
@@ -128,7 +128,21 @@ func DecorateEnvVars(ctx context.Context, envVars []v1.EnvVar, taskEnvironmentVa
 		envVars = append(envVars, v1.EnvVar{Name: k, Value: value})
 	}
 
-	return envVars
+	envFroms := []v1.EnvFromSource{}
+
+	for _, secretName := range config.GetK8sPluginConfig().DefaultEnvFromSecrets {
+		optional := true
+		secretRef := v1.SecretEnvSource{LocalObjectReference: v1.LocalObjectReference{Name: secretName}, Optional: &optional}
+		envFroms = append(envFroms, v1.EnvFromSource{SecretRef: &secretRef})
+	}
+
+	for _, cmName := range config.GetK8sPluginConfig().DefaultEnvFromConfigMaps {
+		optional := true
+		cmRef := v1.ConfigMapEnvSource{LocalObjectReference: v1.LocalObjectReference{Name: cmName}, Optional: &optional}
+		envFroms = append(envFroms, v1.EnvFromSource{ConfigMapRef: &cmRef})
+	}
+
+	return envVars, envFroms
 }
 
 func GetPodTolerations(interruptible bool, resourceRequirements ...v1.ResourceRequirements) []v1.Toleration {

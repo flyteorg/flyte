@@ -62,7 +62,7 @@ var (
 		GCInterval: config.Duration{
 			Duration: 30 * time.Minute,
 		},
-		MaxDatasetSizeBytes: 10 * 1024 * 1024,
+		MaxDatasetSizeBytes: -1,
 		Queue: CompositeQueueConfig{
 			Type: CompositeQueueBatch,
 			BatchingInterval: config.Duration{
@@ -115,8 +115,11 @@ var (
 		},
 		ClusterID:                "propeller",
 		CreateFlyteWorkflowCRD:   false,
-		ArrayNodeEventVersion:    0,
 		NodeExecutionWorkerCount: 8,
+		ArrayNode: ArrayNodeConfig{
+			EventVersion:               0,
+			DefaultParallelismBehavior: ParallelismBehaviorUnlimited,
+		},
 	}
 )
 
@@ -142,7 +145,7 @@ type Config struct {
 	GCInterval               config.Duration      `json:"gc-interval" pflag:"Run periodic GC every 30 minutes"`
 	LeaderElection           LeaderElectionConfig `json:"leader-election,omitempty" pflag:",Config for leader election."`
 	PublishK8sEvents         bool                 `json:"publish-k8s-events" pflag:",Enable events publishing to K8s events API."`
-	MaxDatasetSizeBytes      int64                `json:"max-output-size-bytes" pflag:",Maximum size of outputs per task"`
+	MaxDatasetSizeBytes      int64                `json:"max-output-size-bytes" pflag:",Deprecated! Use storage.limits.maxDownloadMBs instead"`
 	EnableGrpcLatencyMetrics bool                 `json:"enable-grpc-latency-metrics" pflag:",Enable grpc latency metrics. Note Histograms metrics can be expensive on Prometheus servers."`
 	KubeConfig               KubeClientConfig     `json:"kube-client-config" pflag:",Configuration to control the Kubernetes client"`
 	NodeConfig               NodeConfig           `json:"node-config,omitempty" pflag:",config for a workflow node"`
@@ -156,8 +159,8 @@ type Config struct {
 	ExcludeDomainLabel       []string             `json:"exclude-domain-label" pflag:",Exclude the specified domain label from the k8s FlyteWorkflow CRD label selector"`
 	ClusterID                string               `json:"cluster-id" pflag:",Unique cluster id running this flytepropeller instance with which to annotate execution events"`
 	CreateFlyteWorkflowCRD   bool                 `json:"create-flyteworkflow-crd" pflag:",Enable creation of the FlyteWorkflow CRD on startup"`
-	ArrayNodeEventVersion    int                  `json:"array-node-event-version" pflag:",ArrayNode eventing version. 0 => legacy (drop-in replacement for maptask), 1 => new"`
 	NodeExecutionWorkerCount int                  `json:"node-execution-worker-count" pflag:",Number of workers to evaluate node executions, currently only used for array nodes"`
+	ArrayNode                ArrayNodeConfig      `json:"array-node-config,omitempty" pflag:",Configuration for array nodes"`
 }
 
 // KubeClientConfig contains the configuration used by flytepropeller to configure its internal Kubernetes Client.
@@ -256,6 +259,31 @@ const (
 type EventConfig struct {
 	RawOutputPolicy           RawOutputPolicy `json:"raw-output-policy" pflag:",How output data should be passed along in execution events."`
 	FallbackToOutputReference bool            `json:"fallback-to-output-reference" pflag:",Whether output data should be sent by reference when it is too large to be sent inline in execution events."`
+}
+
+// ParallelismBehavior defines how ArrayNode should handle subNode parallelism by default
+type ParallelismBehavior = string
+
+const (
+	// ParallelismBehaviorHybrid means that ArrayNode will adhere to the parallelism defined in the
+	// ArrayNode exactly. This means `nil` will use the workflow parallelism, and 0 will have
+	// unlimited parallelism.
+	ParallelismBehaviorHybrid ParallelismBehavior = "hybrid"
+
+	// ParallelismBehaviorUnlimited means that ArrayNode subNodes will be evaluated with unlimited
+	// parallelism for both nil and 0. If a non-default (ie. nil / zero) parallelism is set, then
+	// ArrayNode will adhere to that value.
+	ParallelismBehaviorUnlimited ParallelismBehavior = "unlimited"
+
+	// ParallelismBehaviorWorkflow means that ArrayNode subNodes will be evaluated using the
+	// configured workflow parallelism for both nil and 0. If a non-default (ie. nil / zero)
+	// parallelism is set, then ArrayNode will adhere to that value.
+	ParallelismBehaviorWorkflow ParallelismBehavior = "workflow"
+)
+
+type ArrayNodeConfig struct {
+	EventVersion               int                 `json:"event-version" pflag:",ArrayNode eventing version. 0 => legacy (drop-in replacement for maptask), 1 => new"`
+	DefaultParallelismBehavior ParallelismBehavior `json:"default-parallelism-behavior" pflag:",Default parallelism behavior for array nodes"`
 }
 
 // GetConfig extracts the Configuration from the global config module in flytestdlib and returns the corresponding type-casted object.

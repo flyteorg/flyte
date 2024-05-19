@@ -1,8 +1,9 @@
 export REPOSITORY=flyteadmin
 export FLYTE_SCHEDULER_REPOSITORY=flytescheduler
-include boilerplate/flyte/docker_build/Makefile
-include boilerplate/flyte/golang_test_targets/Makefile
-include boilerplate/flyte/end2end/Makefile
+export REPO_ROOT=..
+include ../boilerplate/flyte/docker_build/Makefile
+include ../boilerplate/flyte/golang_test_targets/Makefile
+include ../boilerplate/flyte/end2end/Makefile
 
 GIT_VERSION := $(shell git describe --always --tags)
 GIT_HASH := $(shell git rev-parse --short HEAD)
@@ -67,7 +68,6 @@ linux_compile_scheduler: export GOOS ?= linux
 linux_compile_scheduler:
 	go build -o /artifacts/flytescheduler -ldflags=$(LD_FLAGS) ./cmd/scheduler/
 
-
 .PHONY: server
 server:
 	go run cmd/main.go serve  --server.kube-config ~/.kube/config  --config flyteadmin_config.yaml
@@ -75,7 +75,6 @@ server:
 .PHONY: scheduler
 scheduler:
 	go run scheduler/main.go run  --server.kube-config ~/.kube/config  --config flyteadmin_config.yaml
-
 
 .PHONY: migrate
 migrate:
@@ -86,7 +85,3 @@ seed_projects:
 	go run cmd/main.go migrate seed-projects project admintests flytekit --server.kube-config ~/.kube/config  --config flyteadmin_config.yaml
 
 all: compile
-
-.PHONY: go-tidy
-go-tidy:
-	go mod tidy

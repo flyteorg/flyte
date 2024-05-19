@@ -85,7 +85,7 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "leader-election.renew-deadline"), defaultConfig.LeaderElection.RenewDeadline.String(), "Duration that the acting master will retry refreshing leadership before giving up.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "leader-election.retry-period"), defaultConfig.LeaderElection.RetryPeriod.String(), "Duration the LeaderElector clients should wait between tries of actions.")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "publish-k8s-events"), defaultConfig.PublishK8sEvents, "Enable events publishing to K8s events API.")
-	cmdFlags.Int64(fmt.Sprintf("%v%v", prefix, "max-output-size-bytes"), defaultConfig.MaxDatasetSizeBytes, "Maximum size of outputs per task")
+	cmdFlags.Int64(fmt.Sprintf("%v%v", prefix, "max-output-size-bytes"), defaultConfig.MaxDatasetSizeBytes, "Deprecated! Use storage.limits.maxDownloadMBs instead")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "enable-grpc-latency-metrics"), defaultConfig.EnableGrpcLatencyMetrics, "Enable grpc latency metrics. Note Histograms metrics can be expensive on Prometheus servers.")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "kube-client-config.burst"), defaultConfig.KubeConfig.Burst, "Max burst rate for throttle. 0 defaults to 10")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "kube-client-config.timeout"), defaultConfig.KubeConfig.Timeout.String(), "Max duration allowed for every request to KubeAPI before giving up. 0 implies no timeout.")
@@ -108,7 +108,8 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "exclude-domain-label"), defaultConfig.ExcludeDomainLabel, "Exclude the specified domain label from the k8s FlyteWorkflow CRD label selector")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "cluster-id"), defaultConfig.ClusterID, "Unique cluster id running this flytepropeller instance with which to annotate execution events")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "create-flyteworkflow-crd"), defaultConfig.CreateFlyteWorkflowCRD, "Enable creation of the FlyteWorkflow CRD on startup")
-	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "array-node-event-version"), defaultConfig.ArrayNodeEventVersion, "ArrayNode eventing version. 0 => legacy (drop-in replacement for maptask),  1 => new")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "node-execution-worker-count"), defaultConfig.NodeExecutionWorkerCount, "Number of workers to evaluate node executions,  currently only used for array nodes")
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "array-node-config.event-version"), defaultConfig.ArrayNode.EventVersion, "ArrayNode eventing version. 0 => legacy (drop-in replacement for maptask),  1 => new")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "array-node-config.default-parallelism-behavior"), defaultConfig.ArrayNode.DefaultParallelismBehavior, "Default parallelism behavior for array nodes")
 	return cmdFlags
 }

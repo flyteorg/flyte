@@ -178,11 +178,17 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 			return nil, ok
 		}
 
+		var parallelism *uint32
+		switch x := arrayNode.GetParallelismOption().(type) {
+		case *core.ArrayNode_Parallelism:
+			parallelism = &x.Parallelism
+		}
+
 		// build ArrayNode
 		nodeSpec.Kind = v1alpha1.NodeKindArray
 		nodeSpec.ArrayNode = &v1alpha1.ArrayNodeSpec{
 			SubNodeSpec: subNodeSpecs[0],
-			Parallelism: arrayNode.Parallelism,
+			Parallelism: parallelism,
 		}
 
 		switch successCriteria := arrayNode.SuccessCriteria.(type) {
