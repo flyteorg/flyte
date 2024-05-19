@@ -437,6 +437,7 @@ func TestCheckSubTasksState(t *testing.T) {
 		resourceManager.AssertNumberOfCalls(t, "AllocateResource", 0)
 		resourceManager.AssertNumberOfCalls(t, "ReleaseResource", 0)
 
+		// TODO: write tests for CustomInfo here?
 		assert.Equal(t, subtaskCount, len(externalResources))
 		for i := 0; i < subtaskCount; i++ {
 			externalResource := externalResources[i]

@@ -89,6 +89,7 @@ type ExternalResource struct {
 	RetryAttempt uint32
 	// Phase (if exists) associated with the external resource
 	Phase Phase
+	// TODO: should there also be a CustomInfo here?
 }
 
 type ReasonInfo struct {
