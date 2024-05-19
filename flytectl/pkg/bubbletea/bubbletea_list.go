@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/bubbles/list"
+	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/spf13/cobra"
@@ -54,13 +55,36 @@ func (d itemDelegate) Render(w io.Writer, m list.Model, index int, listItem list
 	fmt.Fprint(w, fn(str))
 }
 
+type viewType int
+
+const (
+	listView viewType = iota
+	inputView
+)
+
+func initListModel() listModel {
+	ti := textinput.New()
+	ti.Placeholder = "Type in here"
+	ti.Focus()
+	ti.CharLimit = 156
+	ti.Width = 20
+
+	return listModel{
+		view:      listView,
+		textInput: ti,
+	}
+}
+
 type listModel struct {
-	list     list.Model
-	quitting bool
+	quitting   bool
+	view       viewType
+	list       list.Model
+	textInput  textinput.Model
+	inputTitle string
 }
 
 func (m listModel) Init() tea.Cmd {
-	return nil
+	return textinput.Blink
 }
 
 func (m listModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -71,24 +95,37 @@ func (m listModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "q", "ctrl+c":
+		case "ctrl+c", "q":
 			m.quitting = true
 			return m, tea.Quit
 
 		case "enter":
-			item, _ := m.list.SelectedItem().(item)
-			args = append(args, string(item))
-			err := genListModel(&m, string(item))
+			var err error
+			if m.view == inputView {
+				m.view = listView
+				args = append(args, m.textInput.Value())
+				m.textInput.SetValue("")
+				err = genListModel(&m, "")
+			} else if m.view == listView {
+				item, _ := m.list.SelectedItem().(item)
+				args = append(args, string(item))
+				err = genListModel(&m, string(item))
+			}
 			if err != nil || m.quitting {
-				listErrMsg = err
 				return m, tea.Quit
 			}
 			return m, nil
+
 		}
 	}
 
 	var cmd tea.Cmd
-	m.list, cmd = m.list.Update(msg)
+	if m.view == inputView {
+		m.textInput, cmd = m.textInput.Update(msg)
+	} else if m.view == listView {
+		m.list, cmd = m.list.Update(msg)
+	}
+
 	return m, cmd
 }
 
@@ -96,6 +133,15 @@ func (m listModel) View() string {
 	if m.quitting {
 		return quitTextStyle.Render("")
 	}
+
+	if m.view == inputView {
+		return fmt.Sprintf(
+			m.inputTitle+"\n\n%s\n\n%s",
+			m.textInput.View(),
+			"(press q to quit)",
+		) + "\n"
+	}
+
 	return "\n" + m.list.View()
 }
 
@@ -133,9 +179,10 @@ func ShowCmdList(_rootCmd *cobra.Command) {
 		Short: currentCmd.Short,
 	}
 
-	var m listModel
+	m := initListModel()
 	if err := genListModel(&m, cmdName); err != nil {
-		return
+		fmt.Println("Error running program:", err)
+		os.Exit(1)
 	}
 
 	if !m.quitting {
