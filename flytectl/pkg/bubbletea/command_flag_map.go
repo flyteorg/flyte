@@ -8,9 +8,10 @@ var commandFlagMap = make(map[string][]string)
 
 func InitCommandFlagMap() {
 	// compile
-	commandFlagMap["compile"] = []string{"--file"}
+	commandFlagMap["compile"] = []string{"--file"} // user input by themselves
 	// completion
-	commandFlagMap["completion"] = []string{"--shell"}
+	commandFlagMap["completion"] = []string{"-h"} // Feels weird to run "--shell" with bubbletea
+	// Show user -h
 	// config
 	commandFlagMap["config|discover"] = []string{""}
 	commandFlagMap["config|docs"] = []string{""}
