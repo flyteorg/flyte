@@ -575,7 +575,11 @@ func (m *NodeExecutionManager) GetNodeExecutionData(
 			id.Project,
 			id.Domain,
 			nodeExecution.InputUri,
-			objectStore)
+			objectStore,
+		)
+		if err != nil {
+			logger.Errorf(ctx, "failed to read inputs during execution [%v]: %v", id, err)
+		}
 		return err
 	})
 
@@ -591,7 +595,11 @@ func (m *NodeExecutionManager) GetNodeExecutionData(
 			cluster,
 			id.Project,
 			id.Domain,
-			objectStore)
+			objectStore,
+		)
+		if err != nil {
+			logger.Errorf(ctx, "failed to read outputs during execution [%v]: %v", id, err)
+		}
 		return err
 	})
 

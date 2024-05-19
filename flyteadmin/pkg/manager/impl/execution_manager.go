@@ -1781,7 +1781,11 @@ func (m *ExecutionManager) GetExecutionData(
 			id.Project,
 			id.Domain,
 			executionModel.InputsURI.String(),
-			objectStore)
+			objectStore,
+		)
+		if err != nil {
+			logger.Errorf(ctx, "failed to read inputs during execution [%v]: %v", id, err)
+		}
 		return err
 	})
 
@@ -1797,7 +1801,11 @@ func (m *ExecutionManager) GetExecutionData(
 			cluster,
 			id.Project,
 			id.Domain,
-			objectStore)
+			objectStore,
+		)
+		if err != nil {
+			logger.Errorf(ctx, "failed to read outputs during execution [%v]: %v", id, err)
+		}
 		return err
 	})
 

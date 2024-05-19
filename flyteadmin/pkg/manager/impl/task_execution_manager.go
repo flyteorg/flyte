@@ -303,6 +303,7 @@ func (m *TaskExecutionManager) GetTaskExecutionData(ctx context.Context,
 	if err := validation.ValidateTaskExecutionIdentifier(request.Id); err != nil {
 		logger.Debugf(ctx, "Invalid identifier [%+v]: %v", request.Id, err)
 	}
+
 	ctx = getTaskExecutionContext(ctx, request.Id)
 	group, groupCtx := errgroup.WithContext(ctx)
 	var taskExecution *admin.TaskExecution
@@ -351,7 +352,11 @@ func (m *TaskExecutionManager) GetTaskExecutionData(ctx context.Context,
 			id.Project,
 			id.Domain,
 			taskExecution.InputUri,
-			objectStore)
+			objectStore,
+		)
+		if err != nil {
+			logger.Errorf(ctx, "failed to read inputs during execution [%v]: %v", id, err)
+		}
 		return err
 	})
 
@@ -367,7 +372,11 @@ func (m *TaskExecutionManager) GetTaskExecutionData(ctx context.Context,
 			cluster,
 			id.Project,
 			id.Domain,
-			objectStore)
+			objectStore,
+		)
+		if err != nil {
+			logger.Errorf(ctx, "failed to read outputs during execution [%v]: %v", id, err)
+		}
 		return err
 	})
 

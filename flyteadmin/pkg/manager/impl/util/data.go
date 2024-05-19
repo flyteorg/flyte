@@ -150,7 +150,6 @@ func GetOutputs(ctx context.Context,
 			err = readFromDataPlane(ctx, objectStore, cluster, project, domain, closure.GetOutputUri(), fullOutputs)
 		}
 	}
-
 	return fullOutputs, &outputsURLBlob, err
 }
 
