@@ -21,6 +21,7 @@ tools=(
 	"github.com/daixiang0/gci"
 	"github.com/alvaroloes/enumer"
 	"github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc"
+	"golang.org/x/tools/cmd/goimports@v0.21.0"
 )
 
 # This ensures pflags are up to date.
