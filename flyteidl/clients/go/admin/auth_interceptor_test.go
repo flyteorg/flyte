@@ -72,10 +72,11 @@ func (s authMetadataServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	http.NotFound(w, r)
 }
 
-func tokenHandler(w http.ResponseWriter, r *http.Request) {
+func (s *authMetadataServer) tokenHandler(w http.ResponseWriter, r *http.Request) {
 	tokenJSON := []byte(`{"access_token": "exampletoken", "token_type": "bearer"}`)
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(tokenJSON)
+	_, err := w.Write(tokenJSON)
+	assert.NoError(s.t, err)
 }
 
 func (s *authMetadataServer) Start(_ context.Context) error {
@@ -99,7 +100,7 @@ func (s *authMetadataServer) Start(_ context.Context) error {
 	s.grpcServer = grpcS
 	mux := http.NewServeMux()
 	// Attach the handler to the /oauth2/token path
-	mux.HandleFunc("/oauth2/token", tokenHandler)
+	mux.HandleFunc("/oauth2/token", s.tokenHandler)
 
 	//nolint:gosec
 	s.httpServer = &http.Server{
