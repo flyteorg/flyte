@@ -281,9 +281,9 @@ cacheservice:
   replicaCount: 1
   image:
     # -- Docker image for Cacheservice deployment
-    repository: cr.flyte.org/flyteorg/cacheservice # CACHESERVICE_IMAGE
+    repository: cr.flyte.org/flyteorg/cacheservice  # CACHESERVICE_IMAGE
     # -- Docker image tag
-    tag: v1.10.7 # CACHESERVICE_TAG
+    tag: v1.10.7  # CACHESERVICE_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Cacheservice deployment
