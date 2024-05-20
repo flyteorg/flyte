@@ -13,27 +13,27 @@ func InitCommandFlagMap() {
 	commandFlagMap["completion"] = []string{"-h"} // Feels weird to run "--shell" with bubbletea
 	// Show user -h
 	// config
-	commandFlagMap["config|discover"] = []string{""}
-	commandFlagMap["config|docs"] = []string{""}
-	commandFlagMap["config|init"] = []string{""}
-	commandFlagMap["config|validate"] = []string{""}
+	commandFlagMap["config|discover"] = []string{}
+	commandFlagMap["config|docs"] = []string{}
+	commandFlagMap["config|init"] = []string{}
+	commandFlagMap["config|validate"] = []string{}
 	// create
 	commandFlagMap["create|execution"] = []string{"-p", "-d"}
 	commandFlagMap["create|project"] = []string{"--pid"} //?
 	// delete
-	commandFlagMap["delete|cluster-resource-attribute"] = []string{""} //?
-	commandFlagMap["delete|execution"] = []string{"-p", "-d"}
-	commandFlagMap["delete|execution-cluster-label"] = []string{""}   //?
-	commandFlagMap["delete|execution-queue-attribute"] = []string{""} //?
-	commandFlagMap["delete|plugin-override"] = []string{""}           //?
-	commandFlagMap["delete|task-resource-attribute"] = []string{""}   //?
-	commandFlagMap["delete|workflow-execution-config"] = []string{""} //?
+	commandFlagMap["delete|cluster-resource-attribute"] = []string{}    //?
+	commandFlagMap["delete|execution"] = []string{"--name", "-p", "-d"} // flytectl delete execution c6a51x2l9e  -d development  -p flytesnacks
+	commandFlagMap["delete|execution-cluster-label"] = []string{}       //?
+	commandFlagMap["delete|execution-queue-attribute"] = []string{}     //?
+	commandFlagMap["delete|plugin-override"] = []string{}               //?
+	commandFlagMap["delete|task-resource-attribute"] = []string{}       //?
+	commandFlagMap["delete|workflow-execution-config"] = []string{}     //?
 	// demo
-	commandFlagMap["demo|exec"] = []string{""} //?
-	commandFlagMap["demo|reload"] = []string{""}
-	commandFlagMap["demo|start"] = []string{""}
-	commandFlagMap["demo|status"] = []string{""}
-	commandFlagMap["demo|teardown"] = []string{""}
+	commandFlagMap["demo|exec"] = []string{} //?
+	commandFlagMap["demo|reload"] = []string{}
+	commandFlagMap["demo|start"] = []string{}
+	commandFlagMap["demo|status"] = []string{}
+	commandFlagMap["demo|teardown"] = []string{}
 	// get
 	commandFlagMap["get|cluster-resource-attribute"] = []string{"-p", "-d"}
 	commandFlagMap["get|execution"] = []string{"-p", "-d"}
