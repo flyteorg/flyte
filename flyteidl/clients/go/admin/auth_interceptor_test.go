@@ -2,13 +2,14 @@ package admin
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"net"
 	"net/http"
-	"net/http/httptest"
 	"net/url"
+	"os"
 	"strings"
 	"sync"
 	"testing"
@@ -31,10 +32,11 @@ import (
 // authMetadataServer is a fake AuthMetadataServer that takes in an AuthMetadataServer implementation (usually one
 // initialized through mockery) and starts a local server that uses it to respond to grpc requests.
 type authMetadataServer struct {
-	s           *httptest.Server
 	t           testing.TB
-	port        int
+	grpcPort    int
+	httpPort    int
 	grpcServer  *grpc.Server
+	httpServer  *http.Server
 	netListener net.Listener
 	impl        service.AuthMetadataServiceServer
 	lck         *sync.RWMutex
@@ -70,27 +72,48 @@ func (s authMetadataServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	http.NotFound(w, r)
 }
 
+func tokenHandler(w http.ResponseWriter, r *http.Request) {
+	tokenJSON := []byte(`{"access_token": "exampletoken", "token_type": "bearer"}`)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(tokenJSON)
+}
+
 func (s *authMetadataServer) Start(_ context.Context) error {
 	s.lck.Lock()
 	defer s.lck.Unlock()
 
 	/***** Set up the server serving channelz service. *****/
-	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", s.port))
+
+	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", s.grpcPort))
 	if err != nil {
-		return fmt.Errorf("failed to listen on port [%v]: %w", s.port, err)
+		return fmt.Errorf("failed to listen on port [%v]: %w", s.grpcPort, err)
 	}
 
+	s.netListener = lis
 	grpcS := grpc.NewServer()
 	service.RegisterAuthMetadataServiceServer(grpcS, s)
 	go func() {
+		defer grpcS.Stop()
 		_ = grpcS.Serve(lis)
-		//assert.NoError(s.t, err)
 	}()
-
 	s.grpcServer = grpcS
-	s.netListener = lis
+	mux := http.NewServeMux()
+	// Attach the handler to the /oauth2/token path
+	mux.HandleFunc("/oauth2/token", tokenHandler)
 
-	s.s = httptest.NewServer(s)
+	//nolint:gosec
+	s.httpServer = &http.Server{
+		Addr:    fmt.Sprintf("localhost:%d", s.httpPort),
+		Handler: mux,
+	}
+
+	go func() {
+		defer s.httpServer.Close()
+		err := s.httpServer.ListenAndServe()
+		if err != nil {
+			panic(err)
+		}
+	}()
 
 	return nil
 }
@@ -98,27 +121,30 @@ func (s *authMetadataServer) Start(_ context.Context) error {
 func (s *authMetadataServer) Close() {
 	s.lck.RLock()
 	defer s.lck.RUnlock()
-
 	s.grpcServer.Stop()
-	s.s.Close()
 }
 
-func newAuthMetadataServer(t testing.TB, port int, impl service.AuthMetadataServiceServer) *authMetadataServer {
+func newAuthMetadataServer(t testing.TB, grpcPort int, httpPort int, impl service.AuthMetadataServiceServer) *authMetadataServer {
 	return &authMetadataServer{
-		port: port,
-		t:    t,
-		impl: impl,
-		lck:  &sync.RWMutex{},
+		grpcPort: grpcPort,
+		httpPort: httpPort,
+		t:        t,
+		impl:     impl,
+		lck:      &sync.RWMutex{},
 	}
 }
 
 func Test_newAuthInterceptor(t *testing.T) {
-	c := &mocks.TokenCache{}
-	c.On("GetToken").Return(nil)
+	plan, _ := os.ReadFile("tokenorchestrator/testdata/token.json")
+	var tokenData oauth2.Token
+	err := json.Unmarshal(plan, &tokenData)
+	assert.NoError(t, err)
 	t.Run("Other Error", func(t *testing.T) {
 		f := NewPerRPCCredentialsFuture()
 		p := NewPerRPCCredentialsFuture()
-		interceptor := NewAuthInterceptor(&Config{}, c, f, p)
+		mockTokenCache := &mocks.TokenCache{}
+		mockTokenCache.OnGetTokenMatch().Return(&tokenData, nil)
+		interceptor := NewAuthInterceptor(&Config{}, mockTokenCache, f, p)
 		otherError := func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, opts ...grpc.CallOption) error {
 			return status.New(codes.Canceled, "").Err()
 		}
@@ -131,28 +157,35 @@ func Test_newAuthInterceptor(t *testing.T) {
 			Level: logger.DebugLevel,
 		}))
 
-		port := rand.IntnRange(10000, 60000)
+		httpPort := rand.IntnRange(10000, 60000)
+		grpcPort := rand.IntnRange(10000, 60000)
 		m := &adminMocks.AuthMetadataServiceServer{}
 		m.OnGetOAuth2MetadataMatch(mock.Anything, mock.Anything).Return(&service.OAuth2MetadataResponse{
-			AuthorizationEndpoint: fmt.Sprintf("http://localhost:%d/oauth2/authorize", port),
-			TokenEndpoint:         fmt.Sprintf("http://localhost:%d/oauth2/token", port),
-			JwksUri:               fmt.Sprintf("http://localhost:%d/oauth2/jwks", port),
+			AuthorizationEndpoint: fmt.Sprintf("http://localhost:%d/oauth2/authorize", httpPort),
+			TokenEndpoint:         fmt.Sprintf("http://localhost:%d/oauth2/token", httpPort),
+			JwksUri:               fmt.Sprintf("http://localhost:%d/oauth2/jwks", httpPort),
 		}, nil)
+
 		m.OnGetPublicClientConfigMatch(mock.Anything, mock.Anything).Return(&service.PublicClientAuthConfigResponse{
 			Scopes: []string{"all"},
 		}, nil)
-		s := newAuthMetadataServer(t, port, m)
+		s := newAuthMetadataServer(t, grpcPort, httpPort, m)
 		ctx := context.Background()
 		assert.NoError(t, s.Start(ctx))
 		defer s.Close()
 
-		u, err := url.Parse(fmt.Sprintf("dns:///localhost:%d", port))
+		u, err := url.Parse(fmt.Sprintf("dns:///localhost:%d", grpcPort))
 		assert.NoError(t, err)
 
 		f := NewPerRPCCredentialsFuture()
 		p := NewPerRPCCredentialsFuture()
 		c := &mocks.TokenCache{}
-		c.On("Purge").Return()
+		c.OnGetTokenMatch().Return(nil, nil)
+		c.OnTryLockMatch().Return(true)
+		c.OnSaveTokenMatch(mock.Anything).Return(nil)
+		c.On("CondBroadcast").Return()
+		c.On("Unlock").Return()
+		c.OnPurgeIfEqualsMatch(mock.Anything).Return(true, nil)
 		interceptor := NewAuthInterceptor(&Config{
 			Endpoint:              config.URL{URL: *u},
 			UseInsecureConnection: true,
@@ -161,7 +194,6 @@ func Test_newAuthInterceptor(t *testing.T) {
 		unauthenticated := func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, opts ...grpc.CallOption) error {
 			return status.New(codes.Unauthenticated, "").Err()
 		}
-
 		err = interceptor(ctx, "POST", nil, nil, nil, unauthenticated)
 		assert.Error(t, err)
 		assert.Truef(t, f.IsInitialized(), "PerRPCCredentialFuture should be initialized")
@@ -173,24 +205,26 @@ func Test_newAuthInterceptor(t *testing.T) {
 			Level: logger.DebugLevel,
 		}))
 
-		port := rand.IntnRange(10000, 60000)
+		httpPort := rand.IntnRange(10000, 60000)
+		grpcPort := rand.IntnRange(10000, 60000)
 		m := &adminMocks.AuthMetadataServiceServer{}
-		s := newAuthMetadataServer(t, port, m)
+		s := newAuthMetadataServer(t, grpcPort, httpPort, m)
 		ctx := context.Background()
 		assert.NoError(t, s.Start(ctx))
 		defer s.Close()
 
-		u, err := url.Parse(fmt.Sprintf("dns:///localhost:%d", port))
+		u, err := url.Parse(fmt.Sprintf("dns:///localhost:%d", grpcPort))
 		assert.NoError(t, err)
 
 		f := NewPerRPCCredentialsFuture()
 		p := NewPerRPCCredentialsFuture()
-
+		c := &mocks.TokenCache{}
+		c.OnGetTokenMatch().Return(nil, nil)
 		interceptor := NewAuthInterceptor(&Config{
 			Endpoint:              config.URL{URL: *u},
 			UseInsecureConnection: true,
 			AuthType:              AuthTypeClientSecret,
-		}, &mocks.TokenCache{}, f, p)
+		}, c, f, p)
 		authenticated := func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, opts ...grpc.CallOption) error {
 			return nil
 		}
@@ -205,33 +239,39 @@ func Test_newAuthInterceptor(t *testing.T) {
 			Level: logger.DebugLevel,
 		}))
 
-		port := rand.IntnRange(10000, 60000)
+		httpPort := rand.IntnRange(10000, 60000)
+		grpcPort := rand.IntnRange(10000, 60000)
 		m := &adminMocks.AuthMetadataServiceServer{}
 		m.OnGetOAuth2MetadataMatch(mock.Anything, mock.Anything).Return(&service.OAuth2MetadataResponse{
-			AuthorizationEndpoint: fmt.Sprintf("http://localhost:%d/oauth2/authorize", port),
-			TokenEndpoint:         fmt.Sprintf("http://localhost:%d/oauth2/token", port),
-			JwksUri:               fmt.Sprintf("http://localhost:%d/oauth2/jwks", port),
+			AuthorizationEndpoint: fmt.Sprintf("http://localhost:%d/oauth2/authorize", httpPort),
+			TokenEndpoint:         fmt.Sprintf("http://localhost:%d/oauth2/token", httpPort),
+			JwksUri:               fmt.Sprintf("http://localhost:%d/oauth2/jwks", httpPort),
 		}, nil)
 		m.OnGetPublicClientConfigMatch(mock.Anything, mock.Anything).Return(&service.PublicClientAuthConfigResponse{
 			Scopes: []string{"all"},
 		}, nil)
 
-		s := newAuthMetadataServer(t, port, m)
+		s := newAuthMetadataServer(t, grpcPort, httpPort, m)
 		ctx := context.Background()
 		assert.NoError(t, s.Start(ctx))
 		defer s.Close()
 
-		u, err := url.Parse(fmt.Sprintf("dns:///localhost:%d", port))
+		u, err := url.Parse(fmt.Sprintf("dns:///localhost:%d", grpcPort))
 		assert.NoError(t, err)
 
 		f := NewPerRPCCredentialsFuture()
 		p := NewPerRPCCredentialsFuture()
 
+		c := &mocks.TokenCache{}
+		c.OnGetTokenMatch().Return(nil, nil)
+		c.OnTryLockMatch().Return(true)
+		c.OnSaveTokenMatch(mock.Anything).Return(nil)
+		c.OnPurgeIfEqualsMatch(mock.Anything).Return(true, nil)
 		interceptor := NewAuthInterceptor(&Config{
 			Endpoint:              config.URL{URL: *u},
 			UseInsecureConnection: true,
 			AuthType:              AuthTypeClientSecret,
-		}, &mocks.TokenCache{}, f, p)
+		}, c, f, p)
 		unauthenticated := func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, opts ...grpc.CallOption) error {
 			return status.New(codes.Aborted, "").Err()
 		}
@@ -243,19 +283,21 @@ func Test_newAuthInterceptor(t *testing.T) {
 }
 
 func TestMaterializeCredentials(t *testing.T) {
-	port := rand.IntnRange(10000, 60000)
-	c := &mocks.TokenCache{}
-	c.On("Purge").Return()
 	t.Run("No oauth2 metadata endpoint or Public client config lookup", func(t *testing.T) {
+		httpPort := rand.IntnRange(10000, 60000)
+		grpcPort := rand.IntnRange(10000, 60000)
+		c := &mocks.TokenCache{}
+		c.OnGetTokenMatch().Return(nil, nil)
+		c.OnSaveTokenMatch(mock.Anything).Return(nil)
 		m := &adminMocks.AuthMetadataServiceServer{}
 		m.OnGetOAuth2MetadataMatch(mock.Anything, mock.Anything).Return(nil, errors.New("unexpected call to get oauth2 metadata"))
 		m.OnGetPublicClientConfigMatch(mock.Anything, mock.Anything).Return(nil, errors.New("unexpected call to get public client config"))
-		s := newAuthMetadataServer(t, port, m)
+		s := newAuthMetadataServer(t, grpcPort, httpPort, m)
 		ctx := context.Background()
 		assert.NoError(t, s.Start(ctx))
 		defer s.Close()
 
-		u, err := url.Parse(fmt.Sprintf("dns:///localhost:%d", port))
+		u, err := url.Parse(fmt.Sprintf("dns:///localhost:%d", grpcPort))
 		assert.NoError(t, err)
 
 		f := NewPerRPCCredentialsFuture()
@@ -265,7 +307,7 @@ func TestMaterializeCredentials(t *testing.T) {
 			Endpoint:              config.URL{URL: *u},
 			UseInsecureConnection: true,
 			AuthType:              AuthTypeClientSecret,
-			TokenURL:              fmt.Sprintf("http://localhost:%d/api/v1/token", port),
+			TokenURL:              fmt.Sprintf("http://localhost:%d/oauth2/token", httpPort),
 			Scopes:                []string{"all"},
 			Audience:              "http://localhost:30081",
 			AuthorizationHeader:   "authorization",
@@ -273,16 +315,21 @@ func TestMaterializeCredentials(t *testing.T) {
 		assert.NoError(t, err)
 	})
 	t.Run("Failed to fetch client metadata", func(t *testing.T) {
+		httpPort := rand.IntnRange(10000, 60000)
+		grpcPort := rand.IntnRange(10000, 60000)
+		c := &mocks.TokenCache{}
+		c.OnGetTokenMatch().Return(nil, nil)
+		c.OnSaveTokenMatch(mock.Anything).Return(nil)
 		m := &adminMocks.AuthMetadataServiceServer{}
 		m.OnGetOAuth2MetadataMatch(mock.Anything, mock.Anything).Return(nil, errors.New("unexpected call to get oauth2 metadata"))
 		failedPublicClientConfigLookup := errors.New("expected err")
 		m.OnGetPublicClientConfigMatch(mock.Anything, mock.Anything).Return(nil, failedPublicClientConfigLookup)
-		s := newAuthMetadataServer(t, port, m)
+		s := newAuthMetadataServer(t, grpcPort, httpPort, m)
 		ctx := context.Background()
 		assert.NoError(t, s.Start(ctx))
 		defer s.Close()
 
-		u, err := url.Parse(fmt.Sprintf("dns:///localhost:%d", port))
+		u, err := url.Parse(fmt.Sprintf("dns:///localhost:%d", grpcPort))
 		assert.NoError(t, err)
 
 		f := NewPerRPCCredentialsFuture()
@@ -292,7 +339,7 @@ func TestMaterializeCredentials(t *testing.T) {
 			Endpoint:              config.URL{URL: *u},
 			UseInsecureConnection: true,
 			AuthType:              AuthTypeClientSecret,
-			TokenURL:              fmt.Sprintf("http://localhost:%d/api/v1/token", port),
+			TokenURL:              fmt.Sprintf("http://localhost:%d/api/v1/token", httpPort),
 			Scopes:                []string{"all"},
 		}, c, f, p)
 		assert.EqualError(t, err, "failed to fetch client metadata. Error: rpc error: code = Unknown desc = expected err")

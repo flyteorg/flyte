@@ -12,8 +12,8 @@ type TokenCache struct {
 	mock.Mock
 }
 
-// CondSignal provides a mock function with given fields:
-func (_m *TokenCache) CondSignal() {
+// CondBroadcast provides a mock function with given fields:
+func (_m *TokenCache) CondBroadcast() {
 	_m.Called()
 }
 

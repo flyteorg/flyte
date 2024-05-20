@@ -8,9 +8,9 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/flyteorg/flyte/flytectl/cmd/config"
 	"github.com/flyteorg/flyte/flytectl/pkg/pkce"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin"
+	"github.com/flyteorg/flytectl/cmd/config"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -73,10 +73,10 @@ func generateCommandFunc(cmdEntry CommandEntry) func(cmd *cobra.Command, args []
 		cmdCtx := NewCommandContextNoClient(cmd.OutOrStdout())
 		if !cmdEntry.DisableFlyteClient {
 			clientSet, err := admin.ClientSetBuilder().WithConfig(admin.GetConfig(ctx)).
-				WithTokenCache(pkce.TokenCacheKeyringProvider{
-					ServiceUser: fmt.Sprintf("%s:%s", adminCfg.Endpoint.String(), pkce.KeyRingServiceUser),
-					ServiceName: pkce.KeyRingServiceName,
-				}).Build(ctx)
+				WithTokenCache(pkce.NewTokenCacheKeyringProvider(
+					pkce.KeyRingServiceName,
+					fmt.Sprintf("%s:%s", adminCfg.Endpoint.String(), pkce.KeyRingServiceUser),
+				)).Build(ctx)
 			if err != nil {
 				return err
 			}

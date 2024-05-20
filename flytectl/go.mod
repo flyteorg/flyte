@@ -13,9 +13,10 @@ require (
 	github.com/docker/docker v24.0.9+incompatible
 	github.com/docker/go-connections v0.4.0
 	github.com/enescakir/emoji v1.0.0
-	github.com/flyteorg/flyte/flyteidl v0.0.0-00010101000000-000000000000
-	github.com/flyteorg/flyte/flytepropeller v0.0.0-00010101000000-000000000000
-	github.com/flyteorg/flyte/flytestdlib v0.0.0-00010101000000-000000000000
+	github.com/flyteorg/flyte/flyteidl v1.9.12
+	github.com/flyteorg/flyte/flytepropeller v1.9.12
+	github.com/flyteorg/flyte/flytestdlib v1.9.12
+	github.com/flyteorg/flytectl v0.8.20
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
 	github.com/golang/protobuf v1.5.3
 	github.com/google/go-github/v42 v42.0.0
