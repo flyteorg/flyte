@@ -147,7 +147,7 @@ func CreateExecutionModel(input CreateExecutionModelInput) (*models.Execution, e
 	return executionModel, nil
 }
 
-// CreateExecutionTagModel transforms a ExecutionCreateRequest to a ExecutionTag model
+// CreateExecutionTagModel transforms a CreateExecutionModelInput to a ExecutionTag model
 func CreateExecutionTagModel(input CreateExecutionModelInput) ([]*models.ExecutionTag, error) {
 	tags := make([]*models.ExecutionTag, 0, len(input.RequestSpec.Labels.Values))
 	for k, v := range input.RequestSpec.Labels.Values {

@@ -73,7 +73,7 @@ type AdminTag struct {
 }
 
 type ExecutionTag struct {
-	gorm.Model
+	BaseModel
 	ExecutionKey
 	// The key of the tag.
 	Key string `gorm:"primary_key" valid:"length(0|255)"`

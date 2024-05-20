@@ -26,7 +26,7 @@ func (r *ExecutionRepo) Create(ctx context.Context, input models.Execution, exec
 	timer := r.metrics.CreateDuration.Start()
 	err := r.db.WithContext(ctx).Transaction(func(_ *gorm.DB) error {
 		if executionTagModel != nil && len(executionTagModel) > 0 {
-			tx := r.db.WithContext(ctx).Omit("id").Create(executionTagModel)
+			tx := r.db.WithContext(ctx).Create(executionTagModel)
 			if tx.Error != nil {
 				return r.errorTransformer.ToFlyteAdminError(tx.Error)
 			}
