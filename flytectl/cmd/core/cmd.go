@@ -8,9 +8,9 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/flyteorg/flyte/flytectl/cmd/config"
 	"github.com/flyteorg/flyte/flytectl/pkg/pkce"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin"
-	"github.com/flyteorg/flytectl/cmd/config"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
