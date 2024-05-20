@@ -11,4 +11,5 @@ import (
 type FlyteAdminDataProvider interface {
 	GetClusterResourceAttributes(ctx context.Context, org, project, domain string) (*admin.ClusterResourceAttributes, error)
 	GetProjects(ctx context.Context) (*admin.Projects, error)
+	GetArchivedProjects(ctx context.Context) (*admin.Projects, error)
 }
