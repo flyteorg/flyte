@@ -186,20 +186,6 @@ Converts a Pandas dataframe into an HTML table.
 :class: with-shadow
 :::
 
-#### Source code renderer
-
-Converts source code to HTML and renders it as a Unicode string on the deck.
-
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/development_lifecycle/development_lifecycle/decks.py
-:caption: development_lifecycle/decks.py
-:lines: 128-141
-```
-
-:::{figure} https://raw.githubusercontent.com/flyteorg/static-resources/main/flytesnacks/user_guide/flyte_decks_source_code_renderer.png
-:alt: Source code renderer
-:class: with-shadow
-:::
-
 ### Contribute to renderers
 
 Don't hesitate to integrate a new renderer into
