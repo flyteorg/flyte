@@ -6,23 +6,22 @@ import (
 	"fmt"
 	"net/http"
 
-	"golang.org/x/oauth2"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/cache"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"golang.org/x/oauth2"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
+	"google.golang.org/grpc"
 )
 
 const ProxyAuthorizationHeader = "proxy-authorization"
 
 // MaterializeCredentials will attempt to build a TokenSource given the anonymously available information exposed by the server.
 // Once established, it'll invoke PerRPCCredentialsFuture.Store() on perRPCCredentials to populate it with the appropriate values.
-func MaterializeCredentials(ctx context.Context, cfg *Config, tokenCache cache.TokenCache,
-	perRPCCredentials *PerRPCCredentialsFuture, proxyCredentialsFuture *PerRPCCredentialsFuture) error {
-
+func MaterializeCredentials(ctx context.Context, cfg *Config, tokenCache cache.TokenCache, perRPCCredentials *PerRPCCredentialsFuture, proxyCredentialsFuture *PerRPCCredentialsFuture) error {
 	authMetadataClient, err := InitializeAuthMetadataClient(ctx, cfg, proxyCredentialsFuture)
 	if err != nil {
 		return fmt.Errorf("failed to initialized Auth Metadata Client. Error: %w", err)
@@ -44,17 +43,11 @@ func MaterializeCredentials(ctx context.Context, cfg *Config, tokenCache cache.T
 
 	tokenSource, err := tokenSourceProvider.GetTokenSource(ctx)
 	if err != nil {
-		return fmt.Errorf("failed to get token source. Error: %w", err)
-	}
-
-	_, err = tokenSource.Token()
-	if err != nil {
-		return fmt.Errorf("failed to issue token. Error: %w", err)
+		return err
 	}
 
 	wrappedTokenSource := NewCustomHeaderTokenSource(tokenSource, cfg.UseInsecureConnection, authorizationMetadataKey)
 	perRPCCredentials.Store(wrappedTokenSource)
-
 	return nil
 }
 
@@ -142,15 +135,6 @@ func NewAuthInterceptor(cfg *Config, tokenCache cache.TokenCache, credentialsFut
 	return func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
 		ctx = setHTTPClientContext(ctx, cfg, proxyCredentialsFuture)
 
-		// If there is already a token in the cache (e.g. key-ring), we should use it immediately...
-		t, _ := tokenCache.GetToken()
-		if t != nil {
-			err := MaterializeCredentials(ctx, cfg, tokenCache, credentialsFuture, proxyCredentialsFuture)
-			if err != nil {
-				return fmt.Errorf("failed to materialize credentials. Error: %v", err)
-			}
-		}
-
 		err := invoker(ctx, method, req, reply, cc, opts...)
 		if err != nil {
 			logger.Debugf(ctx, "Request failed due to [%v]. If it's an unauthenticated error, we will attempt to establish an authenticated context.", err)
@@ -158,33 +142,10 @@ func NewAuthInterceptor(cfg *Config, tokenCache cache.TokenCache, credentialsFut
 			if st, ok := status.FromError(err); ok {
 				// If the error we receive from executing the request expects
 				if shouldAttemptToAuthenticate(st.Code()) {
-					err = func() error {
-						if !tokenCache.TryLock() {
-							tokenCache.CondWait()
-							return nil
-						}
-
-						defer tokenCache.Unlock()
-						_, err := tokenCache.PurgeIfEquals(t)
-						if err != nil && !errors.Is(err, cache.ErrNotFound) {
-							logger.Errorf(ctx, "Failed to purge cache. Error [%v]", err)
-							return fmt.Errorf("failed to purge cache. Error: %w", err)
-						}
-
-						logger.Debugf(ctx, "Request failed due to [%v]. Attempting to establish an authenticated connection and trying again.", st.Code())
-						newErr := MaterializeCredentials(ctx, cfg, tokenCache, credentialsFuture, proxyCredentialsFuture)
-						if newErr != nil {
-							errString := fmt.Sprintf("authentication error! Original Error: %v, Auth Error: %v", err, newErr)
-							logger.Errorf(ctx, errString)
-							return fmt.Errorf(errString)
-						}
-
-						tokenCache.CondBroadcast()
-						return nil
-					}()
-
-					if err != nil {
-						return err
+					logger.Debugf(ctx, "Request failed due to [%v]. Attempting to establish an authenticated connection and trying again.", st.Code())
+					newErr := MaterializeCredentials(ctx, cfg, tokenCache, credentialsFuture, proxyCredentialsFuture)
+					if newErr != nil {
+						return fmt.Errorf("authentication error! Original Error: %v, Auth Error: %w", err, newErr)
 					}
 
 					return invoker(ctx, method, req, reply, cc, opts...)
@@ -207,7 +168,6 @@ func NewProxyAuthInterceptor(cfg *Config, proxyCredentialsFuture *PerRPCCredenti
 			}
 			return invoker(ctx, method, req, reply, cc, opts...)
 		}
-
 		return err
 	}
 }

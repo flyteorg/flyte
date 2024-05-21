@@ -3,6 +3,8 @@ package tokenorchestrator
 import (
 	"context"
 	"fmt"
+	"time"
+
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 
 	"golang.org/x/oauth2"
@@ -52,28 +54,21 @@ func (t BaseTokenOrchestrator) FetchTokenFromCacheOrRefreshIt(ctx context.Contex
 		return nil, err
 	}
 
-	if token.Valid() {
+	if !token.Valid() {
+		return nil, fmt.Errorf("token from cache is invalid")
+	}
+
+	// If token doesn't need to be refreshed, return it.
+	if time.Now().Before(token.Expiry.Add(-tokenRefreshGracePeriod.Duration)) {
+		logger.Infof(ctx, "found the token in the cache")
 		return token, nil
 	}
-
-	t.TokenCache.Lock()
-	defer t.TokenCache.Unlock()
-
-	token, err = t.TokenCache.GetToken()
-	if err != nil {
-		return nil, err
-	}
-
-	if token.Valid() {
-		return token, nil
-	}
+	token.Expiry = token.Expiry.Add(-tokenRefreshGracePeriod.Duration)
 
 	token, err = t.RefreshToken(ctx, token)
 	if err != nil {
 		return nil, fmt.Errorf("failed to refresh token using cached token. Error: %w", err)
 	}
-
-	token.Expiry = token.Expiry.Add(-tokenRefreshGracePeriod.Duration)
 
 	if !token.Valid() {
 		return nil, fmt.Errorf("refreshed token is invalid")
