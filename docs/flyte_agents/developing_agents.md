@@ -133,7 +133,7 @@ class FileSensor(BaseSensor):
 
 ### 2. Test the agent
 
-You can test your agent in a {ref}`local Python environment <testing_agents_locally>` or in a {ref}<local development cluster `testing_agents_in_a_local_development_cluster`>.
+You can test your agent in a {ref}`local Python environment <testing_agents_locally>` or in a {ref}`local development cluster <testing_agents_in_a_local_development_cluster>`.
 
 ### 3. Build a new Docker image
 
