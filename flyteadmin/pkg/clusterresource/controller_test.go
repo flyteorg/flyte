@@ -5,6 +5,7 @@ import (
 	"crypto/md5" // #nosec
 	"io/ioutil"
 	"os"
+	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -29,6 +30,7 @@ const domain = "domain-bar"
 var testScope = mockScope.NewTestScope()
 
 func TestTemplateAlreadyApplied(t *testing.T) {
+	ctx := context.TODO()
 	const namespace = "namespace"
 	const fileName = "fileName"
 	testController := controller{
@@ -36,15 +38,15 @@ func TestTemplateAlreadyApplied(t *testing.T) {
 	}
 	checksum1 := md5.Sum([]byte("template1")) // #nosec
 	checksum2 := md5.Sum([]byte("template2")) // #nosec
-	assert.False(t, testController.templateAlreadyApplied(namespace, fileName, checksum1))
+	assert.False(t, testController.templateAlreadyApplied(ctx, namespace, fileName, checksum1))
 
-	testController.appliedTemplates = make(map[string]TemplateChecksums)
-	testController.setTemplateChecksum(namespace, fileName, checksum1)
-	assert.True(t, testController.templateAlreadyApplied(namespace, fileName, checksum1))
-	assert.False(t, testController.templateAlreadyApplied(namespace, fileName, checksum2))
+	testController.appliedNamespaceTemplateChecksums = sync.Map{}
+	testController.setTemplateChecksum(ctx, namespace, fileName, checksum1)
+	assert.True(t, testController.templateAlreadyApplied(ctx, namespace, fileName, checksum1))
+	assert.False(t, testController.templateAlreadyApplied(ctx, namespace, fileName, checksum2))
 
-	testController.setTemplateChecksum(namespace, fileName, checksum2)
-	assert.True(t, testController.templateAlreadyApplied(namespace, fileName, checksum2))
+	testController.setTemplateChecksum(ctx, namespace, fileName, checksum2)
+	assert.True(t, testController.templateAlreadyApplied(ctx, namespace, fileName, checksum2))
 }
 
 func TestPopulateTemplateValues(t *testing.T) {
