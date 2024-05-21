@@ -16,7 +16,7 @@ import (
 func TestFetchFromAuthFlow(t *testing.T) {
 	ctx := context.Background()
 	t.Run("fetch from auth flow", func(t *testing.T) {
-		tokenCache := cache.NewTokenCacheInMemoryProvider()
+		tokenCache := &cache.TokenCacheInMemoryProvider{}
 		orchestrator, err := NewTokenOrchestrator(tokenorchestrator.BaseTokenOrchestrator{
 			ClientConfig: &oauth.Config{
 				Config: &oauth2.Config{

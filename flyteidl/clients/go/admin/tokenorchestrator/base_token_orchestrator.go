@@ -3,6 +3,7 @@ package tokenorchestrator
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"golang.org/x/oauth2"
 
@@ -52,21 +53,16 @@ func (t BaseTokenOrchestrator) FetchTokenFromCacheOrRefreshIt(ctx context.Contex
 		return nil, err
 	}
 
-	if token.Valid() {
+	if !token.Valid() {
+		return nil, fmt.Errorf("token from cache is invalid")
+	}
+
+	// If token doesn't need to be refreshed, return it.
+	if time.Now().Before(token.Expiry.Add(-tokenRefreshGracePeriod.Duration)) {
+		logger.Infof(ctx, "found the token in the cache")
 		return token, nil
 	}
-
-	t.TokenCache.Lock()
-	defer t.TokenCache.Unlock()
-
-	token, err = t.TokenCache.GetToken()
-	if err != nil {
-		return nil, err
-	}
-
-	if token.Valid() {
-		return token, nil
-	}
+	token.Expiry = token.Expiry.Add(-tokenRefreshGracePeriod.Duration)
 
 	token, err = t.RefreshToken(ctx, token)
 	if err != nil {
@@ -76,8 +72,6 @@ func (t BaseTokenOrchestrator) FetchTokenFromCacheOrRefreshIt(ctx context.Contex
 	if !token.Valid() {
 		return nil, fmt.Errorf("refreshed token is invalid")
 	}
-
-	token.Expiry = token.Expiry.Add(-tokenRefreshGracePeriod.Duration)
 
 	err = t.TokenCache.SaveToken(token)
 	if err != nil {
