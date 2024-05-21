@@ -255,8 +255,6 @@ func TestGetAuthenticationDialOptionPkce(t *testing.T) {
 		mockAuthClient := new(mocks.AuthMetadataServiceClient)
 		mockTokenCache.OnGetTokenMatch().Return(&tokenData, nil)
 		mockTokenCache.OnSaveTokenMatch(mock.Anything).Return(nil)
-		mockTokenCache.On("Lock").Return()
-		mockTokenCache.On("Unlock").Return()
 		mockAuthClient.OnGetOAuth2MetadataMatch(mock.Anything, mock.Anything).Return(metadata, nil)
 		mockAuthClient.OnGetPublicClientConfigMatch(mock.Anything, mock.Anything).Return(clientMetatadata, nil)
 		tokenSourceProvider, err := NewTokenSourceProvider(ctx, adminServiceConfig, mockTokenCache, mockAuthClient)
@@ -290,7 +288,7 @@ func Test_getPkceAuthTokenSource(t *testing.T) {
 		assert.NoError(t, err)
 
 		// populate the cache
-		tokenCache := cache.NewTokenCacheInMemoryProvider()
+		tokenCache := &cache.TokenCacheInMemoryProvider{}
 		assert.NoError(t, tokenCache.SaveToken(&tokenData))
 
 		baseOrchestrator := tokenorchestrator.BaseTokenOrchestrator{

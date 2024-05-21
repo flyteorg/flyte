@@ -17,9 +17,9 @@ func TestClientsetBuilder_Build(t *testing.T) {
 	cb := NewClientsetBuilder().WithConfig(&Config{
 		UseInsecureConnection: true,
 		Endpoint:              config.URL{URL: *u},
-	}).WithTokenCache(cache.NewTokenCacheInMemoryProvider())
+	}).WithTokenCache(&cache.TokenCacheInMemoryProvider{})
 	ctx := context.Background()
 	_, err := cb.Build(ctx)
 	assert.NoError(t, err)
-	assert.True(t, reflect.TypeOf(cb.tokenCache) == reflect.TypeOf(cache.NewTokenCacheInMemoryProvider()))
+	assert.True(t, reflect.TypeOf(cb.tokenCache) == reflect.TypeOf(&cache.TokenCacheInMemoryProvider{}))
 }
