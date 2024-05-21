@@ -29,6 +29,8 @@ If you are using a managed deployment of Flyte, you will need to contact your de
   - Configuring your Flyte deployment for the sensor agent.
 * - {ref}`SageMaker Inference <deployment-agent-setup-sagemaker-inference>`
   - Deploy models and create, as well as trigger inference endpoints on SageMaker.
+* - {ref}`OpenAI Batch <deployment-agent-setup-openai-batch>`
+  - Submit requests to OpenAI GPT models for asynchronous batch processing.
 ```
 
 ```{toctree}
@@ -44,4 +46,5 @@ mmcloud
 sagemaker_inference
 sensor
 snowflake
+openai_batch
 ```
