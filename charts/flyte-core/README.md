@@ -195,8 +195,11 @@ helm install gateway bitnami/contour -n flyte
 | flyteadmin.serviceMonitor.scrapeTimeout | string | `"30s"` | Sets the timeout after which request to scrape metrics will time out |
 | flyteadmin.tolerations | list | `[]` | tolerations for Flyteadmin deployment |
 | flyteagent.enabled | bool | `false` |  |
-| flyteagent.plugin_config.plugins.agentService.defaultAgent.endpoint | string | `"dns:///flyteagent.flyte.svc.cluster.local:8000"` |  |
-| flyteagent.plugin_config.plugins.agentService.defaultAgent.insecure | bool | `true` |  |
+| flyteagent.plugin_config.plugins.agent-service | object | `{"defaultAgent":{"endpoint":"dns:///flyteagent.flyte.svc.cluster.local:8000","insecure":true},"supportedTaskTypes":["sensor"]}` | Agent service configuration for propeller. |
+| flyteagent.plugin_config.plugins.agent-service.defaultAgent | object | `{"endpoint":"dns:///flyteagent.flyte.svc.cluster.local:8000","insecure":true}` | The default agent service to use for plugin tasks. |
+| flyteagent.plugin_config.plugins.agent-service.defaultAgent.endpoint | string | `"dns:///flyteagent.flyte.svc.cluster.local:8000"` | The agent service endpoint propeller should connect to. |
+| flyteagent.plugin_config.plugins.agent-service.defaultAgent.insecure | bool | `true` | Whether the connection from propeller to the agent service should use TLS. |
+| flyteagent.plugin_config.plugins.agent-service.supportedTaskTypes | list | `["sensor"]` | The task types supported by the default agent. |
 | flyteagent.podLabels | object | `{}` | Labels for flyteagent pods |
 | flyteconsole.affinity | object | `{}` | affinity for Flyteconsole deployment |
 | flyteconsole.enabled | bool | `true` |  |
