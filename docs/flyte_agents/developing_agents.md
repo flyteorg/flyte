@@ -169,13 +169,26 @@ kubectl set image deployment/flyteagent flyteagent=ghcr.io/flyteorg/flyteagent:l
 2. Update the FlytePropeller configmap:
 
 ```YAML
- tasks:
-   task-plugins:
-     enabled-plugins:
-       - agent-service
-     default-for-task-types:
-       - bigquery_query_job_task: agent-service
-       - custom_task: agent-service
+plugins:
+  agent-service:
+    defaultAgent:
+      endpoint: dns:///flyteagent.<flyteagent namespace>.svc.cluster.local:8000
+    supportedTaskTypes:
+    - sensor
+    - custom_task
+tasks:
+  task-plugins:
+    default-for-task-types:
+      custom_task: agent-service
+      container: container
+      container_array: k8s-array
+      sensor: agent-service
+      sidecar: sidecar
+    enabled-plugins:
+    - container
+    - sidecar
+    - k8s-array
+    - agent-service
 ```
 
 3. Restart FlytePropeller:
@@ -193,7 +206,7 @@ By running agents independently, you can thoroughly test and validate your agent
 controlled environment before deploying them to the production cluster.
 
 By default, all agent requests will be sent to the default agent service. However,
-you can route particular task requests to designated agent services by adjusting the FlytePropeller configuration. 
+you can route particular task requests to designated agent services by adjusting the FlytePropeller configuration.
 
 ```yaml
  plugins:
