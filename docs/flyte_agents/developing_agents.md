@@ -41,46 +41,72 @@ To create a new async agent, extend the [`AsyncAgentBase`](https://github.com/fl
 - `get`: This method retrieves the job resource (jobID or output literal) associated with the task, such as a BigQuery job ID or Databricks task ID.
 - `delete`: Invoking this method will send a request to delete the corresponding job.
 
+Below is a skeleton for an example async agent. Modify it as needed.
+
 ```python
+# agent.py
 from typing import Optional
 from dataclasses import dataclass
+
+from flyteidl.core.execution_pb2 import TaskExecution
 from flytekit.models.literals import LiteralMap
 from flytekit.models.task import TaskTemplate
 from flytekit.extend.backend.base_agent import AsyncAgentBase, AgentRegistry, Resource, ResourceMeta
 
 
 @dataclass
-class BigQueryMetadata(ResourceMeta):
+class ExampleMetadata(ResourceMeta):
     """
     This is the metadata for the job. For example, the id of the job.
     """
+
     job_id: str
 
-class BigQueryAgent(AsyncAgentBase):
+
+class ExampleAgent(AsyncAgentBase):
     def __init__(self):
-        super().__init__(task_type_name="bigquery", metadata_type=BigQueryMetadata)
+        super().__init__(task_type_name="example", metadata_type=ExampleMetadata)
 
     def create(
         self,
         task_template: TaskTemplate,
         inputs: Optional[LiteralMap] = None,
         **kwargs,
-    ) -> BigQueryMetadata:
-        job_id = submit_bigquery_job(inputs)
-        return BigQueryMetadata(job_id=job_id)
+    ) -> ExampleMetadata:
+        print(f"create called task_template={task_template}")
+        # pull out plugin specific configuration from the task
+        custom = task_template.custom
+        # pull out the environment field set from the task
+        environment = custom["environment"]
 
-    def get(self, resource_meta: BigQueryMetadata, **kwargs) -> Resource:
-        phase, outputs = get_job_status(resource_meta.job_id)
-        return Resource(phase=phase, outputs=outputs)
+        # submit job on external platform
+        # job_id = submit_job(inputs, environment)
+        job_id = "temp"
 
-    def delete(self, resource_meta: BigQueryMetadata, **kwargs):
-        cancel_bigquery_job(resource_meta.job_id)
+        # return metadata which will be used for following get & delete calls
+        return ExampleMetadata(job_id=job_id)
 
-# To register the bigquery agent
-AgentRegistry.register(BigQueryAgent())
+    def get(self, resource_meta: ExampleMetadata, **kwargs) -> Resource:
+        print(f"get called resource_meta={resource_meta}")
+        # query external platform for job status
+        # phase = get_job_status(resource_meta.job_id)
+        phase = TaskExecution.SUCCEEDED
+
+        # phases can be TaskExecution.RUNNING, TaskExecution.SUCCEEDED, TaskExecution.FAILED, etc
+        return Resource(phase=phase)
+
+    def delete(self, resource_meta: ExampleMetadata, **kwargs):
+        print(f"delete called resource_meta={resource_meta}")
+        # cancel job on external platform
+        # cancel_job(resource_meta.job_id)
+        pass
+
+
+# To register the example agent
+AgentRegistry.register(ExampleAgent())
 ```
 
-For an example implementation, see the [BigQuery agent](https://github.com/flyteorg/flytekit/blob/master/plugins/flytekit-bigquery/flytekitplugins/bigquery/agent.py#L43).
+For an example implementation of a real agent, see the [BigQuery agent](https://github.com/flyteorg/flytekit/blob/master/plugins/flytekit-bigquery/flytekitplugins/bigquery/agent.py#L43).
 
 #### Sync agent interface specification
 
@@ -193,7 +219,7 @@ By running agents independently, you can thoroughly test and validate your agent
 controlled environment before deploying them to the production cluster.
 
 By default, all agent requests will be sent to the default agent service. However,
-you can route particular task requests to designated agent services by adjusting the FlytePropeller configuration. 
+you can route particular task requests to designated agent services by adjusting the FlytePropeller configuration.
 
 ```yaml
  plugins:
