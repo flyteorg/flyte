@@ -29,7 +29,8 @@ func (t *TokenCacheInMemoryProvider) GetToken() (*oauth2.Token, error) {
 }
 
 func (t *TokenCacheInMemoryProvider) PurgeIfEquals(existing *oauth2.Token) (bool, error) {
-	return t.token.CompareAndSwap(existing, nil), nil
+	// Add an empty token since we can't mark it nil using Compare and swap
+	return t.token.CompareAndSwap(existing, &oauth2.Token{}), nil
 }
 
 func (t *TokenCacheInMemoryProvider) Lock() {
@@ -55,9 +56,10 @@ func (t *TokenCacheInMemoryProvider) CondBroadcast() {
 }
 
 func NewTokenCacheInMemoryProvider() *TokenCacheInMemoryProvider {
+	condMutex := &sync.Mutex{}
 	return &TokenCacheInMemoryProvider{
-		mu:    &sync.Mutex{},
+		mu:    condMutex,
 		token: atomic.Value{},
-		cond:  sync.NewCond(&sync.Mutex{}),
+		cond:  sync.NewCond(condMutex),
 	}
 }
