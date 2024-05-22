@@ -17,11 +17,11 @@ Select the integration you need and follow the steps to install the correspondin
 
   .. group-tab:: PyTorch/TensorFlow/MPI
 
-    1. Install the `Kubeflow training-operator <https://github.com/kubeflow/training-operator?tab=readme-ov-file#kubeflow-training-operator>`__:
+    1. Install the `Kubeflow training-operator <https://github.com/kubeflow/training-operator?tab=readme-ov-file#stable-release>`__ (Please install the stable release):
 
     .. code-block:: bash
 
-      kubectl apply -k "github.com/kubeflow/training-operator/manifests/overlays/standalone"
+      kubectl apply -k "github.com/kubeflow/training-operator/manifests/overlays/standalone?ref=v1.7.0"
 
     **Optional: Using a gang scheduler**
 
