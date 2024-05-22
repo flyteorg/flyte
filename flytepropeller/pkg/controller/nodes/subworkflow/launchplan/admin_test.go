@@ -25,6 +25,29 @@ import (
 	storageMocks "github.com/flyteorg/flyte/flytestdlib/storage/mocks"
 )
 
+var (
+	launchPlanWithOutputs = &core.LaunchPlanTemplate{
+		Id: &core.Identifier{},
+		Interface: &core.TypedInterface{
+			Inputs: &core.VariableMap{
+				Variables: map[string]*core.Variable{
+					"foo": {
+						Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING}},
+					},
+				},
+			},
+			Outputs: &core.VariableMap{
+				Variables: map[string]*core.Variable{
+					"bar": {
+						Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING}},
+					},
+				},
+			},
+		},
+	}
+	parentWorkflowID = "parentwf"
+)
+
 func TestAdminLaunchPlanExecutor_GetStatus(t *testing.T) {
 	ctx := context.TODO()
 	adminConfig := defaultAdminConfig
@@ -49,9 +72,22 @@ func TestAdminLaunchPlanExecutor_GetStatus(t *testing.T) {
 			mock.MatchedBy(func(o *admin.WorkflowExecutionGetRequest) bool { return true }),
 		).Return(result, nil)
 		assert.NoError(t, err)
-		s, _, err := exec.GetStatus(ctx, id)
+		s, _, err := exec.GetStatus(
+			ctx,
+			id,
+			launchPlanWithOutputs,
+			parentWorkflowID,
+		)
 		assert.NoError(t, err)
 		assert.Equal(t, result, s)
+
+		item, err := exec.(*adminLaunchPlanExecutor).cache.Get(id.String())
+		assert.NoError(t, err)
+		assert.NotNil(t, item)
+		assert.IsType(t, executionCacheItem{}, item)
+		e := item.(executionCacheItem)
+		assert.True(t, e.HasOutputs)
+		assert.Equal(t, parentWorkflowID, e.ParentWorkflowID)
 	})
 
 	t.Run("notFound", func(t *testing.T) {
@@ -86,18 +122,16 @@ func TestAdminLaunchPlanExecutor_GetStatus(t *testing.T) {
 				},
 			},
 			id,
-			&core.LaunchPlanTemplate{
-				Id: &core.Identifier{},
-			},
+			launchPlanWithOutputs,
 			nil,
-			"",
+			parentWorkflowID,
 		)
 		assert.NoError(t, err)
 
 		// Allow for sync to be called
 		time.Sleep(time.Second)
 
-		s, _, err := exec.GetStatus(ctx, id)
+		s, _, err := exec.GetStatus(ctx, id, launchPlanWithOutputs, parentWorkflowID)
 		assert.Error(t, err)
 		assert.Nil(t, s)
 		assert.True(t, IsNotFound(err))
@@ -135,18 +169,16 @@ func TestAdminLaunchPlanExecutor_GetStatus(t *testing.T) {
 				},
 			},
 			id,
-			&core.LaunchPlanTemplate{
-				Id: &core.Identifier{},
-			},
+			launchPlanWithOutputs,
 			nil,
-			"",
+			parentWorkflowID,
 		)
 		assert.NoError(t, err)
 
 		// Allow for sync to be called
 		time.Sleep(time.Second)
 
-		s, _, err := exec.GetStatus(ctx, id)
+		s, _, err := exec.GetStatus(ctx, id, launchPlanWithOutputs, parentWorkflowID)
 		assert.Error(t, err)
 		assert.Nil(t, s)
 		assert.False(t, IsNotFound(err))
@@ -190,11 +222,9 @@ func TestAdminLaunchPlanExecutor_Launch(t *testing.T) {
 				},
 			},
 			id,
-			&core.LaunchPlanTemplate{
-				Id: &core.Identifier{},
-			},
+			launchPlanWithOutputs,
 			nil,
-			"",
+			parentWorkflowID,
 		)
 		assert.NoError(t, err)
 	})
@@ -229,11 +259,9 @@ func TestAdminLaunchPlanExecutor_Launch(t *testing.T) {
 				ParentNodeExecution: parentNodeExecution,
 			},
 			id,
-			&core.LaunchPlanTemplate{
-				Id: &core.Identifier{},
-			},
+			launchPlanWithOutputs,
 			nil,
-			"",
+			parentWorkflowID,
 		)
 		assert.NoError(t, err)
 	})
@@ -281,11 +309,9 @@ func TestAdminLaunchPlanExecutor_Launch(t *testing.T) {
 				ParentNodeExecution: parentNodeExecution,
 			},
 			id,
-			&core.LaunchPlanTemplate{
-				Id: &core.Identifier{},
-			},
+			launchPlanWithOutputs,
 			nil,
-			"",
+			parentWorkflowID,
 		)
 		assert.NoError(t, err)
 		assert.True(t, createCalled)
@@ -312,11 +338,9 @@ func TestAdminLaunchPlanExecutor_Launch(t *testing.T) {
 				},
 			},
 			id,
-			&core.LaunchPlanTemplate{
-				Id: &core.Identifier{},
-			},
+			launchPlanWithOutputs,
 			nil,
-			"",
+			parentWorkflowID,
 		)
 		assert.Error(t, err)
 		assert.True(t, IsAlreadyExists(err))
@@ -343,11 +367,9 @@ func TestAdminLaunchPlanExecutor_Launch(t *testing.T) {
 				},
 			},
 			id,
-			&core.LaunchPlanTemplate{
-				Id: &core.Identifier{},
-			},
+			launchPlanWithOutputs,
 			nil,
-			"",
+			parentWorkflowID,
 		)
 		assert.Error(t, err)
 		assert.False(t, IsAlreadyExists(err))
