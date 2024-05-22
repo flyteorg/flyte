@@ -22,6 +22,44 @@ func TestSimpleLiteralCasting(t *testing.T) {
 		assert.True(t, castable, "Integers should be castable to other integers")
 	})
 
+	t.Run("IntegerToPythonAny", func(t *testing.T) {
+		castable := AreTypesCastable(
+			&core.LiteralType{
+				Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER},
+			},
+			&core.LiteralType{
+				Type: &core.LiteralType_Blob{},
+				Metadata: &structpb.Struct{
+					Fields: map[string]*structpb.Value{
+						"python_class_name": {
+							Kind: &structpb.Value_StringValue{StringValue: "typing.Any"},
+						},
+					},
+				},
+			},
+		)
+		assert.True(t, castable, "Integers should be castable to Python Any")
+	})
+
+	t.Run("PythonAnyToInteger", func(t *testing.T) {
+		castable := AreTypesCastable(
+			&core.LiteralType{
+				Type: &core.LiteralType_Blob{},
+				Metadata: &structpb.Struct{
+					Fields: map[string]*structpb.Value{
+						"python_class_name": {
+							Kind: &structpb.Value_StringValue{StringValue: "typing.Any"},
+						},
+					},
+				},
+			},
+			&core.LiteralType{
+				Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER},
+			},
+		)
+		assert.True(t, castable, "Python Any should be castable to Integers")
+	})
+
 	t.Run("IntegerToFloat", func(t *testing.T) {
 		castable := AreTypesCastable(
 			&core.LiteralType{
