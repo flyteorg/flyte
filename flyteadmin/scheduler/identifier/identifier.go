@@ -6,9 +6,11 @@ import (
 	"fmt"
 	"hash/fnv"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/samber/lo"
 
 	"github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/models"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -18,8 +20,7 @@ import (
 // Utility functions used by the flyte native scheduler
 
 const (
-	scheduleNameInputsFormat = "%s:%s:%s:%s"
-	executionIDInputsFormat  = scheduleNameInputsFormat + ":%d"
+	executionIDInputsFormat = "%s:%d"
 )
 
 // GetScheduleName generate the schedule name to be used as unique identification string within the scheduler
@@ -40,11 +41,19 @@ func GetExecutionIdentifier(ctx context.Context, identifier core.Identifier, sch
 	return uuid.FromBytes(b)
 }
 
+func getIdentifierString(identifier *core.Identifier) string {
+	fields := lo.Filter([]string{
+		identifier.Org, identifier.Project, identifier.Domain, identifier.Name, identifier.Version,
+	}, func(item string, index int) bool {
+		return len(item) > 0
+	})
+	return strings.Join(fields, ":")
+}
+
 // hashIdentifier returns the hash of the identifier
 func hashIdentifier(ctx context.Context, identifier core.Identifier) uint64 {
 	h := fnv.New64()
-	_, err := h.Write([]byte(fmt.Sprintf(scheduleNameInputsFormat,
-		identifier.Project, identifier.Domain, identifier.Name, identifier.Version)))
+	_, err := h.Write([]byte(getIdentifierString(&identifier)))
 	if err != nil {
 		// This shouldn't occur.
 		logger.Errorf(ctx,
@@ -55,11 +64,15 @@ func hashIdentifier(ctx context.Context, identifier core.Identifier) uint64 {
 	return h.Sum64()
 }
 
+func getExecutionIDInputsFormat(identifier *core.Identifier, scheduleTime time.Time) []byte {
+	return []byte(fmt.Sprintf(executionIDInputsFormat, getIdentifierString(identifier), scheduleTime.Unix()))
+}
+
 // hashScheduledTimeStamp return the hash of the identifier and the scheduledTime
 func hashScheduledTimeStamp(ctx context.Context, identifier core.Identifier, scheduledTime time.Time) uint64 {
 	h := fnv.New64()
-	_, err := h.Write([]byte(fmt.Sprintf(executionIDInputsFormat,
-		identifier.Project, identifier.Domain, identifier.Name, identifier.Version, scheduledTime.Unix())))
+
+	_, err := h.Write(getExecutionIDInputsFormat(&identifier, scheduledTime))
 	if err != nil {
 		// This shouldn't occur.
 		logger.Errorf(ctx,

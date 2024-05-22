@@ -5,12 +5,14 @@ package tests
 
 import (
 	"context"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/golang/protobuf/proto"
-	"github.com/stretchr/testify/assert"
 	"sync"
 	"testing"
+
+	"github.com/golang/protobuf/proto"
+	"github.com/stretchr/testify/assert"
+
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
 var taskResourceAttributes = &admin.TaskResourceAttributes{

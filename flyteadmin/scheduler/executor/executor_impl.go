@@ -55,6 +55,7 @@ func (w *executor) Execute(ctx context.Context, scheduledTime time.Time, s model
 
 	// Making the identifier deterministic using the hash of the identifier and scheduled time
 	executionIdentifier, err := identifier.GetExecutionIdentifier(ctx, core.Identifier{
+		Org:     s.Org,
 		Project: s.Project,
 		Domain:  s.Domain,
 		Name:    s.Name,
@@ -67,12 +68,14 @@ func (w *executor) Execute(ctx context.Context, scheduledTime time.Time, s model
 	}
 
 	executionRequest := &admin.ExecutionCreateRequest{
+		Org:     s.Org,
 		Project: s.Project,
 		Domain:  s.Domain,
 		Name:    "f" + strings.ReplaceAll(executionIdentifier.String(), "-", "")[:19],
 		Spec: &admin.ExecutionSpec{
 			LaunchPlan: &core.Identifier{
 				ResourceType: core.ResourceType_LAUNCH_PLAN,
+				Org:          s.Org,
 				Project:      s.Project,
 				Domain:       s.Domain,
 				Name:         s.Name,
