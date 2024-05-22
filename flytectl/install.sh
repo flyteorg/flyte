@@ -42,6 +42,10 @@ parse_args() {
   TAG=$1
 }
 
+# this function wraps all the destructive operations
+# if a curl|bash cuts off the end of the script due to
+# network, either nothing will happen or will syntax error
+# out preventing half-done work
 execute() {
   tmpdir=$(mktemp -d)
   log_debug "downloading files into ${tmpdir}"
@@ -146,7 +150,7 @@ log_prefix() {
   echo "$0"
 }
 
-_logp=7
+_logp=6
 log_set_priority() {
   _logp="$1"
 }
@@ -275,11 +279,7 @@ untar() {
 http_download_curl() {
   local_file=$1
   source_url=$2
-  log_info "http_download " $source_url
-  log_info "local_file" $local_file
-  log_info "source_url" $source_url
   header=$3
-  log_info "header" $header
   if [ -z "$header" ];then
     code=$(curl -w '%{http_code}' -sL -o "$local_file" "$source_url")
   else
@@ -336,13 +336,15 @@ github_release() {
   json=$(http_copy "$giturl" "Accept:application/json")
   test -z "$json" && return 1
   if [ "$version" = "latest" ]; then
-  # Get the first element of the filtered json array
+    # Get the first element of the filtered json array
     version=$(echo "$json" | head -n 1 | sed 's/"flytectl\///' | sed 's/"//')
   else
     # Get the element of the filtered json array that matches the version
     version=$(echo "$json" | grep -oE '"flytectl/'"$version"'"' | sed 's/"flytectl\///' | sed 's/"//')
   fi
   test -z "$version" && return 1
+  # Notice that we're prepending "flytectl/" to the found version. That prefix is part of the asset used
+  # to download the flytectl binary.
   echo "flytectl/$version"
 }
 
