@@ -279,10 +279,19 @@ flyteagent:
   enabled: false
   plugin_config:
     plugins:
-      agentService:
+      # -- Agent service configuration for propeller.
+      agent-service:
+        # -- The default agent service to use for plugin tasks.
         defaultAgent:
+          # -- The agent service endpoint propeller should connect to.
           endpoint: "dns:///flyteagent.flyte.svc.cluster.local:8000"
+          # -- Whether the connection from propeller to the agent service should use TLS.
           insecure: true
+        # -- The task types supported by the default agent.
+        supportedTaskTypes:
+        - sensor
+        # -- Uncomment to enable task type that uses Flyte Agent
+        # - bigquery_query_job_task
   # -- Labels for flyteagent pods
   podLabels: {}
 
