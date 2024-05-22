@@ -6,7 +6,7 @@ dependencies:
   - pip
   - codespell
   - furo
-  - flytekit>=1.10.2
+  - flytekit>=1.12.1b2
   - gitpython
   - ipython!=8.7.0
   - graphviz
