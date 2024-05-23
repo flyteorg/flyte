@@ -24,7 +24,6 @@ func (t *TokenCacheInMemoryProvider) GetToken() (*oauth2.Token, error) {
 	if tkn == nil {
 		return nil, fmt.Errorf("cannot find token in cache")
 	}
-
 	return tkn.(*oauth2.Token), nil
 }
 
@@ -46,8 +45,12 @@ func (t *TokenCacheInMemoryProvider) Unlock() {
 }
 
 // CondWait waits for the condition to be true.
+// It also locks the Locker in the condition variable as the semantics of Wait is that it unlocks the Locker after adding
+// the consumer to the waitlist and before blocking on notification.
 func (t *TokenCacheInMemoryProvider) CondWait() {
+	t.cond.L.Lock()
 	t.cond.Wait()
+	t.cond.L.Unlock()
 }
 
 // CondBroadcast signals the condition.
@@ -56,10 +59,9 @@ func (t *TokenCacheInMemoryProvider) CondBroadcast() {
 }
 
 func NewTokenCacheInMemoryProvider() *TokenCacheInMemoryProvider {
-	condMutex := &sync.Mutex{}
 	return &TokenCacheInMemoryProvider{
-		mu:    condMutex,
+		mu:    &sync.Mutex{},
 		token: atomic.Value{},
-		cond:  sync.NewCond(condMutex),
+		cond:  sync.NewCond(&sync.Mutex{}),
 	}
 }
