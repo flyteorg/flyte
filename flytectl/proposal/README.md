@@ -231,7 +231,7 @@ Support
 
 ## Install all examples
 
-Today Flytesnacks houses a few examples for Flyte usage in python. When a user wants to get started with Flyte quickly, it would be preferable that all Flytesnacks examples are serialized and stored as artifacts in flytesnacks for every checkin. This can be done for python flytekit using `pyflyte serialize` command. Once they are posted as serialized blobs, flytectl could easily retrieve them and register them in a specific project as desired by the user.
+Today Flytesnacks houses a few examples for Flyte usage in python. When a user wants to get started with Flyte quickly, it would be preferable that all Flytesnacks examples are serialized and stored as artifacts in flytesnacks for every commit to master. This can be done for python flytekit using `pyflyte serialize` command. Once they are posted as serialized blobs, flytectl could easily retrieve them and register them in a specific project as desired by the user.
 
 ```bash
 $ flytectl examples register-all [cookbook|plugins|--custom-path=remote-path] [--semver semantic-version-of-flytesnacks-examples] --target-project --target-domain
