@@ -44,7 +44,8 @@ func (t *TokenCacheInMemoryProvider) Unlock() {
 	t.mu.Unlock()
 }
 
-// CondWait waits for the condition to be true.
+// CondWait  adds the current go routine to the condition waitlist and waits for another go routine to notify using CondBroadcast
+// The current usage is that one who was able to acquire the lock using TryLock is the one who gets a valid token and notifies all the waitlist requesters so that they can use the new valid token.
 // It also locks the Locker in the condition variable as the semantics of Wait is that it unlocks the Locker after adding
 // the consumer to the waitlist and before blocking on notification.
 func (t *TokenCacheInMemoryProvider) CondWait() {
