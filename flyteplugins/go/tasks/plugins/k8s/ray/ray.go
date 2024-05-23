@@ -562,7 +562,6 @@ func (plugin rayJobResourceHandler) GetTaskPhase(ctx context.Context, pluginCont
 	}
 
 	var phaseInfo pluginsCore.PhaseInfo
-	var err error
 
 	// KubeRay creates a Ray cluster first, and then submits a Ray job to the cluster
 	switch rayJob.Status.JobDeploymentStatus {
