@@ -41,10 +41,10 @@ for tool in "${tools[@]}"; do
 		echo "Renaming mockery to mockery-fork"
 		mv $(go env GOPATH)/bin/mockery $(go env GOPATH)/bin/mockery-fork
 	fi
-	# If tool is named vektra/mockery/v2, we need to rename the binary to mockery-vektra
+	# If tool is named vektra/mockery/v2, we need to rename the binary to mockery-v2
 	if [[ $tool == "github.com/vektra/mockery/v2@v2.40.3" ]]; then
-		echo "Renaming mockery to mockery-vektra"
-		mv $(go env GOPATH)/bin/mockery $(go env GOPATH)/bin/mockery-vektra
+		echo "Renaming mockery to mockery-v2"
+		mv $(go env GOPATH)/bin/mockery $(go env GOPATH)/bin/mockery-v2
 	fi
 done
 
