@@ -151,8 +151,8 @@ spec:
         imagePullPolicy: "{{ .Values.flyteadmin.image.pullPolicy }}"
         name: flyteadmin
         ports:
-        - containerPort: 8088
-        - containerPort: 8089
+        - containerPort: {{ .Values.configmap.adminServer.server.httpPort }}
+        - containerPort: {{ .Values.configmap.adminServer.server.grpc.port }}
         - containerPort: {{ .Values.configmap.adminServer.flyteadmin.profilerPort }}
         readinessProbe:
           exec:

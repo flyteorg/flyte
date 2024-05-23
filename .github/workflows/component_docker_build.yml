@@ -17,7 +17,7 @@ jobs:
       cache_key: ${{ steps.cache_key.outputs.cache_key }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - id: load-docker-cache
         name: Load Docker Cache
         uses: actions/cache@v3

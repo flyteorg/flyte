@@ -10,9 +10,10 @@
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
-# documentation root, use os.path.abspath to make it absolute, like shown here.
+# documentation root, use pathlib.Path.resolve(strict=True) to make it absolute, like shown here.
 
 import os
+from pathlib import Path
 import logging
 import sys
 
@@ -21,8 +22,8 @@ import sphinx.errors
 from sphinx.util import logging as sphinx_logging
 
 
-sys.path.insert(0, os.path.abspath("../"))
-sys.path.append(os.path.abspath("./_ext"))
+sys.path.insert(0, str(Path("../").resolve(strict=True)))
+sys.path.append(str(Path("./_ext").resolve(strict=True)))
 
 sphinx.application.ExtensionError = sphinx.errors.ExtensionError
 
@@ -35,7 +36,7 @@ author = "Flyte"
 # The short X.Y version
 version = ""
 # The full version, including alpha/beta/rc tags
-release = "1.10.7"
+release = "1.12.0"
 
 # -- General configuration ---------------------------------------------------
 
@@ -65,7 +66,8 @@ extensions = [
     "sphinxext.remoteliteralinclude",
     "sphinx_issues",
     "sphinx_click",
-    "sphinx_panels",
+    "sphinx_design",
+    "sphinx_reredirects",
     "sphinxcontrib.mermaid",
     "sphinxcontrib.video",
     "sphinxcontrib.youtube",
@@ -90,6 +92,19 @@ extlinks = {
     "idl": ("https://github.com/flyteorg/flyteidl/tree/v0.14.1/%s", ""),
     "admin": ("https://github.com/flyteorg/flyteadmin/tree/master/%s", ""),
     "cookbook": ("https://flytecookbook.readthedocs.io/en/latest/", None),
+}
+
+# redirects
+redirects = {
+    "flytesnacks/deprecated_integrations": "../deprecated_integrations/index.html",
+    "flytesnacks/examples/bigquery_plugin/index": "../../../deprecated_integrations/bigquery_plugin/index.html",
+    "flytesnacks/examples/bigquery_plugin/bigquery_plugin_example": "../../../deprecated_integrations/bigquery_plugin/biquery_plugin_example.html",
+    "flytesnacks/examples/databricks_plugin/index": "../../../deprecated_integrations/databricks_plugin/index.html",
+    "flytesnacks/examples/databricks_plugin/databricks_plugin_example": "../../../deprecated_integrations/databricks_plugin/databricks_plugin_example.html",
+    "flytesnacks/examples/mmcloud_plugin/index": "../../../deprecated_integrations/mmcloud_plugin/index.html",
+    "flytesnacks/examples/mmcloud_plugin/mmcloud_plugin_example": "../../../deprecated_integrations/mmcloud_plugin/mmcloud_plugin_example.html",
+    "flytesnacks/examples/snowflake_plugin/index": "../../../deprecated_integrations/snowflake_plugin/index.html",
+    "flytesnacks/examples/snowflake_plugin/snowflake_plugin_example": "../../../deprecated_integrations/snowflake_plugin/snowflake_plugin_example.html",
 }
 
 
@@ -129,6 +144,7 @@ exclude_patterns = [
     "flytesnacks/feature_engineering.md",
     "flytesnacks/flyte_lab.md",
     "flytesnacks/ml_training.md",
+    "flytesnacks/deprecated_integrations.md",
     "flytesnacks/README.md",
     "flytekit/**/README.md",
     "flytekit/_templates/**",
@@ -140,7 +156,6 @@ exclude_patterns = [
     "protos/index.rst",
     "api/flytekit/_templates/**",
     "api/flytekit/index.rst",
-    "reference/index.rst",
 ]
 
 # -- Options for HTML output -------------------------------------------------
@@ -187,6 +202,7 @@ html_theme_options = {
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
 html_css_files = ["custom.css", "flyte.css", "algolia.css"]
+html_js_files = ["custom.js"]
 
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.
@@ -313,6 +329,7 @@ PROTO_REF_REPLACE = r"\1/protos/docs"
 # These patterns are used to replace values in source files that are imported
 # from other repos.
 REPLACE_PATTERNS = {
+
     r"<flyte:deployment/index>": r"</deployment/index>",
     r"<flytectl:index>": r"</flytectl/overview>",
     INTERSPHINX_REFS_PATTERN: INTERSPHINX_REFS_REPLACE,
@@ -328,17 +345,17 @@ REPLACE_PATTERNS = {
     PROTO_REF_PATTERN: PROTO_REF_REPLACE,
     r"/protos/docs/service/index": r"/protos/docs/service/service",
     r"<weather_forecasting>": r"</flytesnacks/weather_forecasting>",
-    r"<environment_setup>": r"</flytesnacks/environment_setup>"
 }
+
+# r"<environment_setup>": r"</flytesnacks/environment_setup>",
 
 import_projects_config = {
     "clone_dir": "_projects",
     "flytekit_api_dir": "_src/flytekit/",
     "source_regex_mapping": REPLACE_PATTERNS,
     "list_table_toc": [
-        "flytesnacks/userguide",
-        "flytesnacks/tutorials",
-        "flytesnacks/integrations",
+       "flytesnacks/tutorials",
+       "flytesnacks/integrations"
     ],
     "dev_build": bool(int(os.environ.get("MONODOCS_DEV_BUILD", 1))),
 }
@@ -347,7 +364,6 @@ import_projects_config = {
 # is useful for building the docs in the CI/CD of the corresponding repos.
 flytesnacks_local_path = os.environ.get("FLYTESNACKS_LOCAL_PATH", None)
 flytekit_local_path = os.environ.get("FLYTEKIT_LOCAL_PATH", None)
-flytectl_local_path = os.environ.get("FLYTECTL_LOCAL_PATH", None)
 
 flytesnacks_path = flytesnacks_local_path or "_projects/flytesnacks"
 flytekit_path = flytekit_local_path or "_projects/api/flytekit"
@@ -368,7 +384,19 @@ import_projects = [
                 "flytesnacks/auto_examples",
                 "flytesnacks/_build",
                 "flytesnacks/_tags",
-                "flytesnacks/getting_started",
+                "flytesnacks/index.md",
+                "examples/advanced_composition",
+                "examples/basics",
+                "examples/customizing_dependencies",
+                "examples/data_types_and_io",
+                "examples/development_lifecycle",
+                "examples/extending",
+                "examples/productionizing",
+                "examples/testing",
+                "examples/bigquery_plugin",
+                "examples/databricks_plugin",
+                "examples/mmcloud_plugin",
+                "examples/snowflake_plugin",
             ]
         ],
         "local": flytesnacks_local_path is not None,
@@ -388,10 +416,10 @@ import_projects = [
     },
     {
         "name": "flytectl",
-        "source": flytectl_local_path or "https://github.com/flyteorg/flytectl",
+        "source": "../flytectl",
         "docs_path": "docs/source",
         "dest": "flytectl",
-        "local": flytectl_local_path is not None,
+        "local": True,
     },
     {
         "name": "flyteidl",

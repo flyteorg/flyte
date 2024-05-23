@@ -88,12 +88,15 @@ func (m *LaunchPlanManager) CreateLaunchPlan(
 	existingLaunchPlanModel, err := util.GetLaunchPlanModel(ctx, m.db, *request.Id)
 	if err == nil {
 		if bytes.Equal(existingLaunchPlanModel.Digest, launchPlanDigest) {
-			return nil, errors.NewFlyteAdminErrorf(codes.AlreadyExists,
-				"identical launch plan already exists with id %s", request.Id)
+			return nil, errors.NewLaunchPlanExistsIdenticalStructureError(ctx, &request)
 		}
-
-		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
-			"launch plan with different structure already exists with id %v", request.Id)
+		existingLaunchPlan, transformerErr := transformers.FromLaunchPlanModel(existingLaunchPlanModel)
+		if transformerErr != nil {
+			logger.Errorf(ctx, "failed to transform launch plan from launch plan model")
+			return nil, transformerErr
+		}
+		// A launch plan exists with different structure
+		return nil, errors.NewLaunchPlanExistsDifferentStructureError(ctx, &request, existingLaunchPlan.Spec, launchPlan.Spec)
 	}
 
 	launchPlanModel, err :=

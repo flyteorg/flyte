@@ -36,3 +36,14 @@ table {
     width: 100%;
     box-shadow: none !important;
 }
+
+.sidebar-container, .toc-drawer {
+    width: 22em;
+    padding-right: 0;
+}
+
+@media (max-width: 82em) {
+    .toc-drawer {
+        right: -22em;
+    }
+}

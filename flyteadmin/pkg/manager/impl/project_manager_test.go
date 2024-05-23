@@ -278,3 +278,59 @@ func TestProjectManager_UpdateProject_ErrorDueToInvalidProjectName(t *testing.T)
 	})
 	assert.EqualError(t, err, "project_name cannot exceed 64 characters")
 }
+
+func TestProjectManager_TestGetProject(t *testing.T) {
+	mockRepository := repositoryMocks.NewMockRepository()
+	mockedProject := &admin.ProjectGetRequest{Id: project}
+	activeState := int32(admin.Project_ACTIVE)
+	mockRepository.ProjectRepo().(*repositoryMocks.MockProjectRepo).GetFunction = func(ctx context.Context, projectID string) (models.Project, error) {
+
+		return models.Project{
+			BaseModel:   models.BaseModel{},
+			Identifier:  projectID,
+			Name:        "a-mocked-project",
+			Description: "A mocked project",
+			State:       &activeState,
+		}, nil
+	}
+
+	projectManager := NewProjectManager(mockRepository, runtimeMocks.NewMockConfigurationProvider(
+		getMockApplicationConfigForProjectManagerTest(), nil, nil, nil, nil, nil))
+
+	resp, _ := projectManager.GetProject(context.Background(),
+		*mockedProject)
+
+	assert.Equal(t, mockedProject.Id, resp.Id)
+	assert.Equal(t, "a-mocked-project", resp.Name)
+	assert.Equal(t, "A mocked project", resp.Description)
+	assert.Equal(t, admin.Project_ProjectState(0), resp.State)
+}
+
+func TestProjectManager_TestGetProject_ErrorDueToProjectNotFound(t *testing.T) {
+	mockRepository := repositoryMocks.NewMockRepository()
+	mockedProject := &admin.ProjectGetRequest{Id: project}
+	mockRepository.ProjectRepo().(*repositoryMocks.MockProjectRepo).GetFunction = func(ctx context.Context, projectID string) (models.Project, error) {
+		return models.Project{}, errors.New("project " + projectID + " not found")
+	}
+
+	projectManager := NewProjectManager(mockRepository, runtimeMocks.NewMockConfigurationProvider(
+		getMockApplicationConfigForProjectManagerTest(), nil, nil, nil, nil, nil))
+
+	_, err := projectManager.GetProject(context.Background(),
+		*mockedProject)
+
+	assert.EqualError(t, err, "project "+project+" not found")
+}
+
+func TestProjectManager_TestGetProject_ErrorDueToEmptyProjectGetRequest(t *testing.T) {
+	mockRepository := repositoryMocks.NewMockRepository()
+	mockedProject := &admin.ProjectGetRequest{Id: ""}
+
+	projectManager := NewProjectManager(mockRepository, runtimeMocks.NewMockConfigurationProvider(
+		getMockApplicationConfigForProjectManagerTest(), nil, nil, nil, nil, nil))
+
+	_, err := projectManager.GetProject(context.Background(),
+		*mockedProject)
+
+	assert.EqualError(t, err, "missing project_id")
+}

@@ -170,7 +170,7 @@ apply.
 
 .. note::
     The template values, for example, ``projectQuotaCpu`` or ``projectQuotaMemory`` are free-form strings.
-    Ensure that they match the template placeholders in your `template file <https://github.com/flyteorg/flyte/blob/master/kustomize/base/single_cluster/headless/config/clusterresource-templates/ab_project-resource-quota.yaml>`__
+    Ensure that they match the template placeholders in your values file (e.g. `values-eks.yaml <https://github.com/flyteorg/flyte/blob/1e3d515550cb338c2edb3919d79c6fa1f0da5a19/charts/flyte-core/values-eks.yaml#L366-L388>`__)
     for your changes to take effect and custom values to be substituted.
 
 You can view all custom cluster-resource-attributes by visiting ``protocol://<host/api/v1/matchable_attributes?resource_type=1>``
@@ -187,7 +187,7 @@ etc. in the `Workflow execution config <https://github.com/flyteorg/flyteidl/blo
 - `max_parallelism`: Limits maximum number of nodes that can be evaluated for an individual workflow in parallel
 - `security context <https://docs.flyte.org/projects/flyteidl/en/latest/protos/docs/core/core.html#securitycontext>`__: configures the pod identity and auth credentials for task pods at execution time
 - `raw_output_data_config`: where offloaded user data is stored
-- `interruptible`: whether to use [spot instances](https://docs.flyte.org/en/latest/flytesnacks/examples/productionizing/spot_instances.html#using-spot-preemptible-instances)
+- `interruptible`: whether to use [spot instances](https://docs.flyte.org/en/user_guide/productionizing/spot_instances.html)
 - `overwrite_cache`: Allows for all cached values of a workflow and its tasks to be overwritten for a single execution.
 - `envs`: Custom environment variables to apply for task pods brought up during execution
 

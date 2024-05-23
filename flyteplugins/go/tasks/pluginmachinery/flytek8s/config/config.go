@@ -90,6 +90,10 @@ type K8sPluginConfig struct {
 	DefaultEnvVars map[string]string `json:"default-env-vars" pflag:"-,Additional environment variable that should be injected into every resource"`
 	// Provide additional environment variable pairs whose values resolve from the plugin's execution environment.
 	DefaultEnvVarsFromEnv map[string]string `json:"default-env-vars-from-env" pflag:"-,Additional environment variable that should be injected into every resource"`
+	// Provide additional environment variable parts from configMaps
+	DefaultEnvFromConfigMaps []string `json:"default-env-from-configmaps" pflag:"-,Additional environment variable sets that should be injected into each pod from these configMaps"`
+	// Provide additional environment variable parts from secrets
+	DefaultEnvFromSecrets []string `json:"default-env-from-secrets" pflag:"-,Additional environment variable sets that should be injected into each pod from these secret"`
 
 	// default cpu requests for a container
 	DefaultCPURequest resource.Quantity `json:"default-cpus" pflag:",Defines a default value for cpu for containers if not specified."`
@@ -151,6 +155,9 @@ type K8sPluginConfig struct {
 	// error persists past this grace period, it will be inferred to be a permanent
 	// one, and the corresponding task marked as failed
 	ImagePullBackoffGracePeriod config2.Duration `json:"image-pull-backoff-grace-period" pflag:"-,Time to wait for transient ImagePullBackoff errors to be resolved."`
+
+	// ImagePullPolicy for the submitted pod.
+	ImagePullPolicy v1.PullPolicy `json:"image-pull-policy" pflag:"-,Image pull policy for all k8s pods created by FlytePropeller."`
 
 	// Time to wait while pod is in pending phase. If the pod is stuck in
 	// pending phase past this timeout, it will be inferred to be a permanent

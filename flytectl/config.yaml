@@ -1,0 +1,10 @@
+admin:
+  # For GRPC endpoints you might want to use dns:///flyte.myexample.com
+  endpoint: dns:///localhost:30080
+  insecure: true
+  authType: Pkce
+console:
+  endpoint: http://localhost:30080
+logger:
+  show-source: true
+  level: 0

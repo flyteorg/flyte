@@ -307,3 +307,35 @@ func TestRandomClusterSelectorGetTargetWithFallbackToDefault3(t *testing.T) {
 	assert.Equal(t, testCluster1, target.ID)
 	assert.True(t, target.Enabled)
 }
+
+func TestRandomClusterSelectorGetTargetWithExecutionClusterLabelClusterAssignmentOne(t *testing.T) {
+	cluster := getRandomClusterSelectorWithDefaultLabelForTest(t, clusterConfig2WithDefaultLabel)
+	target, err := cluster.GetTarget(context.Background(), &executioncluster.ExecutionTargetSpec{
+		Project:     testProject,
+		Domain:      "different",
+		Workflow:    testWorkflow,
+		ExecutionID: "e3",
+		ExecutionClusterLabel: &admin.ExecutionClusterLabel{
+			Value: "one",
+		},
+	})
+	assert.Nil(t, err)
+	assert.Equal(t, "testcluster1", target.ID)
+	assert.True(t, target.Enabled)
+}
+
+func TestRandomClusterSelectorGetTargetWithExecutionClusterLabelClusterAssignmentThree(t *testing.T) {
+	cluster := getRandomClusterSelectorWithDefaultLabelForTest(t, clusterConfig2WithDefaultLabel)
+	target, err := cluster.GetTarget(context.Background(), &executioncluster.ExecutionTargetSpec{
+		Project:     testProject,
+		Domain:      "different",
+		Workflow:    testWorkflow,
+		ExecutionID: "e3",
+		ExecutionClusterLabel: &admin.ExecutionClusterLabel{
+			Value: "three",
+		},
+	})
+	assert.Nil(t, err)
+	assert.Equal(t, "testcluster3", target.ID)
+	assert.True(t, target.Enabled)
+}

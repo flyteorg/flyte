@@ -21,8 +21,9 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Codespell
         uses: codespell-project/actions-codespell@v2
         with:
           skip: "*.pb,monodocs-environment.lock.yaml"
+          ignore_words_list: crate,lightyear,fo

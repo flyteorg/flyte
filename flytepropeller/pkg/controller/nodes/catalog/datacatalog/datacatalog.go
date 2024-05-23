@@ -147,8 +147,8 @@ func (m *CatalogClient) Get(ctx context.Context, key catalog.Key) (catalog.Entry
 	return catalog.NewCatalogEntry(ioutils.NewInMemoryOutputReader(outputs, nil, nil), catalog.NewStatus(core.CatalogCacheStatus_CACHE_HIT, md)), nil
 }
 
-// CreateDataset creates a Dataset in datacatalog including the associated metadata.
-func (m *CatalogClient) CreateDataset(ctx context.Context, key catalog.Key, metadata *datacatalog.Metadata) (*datacatalog.DatasetID, error) {
+// createDataset creates a Dataset in datacatalog including the associated metadata.
+func (m *CatalogClient) createDataset(ctx context.Context, key catalog.Key, metadata *datacatalog.Metadata) (*datacatalog.DatasetID, error) {
 	datasetID, err := GenerateDatasetIDForTask(ctx, key)
 	if err != nil {
 		logger.Errorf(ctx, "DataCatalog failed to generate dataset for ID: %s, err: %s", key.Identifier, err)
@@ -205,9 +205,9 @@ func (m *CatalogClient) prepareInputsAndOutputs(ctx context.Context, key catalog
 	return inputs, outputs, nil
 }
 
-// CreateArtifact creates an Artifact in datacatalog including its associated ArtifactData and tags it with a hash of
+// createArtifact creates an Artifact in datacatalog including its associated ArtifactData and tags it with a hash of
 // the provided input values for retrieval.
-func (m *CatalogClient) CreateArtifact(ctx context.Context, key catalog.Key, datasetID *datacatalog.DatasetID, inputs *core.LiteralMap, outputs *core.LiteralMap, metadata catalog.Metadata) (catalog.Status, error) {
+func (m *CatalogClient) createArtifact(ctx context.Context, key catalog.Key, datasetID *datacatalog.DatasetID, inputs *core.LiteralMap, outputs *core.LiteralMap, metadata catalog.Metadata) (catalog.Status, error) {
 	logger.Debugf(ctx, "Creating artifact for key %+v, dataset %+v and execution %+v", key, datasetID, metadata)
 
 	// Create the artifact for the execution that belongs in the task
@@ -263,8 +263,8 @@ func (m *CatalogClient) CreateArtifact(ctx context.Context, key catalog.Key, dat
 	return catalog.NewStatus(core.CatalogCacheStatus_CACHE_POPULATED, EventCatalogMetadata(datasetID, tag, nil)), nil
 }
 
-// UpdateArtifact overwrites the ArtifactData of an existing artifact with the provided data in datacatalog.
-func (m *CatalogClient) UpdateArtifact(ctx context.Context, key catalog.Key, datasetID *datacatalog.DatasetID, inputs *core.LiteralMap, outputs *core.LiteralMap, metadata catalog.Metadata) (catalog.Status, error) {
+// updateArtifact overwrites the ArtifactData of an existing artifact with the provided data in datacatalog.
+func (m *CatalogClient) updateArtifact(ctx context.Context, key catalog.Key, datasetID *datacatalog.DatasetID, inputs *core.LiteralMap, outputs *core.LiteralMap, metadata catalog.Metadata) (catalog.Status, error) {
 	logger.Debugf(ctx, "Updating artifact for key %+v, dataset %+v and execution %+v", key, datasetID, metadata)
 
 	artifactDataList := make([]*datacatalog.ArtifactData, 0, len(outputs.Literals))
@@ -316,17 +316,21 @@ func (m *CatalogClient) UpdateArtifact(ctx context.Context, key catalog.Key, dat
 // Lastly, CatalogClient will create an Artifact tagged with the input value hash and store the provided execution data.
 func (m *CatalogClient) Put(ctx context.Context, key catalog.Key, reader io.OutputReader, metadata catalog.Metadata) (catalog.Status, error) {
 	// Ensure dataset exists, idempotent operations. Populate Metadata for later recovery
-	datasetID, err := m.CreateDataset(ctx, key, GetDatasetMetadataForSource(metadata.TaskExecutionIdentifier))
+	datasetID, err := m.createDataset(ctx, key, GetDatasetMetadataForSource(metadata.TaskExecutionIdentifier))
 	if err != nil {
-		return catalog.Status{}, err
+		return catalog.NewPutFailureStatus(&key), err
 	}
 
 	inputs, outputs, err := m.prepareInputsAndOutputs(ctx, key, reader)
 	if err != nil {
-		return catalog.Status{}, err
+		return catalog.NewPutFailureStatus(&key), err
 	}
 
-	return m.CreateArtifact(ctx, key, datasetID, inputs, outputs, metadata)
+	createArtifactStatus, err := m.createArtifact(ctx, key, datasetID, inputs, outputs, metadata)
+	if err != nil {
+		return catalog.NewPutFailureStatus(&key), err
+	}
+	return createArtifactStatus, err
 }
 
 // Update stores the result of a task execution as a cached Artifact, overwriting any already stored data from a previous
@@ -337,27 +341,31 @@ func (m *CatalogClient) Put(ctx context.Context, key catalog.Key, reader io.Outp
 // has of the input values will exist.
 func (m *CatalogClient) Update(ctx context.Context, key catalog.Key, reader io.OutputReader, metadata catalog.Metadata) (catalog.Status, error) {
 	// Ensure dataset exists, idempotent operations. Populate Metadata for later recovery
-	datasetID, err := m.CreateDataset(ctx, key, GetDatasetMetadataForSource(metadata.TaskExecutionIdentifier))
+	datasetID, err := m.createDataset(ctx, key, GetDatasetMetadataForSource(metadata.TaskExecutionIdentifier))
 	if err != nil {
-		return catalog.Status{}, err
+		return catalog.NewPutFailureStatus(&key), err
 	}
 
 	inputs, outputs, err := m.prepareInputsAndOutputs(ctx, key, reader)
 	if err != nil {
-		return catalog.Status{}, err
+		return catalog.NewPutFailureStatus(&key), err
 	}
 
-	catalogStatus, err := m.UpdateArtifact(ctx, key, datasetID, inputs, outputs, metadata)
+	catalogStatus, err := m.updateArtifact(ctx, key, datasetID, inputs, outputs, metadata)
 	if err != nil {
 		if status.Code(err) == codes.NotFound {
 			// No existing artifact found (e.g. initial execution of task with overwrite flag already set),
 			// silently ignore error and create artifact instead to make overwriting an idempotent operation.
 			logger.Debugf(ctx, "Artifact %+v for dataset %+v does not exist while updating, creating instead", key, datasetID)
-			return m.CreateArtifact(ctx, key, datasetID, inputs, outputs, metadata)
+			createArtifactStatus, err := m.createArtifact(ctx, key, datasetID, inputs, outputs, metadata)
+			if err != nil {
+				return catalog.NewPutFailureStatus(&key), err
+			}
+			return createArtifactStatus, nil
 		}
 
 		logger.Errorf(ctx, "Failed to update artifact %+v for dataset %+v: %v", key, datasetID, err)
-		return catalog.Status{}, err
+		return catalog.NewPutFailureStatus(&key), err
 	}
 
 	logger.Debugf(ctx, "Successfully updated artifact %+v for dataset %+v", key, datasetID)
@@ -444,16 +452,17 @@ func (m *CatalogClient) ReleaseReservation(ctx context.Context, key catalog.Key,
 }
 
 // NewDataCatalog creates a new Datacatalog client for task execution caching
-func NewDataCatalog(ctx context.Context, endpoint string, insecureConnection bool, maxCacheAge time.Duration, useAdminAuth bool, defaultServiceConfig string, authOpt ...grpc.DialOption) (*CatalogClient, error) {
+func NewDataCatalog(ctx context.Context, endpoint string, insecureConnection bool, maxCacheAge time.Duration,
+	useAdminAuth bool, defaultServiceConfig string, maxRetries uint, backoffScalar int, backoffJitter float64, authOpt ...grpc.DialOption) (*CatalogClient, error) {
 	var opts []grpc.DialOption
 	if useAdminAuth && authOpt != nil {
 		opts = append(opts, authOpt...)
 	}
 
 	grpcOptions := []grpcRetry.CallOption{
-		grpcRetry.WithBackoff(grpcRetry.BackoffLinear(100 * time.Millisecond)),
+		grpcRetry.WithBackoff(grpcRetry.BackoffExponentialWithJitter(time.Duration(backoffScalar)*time.Millisecond, backoffJitter)),
 		grpcRetry.WithCodes(codes.DeadlineExceeded, codes.Unavailable, codes.Canceled),
-		grpcRetry.WithMax(5),
+		grpcRetry.WithMax(maxRetries),
 	}
 
 	if insecureConnection {

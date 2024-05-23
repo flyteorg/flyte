@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	pluginErrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi"
 	"github.com/flyteorg/flyte/flytestdlib/cache"
@@ -15,7 +16,7 @@ func launch(ctx context.Context, p webapi.AsyncPlugin, tCtx core.TaskExecutionCo
 	rMeta, r, err := p.Create(ctx, tCtx)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to create resource. Error: %v", err)
-		return nil, core.PhaseInfo{}, err
+		return state, core.PhaseInfoRetryableFailure(pluginErrors.TaskFailedWithError, err.Error(), nil), nil
 	}
 
 	// If the plugin also returned the created resource, check to see if it's already in a terminal state.
@@ -37,6 +38,8 @@ func launch(ctx context.Context, p webapi.AsyncPlugin, tCtx core.TaskExecutionCo
 	// Store the created resource name, and update our state.
 	state.ResourceMeta = rMeta
 	state.Phase = PhaseResourcesCreated
+	state.PhaseVersion = 2
+
 	cacheItem := CacheItem{
 		State: *state,
 	}
@@ -48,5 +51,5 @@ func launch(ctx context.Context, p webapi.AsyncPlugin, tCtx core.TaskExecutionCo
 		return nil, core.PhaseInfo{}, err
 	}
 
-	return state, core.PhaseInfoQueued(time.Now(), 2, "launched"), nil
+	return state, core.PhaseInfoQueued(time.Now(), state.PhaseVersion, "launched"), nil
 }

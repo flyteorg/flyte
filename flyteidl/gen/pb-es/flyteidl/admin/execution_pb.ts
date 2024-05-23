@@ -12,6 +12,8 @@ import { Annotations, AuthRole, Envs, Labels, Notification, RawOutputDataConfig,
 import { ArtifactID } from "../core/artifact_id_pb.js";
 import { SecurityContext } from "../core/security_pb.js";
 import { ClusterAssignment } from "./cluster_assignment_pb.js";
+import { ExecutionClusterLabel } from "./matchable_resource_pb.js";
+import { ExecutionEnvAssignment } from "../core/execution_envs_pb.js";
 import { Span } from "../core/metrics_pb.js";
 
 /**
@@ -914,6 +916,13 @@ export enum ExecutionMetadata_ExecutionMode {
    * @generated from enum value: RECOVERED = 5;
    */
   RECOVERED = 5,
+
+  /**
+   * Execution was kicked off by the artifact trigger system
+   *
+   * @generated from enum value: TRIGGER = 6;
+   */
+  TRIGGER = 6,
 }
 // Retrieve enum metadata with: proto3.getEnumType(ExecutionMetadata_ExecutionMode)
 proto3.util.setEnumType(ExecutionMetadata_ExecutionMode, "flyteidl.admin.ExecutionMetadata.ExecutionMode", [
@@ -923,6 +932,7 @@ proto3.util.setEnumType(ExecutionMetadata_ExecutionMode, "flyteidl.admin.Executi
   { no: 3, name: "RELAUNCH" },
   { no: 4, name: "CHILD_WORKFLOW" },
   { no: 5, name: "RECOVERED" },
+  { no: 6, name: "TRIGGER" },
 ]);
 
 /**
@@ -1107,6 +1117,20 @@ export class ExecutionSpec extends Message<ExecutionSpec> {
    */
   tags: string[] = [];
 
+  /**
+   * Execution cluster label to be set for the execution.
+   *
+   * @generated from field: flyteidl.admin.ExecutionClusterLabel execution_cluster_label = 25;
+   */
+  executionClusterLabel?: ExecutionClusterLabel;
+
+  /**
+   * Execution environment assignments to be set for the execution.
+   *
+   * @generated from field: repeated flyteidl.core.ExecutionEnvAssignment execution_env_assignments = 26;
+   */
+  executionEnvAssignments: ExecutionEnvAssignment[] = [];
+
   constructor(data?: PartialMessage<ExecutionSpec>) {
     super();
     proto3.util.initPartial(data, this);
@@ -1132,6 +1156,8 @@ export class ExecutionSpec extends Message<ExecutionSpec> {
     { no: 22, name: "overwrite_cache", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 23, name: "envs", kind: "message", T: Envs },
     { no: 24, name: "tags", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 25, name: "execution_cluster_label", kind: "message", T: ExecutionClusterLabel },
+    { no: 26, name: "execution_env_assignments", kind: "message", T: ExecutionEnvAssignment, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExecutionSpec {
