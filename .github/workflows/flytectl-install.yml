@@ -1,0 +1,33 @@
+name: Flytectl-specific checks
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+on:
+  pull_request:
+    paths:
+      - flytectl/**
+  push:
+    branches:
+      - master
+
+jobs:
+  install-script:
+    name: Install script
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        version:
+          - v0.8.20
+          - latest
+          # Test the case where no version is specified
+          - " "
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          chmod +x ./flytectl/install.sh
+          ./flytectl/install.sh ${{ matrix.version }}
+          ./bin/flytectl version
+
