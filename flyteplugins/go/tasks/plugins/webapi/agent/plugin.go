@@ -7,8 +7,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
-
 	"golang.org/x/exp/maps"
 	"k8s.io/apimachinery/pkg/util/wait"
 
