@@ -11,6 +11,7 @@ import (
 	"github.com/flyteorg/flyte/flytectl/cmd/config"
 	"github.com/flyteorg/flyte/flytectl/pkg/pkce"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin"
+	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/cache"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -70,13 +71,24 @@ func generateCommandFunc(cmdEntry CommandEntry) func(cmd *cobra.Command, args []
 			return cmdEntry.CmdFunc(ctx, args, CommandContext{})
 		}
 
+		var tokenCache cache.TokenCache
+		svcUser := fmt.Sprintf("%s:%s", adminCfg.Endpoint.String(), pkce.KeyRingServiceUser)
+		switch config.GetConfig().TokenCacheType {
+		case cache.TokenCacheTypeFilesystem:
+			tokenCache = pkce.NewtokenCacheFilesystemProvider(svcUser)
+		case cache.TokenCacheTypeKeyring:
+			fallthrough
+		default:
+			tokenCache = pkce.TokenCacheKeyringProvider{
+				ServiceUser: svcUser,
+				ServiceName: pkce.KeyRingServiceName,
+			}
+		}
+
 		cmdCtx := NewCommandContextNoClient(cmd.OutOrStdout())
 		if !cmdEntry.DisableFlyteClient {
 			clientSet, err := admin.ClientSetBuilder().WithConfig(admin.GetConfig(ctx)).
-				WithTokenCache(pkce.TokenCacheKeyringProvider{
-					ServiceUser: fmt.Sprintf("%s:%s", adminCfg.Endpoint.String(), pkce.KeyRingServiceUser),
-					ServiceName: pkce.KeyRingServiceName,
-				}).Build(ctx)
+				WithTokenCache(tokenCache).Build(ctx)
 			if err != nil {
 				return err
 			}

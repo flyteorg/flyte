@@ -20,6 +20,7 @@ import (
 	"github.com/flyteorg/flyte/flytectl/cmd/version"
 	f "github.com/flyteorg/flyte/flytectl/pkg/filesystemutils"
 	"github.com/flyteorg/flyte/flytectl/pkg/printer"
+	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/cache"
 	stdConfig "github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/config/viper"
 
@@ -57,6 +58,7 @@ func newRootCmd() *cobra.Command {
 	rootCmd.PersistentFlags().StringVarP(&(config.GetConfig().Domain), "domain", "d", "", "Specifies the Flyte project's domain.")
 	rootCmd.PersistentFlags().StringVarP(&(config.GetConfig().Output), "output", "o", printer.OutputFormatTABLE.String(), fmt.Sprintf("Specifies the output type - supported formats %s. NOTE: dot, doturl are only supported for Workflow", printer.OutputFormats()))
 	rootCmd.PersistentFlags().BoolVarP(&(config.GetConfig().Interactive), "interactive", "i", false, "Set this flag to use an interactive CLI")
+	rootCmd.PersistentFlags().Var(&(config.GetConfig().TokenCacheType), "token-cache-type", fmt.Sprintf("Type of token cache to use (available options are %s)", cache.AllTokenCacheTypes))
 
 	rootCmd.AddCommand(get.CreateGetCommand())
 	compileCmd := compile.CreateCompileCommand()

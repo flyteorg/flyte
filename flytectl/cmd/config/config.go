@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/cache"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 
 	"github.com/flyteorg/flyte/flytectl/pkg/printer"
@@ -11,7 +12,8 @@ import (
 
 var (
 	defaultConfig = &Config{
-		Output: printer.OutputFormatTABLE.String(),
+		Output:         printer.OutputFormatTABLE.String(),
+		TokenCacheType: cache.TokenCacheTypeKeyring,
 	}
 
 	section = config.MustRegisterSection("root", defaultConfig)
@@ -19,10 +21,11 @@ var (
 
 // Config hold configuration for flytectl flag
 type Config struct {
-	Project     string `json:"project" pflag:",Specifies the project to work on."`
-	Domain      string `json:"domain" pflag:",Specifies the domain to work on."`
-	Output      string `json:"output" pflag:",Specifies the output type."`
-	Interactive bool   `json:"interactive" pflag:",Set this to trigger bubbletea interface."`
+	Project        string               `json:"project" pflag:",Specifies the project to work on."`
+	Domain         string               `json:"domain" pflag:",Specifies the domain to work on."`
+	Output         string               `json:"output" pflag:",Specifies the output type."`
+	Interactive    bool                 `json:"interactive" pflag:",Set this to trigger bubbletea interface."`
+	TokenCacheType cache.TokenCacheType `json:"token_cache_type" pflag:",Specifices the token cache type to use for fetching / saving auth tokens."`
 }
 
 // OutputFormat will return output format
