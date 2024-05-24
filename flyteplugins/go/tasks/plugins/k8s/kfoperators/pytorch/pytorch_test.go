@@ -664,7 +664,7 @@ func TestGetTaskPhaseIncreasePhaseVersion(t *testing.T) {
 	}
 	taskCtx := dummyPytorchTaskContext(dummyPytorchTaskTemplate("", dummyPytorchCustomObj(2)), resourceRequirements, nil, "", pluginState)
 
-	taskPhase, err := pytorchResourceHandler.GetTaskPhase(ctx, taskCtx, dummyPytorchJobResource(pytorchResourceHandler, 2, commonOp.JobCreated))
+	taskPhase, err := pytorchResourceHandler.GetTaskPhase(ctx, taskCtx, dummyPytorchJobResource(pytorchResourceHandler, 4, commonOp.JobCreated))
 
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Version(), pluginsCore.DefaultPhaseVersion+1)
