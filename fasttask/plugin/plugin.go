@@ -43,7 +43,7 @@ type State struct {
 
 // Plugin is a fast task plugin that offers task execution to a worker pool.
 type Plugin struct {
-	fastTaskService *FastTaskService
+	fastTaskService FastTaskService
 }
 
 // GetID returns the unique identifier for the plugin.
@@ -300,7 +300,7 @@ func init() {
 				}
 
 				// create and start grpc server
-				fastTaskService := NewFastTaskService(iCtx.EnqueueOwner())
+				fastTaskService := newFastTaskService(iCtx.EnqueueOwner(), iCtx.MetricsScope())
 				go func() {
 					grpcServer := grpc.NewServer()
 					pb.RegisterFastTaskServer(grpcServer, fastTaskService)

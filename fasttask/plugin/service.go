@@ -2,7 +2,6 @@ package plugin
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"io"
 	"math/rand"
@@ -20,9 +19,18 @@ import (
 
 var maxPendingOwnersPerQueue = 100
 
-// FastTaskService is a gRPC service that manages assignment and management of task executions with
-// respect to fasttask workers.
-type FastTaskService struct {
+//go:generate mockery -all -case=underscore
+
+// FastTaskService defines the interface for managing assignment and management of task executions
+type FastTaskService interface {
+	CheckStatus(ctx context.Context, taskID, queueID, workerID string) (core.Phase, string, error)
+	Cleanup(ctx context.Context, taskID, queueID, workerID string) error
+	OfferOnQueue(ctx context.Context, queueID, taskID, namespace, workflowID string, cmd []string) (string, error)
+}
+
+// fastTaskServiceImpl is a gRPC service that manages assignment and management of task executions
+// with respect to fasttask workers.
+type fastTaskServiceImpl struct {
 	pb.UnimplementedFastTaskServer
 	enqueueOwner core.EnqueueOwner
 
@@ -34,7 +42,7 @@ type FastTaskService struct {
 	pendingTaskOwners     map[string]map[string]types.NamespacedName // map[queueID]map[taskID]ownerID
 	pendingTaskOwnersLock sync.RWMutex
 
-	taskStatusChannels sync.Map // map[string]chan *WorkerTaskStatus
+	taskStatusChannels sync.Map // map[taskID]chan *WorkerTaskStatus
 	metrics            metrics
 }
 
@@ -66,12 +74,22 @@ type metrics struct {
 	workers *prometheus.Desc
 }
 
-func (f *FastTaskService) Describe(ch chan<- *prometheus.Desc) {
+func newMetrics(scope promutils.Scope) metrics {
+	return metrics{
+		taskNoWorkersAvailable:  scope.MustNewCounter("task_no_workers_available", "Count of task assignment attempts with no workers available"),
+		taskNoCapacityAvailable: scope.MustNewCounter("task_no_capacity_available", "Count of task assignment attempts with no capacity available"),
+		taskAssigned:            scope.MustNewCounter("task_assigned", "Count of task assignments"),
+		queues:                  prometheus.NewDesc(scope.NewScopedMetricName("queue"), "Current number of queues", nil, nil),
+		workers:                 prometheus.NewDesc(scope.NewScopedMetricName("workers"), "Current number of workers", nil, nil),
+	}
+}
+
+func (f *fastTaskServiceImpl) Describe(ch chan<- *prometheus.Desc) {
 	ch <- f.metrics.queues
 	ch <- f.metrics.workers
 }
 
-func (f *FastTaskService) Collect(ch chan<- prometheus.Metric) {
+func (f *fastTaskServiceImpl) Collect(ch chan<- prometheus.Metric) {
 	f.queuesLock.RLock()
 	defer f.queuesLock.RUnlock()
 
@@ -89,7 +107,7 @@ func (f *FastTaskService) Collect(ch chan<- prometheus.Metric) {
 
 // Heartbeat is a gRPC stream that manages the heartbeat of a fasttask worker. This includes
 // receiving task status updates and sending task assignments.
-func (f *FastTaskService) Heartbeat(stream pb.FastTask_HeartbeatServer) error {
+func (f *fastTaskServiceImpl) Heartbeat(stream pb.FastTask_HeartbeatServer) error {
 	workerID := ""
 
 	// recv initial heartbeat request
@@ -188,7 +206,8 @@ func (f *FastTaskService) Heartbeat(stream pb.FastTask_HeartbeatServer) error {
 	return nil
 }
 
-func (f *FastTaskService) addWorkerToQueue(queueID string, worker *Worker) *Queue {
+// addWorkerToQueue adds a worker to the queue. If the queue does not exist, it is created.
+func (f *fastTaskServiceImpl) addWorkerToQueue(queueID string, worker *Worker) *Queue {
 	f.queuesLock.Lock()
 	defer f.queuesLock.Unlock()
 
@@ -207,7 +226,8 @@ func (f *FastTaskService) addWorkerToQueue(queueID string, worker *Worker) *Queu
 	return queue
 }
 
-func (f *FastTaskService) removeWorkerFromQueue(queueID, workerID string) {
+// removeWorkerFromQueue removes a worker from the queue. If the queue is empty, it is deleted.
+func (f *fastTaskServiceImpl) removeWorkerFromQueue(queueID, workerID string) {
 	f.queuesLock.Lock()
 	defer f.queuesLock.Unlock()
 
@@ -226,7 +246,7 @@ func (f *FastTaskService) removeWorkerFromQueue(queueID, workerID string) {
 }
 
 // addPendingOwner adds to the pending owners list for the queue, if not already full
-func (f *FastTaskService) addPendingOwner(queueID, taskID string, ownerID types.NamespacedName) {
+func (f *fastTaskServiceImpl) addPendingOwner(queueID, taskID string, ownerID types.NamespacedName) {
 	f.pendingTaskOwnersLock.Lock()
 	defer f.pendingTaskOwnersLock.Unlock()
 
@@ -243,7 +263,7 @@ func (f *FastTaskService) addPendingOwner(queueID, taskID string, ownerID types.
 }
 
 // removePendingOwner removes the pending owner from the list if still there
-func (f *FastTaskService) removePendingOwner(queueID, taskID string) {
+func (f *fastTaskServiceImpl) removePendingOwner(queueID, taskID string) {
 	f.pendingTaskOwnersLock.Lock()
 	defer f.pendingTaskOwnersLock.Unlock()
 
@@ -259,7 +279,7 @@ func (f *FastTaskService) removePendingOwner(queueID, taskID string) {
 }
 
 // enqueuePendingOwners drains the pending owners list for the queue and enqueues them for reevaluation
-func (f *FastTaskService) enqueuePendingOwners(queueID string) {
+func (f *fastTaskServiceImpl) enqueuePendingOwners(queueID string) {
 	f.pendingTaskOwnersLock.Lock()
 	defer f.pendingTaskOwnersLock.Unlock()
 
@@ -284,7 +304,7 @@ func (f *FastTaskService) enqueuePendingOwners(queueID string) {
 
 // OfferOnQueue offers a task to a worker on a specific queue. If no workers are available, an
 // empty string is returned.
-func (f *FastTaskService) OfferOnQueue(ctx context.Context, queueID, taskID, namespace, workflowID string, cmd []string) (string, error) {
+func (f *fastTaskServiceImpl) OfferOnQueue(ctx context.Context, queueID, taskID, namespace, workflowID string, cmd []string) (string, error) {
 	f.queuesLock.RLock()
 	defer f.queuesLock.RUnlock()
 
@@ -318,7 +338,7 @@ func (f *FastTaskService) OfferOnQueue(ctx context.Context, queueID, taskID, nam
 		worker.capacity.BacklogCount++
 	} else {
 		// No workers available. Note, we do not add to pending owners at this time as we are optimizing for the worker
-		// startup case. Theworker backlog should be sufficient to keep the worker busy without needing to proactively
+		// startup case. The worker backlog should be sufficient to keep the worker busy without needing to proactively
 		// enqueue owners when capacity becomes available.
 		f.metrics.taskNoCapacityAvailable.Inc()
 		return "", nil
@@ -340,13 +360,13 @@ func (f *FastTaskService) OfferOnQueue(ctx context.Context, queueID, taskID, nam
 }
 
 // CheckStatus checks the status of a task on a specific queue and worker.
-func (f *FastTaskService) CheckStatus(ctx context.Context, taskID, queueID, workerID string) (core.Phase, string, error) {
+func (f *fastTaskServiceImpl) CheckStatus(ctx context.Context, taskID, queueID, workerID string) (core.Phase, string, error) {
 	taskStatusChannelResult, exists := f.taskStatusChannels.Load(taskID)
 	if !exists {
 		// if this plugin restarts then TaskContexts may not exist for tasks that are still active. we can
 		// create a TaskContext here because we ensure it will be cleaned up when the task completes.
 		f.taskStatusChannels.Store(taskID, make(chan *workerTaskStatus, GetConfig().TaskStatusBufferSize))
-		return core.PhaseUndefined, "", errors.New("task context not found")
+		return core.PhaseUndefined, "", fmt.Errorf("task context not found")
 	}
 
 	taskStatusChannel := taskStatusChannelResult.(chan *workerTaskStatus)
@@ -377,14 +397,16 @@ Loop:
 		f.queuesLock.RLock()
 		defer f.queuesLock.RUnlock()
 
-		queue := f.queues[queueID]
-		queue.lock.RLock()
-		defer queue.lock.RUnlock()
+		// if here it should be impossible for the queue not to exist, but left for safety
+		if queue, exists := f.queues[queueID]; exists {
+			queue.lock.RLock()
+			defer queue.lock.RUnlock()
 
-		if worker, exists := queue.workers[workerID]; exists {
-			worker.responseChan <- &pb.HeartbeatResponse{
-				TaskId:    taskID,
-				Operation: pb.HeartbeatResponse_ACK,
+			if worker, exists := queue.workers[workerID]; exists {
+				worker.responseChan <- &pb.HeartbeatResponse{
+					TaskId:    taskID,
+					Operation: pb.HeartbeatResponse_ACK,
+				}
 			}
 		}
 	}
@@ -394,7 +416,7 @@ Loop:
 
 // Cleanup is used to indicate a task is no longer being tracked by the worker and delete the
 // associated task context.
-func (f *FastTaskService) Cleanup(ctx context.Context, taskID, queueID, workerID string) error {
+func (f *fastTaskServiceImpl) Cleanup(ctx context.Context, taskID, queueID, workerID string) error {
 	// send delete taskID message to worker
 	f.queuesLock.RLock()
 	defer f.queuesLock.RUnlock()
@@ -420,21 +442,12 @@ func (f *FastTaskService) Cleanup(ctx context.Context, taskID, queueID, workerID
 	return nil
 }
 
-// NewFastTaskService creates a new FastTaskService.
-func NewFastTaskService(enqueueOwner core.EnqueueOwner) *FastTaskService {
-	scope := promutils.NewScope("fasttask")
-	svc := &FastTaskService{
+// newFastTaskService creates a new fastTaskServiceImpl.
+func newFastTaskService(enqueueOwner core.EnqueueOwner, scope promutils.Scope) *fastTaskServiceImpl {
+	return &fastTaskServiceImpl{
 		enqueueOwner:      enqueueOwner,
 		queues:            make(map[string]*Queue),
 		pendingTaskOwners: make(map[string]map[string]types.NamespacedName),
-		metrics: metrics{
-			taskNoWorkersAvailable:  scope.MustNewCounter("task_no_workers_available", "Count of task assignment attempts with no workers available"),
-			taskNoCapacityAvailable: scope.MustNewCounter("task_no_capacity_available", "Count of task assignment attempts with no capacity available"),
-			taskAssigned:            scope.MustNewCounter("task_assigned", "Count of task assignments"),
-			queues:                  prometheus.NewDesc(scope.NewScopedMetricName("queue"), "Current number of queues", nil, nil),
-			workers:                 prometheus.NewDesc(scope.NewScopedMetricName("workers"), "Current number of workers", nil, nil),
-		},
+		metrics:           newMetrics(scope),
 	}
-	prometheus.MustRegister(svc)
-	return svc
 }
