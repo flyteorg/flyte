@@ -364,7 +364,7 @@ func (w *autoRefresh) inProcessing(key interface{}) bool {
 	item, found := w.processing.Load(key)
 	if found {
 		// handle potential race conditions where the item is in processing but not in the workqueue
-		if timeItem, ok := item.(time.Time); ok && time.Since(timeItem) > (w.syncPeriod*10) {
+		if timeItem, ok := item.(time.Time); ok && time.Since(timeItem) > (w.syncPeriod*5) {
 			w.processing.Delete(key)
 			return false
 		}
