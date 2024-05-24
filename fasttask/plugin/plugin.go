@@ -19,6 +19,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 
 	"github.com/unionai/flyte/fasttask/plugin/pb"
 )
@@ -27,18 +28,18 @@ const fastTaskType = "fast-task"
 
 var statusUpdateNotFoundError = errors.New("StatusUpdateNotFound")
 
-type Phase int
+type SubmissionPhase int
 
 const (
-	PhaseNotStarted Phase = iota
-	PhaseRunning
+	NotSubmitted SubmissionPhase = iota
+	Submitted
 )
 
 // State maintains the current status of the task execution.
 type State struct {
-	Phase       Phase
-	WorkerID    string
-	LastUpdated time.Time
+	SubmissionPhase SubmissionPhase
+	WorkerID        string
+	LastUpdated     time.Time
 }
 
 // Plugin is a fast task plugin that offers task execution to a worker pool.
@@ -164,9 +165,10 @@ func (p *Plugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (co
 		return core.UnknownTransition, err
 	}
 
+	queueID := fastTaskEnvironment.GetQueueId()
 	phaseInfo := core.PhaseInfoUndefined
-	switch pluginState.Phase {
-	case PhaseNotStarted:
+	switch pluginState.SubmissionPhase {
+	case NotSubmitted:
 		// read task template
 		taskTemplate, err := tCtx.TaskReader().Read(ctx)
 		if err != nil {
@@ -191,17 +193,18 @@ func (p *Plugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (co
 
 		// offer the work to the queue
 		ownerID := tCtx.TaskExecutionMetadata().GetOwnerID()
-		workerID, err := p.fastTaskService.OfferOnQueue(ctx, fastTaskEnvironment.GetQueueId(), taskID, ownerID.Namespace, ownerID.Name, command)
+		workerID, err := p.fastTaskService.OfferOnQueue(ctx, queueID, taskID, ownerID.Namespace, ownerID.Name, command)
 		if err != nil {
 			return core.UnknownTransition, err
 		}
 
 		if len(workerID) > 0 {
-			pluginState.Phase = PhaseRunning
+			pluginState.SubmissionPhase = Submitted
+
 			pluginState.WorkerID = workerID
 			pluginState.LastUpdated = time.Now()
 
-			phaseInfo = core.PhaseInfoRunning(core.DefaultPhaseVersion, nil)
+			phaseInfo = core.PhaseInfoQueued(time.Now(), core.DefaultPhaseVersion, fmt.Sprintf("task offered to worker %s", workerID))
 		} else {
 			if pluginState.LastUpdated.IsZero() {
 				pluginState.LastUpdated = time.Now()
@@ -209,12 +212,13 @@ func (p *Plugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (co
 
 			// fail if no worker available within grace period
 			if time.Since(pluginState.LastUpdated) > GetConfig().GracePeriodWorkersUnavailable.Duration {
-				phaseInfo = core.PhaseInfoSystemFailure("unknown", "timed out waiting for worker availability", nil)
+				logger.Infof(ctx, "Timed out waiting for available worker for queue %s", queueID)
+				phaseInfo = core.PhaseInfoSystemFailure("unknown", fmt.Sprintf("timed out waiting for available worker for queue %s", queueID), nil)
 			} else {
-				phaseInfo = core.PhaseInfoNotReady(time.Now(), core.DefaultPhaseVersion, "no workers available")
+				phaseInfo = core.PhaseInfoWaitingForResourcesInfo(time.Now(), core.DefaultPhaseVersion, "no workers available", nil)
 			}
 		}
-	case PhaseRunning:
+	case Submitted:
 		// check the task status
 		phase, reason, err := p.fastTaskService.CheckStatus(ctx, taskID, fastTaskEnvironment.GetQueueId(), pluginState.WorkerID)
 
@@ -223,7 +227,8 @@ func (p *Plugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (co
 			return core.UnknownTransition, err
 		} else if errors.Is(err, statusUpdateNotFoundError) && now.Sub(pluginState.LastUpdated) > GetConfig().GracePeriodStatusNotFound.Duration {
 			// if task has not been updated within the grace period we should abort
-			return core.DoTransition(core.PhaseInfoSystemRetryableFailure("unknown", "task status update not reported within grace period", nil)), nil
+			logger.Infof(ctx, "Task status update not reported within grace period for queue %s and worker %s", queueID, pluginState.WorkerID)
+			return core.DoTransition(core.PhaseInfoSystemRetryableFailure("unknown", fmt.Sprintf("task status update not reported within grace period for queue %s and worker %s", queueID, pluginState.WorkerID), nil)), nil
 		} else if phase == core.PhaseSuccess {
 			taskTemplate, err := tCtx.TaskReader().Read(ctx)
 			if err != nil {

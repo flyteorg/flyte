@@ -91,8 +91,8 @@ func TestFinalize(t *testing.T) {
 	tCtx.OnTaskReader().Return(taskReader)
 
 	arrayNodeStateInput := &State{
-		Phase:    PhaseRunning,
-		WorkerID: "w0",
+		SubmissionPhase: Submitted,
+		WorkerID:        "w0",
 	}
 	pluginStateReader := &coremocks.PluginStateReader{}
 	pluginStateReader.On("Get", mock.Anything).Return(
@@ -258,7 +258,7 @@ func TestHandleNotYetStarted(t *testing.T) {
 		{
 			name:           "NoWorkersAvailable",
 			workerID:       "",
-			expectedPhase:  core.PhaseNotReady,
+			expectedPhase:  core.PhaseWaitingForResources,
 			expectedReason: "no workers available",
 			expectedError:  nil,
 		},
@@ -273,8 +273,8 @@ func TestHandleNotYetStarted(t *testing.T) {
 		{
 			name:           "AssignedToWorker",
 			workerID:       "w0",
-			expectedPhase:  core.PhaseRunning,
-			expectedReason: "",
+			expectedPhase:  core.PhaseQueued,
+			expectedReason: "task offered to worker w0",
 			expectedError:  nil,
 		},
 	}
@@ -316,8 +316,8 @@ func TestHandleNotYetStarted(t *testing.T) {
 			tCtx.OnTaskReader().Return(taskReader)
 
 			arrayNodeStateInput := &State{
-				Phase:       PhaseNotStarted,
-				LastUpdated: test.lastUpdated,
+				SubmissionPhase: NotSubmitted,
+				LastUpdated:     test.lastUpdated,
 			}
 			pluginStateReader := &coremocks.PluginStateReader{}
 			pluginStateReader.On("Get", mock.Anything).Return(
@@ -437,9 +437,9 @@ func TestHandleRunning(t *testing.T) {
 			tCtx.OnTaskReader().Return(taskReader)
 
 			arrayNodeStateInput := &State{
-				Phase:       PhaseRunning,
-				WorkerID:    "w0",
-				LastUpdated: test.lastUpdated,
+				SubmissionPhase: Submitted,
+				WorkerID:        "w0",
+				LastUpdated:     test.lastUpdated,
 			}
 			pluginStateReader := &coremocks.PluginStateReader{}
 			pluginStateReader.On("Get", mock.Anything).Return(
