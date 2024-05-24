@@ -191,12 +191,10 @@ func (f *fastTaskServiceImpl) Heartbeat(stream pb.FastTask_HeartbeatServer) erro
 			// if taskStatus is complete then enqueueOwner for fast feedback
 			phase := core.Phase(taskStatus.GetPhase())
 			if phase == core.PhaseSuccess || phase == core.PhaseRetryableFailure {
-				ownerID := types.NamespacedName{
+				if err := f.enqueueOwner(types.NamespacedName{
 					Namespace: taskStatus.GetNamespace(),
 					Name:      taskStatus.GetWorkflowId(),
-				}
-
-				if err := f.enqueueOwner(ownerID); err != nil {
+				}); err != nil {
 					logger.Warnf(context.Background(), "failed to enqueue owner for task %s: %+v", taskStatus.GetTaskId(), err)
 				}
 			}
