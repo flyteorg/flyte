@@ -776,8 +776,8 @@ func TestGetTaskPhaseIncreasePhaseVersion(t *testing.T) {
 	}
 	pluginCtx := newPluginContext(pluginState)
 
-	rayObject := &rayv1alpha1.RayJob{}
-	rayObject.Status.JobDeploymentStatus = rayv1alpha1.JobDeploymentStatusInitializing
+	rayObject := &rayv1.RayJob{}
+	rayObject.Status.JobDeploymentStatus = rayv1.JobDeploymentStatusInitializing
 	phaseInfo, err := rayJobResourceHandler.GetTaskPhase(ctx, pluginCtx, rayObject)
 
 	assert.NoError(t, err)
