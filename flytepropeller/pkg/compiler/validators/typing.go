@@ -371,11 +371,11 @@ func isTypeAny(t *flyte.LiteralType) bool {
 }
 
 func AreTypesCastable(upstreamType *flyte.LiteralType, downstreamType *flyte.LiteralType) bool {
-	typeChecker := getTypeChecker(downstreamType)
-
-	if isTypeAny(upstreamType) || isTypeAny(downstreamType) {
+	if isTypeAny(downstreamType) {
 		return true
 	}
+
+	typeChecker := getTypeChecker(downstreamType)
 
 	// if upstream is a singular union we check if the downstream type is castable from the union variant
 	if upstreamType.GetUnionType() != nil && len(upstreamType.GetUnionType().GetVariants()) == 1 {
