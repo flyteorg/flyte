@@ -262,7 +262,6 @@ func GetAuthenticationCustomMetadataInterceptor(authCtx interfaces.Authenticatio
 			if ok {
 				existingHeader := md.Get(authCtx.Options().GrpcAuthorizationHeader)
 				if len(existingHeader) > 0 {
-					logger.Debugf(ctx, "Found existing metadata %s", existingHeader[0])
 					newAuthorizationMetadata := metadata.Pairs(DefaultAuthorizationHeader, existingHeader[0])
 					joinedMetadata := metadata.Join(md, newAuthorizationMetadata)
 					newCtx := metadata.NewIncomingContext(ctx, joinedMetadata)

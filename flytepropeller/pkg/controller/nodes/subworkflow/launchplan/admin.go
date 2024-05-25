@@ -160,7 +160,7 @@ func (a *adminLaunchPlanExecutor) Launch(ctx context.Context, launchCtx LaunchCo
 		}
 	}
 
-	hasOutputs := launchPlan.GetInterface() != nil && launchPlan.GetInterface().GetOutputs() != nil && len(launchPlan.GetInterface().GetOutputs().GetVariables()) > 0
+	hasOutputs := launchPlan.GetInterface() != nil && launchPlan.GetInterface().GetOutputs().GetVariables() != nil && len(launchPlan.GetInterface().GetOutputs().GetVariables()) > 0
 	_, err = a.cache.GetOrCreate(executionID.String(), executionCacheItem{
 		WorkflowExecutionIdentifier: *executionID,
 		HasOutputs:                  hasOutputs,
@@ -173,12 +173,18 @@ func (a *adminLaunchPlanExecutor) Launch(ctx context.Context, launchCtx LaunchCo
 	return nil
 }
 
-func (a *adminLaunchPlanExecutor) GetStatus(ctx context.Context, executionID *core.WorkflowExecutionIdentifier) (*admin.ExecutionClosure, *core.LiteralMap, error) {
+func (a *adminLaunchPlanExecutor) GetStatus(ctx context.Context, executionID *core.WorkflowExecutionIdentifier,
+	launchPlan v1alpha1.ExecutableLaunchPlan, parentWorkflowID v1alpha1.WorkflowID) (*admin.ExecutionClosure, *core.LiteralMap, error) {
 	if executionID == nil {
 		return nil, nil, fmt.Errorf("nil executionID")
 	}
 
-	obj, err := a.cache.GetOrCreate(executionID.String(), executionCacheItem{WorkflowExecutionIdentifier: *executionID})
+	hasOutputs := launchPlan.GetInterface() != nil && launchPlan.GetInterface().GetOutputs().GetVariables() != nil && len(launchPlan.GetInterface().GetOutputs().GetVariables()) > 0
+	obj, err := a.cache.GetOrCreate(executionID.String(), executionCacheItem{
+		WorkflowExecutionIdentifier: *executionID,
+		HasOutputs:                  hasOutputs,
+		ParentWorkflowID:            parentWorkflowID,
+	})
 	if err != nil {
 		return nil, nil, err
 	}

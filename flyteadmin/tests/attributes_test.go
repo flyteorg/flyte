@@ -8,16 +8,16 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/runtime"
-	runtimeIfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/golang/protobuf/proto"
+	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/runtime"
+	runtimeIfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/golang/protobuf/proto"
-	"github.com/stretchr/testify/assert"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 var matchingTaskResourceAttributes = &admin.MatchingAttributes{

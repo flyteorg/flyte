@@ -70,8 +70,8 @@ func (_m FlyteAdmin_GetStatus) Return(_a0 *admin.ExecutionClosure, _a1 *core.Lit
 	return &FlyteAdmin_GetStatus{Call: _m.Call.Return(_a0, _a1, _a2)}
 }
 
-func (_m *FlyteAdmin) OnGetStatus(ctx context.Context, executionID *core.WorkflowExecutionIdentifier) *FlyteAdmin_GetStatus {
-	c_call := _m.On("GetStatus", ctx, executionID)
+func (_m *FlyteAdmin) OnGetStatus(ctx context.Context, executionID *core.WorkflowExecutionIdentifier, launchPlan v1alpha1.ExecutableLaunchPlan, parentWorkflowID string) *FlyteAdmin_GetStatus {
+	c_call := _m.On("GetStatus", ctx, executionID, launchPlan, parentWorkflowID)
 	return &FlyteAdmin_GetStatus{Call: c_call}
 }
 
@@ -80,13 +80,13 @@ func (_m *FlyteAdmin) OnGetStatusMatch(matchers ...interface{}) *FlyteAdmin_GetS
 	return &FlyteAdmin_GetStatus{Call: c_call}
 }
 
-// GetStatus provides a mock function with given fields: ctx, executionID
-func (_m *FlyteAdmin) GetStatus(ctx context.Context, executionID *core.WorkflowExecutionIdentifier) (*admin.ExecutionClosure, *core.LiteralMap, error) {
-	ret := _m.Called(ctx, executionID)
+// GetStatus provides a mock function with given fields: ctx, executionID, launchPlan, parentWorkflowID
+func (_m *FlyteAdmin) GetStatus(ctx context.Context, executionID *core.WorkflowExecutionIdentifier, launchPlan v1alpha1.ExecutableLaunchPlan, parentWorkflowID string) (*admin.ExecutionClosure, *core.LiteralMap, error) {
+	ret := _m.Called(ctx, executionID, launchPlan, parentWorkflowID)
 
 	var r0 *admin.ExecutionClosure
-	if rf, ok := ret.Get(0).(func(context.Context, *core.WorkflowExecutionIdentifier) *admin.ExecutionClosure); ok {
-		r0 = rf(ctx, executionID)
+	if rf, ok := ret.Get(0).(func(context.Context, *core.WorkflowExecutionIdentifier, v1alpha1.ExecutableLaunchPlan, string) *admin.ExecutionClosure); ok {
+		r0 = rf(ctx, executionID, launchPlan, parentWorkflowID)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*admin.ExecutionClosure)
@@ -94,8 +94,8 @@ func (_m *FlyteAdmin) GetStatus(ctx context.Context, executionID *core.WorkflowE
 	}
 
 	var r1 *core.LiteralMap
-	if rf, ok := ret.Get(1).(func(context.Context, *core.WorkflowExecutionIdentifier) *core.LiteralMap); ok {
-		r1 = rf(ctx, executionID)
+	if rf, ok := ret.Get(1).(func(context.Context, *core.WorkflowExecutionIdentifier, v1alpha1.ExecutableLaunchPlan, string) *core.LiteralMap); ok {
+		r1 = rf(ctx, executionID, launchPlan, parentWorkflowID)
 	} else {
 		if ret.Get(1) != nil {
 			r1 = ret.Get(1).(*core.LiteralMap)
@@ -103,8 +103,8 @@ func (_m *FlyteAdmin) GetStatus(ctx context.Context, executionID *core.WorkflowE
 	}
 
 	var r2 error
-	if rf, ok := ret.Get(2).(func(context.Context, *core.WorkflowExecutionIdentifier) error); ok {
-		r2 = rf(ctx, executionID)
+	if rf, ok := ret.Get(2).(func(context.Context, *core.WorkflowExecutionIdentifier, v1alpha1.ExecutableLaunchPlan, string) error); ok {
+		r2 = rf(ctx, executionID, launchPlan, parentWorkflowID)
 	} else {
 		r2 = ret.Error(2)
 	}
