@@ -210,3 +210,22 @@ func TestQueueBuildUp(t *testing.T) {
 	time.Sleep(5 * time.Second)
 	assert.Equal(t, int32(size), syncCount.Load())
 }
+
+func TestInProcessing(t *testing.T) {
+
+	syncPeriod := time.Millisecond
+	cache := &autoRefresh{
+		processing: &sync.Map{},
+		syncPeriod: syncPeriod,
+	}
+
+	assert.False(t, cache.inProcessing("test"))
+
+	cache.processing.Store("test", time.Now())
+	assert.True(t, cache.inProcessing("test"))
+
+	cache.processing.Store("test1", time.Now().Add(syncPeriod*-11))
+	assert.False(t, cache.inProcessing("test1"))
+	_, found := cache.processing.Load("test1")
+	assert.False(t, found)
+}
