@@ -141,6 +141,20 @@ func TestExecutionConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_targetExecutionCluster", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("targetExecutionCluster", testValue)
+			if vString, err := cmdFlags.GetString("targetExecutionCluster"); err == nil {
+				testDecodeJson_ExecutionConfig(t, fmt.Sprintf("%v", vString), &actual.TargetExecutionCluster)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_kubeServiceAcct", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {

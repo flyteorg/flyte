@@ -129,6 +129,22 @@ func TestCreateExecutionRequestForWorkflow(t *testing.T) {
 		assert.Nil(t, err)
 		assert.NotNil(t, execCreateRequest)
 	})
+	t.Run("successful with execution Cluster label and envs", func(t *testing.T) {
+		s := setup()
+		defer s.TearDown()
+
+		createExecutionUtilSetup()
+		launchPlan := &admin.LaunchPlan{}
+		s.FetcherExt.OnFetchLPVersionMatch(s.Ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(launchPlan, nil)
+		var executionConfigWithEnvs = &ExecutionConfig{
+			Envs:                   map[string]string{},
+			TargetExecutionCluster: "cluster",
+		}
+		execCreateRequest, err := createExecutionRequestForWorkflow(s.Ctx, "wfName", config.GetConfig().Project, config.GetConfig().Domain, s.CmdCtx, executionConfigWithEnvs, "")
+		assert.Nil(t, err)
+		assert.NotNil(t, execCreateRequest)
+		assert.Equal(t, "cluster", execCreateRequest.Spec.ExecutionClusterLabel.Value)
+	})
 	t.Run("failed literal conversion", func(t *testing.T) {
 		s := setup()
 		defer s.TearDown()
