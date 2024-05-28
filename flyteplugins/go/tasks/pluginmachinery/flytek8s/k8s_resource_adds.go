@@ -113,7 +113,7 @@ func GetExecutionEnvVars(id pluginsCore.TaskExecutionID) []v1.EnvVar {
 	return envVars
 }
 
-func DecorateEnvVars(ctx context.Context, envVars []v1.EnvVar, taskEnvironmentVariables map[string]string, id pluginsCore.TaskExecutionID) ([]v1.EnvVar, []v1.EnvFromSource) {
+func DecorateEnvVars(ctx context.Context, envVars []v1.EnvVar, envFroms []v1.EnvFromSource, taskEnvironmentVariables map[string]string, id pluginsCore.TaskExecutionID) ([]v1.EnvVar, []v1.EnvFromSource) {
 	envVars = append(envVars, GetContextEnvVars(ctx)...)
 	envVars = append(envVars, GetExecutionEnvVars(id)...)
 
@@ -127,8 +127,6 @@ func DecorateEnvVars(ctx context.Context, envVars []v1.EnvVar, taskEnvironmentVa
 		value := os.Getenv(envVarName)
 		envVars = append(envVars, v1.EnvVar{Name: k, Value: value})
 	}
-
-	envFroms := []v1.EnvFromSource{}
 
 	for _, secretName := range config.GetK8sPluginConfig().DefaultEnvFromSecrets {
 		optional := true
