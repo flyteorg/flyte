@@ -920,9 +920,9 @@ cluster_resource_manager:
     # -- Should a service account be created for the ClusterResource
     create: true
     # -- Annotations for ServiceAccount attached to the ClusterResource
-    annotations: { }
+    annotations: {}
     # -- ImagePullSecrets to automatically assign to the service ClusterResource
-    imagePullSecrets: [ ]
+    imagePullSecrets: []
   # -- Annotations for ClusterResource pods
   podAnnotations: {}
   # -- Additional ClusterResource container environment variables
