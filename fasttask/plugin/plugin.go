@@ -116,11 +116,10 @@ func (p *Plugin) getExecutionEnv(ctx context.Context, tCtx core.TaskExecutionCon
 			}
 
 			fastTaskEnvironmentSpec.PodTemplateSpec = podTemplateSpecBytes
+			fastTaskEnvironmentSpec.PrimaryContainerName = primaryContainerName
 			if err := utils.MarshalStruct(fastTaskEnvironmentSpec, environmentSpec); err != nil {
 				return nil, fmt.Errorf("unable to marshal EnvironmentSpec [%v], Err: [%v]", fastTaskEnvironmentSpec, err.Error())
 			}
-
-			fastTaskEnvironmentSpec.PrimaryContainerName = primaryContainerName
 		}
 
 		environment, err := executionEnvClient.Create(ctx, executionEnv.GetId(), environmentSpec)
