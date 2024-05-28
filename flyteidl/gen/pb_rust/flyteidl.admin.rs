@@ -1100,6 +1100,8 @@ pub struct TaskResourceAttributesWithSource {
     pub source: i32,
     #[prost(message, optional, tag="2")]
     pub value: ::core::option::Option<TaskResourceAttributes>,
+    #[prost(bool, tag="3")]
+    pub is_mutable: bool,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1108,6 +1110,8 @@ pub struct ClusterResourceAttributesWithSource {
     pub source: i32,
     #[prost(message, optional, tag="2")]
     pub value: ::core::option::Option<ClusterResourceAttributes>,
+    #[prost(bool, tag="3")]
+    pub is_mutable: bool,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1116,6 +1120,8 @@ pub struct ExecutionQueueAttributesWithSource {
     pub source: i32,
     #[prost(message, optional, tag="2")]
     pub value: ::core::option::Option<ExecutionQueueAttributes>,
+    #[prost(bool, tag="3")]
+    pub is_mutable: bool,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1124,6 +1130,8 @@ pub struct ExecutionClusterLabelWithSource {
     pub source: i32,
     #[prost(message, optional, tag="2")]
     pub value: ::core::option::Option<ExecutionClusterLabel>,
+    #[prost(bool, tag="3")]
+    pub is_mutable: bool,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1132,6 +1140,8 @@ pub struct QualityOfServiceWithSource {
     pub source: i32,
     #[prost(message, optional, tag="2")]
     pub value: ::core::option::Option<super::core::QualityOfService>,
+    #[prost(bool, tag="3")]
+    pub is_mutable: bool,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1140,6 +1150,8 @@ pub struct PluginOverridesWithSource {
     pub source: i32,
     #[prost(message, optional, tag="2")]
     pub value: ::core::option::Option<PluginOverrides>,
+    #[prost(bool, tag="3")]
+    pub is_mutable: bool,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1148,6 +1160,8 @@ pub struct WorkflowExecutionConfigWithSource {
     pub source: i32,
     #[prost(message, optional, tag="2")]
     pub value: ::core::option::Option<WorkflowExecutionConfig>,
+    #[prost(bool, tag="3")]
+    pub is_mutable: bool,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1156,6 +1170,8 @@ pub struct ClusterAssignmentWithSource {
     pub source: i32,
     #[prost(message, optional, tag="2")]
     pub value: ::core::option::Option<ClusterAssignment>,
+    #[prost(bool, tag="3")]
+    pub is_mutable: bool,
 }
 /// Configuration with source information.
 #[allow(clippy::derive_partial_eq_without_eq)]

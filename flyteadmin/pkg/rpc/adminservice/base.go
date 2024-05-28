@@ -16,6 +16,7 @@ import (
 	executionCluster "github.com/flyteorg/flyte/flyteadmin/pkg/executioncluster/impl"
 	manager "github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/configurations"
+	projectConfigurationPlugin "github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/configurations/plugin"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/resources"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories"
@@ -87,7 +88,9 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 	repo := repositories.NewGormRepo(
 		db, errors.NewPostgresErrorTransformer(adminScope.NewSubScope("errors")), dbScope)
 
-	configurationManager, err := configurations.NewConfigurationManager(ctx, repo, configuration, dataStorageClient, configurations.ShouldBootstrapOrUpdateDefault)
+	defaultProjectConfigurationPlugin := projectConfigurationPlugin.NewDefaultProjectConfigurationPlugin()
+	pluginRegistry.RegisterDefault(plugins.PluginIDProjectConfiguration, defaultProjectConfigurationPlugin)
+	configurationManager, err := configurations.NewConfigurationManager(ctx, repo, configuration, dataStorageClient, pluginRegistry, configurations.ShouldBootstrapOrUpdateDefault)
 	if err != nil {
 		logger.Fatal(ctx, err)
 	}

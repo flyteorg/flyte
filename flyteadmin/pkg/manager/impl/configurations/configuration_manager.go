@@ -4,14 +4,18 @@ import (
 	"context"
 	"sync"
 
+	"google.golang.org/grpc/codes"
+
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/configurations/plugin"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/util"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/validation"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
 	repositoryInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/plugins"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
@@ -23,6 +27,7 @@ type ConfigurationManager struct {
 	config         runtimeInterfaces.Configuration
 	storageClient  *storage.DataStore
 	cacheConfigDoc *configurationDocumentCache
+	pluginRegistry *plugins.Registry
 }
 
 const (
@@ -109,7 +114,7 @@ func (m *ConfigurationManager) getProjectDomainConfiguration(
 	}
 
 	// Get the configuration with source
-	configurationWithSource, err := util.GetConfigurationWithSource(ctx, &activeDocument, request.GetId())
+	configurationWithSource, err := util.GetConfigurationWithSource(ctx, &activeDocument, request.GetId(), plugins.Get[plugin.ProjectConfigurationPlugin](m.pluginRegistry, plugins.PluginIDProjectConfiguration))
 	if err != nil {
 		return nil, err
 	}
@@ -136,7 +141,7 @@ func (m *ConfigurationManager) getDefaultConfiguration(
 		return nil, err
 	}
 
-	defaultConfigurationWithSource, err := util.GetDefaultConfigurationWithSource(ctx, &activeDocument, request.GetId().GetDomain())
+	defaultConfigurationWithSource, err := util.GetDefaultConfigurationWithSource(ctx, &activeDocument, request.GetId().GetDomain(), plugins.Get[plugin.ProjectConfigurationPlugin](m.pluginRegistry, plugins.PluginIDProjectConfiguration))
 	if err != nil {
 		return nil, err
 	}
@@ -185,6 +190,12 @@ func (m *ConfigurationManager) updateConfiguration(
 		return nil, err
 	}
 
+	// Check if the configuration is editing non-mutable attributes
+	projectConfigurationPlugin := plugins.Get[plugin.ProjectConfigurationPlugin](m.pluginRegistry, plugins.PluginIDProjectConfiguration)
+	if err := m.canEditAttributes(ctx, request, projectConfigurationPlugin); err != nil {
+		return nil, err
+	}
+
 	// Get the active document
 	activeDocument, err := m.GetEditableActiveDocument(ctx)
 	if err != nil {
@@ -216,7 +227,7 @@ func (m *ConfigurationManager) updateConfiguration(
 	}
 
 	// Get the configuration with source
-	configurationWithSource, err := util.GetConfigurationWithSource(ctx, updatedDocument, request.GetId())
+	configurationWithSource, err := util.GetConfigurationWithSource(ctx, updatedDocument, request.GetId(), projectConfigurationPlugin)
 	if err != nil {
 		return nil, err
 	}
@@ -313,9 +324,61 @@ func (m *ConfigurationManager) bootstrapOrUpdateDefaultConfigurationDocument(ctx
 	return m.updateDocumentMetadata(ctx, updatedDocument, metadata, versionToUpdate)
 }
 
+func (m *ConfigurationManager) canEditAttributes(ctx context.Context, request admin.ConfigurationUpdateRequest, projectConfigurationPlugin plugin.ProjectConfigurationPlugin) error {
+	// Check if the configuration is editing non-mutable attributes
+	document, err := m.GetReadOnlyActiveDocument(ctx)
+	if err != nil {
+		return err
+	}
+
+	currentConfiguration, err := util.GetConfigurationFromDocument(ctx, &document, request.Id)
+	if err != nil {
+		return err
+	}
+	// If the new configuration contains cluster assignment, we should use that to determine mutability
+	clusterAssignment := currentConfiguration.GetClusterAssignment()
+	if request.Configuration.ClusterAssignment != nil {
+		clusterAssignment = request.Configuration.ClusterAssignment
+	}
+	mutableAttributes, err := projectConfigurationPlugin.GetMutableAttributes(ctx, &plugin.GetMutableAttributesInput{ClusterAssignment: clusterAssignment})
+	if err != nil {
+		return err
+	}
+	var notEditableAttributes []string
+	if !mutableAttributes.Has(admin.MatchableResource_TASK_RESOURCE) && request.Configuration.TaskResourceAttributes != nil {
+		notEditableAttributes = append(notEditableAttributes, admin.MatchableResource_name[int32(admin.MatchableResource_TASK_RESOURCE)])
+	}
+	if !mutableAttributes.Has(admin.MatchableResource_CLUSTER_RESOURCE) && request.Configuration.ClusterResourceAttributes != nil {
+		notEditableAttributes = append(notEditableAttributes, admin.MatchableResource_name[int32(admin.MatchableResource_CLUSTER_RESOURCE)])
+	}
+	if !mutableAttributes.Has(admin.MatchableResource_EXECUTION_QUEUE) && request.Configuration.ExecutionQueueAttributes != nil {
+		notEditableAttributes = append(notEditableAttributes, admin.MatchableResource_name[int32(admin.MatchableResource_EXECUTION_QUEUE)])
+	}
+	if !mutableAttributes.Has(admin.MatchableResource_EXECUTION_CLUSTER_LABEL) && request.Configuration.ExecutionClusterLabel != nil {
+		notEditableAttributes = append(notEditableAttributes, admin.MatchableResource_name[int32(admin.MatchableResource_EXECUTION_CLUSTER_LABEL)])
+	}
+	if !mutableAttributes.Has(admin.MatchableResource_QUALITY_OF_SERVICE_SPECIFICATION) && request.Configuration.QualityOfService != nil {
+		notEditableAttributes = append(notEditableAttributes, admin.MatchableResource_name[int32(admin.MatchableResource_QUALITY_OF_SERVICE_SPECIFICATION)])
+	}
+	if !mutableAttributes.Has(admin.MatchableResource_PLUGIN_OVERRIDE) && request.Configuration.PluginOverrides != nil {
+		notEditableAttributes = append(notEditableAttributes, admin.MatchableResource_name[int32(admin.MatchableResource_PLUGIN_OVERRIDE)])
+	}
+	if !mutableAttributes.Has(admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG) && request.Configuration.WorkflowExecutionConfig != nil {
+		notEditableAttributes = append(notEditableAttributes, admin.MatchableResource_name[int32(admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG)])
+	}
+	if !mutableAttributes.Has(admin.MatchableResource_CLUSTER_ASSIGNMENT) && request.Configuration.ClusterAssignment != nil {
+		notEditableAttributes = append(notEditableAttributes, admin.MatchableResource_name[int32(admin.MatchableResource_CLUSTER_ASSIGNMENT)])
+	}
+	if len(notEditableAttributes) > 0 {
+		logger.Debugf(ctx, "Not editable attributes: %v", notEditableAttributes)
+		return errors.NewFlyteAdminErrorf(codes.InvalidArgument, "attributes not editable: %v", notEditableAttributes)
+	}
+	return nil
+}
+
 // In the context of a flyteadmin, we expect to mutate the global configuration based on the values in configmap. At this scenario, we expect bootstrap to be true.
 // In the context of a cluster resource controller, we expect to read the configuration from the database and not mutate it. At this scenario, we expect bootstrap to be false.
-func NewConfigurationManager(ctx context.Context, db repositoryInterfaces.Repository, config runtimeInterfaces.Configuration, storageClient *storage.DataStore, bootstrapOrUpdateDefault bool) (interfaces.ConfigurationInterface, error) {
+func NewConfigurationManager(ctx context.Context, db repositoryInterfaces.Repository, config runtimeInterfaces.Configuration, storageClient *storage.DataStore, pluginRegistry *plugins.Registry, bootstrapOrUpdateDefault bool) (interfaces.ConfigurationInterface, error) {
 	configurationManager := &ConfigurationManager{
 		db:            db,
 		config:        config,
@@ -324,6 +387,7 @@ func NewConfigurationManager(ctx context.Context, db repositoryInterfaces.Reposi
 			configDoc: nil,
 			mutex:     sync.RWMutex{},
 		},
+		pluginRegistry: pluginRegistry,
 	}
 	if bootstrapOrUpdateDefault {
 		logger.Debug(ctx, "Bootstrapping or updating default configuration document")

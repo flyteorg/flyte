@@ -49,11 +49,13 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/executioncluster/impl"
 	executionclusterIfaces "github.com/flyteorg/flyte/flyteadmin/pkg/executioncluster/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/configurations"
+	projectConfigurationPlugin "github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/configurations/plugin"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/resources"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories"
 	errors2 "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/runtime"
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/plugins"
 	admin2 "github.com/flyteorg/flyte/flyteidl/clients/go/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
@@ -880,7 +882,7 @@ func NewClusterResourceController(adminDataProvider interfaces.FlyteAdminDataPro
 	}
 }
 
-func NewClusterResourceControllerFromConfig(ctx context.Context, scope promutils.Scope, configuration runtimeInterfaces.Configuration) (Controller, error) {
+func NewClusterResourceControllerFromConfig(ctx context.Context, scope promutils.Scope, configuration runtimeInterfaces.Configuration, pluginRegistry *plugins.Registry) (Controller, error) {
 	initializationErrorCounter := scope.MustNewCounter(
 		"flyteclient_initialization_error",
 		"count of errors encountered initializing a flyte client from kube config")
@@ -921,7 +923,10 @@ func NewClusterResourceControllerFromConfig(ctx context.Context, scope promutils
 			logger.Errorf(ctx, "Failed to create data storage client: %v", err)
 			return nil, err
 		}
-		configurationManager, err := configurations.NewConfigurationManager(ctx, repo, configuration, dataStorageClient, configurations.ShouldNotBootstrapOrUpdateDefault)
+
+		defaultProjectConfigurationPlugin := projectConfigurationPlugin.NewDefaultProjectConfigurationPlugin()
+		pluginRegistry.RegisterDefault(plugins.PluginIDProjectConfiguration, defaultProjectConfigurationPlugin)
+		configurationManager, err := configurations.NewConfigurationManager(ctx, repo, configuration, dataStorageClient, pluginRegistry, configurations.ShouldNotBootstrapOrUpdateDefault)
 		if err != nil {
 			logger.Errorf(ctx, "Failed to create configuration manager: %v", err)
 			return nil, err

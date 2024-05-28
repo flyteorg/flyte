@@ -74,12 +74,14 @@ func TestConfiguration(t *testing.T) {
 
 	expectedConfiguration := currentConfiguration.Configuration
 	expectedConfiguration.TaskResourceAttributes = &admin.TaskResourceAttributesWithSource{
-		Source: admin.AttributesSource_PROJECT_DOMAIN,
-		Value:  taskResourceAttributes,
+		Source:    admin.AttributesSource_PROJECT_DOMAIN,
+		Value:     taskResourceAttributes,
+		IsMutable: true,
 	}
 	expectedConfiguration.ExecutionQueueAttributes = &admin.ExecutionQueueAttributesWithSource{
-		Source: admin.AttributesSource_PROJECT_DOMAIN,
-		Value:  executionQueueAttributes,
+		Source:    admin.AttributesSource_PROJECT_DOMAIN,
+		Value:     executionQueueAttributes,
+		IsMutable: true,
 	}
 	assert.True(t, proto.Equal(expectedConfiguration, updatedConfiguration.Configuration))
 }
@@ -129,8 +131,9 @@ func TestDefaultConfiguration(t *testing.T) {
 	assert.NotNil(t, updatedConfiguration)
 	assert.True(t, proto.Equal(configurationId, updatedConfiguration.Id))
 	defaultConfiguration.Configuration.TaskResourceAttributes = &admin.TaskResourceAttributesWithSource{
-		Source: admin.AttributesSource_PROJECT_DOMAIN,
-		Value:  taskResourceAttributes,
+		Source:    admin.AttributesSource_PROJECT_DOMAIN,
+		Value:     taskResourceAttributes,
+		IsMutable: true,
 	}
 	assert.True(t, proto.Equal(defaultConfiguration.Configuration, updatedConfiguration.Configuration))
 }
@@ -204,13 +207,15 @@ func TestConcurrentConfiguration(t *testing.T) {
 					expectedConfiguration := *(*defaultConfiguration).Configuration
 					if counter%2 == 0 {
 						expectedConfiguration.TaskResourceAttributes = &admin.TaskResourceAttributesWithSource{
-							Source: admin.AttributesSource_PROJECT_DOMAIN,
-							Value:  taskResourceAttributes,
+							Source:    admin.AttributesSource_PROJECT_DOMAIN,
+							Value:     taskResourceAttributes,
+							IsMutable: true,
 						}
 					} else {
 						expectedConfiguration.ExecutionQueueAttributes = &admin.ExecutionQueueAttributesWithSource{
-							Source: admin.AttributesSource_PROJECT_DOMAIN,
-							Value:  executionQueueAttributes,
+							Source:    admin.AttributesSource_PROJECT_DOMAIN,
+							Value:     executionQueueAttributes,
+							IsMutable: true,
 						}
 					}
 					assert.True(t, proto.Equal(&expectedConfiguration, updatedConfiguration.Configuration))

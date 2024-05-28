@@ -16,6 +16,7 @@ const (
 	PluginIDLogoutHook             PluginID = "LogoutHook"
 	PluginIDAdditionalGRPCService  PluginID = "AdditionalGRPCService"
 	PluginIDObjectStore            PluginID = "ObjectStore"
+	PluginIDProjectConfiguration   PluginID = "ProjectConfiguration"
 )
 
 type AtomicRegistry struct {

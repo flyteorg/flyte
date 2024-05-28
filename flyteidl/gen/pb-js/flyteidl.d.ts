@@ -12364,6 +12364,9 @@ export namespace flyteidl {
 
             /** TaskResourceAttributesWithSource value */
             value?: (flyteidl.admin.ITaskResourceAttributes|null);
+
+            /** TaskResourceAttributesWithSource isMutable */
+            isMutable?: (boolean|null);
         }
 
         /** Represents a TaskResourceAttributesWithSource. */
@@ -12380,6 +12383,9 @@ export namespace flyteidl {
 
             /** TaskResourceAttributesWithSource value. */
             public value?: (flyteidl.admin.ITaskResourceAttributes|null);
+
+            /** TaskResourceAttributesWithSource isMutable. */
+            public isMutable: boolean;
 
             /**
              * Creates a new TaskResourceAttributesWithSource instance using the specified properties.
@@ -12422,6 +12428,9 @@ export namespace flyteidl {
 
             /** ClusterResourceAttributesWithSource value */
             value?: (flyteidl.admin.IClusterResourceAttributes|null);
+
+            /** ClusterResourceAttributesWithSource isMutable */
+            isMutable?: (boolean|null);
         }
 
         /** Represents a ClusterResourceAttributesWithSource. */
@@ -12438,6 +12447,9 @@ export namespace flyteidl {
 
             /** ClusterResourceAttributesWithSource value. */
             public value?: (flyteidl.admin.IClusterResourceAttributes|null);
+
+            /** ClusterResourceAttributesWithSource isMutable. */
+            public isMutable: boolean;
 
             /**
              * Creates a new ClusterResourceAttributesWithSource instance using the specified properties.
@@ -12480,6 +12492,9 @@ export namespace flyteidl {
 
             /** ExecutionQueueAttributesWithSource value */
             value?: (flyteidl.admin.IExecutionQueueAttributes|null);
+
+            /** ExecutionQueueAttributesWithSource isMutable */
+            isMutable?: (boolean|null);
         }
 
         /** Represents an ExecutionQueueAttributesWithSource. */
@@ -12496,6 +12511,9 @@ export namespace flyteidl {
 
             /** ExecutionQueueAttributesWithSource value. */
             public value?: (flyteidl.admin.IExecutionQueueAttributes|null);
+
+            /** ExecutionQueueAttributesWithSource isMutable. */
+            public isMutable: boolean;
 
             /**
              * Creates a new ExecutionQueueAttributesWithSource instance using the specified properties.
@@ -12538,6 +12556,9 @@ export namespace flyteidl {
 
             /** ExecutionClusterLabelWithSource value */
             value?: (flyteidl.admin.IExecutionClusterLabel|null);
+
+            /** ExecutionClusterLabelWithSource isMutable */
+            isMutable?: (boolean|null);
         }
 
         /** Represents an ExecutionClusterLabelWithSource. */
@@ -12554,6 +12575,9 @@ export namespace flyteidl {
 
             /** ExecutionClusterLabelWithSource value. */
             public value?: (flyteidl.admin.IExecutionClusterLabel|null);
+
+            /** ExecutionClusterLabelWithSource isMutable. */
+            public isMutable: boolean;
 
             /**
              * Creates a new ExecutionClusterLabelWithSource instance using the specified properties.
@@ -12596,6 +12620,9 @@ export namespace flyteidl {
 
             /** QualityOfServiceWithSource value */
             value?: (flyteidl.core.IQualityOfService|null);
+
+            /** QualityOfServiceWithSource isMutable */
+            isMutable?: (boolean|null);
         }
 
         /** Represents a QualityOfServiceWithSource. */
@@ -12612,6 +12639,9 @@ export namespace flyteidl {
 
             /** QualityOfServiceWithSource value. */
             public value?: (flyteidl.core.IQualityOfService|null);
+
+            /** QualityOfServiceWithSource isMutable. */
+            public isMutable: boolean;
 
             /**
              * Creates a new QualityOfServiceWithSource instance using the specified properties.
@@ -12654,6 +12684,9 @@ export namespace flyteidl {
 
             /** PluginOverridesWithSource value */
             value?: (flyteidl.admin.IPluginOverrides|null);
+
+            /** PluginOverridesWithSource isMutable */
+            isMutable?: (boolean|null);
         }
 
         /** Represents a PluginOverridesWithSource. */
@@ -12670,6 +12703,9 @@ export namespace flyteidl {
 
             /** PluginOverridesWithSource value. */
             public value?: (flyteidl.admin.IPluginOverrides|null);
+
+            /** PluginOverridesWithSource isMutable. */
+            public isMutable: boolean;
 
             /**
              * Creates a new PluginOverridesWithSource instance using the specified properties.
@@ -12712,6 +12748,9 @@ export namespace flyteidl {
 
             /** WorkflowExecutionConfigWithSource value */
             value?: (flyteidl.admin.IWorkflowExecutionConfig|null);
+
+            /** WorkflowExecutionConfigWithSource isMutable */
+            isMutable?: (boolean|null);
         }
 
         /** Represents a WorkflowExecutionConfigWithSource. */
@@ -12728,6 +12767,9 @@ export namespace flyteidl {
 
             /** WorkflowExecutionConfigWithSource value. */
             public value?: (flyteidl.admin.IWorkflowExecutionConfig|null);
+
+            /** WorkflowExecutionConfigWithSource isMutable. */
+            public isMutable: boolean;
 
             /**
              * Creates a new WorkflowExecutionConfigWithSource instance using the specified properties.
@@ -12770,6 +12812,9 @@ export namespace flyteidl {
 
             /** ClusterAssignmentWithSource value */
             value?: (flyteidl.admin.IClusterAssignment|null);
+
+            /** ClusterAssignmentWithSource isMutable */
+            isMutable?: (boolean|null);
         }
 
         /** Represents a ClusterAssignmentWithSource. */
@@ -12786,6 +12831,9 @@ export namespace flyteidl {
 
             /** ClusterAssignmentWithSource value. */
             public value?: (flyteidl.admin.IClusterAssignment|null);
+
+            /** ClusterAssignmentWithSource isMutable. */
+            public isMutable: boolean;
 
             /**
              * Creates a new ClusterAssignmentWithSource instance using the specified properties.
