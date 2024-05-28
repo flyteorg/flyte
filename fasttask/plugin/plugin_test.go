@@ -2,6 +2,7 @@ package plugin
 
 import (
 	"context"
+	"encoding/json"
 	"testing"
 	"time"
 
@@ -9,12 +10,14 @@ import (
 	_struct "github.com/golang/protobuf/ptypes/struct"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"google.golang.org/protobuf/types/known/structpb"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
 
 	idlcore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	coremocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	iomocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 
@@ -82,7 +85,7 @@ func TestFinalize(t *testing.T) {
 	// initialize static execution context attributes
 	taskMetadata := &coremocks.TaskExecutionMetadata{}
 	taskExecutionID := &coremocks.TaskExecutionID{}
-	taskExecutionID.OnGetGeneratedNameWithMatch(mock.Anything, mock.Anything).Return("task_id", nil)
+	taskExecutionID.OnGetGeneratedNameWithMatch(mock.Anything, mock.Anything).Return("task-id", nil)
 	taskMetadata.OnGetTaskExecutionID().Return(taskExecutionID)
 
 	// create TaskExecutionContext
@@ -106,7 +109,7 @@ func TestFinalize(t *testing.T) {
 
 	// create FastTaskService mock
 	fastTaskService := &mocks.FastTaskService{}
-	fastTaskService.OnCleanup(ctx, "task_id", "foo", "w0").Return(nil)
+	fastTaskService.OnCleanup(ctx, "task-id", "foo", "w0").Return(nil)
 
 	// initialize plugin
 	plugin := &Plugin{
@@ -120,6 +123,8 @@ func TestFinalize(t *testing.T) {
 
 func TestGetExecutionEnv(t *testing.T) {
 	ctx := context.TODO()
+	tCtx := &coremocks.TaskExecutionContext{}
+	tCtx.OnTaskReader().Return(&coremocks.TaskReader{})
 
 	expectedExtant := &pb.FastTaskEnvironment{
 		QueueId: "foo",
@@ -128,11 +133,19 @@ func TestGetExecutionEnv(t *testing.T) {
 	err := utils.MarshalStruct(expectedExtant, expectedExtantStruct)
 	assert.Nil(t, err)
 
+	toFastTaskSpec := func(spec *pb.FastTaskEnvironmentSpec) *structpb.Struct {
+		specStruct := &_struct.Struct{}
+		err := utils.MarshalStruct(spec, specStruct)
+		assert.Nil(t, err)
+		return specStruct
+	}
+
 	tests := []struct {
-		name            string
-		fastTaskExtant  *pb.FastTaskEnvironment
-		fastTaskSpec    *pb.FastTaskEnvironmentSpec
-		clientGetExists bool
+		name                     string
+		fastTaskExtant           *pb.FastTaskEnvironment
+		fastTaskSpec             *pb.FastTaskEnvironmentSpec
+		clientGetExists          bool
+		createExectionEnvMatcher interface{} // func (environmentSpec *structpb.Struct) bool
 	}{
 		{
 			name: "ExecutionExtant",
@@ -141,9 +154,10 @@ func TestGetExecutionEnv(t *testing.T) {
 			},
 		},
 		{
-			name:            "ExecutionSpecExists",
-			fastTaskSpec:    &pb.FastTaskEnvironmentSpec{},
-			clientGetExists: true,
+			name:                     "ExecutionSpecExists",
+			fastTaskSpec:             &pb.FastTaskEnvironmentSpec{},
+			clientGetExists:          true,
+			createExectionEnvMatcher: expectedExtantStruct,
 		},
 		{
 			name: "ExecutionSpecCreate",
@@ -151,11 +165,25 @@ func TestGetExecutionEnv(t *testing.T) {
 				PodTemplateSpec: []byte("bar"),
 			},
 			clientGetExists: false,
+			createExectionEnvMatcher: toFastTaskSpec(
+				&pb.FastTaskEnvironmentSpec{
+					PodTemplateSpec: []byte("bar"),
+				},
+			),
 		},
 		{
 			name:            "ExecutionSpecInjectPodTemplateAndCreate",
 			fastTaskSpec:    &pb.FastTaskEnvironmentSpec{},
 			clientGetExists: false,
+			createExectionEnvMatcher: mock.MatchedBy(func(environmentSpec *structpb.Struct) bool {
+				spec := &pb.FastTaskEnvironmentSpec{}
+				err := utils.UnmarshalStruct(environmentSpec, spec)
+				assert.Nil(t, err)
+				var podTemplateSpec v1.PodTemplateSpec
+				err = json.Unmarshal(spec.GetPodTemplateSpec(), &podTemplateSpec)
+				assert.Nil(t, err)
+				return podTemplateSpec.Namespace == "test-namespace" && spec.GetPrimaryContainerName() == "task-id"
+			}),
 		},
 	}
 
@@ -189,9 +217,9 @@ func TestGetExecutionEnv(t *testing.T) {
 			},
 		},
 	})
-	taskExecutionID.OnGetGeneratedNameMatch().Return("task_id")
+	taskExecutionID.OnGetGeneratedNameMatch().Return("task-id")
 	taskMetadata.OnGetTaskExecutionID().Return(taskExecutionID)
-	taskExecutionID.OnGetGeneratedNameWithMatch(mock.Anything, mock.Anything).Return("task_id", nil)
+	taskExecutionID.OnGetGeneratedNameWithMatch(mock.Anything, mock.Anything).Return("task-id", nil)
 	taskMetadata.OnGetTaskExecutionID().Return(taskExecutionID)
 
 	taskOverrides := &coremocks.TaskOverrides{}
@@ -212,6 +240,9 @@ func TestGetExecutionEnv(t *testing.T) {
 						Args:    []string{},
 					},
 				},
+				Config: map[string]string{
+					flytek8s.PrimaryContainerKey: "primary",
+				},
 			}
 
 			// create ExecutionEnvClient mock
@@ -221,7 +252,7 @@ func TestGetExecutionEnv(t *testing.T) {
 			} else {
 				executionEnvClient.OnGetMatch(ctx, mock.Anything).Return(nil)
 			}
-			executionEnvClient.OnCreateMatch(ctx, "foo", mock.Anything).Return(expectedExtantStruct, nil)
+			executionEnvClient.OnCreateMatch(ctx, "foo", test.createExectionEnvMatcher).Return(expectedExtantStruct, nil)
 
 			// create TaskExecutionContext
 			tCtx := &coremocks.TaskExecutionContext{}
@@ -304,7 +335,7 @@ func TestHandleNotYetStarted(t *testing.T) {
 		Name:      "execution_id",
 	})
 	taskExecutionID := &coremocks.TaskExecutionID{}
-	taskExecutionID.OnGetGeneratedNameWithMatch(mock.Anything, mock.Anything).Return("task_id", nil)
+	taskExecutionID.OnGetGeneratedNameWithMatch(mock.Anything, mock.Anything).Return("task-id", nil)
 	taskMetadata.OnGetTaskExecutionID().Return(taskExecutionID)
 
 	for _, test := range tests {
@@ -342,7 +373,7 @@ func TestHandleNotYetStarted(t *testing.T) {
 
 			// create FastTaskService mock
 			fastTaskService := &mocks.FastTaskService{}
-			fastTaskService.OnOfferOnQueue(ctx, "foo", "task_id", "namespace", "execution_id", []string{}).Return(test.workerID, nil)
+			fastTaskService.OnOfferOnQueue(ctx, "foo", "task-id", "namespace", "execution_id", []string{}).Return(test.workerID, nil)
 
 			// initialize plugin
 			plugin := &Plugin{
@@ -427,7 +458,7 @@ func TestHandleRunning(t *testing.T) {
 		Name:      "execution_id",
 	})
 	taskExecutionID := &coremocks.TaskExecutionID{}
-	taskExecutionID.OnGetGeneratedNameWithMatch(mock.Anything, mock.Anything).Return("task_id", nil)
+	taskExecutionID.OnGetGeneratedNameWithMatch(mock.Anything, mock.Anything).Return("task-id", nil)
 	taskMetadata.OnGetTaskExecutionID().Return(taskExecutionID)
 
 	for _, test := range tests {
@@ -464,7 +495,7 @@ func TestHandleRunning(t *testing.T) {
 
 			// create FastTaskService mock
 			fastTaskService := &mocks.FastTaskService{}
-			fastTaskService.OnCheckStatusMatch(ctx, "task_id", "foo", "w0").Return(test.taskStatusPhase, "", test.checkStatusError)
+			fastTaskService.OnCheckStatusMatch(ctx, "task-id", "foo", "w0").Return(test.taskStatusPhase, "", test.checkStatusError)
 
 			// initialize plugin
 			plugin := &Plugin{
