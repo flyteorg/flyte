@@ -63,5 +63,6 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "init-container-memory"), defaultConfig.InitContainerMemory.String(), "The default memory request / limit for the init container used to inject the fasttask worker binary.")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "nonce-length"), defaultConfig.NonceLength, "The length of the nonce value to uniquely link a fasttask replica to the environment instance,  ensuring fast turnover of environments regardless of cache freshness.")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "task-status-buffer-size"), defaultConfig.TaskStatusBufferSize, "The size of the task status buffer for each task.")
+	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "additional-worker-args"), defaultConfig.AdditionalWorkerArgs, "Additional arguments to pass to the fasttask worker binary.")
 	return cmdFlags
 }

@@ -281,4 +281,18 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_additional-worker-args", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := join_Config(defaultConfig.AdditionalWorkerArgs, ",")
+
+			cmdFlags.Set("additional-worker-args", testValue)
+			if vStringSlice, err := cmdFlags.GetStringSlice("additional-worker-args"); err == nil {
+				testDecodeRaw_Config(t, join_Config(vStringSlice, ","), &actual.AdditionalWorkerArgs)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }

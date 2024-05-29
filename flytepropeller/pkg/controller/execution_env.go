@@ -31,7 +31,9 @@ func (e *ExecutionEnvClient) Get(ctx context.Context, executionEnvID string) *_s
 
 // NewExecutionEnvClient creates a new ExecutionEnvClient.
 func NewExecutionEnvClient(ctx context.Context, kubeClient executors.Client, scope promutils.Scope) (pluginscore.ExecutionEnvClient, error) {
-	fastTaskEnvBuilder := plugin.NewEnvironmentBuilder(kubeClient)
+	envBuilderScope := scope.NewSubScope("env_builder")
+
+	fastTaskEnvBuilder := plugin.NewEnvironmentBuilder(kubeClient, envBuilderScope.NewSubScope("fast_task"))
 	if err := fastTaskEnvBuilder.Start(ctx); err != nil {
 		return nil, err
 	}
