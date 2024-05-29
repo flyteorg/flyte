@@ -37,7 +37,7 @@ cross_compile:
 	go build -o bin/cross/kubectl-flyte ./cmd/kubectl-flyte/main.go
 
 op_code_generate:
-	@RESOURCE_NAME=flyteworkflow OPERATOR_PKG=github.com/flyteorg/flytepropeller ./hack/update-codegen.sh
+	@RESOURCE_NAME=flyteworkflow OPERATOR_PKG=github.com/flyteorg/flyte/flytepropeller ./hack/update-codegen.sh
 
 benchmark:
 	mkdir -p ./bin/benchmark

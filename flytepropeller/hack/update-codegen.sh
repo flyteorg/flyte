@@ -36,7 +36,7 @@ bash ${CODEGEN_PKG}/generate-groups.sh "deepcopy,client,informer,lister" \
   ${OPERATOR_PKG}/pkg/client \
   ${OPERATOR_PKG}/pkg/apis \
   ${RESOURCE_NAME}:v1alpha1 \
-  --output-base "$(dirname ${BASH_SOURCE})/../../../.." \
+  --output-base "$(dirname ${BASH_SOURCE})/../../../../.." \
   --go-header-file ${SCRIPT_ROOT}/hack/boilerplate.go.txt
 
 # To use your own boilerplate text use:
