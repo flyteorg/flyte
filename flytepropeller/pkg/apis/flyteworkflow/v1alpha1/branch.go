@@ -4,6 +4,7 @@ import (
 	"bytes"
 
 	"github.com/golang/protobuf/jsonpb"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
@@ -54,6 +55,33 @@ type BranchNodeSpec struct {
 	ElseIf   []*IfBlock  `json:"elseIf,omitempty"`
 	Else     *NodeID     `json:"else,omitempty"`
 	ElseFail *core.Error `json:"elseFail,omitempty"`
+}
+
+// BranchNodeSpec contains at least one proto message directly, which means that we need to
+// implement DeepCopyInto since the generated proto messages do not implement that function.
+func (in *BranchNodeSpec) DeepCopyInto(out *BranchNodeSpec) {
+	*out = *in
+	in.If.DeepCopyInto(&out.If)
+	if in.ElseIf != nil {
+		in, out := &in.ElseIf, &out.ElseIf
+		*out = make([]*IfBlock, len(*in))
+		for i := range *in {
+			if (*in)[i] != nil {
+				in, out := &(*in)[i], &(*out)[i]
+				*out = new(IfBlock)
+				(*in).DeepCopyInto(*out)
+			}
+		}
+	}
+	if in.Else != nil {
+		in, out := &in.Else, &out.Else
+		*out = new(string)
+		**out = **in
+	}
+	if in.ElseFail != nil {
+		out.ElseFail = proto.Clone(in.ElseFail).(*core.Error)
+	}
+	return
 }
 
 func (in *BranchNodeSpec) GetIf() ExecutableIfBlock {

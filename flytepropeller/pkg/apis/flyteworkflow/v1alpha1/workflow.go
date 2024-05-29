@@ -79,6 +79,76 @@ type FlyteWorkflow struct {
 	WorkflowClosureReference DataReference `json:"workflowClosureReference,omitempty"`
 }
 
+// FlyteWorkflow contains at least one proto message directly, which means that we need to
+// implement DeepCopyInto since the generated proto messages do not implement that function.
+func (in *FlyteWorkflow) DeepCopyInto(out *FlyteWorkflow) {
+	*out = *in
+	out.TypeMeta = in.TypeMeta
+	in.ObjectMeta.DeepCopyInto(&out.ObjectMeta)
+	if in.WorkflowSpec != nil {
+		in, out := &in.WorkflowSpec, &out.WorkflowSpec
+		*out = new(WorkflowSpec)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.WorkflowMeta != nil {
+		in, out := &in.WorkflowMeta, &out.WorkflowMeta
+		*out = new(WorkflowMeta)
+		**out = **in
+	}
+	if in.Inputs != nil {
+		in, out := &in.Inputs, &out.Inputs
+		*out = (*in).DeepCopy()
+	}
+	in.ExecutionID.DeepCopyInto(&out.ExecutionID)
+	if in.Tasks != nil {
+		in, out := &in.Tasks, &out.Tasks
+		*out = make(map[string]*TaskSpec, len(*in))
+		for key, val := range *in {
+			var outVal *TaskSpec
+			if val == nil {
+				(*out)[key] = nil
+			} else {
+				in, out := &val, &outVal
+				*out = (*in).DeepCopy()
+			}
+			(*out)[key] = outVal
+		}
+	}
+	if in.SubWorkflows != nil {
+		in, out := &in.SubWorkflows, &out.SubWorkflows
+		*out = make(map[string]*WorkflowSpec, len(*in))
+		for key, val := range *in {
+			var outVal *WorkflowSpec
+			if val == nil {
+				(*out)[key] = nil
+			} else {
+				in, out := &val, &outVal
+				*out = new(WorkflowSpec)
+				(*in).DeepCopyInto(*out)
+			}
+			(*out)[key] = outVal
+		}
+	}
+	if in.ActiveDeadlineSeconds != nil {
+		in, out := &in.ActiveDeadlineSeconds, &out.ActiveDeadlineSeconds
+		*out = new(int64)
+		**out = **in
+	}
+	out.NodeDefaults = in.NodeDefaults
+	if in.AcceptedAt != nil {
+		in, out := &in.AcceptedAt, &out.AcceptedAt
+		*out = (*in).DeepCopy()
+	}
+	out.SecurityContext = in.SecurityContext
+	in.Status.DeepCopyInto(&out.Status)
+	in.RawOutputDataConfig.DeepCopyInto(&out.RawOutputDataConfig)
+	in.ExecutionConfig.DeepCopyInto(&out.ExecutionConfig)
+	if in.DataReferenceConstructor != nil {
+		out.DataReferenceConstructor = in.DataReferenceConstructor
+	}
+	return
+}
+
 func (in *FlyteWorkflow) GetSecurityContext() core.SecurityContext {
 	return in.SecurityContext
 }

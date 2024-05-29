@@ -4,6 +4,7 @@ import (
 	"bytes"
 
 	"github.com/golang/protobuf/jsonpb"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
@@ -36,6 +37,10 @@ func (in ApproveCondition) MarshalJSON() ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
+func (in *ApproveCondition) DeepCopyInto(out *ApproveCondition) {
+	out.ApproveCondition = proto.Clone(in.ApproveCondition).(*core.ApproveCondition)
+}
+
 func (in *ApproveCondition) UnmarshalJSON(b []byte) error {
 	in.ApproveCondition = &core.ApproveCondition{}
 	return jsonpb.Unmarshal(bytes.NewReader(b), in.ApproveCondition)
@@ -62,6 +67,10 @@ func (in *SignalCondition) UnmarshalJSON(b []byte) error {
 	return jsonpb.Unmarshal(bytes.NewReader(b), in.SignalCondition)
 }
 
+func (in *SignalCondition) DeepCopyInto(out *SignalCondition) {
+	out.SignalCondition = proto.Clone(in.SignalCondition).(*core.SignalCondition)
+}
+
 type SleepCondition struct {
 	*core.SleepCondition
 }
@@ -81,6 +90,10 @@ func (in SleepCondition) MarshalJSON() ([]byte, error) {
 func (in *SleepCondition) UnmarshalJSON(b []byte) error {
 	in.SleepCondition = &core.SleepCondition{}
 	return jsonpb.Unmarshal(bytes.NewReader(b), in.SleepCondition)
+}
+
+func (in *SleepCondition) DeepCopyInto(out *SleepCondition) {
+	out.SleepCondition = proto.Clone(in.SleepCondition).(*core.SleepCondition)
 }
 
 type GateNodeSpec struct {

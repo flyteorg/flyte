@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"time"
 
+	"google.golang.org/protobuf/proto"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -174,6 +175,15 @@ type WorkflowNodeStatus struct {
 	ExecutionError *core.ExecutionError `json:"executionError,omitempty"`
 }
 
+func (in *WorkflowNodeStatus) DeepCopyInto(out *WorkflowNodeStatus) {
+	*out = *in
+	out.MutableStruct = in.MutableStruct
+	if in.ExecutionError != nil {
+		out.ExecutionError = proto.Clone(in.ExecutionError).(*core.ExecutionError)
+	}
+	return
+}
+
 func (in *WorkflowNodeStatus) SetExecutionError(executionError *core.ExecutionError) {
 	if in.ExecutionError != executionError {
 		in.SetDirty()
@@ -237,6 +247,21 @@ type ArrayNodeStatus struct {
 	SubNodeRetryAttempts  bitarray.CompactArray `json:"subattempts,omitempty"`
 	SubNodeSystemFailures bitarray.CompactArray `json:"subsysfailures,omitempty"`
 	TaskPhaseVersion      uint32                `json:"taskPhaseVersion,omitempty"`
+}
+
+// ArrayNodeStatus contains at least one proto message directly, which means that we need to
+// implement DeepCopyInto since the generated proto messages do not implement that function.
+func (in *ArrayNodeStatus) DeepCopyInto(out *ArrayNodeStatus) {
+	*out = *in
+	out.MutableStruct = in.MutableStruct
+	if in.ExecutionError != nil {
+		out.ExecutionError = proto.Clone(in.ExecutionError).(*core.ExecutionError)
+	}
+	in.SubNodePhases.DeepCopyInto(&out.SubNodePhases)
+	in.SubNodeTaskPhases.DeepCopyInto(&out.SubNodeTaskPhases)
+	in.SubNodeRetryAttempts.DeepCopyInto(&out.SubNodeRetryAttempts)
+	in.SubNodeSystemFailures.DeepCopyInto(&out.SubNodeSystemFailures)
+	return
 }
 
 func (in *ArrayNodeStatus) GetArrayNodePhase() ArrayNodePhase {
@@ -350,6 +375,92 @@ type NodeStatus struct {
 
 	// Not Persisted
 	DataReferenceConstructor storage.ReferenceConstructor `json:"-"`
+}
+
+// TODO: add comment
+func (in *NodeStatus) DeepCopyInto(out *NodeStatus) {
+	*out = *in
+	out.MutableStruct = in.MutableStruct
+	if in.QueuedAt != nil {
+		in, out := &in.QueuedAt, &out.QueuedAt
+		*out = (*in).DeepCopy()
+	}
+	if in.StartedAt != nil {
+		in, out := &in.StartedAt, &out.StartedAt
+		*out = (*in).DeepCopy()
+	}
+	if in.StoppedAt != nil {
+		in, out := &in.StoppedAt, &out.StoppedAt
+		*out = (*in).DeepCopy()
+	}
+	if in.LastUpdatedAt != nil {
+		in, out := &in.LastUpdatedAt, &out.LastUpdatedAt
+		*out = (*in).DeepCopy()
+	}
+	if in.LastAttemptStartedAt != nil {
+		in, out := &in.LastAttemptStartedAt, &out.LastAttemptStartedAt
+		*out = (*in).DeepCopy()
+	}
+	if in.ParentNode != nil {
+		in, out := &in.ParentNode, &out.ParentNode
+		*out = new(string)
+		**out = **in
+	}
+	if in.ParentTask != nil {
+		in, out := &in.ParentTask, &out.ParentTask
+		*out = (*in).DeepCopy()
+	}
+	if in.BranchStatus != nil {
+		in, out := &in.BranchStatus, &out.BranchStatus
+		*out = new(BranchNodeStatus)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.SubNodeStatus != nil {
+		in, out := &in.SubNodeStatus, &out.SubNodeStatus
+		*out = make(map[string]*NodeStatus, len(*in))
+		for key, val := range *in {
+			var outVal *NodeStatus
+			if val == nil {
+				(*out)[key] = nil
+			} else {
+				in, out := &val, &outVal
+				*out = new(NodeStatus)
+				(*in).DeepCopyInto(*out)
+			}
+			(*out)[key] = outVal
+		}
+	}
+	if in.WorkflowNodeStatus != nil {
+		in, out := &in.WorkflowNodeStatus, &out.WorkflowNodeStatus
+		*out = new(WorkflowNodeStatus)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.TaskNodeStatus != nil {
+		in, out := &in.TaskNodeStatus, &out.TaskNodeStatus
+		*out = (*in).DeepCopy()
+	}
+	if in.DynamicNodeStatus != nil {
+		in, out := &in.DynamicNodeStatus, &out.DynamicNodeStatus
+		*out = new(DynamicNodeStatus)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.GateNodeStatus != nil {
+		in, out := &in.GateNodeStatus, &out.GateNodeStatus
+		*out = new(GateNodeStatus)
+		**out = **in
+	}
+	if in.ArrayNodeStatus != nil {
+		in, out := &in.ArrayNodeStatus, &out.ArrayNodeStatus
+		*out = (*in).DeepCopy()
+	}
+	if in.Error != nil {
+		in, out := &in.Error, &out.Error
+		*out = (*in).DeepCopy()
+	}
+	if in.DataReferenceConstructor != nil {
+		out.DataReferenceConstructor = in.DataReferenceConstructor
+	}
+	return
 }
 
 func (in *NodeStatus) IsDirty() bool {

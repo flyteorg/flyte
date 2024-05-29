@@ -45,6 +45,49 @@ type WorkflowStatus struct {
 	DataReferenceConstructor storage.ReferenceConstructor `json:"-"`
 }
 
+func (in *WorkflowStatus) DeepCopyInto(out *WorkflowStatus) {
+	*out = *in
+	if in.StartedAt != nil {
+		in, out := &in.StartedAt, &out.StartedAt
+		*out = (*in).DeepCopy()
+	}
+	if in.StoppedAt != nil {
+		in, out := &in.StoppedAt, &out.StoppedAt
+		*out = (*in).DeepCopy()
+	}
+	if in.LastUpdatedAt != nil {
+		in, out := &in.LastUpdatedAt, &out.LastUpdatedAt
+		*out = (*in).DeepCopy()
+	}
+	if in.NodeStatus != nil {
+		in, out := &in.NodeStatus, &out.NodeStatus
+		*out = make(map[string]*NodeStatus, len(*in))
+		for key, val := range *in {
+			var outVal *NodeStatus
+			if val == nil {
+				(*out)[key] = nil
+			} else {
+				in, out := &val, &outVal
+				*out = (*in).DeepCopy()
+			}
+			(*out)[key] = outVal
+		}
+	}
+	if in.Error != nil {
+		in, out := &in.Error, &out.Error
+		*out = (*in).DeepCopy()
+	}
+	if in.DefinitionVersion != nil {
+		in, out := &in.DefinitionVersion, &out.DefinitionVersion
+		*out = new(WorkflowDefinitionVersion)
+		**out = **in
+	}
+	if in.DataReferenceConstructor != nil {
+		out.DataReferenceConstructor = in.DataReferenceConstructor
+	}
+	return
+}
+
 func IsWorkflowPhaseTerminal(p WorkflowPhase) bool {
 	return p == WorkflowPhaseFailed || p == WorkflowPhaseSuccess || p == WorkflowPhaseAborted
 }

@@ -58,7 +58,10 @@ func (c *Clientset) Tracker() testing.ObjectTracker {
 	return c.tracker
 }
 
-var _ clientset.Interface = &Clientset{}
+var (
+	_ clientset.Interface = &Clientset{}
+	_ testing.FakeClient  = &Clientset{}
+)
 
 // FlyteworkflowV1alpha1 retrieves the FlyteworkflowV1alpha1Client
 func (c *Clientset) FlyteworkflowV1alpha1() flyteworkflowv1alpha1.FlyteworkflowV1alpha1Interface {
