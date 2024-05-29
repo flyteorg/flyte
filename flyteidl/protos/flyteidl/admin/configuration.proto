@@ -49,41 +49,49 @@ enum AttributesSource {
 message TaskResourceAttributesWithSource {
   AttributesSource source = 1;
   TaskResourceAttributes value = 2;
+  bool is_mutable = 3;
 }
 
 message ClusterResourceAttributesWithSource {
   AttributesSource source = 1;
   ClusterResourceAttributes value = 2;
+  bool is_mutable = 3;
 }
 
 message ExecutionQueueAttributesWithSource {
   AttributesSource source = 1;
   ExecutionQueueAttributes value = 2;
+  bool is_mutable = 3;
 }
 
 message ExecutionClusterLabelWithSource {
   AttributesSource source = 1;
   ExecutionClusterLabel value = 2;
+  bool is_mutable = 3;
 }
 
 message QualityOfServiceWithSource {
   AttributesSource source = 1;
   core.QualityOfService value = 2;
+  bool is_mutable = 3;
 }
 
 message PluginOverridesWithSource {
   AttributesSource source = 1;
   PluginOverrides value = 2;
+  bool is_mutable = 3;
 }
 
 message WorkflowExecutionConfigWithSource {
   AttributesSource source = 1;
   WorkflowExecutionConfig value = 2;
+  bool is_mutable = 3;
 }
 
 message ClusterAssignmentWithSource {
   AttributesSource source = 1;
   ClusterAssignment value = 2;
+  bool is_mutable = 3;
 }
 
 // Configuration with source information.
@@ -178,4 +186,3 @@ message ConfigurationDocument {
   // The key is the string serialized ConfigurationID with (https://pkg.go.dev/github.com/golang/protobuf/jsonpb#Marshaler.Marshal).
   map<string, Configuration> configurations = 3;
 }
-

@@ -7,97 +7,99 @@ import (
 	"google.golang.org/grpc/codes"
 
 	flyteErrs "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/configurations/plugin"
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
-func AddConfigurationSource(configuration *admin.Configuration, source admin.AttributesSource) *admin.ConfigurationWithSource {
+func addConfigurationSource(configuration *admin.Configuration, source admin.AttributesSource) *admin.ConfigurationWithSource {
 	configurationWithSource := &admin.ConfigurationWithSource{}
-	if configuration.TaskResourceAttributes != nil {
-		configurationWithSource.TaskResourceAttributes = &admin.TaskResourceAttributesWithSource{
-			Source: source,
-			Value:  configuration.TaskResourceAttributes,
-		}
+	configurationWithSource.TaskResourceAttributes = &admin.TaskResourceAttributesWithSource{
+		Source: source,
+		Value:  configuration.TaskResourceAttributes,
 	}
-	if configuration.ClusterResourceAttributes != nil {
-		configurationWithSource.ClusterResourceAttributes = &admin.ClusterResourceAttributesWithSource{
-			Source: source,
-			Value:  configuration.ClusterResourceAttributes,
-		}
+	configurationWithSource.ClusterResourceAttributes = &admin.ClusterResourceAttributesWithSource{
+		Source: source,
+		Value:  configuration.ClusterResourceAttributes,
 	}
-	if configuration.ExecutionQueueAttributes != nil {
-		configurationWithSource.ExecutionQueueAttributes = &admin.ExecutionQueueAttributesWithSource{
-			Source: source,
-			Value:  configuration.ExecutionQueueAttributes,
-		}
+	configurationWithSource.ExecutionQueueAttributes = &admin.ExecutionQueueAttributesWithSource{
+		Source: source,
+		Value:  configuration.ExecutionQueueAttributes,
 	}
-	if configuration.ExecutionClusterLabel != nil {
-		configurationWithSource.ExecutionClusterLabel = &admin.ExecutionClusterLabelWithSource{
-			Source: source,
-			Value:  configuration.ExecutionClusterLabel,
-		}
+	configurationWithSource.ExecutionClusterLabel = &admin.ExecutionClusterLabelWithSource{
+		Source: source,
+		Value:  configuration.ExecutionClusterLabel,
 	}
-	if configuration.QualityOfService != nil {
-		configurationWithSource.QualityOfService = &admin.QualityOfServiceWithSource{
-			Source: source,
-			Value:  configuration.QualityOfService,
-		}
+	configurationWithSource.QualityOfService = &admin.QualityOfServiceWithSource{
+		Source: source,
+		Value:  configuration.QualityOfService,
 	}
-
-	if configuration.PluginOverrides != nil {
-		configurationWithSource.PluginOverrides = &admin.PluginOverridesWithSource{
-			Source: source,
-			Value:  configuration.PluginOverrides,
-		}
+	configurationWithSource.PluginOverrides = &admin.PluginOverridesWithSource{
+		Source: source,
+		Value:  configuration.PluginOverrides,
 	}
-	if configuration.WorkflowExecutionConfig != nil {
-		configurationWithSource.WorkflowExecutionConfig = &admin.WorkflowExecutionConfigWithSource{
-			Source: source,
-			Value:  configuration.WorkflowExecutionConfig,
-		}
+	configurationWithSource.WorkflowExecutionConfig = &admin.WorkflowExecutionConfigWithSource{
+		Source: source,
+		Value:  configuration.WorkflowExecutionConfig,
 	}
-	if configuration.ClusterAssignment != nil {
-		configurationWithSource.ClusterAssignment = &admin.ClusterAssignmentWithSource{
-			Source: source,
-			Value:  configuration.ClusterAssignment,
-		}
+	configurationWithSource.ClusterAssignment = &admin.ClusterAssignmentWithSource{
+		Source: source,
+		Value:  configuration.ClusterAssignment,
 	}
 	return configurationWithSource
 }
 
 // If current configuration is missing a field, merge the incoming configuration into the current configuration.
-func MergeConfigurations(current *admin.ConfigurationWithSource, incoming *admin.ConfigurationWithSource) *admin.ConfigurationWithSource {
-	if current.TaskResourceAttributes == nil {
+func mergeConfigurations(current *admin.ConfigurationWithSource, incoming *admin.ConfigurationWithSource) *admin.ConfigurationWithSource {
+	if current.TaskResourceAttributes == nil || current.TaskResourceAttributes.Value == nil {
 		current.TaskResourceAttributes = incoming.TaskResourceAttributes
 	}
-	if current.ClusterResourceAttributes == nil {
+	if current.ClusterResourceAttributes == nil || current.ClusterResourceAttributes.Value == nil {
 		current.ClusterResourceAttributes = incoming.ClusterResourceAttributes
 	}
-	if current.ExecutionQueueAttributes == nil {
+	if current.ExecutionQueueAttributes == nil || current.ExecutionQueueAttributes.Value == nil {
 		current.ExecutionQueueAttributes = incoming.ExecutionQueueAttributes
 	}
-	if current.ExecutionClusterLabel == nil {
+	if current.ExecutionClusterLabel == nil || current.ExecutionClusterLabel.Value == nil {
 		current.ExecutionClusterLabel = incoming.ExecutionClusterLabel
 	}
-	if current.QualityOfService == nil {
+	if current.QualityOfService == nil || current.QualityOfService.Value == nil {
 		current.QualityOfService = incoming.QualityOfService
 	}
-	if current.PluginOverrides == nil {
+	if current.PluginOverrides == nil || current.PluginOverrides.Value == nil {
 		current.PluginOverrides = incoming.PluginOverrides
 	}
-	if current.WorkflowExecutionConfig == nil {
+	if current.WorkflowExecutionConfig == nil || current.WorkflowExecutionConfig.Value == nil {
 		current.WorkflowExecutionConfig = incoming.WorkflowExecutionConfig
 	}
-	if current.ClusterAssignment == nil {
+	if current.ClusterAssignment == nil || current.ClusterAssignment.Value == nil {
 		current.ClusterAssignment = incoming.ClusterAssignment
 	}
 	return current
 }
 
+func addConfigurationIsMutable(ctx context.Context, configuration *admin.ConfigurationWithSource, projectConfigurationPlugin plugin.ProjectConfigurationPlugin) (*admin.ConfigurationWithSource, error) {
+	clusterAssignment := configuration.GetClusterAssignment().GetValue()
+	mutableAttributes, err := projectConfigurationPlugin.GetMutableAttributes(ctx, &plugin.GetMutableAttributesInput{ClusterAssignment: clusterAssignment})
+	if err != nil {
+		return nil, err
+	}
+
+	configuration.TaskResourceAttributes.IsMutable = mutableAttributes.Has(admin.MatchableResource_TASK_RESOURCE)
+	configuration.ClusterResourceAttributes.IsMutable = mutableAttributes.Has(admin.MatchableResource_CLUSTER_RESOURCE)
+	configuration.ExecutionQueueAttributes.IsMutable = mutableAttributes.Has(admin.MatchableResource_EXECUTION_QUEUE)
+	configuration.ExecutionClusterLabel.IsMutable = mutableAttributes.Has(admin.MatchableResource_EXECUTION_CLUSTER_LABEL)
+	configuration.QualityOfService.IsMutable = mutableAttributes.Has(admin.MatchableResource_QUALITY_OF_SERVICE_SPECIFICATION)
+	configuration.PluginOverrides.IsMutable = mutableAttributes.Has(admin.MatchableResource_PLUGIN_OVERRIDE)
+	configuration.WorkflowExecutionConfig.IsMutable = mutableAttributes.Has(admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG)
+	configuration.ClusterAssignment.IsMutable = mutableAttributes.Has(admin.MatchableResource_CLUSTER_ASSIGNMENT)
+	return configuration, nil
+}
+
 // Merges the configuration from higher level to lower level.
-func GetConfigurationWithSource(ctx context.Context, document *admin.ConfigurationDocument, id *admin.ConfigurationID) (*admin.ConfigurationWithSource, error) {
+func GetConfigurationWithSource(ctx context.Context, document *admin.ConfigurationDocument, id *admin.ConfigurationID, projectConfigurationPlugin plugin.ProjectConfigurationPlugin) (*admin.ConfigurationWithSource, error) {
 	projectDomainConfiguration, err := GetConfigurationFromDocument(ctx, document, &admin.ConfigurationID{
 		Org:     id.Org,
 		Project: id.Project,
@@ -123,14 +125,15 @@ func GetConfigurationWithSource(ctx context.Context, document *admin.Configurati
 	if err != nil {
 		return nil, err
 	}
-	configuration := AddConfigurationSource(&projectDomainConfiguration, admin.AttributesSource_PROJECT_DOMAIN)
-	configuration = MergeConfigurations(configuration, AddConfigurationSource(&projectConfiguration, admin.AttributesSource_PROJECT))
-	configuration = MergeConfigurations(configuration, AddConfigurationSource(&domainConfiguration, admin.AttributesSource_DOMAIN))
-	configuration = MergeConfigurations(configuration, AddConfigurationSource(&globalConfiguration, admin.AttributesSource_GLOBAL))
-	return configuration, nil
+	configuration := addConfigurationSource(&projectDomainConfiguration, admin.AttributesSource_PROJECT_DOMAIN)
+	configuration = mergeConfigurations(configuration, addConfigurationSource(&projectConfiguration, admin.AttributesSource_PROJECT))
+	configuration = mergeConfigurations(configuration, addConfigurationSource(&domainConfiguration, admin.AttributesSource_DOMAIN))
+	configuration = mergeConfigurations(configuration, addConfigurationSource(&globalConfiguration, admin.AttributesSource_GLOBAL))
+
+	return addConfigurationIsMutable(ctx, configuration, projectConfigurationPlugin)
 }
 
-func GetDefaultConfigurationWithSource(ctx context.Context, document *admin.ConfigurationDocument, domain string) (*admin.ConfigurationWithSource, error) {
+func GetDefaultConfigurationWithSource(ctx context.Context, document *admin.ConfigurationDocument, domain string, projectConfigurationPlugin plugin.ProjectConfigurationPlugin) (*admin.ConfigurationWithSource, error) {
 	domainConfiguration, err := GetConfigurationFromDocument(ctx, document, &admin.ConfigurationID{
 		Domain: domain,
 	})
@@ -141,9 +144,10 @@ func GetDefaultConfigurationWithSource(ctx context.Context, document *admin.Conf
 	if err != nil {
 		return nil, err
 	}
-	configuration := AddConfigurationSource(&domainConfiguration, admin.AttributesSource_DOMAIN)
-	configuration = MergeConfigurations(configuration, AddConfigurationSource(&globalConfiguration, admin.AttributesSource_GLOBAL))
-	return configuration, nil
+	configuration := addConfigurationSource(&domainConfiguration, admin.AttributesSource_DOMAIN)
+	configuration = mergeConfigurations(configuration, addConfigurationSource(&globalConfiguration, admin.AttributesSource_GLOBAL))
+
+	return addConfigurationIsMutable(ctx, configuration, projectConfigurationPlugin)
 }
 
 func GetConfigurationFromDocument(ctx context.Context, document *admin.ConfigurationDocument, id *admin.ConfigurationID) (admin.Configuration, error) {

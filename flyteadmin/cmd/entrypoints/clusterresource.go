@@ -9,6 +9,7 @@ import (
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/clusterresource"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/runtime"
+	"github.com/flyteorg/flyte/flyteadmin/plugins"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
@@ -25,7 +26,8 @@ var controllerRunCmd = &cobra.Command{
 		ctx := context.Background()
 		configuration := runtime.NewConfigurationProvider()
 		scope := promutils.NewScope(configuration.ApplicationConfiguration().GetTopLevelConfig().MetricsScope).NewSubScope("clusterresource")
-		clusterResourceController, err := clusterresource.NewClusterResourceControllerFromConfig(ctx, scope, configuration)
+		pluginRegistry := plugins.NewRegistry()
+		clusterResourceController, err := clusterresource.NewClusterResourceControllerFromConfig(ctx, scope, configuration, pluginRegistry)
 		if err != nil {
 			return err
 		}
@@ -42,7 +44,8 @@ var controllerSyncCmd = &cobra.Command{
 		ctx := context.Background()
 		configuration := runtime.NewConfigurationProvider()
 		scope := promutils.NewScope(configuration.ApplicationConfiguration().GetTopLevelConfig().MetricsScope).NewSubScope("clusterresource")
-		clusterResourceController, err := clusterresource.NewClusterResourceControllerFromConfig(ctx, scope, configuration)
+		pluginRegistry := plugins.NewRegistry()
+		clusterResourceController, err := clusterresource.NewClusterResourceControllerFromConfig(ctx, scope, configuration, pluginRegistry)
 		if err != nil {
 			return err
 		}

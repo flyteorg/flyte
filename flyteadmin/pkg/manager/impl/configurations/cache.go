@@ -1,8 +1,9 @@
 package configurations
 
 import (
-	"maps"
 	"sync"
+
+	"maps"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )

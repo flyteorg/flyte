@@ -63,10 +63,10 @@ func startCacheService(ctx context.Context, _ CacheService) error {
 	return cacheservice.ServeInsecure(ctx, cacheCfg)
 }
 
-func startClusterResourceController(ctx context.Context) error {
+func startClusterResourceController(ctx context.Context, pluginRegistry *plugins.Registry) error {
 	configuration := runtime.NewConfigurationProvider()
 	scope := promutils.NewScope(configuration.ApplicationConfiguration().GetTopLevelConfig().MetricsScope).NewSubScope("clusterresource")
-	clusterResourceController, err := clusterresource.NewClusterResourceControllerFromConfig(ctx, scope, configuration)
+	clusterResourceController, err := clusterresource.NewClusterResourceControllerFromConfig(ctx, scope, configuration, pluginRegistry)
 	if err != nil {
 		return err
 	}
@@ -100,18 +100,18 @@ func startAdmin(ctx context.Context, cfg Admin) error {
 		})
 	}
 
+	pluginRegistry := plugins.NewAtomicRegistry(plugins.NewRegistry())
 	if !cfg.DisableClusterResourceManager {
 		logger.Infof(ctx, "Starting cluster resource controller...")
 		g.Go(func() error {
-			return startClusterResourceController(childCtx)
+			return startClusterResourceController(childCtx, pluginRegistry.Load())
 		})
 	}
 
 	if !cfg.Disabled {
 		g.Go(func() error {
 			logger.Infof(ctx, "Starting Admin server...")
-			registry := plugins.NewAtomicRegistry(plugins.NewRegistry())
-			return adminServer.Serve(childCtx, registry.Load(), GetConsoleHandlers())
+			return adminServer.Serve(childCtx, pluginRegistry.Load(), GetConsoleHandlers())
 		})
 	}
 	return g.Wait()

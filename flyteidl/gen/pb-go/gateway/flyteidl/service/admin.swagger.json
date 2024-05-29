@@ -9672,6 +9672,9 @@
         },
         "value": {
           "$ref": "#/definitions/adminClusterAssignment"
+        },
+        "is_mutable": {
+          "type": "boolean"
         }
       }
     },
@@ -9695,6 +9698,9 @@
         },
         "value": {
           "$ref": "#/definitions/adminClusterResourceAttributes"
+        },
+        "is_mutable": {
+          "type": "boolean"
         }
       }
     },
@@ -10064,6 +10070,9 @@
         },
         "value": {
           "$ref": "#/definitions/adminExecutionClusterLabel"
+        },
+        "is_mutable": {
+          "type": "boolean"
         }
       }
     },
@@ -10215,6 +10224,9 @@
         },
         "value": {
           "$ref": "#/definitions/adminExecutionQueueAttributes"
+        },
+        "is_mutable": {
+          "type": "boolean"
         }
       }
     },
@@ -11066,6 +11078,9 @@
         },
         "value": {
           "$ref": "#/definitions/adminPluginOverrides"
+        },
+        "is_mutable": {
+          "type": "boolean"
         }
       }
     },
@@ -11219,6 +11234,9 @@
         },
         "value": {
           "$ref": "#/definitions/coreQualityOfService"
+        },
+        "is_mutable": {
+          "type": "boolean"
         }
       }
     },
@@ -11547,6 +11565,9 @@
         },
         "value": {
           "$ref": "#/definitions/adminTaskResourceAttributes"
+        },
+        "is_mutable": {
+          "type": "boolean"
         }
       }
     },
@@ -11751,6 +11772,9 @@
         },
         "value": {
           "$ref": "#/definitions/adminWorkflowExecutionConfig"
+        },
+        "is_mutable": {
+          "type": "boolean"
         }
       }
     },

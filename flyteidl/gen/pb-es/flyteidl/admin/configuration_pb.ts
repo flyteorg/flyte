@@ -142,6 +142,11 @@ export class TaskResourceAttributesWithSource extends Message<TaskResourceAttrib
    */
   value?: TaskResourceAttributes;
 
+  /**
+   * @generated from field: bool is_mutable = 3;
+   */
+  isMutable = false;
+
   constructor(data?: PartialMessage<TaskResourceAttributesWithSource>) {
     super();
     proto3.util.initPartial(data, this);
@@ -152,6 +157,7 @@ export class TaskResourceAttributesWithSource extends Message<TaskResourceAttrib
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "source", kind: "enum", T: proto3.getEnumType(AttributesSource) },
     { no: 2, name: "value", kind: "message", T: TaskResourceAttributes },
+    { no: 3, name: "is_mutable", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TaskResourceAttributesWithSource {
@@ -185,6 +191,11 @@ export class ClusterResourceAttributesWithSource extends Message<ClusterResource
    */
   value?: ClusterResourceAttributes;
 
+  /**
+   * @generated from field: bool is_mutable = 3;
+   */
+  isMutable = false;
+
   constructor(data?: PartialMessage<ClusterResourceAttributesWithSource>) {
     super();
     proto3.util.initPartial(data, this);
@@ -195,6 +206,7 @@ export class ClusterResourceAttributesWithSource extends Message<ClusterResource
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "source", kind: "enum", T: proto3.getEnumType(AttributesSource) },
     { no: 2, name: "value", kind: "message", T: ClusterResourceAttributes },
+    { no: 3, name: "is_mutable", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ClusterResourceAttributesWithSource {
@@ -228,6 +240,11 @@ export class ExecutionQueueAttributesWithSource extends Message<ExecutionQueueAt
    */
   value?: ExecutionQueueAttributes;
 
+  /**
+   * @generated from field: bool is_mutable = 3;
+   */
+  isMutable = false;
+
   constructor(data?: PartialMessage<ExecutionQueueAttributesWithSource>) {
     super();
     proto3.util.initPartial(data, this);
@@ -238,6 +255,7 @@ export class ExecutionQueueAttributesWithSource extends Message<ExecutionQueueAt
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "source", kind: "enum", T: proto3.getEnumType(AttributesSource) },
     { no: 2, name: "value", kind: "message", T: ExecutionQueueAttributes },
+    { no: 3, name: "is_mutable", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExecutionQueueAttributesWithSource {
@@ -271,6 +289,11 @@ export class ExecutionClusterLabelWithSource extends Message<ExecutionClusterLab
    */
   value?: ExecutionClusterLabel;
 
+  /**
+   * @generated from field: bool is_mutable = 3;
+   */
+  isMutable = false;
+
   constructor(data?: PartialMessage<ExecutionClusterLabelWithSource>) {
     super();
     proto3.util.initPartial(data, this);
@@ -281,6 +304,7 @@ export class ExecutionClusterLabelWithSource extends Message<ExecutionClusterLab
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "source", kind: "enum", T: proto3.getEnumType(AttributesSource) },
     { no: 2, name: "value", kind: "message", T: ExecutionClusterLabel },
+    { no: 3, name: "is_mutable", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExecutionClusterLabelWithSource {
@@ -314,6 +338,11 @@ export class QualityOfServiceWithSource extends Message<QualityOfServiceWithSour
    */
   value?: QualityOfService;
 
+  /**
+   * @generated from field: bool is_mutable = 3;
+   */
+  isMutable = false;
+
   constructor(data?: PartialMessage<QualityOfServiceWithSource>) {
     super();
     proto3.util.initPartial(data, this);
@@ -324,6 +353,7 @@ export class QualityOfServiceWithSource extends Message<QualityOfServiceWithSour
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "source", kind: "enum", T: proto3.getEnumType(AttributesSource) },
     { no: 2, name: "value", kind: "message", T: QualityOfService },
+    { no: 3, name: "is_mutable", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): QualityOfServiceWithSource {
@@ -357,6 +387,11 @@ export class PluginOverridesWithSource extends Message<PluginOverridesWithSource
    */
   value?: PluginOverrides;
 
+  /**
+   * @generated from field: bool is_mutable = 3;
+   */
+  isMutable = false;
+
   constructor(data?: PartialMessage<PluginOverridesWithSource>) {
     super();
     proto3.util.initPartial(data, this);
@@ -367,6 +402,7 @@ export class PluginOverridesWithSource extends Message<PluginOverridesWithSource
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "source", kind: "enum", T: proto3.getEnumType(AttributesSource) },
     { no: 2, name: "value", kind: "message", T: PluginOverrides },
+    { no: 3, name: "is_mutable", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): PluginOverridesWithSource {
@@ -400,6 +436,11 @@ export class WorkflowExecutionConfigWithSource extends Message<WorkflowExecution
    */
   value?: WorkflowExecutionConfig;
 
+  /**
+   * @generated from field: bool is_mutable = 3;
+   */
+  isMutable = false;
+
   constructor(data?: PartialMessage<WorkflowExecutionConfigWithSource>) {
     super();
     proto3.util.initPartial(data, this);
@@ -410,6 +451,7 @@ export class WorkflowExecutionConfigWithSource extends Message<WorkflowExecution
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "source", kind: "enum", T: proto3.getEnumType(AttributesSource) },
     { no: 2, name: "value", kind: "message", T: WorkflowExecutionConfig },
+    { no: 3, name: "is_mutable", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): WorkflowExecutionConfigWithSource {
@@ -443,6 +485,11 @@ export class ClusterAssignmentWithSource extends Message<ClusterAssignmentWithSo
    */
   value?: ClusterAssignment;
 
+  /**
+   * @generated from field: bool is_mutable = 3;
+   */
+  isMutable = false;
+
   constructor(data?: PartialMessage<ClusterAssignmentWithSource>) {
     super();
     proto3.util.initPartial(data, this);
@@ -453,6 +500,7 @@ export class ClusterAssignmentWithSource extends Message<ClusterAssignmentWithSo
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "source", kind: "enum", T: proto3.getEnumType(AttributesSource) },
     { no: 2, name: "value", kind: "message", T: ClusterAssignment },
+    { no: 3, name: "is_mutable", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ClusterAssignmentWithSource {
