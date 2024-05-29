@@ -35,14 +35,13 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
-      securityContext:
-        fsGroup: 65534
-        runAsNonRoot: true
-        runAsUser: 1001
-        fsGroupChangePolicy: "Always"
-        seLinuxOptions:
-          type: spc_t
+      {{- with .Values.webhook.securityContext }}
+      securityContext: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
       serviceAccountName: {{ template "flyte-pod-webhook.name" . }}
+      {{- if .Values.webhook.priorityClassName }}
+      priorityClassName: {{ .Values.webhook.priorityClassName }}
+      {{- end }}
 {{- if .Values.webhook.enabled }}
       initContainers:
       - name: generate-secrets
@@ -107,6 +106,9 @@ spec:
             allowPrivilegeEscalation: false
             capabilities:
               drop: ["ALL"]
+          {{- with .Values.webhook.resources }}
+          resources: {{- toYaml . | nindent 12 }}
+          {{- end }}
           volumeMounts:
             - name: config-volume
               mountPath: /etc/flyte/config

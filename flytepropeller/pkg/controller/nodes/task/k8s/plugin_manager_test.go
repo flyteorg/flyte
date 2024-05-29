@@ -190,7 +190,6 @@ func getMockTaskContext(initPhase PluginPhase, wantPhase PluginPhase) pluginsCor
 	taskExecutionContext.OnOutputWriter().Return(&dummyOutputWriter{})
 
 	taskExecutionContext.OnDataStore().Return(nil)
-	taskExecutionContext.OnMaxDatasetSizeBytes().Return(int64(0))
 	return taskExecutionContext
 }
 
@@ -807,7 +806,8 @@ func TestPluginManager_Handle_PluginState(t *testing.T) {
 		},
 	}
 
-	for _, tt := range tests {
+	for i := range tests {
+		tt := tests[i]
 		t.Run(tt.name, func(t *testing.T) {
 			// mock TaskExecutionContext
 			tCtx := &pluginsCoreMock.TaskExecutionContext{}
@@ -991,10 +991,7 @@ func TestResourceManagerConstruction(t *testing.T) {
 	gvk, err := getPluginGvk(&v1.Pod{})
 	assert.NoError(t, err)
 	assert.Equal(t, gvk.Kind, "Pod")
-	si, err := getPluginSharedInformer(ctx, fakeKubeClient, &v1.Pod{})
-	assert.NotNil(t, si)
-	assert.NoError(t, err)
-	rm := index.GetOrCreateResourceLevelMonitor(ctx, scope, si, gvk)
+	rm := index.GetOrCreateResourceLevelMonitor(ctx, scope, fakeKubeClient.GetCache(), gvk)
 	assert.NotNil(t, rm)
 }
 

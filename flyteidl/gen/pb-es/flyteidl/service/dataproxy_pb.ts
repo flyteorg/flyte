@@ -60,6 +60,13 @@ export class CreateUploadLocationResponse extends Message<CreateUploadLocationRe
    */
   expiresAt?: Timestamp;
 
+  /**
+   * Data proxy generates these headers for client, and they have to add these headers to the request when uploading the file.
+   *
+   * @generated from field: map<string, string> headers = 4;
+   */
+  headers: { [key: string]: string } = {};
+
   constructor(data?: PartialMessage<CreateUploadLocationResponse>) {
     super();
     proto3.util.initPartial(data, this);
@@ -71,6 +78,7 @@ export class CreateUploadLocationResponse extends Message<CreateUploadLocationRe
     { no: 1, name: "signed_url", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "native_url", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "expires_at", kind: "message", T: Timestamp },
+    { no: 4, name: "headers", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateUploadLocationResponse {

@@ -50,7 +50,7 @@ func (t *TokenCacheInMemoryProvider) Unlock() {
 // It also locks the Locker in the condition variable as the semantics of Wait is that it unlocks the Locker after adding
 // the consumer to the waitlist and before blocking on notification.
 // We use the condLocker which is noOp locker to get added to waitlist for notifications.
-// The underlying notifcationList doesn't need to be guarded as it implmentation is atomic and is thread safe
+// The underlying notifcationList doesn't need to be guarded as it implementation is atomic and is thread safe
 // Refer https://go.dev/src/runtime/sema.go
 // Following is the function and its comments
 // notifyListAdd adds the caller to a notify list such that it can receive

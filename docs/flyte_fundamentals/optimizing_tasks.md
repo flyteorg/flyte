@@ -66,12 +66,13 @@ import random
 @task(retries=3)
 def compute_mean(data: List[float]) -> float:
     if random() < 0.05:
-        raise RuntimeError("Something bad happened 🔥")
+        raise FlyteRecoverableException("Something bad happened 🔥")
     return sum(data) / len(data)
 ```
 
 ```{note}
-Retries only take effect when running a task on a Flyte cluster.
+Retries only take effect when running a task on a Flyte cluster. 
+See {ref}`Fault Tolerance <fault-tolerance>` for details on the types of errors that will be retried.
 ```
 
 ## Timeouts
@@ -242,8 +243,7 @@ at the most granular level of your workflow!
 When this task is executed on a Flyte cluster, it automatically provisions all of
 the resources that you need. In this case, that need is distributed
 training, but Flyte also provides integrations for {ref}`Spark <plugins-spark-k8s>`,
-{ref}`Ray <kube-ray-op>`, {ref}`MPI <kf-mpi-op>`, {ref}`Sagemaker <aws-sagemaker>`,
-{ref}`Snowflake <plugins-snowflake>`, and more.
+{ref}`Ray <kube-ray-op>`, {ref}`MPI <kf-mpi-op>`, {ref}`Snowflake <snowflake_agent>`, and more.
 
 Even though Flyte itself is a powerful compute engine and orchestrator for
 data engineering, machine learning, and analytics, perhaps you have existing

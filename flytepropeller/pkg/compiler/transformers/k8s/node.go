@@ -30,6 +30,7 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 	var task *core.TaskTemplate
 	var resources *core.Resources
 	var extendedResources *v1alpha1.ExtendedResources
+	var containerImage string
 	if n.GetTaskNode() != nil {
 		taskID := n.GetTaskNode().GetReferenceId().String()
 		// TODO: Use task index for quick lookup
@@ -54,6 +55,10 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 				extendedResources = &v1alpha1.ExtendedResources{
 					ExtendedResources: overrides.GetExtendedResources(),
 				}
+			}
+
+			if len(overrides.GetContainerImage()) > 0 {
+				containerImage = overrides.GetContainerImage()
 			}
 		}
 	}
@@ -112,6 +117,7 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 		Cacheable:         cacheable,
 		CacheVersion:      cacheVersion,
 		CacheSerializable: cacheSerializable,
+		ContainerImage:    containerImage,
 	}
 
 	switch v := n.GetTarget().(type) {

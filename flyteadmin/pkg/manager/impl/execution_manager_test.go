@@ -60,13 +60,14 @@ import (
 const (
 	principal                   = "principal"
 	rawOutput                   = "raw_output"
-	executionOrgQueryExpr       = "execution_org = ?"
-	executionProjectQueryExpr   = "execution_project = ?"
-	executionDomainQueryExpr    = "execution_domain = ?"
-	executionNameQueryExpr      = "execution_name = ?"
+	executionClusterLabel       = "execution_cluster_label"
 	executionCreatedAtFilter    = "gte(execution_created_at,2021-01-01T00:00:00Z)"
 	executionCreatedAtValue     = "2021-01-01T00:00:00Z"
 	executionCreatedAtQueryExpr = "execution_created_at >= ?"
+	executionDomainQueryExpr    = "execution_domain = ?"
+	executionNameQueryExpr      = "execution_name = ?"
+	executionOrgQueryExpr       = "execution_org = ?"
+	executionProjectQueryExpr   = "execution_project = ?"
 )
 
 var spec = testutils.GetExecutionRequest().Spec
@@ -400,6 +401,7 @@ func TestCreateExecution(t *testing.T) {
 	}
 	request.Spec.RawOutputDataConfig = &admin.RawOutputDataConfig{OutputLocationPrefix: rawOutput}
 	request.Spec.ClusterAssignment = &clusterAssignment
+	request.Spec.ExecutionClusterLabel = &admin.ExecutionClusterLabel{Value: executionClusterLabel}
 
 	identity, err := auth.NewIdentityContext("", principal, "", time.Now(), sets.NewString(), nil, nil)
 	assert.NoError(t, err)

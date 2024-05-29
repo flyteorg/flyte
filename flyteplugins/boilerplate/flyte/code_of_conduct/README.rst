@@ -1,2 +1,0 @@
-CODE OF CONDUCT
-~~~~~~~~~~~~~~~

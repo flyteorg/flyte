@@ -18,6 +18,7 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/workflow/errors"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/workflowstore"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/utils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
@@ -70,6 +71,7 @@ type workflowExecutor struct {
 	eventConfig        *config.EventConfig
 	clusterID          string
 	executionEnvClient pluginscore.ExecutionEnvClient // TODO @hamersaw - use to delete environments on success / failure
+	activeExecutions   *workflowstore.ExecutionStatsHolder
 }
 
 func (c *workflowExecutor) constructWorkflowMetadataPrefix(ctx context.Context, w *v1alpha1.FlyteWorkflow) (storage.DataReference, error) {
@@ -137,6 +139,18 @@ func (c *workflowExecutor) handleReadyWorkflow(ctx context.Context, w *v1alpha1.
 	return StatusRunning, nil
 }
 
+func (c *workflowExecutor) updateExecutionStats(ctx context.Context, execcontext executors.ExecutionContext) {
+	execStats := workflowstore.SingleExecutionStats{
+		ActiveNodeCount: execcontext.CurrentNodeExecutionCount(),
+		ActiveTaskCount: execcontext.CurrentTaskExecutionCount()}
+	logger.Debugf(ctx, "execution stats -  execution count [%v], task execution count [%v], execution-id [%v], ",
+		execStats.ActiveNodeCount, execStats.ActiveTaskCount, execcontext.GetExecutionID())
+	statErr := c.activeExecutions.AddOrUpdateEntry(execcontext.GetExecutionID().String(), execStats)
+	if statErr != nil {
+		logger.Errorf(ctx, "error updating active executions stats: %v", statErr)
+	}
+}
+
 func (c *workflowExecutor) handleRunningWorkflow(ctx context.Context, w *v1alpha1.FlyteWorkflow) (Status, error) {
 	startNode := w.StartNode()
 	if startNode == nil {
@@ -146,10 +160,11 @@ func (c *workflowExecutor) handleRunningWorkflow(ctx context.Context, w *v1alpha
 			Message: "Start node not found"}), nil
 	}
 	execcontext := executors.NewExecutionContext(w, w, w, nil, executors.InitializeControlFlow())
-	state, err := c.nodeExecutor.RecursiveNodeHandler(ctx, execcontext, w, w, startNode)
+	state, handlerErr := c.nodeExecutor.RecursiveNodeHandler(ctx, execcontext, w, w, startNode)
+	c.updateExecutionStats(ctx, execcontext)
 
-	if err != nil {
-		return StatusRunning, err
+	if handlerErr != nil {
+		return StatusRunning, handlerErr
 	}
 	if state.HasFailed() {
 		logger.Infof(ctx, "Workflow has failed. Error [%s]", state.Err.String())
@@ -177,9 +192,11 @@ func (c *workflowExecutor) handleFailureNode(ctx context.Context, w *v1alpha1.Fl
 
 	failureNodeStatus := w.GetExecutionStatus().GetNodeExecutionStatus(ctx, failureNode.GetID())
 	failureNodeLookup := executors.NewFailureNodeLookup(w, failureNode, failureNodeStatus)
-	state, err := c.nodeExecutor.RecursiveNodeHandler(ctx, execcontext, failureNodeLookup, failureNodeLookup, failureNode)
-	if err != nil {
-		return StatusFailureNode(execErr), err
+	state, handlerErr := c.nodeExecutor.RecursiveNodeHandler(ctx, execcontext, failureNodeLookup, failureNodeLookup, failureNode)
+	c.updateExecutionStats(ctx, execcontext)
+
+	if handlerErr != nil {
+		return StatusFailureNode(execErr), handlerErr
 	}
 
 	switch state.NodePhase {
@@ -506,7 +523,7 @@ func (c *workflowExecutor) cleanupRunningNodes(ctx context.Context, w v1alpha1.E
 
 func NewExecutor(ctx context.Context, store *storage.DataStore, enQWorkflow v1alpha1.EnqueueWorkflow, eventSink events.EventSink,
 	k8sEventRecorder record.EventRecorder, metadataPrefix string, nodeExecutor interfaces.Node, eventConfig *config.EventConfig,
-	clusterID string, executionEnvClient pluginscore.ExecutionEnvClient, scope promutils.Scope) (executors.Workflow, error) {
+	clusterID string, executionEnvClient pluginscore.ExecutionEnvClient, activeExecutions *workflowstore.ExecutionStatsHolder, scope promutils.Scope) (executors.Workflow, error) {
 	basePrefix := store.GetBaseContainerFQN(ctx)
 	if metadataPrefix != "" {
 		var err error
@@ -530,6 +547,7 @@ func NewExecutor(ctx context.Context, store *storage.DataStore, enQWorkflow v1al
 		eventConfig:        eventConfig,
 		clusterID:          clusterID,
 		executionEnvClient: executionEnvClient,
+		activeExecutions:   activeExecutions,
 	}, nil
 }
 

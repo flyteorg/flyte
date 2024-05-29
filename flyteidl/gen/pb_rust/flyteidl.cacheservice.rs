@@ -179,4 +179,5 @@ pub struct ReleaseReservationRequest {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ReleaseReservationResponse {
 }
+include!("flyteidl.cacheservice.tonic.rs");
 // @@protoc_insertion_point(module)

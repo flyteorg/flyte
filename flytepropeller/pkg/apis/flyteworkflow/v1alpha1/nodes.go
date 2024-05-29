@@ -209,6 +209,8 @@ type NodeSpec struct {
 	// CacheSerializable indicates that this nodes caching operations should be serialized.
 	// +optional
 	CacheSerializable *bool `json:"cacheSerializable,omitempty"`
+
+	ContainerImage string `json:"containerImage,omitempty"`
 }
 
 func (in *NodeSpec) GetName() string {
@@ -318,4 +320,8 @@ func (in *NodeSpec) IsEndNode() bool {
 
 func (in *NodeSpec) GetInputBindings() []*Binding {
 	return in.InputBindings
+}
+
+func (in *NodeSpec) GetContainerImage() string {
+	return in.ContainerImage
 }

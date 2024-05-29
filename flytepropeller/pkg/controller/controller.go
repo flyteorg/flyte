@@ -83,10 +83,11 @@ type Controller struct {
 	workflowStore       workflowstore.FlyteWorkflow
 	// recorder is an event recorder for recording Event resources to the
 	// Kubernetes API.
-	recorder      record.EventRecorder
-	metrics       *metrics
-	leaderElector *leaderelection.LeaderElector
-	levelMonitor  *ResourceLevelMonitor
+	recorder       record.EventRecorder
+	metrics        *metrics
+	leaderElector  *leaderelection.LeaderElector
+	levelMonitor   *ResourceLevelMonitor
+	executionStats *workflowstore.ExecutionStatsMonitor
 }
 
 // Run either as a leader -if configured- or as a standalone process.
@@ -118,6 +119,7 @@ func (c *Controller) run(ctx context.Context) error {
 
 	// Start the collector process
 	c.levelMonitor.RunCollector(ctx)
+	c.executionStats.RunStatsMonitor(ctx)
 
 	// Start the informer factories to begin populating the informer caches
 	logger.Info(ctx, "Starting FlyteWorkflow controller")
@@ -331,7 +333,6 @@ func New(ctx context.Context, cfg *config.Config, kubeClientset kubernetes.Inter
 	if sCfg == nil {
 		logger.Errorf(ctx, "Storage configuration missing.")
 	}
-
 	store, err := storage.NewDataStore(sCfg, scope.NewSubScope("metastore"))
 	if err != nil {
 		return nil, errors.Wrapf(err, "Failed to create Metadata storage")
@@ -446,14 +447,20 @@ func New(ctx context.Context, cfg *config.Config, kubeClientset kubernetes.Inter
 	}
 
 	nodeExecutor, err := nodes.NewExecutor(ctx, cfg.NodeConfig, store, controller.enqueueWorkflowForNodeUpdates, eventSink,
-		launchPlanActor, launchPlanActor, cfg.MaxDatasetSizeBytes, storage.DataReference(cfg.DefaultRawOutputPrefix), kubeClient,
+		launchPlanActor, launchPlanActor, storage.DataReference(cfg.DefaultRawOutputPrefix), kubeClient,
 		cacheClient, recoveryClient, &cfg.EventConfig, cfg.ClusterID, signalClient, nodeHandlerFactory, executionEnvClient, scope)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Failed to create Controller.")
 	}
 
+	activeExecutions, err := workflowstore.NewExecutionStatsHolder()
+	if err != nil {
+		return nil, err
+	}
+	controller.executionStats = workflowstore.NewExecutionStatsMonitor(scope.NewSubScope("execstats"), flyteworkflowInformer.Lister(), activeExecutions)
+
 	workflowExecutor, err := workflow.NewExecutor(ctx, store, controller.enqueueWorkflowForNodeUpdates, eventSink,
-		controller.recorder, cfg.MetadataPrefix, nodeExecutor, &cfg.EventConfig, cfg.ClusterID, executionEnvClient, scope)
+		controller.recorder, cfg.MetadataPrefix, nodeExecutor, &cfg.EventConfig, cfg.ClusterID, executionEnvClient, activeExecutions, scope)
 	if err != nil {
 		return nil, err
 	}

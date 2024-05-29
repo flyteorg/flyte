@@ -61,9 +61,6 @@ type PluginContext interface {
 	// Returns a handle to the currently configured storage backend that can be used to communicate with the tasks or write metadata
 	DataStore() *storage.DataStore
 
-	// Returns the max allowed dataset size that the outputwriter will accept
-	MaxDatasetSizeBytes() int64
-
 	// Returns a handle to the Task's execution metadata.
 	TaskExecutionMetadata() pluginsCore.TaskExecutionMetadata
 

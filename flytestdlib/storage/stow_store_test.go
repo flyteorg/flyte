@@ -53,7 +53,7 @@ type mockStowContainer struct {
 
 // CreateSignedURL creates a signed url with the provided properties.
 func (m mockStowContainer) PreSignRequest(_ context.Context, _ stow.ClientMethod, s string,
-	_ stow.PresignRequestParams) (urlResp stow.PresignResponse, err error) {
+	_ stow.PresignRequestParams) (response stow.PresignResponse, err error) {
 	return stow.PresignResponse{Url: s}, nil
 }
 

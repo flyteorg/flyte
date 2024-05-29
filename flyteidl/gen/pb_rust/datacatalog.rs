@@ -562,4 +562,5 @@ pub mod pagination_options {
         }
     }
 }
+include!("datacatalog.tonic.rs");
 // @@protoc_insertion_point(module)

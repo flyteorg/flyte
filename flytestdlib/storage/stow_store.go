@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/url"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -27,9 +28,8 @@ import (
 	"github.com/flyteorg/stow/swift"
 )
 
-const (
-	FailureTypeLabel contextutils.Key = "failure_type"
-)
+const FailureTypeLabel contextutils.Key = "failure_type"
+const FlyteContentMD5 = "flyteContentMD5"
 
 var fQNFn = map[string]func(string) DataReference{
 	s3.Kind: func(bucket string) DataReference {
@@ -108,9 +108,10 @@ type stowMetrics struct {
 
 // StowMetadata that will be returned
 type StowMetadata struct {
-	exists bool
-	size   int64
-	etag   string
+	exists     bool
+	size       int64
+	etag       string
+	contentMD5 string
 }
 
 func (s StowMetadata) Size() int64 {
@@ -123,6 +124,10 @@ func (s StowMetadata) Exists() bool {
 
 func (s StowMetadata) Etag() string {
 	return s.etag
+}
+
+func (s StowMetadata) ContentMD5() string {
+	return s.contentMD5
 }
 
 // Implements DataStore to talk to stow location store.
@@ -229,11 +234,18 @@ func (s *StowStore) Head(ctx context.Context, reference DataReference) (Metadata
 			// Err will be caught below
 		} else if etag, err := item.ETag(); err != nil {
 			// Err will be caught below
+		} else if metadata, err := item.Metadata(); err != nil {
+			// Err will be caught below
 		} else {
+			contentMD5, ok := metadata[strings.ToLower(FlyteContentMD5)].(string)
+			if !ok {
+				logger.Warningf(ctx, "Failed to cast contentMD5 [%v] to string", contentMD5)
+			}
 			return StowMetadata{
-				exists: true,
-				size:   size,
-				etag:   etag,
+				exists:     true,
+				size:       size,
+				etag:       etag,
+				contentMD5: contentMD5,
 			}, nil
 		}
 	}
@@ -357,22 +369,24 @@ func (s *StowStore) CreateSignedURL(ctx context.Context, reference DataReference
 		return SignedURLResponse{}, err
 	}
 
-	resp, err := c.PreSignRequest(ctx, properties.Scope, key, stow.PresignRequestParams{
-		ExpiresIn:  properties.ExpiresIn,
-		ContentMD5: properties.ContentMD5,
+	res, err := c.PreSignRequest(ctx, properties.Scope, key, stow.PresignRequestParams{
+		ExpiresIn:             properties.ExpiresIn,
+		ContentMD5:            properties.ContentMD5,
+		AddContentMD5Metadata: properties.AddContentMD5Metadata,
 	})
 
 	if err != nil {
 		return SignedURLResponse{}, err
 	}
 
-	urlVal, err := url.Parse(resp.Url)
+	urlVal, err := url.Parse(res.Url)
 	if err != nil {
 		return SignedURLResponse{}, err
 	}
 
 	return SignedURLResponse{
-		URL: *urlVal,
+		URL:                    *urlVal,
+		RequiredRequestHeaders: res.RequiredRequestHeaders,
 	}, nil
 }
 

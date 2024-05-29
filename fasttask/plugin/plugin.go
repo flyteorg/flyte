@@ -257,7 +257,7 @@ func (p *Plugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (co
 
 			// gather outputs if they exist
 			if taskTemplate.GetInterface() != nil && taskTemplate.GetInterface().GetOutputs() != nil && taskTemplate.GetInterface().GetOutputs().GetVariables() != nil {
-				outputReader := ioutils.NewRemoteFileOutputReader(ctx, tCtx.DataStore(), tCtx.OutputWriter(), tCtx.MaxDatasetSizeBytes())
+				outputReader := ioutils.NewRemoteFileOutputReader(ctx, tCtx.DataStore(), tCtx.OutputWriter(), 0)
 				err = tCtx.OutputWriter().Put(ctx, outputReader)
 				if err != nil {
 					return core.UnknownTransition, err

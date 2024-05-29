@@ -1,4 +1,0 @@
-bases:
-  - ../namespace
-  - github.com/kubeflow/manifests/tf-training/tf-job-crds/base?ref=v1.0.0
-  - github.com/kubeflow/manifests/tf-training/tf-job-operator/base?ref=v1.0.0

@@ -19,13 +19,9 @@ spec:
         {{- end }}
       labels: {{ include "flytescheduler.podLabels" . | nindent 8 }}
     spec:
-      securityContext:
-        runAsNonRoot: true
-        fsGroup: 65534
-        runAsUser: 1001
-        fsGroupChangePolicy: "Always"
-        seLinuxOptions:
-          type: spc_t
+      {{- with .Values.flytescheduler.securityContext }}
+      securityContext: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
       {{- if .Values.flytescheduler.priorityClassName }}
       priorityClassName: {{ .Values.flytescheduler.priorityClassName }}
       {{- end }}
@@ -52,8 +48,10 @@ spec:
         volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 8 }}
         - mountPath: /etc/flyte/config
           name: config-volume
+        {{- if .Values.secrets.adminOauthClientCredentials.enabled }}
         - name: auth
           mountPath: /etc/secrets/
+        {{- end }}
       {{- end }}
       containers:
       - command:
@@ -80,8 +78,10 @@ spec:
         volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 8 }}
         - mountPath: /etc/flyte/config
           name: config-volume
+        {{- if .Values.secrets.adminOauthClientCredentials.enabled }}
         - name: auth
           mountPath: /etc/secrets/
+        {{- end }}
         {{- with .Values.flytescheduler.additionalVolumeMounts -}}
         {{ tpl (toYaml .) $ | nindent 8 }}
         {{- end }}
@@ -95,9 +95,11 @@ spec:
       - configMap:
           name: flyte-scheduler-config
         name: config-volume
+      {{- if .Values.secrets.adminOauthClientCredentials.enabled }}
       - name: auth
         secret:
           secretName: flyte-secret-auth
+      {{- end }}
       {{- with .Values.flytescheduler.additionalVolumes -}}
       {{ tpl (toYaml .) $ | nindent 6 }}
       {{- end }}

@@ -119,7 +119,7 @@ data:
   storage.yaml: | 
     storage:
       type: s3
-      container: "<BUCKET_NAME>"
+      container: "<METADATA_BUCKET_NAME>"
       connection:
         auth-type: iam
         region: <AWS_REGION>
@@ -207,7 +207,7 @@ data:
     plugins:
       k8s:
         co-pilot:
-          image: cr.flyte.org/flyteorg/flytecopilot:v1.11.0-b1
+          image: cr.flyte.org/flyteorg/flytecopilot:v1.12.0
           name: flyte-copilot-
           start-timeout: 30s
   core.yaml: | 
@@ -250,7 +250,7 @@ data:
           rate: 100
           type: bucket
         type: batch
-      rawoutput-prefix: s3://<BUCKET_NAME>/
+      rawoutput-prefix: s3://<RAW_DATA_BUCKET_NAME>/
       workers: 40
       workflow-reeval-duration: 30s
     webhook:
@@ -267,6 +267,7 @@ data:
         - container
         - sidecar
         - k8s-array
+        - agent-service
   k8s.yaml: | 
     plugins:
       k8s:
@@ -280,7 +281,7 @@ data:
   storage.yaml: | 
     storage:
       type: s3
-      container: "<BUCKET_NAME>"
+      container: "<METADATA_BUCKET_NAME>"
       connection:
         auth-type: iam
         region: <AWS_REGION>
@@ -539,17 +540,17 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "6f580bc477903d807fd016b16fc0e9b21b8a44008eaca55124d7eb505466b74"
+        configChecksum: "d12cf8feabbe27124f9a86f10e33fed153024161ae98b3d419f7efbeb031bd8"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
         helm.sh/chart: flyte-core-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
-      securityContext:
+      securityContext: 
         fsGroup: 65534
+        fsGroupChangePolicy: Always
         runAsUser: 1001
-        fsGroupChangePolicy: "Always"
       priorityClassName: system-cluster-critical
       containers:
       - command:
@@ -565,7 +566,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: "cr.flyte.org/flyteorg/flytepropeller:v1.11.0-b1"
+        image: "cr.flyte.org/flyteorg/flytepropeller:v1.12.0"
         imagePullPolicy: "IfNotPresent"
         name: flytepropeller
         ports:
@@ -619,21 +620,21 @@ spec:
       labels:
         app: flyte-pod-webhook
         app.kubernetes.io/name: flyte-pod-webhook
-        app.kubernetes.io/version: v1.11.0-b1
+        app.kubernetes.io/version: v1.12.0
       annotations:
-        configChecksum: "6f580bc477903d807fd016b16fc0e9b21b8a44008eaca55124d7eb505466b74"
+        configChecksum: "d12cf8feabbe27124f9a86f10e33fed153024161ae98b3d419f7efbeb031bd8"
     spec:
-      securityContext:
+      securityContext: 
         fsGroup: 65534
+        fsGroupChangePolicy: Always
         runAsNonRoot: true
         runAsUser: 1001
-        fsGroupChangePolicy: "Always"
         seLinuxOptions:
           type: spc_t
       serviceAccountName: flyte-pod-webhook
       initContainers:
       - name: generate-secrets
-        image: "cr.flyte.org/flyteorg/flytepropeller:v1.11.0-b1"
+        image: "cr.flyte.org/flyteorg/flytepropeller:v1.12.0"
         imagePullPolicy: "IfNotPresent"
         command:
           - flytepropeller
@@ -660,7 +661,7 @@ spec:
             mountPath: /etc/flyte/config
       containers:
         - name: webhook
-          image: "cr.flyte.org/flyteorg/flytepropeller:v1.11.0-b1"
+          image: "cr.flyte.org/flyteorg/flytepropeller:v1.12.0"
           imagePullPolicy: "IfNotPresent"
           command:
             - flytepropeller
@@ -683,6 +684,11 @@ spec:
             allowPrivilegeEscalation: false
             capabilities:
               drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 200m
+              ephemeral-storage: 500Mi
+              memory: 500Mi
           volumeMounts:
             - name: config-volume
               mountPath: /etc/flyte/config

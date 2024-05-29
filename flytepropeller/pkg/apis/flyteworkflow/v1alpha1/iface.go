@@ -445,6 +445,7 @@ type ExecutableNode interface {
 	IsCacheable() *bool
 	GetCacheVersion() *string
 	IsCacheSerializable() *bool
+	GetContainerImage() string
 }
 
 // ExecutableWorkflowStatus is an interface for the Workflow p. This is the mutable portion for a Workflow

@@ -4,12 +4,12 @@ package pbhash
 import (
 	"context"
 	"encoding/base64"
-	"github.com/flyteorg/flyte/flytestdlib/utils"
 
 	goObjectHash "github.com/benlaurie/objecthash/go/objecthash"
 	"github.com/golang/protobuf/proto"
 
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 func fromHashToByteArray(input [32]byte) []byte {

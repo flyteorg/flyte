@@ -3,29 +3,25 @@
 # 
 # TO OPT OUT OF UPDATES, SEE https://github.com/flyteorg/boilerplate/blob/master/Readme.rst
 
-run:
-  skip-dirs:
+issues:
+  exclude-dirs:
     - pkg/client 
     - gen
 
 linters:
   disable-all: true
   enable:
-    - deadcode
     - errcheck
-    - gas
     - goconst
     - goimports
-    - golint
+    - gosec
     - gosimple
     - govet
     - ineffassign
     - misspell
     - nakedret
     - staticcheck
-    - structcheck
     - typecheck
     - unconvert
     - unparam
     - unused
-    - varcheck

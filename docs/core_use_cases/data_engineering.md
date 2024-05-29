@@ -170,6 +170,6 @@ and [DBT](https://github.com/flyteorg/flytekit/tree/master/plugins/flytekit-dbt)
 integrations.
 
 For database connectors, Flyte provides first-party support for {ref}`AWS Athena <aws-athena>`,
-{ref}`Google Bigquery <big-query>`, {ref}`Snowflake <plugins-snowflake>`,
+{ref}`Google BigQuery <bigquery_agent>`, {ref}`Snowflake <snowflake_agent>`,
 {ref}`SQLAlchemy <sql_alchemy>`, and {ref}`SQLite3 <integrations_sql_sqlite3>`.
 ```

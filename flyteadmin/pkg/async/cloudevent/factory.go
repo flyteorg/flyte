@@ -4,10 +4,10 @@ import (
 	"context"
 	"time"
 
+	"github.com/IBM/sarama"
 	"github.com/NYTimes/gizmo/pubsub"
 	gizmoAWS "github.com/NYTimes/gizmo/pubsub/aws"
 	gizmoGCP "github.com/NYTimes/gizmo/pubsub/gcp"
-	"github.com/Shopify/sarama"
 	"github.com/cloudevents/sdk-go/protocol/kafka_sarama/v2"
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 

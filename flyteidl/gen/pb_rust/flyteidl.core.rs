@@ -1729,8 +1729,6 @@ pub struct K8sObjectMetadata {
 pub struct Sql {
     /// The actual query to run, the query can have templated parameters.
     /// We use Flyte's Golang templating format for Query templating.
-    /// Refer to the templating documentation.
-    /// <https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/external_services/hive/hive.html#sphx-glr-auto-integrations-external-services-hive-hive-py>
     /// For example,
     /// insert overwrite directory '{{ .rawOutputDataPrefix }}' stored as parquet
     /// select *
@@ -2664,6 +2662,9 @@ pub struct TaskNodeOverrides {
     /// v1.ResourceRequirements, to allocate to a task.
     #[prost(message, optional, tag="2")]
     pub extended_resources: ::core::option::Option<ExtendedResources>,
+    /// Override for the image used by task pods.
+    #[prost(string, tag="3")]
+    pub container_image: ::prost::alloc::string::String,
 }
 /// A structure that uniquely identifies a launch plan in the system.
 #[allow(clippy::derive_partial_eq_without_eq)]

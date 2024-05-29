@@ -31,7 +31,7 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- define "flyteagent.podLabels" -}}
 {{ include "flyteagent.labels" . }}
 {{- with .Values.podLabels }}
-{{- toYaml . }}
+{{ toYaml . }}
 {{- end }}
 {{- end -}}
 

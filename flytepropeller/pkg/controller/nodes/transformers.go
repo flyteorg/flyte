@@ -178,7 +178,6 @@ func ToNodeExecutionEvent(nodeExecID *core.NodeExecutionIdentifier,
 	if node.GetKind() == v1alpha1.NodeKindWorkflow && node.GetWorkflowNode() != nil && node.GetWorkflowNode().GetSubWorkflowRef() != nil {
 		nev.IsParent = true
 	} else if node.GetKind() == v1alpha1.NodeKindArray {
-		nev.IsParent = true
 		nev.IsArray = true
 		if config.GetConfig().ArrayNode.EventVersion == 1 {
 			nev.IsParent = true

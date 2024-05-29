@@ -90,6 +90,7 @@ func dummySidecarTaskMetadata(resources *v1.ResourceRequirements, extendedResour
 	to := &pluginsCoreMock.TaskOverrides{}
 	to.On("GetResources").Return(resources)
 	to.On("GetExtendedResources").Return(extendedResources)
+	to.On("GetContainerImage").Return("")
 	taskMetadata.On("GetOverrides").Return(to)
 	taskMetadata.On("GetEnvironmentVariables").Return(nil)
 

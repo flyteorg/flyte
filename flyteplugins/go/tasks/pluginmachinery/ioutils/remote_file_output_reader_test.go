@@ -14,9 +14,14 @@ import (
 )
 
 type MemoryMetadata struct {
-	exists bool
-	size   int64
-	etag   string
+	exists     bool
+	size       int64
+	etag       string
+	contentMD5 string
+}
+
+func (m MemoryMetadata) ContentMD5() string {
+	return m.contentMD5
 }
 
 func (m MemoryMetadata) Size() int64 {
