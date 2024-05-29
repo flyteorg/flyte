@@ -56,14 +56,14 @@ When this task finishes, the Flytekit engine returns the `FlyteFile` instance, u
 
 Lastly, define a workflow. The `normalize_csv_files` workflow has an `output_location` argument which is passed to the `location` input of the task. If it's not an empty string, the task attempts to upload its file to that location.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/data_types_and_io/data_types_and_io/file.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/0ec8388759d34566a0ffc0c3c2d7443fd4a3a46f/examples/data_types_and_io/data_types_and_io/file.py
 :caption: data_types_and_io/file.py
 :pyobject: normalize_csv_file
 ```
 
 You can run the workflow locally as follows:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/data_types_and_io/data_types_and_io/file.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/0ec8388759d34566a0ffc0c3c2d7443fd4a3a46f/examples/data_types_and_io/data_types_and_io/file.py
 :caption: data_types_and_io/file.py
 :lines: 75-95
 ```

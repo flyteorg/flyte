@@ -27,7 +27,7 @@ To clone and run the example code on this page, see the [Flytesnacks repo][flyte
 
 First, we import the dependencies:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/extending/extending/custom_types.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/0ec8388759d34566a0ffc0c3c2d7443fd4a3a46f/examples/extending/extending/custom_types.py
 :caption: extending/custom_types.py
 :lines: 1-7
 ```
@@ -38,7 +38,7 @@ First, we import the dependencies:
 
 Defined type here represents a list of files on the disk. We will refer to it as `MyDataset`.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/extending/extending/custom_types.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/0ec8388759d34566a0ffc0c3c2d7443fd4a3a46f/examples/extending/extending/custom_types.py
 :caption: extending/custom_types.py
 :pyobject: MyDataset
 ```
@@ -53,7 +53,7 @@ The `TypeTransformer` is a Generic abstract base class. The `Generic` type argum
 that we want to work with. In this case, it is the `MyDataset` object.
 :::
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/extending/extending/custom_types.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/0ec8388759d34566a0ffc0c3c2d7443fd4a3a46f/examples/extending/extending/custom_types.py
 :caption: extending/custom_types.py
 :pyobject: MyDatasetTransformer
 ```
@@ -61,23 +61,23 @@ that we want to work with. In this case, it is the `MyDataset` object.
 Before we can use MyDataset in our tasks, we need to let Flytekit know that `MyDataset` should be considered as a valid type.
 This is done using {py:class}`~flytekit:flytekit.extend.TypeEngine`'s `register` method.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/extending/extending/custom_types.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/0ec8388759d34566a0ffc0c3c2d7443fd4a3a46f/examples/extending/extending/custom_types.py
 :caption: extending/custom_types.py
 :lines: 87
 ```
 
 The new type should be ready to use! Let us write an example generator and consumer for this new datatype.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/extending/extending/custom_types.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/0ec8388759d34566a0ffc0c3c2d7443fd4a3a46f/examples/extending/extending/custom_types.py
 :caption: extending/custom_types.py
 :lines: 91-114
 ```
 
 This workflow can be executed and tested locally. Flytekit will exercise the entire path even if you run it locally.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/extending/extending/custom_types.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/0ec8388759d34566a0ffc0c3c2d7443fd4a3a46f/examples/extending/extending/custom_types.py
 :caption: extending/custom_types.py
 :lines: 119-120
 ```
 
-[flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/extending/
+[flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/0ec8388759d34566a0ffc0c3c2d7443fd4a3a46f/examples/extending/
