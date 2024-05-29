@@ -187,4 +187,5 @@ replace (
 	github.com/flyteorg/flyte/flyteplugins => ../flyteplugins
 	github.com/flyteorg/flyte/flytepropeller => ../flytepropeller
 	github.com/flyteorg/flyte/flytestdlib => ../flytestdlib
+	github.com/unionai/flyte/fasttask/plugin => ../fasttask/plugin
 )
