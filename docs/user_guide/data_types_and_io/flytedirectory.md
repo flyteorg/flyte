@@ -83,7 +83,7 @@ You can run the workflow locally as follows:
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/data_types_and_io/data_types_and_io/folder.py
 :caption: data_types_and_io/folder.py
-:lines: 98-118
+:lines: 94-114
 ```
 
 [flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/data_types_and_io/
