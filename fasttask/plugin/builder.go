@@ -233,11 +233,10 @@ func (i *InMemoryEnvBuilder) createPod(ctx context.Context, fastTaskEnvironmentS
 	container.Args = []string{
 		"/tmp/worker",
 		"bridge",
-		"--queue-id",
-		executionEnvID,
-		"--fasttask-url",
-		GetConfig().CallbackURI,
 	}
+
+	// append additional worker args before plugin args to ensure they are overridden
+	container.Args = append(container.Args, GetConfig().AdditionalWorkerArgs...)
 
 	if fastTaskEnvironmentSpec.GetBacklogLength() > 0 {
 		container.Args = append(container.Args, "--backlog-length", fmt.Sprintf("%d", fastTaskEnvironmentSpec.GetBacklogLength()))
@@ -245,6 +244,13 @@ func (i *InMemoryEnvBuilder) createPod(ctx context.Context, fastTaskEnvironmentS
 	if fastTaskEnvironmentSpec.GetParallelism() > 0 {
 		container.Args = append(container.Args, "--parallelism", fmt.Sprintf("%d", fastTaskEnvironmentSpec.GetParallelism()))
 	}
+
+	container.Args = append(container.Args,
+		"--queue-id",
+		executionEnvID,
+		"--fasttask-url",
+		GetConfig().CallbackURI,
+	)
 
 	container.VolumeMounts = append(container.VolumeMounts, v1.VolumeMount{
 		Name:      "workdir",

@@ -28,6 +28,7 @@ var (
 		InitContainerMemory:           defaultMemory,
 		NonceLength:                   12,
 		TaskStatusBufferSize:          512,
+		AdditionalWorkerArgs:          []string{},
 	}
 
 	configSection = pluginsConfig.MustRegisterSubSection("fasttask", defaultConfig)
@@ -47,6 +48,7 @@ type Config struct {
 	InitContainerMemory           resource.Quantity `json:"init-container-memory" pflag:",The default memory request / limit for the init container used to inject the fasttask worker binary."`
 	NonceLength                   int               `json:"nonce-length" pflag:",The length of the nonce value to uniquely link a fasttask replica to the environment instance, ensuring fast turnover of environments regardless of cache freshness."`
 	TaskStatusBufferSize          int               `json:"task-status-buffer-size" pflag:",The size of the task status buffer for each task."`
+	AdditionalWorkerArgs          []string          `json:"additional-worker-args" pflag:",Additional arguments to pass to the fasttask worker binary."`
 }
 
 func GetConfig() *Config {
