@@ -17,6 +17,7 @@ import (
 
 	coremocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 
 	"github.com/unionai/flyte/fasttask/plugin/pb"
 )
@@ -136,6 +137,8 @@ func TestCreate(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
+			scope := promutils.NewTestScope()
+
 			fastTaskEnvSpecStruct := &_struct.Struct{}
 			err := utils.MarshalStruct(test.environmentSpec, fastTaskEnvSpecStruct)
 			assert.Nil(t, err)
@@ -148,7 +151,7 @@ func TestCreate(t *testing.T) {
 			kubeClientImpl.OnGetClient().Return(kubeClient)
 			kubeClientImpl.OnGetCache().Return(kubeCache)
 
-			builder := NewEnvironmentBuilder(kubeClientImpl)
+			builder := NewEnvironmentBuilder(kubeClientImpl, scope)
 			builder.environments = test.environments
 
 			// call `Create`
@@ -214,6 +217,8 @@ func TestDetectOrphanedEnvironments(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
+			scope := promutils.NewTestScope()
+
 			// initialize InMemoryBuilder
 			kubeClient := &kubeClient{}
 			kubeCache := &kubeCache{
@@ -224,7 +229,7 @@ func TestDetectOrphanedEnvironments(t *testing.T) {
 			kubeClientImpl.OnGetClient().Return(kubeClient)
 			kubeClientImpl.OnGetCache().Return(kubeCache)
 
-			builder := NewEnvironmentBuilder(kubeClientImpl)
+			builder := NewEnvironmentBuilder(kubeClientImpl, scope)
 			builder.environments = test.environments
 
 			// call `Create`
@@ -297,6 +302,8 @@ func TestGCEnvironments(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
+			scope := promutils.NewTestScope()
+
 			// initialize InMemoryBuilder
 			kubeClient := &kubeClient{}
 			kubeCache := &kubeCache{}
@@ -305,7 +312,7 @@ func TestGCEnvironments(t *testing.T) {
 			kubeClientImpl.OnGetClient().Return(kubeClient)
 			kubeClientImpl.OnGetCache().Return(kubeCache)
 
-			builder := NewEnvironmentBuilder(kubeClientImpl)
+			builder := NewEnvironmentBuilder(kubeClientImpl, scope)
 			builder.environments = test.environments
 
 			// call `Create`
@@ -360,6 +367,8 @@ func TestGet(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
+			scope := promutils.NewTestScope()
+
 			// initialize InMemoryBuilder
 			kubeClient := &kubeClient{}
 			kubeCache := &kubeCache{}
@@ -368,7 +377,7 @@ func TestGet(t *testing.T) {
 			kubeClientImpl.OnGetClient().Return(kubeClient)
 			kubeClientImpl.OnGetCache().Return(kubeCache)
 
-			builder := NewEnvironmentBuilder(kubeClientImpl)
+			builder := NewEnvironmentBuilder(kubeClientImpl, scope)
 			builder.environments = test.environments
 
 			// call `Get`
@@ -463,6 +472,8 @@ func TestRepairEnvironments(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
+			scope := promutils.NewTestScope()
+
 			// initialize InMemoryBuilder
 			kubeClient := &kubeClient{}
 			kubeCache := &kubeCache{
@@ -473,7 +484,7 @@ func TestRepairEnvironments(t *testing.T) {
 			kubeClientImpl.OnGetClient().Return(kubeClient)
 			kubeClientImpl.OnGetCache().Return(kubeCache)
 
-			builder := NewEnvironmentBuilder(kubeClientImpl)
+			builder := NewEnvironmentBuilder(kubeClientImpl, scope)
 			builder.environments = test.environments
 
 			// call `Create`

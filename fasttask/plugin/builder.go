@@ -11,6 +11,7 @@ import (
 	"time"
 
 	_struct "github.com/golang/protobuf/ptypes/struct"
+	"github.com/prometheus/client_golang/prometheus"
 	v1 "k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -22,6 +23,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 
 	"github.com/unionai/flyte/fasttask/plugin/pb"
 )
@@ -41,6 +43,24 @@ const (
 	TTL_SECONDS        = "ttl-seconds"
 )
 
+// builderMetrics is a collection of metrics for the InMemoryEnvBuilder.
+type builderMetrics struct {
+	environmentsCreated        prometheus.Counter
+	environmentsGCed           prometheus.Counter
+	environmentOrphansDetected prometheus.Counter
+	environmentsRepaired       prometheus.Counter
+}
+
+// newBuilderMetrics creates a new builderMetrics with the given scope.
+func newBuilderMetrics(scope promutils.Scope) builderMetrics {
+	return builderMetrics{
+		environmentsCreated:        scope.MustNewCounter("env_created", "The number of environments created"),
+		environmentsGCed:           scope.MustNewCounter("env_gced", "The number of environments garbage collected"),
+		environmentOrphansDetected: scope.MustNewCounter("env_orphans_detected", "The number of orphaned environments detected"),
+		environmentsRepaired:       scope.MustNewCounter("env_repaired", "The number of environments repaired"),
+	}
+}
+
 // environment represents a managed fast task environment, including it's definition and current
 // state
 type environment struct {
@@ -57,6 +77,7 @@ type InMemoryEnvBuilder struct {
 	environments map[string]*environment
 	kubeClient   core.KubeClient
 	lock         sync.Mutex
+	metrics      builderMetrics
 	randSource   *rand.Rand
 }
 
@@ -140,6 +161,8 @@ func (i *InMemoryEnvBuilder) Create(ctx context.Context, executionEnvID string, 
 	}
 
 	i.environments[executionEnvID] = env
+	i.metrics.environmentsCreated.Inc()
+
 	i.lock.Unlock()
 
 	// create replicas
@@ -385,6 +408,8 @@ func (i *InMemoryEnvBuilder) gcEnvironments(ctx context.Context) error {
 	i.lock.Lock()
 	for _, environmentID := range deletedEnvironments {
 		logger.Infof(ctx, "garbage collected environment '%s'", environmentID)
+		i.metrics.environmentsGCed.Inc()
+
 		delete(i.environments, environmentID)
 	}
 	i.lock.Unlock()
@@ -462,6 +487,8 @@ func (i *InMemoryEnvBuilder) repairEnvironments(ctx context.Context) error {
 		}
 
 		logger.Infof(ctx, "repaired environment '%s'", environmentID)
+		i.metrics.environmentsRepaired.Inc()
+
 		environment.state = HEALTHY
 	}
 	i.lock.Unlock()
@@ -550,6 +577,8 @@ func (i *InMemoryEnvBuilder) detectOrphanedEnvironments(ctx context.Context, k8s
 	// copy orphaned environments to env builder
 	for environmentID, orphanedEnvironment := range orphanedEnvironments {
 		logger.Infof(ctx, "detected orphaned environment '%s'", environmentID)
+		i.metrics.environmentOrphansDetected.Inc()
+
 		i.environments[environmentID] = orphanedEnvironment
 	}
 
@@ -557,10 +586,11 @@ func (i *InMemoryEnvBuilder) detectOrphanedEnvironments(ctx context.Context, k8s
 }
 
 // NewEnvironmentBuilder creates a new InMemoryEnvBuilder with the given kube client.
-func NewEnvironmentBuilder(kubeClient core.KubeClient) *InMemoryEnvBuilder {
+func NewEnvironmentBuilder(kubeClient core.KubeClient, scope promutils.Scope) *InMemoryEnvBuilder {
 	return &InMemoryEnvBuilder{
 		environments: make(map[string]*environment),
 		kubeClient:   kubeClient,
+		metrics:      newBuilderMetrics(scope),
 		randSource:   rand.New(rand.NewSource(time.Now().UnixNano())),
 	}
 }

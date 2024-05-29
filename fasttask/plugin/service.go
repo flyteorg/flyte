@@ -43,7 +43,7 @@ type fastTaskServiceImpl struct {
 	pendingTaskOwnersLock sync.RWMutex
 
 	taskStatusChannels sync.Map // map[taskID]chan *WorkerTaskStatus
-	metrics            metrics
+	metrics            serviceMetrics
 }
 
 // Queue is a collection of Workers that are capable of executing similar tasks.
@@ -65,44 +65,24 @@ type workerTaskStatus struct {
 	taskStatus *pb.TaskStatus
 }
 
-type metrics struct {
+// serviceMetrics defines a collection of metrics for the fasttask service.
+type serviceMetrics struct {
 	taskNoWorkersAvailable  prometheus.Counter
 	taskNoCapacityAvailable prometheus.Counter
 	taskAssigned            prometheus.Counter
-
-	queues  *prometheus.Desc
-	workers *prometheus.Desc
+	queues                  prometheus.Gauge
+	workers                 prometheus.Gauge
 }
 
-func newMetrics(scope promutils.Scope) metrics {
-	return metrics{
+// newServiceMetrics creates a new serviceMetrics with the given scope.
+func newServiceMetrics(scope promutils.Scope) serviceMetrics {
+	return serviceMetrics{
 		taskNoWorkersAvailable:  scope.MustNewCounter("task_no_workers_available", "Count of task assignment attempts with no workers available"),
 		taskNoCapacityAvailable: scope.MustNewCounter("task_no_capacity_available", "Count of task assignment attempts with no capacity available"),
 		taskAssigned:            scope.MustNewCounter("task_assigned", "Count of task assignments"),
-		queues:                  prometheus.NewDesc(scope.NewScopedMetricName("queue"), "Current number of queues", nil, nil),
-		workers:                 prometheus.NewDesc(scope.NewScopedMetricName("workers"), "Current number of workers", nil, nil),
+		queues:                  scope.MustNewGauge("queues", "Current number of queues"),
+		workers:                 scope.MustNewGauge("workers", "Current number of workers"),
 	}
-}
-
-func (f *fastTaskServiceImpl) Describe(ch chan<- *prometheus.Desc) {
-	ch <- f.metrics.queues
-	ch <- f.metrics.workers
-}
-
-func (f *fastTaskServiceImpl) Collect(ch chan<- prometheus.Metric) {
-	f.queuesLock.RLock()
-	defer f.queuesLock.RUnlock()
-
-	queues := len(f.queues)
-	workers := 0
-	for _, queue := range f.queues {
-		queue.lock.RLock()
-		workers += len(queue.workers)
-		queue.lock.RUnlock()
-	}
-
-	ch <- prometheus.MustNewConstMetric(f.metrics.queues, prometheus.GaugeValue, float64(queues))
-	ch <- prometheus.MustNewConstMetric(f.metrics.workers, prometheus.GaugeValue, float64(workers))
 }
 
 // Heartbeat is a gRPC stream that manages the heartbeat of a fasttask worker. This includes
@@ -215,12 +195,14 @@ func (f *fastTaskServiceImpl) addWorkerToQueue(queueID string, worker *Worker) *
 			workers: make(map[string]*Worker),
 		}
 		f.queues[queueID] = queue
+		f.metrics.queues.Inc()
 	}
 
 	queue.lock.Lock()
 	defer queue.lock.Unlock()
 
 	queue.workers[worker.workerID] = worker
+	f.metrics.workers.Inc()
 	return queue
 }
 
@@ -238,8 +220,10 @@ func (f *fastTaskServiceImpl) removeWorkerFromQueue(queueID, workerID string) {
 	defer queue.lock.Unlock()
 
 	delete(queue.workers, workerID)
+	f.metrics.workers.Dec()
 	if len(queue.workers) == 0 {
 		delete(f.queues, queueID)
+		f.metrics.queues.Dec()
 	}
 }
 
@@ -446,6 +430,6 @@ func newFastTaskService(enqueueOwner core.EnqueueOwner, scope promutils.Scope) *
 		enqueueOwner:      enqueueOwner,
 		queues:            make(map[string]*Queue),
 		pendingTaskOwners: make(map[string]map[string]types.NamespacedName),
-		metrics:           newMetrics(scope),
+		metrics:           newServiceMetrics(scope),
 	}
 }

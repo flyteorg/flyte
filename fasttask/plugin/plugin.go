@@ -8,6 +8,7 @@ import (
 	"net"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus"
 	"google.golang.org/grpc"
 	v1 "k8s.io/api/core/v1"
 
@@ -20,6 +21,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 
 	"github.com/unionai/flyte/fasttask/plugin/pb"
 )
@@ -35,6 +37,20 @@ const (
 	Submitted
 )
 
+// pluginMetrics is a collection of metrics for the plugin.
+type pluginMetrics struct {
+	workersUnavailableTimeout   prometheus.Counter
+	statusUpdateNotFoundTimeout prometheus.Counter
+}
+
+// newPluginMetrics creates a new pluginMetrics with the given scope.
+func newPluginMetrics(scope promutils.Scope) pluginMetrics {
+	return pluginMetrics{
+		workersUnavailableTimeout:   scope.MustNewCounter("workers_unavailable_timeout", "Count of tasks that timed out waiting for workers to become available"),
+		statusUpdateNotFoundTimeout: scope.MustNewCounter("status_update_not_found_timeout", "Count of tasks that timed out waiting for status update from worker"),
+	}
+}
+
 // State maintains the current status of the task execution.
 type State struct {
 	SubmissionPhase SubmissionPhase
@@ -45,6 +61,7 @@ type State struct {
 // Plugin is a fast task plugin that offers task execution to a worker pool.
 type Plugin struct {
 	fastTaskService FastTaskService
+	metrics         pluginMetrics
 }
 
 // GetID returns the unique identifier for the plugin.
@@ -212,6 +229,8 @@ func (p *Plugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (co
 			// fail if no worker available within grace period
 			if time.Since(pluginState.LastUpdated) > GetConfig().GracePeriodWorkersUnavailable.Duration {
 				logger.Infof(ctx, "Timed out waiting for available worker for queue %s", queueID)
+				p.metrics.workersUnavailableTimeout.Inc()
+
 				phaseInfo = core.PhaseInfoSystemFailure("unknown", fmt.Sprintf("timed out waiting for available worker for queue %s", queueID), nil)
 			} else {
 				phaseInfo = core.PhaseInfoWaitingForResourcesInfo(time.Now(), core.DefaultPhaseVersion, "no workers available", nil)
@@ -227,6 +246,8 @@ func (p *Plugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (co
 		} else if errors.Is(err, statusUpdateNotFoundError) && now.Sub(pluginState.LastUpdated) > GetConfig().GracePeriodStatusNotFound.Duration {
 			// if task has not been updated within the grace period we should abort
 			logger.Infof(ctx, "Task status update not reported within grace period for queue %s and worker %s", queueID, pluginState.WorkerID)
+			p.metrics.statusUpdateNotFoundTimeout.Inc()
+
 			return core.DoTransition(core.PhaseInfoSystemRetryableFailure("unknown", fmt.Sprintf("task status update not reported within grace period for queue %s and worker %s", queueID, pluginState.WorkerID), nil)), nil
 		} else if phase == core.PhaseSuccess {
 			taskTemplate, err := tCtx.TaskReader().Read(ctx)
@@ -315,6 +336,7 @@ func init() {
 
 				return &Plugin{
 					fastTaskService: fastTaskService,
+					metrics:         newPluginMetrics(iCtx.MetricsScope()),
 				}, nil
 			},
 			IsDefault: false,

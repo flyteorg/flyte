@@ -20,6 +20,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	iomocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 
 	"github.com/unionai/flyte/fasttask/plugin/mocks"
 	"github.com/unionai/flyte/fasttask/plugin/pb"
@@ -76,6 +77,7 @@ func getBaseFasttaskTaskTemplate(t *testing.T) *idlcore.TaskTemplate {
 
 func TestFinalize(t *testing.T) {
 	ctx := context.TODO()
+	scope := promutils.NewTestScope()
 
 	// initialize fasttask TaskTemplate
 	taskTemplate := getBaseFasttaskTaskTemplate(t)
@@ -114,6 +116,7 @@ func TestFinalize(t *testing.T) {
 	// initialize plugin
 	plugin := &Plugin{
 		fastTaskService: fastTaskService,
+		metrics:         newPluginMetrics(scope),
 	}
 
 	// call handle
@@ -229,6 +232,8 @@ func TestGetExecutionEnv(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
+			scope := promutils.NewTestScope()
+
 			// initialize fasttask TaskTemplate
 			executionEnvStruct := buildFasttaskEnvironment(t, test.fastTaskExtant, test.fastTaskSpec)
 			taskTemplate := &idlcore.TaskTemplate{
@@ -266,7 +271,9 @@ func TestGetExecutionEnv(t *testing.T) {
 			tCtx.OnGetExecutionEnvClient().Return(executionEnvClient)
 
 			// initialize plugin
-			plugin := &Plugin{}
+			plugin := &Plugin{
+				metrics: newPluginMetrics(scope),
+			}
 
 			// call handle
 			fastTaskEnvironment, err := plugin.getExecutionEnv(ctx, tCtx)
@@ -339,6 +346,8 @@ func TestHandleNotYetStarted(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
+			scope := promutils.NewTestScope()
+
 			// create TaskExecutionContext
 			tCtx := &coremocks.TaskExecutionContext{}
 			tCtx.OnInputReader().Return(inputReader)
@@ -377,6 +386,7 @@ func TestHandleNotYetStarted(t *testing.T) {
 			// initialize plugin
 			plugin := &Plugin{
 				fastTaskService: fastTaskService,
+				metrics:         newPluginMetrics(scope),
 			}
 
 			// call handle
@@ -462,6 +472,8 @@ func TestHandleRunning(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
+			scope := promutils.NewTestScope()
+
 			// create TaskExecutionContext
 			tCtx := &coremocks.TaskExecutionContext{}
 			tCtx.OnTaskExecutionMetadata().Return(taskMetadata)
@@ -499,6 +511,7 @@ func TestHandleRunning(t *testing.T) {
 			// initialize plugin
 			plugin := &Plugin{
 				fastTaskService: fastTaskService,
+				metrics:         newPluginMetrics(scope),
 			}
 
 			// call handle
