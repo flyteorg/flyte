@@ -51,14 +51,14 @@ To clone and run the example code on this page, see the [Flytesnacks repo][flyte
 
 To begin, import the necessary libraries and set the number of task retries to `3`:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/checkpoint.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/checkpoint.py
 :caption: advanced_composition/checkpoint.py
 :lines: 1-4
 ```
 
 We define a task to iterate precisely `n_iterations`, checkpoint its state, and recover from simulated failures:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/checkpoint.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/checkpoint.py
 :caption: advanced_composition/checkpoint.py
 :pyobject: use_checkpoint
 ```
@@ -69,14 +69,14 @@ The checkpoint system offers additional APIs, documented in the code accessible 
 Create a workflow that invokes the task:
 The task will automatically undergo retries in the event of a  {ref}`FlyteRecoverableException <flytekit:exception_handling>`.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/checkpoint.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/checkpoint.py
 :caption: advanced_composition/checkpoint.py
 :pyobject: checkpointing_example
 ```
 
 The local checkpoint is not utilized here because retries are not supported:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/checkpoint.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/checkpoint.py
 :caption: advanced_composition/checkpoint.py
 :lines: 37-42
 ```
@@ -87,7 +87,7 @@ To run the provided workflow on the Flyte cluster, use the following command:
 
 ```
 pyflyte run --remote \
-  https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/checkpoint.py \
+  https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/checkpoint.py \
   checkpointing_example --n_iterations 10
 ```
 
