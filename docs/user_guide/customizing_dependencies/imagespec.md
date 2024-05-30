@@ -26,7 +26,7 @@ Before building the image, Flytekit checks the container registry first to see i
 To clone and run the example code on this page, see the [Flytesnacks repo][flytesnacks].
 ```
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/customizing_dependencies/customizing_dependencies/image_spec.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/customizing_dependencies/customizing_dependencies/image_spec.py
 :caption: customizing_dependencies/image_spec.py
 :lines: 1-4
 ```
@@ -45,7 +45,7 @@ More specifically, flytekit invokes [DefaultImages.default_image()](https://gith
 This function determines and returns the default image based on the Python version and flytekit version. For example, if you are using python 3.8 and flytekit 0.16.0, the default image assigned will be `ghcr.io/flyteorg/flytekit:py3.8-1.6.0`.
 If desired, you can also override the default image by providing a custom `base_image` parameter when using the `ImageSpec`.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/customizing_dependencies/customizing_dependencies/image_spec.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/customizing_dependencies/customizing_dependencies/image_spec.py
 :caption: customizing_dependencies/image_spec.py
 :lines: 6-19
 ```
@@ -59,14 +59,14 @@ To upload the image to the local registry in the demo cluster, indicate the regi
 If the task is indeed using the image built from the `ImageSpec`, it will then import Tensorflow.
 This approach helps minimize module loading time and prevents unnecessary dependency installation within a single image.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/customizing_dependencies/customizing_dependencies/image_spec.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/customizing_dependencies/customizing_dependencies/image_spec.py
 :caption: customizing_dependencies/image_spec.py
 :lines: 21-22
 ```
 
 To enable tasks to utilize the images built with `ImageSpec`, you can specify the `container_image` parameter for those tasks.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/customizing_dependencies/customizing_dependencies/image_spec.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/customizing_dependencies/customizing_dependencies/image_spec.py
 :caption: customizing_dependencies/image_spec.py
 :lines: 27-56
 ```

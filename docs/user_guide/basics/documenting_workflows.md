@@ -15,14 +15,14 @@ To clone and run the example code on this page, see the [Flytesnacks repo][flyte
 
 To begin, import the relevant libraries:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/documenting_workflows.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/documenting_workflows.py
 :caption: basics/documenting_workflows.py
 :lines: 1-3
 ```
 
 We import the `slope` and `intercept` tasks from the `workflow.py` file.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/documenting_workflows.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/documenting_workflows.py
 :caption: basics/documenting_workflows.py
 :lines: 6
 ```
@@ -35,7 +35,7 @@ The initial section of the docstring provides a concise overview of the workflow
 The subsequent section provides a comprehensive explanation.
 The last part of the docstring outlines the parameters and return type.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/documenting_workflows.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/documenting_workflows.py
 :caption: basics/documenting_workflows.py
 :pyobject: sphinx_docstring_wf
 ```
@@ -49,7 +49,7 @@ The next section offers a comprehensive description.
 The third section of the docstring details all parameters along with their respective data types.
 The final section of the docstring explains the return type and its associated data type.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/documenting_workflows.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/documenting_workflows.py
 :caption: basics/documenting_workflows.py
 :pyobject: numpy_docstring_wf
 ```
@@ -63,7 +63,7 @@ The subsequent section of the docstring provides an extensive explanation.
 The third segment of the docstring outlines the parameters and return type,
 including their respective data types.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/documenting_workflows.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/documenting_workflows.py
 :caption: basics/documenting_workflows.py
 :pyobject: google_docstring_wf
 ```

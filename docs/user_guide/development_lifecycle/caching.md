@@ -25,14 +25,14 @@ To clone and run the example code on this page, see the [Flytesnacks repo][flyte
 
 Import the necessary libraries:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/development_lifecycle/development_lifecycle/task_cache.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/development_lifecycle/development_lifecycle/task_cache.py
 :caption: development_lifecycle/task_cache.py
 :lines: 1-3
 ```
 
 For any {py:func}`flytekit.task` in Flyte, there is always one required import, which is:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/development_lifecycle/development_lifecycle/task_cache.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/development_lifecycle/development_lifecycle/task_cache.py
 :caption: development_lifecycle/task_cache.py
 :lines: 8-10
 ```
@@ -43,7 +43,7 @@ Task caching is disabled by default to avoid unintended consequences of caching 
 Bumping the `cache_version` is akin to invalidating the cache.
 You can manually update this version and Flyte caches the next execution instead of relying on the old cache.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/development_lifecycle/development_lifecycle/task_cache.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/development_lifecycle/development_lifecycle/task_cache.py
 :caption: development_lifecycle/task_cache.py
 :pyobject: square
 ```
@@ -103,7 +103,7 @@ The format used by the store is opaque and not meant to be inspectable.
 
 The default behavior displayed by Flyte's memoization feature might not match the user intuition. For example, this code makes use of pandas dataframes:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/development_lifecycle/development_lifecycle/task_cache.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/development_lifecycle/development_lifecycle/task_cache.py
 :caption: development_lifecycle/task_cache.py
 :lines: 39-54
 ```
@@ -112,7 +112,7 @@ If run twice with the same inputs, one would expect that `bar` would trigger a c
 However, with release 1.2.0, Flyte provides a new way to control memoization behavior of literals. This is done via a `typing.Annotated` call on the task signature.
 For example, in order to cache the result of calls to `bar`, you can rewrite the code above like this:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/development_lifecycle/development_lifecycle/task_cache.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/development_lifecycle/development_lifecycle/task_cache.py
 :caption: development_lifecycle/task_cache.py
 :lines: 64-85
 ```
@@ -128,7 +128,7 @@ This feature also works in local execution.
 
 Here's a complete example of the feature:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/development_lifecycle/development_lifecycle/task_cache.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/development_lifecycle/development_lifecycle/task_cache.py
 :caption: development_lifecycle/task_cache.py
 :lines: 97-134
 ```

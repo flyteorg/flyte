@@ -17,14 +17,14 @@ To clone and run the example code on this page, see the [Flytesnacks repo][flyte
 
 To begin, import the required dependencies.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/decorating_tasks.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/decorating_tasks.py
 :caption: advanced_composition/decorating_tasks.py
 :lines: 1-4
 ```
 
 Create a logger to monitor the execution's progress.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/decorating_tasks.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/decorating_tasks.py
 :caption: advanced_composition/decorating_tasks.py
 :lines: 7
 ```
@@ -33,7 +33,7 @@ Create a logger to monitor the execution's progress.
 
 We define a decorator that logs the input and output details for a decorated task.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/decorating_tasks.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/decorating_tasks.py
 :caption: advanced_composition/decorating_tasks.py
 :pyobject: log_io
 ```
@@ -44,7 +44,7 @@ We create a task named `t1` that is decorated with `log_io`.
 The order of invoking the decorators is important. `@task` should always be the outer-most decorator.
 :::
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/decorating_tasks.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/decorating_tasks.py
 :caption: advanced_composition/decorating_tasks.py
 :pyobject: t1
 ```
@@ -58,7 +58,7 @@ You can also stack multiple decorators on top of each other as long as `@task` i
 We define a decorator that verifies if the output from the decorated function is a positive number before it's returned.
 If this assumption is violated, it raises a `ValueError` exception.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/decorating_tasks.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/decorating_tasks.py
 :caption: advanced_composition/decorating_tasks.py
 :pyobject: validate_output
 ```
@@ -69,14 +69,14 @@ The output of the `validate_output` task uses {py:func}`~functools.partial` to i
 
 We define a function that uses both the logging and validator decorators.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/decorating_tasks.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/decorating_tasks.py
 :caption: advanced_composition/decorating_tasks.py
 :pyobject: t2
 ```
 
 Finally, we compose a workflow that calls `t1` and `t2`.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/decorating_tasks.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/decorating_tasks.py
 :caption: advanced_composition/decorating_tasks.py
 :lines: 53-59
 ```
@@ -87,7 +87,7 @@ To run the provided workflow on the Flyte cluster, use the following command:
 
 ```
 pyflyte run --remote \
-  https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/decorating_tasks.py \
+  https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/decorating_tasks.py \
   decorating_task_wf --x 10
 ```
 

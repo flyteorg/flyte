@@ -21,14 +21,14 @@ When a workflow reaches a specified [terminal workflow execution phase](https://
 To clone and run the example code on this page, see the [Flytesnacks repo][flytesnacks].
 ```
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/productionizing/productionizing/lp_notifications.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/productionizing/productionizing/lp_notifications.py
 :caption: productionizing/lp_notifications.py
 :lines: 1
 ```
 
 Consider the following example workflow:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/productionizing/productionizing/lp_notifications.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/productionizing/productionizing/lp_notifications.py
 :caption: productionizing/lp_notifications.py
 :lines: 3-14
 ```
@@ -37,21 +37,21 @@ Here are three scenarios that can help deepen your understanding of how notifica
 
 1. Launch Plan triggers email notifications when the workflow execution reaches the `SUCCEEDED` phase.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/productionizing/productionizing/lp_notifications.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/productionizing/productionizing/lp_notifications.py
 :caption: productionizing/lp_notifications.py
 :lines: 20-30
 ```
 
 2. Notifications shine when used for scheduled workflows to alert for failures.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/productionizing/productionizing/lp_notifications.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/productionizing/productionizing/lp_notifications.py
 :caption: productionizing/lp_notifications.py
 :lines: 33-44
 ```
 
 3. Notifications can be combined with different permutations of terminal phases and recipient targets.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/productionizing/productionizing/lp_notifications.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/productionizing/productionizing/lp_notifications.py
 :caption: productionizing/lp_notifications.py
 :lines: 48-70
 ```

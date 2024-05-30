@@ -6,42 +6,42 @@ A lot of the tasks that you write you can run locally, but some of them you will
 To clone and run the example code on this page, see the [Flytesnacks repo][flytesnacks].
 ```
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/testing/testing/mocking.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/testing/testing/mocking.py
 :caption: testing/mocking.py
 :lines: 1-6
 ```
 
 This is a generic SQL task (and is by default not hooked up to any datastore nor handled by any plugin), and must be mocked:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/testing/testing/mocking.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/testing/testing/mocking.py
 :caption: testing/mocking.py
 :lines: 10-16
 ```
 
 This is a task that can run locally:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/testing/testing/mocking.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/testing/testing/mocking.py
 :caption: testing/mocking.py
 :pyobject: t1
 ```
 
 Declare a workflow that chains these two tasks together.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/testing/testing/mocking.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/testing/testing/mocking.py
 :caption: testing/mocking.py
 :pyobject: my_wf
 ```
 
 Without a mock, calling the workflow would typically raise an exception, but with the `task_mock` construct, which returns a `MagicMock` object, we can override the return value.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/testing/testing/mocking.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/testing/testing/mocking.py
 :caption: testing/mocking.py
 :pyobject: main_1
 ```
 
 There is another utility as well called `patch` which offers the same functionality, but in the traditional Python patching style, where the first argument is the `MagicMock` object.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/testing/testing/mocking.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/testing/testing/mocking.py
 :caption: testing/mocking.py
 :lines: 45-56
 ```

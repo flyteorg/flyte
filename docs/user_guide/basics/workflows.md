@@ -25,7 +25,7 @@ To clone and run the example code on this page, see the [Flytesnacks repo][flyte
 
 To begin, import {py:func}`~flytekit.task` and {py:func}`~flytekit.workflow` from the flytekit library:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/workflow.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/workflow.py
 :caption: basics/workflow.py
 :lines: 1
 ```
@@ -33,7 +33,7 @@ To begin, import {py:func}`~flytekit.task` and {py:func}`~flytekit.workflow` fro
 We define `slope` and `intercept` tasks to compute the slope and
 intercept of the regression line, respectively:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/workflow.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/workflow.py
 :caption: basics/workflow.py
 :lines: 6-19
 ```
@@ -41,7 +41,7 @@ intercept of the regression line, respectively:
 Define a workflow to establish the task dependencies.
 Just like a task, a workflow is also strongly typed:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/workflow.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/workflow.py
 :caption: basics/workflow.py
 :pyobject: simple_wf
 ```
@@ -68,7 +68,7 @@ Bear in mind that a workflow can have tasks, other workflows and dynamic workflo
 
 You can run a workflow by calling it as you would with a Python function and providing the necessary inputs:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/workflow.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/workflow.py
 :caption: basics/workflow.py
 :lines: 33-34
 ```
@@ -77,7 +77,7 @@ To run the workflow locally, you can use the following `pyflyte run` command:
 
 ```
 pyflyte run \
-  https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/workflow.py \
+  https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/workflow.py \
   simple_wf --x '[-3,0,3]' --y '[7,4,-2]'
 ```
 
@@ -86,7 +86,7 @@ simply add the `--remote flag` to the `pyflyte run` command:
 
 ```
 pyflyte run --remote \
-  https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/workflow.py \
+  https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/workflow.py \
   simple_wf --x '[-3,0,3]' --y '[7,4,-2]'
 ```
 
@@ -101,7 +101,7 @@ without the confines of a workflow, offers a convenient approach for iterating o
 
 You can use the {py:func}`functools.partial` function to assign default or constant values to the parameters of your tasks.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/workflow.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/workflow.py
 :caption: basics/workflow.py
 :lines: 39-45
 ```

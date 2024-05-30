@@ -62,7 +62,7 @@ Once you've defined a secret on the Flyte backend, `flytekit` exposes a class
 called {py:class}`~flytekit.Secret`s, which allows you to request a secret
 from the configured secret manager:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/productionizing/productionizing/use_secrets.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/productionizing/productionizing/use_secrets.py
 :caption: productionizing/use_secrets.py
 :lines: 1-6, 49-53
 ```
@@ -76,7 +76,7 @@ In the code below we specify two variables, `SECRET_GROUP` and
 `SECRET_NAME`, which maps onto the `user-info` secret that we created
 with `kubectl` above, with a key called `user_secret`.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/productionizing/productionizing/use_secrets.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/productionizing/productionizing/use_secrets.py
 :caption: productionizing/use_secrets.py
 :lines: 66-67
 ```
@@ -92,7 +92,7 @@ invoking the {py:func}`flytekit.current_context` function, as shown below.
 At runtime, flytekit looks inside the task pod for an environment variable or
 a mounted file with a predefined name/path and loads the value.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/productionizing/productionizing/use_secrets.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/productionizing/productionizing/use_secrets.py
 :caption: productionizing/use_secrets.py
 :pyobject: secret_task
 ```
@@ -127,14 +127,14 @@ the same secret:
 In this case, the secret group will be `user-info`, with three available
 secret keys: `user_secret`, `username`, and `password`:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/productionizing/productionizing/use_secrets.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/productionizing/productionizing/use_secrets.py
 :caption: productionizing/use_secrets.py
 :lines: 107-108
 ```
 
 The Secret structure allows passing two fields, matching the key and the group, as previously described:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/productionizing/productionizing/use_secrets.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/productionizing/productionizing/use_secrets.py
 :caption: productionizing/use_secrets.py
 :lines: 113-124
 ```
@@ -155,14 +155,14 @@ In these scenarios you can specify the `mount_requirement=Secret.MountType.FILE`
 
 In the following example we force the mounting to be an environment variable:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/productionizing/productionizing/use_secrets.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/productionizing/productionizing/use_secrets.py
 :caption: productionizing/use_secrets.py
 :lines: 139-158
 ```
 
 These tasks can be used in your workflow as usual
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/productionizing/productionizing/use_secrets.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/productionizing/productionizing/use_secrets.py
 :caption: productionizing/use_secrets.py
 :pyobject: my_secret_workflow
 ```
@@ -172,7 +172,7 @@ These tasks can be used in your workflow as usual
 The simplest way to test secret accessibility is to export the secret as an
 environment variable. There are some helper methods available to do so:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/productionizing/productionizing/use_secrets.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/productionizing/productionizing/use_secrets.py
 :caption: productionizing/use_secrets.py
 :lines: 172-182
 ```
