@@ -28,7 +28,7 @@ To clone and run the example code on this page, see the [Flytesnacks repo][flyte
 
 To begin, import the dependencies:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/development_lifecycle/development_lifecycle/decks.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/development_lifecycle/development_lifecycle/decks.py
 :caption: development_lifecycle/decks.py
 :lines: 1-4
 ```
@@ -39,7 +39,7 @@ We create a new deck named `pca` and render Markdown content along with a
 You can begin by initializing an {ref}`ImageSpec <image_spec_example>` object to encompass all the necessary dependencies.
 This approach automatically triggers a Docker build, alleviating the need for you to manually create a Docker image.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/development_lifecycle/development_lifecycle/decks.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/development_lifecycle/development_lifecycle/decks.py
 :caption: development_lifecycle/decks.py
 :lines: 15-19
 ```
@@ -51,7 +51,7 @@ To upload the image to the local registry in the demo cluster, indicate the regi
 
 Note the usage of `append` to append the Plotly deck to the Markdown deck.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/development_lifecycle/development_lifecycle/decks.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/development_lifecycle/development_lifecycle/decks.py
 :caption: development_lifecycle/decks.py
 :pyobject: pca_plot
 ```
@@ -96,7 +96,7 @@ When the task connected with a deck object is executed, these objects employ ren
 
 Creates a profile report from a Pandas DataFrame.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/development_lifecycle/development_lifecycle/decks.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/development_lifecycle/development_lifecycle/decks.py
 :caption: development_lifecycle/decks.py
 :lines: 44-51
 ```
@@ -113,7 +113,7 @@ Creates a profile report from a Pandas DataFrame.
 Renders DataFrame as an HTML table.
 This renderer doesn't necessitate plugin installation since it's accessible within the flytekit library.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/development_lifecycle/development_lifecycle/decks.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/development_lifecycle/development_lifecycle/decks.py
 :caption: development_lifecycle/decks.py
 :lines: 57-64
 ```
@@ -127,7 +127,7 @@ This renderer doesn't necessitate plugin installation since it's accessible with
 
 Converts a Markdown string into HTML, producing HTML as a Unicode string.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/development_lifecycle/development_lifecycle/decks.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/development_lifecycle/development_lifecycle/decks.py
 :caption: development_lifecycle/decks.py
 :pyobject: markdown_renderer
 ```
@@ -147,7 +147,7 @@ The median (Q2) is indicated by a line within the box.
 Typically, the whiskers extend to the edges of the box,
 plus or minus 1.5 times the interquartile range (IQR: Q3-Q1).
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/development_lifecycle/development_lifecycle/decks.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/development_lifecycle/development_lifecycle/decks.py
 :caption: development_lifecycle/decks.py
 :lines: 85-91
 ```
@@ -162,7 +162,7 @@ plus or minus 1.5 times the interquartile range (IQR: Q3-Q1).
 Converts a {ref}`FlyteFile <files>` or `PIL.Image.Image` object into an HTML string,
 where the image data is encoded as a base64 string.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/development_lifecycle/development_lifecycle/decks.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/development_lifecycle/development_lifecycle/decks.py
 :caption: development_lifecycle/decks.py
 :lines: 97-111
 ```
@@ -176,7 +176,7 @@ where the image data is encoded as a base64 string.
 
 Converts a Pandas dataframe into an HTML table.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/development_lifecycle/development_lifecycle/decks.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/development_lifecycle/development_lifecycle/decks.py
 :caption: development_lifecycle/decks.py
 :lines: 115-123
 ```

@@ -17,7 +17,7 @@ To clone and run the example code on this page, see the [Flytesnacks repo][flyte
 
 To begin, import `task` and `workflow` from the `flytekit` library:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/hello_world.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/hello_world.py
 :caption: basics/hello_world.py
 :lines: 1
 ```
@@ -25,7 +25,7 @@ To begin, import `task` and `workflow` from the `flytekit` library:
 Define a task that produces the string "Hello, World!".
 Simply using the `@task` decorator to annotate the Python function:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/hello_world.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/hello_world.py
 :caption: basics/hello_world.py
 :pyobject: say_hello
 ```
@@ -33,14 +33,14 @@ Simply using the `@task` decorator to annotate the Python function:
 You can handle the output of a task in the same way you would with a regular Python function.
 Store the output in a variable and use it as a return value for a Flyte workflow:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/hello_world.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/hello_world.py
 :caption: basics/hello_world.py
 :pyobject: hello_world_wf
 ```
 
 Run the workflow by simply calling it like a Python function:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/hello_world.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/hello_world.py
 :caption: basics/hello_world.py
 :lines: 19-20
 ```
