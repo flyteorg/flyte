@@ -62,7 +62,8 @@ func (in *WorkflowStatus) DeepCopyInto(out *WorkflowStatus) {
 	if in.NodeStatus != nil {
 		in, out := &in.NodeStatus, &out.NodeStatus
 		*out = make(map[string]*NodeStatus, len(*in))
-		for key, val := range *in {
+		for key, v := range *in {
+			val := v
 			var outVal *NodeStatus
 			if val == nil {
 				(*out)[key] = nil
@@ -85,7 +86,6 @@ func (in *WorkflowStatus) DeepCopyInto(out *WorkflowStatus) {
 	if in.DataReferenceConstructor != nil {
 		out.DataReferenceConstructor = in.DataReferenceConstructor
 	}
-	return
 }
 
 func IsWorkflowPhaseTerminal(p WorkflowPhase) bool {

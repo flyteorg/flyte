@@ -81,7 +81,6 @@ func (in *BranchNodeSpec) DeepCopyInto(out *BranchNodeSpec) {
 	if in.ElseFail != nil {
 		out.ElseFail = proto.Clone(in.ElseFail).(*core.Error)
 	}
-	return
 }
 
 func (in *BranchNodeSpec) GetIf() ExecutableIfBlock {

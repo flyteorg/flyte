@@ -103,7 +103,8 @@ func (in *FlyteWorkflow) DeepCopyInto(out *FlyteWorkflow) {
 	if in.Tasks != nil {
 		in, out := &in.Tasks, &out.Tasks
 		*out = make(map[string]*TaskSpec, len(*in))
-		for key, val := range *in {
+		for key, v := range *in {
+			val := v
 			var outVal *TaskSpec
 			if val == nil {
 				(*out)[key] = nil
@@ -117,7 +118,8 @@ func (in *FlyteWorkflow) DeepCopyInto(out *FlyteWorkflow) {
 	if in.SubWorkflows != nil {
 		in, out := &in.SubWorkflows, &out.SubWorkflows
 		*out = make(map[string]*WorkflowSpec, len(*in))
-		for key, val := range *in {
+		for key, v := range *in {
+			val := v
 			var outVal *WorkflowSpec
 			if val == nil {
 				(*out)[key] = nil
@@ -146,7 +148,6 @@ func (in *FlyteWorkflow) DeepCopyInto(out *FlyteWorkflow) {
 	if in.DataReferenceConstructor != nil {
 		out.DataReferenceConstructor = in.DataReferenceConstructor
 	}
-	return
 }
 
 func (in *FlyteWorkflow) GetSecurityContext() core.SecurityContext {

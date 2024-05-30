@@ -181,7 +181,6 @@ func (in *WorkflowNodeStatus) DeepCopyInto(out *WorkflowNodeStatus) {
 	if in.ExecutionError != nil {
 		out.ExecutionError = proto.Clone(in.ExecutionError).(*core.ExecutionError)
 	}
-	return
 }
 
 func (in *WorkflowNodeStatus) SetExecutionError(executionError *core.ExecutionError) {
@@ -261,7 +260,6 @@ func (in *ArrayNodeStatus) DeepCopyInto(out *ArrayNodeStatus) {
 	in.SubNodeTaskPhases.DeepCopyInto(&out.SubNodeTaskPhases)
 	in.SubNodeRetryAttempts.DeepCopyInto(&out.SubNodeRetryAttempts)
 	in.SubNodeSystemFailures.DeepCopyInto(&out.SubNodeSystemFailures)
-	return
 }
 
 func (in *ArrayNodeStatus) GetArrayNodePhase() ArrayNodePhase {
@@ -418,7 +416,8 @@ func (in *NodeStatus) DeepCopyInto(out *NodeStatus) {
 	if in.SubNodeStatus != nil {
 		in, out := &in.SubNodeStatus, &out.SubNodeStatus
 		*out = make(map[string]*NodeStatus, len(*in))
-		for key, val := range *in {
+		for key, v := range *in {
+			val := v
 			var outVal *NodeStatus
 			if val == nil {
 				(*out)[key] = nil
@@ -460,7 +459,6 @@ func (in *NodeStatus) DeepCopyInto(out *NodeStatus) {
 	if in.DataReferenceConstructor != nil {
 		out.DataReferenceConstructor = in.DataReferenceConstructor
 	}
-	return
 }
 
 func (in *NodeStatus) IsDirty() bool {
