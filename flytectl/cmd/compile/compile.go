@@ -80,16 +80,20 @@ func compileFromPackage(packagePath string) error {
 		return err
 	}
 
+	var providers []common.InterfaceProvider
+	for _, plan := range plans {
+		providers = append(providers, compiler.NewLaunchPlanInterfaceProvider(*plan))
+	}
+
 	// compile workflows
 	for wfName, workflow := range workflows {
 
 		fmt.Println("\nCompiling workflow:", wfName)
-		plan := plans[wfName]
 
 		_, err := compiler.CompileWorkflow(workflow.Template,
 			workflow.SubWorkflows,
 			compiledTasks,
-			[]common.InterfaceProvider{compiler.NewLaunchPlanInterfaceProvider(*plan)})
+			providers)
 		if err != nil {
 			fmt.Println(":( Error Compiling workflow:", wfName)
 			return err
