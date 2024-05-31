@@ -17560,6 +17560,52 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of a GetDomainRequest. */
+        interface IGetDomainRequest {
+        }
+
+        /** Represents a GetDomainRequest. */
+        class GetDomainRequest implements IGetDomainRequest {
+
+            /**
+             * Constructs a new GetDomainRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IGetDomainRequest);
+
+            /**
+             * Creates a new GetDomainRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns GetDomainRequest instance
+             */
+            public static create(properties?: flyteidl.admin.IGetDomainRequest): flyteidl.admin.GetDomainRequest;
+
+            /**
+             * Encodes the specified GetDomainRequest message. Does not implicitly {@link flyteidl.admin.GetDomainRequest.verify|verify} messages.
+             * @param message GetDomainRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IGetDomainRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a GetDomainRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns GetDomainRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.GetDomainRequest;
+
+            /**
+             * Verifies a GetDomainRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a Domain. */
         interface IDomain {
 
@@ -17612,6 +17658,58 @@ export namespace flyteidl {
 
             /**
              * Verifies a Domain message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a Domains. */
+        interface IDomains {
+
+            /** Domains domains */
+            domains?: (flyteidl.admin.IDomain[]|null);
+        }
+
+        /** Represents a Domains. */
+        class Domains implements IDomains {
+
+            /**
+             * Constructs a new Domains.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IDomains);
+
+            /** Domains domains. */
+            public domains: flyteidl.admin.IDomain[];
+
+            /**
+             * Creates a new Domains instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns Domains instance
+             */
+            public static create(properties?: flyteidl.admin.IDomains): flyteidl.admin.Domains;
+
+            /**
+             * Encodes the specified Domains message. Does not implicitly {@link flyteidl.admin.Domains.verify|verify} messages.
+             * @param message Domains message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IDomains, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a Domains message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns Domains
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.Domains;
+
+            /**
+             * Verifies a Domains message.
              * @param message Plain object to verify
              * @returns `null` if valid, otherwise the reason why it is not
              */
@@ -21645,6 +21743,20 @@ export namespace flyteidl {
             public getNodeExecutionData(request: flyteidl.admin.INodeExecutionGetDataRequest): Promise<flyteidl.admin.NodeExecutionGetDataResponse>;
 
             /**
+             * Calls GetDomains.
+             * @param request GetDomainRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and Domains
+             */
+            public getDomains(request: flyteidl.admin.IGetDomainRequest, callback: flyteidl.service.AdminService.GetDomainsCallback): void;
+
+            /**
+             * Calls GetDomains.
+             * @param request GetDomainRequest message or plain object
+             * @returns Promise
+             */
+            public getDomains(request: flyteidl.admin.IGetDomainRequest): Promise<flyteidl.admin.Domains>;
+
+            /**
              * Calls RegisterProject.
              * @param request ProjectRegisterRequest message or plain object
              * @param callback Node-style callback called with the error, if any, and ProjectRegisterResponse
@@ -22220,6 +22332,13 @@ export namespace flyteidl {
              * @param [response] NodeExecutionGetDataResponse
              */
             type GetNodeExecutionDataCallback = (error: (Error|null), response?: flyteidl.admin.NodeExecutionGetDataResponse) => void;
+
+            /**
+             * Callback as used by {@link flyteidl.service.AdminService#getDomains}.
+             * @param error Error, if any
+             * @param [response] Domains
+             */
+            type GetDomainsCallback = (error: (Error|null), response?: flyteidl.admin.Domains) => void;
 
             /**
              * Callback as used by {@link flyteidl.service.AdminService#registerProject}.

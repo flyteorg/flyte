@@ -8,6 +8,39 @@ import { Message, proto3 } from "@bufbuild/protobuf";
 import { Labels, Sort } from "./common_pb.js";
 
 /**
+ * Empty request for GetDomain
+ *
+ * @generated from message flyteidl.admin.GetDomainRequest
+ */
+export class GetDomainRequest extends Message<GetDomainRequest> {
+  constructor(data?: PartialMessage<GetDomainRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.admin.GetDomainRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetDomainRequest {
+    return new GetDomainRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetDomainRequest {
+    return new GetDomainRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetDomainRequest {
+    return new GetDomainRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GetDomainRequest | PlainMessage<GetDomainRequest> | undefined, b: GetDomainRequest | PlainMessage<GetDomainRequest> | undefined): boolean {
+    return proto3.util.equals(GetDomainRequest, a, b);
+  }
+}
+
+/**
  * Namespace within a project commonly used to differentiate between different service instances.
  * e.g. "production", "development", etc.
  *
@@ -54,6 +87,45 @@ export class Domain extends Message<Domain> {
 
   static equals(a: Domain | PlainMessage<Domain> | undefined, b: Domain | PlainMessage<Domain> | undefined): boolean {
     return proto3.util.equals(Domain, a, b);
+  }
+}
+
+/**
+ * Represents a list of domains.
+ *
+ * @generated from message flyteidl.admin.Domains
+ */
+export class Domains extends Message<Domains> {
+  /**
+   * @generated from field: repeated flyteidl.admin.Domain domains = 1;
+   */
+  domains: Domain[] = [];
+
+  constructor(data?: PartialMessage<Domains>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.admin.Domains";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "domains", kind: "message", T: Domain, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Domains {
+    return new Domains().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Domains {
+    return new Domains().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Domains {
+    return new Domains().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: Domains | PlainMessage<Domains> | undefined, b: Domains | PlainMessage<Domains> | undefined): boolean {
+    return proto3.util.equals(Domains, a, b);
   }
 }
 

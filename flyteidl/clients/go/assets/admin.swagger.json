@@ -830,6 +830,28 @@
         ]
       }
     },
+    "/api/v1/domains": {
+      "get": {
+        "operationId": "AdminService_GetDomains",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminDomains"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
     "/api/v1/events/nodes": {
       "post": {
         "summary": "Indicates a :ref:`ref_flyteidl.event.NodeExecutionEvent` has occurred.",
@@ -4670,6 +4692,19 @@
         }
       },
       "description": "Namespace within a project commonly used to differentiate between different service instances.\ne.g. \"production\", \"development\", etc."
+    },
+    "adminDomains": {
+      "type": "object",
+      "properties": {
+        "domains": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/adminDomain"
+          }
+        }
+      },
+      "description": "Represents a list of domains."
     },
     "adminDynamicNodeWorkflowResponse": {
       "type": "object",

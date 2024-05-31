@@ -54,6 +54,12 @@ func (m *ProjectManager) getDomains() []*admin.Domain {
 	return domains
 }
 
+func (m *ProjectManager) GetDomains(ctx context.Context, request admin.GetDomainRequest) *admin.Domains {
+	return &admin.Domains{
+		Domains: m.getDomains(),
+	}
+}
+
 func (m *ProjectManager) ListProjects(ctx context.Context, request admin.ProjectListRequest) (*admin.Projects, error) {
 	spec := util.FilterSpec{
 		RequestFilters: request.Filters,
@@ -76,7 +82,6 @@ func (m *ProjectManager) ListProjects(ctx context.Context, request admin.Project
 		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 			"invalid pagination token %s for ListProjects", request.Token)
 	}
-
 	// And finally, query the database
 	listProjectsInput := repoInterfaces.ListResourceInput{
 		Limit:         int(request.Limit),

@@ -170,6 +170,11 @@ class AdminServiceStub(object):
                 request_serializer=flyteidl_dot_admin_dot_node__execution__pb2.NodeExecutionGetDataRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_admin_dot_node__execution__pb2.NodeExecutionGetDataResponse.FromString,
                 )
+        self.GetDomains = channel.unary_unary(
+                '/flyteidl.service.AdminService/GetDomains',
+                request_serializer=flyteidl_dot_admin_dot_project__pb2.GetDomainRequest.SerializeToString,
+                response_deserializer=flyteidl_dot_admin_dot_project__pb2.Domains.FromString,
+                )
         self.RegisterProject = channel.unary_unary(
                 '/flyteidl.service.AdminService/RegisterProject',
                 request_serializer=flyteidl_dot_admin_dot_project__pb2.ProjectRegisterRequest.SerializeToString,
@@ -512,6 +517,12 @@ class AdminServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def GetDomains(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
     def RegisterProject(self, request, context):
         """Registers a :ref:`ref_flyteidl.admin.Project` with the Flyte deployment.
         """
@@ -844,6 +855,11 @@ def add_AdminServiceServicer_to_server(servicer, server):
                     servicer.GetNodeExecutionData,
                     request_deserializer=flyteidl_dot_admin_dot_node__execution__pb2.NodeExecutionGetDataRequest.FromString,
                     response_serializer=flyteidl_dot_admin_dot_node__execution__pb2.NodeExecutionGetDataResponse.SerializeToString,
+            ),
+            'GetDomains': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetDomains,
+                    request_deserializer=flyteidl_dot_admin_dot_project__pb2.GetDomainRequest.FromString,
+                    response_serializer=flyteidl_dot_admin_dot_project__pb2.Domains.SerializeToString,
             ),
             'RegisterProject': grpc.unary_unary_rpc_method_handler(
                     servicer.RegisterProject,
@@ -1465,6 +1481,23 @@ class AdminService(object):
         return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AdminService/GetNodeExecutionData',
             flyteidl_dot_admin_dot_node__execution__pb2.NodeExecutionGetDataRequest.SerializeToString,
             flyteidl_dot_admin_dot_node__execution__pb2.NodeExecutionGetDataResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetDomains(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AdminService/GetDomains',
+            flyteidl_dot_admin_dot_project__pb2.GetDomainRequest.SerializeToString,
+            flyteidl_dot_admin_dot_project__pb2.Domains.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 

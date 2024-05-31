@@ -48,6 +48,7 @@ const (
 	AdminService_ListNodeExecutions_FullMethodName            = "/flyteidl.service.AdminService/ListNodeExecutions"
 	AdminService_ListNodeExecutionsForTask_FullMethodName     = "/flyteidl.service.AdminService/ListNodeExecutionsForTask"
 	AdminService_GetNodeExecutionData_FullMethodName          = "/flyteidl.service.AdminService/GetNodeExecutionData"
+	AdminService_GetDomains_FullMethodName                    = "/flyteidl.service.AdminService/GetDomains"
 	AdminService_RegisterProject_FullMethodName               = "/flyteidl.service.AdminService/RegisterProject"
 	AdminService_UpdateProject_FullMethodName                 = "/flyteidl.service.AdminService/UpdateProject"
 	AdminService_GetProject_FullMethodName                    = "/flyteidl.service.AdminService/GetProject"
@@ -141,6 +142,7 @@ type AdminServiceClient interface {
 	ListNodeExecutionsForTask(ctx context.Context, in *admin.NodeExecutionForTaskListRequest, opts ...grpc.CallOption) (*admin.NodeExecutionList, error)
 	// Fetches input and output data for a :ref:`ref_flyteidl.admin.NodeExecution`.
 	GetNodeExecutionData(ctx context.Context, in *admin.NodeExecutionGetDataRequest, opts ...grpc.CallOption) (*admin.NodeExecutionGetDataResponse, error)
+	GetDomains(ctx context.Context, in *admin.GetDomainRequest, opts ...grpc.CallOption) (*admin.Domains, error)
 	// Registers a :ref:`ref_flyteidl.admin.Project` with the Flyte deployment.
 	RegisterProject(ctx context.Context, in *admin.ProjectRegisterRequest, opts ...grpc.CallOption) (*admin.ProjectRegisterResponse, error)
 	// Updates an existing :ref:`ref_flyteidl.admin.Project`
@@ -458,6 +460,15 @@ func (c *adminServiceClient) GetNodeExecutionData(ctx context.Context, in *admin
 	return out, nil
 }
 
+func (c *adminServiceClient) GetDomains(ctx context.Context, in *admin.GetDomainRequest, opts ...grpc.CallOption) (*admin.Domains, error) {
+	out := new(admin.Domains)
+	err := c.cc.Invoke(ctx, AdminService_GetDomains_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *adminServiceClient) RegisterProject(ctx context.Context, in *admin.ProjectRegisterRequest, opts ...grpc.CallOption) (*admin.ProjectRegisterResponse, error) {
 	out := new(admin.ProjectRegisterResponse)
 	err := c.cc.Invoke(ctx, AdminService_RegisterProject_FullMethodName, in, out, opts...)
@@ -765,6 +776,7 @@ type AdminServiceServer interface {
 	ListNodeExecutionsForTask(context.Context, *admin.NodeExecutionForTaskListRequest) (*admin.NodeExecutionList, error)
 	// Fetches input and output data for a :ref:`ref_flyteidl.admin.NodeExecution`.
 	GetNodeExecutionData(context.Context, *admin.NodeExecutionGetDataRequest) (*admin.NodeExecutionGetDataResponse, error)
+	GetDomains(context.Context, *admin.GetDomainRequest) (*admin.Domains, error)
 	// Registers a :ref:`ref_flyteidl.admin.Project` with the Flyte deployment.
 	RegisterProject(context.Context, *admin.ProjectRegisterRequest) (*admin.ProjectRegisterResponse, error)
 	// Updates an existing :ref:`ref_flyteidl.admin.Project`
@@ -909,6 +921,9 @@ func (UnimplementedAdminServiceServer) ListNodeExecutionsForTask(context.Context
 }
 func (UnimplementedAdminServiceServer) GetNodeExecutionData(context.Context, *admin.NodeExecutionGetDataRequest) (*admin.NodeExecutionGetDataResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetNodeExecutionData not implemented")
+}
+func (UnimplementedAdminServiceServer) GetDomains(context.Context, *admin.GetDomainRequest) (*admin.Domains, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetDomains not implemented")
 }
 func (UnimplementedAdminServiceServer) RegisterProject(context.Context, *admin.ProjectRegisterRequest) (*admin.ProjectRegisterResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RegisterProject not implemented")
@@ -1503,6 +1518,24 @@ func _AdminService_GetNodeExecutionData_Handler(srv interface{}, ctx context.Con
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AdminServiceServer).GetNodeExecutionData(ctx, req.(*admin.NodeExecutionGetDataRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AdminService_GetDomains_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(admin.GetDomainRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdminServiceServer).GetDomains(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AdminService_GetDomains_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdminServiceServer).GetDomains(ctx, req.(*admin.GetDomainRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -2111,6 +2144,10 @@ var AdminService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetNodeExecutionData",
 			Handler:    _AdminService_GetNodeExecutionData_Handler,
+		},
+		{
+			MethodName: "GetDomains",
+			Handler:    _AdminService_GetDomains_Handler,
 		},
 		{
 			MethodName: "RegisterProject",
