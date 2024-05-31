@@ -188,7 +188,7 @@ func NewClientCredentialsTokenSourceProvider(ctx context.Context, cfg *Config, s
 	}
 	secret = strings.TrimSpace(secret)
 	if tokenCache == nil {
-		tokenCache = &cache.TokenCacheInMemoryProvider{}
+		tokenCache = cache.NewTokenCacheInMemoryProvider()
 	}
 	return ClientCredentialsTokenSourceProvider{
 		ccConfig: clientcredentials.Config{
@@ -227,14 +227,14 @@ func (s *customTokenSource) Token() (*oauth2.Token, error) {
 
 	token, err := s.new.Token()
 	if err != nil {
-		logger.Warnf(s.ctx, "failed to get token: %w", err)
+		logger.Warnf(s.ctx, "failed to get token: %v", err)
 		return nil, fmt.Errorf("failed to get token: %w", err)
 	}
 	logger.Infof(s.ctx, "retrieved token with expiry %v", token.Expiry)
 
 	err = s.tokenCache.SaveToken(token)
 	if err != nil {
-		logger.Warnf(s.ctx, "failed to cache token: %w", err)
+		logger.Warnf(s.ctx, "failed to cache token: %v", err)
 	}
 
 	return token, nil
