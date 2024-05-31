@@ -69,4 +69,7 @@ func TestCompilePackage(t *testing.T) {
 	err = compileFromPackage("testdata/invalidworkflow.tgz")
 	assert.NotNil(t, err, "unable to handle invalid workflow")
 
+	// testing workflows with launchplans used within workflow
+	err = compileFromPackage("testdata/launchplan-in-wf.tgz")
+	assert.Nil(t, err, "unable to compile workflow with launchplans used within workflow")
 }
