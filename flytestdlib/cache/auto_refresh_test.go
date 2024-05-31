@@ -84,13 +84,13 @@ func TestCacheFour(t *testing.T) {
 			assert.NoError(t, err)
 		}
 
-		// Wait half a second for all resync periods to complete
-		time.Sleep(500 * time.Millisecond)
-		for i := 1; i <= 10; i++ {
-			item, err := cache.Get(fmt.Sprintf("%d", i))
-			assert.NoError(t, err)
-			assert.Equal(t, 10, item.(fakeCacheItem).val)
-		}
+		assert.EventuallyWithT(t, func(c *assert.CollectT) {
+			for i := 1; i <= 10; i++ {
+				item, err := cache.Get(fmt.Sprintf("%d", i))
+				assert.NoError(c, err)
+				assert.Equal(c, 10, item.(fakeCacheItem).val)
+			}
+		}, 3*time.Second, 100*time.Millisecond)
 		cancel()
 	})
 
