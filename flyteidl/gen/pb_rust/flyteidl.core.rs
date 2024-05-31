@@ -1063,14 +1063,17 @@ pub mod secret {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Connection {
+    /// The task type that the connection is used for.
+    #[prost(string, tag="1")]
+    pub task_type: ::prost::alloc::string::String,
     /// The credentials to use for the connection, such as API keys, OAuth2 tokens, etc.
     /// The key is the name of the secret, and it's defined in the flytekit.
     /// flytekit uses the key to locate the desired secret within the map.
-    #[prost(map="string, string", tag="1")]
+    #[prost(map="string, string", tag="2")]
     pub secrets: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
     /// The configuration to use for the connection, such as the endpoint, account name, etc.
     /// The key is the name of the config, and it's defined in the flytekit.
-    #[prost(map="string, string", tag="2")]
+    #[prost(map="string, string", tag="3")]
     pub configs: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
 }
 /// OAuth2Client encapsulates OAuth2 Client Credentials to be used when making calls on behalf of that task.

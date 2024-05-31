@@ -17152,6 +17152,7 @@
                  * Properties of a Connection.
                  * @memberof flyteidl.core
                  * @interface IConnection
+                 * @property {string|null} [taskType] Connection taskType
                  * @property {Object.<string,string>|null} [secrets] Connection secrets
                  * @property {Object.<string,string>|null} [configs] Connection configs
                  */
@@ -17172,6 +17173,14 @@
                             if (properties[keys[i]] != null)
                                 this[keys[i]] = properties[keys[i]];
                 }
+    
+                /**
+                 * Connection taskType.
+                 * @member {string} taskType
+                 * @memberof flyteidl.core.Connection
+                 * @instance
+                 */
+                Connection.prototype.taskType = "";
     
                 /**
                  * Connection secrets.
@@ -17213,12 +17222,14 @@
                 Connection.encode = function encode(message, writer) {
                     if (!writer)
                         writer = $Writer.create();
+                    if (message.taskType != null && message.hasOwnProperty("taskType"))
+                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.taskType);
                     if (message.secrets != null && message.hasOwnProperty("secrets"))
                         for (var keys = Object.keys(message.secrets), i = 0; i < keys.length; ++i)
-                            writer.uint32(/* id 1, wireType 2 =*/10).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]).uint32(/* id 2, wireType 2 =*/18).string(message.secrets[keys[i]]).ldelim();
+                            writer.uint32(/* id 2, wireType 2 =*/18).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]).uint32(/* id 2, wireType 2 =*/18).string(message.secrets[keys[i]]).ldelim();
                     if (message.configs != null && message.hasOwnProperty("configs"))
                         for (var keys = Object.keys(message.configs), i = 0; i < keys.length; ++i)
-                            writer.uint32(/* id 2, wireType 2 =*/18).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]).uint32(/* id 2, wireType 2 =*/18).string(message.configs[keys[i]]).ldelim();
+                            writer.uint32(/* id 3, wireType 2 =*/26).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]).uint32(/* id 2, wireType 2 =*/18).string(message.configs[keys[i]]).ldelim();
                     return writer;
                 };
     
@@ -17241,6 +17252,9 @@
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
                         case 1:
+                            message.taskType = reader.string();
+                            break;
+                        case 2:
                             reader.skip().pos++;
                             if (message.secrets === $util.emptyObject)
                                 message.secrets = {};
@@ -17248,7 +17262,7 @@
                             reader.pos++;
                             message.secrets[key] = reader.string();
                             break;
-                        case 2:
+                        case 3:
                             reader.skip().pos++;
                             if (message.configs === $util.emptyObject)
                                 message.configs = {};
@@ -17275,6 +17289,9 @@
                 Connection.verify = function verify(message) {
                     if (typeof message !== "object" || message === null)
                         return "object expected";
+                    if (message.taskType != null && message.hasOwnProperty("taskType"))
+                        if (!$util.isString(message.taskType))
+                            return "taskType: string expected";
                     if (message.secrets != null && message.hasOwnProperty("secrets")) {
                         if (!$util.isObject(message.secrets))
                             return "secrets: object expected";

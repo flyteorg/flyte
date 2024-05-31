@@ -123,11 +123,18 @@ proto3.util.setEnumType(Secret_MountType, "flyteidl.core.Secret.MountType", [
  */
 export class Connection extends Message<Connection> {
   /**
+   * The task type that the connection is used for.
+   *
+   * @generated from field: string task_type = 1;
+   */
+  taskType = "";
+
+  /**
    * The credentials to use for the connection, such as API keys, OAuth2 tokens, etc.
    * The key is the name of the secret, and it's defined in the flytekit.
    * flytekit uses the key to locate the desired secret within the map.
    *
-   * @generated from field: map<string, string> secrets = 1;
+   * @generated from field: map<string, string> secrets = 2;
    */
   secrets: { [key: string]: string } = {};
 
@@ -135,7 +142,7 @@ export class Connection extends Message<Connection> {
    * The configuration to use for the connection, such as the endpoint, account name, etc.
    * The key is the name of the config, and it's defined in the flytekit.
    *
-   * @generated from field: map<string, string> configs = 2;
+   * @generated from field: map<string, string> configs = 3;
    */
   configs: { [key: string]: string } = {};
 
@@ -147,8 +154,9 @@ export class Connection extends Message<Connection> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "flyteidl.core.Connection";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "secrets", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
-    { no: 2, name: "configs", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
+    { no: 1, name: "task_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "secrets", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
+    { no: 3, name: "configs", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Connection {

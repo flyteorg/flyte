@@ -6938,6 +6938,10 @@
     "coreConnection": {
       "type": "object",
       "properties": {
+        "task_type": {
+          "type": "string",
+          "description": "The task type that the connection is used for."
+        },
         "secrets": {
           "type": "object",
           "additionalProperties": {

@@ -7095,6 +7095,9 @@ export namespace flyteidl {
         /** Properties of a Connection. */
         interface IConnection {
 
+            /** Connection taskType */
+            taskType?: (string|null);
+
             /** Connection secrets */
             secrets?: ({ [k: string]: string }|null);
 
@@ -7110,6 +7113,9 @@ export namespace flyteidl {
              * @param [properties] Properties to set
              */
             constructor(properties?: flyteidl.core.IConnection);
+
+            /** Connection taskType. */
+            public taskType: string;
 
             /** Connection secrets. */
             public secrets: { [k: string]: string };
