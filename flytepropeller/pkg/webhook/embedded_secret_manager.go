@@ -20,7 +20,8 @@ const (
 	UnionSecretEnvVarPrefix                                     = "_UNION_"
 	SecretFieldSeparator                                        = "__"
 	ValueFormatter                                              = "%s"
-	SecretsStorageOrgPrefixFormat                               = "org" + SecretFieldSeparator + ValueFormatter
+	SecretsStorageUnionPrefix                                   = "u"
+	SecretsStorageOrgPrefixFormat                               = SecretsStorageUnionPrefix + SecretFieldSeparator + "org" + SecretFieldSeparator + ValueFormatter
 	SecretsStorageDomainPrefixFormat                            = SecretsStorageOrgPrefixFormat + SecretFieldSeparator + "domain" + SecretFieldSeparator + ValueFormatter
 	SecretsStorageProjectPrefixFormat                           = SecretsStorageDomainPrefixFormat + SecretFieldSeparator + "project" + SecretFieldSeparator + ValueFormatter
 	SecretsStorageFormat                                        = SecretsStorageProjectPrefixFormat + SecretFieldSeparator + "key" + SecretFieldSeparator + ValueFormatter
