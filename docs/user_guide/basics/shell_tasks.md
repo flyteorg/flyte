@@ -15,7 +15,7 @@ To clone and run the example code on this page, see the [Flytesnacks repo][flyte
 
 First, import the necessary libraries:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/shell_task.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/shell_task.py
 :caption: basics/shell_task.py
 :lines: 1-8
 ```
@@ -24,7 +24,7 @@ With the required imports in place, you can proceed to define a shell task.
 To create a shell task, provide a name for it, specify the bash script to be executed,
 and define inputs and outputs if needed:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/shell_task.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/shell_task.py
 :caption: basics/shell_task.py
 :lines: 13-55
 ```
@@ -40,21 +40,21 @@ Here's a breakdown of the parameters of the `ShellTask`:
 We define a task to instantiate `FlyteFile` and `FlyteDirectory`.
 A `.gitkeep` file is created in the FlyteDirectory as a placeholder to ensure the directory exists:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/shell_task.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/shell_task.py
 :caption: basics/shell_task.py
 :pyobject: create_entities
 ```
 
 We create a workflow to define the dependencies between the tasks:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/shell_task.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/shell_task.py
 :caption: basics/shell_task.py
 :pyobject: shell_task_wf
 ```
 
 You can run the workflow locally:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/shell_task.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/shell_task.py
 :caption: basics/shell_task.py
 :lines: 85-86
 ```

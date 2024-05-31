@@ -94,7 +94,7 @@ data:
     plugins:
       k8s:
         co-pilot:
-          image: cr.flyte.org/flyteorg/flytecopilot:v1.12.0
+          image: cr.flyte.org/flyteorg/flytecopilot:v1.12.1-rc0
           name: flyte-copilot-
           start-timeout: 30s
   core.yaml: | 
@@ -428,7 +428,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "30754d520f947609ef5d5093123c673af1437e3fedd2e55f9cb58ed457e8b79"
+        configChecksum: "045a4308f47bb9665d221d5d83667a7c9e05ca761134dc79fa8295dd8b611dd"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -454,7 +454,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: "cr.flyte.org/flyteorg/flytepropeller:v1.12.0"
+        image: "cr.flyte.org/flyteorg/flytepropeller:v1.12.1-rc0"
         imagePullPolicy: "IfNotPresent"
         name: flytepropeller
         ports:
@@ -508,9 +508,9 @@ spec:
       labels:
         app: flyte-pod-webhook
         app.kubernetes.io/name: flyte-pod-webhook
-        app.kubernetes.io/version: v1.12.0
+        app.kubernetes.io/version: v1.12.1-rc0
       annotations:
-        configChecksum: "30754d520f947609ef5d5093123c673af1437e3fedd2e55f9cb58ed457e8b79"
+        configChecksum: "045a4308f47bb9665d221d5d83667a7c9e05ca761134dc79fa8295dd8b611dd"
     spec:
       securityContext: 
         fsGroup: 65534
@@ -522,7 +522,7 @@ spec:
       serviceAccountName: flyte-pod-webhook
       initContainers:
       - name: generate-secrets
-        image: "cr.flyte.org/flyteorg/flytepropeller:v1.12.0"
+        image: "cr.flyte.org/flyteorg/flytepropeller:v1.12.1-rc0"
         imagePullPolicy: "IfNotPresent"
         command:
           - flytepropeller
@@ -549,7 +549,7 @@ spec:
             mountPath: /etc/flyte/config
       containers:
         - name: webhook
-          image: "cr.flyte.org/flyteorg/flytepropeller:v1.12.0"
+          image: "cr.flyte.org/flyteorg/flytepropeller:v1.12.1-rc0"
           imagePullPolicy: "IfNotPresent"
           command:
             - flytepropeller
