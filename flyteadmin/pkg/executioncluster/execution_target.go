@@ -5,18 +5,20 @@ import (
 	restclient "k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	flyteclient "github.com/flyteorg/flyte/flytepropeller/pkg/client/clientset/versioned"
 	"github.com/flyteorg/flyte/flytestdlib/random"
 )
 
 // Spec to determine the execution target
 type ExecutionTargetSpec struct {
-	TargetID    string
-	ExecutionID string
-	Project     string
-	Domain      string
-	Workflow    string
-	LaunchPlan  string
+	TargetID              string
+	ExecutionID           string
+	Project               string
+	Domain                string
+	Workflow              string
+	LaunchPlan            string
+	ExecutionClusterLabel *admin.ExecutionClusterLabel
 }
 
 // Client object of the target execution cluster

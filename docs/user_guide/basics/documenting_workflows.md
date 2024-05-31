@@ -1,22 +1,3 @@
----
-jupytext:
-  cell_metadata_filter: all
-  formats: md:myst
-  main_language: python
-  notebook_metadata_filter: all
-  text_representation:
-    extension: .md
-    format_name: myst
-    format_version: 0.13
-    jupytext_version: 1.16.1
-kernelspec:
-  display_name: Python 3
-  language: python
-  name: python3
----
-
-+++ {"lines_to_next_cell": 0}
-
 # Documenting workflows
 
 ```{eval-rst}
@@ -28,23 +9,23 @@ Flyte enables the use of docstrings to document your code.
 Docstrings are stored in [FlyteAdmin](https://docs.flyte.org/en/latest/concepts/admin.html)
 and displayed on the UI.
 
-To begin, import the relevant libraries.
-
-```{code-cell}
-from typing import Tuple
-
-from flytekit import workflow
+```{note}
+To clone and run the example code on this page, see the [Flytesnacks repo][flytesnacks].
 ```
 
-+++ {"lines_to_next_cell": 0}
+To begin, import the relevant libraries:
+
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/documenting_workflows.py
+:caption: basics/documenting_workflows.py
+:lines: 1-3
+```
 
 We import the `slope` and `intercept` tasks from the `workflow.py` file.
 
-```{code-cell}
-from .workflow import intercept, slope
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/documenting_workflows.py
+:caption: basics/documenting_workflows.py
+:lines: 6
 ```
-
-+++ {"lines_to_next_cell": 0}
 
 ## Sphinx-style docstring
 
@@ -54,25 +35,10 @@ The initial section of the docstring provides a concise overview of the workflow
 The subsequent section provides a comprehensive explanation.
 The last part of the docstring outlines the parameters and return type.
 
-```{code-cell}
-@workflow
-def sphinx_docstring_wf(x: list[int] = [-3, 0, 3], y: list[int] = [7, 4, -2]) -> Tuple[float, float]:
-    """
-    Slope and intercept of a regression line
-
-    This workflow accepts a list of coefficient pairs for a regression line.
-    It calculates both the slope and intercept of the regression line.
-
-    :param x: List of x-coefficients
-    :param y: List of y-coefficients
-    :return: Slope and intercept values
-    """
-    slope_value = slope(x=x, y=y)
-    intercept_value = intercept(x=x, y=y, slope=slope_value)
-    return slope_value, intercept_value
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/documenting_workflows.py
+:caption: basics/documenting_workflows.py
+:pyobject: sphinx_docstring_wf
 ```
-
-+++ {"lines_to_next_cell": 0}
 
 ## NumPy-style docstring
 
@@ -83,33 +49,10 @@ The next section offers a comprehensive description.
 The third section of the docstring details all parameters along with their respective data types.
 The final section of the docstring explains the return type and its associated data type.
 
-```{code-cell}
-@workflow
-def numpy_docstring_wf(x: list[int] = [-3, 0, 3], y: list[int] = [7, 4, -2]) -> Tuple[float, float]:
-    """
-    Slope and intercept of a regression line
-
-    This workflow accepts a list of coefficient pairs for a regression line.
-    It calculates both the slope and intercept of the regression line.
-
-    Parameters
-    ----------
-    x : list[int]
-        List of x-coefficients
-    y : list[int]
-        List of y-coefficients
-
-    Returns
-    -------
-    out : Tuple[float, float]
-        Slope and intercept values
-    """
-    slope_value = slope(x=x, y=y)
-    intercept_value = intercept(x=x, y=y, slope=slope_value)
-    return slope_value, intercept_value
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/documenting_workflows.py
+:caption: basics/documenting_workflows.py
+:pyobject: numpy_docstring_wf
 ```
-
-+++ {"lines_to_next_cell": 0}
 
 ## Google-style docstring
 
@@ -120,27 +63,9 @@ The subsequent section of the docstring provides an extensive explanation.
 The third segment of the docstring outlines the parameters and return type,
 including their respective data types.
 
-```{code-cell}
-:lines_to_next_cell: 2
-
-@workflow
-def google_docstring_wf(x: list[int] = [-3, 0, 3], y: list[int] = [7, 4, -2]) -> Tuple[float, float]:
-    """
-    Slope and intercept of a regression line
-
-    This workflow accepts a list of coefficient pairs for a regression line.
-    It calculates both the slope and intercept of the regression line.
-
-    Args:
-      x (list[int]): List of x-coefficients
-      y (list[int]): List of y-coefficients
-
-    Returns:
-      Tuple[float, float]: Slope and intercept values
-    """
-    slope_value = slope(x=x, y=y)
-    intercept_value = intercept(x=x, y=y, slope=slope_value)
-    return slope_value, intercept_value
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/documenting_workflows.py
+:caption: basics/documenting_workflows.py
+:pyobject: google_docstring_wf
 ```
 
 Here are two screenshots showcasing how the description appears on the UI:
@@ -155,3 +80,5 @@ Here are two screenshots showcasing how the description appears on the UI:
 :alt: Long description
 :class: with-shadow
 :::
+
+[flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/basics

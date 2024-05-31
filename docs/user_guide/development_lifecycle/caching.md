@@ -1,20 +1,3 @@
----
-jupytext:
-  cell_metadata_filter: all
-  formats: md:myst
-  main_language: python
-  notebook_metadata_filter: all
-  text_representation:
-    extension: .md
-    format_name: myst
-    format_version: 0.13
-    jupytext_version: 1.16.1
-kernelspec:
-  display_name: Python 3
-  language: python
-  name: python3
----
-
 # Caching
 
 ```{eval-rst}
@@ -29,33 +12,29 @@ Task caching is useful when a user knows that many executions with the same inpu
 - Running the code multiple times when debugging workflows
 - Running the commonly shared tasks amongst different workflows, which receive the same inputs
 
-Let's watch a brief explanation of caching and a demo in this video, followed by how task caching can be enabled .
+Let's watch a brief explanation of caching and a demo in this video, followed by how task caching can be enabled.
 
 ```{eval-rst}
 .. youtube:: WNkThCp-gqo
 
 ```
 
-+++ {"lines_to_next_cell": 0}
-
-Import the necessary libraries.
-
-```{code-cell}
-import time
-
-import pandas
+```{note}
+To clone and run the example code on this page, see the [Flytesnacks repo][flytesnacks].
 ```
 
-+++ {"lines_to_next_cell": 0}
+Import the necessary libraries:
+
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/development_lifecycle/development_lifecycle/task_cache.py
+:caption: development_lifecycle/task_cache.py
+:lines: 1-3
+```
 
 For any {py:func}`flytekit.task` in Flyte, there is always one required import, which is:
 
-```{code-cell}
-:lines_to_next_cell: 1
-
-from flytekit import HashMethod, task, workflow
-from flytekit.core.node_creation import create_node
-from typing_extensions import Annotated
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/development_lifecycle/development_lifecycle/task_cache.py
+:caption: development_lifecycle/task_cache.py
+:lines: 8-10
 ```
 
 Task caching is disabled by default to avoid unintended consequences of caching tasks with side effects. To enable caching and control its behavior, use the `cache` and `cache_version` parameters when constructing a task.
@@ -64,25 +43,13 @@ Task caching is disabled by default to avoid unintended consequences of caching 
 Bumping the `cache_version` is akin to invalidating the cache.
 You can manually update this version and Flyte caches the next execution instead of relying on the old cache.
 
-```{code-cell}
-@task(cache=True, cache_version="1.0")  # noqa: F841
-def square(n: int) -> int:
-    """
-     Parameters:
-        n (int): name of the parameter for the task will be derived from the name of the input variable.
-                 The type will be automatically deduced to ``Types.Integer``.
-
-    Return:
-        int: The label for the output will be automatically assigned, and the type will be deduced from the annotation.
-
-    """
-    return n * n
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/development_lifecycle/development_lifecycle/task_cache.py
+:caption: development_lifecycle/task_cache.py
+:pyobject: square
 ```
 
 In the above example, calling `square(n=2)` twice (even if it's across different executions or different workflows) will only execute the multiplication operation once.
 The next time, the output will be made available immediately since it is captured from the previous execution with the same inputs.
-
-+++
 
 If in a subsequent code update, you update the signature of the task to return the original number along with the result, it'll automatically invalidate the cache (even though the cache version remains the same).
 
@@ -91,8 +58,6 @@ If in a subsequent code update, you update the signature of the task to return t
 def square(n: int) -> Tuple[int, int]:
     ...
 ```
-
-+++
 
 :::{note}
 If the user changes the task interface in any way (such as adding, removing, or editing inputs/outputs), Flyte treats that as a task functionality change. In the subsequent execution, Flyte runs the task and stores the outputs as newly cached values.
@@ -126,6 +91,7 @@ Task executions can be cached across different versions of the task because a ch
 The flytekit package uses the [diskcache](https://github.com/grantjenks/python-diskcache) package, specifically [diskcache.Cache](http://www.grantjenks.com/docs/diskcache/tutorial.html#cache), to aid in the memoization of task executions. The results of local task executions are stored under `~/.flyte/local-cache/` and cache keys are composed of **Cache Version**, **Task Signature**, and **Task Input Values**.
 
 Similar to the remote case, a local cache entry for a task will be invalidated if either the `cache_version` or the task signature is modified. In addition, the local cache can also be emptied by running the following command: `pyflyte local-cache clear`, which essentially obliterates the contents of the `~/.flyte/local-cache/` directory.
+To disable the local cache, you can set the `local.cache_enabled` config option (e.g. by setting the environment variable `FLYTE_LOCAL_CACHE_ENABLED=False`).
 
 :::{note}
 The format used by the store is opaque and not meant to be inspectable.
@@ -137,52 +103,18 @@ The format used by the store is opaque and not meant to be inspectable.
 
 The default behavior displayed by Flyte's memoization feature might not match the user intuition. For example, this code makes use of pandas dataframes:
 
-```{code-cell}
-@task
-def foo(a: int, b: str) -> pandas.DataFrame:
-    df = pandas.DataFrame(...)
-    ...
-    return df
-
-
-@task(cache=True, cache_version="1.0")
-def bar(df: pandas.DataFrame) -> int:
-    ...
-
-
-@workflow
-def wf(a: int, b: str):
-    df = foo(a=a, b=b)
-    v = bar(df=df)  # noqa: F841
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/development_lifecycle/development_lifecycle/task_cache.py
+:caption: development_lifecycle/task_cache.py
+:lines: 39-54
 ```
 
 If run twice with the same inputs, one would expect that `bar` would trigger a cache hit, but it turns out that's not the case because of how dataframes are represented in Flyte.
 However, with release 1.2.0, Flyte provides a new way to control memoization behavior of literals. This is done via a `typing.Annotated` call on the task signature.
 For example, in order to cache the result of calls to `bar`, you can rewrite the code above like this:
 
-```{code-cell}
-def hash_pandas_dataframe(df: pandas.DataFrame) -> str:
-    return str(pandas.util.hash_pandas_object(df))
-
-
-@task
-def foo_1(  # noqa: F811
-    a: int, b: str  # noqa: F821
-) -> Annotated[pandas.DataFrame, HashMethod(hash_pandas_dataframe)]:  # noqa: F821  # noqa: F821
-    df = pandas.DataFrame(...)  # noqa: F821
-    ...
-    return df
-
-
-@task(cache=True, cache_version="1.0")  # noqa: F811
-def bar_1(df: pandas.DataFrame) -> int:  # noqa: F811
-    ...  # noqa: F811
-
-
-@workflow
-def wf_1(a: int, b: str):  # noqa: F811
-    df = foo(a=a, b=b)  # noqa: F811
-    v = bar(df=df)  # noqa: F841
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/development_lifecycle/development_lifecycle/task_cache.py
+:caption: development_lifecycle/task_cache.py
+:lines: 64-85
 ```
 
 Note how the output of task `foo` is annotated with an object of type `HashMethod`. Essentially, it represents a function that produces a hash that is used as part of the cache key calculation in calling the task `bar`.
@@ -194,47 +126,11 @@ This is done by turning the literal representation into a string and using that 
 
 This feature also works in local execution.
 
-+++
-
 Here's a complete example of the feature:
 
-```{code-cell}
-def hash_pandas_dataframe(df: pandas.DataFrame) -> str:
-    return str(pandas.util.hash_pandas_object(df))
-
-
-@task
-def uncached_data_reading_task() -> Annotated[pandas.DataFrame, HashMethod(hash_pandas_dataframe)]:
-    return pandas.DataFrame({"column_1": [1, 2, 3]})
-
-
-@task(cache=True, cache_version="1.0")
-def cached_data_processing_task(df: pandas.DataFrame) -> pandas.DataFrame:
-    time.sleep(1)
-    return df * 2
-
-
-@task
-def compare_dataframes(df1: pandas.DataFrame, df2: pandas.DataFrame):
-    assert df1.equals(df2)
-
-
-@workflow
-def cached_dataframe_wf():
-    raw_data = uncached_data_reading_task()
-
-    # Execute `cached_data_processing_task` twice, but force those
-    # two executions to happen serially to demonstrate how the second run
-    # hits the cache.
-    t1_node = create_node(cached_data_processing_task, df=raw_data)
-    t2_node = create_node(cached_data_processing_task, df=raw_data)
-    t1_node >> t2_node
-
-    # Confirm that the dataframes actually match
-    compare_dataframes(df1=t1_node.o0, df2=t2_node.o0)
-
-
-if __name__ == "__main__":
-    df1 = cached_dataframe_wf()
-    print(f"Running cached_dataframe_wf once : {df1}")
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/development_lifecycle/development_lifecycle/task_cache.py
+:caption: development_lifecycle/task_cache.py
+:lines: 97-134
 ```
+
+[flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/development_lifecycle/

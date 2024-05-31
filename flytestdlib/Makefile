@@ -1,5 +1,6 @@
 export REPOSITORY=flytestdlib
-include boilerplate/flyte/golang_test_targets/Makefile
+export REPO_ROOT=..
+include ../boilerplate/flyte/golang_test_targets/Makefile
 
 .PHONY: update_boilerplate
 update_boilerplate:
@@ -28,7 +29,3 @@ compile:
 .PHONY: test_unit_codecov
 test_unit_codecov:
 	go test ./... -race -coverprofile=coverage.txt -covermode=atomic
-
-.PHONY: go-tidy
-go-tidy:
-	go mod tidy

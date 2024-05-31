@@ -141,7 +141,7 @@ func (d dynamicNodeTaskNodeHandler) handleDynamicSubNodes(ctx context.Context, n
 		// These outputPaths only reads the output metadata. So the sandbox is completely optional here and hence it is nil.
 		// The sandbox creation as it uses hashing can be expensive and we skip that expense.
 		outputPaths := ioutils.NewReadOnlyOutputFilePaths(ctx, nCtx.DataStore(), nCtx.NodeStatus().GetOutputDir())
-		outputReader := ioutils.NewRemoteFileOutputReader(ctx, nCtx.DataStore(), outputPaths, nCtx.MaxDatasetSizeBytes())
+		outputReader := ioutils.NewRemoteFileOutputReader(ctx, nCtx.DataStore(), outputPaths, 0)
 		ee, err := d.TaskNodeHandler.ValidateOutput(ctx, nCtx.NodeID(), nCtx.InputReader(),
 			outputReader, nil, nCtx.ExecutionContext().GetExecutionConfig(), nCtx.TaskReader())
 

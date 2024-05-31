@@ -1,22 +1,3 @@
----
-jupytext:
-  cell_metadata_filter: all
-  formats: md:myst
-  main_language: python
-  notebook_metadata_filter: all
-  text_representation:
-    extension: .md
-    format_name: myst
-    format_version: 0.13
-    jupytext_version: 1.16.1
-kernelspec:
-  display_name: Python 3
-  language: python
-  name: python3
----
-
-+++ {"lines_to_next_cell": 0}
-
 (imperative_workflow)=
 
 # Imperative workflows
@@ -36,73 +17,67 @@ in textual form (perhaps during a transition from a legacy system).
 In such scenarios, you want to orchestrate these tasks.
 This is where Flyte's imperative workflows come into play, allowing you to programmatically construct workflows.
 
-To begin, import the necessary dependencies.
-
-```{code-cell}
-from flytekit import Workflow
+```{note}
+To clone and run the example code on this page, see the [Flytesnacks repo][flytesnacks].
 ```
 
-+++ {"lines_to_next_cell": 0}
+To begin, import the necessary dependencies:
 
-We import the `slope` and `intercept` tasks from the `workflow.py` file.
-
-```{code-cell}
-from .workflow import intercept, slope
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/imperative_workflow.py
+:caption: basics/imperative_workflow.py
+:lines: 1
 ```
 
-+++ {"lines_to_next_cell": 0}
+We import the `slope` and `intercept` tasks from the `workflow.py` file:
 
-Create an imperative workflow.
-
-```{code-cell}
-imperative_wf = Workflow(name="imperative_workflow")
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/imperative_workflow.py
+:caption: basics/imperative_workflow.py
+:lines: 4
 ```
 
-+++ {"lines_to_next_cell": 0}
+Create an imperative workflow:
 
-Add the workflow inputs to the imperative workflow.
-
-```{code-cell}
-imperative_wf.add_workflow_input("x", list[int])
-imperative_wf.add_workflow_input("y", list[int])
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/imperative_workflow.py
+:caption: basics/imperative_workflow.py
+:lines: 7
 ```
 
-+++ {"lines_to_next_cell": 0}
+Add the workflow inputs to the imperative workflow:
+
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/imperative_workflow.py
+:caption: basics/imperative_workflow.py
+:lines: 11-12
+```
 
 ::: {note}
 If you want to assign default values to the workflow inputs,
 you can create a {ref}`launch plan <launch_plan>`.
 :::
 
-Add the tasks that need to be triggered from within the workflow.
+Add the tasks that need to be triggered from within the workflow:
 
-```{code-cell}
-node_t1 = imperative_wf.add_entity(slope, x=imperative_wf.inputs["x"], y=imperative_wf.inputs["y"])
-node_t2 = imperative_wf.add_entity(
-    intercept, x=imperative_wf.inputs["x"], y=imperative_wf.inputs["y"], slope=node_t1.outputs["o0"]
-)
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/imperative_workflow.py
+:caption: basics/imperative_workflow.py
+:lines: 16-19
 ```
 
-+++ {"lines_to_next_cell": 0}
+Lastly, add the workflow output:
 
-Lastly, add the workflow output.
-
-```{code-cell}
-imperative_wf.add_workflow_output("wf_output", node_t2.outputs["o0"])
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/imperative_workflow.py
+:caption: basics/imperative_workflow.py
+:lines: 23
 ```
-
-+++ {"lines_to_next_cell": 0}
 
 You can execute the workflow locally as follows:
 
-```{code-cell}
-if __name__ == "__main__":
-    print(f"Running imperative_wf() {imperative_wf(x=[-3, 0, 3], y=[7, 4, -2])}")
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/imperative_workflow.py
+:caption: basics/imperative_workflow.py
+:lines: 27-28
 ```
 
 :::{note}
 You also have the option to provide a list of inputs and
-retrieve a list of outputs from the workflow.
+retrieve a list of outputs from the workflow:
 
 ```python
 wf_input_y = imperative_wf.add_workflow_input("y", list[str])
@@ -117,3 +92,5 @@ wf.add_workflow_output(
 )
 ```
 :::
+
+[flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/basics/

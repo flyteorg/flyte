@@ -20,7 +20,7 @@ jobs:
       run:
         working-directory: ${{ inputs.component }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: arduino/setup-protoc@v1
         with:
           repo-token: ${{ secrets.FLYTE_BOT_PAT }}

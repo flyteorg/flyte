@@ -59,5 +59,6 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "remoteClusterConfig.endpoint"), defaultConfig.RemoteClusterConfig.Endpoint, " Remote K8s cluster endpoint")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "remoteClusterConfig.enabled"), defaultConfig.RemoteClusterConfig.Enabled, " Boolean flag to enable or disable")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "enableUsageStats"), defaultConfig.EnableUsageStats, "Enable usage stats for ray jobs. These stats are submitted to usage-stats.ray.io per https://docs.ray.io/en/latest/cluster/usage-stats.html")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "serviceAccount"), defaultConfig.ServiceAccount, "The k8s service account to run as")
 	return cmdFlags
 }

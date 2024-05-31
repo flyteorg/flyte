@@ -1,7 +1,8 @@
 export REPOSITORY=flytepropeller
-include boilerplate/flyte/docker_build/Makefile
-include boilerplate/flyte/golang_test_targets/Makefile
-include boilerplate/flyte/end2end/Makefile
+export REPO_ROOT=..
+include ../boilerplate/flyte/docker_build/Makefile
+include ../boilerplate/flyte/golang_test_targets/Makefile
+include ../boilerplate/flyte/end2end/Makefile
 
 .PHONY: update_boilerplate
 update_boilerplate:
@@ -59,7 +60,3 @@ clean:
 golden:
 	go test ./cmd/kubectl-flyte/cmd -update
 	go test ./pkg/compiler/test -update
-
-.PHONY: go-tidy
-go-tidy:
-	go mod tidy

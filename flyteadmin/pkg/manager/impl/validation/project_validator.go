@@ -31,6 +31,13 @@ func ValidateProjectRegisterRequest(request admin.ProjectRegisterRequest) error 
 	return ValidateProject(project)
 }
 
+func ValidateProjectGetRequest(request admin.ProjectGetRequest) error {
+	if err := ValidateEmptyStringField(request.Id, projectID); err != nil {
+		return err
+	}
+	return nil
+}
+
 func ValidateProject(project admin.Project) error {
 	if err := ValidateEmptyStringField(project.Id, projectID); err != nil {
 		return err

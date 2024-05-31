@@ -85,6 +85,9 @@ pub struct CreateUploadLocationResponse {
     /// ExpiresAt defines when will the signed URL expires.
     #[prost(message, optional, tag="3")]
     pub expires_at: ::core::option::Option<::prost_types::Timestamp>,
+    /// Data proxy generates these headers for client, and they have to add these headers to the request when uploading the file.
+    #[prost(map="string, string", tag="4")]
+    pub headers: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
 }
 /// CreateUploadLocationRequest specified request for the CreateUploadLocation API.
 /// The implementation in data proxy service will create the s3 location with some server side configured prefixes,
@@ -122,6 +125,14 @@ pub struct CreateUploadLocationRequest {
     /// +optional
     #[prost(string, tag="6")]
     pub filename_root: ::prost::alloc::string::String,
+    /// If true, the data proxy will add content_md5 to the metadata to the signed URL and
+    /// it will force clients to add this metadata to the object.
+    /// This make sure dataproxy is backward compatible with the old flytekit.
+    #[prost(bool, tag="7")]
+    pub add_content_md5_metadata: bool,
+    /// Optional, org key applied to the resource.
+    #[prost(string, tag="8")]
+    pub org: ::prost::alloc::string::String,
 }
 /// CreateDownloadLocationRequest specified request for the CreateDownloadLocation API.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -397,4 +408,5 @@ pub struct UserInfoResponse {
     #[prost(message, optional, tag="8")]
     pub additional_claims: ::core::option::Option<::prost_types::Struct>,
 }
+include!("flyteidl.service.tonic.rs");
 // @@protoc_insertion_point(module)
