@@ -21,7 +21,7 @@ jobs:
         working-directory: ${{ inputs.component }}
     steps:
       - uses: actions/checkout@v4
-      - uses: arduino/setup-protoc@v1
+      - uses: arduino/setup-protoc@v3
         with:
           repo-token: ${{ secrets.FLYTE_BOT_PAT }}
       - uses: bufbuild/buf-setup-action@v1
