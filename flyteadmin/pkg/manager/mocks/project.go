@@ -6,12 +6,14 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
+type GetDomainsFunc func(ctx context.Context, request admin.GetDomainRequest) *admin.Domains
 type CreateProjectFunc func(ctx context.Context, request admin.ProjectRegisterRequest) (*admin.ProjectRegisterResponse, error)
 type ListProjectFunc func(ctx context.Context, request admin.ProjectListRequest) (*admin.Projects, error)
 type UpdateProjectFunc func(ctx context.Context, request admin.Project) (*admin.ProjectUpdateResponse, error)
 type GetProjectFunc func(ctx context.Context, request admin.ProjectGetRequest) (*admin.Project, error)
 
 type MockProjectManager struct {
+	getDomainsFunc    GetDomainsFunc
 	listProjectFunc   ListProjectFunc
 	createProjectFunc CreateProjectFunc
 	updateProjectFunc UpdateProjectFunc
@@ -20,6 +22,13 @@ type MockProjectManager struct {
 
 func (m *MockProjectManager) SetCreateProject(createProjectFunc CreateProjectFunc) {
 	m.createProjectFunc = createProjectFunc
+}
+
+func (manager *MockProjectManager) GetDomains(ctx context.Context, request admin.GetDomainRequest) *admin.Domains {
+	if manager.getDomainsFunc != nil {
+		return manager.getDomainsFunc(ctx, request)
+	}
+	return nil
 }
 
 func (m *MockProjectManager) CreateProject(ctx context.Context, request admin.ProjectRegisterRequest) (*admin.ProjectRegisterResponse, error) {
