@@ -90,7 +90,7 @@ To download manually, see the [flytectl releases](https://github.com/flyteorg/fl
 To use `curl`, on the command line, run the following:
 
 ```{warning}
-`jq <https://jqlang.github.io/jq>`_ is a dependency of this script.
+[jq](https://jqlang.github.io/jq>) is a dependency of this script.
 ```
 
 ```{prompt} bash $
