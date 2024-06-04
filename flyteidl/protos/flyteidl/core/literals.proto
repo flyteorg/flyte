@@ -77,6 +77,11 @@ message StructuredDataset {
     StructuredDatasetMetadata metadata = 2;
 }
 
+message Any {
+    Literal value = 1;
+    LiteralType type = 2;
+}
+
 message Scalar {
     oneof value {
         Primitive primitive = 1;
@@ -88,6 +93,7 @@ message Scalar {
         google.protobuf.Struct generic = 7;
         StructuredDataset structured_dataset = 8;
         Union union = 9;
+        Any any = 10;
     }
 }
 

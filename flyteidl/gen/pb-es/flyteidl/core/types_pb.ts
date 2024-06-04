@@ -487,6 +487,46 @@ export class UnionType extends Message<UnionType> {
 }
 
 /**
+ * @generated from message flyteidl.core.AnyType
+ */
+export class AnyType extends Message<AnyType> {
+  /**
+   * Any type is a special type that can be used to represent any type
+   * This is useful when the type is not known at compile time
+   *
+   * @generated from field: flyteidl.core.LiteralType type = 1;
+   */
+  type?: LiteralType;
+
+  constructor(data?: PartialMessage<AnyType>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.core.AnyType";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "type", kind: "message", T: LiteralType },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AnyType {
+    return new AnyType().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AnyType {
+    return new AnyType().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AnyType {
+    return new AnyType().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: AnyType | PlainMessage<AnyType> | undefined, b: AnyType | PlainMessage<AnyType> | undefined): boolean {
+    return proto3.util.equals(AnyType, a, b);
+  }
+}
+
+/**
  * Hints to improve type matching
  * e.g. allows distinguishing output from custom type transformers
  * even if the underlying IDL serialization matches.
@@ -655,6 +695,14 @@ export class LiteralType extends Message<LiteralType> {
      */
     value: UnionType;
     case: "unionType";
+  } | {
+    /**
+     * Any Type
+     *
+     * @generated from field: flyteidl.core.AnyType any_type = 12;
+     */
+    value: AnyType;
+    case: "anyType";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   /**
@@ -696,6 +744,7 @@ export class LiteralType extends Message<LiteralType> {
     { no: 7, name: "enum_type", kind: "message", T: EnumType, oneof: "type" },
     { no: 8, name: "structured_dataset_type", kind: "message", T: StructuredDatasetType, oneof: "type" },
     { no: 10, name: "union_type", kind: "message", T: UnionType, oneof: "type" },
+    { no: 12, name: "any_type", kind: "message", T: AnyType, oneof: "type" },
     { no: 6, name: "metadata", kind: "message", T: Struct },
     { no: 9, name: "annotation", kind: "message", T: TypeAnnotation },
     { no: 11, name: "structure", kind: "message", T: TypeStructure },
