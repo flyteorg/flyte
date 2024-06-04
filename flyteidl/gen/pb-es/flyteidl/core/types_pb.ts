@@ -61,6 +61,11 @@ export enum SimpleType {
    * @generated from enum value: STRUCT = 9;
    */
   STRUCT = 9,
+
+  /**
+   * @generated from enum value: ANY = 10;
+   */
+  ANY = 10,
 }
 // Retrieve enum metadata with: proto3.getEnumType(SimpleType)
 proto3.util.setEnumType(SimpleType, "flyteidl.core.SimpleType", [
@@ -74,6 +79,7 @@ proto3.util.setEnumType(SimpleType, "flyteidl.core.SimpleType", [
   { no: 7, name: "BINARY" },
   { no: 8, name: "ERROR" },
   { no: 9, name: "STRUCT" },
+  { no: 10, name: "ANY" },
 ]);
 
 /**

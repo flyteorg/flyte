@@ -58,6 +58,11 @@ message Union {
     LiteralType type = 2;
 }
 
+message Any {
+    Literal value = 1;
+    LiteralType type = 2;
+}
+
 message StructuredDatasetMetadata {
     // Bundle the type information along with the literal.
     // This is here because StructuredDatasets can often be more defined at run time than at compile time.
@@ -88,6 +93,7 @@ message Scalar {
         google.protobuf.Struct generic = 7;
         StructuredDataset structured_dataset = 8;
         Union union = 9;
+        Any any = 10;
     }
 }
 

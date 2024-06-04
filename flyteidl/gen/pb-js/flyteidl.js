@@ -4545,6 +4545,7 @@
              * @property {number} BINARY=7 BINARY value
              * @property {number} ERROR=8 ERROR value
              * @property {number} STRUCT=9 STRUCT value
+             * @property {number} ANY=10 ANY value
              */
             core.SimpleType = (function() {
                 var valuesById = {}, values = Object.create(valuesById);
@@ -4558,6 +4559,7 @@
                 values[valuesById[7] = "BINARY"] = 7;
                 values[valuesById[8] = "ERROR"] = 8;
                 values[valuesById[9] = "STRUCT"] = 9;
+                values[valuesById[10] = "ANY"] = 10;
                 return values;
             })();
     
@@ -6049,6 +6051,7 @@
                         case 7:
                         case 8:
                         case 9:
+                        case 10:
                             break;
                         }
                     }
@@ -7531,6 +7534,137 @@
                 return Union;
             })();
     
+            core.Any = (function() {
+    
+                /**
+                 * Properties of an Any.
+                 * @memberof flyteidl.core
+                 * @interface IAny
+                 * @property {flyteidl.core.ILiteral|null} [value] Any value
+                 * @property {flyteidl.core.ILiteralType|null} [type] Any type
+                 */
+    
+                /**
+                 * Constructs a new Any.
+                 * @memberof flyteidl.core
+                 * @classdesc Represents an Any.
+                 * @implements IAny
+                 * @constructor
+                 * @param {flyteidl.core.IAny=} [properties] Properties to set
+                 */
+                function Any(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * Any value.
+                 * @member {flyteidl.core.ILiteral|null|undefined} value
+                 * @memberof flyteidl.core.Any
+                 * @instance
+                 */
+                Any.prototype.value = null;
+    
+                /**
+                 * Any type.
+                 * @member {flyteidl.core.ILiteralType|null|undefined} type
+                 * @memberof flyteidl.core.Any
+                 * @instance
+                 */
+                Any.prototype.type = null;
+    
+                /**
+                 * Creates a new Any instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.core.Any
+                 * @static
+                 * @param {flyteidl.core.IAny=} [properties] Properties to set
+                 * @returns {flyteidl.core.Any} Any instance
+                 */
+                Any.create = function create(properties) {
+                    return new Any(properties);
+                };
+    
+                /**
+                 * Encodes the specified Any message. Does not implicitly {@link flyteidl.core.Any.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.core.Any
+                 * @static
+                 * @param {flyteidl.core.IAny} message Any message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                Any.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.value != null && message.hasOwnProperty("value"))
+                        $root.flyteidl.core.Literal.encode(message.value, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.type != null && message.hasOwnProperty("type"))
+                        $root.flyteidl.core.LiteralType.encode(message.type, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes an Any message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.core.Any
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.core.Any} Any
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                Any.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.Any();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.value = $root.flyteidl.core.Literal.decode(reader, reader.uint32());
+                            break;
+                        case 2:
+                            message.type = $root.flyteidl.core.LiteralType.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies an Any message.
+                 * @function verify
+                 * @memberof flyteidl.core.Any
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                Any.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.value != null && message.hasOwnProperty("value")) {
+                        var error = $root.flyteidl.core.Literal.verify(message.value);
+                        if (error)
+                            return "value." + error;
+                    }
+                    if (message.type != null && message.hasOwnProperty("type")) {
+                        var error = $root.flyteidl.core.LiteralType.verify(message.type);
+                        if (error)
+                            return "type." + error;
+                    }
+                    return null;
+                };
+    
+                return Any;
+            })();
+    
             core.StructuredDatasetMetadata = (function() {
     
                 /**
@@ -7787,6 +7921,7 @@
                  * @property {google.protobuf.IStruct|null} [generic] Scalar generic
                  * @property {flyteidl.core.IStructuredDataset|null} [structuredDataset] Scalar structuredDataset
                  * @property {flyteidl.core.IUnion|null} [union] Scalar union
+                 * @property {flyteidl.core.IAny|null} [any] Scalar any
                  */
     
                 /**
@@ -7876,17 +8011,25 @@
                  */
                 Scalar.prototype.union = null;
     
+                /**
+                 * Scalar any.
+                 * @member {flyteidl.core.IAny|null|undefined} any
+                 * @memberof flyteidl.core.Scalar
+                 * @instance
+                 */
+                Scalar.prototype.any = null;
+    
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
     
                 /**
                  * Scalar value.
-                 * @member {"primitive"|"blob"|"binary"|"schema"|"noneType"|"error"|"generic"|"structuredDataset"|"union"|undefined} value
+                 * @member {"primitive"|"blob"|"binary"|"schema"|"noneType"|"error"|"generic"|"structuredDataset"|"union"|"any"|undefined} value
                  * @memberof flyteidl.core.Scalar
                  * @instance
                  */
                 Object.defineProperty(Scalar.prototype, "value", {
-                    get: $util.oneOfGetter($oneOfFields = ["primitive", "blob", "binary", "schema", "noneType", "error", "generic", "structuredDataset", "union"]),
+                    get: $util.oneOfGetter($oneOfFields = ["primitive", "blob", "binary", "schema", "noneType", "error", "generic", "structuredDataset", "union", "any"]),
                     set: $util.oneOfSetter($oneOfFields)
                 });
     
@@ -7932,6 +8075,8 @@
                         $root.flyteidl.core.StructuredDataset.encode(message.structuredDataset, writer.uint32(/* id 8, wireType 2 =*/66).fork()).ldelim();
                     if (message.union != null && message.hasOwnProperty("union"))
                         $root.flyteidl.core.Union.encode(message.union, writer.uint32(/* id 9, wireType 2 =*/74).fork()).ldelim();
+                    if (message.any != null && message.hasOwnProperty("any"))
+                        $root.flyteidl.core.Any.encode(message.any, writer.uint32(/* id 10, wireType 2 =*/82).fork()).ldelim();
                     return writer;
                 };
     
@@ -7979,6 +8124,9 @@
                             break;
                         case 9:
                             message.union = $root.flyteidl.core.Union.decode(reader, reader.uint32());
+                            break;
+                        case 10:
+                            message.any = $root.flyteidl.core.Any.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -8086,6 +8234,16 @@
                             var error = $root.flyteidl.core.Union.verify(message.union);
                             if (error)
                                 return "union." + error;
+                        }
+                    }
+                    if (message.any != null && message.hasOwnProperty("any")) {
+                        if (properties.value === 1)
+                            return "value: multiple values";
+                        properties.value = 1;
+                        {
+                            var error = $root.flyteidl.core.Any.verify(message.any);
+                            if (error)
+                                return "any." + error;
                         }
                     }
                     return null;

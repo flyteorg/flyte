@@ -357,17 +357,12 @@ func getTypeChecker(t *flyte.LiteralType) typeChecker {
 }
 
 func isTypeAny(t *flyte.LiteralType) bool {
-	if t.GetMetadata() != nil {
-		if t.GetMetadata().GetFields() != nil {
-			pythonClassName := t.GetMetadata().GetFields()["python_class_name"]
-			if pythonClassName != nil {
-				if strVal, ok := pythonClassName.GetKind().(*structpb.Value_StringValue); ok && strVal.StringValue == "typing.Any" {
-					return true
-				}
-			}
-		}
+	switch t.GetType().(type) {
+	case *flyte.LiteralType_Simple:
+		return t.GetSimple() == flyte.SimpleType_ANY
+	default:
+		return false
 	}
-	return false
 }
 
 func AreTypesCastable(upstreamType *flyte.LiteralType, downstreamType *flyte.LiteralType) bool {
