@@ -42,7 +42,7 @@ func (m *ProjectManager) CreateProject(ctx context.Context, request admin.Projec
 	return &admin.ProjectRegisterResponse{}, nil
 }
 
-func (m *ProjectManager) getDomains() []*admin.Domain {
+func (m *ProjectManager) GetDomains(ctx context.Context, request admin.GetDomainRequest) *admin.Domains {
 	configDomains := m.config.ApplicationConfiguration().GetDomainsConfig()
 	var domains = make([]*admin.Domain, len(*configDomains))
 	for index, configDomain := range *configDomains {
@@ -51,12 +51,8 @@ func (m *ProjectManager) getDomains() []*admin.Domain {
 			Name: configDomain.Name,
 		}
 	}
-	return domains
-}
-
-func (m *ProjectManager) GetDomains(ctx context.Context, request admin.GetDomainRequest) *admin.Domains {
 	return &admin.Domains{
-		Domains: m.getDomains(),
+		Domains: domains,
 	}
 }
 
@@ -93,7 +89,7 @@ func (m *ProjectManager) ListProjects(ctx context.Context, request admin.Project
 	if err != nil {
 		return nil, err
 	}
-	projects := transformers.FromProjectModels(projectModels, m.getDomains())
+	projects := transformers.FromProjectModels(projectModels, m.GetDomains(ctx, admin.GetDomainRequest{}).Domains)
 
 	var token string
 	if len(projects) == int(request.Limit) {
@@ -140,7 +136,7 @@ func (m *ProjectManager) GetProject(ctx context.Context, request admin.ProjectGe
 	if err != nil {
 		return nil, err
 	}
-	projectResponse := transformers.FromProjectModel(projectModel, m.getDomains())
+	projectResponse := transformers.FromProjectModel(projectModel, m.GetDomains(ctx, admin.GetDomainRequest{}).Domains)
 
 	return &projectResponse, nil
 }
