@@ -24,9 +24,9 @@ func (m *MockProjectManager) SetCreateProject(createProjectFunc CreateProjectFun
 	m.createProjectFunc = createProjectFunc
 }
 
-func (manager *MockProjectManager) GetDomains(ctx context.Context, request admin.GetDomainRequest) *admin.Domains {
-	if manager.getDomainsFunc != nil {
-		return manager.getDomainsFunc(ctx, request)
+func (m *MockProjectManager) GetDomains(ctx context.Context, request admin.GetDomainRequest) *admin.Domains {
+	if m.getDomainsFunc != nil {
+		return m.getDomainsFunc(ctx, request)
 	}
 	return nil
 }
