@@ -357,12 +357,11 @@ func getTypeChecker(t *flyte.LiteralType) typeChecker {
 }
 
 func isTypeAny(t *flyte.LiteralType) bool {
-	switch t.GetType().(type) {
-	case *flyte.LiteralType_Simple:
-		return t.GetSimple() == flyte.SimpleType_ANY
-	default:
-		return false
+	if simpleType, ok := t.GetType().(*flyte.LiteralType_Simple); ok {
+		return simpleType.Simple == flyte.SimpleType_ANY
 	}
+
+	return false
 }
 
 func AreTypesCastable(upstreamType *flyte.LiteralType, downstreamType *flyte.LiteralType) bool {
