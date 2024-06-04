@@ -11,6 +11,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"google.golang.org/grpc"
 	v1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	idlcore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	flyteerrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
@@ -18,8 +19,10 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/template"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils/secrets"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 
@@ -104,52 +107,8 @@ func (p *Plugin) getExecutionEnv(ctx context.Context, tCtx core.TaskExecutionCon
 			return fastTaskEnvironment, nil
 		}
 
-		// create environment
-		environmentSpec := e.Spec
-
-		fastTaskEnvironmentSpec := &pb.FastTaskEnvironmentSpec{}
-		if err := utils.UnmarshalStruct(environmentSpec, fastTaskEnvironmentSpec); err != nil {
-			return nil, flyteerrors.Wrapf(flyteerrors.BadTaskSpecification, err, "failed to unmarshal environment spec")
-		}
-
-		// if podTemplateSpec is not popualated - then generate from tCtx
-		if len(fastTaskEnvironmentSpec.GetPodTemplateSpec()) == 0 {
-			podSpec, objectMeta, primaryContainerName, err := flytek8s.ToK8sPodSpec(ctx, tCtx)
-			if err != nil {
-				return nil, flyteerrors.Wrapf(flyteerrors.BadTaskSpecification, err, "failed to create environment")
-			}
-
-			podTemplateSpec := &v1.PodTemplateSpec{
-				ObjectMeta: *objectMeta,
-				Spec:       *podSpec,
-			}
-			podTemplateSpec.SetNamespace(tCtx.TaskExecutionMetadata().GetNamespace())
-
-			// need to marshal as JSON to maintain container resources, proto serialization does
-			// not persist these settings for `PodSpec`
-			podTemplateSpecBytes, err := json.Marshal(podTemplateSpec)
-			if err != nil {
-				return nil, flyteerrors.Wrapf(flyteerrors.BadTaskSpecification, err, "failed to marshal pod template spec")
-			}
-
-			fastTaskEnvironmentSpec.PodTemplateSpec = podTemplateSpecBytes
-			fastTaskEnvironmentSpec.PrimaryContainerName = primaryContainerName
-			if err := utils.MarshalStruct(fastTaskEnvironmentSpec, environmentSpec); err != nil {
-				return nil, fmt.Errorf("unable to marshal EnvironmentSpec [%v], Err: [%v]", fastTaskEnvironmentSpec, err.Error())
-			}
-		}
-
-		environment, err := executionEnvClient.Create(ctx, executionEnv.GetId(), environmentSpec)
-		if err != nil {
-			return nil, flyteerrors.Wrapf(flyteerrors.BadTaskSpecification, err, "failed to create environment")
-		}
-
-		fastTaskEnvironment := &pb.FastTaskEnvironment{}
-		if err := utils.UnmarshalStruct(environment, fastTaskEnvironment); err != nil {
-			return nil, flyteerrors.Wrapf(flyteerrors.BadTaskSpecification, err, "failed to unmarshal environment extant")
-		}
-
-		return fastTaskEnvironment, nil
+		// otherwise create the environment
+		return p.createExecutionEnv(ctx, tCtx, executionEnv.GetId(), e)
 	case *idlcore.ExecutionEnv_Extant:
 		fastTaskEnvironment := &pb.FastTaskEnvironment{}
 		if err := utils.UnmarshalStruct(e.Extant, fastTaskEnvironment); err != nil {
@@ -160,6 +119,91 @@ func (p *Plugin) getExecutionEnv(ctx context.Context, tCtx core.TaskExecutionCon
 	}
 
 	return nil, nil
+}
+
+func (p *Plugin) createExecutionEnv(ctx context.Context, tCtx core.TaskExecutionContext, envID string, envSpec *idlcore.ExecutionEnv_Spec) (*pb.FastTaskEnvironment, error) {
+	environmentSpec := envSpec.Spec
+
+	fastTaskEnvironmentSpec := &pb.FastTaskEnvironmentSpec{}
+	if err := utils.UnmarshalStruct(environmentSpec, fastTaskEnvironmentSpec); err != nil {
+		return nil, flyteerrors.Wrapf(flyteerrors.BadTaskSpecification, err, "failed to unmarshal environment spec")
+	}
+	var podTemplateSpec v1.PodTemplateSpec
+	if len(fastTaskEnvironmentSpec.GetPodTemplateSpec()) > 0 {
+		if err := json.Unmarshal(fastTaskEnvironmentSpec.GetPodTemplateSpec(), &podTemplateSpec); err != nil {
+			return nil, flyteerrors.Wrapf(flyteerrors.BadTaskSpecification, err, "failed to unmarshal pod template spec")
+		}
+	} else {
+		podSpec, objectMeta, primaryContainerName, err := flytek8s.ToK8sPodSpec(ctx, tCtx)
+		if err != nil {
+			return nil, flyteerrors.Wrapf(flyteerrors.BadTaskSpecification, err, "failed to create environment")
+		}
+
+		podTemplateSpec = v1.PodTemplateSpec{
+			ObjectMeta: *objectMeta,
+			Spec:       *podSpec,
+		}
+		fastTaskEnvironmentSpec.PrimaryContainerName = primaryContainerName
+	}
+	if err := p.addObjectMetadata(ctx, tCtx, &podTemplateSpec, config.GetK8sPluginConfig()); err != nil {
+		return nil, flyteerrors.Wrapf(flyteerrors.BadTaskSpecification, err, "failed to add object metadata")
+	}
+
+	// need to marshal as JSON to maintain container resources, proto serialization does
+	// not persist these settings for `PodSpec`
+	podTemplateSpecBytes, err := json.Marshal(podTemplateSpec)
+	if err != nil {
+		return nil, flyteerrors.Wrapf(flyteerrors.BadTaskSpecification, err, "failed to marshal pod template spec")
+	}
+
+	fastTaskEnvironmentSpec.PodTemplateSpec = podTemplateSpecBytes
+	if err := utils.MarshalStruct(fastTaskEnvironmentSpec, environmentSpec); err != nil {
+		return nil, flyteerrors.Wrapf(flyteerrors.BadTaskSpecification, err, "failed to marshal environment spec")
+	}
+
+	executionEnvClient := tCtx.GetExecutionEnvClient()
+	environment, err := executionEnvClient.Create(ctx, envID, environmentSpec)
+	if err != nil {
+		return nil, flyteerrors.Wrapf(flyteerrors.BadTaskSpecification, err, "failed to create environment")
+	}
+
+	fastTaskEnvironment := &pb.FastTaskEnvironment{}
+	if err := utils.UnmarshalStruct(environment, fastTaskEnvironment); err != nil {
+		return nil, flyteerrors.Wrapf(flyteerrors.BadTaskSpecification, err, "failed to unmarshal environment extant")
+	}
+
+	return fastTaskEnvironment, nil
+}
+
+func (p *Plugin) addObjectMetadata(ctx context.Context, tCtx core.TaskExecutionContext, spec *v1.PodTemplateSpec, cfg *config.K8sPluginConfig) error {
+	annotations := make(map[string]string)
+	labels := make(map[string]string)
+
+	tmpl, err := tCtx.TaskReader().Read(ctx)
+	if err != nil {
+		return flyteerrors.Wrapf(flyteerrors.BadTaskSpecification, err, "failed to read task template")
+	}
+	if len(tmpl.GetSecurityContext().GetSecrets()) > 0 {
+		secretsMap, err := secrets.MarshalSecretsToMapStrings(tmpl.GetSecurityContext().GetSecrets())
+		if err != nil {
+			return flyteerrors.Wrapf(flyteerrors.BadTaskSpecification, err, "failed to marshal secrets")
+		}
+		annotations = utils.UnionMaps(annotations, secretsMap)
+		labels[secrets.PodLabel] = secrets.PodLabelValue
+	}
+
+	spec.SetAnnotations(utils.UnionMaps(cfg.DefaultAnnotations, spec.GetAnnotations(), annotations))
+	spec.SetLabels(utils.UnionMaps(cfg.DefaultLabels, spec.GetLabels(), labels))
+	spec.SetNamespace(tCtx.TaskExecutionMetadata().GetNamespace())
+
+	// don't set owner references for fast tasks, as they are intended to outlive a single task execution
+	spec.SetOwnerReferences([]metav1.OwnerReference{})
+
+	if cfg.InjectFinalizer { // nolint: staticcheck
+		// TODO: add finalizer
+	}
+
+	return nil
 }
 
 // Handle is the main entrypoint for the plugin. It will offer the task to the worker pool and

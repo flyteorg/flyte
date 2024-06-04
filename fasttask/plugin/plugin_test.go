@@ -12,14 +12,17 @@ import (
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/protobuf/types/known/structpb"
 	v1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
 	idlcore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	coremocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	iomocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils/secrets"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 
 	"github.com/unionai/flyte/fasttask/plugin/mocks"
@@ -143,6 +146,27 @@ func TestGetExecutionEnv(t *testing.T) {
 		return specStruct
 	}
 
+	podTemplateSpec := &v1.PodTemplateSpec{
+		ObjectMeta: metav1.ObjectMeta{
+			Annotations: map[string]string{
+				"cluster-autoscaler.kubernetes.io/safe-to-evict": "false",
+			},
+			Labels: map[string]string{
+				"cluster-autoscaler.kubernetes.io/safe-to-evict": "false",
+			},
+			Namespace: "test-namespace",
+		},
+		Spec: v1.PodSpec{
+			Containers: []v1.Container{
+				{
+					Command: []string{"bar"},
+				},
+			},
+		},
+	}
+	podTemplateSpecBytes, err := json.Marshal(podTemplateSpec)
+	assert.Nil(t, err)
+
 	tests := []struct {
 		name                     string
 		fastTaskExtant           *pb.FastTaskEnvironment
@@ -165,12 +189,12 @@ func TestGetExecutionEnv(t *testing.T) {
 		{
 			name: "ExecutionSpecCreate",
 			fastTaskSpec: &pb.FastTaskEnvironmentSpec{
-				PodTemplateSpec: []byte("bar"),
+				PodTemplateSpec: podTemplateSpecBytes,
 			},
 			clientGetExists: false,
 			createExectionEnvMatcher: toFastTaskSpec(
 				&pb.FastTaskEnvironmentSpec{
-					PodTemplateSpec: []byte("bar"),
+					PodTemplateSpec: podTemplateSpecBytes,
 				},
 			),
 		},
@@ -204,10 +228,13 @@ func TestGetExecutionEnv(t *testing.T) {
 	outputReader.OnGetPreviousCheckpointsPrefix().Return("/prev")
 
 	taskMetadata := &coremocks.TaskExecutionMetadata{}
+	taskMetadata.OnGetAnnotations().Return(map[string]string{})
 	taskMetadata.OnGetEnvironmentVariables().Return(nil)
+	taskMetadata.OnGetLabels().Return(map[string]string{})
 	taskMetadata.OnGetK8sServiceAccount().Return("service-account")
 	taskMetadata.OnGetNamespace().Return("test-namespace")
 	taskMetadata.OnGetPlatformResources().Return(&v1.ResourceRequirements{})
+	taskMetadata.OnGetSecurityContext().Return(idlcore.SecurityContext{})
 	taskMetadata.OnIsInterruptible().Return(true)
 
 	taskExecutionID := &coremocks.TaskExecutionID{}
@@ -282,6 +309,59 @@ func TestGetExecutionEnv(t *testing.T) {
 			assert.True(t, proto.Equal(expectedExtant, fastTaskEnvironment))
 		})
 	}
+}
+
+func TestAddObjectMetadata(t *testing.T) {
+	ctx := context.Background()
+	scope := promutils.NewTestScope()
+	plugin := &Plugin{
+		metrics: newPluginMetrics(scope),
+	}
+
+	taskMetadata := &coremocks.TaskExecutionMetadata{}
+	taskMetadata.OnGetNamespace().Return("test-namespace")
+
+	taskReader := &coremocks.TaskReader{}
+	taskReader.OnRead(ctx).Return(&idlcore.TaskTemplate{
+		SecurityContext: &idlcore.SecurityContext{
+			Secrets: []*idlcore.Secret{
+				{
+					Group:            "my_group",
+					Key:              "my_key",
+					MountRequirement: idlcore.Secret_ENV_VAR,
+				},
+			},
+		},
+	}, nil)
+
+	tCtx := &coremocks.TaskExecutionContext{}
+	tCtx.OnTaskExecutionMetadata().Return(taskMetadata)
+	tCtx.OnTaskReader().Return(taskReader)
+
+	cfg := &config.K8sPluginConfig{
+		DefaultAnnotations: map[string]string{
+			"defaultAnnotation": "defaultAnnotation",
+		},
+		DefaultLabels: map[string]string{
+			"defaultLabel": "defaultLabel",
+		},
+	}
+
+	spec := &v1.PodTemplateSpec{}
+	err := plugin.addObjectMetadata(ctx, tCtx, spec, cfg)
+
+	assert.Nil(t, err)
+	assert.Equal(t, map[string]string{
+		"defaultAnnotation": "defaultAnnotation",
+		"flyte.secrets/s0":  "m4zg54lqhiqce2lzl4txe22voarau12fpe4caitnpfpwwzlzeifg122vnz1f53tfof1ws3tfnvsw34b1ebcu3vs6kzavecq",
+	}, spec.GetAnnotations())
+	assert.Equal(t, map[string]string{
+		secrets.PodLabel: secrets.PodLabelValue,
+		"defaultLabel":   "defaultLabel",
+	}, spec.GetLabels())
+	assert.Equal(t, "test-namespace", spec.GetNamespace())
+	assert.Len(t, spec.GetOwnerReferences(), 0)
+	assert.Len(t, spec.GetFinalizers(), 0)
 }
 
 func TestHandleNotYetStarted(t *testing.T) {
