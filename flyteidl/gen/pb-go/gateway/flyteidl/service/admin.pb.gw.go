@@ -8637,7 +8637,7 @@ func local_request_AdminService_GetTaskExecutionData_0(ctx context.Context, mars
 }
 
 var (
-	filter_AdminService_GetTaskExecutionData_1 = &utilities.DoubleArray{Encoding: map[string]int{"id": 0, "node_execution_id": 1, "execution_id": 2, "org": 3, "project": 4, "domain": 5, "name": 6, "node_id": 7, "nodeId": 8, "task_id": 9, "version": 10, "retry_attempt": 11, "retryAttempt": 12}, Base: []int{1, 29, 1, 5, 29, 31, 33, 35, 1, 36, 10, 37, 11, 38, 0, 3, 0, 16, 14, 7, 0, 20, 17, 11, 0, 19, 14, 0, 25, 17, 0, 27, 20, 0, 29, 23, 0, 28, 26, 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, Check: []int{0, 1, 2, 3, 1, 1, 1, 1, 4, 1, 2, 1, 11, 1, 9, 13, 16, 2, 18, 19, 20, 2, 22, 23, 24, 2, 26, 27, 2, 29, 30, 2, 32, 33, 2, 35, 36, 2, 38, 39, 2, 41, 5, 6, 6, 7, 7, 8, 8, 10, 12, 14}}
+	filter_AdminService_GetTaskExecutionData_1 = &utilities.DoubleArray{Encoding: map[string]int{"id": 0, "node_execution_id": 1, "execution_id": 2, "org": 3, "task_id": 4, "project": 5, "domain": 6, "name": 7, "node_id": 8, "nodeId": 9, "version": 10, "retry_attempt": 11, "retryAttempt": 12}, Base: []int{1, 32, 1, 2, 33, 1, 35, 37, 39, 10, 40, 41, 10, 42, 0, 3, 0, 16, 13, 7, 0, 20, 16, 11, 0, 18, 14, 0, 26, 17, 0, 27, 20, 0, 29, 23, 0, 31, 26, 0, 31, 29, 0, 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, Check: []int{0, 1, 2, 3, 1, 4, 1, 1, 1, 2, 1, 1, 10, 1, 6, 13, 16, 2, 18, 19, 20, 2, 22, 23, 24, 2, 26, 27, 2, 29, 30, 2, 32, 33, 2, 35, 36, 2, 38, 39, 2, 41, 42, 2, 44, 5, 5, 7, 7, 8, 8, 9, 9, 11, 12, 14}}
 )
 
 func request_AdminService_GetTaskExecutionData_1(ctx context.Context, marshaler runtime.Marshaler, client extService.AdminServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -8659,6 +8659,16 @@ func request_AdminService_GetTaskExecutionData_1(ctx context.Context, marshaler 
 	err = runtime.PopulateFieldFromPath(&protoReq, "id.node_execution_id.execution_id.org", val)
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id.node_execution_id.execution_id.org", err)
+	}
+
+	val, ok = pathParams["id.task_id.org"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id.task_id.org")
+	}
+
+	err = runtime.PopulateFieldFromPath(&protoReq, "id.task_id.org", val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id.task_id.org", err)
 	}
 
 	val, ok = pathParams["id.node_execution_id.execution_id.project"]
@@ -8782,6 +8792,16 @@ func local_request_AdminService_GetTaskExecutionData_1(ctx context.Context, mars
 	err = runtime.PopulateFieldFromPath(&protoReq, "id.node_execution_id.execution_id.org", val)
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id.node_execution_id.execution_id.org", err)
+	}
+
+	val, ok = pathParams["id.task_id.org"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id.task_id.org")
+	}
+
+	err = runtime.PopulateFieldFromPath(&protoReq, "id.task_id.org", val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id.task_id.org", err)
 	}
 
 	val, ok = pathParams["id.node_execution_id.execution_id.project"]
@@ -15731,7 +15751,7 @@ func RegisterAdminServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flyteidl.service.AdminService/GetTaskExecutionData", runtime.WithHTTPPathPattern("/api/v1/org/data/task_executions/{id.node_execution_id.execution_id.org}/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flyteidl.service.AdminService/GetTaskExecutionData", runtime.WithHTTPPathPattern("/api/v1/org/data/task_executions/{id.node_execution_id.execution_id.org}/{id.task_id.org}/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -18702,7 +18722,7 @@ func RegisterAdminServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl.service.AdminService/GetTaskExecutionData", runtime.WithHTTPPathPattern("/api/v1/org/data/task_executions/{id.node_execution_id.execution_id.org}/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl.service.AdminService/GetTaskExecutionData", runtime.WithHTTPPathPattern("/api/v1/org/data/task_executions/{id.node_execution_id.execution_id.org}/{id.task_id.org}/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -19874,7 +19894,7 @@ var (
 
 	pattern_AdminService_GetTaskExecutionData_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8, 1, 0, 4, 1, 5, 9, 1, 0, 4, 1, 5, 10, 1, 0, 4, 1, 5, 11, 1, 0, 4, 1, 5, 12}, []string{"api", "v1", "data", "task_executions", "id.node_execution_id.execution_id.project", "id.node_execution_id.execution_id.domain", "id.node_execution_id.execution_id.name", "id.node_execution_id.node_id", "id.task_id.project", "id.task_id.domain", "id.task_id.name", "id.task_id.version", "id.retry_attempt"}, ""))
 
-	pattern_AdminService_GetTaskExecutionData_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8, 1, 0, 4, 1, 5, 9, 1, 0, 4, 1, 5, 10, 1, 0, 4, 1, 5, 11, 1, 0, 4, 1, 5, 12, 1, 0, 4, 1, 5, 13, 1, 0, 4, 1, 5, 14}, []string{"api", "v1", "org", "data", "task_executions", "id.node_execution_id.execution_id.org", "id.node_execution_id.execution_id.project", "id.node_execution_id.execution_id.domain", "id.node_execution_id.execution_id.name", "id.node_execution_id.node_id", "id.task_id.project", "id.task_id.domain", "id.task_id.name", "id.task_id.version", "id.retry_attempt"}, ""))
+	pattern_AdminService_GetTaskExecutionData_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8, 1, 0, 4, 1, 5, 9, 1, 0, 4, 1, 5, 10, 1, 0, 4, 1, 5, 11, 1, 0, 4, 1, 5, 12, 1, 0, 4, 1, 5, 13, 1, 0, 4, 1, 5, 14, 1, 0, 4, 1, 5, 15}, []string{"api", "v1", "org", "data", "task_executions", "id.node_execution_id.execution_id.org", "id.task_id.org", "id.node_execution_id.execution_id.project", "id.node_execution_id.execution_id.domain", "id.node_execution_id.execution_id.name", "id.node_execution_id.node_id", "id.task_id.project", "id.task_id.domain", "id.task_id.name", "id.task_id.version", "id.retry_attempt"}, ""))
 
 	pattern_AdminService_UpdateProjectDomainAttributes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "project_domain_attributes", "attributes.project", "attributes.domain"}, ""))
 

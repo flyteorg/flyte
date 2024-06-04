@@ -3136,7 +3136,7 @@
         ]
       }
     },
-    "/api/v1/org/data/task_executions/{id.node_execution_id.execution_id.org}/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}": {
+    "/api/v1/org/data/task_executions/{id.node_execution_id.execution_id.org}/{id.task_id.org}/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}": {
       "get": {
         "summary": "Fetches input and output data for a :ref:`ref_flyteidl.admin.TaskExecution`.",
         "description": "Retrieve input and output data from an existing task execution.",
@@ -3158,6 +3158,13 @@
         "parameters": [
           {
             "name": "id.node_execution_id.execution_id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.task_id.org",
             "description": "Optional, org key applied to the resource.",
             "in": "path",
             "required": true,
@@ -3239,13 +3246,6 @@
               "DATASET"
             ],
             "default": "UNSPECIFIED"
-          },
-          {
-            "name": "id.task_id.org",
-            "description": "Optional, org key applied to the resource.",
-            "in": "query",
-            "required": false,
-            "type": "string"
           }
         ],
         "tags": [
