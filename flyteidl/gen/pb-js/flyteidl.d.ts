@@ -3161,64 +3161,6 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
-        /** Properties of an Any. */
-        interface IAny {
-
-            /** Any value */
-            value?: (flyteidl.core.ILiteral|null);
-
-            /** Any type */
-            type?: (flyteidl.core.ILiteralType|null);
-        }
-
-        /** Represents an Any. */
-        class Any implements IAny {
-
-            /**
-             * Constructs a new Any.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.core.IAny);
-
-            /** Any value. */
-            public value?: (flyteidl.core.ILiteral|null);
-
-            /** Any type. */
-            public type?: (flyteidl.core.ILiteralType|null);
-
-            /**
-             * Creates a new Any instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns Any instance
-             */
-            public static create(properties?: flyteidl.core.IAny): flyteidl.core.Any;
-
-            /**
-             * Encodes the specified Any message. Does not implicitly {@link flyteidl.core.Any.verify|verify} messages.
-             * @param message Any message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.core.IAny, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes an Any message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns Any
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.Any;
-
-            /**
-             * Verifies an Any message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
         /** Properties of a StructuredDatasetMetadata. */
         interface IStructuredDatasetMetadata {
 
@@ -3358,9 +3300,6 @@ export namespace flyteidl {
 
             /** Scalar union */
             union?: (flyteidl.core.IUnion|null);
-
-            /** Scalar any */
-            any?: (flyteidl.core.IAny|null);
         }
 
         /** Represents a Scalar. */
@@ -3399,11 +3338,8 @@ export namespace flyteidl {
             /** Scalar union. */
             public union?: (flyteidl.core.IUnion|null);
 
-            /** Scalar any. */
-            public any?: (flyteidl.core.IAny|null);
-
             /** Scalar value. */
-            public value?: ("primitive"|"blob"|"binary"|"schema"|"noneType"|"error"|"generic"|"structuredDataset"|"union"|"any");
+            public value?: ("primitive"|"blob"|"binary"|"schema"|"noneType"|"error"|"generic"|"structuredDataset"|"union");
 
             /**
              * Creates a new Scalar instance using the specified properties.

@@ -427,14 +427,6 @@ pub struct Union {
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct Any {
-    #[prost(message, optional, boxed, tag="1")]
-    pub value: ::core::option::Option<::prost::alloc::boxed::Box<Literal>>,
-    #[prost(message, optional, tag="2")]
-    pub r#type: ::core::option::Option<LiteralType>,
-}
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
 pub struct StructuredDatasetMetadata {
     /// Bundle the type information along with the literal.
     /// This is here because StructuredDatasets can often be more defined at run time than at compile time.
@@ -459,7 +451,7 @@ pub struct StructuredDataset {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Scalar {
-    #[prost(oneof="scalar::Value", tags="1, 2, 3, 4, 5, 6, 7, 8, 9, 10")]
+    #[prost(oneof="scalar::Value", tags="1, 2, 3, 4, 5, 6, 7, 8, 9")]
     pub value: ::core::option::Option<scalar::Value>,
 }
 /// Nested message and enum types in `Scalar`.
@@ -485,8 +477,6 @@ pub mod scalar {
         StructuredDataset(super::StructuredDataset),
         #[prost(message, tag="9")]
         Union(::prost::alloc::boxed::Box<super::Union>),
-        #[prost(message, tag="10")]
-        Any(::prost::alloc::boxed::Box<super::Any>),
     }
 }
 /// A simple value. This supports any level of nesting (e.g. array of array of array of Blobs) as well as simple primitives.
