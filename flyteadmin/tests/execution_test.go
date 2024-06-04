@@ -415,3 +415,64 @@ func TestGetRunningExecutionsCount(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, int64(2), runningExecutionsCountResp.Count)
 }
+
+func TestResolvedSpec(t *testing.T) {
+	truncateAllTablesForTestingOnly()
+
+	ctx := context.Background()
+	client, conn := GetTestAdminServiceClient()
+	defer conn.Close()
+
+	insertTasksForTests(t, client)
+	createWorkflowReq := getWorkflowCreateRequest()
+	_, err := client.CreateWorkflow(ctx, &createWorkflowReq)
+	assert.Nil(t, err)
+	createLaunchPlanReq := getLaunchPlanCreateRequest(createWorkflowReq.Id)
+	_, err = client.CreateLaunchPlan(ctx, &createLaunchPlanReq)
+
+	spec := &admin.ExecutionSpec{
+		LaunchPlan: &launchPlanIdentifier,
+		Labels: &admin.Labels{Values: map[string]string{
+			"foo": "bar",
+		}},
+		OverwriteCache: true,
+		MaxParallelism: 10,
+		ClusterAssignment: &admin.ClusterAssignment{
+			ClusterPoolName: "cluster",
+		},
+		Metadata:        &admin.ExecutionMetadata{},
+		Annotations:     &admin.Annotations{Values: map[string]string{"foo": "bar"}},
+		SecurityContext: &core.SecurityContext{RunAs: &core.Identity{IamRole: "iamrole"}},
+		TaskResourceAttributes: &admin.TaskResourceAttributes{
+			Defaults: &admin.TaskResourceSpec{
+				Cpu:              "1",
+				Gpu:              "0",
+				Memory:           "1Gi",
+				EphemeralStorage: "0",
+			},
+			Limits: &admin.TaskResourceSpec{
+				Cpu:              "2",
+				Gpu:              "0",
+				Memory:           "2Gi",
+				EphemeralStorage: "0",
+			},
+		},
+	}
+	_, err = client.CreateExecution(ctx, &admin.ExecutionCreateRequest{
+		Project: launchPlanIdentifier.Project,
+		Domain:  launchPlanIdentifier.Domain,
+		Name:    launchPlanIdentifier.Name,
+		Spec:    spec,
+	})
+	assert.Nil(t, err)
+
+	resp, err := client.GetExecution(ctx, &admin.WorkflowExecutionGetRequest{
+		Id: &core.WorkflowExecutionIdentifier{
+			Project: launchPlanIdentifier.Project,
+			Domain:  launchPlanIdentifier.Domain,
+			Name:    launchPlanIdentifier.Name,
+		},
+	})
+	assert.Nil(t, err)
+	assert.True(t, proto.Equal(spec, resp.Closure.ResolvedSpec))
+}

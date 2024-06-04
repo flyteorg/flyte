@@ -118,7 +118,7 @@ func TestGetTaskResources(t *testing.T) {
 }
 
 func TestFromAdminProtoTaskResourceSpec(t *testing.T) {
-	taskResourceSet := fromAdminProtoTaskResourceSpec(context.TODO(), &admin.TaskResourceSpec{
+	taskResourceSet := FromAdminProtoTaskResourceSpec(context.TODO(), &admin.TaskResourceSpec{
 		Cpu:              "1",
 		Memory:           "100",
 		EphemeralStorage: "300",

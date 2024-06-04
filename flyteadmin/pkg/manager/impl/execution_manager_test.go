@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"reflect"
 	"strings"
 	"testing"
 	"time"
@@ -79,6 +80,7 @@ var closure = admin.ExecutionClosure{
 		State:      admin.ExecutionState_EXECUTION_ACTIVE,
 		OccurredAt: testutils.MockCreatedAtProto,
 	},
+	ResolvedSpec: getExpectedSpec(),
 }
 var closureBytes, _ = proto.Marshal(&closure)
 
@@ -159,6 +161,7 @@ func getLegacyClosure() *admin.ExecutionClosure {
 			State:      admin.ExecutionState_EXECUTION_ACTIVE,
 			OccurredAt: testutils.MockCreatedAtProto,
 		},
+		ResolvedSpec: getExpectedSpec(),
 	}
 }
 
@@ -2481,6 +2484,7 @@ func TestCreateWorkflowEvent_StartedRunning(t *testing.T) {
 			State:      admin.ExecutionState_EXECUTION_ACTIVE,
 			OccurredAt: testutils.MockCreatedAtProto,
 		},
+		ResolvedSpec: getExpectedSpec(),
 	}
 	closureBytes, _ := proto.Marshal(&closure)
 	updateExecutionFunc := func(
@@ -6296,4 +6300,38 @@ func TestResolveParameterMapArtifacts(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, 1, len(x))
 	})
+}
+
+func TestCompleteResolvedSpec(t *testing.T) {
+	existingFields := sets.NewString(
+		"LaunchPlan",
+		"Inputs",
+		"Metadata",
+		"NotificationOverrides",
+		"Labels",
+		"Annotations",
+		"SecurityContext",
+		"AuthRole",
+		"QualityOfService",
+		"MaxParallelism",
+		"RawOutputDataConfig",
+		"ClusterAssignment",
+		"Interruptible",
+		"OverwriteCache",
+		"Envs",
+		"Tags",
+		"ExecutionClusterLabel",
+		"ExecutionEnvAssignments",
+		"TaskResourceAttributes",
+	)
+	specType := reflect.ValueOf(admin.ExecutionSpec{}).Type()
+	for i := 0; i < specType.NumField(); i++ {
+		fieldName := specType.Field(i).Name
+		if fieldName == "state" || fieldName == "sizeCache" || fieldName == "unknownFields" {
+			continue
+		}
+		if !existingFields.Has(fieldName) {
+			t.Fatalf("This is a warning test. You are adding a new field [%s] to ExecutionSpec.proto, be sure to also modify completeResolvedSpec function in execution_manager.go", fieldName)
+		}
+	}
 }

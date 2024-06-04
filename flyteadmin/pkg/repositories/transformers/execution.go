@@ -32,6 +32,7 @@ var clusterReassignablePhases = sets.NewString(core.WorkflowExecution_UNDEFINED.
 type CreateExecutionModelInput struct {
 	WorkflowExecutionID   core.WorkflowExecutionIdentifier
 	RequestSpec           *admin.ExecutionSpec
+	ResolvedSpec          *admin.ExecutionSpec
 	LaunchPlanID          uint
 	WorkflowID            uint
 	TaskID                uint
@@ -70,10 +71,15 @@ func CreateExecutionModel(input CreateExecutionModelInput) (*models.Execution, e
 		Namespace:        input.Namespace,
 	}
 	requestSpec.SecurityContext = input.SecurityContext
+	if input.RequestSpec.Metadata == nil {
+		input.RequestSpec.Metadata = &admin.ExecutionMetadata{}
+	}
+	input.RequestSpec.Metadata.SystemMetadata = requestSpec.Metadata.SystemMetadata
 	spec, err := proto.Marshal(requestSpec)
 	if err != nil {
 		return nil, flyteErrs.NewFlyteAdminErrorf(codes.Internal, "Failed to serialize execution spec: %v", err)
 	}
+
 	createdAt := timestamppb.New(input.CreatedAt)
 	closure := admin.ExecutionClosure{
 		CreatedAt:     createdAt,
@@ -85,6 +91,7 @@ func CreateExecutionModel(input CreateExecutionModelInput) (*models.Execution, e
 			Principal:  requestSpec.Metadata.Principal,
 			OccurredAt: createdAt,
 		},
+		ResolvedSpec: input.ResolvedSpec,
 	}
 	if input.Error != nil {
 		closure.Phase = core.WorkflowExecution_FAILED
@@ -220,6 +227,17 @@ func UpdateExecutionModelState(
 			if err := reassignCluster(ctx, request.Event.ProducerId, request.Event.ExecutionId, execution); err != nil {
 				return err
 			}
+			// also update the resolved spec
+			if executionClosure.ResolvedSpec == nil {
+				executionClosure.ResolvedSpec = &admin.ExecutionSpec{}
+			}
+			if executionClosure.ResolvedSpec.Metadata == nil {
+				executionClosure.ResolvedSpec.Metadata = &admin.ExecutionMetadata{}
+			}
+			if executionClosure.ResolvedSpec.Metadata.SystemMetadata == nil {
+				executionClosure.ResolvedSpec.Metadata.SystemMetadata = &admin.SystemMetadata{}
+			}
+			executionClosure.ResolvedSpec.Metadata.SystemMetadata.ExecutionCluster = request.Event.ProducerId
 		} else if execution.Cluster != request.Event.ProducerId {
 			errorMsg := fmt.Sprintf("Cannot accept events for running/terminated execution [%v] from cluster [%s],"+
 				"expected events to originate from [%s]",

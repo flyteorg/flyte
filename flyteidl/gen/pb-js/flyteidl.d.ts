@@ -15611,6 +15611,9 @@ export namespace flyteidl {
 
             /** ExecutionClosure stateChangeDetails */
             stateChangeDetails?: (flyteidl.admin.IExecutionStateChangeDetails|null);
+
+            /** ExecutionClosure resolvedSpec */
+            resolvedSpec?: (flyteidl.admin.IExecutionSpec|null);
         }
 
         /** Represents an ExecutionClosure. */
@@ -15663,6 +15666,9 @@ export namespace flyteidl {
 
             /** ExecutionClosure stateChangeDetails. */
             public stateChangeDetails?: (flyteidl.admin.IExecutionStateChangeDetails|null);
+
+            /** ExecutionClosure resolvedSpec. */
+            public resolvedSpec?: (flyteidl.admin.IExecutionSpec|null);
 
             /** ExecutionClosure outputResult. */
             public outputResult?: ("outputs"|"error"|"abortCause"|"abortMetadata"|"outputData");
@@ -15977,6 +15983,9 @@ export namespace flyteidl {
 
             /** ExecutionSpec executionEnvAssignments */
             executionEnvAssignments?: (flyteidl.core.IExecutionEnvAssignment[]|null);
+
+            /** ExecutionSpec taskResourceAttributes */
+            taskResourceAttributes?: (flyteidl.admin.ITaskResourceAttributes|null);
         }
 
         /** Represents an ExecutionSpec. */
@@ -16044,6 +16053,9 @@ export namespace flyteidl {
 
             /** ExecutionSpec executionEnvAssignments. */
             public executionEnvAssignments: flyteidl.core.IExecutionEnvAssignment[];
+
+            /** ExecutionSpec taskResourceAttributes. */
+            public taskResourceAttributes?: (flyteidl.admin.ITaskResourceAttributes|null);
 
             /** ExecutionSpec notificationOverrides. */
             public notificationOverrides?: ("notifications"|"disableAll");

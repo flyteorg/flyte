@@ -55,8 +55,8 @@ func GetCompleteTaskResourceRequirements(ctx context.Context, identifier *core.I
 	}
 }
 
-// fromAdminProtoTaskResourceSpec parses the flyteidl `TaskResourceSpec` message into a `TaskResourceSet`.
-func fromAdminProtoTaskResourceSpec(ctx context.Context, spec *admin.TaskResourceSpec) runtimeInterfaces.TaskResourceSet {
+// FromAdminProtoTaskResourceSpec parses the flyteidl `TaskResourceSpec` message into a `TaskResourceSet`.
+func FromAdminProtoTaskResourceSpec(ctx context.Context, spec *admin.TaskResourceSpec) runtimeInterfaces.TaskResourceSet {
 	result := runtimeInterfaces.TaskResourceSet{}
 	if len(spec.Cpu) > 0 {
 		result.CPU = parseQuantityNoError(ctx, "project", "cpu", spec.Cpu)
@@ -75,6 +75,15 @@ func fromAdminProtoTaskResourceSpec(ctx context.Context, spec *admin.TaskResourc
 	}
 
 	return result
+}
+
+func ToAdminProtoTaskResourceSpec(taskResourceSet *runtimeInterfaces.TaskResourceSet) *admin.TaskResourceSpec {
+	return &admin.TaskResourceSpec{
+		Cpu:              taskResourceSet.CPU.String(),
+		Memory:           taskResourceSet.Memory.String(),
+		EphemeralStorage: taskResourceSet.EphemeralStorage.String(),
+		Gpu:              taskResourceSet.GPU.String(),
+	}
 }
 
 // GetTaskResources returns the most specific default and limit task resources for the specified id. This first checks
@@ -108,8 +117,8 @@ func GetTaskResources(ctx context.Context, id *core.Identifier, resourceManager 
 	logger.Debugf(ctx, "Assigning task requested resources for [%+v]", id)
 	var taskResourceAttributes = workflowengineInterfaces.TaskResources{}
 	if resource != nil && resource.Attributes != nil && resource.Attributes.GetTaskResourceAttributes() != nil {
-		taskResourceAttributes.Defaults = fromAdminProtoTaskResourceSpec(ctx, resource.Attributes.GetTaskResourceAttributes().Defaults)
-		taskResourceAttributes.Limits = fromAdminProtoTaskResourceSpec(ctx, resource.Attributes.GetTaskResourceAttributes().Limits)
+		taskResourceAttributes.Defaults = FromAdminProtoTaskResourceSpec(ctx, resource.Attributes.GetTaskResourceAttributes().Defaults)
+		taskResourceAttributes.Limits = FromAdminProtoTaskResourceSpec(ctx, resource.Attributes.GetTaskResourceAttributes().Limits)
 	} else {
 		taskResourceAttributes = workflowengineInterfaces.TaskResources{
 			Defaults: taskResourceConfig.GetDefaults(),

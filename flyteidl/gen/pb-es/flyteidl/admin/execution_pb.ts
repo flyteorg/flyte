@@ -12,7 +12,7 @@ import { Annotations, AuthRole, Envs, Labels, Notification, RawOutputDataConfig,
 import { ArtifactID } from "../core/artifact_id_pb.js";
 import { SecurityContext } from "../core/security_pb.js";
 import { ClusterAssignment } from "./cluster_assignment_pb.js";
-import { ExecutionClusterLabel } from "./matchable_resource_pb.js";
+import { ExecutionClusterLabel, TaskResourceAttributes } from "./matchable_resource_pb.js";
 import { ExecutionEnvAssignment } from "../core/execution_envs_pb.js";
 import { Span } from "../core/metrics_pb.js";
 
@@ -674,6 +674,18 @@ export class ExecutionClosure extends Message<ExecutionClosure> {
    */
   stateChangeDetails?: ExecutionStateChangeDetails;
 
+  /**
+   * In execution time, execution manager will resolve all parameters for the execution based on the priority of
+   * 1. Request execution spec
+   * 2. Project configuration
+   * 3. ConfigMap
+   * 4. Default values
+   * And store the resolved values in this field.
+   *
+   * @generated from field: flyteidl.admin.ExecutionSpec resolved_spec = 15;
+   */
+  resolvedSpec?: ExecutionSpec;
+
   constructor(data?: PartialMessage<ExecutionClosure>) {
     super();
     proto3.util.initPartial(data, this);
@@ -696,6 +708,7 @@ export class ExecutionClosure extends Message<ExecutionClosure> {
     { no: 9, name: "notifications", kind: "message", T: Notification, repeated: true },
     { no: 11, name: "workflow_id", kind: "message", T: Identifier },
     { no: 14, name: "state_change_details", kind: "message", T: ExecutionStateChangeDetails },
+    { no: 15, name: "resolved_spec", kind: "message", T: ExecutionSpec },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExecutionClosure {
@@ -1131,6 +1144,13 @@ export class ExecutionSpec extends Message<ExecutionSpec> {
    */
   executionEnvAssignments: ExecutionEnvAssignment[] = [];
 
+  /**
+   * Default task resource attributes for the execution.
+   *
+   * @generated from field: flyteidl.admin.TaskResourceAttributes task_resource_attributes = 27;
+   */
+  taskResourceAttributes?: TaskResourceAttributes;
+
   constructor(data?: PartialMessage<ExecutionSpec>) {
     super();
     proto3.util.initPartial(data, this);
@@ -1158,6 +1178,7 @@ export class ExecutionSpec extends Message<ExecutionSpec> {
     { no: 24, name: "tags", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 25, name: "execution_cluster_label", kind: "message", T: ExecutionClusterLabel },
     { no: 26, name: "execution_env_assignments", kind: "message", T: ExecutionEnvAssignment, repeated: true },
+    { no: 27, name: "task_resource_attributes", kind: "message", T: TaskResourceAttributes },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExecutionSpec {

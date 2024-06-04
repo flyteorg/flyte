@@ -82,6 +82,7 @@ func TestCreateExecutionModel(t *testing.T) {
 				Org:     testOrg,
 			},
 			RequestSpec:           execRequest.Spec,
+			ResolvedSpec:          execRequest.Spec,
 			LaunchPlanID:          lpID,
 			WorkflowID:            wfID,
 			CreatedAt:             createdAt,
@@ -129,6 +130,7 @@ func TestCreateExecutionModel(t *testing.T) {
 				OccurredAt: expectedCreatedAt,
 				Principal:  principal,
 			},
+			ResolvedSpec: execRequest.Spec,
 		})
 		assert.Equal(t, expectedClosure, execution.Closure)
 	})
@@ -142,6 +144,7 @@ func TestCreateExecutionModel(t *testing.T) {
 				Org:     testOrg,
 			},
 			RequestSpec:           execRequest.Spec,
+			ResolvedSpec:          execRequest.Spec,
 			LaunchPlanID:          lpID,
 			WorkflowID:            wfID,
 			CreatedAt:             createdAt,
@@ -197,6 +200,7 @@ func TestCreateExecutionModel(t *testing.T) {
 				OccurredAt: expectedCreatedAt,
 				Principal:  principal,
 			},
+			ResolvedSpec: execRequest.Spec,
 		})
 		assert.Equal(t, string(expectedClosure), string(execution.Closure))
 	})
@@ -210,6 +214,7 @@ func TestCreateExecutionModel(t *testing.T) {
 				Org:     testOrg,
 			},
 			RequestSpec:           execRequest.Spec,
+			ResolvedSpec:          execRequest.Spec,
 			LaunchPlanID:          lpID,
 			WorkflowID:            wfID,
 			CreatedAt:             createdAt,
@@ -265,6 +270,7 @@ func TestCreateExecutionModel(t *testing.T) {
 				OccurredAt: expectedCreatedAt,
 				Principal:  principal,
 			},
+			ResolvedSpec: execRequest.Spec,
 		})
 		assert.Equal(t, expectedClosure, execution.Closure)
 	})
@@ -278,6 +284,7 @@ func TestCreateExecutionModel(t *testing.T) {
 				Org:     testOrg,
 			},
 			RequestSpec:           execRequest.Spec,
+			ResolvedSpec:          execRequest.Spec,
 			LaunchPlanID:          lpID,
 			WorkflowID:            wfID,
 			CreatedAt:             createdAt,
@@ -333,6 +340,7 @@ func TestCreateExecutionModel(t *testing.T) {
 				OccurredAt: expectedCreatedAt,
 				Principal:  principal,
 			},
+			ResolvedSpec: execRequest.Spec,
 		})
 		assert.Equal(t, expectedClosure, execution.Closure)
 	})
@@ -723,6 +731,7 @@ func TestFromExecutionModel(t *testing.T) {
 			State:      admin.ExecutionState_EXECUTION_ACTIVE,
 			OccurredAt: createdAtProto,
 		},
+		ResolvedSpec: spec,
 	}
 	closureBytes, _ := proto.Marshal(&closure)
 	stateInt := int32(admin.ExecutionState_EXECUTION_ACTIVE)
@@ -887,6 +896,7 @@ func TestFromExecutionModels(t *testing.T) {
 			State:      admin.ExecutionState_EXECUTION_ACTIVE,
 			OccurredAt: createdAtProto,
 		},
+		ResolvedSpec: spec,
 	}
 	closureBytes, _ := proto.Marshal(&closure)
 	stateInt := int32(admin.ExecutionState_EXECUTION_ACTIVE)

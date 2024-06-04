@@ -109,7 +109,7 @@ class AbortMetadata(_message.Message):
     def __init__(self, cause: _Optional[str] = ..., principal: _Optional[str] = ...) -> None: ...
 
 class ExecutionClosure(_message.Message):
-    __slots__ = ["outputs", "error", "abort_cause", "abort_metadata", "output_data", "computed_inputs", "phase", "started_at", "duration", "created_at", "updated_at", "notifications", "workflow_id", "state_change_details"]
+    __slots__ = ["outputs", "error", "abort_cause", "abort_metadata", "output_data", "computed_inputs", "phase", "started_at", "duration", "created_at", "updated_at", "notifications", "workflow_id", "state_change_details", "resolved_spec"]
     OUTPUTS_FIELD_NUMBER: _ClassVar[int]
     ERROR_FIELD_NUMBER: _ClassVar[int]
     ABORT_CAUSE_FIELD_NUMBER: _ClassVar[int]
@@ -124,6 +124,7 @@ class ExecutionClosure(_message.Message):
     NOTIFICATIONS_FIELD_NUMBER: _ClassVar[int]
     WORKFLOW_ID_FIELD_NUMBER: _ClassVar[int]
     STATE_CHANGE_DETAILS_FIELD_NUMBER: _ClassVar[int]
+    RESOLVED_SPEC_FIELD_NUMBER: _ClassVar[int]
     outputs: LiteralMapBlob
     error: _execution_pb2.ExecutionError
     abort_cause: str
@@ -138,7 +139,8 @@ class ExecutionClosure(_message.Message):
     notifications: _containers.RepeatedCompositeFieldContainer[_common_pb2.Notification]
     workflow_id: _identifier_pb2.Identifier
     state_change_details: ExecutionStateChangeDetails
-    def __init__(self, outputs: _Optional[_Union[LiteralMapBlob, _Mapping]] = ..., error: _Optional[_Union[_execution_pb2.ExecutionError, _Mapping]] = ..., abort_cause: _Optional[str] = ..., abort_metadata: _Optional[_Union[AbortMetadata, _Mapping]] = ..., output_data: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., computed_inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., phase: _Optional[_Union[_execution_pb2.WorkflowExecution.Phase, str]] = ..., started_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., duration: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., updated_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., notifications: _Optional[_Iterable[_Union[_common_pb2.Notification, _Mapping]]] = ..., workflow_id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., state_change_details: _Optional[_Union[ExecutionStateChangeDetails, _Mapping]] = ...) -> None: ...
+    resolved_spec: ExecutionSpec
+    def __init__(self, outputs: _Optional[_Union[LiteralMapBlob, _Mapping]] = ..., error: _Optional[_Union[_execution_pb2.ExecutionError, _Mapping]] = ..., abort_cause: _Optional[str] = ..., abort_metadata: _Optional[_Union[AbortMetadata, _Mapping]] = ..., output_data: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., computed_inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., phase: _Optional[_Union[_execution_pb2.WorkflowExecution.Phase, str]] = ..., started_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., duration: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., updated_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., notifications: _Optional[_Iterable[_Union[_common_pb2.Notification, _Mapping]]] = ..., workflow_id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., state_change_details: _Optional[_Union[ExecutionStateChangeDetails, _Mapping]] = ..., resolved_spec: _Optional[_Union[ExecutionSpec, _Mapping]] = ...) -> None: ...
 
 class SystemMetadata(_message.Message):
     __slots__ = ["execution_cluster", "namespace"]
@@ -191,7 +193,7 @@ class NotificationList(_message.Message):
     def __init__(self, notifications: _Optional[_Iterable[_Union[_common_pb2.Notification, _Mapping]]] = ...) -> None: ...
 
 class ExecutionSpec(_message.Message):
-    __slots__ = ["launch_plan", "inputs", "metadata", "notifications", "disable_all", "labels", "annotations", "security_context", "auth_role", "quality_of_service", "max_parallelism", "raw_output_data_config", "cluster_assignment", "interruptible", "overwrite_cache", "envs", "tags", "execution_cluster_label", "execution_env_assignments"]
+    __slots__ = ["launch_plan", "inputs", "metadata", "notifications", "disable_all", "labels", "annotations", "security_context", "auth_role", "quality_of_service", "max_parallelism", "raw_output_data_config", "cluster_assignment", "interruptible", "overwrite_cache", "envs", "tags", "execution_cluster_label", "execution_env_assignments", "task_resource_attributes"]
     LAUNCH_PLAN_FIELD_NUMBER: _ClassVar[int]
     INPUTS_FIELD_NUMBER: _ClassVar[int]
     METADATA_FIELD_NUMBER: _ClassVar[int]
@@ -211,6 +213,7 @@ class ExecutionSpec(_message.Message):
     TAGS_FIELD_NUMBER: _ClassVar[int]
     EXECUTION_CLUSTER_LABEL_FIELD_NUMBER: _ClassVar[int]
     EXECUTION_ENV_ASSIGNMENTS_FIELD_NUMBER: _ClassVar[int]
+    TASK_RESOURCE_ATTRIBUTES_FIELD_NUMBER: _ClassVar[int]
     launch_plan: _identifier_pb2.Identifier
     inputs: _literals_pb2.LiteralMap
     metadata: ExecutionMetadata
@@ -230,7 +233,8 @@ class ExecutionSpec(_message.Message):
     tags: _containers.RepeatedScalarFieldContainer[str]
     execution_cluster_label: _matchable_resource_pb2.ExecutionClusterLabel
     execution_env_assignments: _containers.RepeatedCompositeFieldContainer[_execution_envs_pb2.ExecutionEnvAssignment]
-    def __init__(self, launch_plan: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., metadata: _Optional[_Union[ExecutionMetadata, _Mapping]] = ..., notifications: _Optional[_Union[NotificationList, _Mapping]] = ..., disable_all: bool = ..., labels: _Optional[_Union[_common_pb2.Labels, _Mapping]] = ..., annotations: _Optional[_Union[_common_pb2.Annotations, _Mapping]] = ..., security_context: _Optional[_Union[_security_pb2.SecurityContext, _Mapping]] = ..., auth_role: _Optional[_Union[_common_pb2.AuthRole, _Mapping]] = ..., quality_of_service: _Optional[_Union[_execution_pb2.QualityOfService, _Mapping]] = ..., max_parallelism: _Optional[int] = ..., raw_output_data_config: _Optional[_Union[_common_pb2.RawOutputDataConfig, _Mapping]] = ..., cluster_assignment: _Optional[_Union[_cluster_assignment_pb2.ClusterAssignment, _Mapping]] = ..., interruptible: _Optional[_Union[_wrappers_pb2.BoolValue, _Mapping]] = ..., overwrite_cache: bool = ..., envs: _Optional[_Union[_common_pb2.Envs, _Mapping]] = ..., tags: _Optional[_Iterable[str]] = ..., execution_cluster_label: _Optional[_Union[_matchable_resource_pb2.ExecutionClusterLabel, _Mapping]] = ..., execution_env_assignments: _Optional[_Iterable[_Union[_execution_envs_pb2.ExecutionEnvAssignment, _Mapping]]] = ...) -> None: ...
+    task_resource_attributes: _matchable_resource_pb2.TaskResourceAttributes
+    def __init__(self, launch_plan: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., metadata: _Optional[_Union[ExecutionMetadata, _Mapping]] = ..., notifications: _Optional[_Union[NotificationList, _Mapping]] = ..., disable_all: bool = ..., labels: _Optional[_Union[_common_pb2.Labels, _Mapping]] = ..., annotations: _Optional[_Union[_common_pb2.Annotations, _Mapping]] = ..., security_context: _Optional[_Union[_security_pb2.SecurityContext, _Mapping]] = ..., auth_role: _Optional[_Union[_common_pb2.AuthRole, _Mapping]] = ..., quality_of_service: _Optional[_Union[_execution_pb2.QualityOfService, _Mapping]] = ..., max_parallelism: _Optional[int] = ..., raw_output_data_config: _Optional[_Union[_common_pb2.RawOutputDataConfig, _Mapping]] = ..., cluster_assignment: _Optional[_Union[_cluster_assignment_pb2.ClusterAssignment, _Mapping]] = ..., interruptible: _Optional[_Union[_wrappers_pb2.BoolValue, _Mapping]] = ..., overwrite_cache: bool = ..., envs: _Optional[_Union[_common_pb2.Envs, _Mapping]] = ..., tags: _Optional[_Iterable[str]] = ..., execution_cluster_label: _Optional[_Union[_matchable_resource_pb2.ExecutionClusterLabel, _Mapping]] = ..., execution_env_assignments: _Optional[_Iterable[_Union[_execution_envs_pb2.ExecutionEnvAssignment, _Mapping]]] = ..., task_resource_attributes: _Optional[_Union[_matchable_resource_pb2.TaskResourceAttributes, _Mapping]] = ...) -> None: ...
 
 class ExecutionTerminateRequest(_message.Message):
     __slots__ = ["id", "cause"]

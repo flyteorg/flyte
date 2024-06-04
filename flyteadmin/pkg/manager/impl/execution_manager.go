@@ -644,9 +644,13 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 		return nil, nil, err
 	}
 
+	resolvedSpec := proto.Clone(request.Spec).(*admin.ExecutionSpec)
+	resolvedSpec = completeResolvedSpec(resolvedSpec, &executionParameters)
+
 	executionModel, err := transformers.CreateExecutionModel(transformers.CreateExecutionModelInput{
 		WorkflowExecutionID: workflowExecutionID,
 		RequestSpec:         requestSpec,
+		ResolvedSpec:        resolvedSpec,
 		TaskID:              taskModel.ID,
 		WorkflowID:          workflowModel.ID,
 		// The execution is not considered running until the propeller sends a specific event saying so.
@@ -1115,10 +1119,18 @@ func (m *ExecutionManager) launchExecution(
 		return nil, nil, err
 	}
 
+	var taskResources workflowengineInterfaces.TaskResources
+	if requestSpec.TaskResourceAttributes != nil {
+		taskResources = workflowengineInterfaces.TaskResources{
+			Defaults: util.FromAdminProtoTaskResourceSpec(ctx, requestSpec.TaskResourceAttributes.Defaults),
+			Limits:   util.FromAdminProtoTaskResourceSpec(ctx, requestSpec.TaskResourceAttributes.Limits),
+		}
+	} else {
+		taskResources = util.GetTaskResources(ctx, workflow.Id, m.resourceManager, m.config.TaskResourceConfiguration())
+	}
 	// Dynamically assign task resource defaults.
-	platformTaskResources := util.GetTaskResources(ctx, workflow.Id, m.resourceManager, m.config.TaskResourceConfiguration())
 	for _, task := range workflow.Closure.CompiledWorkflow.Tasks {
-		m.setCompiledTaskDefaults(ctx, task, platformTaskResources)
+		m.setCompiledTaskDefaults(ctx, task, taskResources)
 	}
 
 	// Dynamically assign execution queues.
@@ -1165,7 +1177,7 @@ func (m *ExecutionManager) launchExecution(
 		Labels:                labels,
 		Annotations:           annotations,
 		ExecutionConfig:       executionConfig,
-		TaskResources:         &platformTaskResources,
+		TaskResources:         &taskResources,
 		EventVersion:          m.config.ApplicationConfiguration().GetTopLevelConfig().EventVersion,
 		RoleNameKey:           m.config.ApplicationConfiguration().GetTopLevelConfig().RoleNameKey,
 		RawOutputDataConfig:   rawOutputDataConfig,
@@ -1209,9 +1221,13 @@ func (m *ExecutionManager) launchExecution(
 		m.publishExecutionStart(ctx, workflowExecutionID, request.Spec.LaunchPlan, workflow.Id, artifactTrackers, usedArtifactIDs)
 	}
 
+	resolvedSpec := proto.Clone(request.Spec).(*admin.ExecutionSpec)
+	resolvedSpec = completeResolvedSpec(resolvedSpec, &executionParameters)
+
 	createExecModelInput := transformers.CreateExecutionModelInput{
 		WorkflowExecutionID: workflowExecutionID,
 		RequestSpec:         requestSpec,
+		ResolvedSpec:        resolvedSpec,
 		LaunchPlanID:        launchPlanModel.ID,
 		WorkflowID:          launchPlanModel.WorkflowID,
 		// The execution is not considered running until the propeller sends a specific event saying so.
@@ -1255,6 +1271,29 @@ func (m *ExecutionManager) launchExecution(
 	}
 
 	return ctx, executionModel, nil
+}
+
+// This function will store the values for an execution in the execution spec.
+// Be sure to update this function when adding new fields to the execution spec.
+func completeResolvedSpec(spec *admin.ExecutionSpec, executionParameters *workflowengineInterfaces.ExecutionParameters) *admin.ExecutionSpec {
+	// We can skip fields that are in input spec, since they are already copied when proto.clone() is called.
+	// Skipped: LaunchPlan, Metadata, NotificationOverrides, tags
+	spec.Labels = &admin.Labels{Values: executionParameters.Labels}
+	spec.Annotations = &admin.Annotations{Values: executionParameters.Annotations}
+	spec.SecurityContext = executionParameters.ExecutionConfig.SecurityContext
+	spec.MaxParallelism = executionParameters.ExecutionConfig.MaxParallelism
+	spec.RawOutputDataConfig = executionParameters.RawOutputDataConfig
+	spec.ClusterAssignment = executionParameters.ClusterAssignment
+	spec.Interruptible = executionParameters.ExecutionConfig.Interruptible
+	spec.OverwriteCache = executionParameters.ExecutionConfig.OverwriteCache
+	spec.Envs = executionParameters.ExecutionConfig.Envs
+	spec.ExecutionClusterLabel = executionParameters.ExecutionClusterLabel
+	spec.ExecutionEnvAssignments = executionParameters.ExecutionConfig.ExecutionEnvAssignments
+	spec.TaskResourceAttributes = &admin.TaskResourceAttributes{
+		Defaults: util.ToAdminProtoTaskResourceSpec(&executionParameters.TaskResources.Defaults),
+		Limits:   util.ToAdminProtoTaskResourceSpec(&executionParameters.TaskResources.Limits),
+	}
+	return spec
 }
 
 // publishExecutionStart is an event that Admin publishes for artifact lineage.

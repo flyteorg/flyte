@@ -37659,6 +37659,7 @@
                  * @property {Array.<flyteidl.admin.INotification>|null} [notifications] ExecutionClosure notifications
                  * @property {flyteidl.core.IIdentifier|null} [workflowId] ExecutionClosure workflowId
                  * @property {flyteidl.admin.IExecutionStateChangeDetails|null} [stateChangeDetails] ExecutionClosure stateChangeDetails
+                 * @property {flyteidl.admin.IExecutionSpec|null} [resolvedSpec] ExecutionClosure resolvedSpec
                  */
     
                 /**
@@ -37789,6 +37790,14 @@
                  */
                 ExecutionClosure.prototype.stateChangeDetails = null;
     
+                /**
+                 * ExecutionClosure resolvedSpec.
+                 * @member {flyteidl.admin.IExecutionSpec|null|undefined} resolvedSpec
+                 * @memberof flyteidl.admin.ExecutionClosure
+                 * @instance
+                 */
+                ExecutionClosure.prototype.resolvedSpec = null;
+    
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
     
@@ -37856,6 +37865,8 @@
                         $root.flyteidl.core.LiteralMap.encode(message.outputData, writer.uint32(/* id 13, wireType 2 =*/106).fork()).ldelim();
                     if (message.stateChangeDetails != null && message.hasOwnProperty("stateChangeDetails"))
                         $root.flyteidl.admin.ExecutionStateChangeDetails.encode(message.stateChangeDetails, writer.uint32(/* id 14, wireType 2 =*/114).fork()).ldelim();
+                    if (message.resolvedSpec != null && message.hasOwnProperty("resolvedSpec"))
+                        $root.flyteidl.admin.ExecutionSpec.encode(message.resolvedSpec, writer.uint32(/* id 15, wireType 2 =*/122).fork()).ldelim();
                     return writer;
                 };
     
@@ -37920,6 +37931,9 @@
                             break;
                         case 14:
                             message.stateChangeDetails = $root.flyteidl.admin.ExecutionStateChangeDetails.decode(reader, reader.uint32());
+                            break;
+                        case 15:
+                            message.resolvedSpec = $root.flyteidl.admin.ExecutionSpec.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -38045,6 +38059,11 @@
                         var error = $root.flyteidl.admin.ExecutionStateChangeDetails.verify(message.stateChangeDetails);
                         if (error)
                             return "stateChangeDetails." + error;
+                    }
+                    if (message.resolvedSpec != null && message.hasOwnProperty("resolvedSpec")) {
+                        var error = $root.flyteidl.admin.ExecutionSpec.verify(message.resolvedSpec);
+                        if (error)
+                            return "resolvedSpec." + error;
                     }
                     return null;
                 };
@@ -38605,6 +38624,7 @@
                  * @property {Array.<string>|null} [tags] ExecutionSpec tags
                  * @property {flyteidl.admin.IExecutionClusterLabel|null} [executionClusterLabel] ExecutionSpec executionClusterLabel
                  * @property {Array.<flyteidl.core.IExecutionEnvAssignment>|null} [executionEnvAssignments] ExecutionSpec executionEnvAssignments
+                 * @property {flyteidl.admin.ITaskResourceAttributes|null} [taskResourceAttributes] ExecutionSpec taskResourceAttributes
                  */
     
                 /**
@@ -38776,6 +38796,14 @@
                  */
                 ExecutionSpec.prototype.executionEnvAssignments = $util.emptyArray;
     
+                /**
+                 * ExecutionSpec taskResourceAttributes.
+                 * @member {flyteidl.admin.ITaskResourceAttributes|null|undefined} taskResourceAttributes
+                 * @memberof flyteidl.admin.ExecutionSpec
+                 * @instance
+                 */
+                ExecutionSpec.prototype.taskResourceAttributes = null;
+    
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
     
@@ -38854,6 +38882,8 @@
                     if (message.executionEnvAssignments != null && message.executionEnvAssignments.length)
                         for (var i = 0; i < message.executionEnvAssignments.length; ++i)
                             $root.flyteidl.core.ExecutionEnvAssignment.encode(message.executionEnvAssignments[i], writer.uint32(/* id 26, wireType 2 =*/210).fork()).ldelim();
+                    if (message.taskResourceAttributes != null && message.hasOwnProperty("taskResourceAttributes"))
+                        $root.flyteidl.admin.TaskResourceAttributes.encode(message.taskResourceAttributes, writer.uint32(/* id 27, wireType 2 =*/218).fork()).ldelim();
                     return writer;
                 };
     
@@ -38935,6 +38965,9 @@
                             if (!(message.executionEnvAssignments && message.executionEnvAssignments.length))
                                 message.executionEnvAssignments = [];
                             message.executionEnvAssignments.push($root.flyteidl.core.ExecutionEnvAssignment.decode(reader, reader.uint32()));
+                            break;
+                        case 27:
+                            message.taskResourceAttributes = $root.flyteidl.admin.TaskResourceAttributes.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -39057,6 +39090,11 @@
                             if (error)
                                 return "executionEnvAssignments." + error;
                         }
+                    }
+                    if (message.taskResourceAttributes != null && message.hasOwnProperty("taskResourceAttributes")) {
+                        var error = $root.flyteidl.admin.TaskResourceAttributes.verify(message.taskResourceAttributes);
+                        if (error)
+                            return "taskResourceAttributes." + error;
                     }
                     return null;
                 };

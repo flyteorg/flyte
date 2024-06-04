@@ -1726,6 +1726,14 @@ pub struct ExecutionClosure {
     /// Provides the details of the last stage change
     #[prost(message, optional, tag="14")]
     pub state_change_details: ::core::option::Option<ExecutionStateChangeDetails>,
+    /// In execution time, execution manager will resolve all parameters for the execution based on the priority of
+    /// 1. Request execution spec
+    /// 2. Project configuration
+    /// 3. ConfigMap
+    /// 4. Default values
+    /// And store the resolved values in this field.
+    #[prost(message, optional, tag="15")]
+    pub resolved_spec: ::core::option::Option<ExecutionSpec>,
     /// A result produced by a terminated execution.
     /// A pending (non-terminal) execution will not have any output result.
     #[prost(oneof="execution_closure::OutputResult", tags="1, 2, 10, 12, 13")]
@@ -1930,6 +1938,9 @@ pub struct ExecutionSpec {
     /// Execution environment assignments to be set for the execution.
     #[prost(message, repeated, tag="26")]
     pub execution_env_assignments: ::prost::alloc::vec::Vec<super::core::ExecutionEnvAssignment>,
+    /// Default task resource attributes for the execution.
+    #[prost(message, optional, tag="27")]
+    pub task_resource_attributes: ::core::option::Option<TaskResourceAttributes>,
     #[prost(oneof="execution_spec::NotificationOverrides", tags="5, 6")]
     pub notification_overrides: ::core::option::Option<execution_spec::NotificationOverrides>,
 }

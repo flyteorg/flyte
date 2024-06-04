@@ -10049,6 +10049,10 @@
         "state_change_details": {
           "$ref": "#/definitions/adminExecutionStateChangeDetails",
           "title": "Provides the details of the last stage change"
+        },
+        "resolved_spec": {
+          "$ref": "#/definitions/adminExecutionSpec",
+          "description": "In execution time, execution manager will resolve all parameters for the execution based on the priority of\n1. Request execution spec\n2. Project configuration\n3. ConfigMap\n4. Default values\nAnd store the resolved values in this field."
         }
       },
       "title": "Encapsulates the results of the Execution"
@@ -10352,6 +10356,10 @@
             "$ref": "#/definitions/coreExecutionEnvAssignment"
           },
           "description": "Execution environment assignments to be set for the execution."
+        },
+        "task_resource_attributes": {
+          "$ref": "#/definitions/adminTaskResourceAttributes",
+          "description": "Default task resource attributes for the execution."
         }
       },
       "description": "An ExecutionSpec encompasses all data used to launch this execution. The Spec does not change over the lifetime\nof an execution as it progresses across phase changes."

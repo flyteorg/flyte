@@ -225,27 +225,11 @@ func collectGlobalConfiguration(ctx context.Context, config runtimeInterfaces.Co
 	logger.Debug(ctx, "Collecting global configuration")
 	// Task resource attributes
 	taskResourceAttributesConfig := config.TaskResourceConfiguration()
-	defaultCPU := taskResourceAttributesConfig.GetDefaults().CPU
-	defaultGPU := taskResourceAttributesConfig.GetDefaults().GPU
-	defaultMemory := taskResourceAttributesConfig.GetDefaults().Memory
-	defaultEphemeralStorage := taskResourceAttributesConfig.GetDefaults().EphemeralStorage
-	limitCPU := taskResourceAttributesConfig.GetLimits().CPU
-	limitGPU := taskResourceAttributesConfig.GetLimits().GPU
-	limitMemory := taskResourceAttributesConfig.GetLimits().Memory
-	limitEphemeralStorage := taskResourceAttributesConfig.GetLimits().EphemeralStorage
+	defaults := taskResourceAttributesConfig.GetDefaults()
+	limits := taskResourceAttributesConfig.GetLimits()
 	taskResourceAttributes := admin.TaskResourceAttributes{
-		Defaults: &admin.TaskResourceSpec{
-			Cpu:              defaultCPU.String(),
-			Gpu:              defaultGPU.String(),
-			Memory:           defaultMemory.String(),
-			EphemeralStorage: defaultEphemeralStorage.String(),
-		},
-		Limits: &admin.TaskResourceSpec{
-			Cpu:              limitCPU.String(),
-			Gpu:              limitGPU.String(),
-			Memory:           limitMemory.String(),
-			EphemeralStorage: limitEphemeralStorage.String(),
-		},
+		Defaults: ToAdminProtoTaskResourceSpec(&defaults),
+		Limits:   ToAdminProtoTaskResourceSpec(&limits),
 	}
 
 	// Workflow execution configuration
