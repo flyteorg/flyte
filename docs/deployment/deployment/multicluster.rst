@@ -386,8 +386,22 @@ label has to be 1.
 
 .. note:: 
    This step will disable ``flytepropeller`` in the control plane cluster, leaving no possibility of running workflows there. If you require
-   the control plane to run workflows, edit the ``values-controlplane.yaml`` file and set ``flytepropeller.enabled`` to ``true``. Then, perform the ``helm upgrade`` operation and complete the steps in :ref:`this section <dataplane-deployment>` to configure it 
-   as a dataplane cluster.
+   the control plane to run workflows, edit the ``values-controlplane.yaml`` file and set ``flytepropeller.enabled`` to ``true`` and add one
+   additional cluster config for the control plane cluster itself:
+
+   .. code-block:: yaml
+      :caption: values-override.yaml
+
+      configmap:
+         clusters:
+            clusterConfigs:
+            - name: "dataplane_1"
+              ...
+            - name: "controlplane"
+              enabled: true
+              inCluster: true  # Use in-cluster credentials
+
+   Then, perform the ``helm upgrade`` operation.
 
 .. tab-set::
 

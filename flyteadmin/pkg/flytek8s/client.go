@@ -54,7 +54,7 @@ func GetRestClientConfig(kubeConfigPathString, master string,
 			return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "Error building kubeconfig: %v", err)
 		}
 		logger.Debugf(context.Background(), "successfully loaded kube config from %s", kubeConfigPathString)
-	} else if k8sCluster != nil {
+	} else if k8sCluster != nil && !k8sCluster.InCluster {
 		kubeConfiguration, err = RemoteClusterConfig(k8sCluster.Endpoint, k8sCluster.Auth)
 		if err != nil {
 			return nil, err
