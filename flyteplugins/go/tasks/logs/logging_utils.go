@@ -32,7 +32,6 @@ func GetLogsForContainerInPod(ctx context.Context, logPlugin tasklog.Plugin, tas
 	containerID := v1.ContainerStatus{}.ContainerID
 	if uint32(len(pod.Status.ContainerStatuses)) <= index {
 		logger.Errorf(ctx, "containerStatus IndexOutOfBound, requested [%d], but total containerStatuses [%d] in pod phase [%v]", index, len(pod.Status.ContainerStatuses), pod.Status.Phase)
-		// return nil, nil
 	} else {
 		containerID = pod.Status.ContainerStatuses[index].ContainerID
 	}
