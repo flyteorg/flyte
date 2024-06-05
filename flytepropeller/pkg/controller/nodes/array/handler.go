@@ -564,17 +564,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 	// report to admin through a TaskExecutionEvent.
 	if eventRecorder.finalizeRequired(ctx) {
 		// determine task phase from ArrayNodePhase
-		taskPhase := idlcore.TaskExecution_UNDEFINED
-		switch currentArrayNodePhase {
-		case v1alpha1.ArrayNodePhaseNone:
-			taskPhase = idlcore.TaskExecution_QUEUED
-		case v1alpha1.ArrayNodePhaseExecuting:
-			taskPhase = idlcore.TaskExecution_RUNNING
-		case v1alpha1.ArrayNodePhaseSucceeding:
-			taskPhase = idlcore.TaskExecution_SUCCEEDED
-		case v1alpha1.ArrayNodePhaseFailing:
-			taskPhase = idlcore.TaskExecution_FAILED
-		}
+		taskPhase := mapTaskPhase(arrayNodeState.Phase)
 
 		// if the ArrayNode phase has changed we need to reset the taskPhaseVersion to 0, otherwise
 		// increment it if we detect any changes in subNode state.
@@ -639,6 +629,22 @@ func New(nodeExecutor interfaces.Node, eventConfig *config.EventConfig, scope pr
 		pluginStateBytesNotStarted:  pluginStateBytesNotStarted,
 		pluginStateBytesStarted:     pluginStateBytesStarted,
 	}, nil
+}
+
+func mapTaskPhase(arrayNodePhase v1alpha1.ArrayNodePhase) idlcore.TaskExecution_Phase {
+	taskPhase := idlcore.TaskExecution_UNDEFINED
+	switch arrayNodePhase {
+	case v1alpha1.ArrayNodePhaseNone:
+		taskPhase = idlcore.TaskExecution_QUEUED
+	case v1alpha1.ArrayNodePhaseExecuting:
+		taskPhase = idlcore.TaskExecution_RUNNING
+	case v1alpha1.ArrayNodePhaseSucceeding:
+		taskPhase = idlcore.TaskExecution_SUCCEEDED
+	case v1alpha1.ArrayNodePhaseFailing:
+		taskPhase = idlcore.TaskExecution_FAILED
+	}
+
+	return taskPhase
 }
 
 // buildArrayNodeContext creates a custom environment to execute the ArrayNode subnode. This is uniquely required for

@@ -442,6 +442,7 @@ func TestHandleArrayNodePhaseNone(t *testing.T) {
 
 			if len(test.expectedExternalResourcePhases) > 0 {
 				assert.Equal(t, 1, len(eventRecorder.taskExecutionEvents))
+				assert.Equal(t, mapTaskPhase(test.expectedArrayNodePhase), eventRecorder.taskExecutionEvents[0].Phase)
 
 				externalResources := eventRecorder.taskExecutionEvents[0].Metadata.GetExternalResources()
 				assert.Equal(t, len(test.expectedExternalResourcePhases), len(externalResources))
@@ -753,6 +754,7 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 
 			if len(test.expectedExternalResourcePhases) > 0 {
 				assert.Equal(t, 1, len(eventRecorder.taskExecutionEvents))
+				assert.Equal(t, mapTaskPhase(test.expectedArrayNodePhase), eventRecorder.taskExecutionEvents[0].Phase)
 
 				externalResources := eventRecorder.taskExecutionEvents[0].Metadata.GetExternalResources()
 				assert.Equal(t, len(test.expectedExternalResourcePhases), len(externalResources))
