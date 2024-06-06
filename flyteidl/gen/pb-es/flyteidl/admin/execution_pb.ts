@@ -1113,7 +1113,8 @@ export class ExecutionSpec extends Message<ExecutionSpec> {
   /**
    * Tags to be set for the execution.
    *
-   * @generated from field: repeated string tags = 24;
+   * @generated from field: repeated string tags = 24 [deprecated = true];
+   * @deprecated
    */
   tags: string[] = [];
 
