@@ -22,21 +22,21 @@ To clone and run the example code on this page, see the [Flytesnacks repo][flyte
 
 To begin, import the required dependencies:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/named_outputs.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/named_outputs.py
 :caption: basics/named_outputs.py
 :lines: 1-3
 ```
 
 Define a `NamedTuple` and assign it as an output to a task:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/named_outputs.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/named_outputs.py
 :caption: basics/named_outputs.py
 :lines: 6-14
 ```
 
 Likewise, assign a `NamedTuple` to the output of `intercept` task:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/named_outputs.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/named_outputs.py
 :caption: basics/named_outputs.py
 :lines: 18-26
 ```
@@ -59,14 +59,14 @@ Remember that we are extracting individual task execution outputs by dereferenci
 This is necessary because `NamedTuple`s function as tuples and require this dereferencing:
 :::
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/named_outputs.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/named_outputs.py
 :caption: basics/named_outputs.py
 :lines: 32-39
 ```
 
 You can run the workflow locally as follows:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/named_outputs.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/named_outputs.py
 :caption: basics/named_outputs.py
 :lines: 43-44
 ```
