@@ -228,7 +228,18 @@ func TestListWorkflowExecutionsWithLabels(t *testing.T) {
 			Domain:  "domain1",
 		},
 		Limit:   5,
-		Filters: "value_in(execution_tag.name, key1)",
+		Filters: "value_in(execution_tag.key, key1)",
+	})
+	assert.Nil(t, err)
+	assert.Equal(t, len(resp.Executions), 2)
+
+	resp, err = client.ListExecutions(ctx, &admin.ResourceListRequest{
+		Id: &admin.NamedEntityIdentifier{
+			Project: "project1",
+			Domain:  "domain1",
+		},
+		Limit:   5,
+		Filters: "value_in(execution_tag.value, value2)",
 	})
 	assert.Nil(t, err)
 	assert.Equal(t, len(resp.Executions), 2)
