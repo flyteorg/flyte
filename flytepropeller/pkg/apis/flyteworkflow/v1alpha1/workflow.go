@@ -78,6 +78,7 @@ type FlyteWorkflow struct {
 	// and parse the static data prior to processing.
 	WorkflowClosureReference DataReference `json:"workflowClosureReference,omitempty"`
 
+	// TODO: Add comment
 	ConsoleURL string `json:"consoleUrl,omitempty"`
 }
 
@@ -103,6 +104,8 @@ func (in *FlyteWorkflow) GetDefinitionVersion() WorkflowDefinitionVersion {
 func (in *FlyteWorkflow) GetExecutionConfig() ExecutionConfig {
 	return in.ExecutionConfig
 }
+
+func (in *FlyteWorkflow) GetConsoleURL() string { return in.ConsoleURL }
 
 type WorkflowMeta struct {
 	EventVersion EventVersion `json:"eventVersion,omitempty"`
