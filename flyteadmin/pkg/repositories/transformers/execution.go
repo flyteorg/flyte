@@ -161,6 +161,18 @@ func CreateExecutionTagModel(input CreateExecutionModelInput) ([]*models.Executi
 			Value: v,
 		})
 	}
+	for _, v := range input.RequestSpec.Tags {
+		tags = append(tags, &models.ExecutionTag{
+			ExecutionKey: models.ExecutionKey{
+				Project: input.WorkflowExecutionID.Project,
+				Domain:  input.WorkflowExecutionID.Domain,
+				Name:    input.WorkflowExecutionID.Name,
+			},
+			Key:   v,
+			Value: "",
+		})
+	}
+
 	logger.Infof(context.Background(), "tttttttttags [%v]", input.RequestSpec.Labels.Values)
 
 	return tags, nil
