@@ -45,7 +45,7 @@ using the `@eager` decorator.
 To clone and run the example code on this page, see the [Flytesnacks repo][flytesnacks].
 ```
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/eager_workflows.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/eager_workflows.py
 :caption: advanced_composition/eager_workflows.py
 :lines: 1-21
 ```
@@ -116,7 +116,7 @@ One of the biggest benefits of eager workflows is that you can now materialize
 task and subworkflow outputs as Python values and do operations on them just
 like you would in any other Python function. Let's look at another example:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/eager_workflows.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/eager_workflows.py
 :caption: advanced_composition/eager_workflows.py
 :pyobject: another_eager_workflow
 ```
@@ -131,7 +131,7 @@ As you saw in the `simple_eager_workflow` workflow above, you can use regular
 Python conditionals in your eager workflows. Let's look at a more complicated
 example:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/eager_workflows.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/eager_workflows.py
 :caption: advanced_composition/eager_workflows.py
 :lines: 36-53
 ```
@@ -144,7 +144,7 @@ to check if `out` is negative, but we're also using the `gt_100` task in the
 
 You can also gather the outputs of multiple tasks or subworkflows into a list:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/eager_workflows.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/eager_workflows.py
 :caption: advanced_composition/eager_workflows.py
 :lines: 58-69
 ```
@@ -153,7 +153,7 @@ You can also gather the outputs of multiple tasks or subworkflows into a list:
 
 You can also invoke static workflows from within an eager workflow:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/eager_workflows.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/eager_workflows.py
 :caption: advanced_composition/eager_workflows.py
 :lines: 74-84
 ```
@@ -162,7 +162,7 @@ You can also invoke static workflows from within an eager workflow:
 
 You can have nest eager subworkflows inside a parent eager workflow:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/eager_workflows.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/eager_workflows.py
 :caption: advanced_composition/eager_workflows.py
 :lines: 89-97
 ```
@@ -171,7 +171,7 @@ You can have nest eager subworkflows inside a parent eager workflow:
 
 You can also catch exceptions in eager workflows through `EagerException`:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/eager_workflows.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/eager_workflows.py
 :caption: advanced_composition/eager_workflows.py
 :lines: 102-117
 ```
@@ -195,7 +195,7 @@ and remotely.
 You can execute eager workflows locally by simply calling them like a regular
 `async` function:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/eager_workflows.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/eager_workflows.py
 :caption: advanced_composition/eager_workflows.py
 :lines: 123-125
 ```
@@ -244,7 +244,7 @@ When using a sandbox cluster started with `flytectl demo start`, however, the
 `client_secret_group` and `client_secret_key` are not required, since the
 default sandbox configuration does not require key-based authentication.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/eager_workflows.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/eager_workflows.py
 :caption: advanced_composition/eager_workflows.py
 :lines: 130-145
 ```
