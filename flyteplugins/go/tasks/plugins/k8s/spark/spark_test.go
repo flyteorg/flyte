@@ -405,6 +405,7 @@ func dummySparkTaskContext(taskTemplate *core.TaskTemplate, interruptible bool) 
 	taskExecutionMetadata.On("GetPlatformResources").Return(nil)
 	taskExecutionMetadata.On("GetOverrides").Return(overrides)
 	taskExecutionMetadata.On("GetK8sServiceAccount").Return("new-val")
+	taskExecutionMetadata.On("GetConsoleURL").Return("")
 	taskCtx.On("TaskExecutionMetadata").Return(taskExecutionMetadata)
 	return taskCtx
 }

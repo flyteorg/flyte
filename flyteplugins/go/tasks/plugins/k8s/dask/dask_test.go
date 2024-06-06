@@ -191,6 +191,7 @@ func dummyDaskTaskContext(taskTemplate *core.TaskTemplate, resources *v1.Resourc
 	taskExecutionMetadata.OnGetEnvironmentVariables().Return(nil)
 	taskExecutionMetadata.OnGetK8sServiceAccount().Return(defaultServiceAccountName)
 	taskExecutionMetadata.OnGetNamespace().Return(defaultNamespace)
+	taskExecutionMetadata.OnGetConsoleURL().Return("")
 	overrides := &mocks.TaskOverrides{}
 	overrides.OnGetResources().Return(resources)
 	overrides.OnGetExtendedResources().Return(extendedResources)
