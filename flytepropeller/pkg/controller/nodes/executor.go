@@ -500,6 +500,7 @@ type nodeExecutor struct {
 	shardSelector                   ioutils.ShardSelector
 	store                           *storage.DataStore
 	taskRecorder                    events.TaskEventRecorder
+	consoleURL                      string
 }
 
 func (c *nodeExecutor) RecordTransitionLatency(ctx context.Context, dag executors.DAGStructure, nl executors.NodeLookup, node v1alpha1.ExecutableNode, nodeStatus v1alpha1.ExecutableNodeStatus) {

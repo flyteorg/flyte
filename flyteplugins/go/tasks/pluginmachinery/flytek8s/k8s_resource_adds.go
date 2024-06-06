@@ -2,6 +2,7 @@ package flytek8s
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"strconv"
 
@@ -67,6 +68,15 @@ func GetExecutionEnvVars(id pluginsCore.TaskExecutionID) []v1.EnvVar {
 		// 	Name:  "FLYTE_INTERNAL_EXECUTION_LAUNCHPLAN",
 		// 	Value: "",
 		// },
+	}
+
+	if id.GetConsoleURL() != "" {
+		envVars = append(envVars, v1.EnvVar{
+			Name: "FLYTE_EXECUTION_URL",
+			// TODO: is it safe to append `attempt` like this?
+			// TODO: should we use net/url to build this url?
+			Value: fmt.Sprintf("%s/projects/%s/domains/%s/executions/%s/nodeId/%s-%s/nodes", id.GetConsoleURL(), nodeExecutionID.Project, nodeExecutionID.Domain, nodeExecutionID.Name, id.GetUniqueNodeID(), attemptNumber),
+		})
 	}
 
 	// Task definition Level env variables.

@@ -63,6 +63,9 @@ type TaskExecutionContext interface {
 
 	// Returns a handle to the Task events recorder, which get stored in the Admin.
 	EventsRecorder() EventsRecorder
+
+	// TODO: Is this right? Where else can I plop this in?
+	// ConsoleURL() string
 }
 
 // A simple fire-and-forget func

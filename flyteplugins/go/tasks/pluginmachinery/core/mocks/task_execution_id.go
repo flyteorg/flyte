@@ -12,6 +12,38 @@ type TaskExecutionID struct {
 	mock.Mock
 }
 
+type TaskExecutionID_GetConsoleURL struct {
+	*mock.Call
+}
+
+func (_m TaskExecutionID_GetConsoleURL) Return(_a0 string) *TaskExecutionID_GetConsoleURL {
+	return &TaskExecutionID_GetConsoleURL{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *TaskExecutionID) OnGetConsoleURL() *TaskExecutionID_GetConsoleURL {
+	c_call := _m.On("GetConsoleURL")
+	return &TaskExecutionID_GetConsoleURL{Call: c_call}
+}
+
+func (_m *TaskExecutionID) OnGetConsoleURLMatch(matchers ...interface{}) *TaskExecutionID_GetConsoleURL {
+	c_call := _m.On("GetConsoleURL", matchers...)
+	return &TaskExecutionID_GetConsoleURL{Call: c_call}
+}
+
+// GetConsoleURL provides a mock function with given fields:
+func (_m *TaskExecutionID) GetConsoleURL() string {
+	ret := _m.Called()
+
+	var r0 string
+	if rf, ok := ret.Get(0).(func() string); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	return r0
+}
+
 type TaskExecutionID_GetGeneratedName struct {
 	*mock.Call
 }

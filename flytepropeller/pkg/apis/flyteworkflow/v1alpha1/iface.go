@@ -511,6 +511,7 @@ type Meta interface {
 	GetEventVersion() EventVersion
 	GetDefinitionVersion() WorkflowDefinitionVersion
 	GetRawOutputDataConfig() RawOutputDataConfig
+	GetConsoleURL() string
 }
 
 type TaskDetailsGetter interface {
@@ -534,6 +535,7 @@ type ExecutableWorkflow interface {
 	MetaExtended
 	NodeStatusGetter
 	GetExecutionConfig() ExecutionConfig
+	GetConsoleURL() string
 }
 
 type NodeStatusGetter interface {
