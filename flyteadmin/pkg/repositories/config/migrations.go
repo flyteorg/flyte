@@ -1218,7 +1218,7 @@ var NoopMigrations = []*gormigrate.Migration{
 	{
 		ID: "2024-06-06-drop-admin-tags",
 		Migrate: func(tx *gorm.DB) error {
-			return tx.Migrator().DropTable("execution_tags")
+			return tx.Migrator().DropTable("admin_tags")
 		},
 	},
 }
