@@ -161,6 +161,7 @@ func CreateExecutionTagModel(input CreateExecutionModelInput) ([]*models.Executi
 			Value: v,
 		})
 	}
+	logger.Infof(context.Background(), "tttttttttags [%v]", input.RequestSpec.Labels.Values)
 
 	return tags, nil
 }

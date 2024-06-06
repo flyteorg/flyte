@@ -78,7 +78,7 @@ type ExecutionTag struct {
 	// The key of the tag.
 	Key string `gorm:"primary_key" valid:"length(0|255)"`
 	// The value of the tag.
-	Value string `gorm:"uniqueIndex" valid:"length(0|255)"`
+	Value string `gorm:"primary_key" valid:"length(0|255)"`
 }
 
 func (b *AdminTag) BeforeCreate(tx *gorm.DB) (err error) {
@@ -90,6 +90,7 @@ func (b *AdminTag) BeforeCreate(tx *gorm.DB) (err error) {
 }
 
 var (
-	ExecutionColumns = modelColumns(Execution{})
-	AdminTagColumns  = modelColumns(AdminTag{})
+	ExecutionColumns    = modelColumns(Execution{})
+	AdminTagColumns     = modelColumns(AdminTag{})
+	ExecutionTagColumns = modelColumns(ExecutionTag{})
 )

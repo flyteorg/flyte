@@ -25,18 +25,25 @@ var executionUpdatedAt = time.Date(2018, time.February, 17, 00, 01, 00, 00, time
 
 func TestCreateExecution(t *testing.T) {
 	executionRepo := NewExecutionRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
+	executionKey := models.ExecutionKey{
+		Project: "project",
+		Domain:  "domain",
+		Name:    "1",
+	}
 	err := executionRepo.Create(context.Background(), models.Execution{
-		ExecutionKey: models.ExecutionKey{
-			Project: "project",
-			Domain:  "domain",
-			Name:    "1",
-		},
+		ExecutionKey:       executionKey,
 		LaunchPlanID:       uint(2),
 		Phase:              core.WorkflowExecution_SUCCEEDED.String(),
 		Closure:            []byte{1, 2},
 		Spec:               []byte{3, 4},
 		StartedAt:          &executionStartedAt,
 		ExecutionCreatedAt: &createdAt,
+	}, []*models.ExecutionTag{
+		{
+			ExecutionKey: executionKey,
+			Key:          "hello",
+			Value:        "world",
+		},
 	})
 	assert.NoError(t, err)
 }
@@ -298,6 +305,43 @@ func TestListExecutions_WithTags(t *testing.T) {
 			getEqualityFilter(common.Task, "domain", domain),
 			getEqualityFilter(common.Task, "name", name),
 			tagFilter,
+		},
+		Limit: 20,
+	})
+	assert.NoError(t, err)
+	assert.True(t, mockQuery.Triggered)
+}
+
+func TestListExecutions_WithLabels(t *testing.T) {
+	executionRepo := NewExecutionRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
+
+	executions := make([]map[string]interface{}, 0)
+	GlobalMock := mocket.Catcher.Reset()
+	// Only match on queries that include ordering by name
+	mockQuery := GlobalMock.NewMock().WithQuery(`execution_name asc`)
+	mockQuery.WithReply(executions)
+
+	sortParameter, err := common.NewSortParameter(&admin.Sort{
+		Direction: admin.Sort_ASCENDING,
+		Key:       "execution_name",
+	}, models.ExecutionColumns)
+	require.NoError(t, err)
+
+	keys := []string{"rust", "tonic"}
+	values := []string{"foo", "bar"}
+	keyFilter, err := common.NewRepeatedValueFilter(common.ExecutionAdminTag, common.ValueIn, "execution_tag_name", keys)
+	assert.NoError(t, err)
+	valueFilter, err := common.NewRepeatedValueFilter(common.ExecutionAdminTag, common.ValueIn, "execution_tag_value", values)
+	assert.NoError(t, err)
+
+	_, err = executionRepo.List(context.Background(), interfaces.ListResourceInput{
+		SortParameter: sortParameter,
+		InlineFilters: []common.InlineFilter{
+			getEqualityFilter(common.Task, "project", project),
+			getEqualityFilter(common.Task, "domain", domain),
+			getEqualityFilter(common.Task, "name", name),
+			keyFilter,
+			valueFilter,
 		},
 		Limit: 20,
 	})

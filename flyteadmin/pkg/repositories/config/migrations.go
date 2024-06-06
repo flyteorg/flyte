@@ -1182,15 +1182,27 @@ var NoopMigrations = []*gormigrate.Migration{
 			return tx.AutoMigrate(&Execution{})
 		},
 	},
+
 	{
-		ID: "2024-5-20-execution-tags",
+		ID: "2024-5-24-execution-tags",
 		Migrate: func(tx *gorm.DB) error {
-			// Deprecate execution_admin_tags and admin_tags tables, and create a new table execution_tags
-			// to store tags associated with executions.
-			sql := "CREATE TABLE execution_tags as select execution_project, execution_domain, execution_name," +
-				" created_at, updated_at, deleted_at, name as key, null as value from execution_admin_tags" +
-				" INNER JOIN admin_tags a on execution_admin_tags.admin_tag_id = a.id;"
-			return tx.Exec(sql).Error
+			return tx.Transaction(func(_ *gorm.DB) error {
+				// Create an execution_tags Table
+				if err := tx.AutoMigrate(&models.ExecutionTag{}); err != nil {
+					return err
+				}
+				// Deprecate execution_admin_tags and admin_tags tables, and create a new table execution_tags
+				// to store tags associated with executions.
+				sql := "INSERT INTO execution_tags (execution_project, execution_domain, execution_name, created_at, updated_at, deleted_at, key, value)" +
+					" SELECT execution_project, execution_domain, execution_name, created_at, updated_at, deleted_at, name as key, null as value" +
+					" FROM execution_admin_tags" +
+					" INNER JOIN admin_tags a on execution_admin_tags.admin_tag_id = a.id;"
+				if err := tx.Exec(sql).Error; err != nil {
+					return err
+				}
+				sql = "ALTER TABLE execution_tags ALTER COLUMN id SET DATA TYPE serial"
+				return nil
+			})
 		},
 		Rollback: func(tx *gorm.DB) error {
 			return tx.Migrator().DropTable("execution_tags")
