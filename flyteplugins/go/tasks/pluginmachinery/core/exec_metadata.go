@@ -32,8 +32,6 @@ type TaskExecutionID interface {
 	// GetUniqueNodeID returns the fully-qualified Node ID that is unique within a
 	// given workflow execution.
 	GetUniqueNodeID() string
-
-	GetConsoleURL() string
 }
 
 // TaskExecutionMetadata represents any execution information for a Task. It is used to communicate meta information about the
@@ -55,4 +53,5 @@ type TaskExecutionMetadata interface {
 	GetPlatformResources() *v1.ResourceRequirements
 	GetInterruptibleFailureThreshold() int32
 	GetEnvironmentVariables() map[string]string
+	GetConsoleURL() string
 }

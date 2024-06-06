@@ -292,7 +292,7 @@ func AddFlyteCustomizationsToContainer(ctx context.Context, parameters template.
 	}
 	container.Args = modifiedArgs
 
-	container.Env, container.EnvFrom = DecorateEnvVars(ctx, container.Env, parameters.TaskExecMetadata.GetEnvironmentVariables(), parameters.TaskExecMetadata.GetTaskExecutionID())
+	container.Env, container.EnvFrom = DecorateEnvVars(ctx, container.Env, parameters.TaskExecMetadata.GetEnvironmentVariables(), parameters.TaskExecMetadata.GetTaskExecutionID(), parameters.TaskExecMetadata.GetConsoleURL())
 
 	// retrieve platformResources and overrideResources to use when aggregating container resources
 	platformResources := parameters.TaskExecMetadata.GetPlatformResources()

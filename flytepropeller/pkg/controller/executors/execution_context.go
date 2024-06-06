@@ -19,7 +19,6 @@ type ImmutableExecutionContext interface {
 	GetID() v1alpha1.WorkflowID
 	GetOnFailurePolicy() v1alpha1.WorkflowOnFailurePolicy
 	GetExecutionConfig() v1alpha1.ExecutionConfig
-	GetConsoleURL() string
 }
 
 type ParentInfoGetter interface {

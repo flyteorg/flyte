@@ -535,7 +535,6 @@ type ExecutableWorkflow interface {
 	MetaExtended
 	NodeStatusGetter
 	GetExecutionConfig() ExecutionConfig
-	GetConsoleURL() string
 }
 
 type NodeStatusGetter interface {

@@ -36,7 +36,6 @@ type taskExecutionID struct {
 	execName     string
 	id           *core.TaskExecutionIdentifier
 	uniqueNodeID string
-	consoleURL   string
 }
 
 func (te taskExecutionID) GetID() core.TaskExecutionIdentifier {
@@ -63,8 +62,6 @@ func (te taskExecutionID) GetGeneratedNameWith(minLength, maxLength int) (string
 
 	return te.execName, nil
 }
-
-func (te taskExecutionID) GetConsoleURL() string { return te.consoleURL }
 
 type taskExecutionMetadata struct {
 	interfaces.NodeExecutionMetadata
@@ -293,8 +290,6 @@ func (t *Handler) newTaskExecutionContext(ctx context.Context, nCtx interfaces.N
 		return nil, err
 	}
 
-	nCtx.Node().GetTaskID()
-
 	return &taskExecutionContext{
 		NodeExecutionContext: nCtx,
 		tm: taskExecutionMetadata{
@@ -303,7 +298,6 @@ func (t *Handler) newTaskExecutionContext(ctx context.Context, nCtx interfaces.N
 				execName:     uniqueID,
 				id:           id,
 				uniqueNodeID: currentNodeUniqueID,
-				consoleURL:   nCtx.NodeExecutionMetadata().GetConsoleURL(),
 			},
 			o:                    nCtx.Node(),
 			maxAttempts:          maxAttempts,

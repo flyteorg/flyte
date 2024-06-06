@@ -118,8 +118,6 @@ func (e nodeExecMetadata) GetLabels() map[string]string {
 	return e.nodeLabels
 }
 
-func (e nodeExecMetadata) GetConsoleURL() string { return e.Meta.GetConsoleURL() }
-
 type nodeExecContext struct {
 	store           *storage.DataStore
 	tr              interfaces.TaskReader

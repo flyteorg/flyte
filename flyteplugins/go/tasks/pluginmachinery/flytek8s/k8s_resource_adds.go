@@ -33,7 +33,7 @@ func GetContextEnvVars(ownerCtx context.Context) []v1.EnvVar {
 	return envVars
 }
 
-func GetExecutionEnvVars(id pluginsCore.TaskExecutionID) []v1.EnvVar {
+func GetExecutionEnvVars(id pluginsCore.TaskExecutionID, consoleURL string) []v1.EnvVar {
 
 	if id == nil || id.GetID().NodeExecutionId == nil || id.GetID().NodeExecutionId.ExecutionId == nil {
 		return []v1.EnvVar{}
@@ -70,12 +70,12 @@ func GetExecutionEnvVars(id pluginsCore.TaskExecutionID) []v1.EnvVar {
 		// },
 	}
 
-	if id.GetConsoleURL() != "" {
+	if consoleURL != "" {
 		envVars = append(envVars, v1.EnvVar{
 			Name: "FLYTE_EXECUTION_URL",
 			// TODO: is it safe to append `attempt` like this?
 			// TODO: should we use net/url to build this url?
-			Value: fmt.Sprintf("%s/projects/%s/domains/%s/executions/%s/nodeId/%s-%s/nodes", id.GetConsoleURL(), nodeExecutionID.Project, nodeExecutionID.Domain, nodeExecutionID.Name, id.GetUniqueNodeID(), attemptNumber),
+			Value: fmt.Sprintf("%s/projects/%s/domains/%s/executions/%s/nodeId/%s-%s/nodes", consoleURL, nodeExecutionID.Project, nodeExecutionID.Domain, nodeExecutionID.Name, id.GetUniqueNodeID(), attemptNumber),
 		})
 	}
 
@@ -123,9 +123,9 @@ func GetExecutionEnvVars(id pluginsCore.TaskExecutionID) []v1.EnvVar {
 	return envVars
 }
 
-func DecorateEnvVars(ctx context.Context, envVars []v1.EnvVar, taskEnvironmentVariables map[string]string, id pluginsCore.TaskExecutionID) ([]v1.EnvVar, []v1.EnvFromSource) {
+func DecorateEnvVars(ctx context.Context, envVars []v1.EnvVar, taskEnvironmentVariables map[string]string, id pluginsCore.TaskExecutionID, consoleURL string) ([]v1.EnvVar, []v1.EnvFromSource) {
 	envVars = append(envVars, GetContextEnvVars(ctx)...)
-	envVars = append(envVars, GetExecutionEnvVars(id)...)
+	envVars = append(envVars, GetExecutionEnvVars(id, consoleURL)...)
 
 	for k, v := range taskEnvironmentVariables {
 		envVars = append(envVars, v1.EnvVar{Name: k, Value: v})
