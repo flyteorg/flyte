@@ -44,6 +44,11 @@ func TestCreateExecution(t *testing.T) {
 			Key:          "hello",
 			Value:        "world",
 		},
+		{
+			ExecutionKey: executionKey,
+			Key:          "rust",
+			Value:        "",
+		},
 	})
 	assert.NoError(t, err)
 }

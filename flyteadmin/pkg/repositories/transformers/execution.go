@@ -149,18 +149,22 @@ func CreateExecutionModel(input CreateExecutionModelInput) (*models.Execution, e
 
 // CreateExecutionTagModel transforms a CreateExecutionModelInput to a ExecutionTag model
 func CreateExecutionTagModel(input CreateExecutionModelInput) ([]*models.ExecutionTag, error) {
-	tags := make([]*models.ExecutionTag, 0, len(input.RequestSpec.Labels.Values))
-	for k, v := range input.RequestSpec.Labels.Values {
-		tags = append(tags, &models.ExecutionTag{
-			ExecutionKey: models.ExecutionKey{
-				Project: input.WorkflowExecutionID.Project,
-				Domain:  input.WorkflowExecutionID.Domain,
-				Name:    input.WorkflowExecutionID.Name,
-			},
-			Key:   k,
-			Value: v,
-		})
+	tags := make([]*models.ExecutionTag, 0)
+
+	if input.RequestSpec.Labels != nil {
+		for k, v := range input.RequestSpec.Labels.Values {
+			tags = append(tags, &models.ExecutionTag{
+				ExecutionKey: models.ExecutionKey{
+					Project: input.WorkflowExecutionID.Project,
+					Domain:  input.WorkflowExecutionID.Domain,
+					Name:    input.WorkflowExecutionID.Name,
+				},
+				Key:   k,
+				Value: v,
+			})
+		}
 	}
+
 	for _, v := range input.RequestSpec.Tags {
 		tags = append(tags, &models.ExecutionTag{
 			ExecutionKey: models.ExecutionKey{
@@ -172,8 +176,6 @@ func CreateExecutionTagModel(input CreateExecutionModelInput) ([]*models.Executi
 			Value: "",
 		})
 	}
-
-	logger.Infof(context.Background(), "tttttttttags [%v]", input.RequestSpec.Labels.Values)
 
 	return tags, nil
 }
