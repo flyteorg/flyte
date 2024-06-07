@@ -124,6 +124,7 @@ var (
 		ArrayNode: ArrayNodeConfig{
 			EventVersion:               0,
 			DefaultParallelismBehavior: ParallelismBehaviorUnlimited,
+			UseMapPluginLogs:           false,
 		},
 	}
 )
@@ -173,7 +174,7 @@ type Config struct {
 	CreateFlyteWorkflowCRD   bool                 `json:"create-flyteworkflow-crd" pflag:",Enable creation of the FlyteWorkflow CRD on startup"`
 	NodeExecutionWorkerCount int                  `json:"node-execution-worker-count" pflag:",Number of workers to evaluate node executions, currently only used for array nodes"`
 	AcceleratedInputs        AcceleratedInputs    `json:"accelerated-inputs" pflag:",Accelerated inputs config"`
-	ArrayNode                ArrayNodeConfig      `json:"array-node-config,omitempty" pflag:",Configuration for array nodes"`
+	ArrayNode                ArrayNodeConfig      `json:"array-node,omitempty" pflag:",Configuration for array nodes"`
 }
 
 // KubeClientConfig contains the configuration used by flytepropeller to configure its internal Kubernetes Client.
@@ -297,6 +298,7 @@ const (
 type ArrayNodeConfig struct {
 	EventVersion               int                 `json:"event-version" pflag:",ArrayNode eventing version. 0 => legacy (drop-in replacement for maptask), 1 => new"`
 	DefaultParallelismBehavior ParallelismBehavior `json:"default-parallelism-behavior" pflag:",Default parallelism behavior for array nodes"`
+	UseMapPluginLogs           bool                `json:"use-map-plugin-logs" pflag:",Override subNode log links with those configured for the map plugin logs"`
 }
 
 // GetConfig extracts the Configuration from the global config module in flytestdlib and returns the corresponding type-casted object.

@@ -113,7 +113,8 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "accelerated-inputs.remote-path-prefix"), defaultConfig.AcceleratedInputs.RemotePathPrefix, "Remote path prefix that should be replaced with local path prefix")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "accelerated-inputs.local-path-prefix"), defaultConfig.AcceleratedInputs.LocalPathPrefix, "Path to locally mounted directory k8s pod")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "accelerated-inputs.volume-path"), defaultConfig.AcceleratedInputs.VolumePath, "Path to locally mounted directory on k8s host node")
-	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "array-node-config.event-version"), defaultConfig.ArrayNode.EventVersion, "ArrayNode eventing version. 0 => legacy (drop-in replacement for maptask),  1 => new")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "array-node-config.default-parallelism-behavior"), defaultConfig.ArrayNode.DefaultParallelismBehavior, "Default parallelism behavior for array nodes")
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "array-node.event-version"), defaultConfig.ArrayNode.EventVersion, "ArrayNode eventing version. 0 => legacy (drop-in replacement for maptask),  1 => new")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "array-node.default-parallelism-behavior"), defaultConfig.ArrayNode.DefaultParallelismBehavior, "Default parallelism behavior for array nodes")
+	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "array-node.use-map-plugin-logs"), defaultConfig.ArrayNode.UseMapPluginLogs, "Override subNode log links with those configured for the map plugin logs")
 	return cmdFlags
 }

@@ -981,13 +981,13 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_array-node-config.event-version", func(t *testing.T) {
+	t.Run("Test_array-node.event-version", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
 
-			cmdFlags.Set("array-node-config.event-version", testValue)
-			if vInt, err := cmdFlags.GetInt("array-node-config.event-version"); err == nil {
+			cmdFlags.Set("array-node.event-version", testValue)
+			if vInt, err := cmdFlags.GetInt("array-node.event-version"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.ArrayNode.EventVersion)
 
 			} else {
@@ -995,14 +995,28 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_array-node-config.default-parallelism-behavior", func(t *testing.T) {
+	t.Run("Test_array-node.default-parallelism-behavior", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
 
-			cmdFlags.Set("array-node-config.default-parallelism-behavior", testValue)
-			if vString, err := cmdFlags.GetString("array-node-config.default-parallelism-behavior"); err == nil {
+			cmdFlags.Set("array-node.default-parallelism-behavior", testValue)
+			if vString, err := cmdFlags.GetString("array-node.default-parallelism-behavior"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.ArrayNode.DefaultParallelismBehavior)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_array-node.use-map-plugin-logs", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("array-node.use-map-plugin-logs", testValue)
+			if vBool, err := cmdFlags.GetBool("array-node.use-map-plugin-logs"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.ArrayNode.UseMapPluginLogs)
 
 			} else {
 				assert.FailNow(t, err.Error())
