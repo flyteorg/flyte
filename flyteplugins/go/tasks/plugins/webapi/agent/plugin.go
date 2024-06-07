@@ -178,11 +178,6 @@ func (p Plugin) ExecuteTaskSync(
 		return nil, nil, err
 	}
 
-	if err != nil {
-		logger.Errorf(ctx, "Failed to write output with err %s", err.Error())
-		return nil, nil, err
-	}
-
 	return nil, ResourceWrapper{
 		Phase:    resource.Phase,
 		Outputs:  resource.Outputs,
