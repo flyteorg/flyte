@@ -165,6 +165,7 @@ func (p Plugin) ExecuteTaskSync(
 
 	in, err := stream.Recv()
 	if err != nil {
+		logger.Errorf(ctx, "Failed to receive output with err %s", err.Error())
 		return nil, nil, err
 	}
 	if in.GetHeader() == nil {
@@ -175,6 +176,7 @@ func (p Plugin) ExecuteTaskSync(
 	resource := in.GetHeader().GetResource()
 
 	if err := stream.CloseSend(); err != nil {
+		logger.Errorf(ctx, "Failed to close stream with err %s", err.Error())
 		return nil, nil, err
 	}
 
