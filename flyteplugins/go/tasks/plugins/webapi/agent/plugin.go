@@ -165,7 +165,7 @@ func (p Plugin) ExecuteTaskSync(
 
 	in, err := stream.Recv()
 	if err != nil {
-		logger.Errorf(ctx, "Failed to receive output with err %s", err.Error())
+		logger.Errorf(ctx, "Failed to write output with err %s", err.Error())
 		return nil, nil, err
 	}
 	if in.GetHeader() == nil {
