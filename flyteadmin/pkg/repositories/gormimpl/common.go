@@ -28,8 +28,6 @@ const taskExecutionTableName = "task_executions"
 const taskTableName = "tasks"
 const workflowTableName = "workflows"
 const descriptionEntityTableName = "description_entities"
-const AdminTagsTableName = "admin_tags"
-const executionAdminTagsTableName = "execution_admin_tags"
 const executionTagsTableName = "execution_tags"
 
 const limit = "limit"
