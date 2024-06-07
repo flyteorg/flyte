@@ -18,7 +18,7 @@ At times, you may find the need to pass tensors and modules (models) within your
 To clone and run the example code on this page, see the [Flytesnacks repo][flytesnacks].
 ```
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/data_types_and_io/data_types_and_io/pytorch_type.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/pytorch_type.py
 :caption: data_types_and_io/pytorch_type.py
 :lines: 5-50
 ```
@@ -36,7 +36,7 @@ According to the PyTorch [docs](https://pytorch.org/tutorials/beginner/saving_lo
 it's recommended to store the module's `state_dict` rather than the module itself,
 although the serialization should work in either case.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/data_types_and_io/data_types_and_io/pytorch_type.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/pytorch_type.py
 :caption: data_types_and_io/pytorch_type.py
 :lines: 63-117
 ```

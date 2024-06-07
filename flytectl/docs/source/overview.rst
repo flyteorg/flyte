@@ -30,6 +30,9 @@ Flytectl is a Golang binary that can be installed on any platform supported by G
 
     .. tab-item:: Other Operating systems
 
+      .. warning::
+          `jq <https://jqlang.github.io/jq>`_ is a dependency of this script.
+
       .. prompt:: bash $
 
           curl -sL https://ctl.flyte.org/install | bash

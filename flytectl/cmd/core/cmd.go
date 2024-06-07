@@ -73,10 +73,10 @@ func generateCommandFunc(cmdEntry CommandEntry) func(cmd *cobra.Command, args []
 		cmdCtx := NewCommandContextNoClient(cmd.OutOrStdout())
 		if !cmdEntry.DisableFlyteClient {
 			clientSet, err := admin.ClientSetBuilder().WithConfig(admin.GetConfig(ctx)).
-				WithTokenCache(pkce.TokenCacheKeyringProvider{
-					ServiceUser: fmt.Sprintf("%s:%s", adminCfg.Endpoint.String(), pkce.KeyRingServiceUser),
-					ServiceName: pkce.KeyRingServiceName,
-				}).Build(ctx)
+				WithTokenCache(pkce.NewTokenCacheKeyringProvider(
+					pkce.KeyRingServiceName,
+					fmt.Sprintf("%s:%s", adminCfg.Endpoint.String(), pkce.KeyRingServiceUser),
+				)).Build(ctx)
 			if err != nil {
 				return err
 			}

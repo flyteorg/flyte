@@ -32,7 +32,7 @@ func TestClusterConfig(t *testing.T) {
 	configProvider := NewConfigurationProvider()
 	clusterConfig := configProvider.ClusterConfiguration()
 	clusters := clusterConfig.GetClusterConfigs()
-	assert.Equal(t, 2, len(clusters))
+	assert.Equal(t, 3, len(clusters))
 
 	assert.Equal(t, "testcluster", clusters[0].Name)
 	assert.Equal(t, "testcluster_endpoint", clusters[0].Endpoint)
@@ -40,14 +40,23 @@ func TestClusterConfig(t *testing.T) {
 	assert.Equal(t, "/path/to/testcluster/token", clusters[0].Auth.TokenPath)
 	assert.Equal(t, "file_path", clusters[0].Auth.Type)
 	assert.False(t, clusters[0].Enabled)
+	assert.Equal(t, false, clusters[0].InCluster)
 
 	assert.Equal(t, "testcluster2", clusters[1].Name)
 	assert.Equal(t, "testcluster2_endpoint", clusters[1].Endpoint)
 	assert.Equal(t, "/path/to/testcluster2/cert", clusters[1].Auth.CertPath)
 	assert.Equal(t, "/path/to/testcluster2/token", clusters[1].Auth.TokenPath)
 	assert.True(t, clusters[1].Enabled)
-
 	assert.Equal(t, "file_path", clusters[1].Auth.Type)
+	assert.Equal(t, false, clusters[1].InCluster)
+
+	assert.Equal(t, "testcluster3", clusters[2].Name)
+	assert.Equal(t, "", clusters[2].Endpoint)
+	assert.Equal(t, "", clusters[2].Auth.CertPath)
+	assert.Equal(t, "", clusters[2].Auth.TokenPath)
+	assert.True(t, clusters[2].Enabled)
+	assert.Equal(t, "", clusters[2].Auth.Type)
+	assert.Equal(t, true, clusters[2].InCluster)
 }
 
 func TestGetCloudEventsConfig(t *testing.T) {
