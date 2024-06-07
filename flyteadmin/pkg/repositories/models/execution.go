@@ -76,9 +76,9 @@ type ExecutionTag struct {
 	BaseModel
 	ExecutionKey
 	// The key of the tag.
-	Key string `gorm:"primary_key" valid:"length(0|255)"`
+	Key string `gorm:"primary_key;size:255"`
 	// The value of the tag.
-	Value string `gorm:"primary_key" valid:"length(0|255)"`
+	Value string `gorm:"primary_key;size:255"`
 }
 
 func (b *AdminTag) BeforeCreate(tx *gorm.DB) (err error) {
