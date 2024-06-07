@@ -34,11 +34,11 @@ func (m *AdminService) GetDomains(ctx context.Context, request *admin.GetDomainR
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
 	var response *admin.Domains
-	m.Metrics.projectEndpointMetrics.get.Time(func() {
+	m.Metrics.domainEndpointMetrics.get.Time(func() {
 		response = m.ProjectManager.GetDomains(ctx, *request)
 	})
 
-	m.Metrics.projectEndpointMetrics.get.Success()
+	m.Metrics.domainEndpointMetrics.get.Success()
 	return response, nil
 }
 

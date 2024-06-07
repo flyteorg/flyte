@@ -750,26 +750,26 @@ func (_m *AdminFetcherExtInterface) FetchWorkflowVersion(ctx context.Context, na
 	return r0, r1
 }
 
-type AdminFetcherExtInterface_GetDomain struct {
+type AdminFetcherExtInterface_GetDomains struct {
 	*mock.Call
 }
 
-func (_m AdminFetcherExtInterface_GetDomain) Return(_a0 *admin.Domains, _a1 error) *AdminFetcherExtInterface_GetDomain {
-	return &AdminFetcherExtInterface_GetDomain{Call: _m.Call.Return(_a0, _a1)}
+func (_m AdminFetcherExtInterface_GetDomains) Return(_a0 *admin.Domains, _a1 error) *AdminFetcherExtInterface_GetDomains {
+	return &AdminFetcherExtInterface_GetDomains{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *AdminFetcherExtInterface) OnGetDomain(ctx context.Context) *AdminFetcherExtInterface_GetDomain {
-	c_call := _m.On("GetDomain", ctx)
-	return &AdminFetcherExtInterface_GetDomain{Call: c_call}
+func (_m *AdminFetcherExtInterface) OnGetDomains(ctx context.Context) *AdminFetcherExtInterface_GetDomains {
+	c_call := _m.On("GetDomains", ctx)
+	return &AdminFetcherExtInterface_GetDomains{Call: c_call}
 }
 
-func (_m *AdminFetcherExtInterface) OnGetDomainMatch(matchers ...interface{}) *AdminFetcherExtInterface_GetDomain {
-	c_call := _m.On("GetDomain", matchers...)
-	return &AdminFetcherExtInterface_GetDomain{Call: c_call}
+func (_m *AdminFetcherExtInterface) OnGetDomainsMatch(matchers ...interface{}) *AdminFetcherExtInterface_GetDomains {
+	c_call := _m.On("GetDomains", matchers...)
+	return &AdminFetcherExtInterface_GetDomains{Call: c_call}
 }
 
-// GetDomain provides a mock function with given fields: ctx
-func (_m *AdminFetcherExtInterface) GetDomain(ctx context.Context) (*admin.Domains, error) {
+// GetDomains provides a mock function with given fields: ctx
+func (_m *AdminFetcherExtInterface) GetDomains(ctx context.Context) (*admin.Domains, error) {
 	ret := _m.Called(ctx)
 
 	var r0 *admin.Domains
