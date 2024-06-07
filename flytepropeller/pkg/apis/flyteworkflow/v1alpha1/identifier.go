@@ -4,6 +4,7 @@ import (
 	"bytes"
 
 	"github.com/golang/protobuf/jsonpb"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
@@ -34,7 +35,7 @@ type WorkflowExecutionIdentifier struct {
 }
 
 func (in *WorkflowExecutionIdentifier) DeepCopyInto(out *WorkflowExecutionIdentifier) {
-	*out = *in
+	out.WorkflowExecutionIdentifier = proto.Clone(in.WorkflowExecutionIdentifier).(*core.WorkflowExecutionIdentifier)
 }
 
 type TaskExecutionIdentifier struct {

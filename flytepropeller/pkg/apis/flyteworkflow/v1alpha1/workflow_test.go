@@ -7,8 +7,10 @@ import (
 
 	"github.com/ghodss/yaml"
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/proto"
 	"k8s.io/apimachinery/pkg/util/sets"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 )
 
@@ -78,4 +80,61 @@ func TestWorkflowIsInterruptible(t *testing.T) {
 	w.ExecutionConfig.Interruptible = nil
 	w.NodeDefaults.Interruptible = true
 	assert.True(t, w.IsInterruptible())
+}
+
+// w := &v1alpha1.FlyteWorkflow{
+// 	Inputs: v1alpha1.Inputs{
+// 		&core.LiteralMap{
+// 			Literals: map[string]*core.Literal{
+// 				"p1": {
+// 					Value: &core.Literal_Scalar{
+// 						Scalar: &core.Scalar{
+// 							Value: &core.Scalar_Primitive{
+// 								Primitive: &core.Primitive{
+// 									Value: &core.Primitive_Integer{
+// 										Integer: 1,
+// 									},
+// 								},
+// 							},
+// 						},
+// 					},
+// 				},
+// 			},
+// 		},
+// 	},
+// }
+
+func TestWrappedInputsDeepCopy(t *testing.T) {
+	// 1. Setup proto
+	litMap := core.LiteralMap{
+		Literals: map[string]*core.Literal{
+			"p1": {
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Primitive{
+							Primitive: &core.Primitive{
+								Value: &core.Primitive_Integer{
+									Integer: 1,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	// 2. Define wrapper
+	inputs := v1alpha1.Inputs{
+		&litMap,
+	}
+
+	// 3. Deep copy
+	inputsCopy := inputs.DeepCopy()
+
+	// 4. Assert that pointers are different
+	assert.True(t, inputs.LiteralMap != inputsCopy.LiteralMap)
+
+	// 5. Assert that the content is the same
+	assert.True(t, proto.Equal(inputs.LiteralMap, inputsCopy.LiteralMap))
 }

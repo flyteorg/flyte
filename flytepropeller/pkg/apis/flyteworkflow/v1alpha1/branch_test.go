@@ -136,11 +136,11 @@ func TestWrappedErrorDeepCopy(t *testing.T) {
 	}
 
 	// 3. Deep copy the wrapper object
-	copyError := error.DeepCopy()
+	errorCopy := error.DeepCopy()
 
-	// 4. Compare the pointers and the actual values
-	// Assert that the pointers are different
-	assert.True(t, error.Error != copyError.Error)
-	// Assert that the values stored in the proto messages are equal
-	assert.True(t, proto.Equal(error.Error, copyError.Error))
+	// 4. Assert that the pointers are different
+	assert.True(t, error.Error != errorCopy.Error)
+
+	// 5. Assert that the values stored in the proto messages are equal
+	assert.True(t, proto.Equal(error.Error, errorCopy.Error))
 }

@@ -1,6 +1,7 @@
 package v1alpha1
 
 import (
+	"google.golang.org/protobuf/proto"
 	"k8s.io/apimachinery/pkg/api/resource"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
@@ -15,7 +16,7 @@ type RawOutputDataConfig struct {
 }
 
 func (in *RawOutputDataConfig) DeepCopyInto(out *RawOutputDataConfig) {
-	*out = *in
+	out.RawOutputDataConfig = proto.Clone(in.RawOutputDataConfig).(*admin.RawOutputDataConfig)
 }
 
 // This contains workflow-execution specifications and overrides.
