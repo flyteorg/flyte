@@ -4,6 +4,7 @@ import (
 	"bytes"
 
 	"github.com/golang/protobuf/jsonpb"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
@@ -30,5 +31,5 @@ func (in *ExecutionError) MarshalJSON() ([]byte, error) {
 }
 
 func (in *ExecutionError) DeepCopyInto(out *ExecutionError) {
-	*out = *in
+	out.ExecutionError = proto.Clone(in.ExecutionError).(*core.ExecutionError)
 }
