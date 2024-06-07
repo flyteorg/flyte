@@ -22,7 +22,7 @@ func TestGetDomains(t *testing.T) {
 	domains, err := client.GetDomains(ctx, &admin.GetDomainRequest{})
 	assert.Nil(t, err)
 	assert.NotEmpty(t, domains.Domains)
-	for _, domain := range project.Domains {
+	for _, domain := range domains.Domains {
 		assert.Contains(t, []string{"development", "domain", "staging", "production"}, domain.Id)
 		assert.Contains(t, []string{"development", "domain", "staging", "production"}, domain.Name)
 	}
