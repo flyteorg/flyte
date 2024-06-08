@@ -331,7 +331,7 @@ func (p Plugin) watchAgents(ctx context.Context, DefaultPlugins *map[core.TaskTy
 		defer mu.Unlock()
 		updateAgentClientSets(ctx, p.cs)
 		agentRegistry = updateAgentRegistry(ctx, p.cs)
-		// logger.Infof(ctx, "@@@ Plugin Client Set:[%v]", p.cs)
+		logger.Infof(ctx, "@@@ Updated agentRegistry:[%v]", agentRegistry)
 
 		// get registered core plugin
 		var corePlugin core.Plugin
