@@ -168,8 +168,6 @@ func updateAgentRegistry(ctx context.Context, cs *ClientSet) {
 }
 
 func getAgentClientSets(ctx context.Context) *ClientSet {
-	logger.Infof(ctx, "Initializing agent clients")
-
 	clientSet := &ClientSet{
 		asyncAgentClients:    make(map[string]service.AsyncAgentServiceClient),
 		syncAgentClients:     make(map[string]service.SyncAgentServiceClient),
