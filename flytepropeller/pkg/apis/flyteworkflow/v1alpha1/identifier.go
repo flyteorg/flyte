@@ -27,7 +27,7 @@ func (in *Identifier) MarshalJSON() ([]byte, error) {
 }
 
 func (in *Identifier) DeepCopyInto(out *Identifier) {
-	*out = *in
+	out.Identifier = proto.Clone(in.Identifier).(*core.Identifier)
 }
 
 type WorkflowExecutionIdentifier struct {
@@ -43,5 +43,5 @@ type TaskExecutionIdentifier struct {
 }
 
 func (in *TaskExecutionIdentifier) DeepCopyInto(out *TaskExecutionIdentifier) {
-	*out = *in
+	out.TaskExecutionIdentifier = proto.Clone(in.TaskExecutionIdentifier).(*core.TaskExecutionIdentifier)
 }
