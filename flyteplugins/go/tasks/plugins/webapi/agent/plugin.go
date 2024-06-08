@@ -25,8 +25,23 @@ import (
 )
 
 type Registry map[string]map[int32]*Agent // map[taskTypeName][taskTypeVersion] => Agent
-var agentRegistry Registry
-var mu sync.RWMutex
+
+var (
+	agentRegistry Registry
+	mu            sync.RWMutex
+)
+
+func GetAgentRegistry() Registry {
+	mu.Lock()
+	defer mu.Unlock()
+	return agentRegistry
+}
+
+func SetAgentRegistry(r Registry) {
+	mu.Lock()
+	agentRegistry = r
+	mu.Unlock()
+}
 
 type Plugin struct {
 	metricScope promutils.Scope
@@ -329,8 +344,7 @@ func (p Plugin) watchAgents(ctx context.Context) {
 	go wait.Until(func() {
 		mu.Lock()
 		defer mu.Unlock()
-		updateAgentClientSets(ctx, p.cs)
-		agentRegistry = updateAgentRegistry(ctx, p.cs)
+		updateAgentRegistry(ctx, p.cs)
 	}, p.cfg.PollInterval.Duration, ctx.Done())
 }
 
@@ -357,9 +371,8 @@ func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, outputs *fly
 }
 
 func getFinalAgent(taskCategory *admin.TaskCategory, cfg *Config) (*Deployment, bool) {
-	mu.RLock()
-	defer mu.RUnlock()
-	if agent, exists := agentRegistry[taskCategory.Name][taskCategory.Version]; exists {
+	r := GetAgentRegistry()
+	if agent, exists := r[taskCategory.Name][taskCategory.Version]; exists {
 		return agent.AgentDeployment, agent.IsSync
 	}
 	return &cfg.DefaultAgent, false
@@ -383,14 +396,9 @@ func newAgentPlugin() webapi.PluginEntry {
 	ctx := context.Background()
 	cfg := GetConfig()
 
-	clientSet := &ClientSet{
-		asyncAgentClients:    make(map[string]service.AsyncAgentServiceClient),
-		syncAgentClients:     make(map[string]service.SyncAgentServiceClient),
-		agentMetadataClients: make(map[string]service.AgentMetadataServiceClient),
-	}
-	updateAgentClientSets(ctx, clientSet)
-	agentRegistry := updateAgentRegistry(ctx, clientSet)
-	supportedTaskTypes := append(maps.Keys(agentRegistry), cfg.SupportedTaskTypes...)
+	clientSet := initializeAgentClientSets(ctx)
+	updateAgentRegistry(ctx, clientSet)
+	supportedTaskTypes := append(maps.Keys(GetAgentRegistry()), cfg.SupportedTaskTypes...)
 
 	return webapi.PluginEntry{
 		ID:                 "agent-service",

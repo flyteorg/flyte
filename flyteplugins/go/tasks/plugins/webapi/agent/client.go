@@ -97,7 +97,7 @@ func getFinalContext(ctx context.Context, operation string, agent *Deployment) (
 	return context.WithTimeout(ctx, timeout)
 }
 
-func updateAgentRegistry(ctx context.Context, cs *ClientSet) Registry {
+func updateAgentRegistry(ctx context.Context, cs *ClientSet) {
 	agentRegistry := make(Registry)
 	cfg := GetConfig()
 	var agentDeployments []*Deployment
@@ -159,10 +159,18 @@ func updateAgentRegistry(ctx context.Context, cs *ClientSet) Registry {
 		}
 	}
 	logger.Debugf(ctx, "AgentDeployment service supports task types: %v", maps.Keys(agentRegistry))
-	return agentRegistry
+	SetAgentRegistry(agentRegistry)
 }
 
-func updateAgentClientSets(ctx context.Context, clientSet *ClientSet) {
+func initializeAgentClientSets(ctx context.Context) *ClientSet {
+	logger.Infof(ctx, "Initializing agent clients")
+
+	clientSet := &ClientSet{
+		asyncAgentClients:    make(map[string]service.AsyncAgentServiceClient),
+		syncAgentClients:     make(map[string]service.SyncAgentServiceClient),
+		agentMetadataClients: make(map[string]service.AgentMetadataServiceClient),
+	}
+
 	var agentDeployments []*Deployment
 	cfg := GetConfig()
 
@@ -182,4 +190,5 @@ func updateAgentClientSets(ctx context.Context, clientSet *ClientSet) {
 		clientSet.asyncAgentClients[agentService.Endpoint] = service.NewAsyncAgentServiceClient(conn)
 		clientSet.agentMetadataClients[agentService.Endpoint] = service.NewAgentMetadataServiceClient(conn)
 	}
+	return clientSet
 }

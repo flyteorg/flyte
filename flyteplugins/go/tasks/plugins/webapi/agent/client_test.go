@@ -27,7 +27,7 @@ func TestInitializeClients(t *testing.T) {
 		syncAgentClients:     make(map[string]service.SyncAgentServiceClient),
 		agentMetadataClients: make(map[string]service.AgentMetadataServiceClient),
 	}
-	updateAgentClientSets(ctx, cs)
+	cs = initializeAgentClientSets(ctx)
 	_, ok := cs.syncAgentClients["y"]
 	assert.True(t, ok)
 	_, ok = cs.asyncAgentClients["x"]

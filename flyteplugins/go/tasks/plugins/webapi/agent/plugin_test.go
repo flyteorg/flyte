@@ -318,10 +318,10 @@ func TestInitializeAgentRegistry(t *testing.T) {
 	cfg.AgentForTaskTypes = map[string]string{"task1": "agent-deployment-1", "task2": "agent-deployment-2"}
 	err := SetConfig(&cfg)
 	assert.NoError(t, err)
-	registry := updateAgentRegistry(context.Background(), cs)
+	updateAgentRegistry(context.Background(), cs)
 
 	// In golang, the order of keys in a map is random. So, we sort the keys before asserting.
-	agentRegistryKeys := maps.Keys(registry)
+	agentRegistryKeys := maps.Keys(GetAgentRegistry())
 	sort.Strings(agentRegistryKeys)
 
 	assert.Equal(t, agentRegistryKeys, []string{"task1", "task2", "task3"})
