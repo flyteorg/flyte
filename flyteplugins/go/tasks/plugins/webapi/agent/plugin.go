@@ -345,17 +345,18 @@ func (p Plugin) watchAgents(ctx context.Context, DefaultPlugins *map[core.TaskTy
 		clientSet := getAgentClientSets(ctx)
 		updateAgentRegistry(ctx, clientSet)
 
-		// get registered core plugin for DefaultPlugins
-		var corePlugin core.Plugin
+		// Get the core plugin with ID "agent-service" from DefaultPlugins
+		var agentCorePlugin core.Plugin
 		for _, plugin := range *DefaultPlugins {
 			if plugin.GetID() == "agent-service" {
-				corePlugin = plugin
+				agentCorePlugin = plugin
 				break
 			}
 		}
 
+		// Map each task type in the agent registry to the core plugin
 		for _, task := range maps.Keys(agentRegistry) {
-			(*DefaultPlugins)[task] = corePlugin
+			(*DefaultPlugins)[task] = agentCorePlugin
 		}
 
 	}, p.cfg.PollInterval.Duration, ctx.Done())
