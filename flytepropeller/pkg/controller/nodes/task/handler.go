@@ -186,7 +186,7 @@ type pluginID = string
 type Handler struct {
 	catalog         catalog.Client
 	asyncCatalog    catalog.AsyncClient
-	DefaultPlugins  map[pluginCore.TaskType]pluginCore.Plugin
+	defaultPlugins  map[pluginCore.TaskType]pluginCore.Plugin
 	pluginsForType  map[pluginCore.TaskType]map[pluginID]pluginCore.Plugin
 	taskMetricsMap  map[MetricKey]*taskMetrics
 	defaultPlugin   pluginCore.Plugin
@@ -229,7 +229,7 @@ func (t *Handler) Setup(ctx context.Context, sCtx interfaces.SetupContext) error
 	// Create the resource negotiator here
 	// and then convert it to proxies later and pass them to plugins
 	enabledPlugins, defaultForTaskTypes, err := WranglePluginsAndGenerateFinalList(ctx, &t.cfg.TaskPlugins,
-		t.pluginRegistry, t.kubeClientset, &t.DefaultPlugins)
+		t.pluginRegistry, t.kubeClientset, &t.defaultPlugins)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to finalize enabled plugins. Error: %s", err)
 		return err
@@ -254,14 +254,14 @@ func (t *Handler) Setup(ctx context.Context, sCtx interfaces.SetupContext) error
 		for _, tt := range p.RegisteredTaskTypes {
 			for _, defaultTaskType := range defaultForTaskTypes[cp.GetID()] {
 				if defaultTaskType == tt {
-					if existingHandler, alreadyDefaulted := t.DefaultPlugins[tt]; alreadyDefaulted && existingHandler.GetID() != cp.GetID() {
+					if existingHandler, alreadyDefaulted := t.defaultPlugins[tt]; alreadyDefaulted && existingHandler.GetID() != cp.GetID() {
 						logger.Errorf(ctx, "TaskType [%s] has multiple default handlers specified: [%s] and [%s]",
 							tt, existingHandler.GetID(), cp.GetID())
 						return regErrors.New(fmt.Sprintf("TaskType [%s] has multiple default handlers specified: [%s] and [%s]",
 							tt, existingHandler.GetID(), cp.GetID()))
 					}
 					logger.Infof(ctx, "Plugin [%s] registered for TaskType [%s]", cp.GetID(), tt)
-					t.DefaultPlugins[tt] = cp
+					t.defaultPlugins[tt] = cp
 				}
 			}
 
@@ -286,9 +286,9 @@ func (t *Handler) Setup(ctx context.Context, sCtx interfaces.SetupContext) error
 		}
 	}
 
-	// Read from the fallback task handler map for any remaining tasks without a DefaultPlugins registered handler.
+	// Read from the fallback task handler map for any remaining tasks without a defaultPlugins registered handler.
 	for taskType, registeredPlugins := range fallbackTaskHandlerMap {
-		if _, ok := t.DefaultPlugins[taskType]; ok {
+		if _, ok := t.defaultPlugins[taskType]; ok {
 			continue
 		}
 		if len(registeredPlugins) != 1 {
@@ -296,7 +296,7 @@ func (t *Handler) Setup(ctx context.Context, sCtx interfaces.SetupContext) error
 			return regErrors.New(fmt.Sprintf("Multiple plugins registered to handle task type: %s. ([%+v]). Use default-for-task-type config option to choose the desired plugin.", taskType, registeredPlugins))
 		}
 		for _, plugin := range registeredPlugins {
-			t.DefaultPlugins[taskType] = plugin
+			t.defaultPlugins[taskType] = plugin
 		}
 	}
 
@@ -329,11 +329,11 @@ func (t Handler) ResolvePlugin(ctx context.Context, ttype string, executionConfi
 		// If we've exhausted the list of overridable plugins and no single implementation is found, fail fast if the
 		// task plugin overrides specify so.
 		if executionConfig.TaskPluginImpls[ttype].MissingPluginBehavior == admin.PluginOverride_FAIL {
-			return nil, fmt.Errorf("no matching plugin overrides defined for Handler type [%s]. Ignoring any DefaultPlugins configured", ttype)
+			return nil, fmt.Errorf("no matching plugin overrides defined for Handler type [%s]. Ignoring any defaultPlugins configured", ttype)
 		}
 	}
 
-	p, ok := t.DefaultPlugins[ttype]
+	p, ok := t.defaultPlugins[ttype]
 	if ok {
 		logger.Debugf(ctx, "Plugin [%s] resolved for Handler type [%s]", p.GetID(), ttype)
 		return p, nil
@@ -894,7 +894,7 @@ func New(ctx context.Context, kubeClient executors.Client, kubeClientset kuberne
 	cfg := config.GetConfig()
 	return &Handler{
 		pluginRegistry: pluginMachinery.PluginRegistry(),
-		DefaultPlugins: make(map[pluginCore.TaskType]pluginCore.Plugin),
+		defaultPlugins: make(map[pluginCore.TaskType]pluginCore.Plugin),
 		pluginsForType: make(map[pluginCore.TaskType]map[pluginID]pluginCore.Plugin),
 		taskMetricsMap: make(map[MetricKey]*taskMetrics),
 		metrics: &metrics{

@@ -340,14 +340,14 @@ func (p Plugin) getAsyncAgentClient(ctx context.Context, agent *Deployment) (ser
 	return client, nil
 }
 
-func (p Plugin) watchAgents(ctx context.Context, DefaultPlugins *map[core.TaskType]core.Plugin) {
+func (p Plugin) watchAgents(ctx context.Context, defaultPlugins *map[core.TaskType]core.Plugin) {
 	go wait.Until(func() {
 		clientSet := getAgentClientSets(ctx)
 		updateAgentRegistry(ctx, clientSet)
 
-		// Get the core plugin with ID "agent-service" from DefaultPlugins
+		// Get the core plugin with ID "agent-service" from defaultPlugins
 		var agentCorePlugin core.Plugin
-		for _, plugin := range *DefaultPlugins {
+		for _, plugin := range *defaultPlugins {
 			if plugin.GetID() == "agent-service" {
 				agentCorePlugin = plugin
 				break
@@ -356,7 +356,7 @@ func (p Plugin) watchAgents(ctx context.Context, DefaultPlugins *map[core.TaskTy
 
 		// Map each task type in the agent registry to the core plugin
 		for _, task := range maps.Keys(agentRegistry) {
-			(*DefaultPlugins)[task] = agentCorePlugin
+			(*defaultPlugins)[task] = agentCorePlugin
 		}
 
 	}, p.cfg.PollInterval.Duration, ctx.Done())
@@ -406,7 +406,7 @@ func buildTaskExecutionMetadata(taskExecutionMetadata core.TaskExecutionMetadata
 	}
 }
 
-func newAgentPlugin(DefaultPlugins *map[core.TaskType]core.Plugin) webapi.PluginEntry {
+func newAgentPlugin(defaultPlugins *map[core.TaskType]core.Plugin) webapi.PluginEntry {
 	ctx := context.Background()
 	cfg := GetConfig()
 
@@ -423,14 +423,14 @@ func newAgentPlugin(DefaultPlugins *map[core.TaskType]core.Plugin) webapi.Plugin
 				cfg:         cfg,
 				cs:          clientSet,
 			}
-			plugin.watchAgents(ctx, DefaultPlugins)
+			plugin.watchAgents(ctx, defaultPlugins)
 			return plugin, nil
 		},
 	}
 }
 
-func RegisterAgentPlugin(DefaultPlugins *map[core.TaskType]core.Plugin) {
+func RegisterAgentPlugin(defaultPlugins *map[core.TaskType]core.Plugin) {
 	gob.Register(ResourceMetaWrapper{})
 	gob.Register(ResourceWrapper{})
-	pluginmachinery.PluginRegistry().RegisterRemotePlugin(newAgentPlugin(DefaultPlugins))
+	pluginmachinery.PluginRegistry().RegisterRemotePlugin(newAgentPlugin(defaultPlugins))
 }
