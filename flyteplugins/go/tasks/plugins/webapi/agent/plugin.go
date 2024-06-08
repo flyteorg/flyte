@@ -331,9 +331,24 @@ func (p Plugin) watchAgents(ctx context.Context, DefaultPlugins *map[core.TaskTy
 		defer mu.Unlock()
 		updateAgentClientSets(ctx, p.cs)
 		agentRegistry = updateAgentRegistry(ctx, p.cs)
+		// logger.Infof(ctx, "@@@ Plugin Client Set:[%v]", p.cs)
+
+		// get registered core plugin
+		var corePlugin core.Plugin
+		// logger.Infof(ctx, "@@@ Before corePlugin:[%v]", corePlugin)
+		for _, plugin := range *DefaultPlugins {
+			if plugin.GetID() == "agent-service" {
+				corePlugin = plugin
+				break
+			}
+		}
+		// logger.Infof(ctx, "@@@ After corePlugin:[%v]", corePlugin)
+
+		// logger.Infof(ctx, "@@@ watchAgents corePlugin:[%v]", corePlugin)
+		// TODO: Delete disconnected agent task
 		for _, task := range maps.Keys(agentRegistry) {
-			logger.Infof(ctx, "@@@ Updating Default Plugin for task type:[%s]", task)
-			(*DefaultPlugins)[task] = (*DefaultPlugins)["sensor"]
+			// logger.Infof(ctx, "@@@ Updating Default Plugin for task type:[%s]", task)
+			(*DefaultPlugins)[task] = corePlugin
 		}
 	}, p.cfg.PollInterval.Duration, ctx.Done())
 }
@@ -396,23 +411,20 @@ func newAgentPlugin(DefaultPlugins *map[core.TaskType]core.Plugin) webapi.Plugin
 	agentRegistry := updateAgentRegistry(ctx, clientSet)
 	supportedTaskTypes := append(maps.Keys(agentRegistry), cfg.SupportedTaskTypes...)
 
-	pluginLoader := func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
-		plugin := &Plugin{
-			metricScope: iCtx.MetricsScope(),
-			cfg:         cfg,
-			cs:          clientSet,
-		}
-		plugin.watchAgents(ctx, DefaultPlugins)
-		return plugin, nil
-	}
-
-	pluginEntry := webapi.PluginEntry{
+	return webapi.PluginEntry{
 		ID:                 "agent-service",
 		SupportedTaskTypes: supportedTaskTypes,
-		PluginLoader:       pluginLoader,
+		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
+			plugin := &Plugin{
+				metricScope: iCtx.MetricsScope(),
+				cfg:         cfg,
+				cs:          clientSet,
+			}
+			plugin.watchAgents(ctx, DefaultPlugins)
+			return plugin, nil
+		},
 	}
 
-	return pluginEntry
 }
 
 func RegisterAgentPlugin(DefaultPlugins *map[core.TaskType]core.Plugin) {
