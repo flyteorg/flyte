@@ -398,7 +398,8 @@ enabled_plugins:
         - container
         - sidecar
         - k8s-array
-        - agent-service
+        # -- Uncomment to enable agent service plugin in Propeller
+        # - agent-service
       default-for-task-types:
         container: container
         sidecar: sidecar
