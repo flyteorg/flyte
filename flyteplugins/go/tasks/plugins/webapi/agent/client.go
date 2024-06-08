@@ -113,7 +113,11 @@ func updateAgentRegistry(ctx context.Context, cs *ClientSet) {
 	}
 	agentDeployments = append(agentDeployments, maps.Values(cfg.AgentDeployments)...)
 	for _, agentDeployment := range agentDeployments {
-		client := cs.agentMetadataClients[agentDeployment.Endpoint]
+		client, ok := cs.agentMetadataClients[agentDeployment.Endpoint]
+		if !ok {
+			logger.Warningf(ctx, "Agent client not found in the clientSet for the endpoint: %v", agentDeployment.Endpoint)
+			continue
+		}
 
 		finalCtx, cancel := getFinalContext(ctx, "ListAgents", agentDeployment)
 		defer cancel()
@@ -162,7 +166,7 @@ func updateAgentRegistry(ctx context.Context, cs *ClientSet) {
 	SetAgentRegistry(agentRegistry)
 }
 
-func initializeAgentClientSets(ctx context.Context) *ClientSet {
+func getAgentClientSets(ctx context.Context) *ClientSet {
 	logger.Infof(ctx, "Initializing agent clients")
 
 	clientSet := &ClientSet{
@@ -178,17 +182,19 @@ func initializeAgentClientSets(ctx context.Context) *ClientSet {
 		agentDeployments = append(agentDeployments, &cfg.DefaultAgent)
 	}
 	agentDeployments = append(agentDeployments, maps.Values(cfg.AgentDeployments)...)
-	for _, agentService := range agentDeployments {
-		if _, ok := clientSet.agentMetadataClients[agentService.Endpoint]; ok {
+	for _, agentDeployment := range agentDeployments {
+		if _, ok := clientSet.agentMetadataClients[agentDeployment.Endpoint]; ok {
+			logger.Infof(ctx, "Agent client already initialized for [%v]", agentDeployment.Endpoint)
 			continue
 		}
-		conn, err := getGrpcConnection(ctx, agentService)
+		conn, err := getGrpcConnection(ctx, agentDeployment)
 		if err != nil {
-			logger.Warningf(ctx, "failed to create connection to agent: [%v] with error: [%v]", agentService, err)
+			logger.Errorf(ctx, "failed to create connection to agent: [%v] with error: [%v]", agentDeployment, err)
+			continue
 		}
-		clientSet.syncAgentClients[agentService.Endpoint] = service.NewSyncAgentServiceClient(conn)
-		clientSet.asyncAgentClients[agentService.Endpoint] = service.NewAsyncAgentServiceClient(conn)
-		clientSet.agentMetadataClients[agentService.Endpoint] = service.NewAgentMetadataServiceClient(conn)
+		clientSet.syncAgentClients[agentDeployment.Endpoint] = service.NewSyncAgentServiceClient(conn)
+		clientSet.asyncAgentClients[agentDeployment.Endpoint] = service.NewAsyncAgentServiceClient(conn)
+		clientSet.agentMetadataClients[agentDeployment.Endpoint] = service.NewAgentMetadataServiceClient(conn)
 	}
 	return clientSet
 }

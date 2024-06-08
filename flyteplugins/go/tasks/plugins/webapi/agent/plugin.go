@@ -39,8 +39,8 @@ func GetAgentRegistry() Registry {
 
 func SetAgentRegistry(r Registry) {
 	mu.Lock()
+	defer mu.Unlock()
 	agentRegistry = r
-	mu.Unlock()
 }
 
 type Plugin struct {
@@ -342,9 +342,8 @@ func (p Plugin) getAsyncAgentClient(ctx context.Context, agent *Deployment) (ser
 
 func (p Plugin) watchAgents(ctx context.Context) {
 	go wait.Until(func() {
-		mu.Lock()
-		defer mu.Unlock()
-		updateAgentRegistry(ctx, p.cs)
+		clientSet := getAgentClientSets(ctx)
+		updateAgentRegistry(ctx, clientSet)
 	}, p.cfg.PollInterval.Duration, ctx.Done())
 }
 
@@ -396,7 +395,7 @@ func newAgentPlugin() webapi.PluginEntry {
 	ctx := context.Background()
 	cfg := GetConfig()
 
-	clientSet := initializeAgentClientSets(ctx)
+	clientSet := getAgentClientSets(ctx)
 	updateAgentRegistry(ctx, clientSet)
 	supportedTaskTypes := append(maps.Keys(GetAgentRegistry()), cfg.SupportedTaskTypes...)
 
