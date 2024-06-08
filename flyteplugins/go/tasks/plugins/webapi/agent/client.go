@@ -132,11 +132,11 @@ func updateAgentRegistry(ctx context.Context, cs *ClientSet) {
 			}
 
 			if !ok {
-				logger.Warningf(finalCtx, "failed to list agent: [%v] with a non-gRPC error: [%v]", agentDeployment.Endpoint, err)
+				logger.Errorf(finalCtx, "failed to list agent: [%v] with a non-gRPC error: [%v]", agentDeployment.Endpoint, err)
 				continue
 			}
 
-			logger.Warningf(finalCtx, "failed to list agent: [%v] with error: [%v]", agentDeployment.Endpoint, err)
+			logger.Errorf(finalCtx, "failed to list agent: [%v] with error: [%v]", agentDeployment.Endpoint, err)
 			continue
 		}
 
