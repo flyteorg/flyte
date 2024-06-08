@@ -448,7 +448,6 @@ data:
         - container
         - sidecar
         - k8s-array
-        - agent-service
     plugins:
       logs:
         kubernetes-enabled: true

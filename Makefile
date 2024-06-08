@@ -138,7 +138,7 @@ go-tidy:
 
 .PHONY: lint-helm-charts
 lint-helm-charts:
-	# This pressuposes that you have act installed
+	# This presupposes that you have act installed
 	act pull_request -W .github/workflows/validate-helm-charts.yaml --container-architecture linux/amd64 -e charts/event.json
 
 .PHONY: spellcheck
