@@ -340,10 +340,24 @@ func (p Plugin) getAsyncAgentClient(ctx context.Context, agent *Deployment) (ser
 	return client, nil
 }
 
-func (p Plugin) watchAgents(ctx context.Context) {
+func (p Plugin) watchAgents(ctx context.Context, DefaultPlugins *map[core.TaskType]core.Plugin) {
 	go wait.Until(func() {
 		clientSet := getAgentClientSets(ctx)
 		updateAgentRegistry(ctx, clientSet)
+
+		// get registered core plugin for DefaultPlugins
+		var corePlugin core.Plugin
+		for _, plugin := range *DefaultPlugins {
+			if plugin.GetID() == "agent-service" {
+				corePlugin = plugin
+				break
+			}
+		}
+
+		for _, task := range maps.Keys(agentRegistry) {
+			(*DefaultPlugins)[task] = corePlugin
+		}
+
 	}, p.cfg.PollInterval.Duration, ctx.Done())
 }
 
@@ -391,7 +405,7 @@ func buildTaskExecutionMetadata(taskExecutionMetadata core.TaskExecutionMetadata
 	}
 }
 
-func newAgentPlugin() webapi.PluginEntry {
+func newAgentPlugin(DefaultPlugins *map[core.TaskType]core.Plugin) webapi.PluginEntry {
 	ctx := context.Background()
 	cfg := GetConfig()
 
@@ -408,14 +422,14 @@ func newAgentPlugin() webapi.PluginEntry {
 				cfg:         cfg,
 				cs:          clientSet,
 			}
-			plugin.watchAgents(ctx)
+			plugin.watchAgents(ctx, DefaultPlugins)
 			return plugin, nil
 		},
 	}
 }
 
-func RegisterAgentPlugin() {
+func RegisterAgentPlugin(DefaultPlugins *map[core.TaskType]core.Plugin) {
 	gob.Register(ResourceMetaWrapper{})
 	gob.Register(ResourceWrapper{})
-	pluginmachinery.PluginRegistry().RegisterRemotePlugin(newAgentPlugin())
+	pluginmachinery.PluginRegistry().RegisterRemotePlugin(newAgentPlugin(DefaultPlugins))
 }
