@@ -356,7 +356,9 @@ func (p Plugin) watchAgents(ctx context.Context, defaultPlugins *map[core.TaskTy
 
 		// Map each task type in the agent registry to the core plugin
 		for _, task := range maps.Keys(agentRegistry) {
-			(*defaultPlugins)[task] = agentCorePlugin
+			if _, ok := (*defaultPlugins)[task]; !ok {
+				(*defaultPlugins)[task] = agentCorePlugin
+			}
 		}
 
 	}, p.cfg.PollInterval.Duration, ctx.Done())
