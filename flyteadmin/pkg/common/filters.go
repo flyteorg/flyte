@@ -319,6 +319,7 @@ func NewRepeatedValueFilter(entity Entity, function FilterExpression, field stri
 	}
 	customizedField := customizeField(field, entity)
 	customizedEntity := customizeEntity(field, entity)
+
 	return &inlineFilterImpl{
 		entity:        customizedEntity,
 		function:      function,
