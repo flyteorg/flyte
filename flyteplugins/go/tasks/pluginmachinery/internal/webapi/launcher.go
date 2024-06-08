@@ -2,9 +2,9 @@ package webapi
 
 import (
 	"context"
-	pluginErrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	"time"
 
+	pluginErrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi"
 	"github.com/flyteorg/flyte/flytestdlib/cache"
@@ -38,6 +38,8 @@ func launch(ctx context.Context, p webapi.AsyncPlugin, tCtx core.TaskExecutionCo
 	// Store the created resource name, and update our state.
 	state.ResourceMeta = rMeta
 	state.Phase = PhaseResourcesCreated
+	state.PhaseVersion = 2
+
 	cacheItem := CacheItem{
 		State: *state,
 	}
@@ -49,5 +51,5 @@ func launch(ctx context.Context, p webapi.AsyncPlugin, tCtx core.TaskExecutionCo
 		return nil, core.PhaseInfo{}, err
 	}
 
-	return state, core.PhaseInfoQueued(time.Now(), 2, "launched"), nil
+	return state, core.PhaseInfoQueued(time.Now(), state.PhaseVersion, "launched"), nil
 }

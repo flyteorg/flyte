@@ -11,7 +11,8 @@ import (
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
-	"k8s.io/client-go/tools/cache"
+	"sigs.k8s.io/controller-runtime/pkg/cache"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
@@ -37,34 +38,29 @@ var pods = []interface{}{
 	},
 }
 
-func TestNewResourceLevelMonitor(t *testing.T) {
-	x := v1.Pod{}
-	x.GetObjectMeta()
-	lm := ResourceLevelMonitor{}
-	res := lm.countList(context.Background(), pods)
-	assert.Equal(t, 2, res["ns-a"])
-	assert.Equal(t, 1, res["ns-b"])
+type MyFakeCache struct {
+	cache.Cache
 }
 
-type MyFakeInformer struct {
-	cache.SharedIndexInformer
-	store cache.Store
+func (m MyFakeCache) List(_ context.Context, list client.ObjectList, _ ...client.ListOption) error {
+	objectMetadataList, ok := list.(*metav1.PartialObjectMetadataList)
+	if !ok {
+		return fmt.Errorf("unexpected type %T", list)
+	}
+
+	objectMetadataList.Items = make([]metav1.PartialObjectMetadata, 0)
+	for _, pod := range pods {
+		objectMetadataList.Items = append(objectMetadataList.Items, metav1.PartialObjectMetadata{
+			TypeMeta:   objectMetadataList.TypeMeta,
+			ObjectMeta: pod.(*v1.Pod).ObjectMeta,
+		})
+	}
+
+	return nil
 }
 
-func (m MyFakeInformer) GetStore() cache.Store {
-	return m.store
-}
-
-func (m MyFakeInformer) HasSynced() bool {
+func (m MyFakeCache) WaitForCacheSync(_ context.Context) bool {
 	return true
-}
-
-type MyFakeStore struct {
-	cache.Store
-}
-
-func (m MyFakeStore) List() []interface{} {
-	return pods
 }
 
 func TestResourceLevelMonitor_collect(t *testing.T) {
@@ -73,12 +69,10 @@ func TestResourceLevelMonitor_collect(t *testing.T) {
 
 	kinds, _, err := scheme.Scheme.ObjectKinds(&v1.Pod{})
 	assert.NoError(t, err)
-	myInformer := MyFakeInformer{
-		store: MyFakeStore{},
-	}
+	myCache := MyFakeCache{}
 
 	index := NewResourceMonitorIndex()
-	rm := index.GetOrCreateResourceLevelMonitor(ctx, scope, myInformer, kinds[0])
+	rm := index.GetOrCreateResourceLevelMonitor(ctx, scope, myCache, kinds[0])
 	rm.collect(ctx)
 
 	var expected = `
@@ -98,14 +92,11 @@ func TestResourceLevelMonitorSingletonness(t *testing.T) {
 
 	kinds, _, err := scheme.Scheme.ObjectKinds(&v1.Pod{})
 	assert.NoError(t, err)
-	myInformer := MyFakeInformer{
-		store: MyFakeStore{},
-	}
+	myCache := MyFakeCache{}
 
 	index := NewResourceMonitorIndex()
-	rm := index.GetOrCreateResourceLevelMonitor(ctx, scope, myInformer, kinds[0])
-	fmt.Println(rm)
-	//rm2 := index.GetOrCreateResourceLevelMonitor(ctx, scope, myInformer, kinds[0])
+	rm := index.GetOrCreateResourceLevelMonitor(ctx, scope, myCache, kinds[0])
+	rm2 := index.GetOrCreateResourceLevelMonitor(ctx, scope, myCache, kinds[0])
 
-	//assert.Equal(t, rm, rm2)
+	assert.Equal(t, rm, rm2)
 }

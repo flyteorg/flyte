@@ -1,22 +1,3 @@
----
-jupytext:
-  cell_metadata_filter: all
-  formats: md:myst
-  main_language: python
-  notebook_metadata_filter: all
-  text_representation:
-    extension: .md
-    format_name: myst
-    format_version: 0.13
-    jupytext_version: 1.16.1
-kernelspec:
-  display_name: Python 3
-  language: python
-  name: python3
----
-
-+++ {"lines_to_next_cell": 0}
-
 (eager_workflows)=
 
 # Eager workflows
@@ -60,32 +41,14 @@ the python constructs that you're familiar with via the `asyncio` API. To
 understand what this looks like, let's define a very basic eager workflow
 using the `@eager` decorator.
 
-```{code-cell}
-:lines_to_next_cell: 2
-
-from flytekit import task, workflow
-from flytekit.experimental import eager
-
-
-@task
-def add_one(x: int) -> int:
-    return x + 1
-
-
-@task
-def double(x: int) -> int:
-    return x * 2
-
-
-@eager
-async def simple_eager_workflow(x: int) -> int:
-    out = await add_one(x=x)
-    if out < 0:
-        return -1
-    return await double(x=out)
+```{note}
+To clone and run the example code on this page, see the [Flytesnacks repo][flytesnacks].
 ```
 
-+++ {"lines_to_next_cell": 2}
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/eager_workflows.py
+:caption: advanced_composition/eager_workflows.py
+:lines: 1-21
+```
 
 As we can see in the code above, we're defining an `async` function called
 `simple_eager_workflow` that takes an integer as input and returns an integer.
@@ -153,18 +116,10 @@ One of the biggest benefits of eager workflows is that you can now materialize
 task and subworkflow outputs as Python values and do operations on them just
 like you would in any other Python function. Let's look at another example:
 
-```{code-cell}
-@eager
-async def another_eager_workflow(x: int) -> int:
-    out = await add_one(x=x)
-
-    # out is a Python integer
-    out = out - 1
-
-    return await double(x=out)
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/eager_workflows.py
+:caption: advanced_composition/eager_workflows.py
+:pyobject: another_eager_workflow
 ```
-
-+++ {"lines_to_next_cell": 0}
 
 Since out is an actual Python integer and not a promise, we can do operations
 on it at runtime, inside the eager workflow function body. This is not possible
@@ -176,27 +131,9 @@ As you saw in the `simple_eager_workflow` workflow above, you can use regular
 Python conditionals in your eager workflows. Let's look at a more complicated
 example:
 
-```{code-cell}
-:lines_to_next_cell: 2
-
-@task
-def gt_100(x: int) -> bool:
-    return x > 100
-
-
-@eager
-async def eager_workflow_with_conditionals(x: int) -> int:
-    out = await add_one(x=x)
-
-    if out < 0:
-        return -1
-    elif await gt_100(x=out):
-        return 100
-    else:
-        out = await double(x=out)
-
-    assert out >= -1
-    return out
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/eager_workflows.py
+:caption: advanced_composition/eager_workflows.py
+:lines: 36-53
 ```
 
 In the above example, we're using the eager workflow's Python runtime
@@ -207,88 +144,36 @@ to check if `out` is negative, but we're also using the `gt_100` task in the
 
 You can also gather the outputs of multiple tasks or subworkflows into a list:
 
-```{code-cell}
-import asyncio
-
-
-@eager
-async def eager_workflow_with_for_loop(x: int) -> int:
-    outputs = []
-
-    for i in range(x):
-        outputs.append(add_one(x=i))
-
-    outputs = await asyncio.gather(*outputs)
-    return await double(x=sum(outputs))
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/eager_workflows.py
+:caption: advanced_composition/eager_workflows.py
+:lines: 58-69
 ```
-
-+++ {"lines_to_next_cell": 0}
 
 ### Static subworkflows
 
 You can also invoke static workflows from within an eager workflow:
 
-```{code-cell}
-:lines_to_next_cell: 2
-
-@workflow
-def subworkflow(x: int) -> int:
-    out = add_one(x=x)
-    return double(x=out)
-
-
-@eager
-async def eager_workflow_with_static_subworkflow(x: int) -> int:
-    out = await subworkflow(x=x)
-    assert out == (x + 1) * 2
-    return out
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/eager_workflows.py
+:caption: advanced_composition/eager_workflows.py
+:lines: 74-84
 ```
-
-+++ {"lines_to_next_cell": 0}
 
 ### Eager subworkflows
 
 You can have nest eager subworkflows inside a parent eager workflow:
 
-```{code-cell}
-:lines_to_next_cell: 2
-
-@eager
-async def eager_subworkflow(x: int) -> int:
-    return await add_one(x=x)
-
-
-@eager
-async def nested_eager_workflow(x: int) -> int:
-    out = await eager_subworkflow(x=x)
-    return await double(x=out)
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/eager_workflows.py
+:caption: advanced_composition/eager_workflows.py
+:lines: 89-97
 ```
-
-+++ {"lines_to_next_cell": 0}
 
 ### Catching exceptions
 
 You can also catch exceptions in eager workflows through `EagerException`:
 
-```{code-cell}
-:lines_to_next_cell: 2
-
-from flytekit.experimental import EagerException
-
-
-@task
-def raises_exc(x: int) -> int:
-    if x <= 0:
-        raise TypeError
-    return x
-
-
-@eager
-async def eager_workflow_with_exception(x: int) -> int:
-    try:
-        return await raises_exc(x=x)
-    except EagerException:
-        return -1
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/eager_workflows.py
+:caption: advanced_composition/eager_workflows.py
+:lines: 102-117
 ```
 
 Even though the `raises_exc` exception task raises a `TypeError`, the
@@ -310,10 +195,9 @@ and remotely.
 You can execute eager workflows locally by simply calling them like a regular
 `async` function:
 
-```{code-cell}
-if __name__ == "__main__":
-    result = asyncio.run(simple_eager_workflow(x=5))
-    print(f"Result: {result}")  # "Result: 12"
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/eager_workflows.py
+:caption: advanced_composition/eager_workflows.py
+:lines: 123-125
 ```
 
 This just uses the `asyncio.run` function to execute the eager workflow just
@@ -329,7 +213,7 @@ object to kick off task, static workflow, and eager workflow executions.
 
 In order to actually execute them on a Flyte cluster, you'll need to configure
 eager workflows with a `FlyteRemote` object and secrets configuration that
-allows you to authenticate into the cluster via a client secret key.
+allows you to authenticate into the cluster via a client secret key:
 
 ```{code-block} python
 from flytekit.remote import FlyteRemote
@@ -348,15 +232,11 @@ async def eager_workflow_remote(x: int) -> int:
     ...
 ```
 
-+++
-
 Where `config.yaml` contains a
 [flytectl](https://docs.flyte.org/projects/flytectl/en/latest/#configuration)-compatible
 config file and `my_client_secret_group` and `my_client_secret_key` are the
 {ref}`secret group and key <secrets>` that you've configured for your Flyte
 cluster to authenticate via a client key.
-
-+++
 
 ### Sandbox Flyte cluster execution
 
@@ -364,25 +244,9 @@ When using a sandbox cluster started with `flytectl demo start`, however, the
 `client_secret_group` and `client_secret_key` are not required, since the
 default sandbox configuration does not require key-based authentication.
 
-```{code-cell}
-:lines_to_next_cell: 2
-
-from flytekit.configuration import Config
-from flytekit.remote import FlyteRemote
-
-
-@eager(
-    remote=FlyteRemote(
-        config=Config.for_sandbox(),
-        default_project="flytesnacks",
-        default_domain="development",
-    )
-)
-async def eager_workflow_sandbox(x: int) -> int:
-    out = await add_one(x=x)
-    if out < 0:
-        return -1
-    return await double(x=out)
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/eager_workflows.py
+:caption: advanced_composition/eager_workflows.py
+:lines: 130-145
 ```
 
 ```{important}
@@ -493,3 +357,5 @@ of promises and materialized values:
 | `@workflow` | Compiled at compile-time | All inputs and intermediary outputs are promises | Type errors caught at compile-time | Constrained by Flyte DSL |
 | `@dynamic` | Compiled at run-time | Inputs are materialized, but outputs of all Flyte entities are Promises | More flexible than `@workflow`, e.g. can do Python operations on inputs | Can't use a lot of Python constructs (e.g. try/except) |
 | `@eager` | Never compiled | Everything is materialized! | Can effectively use all Python constructs via `asyncio` syntax | No compile-time benefits, this is the wild west 🏜 |
+
+[flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/advanced_composition/

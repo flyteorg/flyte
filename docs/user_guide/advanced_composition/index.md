@@ -16,6 +16,7 @@ chaining_flyte_entities
 subworkflows
 dynamic_workflows
 map_tasks
+nested_parallelization
 eager_workflows
 decorating_tasks
 decorating_workflows

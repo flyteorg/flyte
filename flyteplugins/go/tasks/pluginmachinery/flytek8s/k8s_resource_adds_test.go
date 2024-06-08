@@ -283,7 +283,7 @@ func TestDecorateEnvVars(t *testing.T) {
 				DefaultEnvVars:        tt.additionEnvVar,
 				DefaultEnvVarsFromEnv: tt.additionEnvVarFromEnv,
 			}))
-			if got := DecorateEnvVars(ctx, tt.args.envVars, tt.executionEnvVar, tt.args.id); !reflect.DeepEqual(got, tt.want) {
+			if got, _ := DecorateEnvVars(ctx, tt.args.envVars, tt.executionEnvVar, tt.args.id); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("DecorateEnvVars() = %v, want %v", got, tt.want)
 			}
 		})

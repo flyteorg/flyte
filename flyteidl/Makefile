@@ -1,7 +1,6 @@
-#!/bin/bash
-
 export REPOSITORY=flyteidl
-include boilerplate/flyte/golang_test_targets/Makefile
+export REPO_ROOT=..
+include ../boilerplate/flyte/golang_test_targets/Makefile
 
 define PIP_COMPILE
 pip-compile $(1) --upgrade --verbose
@@ -34,17 +33,9 @@ build_python:
 install-piptools:
 	pip install -U pip-tools
 
-.PHONY: doc-requirements.txt
-doc-requirements.txt: doc-requirements.in install-piptools
-	$(call PIP_COMPILE,doc-requirements.in)
-
 PLACEHOLDER_NPM := \"version\": \"0.0.0-develop\"
 
 .PHONY: update_npmversion
 update_npmversion:
 	grep "$(PLACEHOLDER_NPM)" "package.json"
 	sed -i "s/$(PLACEHOLDER_NPM)/\"version\":  \"${VERSION}\"/g" "package.json"
-
-.PHONY: go-tidy
-go-tidy:
-	go mod tidy

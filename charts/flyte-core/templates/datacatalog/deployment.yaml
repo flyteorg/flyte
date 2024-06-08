@@ -66,8 +66,8 @@ spec:
         imagePullPolicy: "{{ .Values.datacatalog.image.pullPolicy }}"
         name: datacatalog
         ports:
-        - containerPort: 8088
-        - containerPort: 8089
+        - containerPort: {{ .Values.configmap.datacatalogServer.application.httpPort }}
+        - containerPort: {{ .Values.configmap.datacatalogServer.application.grpcPort }}
         - containerPort: {{ index .Values.configmap.datacatalogServer.datacatalog "profiler-port" }}
         securityContext:
           allowPrivilegeEscalation: false

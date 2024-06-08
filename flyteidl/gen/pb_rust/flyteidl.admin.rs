@@ -1,9 +1,10 @@
 // @generated
 /// Represents a subset of runtime task execution metadata that are relevant to external plugins.
+///
+/// ID of the task execution
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct TaskExecutionMetadata {
-    /// ID of the task execution
     #[prost(message, optional, tag="1")]
     pub task_execution_id: ::core::option::Option<super::core::TaskExecutionIdentifier>,
     /// k8s namespace where the task is executed in
@@ -38,6 +39,9 @@ pub struct TaskExecutionMetadata {
     /// These overrides can be used to customize the behavior of the task node.
     #[prost(message, optional, tag="10")]
     pub overrides: ::core::option::Option<super::core::TaskNodeOverrides>,
+    /// Identity of user running this task execution
+    #[prost(message, optional, tag="11")]
+    pub identity: ::core::option::Option<super::core::Identity>,
 }
 /// Represents a request structure to create task.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -1034,6 +1038,268 @@ pub struct TaskExecutionEventRequest {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct TaskExecutionEventResponse {
 }
+/// Defines a set of overridable task resource attributes set during task registration.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct TaskResourceSpec {
+    #[prost(string, tag="1")]
+    pub cpu: ::prost::alloc::string::String,
+    #[prost(string, tag="2")]
+    pub gpu: ::prost::alloc::string::String,
+    #[prost(string, tag="3")]
+    pub memory: ::prost::alloc::string::String,
+    #[prost(string, tag="4")]
+    pub storage: ::prost::alloc::string::String,
+    #[prost(string, tag="5")]
+    pub ephemeral_storage: ::prost::alloc::string::String,
+}
+/// Defines task resource defaults and limits that will be applied at task registration.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct TaskResourceAttributes {
+    #[prost(message, optional, tag="1")]
+    pub defaults: ::core::option::Option<TaskResourceSpec>,
+    #[prost(message, optional, tag="2")]
+    pub limits: ::core::option::Option<TaskResourceSpec>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ClusterResourceAttributes {
+    /// Custom resource attributes which will be applied in cluster resource creation (e.g. quotas).
+    /// Map keys are the *case-sensitive* names of variables in templatized resource files.
+    /// Map values should be the custom values which get substituted during resource creation.
+    #[prost(map="string, string", tag="1")]
+    pub attributes: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ExecutionQueueAttributes {
+    /// Tags used for assigning execution queues for tasks defined within this project.
+    #[prost(string, repeated, tag="1")]
+    pub tags: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ExecutionClusterLabel {
+    /// Label value to determine where the execution will be run
+    #[prost(string, tag="1")]
+    pub value: ::prost::alloc::string::String,
+}
+/// This MatchableAttribute configures selecting alternate plugin implementations for a given task type.
+/// In addition to an override implementation a selection of fallbacks can be provided or other modes
+/// for handling cases where the desired plugin override is not enabled in a given Flyte deployment.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct PluginOverride {
+    /// A predefined yet extensible Task type identifier.
+    #[prost(string, tag="1")]
+    pub task_type: ::prost::alloc::string::String,
+    /// A set of plugin ids which should handle tasks of this type instead of the default registered plugin. The list will be tried in order until a plugin is found with that id.
+    #[prost(string, repeated, tag="2")]
+    pub plugin_id: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    /// Defines the behavior when no plugin from the plugin_id list is not found.
+    #[prost(enumeration="plugin_override::MissingPluginBehavior", tag="4")]
+    pub missing_plugin_behavior: i32,
+}
+/// Nested message and enum types in `PluginOverride`.
+pub mod plugin_override {
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+    #[repr(i32)]
+    pub enum MissingPluginBehavior {
+        /// By default, if this plugin is not enabled for a Flyte deployment then execution will fail.
+        Fail = 0,
+        /// Uses the system-configured default implementation.
+        UseDefault = 1,
+    }
+    impl MissingPluginBehavior {
+        /// String value of the enum field names used in the ProtoBuf definition.
+        ///
+        /// The values are not transformed in any way and thus are considered stable
+        /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+        pub fn as_str_name(&self) -> &'static str {
+            match self {
+                MissingPluginBehavior::Fail => "FAIL",
+                MissingPluginBehavior::UseDefault => "USE_DEFAULT",
+            }
+        }
+        /// Creates an enum from field names used in the ProtoBuf definition.
+        pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+            match value {
+                "FAIL" => Some(Self::Fail),
+                "USE_DEFAULT" => Some(Self::UseDefault),
+                _ => None,
+            }
+        }
+    }
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct PluginOverrides {
+    #[prost(message, repeated, tag="1")]
+    pub overrides: ::prost::alloc::vec::Vec<PluginOverride>,
+}
+/// Adds defaults for customizable workflow-execution specifications and overrides.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct WorkflowExecutionConfig {
+    /// Can be used to control the number of parallel nodes to run within the workflow. This is useful to achieve fairness.
+    #[prost(int32, tag="1")]
+    pub max_parallelism: i32,
+    /// Indicates security context permissions for executions triggered with this matchable attribute. 
+    #[prost(message, optional, tag="2")]
+    pub security_context: ::core::option::Option<super::core::SecurityContext>,
+    /// Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
+    #[prost(message, optional, tag="3")]
+    pub raw_output_data_config: ::core::option::Option<RawOutputDataConfig>,
+    /// Custom labels to be applied to a triggered execution resource.
+    #[prost(message, optional, tag="4")]
+    pub labels: ::core::option::Option<Labels>,
+    /// Custom annotations to be applied to a triggered execution resource.
+    #[prost(message, optional, tag="5")]
+    pub annotations: ::core::option::Option<Annotations>,
+    /// Allows for the interruptible flag of a workflow to be overwritten for a single execution.
+    /// Omitting this field uses the workflow's value as a default.
+    /// As we need to distinguish between the field not being provided and its default value false, we have to use a wrapper
+    /// around the bool field.
+    #[prost(message, optional, tag="6")]
+    pub interruptible: ::core::option::Option<bool>,
+    /// Allows for all cached values of a workflow and its tasks to be overwritten for a single execution.
+    /// If enabled, all calculations are performed even if cached results would be available, overwriting the stored
+    /// data once execution finishes successfully.
+    #[prost(bool, tag="7")]
+    pub overwrite_cache: bool,
+    /// Environment variables to be set for the execution.
+    #[prost(message, optional, tag="8")]
+    pub envs: ::core::option::Option<Envs>,
+    /// Execution environment assignments to be set for the execution.
+    #[prost(message, repeated, tag="9")]
+    pub execution_env_assignments: ::prost::alloc::vec::Vec<super::core::ExecutionEnvAssignment>,
+}
+/// Generic container for encapsulating all types of the above attributes messages.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct MatchingAttributes {
+    #[prost(oneof="matching_attributes::Target", tags="1, 2, 3, 4, 5, 6, 7, 8")]
+    pub target: ::core::option::Option<matching_attributes::Target>,
+}
+/// Nested message and enum types in `MatchingAttributes`.
+pub mod matching_attributes {
+    #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum Target {
+        #[prost(message, tag="1")]
+        TaskResourceAttributes(super::TaskResourceAttributes),
+        #[prost(message, tag="2")]
+        ClusterResourceAttributes(super::ClusterResourceAttributes),
+        #[prost(message, tag="3")]
+        ExecutionQueueAttributes(super::ExecutionQueueAttributes),
+        #[prost(message, tag="4")]
+        ExecutionClusterLabel(super::ExecutionClusterLabel),
+        #[prost(message, tag="5")]
+        QualityOfService(super::super::core::QualityOfService),
+        #[prost(message, tag="6")]
+        PluginOverrides(super::PluginOverrides),
+        #[prost(message, tag="7")]
+        WorkflowExecutionConfig(super::WorkflowExecutionConfig),
+        #[prost(message, tag="8")]
+        ClusterAssignment(super::ClusterAssignment),
+    }
+}
+/// Represents a custom set of attributes applied for either a domain (and optional org); a domain and project (and optional org);
+/// or domain, project and workflow name (and optional org).
+/// These are used to override system level defaults for kubernetes cluster resource management,
+/// default execution values, and more all across different levels of specificity.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct MatchableAttributesConfiguration {
+    #[prost(message, optional, tag="1")]
+    pub attributes: ::core::option::Option<MatchingAttributes>,
+    #[prost(string, tag="2")]
+    pub domain: ::prost::alloc::string::String,
+    #[prost(string, tag="3")]
+    pub project: ::prost::alloc::string::String,
+    #[prost(string, tag="4")]
+    pub workflow: ::prost::alloc::string::String,
+    #[prost(string, tag="5")]
+    pub launch_plan: ::prost::alloc::string::String,
+    /// Optional, org key applied to the resource.
+    #[prost(string, tag="6")]
+    pub org: ::prost::alloc::string::String,
+}
+/// Request all matching resource attributes for a resource type.
+/// See :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for more details
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ListMatchableAttributesRequest {
+    /// +required
+    #[prost(enumeration="MatchableResource", tag="1")]
+    pub resource_type: i32,
+    /// Optional, org filter applied to list project requests.
+    #[prost(string, tag="2")]
+    pub org: ::prost::alloc::string::String,
+}
+/// Response for a request for all matching resource attributes for a resource type.
+/// See :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for more details
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ListMatchableAttributesResponse {
+    #[prost(message, repeated, tag="1")]
+    pub configurations: ::prost::alloc::vec::Vec<MatchableAttributesConfiguration>,
+}
+/// Defines a resource that can be configured by customizable Project-, ProjectDomain- or WorkflowAttributes
+/// based on matching tags.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+#[repr(i32)]
+pub enum MatchableResource {
+    /// Applies to customizable task resource requests and limits.
+    TaskResource = 0,
+    /// Applies to configuring templated kubernetes cluster resources.
+    ClusterResource = 1,
+    /// Configures task and dynamic task execution queue assignment.
+    ExecutionQueue = 2,
+    /// Configures the K8s cluster label to be used for execution to be run
+    ExecutionClusterLabel = 3,
+    /// Configures default quality of service when undefined in an execution spec.
+    QualityOfServiceSpecification = 4,
+    /// Selects configurable plugin implementation behavior for a given task type.
+    PluginOverride = 5,
+    /// Adds defaults for customizable workflow-execution specifications and overrides.
+    WorkflowExecutionConfig = 6,
+    /// Controls how to select an available cluster on which this execution should run.
+    ClusterAssignment = 7,
+}
+impl MatchableResource {
+    /// String value of the enum field names used in the ProtoBuf definition.
+    ///
+    /// The values are not transformed in any way and thus are considered stable
+    /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+    pub fn as_str_name(&self) -> &'static str {
+        match self {
+            MatchableResource::TaskResource => "TASK_RESOURCE",
+            MatchableResource::ClusterResource => "CLUSTER_RESOURCE",
+            MatchableResource::ExecutionQueue => "EXECUTION_QUEUE",
+            MatchableResource::ExecutionClusterLabel => "EXECUTION_CLUSTER_LABEL",
+            MatchableResource::QualityOfServiceSpecification => "QUALITY_OF_SERVICE_SPECIFICATION",
+            MatchableResource::PluginOverride => "PLUGIN_OVERRIDE",
+            MatchableResource::WorkflowExecutionConfig => "WORKFLOW_EXECUTION_CONFIG",
+            MatchableResource::ClusterAssignment => "CLUSTER_ASSIGNMENT",
+        }
+    }
+    /// Creates an enum from field names used in the ProtoBuf definition.
+    pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+        match value {
+            "TASK_RESOURCE" => Some(Self::TaskResource),
+            "CLUSTER_RESOURCE" => Some(Self::ClusterResource),
+            "EXECUTION_QUEUE" => Some(Self::ExecutionQueue),
+            "EXECUTION_CLUSTER_LABEL" => Some(Self::ExecutionClusterLabel),
+            "QUALITY_OF_SERVICE_SPECIFICATION" => Some(Self::QualityOfServiceSpecification),
+            "PLUGIN_OVERRIDE" => Some(Self::PluginOverride),
+            "WORKFLOW_EXECUTION_CONFIG" => Some(Self::WorkflowExecutionConfig),
+            "CLUSTER_ASSIGNMENT" => Some(Self::ClusterAssignment),
+            _ => None,
+        }
+    }
+}
 /// Request to launch an execution with the given project, domain and optionally-assigned name.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1407,8 +1673,15 @@ pub struct ExecutionSpec {
     #[prost(message, optional, tag="23")]
     pub envs: ::core::option::Option<Envs>,
     /// Tags to be set for the execution.
+    #[deprecated]
     #[prost(string, repeated, tag="24")]
     pub tags: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    /// Execution cluster label to be set for the execution.
+    #[prost(message, optional, tag="25")]
+    pub execution_cluster_label: ::core::option::Option<ExecutionClusterLabel>,
+    /// Execution environment assignments to be set for the execution.
+    #[prost(message, repeated, tag="26")]
+    pub execution_env_assignments: ::prost::alloc::vec::Vec<super::core::ExecutionEnvAssignment>,
     #[prost(oneof="execution_spec::NotificationOverrides", tags="5, 6")]
     pub notification_overrides: ::core::option::Option<execution_spec::NotificationOverrides>,
 }
@@ -1754,6 +2027,9 @@ pub struct LaunchPlanSpec {
     /// Environment variables to be set for the execution.
     #[prost(message, optional, tag="21")]
     pub envs: ::core::option::Option<Envs>,
+    /// Execution environment assignments to be set for the execution.
+    #[prost(message, repeated, tag="22")]
+    pub execution_env_assignments: ::prost::alloc::vec::Vec<super::core::ExecutionEnvAssignment>,
 }
 /// Values computed by the flyte platform after launch plan registration.
 /// These include expected_inputs required to be present in a CreateExecutionRequest
@@ -1877,265 +2153,6 @@ impl LaunchPlanState {
         match value {
             "INACTIVE" => Some(Self::Inactive),
             "ACTIVE" => Some(Self::Active),
-            _ => None,
-        }
-    }
-}
-/// Defines a set of overridable task resource attributes set during task registration.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct TaskResourceSpec {
-    #[prost(string, tag="1")]
-    pub cpu: ::prost::alloc::string::String,
-    #[prost(string, tag="2")]
-    pub gpu: ::prost::alloc::string::String,
-    #[prost(string, tag="3")]
-    pub memory: ::prost::alloc::string::String,
-    #[prost(string, tag="4")]
-    pub storage: ::prost::alloc::string::String,
-    #[prost(string, tag="5")]
-    pub ephemeral_storage: ::prost::alloc::string::String,
-}
-/// Defines task resource defaults and limits that will be applied at task registration.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct TaskResourceAttributes {
-    #[prost(message, optional, tag="1")]
-    pub defaults: ::core::option::Option<TaskResourceSpec>,
-    #[prost(message, optional, tag="2")]
-    pub limits: ::core::option::Option<TaskResourceSpec>,
-}
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct ClusterResourceAttributes {
-    /// Custom resource attributes which will be applied in cluster resource creation (e.g. quotas).
-    /// Map keys are the *case-sensitive* names of variables in templatized resource files.
-    /// Map values should be the custom values which get substituted during resource creation.
-    #[prost(map="string, string", tag="1")]
-    pub attributes: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
-}
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct ExecutionQueueAttributes {
-    /// Tags used for assigning execution queues for tasks defined within this project.
-    #[prost(string, repeated, tag="1")]
-    pub tags: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
-}
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct ExecutionClusterLabel {
-    /// Label value to determine where the execution will be run
-    #[prost(string, tag="1")]
-    pub value: ::prost::alloc::string::String,
-}
-/// This MatchableAttribute configures selecting alternate plugin implementations for a given task type.
-/// In addition to an override implementation a selection of fallbacks can be provided or other modes
-/// for handling cases where the desired plugin override is not enabled in a given Flyte deployment.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct PluginOverride {
-    /// A predefined yet extensible Task type identifier.
-    #[prost(string, tag="1")]
-    pub task_type: ::prost::alloc::string::String,
-    /// A set of plugin ids which should handle tasks of this type instead of the default registered plugin. The list will be tried in order until a plugin is found with that id.
-    #[prost(string, repeated, tag="2")]
-    pub plugin_id: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
-    /// Defines the behavior when no plugin from the plugin_id list is not found.
-    #[prost(enumeration="plugin_override::MissingPluginBehavior", tag="4")]
-    pub missing_plugin_behavior: i32,
-}
-/// Nested message and enum types in `PluginOverride`.
-pub mod plugin_override {
-    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
-    #[repr(i32)]
-    pub enum MissingPluginBehavior {
-        /// By default, if this plugin is not enabled for a Flyte deployment then execution will fail.
-        Fail = 0,
-        /// Uses the system-configured default implementation.
-        UseDefault = 1,
-    }
-    impl MissingPluginBehavior {
-        /// String value of the enum field names used in the ProtoBuf definition.
-        ///
-        /// The values are not transformed in any way and thus are considered stable
-        /// (if the ProtoBuf definition does not change) and safe for programmatic use.
-        pub fn as_str_name(&self) -> &'static str {
-            match self {
-                MissingPluginBehavior::Fail => "FAIL",
-                MissingPluginBehavior::UseDefault => "USE_DEFAULT",
-            }
-        }
-        /// Creates an enum from field names used in the ProtoBuf definition.
-        pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
-            match value {
-                "FAIL" => Some(Self::Fail),
-                "USE_DEFAULT" => Some(Self::UseDefault),
-                _ => None,
-            }
-        }
-    }
-}
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct PluginOverrides {
-    #[prost(message, repeated, tag="1")]
-    pub overrides: ::prost::alloc::vec::Vec<PluginOverride>,
-}
-/// Adds defaults for customizable workflow-execution specifications and overrides.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct WorkflowExecutionConfig {
-    /// Can be used to control the number of parallel nodes to run within the workflow. This is useful to achieve fairness.
-    #[prost(int32, tag="1")]
-    pub max_parallelism: i32,
-    /// Indicates security context permissions for executions triggered with this matchable attribute. 
-    #[prost(message, optional, tag="2")]
-    pub security_context: ::core::option::Option<super::core::SecurityContext>,
-    /// Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
-    #[prost(message, optional, tag="3")]
-    pub raw_output_data_config: ::core::option::Option<RawOutputDataConfig>,
-    /// Custom labels to be applied to a triggered execution resource.
-    #[prost(message, optional, tag="4")]
-    pub labels: ::core::option::Option<Labels>,
-    /// Custom annotations to be applied to a triggered execution resource.
-    #[prost(message, optional, tag="5")]
-    pub annotations: ::core::option::Option<Annotations>,
-    /// Allows for the interruptible flag of a workflow to be overwritten for a single execution.
-    /// Omitting this field uses the workflow's value as a default.
-    /// As we need to distinguish between the field not being provided and its default value false, we have to use a wrapper
-    /// around the bool field.
-    #[prost(message, optional, tag="6")]
-    pub interruptible: ::core::option::Option<bool>,
-    /// Allows for all cached values of a workflow and its tasks to be overwritten for a single execution.
-    /// If enabled, all calculations are performed even if cached results would be available, overwriting the stored
-    /// data once execution finishes successfully.
-    #[prost(bool, tag="7")]
-    pub overwrite_cache: bool,
-    /// Environment variables to be set for the execution.
-    #[prost(message, optional, tag="8")]
-    pub envs: ::core::option::Option<Envs>,
-}
-/// Generic container for encapsulating all types of the above attributes messages.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct MatchingAttributes {
-    #[prost(oneof="matching_attributes::Target", tags="1, 2, 3, 4, 5, 6, 7, 8")]
-    pub target: ::core::option::Option<matching_attributes::Target>,
-}
-/// Nested message and enum types in `MatchingAttributes`.
-pub mod matching_attributes {
-    #[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Oneof)]
-    pub enum Target {
-        #[prost(message, tag="1")]
-        TaskResourceAttributes(super::TaskResourceAttributes),
-        #[prost(message, tag="2")]
-        ClusterResourceAttributes(super::ClusterResourceAttributes),
-        #[prost(message, tag="3")]
-        ExecutionQueueAttributes(super::ExecutionQueueAttributes),
-        #[prost(message, tag="4")]
-        ExecutionClusterLabel(super::ExecutionClusterLabel),
-        #[prost(message, tag="5")]
-        QualityOfService(super::super::core::QualityOfService),
-        #[prost(message, tag="6")]
-        PluginOverrides(super::PluginOverrides),
-        #[prost(message, tag="7")]
-        WorkflowExecutionConfig(super::WorkflowExecutionConfig),
-        #[prost(message, tag="8")]
-        ClusterAssignment(super::ClusterAssignment),
-    }
-}
-/// Represents a custom set of attributes applied for either a domain (and optional org); a domain and project (and optional org);
-/// or domain, project and workflow name (and optional org).
-/// These are used to override system level defaults for kubernetes cluster resource management,
-/// default execution values, and more all across different levels of specificity.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct MatchableAttributesConfiguration {
-    #[prost(message, optional, tag="1")]
-    pub attributes: ::core::option::Option<MatchingAttributes>,
-    #[prost(string, tag="2")]
-    pub domain: ::prost::alloc::string::String,
-    #[prost(string, tag="3")]
-    pub project: ::prost::alloc::string::String,
-    #[prost(string, tag="4")]
-    pub workflow: ::prost::alloc::string::String,
-    #[prost(string, tag="5")]
-    pub launch_plan: ::prost::alloc::string::String,
-    /// Optional, org key applied to the resource.
-    #[prost(string, tag="6")]
-    pub org: ::prost::alloc::string::String,
-}
-/// Request all matching resource attributes for a resource type.
-/// See :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for more details
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct ListMatchableAttributesRequest {
-    /// +required
-    #[prost(enumeration="MatchableResource", tag="1")]
-    pub resource_type: i32,
-    /// Optional, org filter applied to list project requests.
-    #[prost(string, tag="2")]
-    pub org: ::prost::alloc::string::String,
-}
-/// Response for a request for all matching resource attributes for a resource type.
-/// See :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for more details
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct ListMatchableAttributesResponse {
-    #[prost(message, repeated, tag="1")]
-    pub configurations: ::prost::alloc::vec::Vec<MatchableAttributesConfiguration>,
-}
-/// Defines a resource that can be configured by customizable Project-, ProjectDomain- or WorkflowAttributes
-/// based on matching tags.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
-#[repr(i32)]
-pub enum MatchableResource {
-    /// Applies to customizable task resource requests and limits.
-    TaskResource = 0,
-    /// Applies to configuring templated kubernetes cluster resources.
-    ClusterResource = 1,
-    /// Configures task and dynamic task execution queue assignment.
-    ExecutionQueue = 2,
-    /// Configures the K8s cluster label to be used for execution to be run
-    ExecutionClusterLabel = 3,
-    /// Configures default quality of service when undefined in an execution spec.
-    QualityOfServiceSpecification = 4,
-    /// Selects configurable plugin implementation behavior for a given task type.
-    PluginOverride = 5,
-    /// Adds defaults for customizable workflow-execution specifications and overrides.
-    WorkflowExecutionConfig = 6,
-    /// Controls how to select an available cluster on which this execution should run.
-    ClusterAssignment = 7,
-}
-impl MatchableResource {
-    /// String value of the enum field names used in the ProtoBuf definition.
-    ///
-    /// The values are not transformed in any way and thus are considered stable
-    /// (if the ProtoBuf definition does not change) and safe for programmatic use.
-    pub fn as_str_name(&self) -> &'static str {
-        match self {
-            MatchableResource::TaskResource => "TASK_RESOURCE",
-            MatchableResource::ClusterResource => "CLUSTER_RESOURCE",
-            MatchableResource::ExecutionQueue => "EXECUTION_QUEUE",
-            MatchableResource::ExecutionClusterLabel => "EXECUTION_CLUSTER_LABEL",
-            MatchableResource::QualityOfServiceSpecification => "QUALITY_OF_SERVICE_SPECIFICATION",
-            MatchableResource::PluginOverride => "PLUGIN_OVERRIDE",
-            MatchableResource::WorkflowExecutionConfig => "WORKFLOW_EXECUTION_CONFIG",
-            MatchableResource::ClusterAssignment => "CLUSTER_ASSIGNMENT",
-        }
-    }
-    /// Creates an enum from field names used in the ProtoBuf definition.
-    pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
-        match value {
-            "TASK_RESOURCE" => Some(Self::TaskResource),
-            "CLUSTER_RESOURCE" => Some(Self::ClusterResource),
-            "EXECUTION_QUEUE" => Some(Self::ExecutionQueue),
-            "EXECUTION_CLUSTER_LABEL" => Some(Self::ExecutionClusterLabel),
-            "QUALITY_OF_SERVICE_SPECIFICATION" => Some(Self::QualityOfServiceSpecification),
-            "PLUGIN_OVERRIDE" => Some(Self::PluginOverride),
-            "WORKFLOW_EXECUTION_CONFIG" => Some(Self::WorkflowExecutionConfig),
-            "CLUSTER_ASSIGNMENT" => Some(Self::ClusterAssignment),
             _ => None,
         }
     }
@@ -2570,6 +2587,17 @@ pub struct ProjectRegisterResponse {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ProjectUpdateResponse {
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ProjectGetRequest {
+    /// Indicates a unique project.
+    /// +required
+    #[prost(string, tag="1")]
+    pub id: ::prost::alloc::string::String,
+    /// Optional, org key applied to the resource.
+    #[prost(string, tag="2")]
+    pub org: ::prost::alloc::string::String,
 }
 /// Defines a set of custom matching attributes at the project level.
 /// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`

@@ -1,30 +1,9 @@
----
-jupytext:
-  cell_metadata_filter: all
-  formats: md:myst
-  main_language: python
-  notebook_metadata_filter: all
-  text_representation:
-    extension: .md
-    format_name: myst
-    format_version: 0.13
-    jupytext_version: 1.16.1
-kernelspec:
-  display_name: Python 3
-  language: python
-  name: python3
----
-
-+++ {"lines_to_next_cell": 0}
-
-# Spot instances
+ # Spot instances
 
 ```{eval-rst}
 .. tags:: AWS, GCP, Intermediate
 
 ```
-
-+++
 
 ## What are spot instances?
 
@@ -52,7 +31,6 @@ This can be done by setting taints and tolerations using the [config](https://gi
 When your spot/preemptible instance is terminated, ASG attempts to launch a replacement instance to maintain the desired capacity for the group.
 :::
 
-+++
 
 ## What are interruptible tasks?
 
@@ -67,8 +45,6 @@ To run your workload on a spot/preemptible instance, you can set interruptible t
 def add_one_and_print(value_to_print: int) -> int:
     return value_to_print + 1
 ```
-
-+++
 
 By setting this value, Flyte will schedule your task on an auto-scaling group (ASG) with only spot instances.
 
@@ -86,7 +62,5 @@ If your task does NOT exhibit the following properties, you can set `interruptib
 - Long-Running Tasks: The task takes > 2 hours. Having an interruption during this time frame could potentially waste a lot of computation.
 
 In a nutshell, you should use spot/preemptible instances when you want to reduce the total cost of running jobs at the expense of potential delays in execution due to restarts.
-
-+++
 
 % TODO: Write "How to Recover From Interruptions?" section

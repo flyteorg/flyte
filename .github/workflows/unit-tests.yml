@@ -10,7 +10,7 @@ on:
         required: true
         type: string
     secrets:
-      FLYTE_BOT_PAT:
+      CODECOV_TOKEN:
         required: true
 jobs:
   tests:
@@ -21,21 +21,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Set up Go
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v4
         with:
           go-version: ${{ inputs.go-version }}
       - name: Unit Tests
-        env:
-          GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
         run: make install && make test_unit_codecov
-      # TODO(monorepo): Figure out how to do code coverage aggregation
       - name: Push CodeCov
-        uses: codecov/codecov-action@v3.1.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
+        uses: codecov/codecov-action@v4
         with:
           file: coverage.txt
-          flags: unittests
+          flags: unittests-${{ inputs.component }}
           fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}

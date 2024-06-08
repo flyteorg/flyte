@@ -41,6 +41,9 @@ type State struct {
 	// Phase current phase of the resource.
 	Phase Phase `json:"phase,omitempty"`
 
+	// PhaseVersion is the version of the phase. This is used to detect if the phase has changed since the last time
+	PhaseVersion uint32
+
 	// ResourceMeta contain metadata about resource this task created. This can be a complex structure or a simple type
 	// (e.g. a string). It should contain enough information for the plugin to interact (retrieve, check status, delete)
 	// with the resource through the remote service.

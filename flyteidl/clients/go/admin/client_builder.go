@@ -40,7 +40,7 @@ func (cb *ClientsetBuilder) WithDialOptions(opts ...grpc.DialOption) *ClientsetB
 // Build the clientset using the current state of the ClientsetBuilder
 func (cb *ClientsetBuilder) Build(ctx context.Context) (*Clientset, error) {
 	if cb.tokenCache == nil {
-		cb.tokenCache = &cache.TokenCacheInMemoryProvider{}
+		cb.tokenCache = cache.NewTokenCacheInMemoryProvider()
 	}
 
 	if cb.config == nil {

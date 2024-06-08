@@ -7,7 +7,7 @@ This is one of the core repositories of Flyte. It contains the Specification of 
 
 * [flyte.org](https://flyte.org)
 * [Flyte Docs](http://docs.flyte.org)
-* [Flyteidl API reference documentation](https://docs.flyte.org/projects/flyteidl/en/stable/index.html)
+* [Flyteidl API reference documentation](https://docs.flyte.org/en/latest/reference_flyteidl.html)
 
 ## Contributing to Flyteidl
 

@@ -1,20 +1,3 @@
----
-jupytext:
-  cell_metadata_filter: all
-  formats: md:myst
-  main_language: python
-  notebook_metadata_filter: all
-  text_representation:
-    extension: .md
-    format_name: myst
-    format_version: 0.13
-    jupytext_version: 1.16.1
-kernelspec:
-  display_name: Python 3
-  language: python
-  name: python3
----
-
 (configure-logging)=
 
 # Configuring logging links in the UI
@@ -24,20 +7,16 @@ kernelspec:
 ```
 
 To debug your workflows in production, you want to access logs from your tasks as they run.
-These logs are different from the core Flyte platform logs, are specific to execution, and may vary from plugin to plugin;
-for example, Spark may have driver and executor logs.
+These logs are different from the core Flyte platform logs, are specific to execution, and may vary from plugin to plugin; for example, Spark may have driver and executor logs.
 
-Every organization potentially uses different log aggregators, making it hard to create a one-size-fits-all solution.
-Some examples of the log aggregators include cloud-hosted solutions like AWS CloudWatch, GCP Stackdriver, Splunk, Datadog, etc.
+Every organization potentially uses different log aggregators, making it hard to create a one-size-fits-all solution. Some examples of the log aggregators include cloud-hosted solutions like AWS CloudWatch, GCP Stackdriver, Splunk, Datadog, etc.
 
 Flyte provides a simplified interface to configure your log provider. Flyte-sandbox
-ships with the Kubernetes dashboard to visualize the logs. This may not be safe for production, hence we recommend users
-explore other log aggregators.
+ships with the Kubernetes dashboard to visualize the logs. This may not be safe for production, hence we recommend users explore other log aggregators.
 
 ## How to configure?
 
-To configure your log provider, the provider needs to support `URL` links that are shareable and can be templatized.
-The templating engine has access to [these](https://github.com/flyteorg/flyteplugins/blob/b0684d97a1cf240f1a44f310f4a79cc21844caa9/go/tasks/pluginmachinery/tasklog/plugin.go#L7-L16) parameters.
+To configure your log provider, the provider needs to support `URL` links that are shareable and can be templatized. The templating engine has access to [these](https://github.com/flyteorg/flyteplugins/blob/b0684d97a1cf240f1a44f310f4a79cc21844caa9/go/tasks/pluginmachinery/tasklog/plugin.go#L7-L16) parameters.
 
 The parameters can be used to generate a unique URL to the logs using a templated URI that pertain to a specific task. The templated URI has access to the following parameters:
 
@@ -105,7 +84,7 @@ Flytepropeller pod would be created as:
 :::
 
 This code snippet will output two logs per task that use the log plugin.
-However, not all task types use the log plugin; for example, the SageMaker plugin uses the log output provided by Sagemaker, and the Snowflake plugin will use a link to the snowflake console.
+However, not all task types use the log plugin; for example, the Snowflake plugin will use a link to the Snowflake console.
 
 ## Datadog integration
 
@@ -128,7 +107,7 @@ If you're using environment variables, use the following config:
 DD_LOGS_ENABLED: "false"
 DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL: "true"
 DD_LOGS_CONFIG_K8S_CONTAINER_USE_FILE: "true"
-DD_CONTAINER_EXCLUDE_LOGS: "name:datadog-agent"  # This is to avoid tracking logs produced by the datadog agent itself
+DD_CONTAINER_EXCLUDE_LOGS: "name:datadog-agent" # This is to avoid tracking logs produced by the datadog agent itself
 ```
 
 :::{warning}

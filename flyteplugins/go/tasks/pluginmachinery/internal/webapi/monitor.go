@@ -2,6 +2,7 @@ package webapi
 
 import (
 	"context"
+	"time"
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
@@ -38,7 +39,7 @@ func monitor(ctx context.Context, tCtx core.TaskExecutionContext, p Client, cach
 			}
 			return state, core.PhaseInfoFailure(errors.CacheFailed, cacheItem.ErrorMessage, nil), nil
 		}
-		return state, core.PhaseInfoRunning(0, nil), nil
+		return state, core.PhaseInfoQueued(time.Now(), cacheItem.PhaseVersion, "job submitted"), nil
 	}
 
 	newPhase, err := p.Status(ctx, newPluginContext(cacheItem.ResourceMeta, cacheItem.Resource, "", tCtx))
@@ -56,6 +57,7 @@ func monitor(ctx context.Context, tCtx core.TaskExecutionContext, p Client, cach
 	}
 
 	cacheItem.Phase = newPluginPhase
+	cacheItem.PhaseVersion = newPhase.Version()
 
 	if newPluginPhase.IsTerminal() {
 		// Queue item for deletion in the cache.

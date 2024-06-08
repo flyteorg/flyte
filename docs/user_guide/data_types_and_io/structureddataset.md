@@ -1,22 +1,3 @@
----
-jupytext:
-  cell_metadata_filter: all
-  formats: md:myst
-  main_language: python
-  notebook_metadata_filter: all
-  text_representation:
-    extension: .md
-    format_name: myst
-    format_version: 0.13
-    jupytext_version: 1.16.1
-kernelspec:
-  display_name: Python 3
-  language: python
-  name: python3
----
-
-+++ {"lines_to_next_cell": 0}
-
 (structured_dataset)=
 
 # StructuredDataset
@@ -27,10 +8,7 @@ kernelspec:
 ```{currentmodule} flytekit.types.structured
 ```
 
-As with most type systems, Python has primitives, container types like maps and tuples, and support for user-defined structures.
-However, while there’s a rich variety of dataframe classes (Pandas, Spark, Pandera, etc.), there’s no native Python type that
-represents a dataframe in the abstract. This is the gap that the {py:class}`StructuredDataset` type is meant to fill.
-It offers the following benefits:
+As with most type systems, Python has primitives, container types like maps and tuples, and support for user-defined structures. However, while there’s a rich variety of dataframe classes (Pandas, Spark, Pandera, etc.), there’s no native Python type that represents a dataframe in the abstract. This is the gap that the {py:class}`StructuredDataset` type is meant to fill. It offers the following benefits:
 
 - Eliminate boilerplate code you would otherwise need to write to serialize/deserialize from file objects into dataframe instances,
 - Eliminate additional inputs/outputs that convey metadata around the format of the tabular data held in those files,
@@ -50,44 +28,26 @@ the {py:class}`StructuredDataset` type.
 This example demonstrates how to work with a structured dataset using Flyte entities.
 
 ```{note}
-To use the `StructuredDataset` type, you only need to import `pandas`.
-The other imports specified below are only necessary for this specific example.
+To use the `StructuredDataset` type, you only need to import `pandas`. The other imports specified below are only necessary for this specific example.
+```
+
+```{note}
+To clone and run the example code on this page, see the [Flytesnacks repo][flytesnacks].
 ```
 
 To begin, import the dependencies for the example:
 
-```{code-cell}
-import os
-import typing
-
-import numpy as np
-import pandas as pd
-import pyarrow as pa
-import pyarrow.parquet as pq
-from flytekit import FlyteContext, StructuredDatasetType, kwtypes, task, workflow
-from flytekit.models import literals
-from flytekit.models.literals import StructuredDatasetMetadata
-from flytekit.types.structured.structured_dataset import (
-    PARQUET,
-    StructuredDataset,
-    StructuredDatasetDecoder,
-    StructuredDatasetEncoder,
-    StructuredDatasetTransformerEngine,
-)
-from typing_extensions import Annotated
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/structured_dataset.py
+:caption: data_types_and_io/structured_dataset.py
+:lines: 1-18
 ```
-
-+++ {"lines_to_next_cell": 0}
 
 Define a task that returns a Pandas DataFrame.
 
-```{code-cell}
-@task
-def generate_pandas_df(a: int) -> pd.DataFrame:
-    return pd.DataFrame({"Name": ["Tom", "Joseph"], "Age": [a, 22], "Height": [160, 178]})
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/structured_dataset.py
+:caption: data_types_and_io/structured_dataset.py
+:pyobject: generate_pandas_df
 ```
-
-+++ {"lines_to_next_cell": 0}
 
 Using this simplest form, however, the user is not able to set the additional dataframe information alluded to above,
 
@@ -106,33 +66,20 @@ you can just specify the column names and their types in the structured dataset 
 
 First, initialize column types you want to extract from the `StructuredDataset`.
 
-```{code-cell}
-all_cols = kwtypes(Name=str, Age=int, Height=int)
-col = kwtypes(Age=int)
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/structured_dataset.py
+:caption: data_types_and_io/structured_dataset.py
+:lines: 30-31
 ```
-
-+++ {"lines_to_next_cell": 0}
 
 Define a task that opens a structured dataset by calling `all()`.
 When you invoke `all()` with ``pandas.DataFrame``, the Flyte engine downloads the parquet file on S3, and deserializes it to `pandas.DataFrame`.
 Keep in mind that you can invoke ``open()`` with any dataframe type that's supported or added to structured dataset.
 For instance, you can use ``pa.Table`` to convert the Pandas DataFrame to a PyArrow table.
 
-```{code-cell}
-@task
-def get_subset_pandas_df(df: Annotated[StructuredDataset, all_cols]) -> Annotated[StructuredDataset, col]:
-    df = df.open(pd.DataFrame).all()
-    df = pd.concat([df, pd.DataFrame([[30]], columns=["Age"])])
-    return StructuredDataset(dataframe=df)
-
-
-@workflow
-def simple_sd_wf(a: int = 19) -> Annotated[StructuredDataset, col]:
-    pandas_df = generate_pandas_df(a=a)
-    return get_subset_pandas_df(df=pandas_df)
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/structured_dataset.py
+:caption: data_types_and_io/structured_dataset.py
+:lines: 41-51
 ```
-
-+++ {"lines_to_next_cell": 0}
 
 The code may result in runtime failures if the columns do not match.
 The input ``df`` has ``Name``, ``Age`` and ``Height`` columns, whereas the output structured dataset will only have the ``Age`` column.
@@ -142,25 +89,10 @@ You can use a custom serialization format to serialize your dataframes.
 Here's how you can register the Pandas to CSV handler, which is already available,
 and enable the CSV serialization by annotating the structured dataset with the CSV format:
 
-```{code-cell}
-from flytekit.types.structured import register_csv_handlers
-from flytekit.types.structured.structured_dataset import CSV
-
-register_csv_handlers()
-
-
-@task
-def pandas_to_csv(df: pd.DataFrame) -> Annotated[StructuredDataset, CSV]:
-    return StructuredDataset(dataframe=df)
-
-
-@workflow
-def pandas_to_csv_wf() -> Annotated[StructuredDataset, CSV]:
-    pandas_df = generate_pandas_df(a=19)
-    return pandas_to_csv(df=pandas_df)
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/structured_dataset.py
+:caption: data_types_and_io/structured_dataset.py
+:lines: 57-71
 ```
-
-+++ {"lines_to_next_cell": 0}
 
 ## Storage driver and location
 By default, the data will be written to the same place that all other pointer-types (FlyteFile, FlyteDirectory, etc.) are written to.
@@ -266,100 +198,47 @@ enabling the use of a 2D NumPy array as a valid type within structured datasets.
 Extend `StructuredDatasetEncoder` and implement the `encode` function.
 The `encode` function converts NumPy array to an intermediate format (parquet file format in this case).
 
-```{code-cell}
-class NumpyEncodingHandler(StructuredDatasetEncoder):
-    def encode(
-        self,
-        ctx: FlyteContext,
-        structured_dataset: StructuredDataset,
-        structured_dataset_type: StructuredDatasetType,
-    ) -> literals.StructuredDataset:
-        df = typing.cast(np.ndarray, structured_dataset.dataframe)
-        name = ["col" + str(i) for i in range(len(df))]
-        table = pa.Table.from_arrays(df, name)
-        path = ctx.file_access.get_random_remote_directory()
-        local_dir = ctx.file_access.get_random_local_directory()
-        local_path = os.path.join(local_dir, f"{0:05}")
-        pq.write_table(table, local_path)
-        ctx.file_access.upload_directory(local_dir, path)
-        return literals.StructuredDataset(
-            uri=path,
-            metadata=StructuredDatasetMetadata(structured_dataset_type=StructuredDatasetType(format=PARQUET)),
-        )
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/structured_dataset.py
+:caption: data_types_and_io/structured_dataset.py
+:pyobject: NumpyEncodingHandler
 ```
-
-+++ {"lines_to_next_cell": 0}
 
 ### NumPy decoder
 
 Extend {py:class}`StructuredDatasetDecoder` and implement the {py:meth}`~StructuredDatasetDecoder.decode` function.
 The {py:meth}`~StructuredDatasetDecoder.decode` function converts the parquet file to a `numpy.ndarray`.
 
-```{code-cell}
-class NumpyDecodingHandler(StructuredDatasetDecoder):
-    def decode(
-        self,
-        ctx: FlyteContext,
-        flyte_value: literals.StructuredDataset,
-        current_task_metadata: StructuredDatasetMetadata,
-    ) -> np.ndarray:
-        local_dir = ctx.file_access.get_random_local_directory()
-        ctx.file_access.get_data(flyte_value.uri, local_dir, is_multipart=True)
-        table = pq.read_table(local_dir)
-        return table.to_pandas().to_numpy()
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/structured_dataset.py
+:caption: data_types_and_io/structured_dataset.py
+:pyobject: NumpyDecodingHandler
 ```
-
-+++ {"lines_to_next_cell": 0}
 
 ### NumPy renderer
 
 Create a default renderer for numpy array, then Flytekit will use this renderer to
 display schema of NumPy array on the Flyte deck.
 
-```{code-cell}
-class NumpyRenderer:
-    def to_html(self, df: np.ndarray) -> str:
-        assert isinstance(df, np.ndarray)
-        name = ["col" + str(i) for i in range(len(df))]
-        table = pa.Table.from_arrays(df, name)
-        return pd.DataFrame(table.schema).to_html(index=False)
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/structured_dataset.py
+:caption: data_types_and_io/structured_dataset.py
+:pyobject: NumpyRenderer
 ```
-
-+++ {"lines_to_next_cell": 0}
 
 In the end, register the encoder, decoder and renderer with the `StructuredDatasetTransformerEngine`.
 Specify the Python type you want to register this encoder with (`np.ndarray`),
 the storage engine to register this against (if not specified, it is assumed to work for all the storage backends),
 and the byte format, which in this case is `PARQUET`.
 
-```{code-cell}
-StructuredDatasetTransformerEngine.register(NumpyEncodingHandler(np.ndarray, None, PARQUET))
-StructuredDatasetTransformerEngine.register(NumpyDecodingHandler(np.ndarray, None, PARQUET))
-StructuredDatasetTransformerEngine.register_renderer(np.ndarray, NumpyRenderer())
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/structured_dataset.py
+:caption: data_types_and_io/structured_dataset.py
+:lines: 127-129
 ```
-
-+++ {"lines_to_next_cell": 0}
 
 You can now use `numpy.ndarray` to deserialize the parquet file to NumPy and serialize a task's output (NumPy array) to a parquet file.
 
-```{code-cell}
-@task
-def generate_pd_df_with_str() -> pd.DataFrame:
-    return pd.DataFrame({"Name": ["Tom", "Joseph"]})
-
-
-@task
-def to_numpy(sd: StructuredDataset) -> Annotated[StructuredDataset, None, PARQUET]:
-    numpy_array = sd.open(np.ndarray).all()
-    return StructuredDataset(dataframe=numpy_array)
-
-
-@workflow
-def numpy_wf() -> Annotated[StructuredDataset, None, PARQUET]:
-    return to_numpy(sd=generate_pd_df_with_str())
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/structured_dataset.py
+:caption: data_types_and_io/structured_dataset.py
+:lines: 134-149
 ```
-
-+++ {"lines_to_next_cell": 0}
 
 :::{note}
 `pyarrow` raises an `Expected bytes, got a 'int' object` error when the dataframe contains integers.
@@ -367,10 +246,22 @@ def numpy_wf() -> Annotated[StructuredDataset, None, PARQUET]:
 
 You can run the code locally as follows:
 
-```{code-cell}
-if __name__ == "__main__":
-    sd = simple_sd_wf()
-    print(f"A simple Pandas dataframe workflow: {sd.open(pd.DataFrame).all()}")
-    print(f"Using CSV as the serializer: {pandas_to_csv_wf().open(pd.DataFrame).all()}")
-    print(f"NumPy encoder and decoder: {numpy_wf().open(np.ndarray).all()}")
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/structured_dataset.py
+:caption: data_types_and_io/structured_dataset.py
+:lines: 153-157
 ```
+
+### The nested typed columns
+
+Like most storage formats (e.g. Avro, Parquet, and BigQuery), StructuredDataset support nested field structures.
+
+:::{note}
+Nested field StructuredDataset should be run when flytekit version > 1.11.0.
+:::
+
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/structured_dataset.py
+:caption: data_types_and_io/structured_dataset.py
+:lines: 159-270
+```
+
+[flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/data_types_and_io/

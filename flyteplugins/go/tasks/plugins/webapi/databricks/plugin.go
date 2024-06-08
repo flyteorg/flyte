@@ -234,10 +234,14 @@ func (p Plugin) sendRequest(method string, databricksJob map[string]interface{},
 		return nil, err
 	}
 	var data map[string]interface{}
-	err = json.Unmarshal(responseBody, &data)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse response with err: [%v]", err)
+
+	if len(responseBody) != 0 {
+		err = json.Unmarshal(responseBody, &data)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse response with err: [%v]", err)
+		}
 	}
+
 	if resp.StatusCode != http.StatusOK {
 		message := ""
 		if v, ok := data["message"]; ok {
@@ -259,9 +263,15 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 	taskInfo := createTaskInfo(exec.RunID, jobID, exec.DatabricksInstance)
 	switch lifeCycleState {
 	// Job response format. https://docs.databricks.com/en/workflows/jobs/jobs-2.0-api.html#runlifecyclestate
+	case "QUEUED":
+		return core.PhaseInfoQueued(time.Now(), core.DefaultPhaseVersion, message), nil
 	case "PENDING":
 		return core.PhaseInfoInitializing(time.Now(), core.DefaultPhaseVersion, message, taskInfo), nil
 	case "RUNNING":
+		fallthrough
+	case "BLOCKED":
+		fallthrough
+	case "WAITING_FOR_RETRY":
 		fallthrough
 	case "TERMINATING":
 		return core.PhaseInfoRunning(core.DefaultPhaseVersion, taskInfo), nil
@@ -272,12 +282,14 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 				return core.PhaseInfoFailure(string(rune(http.StatusInternalServerError)), "failed to write output", taskInfo), nil
 			}
 			return core.PhaseInfoSuccess(taskInfo), nil
+		} else if resultState == "FAILED" {
+			return core.PhaseInfoRetryableFailure("job failed", message, taskInfo), nil
 		}
 		return core.PhaseInfoFailure(pluginErrors.TaskFailedWithError, message, taskInfo), nil
 	case "SKIPPED":
 		return core.PhaseInfoFailure(string(rune(http.StatusConflict)), message, taskInfo), nil
 	case "INTERNAL_ERROR":
-		return core.PhaseInfoFailure(string(rune(http.StatusInternalServerError)), message, taskInfo), nil
+		return core.PhaseInfoRetryableFailure(string(rune(http.StatusInternalServerError)), message, taskInfo), nil
 	}
 	return core.PhaseInfoUndefined, pluginErrors.Errorf(pluginsCore.SystemErrorCode, "unknown execution phase [%v].", lifeCycleState)
 }
@@ -292,7 +304,7 @@ func writeOutput(ctx context.Context, taskCtx webapi.StatusContext) error {
 		return nil
 	}
 
-	outputReader := ioutils.NewRemoteFileOutputReader(ctx, taskCtx.DataStore(), taskCtx.OutputWriter(), taskCtx.MaxDatasetSizeBytes())
+	outputReader := ioutils.NewRemoteFileOutputReader(ctx, taskCtx.DataStore(), taskCtx.OutputWriter(), 0)
 	return taskCtx.OutputWriter().Put(ctx, outputReader)
 }
 

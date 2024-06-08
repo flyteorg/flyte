@@ -1,3 +1,4 @@
+{{- if .Values.ingress.separateGrpcIngress }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -47,3 +48,4 @@ spec:
       nodePort: null
       {{- end }}
   selector: {{- include "flyte-binary.selectorLabels" . | nindent 4 }}
+{{- end }}

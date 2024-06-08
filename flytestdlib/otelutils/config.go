@@ -43,7 +43,7 @@ type FileConfig struct {
 }
 
 type JaegerConfig struct {
-	Endpoint string `json:"endpoint" pflag:",Endpoint for the jaeger telemtry trace ingestor"`
+	Endpoint string `json:"endpoint" pflag:",Endpoint for the jaeger telemetry trace ingestor"`
 }
 
 func GetConfig() *Config {

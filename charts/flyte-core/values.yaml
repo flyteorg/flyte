@@ -15,8 +15,8 @@ flyteadmin:
   replicaCount: 1
   image:
     # -- Docker image for Flyteadmin deployment
-    repository: cr.flyte.org/flyteorg/flyteadmin # FLYTEADMIN_IMAGE
-    tag: v1.11.0-b1 # FLYTEADMIN_TAG
+    repository: cr.flyte.org/flyteorg/flyteadmin  # FLYTEADMIN_IMAGE
+    tag: v1.12.1-rc0  # FLYTEADMIN_TAG
     pullPolicy: IfNotPresent
   # -- Additional flyteadmin container environment variables
   #
@@ -54,6 +54,8 @@ flyteadmin:
       projectcontour.io/upstream-protocol.h2c: grpc
     type: ClusterIP
     loadBalancerSourceRanges: []
+    # -- Appends additional ports to the service spec.
+    additionalPorts: []
   # -- Configuration for service accounts for FlyteAdmin
   serviceAccount:
     # -- Should a service account be created for flyteadmin
@@ -140,9 +142,9 @@ flytescheduler:
   runPrecheck: true
   image:
     # -- Docker image for Flytescheduler deployment
-    repository: cr.flyte.org/flyteorg/flytescheduler # FLYTESCHEDULER_IMAGE
+    repository: cr.flyte.org/flyteorg/flytescheduler  # FLYTESCHEDULER_IMAGE
     # -- Docker image tag
-    tag: v1.11.0-b1 # FLYTESCHEDULER_TAG
+    tag: v1.12.1-rc0  # FLYTESCHEDULER_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytescheduler deployment
@@ -206,9 +208,9 @@ datacatalog:
   replicaCount: 1
   image:
     # -- Docker image for Datacatalog deployment
-    repository: cr.flyte.org/flyteorg/datacatalog # DATACATALOG_IMAGE
+    repository: cr.flyte.org/flyteorg/datacatalog  # DATACATALOG_IMAGE
     # -- Docker image tag
-    tag: v1.11.0-b1 # DATACATALOG_TAG
+    tag: v1.12.1-rc0  # DATACATALOG_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Datacatalog deployment
@@ -228,6 +230,8 @@ datacatalog:
     annotations:
       projectcontour.io/upstream-protocol.h2c: grpc
     type: NodePort
+    # -- Appends additional ports to the service spec.
+    additionalPorts: []
   # -- Configuration for service accounts for Datacatalog
   serviceAccount:
     # -- Should a service account be created for Datacatalog
@@ -275,10 +279,19 @@ flyteagent:
   enabled: false
   plugin_config:
     plugins:
-      agentService:
+      # -- Agent service configuration for propeller.
+      agent-service:
+        # -- The default agent service to use for plugin tasks.
         defaultAgent:
+          # -- The agent service endpoint propeller should connect to.
           endpoint: "dns:///flyteagent.flyte.svc.cluster.local:8000"
+          # -- Whether the connection from propeller to the agent service should use TLS.
           insecure: true
+        # -- The task types supported by the default agent.
+        supportedTaskTypes:
+        - sensor
+        # -- Uncomment to enable task type that uses Flyte Agent
+        # - bigquery_query_job_task
   # -- Labels for flyteagent pods
   podLabels: {}
 
@@ -295,8 +308,8 @@ flytepropeller:
   replicaCount: 1
   image:
     # -- Docker image for Flytepropeller deployment
-    repository: cr.flyte.org/flyteorg/flytepropeller # FLYTEPROPELLER_IMAGE
-    tag: v1.11.0-b1 # FLYTEPROPELLER_TAG
+    repository: cr.flyte.org/flyteorg/flytepropeller  # FLYTEPROPELLER_IMAGE
+    tag: v1.12.1-rc0  # FLYTEPROPELLER_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytepropeller deployment
   resources:
@@ -356,6 +369,8 @@ flytepropeller:
   service:
     # -- If enabled create the flytepropeller service
     enabled: false
+    # -- Appends additional ports to the service spec.
+    additionalPorts: []
 
   # -- Settings for flytepropeller service monitor
   serviceMonitor:
@@ -378,8 +393,8 @@ flyteconsole:
   replicaCount: 1
   image:
     # -- Docker image for Flyteconsole deployment
-    repository: cr.flyte.org/flyteorg/flyteconsole # FLYTECONSOLE_IMAGE
-    tag: v1.11.0 # FLYTECONSOLE_TAG
+    repository: cr.flyte.org/flyteorg/flyteconsole  # FLYTECONSOLE_IMAGE
+    tag: v1.14.0  # FLYTECONSOLE_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flyteconsole deployment
   resources:
@@ -430,9 +445,12 @@ deployRedoc: false
 
 secrets:
   adminOauthClientCredentials:
-    # -- If enabled is true, helm will create and manage `flyte-secret-auth` and populate it with `clientSecret`.
-    # If enabled is false, it's up to the user to create `flyte-secret-auth` as described in
+    # If enabled is true, and `clientSecret` is specified, helm will create and mount `flyte-secret-auth`.
+    # If enabled is true, and `clientSecret` is null, it's up to the user to create `flyte-secret-auth` as described in
     # https://docs.flyte.org/en/latest/deployment/cluster_config/auth_setup.html#oauth2-authorization-server
+    # and helm will mount `flyte-secret-auth`.
+    # If enabled is false, auth is not turned on.
+    # Note: Unsupported combination: enabled.false and clientSecret.someValue
     enabled: true
     clientSecret: foobar
     clientId: flytepropeller
@@ -444,6 +462,8 @@ secrets:
 webhook:
   # -- enable or disable secrets webhook
   enabled: true
+  # -- Sets priorityClassName for webhook pod
+  priorityClassName: ""
   # -- Configuration for service accounts for the webhook
   serviceAccount:
     # -- Should a service account be created for the webhook
@@ -626,7 +646,8 @@ configmap:
     # Refer to the [server config](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/config#ServerConfig).
     server:
       httpPort: 8088
-      grpcPort: 8089
+      grpc:
+        port: 8089
       security:
         # -- Controls whether to serve requests over SSL/TLS.
         secure: false
@@ -731,7 +752,7 @@ configmap:
         # -- Structure documented [here](https://pkg.go.dev/github.com/lyft/flyteplugins@v0.5.28/go/tasks/pluginmachinery/flytek8s/config#FlyteCoPilotConfig)
         co-pilot:
           name: flyte-copilot-
-          image: cr.flyte.org/flyteorg/flytecopilot:v1.11.0-b1 # FLYTECOPILOT_IMAGE
+          image: cr.flyte.org/flyteorg/flytecopilot:v1.12.1-rc0  # FLYTECOPILOT_IMAGE
           start-timeout: 30s
 
   # -- Core propeller configuration
@@ -792,8 +813,7 @@ configmap:
           - container
           - sidecar
           - k8s-array
-          # -- Uncomment to enable agent service
-          # - agent-service
+          - agent-service
         default-for-task-types:
           container: container
           sidecar: sidecar
@@ -870,7 +890,7 @@ external_events:
     # writing to fifo sns topics.
     topicName: "arn:aws:sns:us-east-2:123456:123-my-topic"
     eventTypes:
-      - all # Or workflow, node, task. Or "*"
+      - all  # Or workflow, node, task. Or "*"
 
 # Cloud events are used to send events (unprocessed, as Admin see them) in cloud event format to
 # an SNS topic (or gcp equivalent)
@@ -884,7 +904,7 @@ cloud_events:
     # writing to fifo sns topics.
     topicName: "arn:aws:sns:us-east-2:123456:123-my-topic"
     eventTypes:
-      - all # Or workflow, node, task. Or "*"
+      - all  # Or workflow, node, task. Or "*"
 
 # -- Configuration for the Cluster resource manager component. This is an optional component, that enables automatic
 # cluster configuration. This is useful to set default quotas, manage namespaces etc that map to a project/domain

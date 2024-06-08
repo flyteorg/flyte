@@ -1,21 +1,3 @@
----
-jupytext:
-  cell_metadata_filter: all
-  formats: md:myst
-  main_language: python
-  notebook_metadata_filter: all
-  text_representation:
-    extension: .md
-    format_name: myst
-    format_version: 0.13
-    jupytext_version: 1.16.1
-kernelspec:
-  display_name: Python 3
-  language: python
-  name: python3
----
-
-%% [markdown]
 (extend-plugin-flyte-backend)=
 
 # Backend plugins
@@ -30,15 +12,15 @@ Flyte.
 To recap, here are a few examples of why you would want to implement a backend plugin:
 
 1. We want to add a new capability to the Flyte Platform, for example we might want to:
-   - Talk to a new service like  AWS Sagemaker, Snowflake, Redshift, Athena, BigQuery, etc.
+   - Talk to a new service like AWS SageMaker, Snowflake, Redshift, Athena, BigQuery, etc.
    - Orchestrate a set of containers in a new way like Spark, Flink, Distributed
      training on Kubernetes (usually using a Kubernetes operator).
    - Use a new container orchestration engine like AWS Batch/ECS, Hashicorp' Nomad
    - Use a completely new runtime like AWS Lambda, KNative, etc.
-3. You want to retain the capability to update the plugin implementation and roll
+2. You want to retain the capability to update the plugin implementation and roll
    out new changes and fixes without affecting the users code or requiring them to update
    versions of their plugins.
-4. You want the same plugin to be accessible across multiple language SDK's.
+3. You want the same plugin to be accessible across multiple language SDK's.
 
 ```{note}
 Talking to a new service can be done using flytekit extensions and usually is the better way to get started. But, once matured, most of these extensions are better to be migrated to the backend. For the rest of the cases, it is possible to extend flytekit to achieve these scenarios, but this is less desirable, because of the associated overhead of first launching a container that launches these jobs downstream.
@@ -85,6 +67,7 @@ The backend plugin is where the actual logic of the execution is implemented. Th
 1. [Kubernetes operator Plugin](https://pkg.go.dev/github.com/lyft/flyteplugins@v0.5.26/go/tasks/pluginmachinery/k8s#Plugin): The demo in the video below shows two examples of K8s backend plugins: flytekit `Athena` & `Spark`, and Flyte K8s `Pod` & `Spark`.
 
    ```{youtube} oK2RGQuP94k
+
    ```
 
 2. **A Web API plugin:** [Async](https://pkg.go.dev/github.com/lyft/flyteplugins@v0.5.26/go/tasks/pluginmachinery/webapi#AsyncPlugin) or [Sync](https://pkg.go.dev/github.com/lyft/flyteplugins@v0.5.26/go/tasks/pluginmachinery/webapi#SyncPlugin).
