@@ -10,8 +10,6 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
 	"k8s.io/apimachinery/pkg/util/wait"
 
-	"golang.org/x/exp/maps"
-
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	flyteIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
@@ -23,6 +21,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"golang.org/x/exp/maps"
 )
 
 type Registry map[string]map[int32]*Agent // map[taskTypeName][taskTypeVersion] => Agent
@@ -326,12 +325,16 @@ func (p Plugin) getAsyncAgentClient(ctx context.Context, agent *Deployment) (ser
 	return client, nil
 }
 
-func (p Plugin) watchAgents(ctx context.Context) {
+func (p Plugin) watchAgents(ctx context.Context, DefaultPlugins *map[core.TaskType]core.Plugin) {
 	go wait.Until(func() {
 		mu.Lock()
 		defer mu.Unlock()
 		updateAgentClientSets(ctx, p.cs)
 		agentRegistry = updateAgentRegistry(ctx, p.cs)
+		for _, task := range maps.Keys(agentRegistry) {
+			logger.Infof(ctx, "@@@ Updating Default Plugin for task type:[%s]", task)
+			(*DefaultPlugins)[task] = (*DefaultPlugins)["sensor"]
+		}
 	}, p.cfg.PollInterval.Duration, ctx.Done())
 }
 
@@ -380,7 +383,7 @@ func buildTaskExecutionMetadata(taskExecutionMetadata core.TaskExecutionMetadata
 	}
 }
 
-func newAgentPlugin() webapi.PluginEntry {
+func newAgentPlugin(DefaultPlugins *map[core.TaskType]core.Plugin) webapi.PluginEntry {
 	ctx := context.Background()
 	cfg := GetConfig()
 
@@ -393,23 +396,27 @@ func newAgentPlugin() webapi.PluginEntry {
 	agentRegistry := updateAgentRegistry(ctx, clientSet)
 	supportedTaskTypes := append(maps.Keys(agentRegistry), cfg.SupportedTaskTypes...)
 
-	return webapi.PluginEntry{
+	pluginLoader := func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
+		plugin := &Plugin{
+			metricScope: iCtx.MetricsScope(),
+			cfg:         cfg,
+			cs:          clientSet,
+		}
+		plugin.watchAgents(ctx, DefaultPlugins)
+		return plugin, nil
+	}
+
+	pluginEntry := webapi.PluginEntry{
 		ID:                 "agent-service",
 		SupportedTaskTypes: supportedTaskTypes,
-		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
-			plugin := &Plugin{
-				metricScope: iCtx.MetricsScope(),
-				cfg:         cfg,
-				cs:          clientSet,
-			}
-			plugin.watchAgents(ctx)
-			return plugin, nil
-		},
+		PluginLoader:       pluginLoader,
 	}
+
+	return pluginEntry
 }
 
-func RegisterAgentPlugin() {
+func RegisterAgentPlugin(DefaultPlugins *map[core.TaskType]core.Plugin) {
 	gob.Register(ResourceMetaWrapper{})
 	gob.Register(ResourceWrapper{})
-	pluginmachinery.PluginRegistry().RegisterRemotePlugin(newAgentPlugin())
+	pluginmachinery.PluginRegistry().RegisterRemotePlugin(newAgentPlugin(DefaultPlugins))
 }

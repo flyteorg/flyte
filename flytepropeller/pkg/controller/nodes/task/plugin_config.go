@@ -19,13 +19,15 @@ import (
 var once sync.Once
 
 func WranglePluginsAndGenerateFinalList(ctx context.Context, cfg *config.TaskPluginConfig, pr PluginRegistryIface,
-	kubeClientset kubernetes.Interface) (enabledPlugins []core.PluginEntry, defaultForTaskTypes map[pluginID][]taskType, err error) {
+	kubeClientset kubernetes.Interface, DefaultPlugins *map[core.TaskType]core.Plugin) (enabledPlugins []core.
+	PluginEntry,
+	defaultForTaskTypes map[pluginID][]taskType, err error) {
 	if cfg == nil {
 		return nil, nil, fmt.Errorf("unable to initialize plugin list, cfg is a required argument")
 	}
 
 	// Register the GRPC plugin after the config is loaded
-	once.Do(func() { agent.RegisterAgentPlugin() })
+	once.Do(func() { agent.RegisterAgentPlugin(DefaultPlugins) })
 	pluginsConfigMeta, err := cfg.GetEnabledPlugins()
 
 	if err != nil {
