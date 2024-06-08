@@ -2,10 +2,11 @@ package agent
 
 import (
 	"context"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 )
 
 func TestInitializeClients(t *testing.T) {

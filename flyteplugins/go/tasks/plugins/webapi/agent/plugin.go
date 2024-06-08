@@ -4,10 +4,11 @@ import (
 	"context"
 	"encoding/gob"
 	"fmt"
-	"golang.org/x/exp/maps"
-	"k8s.io/apimachinery/pkg/util/wait"
 	"sync"
 	"time"
+
+	"golang.org/x/exp/maps"
+	"k8s.io/apimachinery/pkg/util/wait"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	flyteIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
