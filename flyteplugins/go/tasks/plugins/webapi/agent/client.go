@@ -164,7 +164,7 @@ func updateAgentRegistry(ctx context.Context, cs *ClientSet) {
 		}
 	}
 	logger.Debugf(ctx, "AgentDeployment service supports task types: %v", maps.Keys(agentRegistry))
-	SetAgentRegistry(agentRegistry)
+	setAgentRegistry(agentRegistry)
 }
 
 func getAgentClientSets(ctx context.Context) *ClientSet {

@@ -321,7 +321,7 @@ func TestInitializeAgentRegistry(t *testing.T) {
 	updateAgentRegistry(context.Background(), cs)
 
 	// In golang, the order of keys in a map is random. So, we sort the keys before asserting.
-	agentRegistryKeys := maps.Keys(GetAgentRegistry())
+	agentRegistryKeys := maps.Keys(getAgentRegistry())
 	sort.Strings(agentRegistryKeys)
 
 	assert.Equal(t, agentRegistryKeys, []string{"task1", "task2", "task3"})

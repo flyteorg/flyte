@@ -31,13 +31,13 @@ var (
 	mu            sync.RWMutex
 )
 
-func GetAgentRegistry() Registry {
+func getAgentRegistry() Registry {
 	mu.Lock()
 	defer mu.Unlock()
 	return agentRegistry
 }
 
-func SetAgentRegistry(r Registry) {
+func setAgentRegistry(r Registry) {
 	mu.Lock()
 	defer mu.Unlock()
 	agentRegistry = r
@@ -370,7 +370,7 @@ func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, outputs *fly
 }
 
 func getFinalAgent(taskCategory *admin.TaskCategory, cfg *Config) (*Deployment, bool) {
-	r := GetAgentRegistry()
+	r := getAgentRegistry()
 	if agent, exists := r[taskCategory.Name][taskCategory.Version]; exists {
 		return agent.AgentDeployment, agent.IsSync
 	}
@@ -397,7 +397,7 @@ func newAgentPlugin() webapi.PluginEntry {
 
 	clientSet := getAgentClientSets(ctx)
 	updateAgentRegistry(ctx, clientSet)
-	supportedTaskTypes := append(maps.Keys(GetAgentRegistry()), cfg.SupportedTaskTypes...)
+	supportedTaskTypes := append(maps.Keys(getAgentRegistry()), cfg.SupportedTaskTypes...)
 
 	return webapi.PluginEntry{
 		ID:                 "agent-service",
