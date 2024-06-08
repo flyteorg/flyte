@@ -241,7 +241,10 @@ func buildBranchNodeSpec(branch *core.BranchNode, tasks []*core.CompiledTask, er
 		childNodes = append(childNodes, ns...)
 		res.Else = refStr(branch.IfElse.GetElseNode().Id)
 	case *core.IfElseBlock_Error:
-		res.ElseFail = branch.IfElse.GetError()
+		coreError := branch.IfElse.GetError()
+		res.ElseFail = &v1alpha1.Error{
+			coreError,
+		}
 	}
 
 	other := make([]*v1alpha1.IfBlock, 0, len(branch.IfElse.Other))
