@@ -59,3 +59,37 @@ func (_m *ReferenceConstructor) ConstructReference(ctx context.Context, referenc
 
 	return r0, r1
 }
+
+type ReferenceConstructor_DeepCopyReferenceConstructor struct {
+	*mock.Call
+}
+
+func (_m ReferenceConstructor_DeepCopyReferenceConstructor) Return(_a0 storage.ReferenceConstructor) *ReferenceConstructor_DeepCopyReferenceConstructor {
+	return &ReferenceConstructor_DeepCopyReferenceConstructor{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ReferenceConstructor) OnDeepCopyReferenceConstructor() *ReferenceConstructor_DeepCopyReferenceConstructor {
+	c_call := _m.On("DeepCopyReferenceConstructor")
+	return &ReferenceConstructor_DeepCopyReferenceConstructor{Call: c_call}
+}
+
+func (_m *ReferenceConstructor) OnDeepCopyReferenceConstructorMatch(matchers ...interface{}) *ReferenceConstructor_DeepCopyReferenceConstructor {
+	c_call := _m.On("DeepCopyReferenceConstructor", matchers...)
+	return &ReferenceConstructor_DeepCopyReferenceConstructor{Call: c_call}
+}
+
+// DeepCopyReferenceConstructor provides a mock function with given fields:
+func (_m *ReferenceConstructor) DeepCopyReferenceConstructor() storage.ReferenceConstructor {
+	ret := _m.Called()
+
+	var r0 storage.ReferenceConstructor
+	if rf, ok := ret.Get(0).(func() storage.ReferenceConstructor); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(storage.ReferenceConstructor)
+		}
+	}
+
+	return r0
+}

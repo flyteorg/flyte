@@ -98,6 +98,10 @@ type ReferenceConstructor interface {
 	// ConstructReference creates a new dataReference that matches the storage structure.
 	ConstructReference(ctx context.Context, reference DataReference, nestedKeys ...string) (DataReference, error)
 
+	// Explain that in order for this interface to be part of a CRD we need to implement a DeepCopy method as per
+	// https://pkg.go.dev/k8s.io/gengo/examples/deepcopy-gen.
+	DeepCopyReferenceConstructor() ReferenceConstructor
+
 	// FromSignedURL constructs a data reference from a signed URL
 	//FromSignedURL(ctx context.Context, signedURL string) (DataReference, error)
 }

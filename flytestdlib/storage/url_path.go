@@ -47,6 +47,10 @@ func (URLPathConstructor) ConstructReference(ctx context.Context, reference Data
 	return DataReference(u.String()), nil
 }
 
+func (URLPathConstructor) DeepCopyReferenceConstructor() ReferenceConstructor {
+	return NewURLPathConstructor()
+}
+
 func NewURLPathConstructor() URLPathConstructor {
 	return URLPathConstructor{}
 }
