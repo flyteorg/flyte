@@ -1,9 +1,7 @@
 package common
 
 import (
-	pluginCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"strconv"
-	"sync"
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/encoding"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
@@ -37,34 +35,4 @@ func CreateParentInfo(grandParentInfo executors.ImmutableParentInfo, nodeID stri
 	}
 	return executors.NewParentInfo(uniqueID, parentAttempt), nil
 
-}
-
-type SafeDefaultPlugins struct {
-	mu      sync.RWMutex
-	plugins map[pluginCore.TaskType]pluginCore.Plugin
-}
-
-func NewSafeDefaultPlugins() SafeDefaultPlugins {
-	return SafeDefaultPlugins{
-		plugins: make(map[pluginCore.TaskType]pluginCore.Plugin),
-	}
-}
-
-func (p *SafeDefaultPlugins) GetPlugin(taskType pluginCore.TaskType) (pluginCore.Plugin, bool) {
-	p.mu.RLock()
-	defer p.mu.RUnlock()
-	corePlugin, exists := p.plugins[taskType]
-	return corePlugin, exists
-}
-
-func (p *SafeDefaultPlugins) GetAllPlugins() map[pluginCore.TaskType]pluginCore.Plugin {
-	p.mu.RLock()
-	defer p.mu.RUnlock()
-	return p.plugins
-}
-
-func (p *SafeDefaultPlugins) SetPlugin(taskType pluginCore.TaskType, plugin pluginCore.Plugin) {
-	p.mu.Lock()
-	defer p.mu.Unlock()
-	p.plugins[taskType] = plugin
 }

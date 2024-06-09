@@ -3,14 +3,12 @@ package task
 import (
 	"context"
 	"fmt"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/common"
 	"strings"
 	"sync"
 
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/webapi/agent"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/backoff"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/k8s"
@@ -20,14 +18,12 @@ import (
 var once sync.Once
 
 func WranglePluginsAndGenerateFinalList(ctx context.Context, cfg *config.TaskPluginConfig, pr PluginRegistryIface,
-	kubeClientset kubernetes.Interface, defaultPlugins *common.SafeDefaultPlugins) (enabledPlugins []core.PluginEntry,
-	defaultForTaskTypes map[pluginID][]taskType, err error) {
+	kubeClientset kubernetes.Interface) (enabledPlugins []core.PluginEntry, defaultForTaskTypes map[pluginID][]taskType, err error) {
 	if cfg == nil {
 		return nil, nil, fmt.Errorf("unable to initialize plugin list, cfg is a required argument")
 	}
 
 	// Register the GRPC plugin after the config is loaded
-	once.Do(func() { agent.RegisterAgentPlugin(defaultPlugins) })
 	pluginsConfigMeta, err := cfg.GetEnabledPlugins()
 
 	if err != nil {

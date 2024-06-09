@@ -3,6 +3,9 @@ package core
 import (
 	"context"
 	"fmt"
+	"golang.org/x/exp/maps"
+	"k8s.io/utils/strings/slices"
+	"sync"
 )
 
 //go:generate mockery -all -case=underscore
@@ -53,6 +56,37 @@ type Plugin interface {
 	Abort(ctx context.Context, tCtx TaskExecutionContext) error
 	// Finalize is always called, after Handle or Abort. Finalize should be an idempotent operation
 	Finalize(ctx context.Context, tCtx TaskExecutionContext) error
+}
+
+type AgentService struct {
+	mu                 sync.RWMutex
+	supportedTaskTypes []TaskType
+	CorePlugin         Plugin
+}
+
+// It clones the supportedTaskTypes slice to minimize the duration of the read lock.
+func (p *AgentService) ContainTaskType(taskType TaskType) bool {
+	p.mu.RLock()
+	defer p.mu.RUnlock()
+	return slices.Contains(p.supportedTaskTypes, taskType)
+}
+
+// Set adds new taskTypes to supportedTaskTypes, ensuring no duplicates
+func (p *AgentService) Set(taskTypes []TaskType) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	// Initialize the map with enough capacity to avoid reallocations
+	taskTypeSet := make(map[TaskType]struct{}, len(p.supportedTaskTypes)+len(taskTypes))
+
+	for _, t := range p.supportedTaskTypes {
+		taskTypeSet[t] = struct{}{}
+	}
+	for _, t := range taskTypes {
+		taskTypeSet[t] = struct{}{}
+	}
+
+	p.supportedTaskTypes = maps.Keys(taskTypeSet)
 }
 
 // Loads and validates a plugin.

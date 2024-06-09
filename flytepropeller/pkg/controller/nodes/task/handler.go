@@ -3,7 +3,7 @@ package task
 import (
 	"context"
 	"fmt"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/common"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/webapi/agent"
 	"runtime/debug"
 	"time"
 
@@ -187,7 +187,7 @@ type pluginID = string
 type Handler struct {
 	catalog         catalog.Client
 	asyncCatalog    catalog.AsyncClient
-	defaultPlugins  common.SafeDefaultPlugins
+	defaultPlugins  map[pluginCore.TaskType]pluginCore.Plugin
 	pluginsForType  map[pluginCore.TaskType]map[pluginID]pluginCore.Plugin
 	taskMetricsMap  map[MetricKey]*taskMetrics
 	defaultPlugin   pluginCore.Plugin
@@ -201,6 +201,7 @@ type Handler struct {
 	pluginScope     promutils.Scope
 	eventConfig     *controllerConfig.EventConfig
 	clusterID       string
+	agentService    *pluginCore.AgentService
 }
 
 func (t *Handler) FinalizeRequired() bool {
@@ -227,10 +228,10 @@ func (t *Handler) Setup(ctx context.Context, sCtx interfaces.SetupContext) error
 		return err
 	}
 
+	once.Do(func() { agent.RegisterAgentPlugin(t.agentService) })
 	// Create the resource negotiator here
 	// and then convert it to proxies later and pass them to plugins
-	enabledPlugins, defaultForTaskTypes, err := WranglePluginsAndGenerateFinalList(ctx, &t.cfg.TaskPlugins,
-		t.pluginRegistry, t.kubeClientset, &t.defaultPlugins)
+	enabledPlugins, defaultForTaskTypes, err := WranglePluginsAndGenerateFinalList(ctx, &t.cfg.TaskPlugins, t.pluginRegistry, t.kubeClientset)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to finalize enabled plugins. Error: %s", err)
 		return err
@@ -247,6 +248,11 @@ func (t *Handler) Setup(ctx context.Context, sCtx interfaces.SetupContext) error
 			tSCtx, newResourceManagerBuilder.GetResourceRegistrar(pluginResourceNamespacePrefix), p.ID)
 		logger.Infof(ctx, "Loading Plugin [%s] ENABLED", p.ID)
 		cp, err := pluginCore.LoadPlugin(ctx, sCtxFinal, p)
+
+		if cp.GetID() == agent.ID {
+			t.agentService.CorePlugin = cp
+		}
+
 		if err != nil {
 			return regErrors.Wrapf(err, "failed to load plugin - %s", p.ID)
 		}
@@ -255,14 +261,14 @@ func (t *Handler) Setup(ctx context.Context, sCtx interfaces.SetupContext) error
 		for _, tt := range p.RegisteredTaskTypes {
 			for _, defaultTaskType := range defaultForTaskTypes[cp.GetID()] {
 				if defaultTaskType == tt {
-					if existingHandler, alreadyDefaulted := t.defaultPlugins.GetPlugin(tt); alreadyDefaulted && existingHandler.GetID() != cp.GetID() {
+					if existingHandler, alreadyDefaulted := t.defaultPlugins[tt]; alreadyDefaulted && existingHandler.GetID() != cp.GetID() {
 						logger.Errorf(ctx, "TaskType [%s] has multiple default handlers specified: [%s] and [%s]",
 							tt, existingHandler.GetID(), cp.GetID())
 						return regErrors.New(fmt.Sprintf("TaskType [%s] has multiple default handlers specified: [%s] and [%s]",
 							tt, existingHandler.GetID(), cp.GetID()))
 					}
 					logger.Infof(ctx, "Plugin [%s] registered for TaskType [%s]", cp.GetID(), tt)
-					t.defaultPlugins.SetPlugin(tt, cp)
+					t.defaultPlugins[tt] = cp
 				}
 			}
 
@@ -289,7 +295,7 @@ func (t *Handler) Setup(ctx context.Context, sCtx interfaces.SetupContext) error
 
 	// Read from the fallback task handler map for any remaining tasks without a defaultPlugins registered handler.
 	for taskType, registeredPlugins := range fallbackTaskHandlerMap {
-		if _, ok := t.defaultPlugins.GetPlugin(taskType); ok {
+		if _, ok := t.defaultPlugins[taskType]; ok {
 			continue
 		}
 		if len(registeredPlugins) != 1 {
@@ -297,7 +303,7 @@ func (t *Handler) Setup(ctx context.Context, sCtx interfaces.SetupContext) error
 			return regErrors.New(fmt.Sprintf("Multiple plugins registered to handle task type: %s. ([%+v]). Use default-for-task-type config option to choose the desired plugin.", taskType, registeredPlugins))
 		}
 		for _, plugin := range registeredPlugins {
-			t.defaultPlugins.SetPlugin(taskType, plugin)
+			t.defaultPlugins[taskType] = plugin
 		}
 	}
 
@@ -308,7 +314,6 @@ func (t *Handler) Setup(ctx context.Context, sCtx interfaces.SetupContext) error
 	}
 
 	t.resourceManager = rm
-
 	return nil
 }
 
@@ -334,11 +339,16 @@ func (t Handler) ResolvePlugin(ctx context.Context, ttype string, executionConfi
 		}
 	}
 
-	p, ok := t.defaultPlugins.GetPlugin(ttype)
+	p, ok := t.defaultPlugins[ttype]
 	if ok {
 		logger.Debugf(ctx, "Plugin [%s] resolved for Handler type [%s]", p.GetID(), ttype)
 		return p, nil
 	}
+
+	if t.agentService.ContainTaskType(ttype) {
+		return t.agentService.CorePlugin, nil
+	}
+
 	if t.defaultPlugin != nil {
 		logger.Warnf(ctx, "No plugin found for Handler-type [%s], defaulting to [%s]", ttype, t.defaultPlugin.GetID())
 		return t.defaultPlugin, nil
@@ -895,7 +905,7 @@ func New(ctx context.Context, kubeClient executors.Client, kubeClientset kuberne
 	cfg := config.GetConfig()
 	return &Handler{
 		pluginRegistry: pluginMachinery.PluginRegistry(),
-		defaultPlugins: common.NewSafeDefaultPlugins(),
+		defaultPlugins: make(map[pluginCore.TaskType]pluginCore.Plugin),
 		pluginsForType: make(map[pluginCore.TaskType]map[pluginID]pluginCore.Plugin),
 		taskMetricsMap: make(map[MetricKey]*taskMetrics),
 		metrics: &metrics{
@@ -915,5 +925,6 @@ func New(ctx context.Context, kubeClient executors.Client, kubeClientset kuberne
 		cfg:             cfg,
 		eventConfig:     eventConfig,
 		clusterID:       clusterID,
+		agentService:    &pluginCore.AgentService{},
 	}, nil
 }
