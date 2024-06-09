@@ -3,6 +3,7 @@ package task
 import (
 	"context"
 	"fmt"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/common"
 	"strings"
 	"sync"
 
@@ -19,7 +20,7 @@ import (
 var once sync.Once
 
 func WranglePluginsAndGenerateFinalList(ctx context.Context, cfg *config.TaskPluginConfig, pr PluginRegistryIface,
-	kubeClientset kubernetes.Interface, defaultPlugins *map[core.TaskType]core.Plugin) (enabledPlugins []core.PluginEntry,
+	kubeClientset kubernetes.Interface, defaultPlugins *common.SafeDefaultPlugins) (enabledPlugins []core.PluginEntry,
 	defaultForTaskTypes map[pluginID][]taskType, err error) {
 	if cfg == nil {
 		return nil, nil, fmt.Errorf("unable to initialize plugin list, cfg is a required argument")

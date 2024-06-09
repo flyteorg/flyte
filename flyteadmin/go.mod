@@ -15,7 +15,7 @@ require (
 	github.com/evanphx/json-patch v5.6.0+incompatible
 	github.com/flyteorg/flyte/flyteidl v0.0.0-00010101000000-000000000000
 	github.com/flyteorg/flyte/flyteplugins v0.0.0-00010101000000-000000000000
-	github.com/flyteorg/flyte/flytepropeller v0.0.0-00010101000000-000000000000
+	github.com/flyteorg/flyte/flytepropeller v1.12.0
 	github.com/flyteorg/flyte/flytestdlib v0.0.0-00010101000000-000000000000
 	github.com/flyteorg/stow v0.3.10
 	github.com/ghodss/yaml v1.0.0

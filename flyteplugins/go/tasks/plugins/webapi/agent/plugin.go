@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/gob"
 	"fmt"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/common"
 	"sync"
 	"time"
 
@@ -26,21 +27,39 @@ import (
 
 type Registry map[string]map[int32]*Agent // map[taskTypeName][taskTypeVersion] => Agent
 
-var (
-	agentRegistry Registry
-	mu            sync.RWMutex
-)
-
-func getAgentRegistry() Registry {
-	mu.RLock()
-	defer mu.RUnlock()
-	return agentRegistry
+type safeAgentRegistry struct {
+	mu       sync.RWMutex
+	registry Registry
 }
 
-func setAgentRegistry(r Registry) {
-	mu.Lock()
-	defer mu.Unlock()
-	agentRegistry = r
+func newSafeAgentRegistry() *safeAgentRegistry {
+	return &safeAgentRegistry{
+		registry: make(Registry),
+	}
+}
+
+func (s *safeAgentRegistry) get() Registry {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return s.registry
+}
+
+func (s *safeAgentRegistry) set(r Registry) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.registry = r
+}
+
+var (
+	agentRegistry *safeAgentRegistry
+	once          sync.Once
+)
+
+func getAgentRegistry() *safeAgentRegistry {
+	once.Do(func() {
+		agentRegistry = newSafeAgentRegistry()
+	})
+	return agentRegistry
 }
 
 type Plugin struct {
@@ -340,14 +359,15 @@ func (p Plugin) getAsyncAgentClient(ctx context.Context, agent *Deployment) (ser
 	return client, nil
 }
 
-func (p Plugin) watchAgents(ctx context.Context, defaultPlugins *map[core.TaskType]core.Plugin) {
+func (p Plugin) watchAgents(ctx context.Context, defaultPlugins *common.SafeDefaultPlugins) {
 	go wait.Until(func() {
 		clientSet := getAgentClientSets(ctx)
 		updateAgentRegistry(ctx, clientSet)
 
 		// Get the core plugin with ID "agent-service" from defaultPlugins
 		var agentCorePlugin core.Plugin
-		for _, plugin := range *defaultPlugins {
+		allDefaultPlugins := defaultPlugins.GetAllPlugins()
+		for _, plugin := range allDefaultPlugins {
 			if plugin.GetID() == "agent-service" {
 				agentCorePlugin = plugin
 				break
@@ -355,12 +375,12 @@ func (p Plugin) watchAgents(ctx context.Context, defaultPlugins *map[core.TaskTy
 		}
 
 		// Map each task type in the agent registry to the core plugin
-		for _, task := range maps.Keys(agentRegistry) {
-			if _, ok := (*defaultPlugins)[task]; !ok {
-				(*defaultPlugins)[task] = agentCorePlugin
+		newAgentRegistry := maps.Keys(getAgentRegistry().get())
+		for _, taskType := range newAgentRegistry {
+			if _, exist := defaultPlugins.GetPlugin(taskType); !exist {
+				defaultPlugins.SetPlugin(taskType, agentCorePlugin)
 			}
 		}
-
 	}, p.cfg.PollInterval.Duration, ctx.Done())
 }
 
@@ -387,7 +407,7 @@ func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, outputs *fly
 }
 
 func getFinalAgent(taskCategory *admin.TaskCategory, cfg *Config) (*Deployment, bool) {
-	r := getAgentRegistry()
+	r := getAgentRegistry().get()
 	if agent, exists := r[taskCategory.Name][taskCategory.Version]; exists {
 		return agent.AgentDeployment, agent.IsSync
 	}
@@ -408,13 +428,12 @@ func buildTaskExecutionMetadata(taskExecutionMetadata core.TaskExecutionMetadata
 	}
 }
 
-func newAgentPlugin(defaultPlugins *map[core.TaskType]core.Plugin) webapi.PluginEntry {
+func newAgentPlugin(defaultPlugins *common.SafeDefaultPlugins) webapi.PluginEntry {
 	ctx := context.Background()
 	cfg := GetConfig()
-
 	clientSet := getAgentClientSets(ctx)
 	updateAgentRegistry(ctx, clientSet)
-	supportedTaskTypes := append(maps.Keys(getAgentRegistry()), cfg.SupportedTaskTypes...)
+	supportedTaskTypes := append(maps.Keys(getAgentRegistry().get()), cfg.SupportedTaskTypes...)
 
 	return webapi.PluginEntry{
 		ID:                 "agent-service",
@@ -431,7 +450,7 @@ func newAgentPlugin(defaultPlugins *map[core.TaskType]core.Plugin) webapi.Plugin
 	}
 }
 
-func RegisterAgentPlugin(defaultPlugins *map[core.TaskType]core.Plugin) {
+func RegisterAgentPlugin(defaultPlugins *common.SafeDefaultPlugins) {
 	gob.Register(ResourceMetaWrapper{})
 	gob.Register(ResourceWrapper{})
 	pluginmachinery.PluginRegistry().RegisterRemotePlugin(newAgentPlugin(defaultPlugins))
