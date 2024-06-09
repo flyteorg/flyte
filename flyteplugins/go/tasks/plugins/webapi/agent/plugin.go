@@ -32,8 +32,8 @@ var (
 )
 
 func getAgentRegistry() Registry {
-	mu.Lock()
-	defer mu.Unlock()
+	mu.RLock()
+	defer mu.RUnlock()
 	return agentRegistry
 }
 
