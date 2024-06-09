@@ -451,32 +451,32 @@ func TestGetOIdCMetadataEndpointRedirectHandler(t *testing.T) {
 	ctx := context.Background()
 	type test struct {
 		name                     string
-		baseUrl                  string
+		baseURL                  string
 		metadataPath             string
 		expectedRedirectLocation string
 	}
 	tests := []test{
 		{
 			name:                     "base_url_without_path",
-			baseUrl:                  "http://www.google.com",
+			baseURL:                  "http://www.google.com",
 			metadataPath:             OIdCMetadataEndpoint,
 			expectedRedirectLocation: "http://www.google.com/.well-known/openid-configuration",
 		},
 		{
 			name:                     "base_url_with_path",
-			baseUrl:                  "https://login.microsoftonline.com/abc/v2.0",
+			baseURL:                  "https://login.microsoftonline.com/abc/v2.0",
 			metadataPath:             OIdCMetadataEndpoint,
 			expectedRedirectLocation: "https://login.microsoftonline.com/abc/v2.0/.well-known/openid-configuration",
 		},
 		{
 			name:                     "base_url_with_trailing_slash_path",
-			baseUrl:                  "https://login.microsoftonline.com/abc/v2.0/",
+			baseURL:                  "https://login.microsoftonline.com/abc/v2.0/",
 			metadataPath:             OIdCMetadataEndpoint,
 			expectedRedirectLocation: "https://login.microsoftonline.com/abc/v2.0/.well-known/openid-configuration",
 		},
 		{
 			name:                     "absolute_metadata_path",
-			baseUrl:                  "https://login.microsoftonline.com/abc/v2.0/",
+			baseURL:                  "https://login.microsoftonline.com/abc/v2.0/",
 			metadataPath:             "/.well-known/openid-configuration",
 			expectedRedirectLocation: "https://login.microsoftonline.com/.well-known/openid-configuration",
 		},
@@ -488,7 +488,7 @@ func TestGetOIdCMetadataEndpointRedirectHandler(t *testing.T) {
 			mockAuthCtx.OnOptions().Return(&config.Config{
 				UserAuth: config.UserAuthConfig{
 					OpenID: config.OpenIDOptions{
-						BaseURL: stdConfig.URL{URL: mustParseURL(t, tt.baseUrl)},
+						BaseURL: stdConfig.URL{URL: mustParseURL(t, tt.baseURL)},
 					},
 				},
 			})
