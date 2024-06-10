@@ -228,9 +228,7 @@ func TestWorkflow(t *testing.T) {
 			},
 		},
 		DataReferenceConstructor: storage.URLPathConstructor{},
-		WorkflowClosureReference: v1alpha1.DataReference(
-			storage.DataReference("data-reference"),
-		),
+		WorkflowClosureReference: storage.DataReference("data-reference"),
 	}
 
 	wCopy := w.DeepCopy()

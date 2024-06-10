@@ -243,7 +243,7 @@ func buildBranchNodeSpec(branch *core.BranchNode, tasks []*core.CompiledTask, er
 	case *core.IfElseBlock_Error:
 		coreError := branch.IfElse.GetError()
 		res.ElseFail = &v1alpha1.Error{
-			coreError,
+			Error: coreError,
 		}
 	}
 

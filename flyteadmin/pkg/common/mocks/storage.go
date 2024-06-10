@@ -83,6 +83,10 @@ func (t *TestDataStore) Delete(ctx context.Context, reference storage.DataRefere
 	return t.DeleteCb(ctx, reference)
 }
 
+func (t *TestDataStore) DeepCopyReferenceConstructor() storage.ReferenceConstructor {
+	return nil
+}
+
 func GetMockStorageClient() *storage.DataStore {
 	mockStorageClient := TestDataStore{
 		Store: make(map[storage.DataReference][]byte),

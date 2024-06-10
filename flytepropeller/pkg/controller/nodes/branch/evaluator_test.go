@@ -672,8 +672,10 @@ func TestDecideBranch(t *testing.T) {
 					ThenNode: &n2,
 				},
 			},
-			ElseFail: &core.Error{
-				Message: userError,
+			ElseFail: &v1alpha1.Error{
+				Error: &core.Error{
+					Message: userError,
+				},
 			},
 		}
 

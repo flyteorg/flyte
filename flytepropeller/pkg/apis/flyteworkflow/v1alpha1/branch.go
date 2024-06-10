@@ -96,5 +96,8 @@ func (in *BranchNodeSpec) GetElseIf() []ExecutableIfBlock {
 }
 
 func (in *BranchNodeSpec) GetElseFail() *core.Error {
+	if in.ElseFail == nil {
+		return nil
+	}
 	return in.ElseFail.Error
 }
