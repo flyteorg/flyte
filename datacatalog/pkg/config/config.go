@@ -22,7 +22,7 @@ var defaultConfig = &Config{
 	GrpcPort:             8081,
 	HTTPPort:             8080,
 	GrpcServerReflection: true,
-	// SetSupportedTaskType the HTTP timeout to avoid security vulnerabilities with expired, inactive connections:
+	// Set the HTTP timeout to avoid security vulnerabilities with expired, inactive connections:
 	// https://deepsource.io/directory/analyzers/go/issues/GO-S2114
 	// just shy of requestTimeoutUpperBound
 	ReadHeaderTimeoutSeconds: 32,

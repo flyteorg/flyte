@@ -247,7 +247,7 @@ var startCmd = &cobra.Command{
 
 func init() {
 	RootCmd.AddCommand(startCmd)
-	// SetSupportedTaskType Keys
+	// Set Keys
 	labeled.SetMetricKeys(contextutils.AppNameKey, contextutils.ProjectKey, contextutils.DomainKey,
 		contextutils.ExecIDKey, contextutils.WorkflowIDKey, contextutils.NodeIDKey, contextutils.TaskIDKey,
 		contextutils.TaskTypeKey, common.RuntimeTypeKey, common.RuntimeVersionKey, storage.FailureTypeLabel)

@@ -134,7 +134,7 @@ func CreateVaultAnnotationsForSecret(secret *core.Secret, kvversion config.KVVer
 		fmt.Sprintf("vault.hashicorp.com/agent-inject-file-%s", id):   fmt.Sprintf("%s/%s", secret.Group, secret.Key),
 	}
 
-	// SetSupportedTaskType the consul template language query depending on the KV Secrets Engine version.
+	// Set the consul template language query depending on the KV Secrets Engine version.
 	// Version 1 stores plain k:v pairs under .Data, version 2 supports versioned secrets
 	// and wraps the k:v pairs into an additional subfield.
 	var query string

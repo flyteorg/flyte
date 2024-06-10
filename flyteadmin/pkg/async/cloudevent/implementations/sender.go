@@ -45,7 +45,7 @@ type KafkaSender struct {
 
 func (s *KafkaSender) Send(ctx context.Context, notificationType string, event cloudevents.Event) error {
 	if result := s.Client.Send(
-		// SetSupportedTaskType the producer message key
+		// Set the producer message key
 		kafka_sarama.WithMessageKey(ctx, sarama.StringEncoder(event.ID())),
 		event,
 	); cloudevents.IsUndelivered(result) {

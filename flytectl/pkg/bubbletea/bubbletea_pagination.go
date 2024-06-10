@@ -34,7 +34,7 @@ func newModel(initMsg []proto.Message) pageModel {
 	p := paginator.New()
 	p.PerPage = msgPerPage
 	p.Page = int(filter.Page) - 1
-	// SetSupportedTaskType the upper bound of the page number
+	// Set the upper bound of the page number
 	p.SetTotalPages(getLastMsgIdx())
 
 	s := spinner.New()
@@ -98,7 +98,7 @@ func (m pageModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			fetchingBackward = false
 		}
-		// SetSupportedTaskType the upper bound of the page number
+		// Set the upper bound of the page number
 		m.paginator.SetTotalPages(getLastMsgIdx())
 		return m, nil
 	}

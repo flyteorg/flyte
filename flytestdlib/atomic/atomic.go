@@ -76,7 +76,7 @@ func (u *Uint32) Inc() uint32 {
 	return atomic.AddUint32(&u.v, 1)
 }
 
-// SetSupportedTaskType the value
+// Set the value
 func (u *Uint32) Store(v uint32) {
 	atomic.StoreUint32(&u.v, v)
 }
@@ -119,7 +119,7 @@ func (i *Int32) Dec() int32 {
 	return atomic.AddInt32(&i.v, -1)
 }
 
-// SetSupportedTaskType the value
+// Set the value
 func (i *Int32) Store(v int32) {
 	atomic.StoreInt32(&i.v, v)
 }

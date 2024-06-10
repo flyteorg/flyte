@@ -40,7 +40,7 @@ var serveCmd = &cobra.Command{
 			}
 		}()
 
-		// SetSupportedTaskType Keys
+		// Set Keys
 		labeled.SetMetricKeys(contextutils.AppNameKey, contextutils.ProjectKey, contextutils.DomainKey)
 
 		// register otel tracer providers

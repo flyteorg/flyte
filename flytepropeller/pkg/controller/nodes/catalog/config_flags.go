@@ -58,6 +58,6 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "max-retries"), defaultConfig.MaxRetries, "The max number of retries for event recording.")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "base-scalar"), defaultConfig.BackoffScalar, "The base/scalar backoff duration in milliseconds for event recording retries.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "backoff-jitter"), defaultConfig.BackoffJitter, "A string representation of a floating point number between 0 and 1 specifying the jitter factor for event recording retries.")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "default-service-config"), defaultConfig.DefaultServiceConfig, " SetSupportedTaskType the default service config for the catalog gRPC client")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "default-service-config"), defaultConfig.DefaultServiceConfig, " Set the default service config for the catalog gRPC client")
 	return cmdFlags
 }
