@@ -404,7 +404,7 @@ func TestSetHTTPClientContext(t *testing.T) {
 	t.Run("proxy url", func(t *testing.T) {
 		cfg := &Config{
 			HTTPProxyURL: config.
-			URL{URL: url.URL{
+				URL{URL: url.URL{
 				Scheme: "http",
 				Host:   "localhost:8080",
 			}},
