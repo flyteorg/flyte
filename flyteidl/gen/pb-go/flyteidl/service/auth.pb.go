@@ -81,7 +81,7 @@ type OAuth2MetadataResponse struct {
 	ScopesSupported []string `protobuf:"bytes,5,rep,name=scopes_supported,json=scopesSupported,proto3" json:"scopes_supported,omitempty"`
 	// JSON array containing a list of client authentication methods supported by this token endpoint.
 	TokenEndpointAuthMethodsSupported []string `protobuf:"bytes,6,rep,name=token_endpoint_auth_methods_supported,json=tokenEndpointAuthMethodsSupported,proto3" json:"token_endpoint_auth_methods_supported,omitempty"`
-	// URL of the authorization server's JWK SetSupportedTaskType [JWK] document. The referenced document contains the signing key(s) the
+	// URL of the authorization server's JWK Set [JWK] document. The referenced document contains the signing key(s) the
 	// client uses to validate signatures from the authorization server.
 	JwksUri string `protobuf:"bytes,7,opt,name=jwks_uri,json=jwksUri,proto3" json:"jwks_uri,omitempty"`
 	// JSON array containing a list of Proof Key for Code Exchange (PKCE) [RFC7636] code challenge methods supported by

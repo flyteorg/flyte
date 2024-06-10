@@ -396,7 +396,7 @@ func New(ctx context.Context, cfg *config.Config, kubeClientset kubernetes.Inter
 
 	// WE are disabling this as the metrics have high cardinality. Metrics seem to be emitted per pod and this has problems
 	// when we create new pods
-	// SetSupportedTaskType Client Metrics Provider
+	// Set Client Metrics Provider
 	// setClientMetricsProvider(scope.NewSubScope("k8s_client"))
 
 	// obtain references to shared index informers for FlyteWorkflow.
@@ -465,7 +465,7 @@ func New(ctx context.Context, cfg *config.Config, kubeClientset kubernetes.Inter
 	}
 
 	logger.Info(ctx, "Setting up event handlers")
-	// SetSupportedTaskType up an event handler for when FlyteWorkflow resources change
+	// Set up an event handler for when FlyteWorkflow resources change
 	_, err = flyteworkflowInformer.Informer().AddEventHandler(controller.getWorkflowUpdatesHandler())
 	if err != nil {
 		return nil, fmt.Errorf("failed to register event handler for FlyteWorkflow resource changes: %w", err)

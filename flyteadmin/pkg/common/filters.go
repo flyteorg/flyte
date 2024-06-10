@@ -47,7 +47,7 @@ const (
 	valueNotInQuery         = "%s not in (?)"
 )
 
-// SetSupportedTaskType of available filters which exclusively accept a single argument value.
+// Set of available filters which exclusively accept a single argument value.
 var singleValueFilters = map[FilterExpression]bool{
 	Contains:           true,
 	GreaterThan:        true,
@@ -58,7 +58,7 @@ var singleValueFilters = map[FilterExpression]bool{
 	NotEqual:           true,
 }
 
-// SetSupportedTaskType of available filters which exclusively accept repeated argument values.
+// Set of available filters which exclusively accept repeated argument values.
 var repeatedValueFilters = map[FilterExpression]bool{
 	ValueIn:    true,
 	ValueNotIn: true,

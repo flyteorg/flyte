@@ -230,7 +230,7 @@ func TestStrictAccessor(t *testing.T) {
 			assert.NoError(t, v.UpdateConfig(context.TODO()))
 		})
 
-		t.Run(fmt.Sprintf("[%v] SetSupportedTaskType through env", provider(config.Options{}).ID()), func(t *testing.T) {
+		t.Run(fmt.Sprintf("[%v] Set through env", provider(config.Options{}).ID()), func(t *testing.T) {
 			reg := config.NewRootSection()
 			_, err := reg.RegisterSection(MyComponentSectionKey, &MyComponentConfig{})
 			assert.NoError(t, err)
@@ -415,11 +415,11 @@ func TestAccessor_UpdateConfig(t *testing.T) {
 				RootSection: reg,
 			})
 			key := strings.ToUpper("my-component.str")
-			assert.NoError(t, os.Setenv(key, "SetSupportedTaskType From Env"))
+			assert.NoError(t, os.Setenv(key, "Set From Env"))
 			defer func() { assert.NoError(t, os.Unsetenv(key)) }()
 			assert.NoError(t, v.UpdateConfig(context.TODO()))
 			r := reg.GetSection(MyComponentSectionKey).GetConfig().(*MyComponentConfig)
-			assert.Equal(t, "SetSupportedTaskType From Env", r.StringValue)
+			assert.Equal(t, "Set From Env", r.StringValue)
 		})
 
 		t.Run(fmt.Sprintf("[%v] Override in Env Var no config file", provider(config.Options{}).ID()), func(t *testing.T) {
@@ -429,11 +429,11 @@ func TestAccessor_UpdateConfig(t *testing.T) {
 
 			v := provider(config.Options{RootSection: reg})
 			key := strings.ToUpper("my-component.str3")
-			assert.NoError(t, os.Setenv(key, "SetSupportedTaskType From Env"))
+			assert.NoError(t, os.Setenv(key, "Set From Env"))
 			defer func() { assert.NoError(t, os.Unsetenv(key)) }()
 			assert.NoError(t, v.UpdateConfig(context.TODO()))
 			r := reg.GetSection(MyComponentSectionKey).GetConfig().(*MyComponentConfig)
-			assert.Equal(t, "SetSupportedTaskType From Env", r.StringValue3)
+			assert.Equal(t, "Set From Env", r.StringValue3)
 		})
 
 		t.Run(fmt.Sprintf("[%v] Change handler", provider(config.Options{}).ID()), func(t *testing.T) {
@@ -522,11 +522,11 @@ func TestAccessor_UpdateConfig(t *testing.T) {
 				RootSection: reg,
 			})
 			key := strings.ToUpper("my-component.str")
-			assert.NoError(t, os.Setenv(key, "SetSupportedTaskType From Env"))
+			assert.NoError(t, os.Setenv(key, "Set From Env"))
 			defer func() { assert.NoError(t, os.Unsetenv(key)) }()
 			assert.NoError(t, v.UpdateConfig(context.TODO()))
 			r := reg.GetSection(MyComponentSectionKey).GetConfig().(*MyComponentConfig)
-			assert.Equal(t, "SetSupportedTaskType From Env", r.StringValue)
+			assert.Equal(t, "Set From Env", r.StringValue)
 			assert.Equal(t, "default value 2", r.StringValue2)
 		})
 	}

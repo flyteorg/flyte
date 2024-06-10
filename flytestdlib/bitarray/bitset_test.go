@@ -18,7 +18,7 @@ func ExampleBitSet() {
 }
 
 func TestBitSet_Set(t *testing.T) {
-	t.Run("Empty SetSupportedTaskType", func(t *testing.T) {
+	t.Run("Empty Set", func(t *testing.T) {
 		b := new(BitSet)
 		b.Set(5)
 		assert.True(t, b.IsSet(5))

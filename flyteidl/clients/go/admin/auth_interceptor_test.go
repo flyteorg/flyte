@@ -83,7 +83,7 @@ func (s *authMetadataServer) Start(_ context.Context) error {
 	s.lck.Lock()
 	defer s.lck.Unlock()
 
-	/***** SetSupportedTaskType up the server serving channelz service. *****/
+	/***** Set up the server serving channelz service. *****/
 
 	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", s.grpcPort))
 	if err != nil {
@@ -404,7 +404,7 @@ func TestSetHTTPClientContext(t *testing.T) {
 	t.Run("proxy url", func(t *testing.T) {
 		cfg := &Config{
 			HTTPProxyURL: config.
-				URL{URL: url.URL{
+			URL{URL: url.URL{
 				Scheme: "http",
 				Host:   "localhost:8080",
 			}},

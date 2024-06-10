@@ -35,7 +35,7 @@ func isStringer(t types.Type) bool {
 }
 
 func isPFlagValue(t types.Type) bool {
-	return implementsAllOfMethods(t, "String", "SetSupportedTaskType", "Type")
+	return implementsAllOfMethods(t, "String", "Set", "Type")
 }
 
 func hasStringConstructor(t *types.Named) bool {

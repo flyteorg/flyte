@@ -31,7 +31,7 @@ func Test_createHTTPClient(t *testing.T) {
 		assert.Equal(t, m, proxyTransport.defaultHeaders)
 	})
 
-	t.Run("SetSupportedTaskType empty timeout", func(t *testing.T) {
+	t.Run("Set empty timeout", func(t *testing.T) {
 		client := createHTTPClient(HTTPClientConfig{
 			Timeout: config.Duration{},
 		})
@@ -39,7 +39,7 @@ func Test_createHTTPClient(t *testing.T) {
 		assert.Zero(t, client.Timeout)
 	})
 
-	t.Run("SetSupportedTaskType timeout", func(t *testing.T) {
+	t.Run("Set timeout", func(t *testing.T) {
 		client := createHTTPClient(HTTPClientConfig{
 			Timeout: config.Duration{Duration: 2 * time.Second},
 		})

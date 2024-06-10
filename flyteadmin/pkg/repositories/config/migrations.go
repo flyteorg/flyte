@@ -196,7 +196,7 @@ var LegacyMigrations = []*gormigrate.Migration{
 			return tx.Table("named_entity_metadata").Migrator().DropColumn(&models.NamedEntityMetadata{}, "state")
 		},
 	},
-	// SetSupportedTaskType default state value for workflow model
+	// Set default state value for workflow model
 	{
 		ID: "2020-04-03-named-entity-state-default",
 		Migrate: func(tx *gorm.DB) error {

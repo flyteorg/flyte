@@ -96,7 +96,7 @@ func (i GCPSecretManagerInjector) Inject(ctx context.Context, secret *core.Secre
 
 		// Inject GCP secret-inject webhook annotations to mount the secret in a predictable location.
 		envVars := []corev1.EnvVar{
-			// SetSupportedTaskType environment variable to let the container know where to find the mounted files.
+			// Set environment variable to let the container know where to find the mounted files.
 			{
 				Name:  SecretPathDefaultDirEnvVar,
 				Value: GCPSecretMountPath,

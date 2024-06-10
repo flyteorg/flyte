@@ -278,7 +278,7 @@ func (m *LaunchPlanManager) enableLaunchPlan(ctx context.Context, request admin.
 		logger.Debugf(ctx, "Failed to find launch plan to enable with id [%+v] and err %v", request.Id, err)
 		return nil, err
 	}
-	// SetSupportedTaskType desired launch plan version to active:
+	// Set desired launch plan version to active:
 	err = m.updateLaunchPlanModelState(&newlyActiveLaunchPlanModel, admin.LaunchPlanState_ACTIVE)
 	if err != nil {
 		return nil, err

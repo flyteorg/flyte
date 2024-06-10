@@ -209,7 +209,7 @@ func Test{{ .Name }}_SetFlags(t *testing.T) {
 			{{ else if eq .TestStrategy "Raw" }}testValue := {{ .TestValue }}
 			{{ else }}testValue := join_{{ $ParentName }}({{ .TestValue }}, ",")
 			{{ end }}
-			cmdFlags.SetSupportedTaskType("{{ .Name }}", testValue)
+			cmdFlags.Set("{{ .Name }}", testValue)
 			{{- if eq .FlagMethodName "" }}
 			if {{ $varName }} := cmdFlags.Lookup("{{ .Name }}"); {{ $varName }} != nil {
 				{{ if eq .TestStrategy "Json" }}testDecodeJson_{{ $ParentName }}(t, fmt.Sprintf("%v", v.Value.String()), &actual.{{ .GoName }})

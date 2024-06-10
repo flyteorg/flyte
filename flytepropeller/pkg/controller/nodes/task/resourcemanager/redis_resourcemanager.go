@@ -16,7 +16,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
-// This is the key that will point to the Redis SetSupportedTaskType.
+// This is the key that will point to the Redis Set.
 // https://redis.io/commands#set
 const RedisSetKeyPrefix = "redisresourcemanager"
 
@@ -162,7 +162,7 @@ func NewRedisResourceManagerMetrics(scope promutils.Scope) *RedisResourceManager
 	return &RedisResourceManagerMetrics{
 		Scope: scope,
 		RedisSizeCheckTime: scope.MustNewStopWatch("size_check_time",
-			"The time it takes to measure the size of the Redis SetSupportedTaskType where all utilized resource are stored", time.Millisecond),
+			"The time it takes to measure the size of the Redis Set where all utilized resource are stored", time.Millisecond),
 
 		AllocatedTokensGauge: scope.MustNewGauge("size",
 			"The number of allocation resourceRegistryTokens currently in the Redis set"),

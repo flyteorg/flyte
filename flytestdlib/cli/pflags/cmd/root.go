@@ -35,7 +35,7 @@ type MyStruct struct {
 func init() {
 	root.Flags().StringVarP(&pkg, "package", "p", ".", "Determines the source/destination package.")
 	root.Flags().StringVar(&defaultValuesVariable, "default-var", "defaultConfig", "Points to a variable to use to load default configs. If specified & found, it'll be used instead of the values specified in the tag.")
-	root.Flags().BoolVar(&shouldBindDefaultVariable, "bind-default-var", false, "The generated PFlags SetSupportedTaskType will bind fields to the default variable.")
+	root.Flags().BoolVar(&shouldBindDefaultVariable, "bind-default-var", false, "The generated PFlags Set will bind fields to the default variable.")
 }
 
 func Execute() error {

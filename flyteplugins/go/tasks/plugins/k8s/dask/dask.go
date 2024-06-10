@@ -120,12 +120,12 @@ func createWorkerSpec(cluster plugins.DaskWorkerGroup, podSpec *v1.PodSpec, prim
 	}
 	primaryContainer.Name = "dask-worker"
 
-	// SetSupportedTaskType custom image if present
+	// Set custom image if present
 	if cluster.GetImage() != "" {
 		primaryContainer.Image = cluster.GetImage()
 	}
 
-	// SetSupportedTaskType custom resources
+	// Set custom resources
 	resources := &primaryContainer.Resources
 	clusterResources := cluster.GetResources()
 	if len(clusterResources.Requests) >= 1 || len(clusterResources.Limits) >= 1 {
@@ -139,7 +139,7 @@ func createWorkerSpec(cluster plugins.DaskWorkerGroup, podSpec *v1.PodSpec, prim
 	}
 	primaryContainer.Resources = *resources
 
-	// SetSupportedTaskType custom args
+	// Set custom args
 	workerArgs := []string{
 		"dask-worker",
 		"--name",
@@ -217,7 +217,7 @@ func createSchedulerSpec(scheduler plugins.DaskScheduler, clusterName string, po
 
 	schedulerPodSpec.RestartPolicy = v1.RestartPolicyAlways
 
-	// SetSupportedTaskType primary container
+	// Set primary container
 	err = replacePrimaryContainer(schedulerPodSpec, primaryContainerName, *primaryContainer)
 	if err != nil {
 		return nil, err

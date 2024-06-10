@@ -1425,7 +1425,7 @@ func makeExecutionWithEnvs(
 }
 
 func TestRelaunchExecution(t *testing.T) {
-	// SetSupportedTaskType up mocks.
+	// Set up mocks.
 	repository := getMockRepositoryForExecTest()
 	setDefaultLpCallbackForExecTest(repository)
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
@@ -1487,7 +1487,7 @@ func TestRelaunchExecution(t *testing.T) {
 }
 
 func TestRelaunchExecution_GetExistingFailure(t *testing.T) {
-	// SetSupportedTaskType up mocks.
+	// Set up mocks.
 	repository := getMockRepositoryForExecTest()
 	setDefaultLpCallbackForExecTest(repository)
 
@@ -1524,7 +1524,7 @@ func TestRelaunchExecution_GetExistingFailure(t *testing.T) {
 }
 
 func TestRelaunchExecution_CreateFailure(t *testing.T) {
-	// SetSupportedTaskType up mocks.
+	// Set up mocks.
 	repository := getMockRepositoryForExecTest()
 	setDefaultLpCallbackForExecTest(repository)
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
@@ -1564,7 +1564,7 @@ func TestRelaunchExecution_CreateFailure(t *testing.T) {
 }
 
 func TestRelaunchExecutionInterruptibleOverride(t *testing.T) {
-	// SetSupportedTaskType up mocks.
+	// Set up mocks.
 	repository := getMockRepositoryForExecTest()
 	setDefaultLpCallbackForExecTest(repository)
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
@@ -1615,7 +1615,7 @@ func TestRelaunchExecutionInterruptibleOverride(t *testing.T) {
 }
 
 func TestRelaunchExecutionOverwriteCacheOverride(t *testing.T) {
-	// SetSupportedTaskType up mocks.
+	// Set up mocks.
 	repository := getMockRepositoryForExecTest()
 	setDefaultLpCallbackForExecTest(repository)
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
@@ -1738,7 +1738,7 @@ func TestRelaunchExecutionOverwriteCacheOverride(t *testing.T) {
 }
 
 func TestRelaunchExecutionEnvsOverride(t *testing.T) {
-	// SetSupportedTaskType up mocks.
+	// Set up mocks.
 	repository := getMockRepositoryForExecTest()
 	setDefaultLpCallbackForExecTest(repository)
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
@@ -1790,7 +1790,7 @@ func TestRelaunchExecutionEnvsOverride(t *testing.T) {
 }
 
 func TestRecoverExecution(t *testing.T) {
-	// SetSupportedTaskType up mocks.
+	// Set up mocks.
 	repository := getMockRepositoryForExecTest()
 	setDefaultLpCallbackForExecTest(repository)
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
@@ -1953,7 +1953,7 @@ func TestRecoverExecution_RecoveredChildNode(t *testing.T) {
 }
 
 func TestRecoverExecution_GetExistingFailure(t *testing.T) {
-	// SetSupportedTaskType up mocks.
+	// Set up mocks.
 	repository := getMockRepositoryForExecTest()
 	setDefaultLpCallbackForExecTest(repository)
 	r := plugins.NewRegistry()
@@ -1989,7 +1989,7 @@ func TestRecoverExecution_GetExistingFailure(t *testing.T) {
 }
 
 func TestRecoverExecution_GetExistingInputsFailure(t *testing.T) {
-	// SetSupportedTaskType up mocks.
+	// Set up mocks.
 	repository := getMockRepositoryForExecTest()
 	setDefaultLpCallbackForExecTest(repository)
 
@@ -2027,7 +2027,7 @@ func TestRecoverExecution_GetExistingInputsFailure(t *testing.T) {
 }
 
 func TestRecoverExecutionInterruptibleOverride(t *testing.T) {
-	// SetSupportedTaskType up mocks.
+	// Set up mocks.
 	repository := getMockRepositoryForExecTest()
 	setDefaultLpCallbackForExecTest(repository)
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
@@ -2090,7 +2090,7 @@ func TestRecoverExecutionInterruptibleOverride(t *testing.T) {
 }
 
 func TestRecoverExecutionOverwriteCacheOverride(t *testing.T) {
-	// SetSupportedTaskType up mocks.
+	// Set up mocks.
 	repository := getMockRepositoryForExecTest()
 	setDefaultLpCallbackForExecTest(repository)
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
@@ -2151,7 +2151,7 @@ func TestRecoverExecutionOverwriteCacheOverride(t *testing.T) {
 }
 
 func TestRecoverExecutionEnvsOverride(t *testing.T) {
-	// SetSupportedTaskType up mocks.
+	// Set up mocks.
 	repository := getMockRepositoryForExecTest()
 	setDefaultLpCallbackForExecTest(repository)
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
@@ -3896,7 +3896,7 @@ func TestCreateExecution_LegacyClient(t *testing.T) {
 }
 
 func TestRelaunchExecution_LegacyModel(t *testing.T) {
-	// SetSupportedTaskType up mocks.
+	// Set up mocks.
 	repository := getMockRepositoryForExecTest()
 	setDefaultLpCallbackForExecTest(repository)
 	storageClient := getMockStorageForExecTest(context.Background())

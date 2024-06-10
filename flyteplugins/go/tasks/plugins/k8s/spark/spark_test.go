@@ -410,13 +410,13 @@ func dummySparkTaskContext(taskTemplate *core.TaskTemplate, interruptible bool) 
 }
 
 func defaultPluginConfig() *config.K8sPluginConfig {
-	// SetSupportedTaskType Interruptible Config
+	// Set Interruptible Config
 	runAsUser := int64(1000)
 	dnsOptVal1 := "1"
 	dnsOptVal2 := "1"
 	dnsOptVal3 := "3"
 
-	// SetSupportedTaskType scheduler
+	// Set scheduler
 	schedulerName := "custom-scheduler"
 
 	// Node selectors
@@ -541,7 +541,7 @@ func TestBuildResourceContainer(t *testing.T) {
 	// Case1: Valid Spark Task-Template
 	taskTemplate := dummySparkTaskTemplateContainer("blah-1", dummySparkConf)
 
-	// SetSupportedTaskType spark custom feature config.
+	// Set spark custom feature config.
 	assert.NoError(t, setSparkConfig(&Config{
 		Features: []Feature{
 			{

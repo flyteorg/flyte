@@ -647,7 +647,7 @@ func resolveAuthRole(request *admin.ExecutionCreateRequest, launchPlan *admin.La
 		return &admin.AuthRole{}
 	}
 
-	// SetSupportedTaskType role permissions based on launch plan Auth values.
+	// Set role permissions based on launch plan Auth values.
 	// The branched-ness of this check is due to the presence numerous deprecated fields
 	if launchPlan.Spec.GetAuthRole() != nil {
 		return launchPlan.Spec.GetAuthRole()

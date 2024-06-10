@@ -27,9 +27,9 @@ type IdentityContext struct {
 	appID           string
 	authenticatedAt time.Time
 	userInfo        *service.UserInfoResponse
-	// SetSupportedTaskType to pointer just to keep this struct go-simple to support equal operator
+	// Set to pointer just to keep this struct go-simple to support equal operator
 	scopes *sets.String
-	// Raw JWT token from the IDP. SetSupportedTaskType to a pointer to support the equal operator for this struct.
+	// Raw JWT token from the IDP. Set to a pointer to support the equal operator for this struct.
 	claims *claimsType
 	// executionIdentity stores a unique string that can be used to identify the user associated with a given task.
 	// This identifier is passed down to the ExecutionSpec and can be used for various purposes, such as setting the user identifier on a pod label.
