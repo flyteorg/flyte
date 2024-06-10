@@ -53,11 +53,11 @@ type Config struct {
 	BackoffScalar int             `json:"base-scalar" pflag:",The base/scalar backoff duration in milliseconds for event recording retries."`
 	BackoffJitter string          `json:"backoff-jitter" pflag:",A string representation of a floating point number between 0 and 1 specifying the jitter factor for event recording retries."`
 
-	// Set the gRPC service config formatted as a json string https://github.com/grpc/grpc/blob/master/doc/service_config.md
+	// SetSupportedTaskType the gRPC service config formatted as a json string https://github.com/grpc/grpc/blob/master/doc/service_config.md
 	// eg. {"loadBalancingConfig": [{"round_robin":{}}], "methodConfig": [{"name":[{"service": "foo", "method": "bar"}, {"service": "baz"}], "timeout": "1.000000001s"}]}
 	// find the full schema here https://github.com/grpc/grpc-proto/blob/master/grpc/service_config/service_config.proto#L625
 	// Note that required packages may need to be preloaded to support certain service config. For example "google.golang.org/grpc/balancer/roundrobin" should be preloaded to have round-robin policy supported.
-	DefaultServiceConfig string `json:"default-service-config" pflag:"\"\", Set the default service config for the catalog gRPC client"`
+	DefaultServiceConfig string `json:"default-service-config" pflag:"\"\", SetSupportedTaskType the default service config for the catalog gRPC client"`
 }
 
 func (c Config) GetBackoffJitter(ctx context.Context) float64 {

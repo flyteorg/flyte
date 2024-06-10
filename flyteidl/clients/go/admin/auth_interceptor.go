@@ -105,7 +105,7 @@ func (c *proxyAuthTransport) RoundTrip(req *http.Request) (*http.Response, error
 	return c.transport.RoundTrip(req)
 }
 
-// Set up http client used in oauth2
+// SetSupportedTaskType up http client used in oauth2
 func setHTTPClientContext(ctx context.Context, cfg *Config, proxyCredentialsFuture *PerRPCCredentialsFuture) context.Context {
 	httpClient := &http.Client{}
 	transport := &http.Transport{}

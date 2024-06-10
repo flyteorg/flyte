@@ -58,7 +58,7 @@ func (i K8sSecretInjector) Inject(ctx context.Context, secret *core.Secret, p *c
 		p.Spec.InitContainers = AppendVolumeMounts(p.Spec.InitContainers, mount)
 		p.Spec.Containers = AppendVolumeMounts(p.Spec.Containers, mount)
 
-		// Set environment variable to let the container know where to find the mounted files.
+		// SetSupportedTaskType environment variable to let the container know where to find the mounted files.
 		defaultDirEnvVar := corev1.EnvVar{
 			Name:  SecretPathDefaultDirEnvVar,
 			Value: filepath.Join(K8sSecretPathPrefix...),

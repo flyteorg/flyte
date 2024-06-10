@@ -57,10 +57,10 @@ func (w *ScheduledExecutor) Run(ctx context.Context) error {
 	logger.Infof(ctx, "Number of schedules retrieved %v", len(schedules))
 	adminRateLimit := w.workflowExecutorConfig.GetAdminRateLimit()
 
-	// Set the rate limit on the admin
+	// SetSupportedTaskType the rate limit on the admin
 	rateLimiter := rate.NewLimiter(adminRateLimit.GetTps(), adminRateLimit.GetBurst())
 
-	// Set the executor to send executions to admin
+	// SetSupportedTaskType the executor to send executions to admin
 	executor := executor.New(w.scope, w.adminServiceClient)
 
 	// Create the scheduler using GoCronScheduler implementation

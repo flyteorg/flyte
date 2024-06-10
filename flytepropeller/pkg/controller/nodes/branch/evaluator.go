@@ -84,7 +84,7 @@ func EvaluateIfBlock(block v1alpha1.ExecutableIfBlock, nodeInputs *core.LiteralM
 	if ok, err := EvaluateBooleanExpression(block.GetCondition(), nodeInputs); err != nil {
 		return nil, skippedNodeIds, err
 	} else if ok {
-		// Set status to running
+		// SetSupportedTaskType status to running
 		return block.GetThenNode(), skippedNodeIds, err
 	}
 	// This branch is not taken

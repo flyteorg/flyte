@@ -35,10 +35,6 @@ import (
 )
 
 func TestEndToEnd(t *testing.T) {
-	agentRegistry = Registry{
-		"openai": {defaultTaskTypeVersion: {AgentDeployment: &Deployment{Endpoint: defaultAgentEndpoint}, IsSync: true}},
-		"spark":  {defaultTaskTypeVersion: {AgentDeployment: &Deployment{Endpoint: defaultAgentEndpoint}, IsSync: false}},
-	}
 	iter := func(ctx context.Context, tCtx pluginCore.TaskExecutionContext) error {
 		return nil
 	}
@@ -259,6 +255,9 @@ func getTaskContext(t *testing.T) *pluginCoreMocks.TaskExecutionContext {
 
 func newMockAsyncAgentPlugin() webapi.PluginEntry {
 	asyncAgentClient := new(agentMocks.AsyncAgentServiceClient)
+	agentRegistry := Registry{
+		"spark": {defaultTaskTypeVersion: {AgentDeployment: &Deployment{Endpoint: defaultAgentEndpoint}, IsSync: false}},
+	}
 
 	mockCreateRequestMatcher := mock.MatchedBy(func(request *admin.CreateTaskRequest) bool {
 		expectedArgs := []string{"pyflyte-fast-execute", "--output-prefix", "/tmp/123"}
@@ -291,12 +290,17 @@ func newMockAsyncAgentPlugin() webapi.PluginEntry {
 						defaultAgentEndpoint: asyncAgentClient,
 					},
 				},
+				registry: agentRegistry,
 			}, nil
 		},
 	}
 }
 
 func newMockSyncAgentPlugin() webapi.PluginEntry {
+	agentRegistry := Registry{
+		"openai": {defaultTaskTypeVersion: {AgentDeployment: &Deployment{Endpoint: defaultAgentEndpoint}, IsSync: true}},
+	}
+
 	syncAgentClient := new(agentMocks.SyncAgentServiceClient)
 	output, _ := coreutils.MakeLiteralMap(map[string]interface{}{"x": 1})
 	resource := &admin.Resource{Phase: flyteIdlCore.TaskExecution_SUCCEEDED, Outputs: output}
@@ -331,6 +335,7 @@ func newMockSyncAgentPlugin() webapi.PluginEntry {
 						defaultAgentEndpoint: syncAgentClient,
 					},
 				},
+				registry: agentRegistry,
 			}, nil
 		},
 	}

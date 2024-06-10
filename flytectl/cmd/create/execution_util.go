@@ -37,7 +37,7 @@ func createExecutionRequestForWorkflow(ctx context.Context, workflowName, projec
 
 	envs := makeEnvs(executionConfig)
 
-	// Set both deprecated field and new field for security identity passing
+	// SetSupportedTaskType both deprecated field and new field for security identity passing
 	var securityContext *core.SecurityContext
 	var authRole *admin.AuthRole
 
@@ -77,7 +77,7 @@ func createExecutionRequestForTask(ctx context.Context, taskName string, project
 
 	envs := makeEnvs(executionConfig)
 
-	// Set both deprecated field and new field for security identity passing
+	// SetSupportedTaskType both deprecated field and new field for security identity passing
 	var securityContext *core.SecurityContext
 	var authRole *admin.AuthRole
 

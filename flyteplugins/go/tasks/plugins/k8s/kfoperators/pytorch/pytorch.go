@@ -76,7 +76,7 @@ func (pytorchOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx
 		workerReplicas := pytorchTaskExtraArgs.GetWorkers()
 		workerReplicaSpec.Replicas = &workerReplicas
 
-		// Set elastic config
+		// SetSupportedTaskType elastic config
 		elasticConfig := pytorchTaskExtraArgs.GetElasticConfig()
 		if elasticConfig != nil {
 			elasticPolicy = ParseElasticConfig(elasticConfig)
@@ -102,7 +102,7 @@ func (pytorchOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx
 		if kfPytorchTaskExtraArgs.GetRunPolicy() != nil {
 			runPolicy = common.ParseRunPolicy(*kfPytorchTaskExtraArgs.GetRunPolicy())
 		}
-		// Set elastic config
+		// SetSupportedTaskType elastic config
 		elasticConfig := kfPytorchTaskExtraArgs.GetElasticConfig()
 		if elasticConfig != nil {
 			elasticPolicy = ParseElasticConfig(elasticConfig)

@@ -97,7 +97,7 @@ func getFinalContext(ctx context.Context, operation string, agent *Deployment) (
 	return context.WithTimeout(ctx, timeout)
 }
 
-func updateAgentRegistry(ctx context.Context, cs *ClientSet) {
+func updateAgentRegistry(ctx context.Context, cs *ClientSet, registry Registry) {
 	newAgentRegistry := make(Registry)
 	cfg := GetConfig()
 	var agentDeployments []*Deployment
@@ -164,7 +164,7 @@ func updateAgentRegistry(ctx context.Context, cs *ClientSet) {
 		}
 	}
 	logger.Debugf(ctx, "AgentDeployment service supports task types: %v", maps.Keys(newAgentRegistry))
-	getAgentRegistry().set(newAgentRegistry)
+	registry = newAgentRegistry
 }
 
 func getAgentClientSets(ctx context.Context) *ClientSet {

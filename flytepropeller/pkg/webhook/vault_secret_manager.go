@@ -44,7 +44,7 @@ func (i VaultSecretManagerInjector) Inject(ctx context.Context, secret *coreIdl.
 	case coreIdl.Secret_ANY:
 		fallthrough
 	case coreIdl.Secret_FILE:
-		// Set environment variable to let the container know where to find the mounted files.
+		// SetSupportedTaskType environment variable to let the container know where to find the mounted files.
 		defaultDirEnvVar := corev1.EnvVar{
 			Name:  SecretPathDefaultDirEnvVar,
 			Value: filepath.Join(VaultSecretPathPrefix...),

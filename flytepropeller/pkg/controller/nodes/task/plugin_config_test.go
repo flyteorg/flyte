@@ -62,7 +62,7 @@ func TestWranglePluginsAndGenerateFinalList(t *testing.T) {
 				k8s:  tt.args.k8sPlugins,
 			}
 			mockClientset := k8sfake.NewSimpleClientset()
-			got, _, err := WranglePluginsAndGenerateFinalList(context.TODO(), tt.args.cfg, pr, mockClientset, nil)
+			got, _, err := WranglePluginsAndGenerateFinalList(context.TODO(), tt.args.cfg, pr, mockClientset)
 			if (err != nil) != tt.want.err {
 				t.Errorf("WranglePluginsAndGenerateFinalList() error = %v, wantErr %v", err, tt.want.err)
 				return

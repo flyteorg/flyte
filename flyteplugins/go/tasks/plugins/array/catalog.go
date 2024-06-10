@@ -119,7 +119,7 @@ func DetermineDiscoverability(ctx context.Context, tCtx core.TaskExecutionContex
 	// If the task is not discoverable, then skip data catalog work and move directly to launch
 	if taskTemplate.Metadata == nil || !taskTemplate.Metadata.Discoverable {
 		logger.Infof(ctx, "Task is not discoverable, moving to launch phase...")
-		// Set an all set indexes to cache. This task won't try to write to catalog anyway.
+		// SetSupportedTaskType an all set indexes to cache. This task won't try to write to catalog anyway.
 		state = state.SetIndexesToCache(arrayCore.InvertBitSet(bitarray.NewBitSet(uint(arrayJobSize)), uint(arrayJobSize)))
 		state = state.SetPhase(arrayCore.PhasePreLaunch, core.DefaultPhaseVersion).SetReason("Task is not discoverable.")
 

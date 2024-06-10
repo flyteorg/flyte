@@ -2,7 +2,6 @@ package agent
 
 import (
 	"context"
-	"sort"
 	"testing"
 	"time"
 
@@ -35,9 +34,12 @@ func TestPlugin(t *testing.T) {
 	cfg.AgentDeployments = map[string]*Deployment{"spark_agent": {Endpoint: "localhost:80"}}
 	cfg.AgentForTaskTypes = map[string]string{"spark": "spark_agent", "bar": "bar_agent"}
 
+	agent := &Agent{AgentDeployment: &Deployment{Endpoint: "localhost:80"}}
+	agentRegistry := Registry{"spark": {defaultTaskTypeVersion: agent}}
 	plugin := Plugin{
 		metricScope: fakeSetupContext.MetricsScope(),
 		cfg:         GetConfig(),
+		registry:    agentRegistry,
 	}
 	t.Run("get config", func(t *testing.T) {
 		err := SetConfig(&cfg)
@@ -59,16 +61,14 @@ func TestPlugin(t *testing.T) {
 	})
 
 	t.Run("test getFinalAgent", func(t *testing.T) {
-		agent := &Agent{AgentDeployment: &Deployment{Endpoint: "localhost:80"}}
-		agentRegistry = Registry{"spark": {defaultTaskTypeVersion: agent}}
 		spark := &admin.TaskCategory{Name: "spark", Version: defaultTaskTypeVersion}
 		foo := &admin.TaskCategory{Name: "foo", Version: defaultTaskTypeVersion}
 		bar := &admin.TaskCategory{Name: "bar", Version: defaultTaskTypeVersion}
-		agentDeployment, _ := getFinalAgent(spark, &cfg)
+		agentDeployment, _ := plugin.getFinalAgent(spark, &cfg)
 		assert.Equal(t, agentDeployment.Endpoint, "localhost:80")
-		agentDeployment, _ = getFinalAgent(foo, &cfg)
+		agentDeployment, _ = plugin.getFinalAgent(foo, &cfg)
 		assert.Equal(t, agentDeployment.Endpoint, cfg.DefaultAgent.Endpoint)
-		agentDeployment, _ = getFinalAgent(bar, &cfg)
+		agentDeployment, _ = plugin.getFinalAgent(bar, &cfg)
 		assert.Equal(t, agentDeployment.Endpoint, cfg.DefaultAgent.Endpoint)
 	})
 
@@ -318,11 +318,11 @@ func TestInitializeAgentRegistry(t *testing.T) {
 	cfg.AgentForTaskTypes = map[string]string{"task1": "agent-deployment-1", "task2": "agent-deployment-2"}
 	err := SetConfig(&cfg)
 	assert.NoError(t, err)
-	updateAgentRegistry(context.Background(), cs)
 
-	// In golang, the order of keys in a map is random. So, we sort the keys before asserting.
-	agentRegistryKeys := maps.Keys(getAgentRegistry())
-	sort.Strings(agentRegistryKeys)
+	agent := &Agent{AgentDeployment: &Deployment{Endpoint: "localhost:80"}}
+	agentRegistry := Registry{"spark": {defaultTaskTypeVersion: agent}}
+	updateAgentRegistry(context.Background(), cs, agentRegistry)
 
-	assert.Equal(t, agentRegistryKeys, []string{"task1", "task2", "task3"})
+	agentRegistryKeys := maps.Keys(agentRegistry)
+	assert.Equal(t, agentRegistryKeys, []string{"spark"})
 }

@@ -3,7 +3,6 @@ package core
 import (
 	"context"
 	"fmt"
-	"golang.org/x/exp/maps"
 	"k8s.io/utils/strings/slices"
 	"sync"
 )
@@ -64,32 +63,21 @@ type AgentService struct {
 	CorePlugin         Plugin
 }
 
-// It clones the supportedTaskTypes slice to minimize the duration of the read lock.
+// ContainTaskType check if agent supports this task type.
 func (p *AgentService) ContainTaskType(taskType TaskType) bool {
 	p.mu.RLock()
 	defer p.mu.RUnlock()
 	return slices.Contains(p.supportedTaskTypes, taskType)
 }
 
-// Set adds new taskTypes to supportedTaskTypes, ensuring no duplicates
-func (p *AgentService) Set(taskTypes []TaskType) {
+// SetSupportedTaskType set supportTaskType in the agent service.
+func (p *AgentService) SetSupportedTaskType(taskTypes []TaskType) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
-
-	// Initialize the map with enough capacity to avoid reallocations
-	taskTypeSet := make(map[TaskType]struct{}, len(p.supportedTaskTypes)+len(taskTypes))
-
-	for _, t := range p.supportedTaskTypes {
-		taskTypeSet[t] = struct{}{}
-	}
-	for _, t := range taskTypes {
-		taskTypeSet[t] = struct{}{}
-	}
-
-	p.supportedTaskTypes = maps.Keys(taskTypeSet)
+	p.supportedTaskTypes = taskTypes
 }
 
-// Loads and validates a plugin.
+// LoadPlugin Loads and validates a plugin.
 func LoadPlugin(ctx context.Context, iCtx SetupContext, entry PluginEntry) (Plugin, error) {
 	plugin, err := entry.LoadPlugin(ctx, iCtx)
 	if err != nil {

@@ -108,7 +108,7 @@ func getSparkConfig(taskCtx pluginsCore.TaskExecutionContext, sparkJob *plugins.
 		}
 	}
 
-	// Set pod limits.
+	// SetSupportedTaskType pod limits.
 	if len(sparkConfig[sparkOpConfig.SparkDriverCoreLimitKey]) == 0 {
 		// spark.kubernetes.driver.request.cores takes precedence over spark.driver.cores
 		if len(sparkConfig[sparkOpConfig.SparkDriverCoreRequestKey]) != 0 {

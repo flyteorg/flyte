@@ -879,7 +879,7 @@ func getStorageClient(ctx context.Context) (*storage.DataStore, error) {
 		return Client, nil
 	}
 	testScope := promutils.NewTestScope()
-	// Set Keys
+	// SetSupportedTaskType Keys
 	labeled.SetMetricKeys(contextutils.AppNameKey, contextutils.ProjectKey, contextutils.DomainKey)
 	s, err := storage.NewDataStore(storage.GetConfig(), testScope.NewSubScope("flytectl"))
 	if err != nil {

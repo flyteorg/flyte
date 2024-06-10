@@ -159,6 +159,6 @@ func setupDbConnectionPool(ctx context.Context, gormDb *gorm.DB, dbConfig *datab
 	genericDb.SetConnMaxLifetime(dbConfig.ConnMaxLifeTime.Duration)
 	genericDb.SetMaxIdleConns(dbConfig.MaxIdleConnections)
 	genericDb.SetMaxOpenConns(dbConfig.MaxOpenConnections)
-	logger.Infof(ctx, "Set connection pool values to [%+v]", genericDb.Stats())
+	logger.Infof(ctx, "SetSupportedTaskType connection pool values to [%+v]", genericDb.Stats())
 	return nil
 }

@@ -152,7 +152,7 @@ func buildFinalPhases(executedTasks bitarray.CompactArray, indexes *bitarray.Bit
 		res.SetItem(arrayCore.CalculateOriginalIndex(i, indexes), phaseIdx)
 	}
 
-	// Set phases os already discovered tasks to success
+	// SetSupportedTaskType phases os already discovered tasks to success
 	for i := uint(0); i < totalSize; i++ {
 		if !indexes.IsSet(i) {
 			res.SetItem(int(i), bitarray.Item(pluginCore.PhaseSuccess))

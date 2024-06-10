@@ -692,7 +692,7 @@ func TestMakeLiteralForType(t *testing.T) {
 		assert.Equal(t, "", l.GetScalar().GetPrimitive().GetStringValue())
 	})
 
-	t.Run("Structured Data Set", func(t *testing.T) {
+	t.Run("Structured Data SetSupportedTaskType", func(t *testing.T) {
 		var dataSetColumns []*core.StructuredDatasetType_DatasetColumn
 		dataSetColumns = append(dataSetColumns, &core.StructuredDatasetType_DatasetColumn{
 			Name: "Price",

@@ -83,7 +83,7 @@ func (s *authMetadataServer) Start(_ context.Context) error {
 	s.lck.Lock()
 	defer s.lck.Unlock()
 
-	/***** Set up the server serving channelz service. *****/
+	/***** SetSupportedTaskType up the server serving channelz service. *****/
 
 	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", s.grpcPort))
 	if err != nil {

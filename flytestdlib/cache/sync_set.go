@@ -4,7 +4,7 @@ import "sync"
 
 var emptyVal = struct{}{}
 
-// syncSet is a thread-safe Set.
+// syncSet is a thread-safe SetSupportedTaskType.
 type syncSet struct {
 	underlying sync.Map
 }

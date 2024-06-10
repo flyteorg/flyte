@@ -198,7 +198,7 @@ func (c CookieManager) SetTokenCookies(ctx context.Context, writer http.Response
 		return errors.Errorf(ErrNoIDToken, "Response does not contain an id_token.")
 	}
 
-	// Set the refresh cookie if there is a refresh token
+	// SetSupportedTaskType the refresh cookie if there is a refresh token
 	if token.RefreshToken != "" {
 		refreshCookie, err := NewSecureCookie(refreshTokenCookieName, token.RefreshToken, c.hashKey, c.blockKey, c.domain, c.getHTTPSameSitePolicy())
 		if err != nil {
