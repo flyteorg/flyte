@@ -8,8 +8,10 @@ build:
   os: "ubuntu-22.04"
   tools:
     python: "mambaforge-22.9"
+    nodejs: "20.14.0"
   jobs:
     post_install:
+      - npm install -g @mermaid-js/mermaid-cli
       - cat monodocs-environment.lock.yaml
       - conda-lock install --name $READTHEDOCS_VERSION monodocs-environment.lock.yaml
       - pip install ./flyteidl

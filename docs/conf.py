@@ -294,7 +294,7 @@ intersphinx_mapping = {
 myst_enable_extensions = ["colon_fence"]
 
 # Sphinx-mermaid config
-mermaid_output_format = "raw"
+mermaid_output_format = "png"
 mermaid_version = "latest"
 mermaid_init_js = "mermaid.initialize({startOnLoad:false});"
 
