@@ -2121,18 +2121,33 @@ func TestMergePodSpecs(t *testing.T) {
 
 func TestAddFlyteCustomizationsToContainer_SetConsoleUrl(t *testing.T) {
 	tests := []struct {
-		name           string
-		consoleURL     string
-		expectedEnvVar *v1.EnvVar
+		name              string
+		includeConsoleURL bool
+		consoleURL        string
+		expectedEnvVar    *v1.EnvVar
 	}{
 		{
-			name:           "console url is not set",
-			consoleURL:     "",
-			expectedEnvVar: nil,
+			name:              "do not include console url and console url is not set",
+			includeConsoleURL: false,
+			consoleURL:        "",
+			expectedEnvVar:    nil,
 		},
 		{
-			name:       "console url is set",
-			consoleURL: "gopher://flyte:65535/console",
+			name:              "include console url but console url is not set",
+			includeConsoleURL: false,
+			consoleURL:        "",
+			expectedEnvVar:    nil,
+		},
+		{
+			name:              "do not include console url but console url is set",
+			includeConsoleURL: false,
+			consoleURL:        "gopher://flyte:65535/console",
+			expectedEnvVar:    nil,
+		},
+		{
+			name:              "include console url and console url is set",
+			includeConsoleURL: true,
+			consoleURL:        "gopher://flyte:65535/console",
 			expectedEnvVar: &v1.EnvVar{
 				Name:  "FLYTE_EXECUTION_URL",
 				Value: "gopher://flyte:65535/console/projects/p2/domains/d2/executions/n2/nodeId/unique_node_id-1/nodes",
@@ -2149,7 +2164,7 @@ func TestAddFlyteCustomizationsToContainer_SetConsoleUrl(t *testing.T) {
 					"{{ .OutputPrefix }}",
 				},
 			}
-			templateParameters := getTemplateParametersForTest(&v1.ResourceRequirements{}, &v1.ResourceRequirements{}, tt.consoleURL)
+			templateParameters := getTemplateParametersForTest(&v1.ResourceRequirements{}, &v1.ResourceRequirements{}, tt.includeConsoleURL, tt.consoleURL)
 			err := AddFlyteCustomizationsToContainer(context.TODO(), templateParameters, ResourceCustomizationModeAssignResources, container)
 			assert.NoError(t, err)
 			if tt.expectedEnvVar == nil {
