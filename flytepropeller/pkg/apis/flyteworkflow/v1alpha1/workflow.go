@@ -194,31 +194,6 @@ func (in *FlyteWorkflow) GetRawOutputDataConfig() RawOutputDataConfig {
 	return in.RawOutputDataConfig
 }
 
-// type SecurityContext struct {
-// 	*core.SecurityContext
-// }
-
-// func (in *SecurityContext) UnmarshalJSON(b []byte) error {
-// 	in.SecurityContext = &core.SecurityContext{}
-// 	return jsonpb.Unmarshal(bytes.NewReader(b), in.SecurityContext)
-// }
-
-// func (in *SecurityContext) MarshalJSON() ([]byte, error) {
-// 	if in == nil || in.SecurityContext == nil {
-// 		return nilJSON, nil
-// 	}
-
-// 	var buf bytes.Buffer
-// 	if err := marshaler.Marshal(&buf, in.SecurityContext); err != nil {
-// 		return nil, err
-// 	}
-// 	return buf.Bytes(), nil
-// }
-
-// func (in *SecurityContext) DeepCopyInto(out *SecurityContext) {
-// 	out.SecurityContext = proto.Clone(in.SecurityContext).(*core.SecurityContext)
-// }
-
 type Inputs struct {
 	*core.LiteralMap
 }
