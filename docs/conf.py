@@ -299,7 +299,7 @@ myst_enable_extensions = ["colon_fence"]
 mermaid_output_format = "png"
 mermaid_version = "latest"
 mermaid_init_js = "mermaid.initialize({startOnLoad:false});"
-if os.environ.get("MONODOCS_DEV_BUILD"):
+if not os.environ.get("MONODOCS_DEV_BUILD"):
     mermaid_cmd = "/home/docs/.asdf/shims/mmdc"
 
 # Makes it so that only the command is copied, not the output
