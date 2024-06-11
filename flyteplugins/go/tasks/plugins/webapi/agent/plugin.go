@@ -68,18 +68,18 @@ func (p *Plugin) setRegistry(r Registry) {
 	p.registry = r
 }
 
-func (p Plugin) GetConfig() webapi.PluginConfig {
+func (p *Plugin) GetConfig() webapi.PluginConfig {
 	return GetConfig().WebAPI
 }
 
-func (p Plugin) ResourceRequirements(_ context.Context, _ webapi.TaskExecutionContextReader) (
+func (p *Plugin) ResourceRequirements(_ context.Context, _ webapi.TaskExecutionContextReader) (
 	namespace core.ResourceNamespace, constraints core.ResourceConstraintsSpec, err error) {
 
 	// Resource requirements are assumed to be the same.
 	return "default", p.cfg.ResourceConstraints, nil
 }
 
-func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextReader) (webapi.ResourceMeta,
+func (p *Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextReader) (webapi.ResourceMeta,
 	webapi.Resource, error) {
 	taskTemplate, err := taskCtx.TaskReader().Read(ctx)
 	if err != nil {
@@ -148,7 +148,7 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 	}, nil, nil
 }
 
-func (p Plugin) ExecuteTaskSync(
+func (p *Plugin) ExecuteTaskSync(
 	ctx context.Context,
 	client service.SyncAgentServiceClient,
 	header *admin.CreateRequestHeader,
@@ -208,7 +208,7 @@ func (p Plugin) ExecuteTaskSync(
 	}, err
 }
 
-func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest webapi.Resource, err error) {
+func (p *Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest webapi.Resource, err error) {
 	metadata := taskCtx.ResourceMeta().(ResourceMetaWrapper)
 	agent, _ := p.getFinalAgent(&metadata.TaskCategory, p.cfg)
 
@@ -238,7 +238,7 @@ func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest weba
 	}, nil
 }
 
-func (p Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error {
+func (p *Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error {
 	if taskCtx.ResourceMeta() == nil {
 		return nil
 	}
@@ -261,7 +261,7 @@ func (p Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error 
 	return err
 }
 
-func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase core.PhaseInfo, err error) {
+func (p *Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase core.PhaseInfo, err error) {
 	resource := taskCtx.Resource().(ResourceWrapper)
 	taskInfo := &core.TaskInfo{Logs: resource.LogLinks}
 
@@ -313,7 +313,7 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 	return core.PhaseInfoUndefined, pluginErrors.Errorf(core.SystemErrorCode, "unknown execution state [%v].", resource.State)
 }
 
-func (p Plugin) getSyncAgentClient(ctx context.Context, agent *Deployment) (service.SyncAgentServiceClient, error) {
+func (p *Plugin) getSyncAgentClient(ctx context.Context, agent *Deployment) (service.SyncAgentServiceClient, error) {
 	client, ok := p.cs.syncAgentClients[agent.Endpoint]
 	if !ok {
 		conn, err := getGrpcConnection(ctx, agent)
@@ -326,7 +326,7 @@ func (p Plugin) getSyncAgentClient(ctx context.Context, agent *Deployment) (serv
 	return client, nil
 }
 
-func (p Plugin) getAsyncAgentClient(ctx context.Context, agent *Deployment) (service.AsyncAgentServiceClient, error) {
+func (p *Plugin) getAsyncAgentClient(ctx context.Context, agent *Deployment) (service.AsyncAgentServiceClient, error) {
 	client, ok := p.cs.asyncAgentClients[agent.Endpoint]
 	if !ok {
 		conn, err := getGrpcConnection(ctx, agent)
@@ -344,7 +344,7 @@ func (p *Plugin) watchAgents(ctx context.Context, agentService *core.AgentServic
 		clientSet := getAgentClientSets(ctx)
 		agentRegistry := getUpdatedAgentRegistry(ctx, clientSet)
 		p.setRegistry(agentRegistry)
-		agentService.SetSupportedTaskType(p.getRegistryTaskTypes())
+		agentService.SetSupportedTaskType(maps.Keys(agentRegistry))
 	}, p.cfg.PollInterval.Duration, ctx.Done())
 }
 

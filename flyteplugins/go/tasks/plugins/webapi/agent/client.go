@@ -102,12 +102,6 @@ func getUpdatedAgentRegistry(ctx context.Context, cs *ClientSet) Registry {
 	cfg := GetConfig()
 	var agentDeployments []*Deployment
 
-	// Ensure that the old configuration is backward compatible
-	for taskType, agentDeploymentID := range cfg.AgentForTaskTypes {
-		agent := Agent{AgentDeployment: cfg.AgentDeployments[agentDeploymentID], IsSync: false}
-		newAgentRegistry[taskType] = map[int32]*Agent{defaultTaskTypeVersion: &agent}
-	}
-
 	if len(cfg.DefaultAgent.Endpoint) != 0 {
 		agentDeployments = append(agentDeployments, &cfg.DefaultAgent)
 	}
@@ -165,6 +159,7 @@ func getUpdatedAgentRegistry(ctx context.Context, cs *ClientSet) Registry {
 		}
 	}
 
+	// Ensure that the old configuration is backward compatible
 	for _, taskType := range cfg.SupportedTaskTypes {
 		if _, ok := newAgentRegistry[taskType]; !ok {
 			agent := &Agent{AgentDeployment: &cfg.DefaultAgent, IsSync: false}
@@ -172,7 +167,6 @@ func getUpdatedAgentRegistry(ctx context.Context, cs *ClientSet) Registry {
 		}
 	}
 
-	logger.Debugf(ctx, "AgentDeployment service supports task types: %v", maps.Keys(newAgentRegistry))
 	return newAgentRegistry
 }
 
