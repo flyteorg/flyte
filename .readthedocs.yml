@@ -18,7 +18,7 @@ build:
       - conda env list
       - conda list
       - npm install -g @mermaid-js/mermaid-cli
-      - echo $MONODOCS_DEV_BUILD
+      - which mmdc
 
 # Build documentation in the docs/ directory with Sphinx
 sphinx:
