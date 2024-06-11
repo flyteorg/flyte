@@ -73,7 +73,6 @@ func GetExecutionEnvVars(id pluginsCore.TaskExecutionID, consoleURL string) []v1
 	if consoleURL != "" {
 		envVars = append(envVars, v1.EnvVar{
 			Name: "FLYTE_EXECUTION_URL",
-			// TODO: is it safe to append `attempt` like this?
 			// TODO: should we use net/url to build this url?
 			Value: fmt.Sprintf("%s/projects/%s/domains/%s/executions/%s/nodeId/%s-%s/nodes", consoleURL, nodeExecutionID.Project, nodeExecutionID.Domain, nodeExecutionID.Name, id.GetUniqueNodeID(), attemptNumber),
 		})

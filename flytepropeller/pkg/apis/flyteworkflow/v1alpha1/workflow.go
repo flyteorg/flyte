@@ -78,7 +78,7 @@ type FlyteWorkflow struct {
 	// and parse the static data prior to processing.
 	WorkflowClosureReference DataReference `json:"workflowClosureReference,omitempty"`
 
-	// TODO: Add comment
+	// Flyteconsole url
 	ConsoleURL string `json:"consoleUrl,omitempty"`
 }
 
