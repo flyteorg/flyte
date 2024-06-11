@@ -275,28 +275,6 @@ func TestWorkflowIsInterruptible(t *testing.T) {
 	assert.True(t, w.IsInterruptible())
 }
 
-// w := &v1alpha1.FlyteWorkflow{
-// 	Inputs: v1alpha1.Inputs{
-// 		&core.LiteralMap{
-// 			Literals: map[string]*core.Literal{
-// 				"p1": {
-// 					Value: &core.Literal_Scalar{
-// 						Scalar: &core.Scalar{
-// 							Value: &core.Scalar_Primitive{
-// 								Primitive: &core.Primitive{
-// 									Value: &core.Primitive_Integer{
-// 										Integer: 1,
-// 									},
-// 								},
-// 							},
-// 						},
-// 					},
-// 				},
-// 			},
-// 		},
-// 	},
-// }
-
 func TestWrappedInputsDeepCopy(t *testing.T) {
 	// 1. Setup proto
 	litMap := core.LiteralMap{

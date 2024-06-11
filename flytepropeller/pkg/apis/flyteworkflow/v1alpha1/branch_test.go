@@ -74,7 +74,7 @@ func TestBranchNodeSpecMethods(t *testing.T) {
 	assert.Equal(t, boolExpr, elifs[0].GetCondition())
 	assert.Equal(t, &elifNode, elifs[0].GetThenNode())
 
-	assert.Equal(t, errorMessage.Error, branchNodeSpec.GetElseFail())
+	assert.True(t, proto.Equal(errorMessage.Error, branchNodeSpec.GetElseFail()))
 
 	branchNodeSpec.ElseFail = nil
 	assert.Nil(t, branchNodeSpec.GetElseFail())
