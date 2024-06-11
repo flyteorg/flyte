@@ -6,6 +6,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 	v12 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -18,8 +19,35 @@ import (
 
 func TestGetExecutionEnvVars(t *testing.T) {
 	mock := mockTaskExecutionIdentifier{}
-	envVars := GetExecutionEnvVars(mock, "")
-	assert.Len(t, envVars, 12)
+	tests := []struct {
+		name            string
+		expectedEnvVars int
+		consoleURL      string
+		expectedEnvVar  *v12.EnvVar
+	}{
+		{
+			"no-console-url",
+			12,
+			"",
+			nil,
+		},
+		{
+			"with-console-url",
+			13,
+			"scheme://host/path",
+			&v12.EnvVar{
+				Name:  "FLYTE_EXECUTION_URL",
+				Value: "scheme://host/path/projects/proj/domains/domain/executions/name/nodeId/unique-node-id-1/nodes",
+			},
+		},
+	}
+	for _, tt := range tests {
+		envVars := GetExecutionEnvVars(mock, tt.consoleURL)
+		assert.Len(t, envVars, tt.expectedEnvVars)
+		if tt.expectedEnvVar != nil {
+			assert.True(t, proto.Equal(&envVars[4], tt.expectedEnvVar))
+		}
+	}
 }
 
 func TestGetTolerationsForResources(t *testing.T) {

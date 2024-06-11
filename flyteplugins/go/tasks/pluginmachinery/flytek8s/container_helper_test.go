@@ -448,9 +448,10 @@ func TestToK8sContainer(t *testing.T) {
 	assert.False(t, *container.SecurityContext.AllowPrivilegeEscalation)
 }
 
-func getTemplateParametersForTest(resourceRequirements, platformResources *v1.ResourceRequirements) template.Parameters {
+func getTemplateParametersForTest(resourceRequirements, platformResources *v1.ResourceRequirements, consoleURL string) template.Parameters {
 	mockTaskExecMetadata := mocks.TaskExecutionMetadata{}
 	mockTaskExecutionID := mocks.TaskExecutionID{}
+	mockTaskExecutionID.OnGetUniqueNodeID().Return("unique_node_id")
 	mockTaskExecutionID.OnGetGeneratedName().Return("gen_name")
 	mockTaskExecutionID.OnGetID().Return(core.TaskExecutionIdentifier{
 		TaskId: &core.Identifier{
@@ -478,7 +479,7 @@ func getTemplateParametersForTest(resourceRequirements, platformResources *v1.Re
 	mockTaskExecMetadata.OnGetPlatformResources().Return(platformResources)
 	mockTaskExecMetadata.OnGetEnvironmentVariables().Return(nil)
 	mockTaskExecMetadata.OnGetNamespace().Return("my-namespace")
-	mockTaskExecMetadata.OnGetConsoleURL().Return("")
+	mockTaskExecMetadata.OnGetConsoleURL().Return(consoleURL)
 
 	mockInputReader := mocks2.InputReader{}
 	mockInputPath := storage.DataReference("s3://input/path")
@@ -508,7 +509,7 @@ func TestAddFlyteCustomizationsToContainer(t *testing.T) {
 		Limits: v1.ResourceList{
 			v1.ResourceEphemeralStorage: resource.MustParse("2048Mi"),
 		},
-	}, nil)
+	}, nil, "")
 	container := &v1.Container{
 		Command: []string{
 			"{{ .Input }}",
@@ -556,7 +557,7 @@ func TestAddFlyteCustomizationsToContainer_Resources(t *testing.T) {
 			Limits: v1.ResourceList{
 				v1.ResourceMemory: resource.MustParse("20"),
 			},
-		})
+		}, "")
 		err := AddFlyteCustomizationsToContainer(context.TODO(), templateParameters, ResourceCustomizationModeMergeExistingResources, container)
 		assert.NoError(t, err)
 		assert.True(t, container.Resources.Requests.Cpu().Equal(resource.MustParse("1")))
@@ -579,7 +580,7 @@ func TestAddFlyteCustomizationsToContainer_Resources(t *testing.T) {
 			Limits: v1.ResourceList{
 				v1.ResourceMemory: resource.MustParse("20"),
 			},
-		})
+		}, "")
 		err := AddFlyteCustomizationsToContainer(context.TODO(), templateParameters, ResourceCustomizationModeMergeExistingResources, container)
 		assert.NoError(t, err)
 		assert.True(t, container.Resources.Requests.Cpu().Equal(resource.MustParse("1")))
@@ -614,7 +615,7 @@ func TestAddFlyteCustomizationsToContainer_Resources(t *testing.T) {
 				v1.ResourceCPU:    resource.MustParse("10"),
 				v1.ResourceMemory: resource.MustParse("20"),
 			},
-		})
+		}, "")
 		err := AddFlyteCustomizationsToContainer(context.TODO(), templateParameters, ResourceCustomizationModeMergeExistingResources, container)
 		assert.NoError(t, err)
 		assert.True(t, container.Resources.Requests.Cpu().Equal(resource.MustParse("10")))
@@ -651,7 +652,7 @@ func TestAddFlyteCustomizationsToContainer_Resources(t *testing.T) {
 		templateParameters := getTemplateParametersForTest(&v1.ResourceRequirements{
 			Requests: overrideRequests,
 			Limits:   overrideLimits,
-		}, &v1.ResourceRequirements{})
+		}, &v1.ResourceRequirements{}, "")
 
 		err := AddFlyteCustomizationsToContainer(context.TODO(), templateParameters, ResourceCustomizationModeMergeExistingResources, container)
 		assert.NoError(t, err)
@@ -686,10 +687,63 @@ func TestAddFlyteCustomizationsToContainer_ValidateExistingResources(t *testing.
 			v1.ResourceCPU:    resource.MustParse("10"),
 			v1.ResourceMemory: resource.MustParse("20"),
 		},
-	})
+	}, "")
 	err := AddFlyteCustomizationsToContainer(context.TODO(), templateParameters, ResourceCustomizationModeEnsureExistingResourcesInRange, container)
 	assert.NoError(t, err)
 
 	assert.True(t, container.Resources.Requests.Cpu().Equal(resource.MustParse("10")))
 	assert.True(t, container.Resources.Limits.Cpu().Equal(resource.MustParse("10")))
+}
+
+func TestAddFlyteCustomizationsToContainer_SetConsoleUrl(t *testing.T) {
+	tests := []struct {
+		name           string
+		consoleURL     string
+		expectedEnvVar *v1.EnvVar
+	}{
+		{
+			name:           "console url is not set",
+			consoleURL:     "",
+			expectedEnvVar: nil,
+		},
+		{
+			name:       "console url is set",
+			consoleURL: "gopher://flyte:65535/console",
+			expectedEnvVar: &v1.EnvVar{
+				Name:  "FLYTE_EXECUTION_URL",
+				Value: "gopher://flyte:65535/console/projects/p2/domains/d2/executions/n2/nodeId/unique_node_id-1/nodes",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			container := &v1.Container{
+				Command: []string{
+					"{{ .Input }}",
+				},
+				Args: []string{
+					"{{ .OutputPrefix }}",
+				},
+			}
+			templateParameters := getTemplateParametersForTest(&v1.ResourceRequirements{}, &v1.ResourceRequirements{}, tt.consoleURL)
+			err := AddFlyteCustomizationsToContainer(context.TODO(), templateParameters, ResourceCustomizationModeAssignResources, container)
+			assert.NoError(t, err)
+			if tt.expectedEnvVar == nil {
+				// Confirm that there is no env var FLYTE_EXECUTION_URL set
+				for _, envVar := range container.Env {
+					assert.NotEqual(t, "FLYTE_EXECUTION_URL", envVar.Name)
+				}
+			}
+			if tt.expectedEnvVar != nil {
+				// Assert that the env var FLYTE_EXECUTION_URL is set if its value is non-nil
+				for _, envVar := range container.Env {
+					if envVar.Name == tt.expectedEnvVar.Name {
+						assert.Equal(t, tt.expectedEnvVar.Value, envVar.Value)
+						return
+					}
+				}
+				t.Fail()
+			}
+		})
+	}
 }
