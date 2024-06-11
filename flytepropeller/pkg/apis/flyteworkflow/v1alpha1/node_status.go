@@ -173,14 +173,17 @@ type WorkflowNodeStatus struct {
 }
 
 func (in *WorkflowNodeStatus) SetExecutionError(executionError *core.ExecutionError) {
-	if in.ExecutionError.ExecutionError != executionError {
+	if in.ExecutionError != nil && in.ExecutionError.ExecutionError != executionError {
 		in.SetDirty()
 		in.ExecutionError.ExecutionError = executionError
 	}
 }
 
 func (in *WorkflowNodeStatus) GetExecutionError() *core.ExecutionError {
-	return in.ExecutionError.ExecutionError
+	if in.ExecutionError != nil {
+		return in.ExecutionError.ExecutionError
+	}
+	return nil
 }
 
 func (in *WorkflowNodeStatus) GetWorkflowNodePhase() WorkflowNodePhase {
@@ -249,11 +252,14 @@ func (in *ArrayNodeStatus) SetArrayNodePhase(phase ArrayNodePhase) {
 }
 
 func (in *ArrayNodeStatus) GetExecutionError() *core.ExecutionError {
-	return in.ExecutionError.ExecutionError
+	if in.ExecutionError != nil {
+		return in.ExecutionError.ExecutionError
+	}
+	return nil
 }
 
 func (in *ArrayNodeStatus) SetExecutionError(executionError *core.ExecutionError) {
-	if in.ExecutionError.ExecutionError != executionError {
+	if in.ExecutionError != nil && in.ExecutionError.ExecutionError != executionError {
 		in.SetDirty()
 		in.ExecutionError.ExecutionError = executionError
 	}
