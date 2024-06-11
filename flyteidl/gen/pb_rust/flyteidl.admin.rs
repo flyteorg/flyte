@@ -1673,6 +1673,7 @@ pub struct ExecutionSpec {
     #[prost(message, optional, tag="23")]
     pub envs: ::core::option::Option<Envs>,
     /// Tags to be set for the execution.
+    #[deprecated]
     #[prost(string, repeated, tag="24")]
     pub tags: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
     /// Execution cluster label to be set for the execution.
