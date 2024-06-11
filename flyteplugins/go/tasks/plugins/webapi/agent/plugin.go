@@ -56,10 +56,10 @@ type ResourceMetaWrapper struct {
 	TaskCategory      admin.TaskCategory
 }
 
-func (p *Plugin) getRegistry() Registry {
+func (p *Plugin) getRegistryTaskTypes() []core.TaskType {
 	p.mu.RLock()
 	defer p.mu.RUnlock()
-	return p.registry
+	return maps.Keys(p.registry)
 }
 
 func (p *Plugin) setRegistry(r Registry) {
@@ -342,13 +342,16 @@ func (p Plugin) getAsyncAgentClient(ctx context.Context, agent *Deployment) (ser
 func (p *Plugin) watchAgents(ctx context.Context, agentService *core.AgentService) {
 	go wait.Until(func() {
 		clientSet := getAgentClientSets(ctx)
-		updateAgentRegistry(ctx, clientSet, p.registry)
-		agentService.SetSupportedTaskType(maps.Keys(p.registry))
-
+		agentRegistry := getUpdatedAgentRegistry(ctx, clientSet)
+		p.setRegistry(agentRegistry)
+		agentService.SetSupportedTaskType(p.getRegistryTaskTypes())
 	}, p.cfg.PollInterval.Duration, ctx.Done())
 }
 
 func (p *Plugin) getFinalAgent(taskCategory *admin.TaskCategory, cfg *Config) (*Deployment, bool) {
+	p.mu.RLock()
+	defer p.mu.RUnlock()
+
 	if agent, exists := p.registry[taskCategory.Name][taskCategory.Version]; exists {
 		return agent.AgentDeployment, agent.IsSync
 	}
@@ -395,9 +398,8 @@ func newAgentPlugin(agentService *core.AgentService) webapi.PluginEntry {
 	ctx := context.Background()
 	cfg := GetConfig()
 	clientSet := getAgentClientSets(ctx)
-	agentRegistry := make(Registry)
-	updateAgentRegistry(ctx, clientSet, agentRegistry)
-	supportedTaskTypes := append(maps.Keys(agentRegistry), cfg.SupportedTaskTypes...)
+	agentRegistry := getUpdatedAgentRegistry(ctx, clientSet)
+	supportedTaskTypes := maps.Keys(agentRegistry)
 
 	return webapi.PluginEntry{
 		ID:                 "agent-service",

@@ -97,7 +97,7 @@ func getFinalContext(ctx context.Context, operation string, agent *Deployment) (
 	return context.WithTimeout(ctx, timeout)
 }
 
-func updateAgentRegistry(ctx context.Context, cs *ClientSet, registry Registry) {
+func getUpdatedAgentRegistry(ctx context.Context, cs *ClientSet) Registry {
 	newAgentRegistry := make(Registry)
 	cfg := GetConfig()
 	var agentDeployments []*Deployment
@@ -153,18 +153,27 @@ func updateAgentRegistry(ctx context.Context, cs *ClientSet, registry Registry) 
 				newAgentRegistry[supportedCategory.GetName()] = map[int32]*Agent{supportedCategory.GetVersion(): agent}
 			}
 		}
-		// If the agent doesn't implement the metadata service, we construct the registry based on the configuration
-		for taskType, agentDeploymentID := range cfg.AgentForTaskTypes {
-			if agentDeployment, ok := cfg.AgentDeployments[agentDeploymentID]; ok {
-				if _, ok := newAgentRegistry[taskType]; !ok {
-					agent := &Agent{AgentDeployment: agentDeployment, IsSync: false}
-					newAgentRegistry[taskType] = map[int32]*Agent{defaultTaskTypeVersion: agent}
-				}
+	}
+
+	// If the agent doesn't implement the metadata service, we construct the registry based on the configuration
+	for taskType, agentDeploymentID := range cfg.AgentForTaskTypes {
+		if agentDeployment, ok := cfg.AgentDeployments[agentDeploymentID]; ok {
+			if _, ok := newAgentRegistry[taskType]; !ok {
+				agent := &Agent{AgentDeployment: agentDeployment, IsSync: false}
+				newAgentRegistry[taskType] = map[int32]*Agent{defaultTaskTypeVersion: agent}
 			}
 		}
 	}
+
+	for _, taskType := range cfg.SupportedTaskTypes {
+		if _, ok := newAgentRegistry[taskType]; !ok {
+			agent := &Agent{AgentDeployment: &cfg.DefaultAgent, IsSync: false}
+			newAgentRegistry[taskType] = map[int32]*Agent{defaultTaskTypeVersion: agent}
+		}
+	}
+
 	logger.Debugf(ctx, "AgentDeployment service supports task types: %v", maps.Keys(newAgentRegistry))
-	registry = newAgentRegistry
+	return newAgentRegistry
 }
 
 func getAgentClientSets(ctx context.Context) *ClientSet {
