@@ -105,6 +105,8 @@ redirects = {
     "flytesnacks/examples/mmcloud_plugin/mmcloud_plugin_example": "../../../deprecated_integrations/mmcloud_plugin/mmcloud_plugin_example.html",
     "flytesnacks/examples/snowflake_plugin/index": "../../../deprecated_integrations/snowflake_plugin/index.html",
     "flytesnacks/examples/snowflake_plugin/snowflake_plugin_example": "../../../deprecated_integrations/snowflake_plugin/snowflake_plugin_example.html",
+    "deprecated_integrations/mmcloud_plugin/index": "../../flytesnacks/examples/mmcloud_agent/index.html",
+    "deprecated_integrations/mmcloud_plugin/mmcloud_plugin_example": "../../flytesnacks/examples/mmcloud_agent/index.html"
 }
 
 

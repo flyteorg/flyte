@@ -8,8 +8,6 @@
   - Deprecated BigQuery plugin.
 * - {doc}`Databricks <databricks_plugin/index>`
   - Deprecated Databricks plugin.
-* - {doc}`Memory Machine Cloud <mmcloud_plugin/index>`
-  - Deprecated MemVerge Memory Machine Cloud plugin.
 * - {doc}`Snowflake <snowflake_plugin/index>`
   - Deprecated Snowflake plugin.
 ```
@@ -20,6 +18,5 @@
 
 bigquery_plugin/index
 databricks_plugin/index
-mmcloud_plugin/index
 snowflake_plugin/index
 ```
