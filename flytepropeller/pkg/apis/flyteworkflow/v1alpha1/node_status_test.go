@@ -187,7 +187,7 @@ func TestDynamicNodeStatus_SetExecutionError(t *testing.T) {
 			}
 			in.SetExecutionError(tt.NewError)
 			if tt.NewError == nil {
-				assert.Nil(t, in.Error)
+				assert.Nil(t, in.Error.ExecutionError)
 			} else {
 				assert.NotNil(t, in.Error)
 				assert.Equal(t, tt.NewError, in.Error.ExecutionError)
