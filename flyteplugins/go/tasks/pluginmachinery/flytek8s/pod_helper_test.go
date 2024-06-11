@@ -2118,3 +2118,56 @@ func TestMergePodSpecs(t *testing.T) {
 	assert.Equal(t, podSpec.Containers[1].Name, defaultContainer.Name)
 	assert.Equal(t, defaultContainerTemplate.TerminationMessagePath, defaultContainer.TerminationMessagePath)
 }
+
+func TestAddFlyteCustomizationsToContainer_SetConsoleUrl(t *testing.T) {
+	tests := []struct {
+		name           string
+		consoleURL     string
+		expectedEnvVar *v1.EnvVar
+	}{
+		{
+			name:           "console url is not set",
+			consoleURL:     "",
+			expectedEnvVar: nil,
+		},
+		{
+			name:       "console url is set",
+			consoleURL: "gopher://flyte:65535/console",
+			expectedEnvVar: &v1.EnvVar{
+				Name:  "FLYTE_EXECUTION_URL",
+				Value: "gopher://flyte:65535/console/projects/p2/domains/d2/executions/n2/nodeId/unique_node_id-1/nodes",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			container := &v1.Container{
+				Command: []string{
+					"{{ .Input }}",
+				},
+				Args: []string{
+					"{{ .OutputPrefix }}",
+				},
+			}
+			templateParameters := getTemplateParametersForTest(&v1.ResourceRequirements{}, &v1.ResourceRequirements{}, tt.consoleURL)
+			err := AddFlyteCustomizationsToContainer(context.TODO(), templateParameters, ResourceCustomizationModeAssignResources, container)
+			assert.NoError(t, err)
+			if tt.expectedEnvVar == nil {
+				// Confirm that there is no env var FLYTE_EXECUTION_URL set
+				for _, envVar := range container.Env {
+					assert.NotEqual(t, "FLYTE_EXECUTION_URL", envVar.Name)
+				}
+			}
+			if tt.expectedEnvVar != nil {
+				// Assert that the env var FLYTE_EXECUTION_URL is set if its value is non-nil
+				for _, envVar := range container.Env {
+					if envVar.Name == tt.expectedEnvVar.Name {
+						assert.Equal(t, tt.expectedEnvVar.Value, envVar.Value)
+						return
+					}
+				}
+				t.Fail()
+			}
+		})
+	}
+}
