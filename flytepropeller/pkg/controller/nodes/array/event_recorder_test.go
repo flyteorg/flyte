@@ -37,7 +37,7 @@ func newBufferedEventRecorder() *bufferedEventRecorder {
 }
 
 func TestGetPluginLogs(t *testing.T) {
-	// intitialize log plugin
+	// initialize log plugin
 	logConfig := &logs.LogConfig{
 		Templates: []tasklog.TemplateLogPlugin{
 			tasklog.TemplateLogPlugin{

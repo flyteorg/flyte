@@ -25,7 +25,7 @@ func (r *ConfigurationRepo) GetActive(ctx context.Context) (models.Configuration
 	var metadata models.ConfigurationDocumentMetadata
 	timer := r.metrics.GetDuration.Start()
 	// Get the only one active configuration document
-	tx := r.db.Where(&models.ConfigurationDocumentMetadata{
+	tx := r.db.WithContext(ctx).Where(&models.ConfigurationDocumentMetadata{
 		Active: true,
 	}).Take(&metadata)
 	timer.Stop()
