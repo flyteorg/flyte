@@ -28,12 +28,12 @@ func (m *AdminService) RegisterProject(ctx context.Context, request *admin.Proje
 	return response, nil
 }
 
-func (m *AdminService) GetDomains(ctx context.Context, request *admin.GetDomainRequest) (*admin.Domains, error) {
+func (m *AdminService) GetDomains(ctx context.Context, request *admin.GetDomainRequest) (*admin.GetDomainsResponse, error) {
 	defer m.interceptPanic(ctx, request)
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
-	var response *admin.Domains
+	var response *admin.GetDomainsResponse
 	m.Metrics.domainEndpointMetrics.get.Time(func() {
 		response = m.ProjectManager.GetDomains(ctx, *request)
 	})

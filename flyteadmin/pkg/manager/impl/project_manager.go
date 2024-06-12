@@ -42,20 +42,6 @@ func (m *ProjectManager) CreateProject(ctx context.Context, request admin.Projec
 	return &admin.ProjectRegisterResponse{}, nil
 }
 
-func (m *ProjectManager) GetDomains(ctx context.Context, request admin.GetDomainRequest) *admin.Domains {
-	configDomains := m.config.ApplicationConfiguration().GetDomainsConfig()
-	var domains = make([]*admin.Domain, len(*configDomains))
-	for index, configDomain := range *configDomains {
-		domains[index] = &admin.Domain{
-			Id:   configDomain.ID,
-			Name: configDomain.Name,
-		}
-	}
-	return &admin.Domains{
-		Domains: domains,
-	}
-}
-
 func (m *ProjectManager) ListProjects(ctx context.Context, request admin.ProjectListRequest) (*admin.Projects, error) {
 	spec := util.FilterSpec{
 		RequestFilters: request.Filters,
@@ -139,6 +125,20 @@ func (m *ProjectManager) GetProject(ctx context.Context, request admin.ProjectGe
 	projectResponse := transformers.FromProjectModel(projectModel, m.GetDomains(ctx, admin.GetDomainRequest{}).Domains)
 
 	return &projectResponse, nil
+}
+
+func (m *ProjectManager) GetDomains(ctx context.Context, request admin.GetDomainRequest) *admin.GetDomainsResponse {
+	configDomains := m.config.ApplicationConfiguration().GetDomainsConfig()
+	var domains = make([]*admin.Domain, len(*configDomains))
+	for index, configDomain := range *configDomains {
+		domains[index] = &admin.Domain{
+			Id:   configDomain.ID,
+			Name: configDomain.Name,
+		}
+	}
+	return &admin.GetDomainsResponse{
+		Domains: domains,
+	}
 }
 
 func NewProjectManager(db repoInterfaces.Repository, config runtimeInterfaces.Configuration) interfaces.ProjectInterface {

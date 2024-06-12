@@ -2478,7 +2478,7 @@ pub struct Domain {
 /// Represents a list of domains.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct Domains {
+pub struct GetDomainsResponse {
     #[prost(message, repeated, tag="1")]
     pub domains: ::prost::alloc::vec::Vec<Domain>,
 }

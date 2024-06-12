@@ -21,7 +21,7 @@ message Domain {
 }
 
 // Represents a list of domains.
-message Domains {
+message GetDomainsResponse {
     repeated Domain domains = 1;
 }
 

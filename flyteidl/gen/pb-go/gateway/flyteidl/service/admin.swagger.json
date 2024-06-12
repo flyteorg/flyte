@@ -837,7 +837,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/adminDomains"
+              "$ref": "#/definitions/adminGetDomainsResponse"
             }
           },
           "default": {
@@ -4693,19 +4693,6 @@
       },
       "description": "Namespace within a project commonly used to differentiate between different service instances.\ne.g. \"production\", \"development\", etc."
     },
-    "adminDomains": {
-      "type": "object",
-      "properties": {
-        "domains": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/adminDomain"
-          }
-        }
-      },
-      "description": "Represents a list of domains."
-    },
     "adminDynamicNodeWorkflowResponse": {
       "type": "object",
       "properties": {
@@ -5145,6 +5132,19 @@
         }
       },
       "description": "These URLs are returned as part of node and task execution data requests."
+    },
+    "adminGetDomainsResponse": {
+      "type": "object",
+      "properties": {
+        "domains": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/adminDomain"
+          }
+        }
+      },
+      "description": "Represents a list of domains."
     },
     "adminGetVersionResponse": {
       "type": "object",

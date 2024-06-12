@@ -597,7 +597,7 @@ type AdminServiceClient_GetDomains struct {
 	*mock.Call
 }
 
-func (_m AdminServiceClient_GetDomains) Return(_a0 *admin.Domains, _a1 error) *AdminServiceClient_GetDomains {
+func (_m AdminServiceClient_GetDomains) Return(_a0 *admin.GetDomainsResponse, _a1 error) *AdminServiceClient_GetDomains {
 	return &AdminServiceClient_GetDomains{Call: _m.Call.Return(_a0, _a1)}
 }
 
@@ -612,7 +612,7 @@ func (_m *AdminServiceClient) OnGetDomainsMatch(matchers ...interface{}) *AdminS
 }
 
 // GetDomains provides a mock function with given fields: ctx, in, opts
-func (_m *AdminServiceClient) GetDomains(ctx context.Context, in *admin.GetDomainRequest, opts ...grpc.CallOption) (*admin.Domains, error) {
+func (_m *AdminServiceClient) GetDomains(ctx context.Context, in *admin.GetDomainRequest, opts ...grpc.CallOption) (*admin.GetDomainsResponse, error) {
 	_va := make([]interface{}, len(opts))
 	for _i := range opts {
 		_va[_i] = opts[_i]
@@ -622,12 +622,12 @@ func (_m *AdminServiceClient) GetDomains(ctx context.Context, in *admin.GetDomai
 	_ca = append(_ca, _va...)
 	ret := _m.Called(_ca...)
 
-	var r0 *admin.Domains
-	if rf, ok := ret.Get(0).(func(context.Context, *admin.GetDomainRequest, ...grpc.CallOption) *admin.Domains); ok {
+	var r0 *admin.GetDomainsResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.GetDomainRequest, ...grpc.CallOption) *admin.GetDomainsResponse); ok {
 		r0 = rf(ctx, in, opts...)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*admin.Domains)
+			r0 = ret.Get(0).(*admin.GetDomainsResponse)
 		}
 	}
 

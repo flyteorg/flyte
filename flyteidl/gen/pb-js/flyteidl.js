@@ -42752,24 +42752,24 @@
                 return Domain;
             })();
     
-            admin.Domains = (function() {
+            admin.GetDomainsResponse = (function() {
     
                 /**
-                 * Properties of a Domains.
+                 * Properties of a GetDomainsResponse.
                  * @memberof flyteidl.admin
-                 * @interface IDomains
-                 * @property {Array.<flyteidl.admin.IDomain>|null} [domains] Domains domains
+                 * @interface IGetDomainsResponse
+                 * @property {Array.<flyteidl.admin.IDomain>|null} [domains] GetDomainsResponse domains
                  */
     
                 /**
-                 * Constructs a new Domains.
+                 * Constructs a new GetDomainsResponse.
                  * @memberof flyteidl.admin
-                 * @classdesc Represents a Domains.
-                 * @implements IDomains
+                 * @classdesc Represents a GetDomainsResponse.
+                 * @implements IGetDomainsResponse
                  * @constructor
-                 * @param {flyteidl.admin.IDomains=} [properties] Properties to set
+                 * @param {flyteidl.admin.IGetDomainsResponse=} [properties] Properties to set
                  */
-                function Domains(properties) {
+                function GetDomainsResponse(properties) {
                     this.domains = [];
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
@@ -42778,35 +42778,35 @@
                 }
     
                 /**
-                 * Domains domains.
+                 * GetDomainsResponse domains.
                  * @member {Array.<flyteidl.admin.IDomain>} domains
-                 * @memberof flyteidl.admin.Domains
+                 * @memberof flyteidl.admin.GetDomainsResponse
                  * @instance
                  */
-                Domains.prototype.domains = $util.emptyArray;
+                GetDomainsResponse.prototype.domains = $util.emptyArray;
     
                 /**
-                 * Creates a new Domains instance using the specified properties.
+                 * Creates a new GetDomainsResponse instance using the specified properties.
                  * @function create
-                 * @memberof flyteidl.admin.Domains
+                 * @memberof flyteidl.admin.GetDomainsResponse
                  * @static
-                 * @param {flyteidl.admin.IDomains=} [properties] Properties to set
-                 * @returns {flyteidl.admin.Domains} Domains instance
+                 * @param {flyteidl.admin.IGetDomainsResponse=} [properties] Properties to set
+                 * @returns {flyteidl.admin.GetDomainsResponse} GetDomainsResponse instance
                  */
-                Domains.create = function create(properties) {
-                    return new Domains(properties);
+                GetDomainsResponse.create = function create(properties) {
+                    return new GetDomainsResponse(properties);
                 };
     
                 /**
-                 * Encodes the specified Domains message. Does not implicitly {@link flyteidl.admin.Domains.verify|verify} messages.
+                 * Encodes the specified GetDomainsResponse message. Does not implicitly {@link flyteidl.admin.GetDomainsResponse.verify|verify} messages.
                  * @function encode
-                 * @memberof flyteidl.admin.Domains
+                 * @memberof flyteidl.admin.GetDomainsResponse
                  * @static
-                 * @param {flyteidl.admin.IDomains} message Domains message or plain object to encode
+                 * @param {flyteidl.admin.IGetDomainsResponse} message GetDomainsResponse message or plain object to encode
                  * @param {$protobuf.Writer} [writer] Writer to encode to
                  * @returns {$protobuf.Writer} Writer
                  */
-                Domains.encode = function encode(message, writer) {
+                GetDomainsResponse.encode = function encode(message, writer) {
                     if (!writer)
                         writer = $Writer.create();
                     if (message.domains != null && message.domains.length)
@@ -42816,20 +42816,20 @@
                 };
     
                 /**
-                 * Decodes a Domains message from the specified reader or buffer.
+                 * Decodes a GetDomainsResponse message from the specified reader or buffer.
                  * @function decode
-                 * @memberof flyteidl.admin.Domains
+                 * @memberof flyteidl.admin.GetDomainsResponse
                  * @static
                  * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
                  * @param {number} [length] Message length if known beforehand
-                 * @returns {flyteidl.admin.Domains} Domains
+                 * @returns {flyteidl.admin.GetDomainsResponse} GetDomainsResponse
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                Domains.decode = function decode(reader, length) {
+                GetDomainsResponse.decode = function decode(reader, length) {
                     if (!(reader instanceof $Reader))
                         reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.Domains();
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.GetDomainsResponse();
                     while (reader.pos < end) {
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
@@ -42847,14 +42847,14 @@
                 };
     
                 /**
-                 * Verifies a Domains message.
+                 * Verifies a GetDomainsResponse message.
                  * @function verify
-                 * @memberof flyteidl.admin.Domains
+                 * @memberof flyteidl.admin.GetDomainsResponse
                  * @static
                  * @param {Object.<string,*>} message Plain object to verify
                  * @returns {string|null} `null` if valid, otherwise the reason why it is not
                  */
-                Domains.verify = function verify(message) {
+                GetDomainsResponse.verify = function verify(message) {
                     if (typeof message !== "object" || message === null)
                         return "object expected";
                     if (message.domains != null && message.hasOwnProperty("domains")) {
@@ -42869,7 +42869,7 @@
                     return null;
                 };
     
-                return Domains;
+                return GetDomainsResponse;
             })();
     
             admin.Project = (function() {
@@ -52147,39 +52147,6 @@
                  */
     
                 /**
-                 * Callback as used by {@link flyteidl.service.AdminService#getDomains}.
-                 * @memberof flyteidl.service.AdminService
-                 * @typedef GetDomainsCallback
-                 * @type {function}
-                 * @param {Error|null} error Error, if any
-                 * @param {flyteidl.admin.Domains} [response] Domains
-                 */
-    
-                /**
-                 * Calls GetDomains.
-                 * @function getDomains
-                 * @memberof flyteidl.service.AdminService
-                 * @instance
-                 * @param {flyteidl.admin.IGetDomainRequest} request GetDomainRequest message or plain object
-                 * @param {flyteidl.service.AdminService.GetDomainsCallback} callback Node-style callback called with the error, if any, and Domains
-                 * @returns {undefined}
-                 * @variation 1
-                 */
-                Object.defineProperty(AdminService.prototype.getDomains = function getDomains(request, callback) {
-                    return this.rpcCall(getDomains, $root.flyteidl.admin.GetDomainRequest, $root.flyteidl.admin.Domains, request, callback);
-                }, "name", { value: "GetDomains" });
-    
-                /**
-                 * Calls GetDomains.
-                 * @function getDomains
-                 * @memberof flyteidl.service.AdminService
-                 * @instance
-                 * @param {flyteidl.admin.IGetDomainRequest} request GetDomainRequest message or plain object
-                 * @returns {Promise<flyteidl.admin.Domains>} Promise
-                 * @variation 2
-                 */
-    
-                /**
                  * Callback as used by {@link flyteidl.service.AdminService#registerProject}.
                  * @memberof flyteidl.service.AdminService
                  * @typedef RegisterProjectCallback
@@ -52308,6 +52275,39 @@
                  * @instance
                  * @param {flyteidl.admin.IProjectListRequest} request ProjectListRequest message or plain object
                  * @returns {Promise<flyteidl.admin.Projects>} Promise
+                 * @variation 2
+                 */
+    
+                /**
+                 * Callback as used by {@link flyteidl.service.AdminService#getDomains}.
+                 * @memberof flyteidl.service.AdminService
+                 * @typedef GetDomainsCallback
+                 * @type {function}
+                 * @param {Error|null} error Error, if any
+                 * @param {flyteidl.admin.GetDomainsResponse} [response] GetDomainsResponse
+                 */
+    
+                /**
+                 * Calls GetDomains.
+                 * @function getDomains
+                 * @memberof flyteidl.service.AdminService
+                 * @instance
+                 * @param {flyteidl.admin.IGetDomainRequest} request GetDomainRequest message or plain object
+                 * @param {flyteidl.service.AdminService.GetDomainsCallback} callback Node-style callback called with the error, if any, and GetDomainsResponse
+                 * @returns {undefined}
+                 * @variation 1
+                 */
+                Object.defineProperty(AdminService.prototype.getDomains = function getDomains(request, callback) {
+                    return this.rpcCall(getDomains, $root.flyteidl.admin.GetDomainRequest, $root.flyteidl.admin.GetDomainsResponse, request, callback);
+                }, "name", { value: "GetDomains" });
+    
+                /**
+                 * Calls GetDomains.
+                 * @function getDomains
+                 * @memberof flyteidl.service.AdminService
+                 * @instance
+                 * @param {flyteidl.admin.IGetDomainRequest} request GetDomainRequest message or plain object
+                 * @returns {Promise<flyteidl.admin.GetDomainsResponse>} Promise
                  * @variation 2
                  */
     

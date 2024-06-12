@@ -948,32 +948,6 @@ pub mod admin_service_client {
                 );
             self.inner.unary(req, path, codec).await
         }
-        ///
-        pub async fn get_domains(
-            &mut self,
-            request: impl tonic::IntoRequest<super::super::admin::GetDomainRequest>,
-        ) -> std::result::Result<
-            tonic::Response<super::super::admin::Domains>,
-            tonic::Status,
-        > {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl.service.AdminService/GetDomains",
-            );
-            let mut req = request.into_request();
-            req.extensions_mut()
-                .insert(GrpcMethod::new("flyteidl.service.AdminService", "GetDomains"));
-            self.inner.unary(req, path, codec).await
-        }
         /** Registers a :ref:`ref_flyteidl.admin.Project` with the Flyte deployment.
 */
         pub async fn register_project(
@@ -1088,6 +1062,32 @@ pub mod admin_service_client {
                 .insert(
                     GrpcMethod::new("flyteidl.service.AdminService", "ListProjects"),
                 );
+            self.inner.unary(req, path, codec).await
+        }
+        ///
+        pub async fn get_domains(
+            &mut self,
+            request: impl tonic::IntoRequest<super::super::admin::GetDomainRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::super::admin::GetDomainsResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/flyteidl.service.AdminService/GetDomains",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("flyteidl.service.AdminService", "GetDomains"));
             self.inner.unary(req, path, codec).await
         }
         /** Indicates a :ref:`ref_flyteidl.event.WorkflowExecutionEvent` has occurred.
@@ -2111,14 +2111,6 @@ pub mod admin_service_server {
             tonic::Response<super::super::admin::NodeExecutionGetDataResponse>,
             tonic::Status,
         >;
-        ///
-        async fn get_domains(
-            &self,
-            request: tonic::Request<super::super::admin::GetDomainRequest>,
-        ) -> std::result::Result<
-            tonic::Response<super::super::admin::Domains>,
-            tonic::Status,
-        >;
         /** Registers a :ref:`ref_flyteidl.admin.Project` with the Flyte deployment.
 */
         async fn register_project(
@@ -2155,6 +2147,14 @@ pub mod admin_service_server {
             request: tonic::Request<super::super::admin::ProjectListRequest>,
         ) -> std::result::Result<
             tonic::Response<super::super::admin::Projects>,
+            tonic::Status,
+        >;
+        ///
+        async fn get_domains(
+            &self,
+            request: tonic::Request<super::super::admin::GetDomainRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::super::admin::GetDomainsResponse>,
             tonic::Status,
         >;
         /** Indicates a :ref:`ref_flyteidl.event.WorkflowExecutionEvent` has occurred.
@@ -3850,54 +3850,6 @@ pub mod admin_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/flyteidl.service.AdminService/GetDomains" => {
-                    #[allow(non_camel_case_types)]
-                    struct GetDomainsSvc<T: AdminService>(pub Arc<T>);
-                    impl<
-                        T: AdminService,
-                    > tonic::server::UnaryService<super::super::admin::GetDomainRequest>
-                    for GetDomainsSvc<T> {
-                        type Response = super::super::admin::Domains;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<
-                                super::super::admin::GetDomainRequest,
-                            >,
-                        ) -> Self::Future {
-                            let inner = Arc::clone(&self.0);
-                            let fut = async move {
-                                <T as AdminService>::get_domains(&inner, request).await
-                            };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let max_decoding_message_size = self.max_decoding_message_size;
-                    let max_encoding_message_size = self.max_encoding_message_size;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let inner = inner.0;
-                        let method = GetDomainsSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            )
-                            .apply_max_message_size_config(
-                                max_decoding_message_size,
-                                max_encoding_message_size,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
                 "/flyteidl.service.AdminService/RegisterProject" => {
                     #[allow(non_camel_case_types)]
                     struct RegisterProjectSvc<T: AdminService>(pub Arc<T>);
@@ -4075,6 +4027,54 @@ pub mod admin_service_server {
                     let fut = async move {
                         let inner = inner.0;
                         let method = ListProjectsSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/flyteidl.service.AdminService/GetDomains" => {
+                    #[allow(non_camel_case_types)]
+                    struct GetDomainsSvc<T: AdminService>(pub Arc<T>);
+                    impl<
+                        T: AdminService,
+                    > tonic::server::UnaryService<super::super::admin::GetDomainRequest>
+                    for GetDomainsSvc<T> {
+                        type Response = super::super::admin::GetDomainsResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<
+                                super::super::admin::GetDomainRequest,
+                            >,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                <T as AdminService>::get_domains(&inner, request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = GetDomainsSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(

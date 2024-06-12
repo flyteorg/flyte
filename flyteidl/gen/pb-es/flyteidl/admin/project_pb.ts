@@ -93,39 +93,39 @@ export class Domain extends Message<Domain> {
 /**
  * Represents a list of domains.
  *
- * @generated from message flyteidl.admin.Domains
+ * @generated from message flyteidl.admin.GetDomainsResponse
  */
-export class Domains extends Message<Domains> {
+export class GetDomainsResponse extends Message<GetDomainsResponse> {
   /**
    * @generated from field: repeated flyteidl.admin.Domain domains = 1;
    */
   domains: Domain[] = [];
 
-  constructor(data?: PartialMessage<Domains>) {
+  constructor(data?: PartialMessage<GetDomainsResponse>) {
     super();
     proto3.util.initPartial(data, this);
   }
 
   static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "flyteidl.admin.Domains";
+  static readonly typeName = "flyteidl.admin.GetDomainsResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "domains", kind: "message", T: Domain, repeated: true },
   ]);
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Domains {
-    return new Domains().fromBinary(bytes, options);
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetDomainsResponse {
+    return new GetDomainsResponse().fromBinary(bytes, options);
   }
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Domains {
-    return new Domains().fromJson(jsonValue, options);
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetDomainsResponse {
+    return new GetDomainsResponse().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Domains {
-    return new Domains().fromJsonString(jsonString, options);
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetDomainsResponse {
+    return new GetDomainsResponse().fromJsonString(jsonString, options);
   }
 
-  static equals(a: Domains | PlainMessage<Domains> | undefined, b: Domains | PlainMessage<Domains> | undefined): boolean {
-    return proto3.util.equals(Domains, a, b);
+  static equals(a: GetDomainsResponse | PlainMessage<GetDomainsResponse> | undefined, b: GetDomainsResponse | PlainMessage<GetDomainsResponse> | undefined): boolean {
+    return proto3.util.equals(GetDomainsResponse, a, b);
   }
 }
 

@@ -19,7 +19,7 @@ class Domain(_message.Message):
     name: str
     def __init__(self, id: _Optional[str] = ..., name: _Optional[str] = ...) -> None: ...
 
-class Domains(_message.Message):
+class GetDomainsResponse(_message.Message):
     __slots__ = ["domains"]
     DOMAINS_FIELD_NUMBER: _ClassVar[int]
     domains: _containers.RepeatedCompositeFieldContainer[Domain]
