@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package flyteidl.plugins;
+
+option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins";
+
+import "flyteidl/core/tasks.proto";
+
+enum RestartPolicy {
+  RESTART_POLICY_NEVER = 0;
+  RESTART_POLICY_ON_FAILURE = 1;
+  RESTART_POLICY_ALWAYS = 2;
+}
+
+message CommonReplicaSpec {
+  // Number of replicas
+  int32 replicas = 1;
+
+  // Image used for the replica group
+  string image = 2;
+
+  // Resources required for the replica group
+  core.Resources resources = 3;
+
+  // RestartPolicy determines whether pods will be restarted when they exit
+  RestartPolicy restart_policy = 4;
+}
