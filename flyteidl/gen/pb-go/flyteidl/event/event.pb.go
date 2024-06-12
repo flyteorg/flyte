@@ -265,13 +265,19 @@ type NodeExecutionEvent struct {
 	ReportedAt *timestamppb.Timestamp `protobuf:"bytes,21,opt,name=reported_at,json=reportedAt,proto3" json:"reported_at,omitempty"`
 	// Indicates if this node is an ArrayNode.
 	IsArray bool `protobuf:"varint,22,opt,name=is_array,json=isArray,proto3" json:"is_array,omitempty"`
+<<<<<<< HEAD
 	// Holding this field here for now, this will be upstreamed soon.
+=======
+>>>>>>> 5ec9fe3cc (Add fields to NodeExecutionEvent (#315))
 	// So that Admin doesn't have to rebuild the node execution graph to find the target entity, propeller will fill this
 	// in optionally - currently this is only filled in for subworkflows. This is the ID of the subworkflow corresponding
 	// to this node execution. It is difficult to find because Admin only sees one node at a time. A subworkflow could be
 	// nested multiple layers deep, and you'd need to access the correct workflow template to know the target subworkflow.
 	TargetEntity *core.Identifier `protobuf:"bytes,23,opt,name=target_entity,json=targetEntity,proto3" json:"target_entity,omitempty"`
+<<<<<<< HEAD
 	// Holding this field here for now, this will be upstreamed soon.
+=======
+>>>>>>> 5ec9fe3cc (Add fields to NodeExecutionEvent (#315))
 	// Tasks and subworkflows (but not launch plans) that are run within a dynamic task are effectively independent of
 	// the tasks that are registered in Admin's db. Confusingly, they are often identical, but sometimes they are not
 	// even registered at all. Similar to the target_entity field, at the time Admin receives this event, it has no idea

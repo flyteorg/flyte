@@ -220,7 +220,11 @@ func sendEvents(ctx context.Context, nCtx interfaces.NodeExecutionContext, index
 	timestamp := ptypes.TimestampNow()
 	workflowExecutionID := nCtx.ExecutionContext().GetExecutionID().WorkflowExecutionIdentifier
 
-	// send NodeExecutionEvent
+	// Extract dynamic chain information.
+	var dynamic = false
+	if nCtx.ExecutionContext() != nil && nCtx.ExecutionContext().GetParentInfo() != nil && nCtx.ExecutionContext().GetParentInfo().IsInDynamicChain() {
+		dynamic = true
+	}
 	nodeExecutionEvent := &event.NodeExecutionEvent{
 		Id: &idlcore.NodeExecutionIdentifier{
 			NodeId:      subNodeID,
@@ -231,14 +235,15 @@ func sendEvents(ctx context.Context, nCtx interfaces.NodeExecutionContext, index
 		ParentNodeMetadata: &event.ParentNodeExecutionMetadata{
 			NodeId: nCtx.NodeID(),
 		},
-		ReportedAt: timestamp,
+		ReportedAt:       timestamp,
+		IsInDynamicChain: dynamic,
 	}
 
 	if err := eventRecorder.RecordNodeEvent(ctx, nodeExecutionEvent, eventConfig); err != nil {
 		return err
 	}
 
-	// send TaskExeucutionEvent
+	// send TaskExecutionEvent
 	taskExecutionEvent := &event.TaskExecutionEvent{
 		TaskId: &idlcore.Identifier{
 			ResourceType: idlcore.ResourceType_TASK,
