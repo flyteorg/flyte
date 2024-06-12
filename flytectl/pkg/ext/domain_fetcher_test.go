@@ -22,7 +22,7 @@ func TestAdminFetcherExtClient_GetDomains(t *testing.T) {
 		Id:   "production",
 		Name: "production",
 	}
-	domains := &admin.Domains{
+	domains := &admin.GetDomainsResponse{
 		Domains: []*admin.Domain{domain1, domain2, domain3},
 	}
 
