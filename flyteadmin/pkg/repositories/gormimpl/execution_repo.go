@@ -22,14 +22,24 @@ type ExecutionRepo struct {
 	metrics          gormMetrics
 }
 
-func (r *ExecutionRepo) Create(ctx context.Context, input models.Execution) error {
+func (r *ExecutionRepo) Create(ctx context.Context, input models.Execution, executionTagModel []*models.ExecutionTag) error {
 	timer := r.metrics.CreateDuration.Start()
-	tx := r.db.WithContext(ctx).Omit("id").Create(&input)
+	err := r.db.WithContext(ctx).Transaction(func(_ *gorm.DB) error {
+		if len(executionTagModel) > 0 {
+			tx := r.db.WithContext(ctx).Create(executionTagModel)
+			if tx.Error != nil {
+				return r.errorTransformer.ToFlyteAdminError(tx.Error)
+			}
+		}
+
+		tx := r.db.WithContext(ctx).Create(&input)
+		if tx.Error != nil {
+			return r.errorTransformer.ToFlyteAdminError(tx.Error)
+		}
+		return nil
+	})
 	timer.Stop()
-	if tx.Error != nil {
-		return r.errorTransformer.ToFlyteAdminError(tx.Error)
-	}
-	return nil
+	return err
 }
 
 func (r *ExecutionRepo) Get(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
@@ -89,11 +99,9 @@ func (r *ExecutionRepo) List(ctx context.Context, input interfaces.ListResourceI
 			taskTableName, executionTableName, taskTableName))
 	}
 
-	if ok := input.JoinTableEntities[common.AdminTag]; ok {
+	if ok := input.JoinTableEntities[common.ExecutionTag]; ok {
 		tx = tx.Joins(fmt.Sprintf("INNER JOIN %s ON %s.execution_name = %s.execution_name",
-			executionAdminTagsTableName, executionTableName, executionAdminTagsTableName))
-		tx = tx.Joins(fmt.Sprintf("INNER JOIN %s ON %s.id = %s.admin_tag_id",
-			AdminTagsTableName, AdminTagsTableName, executionAdminTagsTableName))
+			executionTagsTableName, executionTableName, executionTagsTableName))
 	}
 
 	// Apply filters
