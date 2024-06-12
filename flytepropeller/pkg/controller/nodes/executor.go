@@ -909,6 +909,12 @@ func (c *nodeExecutor) Abort(ctx context.Context, h interfaces.NodeHandler, nCtx
 			nodeExecutionID.NodeId = currentNodeUniqueID
 		}
 
+		var dynamic = false
+		if nCtx.ExecutionContext().GetParentInfo() != nil && nCtx.ExecutionContext().GetParentInfo().IsInDynamicChain() {
+			dynamic = true
+		}
+
+		targetEntity := common.GetTargetEntity(ctx, nCtx)
 		err := nCtx.EventsRecorder().RecordNodeEvent(ctx, &event.NodeExecutionEvent{
 			Id:         nodeExecutionID,
 			Phase:      core.NodeExecution_ABORTED,
@@ -919,8 +925,10 @@ func (c *nodeExecutor) Abort(ctx context.Context, h interfaces.NodeHandler, nCtx
 					Message: reason,
 				},
 			},
-			ProducerId: c.clusterID,
-			ReportedAt: ptypes.TimestampNow(),
+			ProducerId:       c.clusterID,
+			ReportedAt:       ptypes.TimestampNow(),
+			IsInDynamicChain: dynamic,
+			TargetEntity:     targetEntity,
 		}, c.eventConfig)
 		if err != nil && !eventsErr.IsNotFound(err) && !eventsErr.IsEventIncompatibleClusterError(err) {
 			if errors2.IsCausedBy(err, errors.IllegalStateError) {
@@ -1012,10 +1020,12 @@ func (c *nodeExecutor) handleNotYetStartedNode(ctx context.Context, dag executor
 		logger.Infof(ctx, "Change in node state detected from [%s] -> [%s]", nodeStatus.GetPhase().String(), np.String())
 		p = p.WithOccuredAt(occurredAt)
 
+		targetEntity := common.GetTargetEntity(ctx, nCtx)
+
 		nev, err := ToNodeExecutionEvent(nCtx.NodeExecutionMetadata().GetNodeExecutionID(),
 			p, nCtx.InputReader().GetInputPath().String(), nodeStatus, nCtx.ExecutionContext().GetEventVersion(),
 			nCtx.ExecutionContext().GetParentInfo(), nCtx.Node(), c.clusterID, nCtx.NodeStateReader().GetDynamicNodeState().Phase,
-			c.eventConfig)
+			c.eventConfig, targetEntity)
 		if err != nil {
 			return interfaces.NodeStatusUndefined, errors.Wrapf(errors.IllegalStateError, nCtx.NodeID(), err, "could not convert phase info to event")
 		}
@@ -1239,10 +1249,12 @@ func (c *nodeExecutor) handleQueuedOrRunningNode(ctx context.Context, nCtx inter
 		// assert np == skipped, succeeding, failing or recovered
 		logger.Infof(ctx, "Change in node state detected from [%s] -> [%s], (handler phase [%s])", nodeStatus.GetPhase().String(), np.String(), p.GetPhase().String())
 
+		targetEntity := common.GetTargetEntity(ctx, nCtx)
+
 		nev, err := ToNodeExecutionEvent(nCtx.NodeExecutionMetadata().GetNodeExecutionID(),
 			p, nCtx.InputReader().GetInputPath().String(), nCtx.NodeStatus(), nCtx.ExecutionContext().GetEventVersion(),
 			nCtx.ExecutionContext().GetParentInfo(), nCtx.Node(), c.clusterID, nCtx.NodeStateReader().GetDynamicNodeState().Phase,
-			c.eventConfig)
+			c.eventConfig, targetEntity)
 		if err != nil {
 			return interfaces.NodeStatusUndefined, errors.Wrapf(errors.IllegalStateError, nCtx.NodeID(), err, "could not convert phase info to event")
 		}
@@ -1259,6 +1271,10 @@ func (c *nodeExecutor) handleQueuedOrRunningNode(ctx context.Context, nCtx inter
 				np = v1alpha1.NodePhaseFailing
 				p = handler.PhaseInfoFailure(core.ExecutionError_USER, "NodeFailed", err.Error(), p.GetInfo())
 
+				var dynamic = false
+				if nCtx.ExecutionContext().GetParentInfo() != nil && nCtx.ExecutionContext().GetParentInfo().IsInDynamicChain() {
+					dynamic = true
+				}
 				err = nCtx.EventsRecorder().RecordNodeEvent(ctx, &event.NodeExecutionEvent{
 					Id:         nCtx.NodeExecutionMetadata().GetNodeExecutionID(),
 					Phase:      core.NodeExecution_FAILED,
@@ -1269,7 +1285,9 @@ func (c *nodeExecutor) handleQueuedOrRunningNode(ctx context.Context, nCtx inter
 							Message: err.Error(),
 						},
 					},
-					ReportedAt: ptypes.TimestampNow(),
+					ReportedAt:       ptypes.TimestampNow(),
+					IsInDynamicChain: dynamic,
+					TargetEntity:     targetEntity,
 				}, c.eventConfig)
 
 				if err != nil {

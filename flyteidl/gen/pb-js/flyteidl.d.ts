@@ -8380,6 +8380,12 @@ export namespace flyteidl {
 
             /** NodeExecutionEvent isArray */
             isArray?: (boolean|null);
+
+            /** NodeExecutionEvent targetEntity */
+            targetEntity?: (flyteidl.core.IIdentifier|null);
+
+            /** NodeExecutionEvent isInDynamicChain */
+            isInDynamicChain?: (boolean|null);
         }
 
         /** Represents a NodeExecutionEvent. */
@@ -8456,6 +8462,12 @@ export namespace flyteidl {
 
             /** NodeExecutionEvent isArray. */
             public isArray: boolean;
+
+            /** NodeExecutionEvent targetEntity. */
+            public targetEntity?: (flyteidl.core.IIdentifier|null);
+
+            /** NodeExecutionEvent isInDynamicChain. */
+            public isInDynamicChain: boolean;
 
             /** NodeExecutionEvent inputValue. */
             public inputValue?: ("inputUri"|"inputData");
