@@ -54,9 +54,6 @@ type State struct {
 	// level retries, just errors from hitting API, inside the sync loop
 	SyncFailureCount int `json:"syncFailureCount,omitempty"`
 
-	// In creating the resource, this is the number of failures
-	CreationFailureCount int `json:"creationFailureCount,omitempty"`
-
 	// The time the execution first requests for an allocation token
 	AllocationTokenRequestStartTime time.Time `json:"allocationTokenRequestStartTime,omitempty"`
 
