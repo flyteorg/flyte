@@ -17,11 +17,11 @@ Select the integration you need and follow the steps to install the correspondin
 
   .. group-tab:: PyTorch/TensorFlow/MPI
 
-    1. Install the `Kubeflow training-operator <https://github.com/kubeflow/training-operator?tab=readme-ov-file#kubeflow-training-operator>`__:
+    1. Install the `Kubeflow training-operator <https://github.com/kubeflow/training-operator?tab=readme-ov-file#stable-release>`__ (Please install the stable release):
 
     .. code-block:: bash
 
-      kubectl apply -k "github.com/kubeflow/training-operator/manifests/overlays/standalone"
+      kubectl apply -k "github.com/kubeflow/training-operator/manifests/overlays/standalone?ref=v1.7.0"
 
     **Optional: Using a gang scheduler**
 
@@ -73,15 +73,17 @@ Select the integration you need and follow the steps to install the correspondin
       
     To install the Kuberay operator, run the following command:
   
-        helm install kuberay-operator kuberay/kuberay-operator --version 1.0.0
-  
+    .. code-block:: bash
+
+       helm install kuberay-operator kuberay/kuberay-operator --namespace ray-system --version 1.1.0 --create-namespace
+
   .. group-tab:: Spark
   
     To add the Spark Helm repository, run the following commands:
   
     .. code-block:: bash
   
-       helm repo add spark-operator https://googlecloudplatform.github.io/spark-on-k8s-operator
+       helm repo add spark-operator https://kubeflow.github.io/spark-operator
   
     To install the Spark operator, run the following command:
   
@@ -270,18 +272,6 @@ Specify plugin configuration
                      - container: container
                      - container_array: k8s-array
                      - ray: ray
-           rbac:
-             extraRules:
-               - apiGroups:
-               - "ray.io"
-               resources:
-               - rayjob
-               verbs:
-               - create
-               - get
-               - list
-               - patch
-               - update
 
       .. group-tab:: Flyte core
     
@@ -342,6 +332,23 @@ Specify plugin configuration
                         - development:
                           - defaultIamRole:
                               value: <FLYTE_IAM_USER_ARN>
+                      plugins:
+                        spark:
+                        # Edit the Spark configuration as you see fit
+                          spark-config-default:
+                            - spark.driver.cores: "1"
+                            - spark.hadoop.fs.s3a.aws.credentials.provider: "com.amazonaws.auth.DefaultAWSCredentialsProviderChain"
+                            - spark.kubernetes.allocation.batch.size: "50"
+                            - spark.hadoop.fs.s3a.acl.default: "BucketOwnerFullControl"
+                            - spark.hadoop.fs.s3n.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+                            - spark.hadoop.fs.AbstractFileSystem.s3n.impl: "org.apache.hadoop.fs.s3a.S3A"
+                            - spark.hadoop.fs.s3.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+                            - spark.hadoop.fs.AbstractFileSystem.s3.impl: "org.apache.hadoop.fs.s3a.S3A"
+                            - spark.hadoop.fs.s3a.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+                            - spark.hadoop.fs.AbstractFileSystem.s3a.impl: "org.apache.hadoop.fs.s3a.S3A"
+                            - spark.network.timeout: 600s
+                            - spark.executorEnv.KUBERNETES_REQUEST_TIMEOUT: 100000
+                            - spark.executor.heartbeatInterval: 60s
                   clusterResourceTemplates:
                     inline:
                       #This section automates the creation of the project-domain namespaces
@@ -416,23 +423,6 @@ Specify plugin configuration
                             - kind: ServiceAccount
                               name: spark
                               namespace: "{{ namespace }}"
-                      plugins:
-                        spark:
-                        # Edit the Spark configuration as you see fit
-                          spark-config-default:
-                            - spark.driver.cores: "1"
-                            - spark.hadoop.fs.s3a.aws.credentials.provider: "com.amazonaws.auth.DefaultAWSCredentialsProviderChain"
-                            - spark.kubernetes.allocation.batch.size: "50"
-                            - spark.hadoop.fs.s3a.acl.default: "BucketOwnerFullControl"
-                            - spark.hadoop.fs.s3n.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
-                            - spark.hadoop.fs.AbstractFileSystem.s3n.impl: "org.apache.hadoop.fs.s3a.S3A"
-                            - spark.hadoop.fs.s3.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
-                            - spark.hadoop.fs.AbstractFileSystem.s3.impl: "org.apache.hadoop.fs.s3a.S3A"
-                            - spark.hadoop.fs.s3a.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
-                            - spark.hadoop.fs.AbstractFileSystem.s3a.impl: "org.apache.hadoop.fs.s3a.S3A"
-                            - spark.network.timeout: 600s
-                            - spark.executorEnv.KUBERNETES_REQUEST_TIMEOUT: 100000
-                            - spark.executor.heartbeatInterval: 60s
                 
               2. (Optional) The Spark operator supports Kubernetes ResourceQuota enforcement. If you plan to use it, 
                  set `per-Task resource requests <https://docs.flyte.org/en/latest/user_guide/productionizing/customizing_task_resources.html#customizing-task-resources>`__ that fit into the quota for each project-namespace. A Task without resource requests
@@ -508,6 +498,21 @@ Specify plugin configuration
                         - development:
                           - gsa:
                               value: <GoogleServiceAccount-EMAIL>
+                      plugins:
+                        spark:
+                        # Edit the Spark configuration as you see fit
+                          spark-config-default:
+                            - spark.eventLog.enabled: "true"
+                            - spark.eventLog.dir: "{{ .Values.userSettings.bucketName }}/spark-events"
+                            - spark.driver.cores: "1"
+                            - spark.executorEnv.HTTP2_DISABLE: "true"
+                            - spark.hadoop.fs.AbstractFileSystem.gs.impl: com.google.cloud.hadoop.fs.gcs.GoogleHadoopFS
+                            - spark.kubernetes.allocation.batch.size: "50"
+                            - spark.kubernetes.driverEnv.HTTP2_DISABLE: "true"
+                            - spark.network.timeout: 600s
+                            - spark.executorEnv.KUBERNETES_REQUEST_TIMEOUT: 100000
+                            - spark.executor.heartbeatInterval: 60s
+
                   clusterResourceTemplates:
                     inline:
                       #This section automates the creation of the project-domain namespaces
@@ -582,21 +587,7 @@ Specify plugin configuration
                             - kind: ServiceAccount
                               name: spark
                               namespace: "{{ namespace }}"
-                      plugins:
-                        spark:
-                        # Edit the Spark configuration as you see fit
-                          spark-config-default:
-                            - spark.eventLog.enabled: "true"
-                            - spark.eventLog.dir: "{{ .Values.userSettings.bucketName }}/spark-events"
-                            - spark.driver.cores: "1"
-                            - spark.executorEnv.HTTP2_DISABLE: "true"
-                            - spark.hadoop.fs.AbstractFileSystem.gs.impl: com.google.cloud.hadoop.fs.gcs.GoogleHadoopFS
-                            - spark.kubernetes.allocation.batch.size: "50"
-                            - spark.kubernetes.driverEnv.HTTP2_DISABLE: "true"
-                            - spark.network.timeout: 600s
-                            - spark.executorEnv.KUBERNETES_REQUEST_TIMEOUT: 100000
-                            - spark.executor.heartbeatInterval: 60s
-               
+
         .. group-tab:: flyte-core
 
           .. tabs:: 
@@ -1036,9 +1027,3 @@ Wait for the upgrade to complete. You can check the status of the deployment pod
   kubectl get pods -n flyte
 
 Once all the components are up and running, go to the `examples section <https://docs.flyte.org/en/latest/flytesnacks/integrations.html#native-backend-plugins>`__ to learn more about how to use Flyte backend plugins.
-
-
-
-
-
-

@@ -99,8 +99,7 @@ Here's a breakdown of these mappings:
     * - ``@dataclass``
       - ``Struct``
       - Automatic
-      - The class should be a pure value class that inherits from Mashumaro's DataClassJSONMixin,
-        and be annotated with the ``@dataclass`` decorator.
+      - The class should be a pure value class annotated with the ``@dataclass`` decorator.
     * - ``np.ndarray``
       - File
       - Automatic

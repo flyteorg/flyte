@@ -1,22 +1,3 @@
----
-jupytext:
-  cell_metadata_filter: all
-  formats: md:myst
-  main_language: python
-  notebook_metadata_filter: all
-  text_representation:
-    extension: .md
-    format_name: myst
-    format_version: 0.13
-    jupytext_version: 1.16.1
-kernelspec:
-  display_name: Python 3
-  language: python
-  name: python3
----
-
-+++ {"lines_to_next_cell": 0}
-
 (map_task)=
 
 # Map tasks
@@ -36,36 +17,23 @@ Map tasks find utility in diverse scenarios, such as:
 
 The following examples demonstrate how to use map tasks with both single and multiple inputs.
 
-To begin, import the required libraries.
-
-```{code-cell}
-from flytekit import map_task, task, workflow
+```{note}
+To clone and run the example code on this page, see the [Flytesnacks repo][flytesnacks].
 ```
 
-+++ {"lines_to_next_cell": 0}
+To begin, import the required libraries:
 
-Here's a simple workflow that uses {py:func}`map_task <flytekit:flytekit.map_task>`.
-
-```{code-cell}
-threshold = 11
-
-
-@task
-def detect_anomalies(data_point: int) -> bool:
-    return data_point > threshold
-
-
-@workflow
-def map_workflow(data: list[int] = [10, 12, 11, 10, 13, 12, 100, 11, 12, 10]) -> list[bool]:
-    # Use the map task to apply the anomaly detection function to each data point
-    return map_task(detect_anomalies)(data_point=data)
-
-
-if __name__ == "__main__":
-    print(f"Anomalies Detected: {map_workflow()}")
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/map_task.py
+:caption: advanced_composition/map_task.py
+:lines: 1
 ```
 
-+++ {"lines_to_next_cell": 0}
+Here's a simple workflow that uses {py:func}`map_task <flytekit:flytekit.map_task>`:
+
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/map_task.py
+:caption: advanced_composition/map_task.py
+:lines: 4-19
+```
 
 To customize resource allocations, such as memory usage for individual map tasks,
 you can leverage `with_overrides`. Here's an example using the `detect_anomalies` map task within a workflow:
@@ -79,7 +47,7 @@ def map_workflow_with_resource_overrides(data: list[int] = [10, 12, 11, 10, 13, 
     return map_task(detect_anomalies)(data_point=data).with_overrides(requests=Resources(mem="2Gi"))
 ```
 
-You can use {py:class}`~flytekit.TaskMetadata` to set attributes such as `cache`, `cache_version`, `interruptible`, `retries` and `timeout`.
+You can use {py:class}`~flytekit.TaskMetadata` to set attributes such as `cache`, `cache_version`, `interruptible`, `retries` and `timeout`:
 ```python
 from flytekit import TaskMetadata
 
@@ -90,13 +58,12 @@ def map_workflow_with_metadata(data: list[int] = [10, 12, 11, 10, 13, 12, 100, 1
         data_point=data
     )
 ```
+When `cache` and `cache_version` are used in `TaskMetadata` for a map task, the cache hits occur on individual tasks being mapped over, rather than the parent map task operation. This means that if one input item in a list changes, each previously executed task is read from cache and only the task for the changed item is actually executed, rather than the task being re-executed for every item.  Note that this has the same effect as adding `cache` and `cache_version` in the `@task` decorator for a task being mapped over.
 
 You can also configure `concurrency` and `min_success_ratio` for a map task:
 - `concurrency` limits the number of mapped tasks that can run in parallel to the specified batch size.
-If the input size exceeds the concurrency value, multiple batches will run serially until all inputs are processed.
-If left unspecified, it implies unbounded concurrency.
-- `min_success_ratio` determines the minimum fraction of total jobs that must complete successfully before terminating
-the map task and marking it as successful.
+If the input size exceeds the concurrency value, multiple batches will run serially until all inputs are processed. If left unspecified, it implies unbounded concurrency.
+- `min_success_ratio` determines the minimum fraction of total jobs that must complete successfully before terminating the map task and marking it as successful.
 
 ```python
 @workflow
@@ -107,94 +74,52 @@ def map_workflow_with_additional_params(data: list[int] = [10, 12, 11, 10, 13, 1
 A map task internally uses a compression algorithm (bitsets) to handle every Flyte workflow node’s metadata,
 which would have otherwise been in the order of 100s of bytes.
 
-When defining a map task, avoid calling other tasks in it. Flyte
-can't accurately register tasks that call other tasks. While Flyte
-will correctly execute a task that calls other tasks, it will not be
-able to give full performance advantages. This is
-especially true for map tasks.
+When defining a map task, avoid calling other tasks in it. Flyte can't accurately register tasks that call other tasks. While Flyte will correctly execute a task that calls other tasks, it will not be able to give full performance advantages. This is especially true for map tasks.
 
-In this example, the map task `suboptimal_mappable_task` would not
-give you the best performance.
+In this example, the map task `suboptimal_mappable_task` would not give you the best performance:
 
-```{code-cell}
-@task
-def upperhalf(a: int) -> int:
-    return a / 2 + 1
-
-
-@task
-def suboptimal_mappable_task(a: int) -> str:
-    inc = upperhalf(a=a)
-    stringified = str(inc)
-    return stringified
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/map_task.py
+:caption: advanced_composition/map_task.py
+:lines: 31-40
 ```
-
-+++ {"lines_to_next_cell": 0}
 
 By default, the map task utilizes the Kubernetes array plugin for execution.
 However, map tasks can also be run on alternate execution backends.
 For example, you can configure the map task to run on
-[AWS Batch](https://docs.flyte.org/en/latest/deployment/plugin_setup/aws/batch.html#deployment-plugin-setup-aws-array),
-a provisioned service that offers scalability for handling large-scale tasks.
+[AWS Batch](https://docs.flyte.org/en/latest/deployment/plugin_setup/aws/batch.html#deployment-plugin-setup-aws-array), a provisioned service that offers scalability for handling large-scale tasks.
 
 ## Map a task with multiple inputs
 
 You might need to map a task with multiple inputs.
 
-For instance, consider a task that requires three inputs.
+For instance, consider a task that requires three inputs:
 
-```{code-cell}
-@task
-def multi_input_task(quantity: int, price: float, shipping: float) -> float:
-    return quantity * price * shipping
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/map_task.py
+:caption: advanced_composition/map_task.py
+:pyobject: multi_input_task
 ```
-
-+++ {"lines_to_next_cell": 0}
 
 You may want to map this task with only the ``quantity`` input, while keeping the other inputs unchanged.
 Since a map task accepts only one input, you can achieve this by partially binding values to the map task.
-This can be done using the {py:func}`functools.partial` function.
+This can be done using the {py:func}`functools.partial` function:
 
-```{code-cell}
-import functools
-
-
-@workflow
-def multiple_inputs_map_workflow(list_q: list[int] = [1, 2, 3, 4, 5], p: float = 6.0, s: float = 7.0) -> list[float]:
-    partial_task = functools.partial(multi_input_task, price=p, shipping=s)
-    return map_task(partial_task)(quantity=list_q)
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/map_task.py
+:caption: advanced_composition/map_task.py
+:lines: 52-58
 ```
 
-+++ {"lines_to_next_cell": 0}
+Another possibility is to bind the outputs of a task to partials:
 
-Another possibility is to bind the outputs of a task to partials.
-
-```{code-cell}
-@task
-def get_price() -> float:
-    return 7.0
-
-
-@workflow
-def map_workflow_partial_with_task_output(list_q: list[int] = [1, 2, 3, 4, 5], s: float = 6.0) -> list[float]:
-    p = get_price()
-    partial_task = functools.partial(multi_input_task, price=p, shipping=s)
-    return map_task(partial_task)(quantity=list_q)
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/map_task.py
+:caption: advanced_composition/map_task.py
+:lines: 63-72
 ```
 
-+++ {"lines_to_next_cell": 0}
+You can also provide multiple lists as input to a `map_task`:
 
-You can also provide multiple lists as input to a ``map_task``.
-
-```{code-cell}
-:lines_to_next_cell: 2
-
-@workflow
-def map_workflow_with_lists(
-    list_q: list[int] = [1, 2, 3, 4, 5], list_p: list[float] = [6.0, 9.0, 8.7, 6.5, 1.2], s: float = 6.0
-) -> list[float]:
-    partial_task = functools.partial(multi_input_task, shipping=s)
-    return map_task(partial_task)(quantity=list_q, price=list_p)
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/map_task.py
+:caption: advanced_composition/map_task.py
+:pyobject: map_workflow_with_lists
 ```
 
 ```{note}
@@ -207,31 +132,31 @@ To run the provided workflows on the Flyte cluster, use the following commands:
 
 ```
 pyflyte run --remote \
-  https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/map_task.py \
+  https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/map_task.py \
   map_workflow
 ```
 
 ```
 pyflyte run --remote \
-  https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/map_task.py \
+  https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/map_task.py \
   map_workflow_with_additional_params
 ```
 
 ```
 pyflyte run --remote \
-  https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/map_task.py \
+  https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/map_task.py \
   multiple_inputs_map_workflow
 ```
 
 ```
 pyflyte run --remote \
-  https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/map_task.py \
+  https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/map_task.py \
   map_workflow_partial_with_task_output
 ```
 
 ```
 pyflyte run --remote \
-  https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/map_task.py \
+  https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/map_task.py \
   map_workflow_with_lists
 ```
 
@@ -239,7 +164,7 @@ pyflyte run --remote \
 
 :::{important}
 This feature is experimental and the API is subject to breaking changes.
-If you encounter any issues please consider submitting a
+If you encounter any issues, please submit a
 [bug report](https://github.com/flyteorg/flyte/issues/new?assignees=&labels=bug%2Cuntriaged&projects=&template=bug_report.yaml&title=%5BBUG%5D+).
 :::
 
@@ -276,3 +201,5 @@ In contrast to map tasks, an ArrayNode provides the following enhancements:
 - **Multiple input values**. Subtasks can be defined with multiple input values, enhancing their versatility.
 
 We expect the performance of ArrayNode map tasks to compare closely to standard map tasks.
+
+[flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/advanced_composition/

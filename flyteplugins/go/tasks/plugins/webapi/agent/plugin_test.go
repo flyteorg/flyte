@@ -60,30 +60,41 @@ func TestPlugin(t *testing.T) {
 
 	t.Run("test getFinalAgent", func(t *testing.T) {
 		agent := &Agent{AgentDeployment: &Deployment{Endpoint: "localhost:80"}}
-		agentRegistry := Registry{"spark": {defaultTaskTypeVersion: agent}}
+		agentRegistry = Registry{"spark": {defaultTaskTypeVersion: agent}}
 		spark := &admin.TaskCategory{Name: "spark", Version: defaultTaskTypeVersion}
 		foo := &admin.TaskCategory{Name: "foo", Version: defaultTaskTypeVersion}
 		bar := &admin.TaskCategory{Name: "bar", Version: defaultTaskTypeVersion}
-		agentDeployment, _ := getFinalAgent(spark, &cfg, agentRegistry)
+		agentDeployment, _ := getFinalAgent(spark, &cfg)
 		assert.Equal(t, agentDeployment.Endpoint, "localhost:80")
-		agentDeployment, _ = getFinalAgent(foo, &cfg, agentRegistry)
+		agentDeployment, _ = getFinalAgent(foo, &cfg)
 		assert.Equal(t, agentDeployment.Endpoint, cfg.DefaultAgent.Endpoint)
-		agentDeployment, _ = getFinalAgent(bar, &cfg, agentRegistry)
+		agentDeployment, _ = getFinalAgent(bar, &cfg)
 		assert.Equal(t, agentDeployment.Endpoint, cfg.DefaultAgent.Endpoint)
 	})
 
 	t.Run("test getFinalTimeout", func(t *testing.T) {
 		timeout := getFinalTimeout("CreateTask", &Deployment{Endpoint: "localhost:8080", Timeouts: map[string]config.Duration{"CreateTask": {Duration: 1 * time.Millisecond}}})
 		assert.Equal(t, 1*time.Millisecond, timeout.Duration)
+		timeout = getFinalTimeout("GetTask", &Deployment{Endpoint: "localhost:8080", Timeouts: map[string]config.Duration{"GetTask": {Duration: 1 * time.Millisecond}}})
+		assert.Equal(t, 1*time.Millisecond, timeout.Duration)
 		timeout = getFinalTimeout("DeleteTask", &Deployment{Endpoint: "localhost:8080", DefaultTimeout: config.Duration{Duration: 10 * time.Second}})
 		assert.Equal(t, 10*time.Second, timeout.Duration)
+		timeout = getFinalTimeout("ExecuteTaskSync", &Deployment{Endpoint: "localhost:8080", Timeouts: map[string]config.Duration{"ExecuteTaskSync": {Duration: 1 * time.Millisecond}}})
+		assert.Equal(t, 1*time.Millisecond, timeout.Duration)
 	})
 
 	t.Run("test getFinalContext", func(t *testing.T) {
-		ctx, _ := getFinalContext(context.TODO(), "DeleteTask", &Deployment{})
+
+		ctx, _ := getFinalContext(context.TODO(), "CreateTask", &Deployment{Endpoint: "localhost:8080", Timeouts: map[string]config.Duration{"CreateTask": {Duration: 1 * time.Millisecond}}})
+		assert.NotEqual(t, context.TODO(), ctx)
+
+		ctx, _ = getFinalContext(context.TODO(), "GetTask", &Deployment{Endpoint: "localhost:8080", Timeouts: map[string]config.Duration{"GetTask": {Duration: 1 * time.Millisecond}}})
+		assert.NotEqual(t, context.TODO(), ctx)
+
+		ctx, _ = getFinalContext(context.TODO(), "DeleteTask", &Deployment{})
 		assert.Equal(t, context.TODO(), ctx)
 
-		ctx, _ = getFinalContext(context.TODO(), "CreateTask", &Deployment{Endpoint: "localhost:8080", Timeouts: map[string]config.Duration{"CreateTask": {Duration: 1 * time.Millisecond}}})
+		ctx, _ = getFinalContext(context.TODO(), "ExecuteTaskSync", &Deployment{Endpoint: "localhost:8080", Timeouts: map[string]config.Duration{"ExecuteTaskSync": {Duration: 10 * time.Second}}})
 		assert.NotEqual(t, context.TODO(), ctx)
 	})
 
@@ -307,11 +318,10 @@ func TestInitializeAgentRegistry(t *testing.T) {
 	cfg.AgentForTaskTypes = map[string]string{"task1": "agent-deployment-1", "task2": "agent-deployment-2"}
 	err := SetConfig(&cfg)
 	assert.NoError(t, err)
-	agentRegistry, err := initializeAgentRegistry(cs)
-	assert.NoError(t, err)
+	updateAgentRegistry(context.Background(), cs)
 
 	// In golang, the order of keys in a map is random. So, we sort the keys before asserting.
-	agentRegistryKeys := maps.Keys(agentRegistry)
+	agentRegistryKeys := maps.Keys(getAgentRegistry())
 	sort.Strings(agentRegistryKeys)
 
 	assert.Equal(t, agentRegistryKeys, []string{"task1", "task2", "task3"})

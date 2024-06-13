@@ -484,7 +484,7 @@ func QueryUserInfoUsingAccessToken(ctx context.Context, originalRequest *http.Re
 // See https://tools.ietf.org/html/rfc8414 for more information.
 func GetOIdCMetadataEndpointRedirectHandler(ctx context.Context, authCtx interfaces.AuthenticationContext) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
-		metadataURL := authCtx.Options().UserAuth.OpenID.BaseURL.ResolveReference(authCtx.GetOIdCMetadataURL())
+		metadataURL := authCtx.Options().UserAuth.OpenID.BaseURL.JoinPath("/").ResolveReference(authCtx.GetOIdCMetadataURL())
 		http.Redirect(writer, request, metadataURL.String(), http.StatusSeeOther)
 	}
 }

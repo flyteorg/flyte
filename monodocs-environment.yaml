@@ -6,7 +6,6 @@ dependencies:
   - pip
   - codespell
   - furo
-  - flytekit>=1.10.2
   - gitpython
   - ipython!=8.7.0
   - graphviz
@@ -14,16 +13,17 @@ dependencies:
   - myst-nb
   - psycopg2-binary
   - recommonmark
-  - sphinx==4.5.0
+  - sphinx
   - sphinx-prompt
   - sphinx-click
   - sphinx-autoapi
   - sphinx-copybutton
   - sphinx-issues
   - sphinx_fontawesome
-  - sphinx-panels
+  - sphinx-design
+  - sphinx-reredirects
   - sphinxcontrib-mermaid
-  - sphinxcontrib-youtube==1.2.0
+  - sphinxcontrib-youtube
   - sphinx-tabs
   - sphinx-tags==0.2.1
 
@@ -53,12 +53,13 @@ dependencies:
   - tensorflow>=2.13.0          # onnxtensorflow
   - scikit-learn                # scikit-learn
   - dask[distributed]           # dask
-  - mlflow==2.7.0               # mlflow
+  - mlflow>=2.10.0              # mlflow
   - snowflake-connector-python  # snowflake
   - vaex-core                   # vaex
   - openai                      # chatgpt
 
   - pip:
+    - flytekit>=1.12.1b2
     - readthedocs-sphinx-ext
     - sphinx-code-include
     - sphinxext-remoteliteralinclude
@@ -76,6 +77,7 @@ dependencies:
     - ray==2.6.3
     - duckdb
     - aioboto3>=12.3.0                    # aws sagemaker inference
+    - databricks-cli              # mlflow
 
 platforms:
   - linux-64

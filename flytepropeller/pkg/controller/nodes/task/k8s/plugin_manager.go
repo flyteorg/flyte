@@ -3,7 +3,6 @@ package k8s
 import (
 	"context"
 	"fmt"
-	"reflect"
 	"time"
 
 	"golang.org/x/time/rate"
@@ -16,7 +15,6 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/scheme"
-	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/event"
@@ -289,7 +287,7 @@ func (e *PluginManager) checkResourcePhase(ctx context.Context, tCtx pluginsCore
 		var opReader io.OutputReader
 		if pCtx.ow == nil {
 			logger.Infof(ctx, "Plugin [%s] returned no outputReader, assuming file based outputs", e.id)
-			opReader = ioutils.NewRemoteFileOutputReader(ctx, tCtx.DataStore(), tCtx.OutputWriter(), tCtx.MaxDatasetSizeBytes())
+			opReader = ioutils.NewRemoteFileOutputReader(ctx, tCtx.DataStore(), tCtx.OutputWriter(), 0)
 		} else {
 			logger.Infof(ctx, "Plugin [%s] returned outputReader", e.id)
 			opReader = pCtx.ow.GetReader()
@@ -641,11 +639,8 @@ func NewPluginManager(ctx context.Context, iCtx pluginsCore.SetupContext, entry 
 	}
 
 	// Construct the collector that will emit a gauge indicating current levels of the resource that this K8s plugin operates on
-	pluginInformer, err := getPluginSharedInformer(ctx, kubeClient, entry.ResourceToWatch)
-	if err != nil {
-		return nil, err
-	}
-	rm := monitorIndex.GetOrCreateResourceLevelMonitor(ctx, metricsScope, pluginInformer, gvk)
+	rm := monitorIndex.GetOrCreateResourceLevelMonitor(ctx, metricsScope, kubeClient.GetCache(), gvk)
+
 	// Start the poller and gauge emitter
 	rm.RunCollectorOnce(ctx)
 
@@ -666,18 +661,4 @@ func getPluginGvk(resourceToWatch runtime.Object) (schema.GroupVersionKind, erro
 		return schema.GroupVersionKind{}, errors.Errorf(errors.PluginInitializationFailed, "No kind in schema for %v", resourceToWatch)
 	}
 	return kinds[0], nil
-}
-
-func getPluginSharedInformer(ctx context.Context, kubeClient pluginsCore.KubeClient, resourceToWatch client.Object) (cache.SharedIndexInformer, error) {
-	i, err := kubeClient.GetCache().GetInformer(ctx, resourceToWatch)
-	if err != nil {
-		return nil, errors.Wrapf(errors.PluginInitializationFailed, err, "Error getting informer for %s", reflect.TypeOf(i))
-	}
-
-	si, casted := i.(cache.SharedIndexInformer)
-	if !casted {
-		return nil, errors.Errorf(errors.PluginInitializationFailed, "wrong type. Actual: %v", reflect.TypeOf(i))
-	}
-
-	return si, nil
 }

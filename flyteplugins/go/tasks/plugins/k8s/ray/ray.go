@@ -380,19 +380,6 @@ func buildSubmitterPodTemplate(podSpec *v1.PodSpec, objectMeta *metav1.ObjectMet
 func buildWorkerPodTemplate(primaryContainer *v1.Container, podSpec *v1.PodSpec, objectMetadata *metav1.ObjectMeta, taskCtx pluginsCore.TaskExecutionContext) v1.PodTemplateSpec {
 	// Some configs are copy from  https://github.com/ray-project/kuberay/blob/b72e6bdcd9b8c77a9dc6b5da8560910f3a0c3ffd/apiserver/pkg/util/cluster.go#L185
 	// They should always be the same, so we could hard code here.
-	initContainers := []v1.Container{
-		{
-			Name:  "init-myservice",
-			Image: "busybox:1.28",
-			Command: []string{
-				"sh",
-				"-c",
-				"until nslookup $RAY_IP.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for myservice; sleep 2; done",
-			},
-			Resources: primaryContainer.Resources,
-		},
-	}
-	podSpec.InitContainers = append(podSpec.InitContainers, initContainers...)
 
 	primaryContainer.Name = "ray-worker"
 

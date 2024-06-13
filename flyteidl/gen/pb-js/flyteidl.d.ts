@@ -4506,7 +4506,7 @@ export namespace flyteidl {
             node?: (flyteidl.core.INode|null);
 
             /** ArrayNode parallelism */
-            parallelism?: (Long|null);
+            parallelism?: (number|null);
 
             /** ArrayNode minSuccesses */
             minSuccesses?: (number|null);
@@ -4528,13 +4528,16 @@ export namespace flyteidl {
             public node?: (flyteidl.core.INode|null);
 
             /** ArrayNode parallelism. */
-            public parallelism: Long;
+            public parallelism: number;
 
             /** ArrayNode minSuccesses. */
             public minSuccesses: number;
 
             /** ArrayNode minSuccessRatio. */
             public minSuccessRatio: number;
+
+            /** ArrayNode parallelismOption. */
+            public parallelismOption?: "parallelism";
 
             /** ArrayNode successCriteria. */
             public successCriteria?: ("minSuccesses"|"minSuccessRatio");
@@ -7566,6 +7569,143 @@ export namespace flyteidl {
 
             /**
              * Verifies an ErrorDocument message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of an ExecutionEnvAssignment. */
+        interface IExecutionEnvAssignment {
+
+            /** ExecutionEnvAssignment nodeIds */
+            nodeIds?: (string[]|null);
+
+            /** ExecutionEnvAssignment taskType */
+            taskType?: (string|null);
+
+            /** ExecutionEnvAssignment executionEnv */
+            executionEnv?: (flyteidl.core.IExecutionEnv|null);
+        }
+
+        /** Represents an ExecutionEnvAssignment. */
+        class ExecutionEnvAssignment implements IExecutionEnvAssignment {
+
+            /**
+             * Constructs a new ExecutionEnvAssignment.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.IExecutionEnvAssignment);
+
+            /** ExecutionEnvAssignment nodeIds. */
+            public nodeIds: string[];
+
+            /** ExecutionEnvAssignment taskType. */
+            public taskType: string;
+
+            /** ExecutionEnvAssignment executionEnv. */
+            public executionEnv?: (flyteidl.core.IExecutionEnv|null);
+
+            /**
+             * Creates a new ExecutionEnvAssignment instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ExecutionEnvAssignment instance
+             */
+            public static create(properties?: flyteidl.core.IExecutionEnvAssignment): flyteidl.core.ExecutionEnvAssignment;
+
+            /**
+             * Encodes the specified ExecutionEnvAssignment message. Does not implicitly {@link flyteidl.core.ExecutionEnvAssignment.verify|verify} messages.
+             * @param message ExecutionEnvAssignment message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.IExecutionEnvAssignment, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an ExecutionEnvAssignment message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ExecutionEnvAssignment
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.ExecutionEnvAssignment;
+
+            /**
+             * Verifies an ExecutionEnvAssignment message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of an ExecutionEnv. */
+        interface IExecutionEnv {
+
+            /** ExecutionEnv id */
+            id?: (string|null);
+
+            /** ExecutionEnv type */
+            type?: (string|null);
+
+            /** ExecutionEnv extant */
+            extant?: (google.protobuf.IStruct|null);
+
+            /** ExecutionEnv spec */
+            spec?: (google.protobuf.IStruct|null);
+        }
+
+        /** Represents an ExecutionEnv. */
+        class ExecutionEnv implements IExecutionEnv {
+
+            /**
+             * Constructs a new ExecutionEnv.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.IExecutionEnv);
+
+            /** ExecutionEnv id. */
+            public id: string;
+
+            /** ExecutionEnv type. */
+            public type: string;
+
+            /** ExecutionEnv extant. */
+            public extant?: (google.protobuf.IStruct|null);
+
+            /** ExecutionEnv spec. */
+            public spec?: (google.protobuf.IStruct|null);
+
+            /** ExecutionEnv environment. */
+            public environment?: ("extant"|"spec");
+
+            /**
+             * Creates a new ExecutionEnv instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ExecutionEnv instance
+             */
+            public static create(properties?: flyteidl.core.IExecutionEnv): flyteidl.core.ExecutionEnv;
+
+            /**
+             * Encodes the specified ExecutionEnv message. Does not implicitly {@link flyteidl.core.ExecutionEnv.verify|verify} messages.
+             * @param message ExecutionEnv message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.IExecutionEnv, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an ExecutionEnv message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ExecutionEnv
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.ExecutionEnv;
+
+            /**
+             * Verifies an ExecutionEnv message.
              * @param message Plain object to verify
              * @returns `null` if valid, otherwise the reason why it is not
              */
@@ -13937,6 +14077,9 @@ export namespace flyteidl {
 
             /** ExecutionSpec executionClusterLabel */
             executionClusterLabel?: (flyteidl.admin.IExecutionClusterLabel|null);
+
+            /** ExecutionSpec executionEnvAssignments */
+            executionEnvAssignments?: (flyteidl.core.IExecutionEnvAssignment[]|null);
         }
 
         /** Represents an ExecutionSpec. */
@@ -14001,6 +14144,9 @@ export namespace flyteidl {
 
             /** ExecutionSpec executionClusterLabel. */
             public executionClusterLabel?: (flyteidl.admin.IExecutionClusterLabel|null);
+
+            /** ExecutionSpec executionEnvAssignments. */
+            public executionEnvAssignments: flyteidl.core.IExecutionEnvAssignment[];
 
             /** ExecutionSpec notificationOverrides. */
             public notificationOverrides?: ("notifications"|"disableAll");
@@ -15001,6 +15147,9 @@ export namespace flyteidl {
 
             /** WorkflowExecutionConfig envs */
             envs?: (flyteidl.admin.IEnvs|null);
+
+            /** WorkflowExecutionConfig executionEnvAssignments */
+            executionEnvAssignments?: (flyteidl.core.IExecutionEnvAssignment[]|null);
         }
 
         /** Represents a WorkflowExecutionConfig. */
@@ -15035,6 +15184,9 @@ export namespace flyteidl {
 
             /** WorkflowExecutionConfig envs. */
             public envs?: (flyteidl.admin.IEnvs|null);
+
+            /** WorkflowExecutionConfig executionEnvAssignments. */
+            public executionEnvAssignments: flyteidl.core.IExecutionEnvAssignment[];
 
             /**
              * Creates a new WorkflowExecutionConfig instance using the specified properties.
@@ -15698,6 +15850,9 @@ export namespace flyteidl {
 
             /** LaunchPlanSpec envs */
             envs?: (flyteidl.admin.IEnvs|null);
+
+            /** LaunchPlanSpec executionEnvAssignments */
+            executionEnvAssignments?: (flyteidl.core.IExecutionEnvAssignment[]|null);
         }
 
         /** Represents a LaunchPlanSpec. */
@@ -15756,6 +15911,9 @@ export namespace flyteidl {
 
             /** LaunchPlanSpec envs. */
             public envs?: (flyteidl.admin.IEnvs|null);
+
+            /** LaunchPlanSpec executionEnvAssignments. */
+            public executionEnvAssignments: flyteidl.core.IExecutionEnvAssignment[];
 
             /**
              * Creates a new LaunchPlanSpec instance using the specified properties.

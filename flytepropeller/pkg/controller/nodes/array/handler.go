@@ -252,26 +252,14 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		arrayNodeState.Phase = v1alpha1.ArrayNodePhaseExecuting
 	case v1alpha1.ArrayNodePhaseExecuting:
 		// process array node subNodes
+		remainingWorkflowParallelism := int(nCtx.ExecutionContext().GetExecutionConfig().MaxParallelism - nCtx.ExecutionContext().CurrentParallelism())
+		incrementWorkflowParallelism, maxParallelism := inferParallelism(ctx, arrayNode.GetParallelism(),
+			config.GetConfig().ArrayNode.DefaultParallelismBehavior, remainingWorkflowParallelism, len(arrayNodeState.SubNodePhases.GetItems()))
 
-		availableParallelism := 0
-		// using the workflow's parallelism if the array node parallelism is not set
-		useWorkflowParallelism := int(arrayNode.GetParallelism()) == -1
-		if useWorkflowParallelism {
-			// greedily take all available slots
-			// TODO: This will need to be re-evaluated if we want to support dynamics & sub_workflows
-			currentParallelism := nCtx.ExecutionContext().CurrentParallelism()
-			maxParallelism := nCtx.ExecutionContext().GetExecutionConfig().MaxParallelism
-			availableParallelism = int(maxParallelism - currentParallelism)
-		} else {
-			availableParallelism = int(arrayNode.GetParallelism())
-			if availableParallelism == 0 {
-				availableParallelism = len(arrayNodeState.SubNodePhases.GetItems())
-			}
-		}
-
-		nodeExecutionRequests := make([]*nodeExecutionRequest, 0, availableParallelism)
+		nodeExecutionRequests := make([]*nodeExecutionRequest, 0, maxParallelism)
+		currentParallelism := 0
 		for i, nodePhaseUint64 := range arrayNodeState.SubNodePhases.GetItems() {
-			if availableParallelism == 0 {
+			if currentParallelism >= maxParallelism {
 				break
 			}
 
@@ -315,10 +303,10 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			// TODO - this is a naive implementation of parallelism, if we want to support more
 			// complex subNodes (ie. dynamics / subworkflows) we need to revisit this so that
 			// parallelism is handled during subNode evaluations + avoid deadlocks
-			if useWorkflowParallelism {
+			if incrementWorkflowParallelism {
 				nCtx.ExecutionContext().IncrementParallelism()
 			}
-			availableParallelism--
+			currentParallelism++
 		}
 
 		workerErrorCollector := errorcollector.NewErrorMessageCollector()
@@ -418,6 +406,12 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			// wait until all tasks have completed before declaring success
 			arrayNodeState.Phase = v1alpha1.ArrayNodePhaseSucceeding
 		}
+
+		// if incrementWorkflowParallelism is not set then we need to increment the parallelism by one
+		// to indicate that the overall ArrayNode is still running
+		if !incrementWorkflowParallelism && arrayNodeState.Phase == v1alpha1.ArrayNodePhaseExecuting {
+			nCtx.ExecutionContext().IncrementParallelism()
+		}
 	case v1alpha1.ArrayNodePhaseFailing:
 		if err := a.Abort(ctx, nCtx, "ArrayNodeFailing"); err != nil {
 			return handler.UnknownTransition, err
@@ -485,7 +479,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 				// checkpoint paths are not computed here because this function is only called when writing
 				// existing cached outputs. if this functionality changes this will need to be revisited.
 				outputPaths := ioutils.NewCheckpointRemoteFilePaths(ctx, nCtx.DataStore(), subOutputDir, ioutils.NewRawOutputPaths(ctx, subDataDir), "")
-				reader := ioutils.NewRemoteFileOutputReader(ctx, nCtx.DataStore(), outputPaths, nCtx.MaxDatasetSizeBytes())
+				reader := ioutils.NewRemoteFileOutputReader(ctx, nCtx.DataStore(), outputPaths, 0)
 
 				gatherOutputsRequest.reader = &reader
 				a.gatherOutputsRequestChannel <- gatherOutputsRequest

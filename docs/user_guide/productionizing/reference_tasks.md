@@ -1,31 +1,10 @@
----
-jupytext:
-  cell_metadata_filter: all
-  formats: md:myst
-  main_language: python
-  notebook_metadata_filter: all
-  text_representation:
-    extension: .md
-    format_name: myst
-    format_version: 0.13
-    jupytext_version: 1.16.1
-kernelspec:
-  display_name: Python 3
-  language: python
-  name: python3
----
-
-+++ {"lines_to_next_cell": 0}
-
 # Reference tasks
 
 ```{eval-rst}
 .. tags:: Intermediate
 ```
 
-A {py:func}`flytekit.reference_task` references the Flyte tasks that have already been defined, serialized, and registered.
-You can reference tasks from other projects and create workflows that use tasks declared by others.
-These tasks can be in their own containers, python runtimes, flytekit versions, and even different languages.
+A {py:func}`flytekit.reference_task` references the Flyte tasks that have already been defined, serialized, and registered. You can reference tasks from other projects and create workflows that use tasks declared by others. These tasks can be in their own containers, python runtimes, flytekit versions, and even different languages.
 
 The following example illustrates how to use reference tasks.
 
@@ -33,38 +12,13 @@ The following example illustrates how to use reference tasks.
 Reference tasks cannot be run locally. You must mock them out.
 :::
 
-```{code-cell}
-:lines_to_next_cell: 2
+```{note}
+To clone and run the example code on this page, see the [Flytesnacks repo][flytesnacks].
+```
 
-from typing import List
-
-from flytekit import reference_task, workflow
-from flytekit.types.file import FlyteFile
-
-
-@reference_task(
-    project="flytesnacks",
-    domain="development",
-    name="data_types_and_io.file.normalize_columns",
-    version="{{ registration.version }}",
-)
-def normalize_columns(
-    csv_url: FlyteFile,
-    column_names: List[str],
-    columns_to_normalize: List[str],
-    output_location: str,
-) -> FlyteFile:
-    ...
-
-
-@workflow
-def wf() -> FlyteFile:
-    return normalize_columns(
-        csv_url="https://people.sc.fsu.edu/~jburkardt/data/csv/biostats.csv",
-        column_names=["Name", "Sex", "Age", "Heights (in)", "Weight (lbs)"],
-        columns_to_normalize=["Age"],
-        output_location="",
-    )
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/productionizing/productionizing/reference_task.py
+:caption: productionizing/reference_task.py
+:lines: 1-36
 ```
 
 :::{note}
@@ -87,3 +41,5 @@ A typical reference task would resemble the following:
      ...
 ```
 :::
+
+[flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/productionizing/

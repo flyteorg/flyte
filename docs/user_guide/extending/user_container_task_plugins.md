@@ -1,22 +1,3 @@
----
-jupytext:
-  cell_metadata_filter: all
-  formats: md:myst
-  main_language: python
-  notebook_metadata_filter: all
-  text_representation:
-    extension: .md
-    format_name: myst
-    format_version: 0.13
-    jupytext_version: 1.16.1
-kernelspec:
-  display_name: Python 3
-  language: python
-  name: python3
----
-
-+++ {"lines_to_next_cell": 0}
-
 (user_container)=
 
 # User container task plugins
@@ -27,16 +8,17 @@ kernelspec:
 
 A user container task plugin runs a user-defined container that has the user code.
 
-This tutorial will walk you through writing your own sensor-style plugin that allows users to wait for a file to land
-in the object store. Remember that if you follow the flyte/flytekit constructs, you will automatically make your plugin portable
-across all cloud platforms that Flyte supports.
+This tutorial will walk you through writing your own sensor-style plugin that allows users to wait for a file to land in the object store. Remember that if you follow the flyte/flytekit constructs, you will automatically make your plugin portable across all cloud platforms that Flyte supports.
 
 ## Sensor plugin
 
-A sensor plugin waits for some event to happen before marking the task as success. You need not worry about the
-timeout as that will be handled by the flyte engine itself when running in production.
+A sensor plugin waits for some event to happen before marking the task as success. You need not worry about the timeout as that will be handled by the flyte engine itself when running in production.
 
 ### Plugin API
+
+```{note}
+To clone and run the example code on this page, see the [Flytesnacks repo][flytesnacks].
+```
 
 ```python
 sensor = WaitForObjectStoreFile(metadata=metadata(timeout="1H", retries=10))
@@ -50,58 +32,19 @@ def wait_and_run(path: str) -> int:
     return do_next(path=path)
 ```
 
-```{code-cell}
-import typing
-from datetime import timedelta
-from time import sleep
-
-from flytekit import TaskMetadata, task, workflow
-from flytekit.extend import Interface, PythonTask, context_manager
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/extending/extending/user_container.py
+:caption: extending/user_container.py
+:lines: 1-6
 ```
-
-+++ {"lines_to_next_cell": 0}
 
 ### Plugin structure
 
 As illustrated above, to achieve this structure we need to create a class named `WaitForObjectStoreFile`, which
 derives from {py:class}`flytekit.PythonFunctionTask` as follows.
 
-```{code-cell}
-class WaitForObjectStoreFile(PythonTask):
-    """
-    Add documentation here for your plugin.
-    This plugin creates an object store file sensor that waits and exits only when the file exists.
-    """
-
-    _VAR_NAME: str = "path"
-
-    def __init__(
-        self,
-        name: str,
-        poll_interval: timedelta = timedelta(seconds=10),
-        **kwargs,
-    ):
-        super(WaitForObjectStoreFile, self).__init__(
-            task_type="object-store-sensor",
-            name=name,
-            task_config=None,
-            interface=Interface(inputs={self._VAR_NAME: str}, outputs={self._VAR_NAME: str}),
-            **kwargs,
-        )
-        self._poll_interval = poll_interval
-
-    def execute(self, **kwargs) -> typing.Any:
-        # No need to check for existence, as that is guaranteed.
-        path = kwargs[self._VAR_NAME]
-        ctx = context_manager.FlyteContext.current_context()
-        user_context = ctx.user_space_params
-        while True:
-            user_context.logging.info(f"Sensing file in path {path}...")
-            if ctx.file_access.exists(path):
-                user_context.logging.info(f"file in path {path} exists!")
-                return path
-            user_context.logging.warning(f"file in path {path} does not exists!")
-            sleep(self._poll_interval.seconds)
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/extending/extending/user_container.py
+:caption: extending/user_container.py
+:pyobject: WaitForObjectStoreFile
 ```
 
 #### Config objects
@@ -122,43 +65,24 @@ In this example, we are creating a named class plugin, and hence, this construct
 
 Refer to the [spark plugin](https://github.com/flyteorg/flytekit/tree/master/plugins/flytekit-spark) for an example of a config object.
 
-+++
 
 ### Actual usage
 
-```{code-cell}
-sensor = WaitForObjectStoreFile(
-    name="my-objectstore-sensor",
-    metadata=TaskMetadata(retries=10, timeout=timedelta(minutes=20)),
-    poll_interval=timedelta(seconds=1),
-)
-
-
-@task
-def print_file(path: str) -> str:
-    print(path)
-    return path
-
-
-@workflow
-def my_workflow(path: str) -> str:
-    return print_file(path=sensor(path=path))
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/extending/extending/user_container.py
+:caption: extending/user_container.py
+:lines: 54-69
 ```
-
-+++ {"lines_to_next_cell": 0}
 
 And of course, you can run the workflow locally using your own new shiny plugin!
 
-```{code-cell}
-if __name__ == "__main__":
-    f = "/tmp/some-file"
-    with open(f, "w") as w:
-        w.write("Hello World!")
-
-    print(my_workflow(path=f))
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/extending/extending/user_container.py
+:caption: extending/user_container.py
+:lines: 73-78
 ```
 
 The key takeaways of a user container task plugin are:
 
 - The task object that gets serialized at compile-time is recreated using the user's code at run time.
 - At platform-run-time, the user-decorated function is executed.
+
+[flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/extending/

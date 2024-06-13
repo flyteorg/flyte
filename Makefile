@@ -11,6 +11,7 @@ GIT_HASH := $(shell git rev-parse --short HEAD)
 TIMESTAMP := $(shell date '+%Y-%m-%d')
 PACKAGE ?=github.com/flyteorg/flytestdlib
 LD_FLAGS="-s -w -X $(PACKAGE)/version.Version=$(GIT_VERSION) -X $(PACKAGE)/version.Build=$(GIT_HASH) -X $(PACKAGE)/version.BuildTime=$(TIMESTAMP)"
+TMP_BUILD_DIR := .tmp_build
 
 .PHONY: cmd/single/dist
 cmd/single/dist: export FLYTECONSOLE_VERSION ?= latest
@@ -43,7 +44,7 @@ release_automation:
 	$(MAKE) -C docker/sandbox-bundled manifests
 
 .PHONY: deploy_sandbox
-deploy_sandbox: 
+deploy_sandbox:
 	bash script/deploy.sh
 
 .PHONY: install-piptools
@@ -82,9 +83,29 @@ helm_install: ## Install helm charts
 helm_upgrade: ## Upgrade helm charts
 	helm upgrade flyte --debug ./charts/flyte -f ./charts/flyte/values.yaml --create-namespace --namespace=flyte
 
+# Used in CI
 .PHONY: docs
 docs:
 	make -C docs clean html SPHINXOPTS=-W
+
+$(TMP_BUILD_DIR):
+	mkdir $@
+
+$(TMP_BUILD_DIR)/conda-lock-image: docs/Dockerfile.conda-lock | $(TMP_BUILD_DIR)
+	docker buildx build --load --platform=linux/amd64 --build-arg USER_UID=$$(id -u) --build-arg USER_GID=$$(id -g) -t flyte-conda-lock:latest -f docs/Dockerfile.conda-lock .
+	touch $(TMP_BUILD_DIR)/conda-lock-image
+
+monodocs-environment.lock.yaml: monodocs-environment.yaml $(TMP_BUILD_DIR)/conda-lock-image
+	docker run --platform=linux/amd64 --rm --pull never -v ./:/flyte flyte-conda-lock:latest lock --file monodocs-environment.yaml --lockfile monodocs-environment.lock.yaml
+
+$(TMP_BUILD_DIR)/dev-docs-image: docs/Dockerfile.docs monodocs-environment.lock.yaml | $(TMP_BUILD_DIR)
+	docker buildx build --load --platform=linux/amd64 --build-arg USER_UID=$$(id -u) --build-arg USER_GID=$$(id -g) -t flyte-dev-docs:latest -f docs/Dockerfile.docs .
+	touch $(TMP_BUILD_DIR)/dev-docs-image
+
+# Build docs in docker container for local development
+.PHONY: dev-docs
+dev-docs: $(TMP_BUILD_DIR)/dev-docs-image
+	bash script/local_build_docs.sh
 
 .PHONY: help
 help: SHELL := /bin/sh
@@ -120,6 +141,10 @@ lint-helm-charts:
 	# This pressuposes that you have act installed
 	act pull_request -W .github/workflows/validate-helm-charts.yaml --container-architecture linux/amd64 -e charts/event.json
 
+.PHONY: spellcheck
+spellcheck:
+	act pull_request --container-architecture linux/amd64 -W .github/workflows/codespell.yml
+
 .PHONY: clean
-clean: ## Remove the HTML files related to the Flyteconsole.
-	rm -rf cmd/single/dist
+clean: ## Remove the HTML files related to the Flyteconsole and Makefile
+	rm -rf cmd/single/dist .tmp_build

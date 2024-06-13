@@ -1,6 +1,13 @@
 <!doctype html>
 <html class="no-js"{% if language is not none %} lang="{{ language }}"{% endif %}>
   <head>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-WC8V9XS');</script>
+    <!-- End Google Tag Manager -->
     {%- block site_meta -%}
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
@@ -98,8 +105,19 @@
         }
       });
     </script>
+    <!-- RunLLM Configuration -->
+    <script defer id="runllm-widget-script" type="module" src='https://cdn.jsdelivr.net/npm/@runllm/search-widget@stable/dist/run-llm-search-widget.es.js'
+      runllm-server-address="https://api.runllm.com" runllm-assistant-id="60" runllm-position="BOTTOM_RIGHT"
+      runllm-keyboard-shortcut="Mod+j"
+      version="stable"
+      runllm-slack-community-url="https://flyte-org.slack.com/join/shared_invite/zt-2eq2fgs5f-UGUWnMYVB9agervilmlyaw#/shared-invite/email"
+      runllm-name="RunLLM" />
   </head>
   <body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WC8V9XS"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
     {% block body %}
     <script>
       document.body.dataset.theme = localStorage.getItem("theme") || "auto";
