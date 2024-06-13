@@ -37,7 +37,7 @@ func TestGetExecutionEnvVars(t *testing.T) {
 			"scheme://host/path",
 			&v12.EnvVar{
 				Name:  "FLYTE_EXECUTION_URL",
-				Value: "scheme://host/path/projects/proj/domains/domain/executions/name/nodeId/unique-node-id-1/nodes",
+				Value: "scheme://host/path/projects/proj/domains/domain/executions/name/nodeId/unique-node-id/nodes",
 			},
 		},
 	}
