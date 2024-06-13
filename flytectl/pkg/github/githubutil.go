@@ -27,14 +27,13 @@ const (
 	flyte                   = "flyte"
 	flytectl                = "flytectl"
 	sandboxSupportedVersion = "v0.10.0"
-	// TODO - change this to the monorepo name after we have a successful release
-	flytectlRepository   = "github.com/flyteorg/flytectl"
-	commonMessage        = "\n A new release of flytectl is available: %s → %s \n"
-	brewMessage          = "To upgrade, run: brew update && brew upgrade flytectl \n"
-	linuxMessage         = "To upgrade, run: flytectl upgrade \n"
-	darwinMessage        = "To upgrade, run: flytectl upgrade \n"
-	releaseURL           = "https://github.com/flyteorg/flyte/flytectl/releases/tag/%s \n"
-	brewInstallDirectory = "/Cellar/flytectl"
+	flytectlRepository      = "github.com/flyteorg/flyte"
+	commonMessage           = "\n A new release of flytectl is available: %s → %s \n"
+	brewMessage             = "To upgrade, run: brew update && brew upgrade flytectl \n"
+	linuxMessage            = "To upgrade, run: flytectl upgrade \n"
+	darwinMessage           = "To upgrade, run: flytectl upgrade \n"
+	releaseURL              = "https://github.com/flyteorg/flyte/releases/tag/%s \n"
+	brewInstallDirectory    = "/Cellar/flytectl"
 )
 
 var Client GHRepoService
@@ -73,14 +72,20 @@ func GetLatestRelease(repoName string, g GHRepoService) (*github.RepositoryRelea
 }
 
 // ListReleases returns the list of release of provided repoName
-func ListReleases(repoName string, g GHRepoService) ([]*github.RepositoryRelease, error) {
+func ListReleases(repoName string, g GHRepoService, filterPrefix string) ([]*github.RepositoryRelease, error) {
 	releases, _, err := g.ListReleases(context.Background(), owner, repoName, &github.ListOptions{
 		PerPage: 100,
 	})
 	if err != nil {
 		return nil, err
 	}
-	return releases, err
+	var filteredReleases []*github.RepositoryRelease
+	for _, release := range releases {
+		if !strings.HasPrefix(release.GetTagName(), filterPrefix) {
+			filteredReleases = append(filteredReleases, release)
+		}
+	}
+	return filteredReleases, err
 }
 
 // GetReleaseByTag returns the provided tag release if tag exist in repository
@@ -119,7 +124,8 @@ func GetAssetFromRelease(tag, assetName, repoName string, g GHRepoService) (*git
 func GetSandboxImageSha(tag string, pre bool, g GHRepoService) (string, string, error) {
 	var release *github.RepositoryRelease
 	if len(tag) == 0 {
-		releases, err := ListReleases(flyte, g)
+		// Only fetch Flyte releases
+		releases, err := ListReleases(flyte, g, "flytectl/")
 		if err != nil {
 			return "", release.GetTagName(), err
 		}
@@ -232,7 +238,7 @@ func GetGHRepoService() GHRepoService {
 			gh = github.NewClient(oauth2.NewClient(context.Background(), oauth2.StaticTokenSource(
 				&oauth2.Token{AccessToken: os.Getenv("GITHUB_TOKEN")},
 			)))
-			if _, err := ListReleases(flyte, gh.Repositories); err != nil {
+			if _, err := ListReleases(flyte, gh.Repositories, ""); err != nil {
 				logger.Warnf(context.Background(), "Found GITHUB_TOKEN but failed to fetch releases. Using empty http.Client: %s.", err)
 				gh = nil
 			}

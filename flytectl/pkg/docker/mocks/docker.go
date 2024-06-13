@@ -7,8 +7,6 @@ import (
 
 	container "github.com/docker/docker/api/types/container"
 
-	filters "github.com/docker/docker/api/types/filters"
-
 	io "io"
 
 	mock "github.com/stretchr/testify/mock"
@@ -31,7 +29,7 @@ type Docker_ContainerCreate struct {
 	*mock.Call
 }
 
-func (_m Docker_ContainerCreate) Return(_a0 container.ContainerCreateCreatedBody, _a1 error) *Docker_ContainerCreate {
+func (_m Docker_ContainerCreate) Return(_a0 container.CreateResponse, _a1 error) *Docker_ContainerCreate {
 	return &Docker_ContainerCreate{Call: _m.Call.Return(_a0, _a1)}
 }
 
@@ -46,14 +44,14 @@ func (_m *Docker) OnContainerCreateMatch(matchers ...interface{}) *Docker_Contai
 }
 
 // ContainerCreate provides a mock function with given fields: ctx, config, hostConfig, networkingConfig, platform, containerName
-func (_m *Docker) ContainerCreate(ctx context.Context, config *container.Config, hostConfig *container.HostConfig, networkingConfig *network.NetworkingConfig, platform *v1.Platform, containerName string) (container.ContainerCreateCreatedBody, error) {
+func (_m *Docker) ContainerCreate(ctx context.Context, config *container.Config, hostConfig *container.HostConfig, networkingConfig *network.NetworkingConfig, platform *v1.Platform, containerName string) (container.CreateResponse, error) {
 	ret := _m.Called(ctx, config, hostConfig, networkingConfig, platform, containerName)
 
-	var r0 container.ContainerCreateCreatedBody
-	if rf, ok := ret.Get(0).(func(context.Context, *container.Config, *container.HostConfig, *network.NetworkingConfig, *v1.Platform, string) container.ContainerCreateCreatedBody); ok {
+	var r0 container.CreateResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *container.Config, *container.HostConfig, *network.NetworkingConfig, *v1.Platform, string) container.CreateResponse); ok {
 		r0 = rf(ctx, config, hostConfig, networkingConfig, platform, containerName)
 	} else {
-		r0 = ret.Get(0).(container.ContainerCreateCreatedBody)
+		r0 = ret.Get(0).(container.CreateResponse)
 	}
 
 	var r1 error
@@ -372,12 +370,12 @@ type Docker_ContainerWait struct {
 	*mock.Call
 }
 
-func (_m Docker_ContainerWait) Return(_a0 <-chan container.ContainerWaitOKBody, _a1 <-chan error) *Docker_ContainerWait {
+func (_m Docker_ContainerWait) Return(_a0 <-chan container.WaitResponse, _a1 <-chan error) *Docker_ContainerWait {
 	return &Docker_ContainerWait{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *Docker) OnContainerWait(ctx context.Context, containerID string, condition container.WaitCondition) *Docker_ContainerWait {
-	c_call := _m.On("ContainerWait", ctx, containerID, condition)
+func (_m *Docker) OnContainerWait(ctx context.Context, _a1 string, condition container.WaitCondition) *Docker_ContainerWait {
+	c_call := _m.On("ContainerWait", ctx, _a1, condition)
 	return &Docker_ContainerWait{Call: c_call}
 }
 
@@ -386,22 +384,22 @@ func (_m *Docker) OnContainerWaitMatch(matchers ...interface{}) *Docker_Containe
 	return &Docker_ContainerWait{Call: c_call}
 }
 
-// ContainerWait provides a mock function with given fields: ctx, containerID, condition
-func (_m *Docker) ContainerWait(ctx context.Context, containerID string, condition container.WaitCondition) (<-chan container.ContainerWaitOKBody, <-chan error) {
-	ret := _m.Called(ctx, containerID, condition)
+// ContainerWait provides a mock function with given fields: ctx, _a1, condition
+func (_m *Docker) ContainerWait(ctx context.Context, _a1 string, condition container.WaitCondition) (<-chan container.WaitResponse, <-chan error) {
+	ret := _m.Called(ctx, _a1, condition)
 
-	var r0 <-chan container.ContainerWaitOKBody
-	if rf, ok := ret.Get(0).(func(context.Context, string, container.WaitCondition) <-chan container.ContainerWaitOKBody); ok {
-		r0 = rf(ctx, containerID, condition)
+	var r0 <-chan container.WaitResponse
+	if rf, ok := ret.Get(0).(func(context.Context, string, container.WaitCondition) <-chan container.WaitResponse); ok {
+		r0 = rf(ctx, _a1, condition)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(<-chan container.ContainerWaitOKBody)
+			r0 = ret.Get(0).(<-chan container.WaitResponse)
 		}
 	}
 
 	var r1 <-chan error
 	if rf, ok := ret.Get(1).(func(context.Context, string, container.WaitCondition) <-chan error); ok {
-		r1 = rf(ctx, containerID, condition)
+		r1 = rf(ctx, _a1, condition)
 	} else {
 		if ret.Get(1) != nil {
 			r1 = ret.Get(1).(<-chan error)
@@ -545,11 +543,11 @@ type Docker_VolumeCreate struct {
 	*mock.Call
 }
 
-func (_m Docker_VolumeCreate) Return(_a0 types.Volume, _a1 error) *Docker_VolumeCreate {
+func (_m Docker_VolumeCreate) Return(_a0 volume.Volume, _a1 error) *Docker_VolumeCreate {
 	return &Docker_VolumeCreate{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *Docker) OnVolumeCreate(ctx context.Context, options volume.VolumeCreateBody) *Docker_VolumeCreate {
+func (_m *Docker) OnVolumeCreate(ctx context.Context, options volume.CreateOptions) *Docker_VolumeCreate {
 	c_call := _m.On("VolumeCreate", ctx, options)
 	return &Docker_VolumeCreate{Call: c_call}
 }
@@ -560,18 +558,18 @@ func (_m *Docker) OnVolumeCreateMatch(matchers ...interface{}) *Docker_VolumeCre
 }
 
 // VolumeCreate provides a mock function with given fields: ctx, options
-func (_m *Docker) VolumeCreate(ctx context.Context, options volume.VolumeCreateBody) (types.Volume, error) {
+func (_m *Docker) VolumeCreate(ctx context.Context, options volume.CreateOptions) (volume.Volume, error) {
 	ret := _m.Called(ctx, options)
 
-	var r0 types.Volume
-	if rf, ok := ret.Get(0).(func(context.Context, volume.VolumeCreateBody) types.Volume); ok {
+	var r0 volume.Volume
+	if rf, ok := ret.Get(0).(func(context.Context, volume.CreateOptions) volume.Volume); ok {
 		r0 = rf(ctx, options)
 	} else {
-		r0 = ret.Get(0).(types.Volume)
+		r0 = ret.Get(0).(volume.Volume)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, volume.VolumeCreateBody) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, volume.CreateOptions) error); ok {
 		r1 = rf(ctx, options)
 	} else {
 		r1 = ret.Error(1)
@@ -584,12 +582,12 @@ type Docker_VolumeList struct {
 	*mock.Call
 }
 
-func (_m Docker_VolumeList) Return(_a0 volume.VolumeListOKBody, _a1 error) *Docker_VolumeList {
+func (_m Docker_VolumeList) Return(_a0 volume.ListResponse, _a1 error) *Docker_VolumeList {
 	return &Docker_VolumeList{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *Docker) OnVolumeList(ctx context.Context, filter filters.Args) *Docker_VolumeList {
-	c_call := _m.On("VolumeList", ctx, filter)
+func (_m *Docker) OnVolumeList(ctx context.Context, options volume.ListOptions) *Docker_VolumeList {
+	c_call := _m.On("VolumeList", ctx, options)
 	return &Docker_VolumeList{Call: c_call}
 }
 
@@ -598,20 +596,20 @@ func (_m *Docker) OnVolumeListMatch(matchers ...interface{}) *Docker_VolumeList 
 	return &Docker_VolumeList{Call: c_call}
 }
 
-// VolumeList provides a mock function with given fields: ctx, filter
-func (_m *Docker) VolumeList(ctx context.Context, filter filters.Args) (volume.VolumeListOKBody, error) {
-	ret := _m.Called(ctx, filter)
+// VolumeList provides a mock function with given fields: ctx, options
+func (_m *Docker) VolumeList(ctx context.Context, options volume.ListOptions) (volume.ListResponse, error) {
+	ret := _m.Called(ctx, options)
 
-	var r0 volume.VolumeListOKBody
-	if rf, ok := ret.Get(0).(func(context.Context, filters.Args) volume.VolumeListOKBody); ok {
-		r0 = rf(ctx, filter)
+	var r0 volume.ListResponse
+	if rf, ok := ret.Get(0).(func(context.Context, volume.ListOptions) volume.ListResponse); ok {
+		r0 = rf(ctx, options)
 	} else {
-		r0 = ret.Get(0).(volume.VolumeListOKBody)
+		r0 = ret.Get(0).(volume.ListResponse)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, filters.Args) error); ok {
-		r1 = rf(ctx, filter)
+	if rf, ok := ret.Get(1).(func(context.Context, volume.ListOptions) error); ok {
+		r1 = rf(ctx, options)
 	} else {
 		r1 = ret.Error(1)
 	}

@@ -449,24 +449,60 @@ func TestGetHTTPRequestCookieToMetadataHandler_CustomHeader(t *testing.T) {
 
 func TestGetOIdCMetadataEndpointRedirectHandler(t *testing.T) {
 	ctx := context.Background()
-	metadataPath := mustParseURL(t, OIdCMetadataEndpoint)
-	mockAuthCtx := mocks.AuthenticationContext{}
-	mockAuthCtx.OnOptions().Return(&config.Config{
-		UserAuth: config.UserAuthConfig{
-			OpenID: config.OpenIDOptions{
-				BaseURL: stdConfig.URL{URL: mustParseURL(t, "http://www.google.com")},
-			},
+	type test struct {
+		name                     string
+		baseURL                  string
+		metadataPath             string
+		expectedRedirectLocation string
+	}
+	tests := []test{
+		{
+			name:                     "base_url_without_path",
+			baseURL:                  "http://www.google.com",
+			metadataPath:             OIdCMetadataEndpoint,
+			expectedRedirectLocation: "http://www.google.com/.well-known/openid-configuration",
 		},
-	})
+		{
+			name:                     "base_url_with_path",
+			baseURL:                  "https://login.microsoftonline.com/abc/v2.0",
+			metadataPath:             OIdCMetadataEndpoint,
+			expectedRedirectLocation: "https://login.microsoftonline.com/abc/v2.0/.well-known/openid-configuration",
+		},
+		{
+			name:                     "base_url_with_trailing_slash_path",
+			baseURL:                  "https://login.microsoftonline.com/abc/v2.0/",
+			metadataPath:             OIdCMetadataEndpoint,
+			expectedRedirectLocation: "https://login.microsoftonline.com/abc/v2.0/.well-known/openid-configuration",
+		},
+		{
+			name:                     "absolute_metadata_path",
+			baseURL:                  "https://login.microsoftonline.com/abc/v2.0/",
+			metadataPath:             "/.well-known/openid-configuration",
+			expectedRedirectLocation: "https://login.microsoftonline.com/.well-known/openid-configuration",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			metadataPath := mustParseURL(t, tt.metadataPath)
+			mockAuthCtx := mocks.AuthenticationContext{}
+			mockAuthCtx.OnOptions().Return(&config.Config{
+				UserAuth: config.UserAuthConfig{
+					OpenID: config.OpenIDOptions{
+						BaseURL: stdConfig.URL{URL: mustParseURL(t, tt.baseURL)},
+					},
+				},
+			})
 
-	mockAuthCtx.OnGetOIdCMetadataURL().Return(&metadataPath)
-	handler := GetOIdCMetadataEndpointRedirectHandler(ctx, &mockAuthCtx)
-	req, err := http.NewRequest("GET", "/xyz", nil)
-	assert.NoError(t, err)
-	w := httptest.NewRecorder()
-	handler(w, req)
-	assert.Equal(t, http.StatusSeeOther, w.Code)
-	assert.Equal(t, "http://www.google.com/.well-known/openid-configuration", w.Header()["Location"][0])
+			mockAuthCtx.OnGetOIdCMetadataURL().Return(&metadataPath)
+			handler := GetOIdCMetadataEndpointRedirectHandler(ctx, &mockAuthCtx)
+			req, err := http.NewRequest("GET", "/xyz", nil)
+			assert.NoError(t, err)
+			w := httptest.NewRecorder()
+			handler(w, req)
+			assert.Equal(t, http.StatusSeeOther, w.Code)
+			assert.Equal(t, tt.expectedRedirectLocation, w.Header()["Location"][0])
+		})
+	}
 }
 
 func TestUserInfoForwardResponseHander(t *testing.T) {

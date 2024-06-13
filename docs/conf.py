@@ -36,7 +36,7 @@ author = "Flyte"
 # The short X.Y version
 version = ""
 # The full version, including alpha/beta/rc tags
-release = "1.12.0"
+release = "1.12.1-rc0"
 
 # -- General configuration ---------------------------------------------------
 
@@ -105,6 +105,8 @@ redirects = {
     "flytesnacks/examples/mmcloud_plugin/mmcloud_plugin_example": "../../../deprecated_integrations/mmcloud_plugin/mmcloud_plugin_example.html",
     "flytesnacks/examples/snowflake_plugin/index": "../../../deprecated_integrations/snowflake_plugin/index.html",
     "flytesnacks/examples/snowflake_plugin/snowflake_plugin_example": "../../../deprecated_integrations/snowflake_plugin/snowflake_plugin_example.html",
+    "deprecated_integrations/mmcloud_plugin/index": "../../flytesnacks/examples/mmcloud_agent/index.html",
+    "deprecated_integrations/mmcloud_plugin/mmcloud_plugin_example": "../../flytesnacks/examples/mmcloud_agent/index.html"
 }
 
 
@@ -364,7 +366,6 @@ import_projects_config = {
 # is useful for building the docs in the CI/CD of the corresponding repos.
 flytesnacks_local_path = os.environ.get("FLYTESNACKS_LOCAL_PATH", None)
 flytekit_local_path = os.environ.get("FLYTEKIT_LOCAL_PATH", None)
-flytectl_local_path = os.environ.get("FLYTECTL_LOCAL_PATH", None)
 
 flytesnacks_path = flytesnacks_local_path or "_projects/flytesnacks"
 flytekit_path = flytekit_local_path or "_projects/api/flytekit"
@@ -417,10 +418,10 @@ import_projects = [
     },
     {
         "name": "flytectl",
-        "source": flytectl_local_path or "https://github.com/flyteorg/flytectl",
+        "source": "../flytectl",
         "docs_path": "docs/source",
         "dest": "flytectl",
-        "local": flytectl_local_path is not None,
+        "local": True,
     },
     {
         "name": "flyteidl",

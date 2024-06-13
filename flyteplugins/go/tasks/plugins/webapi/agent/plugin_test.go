@@ -60,15 +60,15 @@ func TestPlugin(t *testing.T) {
 
 	t.Run("test getFinalAgent", func(t *testing.T) {
 		agent := &Agent{AgentDeployment: &Deployment{Endpoint: "localhost:80"}}
-		agentRegistry := Registry{"spark": {defaultTaskTypeVersion: agent}}
+		agentRegistry = Registry{"spark": {defaultTaskTypeVersion: agent}}
 		spark := &admin.TaskCategory{Name: "spark", Version: defaultTaskTypeVersion}
 		foo := &admin.TaskCategory{Name: "foo", Version: defaultTaskTypeVersion}
 		bar := &admin.TaskCategory{Name: "bar", Version: defaultTaskTypeVersion}
-		agentDeployment, _ := getFinalAgent(spark, &cfg, agentRegistry)
+		agentDeployment, _ := getFinalAgent(spark, &cfg)
 		assert.Equal(t, agentDeployment.Endpoint, "localhost:80")
-		agentDeployment, _ = getFinalAgent(foo, &cfg, agentRegistry)
+		agentDeployment, _ = getFinalAgent(foo, &cfg)
 		assert.Equal(t, agentDeployment.Endpoint, cfg.DefaultAgent.Endpoint)
-		agentDeployment, _ = getFinalAgent(bar, &cfg, agentRegistry)
+		agentDeployment, _ = getFinalAgent(bar, &cfg)
 		assert.Equal(t, agentDeployment.Endpoint, cfg.DefaultAgent.Endpoint)
 	})
 
@@ -318,11 +318,10 @@ func TestInitializeAgentRegistry(t *testing.T) {
 	cfg.AgentForTaskTypes = map[string]string{"task1": "agent-deployment-1", "task2": "agent-deployment-2"}
 	err := SetConfig(&cfg)
 	assert.NoError(t, err)
-	agentRegistry, err := initializeAgentRegistry(cs)
-	assert.NoError(t, err)
+	updateAgentRegistry(context.Background(), cs)
 
 	// In golang, the order of keys in a map is random. So, we sort the keys before asserting.
-	agentRegistryKeys := maps.Keys(agentRegistry)
+	agentRegistryKeys := maps.Keys(getAgentRegistry())
 	sort.Strings(agentRegistryKeys)
 
 	assert.Equal(t, agentRegistryKeys, []string{"task1", "task2", "task3"})

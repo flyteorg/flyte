@@ -103,19 +103,19 @@ helm upgrade -f values.yaml flyte .
 | postgres.service | object | `{"annotations":{},"type":"NodePort"}` | Service settings for Postgres |
 | postgres.tolerations | list | `[]` | tolerations for Postgres deployment |
 | redis.enabled | bool | `false` | - enable or disable Redis Statefulset installation |
-| redoc.affinity | object | `{}` | affinity for Minio deployment |
-| redoc.enabled | bool | `false` | - enable or disable Minio deployment installation |
+| redoc.affinity | object | `{}` | affinity for redoc deployment |
+| redoc.enabled | bool | `false` | - enable or disable redoc deployment installation |
 | redoc.image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
-| redoc.image.repository | string | `"docker.io/redocly/redoc"` | Docker image for Minio deployment |
+| redoc.image.repository | string | `"docker.io/redocly/redoc"` | Docker image for redoc deployment |
 | redoc.image.tag | string | `"latest"` | Docker image tag |
-| redoc.nodeSelector | object | `{}` | nodeSelector for Minio deployment |
-| redoc.podAnnotations | object | `{}` | Annotations for Minio pods |
-| redoc.replicaCount | int | `1` | Replicas count for Minio deployment |
-| redoc.resources | object | `{"limits":{"cpu":"200m","memory":"512Mi"},"requests":{"cpu":"10m","memory":"128Mi"}}` | Default resources requests and limits for Minio deployment |
+| redoc.nodeSelector | object | `{}` | nodeSelector for redoc deployment |
+| redoc.podAnnotations | object | `{}` | Annotations for redoc pods |
+| redoc.replicaCount | int | `1` | Replicas count for redoc deployment |
+| redoc.resources | object | `{"limits":{"cpu":"200m","memory":"512Mi"},"requests":{"cpu":"10m","memory":"128Mi"}}` | Default resources requests and limits for redoc deployment |
 | redoc.resources.limits | object | `{"cpu":"200m","memory":"512Mi"}` | Limits are the maximum set of resources needed for this pod |
 | redoc.resources.requests | object | `{"cpu":"10m","memory":"128Mi"}` | Requests are the minimum set of resources needed for this pod |
-| redoc.service | object | `{"type":"ClusterIP"}` | Service settings for Minio |
-| redoc.tolerations | list | `[]` | tolerations for Minio deployment |
+| redoc.service | object | `{"type":"ClusterIP"}` | Service settings for redoc |
+| redoc.tolerations | list | `[]` | tolerations for redoc deployment |
 | sparkoperator | object | `{"enabled":false}` | Optional: Spark Plugin using the Spark Operator |
 | sparkoperator.enabled | bool | `false` | - enable or disable Sparkoperator deployment installation |
 | webhook.enabled | bool | `true` |  |

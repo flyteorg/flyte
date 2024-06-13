@@ -1222,6 +1222,61 @@ var ContinuedMigrations = []*gormigrate.Migration{
 			return tx.Table("launch_plans").Migrator().DropColumn(&models.LaunchPlan{}, "launch_condition_type")
 		},
 	},
+
+	{
+		ID: "2024-06-06-execution-tags",
+		Migrate: func(tx *gorm.DB) error {
+			type ExecutionKey struct {
+				Project string `gorm:"primary_key;column:execution_project;size:255"`
+				Domain  string `gorm:"primary_key;column:execution_domain;size:255"`
+				Name    string `gorm:"primary_key;column:execution_name;size:255"`
+			}
+
+			type ExecutionTag struct {
+				ID        uint       `gorm:"index;autoIncrement;not null"`
+				CreatedAt time.Time  `gorm:"type:time"`
+				UpdatedAt time.Time  `gorm:"type:time"`
+				DeletedAt *time.Time `gorm:"index"`
+				ExecutionKey
+				Key   string `gorm:"primary_key;index:tag_key;size:255"`
+				Value string `gorm:"primary_key;index:tag_value;size:255"`
+			}
+
+			return tx.Transaction(func(_ *gorm.DB) error {
+				// Create an execution_tags Table
+				if err := tx.AutoMigrate(&ExecutionTag{}); err != nil {
+					return err
+				}
+				// Drop execution_admin_tags and admin_tags tables, and create a new table execution_tags
+				// to store tags associated with executions.
+				sql := "INSERT INTO execution_tags (execution_project, execution_domain, execution_name, created_at, updated_at, deleted_at, key, value)" +
+					" SELECT execution_project, execution_domain, execution_name, created_at, updated_at, deleted_at, name as key, null as value" +
+					" FROM execution_admin_tags" +
+					" INNER JOIN admin_tags a on execution_admin_tags.admin_tag_id = a.id;"
+				if err := tx.Exec(sql).Error; err != nil {
+					return err
+				}
+				return nil
+			})
+		},
+		Rollback: func(tx *gorm.DB) error {
+			return tx.Migrator().DropTable("execution_tags")
+		},
+	},
+
+	{
+		ID: "2024-06-06-drop-execution_admin-tags",
+		Migrate: func(tx *gorm.DB) error {
+			return tx.Migrator().DropTable("execution_admin_tags")
+		},
+	},
+
+	{
+		ID: "2024-06-06-drop-admin-tags",
+		Migrate: func(tx *gorm.DB) error {
+			return tx.Migrator().DropTable("admin_tags")
+		},
+	},
 }
 
 var m = append(LegacyMigrations, NoopMigrations...)
