@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -12,6 +13,10 @@ import (
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
+)
+
+const (
+	flyteExecutionURL = "FLYTE_EXECUTION_URL"
 )
 
 func GetContextEnvVars(ownerCtx context.Context) []v1.EnvVar {
@@ -70,10 +75,10 @@ func GetExecutionEnvVars(id pluginsCore.TaskExecutionID, consoleURL string) []v1
 		// },
 	}
 
-	if consoleURL != "" {
+	if len(consoleURL) > 0 {
+		consoleURL = strings.TrimRight(consoleURL, "/")
 		envVars = append(envVars, v1.EnvVar{
-			Name: "FLYTE_EXECUTION_URL",
-			// TODO: should we use net/url to build this url?
+			Name:  flyteExecutionURL,
 			Value: fmt.Sprintf("%s/projects/%s/domains/%s/executions/%s/nodeId/%s/nodes", consoleURL, nodeExecutionID.Project, nodeExecutionID.Domain, nodeExecutionID.Name, id.GetUniqueNodeID()),
 		})
 	}

@@ -2149,7 +2149,7 @@ func TestAddFlyteCustomizationsToContainer_SetConsoleUrl(t *testing.T) {
 			includeConsoleURL: true,
 			consoleURL:        "gopher://flyte:65535/console",
 			expectedEnvVar: &v1.EnvVar{
-				Name:  "FLYTE_EXECUTION_URL",
+				Name:  flyteExecutionURL,
 				Value: "gopher://flyte:65535/console/projects/p2/domains/d2/executions/n2/nodeId/unique_node_id/nodes",
 			},
 		},

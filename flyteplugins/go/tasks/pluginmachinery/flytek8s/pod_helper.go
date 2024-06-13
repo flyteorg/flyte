@@ -316,7 +316,7 @@ func BuildRawPod(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v
 	return podSpec, &objectMeta, primaryContainerName, nil
 }
 
-func shouldIncludeConsoleURL(taskTemplate *core.TaskTemplate) bool {
+func hasExternalLinkType(taskTemplate *core.TaskTemplate) bool {
 	if taskTemplate == nil {
 		return false
 	}
@@ -345,7 +345,7 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 		OutputPath:        tCtx.OutputWriter(),
 		Task:              tCtx.TaskReader(),
 		TaskExecMetadata:  tCtx.TaskExecutionMetadata(),
-		IncludeConsoleURL: shouldIncludeConsoleURL(taskTemplate),
+		IncludeConsoleURL: hasExternalLinkType(taskTemplate),
 	}
 
 	resourceRequests := make([]v1.ResourceRequirements, 0, len(podSpec.Containers))

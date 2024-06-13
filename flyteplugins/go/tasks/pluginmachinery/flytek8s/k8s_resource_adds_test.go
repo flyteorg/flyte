@@ -40,6 +40,24 @@ func TestGetExecutionEnvVars(t *testing.T) {
 				Value: "scheme://host/path/projects/proj/domains/domain/executions/name/nodeId/unique-node-id/nodes",
 			},
 		},
+		{
+			"with-console-url-ending-in-single-slash",
+			13,
+			"scheme://host/path/",
+			&v12.EnvVar{
+				Name:  "FLYTE_EXECUTION_URL",
+				Value: "scheme://host/path/projects/proj/domains/domain/executions/name/nodeId/unique-node-id/nodes",
+			},
+		},
+		{
+			"with-console-url-ending-in-multiple-slashes",
+			13,
+			"scheme://host/path////",
+			&v12.EnvVar{
+				Name:  "FLYTE_EXECUTION_URL",
+				Value: "scheme://host/path/projects/proj/domains/domain/executions/name/nodeId/unique-node-id/nodes",
+			},
+		},
 	}
 	for _, tt := range tests {
 		envVars := GetExecutionEnvVars(mock, tt.consoleURL)

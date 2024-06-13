@@ -105,7 +105,7 @@ type ApplicationConfig struct {
 	FeatureGates FeatureGates `json:"featureGates" pflag:",Enable experimental features."`
 
 	// A URL pointing to the flyteconsole instance used to hit this flyteadmin instance.
-	ConsoleURL string `json:"consoleUrl,omitempty"`
+	ConsoleURL string `json:"consoleUrl,omitempty" pflag:",A URL pointing to the flyteconsole instance used to hit this flyteadmin instance."`
 }
 
 func (a *ApplicationConfig) GetRoleNameKey() string {
