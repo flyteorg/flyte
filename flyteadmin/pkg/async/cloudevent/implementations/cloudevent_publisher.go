@@ -206,10 +206,10 @@ func getNodeExecutionContext(ctx context.Context, identifier *core.NodeExecution
 
 // This is a rough copy of the ListTaskExecutions function in TaskExecutionManager. It can be deprecated once we move the processing out of Admin itself.
 // Just return the highest retry attempt.
-func (c *CloudEventWrappedPublisher) getLatestTaskExecutions(ctx context.Context, nodeExecutionID core.NodeExecutionIdentifier) (*admin.TaskExecution, error) {
-	ctx = getNodeExecutionContext(ctx, &nodeExecutionID)
+func (c *CloudEventWrappedPublisher) getLatestTaskExecutions(ctx context.Context, nodeExecutionID *core.NodeExecutionIdentifier) (*admin.TaskExecution, error) {
+	ctx = getNodeExecutionContext(ctx, nodeExecutionID)
 
-	identifierFilters, err := util.GetNodeExecutionIdentifierFilters(ctx, nodeExecutionID)
+	identifierFilters, err := util.GetNodeExecutionIdentifierFilters(ctx, *nodeExecutionID)
 	if err != nil {
 		return nil, err
 	}
@@ -251,17 +251,27 @@ func (c *CloudEventWrappedPublisher) TransformNodeExecutionEvent(ctx context.Con
 		return nil, fmt.Errorf("nothing to publish, NodeExecution event or ID is nil")
 	}
 
-	// Skip nodes unless they're succeeded and not start nodes
+	// Don't bother trying to add additional information to events unless it's useful to
+	var skip = false
 	if rawEvent.Phase != core.NodeExecution_SUCCEEDED {
-		return &event.CloudEventNodeExecution{
-			RawEvent: rawEvent,
-		}, nil
-	} else if rawEvent.Id.NodeId == "start-node" {
+		// Skip non-succeeded nodes
+		logger.Debugf(ctx, "skipping non-succeeded event [%+v]", rawEvent.Id)
+		skip = true
+	} else if rawEvent.Id.NodeId == "start-node" || rawEvent.SpecNodeId == "start-node" ||
+		rawEvent.Id.NodeId == "end-node" || rawEvent.SpecNodeId == "end-node" {
+		// Skip start and end nodes
+		logger.Debugf(ctx, "skipping start/end node event [%+v]", rawEvent.Id)
+		skip = true
+	} else if rawEvent.IsInDynamicChain {
+		// Skip nodes that came from a dynamic task for now because it's a bit too tricky to get at the right task/wf definition
+		logger.Debugf(ctx, "skipping dynamic chain event [%+v]", rawEvent.Id)
+		skip = true
+	}
+	if skip {
 		return &event.CloudEventNodeExecution{
 			RawEvent: rawEvent,
 		}, nil
 	}
-	// metric
 
 	// This gets the parent workflow execution metadata
 	executionModel, err := c.db.ExecutionRepo().Get(ctx, repositoryInterfaces.Identifier{
@@ -281,15 +291,94 @@ func (c *CloudEventWrappedPublisher) TransformNodeExecutionEvent(ctx context.Con
 		fmt.Printf("there was an error with spec %v %v", err, executionModel.Spec)
 	}
 
-	// Fetch the latest task execution if any, and pull out the task interface, if applicable.
-	// These are optional fields... if the node execution doesn't have a task execution then these will be empty.
+	// Multiple cases here that this function should handle.
+
+	if rawEvent.GetTaskNodeMetadata() != nil || rawEvent.GetIsDynamic() {
+		// Existence of task node metadata implies this is a task node
+		// Fetch the latest task execution if any, and pull out the task interface, if applicable.
+		// These are optional fields... if the node execution doesn't have a task execution then these will be empty.
+		taskExecID, typedInterface, err := c.getTaskExecutionSupplemental(ctx, rawEvent.Id)
+		if err != nil {
+			logger.Errorf(ctx, "failed to get additional task information for node exec id [%+v] with err: %v", rawEvent.Id, err)
+			return &event.CloudEventNodeExecution{
+				RawEvent: rawEvent,
+			}, nil
+		}
+
+		return &event.CloudEventNodeExecution{
+			RawEvent:        rawEvent,
+			TaskExecId:      taskExecID,
+			OutputInterface: typedInterface,
+			ArtifactIds:     spec.GetMetadata().GetArtifactIds(),
+			Principal:       spec.GetMetadata().Principal,
+			LaunchPlanId:    spec.LaunchPlan,
+		}, nil
+
+	} else if rawEvent.GetIsParent() && rawEvent.GetTargetEntity() != nil &&
+		rawEvent.GetTargetEntity().ResourceType == core.ResourceType_WORKFLOW {
+		// This is a sub workflow node
+
+		typedInterface, err := c.getSubWorkflowExecutionSupplemental(ctx, rawEvent.GetTargetEntity())
+		if err != nil {
+			logger.Errorf(ctx, "failed to get additional subwf information for node exec id [%+v] with err: %v", rawEvent.Id, err)
+			return &event.CloudEventNodeExecution{
+				RawEvent: rawEvent,
+			}, nil
+		}
+
+		return &event.CloudEventNodeExecution{
+			RawEvent:        rawEvent,
+			OutputInterface: typedInterface,
+			ArtifactIds:     spec.GetMetadata().GetArtifactIds(),
+			Principal:       spec.GetMetadata().Principal,
+			LaunchPlanId:    spec.LaunchPlan,
+		}, nil
+
+	} else {
+		// Unhandled case, just return it
+		logger.Debugf(ctx, "unhandled node execution event, sending as raw [%+v]", rawEvent.Id)
+		return &event.CloudEventNodeExecution{
+			RawEvent: rawEvent,
+		}, nil
+	}
+
+}
+
+func (c *CloudEventWrappedPublisher) getSubWorkflowExecutionSupplemental(ctx context.Context, subWorkflowID *core.Identifier) (*core.TypedInterface, error) {
+	workflowModel, err := c.db.WorkflowRepo().Get(ctx, repositoryInterfaces.Identifier{
+		Project: subWorkflowID.Project,
+		Domain:  subWorkflowID.Domain,
+		Name:    subWorkflowID.Name,
+		Version: subWorkflowID.Version,
+		Org:     subWorkflowID.Org,
+	})
+	if err != nil {
+		logger.Infof(ctx, "couldn't find workflow [%+v] for cloud event processing", subWorkflowID)
+		return nil, err
+	}
+
+	var workflowInterface core.TypedInterface
+	if workflowModel.TypedInterface != nil && len(workflowModel.TypedInterface) > 0 {
+		err = proto.Unmarshal(workflowModel.TypedInterface, &workflowInterface)
+		if err != nil {
+			return nil, fmt.Errorf(
+				"artifact eventing - failed to unmarshal TypedInterface for workflow [%+v] with err: %v",
+				workflowModel.ID, err)
+		}
+	}
+	return &workflowInterface, nil
+}
+
+func (c *CloudEventWrappedPublisher) getTaskExecutionSupplemental(ctx context.Context, nodeExecutionID *core.NodeExecutionIdentifier) (
+	*core.TaskExecutionIdentifier, *core.TypedInterface, error) {
+
 	var taskExecID *core.TaskExecutionIdentifier
 	var typedInterface *core.TypedInterface
 
-	lte, err := c.getLatestTaskExecutions(ctx, *rawEvent.Id)
+	lte, err := c.getLatestTaskExecutions(ctx, nodeExecutionID)
 	if err != nil {
-		logger.Errorf(ctx, "failed to get latest task execution for node exec id [%+v] with err: %v", rawEvent.Id, err)
-		return nil, err
+		logger.Errorf(ctx, "failed to get latest task execution for node exec id [%+v] with err: %v", nodeExecutionID, err)
+		return nil, nil, err
 	}
 	if lte != nil {
 		taskModel, err := c.db.TaskRepo().Get(ctx, repositoryInterfaces.Identifier{
@@ -301,27 +390,19 @@ func (c *CloudEventWrappedPublisher) TransformNodeExecutionEvent(ctx context.Con
 		})
 		if err != nil {
 			// TODO: metric this
-			// metric
 			logger.Debugf(ctx, "Failed to get task with task id [%+v] with err %v", lte.Id.TaskId, err)
-			return nil, err
+			return nil, nil, err
 		}
 		task, err := transformers.FromTaskModel(taskModel)
 		if err != nil {
 			logger.Debugf(ctx, "Failed to transform task model with err %v", err)
-			return nil, err
+			return nil, nil, err
 		}
 		typedInterface = task.Closure.CompiledTask.Template.Interface
 		taskExecID = lte.Id
 	}
 
-	return &event.CloudEventNodeExecution{
-		RawEvent:        rawEvent,
-		TaskExecId:      taskExecID,
-		OutputInterface: typedInterface,
-		ArtifactIds:     spec.GetMetadata().GetArtifactIds(),
-		Principal:       spec.GetMetadata().Principal,
-		LaunchPlanId:    spec.LaunchPlan,
-	}, nil
+	return taskExecID, typedInterface, nil
 }
 
 func (c *CloudEventWrappedPublisher) TransformTaskExecutionEvent(ctx context.Context, rawEvent *event.TaskExecutionEvent) (*event.CloudEventTaskExecution, error) {
