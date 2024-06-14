@@ -499,7 +499,7 @@ Section: otel
 type (string)
 ------------------------------------------------------------------------------------------------------------------------
 
-Sets the type of exporter to configure [noop/file/jaeger].
+Sets the type of exporter to configure [noop/file/jaeger/otlpGrpc/otlpHttp].
 
 **Default Value**: 
 

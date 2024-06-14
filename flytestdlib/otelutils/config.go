@@ -35,7 +35,7 @@ var (
 )
 
 type Config struct {
-	ExporterType ExporterType `json:"type" pflag:",Sets the type of exporter to configure [noop/file/jaeger]."`
+	ExporterType ExporterType `json:"type" pflag:",Sets the type of exporter to configure [noop/file/jaeger/otlpGrpc/otlpHttp]."`
 	FileConfig   FileConfig   `json:"file" pflag:",Configuration for exporting telemetry traces to a file"`
 	JaegerConfig JaegerConfig `json:"jaeger" pflag:",Configuration for exporting telemetry traces to a jaeger"`
 }
