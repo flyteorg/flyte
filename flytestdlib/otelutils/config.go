@@ -18,7 +18,7 @@ const (
 	FileExporter     ExporterType = "file"
 	JaegerExporter   ExporterType = "jaeger"
 	OtlpGrpcExporter ExporterType = "otlpGrpc"
-	OtlpHttpExporter ExporterType = "otlpHttp"
+	OtlpHTTPExporter ExporterType = "otlpHttp"
 )
 
 var (

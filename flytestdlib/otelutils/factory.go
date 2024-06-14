@@ -3,18 +3,18 @@ package otelutils
 import (
 	"context"
 	"fmt"
-	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
-	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
-	"go.opentelemetry.io/otel/trace/noop"
 	"os"
 
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/jaeger"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
 	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
 	"go.opentelemetry.io/otel/sdk/resource"
 	"go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.21.0"
 	rawtrace "go.opentelemetry.io/otel/trace"
+	"go.opentelemetry.io/otel/trace/noop"
 
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/version"
@@ -80,7 +80,7 @@ func RegisterTracerProvider(ctx context.Context, serviceName string, config *Con
 			return err
 		}
 		opts = append(opts, trace.WithBatcher(exporter))
-	case OtlpHttpExporter:
+	case OtlpHTTPExporter:
 		// Pull configuration from environment variables
 		// https://opentelemetry.io/docs/languages/sdk-configuration/otlp-exporter/
 		exporter, err := otlptracehttp.New(ctx)
