@@ -31,6 +31,29 @@ func TestRegisterTracerProvider(t *testing.T) {
 
 	// validate tracerProvider is registered
 	assert.Len(t, tracerProviders, 1)
+
+	// register tracer provider with otel grpc exporter
+	fullConfig = Config{
+		ExporterType: OtlpGrpcExporter,
+	}
+
+	err = RegisterTracerProvider(ctx, serviceName, &fullConfig)
+	assert.Nil(t, err)
+
+	// validate tracerProvider is registered
+	assert.Len(t, tracerProviders, 1)
+
+	// register tracer provider with otel http exporter
+	fullConfig = Config{
+		ExporterType: OtlpHTTPExporter,
+	}
+
+	err = RegisterTracerProvider(ctx, serviceName, &fullConfig)
+	assert.Nil(t, err)
+
+	// validate tracerProvider is registered
+	assert.Len(t, tracerProviders, 1)
+
 }
 
 func TestNewSpan(t *testing.T) {
