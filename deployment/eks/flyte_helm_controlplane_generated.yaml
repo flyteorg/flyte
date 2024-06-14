@@ -472,6 +472,9 @@ subjects:
 - kind: ServiceAccount
   name: flyteadmin
   namespace: flyte
+- kind: ServiceAccount
+  name: flyteclusterresourcesync
+  namespace: flyte
 ---
 # Source: flyte-core/templates/admin/service.yaml
 apiVersion: v1
