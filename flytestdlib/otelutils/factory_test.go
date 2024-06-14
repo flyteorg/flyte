@@ -9,9 +9,10 @@ import (
 
 func TestRegisterTracerProvider(t *testing.T) {
 	serviceName := "foo"
+	ctx := context.Background()
 
 	// register tracer provider with no exporters
-	err := RegisterTracerProvider(serviceName, defaultConfig)
+	err := RegisterTracerProvider(ctx, serviceName, defaultConfig)
 	assert.Nil(t, err)
 
 	// validate no tracerProviders are registered
@@ -25,7 +26,7 @@ func TestRegisterTracerProvider(t *testing.T) {
 		},
 		JaegerConfig: JaegerConfig{},
 	}
-	err = RegisterTracerProvider(serviceName, &fullConfig)
+	err = RegisterTracerProvider(ctx, serviceName, &fullConfig)
 	assert.Nil(t, err)
 
 	// validate tracerProvider is registered

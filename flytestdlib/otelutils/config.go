@@ -14,9 +14,11 @@ const configSectionKey = "otel"
 type ExporterType = string
 
 const (
-	NoopExporter   ExporterType = "noop"
-	FileExporter   ExporterType = "file"
-	JaegerExporter ExporterType = "jaeger"
+	NoopExporter     ExporterType = "noop"
+	FileExporter     ExporterType = "file"
+	JaegerExporter   ExporterType = "jaeger"
+	OtlpGrpcExporter ExporterType = "otlpGrpc"
+	OtlpHttpExporter ExporterType = "otlpHttp"
 )
 
 var (
