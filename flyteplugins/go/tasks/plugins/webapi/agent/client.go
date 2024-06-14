@@ -62,19 +62,12 @@ func getGrpcConnection(ctx context.Context, agent *Deployment) (*grpc.ClientConn
 	if err != nil {
 		return nil, err
 	}
-	defer func() {
-		if err != nil {
-			if cerr := conn.Close(); cerr != nil {
-				grpclog.Infof("Failed to close conn to %s: %v", agent, cerr)
-			}
-			return
+
+	go func() {
+		<-ctx.Done()
+		if cerr := conn.Close(); cerr != nil {
+			grpclog.Infof("Failed to close conn to %s: %v", agent, cerr)
 		}
-		go func() {
-			<-ctx.Done()
-			if cerr := conn.Close(); cerr != nil {
-				grpclog.Infof("Failed to close conn to %s: %v", agent, cerr)
-			}
-		}()
 	}()
 
 	return conn, nil
