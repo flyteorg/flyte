@@ -159,6 +159,7 @@ func dummyRayTaskContext(taskTemplate *core.TaskTemplate, resources *corev1.Reso
 		RunAs: &core.Identity{K8SServiceAccount: serviceAccount},
 	})
 	taskExecutionMetadata.OnGetEnvironmentVariables().Return(nil)
+	taskExecutionMetadata.OnGetConsoleURL().Return("")
 	taskCtx.OnTaskExecutionMetadata().Return(taskExecutionMetadata)
 	return taskCtx
 }

@@ -316,6 +316,19 @@ func BuildRawPod(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v
 	return podSpec, &objectMeta, primaryContainerName, nil
 }
 
+func hasExternalLinkType(taskTemplate *core.TaskTemplate) bool {
+	if taskTemplate == nil {
+		return false
+	}
+	config := taskTemplate.GetConfig()
+	if config == nil {
+		return false
+	}
+	// The presence of any "link_type" is sufficient to guarantee that the console URL should be included.
+	_, exists := config["link_type"]
+	return exists
+}
+
 // ApplyFlytePodConfiguration updates the PodSpec and ObjectMeta with various Flyte configuration. This includes
 // applying default k8s configuration, applying overrides (resources etc.), injecting copilot containers, and merging with the
 // configuration PodTemplate (if exists).
@@ -328,10 +341,11 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 
 	// add flyte resource customizations to containers
 	templateParameters := template.Parameters{
-		Inputs:           tCtx.InputReader(),
-		OutputPath:       tCtx.OutputWriter(),
-		Task:             tCtx.TaskReader(),
-		TaskExecMetadata: tCtx.TaskExecutionMetadata(),
+		Inputs:            tCtx.InputReader(),
+		OutputPath:        tCtx.OutputWriter(),
+		Task:              tCtx.TaskReader(),
+		TaskExecMetadata:  tCtx.TaskExecutionMetadata(),
+		IncludeConsoleURL: hasExternalLinkType(taskTemplate),
 	}
 
 	resourceRequests := make([]v1.ResourceRequirements, 0, len(podSpec.Containers))

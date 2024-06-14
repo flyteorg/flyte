@@ -170,6 +170,7 @@ func dummyTensorFlowTaskContext(taskTemplate *core.TaskTemplate, resources *core
 	taskExecutionMetadata.OnGetK8sServiceAccount().Return(serviceAccount)
 	taskExecutionMetadata.OnGetPlatformResources().Return(&corev1.ResourceRequirements{})
 	taskExecutionMetadata.OnGetEnvironmentVariables().Return(nil)
+	taskExecutionMetadata.OnGetConsoleURL().Return("")
 	taskCtx.OnTaskExecutionMetadata().Return(taskExecutionMetadata)
 	return taskCtx
 }
