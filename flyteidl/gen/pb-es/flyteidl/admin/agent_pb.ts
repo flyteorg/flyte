@@ -136,11 +136,18 @@ export class TaskExecutionMetadata extends Message<TaskExecutionMetadata> {
   overrides?: TaskNodeOverrides;
 
   /**
-   * Identity of user running this task execution
+   * Identity of user running this task execution (which can be scheduler)
    *
    * @generated from field: flyteidl.core.Identity identity = 11;
    */
   identity?: Identity;
+
+  /**
+   * Identifier of the entity that triggered this execution.
+   *
+   * @generated from field: string principal = 12;
+   */
+  principal = "";
 
   constructor(data?: PartialMessage<TaskExecutionMetadata>) {
     super();
@@ -161,6 +168,7 @@ export class TaskExecutionMetadata extends Message<TaskExecutionMetadata> {
     { no: 9, name: "interruptible_failure_threshold", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 10, name: "overrides", kind: "message", T: TaskNodeOverrides },
     { no: 11, name: "identity", kind: "message", T: Identity },
+    { no: 12, name: "principal", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TaskExecutionMetadata {

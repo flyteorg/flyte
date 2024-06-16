@@ -39,9 +39,12 @@ pub struct TaskExecutionMetadata {
     /// These overrides can be used to customize the behavior of the task node.
     #[prost(message, optional, tag="10")]
     pub overrides: ::core::option::Option<super::core::TaskNodeOverrides>,
-    /// Identity of user running this task execution
+    /// Identity of user running this task execution (which can be scheduler)
     #[prost(message, optional, tag="11")]
     pub identity: ::core::option::Option<super::core::Identity>,
+    /// Identifier of the entity that triggered this execution.
+    #[prost(string, tag="12")]
+    pub principal: ::prost::alloc::string::String,
 }
 /// Represents a request structure to create task.
 #[allow(clippy::derive_partial_eq_without_eq)]

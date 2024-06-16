@@ -22743,6 +22743,7 @@
                  * @property {number|null} [interruptibleFailureThreshold] TaskExecutionMetadata interruptibleFailureThreshold
                  * @property {flyteidl.core.ITaskNodeOverrides|null} [overrides] TaskExecutionMetadata overrides
                  * @property {flyteidl.core.IIdentity|null} [identity] TaskExecutionMetadata identity
+                 * @property {string|null} [principal] TaskExecutionMetadata principal
                  */
     
                 /**
@@ -22852,6 +22853,14 @@
                 TaskExecutionMetadata.prototype.identity = null;
     
                 /**
+                 * TaskExecutionMetadata principal.
+                 * @member {string} principal
+                 * @memberof flyteidl.admin.TaskExecutionMetadata
+                 * @instance
+                 */
+                TaskExecutionMetadata.prototype.principal = "";
+    
+                /**
                  * Creates a new TaskExecutionMetadata instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.TaskExecutionMetadata
@@ -22900,6 +22909,8 @@
                         $root.flyteidl.core.TaskNodeOverrides.encode(message.overrides, writer.uint32(/* id 10, wireType 2 =*/82).fork()).ldelim();
                     if (message.identity != null && message.hasOwnProperty("identity"))
                         $root.flyteidl.core.Identity.encode(message.identity, writer.uint32(/* id 11, wireType 2 =*/90).fork()).ldelim();
+                    if (message.principal != null && message.hasOwnProperty("principal"))
+                        writer.uint32(/* id 12, wireType 2 =*/98).string(message.principal);
                     return writer;
                 };
     
@@ -22968,6 +22979,9 @@
                             break;
                         case 11:
                             message.identity = $root.flyteidl.core.Identity.decode(reader, reader.uint32());
+                            break;
+                        case 12:
+                            message.principal = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -23042,6 +23056,9 @@
                         if (error)
                             return "identity." + error;
                     }
+                    if (message.principal != null && message.hasOwnProperty("principal"))
+                        if (!$util.isString(message.principal))
+                            return "principal: string expected";
                     return null;
                 };
     

@@ -27,7 +27,7 @@ enum State {
 // Represents a subset of runtime task execution metadata that are relevant to external plugins.
 message TaskExecutionMetadata {
   // ID of the task execution
-  
+
   core.TaskExecutionIdentifier task_execution_id = 1;
   // k8s namespace where the task is executed in
   string namespace = 2;
@@ -52,8 +52,11 @@ message TaskExecutionMetadata {
   // Overrides for specific properties of the task node.
   // These overrides can be used to customize the behavior of the task node.
   core.TaskNodeOverrides overrides = 10;
-  // Identity of user running this task execution
+  // Identity of user running this task execution (which can be scheduler)
   core.Identity identity = 11;
+  // Identifier of the entity that triggered this execution.
+  string principal = 12;
+
 }
 
 // Represents a request structure to create task.
@@ -157,7 +160,7 @@ message DeleteTaskResponse {}
 message Agent {
   // Name is the developer-assigned name of the agent.
   string name = 1;
-  
+
   // SupportedTaskTypes are the types of the tasks that the agent can handle.
   repeated string supported_task_types = 2 [deprecated = true];
 

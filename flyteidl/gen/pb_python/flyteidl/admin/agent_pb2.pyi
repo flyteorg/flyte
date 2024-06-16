@@ -30,7 +30,7 @@ RUNNING: State
 SUCCEEDED: State
 
 class TaskExecutionMetadata(_message.Message):
-    __slots__ = ["task_execution_id", "namespace", "labels", "annotations", "k8s_service_account", "environment_variables", "max_attempts", "interruptible", "interruptible_failure_threshold", "overrides", "identity"]
+    __slots__ = ["task_execution_id", "namespace", "labels", "annotations", "k8s_service_account", "environment_variables", "max_attempts", "interruptible", "interruptible_failure_threshold", "overrides", "identity", "principal"]
     class LabelsEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -63,6 +63,7 @@ class TaskExecutionMetadata(_message.Message):
     INTERRUPTIBLE_FAILURE_THRESHOLD_FIELD_NUMBER: _ClassVar[int]
     OVERRIDES_FIELD_NUMBER: _ClassVar[int]
     IDENTITY_FIELD_NUMBER: _ClassVar[int]
+    PRINCIPAL_FIELD_NUMBER: _ClassVar[int]
     task_execution_id: _identifier_pb2.TaskExecutionIdentifier
     namespace: str
     labels: _containers.ScalarMap[str, str]
@@ -74,7 +75,8 @@ class TaskExecutionMetadata(_message.Message):
     interruptible_failure_threshold: int
     overrides: _workflow_pb2.TaskNodeOverrides
     identity: _security_pb2.Identity
-    def __init__(self, task_execution_id: _Optional[_Union[_identifier_pb2.TaskExecutionIdentifier, _Mapping]] = ..., namespace: _Optional[str] = ..., labels: _Optional[_Mapping[str, str]] = ..., annotations: _Optional[_Mapping[str, str]] = ..., k8s_service_account: _Optional[str] = ..., environment_variables: _Optional[_Mapping[str, str]] = ..., max_attempts: _Optional[int] = ..., interruptible: bool = ..., interruptible_failure_threshold: _Optional[int] = ..., overrides: _Optional[_Union[_workflow_pb2.TaskNodeOverrides, _Mapping]] = ..., identity: _Optional[_Union[_security_pb2.Identity, _Mapping]] = ...) -> None: ...
+    principal: str
+    def __init__(self, task_execution_id: _Optional[_Union[_identifier_pb2.TaskExecutionIdentifier, _Mapping]] = ..., namespace: _Optional[str] = ..., labels: _Optional[_Mapping[str, str]] = ..., annotations: _Optional[_Mapping[str, str]] = ..., k8s_service_account: _Optional[str] = ..., environment_variables: _Optional[_Mapping[str, str]] = ..., max_attempts: _Optional[int] = ..., interruptible: bool = ..., interruptible_failure_threshold: _Optional[int] = ..., overrides: _Optional[_Union[_workflow_pb2.TaskNodeOverrides, _Mapping]] = ..., identity: _Optional[_Union[_security_pb2.Identity, _Mapping]] = ..., principal: _Optional[str] = ...) -> None: ...
 
 class CreateTaskRequest(_message.Message):
     __slots__ = ["inputs", "template", "output_prefix", "task_execution_metadata"]

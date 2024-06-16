@@ -2074,7 +2074,11 @@
         },
         "identity": {
           "$ref": "#/definitions/coreIdentity",
-          "title": "Identity of user running this task execution"
+          "title": "Identity of user running this task execution (which can be scheduler)"
+        },
+        "principal": {
+          "type": "string",
+          "description": "Identifier of the entity that triggered this execution."
         }
       },
       "description": "Represents a subset of runtime task execution metadata that are relevant to external plugins.\n\nID of the task execution"
