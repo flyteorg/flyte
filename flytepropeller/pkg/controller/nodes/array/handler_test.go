@@ -91,11 +91,11 @@ func createNodeExecutionContext(dataStore *storage.DataStore, eventRecorder inte
 
 	// ExecutionContext
 	executionContext := &execmocks.ExecutionContext{}
-	executionContext.OnGetEventVersion().Return(1)
-	executionContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{
+	executionContext.EXPECT().GetEventVersion().Return(1)
+	executionContext.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{
 		MaxParallelism: maxParallelism,
 	})
-	executionContext.OnGetExecutionID().Return(
+	executionContext.EXPECT().GetExecutionID().Return(
 		v1alpha1.ExecutionID{
 			WorkflowExecutionIdentifier: &idlcore.WorkflowExecutionIdentifier{
 				Project: "project",
@@ -103,15 +103,15 @@ func createNodeExecutionContext(dataStore *storage.DataStore, eventRecorder inte
 				Name:    "name",
 			},
 		})
-	executionContext.OnGetLabels().Return(nil)
-	executionContext.OnGetRawOutputDataConfig().Return(v1alpha1.RawOutputDataConfig{})
-	executionContext.OnIsInterruptible().Return(false)
-	executionContext.OnGetParentInfo().Return(nil)
+	executionContext.EXPECT().GetLabels().Return(nil)
+	executionContext.EXPECT().GetRawOutputDataConfig().Return(v1alpha1.RawOutputDataConfig{})
+	executionContext.EXPECT().IsInterruptible().Return(false)
+	executionContext.EXPECT().GetParentInfo().Return(nil)
 	outputVariableMap := make(map[string]*idlcore.Variable)
 	for _, outputVariable := range outputVariables {
 		outputVariableMap[outputVariable] = &idlcore.Variable{}
 	}
-	executionContext.OnGetTaskMatch(taskRef).Return(
+	executionContext.EXPECT().GetTask(taskRef).Return(
 		&v1alpha1.TaskSpec{
 			TaskTemplate: &idlcore.TaskTemplate{
 				Interface: &idlcore.TypedInterface{
@@ -123,12 +123,12 @@ func createNodeExecutionContext(dataStore *storage.DataStore, eventRecorder inte
 		},
 		nil,
 	)
-	executionContext.OnCurrentParallelism().Return(currentParallelism)
+	executionContext.EXPECT().CurrentParallelism().Return(currentParallelism)
 	executionContext.On("IncrementParallelism").Run(func(args mock.Arguments) {}).Return(currentParallelism)
-	executionContext.OnIncrementNodeExecutionCount().Return(1)
-	executionContext.OnIncrementTaskExecutionCount().Return(1)
-	executionContext.OnCurrentNodeExecutionCount().Return(1)
-	executionContext.OnCurrentTaskExecutionCount().Return(1)
+	executionContext.EXPECT().IncrementNodeExecutionCount().Return(1)
+	executionContext.EXPECT().IncrementTaskExecutionCount().Return(1)
+	executionContext.EXPECT().CurrentNodeExecutionCount().Return(1)
+	executionContext.EXPECT().CurrentTaskExecutionCount().Return(1)
 	nCtx.OnExecutionContext().Return(executionContext)
 
 	// EventsRecorder

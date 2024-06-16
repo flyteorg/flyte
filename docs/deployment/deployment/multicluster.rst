@@ -199,13 +199,20 @@ the first cluster only.
             insecure: false #enables secure communication over SSL. Requires a signed certificate
         catalog:
           catalog-cache:
-            endpoint: <your-Ingress-FQDN>:443
+            endpoint: <your-datacatalog-address>
             insecure: false 
 
 .. note:: 
 
    This step is needed so the ``flytepropeller`` instance in the data plane cluster is able to send notifications
-   back to the ``flyteadmin`` service in the control plane. The ``catalog`` service runs in the control plane and is used when caching is enabled.
+   back to the ``flyteadmin`` service in the control plane.
+
+   The ``catalog`` service runs in the control plane and is used when caching is enabled. Note that ``catalog`` is
+   not exposed via the ingress by default and does not have its own authentication mechanism. The ``catalog`` service
+   in the control plane cluster can for instance be made available to the ``flytepropeller`` services in the data plane
+   clusters with an internal load balancer service (see e.g. `GKE documentation <https://cloud.google.com/kubernetes-engine/docs/how-to/internal-load-balancing#create>`_
+   or `AWS Load Balancer Controller <https://kubernetes-sigs.github.io/aws-load-balancer-controller/latest/guide/service/nlb/>`_).
+   if the clusters use the same VPC network.
 
 3. Install Flyte data plane Helm chart:
 
@@ -379,8 +386,22 @@ label has to be 1.
 
 .. note:: 
    This step will disable ``flytepropeller`` in the control plane cluster, leaving no possibility of running workflows there. If you require
-   the control plane to run workflows, edit the ``values-controlplane.yaml`` file and set ``flytepropeller.enabled`` to ``true``. Then, perform the ``helm upgrade`` operation and complete the steps in :ref:`this section <dataplane-deployment>` to configure it 
-   as a dataplane cluster.
+   the control plane to run workflows, edit the ``values-controlplane.yaml`` file and set ``flytepropeller.enabled`` to ``true`` and add one
+   additional cluster config for the control plane cluster itself:
+
+   .. code-block:: yaml
+      :caption: values-override.yaml
+
+      configmap:
+         clusters:
+            clusterConfigs:
+            - name: "dataplane_1"
+              ...
+            - name: "controlplane"
+              enabled: true
+              inCluster: true  # Use in-cluster credentials
+
+   Then, perform the ``helm upgrade`` operation.
 
 .. tab-set::
 

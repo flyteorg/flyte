@@ -176,7 +176,7 @@ func TestGetExecutionFuncWithIOData(t *testing.T) {
 		nodeExecList := &admin.NodeExecutionList{NodeExecutions: nodeExecutions}
 
 		inputs := map[string]*core.Literal{
-			"val1": &core.Literal{
+			"val1": {
 				Value: &core.Literal_Scalar{
 					Scalar: &core.Scalar{
 						Value: &core.Scalar_Primitive{
@@ -191,7 +191,7 @@ func TestGetExecutionFuncWithIOData(t *testing.T) {
 			},
 		}
 		outputs := map[string]*core.Literal{
-			"o2": &core.Literal{
+			"o2": {
 				Value: &core.Literal_Scalar{
 					Scalar: &core.Scalar{
 						Value: &core.Scalar_Primitive{
@@ -288,7 +288,7 @@ func TestGetExecutionFuncWithIOData(t *testing.T) {
 			nodeExecutions := []*admin.NodeExecution{nodeExec1}
 			nodeExecList := &admin.NodeExecutionList{NodeExecutions: nodeExecutions}
 			inputs := map[string]*core.Literal{
-				"val1": &core.Literal{
+				"val1": {
 					Value: &core.Literal_Scalar{
 						Scalar: &core.Scalar{
 							Value: &core.Scalar_Primitive{
@@ -303,7 +303,7 @@ func TestGetExecutionFuncWithIOData(t *testing.T) {
 				},
 			}
 			outputs := map[string]*core.Literal{
-				"o2": &core.Literal{
+				"o2": {
 					Value: &core.Literal_Scalar{
 						Scalar: &core.Scalar{
 							Value: &core.Scalar_Primitive{

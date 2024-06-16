@@ -30,7 +30,7 @@ func TestGetSubWorkflow(t *testing.T) {
 		ectx := &execMocks.ExecutionContext{}
 
 		swf := &coreMocks.ExecutableSubWorkflow{}
-		ectx.OnFindSubWorkflow("x").Return(swf)
+		ectx.EXPECT().FindSubWorkflow("x").Return(swf)
 
 		nCtx := &mocks.NodeExecutionContext{}
 		nCtx.OnNode().Return(node)
@@ -60,7 +60,7 @@ func TestGetSubWorkflow(t *testing.T) {
 
 		swf := &coreMocks.ExecutableSubWorkflow{}
 		swf.OnGetOnFailureNode().Return(failureNode)
-		ectx.OnFindSubWorkflow("x").Return(swf)
+		ectx.EXPECT().FindSubWorkflow("x").Return(swf)
 
 		nCtx := &mocks.NodeExecutionContext{}
 		nCtx.OnNode().Return(node)
@@ -82,7 +82,7 @@ func TestGetSubWorkflow(t *testing.T) {
 
 		ectx := &execMocks.ExecutionContext{}
 
-		ectx.OnFindSubWorkflow("x").Return(nil)
+		ectx.EXPECT().FindSubWorkflow("x").Return(nil)
 
 		nCtx := &mocks.NodeExecutionContext{}
 		nCtx.OnNode().Return(node)
@@ -107,7 +107,7 @@ func Test_subworkflowHandler_HandleAbort(t *testing.T) {
 
 		swf := &coreMocks.ExecutableSubWorkflow{}
 		ectx := &execMocks.ExecutionContext{}
-		ectx.OnFindSubWorkflow("x").Return(swf)
+		ectx.EXPECT().FindSubWorkflow("x").Return(swf)
 
 		ns := &coreMocks.ExecutableNodeStatus{}
 		nCtx := &mocks.NodeExecutionContext{}
@@ -138,8 +138,8 @@ func Test_subworkflowHandler_HandleAbort(t *testing.T) {
 		swf.OnStartNode().Return(&coreMocks.ExecutableNode{})
 
 		ectx := &execMocks.ExecutionContext{}
-		ectx.OnFindSubWorkflow("x").Return(swf)
-		ectx.OnGetParentInfo().Return(nil)
+		ectx.EXPECT().FindSubWorkflow("x").Return(swf)
+		ectx.EXPECT().GetParentInfo().Return(nil)
 
 		ns := &coreMocks.ExecutableNodeStatus{}
 		nCtx := &mocks.NodeExecutionContext{}
@@ -172,8 +172,8 @@ func Test_subworkflowHandler_HandleAbort(t *testing.T) {
 		swf.OnStartNode().Return(&coreMocks.ExecutableNode{})
 
 		ectx := &execMocks.ExecutionContext{}
-		ectx.OnFindSubWorkflow("x").Return(swf)
-		ectx.OnGetParentInfo().Return(nil)
+		ectx.EXPECT().FindSubWorkflow("x").Return(swf)
+		ectx.EXPECT().GetParentInfo().Return(nil)
 
 		ns := &coreMocks.ExecutableNodeStatus{}
 		nCtx := &mocks.NodeExecutionContext{}

@@ -28,7 +28,7 @@ jobs:
           python-version: "3.10"
           check-latest: true
 
-      - uses: unionai/flytectl-setup-action@v0.0.1
+      - uses: unionai/flytectl-setup-action@v0.0.3
         name: Setup flytectl
 
       - name: Set up chart-testing

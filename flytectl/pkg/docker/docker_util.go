@@ -373,21 +373,24 @@ func PrintCreateVolume(name string) {
 
 func GetOrCreateVolume(
 	ctx context.Context, cli Docker, volumeName string, dryRun bool,
-) (*types.Volume, error) {
+) (*volume.Volume, error) {
 	if dryRun {
 		PrintCreateVolume(volumeName)
 		return nil, nil
 	}
 
-	resp, err := cli.VolumeList(ctx, filters.NewArgs(
-		filters.KeyValuePair{Key: "name", Value: fmt.Sprintf("^%s$", volumeName)},
-	))
+	lo := volume.ListOptions{
+		Filters: filters.NewArgs(
+			filters.KeyValuePair{Key: "name", Value: fmt.Sprintf("^%s$", volumeName)},
+		),
+	}
+	resp, err := cli.VolumeList(ctx, lo)
 	if err != nil {
 		return nil, err
 	}
 	switch len(resp.Volumes) {
 	case 0:
-		v, err := cli.VolumeCreate(ctx, volume.VolumeCreateBody{Name: volumeName})
+		v, err := cli.VolumeCreate(ctx, volume.CreateOptions{Name: volumeName})
 		if err != nil {
 			return nil, err
 		}

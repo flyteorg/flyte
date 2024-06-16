@@ -55,7 +55,7 @@ func TestCompilePackage(t *testing.T) {
 
 	// invalid workflow, types do not match
 	err = compileFromPackage("testdata/bad-workflow-package.tgz")
-	assert.NotNil(t, err, "compilin an invalid workflow returns no error")
+	assert.NotNil(t, err, "compiling an invalid workflow returns no error")
 
 	// testing badly serialized task
 	err = compileFromPackage("testdata/invalidtask.tgz")

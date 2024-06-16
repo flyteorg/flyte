@@ -106,7 +106,7 @@ func createNodeExecutionContext(gateNode *v1alpha1.GateNodeSpec) *nodeMocks.Node
 	dataStore, _ := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
 
 	eCtx := &executormocks.ExecutionContext{}
-	eCtx.OnGetExecutionID().Return(wfExecID)
+	eCtx.EXPECT().GetExecutionID().Return(wfExecID)
 
 	nCtx := &nodeMocks.NodeExecutionContext{}
 	nCtx.OnNodeExecutionMetadata().Return(nm)
