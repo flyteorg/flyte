@@ -54,4 +54,5 @@ type TaskExecutionMetadata interface {
 	GetInterruptibleFailureThreshold() int32
 	GetEnvironmentVariables() map[string]string
 	GetConsoleURL() string
+	GetPrincipal() string
 }

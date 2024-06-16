@@ -40,6 +40,7 @@ type NodeExecutionMetadata interface {
 	IsInterruptible() bool
 	GetInterruptibleFailureThreshold() int32
 	GetConsoleURL() string
+	GetPrincipal() string
 }
 
 type NodeExecutionContext interface {

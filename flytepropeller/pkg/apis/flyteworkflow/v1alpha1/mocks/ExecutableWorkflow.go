@@ -826,6 +826,38 @@ func (_m *ExecutableWorkflow) GetOwnerReference() v1.OwnerReference {
 	return r0
 }
 
+type ExecutableWorkflow_GetPrincipal struct {
+	*mock.Call
+}
+
+func (_m ExecutableWorkflow_GetPrincipal) Return(_a0 string) *ExecutableWorkflow_GetPrincipal {
+	return &ExecutableWorkflow_GetPrincipal{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutableWorkflow) OnGetPrincipal() *ExecutableWorkflow_GetPrincipal {
+	c_call := _m.On("GetPrincipal")
+	return &ExecutableWorkflow_GetPrincipal{Call: c_call}
+}
+
+func (_m *ExecutableWorkflow) OnGetPrincipalMatch(matchers ...interface{}) *ExecutableWorkflow_GetPrincipal {
+	c_call := _m.On("GetPrincipal", matchers...)
+	return &ExecutableWorkflow_GetPrincipal{Call: c_call}
+}
+
+// GetPrincipal provides a mock function with given fields:
+func (_m *ExecutableWorkflow) GetPrincipal() string {
+	ret := _m.Called()
+
+	var r0 string
+	if rf, ok := ret.Get(0).(func() string); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	return r0
+}
+
 type ExecutableWorkflow_GetRawOutputDataConfig struct {
 	*mock.Call
 }

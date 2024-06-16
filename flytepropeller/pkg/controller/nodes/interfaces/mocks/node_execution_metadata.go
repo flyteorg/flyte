@@ -311,6 +311,38 @@ func (_m *NodeExecutionMetadata) GetOwnerReference() v1.OwnerReference {
 	return r0
 }
 
+type NodeExecutionMetadata_GetPrincipal struct {
+	*mock.Call
+}
+
+func (_m NodeExecutionMetadata_GetPrincipal) Return(_a0 string) *NodeExecutionMetadata_GetPrincipal {
+	return &NodeExecutionMetadata_GetPrincipal{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *NodeExecutionMetadata) OnGetPrincipal() *NodeExecutionMetadata_GetPrincipal {
+	c_call := _m.On("GetPrincipal")
+	return &NodeExecutionMetadata_GetPrincipal{Call: c_call}
+}
+
+func (_m *NodeExecutionMetadata) OnGetPrincipalMatch(matchers ...interface{}) *NodeExecutionMetadata_GetPrincipal {
+	c_call := _m.On("GetPrincipal", matchers...)
+	return &NodeExecutionMetadata_GetPrincipal{Call: c_call}
+}
+
+// GetPrincipal provides a mock function with given fields:
+func (_m *NodeExecutionMetadata) GetPrincipal() string {
+	ret := _m.Called()
+
+	var r0 string
+	if rf, ok := ret.Get(0).(func() string); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	return r0
+}
+
 type NodeExecutionMetadata_GetSecurityContext struct {
 	*mock.Call
 }

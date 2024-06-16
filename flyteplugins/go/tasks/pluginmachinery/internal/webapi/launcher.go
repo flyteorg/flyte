@@ -13,6 +13,7 @@ import (
 
 func launch(ctx context.Context, p webapi.AsyncPlugin, tCtx core.TaskExecutionContext, cache cache.AutoRefresh,
 	state *State) (newState *State, phaseInfo core.PhaseInfo, err error) {
+	// agent plugin call happens here
 	rMeta, r, err := p.Create(ctx, tCtx)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to create resource. Error: %v", err)

@@ -442,6 +442,38 @@ func (_m *MetaExtended) GetOwnerReference() v1.OwnerReference {
 	return r0
 }
 
+type MetaExtended_GetPrincipal struct {
+	*mock.Call
+}
+
+func (_m MetaExtended_GetPrincipal) Return(_a0 string) *MetaExtended_GetPrincipal {
+	return &MetaExtended_GetPrincipal{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *MetaExtended) OnGetPrincipal() *MetaExtended_GetPrincipal {
+	c_call := _m.On("GetPrincipal")
+	return &MetaExtended_GetPrincipal{Call: c_call}
+}
+
+func (_m *MetaExtended) OnGetPrincipalMatch(matchers ...interface{}) *MetaExtended_GetPrincipal {
+	c_call := _m.On("GetPrincipal", matchers...)
+	return &MetaExtended_GetPrincipal{Call: c_call}
+}
+
+// GetPrincipal provides a mock function with given fields:
+func (_m *MetaExtended) GetPrincipal() string {
+	ret := _m.Called()
+
+	var r0 string
+	if rf, ok := ret.Get(0).(func() string); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	return r0
+}
+
 type MetaExtended_GetRawOutputDataConfig struct {
 	*mock.Call
 }

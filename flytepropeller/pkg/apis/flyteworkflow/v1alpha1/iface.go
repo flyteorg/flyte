@@ -512,6 +512,7 @@ type Meta interface {
 	GetDefinitionVersion() WorkflowDefinitionVersion
 	GetRawOutputDataConfig() RawOutputDataConfig
 	GetConsoleURL() string
+	GetPrincipal() string
 }
 
 type TaskDetailsGetter interface {

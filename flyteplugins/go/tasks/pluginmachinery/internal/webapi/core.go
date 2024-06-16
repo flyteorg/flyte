@@ -74,14 +74,21 @@ func (c CorePlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) 
 	var nextState *State
 	var phaseInfo core.PhaseInfo
 
+	// things that would be helpful to have here
+	// 1. maybe an admin.ExecutionSpec? It has a GetMetadata
+	// 2. interfaces.NodeExecutionContext ... it looks like what's getting passed here is
+	//    actually a tCtx *taskExecutionContext ... which IS a interfaces.NodeExecutionContent - hmmm
+
 	switch incomingState.Phase {
 	case PhaseNotStarted:
 		if len(c.p.GetConfig().ResourceQuotas) > 0 {
 			nextState, phaseInfo, err = c.tokenAllocator.allocateToken(ctx, c.p, tCtx, &incomingState, c.metrics)
 		} else {
+			// triggers agent plugin call
 			nextState, phaseInfo, err = launch(ctx, c.p, tCtx, c.cache, &incomingState)
 		}
 	case PhaseAllocationTokenAcquired:
+		// triggers agent plugin call
 		nextState, phaseInfo, err = launch(ctx, c.p, tCtx, c.cache, &incomingState)
 	case PhaseResourcesCreated:
 		nextState, phaseInfo, err = monitor(ctx, tCtx, c.p, c.cache, &incomingState)

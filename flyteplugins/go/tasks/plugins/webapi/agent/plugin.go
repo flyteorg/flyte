@@ -374,6 +374,22 @@ func getFinalAgent(taskCategory *admin.TaskCategory, cfg *Config) (*Deployment, 
 	return &cfg.DefaultAgent, false
 }
 
+// this "principal" appears to be the email address, not the subject id
+// func getUser(ctx context.Context) string {
+// 	principalContextUser := ctx.Value("principal")
+// 	if principalContextUser != nil {
+// 		return fmt.Sprintf("%v", principalContextUser)
+// 	}
+// 	return ""
+// }
+
+// NOTE: probably not right
+// // Returns the unique string which identifies the authenticated end user (if any).
+// func getUser(ctx context.Context) string {
+// 	identityContext := auth.IdentityContextFromContext(ctx)
+// 	return identityContext.UserID()
+// }
+
 func buildTaskExecutionMetadata(taskExecutionMetadata core.TaskExecutionMetadata) admin.TaskExecutionMetadata {
 	taskExecutionID := taskExecutionMetadata.GetTaskExecutionID().GetID()
 
@@ -385,6 +401,7 @@ func buildTaskExecutionMetadata(taskExecutionMetadata core.TaskExecutionMetadata
 		K8SServiceAccount:    taskExecutionMetadata.GetK8sServiceAccount(),
 		EnvironmentVariables: taskExecutionMetadata.GetEnvironmentVariables(),
 		Identity:             taskExecutionMetadata.GetSecurityContext().RunAs,
+		Principal:            taskExecutionMetadata.GetPrincipal(),
 	}
 }
 

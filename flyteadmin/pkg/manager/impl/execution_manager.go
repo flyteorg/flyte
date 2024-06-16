@@ -293,6 +293,7 @@ func (m *ExecutionManager) getInheritedExecMetadata(ctx context.Context, request
 			requestSpec.Metadata.ParentNodeExecution, workflowExecutionID, err)
 		return parentNodeExecutionID, sourceExecutionID, err
 	}
+	// NOTE: this seems like the only place that the metadata principal is set -- so how can this be passed along?
 	sourceExecutionID = sourceExecutionModel.ID
 	requestSpec.Metadata.Principal = sourceExecutionModel.User
 	sourceExecution, err := transformers.FromExecutionModel(ctx, *sourceExecutionModel, transformers.DefaultExecutionTransformerOptions)
@@ -490,6 +491,7 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 	if requestSpec.Metadata == nil {
 		requestSpec.Metadata = &admin.ExecutionMetadata{}
 	}
+	// NOTE: this seems like the only place that the metadata principal is set -- so how can this be passed along?
 	requestSpec.Metadata.Principal = getUser(ctx)
 
 	// Get the node execution (if any) that launched this execution
@@ -892,6 +894,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 	if requestSpec.Metadata == nil {
 		requestSpec.Metadata = &admin.ExecutionMetadata{}
 	}
+	// NOTE: this seems like the only place that the metadata principal is set -- so how can this be passed along?
 	requestSpec.Metadata.Principal = getUser(ctx)
 	requestSpec.Metadata.ArtifactIds = usedArtifactIDs
 

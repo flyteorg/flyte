@@ -107,6 +107,10 @@ func (in *FlyteWorkflow) GetExecutionConfig() ExecutionConfig {
 
 func (in *FlyteWorkflow) GetConsoleURL() string { return in.ConsoleURL }
 
+// TODO: fill this out...? somehow? or can this be omitted?
+// need to define the value *somewhere*
+func (in *FlyteWorkflow) GetPrincipal() string { return "" }
+
 type WorkflowMeta struct {
 	EventVersion EventVersion `json:"eventVersion,omitempty"`
 }

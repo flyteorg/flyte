@@ -892,6 +892,51 @@ func (_c *ExecutionContext_GetParentInfo_Call) RunAndReturn(run func() executors
 	return _c
 }
 
+// GetPrincipal provides a mock function with given fields:
+func (_m *ExecutionContext) GetPrincipal() string {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetPrincipal")
+	}
+
+	var r0 string
+	if rf, ok := ret.Get(0).(func() string); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	return r0
+}
+
+// ExecutionContext_GetPrincipal_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetPrincipal'
+type ExecutionContext_GetPrincipal_Call struct {
+	*mock.Call
+}
+
+// GetPrincipal is a helper method to define mock.On call
+func (_e *ExecutionContext_Expecter) GetPrincipal() *ExecutionContext_GetPrincipal_Call {
+	return &ExecutionContext_GetPrincipal_Call{Call: _e.mock.On("GetPrincipal")}
+}
+
+func (_c *ExecutionContext_GetPrincipal_Call) Run(run func()) *ExecutionContext_GetPrincipal_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *ExecutionContext_GetPrincipal_Call) Return(_a0 string) *ExecutionContext_GetPrincipal_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *ExecutionContext_GetPrincipal_Call) RunAndReturn(run func() string) *ExecutionContext_GetPrincipal_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetRawOutputDataConfig provides a mock function with given fields:
 func (_m *ExecutionContext) GetRawOutputDataConfig() v1alpha1.RawOutputDataConfig {
 	ret := _m.Called()
