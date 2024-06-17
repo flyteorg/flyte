@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-
 	"github.com/stretchr/testify/assert"
 )
 

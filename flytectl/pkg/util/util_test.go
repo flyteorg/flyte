@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/flyteorg/flyte/flytectl/pkg/docker"
-
 	"github.com/stretchr/testify/assert"
 )
 

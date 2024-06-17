@@ -9,7 +9,6 @@ import (
 	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
 	g "github.com/flyteorg/flyte/flytectl/pkg/github"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
-
 	"github.com/google/go-github/v42/github"
 )
 
