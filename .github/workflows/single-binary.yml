@@ -174,7 +174,7 @@ jobs:
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install flytekit flytekitplugins-deck-standard
+          pip install flytekit flytekitplugins-deck-standard "numpy<2.0.0"
           pip freeze
       - name: Checkout flytesnacks
         uses: actions/checkout@v4
