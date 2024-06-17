@@ -82,6 +82,9 @@ type FlyteWorkflow struct {
 	// LaunchPlans is a list of launch plans that are associated with this workflow. This is used to provide additional
 	// metadata to aid in launch plan orchestration.
 	LaunchPlans []*LaunchPlanSpec `json:"launchPlans,omitempty"`
+
+	// Flyteconsole url
+	ConsoleURL string `json:"consoleUrl,omitempty"`
 }
 
 func (in *FlyteWorkflow) GetSecurityContext() core.SecurityContext {
@@ -106,6 +109,8 @@ func (in *FlyteWorkflow) GetDefinitionVersion() WorkflowDefinitionVersion {
 func (in *FlyteWorkflow) GetExecutionConfig() ExecutionConfig {
 	return in.ExecutionConfig
 }
+
+func (in *FlyteWorkflow) GetConsoleURL() string { return in.ConsoleURL }
 
 type WorkflowMeta struct {
 	EventVersion EventVersion `json:"eventVersion,omitempty"`

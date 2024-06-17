@@ -404,6 +404,7 @@ func TestToK8sContainer(t *testing.T) {
 		"foo": "bar",
 	})
 	mockTaskExecMetadata.OnGetNamespace().Return("my-namespace")
+	mockTaskExecMetadata.OnGetConsoleURL().Return("")
 
 	tCtx := &mocks.TaskExecutionContext{}
 	tCtx.OnTaskExecutionMetadata().Return(&mockTaskExecMetadata)
@@ -447,9 +448,10 @@ func TestToK8sContainer(t *testing.T) {
 	assert.False(t, *container.SecurityContext.AllowPrivilegeEscalation)
 }
 
-func getTemplateParametersForTest(resourceRequirements, platformResources *v1.ResourceRequirements) template.Parameters {
+func getTemplateParametersForTest(resourceRequirements, platformResources *v1.ResourceRequirements, includeConsoleURL bool, consoleURL string) template.Parameters {
 	mockTaskExecMetadata := mocks.TaskExecutionMetadata{}
 	mockTaskExecutionID := mocks.TaskExecutionID{}
+	mockTaskExecutionID.OnGetUniqueNodeID().Return("unique_node_id")
 	mockTaskExecutionID.OnGetGeneratedName().Return("gen_name")
 	mockTaskExecutionID.OnGetID().Return(core.TaskExecutionIdentifier{
 		TaskId: &core.Identifier{
@@ -477,6 +479,7 @@ func getTemplateParametersForTest(resourceRequirements, platformResources *v1.Re
 	mockTaskExecMetadata.OnGetPlatformResources().Return(platformResources)
 	mockTaskExecMetadata.OnGetEnvironmentVariables().Return(nil)
 	mockTaskExecMetadata.OnGetNamespace().Return("my-namespace")
+	mockTaskExecMetadata.OnGetConsoleURL().Return(consoleURL)
 
 	mockInputReader := mocks2.InputReader{}
 	mockInputPath := storage.DataReference("s3://input/path")
@@ -492,9 +495,10 @@ func getTemplateParametersForTest(resourceRequirements, platformResources *v1.Re
 	mockOutputPath.OnGetPreviousCheckpointsPrefix().Return("/prev")
 
 	return template.Parameters{
-		TaskExecMetadata: &mockTaskExecMetadata,
-		Inputs:           &mockInputReader,
-		OutputPath:       &mockOutputPath,
+		TaskExecMetadata:  &mockTaskExecMetadata,
+		Inputs:            &mockInputReader,
+		OutputPath:        &mockOutputPath,
+		IncludeConsoleURL: includeConsoleURL,
 	}
 }
 
@@ -506,7 +510,7 @@ func TestAddFlyteCustomizationsToContainer(t *testing.T) {
 		Limits: v1.ResourceList{
 			v1.ResourceEphemeralStorage: resource.MustParse("2048Mi"),
 		},
-	}, nil)
+	}, nil, false, "")
 	container := &v1.Container{
 		Command: []string{
 			"{{ .Input }}",
@@ -554,7 +558,7 @@ func TestAddFlyteCustomizationsToContainer_Resources(t *testing.T) {
 			Limits: v1.ResourceList{
 				v1.ResourceMemory: resource.MustParse("20"),
 			},
-		})
+		}, false, "")
 		err := AddFlyteCustomizationsToContainer(context.TODO(), templateParameters, ResourceCustomizationModeMergeExistingResources, container)
 		assert.NoError(t, err)
 		assert.True(t, container.Resources.Requests.Cpu().Equal(resource.MustParse("1")))
@@ -577,7 +581,7 @@ func TestAddFlyteCustomizationsToContainer_Resources(t *testing.T) {
 			Limits: v1.ResourceList{
 				v1.ResourceMemory: resource.MustParse("20"),
 			},
-		})
+		}, false, "")
 		err := AddFlyteCustomizationsToContainer(context.TODO(), templateParameters, ResourceCustomizationModeMergeExistingResources, container)
 		assert.NoError(t, err)
 		assert.True(t, container.Resources.Requests.Cpu().Equal(resource.MustParse("1")))
@@ -612,7 +616,7 @@ func TestAddFlyteCustomizationsToContainer_Resources(t *testing.T) {
 				v1.ResourceCPU:    resource.MustParse("10"),
 				v1.ResourceMemory: resource.MustParse("20"),
 			},
-		})
+		}, false, "")
 		err := AddFlyteCustomizationsToContainer(context.TODO(), templateParameters, ResourceCustomizationModeMergeExistingResources, container)
 		assert.NoError(t, err)
 		assert.True(t, container.Resources.Requests.Cpu().Equal(resource.MustParse("10")))
@@ -649,7 +653,7 @@ func TestAddFlyteCustomizationsToContainer_Resources(t *testing.T) {
 		templateParameters := getTemplateParametersForTest(&v1.ResourceRequirements{
 			Requests: overrideRequests,
 			Limits:   overrideLimits,
-		}, &v1.ResourceRequirements{})
+		}, &v1.ResourceRequirements{}, false, "")
 
 		err := AddFlyteCustomizationsToContainer(context.TODO(), templateParameters, ResourceCustomizationModeMergeExistingResources, container)
 		assert.NoError(t, err)
@@ -684,7 +688,7 @@ func TestAddFlyteCustomizationsToContainer_ValidateExistingResources(t *testing.
 			v1.ResourceCPU:    resource.MustParse("10"),
 			v1.ResourceMemory: resource.MustParse("20"),
 		},
-	})
+	}, false, "")
 	err := AddFlyteCustomizationsToContainer(context.TODO(), templateParameters, ResourceCustomizationModeEnsureExistingResourcesInRange, container)
 	assert.NoError(t, err)
 

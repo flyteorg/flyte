@@ -2,8 +2,10 @@ package flytek8s
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"strconv"
+	"strings"
 
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -11,6 +13,10 @@ import (
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
+)
+
+const (
+	flyteExecutionURL = "FLYTE_EXECUTION_URL"
 )
 
 func GetContextEnvVars(ownerCtx context.Context) []v1.EnvVar {
@@ -32,7 +38,7 @@ func GetContextEnvVars(ownerCtx context.Context) []v1.EnvVar {
 	return envVars
 }
 
-func GetExecutionEnvVars(id pluginsCore.TaskExecutionID) []v1.EnvVar {
+func GetExecutionEnvVars(id pluginsCore.TaskExecutionID, consoleURL string) []v1.EnvVar {
 
 	if id == nil || id.GetID().NodeExecutionId == nil || id.GetID().NodeExecutionId.ExecutionId == nil {
 		return []v1.EnvVar{}
@@ -67,6 +73,14 @@ func GetExecutionEnvVars(id pluginsCore.TaskExecutionID) []v1.EnvVar {
 		// 	Name:  "FLYTE_INTERNAL_EXECUTION_LAUNCHPLAN",
 		// 	Value: "",
 		// },
+	}
+
+	if len(consoleURL) > 0 {
+		consoleURL = strings.TrimRight(consoleURL, "/")
+		envVars = append(envVars, v1.EnvVar{
+			Name:  flyteExecutionURL,
+			Value: fmt.Sprintf("%s/projects/%s/domains/%s/executions/%s/nodeId/%s/nodes", consoleURL, nodeExecutionID.Project, nodeExecutionID.Domain, nodeExecutionID.Name, id.GetUniqueNodeID()),
+		})
 	}
 
 	// Task definition Level env variables.
@@ -113,9 +127,9 @@ func GetExecutionEnvVars(id pluginsCore.TaskExecutionID) []v1.EnvVar {
 	return envVars
 }
 
-func DecorateEnvVars(ctx context.Context, envVars []v1.EnvVar, taskEnvironmentVariables map[string]string, id pluginsCore.TaskExecutionID) ([]v1.EnvVar, []v1.EnvFromSource) {
+func DecorateEnvVars(ctx context.Context, envVars []v1.EnvVar, taskEnvironmentVariables map[string]string, id pluginsCore.TaskExecutionID, consoleURL string) ([]v1.EnvVar, []v1.EnvFromSource) {
 	envVars = append(envVars, GetContextEnvVars(ctx)...)
-	envVars = append(envVars, GetExecutionEnvVars(id)...)
+	envVars = append(envVars, GetExecutionEnvVars(id, consoleURL)...)
 
 	for k, v := range taskEnvironmentVariables {
 		envVars = append(envVars, v1.EnvVar{Name: k, Value: v})

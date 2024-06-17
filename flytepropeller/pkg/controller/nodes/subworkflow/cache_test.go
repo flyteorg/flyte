@@ -134,7 +134,7 @@ func TestGetCatalogKey(t *testing.T) {
 				mockSubWorkflow.OnGetIdentifier().Return(identifier)
 				mockSubWorkflow.OnGetInterface().Return(typedInterface)
 
-				mockExecutionContext.OnFindSubWorkflowMatch(mock.Anything).Return(mockSubWorkflow)
+				mockExecutionContext.EXPECT().FindSubWorkflow(mock.Anything).Return(mockSubWorkflow)
 			case core.ResourceType_LAUNCH_PLAN:
 				mockWorkflowNode.OnGetSubWorkflowRef().Return(nil)
 				launchPlanID := &v1alpha1.Identifier{
@@ -147,7 +147,7 @@ func TestGetCatalogKey(t *testing.T) {
 				mockLaunchPlan.OnGetInterface().Return(typedInterface)
 				mockLaunchPlan.OnGetFixedInputs().Return(tt.fixedInputs)
 
-				mockExecutionContext.OnFindLaunchPlanMatch(mock.Anything).Return(mockLaunchPlan)
+				mockExecutionContext.EXPECT().FindLaunchPlan(mock.Anything).Return(mockLaunchPlan)
 			}
 
 			mockInputReader := &iomocks.InputReader{}

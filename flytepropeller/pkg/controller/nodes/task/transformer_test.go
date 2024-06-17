@@ -60,8 +60,8 @@ func TestToTaskExecutionEvent(t *testing.T) {
 	nodeExecutionMetadata.OnIsInterruptible().Return(true)
 
 	mockExecContext := &mocks2.ExecutionContext{}
-	mockExecContext.OnGetEventVersion().Return(v1alpha1.EventVersion0)
-	mockExecContext.OnGetParentInfo().Return(nil)
+	mockExecContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion0)
+	mockExecContext.EXPECT().GetParentInfo().Return(nil)
 
 	tID := &pluginMocks.TaskExecutionID{}
 	generatedName := "generated_name"
@@ -252,11 +252,11 @@ func TestToTaskExecutionEventWithParent(t *testing.T) {
 	nodeExecutionMetadata.OnIsInterruptible().Return(true)
 
 	mockExecContext := &mocks2.ExecutionContext{}
-	mockExecContext.OnGetEventVersion().Return(v1alpha1.EventVersion1)
+	mockExecContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion1)
 	mockParentInfo := &mocks2.ImmutableParentInfo{}
 	mockParentInfo.OnGetUniqueID().Return("np1")
 	mockParentInfo.OnCurrentAttempt().Return(uint32(2))
-	mockExecContext.OnGetParentInfo().Return(mockParentInfo)
+	mockExecContext.EXPECT().GetParentInfo().Return(mockParentInfo)
 
 	tID := &pluginMocks.TaskExecutionID{}
 	generatedName := "generated_name"

@@ -58,9 +58,9 @@ func TestGetPluginLogs(t *testing.T) {
 	nCtx.OnCurrentAttempt().Return(uint32(0))
 
 	executionContext := &execmocks.ExecutionContext{}
-	executionContext.OnGetEventVersion().Return(1)
-	executionContext.OnGetParentInfo().Return(nil)
-	executionContext.OnGetTaskMatch(taskRef).Return(
+	executionContext.EXPECT().GetEventVersion().Return(1)
+	executionContext.EXPECT().GetParentInfo().Return(nil)
+	executionContext.EXPECT().GetTask(taskRef).Return(
 		&v1alpha1.TaskSpec{
 			TaskTemplate: &idlcore.TaskTemplate{
 				Id: &idlcore.Identifier{

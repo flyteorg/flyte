@@ -34,6 +34,7 @@ var flyteAdminConfig = config.MustRegisterSection(flyteAdmin, &interfaces.Applic
 	K8SServiceAccount:           "",
 	UseOffloadedWorkflowClosure: false,
 	ResourceAttributesMode:      interfaces.ResourceAttributesModeConfiguration,
+	ConsoleURL:                  "",
 })
 
 var schedulerConfig = config.MustRegisterSection(scheduler, &interfaces.SchedulerConfig{
