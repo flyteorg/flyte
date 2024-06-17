@@ -5,6 +5,8 @@ Provides an ``install`` make target that uses ``go mod`` to install golang depen
 
 Provides a ``lint`` make target that uses golangci to lint your code.
 
+Provides a ``lint-fix`` make target that uses golangci to lint and fix your code in place.
+
 Provides a ``test_unit`` target for unit tests.
 
 Provides a ``test_unit_cover`` target for analysing coverage of unit tests, which will output the coverage of each function and total statement coverage.
