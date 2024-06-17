@@ -43,6 +43,8 @@ func TestCompileCommand(t *testing.T) {
 	assert.NotNil(t, err, "calling compile with Empty file flag does not error")
 }
 
+// New packages can be created by using the following command
+// pyflyte --pkgs <module> package -f
 func TestCompilePackage(t *testing.T) {
 	// valid package contains two workflows
 	// with three tasks
@@ -69,4 +71,7 @@ func TestCompilePackage(t *testing.T) {
 	err = compileFromPackage("testdata/invalidworkflow.tgz")
 	assert.NotNil(t, err, "unable to handle invalid workflow")
 
+	// testing workflows with launchplans used within workflow
+	err = compileFromPackage("testdata/launchplan-in-wf.tgz")
+	assert.Nil(t, err, "unable to compile workflow with launchplans used within workflow")
 }
