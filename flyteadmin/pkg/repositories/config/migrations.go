@@ -1250,7 +1250,7 @@ var ContinuedMigrations = []*gormigrate.Migration{
 				// Drop execution_admin_tags and admin_tags tables, and create a new table execution_tags
 				// to store tags associated with executions.
 				sql := "INSERT INTO execution_tags (execution_project, execution_domain, execution_name, created_at, updated_at, deleted_at, key, value)" +
-					" SELECT execution_project, execution_domain, execution_name, created_at, updated_at, deleted_at, name as key, null as value" +
+					" SELECT execution_project, execution_domain, execution_name, created_at, updated_at, deleted_at, name as key, '' as value" +
 					" FROM execution_admin_tags" +
 					" INNER JOIN admin_tags a on execution_admin_tags.admin_tag_id = a.id;"
 				if err := tx.Exec(sql).Error; err != nil {
