@@ -3,11 +3,10 @@ package sandbox
 import (
 	"context"
 
-	"github.com/flyteorg/flyte/flytectl/pkg/docker"
-	"github.com/flyteorg/flyte/flytectl/pkg/sandbox"
-
 	sandboxCmdConfig "github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/sandbox"
 	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
+	"github.com/flyteorg/flyte/flytectl/pkg/docker"
+	"github.com/flyteorg/flyte/flytectl/pkg/sandbox"
 )
 
 const (

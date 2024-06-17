@@ -8,18 +8,16 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/flyteorg/flyte/flytectl/cmd/testutils"
-
-	admin2 "github.com/flyteorg/flyte/flyteidl/clients/go/admin"
-
-	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
-	"github.com/stretchr/testify/assert"
-
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+
+	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
+	"github.com/flyteorg/flyte/flytectl/cmd/testutils"
 	"github.com/flyteorg/flyte/flytectl/pkg/docker"
 	"github.com/flyteorg/flyte/flytectl/pkg/docker/mocks"
-	"github.com/stretchr/testify/mock"
+	admin2 "github.com/flyteorg/flyte/flyteidl/clients/go/admin"
 )
 
 func TestSandboxClusterExec(t *testing.T) {

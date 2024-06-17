@@ -4,10 +4,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/flyteorg/flyte/flytectl/cmd/testutils"
-
 	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/project"
-
+	"github.com/flyteorg/flyte/flytectl/cmd/testutils"
 	"github.com/flyteorg/flyte/flytectl/pkg/filters"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/stretchr/testify/assert"

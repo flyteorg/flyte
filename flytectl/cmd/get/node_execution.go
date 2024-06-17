@@ -7,13 +7,12 @@ import (
 	"sort"
 	"strconv"
 
+	"github.com/disiqueira/gotree"
 	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
 	"github.com/flyteorg/flyte/flytectl/pkg/printer"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-
-	"github.com/disiqueira/gotree"
 	"github.com/golang/protobuf/jsonpb"
 )
 

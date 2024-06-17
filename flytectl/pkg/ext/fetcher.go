@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/flyteorg/flyte/flytectl/pkg/filters"
-
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 )

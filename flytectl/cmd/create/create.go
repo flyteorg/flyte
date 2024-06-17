@@ -3,7 +3,6 @@ package create
 import (
 	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/project"
 	cmdcore "github.com/flyteorg/flyte/flytectl/cmd/core"
-
 	"github.com/spf13/cobra"
 )
 

@@ -6,11 +6,10 @@ import (
 	"io/ioutil"
 	"testing"
 
+	graphviz "github.com/awalterschulze/gographviz"
 	"github.com/flyteorg/flyte/flytectl/pkg/visualize/mocks"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/utils"
-
-	graphviz "github.com/awalterschulze/gographviz"
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"

@@ -3,7 +3,6 @@ package register
 import (
 	rconfig "github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/register"
 	cmdcore "github.com/flyteorg/flyte/flytectl/cmd/core"
-
 	"github.com/spf13/cobra"
 )
 
