@@ -49,11 +49,11 @@ func ExtractCurrentCondition(jobConditions []commonOp.JobCondition) (commonOp.Jo
 func GetPhaseInfo(currentCondition commonOp.JobCondition, occurredAt time.Time,
 	taskPhaseInfo pluginsCore.TaskInfo) (pluginsCore.PhaseInfo, error) {
 	if len(currentCondition.Type) == 0 {
-		return pluginsCore.PhaseInfoQueued(occurredAt, pluginsCore.DefaultPhaseVersion, "JobCreated"), nil
+		return pluginsCore.PhaseInfoQueuedWithTaskInfo(occurredAt, pluginsCore.DefaultPhaseVersion, "JobCreated", &taskPhaseInfo), nil
 	}
 	switch currentCondition.Type {
 	case commonOp.JobCreated:
-		return pluginsCore.PhaseInfoQueued(occurredAt, pluginsCore.DefaultPhaseVersion, "JobCreated"), nil
+		return pluginsCore.PhaseInfoQueuedWithTaskInfo(occurredAt, pluginsCore.DefaultPhaseVersion, "JobCreated", &taskPhaseInfo), nil
 	case commonOp.JobRunning:
 		return pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, &taskPhaseInfo), nil
 	case commonOp.JobSucceeded:
@@ -73,7 +73,7 @@ func GetMPIPhaseInfo(currentCondition commonOp.JobCondition, occurredAt time.Tim
 	taskPhaseInfo pluginsCore.TaskInfo) (pluginsCore.PhaseInfo, error) {
 	switch currentCondition.Type {
 	case commonOp.JobCreated:
-		return pluginsCore.PhaseInfoQueued(occurredAt, pluginsCore.DefaultPhaseVersion, "New job name submitted to MPI operator"), nil
+		return pluginsCore.PhaseInfoQueuedWithTaskInfo(occurredAt, pluginsCore.DefaultPhaseVersion, "New job name submitted to MPI operator", &taskPhaseInfo), nil
 	case commonOp.JobRunning:
 		return pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, &taskPhaseInfo), nil
 	case commonOp.JobSucceeded:

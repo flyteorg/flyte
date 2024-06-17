@@ -2,6 +2,7 @@ package ray
 
 import (
 	"context"
+	"reflect"
 	"testing"
 	"time"
 
@@ -676,7 +677,7 @@ func TestInjectLogsSidecar(t *testing.T) {
 	}
 }
 
-func newPluginContext() k8s.PluginContext {
+func newPluginContext(pluginState k8s.PluginState) k8s.PluginContext {
 	plg := &mocks2.PluginContext{}
 
 	taskExecID := &mocks.TaskExecutionID{}
@@ -703,6 +704,19 @@ func newPluginContext() k8s.PluginContext {
 	tskCtx := &mocks.TaskExecutionMetadata{}
 	tskCtx.OnGetTaskExecutionID().Return(taskExecID)
 	plg.OnTaskExecutionMetadata().Return(tskCtx)
+
+	pluginStateReaderMock := mocks.PluginStateReader{}
+	pluginStateReaderMock.On("Get", mock.AnythingOfType(reflect.TypeOf(&pluginState).String())).Return(
+		func(v interface{}) uint8 {
+			*(v.(*k8s.PluginState)) = pluginState
+			return 0
+		},
+		func(v interface{}) error {
+			return nil
+		})
+
+	plg.OnPluginStateReader().Return(&pluginStateReaderMock)
+
 	return plg
 }
 
@@ -720,7 +734,7 @@ func init() {
 func TestGetTaskPhase(t *testing.T) {
 	ctx := context.Background()
 	rayJobResourceHandler := rayJobResourceHandler{}
-	pluginCtx := newPluginContext()
+	pluginCtx := newPluginContext(k8s.PluginState{})
 
 	testCases := []struct {
 		rayJobPhase       rayv1.JobDeploymentStatus
@@ -751,8 +765,28 @@ func TestGetTaskPhase(t *testing.T) {
 	}
 }
 
+func TestGetTaskPhaseIncreasePhaseVersion(t *testing.T) {
+	rayJobResourceHandler := rayJobResourceHandler{}
+
+	ctx := context.TODO()
+
+	pluginState := k8s.PluginState{
+		Phase:        pluginsCore.PhaseInitializing,
+		PhaseVersion: pluginsCore.DefaultPhaseVersion,
+		Reason:       "task submitted to K8s",
+	}
+	pluginCtx := newPluginContext(pluginState)
+
+	rayObject := &rayv1.RayJob{}
+	rayObject.Status.JobDeploymentStatus = rayv1.JobDeploymentStatusInitializing
+	phaseInfo, err := rayJobResourceHandler.GetTaskPhase(ctx, pluginCtx, rayObject)
+
+	assert.NoError(t, err)
+	assert.Equal(t, phaseInfo.Version(), pluginsCore.DefaultPhaseVersion+1)
+}
+
 func TestGetEventInfo_LogTemplates(t *testing.T) {
-	pluginCtx := newPluginContext()
+	pluginCtx := newPluginContext(k8s.PluginState{})
 	testCases := []struct {
 		name             string
 		rayJob           rayv1.RayJob
@@ -851,7 +885,7 @@ func TestGetEventInfo_LogTemplates(t *testing.T) {
 }
 
 func TestGetEventInfo_LogTemplates_V1(t *testing.T) {
-	pluginCtx := newPluginContext()
+	pluginCtx := newPluginContext(k8s.PluginState{})
 	testCases := []struct {
 		name             string
 		rayJob           rayv1.RayJob
@@ -950,7 +984,7 @@ func TestGetEventInfo_LogTemplates_V1(t *testing.T) {
 }
 
 func TestGetEventInfo_DashboardURL(t *testing.T) {
-	pluginCtx := newPluginContext()
+	pluginCtx := newPluginContext(k8s.PluginState{})
 	testCases := []struct {
 		name                 string
 		rayJob               rayv1.RayJob
@@ -1002,7 +1036,7 @@ func TestGetEventInfo_DashboardURL(t *testing.T) {
 }
 
 func TestGetEventInfo_DashboardURL_V1(t *testing.T) {
-	pluginCtx := newPluginContext()
+	pluginCtx := newPluginContext(k8s.PluginState{})
 	testCases := []struct {
 		name                 string
 		rayJob               rayv1.RayJob
