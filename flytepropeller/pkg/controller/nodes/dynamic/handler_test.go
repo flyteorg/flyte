@@ -576,12 +576,12 @@ func Test_dynamicNodeHandler_Handle_SubTaskV1(t *testing.T) {
 				assert.NoError(t, nCtx.DataStore().WriteProtobuf(context.TODO(), endF, storage.Options{}, &core.LiteralMap{}))
 			}
 			execContext := executorMocks.ExecutionContext{}
-			execContext.OnGetEventVersion().Return(v1alpha1.EventVersion1)
+			execContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion1)
 			immutableParentInfo := executorMocks.ImmutableParentInfo{}
 			immutableParentInfo.OnGetUniqueID().Return("c1")
 			immutableParentInfo.OnCurrentAttempt().Return(uint32(2))
-			execContext.OnGetParentInfo().Return(&immutableParentInfo)
-			execContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
+			execContext.EXPECT().GetParentInfo().Return(&immutableParentInfo)
+			execContext.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
 			nCtx.OnExecutionContext().Return(&execContext)
 			d := New(h, n, mockLPLauncher, eventConfig, promutils.NewTestScope())
 			got, err := d.Handle(context.TODO(), nCtx)
@@ -766,9 +766,9 @@ func Test_dynamicNodeHandler_Handle_SubTask(t *testing.T) {
 				assert.NoError(t, nCtx.DataStore().WriteProtobuf(context.TODO(), endF, storage.Options{}, &core.LiteralMap{}))
 			}
 			execContext := executorMocks.ExecutionContext{}
-			execContext.OnGetEventVersion().Return(v1alpha1.EventVersion0)
-			execContext.OnGetParentInfo().Return(nil)
-			execContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
+			execContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion0)
+			execContext.EXPECT().GetParentInfo().Return(nil)
+			execContext.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
 			nCtx.OnExecutionContext().Return(&execContext)
 			d := New(h, n, mockLPLauncher, eventConfig, promutils.NewTestScope())
 			got, err := d.Handle(context.TODO(), nCtx)
@@ -913,8 +913,8 @@ func TestDynamicNodeTaskNodeHandler_Finalize(t *testing.T) {
 		nCtx.OnEnqueueOwnerFunc().Return(func() error { return nil })
 		nCtx.OnDataStore().Return(dataStore)
 		execContext := executorMocks.ExecutionContext{}
-		execContext.OnGetEventVersion().Return(v1alpha1.EventVersion0)
-		execContext.OnGetParentInfo().Return(nil)
+		execContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion0)
+		execContext.EXPECT().GetParentInfo().Return(nil)
 		nCtx.OnExecutionContext().Return(&execContext)
 
 		endNodeStatus := &flyteMocks.ExecutableNodeStatus{}
