@@ -55,12 +55,6 @@ type nodeExecutionEndpointMetrics struct {
 	getDynamicNodeWorkflow util.RequestMetrics
 }
 
-type domainEndpointMetrics struct {
-	scope promutils.Scope
-
-	get util.RequestMetrics
-}
-
 type projectEndpointMetrics struct {
 	scope promutils.Scope
 
@@ -68,6 +62,12 @@ type projectEndpointMetrics struct {
 	list     util.RequestMetrics
 	update   util.RequestMetrics
 	get      util.RequestMetrics
+}
+
+type domainEndpointMetrics struct {
+	scope promutils.Scope
+
+	get util.RequestMetrics
 }
 
 type attributeEndpointMetrics struct {
@@ -122,8 +122,8 @@ type AdminMetrics struct {
 	launchPlanEndpointMetrics              launchPlanEndpointMetrics
 	namedEntityEndpointMetrics             namedEntityEndpointMetrics
 	nodeExecutionEndpointMetrics           nodeExecutionEndpointMetrics
-	domainEndpointMetrics                  domainEndpointMetrics
 	projectEndpointMetrics                 projectEndpointMetrics
+	domainEndpointMetrics                  domainEndpointMetrics
 	projectAttributesEndpointMetrics       attributeEndpointMetrics
 	projectDomainAttributesEndpointMetrics attributeEndpointMetrics
 	workflowAttributesEndpointMetrics      attributeEndpointMetrics
@@ -179,16 +179,16 @@ func InitMetrics(adminScope promutils.Scope) AdminMetrics {
 			listChildren:           util.NewRequestMetrics(adminScope, "list_children_node_executions"),
 			getDynamicNodeWorkflow: util.NewRequestMetrics(adminScope, "get_dynamic_node_workflow"),
 		},
-		domainEndpointMetrics: domainEndpointMetrics{
-			scope: adminScope,
-			get:   util.NewRequestMetrics(adminScope, "get_domain"),
-		},
 		projectEndpointMetrics: projectEndpointMetrics{
 			scope:    adminScope,
 			register: util.NewRequestMetrics(adminScope, "register_project"),
 			list:     util.NewRequestMetrics(adminScope, "list_projects"),
 			update:   util.NewRequestMetrics(adminScope, "update_project"),
 			get:      util.NewRequestMetrics(adminScope, "get_project"),
+		},
+		domainEndpointMetrics: domainEndpointMetrics{
+			scope: adminScope,
+			get:   util.NewRequestMetrics(adminScope, "get_domain"),
 		},
 		projectAttributesEndpointMetrics: attributeEndpointMetrics{
 			scope:  adminScope,

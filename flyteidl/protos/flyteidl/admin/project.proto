@@ -7,8 +7,7 @@ option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin
 import "flyteidl/admin/common.proto";
 
 // Empty request for GetDomain
-message GetDomainRequest {
-}
+message GetDomainRequest {}
 
 // Namespace within a project commonly used to differentiate between different service instances.
 // e.g. "production", "development", etc.

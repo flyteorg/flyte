@@ -14,20 +14,6 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
-func TestGetDomains(t *testing.T) {
-	ctx := context.Background()
-	client, conn := GetTestAdminServiceClient()
-	defer conn.Close()
-
-	domains, err := client.GetDomains(ctx, &admin.GetDomainRequest{})
-	assert.Nil(t, err)
-	assert.NotEmpty(t, domains.Domains)
-	for _, domain := range domains.Domains {
-		assert.Contains(t, []string{"development", "domain", "staging", "production"}, domain.Id)
-		assert.Contains(t, []string{"development", "domain", "staging", "production"}, domain.Name)
-	}
-}
-
 func TestCreateProject(t *testing.T) {
 	truncateAllTablesForTestingOnly()
 	ctx := context.Background()
@@ -240,4 +226,18 @@ func TestUpdateProjectLabels_BadLabels(t *testing.T) {
 
 	// Assert that update went through without an error.
 	assert.EqualError(t, err, "rpc error: code = InvalidArgument desc = invalid label value [#bar]: [a valid label must be an empty string or consist of alphanumeric characters, '-', '_' or '.', and must start and end with an alphanumeric character (e.g. 'MyValue',  or 'my_value',  or '12345', regex used for validation is '(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])?')]")
+}
+
+func TestGetDomains(t *testing.T) {
+	ctx := context.Background()
+	client, conn := GetTestAdminServiceClient()
+	defer conn.Close()
+
+	domains, err := client.GetDomains(ctx, &admin.GetDomainRequest{})
+	assert.Nil(t, err)
+	assert.NotEmpty(t, domains.Domains)
+	for _, domain := range domains.Domains {
+		assert.Contains(t, []string{"development", "domain", "staging", "production"}, domain.Id)
+		assert.Contains(t, []string{"development", "domain", "staging", "production"}, domain.Name)
+	}
 }
