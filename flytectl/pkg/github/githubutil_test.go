@@ -10,7 +10,6 @@ import (
 	"github.com/flyteorg/flyte/flytectl/pkg/platformutil"
 	stdlibversion "github.com/flyteorg/flyte/flytestdlib/version"
 	"github.com/google/go-github/v42/github"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"golang.org/x/text/cases"
