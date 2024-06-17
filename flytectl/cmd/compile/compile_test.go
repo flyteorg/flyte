@@ -43,6 +43,8 @@ func TestCompileCommand(t *testing.T) {
 	assert.NotNil(t, err, "calling compile with Empty file flag does not error")
 }
 
+// New packages can be created by using the following command
+// pyflyte --pkgs <module> package -f
 func TestCompilePackage(t *testing.T) {
 	// valid package contains two workflows
 	// with three tasks
