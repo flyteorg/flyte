@@ -327,20 +327,29 @@ func (p daskResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s
 		}
 	}
 
+	var phaseInfo pluginsCore.PhaseInfo
 	switch status {
 	case "":
-		return pluginsCore.PhaseInfoInitializing(occurredAt, pluginsCore.DefaultPhaseVersion, "unknown", &info), nil
+		phaseInfo = pluginsCore.PhaseInfoInitializing(occurredAt, pluginsCore.DefaultPhaseVersion, "unknown", &info)
 	case daskAPI.DaskJobCreated:
-		return pluginsCore.PhaseInfoInitializing(occurredAt, pluginsCore.DefaultPhaseVersion, "job created", &info), nil
+		phaseInfo = pluginsCore.PhaseInfoInitializing(occurredAt, pluginsCore.DefaultPhaseVersion, "job created", &info)
 	case daskAPI.DaskJobClusterCreated:
-		return pluginsCore.PhaseInfoInitializing(occurredAt, pluginsCore.DefaultPhaseVersion, "cluster created", &info), nil
+		phaseInfo = pluginsCore.PhaseInfoInitializing(occurredAt, pluginsCore.DefaultPhaseVersion, "cluster created", &info)
 	case daskAPI.DaskJobFailed:
 		reason := "Dask Job failed"
-		return pluginsCore.PhaseInfoRetryableFailure(errors.DownstreamSystemError, reason, &info), nil
+		phaseInfo = pluginsCore.PhaseInfoRetryableFailure(errors.DownstreamSystemError, reason, &info)
 	case daskAPI.DaskJobSuccessful:
-		return pluginsCore.PhaseInfoSuccess(&info), nil
+		phaseInfo = pluginsCore.PhaseInfoSuccess(&info)
+	default:
+		phaseInfo = pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, &info)
 	}
-	return pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, &info), nil
+
+	phaseVersionUpdateErr := k8s.MaybeUpdatePhaseVersionFromPluginContext(&phaseInfo, &pluginContext)
+	if phaseVersionUpdateErr != nil {
+		return phaseInfo, phaseVersionUpdateErr
+	}
+
+	return phaseInfo, nil
 }
 
 func (daskResourceHandler) GetProperties() k8s.PluginProperties {

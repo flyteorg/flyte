@@ -3,6 +3,7 @@ package spark
 import (
 	"context"
 	"os"
+	"reflect"
 	"strconv"
 	"testing"
 
@@ -97,7 +98,7 @@ func TestGetEventInfo(t *testing.T) {
 			},
 		},
 	}))
-	pluginContext := dummySparkPluginContext(dummySparkTaskTemplateContainer("blah-1", dummySparkConf), false)
+	pluginContext := dummySparkPluginContext(dummySparkTaskTemplateContainer("blah-1", dummySparkConf), false, k8s.PluginState{})
 	info, err := getEventInfoForSpark(pluginContext, dummySparkApplication(sj.RunningState))
 	assert.NoError(t, err)
 	assert.Len(t, info.Logs, 6)
@@ -119,9 +120,14 @@ func TestGetEventInfo(t *testing.T) {
 	assert.Equal(t, expectedLinks, generatedLinks)
 
 	info, err = getEventInfoForSpark(pluginContext, dummySparkApplication(sj.SubmittedState))
+	generatedLinks = make([]string, 0, len(info.Logs))
+	for _, l := range info.Logs {
+		generatedLinks = append(generatedLinks, l.Uri)
+	}
 	assert.NoError(t, err)
-	assert.Len(t, info.Logs, 1)
-	assert.Equal(t, "https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logStream:group=/kubernetes/flyte;prefix=var.log.containers.spark-app-name;streamFilter=typeLogStreamPrefix", info.Logs[0].Uri)
+	assert.Len(t, info.Logs, 5)
+	assert.Equal(t, expectedLinks[:5], generatedLinks) // No Spark Driver UI for Submitted state
+	assert.True(t, info.Logs[4].ShowWhilePending)      // All User Logs should be shown while pending
 
 	assert.NoError(t, setSparkConfig(&Config{
 		SparkHistoryServerURL: "spark-history.flyte",
@@ -192,7 +198,7 @@ func TestGetTaskPhase(t *testing.T) {
 	}
 
 	ctx := context.TODO()
-	pluginCtx := dummySparkPluginContext(dummySparkTaskTemplateContainer("", dummySparkConf), false)
+	pluginCtx := dummySparkPluginContext(dummySparkTaskTemplateContainer("", dummySparkConf), false, k8s.PluginState{})
 	taskPhase, err := sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.NewState))
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Phase(), pluginsCore.PhaseQueued)
@@ -262,6 +268,23 @@ func TestGetTaskPhase(t *testing.T) {
 	assert.NotNil(t, taskPhase.Info())
 	assert.Equal(t, expectedLogCtx, taskPhase.Info().LogContext)
 	assert.Nil(t, err)
+}
+
+func TestGetTaskPhaseIncreasePhaseVersion(t *testing.T) {
+	sparkResourceHandler := sparkResourceHandler{}
+	ctx := context.TODO()
+
+	pluginState := k8s.PluginState{
+		Phase:        pluginsCore.PhaseInitializing,
+		PhaseVersion: pluginsCore.DefaultPhaseVersion,
+		Reason:       "task submitted to K8s",
+	}
+
+	pluginCtx := dummySparkPluginContext(dummySparkTaskTemplateContainer("", dummySparkConf), false, pluginState)
+	taskPhase, err := sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.SubmittedState))
+
+	assert.NoError(t, err)
+	assert.Equal(t, taskPhase.Version(), pluginsCore.DefaultPhaseVersion+1)
 }
 
 func dummySparkApplication(state sj.ApplicationStateType) *sj.SparkApplication {
@@ -450,7 +473,7 @@ func dummySparkTaskContext(taskTemplate *core.TaskTemplate, interruptible bool) 
 	return taskCtx
 }
 
-func dummySparkPluginContext(taskTemplate *core.TaskTemplate, interruptible bool) k8s.PluginContext {
+func dummySparkPluginContext(taskTemplate *core.TaskTemplate, interruptible bool, pluginState k8s.PluginState) k8s.PluginContext {
 	pCtx := &k8smocks.PluginContext{}
 	inputReader := &pluginIOMocks.InputReader{}
 	inputReader.OnGetInputPrefixPath().Return("/input/prefix")
@@ -510,6 +533,18 @@ func dummySparkPluginContext(taskTemplate *core.TaskTemplate, interruptible bool
 	taskExecutionMetadata.On("GetK8sServiceAccount").Return("new-val")
 	taskExecutionMetadata.On("GetConsoleURL").Return("")
 	pCtx.OnTaskExecutionMetadata().Return(taskExecutionMetadata)
+
+	pluginStateReaderMock := mocks.PluginStateReader{}
+	pluginStateReaderMock.On("Get", mock.AnythingOfType(reflect.TypeOf(&pluginState).String())).Return(
+		func(v interface{}) uint8 {
+			*(v.(*k8s.PluginState)) = pluginState
+			return 0
+		},
+		func(v interface{}) error {
+			return nil
+		})
+
+	pCtx.OnPluginStateReader().Return(&pluginStateReaderMock)
 	return pCtx
 }
 

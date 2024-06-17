@@ -2,7 +2,6 @@ package pod
 
 import (
 	"context"
-	"time"
 
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -174,7 +173,7 @@ func (plugin) GetTaskPhaseWithLogs(ctx context.Context, pluginContext k8s.Plugin
 	}
 
 	taskExecID := pluginContext.TaskExecutionMetadata().GetTaskExecutionID()
-	if pod.Status.Phase != v1.PodPending && pod.Status.Phase != v1.PodUnknown {
+	if pod.Status.Phase != v1.PodUnknown {
 		taskLogs, err := logs.GetLogsForContainerInPod(ctx, logPlugin, taskExecID, pod, 0, logSuffix, extraLogTemplateVarsByScheme, taskTemplate)
 		if err != nil {
 			return pluginsCore.PhaseInfoUndefined, err
@@ -206,6 +205,8 @@ func (plugin) GetProperties() k8s.PluginProperties {
 }
 
 func DemystifyPodStatus(pod *v1.Pod, info pluginsCore.TaskInfo) (pluginsCore.PhaseInfo, error) {
+	pluginState := k8s.PluginState{}
+	transitionOccurredAt := flytek8s.GetLastTransitionOccurredAt(pod).Time
 	phaseInfo := pluginsCore.PhaseInfoUndefined
 	var err error
 
@@ -216,9 +217,9 @@ func DemystifyPodStatus(pod *v1.Pod, info pluginsCore.TaskInfo) (pluginsCore.Pha
 	case v1.PodFailed:
 		phaseInfo, err = flytek8s.DemystifyFailure(pod.Status, info)
 	case v1.PodPending:
-		phaseInfo, err = flytek8s.DemystifyPending(pod.Status)
+		phaseInfo, err = flytek8s.DemystifyPending(pod.Status, info)
 	case v1.PodReasonUnschedulable:
-		phaseInfo = pluginsCore.PhaseInfoQueued(*timeOrNow(info.OccurredAt), pluginsCore.DefaultPhaseVersion, "pod unschedulable")
+		phaseInfo = pluginsCore.PhaseInfoQueuedWithTaskInfo(transitionOccurredAt, pluginsCore.DefaultPhaseVersion, "pod unschedulable", &info)
 	case v1.PodUnknown:
 		// DO NOTHING
 	default:
@@ -263,15 +264,12 @@ func DemystifyPodStatus(pod *v1.Pod, info pluginsCore.TaskInfo) (pluginsCore.Pha
 		}
 	}
 
-	return phaseInfo, err
-}
-
-func timeOrNow(t *time.Time) *time.Time {
-	if t != nil {
-		return t
+	if err != nil {
+		return pluginsCore.PhaseInfoUndefined, err
 	}
-	now := time.Now()
-	return &now
+
+	k8s.MaybeUpdatePhaseVersion(&phaseInfo, &pluginState)
+	return phaseInfo, err
 }
 
 func init() {

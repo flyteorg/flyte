@@ -168,3 +168,25 @@ func AbortBehaviorDelete(resource client.Object) AbortBehavior {
 		DeleteResource: true,
 	}
 }
+
+// if we have the same Phase as the previous evaluation and updated the Reason but not the PhaseVersion we must
+// update the PhaseVersion so an event is sent to reflect the Reason update. this does not handle the Running
+// Phase because the legacy used `DefaultPhaseVersion + 1` which will only increment to 1.
+
+func MaybeUpdatePhaseVersion(phaseInfo *pluginsCore.PhaseInfo, pluginState *PluginState) {
+	if phaseInfo.Phase() != pluginsCore.PhaseRunning && phaseInfo.Phase() == pluginState.Phase &&
+		phaseInfo.Version() <= pluginState.PhaseVersion && phaseInfo.Reason() != pluginState.Reason {
+
+		*phaseInfo = phaseInfo.WithVersion(pluginState.PhaseVersion + 1)
+	}
+}
+
+func MaybeUpdatePhaseVersionFromPluginContext(phaseInfo *pluginsCore.PhaseInfo, pluginContext *PluginContext) error {
+	pluginState := PluginState{}
+	_, err := (*pluginContext).PluginStateReader().Get(&pluginState)
+	if err != nil {
+		return err
+	}
+	MaybeUpdatePhaseVersion(phaseInfo, &pluginState)
+	return nil
+}
