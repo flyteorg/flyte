@@ -32,7 +32,7 @@ func TestCheckStatus(t *testing.T) {
 			workerID:      "w1",
 			taskStatuses:  nil,
 			expectedPhase: core.PhaseUndefined,
-			expectedError: fmt.Errorf("task context not found"),
+			expectedError: fmt.Errorf("task context not found: %w", taskContextNotFoundError),
 		},
 		{
 			name:          "NoUpdates",

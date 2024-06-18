@@ -348,7 +348,7 @@ func (f *fastTaskServiceImpl) CheckStatus(ctx context.Context, taskID, queueID, 
 		// if this plugin restarts then TaskContexts may not exist for tasks that are still active. we can
 		// create a TaskContext here because we ensure it will be cleaned up when the task completes.
 		f.taskStatusChannels.Store(taskID, make(chan *workerTaskStatus, GetConfig().TaskStatusBufferSize))
-		return core.PhaseUndefined, "", fmt.Errorf("task context not found")
+		return core.PhaseUndefined, "", fmt.Errorf("task context not found: %w", taskContextNotFoundError)
 	}
 
 	taskStatusChannel := taskStatusChannelResult.(chan *workerTaskStatus)

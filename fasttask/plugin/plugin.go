@@ -31,7 +31,10 @@ import (
 
 const fastTaskType = "fast-task"
 
-var statusUpdateNotFoundError = errors.New("StatusUpdateNotFound")
+var (
+	statusUpdateNotFoundError = errors.New("StatusUpdateNotFound")
+	taskContextNotFoundError  = errors.New("TaskContextNotFound")
+)
 
 type SubmissionPhase int
 
@@ -285,7 +288,7 @@ func (p *Plugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (co
 		phase, reason, err := p.fastTaskService.CheckStatus(ctx, taskID, fastTaskEnvironment.GetQueueId(), pluginState.WorkerID)
 
 		now := time.Now()
-		if err != nil && !errors.Is(err, statusUpdateNotFoundError) {
+		if err != nil && !errors.Is(err, statusUpdateNotFoundError) && !errors.Is(err, taskContextNotFoundError) {
 			return core.UnknownTransition, err
 		} else if errors.Is(err, statusUpdateNotFoundError) && now.Sub(pluginState.LastUpdated) > GetConfig().GracePeriodStatusNotFound.Duration {
 			// if task has not been updated within the grace period we should abort
