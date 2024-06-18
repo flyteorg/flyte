@@ -257,6 +257,10 @@ func customizeField(field string, entity Entity) string {
 	if entity == Execution && executionIdentifierFields[field] {
 		return fmt.Sprintf("execution_%s", field)
 	}
+	// admin_tag table has been migrated to an execution_tag table, so we need to customize the field name.
+	if entity == AdminTag && field == "name" {
+		return "key"
+	}
 	return field
 }
 
@@ -265,6 +269,10 @@ func customizeEntity(field string, entity Entity) Entity {
 	// is stored using a different entity type.
 	if entity == NamedEntity && entityMetadataFields[field] {
 		return NamedEntityMetadata
+	}
+	// admin_tag table has been migrated to an execution_tag table.
+	if entity == AdminTag {
+		return ExecutionTag
 	}
 	return entity
 }
@@ -290,8 +298,9 @@ func NewRepeatedValueFilter(entity Entity, function FilterExpression, field stri
 		return nil, GetInvalidRepeatedValueFilterErr(function)
 	}
 	customizedField := customizeField(field, entity)
+	customizedEntity := customizeEntity(field, entity)
 	return &inlineFilterImpl{
-		entity:        entity,
+		entity:        customizedEntity,
 		function:      function,
 		field:         customizedField,
 		repeatedValue: repeatedValue,

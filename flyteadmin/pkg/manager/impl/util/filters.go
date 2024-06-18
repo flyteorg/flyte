@@ -64,6 +64,7 @@ var filterFieldEntityPrefix = map[string]common.Entity{
 	"signal":                common.Signal,
 	"admin_tag":             common.AdminTag,
 	"execution_admin_tag":   common.ExecutionAdminTag,
+	"execution_tag":         common.ExecutionTag,
 }
 
 func parseField(field string, primaryEntity common.Entity) (common.Entity, string) {
@@ -121,7 +122,7 @@ func prepareValues(field string, values []string) (interface{}, error) {
 }
 
 var allowedJoinEntities = map[common.Entity]sets.String{
-	common.Execution:           sets.NewString(common.Execution, common.LaunchPlan, common.Workflow, common.Task, common.AdminTag),
+	common.Execution:           sets.NewString(common.Execution, common.LaunchPlan, common.Workflow, common.Task, common.AdminTag, common.ExecutionTag),
 	common.LaunchPlan:          sets.NewString(common.LaunchPlan, common.Workflow),
 	common.NodeExecution:       sets.NewString(common.NodeExecution, common.Execution),
 	common.NodeExecutionEvent:  sets.NewString(common.NodeExecutionEvent),
@@ -133,6 +134,7 @@ var allowedJoinEntities = map[common.Entity]sets.String{
 	common.Project:             sets.NewString(common.Project),
 	common.Signal:              sets.NewString(common.Signal),
 	common.AdminTag:            sets.NewString(common.AdminTag),
+	common.ExecutionTag:        sets.NewString(common.ExecutionTag),
 }
 
 var entityColumns = map[common.Entity]sets.String{
@@ -148,6 +150,7 @@ var entityColumns = map[common.Entity]sets.String{
 	common.Project:             models.ProjectColumns,
 	common.Signal:              models.SignalColumns,
 	common.AdminTag:            models.AdminTagColumns,
+	common.ExecutionTag:        models.ExecutionTagColumns,
 }
 
 func ParseFilters(filterParams string, primaryEntity common.Entity) ([]common.InlineFilter, error) {

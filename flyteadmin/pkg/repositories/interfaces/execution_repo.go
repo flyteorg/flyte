@@ -9,7 +9,7 @@ import (
 // Defines the interface for interacting with workflow execution models.
 type ExecutionRepoInterface interface {
 	// Inserts a workflow execution model into the database store.
-	Create(ctx context.Context, input models.Execution) error
+	Create(ctx context.Context, input models.Execution, executionTagModel []*models.ExecutionTag) error
 	// This updates only an existing execution model with all non-empty fields in the input.
 	Update(ctx context.Context, execution models.Execution) error
 	// Returns a matching execution if it exists.
