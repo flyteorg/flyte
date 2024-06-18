@@ -172,7 +172,7 @@ jobs:
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install flytekit flytekitplugins-deck-standard "numpy<2.0.0" flytekitplugins-envd pyarrow pandas
+          pip install flytekit flytekitplugins-deck-standard flytekitplugins-envd "numpy<2.0.0" pyarrow pandas
           pip freeze
       - name: Checkout flytesnacks
         uses: actions/checkout@v4
