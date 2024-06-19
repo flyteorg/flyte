@@ -6,8 +6,8 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
+	webhookConfig "github.com/flyteorg/flyte/flytepropeller/pkg/secret/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/webhook"
-	webhookConfig "github.com/flyteorg/flyte/flytepropeller/pkg/webhook/config"
 )
 
 // initCertsCmd initializes x509 TLS Certificates and saves them to a secret.

@@ -1,5 +1,6 @@
 from flyteidl.admin import cluster_assignment_pb2 as _cluster_assignment_pb2
 from flyteidl.admin import common_pb2 as _common_pb2
+from flyteidl.admin import matchable_resource_pb2 as _matchable_resource_pb2
 from flyteidl.core import literals_pb2 as _literals_pb2
 from flyteidl.core import execution_pb2 as _execution_pb2
 from flyteidl.core import execution_envs_pb2 as _execution_envs_pb2
@@ -10,7 +11,6 @@ from flyteidl.core import security_pb2 as _security_pb2
 from google.protobuf import duration_pb2 as _duration_pb2
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from google.protobuf import wrappers_pb2 as _wrappers_pb2
-from flyteidl.admin import matchable_resource_pb2 as _matchable_resource_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor

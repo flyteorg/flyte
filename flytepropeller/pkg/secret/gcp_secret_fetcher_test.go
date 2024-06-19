@@ -1,4 +1,4 @@
-package webhook
+package secret
 
 import (
 	"context"
@@ -10,8 +10,8 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/flyteorg/flyte/flytepropeller/pkg/webhook/config"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/webhook/mocks"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/secret/config"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/secret/mocks"
 	stdlibErrors "github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
@@ -42,7 +42,7 @@ func TestGetSecretValueGCP(t *testing.T) {
 			},
 		}, nil)
 
-		_, err := gcpSecretsFetcher.GetSecretValue(ctx, "secretID")
+		_, err := gcpSecretsFetcher.Get(ctx, "secretID")
 		assert.NoError(t, err)
 	})
 
@@ -56,7 +56,7 @@ func TestGetSecretValueGCP(t *testing.T) {
 			Name: fmt.Sprintf(GCPSecretNameFormat, gcpProject, secretID),
 		}).Return(nil, cause)
 
-		_, err := gcpSecretsFetcher.GetSecretValue(ctx, "secretID")
+		_, err := gcpSecretsFetcher.Get(ctx, "secretID")
 		assert.Equal(t, stdlibErrors.Wrapf(ErrCodeSecretNotFound, cause, fmt.Sprintf(SecretNotFoundErrorFormat, secretID)), err)
 	})
 
@@ -70,7 +70,7 @@ func TestGetSecretValueGCP(t *testing.T) {
 			Name: fmt.Sprintf(GCPSecretNameFormat, gcpProject, secretID),
 		}).Return(nil, cause)
 
-		_, err := gcpSecretsFetcher.GetSecretValue(ctx, "secretID")
+		_, err := gcpSecretsFetcher.Get(ctx, "secretID")
 		assert.Equal(t, stdlibErrors.Wrapf(ErrCodeSecretReadFailure, cause, fmt.Sprintf(SecretReadFailureErrorFormat, secretID)), err)
 	})
 }

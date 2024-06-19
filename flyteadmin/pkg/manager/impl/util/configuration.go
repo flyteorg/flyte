@@ -10,6 +10,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/configurations/plugin"
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
@@ -48,6 +49,10 @@ func addConfigurationSource(configuration *admin.Configuration, source admin.Att
 		Source: source,
 		Value:  configuration.ClusterAssignment,
 	}
+	configurationWithSource.ExternalResourceAttributes = &admin.ExternalResourceAttributesWithSource{
+		Source: source,
+		Value:  configuration.ExternalResourceAttributes,
+	}
 	return configurationWithSource
 }
 
@@ -77,6 +82,9 @@ func mergeConfigurations(current *admin.ConfigurationWithSource, incoming *admin
 	if current.ClusterAssignment == nil || current.ClusterAssignment.Value == nil {
 		current.ClusterAssignment = incoming.ClusterAssignment
 	}
+	if current.ExternalResourceAttributes == nil || current.ExternalResourceAttributes.Value == nil {
+		current.ExternalResourceAttributes = incoming.ExternalResourceAttributes
+	}
 	return current
 }
 
@@ -95,6 +103,7 @@ func addConfigurationIsMutable(ctx context.Context, configuration *admin.Configu
 	configuration.PluginOverrides.IsMutable = mutableAttributes.Has(admin.MatchableResource_PLUGIN_OVERRIDE)
 	configuration.WorkflowExecutionConfig.IsMutable = mutableAttributes.Has(admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG)
 	configuration.ClusterAssignment.IsMutable = mutableAttributes.Has(admin.MatchableResource_CLUSTER_ASSIGNMENT)
+	configuration.ExternalResourceAttributes.IsMutable = mutableAttributes.Has(admin.MatchableResource_EXTERNAL_RESOURCE)
 	return configuration, nil
 }
 
@@ -234,15 +243,31 @@ func collectGlobalConfiguration(ctx context.Context, config runtimeInterfaces.Co
 
 	// Workflow execution configuration
 	workflowExecutionConfig := config.ApplicationConfiguration().GetTopLevelConfig().GetAsWorkflowExecutionConfig()
+
+	// External resource attributes
+	externalResourceAttributesConfig := config.ExternalResourceConfiguration()
+	connections := make(map[string]*core.Connection)
+	for key, connection := range externalResourceAttributesConfig.GetConnections() {
+		connections[key] = &core.Connection{
+			TaskType: connection.TaskType,
+			Secrets:  connection.Secrets,
+			Configs:  connection.Configs,
+		}
+	}
+	ExternalResourceAttributes := admin.ExternalResourceAttributes{
+		Connections: connections,
+	}
+
 	return &admin.Configuration{
-		TaskResourceAttributes:    &taskResourceAttributes,
-		ClusterResourceAttributes: nil, // handle in domain level
-		ExecutionQueueAttributes:  nil,
-		ExecutionClusterLabel:     nil,
-		QualityOfService:          nil,
-		PluginOverrides:           nil,
-		WorkflowExecutionConfig:   &workflowExecutionConfig,
-		ClusterAssignment:         nil, // handle in domain level
+		TaskResourceAttributes:     &taskResourceAttributes,
+		ClusterResourceAttributes:  nil, // handle in domain level
+		ExecutionQueueAttributes:   nil,
+		ExecutionClusterLabel:      nil,
+		QualityOfService:           nil,
+		PluginOverrides:            nil,
+		WorkflowExecutionConfig:    &workflowExecutionConfig,
+		ClusterAssignment:          nil, // handle in domain level
+		ExternalResourceAttributes: &ExternalResourceAttributes,
 	}
 }
 

@@ -17,20 +17,55 @@ type TaskResources struct {
 	Limits   runtime.TaskResourceSet
 }
 
+type AttributesSource int
+
+// Connection store the secret and config information required to connect to an external service.
+type Connection struct {
+	// Defines the type of the task that the connection is associated with.
+	TaskType string
+	// Defines the source of the attributes.
+	Source AttributesSource
+	// Defines a map of secrets that are used to connect to the external services.
+	// The key is the name of the secret, such as openai_api_key, databricks_access_token, etc.
+	// The value is the reference of the k8s or aws secret.
+	Secrets map[string]string
+	// Defines a map of configs that are used to connect to the external services, such as organization_id, workspace_id, etc.
+	Configs map[string]string
+}
+
+type ExternalResourceAttributes struct {
+	// Defines a map of connections that are used to connect to the external services.
+	// The key is the name of the connection, such as openai, databricks, etc.
+	// The value is the connection object.
+	connections map[string]Connection
+}
+
+func (e *ExternalResourceAttributes) AddConnection(name string, conn Connection) {
+	if e.connections == nil {
+		e.connections = make(map[string]Connection)
+	}
+	e.connections[name] = conn
+}
+
+func (e *ExternalResourceAttributes) GetConnections() map[string]Connection {
+	return e.connections
+}
+
 type ExecutionParameters struct {
-	Inputs                *core.LiteralMap
-	AcceptedAt            time.Time
-	Labels                map[string]string
-	Annotations           map[string]string
-	TaskPluginOverrides   []*admin.PluginOverride
-	ExecutionConfig       *admin.WorkflowExecutionConfig
-	RecoveryExecution     *core.WorkflowExecutionIdentifier
-	TaskResources         *TaskResources
-	EventVersion          int
-	RoleNameKey           string
-	RawOutputDataConfig   *admin.RawOutputDataConfig
-	ClusterAssignment     *admin.ClusterAssignment
-	ExecutionClusterLabel *admin.ExecutionClusterLabel
+	Inputs                     *core.LiteralMap
+	AcceptedAt                 time.Time
+	Labels                     map[string]string
+	Annotations                map[string]string
+	TaskPluginOverrides        []*admin.PluginOverride
+	ExecutionConfig            *admin.WorkflowExecutionConfig
+	RecoveryExecution          *core.WorkflowExecutionIdentifier
+	TaskResources              *TaskResources
+	EventVersion               int
+	RoleNameKey                string
+	RawOutputDataConfig        *admin.RawOutputDataConfig
+	ClusterAssignment          *admin.ClusterAssignment
+	ExecutionClusterLabel      *admin.ExecutionClusterLabel
+	ExternalResourceAttributes *ExternalResourceAttributes
 }
 
 // ExecutionData includes all parameters required to create an execution CRD object.

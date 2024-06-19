@@ -20,8 +20,8 @@ import (
 	v1 "k8s.io/client-go/kubernetes/typed/core/v1"
 
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
+	webhookConfig "github.com/flyteorg/flyte/flytepropeller/pkg/secret/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/utils"
-	webhookConfig "github.com/flyteorg/flyte/flytepropeller/pkg/webhook/config"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 

@@ -369,6 +369,10 @@ func (m *ConfigurationManager) canEditAttributes(ctx context.Context, request ad
 	if !mutableAttributes.Has(admin.MatchableResource_CLUSTER_ASSIGNMENT) && request.Configuration.ClusterAssignment != nil {
 		notEditableAttributes = append(notEditableAttributes, admin.MatchableResource_name[int32(admin.MatchableResource_CLUSTER_ASSIGNMENT)])
 	}
+	if !mutableAttributes.Has(admin.MatchableResource_EXTERNAL_RESOURCE) && request.Configuration.ExternalResourceAttributes != nil {
+		notEditableAttributes = append(notEditableAttributes, admin.MatchableResource_name[int32(admin.MatchableResource_EXTERNAL_RESOURCE)])
+
+	}
 	if len(notEditableAttributes) > 0 {
 		logger.Debugf(ctx, "Not editable attributes: %v", notEditableAttributes)
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument, "attributes not editable: %v", notEditableAttributes)

@@ -1,4 +1,4 @@
-package webhook
+package secret
 
 import (
 	"context"
@@ -10,8 +10,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/secretsmanager/types"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/flyteorg/flyte/flytepropeller/pkg/webhook/config"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/webhook/mocks"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/secret/config"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/secret/mocks"
 	stdlibErrors "github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
@@ -41,7 +41,7 @@ func TestGetSecretValueAWS(t *testing.T) {
 			SecretString: aws.String("secretValue"),
 		}, nil)
 
-		_, err := awsSecretsFetcher.GetSecretValue(ctx, "secretID")
+		_, err := awsSecretsFetcher.Get(ctx, "secretID")
 		assert.NoError(t, err)
 	})
 
@@ -54,7 +54,7 @@ func TestGetSecretValueAWS(t *testing.T) {
 			VersionStage: aws.String(AWSSecretLatesVersion),
 		}).Return(nil, cause)
 
-		_, err := awsSecretsFetcher.GetSecretValue(ctx, "secretID")
+		_, err := awsSecretsFetcher.Get(ctx, "secretID")
 		assert.Equal(t, stdlibErrors.Wrapf(ErrCodeSecretNotFound, cause, fmt.Sprintf(SecretNotFoundErrorFormat, secretID)), err)
 	})
 
@@ -67,7 +67,7 @@ func TestGetSecretValueAWS(t *testing.T) {
 			VersionStage: aws.String(AWSSecretLatesVersion),
 		}).Return(nil, cause)
 
-		_, err := awsSecretsFetcher.GetSecretValue(ctx, "secretID")
+		_, err := awsSecretsFetcher.Get(ctx, "secretID")
 		assert.Equal(t, stdlibErrors.Wrapf(ErrCodeSecretReadFailure, cause, fmt.Sprintf(SecretReadFailureErrorFormat, secretID)), err)
 	})
 }

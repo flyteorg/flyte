@@ -29,7 +29,8 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/resourcemanager"
 	rmConfig "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/resourcemanager/config"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/secretmanager"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/secret"
+	secretConfig "github.com/flyteorg/flyte/flytepropeller/pkg/secret/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/utils"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
@@ -890,6 +891,12 @@ func New(ctx context.Context, kubeClient executors.Client, kubeClientset kuberne
 		return nil, err
 	}
 
+	secretManager, err := secret.NewSecretFetcherManager(ctx, secretConfig.GetConfig().EmbeddedSecretManagerConfig)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to create secret manager with err %v", err)
+		return nil, err
+	}
+
 	cfg := config.GetConfig()
 	return &Handler{
 		pluginRegistry: pluginMachinery.PluginRegistry(),
@@ -909,7 +916,7 @@ func New(ctx context.Context, kubeClient executors.Client, kubeClientset kuberne
 		catalog:         client,
 		asyncCatalog:    async,
 		resourceManager: nil,
-		secretManager:   secretmanager.NewFileEnvSecretManager(secretmanager.GetConfig()),
+		secretManager:   secretManager,
 		cfg:             cfg,
 		eventConfig:     eventConfig,
 		clusterID:       clusterID,

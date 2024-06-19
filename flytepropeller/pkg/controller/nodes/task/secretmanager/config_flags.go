@@ -50,6 +50,7 @@ func (Config) mustMarshalJSON(v json.Marshaler) string {
 // flags is json-name.json-sub-name... etc.
 func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags := pflag.NewFlagSet("Config", pflag.ExitOnError)
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "type"), defaultConfig.Type, "Sets the type of storage to configure [local].")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "secrets-prefix"), defaultConfig.SecretFilePrefix, " Prefix where to look for secrets file")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "env-prefix"), defaultConfig.EnvironmentPrefix, " Prefix for environment variables")
 	return cmdFlags

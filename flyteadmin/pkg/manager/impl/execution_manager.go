@@ -13,6 +13,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"github.com/flyteorg/flyte/flyteadmin/auth"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/artifacts"
@@ -427,6 +428,70 @@ func (m *ExecutionManager) getClusterAssignment(ctx context.Context, request *ad
 	}, nil
 }
 
+func (m *ExecutionManager) getExternalResourceAttributes(ctx context.Context, request *admin.ExecutionCreateRequest) (
+	*workflowengineInterfaces.ExternalResourceAttributes, error) {
+	// Merge connections from all sources
+	// The order of precedence is Project-Domain > Project > Global
+	// conn1 (openai) <- project-domain
+	// conn2 (databricks) <- project
+	// conn3 (s3) <- global
+	// conn4 (databricks) <- global
+	// conn5 (openai) <- global
+	// Merged connections: conn1, conn2, conn3
+	externalResourceAttributes := &workflowengineInterfaces.ExternalResourceAttributes{}
+
+	// TODO: Get the global level external resource attributes
+
+	// Project level external resource attributes
+	projectResource, err := m.resourceManager.GetResource(ctx, interfaces.ResourceRequest{
+		Org:          request.Org,
+		Project:      request.Project,
+		ResourceType: admin.MatchableResource_EXTERNAL_RESOURCE,
+	})
+	if err != nil && !errors.IsDoesNotExistError(err) {
+		errString := fmt.Sprintf("Failed to get external resource with error: %v", err)
+		logger.Error(ctx, errString)
+		return nil, status.Errorf(codes.Internal, errString)
+	}
+	if projectResource != nil && projectResource.Attributes.GetExternalResourceAttributes() != nil {
+		attr := projectResource.Attributes.GetExternalResourceAttributes()
+		for name, connection := range attr.Connections {
+			externalResourceAttributes.AddConnection(name, workflowengineInterfaces.Connection{
+				TaskType: connection.GetTaskType(),
+				Secrets:  connection.GetSecrets(),
+				Configs:  connection.GetConfigs(),
+				Source:   workflowengineInterfaces.AttributesSource(admin.AttributesSource_PROJECT),
+			})
+		}
+	}
+
+	// Project-Domain level external resource attributes
+	projectDomainResource, err := m.resourceManager.GetResource(ctx, interfaces.ResourceRequest{
+		Org:          request.Org,
+		Project:      request.Project,
+		Domain:       request.Domain,
+		ResourceType: admin.MatchableResource_EXTERNAL_RESOURCE,
+	})
+	if err != nil && !errors.IsDoesNotExistError(err) {
+		errString := fmt.Sprintf("Failed to get external resource with error: %v", err)
+		logger.Error(ctx, errString)
+		return nil, status.Errorf(codes.Internal, errString)
+	}
+	if projectDomainResource != nil && projectDomainResource.Attributes.GetExternalResourceAttributes() != nil {
+		attr := projectDomainResource.Attributes.GetExternalResourceAttributes()
+		for name, connection := range attr.Connections {
+			externalResourceAttributes.AddConnection(name, workflowengineInterfaces.Connection{
+				TaskType: connection.GetTaskType(),
+				Secrets:  connection.GetSecrets(),
+				Configs:  connection.GetConfigs(),
+				Source:   workflowengineInterfaces.AttributesSource(admin.AttributesSource_PROJECT_DOMAIN),
+			})
+		}
+	}
+
+	return externalResourceAttributes, nil
+}
+
 func (m *ExecutionManager) launchSingleTaskExecution(
 	ctx context.Context, request admin.ExecutionCreateRequest, requestedAt time.Time) (
 	context.Context, *models.Execution, []*models.ExecutionTag, error) {
@@ -575,22 +640,28 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 		return nil, nil, nil, err
 	}
 
+	externalResourceAttributes, err := m.getExternalResourceAttributes(ctx, &request)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
 	var executionClusterLabel *admin.ExecutionClusterLabel
 	if requestSpec.ExecutionClusterLabel != nil {
 		executionClusterLabel = requestSpec.ExecutionClusterLabel
 	}
 	executionParameters := workflowengineInterfaces.ExecutionParameters{
-		Inputs:                executionInputs,
-		AcceptedAt:            requestedAt,
-		Labels:                labels,
-		Annotations:           annotations,
-		ExecutionConfig:       executionConfig,
-		TaskResources:         &platformTaskResources,
-		EventVersion:          m.config.ApplicationConfiguration().GetTopLevelConfig().EventVersion,
-		RoleNameKey:           m.config.ApplicationConfiguration().GetTopLevelConfig().RoleNameKey,
-		RawOutputDataConfig:   rawOutputDataConfig,
-		ClusterAssignment:     clusterAssignment,
-		ExecutionClusterLabel: executionClusterLabel,
+		Inputs:                     executionInputs,
+		AcceptedAt:                 requestedAt,
+		Labels:                     labels,
+		Annotations:                annotations,
+		ExecutionConfig:            executionConfig,
+		TaskResources:              &platformTaskResources,
+		EventVersion:               m.config.ApplicationConfiguration().GetTopLevelConfig().EventVersion,
+		RoleNameKey:                m.config.ApplicationConfiguration().GetTopLevelConfig().RoleNameKey,
+		RawOutputDataConfig:        rawOutputDataConfig,
+		ClusterAssignment:          clusterAssignment,
+		ExecutionClusterLabel:      executionClusterLabel,
+		ExternalResourceAttributes: externalResourceAttributes,
 	}
 
 	overrides, err := m.addPluginOverrides(ctx, &workflowExecutionID, workflowExecutionID.Name, "")
@@ -1180,18 +1251,24 @@ func (m *ExecutionManager) launchExecution(
 		executionClusterLabel = requestSpec.ExecutionClusterLabel
 	}
 
+	externalResourceAttributes, err := m.getExternalResourceAttributes(ctx, &request)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
 	executionParameters := workflowengineInterfaces.ExecutionParameters{
-		Inputs:                executionInputs,
-		AcceptedAt:            requestedAt,
-		Labels:                labels,
-		Annotations:           annotations,
-		ExecutionConfig:       executionConfig,
-		TaskResources:         &taskResources,
-		EventVersion:          m.config.ApplicationConfiguration().GetTopLevelConfig().EventVersion,
-		RoleNameKey:           m.config.ApplicationConfiguration().GetTopLevelConfig().RoleNameKey,
-		RawOutputDataConfig:   rawOutputDataConfig,
-		ClusterAssignment:     clusterAssignment,
-		ExecutionClusterLabel: executionClusterLabel,
+		Inputs:                     executionInputs,
+		AcceptedAt:                 requestedAt,
+		Labels:                     labels,
+		Annotations:                annotations,
+		ExecutionConfig:            executionConfig,
+		TaskResources:              &taskResources,
+		EventVersion:               m.config.ApplicationConfiguration().GetTopLevelConfig().EventVersion,
+		RoleNameKey:                m.config.ApplicationConfiguration().GetTopLevelConfig().RoleNameKey,
+		RawOutputDataConfig:        rawOutputDataConfig,
+		ClusterAssignment:          clusterAssignment,
+		ExecutionClusterLabel:      executionClusterLabel,
+		ExternalResourceAttributes: externalResourceAttributes,
 	}
 
 	overrides, err := m.addPluginOverrides(ctx, &workflowExecutionID, launchPlan.GetSpec().WorkflowId.Name, launchPlan.Id.Name)

@@ -148,6 +148,40 @@ func (_m *Configuration) ClusterResourceConfiguration() interfaces.ClusterResour
 	return r0
 }
 
+type Configuration_ExternalResourceConfiguration struct {
+	*mock.Call
+}
+
+func (_m Configuration_ExternalResourceConfiguration) Return(_a0 interfaces.ExternalResourceConfiguration) *Configuration_ExternalResourceConfiguration {
+	return &Configuration_ExternalResourceConfiguration{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *Configuration) OnExternalResourceConfiguration() *Configuration_ExternalResourceConfiguration {
+	c_call := _m.On("ExternalResourceConfiguration")
+	return &Configuration_ExternalResourceConfiguration{Call: c_call}
+}
+
+func (_m *Configuration) OnExternalResourceConfigurationMatch(matchers ...interface{}) *Configuration_ExternalResourceConfiguration {
+	c_call := _m.On("ExternalResourceConfiguration", matchers...)
+	return &Configuration_ExternalResourceConfiguration{Call: c_call}
+}
+
+// ExternalResourceConfiguration provides a mock function with given fields:
+func (_m *Configuration) ExternalResourceConfiguration() interfaces.ExternalResourceConfiguration {
+	ret := _m.Called()
+
+	var r0 interfaces.ExternalResourceConfiguration
+	if rf, ok := ret.Get(0).(func() interfaces.ExternalResourceConfiguration); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(interfaces.ExternalResourceConfiguration)
+		}
+	}
+
+	return r0
+}
+
 type Configuration_NamespaceMappingConfiguration struct {
 	*mock.Call
 }

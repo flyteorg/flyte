@@ -5,7 +5,7 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
-import { ClusterResourceAttributes, ExecutionClusterLabel, ExecutionQueueAttributes, PluginOverrides, TaskResourceAttributes, WorkflowExecutionConfig } from "./matchable_resource_pb.js";
+import { ClusterResourceAttributes, ExecutionClusterLabel, ExecutionQueueAttributes, ExternalResourceAttributes, PluginOverrides, TaskResourceAttributes, WorkflowExecutionConfig } from "./matchable_resource_pb.js";
 import { QualityOfService } from "../core/execution_pb.js";
 import { ClusterAssignment } from "./cluster_assignment_pb.js";
 
@@ -521,6 +521,55 @@ export class ClusterAssignmentWithSource extends Message<ClusterAssignmentWithSo
 }
 
 /**
+ * @generated from message flyteidl.admin.ExternalResourceAttributesWithSource
+ */
+export class ExternalResourceAttributesWithSource extends Message<ExternalResourceAttributesWithSource> {
+  /**
+   * @generated from field: flyteidl.admin.AttributesSource source = 1;
+   */
+  source = AttributesSource.SOURCE_UNSPECIFIED;
+
+  /**
+   * @generated from field: flyteidl.admin.ExternalResourceAttributes value = 2;
+   */
+  value?: ExternalResourceAttributes;
+
+  /**
+   * @generated from field: bool is_mutable = 3;
+   */
+  isMutable = false;
+
+  constructor(data?: PartialMessage<ExternalResourceAttributesWithSource>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.admin.ExternalResourceAttributesWithSource";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "source", kind: "enum", T: proto3.getEnumType(AttributesSource) },
+    { no: 2, name: "value", kind: "message", T: ExternalResourceAttributes },
+    { no: 3, name: "is_mutable", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExternalResourceAttributesWithSource {
+    return new ExternalResourceAttributesWithSource().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ExternalResourceAttributesWithSource {
+    return new ExternalResourceAttributesWithSource().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ExternalResourceAttributesWithSource {
+    return new ExternalResourceAttributesWithSource().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ExternalResourceAttributesWithSource | PlainMessage<ExternalResourceAttributesWithSource> | undefined, b: ExternalResourceAttributesWithSource | PlainMessage<ExternalResourceAttributesWithSource> | undefined): boolean {
+    return proto3.util.equals(ExternalResourceAttributesWithSource, a, b);
+  }
+}
+
+/**
  * Configuration with source information.
  *
  * @generated from message flyteidl.admin.ConfigurationWithSource
@@ -566,6 +615,11 @@ export class ConfigurationWithSource extends Message<ConfigurationWithSource> {
    */
   clusterAssignment?: ClusterAssignmentWithSource;
 
+  /**
+   * @generated from field: flyteidl.admin.ExternalResourceAttributesWithSource external_resource_attributes = 9;
+   */
+  externalResourceAttributes?: ExternalResourceAttributesWithSource;
+
   constructor(data?: PartialMessage<ConfigurationWithSource>) {
     super();
     proto3.util.initPartial(data, this);
@@ -582,6 +636,7 @@ export class ConfigurationWithSource extends Message<ConfigurationWithSource> {
     { no: 6, name: "plugin_overrides", kind: "message", T: PluginOverridesWithSource },
     { no: 7, name: "workflow_execution_config", kind: "message", T: WorkflowExecutionConfigWithSource },
     { no: 8, name: "cluster_assignment", kind: "message", T: ClusterAssignmentWithSource },
+    { no: 9, name: "external_resource_attributes", kind: "message", T: ExternalResourceAttributesWithSource },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ConfigurationWithSource {
@@ -647,6 +702,11 @@ export class Configuration extends Message<Configuration> {
    */
   clusterAssignment?: ClusterAssignment;
 
+  /**
+   * @generated from field: flyteidl.admin.ExternalResourceAttributes external_resource_attributes = 9;
+   */
+  externalResourceAttributes?: ExternalResourceAttributes;
+
   constructor(data?: PartialMessage<Configuration>) {
     super();
     proto3.util.initPartial(data, this);
@@ -663,6 +723,7 @@ export class Configuration extends Message<Configuration> {
     { no: 6, name: "plugin_overrides", kind: "message", T: PluginOverrides },
     { no: 7, name: "workflow_execution_config", kind: "message", T: WorkflowExecutionConfig },
     { no: 8, name: "cluster_assignment", kind: "message", T: ClusterAssignment },
+    { no: 9, name: "external_resource_attributes", kind: "message", T: ExternalResourceAttributes },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Configuration {

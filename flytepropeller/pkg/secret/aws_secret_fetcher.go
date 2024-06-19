@@ -1,4 +1,4 @@
-package webhook
+package secret
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 	awssm "github.com/aws/aws-sdk-go-v2/service/secretsmanager"
 	"github.com/aws/aws-sdk-go-v2/service/secretsmanager/types"
 
-	"github.com/flyteorg/flyte/flytepropeller/pkg/webhook/config"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/secret/config"
 	stdlibErrors "github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
@@ -17,6 +17,10 @@ import (
 type AWSSecretFetcher struct {
 	client AWSSecretsIface
 	cfg    config.AWSConfig
+}
+
+func (a AWSSecretFetcher) Get(ctx context.Context, key string) (string, error) {
+	return a.GetSecretValue(ctx, key)
 }
 
 func (a AWSSecretFetcher) GetSecretValue(ctx context.Context, secretID string) (string, error) {

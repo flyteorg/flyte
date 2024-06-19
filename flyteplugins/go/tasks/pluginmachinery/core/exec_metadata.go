@@ -1,10 +1,13 @@
 package core
 
 import (
+	"fmt"
+
 	v1 "k8s.io/api/core/v1"
 	v12 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
@@ -14,6 +17,27 @@ type TaskOverrides interface {
 	GetExtendedResources() *core.ExtendedResources
 	GetContainerImage() string
 	GetConfig() *v1.ConfigMap
+}
+
+type ConnectionWrapper struct {
+	Connection core.Connection
+	Source     admin.AttributesSource
+}
+
+// ExternalResourceAttributes is a wrapper around ExternalResourceAttributes to expose the source of the attributes
+type ExternalResourceAttributes struct {
+	Connections map[string]ConnectionWrapper
+}
+
+func (e ExternalResourceAttributes) GetConnection(name string) (*core.Connection, admin.AttributesSource, error) {
+	if connWrapper, ok := e.Connections[name]; ok {
+		return &connWrapper.Connection, connWrapper.Source, nil
+	}
+	return nil, admin.AttributesSource_SOURCE_UNSPECIFIED, fmt.Errorf("connection [%s] not found", name)
+}
+
+func (e ExternalResourceAttributes) GetConnections() map[string]ConnectionWrapper {
+	return e.Connections
 }
 
 // TaskExecutionID is a simple Interface to expose the ExecutionID of the running Task
@@ -53,5 +77,6 @@ type TaskExecutionMetadata interface {
 	GetPlatformResources() *v1.ResourceRequirements
 	GetInterruptibleFailureThreshold() int32
 	GetEnvironmentVariables() map[string]string
+	GetExternalResourceAttributes() ExternalResourceAttributes
 	GetConsoleURL() string
 }

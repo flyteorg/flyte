@@ -17,6 +17,7 @@ type MockConfigurationProvider struct {
 	namespaceMappingConfiguration       interfaces.NamespaceMappingConfiguration
 	qualityOfServiceConfiguration       interfaces.QualityOfServiceConfiguration
 	clusterPoolAssignmentConfiguration  interfaces.ClusterPoolAssignmentConfiguration
+	externalResourceConfiguration       interfaces.ExternalResourceConfiguration
 }
 
 func (p *MockConfigurationProvider) ApplicationConfiguration() interfaces.ApplicationConfiguration {
@@ -79,6 +80,14 @@ func (p *MockConfigurationProvider) AddClusterPoolAssignmentConfiguration(cfg in
 	p.clusterPoolAssignmentConfiguration = cfg
 }
 
+func (p *MockConfigurationProvider) ExternalResourceConfiguration() interfaces.ExternalResourceConfiguration {
+	return p.externalResourceConfiguration
+}
+
+func (p *MockConfigurationProvider) AddExternalResourceConfiguration(cfg interfaces.ExternalResourceConfiguration) {
+	p.externalResourceConfiguration = cfg
+}
+
 func NewMockConfigurationProvider(
 	applicationConfiguration interfaces.ApplicationConfiguration,
 	queueConfiguration interfaces.QueueConfiguration,
@@ -94,6 +103,9 @@ func NewMockConfigurationProvider(
 	mockClusterPoolAssignmentConfiguration := &ifaceMocks.ClusterPoolAssignmentConfiguration{}
 	mockClusterPoolAssignmentConfiguration.OnGetClusterPoolAssignments().Return(make(map[string]interfaces.ClusterPoolAssignment))
 
+	mockExternalResourceConfiguration := &ifaceMocks.ExternalResourceConfiguration{}
+	mockExternalResourceConfiguration.OnGetConnections().Return(map[string]interfaces.Connection{})
+
 	return &MockConfigurationProvider{
 		applicationConfiguration:           applicationConfiguration,
 		queueConfiguration:                 queueConfiguration,
@@ -103,5 +115,6 @@ func NewMockConfigurationProvider(
 		namespaceMappingConfiguration:      namespaceMappingConfiguration,
 		qualityOfServiceConfiguration:      mockQualityOfServiceConfiguration,
 		clusterPoolAssignmentConfiguration: mockClusterPoolAssignmentConfiguration,
+		externalResourceConfiguration:      mockExternalResourceConfiguration,
 	}
 }

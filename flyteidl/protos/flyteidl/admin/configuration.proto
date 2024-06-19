@@ -94,6 +94,12 @@ message ClusterAssignmentWithSource {
   bool is_mutable = 3;
 }
 
+message ExternalResourceAttributesWithSource {
+  AttributesSource source = 1;
+  ExternalResourceAttributes value = 2;
+  bool is_mutable = 3;
+}
+
 // Configuration with source information.
 message ConfigurationWithSource {
   TaskResourceAttributesWithSource task_resource_attributes = 1;
@@ -111,6 +117,8 @@ message ConfigurationWithSource {
   WorkflowExecutionConfigWithSource workflow_execution_config = 7;
 
   ClusterAssignmentWithSource cluster_assignment = 8;
+
+  ExternalResourceAttributesWithSource external_resource_attributes = 9;
 }
 
 // Configuration is a collection of attributes that can be applied to a project or a workflow.
@@ -130,6 +138,8 @@ message Configuration {
   WorkflowExecutionConfig workflow_execution_config = 7;
 
   ClusterAssignment cluster_assignment = 8;
+
+  ExternalResourceAttributes external_resource_attributes = 9;
 }
 
 // Request to get a configuration.

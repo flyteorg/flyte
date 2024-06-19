@@ -7,6 +7,8 @@ import (
 	"time"
 
 	"golang.org/x/exp/maps"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	flyteIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -18,6 +20,7 @@ import (
 	flyteIO "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/secret"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
@@ -49,6 +52,7 @@ type ResourceMetaWrapper struct {
 	OutputPrefix      string
 	AgentResourceMeta []byte
 	TaskCategory      admin.TaskCategory
+	Connection        flyteIdl.Connection
 }
 
 func (p Plugin) GetConfig() webapi.PluginConfig {
@@ -97,6 +101,40 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 	taskCategory := admin.TaskCategory{Name: taskTemplate.Type, Version: taskTemplate.TaskTypeVersion}
 	agent, isSync := getFinalAgent(&taskCategory, p.cfg, p.agentRegistry)
 
+	connection := flyteIdl.Connection{}
+	if taskTemplate.SecurityContext != nil && taskTemplate.SecurityContext.GetConnectionRef() != "" {
+		externalResourceAttributes := taskCtx.TaskExecutionMetadata().GetExternalResourceAttributes()
+
+		conn, source, err := externalResourceAttributes.GetConnection(taskTemplate.SecurityContext.GetConnectionRef())
+		if err != nil {
+			errString := fmt.Sprintf("Failed to get connection with error: %v", err)
+			logger.Errorf(ctx, errString)
+			return nil, nil, status.Errorf(codes.Internal, errString)
+		}
+
+		if conn.GetTaskType() != taskTemplate.Type {
+			return nil, nil, fmt.Errorf("the type of connection [%s] does not match the task type [%s]", conn.GetTaskType(), taskTemplate.Type)
+		}
+
+		labels := taskCtx.TaskExecutionMetadata().GetLabels()
+		for k, v := range conn.GetSecrets() {
+			secretID, err := secret.GetSecretID(v, source, labels)
+			if err != nil {
+				errString := fmt.Sprintf("Failed to get secret id with error: %v", err)
+				logger.Errorf(ctx, errString)
+				return nil, nil, status.Errorf(codes.Internal, errString)
+			}
+			secretVal, err := taskCtx.SecretManager().Get(ctx, secretID)
+			if err != nil {
+				errString := fmt.Sprintf("Failed to get secret value with error: %v", err)
+				logger.Errorf(ctx, errString)
+				return nil, nil, status.Errorf(codes.Internal, errString)
+			}
+			conn.Secrets[k] = secretVal
+		}
+		connection = *conn
+	}
+
 	taskExecutionMetadata := buildTaskExecutionMetadata(taskCtx.TaskExecutionMetadata())
 
 	if isSync {
@@ -106,7 +144,12 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 		if err != nil {
 			return nil, nil, err
 		}
-		header := &admin.CreateRequestHeader{Template: taskTemplate, OutputPrefix: outputPrefix, TaskExecutionMetadata: &taskExecutionMetadata}
+		header := &admin.CreateRequestHeader{
+			Template:              taskTemplate,
+			OutputPrefix:          outputPrefix,
+			TaskExecutionMetadata: &taskExecutionMetadata,
+			Connection:            &connection,
+		}
 		return p.ExecuteTaskSync(finalCtx, client, header, inputs)
 	}
 
@@ -118,7 +161,13 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 	if err != nil {
 		return nil, nil, err
 	}
-	request := &admin.CreateTaskRequest{Inputs: inputs, Template: taskTemplate, OutputPrefix: outputPrefix, TaskExecutionMetadata: &taskExecutionMetadata}
+	request := &admin.CreateTaskRequest{
+		Inputs:                inputs,
+		Template:              taskTemplate,
+		OutputPrefix:          outputPrefix,
+		TaskExecutionMetadata: &taskExecutionMetadata,
+		Connection:            &connection,
+	}
 	res, err := client.CreateTask(finalCtx, request)
 	if err != nil {
 		return nil, nil, err
@@ -128,6 +177,7 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 		OutputPrefix:      outputPrefix,
 		AgentResourceMeta: res.GetResourceMeta(),
 		TaskCategory:      taskCategory,
+		Connection:        connection,
 	}, nil, nil
 }
 
@@ -206,6 +256,7 @@ func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest weba
 		TaskType:     metadata.TaskCategory.Name,
 		TaskCategory: &metadata.TaskCategory,
 		ResourceMeta: metadata.AgentResourceMeta,
+		Connection:   &metadata.Connection,
 	}
 	res, err := client.GetTask(finalCtx, request)
 	if err != nil {
@@ -239,6 +290,7 @@ func (p Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error 
 		TaskType:     metadata.TaskCategory.Name,
 		TaskCategory: &metadata.TaskCategory,
 		ResourceMeta: metadata.AgentResourceMeta,
+		Connection:   &metadata.Connection,
 	}
 	_, err = client.DeleteTask(finalCtx, request)
 	return err

@@ -42,7 +42,7 @@ func addPermissions(securityCtx *core.SecurityContext, roleNameKey string, flyte
 
 func addExecutionOverrides(taskPluginOverrides []*admin.PluginOverride,
 	workflowExecutionConfig *admin.WorkflowExecutionConfig, recoveryExecution *core.WorkflowExecutionIdentifier,
-	taskResources *interfaces.TaskResources, flyteWf *v1alpha1.FlyteWorkflow) {
+	taskResources *interfaces.TaskResources, externalResourceAttributes *interfaces.ExternalResourceAttributes, flyteWf *v1alpha1.FlyteWorkflow) {
 	executionConfig := v1alpha1.ExecutionConfig{
 		TaskPluginImpls: make(map[string]v1alpha1.TaskPluginOverride),
 		RecoveryExecution: v1alpha1.WorkflowExecutionIdentifier{
@@ -114,6 +114,23 @@ func addExecutionOverrides(taskPluginOverrides []*admin.PluginOverride,
 			Limits:   limits,
 		}
 	}
+
+	if externalResourceAttributes != nil {
+		connections := make(map[string]v1alpha1.Connection)
+		for _, connection := range externalResourceAttributes.GetConnections() {
+			connections[connection.TaskType] = v1alpha1.Connection{
+				TaskType: connection.TaskType,
+				Source:   v1alpha1.AttributesSource(connection.Source),
+				Secrets:  connection.Secrets,
+				Configs:  connection.Configs,
+			}
+		}
+
+		executionConfig.ExternalResourceAttributes = v1alpha1.ExternalResourceAttributes{
+			Connections: connections,
+		}
+	}
+
 	flyteWf.ExecutionConfig = executionConfig
 }
 
@@ -147,7 +164,7 @@ func PrepareFlyteWorkflow(data interfaces.ExecutionData, flyteWorkflow *v1alpha1
 	}
 	flyteWorkflow.WorkflowMeta.EventVersion = v1alpha1.EventVersion(data.ExecutionParameters.EventVersion)
 	addExecutionOverrides(data.ExecutionParameters.TaskPluginOverrides, data.ExecutionParameters.ExecutionConfig,
-		data.ExecutionParameters.RecoveryExecution, data.ExecutionParameters.TaskResources, flyteWorkflow)
+		data.ExecutionParameters.RecoveryExecution, data.ExecutionParameters.TaskResources, data.ExecutionParameters.ExternalResourceAttributes, flyteWorkflow)
 
 	if data.ExecutionParameters.RawOutputDataConfig != nil {
 		flyteWorkflow.RawOutputDataConfig = v1alpha1.RawOutputDataConfig{

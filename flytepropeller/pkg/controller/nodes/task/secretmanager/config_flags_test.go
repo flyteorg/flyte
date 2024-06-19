@@ -99,6 +99,20 @@ func TestConfig_SetFlags(t *testing.T) {
 	cmdFlags := actual.GetPFlagSet("")
 	assert.True(t, cmdFlags.HasFlags())
 
+	t.Run("Test_type", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("type", testValue)
+			if vString, err := cmdFlags.GetString("type"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.Type)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_secrets-prefix", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {

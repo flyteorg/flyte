@@ -1,4 +1,4 @@
-package webhook
+package secret
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/flyteorg/flyte/flytepropeller/pkg/webhook/config"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/secret/config"
 	stdlibErrors "github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
@@ -16,6 +16,10 @@ import (
 type GCPSecretFetcher struct {
 	client GCPSecretsIface
 	cfg    config.GCPConfig
+}
+
+func (g GCPSecretFetcher) Get(ctx context.Context, key string) (string, error) {
+	return g.GetSecretValue(ctx, key)
 }
 
 func (g GCPSecretFetcher) GetSecretValue(ctx context.Context, secretID string) (string, error) {

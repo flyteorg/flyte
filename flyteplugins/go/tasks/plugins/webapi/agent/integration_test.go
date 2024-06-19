@@ -91,19 +91,27 @@ func TestEndToEnd(t *testing.T) {
 		plugin, err := pluginEntry.LoadPlugin(context.TODO(), newFakeSetupContext("sync task"))
 		assert.NoError(t, err)
 
-		template.Type = "openai"
-		template.Interface = &flyteIdlCore.TypedInterface{
-			Outputs: &flyteIdlCore.VariableMap{
-				Variables: map[string]*flyteIdlCore.Variable{
-					"x": {Type: &flyteIdlCore.LiteralType{
-						Type: &flyteIdlCore.LiteralType_Simple{
-							Simple: flyteIdlCore.SimpleType_INTEGER,
+		template := flyteIdlCore.TaskTemplate{
+			Type:   "openai",
+			Custom: st,
+			Target: &flyteIdlCore.TaskTemplate_Container{
+				Container: &flyteIdlCore.Container{Args: []string{"pyflyte-fast-execute", "--output-prefix", "/tmp/123"}},
+			},
+			Interface: &flyteIdlCore.TypedInterface{
+				Outputs: &flyteIdlCore.VariableMap{
+					Variables: map[string]*flyteIdlCore.Variable{
+						"x": {Type: &flyteIdlCore.LiteralType{
+							Type: &flyteIdlCore.LiteralType_Simple{
+								Simple: flyteIdlCore.SimpleType_INTEGER,
+							},
 						},
-					},
+						},
 					},
 				},
 			},
+			SecurityContext: &flyteIdlCore.SecurityContext{ConnectionRef: "my-openai"},
 		}
+
 		expectedOutputs, err := coreutils.MakeLiteralMap(map[string]interface{}{"x": 1})
 		assert.NoError(t, err)
 		phase := tests.RunPluginEndToEndTest(t, plugin, &template, inputs, expectedOutputs, nil, iter)

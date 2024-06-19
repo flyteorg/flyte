@@ -1,4 +1,4 @@
-package webhook
+package secret
 
 import (
 	"context"
@@ -10,8 +10,9 @@ import (
 	awssm "github.com/aws/aws-sdk-go-v2/service/secretsmanager"
 	corev1 "k8s.io/api/core/v1"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/webhook/config"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/secret/config"
 	stdlibErrors "github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
@@ -45,7 +46,7 @@ const (
 
 //go:generate mockery --output=./mocks --case=underscore -name=SecretFetcher
 type SecretFetcher interface {
-	GetSecretValue(ctx context.Context, secretID string) (string, error)
+	Get(ctx context.Context, key string) (string, error)
 }
 
 // AWSSecretManagerInjector allows injecting of secrets from AWS Secret Manager as environment variable. It uses AWS-provided SideCar
@@ -61,6 +62,23 @@ type EmbeddedSecretManagerInjector struct {
 
 func (i EmbeddedSecretManagerInjector) Type() config.SecretManagerType {
 	return config.SecretManagerTypeEmbedded
+}
+
+func GetSecretID(secretKey string, source admin.AttributesSource, labels map[string]string) (string, error) {
+	err := validateRequiredFieldsExist(labels)
+	if err != nil {
+		return "", err
+	}
+	if source == admin.AttributesSource_PROJECT_DOMAIN {
+		return fmt.Sprintf(SecretsStorageFormat, labels[OrganizationLabel], labels[DomainLabel], labels[ProjectLabel], secretKey), nil
+	}
+
+	if source == admin.AttributesSource_DOMAIN {
+		return fmt.Sprintf(SecretsStorageFormat, labels[OrganizationLabel], labels[DomainLabel], EmptySecretScope, secretKey), nil
+	}
+
+	orgScopedSecret := fmt.Sprintf(SecretsStorageFormat, labels[OrganizationLabel], EmptySecretScope, EmptySecretScope, secretKey)
+	return orgScopedSecret, nil
 }
 
 func validateRequiredFieldsExist(labels map[string]string) error {
@@ -84,7 +102,7 @@ func (i EmbeddedSecretManagerInjector) lookUpSecret(ctx context.Context, secret 
 	}
 	// Fetch project-domain scoped secret
 	projectDomainScopedSecret := fmt.Sprintf(SecretsStorageFormat, labels[OrganizationLabel], labels[DomainLabel], labels[ProjectLabel], secret.Key)
-	secretValue, err := i.secretFetcher.GetSecretValue(ctx, projectDomainScopedSecret)
+	secretValue, err := i.secretFetcher.Get(ctx, projectDomainScopedSecret)
 	if err != nil && !stdlibErrors.IsCausedBy(err, ErrCodeSecretNotFound) {
 		return "", err
 	}
@@ -94,7 +112,7 @@ func (i EmbeddedSecretManagerInjector) lookUpSecret(ctx context.Context, secret 
 
 	// Fetch domain scoped secret
 	domainScopedSecret := fmt.Sprintf(SecretsStorageFormat, labels[OrganizationLabel], labels[DomainLabel], EmptySecretScope, secret.Key)
-	secretValue, err = i.secretFetcher.GetSecretValue(ctx, domainScopedSecret)
+	secretValue, err = i.secretFetcher.Get(ctx, domainScopedSecret)
 	if err != nil && !stdlibErrors.IsCausedBy(err, ErrCodeSecretNotFound) {
 		return "", err
 	}
@@ -104,7 +122,7 @@ func (i EmbeddedSecretManagerInjector) lookUpSecret(ctx context.Context, secret 
 
 	// Fetch organization scoped secret
 	orgScopedSecret := fmt.Sprintf(SecretsStorageFormat, labels[OrganizationLabel], EmptySecretScope, EmptySecretScope, secret.Key)
-	secretValue, err = i.secretFetcher.GetSecretValue(ctx, orgScopedSecret)
+	secretValue, err = i.secretFetcher.Get(ctx, orgScopedSecret)
 	if err != nil && !stdlibErrors.IsCausedBy(err, ErrCodeSecretNotFound) {
 		return "", err
 	}

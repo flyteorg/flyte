@@ -10,6 +10,8 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
+type AttributesSource int
+
 // This contains an OutputLocationPrefix. When running against AWS, this should be something of the form
 // s3://my-bucket, or s3://my-bucket/  A sharding string will automatically be appended to this prefix before
 // handing off to plugins/tasks. Sharding behavior may change in the future.
@@ -41,6 +43,8 @@ type ExecutionConfig struct {
 	EnvironmentVariables map[string]string
 	// ExecutionEnvAssignments defines execution environment assignments to be set for the execution.
 	ExecutionEnvAssignments []ExecutionEnvAssignment
+	// Defines a list of connections config that used to connect to the external services.
+	ExternalResourceAttributes ExternalResourceAttributes
 }
 
 type TaskPluginOverride struct {
@@ -64,6 +68,27 @@ type TaskResources struct {
 	Requests TaskResourceSpec
 	// A hard limit, a task cannot consume resources greater than the limit specifies.
 	Limits TaskResourceSpec
+}
+
+// Connection store the secret and config information required to connect to an external service.
+type Connection struct {
+	// Defines the type of the task that the connection is associated with.
+	TaskType string
+	// Defines the source of the attributes.
+	Source AttributesSource
+	// Defines a map of secrets that are used to connect to the external services.
+	// The key is the name of the secret, such as openai_api_key, databricks_access_token, etc.
+	// The value is the reference of the k8s or aws secret.
+	Secrets map[string]string
+	// Defines a map of configs that are used to connect to the external services, such as organization_id, workspace_id, etc.
+	Configs map[string]string
+}
+
+// ExternalResourceAttributes encapsulates all the attributes
+// that are required to connect to external resources or services.
+type ExternalResourceAttributes struct {
+	// Defines a map of connections that are used to connect to the external services.
+	Connections map[string]Connection
 }
 
 // ExecutionEnvAssignment is a wrapper around core.ExecutionEnvAssignment to define

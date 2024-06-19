@@ -1,4 +1,4 @@
-package webhook
+package secret
 
 import (
 	"context"
@@ -11,8 +11,8 @@ import (
 	corev1 "k8s.io/api/core/v1"
 
 	coreIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/webhook/config"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/webhook/mocks"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/secret/config"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/secret/mocks"
 )
 
 func TestGlobalSecrets_Inject(t *testing.T) {

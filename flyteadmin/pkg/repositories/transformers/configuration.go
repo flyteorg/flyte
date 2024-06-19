@@ -29,6 +29,8 @@ func UpdateMatchingAttributesInConfiguration(matchingAttributes *admin.MatchingA
 		configuration.WorkflowExecutionConfig = x.WorkflowExecutionConfig
 	case *admin.MatchingAttributes_ClusterAssignment:
 		configuration.ClusterAssignment = x.ClusterAssignment
+	case *admin.MatchingAttributes_ExternalResourceAttributes:
+		configuration.ExternalResourceAttributes = x.ExternalResourceAttributes
 	default:
 		return nil, unsupportedResourceTypeError
 	}
@@ -54,6 +56,8 @@ func deleteMatchableResourceFromConfiguration(resourceType admin.MatchableResour
 		configuration.WorkflowExecutionConfig = nil
 	case admin.MatchableResource_CLUSTER_ASSIGNMENT:
 		configuration.ClusterAssignment = nil
+	case admin.MatchableResource_EXTERNAL_RESOURCE:
+		configuration.ExternalResourceAttributes = nil
 	default:
 		return nil, unsupportedResourceTypeError
 	}
@@ -106,6 +110,11 @@ func GetMatchingAttributesFromConfiguration(configuration *admin.Configuration, 
 			return nil, attributeNotFoundError
 		}
 		return &admin.MatchingAttributes{Target: &admin.MatchingAttributes_ClusterAssignment{ClusterAssignment: configuration.ClusterAssignment}}, nil
+	case admin.MatchableResource_EXTERNAL_RESOURCE:
+		if configuration.ExternalResourceAttributes == nil {
+			return nil, attributeNotFoundError
+		}
+		return &admin.MatchingAttributes{Target: &admin.MatchingAttributes_ExternalResourceAttributes{ExternalResourceAttributes: configuration.ExternalResourceAttributes}}, nil
 	default:
 		return nil, unsupportedResourceTypeError
 	}

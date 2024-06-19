@@ -36,6 +36,9 @@ enum MatchableResource {
 
   // Controls how to select an available cluster on which this execution should run.
   CLUSTER_ASSIGNMENT = 7;
+
+  // Configures the task connection to be used by the agent to connect to external systems.
+  EXTERNAL_RESOURCE = 8;
 }
 
 // Defines a set of overridable task resource attributes set during task registration.
@@ -137,6 +140,13 @@ message WorkflowExecutionConfig {
   repeated core.ExecutionEnvAssignment execution_env_assignments = 9;
 }
 
+// ExternalResourceAttributes is a message that encapsulates all the attributes
+// that are required to connect to external resources or services.
+message ExternalResourceAttributes {
+  // Connections here is used by the agent to connect to external systems.
+  map<string, core.Connection> connections = 1;
+}
+
 // Generic container for encapsulating all types of the above attributes messages.
 message MatchingAttributes {
   oneof target {
@@ -155,6 +165,8 @@ message MatchingAttributes {
     WorkflowExecutionConfig workflow_execution_config = 7;
 
     ClusterAssignment cluster_assignment = 8;
+
+    ExternalResourceAttributes external_resource_attributes = 9;
   }
 }
 

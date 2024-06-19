@@ -5807,6 +5807,64 @@ func TestGetClusterAssignment(t *testing.T) {
 	})
 }
 
+func TestGetExternalResourceAttribute(t *testing.T) {
+	ExternalResourceAttributes := &admin.ExternalResourceAttributes{
+		Connections: map[string]*core.Connection{
+			"conn1": {
+				TaskType: "openai",
+				Secrets:  map[string]string{"key1": "value1"},
+				Configs:  map[string]string{"key2": "value2"},
+			},
+		},
+	}
+	resourceManager := managerMocks.MockResourceManager{}
+	resourceManager.GetResourceFunc = func(ctx context.Context,
+		request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
+		if len(request.Project) != 0 && len(request.Domain) != 0 {
+			assert.EqualValues(t, request, managerInterfaces.ResourceRequest{
+				Project:      workflowIdentifier.Project,
+				Domain:       workflowIdentifier.Domain,
+				ResourceType: admin.MatchableResource_EXTERNAL_RESOURCE,
+			})
+		}
+		if len(request.Project) != 0 && len(request.Domain) == 0 {
+			assert.EqualValues(t, request, managerInterfaces.ResourceRequest{
+				Project:      workflowIdentifier.Project,
+				ResourceType: admin.MatchableResource_EXTERNAL_RESOURCE,
+			})
+		}
+		if len(request.Project) == 0 && len(request.Domain) == 0 {
+			assert.EqualValues(t, request, managerInterfaces.ResourceRequest{
+				ResourceType: admin.MatchableResource_EXTERNAL_RESOURCE,
+			})
+		}
+		return &managerInterfaces.ResourceResponse{
+			Attributes: &admin.MatchingAttributes{
+				Target: &admin.MatchingAttributes_ExternalResourceAttributes{
+					ExternalResourceAttributes: ExternalResourceAttributes,
+				},
+			},
+		}, nil
+	}
+
+	executionManager := ExecutionManager{resourceManager: &resourceManager}
+
+	t.Run("value from db", func(t *testing.T) {
+		era, err := executionManager.getExternalResourceAttributes(context.TODO(), &admin.ExecutionCreateRequest{
+			Project: workflowIdentifier.Project,
+			Domain:  workflowIdentifier.Domain,
+			Spec:    &admin.ExecutionSpec{},
+		})
+		assert.NoError(t, err)
+		assert.Equal(t, 1, len(era.GetConnections()))
+		actualConn := era.GetConnections()["conn1"]
+		expectedConn := ExternalResourceAttributes.Connections["conn1"]
+		assert.Equal(t, actualConn.Secrets, expectedConn.Secrets)
+		assert.Equal(t, actualConn.Configs, expectedConn.Configs)
+		assert.Equal(t, actualConn.TaskType, expectedConn.TaskType)
+	})
+}
+
 func TestResolvePermissions(t *testing.T) {
 	assumableIamRole := "role"
 	k8sServiceAccount := "sa"

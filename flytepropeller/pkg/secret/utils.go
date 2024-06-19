@@ -1,4 +1,4 @@
-package webhook
+package secret
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ import (
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/encoding"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/webhook/config"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/secret/config"
 )
 
 func hasEnvVar(envVars []corev1.EnvVar, envVarKey string) bool {

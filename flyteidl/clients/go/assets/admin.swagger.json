@@ -1975,7 +1975,7 @@
         "parameters": [
           {
             "name": "resource_type",
-            "description": "+required\n\n - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.\n - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.\n - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.\n - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.",
+            "description": "+required\n\n - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.\n - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.\n - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.\n - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.\n - EXTERNAL_RESOURCE: Configures the task connection to be used by the agent to connect to external systems.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -1987,7 +1987,8 @@
               "QUALITY_OF_SERVICE_SPECIFICATION",
               "PLUGIN_OVERRIDE",
               "WORKFLOW_EXECUTION_CONFIG",
-              "CLUSTER_ASSIGNMENT"
+              "CLUSTER_ASSIGNMENT",
+              "EXTERNAL_RESOURCE"
             ],
             "default": "TASK_RESOURCE"
           },
@@ -4557,7 +4558,7 @@
           },
           {
             "name": "resource_type",
-            "description": "+required\n\n - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.\n - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.\n - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.\n - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.",
+            "description": "+required\n\n - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.\n - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.\n - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.\n - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.\n - EXTERNAL_RESOURCE: Configures the task connection to be used by the agent to connect to external systems.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -4569,7 +4570,8 @@
               "QUALITY_OF_SERVICE_SPECIFICATION",
               "PLUGIN_OVERRIDE",
               "WORKFLOW_EXECUTION_CONFIG",
-              "CLUSTER_ASSIGNMENT"
+              "CLUSTER_ASSIGNMENT",
+              "EXTERNAL_RESOURCE"
             ],
             "default": "TASK_RESOURCE"
           }
@@ -5242,7 +5244,7 @@
           },
           {
             "name": "resource_type",
-            "description": "Which type of matchable attributes to return.\n+required\n\n - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.\n - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.\n - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.\n - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.",
+            "description": "Which type of matchable attributes to return.\n+required\n\n - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.\n - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.\n - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.\n - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.\n - EXTERNAL_RESOURCE: Configures the task connection to be used by the agent to connect to external systems.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -5254,7 +5256,8 @@
               "QUALITY_OF_SERVICE_SPECIFICATION",
               "PLUGIN_OVERRIDE",
               "WORKFLOW_EXECUTION_CONFIG",
-              "CLUSTER_ASSIGNMENT"
+              "CLUSTER_ASSIGNMENT",
+              "EXTERNAL_RESOURCE"
             ],
             "default": "TASK_RESOURCE"
           }
@@ -5353,7 +5356,7 @@
           },
           {
             "name": "resource_type",
-            "description": "Which type of matchable attributes to return.\n+required\n\n - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.\n - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.\n - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.\n - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.",
+            "description": "Which type of matchable attributes to return.\n+required\n\n - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.\n - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.\n - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.\n - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.\n - EXTERNAL_RESOURCE: Configures the task connection to be used by the agent to connect to external systems.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -5365,7 +5368,8 @@
               "QUALITY_OF_SERVICE_SPECIFICATION",
               "PLUGIN_OVERRIDE",
               "WORKFLOW_EXECUTION_CONFIG",
-              "CLUSTER_ASSIGNMENT"
+              "CLUSTER_ASSIGNMENT",
+              "EXTERNAL_RESOURCE"
             ],
             "default": "TASK_RESOURCE"
           }
@@ -6406,7 +6410,7 @@
           },
           {
             "name": "resource_type",
-            "description": "Which type of matchable attributes to return.\n+required\n\n - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.\n - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.\n - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.\n - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.",
+            "description": "Which type of matchable attributes to return.\n+required\n\n - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.\n - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.\n - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.\n - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.\n - EXTERNAL_RESOURCE: Configures the task connection to be used by the agent to connect to external systems.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -6418,7 +6422,8 @@
               "QUALITY_OF_SERVICE_SPECIFICATION",
               "PLUGIN_OVERRIDE",
               "WORKFLOW_EXECUTION_CONFIG",
-              "CLUSTER_ASSIGNMENT"
+              "CLUSTER_ASSIGNMENT",
+              "EXTERNAL_RESOURCE"
             ],
             "default": "TASK_RESOURCE"
           }
@@ -6960,7 +6965,7 @@
           },
           {
             "name": "resource_type",
-            "description": "Which type of matchable attributes to return.\n+required\n\n - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.\n - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.\n - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.\n - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.",
+            "description": "Which type of matchable attributes to return.\n+required\n\n - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.\n - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.\n - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.\n - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.\n - EXTERNAL_RESOURCE: Configures the task connection to be used by the agent to connect to external systems.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -6972,7 +6977,8 @@
               "QUALITY_OF_SERVICE_SPECIFICATION",
               "PLUGIN_OVERRIDE",
               "WORKFLOW_EXECUTION_CONFIG",
-              "CLUSTER_ASSIGNMENT"
+              "CLUSTER_ASSIGNMENT",
+              "EXTERNAL_RESOURCE"
             ],
             "default": "TASK_RESOURCE"
           },
@@ -7112,7 +7118,7 @@
           },
           {
             "name": "resource_type",
-            "description": "Which type of matchable attributes to return.\n+required\n\n - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.\n - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.\n - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.\n - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.",
+            "description": "Which type of matchable attributes to return.\n+required\n\n - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.\n - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.\n - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.\n - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.\n - EXTERNAL_RESOURCE: Configures the task connection to be used by the agent to connect to external systems.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -7124,7 +7130,8 @@
               "QUALITY_OF_SERVICE_SPECIFICATION",
               "PLUGIN_OVERRIDE",
               "WORKFLOW_EXECUTION_CONFIG",
-              "CLUSTER_ASSIGNMENT"
+              "CLUSTER_ASSIGNMENT",
+              "EXTERNAL_RESOURCE"
             ],
             "default": "TASK_RESOURCE"
           },
@@ -8151,7 +8158,7 @@
           },
           {
             "name": "resource_type",
-            "description": "Which type of matchable attributes to return.\n+required\n\n - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.\n - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.\n - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.\n - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.",
+            "description": "Which type of matchable attributes to return.\n+required\n\n - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.\n - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.\n - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.\n - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.\n - EXTERNAL_RESOURCE: Configures the task connection to be used by the agent to connect to external systems.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -8163,7 +8170,8 @@
               "QUALITY_OF_SERVICE_SPECIFICATION",
               "PLUGIN_OVERRIDE",
               "WORKFLOW_EXECUTION_CONFIG",
-              "CLUSTER_ASSIGNMENT"
+              "CLUSTER_ASSIGNMENT",
+              "EXTERNAL_RESOURCE"
             ],
             "default": "TASK_RESOURCE"
           },
@@ -9738,6 +9746,9 @@
         },
         "cluster_assignment": {
           "$ref": "#/definitions/adminClusterAssignment"
+        },
+        "external_resource_attributes": {
+          "$ref": "#/definitions/adminExternalResourceAttributes"
         }
       },
       "description": "Configuration is a collection of attributes that can be applied to a project or a workflow."
@@ -9826,6 +9837,9 @@
         },
         "cluster_assignment": {
           "$ref": "#/definitions/adminClusterAssignmentWithSource"
+        },
+        "external_resource_attributes": {
+          "$ref": "#/definitions/adminExternalResourceAttributesWithSource"
         }
       },
       "description": "Configuration with source information."
@@ -10406,6 +10420,33 @@
     "adminExecutionUpdateResponse": {
       "type": "object"
     },
+    "adminExternalResourceAttributes": {
+      "type": "object",
+      "properties": {
+        "connections": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/coreConnection"
+          },
+          "description": "Connections here is used by the agent to connect to external systems."
+        }
+      },
+      "description": "ExternalResourceAttributes is a message that encapsulates all the attributes\nthat are required to connect to external resources or services."
+    },
+    "adminExternalResourceAttributesWithSource": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "$ref": "#/definitions/adminAttributesSource"
+        },
+        "value": {
+          "$ref": "#/definitions/adminExternalResourceAttributes"
+        },
+        "is_mutable": {
+          "type": "boolean"
+        }
+      }
+    },
     "adminFixedRate": {
       "type": "object",
       "properties": {
@@ -10723,10 +10764,11 @@
         "QUALITY_OF_SERVICE_SPECIFICATION",
         "PLUGIN_OVERRIDE",
         "WORKFLOW_EXECUTION_CONFIG",
-        "CLUSTER_ASSIGNMENT"
+        "CLUSTER_ASSIGNMENT",
+        "EXTERNAL_RESOURCE"
       ],
       "default": "TASK_RESOURCE",
-      "description": "Defines a resource that can be configured by customizable Project-, ProjectDomain- or WorkflowAttributes\nbased on matching tags.\n\n - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.\n - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.\n - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.\n - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run."
+      "description": "Defines a resource that can be configured by customizable Project-, ProjectDomain- or WorkflowAttributes\nbased on matching tags.\n\n - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.\n - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.\n - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.\n - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.\n - EXTERNAL_RESOURCE: Configures the task connection to be used by the agent to connect to external systems."
     },
     "adminMatchingAttributes": {
       "type": "object",
@@ -10754,6 +10796,9 @@
         },
         "cluster_assignment": {
           "$ref": "#/definitions/adminClusterAssignment"
+        },
+        "external_resource_attributes": {
+          "$ref": "#/definitions/adminExternalResourceAttributes"
         }
       },
       "description": "Generic container for encapsulating all types of the above attributes messages."
@@ -12319,6 +12364,29 @@
       },
       "description": "Defines a conjunction expression of two boolean expressions."
     },
+    "coreConnection": {
+      "type": "object",
+      "properties": {
+        "task_type": {
+          "type": "string",
+          "description": "The task type that the connection is used for."
+        },
+        "secrets": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "The credentials to use for the connection, such as API keys, OAuth2 tokens, etc.\nThe key is the name of the secret, and it's defined in the flytekit.\nflytekit uses the key to locate the desired secret within the map."
+        },
+        "configs": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "The configuration to use for the connection, such as the endpoint, account name, etc.\nThe key is the name of the config, and it's defined in the flytekit."
+        }
+      }
+    },
     "coreConnectionSet": {
       "type": "object",
       "properties": {
@@ -13332,6 +13400,10 @@
             "$ref": "#/definitions/coreOAuth2TokenRequest"
           },
           "description": "tokens indicate the list of token requests the task needs in order to proceed. Tokens will be mounted/passed to the\npod as it starts. If the plugin responsible for kicking of the task will not run it on a flyte cluster (e.g. AWS\nBatch), it's the responsibility of the plugin to fetch the secret (which means propeller identity will need access\nto the secret) and to pass it to the remote execution engine."
+        },
+        "connection_ref": {
+          "type": "string",
+          "title": "The name of the connection.\nThe connection is defined in the externalResourceAttributes or flyteadmin configmap.\nThe connection config take precedence in the following order:\n1. connection in the externalResourceAttributes in the project-domain settings.\n2. connection in the externalResourceAttributes in the project settings.\n3. connection in the flyteadmin configmap.\n+optional"
         }
       },
       "description": "SecurityContext holds security attributes that apply to tasks."

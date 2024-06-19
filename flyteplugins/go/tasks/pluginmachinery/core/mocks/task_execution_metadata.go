@@ -120,6 +120,38 @@ func (_m *TaskExecutionMetadata) GetEnvironmentVariables() map[string]string {
 	return r0
 }
 
+type TaskExecutionMetadata_GetExternalResource struct {
+	*mock.Call
+}
+
+func (_m TaskExecutionMetadata_GetExternalResource) Return(_a0 core.ExternalResourceAttributes) *TaskExecutionMetadata_GetExternalResource {
+	return &TaskExecutionMetadata_GetExternalResource{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *TaskExecutionMetadata) OnGetExternalResource() *TaskExecutionMetadata_GetExternalResource {
+	c_call := _m.On("GetExternalResourceAttributes")
+	return &TaskExecutionMetadata_GetExternalResource{Call: c_call}
+}
+
+func (_m *TaskExecutionMetadata) OnGetExternalResourceMatch(matchers ...interface{}) *TaskExecutionMetadata_GetExternalResource {
+	c_call := _m.On("GetExternalResourceAttributes", matchers...)
+	return &TaskExecutionMetadata_GetExternalResource{Call: c_call}
+}
+
+// GetExternalResource provides a mock function with given fields:
+func (_m *TaskExecutionMetadata) GetExternalResourceAttributes() core.ExternalResourceAttributes {
+	ret := _m.Called()
+
+	var r0 core.ExternalResourceAttributes
+	if rf, ok := ret.Get(0).(func() core.ExternalResourceAttributes); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(core.ExternalResourceAttributes)
+	}
+
+	return r0
+}
+
 type TaskExecutionMetadata_GetInterruptibleFailureThreshold struct {
 	*mock.Call
 }

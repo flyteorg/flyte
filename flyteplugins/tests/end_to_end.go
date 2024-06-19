@@ -19,6 +19,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/rand"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	idlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
 	catalogMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog/mocks"
@@ -149,6 +150,17 @@ func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *i
 	overrides.OnGetExtendedResources().Return(&idlCore.ExtendedResources{})
 	overrides.OnGetContainerImage().Return("")
 
+	connections := map[string]pluginCore.ConnectionWrapper{
+		"my-openai": {
+			Connection: idlCore.Connection{
+				TaskType: "openai",
+				Secrets:  map[string]string{"key": "value"},
+				Configs:  map[string]string{"key": "value"},
+			},
+			Source: admin.AttributesSource_GLOBAL,
+		},
+	}
+
 	tMeta := &coreMocks.TaskExecutionMetadata{}
 	tMeta.OnGetTaskExecutionID().Return(tID)
 	tMeta.OnGetOverrides().Return(overrides)
@@ -160,7 +172,7 @@ func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *i
 			K8SServiceAccount: "s",
 		},
 	})
-	tMeta.OnGetLabels().Return(map[string]string{})
+	tMeta.OnGetLabels().Return(map[string]string{"organization": "flyte", "project": "flytesnacks", "domain": "development"})
 	tMeta.OnGetAnnotations().Return(map[string]string{})
 	tMeta.OnIsInterruptible().Return(true)
 	tMeta.OnGetOwnerReference().Return(v12.OwnerReference{})
@@ -171,6 +183,7 @@ func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *i
 	tMeta.OnGetPlatformResources().Return(&v1.ResourceRequirements{})
 	tMeta.OnGetInterruptibleFailureThreshold().Return(2)
 	tMeta.OnGetEnvironmentVariables().Return(nil)
+	tMeta.OnGetExternalResource().Return(pluginCore.ExternalResourceAttributes{Connections: connections})
 	tMeta.OnGetConsoleURL().Return("")
 
 	catClient := &catalogMocks.Client{}

@@ -44,7 +44,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/webhook/config"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/secret"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/secret/config"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
@@ -179,7 +180,7 @@ func NewPodCreationWebhookConfig(ctx context.Context, cfg *config.Config, scheme
 		}
 	}
 
-	secretsMutator, err := NewSecretsMutator(ctx, cfg, scope.NewSubScope("secrets"))
+	secretsMutator, err := secret.NewSecretsMutator(ctx, cfg, scope.NewSubScope("secrets"))
 	if err != nil {
 		return nil, err
 	}

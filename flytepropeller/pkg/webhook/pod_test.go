@@ -16,8 +16,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils/secrets"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/webhook/config"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/webhook/mocks"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/secret"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/secret/config"
+	secretMocks "github.com/flyteorg/flyte/flytepropeller/pkg/secret/mocks"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
@@ -88,11 +89,11 @@ func TestPodMutator_Mutate(t *testing.T) {
 		},
 	}
 
-	successMutator := &mocks.PodMutator{}
+	successMutator := &secretMocks.PodMutator{}
 	successMutator.OnID().Return("SucceedingMutator")
 	successMutator.OnMutateMatch(mock.Anything, mock.Anything).Return(nil, false, nil)
 
-	failedMutator := &mocks.PodMutator{}
+	failedMutator := &secretMocks.PodMutator{}
 	failedMutator.OnID().Return("FailingMutator")
 	admissionError := admission.Errored(http.StatusBadRequest, fmt.Errorf("failing mock"))
 	failedMutator.OnMutateMatch(mock.Anything, mock.Anything).Return(nil, false, &admissionError)
@@ -130,7 +131,7 @@ func Test_CreateMutationWebhookConfiguration(t *testing.T) {
 		assert.Equal(t, "flyte-pod-webhook.flyte.org", c.Webhooks[0].Name)
 		assert.Equal(t, serviceName, c.Webhooks[0].ClientConfig.Service.Name)
 		assert.Equal(t, namespace, c.Webhooks[0].ClientConfig.Service.Namespace)
-		assert.Equal(t, getPodMutatePath(SecretsID), *c.Webhooks[0].ClientConfig.Service.Path)
+		assert.Equal(t, getPodMutatePath(secret.SecretsID), *c.Webhooks[0].ClientConfig.Service.Path)
 		assert.Equal(t, 1, len(c.Webhooks[0].ObjectSelector.MatchLabels))
 		assert.Equal(t, 0, len(c.Webhooks[0].ObjectSelector.DeepCopy().MatchExpressions))
 		assert.Equal(t, expectedSecretsLabelSelector, *c.Webhooks[0].ObjectSelector)
@@ -158,7 +159,7 @@ func Test_CreateMutationWebhookConfiguration(t *testing.T) {
 		assert.Equal(t, secretsWebhookName, c.Webhooks[0].Name)
 		assert.Equal(t, serviceName, c.Webhooks[0].ClientConfig.Service.Name)
 		assert.Equal(t, namespace, c.Webhooks[0].ClientConfig.Service.Namespace)
-		assert.Equal(t, getPodMutatePath(SecretsID), *c.Webhooks[0].ClientConfig.Service.Path)
+		assert.Equal(t, getPodMutatePath(secret.SecretsID), *c.Webhooks[0].ClientConfig.Service.Path)
 		assert.Equal(t, 1, len(c.Webhooks[0].ObjectSelector.MatchLabels))
 		assert.Equal(t, 0, len(c.Webhooks[0].ObjectSelector.DeepCopy().MatchExpressions))
 		assert.Equal(t, expectedSecretsLabelSelector, *c.Webhooks[0].ObjectSelector)
@@ -172,7 +173,7 @@ func Test_CreateMutationWebhookConfiguration(t *testing.T) {
 }
 
 func Test_GetMutatePath(t *testing.T) {
-	assert.Equal(t, "/mutate--v1-pod/secrets", getPodMutatePath(SecretsID))
+	assert.Equal(t, "/mutate--v1-pod/secrets", getPodMutatePath(secret.SecretsID))
 	assert.Equal(t, "/mutate--v1-pod/image-builder", getPodMutatePath(ImageBuilderV1ID))
 }
 
@@ -186,7 +187,7 @@ func Test_Register(t *testing.T) {
 		}, latest.Scheme, promutils.NewTestScope())
 		assert.NoError(t, err)
 
-		mockRegister := &mocks.HTTPHookRegistererIface{}
+		mockRegister := &secretMocks.HTTPHookRegistererIface{}
 		wh := &admission.Webhook{Handler: pm.httpHandlers[0]}
 		mockRegister.On("Register", "/mutate--v1-pod/secrets", wh)
 		err = pm.Register(ctx, mockRegister)
@@ -201,9 +202,9 @@ func Test_Register(t *testing.T) {
 		}, latest.Scheme, promutils.NewTestScope())
 		assert.NoError(t, err)
 
-		mockRegister := &mocks.HTTPHookRegistererIface{}
+		mockRegister := &secretMocks.HTTPHookRegistererIface{}
 		secretWH := &admission.Webhook{Handler: pm.httpHandlers[0]}
-		mockRegister.On("Register", getPodMutatePath(SecretsID), secretWH)
+		mockRegister.On("Register", getPodMutatePath(secret.SecretsID), secretWH)
 		imageBuilderWH := &admission.Webhook{Handler: pm.httpHandlers[1]}
 		mockRegister.On("Register", getPodMutatePath(ImageBuilderV1ID), imageBuilderWH)
 

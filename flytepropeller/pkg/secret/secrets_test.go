@@ -1,4 +1,4 @@
-package webhook
+package secret
 
 import (
 	"context"
@@ -12,8 +12,8 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	secretUtils "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils/secrets"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/webhook/config"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/webhook/mocks"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/secret/config"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/secret/mocks"
 )
 
 func TestSecretsWebhook_Mutate(t *testing.T) {

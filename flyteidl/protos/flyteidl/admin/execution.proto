@@ -5,6 +5,7 @@ option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin
 
 import "flyteidl/admin/cluster_assignment.proto";
 import "flyteidl/admin/common.proto";
+import "flyteidl/admin/matchable_resource.proto";
 import "flyteidl/core/literals.proto";
 import "flyteidl/core/execution.proto";
 import "flyteidl/core/execution_envs.proto";
@@ -15,7 +16,6 @@ import "flyteidl/core/security.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
-import "flyteidl/admin/matchable_resource.proto";
 
 // Request to launch an execution with the given project, domain and optionally-assigned name.
 message ExecutionCreateRequest {

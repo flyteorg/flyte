@@ -345,6 +345,11 @@ func TestGetConfiguration(t *testing.T) {
 				Value:     nil,
 				IsMutable: false,
 			},
+			ExternalResourceAttributes: &admin.ExternalResourceAttributesWithSource{
+				Source:    admin.AttributesSource_GLOBAL,
+				Value:     nil,
+				IsMutable: false,
+			},
 		},
 	}))
 }
@@ -514,6 +519,11 @@ func TestGetDefaultConfiguration(t *testing.T) {
 				Value:     nil,
 				IsMutable: false,
 			},
+			ExternalResourceAttributes: &admin.ExternalResourceAttributesWithSource{
+				Source:    admin.AttributesSource_GLOBAL,
+				Value:     nil,
+				IsMutable: false,
+			},
 		},
 	}))
 }
@@ -650,6 +660,7 @@ func TestUpdateProjectDomainConfiguration(t *testing.T) {
 	applicationConfig.AssertExpectations(t)
 	mockRefConstructor.AssertExpectations(t)
 	mockPBStore.AssertExpectations(t)
+
 	assert.True(t, proto.Equal(response, &admin.ConfigurationUpdateResponse{
 		Id:      &admin.ConfigurationID{Org: "org", Project: "project", Domain: "domain"},
 		Version: "x/Jg9dpEFSgcOydAjamhQRezcQrJHq8FictmbduZX6A=",
@@ -701,6 +712,11 @@ func TestUpdateProjectDomainConfiguration(t *testing.T) {
 				IsMutable: false,
 			},
 			ClusterAssignment: &admin.ClusterAssignmentWithSource{
+				Source:    admin.AttributesSource_GLOBAL,
+				Value:     nil,
+				IsMutable: false,
+			},
+			ExternalResourceAttributes: &admin.ExternalResourceAttributesWithSource{
 				Source:    admin.AttributesSource_GLOBAL,
 				Value:     nil,
 				IsMutable: false,
@@ -790,6 +806,7 @@ func TestNewAttributes(t *testing.T) {
 		"PLUGIN_OVERRIDE",
 		"WORKFLOW_EXECUTION_CONFIG",
 		"CLUSTER_ASSIGNMENT",
+		"EXTERNAL_RESOURCE",
 	)
 	for _, resource := range admin.MatchableResource_name {
 		if !existingAttributes.Has(resource) {
@@ -806,6 +823,7 @@ func TestNewAttributes(t *testing.T) {
 		"PluginOverrides",
 		"WorkflowExecutionConfig",
 		"ClusterAssignment",
+		"ExternalResourceAttributes",
 	)
 	configType := reflect.ValueOf(admin.Configuration{}).Type()
 	for i := 0; i < configType.NumField(); i++ {

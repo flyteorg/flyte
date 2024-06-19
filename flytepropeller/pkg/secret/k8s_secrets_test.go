@@ -1,4 +1,4 @@
-package webhook
+package secret
 
 import (
 	"context"

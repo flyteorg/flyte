@@ -22,8 +22,8 @@ func (_m GlobalSecretProvider_GetForSecret) Return(_a0 string, _a1 error) *Globa
 	return &GlobalSecretProvider_GetForSecret{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *GlobalSecretProvider) OnGetForSecret(ctx context.Context, secret *core.Secret) *GlobalSecretProvider_GetForSecret {
-	c_call := _m.On("GetForSecret", ctx, secret)
+func (_m *GlobalSecretProvider) OnGetForSecret(ctx context.Context, _a1 *core.Secret) *GlobalSecretProvider_GetForSecret {
+	c_call := _m.On("GetForSecret", ctx, _a1)
 	return &GlobalSecretProvider_GetForSecret{Call: c_call}
 }
 
@@ -32,20 +32,20 @@ func (_m *GlobalSecretProvider) OnGetForSecretMatch(matchers ...interface{}) *Gl
 	return &GlobalSecretProvider_GetForSecret{Call: c_call}
 }
 
-// GetForSecret provides a mock function with given fields: ctx, secret
-func (_m *GlobalSecretProvider) GetForSecret(ctx context.Context, secret *core.Secret) (string, error) {
-	ret := _m.Called(ctx, secret)
+// GetForSecret provides a mock function with given fields: ctx, _a1
+func (_m *GlobalSecretProvider) GetForSecret(ctx context.Context, _a1 *core.Secret) (string, error) {
+	ret := _m.Called(ctx, _a1)
 
 	var r0 string
 	if rf, ok := ret.Get(0).(func(context.Context, *core.Secret) string); ok {
-		r0 = rf(ctx, secret)
+		r0 = rf(ctx, _a1)
 	} else {
 		r0 = ret.Get(0).(string)
 	}
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, *core.Secret) error); ok {
-		r1 = rf(ctx, secret)
+		r1 = rf(ctx, _a1)
 	} else {
 		r1 = ret.Error(1)
 	}

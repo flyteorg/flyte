@@ -31,9 +31,10 @@ import (
 	propellerEntrypoint "github.com/flyteorg/flyte/flytepropeller/pkg/controller"
 	propellerConfig "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
+	webhookConfig "github.com/flyteorg/flyte/flytepropeller/pkg/secret/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/signals"
 	webhookEntrypoint "github.com/flyteorg/flyte/flytepropeller/pkg/webhook"
-	webhookConfig "github.com/flyteorg/flyte/flytepropeller/pkg/webhook/config"
+
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/otelutils"
