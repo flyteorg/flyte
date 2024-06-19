@@ -119,15 +119,15 @@ func isUpgradeSupported(goos platformutil.Platform) (bool, error) {
 		return false, err
 	}
 
-	compatible_version := strings.TrimPrefix(latest, fmt.Sprintf("%s/", github.FlytectlReleaseConfig.ExecutableName))
-	if isGreater, err := util.IsVersionGreaterThan(compatible_version, stdlibversion.Version); err != nil {
+	compatibleVersion := strings.TrimPrefix(latest, fmt.Sprintf("%s/", github.FlytectlReleaseConfig.ExecutableName))
+	if isGreater, err := util.IsVersionGreaterThan(compatibleVersion, stdlibversion.Version); err != nil {
 		return false, err
 	} else if !isGreater {
 		fmt.Println("You already have the latest version of Flytectl")
 		return false, nil
 	}
 
-	message, err := github.GetUpgradeMessage(compatible_version, goos)
+	message, err := github.GetUpgradeMessage(compatibleVersion, goos)
 	if err != nil {
 		return false, err
 	}

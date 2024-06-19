@@ -15,24 +15,15 @@ import (
 	"github.com/mouuff/go-rocket-update/pkg/provider"
 )
 
-// type GitHubProvider struct {
-// 	provider.Github
-// }
-
 // Github provider finds a archive file in the repository's releases to provide files
-type GitHubProvider struct {
+type GHProvider struct {
 	RepositoryURL string // Repository URL, example github.com/mouuff/go-rocket-update
 	ArchiveName   string // Archive name (the zip/tar.gz you upload for a release on github), example: binaries.zip
 
 	tmpDir             string            // temporary directory this is used internally
 	decompressProvider provider.Provider // provider used to decompress the downloaded archive
 	archivePath        string            // path to the downloaded archive (should be in tmpDir)
-}
-
-// githubTag struct used to unmarshal response from github
-// https://api.github.com/repos/ownerName/projectName/tags
-type githubTag struct {
-	Name string `json:"name"`
+	ghRepo             GHRepoService     // github repository service
 }
 
 // githubRepositoryInfo is used to get the name of the project and the owner name
@@ -43,7 +34,7 @@ type githubRepositoryInfo struct {
 }
 
 // getRepositoryInfo parses the github repository URL
-func (c *GitHubProvider) repositoryInfo() (*githubRepositoryInfo, error) {
+func (c *GHProvider) repositoryInfo() (*githubRepositoryInfo, error) {
 	re := regexp.MustCompile(`github\.com/(.*?)/(.*?)$`)
 	submatches := re.FindAllStringSubmatch(c.RepositoryURL, 1)
 	if len(submatches) < 1 {
@@ -57,7 +48,7 @@ func (c *GitHubProvider) repositoryInfo() (*githubRepositoryInfo, error) {
 
 // getArchiveURL get the archive URL for the github repository
 // If no tag is provided then the latest version is selected
-func (c *GitHubProvider) getArchiveURL(tag string) (string, error) {
+func (c *GHProvider) getArchiveURL(tag string) (string, error) {
 	if len(tag) == 0 {
 		// Get latest version if no tag is provided
 		var err error
@@ -80,41 +71,45 @@ func (c *GitHubProvider) getArchiveURL(tag string) (string, error) {
 }
 
 // Open opens the provider
-func (c *GitHubProvider) Open() (err error) {
+func (c *GHProvider) Open() (err error) {
 	archiveURL, err := c.getArchiveURL("") // get archive url for latest version
 	if err != nil {
-		return
+		return err
 	}
-	resp, err := http.Get(archiveURL)
+	req, err := http.NewRequest("GET", archiveURL, nil)
 	if err != nil {
-		return
+		return err
+	}
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
 	}
 	defer resp.Body.Close()
 
 	c.tmpDir, err = os.MkdirTemp("", "rocket-update")
 	if err != nil {
-		return
+		return err
 	}
 
 	c.archivePath = filepath.Join(c.tmpDir, c.ArchiveName)
 	archiveFile, err := os.Create(c.archivePath)
 	if err != nil {
-		return
+		return err
 	}
 	_, err = io.Copy(archiveFile, resp.Body)
 	archiveFile.Close()
 	if err != nil {
-		return
+		return err
 	}
 	c.decompressProvider, err = provider.Decompress(c.archivePath)
 	if err != nil {
-		return nil
+		return err
 	}
 	return c.decompressProvider.Open()
 }
 
 // Close closes the provider
-func (c *GitHubProvider) Close() error {
+func (c *GHProvider) Close() error {
 	if c.decompressProvider != nil {
 		c.decompressProvider.Close()
 		c.decompressProvider = nil
@@ -129,17 +124,17 @@ func (c *GitHubProvider) Close() error {
 }
 
 // GetLatestVersion gets the latest version
-func (c *GitHubProvider) GetLatestVersion() (string, error) {
+func (c *GHProvider) GetLatestVersion() (string, error) {
 	tags, err := c.getReleases()
 	if err != nil {
 		return "", err
 	}
-	latest_tag := tags[0].GetTagName()
-	return latest_tag, err
+	latestTag := tags[0].GetTagName()
+	return latestTag, err
 }
 
-func (c *GitHubProvider) getReleases() ([]*go_github.RepositoryRelease, error) {
-	g := GetGHRepoService()
+func (c *GHProvider) getReleases() ([]*go_github.RepositoryRelease, error) {
+	g := c.ghRepo
 	releases, _, err := g.ListReleases(context.Background(), owner, flyte, &go_github.ListOptions{
 		PerPage: 100,
 	})
@@ -156,7 +151,7 @@ func (c *GitHubProvider) getReleases() ([]*go_github.RepositoryRelease, error) {
 }
 
 // Walk walks all the files provided
-func (c *GitHubProvider) Walk(walkFn provider.WalkFunc) error {
+func (c *GHProvider) Walk(walkFn provider.WalkFunc) error {
 	if c.decompressProvider == nil {
 		// TODO specify error
 		return provider.ErrNotOpenned
@@ -165,6 +160,6 @@ func (c *GitHubProvider) Walk(walkFn provider.WalkFunc) error {
 }
 
 // Retrieve file relative to "provider" to destination
-func (c *GitHubProvider) Retrieve(src string, dest string) error {
+func (c *GHProvider) Retrieve(src string, dest string) error {
 	return c.decompressProvider.Retrieve(src, dest)
 }

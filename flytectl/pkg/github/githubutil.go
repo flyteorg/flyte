@@ -39,9 +39,10 @@ var Client GHRepoService
 
 // FlytectlReleaseConfig represent the updater config for flytectl binary
 var FlytectlReleaseConfig = &updater.Updater{
-	Provider: &GitHubProvider{
+	Provider: &GHProvider{
 		RepositoryURL: flytectlRepository,
 		ArchiveName:   getFlytectlAssetName(),
+		ghRepo:        GetGHRepoService(),
 	},
 	ExecutableName: flytectl,
 	Version:        stdlibversion.Version,
