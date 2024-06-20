@@ -6,6 +6,9 @@ option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin
 
 import "flyteidl/admin/common.proto";
 
+// Empty request for GetDomain
+message GetDomainRequest {}
+
 // Namespace within a project commonly used to differentiate between different service instances.
 // e.g. "production", "development", etc.
 message Domain {
@@ -16,6 +19,10 @@ message Domain {
     string name  = 2;
 }
 
+// Represents a list of domains.
+message GetDomainsResponse {
+    repeated Domain domains = 1;
+}
 
 // Top-level namespace used to classify different entities like workflows and executions.
 message Project {
