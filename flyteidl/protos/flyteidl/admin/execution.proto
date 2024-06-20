@@ -331,7 +331,7 @@ message ExecutionSpec {
     Envs envs = 23;
 
     // Tags to be set for the execution.
-    repeated string tags = 24;
+    repeated string tags = 24 [deprecated = true];
 
     // Execution cluster label to be set for the execution.
     ExecutionClusterLabel execution_cluster_label = 25;

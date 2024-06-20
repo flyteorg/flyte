@@ -55,6 +55,10 @@ func (e K8sWorkflowExecutor) Execute(ctx context.Context, data interfaces.Execut
 		flyteWf.Tasks = nil
 	}
 
+	if consoleURL := e.config.ApplicationConfiguration().GetTopLevelConfig().ConsoleURL; len(consoleURL) > 0 {
+		flyteWf.ConsoleURL = consoleURL
+	}
+
 	executionTargetSpec := executioncluster.ExecutionTargetSpec{
 		Project:               data.ExecutionID.Project,
 		Domain:                data.ExecutionID.Domain,

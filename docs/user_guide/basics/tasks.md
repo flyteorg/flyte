@@ -34,7 +34,7 @@ To clone and run the example code on this page, see the [Flytesnacks repo][flyte
 
 To begin, import `task` from the `flytekit` library:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/task.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/task.py
 :caption: basics/task.py
 :lines: 1
 ```
@@ -45,7 +45,7 @@ Learn more about the supported types in the {ref}`type-system section <python_to
 
 We create a task that computes the slope of a regression line:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/task.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/task.py
 :caption: basics/task.py
 :pyobject: slope
 ```
@@ -58,7 +58,7 @@ starting with 0, e.g., -> `out0, out1, out2, ...`.
 
 You can execute a Flyte task just like any regular Python function:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/task.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/task.py
 :caption: basics/task.py
 :lines: 14-15
 ```
@@ -73,7 +73,7 @@ the values for the corresponding parameters.
 To run it locally, you can use the following `pyflyte run` command:
 ```
 pyflyte run \
-  https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/task.py \
+  https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/task.py \
   slope --x '[-3,0,3]' --y '[7,4,-2]'
 ```
 
@@ -81,7 +81,7 @@ If you want to run it remotely on the Flyte cluster,
 simply add the `--remote flag` to the `pyflyte run` command:
 ```
 pyflyte run --remote \
-  https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/task.py \
+  https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/task.py \
   slope --x '[-3,0,3]' --y '[7,4,-2]'
 ```
 
