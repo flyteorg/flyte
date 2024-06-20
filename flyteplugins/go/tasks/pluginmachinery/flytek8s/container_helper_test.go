@@ -725,7 +725,7 @@ func TestAddFlyteCustomizationsToContainer_ValidateEnvFrom(t *testing.T) {
 		},
 	}
 
-	err := AddFlyteCustomizationsToContainer(context.TODO(), getTemplateParametersForTest(nil, nil), ResourceCustomizationModeEnsureExistingResourcesInRange, container)
+	err := AddFlyteCustomizationsToContainer(context.TODO(), getTemplateParametersForTest(nil, nil, false, ""), ResourceCustomizationModeEnsureExistingResourcesInRange, container)
 	assert.NoError(t, err)
 
 	assert.Len(t, container.EnvFrom, 2)
