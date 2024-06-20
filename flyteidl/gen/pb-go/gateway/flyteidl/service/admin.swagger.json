@@ -830,6 +830,28 @@
         ]
       }
     },
+    "/api/v1/domains": {
+      "get": {
+        "operationId": "AdminService_GetDomains",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminGetDomainsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
     "/api/v1/events/nodes": {
       "post": {
         "summary": "Indicates a :ref:`ref_flyteidl.event.NodeExecutionEvent` has occurred.",
@@ -5110,6 +5132,19 @@
         }
       },
       "description": "These URLs are returned as part of node and task execution data requests."
+    },
+    "adminGetDomainsResponse": {
+      "type": "object",
+      "properties": {
+        "domains": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/adminDomain"
+          }
+        }
+      },
+      "description": "Represents a list of domains."
     },
     "adminGetVersionResponse": {
       "type": "object",

@@ -74,6 +74,8 @@ type AdminFetcherExtInterface interface {
 
 	// GetProjectByID fetches a single project by its identifier. If project does not exist, an error will be returned
 	GetProjectByID(ctx context.Context, projectID string) (*admin.Project, error)
+
+	GetDomains(ctx context.Context) (*admin.GetDomainsResponse, error)
 }
 
 // AdminFetcherExtClient is used for interacting with extended features used for fetching data from admin service
