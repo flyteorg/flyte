@@ -5,6 +5,6 @@ plugins:
   - plugin: buf.build/grpc/go:v1.3.0
     out: plugin
   - plugin: buf.build/community/neoeinstein-prost:v0.2.3
-    out: worker/src/pb
+    out: worker/bridge/src/pb
   - plugin: buf.build/community/neoeinstein-tonic:v0.3.0
-    out: worker/src/pb
+    out: worker/bridge/src/pb

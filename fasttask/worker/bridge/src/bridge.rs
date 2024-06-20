@@ -1,21 +1,21 @@
 use std::collections::{HashMap, HashSet};
 use std::future::Future;
-use std::sync::{Arc, Mutex, RwLock};
 use std::pin::Pin;
+use std::sync::{Arc, Mutex, RwLock};
 use std::task::{Context, Poll, Waker};
-use std::time::{UNIX_EPOCH, Duration, SystemTime};
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
-use crate::{FAILED, SUCCEEDED, task, BridgeArgs, TaskContext};
-use crate::pb::fasttask::{Capacity, HeartbeatRequest, TaskStatus};
-use crate::pb::fasttask::heartbeat_response::Operation;
+use crate::cli::BridgeArgs;
+use crate::common::TaskContext;
+use crate::common::{Executor, FAILED, SUCCEEDED};
 use crate::pb::fasttask::fast_task_client::FastTaskClient;
-use crate::executor::Executor;
+use crate::pb::fasttask::heartbeat_response::Operation;
+use crate::pb::fasttask::{Capacity, HeartbeatRequest, TaskStatus};
+use crate::task;
 
-use async_channel;
-use tokio;
 use tokio::net::TcpListener;
-use tokio::time::Interval;
 use tokio::process::Command;
+use tokio::time::Interval;
 use tokio_util::codec::{Framed, LengthDelimitedCodec};
 use tonic::Request;
 use tracing::{debug, error, warn};
@@ -81,13 +81,14 @@ impl Heartbeater {
     }
 }
 
-pub async fn run(args: BridgeArgs, executor_registration_addr: &str) -> Result<(), Box<dyn std::error::Error>> {
+pub async fn run(args: BridgeArgs) -> Result<(), Box<dyn std::error::Error>> {
+    let executor_registration_addr = args.executor_registration_addr;
     let worker_id = Uuid::new_v4().to_string(); // generate a random worker_id so that it is different on restart
     let (task_status_tx, task_status_rx) = async_channel::unbounded();
-    let task_statuses: Arc<RwLock<Vec<TaskStatus>>> = Arc::new(RwLock::new(vec!()));
+    let task_statuses: Arc<RwLock<Vec<TaskStatus>>> = Arc::new(RwLock::new(vec![]));
     let heartbeat_bool = Arc::new(Mutex::new(AsyncBool::new()));
 
-    let (backlog_tx, backlog_rx) = match args.backlog_length{
+    let (backlog_tx, backlog_rx) = match args.backlog_length {
         0 => (None, None),
         x => {
             let (tx, rx) = async_channel::bounded(x);
@@ -100,7 +101,7 @@ pub async fn run(args: BridgeArgs, executor_registration_addr: &str) -> Result<(
     let (executor_tx, executor_rx) = async_channel::unbounded();
 
     let executor_tx_clone = executor_tx.clone();
-    let listener = match TcpListener::bind(executor_registration_addr).await {
+    let listener = match TcpListener::bind(&executor_registration_addr).await {
         Ok(listener) => listener,
         Err(e) => {
             error!("failed to bind to port '{}'", e);
@@ -108,17 +109,15 @@ pub async fn run(args: BridgeArgs, executor_registration_addr: &str) -> Result<(
         }
     };
 
-    let executor_registration_addr = executor_registration_addr.to_string();
     tokio::spawn(async move {
         let mut index = 0;
         loop {
             build_executor_rx.recv().await;
 
             // start child process
-            let child = Command::new(std::env::args().next().unwrap())
+            let child = Command::new("unionai-actor-executor")
                 .arg("--executor-registration-addr")
                 .arg(executor_registration_addr.clone())
-                .arg("executor")
                 .arg("--id")
                 .arg(index.to_string())
                 .spawn()
@@ -127,10 +126,7 @@ pub async fn run(args: BridgeArgs, executor_registration_addr: &str) -> Result<(
             let stream = listener.accept().await.unwrap().0;
             let framed = Framed::new(stream, LengthDelimitedCodec::new());
 
-            let executor = Executor{
-                framed,
-                child,
-            };
+            let executor = Executor { framed, child };
             executor_tx_clone.send(executor).await;
 
             index += 1;
@@ -142,7 +138,8 @@ pub async fn run(args: BridgeArgs, executor_registration_addr: &str) -> Result<(
     }
 
     // spawn task status aggregator
-    let (heartbeat_bool_clone, task_statuses_clone) = (heartbeat_bool.clone(), task_statuses.clone());
+    let (heartbeat_bool_clone, task_statuses_clone) =
+        (heartbeat_bool.clone(), task_statuses.clone());
     tokio::spawn(async move {
         loop {
             let task_status_result = task_status_rx.recv().await;
@@ -164,18 +161,38 @@ pub async fn run(args: BridgeArgs, executor_registration_addr: &str) -> Result<(
         // initialize grpc client
         let mut client = match FastTaskClient::connect(args.fasttask_url.clone()).await {
             Ok(client) => client,
-            Err(e) =>  {
-                error!("failed to connect to grpc service '{}' '{:?}'", args.fasttask_url, e);
+            Err(e) => {
+                error!(
+                    "failed to connect to grpc service '{}' '{:?}'",
+                    args.fasttask_url, e
+                );
                 tokio::time::sleep(Duration::from_secs(1)).await;
                 continue;
-            },
+            }
         };
 
         // start heartbeater
-        let (worker_id_clone, queue_id_clone, task_statuses_clone, heartbeat_bool_clone, heartbeat_interval_seconds, fast_register_dir_override) =
-            (worker_id.clone(), args.queue_id.clone(), task_statuses.clone(), heartbeat_bool.clone(), args.heartbeat_interval_seconds, args.fast_register_dir_override.clone());
-        let (executor_rx_clone, parallelism_clone, backlog_rx_clone, backlog_length_clone) =
-            (executor_rx.clone(), args.parallelism as i32, backlog_rx.clone(), args.backlog_length as i32);
+        let (
+            worker_id_clone,
+            queue_id_clone,
+            task_statuses_clone,
+            heartbeat_bool_clone,
+            heartbeat_interval_seconds,
+            fast_register_dir_override,
+        ) = (
+            worker_id.clone(),
+            args.queue_id.clone(),
+            task_statuses.clone(),
+            heartbeat_bool.clone(),
+            args.heartbeat_interval_seconds,
+            args.fast_register_dir_override.clone(),
+        );
+        let (executor_rx_clone, parallelism_clone, backlog_rx_clone, backlog_length_clone) = (
+            executor_rx.clone(),
+            args.parallelism as i32,
+            backlog_rx.clone(),
+            args.backlog_length as i32,
+        );
         let outbound = async_stream::stream! {
             let mut heartbeater = Heartbeater {
                 interval: tokio::time::interval(Duration::from_secs(heartbeat_interval_seconds)),
@@ -219,7 +236,7 @@ pub async fn run(args: BridgeArgs, executor_registration_addr: &str) -> Result<(
             Err(e) => {
                 warn!("failed to send heartbeat '{:?}'", e);
                 continue;
-            },
+            }
         };
 
         let mut inbound = response.into_inner();
@@ -247,8 +264,12 @@ pub async fn run(args: BridgeArgs, executor_registration_addr: &str) -> Result<(
                     if cmd_str[0].eq("pyflyte-fast-execute") {
                         for i in 0..cmd_str.len() {
                             match cmd_str[i] {
-                                ref x if x.eq("--dest-dir") => cmd_str[i+1] = fast_register_dir_override.clone(),
-                                ref x if x.eq("--additional-distribution") => fast_register_id_index = Some(i+1),
+                                ref x if x.eq("--dest-dir") => {
+                                    cmd_str[i + 1] = fast_register_dir_override.clone()
+                                }
+                                ref x if x.eq("--additional-distribution") => {
+                                    fast_register_id_index = Some(i + 1)
+                                }
                                 ref x if x.eq("pyflyte-execute") => pyflyte_execute_index = Some(i),
                                 _ => (),
                             }
@@ -272,39 +293,86 @@ pub async fn run(args: BridgeArgs, executor_registration_addr: &str) -> Result<(
                     //cmd.args(&cmd_str[cmd_index+1..]);
 
                     // execute command
-                    let (task_id, namespace, workflow_id) =
-                        (heartbeat_response.task_id.clone(), heartbeat_response.namespace.clone(), heartbeat_response.workflow_id.clone());
-                    let (task_contexts_clone, task_status_tx_clone, task_status_report_interval_seconds, last_ack_grace_period_seconds) =
-                        (task_contexts.clone(), task_status_tx.clone(), args.task_status_report_interval_seconds, args.last_ack_grace_period_seconds);
-                    let (backlog_tx_clone, backlog_rx_clone, executor_tx_clone, executor_rx_clone, build_executor_tx_clone) =
-                        (backlog_tx.clone(), backlog_rx.clone(), executor_tx.clone(), executor_rx.clone(), build_executor_tx.clone());
+                    let (task_id, namespace, workflow_id) = (
+                        heartbeat_response.task_id.clone(),
+                        heartbeat_response.namespace.clone(),
+                        heartbeat_response.workflow_id.clone(),
+                    );
+                    let (
+                        task_contexts_clone,
+                        task_status_tx_clone,
+                        task_status_report_interval_seconds,
+                        last_ack_grace_period_seconds,
+                    ) = (
+                        task_contexts.clone(),
+                        task_status_tx.clone(),
+                        args.task_status_report_interval_seconds,
+                        args.last_ack_grace_period_seconds,
+                    );
+                    let (
+                        backlog_tx_clone,
+                        backlog_rx_clone,
+                        executor_tx_clone,
+                        executor_rx_clone,
+                        build_executor_tx_clone,
+                    ) = (
+                        backlog_tx.clone(),
+                        backlog_rx.clone(),
+                        executor_tx.clone(),
+                        executor_rx.clone(),
+                        build_executor_tx.clone(),
+                    );
                     tokio::spawn(async move {
-                        if let Err(e) = task::execute(task_contexts_clone, task_id, namespace, workflow_id, cmd, task_status_tx_clone,
-                                task_status_report_interval_seconds, last_ack_grace_period_seconds,
-                                backlog_tx_clone, backlog_rx_clone, executor_tx_clone, executor_rx_clone, build_executor_tx_clone).await {
+                        if let Err(e) = task::execute(
+                            task_contexts_clone,
+                            task_id,
+                            namespace,
+                            workflow_id,
+                            cmd,
+                            task_status_tx_clone,
+                            task_status_report_interval_seconds,
+                            last_ack_grace_period_seconds,
+                            backlog_tx_clone,
+                            backlog_rx_clone,
+                            executor_tx_clone,
+                            executor_rx_clone,
+                            build_executor_tx_clone,
+                        )
+                        .await
+                        {
                             warn!("failed to execute task '{:?}'", e);
                         }
                     });
-                },
+                }
                 Some(Operation::Ack) => {
                     let mut task_contexts = task_contexts.write().unwrap();
 
                     // update last ack timestamp
-                    if let Some(ref mut task_context) = task_contexts.get_mut(&heartbeat_response.task_id) {
-                        task_context.last_ack_timestamp = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
+                    if let Some(ref mut task_context) =
+                        task_contexts.get_mut(&heartbeat_response.task_id)
+                    {
+                        task_context.last_ack_timestamp = SystemTime::now()
+                            .duration_since(UNIX_EPOCH)
+                            .unwrap()
+                            .as_secs();
                     }
-                },
+                }
                 Some(Operation::Delete) => {
                     let mut task_contexts = task_contexts.write().unwrap();
 
                     // send kill signal
-                    if let Some(ref mut task_context) = task_contexts.get_mut(&heartbeat_response.task_id) {
+                    if let Some(ref mut task_context) =
+                        task_contexts.get_mut(&heartbeat_response.task_id)
+                    {
                         if let Err(e) = task_context.kill_tx.send(()).await {
                             warn!("failed to kill task '{:?}'", e);
                         }
                     }
-                },
-                None => warn!("unsupported heartbeat request operation '{:?}'", heartbeat_response.operation),
+                }
+                None => warn!(
+                    "unsupported heartbeat request operation '{:?}'",
+                    heartbeat_response.operation
+                ),
             }
         }
     }

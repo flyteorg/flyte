@@ -4,4 +4,7 @@
     "gopls": {
         "formatting.local": "github.com/flyteorg"
     },
+    "rust-analyzer.linkedProjects": [
+        "fasttask/worker/Cargo.toml"
+    ]
 }

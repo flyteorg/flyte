@@ -1,0 +1,11 @@
+include Cargo.toml
+include Cargo.lock
+
+recursive-include bridge *.rs
+recursive-include bridge *.toml
+recursive-include executor *.rs
+recursive-include executor *.toml
+include setup.cfg
+exclude Dockerfile
+global-exclude */__pycache__/*
+global-exclude *.pyc

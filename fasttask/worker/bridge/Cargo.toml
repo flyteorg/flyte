@@ -1,0 +1,27 @@
+[package]
+name = "unionai_actor_bridge"
+version.workspace = true
+edition = "2021"
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "unionai-actor-bridge"
+path = "src/main.rs"
+
+[dependencies]
+async-channel = "2.1"
+async-stream = "0.3"
+bincode = { workspace = true }
+clap = { version = "4.4.6", features = ["derive"] }
+futures = { workspace = true }
+prost = "0.11"
+prost-types = "0.11"
+serde = { version = "1.0", features = ["derive"] }
+tokio = { workspace = true }
+tokio-util = { workspace = true }
+tonic = "0.9"
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+uuid = { version = "1.4.1", features = ["v4"] }

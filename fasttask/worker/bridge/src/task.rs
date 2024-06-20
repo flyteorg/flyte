@@ -1,38 +1,40 @@
 use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
-use std::time::{UNIX_EPOCH, Instant, Duration, SystemTime};
+use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
-use crate::{FAILED, QUEUED, RUNNING};
-use crate::TaskContext;
+use crate::common::{Executor, Response, Task};
+use crate::common::{TaskContext, FAILED, QUEUED, RUNNING};
 use crate::pb::fasttask::TaskStatus;
-use crate::executor::{Task, Executor, Response};
 
 use async_channel::{self, Receiver, Sender, TryRecvError, TrySendError};
 use futures::sink::SinkExt;
 use futures::stream::StreamExt;
-use tokio;
 use tracing::{debug, info, warn};
 
 pub async fn execute(
-        task_contexts: Arc<RwLock<HashMap<String, TaskContext>>>,
-        task_id: String,
-        namespace: String,
-        workflow_id: String,
-        cmd: Vec<String>,
-        task_status_tx: Sender<TaskStatus>,
-        task_status_report_interval_seconds: u64,
-        last_ack_grace_period_seconds: u64,
-        backlog_tx: Option<Sender<()>>,
-        backlog_rx: Option<Receiver<()>>,
-        executor_tx: Sender<Executor>,
-        executor_rx: Receiver<Executor>,
-        build_executor_tx: Sender<()>,
-    ) -> Result<(), Box<dyn std::error::Error>> {
-
+    task_contexts: Arc<RwLock<HashMap<String, TaskContext>>>,
+    task_id: String,
+    namespace: String,
+    workflow_id: String,
+    cmd: Vec<String>,
+    task_status_tx: Sender<TaskStatus>,
+    task_status_report_interval_seconds: u64,
+    last_ack_grace_period_seconds: u64,
+    backlog_tx: Option<Sender<()>>,
+    backlog_rx: Option<Receiver<()>>,
+    executor_tx: Sender<Executor>,
+    executor_rx: Receiver<Executor>,
+    build_executor_tx: Sender<()>,
+) -> Result<(), Box<dyn std::error::Error>> {
     // check if task may be executed or backlogged
     let (mut executor, backlogged) = is_executable(&executor_rx, &backlog_tx).await?;
 
-    info!("starting task execution task_id={:?} executor={:?} backlogged={:?}", task_id, executor.is_some(), backlogged);
+    info!(
+        "starting task execution task_id={:?} executor={:?} backlogged={:?}",
+        task_id,
+        executor.is_some(),
+        backlogged
+    );
     if executor.is_none() && !backlogged {
         // if no executor and not backlogged then we drop the task transparently and allow grace
         // period to failover to another worker
@@ -40,21 +42,41 @@ pub async fn execute(
     }
 
     // create and store new task context
-    let (kill_tx, kill_rx) = async_channel::bounded(1); 
+    let (kill_tx, kill_rx) = async_channel::bounded(1);
     {
         let mut task_contexts = task_contexts.write().unwrap();
-        task_contexts.insert(task_id.clone(), TaskContext{
-            kill_tx: kill_tx,
-            last_ack_timestamp: SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs(),
-        });
+        task_contexts.insert(
+            task_id.clone(),
+            TaskContext {
+                kill_tx: kill_tx,
+                last_ack_timestamp: SystemTime::now()
+                    .duration_since(UNIX_EPOCH)
+                    .unwrap()
+                    .as_secs(),
+            },
+        );
     }
 
     // if backlogged we wait until we can execute
     let (mut phase, mut reason) = (QUEUED, "".to_string());
     if backlogged {
         let backlog_rx = backlog_rx.unwrap();
-        executor = match wait_in_backlog(task_contexts.clone(), &kill_rx, &task_id, &namespace, &workflow_id, &task_status_tx,
-                task_status_report_interval_seconds, last_ack_grace_period_seconds, &mut phase, &mut reason, &executor_rx, &backlog_rx).await {
+        executor = match wait_in_backlog(
+            task_contexts.clone(),
+            &kill_rx,
+            &task_id,
+            &namespace,
+            &workflow_id,
+            &task_status_tx,
+            task_status_report_interval_seconds,
+            last_ack_grace_period_seconds,
+            &mut phase,
+            &mut reason,
+            &executor_rx,
+            &backlog_rx,
+        )
+        .await
+        {
             Ok(executor) => executor,
             Err(e) => return Err(e),
         };
@@ -63,8 +85,22 @@ pub async fn execute(
     // execute task by running command - the only way that executor is None is if the task is
     // previous killed during the previous `wait_in_backlog` function call
     let killed = if let Some(mut executor) = executor {
-        let result = match run_command(task_contexts.clone(), &kill_rx, &task_id, &namespace, &workflow_id, cmd, &task_status_tx,
-                task_status_report_interval_seconds, last_ack_grace_period_seconds, &mut phase, &mut reason, &mut executor).await {
+        let result = match run_command(
+            task_contexts.clone(),
+            &kill_rx,
+            &task_id,
+            &namespace,
+            &workflow_id,
+            cmd,
+            &task_status_tx,
+            task_status_report_interval_seconds,
+            last_ack_grace_period_seconds,
+            &mut phase,
+            &mut reason,
+            &mut executor,
+        )
+        .await
+        {
             Ok(result) => Ok(result),
             Err(e) => Err(format!("failed to run command: {:?}", e)),
         };
@@ -75,15 +111,15 @@ pub async fn execute(
             Ok(true) => {
                 build_executor_tx.send(()).await?;
                 true
-            },
+            }
             Ok(false) => {
                 executor_tx.send(executor).await?;
                 false
-            },
+            }
             Err(e) => {
                 executor_tx.send(executor).await?;
                 return Err(e.into());
-            },
+            }
         }
     } else {
         true
@@ -91,8 +127,20 @@ pub async fn execute(
 
     // if not closed then report terminal status
     if !killed {
-        if let Err(e) = report_terminal_status(task_contexts.clone(), &kill_rx, &task_id, &namespace, &workflow_id, &task_status_tx,
-                task_status_report_interval_seconds, last_ack_grace_period_seconds, &mut phase, &mut reason).await {
+        if let Err(e) = report_terminal_status(
+            task_contexts.clone(),
+            &kill_rx,
+            &task_id,
+            &namespace,
+            &workflow_id,
+            &task_status_tx,
+            task_status_report_interval_seconds,
+            last_ack_grace_period_seconds,
+            &mut phase,
+            &mut reason,
+        )
+        .await
+        {
             return Err(e);
         }
     }
@@ -106,30 +154,44 @@ pub async fn execute(
     Ok(())
 }
 
-async fn is_executable(executor_rx: &Receiver<Executor>, backlog_tx: &Option<Sender<()>>) -> Result<(Option<Executor>, bool), String> {
+async fn is_executable(
+    executor_rx: &Receiver<Executor>,
+    backlog_tx: &Option<Sender<()>>,
+) -> Result<(Option<Executor>, bool), String> {
     match executor_rx.try_recv() {
         Ok(executor) => return Ok((Some(executor), false)),
         Err(TryRecvError::Closed) => return Err("executor_rx is closed".into()),
-        Err(TryRecvError::Empty) => {},
+        Err(TryRecvError::Empty) => {}
     }
 
     if let Some(backlog_tx) = backlog_tx {
         match backlog_tx.try_send(()) {
             Ok(_) => return Ok((None, true)),
             Err(TrySendError::Closed(e)) => return Err(format!("backlog_tx is closed: {:?}", e)),
-            Err(TrySendError::Full(_)) => {},
+            Err(TrySendError::Full(_)) => {}
         }
     }
 
     Ok((None, false))
 }
 
-async fn report_terminal_status(task_contexts: Arc<RwLock<HashMap<String, TaskContext>>>, kill_rx: &Receiver<()>, task_id: &str, namespace: &str, workflow_id: &str,
-        task_status_tx: &Sender<TaskStatus>, task_status_report_interval_seconds: u64, last_ack_grace_period_seconds: u64, phase: &mut i32, reason: &mut String) -> Result<(), Box<dyn std::error::Error>> {
+async fn report_terminal_status(
+    task_contexts: Arc<RwLock<HashMap<String, TaskContext>>>,
+    kill_rx: &Receiver<()>,
+    task_id: &str,
+    namespace: &str,
+    workflow_id: &str,
+    task_status_tx: &Sender<TaskStatus>,
+    task_status_report_interval_seconds: u64,
+    last_ack_grace_period_seconds: u64,
+    phase: &mut i32,
+    reason: &mut String,
+) -> Result<(), Box<dyn std::error::Error>> {
     // send completed task status until deleted
-    let mut interval = tokio::time::interval(Duration::from_secs(task_status_report_interval_seconds));
+    let mut interval =
+        tokio::time::interval(Duration::from_secs(task_status_report_interval_seconds));
     loop {
-        tokio::select!{
+        tokio::select! {
             _ = interval.tick() => {
                 // if last_ack_timestamp > grace_period then kill tasks and delete from task_contexts
                 let last_ack_timestamp;
@@ -168,19 +230,30 @@ async fn report_terminal_status(task_contexts: Arc<RwLock<HashMap<String, TaskCo
     }
 }
 
-async fn run_command(task_contexts: Arc<RwLock<HashMap<String, TaskContext>>>, kill_rx: &Receiver<()>, task_id: &str, namespace: &str, workflow_id: &str,
-        cmd: Vec<String>, task_status_tx: &Sender<TaskStatus>, task_status_report_interval_seconds: u64, last_ack_grace_period_seconds: u64, phase: &mut i32, reason: &mut String, executor: &mut Executor) -> Result<bool, Box<dyn std::error::Error>> {
+async fn run_command(
+    task_contexts: Arc<RwLock<HashMap<String, TaskContext>>>,
+    kill_rx: &Receiver<()>,
+    task_id: &str,
+    namespace: &str,
+    workflow_id: &str,
+    cmd: Vec<String>,
+    task_status_tx: &Sender<TaskStatus>,
+    task_status_report_interval_seconds: u64,
+    last_ack_grace_period_seconds: u64,
+    phase: &mut i32,
+    reason: &mut String,
+    executor: &mut Executor,
+) -> Result<bool, Box<dyn std::error::Error>> {
     // execute command and monitor
     let task_start_ts = Instant::now();
- 
-    let buf = bincode::serialize(&Task{
-        cmd
-    }).unwrap();
+
+    let buf = bincode::serialize(&Task { cmd }).unwrap();
     executor.framed.send(buf.into()).await.unwrap();
 
-    let mut interval = tokio::time::interval(Duration::from_secs(task_status_report_interval_seconds));
+    let mut interval =
+        tokio::time::interval(Duration::from_secs(task_status_report_interval_seconds));
     loop {
-        tokio::select!{
+        tokio::select! {
             result = executor.framed.next() => {
                 info!("completed task_id {} in {}", task_id, task_start_ts.elapsed().as_millis());
                 let buf = result.unwrap().unwrap();
@@ -260,13 +333,24 @@ async fn run_command(task_contexts: Arc<RwLock<HashMap<String, TaskContext>>>, k
     Ok(false)
 }
 
-async fn wait_in_backlog(task_contexts: Arc<RwLock<HashMap<String, TaskContext>>>, kill_rx: &Receiver<()>, task_id: &str, namespace: &str, workflow_id: &str,
-        task_status_tx: &Sender<TaskStatus>, task_status_report_interval_seconds: u64, last_ack_grace_period_seconds: u64, phase: &mut i32, reason: &mut String,
-        executor_rx: &Receiver<Executor>, backlog_rx: &Receiver<()>) -> Result<Option<Executor>, Box<dyn std::error::Error>> {
-
-    let mut interval = tokio::time::interval(Duration::from_secs(task_status_report_interval_seconds));
+async fn wait_in_backlog(
+    task_contexts: Arc<RwLock<HashMap<String, TaskContext>>>,
+    kill_rx: &Receiver<()>,
+    task_id: &str,
+    namespace: &str,
+    workflow_id: &str,
+    task_status_tx: &Sender<TaskStatus>,
+    task_status_report_interval_seconds: u64,
+    last_ack_grace_period_seconds: u64,
+    phase: &mut i32,
+    reason: &mut String,
+    executor_rx: &Receiver<Executor>,
+    backlog_rx: &Receiver<()>,
+) -> Result<Option<Executor>, Box<dyn std::error::Error>> {
+    let mut interval =
+        tokio::time::interval(Duration::from_secs(task_status_report_interval_seconds));
     loop {
-        tokio::select!{
+        tokio::select! {
             result = executor_rx.recv() => {
                 let executor = match result {
                     Ok(executor) => executor,

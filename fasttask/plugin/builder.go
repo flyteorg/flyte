@@ -219,43 +219,10 @@ func (i *InMemoryEnvBuilder) createPod(ctx context.Context, fastTaskEnvironmentS
 	}
 	objectMeta.Annotations[TTL_SECONDS] = fmt.Sprintf("%d", fastTaskEnvironmentSpec.GetTtlSeconds())
 
-	// create new volume 'workdir'
-	podSpec.Volumes = append(podSpec.Volumes, v1.Volume{
-		Name: "workdir",
-		VolumeSource: v1.VolumeSource{
-			EmptyDir: &v1.EmptyDirVolumeSource{},
-		},
-	})
-
-	// add init container to copy worker binary to volume
-	podSpec.InitContainers = append(podSpec.InitContainers, v1.Container{
-		Name:            "worker",
-		Image:           GetConfig().Image,
-		ImagePullPolicy: v1.PullIfNotPresent,
-		Command:         []string{"cp", "/usr/local/bin/worker", "/tmp/worker"},
-		Resources: v1.ResourceRequirements{
-			Limits: v1.ResourceList{
-				v1.ResourceCPU:    GetConfig().InitContainerCPU,
-				v1.ResourceMemory: GetConfig().InitContainerMemory,
-			},
-			Requests: v1.ResourceList{
-				v1.ResourceCPU:    GetConfig().InitContainerCPU,
-				v1.ResourceMemory: GetConfig().InitContainerMemory,
-			},
-		},
-		VolumeMounts: []v1.VolumeMount{
-			{
-				Name:      "workdir",
-				MountPath: "/tmp",
-			},
-		},
-	})
-
 	// update primary container arguments and volume mounts
 	container := &podSpec.Containers[primaryContainerIndex]
 	container.Args = []string{
-		"/tmp/worker",
-		"bridge",
+		"unionai-actor-bridge",
 	}
 
 	// append additional worker args before plugin args to ensure they are overridden
@@ -274,11 +241,6 @@ func (i *InMemoryEnvBuilder) createPod(ctx context.Context, fastTaskEnvironmentS
 		"--fasttask-url",
 		GetConfig().CallbackURI,
 	)
-
-	container.VolumeMounts = append(container.VolumeMounts, v1.VolumeMount{
-		Name:      "workdir",
-		MountPath: "/tmp",
-	})
 
 	// use kubeclient to create worker
 	return i.kubeClient.GetClient().Create(ctx, &v1.Pod{

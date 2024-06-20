@@ -1,0 +1,65 @@
+[build-system]
+requires = ["setuptools", "setuptools-rust"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "unionai-actor"
+version = "0.1.0"
+requires-python = ">=3.8"
+description = "Enables Union.ai actors"
+authors = [{ name = "unionai", email = "info@union.ai" }]
+license = { file = "LICENSE" }
+readme = { file = "README.md", content-type = "text/markdown" }
+dependencies = []
+classifiers = [
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+    "License :: Other/Proprietary License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+[project.scripts]
+# Python entry-point wrapper to be installed in `$venv/bin`
+unionai-actor-executor = "unionai_actor_executor._lib:executor"
+
+[tool.setuptools]
+include-package-data = true
+license-files = ["licenses/*.txt", "LICENSE"]
+
+[tool.setuptools.packages]
+# Pure Python packages/modules
+find = { where = ["python_src"] }
+
+[[tool.setuptools-rust.ext-modules]]
+# Private Rust extension module to be nested into Python package
+target = "unionai_actor_executor._lib" # The last part of the name (e.g. "_lib") has to match lib.name in Cargo.toml,
+# but you can add a prefix to nest it inside of a Python package.
+binding = "PyO3" # Default value, can be omitted
+# See reference for RustExtension in https://setuptools-rust.readthedocs.io/en/latest/reference.html
+path = "executor/Cargo.toml"
+
+[[tool.setuptools-rust.bins]]
+# Rust executable to be installed in `$venv/bin`
+target = "unionai-actor-bridge" # Needs to match bin.name in Cargo.toml
+args = ["--profile", "release"] # Extra args for Cargo
+path = "bridge/Cargo.toml"
+# See reference for RustBin in https://setuptools-rust.readthedocs.io/en/latest/reference.html
+# Note that you can also use Python entry-points as alternative to Rust binaries
+
+[tool.cibuildwheel]
+build = "cp*-manylinux_aarch64 cp*-manylinux_x86_64"
+before-all = "curl https://sh.rustup.rs -sSf | sh -s -- --profile=minimal -y"
+environment = { PATH = "$HOME/.cargo/bin:$PATH" }
+build-verbosity = 1
+
+# Use abi3audit to catch issues with Limited API wheels
+[tool.cibuildwheel.linux]
+repair-wheel-command = [
+    "auditwheel repair -w {dest_dir} {wheel}",
+    "pipx run abi3audit --strict --report {wheel}",
+]
