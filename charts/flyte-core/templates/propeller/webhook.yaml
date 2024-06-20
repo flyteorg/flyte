@@ -26,12 +26,12 @@ spec:
         app: {{ template "flyte-pod-webhook.name" . }}
         app.kubernetes.io/name: {{ template "flyte-pod-webhook.name" . }}
         app.kubernetes.io/version: {{ .Values.flytepropeller.image.tag }}
-        {{- with .Values.flytepropeller.podLabels }}
+        {{- with .Values.webhook.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
       annotations:
         configChecksum: {{ include (print .Template.BasePath "/propeller/configmap.yaml") . | sha256sum | trunc 63 | quote }}
-        {{- with .Values.flytepropeller.podAnnotations }}
+        {{- with .Values.webhook.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
@@ -63,8 +63,8 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: metadata.namespace
-        {{- if .Values.flytepropeller.podEnv -}}
-        {{- with .Values.flytepropeller.podEnv -}}
+        {{- if .Values.webhook.podEnv -}}
+        {{- with .Values.webhook.podEnv -}}
         {{- toYaml . | nindent 10 }}
         {{- end }}
         {{- end }}
@@ -95,8 +95,8 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
-        {{- if .Values.flytepropeller.podEnv -}}
-        {{- with .Values.flytepropeller.podEnv -}}
+        {{- if .Values.webhook.podEnv -}}
+        {{- with .Values.webhook.podEnv -}}
         {{- toYaml . | nindent 12 }}
         {{- end }}
         {{- end }}
@@ -123,7 +123,7 @@ spec:
         - name: webhook-certs
           secret:
             secretName: flyte-pod-webhook
-      {{- with .Values.flytepropeller.nodeSelector }}
+      {{- with .Values.webhook.nodeSelector }}
       nodeSelector: {{ tpl (toYaml .) $ | nindent 8 }}
       {{- end }}
 ---
