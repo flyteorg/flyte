@@ -160,6 +160,14 @@ func (c *CloudEventWrappedPublisher) TransformWorkflowExecutionEvent(ctx context
 		logger.Warningf(ctx, "workflow id is nil for execution [%+v]", ex)
 		return nil, fmt.Errorf("workflow id is nil for execution [%+v]", ex)
 	}
+
+	if ex.GetSpec().GetLaunchPlan().GetResourceType() == core.ResourceType_TASK {
+		logger.Debugf(ctx, "skipping single task execution workflow event [%+v]", rawEvent.ExecutionId)
+		return &event.CloudEventWorkflowExecution{
+			RawEvent: rawEvent,
+		}, nil
+	}
+
 	workflowModel, err := c.db.WorkflowRepo().Get(ctx, repositoryInterfaces.Identifier{
 		Org:     ex.Closure.WorkflowId.Org,
 		Project: ex.Closure.WorkflowId.Project,
@@ -171,6 +179,7 @@ func (c *CloudEventWrappedPublisher) TransformWorkflowExecutionEvent(ctx context
 		logger.Warningf(ctx, "couldn't find workflow [%+v] for cloud event processing", ex.Closure.WorkflowId)
 		return nil, err
 	}
+
 	var workflowInterface core.TypedInterface
 	if workflowModel.TypedInterface != nil && len(workflowModel.TypedInterface) > 0 {
 		err = proto.Unmarshal(workflowModel.TypedInterface, &workflowInterface)
