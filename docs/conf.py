@@ -298,7 +298,7 @@ myst_enable_extensions = ["colon_fence"]
 # Sphinx-mermaid config
 mermaid_output_format = "raw"
 mermaid_version = "latest"
-mermaid_init_js = "mermaid.initialize({startOnLoad:false});"
+mermaid_init_js = "mermaid.initialize({startOnLoad:true});"
 
 # Makes it so that only the command is copied, not the output
 copybutton_prompt_text = "$ "
