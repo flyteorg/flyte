@@ -513,15 +513,27 @@ func (i *InMemoryEnvBuilder) detectOrphanedEnvironments(ctx context.Context, k8s
 	defer i.lock.Unlock()
 
 	orphanedEnvironments := make(map[string]*environment, 0)
+	orphanedPods := make(map[string][]string, 0)
 	for _, pod := range podList.Items {
-		// if environment exists we do not need to process
+		// check if environment already exists or pod is accounted for
 		environmentID, labelExists := pod.Labels[EXECUTION_ENV_ID]
 		if !labelExists {
 			continue
 		}
 
-		_, environmentExists := i.environments[environmentID]
-		if environmentExists {
+		if environment, environmentExists := i.environments[environmentID]; environmentExists {
+			found := false
+			for _, replica := range environment.replicas {
+				if replica == pod.Name {
+					found = true
+					break
+				}
+			}
+
+			if !found {
+				orphanedPods[environmentID] = append(orphanedPods[environmentID], pod.Name)
+			}
+
 			continue
 		}
 
@@ -580,6 +592,11 @@ func (i *InMemoryEnvBuilder) detectOrphanedEnvironments(ctx context.Context, k8s
 		i.metrics.environmentOrphansDetected.Inc()
 
 		i.environments[environmentID] = orphanedEnvironment
+	}
+
+	for environmentID, podNames := range orphanedPods {
+		logger.Infof(ctx, "detected orphaned pod(s) '%v' for environment '%s'", podNames, environmentID)
+		i.environments[environmentID].replicas = append(i.environments[environmentID].replicas, podNames...)
 	}
 
 	return nil

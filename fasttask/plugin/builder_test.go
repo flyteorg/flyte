@@ -213,6 +213,17 @@ func TestDetectOrphanedEnvironments(t *testing.T) {
 			expectedEnvironmentCount: 1,
 			expectedReplicaCount:     2,
 		},
+		{
+			name: "ExistingOrphanedEnvironment",
+			environments: map[string]*environment{
+				"foo": &environment{
+					replicas: []string{"bar"},
+					state:    ORPHANED,
+				},
+			},
+			expectedEnvironmentCount: 1,
+			expectedReplicaCount:     2,
+		},
 	}
 
 	for _, test := range tests {
