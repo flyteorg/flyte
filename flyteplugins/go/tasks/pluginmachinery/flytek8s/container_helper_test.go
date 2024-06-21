@@ -695,3 +695,40 @@ func TestAddFlyteCustomizationsToContainer_ValidateExistingResources(t *testing.
 	assert.True(t, container.Resources.Requests.Cpu().Equal(resource.MustParse("10")))
 	assert.True(t, container.Resources.Limits.Cpu().Equal(resource.MustParse("10")))
 }
+
+func TestAddFlyteCustomizationsToContainer_ValidateEnvFrom(t *testing.T) {
+	configMapSource := v1.EnvFromSource{
+		ConfigMapRef: &v1.ConfigMapEnvSource{
+			LocalObjectReference: v1.LocalObjectReference{
+				Name: "my-configmap",
+			},
+		},
+	}
+	secretSource := v1.EnvFromSource{
+		SecretRef: &v1.SecretEnvSource{
+			LocalObjectReference: v1.LocalObjectReference{
+				Name: "my-secret",
+			},
+		},
+	}
+
+	container := &v1.Container{
+		Command: []string{
+			"{{ .Input }}",
+		},
+		Args: []string{
+			"{{ .OutputPrefix }}",
+		},
+		EnvFrom: []v1.EnvFromSource{
+			configMapSource,
+			secretSource,
+		},
+	}
+
+	err := AddFlyteCustomizationsToContainer(context.TODO(), getTemplateParametersForTest(nil, nil, false, ""), ResourceCustomizationModeEnsureExistingResourcesInRange, container)
+	assert.NoError(t, err)
+
+	assert.Len(t, container.EnvFrom, 2)
+	assert.Equal(t, container.EnvFrom[0], configMapSource)
+	assert.Equal(t, container.EnvFrom[1], secretSource)
+}
