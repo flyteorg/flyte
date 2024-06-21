@@ -23,6 +23,8 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils/secrets"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/errorcollector"
+	podplugin "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/pod"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 
@@ -30,6 +32,7 @@ import (
 )
 
 const fastTaskType = "fast-task"
+const maxErrorMessageLength = 102400 // 100kb
 
 var (
 	statusUpdateNotFoundError = errors.New("StatusUpdateNotFound")
@@ -45,14 +48,14 @@ const (
 
 // pluginMetrics is a collection of metrics for the plugin.
 type pluginMetrics struct {
-	workersUnavailableTimeout   prometheus.Counter
+	allReplicasFailed           prometheus.Counter
 	statusUpdateNotFoundTimeout prometheus.Counter
 }
 
 // newPluginMetrics creates a new pluginMetrics with the given scope.
 func newPluginMetrics(scope promutils.Scope) pluginMetrics {
 	return pluginMetrics{
-		workersUnavailableTimeout:   scope.MustNewCounter("workers_unavailable_timeout", "Count of tasks that timed out waiting for workers to become available"),
+		allReplicasFailed:           scope.MustNewCounter("all_replicas_failed", "Count of tasks that failed due to all environment replicas failing"),
 		statusUpdateNotFoundTimeout: scope.MustNewCounter("status_update_not_found_timeout", "Count of tasks that timed out waiting for status update from worker"),
 	}
 }
@@ -273,12 +276,52 @@ func (p *Plugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (co
 				pluginState.LastUpdated = time.Now()
 			}
 
-			// fail if no worker available within grace period
-			if time.Since(pluginState.LastUpdated) > GetConfig().GracePeriodWorkersUnavailable.Duration {
-				logger.Infof(ctx, "Timed out waiting for available worker for queue %s", queueID)
-				p.metrics.workersUnavailableTimeout.Inc()
+			//  fail if all replicas for this environment are in a failed state
+			statuses, err := tCtx.GetExecutionEnvClient().Status(ctx, queueID)
+			if err != nil {
+				return core.UnknownTransition, err
+			}
 
-				phaseInfo = core.PhaseInfoSystemFailure("unknown", fmt.Sprintf("timed out waiting for available worker for queue %s", queueID), nil)
+			statusesMap := statuses.(map[string]*v1.Pod)
+
+			allReplicasFailed := true
+			messageCollector := errorcollector.NewErrorMessageCollector()
+
+			now := time.Now()
+			index := 0
+			for _, pod := range statusesMap {
+				if pod == nil {
+					// pod does not exist because it has not yet been populated in the kubeclient
+					// cache or was deleted. to be safe, we treat both as a non-failure state.
+					allReplicasFailed = false
+					break
+				}
+
+				phaseInfo, err := podplugin.DemystifyPodStatus(pod, core.TaskInfo{OccurredAt: &now})
+				if err != nil {
+					return core.UnknownTransition, err
+				}
+
+				switch phaseInfo.Phase() {
+				case core.PhasePermanentFailure, core.PhaseRetryableFailure:
+					if phaseInfo.Err() != nil {
+						messageCollector.Collect(index, phaseInfo.Err().GetMessage())
+					} else {
+						messageCollector.Collect(index, phaseInfo.Reason())
+					}
+				default:
+					allReplicasFailed = false
+				}
+
+				index++
+			}
+
+			if allReplicasFailed {
+				logger.Infof(ctx, "all workers have failed for queue %s", queueID)
+				p.metrics.allReplicasFailed.Inc()
+
+				phaseInfo = core.PhaseInfoSystemFailure("unknown", fmt.Sprintf("all workers have failed for queue %s\n%s",
+					queueID, messageCollector.Summary(maxErrorMessageLength)), nil)
 			} else {
 				phaseInfo = core.PhaseInfoWaitingForResourcesInfo(time.Now(), core.DefaultPhaseVersion, "no workers available", nil)
 			}

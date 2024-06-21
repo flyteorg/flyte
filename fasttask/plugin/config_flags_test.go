@@ -183,20 +183,6 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_grace-period-workers-unavailable", func(t *testing.T) {
-
-		t.Run("Override", func(t *testing.T) {
-			testValue := defaultConfig.GracePeriodWorkersUnavailable.String()
-
-			cmdFlags.Set("grace-period-workers-unavailable", testValue)
-			if vString, err := cmdFlags.GetString("grace-period-workers-unavailable"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.GracePeriodWorkersUnavailable)
-
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
-	})
 	t.Run("Test_heartbeat-buffer-size", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {

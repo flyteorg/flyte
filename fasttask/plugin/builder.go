@@ -177,6 +177,44 @@ func (i *InMemoryEnvBuilder) Create(ctx context.Context, executionEnvID string, 
 	return env.extant, nil
 }
 
+// Status returns the status of the environment with the given execution environment ID. This
+// includes the details of each pod in the environment replica set.
+func (i *InMemoryEnvBuilder) Status(ctx context.Context, executionEnvID string) (interface{}, error) {
+	i.lock.Lock()
+	defer i.lock.Unlock()
+
+	// check if environment exists
+	environment, exists := i.environments[executionEnvID]
+	if !exists {
+		return nil, nil
+	}
+
+	// retrieve pod details from kubeclient cache
+	statuses := make(map[string]*v1.Pod, 0)
+
+	podTemplateSpec := &v1.PodTemplateSpec{}
+	if err := json.Unmarshal(environment.spec.GetPodTemplateSpec(), podTemplateSpec); err != nil {
+		return nil, flyteerrors.Errorf(flyteerrors.BadTaskSpecification,
+			"unable to unmarshal PodTemplateSpec [%v], Err: [%v]", environment.spec.GetPodTemplateSpec(), err.Error())
+	}
+
+	for _, podName := range environment.replicas {
+		pod := v1.Pod{}
+		err := i.kubeClient.GetCache().Get(ctx, types.NamespacedName{
+			Name:      podName,
+			Namespace: podTemplateSpec.Namespace,
+		}, &pod)
+
+		if k8serrors.IsNotFound(err) || k8serrors.IsGone(err) {
+			statuses[podName] = nil
+		} else {
+			statuses[podName] = &pod
+		}
+	}
+
+	return statuses, nil
+}
+
 // createPod creates a new pod for the given execution environment ID and pod name. The pod is
 // created using the given FastTaskEnvironmentSpec.
 func (i *InMemoryEnvBuilder) createPod(ctx context.Context, fastTaskEnvironmentSpec *pb.FastTaskEnvironmentSpec, executionEnvID, podName string) error {

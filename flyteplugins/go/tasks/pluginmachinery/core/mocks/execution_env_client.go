@@ -89,3 +89,44 @@ func (_m *ExecutionEnvClient) Get(ctx context.Context, executionEnvID string) *s
 
 	return r0
 }
+
+type ExecutionEnvClient_Status struct {
+	*mock.Call
+}
+
+func (_m ExecutionEnvClient_Status) Return(_a0 interface{}, _a1 error) *ExecutionEnvClient_Status {
+	return &ExecutionEnvClient_Status{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *ExecutionEnvClient) OnStatus(ctx context.Context, executionEnvID string) *ExecutionEnvClient_Status {
+	c_call := _m.On("Status", ctx, executionEnvID)
+	return &ExecutionEnvClient_Status{Call: c_call}
+}
+
+func (_m *ExecutionEnvClient) OnStatusMatch(matchers ...interface{}) *ExecutionEnvClient_Status {
+	c_call := _m.On("Status", matchers...)
+	return &ExecutionEnvClient_Status{Call: c_call}
+}
+
+// Status provides a mock function with given fields: ctx, executionEnvID
+func (_m *ExecutionEnvClient) Status(ctx context.Context, executionEnvID string) (interface{}, error) {
+	ret := _m.Called(ctx, executionEnvID)
+
+	var r0 interface{}
+	if rf, ok := ret.Get(0).(func(context.Context, string) interface{}); ok {
+		r0 = rf(ctx, executionEnvID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(interface{})
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
+		r1 = rf(ctx, executionEnvID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}

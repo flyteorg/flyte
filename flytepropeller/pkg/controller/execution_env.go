@@ -29,6 +29,12 @@ func (e *ExecutionEnvClient) Get(ctx context.Context, executionEnvID string) *_s
 	return fastTaskEnvBuilder.Get(ctx, executionEnvID)
 }
 
+// Status returns the status of the execution environment with the given ID.
+func (e *ExecutionEnvClient) Status(ctx context.Context, executionEnvID string) (interface{}, error) {
+	fastTaskEnvBuilder := e.envBuilders["fast-task"]
+	return fastTaskEnvBuilder.Status(ctx, executionEnvID)
+}
+
 // NewExecutionEnvClient creates a new ExecutionEnvClient.
 func NewExecutionEnvClient(ctx context.Context, kubeClient executors.Client, scope promutils.Scope) (pluginscore.ExecutionEnvClient, error) {
 	envBuilderScope := scope.NewSubScope("env_builder")

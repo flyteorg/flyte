@@ -367,24 +367,34 @@ func TestAddObjectMetadata(t *testing.T) {
 func TestHandleNotYetStarted(t *testing.T) {
 	ctx := context.TODO()
 	tests := []struct {
-		name           string
-		workerID       string
-		lastUpdated    time.Time
-		expectedPhase  core.Phase
-		expectedReason string
-		expectedError  error
+		name               string
+		workerID           string
+		lastUpdated        time.Time
+		executionEnvStatus map[string]*v1.Pod
+		expectedPhase      core.Phase
+		expectedReason     string
+		expectedError      error
 	}{
 		{
-			name:           "NoWorkersAvailable",
-			workerID:       "",
+			name:     "NoWorkersAvailable",
+			workerID: "",
+			executionEnvStatus: map[string]*v1.Pod{
+				"foo": nil,
+			},
 			expectedPhase:  core.PhaseWaitingForResources,
 			expectedReason: "no workers available",
 			expectedError:  nil,
 		},
 		{
-			name:           "NoWorkersAvailableGracePeriodFailure",
-			workerID:       "",
-			lastUpdated:    time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC),
+			name:     "NoWorkersAllFailed",
+			workerID: "",
+			executionEnvStatus: map[string]*v1.Pod{
+				"foo": &v1.Pod{
+					Status: v1.PodStatus{
+						Phase: v1.PodFailed,
+					},
+				},
+			},
 			expectedPhase:  core.PhasePermanentFailure,
 			expectedReason: "",
 			expectedError:  nil,
@@ -435,6 +445,10 @@ func TestHandleNotYetStarted(t *testing.T) {
 			tCtx.OnOutputWriter().Return(outputReader)
 			tCtx.OnTaskExecutionMetadata().Return(taskMetadata)
 			tCtx.OnTaskReader().Return(taskReader)
+
+			executionEnvClient := &coremocks.ExecutionEnvClient{}
+			executionEnvClient.OnStatusMatch(ctx, mock.Anything).Return(test.executionEnvStatus, nil)
+			tCtx.OnGetExecutionEnvClient().Return(executionEnvClient)
 
 			arrayNodeStateInput := &State{
 				SubmissionPhase: NotSubmitted,

@@ -180,7 +180,29 @@ func (plugin) GetTaskPhaseWithLogs(ctx context.Context, pluginContext k8s.Plugin
 		info.Logs = taskLogs
 	}
 
+	phaseInfo, err := DemystifyPodStatus(pod, info)
+	if err != nil {
+		return pluginsCore.PhaseInfoUndefined, err
+	} else if phaseInfo.Phase() != pluginsCore.PhaseRunning && phaseInfo.Phase() == pluginState.Phase &&
+		phaseInfo.Version() <= pluginState.PhaseVersion && phaseInfo.Reason() != pluginState.Reason {
+
+		// if we have the same Phase as the previous evaluation and updated the Reason but not the PhaseVersion we must
+		// update the PhaseVersion so an event is sent to reflect the Reason update. this does not handle the Running
+		// Phase because the legacy used `DefaultPhaseVersion + 1` which will only increment to 1.
+		phaseInfo = phaseInfo.WithVersion(pluginState.PhaseVersion + 1)
+	}
+
+	return phaseInfo, err
+}
+
+func (plugin) GetProperties() k8s.PluginProperties {
+	return k8s.PluginProperties{}
+}
+
+func DemystifyPodStatus(pod *v1.Pod, info pluginsCore.TaskInfo) (pluginsCore.PhaseInfo, error) {
 	phaseInfo := pluginsCore.PhaseInfoUndefined
+	var err error
+
 	switch pod.Status.Phase {
 	case v1.PodSucceeded:
 		phaseInfo, err = flytek8s.DemystifySuccess(pod.Status, info)
@@ -189,11 +211,11 @@ func (plugin) GetTaskPhaseWithLogs(ctx context.Context, pluginContext k8s.Plugin
 	case v1.PodPending:
 		phaseInfo, err = flytek8s.DemystifyPending(pod.Status)
 	case v1.PodReasonUnschedulable:
-		phaseInfo = pluginsCore.PhaseInfoQueued(transitionOccurredAt, pluginsCore.DefaultPhaseVersion, "pod unschedulable")
+		phaseInfo = pluginsCore.PhaseInfoQueued(*info.OccurredAt, pluginsCore.DefaultPhaseVersion, "pod unschedulable")
 	case v1.PodUnknown:
 		// DO NOTHING
 	default:
-		primaryContainerName, exists := r.GetAnnotations()[flytek8s.PrimaryContainerKey]
+		primaryContainerName, exists := pod.GetAnnotations()[flytek8s.PrimaryContainerKey]
 		if !exists {
 			// if all of the containers in the Pod are complete, as an optimization, we can declare the task as
 			// succeeded rather than waiting for the Pod to be marked completed.
@@ -234,22 +256,7 @@ func (plugin) GetTaskPhaseWithLogs(ctx context.Context, pluginContext k8s.Plugin
 		}
 	}
 
-	if err != nil {
-		return pluginsCore.PhaseInfoUndefined, err
-	} else if phaseInfo.Phase() != pluginsCore.PhaseRunning && phaseInfo.Phase() == pluginState.Phase &&
-		phaseInfo.Version() <= pluginState.PhaseVersion && phaseInfo.Reason() != pluginState.Reason {
-
-		// if we have the same Phase as the previous evaluation and updated the Reason but not the PhaseVersion we must
-		// update the PhaseVersion so an event is sent to reflect the Reason update. this does not handle the Running
-		// Phase because the legacy used `DefaultPhaseVersion + 1` which will only increment to 1.
-		phaseInfo = phaseInfo.WithVersion(pluginState.PhaseVersion + 1)
-	}
-
 	return phaseInfo, err
-}
-
-func (plugin) GetProperties() k8s.PluginProperties {
-	return k8s.PluginProperties{}
 }
 
 func init() {

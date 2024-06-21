@@ -11,4 +11,5 @@ import (
 type ExecutionEnvClient interface {
 	Get(ctx context.Context, executionEnvID string) *_struct.Struct
 	Create(ctx context.Context, executionEnvID string, executionEnvSpec *_struct.Struct) (*_struct.Struct, error)
+	Status(ctx context.Context, executionEnvID string) (interface{}, error)
 }

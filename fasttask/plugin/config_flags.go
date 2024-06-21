@@ -56,7 +56,6 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "env-gc-interval"), defaultConfig.EnvGCInterval.String(), "Frequency that environments are GCed in case of TTL expirations.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "env-repair-interval"), defaultConfig.EnvRepairInterval.String(), "Frequency that environments are repaired in case of external modifications (ex. pod deletion).")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "grace-period-status-not-found"), defaultConfig.GracePeriodStatusNotFound.String(), "The grace period for a task status to be reported before the task is considered failed.")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "grace-period-workers-unavailable"), defaultConfig.GracePeriodWorkersUnavailable.String(), "The grace period for a worker to become available before the task is considered failed.")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "heartbeat-buffer-size"), defaultConfig.HeartbeatBufferSize, "The size of the heartbeat buffer for each worker.")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "nonce-length"), defaultConfig.NonceLength, "The length of the nonce value to uniquely link a fasttask replica to the environment instance,  ensuring fast turnover of environments regardless of cache freshness.")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "task-status-buffer-size"), defaultConfig.TaskStatusBufferSize, "The size of the task status buffer for each task.")
