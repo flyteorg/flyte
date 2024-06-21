@@ -73,7 +73,7 @@ For example, to archive a project:
 
 ::
 
-    $ uctl update project --file update.yaml --archive
+    $ flytectl update project --file update.yaml --archive
 
 And to activate (unarchive) the same project:
 
@@ -85,7 +85,7 @@ And to activate (unarchive) the same project:
 
 ::
 
-    $ uctl update project --file update.yaml --archive
+    $ flytectl update project --file update.yaml --archive
 
 Note that when using a *yaml* file, the *activate* flag is not used.
 Instead, the *archive* flag is used for *both* archiving and activating (unarchiving) with the difference being in the *state* field of the *yaml* file.
