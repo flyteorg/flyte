@@ -6,10 +6,46 @@
 .. tags:: Deployment, Infrastructure, GPU, Intermediate
 ```
 
-Along with the simpler resources like CPU/Memory, you may want to configure and access GPU resources. Flyte
-allows you to configure the GPU access poilcy for your cluster. GPUs are expensive and it would not be ideal to
+Along with compute resources like CPU and Memory, you may want to configure and access GPU resources. 
+
+Flyte gives you three main levels of granularity to request accelerator resources from your Task definition.
+
+## Requesting a generic accelerator
+
+Example:
+
+```python
+from flytekit import task,Resources
+import torch
+
+@task(requests=Resources( gpu="1")) 
+def gpu_available() -> bool:
+   return torch.cuda.is_available()
+```
+The goal here is to make a simple request of any available GPU device(s).
+
+### How it works?
+
+
+
+
+
+### Infrastructure requirements
+
+## Requesting a specific GPU device
+
+### Infrastructure requirements
+
+### How it works?
+
+## Requesting a GPU partition
+
+Flyte
+allows you to configure the GPU access policy for your cluster. GPUs are expensive and it would not be ideal to
 treat machines with GPUs and machines with CPUs equally. You may want to reserve machines with GPUs for tasks
-that explicitly request GPUs. To achieve this, Flyte uses the Kubernetes concept of [taints and tolerations](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/).
+that explicitly request them. To achieve this, Flyte uses the Kubernetes concept of [taints and tolerations](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/).
+
+
 
 Kubernetes can automatically apply tolerations for extended resources like GPUs using the [ExtendedResourceToleration plugin](https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/#extendedresourcetoleration), enabled by default in some cloud environments. Make sure the GPU nodes are tainted with a key matching the resource name, i.e., `key: nvidia.com/gpu`.
 
