@@ -13,14 +13,15 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/secret/config"
 )
 
-func hasEnvVar(envVars []corev1.EnvVar, envVarKey string) bool {
-	for _, e := range envVars {
+// If env var exists in the existing list of envVars then return the index for it or else return -1
+func hasEnvVar(envVars []corev1.EnvVar, envVarKey string) int {
+	for index, e := range envVars {
 		if e.Name == envVarKey {
-			return true
+			return index
 		}
 	}
 
-	return false
+	return -1
 }
 
 func CreateEnvVarForSecret(secret *core.Secret) corev1.EnvVar {
@@ -80,10 +81,13 @@ func AppendVolumeMounts(containers []corev1.Container, mount corev1.VolumeMount)
 func AppendEnvVars(containers []corev1.Container, envVar corev1.EnvVar) []corev1.Container {
 	res := make([]corev1.Container, 0, len(containers))
 	for _, c := range containers {
-		if !hasEnvVar(c.Env, envVar.Name) {
-			c.Env = append(c.Env, envVar)
+		if foundIndex := hasEnvVar(c.Env, envVar.Name); foundIndex >= 0 {
+			// This would be someone adding a duplicate key to what the webhook is trying to add.We should delete the existing one and then add the new at the beginning
+			c.Env = append(c.Env[:foundIndex], c.Env[foundIndex+1:]...)
 		}
-
+		// Append the passed in environment variable to the start of the list.
+		// With multiple calls to this function too, eg : in case of injecting multiple secrets, the same premise holds.
+		c.Env = append([]corev1.EnvVar{envVar}, c.Env...)
 		res = append(res, c)
 	}
 

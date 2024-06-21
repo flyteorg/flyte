@@ -31,6 +31,10 @@ func TestK8sSecretInjector_Inject(t *testing.T) {
 					Name: "container1",
 					Env: []corev1.EnvVar{
 						{
+							Name:  "FLYTE_SECRETS_ENV_PREFIX",
+							Value: "_FSEC_",
+						},
+						{
 							Name: "_FSEC_GROUP_HELLO",
 							ValueFrom: &corev1.EnvVarSource{
 								SecretKeyRef: &corev1.SecretKeySelector{
@@ -41,10 +45,6 @@ func TestK8sSecretInjector_Inject(t *testing.T) {
 									Optional: &optional,
 								},
 							},
-						},
-						{
-							Name:  "FLYTE_SECRETS_ENV_PREFIX",
-							Value: "_FSEC_",
 						},
 					},
 				},
@@ -84,11 +84,11 @@ func TestK8sSecretInjector_Inject(t *testing.T) {
 					},
 					Env: []corev1.EnvVar{
 						{
-							Name:  "FLYTE_SECRETS_DEFAULT_DIR",
-							Value: "/etc/flyte/secrets",
+							Name: "FLYTE_SECRETS_FILE_PREFIX",
 						},
 						{
-							Name: "FLYTE_SECRETS_FILE_PREFIX",
+							Name:  "FLYTE_SECRETS_DEFAULT_DIR",
+							Value: "/etc/flyte/secrets",
 						},
 					},
 				},
@@ -132,11 +132,11 @@ func TestK8sSecretInjector_Inject(t *testing.T) {
 					},
 					Env: []corev1.EnvVar{
 						{
-							Name:  "FLYTE_SECRETS_DEFAULT_DIR",
-							Value: "/etc/flyte/secrets",
+							Name: "FLYTE_SECRETS_FILE_PREFIX",
 						},
 						{
-							Name: "FLYTE_SECRETS_FILE_PREFIX",
+							Name:  "FLYTE_SECRETS_DEFAULT_DIR",
+							Value: "/etc/flyte/secrets",
 						},
 					},
 				},
@@ -170,11 +170,11 @@ func TestK8sSecretInjector_Inject(t *testing.T) {
 					},
 					Env: []corev1.EnvVar{
 						{
-							Name:  "FLYTE_SECRETS_DEFAULT_DIR",
-							Value: "/etc/flyte/secrets",
+							Name: "FLYTE_SECRETS_FILE_PREFIX",
 						},
 						{
-							Name: "FLYTE_SECRETS_FILE_PREFIX",
+							Name:  "FLYTE_SECRETS_DEFAULT_DIR",
+							Value: "/etc/flyte/secrets",
 						},
 					},
 				},

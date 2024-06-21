@@ -43,20 +43,20 @@ func TestAWSSecretManagerInjector_Inject(t *testing.T) {
 					Image: "docker.io/amazon/aws-secrets-manager-secret-sidecar:v0.1.4",
 					Env: []corev1.EnvVar{
 						{
-							Name:  "SECRET_ARN",
-							Value: inputSecret.Group + ":" + inputSecret.Key,
-						},
-						{
-							Name:  "SECRET_FILENAME",
-							Value: "/" + inputSecret.Group + "/" + inputSecret.Key,
+							Name:  "FLYTE_SECRETS_FILE_PREFIX",
+							Value: "",
 						},
 						{
 							Name:  "FLYTE_SECRETS_DEFAULT_DIR",
 							Value: "/etc/flyte/secrets",
 						},
 						{
-							Name:  "FLYTE_SECRETS_FILE_PREFIX",
-							Value: "",
+							Name:  "SECRET_ARN",
+							Value: inputSecret.Group + ":" + inputSecret.Key,
+						},
+						{
+							Name:  "SECRET_FILENAME",
+							Value: "/" + inputSecret.Group + "/" + inputSecret.Key,
 						},
 					},
 					VolumeMounts: []corev1.VolumeMount{

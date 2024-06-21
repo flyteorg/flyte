@@ -17,7 +17,7 @@ func Test_hasEnvVar(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want bool
+		want int
 	}{
 		{
 			name: "exists",
@@ -29,7 +29,7 @@ func Test_hasEnvVar(t *testing.T) {
 				},
 				envVarKey: "ENV_VAR_1",
 			},
-			want: true,
+			want: 0,
 		},
 
 		{
@@ -42,7 +42,7 @@ func Test_hasEnvVar(t *testing.T) {
 				},
 				envVarKey: "ENV_VAR",
 			},
-			want: false,
+			want: -1,
 		},
 	}
 
@@ -137,7 +137,7 @@ func TestUpdateEnvVars(t *testing.T) {
 					Env: []corev1.EnvVar{
 						{
 							Name:  "my_secret",
-							Value: "my_val_already",
+							Value: "my_val",
 						},
 					},
 				},

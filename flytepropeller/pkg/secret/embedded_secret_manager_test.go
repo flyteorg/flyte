@@ -148,12 +148,12 @@ func TestEmbeddedSecretManagerInjector_Inject(t *testing.T) {
 						{
 							Env: []corev1.EnvVar{
 								{
-									Name:  SecretEnvVarPrefix,
-									Value: UnionSecretEnvVarPrefix,
-								},
-								{
 									Name:  "_UNION_SECRETID",
 									Value: secretValue,
+								},
+								{
+									Name:  SecretEnvVarPrefix,
+									Value: UnionSecretEnvVarPrefix,
 								},
 							},
 						},

@@ -43,12 +43,12 @@ func TestGCPSecretManagerInjector_Inject(t *testing.T) {
 					},
 					Env: []corev1.EnvVar{
 						{
-							Name:  "FLYTE_SECRETS_DEFAULT_DIR",
-							Value: "/etc/flyte/secrets",
-						},
-						{
 							Name:  "FLYTE_SECRETS_FILE_PREFIX",
 							Value: "",
+						},
+						{
+							Name:  "FLYTE_SECRETS_DEFAULT_DIR",
+							Value: "/etc/flyte/secrets",
 						},
 					},
 					VolumeMounts: []corev1.VolumeMount{

@@ -22,11 +22,11 @@ var (
 				Name: "container1",
 				Env: []corev1.EnvVar{
 					{
-						Name:  "FLYTE_SECRETS_DEFAULT_DIR",
-						Value: "/etc/flyte/secrets",
+						Name: "FLYTE_SECRETS_FILE_PREFIX",
 					},
 					{
-						Name: "FLYTE_SECRETS_FILE_PREFIX",
+						Name:  "FLYTE_SECRETS_DEFAULT_DIR",
+						Value: "/etc/flyte/secrets",
 					},
 				},
 			},

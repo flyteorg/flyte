@@ -40,12 +40,12 @@ func TestGlobalSecrets_Inject(t *testing.T) {
 					Name: "container1",
 					Env: []corev1.EnvVar{
 						{
-							Name:  "FLYTE_SECRETS_ENV_PREFIX",
-							Value: "_FSEC_",
-						},
-						{
 							Name:  "_FSEC_GROUP_HELLO",
 							Value: "my_password",
+						},
+						{
+							Name:  "FLYTE_SECRETS_ENV_PREFIX",
+							Value: "_FSEC_",
 						},
 					},
 				},
