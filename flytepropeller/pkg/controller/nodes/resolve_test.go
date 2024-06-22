@@ -172,6 +172,8 @@ func (d *dummyBaseWorkflow) GetExecutionConfig() v1alpha1.ExecutionConfig {
 	return v1alpha1.ExecutionConfig{}
 }
 
+func (d *dummyBaseWorkflow) GetConsoleURL() string { return "" }
+
 func createDummyBaseWorkflow(dataStore *storage.DataStore) *dummyBaseWorkflow {
 	return &dummyBaseWorkflow{
 		ID: "w1",

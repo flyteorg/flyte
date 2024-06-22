@@ -245,19 +245,19 @@ func TestSubWorkflowHandler_StartLaunchPlan(t *testing.T) {
 
 		nCtx.OnNodeExecutionMetadata().Return(nm)
 		ectx := &execMocks.ExecutionContext{}
-		ectx.OnGetDefinitionVersion().Return(v1alpha1.WorkflowDefinitionVersion1)
-		ectx.OnGetEventVersion().Return(1)
-		ectx.OnGetParentInfo().Return(nil)
-		ectx.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{
+		ectx.EXPECT().GetDefinitionVersion().Return(v1alpha1.WorkflowDefinitionVersion1)
+		ectx.EXPECT().GetEventVersion().Return(1)
+		ectx.EXPECT().GetParentInfo().Return(nil)
+		ectx.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{
 			RecoveryExecution: v1alpha1.WorkflowExecutionIdentifier{
 				WorkflowExecutionIdentifier: recoveredExecID,
 			},
 		})
-		ectx.OnIncrementParallelism().Return(1)
-		ectx.OnGetSecurityContext().Return(core.SecurityContext{})
-		ectx.OnGetRawOutputDataConfig().Return(v1alpha1.RawOutputDataConfig{})
-		ectx.OnGetLabels().Return(nil)
-		ectx.OnGetAnnotations().Return(nil)
+		ectx.EXPECT().IncrementParallelism().Return(1)
+		ectx.EXPECT().GetSecurityContext().Return(core.SecurityContext{})
+		ectx.EXPECT().GetRawOutputDataConfig().Return(v1alpha1.RawOutputDataConfig{})
+		ectx.EXPECT().GetLabels().Return(nil)
+		ectx.EXPECT().GetAnnotations().Return(nil)
 
 		nCtx.OnExecutionContext().Return(ectx)
 		nCtx.OnCurrentAttempt().Return(uint32(1))
@@ -671,7 +671,7 @@ func TestLaunchPlanHandler_HandleAbort(t *testing.T) {
 		}
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
 		eCtx := &execMocks.ExecutionContext{}
-		eCtx.OnGetName().Return("name")
+		eCtx.EXPECT().GetName().Return("name")
 		nCtx.OnExecutionContext().Return(eCtx)
 		err := h.HandleAbort(ctx, nCtx, "some reason")
 		assert.NoError(t, err)

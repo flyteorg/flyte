@@ -22,7 +22,7 @@ type MockExecutionRepo struct {
 	countFunction  CountExecutionFunc
 }
 
-func (r *MockExecutionRepo) Create(ctx context.Context, input models.Execution) error {
+func (r *MockExecutionRepo) Create(ctx context.Context, input models.Execution, executionTagModel []*models.ExecutionTag) error {
 	if r.createFunction != nil {
 		return r.createFunction(ctx, input)
 	}
