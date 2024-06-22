@@ -113,7 +113,7 @@ func TestEndToEnd(t *testing.T) {
 	t.Run("failed to create a job", func(t *testing.T) {
 		agentPlugin := newMockAsyncAgentPlugin()
 		agentPlugin.PluginLoader = func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
-			return Plugin{
+			return &Plugin{
 				metricScope: iCtx.MetricsScope(),
 				cfg:         GetConfig(),
 				cs: &ClientSet{
@@ -282,7 +282,7 @@ func newMockAsyncAgentPlugin() webapi.PluginEntry {
 		ID:                 "agent-service",
 		SupportedTaskTypes: []core.TaskType{"bigquery_query_job_task", "spark"},
 		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
-			return Plugin{
+			return &Plugin{
 				metricScope: iCtx.MetricsScope(),
 				cfg:         &cfg,
 				cs: &ClientSet{
@@ -327,7 +327,7 @@ func newMockSyncAgentPlugin() webapi.PluginEntry {
 		ID:                 "agent-service",
 		SupportedTaskTypes: []core.TaskType{"openai"},
 		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
-			return Plugin{
+			return &Plugin{
 				metricScope: iCtx.MetricsScope(),
 				cfg:         &cfg,
 				cs: &ClientSet{

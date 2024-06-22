@@ -319,10 +319,11 @@ func TestInitializeAgentRegistry(t *testing.T) {
 	err := SetConfig(&cfg)
 	assert.NoError(t, err)
 
-	agent := &Agent{AgentDeployment: &Deployment{Endpoint: "localhost:80"}}
-	agentRegistry := Registry{"spark": {defaultTaskTypeVersion: agent}}
-	updateAgentRegistry(context.Background(), cs, agentRegistry)
-
+	agentRegistry := getAgentRegistry(context.Background(), cs)
 	agentRegistryKeys := maps.Keys(agentRegistry)
-	assert.Equal(t, agentRegistryKeys, []string{"spark"})
+	expectedKeys := []string{"task1", "task2", "task3", "task_type_1", "task_type_2"}
+
+	for _, key := range expectedKeys {
+		assert.Contains(t, agentRegistryKeys, key)
+	}
 }

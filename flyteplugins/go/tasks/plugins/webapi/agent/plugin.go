@@ -56,12 +56,6 @@ type ResourceMetaWrapper struct {
 	TaskCategory      admin.TaskCategory
 }
 
-func (p *Plugin) getRegistryTaskTypes() []core.TaskType {
-	p.mu.RLock()
-	defer p.mu.RUnlock()
-	return maps.Keys(p.registry)
-}
-
 func (p *Plugin) setRegistry(r Registry) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
@@ -339,7 +333,7 @@ func (p *Plugin) getAsyncAgentClient(ctx context.Context, agent *Deployment) (se
 func (p *Plugin) watchAgents(ctx context.Context, agentService *core.AgentService) {
 	go wait.Until(func() {
 		clientSet := getAgentClientSets(ctx)
-		agentRegistry := getUpdatedAgentRegistry(ctx, clientSet)
+		agentRegistry := getAgentRegistry(ctx, clientSet)
 		p.setRegistry(agentRegistry)
 		agentService.SetSupportedTaskType(maps.Keys(agentRegistry))
 	}, p.cfg.PollInterval.Duration, ctx.Done())
@@ -395,7 +389,7 @@ func newAgentPlugin(agentService *core.AgentService) webapi.PluginEntry {
 	ctx := context.Background()
 	cfg := GetConfig()
 	clientSet := getAgentClientSets(ctx)
-	agentRegistry := getUpdatedAgentRegistry(ctx, clientSet)
+	agentRegistry := getAgentRegistry(ctx, clientSet)
 	supportedTaskTypes := maps.Keys(agentRegistry)
 
 	return webapi.PluginEntry{

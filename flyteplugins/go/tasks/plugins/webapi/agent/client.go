@@ -90,7 +90,7 @@ func getFinalContext(ctx context.Context, operation string, agent *Deployment) (
 	return context.WithTimeout(ctx, timeout)
 }
 
-func getUpdatedAgentRegistry(ctx context.Context, cs *ClientSet) Registry {
+func getAgentRegistry(ctx context.Context, cs *ClientSet) Registry {
 	newAgentRegistry := make(Registry)
 	cfg := GetConfig()
 	var agentDeployments []*Deployment

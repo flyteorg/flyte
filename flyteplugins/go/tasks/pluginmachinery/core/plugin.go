@@ -3,8 +3,9 @@ package core
 import (
 	"context"
 	"fmt"
-	"k8s.io/utils/strings/slices"
 	"sync"
+
+	"k8s.io/utils/strings/slices"
 )
 
 //go:generate mockery -all -case=underscore
