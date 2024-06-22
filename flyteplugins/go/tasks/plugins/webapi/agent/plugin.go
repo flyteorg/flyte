@@ -182,6 +182,7 @@ func (p *Plugin) ExecuteTaskSync(
 
 	in, err := stream.Recv()
 	if err != nil {
+		logger.Errorf(ctx, "Failed to write output with err %s", err.Error())
 		return nil, nil, err
 	}
 	if in.GetHeader() == nil {
@@ -192,11 +193,7 @@ func (p *Plugin) ExecuteTaskSync(
 	resource := in.GetHeader().GetResource()
 
 	if err := stream.CloseSend(); err != nil {
-		return nil, nil, err
-	}
-
-	if err != nil {
-		logger.Errorf(ctx, "Failed to write output with err %s", err.Error())
+		logger.Errorf(ctx, "Failed to close stream with err %s", err.Error())
 		return nil, nil, err
 	}
 
@@ -267,7 +264,7 @@ func (p *Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phas
 
 	switch resource.Phase {
 	case flyteIdl.TaskExecution_QUEUED:
-		return core.PhaseInfoQueuedWithTaskInfo(core.DefaultPhaseVersion, resource.Message, taskInfo), nil
+		return core.PhaseInfoQueuedWithTaskInfo(time.Now(), core.DefaultPhaseVersion, resource.Message, taskInfo), nil
 	case flyteIdl.TaskExecution_WAITING_FOR_RESOURCES:
 		return core.PhaseInfoWaitingForResourcesInfo(time.Now(), core.DefaultPhaseVersion, resource.Message, taskInfo), nil
 	case flyteIdl.TaskExecution_INITIALIZING:
