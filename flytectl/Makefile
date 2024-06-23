@@ -30,10 +30,6 @@ update_boilerplate:
 install-piptools:
 	pip install -U pip-tools
 
-.PHONY: doc-requirements.txt
-doc-requirements.txt: doc-requirements.in install-piptools
-	$(call PIP_COMPILE,doc-requirements.in)
-
 .PHONY: test_unit_without_flag
 test_unit_without_flag:
 	go test ./... -race -coverprofile=coverage.temp.txt -covermode=atomic
