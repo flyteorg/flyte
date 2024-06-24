@@ -2971,7 +2971,9 @@ pub struct ExecutionEnv {
     /// type is the type of the execution environment.
     #[prost(string, tag="2")]
     pub r#type: ::prost::alloc::string::String,
-    /// version is the version of the execution environment.
+    /// version is the version of the execution environment. This may be used differently by each
+    /// individual environment type (ex. auto-generated or manually specificed), but is intended to
+    /// allow variance in environment specifications with the same ID.
     #[prost(string, tag="5")]
     pub version: ::prost::alloc::string::String,
     /// environment is a oneof field that can be used to specify the environment in different ways.

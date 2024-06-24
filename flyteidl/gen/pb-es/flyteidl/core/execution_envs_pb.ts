@@ -109,7 +109,9 @@ export class ExecutionEnv extends Message<ExecutionEnv> {
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   /**
-   * version is the version of the execution environment.
+   * version is the version of the execution environment. This may be used differently by each
+   * individual environment type (ex. auto-generated or manually specificed), but is intended to
+   * allow variance in environment specifications with the same ID.
    *
    * @generated from field: string version = 5;
    */
