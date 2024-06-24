@@ -711,7 +711,10 @@ func (a *arrayNodeHandler) buildArrayNodeContext(ctx context.Context, nCtx inter
 	if err != nil {
 		return nil, nil, nil, nil, nil, nil, err
 	}
-	arrayExecutionContext := newArrayExecutionContext(executors.NewExecutionContextWithParentInfo(nCtx.ExecutionContext(), newParentInfo), subNodeIndex)
+	// set new parent info and re-initialize the control flow to not inherit the parent's state
+	arrayExecutionContext := newArrayExecutionContext(
+		executors.NewExecutionContext(nCtx.ExecutionContext(), nCtx.ExecutionContext(), nCtx.ExecutionContext(), newParentInfo, executors.InitializeControlFlow()),
+		subNodeIndex)
 
 	arrayNodeExecutionContextBuilder := newArrayNodeExecutionContextBuilder(a.nodeExecutor.GetNodeExecutionContextBuilder(),
 		subNodeID, subNodeIndex, subNodeStatus, inputReader, eventRecorder)
