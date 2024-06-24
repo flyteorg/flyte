@@ -107,7 +107,7 @@ type ExecutionEnv struct {
 	//	*ExecutionEnv_Extant
 	//	*ExecutionEnv_Spec
 	Environment isExecutionEnv_Environment `protobuf_oneof:"environment"`
-	// verison is the version of the execution environment.
+	// version is the version of the execution environment.
 	Version string `protobuf:"bytes,5,opt,name=version,proto3" json:"version,omitempty"`
 }
 

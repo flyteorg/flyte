@@ -37,6 +37,6 @@ message ExecutionEnv {
     google.protobuf.Struct spec = 4;
   }
 
-  // verison is the version of the execution environment.
+  // version is the version of the execution environment.
   string version = 5;
 }

@@ -7094,7 +7094,7 @@
         },
         "version": {
           "type": "string",
-          "description": "verison is the version of the execution environment."
+          "description": "version is the version of the execution environment."
         }
       },
       "description": "ExecutionEnv is a message that is used to specify the execution environment."

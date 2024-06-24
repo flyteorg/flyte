@@ -109,7 +109,7 @@ export class ExecutionEnv extends Message<ExecutionEnv> {
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   /**
-   * verison is the version of the execution environment.
+   * version is the version of the execution environment.
    *
    * @generated from field: string version = 5;
    */
