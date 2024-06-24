@@ -454,6 +454,9 @@ flyteconsole:
     # prometheus to auto-detect the service monitor and start scrapping the metrics
     labels: {}
 
+  livenessProbe: {}
+  readinessProbe: {}
+
 # It will enable the redoc route in ingress
 deployRedoc: false
 
