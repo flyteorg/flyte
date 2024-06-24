@@ -12,8 +12,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
-//go:generate mockery -all -case=underscore
-
+//go:generate mockery --output=./mocks --case=underscore --name=GlobalSecretProvider
 type GlobalSecretProvider interface {
 	GetForSecret(ctx context.Context, secret *coreIdl.Secret) (string, error)
 }

@@ -20,7 +20,7 @@ import (
 
 func TestEmbeddedSecretManagerInjector_Inject(t *testing.T) {
 	ctx = context.Background()
-	gcpClient = &mocks.GCPSecretsIface{}
+	gcpClient = &mocks.GCPSecretManagerClient{}
 	gcpProject = "project"
 	secretIDKey := "secretID"
 	secretValue := "secretValue"

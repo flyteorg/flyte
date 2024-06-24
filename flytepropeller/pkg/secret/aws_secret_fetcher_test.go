@@ -19,7 +19,7 @@ import (
 var (
 	ctx       context.Context
 	scope     promutils.Scope
-	awsClient *mocks.AWSSecretsIface
+	awsClient *mocks.AWSSecretManagerClient
 )
 
 const secretID = "secretID"
@@ -27,7 +27,7 @@ const secretID = "secretID"
 func SetupTest() {
 	scope = promutils.NewTestScope()
 	ctx = context.Background()
-	awsClient = &mocks.AWSSecretsIface{}
+	awsClient = &mocks.AWSSecretManagerClient{}
 }
 
 func TestGetSecretValueAWS(t *testing.T) {
@@ -36,12 +36,12 @@ func TestGetSecretValueAWS(t *testing.T) {
 		awsSecretsFetcher := NewAWSSecretFetcher(config.AWSConfig{}, awsClient)
 		awsClient.OnGetSecretValueMatch(ctx, &secretsmanager.GetSecretValueInput{
 			SecretId:     aws.String(secretID),
-			VersionStage: aws.String(AWSSecretLatesVersion),
+			VersionStage: aws.String(AWSSecretLatestVersion),
 		}).Return(&secretsmanager.GetSecretValueOutput{
 			SecretString: aws.String("secretValue"),
 		}, nil)
 
-		_, err := awsSecretsFetcher.Get(ctx, "secretID")
+		_, err := awsSecretsFetcher.GetSecretValue(ctx, "secretID")
 		assert.NoError(t, err)
 	})
 
@@ -51,10 +51,10 @@ func TestGetSecretValueAWS(t *testing.T) {
 		cause := &types.ResourceNotFoundException{}
 		awsClient.OnGetSecretValueMatch(ctx, &secretsmanager.GetSecretValueInput{
 			SecretId:     aws.String(secretID),
-			VersionStage: aws.String(AWSSecretLatesVersion),
+			VersionStage: aws.String(AWSSecretLatestVersion),
 		}).Return(nil, cause)
 
-		_, err := awsSecretsFetcher.Get(ctx, "secretID")
+		_, err := awsSecretsFetcher.GetSecretValue(ctx, "secretID")
 		assert.Equal(t, stdlibErrors.Wrapf(ErrCodeSecretNotFound, cause, fmt.Sprintf(SecretNotFoundErrorFormat, secretID)), err)
 	})
 
@@ -64,10 +64,10 @@ func TestGetSecretValueAWS(t *testing.T) {
 		cause := fmt.Errorf("some error")
 		awsClient.OnGetSecretValueMatch(ctx, &secretsmanager.GetSecretValueInput{
 			SecretId:     aws.String(secretID),
-			VersionStage: aws.String(AWSSecretLatesVersion),
+			VersionStage: aws.String(AWSSecretLatestVersion),
 		}).Return(nil, cause)
 
-		_, err := awsSecretsFetcher.Get(ctx, "secretID")
+		_, err := awsSecretsFetcher.GetSecretValue(ctx, "secretID")
 		assert.Equal(t, stdlibErrors.Wrapf(ErrCodeSecretReadFailure, cause, fmt.Sprintf(SecretReadFailureErrorFormat, secretID)), err)
 	})
 }

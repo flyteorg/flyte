@@ -14,41 +14,51 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
+const (
+	AWSSecretLatestVersion = "AWSCURRENT"
+)
+
 type AWSSecretFetcher struct {
-	client AWSSecretsIface
+	client AWSSecretManagerClient
 	cfg    config.AWSConfig
 }
 
-func (a AWSSecretFetcher) Get(ctx context.Context, key string) (string, error) {
-	return a.GetSecretValue(ctx, key)
-}
-
-func (a AWSSecretFetcher) GetSecretValue(ctx context.Context, secretID string) (string, error) {
+func (a AWSSecretFetcher) GetSecretValue(ctx context.Context, secretID string) (*SecretValue, error) {
 	logger.Infof(ctx, "Got fetch secret Request for %v!", secretID)
 	resp, err := a.client.GetSecretValue(ctx, &awssm.GetSecretValueInput{
 		SecretId:     aws.String(secretID),
-		VersionStage: aws.String(AWSSecretLatesVersion),
+		VersionStage: aws.String(AWSSecretLatestVersion),
 	})
+
 	if err != nil {
 		var notFound *types.ResourceNotFoundException
 		if errors.As(err, &notFound) {
 			wrappedErr := stdlibErrors.Wrapf(ErrCodeSecretNotFound, err, fmt.Sprintf(SecretNotFoundErrorFormat, secretID))
 			logger.Warn(ctx, wrappedErr)
-			return "", wrappedErr
+			return nil, wrappedErr
 		}
 		wrappedErr := stdlibErrors.Wrapf(ErrCodeSecretReadFailure, err, fmt.Sprintf(SecretReadFailureErrorFormat, secretID))
 		logger.Error(ctx, wrappedErr)
-		return "", wrappedErr
+		return nil, wrappedErr
 	}
-	if resp.SecretString == nil || *resp.SecretString == "" {
+
+	if (resp.SecretString == nil || *resp.SecretString == "") && resp.SecretBinary == nil {
 		wrappedErr := stdlibErrors.Wrapf(ErrCodeSecretNil, err, fmt.Sprintf(SecretNilErrorFormat, secretID))
 		logger.Error(ctx, wrappedErr)
-		return "", wrappedErr
+		return nil, wrappedErr
 	}
-	return *resp.SecretString, nil
+
+	secretValue := &SecretValue{}
+	if resp.SecretString != nil {
+		secretValue.StringValue = *resp.SecretString
+	} else {
+		secretValue.BinaryValue = resp.SecretBinary
+	}
+
+	return secretValue, nil
 }
 
 // NewAWSSecretFetcher creates a secret value fetcher for AWS
-func NewAWSSecretFetcher(cfg config.AWSConfig, client AWSSecretsIface) SecretFetcher {
+func NewAWSSecretFetcher(cfg config.AWSConfig, client AWSSecretManagerClient) SecretFetcher {
 	return AWSSecretFetcher{cfg: cfg, client: client}
 }

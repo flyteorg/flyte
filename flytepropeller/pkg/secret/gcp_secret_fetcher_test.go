@@ -17,14 +17,14 @@ import (
 )
 
 var (
-	gcpClient  *mocks.GCPSecretsIface
+	gcpClient  *mocks.GCPSecretManagerClient
 	gcpProject string
 )
 
 func SetupGCPTest() {
 	scope = promutils.NewTestScope()
 	ctx = context.Background()
-	gcpClient = &mocks.GCPSecretsIface{}
+	gcpClient = &mocks.GCPSecretManagerClient{}
 	gcpProject = "project"
 }
 
@@ -42,7 +42,7 @@ func TestGetSecretValueGCP(t *testing.T) {
 			},
 		}, nil)
 
-		_, err := gcpSecretsFetcher.Get(ctx, "secretID")
+		_, err := gcpSecretsFetcher.GetSecretValue(ctx, "secretID")
 		assert.NoError(t, err)
 	})
 
@@ -56,7 +56,7 @@ func TestGetSecretValueGCP(t *testing.T) {
 			Name: fmt.Sprintf(GCPSecretNameFormat, gcpProject, secretID),
 		}).Return(nil, cause)
 
-		_, err := gcpSecretsFetcher.Get(ctx, "secretID")
+		_, err := gcpSecretsFetcher.GetSecretValue(ctx, "secretID")
 		assert.Equal(t, stdlibErrors.Wrapf(ErrCodeSecretNotFound, cause, fmt.Sprintf(SecretNotFoundErrorFormat, secretID)), err)
 	})
 
@@ -70,7 +70,7 @@ func TestGetSecretValueGCP(t *testing.T) {
 			Name: fmt.Sprintf(GCPSecretNameFormat, gcpProject, secretID),
 		}).Return(nil, cause)
 
-		_, err := gcpSecretsFetcher.Get(ctx, "secretID")
+		_, err := gcpSecretsFetcher.GetSecretValue(ctx, "secretID")
 		assert.Equal(t, stdlibErrors.Wrapf(ErrCodeSecretReadFailure, cause, fmt.Sprintf(SecretReadFailureErrorFormat, secretID)), err)
 	})
 }

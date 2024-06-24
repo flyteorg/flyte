@@ -2,12 +2,11 @@ package secret
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 	"strings"
+	"unicode/utf8"
 
-	gcpsm "cloud.google.com/go/secretmanager/apiv1"
-	awsConfig "github.com/aws/aws-sdk-go-v2/config"
-	awssm "github.com/aws/aws-sdk-go-v2/service/secretsmanager"
 	corev1 "k8s.io/api/core/v1"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
@@ -18,36 +17,34 @@ import (
 )
 
 const (
-	UnionSecretEnvVarPrefix                                     = "_UNION_"
-	SecretFieldSeparator                                        = "__"
-	ValueFormatter                                              = "%s"
-	SecretsStorageUnionPrefix                                   = "u"
-	SecretsStorageOrgPrefixFormat                               = SecretsStorageUnionPrefix + SecretFieldSeparator + "org" + SecretFieldSeparator + ValueFormatter
-	SecretsStorageDomainPrefixFormat                            = SecretsStorageOrgPrefixFormat + SecretFieldSeparator + "domain" + SecretFieldSeparator + ValueFormatter
-	SecretsStorageProjectPrefixFormat                           = SecretsStorageDomainPrefixFormat + SecretFieldSeparator + "project" + SecretFieldSeparator + ValueFormatter
-	SecretsStorageFormat                                        = SecretsStorageProjectPrefixFormat + SecretFieldSeparator + "key" + SecretFieldSeparator + ValueFormatter
-	ProjectLabel                                                = "project"
-	DomainLabel                                                 = "domain"
-	OrganizationLabel                                           = "organization"
-	EmptySecretScope                                            = ""
-	AWSSecretLatesVersion                                       = "AWSCURRENT"
-	GCPSecretNameFormat                                         = "projects/%s/secrets/%s/versions/latest"                                   // #nosec G101
+	UnionSecretEnvVarPrefix = "_UNION_"
+	// Static name of the volume used for mounting secrets with file mount requirement.
+	EmbeddedSecretsVolumeName = "embedded-secret-vol" // #nosec G101
+	EmbeddedSecretsMountPath  = "/etc/flyte/secrets"  // #nosec G101
+
+	SecretFieldSeparator              = "__"
+	ValueFormatter                    = "%s"
+	SecretsStorageUnionPrefix         = "u"
+	SecretsStorageOrgPrefixFormat     = SecretsStorageUnionPrefix + SecretFieldSeparator + "org" + SecretFieldSeparator + ValueFormatter
+	SecretsStorageDomainPrefixFormat  = SecretsStorageOrgPrefixFormat + SecretFieldSeparator + "domain" + SecretFieldSeparator + ValueFormatter
+	SecretsStorageProjectPrefixFormat = SecretsStorageDomainPrefixFormat + SecretFieldSeparator + "project" + SecretFieldSeparator + ValueFormatter
+	SecretsStorageFormat              = SecretsStorageProjectPrefixFormat + SecretFieldSeparator + "key" + SecretFieldSeparator + ValueFormatter
+	ProjectLabel                      = "project"
+	DomainLabel                       = "domain"
+	OrganizationLabel                 = "organization"
+	EmptySecretScope                  = ""
+
 	SecretNotFoundErrorFormat                                   = "secret %v not found in the secret manager"                                // #nosec G101
 	SecretReadFailureErrorFormat                                = "secret %v failed to be read from secret manager"                          // #nosec G101
 	SecretNilErrorFormat                                        = "secret %v read as empty from the secret manager"                          // #nosec G101
 	SecretRequirementsErrorFormat                               = "secret read requirements not met due to empty %v field in the pod labels" // #nosec G101
-	SecretSecretNotFoundAcrossAllScopes                         = "secret not found across all scope"                                        // #nosec G101
+	SecretSecretNotFoundAcrossAllScopes                         = "secret not found across all scopes"                                       // #nosec G101
 	ErrCodeSecretRequirementsError       stdlibErrors.ErrorCode = "SecretRequirementsError"                                                  // #nosec G101
 	ErrCodeSecretNotFound                stdlibErrors.ErrorCode = "SecretNotFound"                                                           // #nosec G101
 	ErrCodeSecretNotFoundAcrossAllScopes stdlibErrors.ErrorCode = "SecretNotFoundAcrossAllScopes"                                            // #nosec G101
 	ErrCodeSecretReadFailure             stdlibErrors.ErrorCode = "SecretReadFailure"                                                        // #nosec G101
 	ErrCodeSecretNil                     stdlibErrors.ErrorCode = "SecretNil"                                                                // #nosec G101
 )
-
-//go:generate mockery --output=./mocks --case=underscore -name=SecretFetcher
-type SecretFetcher interface {
-	Get(ctx context.Context, key string) (string, error)
-}
 
 // AWSSecretManagerInjector allows injecting of secrets from AWS Secret Manager as environment variable. It uses AWS-provided SideCar
 // as an init-container to download the secret and save it to a local volume shared with all other containers in the pod.
@@ -94,90 +91,172 @@ func validateRequiredFieldsExist(labels map[string]string) error {
 	return nil
 }
 
-func (i EmbeddedSecretManagerInjector) lookUpSecret(ctx context.Context, secret *core.Secret, labels map[string]string) (string, error) {
+func (i EmbeddedSecretManagerInjector) lookUpSecret(ctx context.Context, secret *core.Secret, labels map[string]string) (*SecretValue, error) {
 	// Fetch the secret from configured secrets manager
 	err := validateRequiredFieldsExist(labels)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	// Fetch project-domain scoped secret
 	projectDomainScopedSecret := fmt.Sprintf(SecretsStorageFormat, labels[OrganizationLabel], labels[DomainLabel], labels[ProjectLabel], secret.Key)
-	secretValue, err := i.secretFetcher.Get(ctx, projectDomainScopedSecret)
-	if err != nil && !stdlibErrors.IsCausedBy(err, ErrCodeSecretNotFound) {
-		return "", err
-	}
-	if len(secretValue) > 0 {
+	secretValue, err := i.secretFetcher.GetSecretValue(ctx, projectDomainScopedSecret)
+	if err == nil {
 		return secretValue, nil
+	}
+	if !stdlibErrors.IsCausedBy(err, ErrCodeSecretNotFound) {
+		return nil, err
 	}
 
 	// Fetch domain scoped secret
 	domainScopedSecret := fmt.Sprintf(SecretsStorageFormat, labels[OrganizationLabel], labels[DomainLabel], EmptySecretScope, secret.Key)
-	secretValue, err = i.secretFetcher.Get(ctx, domainScopedSecret)
-	if err != nil && !stdlibErrors.IsCausedBy(err, ErrCodeSecretNotFound) {
-		return "", err
-	}
-	if len(secretValue) > 0 {
+	secretValue, err = i.secretFetcher.GetSecretValue(ctx, domainScopedSecret)
+	if err == nil {
 		return secretValue, nil
+	}
+	if !stdlibErrors.IsCausedBy(err, ErrCodeSecretNotFound) {
+		return nil, err
 	}
 
 	// Fetch organization scoped secret
 	orgScopedSecret := fmt.Sprintf(SecretsStorageFormat, labels[OrganizationLabel], EmptySecretScope, EmptySecretScope, secret.Key)
-	secretValue, err = i.secretFetcher.Get(ctx, orgScopedSecret)
-	if err != nil && !stdlibErrors.IsCausedBy(err, ErrCodeSecretNotFound) {
-		return "", err
+	secretValue, err = i.secretFetcher.GetSecretValue(ctx, orgScopedSecret)
+	if err != nil {
+		return secretValue, err
 	}
-	if len(secretValue) > 0 {
-		return secretValue, nil
+	if !stdlibErrors.IsCausedBy(err, ErrCodeSecretNotFound) {
+		return nil, err
 	}
 
-	return "", stdlibErrors.Errorf(ErrCodeSecretNotFoundAcrossAllScopes, SecretSecretNotFoundAcrossAllScopes)
+	return nil, stdlibErrors.Errorf(ErrCodeSecretNotFoundAcrossAllScopes, SecretSecretNotFoundAcrossAllScopes)
 }
-func (i EmbeddedSecretManagerInjector) Inject(ctx context.Context, secret *core.Secret, p *corev1.Pod) (newP *corev1.Pod, injected bool, err error) {
+
+func (i EmbeddedSecretManagerInjector) Inject(
+	ctx context.Context,
+	secret *core.Secret,
+	pod *corev1.Pod,
+) (*corev1.Pod, bool /*injected*/, error) {
 	if len(secret.Key) == 0 {
-		return p, false, fmt.Errorf("EmbeddedSecretManager requires key to be set. "+
-			"Secret: [%v]", secret)
+		return pod, false, fmt.Errorf("EmbeddedSecretManager requires key to be set. Secret: [%v]", secret)
+	}
+
+	secretValue, err := i.lookUpSecret(ctx, secret, pod.Labels)
+	if err != nil {
+		return pod, false, err
 	}
 
 	switch secret.MountRequirement {
 	case core.Secret_ANY:
 		fallthrough
 	case core.Secret_ENV_VAR:
-		// Fetch the secret from secrets manager
-		secretValue, err := i.lookUpSecret(ctx, secret, p.Labels)
-		if err != nil {
-			return p, false, err
+		var stringValue string
+		if secretValue.StringValue != "" {
+			stringValue = secretValue.StringValue
+		} else {
+			// GCP secrets store values as binary only. This means a secret could be
+			// defined as a file, but mounted as an environment variable.
+			// We could fail this path for AWS, but for consistent behaviour between
+			// AWS and GCP we will allow this path for AWS as well.
+			if !utf8.Valid(secretValue.BinaryValue) {
+				return pod, false, fmt.Errorf(
+					"secret %q is attempted to be mounted as an environment variable, "+
+						"but has a binary value that is not a valid UTF-8 string; mount "+
+						"as a file instead", secret.Key)
+			}
+			stringValue = string(secretValue.BinaryValue)
 		}
-
-		prefixEnvVar := corev1.EnvVar{
-			Name:  SecretEnvVarPrefix,
-			Value: UnionSecretEnvVarPrefix,
-		}
-		// Inject secret-inject webhook annotations to mount the secret in a predictable location.
-		envVars := []corev1.EnvVar{
-			prefixEnvVar,
-			// Set environment variable to let the container know where to find the mounted files.
-			{
-				Name:  UnionSecretEnvVarPrefix + strings.ToUpper(secret.Key),
-				Value: secretValue,
-			},
-		}
-
-		for _, envVar := range envVars {
-			p.Spec.InitContainers = AppendEnvVars(p.Spec.InitContainers, envVar)
-			p.Spec.Containers = AppendEnvVars(p.Spec.Containers, envVar)
-		}
-
+		i.injectAsEnvVar(secret.Key, stringValue, pod)
 	case core.Secret_FILE:
-		err := fmt.Errorf("secret [%v] requirement is not supported for secret [%v]", secret.MountRequirement.String(), secret.Key)
-		logger.Error(ctx, err)
-		return p, false, err
+		if secretValue.BinaryValue == nil {
+			return pod, false, fmt.Errorf(
+				"secret %q is attempted to be mounted as a file, but has no binary "+
+					"value; mount as an environment variable instead", secret.Key)
+		}
+		i.injectAsFile(secret.Key, secretValue.BinaryValue, pod)
 	default:
 		err := fmt.Errorf("unrecognized mount requirement [%v] for secret [%v]", secret.MountRequirement.String(), secret.Key)
 		logger.Error(ctx, err)
-		return p, false, err
+		return pod, false, err
 	}
 
-	return p, true, nil
+	return pod, true, nil
+}
+
+func (i EmbeddedSecretManagerInjector) injectAsEnvVar(secretKey string, secretValue string, pod *corev1.Pod) {
+	envVars := []corev1.EnvVar{
+		{
+			Name:  SecretEnvVarPrefix,
+			Value: UnionSecretEnvVarPrefix,
+		},
+		{
+			Name:  UnionSecretEnvVarPrefix + strings.ToUpper(secretKey),
+			Value: secretValue,
+		},
+	}
+	pod.Spec.InitContainers = AppendEnvVars(pod.Spec.InitContainers, envVars...)
+	pod.Spec.Containers = AppendEnvVars(pod.Spec.Containers, envVars...)
+}
+
+func (i EmbeddedSecretManagerInjector) injectAsFile(secretKey string, secretValue []byte, pod *corev1.Pod) {
+	// A volume with a static name so that if we try to inject multiple secrets, we won't mount multiple volumes.
+	volume := corev1.Volume{
+		Name: EmbeddedSecretsVolumeName,
+		VolumeSource: corev1.VolumeSource{
+			EmptyDir: &corev1.EmptyDirVolumeSource{
+				Medium: corev1.StorageMediumMemory,
+			},
+		},
+	}
+	pod.Spec.Volumes = appendVolumeIfNotExists(pod.Spec.Volumes, volume)
+
+	secretFilePath := EmbeddedSecretsMountPath + "/" + secretKey
+	secretInitContainer := corev1.Container{
+		Name:  "init-embedded-secret-" + secretKey,
+		Image: i.cfg.FileMountInitContainer.Image,
+		Env: []corev1.EnvVar{
+			{
+				Name:  "SECRET_VALUE",
+				Value: base64.StdEncoding.EncodeToString(secretValue),
+			},
+		},
+		Command: []string{
+			"sh",
+			"-c",
+			fmt.Sprintf("printf \"%%s\" \"$SECRET_VALUE\" | base64 -d > \"%s\"", secretFilePath),
+		},
+		Resources: i.cfg.FileMountInitContainer.Resources,
+		VolumeMounts: []corev1.VolumeMount{
+			{
+				Name:      EmbeddedSecretsVolumeName,
+				ReadOnly:  false,
+				MountPath: EmbeddedSecretsMountPath,
+			},
+		},
+	}
+	pod.Spec.InitContainers = append(pod.Spec.InitContainers, secretInitContainer)
+
+	secretVolumeMount := corev1.VolumeMount{
+		Name:      EmbeddedSecretsVolumeName,
+		ReadOnly:  true,
+		MountPath: EmbeddedSecretsMountPath,
+	}
+	pod.Spec.InitContainers = AppendVolumeMounts(pod.Spec.InitContainers, secretVolumeMount)
+	pod.Spec.Containers = AppendVolumeMounts(pod.Spec.Containers, secretVolumeMount)
+
+	// Inject AWS secret-inject webhook annotations to mount the secret in a predictable location.
+	envVars := []corev1.EnvVar{
+		// Set environment variable to let the containers know where to find the mounted files.
+		{
+			Name:  SecretPathDefaultDirEnvVar,
+			Value: EmbeddedSecretsMountPath,
+		},
+		// Sets an empty prefix to let the containers know the file names will match the secret keys as-is.
+		{
+			Name:  SecretPathFilePrefixEnvVar,
+			Value: "",
+		},
+	}
+	pod.Spec.InitContainers = AppendEnvVars(pod.Spec.InitContainers, envVars...)
+	pod.Spec.Containers = AppendEnvVars(pod.Spec.Containers, envVars...)
 }
 
 func NewEmbeddedSecretManagerInjector(cfg config.EmbeddedSecretManagerConfig, secretFetcher SecretFetcher) SecretsInjector {
@@ -185,24 +264,4 @@ func NewEmbeddedSecretManagerInjector(cfg config.EmbeddedSecretManagerConfig, se
 		cfg:           cfg,
 		secretFetcher: secretFetcher,
 	}
-}
-
-func NewSecretFetcherManager(ctx context.Context, cfg config.EmbeddedSecretManagerConfig) (SecretFetcher, error) {
-	switch cfg.Type {
-	case config.EmbeddedSecretManagerTypeAWS:
-		awsCfg, err := awsConfig.LoadDefaultConfig(ctx, awsConfig.WithRegion(cfg.AWSConfig.Region))
-		if err != nil {
-			logger.Errorf(ctx, "failed to start secret manager service due to %v", err)
-			return nil, fmt.Errorf("failed to start secret manager service due to %v", err)
-		}
-		return NewAWSSecretFetcher(cfg.AWSConfig, awssm.NewFromConfig(awsCfg)), nil
-	case config.EmbeddedSecretManagerTypeGCP:
-		gcpSmClient, err := gcpsm.NewClient(ctx)
-		if err != nil {
-			logger.Errorf(ctx, "failed to start secret manager service due to %v", err)
-			return nil, fmt.Errorf("failed to start secret manager service due to %v", err)
-		}
-		return NewGCPSecretFetcher(cfg.GCPConfig, gcpSmClient), nil
-	}
-	return nil, fmt.Errorf("failed to start secret fetcher service due to unsupported type %v. Only supported for aws and gcp right now", cfg.Type)
 }

@@ -54,6 +54,21 @@ var (
 			Role:      "flyte",
 			KVVersion: KVVersion2,
 		},
+		EmbeddedSecretManagerConfig: EmbeddedSecretManagerConfig{
+			FileMountInitContainer: FileMountInitContainerConfig{
+				Image: "busybox:1.28",
+				Resources: corev1.ResourceRequirements{
+					Requests: corev1.ResourceList{
+						corev1.ResourceMemory: resource.MustParse("100Mi"),
+						corev1.ResourceCPU:    resource.MustParse("100m"),
+					},
+					Limits: corev1.ResourceList{
+						corev1.ResourceMemory: resource.MustParse("100Mi"),
+						corev1.ResourceCPU:    resource.MustParse("100m"),
+					},
+				},
+			},
+		},
 	}
 
 	configSection = config.MustRegisterSection("webhook", DefaultConfig)
@@ -126,9 +141,10 @@ const (
 )
 
 type EmbeddedSecretManagerConfig struct {
-	Type      EmbeddedSecretManagerType `json:"type" pflags:"-,Type of embedded secret manager to initialize"`
-	AWSConfig AWSConfig                 `json:"awsConfig" pflag:",Config for AWS settings"`
-	GCPConfig GCPConfig                 `json:"gcpConfig" pflag:",Config for GCP settings"`
+	Type                   EmbeddedSecretManagerType    `json:"type" pflags:"-,Type of embedded secret manager to initialize"`
+	AWSConfig              AWSConfig                    `json:"awsConfig" pflag:",Config for AWS settings"`
+	GCPConfig              GCPConfig                    `json:"gcpConfig" pflag:",Config for GCP settings"`
+	FileMountInitContainer FileMountInitContainerConfig `json:"fileMountInitContainer" pflag:",Init container configuration to use for mounting secrets as files."`
 }
 
 type AWSConfig struct {
@@ -137,6 +153,11 @@ type AWSConfig struct {
 
 type GCPConfig struct {
 	Project string `json:"project" pflag:",GCP project to be used for secret manager"`
+}
+
+type FileMountInitContainerConfig struct {
+	Image     string                      `json:"image" pflag:",Specifies init container image to use for mounting secrets as files."`
+	Resources corev1.ResourceRequirements `json:"resources" pflag:"-,Specifies resource requirements for the init container."`
 }
 
 func (c Config) ExpandCertDir() string {

@@ -63,5 +63,6 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "embeddedSecretManagerConfig.type"), DefaultConfig.EmbeddedSecretManagerConfig.Type.String(), "")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "embeddedSecretManagerConfig.awsConfig.region"), DefaultConfig.EmbeddedSecretManagerConfig.AWSConfig.Region, "AWS region")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "embeddedSecretManagerConfig.gcpConfig.project"), DefaultConfig.EmbeddedSecretManagerConfig.GCPConfig.Project, "GCP project to be used for secret manager")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "embeddedSecretManagerConfig.fileMountInitContainer.image"), DefaultConfig.EmbeddedSecretManagerConfig.FileMountInitContainer.Image, "Specifies init container image to use for mounting secrets as files.")
 	return cmdFlags
 }

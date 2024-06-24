@@ -1,4 +1,5 @@
 export REPOSITORY=flyte
+export REPO_ROOT=.
 include boilerplate/flyte/end2end/Makefile
 include boilerplate/flyte/golang_test_targets/Makefile
 

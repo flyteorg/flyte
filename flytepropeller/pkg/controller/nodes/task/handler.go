@@ -29,7 +29,6 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/resourcemanager"
 	rmConfig "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/resourcemanager/config"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/secret"
 	secretConfig "github.com/flyteorg/flyte/flytepropeller/pkg/secret/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/utils"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
@@ -891,7 +890,7 @@ func New(ctx context.Context, kubeClient executors.Client, kubeClientset kuberne
 		return nil, err
 	}
 
-	secretManager, err := secret.NewSecretFetcherManager(ctx, secretConfig.GetConfig().EmbeddedSecretManagerConfig)
+	secretManager, err := pluginCore.NewEmbeddedSecretManager(ctx, secretConfig.GetConfig().EmbeddedSecretManagerConfig)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to create secret manager with err %v", err)
 		return nil, err

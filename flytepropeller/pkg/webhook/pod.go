@@ -97,6 +97,8 @@ type httpHandler struct {
 	path string
 }
 
+//go:generate mockery --output=./mocks --case=underscore --name=PodMutator
+
 // PodMutator contains the business logic for a unique type of mutation or validation.
 type PodMutator interface {
 	ID() string

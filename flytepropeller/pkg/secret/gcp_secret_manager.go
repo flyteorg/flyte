@@ -3,7 +3,6 @@ package secret
 import (
 	"context"
 	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
 
@@ -17,12 +16,9 @@ import (
 const (
 	// GCPSecretsVolumeName defines the static name of the volume used for mounting/sharing secrets between init-container
 	// sidecar and the rest of the containers in the pod.
-	GCPSecretsVolumeName = "gcp-secret-vol" // #nosec
-)
+	GCPSecretsVolumeName = "gcp-secret-vol" // #nosec G101
 
-var (
-	// GCPSecretMountPath defines the default mount path for secrets
-	GCPSecretMountPath = filepath.Join(string(os.PathSeparator), "etc", "flyte", "secrets")
+	GCPSecretMountPath = "/etc/flyte/secrets" // #nosec G101
 )
 
 // GCPSecretManagerInjector allows injecting of secrets from GCP Secret Manager as files. It uses a Google Cloud

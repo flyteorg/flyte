@@ -18,7 +18,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils/secrets"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/secret"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/secret/config"
-	secretMocks "github.com/flyteorg/flyte/flytepropeller/pkg/secret/mocks"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/webhook/mocks"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
@@ -89,11 +89,11 @@ func TestPodMutator_Mutate(t *testing.T) {
 		},
 	}
 
-	successMutator := &secretMocks.PodMutator{}
+	successMutator := &mocks.PodMutator{}
 	successMutator.OnID().Return("SucceedingMutator")
 	successMutator.OnMutateMatch(mock.Anything, mock.Anything).Return(nil, false, nil)
 
-	failedMutator := &secretMocks.PodMutator{}
+	failedMutator := &mocks.PodMutator{}
 	failedMutator.OnID().Return("FailingMutator")
 	admissionError := admission.Errored(http.StatusBadRequest, fmt.Errorf("failing mock"))
 	failedMutator.OnMutateMatch(mock.Anything, mock.Anything).Return(nil, false, &admissionError)
@@ -187,7 +187,7 @@ func Test_Register(t *testing.T) {
 		}, latest.Scheme, promutils.NewTestScope())
 		assert.NoError(t, err)
 
-		mockRegister := &secretMocks.HTTPHookRegistererIface{}
+		mockRegister := &mocks.HTTPHookRegistererIface{}
 		wh := &admission.Webhook{Handler: pm.httpHandlers[0]}
 		mockRegister.On("Register", "/mutate--v1-pod/secrets", wh)
 		err = pm.Register(ctx, mockRegister)
@@ -202,7 +202,7 @@ func Test_Register(t *testing.T) {
 		}, latest.Scheme, promutils.NewTestScope())
 		assert.NoError(t, err)
 
-		mockRegister := &secretMocks.HTTPHookRegistererIface{}
+		mockRegister := &mocks.HTTPHookRegistererIface{}
 		secretWH := &admission.Webhook{Handler: pm.httpHandlers[0]}
 		mockRegister.On("Register", getPodMutatePath(secret.SecretsID), secretWH)
 		imageBuilderWH := &admission.Webhook{Handler: pm.httpHandlers[1]}

@@ -18,7 +18,7 @@ import (
 
 func TestSecretsWebhook_Mutate(t *testing.T) {
 	t.Run("No injectors", func(t *testing.T) {
-		m := SecretsMutator{}
+		m := SecretsPodMutator{}
 		_, changed, err := m.Mutate(context.Background(), &corev1.Pod{})
 		assert.Nil(t, err)
 		assert.False(t, changed)
@@ -37,7 +37,7 @@ func TestSecretsWebhook_Mutate(t *testing.T) {
 		mutator.OnInjectMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil, false, fmt.Errorf("failed"))
 		mutator.OnType().Return(config.SecretManagerTypeGlobal)
 
-		m := SecretsMutator{
+		m := SecretsPodMutator{
 			enabledSecretManagerTypes: []config.SecretManagerType{config.SecretManagerTypeGlobal},
 			injectors: map[config.SecretManagerType]SecretsInjector{
 				config.SecretManagerTypeGlobal: mutator,
@@ -54,7 +54,7 @@ func TestSecretsWebhook_Mutate(t *testing.T) {
 		mutator.OnInjectMatch(mock.Anything, mock.Anything, mock.Anything).Return(&corev1.Pod{}, true, nil)
 		mutator.OnType().Return(config.SecretManagerTypeGlobal)
 
-		m := SecretsMutator{
+		m := SecretsPodMutator{
 			enabledSecretManagerTypes: []config.SecretManagerType{config.SecretManagerTypeGlobal},
 			injectors: map[config.SecretManagerType]SecretsInjector{
 				config.SecretManagerTypeGlobal: mutator,
@@ -68,7 +68,7 @@ func TestSecretsWebhook_Mutate(t *testing.T) {
 }
 
 func TestSecrets_LabelSelector(t *testing.T) {
-	m := SecretsMutator{}
+	m := SecretsPodMutator{}
 	expected := metav1.LabelSelector{
 		MatchLabels: map[string]string{
 			secretUtils.PodLabel: secretUtils.PodLabelValue,

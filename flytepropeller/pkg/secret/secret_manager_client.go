@@ -8,16 +8,16 @@ import (
 	"github.com/googleapis/gax-go/v2"
 )
 
-//go:generate mockery --output=./mocks --case=underscore -name=AWSSecretsIface
+//go:generate mockery --output=./mocks --case=underscore -name=AWSSecretManagerClient
 
-// AWSSecretsIface AWS Secret Manager API interface used in the webhook for looking up the secret to mount on the user pod.
-type AWSSecretsIface interface {
+// AWSSecretManagerClient AWS Secret Manager API interface used in the webhook for looking up the secret to mount on the user pod.
+type AWSSecretManagerClient interface {
 	GetSecretValue(context.Context, *secretsmanager.GetSecretValueInput, ...func(*secretsmanager.Options)) (*secretsmanager.GetSecretValueOutput, error)
 }
 
-// GCPSecretsIface GCP Secret Manager API interface used in the webhook  for looking up the secret to mount on the user pod.
+// GCPSecretManagerClient GCP Secret Manager API interface used in the webhook for looking up the secret to mount on the user pod.
 //
-//go:generate mockery --output=./mocks --case=underscore -name=GCPSecretsIface
-type GCPSecretsIface interface {
+//go:generate mockery --output=./mocks --case=underscore -name=GCPSecretManagerClient
+type GCPSecretManagerClient interface {
 	AccessSecretVersion(ctx context.Context, req *secretmanagerpb.AccessSecretVersionRequest, opts ...gax.CallOption) (*secretmanagerpb.AccessSecretVersionResponse, error)
 }

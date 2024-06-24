@@ -3,7 +3,6 @@ package secret
 import (
 	"context"
 	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
 
@@ -29,11 +28,9 @@ const (
 
 	// AWS SideCar Docker Container expects the mount to always be under /tmp
 	AWSInitContainerMountPath = "/tmp"
-)
 
-var (
-	// AWSSecretMountPathPrefix defines the default mount path for secrets
-	AWSSecretMountPathPrefix = []string{string(os.PathSeparator), "etc", "flyte", "secrets"}
+	// AWSSecretMountPath defines the default mount path for secrets
+	AWSSecretMountPath = "/etc/flyte/secrets" // #nosec G101
 )
 
 // AWSSecretManagerInjector allows injecting of secrets from AWS Secret Manager as files. It uses AWS-provided SideCar
@@ -85,7 +82,7 @@ func (i AWSSecretManagerInjector) Inject(ctx context.Context, secret *core.Secre
 		secretVolumeMount := corev1.VolumeMount{
 			Name:      AWSSecretsVolumeName,
 			ReadOnly:  true,
-			MountPath: filepath.Join(AWSSecretMountPathPrefix...),
+			MountPath: AWSSecretMountPath,
 		}
 
 		p.Spec.Containers = AppendVolumeMounts(p.Spec.Containers, secretVolumeMount)
@@ -96,7 +93,7 @@ func (i AWSSecretManagerInjector) Inject(ctx context.Context, secret *core.Secre
 			// Set environment variable to let the container know where to find the mounted files.
 			{
 				Name:  SecretPathDefaultDirEnvVar,
-				Value: filepath.Join(AWSSecretMountPathPrefix...),
+				Value: AWSSecretMountPath,
 			},
 			// Sets an empty prefix to let the containers know the file names will match the secret keys as-is.
 			{
