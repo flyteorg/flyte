@@ -18514,6 +18514,7 @@
                  * @property {string|null} [type] ExecutionEnv type
                  * @property {google.protobuf.IStruct|null} [extant] ExecutionEnv extant
                  * @property {google.protobuf.IStruct|null} [spec] ExecutionEnv spec
+                 * @property {string|null} [version] ExecutionEnv version
                  */
     
                 /**
@@ -18563,6 +18564,14 @@
                  */
                 ExecutionEnv.prototype.spec = null;
     
+                /**
+                 * ExecutionEnv version.
+                 * @member {string} version
+                 * @memberof flyteidl.core.ExecutionEnv
+                 * @instance
+                 */
+                ExecutionEnv.prototype.version = "";
+    
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
     
@@ -18609,6 +18618,8 @@
                         $root.google.protobuf.Struct.encode(message.extant, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
                     if (message.spec != null && message.hasOwnProperty("spec"))
                         $root.google.protobuf.Struct.encode(message.spec, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+                    if (message.version != null && message.hasOwnProperty("version"))
+                        writer.uint32(/* id 5, wireType 2 =*/42).string(message.version);
                     return writer;
                 };
     
@@ -18641,6 +18652,9 @@
                             break;
                         case 4:
                             message.spec = $root.google.protobuf.Struct.decode(reader, reader.uint32());
+                            break;
+                        case 5:
+                            message.version = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -18686,6 +18700,9 @@
                                 return "spec." + error;
                         }
                     }
+                    if (message.version != null && message.hasOwnProperty("version"))
+                        if (!$util.isString(message.version))
+                            return "version: string expected";
                     return null;
                 };
     

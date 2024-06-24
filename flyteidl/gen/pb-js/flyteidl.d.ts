@@ -7665,6 +7665,9 @@ export namespace flyteidl {
 
             /** ExecutionEnv spec */
             spec?: (google.protobuf.IStruct|null);
+
+            /** ExecutionEnv version */
+            version?: (string|null);
         }
 
         /** Represents an ExecutionEnv. */
@@ -7687,6 +7690,9 @@ export namespace flyteidl {
 
             /** ExecutionEnv spec. */
             public spec?: (google.protobuf.IStruct|null);
+
+            /** ExecutionEnv version. */
+            public version: string;
 
             /** ExecutionEnv environment. */
             public environment?: ("extant"|"spec");
