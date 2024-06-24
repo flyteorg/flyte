@@ -442,6 +442,18 @@ flyteconsole:
     seLinuxOptions:
       type: spc_t
 
+  # -- Settings for flyteconsole service monitor
+  serviceMonitor:
+    # -- If enabled create the flyteconsole service monitor
+    enabled: false
+    # -- Sets the interval at which metrics will be scraped by prometheus
+    interval: 60s
+    # -- Sets the timeout after which request to scrape metrics will time out
+    scrapeTimeout: 30s
+    # -- Sets the labels for the service monitor which are required by the
+    # prometheus to auto-detect the service monitor and start scrapping the metrics
+    labels: {}
+
 # It will enable the redoc route in ingress
 deployRedoc: false
 
