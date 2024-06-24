@@ -64,6 +64,14 @@ spec:
         volumeMounts:
         - mountPath: /srv/flyte
           name: shared-data
+        {{- with .Values.flyteconsole.livenessProbe }}
+        livenessProbe:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- with .Values.flyteconsole.readinessProbe }}
+        readinessProbe:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
       volumes:
       - emptyDir: {}
         name: shared-data
