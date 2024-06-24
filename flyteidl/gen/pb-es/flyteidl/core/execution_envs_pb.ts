@@ -108,6 +108,13 @@ export class ExecutionEnv extends Message<ExecutionEnv> {
     case: "spec";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
+  /**
+   * verison is the version of the execution environment.
+   *
+   * @generated from field: string version = 5;
+   */
+  version = "";
+
   constructor(data?: PartialMessage<ExecutionEnv>) {
     super();
     proto3.util.initPartial(data, this);
@@ -120,6 +127,7 @@ export class ExecutionEnv extends Message<ExecutionEnv> {
     { no: 2, name: "type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "extant", kind: "message", T: Struct, oneof: "environment" },
     { no: 4, name: "spec", kind: "message", T: Struct, oneof: "environment" },
+    { no: 5, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExecutionEnv {

@@ -7091,6 +7091,10 @@
         "spec": {
           "type": "object",
           "description": "spec is a specification of the environment."
+        },
+        "version": {
+          "type": "string",
+          "description": "verison is the version of the execution environment."
         }
       },
       "description": "ExecutionEnv is a message that is used to specify the execution environment."
