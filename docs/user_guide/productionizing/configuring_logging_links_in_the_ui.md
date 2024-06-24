@@ -88,7 +88,7 @@ However, not all task types use the log plugin; for example, the Snowflake plugi
 
 ### Configure lifetime of logging links
 
-By default, log links are shown once a task starts running and do not disappear when the task finishes. Certain log links might, however, be helpful already when a task is still queued or initializing, for instance, to debug why a task might not be able to start. Other log links might not be valid anymore once the task terminates. You can configure the lifetime of log links in the following way:
+By default, log links are shown once a task starts running and do not disappear when the task finishes. Certain log links might, however, be helpful when a task is still queued or initializing, for instance, to debug why a task might not be able to start. Other log links might not be valid anymore once the task terminates. You can configure the lifetime of log links in the following way:
 
 ```yaml
 task_logs:
