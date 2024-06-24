@@ -711,7 +711,7 @@ func (a *arrayNodeHandler) buildArrayNodeContext(ctx context.Context, nCtx inter
 	if err != nil {
 		return nil, nil, nil, nil, nil, nil, err
 	}
-	// set new parent info and re-initialize the sub-node's control flow to not share/update the parent's state
+	// set new parent info and re-initialize the sub-node's control flow to not share/update the parent wf state
 	arrayExecutionContext := newArrayExecutionContext(
 		executors.NewExecutionContext(nCtx.ExecutionContext(), nCtx.ExecutionContext(), nCtx.ExecutionContext(), newParentInfo, executors.InitializeControlFlow()),
 		subNodeIndex)
