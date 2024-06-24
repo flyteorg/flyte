@@ -557,6 +557,8 @@ spec:
     metadata:
       annotations:
         configChecksum: "440df784b0ea8efb61f3e213b584afa6597df2478322b789fe87e10faee1e0a"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "10254"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -638,6 +640,8 @@ spec:
         app.kubernetes.io/version: v1.12.0
       annotations:
         configChecksum: "440df784b0ea8efb61f3e213b584afa6597df2478322b789fe87e10faee1e0a"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "10254"
     spec:
       securityContext: 
         fsGroup: 65534

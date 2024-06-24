@@ -25,6 +25,11 @@ spec:
         {{- with .Values.flytepropeller.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
+        prometheus.io/path: {{ .Values.flytepropeller.prometheus.path | quote }}
+        prometheus.io/port: {{ .Values.flytepropeller.prometheus.port | quote }}
+        {{- with .Values.flytepropeller.prometheus.enabled }}
+        prometheus.io/scrape: "true"
+        {{- end }}
       {{- if .Values.flytepropeller.manager }}
       labels: {{ include "flytepropeller-manager.podLabels" . | nindent 8 }}
       {{- else }}
@@ -78,6 +83,11 @@ spec:
         {{- end }}
         ports:
         - containerPort: {{ index .Values.configmap.core.propeller "prof-port" }}
+        {{- if .Values.flytepropeller.prometheus.enabled }}
+        - containerPort: {{ .Values.flytepropeller.prometheus.port }}
+          name: debug
+          protocol: TCP
+        {{- end }}
         resources: {{- toYaml .Values.flytepropeller.resources | nindent 10 }}
         volumeMounts:
         - name: config-volume

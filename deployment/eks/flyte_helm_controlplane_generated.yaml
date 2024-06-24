@@ -952,6 +952,8 @@ spec:
     metadata:
       annotations:
         configChecksum: "eb881f73e4aefe47d06e8dc7512d9b06a19805e31263e486979f85d83421fbd"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "10254"
       labels: 
         app.kubernetes.io/name: flyteclusterresourcesync
         app.kubernetes.io/instance: flyte

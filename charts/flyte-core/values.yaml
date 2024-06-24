@@ -436,6 +436,12 @@ flytepropeller:
     interval: 60s
     # -- Sets the timeout after which request to scrape metrics will time out
     scrapeTimeout: 30s
+
+  prometheus:
+    enabled: false
+    path: "/metrics"
+    port: 10254
+
 #
 # FLYTECONSOLE SETTINGS
 #
@@ -544,6 +550,29 @@ webhook:
       cpu: 200m
       ephemeral-storage: 500Mi
       memory: 500Mi
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 10
+    metrics:
+      - type: Resource
+        resource:
+          name: cpu
+          target:
+            type: Utilization
+            averageUtilization: 80
+      - type: Resource
+        resource:
+          name: memory
+          target:
+            type: Utilization
+            averageUtilization: 80
+
+  prometheus:
+    enabled: false
+    path: "/metrics"
+    port: 10254
 
 # ------------------------------------------------
 #
@@ -1025,6 +1054,11 @@ cluster_resource_manager:
                 value: "4"
             - projectQuotaMemory:
                 value: "3000Mi"
+
+  prometheus:
+    enabled: false
+    path: "/metrics"
+    port: 10254
 
   # -- Resource templates that should be applied
   templates:

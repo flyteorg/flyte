@@ -79,7 +79,6 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{ toYaml . }}
 {{- end }}
 {{- end -}}
-
 {{- define "datacatalog.name" -}}
 datacatalog
 {{- end -}}
