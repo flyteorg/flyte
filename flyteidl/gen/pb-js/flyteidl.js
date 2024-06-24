@@ -20298,6 +20298,8 @@
                  * @property {string|null} [deckUri] NodeExecutionEvent deckUri
                  * @property {google.protobuf.ITimestamp|null} [reportedAt] NodeExecutionEvent reportedAt
                  * @property {boolean|null} [isArray] NodeExecutionEvent isArray
+                 * @property {flyteidl.core.IIdentifier|null} [targetEntity] NodeExecutionEvent targetEntity
+                 * @property {boolean|null} [isInDynamicChain] NodeExecutionEvent isInDynamicChain
                  */
     
                 /**
@@ -20491,6 +20493,22 @@
                  */
                 NodeExecutionEvent.prototype.isArray = false;
     
+                /**
+                 * NodeExecutionEvent targetEntity.
+                 * @member {flyteidl.core.IIdentifier|null|undefined} targetEntity
+                 * @memberof flyteidl.event.NodeExecutionEvent
+                 * @instance
+                 */
+                NodeExecutionEvent.prototype.targetEntity = null;
+    
+                /**
+                 * NodeExecutionEvent isInDynamicChain.
+                 * @member {boolean} isInDynamicChain
+                 * @memberof flyteidl.event.NodeExecutionEvent
+                 * @instance
+                 */
+                NodeExecutionEvent.prototype.isInDynamicChain = false;
+    
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
     
@@ -20595,6 +20613,10 @@
                         $root.google.protobuf.Timestamp.encode(message.reportedAt, writer.uint32(/* id 21, wireType 2 =*/170).fork()).ldelim();
                     if (message.isArray != null && message.hasOwnProperty("isArray"))
                         writer.uint32(/* id 22, wireType 0 =*/176).bool(message.isArray);
+                    if (message.targetEntity != null && message.hasOwnProperty("targetEntity"))
+                        $root.flyteidl.core.Identifier.encode(message.targetEntity, writer.uint32(/* id 23, wireType 2 =*/186).fork()).ldelim();
+                    if (message.isInDynamicChain != null && message.hasOwnProperty("isInDynamicChain"))
+                        writer.uint32(/* id 24, wireType 0 =*/192).bool(message.isInDynamicChain);
                     return writer;
                 };
     
@@ -20681,6 +20703,12 @@
                             break;
                         case 22:
                             message.isArray = reader.bool();
+                            break;
+                        case 23:
+                            message.targetEntity = $root.flyteidl.core.Identifier.decode(reader, reader.uint32());
+                            break;
+                        case 24:
+                            message.isInDynamicChain = reader.bool();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -20829,6 +20857,14 @@
                     if (message.isArray != null && message.hasOwnProperty("isArray"))
                         if (typeof message.isArray !== "boolean")
                             return "isArray: boolean expected";
+                    if (message.targetEntity != null && message.hasOwnProperty("targetEntity")) {
+                        var error = $root.flyteidl.core.Identifier.verify(message.targetEntity);
+                        if (error)
+                            return "targetEntity." + error;
+                    }
+                    if (message.isInDynamicChain != null && message.hasOwnProperty("isInDynamicChain"))
+                        if (typeof message.isInDynamicChain !== "boolean")
+                            return "isInDynamicChain: boolean expected";
                     return null;
                 };
     
