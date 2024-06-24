@@ -45,7 +45,7 @@ var serveCmd = &cobra.Command{
 
 		// register otel tracer providers
 		for _, serviceName := range []string{otelutils.DataCatalogGormTracer, otelutils.DataCatalogServerTracer} {
-			if err := otelutils.RegisterTracerProvider(serviceName, otelutils.GetConfig()); err != nil {
+			if err := otelutils.RegisterTracerProviderWithContext(ctx, serviceName, otelutils.GetConfig()); err != nil {
 				logger.Errorf(ctx, "Failed to create otel tracer provider. %v", err)
 				return err
 			}

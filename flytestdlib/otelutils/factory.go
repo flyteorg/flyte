@@ -12,7 +12,7 @@ import (
 	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
 	"go.opentelemetry.io/otel/sdk/resource"
 	"go.opentelemetry.io/otel/sdk/trace"
-	semconv "go.opentelemetry.io/otel/semconv/v1.21.0"
+	semconv "go.opentelemetry.io/otel/semconv/v1.24.0"
 	rawtrace "go.opentelemetry.io/otel/trace"
 	"go.opentelemetry.io/otel/trace/noop"
 
@@ -35,7 +35,14 @@ const (
 var tracerProviders = make(map[string]*trace.TracerProvider)
 var noopTracerProvider = noop.NewTracerProvider()
 
+// Deprecated: RegisterTracerProvider registers a tracer provider for the given service name. It uses a default context if necessary.
+// Instead, use RegisterTracerProviderWithContext.
 func RegisterTracerProvider(serviceName string, config *Config) error {
+	return RegisterTracerProviderWithContext(context.Background(), serviceName, config)
+}
+
+// RegisterTracerProviderWithContext registers a tracer provider for the given service name.
+func RegisterTracerProviderWithContext(ctx context.Context, serviceName string, config *Config) error {
 	if config == nil {
 		return nil
 	}
@@ -71,7 +78,7 @@ func RegisterTracerProvider(serviceName string, config *Config) error {
 		}
 	case OtlpGrpcExporter:
 		exporter, err = otlptracegrpc.New(
-			context.Background(),
+			ctx,
 			otlptracegrpc.WithEndpointURL(config.OtlpGrpcConfig.Endpoint),
 		)
 		if err != nil {
@@ -79,7 +86,7 @@ func RegisterTracerProvider(serviceName string, config *Config) error {
 		}
 	case OtlpHttpExporter:
 		exporter, err = otlptracehttp.New(
-			context.Background(),
+			ctx,
 			otlptracehttp.WithEndpointURL(config.OtlpHttpConfig.Endpoint),
 		)
 		if err != nil {
@@ -121,6 +128,7 @@ func RegisterTracerProvider(serviceName string, config *Config) error {
 	return nil
 }
 
+// GetTracerProvider returns the tracer provider for the given service name.
 func GetTracerProvider(serviceName string) rawtrace.TracerProvider {
 	if t, ok := tracerProviders[serviceName]; ok {
 		return t
@@ -129,6 +137,7 @@ func GetTracerProvider(serviceName string) rawtrace.TracerProvider {
 	return noopTracerProvider
 }
 
+// NewSpan creates a new span with the given service name and span name.
 func NewSpan(ctx context.Context, serviceName string, spanName string) (context.Context, rawtrace.Span) {
 	var attributes []attribute.KeyValue
 	for key, value := range contextutils.GetLogFields(ctx) {
