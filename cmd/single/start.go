@@ -216,7 +216,7 @@ var startCmd = &cobra.Command{
 			otelutils.BlobstoreClientTracer, otelutils.CacheServiceClientTracer, otelutils.CacheServiceGormTracer,
 			otelutils.CacheServiceServerTracer, otelutils.DataCatalogClientTracer, otelutils.DataCatalogGormTracer,
 			otelutils.DataCatalogServerTracer, otelutils.FlytePropellerTracer, otelutils.K8sClientTracer} {
-			if err := otelutils.RegisterTracerProvider(serviceName, otelutils.GetConfig()); err != nil {
+			if err := otelutils.RegisterTracerProviderWithContext(ctx, serviceName, otelutils.GetConfig()); err != nil {
 				logger.Errorf(ctx, "Failed to create otel tracer provider. %v", err)
 				return err
 			}

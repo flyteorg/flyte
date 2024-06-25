@@ -122,7 +122,7 @@ func executeRootCmd(baseCtx context.Context, cfg *config2.Config) error {
 	for _, serviceName := range []string{otelutils.AdminClientTracer, otelutils.BlobstoreClientTracer,
 		otelutils.DataCatalogClientTracer, otelutils.CacheServiceClientTracer,
 		otelutils.FlytePropellerTracer, otelutils.K8sClientTracer} {
-		if err := otelutils.RegisterTracerProvider(serviceName, otelutils.GetConfig()); err != nil {
+		if err := otelutils.RegisterTracerProviderWithContext(ctx, serviceName, otelutils.GetConfig()); err != nil {
 			logger.Errorf(ctx, "Failed to create otel tracer provider. %v", err)
 			return err
 		}
