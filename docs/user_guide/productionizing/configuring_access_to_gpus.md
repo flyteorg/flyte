@@ -8,7 +8,7 @@
 
 Along with compute resources like CPU and Memory, you may want to configure and access GPU resources. 
 
-Flyte gives you three main levels of granularity to request accelerator resources from your Task definition.
+Flyte gives you multiple levels of granularity to request accelerator resources from your Task definition.
 
 ## Requesting a generic accelerator
 
@@ -36,16 +36,66 @@ The goal here is to make a simple request of any available GPU device(s).
 
 ![](https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/deployment/gpus/generic_gpu_access.png)
 
-When this task is executed, `flyteproller` injects a toleration to the Pod spec:
+When this task is executed, `flyteproller` injects a [toleration](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) in the Pod spec:
 
 ```yaml
 tolerations:    nvidia.com/gpu:NoSchedule op=Exists
 ```
-The resource `nvidia.com/gpu` key name is not arbitrary. It corresponds to the Extended Resource that the K8s worker nodes have advertised to the API Server. 
+The Kubernetes scheduler will admit the pods if there are worker nodes with matching taints and available resources in the cluster.
 
+The resource `nvidia.com/gpu` key name is not arbitrary. It corresponds to the [Extended Resource](https://kubernetes.io/docs/tasks/administer-cluster/extended-resource-node/) that the Kubernetes worker nodes advertise to the API server through the [device plugin](https://kubernetes.io/docs/tasks/manage-gpus/scheduling-gpus/#using-device-plugins).
 
+>NVIDIA maintains a [GPU operator](https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/index.html) that automates the management of all software prerequisites on Kubernetes.
 
-### Infrastructure requirements
+If your GPU accelerators expose a different resource name, adjust the following key in the Helm values file:
+
+**flyte-core**
+```yaml
+configmap:
+  k8s:
+    plugins:
+      k8s:
+        gpu-resource-name: <YOUR_GPU_RESOURCE_NAME>
+```
+
+**flyte-binary**
+```yaml
+configuration:
+  inline:
+    plugins:
+      k8s:
+        gpu-resource-name: <YOUR_GPU_RESOURCE_NAME> 
+```
+
+If your infrastructure requires additional tolerations for the scheduling of GPU resources to succeed, adjust the following section in the Helm values file:
+
+**flyte-core**
+```yaml
+configmap:
+  k8s:
+    plugins:
+      k8s:
+        resource-tolerations:
+        - nvidia.com/gpu: 
+          - key: "mykey"
+            operator: "Equal"
+            value: "myvalue"
+            effect: "NoSchedule"  
+```
+**flyte-binary**
+```yaml
+configuration:
+  inline:
+    plugins:
+      k8s:
+        resource-tolerations:
+        - nvidia.com/gpu: 
+          - key: "mykey"
+            operator: "Equal"
+            value: "myvalue"
+            effect: "NoSchedule" 
+```
+>For the above configuration, your worker nodes should have a `mykey=myvalue:NoSchedule` matching taint
 
 ## Requesting a specific GPU device
 
