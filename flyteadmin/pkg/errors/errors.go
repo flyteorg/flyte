@@ -128,7 +128,7 @@ func compareJsons(jsonArray1 jsondiff.Patch, jsonArray2 jsondiff.Patch) []string
 }
 
 func NewTaskExistsDifferentStructureError(ctx context.Context, request *admin.TaskCreateRequest, oldSpec *core.CompiledTask, newSpec *core.CompiledTask) FlyteAdminError {
-	errorMsg := "task with different structure already exists:\n"
+	errorMsg := fmt.Sprintf("%v task with different structure already exists:\n", request.Id.Name)
 	diff, _ := jsondiff.Compare(oldSpec, newSpec)
 	rdiff, _ := jsondiff.Compare(newSpec, oldSpec)
 	rs := compareJsons(diff, rdiff)
@@ -145,7 +145,7 @@ func NewTaskExistsIdenticalStructureError(ctx context.Context, request *admin.Ta
 }
 
 func NewWorkflowExistsDifferentStructureError(ctx context.Context, request *admin.WorkflowCreateRequest, oldSpec *core.CompiledWorkflowClosure, newSpec *core.CompiledWorkflowClosure) FlyteAdminError {
-	errorMsg := "workflow with different structure already exists:\n"
+	errorMsg := fmt.Sprintf("%v workflow with different structure already exists:\n", request.Id.Name)
 	diff, _ := jsondiff.Compare(oldSpec, newSpec)
 	rdiff, _ := jsondiff.Compare(newSpec, oldSpec)
 	rs := compareJsons(diff, rdiff)

@@ -19,7 +19,7 @@ var identifier = core.Identifier{
 	ResourceType: core.ResourceType_TASK,
 	Project:      "testProj",
 	Domain:       "domain",
-	Name:         "name",
+	Name:         "t1",
 	Version:      "ver",
 }
 
@@ -144,7 +144,7 @@ func TestNewTaskExistsDifferentStructureError(t *testing.T) {
 	s, ok := status.FromError(statusErr)
 	assert.True(t, ok)
 	assert.Equal(t, codes.InvalidArgument, s.Code())
-	assert.Equal(t, "task with different structure already exists:\n\t\t- /template/Target/Container/resources/requests/0/value: 150m -> 250m", s.Message())
+	assert.Equal(t, "t1 task with different structure already exists:\n\t\t- /template/Target/Container/resources/requests/0/value: 150m -> 250m", s.Message())
 }
 
 func TestNewTaskExistsIdenticalStructureError(t *testing.T) {
@@ -160,6 +160,14 @@ func TestNewTaskExistsIdenticalStructureError(t *testing.T) {
 }
 
 func TestNewWorkflowExistsDifferentStructureError(t *testing.T) {
+	identifier = core.Identifier{
+		ResourceType: core.ResourceType_WORKFLOW,
+		Project:      "testProj",
+		Domain:       "domain",
+		Name:         "hello",
+		Version:      "ver",
+	}
+
 	req := &admin.WorkflowCreateRequest{
 		Id: &identifier,
 	}
@@ -217,7 +225,7 @@ func TestNewWorkflowExistsDifferentStructureError(t *testing.T) {
 	s, ok := status.FromError(statusErr)
 	assert.True(t, ok)
 	assert.Equal(t, codes.InvalidArgument, s.Code())
-	assert.Equal(t, "workflow with different structure already exists:\n\t\t- /primary/connections/upstream/bar: <nil> -> map[ids:[start-node]]\n\t\t- /primary/connections/upstream/end-node/ids/0: foo -> bar\n\t\t- /primary/connections/upstream/foo: map[ids:[start-node]] -> <nil>\n\t\t- /primary/template/nodes/0/id: foo -> bar", s.Message())
+	assert.Equal(t, "hello workflow with different structure already exists:\n\t\t- /primary/connections/upstream/bar: <nil> -> map[ids:[start-node]]\n\t\t- /primary/connections/upstream/end-node/ids/0: foo -> bar\n\t\t- /primary/connections/upstream/foo: map[ids:[start-node]] -> <nil>\n\t\t- /primary/template/nodes/0/id: foo -> bar", s.Message())
 
 	details, ok := s.Details()[0].(*admin.CreateWorkflowFailureReason)
 	assert.True(t, ok)
