@@ -3,7 +3,12 @@
 # If you are running with the cache run:
 # docker builder prune --filter type=exec.cachemount
 
-FROM quay.io/pypa/manylinux2014_x86_64 as build
+# If your Flyte is running on aarch64 (Apple Silicon), run:
+# docker image build \
+#    --build-arg="MANYLINUX_BASE_IMAGE=quay.io/pypa/manylinux2014_aarch64" \
+#    -t fasttask-runner:TAG .
+ARG MANYLINUX_BASE_IMAGE=quay.io/pypa/manylinux2014_x86_64
+FROM ${MANYLINUX_BASE_IMAGE} as build
 
 RUN curl https://sh.rustup.rs -sSf | sh -s -- --profile=minimal -y
 ENV PATH="/root/.cargo/bin:${PATH}"
