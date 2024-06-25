@@ -317,6 +317,10 @@ helm install gateway bitnami/contour -n flyte
 | webhook.autoscaling.metrics[1].type | string | `"Resource"` |  |
 | webhook.autoscaling.minReplicas | int | `1` |  |
 | webhook.enabled | bool | `true` | enable or disable secrets webhook |
+| webhook.nodeSelector | object | `{}` | nodeSelector for webhook deployment |
+| webhook.podAnnotations | object | `{}` | Annotations for webhook pods |
+| webhook.podEnv | object | `{}` | Additional webhook container environment variables |
+| webhook.podLabels | object | `{}` | Labels for webhook pods |
 | webhook.priorityClassName | string | `""` | Sets priorityClassName for webhook pod |
 | webhook.prometheus.enabled | bool | `false` |  |
 | webhook.prometheus.path | string | `"/metrics"` |  |
