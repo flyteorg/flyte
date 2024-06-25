@@ -816,7 +816,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: S1dTb05oQlRYSmZ0MHI5aw==
+  haSharedSecret: VjExSVFQMEI0ZEdwa0ZJeQ==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1133,7 +1133,8 @@ metadata:
   namespace: flyte
 spec:
   ports:
-  - name: agent-grpc
+  - appProtocol: TCP
+    name: agent-grpc
     port: 8000
     protocol: TCP
     targetPort: agent-grpc
@@ -1412,7 +1413,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: ba31bacfae25dc1d02d3c9cb0c3a633ee568ad397ad170d61542c719c0f36f63
+        checksum/secret: 155e94ff7a4e4352b9092cc5e932d8a8e96b7d9701e4605b3383274c573fc8bf
       labels:
         app: docker-registry
         release: flyte-sandbox
