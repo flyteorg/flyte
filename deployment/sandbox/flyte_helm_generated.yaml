@@ -6870,6 +6870,8 @@ spec:
     metadata:
       annotations:
         configChecksum: "475154c41cdb06999025ab796aa1264fa3d235df51ac088a39c89c7ce300408"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "10254"
       labels: 
         app.kubernetes.io/name: flyteclusterresourcesync
         app.kubernetes.io/instance: flyte
@@ -7174,6 +7176,8 @@ spec:
     metadata:
       annotations:
         configChecksum: "f892b909c52752746c1b17c780ae5733f70d8c731acc9a89c31361c5690c8a5"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "10254"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -7248,6 +7252,8 @@ spec:
         app.kubernetes.io/version: v1.12.1-rc0
       annotations:
         configChecksum: "f892b909c52752746c1b17c780ae5733f70d8c731acc9a89c31361c5690c8a5"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "10254"
     spec:
       securityContext: 
         fsGroup: 65534
