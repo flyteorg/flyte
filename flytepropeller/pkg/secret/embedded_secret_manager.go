@@ -131,7 +131,7 @@ func (i EmbeddedSecretManagerInjector) lookUpSecret(ctx context.Context, secret 
 	// Fetch organization scoped secret
 	orgScopedSecret := fmt.Sprintf(SecretsStorageFormat, labels[OrganizationLabel], EmptySecretScope, EmptySecretScope, secret.Key)
 	secretValue, err = i.secretFetcher.GetSecretValue(ctx, orgScopedSecret)
-	if err != nil {
+	if err == nil {
 		return secretValue, err
 	}
 	if !stdlibErrors.IsCausedBy(err, ErrCodeSecretNotFound) {

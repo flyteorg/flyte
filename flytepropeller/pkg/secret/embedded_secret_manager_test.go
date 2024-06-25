@@ -26,9 +26,18 @@ func TestEmbeddedSecretManagerInjector_Inject(t *testing.T) {
 	secretIDKey := "secretID"
 	secretValue := "secretValue"
 
-	secretID := fmt.Sprintf(SecretsStorageFormat, OrganizationLabel, DomainLabel, ProjectLabel, secretIDKey)
-	gcpClient.OnAccessSecretVersionMatch(ctx, &secretmanagerpb.AccessSecretVersionRequest{
-		Name: fmt.Sprintf(GCPSecretNameFormat, gcpProject, secretID),
+	projectSecretID := fmt.Sprintf(SecretsStorageFormat, OrganizationLabel, DomainLabel, ProjectLabel, secretIDKey)
+	domainSecretID := fmt.Sprintf(SecretsStorageFormat, OrganizationLabel, DomainLabel, EmptySecretScope, secretIDKey)
+	orgSecretID := fmt.Sprintf(SecretsStorageFormat, OrganizationLabel, EmptySecretScope, EmptySecretScope, secretIDKey)
+
+	gcpClient.On("AccessSecretVersion", ctx, &secretmanagerpb.AccessSecretVersionRequest{
+		Name: fmt.Sprintf(GCPSecretNameFormat, gcpProject, projectSecretID),
+	}).Return(nil, stdlibErrors.Errorf(ErrCodeSecretNotFound, fmt.Sprintf(SecretNotFoundErrorFormat, projectSecretID)))
+	gcpClient.On("AccessSecretVersion", ctx, &secretmanagerpb.AccessSecretVersionRequest{
+		Name: fmt.Sprintf(GCPSecretNameFormat, gcpProject, domainSecretID),
+	}).Return(nil, stdlibErrors.Errorf(ErrCodeSecretNotFound, fmt.Sprintf(SecretNotFoundErrorFormat, projectSecretID)))
+	gcpClient.On("AccessSecretVersion", ctx, &secretmanagerpb.AccessSecretVersionRequest{
+		Name: fmt.Sprintf(GCPSecretNameFormat, gcpProject, orgSecretID),
 	}).Return(&secretmanagerpb.AccessSecretVersionResponse{
 		Payload: &secretmanagerpb.SecretPayload{
 			Data: []byte(secretValue),
