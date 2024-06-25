@@ -40,6 +40,7 @@ spec:
   - name: agent-grpc
     port: 8000
     protocol: TCP
+    appProtocol: TCP
     targetPort: agent-grpc
   selector: 
     app.kubernetes.io/name: flyteagent
