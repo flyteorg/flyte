@@ -17,13 +17,15 @@ class ExecutionEnvAssignment(_message.Message):
     def __init__(self, node_ids: _Optional[_Iterable[str]] = ..., task_type: _Optional[str] = ..., execution_env: _Optional[_Union[ExecutionEnv, _Mapping]] = ...) -> None: ...
 
 class ExecutionEnv(_message.Message):
-    __slots__ = ["id", "type", "extant", "spec"]
+    __slots__ = ["id", "type", "extant", "spec", "version"]
     ID_FIELD_NUMBER: _ClassVar[int]
     TYPE_FIELD_NUMBER: _ClassVar[int]
     EXTANT_FIELD_NUMBER: _ClassVar[int]
     SPEC_FIELD_NUMBER: _ClassVar[int]
+    VERSION_FIELD_NUMBER: _ClassVar[int]
     id: str
     type: str
     extant: _struct_pb2.Struct
     spec: _struct_pb2.Struct
-    def __init__(self, id: _Optional[str] = ..., type: _Optional[str] = ..., extant: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ..., spec: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ...) -> None: ...
+    version: str
+    def __init__(self, id: _Optional[str] = ..., type: _Optional[str] = ..., extant: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ..., spec: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ..., version: _Optional[str] = ...) -> None: ...
