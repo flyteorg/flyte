@@ -383,6 +383,12 @@ flytepropeller:
     interval: 60s
     # -- Sets the timeout after which request to scrape metrics will time out
     scrapeTimeout: 30s
+
+  prometheus:
+    enabled: false
+    path: "/metrics"
+    port: 10254
+
 #
 # FLYTECONSOLE SETTINGS
 #
@@ -435,6 +441,21 @@ flyteconsole:
     fsGroupChangePolicy: "OnRootMismatch"
     seLinuxOptions:
       type: spc_t
+
+  # -- Settings for flyteconsole service monitor
+  serviceMonitor:
+    # -- If enabled create the flyteconsole service monitor
+    enabled: false
+    # -- Sets the interval at which metrics will be scraped by prometheus
+    interval: 60s
+    # -- Sets the timeout after which request to scrape metrics will time out
+    scrapeTimeout: 30s
+    # -- Sets the labels for the service monitor which are required by the
+    # prometheus to auto-detect the service monitor and start scrapping the metrics
+    labels: {}
+
+  livenessProbe: {}
+  readinessProbe: {}
 
 # It will enable the redoc route in ingress
 deployRedoc: false
@@ -491,6 +512,29 @@ webhook:
       cpu: 200m
       ephemeral-storage: 500Mi
       memory: 500Mi
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 10
+    metrics:
+      - type: Resource
+        resource:
+          name: cpu
+          target:
+            type: Utilization
+            averageUtilization: 80
+      - type: Resource
+        resource:
+          name: memory
+          target:
+            type: Utilization
+            averageUtilization: 80
+
+  prometheus:
+    enabled: false
+    path: "/metrics"
+    port: 10254
 
 # ------------------------------------------------
 #
@@ -950,6 +994,11 @@ cluster_resource_manager:
                 value: "4"
             - projectQuotaMemory:
                 value: "3000Mi"
+
+  prometheus:
+    enabled: false
+    path: "/metrics"
+    port: 10254
 
   # -- Resource templates that should be applied
   templates:

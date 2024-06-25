@@ -60,7 +60,7 @@ helm install gateway bitnami/contour -n flyte
 | cloud_events.eventsPublisher.eventTypes[0] | string | `"all"` |  |
 | cloud_events.eventsPublisher.topicName | string | `"arn:aws:sns:us-east-2:123456:123-my-topic"` |  |
 | cloud_events.type | string | `"aws"` |  |
-| cluster_resource_manager | object | `{"config":{"cluster_resources":{"customData":[{"production":[{"projectQuotaCpu":{"value":"5"}},{"projectQuotaMemory":{"value":"4000Mi"}}]},{"staging":[{"projectQuotaCpu":{"value":"2"}},{"projectQuotaMemory":{"value":"3000Mi"}}]},{"development":[{"projectQuotaCpu":{"value":"4"}},{"projectQuotaMemory":{"value":"3000Mi"}}]}],"refreshInterval":"5m","standaloneDeployment":false,"templatePath":"/etc/flyte/clusterresource/templates"}},"enabled":true,"nodeSelector":{},"podAnnotations":{},"podEnv":{},"podLabels":{},"resources":{},"service_account_name":"flyteadmin","standaloneDeployment":false,"templates":[{"key":"aa_namespace","value":"apiVersion: v1\nkind: Namespace\nmetadata:\n  name: {{ namespace }}\nspec:\n  finalizers:\n  - kubernetes\n"},{"key":"ab_project_resource_quota","value":"apiVersion: v1\nkind: ResourceQuota\nmetadata:\n  name: project-quota\n  namespace: {{ namespace }}\nspec:\n  hard:\n    limits.cpu: {{ projectQuotaCpu }}\n    limits.memory: {{ projectQuotaMemory }}\n"}]}` | Configuration for the Cluster resource manager component. This is an optional component, that enables automatic cluster configuration. This is useful to set default quotas, manage namespaces etc that map to a project/domain |
+| cluster_resource_manager | object | `{"config":{"cluster_resources":{"customData":[{"production":[{"projectQuotaCpu":{"value":"5"}},{"projectQuotaMemory":{"value":"4000Mi"}}]},{"staging":[{"projectQuotaCpu":{"value":"2"}},{"projectQuotaMemory":{"value":"3000Mi"}}]},{"development":[{"projectQuotaCpu":{"value":"4"}},{"projectQuotaMemory":{"value":"3000Mi"}}]}],"refreshInterval":"5m","standaloneDeployment":false,"templatePath":"/etc/flyte/clusterresource/templates"}},"enabled":true,"nodeSelector":{},"podAnnotations":{},"podEnv":{},"podLabels":{},"prometheus":{"enabled":false,"path":"/metrics","port":10254},"resources":{},"service_account_name":"flyteadmin","standaloneDeployment":false,"templates":[{"key":"aa_namespace","value":"apiVersion: v1\nkind: Namespace\nmetadata:\n  name: {{ namespace }}\nspec:\n  finalizers:\n  - kubernetes\n"},{"key":"ab_project_resource_quota","value":"apiVersion: v1\nkind: ResourceQuota\nmetadata:\n  name: project-quota\n  namespace: {{ namespace }}\nspec:\n  hard:\n    limits.cpu: {{ projectQuotaCpu }}\n    limits.memory: {{ projectQuotaMemory }}\n"}]}` | Configuration for the Cluster resource manager component. This is an optional component, that enables automatic cluster configuration. This is useful to set default quotas, manage namespaces etc that map to a project/domain |
 | cluster_resource_manager.config | object | `{"cluster_resources":{"customData":[{"production":[{"projectQuotaCpu":{"value":"5"}},{"projectQuotaMemory":{"value":"4000Mi"}}]},{"staging":[{"projectQuotaCpu":{"value":"2"}},{"projectQuotaMemory":{"value":"3000Mi"}}]},{"development":[{"projectQuotaCpu":{"value":"4"}},{"projectQuotaMemory":{"value":"3000Mi"}}]}],"refreshInterval":"5m","standaloneDeployment":false,"templatePath":"/etc/flyte/clusterresource/templates"}}` | Configmap for ClusterResource parameters |
 | cluster_resource_manager.config.cluster_resources | object | `{"customData":[{"production":[{"projectQuotaCpu":{"value":"5"}},{"projectQuotaMemory":{"value":"4000Mi"}}]},{"staging":[{"projectQuotaCpu":{"value":"2"}},{"projectQuotaMemory":{"value":"3000Mi"}}]},{"development":[{"projectQuotaCpu":{"value":"4"}},{"projectQuotaMemory":{"value":"3000Mi"}}]}],"refreshInterval":"5m","standaloneDeployment":false,"templatePath":"/etc/flyte/clusterresource/templates"}` | ClusterResource parameters Refer to the [structure](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/runtime/interfaces#ClusterResourceConfig) to customize. |
 | cluster_resource_manager.config.cluster_resources.refreshInterval | string | `"5m"` | How frequently to run the sync process |
@@ -209,15 +209,22 @@ helm install gateway bitnami/contour -n flyte
 | flyteconsole.image.repository | string | `"cr.flyte.org/flyteorg/flyteconsole"` | Docker image for Flyteconsole deployment |
 | flyteconsole.image.tag | string | `"v1.14.0"` |  |
 | flyteconsole.imagePullSecrets | list | `[]` | ImagePullSecrets to assign to the Flyteconsole deployment |
+| flyteconsole.livenessProbe | object | `{}` |  |
 | flyteconsole.nodeSelector | object | `{}` | nodeSelector for Flyteconsole deployment |
 | flyteconsole.podAnnotations | object | `{}` | Annotations for Flyteconsole pods |
 | flyteconsole.podEnv | object | `{}` | Additional Flyteconsole container environment variables |
 | flyteconsole.podLabels | object | `{}` | Labels for Flyteconsole pods |
 | flyteconsole.priorityClassName | string | `""` | Sets priorityClassName for flyte console pod(s). |
+| flyteconsole.readinessProbe | object | `{}` |  |
 | flyteconsole.replicaCount | int | `1` | Replicas count for Flyteconsole deployment |
 | flyteconsole.resources | object | `{"limits":{"cpu":"500m","memory":"250Mi"},"requests":{"cpu":"10m","memory":"50Mi"}}` | Default resources requests and limits for Flyteconsole deployment |
 | flyteconsole.securityContext | object | `{"fsGroupChangePolicy":"OnRootMismatch","runAsNonRoot":true,"runAsUser":1000,"seLinuxOptions":{"type":"spc_t"}}` | Sets securityContext for flyteconsole pod(s). |
 | flyteconsole.service | object | `{"annotations":{},"type":"ClusterIP"}` | Service settings for Flyteconsole |
+| flyteconsole.serviceMonitor | object | `{"enabled":false,"interval":"60s","labels":{},"scrapeTimeout":"30s"}` | Settings for flyteconsole service monitor |
+| flyteconsole.serviceMonitor.enabled | bool | `false` | If enabled create the flyteconsole service monitor |
+| flyteconsole.serviceMonitor.interval | string | `"60s"` | Sets the interval at which metrics will be scraped by prometheus |
+| flyteconsole.serviceMonitor.labels | object | `{}` | Sets the labels for the service monitor which are required by the prometheus to auto-detect the service monitor and start scrapping the metrics |
+| flyteconsole.serviceMonitor.scrapeTimeout | string | `"30s"` | Sets the timeout after which request to scrape metrics will time out |
 | flyteconsole.tolerations | list | `[]` | tolerations for Flyteconsole deployment |
 | flytepropeller.additionalContainers | list | `[]` | Appends additional containers to the deployment spec. May include template values. |
 | flytepropeller.additionalVolumeMounts | list | `[]` | Appends additional volume mounts to the main container's spec. May include template values. |
@@ -238,6 +245,9 @@ helm install gateway bitnami/contour -n flyte
 | flytepropeller.podEnv | object | `{}` | Additional Flytepropeller container environment variables |
 | flytepropeller.podLabels | object | `{}` | Labels for Flytepropeller pods |
 | flytepropeller.priorityClassName | string | `""` | Sets priorityClassName for propeller pod(s). |
+| flytepropeller.prometheus.enabled | bool | `false` |  |
+| flytepropeller.prometheus.path | string | `"/metrics"` |  |
+| flytepropeller.prometheus.port | int | `10254` |  |
 | flytepropeller.replicaCount | int | `1` | Replicas count for Flytepropeller deployment |
 | flytepropeller.resources | object | `{"limits":{"cpu":"200m","ephemeral-storage":"100Mi","memory":"200Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"100Mi"}}` | Default resources requests and limits for Flytepropeller deployment |
 | flytepropeller.securityContext | object | `{"fsGroup":65534,"fsGroupChangePolicy":"Always","runAsUser":1001}` | Sets securityContext for flytepropeller pod(s). |
@@ -295,8 +305,22 @@ helm install gateway bitnami/contour -n flyte
 | storage.s3.authType | string | `"iam"` | type of authentication to use for S3 buckets, can either be iam or accesskey |
 | storage.s3.secretKey | string | `""` | AWS IAM user secret access key to use for S3 bucket auth, only used if authType is set to accesskey |
 | storage.type | string | `"sandbox"` | Sets the storage type. Supported values are sandbox, s3, gcs and custom. |
+| webhook.autoscaling.enabled | bool | `false` |  |
+| webhook.autoscaling.maxReplicas | int | `10` |  |
+| webhook.autoscaling.metrics[0].resource.name | string | `"cpu"` |  |
+| webhook.autoscaling.metrics[0].resource.target.averageUtilization | int | `80` |  |
+| webhook.autoscaling.metrics[0].resource.target.type | string | `"Utilization"` |  |
+| webhook.autoscaling.metrics[0].type | string | `"Resource"` |  |
+| webhook.autoscaling.metrics[1].resource.name | string | `"memory"` |  |
+| webhook.autoscaling.metrics[1].resource.target.averageUtilization | int | `80` |  |
+| webhook.autoscaling.metrics[1].resource.target.type | string | `"Utilization"` |  |
+| webhook.autoscaling.metrics[1].type | string | `"Resource"` |  |
+| webhook.autoscaling.minReplicas | int | `1` |  |
 | webhook.enabled | bool | `true` | enable or disable secrets webhook |
 | webhook.priorityClassName | string | `""` | Sets priorityClassName for webhook pod |
+| webhook.prometheus.enabled | bool | `false` |  |
+| webhook.prometheus.path | string | `"/metrics"` |  |
+| webhook.prometheus.port | int | `10254` |  |
 | webhook.resources.requests.cpu | string | `"200m"` |  |
 | webhook.resources.requests.ephemeral-storage | string | `"500Mi"` |  |
 | webhook.resources.requests.memory | string | `"500Mi"` |  |
