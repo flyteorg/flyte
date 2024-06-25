@@ -44,5 +44,10 @@ subjects:
 - kind: ServiceAccount
   name: {{ template "flyteadmin.name" . }}
   namespace: {{ template "flyte.namespace" . }}
+{{- if and .Values.cluster_resource_manager.enabled .Values.cluster_resource_manager.serviceAccount.create }}
+- kind: ServiceAccount
+  name: {{ template "flyteclusterresourcesync.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+{{- end }}
 {{- end }}
 {{- end }}

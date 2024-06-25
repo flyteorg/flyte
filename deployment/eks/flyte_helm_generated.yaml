@@ -13,6 +13,30 @@ metadata:
   annotations: 
     eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT_NUMBER>:role/iam-role-flyte
 ---
+# Source: flyte-core/templates/clusterresourcesync/rbac.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: flyteclusterresourcesync
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flyteclusterresourcesync
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-core-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+---
+# Source: flyte-core/templates/console/rbac.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: flyteconsole
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flyteconsole
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-core-v0.1.10
+    app.kubernetes.io/managed-by: Helm
+---
 # Source: flyte-core/templates/datacatalog/rbac.yaml
 apiVersion: v1
 kind: ServiceAccount
@@ -27,7 +51,7 @@ metadata:
   annotations: 
     eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT_NUMBER>:role/iam-role-flyte
 ---
-# Source: flyte-core/templates/flytescheduler/sa.yaml
+# Source: flyte-core/templates/flytescheduler/rbac.yaml
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -721,6 +745,9 @@ subjects:
 - kind: ServiceAccount
   name: flyteadmin
   namespace: flyte
+- kind: ServiceAccount
+  name: flyteclusterresourcesync
+  namespace: flyte
 ---
 # Source: flyte-core/templates/propeller/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -1059,7 +1086,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: syncresources
+  name: flyteclusterresourcesync
   namespace: flyte
   labels: 
     app.kubernetes.io/name: flyteclusterresourcesync
@@ -1099,7 +1126,7 @@ spec:
             name: resource-templates
           - mountPath: /etc/flyte/config
             name: config-volume
-      serviceAccountName: flyteadmin
+      serviceAccountName: flyteclusterresourcesync
       volumes:
         - name: db-pass
           secret:
@@ -1167,6 +1194,7 @@ spec:
         volumeMounts:
         - mountPath: /srv/flyte
           name: shared-data
+      serviceAccountName: flyteconsole
       volumes:
       - emptyDir: {}
         name: shared-data

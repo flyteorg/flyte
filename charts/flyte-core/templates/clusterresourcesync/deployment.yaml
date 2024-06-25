@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: syncresources
+  name: {{ template "flyteclusterresourcesync.name" . }}
   namespace: {{ template "flyte.namespace" . }}
   labels: {{ include "flyteclusterresourcesync.labels" . | nindent 4 }}
 spec:
@@ -55,7 +55,7 @@ spec:
           - mountPath: /var/run/credentials
             name: cluster-secrets
           {{- end }}
-      serviceAccountName: {{ .Values.cluster_resource_manager.service_account_name }}
+      serviceAccountName: {{ .Values.cluster_resource_manager.serviceAccount.create | ternary (include "flyteclusterresourcesync.name" .) .Values.cluster_resource_manager.service_account_name }}
       volumes:  {{- include "databaseSecret.volume" . | nindent 8 }}
         - configMap:
             name: clusterresource-template

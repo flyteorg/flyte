@@ -14,7 +14,7 @@
 
 
 {{- define "flyteadmin.name" -}}
-flyteadmin
+{{- default "flyteadmin" .Values.flyteadmin.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{- define "flyteadmin.selectorLabels" -}}
@@ -36,7 +36,7 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
 
 {{- define "flytescheduler.name" -}}
-flytescheduler
+{{- default "flytescheduler" .Values.flytescheduler.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{- define "flytescheduler.selectorLabels" -}}
@@ -59,7 +59,7 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
 
 {{- define "flyteclusterresourcesync.name" -}}
-flyteclusterresourcesync
+{{- default "flyteclusterresourcesync" .Values.cluster_resource_manager.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{- define "flyteclusterresourcesync.selectorLabels" -}}
@@ -81,7 +81,7 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
 
 {{- define "datacatalog.name" -}}
-datacatalog
+{{- default "datacatalog" .Values.datacatalog.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{- define "datacatalog.selectorLabels" -}}
@@ -125,7 +125,7 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
 
 {{- define "flytepropeller-manager.name" -}}
-flytepropeller-manager
+{{- default "flytepropeller-manager" .Values.flytepropeller.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{- define "flytepropeller-manager.selectorLabels" -}}
@@ -147,12 +147,12 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
 
 {{- define "flyte-pod-webhook.name" -}}
-flyte-pod-webhook
+{{- default "flyte-pod-webhook" .Values.webhook.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 
 {{- define "flyteconsole.name" -}}
-flyteconsole
+{{- default "flyteconsole" .Values.flyteconsole.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{- define "flyteconsole.selectorLabels" -}}
