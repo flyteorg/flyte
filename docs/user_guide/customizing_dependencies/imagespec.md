@@ -6,10 +6,6 @@
 .. tags:: Containerization, Intermediate
 ```
 
-:::{note}
-This is an experimental feature, which is subject to change the API in the future.
-:::
-
 `ImageSpec` is a way to specify how to build a container image without a Dockerfile. The `ImageSpec` by default will be
 converted to an [Envd](https://envd.tensorchord.ai/) config, and the [Envd builder](https://github.com/flyteorg/flytekit/blob/master/plugins/flytekit-envd/flytekitplugins/envd/image_builder.py#L12-L34) will build the image for you. However, you can also register your own builder to build
 the image using other tools.
