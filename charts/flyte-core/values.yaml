@@ -498,6 +498,14 @@ webhook:
     annotations:
       projectcontour.io/upstream-protocol.h2c: grpc
     type: ClusterIP
+  # -- Annotations for webhook pods
+  podAnnotations: {}
+  # -- Additional webhook container environment variables
+  podEnv: {}
+  # -- Labels for webhook pods
+  podLabels: {}
+  # -- nodeSelector for webhook deployment
+  nodeSelector: {}
   # -- Sets securityContext for webhook pod(s).
   securityContext:
     fsGroup: 65534
