@@ -86,6 +86,21 @@ pub struct NodeExecutionEvent {
     /// Indicates if this node is an ArrayNode.
     #[prost(bool, tag="22")]
     pub is_array: bool,
+    /// Holding this field here for now, this will be upstreamed soon.
+    /// So that Admin doesn't have to rebuild the node execution graph to find the target entity, propeller will fill this
+    /// in optionally - currently this is only filled in for subworkflows. This is the ID of the subworkflow corresponding
+    /// to this node execution. It is difficult to find because Admin only sees one node at a time. A subworkflow could be
+    /// nested multiple layers deep, and you'd need to access the correct workflow template to know the target subworkflow.
+    #[prost(message, optional, tag="23")]
+    pub target_entity: ::core::option::Option<super::core::Identifier>,
+    /// Holding this field here for now, this will be upstreamed soon.
+    /// Tasks and subworkflows (but not launch plans) that are run within a dynamic task are effectively independent of
+    /// the tasks that are registered in Admin's db. Confusingly, they are often identical, but sometimes they are not
+    /// even registered at all. Similar to the target_entity field, at the time Admin receives this event, it has no idea
+    /// if the relevant execution entity is was registered, or dynamic. This field indicates that the target_entity ID,
+    /// as well as task IDs in any corresponding Task Executions, should not be used to looked up the task in Admin's db.
+    #[prost(bool, tag="24")]
+    pub is_in_dynamic_chain: bool,
     #[prost(oneof="node_execution_event::InputValue", tags="5, 20")]
     pub input_value: ::core::option::Option<node_execution_event::InputValue>,
     #[prost(oneof="node_execution_event::OutputResult", tags="6, 7, 15")]

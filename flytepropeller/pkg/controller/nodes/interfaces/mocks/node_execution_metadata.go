@@ -51,6 +51,38 @@ func (_m *NodeExecutionMetadata) GetAnnotations() map[string]string {
 	return r0
 }
 
+type NodeExecutionMetadata_GetConsoleURL struct {
+	*mock.Call
+}
+
+func (_m NodeExecutionMetadata_GetConsoleURL) Return(_a0 string) *NodeExecutionMetadata_GetConsoleURL {
+	return &NodeExecutionMetadata_GetConsoleURL{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *NodeExecutionMetadata) OnGetConsoleURL() *NodeExecutionMetadata_GetConsoleURL {
+	c_call := _m.On("GetConsoleURL")
+	return &NodeExecutionMetadata_GetConsoleURL{Call: c_call}
+}
+
+func (_m *NodeExecutionMetadata) OnGetConsoleURLMatch(matchers ...interface{}) *NodeExecutionMetadata_GetConsoleURL {
+	c_call := _m.On("GetConsoleURL", matchers...)
+	return &NodeExecutionMetadata_GetConsoleURL{Call: c_call}
+}
+
+// GetConsoleURL provides a mock function with given fields:
+func (_m *NodeExecutionMetadata) GetConsoleURL() string {
+	ret := _m.Called()
+
+	var r0 string
+	if rf, ok := ret.Get(0).(func() string); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	return r0
+}
+
 type NodeExecutionMetadata_GetInterruptibleFailureThreshold struct {
 	*mock.Call
 }

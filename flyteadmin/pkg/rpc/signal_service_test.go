@@ -18,7 +18,7 @@ func TestGetOrCreateSignal(t *testing.T) {
 
 	t.Run("Happy", func(t *testing.T) {
 		signalManager := mocks.SignalInterface{}
-		signalManager.OnGetOrCreateSignalMatch(mock.Anything, mock.Anything).Return(&admin.Signal{}, nil)
+		signalManager.EXPECT().GetOrCreateSignal(mock.Anything, mock.Anything).Return(&admin.Signal{}, nil)
 
 		testScope := mockScope.NewTestScope()
 		mockServer := &SignalService{
@@ -44,7 +44,7 @@ func TestGetOrCreateSignal(t *testing.T) {
 
 	t.Run("ManagerError", func(t *testing.T) {
 		signalManager := mocks.SignalInterface{}
-		signalManager.OnGetOrCreateSignalMatch(mock.Anything, mock.Anything).Return(nil, errors.New("foo"))
+		signalManager.EXPECT().GetOrCreateSignal(mock.Anything, mock.Anything).Return(nil, errors.New("foo"))
 
 		testScope := mockScope.NewTestScope()
 		mockServer := &SignalService{
@@ -62,7 +62,7 @@ func TestListSignals(t *testing.T) {
 
 	t.Run("Happy", func(t *testing.T) {
 		signalManager := mocks.SignalInterface{}
-		signalManager.OnListSignalsMatch(mock.Anything, mock.Anything).Return(&admin.SignalList{}, nil)
+		signalManager.EXPECT().ListSignals(mock.Anything, mock.Anything).Return(&admin.SignalList{}, nil)
 
 		testScope := mockScope.NewTestScope()
 		mockServer := &SignalService{
@@ -88,7 +88,7 @@ func TestListSignals(t *testing.T) {
 
 	t.Run("ManagerError", func(t *testing.T) {
 		signalManager := mocks.SignalInterface{}
-		signalManager.OnListSignalsMatch(mock.Anything, mock.Anything).Return(nil, errors.New("foo"))
+		signalManager.EXPECT().ListSignals(mock.Anything, mock.Anything).Return(nil, errors.New("foo"))
 
 		testScope := mockScope.NewTestScope()
 		mockServer := &SignalService{
@@ -106,7 +106,7 @@ func TestSetSignal(t *testing.T) {
 
 	t.Run("Happy", func(t *testing.T) {
 		signalManager := mocks.SignalInterface{}
-		signalManager.OnSetSignalMatch(mock.Anything, mock.Anything).Return(&admin.SignalSetResponse{}, nil)
+		signalManager.EXPECT().SetSignal(mock.Anything, mock.Anything).Return(&admin.SignalSetResponse{}, nil)
 
 		testScope := mockScope.NewTestScope()
 		mockServer := &SignalService{
@@ -132,7 +132,7 @@ func TestSetSignal(t *testing.T) {
 
 	t.Run("ManagerError", func(t *testing.T) {
 		signalManager := mocks.SignalInterface{}
-		signalManager.OnSetSignalMatch(mock.Anything, mock.Anything).Return(nil, errors.New("foo"))
+		signalManager.EXPECT().SetSignal(mock.Anything, mock.Anything).Return(nil, errors.New("foo"))
 
 		testScope := mockScope.NewTestScope()
 		mockServer := &SignalService{

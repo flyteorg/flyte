@@ -372,6 +372,31 @@ func mergeMetadata(existing, latest *event.TaskExecutionMetadata) *event.TaskExe
 	return existing
 }
 
+func filterExternalResourceLogsByPhase(externalResources []*event.ExternalResourceInfo, phase core.TaskExecution_Phase) {
+	for _, externalResource := range externalResources {
+		externalResource.Logs = filterLogsByPhase(externalResource.Logs, phase)
+	}
+}
+
+func filterLogsByPhase(logs []*core.TaskLog, phase core.TaskExecution_Phase) []*core.TaskLog {
+	filteredLogs := make([]*core.TaskLog, 0, len(logs))
+
+	for _, l := range logs {
+		if common.IsTaskExecutionTerminal(phase) && l.HideOnceFinished {
+			continue
+		}
+		// Some plugins like e.g. Dask, Ray start with or very quickly transition to core.TaskExecution_INITIALIZING
+		// once the CR has been created even though the underlying pods are still pending. We thus treat queued and
+		// initializing the same here.
+		if (phase == core.TaskExecution_QUEUED || phase == core.TaskExecution_INITIALIZING) && !l.ShowWhilePending {
+			continue
+		}
+		filteredLogs = append(filteredLogs, l)
+
+	}
+	return filteredLogs
+}
+
 func UpdateTaskExecutionModel(ctx context.Context, request *admin.TaskExecutionEventRequest, taskExecutionModel *models.TaskExecution,
 	inlineEventDataPolicy interfaces.InlineEventDataPolicy, storageClient *storage.DataStore) error {
 	err := handleTaskExecutionInputs(ctx, taskExecutionModel, request, storageClient)
@@ -384,6 +409,7 @@ func UpdateTaskExecutionModel(ctx context.Context, request *admin.TaskExecutionE
 		return errors.NewFlyteAdminErrorf(codes.Internal,
 			"failed to unmarshal task execution closure with error: %+v", err)
 	}
+	isPhaseChange := taskExecutionModel.Phase != request.Event.Phase.String()
 	existingTaskPhase := taskExecutionModel.Phase
 	taskExecutionModel.Phase = request.Event.Phase.String()
 	taskExecutionModel.PhaseVersion = request.Event.PhaseVersion
@@ -393,7 +419,11 @@ func UpdateTaskExecutionModel(ctx context.Context, request *admin.TaskExecutionE
 		reportedAt = request.Event.OccurredAt
 	}
 	taskExecutionClosure.UpdatedAt = reportedAt
-	taskExecutionClosure.Logs = mergeLogs(taskExecutionClosure.Logs, request.Event.Logs)
+
+	mergedLogs := mergeLogs(taskExecutionClosure.Logs, request.Event.Logs)
+	filteredLogs := filterLogsByPhase(mergedLogs, request.Event.Phase)
+	taskExecutionClosure.Logs = filteredLogs
+
 	if len(request.Event.Reasons) > 0 {
 		for _, reason := range request.Event.Reasons {
 			taskExecutionClosure.Reasons = append(
@@ -437,6 +467,11 @@ func UpdateTaskExecutionModel(ctx context.Context, request *admin.TaskExecutionE
 		return errors.NewFlyteAdminErrorf(codes.Internal, "failed to merge task event custom_info with error: %v", err)
 	}
 	taskExecutionClosure.Metadata = mergeMetadata(taskExecutionClosure.Metadata, request.Event.Metadata)
+
+	if isPhaseChange && taskExecutionClosure.Metadata != nil && len(taskExecutionClosure.Metadata.ExternalResources) > 0 {
+		filterExternalResourceLogsByPhase(taskExecutionClosure.Metadata.ExternalResources, request.Event.Phase)
+	}
+
 	if request.Event.EventVersion > taskExecutionClosure.EventVersion {
 		taskExecutionClosure.EventVersion = request.Event.EventVersion
 	}
