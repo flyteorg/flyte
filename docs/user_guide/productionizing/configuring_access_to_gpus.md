@@ -15,10 +15,18 @@ Flyte gives you three main levels of granularity to request accelerator resource
 Example:
 
 ```python
-from flytekit import task,Resources
-import torch
+from flytekit import ImageSpec, Resources, task
 
-@task(requests=Resources( gpu="1")) 
+image = ImageSpec(
+    base_image= "ghcr.io/flyteorg/flytekit:py3.10-1.10.2",
+     name="pytorch",
+     python_version="3.10",
+     packages=["torch"],
+     builder="envd",
+     registry="<YOUR_CONTAINER_REGISTRY>",
+ )
+
+@task(requests=Resources( gpu="1"))
 def gpu_available() -> bool:
    return torch.cuda.is_available()
 ```
@@ -26,7 +34,14 @@ The goal here is to make a simple request of any available GPU device(s).
 
 ### How it works?
 
+![](https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/deployment/gpus/generic_gpu_access.png)
 
+When this task is executed, `flyteproller` injects a toleration to the Pod spec:
+
+```yaml
+tolerations:    nvidia.com/gpu:NoSchedule op=Exists
+```
+The resource `nvidia.com/gpu` key name is not arbitrary. It corresponds to the Extended Resource that the K8s worker nodes have advertised to the API Server. 
 
 
 
