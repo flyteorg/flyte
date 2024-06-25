@@ -113,6 +113,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_task-plugins.fallback-to-container-handler", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("task-plugins.fallback-to-container-handler", testValue)
+			if vBool, err := cmdFlags.GetBool("task-plugins.fallback-to-container-handler"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.TaskPlugins.FallbackToContainerHandler)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_max-plugin-phase-versions", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {

@@ -7,6 +7,8 @@ import (
 	"testing"
 
 	"github.com/golang/protobuf/proto"
+	"github.com/google/martian/log"
+	"github.com/jinzhu/copier"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	v1 "k8s.io/api/core/v1"
@@ -282,11 +284,20 @@ func Test_task_ResolvePlugin(t *testing.T) {
 		plugins        map[pluginCore.TaskType]pluginCore.Plugin
 		defaultPlugin  pluginCore.Plugin
 		pluginsForType map[pluginCore.TaskType]map[pluginID]pluginCore.Plugin
+		cfg            *config.Config
 	}
 	type args struct {
 		ttype           string
 		executionConfig v1alpha1.ExecutionConfig
 	}
+	cfg := config.GetConfig()
+	cfgNoFallbackContainerHandler := &config.Config{}
+	if err := copier.CopyWithOption(cfgNoFallbackContainerHandler, cfg, copier.Option{DeepCopy: true}); err != nil {
+		log.Errorf("Failed to copy config")
+		return
+	}
+	cfgNoFallbackContainerHandler.TaskPlugins.FallbackToContainerHandler = false
+
 	tests := []struct {
 		name    string
 		fields  fields
@@ -294,19 +305,49 @@ func Test_task_ResolvePlugin(t *testing.T) {
 		want    string
 		wantErr bool
 	}{
-		{"no-plugins", fields{}, args{}, "", true},
-		{"default",
+		{
+			"no-plugins",
+			fields{
+				cfg: cfg,
+			},
+			args{},
+			"",
+			true,
+		},
+		{
+			"no-plugins-no-fallback-container-handler",
+			fields{
+				cfg: cfgNoFallbackContainerHandler,
+			},
+			args{},
+			"",
+			true,
+		},
+		{
+			"default",
 			fields{
 				defaultPlugin: defaultPlugin,
-			}, args{ttype: someID}, defaultID, false},
-		{"actual",
+				cfg:           cfg,
+			},
+			args{ttype: someID},
+			defaultID,
+			false,
+		},
+		{
+			"actual",
 			fields{
 				plugins: map[pluginCore.TaskType]pluginCore.Plugin{
 					someID: somePlugin,
 				},
 				defaultPlugin: defaultPlugin,
-			}, args{ttype: someID}, someID, false},
-		{"override",
+				cfg:           cfg,
+			},
+			args{ttype: someID},
+			someID,
+			false,
+		},
+		{
+			"override",
 			fields{
 				plugins:       make(map[pluginCore.TaskType]pluginCore.Plugin),
 				defaultPlugin: defaultPlugin,
@@ -315,14 +356,22 @@ func Test_task_ResolvePlugin(t *testing.T) {
 						someID: somePlugin,
 					},
 				},
-			}, args{ttype: someID, executionConfig: v1alpha1.ExecutionConfig{
-				TaskPluginImpls: map[string]v1alpha1.TaskPluginOverride{
-					someID: {
-						PluginIDs:             []string{someID},
-						MissingPluginBehavior: admin.PluginOverride_FAIL,
+				cfg: cfg,
+			},
+			args{
+				ttype: someID,
+				executionConfig: v1alpha1.ExecutionConfig{
+					TaskPluginImpls: map[string]v1alpha1.TaskPluginOverride{
+						someID: {
+							PluginIDs:             []string{someID},
+							MissingPluginBehavior: admin.PluginOverride_FAIL,
+						},
 					},
 				},
-			}}, someID, false},
+			},
+			someID,
+			false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -330,6 +379,7 @@ func Test_task_ResolvePlugin(t *testing.T) {
 				defaultPlugins: tt.fields.plugins,
 				defaultPlugin:  tt.fields.defaultPlugin,
 				pluginsForType: tt.fields.pluginsForType,
+				cfg:            tt.fields.cfg,
 			}
 			got, err := tk.ResolvePlugin(context.TODO(), tt.args.ttype, tt.args.executionConfig)
 			if (err != nil) != tt.wantErr {
@@ -887,6 +937,7 @@ func Test_task_Abort(t *testing.T) {
 			tk := Handler{
 				defaultPlugin:   m,
 				resourceManager: noopRm,
+				cfg:             config.GetConfig(),
 			}
 			nCtx := createNodeCtx(tt.args.ev)
 			if err := tk.Abort(context.TODO(), nCtx, "reason"); (err != nil) != tt.wantErr {
@@ -1048,6 +1099,7 @@ func Test_task_Abort_v1(t *testing.T) {
 			tk := Handler{
 				defaultPlugin:   m,
 				resourceManager: noopRm,
+				cfg:             config.GetConfig(),
 			}
 			nCtx := createNodeCtx(tt.args.ev)
 			if err := tk.Abort(context.TODO(), nCtx, "reason"); (err != nil) != tt.wantErr {
