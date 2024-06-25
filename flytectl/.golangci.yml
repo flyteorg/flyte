@@ -13,6 +13,7 @@ linters:
     - deadcode
     - errcheck
     - gas
+    - gci
     - goconst
     - goimports
     - golint

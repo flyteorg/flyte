@@ -32,7 +32,7 @@ def wait_and_run(path: str) -> int:
     return do_next(path=path)
 ```
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/extending/extending/user_container.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/extending/extending/user_container.py
 :caption: extending/user_container.py
 :lines: 1-6
 ```
@@ -42,7 +42,7 @@ def wait_and_run(path: str) -> int:
 As illustrated above, to achieve this structure we need to create a class named `WaitForObjectStoreFile`, which
 derives from {py:class}`flytekit.PythonFunctionTask` as follows.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/extending/extending/user_container.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/extending/extending/user_container.py
 :caption: extending/user_container.py
 :pyobject: WaitForObjectStoreFile
 ```
@@ -68,14 +68,14 @@ Refer to the [spark plugin](https://github.com/flyteorg/flytekit/tree/master/plu
 
 ### Actual usage
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/extending/extending/user_container.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/extending/extending/user_container.py
 :caption: extending/user_container.py
 :lines: 54-69
 ```
 
 And of course, you can run the workflow locally using your own new shiny plugin!
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/extending/extending/user_container.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/extending/extending/user_container.py
 :caption: extending/user_container.py
 :lines: 73-78
 ```

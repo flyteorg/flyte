@@ -415,6 +415,15 @@ service AdminService {
     };
   }
 
+  rpc GetDomains (flyteidl.admin.GetDomainRequest) returns (flyteidl.admin.GetDomainsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/domains"
+    };
+    // option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+    //   description: "Fetch registered domains."
+    // };
+  } 
+
   // Indicates a :ref:`ref_flyteidl.event.WorkflowExecutionEvent` has occurred.
   rpc CreateWorkflowEvent (flyteidl.admin.WorkflowExecutionEventRequest) returns (flyteidl.admin.WorkflowExecutionEventResponse) {
     option (google.api.http) = {

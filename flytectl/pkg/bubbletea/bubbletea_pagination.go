@@ -9,12 +9,11 @@ import (
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/paginator"
 	"github.com/charmbracelet/bubbles/spinner"
+	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/flyteorg/flyte/flytectl/pkg/filters"
 	"github.com/flyteorg/flyte/flytectl/pkg/printer"
 	"github.com/golang/protobuf/proto"
-
-	tea "github.com/charmbracelet/bubbletea"
 )
 
 var (

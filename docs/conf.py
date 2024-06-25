@@ -36,7 +36,7 @@ author = "Flyte"
 # The short X.Y version
 version = ""
 # The full version, including alpha/beta/rc tags
-release = "1.12.0"
+release = "1.12.1-rc0"
 
 # -- General configuration ---------------------------------------------------
 
@@ -105,6 +105,8 @@ redirects = {
     "flytesnacks/examples/mmcloud_plugin/mmcloud_plugin_example": "../../../deprecated_integrations/mmcloud_plugin/mmcloud_plugin_example.html",
     "flytesnacks/examples/snowflake_plugin/index": "../../../deprecated_integrations/snowflake_plugin/index.html",
     "flytesnacks/examples/snowflake_plugin/snowflake_plugin_example": "../../../deprecated_integrations/snowflake_plugin/snowflake_plugin_example.html",
+    "deprecated_integrations/mmcloud_plugin/index": "../../flytesnacks/examples/mmcloud_agent/index.html",
+    "deprecated_integrations/mmcloud_plugin/mmcloud_plugin_example": "../../flytesnacks/examples/mmcloud_agent/index.html"
 }
 
 
@@ -296,7 +298,7 @@ myst_enable_extensions = ["colon_fence"]
 # Sphinx-mermaid config
 mermaid_output_format = "raw"
 mermaid_version = "latest"
-mermaid_init_js = "mermaid.initialize({startOnLoad:false});"
+mermaid_init_js = "mermaid.initialize({startOnLoad:true});"
 
 # Makes it so that only the command is copied, not the output
 copybutton_prompt_text = "$ "

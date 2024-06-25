@@ -869,7 +869,7 @@ otelutils.JaegerConfig
 endpoint (string)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-Endpoint for the jaeger telemtry trace ingestor
+Endpoint for the jaeger telemetry trace ingestor
 
 **Default Value**: 
 

@@ -6,13 +6,11 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/flyteorg/flyte/flytectl/cmd/testutils"
-
 	"github.com/flyteorg/flyte/flytectl/cmd/config"
 	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/execution"
+	"github.com/flyteorg/flyte/flytectl/cmd/testutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -176,7 +174,7 @@ func TestGetExecutionFuncWithIOData(t *testing.T) {
 		nodeExecList := &admin.NodeExecutionList{NodeExecutions: nodeExecutions}
 
 		inputs := map[string]*core.Literal{
-			"val1": &core.Literal{
+			"val1": {
 				Value: &core.Literal_Scalar{
 					Scalar: &core.Scalar{
 						Value: &core.Scalar_Primitive{
@@ -191,7 +189,7 @@ func TestGetExecutionFuncWithIOData(t *testing.T) {
 			},
 		}
 		outputs := map[string]*core.Literal{
-			"o2": &core.Literal{
+			"o2": {
 				Value: &core.Literal_Scalar{
 					Scalar: &core.Scalar{
 						Value: &core.Scalar_Primitive{
@@ -288,7 +286,7 @@ func TestGetExecutionFuncWithIOData(t *testing.T) {
 			nodeExecutions := []*admin.NodeExecution{nodeExec1}
 			nodeExecList := &admin.NodeExecutionList{NodeExecutions: nodeExecutions}
 			inputs := map[string]*core.Literal{
-				"val1": &core.Literal{
+				"val1": {
 					Value: &core.Literal_Scalar{
 						Scalar: &core.Scalar{
 							Value: &core.Scalar_Primitive{
@@ -303,7 +301,7 @@ func TestGetExecutionFuncWithIOData(t *testing.T) {
 				},
 			}
 			outputs := map[string]*core.Literal{
-				"o2": &core.Literal{
+				"o2": {
 					Value: &core.Literal_Scalar{
 						Scalar: &core.Scalar{
 							Value: &core.Scalar_Primitive{

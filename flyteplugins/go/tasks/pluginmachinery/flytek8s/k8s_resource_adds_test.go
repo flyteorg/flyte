@@ -6,6 +6,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 	v12 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -18,8 +19,53 @@ import (
 
 func TestGetExecutionEnvVars(t *testing.T) {
 	mock := mockTaskExecutionIdentifier{}
-	envVars := GetExecutionEnvVars(mock)
-	assert.Len(t, envVars, 12)
+	tests := []struct {
+		name            string
+		expectedEnvVars int
+		consoleURL      string
+		expectedEnvVar  *v12.EnvVar
+	}{
+		{
+			"no-console-url",
+			12,
+			"",
+			nil,
+		},
+		{
+			"with-console-url",
+			13,
+			"scheme://host/path",
+			&v12.EnvVar{
+				Name:  "FLYTE_EXECUTION_URL",
+				Value: "scheme://host/path/projects/proj/domains/domain/executions/name/nodeId/unique-node-id/nodes",
+			},
+		},
+		{
+			"with-console-url-ending-in-single-slash",
+			13,
+			"scheme://host/path/",
+			&v12.EnvVar{
+				Name:  "FLYTE_EXECUTION_URL",
+				Value: "scheme://host/path/projects/proj/domains/domain/executions/name/nodeId/unique-node-id/nodes",
+			},
+		},
+		{
+			"with-console-url-ending-in-multiple-slashes",
+			13,
+			"scheme://host/path////",
+			&v12.EnvVar{
+				Name:  "FLYTE_EXECUTION_URL",
+				Value: "scheme://host/path/projects/proj/domains/domain/executions/name/nodeId/unique-node-id/nodes",
+			},
+		},
+	}
+	for _, tt := range tests {
+		envVars := GetExecutionEnvVars(mock, tt.consoleURL)
+		assert.Len(t, envVars, tt.expectedEnvVars)
+		if tt.expectedEnvVar != nil {
+			assert.True(t, proto.Equal(&envVars[4], tt.expectedEnvVar))
+		}
+	}
 }
 
 func TestGetTolerationsForResources(t *testing.T) {
@@ -257,7 +303,7 @@ func TestDecorateEnvVars(t *testing.T) {
 	defer os.Setenv("value", originalEnvVal)
 
 	expected := append(defaultEnv, GetContextEnvVars(ctx)...)
-	expected = append(expected, GetExecutionEnvVars(mockTaskExecutionIdentifier{})...)
+	expected = append(expected, GetExecutionEnvVars(mockTaskExecutionIdentifier{}, "")...)
 
 	aggregated := append(expected, v12.EnvVar{Name: "k", Value: "v"})
 	type args struct {
@@ -270,12 +316,13 @@ func TestDecorateEnvVars(t *testing.T) {
 		additionEnvVar        map[string]string
 		additionEnvVarFromEnv map[string]string
 		executionEnvVar       map[string]string
+		consoleURL            string
 		want                  []v12.EnvVar
 	}{
-		{"no-additional", args{envVars: defaultEnv, id: mockTaskExecutionIdentifier{}}, emptyEnvVar, emptyEnvVar, emptyEnvVar, expected},
-		{"with-additional", args{envVars: defaultEnv, id: mockTaskExecutionIdentifier{}}, additionalEnv, emptyEnvVar, emptyEnvVar, aggregated},
-		{"from-env", args{envVars: defaultEnv, id: mockTaskExecutionIdentifier{}}, emptyEnvVar, envVarsFromEnv, emptyEnvVar, aggregated},
-		{"from-execution-metadata", args{envVars: defaultEnv, id: mockTaskExecutionIdentifier{}}, emptyEnvVar, emptyEnvVar, additionalEnv, aggregated},
+		{"no-additional", args{envVars: defaultEnv, id: mockTaskExecutionIdentifier{}}, emptyEnvVar, emptyEnvVar, emptyEnvVar, "", expected},
+		{"with-additional", args{envVars: defaultEnv, id: mockTaskExecutionIdentifier{}}, additionalEnv, emptyEnvVar, emptyEnvVar, "", aggregated},
+		{"from-env", args{envVars: defaultEnv, id: mockTaskExecutionIdentifier{}}, emptyEnvVar, envVarsFromEnv, emptyEnvVar, "", aggregated},
+		{"from-execution-metadata", args{envVars: defaultEnv, id: mockTaskExecutionIdentifier{}}, emptyEnvVar, emptyEnvVar, additionalEnv, "", aggregated},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -283,7 +330,7 @@ func TestDecorateEnvVars(t *testing.T) {
 				DefaultEnvVars:        tt.additionEnvVar,
 				DefaultEnvVarsFromEnv: tt.additionEnvVarFromEnv,
 			}))
-			if got, _ := DecorateEnvVars(ctx, tt.args.envVars, tt.executionEnvVar, tt.args.id); !reflect.DeepEqual(got, tt.want) {
+			if got, _ := DecorateEnvVars(ctx, tt.args.envVars, nil, tt.executionEnvVar, tt.args.id, tt.consoleURL); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("DecorateEnvVars() = %v, want %v", got, tt.want)
 			}
 		})

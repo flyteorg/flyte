@@ -80,21 +80,16 @@ func compileFromPackage(packagePath string) error {
 		return err
 	}
 
+	var providers []common.InterfaceProvider
+	var compiledWorkflows = map[string]*core.CompiledWorkflowClosure{}
+
 	// compile workflows
-	for wfName, workflow := range workflows {
+	for _, workflow := range workflows {
+		providers, err = handleWorkflow(workflow, compiledTasks, compiledWorkflows, providers, plans, workflows)
 
-		fmt.Println("\nCompiling workflow:", wfName)
-		plan := plans[wfName]
-
-		_, err := compiler.CompileWorkflow(workflow.Template,
-			workflow.SubWorkflows,
-			compiledTasks,
-			[]common.InterfaceProvider{compiler.NewLaunchPlanInterfaceProvider(*plan)})
 		if err != nil {
-			fmt.Println(":( Error Compiling workflow:", wfName)
 			return err
 		}
-
 	}
 
 	fmt.Println("All Workflows compiled successfully!")
@@ -103,6 +98,65 @@ func compileFromPackage(packagePath string) error {
 	fmt.Println(len(tasks), " Tasks found in package")
 	fmt.Println(len(plans), " Launch plans found in package")
 	return nil
+}
+
+func handleWorkflow(
+	workflow *admin.WorkflowSpec,
+	compiledTasks []*core.CompiledTask,
+	compiledWorkflows map[string]*core.CompiledWorkflowClosure,
+	compiledLaunchPlanProviders []common.InterfaceProvider,
+	plans map[string]*admin.LaunchPlan,
+	workflows map[string]*admin.WorkflowSpec) ([]common.InterfaceProvider, error) {
+	reqs, _ := compiler.GetRequirements(workflow.Template, workflow.SubWorkflows)
+	wfName := workflow.Template.Id.Name
+
+	// Check if all the subworkflows referenced by launchplan are compiled
+	for i := range reqs.GetRequiredLaunchPlanIds() {
+		lpID := &reqs.GetRequiredLaunchPlanIds()[i]
+		lpWfName := plans[lpID.Name].Spec.WorkflowId.Name
+		missingWorkflow := workflows[lpWfName]
+		if compiledWorkflows[lpWfName] == nil {
+			// Recursively compile the missing workflow first
+			err := error(nil)
+			compiledLaunchPlanProviders, err = handleWorkflow(missingWorkflow, compiledTasks, compiledWorkflows, compiledLaunchPlanProviders, plans, workflows)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	fmt.Println("\nCompiling workflow:", wfName)
+
+	wf, err := compiler.CompileWorkflow(workflow.Template,
+		workflow.SubWorkflows,
+		compiledTasks,
+		compiledLaunchPlanProviders)
+
+	if err != nil {
+		fmt.Println(":( Error Compiling workflow:", wfName)
+		return nil, err
+	}
+	compiledWorkflows[wfName] = wf
+
+	// Update the expected inputs and outputs for the launchplans which reference this workflow
+	for _, plan := range plans {
+		if plan.Spec.WorkflowId.Name == wfName {
+			plan.Closure.ExpectedOutputs = wf.Primary.Template.Interface.Outputs
+			newMap := make(map[string]*core.Parameter)
+
+			for key, value := range wf.Primary.Template.Interface.Inputs.Variables {
+				newMap[key] = &core.Parameter{
+					Var: value,
+				}
+			}
+			plan.Closure.ExpectedInputs = &core.ParameterMap{
+				Parameters: newMap,
+			}
+			compiledLaunchPlanProviders = append(compiledLaunchPlanProviders, compiler.NewLaunchPlanInterfaceProvider(*plan))
+		}
+	}
+
+	return compiledLaunchPlanProviders, nil
 }
 
 const (
