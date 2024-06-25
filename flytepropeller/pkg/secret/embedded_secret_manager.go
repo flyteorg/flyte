@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
+	"slices"
 	"strings"
 	"unicode/utf8"
 
@@ -19,8 +20,18 @@ import (
 const (
 	UnionSecretEnvVarPrefix = "_UNION_"
 	// Static name of the volume used for mounting secrets with file mount requirement.
-	EmbeddedSecretsVolumeName = "embedded-secret-vol" // #nosec G101
-	EmbeddedSecretsMountPath  = "/etc/flyte/secrets"  // #nosec G101
+	EmbeddedSecretsFileMountVolumeName        = "embedded-secret-vol"  // #nosec G101
+	EmbeddedSecretsFileMountPath              = "/etc/flyte/secrets"   // #nosec G101
+	EmbeddedSecretsFileMountInitContainerName = "init-embedded-secret" // #nosec G101
+
+	// Name of the environment variable in the init container used for mounting secrets as files.
+	// This environment variable is used to pass secret names and values to the init container.
+	// The init container then reads its value and writes secrets to files.
+	// Format of this environment variable's value:
+	// 		secret_name1=base64_encoded_secret_value1
+	// 		secret_name2=base64_encoded_secret_value2
+	//		...
+	EmbeddedSecretsFileMountInitContainerEnvVariableName = "SECRETS" // #nosec G101
 
 	SecretFieldSeparator              = "__"
 	ValueFormatter                    = "%s"
@@ -197,9 +208,15 @@ func (i EmbeddedSecretManagerInjector) injectAsEnvVar(secretKey string, secretVa
 }
 
 func (i EmbeddedSecretManagerInjector) injectAsFile(secretKey string, secretValue []byte, pod *corev1.Pod) {
-	// A volume with a static name so that if we try to inject multiple secrets, we won't mount multiple volumes.
+	initContainer, exists := i.getOrAppendFileMountInitContainer(pod)
+	appendSecretToFileMountInitContainer(initContainer, secretKey, secretValue)
+
+	if exists {
+		return
+	}
+
 	volume := corev1.Volume{
-		Name: EmbeddedSecretsVolumeName,
+		Name: EmbeddedSecretsFileMountVolumeName,
 		VolumeSource: corev1.VolumeSource{
 			EmptyDir: &corev1.EmptyDirVolumeSource{
 				Medium: corev1.StorageMediumMemory,
@@ -208,46 +225,19 @@ func (i EmbeddedSecretManagerInjector) injectAsFile(secretKey string, secretValu
 	}
 	pod.Spec.Volumes = appendVolumeIfNotExists(pod.Spec.Volumes, volume)
 
-	secretFilePath := EmbeddedSecretsMountPath + "/" + secretKey
-	secretInitContainer := corev1.Container{
-		Name:  "init-embedded-secret-" + secretKey,
-		Image: i.cfg.FileMountInitContainer.Image,
-		Env: []corev1.EnvVar{
-			{
-				Name:  "SECRET_VALUE",
-				Value: base64.StdEncoding.EncodeToString(secretValue),
-			},
-		},
-		Command: []string{
-			"sh",
-			"-c",
-			fmt.Sprintf("printf \"%%s\" \"$SECRET_VALUE\" | base64 -d > \"%s\"", secretFilePath),
-		},
-		Resources: i.cfg.FileMountInitContainer.Resources,
-		VolumeMounts: []corev1.VolumeMount{
-			{
-				Name:      EmbeddedSecretsVolumeName,
-				ReadOnly:  false,
-				MountPath: EmbeddedSecretsMountPath,
-			},
-		},
-	}
-	pod.Spec.InitContainers = append(pod.Spec.InitContainers, secretInitContainer)
-
-	secretVolumeMount := corev1.VolumeMount{
-		Name:      EmbeddedSecretsVolumeName,
+	volumeMount := corev1.VolumeMount{
+		Name:      EmbeddedSecretsFileMountVolumeName,
 		ReadOnly:  true,
-		MountPath: EmbeddedSecretsMountPath,
+		MountPath: EmbeddedSecretsFileMountPath,
 	}
-	pod.Spec.InitContainers = AppendVolumeMounts(pod.Spec.InitContainers, secretVolumeMount)
-	pod.Spec.Containers = AppendVolumeMounts(pod.Spec.Containers, secretVolumeMount)
+	pod.Spec.InitContainers = AppendVolumeMounts(pod.Spec.InitContainers, volumeMount)
+	pod.Spec.Containers = AppendVolumeMounts(pod.Spec.Containers, volumeMount)
 
-	// Inject AWS secret-inject webhook annotations to mount the secret in a predictable location.
 	envVars := []corev1.EnvVar{
 		// Set environment variable to let the containers know where to find the mounted files.
 		{
 			Name:  SecretPathDefaultDirEnvVar,
-			Value: EmbeddedSecretsMountPath,
+			Value: EmbeddedSecretsFileMountPath,
 		},
 		// Sets an empty prefix to let the containers know the file names will match the secret keys as-is.
 		{
@@ -257,6 +247,71 @@ func (i EmbeddedSecretManagerInjector) injectAsFile(secretKey string, secretValu
 	}
 	pod.Spec.InitContainers = AppendEnvVars(pod.Spec.InitContainers, envVars...)
 	pod.Spec.Containers = AppendEnvVars(pod.Spec.Containers, envVars...)
+}
+
+func (i EmbeddedSecretManagerInjector) getOrAppendFileMountInitContainer(pod *corev1.Pod) (*corev1.Container, bool /*exists*/) {
+	index := slices.IndexFunc(
+		pod.Spec.InitContainers,
+		func(c corev1.Container) bool { return c.Name == EmbeddedSecretsFileMountInitContainerName })
+	if index != -1 {
+		return &pod.Spec.InitContainers[index], true
+	}
+
+	pod.Spec.InitContainers = append(pod.Spec.InitContainers, corev1.Container{
+		Name:  EmbeddedSecretsFileMountInitContainerName,
+		Image: i.cfg.FileMountInitContainer.Image,
+		Command: []string{
+			"sh",
+			"-c",
+			// Script below expects an environment variable EmbeddedSecretsFileMountInitContainerEnvVariableName
+			// with contents in the following format:
+			// 		secret_name1=base64_encoded_secret_value1
+			// 		secret_name2=base64_encoded_secret_value2
+			//		...
+			//
+			// It base64-decodes each secret value and writes it to a separate
+			// file in the EmbeddedSecretsFileMountPath directory.
+			fmt.Sprintf(`
+				printf "%%s" "$%s" \
+				| awk '/^.+=/ {
+					i = index($0, "=");
+					name = substr($0, 0, i - 1);
+					value = substr($0, i + 1);
+					output_file = "%s/" name;
+					print value | "base64 -d > " output_file;
+				}'
+				`,
+				EmbeddedSecretsFileMountInitContainerEnvVariableName,
+				EmbeddedSecretsFileMountPath),
+		},
+		Resources: i.cfg.FileMountInitContainer.Resources,
+		VolumeMounts: []corev1.VolumeMount{
+			{
+				Name:      EmbeddedSecretsFileMountVolumeName,
+				ReadOnly:  false,
+				MountPath: EmbeddedSecretsFileMountPath,
+			},
+		},
+	})
+
+	return &pod.Spec.InitContainers[len(pod.Spec.InitContainers)-1], false
+}
+
+func appendSecretToFileMountInitContainer(initContainer *corev1.Container, secretKey string, secretValue []byte) {
+	var envVar *corev1.EnvVar
+	index := slices.IndexFunc(
+		initContainer.Env,
+		func(env corev1.EnvVar) bool { return env.Name == EmbeddedSecretsFileMountInitContainerEnvVariableName })
+	if index != -1 {
+		envVar = &initContainer.Env[index]
+	} else {
+		initContainer.Env = append(initContainer.Env, corev1.EnvVar{
+			Name: EmbeddedSecretsFileMountInitContainerEnvVariableName,
+		})
+		envVar = &initContainer.Env[len(initContainer.Env)-1]
+	}
+
+	envVar.Value += fmt.Sprintf("%s=%s\n", secretKey, base64.StdEncoding.EncodeToString(secretValue))
 }
 
 func NewEmbeddedSecretManagerInjector(cfg config.EmbeddedSecretManagerConfig, secretFetcher SecretFetcher) SecretsInjector {

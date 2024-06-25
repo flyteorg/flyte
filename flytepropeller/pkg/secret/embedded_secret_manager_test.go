@@ -7,6 +7,7 @@ import (
 
 	"cloud.google.com/go/secretmanager/apiv1/secretmanagerpb"
 	"github.com/go-test/deep"
+	"github.com/samber/lo"
 	"github.com/stretchr/testify/assert"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -177,4 +178,58 @@ func TestEmbeddedSecretManagerInjector_Inject(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestEmbeddedSecretManagerInjector_InjectAsFile(t *testing.T) {
+	ctx = context.Background()
+
+	secret := &core.Secret{
+		Key:              "secret1",
+		MountRequirement: core.Secret_FILE,
+	}
+
+	pod := &corev1.Pod{
+		Spec: corev1.PodSpec{},
+		ObjectMeta: metav1.ObjectMeta{
+			Labels: map[string]string{
+				"organization": "organization",
+				"project":      "project",
+				"domain":       "domain",
+			},
+		},
+	}
+
+	injector := NewEmbeddedSecretManagerInjector(
+		config.EmbeddedSecretManagerConfig{},
+		secretFetcherMock{
+			Secrets: map[string]SecretValue{
+				"u__org__organization__domain__domain__project__project__key__secret1": {
+					BinaryValue: []byte("banana"),
+				},
+			},
+		})
+
+	pod, injected, err := injector.Inject(ctx, secret, pod)
+	assert.NoError(t, err)
+	assert.True(t, injected)
+	assert.Len(t, pod.Spec.InitContainers, 1)
+
+	env, found := lo.Find(
+		pod.Spec.InitContainers[0].Env,
+		func(env corev1.EnvVar) bool { return env.Name == "SECRETS" })
+	assert.True(t, found)
+	assert.Equal(t, "secret1=YmFuYW5h\n", env.Value)
+}
+
+type secretFetcherMock struct {
+	Secrets map[string]SecretValue
+}
+
+func (f secretFetcherMock) GetSecretValue(ctx context.Context, secretID string) (*SecretValue, error) {
+	v, ok := f.Secrets[secretID]
+	if !ok {
+		return nil, fmt.Errorf("secret %q not found", secretID)
+	}
+
+	return &v, nil
 }
