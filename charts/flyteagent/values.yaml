@@ -21,7 +21,7 @@ agentSecret:
 replicaCount: 1
 image:
   # -- Docker image for flyteagent deployment
-  repository: ghcr.io/flyteorg/flyteagent
+  repository: cr.flyte.org/flyteorg/flyteagent  # FLYTEAGENT_IMAGE
   # -- Docker image tag
   tag: 1.12.1-rc0  # FLYTEAGENT_TAG
   # -- Docker image pull policy
