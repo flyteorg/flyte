@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/samber/lo"
 	"google.golang.org/grpc"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -25,6 +26,8 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils/secrets"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/errorcollector"
 	podplugin "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/pod"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/transformers/k8s"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 
@@ -182,8 +185,10 @@ func (p *Plugin) createExecutionEnv(ctx context.Context, tCtx core.TaskExecution
 }
 
 func (p *Plugin) addObjectMetadata(ctx context.Context, tCtx core.TaskExecutionContext, spec *v1.PodTemplateSpec, cfg *config.K8sPluginConfig) error {
-	annotations := make(map[string]string)
-	labels := make(map[string]string)
+	annotations := tCtx.TaskExecutionMetadata().GetAnnotations()
+	// Omit some execution specific labels that don't make sense for a reusable env
+	labels := lo.OmitByKeys(tCtx.TaskExecutionMetadata().GetLabels(), []string{
+		k8s.ExecutionIDLabel, k8s.WorkflowNameLabel, nodes.NodeIDLabel, nodes.TaskNameLabel})
 
 	tmpl, err := tCtx.TaskReader().Read(ctx)
 	if err != nil {

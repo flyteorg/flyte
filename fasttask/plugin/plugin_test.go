@@ -320,6 +320,12 @@ func TestAddObjectMetadata(t *testing.T) {
 
 	taskMetadata := &coremocks.TaskExecutionMetadata{}
 	taskMetadata.OnGetNamespace().Return("test-namespace")
+	taskMetadata.OnGetAnnotations().Return(map[string]string{
+		"metadataAnnotation": "metadataAnnotation",
+	})
+	taskMetadata.OnGetLabels().Return(map[string]string{
+		"metadataLabel": "metadataLabel",
+	})
 
 	taskReader := &coremocks.TaskReader{}
 	taskReader.OnRead(ctx).Return(&idlcore.TaskTemplate{
@@ -352,12 +358,14 @@ func TestAddObjectMetadata(t *testing.T) {
 
 	assert.Nil(t, err)
 	assert.Equal(t, map[string]string{
-		"defaultAnnotation": "defaultAnnotation",
-		"flyte.secrets/s0":  "m4zg54lqhiqce2lzl4txe22voarau12fpe4caitnpfpwwzlzeifg122vnz1f53tfof1ws3tfnvsw34b1ebcu3vs6kzavecq",
+		"defaultAnnotation":  "defaultAnnotation",
+		"metadataAnnotation": "metadataAnnotation",
+		"flyte.secrets/s0":   "m4zg54lqhiqce2lzl4txe22voarau12fpe4caitnpfpwwzlzeifg122vnz1f53tfof1ws3tfnvsw34b1ebcu3vs6kzavecq",
 	}, spec.GetAnnotations())
 	assert.Equal(t, map[string]string{
 		secrets.PodLabel: secrets.PodLabelValue,
 		"defaultLabel":   "defaultLabel",
+		"metadataLabel":  "metadataLabel",
 	}, spec.GetLabels())
 	assert.Equal(t, "test-namespace", spec.GetNamespace())
 	assert.Len(t, spec.GetOwnerReferences(), 0)
