@@ -19,7 +19,7 @@ A Helm chart for Flyte agent
 | extraArgs | object | `{}` | Appends extra command line arguments to the main command |
 | fullnameOverride | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
-| image.repository | string | `"ghcr.io/flyteorg/flyteagent"` | Docker image for flyteagent deployment |
+| image.repository | string | `"cr.flyte.org/flyteorg/flyteagent"` | Docker image for flyteagent deployment |
 | image.tag | string | `"1.12.1-rc0"` | Docker image tag |
 | nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` | nodeSelector for flyteagent deployment |

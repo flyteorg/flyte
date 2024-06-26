@@ -816,7 +816,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: eHMzc0p4bTZoSVVFb1V0Uw==
+  haSharedSecret: VjExSVFQMEI0ZEdwa0ZJeQ==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1133,7 +1133,8 @@ metadata:
   namespace: flyte
 spec:
   ports:
-  - name: agent-grpc
+  - appProtocol: TCP
+    name: agent-grpc
     port: 8000
     protocol: TCP
     targetPort: agent-grpc
@@ -1412,7 +1413,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 174761d8b2609550a723b808cf0807c0b29cd4d3e1050ee85178a46fbca1a61c
+        checksum/secret: 155e94ff7a4e4352b9092cc5e932d8a8e96b7d9701e4605b3383274c573fc8bf
       labels:
         app: docker-registry
         release: flyte-sandbox
@@ -1755,7 +1756,7 @@ spec:
           value: minio
         - name: FLYTE_AWS_SECRET_ACCESS_KEY
           value: miniostorage
-        image: ghcr.io/flyteorg/flyteagent:1.12.1-rc0
+        image: cr.flyte.org/flyteorg/flyteagent:1.12.1-rc0
         imagePullPolicy: IfNotPresent
         name: flyteagent
         ports:

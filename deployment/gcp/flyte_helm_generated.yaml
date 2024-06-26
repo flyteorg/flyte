@@ -798,17 +798,22 @@ spec:
     - name: http
       port: 80
       protocol: TCP
+      appProtocol: TCP
       targetPort: 8088
     - name: grpc
       port: 81
       protocol: TCP
+      # intentionally set to TCP instead of grpc
+      appProtocol: TCP
       targetPort: 8089
     - name: redoc
       protocol: TCP
+      appProtocol: TCP
       port: 87
       targetPort: 8087
     - name: http-metrics
       protocol: TCP
+      appProtocol: TCP
       port: 10254
   selector: 
     app.kubernetes.io/name: flyteadmin
@@ -831,6 +836,7 @@ spec:
   - name: http
     port: 80
     protocol: TCP
+    appProtocol: TCP
     targetPort: 8080
   selector: 
     app.kubernetes.io/name: flyteconsole
@@ -1099,6 +1105,8 @@ spec:
     metadata:
       annotations:
         configChecksum: "dc18f5d54e0770c574e6b0693724047e22063030259104eebb554398d63209f"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "10254"
       labels: 
         app.kubernetes.io/name: flyteclusterresourcesync
         app.kubernetes.io/instance: flyte
@@ -1423,6 +1431,8 @@ spec:
     metadata:
       annotations:
         configChecksum: "2a962c9fcb8a58e835ea829883300ae11e9124b9972c5e1fe29e1cc283dd2f9"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "10254"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -1504,6 +1514,8 @@ spec:
         app.kubernetes.io/version: v1.12.1-rc0
       annotations:
         configChecksum: "2a962c9fcb8a58e835ea829883300ae11e9124b9972c5e1fe29e1cc283dd2f9"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "10254"
     spec:
       securityContext: 
         fsGroup: 65534
@@ -1595,6 +1607,7 @@ metadata:
     cert-manager.io/issuer: letsencrypt-production
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/app-root: /console
+    nginx.ingress.kubernetes.io/service-upstream: "true"
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
 spec:
   ingressClassName: 
@@ -1756,6 +1769,7 @@ metadata:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/app-root: /console
     nginx.ingress.kubernetes.io/backend-protocol: GRPC
+    nginx.ingress.kubernetes.io/service-upstream: "true"
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
 spec:
   ingressClassName: 
