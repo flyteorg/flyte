@@ -32,7 +32,7 @@ Select the integration you need and follow the steps to install the correspondin
     To enable gang scheduling for the ``training-operator``:
 
     a. Select a second scheduler from 
-    `Kubernetes scheduler plugins with co-scheduling <https://www.kubeflow.org/docs/components/training/job-scheduling/#running-jobs-with-gang-scheduling>`__
+    `Kubernetes scheduler plugins with co-scheduling <https://www.kubeflow.org/docs/components/training/user-guides/job-scheduling/#scheduler-plugins-with-coscheduling>`__
     or `Apache YuniKorn <https://yunikorn.apache.org/docs/next/user_guide/workloads/run_tf/>`__ .
 
     b. Configure a Flyte ``PodTemplate`` to use the gang scheduler for your Tasks:
