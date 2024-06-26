@@ -614,7 +614,7 @@ Specify plugin configuration
                           spark: spark
                 cluster_resource_manager:
                   enabled: true 
-                  standalone_deploy: false
+                  standaloneDeployment: false
                   # -- Resource templates that should be applied
                   templates:
                     # -- Template for namespaces resources
@@ -726,7 +726,7 @@ Specify plugin configuration
                             spark: spark 
                     cluster_resource_manager:
                       enabled: true
-                      standalone_deploy: false
+                      standaloneDeployment: false
                       config:
                         cluster_resources:
                           customData:
