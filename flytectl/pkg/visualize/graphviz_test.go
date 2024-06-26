@@ -1,18 +1,17 @@
 package visualize
 
 import (
-	"bytes"
 	"fmt"
 	"io/ioutil"
 	"testing"
 
 	graphviz "github.com/awalterschulze/gographviz"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+
 	"github.com/flyteorg/flyte/flytectl/pkg/visualize/mocks"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/utils"
-	"github.com/golang/protobuf/jsonpb"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
 
 func TestRenderWorkflowBranch(t *testing.T) {
@@ -24,10 +23,8 @@ func TestRenderWorkflowBranch(t *testing.T) {
 			r, err := ioutil.ReadFile(fmt.Sprintf("testdata/%s.json", s))
 			assert.NoError(t, err)
 
-			i := bytes.NewReader(r)
-
 			c := &core.CompiledWorkflowClosure{}
-			err = jsonpb.Unmarshal(i, c)
+			err = utils.UnmarshalBytesToPb(r, c)
 			assert.NoError(t, err)
 			b, err := RenderWorkflow(c)
 			fmt.Println(b)

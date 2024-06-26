@@ -377,7 +377,8 @@ func MakeLiteralForSimpleType(t core.SimpleType, s string) (*core.Literal, error
 	switch t {
 	case core.SimpleType_STRUCT:
 		st := &structpb.Struct{}
-		err := jsonpb.UnmarshalString(s, st)
+		unmarshaler := jsonpb.Unmarshaler{AllowUnknownFields: true}
+		err := unmarshaler.Unmarshal(strings.NewReader(s), st)
 		if err != nil {
 			return nil, errors.Wrapf(err, "failed to load generic type as json.")
 		}

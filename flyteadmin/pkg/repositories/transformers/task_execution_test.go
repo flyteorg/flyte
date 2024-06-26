@@ -22,6 +22,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 var taskEventOccurredAt = time.Now().UTC()
@@ -63,7 +64,7 @@ func transformMapToStructPB(t *testing.T, thing map[string]string) *structpb.Str
 	}
 
 	thingAsCustom := &structpb.Struct{}
-	if err := jsonpb.UnmarshalString(string(b), thingAsCustom); err != nil {
+	if err := utils.UnmarshalBytesToPb(b, thingAsCustom); err != nil {
 		t.Fatal(t, err)
 	}
 	return thingAsCustom
