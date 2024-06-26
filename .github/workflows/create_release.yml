@@ -109,7 +109,7 @@ jobs:
           if [ ${{ matrix.component }} = "flytecopilot" ]; then
              echo ::set-output name=version::$(yq eval '.configmap.copilot.plugins.k8s.co-pilot.image' charts/flyte-core/values.yaml | cut -d ":" -f 2 )
           elif [ ${{ matrix.component }} = "flyteagent" ]; then
-             echo ::set-output name=version::$(yq eval '.${{ matrix.component }}.image.tag' charts/flyteagent/values.yaml)
+             echo ::set-output name=version::$(yq eval '.image.tag' charts/flyteagent/values.yaml)
           else
              echo ::set-output name=version::$(yq eval '.${{ matrix.component }}.image.tag' charts/flyte-core/values.yaml)
           fi
