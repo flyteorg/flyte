@@ -3,6 +3,7 @@ package secret
 import (
 	"context"
 	"fmt"
+	"strings"
 	"testing"
 
 	"cloud.google.com/go/secretmanager/apiv1/secretmanagerpb"
@@ -230,6 +231,130 @@ func TestEmbeddedSecretManagerInjector_InjectAsFile(t *testing.T) {
 	assert.Equal(t, "secret1=YmFuYW5h\n", env.Value)
 }
 
+func TestEmbeddedSecretManagerInjector_InjectSecretScopedToOrganization(t *testing.T) {
+	ctx = context.Background()
+	secret := &core.Secret{Key: "secret1"}
+	pod := &corev1.Pod{
+		Spec: corev1.PodSpec{
+			Containers: []corev1.Container{
+				{},
+			},
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Labels: map[string]string{
+				"organization": "o-apple",
+				"domain":       "d-cherry",
+				"project":      "p-banana",
+			},
+		},
+	}
+
+	injector := NewEmbeddedSecretManagerInjector(
+		config.EmbeddedSecretManagerConfig{},
+		secretFetcherMock{
+			Secrets: map[string]SecretValue{
+				"u__org__o-apple__domain____project____key__secret1": {
+					StringValue: "fruits",
+				},
+			},
+		})
+
+	pod, injected, err := injector.Inject(ctx, secret, pod)
+	assert.NoError(t, err)
+	assert.True(t, injected)
+	assert.True(t, podHasSecretInjected(pod, "secret1", "fruits"))
+}
+
+func TestEmbeddedSecretManagerInjector_InjectSecretScopedToDomain(t *testing.T) {
+	ctx = context.Background()
+	secret := &core.Secret{Key: "secret1"}
+	pod := &corev1.Pod{
+		Spec: corev1.PodSpec{
+			Containers: []corev1.Container{
+				{},
+			},
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Labels: map[string]string{
+				"organization": "o-apple",
+				"domain":       "d-cherry",
+				"project":      "p-banana",
+			},
+		},
+	}
+
+	injector := NewEmbeddedSecretManagerInjector(
+		config.EmbeddedSecretManagerConfig{},
+		secretFetcherMock{
+			Secrets: map[string]SecretValue{
+				"u__org__o-apple__domain____project____key__secret1": {
+					StringValue: "fruits @ org",
+				},
+				"u__org__o-apple__domain__d-cherry__project____key__secret1": {
+					StringValue: "fruits @ domain",
+				},
+			},
+		})
+
+	pod, injected, err := injector.Inject(ctx, secret, pod)
+	assert.NoError(t, err)
+	assert.True(t, injected)
+	assert.True(t, podHasSecretInjected(pod, "secret1", "fruits @ domain"))
+}
+
+func TestEmbeddedSecretManagerInjector_InjectSecretScopedToProject(t *testing.T) {
+	ctx = context.Background()
+	secret := &core.Secret{Key: "secret1"}
+	pod := &corev1.Pod{
+		Spec: corev1.PodSpec{
+			Containers: []corev1.Container{
+				{},
+			},
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Labels: map[string]string{
+				"organization": "o-apple",
+				"domain":       "d-cherry",
+				"project":      "p-banana",
+			},
+		},
+	}
+
+	injector := NewEmbeddedSecretManagerInjector(
+		config.EmbeddedSecretManagerConfig{},
+		secretFetcherMock{
+			Secrets: map[string]SecretValue{
+				"u__org__o-apple__domain____project____key__secret1": {
+					StringValue: "fruits @ org",
+				},
+				"u__org__o-apple__domain__d-cherry__project____key__secret1": {
+					StringValue: "fruits @ domain",
+				},
+				"u__org__o-apple__domain__d-cherry__project__p-banana__key__secret1": {
+					StringValue: "fruits @ project",
+				},
+			},
+		})
+
+	pod, injected, err := injector.Inject(ctx, secret, pod)
+	assert.NoError(t, err)
+	assert.True(t, injected)
+	assert.True(t, podHasSecretInjected(pod, "secret1", "fruits @ project"))
+}
+
+func podHasSecretInjected(pod *corev1.Pod, secretKey string, secretValue string) bool {
+	return lo.EveryBy(pod.Spec.Containers, func(container corev1.Container) bool {
+		hasValueEnvVar := lo.ContainsBy(container.Env, func(env corev1.EnvVar) bool {
+			return env.Name == ("_UNION_"+strings.ToUpper(secretKey)) &&
+				env.Value == secretValue
+		})
+		hasPrefixEnvVar := lo.ContainsBy(container.Env, func(env corev1.EnvVar) bool {
+			return env.Name == "FLYTE_SECRETS_ENV_PREFIX" && env.Value == "_UNION_"
+		})
+		return hasValueEnvVar && hasPrefixEnvVar
+	})
+}
+
 type secretFetcherMock struct {
 	Secrets map[string]SecretValue
 }
@@ -237,7 +362,7 @@ type secretFetcherMock struct {
 func (f secretFetcherMock) GetSecretValue(ctx context.Context, secretID string) (*SecretValue, error) {
 	v, ok := f.Secrets[secretID]
 	if !ok {
-		return nil, fmt.Errorf("secret %q not found", secretID)
+		return nil, stdlibErrors.Errorf(ErrCodeSecretNotFound, "secret %q not found", secretID)
 	}
 
 	return &v, nil
