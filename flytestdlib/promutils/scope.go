@@ -138,7 +138,7 @@ func (s Timer) Stop() float64 {
 		s.timer.Observe(0)
 		return 0
 	}
-	scaled := float64(observed / outputScaleDuration)
+	scaled := float64(observed) / float64(outputScaleDuration)
 	s.timer.Observe(scaled)
 	return scaled
 }

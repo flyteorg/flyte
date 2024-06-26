@@ -343,7 +343,7 @@ func TestNewAuthInterceptorAndMaterialize(t *testing.T) {
 			AuthType:              AuthTypeClientSecret,
 			TokenURL:              fmt.Sprintf("http://localhost:%d/oauth2/token", httpPort),
 			Scopes:                []string{"all"},
-			Audience:              "http://localhost:30081",
+			Audience:              fmt.Sprintf("http://localhost:%d", httpPort),
 			AuthorizationHeader:   "authorization",
 		}
 
