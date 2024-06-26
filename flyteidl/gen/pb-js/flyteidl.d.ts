@@ -4513,6 +4513,9 @@ export namespace flyteidl {
 
             /** ArrayNode minSuccessRatio */
             minSuccessRatio?: (number|null);
+
+            /** ArrayNode executionVersion */
+            executionVersion?: (number|null);
         }
 
         /** Represents an ArrayNode. */
@@ -4535,6 +4538,9 @@ export namespace flyteidl {
 
             /** ArrayNode minSuccessRatio. */
             public minSuccessRatio: number;
+
+            /** ArrayNode executionVersion. */
+            public executionVersion: number;
 
             /** ArrayNode parallelismOption. */
             public parallelismOption?: "parallelism";

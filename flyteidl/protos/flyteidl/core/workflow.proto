@@ -134,6 +134,9 @@ message ArrayNode {
         // to determine when an ArrayNode can be marked successful.
         float min_success_ratio = 4;
     }
+
+    // execution_version determines the sub-node state store
+    uint32 execution_version = 5;
 }
 
 // Defines extra information about the Node.

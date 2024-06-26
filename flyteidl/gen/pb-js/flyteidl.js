@@ -10811,6 +10811,7 @@
                  * @property {number|null} [parallelism] ArrayNode parallelism
                  * @property {number|null} [minSuccesses] ArrayNode minSuccesses
                  * @property {number|null} [minSuccessRatio] ArrayNode minSuccessRatio
+                 * @property {number|null} [executionVersion] ArrayNode executionVersion
                  */
     
                 /**
@@ -10859,6 +10860,14 @@
                  * @instance
                  */
                 ArrayNode.prototype.minSuccessRatio = 0;
+    
+                /**
+                 * ArrayNode executionVersion.
+                 * @member {number} executionVersion
+                 * @memberof flyteidl.core.ArrayNode
+                 * @instance
+                 */
+                ArrayNode.prototype.executionVersion = 0;
     
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
@@ -10917,6 +10926,8 @@
                         writer.uint32(/* id 3, wireType 0 =*/24).uint32(message.minSuccesses);
                     if (message.minSuccessRatio != null && message.hasOwnProperty("minSuccessRatio"))
                         writer.uint32(/* id 4, wireType 5 =*/37).float(message.minSuccessRatio);
+                    if (message.executionVersion != null && message.hasOwnProperty("executionVersion"))
+                        writer.uint32(/* id 5, wireType 0 =*/40).uint32(message.executionVersion);
                     return writer;
                 };
     
@@ -10949,6 +10960,9 @@
                             break;
                         case 4:
                             message.minSuccessRatio = reader.float();
+                            break;
+                        case 5:
+                            message.executionVersion = reader.uint32();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -10992,6 +11006,9 @@
                         if (typeof message.minSuccessRatio !== "number")
                             return "minSuccessRatio: number expected";
                     }
+                    if (message.executionVersion != null && message.hasOwnProperty("executionVersion"))
+                        if (!$util.isInteger(message.executionVersion))
+                            return "executionVersion: integer expected";
                     return null;
                 };
     

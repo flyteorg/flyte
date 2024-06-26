@@ -91,16 +91,18 @@ class GateNode(_message.Message):
     def __init__(self, approve: _Optional[_Union[ApproveCondition, _Mapping]] = ..., signal: _Optional[_Union[SignalCondition, _Mapping]] = ..., sleep: _Optional[_Union[SleepCondition, _Mapping]] = ...) -> None: ...
 
 class ArrayNode(_message.Message):
-    __slots__ = ["node", "parallelism", "min_successes", "min_success_ratio"]
+    __slots__ = ["node", "parallelism", "min_successes", "min_success_ratio", "execution_version"]
     NODE_FIELD_NUMBER: _ClassVar[int]
     PARALLELISM_FIELD_NUMBER: _ClassVar[int]
     MIN_SUCCESSES_FIELD_NUMBER: _ClassVar[int]
     MIN_SUCCESS_RATIO_FIELD_NUMBER: _ClassVar[int]
+    EXECUTION_VERSION_FIELD_NUMBER: _ClassVar[int]
     node: Node
     parallelism: int
     min_successes: int
     min_success_ratio: float
-    def __init__(self, node: _Optional[_Union[Node, _Mapping]] = ..., parallelism: _Optional[int] = ..., min_successes: _Optional[int] = ..., min_success_ratio: _Optional[float] = ...) -> None: ...
+    execution_version: int
+    def __init__(self, node: _Optional[_Union[Node, _Mapping]] = ..., parallelism: _Optional[int] = ..., min_successes: _Optional[int] = ..., min_success_ratio: _Optional[float] = ..., execution_version: _Optional[int] = ...) -> None: ...
 
 class NodeMetadata(_message.Message):
     __slots__ = ["name", "timeout", "retries", "interruptible", "cacheable", "cache_version", "cache_serializable"]
