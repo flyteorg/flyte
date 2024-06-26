@@ -79,7 +79,7 @@ spec:
         - pyflyte
         - serve
         - agent
-        image: "cr.flyte.org/flyteorg/flyteagent:1.12.1-rc0"
+        image: "cr.flyte.org/flyteorg/flyteagent:1.12.3"
         imagePullPolicy: "IfNotPresent"
         name: flyteagent
         volumeMounts:
