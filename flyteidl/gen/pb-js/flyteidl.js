@@ -17180,6 +17180,174 @@
                 return Secret;
             })();
     
+            core.Connection = (function() {
+    
+                /**
+                 * Properties of a Connection.
+                 * @memberof flyteidl.core
+                 * @interface IConnection
+                 * @property {string|null} [taskType] Connection taskType
+                 * @property {Object.<string,string>|null} [secrets] Connection secrets
+                 * @property {Object.<string,string>|null} [configs] Connection configs
+                 */
+    
+                /**
+                 * Constructs a new Connection.
+                 * @memberof flyteidl.core
+                 * @classdesc Represents a Connection.
+                 * @implements IConnection
+                 * @constructor
+                 * @param {flyteidl.core.IConnection=} [properties] Properties to set
+                 */
+                function Connection(properties) {
+                    this.secrets = {};
+                    this.configs = {};
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * Connection taskType.
+                 * @member {string} taskType
+                 * @memberof flyteidl.core.Connection
+                 * @instance
+                 */
+                Connection.prototype.taskType = "";
+    
+                /**
+                 * Connection secrets.
+                 * @member {Object.<string,string>} secrets
+                 * @memberof flyteidl.core.Connection
+                 * @instance
+                 */
+                Connection.prototype.secrets = $util.emptyObject;
+    
+                /**
+                 * Connection configs.
+                 * @member {Object.<string,string>} configs
+                 * @memberof flyteidl.core.Connection
+                 * @instance
+                 */
+                Connection.prototype.configs = $util.emptyObject;
+    
+                /**
+                 * Creates a new Connection instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.core.Connection
+                 * @static
+                 * @param {flyteidl.core.IConnection=} [properties] Properties to set
+                 * @returns {flyteidl.core.Connection} Connection instance
+                 */
+                Connection.create = function create(properties) {
+                    return new Connection(properties);
+                };
+    
+                /**
+                 * Encodes the specified Connection message. Does not implicitly {@link flyteidl.core.Connection.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.core.Connection
+                 * @static
+                 * @param {flyteidl.core.IConnection} message Connection message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                Connection.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.taskType != null && message.hasOwnProperty("taskType"))
+                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.taskType);
+                    if (message.secrets != null && message.hasOwnProperty("secrets"))
+                        for (var keys = Object.keys(message.secrets), i = 0; i < keys.length; ++i)
+                            writer.uint32(/* id 2, wireType 2 =*/18).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]).uint32(/* id 2, wireType 2 =*/18).string(message.secrets[keys[i]]).ldelim();
+                    if (message.configs != null && message.hasOwnProperty("configs"))
+                        for (var keys = Object.keys(message.configs), i = 0; i < keys.length; ++i)
+                            writer.uint32(/* id 3, wireType 2 =*/26).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]).uint32(/* id 2, wireType 2 =*/18).string(message.configs[keys[i]]).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a Connection message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.core.Connection
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.core.Connection} Connection
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                Connection.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.Connection(), key;
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.taskType = reader.string();
+                            break;
+                        case 2:
+                            reader.skip().pos++;
+                            if (message.secrets === $util.emptyObject)
+                                message.secrets = {};
+                            key = reader.string();
+                            reader.pos++;
+                            message.secrets[key] = reader.string();
+                            break;
+                        case 3:
+                            reader.skip().pos++;
+                            if (message.configs === $util.emptyObject)
+                                message.configs = {};
+                            key = reader.string();
+                            reader.pos++;
+                            message.configs[key] = reader.string();
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a Connection message.
+                 * @function verify
+                 * @memberof flyteidl.core.Connection
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                Connection.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.taskType != null && message.hasOwnProperty("taskType"))
+                        if (!$util.isString(message.taskType))
+                            return "taskType: string expected";
+                    if (message.secrets != null && message.hasOwnProperty("secrets")) {
+                        if (!$util.isObject(message.secrets))
+                            return "secrets: object expected";
+                        var key = Object.keys(message.secrets);
+                        for (var i = 0; i < key.length; ++i)
+                            if (!$util.isString(message.secrets[key[i]]))
+                                return "secrets: string{k:string} expected";
+                    }
+                    if (message.configs != null && message.hasOwnProperty("configs")) {
+                        if (!$util.isObject(message.configs))
+                            return "configs: object expected";
+                        var key = Object.keys(message.configs);
+                        for (var i = 0; i < key.length; ++i)
+                            if (!$util.isString(message.configs[key[i]]))
+                                return "configs: string{k:string} expected";
+                    }
+                    return null;
+                };
+    
+                return Connection;
+            })();
+    
             core.OAuth2Client = (function() {
     
                 /**
@@ -17677,6 +17845,7 @@
                  * @property {flyteidl.core.IIdentity|null} [runAs] SecurityContext runAs
                  * @property {Array.<flyteidl.core.ISecret>|null} [secrets] SecurityContext secrets
                  * @property {Array.<flyteidl.core.IOAuth2TokenRequest>|null} [tokens] SecurityContext tokens
+                 * @property {string|null} [connectionRef] SecurityContext connectionRef
                  */
     
                 /**
@@ -17721,6 +17890,14 @@
                 SecurityContext.prototype.tokens = $util.emptyArray;
     
                 /**
+                 * SecurityContext connectionRef.
+                 * @member {string} connectionRef
+                 * @memberof flyteidl.core.SecurityContext
+                 * @instance
+                 */
+                SecurityContext.prototype.connectionRef = "";
+    
+                /**
                  * Creates a new SecurityContext instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.core.SecurityContext
@@ -17752,6 +17929,8 @@
                     if (message.tokens != null && message.tokens.length)
                         for (var i = 0; i < message.tokens.length; ++i)
                             $root.flyteidl.core.OAuth2TokenRequest.encode(message.tokens[i], writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                    if (message.connectionRef != null && message.hasOwnProperty("connectionRef"))
+                        writer.uint32(/* id 4, wireType 2 =*/34).string(message.connectionRef);
                     return writer;
                 };
     
@@ -17785,6 +17964,9 @@
                             if (!(message.tokens && message.tokens.length))
                                 message.tokens = [];
                             message.tokens.push($root.flyteidl.core.OAuth2TokenRequest.decode(reader, reader.uint32()));
+                            break;
+                        case 4:
+                            message.connectionRef = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -17828,6 +18010,9 @@
                                 return "tokens." + error;
                         }
                     }
+                    if (message.connectionRef != null && message.hasOwnProperty("connectionRef"))
+                        if (!$util.isString(message.connectionRef))
+                            return "connectionRef: string expected";
                     return null;
                 };
     
@@ -23145,6 +23330,7 @@
                  * @property {flyteidl.core.ITaskTemplate|null} [template] CreateTaskRequest template
                  * @property {string|null} [outputPrefix] CreateTaskRequest outputPrefix
                  * @property {flyteidl.admin.ITaskExecutionMetadata|null} [taskExecutionMetadata] CreateTaskRequest taskExecutionMetadata
+                 * @property {flyteidl.core.IConnection|null} [connection] CreateTaskRequest connection
                  */
     
                 /**
@@ -23195,6 +23381,14 @@
                 CreateTaskRequest.prototype.taskExecutionMetadata = null;
     
                 /**
+                 * CreateTaskRequest connection.
+                 * @member {flyteidl.core.IConnection|null|undefined} connection
+                 * @memberof flyteidl.admin.CreateTaskRequest
+                 * @instance
+                 */
+                CreateTaskRequest.prototype.connection = null;
+    
+                /**
                  * Creates a new CreateTaskRequest instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.CreateTaskRequest
@@ -23226,6 +23420,8 @@
                         writer.uint32(/* id 3, wireType 2 =*/26).string(message.outputPrefix);
                     if (message.taskExecutionMetadata != null && message.hasOwnProperty("taskExecutionMetadata"))
                         $root.flyteidl.admin.TaskExecutionMetadata.encode(message.taskExecutionMetadata, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+                    if (message.connection != null && message.hasOwnProperty("connection"))
+                        $root.flyteidl.core.Connection.encode(message.connection, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
                     return writer;
                 };
     
@@ -23258,6 +23454,9 @@
                             break;
                         case 4:
                             message.taskExecutionMetadata = $root.flyteidl.admin.TaskExecutionMetadata.decode(reader, reader.uint32());
+                            break;
+                        case 5:
+                            message.connection = $root.flyteidl.core.Connection.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -23295,6 +23494,11 @@
                         var error = $root.flyteidl.admin.TaskExecutionMetadata.verify(message.taskExecutionMetadata);
                         if (error)
                             return "taskExecutionMetadata." + error;
+                    }
+                    if (message.connection != null && message.hasOwnProperty("connection")) {
+                        var error = $root.flyteidl.core.Connection.verify(message.connection);
+                        if (error)
+                            return "connection." + error;
                     }
                     return null;
                 };
@@ -23422,6 +23626,7 @@
                  * @property {string|null} [outputPrefix] CreateRequestHeader outputPrefix
                  * @property {flyteidl.admin.ITaskExecutionMetadata|null} [taskExecutionMetadata] CreateRequestHeader taskExecutionMetadata
                  * @property {Long|null} [maxDatasetSizeBytes] CreateRequestHeader maxDatasetSizeBytes
+                 * @property {flyteidl.core.IConnection|null} [connection] CreateRequestHeader connection
                  */
     
                 /**
@@ -23472,6 +23677,14 @@
                 CreateRequestHeader.prototype.maxDatasetSizeBytes = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
     
                 /**
+                 * CreateRequestHeader connection.
+                 * @member {flyteidl.core.IConnection|null|undefined} connection
+                 * @memberof flyteidl.admin.CreateRequestHeader
+                 * @instance
+                 */
+                CreateRequestHeader.prototype.connection = null;
+    
+                /**
                  * Creates a new CreateRequestHeader instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.CreateRequestHeader
@@ -23503,6 +23716,8 @@
                         $root.flyteidl.admin.TaskExecutionMetadata.encode(message.taskExecutionMetadata, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
                     if (message.maxDatasetSizeBytes != null && message.hasOwnProperty("maxDatasetSizeBytes"))
                         writer.uint32(/* id 4, wireType 0 =*/32).int64(message.maxDatasetSizeBytes);
+                    if (message.connection != null && message.hasOwnProperty("connection"))
+                        $root.flyteidl.core.Connection.encode(message.connection, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
                     return writer;
                 };
     
@@ -23535,6 +23750,9 @@
                             break;
                         case 4:
                             message.maxDatasetSizeBytes = reader.int64();
+                            break;
+                        case 5:
+                            message.connection = $root.flyteidl.core.Connection.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -23571,6 +23789,11 @@
                     if (message.maxDatasetSizeBytes != null && message.hasOwnProperty("maxDatasetSizeBytes"))
                         if (!$util.isInteger(message.maxDatasetSizeBytes) && !(message.maxDatasetSizeBytes && $util.isInteger(message.maxDatasetSizeBytes.low) && $util.isInteger(message.maxDatasetSizeBytes.high)))
                             return "maxDatasetSizeBytes: integer|Long expected";
+                    if (message.connection != null && message.hasOwnProperty("connection")) {
+                        var error = $root.flyteidl.core.Connection.verify(message.connection);
+                        if (error)
+                            return "connection." + error;
+                    }
                     return null;
                 };
     
@@ -24006,6 +24229,7 @@
                  * @property {string|null} [taskType] GetTaskRequest taskType
                  * @property {Uint8Array|null} [resourceMeta] GetTaskRequest resourceMeta
                  * @property {flyteidl.admin.ITaskCategory|null} [taskCategory] GetTaskRequest taskCategory
+                 * @property {flyteidl.core.IConnection|null} [connection] GetTaskRequest connection
                  */
     
                 /**
@@ -24048,6 +24272,14 @@
                 GetTaskRequest.prototype.taskCategory = null;
     
                 /**
+                 * GetTaskRequest connection.
+                 * @member {flyteidl.core.IConnection|null|undefined} connection
+                 * @memberof flyteidl.admin.GetTaskRequest
+                 * @instance
+                 */
+                GetTaskRequest.prototype.connection = null;
+    
+                /**
                  * Creates a new GetTaskRequest instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.GetTaskRequest
@@ -24077,6 +24309,8 @@
                         writer.uint32(/* id 2, wireType 2 =*/18).bytes(message.resourceMeta);
                     if (message.taskCategory != null && message.hasOwnProperty("taskCategory"))
                         $root.flyteidl.admin.TaskCategory.encode(message.taskCategory, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                    if (message.connection != null && message.hasOwnProperty("connection"))
+                        $root.flyteidl.core.Connection.encode(message.connection, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
                     return writer;
                 };
     
@@ -24107,6 +24341,9 @@
                         case 3:
                             message.taskCategory = $root.flyteidl.admin.TaskCategory.decode(reader, reader.uint32());
                             break;
+                        case 5:
+                            message.connection = $root.flyteidl.core.Connection.decode(reader, reader.uint32());
+                            break;
                         default:
                             reader.skipType(tag & 7);
                             break;
@@ -24136,6 +24373,11 @@
                         var error = $root.flyteidl.admin.TaskCategory.verify(message.taskCategory);
                         if (error)
                             return "taskCategory." + error;
+                    }
+                    if (message.connection != null && message.hasOwnProperty("connection")) {
+                        var error = $root.flyteidl.core.Connection.verify(message.connection);
+                        if (error)
+                            return "connection." + error;
                     }
                     return null;
                 };
@@ -24492,6 +24734,7 @@
                  * @property {string|null} [taskType] DeleteTaskRequest taskType
                  * @property {Uint8Array|null} [resourceMeta] DeleteTaskRequest resourceMeta
                  * @property {flyteidl.admin.ITaskCategory|null} [taskCategory] DeleteTaskRequest taskCategory
+                 * @property {flyteidl.core.IConnection|null} [connection] DeleteTaskRequest connection
                  */
     
                 /**
@@ -24534,6 +24777,14 @@
                 DeleteTaskRequest.prototype.taskCategory = null;
     
                 /**
+                 * DeleteTaskRequest connection.
+                 * @member {flyteidl.core.IConnection|null|undefined} connection
+                 * @memberof flyteidl.admin.DeleteTaskRequest
+                 * @instance
+                 */
+                DeleteTaskRequest.prototype.connection = null;
+    
+                /**
                  * Creates a new DeleteTaskRequest instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.DeleteTaskRequest
@@ -24563,6 +24814,8 @@
                         writer.uint32(/* id 2, wireType 2 =*/18).bytes(message.resourceMeta);
                     if (message.taskCategory != null && message.hasOwnProperty("taskCategory"))
                         $root.flyteidl.admin.TaskCategory.encode(message.taskCategory, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                    if (message.connection != null && message.hasOwnProperty("connection"))
+                        $root.flyteidl.core.Connection.encode(message.connection, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
                     return writer;
                 };
     
@@ -24593,6 +24846,9 @@
                         case 3:
                             message.taskCategory = $root.flyteidl.admin.TaskCategory.decode(reader, reader.uint32());
                             break;
+                        case 5:
+                            message.connection = $root.flyteidl.core.Connection.decode(reader, reader.uint32());
+                            break;
                         default:
                             reader.skipType(tag & 7);
                             break;
@@ -24622,6 +24878,11 @@
                         var error = $root.flyteidl.admin.TaskCategory.verify(message.taskCategory);
                         if (error)
                             return "taskCategory." + error;
+                    }
+                    if (message.connection != null && message.hasOwnProperty("connection")) {
+                        var error = $root.flyteidl.core.Connection.verify(message.connection);
+                        if (error)
+                            return "connection." + error;
                     }
                     return null;
                 };
