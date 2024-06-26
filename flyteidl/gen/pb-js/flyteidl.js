@@ -10895,17 +10895,6 @@
                 });
     
                 /**
-                 * ArrayNode executionVersionOption.
-                 * @member {"executionVersion"|undefined} executionVersionOption
-                 * @memberof flyteidl.core.ArrayNode
-                 * @instance
-                 */
-                Object.defineProperty(ArrayNode.prototype, "executionVersionOption", {
-                    get: $util.oneOfGetter($oneOfFields = ["executionVersion"]),
-                    set: $util.oneOfSetter($oneOfFields)
-                });
-    
-                /**
                  * Creates a new ArrayNode instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.core.ArrayNode
@@ -11017,11 +11006,9 @@
                         if (typeof message.minSuccessRatio !== "number")
                             return "minSuccessRatio: number expected";
                     }
-                    if (message.executionVersion != null && message.hasOwnProperty("executionVersion")) {
-                        properties.executionVersionOption = 1;
+                    if (message.executionVersion != null && message.hasOwnProperty("executionVersion"))
                         if (!$util.isInteger(message.executionVersion))
                             return "executionVersion: integer expected";
-                    }
                     return null;
                 };
     

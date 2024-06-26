@@ -135,10 +135,8 @@ message ArrayNode {
         float min_success_ratio = 4;
     }
 
-    oneof execution_version_option {
-        // execution_version determines the sub-node state store
-        uint32 execution_version = 5;
-    }
+    // execution_version determines the sub-node state store
+    uint32 execution_version = 5;
 }
 
 // Defines extra information about the Node.

@@ -548,17 +548,11 @@ export class ArrayNode extends Message<ArrayNode> {
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   /**
-   * @generated from oneof flyteidl.core.ArrayNode.execution_version_option
+   * execution_version determines the sub-node state store
+   *
+   * @generated from field: uint32 execution_version = 5;
    */
-  executionVersionOption: {
-    /**
-     * execution_version determines the sub-node state store
-     *
-     * @generated from field: uint32 execution_version = 5;
-     */
-    value: number;
-    case: "executionVersion";
-  } | { case: undefined; value?: undefined } = { case: undefined };
+  executionVersion = 0;
 
   constructor(data?: PartialMessage<ArrayNode>) {
     super();
@@ -572,7 +566,7 @@ export class ArrayNode extends Message<ArrayNode> {
     { no: 2, name: "parallelism", kind: "scalar", T: 13 /* ScalarType.UINT32 */, oneof: "parallelism_option" },
     { no: 3, name: "min_successes", kind: "scalar", T: 13 /* ScalarType.UINT32 */, oneof: "success_criteria" },
     { no: 4, name: "min_success_ratio", kind: "scalar", T: 2 /* ScalarType.FLOAT */, oneof: "success_criteria" },
-    { no: 5, name: "execution_version", kind: "scalar", T: 13 /* ScalarType.UINT32 */, oneof: "execution_version_option" },
+    { no: 5, name: "execution_version", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ArrayNode {
