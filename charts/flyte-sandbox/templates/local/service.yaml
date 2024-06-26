@@ -18,4 +18,13 @@ spec:
     - name: webhook
       port: 9443
       protocol: TCP
+    - name: fasttask
+      port: 15605
+      protocol: TCP
+    - name: artifacts-http
+      port: 15700
+      protocol: TCP
+    - name: artifacts-grpc
+      port: 15701
+      protocol: TCP
 {{- end }}

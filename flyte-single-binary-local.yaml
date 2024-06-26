@@ -8,7 +8,7 @@ admin:
   insecure: true
 flyteadmin:
   featureGates:
-    enableArtifacts: true
+    enableArtifacts: false
 
 catalog-cache:
   endpoint: localhost:8081
@@ -45,6 +45,7 @@ tasks:
       - container
       - sidecar
       - K8S-ARRAY
+      - fast-task
     default-for-task-types:
       - container: container
       - container_array: K8S-ARRAY

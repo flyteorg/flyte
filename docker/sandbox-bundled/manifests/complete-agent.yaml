@@ -689,6 +689,18 @@ data:
                                               route:
                                                   cluster: flyte_grpc
                                             - match:
+                                                  prefix: "/fasttask.FastTask"
+                                              route:
+                                                  cluster: fasttaskcluster
+                                            - match:
+                                                  prefix: "/artifacts/api"
+                                              route:
+                                                  cluster: artifacts_http
+                                            - match:
+                                                  prefix: "/flyteidl.artifact.ArtifactRegistry"
+                                              route:
+                                                  cluster: artifacts_grpc
+                                            - match:
                                                   prefix: "/flyteidl.service.SignalService"
                                               route:
                                                   cluster: flyte_grpc
@@ -715,6 +727,47 @@ data:
                                     typed_config:
                                       "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
         clusters:
+            - name: artifacts_http
+              connect_timeout: 0.25s
+              type: STRICT_DNS
+              lb_policy: ROUND_ROBIN
+              load_assignment:
+                  cluster_name: artifacts_http
+                  endpoints:
+                      - lb_endpoints:
+                            - endpoint:
+                                  address:
+                                      socket_address:
+                                          address: flyte-sandbox-local
+                                          port_value: 15700
+            - name: artifacts_grpc
+              connect_timeout: 0.25s
+              type: STRICT_DNS
+              lb_policy: ROUND_ROBIN
+              http2_protocol_options: {}
+              load_assignment:
+                  cluster_name: artifacts_grpc
+                  endpoints:
+                      - lb_endpoints:
+                            - endpoint:
+                                  address:
+                                      socket_address:
+                                          address: flyte-sandbox-local
+                                          port_value: 15701
+            - name: fasttaskcluster
+              connect_timeout: 0.25s
+              type: STRICT_DNS
+              lb_policy: ROUND_ROBIN
+              http2_protocol_options: {}
+              load_assignment:
+                  cluster_name: fasttaskcluster
+                  endpoints:
+                      - lb_endpoints:
+                            - endpoint:
+                                  address:
+                                      socket_address:
+                                          address: flyte-sandbox-http
+                                          port_value: 15605
             - name: flyte
               connect_timeout: 0.25s
               type: STRICT_DNS
@@ -818,7 +871,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: aUlwRTZPQmF4ajJaeFpZNQ==
+  haSharedSecret: RVNncDd6RHJJZXdEZFpaYw==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1414,7 +1467,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 8c1c8d72ada2b59e44648c99190b2f44ef9d029b33960d594d63a26d7ed88b59
+        checksum/secret: 3716396d50d48416c5629f5bd48da68e48fdd895d59174a184b8ef9e4f0773e6
       labels:
         app: docker-registry
         release: flyte-sandbox

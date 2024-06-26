@@ -49,7 +49,7 @@ manifests: dep_update
 .PHONY: build
 build: flyte dep_update manifests
 	docker buildx build --builder flyte-sandbox --allow security.insecure --load \
-		--tag flyte-sandbox:latest .
+		--tag flyte-sandbox-private:latest .
 
 # Port map
 # 6443 - k8s API server
@@ -59,7 +59,7 @@ build: flyte dep_update manifests
 # 30003 - Buildkit
 # 30080 - Flyte Proxy
 .PHONY: start
-start: FLYTE_SANDBOX_IMAGE := flyte-sandbox:latest
+start: FLYTE_SANDBOX_IMAGE := flyte-sandbox-private:latest
 start: FLYTE_DEV := False
 start:
 	[ -n "$(shell docker volume ls --filter name=^flyte-sandbox$$ --format {{.Name}})" ] || \
