@@ -23,7 +23,7 @@ To clone and run the example code on this page, see the [Flytesnacks repo][flyte
 
 First, import the libraries:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/data_types_and_io/data_types_and_io/file.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/file.py
 :caption: data_types_and_io/file.py
 :lines: 1-8
 ```
@@ -43,7 +43,7 @@ Predefined aliases for commonly used flyte file formats are also available.
 You can find them [here](https://github.com/flyteorg/flytekit/blob/master/flytekit/types/file/__init__.py).
 :::
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/data_types_and_io/data_types_and_io/file.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/file.py
 :caption: data_types_and_io/file.py
 :pyobject: normalize_columns
 ```
@@ -56,14 +56,14 @@ When this task finishes, the Flytekit engine returns the `FlyteFile` instance, u
 
 Lastly, define a workflow. The `normalize_csv_files` workflow has an `output_location` argument which is passed to the `location` input of the task. If it's not an empty string, the task attempts to upload its file to that location.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/data_types_and_io/data_types_and_io/file.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/0ec8388759d34566a0ffc0c3c2d7443fd4a3a46f/examples/data_types_and_io/data_types_and_io/file.py
 :caption: data_types_and_io/file.py
 :pyobject: normalize_csv_file
 ```
 
 You can run the workflow locally as follows:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/data_types_and_io/data_types_and_io/file.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/0ec8388759d34566a0ffc0c3c2d7443fd4a3a46f/examples/data_types_and_io/data_types_and_io/file.py
 :caption: data_types_and_io/file.py
 :lines: 75-95
 ```

@@ -7,32 +7,6 @@ import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialM
 import { Message, proto3 } from "@bufbuild/protobuf";
 
 /**
- * @generated from enum flyteidl.plugins.kubeflow.RestartPolicy
- */
-export enum RestartPolicy {
-  /**
-   * @generated from enum value: RESTART_POLICY_NEVER = 0;
-   */
-  NEVER = 0,
-
-  /**
-   * @generated from enum value: RESTART_POLICY_ON_FAILURE = 1;
-   */
-  ON_FAILURE = 1,
-
-  /**
-   * @generated from enum value: RESTART_POLICY_ALWAYS = 2;
-   */
-  ALWAYS = 2,
-}
-// Retrieve enum metadata with: proto3.getEnumType(RestartPolicy)
-proto3.util.setEnumType(RestartPolicy, "flyteidl.plugins.kubeflow.RestartPolicy", [
-  { no: 0, name: "RESTART_POLICY_NEVER" },
-  { no: 1, name: "RESTART_POLICY_ON_FAILURE" },
-  { no: 2, name: "RESTART_POLICY_ALWAYS" },
-]);
-
-/**
  * @generated from enum flyteidl.plugins.kubeflow.CleanPodPolicy
  */
 export enum CleanPodPolicy {

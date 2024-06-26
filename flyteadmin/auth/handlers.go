@@ -260,9 +260,10 @@ func GetAuthenticationCustomMetadataInterceptor(authCtx interfaces.Authenticatio
 		if authCtx.Options().GrpcAuthorizationHeader != DefaultAuthorizationHeader {
 			md, ok := metadata.FromIncomingContext(ctx)
 			if ok {
-				existingHeader := md.Get(authCtx.Options().GrpcAuthorizationHeader)
+				grpcAuthzHeader := authCtx.Options().GrpcAuthorizationHeader
+				existingHeader := md.Get(grpcAuthzHeader)
 				if len(existingHeader) > 0 {
-					logger.Debugf(ctx, "Found existing metadata %s", existingHeader[0])
+					logger.Debugf(ctx, "Found existing metadata header %s", grpcAuthzHeader)
 					newAuthorizationMetadata := metadata.Pairs(DefaultAuthorizationHeader, existingHeader[0])
 					joinedMetadata := metadata.Join(md, newAuthorizationMetadata)
 					newCtx := metadata.NewIncomingContext(ctx, joinedMetadata)
@@ -484,7 +485,7 @@ func QueryUserInfoUsingAccessToken(ctx context.Context, originalRequest *http.Re
 // See https://tools.ietf.org/html/rfc8414 for more information.
 func GetOIdCMetadataEndpointRedirectHandler(ctx context.Context, authCtx interfaces.AuthenticationContext) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
-		metadataURL := authCtx.Options().UserAuth.OpenID.BaseURL.ResolveReference(authCtx.GetOIdCMetadataURL())
+		metadataURL := authCtx.Options().UserAuth.OpenID.BaseURL.JoinPath("/").ResolveReference(authCtx.GetOIdCMetadataURL())
 		http.Redirect(writer, request, metadataURL.String(), http.StatusSeeOther)
 	}
 }

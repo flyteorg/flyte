@@ -6,14 +6,13 @@ import (
 	"io/ioutil"
 	"strings"
 
+	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
+	cmdGet "github.com/flyteorg/flyte/flytectl/cmd/get"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/google/uuid"
 	"sigs.k8s.io/yaml"
-
-	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
-	cmdGet "github.com/flyteorg/flyte/flytectl/cmd/get"
 )
 
 func createExecutionRequestForWorkflow(ctx context.Context, workflowName, project, domain string,
@@ -54,7 +53,7 @@ func createExecutionRequestForWorkflow(ctx context.Context, workflowName, projec
 		}
 	}
 
-	return createExecutionRequest(lp.Id, inputs, envs, securityContext, authRole, targetExecName), nil
+	return createExecutionRequest(lp.Id, inputs, envs, securityContext, authRole, targetExecName, executionConfig.TargetExecutionCluster), nil
 }
 
 func createExecutionRequestForTask(ctx context.Context, taskName string, project string, domain string,
@@ -102,7 +101,7 @@ func createExecutionRequestForTask(ctx context.Context, taskName string, project
 		Version:      task.Id.Version,
 	}
 
-	return createExecutionRequest(id, inputs, envs, securityContext, authRole, targetExecName), nil
+	return createExecutionRequest(id, inputs, envs, securityContext, authRole, targetExecName, executionConfig.TargetExecutionCluster), nil
 }
 
 func relaunchExecution(ctx context.Context, executionName string, project string, domain string,
@@ -148,7 +147,7 @@ func recoverExecution(ctx context.Context, executionName string, project string,
 	return nil
 }
 
-func createExecutionRequest(ID *core.Identifier, inputs *core.LiteralMap, envs *admin.Envs, securityContext *core.SecurityContext, authRole *admin.AuthRole, targetExecName string) *admin.ExecutionCreateRequest {
+func createExecutionRequest(ID *core.Identifier, inputs *core.LiteralMap, envs *admin.Envs, securityContext *core.SecurityContext, authRole *admin.AuthRole, targetExecName string, targetExecutionCluster string) *admin.ExecutionCreateRequest {
 
 	if len(targetExecName) == 0 {
 		targetExecName = "f" + strings.ReplaceAll(uuid.New().String(), "-", "")[:19]
@@ -156,6 +155,10 @@ func createExecutionRequest(ID *core.Identifier, inputs *core.LiteralMap, envs *
 	var clusterAssignment *admin.ClusterAssignment
 	if executionConfig.ClusterPool != "" {
 		clusterAssignment = &admin.ClusterAssignment{ClusterPoolName: executionConfig.ClusterPool}
+	}
+	var executionClusterLabel *admin.ExecutionClusterLabel
+	if targetExecutionCluster != "" {
+		executionClusterLabel = &admin.ExecutionClusterLabel{Value: targetExecutionCluster}
 	}
 	return &admin.ExecutionCreateRequest{
 		Project: executionConfig.TargetProject,
@@ -168,11 +171,12 @@ func createExecutionRequest(ID *core.Identifier, inputs *core.LiteralMap, envs *
 				Principal: "sdk",
 				Nesting:   0,
 			},
-			AuthRole:          authRole,
-			SecurityContext:   securityContext,
-			ClusterAssignment: clusterAssignment,
-			OverwriteCache:    executionConfig.OverwriteCache,
-			Envs:              envs,
+			AuthRole:              authRole,
+			SecurityContext:       securityContext,
+			ClusterAssignment:     clusterAssignment,
+			OverwriteCache:        executionConfig.OverwriteCache,
+			Envs:                  envs,
+			ExecutionClusterLabel: executionClusterLabel,
 		},
 		Inputs: inputs,
 	}

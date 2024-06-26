@@ -178,6 +178,7 @@ func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *i
 			Configs: map[string]string{"key": "value"},
 		},
 	}})
+	tMeta.OnGetConsoleURL().Return("")
 
 	catClient := &catalogMocks.Client{}
 	catData := sync.Map{}

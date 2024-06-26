@@ -286,6 +286,29 @@ export class NodeExecutionEvent extends Message<NodeExecutionEvent> {
    */
   isArray = false;
 
+  /**
+   * Holding this field here for now, this will be upstreamed soon.
+   * So that Admin doesn't have to rebuild the node execution graph to find the target entity, propeller will fill this
+   * in optionally - currently this is only filled in for subworkflows. This is the ID of the subworkflow corresponding
+   * to this node execution. It is difficult to find because Admin only sees one node at a time. A subworkflow could be
+   * nested multiple layers deep, and you'd need to access the correct workflow template to know the target subworkflow.
+   *
+   * @generated from field: flyteidl.core.Identifier target_entity = 23;
+   */
+  targetEntity?: Identifier;
+
+  /**
+   * Holding this field here for now, this will be upstreamed soon.
+   * Tasks and subworkflows (but not launch plans) that are run within a dynamic task are effectively independent of
+   * the tasks that are registered in Admin's db. Confusingly, they are often identical, but sometimes they are not
+   * even registered at all. Similar to the target_entity field, at the time Admin receives this event, it has no idea
+   * if the relevant execution entity is was registered, or dynamic. This field indicates that the target_entity ID,
+   * as well as task IDs in any corresponding Task Executions, should not be used to looked up the task in Admin's db.
+   *
+   * @generated from field: bool is_in_dynamic_chain = 24;
+   */
+  isInDynamicChain = false;
+
   constructor(data?: PartialMessage<NodeExecutionEvent>) {
     super();
     proto3.util.initPartial(data, this);
@@ -316,6 +339,8 @@ export class NodeExecutionEvent extends Message<NodeExecutionEvent> {
     { no: 19, name: "deck_uri", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 21, name: "reported_at", kind: "message", T: Timestamp },
     { no: 22, name: "is_array", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 23, name: "target_entity", kind: "message", T: Identifier },
+    { no: 24, name: "is_in_dynamic_chain", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): NodeExecutionEvent {

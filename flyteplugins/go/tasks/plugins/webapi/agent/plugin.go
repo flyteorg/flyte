@@ -4,9 +4,11 @@ import (
 	"context"
 	"encoding/gob"
 	"fmt"
+	"sync"
 	"time"
 
 	"golang.org/x/exp/maps"
+	"k8s.io/apimachinery/pkg/util/wait"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	flyteIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -24,11 +26,27 @@ import (
 
 type Registry map[string]map[int32]*Agent // map[taskTypeName][taskTypeVersion] => Agent
 
-type Plugin struct {
-	metricScope   promutils.Scope
-	cfg           *Config
-	cs            *ClientSet
+var (
 	agentRegistry Registry
+	mu            sync.RWMutex
+)
+
+func getAgentRegistry() Registry {
+	mu.Lock()
+	defer mu.Unlock()
+	return agentRegistry
+}
+
+func setAgentRegistry(r Registry) {
+	mu.Lock()
+	defer mu.Unlock()
+	agentRegistry = r
+}
+
+type Plugin struct {
+	metricScope promutils.Scope
+	cfg         *Config
+	cs          *ClientSet
 }
 
 type ResourceWrapper struct {
@@ -97,7 +115,7 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 	outputPrefix := taskCtx.OutputWriter().GetOutputPrefixPath().String()
 
 	taskCategory := admin.TaskCategory{Name: taskTemplate.Type, Version: taskTemplate.TaskTypeVersion}
-	agent, isSync := getFinalAgent(&taskCategory, p.cfg, p.agentRegistry)
+	agent, isSync := getFinalAgent(&taskCategory, p.cfg)
 
 	connection := flyteIdl.Connection{}
 	if taskTemplate.SecurityContext != nil && taskTemplate.SecurityContext.GetConnectionRef() != "" {
@@ -197,6 +215,7 @@ func (p Plugin) ExecuteTaskSync(
 
 	in, err := stream.Recv()
 	if err != nil {
+		logger.Errorf(ctx, "Failed to write output with err %s", err.Error())
 		return nil, nil, err
 	}
 	if in.GetHeader() == nil {
@@ -207,11 +226,7 @@ func (p Plugin) ExecuteTaskSync(
 	resource := in.GetHeader().GetResource()
 
 	if err := stream.CloseSend(); err != nil {
-		return nil, nil, err
-	}
-
-	if err != nil {
-		logger.Errorf(ctx, "Failed to write output with err %s", err.Error())
+		logger.Errorf(ctx, "Failed to close stream with err %s", err.Error())
 		return nil, nil, err
 	}
 
@@ -225,7 +240,7 @@ func (p Plugin) ExecuteTaskSync(
 
 func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest webapi.Resource, err error) {
 	metadata := taskCtx.ResourceMeta().(ResourceMetaWrapper)
-	agent, _ := getFinalAgent(&metadata.TaskCategory, p.cfg, p.agentRegistry)
+	agent, _ := getFinalAgent(&metadata.TaskCategory, p.cfg)
 
 	client, err := p.getAsyncAgentClient(ctx, agent)
 	if err != nil {
@@ -259,7 +274,7 @@ func (p Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error 
 		return nil
 	}
 	metadata := taskCtx.ResourceMeta().(ResourceMetaWrapper)
-	agent, _ := getFinalAgent(&metadata.TaskCategory, p.cfg, p.agentRegistry)
+	agent, _ := getFinalAgent(&metadata.TaskCategory, p.cfg)
 
 	client, err := p.getAsyncAgentClient(ctx, agent)
 	if err != nil {
@@ -284,7 +299,7 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 
 	switch resource.Phase {
 	case flyteIdl.TaskExecution_QUEUED:
-		return core.PhaseInfoQueuedWithTaskInfo(core.DefaultPhaseVersion, resource.Message, taskInfo), nil
+		return core.PhaseInfoQueuedWithTaskInfo(time.Now(), core.DefaultPhaseVersion, resource.Message, taskInfo), nil
 	case flyteIdl.TaskExecution_WAITING_FOR_RESOURCES:
 		return core.PhaseInfoWaitingForResourcesInfo(time.Now(), core.DefaultPhaseVersion, resource.Message, taskInfo), nil
 	case flyteIdl.TaskExecution_INITIALIZING:
@@ -356,6 +371,13 @@ func (p Plugin) getAsyncAgentClient(ctx context.Context, agent *Deployment) (ser
 	return client, nil
 }
 
+func (p Plugin) watchAgents(ctx context.Context) {
+	go wait.Until(func() {
+		clientSet := getAgentClientSets(ctx)
+		updateAgentRegistry(ctx, clientSet)
+	}, p.cfg.PollInterval.Duration, ctx.Done())
+}
+
 func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, outputs *flyteIdl.LiteralMap) error {
 	taskTemplate, err := taskCtx.TaskReader().Read(ctx)
 	if err != nil {
@@ -378,11 +400,11 @@ func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, outputs *fly
 	return taskCtx.OutputWriter().Put(ctx, opReader)
 }
 
-func getFinalAgent(taskCategory *admin.TaskCategory, cfg *Config, agentRegistry Registry) (*Deployment, bool) {
-	if agent, exists := agentRegistry[taskCategory.Name][taskCategory.Version]; exists {
+func getFinalAgent(taskCategory *admin.TaskCategory, cfg *Config) (*Deployment, bool) {
+	r := getAgentRegistry()
+	if agent, exists := r[taskCategory.Name][taskCategory.Version]; exists {
 		return agent.AgentDeployment, agent.IsSync
 	}
-
 	return &cfg.DefaultAgent, false
 }
 
@@ -401,31 +423,24 @@ func buildTaskExecutionMetadata(taskExecutionMetadata core.TaskExecutionMetadata
 }
 
 func newAgentPlugin() webapi.PluginEntry {
-	cs, err := initializeClients(context.Background())
-	if err != nil {
-		// We should wait for all agents to be up and running before starting the server
-		panic(fmt.Sprintf("failed to initialize clients with error: %v", err))
-	}
-
-	agentRegistry, err := initializeAgentRegistry(cs)
-	if err != nil {
-		panic(fmt.Sprintf("failed to initialize agent registry with error: %v", err))
-	}
-
+	ctx := context.Background()
 	cfg := GetConfig()
-	supportedTaskTypes := append(maps.Keys(agentRegistry), cfg.SupportedTaskTypes...)
-	logger.Infof(context.Background(), "AgentDeployment service supports task types: %v", supportedTaskTypes)
+
+	clientSet := getAgentClientSets(ctx)
+	updateAgentRegistry(ctx, clientSet)
+	supportedTaskTypes := append(maps.Keys(getAgentRegistry()), cfg.SupportedTaskTypes...)
 
 	return webapi.PluginEntry{
 		ID:                 "agent-service",
 		SupportedTaskTypes: supportedTaskTypes,
 		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
-			return &Plugin{
-				metricScope:   iCtx.MetricsScope(),
-				cfg:           cfg,
-				cs:            cs,
-				agentRegistry: agentRegistry,
-			}, nil
+			plugin := &Plugin{
+				metricScope: iCtx.MetricsScope(),
+				cfg:         cfg,
+				cs:          clientSet,
+			}
+			plugin.watchAgents(ctx)
+			return plugin, nil
 		},
 	}
 }
@@ -433,6 +448,5 @@ func newAgentPlugin() webapi.PluginEntry {
 func RegisterAgentPlugin() {
 	gob.Register(ResourceMetaWrapper{})
 	gob.Register(ResourceWrapper{})
-
 	pluginmachinery.PluginRegistry().RegisterRemotePlugin(newAgentPlugin())
 }

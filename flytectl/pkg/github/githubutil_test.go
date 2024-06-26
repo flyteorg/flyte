@@ -10,7 +10,6 @@ import (
 	"github.com/flyteorg/flyte/flytectl/pkg/platformutil"
 	stdlibversion "github.com/flyteorg/flyte/flytestdlib/version"
 	"github.com/google/go-github/v42/github"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"golang.org/x/text/cases"
@@ -181,7 +180,7 @@ func TestGetUpgradeMessage(t *testing.T) {
 	stdlibversion.Version = "v0.2.10"
 	message, err := GetUpgradeMessage(version, darwin)
 	assert.Nil(t, err)
-	assert.Equal(t, 163, len(message))
+	assert.Equal(t, 154, len(message))
 
 	version = "v0.2.09"
 	message, err = GetUpgradeMessage(version, darwin)
@@ -196,10 +195,10 @@ func TestGetUpgradeMessage(t *testing.T) {
 	version = "v0.2.20"
 	message, err = GetUpgradeMessage(version, windows)
 	assert.Nil(t, err)
-	assert.Equal(t, 163, len(message))
+	assert.Equal(t, 154, len(message))
 
 	version = "v0.2.20"
 	message, err = GetUpgradeMessage(version, linux)
 	assert.Nil(t, err)
-	assert.Equal(t, 163, len(message))
+	assert.Equal(t, 154, len(message))
 }

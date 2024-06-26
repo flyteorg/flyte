@@ -14,9 +14,18 @@ const configSectionKey = "otel"
 type ExporterType = string
 
 const (
-	NoopExporter   ExporterType = "noop"
-	FileExporter   ExporterType = "file"
-	JaegerExporter ExporterType = "jaeger"
+	NoopExporter     ExporterType = "noop"
+	FileExporter     ExporterType = "file"
+	JaegerExporter   ExporterType = "jaeger"
+	OtlpGrpcExporter ExporterType = "otlpgrpc"
+	OtlpHttpExporter ExporterType = "otlphttp" // nolint:golint
+)
+
+type SamplerType = string
+
+const (
+	AlwaysSample      SamplerType = "always"
+	TraceIDRatioBased SamplerType = "traceid"
 )
 
 var (
@@ -29,13 +38,26 @@ var (
 		JaegerConfig: JaegerConfig{
 			Endpoint: "http://localhost:14268/api/traces",
 		},
+		OtlpGrpcConfig: OtlpGrpcConfig{
+			Endpoint: "http://localhost:4317",
+		},
+		OtlpHttpConfig: OtlpHttpConfig{
+			Endpoint: "http://localhost:4318/v1/traces",
+		},
+		SamplerConfig: SamplerConfig{
+			ParentSampler: AlwaysSample,
+			TraceIDRatio:  0.01,
+		},
 	}
 )
 
 type Config struct {
-	ExporterType ExporterType `json:"type" pflag:",Sets the type of exporter to configure [noop/file/jaeger]."`
-	FileConfig   FileConfig   `json:"file" pflag:",Configuration for exporting telemetry traces to a file"`
-	JaegerConfig JaegerConfig `json:"jaeger" pflag:",Configuration for exporting telemetry traces to a jaeger"`
+	ExporterType   ExporterType   `json:"type" pflag:",Sets the type of exporter to configure [noop/file/jaeger/otlpgrpc/otlphttp]."`
+	FileConfig     FileConfig     `json:"file" pflag:",Configuration for exporting telemetry traces to a file"`
+	JaegerConfig   JaegerConfig   `json:"jaeger" pflag:",Configuration for exporting telemetry traces to a jaeger"`
+	OtlpGrpcConfig OtlpGrpcConfig `json:"otlpgrpc" pflag:",Configuration for exporting telemetry traces to an OTLP gRPC collector"`
+	OtlpHttpConfig OtlpHttpConfig `json:"otlphttp" pflag:",Configuration for exporting telemetry traces to an OTLP HTTP collector"` // nolint:golint
+	SamplerConfig  SamplerConfig  `json:"sampler" pflag:",Configuration for the sampler to use for the tracer"`
 }
 
 type FileConfig struct {
@@ -43,7 +65,20 @@ type FileConfig struct {
 }
 
 type JaegerConfig struct {
-	Endpoint string `json:"endpoint" pflag:",Endpoint for the jaeger telemtry trace ingestor"`
+	Endpoint string `json:"endpoint" pflag:",Endpoint for the jaeger telemetry trace ingestor"`
+}
+
+type OtlpGrpcConfig struct {
+	Endpoint string `json:"endpoint" pflag:",Endpoint for the OTLP telemetry trace collector"`
+}
+
+type OtlpHttpConfig struct { // nolint:golint
+	Endpoint string `json:"endpoint" pflag:",Endpoint for the OTLP telemetry trace collector"`
+}
+
+type SamplerConfig struct {
+	ParentSampler SamplerType `json:"parentSampler" pflag:",Sets the parent sampler to use for the tracer"`
+	TraceIDRatio  float64     `json:"traceIdRatio" pflag:"-,Sets the trace id ratio for the TraceIdRatioBased sampler"`
 }
 
 func GetConfig() *Config {

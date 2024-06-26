@@ -35,6 +35,10 @@ import (
 )
 
 func TestEndToEnd(t *testing.T) {
+	agentRegistry = Registry{
+		"openai": {defaultTaskTypeVersion: {AgentDeployment: &Deployment{Endpoint: defaultAgentEndpoint}, IsSync: true}},
+		"spark":  {defaultTaskTypeVersion: {AgentDeployment: &Deployment{Endpoint: defaultAgentEndpoint}, IsSync: false}},
+	}
 	iter := func(ctx context.Context, tCtx pluginCore.TaskExecutionContext) error {
 		return nil
 	}
@@ -126,6 +130,7 @@ func TestEndToEnd(t *testing.T) {
 				cfg:         GetConfig(),
 				cs: &ClientSet{
 					asyncAgentClients:    map[string]service.AsyncAgentServiceClient{},
+					syncAgentClients:     map[string]service.SyncAgentServiceClient{},
 					agentMetadataClients: map[string]service.AgentMetadataServiceClient{},
 				},
 			}, nil
@@ -334,7 +339,6 @@ func newMockSyncAgentPlugin() webapi.PluginEntry {
 						defaultAgentEndpoint: syncAgentClient,
 					},
 				},
-				agentRegistry: Registry{"openai": {defaultTaskTypeVersion: {AgentDeployment: &Deployment{Endpoint: defaultAgentEndpoint}, IsSync: true}}},
 			}, nil
 		},
 	}

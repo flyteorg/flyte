@@ -7,13 +7,11 @@ import (
 	"os"
 
 	"github.com/flyteorg/flyte/flytectl/cmd/config"
-
-	"github.com/flyteorg/flyte/flytestdlib/storage"
-
 	rconfig "github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/register"
 	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
 	"github.com/flyteorg/flyte/flytectl/pkg/printer"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 const (

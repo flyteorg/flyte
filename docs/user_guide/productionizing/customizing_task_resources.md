@@ -36,35 +36,35 @@ To clone and run the example code on this page, see the [Flytesnacks repo][flyte
 
 Import the dependencies:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/productionizing/productionizing/customizing_resources.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/productionizing/productionizing/customizing_resources.py
 :caption: productionizing/customizing_resources.py
 :lines: 1-3
 ```
 
 Define a task and configure the resources to be allocated to it:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/productionizing/productionizing/customizing_resources.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/productionizing/productionizing/customizing_resources.py
 :caption: productionizing/customizing_resources.py
 :pyobject: count_unique_numbers
 ```
 
 Define a task that computes the square of a number:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/productionizing/productionizing/customizing_resources.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/productionizing/productionizing/customizing_resources.py
 :caption: productionizing/customizing_resources.py
 :pyobject: square
 ```
 
 You can use the tasks decorated with memory and storage hints like regular tasks in a workflow.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/productionizing/productionizing/customizing_resources.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/productionizing/productionizing/customizing_resources.py
 :caption: productionizing/customizing_resources.py
 :pyobject: my_workflow
 ```
 
 You can execute the workflow locally.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/productionizing/productionizing/customizing_resources.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/productionizing/productionizing/customizing_resources.py
 :caption: productionizing/customizing_resources.py
 :lines: 32-34
 ```
@@ -82,7 +82,7 @@ Let's understand how the resources can be initialized with an example.
 
 Import the dependencies.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/productionizing/productionizing/customizing_resources.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/productionizing/productionizing/customizing_resources.py
 :caption: productionizing/customizing_resources.py
 :lines: 38-40
 ```
@@ -90,28 +90,28 @@ Import the dependencies.
 Define a task and configure the resources to be allocated to it.
 You can use tasks decorated with memory and storage hints like regular tasks in a workflow.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/productionizing/productionizing/customizing_resources.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/productionizing/productionizing/customizing_resources.py
 :caption: productionizing/customizing_resources.py
 :pyobject: count_unique_numbers
 ```
 
 Define a task that computes the square of a number:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/productionizing/productionizing/customizing_resources.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/productionizing/productionizing/customizing_resources.py
 :caption: productionizing/customizing_resources.py
 :pyobject: square_1
 ```
 
 The `with_overrides` method overrides the old resource allocations:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/productionizing/productionizing/customizing_resources.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/productionizing/productionizing/customizing_resources.py
 :caption: productionizing/customizing_resources.py
 :pyobject: my_pipeline
 ```
 
 You can execute the workflow locally:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/productionizing/productionizing/customizing_resources.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/productionizing/productionizing/customizing_resources.py
 :caption: productionizing/customizing_resources.py
 :lines: 65-67
 ```

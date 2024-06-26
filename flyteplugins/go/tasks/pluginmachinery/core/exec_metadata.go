@@ -54,5 +54,10 @@ type TaskExecutionMetadata interface {
 	GetPlatformResources() *v1.ResourceRequirements
 	GetInterruptibleFailureThreshold() int32
 	GetEnvironmentVariables() map[string]string
+<<<<<<< HEAD
 	GetExternalResourceAttributes() *admin.ExternalResourceAttributes
+||||||| 4dd5f3c27
+=======
+	GetConsoleURL() string
+>>>>>>> ce5eb03a926b8a4da57fa9d6ffb98f8d768e37b8
 }

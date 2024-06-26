@@ -193,8 +193,8 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 		immutableParentInfo := mocks4.ImmutableParentInfo{}
 		immutableParentInfo.OnGetUniqueID().Return("c1")
 		immutableParentInfo.OnCurrentAttempt().Return(uint32(2))
-		execContext.OnGetParentInfo().Return(&immutableParentInfo)
-		execContext.OnGetEventVersion().Return(v1alpha1.EventVersion1)
+		execContext.EXPECT().GetParentInfo().Return(&immutableParentInfo)
+		execContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion1)
 		nCtx.OnExecutionContext().Return(execContext)
 
 		dCtx, err := d.buildContextualDynamicWorkflow(ctx, nCtx)
@@ -262,8 +262,8 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 		}
 
 		execContext := &mocks4.ExecutionContext{}
-		execContext.OnGetParentInfo().Return(nil)
-		execContext.OnGetEventVersion().Return(v1alpha1.EventVersion0)
+		execContext.EXPECT().GetParentInfo().Return(nil)
+		execContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion0)
 		nCtx.OnExecutionContext().Return(execContext)
 
 		dCtx, err := d.buildContextualDynamicWorkflow(ctx, nCtx)
@@ -330,8 +330,8 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 			metrics:         newMetrics(promutils.NewTestScope()),
 		}
 		execContext := &mocks4.ExecutionContext{}
-		execContext.OnGetParentInfo().Return(nil)
-		execContext.OnGetEventVersion().Return(v1alpha1.EventVersion0)
+		execContext.EXPECT().GetParentInfo().Return(nil)
+		execContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion0)
 		nCtx.OnExecutionContext().Return(execContext)
 
 		_, err = d.buildContextualDynamicWorkflow(ctx, nCtx)
@@ -417,8 +417,8 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 		immutableParentInfo := mocks4.ImmutableParentInfo{}
 		immutableParentInfo.OnGetUniqueID().Return("c1")
 		immutableParentInfo.OnCurrentAttempt().Return(uint32(2))
-		execContext.OnGetParentInfo().Return(&immutableParentInfo)
-		execContext.OnGetEventVersion().Return(v1alpha1.EventVersion1)
+		execContext.EXPECT().GetParentInfo().Return(&immutableParentInfo)
+		execContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion1)
 		nCtx.OnExecutionContext().Return(execContext)
 
 		dCtx, err := d.buildContextualDynamicWorkflow(ctx, nCtx)
@@ -471,8 +471,8 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 		immutableParentInfo := mocks4.ImmutableParentInfo{}
 		immutableParentInfo.OnGetUniqueID().Return("c1")
 		immutableParentInfo.OnCurrentAttempt().Return(uint32(2))
-		execContext.OnGetParentInfo().Return(&immutableParentInfo)
-		execContext.OnGetEventVersion().Return(v1alpha1.EventVersion1)
+		execContext.EXPECT().GetParentInfo().Return(&immutableParentInfo)
+		execContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion1)
 		nCtx.OnExecutionContext().Return(execContext)
 
 		_, err := d.buildContextualDynamicWorkflow(ctx, nCtx)
@@ -560,9 +560,9 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 		immutableParentInfo := mocks4.ImmutableParentInfo{}
 		immutableParentInfo.OnGetUniqueID().Return("c1")
 		immutableParentInfo.OnCurrentAttempt().Return(uint32(2))
-		execContext.OnGetParentInfo().Return(&immutableParentInfo)
-		execContext.OnGetEventVersion().Return(v1alpha1.EventVersion1)
-		execContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{
+		execContext.EXPECT().GetParentInfo().Return(&immutableParentInfo)
+		execContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion1)
+		execContext.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{
 			RecoveryExecution: v1alpha1.WorkflowExecutionIdentifier{},
 		})
 		nCtx.OnExecutionContext().Return(execContext)

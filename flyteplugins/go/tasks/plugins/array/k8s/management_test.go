@@ -116,6 +116,7 @@ func getMockTaskExecutionContext(ctx context.Context, parallelism int) *mocks.Ta
 	tMeta.OnGetPlatformResources().Return(&v1.ResourceRequirements{})
 	tMeta.OnGetInterruptibleFailureThreshold().Return(2)
 	tMeta.OnGetEnvironmentVariables().Return(nil)
+	tMeta.OnGetConsoleURL().Return("")
 
 	ow := &mocks2.OutputWriter{}
 	ow.OnGetOutputPrefixPath().Return("/prefix/")

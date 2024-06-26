@@ -93,6 +93,7 @@ func dummySidecarTaskMetadata(resources *v1.ResourceRequirements, extendedResour
 	to.On("GetContainerImage").Return("")
 	taskMetadata.On("GetOverrides").Return(to)
 	taskMetadata.On("GetEnvironmentVariables").Return(nil)
+	taskMetadata.On("GetConsoleURL").Return("")
 
 	return taskMetadata
 }

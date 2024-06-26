@@ -18,35 +18,6 @@ pub struct RunPolicy {
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]
-pub enum RestartPolicy {
-    Never = 0,
-    OnFailure = 1,
-    Always = 2,
-}
-impl RestartPolicy {
-    /// String value of the enum field names used in the ProtoBuf definition.
-    ///
-    /// The values are not transformed in any way and thus are considered stable
-    /// (if the ProtoBuf definition does not change) and safe for programmatic use.
-    pub fn as_str_name(&self) -> &'static str {
-        match self {
-            RestartPolicy::Never => "RESTART_POLICY_NEVER",
-            RestartPolicy::OnFailure => "RESTART_POLICY_ON_FAILURE",
-            RestartPolicy::Always => "RESTART_POLICY_ALWAYS",
-        }
-    }
-    /// Creates an enum from field names used in the ProtoBuf definition.
-    pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
-        match value {
-            "RESTART_POLICY_NEVER" => Some(Self::Never),
-            "RESTART_POLICY_ON_FAILURE" => Some(Self::OnFailure),
-            "RESTART_POLICY_ALWAYS" => Some(Self::Always),
-            _ => None,
-        }
-    }
-}
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
-#[repr(i32)]
 pub enum CleanPodPolicy {
     CleanpodPolicyNone = 0,
     CleanpodPolicyRunning = 1,
@@ -97,21 +68,29 @@ pub struct DistributedMpiTrainingTask {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct DistributedMpiTrainingReplicaSpec {
+    /// 1~4 deprecated. Use common instead.
     /// Number of replicas
+    #[deprecated]
     #[prost(int32, tag="1")]
     pub replicas: i32,
     /// Image used for the replica group
+    #[deprecated]
     #[prost(string, tag="2")]
     pub image: ::prost::alloc::string::String,
     /// Resources required for the replica group
+    #[deprecated]
     #[prost(message, optional, tag="3")]
     pub resources: ::core::option::Option<super::super::core::Resources>,
     /// Restart policy determines whether pods will be restarted when they exit
-    #[prost(enumeration="RestartPolicy", tag="4")]
+    #[deprecated]
+    #[prost(enumeration="super::RestartPolicy", tag="4")]
     pub restart_policy: i32,
     /// MPI sometimes requires different command set for different replica groups
     #[prost(string, repeated, tag="5")]
     pub command: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    /// The common replica spec
+    #[prost(message, optional, tag="6")]
+    pub common: ::core::option::Option<super::CommonReplicaSpec>,
 }
 /// Custom proto for torch elastic config for distributed training using 
 /// <https://github.com/kubeflow/training-operator/blob/master/pkg/apis/kubeflow.org/v1/pytorch_types.go>
@@ -151,18 +130,26 @@ pub struct DistributedPyTorchTrainingTask {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct DistributedPyTorchTrainingReplicaSpec {
+    /// 1~4 deprecated. Use common instead.
     /// Number of replicas
+    #[deprecated]
     #[prost(int32, tag="1")]
     pub replicas: i32,
     /// Image used for the replica group
+    #[deprecated]
     #[prost(string, tag="2")]
     pub image: ::prost::alloc::string::String,
     /// Resources required for the replica group
+    #[deprecated]
     #[prost(message, optional, tag="3")]
     pub resources: ::core::option::Option<super::super::core::Resources>,
-    /// RestartPolicy determines whether pods will be restarted when they exit
-    #[prost(enumeration="RestartPolicy", tag="4")]
+    /// Restart policy determines whether pods will be restarted when they exit
+    #[deprecated]
+    #[prost(enumeration="super::RestartPolicy", tag="4")]
     pub restart_policy: i32,
+    /// The common replica spec
+    #[prost(message, optional, tag="5")]
+    pub common: ::core::option::Option<super::CommonReplicaSpec>,
 }
 /// Proto for plugin that enables distributed training using <https://github.com/kubeflow/tf-operator>
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -189,17 +176,25 @@ pub struct DistributedTensorflowTrainingTask {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct DistributedTensorflowTrainingReplicaSpec {
+    /// 1~4 deprecated. Use common instead.
     /// Number of replicas
+    #[deprecated]
     #[prost(int32, tag="1")]
     pub replicas: i32,
     /// Image used for the replica group
+    #[deprecated]
     #[prost(string, tag="2")]
     pub image: ::prost::alloc::string::String,
     /// Resources required for the replica group
+    #[deprecated]
     #[prost(message, optional, tag="3")]
     pub resources: ::core::option::Option<super::super::core::Resources>,
-    /// RestartPolicy Determines whether pods will be restarted when they exit
-    #[prost(enumeration="RestartPolicy", tag="4")]
+    /// Restart policy determines whether pods will be restarted when they exit
+    #[deprecated]
+    #[prost(enumeration="super::RestartPolicy", tag="4")]
     pub restart_policy: i32,
+    /// The common replica spec
+    #[prost(message, optional, tag="5")]
+    pub common: ::core::option::Option<super::CommonReplicaSpec>,
 }
 // @@protoc_insertion_point(module)

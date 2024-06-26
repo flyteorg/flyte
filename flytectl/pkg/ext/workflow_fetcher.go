@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/flyteorg/flyte/flytectl/pkg/filters"
-
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )

@@ -81,3 +81,17 @@ func (m *AdminService) GetProject(ctx context.Context, request *admin.ProjectGet
 	m.Metrics.projectEndpointMetrics.get.Success()
 	return response, nil
 }
+
+func (m *AdminService) GetDomains(ctx context.Context, request *admin.GetDomainRequest) (*admin.GetDomainsResponse, error) {
+	defer m.interceptPanic(ctx, request)
+	if request == nil {
+		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
+	}
+	var response *admin.GetDomainsResponse
+	m.Metrics.domainEndpointMetrics.get.Time(func() {
+		response = m.ProjectManager.GetDomains(ctx, *request)
+	})
+
+	m.Metrics.domainEndpointMetrics.get.Success()
+	return response, nil
+}
