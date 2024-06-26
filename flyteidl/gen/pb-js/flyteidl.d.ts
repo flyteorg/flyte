@@ -7654,8 +7654,8 @@ export namespace flyteidl {
         /** Properties of an ExecutionEnv. */
         interface IExecutionEnv {
 
-            /** ExecutionEnv id */
-            id?: (string|null);
+            /** ExecutionEnv name */
+            name?: (string|null);
 
             /** ExecutionEnv type */
             type?: (string|null);
@@ -7679,8 +7679,8 @@ export namespace flyteidl {
              */
             constructor(properties?: flyteidl.core.IExecutionEnv);
 
-            /** ExecutionEnv id. */
-            public id: string;
+            /** ExecutionEnv name. */
+            public name: string;
 
             /** ExecutionEnv type. */
             public type: string;
