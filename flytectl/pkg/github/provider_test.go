@@ -32,6 +32,9 @@ func TestGetLatestFlytectlVersion(t *testing.T) {
 		latestVersion, err := mockProvider.GetLatestVersion()
 		assert.Nil(t, err)
 		assert.Equal(t, "flytectl/1.2.4", latestVersion)
+		cleanVersion, err := mockProvider.GetCleanLatestVersion()
+		assert.Nil(t, err)
+		assert.Equal(t, "1.2.4", cleanVersion)
 	})
 }
 

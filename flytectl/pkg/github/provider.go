@@ -133,6 +133,16 @@ func (c *GHProvider) GetLatestVersion() (string, error) {
 	return latestTag, err
 }
 
+// GetCleanLatestVersion gets the latest version without the "flytectl/" prefix
+func (c *GHProvider) GetCleanLatestVersion() (string, error) {
+	latest, err := c.GetLatestVersion()
+	if err != nil {
+		return "", err
+	}
+	clearVersion := strings.TrimPrefix(latest, fmt.Sprintf("%s/", flytectl))
+	return clearVersion, nil
+}
+
 func (c *GHProvider) getReleases() ([]*go_github.RepositoryRelease, error) {
 	g := c.ghRepo
 	releases, _, err := g.ListReleases(context.Background(), owner, flyte, &go_github.ListOptions{
