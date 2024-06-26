@@ -60,7 +60,7 @@ func TestMetricsScope(t *testing.T) {
 	}
 	t.Run("Counter", func(t *testing.T) {
 		m := s.MustNewCounter("xc", description)
-		assert.Equal(t, `Desc{fqName: "test:xc", help: "some x", constLabels: {}, variableLabels: []}`, m.Desc().String())
+		assert.Equal(t, `Desc{fqName: "test:xc", help: "some x", constLabels: {}, variableLabels: {}}`, m.Desc().String())
 		mv := s.MustNewCounterVec("xcv", description)
 		assert.NotNil(t, mv)
 		assert.Panics(t, func() {
@@ -73,7 +73,7 @@ func TestMetricsScope(t *testing.T) {
 
 	t.Run("Histogram", func(t *testing.T) {
 		m := s.MustNewHistogram("xh", description)
-		assert.Equal(t, `Desc{fqName: "test:xh", help: "some x", constLabels: {}, variableLabels: []}`, m.Desc().String())
+		assert.Equal(t, `Desc{fqName: "test:xh", help: "some x", constLabels: {}, variableLabels: {}}`, m.Desc().String())
 		mv := s.MustNewHistogramVec("xhv", description)
 		assert.NotNil(t, mv)
 		assert.Panics(t, func() {
@@ -92,10 +92,10 @@ func TestMetricsScope(t *testing.T) {
 
 	t.Run("Summary", func(t *testing.T) {
 		m := s.MustNewSummary("xs", description)
-		assert.Equal(t, `Desc{fqName: "test:xs", help: "some x", constLabels: {}, variableLabels: []}`, m.Desc().String())
+		assert.Equal(t, `Desc{fqName: "test:xs", help: "some x", constLabels: {}, variableLabels: {}}`, m.Desc().String())
 		mco, err := s.NewSummaryWithOptions("xsco", description, SummaryOptions{Objectives: map[float64]float64{0.5: 0.05, 1.0: 0.0}})
 		assert.Nil(t, err)
-		assert.Equal(t, `Desc{fqName: "test:xsco", help: "some x", constLabels: {}, variableLabels: []}`, mco.Desc().String())
+		assert.Equal(t, `Desc{fqName: "test:xsco", help: "some x", constLabels: {}, variableLabels: {}}`, mco.Desc().String())
 		mv := s.MustNewSummaryVec("xsv", description)
 		assert.NotNil(t, mv)
 		assert.Panics(t, func() {
@@ -108,7 +108,7 @@ func TestMetricsScope(t *testing.T) {
 
 	t.Run("Gauge", func(t *testing.T) {
 		m := s.MustNewGauge("xg", description)
-		assert.Equal(t, `Desc{fqName: "test:xg", help: "some x", constLabels: {}, variableLabels: []}`, m.Desc().String())
+		assert.Equal(t, `Desc{fqName: "test:xg", help: "some x", constLabels: {}, variableLabels: {}}`, m.Desc().String())
 		mv := s.MustNewGaugeVec("xgv", description)
 		assert.NotNil(t, mv)
 		assert.Panics(t, func() {
@@ -123,7 +123,7 @@ func TestMetricsScope(t *testing.T) {
 		m := s.MustNewStopWatch("xt", description, time.Second)
 		asDesc, ok := m.Observer.(prometheus.Metric)
 		assert.True(t, ok)
-		assert.Equal(t, `Desc{fqName: "test:xt_s", help: "some x", constLabels: {}, variableLabels: []}`, asDesc.Desc().String())
+		assert.Equal(t, `Desc{fqName: "test:xt_s", help: "some x", constLabels: {}, variableLabels: {}}`, asDesc.Desc().String())
 		assert.Panics(t, func() {
 			_ = s.MustNewStopWatch("xt", description, time.Second)
 		})
