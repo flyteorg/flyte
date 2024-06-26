@@ -4548,6 +4548,9 @@ export namespace flyteidl {
             /** ArrayNode successCriteria. */
             public successCriteria?: ("minSuccesses"|"minSuccessRatio");
 
+            /** ArrayNode executionVersionOption. */
+            public executionVersionOption?: "executionVersion";
+
             /**
              * Creates a new ArrayNode instance using the specified properties.
              * @param [properties] Properties to set
