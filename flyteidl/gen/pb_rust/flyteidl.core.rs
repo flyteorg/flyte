@@ -2965,9 +2965,10 @@ pub struct ExecutionEnvAssignment {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ExecutionEnv {
-    /// id is a unique identifier for the execution environment.
+    /// name is a human-readable identifier for the execution environment. This is combined with the
+    /// project, domain, and version to uniquely identify an execution environment.
     #[prost(string, tag="1")]
-    pub id: ::prost::alloc::string::String,
+    pub name: ::prost::alloc::string::String,
     /// type is the type of the execution environment.
     #[prost(string, tag="2")]
     pub r#type: ::prost::alloc::string::String,

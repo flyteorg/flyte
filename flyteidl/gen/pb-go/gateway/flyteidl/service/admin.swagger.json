@@ -7076,9 +7076,9 @@
     "coreExecutionEnv": {
       "type": "object",
       "properties": {
-        "id": {
+        "name": {
           "type": "string",
-          "description": "id is a unique identifier for the execution environment."
+          "description": "name is a human-readable identifier for the execution environment. This is combined with the\nproject, domain, and version to uniquely identify an execution environment."
         },
         "type": {
           "type": "string",
