@@ -14,6 +14,7 @@ import (
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	"github.com/flyteorg/flyte/flyteadmin/auth"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/artifacts"
@@ -602,9 +603,17 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 	}
 
 	// Dynamically assign task resource defaults.
-	platformTaskResources := util.GetTaskResources(ctx, workflow.Id, m.resourceManager, m.config.TaskResourceConfiguration())
+	var taskResources workflowengineInterfaces.TaskResources
+	if requestSpec.TaskResourceAttributes != nil {
+		taskResources = workflowengineInterfaces.TaskResources{
+			Defaults: util.FromAdminProtoTaskResourceSpec(ctx, requestSpec.TaskResourceAttributes.Defaults),
+			Limits:   util.FromAdminProtoTaskResourceSpec(ctx, requestSpec.TaskResourceAttributes.Limits),
+		}
+	} else {
+		taskResources = util.GetTaskResources(ctx, workflow.Id, m.resourceManager, m.config.TaskResourceConfiguration())
+	}
 	for _, t := range workflow.Closure.CompiledWorkflow.Tasks {
-		m.setCompiledTaskDefaults(ctx, t, platformTaskResources)
+		m.setCompiledTaskDefaults(ctx, t, taskResources)
 	}
 
 	// Dynamically assign execution queues.
@@ -655,7 +664,7 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 		Labels:                     labels,
 		Annotations:                annotations,
 		ExecutionConfig:            executionConfig,
-		TaskResources:              &platformTaskResources,
+		TaskResources:              &taskResources,
 		EventVersion:               m.config.ApplicationConfiguration().GetTopLevelConfig().EventVersion,
 		RoleNameKey:                m.config.ApplicationConfiguration().GetTopLevelConfig().RoleNameKey,
 		RawOutputDataConfig:        rawOutputDataConfig,
@@ -1378,6 +1387,11 @@ func completeResolvedSpec(spec *admin.ExecutionSpec, executionParameters *workfl
 	spec.RawOutputDataConfig = executionParameters.RawOutputDataConfig
 	spec.ClusterAssignment = executionParameters.ClusterAssignment
 	spec.Interruptible = executionParameters.ExecutionConfig.Interruptible
+	if spec.GetInterruptible() == nil {
+		spec.Interruptible = &wrapperspb.BoolValue{
+			Value: false,
+		}
+	}
 	spec.OverwriteCache = executionParameters.ExecutionConfig.OverwriteCache
 	spec.Envs = executionParameters.ExecutionConfig.Envs
 	spec.ExecutionClusterLabel = executionParameters.ExecutionClusterLabel
