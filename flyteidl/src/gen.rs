@@ -1,7 +1,7 @@
-use tonic_build;
 use glob::glob;
-use std::path::PathBuf;
 use std::fs;
+use std::path::PathBuf;
+use tonic_build;
 
 fn main() {
     let mut protos: Vec<PathBuf> = Vec::new();
@@ -21,11 +21,11 @@ fn main() {
                         }
                     }
                 }
-            },
+            }
             Err(e) => eprintln!("Error while reading directory entry: {}", e),
         }
     }
-    
+
     tonic_build::configure()
         .out_dir("gen/pb_rust")
         .build_server(false)
@@ -34,7 +34,10 @@ fn main() {
         .type_attribute(".", "#[derive(::pyo3_macro::WithNew)]")
         .compile_well_known_types(true)
         .compile(
-            &protos.iter().map(|p| p.to_str().unwrap()).collect::<Vec<_>>(),
+            &protos
+                .iter()
+                .map(|p| p.to_str().unwrap())
+                .collect::<Vec<_>>(),
             &[
                 "protos/",
                 "protos/google/api/", // Adjust this path to where you have the googleapis protos

@@ -30,8 +30,7 @@ macro_rules! convert_foreign_tonic_error {
                 PyOSError::new_err(err.to_string())
             }
         }
-
-    }
+    };
 }
 
 #[macro_export]
@@ -40,11 +39,10 @@ macro_rules! convert_foreign_prost_error {
     // Create a newtype wrapper, e.g. MyOtherError. Then implement From<MyOtherError> for PyErr (or PyErrArguments), as well as From<OtherError> for MyOtherError.
     () => {
         use prost::{DecodeError, EncodeError, Message};
-        use pyo3::types::{PyBytes};
         use pyo3::exceptions::PyOSError;
+        use pyo3::types::PyBytes;
         use pyo3::PyErr;
         use std::fmt;
-
 
         // An error indicates taht failing at serializing object to bytes string, like `SerializTOString()` for python protos.
         pub struct MessageEncodeError(EncodeError);
@@ -87,30 +85,42 @@ macro_rules! convert_foreign_prost_error {
             }
         }
 
-        pub trait ProtobufDecoder<T> where T: Message + Default {
+        pub trait ProtobufDecoder<T>
+        where
+            T: Message + Default,
+        {
             fn ParseFromString(&self, bytes_obj: &PyBytes) -> Result<T, MessageDecodeError>;
         }
-        
-        pub trait ProtobufEncoder<T> where T: Message + Default {
+
+        pub trait ProtobufEncoder<T>
+        where
+            T: Message + Default,
+        {
             fn SerializeToString(&self, res: T) -> Result<Vec<u8>, MessageEncodeError>;
         }
-        
-        impl<T> ProtobufDecoder<T> for T where T: Message + Default {
+
+        impl<T> ProtobufDecoder<T> for T
+        where
+            T: Message + Default,
+        {
             fn ParseFromString(&self, bytes_obj: &PyBytes) -> Result<T, MessageDecodeError> {
                 let bytes = bytes_obj.as_bytes();
                 let de = Message::decode(&bytes.to_vec()[..]);
                 Ok(de?)
             }
         }
-        
-        impl<T> ProtobufEncoder<T> for T where T: Message + Default {
+
+        impl<T> ProtobufEncoder<T> for T
+        where
+            T: Message + Default,
+        {
             fn SerializeToString(&self, res: T) -> Result<Vec<u8>, MessageEncodeError> {
                 let mut buf = vec![];
                 res.encode(&mut buf)?;
                 Ok(buf)
             }
         }
-    }
+    };
 }
 
 #[macro_export]
@@ -126,7 +136,7 @@ macro_rules! concrete_generic_structure {
         // If we trying to expose `tonic::transport::Channel` through PyO3 so that we can create a tonic channel in Python and take it as input for our gRPC clients bindings,
         // It'll violate the orphan ruls in terms of Rust's traits consisitency, because we were trying to implement a external trait for another external crate's structure in our local crates.
         // Se We may need to define a local structure like `PyClientlWrapper` and it's not necessary to get or set all of its member fields.
-        
+
         // The macro mechanically implement our gRPC client stubs.
         #[pyo3::pymethods]
         impl $name {
@@ -173,7 +183,7 @@ pub mod flyteidl {
 
     use pyo3::prelude::*;
     pub mod admin {
-            
+
         include!("../gen/pb_rust/flyteidl.admin.rs");
     }
     pub mod core {
@@ -184,62 +194,62 @@ pub mod flyteidl {
             }
         }
         impl<'py> pyo3::conversion::FromPyObject<'py> for Box<Node> {
-            fn extract_bound(obj: & pyo3::Bound<'py, pyo3::types:: PyAny>) ->  pyo3::PyResult<Self> {
+            fn extract_bound(obj: &pyo3::Bound<'py, pyo3::types::PyAny>) -> pyo3::PyResult<Self> {
                 Ok(Box::new(Node::extract_bound(obj).unwrap()))
             }
         }
-        
+
         impl pyo3::conversion::IntoPy<pyo3::PyObject> for Box<LiteralType> {
             fn into_py(self, py: pyo3::marker::Python<'_>) -> pyo3::PyObject {
                 self.as_ref().clone().into_py(py)
             }
         }
         impl<'py> pyo3::conversion::FromPyObject<'py> for Box<LiteralType> {
-            fn extract_bound(obj: & pyo3::Bound<'py, pyo3::types:: PyAny>) ->  pyo3::PyResult<Self> {
+            fn extract_bound(obj: &pyo3::Bound<'py, pyo3::types::PyAny>) -> pyo3::PyResult<Self> {
                 Ok(Box::new(LiteralType::extract_bound(obj).unwrap()))
             }
         }
-        
+
         impl pyo3::conversion::IntoPy<pyo3::PyObject> for Box<Literal> {
             fn into_py(self, py: pyo3::marker::Python<'_>) -> pyo3::PyObject {
                 self.as_ref().clone().into_py(py)
             }
         }
         impl<'py> pyo3::conversion::FromPyObject<'py> for Box<Literal> {
-            fn extract_bound(obj: & pyo3::Bound<'py, pyo3::types:: PyAny>) ->  pyo3::PyResult<Self> {
+            fn extract_bound(obj: &pyo3::Bound<'py, pyo3::types::PyAny>) -> pyo3::PyResult<Self> {
                 Ok(Box::new(Literal::extract_bound(obj).unwrap()))
             }
         }
-        
+
         impl pyo3::conversion::IntoPy<pyo3::PyObject> for Box<Union> {
             fn into_py(self, py: pyo3::marker::Python<'_>) -> pyo3::PyObject {
                 self.as_ref().clone().into_py(py)
             }
         }
         impl<'py> pyo3::conversion::FromPyObject<'py> for Box<Union> {
-            fn extract_bound(obj: & pyo3::Bound<'py, pyo3::types:: PyAny>) ->  pyo3::PyResult<Self> {
+            fn extract_bound(obj: &pyo3::Bound<'py, pyo3::types::PyAny>) -> pyo3::PyResult<Self> {
                 Ok(Box::new(Union::extract_bound(obj).unwrap()))
             }
         }
-        
+
         impl pyo3::conversion::IntoPy<pyo3::PyObject> for Box<Scalar> {
             fn into_py(self, py: pyo3::marker::Python<'_>) -> pyo3::PyObject {
                 self.as_ref().clone().into_py(py)
             }
         }
         impl<'py> pyo3::conversion::FromPyObject<'py> for Box<Scalar> {
-            fn extract_bound(obj: & pyo3::Bound<'py, pyo3::types:: PyAny>) ->  pyo3::PyResult<Self> {
+            fn extract_bound(obj: &pyo3::Bound<'py, pyo3::types::PyAny>) -> pyo3::PyResult<Self> {
                 Ok(Box::new(Scalar::extract_bound(obj).unwrap()))
             }
         }
-        
+
         impl pyo3::conversion::IntoPy<pyo3::PyObject> for Box<ConjunctionExpression> {
             fn into_py(self, py: pyo3::marker::Python<'_>) -> pyo3::PyObject {
                 self.as_ref().clone().into_py(py)
             }
         }
         impl<'py> pyo3::conversion::FromPyObject<'py> for Box<ConjunctionExpression> {
-            fn extract_bound(obj: & pyo3::Bound<'py, pyo3::types:: PyAny>) ->  pyo3::PyResult<Self> {
+            fn extract_bound(obj: &pyo3::Bound<'py, pyo3::types::PyAny>) -> pyo3::PyResult<Self> {
                 Ok(Box::new(ConjunctionExpression::extract_bound(obj).unwrap()))
             }
         }
@@ -249,55 +259,55 @@ pub mod flyteidl {
             }
         }
         impl<'py> pyo3::conversion::FromPyObject<'py> for Box<BooleanExpression> {
-            fn extract_bound(obj: & pyo3::Bound<'py, pyo3::types:: PyAny>) ->  pyo3::PyResult<Self> {
+            fn extract_bound(obj: &pyo3::Bound<'py, pyo3::types::PyAny>) -> pyo3::PyResult<Self> {
                 Ok(Box::new(BooleanExpression::extract_bound(obj).unwrap()))
             }
         }
-        
+
         impl pyo3::conversion::IntoPy<pyo3::PyObject> for Box<IfBlock> {
             fn into_py(self, py: pyo3::marker::Python<'_>) -> pyo3::PyObject {
                 self.as_ref().clone().into_py(py)
             }
         }
         impl<'py> pyo3::conversion::FromPyObject<'py> for Box<IfBlock> {
-            fn extract_bound(obj: & pyo3::Bound<'py, pyo3::types:: PyAny>) ->  pyo3::PyResult<Self> {
+            fn extract_bound(obj: &pyo3::Bound<'py, pyo3::types::PyAny>) -> pyo3::PyResult<Self> {
                 Ok(Box::new(IfBlock::extract_bound(obj).unwrap()))
             }
         }
-        
+
         impl pyo3::conversion::IntoPy<pyo3::PyObject> for Box<IfElseBlock> {
             fn into_py(self, py: pyo3::marker::Python<'_>) -> pyo3::PyObject {
                 self.as_ref().clone().into_py(py)
             }
         }
         impl<'py> pyo3::conversion::FromPyObject<'py> for Box<IfElseBlock> {
-            fn extract_bound(obj: & pyo3::Bound<'py, pyo3::types:: PyAny>) ->  pyo3::PyResult<Self> {
+            fn extract_bound(obj: &pyo3::Bound<'py, pyo3::types::PyAny>) -> pyo3::PyResult<Self> {
                 Ok(Box::new(IfElseBlock::extract_bound(obj).unwrap()))
             }
         }
-        
+
         impl pyo3::conversion::IntoPy<pyo3::PyObject> for Box<BranchNode> {
             fn into_py(self, py: pyo3::marker::Python<'_>) -> pyo3::PyObject {
                 self.as_ref().clone().into_py(py)
             }
         }
         impl<'py> pyo3::conversion::FromPyObject<'py> for Box<BranchNode> {
-            fn extract_bound(obj: & pyo3::Bound<'py, pyo3::types:: PyAny>) ->  pyo3::PyResult<Self> {
+            fn extract_bound(obj: &pyo3::Bound<'py, pyo3::types::PyAny>) -> pyo3::PyResult<Self> {
                 Ok(Box::new(BranchNode::extract_bound(obj).unwrap()))
             }
         }
-        
+
         impl pyo3::conversion::IntoPy<pyo3::PyObject> for Box<ArrayNode> {
             fn into_py(self, py: pyo3::marker::Python<'_>) -> pyo3::PyObject {
                 self.as_ref().clone().into_py(py)
             }
         }
         impl<'py> pyo3::conversion::FromPyObject<'py> for Box<ArrayNode> {
-            fn extract_bound(obj: & pyo3::Bound<'py, pyo3::types:: PyAny>) ->  pyo3::PyResult<Self> {
+            fn extract_bound(obj: &pyo3::Bound<'py, pyo3::types::PyAny>) -> pyo3::PyResult<Self> {
                 Ok(Box::new(ArrayNode::extract_bound(obj).unwrap()))
             }
         }
-    
+
         include!("../gen/pb_rust/flyteidl.core.rs");
         #[pymethods]
         impl literal_type::Type {
@@ -395,7 +405,7 @@ fn register_task_execution_submodule(parent_module: &Bound<'_, PyModule>) -> PyR
 
 fn register_core_submodule(parent_module: &Bound<'_, PyModule>) -> PyResult<()> {
     let m = PyModule::new_bound(parent_module.py(), "core")?;
-    
+
     m.add_class::<flyteidl::core::literal_type::Type>();
     m.add_class::<flyteidl::core::LiteralType>();
     m.add_class::<flyteidl::core::Literal>();
@@ -427,7 +437,7 @@ fn register_core_submodule(parent_module: &Bound<'_, PyModule>) -> PyResult<()> 
     m.add_class::<flyteidl::core::TaskTemplate>();
     m.add_class::<flyteidl::core::ParameterMap>();
     m.add_class::<flyteidl::core::Parameter>();
-    m.add_class::<flyteidl::core::NodeExecutionIdentifier>();                
+    m.add_class::<flyteidl::core::NodeExecutionIdentifier>();
     m.add_class::<flyteidl::core::Primitive>();
     m.add_class::<flyteidl::core::SimpleType>();
     m.add_class::<flyteidl::core::Scalar>();
@@ -442,7 +452,6 @@ fn register_core_submodule(parent_module: &Bound<'_, PyModule>) -> PyResult<()> 
     parent_module.add_submodule(&m)?;
     Ok(())
 }
-
 
 fn register_admin_submodule(parent_module: &Bound<'_, PyModule>) -> PyResult<()> {
     let m = PyModule::new_bound(parent_module.py(), "admin")?;
@@ -486,11 +495,10 @@ fn register_admin_submodule(parent_module: &Bound<'_, PyModule>) -> PyResult<()>
 
     parent_module.add_submodule(&m)?;
     Ok(())
-}    
+}
 // A Python module implemented in Rust.
 #[pymodule]
 pub fn _flyteidl_rust(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
-
     register_wkt_submodule(m);
     register_core_submodule(m);
     register_admin_submodule(m);
@@ -507,34 +515,81 @@ pub fn _flyteidl_rust(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
 
     use flyteidl::service::admin_service_client::AdminServiceClient;
     use flyteidl::service::data_proxy_service_client::DataProxyServiceClient;
-    
+
     convert_foreign_tonic_error!();
 
     concrete_generic_structure!(
-        AdminStub, AdminServiceClient, tonic::transport::Channel, 
-        (create_task, flyteidl::admin::TaskCreateRequest, flyteidl::admin::TaskCreateResponse),
-        (get_task, flyteidl::admin::ObjectGetRequest, flyteidl::admin::Task),
-        (create_execution, flyteidl::admin::ExecutionCreateRequest, flyteidl::admin::ExecutionCreateResponse),
-        (get_execution, flyteidl::admin::WorkflowExecutionGetRequest, flyteidl::admin::Execution),
-        (get_execution_data,  flyteidl::admin::WorkflowExecutionGetDataRequest,  flyteidl::admin::WorkflowExecutionGetDataResponse),
-        (list_node_executions,  flyteidl::admin::NodeExecutionListRequest,  flyteidl::admin::NodeExecutionList),
-        (get_node_execution_data, flyteidl::admin::NodeExecutionGetDataRequest, flyteidl::admin::NodeExecutionGetDataResponse),
-        (list_task_executions, flyteidl::admin::TaskExecutionListRequest, flyteidl::admin::TaskExecutionList),
-        (get_task_execution, flyteidl::admin::TaskExecutionGetRequest, flyteidl::admin::TaskExecution),
-        (get_task_execution_data, flyteidl::admin::TaskExecutionGetDataRequest, flyteidl::admin::TaskExecutionGetDataResponse)
+        AdminStub,
+        AdminServiceClient,
+        tonic::transport::Channel,
+        (
+            create_task,
+            flyteidl::admin::TaskCreateRequest,
+            flyteidl::admin::TaskCreateResponse
+        ),
+        (
+            get_task,
+            flyteidl::admin::ObjectGetRequest,
+            flyteidl::admin::Task
+        ),
+        (
+            create_execution,
+            flyteidl::admin::ExecutionCreateRequest,
+            flyteidl::admin::ExecutionCreateResponse
+        ),
+        (
+            get_execution,
+            flyteidl::admin::WorkflowExecutionGetRequest,
+            flyteidl::admin::Execution
+        ),
+        (
+            get_execution_data,
+            flyteidl::admin::WorkflowExecutionGetDataRequest,
+            flyteidl::admin::WorkflowExecutionGetDataResponse
+        ),
+        (
+            list_node_executions,
+            flyteidl::admin::NodeExecutionListRequest,
+            flyteidl::admin::NodeExecutionList
+        ),
+        (
+            get_node_execution_data,
+            flyteidl::admin::NodeExecutionGetDataRequest,
+            flyteidl::admin::NodeExecutionGetDataResponse
+        ),
+        (
+            list_task_executions,
+            flyteidl::admin::TaskExecutionListRequest,
+            flyteidl::admin::TaskExecutionList
+        ),
+        (
+            get_task_execution,
+            flyteidl::admin::TaskExecutionGetRequest,
+            flyteidl::admin::TaskExecution
+        ),
+        (
+            get_task_execution_data,
+            flyteidl::admin::TaskExecutionGetDataRequest,
+            flyteidl::admin::TaskExecutionGetDataResponse
+        )
     );
 
     concrete_generic_structure!(
-        DataProxyStub, DataProxyServiceClient, tonic::transport::Channel, 
-        (create_upload_location, flyteidl::service::CreateUploadLocationRequest, flyteidl::service::CreateUploadLocationResponse)
+        DataProxyStub,
+        DataProxyServiceClient,
+        tonic::transport::Channel,
+        (
+            create_upload_location,
+            flyteidl::service::CreateUploadLocationRequest,
+            flyteidl::service::CreateUploadLocationResponse
+        )
     );
-    
+
     m.add_class::<AdminStub>();
     m.add_class::<DataProxyStub>();
 
     m.add_class::<flyteidl::service::CreateUploadLocationRequest>();
     m.add_class::<flyteidl::service::CreateUploadLocationResponse>();
-      
 
     Ok(())
 }
