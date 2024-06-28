@@ -55,6 +55,10 @@ func (e K8sWorkflowExecutor) Execute(ctx context.Context, data interfaces.Execut
 		flyteWf.Tasks = nil
 	}
 
+	if data.ExecutionParameters.ExecutionConfig.MaxParallelism > 0 {
+		flyteWf.ExecutionConfig.MaxParallelism = uint32(data.ExecutionParameters.ExecutionConfig.MaxParallelism)
+	}
+
 	executionTargetSpec := executioncluster.ExecutionTargetSpec{
 		Project:               data.ExecutionID.Project,
 		Domain:                data.ExecutionID.Domain,
