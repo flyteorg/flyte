@@ -172,7 +172,7 @@ func (plugin) GetTaskPhaseWithLogs(ctx context.Context, pluginContext k8s.Plugin
 	}
 
 	taskExecID := pluginContext.TaskExecutionMetadata().GetTaskExecutionID()
-	if pod.Status.Phase != v1.PodPending && pod.Status.Phase != v1.PodUnknown {
+	if pod.Status.Phase != v1.PodUnknown {
 		taskLogs, err := logs.GetLogsForContainerInPod(ctx, logPlugin, taskExecID, pod, 0, logSuffix, extraLogTemplateVarsByScheme, taskTemplate)
 		if err != nil {
 			return pluginsCore.PhaseInfoUndefined, err
@@ -187,9 +187,9 @@ func (plugin) GetTaskPhaseWithLogs(ctx context.Context, pluginContext k8s.Plugin
 	case v1.PodFailed:
 		phaseInfo, err = flytek8s.DemystifyFailure(pod.Status, info)
 	case v1.PodPending:
-		phaseInfo, err = flytek8s.DemystifyPending(pod.Status)
+		phaseInfo, err = flytek8s.DemystifyPending(pod.Status, info)
 	case v1.PodReasonUnschedulable:
-		phaseInfo = pluginsCore.PhaseInfoQueued(transitionOccurredAt, pluginsCore.DefaultPhaseVersion, "pod unschedulable")
+		phaseInfo = pluginsCore.PhaseInfoQueuedWithTaskInfo(transitionOccurredAt, pluginsCore.DefaultPhaseVersion, "pod unschedulable", &info)
 	case v1.PodUnknown:
 		// DO NOTHING
 	default:
@@ -236,15 +236,9 @@ func (plugin) GetTaskPhaseWithLogs(ctx context.Context, pluginContext k8s.Plugin
 
 	if err != nil {
 		return pluginsCore.PhaseInfoUndefined, err
-	} else if phaseInfo.Phase() != pluginsCore.PhaseRunning && phaseInfo.Phase() == pluginState.Phase &&
-		phaseInfo.Version() <= pluginState.PhaseVersion && phaseInfo.Reason() != pluginState.Reason {
-
-		// if we have the same Phase as the previous evaluation and updated the Reason but not the PhaseVersion we must
-		// update the PhaseVersion so an event is sent to reflect the Reason update. this does not handle the Running
-		// Phase because the legacy used `DefaultPhaseVersion + 1` which will only increment to 1.
-		phaseInfo = phaseInfo.WithVersion(pluginState.PhaseVersion + 1)
 	}
 
+	k8s.MaybeUpdatePhaseVersion(&phaseInfo, &pluginState)
 	return phaseInfo, err
 }
 

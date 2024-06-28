@@ -57,6 +57,7 @@ func dummyTaskExecutionMetadata(resources *v1.ResourceRequirements, extendedReso
 	taskExecutionMetadata.On("IsInterruptible").Return(true)
 	taskExecutionMetadata.OnGetPlatformResources().Return(&v1.ResourceRequirements{})
 	taskExecutionMetadata.OnGetEnvironmentVariables().Return(nil)
+	taskExecutionMetadata.OnGetConsoleURL().Return("")
 	return taskExecutionMetadata
 }
 
@@ -1209,7 +1210,7 @@ func TestDemystifyPending(t *testing.T) {
 				},
 			},
 		}
-		taskStatus, err := DemystifyPending(s)
+		taskStatus, err := DemystifyPending(s, pluginsCore.TaskInfo{})
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseQueued, taskStatus.Phase())
 	})
@@ -1224,7 +1225,7 @@ func TestDemystifyPending(t *testing.T) {
 				},
 			},
 		}
-		taskStatus, err := DemystifyPending(s)
+		taskStatus, err := DemystifyPending(s, pluginsCore.TaskInfo{})
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseQueued, taskStatus.Phase())
 	})
@@ -1239,7 +1240,7 @@ func TestDemystifyPending(t *testing.T) {
 				},
 			},
 		}
-		taskStatus, err := DemystifyPending(s)
+		taskStatus, err := DemystifyPending(s, pluginsCore.TaskInfo{})
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseQueued, taskStatus.Phase())
 	})
@@ -1254,7 +1255,7 @@ func TestDemystifyPending(t *testing.T) {
 				},
 			},
 		}
-		taskStatus, err := DemystifyPending(s)
+		taskStatus, err := DemystifyPending(s, pluginsCore.TaskInfo{})
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseQueued, taskStatus.Phase())
 	})
@@ -1289,7 +1290,7 @@ func TestDemystifyPending(t *testing.T) {
 				},
 			},
 		}
-		taskStatus, err := DemystifyPending(s)
+		taskStatus, err := DemystifyPending(s, pluginsCore.TaskInfo{})
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseInitializing, taskStatus.Phase())
 	})
@@ -1306,7 +1307,7 @@ func TestDemystifyPending(t *testing.T) {
 				},
 			},
 		}
-		taskStatus, err := DemystifyPending(s)
+		taskStatus, err := DemystifyPending(s, pluginsCore.TaskInfo{})
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseInitializing, taskStatus.Phase())
 	})
@@ -1323,7 +1324,7 @@ func TestDemystifyPending(t *testing.T) {
 				},
 			},
 		}
-		taskStatus, err := DemystifyPending(s)
+		taskStatus, err := DemystifyPending(s, pluginsCore.TaskInfo{})
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseInitializing, taskStatus.Phase())
 	})
@@ -1342,7 +1343,7 @@ func TestDemystifyPending(t *testing.T) {
 				},
 			},
 		}
-		taskStatus, err := DemystifyPending(s2)
+		taskStatus, err := DemystifyPending(s2, pluginsCore.TaskInfo{})
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseInitializing, taskStatus.Phase())
 	})
@@ -1361,7 +1362,7 @@ func TestDemystifyPending(t *testing.T) {
 				},
 			},
 		}
-		taskStatus, err := DemystifyPending(s2)
+		taskStatus, err := DemystifyPending(s2, pluginsCore.TaskInfo{})
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, taskStatus.Phase())
 		assert.True(t, taskStatus.CleanupOnFailure())
@@ -1379,7 +1380,7 @@ func TestDemystifyPending(t *testing.T) {
 				},
 			},
 		}
-		taskStatus, err := DemystifyPending(s)
+		taskStatus, err := DemystifyPending(s, pluginsCore.TaskInfo{})
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhasePermanentFailure, taskStatus.Phase())
 		assert.True(t, taskStatus.CleanupOnFailure())
@@ -1397,7 +1398,7 @@ func TestDemystifyPending(t *testing.T) {
 				},
 			},
 		}
-		taskStatus, err := DemystifyPending(s)
+		taskStatus, err := DemystifyPending(s, pluginsCore.TaskInfo{})
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, taskStatus.Phase())
 		assert.True(t, taskStatus.CleanupOnFailure())
@@ -1415,7 +1416,7 @@ func TestDemystifyPending(t *testing.T) {
 				},
 			},
 		}
-		taskStatus, err := DemystifyPending(s)
+		taskStatus, err := DemystifyPending(s, pluginsCore.TaskInfo{})
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, taskStatus.Phase())
 		assert.True(t, taskStatus.CleanupOnFailure())
@@ -1435,7 +1436,7 @@ func TestDemystifyPending(t *testing.T) {
 				},
 			},
 		}
-		taskStatus, err := DemystifyPending(s2)
+		taskStatus, err := DemystifyPending(s2, pluginsCore.TaskInfo{})
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseInitializing, taskStatus.Phase())
 	})
@@ -1454,7 +1455,7 @@ func TestDemystifyPending(t *testing.T) {
 				},
 			},
 		}
-		taskStatus, err := DemystifyPending(s2)
+		taskStatus, err := DemystifyPending(s2, pluginsCore.TaskInfo{})
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhasePermanentFailure, taskStatus.Phase())
 		assert.True(t, taskStatus.CleanupOnFailure())
@@ -1474,7 +1475,7 @@ func TestDemystifyPending(t *testing.T) {
 				},
 			},
 		}
-		taskStatus, err := DemystifyPending(s2)
+		taskStatus, err := DemystifyPending(s2, pluginsCore.TaskInfo{})
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseInitializing, taskStatus.Phase())
 	})
@@ -1493,7 +1494,7 @@ func TestDemystifyPending(t *testing.T) {
 				},
 			},
 		}
-		taskStatus, err := DemystifyPending(s2)
+		taskStatus, err := DemystifyPending(s2, pluginsCore.TaskInfo{})
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhasePermanentFailure, taskStatus.Phase())
 		assert.True(t, taskStatus.CleanupOnFailure())
@@ -1525,7 +1526,7 @@ func TestDemystifyPendingTimeout(t *testing.T) {
 	s.Conditions[0].LastTransitionTime.Time = metav1.Now().Add(-config.GetK8sPluginConfig().PodPendingTimeout.Duration)
 
 	t.Run("PodPendingExceedsTimeout", func(t *testing.T) {
-		taskStatus, err := DemystifyPending(s)
+		taskStatus, err := DemystifyPending(s, pluginsCore.TaskInfo{})
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, taskStatus.Phase())
 		assert.Equal(t, "PodPendingTimeout", taskStatus.Err().Code)
@@ -1696,7 +1697,7 @@ func TestDemystifyPending_testcases(t *testing.T) {
 			assert.NoError(t, err, "failed to read file %s", testFile)
 			pod := &v1.Pod{}
 			if assert.NoError(t, json.Unmarshal(data, pod), "failed to unmarshal json in %s. Expected of type v1.Pod", testFile) {
-				p, err := DemystifyPending(pod.Status)
+				p, err := DemystifyPending(pod.Status, pluginsCore.TaskInfo{})
 				if tt.isErr {
 					assert.Error(t, err, "Error expected from method")
 				} else {
@@ -2116,4 +2117,72 @@ func TestMergePodSpecs(t *testing.T) {
 	defaultContainer := mergedPodSpec.Containers[1]
 	assert.Equal(t, podSpec.Containers[1].Name, defaultContainer.Name)
 	assert.Equal(t, defaultContainerTemplate.TerminationMessagePath, defaultContainer.TerminationMessagePath)
+}
+
+func TestAddFlyteCustomizationsToContainer_SetConsoleUrl(t *testing.T) {
+	tests := []struct {
+		name              string
+		includeConsoleURL bool
+		consoleURL        string
+		expectedEnvVar    *v1.EnvVar
+	}{
+		{
+			name:              "do not include console url and console url is not set",
+			includeConsoleURL: false,
+			consoleURL:        "",
+			expectedEnvVar:    nil,
+		},
+		{
+			name:              "include console url but console url is not set",
+			includeConsoleURL: false,
+			consoleURL:        "",
+			expectedEnvVar:    nil,
+		},
+		{
+			name:              "do not include console url but console url is set",
+			includeConsoleURL: false,
+			consoleURL:        "gopher://flyte:65535/console",
+			expectedEnvVar:    nil,
+		},
+		{
+			name:              "include console url and console url is set",
+			includeConsoleURL: true,
+			consoleURL:        "gopher://flyte:65535/console",
+			expectedEnvVar: &v1.EnvVar{
+				Name:  flyteExecutionURL,
+				Value: "gopher://flyte:65535/console/projects/p2/domains/d2/executions/n2/nodeId/unique_node_id/nodes",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			container := &v1.Container{
+				Command: []string{
+					"{{ .Input }}",
+				},
+				Args: []string{
+					"{{ .OutputPrefix }}",
+				},
+			}
+			templateParameters := getTemplateParametersForTest(&v1.ResourceRequirements{}, &v1.ResourceRequirements{}, tt.includeConsoleURL, tt.consoleURL)
+			err := AddFlyteCustomizationsToContainer(context.TODO(), templateParameters, ResourceCustomizationModeAssignResources, container)
+			assert.NoError(t, err)
+			if tt.expectedEnvVar == nil {
+				// Confirm that there is no env var FLYTE_EXECUTION_URL set
+				for _, envVar := range container.Env {
+					assert.NotEqual(t, "FLYTE_EXECUTION_URL", envVar.Name)
+				}
+			}
+			if tt.expectedEnvVar != nil {
+				// Assert that the env var FLYTE_EXECUTION_URL is set if its value is non-nil
+				for _, envVar := range container.Env {
+					if envVar.Name == tt.expectedEnvVar.Name {
+						assert.Equal(t, tt.expectedEnvVar.Value, envVar.Value)
+						return
+					}
+				}
+				t.Fail()
+			}
+		})
+	}
 }

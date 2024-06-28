@@ -36,7 +36,7 @@ author = "Flyte"
 # The short X.Y version
 version = ""
 # The full version, including alpha/beta/rc tags
-release = "1.12.1-rc0"
+release = "1.13.0-rc0"
 
 # -- General configuration ---------------------------------------------------
 
@@ -298,7 +298,7 @@ myst_enable_extensions = ["colon_fence"]
 # Sphinx-mermaid config
 mermaid_output_format = "raw"
 mermaid_version = "latest"
-mermaid_init_js = "mermaid.initialize({startOnLoad:false});"
+mermaid_init_js = "mermaid.initialize({startOnLoad:true});"
 
 # Makes it so that only the command is copied, not the output
 copybutton_prompt_text = "$ "

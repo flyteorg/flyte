@@ -8,7 +8,6 @@ import (
 	"github.com/flyteorg/flyte/flytectl/cmd/config"
 	"github.com/flyteorg/flyte/flytectl/pkg/filters"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-
 	"gopkg.in/yaml.v3"
 )
 

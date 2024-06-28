@@ -57,6 +57,9 @@ func (e K8sWorkflowExecutor) Execute(ctx context.Context, data interfaces.Execut
 
 	if data.ExecutionParameters.ExecutionConfig.MaxParallelism > 0 {
 		flyteWf.ExecutionConfig.MaxParallelism = uint32(data.ExecutionParameters.ExecutionConfig.MaxParallelism)
+
+	if consoleURL := e.config.ApplicationConfiguration().GetTopLevelConfig().ConsoleURL; len(consoleURL) > 0 {
+		flyteWf.ConsoleURL = consoleURL
 	}
 
 	executionTargetSpec := executioncluster.ExecutionTargetSpec{

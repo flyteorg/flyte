@@ -190,6 +190,11 @@ class AdminServiceStub(object):
                 request_serializer=flyteidl_dot_admin_dot_project__pb2.ProjectListRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_admin_dot_project__pb2.Projects.FromString,
                 )
+        self.GetDomains = channel.unary_unary(
+                '/flyteidl.service.AdminService/GetDomains',
+                request_serializer=flyteidl_dot_admin_dot_project__pb2.GetDomainRequest.SerializeToString,
+                response_deserializer=flyteidl_dot_admin_dot_project__pb2.GetDomainsResponse.FromString,
+                )
         self.CreateWorkflowEvent = channel.unary_unary(
                 '/flyteidl.service.AdminService/CreateWorkflowEvent',
                 request_serializer=flyteidl_dot_admin_dot_event__pb2.WorkflowExecutionEventRequest.SerializeToString,
@@ -542,6 +547,12 @@ class AdminServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def GetDomains(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
     def CreateWorkflowEvent(self, request, context):
         """Indicates a :ref:`ref_flyteidl.event.WorkflowExecutionEvent` has occurred.
         """
@@ -864,6 +875,11 @@ def add_AdminServiceServicer_to_server(servicer, server):
                     servicer.ListProjects,
                     request_deserializer=flyteidl_dot_admin_dot_project__pb2.ProjectListRequest.FromString,
                     response_serializer=flyteidl_dot_admin_dot_project__pb2.Projects.SerializeToString,
+            ),
+            'GetDomains': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetDomains,
+                    request_deserializer=flyteidl_dot_admin_dot_project__pb2.GetDomainRequest.FromString,
+                    response_serializer=flyteidl_dot_admin_dot_project__pb2.GetDomainsResponse.SerializeToString,
             ),
             'CreateWorkflowEvent': grpc.unary_unary_rpc_method_handler(
                     servicer.CreateWorkflowEvent,
@@ -1533,6 +1549,23 @@ class AdminService(object):
         return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AdminService/ListProjects',
             flyteidl_dot_admin_dot_project__pb2.ProjectListRequest.SerializeToString,
             flyteidl_dot_admin_dot_project__pb2.Projects.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetDomains(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AdminService/GetDomains',
+            flyteidl_dot_admin_dot_project__pb2.GetDomainRequest.SerializeToString,
+            flyteidl_dot_admin_dot_project__pb2.GetDomainsResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 

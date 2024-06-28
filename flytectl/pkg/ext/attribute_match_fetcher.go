@@ -3,10 +3,9 @@ package ext
 import (
 	"context"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
 func (a *AdminFetcherExtClient) FetchWorkflowAttributes(ctx context.Context, project, domain, name string,

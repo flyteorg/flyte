@@ -28,15 +28,15 @@ Select the integration you need and follow the steps to install the correspondin
     To address potential issues with worker pods of distributed training jobs being scheduled at different times
     due to resource constraints, you can opt for a gang scheduler. This ensures that all worker pods are scheduled
     simultaneously, reducing the likelihood of job failures caused by timeout errors.
-    
+
     To enable gang scheduling for the ``training-operator``:
 
-    a. Select a second scheduler from 
-    `Kubernetes scheduler plugins with co-scheduling <https://www.kubeflow.org/docs/components/training/job-scheduling/#running-jobs-with-gang-scheduling>`__
+    a. Select a second scheduler from
+    `Kubernetes scheduler plugins with co-scheduling <https://www.kubeflow.org/docs/components/training/user-guides/job-scheduling/#running-jobs-with-gang-scheduling>`__
     or `Apache YuniKorn <https://yunikorn.apache.org/docs/next/user_guide/workloads/run_tf/>`__ .
 
     b. Configure a Flyte ``PodTemplate`` to use the gang scheduler for your Tasks:
-       
+
     **K8s scheduler plugins with co-scheduling**
 
     .. code-block:: yaml
@@ -55,8 +55,8 @@ Select the integration you need and follow the steps to install the correspondin
                 yunikorn.apache.org/task-group-name: ""
                 yunikorn.apache.org/task-groups: ""
                 yunikorn.apache.org/schedulingPolicyParameters: ""
-              
-              
+
+
     See :ref:`deployment-configuration-general` for more information about Pod templates in Flyte.
     You can set the scheduler name in the Pod template passed to the ``@task`` decorator. However, to prevent the
     two different schedulers from competing for resources, we recommend setting the scheduler name in the pod template
@@ -64,45 +64,45 @@ Select the integration you need and follow the steps to install the correspondin
     gang scheduler as well.
 
   .. group-tab:: Ray
-    
+
     To add the Kuberay Helm repo, run the following command:
-  
+
     .. code-block:: bash
 
        helm repo add kuberay https://ray-project.github.io/kuberay-helm/
-      
+
     To install the Kuberay operator, run the following command:
-  
+
     .. code-block:: bash
 
        helm install kuberay-operator kuberay/kuberay-operator --namespace ray-system --version 1.1.0 --create-namespace
 
   .. group-tab:: Spark
-  
+
     To add the Spark Helm repository, run the following commands:
-  
+
     .. code-block:: bash
-  
+
        helm repo add spark-operator https://kubeflow.github.io/spark-operator
-  
+
     To install the Spark operator, run the following command:
-  
+
     .. code-block:: bash
-  
+
        helm install spark-operator spark-operator/spark-operator --namespace spark-operator --create-namespace
-  
+
   .. group-tab:: Dask
-  
+
     To add the Dask Helm repository, run the following command:
-  
+
     .. code-block:: bash
-  
+
        helm repo add dask https://helm.dask.org
-  
+
     To install the Dask operator, run the following command:
-  
+
     .. code-block:: bash
-  
+
        helm install dask-operator dask/dask-kubernetes-operator --namespace dask-operator --create-namespace
 
 Specify plugin configuration
@@ -136,12 +136,12 @@ Specify plugin configuration
                     - pytorch: pytorch
 
       .. group-tab:: Flyte core
-    
+
         Create a file named ``values-override.yaml`` and add the following config to it:
-    
+
         .. code-block:: yaml
           :emphasize-lines: 9,14
-    
+
           configmap:
             enabled_plugins:
               tasks:
@@ -156,9 +156,9 @@ Specify plugin configuration
                     sidecar: sidecar
                     container_array: k8s-array
                     pytorch: pytorch
-   
+
   .. group-tab:: TensorFlow
-   
+
     .. tabs::
 
       .. group-tab:: Flyte binary
@@ -183,11 +183,11 @@ Specify plugin configuration
                     - tensorflow: tensorflow
 
       .. group-tab:: Flyte core
-    
+
         Create a file named ``values-override.yaml`` and add the following config to it:
-    
+
         .. code-block:: yaml
-    
+
           configmap:
             enabled_plugins:
               tasks:
@@ -202,9 +202,9 @@ Specify plugin configuration
                     sidecar: sidecar
                     container_array: k8s-array
                     tensorflow: tensorflow
-   
+
   .. group-tab:: MPI
-   
+
     .. tabs::
 
       .. group-tab:: Flyte binary
@@ -229,11 +229,11 @@ Specify plugin configuration
                     - mpi: mpi
 
       .. group-tab:: Flyte core
-    
+
         Create a file named ``values-override.yaml`` and add the following config to it:
-    
+
         .. code-block:: yaml
-    
+
           configmap:
             enabled_plugins:
               tasks:
@@ -274,12 +274,12 @@ Specify plugin configuration
                      - ray: ray
 
       .. group-tab:: Flyte core
-    
+
         Create a file named ``values-override.yaml`` and add the following config to it:
-    
+
         .. code-block:: yaml
           :emphasize-lines: 9,14
-    
+
           configmap:
             enabled_plugins:
               tasks:
@@ -294,14 +294,14 @@ Specify plugin configuration
                     sidecar: sidecar
                     container_array: k8s-array
                     ray: ray
-   
+
   .. group-tab:: Spark
-   
-      .. tabs:: 
+
+      .. tabs::
 
         .. group-tab:: flyte-binary
 
-          .. tabs:: 
+          .. tabs::
 
             .. group-tab:: AWS
 
@@ -398,7 +398,7 @@ Specify plugin configuration
                             resources:
                             - persistentvolumeclaims
                             verbs:
-                            - "*"                     
+                            - "*"
                       - key: ad_spark_service_account
                         value: |
                           apiVersion: v1
@@ -407,7 +407,7 @@ Specify plugin configuration
                             name: spark
                             namespace: "{{ namespace }}"
                             annotations:
-                              eks.amazonaws.com/role-arn: '{{ defaultIamRole }}'                       
+                              eks.amazonaws.com/role-arn: '{{ defaultIamRole }}'
                       - key: ae_spark_role_binding
                         value: |
                           apiVersion: rbac.authorization.k8s.io/v1
@@ -423,8 +423,8 @@ Specify plugin configuration
                             - kind: ServiceAccount
                               name: spark
                               namespace: "{{ namespace }}"
-                
-              2. (Optional) The Spark operator supports Kubernetes ResourceQuota enforcement. If you plan to use it, 
+
+              2. (Optional) The Spark operator supports Kubernetes ResourceQuota enforcement. If you plan to use it,
                  set `per-Task resource requests <https://docs.flyte.org/en/latest/user_guide/productionizing/customizing_task_resources.html#customizing-task-resources>`__ that fit into the quota for each project-namespace. A Task without resource requests
                  or limits will be rejected by the K8s scheduler as described `in the Kubernetes docs <https://kubernetes.io/docs/concepts/policy/resource-quotas/>`__.
                  The following is a sample configuration you can add to your Helm chart values, adjusting the resources to match your needs:
@@ -452,7 +452,7 @@ Specify plugin configuration
 
                 .. code-block:: yaml
 
-                    templates:         
+                    templates:
                       - key: ab_project_resource_quota
                         value: |
                           apiVersion: v1
@@ -463,14 +463,14 @@ Specify plugin configuration
                           spec:
                             hard:
                               limits.cpu: {{ projectQuotaCpu }}
-                              limits.memory: {{ projectQuotaMemory }} 
+                              limits.memory: {{ projectQuotaMemory }}
 
             .. group-tab:: GCP
 
               .. note::
 
                 Check out the `reference implementation for GCP <https://github.com/unionai-oss/deploy-flyte/blob/main/environments/gcp/flyte-core/README.md>`__ for information on how all the Flyte prerequisites are configured.
- 
+
               Create a file named ``values-override.yaml`` and add the following config to it:
 
               .. code-block:: yaml
@@ -562,7 +562,7 @@ Specify plugin configuration
                             resources:
                             - persistentvolumeclaims
                             verbs:
-                            - "*"                     
+                            - "*"
                       - key: ad_spark_service_account
                         value: |
                           apiVersion: v1
@@ -571,7 +571,7 @@ Specify plugin configuration
                             name: spark
                             namespace: "{{ namespace }}"
                             annotations:
-                              iam.gke.io/gcp-service-account: {{ gsa }}                     
+                              iam.gke.io/gcp-service-account: {{ gsa }}
                       - key: ae_spark_role_binding
                         value: |
                           apiVersion: rbac.authorization.k8s.io/v1
@@ -590,14 +590,14 @@ Specify plugin configuration
 
         .. group-tab:: flyte-core
 
-          .. tabs:: 
+          .. tabs::
 
             .. group-tab:: AWS
 
               Create a file named ``values-override.yaml`` and add the following config to it:
-      
+
               .. code-block:: yaml
-      
+
                 configmap:
                   enabled_plugins:
                     tasks:
@@ -613,7 +613,7 @@ Specify plugin configuration
                           container_array: k8s-array
                           spark: spark
                 cluster_resource_manager:
-                  enabled: true 
+                  enabled: true
                   standalone_deploy: false
                   # -- Resource templates that should be applied
                   templates:
@@ -655,7 +655,7 @@ Specify plugin configuration
                           - persistentvolumeclaims
                           verbs:
                           - "*"
-          
+
                     - key: ad_spark_service_account
                       value: |
                         apiVersion: v1
@@ -663,7 +663,7 @@ Specify plugin configuration
                         metadata:
                           name: spark
                           namespace: {{ namespace }}
-          
+
                     - key: ae_spark_role_binding
                       value: |
                         apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -679,7 +679,7 @@ Specify plugin configuration
                         - kind: ServiceAccount
                           name: spark
                           namespace: {{ namespace }}
-          
+
                 sparkoperator:
                   enabled: true
                   plugin_config:
@@ -700,8 +700,8 @@ Specify plugin configuration
                           - spark.network.timeout: 600s
                           - spark.executorEnv.KUBERNETES_REQUEST_TIMEOUT: 100000
                           - spark.executor.heartbeatInterval: 60s
-                 
-            .. group-tab:: GCP  
+
+            .. group-tab:: GCP
 
               .. note::
 
@@ -723,7 +723,7 @@ Specify plugin configuration
                             container: container
                             sidecar: sidecar
                             container_array: k8s-array
-                            spark: spark 
+                            spark: spark
                     cluster_resource_manager:
                       enabled: true
                       standalone_deploy: false
@@ -732,7 +732,7 @@ Specify plugin configuration
                           customData:
                           - production:
                               - gsa:
-                              #This is the GSA that the Task Pods will use to access GCP resources. 
+                              #This is the GSA that the Task Pods will use to access GCP resources.
                                   value: "<GoogleServiceAccount-email>"
                           - staging:
                               - gsa:
@@ -793,7 +793,7 @@ Specify plugin configuration
                               - "*"
                         #While the Spark Helm chart creates a spark ServiceAccount, this template creates one
                         # on each project-domain namespace and annotates it with the GSA
-                        #You should always run workflows with the Spark service account (eg pyflyte run --remote --service-account=spark ...)      
+                        #You should always run workflows with the Spark service account (eg pyflyte run --remote --service-account=spark ...)
                         - key: ad_spark_service_account
                           value: |
                             apiVersion: v1
@@ -802,7 +802,7 @@ Specify plugin configuration
                               name: spark
                               namespace: "{{ namespace }}"
                               annotations:
-                                iam.gke.io/gcp-service-account: {{ gsa }}           
+                                iam.gke.io/gcp-service-account: {{ gsa }}
                         - key: ae_spark_role_binding
                           value: |
                             apiVersion: rbac.authorization.k8s.io/v1
@@ -954,7 +954,7 @@ Specify plugin configuration
                           spark: spark
 
   .. group-tab:: Dask
-   
+
     .. tabs::
 
       .. group-tab:: Flyte binary
@@ -977,11 +977,11 @@ Specify plugin configuration
                 - dask: dask
 
       .. group-tab:: Flyte core
-    
+
         Create a file named ``values-override.yaml`` and add the following config to it:
-    
+
         .. code-block:: yaml
-    
+
           configmap:
             enabled_plugins:
               tasks:
@@ -1014,7 +1014,7 @@ Upgrade the deployment
   .. group-tab:: flyte-core
 
     .. code-block:: bash
-    
+
       helm upgrade <RELEASE_NAME> flyte/flyte-core -n <YOUR_NAMESPACE> --values values-override.yaml
 
     Replace ``<RELEASE_NAME>`` with the name of your release (e.g., ``flyte``)

@@ -77,6 +77,9 @@ type FlyteWorkflow struct {
 	// portions of the CRD to an external data store to reduce CRD size. If this exists, FlytePropeller must retrieve
 	// and parse the static data prior to processing.
 	WorkflowClosureReference DataReference `json:"workflowClosureReference,omitempty"`
+
+	// Flyteconsole url
+	ConsoleURL string `json:"consoleUrl,omitempty"`
 }
 
 func (in *FlyteWorkflow) GetSecurityContext() core.SecurityContext {
@@ -101,6 +104,8 @@ func (in *FlyteWorkflow) GetDefinitionVersion() WorkflowDefinitionVersion {
 func (in *FlyteWorkflow) GetExecutionConfig() ExecutionConfig {
 	return in.ExecutionConfig
 }
+
+func (in *FlyteWorkflow) GetConsoleURL() string { return in.ConsoleURL }
 
 type WorkflowMeta struct {
 	EventVersion EventVersion `json:"eventVersion,omitempty"`

@@ -2155,6 +2155,10 @@ pub struct TaskLog {
     pub message_format: i32,
     #[prost(message, optional, tag="4")]
     pub ttl: ::core::option::Option<::prost_types::Duration>,
+    #[prost(bool, tag="5")]
+    pub show_while_pending: bool,
+    #[prost(bool, tag="6")]
+    pub hide_once_finished: bool,
 }
 /// Nested message and enum types in `TaskLog`.
 pub mod task_log {
@@ -2961,12 +2965,18 @@ pub struct ExecutionEnvAssignment {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ExecutionEnv {
-    /// id is a unique identifier for the execution environment.
+    /// name is a human-readable identifier for the execution environment. This is combined with the
+    /// project, domain, and version to uniquely identify an execution environment.
     #[prost(string, tag="1")]
-    pub id: ::prost::alloc::string::String,
+    pub name: ::prost::alloc::string::String,
     /// type is the type of the execution environment.
     #[prost(string, tag="2")]
     pub r#type: ::prost::alloc::string::String,
+    /// version is the version of the execution environment. This may be used differently by each
+    /// individual environment type (ex. auto-generated or manually provided), but is intended to
+    /// allow variance in environment specifications with the same ID.
+    #[prost(string, tag="5")]
+    pub version: ::prost::alloc::string::String,
     /// environment is a oneof field that can be used to specify the environment in different ways.
     #[prost(oneof="execution_env::Environment", tags="3, 4")]
     pub environment: ::core::option::Option<execution_env::Environment>,
