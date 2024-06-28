@@ -6,12 +6,11 @@ import (
 	"testing"
 
 	graphviz "github.com/awalterschulze/gographviz"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
-
 	"github.com/flyteorg/flyte/flytectl/pkg/visualize/mocks"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/utils"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestRenderWorkflowBranch(t *testing.T) {
