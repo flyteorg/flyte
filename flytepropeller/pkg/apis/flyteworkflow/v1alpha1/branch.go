@@ -10,7 +10,7 @@ type BooleanExpression struct {
 }
 
 func (in BooleanExpression) MarshalJSON() ([]byte, error) {
-	utils.MarshalPbToBytes(in.BooleanExpression)
+	return utils.MarshalPbToBytes(in.BooleanExpression)
 }
 
 func (in *BooleanExpression) UnmarshalJSON(b []byte) error {
