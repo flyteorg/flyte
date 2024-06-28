@@ -402,9 +402,9 @@ export class LaunchPlanSpec extends Message<LaunchPlanSpec> {
    * If enabled, all calculations are performed even if cached results would be available, overwriting the stored
    * data once execution finishes successfully.
    *
-   * @generated from field: bool overwrite_cache = 20;
+   * @generated from field: optional bool overwrite_cache = 20;
    */
-  overwriteCache = false;
+  overwriteCache?: boolean;
 
   /**
    * Environment variables to be set for the execution.
@@ -442,7 +442,7 @@ export class LaunchPlanSpec extends Message<LaunchPlanSpec> {
     { no: 17, name: "raw_output_data_config", kind: "message", T: RawOutputDataConfig },
     { no: 18, name: "max_parallelism", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 19, name: "interruptible", kind: "message", T: BoolValue },
-    { no: 20, name: "overwrite_cache", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 20, name: "overwrite_cache", kind: "scalar", T: 8 /* ScalarType.BOOL */, opt: true },
     { no: 21, name: "envs", kind: "message", T: Envs },
     { no: 22, name: "execution_env_assignments", kind: "message", T: ExecutionEnvAssignment, repeated: true },
   ]);

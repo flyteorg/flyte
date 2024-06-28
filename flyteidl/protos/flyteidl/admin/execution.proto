@@ -63,7 +63,7 @@ message ExecutionRelaunchRequest {
     // Allows for all cached values of a workflow and its tasks to be overwritten for a single execution.
     // If enabled, all calculations are performed even if cached results would be available, overwriting the stored
     // data once execution finishes successfully.
-    bool overwrite_cache = 4;
+    optional bool overwrite_cache = 4;
 }
 
 // Request to recover the referenced execution.
@@ -325,7 +325,7 @@ message ExecutionSpec {
     // Allows for all cached values of a workflow and its tasks to be overwritten for a single execution.
     // If enabled, all calculations are performed even if cached results would be available, overwriting the stored
     // data once execution finishes successfully.
-    bool overwrite_cache = 22;
+    optional bool overwrite_cache = 22;
 
     // Environment variables to be set for the execution.
     Envs envs = 23;

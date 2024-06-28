@@ -159,9 +159,9 @@ export class ExecutionRelaunchRequest extends Message<ExecutionRelaunchRequest> 
    * If enabled, all calculations are performed even if cached results would be available, overwriting the stored
    * data once execution finishes successfully.
    *
-   * @generated from field: bool overwrite_cache = 4;
+   * @generated from field: optional bool overwrite_cache = 4;
    */
-  overwriteCache = false;
+  overwriteCache?: boolean;
 
   constructor(data?: PartialMessage<ExecutionRelaunchRequest>) {
     super();
@@ -173,7 +173,7 @@ export class ExecutionRelaunchRequest extends Message<ExecutionRelaunchRequest> 
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "id", kind: "message", T: WorkflowExecutionIdentifier },
     { no: 3, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "overwrite_cache", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 4, name: "overwrite_cache", kind: "scalar", T: 8 /* ScalarType.BOOL */, opt: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExecutionRelaunchRequest {
@@ -1099,9 +1099,9 @@ export class ExecutionSpec extends Message<ExecutionSpec> {
    * If enabled, all calculations are performed even if cached results would be available, overwriting the stored
    * data once execution finishes successfully.
    *
-   * @generated from field: bool overwrite_cache = 22;
+   * @generated from field: optional bool overwrite_cache = 22;
    */
-  overwriteCache = false;
+  overwriteCache?: boolean;
 
   /**
    * Environment variables to be set for the execution.
@@ -1154,7 +1154,7 @@ export class ExecutionSpec extends Message<ExecutionSpec> {
     { no: 19, name: "raw_output_data_config", kind: "message", T: RawOutputDataConfig },
     { no: 20, name: "cluster_assignment", kind: "message", T: ClusterAssignment },
     { no: 21, name: "interruptible", kind: "message", T: BoolValue },
-    { no: 22, name: "overwrite_cache", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 22, name: "overwrite_cache", kind: "scalar", T: 8 /* ScalarType.BOOL */, opt: true },
     { no: 23, name: "envs", kind: "message", T: Envs },
     { no: 24, name: "tags", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 25, name: "execution_cluster_label", kind: "message", T: ExecutionClusterLabel },

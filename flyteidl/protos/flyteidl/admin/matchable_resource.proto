@@ -128,7 +128,7 @@ message WorkflowExecutionConfig {
   // Allows for all cached values of a workflow and its tasks to be overwritten for a single execution.
   // If enabled, all calculations are performed even if cached results would be available, overwriting the stored
   // data once execution finishes successfully.
-  bool overwrite_cache = 7;
+  optional bool overwrite_cache = 7;
 
   // Environment variables to be set for the execution.
   Envs envs = 8;

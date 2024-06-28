@@ -1166,8 +1166,8 @@ pub struct WorkflowExecutionConfig {
     /// Allows for all cached values of a workflow and its tasks to be overwritten for a single execution.
     /// If enabled, all calculations are performed even if cached results would be available, overwriting the stored
     /// data once execution finishes successfully.
-    #[prost(bool, tag="7")]
-    pub overwrite_cache: bool,
+    #[prost(bool, optional, tag="7")]
+    pub overwrite_cache: ::core::option::Option<bool>,
     /// Environment variables to be set for the execution.
     #[prost(message, optional, tag="8")]
     pub envs: ::core::option::Option<Envs>,
@@ -1347,8 +1347,8 @@ pub struct ExecutionRelaunchRequest {
     /// Allows for all cached values of a workflow and its tasks to be overwritten for a single execution.
     /// If enabled, all calculations are performed even if cached results would be available, overwriting the stored
     /// data once execution finishes successfully.
-    #[prost(bool, tag="4")]
-    pub overwrite_cache: bool,
+    #[prost(bool, optional, tag="4")]
+    pub overwrite_cache: ::core::option::Option<bool>,
 }
 /// Request to recover the referenced execution.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -1667,8 +1667,8 @@ pub struct ExecutionSpec {
     /// Allows for all cached values of a workflow and its tasks to be overwritten for a single execution.
     /// If enabled, all calculations are performed even if cached results would be available, overwriting the stored
     /// data once execution finishes successfully.
-    #[prost(bool, tag="22")]
-    pub overwrite_cache: bool,
+    #[prost(bool, optional, tag="22")]
+    pub overwrite_cache: ::core::option::Option<bool>,
     /// Environment variables to be set for the execution.
     #[prost(message, optional, tag="23")]
     pub envs: ::core::option::Option<Envs>,
@@ -2022,8 +2022,8 @@ pub struct LaunchPlanSpec {
     /// Allows for all cached values of a workflow and its tasks to be overwritten for a single execution.
     /// If enabled, all calculations are performed even if cached results would be available, overwriting the stored
     /// data once execution finishes successfully.
-    #[prost(bool, tag="20")]
-    pub overwrite_cache: bool,
+    #[prost(bool, optional, tag="20")]
+    pub overwrite_cache: ::core::option::Option<bool>,
     /// Environment variables to be set for the execution.
     #[prost(message, optional, tag="21")]
     pub envs: ::core::option::Option<Envs>,

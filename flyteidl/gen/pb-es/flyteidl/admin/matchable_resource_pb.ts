@@ -489,9 +489,9 @@ export class WorkflowExecutionConfig extends Message<WorkflowExecutionConfig> {
    * If enabled, all calculations are performed even if cached results would be available, overwriting the stored
    * data once execution finishes successfully.
    *
-   * @generated from field: bool overwrite_cache = 7;
+   * @generated from field: optional bool overwrite_cache = 7;
    */
-  overwriteCache = false;
+  overwriteCache?: boolean;
 
   /**
    * Environment variables to be set for the execution.
@@ -521,7 +521,7 @@ export class WorkflowExecutionConfig extends Message<WorkflowExecutionConfig> {
     { no: 4, name: "labels", kind: "message", T: Labels },
     { no: 5, name: "annotations", kind: "message", T: Annotations },
     { no: 6, name: "interruptible", kind: "message", T: BoolValue },
-    { no: 7, name: "overwrite_cache", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 7, name: "overwrite_cache", kind: "scalar", T: 8 /* ScalarType.BOOL */, opt: true },
     { no: 8, name: "envs", kind: "message", T: Envs },
     { no: 9, name: "execution_env_assignments", kind: "message", T: ExecutionEnvAssignment, repeated: true },
   ]);
