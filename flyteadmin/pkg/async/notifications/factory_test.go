@@ -2,6 +2,7 @@ package notifications
 
 import (
 	"context"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -38,7 +39,7 @@ func TestGetEmailer(t *testing.T) {
 		},
 	}
 
-	GetEmailer(cfg, promutils.NewTestScope())
+	GetEmailer(cfg, promutils.NewTestScope(), &mocks.SecretManager{})
 
 	// shouldn't reach here
 	t.Errorf("did not panic")
@@ -47,7 +48,7 @@ func TestGetEmailer(t *testing.T) {
 func TestNewNotificationPublisherAndProcessor(t *testing.T) {
 	testSandboxPublisher := NewNotificationsPublisher(notificationsConfig, scope)
 	assert.IsType(t, testSandboxPublisher, &implementations.SandboxPublisher{})
-	testSandboxProcessor := NewNotificationsProcessor(notificationsConfig, scope)
+	testSandboxProcessor := NewNotificationsProcessor(notificationsConfig, scope, &mocks.SecretManager{})
 	assert.IsType(t, testSandboxProcessor, &implementations.SandboxProcessor{})
 
 	go func() {

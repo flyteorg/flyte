@@ -3,6 +3,7 @@ package notifications
 import (
 	"context"
 	"fmt"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"sync"
 	"time"
 
@@ -50,13 +51,15 @@ func CreateMsgChan() {
 	})
 }
 
-func GetEmailer(config runtimeInterfaces.NotificationsConfig, scope promutils.Scope) interfaces.Emailer {
+func GetEmailer(config runtimeInterfaces.NotificationsConfig, scope promutils.Scope, sm core.SecretManager) interfaces.Emailer {
 	// If an external email service is specified use that instead.
 	// TODO: Handling of this is messy, see https://github.com/flyteorg/flyte/issues/1063
 	if config.NotificationsEmailerConfig.EmailerConfig.ServiceName != "" {
 		switch config.NotificationsEmailerConfig.EmailerConfig.ServiceName {
 		case implementations.Sendgrid:
 			return implementations.NewSendGridEmailer(config, scope)
+		case implementations.Smtp:
+			return implementations.NewSmtpEmailer(context.Background(), config, scope, sm)
 		default:
 			panic(fmt.Errorf("No matching email implementation for %s", config.NotificationsEmailerConfig.EmailerConfig.ServiceName))
 		}
@@ -87,7 +90,7 @@ func GetEmailer(config runtimeInterfaces.NotificationsConfig, scope promutils.Sc
 	}
 }
 
-func NewNotificationsProcessor(config runtimeInterfaces.NotificationsConfig, scope promutils.Scope) interfaces.Processor {
+func NewNotificationsProcessor(config runtimeInterfaces.NotificationsConfig, scope promutils.Scope, sm core.SecretManager) interfaces.Processor {
 	reconnectAttempts := config.ReconnectAttempts
 	reconnectDelay := time.Duration(config.ReconnectDelaySeconds) * time.Second
 	var sub pubsub.Subscriber
@@ -119,7 +122,7 @@ func NewNotificationsProcessor(config runtimeInterfaces.NotificationsConfig, sco
 		if err != nil {
 			panic(err)
 		}
-		emailer = GetEmailer(config, scope)
+		emailer = GetEmailer(config, scope, sm)
 		return implementations.NewProcessor(sub, emailer, scope)
 	case common.GCP:
 		projectID := config.GCPConfig.ProjectID
@@ -135,10 +138,10 @@ func NewNotificationsProcessor(config runtimeInterfaces.NotificationsConfig, sco
 		if err != nil {
 			panic(err)
 		}
-		emailer = GetEmailer(config, scope)
+		emailer = GetEmailer(config, scope, sm)
 		return implementations.NewGcpProcessor(sub, emailer, scope)
 	case common.Sandbox:
-		emailer = GetEmailer(config, scope)
+		emailer = GetEmailer(config, scope, sm)
 		return implementations.NewSandboxProcessor(msgChan, emailer)
 	case common.Local:
 		fallthrough
