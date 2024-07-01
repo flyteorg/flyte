@@ -90,16 +90,10 @@ func getFinalContext(ctx context.Context, operation string, agent *Deployment) (
 	return context.WithTimeout(ctx, timeout)
 }
 
-func updateAgentRegistry(ctx context.Context, cs *ClientSet) {
-	agentRegistry := make(Registry)
+func getAgentRegistry(ctx context.Context, cs *ClientSet) Registry {
+	newAgentRegistry := make(Registry)
 	cfg := GetConfig()
 	var agentDeployments []*Deployment
-
-	// Ensure that the old configuration is backward compatible
-	for taskType, agentDeploymentID := range cfg.AgentForTaskTypes {
-		agent := Agent{AgentDeployment: cfg.AgentDeployments[agentDeploymentID], IsSync: false}
-		agentRegistry[taskType] = map[int32]*Agent{defaultTaskTypeVersion: &agent}
-	}
 
 	if len(cfg.DefaultAgent.Endpoint) != 0 {
 		agentDeployments = append(agentDeployments, &cfg.DefaultAgent)
@@ -137,27 +131,36 @@ func updateAgentRegistry(ctx context.Context, cs *ClientSet) {
 			deprecatedSupportedTaskTypes := agent.SupportedTaskTypes
 			for _, supportedTaskType := range deprecatedSupportedTaskTypes {
 				agent := &Agent{AgentDeployment: agentDeployment, IsSync: agent.IsSync}
-				agentRegistry[supportedTaskType] = map[int32]*Agent{defaultTaskTypeVersion: agent}
+				newAgentRegistry[supportedTaskType] = map[int32]*Agent{defaultTaskTypeVersion: agent}
 			}
 
 			supportedTaskCategories := agent.SupportedTaskCategories
 			for _, supportedCategory := range supportedTaskCategories {
 				agent := &Agent{AgentDeployment: agentDeployment, IsSync: agent.IsSync}
-				agentRegistry[supportedCategory.GetName()] = map[int32]*Agent{supportedCategory.GetVersion(): agent}
-			}
-		}
-		// If the agent doesn't implement the metadata service, we construct the registry based on the configuration
-		for taskType, agentDeploymentID := range cfg.AgentForTaskTypes {
-			if agentDeployment, ok := cfg.AgentDeployments[agentDeploymentID]; ok {
-				if _, ok := agentRegistry[taskType]; !ok {
-					agent := &Agent{AgentDeployment: agentDeployment, IsSync: false}
-					agentRegistry[taskType] = map[int32]*Agent{defaultTaskTypeVersion: agent}
-				}
+				newAgentRegistry[supportedCategory.GetName()] = map[int32]*Agent{supportedCategory.GetVersion(): agent}
 			}
 		}
 	}
-	logger.Debugf(ctx, "AgentDeployment service supports task types: %v", maps.Keys(agentRegistry))
-	setAgentRegistry(agentRegistry)
+
+	// If the agent doesn't implement the metadata service, we construct the registry based on the configuration
+	for taskType, agentDeploymentID := range cfg.AgentForTaskTypes {
+		if agentDeployment, ok := cfg.AgentDeployments[agentDeploymentID]; ok {
+			if _, ok := newAgentRegistry[taskType]; !ok {
+				agent := &Agent{AgentDeployment: agentDeployment, IsSync: false}
+				newAgentRegistry[taskType] = map[int32]*Agent{defaultTaskTypeVersion: agent}
+			}
+		}
+	}
+
+	// Ensure that the old configuration is backward compatible
+	for _, taskType := range cfg.SupportedTaskTypes {
+		if _, ok := newAgentRegistry[taskType]; !ok {
+			agent := &Agent{AgentDeployment: &cfg.DefaultAgent, IsSync: false}
+			newAgentRegistry[taskType] = map[int32]*Agent{defaultTaskTypeVersion: agent}
+		}
+	}
+
+	return newAgentRegistry
 }
 
 func getAgentClientSets(ctx context.Context) *ClientSet {

@@ -593,6 +593,54 @@ func (_m *AdminServiceClient) GetDescriptionEntity(ctx context.Context, in *admi
 	return r0, r1
 }
 
+type AdminServiceClient_GetDomains struct {
+	*mock.Call
+}
+
+func (_m AdminServiceClient_GetDomains) Return(_a0 *admin.GetDomainsResponse, _a1 error) *AdminServiceClient_GetDomains {
+	return &AdminServiceClient_GetDomains{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminServiceClient) OnGetDomains(ctx context.Context, in *admin.GetDomainRequest, opts ...grpc.CallOption) *AdminServiceClient_GetDomains {
+	c_call := _m.On("GetDomains", ctx, in, opts)
+	return &AdminServiceClient_GetDomains{Call: c_call}
+}
+
+func (_m *AdminServiceClient) OnGetDomainsMatch(matchers ...interface{}) *AdminServiceClient_GetDomains {
+	c_call := _m.On("GetDomains", matchers...)
+	return &AdminServiceClient_GetDomains{Call: c_call}
+}
+
+// GetDomains provides a mock function with given fields: ctx, in, opts
+func (_m *AdminServiceClient) GetDomains(ctx context.Context, in *admin.GetDomainRequest, opts ...grpc.CallOption) (*admin.GetDomainsResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *admin.GetDomainsResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.GetDomainRequest, ...grpc.CallOption) *admin.GetDomainsResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.GetDomainsResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.GetDomainRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type AdminServiceClient_GetDynamicNodeWorkflow struct {
 	*mock.Call
 }

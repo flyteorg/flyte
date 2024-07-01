@@ -72,11 +72,12 @@ export class ExecutionEnvAssignment extends Message<ExecutionEnvAssignment> {
  */
 export class ExecutionEnv extends Message<ExecutionEnv> {
   /**
-   * id is a unique identifier for the execution environment.
+   * name is a human-readable identifier for the execution environment. This is combined with the
+   * project, domain, and version to uniquely identify an execution environment.
    *
-   * @generated from field: string id = 1;
+   * @generated from field: string name = 1;
    */
-  id = "";
+  name = "";
 
   /**
    * type is the type of the execution environment.
@@ -108,6 +109,15 @@ export class ExecutionEnv extends Message<ExecutionEnv> {
     case: "spec";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
+  /**
+   * version is the version of the execution environment. This may be used differently by each
+   * individual environment type (ex. auto-generated or manually provided), but is intended to
+   * allow variance in environment specifications with the same ID.
+   *
+   * @generated from field: string version = 5;
+   */
+  version = "";
+
   constructor(data?: PartialMessage<ExecutionEnv>) {
     super();
     proto3.util.initPartial(data, this);
@@ -116,10 +126,11 @@ export class ExecutionEnv extends Message<ExecutionEnv> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "flyteidl.core.ExecutionEnv";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "extant", kind: "message", T: Struct, oneof: "environment" },
     { no: 4, name: "spec", kind: "message", T: Struct, oneof: "environment" },
+    { no: 5, name: "version", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExecutionEnv {
