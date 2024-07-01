@@ -49,8 +49,10 @@ func GetTargetEntity(ctx context.Context, nCtx interfaces.NodeExecutionContext) 
 	if nCtx.Node().GetWorkflowNode() != nil {
 		subRef := nCtx.Node().GetWorkflowNode().GetSubWorkflowRef()
 		if subRef != nil && len(*subRef) > 0 {
-			subWorkflow := nCtx.ExecutionContext().FindSubWorkflow(*subRef)
-			targetEntity = subWorkflow.GetIdentifier()
+			// todo: uncomment this if Support caching subworkflows and launchplans (v2) is upstreamed
+			// for now, we can leave it empty
+			//nCtx.ExecutionContext().FindSubWorkflow(*subRef)
+			//targetEntity = subWorkflow.GetIdentifier()
 		} else if nCtx.Node().GetWorkflowNode().GetLaunchPlanRefID() != nil {
 			lpRef := nCtx.Node().GetWorkflowNode().GetLaunchPlanRefID()
 			targetEntity = lpRef.Identifier

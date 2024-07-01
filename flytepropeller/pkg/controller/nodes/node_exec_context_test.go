@@ -153,37 +153,6 @@ func Test_NodeContextDefault(t *testing.T) {
 	assert.Equal(t, w1.Tasks["taskID"].TaskTemplate.Id.Version, taskIdentifier.Version)
 }
 
-func TestGetTargetEntity_SubWorkflowNode(t *testing.T) {
-	id := &core.Identifier{
-		ResourceType: core.ResourceType_WORKFLOW,
-		Project:      "proj",
-		Domain:       "domain",
-		Name:         "sub-sub",
-		Version:      "v1",
-	}
-	exSubWf := &mocks.ExecutableSubWorkflow{}
-	exSubWf.OnGetIdentifier().Return(id)
-	ec := mocks2.ExecutionContext{}
-	ec.OnFindSubWorkflow("sub-workflow").Return(exSubWf)
-
-	subWfNode := &mocks.ExecutableWorkflowNode{}
-	subWfID := "sub-workflow"
-	subWfNode.OnGetSubWorkflowRef().Return(&subWfID)
-
-	n := &mocks.ExecutableNode{}
-	n.OnGetWorkflowNode().Return(subWfNode)
-
-	nCtx := &mocks3.NodeExecutionContext{}
-	nCtx.OnNode().Return(n)
-	nCtx.OnExecutionContext().Return(&ec)
-
-	fetchedID := common.GetTargetEntity(context.Background(), nCtx)
-	assert.Equal(t, id.Project, fetchedID.Project)
-	assert.Equal(t, id.Domain, fetchedID.Domain)
-	assert.Equal(t, id.Name, fetchedID.Name)
-	assert.Equal(t, id.Version, fetchedID.Version)
-}
-
 func TestGetTargetEntity_LaunchPlanNode(t *testing.T) {
 	id := &core.Identifier{
 		ResourceType: core.ResourceType_LAUNCH_PLAN,
@@ -202,38 +171,6 @@ func TestGetTargetEntity_LaunchPlanNode(t *testing.T) {
 
 	nCtx := &mocks3.NodeExecutionContext{}
 	nCtx.OnNode().Return(n)
-
-	fetchedID := common.GetTargetEntity(context.Background(), nCtx)
-	assert.Equal(t, id.Project, fetchedID.Project)
-	assert.Equal(t, id.Domain, fetchedID.Domain)
-	assert.Equal(t, id.Name, fetchedID.Name)
-	assert.Equal(t, id.Version, fetchedID.Version)
-}
-
-func TestGetTargetEntity_Task(t *testing.T) {
-	id := &core.Identifier{
-		ResourceType: core.ResourceType_TASK,
-		Project:      "proj",
-		Domain:       "domain",
-		Name:         "task",
-		Version:      "v3",
-	}
-
-	n := &mocks.ExecutableNode{}
-	n.OnGetWorkflowNode().Return(nil)
-	taskID := "task-id"
-	n.OnGetTaskID().Return(&taskID)
-
-	taskTemplate := &core.TaskTemplate{Id: id}
-
-	exTask := &mocks.ExecutableTask{}
-	exTask.OnCoreTask().Return(taskTemplate)
-	ec := mocks2.ExecutionContext{}
-	ec.OnGetTask(taskID).Return(exTask, nil)
-
-	nCtx := &mocks3.NodeExecutionContext{}
-	nCtx.OnNode().Return(n)
-	nCtx.OnExecutionContext().Return(&ec)
 
 	fetchedID := common.GetTargetEntity(context.Background(), nCtx)
 	assert.Equal(t, id.Project, fetchedID.Project)

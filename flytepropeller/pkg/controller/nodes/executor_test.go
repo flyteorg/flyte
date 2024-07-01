@@ -1682,16 +1682,11 @@ func TestNodeExecutor_AbortHandler(t *testing.T) {
 		execContext := mocks4.ExecutionContext{}
 		execContext.EXPECT().IsInterruptible().Return(false)
 		r := v1alpha1.RawOutputDataConfig{}
-<<<<<<< HEAD
 		execContext.EXPECT().GetRawOutputDataConfig().Return(r)
 		execContext.EXPECT().GetExecutionID().Return(v1alpha1.WorkflowExecutionIdentifier{})
 		execContext.EXPECT().GetLabels().Return(nil)
 		execContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion0)
-=======
-		execContext.OnGetRawOutputDataConfig().Return(r)
-		execContext.OnGetExecutionID().Return(v1alpha1.WorkflowExecutionIdentifier{})
-		execContext.OnGetLabels().Return(nil)
-		execContext.OnGetEventVersion().Return(v1alpha1.EventVersion0)
+
 		et := &mocks.ExecutableTask{}
 		et.OnCoreTask().Return(&core.TaskTemplate{
 			Id: &core.Identifier{
@@ -1702,13 +1697,12 @@ func TestNodeExecutor_AbortHandler(t *testing.T) {
 				Version:      "v",
 			},
 		})
-		execContext.OnGetTask("id").Return(et, nil)
+		execContext.EXPECT().GetTask("id").Return(et, nil)
 		parentInfo := &mocks4.ImmutableParentInfo{}
 		parentInfo.OnGetUniqueID().Return("someunique1")
 		parentInfo.OnCurrentAttempt().Return(uint32(1))
 		parentInfo.OnIsInDynamicChain().Return(false)
-		execContext.OnGetParentInfo().Return(parentInfo)
->>>>>>> 5ec9fe3cc (Add fields to NodeExecutionEvent (#315))
+		execContext.EXPECT().GetParentInfo().Return(parentInfo)
 
 		assert.NoError(t, nExec.AbortHandler(ctx, &execContext, &dag, nl, n, "aborting"))
 	})
