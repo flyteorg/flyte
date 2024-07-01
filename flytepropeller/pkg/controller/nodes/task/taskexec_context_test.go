@@ -93,9 +93,9 @@ func dummyNodeExecutionContext(t *testing.T, parentInfo executors.ImmutableParen
 	nCtx.OnEnqueueOwnerFunc().Return(nil)
 
 	executionContext := &mocks2.ExecutionContext{}
-	executionContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
-	executionContext.OnGetParentInfo().Return(parentInfo)
-	executionContext.OnGetEventVersion().Return(eventVersion)
+	executionContext.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
+	executionContext.EXPECT().GetParentInfo().Return(parentInfo)
+	executionContext.EXPECT().GetEventVersion().Return(eventVersion)
 	nCtx.OnExecutionContext().Return(executionContext)
 
 	ds, err := storage.NewDataStore(

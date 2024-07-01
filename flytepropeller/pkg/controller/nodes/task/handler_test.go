@@ -80,6 +80,7 @@ func Test_task_setDefault(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			tk := &Handler{
 				defaultPlugin: tt.fields.defaultPlugin,
+				agentService:  &pluginCore.AgentService{},
 			}
 			if err := tk.setDefault(context.TODO(), tt.args.p); (err != nil) != tt.wantErr {
 				t.Errorf("Handler.setDefault() error = %v, wantErr %v", err, tt.wantErr)
@@ -330,6 +331,7 @@ func Test_task_ResolvePlugin(t *testing.T) {
 				defaultPlugins: tt.fields.plugins,
 				defaultPlugin:  tt.fields.defaultPlugin,
 				pluginsForType: tt.fields.pluginsForType,
+				agentService:   &pluginCore.AgentService{},
 			}
 			got, err := tk.ResolvePlugin(context.TODO(), tt.args.ttype, tt.args.executionConfig)
 			if (err != nil) != tt.wantErr {
@@ -499,11 +501,11 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 		nCtx.OnOutputShardSelector().Return(ioutils.NewConstantShardSelector([]string{"x"}))
 
 		executionContext := &mocks.ExecutionContext{}
-		executionContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
-		executionContext.OnGetEventVersion().Return(v1alpha1.EventVersion0)
-		executionContext.OnGetParentInfo().Return(nil)
+		executionContext.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
+		executionContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion0)
+		executionContext.EXPECT().GetParentInfo().Return(nil)
 		if allowIncrementParallelism {
-			executionContext.OnIncrementParallelism().Return(1)
+			executionContext.EXPECT().IncrementParallelism().Return(1)
 		}
 		nCtx.OnExecutionContext().Return(executionContext)
 
@@ -702,6 +704,7 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 				resourceManager: noopRm,
 				taskMetricsMap:  make(map[MetricKey]*taskMetrics),
 				eventConfig:     eventConfig,
+				agentService:    &pluginCore.AgentService{},
 			}
 			got, err := tk.Handle(context.TODO(), nCtx)
 			if (err != nil) != tt.want.wantErr {
@@ -811,9 +814,9 @@ func Test_task_Abort(t *testing.T) {
 		nCtx.OnEventsRecorder().Return(ev)
 
 		executionContext := &mocks.ExecutionContext{}
-		executionContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
-		executionContext.OnGetParentInfo().Return(nil)
-		executionContext.OnGetEventVersion().Return(v1alpha1.EventVersion0)
+		executionContext.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
+		executionContext.EXPECT().GetParentInfo().Return(nil)
+		executionContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion0)
 		nCtx.OnExecutionContext().Return(executionContext)
 
 		nCtx.OnRawOutputPrefix().Return("s3://sandbox/")
@@ -887,6 +890,7 @@ func Test_task_Abort(t *testing.T) {
 			tk := Handler{
 				defaultPlugin:   m,
 				resourceManager: noopRm,
+				agentService:    &pluginCore.AgentService{},
 			}
 			nCtx := createNodeCtx(tt.args.ev)
 			if err := tk.Abort(context.TODO(), nCtx, "reason"); (err != nil) != tt.wantErr {
@@ -972,9 +976,9 @@ func Test_task_Abort_v1(t *testing.T) {
 		nCtx.OnEventsRecorder().Return(ev)
 
 		executionContext := &mocks.ExecutionContext{}
-		executionContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
-		executionContext.OnGetParentInfo().Return(nil)
-		executionContext.OnGetEventVersion().Return(v1alpha1.EventVersion1)
+		executionContext.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
+		executionContext.EXPECT().GetParentInfo().Return(nil)
+		executionContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion1)
 		nCtx.OnExecutionContext().Return(executionContext)
 
 		nCtx.OnRawOutputPrefix().Return("s3://sandbox/")
@@ -1048,6 +1052,7 @@ func Test_task_Abort_v1(t *testing.T) {
 			tk := Handler{
 				defaultPlugin:   m,
 				resourceManager: noopRm,
+				agentService:    &pluginCore.AgentService{},
 			}
 			nCtx := createNodeCtx(tt.args.ev)
 			if err := tk.Abort(context.TODO(), nCtx, "reason"); (err != nil) != tt.wantErr {
@@ -1153,9 +1158,9 @@ func Test_task_Finalize(t *testing.T) {
 		nCtx.OnEnqueueOwnerFunc().Return(nil)
 
 		executionContext := &mocks.ExecutionContext{}
-		executionContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
-		executionContext.OnGetParentInfo().Return(nil)
-		executionContext.OnGetEventVersion().Return(v1alpha1.EventVersion0)
+		executionContext.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
+		executionContext.EXPECT().GetParentInfo().Return(nil)
+		executionContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion0)
 		nCtx.OnExecutionContext().Return(executionContext)
 
 		nCtx.OnRawOutputPrefix().Return("s3://sandbox/")

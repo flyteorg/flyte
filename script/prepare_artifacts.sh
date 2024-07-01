@@ -62,3 +62,6 @@ sed -i "s,repository:[^P]*# FLYTE_IMAGE,repository: cr.flyte.org/flyteorg/flyte-
 sed -i "s,tag:[^P]*# FLYTE_TAG,tag: ${VERSION} # FLYTE_TAG," ./charts/flyte-binary/values.yaml
 sed -i "s,repository:[^P]*# FLYTECOPILOT_IMAGE,repository: cr.flyte.org/flyteorg/flytecopilot-release # FLYTECOPILOT_IMAGE," ./charts/flyte-binary/values.yaml
 sed -i "s,tag:[^P]*# FLYTECOPILOT_TAG,tag: ${VERSION} # FLYTECOPILOT_TAG," ./charts/flyte-binary/values.yaml
+
+sed -i "s,tag:[^P]*# FLYTEAGENT_TAG,tag: ${VERSION} # FLYTEAGENT_TAG," ./charts/flyteagent/values.yaml
+sed -i "s,repository:[^P]*# FLYTEAGENT_IMAGE,repository: cr.flyte.org/flyteorg/flyteagent-release # FLYTEAGENT_IMAGE," ./charts/flyteagent/values.yaml

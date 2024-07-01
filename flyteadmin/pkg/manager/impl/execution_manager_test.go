@@ -428,6 +428,7 @@ func TestCreateExecutionFromWorkflowNode(t *testing.T) {
 	)
 
 	getExecutionCalled := false
+	var clusterLabel = &admin.ExecutionClusterLabel{Value: executionClusterLabel}
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(
 		func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
 			assert.EqualValues(t, input.Project, parentNodeExecutionID.ExecutionId.Project)
@@ -437,6 +438,7 @@ func TestCreateExecutionFromWorkflowNode(t *testing.T) {
 				Metadata: &admin.ExecutionMetadata{
 					Nesting: 1,
 				},
+				ExecutionClusterLabel: clusterLabel,
 			}
 			specBytes, _ := proto.Marshal(spec)
 			getExecutionCalled = true
@@ -462,6 +464,7 @@ func TestCreateExecutionFromWorkflowNode(t *testing.T) {
 			assert.EqualValues(t, input.SourceExecutionID, 2)
 			assert.Equal(t, 2, int(spec.Metadata.Nesting))
 			assert.Equal(t, principal, spec.Metadata.Principal)
+			assert.Equal(t, executionClusterLabel, spec.ExecutionClusterLabel.Value)
 			assert.Equal(t, principal, input.User)
 			return nil
 		},

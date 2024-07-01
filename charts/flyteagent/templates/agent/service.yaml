@@ -15,5 +15,6 @@ spec:
   - name: {{ .Values.ports.name }}
     port: {{ .Values.ports.containerPort }}
     protocol: TCP
+    appProtocol: TCP
     targetPort: {{ .Values.ports.name }}
   selector: {{ include "flyteagent.selectorLabels" . | nindent 4 }}

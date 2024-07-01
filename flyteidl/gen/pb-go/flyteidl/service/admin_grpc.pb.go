@@ -52,6 +52,7 @@ const (
 	AdminService_UpdateProject_FullMethodName                 = "/flyteidl.service.AdminService/UpdateProject"
 	AdminService_GetProject_FullMethodName                    = "/flyteidl.service.AdminService/GetProject"
 	AdminService_ListProjects_FullMethodName                  = "/flyteidl.service.AdminService/ListProjects"
+	AdminService_GetDomains_FullMethodName                    = "/flyteidl.service.AdminService/GetDomains"
 	AdminService_CreateWorkflowEvent_FullMethodName           = "/flyteidl.service.AdminService/CreateWorkflowEvent"
 	AdminService_CreateNodeEvent_FullMethodName               = "/flyteidl.service.AdminService/CreateNodeEvent"
 	AdminService_CreateTaskEvent_FullMethodName               = "/flyteidl.service.AdminService/CreateTaskEvent"
@@ -151,6 +152,7 @@ type AdminServiceClient interface {
 	GetProject(ctx context.Context, in *admin.ProjectGetRequest, opts ...grpc.CallOption) (*admin.Project, error)
 	// Fetches a list of :ref:`ref_flyteidl.admin.Project`
 	ListProjects(ctx context.Context, in *admin.ProjectListRequest, opts ...grpc.CallOption) (*admin.Projects, error)
+	GetDomains(ctx context.Context, in *admin.GetDomainRequest, opts ...grpc.CallOption) (*admin.GetDomainsResponse, error)
 	// Indicates a :ref:`ref_flyteidl.event.WorkflowExecutionEvent` has occurred.
 	CreateWorkflowEvent(ctx context.Context, in *admin.WorkflowExecutionEventRequest, opts ...grpc.CallOption) (*admin.WorkflowExecutionEventResponse, error)
 	// Indicates a :ref:`ref_flyteidl.event.NodeExecutionEvent` has occurred.
@@ -494,6 +496,15 @@ func (c *adminServiceClient) ListProjects(ctx context.Context, in *admin.Project
 	return out, nil
 }
 
+func (c *adminServiceClient) GetDomains(ctx context.Context, in *admin.GetDomainRequest, opts ...grpc.CallOption) (*admin.GetDomainsResponse, error) {
+	out := new(admin.GetDomainsResponse)
+	err := c.cc.Invoke(ctx, AdminService_GetDomains_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *adminServiceClient) CreateWorkflowEvent(ctx context.Context, in *admin.WorkflowExecutionEventRequest, opts ...grpc.CallOption) (*admin.WorkflowExecutionEventResponse, error) {
 	out := new(admin.WorkflowExecutionEventResponse)
 	err := c.cc.Invoke(ctx, AdminService_CreateWorkflowEvent_FullMethodName, in, out, opts...)
@@ -775,6 +786,7 @@ type AdminServiceServer interface {
 	GetProject(context.Context, *admin.ProjectGetRequest) (*admin.Project, error)
 	// Fetches a list of :ref:`ref_flyteidl.admin.Project`
 	ListProjects(context.Context, *admin.ProjectListRequest) (*admin.Projects, error)
+	GetDomains(context.Context, *admin.GetDomainRequest) (*admin.GetDomainsResponse, error)
 	// Indicates a :ref:`ref_flyteidl.event.WorkflowExecutionEvent` has occurred.
 	CreateWorkflowEvent(context.Context, *admin.WorkflowExecutionEventRequest) (*admin.WorkflowExecutionEventResponse, error)
 	// Indicates a :ref:`ref_flyteidl.event.NodeExecutionEvent` has occurred.
@@ -921,6 +933,9 @@ func (UnimplementedAdminServiceServer) GetProject(context.Context, *admin.Projec
 }
 func (UnimplementedAdminServiceServer) ListProjects(context.Context, *admin.ProjectListRequest) (*admin.Projects, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListProjects not implemented")
+}
+func (UnimplementedAdminServiceServer) GetDomains(context.Context, *admin.GetDomainRequest) (*admin.GetDomainsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetDomains not implemented")
 }
 func (UnimplementedAdminServiceServer) CreateWorkflowEvent(context.Context, *admin.WorkflowExecutionEventRequest) (*admin.WorkflowExecutionEventResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateWorkflowEvent not implemented")
@@ -1579,6 +1594,24 @@ func _AdminService_ListProjects_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AdminService_GetDomains_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(admin.GetDomainRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdminServiceServer).GetDomains(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AdminService_GetDomains_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdminServiceServer).GetDomains(ctx, req.(*admin.GetDomainRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _AdminService_CreateWorkflowEvent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(admin.WorkflowExecutionEventRequest)
 	if err := dec(in); err != nil {
@@ -2127,6 +2160,10 @@ var AdminService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListProjects",
 			Handler:    _AdminService_ListProjects_Handler,
+		},
+		{
+			MethodName: "GetDomains",
+			Handler:    _AdminService_GetDomains_Handler,
 		},
 		{
 			MethodName: "CreateWorkflowEvent",

@@ -25,7 +25,7 @@ RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/r
     go build -o dist/flyte-sandbox-bootstrap cmd/bootstrap/main.go
 
 
-FROM rancher/k3s:v1.24.4-k3s1
+FROM rancher/k3s:v1.29.0-k3s1
 
 ARG TARGETARCH
 
