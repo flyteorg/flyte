@@ -179,6 +179,7 @@ func Test_ExtractQueryInfo(t *testing.T) {
 
 			tID := &mocks2.TaskExecutionID{}
 			tMeta.OnGetTaskExecutionID().Return(tID)
+			tMeta.OnGetNamespace().Return("my-namespace")
 
 			tID.OnGetGeneratedName().Return("generated-name")
 

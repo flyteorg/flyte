@@ -21,5 +21,8 @@ spec:
     port: 89
     protocol: TCP
     targetPort: 8089
+  {{- with .Values.datacatalog.service.additionalPorts -}}
+  {{ tpl (toYaml .) $ | nindent 2 }}
+  {{- end }}
   selector: {{ include "datacatalog.selectorLabels" . | nindent 4 }}
 {{- end }}

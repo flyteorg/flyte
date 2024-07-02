@@ -140,6 +140,24 @@ func TestBuildNodeSpec(t *testing.T) {
 		assert.Equal(t, expectedGpuDevice, spec.GetExtendedResources().GetGpuAccelerator().GetDevice())
 	})
 
+	t.Run("node with container image override", func(t *testing.T) {
+		expectedContainerImage := "test-image:latest"
+		n.Node.Target = &core.Node_TaskNode{
+			TaskNode: &core.TaskNode{
+				Reference: &core.TaskNode_ReferenceId{
+					ReferenceId: &core.Identifier{Name: "ref_2"},
+				},
+				Overrides: &core.TaskNodeOverrides{
+					ContainerImage: expectedContainerImage,
+				},
+			},
+		}
+
+		spec := mustBuild(t, n, 1, errs.NewScope())
+		assert.NotNil(t, spec.GetContainerImage())
+		assert.Equal(t, expectedContainerImage, spec.GetContainerImage())
+	})
+
 	t.Run("LaunchPlanRef", func(t *testing.T) {
 		n.Node.Target = &core.Node_WorkflowNode{
 			WorkflowNode: &core.WorkflowNode{
@@ -278,7 +296,9 @@ func TestBuildNodeSpec(t *testing.T) {
 						},
 					},
 				},
-				Parallelism: 10,
+				ParallelismOption: &core.ArrayNode_Parallelism{
+					Parallelism: 10,
+				},
 				SuccessCriteria: &core.ArrayNode_MinSuccessRatio{
 					MinSuccessRatio: 0.5,
 				},
@@ -286,6 +306,35 @@ func TestBuildNodeSpec(t *testing.T) {
 		}
 
 		mustBuild(t, n, 1, errs.NewScope())
+		specs, ok := buildNodeSpec(n.GetCoreNode(), tasks, errs)
+		assert.True(t, ok)
+		assert.Len(t, specs, 1)
+		assert.Equal(t, *specs[0].ArrayNode.Parallelism, uint32(10))
+
+		n.Node.Target = &core.Node_ArrayNode{
+			ArrayNode: &core.ArrayNode{
+				Node: &core.Node{
+					Id: "foo",
+					Target: &core.Node_TaskNode{
+						TaskNode: &core.TaskNode{
+							Reference: &core.TaskNode_ReferenceId{
+								ReferenceId: &core.Identifier{Name: "ref_1"},
+							},
+						},
+					},
+				},
+				ParallelismOption: nil,
+				SuccessCriteria: &core.ArrayNode_MinSuccessRatio{
+					MinSuccessRatio: 0.5,
+				},
+			},
+		}
+
+		mustBuild(t, n, 1, errs.NewScope())
+		specs, ok = buildNodeSpec(n.GetCoreNode(), tasks, errs)
+		assert.True(t, ok)
+		assert.Len(t, specs, 1)
+		assert.Nil(t, specs[0].ArrayNode.Parallelism)
 	})
 }
 

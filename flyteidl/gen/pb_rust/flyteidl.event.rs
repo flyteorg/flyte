@@ -55,7 +55,7 @@ pub struct NodeExecutionEvent {
     /// by the executor of the node.
     #[prost(message, optional, tag="4")]
     pub occurred_at: ::core::option::Option<::prost_types::Timestamp>,
-    /// [To be deprecated] Specifies which task (if any) launched this node.
+    /// \[To be deprecated\] Specifies which task (if any) launched this node.
     #[prost(message, optional, tag="9")]
     pub parent_task_metadata: ::core::option::Option<ParentTaskExecutionMetadata>,
     /// Specifies the parent node of the current node execution. Node executions at level zero will not have a parent node.
@@ -92,9 +92,24 @@ pub struct NodeExecutionEvent {
     /// Indicates if this node is an ArrayNode.
     #[prost(bool, tag="22")]
     pub is_array: bool,
-    #[prost(oneof="node_execution_event::InputValue", tags="5, 20, 24")]
+    /// Holding this field here for now, this will be upstreamed soon.
+    /// So that Admin doesn't have to rebuild the node execution graph to find the target entity, propeller will fill this
+    /// in optionally - currently this is only filled in for subworkflows. This is the ID of the subworkflow corresponding
+    /// to this node execution. It is difficult to find because Admin only sees one node at a time. A subworkflow could be
+    /// nested multiple layers deep, and you'd need to access the correct workflow template to know the target subworkflow.
+    #[prost(message, optional, tag="23")]
+    pub target_entity: ::core::option::Option<super::core::Identifier>,
+    /// Holding this field here for now, this will be upstreamed soon.
+    /// Tasks and subworkflows (but not launch plans) that are run within a dynamic task are effectively independent of
+    /// the tasks that are registered in Admin's db. Confusingly, they are often identical, but sometimes they are not
+    /// even registered at all. Similar to the target_entity field, at the time Admin receives this event, it has no idea
+    /// if the relevant execution entity is was registered, or dynamic. This field indicates that the target_entity ID,
+    /// as well as task IDs in any corresponding Task Executions, should not be used to looked up the task in Admin's db.
+    #[prost(bool, tag="24")]
+    pub is_in_dynamic_chain: bool,
+    #[prost(oneof="node_execution_event::InputValue", tags="5, 20, 25")]
     pub input_value: ::core::option::Option<node_execution_event::InputValue>,
-    #[prost(oneof="node_execution_event::OutputResult", tags="6, 7, 15, 23")]
+    #[prost(oneof="node_execution_event::OutputResult", tags="6, 7, 15, 26")]
     pub output_result: ::core::option::Option<node_execution_event::OutputResult>,
     /// Additional metadata to do with this event's node target based
     /// on the node type
@@ -113,7 +128,7 @@ pub mod node_execution_event {
         #[prost(message, tag="20")]
         DeprecatedInputData(super::super::core::LiteralMap),
         /// Raw input data consumed by this node execution.
-        #[prost(message, tag="24")]
+        #[prost(message, tag="25")]
         InputData(super::super::core::InputData),
     }
     #[allow(clippy::derive_partial_eq_without_eq)]
@@ -131,7 +146,7 @@ pub mod node_execution_event {
         #[prost(message, tag="15")]
         DeprecatedOutputData(super::super::core::LiteralMap),
         /// Raw output data produced by this workflow execution.
-        #[prost(message, tag="23")]
+        #[prost(message, tag="26")]
         OutputData(super::super::core::OutputData),
     }
     /// Additional metadata to do with this event's node target based

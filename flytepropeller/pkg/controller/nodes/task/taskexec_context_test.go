@@ -87,16 +87,15 @@ func dummyNodeExecutionContext(t *testing.T, parentInfo executors.ImmutableParen
 	nCtx.OnInputReader().Return(ir)
 	nCtx.OnCurrentAttempt().Return(uint32(1))
 	nCtx.OnTaskReader().Return(tr)
-	nCtx.OnMaxDatasetSizeBytes().Return(int64(1))
 	nCtx.OnNodeStatus().Return(ns)
 	nCtx.OnNodeID().Return(nodeID)
 	nCtx.OnEventsRecorder().Return(nil)
 	nCtx.OnEnqueueOwnerFunc().Return(nil)
 
 	executionContext := &mocks2.ExecutionContext{}
-	executionContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
-	executionContext.OnGetParentInfo().Return(parentInfo)
-	executionContext.OnGetEventVersion().Return(eventVersion)
+	executionContext.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
+	executionContext.EXPECT().GetParentInfo().Return(parentInfo)
+	executionContext.EXPECT().GetEventVersion().Return(eventVersion)
 	nCtx.OnExecutionContext().Return(executionContext)
 
 	ds, err := storage.NewDataStore(
@@ -162,7 +161,6 @@ func TestHandler_newTaskExecutionContext(t *testing.T) {
 	assert.NotNil(t, got.psm.newState)
 
 	assert.NotNil(t, got.TaskReader())
-	assert.Equal(t, got.MaxDatasetSizeBytes(), int64(1))
 	assert.NotNil(t, got.SecretManager())
 
 	assert.NotNil(t, got.OutputWriter())

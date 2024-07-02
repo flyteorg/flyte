@@ -1,8 +1,9 @@
 name: Upload flyteidl to PyPI and npm
 
 on:
-  release:
-    types: [created]
+  push:
+    tags:
+      - flyteidl/v*.*.*
 
 jobs:
   deploy-to-pypi:
@@ -11,7 +12,7 @@ jobs:
       run:
         working-directory: flyteidl
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Set up Python
         uses: actions/setup-python@v1
         with:
@@ -33,7 +34,7 @@ jobs:
       run:
         working-directory: flyteidl
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v1
         with:
           node-version: "12.x"

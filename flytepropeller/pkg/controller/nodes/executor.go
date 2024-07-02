@@ -156,7 +156,7 @@ func IsMaxParallelismAchieved(ctx context.Context, currentNode v1alpha1.Executab
 		return false
 	}
 
-	if currentNode.GetKind() == v1alpha1.NodeKindTask ||
+	if currentNode.GetKind() == v1alpha1.NodeKindTask || currentNode.GetKind() == v1alpha1.NodeKindArray ||
 		(currentNode.GetKind() == v1alpha1.NodeKindWorkflow && currentNode.GetWorkflowNode() != nil && currentNode.GetWorkflowNode().GetLaunchPlanRefID() != nil) {
 		// If we are queued, let us see if we can proceed within the node parallelism bounds
 		if execContext.CurrentParallelism() >= maxParallelism {
@@ -184,6 +184,15 @@ func (c *recursiveNodeExecutor) RecursiveNodeHandler(ctx context.Context, execCo
 	currentNodeCtx := contextutils.WithNodeID(ctx, currentNode.GetID())
 	nodeStatus := nl.GetNodeExecutionStatus(ctx, currentNode.GetID())
 	nodePhase := nodeStatus.GetPhase()
+
+	if nodePhase == v1alpha1.NodePhaseRunning && execContext != nil {
+		execContext.IncrementNodeExecutionCount()
+		if currentNode.GetKind() == v1alpha1.NodeKindTask {
+			execContext.IncrementTaskExecutionCount()
+		}
+		logger.Debugf(currentNodeCtx, "recursive handler - node execution count [%v], task execution count [%v], phase [%v], ",
+			execContext.CurrentNodeExecutionCount(), execContext.CurrentTaskExecutionCount(), nodePhase.String())
+	}
 
 	if canHandleNode(nodePhase) {
 		// TODO Follow up Pull Request,
@@ -290,6 +299,7 @@ func (c *recursiveNodeExecutor) handleDownstream(ctx context.Context, execContex
 			}), nil
 		}
 
+		logger.Debugf(ctx, "downstream handler starting node id %v, ", downstreamNode.GetID())
 		state, err := c.RecursiveNodeHandler(ctx, execContext, dag, nl, downstreamNode)
 		if err != nil {
 			return interfaces.NodeStatusUndefined, err
@@ -485,7 +495,6 @@ type nodeExecutor struct {
 	enqueueWorkflow                 v1alpha1.EnqueueWorkflow
 	eventConfig                     *config.EventConfig
 	interruptibleFailureThreshold   int32
-	maxDatasetSizeBytes             int64
 	maxNodeRetriesForSystemFailures uint32
 	metrics                         *nodeMetrics
 	nodeRecorder                    events.NodeEventRecorder
@@ -801,7 +810,7 @@ func isTimeoutExpired(queuedAt *metav1.Time, timeout time.Duration) bool {
 	return false
 }
 
-func (c *nodeExecutor) isEligibleForRetry(nCtx interfaces.NodeExecutionContext, nodeStatus v1alpha1.ExecutableNodeStatus, err *core.ExecutionError) (currentAttempt, maxAttempts uint32, isEligible bool) {
+func (c *nodeExecutor) isEligibleForRetry(nCtx interfaces.NodeExecutionContext, nodeStatus v1alpha1.ExecutableNodeStatus, err *core.ExecutionError) (currentAttempt uint32, maxAttempts uint32, isEligible bool) {
 	if config.GetConfig().NodeConfig.IgnoreRetryCause {
 		currentAttempt = nodeStatus.GetAttempts() + 1
 	} else {
@@ -1399,7 +1408,7 @@ func (c *nodeExecutor) HandleNode(ctx context.Context, dag executors.DAGStructur
 }
 
 func NewExecutor(ctx context.Context, nodeConfig config.NodeConfig, store *storage.DataStore, enQWorkflow v1alpha1.EnqueueWorkflow, eventSink events.EventSink,
-	workflowLauncher launchplan.Executor, launchPlanReader launchplan.Reader, maxDatasetSize int64, defaultRawOutputPrefix storage.DataReference, kubeClient executors.Client,
+	workflowLauncher launchplan.Executor, launchPlanReader launchplan.Reader, defaultRawOutputPrefix storage.DataReference, kubeClient executors.Client,
 	catalogClient catalog.Client, recoveryClient recovery.Client, eventConfig *config.EventConfig, clusterID string, signalClient service.SignalServiceClient,
 	nodeHandlerFactory interfaces.HandlerFactory, scope promutils.Scope) (interfaces.Node, error) {
 
@@ -1453,7 +1462,6 @@ func NewExecutor(ctx context.Context, nodeConfig config.NodeConfig, store *stora
 		enqueueWorkflow:                 enQWorkflow,
 		eventConfig:                     eventConfig,
 		interruptibleFailureThreshold:   nodeConfig.InterruptibleFailureThreshold,
-		maxDatasetSizeBytes:             maxDatasetSize,
 		maxNodeRetriesForSystemFailures: uint32(nodeConfig.MaxNodeRetriesOnSystemFailures),
 		metrics:                         metrics,
 		nodeRecorder:                    events.NewNodeEventRecorder(eventSink, nodeScope, store),

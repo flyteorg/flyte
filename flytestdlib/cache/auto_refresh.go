@@ -116,11 +116,14 @@ type autoRefresh struct {
 	syncCb          SyncFunc
 	createBatchesCb CreateBatchesFunc
 	lruMap          *lru.Cache
-	toDelete        *syncSet
-	syncPeriod      time.Duration
-	workqueue       workqueue.RateLimitingInterface
-	parallelizm     int
-	lock            sync.RWMutex
+	// Items that are currently being processed are in the processing set.
+	// It will prevent the same item from being processed multiple times by different workers.
+	processing  *sync.Map
+	toDelete    *syncSet
+	syncPeriod  time.Duration
+	workqueue   workqueue.RateLimitingInterface
+	parallelizm int
+	lock        sync.RWMutex
 }
 
 func getEvictionFunction(counter prometheus.Counter) func(key interface{}, value interface{}) {
@@ -211,6 +214,13 @@ func (w *autoRefresh) GetOrCreate(id ItemID, item Item) (Item, error) {
 
 	w.lruMap.Add(id, item)
 	w.metrics.CacheMiss.Inc()
+
+	// It fixes cold start issue in the AutoRefreshCache by adding the item to the workqueue when it is created.
+	// This way, the item will be processed without waiting for the next sync cycle (30s by default).
+	batch := make([]ItemWrapper, 0, 1)
+	batch = append(batch, itemWrapper{id: id, item: item})
+	w.workqueue.AddRateLimited(&batch)
+	w.processing.Store(id, time.Now())
 	return item, nil
 }
 
@@ -236,7 +246,7 @@ func (w *autoRefresh) enqueueBatches(ctx context.Context) error {
 		// If not ok, it means evicted between the item was evicted between getting the keys and this update loop
 		// which is fine, we can just ignore.
 		if value, ok := w.lruMap.Peek(k); ok {
-			if item, ok := value.(Item); !ok || (ok && !item.IsTerminal()) {
+			if item, ok := value.(Item); !ok || (ok && !item.IsTerminal() && !w.inProcessing(k)) {
 				snapshot = append(snapshot, itemWrapper{
 					id:   k.(ItemID),
 					item: value.(Item),
@@ -252,7 +262,10 @@ func (w *autoRefresh) enqueueBatches(ctx context.Context) error {
 
 	for _, batch := range batches {
 		b := batch
-		w.workqueue.Add(&b)
+		w.workqueue.AddRateLimited(&b)
+		for i := 1; i < len(b); i++ {
+			w.processing.Store(b[i].GetID(), time.Now())
+		}
 	}
 
 	return nil
@@ -295,7 +308,6 @@ func (w *autoRefresh) sync(ctx context.Context) (err error) {
 				logger.Debugf(ctx, "Shutting down worker")
 				return nil
 			}
-
 			// Since we create batches every time we sync, we will just remove the item from the queue here
 			// regardless of whether it succeeded the sync or not.
 			w.workqueue.Forget(batch)
@@ -304,6 +316,7 @@ func (w *autoRefresh) sync(ctx context.Context) (err error) {
 			newBatch := make(Batch, 0, len(*batch.(*Batch)))
 			for _, b := range *batch.(*Batch) {
 				itemID := b.GetID()
+				w.processing.Delete(itemID)
 				item, ok := w.lruMap.Get(itemID)
 				if !ok {
 					logger.Debugf(ctx, "item with id [%v] not found in cache", itemID)
@@ -346,6 +359,20 @@ func (w *autoRefresh) sync(ctx context.Context) (err error) {
 	}
 }
 
+// Checks if the item is currently being processed and returns false if the item has been in processing for too long
+func (w *autoRefresh) inProcessing(key interface{}) bool {
+	item, found := w.processing.Load(key)
+	if found {
+		// handle potential race conditions where the item is in processing but not in the workqueue
+		if timeItem, ok := item.(time.Time); ok && time.Since(timeItem) > (w.syncPeriod*5) {
+			w.processing.Delete(key)
+			return false
+		}
+		return true
+	}
+	return false
+}
+
 // Instantiates a new AutoRefresh Cache that syncs items in batches.
 func NewAutoRefreshBatchedCache(name string, createBatches CreateBatchesFunc, syncCb SyncFunc, syncRateLimiter workqueue.RateLimiter,
 	resyncPeriod time.Duration, parallelizm, size int, scope promutils.Scope) (AutoRefresh, error) {
@@ -363,6 +390,7 @@ func NewAutoRefreshBatchedCache(name string, createBatches CreateBatchesFunc, sy
 		createBatchesCb: createBatches,
 		syncCb:          syncCb,
 		lruMap:          lruCache,
+		processing:      &sync.Map{},
 		toDelete:        newSyncSet(),
 		syncPeriod:      resyncPeriod,
 		workqueue:       workqueue.NewNamedRateLimitingQueue(syncRateLimiter, scope.CurrentScope()),

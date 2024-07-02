@@ -1,3 +1,4 @@
+(flyte_project_components)=
 # Flyte project components
 
 A Flyte project is a directory containing task and workflow code, internal Python source code, configuration files, and other artifacts required to package up your code so that it can be run on a Flyte cluster.
@@ -26,13 +27,13 @@ You can specify pip-installable Python dependencies in your project by adding th
 `requirements.txt` file.
 
 ```{note}
-We recommend using [pip-compile](https://pip-tools.readthedocs.io/en/latest/) to
+We recommend using [pip-compile](https://pip-tools.readthedocs.io/en/stable/) to
 manage your project's Python requirements.
 ```
 
 ````{dropdown} See requirements.txt
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytekit-python-template/main/simple-example/%7B%7Bcookiecutter.project_name%7D%7D/requirements.txt
+```{rli} https://raw.githubusercontent.com/flyteorg/flytekit-python-template/main/basic-template-imagespec/%7B%7Bcookiecutter.project_name%7D%7D/requirements.txt
 :caption: requirements.txt
 ```
 
@@ -52,20 +53,16 @@ The workflow directory also contains an `__init__.py` file to indicate that the 
 
 ### ImageSpec
 
-The workflow code file in the basic template includes an optional ImageSpec configuration. ImageSpec is a Flyte feature that enables you to build a custom container image without having to write a Dockerfile. To learn more, see the [ImageSpec documentation](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/customizing_dependencies/image_spec.html#image-spec-example)
+The workflow code file in the basic template includes an optional ImageSpec configuration. ImageSpec is a Flyte feature that enables you to build a custom container image without having to write a Dockerfile. To learn more, see the {ref}`ImageSpec documentation <image_spec_example>`.
 
 ```python
-# basic_image = ImageSpec(
-#    name="flytekit",  # rename this to your docker image name
-#    base_image="ghcr.io/flyteorg/flytekit:py3.11-1.10.2",
-#    # the base image that flytekit will use to build your image
-#    packages=["example-package"],  # packages to add to the base image
-#    # remove "example-package" before using.
-#    registry="ghcr.io/unionai-oss",
-#    # the registry your image will be pushed to
-#    python_version="3.11"
-#    # the python version; optional if not different from the base image
-# )
+basic_image = ImageSpec(
+   name="flytekit",  # default docker image name.
+   base_image="ghcr.io/flyteorg/flytekit:py3.11-1.10.2",  # the base image that flytekit will use to build your image.
+   packages=["pandas"],  # python packages to install.
+   registry="ghcr.io/unionai-oss", # the registry your image will be pushed to.
+   python_version="3.11"  # Optional if python is installed in the base image.
+)
 ```
 
 ```{note}

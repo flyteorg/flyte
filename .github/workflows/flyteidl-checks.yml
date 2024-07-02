@@ -1,7 +1,7 @@
 name: Flyteidl Verification Tests
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
 on:
@@ -39,7 +39,7 @@ jobs:
       component: flyteidl
       go-version: ${{ needs.unpack-envvars.outputs.go-version }}
     secrets:
-      FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
   generate:
     name: Check Go Generate
     needs:

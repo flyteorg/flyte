@@ -237,17 +237,35 @@ func TestApplyResourceOverrides_OverrideGpu(t *testing.T) {
 	gpuRequest := resource.MustParse("1")
 	overrides := ApplyResourceOverrides(v1.ResourceRequirements{
 		Requests: v1.ResourceList{
-			resourceGPU: gpuRequest,
+			ResourceNvidiaGPU: gpuRequest,
 		},
 	}, v1.ResourceRequirements{}, assignIfUnset)
 	assert.EqualValues(t, gpuRequest, overrides.Requests[ResourceNvidiaGPU])
 
 	overrides = ApplyResourceOverrides(v1.ResourceRequirements{
 		Limits: v1.ResourceList{
-			resourceGPU: gpuRequest,
+			ResourceNvidiaGPU: gpuRequest,
 		},
 	}, v1.ResourceRequirements{}, assignIfUnset)
 	assert.EqualValues(t, gpuRequest, overrides.Limits[ResourceNvidiaGPU])
+}
+
+func TestSanitizeGPUResourceRequirements(t *testing.T) {
+	gpuRequest := resource.MustParse("4")
+	requirements := v1.ResourceRequirements{
+		Requests: v1.ResourceList{
+			resourceGPU: gpuRequest,
+		},
+	}
+
+	expectedRequirements := v1.ResourceRequirements{
+		Requests: v1.ResourceList{
+			ResourceNvidiaGPU: gpuRequest,
+		},
+	}
+
+	SanitizeGPUResourceRequirements(&requirements)
+	assert.EqualValues(t, expectedRequirements, requirements)
 }
 
 func TestMergeResources_EmptyIn(t *testing.T) {
@@ -385,6 +403,8 @@ func TestToK8sContainer(t *testing.T) {
 	mockTaskExecMetadata.OnGetEnvironmentVariables().Return(map[string]string{
 		"foo": "bar",
 	})
+	mockTaskExecMetadata.OnGetNamespace().Return("my-namespace")
+	mockTaskExecMetadata.OnGetConsoleURL().Return("")
 
 	tCtx := &mocks.TaskExecutionContext{}
 	tCtx.OnTaskExecutionMetadata().Return(&mockTaskExecMetadata)
@@ -428,9 +448,10 @@ func TestToK8sContainer(t *testing.T) {
 	assert.False(t, *container.SecurityContext.AllowPrivilegeEscalation)
 }
 
-func getTemplateParametersForTest(resourceRequirements, platformResources *v1.ResourceRequirements) template.Parameters {
+func getTemplateParametersForTest(resourceRequirements, platformResources *v1.ResourceRequirements, includeConsoleURL bool, consoleURL string) template.Parameters {
 	mockTaskExecMetadata := mocks.TaskExecutionMetadata{}
 	mockTaskExecutionID := mocks.TaskExecutionID{}
+	mockTaskExecutionID.OnGetUniqueNodeID().Return("unique_node_id")
 	mockTaskExecutionID.OnGetGeneratedName().Return("gen_name")
 	mockTaskExecutionID.OnGetID().Return(core.TaskExecutionIdentifier{
 		TaskId: &core.Identifier{
@@ -457,6 +478,8 @@ func getTemplateParametersForTest(resourceRequirements, platformResources *v1.Re
 	mockTaskExecMetadata.OnGetOverrides().Return(&mockOverrides)
 	mockTaskExecMetadata.OnGetPlatformResources().Return(platformResources)
 	mockTaskExecMetadata.OnGetEnvironmentVariables().Return(nil)
+	mockTaskExecMetadata.OnGetNamespace().Return("my-namespace")
+	mockTaskExecMetadata.OnGetConsoleURL().Return(consoleURL)
 
 	mockInputReader := mocks2.InputReader{}
 	mockInputPath := storage.DataReference("s3://input/path")
@@ -473,10 +496,11 @@ func getTemplateParametersForTest(resourceRequirements, platformResources *v1.Re
 	mockOutputPath.OnGetPreviousCheckpointsPrefix().Return("/prev")
 
 	return template.Parameters{
-		TaskExecMetadata: &mockTaskExecMetadata,
-		Inputs:           &mockInputReader,
-		OutputPath:       &mockOutputPath,
-		Runtime:          &core.RuntimeMetadata{},
+		TaskExecMetadata:  &mockTaskExecMetadata,
+		Inputs:            &mockInputReader,
+		OutputPath:        &mockOutputPath,
+		IncludeConsoleURL: includeConsoleURL,
+		Runtime:           &core.RuntimeMetadata{},
 	}
 }
 
@@ -488,7 +512,7 @@ func TestAddFlyteCustomizationsToContainer(t *testing.T) {
 		Limits: v1.ResourceList{
 			v1.ResourceEphemeralStorage: resource.MustParse("2048Mi"),
 		},
-	}, nil)
+	}, nil, false, "")
 	container := &v1.Container{
 		Command: []string{
 			"{{ .Input }}",
@@ -536,7 +560,7 @@ func TestAddFlyteCustomizationsToContainer_Resources(t *testing.T) {
 			Limits: v1.ResourceList{
 				v1.ResourceMemory: resource.MustParse("20"),
 			},
-		})
+		}, false, "")
 		err := AddFlyteCustomizationsToContainer(context.TODO(), templateParameters, ResourceCustomizationModeMergeExistingResources, container)
 		assert.NoError(t, err)
 		assert.True(t, container.Resources.Requests.Cpu().Equal(resource.MustParse("1")))
@@ -559,7 +583,7 @@ func TestAddFlyteCustomizationsToContainer_Resources(t *testing.T) {
 			Limits: v1.ResourceList{
 				v1.ResourceMemory: resource.MustParse("20"),
 			},
-		})
+		}, false, "")
 		err := AddFlyteCustomizationsToContainer(context.TODO(), templateParameters, ResourceCustomizationModeMergeExistingResources, container)
 		assert.NoError(t, err)
 		assert.True(t, container.Resources.Requests.Cpu().Equal(resource.MustParse("1")))
@@ -594,13 +618,49 @@ func TestAddFlyteCustomizationsToContainer_Resources(t *testing.T) {
 				v1.ResourceCPU:    resource.MustParse("10"),
 				v1.ResourceMemory: resource.MustParse("20"),
 			},
-		})
+		}, false, "")
 		err := AddFlyteCustomizationsToContainer(context.TODO(), templateParameters, ResourceCustomizationModeMergeExistingResources, container)
 		assert.NoError(t, err)
 		assert.True(t, container.Resources.Requests.Cpu().Equal(resource.MustParse("10")))
 		assert.True(t, container.Resources.Limits.Cpu().Equal(resource.MustParse("10")))
 		assert.True(t, container.Resources.Requests.Memory().Equal(resource.MustParse("2")))
 		assert.True(t, container.Resources.Limits.Memory().Equal(resource.MustParse("2")))
+	})
+	t.Run("ensure gpu resource overriding works for tasks with pod templates", func(t *testing.T) {
+		container := &v1.Container{
+			Command: []string{
+				"{{ .Input }}",
+			},
+			Args: []string{
+				"{{ .OutputPrefix }}",
+			},
+			Resources: v1.ResourceRequirements{
+				Requests: v1.ResourceList{
+					resourceGPU: resource.MustParse("2"), // Tasks with pod templates request resource via the "gpu" key
+				},
+				Limits: v1.ResourceList{
+					resourceGPU: resource.MustParse("2"),
+				},
+			},
+		}
+
+		overrideRequests := v1.ResourceList{
+			ResourceNvidiaGPU: resource.MustParse("4"), // Resource overrides specify the "nvidia.com/gpu" key
+		}
+
+		overrideLimits := v1.ResourceList{
+			ResourceNvidiaGPU: resource.MustParse("4"),
+		}
+
+		templateParameters := getTemplateParametersForTest(&v1.ResourceRequirements{
+			Requests: overrideRequests,
+			Limits:   overrideLimits,
+		}, &v1.ResourceRequirements{}, false, "")
+
+		err := AddFlyteCustomizationsToContainer(context.TODO(), templateParameters, ResourceCustomizationModeMergeExistingResources, container)
+		assert.NoError(t, err)
+		assert.Equal(t, container.Resources.Requests[ResourceNvidiaGPU], overrideRequests[ResourceNvidiaGPU])
+		assert.Equal(t, container.Resources.Limits[ResourceNvidiaGPU], overrideLimits[ResourceNvidiaGPU])
 	})
 }
 
@@ -630,10 +690,47 @@ func TestAddFlyteCustomizationsToContainer_ValidateExistingResources(t *testing.
 			v1.ResourceCPU:    resource.MustParse("10"),
 			v1.ResourceMemory: resource.MustParse("20"),
 		},
-	})
+	}, false, "")
 	err := AddFlyteCustomizationsToContainer(context.TODO(), templateParameters, ResourceCustomizationModeEnsureExistingResourcesInRange, container)
 	assert.NoError(t, err)
 
 	assert.True(t, container.Resources.Requests.Cpu().Equal(resource.MustParse("10")))
 	assert.True(t, container.Resources.Limits.Cpu().Equal(resource.MustParse("10")))
+}
+
+func TestAddFlyteCustomizationsToContainer_ValidateEnvFrom(t *testing.T) {
+	configMapSource := v1.EnvFromSource{
+		ConfigMapRef: &v1.ConfigMapEnvSource{
+			LocalObjectReference: v1.LocalObjectReference{
+				Name: "my-configmap",
+			},
+		},
+	}
+	secretSource := v1.EnvFromSource{
+		SecretRef: &v1.SecretEnvSource{
+			LocalObjectReference: v1.LocalObjectReference{
+				Name: "my-secret",
+			},
+		},
+	}
+
+	container := &v1.Container{
+		Command: []string{
+			"{{ .Input }}",
+		},
+		Args: []string{
+			"{{ .OutputPrefix }}",
+		},
+		EnvFrom: []v1.EnvFromSource{
+			configMapSource,
+			secretSource,
+		},
+	}
+
+	err := AddFlyteCustomizationsToContainer(context.TODO(), getTemplateParametersForTest(nil, nil, false, ""), ResourceCustomizationModeEnsureExistingResourcesInRange, container)
+	assert.NoError(t, err)
+
+	assert.Len(t, container.EnvFrom, 2)
+	assert.Equal(t, container.EnvFrom[0], configMapSource)
+	assert.Equal(t, container.EnvFrom[1], secretSource)
 }

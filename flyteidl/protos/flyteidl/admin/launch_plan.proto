@@ -4,6 +4,7 @@ package flyteidl.admin;
 option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin";
 
 import "flyteidl/core/execution.proto";
+import "flyteidl/core/execution_envs.proto";
 import "flyteidl/core/literals.proto";
 import "flyteidl/core/identifier.proto";
 import "flyteidl/core/interface.proto";
@@ -94,9 +95,6 @@ message LaunchPlanSpec {
     // These can not be overridden when an execution is created with this launch plan.
     // Deprecated: Please use fixec_input_data instead
     core.LiteralMap fixed_inputs = 4 [deprecated = true];
-    // Fixed, non-overridable inputs for the Launch Plan.
-    // These can not be overridden when an execution is created with this launch plan.
-    core.InputData fixed_input_data = 22;
 
     // String to indicate the role to use to execute the workflow underneath
     string role = 5 [deprecated = true];
@@ -139,6 +137,13 @@ message LaunchPlanSpec {
 
     // Environment variables to be set for the execution.
     Envs envs = 21;
+
+    // Execution environment assignments to be set for the execution.
+    repeated core.ExecutionEnvAssignment execution_env_assignments = 22;
+
+    // Fixed, non-overridable inputs for the Launch Plan.
+    // These can not be overridden when an execution is created with this launch plan.
+    core.InputData fixed_input_data = 23;
 }
 
 // Values computed by the flyte platform after launch plan registration.

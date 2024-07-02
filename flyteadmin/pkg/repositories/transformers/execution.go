@@ -34,7 +34,6 @@ type CreateExecutionModelInput struct {
 	LaunchPlanID          uint
 	WorkflowID            uint
 	TaskID                uint
-	Phase                 core.WorkflowExecution_Phase
 	CreatedAt             time.Time
 	Notifications         []*admin.Notification
 	WorkflowIdentifier    *core.Identifier
@@ -76,7 +75,6 @@ func CreateExecutionModel(input CreateExecutionModelInput) (*models.Execution, e
 	}
 	createdAt := timestamppb.New(input.CreatedAt)
 	closure := admin.ExecutionClosure{
-		Phase:         input.Phase,
 		CreatedAt:     createdAt,
 		UpdatedAt:     createdAt,
 		Notifications: input.Notifications,
@@ -86,9 +84,6 @@ func CreateExecutionModel(input CreateExecutionModelInput) (*models.Execution, e
 			Principal:  requestSpec.Metadata.Principal,
 			OccurredAt: createdAt,
 		},
-	}
-	if input.Phase == core.WorkflowExecution_RUNNING {
-		closure.StartedAt = createdAt
 	}
 	if input.Error != nil {
 		closure.Phase = core.WorkflowExecution_FAILED
@@ -116,10 +111,6 @@ func CreateExecutionModel(input CreateExecutionModelInput) (*models.Execution, e
 	}
 
 	activeExecution := int32(admin.ExecutionState_EXECUTION_ACTIVE)
-	tags := make([]models.AdminTag, len(input.RequestSpec.Tags))
-	for i, tag := range input.RequestSpec.Tags {
-		tags[i] = models.AdminTag{Name: tag}
-	}
 
 	executionModel := &models.Execution{
 		ExecutionKey: models.ExecutionKey{
@@ -128,7 +119,7 @@ func CreateExecutionModel(input CreateExecutionModelInput) (*models.Execution, e
 			Name:    input.WorkflowExecutionID.Name,
 		},
 		Spec:                  spec,
-		Phase:                 input.Phase.String(),
+		Phase:                 closure.Phase.String(),
 		Closure:               closureBytes,
 		WorkflowID:            input.WorkflowID,
 		ExecutionCreatedAt:    &input.CreatedAt,
@@ -141,7 +132,6 @@ func CreateExecutionModel(input CreateExecutionModelInput) (*models.Execution, e
 		User:                  requestSpec.Metadata.Principal,
 		State:                 &activeExecution,
 		LaunchEntity:          strings.ToLower(input.LaunchEntity.String()),
-		Tags:                  tags,
 	}
 	// A reference launch entity can be one of either or a task OR launch plan. Traditionally, workflows are executed
 	// with a reference launch plan which is why this behavior is the default below.
@@ -155,6 +145,39 @@ func CreateExecutionModel(input CreateExecutionModelInput) (*models.Execution, e
 	}
 
 	return executionModel, nil
+}
+
+// CreateExecutionTagModel transforms a CreateExecutionModelInput to a ExecutionTag model
+func CreateExecutionTagModel(input CreateExecutionModelInput) ([]*models.ExecutionTag, error) {
+	tags := make([]*models.ExecutionTag, 0)
+
+	if input.RequestSpec.Labels != nil {
+		for k, v := range input.RequestSpec.Labels.Values {
+			tags = append(tags, &models.ExecutionTag{
+				ExecutionKey: models.ExecutionKey{
+					Project: input.WorkflowExecutionID.Project,
+					Domain:  input.WorkflowExecutionID.Domain,
+					Name:    input.WorkflowExecutionID.Name,
+				},
+				Key:   k,
+				Value: v,
+			})
+		}
+	}
+
+	for _, v := range input.RequestSpec.Tags {
+		tags = append(tags, &models.ExecutionTag{
+			ExecutionKey: models.ExecutionKey{
+				Project: input.WorkflowExecutionID.Project,
+				Domain:  input.WorkflowExecutionID.Domain,
+				Name:    input.WorkflowExecutionID.Name,
+			},
+			Key:   v,
+			Value: "",
+		})
+	}
+
+	return tags, nil
 }
 
 func reassignCluster(ctx context.Context, cluster string, executionID *core.WorkflowExecutionIdentifier, execution *models.Execution) error {

@@ -15,6 +15,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	evtErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/transformers/k8s"
 	"github.com/flyteorg/flyte/flytestdlib/cache"
 	stdErr "github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
@@ -114,6 +115,15 @@ func (a *adminLaunchPlanExecutor) Launch(ctx context.Context, launchCtx LaunchCo
 		})
 	}
 
+	// Make a copy of the labels with shard-key removed. This ensures that the shard-key is re-computed for each
+	// instead of being copied from the parent.
+	labels := make(map[string]string)
+	for key, value := range launchCtx.Labels {
+		if key != k8s.ShardKeyLabel {
+			labels[key] = value
+		}
+	}
+
 	req := &admin.ExecutionCreateRequest{
 		Project:   executionID.Project,
 		Domain:    executionID.Domain,
@@ -128,7 +138,7 @@ func (a *adminLaunchPlanExecutor) Launch(ctx context.Context, launchCtx LaunchCo
 				Principal:           launchCtx.Principal,
 				ParentNodeExecution: launchCtx.ParentNodeExecution,
 			},
-			Labels:              &admin.Labels{Values: launchCtx.Labels},
+			Labels:              &admin.Labels{Values: labels},
 			Annotations:         &admin.Annotations{Values: launchCtx.Annotations},
 			SecurityContext:     &launchCtx.SecurityContext,
 			MaxParallelism:      int32(launchCtx.MaxParallelism),

@@ -8,7 +8,7 @@
 : "${K3D_INSTALL_URL:="https://raw.githubusercontent.com/rancher/k3d/main/install.sh"}" # URL to k3d installer script
 : "${K3S_VERSION:="v1.21.1-k3s1"}" # version of k3s to run in k3d cluster, empty value uses default specified by k3d install
 : "${K3D_CLUSTER_NAME:="flyte"}" # name of k3d cluster to be used
-: "${K3D_KUBECONFIG_FILE_PATH:="${HOME}/.k3d/kubeconfig-${K3D_CLUSTER_NAME}.yaml"}" # file path to store kubeconfig file for k3d cluster at
+: "${K3D_KUBECONFIG_FILE_PATH:="${HOME}/.flyte/sandbox/kubeconfig"}" # file path to store kubeconfig file for k3d cluster at
 
 : "${KUBECTL_VERSION:=""}" # version of kubectl to install, empty value uses latest available
 : "${KUBECTL_INSTALL_URL:="https://dl.k8s.io/release/VERSION/bin/linux/amd64/kubectl"}" # URL to kubectl binary, include VERSION to be replaced with KUBECTL_VERSION
@@ -170,4 +170,4 @@ kubectl wait --for=condition=available deployment/minio deployment/postgres -n $
 mkdir -p /tmp/k8s-webhook-server/serving-certs
 
 echo -e "\n*** Successfully set up local development environment."
-echo -e "*** Run \"flyte start --config flyte_local_k3d.yaml\" to start your local flyte installation.\n"
+echo -e "*** Run \"flyte start --config flyte-single-binary-local.yaml\" to start your local flyte installation.\n"

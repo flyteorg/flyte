@@ -1,10 +1,9 @@
 package admin
 
 import (
+	"crypto/x509"
 	"fmt"
 	"io/ioutil"
-
-	"crypto/x509"
 )
 
 // readCACerts from the passed in file at certLoc and return certpool.

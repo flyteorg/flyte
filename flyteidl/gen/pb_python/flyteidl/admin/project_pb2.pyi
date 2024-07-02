@@ -7,6 +7,10 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
+class GetDomainRequest(_message.Message):
+    __slots__ = []
+    def __init__(self) -> None: ...
+
 class Domain(_message.Message):
     __slots__ = ["id", "name"]
     ID_FIELD_NUMBER: _ClassVar[int]
@@ -14,6 +18,12 @@ class Domain(_message.Message):
     id: str
     name: str
     def __init__(self, id: _Optional[str] = ..., name: _Optional[str] = ...) -> None: ...
+
+class GetDomainsResponse(_message.Message):
+    __slots__ = ["domains"]
+    DOMAINS_FIELD_NUMBER: _ClassVar[int]
+    domains: _containers.RepeatedCompositeFieldContainer[Domain]
+    def __init__(self, domains: _Optional[_Iterable[_Union[Domain, _Mapping]]] = ...) -> None: ...
 
 class Project(_message.Message):
     __slots__ = ["id", "name", "domains", "description", "labels", "state", "org"]
@@ -76,3 +86,11 @@ class ProjectRegisterResponse(_message.Message):
 class ProjectUpdateResponse(_message.Message):
     __slots__ = []
     def __init__(self) -> None: ...
+
+class ProjectGetRequest(_message.Message):
+    __slots__ = ["id", "org"]
+    ID_FIELD_NUMBER: _ClassVar[int]
+    ORG_FIELD_NUMBER: _ClassVar[int]
+    id: str
+    org: str
+    def __init__(self, id: _Optional[str] = ..., org: _Optional[str] = ...) -> None: ...

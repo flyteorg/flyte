@@ -68,6 +68,7 @@ func TestLaunchSubTasks(t *testing.T) {
 	tMeta.OnGetTaskExecutionID().Return(tID)
 	tMeta.OnGetOverrides().Return(overrides)
 	tMeta.OnGetPlatformResources().Return(&v1.ResourceRequirements{})
+	tMeta.OnGetNamespace().Return("my-namespace")
 
 	ow := &mocks3.OutputWriter{}
 	ow.OnGetOutputPrefixPath().Return("/prefix/")

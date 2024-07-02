@@ -19,6 +19,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	pluginK8s "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/webapi/agent"
 	eventsErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	controllerConfig "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
@@ -200,6 +201,7 @@ type Handler struct {
 	pluginScope     promutils.Scope
 	eventConfig     *controllerConfig.EventConfig
 	clusterID       string
+	agentService    *pluginCore.AgentService
 }
 
 func (t *Handler) FinalizeRequired() bool {
@@ -226,6 +228,7 @@ func (t *Handler) Setup(ctx context.Context, sCtx interfaces.SetupContext) error
 		return err
 	}
 
+	once.Do(func() { agent.RegisterAgentPlugin(t.agentService) })
 	// Create the resource negotiator here
 	// and then convert it to proxies later and pass them to plugins
 	enabledPlugins, defaultForTaskTypes, err := WranglePluginsAndGenerateFinalList(ctx, &t.cfg.TaskPlugins, t.pluginRegistry, t.kubeClientset)
@@ -245,6 +248,11 @@ func (t *Handler) Setup(ctx context.Context, sCtx interfaces.SetupContext) error
 			tSCtx, newResourceManagerBuilder.GetResourceRegistrar(pluginResourceNamespacePrefix), p.ID)
 		logger.Infof(ctx, "Loading Plugin [%s] ENABLED", p.ID)
 		cp, err := pluginCore.LoadPlugin(ctx, sCtxFinal, p)
+
+		if cp.GetID() == agent.ID {
+			t.agentService.CorePlugin = cp
+		}
+
 		if err != nil {
 			return regErrors.Wrapf(err, "failed to load plugin - %s", p.ID)
 		}
@@ -306,7 +314,6 @@ func (t *Handler) Setup(ctx context.Context, sCtx interfaces.SetupContext) error
 	}
 
 	t.resourceManager = rm
-
 	return nil
 }
 
@@ -337,6 +344,11 @@ func (t Handler) ResolvePlugin(ctx context.Context, ttype string, executionConfi
 		logger.Debugf(ctx, "Plugin [%s] resolved for Handler type [%s]", p.GetID(), ttype)
 		return p, nil
 	}
+
+	if t.agentService.ContainTaskType(ttype) {
+		return t.agentService.CorePlugin, nil
+	}
+
 	if t.defaultPlugin != nil {
 		logger.Warnf(ctx, "No plugin found for Handler-type [%s], defaulting to [%s]", ttype, t.defaultPlugin.GetID())
 		return t.defaultPlugin, nil
@@ -913,5 +925,6 @@ func New(ctx context.Context, kubeClient executors.Client, kubeClientset kuberne
 		cfg:             cfg,
 		eventConfig:     eventConfig,
 		clusterID:       clusterID,
+		agentService:    &pluginCore.AgentService{},
 	}, nil
 }

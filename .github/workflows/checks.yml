@@ -1,7 +1,7 @@
 name: Components Checks
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
 on:
@@ -34,6 +34,7 @@ jobs:
           - flyteadmin
           # TODO(monorepo): Enable lint flytecopilot
           # - flytecopilot
+          - flytectl
           - flyteidl
           - flyteplugins
           - flytepropeller
@@ -53,6 +54,7 @@ jobs:
           - datacatalog
           - flyteadmin
           - flytecopilot
+          - flytectl
           - flyteplugins
           - flytepropeller
           - flytestdlib
@@ -61,35 +63,20 @@ jobs:
       component: ${{ matrix.component }}
       go-version: ${{ needs.unpack-envvars.outputs.go-version }}
     secrets:
-      FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
-  docker-build:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  flyteadmin-int-tests-image-build:
     strategy:
       fail-fast: false
-      matrix:
-        component:
-          - datacatalog
-          - flyteadmin
-          - flytecopilot
-          - flytepropeller
-    name: Docker Build Images
+    name: flyteadmin integration tests image 
     uses: ./.github/workflows/component_docker_build.yml
     with:
-       component: ${{ matrix.component }}
+      component: flyteadmin
 
-  # TODO(monorepo): these tests are broken. They never test an actual change.
-  # endtoend:
-  #   name: End2End Test
-  #   needs: [ docker-build ]
-  #   uses: ./.github/workflows/end2end.yml
-  #   with:
-  #     # Reusing the output of the matrix is ok as they are essentially writing the same value (i.e. the directory artifacts are written + run id)
-  #     cache_key: ${{ needs.docker-build.outputs.cache_key }}
-  #     priorities: "P0"
-
-  integration:
+  flyteadmin-integration-tests:
     name: Integration Test
     needs:
-      - docker-build
+      - flyteadmin-int-tests-image-build
       - unpack-envvars
     strategy:
       fail-fast: false
@@ -99,7 +86,7 @@ jobs:
     uses: ./.github/workflows/integration.yml
     with:
       component: ${{ matrix.component }}
-      cache_key: ${{ needs.docker-build.outputs.cache_key }}
+      cache_key: ${{ needs.flyteadmin-int-tests-image-build.outputs.cache_key }}
       go-version: ${{ needs.unpack-envvars.outputs.go-version }}
 
   generate:
@@ -113,6 +100,7 @@ jobs:
           - datacatalog
           - flyteadmin
           - flytecopilot
+          - flytectl
           - flytepropeller
     uses: ./.github/workflows/go_generate.yml
     with:
@@ -129,3 +117,59 @@ jobs:
     secrets:
       FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
       FLYTE_BOT_USERNAME: ${{ secrets.FLYTE_BOT_USERNAME }}
+
+  dry_run_goreleaser:
+    name: Dry Run Goreleaser
+    runs-on: ubuntu-latest
+    needs:
+      - unpack-envvars
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: "0"
+      - uses: actions/setup-go@v4
+        with:
+          go-version: ${{ needs.unpack-envvars.outputs.go-version }}
+      - name: Run GoReleaser dry run
+        uses: goreleaser/goreleaser-action@v5
+        with:
+          distribution: goreleaser-pro
+          version: latest
+          args: --snapshot  --skip-publish --rm-dist -f flytectl/.goreleaser.yml
+        env:
+          GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
+
+  sandbox:
+    name: Test Getting started
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: flytectl
+    needs:
+      - unpack-envvars
+    steps:
+      - uses: insightsengineering/disk-space-reclaimer@v1
+      - name: Checkout
+        uses: actions/checkout@v2
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('go.sum') }}
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ needs.unpack-envvars.outputs.go-version }}
+      - name: Build Flytectl binary
+        run: make compile
+      - name: Create a sandbox cluster
+        run: |
+          bin/flytectl demo start
+      - name: Setup flytectl config
+        run: bin/flytectl config init
+      - name: Register cookbook
+        run: bin/flytectl register examples -d development  -p flytesnacks
+      - name: Teardown Sandbox cluster
+        run: bin/flytectl demo teardown

@@ -315,8 +315,21 @@ func BuildRawPod(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v
 	return podSpec, &objectMeta, primaryContainerName, nil
 }
 
+func hasExternalLinkType(taskTemplate *core.TaskTemplate) bool {
+	if taskTemplate == nil {
+		return false
+	}
+	config := taskTemplate.GetConfig()
+	if config == nil {
+		return false
+	}
+	// The presence of any "link_type" is sufficient to guarantee that the console URL should be included.
+	_, exists := config["link_type"]
+	return exists
+}
+
 // ApplyFlytePodConfiguration updates the PodSpec and ObjectMeta with various Flyte configuration. This includes
-// applying default k8s configuration, resource requests, injecting copilot containers, and merging with the
+// applying default k8s configuration, applying overrides (resources etc.), injecting copilot containers, and merging with the
 // configuration PodTemplate (if exists).
 func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecutionContext, podSpec *v1.PodSpec, objectMeta *metav1.ObjectMeta, primaryContainerName string) (*v1.PodSpec, *metav1.ObjectMeta, error) {
 	taskTemplate, err := tCtx.TaskReader().Read(ctx)
@@ -327,11 +340,12 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 
 	// add flyte resource customizations to containers
 	templateParameters := template.Parameters{
-		Inputs:           tCtx.InputReader(),
-		OutputPath:       tCtx.OutputWriter(),
-		Task:             tCtx.TaskReader(),
-		TaskExecMetadata: tCtx.TaskExecutionMetadata(),
-		Runtime:          taskTemplate.GetMetadata().GetRuntime(),
+		Inputs:            tCtx.InputReader(),
+		OutputPath:        tCtx.OutputWriter(),
+		Task:              tCtx.TaskReader(),
+		TaskExecMetadata:  tCtx.TaskExecutionMetadata(),
+		Runtime:           taskTemplate.GetMetadata().GetRuntime(),
+		IncludeConsoleURL: hasExternalLinkType(taskTemplate),
 	}
 
 	resourceRequests := make([]v1.ResourceRequirements, 0, len(podSpec.Containers))
@@ -400,7 +414,21 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 		ApplyGPUNodeSelectors(podSpec, extendedResources.GetGpuAccelerator())
 	}
 
+	// Override container image if necessary
+	if len(tCtx.TaskExecutionMetadata().GetOverrides().GetContainerImage()) > 0 {
+		ApplyContainerImageOverride(podSpec, tCtx.TaskExecutionMetadata().GetOverrides().GetContainerImage(), primaryContainerName)
+	}
+
 	return podSpec, objectMeta, nil
+}
+
+func ApplyContainerImageOverride(podSpec *v1.PodSpec, containerImage string, primaryContainerName string) {
+	for i, c := range podSpec.Containers {
+		if c.Name == primaryContainerName {
+			podSpec.Containers[i].Image = containerImage
+			return
+		}
+	}
 }
 
 // ToK8sPodSpec builds a PodSpec and ObjectMeta based on the definition passed by the TaskExecutionContext. This
@@ -571,8 +599,8 @@ func BuildIdentityPod() *v1.Pod {
 //	resources requested is beyond the capability of the system. for this we will rely on configuration
 //	and hence input gates. We should not allow bad requests that Request for large number of resource through.
 //	In the case it makes through, we will fail after timeout
-func DemystifyPending(status v1.PodStatus) (pluginsCore.PhaseInfo, error) {
-	phaseInfo, t := demystifyPendingHelper(status)
+func DemystifyPending(status v1.PodStatus, info pluginsCore.TaskInfo) (pluginsCore.PhaseInfo, error) {
+	phaseInfo, t := demystifyPendingHelper(status, info)
 
 	if phaseInfo.Phase().IsTerminal() {
 		return phaseInfo, nil
@@ -589,13 +617,14 @@ func DemystifyPending(status v1.PodStatus) (pluginsCore.PhaseInfo, error) {
 		return phaseInfo, nil
 	}
 
-	return pluginsCore.PhaseInfoQueued(time.Now(), pluginsCore.DefaultPhaseVersion, "Scheduling"), nil
+	return pluginsCore.PhaseInfoQueuedWithTaskInfo(time.Now(), pluginsCore.DefaultPhaseVersion, "Scheduling", phaseInfo.Info()), nil
 }
 
-func demystifyPendingHelper(status v1.PodStatus) (pluginsCore.PhaseInfo, time.Time) {
+func demystifyPendingHelper(status v1.PodStatus, info pluginsCore.TaskInfo) (pluginsCore.PhaseInfo, time.Time) {
 	// Search over the difference conditions in the status object.  Note that the 'Pending' this function is
 	// demystifying is the 'phase' of the pod status. This is different than the PodReady condition type also used below
-	phaseInfo := pluginsCore.PhaseInfoUndefined
+	phaseInfo := pluginsCore.PhaseInfoQueuedWithTaskInfo(time.Now(), pluginsCore.DefaultPhaseVersion, "Demistify Pending", &info)
+
 	t := time.Now()
 	for _, c := range status.Conditions {
 		t = c.LastTransitionTime.Time
@@ -603,7 +632,7 @@ func demystifyPendingHelper(status v1.PodStatus) (pluginsCore.PhaseInfo, time.Ti
 		case v1.PodScheduled:
 			if c.Status == v1.ConditionFalse {
 				// Waiting to be scheduled. This usually refers to inability to acquire resources.
-				return pluginsCore.PhaseInfoQueued(t, pluginsCore.DefaultPhaseVersion, fmt.Sprintf("%s:%s", c.Reason, c.Message)), t
+				return pluginsCore.PhaseInfoQueuedWithTaskInfo(t, pluginsCore.DefaultPhaseVersion, fmt.Sprintf("%s:%s", c.Reason, c.Message), phaseInfo.Info()), t
 			}
 
 		case v1.PodReasonUnschedulable:
@@ -616,7 +645,7 @@ func demystifyPendingHelper(status v1.PodStatus) (pluginsCore.PhaseInfo, time.Ti
 			//  reason: Unschedulable
 			// 	status: "False"
 			// 	type: PodScheduled
-			return pluginsCore.PhaseInfoQueued(t, pluginsCore.DefaultPhaseVersion, fmt.Sprintf("%s:%s", c.Reason, c.Message)), t
+			return pluginsCore.PhaseInfoQueuedWithTaskInfo(t, pluginsCore.DefaultPhaseVersion, fmt.Sprintf("%s:%s", c.Reason, c.Message), phaseInfo.Info()), t
 
 		case v1.PodReady:
 			if c.Status == v1.ConditionFalse {
@@ -837,9 +866,11 @@ func DemystifyFailure(status v1.PodStatus, info pluginsCore.TaskInfo) (pluginsCo
 	//     }
 	// }
 	//
+
+	var isSystemError bool
 	// In some versions of GKE the reason can also be "Terminated"
 	if code == "Shutdown" || code == "Terminated" {
-		return pluginsCore.PhaseInfoSystemRetryableFailure(Interrupted, message, &info), nil
+		isSystemError = true
 	}
 
 	//
@@ -873,6 +904,11 @@ func DemystifyFailure(status v1.PodStatus, info pluginsCore.TaskInfo) (pluginsCo
 			}
 		}
 	}
+
+	if isSystemError {
+		return pluginsCore.PhaseInfoSystemRetryableFailure(Interrupted, message, &info), nil
+	}
+
 	return pluginsCore.PhaseInfoRetryableFailure(code, message, &info), nil
 }
 

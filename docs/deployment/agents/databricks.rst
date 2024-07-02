@@ -1,6 +1,6 @@
 .. _deployment-agent-setup-databricks:
 
-Databricks Agent
+Databricks agent
 =================
 
 This guide provides an overview of how to set up Databricks agent in your Flyte deployment.
@@ -291,4 +291,4 @@ Wait for the upgrade to complete. You can check the status of the deployment pod
 
   kubectl get pods -n flyte
 
-For databricks plugin on the Flyte cluster, please refer to `Databricks Plugin Example <https://docs.flyte.org/en/latest/flytesnacks/examples/databricks_plugin/index.html>`_
+For Databricks agent on the Flyte cluster, see `Databricks agent <https://docs.flyte.org/en/latest/flytesnacks/examples/databricks_agent/index.html>`_.

@@ -40,6 +40,7 @@ spec:
   - name: agent-grpc
     port: 8000
     protocol: TCP
+    appProtocol: TCP
     targetPort: agent-grpc
   selector: 
     app.kubernetes.io/name: flyteagent
@@ -78,7 +79,7 @@ spec:
         - pyflyte
         - serve
         - agent
-        image: "ghcr.io/flyteorg/flyteagent:1.10.3"
+        image: "cr.flyte.org/flyteorg/flyteagent:1.12.3"
         imagePullPolicy: "IfNotPresent"
         name: flyteagent
         volumeMounts:
@@ -87,6 +88,11 @@ spec:
         ports:
         - containerPort: 8000
           name: agent-grpc
+        readinessProbe:
+          grpc:
+            port: 8000
+          initialDelaySeconds: 1
+          periodSeconds: 3
         securityContext:
             allowPrivilegeEscalation: false
         resources:

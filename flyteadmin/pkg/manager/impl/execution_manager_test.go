@@ -55,8 +55,9 @@ import (
 )
 
 const (
-	principal = "principal"
-	rawOutput = "raw_output"
+	principal             = "principal"
+	rawOutput             = "raw_output"
+	executionClusterLabel = "execution_cluster_label"
 )
 
 var (
@@ -395,6 +396,7 @@ func TestCreateExecution(t *testing.T) {
 	}
 	request.Spec.RawOutputDataConfig = &admin.RawOutputDataConfig{OutputLocationPrefix: rawOutput}
 	request.Spec.ClusterAssignment = &clusterAssignment
+	request.Spec.ExecutionClusterLabel = &admin.ExecutionClusterLabel{Value: executionClusterLabel}
 
 	identity, err := auth.NewIdentityContext("", principal, "", time.Now(), sets.NewString(), nil, nil)
 	assert.NoError(t, err)
@@ -441,6 +443,7 @@ func TestCreateExecutionFromWorkflowNode(t *testing.T) {
 	)
 
 	getExecutionCalled := false
+	var clusterLabel = &admin.ExecutionClusterLabel{Value: executionClusterLabel}
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(
 		func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
 			assert.EqualValues(t, input.Project, parentNodeExecutionID.ExecutionId.Project)
@@ -450,6 +453,7 @@ func TestCreateExecutionFromWorkflowNode(t *testing.T) {
 				Metadata: &admin.ExecutionMetadata{
 					Nesting: 1,
 				},
+				ExecutionClusterLabel: clusterLabel,
 			}
 			specBytes, _ := proto.Marshal(spec)
 			getExecutionCalled = true
@@ -475,6 +479,7 @@ func TestCreateExecutionFromWorkflowNode(t *testing.T) {
 			assert.EqualValues(t, input.SourceExecutionID, 2)
 			assert.Equal(t, 2, int(spec.Metadata.Nesting))
 			assert.Equal(t, principal, spec.Metadata.Principal)
+			assert.Equal(t, executionClusterLabel, spec.ExecutionClusterLabel.Value)
 			assert.Equal(t, principal, input.User)
 			return nil
 		},

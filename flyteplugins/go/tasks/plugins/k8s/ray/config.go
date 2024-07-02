@@ -22,6 +22,7 @@ var (
 		IncludeDashboard:         true,
 		DashboardHost:            "0.0.0.0",
 		EnableUsageStats:         false,
+		ServiceAccount:           "default",
 		Defaults: DefaultConfig{
 			HeadNode: NodeConfig{
 				StartParameters: map[string]string{
@@ -85,6 +86,7 @@ type Config struct {
 	DashboardURLTemplate *tasklog.TemplateLogPlugin    `json:"dashboardURLTemplate" pflag:"-,Template for URL of Ray dashboard running on a head node."`
 	Defaults             DefaultConfig                 `json:"defaults" pflag:"-,Default configuration for ray jobs"`
 	EnableUsageStats     bool                          `json:"enableUsageStats" pflag:",Enable usage stats for ray jobs. These stats are submitted to usage-stats.ray.io per https://docs.ray.io/en/latest/cluster/usage-stats.html"`
+	ServiceAccount       string                        `json:"serviceAccount" pflag:",The k8s service account to run as"`
 }
 
 type DefaultConfig struct {

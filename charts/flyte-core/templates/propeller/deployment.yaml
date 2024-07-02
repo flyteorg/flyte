@@ -25,16 +25,20 @@ spec:
         {{- with .Values.flytepropeller.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
+        prometheus.io/path: {{ .Values.flytepropeller.prometheus.path | quote }}
+        prometheus.io/port: {{ .Values.flytepropeller.prometheus.port | quote }}
+        {{- with .Values.flytepropeller.prometheus.enabled }}
+        prometheus.io/scrape: "true"
+        {{- end }}
       {{- if .Values.flytepropeller.manager }}
       labels: {{ include "flytepropeller-manager.podLabels" . | nindent 8 }}
       {{- else }}
       labels: {{ include "flytepropeller.podLabels" . | nindent 8 }}
       {{- end }}
     spec:
-      securityContext:
-        fsGroup: 65534
-        runAsUser: 1001
-        fsGroupChangePolicy: "Always"
+      {{- with .Values.flytepropeller.securityContext }}
+      securityContext: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
       {{- if .Values.flytepropeller.priorityClassName }}
       priorityClassName: {{ .Values.flytepropeller.priorityClassName }}
       {{- end }}
@@ -79,12 +83,19 @@ spec:
         {{- end }}
         ports:
         - containerPort: {{ index .Values.configmap.core.propeller "prof-port" }}
+        {{- if .Values.flytepropeller.prometheus.enabled }}
+        - containerPort: {{ .Values.flytepropeller.prometheus.port }}
+          name: debug
+          protocol: TCP
+        {{- end }}
         resources: {{- toYaml .Values.flytepropeller.resources | nindent 10 }}
         volumeMounts:
         - name: config-volume
           mountPath: /etc/flyte/config
+        {{- if .Values.secrets.adminOauthClientCredentials.enabled }}
         - name: auth
           mountPath: /etc/secrets/
+        {{- end }}
         {{- with .Values.flytepropeller.additionalVolumeMounts -}}
         {{ tpl (toYaml .) $ | nindent 8 }}
         {{- end }}
@@ -99,9 +110,11 @@ spec:
       - configMap:
           name: flyte-propeller-config
         name: config-volume
+      {{- if .Values.secrets.adminOauthClientCredentials.enabled }}
       - name: auth
         secret:
           secretName: flyte-secret-auth
+      {{- end }}
       {{- with .Values.flytepropeller.additionalVolumes -}}
       {{ tpl (toYaml .) $ | nindent 6 }}
       {{- end }}

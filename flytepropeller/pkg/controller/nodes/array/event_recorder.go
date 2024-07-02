@@ -202,7 +202,7 @@ func (*passThroughEventRecorder) finalizeRequired(ctx context.Context) bool {
 }
 
 func newArrayEventRecorder(eventRecorder interfaces.EventRecorder) arrayEventRecorder {
-	if config.GetConfig().ArrayNodeEventVersion == 0 {
+	if config.GetConfig().ArrayNode.EventVersion == 0 {
 		return &externalResourcesEventRecorder{
 			EventRecorder: eventRecorder,
 		}

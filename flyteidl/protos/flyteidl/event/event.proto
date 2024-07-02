@@ -66,7 +66,7 @@ message NodeExecutionEvent {
         core.LiteralMap deprecated_input_data = 20 [deprecated = true];
 
         // Raw input data consumed by this node execution.
-        core.InputData input_data = 24;
+        core.InputData input_data = 25;
     }
 
     oneof output_result {
@@ -82,7 +82,7 @@ message NodeExecutionEvent {
         core.LiteralMap deprecated_output_data = 15 [deprecated = true];
 
         // Raw output data produced by this workflow execution.
-        core.OutputData output_data = 23;
+        core.OutputData output_data = 26;
     }
 
     // Additional metadata to do with this event's node target based
@@ -128,6 +128,21 @@ message NodeExecutionEvent {
 
     // Indicates if this node is an ArrayNode.
     bool is_array = 22;
+
+    // Holding this field here for now, this will be upstreamed soon.
+    // So that Admin doesn't have to rebuild the node execution graph to find the target entity, propeller will fill this
+    // in optionally - currently this is only filled in for subworkflows. This is the ID of the subworkflow corresponding
+    // to this node execution. It is difficult to find because Admin only sees one node at a time. A subworkflow could be
+    // nested multiple layers deep, and you'd need to access the correct workflow template to know the target subworkflow.
+    core.Identifier target_entity = 23;
+
+    // Holding this field here for now, this will be upstreamed soon.
+    // Tasks and subworkflows (but not launch plans) that are run within a dynamic task are effectively independent of
+    // the tasks that are registered in Admin's db. Confusingly, they are often identical, but sometimes they are not
+    // even registered at all. Similar to the target_entity field, at the time Admin receives this event, it has no idea
+    // if the relevant execution entity is was registered, or dynamic. This field indicates that the target_entity ID,
+    // as well as task IDs in any corresponding Task Executions, should not be used to looked up the task in Admin's db.
+    bool is_in_dynamic_chain = 24;
 }
 
 // For Workflow Nodes we need to send information about the workflow that's launched

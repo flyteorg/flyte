@@ -49,6 +49,7 @@ var (
 	taskTemplateRegex         = regexp.MustCompile(`(?i){{\s*[\.$]TaskTemplatePath\s*}}`)
 	prevCheckpointPrefixRegex = regexp.MustCompile(`(?i){{\s*[\.$]PrevCheckpointPrefix\s*}}`)
 	currCheckpointPrefixRegex = regexp.MustCompile(`(?i){{\s*[\.$]CheckpointOutputPrefix\s*}}`)
+	namespaceRegex            = regexp.MustCompile(`(?i){{\s*[\.$]Namespace\s*}}`)
 	// TODO(haytham): write down the right version once we release flytekit
 	inputDataWrapperMinVersion = version.MustParseSemantic("v1.11.0")
 )
@@ -74,11 +75,12 @@ type RuntimeMetadata interface {
 
 // Parameters struct is used by the Templating Engine to replace the templated parameters
 type Parameters struct {
-	TaskExecMetadata core.TaskExecutionMetadata
-	Inputs           io.InputReader
-	OutputPath       io.OutputFilePaths
-	Task             core.TaskTemplatePath
-	Runtime          RuntimeMetadata
+	TaskExecMetadata  core.TaskExecutionMetadata
+	Inputs            io.InputReader
+	OutputPath        io.OutputFilePaths
+	Task              core.TaskTemplatePath
+	Runtime           RuntimeMetadata
+	IncludeConsoleURL bool
 }
 
 // Render Evaluates templates in each command with the equivalent value from passed args. Templates are case-insensitive
@@ -167,6 +169,9 @@ func render(ctx context.Context, inputTemplate string, params Parameters, perRet
 		}
 		val = taskTemplateRegex.ReplaceAllString(val, p.String())
 	}
+
+	// Replace namespace last, in case it was embedded in other templates
+	val = namespaceRegex.ReplaceAllString(val, params.TaskExecMetadata.GetNamespace())
 
 	inputs, err := params.Inputs.Get(ctx)
 	if err != nil {

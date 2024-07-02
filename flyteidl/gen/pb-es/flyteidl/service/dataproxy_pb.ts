@@ -60,6 +60,13 @@ export class CreateUploadLocationResponse extends Message<CreateUploadLocationRe
    */
   expiresAt?: Timestamp;
 
+  /**
+   * Data proxy generates these headers for client, and they have to add these headers to the request when uploading the file.
+   *
+   * @generated from field: map<string, string> headers = 4;
+   */
+  headers: { [key: string]: string } = {};
+
   constructor(data?: PartialMessage<CreateUploadLocationResponse>) {
     super();
     proto3.util.initPartial(data, this);
@@ -71,6 +78,7 @@ export class CreateUploadLocationResponse extends Message<CreateUploadLocationRe
     { no: 1, name: "signed_url", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "native_url", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "expires_at", kind: "message", T: Timestamp },
+    { no: 4, name: "headers", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateUploadLocationResponse {
@@ -152,6 +160,22 @@ export class CreateUploadLocationRequest extends Message<CreateUploadLocationReq
    */
   filenameRoot = "";
 
+  /**
+   * If true, the data proxy will add content_md5 to the metadata to the signed URL and
+   * it will force clients to add this metadata to the object.
+   * This make sure dataproxy is backward compatible with the old flytekit.
+   *
+   * @generated from field: bool add_content_md5_metadata = 7;
+   */
+  addContentMd5Metadata = false;
+
+  /**
+   * Optional, org key applied to the resource.
+   *
+   * @generated from field: string org = 8;
+   */
+  org = "";
+
   constructor(data?: PartialMessage<CreateUploadLocationRequest>) {
     super();
     proto3.util.initPartial(data, this);
@@ -166,6 +190,8 @@ export class CreateUploadLocationRequest extends Message<CreateUploadLocationReq
     { no: 4, name: "expires_in", kind: "message", T: Duration },
     { no: 5, name: "content_md5", kind: "scalar", T: 12 /* ScalarType.BYTES */ },
     { no: 6, name: "filename_root", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 7, name: "add_content_md5_metadata", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 8, name: "org", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateUploadLocationRequest {

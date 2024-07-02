@@ -30,6 +30,7 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 	var task *core.TaskTemplate
 	var resources *core.Resources
 	var extendedResources *v1alpha1.ExtendedResources
+	var containerImage string
 	if n.GetTaskNode() != nil {
 		taskID := n.GetTaskNode().GetReferenceId().String()
 		// TODO: Use task index for quick lookup
@@ -54,6 +55,10 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 				extendedResources = &v1alpha1.ExtendedResources{
 					ExtendedResources: overrides.GetExtendedResources(),
 				}
+			}
+
+			if len(overrides.GetContainerImage()) > 0 {
+				containerImage = overrides.GetContainerImage()
 			}
 		}
 	}
@@ -96,6 +101,7 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 		InputBindings:     toBindingValueArray(n.GetInputs()),
 		ActiveDeadline:    activeDeadline,
 		Interruptible:     interruptible,
+		ContainerImage:    containerImage,
 	}
 
 	switch v := n.GetTarget().(type) {
@@ -172,11 +178,17 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 			return nil, ok
 		}
 
+		var parallelism *uint32
+		switch x := arrayNode.GetParallelismOption().(type) {
+		case *core.ArrayNode_Parallelism:
+			parallelism = &x.Parallelism
+		}
+
 		// build ArrayNode
 		nodeSpec.Kind = v1alpha1.NodeKindArray
 		nodeSpec.ArrayNode = &v1alpha1.ArrayNodeSpec{
 			SubNodeSpec: subNodeSpecs[0],
-			Parallelism: arrayNode.Parallelism,
+			Parallelism: parallelism,
 		}
 
 		switch successCriteria := arrayNode.SuccessCriteria.(type) {

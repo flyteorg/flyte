@@ -50,14 +50,14 @@ type arrayTaskReader struct {
 }
 
 func (a *arrayTaskReader) Read(ctx context.Context) (*core.TaskTemplate, error) {
-	taskTemplate, err := a.TaskReader.Read(ctx)
+	originalTaskTemplate, err := a.TaskReader.Read(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	// convert output list variable to singular
 	outputVariables := make(map[string]*core.Variable)
-	for key, value := range taskTemplate.Interface.Outputs.Variables {
+	for key, value := range originalTaskTemplate.Interface.Outputs.Variables {
 		switch v := value.Type.Type.(type) {
 		case *core.LiteralType_CollectionType:
 			outputVariables[key] = &core.Variable{
@@ -69,10 +69,14 @@ func (a *arrayTaskReader) Read(ctx context.Context) (*core.TaskTemplate, error) 
 		}
 	}
 
-	taskTemplate.Interface.Outputs = &core.VariableMap{
-		Variables: outputVariables,
+	taskTemplate := *originalTaskTemplate
+	taskTemplate.Interface = &core.TypedInterface{
+		Inputs: originalTaskTemplate.Interface.Inputs,
+		Outputs: &core.VariableMap{
+			Variables: outputVariables,
+		},
 	}
-	return taskTemplate, nil
+	return &taskTemplate, nil
 }
 
 type arrayNodeExecutionContext struct {

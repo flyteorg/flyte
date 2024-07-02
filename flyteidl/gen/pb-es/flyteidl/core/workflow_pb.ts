@@ -8,7 +8,7 @@ import { Duration, Message, proto3 } from "@bufbuild/protobuf";
 import { BooleanExpression } from "./condition_pb.js";
 import { Error, LiteralType } from "./types_pb.js";
 import { Identifier } from "./identifier_pb.js";
-import { Binding, RetryStrategy } from "./literals_pb.js";
+import { Binding, LiteralMap, RetryStrategy } from "./literals_pb.js";
 import { QualityOfService } from "./execution_pb.js";
 import { TypedInterface } from "./interface_pb.js";
 import { ExtendedResources, Resources } from "./tasks_pb.js";
@@ -507,14 +507,20 @@ export class ArrayNode extends Message<ArrayNode> {
   node?: Node;
 
   /**
-   * parallelism defines the minimum number of instances to bring up concurrently at any given
-   * point. Note that this is an optimistic restriction and that, due to network partitioning or
-   * other failures, the actual number of currently running instances might be more. This has to
-   * be a positive number if assigned. Default value is size.
-   *
-   * @generated from field: uint32 parallelism = 2;
+   * @generated from oneof flyteidl.core.ArrayNode.parallelism_option
    */
-  parallelism = 0;
+  parallelismOption: {
+    /**
+     * parallelism defines the minimum number of instances to bring up concurrently at any given
+     * point. Note that this is an optimistic restriction and that, due to network partitioning or
+     * other failures, the actual number of currently running instances might be more. This has to
+     * be a positive number if assigned. Default value is size.
+     *
+     * @generated from field: uint32 parallelism = 2;
+     */
+    value: number;
+    case: "parallelism";
+  } | { case: undefined; value?: undefined } = { case: undefined };
 
   /**
    * @generated from oneof flyteidl.core.ArrayNode.success_criteria
@@ -550,7 +556,7 @@ export class ArrayNode extends Message<ArrayNode> {
   static readonly typeName = "flyteidl.core.ArrayNode";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "node", kind: "message", T: Node },
-    { no: 2, name: "parallelism", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 2, name: "parallelism", kind: "scalar", T: 13 /* ScalarType.UINT32 */, oneof: "parallelism_option" },
     { no: 3, name: "min_successes", kind: "scalar", T: 13 /* ScalarType.UINT32 */, oneof: "success_criteria" },
     { no: 4, name: "min_success_ratio", kind: "scalar", T: 2 /* ScalarType.FLOAT */, oneof: "success_criteria" },
   ]);
@@ -1121,6 +1127,13 @@ export class TaskNodeOverrides extends Message<TaskNodeOverrides> {
    */
   extendedResources?: ExtendedResources;
 
+  /**
+   * Override for the image used by task pods.
+   *
+   * @generated from field: string container_image = 3;
+   */
+  containerImage = "";
+
   constructor(data?: PartialMessage<TaskNodeOverrides>) {
     super();
     proto3.util.initPartial(data, this);
@@ -1131,6 +1144,7 @@ export class TaskNodeOverrides extends Message<TaskNodeOverrides> {
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "resources", kind: "message", T: Resources },
     { no: 2, name: "extended_resources", kind: "message", T: ExtendedResources },
+    { no: 3, name: "container_image", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TaskNodeOverrides {
@@ -1170,6 +1184,13 @@ export class LaunchPlanTemplate extends Message<LaunchPlanTemplate> {
    */
   interface?: TypedInterface;
 
+  /**
+   * A collection of input literals that are fixed for the launch plan
+   *
+   * @generated from field: flyteidl.core.LiteralMap fixed_inputs = 3;
+   */
+  fixedInputs?: LiteralMap;
+
   constructor(data?: PartialMessage<LaunchPlanTemplate>) {
     super();
     proto3.util.initPartial(data, this);
@@ -1180,6 +1201,7 @@ export class LaunchPlanTemplate extends Message<LaunchPlanTemplate> {
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "id", kind: "message", T: Identifier },
     { no: 2, name: "interface", kind: "message", T: TypedInterface },
+    { no: 3, name: "fixed_inputs", kind: "message", T: LiteralMap },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): LaunchPlanTemplate {

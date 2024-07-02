@@ -1,6 +1,7 @@
 package common
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -83,6 +84,14 @@ func TestNewRepeatedValueFilter(t *testing.T) {
 	assert.Equal(t, "projects.project in (?)", expression.Query)
 	assert.Equal(t, vals, expression.Args)
 
+	filter, err = NewRepeatedValueFilter(Workflow, ValueNotIn, "project", vals)
+	assert.NoError(t, err)
+
+	expression, err = filter.GetGormJoinTableQueryExpr("projects")
+	assert.NoError(t, err)
+	assert.Equal(t, "projects.project not in (?)", expression.Query)
+	assert.Equal(t, vals, expression.Args)
+
 	_, err = NewRepeatedValueFilter(Workflow, Equal, "domain", []string{"production", "qa"})
 	assert.EqualError(t, err, "invalid repeated value filter expression: equal")
 }
@@ -96,16 +105,6 @@ func TestGetGormJoinTableQueryExpr(t *testing.T) {
 	assert.Equal(t, "workflows.domain = ?", gormQueryExpr.Query)
 }
 
-var expectedQueriesForFilters = map[FilterExpression]string{
-	Contains:           "field LIKE ?",
-	GreaterThan:        "field > ?",
-	GreaterThanOrEqual: "field >= ?",
-	LessThan:           "field < ?",
-	LessThanOrEqual:    "field <= ?",
-	Equal:              "field = ?",
-	NotEqual:           "field <> ?",
-}
-
 var expectedArgsForFilters = map[FilterExpression]string{
 	Contains:           "%value%",
 	GreaterThan:        "value",
@@ -117,12 +116,13 @@ var expectedArgsForFilters = map[FilterExpression]string{
 }
 
 func TestQueryExpressions(t *testing.T) {
-	for expression, expectedQuery := range expectedQueriesForFilters {
+	for expression := range singleValueFilters {
 		filter, err := NewSingleValueFilter(Workflow, expression, "field", "value")
 		assert.NoError(t, err)
 
 		gormQueryExpr, err := filter.GetGormQueryExpr()
 		assert.NoError(t, err)
+		expectedQuery := fmt.Sprintf(filterQueryMappings[expression], "field")
 		assert.Equal(t, expectedQuery, gormQueryExpr.Query)
 
 		expectedArg, ok := expectedArgsForFilters[expression]
@@ -130,14 +130,17 @@ func TestQueryExpressions(t *testing.T) {
 		assert.Equal(t, expectedArg, gormQueryExpr.Args)
 	}
 
-	// Also test the one repeated value filter
-	filter, err := NewRepeatedValueFilter(Workflow, ValueIn, "field", []string{"value"})
-	assert.NoError(t, err)
+	// Also test the repeated value filters
+	for expression := range repeatedValueFilters {
+		filter, err := NewRepeatedValueFilter(Workflow, expression, "field", []string{"value"})
+		assert.NoError(t, err)
 
-	gormQueryExpr, err := filter.GetGormQueryExpr()
-	assert.NoError(t, err)
-	assert.Equal(t, "field in (?)", gormQueryExpr.Query)
-	assert.EqualValues(t, []string{"value"}, gormQueryExpr.Args)
+		gormQueryExpr, err := filter.GetGormQueryExpr()
+		assert.NoError(t, err)
+		expectedQuery := fmt.Sprintf(filterQueryMappings[expression], "field")
+		assert.Equal(t, expectedQuery, gormQueryExpr.Query)
+		assert.EqualValues(t, []string{"value"}, gormQueryExpr.Args)
+	}
 }
 
 func TestMapFilter(t *testing.T) {

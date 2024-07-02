@@ -27,6 +27,10 @@ func (to *pluginTaskOverrides) GetExtendedResources() *core.ExtendedResources {
 	return to.TaskOverrides.GetExtendedResources()
 }
 
+func (to *pluginTaskOverrides) GetContainerImage() string {
+	return to.TaskOverrides.GetContainerImage()
+}
+
 type pluginTaskExecutionMetadata struct {
 	pluginsCore.TaskExecutionMetadata
 	interruptible *bool

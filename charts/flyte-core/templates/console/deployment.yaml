@@ -22,12 +22,9 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
     {{- end }}
-      securityContext:
-        runAsNonRoot: true
-        runAsUser: 1000
-        fsGroupChangePolicy: "OnRootMismatch"
-        seLinuxOptions:
-          type: spc_t
+      {{- with .Values.flyteconsole.securityContext }}
+      securityContext: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
       {{- if .Values.flyteconsole.priorityClassName }}
       priorityClassName: {{ .Values.flyteconsole.priorityClassName }}
       {{- end }}
@@ -40,6 +37,11 @@ spec:
             name: flyte-console-config
         ports:
         - containerPort: 8080
+        {{- if .Values.flyteconsole.serviceMonitor.enabled  }}
+        - containerPort: 8081
+          name: http-metrics
+          protocol: TCP
+        {{- end }}
         {{- if or .Values.flyteconsole.ga.enabled .Values.flyteconsole.podEnv }}
         env:
         {{- end }}
@@ -62,6 +64,14 @@ spec:
         volumeMounts:
         - mountPath: /srv/flyte
           name: shared-data
+        {{- with .Values.flyteconsole.livenessProbe }}
+        livenessProbe:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- with .Values.flyteconsole.readinessProbe }}
+        readinessProbe:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
       volumes:
       - emptyDir: {}
         name: shared-data

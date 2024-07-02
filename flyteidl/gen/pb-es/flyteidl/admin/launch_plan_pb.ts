@@ -11,6 +11,7 @@ import { InputData, LiteralMap } from "../core/literals_pb.js";
 import { Annotations, AuthRole, Envs, Labels, NamedEntityIdentifier, Notification, RawOutputDataConfig, Sort } from "./common_pb.js";
 import { SecurityContext } from "../core/security_pb.js";
 import { QualityOfService } from "../core/execution_pb.js";
+import { ExecutionEnvAssignment } from "../core/execution_envs_pb.js";
 import { Schedule } from "./schedule_pb.js";
 
 /**
@@ -323,14 +324,6 @@ export class LaunchPlanSpec extends Message<LaunchPlanSpec> {
   fixedInputs?: LiteralMap;
 
   /**
-   * Fixed, non-overridable inputs for the Launch Plan.
-   * These can not be overridden when an execution is created with this launch plan.
-   *
-   * @generated from field: flyteidl.core.InputData fixed_input_data = 22;
-   */
-  fixedInputData?: InputData;
-
-  /**
    * String to indicate the role to use to execute the workflow underneath
    *
    * @generated from field: string role = 5 [deprecated = true];
@@ -422,6 +415,21 @@ export class LaunchPlanSpec extends Message<LaunchPlanSpec> {
    */
   envs?: Envs;
 
+  /**
+   * Execution environment assignments to be set for the execution.
+   *
+   * @generated from field: repeated flyteidl.core.ExecutionEnvAssignment execution_env_assignments = 22;
+   */
+  executionEnvAssignments: ExecutionEnvAssignment[] = [];
+
+  /**
+   * Fixed, non-overridable inputs for the Launch Plan.
+   * These can not be overridden when an execution is created with this launch plan.
+   *
+   * @generated from field: flyteidl.core.InputData fixed_input_data = 23;
+   */
+  fixedInputData?: InputData;
+
   constructor(data?: PartialMessage<LaunchPlanSpec>) {
     super();
     proto3.util.initPartial(data, this);
@@ -434,7 +442,6 @@ export class LaunchPlanSpec extends Message<LaunchPlanSpec> {
     { no: 2, name: "entity_metadata", kind: "message", T: LaunchPlanMetadata },
     { no: 3, name: "default_inputs", kind: "message", T: ParameterMap },
     { no: 4, name: "fixed_inputs", kind: "message", T: LiteralMap },
-    { no: 22, name: "fixed_input_data", kind: "message", T: InputData },
     { no: 5, name: "role", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 6, name: "labels", kind: "message", T: Labels },
     { no: 7, name: "annotations", kind: "message", T: Annotations },
@@ -447,6 +454,8 @@ export class LaunchPlanSpec extends Message<LaunchPlanSpec> {
     { no: 19, name: "interruptible", kind: "message", T: BoolValue },
     { no: 20, name: "overwrite_cache", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 21, name: "envs", kind: "message", T: Envs },
+    { no: 22, name: "execution_env_assignments", kind: "message", T: ExecutionEnvAssignment, repeated: true },
+    { no: 23, name: "fixed_input_data", kind: "message", T: InputData },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): LaunchPlanSpec {

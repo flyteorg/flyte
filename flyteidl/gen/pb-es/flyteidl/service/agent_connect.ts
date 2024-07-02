@@ -3,11 +3,33 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { CreateTaskRequest, CreateTaskResponse, DeleteTaskRequest, DeleteTaskResponse, GetAgentRequest, GetAgentResponse, GetTaskLogsRequest, GetTaskLogsResponse, GetTaskMetricsRequest, GetTaskMetricsResponse, GetTaskRequest, GetTaskResponse, ListAgentsRequest, ListAgentsResponse } from "../admin/agent_pb.js";
+import { CreateTaskRequest, CreateTaskResponse, DeleteTaskRequest, DeleteTaskResponse, ExecuteTaskSyncRequest, ExecuteTaskSyncResponse, GetAgentRequest, GetAgentResponse, GetTaskLogsRequest, GetTaskLogsResponse, GetTaskMetricsRequest, GetTaskMetricsResponse, GetTaskRequest, GetTaskResponse, ListAgentsRequest, ListAgentsResponse } from "../admin/agent_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
- * AsyncAgentService defines an RPC Service that allows propeller to send the request to the agent server.
+ * SyncAgentService defines an RPC Service that allows propeller to send the request to the agent server synchronously.
+ *
+ * @generated from service flyteidl.service.SyncAgentService
+ */
+export const SyncAgentService = {
+  typeName: "flyteidl.service.SyncAgentService",
+  methods: {
+    /**
+     * ExecuteTaskSync streams the create request and inputs to the agent service and streams the outputs back.
+     *
+     * @generated from rpc flyteidl.service.SyncAgentService.ExecuteTaskSync
+     */
+    executeTaskSync: {
+      name: "ExecuteTaskSync",
+      I: ExecuteTaskSyncRequest,
+      O: ExecuteTaskSyncResponse,
+      kind: MethodKind.BiDiStreaming,
+    },
+  }
+} as const;
+
+/**
+ * AsyncAgentService defines an RPC Service that allows propeller to send the request to the agent server asynchronously.
  *
  * @generated from service flyteidl.service.AsyncAgentService
  */
@@ -15,7 +37,7 @@ export const AsyncAgentService = {
   typeName: "flyteidl.service.AsyncAgentService",
   methods: {
     /**
-     * Send a task create request to the agent server.
+     * CreateTask sends a task create request to the agent service.
      *
      * @generated from rpc flyteidl.service.AsyncAgentService.CreateTask
      */
@@ -71,7 +93,7 @@ export const AsyncAgentService = {
       name: "GetTaskLogs",
       I: GetTaskLogsRequest,
       O: GetTaskLogsResponse,
-      kind: MethodKind.Unary,
+      kind: MethodKind.ServerStreaming,
     },
   }
 } as const;

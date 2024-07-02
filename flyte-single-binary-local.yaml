@@ -85,3 +85,11 @@ storage:
       access_key_id: minio
       secret_key: miniostorage
   container: my-s3-bucket
+
+task_resources:
+  defaults:
+    cpu: 500m
+    memory: 500Mi
+  limits:
+    cpu: 4
+    memory: 4Gi

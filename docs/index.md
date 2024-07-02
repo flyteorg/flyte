@@ -79,7 +79,7 @@ contribute its architecture and design. You can also access the
 * - {doc}`🔤 Introduction to Flyte <introduction>`
   - Get your first workflow running, learn about the Flyte development lifecycle
     and core use cases.
-* - {doc}`📖 User Guide <flytesnacks/userguide>`
+* - {doc}`📖 User Guide <user_guide/index>`
   - A comprehensive view of Flyte's functionality for data and ML practitioners.
 * - {doc}`📚 Tutorials <flytesnacks/tutorials>`
   - End-to-end examples of Flyte for data/feature engineering, machine learning,
@@ -106,7 +106,7 @@ Below are the API reference to the different components of Flyte:
   - Flyte's official Python SDK.
 * - {doc}`FlyteCTL <flytectl/docs_index>`
   - Flyte's command-line interface for interacting with a Flyte cluster.
-* - {doc}`FlyteIDL <flytectl/docs_index>`
+* - {doc}`FlyteIDL <reference_flyteidl>`
   - Flyte's core specification language.
 ```
 
@@ -138,6 +138,7 @@ Introduction <introduction>
 Quickstart guide <quickstart_guide>
 Getting started with workflow development <getting_started_with_workflow_development/index>
 Flyte fundamentals <flyte_fundamentals/index>
+Flyte agents <flyte_agents/index>
 Core use cases <core_use_cases/index>
 ```
 
@@ -147,9 +148,10 @@ Core use cases <core_use_cases/index>
 :name: examples-guides
 :hidden:
 
-User Guide <flytesnacks/userguide>
+User Guide <user_guide/index>
 Tutorials <flytesnacks/tutorials>
 Integrations <flytesnacks/integrations>
+Deprecated integrations <deprecated_integrations/index>
 ```
 
 ```{toctree}

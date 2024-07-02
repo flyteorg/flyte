@@ -18,9 +18,9 @@ jobs:
         working-directory: ${{ inputs.component }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Set up Go
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v4
         with:
           go-version: ${{ inputs.go-version }}
       - name: Lint

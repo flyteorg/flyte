@@ -135,7 +135,7 @@ used by Flytepropeller (Kubernetes Operator) to know “how” to execute
 this task.
 
 ``Interface`` contains information about what are the inputs and outputs
-of our task. Flyte uses this interface to check if tasks are composible.
+of our task. Flyte uses this interface to check if tasks are composable.
 
 ``Custom`` is a collection of arbitrary Key/Values, think of it as a
 Json dict that any plugin can define as it wishes. In this case the
@@ -172,30 +172,30 @@ settings are needed for the cluster.
 For more information on why this task contains these fields check
 ``TaskTemplate`` in `FlyteIDL
 repository <https://github.com/flyteorg/flyteidl/blob/master/protos/flyteidl/core/tasks.proto#L102>`__.
-I strongly advice you to take a look at the data structures in this file
+I strongly advise you to take a look at the data structures in this file
 as they provide good insight in the interfaces used all across Flyte’s
 codebases.
 
 3. Once user has packaged workflows and tasks then a registration step
    is needed. During registration Flyte adds these protocolbuffer files to its
    database, essentially making these tasks and workflows runnable for
-   the user. Registration is done via `Flytectl <https://github.com/flyteorg/flytectl>` __
+   the user. Registration is done via `Flytectl <https://github.com/flyteorg/flytectl>`__.
 
-4. At somepoint a Flyte user will trigger a Workflow run. The workflow
+4. At some point a Flyte user will trigger a Workflow run. The workflow
    run will start running the defined DAG. Eventually our Spark task
-   will need to run,. This is where the second step of a plugin kicks
+   will need to run. This is where the second step of a plugin kicks
    in. Flytepropeller (Kubernetes Operator) will realize that this is a
    Task of type ``Spark`` and it will handle it differently.
 
-   -  FlytePropeller knows a task is of type Spark, because our ``TaskTemplate`` defined it so ``Type: Spark``
+   -  FlytePropeller knows a task is of type Spark, because our ``TaskTemplate`` defined it so ``Type: Spark``.
       
    -  Flyte has a ``PluginRegistry`` which has a dictionary from ``Task Type`` to ``Plugin Handlers``.
    
    -  At run time Flytepropeller will run our task, Flytepropeller will figure out it is a Spark task, and then call the method ``BuildResource`` in Spark's plugin implementation. ``BuildResource`` is a method that each plugin has to implement.
    
-   -  `Plugin <https://github.com/flyteorg/flyteplugins/blob/master/go/tasks/pluginmachinery/k8s/plugin.go#L80>`__ is a Golang interface providing an important method ``BuildResource``
+   -  `Plugin <https://github.com/flyteorg/flyteplugins/blob/master/go/tasks/pluginmachinery/k8s/plugin.go#L80>`__ is a Golang interface providing an important method ``BuildResource``.
    
-   -  Spark has its own Plugin defined `here in Flyteplugins repo <https://github.com/flyteorg/flyteplugins/blob/master/go/tasks/plugins/k8s/spark/spark.go>`__
+   -  Spark has its own Plugin defined `here in the Flyteplugins repo <https://github.com/flyteorg/flyteplugins/blob/master/go/tasks/plugins/k8s/spark/spark.go>`__.
 
 Inside Spark’s
 `BuildResource <https://github.com/flyteorg/flyteplugins/blob/master/go/tasks/plugins/k8s/spark/spark.go#L65>`__
@@ -212,19 +212,19 @@ method is where magic happens. At task runtime:
 5. A pod with entrypoint to ``pyflyte-execute`` execute starts running (Spark App).
 
 
-   -  ``pyflyte-execute`` provides all the plumbing magic that is needed. In this particular case, It will create a SparkSession and injects it somewhere so that it is ready for when the user defined python’s code starts running. Be aware that this is part of the SDK code (Flytekit).
+   -  ``pyflyte-execute`` provides all the plumbing magic that is needed. In this particular case, it will create a SparkSession and injects it somewhere so that it is ready for when the user defined python’s code starts running. Be aware that this is part of the SDK code (Flytekit).
 
    -  ``pyflyte-execute`` points to `execute_task_cmd <https://github.com/flyteorg/flytekit/blob/master/flytekit/bin/entrypoint.py#L445>`__.
 
    This entrypoint does a lot of things:
    
-   -  Resolves the function that the user wants to run. i.e: where is the needed package where this function lives? . this is what ``"flytekit.core.python_auto_container.default_task_resolver"`` does
+   -  Resolves the function that the user wants to run. i.e: where is the needed package where this function lives? This is what ``"flytekit.core.python_auto_container.default_task_resolver"`` does.
    
-   -  Downloads needed inputs and do a transformation if need be. I.e: is this a Dataframe? if so we need to transform it into a Pandas DF from parquet.
+   -  Downloads needed inputs and does a transformation if need be. i.e: is this a Dataframe? If so, we need to transform it into a Pandas DF from parquet.
    
-   -  Calls `dispatch_execute <https://github.com/flyteorg/flytekit/blob/771aa8a72fbc3ded437b6ff8498404767fc438db/flytekit/core/base_task.py#L449>`__ . This trigger the execution of our spark task.
+   -  Calls `dispatch_execute <https://github.com/flyteorg/flytekit/blob/771aa8a72fbc3ded437b6ff8498404767fc438db/flytekit/core/base_task.py#L449>`__. This triggers the execution of our spark task.
    
-   -  `PysparkFunctionTask <https://github.com/flyteorg/flytekit/blob/master/plugins/flytekit-spark/flytekitplugins/spark/task.py#L78>`__. defines what gets run just before the user's task code gets executed. It essentially creatse a spark session and then run the user function (The actual code we want to run!).
+   -  `PysparkFunctionTask <https://github.com/flyteorg/flytekit/blob/master/plugins/flytekit-spark/flytekitplugins/spark/task.py#L78>`__ defines what gets run just before the user's task code gets executed. It essentially creates a spark session and then runs the user function (The actual code we want to run!).
 
 ------------
 
@@ -232,14 +232,12 @@ Recap
 -----
 
 -  Flyte requires coordination between multiple pieces of code. In this
-   case the SDK and FlytePropeller (K8s operator)
-- `Flyte IDL (Interface Language Definition) <https://github.com/flyteorg/flyteidl>`__  provides some primitives
-   for services to talk with each other. Flyte uses Procolbuffer
-   representations of these primitives
+   case the SDK and FlytePropeller (K8s operator).
+- `Flyte IDL (Interface Language Definition) <https://github.com/flyteorg/flyteidl>`__ provides some primitives for services to talk with each other. Flyte uses Procolbuffer representations of these primitives.
 -  Three important primitives are : ``Container``, ``K8sPod``, ``Sql``.
    At the end of the day all tasks boil down to one of those three.
 -  github.com/flyteorg/FlytePlugins repository contains all code for plugins:
-   Spark, AWS Athena, BigQuery…
+   Spark, AWS Athena, BigQuery, etc.
 -  Flyte entrypoints are the ones carrying out the heavy lifting: making
    sure that inputs are downloaded and/or transformed as needed.
 -  When running workflows on Flyte, if we want to use Flyte underlying plumbing then

@@ -75,9 +75,11 @@ def schedule_workflow_groups(
         workflow_group_item = list(
             filter(lambda item: item["name"] == wf_group, parsed_manifest)
         )
-        workflows = []
-        if workflow_group_item:
-            workflows = workflow_group_item[0]["examples"]
+        if not workflow_group_item:
+            continue
+        workflows = workflow_group_item[0].get("examples")
+        if not workflows:
+            continue
         executions_by_wfgroup[wf_group] = [
             execute_workflow(remote, tag, workflow[0], workflow[1], cluster_pool_name)
             for workflow in workflows

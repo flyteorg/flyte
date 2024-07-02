@@ -237,44 +237,6 @@ Permitted project operations include:
 - Register
 - List
 
-.. _divedeep-admin-matchable-resources:
-
-Matchable resources
-+++++++++++++++++++
-
-A thorough background on :ref:`matchable resources <deployment-configuration-general>` explains
-their purpose and application logic. As a summary, these are used to override system level defaults for Kubernetes cluster
-resource management, default execution values, and more across different levels of specificity.
-
-These entities consist of:
-
-- ProjectDomainAttributes
-- WorkflowAttributes
-
-``ProjectDomainAttributes`` configure customizable overrides at the project and domain level, and ``WorkflowAttributes`` configure customizable overrides at the project, domain and workflow level.
-
-Permitted attribute operations include:
-
-- Update (implicitly creates if there is no existing override)
-- Get
-- Delete
-
-
-Defaults
---------
-
-Task resource defaults
-++++++++++++++++++++++
-
-User-facing documentation on configuring task resource requests and limits can be found in :std:ref:`cookbook:customizing task resources`.
-
-As a system administrator you may want to define default task resource requests and limits across your Flyte deployment.
-This can be done through the flyteadmin config.
-
-**Default** values get injected as the task requests and limits when a task definition omits a specific resource.
-**Limit** values are only used as validation. Neither a task request nor limit can exceed the limit for a resource type.
-
-
 Using the Admin Service
 -----------------------
 
@@ -298,14 +260,15 @@ The fully supported set of filter functions are
 
 - contains  
 - gt (greater than) 
-- gte (greter than or equal to) 
+- gte (greater than or equal to)
 - lt (less than)  
 - lte (less than or equal to) 
 - eq (equal)  
 - ne (not equal)  
-- value_in (for repeated sets of values)  
+- value_in (value in repeated sets of values)
+- value_not_in (value not in repeated sets of values)
 
-"value_in" is a special case where multiple values are passed to the filter expression. For example:: 
+"value_in" and "value_not_in" are special cases where multiple values are passed to the filter expression. For example::
 
  value_in(phase, RUNNING;SUCCEEDED;FAILED)  
 
