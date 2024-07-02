@@ -179,6 +179,30 @@ func (r *LaunchPlanRepo) ListLaunchPlanIdentifiers(ctx context.Context, input in
 
 }
 
+func (r *LaunchPlanRepo) Count(ctx context.Context, input interfaces.CountResourceInput) (int64, error) {
+	var err error
+	tx := r.db.WithContext(ctx).Model(&models.LaunchPlan{})
+
+	// Add join condition as required by user-specified filters (which can potentially include join table attrs).
+	tx = applyJoinTableEntitiesOnExecution(tx, input.JoinTableEntities)
+
+	// Apply filters
+	tx, err = applyScopedFilters(tx, input.InlineFilters, input.MapFilters)
+	if err != nil {
+		return 0, err
+	}
+
+	// Run the query
+	timer := r.metrics.CountDuration.Start()
+	var count int64
+	tx = tx.Count(&count)
+	timer.Stop()
+	if tx.Error != nil {
+		return 0, r.errorTransformer.ToFlyteAdminError(tx.Error)
+	}
+	return count, nil
+}
+
 // Returns an instance of LaunchPlanRepoInterface
 func NewLaunchPlanRepo(
 	db *gorm.DB, errorTransformer adminErrors.ErrorTransformer, scope promutils.Scope) interfaces.LaunchPlanRepoInterface {

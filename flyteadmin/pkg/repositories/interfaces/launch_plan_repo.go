@@ -22,6 +22,8 @@ type LaunchPlanRepoInterface interface {
 	List(ctx context.Context, input ListResourceInput) (LaunchPlanCollectionOutput, error)
 	// Returns a list of identifiers for launch plans.  A limit must be provided for the results page size.
 	ListLaunchPlanIdentifiers(ctx context.Context, input ListResourceInput) (LaunchPlanCollectionOutput, error)
+	// Returns count of launch plans matching query parameters.
+	Count(ctx context.Context, input CountResourceInput) (int64, error)
 }
 
 type SetStateInput struct {

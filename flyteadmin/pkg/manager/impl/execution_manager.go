@@ -685,6 +685,10 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 		executionParameters.RecoveryExecution = request.Spec.Metadata.ReferenceExecution
 	}
 
+	if err := m.validateActiveExecutions(ctx); err != nil {
+		return nil, nil, nil, err
+	}
+
 	workflowExecutor := plugins.Get[workflowengineInterfaces.WorkflowExecutor](m.pluginRegistry, plugins.PluginIDWorkflowExecutor)
 	execInfo, err := workflowExecutor.Execute(ctx, workflowengineInterfaces.ExecutionData{
 		Namespace:                namespace,
@@ -1041,6 +1045,66 @@ func (m *ExecutionManager) ResolveParameterMapArtifacts(ctx context.Context, inp
 	return pm, artifactIDs, nil
 }
 
+func (m *ExecutionManager) validateActiveExecutions(ctx context.Context) error {
+	getUserPropertiesFunc := plugins.Get[shared.GetUserProperties](m.pluginRegistry, plugins.PluginIDUserProperties)
+	if getUserPropertiesFunc == nil {
+		logger.Warningf(ctx, "failed to find plugin for: %s, not validating", plugins.PluginIDUserProperties)
+		return nil
+	}
+	userProperties := getUserPropertiesFunc(ctx)
+	if userProperties.ActiveExecutions == 0 {
+		logger.Debugf(ctx, "not validating whether execution can be triggered, since active executions limit is set to 0")
+		return nil
+	}
+	aWeekAgo := time.Now().AddDate(0, 0, -7)
+	aWeekAgoFilter, err := util.NewTimestampFilter(common.Execution, common.GreaterThanOrEqual, shared.ExecutionCreatedAt, aWeekAgo)
+	if err != nil {
+		logger.Error(ctx, "failed to add a week ago timestamp filter when filtering on active executions for org %s, aWeekAgo %+v and err: %v", userProperties.Org, aWeekAgo, err)
+		return err
+	}
+
+	orgFilter, err := util.GetSingleValueEqualityFilter(common.Execution, shared.Org, userProperties.Org)
+	if err != nil {
+		logger.Error(ctx, "failed to add org filter when filtering on active executions for org %s and err: %v", userProperties.Org, err)
+		return err
+	}
+	activeExecutionFilter, err := common.NewRepeatedValueFilter(common.Execution, common.ValueIn, shared.Phase, common.ActiveExecutionPhases)
+	if err != nil {
+		logger.Errorf(ctx, "failed to construct active execution phase filter with err %v", err)
+		return err
+	}
+	filters := []common.InlineFilter{aWeekAgoFilter, orgFilter, activeExecutionFilter}
+
+	countExecutionByPhaseInput := repositoryInterfaces.CountResourceInput{
+		InlineFilters: filters,
+	}
+	countExecutionByPhaseOutput, err := m.db.ExecutionRepo().CountByPhase(ctx, countExecutionByPhaseInput)
+	if err != nil {
+		logger.Debugf(ctx, "failed to get execution counts using input [%+v] with err %v", countExecutionByPhaseInput, err)
+		return err
+	}
+
+	executionCounts, err := transformers.FromExecutionCountsByPhase(ctx, countExecutionByPhaseOutput)
+	if err != nil {
+		logger.Errorf(ctx, "failed to transform execution by phase output [%+v] with err %v", countExecutionByPhaseOutput, err)
+		return err
+	}
+	var activeExecutions int64
+	for _, execCount := range executionCounts {
+		if !common.IsExecutionTerminal(execCount.Phase) {
+			activeExecutions += execCount.Count
+		}
+	}
+	if activeExecutions > int64(userProperties.ActiveExecutions) {
+		logger.Debugf(ctx, "user org '%s' has '%d' active executions which exceeds their account limit '%d': blocking creation of additional executions",
+			userProperties.Org, activeExecutions, userProperties.ActiveExecutions)
+		return errors.NewFlyteAdminErrorf(codes.ResourceExhausted, "Your account only allows %d active executions at a time. Please wait for some of your existing executions to complete before starting new ones.", userProperties.ActiveExecutions)
+	}
+	logger.Debugf(ctx, "user org '%s' has '%d' active executions which is permitted under their account limit '%d'",
+		userProperties.Org, activeExecutions, userProperties.ActiveExecutions)
+	return nil
+}
+
 func (m *ExecutionManager) launchExecutionAndPrepareModel(
 	ctx context.Context, request admin.ExecutionCreateRequest, requestedAt time.Time) (context.Context, *models.Execution, []*models.ExecutionTag, error) {
 	err := validation.ValidateExecutionRequest(ctx, request, m.db, m.config.ApplicationConfiguration())
@@ -1336,6 +1400,10 @@ func (m *ExecutionManager) launchExecution(
 		SecurityContext:       executionConfig.SecurityContext,
 		LaunchEntity:          launchPlan.Id.ResourceType,
 		Namespace:             namespace,
+	}
+
+	if err := m.validateActiveExecutions(ctx); err != nil {
+		return nil, nil, nil, err
 	}
 
 	workflowExecutor := plugins.Get[workflowengineInterfaces.WorkflowExecutor](m.pluginRegistry, plugins.PluginIDWorkflowExecutor)

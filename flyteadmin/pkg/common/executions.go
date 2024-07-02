@@ -3,6 +3,7 @@ package common
 import (
 	"fmt"
 
+	"github.com/samber/lo"
 	"k8s.io/apimachinery/pkg/util/rand"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -17,7 +18,7 @@ func GetExecutionName(seed int64) string {
 	return fmt.Sprintf(ExecutionStringFormat, rand.String(ExecutionIDLength-1))
 }
 
-var terminalExecutionPhases = map[core.WorkflowExecution_Phase]bool{
+var TerminalExecutionPhases = map[core.WorkflowExecution_Phase]bool{
 	core.WorkflowExecution_SUCCEEDED: true,
 	core.WorkflowExecution_FAILED:    true,
 	core.WorkflowExecution_TIMED_OUT: true,
@@ -40,7 +41,7 @@ var terminalTaskExecutionPhases = map[core.TaskExecution_Phase]bool{
 }
 
 func IsExecutionTerminal(phase core.WorkflowExecution_Phase) bool {
-	return terminalExecutionPhases[phase]
+	return TerminalExecutionPhases[phase]
 }
 
 func IsNodeExecutionTerminal(phase core.NodeExecution_Phase) bool {
@@ -50,3 +51,15 @@ func IsNodeExecutionTerminal(phase core.NodeExecution_Phase) bool {
 func IsTaskExecutionTerminal(phase core.TaskExecution_Phase) bool {
 	return terminalTaskExecutionPhases[phase]
 }
+
+// ActiveExecutionPhases is computed by mapping over all workflow execution phases (expressed as int32s and converted to enums)
+// and filters out terminal phases.
+var ActiveExecutionPhases = lo.Filter[core.WorkflowExecution_Phase](
+	lo.Map[int32](
+		lo.Keys(core.WorkflowExecution_Phase_name),
+		func(item int32, index int) core.WorkflowExecution_Phase {
+			return core.WorkflowExecution_Phase(item)
+		}),
+	func(item core.WorkflowExecution_Phase, index int) bool {
+		return !IsExecutionTerminal(item)
+	})

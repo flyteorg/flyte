@@ -13,6 +13,7 @@ import (
 	scheduleInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/async/schedule/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/shared"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/util"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/validation"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
@@ -20,6 +21,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/transformers"
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/plugins"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
@@ -41,6 +43,7 @@ type LaunchPlanManager struct {
 	scheduler        scheduleInterfaces.EventScheduler
 	metrics          launchPlanMetrics
 	artifactRegistry *artifacts.ArtifactRegistry
+	pluginRegistry   *plugins.Registry
 }
 
 func getLaunchPlanContext(ctx context.Context, identifier *core.Identifier) context.Context {
@@ -190,7 +193,6 @@ func isScheduleEmpty(launchPlanSpec admin.LaunchPlanSpec) bool {
 
 func (m *LaunchPlanManager) enableSchedule(ctx context.Context, launchPlanIdentifier core.Identifier,
 	launchPlanSpec admin.LaunchPlanSpec) error {
-
 	addScheduleInput, err := m.scheduler.CreateScheduleInput(ctx,
 		m.config.ApplicationConfiguration().GetSchedulerConfig(), launchPlanIdentifier,
 		launchPlanSpec.EntityMetadata.Schedule)
@@ -354,6 +356,28 @@ func (m *LaunchPlanManager) updateTriggers(ctx context.Context, newlyActiveLaunc
 
 func (m *LaunchPlanManager) enableLaunchPlan(ctx context.Context, request admin.LaunchPlanUpdateRequest) (
 	*admin.LaunchPlanUpdateResponse, error) {
+
+	getUserPropertiesFunc := plugins.Get[shared.GetUserProperties](m.pluginRegistry, plugins.PluginIDUserProperties)
+	userProperties := getUserPropertiesFunc(ctx)
+	if userProperties.ActiveLaunchPlans > 0 {
+		logger.Debugf(ctx, "user org '%s' is capped at '%d' active launch plans, verifying if [%+v] can be activated",
+			userProperties.Org, userProperties.ActiveLaunchPlans, request.Id)
+		// enable check to verify if the user will exceed their allowed active launch plans
+		canActivateLaunchPlans, err := util.CanUserOrgActivateLaunchPlans(ctx, userProperties.Org, userProperties.ActiveLaunchPlans, m.db)
+		if err != nil {
+			logger.Warningf(ctx, "failed to get active launch plan count for org: %s with err: %+v", userProperties.Org, err)
+			return nil, err
+		}
+		if !canActivateLaunchPlans {
+			logger.Debugf(ctx, "org '%s' plan is only allowed '%d' active launch plans, not allowing further activation for [%+v]",
+				userProperties.Org, userProperties.ActiveLaunchPlans, request.Id)
+			return nil, errors.NewFlyteAdminErrorf(
+				codes.ResourceExhausted,
+				"org '%s' plan is only allowed '%d' active launch plans. Please disable a currently active launch plan and try again",
+				userProperties.Org, userProperties.ActiveLaunchPlans)
+		}
+	}
+
 	newlyActiveLaunchPlanModel, err := m.db.LaunchPlanRepo().Get(ctx, repoInterfaces.Identifier{
 		Org:     request.Id.Org,
 		Project: request.Id.Project,
@@ -648,7 +672,8 @@ func NewLaunchPlanManager(
 	config runtimeInterfaces.Configuration,
 	scheduler scheduleInterfaces.EventScheduler,
 	scope promutils.Scope,
-	artifactRegistry *artifacts.ArtifactRegistry) interfaces.LaunchPlanInterface {
+	artifactRegistry *artifacts.ArtifactRegistry,
+	pluginRegistry *plugins.Registry) interfaces.LaunchPlanInterface {
 
 	metrics := launchPlanMetrics{
 		Scope: scope,
@@ -664,5 +689,6 @@ func NewLaunchPlanManager(
 		scheduler:        scheduler,
 		metrics:          metrics,
 		artifactRegistry: artifactRegistry,
+		pluginRegistry:   pluginRegistry,
 	}
 }

@@ -337,3 +337,8 @@ func GetNodeExecutionIdentifierFilters(
 	}
 	return append(workflowExecutionIdentifierFilters, nodeIDFilter), nil
 }
+
+func NewTimestampFilter(entity common.Entity, function common.FilterExpression, field string, timestamp time.Time) (common.InlineFilter, error) {
+	value := timestamp.Format(time.RFC3339)
+	return common.NewSingleValueFilter(entity, function, field, value)
+}

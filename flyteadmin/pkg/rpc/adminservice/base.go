@@ -18,6 +18,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/configurations"
 	projectConfigurationPlugin "github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/configurations/plugin"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/resources"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/shared"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
@@ -133,8 +134,10 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 		artifactRegistry = artifacts.NewArtifactRegistry(ctx, adminClientCfg)
 	}
 
+	pluginRegistry.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
+	logger.Debugf(ctx, "successfully registered default user properties plugin")
 	launchPlanManager := manager.NewLaunchPlanManager(
-		repo, configuration, eventScheduler, adminScope.NewSubScope("launch_plan_manager"), artifactRegistry)
+		repo, configuration, eventScheduler, adminScope.NewSubScope("launch_plan_manager"), artifactRegistry, pluginRegistry)
 
 	// Configure admin-specific remote data handler (separate from storage)
 	remoteDataConfig := configuration.ApplicationConfiguration().GetRemoteDataConfig()

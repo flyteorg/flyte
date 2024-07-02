@@ -245,3 +245,16 @@ func TestGetNodeExecutionIdentifierFilters(t *testing.T) {
 	assert.Equal(t, "nodey", queryExpr.Args)
 	assert.Equal(t, "node_id = ?", queryExpr.Query)
 }
+
+func TestNewTimestampFilter(t *testing.T) {
+	timestamp := time.Now()
+
+	filter, err := NewTimestampFilter(common.Execution, common.Equal, "created_at", timestamp)
+
+	assert.NoError(t, err)
+	assert.Equal(t, common.Execution, filter.GetEntity())
+	queryExpr, _ := filter.GetGormQueryExpr()
+	assert.Equal(t, timestamp.Format(time.RFC3339), queryExpr.Args)
+	assert.Equal(t, "created_at = ?", queryExpr.Query)
+
+}

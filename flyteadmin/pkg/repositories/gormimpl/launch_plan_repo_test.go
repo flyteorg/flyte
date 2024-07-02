@@ -502,3 +502,15 @@ func TestListLaunchPlanIds(t *testing.T) {
 		assert.True(t, launchPlan.WorkflowID == workflowID || launchPlan.WorkflowID == uint(2))
 	}
 }
+
+func TestCountLaunchPlans(t *testing.T) {
+	executionRepo := NewLaunchPlanRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
+
+	GlobalMock := mocket.Catcher.Reset()
+	GlobalMock.NewMock().WithQuery(
+		`SELECT count(*) FROM "launch_plans"`).WithReply([]map[string]interface{}{{"rows": 2}})
+
+	count, err := executionRepo.Count(context.Background(), interfaces.CountResourceInput{})
+	assert.NoError(t, err)
+	assert.Equal(t, int64(2), count)
+}

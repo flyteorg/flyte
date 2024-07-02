@@ -15,6 +15,7 @@ type GetLaunchPlanFunc func(input interfaces.Identifier) (models.LaunchPlan, err
 type ListLaunchPlanFunc func(input interfaces.ListResourceInput) (interfaces.LaunchPlanCollectionOutput, error)
 type ListLaunchPlanIdentifiersFunc func(input interfaces.ListResourceInput) (
 	interfaces.LaunchPlanCollectionOutput, error)
+type CountLaunchPlanFunc func(ctx context.Context, input interfaces.CountResourceInput) (int64, error)
 
 type MockLaunchPlanRepo struct {
 	createFunction    CreateLaunchPlanFunc
@@ -23,6 +24,7 @@ type MockLaunchPlanRepo struct {
 	getFunction       GetLaunchPlanFunc
 	listFunction      ListLaunchPlanFunc
 	listIdsFunction   ListLaunchPlanIdentifiersFunc
+	countFunc         CountLaunchPlanFunc
 }
 
 func (r *MockLaunchPlanRepo) Create(ctx context.Context, input models.LaunchPlan) error {
@@ -101,6 +103,16 @@ func (r *MockLaunchPlanRepo) ListLaunchPlanIdentifiers(ctx context.Context, inpu
 
 func (r *MockLaunchPlanRepo) SetListLaunchPlanIdentifiersCallback(fn ListLaunchPlanIdentifiersFunc) {
 	r.listIdsFunction = fn
+}
+func (r *MockLaunchPlanRepo) Count(ctx context.Context, input interfaces.CountResourceInput) (int64, error) {
+	if r.countFunc != nil {
+		return r.countFunc(ctx, input)
+	}
+	return 0, nil
+}
+
+func (r *MockLaunchPlanRepo) SetCountCallback(countFunction CountLaunchPlanFunc) {
+	r.countFunc = countFunction
 }
 
 func NewMockLaunchPlanRepo() interfaces.LaunchPlanRepoInterface {

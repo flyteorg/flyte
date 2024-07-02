@@ -17,6 +17,7 @@ const (
 	PluginIDAdditionalGRPCService  PluginID = "AdditionalGRPCService"
 	PluginIDObjectStore            PluginID = "ObjectStore"
 	PluginIDProjectConfiguration   PluginID = "ProjectConfiguration"
+	PluginIDUserProperties         PluginID = "UserProperties"
 )
 
 type AtomicRegistry struct {

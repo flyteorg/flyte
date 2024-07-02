@@ -20,6 +20,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/schedule/mocks"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	flyteAdminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/shared"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/testutils"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	repositoryMocks "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/mocks"
@@ -27,6 +28,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/transformers"
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	runtimeMocks "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/mocks"
+	"github.com/flyteorg/flyte/flyteadmin/plugins"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	artifactsIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifacts"
@@ -50,6 +52,12 @@ var launchPlanNamedIdentifier = core.Identifier{
 	Domain:  domain,
 	Name:    name,
 	Version: "version",
+}
+
+func getMockPluginRegistry() *plugins.Registry {
+	r := plugins.NewRegistry()
+	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
+	return r
 }
 
 func getMockRepositoryForLpTest() interfaces.Repository {
@@ -93,7 +101,7 @@ func TestCreateLaunchPlan(t *testing.T) {
 			return nil
 		})
 	setDefaultWorkflowCallbackForLpTest(repository)
-	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
+	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil), getMockPluginRegistry())
 	request := testutils.GetLaunchPlanRequest()
 	response, err := lpManager.CreateLaunchPlan(context.Background(), request)
 	assert.Nil(t, err)
@@ -105,7 +113,7 @@ func TestCreateLaunchPlan(t *testing.T) {
 
 func TestLaunchPlanManager_GetLaunchPlan(t *testing.T) {
 	repository := getMockRepositoryForLpTest()
-	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
+	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil), getMockPluginRegistry())
 	state := int32(0)
 	lpRequest := testutils.GetLaunchPlanRequest()
 	workflowRequest := testutils.GetWorkflowRequest()
@@ -141,7 +149,7 @@ func TestLaunchPlanManager_GetLaunchPlan(t *testing.T) {
 
 func TestLaunchPlanManager_GetActiveLaunchPlan(t *testing.T) {
 	repository := getMockRepositoryForLpTest()
-	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
+	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil), getMockPluginRegistry())
 	state := int32(1)
 	lpRequest := testutils.GetLaunchPlanRequest()
 	workflowRequest := testutils.GetWorkflowRequest()
@@ -205,7 +213,7 @@ func TestLaunchPlanManager_GetActiveLaunchPlan(t *testing.T) {
 
 func TestLaunchPlanManager_GetActiveLaunchPlan_NoneActive(t *testing.T) {
 	repository := getMockRepositoryForLpTest()
-	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
+	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil), getMockPluginRegistry())
 	lpRequest := testutils.GetLaunchPlanRequest()
 
 	launchPlanListFunc := func(input interfaces.ListResourceInput) (interfaces.LaunchPlanCollectionOutput, error) {
@@ -225,7 +233,7 @@ func TestLaunchPlanManager_GetActiveLaunchPlan_NoneActive(t *testing.T) {
 
 func TestLaunchPlanManager_GetActiveLaunchPlan_InvalidRequest(t *testing.T) {
 	repository := getMockRepositoryForLpTest()
-	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
+	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil), getMockPluginRegistry())
 	response, err := lpManager.GetActiveLaunchPlan(context.Background(), admin.ActiveLaunchPlanRequest{
 		Id: &admin.NamedEntityIdentifier{
 			Domain: domain,
@@ -237,7 +245,7 @@ func TestLaunchPlanManager_GetActiveLaunchPlan_InvalidRequest(t *testing.T) {
 }
 
 func TestLaunchPlan_ValidationError(t *testing.T) {
-	lpManager := NewLaunchPlanManager(repositoryMocks.NewMockRepository(), getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
+	lpManager := NewLaunchPlanManager(repositoryMocks.NewMockRepository(), getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil), getMockPluginRegistry())
 	request := testutils.GetLaunchPlanRequest()
 	request.Id = nil
 	response, err := lpManager.CreateLaunchPlan(context.Background(), request)
@@ -247,7 +255,7 @@ func TestLaunchPlan_ValidationError(t *testing.T) {
 
 func TestLaunchPlanManager_CreateLaunchPlanErrorDueToBadLabels(t *testing.T) {
 	repository := getMockRepositoryForLpTest()
-	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
+	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil), getMockPluginRegistry())
 	request := testutils.GetLaunchPlanRequest()
 	request.Spec.Labels = &admin.Labels{
 		Values: map[string]string{
@@ -272,7 +280,7 @@ func TestLaunchPlan_DatabaseError(t *testing.T) {
 	}
 
 	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetCreateCallback(lpCreateFunc)
-	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
+	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil), getMockPluginRegistry())
 	request := testutils.GetLaunchPlanRequest()
 	response, err := lpManager.CreateLaunchPlan(context.Background(), request)
 	assert.EqualError(t, err, expectedErr.Error())
@@ -282,7 +290,7 @@ func TestLaunchPlan_DatabaseError(t *testing.T) {
 func TestCreateLaunchPlanInCompatibleInputs(t *testing.T) {
 	repository := getMockRepositoryForLpTest()
 	setDefaultWorkflowCallbackForLpTest(repository)
-	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
+	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil), getMockPluginRegistry())
 	request := testutils.GetLaunchPlanRequest()
 	request.Spec.DefaultInputs = &core.ParameterMap{
 		Parameters: map[string]*core.Parameter{
@@ -331,7 +339,7 @@ func TestCreateLaunchPlanValidateCreate(t *testing.T) {
 	}
 	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetCreateCallback(lpCreateFunc)
 
-	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
+	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil), getMockPluginRegistry())
 	request := testutils.GetLaunchPlanRequest()
 	response, err := lpManager.CreateLaunchPlan(context.Background(), request)
 	assert.Nil(t, err)
@@ -364,7 +372,7 @@ func TestCreateLaunchPlan_ArtifactBehavior(t *testing.T) {
 	setDefaultWorkflowCallbackForLpTest(repository)
 	mockConfig := getMockConfigForLpTest()
 	mockConfig.(*runtimeMocks.MockConfigurationProvider).ApplicationConfiguration().GetTopLevelConfig().FeatureGates.EnableArtifacts = true
-	lpManager := NewLaunchPlanManager(repository, mockConfig, mockScheduler, mockScope.NewTestScope(), &registry)
+	lpManager := NewLaunchPlanManager(repository, mockConfig, mockScheduler, mockScope.NewTestScope(), &registry, getMockPluginRegistry())
 	request := testutils.GetLaunchPlanRequest()
 	response, err := lpManager.CreateLaunchPlan(context.Background(), request)
 	assert.Nil(t, err)
@@ -426,7 +434,7 @@ func TestCreateLaunchPlanNoWorkflowInterface(t *testing.T) {
 	}
 	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetCreateCallback(lpCreateFunc)
 
-	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
+	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil), getMockPluginRegistry())
 	request := testutils.GetLaunchPlanRequest()
 	request.Spec.FixedInputs = nil
 	request.Spec.DefaultInputs = nil
@@ -589,7 +597,7 @@ func TestUpdateTrigger(t *testing.T) {
 		ScheduleType:        "",
 		LaunchConditionType: &x,
 	}
-	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), &registry)
+	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), &registry, getMockPluginRegistry())
 	err := lpManager.(*LaunchPlanManager).updateTriggers(
 		context.Background(),
 		newLP, &oldLP)
@@ -667,7 +675,7 @@ func TestEnableLaunchPlanSched(t *testing.T) {
 	mockConfig := getMockConfigForLpTest()
 	mockConfig.(*runtimeMocks.MockConfigurationProvider).ApplicationConfiguration().GetTopLevelConfig().FeatureGates.EnableArtifacts = true
 
-	lpManager := NewLaunchPlanManager(repository, mockConfig, mockScheduler, mockScope.NewTestScope(), &registry)
+	lpManager := NewLaunchPlanManager(repository, mockConfig, mockScheduler, mockScope.NewTestScope(), &registry, getMockPluginRegistry())
 	_, err := lpManager.UpdateLaunchPlan(context.Background(), admin.LaunchPlanUpdateRequest{
 		Id:    &launchPlanIdentifier,
 		State: admin.LaunchPlanState_ACTIVE,
@@ -723,7 +731,7 @@ func getFakeLaunchPlanManagerWithRegistryClient(t *testing.T, oldModel, newModel
 	mockConfig := getMockConfigForLpTest()
 	mockConfig.(*runtimeMocks.MockConfigurationProvider).ApplicationConfiguration().GetTopLevelConfig().FeatureGates.EnableArtifacts = true
 
-	lpManager := NewLaunchPlanManager(repository, mockConfig, mockScheduler, mockScope.NewTestScope(), &registry).(*LaunchPlanManager)
+	lpManager := NewLaunchPlanManager(repository, mockConfig, mockScheduler, mockScope.NewTestScope(), &registry, getMockPluginRegistry()).(*LaunchPlanManager)
 
 	return lpManager
 }
@@ -830,7 +838,7 @@ func TestEnableSchedule(t *testing.T) {
 				*input.Payload)
 			return nil
 		})
-	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
+	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil), getMockPluginRegistry())
 	err := lpManager.(*LaunchPlanManager).enableSchedule(
 		context.Background(),
 		launchPlanNamedIdentifier,
@@ -842,6 +850,52 @@ func TestEnableSchedule(t *testing.T) {
 	assert.Nil(t, err)
 }
 
+func TestEnableSchedule_ActiveLaunchPlanLimit(t *testing.T) {
+	repository := getMockRepositoryForLpTest()
+	launchPlanCountFunc := func(ctx context.Context, input interfaces.CountResourceInput) (int64, error) {
+		assert.Len(t, input.InlineFilters, 2)
+		orgExpr, _ := input.InlineFilters[0].GetGormQueryExpr()
+		activeExpr, _ := input.InlineFilters[1].GetGormQueryExpr()
+
+		assert.Equal(t, orgExpr.Args, org)
+		assert.Equal(t, orgExpr.Query, testutils.OrgQueryPattern)
+
+		assert.Equal(t, activeExpr.Args, int32(admin.LaunchPlanState_ACTIVE))
+		assert.Equal(t, activeExpr.Query, testutils.StateQueryPattern)
+
+		return 2, nil
+	}
+
+	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetCountCallback(launchPlanCountFunc)
+
+	getUserProperties := func(ctx context.Context) shared.UserProperties {
+		return shared.UserProperties{
+			ActiveLaunchPlans: 1,
+			Org:               org,
+		}
+	}
+	registry := plugins.NewRegistry()
+	registry.RegisterDefault(plugins.PluginIDUserProperties, getUserProperties)
+
+	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil), registry)
+	_, err := lpManager.(*LaunchPlanManager).enableLaunchPlan(
+		context.Background(),
+		admin.LaunchPlanUpdateRequest{
+			Id: &core.Identifier{
+				ResourceType: core.ResourceType_LAUNCH_PLAN,
+				Project:      project,
+				Domain:       domain,
+				Name:         name,
+				Version:      version,
+				Org:          org,
+			},
+		})
+
+	flyteAdminErr := err.(flyteAdminErrors.FlyteAdminError)
+	assert.Equal(t, codes.ResourceExhausted, flyteAdminErr.Code())
+
+}
+
 func TestEnableSchedule_Error(t *testing.T) {
 	expectedErr := errors.New("expected error")
 
@@ -851,7 +905,7 @@ func TestEnableSchedule_Error(t *testing.T) {
 		func(ctx context.Context, input scheduleInterfaces.AddScheduleInput) error {
 			return expectedErr
 		})
-	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
+	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil), getMockPluginRegistry())
 	err := lpManager.(*LaunchPlanManager).enableSchedule(
 		context.Background(),
 		launchPlanNamedIdentifier, admin.LaunchPlanSpec{
@@ -870,7 +924,7 @@ func TestDisableSchedule(t *testing.T) {
 			assert.True(t, proto.Equal(&launchPlanNamedIdentifier, &input.Identifier))
 			return nil
 		})
-	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
+	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil), getMockPluginRegistry())
 	err := lpManager.(*LaunchPlanManager).disableSchedule(context.Background(), launchPlanNamedIdentifier)
 	assert.Nil(t, err)
 }
@@ -884,7 +938,7 @@ func TestDisableSchedule_Error(t *testing.T) {
 		func(ctx context.Context, input scheduleInterfaces.RemoveScheduleInput) error {
 			return expectedErr
 		})
-	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
+	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil), getMockPluginRegistry())
 	err := lpManager.(*LaunchPlanManager).disableSchedule(context.Background(), launchPlanNamedIdentifier)
 	assert.EqualError(t, err, expectedErr.Error())
 }
@@ -932,7 +986,7 @@ func TestUpdateSchedules(t *testing.T) {
 			return nil
 		})
 	repository := getMockRepositoryForLpTest()
-	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
+	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil), getMockPluginRegistry())
 	err := lpManager.(*LaunchPlanManager).updateSchedules(
 		context.Background(),
 		models.LaunchPlan{
@@ -985,7 +1039,7 @@ func TestUpdateSchedules_NothingToDisableButRedo(t *testing.T) {
 			return nil
 		})
 	repository := getMockRepositoryForLpTest()
-	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
+	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil), getMockPluginRegistry())
 	err := lpManager.(*LaunchPlanManager).updateSchedules(context.Background(), models.LaunchPlan{
 		LaunchPlanKey: models.LaunchPlanKey{
 			Project: project,
@@ -1054,7 +1108,7 @@ func TestUpdateSchedules_NothingToEnableButRedo(t *testing.T) {
 		})
 
 	repository := getMockRepositoryForLpTest()
-	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
+	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil), getMockPluginRegistry())
 	err := lpManager.(*LaunchPlanManager).updateSchedules(context.Background(), models.LaunchPlan{
 		LaunchPlanKey: models.LaunchPlanKey{
 			Project: project,
@@ -1103,7 +1157,7 @@ func TestUpdateSchedules_NothingToDoButRedo(t *testing.T) {
 		})
 
 	repository := getMockRepositoryForLpTest()
-	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
+	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil), getMockPluginRegistry())
 	err := lpManager.(*LaunchPlanManager).updateSchedules(context.Background(), models.LaunchPlan{
 		LaunchPlanKey: models.LaunchPlanKey{
 			Project: project,
@@ -1164,7 +1218,7 @@ func TestUpdateSchedules_EnableNoSchedule(t *testing.T) {
 		})
 
 	repository := getMockRepositoryForLpTest()
-	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
+	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil), getMockPluginRegistry())
 	err := lpManager.(*LaunchPlanManager).updateSchedules(context.Background(), models.LaunchPlan{
 		LaunchPlanKey: models.LaunchPlanKey{
 			Project: project,
@@ -1245,7 +1299,7 @@ func TestDisableLaunchPlan(t *testing.T) {
 
 	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetUpdateCallback(disableFunc)
 
-	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
+	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil), getMockPluginRegistry())
 	_, err := lpManager.UpdateLaunchPlan(context.Background(), admin.LaunchPlanUpdateRequest{
 		Id:    &launchPlanIdentifier,
 		State: admin.LaunchPlanState_INACTIVE,
@@ -1266,7 +1320,7 @@ func TestDisableLaunchPlan_DatabaseError(t *testing.T) {
 		return models.LaunchPlan{}, expectedError
 	}
 	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetGetCallback(lpGetFunc)
-	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
+	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil), getMockPluginRegistry())
 	_, err := lpManager.UpdateLaunchPlan(context.Background(), admin.LaunchPlanUpdateRequest{
 		Id:    &launchPlanIdentifier,
 		State: admin.LaunchPlanState_INACTIVE,
@@ -1299,7 +1353,7 @@ func TestDisableLaunchPlan_DatabaseError(t *testing.T) {
 		return expectedError
 	}
 	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetUpdateCallback(disableFunc)
-	lpManager = NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
+	lpManager = NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil), getMockPluginRegistry())
 	_, err = lpManager.UpdateLaunchPlan(context.Background(), admin.LaunchPlanUpdateRequest{
 		Id:    &launchPlanIdentifier,
 		State: admin.LaunchPlanState_INACTIVE,
@@ -1356,7 +1410,7 @@ func TestEnableLaunchPlan(t *testing.T) {
 	}
 	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetSetActiveCallback(enableFunc)
 
-	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
+	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil), getMockPluginRegistry())
 	_, err := lpManager.UpdateLaunchPlan(context.Background(), admin.LaunchPlanUpdateRequest{
 		Id:    &launchPlanIdentifier,
 		State: admin.LaunchPlanState_ACTIVE,
@@ -1385,7 +1439,7 @@ func TestEnableLaunchPlan_NoCurrentlyActiveVersion(t *testing.T) {
 	}
 	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetSetActiveCallback(enableFunc)
 
-	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
+	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil), getMockPluginRegistry())
 	_, err := lpManager.UpdateLaunchPlan(context.Background(), admin.LaunchPlanUpdateRequest{
 		Id:    &launchPlanIdentifier,
 		State: admin.LaunchPlanState_ACTIVE,
@@ -1405,7 +1459,7 @@ func TestEnableLaunchPlan_DatabaseError(t *testing.T) {
 		return models.LaunchPlan{}, expectedError
 	}
 	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetGetCallback(lpGetFunc)
-	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
+	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil), getMockPluginRegistry())
 	_, err := lpManager.UpdateLaunchPlan(context.Background(), admin.LaunchPlanUpdateRequest{
 		Id:    &launchPlanIdentifier,
 		State: admin.LaunchPlanState_ACTIVE,
@@ -1413,7 +1467,7 @@ func TestEnableLaunchPlan_DatabaseError(t *testing.T) {
 	assert.EqualError(t, err, expectedError.Error(), "Failures on getting the existing launch plan should propagate")
 
 	lpGetFunc = makeLaunchPlanRepoGetCallback(t)
-	lpManager = NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
+	lpManager = NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil), getMockPluginRegistry())
 	listFunc := func(input interfaces.ListResourceInput) (interfaces.LaunchPlanCollectionOutput, error) {
 		return interfaces.LaunchPlanCollectionOutput{}, expectedError
 	}
@@ -1461,7 +1515,7 @@ func TestEnableLaunchPlan_DatabaseError(t *testing.T) {
 		return expectedError
 	}
 	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetSetActiveCallback(enableFunc)
-	lpManager = NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
+	lpManager = NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil), getMockPluginRegistry())
 	_, err = lpManager.UpdateLaunchPlan(context.Background(), admin.LaunchPlanUpdateRequest{
 		Id:    &launchPlanIdentifier,
 		State: admin.LaunchPlanState_ACTIVE,
@@ -1471,7 +1525,7 @@ func TestEnableLaunchPlan_DatabaseError(t *testing.T) {
 
 func TestLaunchPlanManager_ListLaunchPlans(t *testing.T) {
 	repository := getMockRepositoryForLpTest()
-	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
+	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil), getMockPluginRegistry())
 	state := int32(0)
 	lpRequest := testutils.GetLaunchPlanRequest()
 	workflowRequest := testutils.GetWorkflowRequest()
@@ -1578,7 +1632,7 @@ func TestLaunchPlanManager_ListLaunchPlans(t *testing.T) {
 
 func TestLaunchPlanManager_ListLaunchPlanIds(t *testing.T) {
 	repository := getMockRepositoryForLpTest()
-	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
+	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil), getMockPluginRegistry())
 	state := int32(0)
 	lpRequest := testutils.GetLaunchPlanRequest()
 	workflowRequest := testutils.GetWorkflowRequest()
@@ -1661,7 +1715,7 @@ func TestLaunchPlanManager_ListLaunchPlanIds(t *testing.T) {
 
 func TestLaunchPlanManager_ListActiveLaunchPlans(t *testing.T) {
 	repository := getMockRepositoryForLpTest()
-	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
+	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil), getMockPluginRegistry())
 	state := int32(admin.LaunchPlanState_ACTIVE)
 	lpRequest := testutils.GetLaunchPlanRequest()
 	workflowRequest := testutils.GetWorkflowRequest()
@@ -1748,7 +1802,7 @@ func TestLaunchPlanManager_ListActiveLaunchPlans(t *testing.T) {
 
 func TestLaunchPlanManager_ListActiveLaunchPlans_BadRequest(t *testing.T) {
 	repository := getMockRepositoryForLpTest()
-	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
+	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil), getMockPluginRegistry())
 	lpList, err := lpManager.ListActiveLaunchPlans(context.Background(), admin.ActiveLaunchPlanListRequest{
 		Domain: domain,
 		Limit:  10,
