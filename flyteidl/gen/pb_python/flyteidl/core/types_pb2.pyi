@@ -19,6 +19,7 @@ class SimpleType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     BINARY: _ClassVar[SimpleType]
     ERROR: _ClassVar[SimpleType]
     STRUCT: _ClassVar[SimpleType]
+    ANY: _ClassVar[SimpleType]
 NONE: SimpleType
 INTEGER: SimpleType
 FLOAT: SimpleType
@@ -29,6 +30,7 @@ DURATION: SimpleType
 BINARY: SimpleType
 ERROR: SimpleType
 STRUCT: SimpleType
+ANY: SimpleType
 
 class SchemaType(_message.Message):
     __slots__ = ["columns"]

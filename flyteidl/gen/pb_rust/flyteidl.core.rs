@@ -305,6 +305,7 @@ pub enum SimpleType {
     Binary = 7,
     Error = 8,
     Struct = 9,
+    Any = 10,
 }
 impl SimpleType {
     /// String value of the enum field names used in the ProtoBuf definition.
@@ -323,6 +324,7 @@ impl SimpleType {
             SimpleType::Binary => "BINARY",
             SimpleType::Error => "ERROR",
             SimpleType::Struct => "STRUCT",
+            SimpleType::Any => "ANY",
         }
     }
     /// Creates an enum from field names used in the ProtoBuf definition.
@@ -338,6 +340,7 @@ impl SimpleType {
             "BINARY" => Some(Self::Binary),
             "ERROR" => Some(Self::Error),
             "STRUCT" => Some(Self::Struct),
+            "ANY" => Some(Self::Any),
             _ => None,
         }
     }
