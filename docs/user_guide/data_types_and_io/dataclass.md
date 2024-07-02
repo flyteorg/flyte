@@ -13,7 +13,7 @@ to serialize and deserialize dataclasses.
 
 :::{important}
 If you're using Flytekit version below v1.10, you'll need to decorate with `@dataclass_json` using
-`from dataclass_json import dataclass_json` instead of inheriting from Mashumaro's `DataClassJSONMixin`.
+`from dataclasses_json import dataclass_json` instead of inheriting from Mashumaro's `DataClassJSONMixin`.
 
 If you're using Flytekit version >= v1.11.1, you don't need to decorate with `@dataclass_json` or
 inherit from Mashumaro's `DataClassJSONMixin`.
