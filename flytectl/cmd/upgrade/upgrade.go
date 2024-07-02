@@ -110,7 +110,7 @@ func upgrade(u *updater.Updater) (string, error) {
 }
 
 func isUpgradeSupported(goos platformutil.Platform) (bool, error) {
-	latest, err := github.FlytectlReleaseConfig.GetLatestVersion()
+	latest, err := github.FlytectlReleaseConfig.Provider.(*github.GHProvider).GetCleanLatestVersion()
 	if err != nil {
 		return false, err
 	}

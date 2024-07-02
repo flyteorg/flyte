@@ -55,6 +55,7 @@ func TestVersionCommand(t *testing.T) {
 func TestVersionCommandFunc(t *testing.T) {
 	ctx := context.Background()
 	s := testutils.Setup()
+	defer s.TearDown()
 	stdlibversion.Build = ""
 	stdlibversion.BuildTime = ""
 	stdlibversion.Version = testVersion
@@ -67,6 +68,7 @@ func TestVersionCommandFunc(t *testing.T) {
 func TestVersionCommandFuncError(t *testing.T) {
 	ctx := context.Background()
 	s := testutils.Setup()
+	defer s.TearDown()
 	stdlibversion.Build = ""
 	stdlibversion.BuildTime = ""
 	stdlibversion.Version = "v"
@@ -79,6 +81,7 @@ func TestVersionCommandFuncError(t *testing.T) {
 func TestVersionCommandFuncErr(t *testing.T) {
 	ctx := context.Background()
 	s := testutils.Setup()
+	defer s.TearDown()
 	stdlibversion.Build = ""
 	stdlibversion.BuildTime = ""
 	stdlibversion.Version = testVersion

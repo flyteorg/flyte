@@ -4,7 +4,7 @@ include ../boilerplate/flyte/docker_build/Makefile
 include ../boilerplate/flyte/golang_test_targets/Makefile
 include ../boilerplate/flyte/end2end/Makefile
 
-GIT_VERSION := $(shell git describe --always --tags)
+GIT_VERSION := $(shell git describe --dirty --tags --long --match 'flytectl/*' --first-parent | sed 's/^flytectl\///')
 GIT_HASH := $(shell git rev-parse --short HEAD)
 TIMESTAMP := $(shell date '+%Y-%m-%d')
 PACKAGE ?=github.com/flyteorg/flyte/flytestdlib

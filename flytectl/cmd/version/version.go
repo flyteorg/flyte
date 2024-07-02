@@ -51,7 +51,7 @@ func GetVersionCommand(rootCmd *cobra.Command) map[string]cmdCore.CommandEntry {
 
 func getVersion(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
 	goos := platformutil.Platform(runtime.GOOS)
-	version, err := github.FlytectlReleaseConfig.GetLatestVersion()
+	version, err := github.FlytectlReleaseConfig.Provider.(*github.GHProvider).GetCleanLatestVersion()
 	if err != nil {
 		logger.Error(ctx, "Unable to get the latest version because %v", err)
 	} else {
