@@ -94,6 +94,7 @@ func (a *arrayNodeHandler) Abort(ctx context.Context, nCtx interfaces.NodeExecut
 			} else {
 				// record events transitioning subNodes to aborted
 				retryAttempt := uint32(arrayNodeState.SubNodeRetryAttempts.GetItem(i))
+
 				if err := sendEvents(ctx, nCtx, i, retryAttempt, idlcore.NodeExecution_ABORTED, idlcore.TaskExecution_ABORTED, eventRecorder, a.eventConfig); err != nil {
 					logger.Warnf(ctx, "failed to record ArrayNode events: %v", err)
 				}
@@ -707,7 +708,7 @@ func (a *arrayNodeHandler) buildArrayNodeContext(ctx context.Context, nCtx inter
 	// initialize mocks
 	arrayNodeLookup := newArrayNodeLookup(nCtx.ContextualNodeLookup(), subNodeID, &subNodeSpec, subNodeStatus)
 
-	newParentInfo, err := common.CreateParentInfo(nCtx.ExecutionContext().GetParentInfo(), nCtx.NodeID(), nCtx.CurrentAttempt())
+	newParentInfo, err := common.CreateParentInfo(nCtx.ExecutionContext().GetParentInfo(), nCtx.NodeID(), nCtx.CurrentAttempt(), false)
 	if err != nil {
 		return nil, nil, nil, nil, nil, nil, err
 	}

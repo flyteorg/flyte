@@ -287,7 +287,6 @@ export class NodeExecutionEvent extends Message<NodeExecutionEvent> {
   isArray = false;
 
   /**
-   * Holding this field here for now, this will be upstreamed soon.
    * So that Admin doesn't have to rebuild the node execution graph to find the target entity, propeller will fill this
    * in optionally - currently this is only filled in for subworkflows. This is the ID of the subworkflow corresponding
    * to this node execution. It is difficult to find because Admin only sees one node at a time. A subworkflow could be
@@ -298,7 +297,6 @@ export class NodeExecutionEvent extends Message<NodeExecutionEvent> {
   targetEntity?: Identifier;
 
   /**
-   * Holding this field here for now, this will be upstreamed soon.
    * Tasks and subworkflows (but not launch plans) that are run within a dynamic task are effectively independent of
    * the tasks that are registered in Admin's db. Confusingly, they are often identical, but sometimes they are not
    * even registered at all. Similar to the target_entity field, at the time Admin receives this event, it has no idea
