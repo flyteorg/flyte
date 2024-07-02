@@ -65,7 +65,7 @@ func (s *SmtpEmailer) SendEmail(ctx context.Context, email admin.EmailMessage) e
 		return s.emailError(ctx, fmt.Sprintf("Error adding email recipient: %s", err))
 	}
 
-	mailBody, err := s.createMailBody(email)
+	mailBody, err := createMailBody(s.config.Sender, email)
 
 	if err != nil {
 		return s.emailError(ctx, fmt.Sprintf("Error creating email body: %s", err))
@@ -99,9 +99,9 @@ func (s *SmtpEmailer) emailError(ctx context.Context, error string) error {
 	return errors.NewFlyteAdminErrorf(codes.Internal, "errors were seen while sending emails")
 }
 
-func (s *SmtpEmailer) createMailBody(email admin.EmailMessage) (string, error) {
+func createMailBody(emailSender string, email admin.EmailMessage) (string, error) {
 	headerMap := make(map[string]string)
-	headerMap["From"] = s.config.Sender
+	headerMap["From"] = emailSender
 	headerMap["To"] = strings.Join(email.RecipientsEmail, ",")
 	headerMap["Subject"] = email.SubjectLine
 	headerMap["Content-Type"] = "text/html; charset=\"UTF-8\""
