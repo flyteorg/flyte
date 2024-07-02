@@ -64,7 +64,7 @@ pub struct BridgeArgs {
         long,
         value_name = "BACKLOG_LENGTH",
         default_value = "5",
-        help = "number of tasks to buffer before dropping assignments"
+        help = "suggested number of tasks to buffer for future execution, the actual number may be higher"
     )]
     pub backlog_length: usize,
     #[arg(

@@ -532,6 +532,7 @@ func TestHandleRunning(t *testing.T) {
 		taskStatusReason       string
 		checkStatusError       error
 		expectedPhase          core.Phase
+		expectedPhaseVersion   uint32
 		expectedReason         string
 		expectedError          error
 		expectedLastUpdatedInc bool
@@ -543,9 +544,22 @@ func TestHandleRunning(t *testing.T) {
 			taskStatusReason:       "",
 			checkStatusError:       nil,
 			expectedPhase:          core.PhaseRunning,
+			expectedPhaseVersion:   1,
 			expectedReason:         "",
 			expectedError:          nil,
 			expectedLastUpdatedInc: true,
+		},
+		{
+			name:                   "RunningStatusNotFound",
+			lastUpdated:            time.Now().Add(-5 * time.Second),
+			taskStatusPhase:        core.PhaseRunning,
+			taskStatusReason:       "",
+			checkStatusError:       statusUpdateNotFoundError,
+			expectedPhase:          core.PhaseRunning,
+			expectedPhaseVersion:   0,
+			expectedReason:         "",
+			expectedError:          nil,
+			expectedLastUpdatedInc: false,
 		},
 		{
 			name:                   "RetryableFailure",
@@ -639,6 +653,7 @@ func TestHandleRunning(t *testing.T) {
 			transition, err := plugin.Handle(ctx, tCtx)
 			assert.Equal(t, test.expectedError, err)
 			assert.Equal(t, test.expectedPhase, transition.Info().Phase())
+			assert.Equal(t, test.expectedPhaseVersion, arrayNodeStateOutput.PhaseVersion)
 
 			if test.expectedLastUpdatedInc {
 				assert.True(t, arrayNodeStateOutput.LastUpdated.After(test.lastUpdated))

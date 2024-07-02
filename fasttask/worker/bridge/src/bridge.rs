@@ -88,13 +88,7 @@ pub async fn run(args: BridgeArgs) -> Result<(), Box<dyn std::error::Error>> {
     let task_statuses: Arc<RwLock<Vec<TaskStatus>>> = Arc::new(RwLock::new(vec![]));
     let heartbeat_bool = Arc::new(Mutex::new(AsyncBool::new()));
 
-    let (backlog_tx, backlog_rx) = match args.backlog_length {
-        0 => (None, None),
-        x => {
-            let (tx, rx) = async_channel::bounded(x);
-            (Some(tx), Some(rx))
-        }
-    };
+    let (backlog_tx, backlog_rx) = async_channel::unbounded();
 
     // build executors
     let (build_executor_tx, build_executor_rx) = async_channel::unbounded();
@@ -203,17 +197,13 @@ pub async fn run(args: BridgeArgs) -> Result<(), Box<dyn std::error::Error>> {
                 // periodically send heartbeat
                 let _ = heartbeater.trigger().await;
 
-                let backlogged = match backlog_rx_clone {
-                    Some(ref rx) => rx.len() as i32,
-                    None => 0,
-                };
                 let mut heartbeat_request = HeartbeatRequest {
                     worker_id: worker_id_clone.clone(),
                     queue_id: queue_id_clone.clone(),
                     capacity: Some(Capacity {
                         execution_count: parallelism_clone - (executor_rx_clone.len() as i32),
                         execution_limit: parallelism_clone,
-                        backlog_count: backlogged,
+                        backlog_count: backlog_rx_clone.len() as i32,
                         backlog_limit: backlog_length_clone,
                     }),
                     task_statuses: vec!(),

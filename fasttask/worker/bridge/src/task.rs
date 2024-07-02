@@ -6,7 +6,7 @@ use crate::common::{Executor, Response, Task};
 use crate::common::{TaskContext, FAILED, QUEUED, RUNNING};
 use crate::pb::fasttask::TaskStatus;
 
-use async_channel::{self, Receiver, Sender, TryRecvError, TrySendError};
+use async_channel::{self, Receiver, Sender, TryRecvError};
 use futures::sink::SinkExt;
 use futures::stream::StreamExt;
 use tracing::{debug, info, warn};
@@ -20,8 +20,8 @@ pub async fn execute(
     task_status_tx: Sender<TaskStatus>,
     task_status_report_interval_seconds: u64,
     last_ack_grace_period_seconds: u64,
-    backlog_tx: Option<Sender<()>>,
-    backlog_rx: Option<Receiver<()>>,
+    backlog_tx: Sender<()>,
+    backlog_rx: Receiver<()>,
     executor_tx: Sender<Executor>,
     executor_rx: Receiver<Executor>,
     build_executor_tx: Sender<()>,
@@ -60,7 +60,6 @@ pub async fn execute(
     // if backlogged we wait until we can execute
     let (mut phase, mut reason) = (QUEUED, "".to_string());
     if backlogged {
-        let backlog_rx = backlog_rx.unwrap();
         executor = match wait_in_backlog(
             task_contexts.clone(),
             &kill_rx,
@@ -156,7 +155,7 @@ pub async fn execute(
 
 async fn is_executable(
     executor_rx: &Receiver<Executor>,
-    backlog_tx: &Option<Sender<()>>,
+    backlog_tx: &Sender<()>,
 ) -> Result<(Option<Executor>, bool), String> {
     match executor_rx.try_recv() {
         Ok(executor) => return Ok((Some(executor), false)),
@@ -164,15 +163,12 @@ async fn is_executable(
         Err(TryRecvError::Empty) => {}
     }
 
-    if let Some(backlog_tx) = backlog_tx {
-        match backlog_tx.try_send(()) {
-            Ok(_) => return Ok((None, true)),
-            Err(TrySendError::Closed(e)) => return Err(format!("backlog_tx is closed: {:?}", e)),
-            Err(TrySendError::Full(_)) => {}
-        }
+    match backlog_tx.send(()).await {
+        Ok(_) => {}
+        Err(e) => return Err(format!("failed to send to backlog_tx: {:?}", e)),
     }
 
-    Ok((None, false))
+    Ok((None, true))
 }
 
 async fn report_terminal_status(
