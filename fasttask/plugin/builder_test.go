@@ -15,6 +15,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	coremocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
@@ -63,8 +64,15 @@ func (k *kubeCache) List(ctx context.Context, list client.ObjectList, opts ...cl
 }
 
 func TestCreate(t *testing.T) {
+	executionEnvID := core.ExecutionEnvID{
+		Project: "project",
+		Domain:  "domain",
+		Name:    "foo",
+		Version: "0",
+	}
+
 	fastTaskEnvironment := &pb.FastTaskEnvironment{
-		QueueId: "foo",
+		QueueId: executionEnvID.String(),
 	}
 
 	fastTaskEnvStruct := &_struct.Struct{}
@@ -112,7 +120,7 @@ func TestCreate(t *testing.T) {
 			name:            "Exists",
 			environmentSpec: fastTaskEnvSpec,
 			environments: map[string]*environment{
-				"foo": &environment{
+				executionEnvID.String(): &environment{
 					extant: fastTaskEnvStruct,
 					state:  HEALTHY,
 				},
@@ -124,7 +132,7 @@ func TestCreate(t *testing.T) {
 			name:            "Orphaned",
 			environmentSpec: fastTaskEnvSpec,
 			environments: map[string]*environment{
-				"foo": &environment{
+				executionEnvID.String(): &environment{
 					extant:   fastTaskEnvStruct,
 					replicas: []string{"bar"},
 					state:    ORPHANED,
@@ -155,7 +163,7 @@ func TestCreate(t *testing.T) {
 			builder.environments = test.environments
 
 			// call `Create`
-			environment, err := builder.Create(ctx, "foo", fastTaskEnvSpecStruct)
+			environment, err := builder.Create(ctx, executionEnvID, fastTaskEnvSpecStruct)
 			assert.Nil(t, err)
 			assert.True(t, proto.Equal(test.expectedEnvironment, environment))
 			assert.Equal(t, test.expectedCreateCalls, kubeClient.createCalls)
@@ -336,8 +344,15 @@ func TestGCEnvironments(t *testing.T) {
 }
 
 func TestGet(t *testing.T) {
+	executionEnvID := core.ExecutionEnvID{
+		Project: "project",
+		Domain:  "domain",
+		Name:    "name",
+		Version: "version",
+	}
+
 	fastTaskEnvironment := &pb.FastTaskEnvironment{
-		QueueId: "foo",
+		QueueId: executionEnvID.String(),
 	}
 
 	fastTaskEnvStruct := &_struct.Struct{}
@@ -353,7 +368,7 @@ func TestGet(t *testing.T) {
 		{
 			name: "Exists",
 			environments: map[string]*environment{
-				"foo": &environment{
+				executionEnvID.String(): &environment{
 					extant: fastTaskEnvStruct,
 					state:  HEALTHY,
 				},
@@ -368,7 +383,7 @@ func TestGet(t *testing.T) {
 		{
 			name: "Tombstoned",
 			environments: map[string]*environment{
-				"foo": &environment{
+				executionEnvID.String(): &environment{
 					state: TOMBSTONED,
 				},
 			},
@@ -392,7 +407,7 @@ func TestGet(t *testing.T) {
 			builder.environments = test.environments
 
 			// call `Get`
-			environment := builder.Get(ctx, "foo")
+			environment := builder.Get(ctx, executionEnvID)
 			assert.True(t, proto.Equal(test.expectedEnvironment, environment))
 		})
 	}

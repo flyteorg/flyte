@@ -5,6 +5,7 @@ package mocks
 import (
 	context "context"
 
+	core "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	mock "github.com/stretchr/testify/mock"
 
 	structpb "google.golang.org/protobuf/types/known/structpb"
@@ -23,7 +24,7 @@ func (_m ExecutionEnvClient_Create) Return(_a0 *structpb.Struct, _a1 error) *Exe
 	return &ExecutionEnvClient_Create{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *ExecutionEnvClient) OnCreate(ctx context.Context, executionEnvID string, executionEnvSpec *structpb.Struct) *ExecutionEnvClient_Create {
+func (_m *ExecutionEnvClient) OnCreate(ctx context.Context, executionEnvID core.ExecutionEnvID, executionEnvSpec *structpb.Struct) *ExecutionEnvClient_Create {
 	c_call := _m.On("Create", ctx, executionEnvID, executionEnvSpec)
 	return &ExecutionEnvClient_Create{Call: c_call}
 }
@@ -34,11 +35,11 @@ func (_m *ExecutionEnvClient) OnCreateMatch(matchers ...interface{}) *ExecutionE
 }
 
 // Create provides a mock function with given fields: ctx, executionEnvID, executionEnvSpec
-func (_m *ExecutionEnvClient) Create(ctx context.Context, executionEnvID string, executionEnvSpec *structpb.Struct) (*structpb.Struct, error) {
+func (_m *ExecutionEnvClient) Create(ctx context.Context, executionEnvID core.ExecutionEnvID, executionEnvSpec *structpb.Struct) (*structpb.Struct, error) {
 	ret := _m.Called(ctx, executionEnvID, executionEnvSpec)
 
 	var r0 *structpb.Struct
-	if rf, ok := ret.Get(0).(func(context.Context, string, *structpb.Struct) *structpb.Struct); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, core.ExecutionEnvID, *structpb.Struct) *structpb.Struct); ok {
 		r0 = rf(ctx, executionEnvID, executionEnvSpec)
 	} else {
 		if ret.Get(0) != nil {
@@ -47,7 +48,7 @@ func (_m *ExecutionEnvClient) Create(ctx context.Context, executionEnvID string,
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, string, *structpb.Struct) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, core.ExecutionEnvID, *structpb.Struct) error); ok {
 		r1 = rf(ctx, executionEnvID, executionEnvSpec)
 	} else {
 		r1 = ret.Error(1)
@@ -64,7 +65,7 @@ func (_m ExecutionEnvClient_Get) Return(_a0 *structpb.Struct) *ExecutionEnvClien
 	return &ExecutionEnvClient_Get{Call: _m.Call.Return(_a0)}
 }
 
-func (_m *ExecutionEnvClient) OnGet(ctx context.Context, executionEnvID string) *ExecutionEnvClient_Get {
+func (_m *ExecutionEnvClient) OnGet(ctx context.Context, executionEnvID core.ExecutionEnvID) *ExecutionEnvClient_Get {
 	c_call := _m.On("Get", ctx, executionEnvID)
 	return &ExecutionEnvClient_Get{Call: c_call}
 }
@@ -75,11 +76,11 @@ func (_m *ExecutionEnvClient) OnGetMatch(matchers ...interface{}) *ExecutionEnvC
 }
 
 // Get provides a mock function with given fields: ctx, executionEnvID
-func (_m *ExecutionEnvClient) Get(ctx context.Context, executionEnvID string) *structpb.Struct {
+func (_m *ExecutionEnvClient) Get(ctx context.Context, executionEnvID core.ExecutionEnvID) *structpb.Struct {
 	ret := _m.Called(ctx, executionEnvID)
 
 	var r0 *structpb.Struct
-	if rf, ok := ret.Get(0).(func(context.Context, string) *structpb.Struct); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, core.ExecutionEnvID) *structpb.Struct); ok {
 		r0 = rf(ctx, executionEnvID)
 	} else {
 		if ret.Get(0) != nil {
@@ -98,7 +99,7 @@ func (_m ExecutionEnvClient_Status) Return(_a0 interface{}, _a1 error) *Executio
 	return &ExecutionEnvClient_Status{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *ExecutionEnvClient) OnStatus(ctx context.Context, executionEnvID string) *ExecutionEnvClient_Status {
+func (_m *ExecutionEnvClient) OnStatus(ctx context.Context, executionEnvID core.ExecutionEnvID) *ExecutionEnvClient_Status {
 	c_call := _m.On("Status", ctx, executionEnvID)
 	return &ExecutionEnvClient_Status{Call: c_call}
 }
@@ -109,11 +110,11 @@ func (_m *ExecutionEnvClient) OnStatusMatch(matchers ...interface{}) *ExecutionE
 }
 
 // Status provides a mock function with given fields: ctx, executionEnvID
-func (_m *ExecutionEnvClient) Status(ctx context.Context, executionEnvID string) (interface{}, error) {
+func (_m *ExecutionEnvClient) Status(ctx context.Context, executionEnvID core.ExecutionEnvID) (interface{}, error) {
 	ret := _m.Called(ctx, executionEnvID)
 
 	var r0 interface{}
-	if rf, ok := ret.Get(0).(func(context.Context, string) interface{}); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, core.ExecutionEnvID) interface{}); ok {
 		r0 = rf(ctx, executionEnvID)
 	} else {
 		if ret.Get(0) != nil {
@@ -122,7 +123,7 @@ func (_m *ExecutionEnvClient) Status(ctx context.Context, executionEnvID string)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, core.ExecutionEnvID) error); ok {
 		r1 = rf(ctx, executionEnvID)
 	} else {
 		r1 = ret.Error(1)

@@ -7712,8 +7712,8 @@ export namespace flyteidl {
         /** Properties of an ExecutionEnv. */
         interface IExecutionEnv {
 
-            /** ExecutionEnv id */
-            id?: (string|null);
+            /** ExecutionEnv name */
+            name?: (string|null);
 
             /** ExecutionEnv type */
             type?: (string|null);
@@ -7723,6 +7723,9 @@ export namespace flyteidl {
 
             /** ExecutionEnv spec */
             spec?: (google.protobuf.IStruct|null);
+
+            /** ExecutionEnv version */
+            version?: (string|null);
         }
 
         /** Represents an ExecutionEnv. */
@@ -7734,8 +7737,8 @@ export namespace flyteidl {
              */
             constructor(properties?: flyteidl.core.IExecutionEnv);
 
-            /** ExecutionEnv id. */
-            public id: string;
+            /** ExecutionEnv name. */
+            public name: string;
 
             /** ExecutionEnv type. */
             public type: string;
@@ -7745,6 +7748,9 @@ export namespace flyteidl {
 
             /** ExecutionEnv spec. */
             public spec?: (google.protobuf.IStruct|null);
+
+            /** ExecutionEnv version. */
+            public version: string;
 
             /** ExecutionEnv environment. */
             public environment?: ("extant"|"spec");

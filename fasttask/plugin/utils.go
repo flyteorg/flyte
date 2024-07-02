@@ -6,11 +6,21 @@ import (
 
 	"k8s.io/api/core/v1"
 
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+
 	"github.com/unionai/flyte/fasttask/plugin/pb"
 )
 
 // isValidEnvironmentSpec validates the FastTaskEnvironmentSpec
-func isValidEnvironmentSpec(fastTaskEnvironmentSpec *pb.FastTaskEnvironmentSpec) error {
+func isValidEnvironmentSpec(executionEnvironmentID core.ExecutionEnvID, fastTaskEnvironmentSpec *pb.FastTaskEnvironmentSpec) error {
+	if len(executionEnvironmentID.Name) == 0 {
+		return fmt.Errorf("execution environment name is required")
+	}
+
+	if len(executionEnvironmentID.Version) == 0 {
+		return fmt.Errorf("execution environment version is required")
+	}
+
 	if fastTaskEnvironmentSpec.GetBacklogLength() < 0 {
 		return fmt.Errorf("backlog length must be greater than or equal to 0")
 	}

@@ -64,8 +64,9 @@ func newBuilderMetrics(scope promutils.Scope) builderMetrics {
 // environment represents a managed fast task environment, including it's definition and current
 // state
 type environment struct {
-	lastAccessedAt time.Time
 	extant         *_struct.Struct
+	lastAccessedAt time.Time
+	name           string
 	replicas       []string
 	spec           *pb.FastTaskEnvironmentSpec
 	state          state
@@ -83,8 +84,8 @@ type InMemoryEnvBuilder struct {
 
 // Get retrieves the environment with the given execution environment ID. If the environment does
 // not exist or has been tombstoned, nil is returned.
-func (i *InMemoryEnvBuilder) Get(ctx context.Context, executionEnvID string) *_struct.Struct {
-	if environment := i.environments[executionEnvID]; environment != nil {
+func (i *InMemoryEnvBuilder) Get(ctx context.Context, executionEnvID core.ExecutionEnvID) *_struct.Struct {
+	if environment := i.environments[executionEnvID.String()]; environment != nil {
 		i.lock.Lock()
 		defer i.lock.Unlock()
 
@@ -98,23 +99,23 @@ func (i *InMemoryEnvBuilder) Get(ctx context.Context, executionEnvID string) *_s
 
 // Create creates a new fast task environment with the given execution environment ID and
 // specification. If the environment already exists, the existing environment is returned.
-func (i *InMemoryEnvBuilder) Create(ctx context.Context, executionEnvID string, spec *_struct.Struct) (*_struct.Struct, error) {
+func (i *InMemoryEnvBuilder) Create(ctx context.Context, executionEnvID core.ExecutionEnvID, spec *_struct.Struct) (*_struct.Struct, error) {
 	// unmarshall and validate FastTaskEnvironmentSpec
 	fastTaskEnvironmentSpec := &pb.FastTaskEnvironmentSpec{}
 	if err := utils.UnmarshalStruct(spec, fastTaskEnvironmentSpec); err != nil {
 		return nil, err
 	}
 
-	if err := isValidEnvironmentSpec(fastTaskEnvironmentSpec); err != nil {
+	if err := isValidEnvironmentSpec(executionEnvID, fastTaskEnvironmentSpec); err != nil {
 		return nil, flyteerrors.Errorf(flyteerrors.BadTaskSpecification,
-			"detected invalid FastTaskEnvironmentSpec [%v], Err: [%v]", fastTaskEnvironmentSpec.GetPodTemplateSpec(), err)
+			"detected invalid EnvironmentSpec for environment '%s', Err: [%v]", executionEnvID, err)
 	}
 
-	logger.Debug(ctx, "creating environment '%s'", executionEnvID)
+	logger.Debugf(ctx, "creating environment '%s'", executionEnvID)
 
 	// build fastTaskEnvironment extant
 	fastTaskEnvironment := &pb.FastTaskEnvironment{
-		QueueId: executionEnvID,
+		QueueId: executionEnvID.String(),
 	}
 	environmentStruct := &_struct.Struct{}
 	if err := utils.MarshalStruct(fastTaskEnvironment, environmentStruct); err != nil {
@@ -124,7 +125,7 @@ func (i *InMemoryEnvBuilder) Create(ctx context.Context, executionEnvID string, 
 	// create environment
 	i.lock.Lock()
 
-	env, exists := i.environments[executionEnvID]
+	env, exists := i.environments[executionEnvID.String()]
 	if exists && env.state != ORPHANED {
 		i.lock.Unlock()
 
@@ -141,8 +142,9 @@ func (i *InMemoryEnvBuilder) Create(ctx context.Context, executionEnvID string, 
 	}
 
 	env = &environment{
-		lastAccessedAt: time.Now(),
 		extant:         environmentStruct,
+		lastAccessedAt: time.Now(),
+		name:           executionEnvID.Name,
 		replicas:       replicas,
 		spec:           fastTaskEnvironmentSpec,
 		state:          HEALTHY,
@@ -155,12 +157,12 @@ func (i *InMemoryEnvBuilder) Create(ctx context.Context, executionEnvID string, 
 			return nil, err
 		}
 
-		podName := fmt.Sprintf("%s-%s", executionEnvID, hex.EncodeToString(nonceBytes)[:GetConfig().NonceLength])
+		podName := fmt.Sprintf("%s-%s", env.name, hex.EncodeToString(nonceBytes)[:GetConfig().NonceLength])
 		env.replicas = append(env.replicas, podName)
 		podNames = append(podNames, podName)
 	}
 
-	i.environments[executionEnvID] = env
+	i.environments[executionEnvID.String()] = env
 	i.metrics.environmentsCreated.Inc()
 
 	i.lock.Unlock()
@@ -168,7 +170,7 @@ func (i *InMemoryEnvBuilder) Create(ctx context.Context, executionEnvID string, 
 	// create replicas
 	for _, podName := range podNames {
 		logger.Debugf(ctx, "creating pod '%s' for environment '%s'", podName, executionEnvID)
-		if err := i.createPod(ctx, fastTaskEnvironmentSpec, executionEnvID, podName); err != nil {
+		if err := i.createPod(ctx, fastTaskEnvironmentSpec, executionEnvID.String(), podName); err != nil {
 			logger.Warnf(ctx, "failed to create pod '%s' for environment '%s' [%v]", podName, executionEnvID, err)
 		}
 	}
@@ -179,12 +181,12 @@ func (i *InMemoryEnvBuilder) Create(ctx context.Context, executionEnvID string, 
 
 // Status returns the status of the environment with the given execution environment ID. This
 // includes the details of each pod in the environment replica set.
-func (i *InMemoryEnvBuilder) Status(ctx context.Context, executionEnvID string) (interface{}, error) {
+func (i *InMemoryEnvBuilder) Status(ctx context.Context, executionEnvID core.ExecutionEnvID) (interface{}, error) {
 	i.lock.Lock()
 	defer i.lock.Unlock()
 
 	// check if environment exists
-	environment, exists := i.environments[executionEnvID]
+	environment, exists := i.environments[executionEnvID.String()]
 	if !exists {
 		return nil, nil
 	}
@@ -425,20 +427,20 @@ func (i *InMemoryEnvBuilder) repairEnvironments(ctx context.Context) error {
 	// identify environments in need of repair
 	i.lock.Lock()
 	pod := &v1.Pod{}
-	for environmentID, environment := range i.environments {
+	for environmentID, env := range i.environments {
 		// check if environment is repairable (ie. HEALTHY or REPAIRING state)
-		if environment.state != HEALTHY && environment.state != REPAIRING {
+		if env.state != HEALTHY && env.state != REPAIRING {
 			continue
 		}
 
 		podTemplateSpec := &v1.PodTemplateSpec{}
-		if err := json.Unmarshal(environment.spec.GetPodTemplateSpec(), podTemplateSpec); err != nil {
+		if err := json.Unmarshal(env.spec.GetPodTemplateSpec(), podTemplateSpec); err != nil {
 			return flyteerrors.Errorf(flyteerrors.BadTaskSpecification,
-				"unable to unmarshal PodTemplateSpec [%v], Err: [%v]", environment.spec.GetPodTemplateSpec(), err.Error())
+				"unable to unmarshal PodTemplateSpec [%v], Err: [%v]", env.spec.GetPodTemplateSpec(), err.Error())
 		}
 
 		podNames := make([]string, 0)
-		for index, podName := range environment.replicas {
+		for index, podName := range env.replicas {
 			err := i.kubeClient.GetCache().Get(ctx, types.NamespacedName{
 				Name:      podName,
 				Namespace: podTemplateSpec.Namespace,
@@ -450,16 +452,16 @@ func (i *InMemoryEnvBuilder) repairEnvironments(ctx context.Context) error {
 					return err
 				}
 
-				newPodName := fmt.Sprintf("%s-%s", environmentID, hex.EncodeToString(nonceBytes)[:GetConfig().NonceLength])
-				environment.replicas[index] = newPodName
+				newPodName := fmt.Sprintf("%s-%s", env.name, hex.EncodeToString(nonceBytes)[:GetConfig().NonceLength])
+				env.replicas[index] = newPodName
 				podNames = append(podNames, newPodName)
 			}
 		}
 
 		if len(podNames) > 0 {
 			logger.Infof(ctx, "repairing environment '%s'", environmentID)
-			environment.state = REPAIRING
-			environmentSpecs[environmentID] = *environment.spec
+			env.state = REPAIRING
+			environmentSpecs[environmentID] = *env.spec
 			environmentReplicas[environmentID] = podNames
 		}
 	}
@@ -568,8 +570,9 @@ func (i *InMemoryEnvBuilder) detectOrphanedEnvironments(ctx context.Context, k8s
 
 			// create orphaned environment
 			orphanedEnvironment = &environment{
-				lastAccessedAt: time.Now(),
 				extant:         nil,
+				lastAccessedAt: time.Now(),
+				name:           "orphaned",
 				replicas:       make([]string, 0),
 				spec: &pb.FastTaskEnvironmentSpec{
 					PodTemplateSpec: podTemplateSpecBytes,

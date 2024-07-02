@@ -31,8 +31,9 @@ import (
 
 func buildFasttaskEnvironment(t *testing.T, fastTaskExtant *pb.FastTaskEnvironment, fastTaskSpec *pb.FastTaskEnvironmentSpec) *_struct.Struct {
 	executionEnv := &idlcore.ExecutionEnv{
-		Id:   "foo",
-		Type: "fast-task",
+		Name:    "foo",
+		Type:    "fast-task",
+		Version: "0",
 	}
 
 	if fastTaskExtant != nil {
@@ -132,8 +133,15 @@ func TestGetExecutionEnv(t *testing.T) {
 	tCtx := &coremocks.TaskExecutionContext{}
 	tCtx.OnTaskReader().Return(&coremocks.TaskReader{})
 
+	executionEnvID := core.ExecutionEnvID{
+		Project: "project",
+		Domain:  "domain",
+		Name:    "foo",
+		Version: "0",
+	}
+
 	expectedExtant := &pb.FastTaskEnvironment{
-		QueueId: "foo",
+		QueueId: executionEnvID.String(),
 	}
 	expectedExtantStruct := &_struct.Struct{}
 	err := utils.MarshalStruct(expectedExtant, expectedExtantStruct)
@@ -177,7 +185,7 @@ func TestGetExecutionEnv(t *testing.T) {
 		{
 			name: "ExecutionExtant",
 			fastTaskExtant: &pb.FastTaskEnvironment{
-				QueueId: "foo",
+				QueueId: executionEnvID.String(),
 			},
 		},
 		{
@@ -246,6 +254,10 @@ func TestGetExecutionEnv(t *testing.T) {
 				Domain:  "my_domain",
 			},
 		},
+		TaskId: &idlcore.Identifier{
+			Project: "project",
+			Domain:  "domain",
+		},
 	})
 	taskExecutionID.OnGetGeneratedNameMatch().Return("task-id")
 	taskMetadata.OnGetTaskExecutionID().Return(taskExecutionID)
@@ -284,7 +296,7 @@ func TestGetExecutionEnv(t *testing.T) {
 			} else {
 				executionEnvClient.OnGetMatch(ctx, mock.Anything).Return(nil)
 			}
-			executionEnvClient.OnCreateMatch(ctx, "foo", test.createExectionEnvMatcher).Return(expectedExtantStruct, nil)
+			executionEnvClient.OnCreateMatch(ctx, executionEnvID, test.createExectionEnvMatcher).Return(expectedExtantStruct, nil)
 
 			// create TaskExecutionContext
 			tCtx := &coremocks.TaskExecutionContext{}
@@ -304,7 +316,7 @@ func TestGetExecutionEnv(t *testing.T) {
 			}
 
 			// call handle
-			fastTaskEnvironment, err := plugin.getExecutionEnv(ctx, tCtx)
+			_, fastTaskEnvironment, err := plugin.getExecutionEnv(ctx, tCtx)
 			assert.Nil(t, err)
 			assert.True(t, proto.Equal(expectedExtant, fastTaskEnvironment))
 		})
@@ -440,6 +452,12 @@ func TestHandleNotYetStarted(t *testing.T) {
 		Name:      "execution_id",
 	})
 	taskExecutionID := &coremocks.TaskExecutionID{}
+	taskExecutionID.OnGetID().Return(idlcore.TaskExecutionIdentifier{
+		TaskId: &idlcore.Identifier{
+			Project: "project",
+			Domain:  "domain",
+		},
+	})
 	taskExecutionID.OnGetGeneratedNameWithMatch(mock.Anything, mock.Anything).Return("task-id", nil)
 	taskMetadata.OnGetTaskExecutionID().Return(taskExecutionID)
 

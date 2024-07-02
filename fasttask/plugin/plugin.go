@@ -86,51 +86,73 @@ func (p *Plugin) GetProperties() core.PluginProperties {
 	return core.PluginProperties{}
 }
 
+// buildExecutionEnvID creates an `ExecutionEnvID` from a task ID and an `ExecutionEnv`. This
+// collection of attributes is used to uniquely identify an execution environment.
+func buildExecutionEnvID(taskID *idlcore.Identifier, executionEnv *idlcore.ExecutionEnv) core.ExecutionEnvID {
+	return core.ExecutionEnvID{
+		Org:     taskID.GetOrg(),
+		Project: taskID.GetProject(),
+		Domain:  taskID.GetDomain(),
+		Name:    executionEnv.GetName(),
+		Version: executionEnv.GetVersion(),
+	}
+}
+
 // getExecutionEnv retrieves the execution environment for the task. If the environment does not
 // exist, it will create it.
 // this is here because we wanted uniformity within `TaskExecutionContext` where functions simply
 // return an interface rather than doing any actual work. alternatively, we could bury this within
 // `NodeExecutionContext` so other `ExecutionEnvironment` plugins do not need to duplicate this.
-func (p *Plugin) getExecutionEnv(ctx context.Context, tCtx core.TaskExecutionContext) (*pb.FastTaskEnvironment, error) {
+func (p *Plugin) getExecutionEnv(ctx context.Context, tCtx core.TaskExecutionContext) (*idlcore.ExecutionEnv, *pb.FastTaskEnvironment, error) {
 	taskTemplate, err := tCtx.TaskReader().Read(ctx)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	executionEnv := &idlcore.ExecutionEnv{}
 	if err := utils.UnmarshalStruct(taskTemplate.GetCustom(), executionEnv); err != nil {
-		return nil, flyteerrors.Wrapf(flyteerrors.BadTaskSpecification, err, "failed to unmarshal environment")
+		return nil, nil, flyteerrors.Wrapf(flyteerrors.BadTaskSpecification, err, "failed to unmarshal environment")
 	}
 
 	switch e := executionEnv.GetEnvironment().(type) {
 	case *idlcore.ExecutionEnv_Spec:
 		executionEnvClient := tCtx.GetExecutionEnvClient()
+		taskExecutionID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID()
+		executionEnvID := buildExecutionEnvID(taskExecutionID.GetTaskId(), executionEnv)
 
 		// if environment already exists then return it
-		if environment := executionEnvClient.Get(ctx, executionEnv.GetId()); environment != nil {
+		if environment := executionEnvClient.Get(ctx, executionEnvID); environment != nil {
 			fastTaskEnvironment := &pb.FastTaskEnvironment{}
 			if err := utils.UnmarshalStruct(environment, fastTaskEnvironment); err != nil {
-				return nil, flyteerrors.Wrapf(flyteerrors.BadTaskSpecification, err, "failed to unmarshal environment client")
+				return nil, nil, flyteerrors.Wrapf(flyteerrors.BadTaskSpecification, err, "failed to unmarshal environment client")
 			}
 
-			return fastTaskEnvironment, nil
+			return executionEnv, fastTaskEnvironment, nil
 		}
 
 		// otherwise create the environment
-		return p.createExecutionEnv(ctx, tCtx, executionEnv.GetId(), e)
+		fastTaskEnvironment, err := p.createExecutionEnv(ctx, tCtx, executionEnvID, e)
+		if err != nil {
+			return nil, nil, err
+		}
+
+		return executionEnv, fastTaskEnvironment, nil
 	case *idlcore.ExecutionEnv_Extant:
 		fastTaskEnvironment := &pb.FastTaskEnvironment{}
 		if err := utils.UnmarshalStruct(e.Extant, fastTaskEnvironment); err != nil {
-			return nil, flyteerrors.Wrapf(flyteerrors.BadTaskSpecification, err, "failed to unmarshal environment extant")
+			return nil, nil, flyteerrors.Wrapf(flyteerrors.BadTaskSpecification, err, "failed to unmarshal environment extant")
 		}
 
-		return fastTaskEnvironment, nil
+		return executionEnv, fastTaskEnvironment, nil
 	}
 
-	return nil, nil
+	return nil, nil, nil
 }
 
-func (p *Plugin) createExecutionEnv(ctx context.Context, tCtx core.TaskExecutionContext, envID string, envSpec *idlcore.ExecutionEnv_Spec) (*pb.FastTaskEnvironment, error) {
+// createExecutionEnv creates a new execution environment based on the specified parameters.
+func (p *Plugin) createExecutionEnv(ctx context.Context, tCtx core.TaskExecutionContext,
+	executionEnvID core.ExecutionEnvID, envSpec *idlcore.ExecutionEnv_Spec) (*pb.FastTaskEnvironment, error) {
+
 	environmentSpec := envSpec.Spec
 
 	fastTaskEnvironmentSpec := &pb.FastTaskEnvironmentSpec{}
@@ -171,7 +193,7 @@ func (p *Plugin) createExecutionEnv(ctx context.Context, tCtx core.TaskExecution
 	}
 
 	executionEnvClient := tCtx.GetExecutionEnvClient()
-	environment, err := executionEnvClient.Create(ctx, envID, environmentSpec)
+	environment, err := executionEnvClient.Create(ctx, executionEnvID, environmentSpec)
 	if err != nil {
 		return nil, flyteerrors.Wrapf(flyteerrors.BadTaskSpecification, err, "failed to create environment")
 	}
@@ -220,7 +242,7 @@ func (p *Plugin) addObjectMetadata(ctx context.Context, tCtx core.TaskExecutionC
 // Handle is the main entrypoint for the plugin. It will offer the task to the worker pool and
 // monitor the task until completion.
 func (p *Plugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (core.Transition, error) {
-	fastTaskEnvironment, err := p.getExecutionEnv(ctx, tCtx)
+	executionEnv, fastTaskEnvironment, err := p.getExecutionEnv(ctx, tCtx)
 	if err != nil {
 		return core.UnknownTransition, err
 	}
@@ -282,7 +304,9 @@ func (p *Plugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (co
 			}
 
 			//  fail if all replicas for this environment are in a failed state
-			statuses, err := tCtx.GetExecutionEnvClient().Status(ctx, queueID)
+			taskExecutionID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID()
+			executionEnvID := buildExecutionEnvID(taskExecutionID.GetTaskId(), executionEnv)
+			statuses, err := tCtx.GetExecutionEnvClient().Status(ctx, executionEnvID)
 			if err != nil {
 				return core.UnknownTransition, err
 			}
@@ -387,7 +411,7 @@ func (p *Plugin) Abort(ctx context.Context, tCtx core.TaskExecutionContext) erro
 
 // Finalize is called when the task execution is complete, performing any necessary cleanup.
 func (p *Plugin) Finalize(ctx context.Context, tCtx core.TaskExecutionContext) error {
-	fastTaskEnvironment, err := p.getExecutionEnv(ctx, tCtx)
+	_, fastTaskEnvironment, err := p.getExecutionEnv(ctx, tCtx)
 	if err != nil {
 		return err
 	}

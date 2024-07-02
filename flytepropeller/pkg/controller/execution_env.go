@@ -18,19 +18,19 @@ type ExecutionEnvClient struct {
 }
 
 // Create initializes an execution environment with the given ID and spec.
-func (e *ExecutionEnvClient) Create(ctx context.Context, executionEnvID string, executionEnvSpec *_struct.Struct) (*_struct.Struct, error) {
+func (e *ExecutionEnvClient) Create(ctx context.Context, executionEnvID pluginscore.ExecutionEnvID, executionEnvSpec *_struct.Struct) (*_struct.Struct, error) {
 	fastTaskEnvBuilder := e.envBuilders["fast-task"]
 	return fastTaskEnvBuilder.Create(ctx, executionEnvID, executionEnvSpec)
 }
 
 // Get returns the execution environment with the given ID.
-func (e *ExecutionEnvClient) Get(ctx context.Context, executionEnvID string) *_struct.Struct {
+func (e *ExecutionEnvClient) Get(ctx context.Context, executionEnvID pluginscore.ExecutionEnvID) *_struct.Struct {
 	fastTaskEnvBuilder := e.envBuilders["fast-task"]
 	return fastTaskEnvBuilder.Get(ctx, executionEnvID)
 }
 
 // Status returns the status of the execution environment with the given ID.
-func (e *ExecutionEnvClient) Status(ctx context.Context, executionEnvID string) (interface{}, error) {
+func (e *ExecutionEnvClient) Status(ctx context.Context, executionEnvID pluginscore.ExecutionEnvID) (interface{}, error) {
 	fastTaskEnvBuilder := e.envBuilders["fast-task"]
 	return fastTaskEnvBuilder.Status(ctx, executionEnvID)
 }
