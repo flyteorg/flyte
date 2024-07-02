@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/utils"
 	"net/http"
 	"sync"
 
@@ -14,6 +13,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/cache"
+	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/utils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
@@ -48,7 +48,6 @@ func MaterializeInMemoryCredentials(ctx context.Context, cfg *Config, tokenCache
 	return nil
 }
 
->>>>>>> d6b17dc0c (Auth/prevent lookup per call (#5686) (#555))
 func GetProxyTokenSource(ctx context.Context, cfg *Config) (oauth2.TokenSource, error) {
 	tokenSourceProvider, err := NewExternalTokenSourceProvider(cfg.ProxyCommand)
 	if err != nil {
@@ -191,11 +190,11 @@ func NewAuthInterceptor(cfg *Config, tokenCache cache.TokenCache, credentialsFut
 	}
 
 	return func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
-
 		ctx = setHTTPClientContext(ctx, cfg, proxyCredentialsFuture)
 		// If there is already a token in the cache (e.g. key-ring), we should use it immediately...
 		t, _ := tokenCache.GetToken()
 		if t != nil {
+
 			err := oauthMetadataProvider.GetOauthMetadata(cfg, tokenCache, proxyCredentialsFuture)
 			if err != nil {
 				return err
@@ -222,12 +221,12 @@ func NewAuthInterceptor(cfg *Config, tokenCache cache.TokenCache, credentialsFut
 					}
 					authorizationMetadataKey := oauthMetadataProvider.authorizationMetadataKey
 					tokenSource := oauthMetadataProvider.tokenSource
+					logger.Debugf(ctx, "authorizationMetadataKey: %s", authorizationMetadataKey)
 					err = func() error {
 						if !tokenCache.TryLock() {
 							tokenCache.CondWait()
 							return nil
 						}
-
 						defer tokenCache.Unlock()
 						_, err := tokenCache.PurgeIfEquals(t)
 						if err != nil && !errors.Is(err, cache.ErrNotFound) {
@@ -271,6 +270,7 @@ func NewProxyAuthInterceptor(cfg *Config, proxyCredentialsFuture *PerRPCCredenti
 			}
 			return invoker(ctx, method, req, reply, cc, opts...)
 		}
+
 		return err
 	}
 }
