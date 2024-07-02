@@ -4545,6 +4545,7 @@
              * @property {number} BINARY=7 BINARY value
              * @property {number} ERROR=8 ERROR value
              * @property {number} STRUCT=9 STRUCT value
+             * @property {number} JSON=10 JSON value
              */
             core.SimpleType = (function() {
                 var valuesById = {}, values = Object.create(valuesById);
@@ -4558,6 +4559,7 @@
                 values[valuesById[7] = "BINARY"] = 7;
                 values[valuesById[8] = "ERROR"] = 8;
                 values[valuesById[9] = "STRUCT"] = 9;
+                values[valuesById[10] = "JSON"] = 10;
                 return values;
             })();
     
@@ -6049,6 +6051,7 @@
                         case 7:
                         case 8:
                         case 9:
+                        case 10:
                             break;
                         }
                     }
@@ -7271,6 +7274,116 @@
                 return Binary;
             })();
     
+            core.Json = (function() {
+    
+                /**
+                 * Properties of a Json.
+                 * @memberof flyteidl.core
+                 * @interface IJson
+                 * @property {string|null} [value] Json value
+                 */
+    
+                /**
+                 * Constructs a new Json.
+                 * @memberof flyteidl.core
+                 * @classdesc Represents a Json.
+                 * @implements IJson
+                 * @constructor
+                 * @param {flyteidl.core.IJson=} [properties] Properties to set
+                 */
+                function Json(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * Json value.
+                 * @member {string} value
+                 * @memberof flyteidl.core.Json
+                 * @instance
+                 */
+                Json.prototype.value = "";
+    
+                /**
+                 * Creates a new Json instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.core.Json
+                 * @static
+                 * @param {flyteidl.core.IJson=} [properties] Properties to set
+                 * @returns {flyteidl.core.Json} Json instance
+                 */
+                Json.create = function create(properties) {
+                    return new Json(properties);
+                };
+    
+                /**
+                 * Encodes the specified Json message. Does not implicitly {@link flyteidl.core.Json.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.core.Json
+                 * @static
+                 * @param {flyteidl.core.IJson} message Json message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                Json.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.value != null && message.hasOwnProperty("value"))
+                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.value);
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a Json message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.core.Json
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.core.Json} Json
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                Json.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.Json();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.value = reader.string();
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a Json message.
+                 * @function verify
+                 * @memberof flyteidl.core.Json
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                Json.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.value != null && message.hasOwnProperty("value"))
+                        if (!$util.isString(message.value))
+                            return "value: string expected";
+                    return null;
+                };
+    
+                return Json;
+            })();
+    
             core.Schema = (function() {
     
                 /**
@@ -7787,6 +7900,7 @@
                  * @property {google.protobuf.IStruct|null} [generic] Scalar generic
                  * @property {flyteidl.core.IStructuredDataset|null} [structuredDataset] Scalar structuredDataset
                  * @property {flyteidl.core.IUnion|null} [union] Scalar union
+                 * @property {flyteidl.core.IJson|null} [json] Scalar json
                  */
     
                 /**
@@ -7876,17 +7990,25 @@
                  */
                 Scalar.prototype.union = null;
     
+                /**
+                 * Scalar json.
+                 * @member {flyteidl.core.IJson|null|undefined} json
+                 * @memberof flyteidl.core.Scalar
+                 * @instance
+                 */
+                Scalar.prototype.json = null;
+    
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
     
                 /**
                  * Scalar value.
-                 * @member {"primitive"|"blob"|"binary"|"schema"|"noneType"|"error"|"generic"|"structuredDataset"|"union"|undefined} value
+                 * @member {"primitive"|"blob"|"binary"|"schema"|"noneType"|"error"|"generic"|"structuredDataset"|"union"|"json"|undefined} value
                  * @memberof flyteidl.core.Scalar
                  * @instance
                  */
                 Object.defineProperty(Scalar.prototype, "value", {
-                    get: $util.oneOfGetter($oneOfFields = ["primitive", "blob", "binary", "schema", "noneType", "error", "generic", "structuredDataset", "union"]),
+                    get: $util.oneOfGetter($oneOfFields = ["primitive", "blob", "binary", "schema", "noneType", "error", "generic", "structuredDataset", "union", "json"]),
                     set: $util.oneOfSetter($oneOfFields)
                 });
     
@@ -7932,6 +8054,8 @@
                         $root.flyteidl.core.StructuredDataset.encode(message.structuredDataset, writer.uint32(/* id 8, wireType 2 =*/66).fork()).ldelim();
                     if (message.union != null && message.hasOwnProperty("union"))
                         $root.flyteidl.core.Union.encode(message.union, writer.uint32(/* id 9, wireType 2 =*/74).fork()).ldelim();
+                    if (message.json != null && message.hasOwnProperty("json"))
+                        $root.flyteidl.core.Json.encode(message.json, writer.uint32(/* id 10, wireType 2 =*/82).fork()).ldelim();
                     return writer;
                 };
     
@@ -7979,6 +8103,9 @@
                             break;
                         case 9:
                             message.union = $root.flyteidl.core.Union.decode(reader, reader.uint32());
+                            break;
+                        case 10:
+                            message.json = $root.flyteidl.core.Json.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -8086,6 +8213,16 @@
                             var error = $root.flyteidl.core.Union.verify(message.union);
                             if (error)
                                 return "union." + error;
+                        }
+                    }
+                    if (message.json != null && message.hasOwnProperty("json")) {
+                        if (properties.value === 1)
+                            return "value: multiple values";
+                        properties.value = 1;
+                        {
+                            var error = $root.flyteidl.core.Json.verify(message.json);
+                            if (error)
+                                return "json." + error;
                         }
                     }
                     return null;

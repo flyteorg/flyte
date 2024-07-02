@@ -262,6 +262,14 @@
       },
       "description": "Represents an error thrown from a node."
     },
+    "coreJson": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string"
+        }
+      }
+    },
     "coreLiteral": {
       "type": "object",
       "properties": {
@@ -434,6 +442,9 @@
         },
         "union": {
           "$ref": "#/definitions/coreUnion"
+        },
+        "json": {
+          "$ref": "#/definitions/coreJson"
         }
       }
     },
@@ -463,7 +474,8 @@
         "DURATION",
         "BINARY",
         "ERROR",
-        "STRUCT"
+        "STRUCT",
+        "JSON"
       ],
       "default": "NONE",
       "description": "Define a set of simple types."

@@ -305,6 +305,7 @@ pub enum SimpleType {
     Binary = 7,
     Error = 8,
     Struct = 9,
+    Json = 10,
 }
 impl SimpleType {
     /// String value of the enum field names used in the ProtoBuf definition.
@@ -323,6 +324,7 @@ impl SimpleType {
             SimpleType::Binary => "BINARY",
             SimpleType::Error => "ERROR",
             SimpleType::Struct => "STRUCT",
+            SimpleType::Json => "JSON",
         }
     }
     /// Creates an enum from field names used in the ProtoBuf definition.
@@ -338,6 +340,7 @@ impl SimpleType {
             "BINARY" => Some(Self::Binary),
             "ERROR" => Some(Self::Error),
             "STRUCT" => Some(Self::Struct),
+            "JSON" => Some(Self::Json),
             _ => None,
         }
     }
@@ -404,6 +407,12 @@ pub struct Binary {
     #[prost(string, tag="2")]
     pub tag: ::prost::alloc::string::String,
 }
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct Json {
+    #[prost(string, tag="1")]
+    pub value: ::prost::alloc::string::String,
+}
 /// A strongly typed schema that defines the interface of data retrieved from the underlying storage medium.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -448,7 +457,7 @@ pub struct StructuredDataset {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Scalar {
-    #[prost(oneof="scalar::Value", tags="1, 2, 3, 4, 5, 6, 7, 8, 9")]
+    #[prost(oneof="scalar::Value", tags="1, 2, 3, 4, 5, 6, 7, 8, 9, 10")]
     pub value: ::core::option::Option<scalar::Value>,
 }
 /// Nested message and enum types in `Scalar`.
@@ -474,6 +483,8 @@ pub mod scalar {
         StructuredDataset(super::StructuredDataset),
         #[prost(message, tag="9")]
         Union(::prost::alloc::boxed::Box<super::Union>),
+        #[prost(message, tag="10")]
+        Json(super::Json),
     }
 }
 /// A simple value. This supports any level of nesting (e.g. array of array of array of Blobs) as well as simple primitives.
