@@ -13,6 +13,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/cache"
+	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/utils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
@@ -23,12 +24,10 @@ const ProxyAuthorizationHeader = "proxy-authorization"
 // Once established, it'll invoke PerRPCCredentialsFuture.Store() on perRPCCredentials to populate it with the appropriate values.
 func MaterializeCredentials(tokenSource oauth2.TokenSource, cfg *Config, authorizationMetadataKey string,
 	perRPCCredentials *PerRPCCredentialsFuture) error {
-
 	_, err := tokenSource.Token()
 	if err != nil {
 		return fmt.Errorf("failed to issue token. Error: %w", err)
 	}
-
 	wrappedTokenSource := NewCustomHeaderTokenSource(tokenSource, cfg.UseInsecureConnection, authorizationMetadataKey)
 	perRPCCredentials.Store(wrappedTokenSource)
 
@@ -119,11 +118,6 @@ func (o *OauthMetadataProvider) getTokenSourceAndMetadata(cfg *Config, tokenCach
 		return fmt.Errorf("failed to initialized Auth Metadata Client. Error: %w", err)
 	}
 
-	tokenSourceProvider, err := NewTokenSourceProvider(ctx, cfg, tokenCache, authMetadataClient)
-	if err != nil {
-		return fmt.Errorf("failed to initialize token source provider. Err: %w", err)
-	}
-
 	authorizationMetadataKey := cfg.AuthorizationHeader
 	if len(authorizationMetadataKey) == 0 {
 		clientMetadata, err := authMetadataClient.GetPublicClientConfig(ctx, &service.PublicClientAuthConfigRequest{})
@@ -133,7 +127,7 @@ func (o *OauthMetadataProvider) getTokenSourceAndMetadata(cfg *Config, tokenCach
 		authorizationMetadataKey = clientMetadata.AuthorizationMetadataKey
 	}
 
-	tokenSource, err := tokenSourceProvider.GetTokenSource(ctx)
+	tokenSource, err := NewInMemoryTokenSourceProvider(tokenCache).GetTokenSource(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to get token source. Error: %w", err)
 	}
@@ -190,8 +184,11 @@ func NewAuthInterceptor(cfg *Config, tokenCache cache.TokenCache, credentialsFut
 			tokenSource := oauthMetadataProvider.tokenSource
 
 			err = MaterializeCredentials(tokenSource, cfg, authorizationMetadataKey, credentialsFuture)
-			if err != nil {
-				return fmt.Errorf("failed to materialize credentials. Error: %v", err)
+			if isValid := utils.Valid(t); isValid {
+				err = MaterializeCredentials(tokenSource, cfg, authorizationMetadataKey, credentialsFuture)
+				if err != nil {
+					return fmt.Errorf("failed to materialize credentials. Error: %v", err)
+				}
 			}
 		}
 

@@ -13,6 +13,7 @@ import (
 
 	tokenCacheMocks "github.com/flyteorg/flyte/flyteidl/clients/go/admin/cache/mocks"
 	adminMocks "github.com/flyteorg/flyte/flyteidl/clients/go/admin/mocks"
+	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/utils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 )
 
@@ -88,9 +89,9 @@ func TestCustomTokenSource_Token(t *testing.T) {
 	minuteAgo := time.Now().Add(-time.Minute)
 	hourAhead := time.Now().Add(time.Hour)
 	twoHourAhead := time.Now().Add(2 * time.Hour)
-	invalidToken := oauth2.Token{AccessToken: "foo", Expiry: minuteAgo}
-	validToken := oauth2.Token{AccessToken: "foo", Expiry: hourAhead}
-	newToken := oauth2.Token{AccessToken: "foo", Expiry: twoHourAhead}
+	invalidToken := utils.GenTokenWithCustomExpiry(t, minuteAgo)
+	validToken := utils.GenTokenWithCustomExpiry(t, hourAhead)
+	newToken := utils.GenTokenWithCustomExpiry(t, twoHourAhead)
 
 	tests := []struct {
 		name          string
@@ -101,24 +102,24 @@ func TestCustomTokenSource_Token(t *testing.T) {
 		{
 			name:          "no cached token",
 			token:         nil,
-			newToken:      &newToken,
-			expectedToken: &newToken,
+			newToken:      newToken,
+			expectedToken: newToken,
 		},
 		{
 			name:          "cached token valid",
-			token:         &validToken,
+			token:         validToken,
 			newToken:      nil,
-			expectedToken: &validToken,
+			expectedToken: validToken,
 		},
 		{
 			name:          "cached token expired",
-			token:         &invalidToken,
-			newToken:      &newToken,
-			expectedToken: &newToken,
+			token:         invalidToken,
+			newToken:      newToken,
+			expectedToken: newToken,
 		},
 		{
 			name:          "failed new token",
-			token:         &invalidToken,
+			token:         invalidToken,
 			newToken:      nil,
 			expectedToken: nil,
 		},
@@ -138,7 +139,7 @@ func TestCustomTokenSource_Token(t *testing.T) {
 			assert.True(t, ok)
 
 			mockSource := &adminMocks.TokenSource{}
-			if test.token != &validToken {
+			if test.token != validToken {
 				if test.newToken != nil {
 					mockSource.OnToken().Return(test.newToken, nil)
 				} else {

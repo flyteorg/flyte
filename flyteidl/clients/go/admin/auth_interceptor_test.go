@@ -2,17 +2,16 @@ package admin
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"net"
 	"net/http"
 	"net/url"
-	"os"
 	"strings"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -25,6 +24,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/cache/mocks"
 	adminMocks "github.com/flyteorg/flyte/flyteidl/clients/go/admin/mocks"
 
+	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/utils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
@@ -137,10 +137,7 @@ func newAuthMetadataServer(t testing.TB, grpcPort int, httpPort int, impl servic
 }
 
 func Test_newAuthInterceptor(t *testing.T) {
-	plan, _ := os.ReadFile("tokenorchestrator/testdata/token.json")
-	var tokenData oauth2.Token
-	err := json.Unmarshal(plan, &tokenData)
-	assert.NoError(t, err)
+	tokenData := utils.GenTokenWithCustomExpiry(t, time.Now().Add(20*time.Minute))
 	t.Run("Other Error", func(t *testing.T) {
 		ctx := context.Background()
 		httpPort := rand.IntnRange(10000, 60000)
@@ -164,12 +161,13 @@ func Test_newAuthInterceptor(t *testing.T) {
 		f := NewPerRPCCredentialsFuture()
 		p := NewPerRPCCredentialsFuture()
 		mockTokenCache := &mocks.TokenCache{}
-		mockTokenCache.OnGetTokenMatch().Return(&tokenData, nil)
+		mockTokenCache.OnGetTokenMatch().Return(tokenData, nil)
 		mockTokenCache.OnSaveTokenMatch(mock.Anything).Return(nil)
 		interceptor := NewAuthInterceptor(&Config{
 			Endpoint:              config.URL{URL: *u},
 			UseInsecureConnection: true,
 		}, mockTokenCache, f, p)
+
 		otherError := func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, opts ...grpc.CallOption) error {
 			return status.New(codes.Canceled, "").Err()
 		}
