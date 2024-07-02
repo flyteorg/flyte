@@ -9,6 +9,8 @@
 : "${K3S_VERSION:="v1.21.1-k3s1"}" # version of k3s to run in k3d cluster, empty value uses default specified by k3d install
 : "${K3D_CLUSTER_NAME:="flyte"}" # name of k3d cluster to be used
 : "${K3D_KUBECONFIG_FILE_PATH:="${HOME}/.flyte/sandbox/kubeconfig"}" # file path to store kubeconfig file for k3d cluster at
+: "${K3D_REGISTRY_NAME:="flyte-registry"}" # name of k3d registry to be used
+: "${K3D_REGISTRY_PORT:="30484"}" # port for k3d registry
 
 : "${KUBECTL_VERSION:=""}" # version of kubectl to install, empty value uses latest available
 : "${KUBECTL_INSTALL_URL:="https://dl.k8s.io/release/VERSION/bin/linux/amd64/kubectl"}" # URL to kubectl binary, include VERSION to be replaced with KUBECTL_VERSION
@@ -132,8 +134,21 @@ else
     IMAGE_ARG="--image rancher/k3s:${K3S_VERSION}"
   fi
 
+  # Using a k3d managed registry: https://k3d.io/v5.0.0/usage/registries/#create-a-customized-k3d-managed-registry
+  K3D_REGISTRY_NAME_ARG=""
+  if [ -n "${K3D_REGISTRY_NAME}" ]; then
+    if k3d registry list --no-headers | grep ${K3D_REGISTRY_NAME} &> /dev/null; then
+      echo -e "\nUsing existing k3d registry ${K3D_REGISTRY_NAME}"
+    else
+      echo -e "\nCreating k3d registry ${K3D_REGISTRY_NAME}"
+      k3d registry create ${K3D_REGISTRY_NAME} --port ${K3D_REGISTRY_PORT}
+    fi
+
+    K3D_REGISTRY_NAME_ARG="--registry-use k3d-${K3D_REGISTRY_NAME}:${K3D_REGISTRY_PORT}"
+  fi
+
   # shellcheck disable=SC2086
-  k3d cluster create -p "30082:30082@server:0" -p "30084:30084@server:0" -p "30088:30088@loadbalancer" -p "30089:30089@server:0" ${IMAGE_ARG} $K3D_CLUSTER_NAME
+  k3d cluster create -p "30082:30082@server:0" -p "30084:30084@server:0" -p "30088:30088@loadbalancer" -p "30089:30089@server:0" ${IMAGE_ARG} ${K3D_REGISTRY_NAME_ARG} $K3D_CLUSTER_NAME
 fi
 
 if [ -f "${K3D_KUBECONFIG_FILE_PATH}" ]; then
