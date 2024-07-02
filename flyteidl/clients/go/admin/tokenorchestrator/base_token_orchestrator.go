@@ -8,6 +8,7 @@ import (
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/cache"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/oauth"
+	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/utils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
@@ -52,7 +53,8 @@ func (t BaseTokenOrchestrator) FetchTokenFromCacheOrRefreshIt(ctx context.Contex
 		return nil, err
 	}
 
-	if token.Valid() {
+	if isValid := utils.Valid(token); isValid {
+		logger.Infof(context.Background(), "retrieved token from cache with expiry %v", token.Expiry)
 		return token, nil
 	}
 
