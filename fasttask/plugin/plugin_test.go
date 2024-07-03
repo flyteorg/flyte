@@ -10,17 +10,20 @@ import (
 	_struct "github.com/golang/protobuf/ptypes/struct"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/structpb"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
 	idlcore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	coremocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	iomocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils/secrets"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
@@ -515,6 +518,7 @@ func TestHandleNotYetStarted(t *testing.T) {
 			assert.Equal(t, test.expectedError, err)
 			assert.Equal(t, test.expectedPhase, transition.Info().Phase())
 			assert.Equal(t, test.expectedReason, transition.Info().Reason())
+			assert.Len(t, transition.Info().Info().Logs, 0)
 
 			if len(test.workerID) > 0 {
 				assert.Equal(t, test.workerID, arrayNodeStateOutput.WorkerID)
@@ -525,68 +529,127 @@ func TestHandleNotYetStarted(t *testing.T) {
 
 func TestHandleRunning(t *testing.T) {
 	ctx := context.TODO()
+	pod := &v1.Pod{
+		ObjectMeta: metav1.ObjectMeta{
+			Namespace: "namespace",
+			Name:      "pod-name",
+		},
+		Spec: v1.PodSpec{
+			Containers: []v1.Container{
+				{
+					Name: "container-name",
+				},
+			},
+			Hostname: "hostname",
+		},
+		Status: v1.PodStatus{
+			ContainerStatuses: []v1.ContainerStatus{
+				{
+					ContainerID: "container-id",
+				},
+			},
+		},
+	}
+
 	tests := []struct {
 		name                   string
 		lastUpdated            time.Time
 		taskStatusPhase        core.Phase
 		taskStatusReason       string
 		checkStatusError       error
+		executionEnvStatus     map[string]*v1.Pod
 		expectedPhase          core.Phase
 		expectedPhaseVersion   uint32
 		expectedReason         string
 		expectedError          error
 		expectedLastUpdatedInc bool
+		expectedLogs           bool
 	}{
 		{
-			name:                   "Running",
-			lastUpdated:            time.Now().Add(-5 * time.Second),
-			taskStatusPhase:        core.PhaseRunning,
-			taskStatusReason:       "",
-			checkStatusError:       nil,
+			name:             "Running",
+			lastUpdated:      time.Now().Add(-5 * time.Second),
+			taskStatusPhase:  core.PhaseRunning,
+			taskStatusReason: "",
+			checkStatusError: nil,
+			executionEnvStatus: map[string]*v1.Pod{
+				"w0": nil,
+			},
 			expectedPhase:          core.PhaseRunning,
 			expectedPhaseVersion:   1,
 			expectedReason:         "",
 			expectedError:          nil,
 			expectedLastUpdatedInc: true,
+			expectedLogs:           false,
 		},
 		{
-			name:                   "RunningStatusNotFound",
-			lastUpdated:            time.Now().Add(-5 * time.Second),
-			taskStatusPhase:        core.PhaseRunning,
-			taskStatusReason:       "",
-			checkStatusError:       statusUpdateNotFoundError,
+			name:             "RunningWithLogs",
+			lastUpdated:      time.Now().Add(-5 * time.Second),
+			taskStatusPhase:  core.PhaseRunning,
+			taskStatusReason: "",
+			checkStatusError: nil,
+			executionEnvStatus: map[string]*v1.Pod{
+				"w0": pod,
+			},
 			expectedPhase:          core.PhaseRunning,
-			expectedPhaseVersion:   0,
+			expectedPhaseVersion:   1,
+			expectedReason:         "",
+			expectedError:          nil,
+			expectedLastUpdatedInc: true,
+			expectedLogs:           true,
+		},
+		{
+			name:             "RunningStatusNotFound",
+			lastUpdated:      time.Now().Add(-5 * time.Second),
+			taskStatusPhase:  core.PhaseRunning,
+			taskStatusReason: "",
+			checkStatusError: statusUpdateNotFoundError,
+			executionEnvStatus: map[string]*v1.Pod{
+				"w0": pod,
+			},
+			expectedPhase:          core.PhaseRunning,
 			expectedReason:         "",
 			expectedError:          nil,
 			expectedLastUpdatedInc: false,
+			expectedLogs:           true,
 		},
 		{
-			name:                   "RetryableFailure",
-			lastUpdated:            time.Now().Add(-5 * time.Second),
-			taskStatusPhase:        core.PhaseRetryableFailure,
-			checkStatusError:       nil,
+			name:             "RetryableFailure",
+			lastUpdated:      time.Now().Add(-5 * time.Second),
+			taskStatusPhase:  core.PhaseRetryableFailure,
+			checkStatusError: nil,
+			executionEnvStatus: map[string]*v1.Pod{
+				"w0": pod,
+			},
 			expectedPhase:          core.PhaseRetryableFailure,
 			expectedError:          nil,
 			expectedLastUpdatedInc: false,
+			expectedLogs:           true,
 		},
 		{
-			name:                   "StatusNotFoundTimeout",
-			lastUpdated:            time.Now().Add(-600 * time.Second),
-			taskStatusPhase:        core.PhaseUndefined,
-			checkStatusError:       statusUpdateNotFoundError,
+			name:             "StatusNotFoundTimeout",
+			lastUpdated:      time.Now().Add(-600 * time.Second),
+			taskStatusPhase:  core.PhaseUndefined,
+			checkStatusError: statusUpdateNotFoundError,
+			executionEnvStatus: map[string]*v1.Pod{
+				"w0": pod,
+			},
 			expectedPhase:          core.PhaseRetryableFailure,
 			expectedError:          nil,
 			expectedLastUpdatedInc: false,
+			expectedLogs:           true,
 		},
 		{
-			name:                   "Success",
-			lastUpdated:            time.Now().Add(-5 * time.Second),
-			taskStatusPhase:        core.PhaseSuccess,
-			checkStatusError:       nil,
+			name:             "Success",
+			lastUpdated:      time.Now().Add(-5 * time.Second),
+			taskStatusPhase:  core.PhaseSuccess,
+			checkStatusError: nil,
+			executionEnvStatus: map[string]*v1.Pod{
+				"w0": pod,
+			},
 			expectedPhase:          core.PhaseSuccess,
 			expectedError:          nil,
 			expectedLastUpdatedInc: false,
+			expectedLogs:           true,
 		},
 	}
 
@@ -603,6 +666,19 @@ func TestHandleRunning(t *testing.T) {
 	})
 	taskExecutionID := &coremocks.TaskExecutionID{}
 	taskExecutionID.OnGetGeneratedNameWithMatch(mock.Anything, mock.Anything).Return("task-id", nil)
+	taskExecutionID.OnGetIDMatch().Return(idlcore.TaskExecutionIdentifier{
+		NodeExecutionId: &idlcore.NodeExecutionIdentifier{
+			ExecutionId: &idlcore.WorkflowExecutionIdentifier{
+				Name:    "my_name",
+				Project: "my_project",
+				Domain:  "my_domain",
+			},
+		},
+		TaskId: &idlcore.Identifier{
+			Project: "project",
+			Domain:  "domain",
+		},
+	})
 	taskMetadata.OnGetTaskExecutionID().Return(taskExecutionID)
 
 	for _, test := range tests {
@@ -613,6 +689,10 @@ func TestHandleRunning(t *testing.T) {
 			tCtx := &coremocks.TaskExecutionContext{}
 			tCtx.OnTaskExecutionMetadata().Return(taskMetadata)
 			tCtx.OnTaskReader().Return(taskReader)
+
+			executionEnvClient := &coremocks.ExecutionEnvClient{}
+			executionEnvClient.OnStatusMatch(ctx, mock.Anything).Return(test.executionEnvStatus, nil)
+			tCtx.OnGetExecutionEnvClient().Return(executionEnvClient)
 
 			arrayNodeStateInput := &State{
 				SubmissionPhase: Submitted,
@@ -645,6 +725,7 @@ func TestHandleRunning(t *testing.T) {
 
 			// initialize plugin
 			plugin := &Plugin{
+				cfg:             defaultConfig,
 				fastTaskService: fastTaskService,
 				metrics:         newPluginMetrics(scope),
 			}
@@ -658,6 +739,92 @@ func TestHandleRunning(t *testing.T) {
 			if test.expectedLastUpdatedInc {
 				assert.True(t, arrayNodeStateOutput.LastUpdated.After(test.lastUpdated))
 			}
+
+			if test.expectedLogs {
+				assert.Len(t, transition.Info().Info().Logs, 1)
+			} else {
+				assert.Len(t, transition.Info().Info().Logs, 0)
+			}
 		})
 	}
+}
+
+func TestGetTaskInfo(t *testing.T) {
+	ctx := context.TODO()
+
+	executionEnvClient := &coremocks.ExecutionEnvClient{}
+	executionEnvClient.OnStatusMatch(ctx, mock.Anything).Return(map[string]*v1.Pod{
+		"w0": {
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: "namespace",
+				Name:      "pod-name",
+			},
+			Spec: v1.PodSpec{
+				Containers: []v1.Container{
+					{
+						Name: "container-name",
+					},
+				},
+				Hostname: "hostname",
+			},
+			Status: v1.PodStatus{
+				ContainerStatuses: []v1.ContainerStatus{
+					{
+						ContainerID: "container-id",
+					},
+				},
+			},
+		},
+	}, nil)
+	tCtx := &coremocks.TaskExecutionContext{}
+	tCtx.OnGetExecutionEnvClient().Return(executionEnvClient)
+
+	taskMetadata := &coremocks.TaskExecutionMetadata{}
+	taskMetadata.OnGetOwnerIDMatch().Return(types.NamespacedName{
+		Namespace: "namespace",
+		Name:      "execution_id",
+	})
+	taskExecutionID := &coremocks.TaskExecutionID{}
+	taskExecutionID.OnGetID().Return(idlcore.TaskExecutionIdentifier{
+		TaskId: &idlcore.Identifier{
+			Project: "project",
+			Domain:  "domain",
+		},
+	})
+	taskExecutionID.OnGetGeneratedNameWithMatch(mock.Anything, mock.Anything).Return("task-id", nil)
+	taskMetadata.OnGetTaskExecutionID().Return(taskExecutionID)
+	tCtx.OnTaskExecutionMetadata().Return(taskMetadata)
+
+	taskTemplate := getBaseFasttaskTaskTemplate(t)
+	taskReader := &coremocks.TaskReader{}
+	taskReader.OnReadMatch(mock.Anything).Return(taskTemplate, nil)
+	tCtx.OnTaskReader().Return(taskReader)
+
+	now := time.Now()
+	start := now.Add(-5 * time.Second)
+	executionEnv := &idlcore.ExecutionEnv{
+		Name:    "foo",
+		Version: "0",
+	}
+	queueID := "foo"
+	workerID := "w0"
+
+	plugin := &Plugin{
+		cfg: &Config{
+			Logs: logs.LogConfig{
+				Templates: []tasklog.TemplateLogPlugin{
+					{
+						DisplayName:  "Custom Logs",
+						TemplateURIs: []string{"http://foo.com/pod={{ .namespace }}/{{ .podName }}"},
+					},
+				},
+			},
+		},
+	}
+	taskInfo, err := plugin.getTaskInfo(ctx, tCtx, start, now, executionEnv, queueID, workerID)
+
+	require.Nil(t, err)
+	require.Len(t, taskInfo.Logs, 1)
+	assert.Equal(t, "Custom Logs (worker)", taskInfo.Logs[0].GetName())
+	assert.Equal(t, "http://foo.com/pod=namespace/pod-name", taskInfo.Logs[0].GetUri())
 }

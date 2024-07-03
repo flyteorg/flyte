@@ -16,12 +16,14 @@ import (
 
 	idlcore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	flyteerrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/template"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils/secrets"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/errorcollector"
@@ -68,11 +70,13 @@ type State struct {
 	SubmissionPhase SubmissionPhase
 	PhaseVersion    uint32
 	WorkerID        string
+	SubmittedAt     time.Time
 	LastUpdated     time.Time
 }
 
 // Plugin is a fast task plugin that offers task execution to a worker pool.
 type Plugin struct {
+	cfg             *Config
 	fastTaskService FastTaskService
 	metrics         pluginMetrics
 }
@@ -243,15 +247,15 @@ func (p *Plugin) addObjectMetadata(ctx context.Context, tCtx core.TaskExecutionC
 // Handle is the main entrypoint for the plugin. It will offer the task to the worker pool and
 // monitor the task until completion.
 func (p *Plugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (core.Transition, error) {
-	executionEnv, fastTaskEnvironment, err := p.getExecutionEnv(ctx, tCtx)
-	if err != nil {
-		return core.UnknownTransition, err
-	}
-
 	// retrieve plugin state
 	pluginState := &State{}
 	if _, err := tCtx.PluginStateReader().Get(pluginState); err != nil {
 		return core.UnknownTransition, flyteerrors.Wrapf(flyteerrors.CorruptedPluginState, err, "Failed to read unmarshal custom state")
+	}
+
+	executionEnv, fastTaskEnvironment, err := p.getExecutionEnv(ctx, tCtx)
+	if err != nil {
+		return core.UnknownTransition, err
 	}
 
 	taskID, err := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedNameWith(0, 50)
@@ -259,145 +263,19 @@ func (p *Plugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (co
 		return core.UnknownTransition, err
 	}
 
-	queueID := fastTaskEnvironment.GetQueueId()
 	phaseInfo := core.PhaseInfoUndefined
 	switch pluginState.SubmissionPhase {
 	case NotSubmitted:
-		// read task template
-		taskTemplate, err := tCtx.TaskReader().Read(ctx)
+		// attempt to submit the task
+		pluginState, phaseInfo, err = p.trySubmitTask(ctx, tCtx, executionEnv, fastTaskEnvironment, pluginState, taskID)
 		if err != nil {
 			return core.UnknownTransition, err
-		}
-
-		taskContainer := taskTemplate.GetContainer()
-		if taskContainer == nil {
-			return core.UnknownTransition, flyteerrors.Errorf(flyteerrors.BadTaskSpecification, "unable to create container with no definition in TaskTemplate")
-		}
-
-		templateParameters := template.Parameters{
-			TaskExecMetadata: tCtx.TaskExecutionMetadata(),
-			Inputs:           tCtx.InputReader(),
-			OutputPath:       tCtx.OutputWriter(),
-			Task:             tCtx.TaskReader(),
-		}
-		command, err := template.Render(ctx, taskContainer.GetArgs(), templateParameters)
-		if err != nil {
-			return core.UnknownTransition, err
-		}
-
-		// offer the work to the queue
-		ownerID := tCtx.TaskExecutionMetadata().GetOwnerID()
-		workerID, err := p.fastTaskService.OfferOnQueue(ctx, queueID, taskID, ownerID.Namespace, ownerID.Name, command)
-		if err != nil {
-			return core.UnknownTransition, err
-		}
-
-		if len(workerID) > 0 {
-			pluginState.SubmissionPhase = Submitted
-			pluginState.PhaseVersion = core.DefaultPhaseVersion
-
-			pluginState.WorkerID = workerID
-			pluginState.LastUpdated = time.Now()
-
-			phaseInfo = core.PhaseInfoQueued(time.Now(), pluginState.PhaseVersion, fmt.Sprintf("task offered to worker %s", workerID))
-		} else {
-			if pluginState.LastUpdated.IsZero() {
-				pluginState.LastUpdated = time.Now()
-			}
-
-			//  fail if all replicas for this environment are in a failed state
-			taskExecutionID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID()
-			executionEnvID := buildExecutionEnvID(taskExecutionID.GetTaskId(), executionEnv)
-			statuses, err := tCtx.GetExecutionEnvClient().Status(ctx, executionEnvID)
-			if err != nil {
-				return core.UnknownTransition, err
-			}
-
-			statusesMap := statuses.(map[string]*v1.Pod)
-
-			allReplicasFailed := true
-			messageCollector := errorcollector.NewErrorMessageCollector()
-
-			now := time.Now()
-			index := 0
-			for _, pod := range statusesMap {
-				if pod == nil {
-					// pod does not exist because it has not yet been populated in the kubeclient
-					// cache or was deleted. to be safe, we treat both as a non-failure state.
-					allReplicasFailed = false
-					break
-				}
-
-				phaseInfo, err := podplugin.DemystifyPodStatus(pod, core.TaskInfo{OccurredAt: &now})
-				if err != nil {
-					return core.UnknownTransition, err
-				}
-
-				switch phaseInfo.Phase() {
-				case core.PhasePermanentFailure, core.PhaseRetryableFailure:
-					if phaseInfo.Err() != nil {
-						messageCollector.Collect(index, phaseInfo.Err().GetMessage())
-					} else {
-						messageCollector.Collect(index, phaseInfo.Reason())
-					}
-				default:
-					allReplicasFailed = false
-				}
-
-				index++
-			}
-
-			if allReplicasFailed {
-				logger.Infof(ctx, "all workers have failed for queue %s", queueID)
-				p.metrics.allReplicasFailed.Inc()
-
-				phaseInfo = core.PhaseInfoSystemFailure("unknown", fmt.Sprintf("all workers have failed for queue %s\n%s",
-					queueID, messageCollector.Summary(maxErrorMessageLength)), nil)
-			} else {
-				pluginState.PhaseVersion = core.DefaultPhaseVersion
-				phaseInfo = core.PhaseInfoWaitingForResourcesInfo(time.Now(), pluginState.PhaseVersion, "no workers available", nil)
-			}
 		}
 	case Submitted:
-		// check the task status
-		phase, reason, err := p.fastTaskService.CheckStatus(ctx, taskID, fastTaskEnvironment.GetQueueId(), pluginState.WorkerID)
-
-		now := time.Now()
+		// monitor task status
+		pluginState, phaseInfo, err = p.monitorTask(ctx, tCtx, executionEnv, fastTaskEnvironment, pluginState, taskID)
 		if err != nil {
-			if errors.Is(err, statusUpdateNotFoundError) && now.Sub(pluginState.LastUpdated) > GetConfig().GracePeriodStatusNotFound.Duration {
-				// if task has not been updated within the grace period we should abort
-				logger.Errorf(ctx, "Task status update not reported within grace period for queue %s and worker %s", queueID, pluginState.WorkerID)
-				p.metrics.statusUpdateNotFoundTimeout.Inc()
-
-				return core.DoTransition(core.PhaseInfoSystemRetryableFailure("unknown",
-					fmt.Sprintf("task status update not reported within grace period for queue %s and worker %s", queueID, pluginState.WorkerID), nil)), nil
-			} else if errors.Is(err, statusUpdateNotFoundError) || errors.Is(err, taskContextNotFoundError) {
-				phaseInfo = core.PhaseInfoRunning(pluginState.PhaseVersion, nil)
-			} else {
-				return core.UnknownTransition, err
-			}
-		} else if phase == core.PhaseSuccess {
-			taskTemplate, err := tCtx.TaskReader().Read(ctx)
-			if err != nil {
-				return core.UnknownTransition, err
-			}
-
-			// gather outputs if they exist
-			if taskTemplate.GetInterface() != nil && taskTemplate.GetInterface().GetOutputs() != nil && taskTemplate.GetInterface().GetOutputs().GetVariables() != nil {
-				outputReader := ioutils.NewRemoteFileOutputReader(ctx, tCtx.DataStore(), tCtx.OutputWriter(), 0)
-				err = tCtx.OutputWriter().Put(ctx, outputReader)
-				if err != nil {
-					return core.UnknownTransition, err
-				}
-			}
-
-			phaseInfo = core.PhaseInfoSuccess(nil)
-		} else if phase == core.PhaseRetryableFailure {
-			return core.DoTransition(core.PhaseInfoRetryableFailure("unknown", reason, nil)), nil
-		} else {
-			pluginState.PhaseVersion++
-			pluginState.LastUpdated = now
-			phaseInfo = core.PhaseInfoRunning(pluginState.PhaseVersion, nil)
+			return core.UnknownTransition, err
 		}
 	}
 
@@ -407,6 +285,226 @@ func (p *Plugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (co
 	}
 
 	return core.DoTransition(phaseInfo), nil
+}
+
+// trySubmitTask tries to submit the task to the worker pool. If successful, the resulting State will include SubmissionPhase.Submitted
+func (p *Plugin) trySubmitTask(ctx context.Context, tCtx core.TaskExecutionContext, executionEnv *idlcore.ExecutionEnv,
+	fastTaskEnvironment *pb.FastTaskEnvironment, initialState *State, taskID string) (*State, core.PhaseInfo, error) {
+	// read task template
+	taskTemplate, err := tCtx.TaskReader().Read(ctx)
+	if err != nil {
+		return nil, core.PhaseInfoUndefined, err
+	}
+
+	taskContainer := taskTemplate.GetContainer()
+	if taskContainer == nil {
+		return nil, core.PhaseInfoUndefined, flyteerrors.Errorf(flyteerrors.BadTaskSpecification, "unable to create container with no definition in TaskTemplate")
+	}
+
+	templateParameters := template.Parameters{
+		TaskExecMetadata: tCtx.TaskExecutionMetadata(),
+		Inputs:           tCtx.InputReader(),
+		OutputPath:       tCtx.OutputWriter(),
+		Task:             tCtx.TaskReader(),
+	}
+	command, err := template.Render(ctx, taskContainer.GetArgs(), templateParameters)
+	if err != nil {
+		return nil, core.PhaseInfoUndefined, err
+	}
+
+	// offer the work to the queue
+	queueID := fastTaskEnvironment.GetQueueId()
+	ownerID := tCtx.TaskExecutionMetadata().GetOwnerID()
+	workerID, err := p.fastTaskService.OfferOnQueue(ctx, queueID, taskID, ownerID.Namespace, ownerID.Name, command)
+	if err != nil {
+		return nil, core.PhaseInfoUndefined, err
+	}
+
+	pluginState := *initialState
+	var phaseInfo core.PhaseInfo
+	now := time.Now()
+	if len(workerID) > 0 {
+		// task was successfully submitted
+		pluginState.WorkerID = workerID
+		pluginState.SubmissionPhase = Submitted
+		pluginState.PhaseVersion = core.DefaultPhaseVersion
+		pluginState.SubmittedAt = now
+		pluginState.LastUpdated = now
+		phaseInfo = core.PhaseInfoQueued(now, pluginState.PhaseVersion, fmt.Sprintf("task offered to worker %s", workerID))
+	} else {
+		// task was not submmitted, get the status from the replicas
+		phaseInfo, err = p.getPhaseInfoFromReplicas(ctx, tCtx, executionEnv, queueID, &pluginState)
+		if err != nil {
+			return nil, core.PhaseInfoUndefined, err
+		}
+	}
+	return &pluginState, phaseInfo, nil
+}
+
+func (p *Plugin) getPhaseInfoFromReplicas(ctx context.Context, tCtx core.TaskExecutionContext,
+	executionEnv *idlcore.ExecutionEnv, queueID string, pluginState *State) (core.PhaseInfo, error) {
+
+	taskExecutionID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID()
+	executionEnvID := buildExecutionEnvID(taskExecutionID.GetTaskId(), executionEnv)
+	statuses, err := tCtx.GetExecutionEnvClient().Status(ctx, executionEnvID)
+	if err != nil {
+		return core.PhaseInfoUndefined, err
+	}
+
+	// fail if all replicas for this environment are in a failed state
+	allReplicasFailed := true
+	messageCollector := errorcollector.NewErrorMessageCollector()
+	statusesMap := statuses.(map[string]*v1.Pod)
+	index := 0
+	var phaseInfo core.PhaseInfo
+	for _, pod := range statusesMap {
+		if pod == nil {
+			// pod does not exist because it has not yet been populated in the kubeclient
+			// cache or was deleted. to be safe, we treat both as a non-failure state.
+			allReplicasFailed = false
+			break
+		}
+
+		now := time.Now()
+		phaseInfo, err = podplugin.DemystifyPodStatus(pod, core.TaskInfo{OccurredAt: &now})
+		if err != nil {
+			return core.PhaseInfoUndefined, err
+		}
+
+		switch phaseInfo.Phase() {
+		case core.PhasePermanentFailure, core.PhaseRetryableFailure:
+			if phaseInfo.Err() != nil {
+				messageCollector.Collect(index, phaseInfo.Err().GetMessage())
+			} else {
+				messageCollector.Collect(index, phaseInfo.Reason())
+			}
+		default:
+			allReplicasFailed = false
+		}
+
+		index++
+	}
+
+	if allReplicasFailed {
+		logger.Infof(ctx, "all workers have failed for queue %s", queueID)
+		p.metrics.allReplicasFailed.Inc()
+
+		phaseInfo = core.PhaseInfoSystemFailure("unknown", fmt.Sprintf("all workers have failed for queue %s\n%s",
+			queueID, messageCollector.Summary(maxErrorMessageLength)), nil)
+	} else {
+		pluginState.PhaseVersion = core.DefaultPhaseVersion
+		phaseInfo = core.PhaseInfoWaitingForResourcesInfo(time.Now(), pluginState.PhaseVersion, "no workers available", nil)
+	}
+	return phaseInfo, nil
+}
+
+func (p *Plugin) monitorTask(ctx context.Context, tCtx core.TaskExecutionContext, executionEnv *idlcore.ExecutionEnv,
+	fastTaskEnvironment *pb.FastTaskEnvironment, initialState *State, taskID string) (*State, core.PhaseInfo, error) {
+	queueID := fastTaskEnvironment.GetQueueId()
+	workerID := initialState.WorkerID
+	taskInfo, err := p.getTaskInfo(ctx, tCtx, initialState.SubmittedAt, time.Now(), executionEnv, queueID, initialState.WorkerID)
+	if err != nil {
+		return nil, core.PhaseInfoUndefined, err
+	}
+
+	// check the task status
+	pluginState := *initialState
+	var phaseInfo core.PhaseInfo
+	phase, reason, err := p.fastTaskService.CheckStatus(ctx, taskID, queueID, workerID)
+	if err != nil {
+		if errors.Is(err, statusUpdateNotFoundError) && time.Since(pluginState.LastUpdated) > GetConfig().GracePeriodStatusNotFound.Duration {
+			// if task has not been updated within the grace period we should abort
+			logger.Warnf(ctx, "Task status update not reported within grace period for queue %s and worker %s", queueID, workerID)
+			p.metrics.statusUpdateNotFoundTimeout.Inc()
+			phaseInfo = core.PhaseInfoSystemRetryableFailure("unknown", fmt.Sprintf("task status update not reported within grace period for queue %s and worker %s", queueID, pluginState.WorkerID), taskInfo)
+		} else if errors.Is(err, statusUpdateNotFoundError) || errors.Is(err, taskContextNotFoundError) {
+			phaseInfo = core.PhaseInfoRunning(pluginState.PhaseVersion, taskInfo)
+		} else {
+			return nil, core.PhaseInfoUndefined, err
+		}
+	} else {
+		pluginState.LastUpdated = time.Now()
+		switch phase {
+		case core.PhaseSuccess:
+			taskTemplate, err := tCtx.TaskReader().Read(ctx)
+			if err != nil {
+				return nil, core.PhaseInfoUndefined, err
+			}
+
+			// gather outputs if they exist
+			if taskTemplate.GetInterface() != nil && taskTemplate.GetInterface().GetOutputs() != nil && taskTemplate.GetInterface().GetOutputs().GetVariables() != nil {
+				outputReader := ioutils.NewRemoteFileOutputReader(ctx, tCtx.DataStore(), tCtx.OutputWriter(), 0)
+				err = tCtx.OutputWriter().Put(ctx, outputReader)
+				if err != nil {
+					return nil, core.PhaseInfoUndefined, err
+				}
+			}
+
+			phaseInfo = core.PhaseInfoSuccess(taskInfo)
+		case core.PhaseRetryableFailure:
+			phaseInfo = core.PhaseInfoRetryableFailure("unknown", reason, taskInfo)
+		default:
+			pluginState.PhaseVersion++
+			phaseInfo = core.PhaseInfoRunning(pluginState.PhaseVersion, taskInfo)
+		}
+	}
+	return &pluginState, phaseInfo, nil
+}
+
+func (p *Plugin) getTaskInfo(ctx context.Context, tCtx core.TaskExecutionContext,
+	start, end time.Time, executionEnv *idlcore.ExecutionEnv, queueID, workerID string) (*core.TaskInfo, error) {
+
+	taskExecutionID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID()
+	executionEnvID := buildExecutionEnvID(taskExecutionID.GetTaskId(), executionEnv)
+	statuses, err := tCtx.GetExecutionEnvClient().Status(ctx, executionEnvID)
+	if err != nil {
+		return nil, err
+	}
+
+	statusesMap := statuses.(map[string]*v1.Pod)
+	pod, ok := statusesMap[workerID]
+	if !ok {
+		return nil, flyteerrors.Errorf(flyteerrors.RuntimeFailure, "worker %s not found in status map", workerID)
+	}
+	if pod == nil {
+		// pod does not exist because it has not yet been populated in the kubeclient cache or was deleted
+		return &core.TaskInfo{}, nil
+	}
+
+	taskTemplate, err := tCtx.TaskReader().Read(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	containerIndex := 0
+	in := tasklog.Input{
+		Namespace:            pod.Namespace,
+		PodName:              pod.Name,
+		PodUID:               string(pod.GetUID()),
+		ContainerName:        pod.Spec.Containers[containerIndex].Name,
+		ContainerID:          pod.Status.ContainerStatuses[containerIndex].ContainerID,
+		LogName:              " (worker)",
+		PodRFC3339StartTime:  start.Format(time.RFC3339),
+		PodRFC3339FinishTime: end.Format(time.RFC3339),
+		PodUnixStartTime:     start.Unix(),
+		PodUnixFinishTime:    end.Unix(),
+		HostName:             pod.Spec.Hostname,
+		TaskTemplate:         taskTemplate,
+	}
+	logPlugin, err := logs.InitializeLogPlugins(&p.cfg.Logs)
+	if err != nil {
+		return nil, err
+	}
+
+	logs, err := logPlugin.GetTaskLogs(in)
+	if err != nil {
+		return nil, err
+	}
+
+	return &core.TaskInfo{
+		Logs: logs.TaskLogs,
+	}, nil
+
 }
 
 // Abort halts the specified task execution.
@@ -463,6 +561,7 @@ func init() {
 				}()
 
 				return &Plugin{
+					cfg:             GetConfig(),
 					fastTaskService: fastTaskService,
 					metrics:         newPluginMetrics(iCtx.MetricsScope()),
 				}, nil

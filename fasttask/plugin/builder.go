@@ -278,6 +278,8 @@ func (i *InMemoryEnvBuilder) createPod(ctx context.Context, fastTaskEnvironmentS
 	container.Args = append(container.Args,
 		"--queue-id",
 		executionEnvID,
+		"--worker-id",
+		podName,
 		"--fasttask-url",
 		GetConfig().CallbackURI,
 	)

@@ -4,6 +4,7 @@ import (
 	"time"
 
 	pluginsConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/config"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 )
 
@@ -21,6 +22,9 @@ var (
 		NonceLength:               12,
 		TaskStatusBufferSize:      512,
 		AdditionalWorkerArgs:      []string{},
+		Logs: logs.LogConfig{
+			IsKubernetesEnabled: true,
+		},
 	}
 
 	configSection = pluginsConfig.MustRegisterSubSection("fasttask", defaultConfig)
@@ -37,6 +41,7 @@ type Config struct {
 	NonceLength               int             `json:"nonce-length" pflag:",The length of the nonce value to uniquely link a fasttask replica to the environment instance, ensuring fast turnover of environments regardless of cache freshness."`
 	TaskStatusBufferSize      int             `json:"task-status-buffer-size" pflag:",The size of the task status buffer for each task."`
 	AdditionalWorkerArgs      []string        `json:"additional-worker-args" pflag:",Additional arguments to pass to the fasttask worker binary."`
+	Logs                      logs.LogConfig  `json:"logs" pflag:",Log configuration for fasttasks"`
 }
 
 func GetConfig() *Config {

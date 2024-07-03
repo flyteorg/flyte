@@ -23,10 +23,18 @@ pub struct BridgeArgs {
         short,
         long,
         value_name = "QUEUE_ID",
-        default_value = "foo",
+        required = true,
         help = "fasttask queue to listen on for tasks"
     )]
     pub queue_id: String,
+    #[arg(
+        short,
+        long,
+        value_name = "WORKER_ID",
+        required = true,
+        help = "worker id to register with fasttask service"
+    )]
+    pub worker_id: String,
     #[arg(
         short = 'i',
         long,

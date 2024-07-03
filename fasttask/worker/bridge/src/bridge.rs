@@ -83,7 +83,7 @@ impl Heartbeater {
 
 pub async fn run(args: BridgeArgs) -> Result<(), Box<dyn std::error::Error>> {
     let executor_registration_addr = args.executor_registration_addr;
-    let worker_id = Uuid::new_v4().to_string(); // generate a random worker_id so that it is different on restart
+    let worker_id = args.worker_id;
     let (task_status_tx, task_status_rx) = async_channel::unbounded();
     let task_statuses: Arc<RwLock<Vec<TaskStatus>>> = Arc::new(RwLock::new(vec![]));
     let heartbeat_bool = Arc::new(Mutex::new(AsyncBool::new()));
