@@ -490,11 +490,11 @@ type EmailServerConfig struct {
 	// Only one of these should be set.
 	APIKeyEnvVar           string `json:"apiKeyEnvVar"`
 	APIKeyFilePath         string `json:"apiKeyFilePath"`
-	SmtpServer             string `json:"smtpServer"`
-	SmtpPort               string `json:"smtpPort"`
-	SmtpSkipTLSVerify      bool   `json:"smtpSkipTLSVerify"`
-	SmtpUsername           string `json:"smtpUsername"`
-	SmtpPasswordSecretName string `json:"smtpPasswordSecretName"`
+	SMTPServer             string `json:"smtpServer"`
+	SMTPPort               string `json:"smtpPort"`
+	SMTPSkipTLSVerify      bool   `json:"smtpSkipTLSVerify"`
+	SMTPUsername           string `json:"smtpUsername"`
+	SMTPPasswordSecretName string `json:"smtpPasswordSecretName"`
 }
 
 // This section handles the configuration of notifications emails.

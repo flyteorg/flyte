@@ -58,8 +58,8 @@ func GetEmailer(config runtimeInterfaces.NotificationsConfig, scope promutils.Sc
 		switch config.NotificationsEmailerConfig.EmailerConfig.ServiceName {
 		case implementations.Sendgrid:
 			return implementations.NewSendGridEmailer(config, scope)
-		case implementations.Smtp:
-			return implementations.NewSmtpEmailer(context.Background(), config, scope, sm)
+		case implementations.SMTP:
+			return implementations.NewSMTPEmailer(context.Background(), config, scope, sm)
 		default:
 			panic(fmt.Errorf("No matching email implementation for %s", config.NotificationsEmailerConfig.EmailerConfig.ServiceName))
 		}

@@ -16,16 +16,16 @@ import (
 	"strings"
 )
 
-type SmtpEmailer struct {
+type SMTPEmailer struct {
 	config        *runtimeInterfaces.NotificationsEmailerConfig
 	systemMetrics emailMetrics
 	tlsConf       *tls.Config
 	auth          *smtp.Auth
 }
 
-func (s *SmtpEmailer) SendEmail(ctx context.Context, email admin.EmailMessage) error {
+func (s *SMTPEmailer) SendEmail(ctx context.Context, email admin.EmailMessage) error {
 
-	newClient, err := smtp.Dial(s.config.EmailerConfig.SmtpServer + ":" + s.config.EmailerConfig.SmtpPort)
+	newClient, err := smtp.Dial(s.config.EmailerConfig.SMTPServer + ":" + s.config.EmailerConfig.SMTPPort)
 
 	if err != nil {
 		return s.emailError(ctx, fmt.Sprintf("Error creating email client: %s", err))
@@ -65,13 +65,7 @@ func (s *SmtpEmailer) SendEmail(ctx context.Context, email admin.EmailMessage) e
 		return s.emailError(ctx, fmt.Sprintf("Error adding email recipient: %s", err))
 	}
 
-	mailBody, err := createMailBody(s.config.Sender, email)
-
-	if err != nil {
-		return s.emailError(ctx, fmt.Sprintf("Error creating email body: %s", err))
-	}
-
-	_, err = writer.Write([]byte(mailBody))
+	_, err = writer.Write([]byte(createMailBody(s.config.Sender, email)))
 
 	if err != nil {
 		return s.emailError(ctx, fmt.Sprintf("Error writing mail body: %s", err))
@@ -93,13 +87,13 @@ func (s *SmtpEmailer) SendEmail(ctx context.Context, email admin.EmailMessage) e
 	return nil
 }
 
-func (s *SmtpEmailer) emailError(ctx context.Context, error string) error {
+func (s *SMTPEmailer) emailError(ctx context.Context, error string) error {
 	s.systemMetrics.SendError.Inc()
 	logger.Error(ctx, error)
 	return errors.NewFlyteAdminErrorf(codes.Internal, "errors were seen while sending emails")
 }
 
-func createMailBody(emailSender string, email admin.EmailMessage) (string, error) {
+func createMailBody(emailSender string, email admin.EmailMessage) string {
 	headerMap := make(map[string]string)
 	headerMap["From"] = emailSender
 	headerMap["To"] = strings.Join(email.RecipientsEmail, ",")
@@ -114,27 +108,27 @@ func createMailBody(emailSender string, email admin.EmailMessage) (string, error
 
 	mailMessage += "\r\n" + email.Body
 
-	return mailMessage, nil
+	return mailMessage
 }
 
-func NewSmtpEmailer(ctx context.Context, config runtimeInterfaces.NotificationsConfig, scope promutils.Scope, sm core.SecretManager) interfaces.Emailer {
+func NewSMTPEmailer(ctx context.Context, config runtimeInterfaces.NotificationsConfig, scope promutils.Scope, sm core.SecretManager) interfaces.Emailer {
 	var tlsConfiguration *tls.Config
 	emailConf := config.NotificationsEmailerConfig.EmailerConfig
 
-	smtpPassword, err := sm.Get(ctx, emailConf.SmtpPasswordSecretName)
+	smtpPassword, err := sm.Get(ctx, emailConf.SMTPPasswordSecretName)
 	if err != nil {
 		logger.Debug(ctx, "No SMTP password found.")
 		smtpPassword = ""
 	}
 
-	auth := smtp.PlainAuth("", emailConf.SmtpUsername, smtpPassword, emailConf.SmtpServer)
+	auth := smtp.PlainAuth("", emailConf.SMTPUsername, smtpPassword, emailConf.SMTPServer)
 
 	tlsConfiguration = &tls.Config{
-		InsecureSkipVerify: emailConf.SmtpSkipTLSVerify,
-		ServerName:         emailConf.SmtpServer,
+		InsecureSkipVerify: emailConf.SMTPSkipTLSVerify,
+		ServerName:         emailConf.SMTPServer,
 	}
 
-	return &SmtpEmailer{
+	return &SMTPEmailer{
 		config:        &config.NotificationsEmailerConfig,
 		systemMetrics: newEmailMetrics(scope.NewSubScope("smtp")),
 		tlsConf:       tlsConfiguration,
