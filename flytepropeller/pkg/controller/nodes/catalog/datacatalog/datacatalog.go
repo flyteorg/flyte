@@ -207,7 +207,8 @@ func (m *CatalogClient) prepareInputsAndOutputs(ctx context.Context, key catalog
 
 // createArtifact creates an Artifact in datacatalog including its associated ArtifactData and tags it with a hash of
 // the provided input values for retrieval.
-func (m *CatalogClient) createArtifact(ctx context.Context, key catalog.Key, datasetID *datacatalog.DatasetID, inputs *core.LiteralMap, outputs *core.LiteralMap, metadata catalog.Metadata) (catalog.Status, error) {
+func (m *CatalogClient) createArtifact(ctx context.Context, key catalog.Key, datasetID *datacatalog.DatasetID,
+	inputs *core.InputData, outputs *core.OutputData, metadata catalog.Metadata) (catalog.Status, error) {
 	logger.Debugf(ctx, "Creating artifact for key %+v, dataset %+v and execution %+v", key, datasetID, metadata)
 
 	// Create the artifact for the execution that belongs in the task
@@ -264,7 +265,8 @@ func (m *CatalogClient) createArtifact(ctx context.Context, key catalog.Key, dat
 }
 
 // updateArtifact overwrites the ArtifactData of an existing artifact with the provided data in datacatalog.
-func (m *CatalogClient) updateArtifact(ctx context.Context, key catalog.Key, datasetID *datacatalog.DatasetID, inputs *core.LiteralMap, outputs *core.LiteralMap, metadata catalog.Metadata) (catalog.Status, error) {
+func (m *CatalogClient) updateArtifact(ctx context.Context, key catalog.Key, datasetID *datacatalog.DatasetID,
+	inputs *core.InputData, outputs *core.OutputData, metadata catalog.Metadata) (catalog.Status, error) {
 	logger.Debugf(ctx, "Updating artifact for key %+v, dataset %+v and execution %+v", key, datasetID, metadata)
 
 	artifactDataList := make([]*datacatalog.ArtifactData, 0, len(outputs.GetOutputs().GetLiterals()))

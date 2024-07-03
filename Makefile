@@ -157,4 +157,3 @@ spellcheck:
 .PHONY: clean
 clean: ## Remove the HTML files related to the Flyteconsole and Makefile
 	rm -rf cmd/single/dist .tmp_build
->>>>>>> 2407e906c9efc2b5b3bb26bf1fe298277abf4a62

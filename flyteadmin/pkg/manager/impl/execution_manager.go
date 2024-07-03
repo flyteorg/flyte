@@ -563,7 +563,7 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 		executionClusterLabel = requestSpec.ExecutionClusterLabel
 	}
 	executionParameters := workflowengineInterfaces.ExecutionParameters{
-		Inputs:                executionInputs,
+		InputData:             executionInputs,
 		AcceptedAt:            requestedAt,
 		Labels:                labels,
 		Annotations:           annotations,
@@ -971,7 +971,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 	}
 
 	executionParameters := workflowengineInterfaces.ExecutionParameters{
-		Inputs:                executionInputs,
+		InputData:             executionInputs,
 		AcceptedAt:            requestedAt,
 		Labels:                labels,
 		Annotations:           annotations,

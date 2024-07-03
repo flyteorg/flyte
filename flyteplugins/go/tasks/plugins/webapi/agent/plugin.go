@@ -147,7 +147,7 @@ func (p *Plugin) ExecuteTaskSync(
 	ctx context.Context,
 	client service.SyncAgentServiceClient,
 	header *admin.CreateRequestHeader,
-	inputs *flyteIdl.LiteralMap,
+	inputs *flyteIdl.InputData,
 ) (webapi.ResourceMeta, webapi.Resource, error) {
 	stream, err := client.ExecuteTaskSync(ctx)
 	if err != nil {
@@ -166,7 +166,7 @@ func (p *Plugin) ExecuteTaskSync(
 	}
 	inputsProto := &admin.ExecuteTaskSyncRequest{
 		Part: &admin.ExecuteTaskSyncRequest_Inputs{
-			Inputs: inputs,
+			Inputs: inputs.GetInputs(),
 		},
 	}
 	err = stream.Send(inputsProto)
@@ -350,7 +350,7 @@ func (p *Plugin) getFinalAgent(taskCategory *admin.TaskCategory, cfg *Config) (*
 	return &cfg.DefaultAgent, false
 }
 
-func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, outputs *flyteIdl.LiteralMap) error {
+func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, outputs *flyteIdl.OutputData) error {
 	taskTemplate, err := taskCtx.TaskReader().Read(ctx)
 	if err != nil {
 		return err

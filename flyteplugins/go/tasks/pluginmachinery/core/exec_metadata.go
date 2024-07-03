@@ -53,9 +53,5 @@ type TaskExecutionMetadata interface {
 	GetPlatformResources() *v1.ResourceRequirements
 	GetInterruptibleFailureThreshold() int32
 	GetEnvironmentVariables() map[string]string
-<<<<<<< HEAD
-	//GetRuntime() string
-=======
 	GetConsoleURL() string
->>>>>>> 2407e906c9efc2b5b3bb26bf1fe298277abf4a62
 }
