@@ -21,7 +21,7 @@ func getNotificationsEmailerConfig() interfaces.NotificationsConfig {
 		NotificationsProcessorConfig: interfaces.NotificationsProcessorConfig{},
 		NotificationsEmailerConfig: interfaces.NotificationsEmailerConfig{
 			EmailerConfig: interfaces.EmailServerConfig{
-				ServiceName:            Smtp,
+				ServiceName:            SMTP,
 				SmtpServer:             "smtpServer",
 				SmtpPort:               "smtpPort",
 				SmtpUsername:           "smtpUsername",
@@ -54,7 +54,7 @@ func TestNewSmtpEmailer(t *testing.T) {
 
 	notificationsConfig := getNotificationsEmailerConfig()
 
-	smtpEmailer := NewSmtpEmailer(context.Background(), notificationsConfig, promutils.NewTestScope(), &secretManagerMock)
+	smtpEmailer := NewSMTPEmailer(context.Background(), notificationsConfig, promutils.NewTestScope(), &secretManagerMock)
 
 	assert.NotNil(t, smtpEmailer)
 }
