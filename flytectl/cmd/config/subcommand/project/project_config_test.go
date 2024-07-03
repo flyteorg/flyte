@@ -7,7 +7,6 @@ import (
 	"github.com/flyteorg/flyte/flytectl/clierrors"
 	"github.com/flyteorg/flyte/flytectl/cmd/config"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-
 	"github.com/stretchr/testify/assert"
 )
 

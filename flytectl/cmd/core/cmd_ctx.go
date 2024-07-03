@@ -3,9 +3,8 @@ package cmdcore
 import (
 	"io"
 
-	"github.com/flyteorg/flyte/flyteidl/clients/go/admin"
-
 	"github.com/flyteorg/flyte/flytectl/pkg/ext"
+	"github.com/flyteorg/flyte/flyteidl/clients/go/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 )
 

@@ -52,7 +52,7 @@ func (r *ResourceLevelMonitor) collect(ctx context.Context) {
 	list := metav1.PartialObjectMetadataList{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       r.gvk.Kind,
-			APIVersion: r.gvk.Version,
+			APIVersion: r.gvk.GroupVersion().String(),
 		},
 	}
 	if err := r.cache.List(ctx, &list); err != nil {

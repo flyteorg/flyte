@@ -47,6 +47,8 @@ func (w *ContextualWorkflow) GetExecutionConfig() v1alpha1.ExecutionConfig {
 	return v1alpha1.ExecutionConfig{}
 }
 
+func (w *ContextualWorkflow) GetConsoleURL() string { return "" }
+
 type WorkflowPrinter struct {
 }
 

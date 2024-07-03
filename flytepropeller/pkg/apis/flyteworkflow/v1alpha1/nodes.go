@@ -224,11 +224,18 @@ func (in *NodeSpec) GetOutputAlias() []Alias {
 	return in.OutputAliases
 }
 
+// In functions below, explicitly strip out nil type information because NodeSpec's WorkflowNode is a struct type,
+// not interface and downstream nil checks will not pass.
+// See the test in TestPointersForNodeSpec for more information.
+
 func (in *NodeSpec) GetWorkflowNode() ExecutableWorkflowNode {
-	if in.WorkflowNode == nil {
-		return nil
+	if in != nil {
+		if in.WorkflowNode == nil {
+			return nil
+		}
+		return in.WorkflowNode
 	}
-	return in.WorkflowNode
+	return nil
 }
 
 func (in *NodeSpec) GetBranchNode() ExecutableBranchNode {

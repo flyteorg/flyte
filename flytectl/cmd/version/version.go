@@ -6,11 +6,9 @@ import (
 	"fmt"
 	"runtime"
 
-	"github.com/flyteorg/flyte/flytectl/pkg/github"
-
-	"github.com/flyteorg/flyte/flytectl/pkg/platformutil"
-
 	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
+	"github.com/flyteorg/flyte/flytectl/pkg/github"
+	"github.com/flyteorg/flyte/flytectl/pkg/platformutil"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	stdlibversion "github.com/flyteorg/flyte/flytestdlib/version"
@@ -53,7 +51,7 @@ func GetVersionCommand(rootCmd *cobra.Command) map[string]cmdCore.CommandEntry {
 
 func getVersion(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
 	goos := platformutil.Platform(runtime.GOOS)
-	version, err := github.FlytectlReleaseConfig.GetLatestVersion()
+	version, err := github.FlytectlReleaseConfig.Provider.(*github.GHProvider).GetCleanLatestVersion()
 	if err != nil {
 		logger.Error(ctx, "Unable to get the latest version because %v", err)
 	} else {

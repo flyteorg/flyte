@@ -13,9 +13,7 @@ import (
 	"github.com/flyteorg/flyte/flytectl/pkg/util"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	stdlibversion "github.com/flyteorg/flyte/flytestdlib/version"
-
 	"github.com/google/go-github/v42/github"
-	"github.com/mouuff/go-rocket-update/pkg/provider"
 	"github.com/mouuff/go-rocket-update/pkg/updater"
 	"golang.org/x/oauth2"
 	"golang.org/x/text/cases"
@@ -40,9 +38,10 @@ var Client GHRepoService
 
 // FlytectlReleaseConfig represent the updater config for flytectl binary
 var FlytectlReleaseConfig = &updater.Updater{
-	Provider: &provider.Github{
+	Provider: &GHProvider{
 		RepositoryURL: flytectlRepository,
 		ArchiveName:   getFlytectlAssetName(),
+		ghRepo:        GetGHRepoService(),
 	},
 	ExecutableName: flytectl,
 	Version:        stdlibversion.Version,

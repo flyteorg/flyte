@@ -5,8 +5,9 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
-import { RestartPolicy, RunPolicy } from "./common_pb.js";
+import { RunPolicy } from "./common_pb.js";
 import { Resources } from "../../core/tasks_pb.js";
+import { CommonReplicaSpec, RestartPolicy } from "../common_pb.js";
 
 /**
  * Proto for plugin that enables distributed training using https://github.com/kubeflow/mpi-operator
@@ -82,30 +83,35 @@ export class DistributedMPITrainingTask extends Message<DistributedMPITrainingTa
  */
 export class DistributedMPITrainingReplicaSpec extends Message<DistributedMPITrainingReplicaSpec> {
   /**
+   * 1~4 deprecated. Use common instead.
    * Number of replicas
    *
-   * @generated from field: int32 replicas = 1;
+   * @generated from field: int32 replicas = 1 [deprecated = true];
+   * @deprecated
    */
   replicas = 0;
 
   /**
    * Image used for the replica group
    *
-   * @generated from field: string image = 2;
+   * @generated from field: string image = 2 [deprecated = true];
+   * @deprecated
    */
   image = "";
 
   /**
    * Resources required for the replica group
    *
-   * @generated from field: flyteidl.core.Resources resources = 3;
+   * @generated from field: flyteidl.core.Resources resources = 3 [deprecated = true];
+   * @deprecated
    */
   resources?: Resources;
 
   /**
    * Restart policy determines whether pods will be restarted when they exit
    *
-   * @generated from field: flyteidl.plugins.kubeflow.RestartPolicy restart_policy = 4;
+   * @generated from field: flyteidl.plugins.RestartPolicy restart_policy = 4 [deprecated = true];
+   * @deprecated
    */
   restartPolicy = RestartPolicy.NEVER;
 
@@ -115,6 +121,13 @@ export class DistributedMPITrainingReplicaSpec extends Message<DistributedMPITra
    * @generated from field: repeated string command = 5;
    */
   command: string[] = [];
+
+  /**
+   * The common replica spec
+   *
+   * @generated from field: flyteidl.plugins.CommonReplicaSpec common = 6;
+   */
+  common?: CommonReplicaSpec;
 
   constructor(data?: PartialMessage<DistributedMPITrainingReplicaSpec>) {
     super();
@@ -129,6 +142,7 @@ export class DistributedMPITrainingReplicaSpec extends Message<DistributedMPITra
     { no: 3, name: "resources", kind: "message", T: Resources },
     { no: 4, name: "restart_policy", kind: "enum", T: proto3.getEnumType(RestartPolicy) },
     { no: 5, name: "command", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 6, name: "common", kind: "message", T: CommonReplicaSpec },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DistributedMPITrainingReplicaSpec {

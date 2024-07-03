@@ -122,6 +122,7 @@ func dummyContainerTaskMetadata(resources *v1.ResourceRequirements, extendedReso
 	taskMetadata.On("GetOverrides").Return(to)
 	taskMetadata.On("IsInterruptible").Return(true)
 	taskMetadata.On("GetEnvironmentVariables").Return(nil)
+	taskMetadata.OnGetConsoleURL().Return("")
 	return taskMetadata
 }
 

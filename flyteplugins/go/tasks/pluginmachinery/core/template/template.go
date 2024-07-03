@@ -64,10 +64,11 @@ func (e ErrorCollection) Error() string {
 
 // Parameters struct is used by the Templating Engine to replace the templated parameters
 type Parameters struct {
-	TaskExecMetadata core.TaskExecutionMetadata
-	Inputs           io.InputReader
-	OutputPath       io.OutputFilePaths
-	Task             core.TaskTemplatePath
+	TaskExecMetadata  core.TaskExecutionMetadata
+	Inputs            io.InputReader
+	OutputPath        io.OutputFilePaths
+	Task              core.TaskTemplatePath
+	IncludeConsoleURL bool
 }
 
 // Render Evaluates templates in each command with the equivalent value from passed args. Templates are case-insensitive

@@ -4,9 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/flyteorg/flyte/flytestdlib/config"
-
 	"github.com/flyteorg/flyte/flytectl/pkg/printer"
+	"github.com/flyteorg/flyte/flytestdlib/config"
 )
 
 var (
