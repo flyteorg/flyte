@@ -42,7 +42,7 @@ Chart for basic single Flyte executable deployment
 | configuration.auth.oidc.clientId | string | `""` |  |
 | configuration.auth.oidc.clientSecret | string | `""` |  |
 | configuration.co-pilot.image.repository | string | `"cr.flyte.org/flyteorg/flytecopilot"` |  |
-| configuration.co-pilot.image.tag | string | `"v1.13.0-rc0"` |  |
+| configuration.co-pilot.image.tag | string | `"v1.13.0"` |  |
 | configuration.database.dbname | string | `"flyte"` |  |
 | configuration.database.host | string | `"127.0.0.1"` |  |
 | configuration.database.options | string | `"sslmode=disable"` |  |
