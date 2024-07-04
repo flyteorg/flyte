@@ -138,6 +138,7 @@ func makeCmdListModel(m *listModel, c *cobra.Command) error {
 	}
 	l := makeList(items, "")
 	m.list = l
+
 	return nil
 }
 
@@ -179,6 +180,10 @@ func makeListModel(m *listModel, item string) error {
 
 func initCmdCtx() error {
 	ctx := context.Background()
+	err := rootCmd.PersistentPreRunE(rootCmd, []string{})
+	if err != nil {
+		return err
+	}
 	adminCfg := admin.GetConfig(ctx)
 	clientSet, err := admin.ClientSetBuilder().WithConfig(admin.GetConfig(ctx)).
 		WithTokenCache(pkce.NewTokenCacheKeyringProvider(
@@ -189,6 +194,7 @@ func initCmdCtx() error {
 		return err
 	}
 	cmdCtx = cmdcore.NewCommandContext(clientSet, nil)
+
 	return nil
 }
 
