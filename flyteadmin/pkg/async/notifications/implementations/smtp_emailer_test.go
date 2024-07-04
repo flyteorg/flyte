@@ -22,10 +22,10 @@ func getNotificationsEmailerConfig() interfaces.NotificationsConfig {
 		NotificationsEmailerConfig: interfaces.NotificationsEmailerConfig{
 			EmailerConfig: interfaces.EmailServerConfig{
 				ServiceName:            SMTP,
-				SmtpServer:             "smtpServer",
-				SmtpPort:               "smtpPort",
-				SmtpUsername:           "smtpUsername",
-				SmtpPasswordSecretName: "smtp_password",
+				SMTPServer:             "smtpServer",
+				SMTPPort:               "smtpPort",
+				SMTPUsername:           "smtpUsername",
+				SMTPPasswordSecretName: "smtp_password",
 			},
 			Subject: "subject",
 			Sender:  "sender",
@@ -42,9 +42,7 @@ func TestEmailCreation(t *testing.T) {
 		SenderEmail:     "sender@sender.com",
 	}
 
-	body, err := createMailBody("sender@sender.com", email)
-
-	assert.NoError(t, err)
+	body := createMailBody("sender@sender.com", email)
 	assert.Equal(t, "From: sender@sender.com\r\nTo: john@doe.com,teresa@tester.com\r\nSubject: subject\r\nContent-Type: text/html; charset=\"UTF-8\"\r\n\r\nEmail Body", body)
 }
 
