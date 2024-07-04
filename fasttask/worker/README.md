@@ -1,7 +1,7 @@
 # Union.ai Actors
 
-This package enables Union.ai actors. To use actors install `unionai` by:
+This package enables Union.ai actors. To use actors install `union` by:
 
 ```bash
-pip install unionai
+pip install union
 ```
