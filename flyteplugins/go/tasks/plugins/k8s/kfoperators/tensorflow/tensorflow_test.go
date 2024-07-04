@@ -7,7 +7,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/protobuf/jsonpb"
 	structpb "github.com/golang/protobuf/ptypes/struct"
 	commonOp "github.com/kubeflow/common/pkg/apis/common/v1"
 	kubeflowv1 "github.com/kubeflow/training-operator/pkg/apis/kubeflow.org/v1"
@@ -29,6 +28,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/kfoperators/common"
+	stdlibUtils "github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 const testImage = "image://"
@@ -100,7 +100,7 @@ func dummyTensorFlowTaskTemplate(id string, args ...interface{}) *core.TaskTempl
 
 	structObj := structpb.Struct{}
 
-	err = jsonpb.UnmarshalString(tfObjJSON, &structObj)
+	err = stdlibUtils.UnmarshalStringToPb(tfObjJSON, &structObj)
 	if err != nil {
 		panic(err)
 	}
