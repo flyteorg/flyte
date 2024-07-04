@@ -22,111 +22,46 @@ type Command struct {
 }
 
 var (
+	cmdCtx        cmdcore.CommandContext
 	rootCmd       *cobra.Command
-	targetCmd     *cobra.Command
-	args          []string
-	isCommand     = true
+	runnableCmd   *cobra.Command
+	curArgs       []string
 	unhandleFlags []string
 	existingFlags []string
+	commandMap          = map[string]Command{}
+	isCommand           = true
 	listErrMsg    error = nil
 )
-var (
-	domainName    = [3]string{"development", "staging", "production"}
-	nameToCommand = map[string]Command{}
-)
-
-// Generate a []list.Item of cmd's subcommands
-func makeSubCmdItems(cmd *cobra.Command) []list.Item {
-	items := []list.Item{}
-
-	for _, subcmd := range cmd.Commands() {
-		subCmdName := strings.Fields(subcmd.Use)[0]
-		nameToCommand[subCmdName] = Command{
-			Cmd:   subcmd,
-			Name:  subCmdName,
-			Short: subcmd.Short,
-		}
-		items = append(items, item(subCmdName))
-	}
-
-	return items
-}
 
 // Generate list.Model for domain names
-func makeDomainListModel(m *listModel) {
-	items := []list.Item{}
-	for _, domain := range domainName {
-		items = append(items, item(domain))
-	}
-
-	m.list = makeList(items, "Please choose one of the domains")
-}
-
-// Get the "get" "project" cobra.Command item
-func extractGetProjectCmd() *cobra.Command {
-	var getCmd *cobra.Command
-	var getProjectCmd *cobra.Command
-
-	for _, cmd := range rootCmd.Commands() {
-		if cmd.Use == "get" {
-			getCmd = cmd
-			break
-		}
-	}
-	for _, cmd := range getCmd.Commands() {
-		if cmd.Use == "project" {
-			getProjectCmd = cmd
-			break
-		}
-	}
-	return getProjectCmd
-}
-
-// Get all the project names from the configured endpoint
-func getProjects(getProjectCmd *cobra.Command) ([]string, error) {
+func makeDomainListModel(m *listModel) error {
 	ctx := context.Background()
-	err := rootCmd.PersistentPreRunE(rootCmd, []string{})
-	if err != nil {
-		return nil, err
-	}
-	adminCfg := admin.GetConfig(ctx)
-
-	clientSet, err := admin.ClientSetBuilder().WithConfig(admin.GetConfig(ctx)).
-		WithTokenCache(pkce.NewTokenCacheKeyringProvider(
-			pkce.KeyRingServiceName,
-			fmt.Sprintf("%s:%s", adminCfg.Endpoint.String(), pkce.KeyRingServiceUser),
-		)).Build(ctx)
-	if err != nil {
-		return nil, err
-	}
-	cmdCtx := cmdcore.NewCommandContext(clientSet, getProjectCmd.OutOrStdout())
-
-	projects, err := cmdCtx.AdminFetcherExt().ListProjects(ctx, project.DefaultConfig.Filter)
-	if err != nil {
-		return nil, err
-	}
-
-	projectNames := []string{}
-	for _, p := range projects.Projects {
-		projectNames = append(projectNames, p.Id)
-	}
-
-	return projectNames, nil
-}
-
-// Generate list.Model for project names from the configured endpoint
-func makeProjectListModel(m *listModel) error {
-	getProjectCmd := extractGetProjectCmd()
-	projects, err := getProjects(getProjectCmd)
+	domains, err := cmdCtx.AdminFetcherExt().GetDomains(ctx)
 	if err != nil {
 		return err
 	}
 
 	items := []list.Item{}
-	for _, project := range projects {
-		items = append(items, item(project))
+	for _, domain := range domains.Domains {
+		items = append(items, item(domain.Id))
+	}
+	m.list = makeList(items, "Please choose one of the domains")
+
+	return nil
+}
+
+// Generate list.Model for project names from the configured endpoint
+func makeProjectListModel(m *listModel) error {
+	ctx := context.Background()
+	projects, err := cmdCtx.AdminFetcherExt().ListProjects(ctx, project.DefaultConfig.Filter)
+	if err != nil {
+		return err
 	}
 
+	items := []list.Item{}
+	for _, p := range projects.Projects {
+		items = append(items, item(p.Id))
+	}
 	m.list = makeList(items, "Please choose one of the projects")
 
 	return nil
@@ -138,16 +73,16 @@ func makeFlagListModel(m *listModel) error {
 	// If flag already specified by user, skip.
 	for i < len(unhandleFlags) {
 		if unhandleFlags[i][0:2] == "--" {
-			if !targetCmd.Flags().Lookup(strings.TrimPrefix(unhandleFlags[i], "--")).Changed {
+			if !runnableCmd.Flags().Lookup(strings.TrimPrefix(unhandleFlags[i], "--")).Changed {
 				break
 			}
 		} else if unhandleFlags[i][0] == '-' {
 			if unhandleFlags[i] == "-h" {
-				args = append(args, "-h")
+				curArgs = append(curArgs, "-h")
 				m.quitting = true
 				return nil
 			}
-			if !targetCmd.Flags().ShorthandLookup(strings.TrimPrefix(unhandleFlags[i], "-")).Changed {
+			if !runnableCmd.Flags().ShorthandLookup(strings.TrimPrefix(unhandleFlags[i], "-")).Changed {
 				break
 			}
 		}
@@ -159,35 +94,51 @@ func makeFlagListModel(m *listModel) error {
 	}
 
 	flag := unhandleFlags[i]
-
 	unhandleFlags = unhandleFlags[i+1:]
-
 	switch flag {
 	case "-p":
-		args = append(args, flag)
+		curArgs = append(curArgs, flag)
 		err := makeProjectListModel(m)
 		if err != nil {
 			return err
 		}
 	case "-d":
-		args = append(args, flag)
+		curArgs = append(curArgs, flag)
 		makeDomainListModel(m)
-	case "--file":
-		m.pendingInputFlags = []string{"--file", "--foo", "--bar"}
-		m.textInputs = makeTextInputModel(m.pendingInputFlags)
-		m.curView = inputView
-		m.textInputTitle = "Enter path to a flyte package file. Flyte packages are tgz files generated by pyflyte or jflyte:"
 	}
 
 	return nil
 }
 
+// Generate a []list.Item of cmd's subcommands
+func makeSubCmdItems(cmd *cobra.Command) []list.Item {
+	items := []list.Item{}
+
+	for _, subcmd := range cmd.Commands() {
+		subCmdName := strings.Fields(subcmd.Use)[0]
+		commandMap[subCmdName] = Command{
+			Cmd:   subcmd,
+			Name:  subCmdName,
+			Short: subcmd.Short,
+		}
+		items = append(items, item(subCmdName))
+	}
+
+	return items
+}
+
 // Generate list.Model of subcommands from a given command
-func makeCmdListModel(m *listModel, c *cobra.Command) {
+func makeCmdListModel(m *listModel, c *cobra.Command) error {
 	items := makeSubCmdItems(c)
+	// If no subcommands, but also not captured by commandFlagMap,
+	// means this command is not supported in bubbletea list yet.
+	if len(items) == 0 {
+		listErrMsg = fmt.Errorf("this command is not supported in interactive mode yet")
+		return listErrMsg
+	}
 	l := makeList(items, "")
 	m.list = l
-
+	return nil
 }
 
 // Generate list.Model after user chose one of the item
@@ -195,14 +146,18 @@ func makeListModel(m *listModel, item string) error {
 	// Still in the stage of handling subcommands
 	if isCommand {
 		var ok bool
-		// check if we reach a runnable command
-		if unhandleFlags, ok = commandFlagMap[sliceToString(args)]; !ok {
-			makeCmdListModel(m, nameToCommand[item].Cmd)
+		// Check if we reach a runnable command
+		if unhandleFlags, ok = commandFlagMap[sliceToString(curArgs)]; !ok {
+			err := makeCmdListModel(m, commandMap[item].Cmd)
+			if err != nil {
+				return err
+			}
 			return nil
 		}
 		isCommand = false
-		targetCmd = nameToCommand[item].Cmd
-		if err := targetCmd.ParseFlags(existingFlags); err != nil {
+		runnableCmd = commandMap[item].Cmd
+		// Check if user input flags are valid
+		if err := runnableCmd.ParseFlags(existingFlags); err != nil {
 			return err
 		}
 	}
@@ -222,7 +177,22 @@ func makeListModel(m *listModel, item string) error {
 	return nil
 }
 
-func ifRunBubbleTea() (*cobra.Command, bool, error) {
+func initCmdCtx() error {
+	ctx := context.Background()
+	adminCfg := admin.GetConfig(ctx)
+	clientSet, err := admin.ClientSetBuilder().WithConfig(admin.GetConfig(ctx)).
+		WithTokenCache(pkce.NewTokenCacheKeyringProvider(
+			pkce.KeyRingServiceName,
+			fmt.Sprintf("%s:%s", adminCfg.Endpoint.String(), pkce.KeyRingServiceUser),
+		)).Build(ctx)
+	if err != nil {
+		return err
+	}
+	cmdCtx = cmdcore.NewCommandContext(clientSet, nil)
+	return nil
+}
+
+func checkRunBubbleTea() (*cobra.Command, bool, error) {
 	cmd, flags, err := rootCmd.Find(os.Args[1:])
 	if err != nil {
 		return cmd, false, err
@@ -231,7 +201,7 @@ func ifRunBubbleTea() (*cobra.Command, bool, error) {
 
 	tempCmd := cmd
 	for tempCmd.HasParent() {
-		args = append([]string{strings.Fields(tempCmd.Use)[0]}, args...)
+		curArgs = append([]string{strings.Fields(tempCmd.Use)[0]}, curArgs...)
 		tempCmd = tempCmd.Parent()
 	}
 

@@ -6,34 +6,34 @@ import (
 
 var commandFlagMap = make(map[string][]string)
 
-func InitCommandFlagMap() {
+func initCommandFlagMap() {
 	// compile
-	commandFlagMap["compile"] = []string{"--file"} // user input by themselves
-	// completion
-	commandFlagMap["completion"] = []string{"-h"} // Feels weird to run "--shell" with bubbletea
-	// Show user -h
-	// config
-	commandFlagMap["config|discover"] = []string{}
-	commandFlagMap["config|docs"] = []string{}
-	commandFlagMap["config|init"] = []string{}
-	commandFlagMap["config|validate"] = []string{}
-	// create
-	commandFlagMap["create|execution"] = []string{"-p", "-d"}
-	commandFlagMap["create|project"] = []string{"--pid"} //?
-	// delete
-	commandFlagMap["delete|cluster-resource-attribute"] = []string{}    //?
-	commandFlagMap["delete|execution"] = []string{"--name", "-p", "-d"} // flytectl delete execution c6a51x2l9e  -d development  -p flytesnacks
-	commandFlagMap["delete|execution-cluster-label"] = []string{}       //?
-	commandFlagMap["delete|execution-queue-attribute"] = []string{}     //?
-	commandFlagMap["delete|plugin-override"] = []string{}               //?
-	commandFlagMap["delete|task-resource-attribute"] = []string{}       //?
-	commandFlagMap["delete|workflow-execution-config"] = []string{}     //?
-	// demo
-	commandFlagMap["demo|exec"] = []string{} //?
-	commandFlagMap["demo|reload"] = []string{}
-	commandFlagMap["demo|start"] = []string{}
-	commandFlagMap["demo|status"] = []string{}
-	commandFlagMap["demo|teardown"] = []string{}
+	// commandFlagMap["compile"] = []string{"--file"} // user input by themselves
+	// // completion
+	// commandFlagMap["completion"] = []string{"-h"} // Feels weird to run "--shell" with bubbletea
+	// // Show user -h
+	// // config
+	// commandFlagMap["config|discover"] = []string{}
+	// commandFlagMap["config|docs"] = []string{}
+	// commandFlagMap["config|init"] = []string{}
+	// commandFlagMap["config|validate"] = []string{}
+	// // create
+	// commandFlagMap["create|execution"] = []string{"-p", "-d"}
+	// commandFlagMap["create|project"] = []string{"--pid"} //?
+	// // delete
+	// commandFlagMap["delete|cluster-resource-attribute"] = []string{}    //?
+	// commandFlagMap["delete|execution"] = []string{"--name", "-p", "-d"} // flytectl delete execution c6a51x2l9e  -d development  -p flytesnacks
+	// commandFlagMap["delete|execution-cluster-label"] = []string{}       //?
+	// commandFlagMap["delete|execution-queue-attribute"] = []string{}     //?
+	// commandFlagMap["delete|plugin-override"] = []string{}               //?
+	// commandFlagMap["delete|task-resource-attribute"] = []string{}       //?
+	// commandFlagMap["delete|workflow-execution-config"] = []string{}     //?
+	// // demo
+	// commandFlagMap["demo|exec"] = []string{} //?
+	// commandFlagMap["demo|reload"] = []string{}
+	// commandFlagMap["demo|start"] = []string{}
+	// commandFlagMap["demo|status"] = []string{}
+	// commandFlagMap["demo|teardown"] = []string{}
 	// get
 	commandFlagMap["get|cluster-resource-attribute"] = []string{"-p", "-d"}
 	commandFlagMap["get|execution"] = []string{"-p", "-d"}
@@ -45,31 +45,31 @@ func InitCommandFlagMap() {
 	commandFlagMap["get|task-resource-attribute"] = []string{"-p", "-d"}
 	commandFlagMap["get|workflow"] = []string{"-p", "-d"}
 	commandFlagMap["get|workflow-execution-config"] = []string{}
-	// register
-	commandFlagMap["register|examples"] = []string{}
-	commandFlagMap["register|files"] = []string{}
-	// sandbox
-	commandFlagMap["sandbox|exec"] = []string{} //?
-	commandFlagMap["sandbox|start"] = []string{}
-	commandFlagMap["sandbox|status"] = []string{}
-	commandFlagMap["sandbox|teardown"] = []string{}
-	// update
-	commandFlagMap["update|cluster-resource-attribute"] = []string{"--attrFile"} //?
-	commandFlagMap["update|execution"] = []string{"-p", "-d"}
-	commandFlagMap["update|execution-cluster-label"] = []string{"--attrFile"}   //?
-	commandFlagMap["update|execution-queue-attribute"] = []string{"--attrFile"} //?
-	commandFlagMap["update|launchplan"] = []string{"-p", "-d"}
-	commandFlagMap["update|launchplan-meta"] = []string{"-p", "-d"}
-	commandFlagMap["update|plugin-override"] = []string{"--attrFile"} //?
-	commandFlagMap["update|project"] = []string{"--pid"}
-	commandFlagMap["update|task-meta"] = []string{"-p", "-d"}
-	commandFlagMap["update|task-resource-attribute"] = []string{"--attrFile"}
-	commandFlagMap["update|workflow-execution-config"] = []string{"--attrFile"}
-	commandFlagMap["update|workflow-meta"] = []string{"-p", "-d"}
-	// upgrade
-	commandFlagMap["upgrade"] = []string{}
-	// version
-	commandFlagMap["version"] = []string{}
+	// // register
+	// commandFlagMap["register|examples"] = []string{}
+	// commandFlagMap["register|files"] = []string{}
+	// // sandbox
+	// commandFlagMap["sandbox|exec"] = []string{} //?
+	// commandFlagMap["sandbox|start"] = []string{}
+	// commandFlagMap["sandbox|status"] = []string{}
+	// commandFlagMap["sandbox|teardown"] = []string{}
+	// // update
+	// commandFlagMap["update|cluster-resource-attribute"] = []string{"--attrFile"} //?
+	// commandFlagMap["update|execution"] = []string{"-p", "-d"}
+	// commandFlagMap["update|execution-cluster-label"] = []string{"--attrFile"}   //?
+	// commandFlagMap["update|execution-queue-attribute"] = []string{"--attrFile"} //?
+	// commandFlagMap["update|launchplan"] = []string{"-p", "-d"}
+	// commandFlagMap["update|launchplan-meta"] = []string{"-p", "-d"}
+	// commandFlagMap["update|plugin-override"] = []string{"--attrFile"} //?
+	// commandFlagMap["update|project"] = []string{"--pid"}
+	// commandFlagMap["update|task-meta"] = []string{"-p", "-d"}
+	// commandFlagMap["update|task-resource-attribute"] = []string{"--attrFile"}
+	// commandFlagMap["update|workflow-execution-config"] = []string{"--attrFile"}
+	// commandFlagMap["update|workflow-meta"] = []string{"-p", "-d"}
+	// // upgrade
+	// commandFlagMap["upgrade"] = []string{}
+	// // version
+	// commandFlagMap["version"] = []string{}
 }
 
 // sliceToString converts a slice of strings to a string representation
