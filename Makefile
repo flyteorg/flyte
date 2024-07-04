@@ -1,4 +1,5 @@
 export REPOSITORY=flyte
+export REPO_ROOT := $(shell pwd)
 include boilerplate/flyte/end2end/Makefile
 include boilerplate/flyte/golang_test_targets/Makefile
 
@@ -136,8 +137,8 @@ go-tidy:
 	make -C flytestdlib go-tidy
 	make -C flytecopilot go-tidy
 
-.PHONY: gen
-gen:
+.PHONY: generate
+generate:
 	make -C flyteidl generate
 	make -C flyteadmin generate
 	make -C flytepropeller generate

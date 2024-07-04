@@ -20896,17 +20896,14 @@
                         $root.google.protobuf.Timestamp.encode(message.reportedAt, writer.uint32(/* id 21, wireType 2 =*/170).fork()).ldelim();
                     if (message.isArray != null && message.hasOwnProperty("isArray"))
                         writer.uint32(/* id 22, wireType 0 =*/176).bool(message.isArray);
-<<<<<<< HEAD
-                    if (message.outputData != null && message.hasOwnProperty("outputData"))
-                        $root.flyteidl.core.OutputData.encode(message.outputData, writer.uint32(/* id 23, wireType 2 =*/186).fork()).ldelim();
-                    if (message.inputData != null && message.hasOwnProperty("inputData"))
-                        $root.flyteidl.core.InputData.encode(message.inputData, writer.uint32(/* id 24, wireType 2 =*/194).fork()).ldelim();
-=======
                     if (message.targetEntity != null && message.hasOwnProperty("targetEntity"))
                         $root.flyteidl.core.Identifier.encode(message.targetEntity, writer.uint32(/* id 23, wireType 2 =*/186).fork()).ldelim();
                     if (message.isInDynamicChain != null && message.hasOwnProperty("isInDynamicChain"))
                         writer.uint32(/* id 24, wireType 0 =*/192).bool(message.isInDynamicChain);
->>>>>>> 2407e906c9efc2b5b3bb26bf1fe298277abf4a62
+                    if (message.inputData != null && message.hasOwnProperty("inputData"))
+                        $root.flyteidl.core.InputData.encode(message.inputData, writer.uint32(/* id 25, wireType 2 =*/202).fork()).ldelim();
+                    if (message.outputData != null && message.hasOwnProperty("outputData"))
+                        $root.flyteidl.core.OutputData.encode(message.outputData, writer.uint32(/* id 26, wireType 2 =*/210).fork()).ldelim();
                     return writer;
                 };
     
@@ -20946,7 +20943,7 @@
                         case 20:
                             message.deprecatedInputData = $root.flyteidl.core.LiteralMap.decode(reader, reader.uint32());
                             break;
-                        case 24:
+                        case 25:
                             message.inputData = $root.flyteidl.core.InputData.decode(reader, reader.uint32());
                             break;
                         case 6:
@@ -20958,7 +20955,7 @@
                         case 15:
                             message.deprecatedOutputData = $root.flyteidl.core.LiteralMap.decode(reader, reader.uint32());
                             break;
-                        case 23:
+                        case 26:
                             message.outputData = $root.flyteidl.core.OutputData.decode(reader, reader.uint32());
                             break;
                         case 8:
@@ -24646,11 +24643,11 @@
                  * @interface IResource
                  * @property {flyteidl.admin.State|null} [state] Resource state
                  * @property {flyteidl.core.ILiteralMap|null} [deprecatedOutputs] Resource deprecatedOutputs
-                 * @property {flyteidl.core.IOutputData|null} [outputs] Resource outputs
                  * @property {string|null} [message] Resource message
                  * @property {Array.<flyteidl.core.ITaskLog>|null} [logLinks] Resource logLinks
                  * @property {flyteidl.core.TaskExecution.Phase|null} [phase] Resource phase
                  * @property {google.protobuf.IStruct|null} [customInfo] Resource customInfo
+                 * @property {flyteidl.core.IOutputData|null} [outputs] Resource outputs
                  */
     
                 /**
@@ -24686,14 +24683,6 @@
                 Resource.prototype.deprecatedOutputs = null;
     
                 /**
-                 * Resource outputs.
-                 * @member {flyteidl.core.IOutputData|null|undefined} outputs
-                 * @memberof flyteidl.admin.Resource
-                 * @instance
-                 */
-                Resource.prototype.outputs = null;
-    
-                /**
                  * Resource message.
                  * @member {string} message
                  * @memberof flyteidl.admin.Resource
@@ -24724,6 +24713,14 @@
                  * @instance
                  */
                 Resource.prototype.customInfo = null;
+    
+                /**
+                 * Resource outputs.
+                 * @member {flyteidl.core.IOutputData|null|undefined} outputs
+                 * @memberof flyteidl.admin.Resource
+                 * @instance
+                 */
+                Resource.prototype.outputs = null;
     
                 /**
                  * Creates a new Resource instance using the specified properties.
@@ -24760,13 +24757,10 @@
                             $root.flyteidl.core.TaskLog.encode(message.logLinks[i], writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
                     if (message.phase != null && message.hasOwnProperty("phase"))
                         writer.uint32(/* id 5, wireType 0 =*/40).int32(message.phase);
-<<<<<<< HEAD
-                    if (message.outputs != null && message.hasOwnProperty("outputs"))
-                        $root.flyteidl.core.OutputData.encode(message.outputs, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
-=======
                     if (message.customInfo != null && message.hasOwnProperty("customInfo"))
                         $root.google.protobuf.Struct.encode(message.customInfo, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
->>>>>>> 2407e906c9efc2b5b3bb26bf1fe298277abf4a62
+                    if (message.outputs != null && message.hasOwnProperty("outputs"))
+                        $root.flyteidl.core.OutputData.encode(message.outputs, writer.uint32(/* id 7, wireType 2 =*/58).fork()).ldelim();
                     return writer;
                 };
     
@@ -24794,9 +24788,6 @@
                         case 2:
                             message.deprecatedOutputs = $root.flyteidl.core.LiteralMap.decode(reader, reader.uint32());
                             break;
-                        case 6:
-                            message.outputs = $root.flyteidl.core.OutputData.decode(reader, reader.uint32());
-                            break;
                         case 3:
                             message.message = reader.string();
                             break;
@@ -24810,6 +24801,9 @@
                             break;
                         case 6:
                             message.customInfo = $root.google.protobuf.Struct.decode(reader, reader.uint32());
+                            break;
+                        case 7:
+                            message.outputs = $root.flyteidl.core.OutputData.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -24846,11 +24840,6 @@
                         if (error)
                             return "deprecatedOutputs." + error;
                     }
-                    if (message.outputs != null && message.hasOwnProperty("outputs")) {
-                        var error = $root.flyteidl.core.OutputData.verify(message.outputs);
-                        if (error)
-                            return "outputs." + error;
-                    }
                     if (message.message != null && message.hasOwnProperty("message"))
                         if (!$util.isString(message.message))
                             return "message: string expected";
@@ -24881,6 +24870,11 @@
                         var error = $root.google.protobuf.Struct.verify(message.customInfo);
                         if (error)
                             return "customInfo." + error;
+                    }
+                    if (message.outputs != null && message.hasOwnProperty("outputs")) {
+                        var error = $root.flyteidl.core.OutputData.verify(message.outputs);
+                        if (error)
+                            return "outputs." + error;
                     }
                     return null;
                 };
@@ -38833,7 +38827,6 @@
                  * @property {flyteidl.admin.ILaunchPlanMetadata|null} [entityMetadata] LaunchPlanSpec entityMetadata
                  * @property {flyteidl.core.IParameterMap|null} [defaultInputs] LaunchPlanSpec defaultInputs
                  * @property {flyteidl.core.ILiteralMap|null} [fixedInputs] LaunchPlanSpec fixedInputs
-                 * @property {flyteidl.core.IInputData|null} [fixedInputData] LaunchPlanSpec fixedInputData
                  * @property {string|null} [role] LaunchPlanSpec role
                  * @property {flyteidl.admin.ILabels|null} [labels] LaunchPlanSpec labels
                  * @property {flyteidl.admin.IAnnotations|null} [annotations] LaunchPlanSpec annotations
@@ -38847,6 +38840,7 @@
                  * @property {boolean|null} [overwriteCache] LaunchPlanSpec overwriteCache
                  * @property {flyteidl.admin.IEnvs|null} [envs] LaunchPlanSpec envs
                  * @property {Array.<flyteidl.core.IExecutionEnvAssignment>|null} [executionEnvAssignments] LaunchPlanSpec executionEnvAssignments
+                 * @property {flyteidl.core.IInputData|null} [fixedInputData] LaunchPlanSpec fixedInputData
                  */
     
                 /**
@@ -38896,14 +38890,6 @@
                  * @instance
                  */
                 LaunchPlanSpec.prototype.fixedInputs = null;
-    
-                /**
-                 * LaunchPlanSpec fixedInputData.
-                 * @member {flyteidl.core.IInputData|null|undefined} fixedInputData
-                 * @memberof flyteidl.admin.LaunchPlanSpec
-                 * @instance
-                 */
-                LaunchPlanSpec.prototype.fixedInputData = null;
     
                 /**
                  * LaunchPlanSpec role.
@@ -39010,6 +38996,14 @@
                 LaunchPlanSpec.prototype.executionEnvAssignments = $util.emptyArray;
     
                 /**
+                 * LaunchPlanSpec fixedInputData.
+                 * @member {flyteidl.core.IInputData|null|undefined} fixedInputData
+                 * @memberof flyteidl.admin.LaunchPlanSpec
+                 * @instance
+                 */
+                LaunchPlanSpec.prototype.fixedInputData = null;
+    
+                /**
                  * Creates a new LaunchPlanSpec instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.LaunchPlanSpec
@@ -39065,14 +39059,11 @@
                         writer.uint32(/* id 20, wireType 0 =*/160).bool(message.overwriteCache);
                     if (message.envs != null && message.hasOwnProperty("envs"))
                         $root.flyteidl.admin.Envs.encode(message.envs, writer.uint32(/* id 21, wireType 2 =*/170).fork()).ldelim();
-<<<<<<< HEAD
-                    if (message.fixedInputData != null && message.hasOwnProperty("fixedInputData"))
-                        $root.flyteidl.core.InputData.encode(message.fixedInputData, writer.uint32(/* id 22, wireType 2 =*/178).fork()).ldelim();
-=======
                     if (message.executionEnvAssignments != null && message.executionEnvAssignments.length)
                         for (var i = 0; i < message.executionEnvAssignments.length; ++i)
                             $root.flyteidl.core.ExecutionEnvAssignment.encode(message.executionEnvAssignments[i], writer.uint32(/* id 22, wireType 2 =*/178).fork()).ldelim();
->>>>>>> 2407e906c9efc2b5b3bb26bf1fe298277abf4a62
+                    if (message.fixedInputData != null && message.hasOwnProperty("fixedInputData"))
+                        $root.flyteidl.core.InputData.encode(message.fixedInputData, writer.uint32(/* id 23, wireType 2 =*/186).fork()).ldelim();
                     return writer;
                 };
     
@@ -39105,9 +39096,6 @@
                             break;
                         case 4:
                             message.fixedInputs = $root.flyteidl.core.LiteralMap.decode(reader, reader.uint32());
-                            break;
-                        case 22:
-                            message.fixedInputData = $root.flyteidl.core.InputData.decode(reader, reader.uint32());
                             break;
                         case 5:
                             message.role = reader.string();
@@ -39150,6 +39138,9 @@
                                 message.executionEnvAssignments = [];
                             message.executionEnvAssignments.push($root.flyteidl.core.ExecutionEnvAssignment.decode(reader, reader.uint32()));
                             break;
+                        case 23:
+                            message.fixedInputData = $root.flyteidl.core.InputData.decode(reader, reader.uint32());
+                            break;
                         default:
                             reader.skipType(tag & 7);
                             break;
@@ -39188,11 +39179,6 @@
                         var error = $root.flyteidl.core.LiteralMap.verify(message.fixedInputs);
                         if (error)
                             return "fixedInputs." + error;
-                    }
-                    if (message.fixedInputData != null && message.hasOwnProperty("fixedInputData")) {
-                        var error = $root.flyteidl.core.InputData.verify(message.fixedInputData);
-                        if (error)
-                            return "fixedInputData." + error;
                     }
                     if (message.role != null && message.hasOwnProperty("role"))
                         if (!$util.isString(message.role))
@@ -39256,6 +39242,11 @@
                             if (error)
                                 return "executionEnvAssignments." + error;
                         }
+                    }
+                    if (message.fixedInputData != null && message.hasOwnProperty("fixedInputData")) {
+                        var error = $root.flyteidl.core.InputData.verify(message.fixedInputData);
+                        if (error)
+                            return "fixedInputData." + error;
                     }
                     return null;
                 };

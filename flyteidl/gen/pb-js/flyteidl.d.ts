@@ -10042,9 +10042,6 @@ export namespace flyteidl {
             /** Resource deprecatedOutputs */
             deprecatedOutputs?: (flyteidl.core.ILiteralMap|null);
 
-            /** Resource outputs */
-            outputs?: (flyteidl.core.IOutputData|null);
-
             /** Resource message */
             message?: (string|null);
 
@@ -10056,6 +10053,9 @@ export namespace flyteidl {
 
             /** Resource customInfo */
             customInfo?: (google.protobuf.IStruct|null);
+
+            /** Resource outputs */
+            outputs?: (flyteidl.core.IOutputData|null);
         }
 
         /** Represents a Resource. */
@@ -10073,9 +10073,6 @@ export namespace flyteidl {
             /** Resource deprecatedOutputs. */
             public deprecatedOutputs?: (flyteidl.core.ILiteralMap|null);
 
-            /** Resource outputs. */
-            public outputs?: (flyteidl.core.IOutputData|null);
-
             /** Resource message. */
             public message: string;
 
@@ -10087,6 +10084,9 @@ export namespace flyteidl {
 
             /** Resource customInfo. */
             public customInfo?: (google.protobuf.IStruct|null);
+
+            /** Resource outputs. */
+            public outputs?: (flyteidl.core.IOutputData|null);
 
             /**
              * Creates a new Resource instance using the specified properties.
@@ -16021,9 +16021,6 @@ export namespace flyteidl {
             /** LaunchPlanSpec fixedInputs */
             fixedInputs?: (flyteidl.core.ILiteralMap|null);
 
-            /** LaunchPlanSpec fixedInputData */
-            fixedInputData?: (flyteidl.core.IInputData|null);
-
             /** LaunchPlanSpec role */
             role?: (string|null);
 
@@ -16062,6 +16059,9 @@ export namespace flyteidl {
 
             /** LaunchPlanSpec executionEnvAssignments */
             executionEnvAssignments?: (flyteidl.core.IExecutionEnvAssignment[]|null);
+
+            /** LaunchPlanSpec fixedInputData */
+            fixedInputData?: (flyteidl.core.IInputData|null);
         }
 
         /** Represents a LaunchPlanSpec. */
@@ -16084,9 +16084,6 @@ export namespace flyteidl {
 
             /** LaunchPlanSpec fixedInputs. */
             public fixedInputs?: (flyteidl.core.ILiteralMap|null);
-
-            /** LaunchPlanSpec fixedInputData. */
-            public fixedInputData?: (flyteidl.core.IInputData|null);
 
             /** LaunchPlanSpec role. */
             public role: string;
@@ -16126,6 +16123,9 @@ export namespace flyteidl {
 
             /** LaunchPlanSpec executionEnvAssignments. */
             public executionEnvAssignments: flyteidl.core.IExecutionEnvAssignment[];
+
+            /** LaunchPlanSpec fixedInputData. */
+            public fixedInputData?: (flyteidl.core.IInputData|null);
 
             /**
              * Creates a new LaunchPlanSpec instance using the specified properties.

@@ -1,5 +1,5 @@
 export REPOSITORY=flytecopilot
-export REPO_ROOT=..
+export REPO_ROOT ?= $(shell pwd)/../
 include ../boilerplate/flyte/docker_build/Makefile
 include ../boilerplate/flyte/golang_test_targets/Makefile
 

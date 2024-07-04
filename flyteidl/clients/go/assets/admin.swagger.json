@@ -4034,454 +4034,6 @@
     }
   },
   "definitions": {
-<<<<<<< HEAD
-    "AdminServiceCreateExecutionBody": {
-      "type": "object",
-      "properties": {
-        "project": {
-          "type": "string",
-          "title": "Name of the project the execution belongs to.\n+required"
-        },
-        "domain": {
-          "type": "string",
-          "title": "Name of the domain the execution belongs to.\nA domain can be considered as a subset within a specific project.\n+required"
-        },
-        "name": {
-          "type": "string",
-          "title": "User provided value for the resource.\nIf none is provided the system will generate a unique string.\n+optional"
-        },
-        "spec": {
-          "$ref": "#/definitions/adminExecutionSpec",
-          "title": "Additional fields necessary to launch the execution.\n+optional"
-        },
-        "inputs": {
-          "$ref": "#/definitions/coreLiteralMap",
-          "description": "The inputs required to start the execution. All required inputs must be\nincluded in this map. If not required and not provided, defaults apply.\n+optional\nDeprecated: Please use input_data instead."
-        },
-        "input_data": {
-          "$ref": "#/definitions/coreInputData",
-          "title": "The inputs required to start the execution. All required inputs must be\nincluded in this map. If not required and not provided, defaults apply.\n+optional"
-        }
-      },
-      "description": "Request to launch an execution with the given project, domain and optionally-assigned name."
-    },
-    "AdminServiceCreateLaunchPlanBody": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "object",
-          "properties": {
-            "resource_type": {
-              "$ref": "#/definitions/coreResourceType",
-              "description": "Identifies the specific type of resource that this identifier corresponds to."
-            },
-            "project": {
-              "type": "string",
-              "description": "Name of the project the resource belongs to."
-            },
-            "domain": {
-              "type": "string",
-              "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project."
-            },
-            "name": {
-              "type": "string",
-              "description": "User provided value for the resource."
-            },
-            "version": {
-              "type": "string",
-              "description": "Specific version of the resource."
-            }
-          },
-          "description": "Uniquely identifies a launch plan entity.",
-          "title": "Uniquely identifies a launch plan entity."
-        },
-        "spec": {
-          "$ref": "#/definitions/adminLaunchPlanSpec",
-          "description": "User-provided launch plan details, including reference workflow, inputs and other metadata."
-        }
-      },
-      "description": "Request to register a launch plan. The included LaunchPlanSpec may have a complete or incomplete set of inputs required\nto launch a workflow execution. By default all launch plans are registered in state INACTIVE. If you wish to\nset the state to ACTIVE, you must submit a LaunchPlanUpdateRequest, after you have successfully created a launch plan."
-    },
-    "AdminServiceCreateNodeEventBody": {
-      "type": "object",
-      "properties": {
-        "request_id": {
-          "type": "string",
-          "title": "Unique ID for this request that can be traced between services"
-        },
-        "event": {
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "object",
-              "properties": {
-                "node_id": {
-                  "type": "string"
-                },
-                "execution_id": {
-                  "type": "object",
-                  "properties": {
-                    "project": {
-                      "type": "string",
-                      "description": "Name of the project the resource belongs to."
-                    },
-                    "domain": {
-                      "type": "string",
-                      "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project."
-                    },
-                    "name": {
-                      "type": "string",
-                      "description": "User or system provided value for the resource."
-                    }
-                  },
-                  "title": "Encapsulation of fields that uniquely identifies a Flyte workflow execution"
-                }
-              },
-              "title": "Unique identifier for this node execution"
-            },
-            "producer_id": {
-              "type": "string",
-              "title": "the id of the originator (Propeller) of the event"
-            },
-            "phase": {
-              "$ref": "#/definitions/coreNodeExecutionPhase"
-            },
-            "occurred_at": {
-              "type": "string",
-              "format": "date-time",
-              "description": "This timestamp represents when the original event occurred, it is generated\nby the executor of the node."
-            },
-            "input_uri": {
-              "type": "string"
-            },
-            "deprecated_input_data": {
-              "$ref": "#/definitions/coreLiteralMap",
-              "title": "Raw input data consumed by this node execution.\nDeprecated: please use input_data instead"
-            },
-            "input_data": {
-              "$ref": "#/definitions/coreInputData",
-              "description": "Raw input data consumed by this node execution."
-            },
-            "output_uri": {
-              "type": "string",
-              "description": "URL to the output of the execution, it encodes all the information\nincluding Cloud source provider. ie., s3://..."
-            },
-            "error": {
-              "$ref": "#/definitions/coreExecutionError",
-              "title": "Error information for the execution"
-            },
-            "deprecated_output_data": {
-              "$ref": "#/definitions/coreLiteralMap",
-              "title": "Raw output data produced by this workflow execution.\nDeprecated: please use output_data instead"
-            },
-            "output_data": {
-              "$ref": "#/definitions/coreOutputData",
-              "description": "Raw output data produced by this workflow execution."
-            },
-            "workflow_node_metadata": {
-              "$ref": "#/definitions/flyteidleventWorkflowNodeMetadata"
-            },
-            "task_node_metadata": {
-              "$ref": "#/definitions/flyteidleventTaskNodeMetadata"
-            },
-            "parent_task_metadata": {
-              "$ref": "#/definitions/eventParentTaskExecutionMetadata",
-              "description": "[To be deprecated] Specifies which task (if any) launched this node."
-            },
-            "parent_node_metadata": {
-              "$ref": "#/definitions/eventParentNodeExecutionMetadata",
-              "description": "Specifies the parent node of the current node execution. Node executions at level zero will not have a parent node."
-            },
-            "retry_group": {
-              "type": "string",
-              "title": "Retry group to indicate grouping of nodes by retries"
-            },
-            "spec_node_id": {
-              "type": "string",
-              "title": "Identifier of the node in the original workflow/graph\nThis maps to value of WorkflowTemplate.nodes[X].id"
-            },
-            "node_name": {
-              "type": "string",
-              "title": "Friendly readable name for the node"
-            },
-            "event_version": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "is_parent": {
-              "type": "boolean",
-              "description": "Whether this node launched a subworkflow."
-            },
-            "is_dynamic": {
-              "type": "boolean",
-              "description": "Whether this node yielded a dynamic workflow."
-            },
-            "deck_uri": {
-              "type": "string",
-              "title": "String location uniquely identifying where the deck HTML file is\nNativeUrl specifies the url in the format of the configured storage provider (e.g. s3://my-bucket/randomstring/suffix.tar)"
-            },
-            "reported_at": {
-              "type": "string",
-              "format": "date-time",
-              "description": "This timestamp represents the instant when the event was reported by the executing framework. For example,\nwhen first processing a node the `occurred_at` timestamp should be the instant propeller makes progress, so when\nliteral inputs are initially copied. The event however will not be sent until after the copy completes.\nExtracting both of these timestamps facilitates a more accurate portrayal of the evaluation time-series."
-            },
-            "is_array": {
-              "type": "boolean",
-              "description": "Indicates if this node is an ArrayNode."
-            }
-          },
-          "description": "Details about the event that occurred.",
-          "title": "Details about the event that occurred."
-        }
-      },
-      "description": "Request to send a notification that a node execution event has occurred."
-    },
-    "AdminServiceCreateTaskEventBody": {
-      "type": "object",
-      "properties": {
-        "request_id": {
-          "type": "string",
-          "title": "Unique ID for this request that can be traced between services"
-        },
-        "event": {
-          "type": "object",
-          "properties": {
-            "task_id": {
-              "$ref": "#/definitions/coreIdentifier",
-              "description": "ID of the task. In combination with the retryAttempt this will indicate\nthe task execution uniquely for a given parent node execution."
-            },
-            "parent_node_execution_id": {
-              "type": "object",
-              "properties": {
-                "node_id": {
-                  "type": "string"
-                },
-                "execution_id": {
-                  "type": "object",
-                  "properties": {
-                    "project": {
-                      "type": "string",
-                      "description": "Name of the project the resource belongs to."
-                    },
-                    "domain": {
-                      "type": "string",
-                      "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project."
-                    },
-                    "name": {
-                      "type": "string",
-                      "description": "User or system provided value for the resource."
-                    }
-                  },
-                  "title": "Encapsulation of fields that uniquely identifies a Flyte workflow execution"
-                }
-              },
-              "title": "A task execution is always kicked off by a node execution, the event consumer\nwill use the parent_id to relate the task to it's parent node execution"
-            },
-            "retry_attempt": {
-              "type": "integer",
-              "format": "int64",
-              "title": "retry attempt number for this task, ie., 2 for the second attempt"
-            },
-            "phase": {
-              "$ref": "#/definitions/coreTaskExecutionPhase",
-              "title": "Phase associated with the event"
-            },
-            "producer_id": {
-              "type": "string",
-              "title": "id of the process that sent this event, mainly for trace debugging"
-            },
-            "logs": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "$ref": "#/definitions/coreTaskLog"
-              },
-              "title": "log information for the task execution"
-            },
-            "occurred_at": {
-              "type": "string",
-              "format": "date-time",
-              "description": "This timestamp represents when the original event occurred, it is generated\nby the executor of the task."
-            },
-            "input_uri": {
-              "type": "string",
-              "description": "URI of the input file, it encodes all the information\nincluding Cloud source provider. ie., s3://..."
-            },
-            "deprecated_input_data": {
-              "$ref": "#/definitions/coreLiteralMap",
-              "title": "Raw input data consumed by this node execution.\nDeprecated: please use input_data instead"
-            },
-            "input_data": {
-              "$ref": "#/definitions/coreInputData",
-              "description": "Raw input data consumed by this node execution."
-            },
-            "output_uri": {
-              "type": "string",
-              "description": "URI to the output of the execution, it will be in a format that encodes all the information\nincluding Cloud source provider. ie., s3://..."
-            },
-            "error": {
-              "$ref": "#/definitions/coreExecutionError",
-              "title": "Error information for the execution"
-            },
-            "deprecated_output_data": {
-              "$ref": "#/definitions/coreLiteralMap",
-              "title": "Raw output data produced by this workflow execution.\nDeprecated: please use output_data instead"
-            },
-            "output_data": {
-              "$ref": "#/definitions/coreOutputData",
-              "description": "Raw output data produced by this workflow execution."
-            },
-            "custom_info": {
-              "type": "object",
-              "description": "Custom data that the task plugin sends back. This is extensible to allow various plugins in the system."
-            },
-            "phase_version": {
-              "type": "integer",
-              "format": "int64",
-              "description": "Some phases, like RUNNING, can send multiple events with changed metadata (new logs, additional custom_info, etc)\nthat should be recorded regardless of the lack of phase change.\nThe version field should be incremented when metadata changes across the duration of an individual phase."
-            },
-            "reason": {
-              "type": "string",
-              "description": "An optional explanation for the phase transition.\nDeprecated: Use reasons instead."
-            },
-            "reasons": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "$ref": "#/definitions/eventEventReason"
-              },
-              "description": "An optional list of explanations for the phase transition."
-            },
-            "task_type": {
-              "type": "string",
-              "description": "A predefined yet extensible Task type identifier. If the task definition is already registered in flyte admin\nthis type will be identical, but not all task executions necessarily use pre-registered definitions and this\ntype is useful to render the task in the UI, filter task executions, etc."
-            },
-            "metadata": {
-              "$ref": "#/definitions/flyteidleventTaskExecutionMetadata",
-              "description": "Metadata around how a task was executed."
-            },
-            "event_version": {
-              "type": "integer",
-              "format": "int32",
-              "description": "The event version is used to indicate versioned changes in how data is reported using this\nproto message. For example, event_verison \u003e 0 means that maps tasks report logs using the\nTaskExecutionMetadata ExternalResourceInfo fields for each subtask rather than the TaskLog\nin this message."
-            },
-            "reported_at": {
-              "type": "string",
-              "format": "date-time",
-              "description": "This timestamp represents the instant when the event was reported by the executing framework. For example, a k8s\npod task may be marked completed at (ie. `occurred_at`) the instant the container running user code completes,\nbut this event will not be reported until the pod is marked as completed. Extracting both of these timestamps\nfacilitates a more accurate portrayal of the evaluation time-series."
-            }
-          },
-          "description": "Details about the event that occurred.",
-          "title": "Details about the event that occurred."
-        }
-      },
-      "description": "Request to send a notification that a task execution event has occurred."
-    },
-    "AdminServiceCreateWorkflowBody": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "object",
-          "properties": {
-            "resource_type": {
-              "$ref": "#/definitions/coreResourceType",
-              "description": "Identifies the specific type of resource that this identifier corresponds to."
-            },
-            "project": {
-              "type": "string",
-              "description": "Name of the project the resource belongs to."
-            },
-            "domain": {
-              "type": "string",
-              "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project."
-            },
-            "name": {
-              "type": "string",
-              "description": "User provided value for the resource."
-            },
-            "version": {
-              "type": "string",
-              "description": "Specific version of the resource."
-            }
-          },
-          "title": "id represents the unique identifier of the workflow.\n+required"
-        },
-        "spec": {
-          "$ref": "#/definitions/adminWorkflowSpec",
-          "title": "Represents the specification for workflow.\n+required"
-        }
-      },
-      "title": "Represents a request structure to create a revision of a workflow.\nSee :ref:`ref_flyteidl.admin.Workflow` for more details"
-    },
-    "AdminServiceCreateWorkflowEventBody": {
-      "type": "object",
-      "properties": {
-        "request_id": {
-          "type": "string",
-          "title": "Unique ID for this request that can be traced between services"
-        },
-        "event": {
-          "type": "object",
-          "properties": {
-            "execution_id": {
-              "type": "object",
-              "properties": {
-                "project": {
-                  "type": "string",
-                  "description": "Name of the project the resource belongs to."
-                },
-                "domain": {
-                  "type": "string",
-                  "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project."
-                },
-                "name": {
-                  "type": "string",
-                  "description": "User or system provided value for the resource."
-                }
-              },
-              "title": "Workflow execution id"
-            },
-            "producer_id": {
-              "type": "string",
-              "title": "the id of the originator (Propeller) of the event"
-            },
-            "phase": {
-              "$ref": "#/definitions/coreWorkflowExecutionPhase"
-            },
-            "occurred_at": {
-              "type": "string",
-              "format": "date-time",
-              "description": "This timestamp represents when the original event occurred, it is generated\nby the executor of the workflow."
-            },
-            "output_uri": {
-              "type": "string",
-              "description": "URL to the output of the execution, it encodes all the information\nincluding Cloud source provider. ie., s3://..."
-            },
-            "error": {
-              "$ref": "#/definitions/coreExecutionError",
-              "title": "Error information for the execution"
-            },
-            "deprecated_output_data": {
-              "$ref": "#/definitions/coreLiteralMap",
-              "title": "Raw output data produced by this workflow execution.\nDeprecated: please use output_data instead"
-            },
-            "output_data": {
-              "$ref": "#/definitions/coreOutputData",
-              "description": "Raw output data produced by this workflow execution."
-            },
-            "event_version": {
-              "type": "integer",
-              "format": "int32"
-            }
-          },
-          "description": "Details about the event that occurred.",
-          "title": "Details about the event that occurred."
-        }
-      },
-      "description": "Request to send a notification that a workflow execution event has occurred."
-    },
-=======
->>>>>>> 2407e906c9efc2b5b3bb26bf1fe298277abf4a62
     "AdminServiceDeleteProjectAttributesBody": {
       "type": "object",
       "properties": {
@@ -5747,10 +5299,6 @@
           "$ref": "#/definitions/coreLiteralMap",
           "title": "Fixed, non-overridable inputs for the Launch Plan.\nThese can not be overridden when an execution is created with this launch plan.\nDeprecated: Please use fixec_input_data instead"
         },
-        "fixed_input_data": {
-          "$ref": "#/definitions/coreInputData",
-          "description": "Fixed, non-overridable inputs for the Launch Plan.\nThese can not be overridden when an execution is created with this launch plan."
-        },
         "role": {
           "type": "string",
           "title": "String to indicate the role to use to execute the workflow underneath"
@@ -5806,6 +5354,10 @@
             "$ref": "#/definitions/coreExecutionEnvAssignment"
           },
           "description": "Execution environment assignments to be set for the execution."
+        },
+        "fixed_input_data": {
+          "$ref": "#/definitions/coreInputData",
+          "description": "Fixed, non-overridable inputs for the Launch Plan.\nThese can not be overridden when an execution is created with this launch plan."
         }
       },
       "description": "User-provided launch plan definition and configuration values."
@@ -7551,19 +7103,6 @@
       },
       "description": "This configuration allows executing raw containers in Flyte using the Flyte CoPilot system.\nFlyte CoPilot, eliminates the needs of flytekit or sdk inside the container. Any inputs required by the users container are side-loaded in the input_path\nAny outputs generated by the user container - within output_path are automatically uploaded."
     },
-    "coreEnumType": {
-      "type": "object",
-      "properties": {
-        "values": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Predefined set of enum values."
-        }
-      },
-      "description": "Enables declaring enum types, with predefined string values\nFor len(values) \u003e 0, the first value in the ordered list is regarded as the default value. If you wish\nTo provide no defaults, make the first value as undefined."
-    },
     "coreError": {
       "type": "object",
       "properties": {
@@ -7982,7 +7521,7 @@
           "description": "A blob might have specialized implementation details depending on associated metadata."
         },
         "enum_type": {
-          "$ref": "#/definitions/coreEnumType",
+          "$ref": "#/definitions/flyteidlcoreEnumType",
           "description": "Defines an enum with pre-defined string values."
         },
         "structured_dataset_type": {
@@ -9554,6 +9093,19 @@
       },
       "title": "Metadata for a WorkflowNode"
     },
+    "flyteidlcoreEnumType": {
+      "type": "object",
+      "properties": {
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Predefined set of enum values."
+        }
+      },
+      "description": "Enables declaring enum types, with predefined string values\nFor len(values) \u003e 0, the first value in the ordered list is regarded as the default value. If you wish\nTo provide no defaults, make the first value as undefined."
+    },
     "flyteidlcoreKeyValuePair": {
       "type": "object",
       "properties": {
@@ -9697,11 +9249,11 @@
       "properties": {
         "@type": {
           "type": "string",
-          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics."
+          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com. As of May 2023, there are no widely used type server\nimplementations and no plans to implement one.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics."
         }
       },
       "additionalProperties": {},
-      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(\u0026foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n    // or ...\n    if (any.isSameTypeAs(Foo.getDefaultInstance())) {\n      foo = any.unpack(Foo.getDefaultInstance());\n    }\n\nExample 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\nExample 4: Pack and unpack a message in Go\n\n     foo := \u0026pb.Foo{...}\n     any, err := anypb.New(foo)\n     if err != nil {\n       ...\n     }\n     ...\n     foo := \u0026pb.Foo{}\n     if err := any.UnmarshalTo(foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\nJSON\n\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": \u003cstring\u003e,\n      \"lastName\": \u003cstring\u003e\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
+      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(\u0026foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n    // or ...\n    if (any.isSameTypeAs(Foo.getDefaultInstance())) {\n      foo = any.unpack(Foo.getDefaultInstance());\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := \u0026pb.Foo{...}\n     any, err := anypb.New(foo)\n     if err != nil {\n       ...\n     }\n     ...\n     foo := \u0026pb.Foo{}\n     if err := any.UnmarshalTo(foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\nJSON\n====\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": \u003cstring\u003e,\n      \"lastName\": \u003cstring\u003e\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
     },
     "protobufNullValue": {
       "type": "string",
@@ -9709,47 +9261,7 @@
         "NULL_VALUE"
       ],
       "default": "NULL_VALUE",
-<<<<<<< HEAD
-      "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\n The JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
-    },
-    "serviceAdminServiceCreateTaskBody": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "object",
-          "properties": {
-            "resource_type": {
-              "$ref": "#/definitions/coreResourceType",
-              "description": "Identifies the specific type of resource that this identifier corresponds to."
-            },
-            "project": {
-              "type": "string",
-              "description": "Name of the project the resource belongs to."
-            },
-            "domain": {
-              "type": "string",
-              "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project."
-            },
-            "name": {
-              "type": "string",
-              "description": "User provided value for the resource."
-            },
-            "version": {
-              "type": "string",
-              "description": "Specific version of the resource."
-            }
-          },
-          "title": "id represents the unique identifier of the task.\n+required"
-        },
-        "spec": {
-          "$ref": "#/definitions/adminTaskSpec",
-          "title": "Represents the specification for task.\n+required"
-        }
-      },
-      "title": "Represents a request structure to create a revision of a task.\nSee :ref:`ref_flyteidl.admin.Task` for more details"
-=======
       "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\nThe JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
->>>>>>> 2407e906c9efc2b5b3bb26bf1fe298277abf4a62
     }
   }
 }
