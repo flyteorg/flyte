@@ -8,7 +8,6 @@ import (
 
 	sj "github.com/GoogleCloudPlatform/spark-on-k8s-operator/pkg/apis/sparkoperator.k8s.io/v1beta2"
 	sparkOp "github.com/GoogleCloudPlatform/spark-on-k8s-operator/pkg/apis/sparkoperator.k8s.io/v1beta2"
-	"github.com/golang/protobuf/jsonpb"
 	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -26,6 +25,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	k8smocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
+	stdlibUtils "github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 const sparkMainClass = "MainClass"
@@ -334,7 +334,7 @@ func dummySparkTaskTemplateContainer(id string, sparkConf map[string]string) *co
 
 	structObj := structpb.Struct{}
 
-	err = jsonpb.UnmarshalString(sparkJobJSON, &structObj)
+	err = stdlibUtils.UnmarshalStringToPb(sparkJobJSON, &structObj)
 	if err != nil {
 		panic(err)
 	}
@@ -362,7 +362,7 @@ func dummySparkTaskTemplatePod(id string, sparkConf map[string]string, podSpec *
 
 	structObj := structpb.Struct{}
 
-	err = jsonpb.UnmarshalString(sparkJobJSON, &structObj)
+	err = stdlibUtils.UnmarshalStringToPb(sparkJobJSON, &structObj)
 	if err != nil {
 		panic(err)
 	}

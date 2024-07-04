@@ -1,13 +1,11 @@
 package v1alpha1
 
 import (
-	"bytes"
-
-	"github.com/golang/protobuf/jsonpb"
 	"k8s.io/apimachinery/pkg/api/resource"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 type AttributesSource int
@@ -98,14 +96,10 @@ type ExecutionEnvAssignment struct {
 }
 
 func (in *ExecutionEnvAssignment) MarshalJSON() ([]byte, error) {
-	var buf bytes.Buffer
-	if err := marshaler.Marshal(&buf, in.ExecutionEnvAssignment); err != nil {
-		return nil, err
-	}
-	return buf.Bytes(), nil
+	return utils.MarshalPbToBytes(in.ExecutionEnvAssignment)
 }
 
 func (in *ExecutionEnvAssignment) UnmarshalJSON(b []byte) error {
 	in.ExecutionEnvAssignment = &core.ExecutionEnvAssignment{}
-	return jsonpb.Unmarshal(bytes.NewReader(b), in.ExecutionEnvAssignment)
+	return utils.UnmarshalBytesToPb(b, in.ExecutionEnvAssignment)
 }
