@@ -604,6 +604,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 			mockNode.OnGetInputBindings().Return([]*v1alpha1.Binding{})
 			mockNode.OnIsInterruptible().Return(nil)
 			mockNode.OnGetName().Return("name")
+			mockNode.OnGetWorkflowNode().Return(nil)
 
 			mockNodeN0 := &mocks.ExecutableNode{}
 			mockNodeN0.OnGetID().Return(nodeN0)
@@ -614,6 +615,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 			mockNodeN0.OnGetTaskID().Return(&taskID0)
 			mockNodeN0.OnIsInterruptible().Return(nil)
 			mockNodeN0.OnGetName().Return("name")
+			mockNodeN0.OnGetWorkflowNode().Return(nil)
 
 			mockN0Status := &mocks.ExecutableNodeStatus{}
 			mockN0Status.OnGetPhase().Return(n0Phase)
@@ -1325,6 +1327,7 @@ func TestNodeExecutor_RecursiveNodeHandler_BranchNode(t *testing.T) {
 				branchTakenNode.OnIsStartNode().Return(false)
 				branchTakenNode.OnIsEndNode().Return(false)
 				branchTakenNode.OnGetInputBindings().Return(nil)
+				branchTakenNode.OnGetWorkflowNode().Return(nil)
 				branchTakeNodeStatus := &mocks.ExecutableNodeStatus{}
 				branchTakeNodeStatus.OnGetPhase().Return(test.currentNodePhase)
 				branchTakeNodeStatus.OnIsDirty().Return(false)
@@ -1649,6 +1652,7 @@ func TestNodeExecutor_AbortHandler(t *testing.T) {
 		n.OnGetID().Return(id)
 		n.OnGetKind().Return(v1alpha1.NodeKindStart)
 		n.OnGetTaskID().Return(&id)
+		n.OnGetWorkflowNode().Return(nil)
 		interruptible := false
 		n.OnIsInterruptible().Return(&interruptible)
 		nl := &mocks4.NodeLookup{}
@@ -1685,6 +1689,23 @@ func TestNodeExecutor_AbortHandler(t *testing.T) {
 		execContext.EXPECT().GetLabels().Return(nil)
 		execContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion0)
 
+		et := &mocks.ExecutableTask{}
+		et.OnCoreTask().Return(&core.TaskTemplate{
+			Id: &core.Identifier{
+				ResourceType: core.ResourceType_TASK,
+				Project:      "p",
+				Domain:       "d",
+				Name:         "fake_task_name",
+				Version:      "v",
+			},
+		})
+		execContext.EXPECT().GetTask("id").Return(et, nil)
+		parentInfo := &mocks4.ImmutableParentInfo{}
+		parentInfo.OnGetUniqueID().Return("someunique1")
+		parentInfo.OnCurrentAttempt().Return(uint32(1))
+		parentInfo.OnIsInDynamicChain().Return(false)
+		execContext.EXPECT().GetParentInfo().Return(parentInfo)
+
 		assert.NoError(t, nExec.AbortHandler(ctx, &execContext, &dag, nl, n, "aborting"))
 	})
 }
@@ -1717,12 +1738,21 @@ func TestNodeExecutionEventStartNode(t *testing.T) {
 	tID := &core.TaskExecutionIdentifier{
 		NodeExecutionId: nID,
 	}
+
 	p := handler.PhaseInfoQueued("r", &core.InputData{Inputs: &core.LiteralMap{}})
+	subWfID := &core.Identifier{
+		ResourceType: core.ResourceType_WORKFLOW,
+		Project:      "p",
+		Domain:       "dev",
+		Name:         "name",
+		Version:      "123",
+	}
 	inputReader := &mocks3.InputReader{}
 	inputReader.OnGetInputDataPath().Return("reference")
 	parentInfo := &mocks4.ImmutableParentInfo{}
 	parentInfo.OnGetUniqueID().Return("np1")
 	parentInfo.OnCurrentAttempt().Return(uint32(2))
+	parentInfo.OnIsInDynamicChain().Return(false)
 
 	id := "id"
 	n := &mocks.ExecutableNode{}
@@ -1738,7 +1768,7 @@ func TestNodeExecutionEventStartNode(t *testing.T) {
 	ns.OnGetDynamicNodeStatus().Return(&v1alpha1.DynamicNodeStatus{})
 	ev, err := ToNodeExecutionEvent(nID, p, "reference", ns, v1alpha1.EventVersion0, parentInfo, n, testClusterID, v1alpha1.DynamicNodePhaseNone, &config.EventConfig{
 		RawOutputPolicy: config.RawOutputPolicyReference,
-	})
+	}, subWfID)
 	assert.NoError(t, err)
 	assert.Equal(t, "start-node", ev.Id.NodeId)
 	assert.Equal(t, execID, ev.Id.ExecutionId)
@@ -1750,6 +1780,7 @@ func TestNodeExecutionEventStartNode(t *testing.T) {
 	assert.Equal(t, "dummy://dummyOutUrl/outputs.pb",
 		ev.OutputResult.(*event.NodeExecutionEvent_OutputUri).OutputUri)
 	assert.Equal(t, ev.ProducerId, testClusterID)
+	assert.Equal(t, subWfID, ev.GetTargetEntity())
 }
 
 func TestNodeExecutionEventV0(t *testing.T) {
@@ -1769,6 +1800,7 @@ func TestNodeExecutionEventV0(t *testing.T) {
 	parentInfo := &mocks4.ImmutableParentInfo{}
 	parentInfo.OnGetUniqueID().Return("np1")
 	parentInfo.OnCurrentAttempt().Return(uint32(2))
+	parentInfo.OnIsInDynamicChain().Return(false).Twice()
 
 	id := "id"
 	n := &mocks.ExecutableNode{}
@@ -1782,7 +1814,7 @@ func TestNodeExecutionEventV0(t *testing.T) {
 	ns.OnGetParentTaskID().Return(tID)
 	ev, err := ToNodeExecutionEvent(nID, p, "reference", ns, v1alpha1.EventVersion0, parentInfo, n, testClusterID, v1alpha1.DynamicNodePhaseNone, &config.EventConfig{
 		RawOutputPolicy: config.RawOutputPolicyReference,
-	})
+	}, nil)
 	assert.NoError(t, err)
 	assert.Equal(t, "n1", ev.Id.NodeId)
 	assert.Equal(t, execID, ev.Id.ExecutionId)
@@ -1791,6 +1823,7 @@ func TestNodeExecutionEventV0(t *testing.T) {
 	assert.Equal(t, tID, ev.ParentTaskMetadata.Id)
 	assert.Empty(t, ev.NodeName)
 	assert.Empty(t, ev.RetryGroup)
+	assert.Empty(t, ev.TargetEntity)
 }
 
 func TestNodeExecutionEventV1(t *testing.T) {
@@ -1819,6 +1852,7 @@ func TestNodeExecutionEventV1(t *testing.T) {
 	parentInfo := &mocks4.ImmutableParentInfo{}
 	parentInfo.OnGetUniqueID().Return("np1")
 	parentInfo.OnCurrentAttempt().Return(uint32(2))
+	parentInfo.OnIsInDynamicChain().Return(false)
 
 	id := "id"
 	n := &mocks.ExecutableNode{}
@@ -1832,7 +1866,7 @@ func TestNodeExecutionEventV1(t *testing.T) {
 	ns.OnGetParentTaskID().Return(tID)
 	eventOpt, err := ToNodeExecutionEvent(nID, p, "reference", ns, v1alpha1.EventVersion1, parentInfo, n, testClusterID, v1alpha1.DynamicNodePhaseNone, &config.EventConfig{
 		RawOutputPolicy: config.RawOutputPolicyInline,
-	})
+	}, nil)
 	assert.NoError(t, err)
 	assert.Equal(t, "np1-2-n1", eventOpt.Id.NodeId)
 	assert.Equal(t, execID, eventOpt.Id.ExecutionId)
@@ -1845,6 +1879,7 @@ func TestNodeExecutionEventV1(t *testing.T) {
 	assert.Equal(t, "name", eventOpt.NodeName)
 	assert.Equal(t, "2", eventOpt.RetryGroup)
 	assert.True(t, proto.Equal(eventOpt.GetInputData(), inputs))
+	assert.Empty(t, eventOpt.TargetEntity)
 }
 
 func TestNodeExecutor_RecursiveNodeHandler_ParallelismLimit(t *testing.T) {
