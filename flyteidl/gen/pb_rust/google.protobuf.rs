@@ -89,10 +89,11 @@
 /// <http://joda-time.sourceforge.net/apidocs/org/joda/time/format/ISODateTimeFormat.html#dateTime(>)
 /// ) to obtain a formatter capable of generating timestamps in this format.
 ///
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
+#[pyo3(subclass)]
 pub struct Timestamp {
     /// Represents seconds of UTC time since Unix epoch
     /// 1970-01-01T00:00:00Z. Must be from 0001-01-01T00:00:00Z to
@@ -114,10 +115,11 @@ pub struct Timestamp {
 /// with the proto support for the language.
 ///
 /// The JSON representation for `Struct` is JSON object.
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
+#[pyo3(subclass)]
 pub struct Struct {
     /// Unordered map of dynamically typed values.
     #[prost(map = "string, message", tag = "1")]
@@ -129,10 +131,11 @@ pub struct Struct {
 /// variants. Absence of any variant indicates an error.
 ///
 /// The JSON representation for `Value` is JSON value.
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
+#[pyo3(subclass)]
 pub struct Value {
     /// The kind of value.
     #[prost(oneof = "value::Kind", tags = "1, 2, 3, 4, 5, 6")]
@@ -141,7 +144,7 @@ pub struct Value {
 /// Nested message and enum types in `Value`.
 pub mod value {
     /// The kind of value.
-    #[::pyo3_macro::with_pyclass]
+    #[pyo3::pyclass(get_all, set_all)]
     #[derive(::pyo3_macro::WithNew)]
     #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
@@ -169,10 +172,11 @@ pub mod value {
 /// `ListValue` is a wrapper around a repeated field of values.
 ///
 /// The JSON representation for `ListValue` is JSON array.
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
+#[pyo3(subclass)]
 pub struct ListValue {
     /// Repeated field of dynamically typed values.
     #[prost(message, repeated, tag = "1")]
@@ -182,7 +186,7 @@ pub struct ListValue {
 /// `Value` type union.
 ///
 /// The JSON representation for `NullValue` is JSON `null`.
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]
@@ -267,10 +271,11 @@ impl NullValue {
 /// be expressed in JSON format as "3.000000001s", and 3 seconds and 1
 /// microsecond should be expressed in JSON format as "3.000001s".
 ///
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
+#[pyo3(subclass)]
 pub struct Duration {
     /// Signed seconds of the span of time. Must be from -315,576,000,000
     /// to +315,576,000,000 inclusive. Note: these bounds are computed from:
@@ -289,10 +294,11 @@ pub struct Duration {
 /// Wrapper message for `double`.
 ///
 /// The JSON representation for `DoubleValue` is JSON number.
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
+#[pyo3(subclass)]
 pub struct DoubleValue {
     /// The double value.
     #[prost(double, tag = "1")]
@@ -301,10 +307,11 @@ pub struct DoubleValue {
 /// Wrapper message for `float`.
 ///
 /// The JSON representation for `FloatValue` is JSON number.
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
+#[pyo3(subclass)]
 pub struct FloatValue {
     /// The float value.
     #[prost(float, tag = "1")]
@@ -313,10 +320,11 @@ pub struct FloatValue {
 /// Wrapper message for `int64`.
 ///
 /// The JSON representation for `Int64Value` is JSON string.
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
+#[pyo3(subclass)]
 pub struct Int64Value {
     /// The int64 value.
     #[prost(int64, tag = "1")]
@@ -325,10 +333,11 @@ pub struct Int64Value {
 /// Wrapper message for `uint64`.
 ///
 /// The JSON representation for `UInt64Value` is JSON string.
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
+#[pyo3(subclass)]
 pub struct UInt64Value {
     /// The uint64 value.
     #[prost(uint64, tag = "1")]
@@ -337,10 +346,11 @@ pub struct UInt64Value {
 /// Wrapper message for `int32`.
 ///
 /// The JSON representation for `Int32Value` is JSON number.
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
+#[pyo3(subclass)]
 pub struct Int32Value {
     /// The int32 value.
     #[prost(int32, tag = "1")]
@@ -349,10 +359,11 @@ pub struct Int32Value {
 /// Wrapper message for `uint32`.
 ///
 /// The JSON representation for `UInt32Value` is JSON number.
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
+#[pyo3(subclass)]
 pub struct UInt32Value {
     /// The uint32 value.
     #[prost(uint32, tag = "1")]
@@ -361,10 +372,11 @@ pub struct UInt32Value {
 /// Wrapper message for `bool`.
 ///
 /// The JSON representation for `BoolValue` is JSON `true` and `false`.
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
+#[pyo3(subclass)]
 pub struct BoolValue {
     /// The bool value.
     #[prost(bool, tag = "1")]
@@ -373,10 +385,11 @@ pub struct BoolValue {
 /// Wrapper message for `string`.
 ///
 /// The JSON representation for `StringValue` is JSON string.
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
+#[pyo3(subclass)]
 pub struct StringValue {
     /// The string value.
     #[prost(string, tag = "1")]
@@ -385,10 +398,11 @@ pub struct StringValue {
 /// Wrapper message for `bytes`.
 ///
 /// The JSON representation for `BytesValue` is JSON string.
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
+#[pyo3(subclass)]
 pub struct BytesValue {
     /// The bytes value.
     #[prost(bytes = "vec", tag = "1")]
@@ -480,10 +494,11 @@ pub struct BytesValue {
 ///        "value": "1.212s"
 ///      }
 ///
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
+#[pyo3(subclass)]
 pub struct Any {
     /// A URL/resource name that uniquely identifies the type of the serialized
     /// protocol buffer message. This string must contain at least
@@ -522,19 +537,21 @@ pub struct Any {
 }
 /// The protocol compiler can output a FileDescriptorSet containing the .proto
 /// files it parses.
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
+#[pyo3(subclass)]
 pub struct FileDescriptorSet {
     #[prost(message, repeated, tag = "1")]
     pub file: ::prost::alloc::vec::Vec<FileDescriptorProto>,
 }
 /// Describes a complete .proto file.
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
+#[pyo3(subclass)]
 pub struct FileDescriptorProto {
     /// file name, relative to root of source tree
     #[prost(string, optional, tag = "1")]
@@ -580,10 +597,11 @@ pub struct FileDescriptorProto {
     pub edition: ::core::option::Option<i32>,
 }
 /// Describes a message type.
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
+#[pyo3(subclass)]
 pub struct DescriptorProto {
     #[prost(string, optional, tag = "1")]
     pub name: ::core::option::Option<::prost::alloc::string::String>,
@@ -610,10 +628,11 @@ pub struct DescriptorProto {
 }
 /// Nested message and enum types in `DescriptorProto`.
 pub mod descriptor_proto {
-    #[::pyo3_macro::with_pyclass]
+    #[pyo3::pyclass(get_all, set_all)]
     #[derive(::pyo3_macro::WithNew)]
     #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Message)]
+#[pyo3(subclass)]
     pub struct ExtensionRange {
         /// Inclusive.
         #[prost(int32, optional, tag = "1")]
@@ -627,10 +646,11 @@ pub mod descriptor_proto {
     /// Range of reserved tag numbers. Reserved tag numbers may not be used by
     /// fields or extension ranges in the same message. Reserved ranges may
     /// not overlap.
-    #[::pyo3_macro::with_pyclass]
+    #[pyo3::pyclass(get_all, set_all)]
     #[derive(::pyo3_macro::WithNew)]
     #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Message)]
+#[pyo3(subclass)]
     pub struct ReservedRange {
         /// Inclusive.
         #[prost(int32, optional, tag = "1")]
@@ -640,10 +660,11 @@ pub mod descriptor_proto {
         pub end: ::core::option::Option<i32>,
     }
 }
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
+#[pyo3(subclass)]
 pub struct ExtensionRangeOptions {
     /// The parser stores options it doesn't recognize here. See above.
     #[prost(message, repeated, tag = "999")]
@@ -669,10 +690,11 @@ pub struct ExtensionRangeOptions {
 }
 /// Nested message and enum types in `ExtensionRangeOptions`.
 pub mod extension_range_options {
-    #[::pyo3_macro::with_pyclass]
+    #[pyo3::pyclass(get_all, set_all)]
     #[derive(::pyo3_macro::WithNew)]
     #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Message)]
+#[pyo3(subclass)]
     pub struct Declaration {
         /// The extension number declared within the extension range.
         #[prost(int32, optional, tag = "1")]
@@ -697,7 +719,7 @@ pub mod extension_range_options {
         pub repeated: ::core::option::Option<bool>,
     }
     /// The verification state of the extension range.
-    #[::pyo3_macro::with_pyclass]
+    #[pyo3::pyclass(get_all, set_all)]
     #[derive(::pyo3_macro::WithNew)]
     #[derive(
         Clone,
@@ -738,10 +760,11 @@ pub mod extension_range_options {
     }
 }
 /// Describes a field within a message.
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
+#[pyo3(subclass)]
 pub struct FieldDescriptorProto {
     #[prost(string, optional, tag = "1")]
     pub name: ::core::option::Option<::prost::alloc::string::String>,
@@ -808,7 +831,7 @@ pub struct FieldDescriptorProto {
 }
 /// Nested message and enum types in `FieldDescriptorProto`.
 pub mod field_descriptor_proto {
-    #[::pyo3_macro::with_pyclass]
+    #[pyo3::pyclass(get_all, set_all)]
     #[derive(::pyo3_macro::WithNew)]
     #[derive(
         Clone,
@@ -909,7 +932,7 @@ pub mod field_descriptor_proto {
             }
         }
     }
-    #[::pyo3_macro::with_pyclass]
+    #[pyo3::pyclass(get_all, set_all)]
     #[derive(::pyo3_macro::WithNew)]
     #[derive(
         Clone,
@@ -956,10 +979,11 @@ pub mod field_descriptor_proto {
     }
 }
 /// Describes a oneof.
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
+#[pyo3(subclass)]
 pub struct OneofDescriptorProto {
     #[prost(string, optional, tag = "1")]
     pub name: ::core::option::Option<::prost::alloc::string::String>,
@@ -967,10 +991,11 @@ pub struct OneofDescriptorProto {
     pub options: ::core::option::Option<OneofOptions>,
 }
 /// Describes an enum type.
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
+#[pyo3(subclass)]
 pub struct EnumDescriptorProto {
     #[prost(string, optional, tag = "1")]
     pub name: ::core::option::Option<::prost::alloc::string::String>,
@@ -998,10 +1023,11 @@ pub mod enum_descriptor_proto {
     /// Note that this is distinct from DescriptorProto.ReservedRange in that it
     /// is inclusive such that it can appropriately represent the entire int32
     /// domain.
-    #[::pyo3_macro::with_pyclass]
+    #[pyo3::pyclass(get_all, set_all)]
     #[derive(::pyo3_macro::WithNew)]
     #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Message)]
+#[pyo3(subclass)]
     pub struct EnumReservedRange {
         /// Inclusive.
         #[prost(int32, optional, tag = "1")]
@@ -1012,10 +1038,11 @@ pub mod enum_descriptor_proto {
     }
 }
 /// Describes a value within an enum.
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
+#[pyo3(subclass)]
 pub struct EnumValueDescriptorProto {
     #[prost(string, optional, tag = "1")]
     pub name: ::core::option::Option<::prost::alloc::string::String>,
@@ -1025,10 +1052,11 @@ pub struct EnumValueDescriptorProto {
     pub options: ::core::option::Option<EnumValueOptions>,
 }
 /// Describes a service.
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
+#[pyo3(subclass)]
 pub struct ServiceDescriptorProto {
     #[prost(string, optional, tag = "1")]
     pub name: ::core::option::Option<::prost::alloc::string::String>,
@@ -1038,10 +1066,11 @@ pub struct ServiceDescriptorProto {
     pub options: ::core::option::Option<ServiceOptions>,
 }
 /// Describes a method of a service.
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
+#[pyo3(subclass)]
 pub struct MethodDescriptorProto {
     #[prost(string, optional, tag = "1")]
     pub name: ::core::option::Option<::prost::alloc::string::String>,
@@ -1060,10 +1089,11 @@ pub struct MethodDescriptorProto {
     #[prost(bool, optional, tag = "6", default = "false")]
     pub server_streaming: ::core::option::Option<bool>,
 }
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
+#[pyo3(subclass)]
 pub struct FileOptions {
     /// Sets the Java package where classes generated from this .proto will be
     /// placed.  By default, the proto package is used, but this is often
@@ -1183,7 +1213,7 @@ pub struct FileOptions {
 /// Nested message and enum types in `FileOptions`.
 pub mod file_options {
     /// Generated classes can be optimized for speed or code size.
-    #[::pyo3_macro::with_pyclass]
+    #[pyo3::pyclass(get_all, set_all)]
     #[derive(::pyo3_macro::WithNew)]
     #[derive(
         Clone,
@@ -1230,10 +1260,11 @@ pub mod file_options {
         }
     }
 }
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
+#[pyo3(subclass)]
 pub struct MessageOptions {
     /// Set true to use the old proto1 MessageSet wire format for extensions.
     /// This is provided for backwards-compatibility with the MessageSet wire
@@ -1309,10 +1340,11 @@ pub struct MessageOptions {
     #[prost(message, repeated, tag = "999")]
     pub uninterpreted_option: ::prost::alloc::vec::Vec<UninterpretedOption>,
 }
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
+#[pyo3(subclass)]
 pub struct FieldOptions {
     /// The ctype option instructs the C++ code generator to use a different
     /// representation of the field than it normally would.  See the specific
@@ -1424,10 +1456,11 @@ pub struct FieldOptions {
 }
 /// Nested message and enum types in `FieldOptions`.
 pub mod field_options {
-    #[::pyo3_macro::with_pyclass]
+    #[pyo3::pyclass(get_all, set_all)]
     #[derive(::pyo3_macro::WithNew)]
     #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Message)]
+#[pyo3(subclass)]
     pub struct EditionDefault {
         #[prost(enumeration = "super::Edition", optional, tag = "3")]
         pub edition: ::core::option::Option<i32>,
@@ -1435,7 +1468,7 @@ pub mod field_options {
         #[prost(string, optional, tag = "2")]
         pub value: ::core::option::Option<::prost::alloc::string::String>,
     }
-    #[::pyo3_macro::with_pyclass]
+    #[pyo3::pyclass(get_all, set_all)]
     #[derive(::pyo3_macro::WithNew)]
     #[derive(
         Clone,
@@ -1483,7 +1516,7 @@ pub mod field_options {
             }
         }
     }
-    #[::pyo3_macro::with_pyclass]
+    #[pyo3::pyclass(get_all, set_all)]
     #[derive(::pyo3_macro::WithNew)]
     #[derive(
         Clone,
@@ -1530,7 +1563,7 @@ pub mod field_options {
     /// If set to RETENTION_SOURCE, the option will be omitted from the binary.
     /// Note: as of January 2023, support for this is in progress and does not yet
     /// have an effect (b/264593489).
-    #[::pyo3_macro::with_pyclass]
+    #[pyo3::pyclass(get_all, set_all)]
     #[derive(::pyo3_macro::WithNew)]
     #[derive(
         Clone,
@@ -1575,7 +1608,7 @@ pub mod field_options {
     /// as an option. If it is unset, then the field may be freely used as an
     /// option on any kind of entity. Note: as of January 2023, support for this is
     /// in progress and does not yet have an effect (b/264593489).
-    #[::pyo3_macro::with_pyclass]
+    #[pyo3::pyclass(get_all, set_all)]
     #[derive(::pyo3_macro::WithNew)]
     #[derive(
         Clone,
@@ -1640,10 +1673,11 @@ pub mod field_options {
         }
     }
 }
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
+#[pyo3(subclass)]
 pub struct OneofOptions {
     /// Any features defined in the specific edition.
     #[prost(message, optional, tag = "1")]
@@ -1652,10 +1686,11 @@ pub struct OneofOptions {
     #[prost(message, repeated, tag = "999")]
     pub uninterpreted_option: ::prost::alloc::vec::Vec<UninterpretedOption>,
 }
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
+#[pyo3(subclass)]
 pub struct EnumOptions {
     /// Set this option to true to allow mapping different tag names to the same
     /// value.
@@ -1683,10 +1718,11 @@ pub struct EnumOptions {
     #[prost(message, repeated, tag = "999")]
     pub uninterpreted_option: ::prost::alloc::vec::Vec<UninterpretedOption>,
 }
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
+#[pyo3(subclass)]
 pub struct EnumValueOptions {
     /// Is this enum value deprecated?
     /// Depending on the target platform, this can emit Deprecated annotations
@@ -1706,10 +1742,11 @@ pub struct EnumValueOptions {
     #[prost(message, repeated, tag = "999")]
     pub uninterpreted_option: ::prost::alloc::vec::Vec<UninterpretedOption>,
 }
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
+#[pyo3(subclass)]
 pub struct ServiceOptions {
     /// Any features defined in the specific edition.
     #[prost(message, optional, tag = "34")]
@@ -1724,10 +1761,11 @@ pub struct ServiceOptions {
     #[prost(message, repeated, tag = "999")]
     pub uninterpreted_option: ::prost::alloc::vec::Vec<UninterpretedOption>,
 }
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
+#[pyo3(subclass)]
 pub struct MethodOptions {
     /// Is this method deprecated?
     /// Depending on the target platform, this can emit Deprecated annotations
@@ -1754,7 +1792,7 @@ pub mod method_options {
     /// Is this method side-effect-free (or safe in HTTP parlance), or idempotent,
     /// or neither? HTTP based RPC implementation may choose GET verb for safe
     /// methods, and PUT verb for idempotent methods instead of the default POST.
-    #[::pyo3_macro::with_pyclass]
+    #[pyo3::pyclass(get_all, set_all)]
     #[derive(::pyo3_macro::WithNew)]
     #[derive(
         Clone,
@@ -1804,10 +1842,11 @@ pub mod method_options {
 /// options protos in descriptor objects (e.g. returned by Descriptor::options(),
 /// or produced by Descriptor::CopyTo()) will never have UninterpretedOptions
 /// in them.
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
+#[pyo3(subclass)]
 pub struct UninterpretedOption {
     #[prost(message, repeated, tag = "2")]
     pub name: ::prost::alloc::vec::Vec<uninterpreted_option::NamePart>,
@@ -1833,10 +1872,11 @@ pub mod uninterpreted_option {
     /// extension (denoted with parentheses in options specs in .proto files).
     /// E.g.,{ \["foo", false\], \["bar.baz", true\], \["moo", false\] } represents
     /// "foo.(bar.baz).moo".
-    #[::pyo3_macro::with_pyclass]
+    #[pyo3::pyclass(get_all, set_all)]
     #[derive(::pyo3_macro::WithNew)]
     #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Message)]
+#[pyo3(subclass)]
     pub struct NamePart {
         #[prost(string, required, tag = "1")]
         pub name_part: ::prost::alloc::string::String,
@@ -1850,10 +1890,11 @@ pub mod uninterpreted_option {
 /// readability, but leave us very open to this scenario.  A future feature will
 /// be designed and implemented to handle this, hopefully before we ever hit a
 /// conflict here.
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
+#[pyo3(subclass)]
 pub struct FeatureSet {
     #[prost(enumeration = "feature_set::FieldPresence", optional, tag = "1")]
     pub field_presence: ::core::option::Option<i32>,
@@ -1870,7 +1911,7 @@ pub struct FeatureSet {
 }
 /// Nested message and enum types in `FeatureSet`.
 pub mod feature_set {
-    #[::pyo3_macro::with_pyclass]
+    #[pyo3::pyclass(get_all, set_all)]
     #[derive(::pyo3_macro::WithNew)]
     #[derive(
         Clone,
@@ -1914,7 +1955,7 @@ pub mod feature_set {
             }
         }
     }
-    #[::pyo3_macro::with_pyclass]
+    #[pyo3::pyclass(get_all, set_all)]
     #[derive(::pyo3_macro::WithNew)]
     #[derive(
         Clone,
@@ -1955,7 +1996,7 @@ pub mod feature_set {
             }
         }
     }
-    #[::pyo3_macro::with_pyclass]
+    #[pyo3::pyclass(get_all, set_all)]
     #[derive(::pyo3_macro::WithNew)]
     #[derive(
         Clone,
@@ -1996,7 +2037,7 @@ pub mod feature_set {
             }
         }
     }
-    #[::pyo3_macro::with_pyclass]
+    #[pyo3::pyclass(get_all, set_all)]
     #[derive(::pyo3_macro::WithNew)]
     #[derive(
         Clone,
@@ -2037,7 +2078,7 @@ pub mod feature_set {
             }
         }
     }
-    #[::pyo3_macro::with_pyclass]
+    #[pyo3::pyclass(get_all, set_all)]
     #[derive(::pyo3_macro::WithNew)]
     #[derive(
         Clone,
@@ -2078,7 +2119,7 @@ pub mod feature_set {
             }
         }
     }
-    #[::pyo3_macro::with_pyclass]
+    #[pyo3::pyclass(get_all, set_all)]
     #[derive(::pyo3_macro::WithNew)]
     #[derive(
         Clone,
@@ -2124,10 +2165,11 @@ pub mod feature_set {
 /// messages are generated from FeatureSet extensions and can be used to seed
 /// feature resolution. The resolution with this object becomes a simple search
 /// for the closest matching edition, followed by proto merges.
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
+#[pyo3(subclass)]
 pub struct FeatureSetDefaults {
     #[prost(message, repeated, tag = "1")]
     pub defaults: ::prost::alloc::vec::Vec<
@@ -2148,10 +2190,11 @@ pub mod feature_set_defaults {
     /// defaults. Not all editions may be contained here.  For a given edition,
     /// the defaults at the closest matching edition ordered at or before it should
     /// be used.  This field must be in strict ascending order by edition.
-    #[::pyo3_macro::with_pyclass]
+    #[pyo3::pyclass(get_all, set_all)]
     #[derive(::pyo3_macro::WithNew)]
     #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Message)]
+#[pyo3(subclass)]
     pub struct FeatureSetEditionDefault {
         #[prost(enumeration = "super::Edition", optional, tag = "3")]
         pub edition: ::core::option::Option<i32>,
@@ -2161,10 +2204,11 @@ pub mod feature_set_defaults {
 }
 /// Encapsulates information about the original source file from which a
 /// FileDescriptorProto was generated.
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
+#[pyo3(subclass)]
 pub struct SourceCodeInfo {
     /// A Location identifies a piece of source code in a .proto file which
     /// corresponds to a particular definition.  This information is intended
@@ -2214,10 +2258,11 @@ pub struct SourceCodeInfo {
 }
 /// Nested message and enum types in `SourceCodeInfo`.
 pub mod source_code_info {
-    #[::pyo3_macro::with_pyclass]
+    #[pyo3::pyclass(get_all, set_all)]
     #[derive(::pyo3_macro::WithNew)]
     #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Message)]
+#[pyo3(subclass)]
     pub struct Location {
         /// Identifies which part of the FileDescriptorProto was defined at this
         /// location.
@@ -2311,10 +2356,11 @@ pub mod source_code_info {
 /// Describes the relationship between generated code and its original source
 /// file. A GeneratedCodeInfo message is associated with only one generated
 /// source file, but may contain references to different source .proto files.
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
+#[pyo3(subclass)]
 pub struct GeneratedCodeInfo {
     /// An Annotation connects some span of text in generated code to an element
     /// of its generating .proto file.
@@ -2323,10 +2369,11 @@ pub struct GeneratedCodeInfo {
 }
 /// Nested message and enum types in `GeneratedCodeInfo`.
 pub mod generated_code_info {
-    #[::pyo3_macro::with_pyclass]
+    #[pyo3::pyclass(get_all, set_all)]
     #[derive(::pyo3_macro::WithNew)]
     #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Message)]
+#[pyo3(subclass)]
     pub struct Annotation {
         /// Identifies the element in the original source .proto file. This field
         /// is formatted the same as SourceCodeInfo.Location.path.
@@ -2351,7 +2398,7 @@ pub mod generated_code_info {
     pub mod annotation {
         /// Represents the identified object's effect on the element in the original
         /// .proto file.
-        #[::pyo3_macro::with_pyclass]
+        #[pyo3::pyclass(get_all, set_all)]
         #[derive(::pyo3_macro::WithNew)]
         #[derive(
             Clone,
@@ -2398,7 +2445,7 @@ pub mod generated_code_info {
     }
 }
 /// The full set of known editions.
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]

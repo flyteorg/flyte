@@ -25,7 +25,7 @@
 ///     produces: "application/json";
 ///   };
 ///
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -125,7 +125,7 @@ pub struct Swagger {
 ///       };
 ///     }
 ///   }
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -200,7 +200,7 @@ pub struct Operation {
 /// allow header parameters to be set here since we do not want users specifying custom non-header
 /// parameters beyond those inferred from the Protobuf schema.
 /// See: <https://swagger.io/specification/v2/#parameter-object>
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -212,7 +212,7 @@ pub struct Parameters {
 }
 /// `HeaderParameter` a HTTP header parameter.
 /// See: <https://swagger.io/specification/v2/#parameter-object>
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -238,7 +238,7 @@ pub struct HeaderParameter {
 pub mod header_parameter {
     /// `Type` is a supported HTTP header type.
     /// See <https://swagger.io/specification/v2/#parameterType.>
-    #[::pyo3_macro::with_pyclass]
+    #[pyo3::pyclass(get_all, set_all)]
     #[derive(::pyo3_macro::WithNew)]
     #[derive(
         Clone,
@@ -290,7 +290,7 @@ pub mod header_parameter {
 ///
 /// See: <https://github.com/OAI/OpenAPI-Specification/blob/3.0.0/versions/2.0.md#headerObject>
 ///
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -317,7 +317,7 @@ pub struct Header {
 ///
 /// See: <https://github.com/OAI/OpenAPI-Specification/blob/3.0.0/versions/2.0.md#responseObject>
 ///
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -375,7 +375,7 @@ pub struct Response {
 ///     ...
 ///   };
 ///
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -428,7 +428,7 @@ pub struct Info {
 ///     ...
 ///   };
 ///
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -463,7 +463,7 @@ pub struct Contact {
 ///     ...
 ///   };
 ///
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -491,7 +491,7 @@ pub struct License {
 ///     ...
 ///   };
 ///
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -509,7 +509,7 @@ pub struct ExternalDocumentation {
 ///
 /// See: <https://github.com/OAI/OpenAPI-Specification/blob/3.0.0/versions/2.0.md#schemaObject>
 ///
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -566,7 +566,7 @@ pub struct Schema {
 ///         }];
 ///   }
 ///
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -653,7 +653,7 @@ pub struct JsonSchema {
 pub mod json_schema {
     /// 'FieldConfiguration' provides additional field level properties used when generating the OpenAPI v2 file.
     /// These properties are not defined by OpenAPIv2, but they are used to control the generation.
-    #[::pyo3_macro::with_pyclass]
+    #[pyo3::pyclass(get_all, set_all)]
     #[derive(::pyo3_macro::WithNew)]
     #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Message)]
@@ -665,7 +665,7 @@ pub mod json_schema {
         #[prost(string, tag = "47")]
         pub path_param_name: ::prost::alloc::string::String,
     }
-    #[::pyo3_macro::with_pyclass]
+    #[pyo3::pyclass(get_all, set_all)]
     #[derive(::pyo3_macro::WithNew)]
     #[derive(
         Clone,
@@ -726,7 +726,7 @@ pub mod json_schema {
 ///
 /// See: <https://github.com/OAI/OpenAPI-Specification/blob/3.0.0/versions/2.0.md#tagObject>
 ///
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -760,7 +760,7 @@ pub struct Tag {
 /// A declaration of the security schemes available to be used in the
 /// specification. This does not enforce the security schemes on the operations
 /// and only serves to provide the relevant details for each scheme.
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -782,7 +782,7 @@ pub struct SecurityDefinitions {
 /// operations. Supported schemes are basic authentication, an API key (either as
 /// a header or as a query parameter) and OAuth2's common flows (implicit,
 /// password, application and access code).
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -835,7 +835,7 @@ pub struct SecurityScheme {
 pub mod security_scheme {
     /// The type of the security scheme. Valid values are "basic",
     /// "apiKey" or "oauth2".
-    #[::pyo3_macro::with_pyclass]
+    #[pyo3::pyclass(get_all, set_all)]
     #[derive(::pyo3_macro::WithNew)]
     #[derive(
         Clone,
@@ -880,7 +880,7 @@ pub mod security_scheme {
         }
     }
     /// The location of the API key. Valid values are "query" or "header".
-    #[::pyo3_macro::with_pyclass]
+    #[pyo3::pyclass(get_all, set_all)]
     #[derive(::pyo3_macro::WithNew)]
     #[derive(
         Clone,
@@ -923,7 +923,7 @@ pub mod security_scheme {
     }
     /// The flow used by the OAuth2 security scheme. Valid values are
     /// "implicit", "password", "application" or "accessCode".
-    #[::pyo3_macro::with_pyclass]
+    #[pyo3::pyclass(get_all, set_all)]
     #[derive(::pyo3_macro::WithNew)]
     #[derive(
         Clone,
@@ -982,7 +982,7 @@ pub mod security_scheme {
 ///
 /// The name used for each property MUST correspond to a security scheme
 /// declared in the Security Definitions.
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1002,7 +1002,7 @@ pub mod security_requirement {
     /// If the security scheme is of type "oauth2", then the value is a list of
     /// scope names required for the execution. For other security scheme types,
     /// the array MUST be empty.
-    #[::pyo3_macro::with_pyclass]
+    #[pyo3::pyclass(get_all, set_all)]
     #[derive(::pyo3_macro::WithNew)]
     #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1016,7 +1016,7 @@ pub mod security_requirement {
 /// See: <https://github.com/OAI/OpenAPI-Specification/blob/3.0.0/versions/2.0.md#scopesObject>
 ///
 /// Lists the available scopes for an OAuth2 security scheme.
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1031,7 +1031,7 @@ pub struct Scopes {
 }
 /// Scheme describes the schemes supported by the OpenAPI Swagger
 /// and Operation objects.
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]

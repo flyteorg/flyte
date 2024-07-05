@@ -2,7 +2,7 @@
 /// Defines the HTTP configuration for an API service. It contains a list of
 /// [HttpRule][google.api.HttpRule], each specifying the mapping of an RPC method
 /// to one or more HTTP REST API methods.
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -290,7 +290,7 @@ pub struct Http {
 /// If an API needs to use a JSON array for request or response body, it can map
 /// the request or response body to a repeated field. However, some gRPC
 /// Transcoding implementations may not support this feature.
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -332,7 +332,7 @@ pub mod http_rule {
     /// Determines the URL pattern is matched by this rules. This pattern can be
     /// used with any of the {get|put|post|delete|patch} methods. A custom method
     /// can be defined using the 'custom' field.
-    #[::pyo3_macro::with_pyclass]
+    #[pyo3::pyclass(get_all, set_all)]
     #[derive(::pyo3_macro::WithNew)]
     #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
@@ -362,7 +362,7 @@ pub mod http_rule {
     }
 }
 /// A custom pattern is used for defining custom HTTP verb.
-#[::pyo3_macro::with_pyclass]
+#[pyo3::pyclass(get_all, set_all)]
 #[derive(::pyo3_macro::WithNew)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
