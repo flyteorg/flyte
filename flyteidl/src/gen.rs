@@ -30,7 +30,10 @@ fn main() {
         .out_dir("gen/pb_rust")
         .build_server(false)
         .build_client(true)
-        .type_attribute(".", "#[::pyo3_macro::with_pyclass]")
+        // `type` already includes enum type
+        .type_attribute(".", "#[pyo3::pyclass(get_all, set_all)]")
+        // `enum` cannot be `subclass`
+        // .enum_attribute(".", "#[pyclass(get_all, set_all)]")
         .type_attribute(".", "#[derive(::pyo3_macro::WithNew)]")
         .compile_well_known_types(true)
         .compile(
