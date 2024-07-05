@@ -1,6 +1,3 @@
-use core::str;
-pub use pyo3::prelude::*;
-
 #[macro_export]
 macro_rules! convert_foreign_tonic_error {
     // Foreign Rust error types: https://pyo3.rs/main/function/error-handling#foreign-rust-error-types
@@ -9,8 +6,6 @@ macro_rules! convert_foreign_tonic_error {
         use tonic::Status;
         // An error indicates taht failing at communicating between gRPC clients and servers.
         pub struct GRPCError(Status);
-        use pyo3::exceptions::PyOSError;
-        use pyo3::PyErr;
         use std::fmt;
 
         impl fmt::Display for GRPCError {
@@ -42,7 +37,6 @@ macro_rules! convert_foreign_prost_error {
         use pyo3::exceptions::PyOSError;
         use pyo3::types::PyBytes;
         use pyo3::PyErr;
-        use std::fmt;
 
         // An error indicates taht failing at serializing object to bytes string, like `SerializTOString()` for python protos.
         pub struct MessageEncodeError(EncodeError);
@@ -123,71 +117,17 @@ macro_rules! convert_foreign_prost_error {
     };
 }
 
-#[macro_export]
-macro_rules! concrete_generic_structure {
-    ($name:ident, $generic:ident, $type:ty, $( ($method_name:ident, $request_type:ty, $response_type:ty) ),* ) => {
-
-        #[pyo3::pyclass]
-        #[derive(Debug)]
-        pub struct $name {
-            pub inner: $generic<$type>,
-            pub rt:  Runtime,
-        }
-        // If we trying to expose `tonic::transport::Channel` through PyO3 so that we can create a tonic channel in Python and take it as input for our gRPC clients bindings,
-        // It'll violate the orphan ruls in terms of Rust's traits consisitency, because we were trying to implement a external trait for another external crate's structure in our local crates.
-        // Se We may need to define a local structure like `PyClientlWrapper` and it's not necessary to get or set all of its member fields.
-
-        // The macro mechanically implement our gRPC client stubs.
-        #[pyo3::pymethods]
-        impl $name {
-
-            // Attempt to create a new client by connecting to a given endpoint.
-            #[new]
-            #[pyo3(signature = (dst))]
-            pub fn new(dst: String) -> Self {
-                let endpoint = tonic::transport::Endpoint::from_shared(dst).unwrap();
-                let rt = Builder::new_current_thread().enable_all().build().unwrap();
-                let client = rt.block_on($generic::<$type>::connect(endpoint)).unwrap();
-                $name {
-                    inner: client,
-                    rt: rt,
-                }
-            }
-
-            // Generate methods for each provided services
-            // Currently in a blocking manner.
-            $(
-                #[pyo3(signature = (request))]
-                pub fn $method_name(
-                    &mut self,
-                    request: $request_type,
-                ) -> Result<$response_type, GRPCError> {
-                    let res = self.rt
-                        .block_on(self.inner.$method_name(request))?.into_inner();
-                Ok(res)
-                }
-            )*
-        }
-    };
-}
-
 pub mod google {
-    use pyo3::prelude::*;
     pub mod protobuf {
         include!("../gen/pb_rust/google.protobuf.rs");
     }
 }
 
 pub mod flyteidl {
-    convert_foreign_prost_error!();
-
-    use pyo3::prelude::*;
     pub mod admin {
-
         include!("../gen/pb_rust/flyteidl.admin.rs");
     }
     pub mod core {
-
         impl pyo3::conversion::IntoPy<pyo3::PyObject> for Box<Node> {
             fn into_py(self, py: pyo3::marker::Python<'_>) -> pyo3::PyObject {
                 self.as_ref().clone().into_py(py)
@@ -309,7 +249,7 @@ pub mod flyteidl {
         }
 
         include!("../gen/pb_rust/flyteidl.core.rs");
-        #[pymethods]
+        #[pyo3::pymethods]
         impl literal_type::Type {
             fn __repr__(&self) -> String {
                 match self {
@@ -326,7 +266,6 @@ pub mod flyteidl {
         include!("../gen/pb_rust/flyteidl.event.rs");
     }
     pub mod plugins {
-        use pyo3::prelude::*;
         include!("../gen/pb_rust/flyteidl.plugins.rs");
         pub mod kubeflow {
             // TODO:
@@ -338,258 +277,526 @@ pub mod flyteidl {
     }
 }
 
-fn register_wkt_submodule(parent_module: &Bound<'_, PyModule>) -> PyResult<()> {
-    let child_module = PyModule::new_bound(parent_module.py(), "wkt")?;
-    child_module.add_class::<google::protobuf::Duration>();
-    child_module.add_class::<google::protobuf::StringValue>();
-    child_module.add_class::<google::protobuf::value::Kind>();
-    parent_module.add_submodule(&child_module)?;
-    Ok(())
-}
+use pyo3::prelude::*;
 
-fn register_scalar_submodule(parent_module: &Bound<'_, PyModule>) -> PyResult<()> {
-    let child_module = PyModule::new_bound(parent_module.py(), "scalar")?;
-    child_module.add_class::<flyteidl::core::scalar::Value>();
-    parent_module.add_submodule(&child_module)?;
-    Ok(())
-}
-
-fn register_literal_submodule(parent_module: &Bound<'_, PyModule>) -> PyResult<()> {
-    let child_module = PyModule::new_bound(parent_module.py(), "literal")?;
-    child_module.add_class::<flyteidl::core::literal::Value>();
-    parent_module.add_submodule(&child_module)?;
-    Ok(())
-}
-
-fn register_primitive_submodule(parent_module: &Bound<'_, PyModule>) -> PyResult<()> {
-    let child_module = PyModule::new_bound(parent_module.py(), "primitive")?;
-    child_module.add_class::<flyteidl::core::primitive::Value>();
-    parent_module.add_submodule(&child_module)?;
-    Ok(())
-}
-
-fn register_literal_type_submodule(parent_module: &Bound<'_, PyModule>) -> PyResult<()> {
-    let child_module = PyModule::new_bound(parent_module.py(), "literal_type")?;
-    child_module.add_class::<flyteidl::core::literal_type::Type>();
-    parent_module.add_submodule(&child_module)?;
-    Ok(())
-}
-
-fn register_workflow_execution_submodule(parent_module: &Bound<'_, PyModule>) -> PyResult<()> {
-    let child_module = PyModule::new_bound(parent_module.py(), "workflow_execution")?;
-    child_module.add_class::<flyteidl::core::workflow_execution::Phase>();
-    parent_module.add_submodule(&child_module)?;
-    Ok(())
-}
-
-fn register_node_execution_closure_submodule(parent_module: &Bound<'_, PyModule>) -> PyResult<()> {
-    let child_module = PyModule::new_bound(parent_module.py(), "node_execution_closure")?;
-    child_module.add_class::<flyteidl::admin::node_execution_closure::TargetMetadata>();
-    parent_module.add_submodule(&child_module)?;
-    Ok(())
-}
-
-fn register_node_execution_submodule(parent_module: &Bound<'_, PyModule>) -> PyResult<()> {
-    let child_module = PyModule::new_bound(parent_module.py(), "node_execution")?;
-    child_module.add_class::<flyteidl::core::node_execution::Phase>();
-    parent_module.add_submodule(&child_module)?;
-    Ok(())
-}
-
-fn register_task_execution_submodule(parent_module: &Bound<'_, PyModule>) -> PyResult<()> {
-    let child_module = PyModule::new_bound(parent_module.py(), "task_execution")?;
-    child_module.add_class::<flyteidl::core::task_execution::Phase>();
-    parent_module.add_submodule(&child_module)?;
-    Ok(())
-}
-
-fn register_core_submodule(parent_module: &Bound<'_, PyModule>) -> PyResult<()> {
-    let m = PyModule::new_bound(parent_module.py(), "core")?;
-
-    m.add_class::<flyteidl::core::literal_type::Type>();
-    m.add_class::<flyteidl::core::LiteralType>();
-    m.add_class::<flyteidl::core::Literal>();
-    m.add_class::<flyteidl::core::LiteralMap>();
-    m.add_class::<flyteidl::core::ExtendedResources>();
-    m.add_class::<flyteidl::core::Resources>();
-    m.add_class::<flyteidl::core::resources::ResourceName>();
-    m.add_class::<flyteidl::core::resources::ResourceEntry>();
-    m.add_class::<flyteidl::core::ResourceType>();
-    m.add_class::<flyteidl::core::ContainerPort>();
-    m.add_class::<flyteidl::core::KeyValuePair>();
-    m.add_class::<flyteidl::core::task_template::Target>();
-    m.add_class::<flyteidl::core::Container>();
-    m.add_class::<flyteidl::core::task_metadata::InterruptibleValue>();
-    m.add_class::<flyteidl::core::SecurityContext>();
-    m.add_class::<flyteidl::core::WorkflowExecutionIdentifier>();
-    m.add_class::<flyteidl::core::task_node::Reference>();
-    m.add_class::<flyteidl::core::TaskNodeOverrides>();
-    m.add_class::<flyteidl::core::TaskNode>();
-    m.add_class::<flyteidl::core::NodeMetadata>();
-    m.add_class::<flyteidl::core::Variable>();
-    m.add_class::<flyteidl::core::VariableMap>();
-    m.add_class::<flyteidl::core::TypedInterface>();
-    m.add_class::<flyteidl::core::RetryStrategy>();
-    m.add_class::<flyteidl::core::RuntimeMetadata>();
-    m.add_class::<flyteidl::core::runtime_metadata::RuntimeType>();
-    m.add_class::<flyteidl::core::TaskMetadata>();
-    m.add_class::<flyteidl::core::Identifier>();
-    m.add_class::<flyteidl::core::TaskTemplate>();
-    m.add_class::<flyteidl::core::ParameterMap>();
-    m.add_class::<flyteidl::core::Parameter>();
-    m.add_class::<flyteidl::core::NodeExecutionIdentifier>();
-    m.add_class::<flyteidl::core::Primitive>();
-    m.add_class::<flyteidl::core::SimpleType>();
-    m.add_class::<flyteidl::core::Scalar>();
-    m.add_class::<flyteidl::core::WorkflowExecution>();
-    m.add_class::<flyteidl::core::ExecutionError>();
-    m.add_class::<flyteidl::core::workflow_execution::Phase>();
-    m.add_class::<flyteidl::core::scalar::Value>();
-    m.add_class::<flyteidl::core::primitive::Value>();
-    m.add_class::<flyteidl::core::Node>();
-    m.add_class::<flyteidl::core::ArrayNode>();
-
-    parent_module.add_submodule(&m)?;
-    Ok(())
-}
-
-fn register_admin_submodule(parent_module: &Bound<'_, PyModule>) -> PyResult<()> {
-    let m = PyModule::new_bound(parent_module.py(), "admin")?;
-
-    m.add_class::<flyteidl::admin::Labels>();
-    m.add_class::<flyteidl::admin::Annotations>();
-    m.add_class::<flyteidl::admin::AuthRole>();
-    m.add_class::<flyteidl::admin::RawOutputDataConfig>();
-    m.add_class::<flyteidl::admin::Envs>();
-    m.add_class::<flyteidl::admin::ClusterAssignment>();
-    m.add_class::<flyteidl::admin::ExecutionMetadata>();
-    m.add_class::<flyteidl::admin::ExecutionSpec>();
-    m.add_class::<flyteidl::admin::ExecutionCreateRequest>();
-    m.add_class::<flyteidl::admin::ExecutionCreateResponse>();
-    m.add_class::<flyteidl::admin::Description>();
-    m.add_class::<flyteidl::admin::DescriptionEntity>();
-    m.add_class::<flyteidl::admin::description::Content>();
-    m.add_class::<flyteidl::admin::TaskSpec>();
-    m.add_class::<flyteidl::admin::ObjectGetRequest>();
-    m.add_class::<flyteidl::admin::Task>();
-    m.add_class::<flyteidl::admin::TaskCreateRequest>();
-    m.add_class::<flyteidl::admin::TaskCreateResponse>();
-    m.add_class::<flyteidl::admin::SourceCode>();
-    m.add_class::<flyteidl::admin::Execution>();
-    m.add_class::<flyteidl::admin::execution_metadata::ExecutionMode>();
-    m.add_class::<flyteidl::admin::WorkflowExecutionGetRequest>();
-    m.add_class::<flyteidl::admin::ExecutionClusterLabel>();
-    m.add_class::<flyteidl::admin::WorkflowExecutionGetDataRequest>();
-    m.add_class::<flyteidl::admin::WorkflowExecutionGetDataResponse>();
-    m.add_class::<flyteidl::admin::NodeExecutionListRequest>();
-    m.add_class::<flyteidl::admin::NodeExecutionList>();
-    m.add_class::<flyteidl::admin::NodeExecution>();
-    m.add_class::<flyteidl::admin::NodeExecutionGetDataRequest>();
-    m.add_class::<flyteidl::admin::NodeExecutionGetDataResponse>();
-    m.add_class::<flyteidl::admin::TaskExecutionListRequest>();
-    m.add_class::<flyteidl::admin::TaskExecutionList>();
-    m.add_class::<flyteidl::admin::TaskExecutionGetRequest>();
-    m.add_class::<flyteidl::admin::TaskExecution>();
-    m.add_class::<flyteidl::admin::TaskExecutionGetDataRequest>();
-    m.add_class::<flyteidl::admin::TaskExecutionGetDataResponse>();
-
-    parent_module.add_submodule(&m)?;
-    Ok(())
-}
-// A Python module implemented in Rust.
 #[pymodule]
-pub fn _flyteidl_rust(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
-    register_wkt_submodule(m);
-    register_core_submodule(m);
-    register_admin_submodule(m);
-    register_scalar_submodule(m);
-    register_literal_submodule(m);
-    register_primitive_submodule(m);
-    register_literal_type_submodule(m);
-    register_workflow_execution_submodule(m);
-    register_node_execution_closure_submodule(m);
-    register_node_execution_submodule(m);
-    register_task_execution_submodule(m);
-
-    use tokio::runtime::{Builder, Runtime};
-
-    use flyteidl::service::admin_service_client::AdminServiceClient;
-    use flyteidl::service::data_proxy_service_client::DataProxyServiceClient;
+// #[pyo3(name="_flyteidl_rust")]
+pub mod _flyteidl_rust {
+    pub use pyo3::prelude::*;
 
     convert_foreign_tonic_error!();
+    convert_foreign_prost_error!();
 
-    concrete_generic_structure!(
-        AdminStub,
-        AdminServiceClient,
-        tonic::transport::Channel,
-        (
-            create_task,
-            flyteidl::admin::TaskCreateRequest,
-            flyteidl::admin::TaskCreateResponse
-        ),
-        (
-            get_task,
-            flyteidl::admin::ObjectGetRequest,
-            flyteidl::admin::Task
-        ),
-        (
-            create_execution,
-            flyteidl::admin::ExecutionCreateRequest,
-            flyteidl::admin::ExecutionCreateResponse
-        ),
-        (
-            get_execution,
-            flyteidl::admin::WorkflowExecutionGetRequest,
-            flyteidl::admin::Execution
-        ),
-        (
-            get_execution_data,
-            flyteidl::admin::WorkflowExecutionGetDataRequest,
-            flyteidl::admin::WorkflowExecutionGetDataResponse
-        ),
-        (
-            list_node_executions,
-            flyteidl::admin::NodeExecutionListRequest,
-            flyteidl::admin::NodeExecutionList
-        ),
-        (
-            get_node_execution_data,
-            flyteidl::admin::NodeExecutionGetDataRequest,
-            flyteidl::admin::NodeExecutionGetDataResponse
-        ),
-        (
-            list_task_executions,
-            flyteidl::admin::TaskExecutionListRequest,
-            flyteidl::admin::TaskExecutionList
-        ),
-        (
-            get_task_execution,
-            flyteidl::admin::TaskExecutionGetRequest,
-            flyteidl::admin::TaskExecution
-        ),
-        (
-            get_task_execution_data,
-            flyteidl::admin::TaskExecutionGetDataRequest,
-            flyteidl::admin::TaskExecutionGetDataResponse
-        )
-    );
+    #[pymodule]
+    pub mod core {
+        #[pymodule_export]
+        use crate::flyteidl::core::{
+            task_node::Reference, task_template::Target, ArrayNode, CompiledTask, Container,
+            ContainerPort, DataLoadingConfig, ExecutionError, ExtendedResources, Identifier,
+            IoStrategy, KeyValuePair, Literal, LiteralMap, LiteralType, Node,
+            NodeExecutionIdentifier, NodeMetadata, Parameter, ParameterMap, Primitive,
+            ResourceType, Resources, RetryStrategy, RuntimeMetadata, Scalar, SecurityContext,
+            SimpleType, TaskMetadata, TaskNode, TaskNodeOverrides, TaskTemplate, TypeAnnotation,
+            TypeStructure, TypedInterface, Variable, VariableMap, WorkflowExecution,
+            WorkflowExecutionIdentifier,
+        };
+    }
+    #[pymodule]
+    pub mod literal {
+        #[pymodule_export]
+        use crate::flyteidl::core::literal::Value;
+    }
+    #[pymodule]
+    pub mod resources {
+        #[pymodule_export]
+        use crate::flyteidl::core::resources::ResourceName;
+    }
+    #[pymodule]
+    pub mod primitive {
+        #[pymodule_export]
+        use crate::flyteidl::core::primitive::Value;
+    }
+    #[pymodule]
+    pub mod literal_type {
+        #[pymodule_export]
+        use crate::flyteidl::core::literal_type::Type;
+    }
+    #[pymodule]
+    pub mod scalar {
+        #[pymodule_export]
+        use crate::flyteidl::core::scalar::Value;
+    }
+    #[pymodule]
+    pub mod runtime_metadata {
+        #[pymodule_export]
+        use crate::flyteidl::core::runtime_metadata::RuntimeType;
+    }
+    #[pymodule]
+    pub mod task_metadata {
+        #[pymodule_export]
+        use crate::flyteidl::core::task_metadata::InterruptibleValue;
+    }
+    #[pymodule]
+    pub mod node_execution {
+        #[pymodule_export]
+        use crate::flyteidl::core::node_execution::Phase;
+    }
+    #[pymodule]
+    pub mod task_execution {
+        #[pymodule_export]
+        use crate::flyteidl::core::task_execution::Phase;
+    }
+    #[pymodule]
+    pub mod data_loading_config {
+        #[pymodule_export]
+        use crate::flyteidl::core::data_loading_config::LiteralMapFormat;
+    }
+    #[pymodule]
+    pub mod task_template {
+        #[pymodule_export]
+        use crate::flyteidl::core::task_template::Target;
+    }
+    #[pymodule]
+    pub mod workflow_execution {
+        #[pymodule_export]
+        use crate::flyteidl::core::workflow_execution::Phase;
+    }
 
-    concrete_generic_structure!(
-        DataProxyStub,
-        DataProxyServiceClient,
-        tonic::transport::Channel,
-        (
-            create_upload_location,
-            flyteidl::service::CreateUploadLocationRequest,
-            flyteidl::service::CreateUploadLocationResponse
-        )
-    );
+    #[pymodule]
+    pub mod admin {
+        #[pymodule_export]
+        use crate::flyteidl::admin::{
+            AbortMetadata, Annotations, AuthRole, ClusterAssignment, Description,
+            DescriptionEntity, Envs, Execution, ExecutionClosure, ExecutionClusterLabel,
+            ExecutionCreateRequest, ExecutionCreateResponse, ExecutionMetadata, ExecutionSpec,
+            Labels, LiteralMapBlob, NodeExecution, NodeExecutionGetDataRequest,
+            NodeExecutionGetDataResponse, NodeExecutionList, NodeExecutionListRequest,
+            Notification, NotificationList, ObjectGetRequest, RawOutputDataConfig, SourceCode,
+            SystemMetadata, Task, TaskClosure, TaskCreateRequest, TaskCreateResponse,
+            TaskExecution, TaskExecutionGetDataRequest, TaskExecutionGetDataResponse,
+            TaskExecutionGetRequest, TaskExecutionList, TaskExecutionListRequest, TaskSpec,
+            WorkflowExecutionGetDataRequest, WorkflowExecutionGetDataResponse,
+            WorkflowExecutionGetRequest,
+        };
+    }
+    #[pymodule]
+    pub mod description {
+        #[pymodule_export]
+        use crate::flyteidl::admin::description::Content;
+    }
+    #[pymodule]
+    pub mod execution_metadata {
+        #[pymodule_export]
+        use crate::flyteidl::admin::execution_metadata::ExecutionMode;
+    }
+    #[pymodule]
+    pub mod node_execution_closure {
+        #[pymodule_export]
+        use crate::flyteidl::admin::node_execution_closure::TargetMetadata;
+    }
+    #[pymodule]
+    pub mod execution_spec {
+        #[pymodule_export]
+        use crate::flyteidl::admin::execution_spec::NotificationOverrides;
+    }
+    #[pymodule]
+    pub mod execution_closure {
+        #[pymodule_export]
+        use crate::flyteidl::admin::execution_closure::OutputResult;
+    }
+    #[pymodule]
+    pub mod literal_map_blob {
+        #[pymodule_export]
+        use crate::flyteidl::admin::literal_map_blob::Data;
+    }
+    #[pymodule]
+    pub mod notification {
+        #[pymodule_export]
+        use crate::flyteidl::admin::notification::Type;
+    }
 
-    m.add_class::<AdminStub>();
-    m.add_class::<DataProxyStub>();
+    #[pymodule]
+    pub mod service {
+        #[pymodule_export]
+        use crate::flyteidl::service::{CreateUploadLocationRequest, CreateUploadLocationResponse};
+    }
 
-    m.add_class::<flyteidl::service::CreateUploadLocationRequest>();
-    m.add_class::<flyteidl::service::CreateUploadLocationResponse>();
+    #[pyclass(subclass, name = "RawSynchronousFlyteClient")]
+    pub struct RawSynchronousFlyteClient {
+        admin_service: crate::flyteidl::service::admin_service_client::AdminServiceClient<
+            tonic::transport::Channel,
+        >,
+        data_proxy_service:
+            crate::flyteidl::service::data_proxy_service_client::DataProxyServiceClient<
+                tonic::transport::Channel,
+            >,
+        runtime: tokio::runtime::Runtime,
+    }
 
-    Ok(())
+    #[pymethods]
+    impl RawSynchronousFlyteClient {
+        // We need this attribute to construct the `RawSynchronousFlyteClient` in Python.
+        #[new]
+        // TODO: Instead of accepting endpoint and kwargs dict as arguments, we should accept a path that reads platform configuration file.
+        #[pyo3(signature = (endpoint, **kwargs))]
+        pub fn new(
+            endpoint: &str,
+            kwargs: Option<&Bound<'_, pyo3::types::PyDict>>,
+        ) -> PyResult<RawSynchronousFlyteClient> {
+            // Use Atomic Reference Counting abstractions as a cheap way to pass string reference into another thread that outlives the scope.
+            let s = std::sync::Arc::new(endpoint);
+            // Check details for constructing Tokio asynchronous `runtime`: https://docs.rs/tokio/latest/tokio/runtime/struct.Builder.html#method.new_current_thread
+            let rt = match tokio::runtime::Builder::new_current_thread()
+                .enable_all()
+                .build()
+            {
+                Ok(rt) => rt,
+                Err(error) => panic!("Failed to initiate Tokio multi-thread runtime: {:?}", error),
+            };
+            // Check details for constructing `channel`: https://docs.rs/tonic/latest/tonic/transport/struct.Channel.html#method.builder
+            // TODO: generally handle more protocols, like the secured one, i.e., `https://`
+            let endpoint_uri =
+                match format!("http://{}", *s.clone()).parse::<tonic::transport::Uri>() {
+                    Ok(uri) => uri,
+                    Err(error) => panic!(
+                        "Got invalid endpoint when parsing endpoint_uri: {:?}",
+                        error
+                    ),
+                };
+            // `Channel::builder(endpoint_uri)` returns type `tonic::transport::Endpoint`.
+            let channel =
+                match rt.block_on(tonic::transport::Channel::builder(endpoint_uri).connect()) {
+                    Ok(ch) => ch,
+                    Err(error) => panic!(
+                        "Failed at connecting to endpoint when constructing channel: {:?}",
+                        error
+                    ),
+                };
+            // Binding connected channel into service client stubs.
+            let admin_stub =
+                crate::flyteidl::service::admin_service_client::AdminServiceClient::new(
+                    channel.clone(),
+                );
+            let data_proxy_stub =
+                crate::flyteidl::service::data_proxy_service_client::DataProxyServiceClient::new(
+                    channel.clone(),
+                );
+            Ok(RawSynchronousFlyteClient {
+                runtime: rt, // The tokio runtime is used in a blocking manner for now.
+                admin_service: admin_stub,
+                data_proxy_service: data_proxy_stub,
+            })
+        }
+
+        pub fn get_task(
+            &mut self,
+            req: crate::flyteidl::admin::ObjectGetRequest,
+        ) -> PyResult<crate::flyteidl::admin::Task> {
+            let res = (match self.runtime.block_on(self.admin_service.get_task(req)) {
+                Ok(res) => res,
+                Err(error) => panic!(
+                    "Failed at awaiting response from gRPC service server: {:?}",
+                    error
+                ),
+            })
+            .into_inner();
+            Ok(res)
+        }
+
+        pub fn create_task(
+            &mut self,
+            req: crate::flyteidl::admin::TaskCreateRequest,
+        ) -> PyResult<crate::flyteidl::admin::TaskCreateResponse> {
+            let res = (match self.runtime.block_on(self.admin_service.create_task(req)) {
+                Ok(res) => res,
+                Err(error) => panic!(
+                    "Failed at awaiting response from gRPC service server: {:?}",
+                    error
+                ),
+            })
+            .into_inner();
+            Ok(res)
+        }
+
+        pub fn create_upload_location(
+            &mut self,
+            req: crate::flyteidl::service::CreateUploadLocationRequest,
+        ) -> PyResult<crate::flyteidl::service::CreateUploadLocationResponse> {
+            let res = (match self
+                .runtime
+                .block_on(self.data_proxy_service.create_upload_location(req))
+            {
+                Ok(res) => res,
+                Err(error) => panic!(
+                    "Failed at awaiting response from gRPC service server: {:?}",
+                    error
+                ),
+            })
+            .into_inner();
+            Ok(res)
+        }
+
+        pub fn create_execution(
+            &mut self,
+            req: crate::flyteidl::admin::ExecutionCreateRequest,
+        ) -> PyResult<crate::flyteidl::admin::ExecutionCreateResponse> {
+            let res = (match self
+                .runtime
+                .block_on(self.admin_service.create_execution(req))
+            {
+                Ok(res) => res,
+                Err(error) => panic!(
+                    "Failed at awaiting response from gRPC service server: {:?}",
+                    error
+                ),
+            })
+            .into_inner();
+            Ok(res)
+        }
+
+        pub fn get_execution(
+            &mut self,
+            req: crate::flyteidl::admin::WorkflowExecutionGetRequest,
+        ) -> PyResult<crate::flyteidl::admin::Execution> {
+            let res = (match self.runtime.block_on(self.admin_service.get_execution(req)) {
+                Ok(res) => res,
+                Err(error) => panic!(
+                    "Failed at awaiting response from gRPC service server: {:?}",
+                    error
+                ),
+            })
+            .into_inner();
+            Ok(res)
+        }
+
+        pub fn get_execution_data(
+            &mut self,
+            req: crate::flyteidl::admin::WorkflowExecutionGetDataRequest,
+        ) -> PyResult<crate::flyteidl::admin::WorkflowExecutionGetDataResponse> {
+            let res = (match self
+                .runtime
+                .block_on(self.admin_service.get_execution_data(req))
+            {
+                Ok(res) => res,
+                Err(error) => panic!(
+                    "Failed at awaiting response from gRPC service server: {:?}",
+                    error
+                ),
+            })
+            .into_inner();
+            Ok(res)
+        }
+
+        pub fn list_node_executions(
+            &mut self,
+            req: crate::flyteidl::admin::NodeExecutionListRequest,
+        ) -> PyResult<crate::flyteidl::admin::NodeExecutionList> {
+            let res = (match self
+                .runtime
+                .block_on(self.admin_service.list_node_executions(req))
+            {
+                Ok(res) => res,
+                Err(error) => panic!(
+                    "Failed at awaiting response from gRPC service server: {:?}",
+                    error
+                ),
+            })
+            .into_inner();
+            Ok(res)
+        }
+
+        pub fn get_node_execution_data(
+            &mut self,
+            req: crate::flyteidl::admin::NodeExecutionGetDataRequest,
+        ) -> PyResult<crate::flyteidl::admin::NodeExecutionGetDataResponse> {
+            let res = (match self
+                .runtime
+                .block_on(self.admin_service.get_node_execution_data(req))
+            {
+                Ok(res) => res,
+                Err(error) => panic!(
+                    "Failed at awaiting response from gRPC service server: {:?}",
+                    error
+                ),
+            })
+            .into_inner();
+            Ok(res)
+        }
+
+        pub fn list_task_executions(
+            &mut self,
+            req: crate::flyteidl::admin::TaskExecutionListRequest,
+        ) -> PyResult<crate::flyteidl::admin::TaskExecutionList> {
+            let res = (match self
+                .runtime
+                .block_on(self.admin_service.list_task_executions(req))
+            {
+                Ok(res) => res,
+                Err(error) => panic!(
+                    "Failed at awaiting response from gRPC service server: {:?}",
+                    error
+                ),
+            })
+            .into_inner();
+            Ok(res)
+        }
+
+        pub fn get_task_execution(
+            &mut self,
+            req: crate::flyteidl::admin::TaskExecutionGetRequest,
+        ) -> PyResult<crate::flyteidl::admin::TaskExecution> {
+            let res = (match self
+                .runtime
+                .block_on(self.admin_service.get_task_execution(req))
+            {
+                Ok(res) => res,
+                Err(error) => panic!(
+                    "Failed at awaiting response from gRPC service server: {:?}",
+                    error
+                ),
+            })
+            .into_inner();
+            Ok(res)
+        }
+
+        pub fn get_task_execution_data(
+            &mut self,
+            req: crate::flyteidl::admin::TaskExecutionGetDataRequest,
+        ) -> PyResult<crate::flyteidl::admin::TaskExecutionGetDataResponse> {
+            let res = (match self
+                .runtime
+                .block_on(self.admin_service.get_task_execution_data(req))
+            {
+                Ok(res) => res,
+                Err(error) => panic!(
+                    "Failed at awaiting response from gRPC service server: {:?}",
+                    error
+                ),
+            })
+            .into_inner();
+            Ok(res)
+        }
+    }
 }
+
+// #[macro_export]
+// macro_rules! concrete_generic_structure {
+//     ($name:ident, $generic:ident, $type:ty, $( ($method_name:ident, $request_type:ty, $response_type:ty) ),* ) => {
+
+//         #[pyo3::pyclass]
+//         #[derive(Debug)]
+//         pub struct $name {
+//             pub inner: $generic<$type>,
+//             pub rt:  Runtime,
+//         }
+//         // If we trying to expose `tonic::transport::Channel` through PyO3 so that we can create a tonic channel in Python and take it as input for our gRPC clients bindings,
+//         // It'll violate the orphan ruls in terms of Rust's traits consisitency, because we were trying to implement a external trait for another external crate's structure in our local crates.
+//         // Se We may need to define a local structure like `PyClientlWrapper` and it's not necessary to get or set all of its member fields.
+
+//         // The macro mechanically implement our gRPC client stubs.
+//         #[pyo3::pymethods]
+//         impl $name {
+
+//             // Attempt to create a new client by connecting to a given endpoint.
+//             #[new]
+//             #[pyo3(signature = (dst))]
+//             pub fn new(dst: String) -> Self {
+//                 let endpoint = tonic::transport::Endpoint::from_shared(dst).unwrap();
+//                 let rt = Builder::new_current_thread().enable_all().build().unwrap();
+//                 let client = rt.block_on($generic::<$type>::connect(endpoint)).unwrap();
+//                 $name {
+//                     inner: client,
+//                     rt: rt,
+//                 }
+//             }
+
+//             // Generate methods for each provided services
+//             // Currently in a blocking manner.
+//             $(
+//                 #[pyo3(signature = (request))]
+//                 pub fn $method_name(
+//                     &mut self,
+//                     request: $request_type,
+//                 ) -> Result<$response_type, GRPCError> {
+//                     let res = self.rt
+//                         .block_on(self.inner.$method_name(request))?.into_inner();
+//                 Ok(res)
+//                 }
+//             )*
+//         }
+//     };
+// }
+
+// A Python module implemented in Rust.
+// #[pymodule]
+// pub fn _flyteidl_rust(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
+
+// concrete_generic_structure!(
+//     AdminStub,
+//     AdminServiceClient,
+//     tonic::transport::Channel,
+//     (
+//         create_task,
+//         flyteidl::admin::TaskCreateRequest,
+//         flyteidl::admin::TaskCreateResponse
+//     ),
+//     (
+//         get_task,
+//         flyteidl::admin::ObjectGetRequest,
+//         flyteidl::admin::Task
+//     ),
+//     (
+//         create_execution,
+//         flyteidl::admin::ExecutionCreateRequest,
+//         flyteidl::admin::ExecutionCreateResponse
+//     ),
+//     (
+//         get_execution,
+//         flyteidl::admin::WorkflowExecutionGetRequest,
+//         flyteidl::admin::Execution
+//     ),
+//     (
+//         get_execution_data,
+//         flyteidl::admin::WorkflowExecutionGetDataRequest,
+//         flyteidl::admin::WorkflowExecutionGetDataResponse
+//     ),
+//     (
+//         list_node_executions,
+//         flyteidl::admin::NodeExecutionListRequest,
+//         flyteidl::admin::NodeExecutionList
+//     ),
+//     (
+//         get_node_execution_data,
+//         flyteidl::admin::NodeExecutionGetDataRequest,
+//         flyteidl::admin::NodeExecutionGetDataResponse
+//     ),
+//     (
+//         list_task_executions,
+//         flyteidl::admin::TaskExecutionListRequest,
+//         flyteidl::admin::TaskExecutionList
+//     ),
+//     (
+//         get_task_execution,
+//         flyteidl::admin::TaskExecutionGetRequest,
+//         flyteidl::admin::TaskExecution
+//     ),
+//     (
+//         get_task_execution_data,
+//         flyteidl::admin::TaskExecutionGetDataRequest,
+//         flyteidl::admin::TaskExecutionGetDataResponse
+//     )
+// );
+
+// concrete_generic_structure!(
+//     DataProxyStub,
+//     DataProxyServiceClient,
+//     tonic::transport::Channel,
+//     (
+//         create_upload_location,
+//         flyteidl::service::CreateUploadLocationRequest,
+//         flyteidl::service::CreateUploadLocationResponse
+//     )
+// );
+// m.add_class::<RawSynchronousFlyteClient>();
+// Ok(())
+// }
