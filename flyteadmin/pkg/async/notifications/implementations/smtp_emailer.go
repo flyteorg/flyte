@@ -123,8 +123,8 @@ func NewSMTPEmailer(ctx context.Context, config runtimeInterfaces.NotificationsC
 
 	auth := smtp.PlainAuth("", emailConf.SMTPUsername, smtpPassword, emailConf.SMTPServer)
 
-	tlsConfiguration = &tls.Config{ // #nosec G402
-		InsecureSkipVerify: emailConf.SMTPSkipTLSVerify,
+	tlsConfiguration = &tls.Config{
+		InsecureSkipVerify: emailConf.SMTPSkipTLSVerify, // #nosec G402
 		ServerName:         emailConf.SMTPServer,
 	}
 
