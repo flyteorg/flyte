@@ -13,7 +13,7 @@ import (
 
 type EventScheduler struct{}
 
-func (s *EventScheduler) CreateScheduleInput(ctx context.Context, appConfig *runtimeInterfaces.SchedulerConfig, identifier core.Identifier, schedule *admin.Schedule) (interfaces.AddScheduleInput, error) {
+func (s *EventScheduler) CreateScheduleInput(ctx context.Context, appConfig *runtimeInterfaces.SchedulerConfig, identifier *core.Identifier, schedule *admin.Schedule) (interfaces.AddScheduleInput, error) {
 	panic("implement me")
 }
 

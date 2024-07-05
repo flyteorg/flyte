@@ -50,7 +50,7 @@ type Task_GetID struct {
 	*mock.Call
 }
 
-func (_m Task_GetID) Return(_a0 core.Identifier) *Task_GetID {
+func (_m Task_GetID) Return(_a0 *core.Identifier) *Task_GetID {
 	return &Task_GetID{Call: _m.Call.Return(_a0)}
 }
 
@@ -65,14 +65,16 @@ func (_m *Task) OnGetIDMatch(matchers ...interface{}) *Task_GetID {
 }
 
 // GetID provides a mock function with given fields:
-func (_m *Task) GetID() core.Identifier {
+func (_m *Task) GetID() *core.Identifier {
 	ret := _m.Called()
 
-	var r0 core.Identifier
-	if rf, ok := ret.Get(0).(func() core.Identifier); ok {
+	var r0 *core.Identifier
+	if rf, ok := ret.Get(0).(func() *core.Identifier); ok {
 		r0 = rf()
 	} else {
-		r0 = ret.Get(0).(core.Identifier)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*core.Identifier)
+		}
 	}
 
 	return r0

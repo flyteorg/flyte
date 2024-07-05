@@ -22,6 +22,9 @@ data:
 {{- with .Values.db.admin }}
   db.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}
+{{- with .Values.configmap.project }}
+  project.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
+{{- end }}
 {{- with .Values.configmap.domain }}
   domain.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}

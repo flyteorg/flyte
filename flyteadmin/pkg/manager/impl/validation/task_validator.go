@@ -25,7 +25,7 @@ import (
 var whitelistedTaskErr = errors.NewFlyteAdminErrorf(codes.InvalidArgument, "task type must be whitelisted before use")
 
 // This is called for a task with a non-nil container.
-func validateContainer(task core.TaskTemplate, platformTaskResources workflowengineInterfaces.TaskResources) error {
+func validateContainer(task *core.TaskTemplate, platformTaskResources workflowengineInterfaces.TaskResources) error {
 	if err := ValidateEmptyStringField(task.GetContainer().Image, shared.Image); err != nil {
 		return err
 	}
@@ -43,7 +43,7 @@ func validateContainer(task core.TaskTemplate, platformTaskResources workfloweng
 }
 
 // This is called for a task with a non-nil k8s pod.
-func validateK8sPod(task core.TaskTemplate, platformTaskResources workflowengineInterfaces.TaskResources) error {
+func validateK8sPod(task *core.TaskTemplate, platformTaskResources workflowengineInterfaces.TaskResources) error {
 	if task.GetK8SPod().PodSpec == nil {
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 			"invalid TaskSpecification, pod tasks should specify their target as a K8sPod with a defined pod spec")
@@ -68,14 +68,14 @@ func validateK8sPod(task core.TaskTemplate, platformTaskResources workflowengine
 	return nil
 }
 
-func validateRuntimeMetadata(metadata core.RuntimeMetadata) error {
+func validateRuntimeMetadata(metadata *core.RuntimeMetadata) error {
 	if err := ValidateEmptyStringField(metadata.Version, shared.RuntimeVersion); err != nil {
 		return err
 	}
 	return nil
 }
 
-func validateTaskTemplate(taskID core.Identifier, task core.TaskTemplate,
+func validateTaskTemplate(taskID *core.Identifier, task *core.TaskTemplate,
 	platformTaskResources workflowengineInterfaces.TaskResources, whitelistConfig runtime.WhitelistConfiguration) error {
 
 	if err := ValidateEmptyStringField(task.Type, shared.Type); err != nil {
@@ -88,7 +88,7 @@ func validateTaskTemplate(taskID core.Identifier, task core.TaskTemplate,
 		return shared.GetMissingArgumentError(shared.Metadata)
 	}
 	if task.Metadata.Runtime != nil {
-		if err := validateRuntimeMetadata(*task.Metadata.Runtime); err != nil {
+		if err := validateRuntimeMetadata(task.Metadata.Runtime); err != nil {
 			return err
 		}
 	}
@@ -107,7 +107,7 @@ func validateTaskTemplate(taskID core.Identifier, task core.TaskTemplate,
 }
 
 func ValidateTask(
-	ctx context.Context, request admin.TaskCreateRequest, db repositoryInterfaces.Repository,
+	ctx context.Context, request *admin.TaskCreateRequest, db repositoryInterfaces.Repository,
 	platformTaskResources workflowengineInterfaces.TaskResources, whitelistConfig runtime.WhitelistConfiguration,
 	applicationConfig runtime.ApplicationConfiguration) error {
 	if err := ValidateIdentifier(request.Id, common.Task); err != nil {
@@ -119,7 +119,7 @@ func ValidateTask(
 	if request.Spec == nil || request.Spec.Template == nil {
 		return shared.GetMissingArgumentError(shared.Spec)
 	}
-	return validateTaskTemplate(*request.Id, *request.Spec.Template, platformTaskResources, whitelistConfig)
+	return validateTaskTemplate(request.Id, request.Spec.Template, platformTaskResources, whitelistConfig)
 }
 
 func taskResourceSetToMap(
@@ -282,7 +282,7 @@ func validateResource(identifier *core.Identifier, requestedResourceDefaults,
 	return nil
 }
 
-func validateTaskType(taskID core.Identifier, taskType string, whitelistConfig runtime.WhitelistConfiguration) error {
+func validateTaskType(taskID *core.Identifier, taskType string, whitelistConfig runtime.WhitelistConfiguration) error {
 	taskTypeWhitelist := whitelistConfig.GetTaskTypeWhitelist()
 	if taskTypeWhitelist == nil {
 		return nil

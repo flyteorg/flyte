@@ -41,6 +41,7 @@ tasks:
       - container
       - sidecar
       - K8S-ARRAY
+      - agent-service
       - echo
     default-for-task-types:
       - container: container
@@ -95,3 +96,9 @@ task_resources:
   limits:
     cpu: 4
     memory: 4Gi
+
+flyte:
+  admin:
+    seedProjects:
+      - name: flytesnacks
+        description: Flytesnacks project

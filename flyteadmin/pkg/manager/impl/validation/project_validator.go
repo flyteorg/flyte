@@ -20,25 +20,25 @@ const maxNameLength = 64
 const maxDescriptionLength = 300
 const maxLabelArrayLength = 16
 
-func ValidateProjectRegisterRequest(request admin.ProjectRegisterRequest) error {
+func ValidateProjectRegisterRequest(request *admin.ProjectRegisterRequest) error {
 	if request.Project == nil {
 		return shared.GetMissingArgumentError(shared.Project)
 	}
-	project := *request.Project
+	project := request.Project
 	if err := ValidateEmptyStringField(project.Name, projectName); err != nil {
 		return err
 	}
 	return ValidateProject(project)
 }
 
-func ValidateProjectGetRequest(request admin.ProjectGetRequest) error {
+func ValidateProjectGetRequest(request *admin.ProjectGetRequest) error {
 	if err := ValidateEmptyStringField(request.Id, projectID); err != nil {
 		return err
 	}
 	return nil
 }
 
-func ValidateProject(project admin.Project) error {
+func ValidateProject(project *admin.Project) error {
 	if err := ValidateEmptyStringField(project.Id, projectID); err != nil {
 		return err
 	}

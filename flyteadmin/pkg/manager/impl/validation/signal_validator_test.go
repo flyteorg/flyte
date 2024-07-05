@@ -20,7 +20,7 @@ func TestValidateSignalGetOrCreateRequest(t *testing.T) {
 	ctx := context.TODO()
 
 	t.Run("Happy", func(t *testing.T) {
-		request := admin.SignalGetOrCreateRequest{
+		request := &admin.SignalGetOrCreateRequest{
 			Id: &core.SignalIdentifier{
 				ExecutionId: &core.WorkflowExecutionIdentifier{
 					Project: "project",
@@ -39,7 +39,7 @@ func TestValidateSignalGetOrCreateRequest(t *testing.T) {
 	})
 
 	t.Run("MissingSignalIdentifier", func(t *testing.T) {
-		request := admin.SignalGetOrCreateRequest{
+		request := &admin.SignalGetOrCreateRequest{
 			Type: &core.LiteralType{
 				Type: &core.LiteralType_Simple{
 					Simple: core.SimpleType_BOOLEAN,
@@ -50,7 +50,7 @@ func TestValidateSignalGetOrCreateRequest(t *testing.T) {
 	})
 
 	t.Run("InvalidSignalIdentifier", func(t *testing.T) {
-		request := admin.SignalGetOrCreateRequest{
+		request := &admin.SignalGetOrCreateRequest{
 			Id: &core.SignalIdentifier{
 				ExecutionId: &core.WorkflowExecutionIdentifier{
 					Project: "project",
@@ -68,7 +68,7 @@ func TestValidateSignalGetOrCreateRequest(t *testing.T) {
 	})
 
 	t.Run("MissingExecutionIdentifier", func(t *testing.T) {
-		request := admin.SignalGetOrCreateRequest{
+		request := &admin.SignalGetOrCreateRequest{
 			Id: &core.SignalIdentifier{
 				SignalId: "signal",
 			},
@@ -82,7 +82,7 @@ func TestValidateSignalGetOrCreateRequest(t *testing.T) {
 	})
 
 	t.Run("InvalidExecutionIdentifier", func(t *testing.T) {
-		request := admin.SignalGetOrCreateRequest{
+		request := &admin.SignalGetOrCreateRequest{
 			Id: &core.SignalIdentifier{
 				ExecutionId: &core.WorkflowExecutionIdentifier{
 					Domain: "domain",
@@ -100,7 +100,7 @@ func TestValidateSignalGetOrCreateRequest(t *testing.T) {
 	})
 
 	t.Run("MissingType", func(t *testing.T) {
-		request := admin.SignalGetOrCreateRequest{
+		request := &admin.SignalGetOrCreateRequest{
 			Id: &core.SignalIdentifier{
 				ExecutionId: &core.WorkflowExecutionIdentifier{
 					Project: "project",
@@ -118,7 +118,7 @@ func TestValidateSignalListrequest(t *testing.T) {
 	ctx := context.TODO()
 
 	t.Run("Happy", func(t *testing.T) {
-		request := admin.SignalListRequest{
+		request := &admin.SignalListRequest{
 			WorkflowExecutionId: &core.WorkflowExecutionIdentifier{
 				Project: "project",
 				Domain:  "domain",
@@ -130,14 +130,14 @@ func TestValidateSignalListrequest(t *testing.T) {
 	})
 
 	t.Run("MissingWorkflowExecutionIdentifier", func(t *testing.T) {
-		request := admin.SignalListRequest{
+		request := &admin.SignalListRequest{
 			Limit: 20,
 		}
 		assert.EqualError(t, ValidateSignalListRequest(ctx, request), "missing execution_id")
 	})
 
 	t.Run("MissingLimit", func(t *testing.T) {
-		request := admin.SignalListRequest{
+		request := &admin.SignalListRequest{
 			WorkflowExecutionId: &core.WorkflowExecutionIdentifier{
 				Project: "project",
 				Domain:  "domain",
@@ -168,7 +168,7 @@ func TestValidateSignalUpdateRequest(t *testing.T) {
 	)
 
 	t.Run("Happy", func(t *testing.T) {
-		request := admin.SignalSetRequest{
+		request := &admin.SignalSetRequest{
 			Id: &core.SignalIdentifier{
 				ExecutionId: &core.WorkflowExecutionIdentifier{
 					Project: "project",
@@ -195,7 +195,7 @@ func TestValidateSignalUpdateRequest(t *testing.T) {
 	})
 
 	t.Run("MissingValue", func(t *testing.T) {
-		request := admin.SignalSetRequest{
+		request := &admin.SignalSetRequest{
 			Id: &core.SignalIdentifier{
 				ExecutionId: &core.WorkflowExecutionIdentifier{
 					Project: "project",
@@ -213,7 +213,7 @@ func TestValidateSignalUpdateRequest(t *testing.T) {
 		repo.SignalRepo().(*repositoryMocks.SignalRepoInterface).
 			OnGetMatch(mock.Anything, mock.Anything).Return(models.Signal{}, errors.New("foo"))
 
-		request := admin.SignalSetRequest{
+		request := &admin.SignalSetRequest{
 			Id: &core.SignalIdentifier{
 				ExecutionId: &core.WorkflowExecutionIdentifier{
 					Project: "project",
@@ -257,7 +257,7 @@ func TestValidateSignalUpdateRequest(t *testing.T) {
 			nil,
 		)
 
-		request := admin.SignalSetRequest{
+		request := &admin.SignalSetRequest{
 			Id: &core.SignalIdentifier{
 				ExecutionId: &core.WorkflowExecutionIdentifier{
 					Project: "project",

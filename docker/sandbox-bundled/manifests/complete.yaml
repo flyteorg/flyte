@@ -432,7 +432,8 @@ data:
         disableScheduler: false
         disabled: false
         seedProjects:
-        - flytesnacks
+        - description: flytesnacks project
+          name: flytesnacks
       dataCatalog:
         disabled: false
       propeller:
@@ -798,7 +799,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: Q3BDekMwb0JHM1pxaXAycg==
+  haSharedSecret: blRGSVdhMW1XMktPRXdNMg==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1196,7 +1197,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: 6fd9b172465e3089fcc59f738b92b8dc4d8939360c19de8ee65f68b0e7422035
-        checksum/configuration: 967349c227efb6765bb7509d14dc7b0d62b07904a337dd70c8682d52d870590a
+        checksum/configuration: 58860be639f08ba58fbbe57b3466bf9a435c378986ede3db4bd96b732d6edc6e
         checksum/configuration-secret: 09216ffaa3d29e14f88b1f30af580d02a2a5e014de4d750b7f275cc07ed4e914
       labels:
         app.kubernetes.io/component: flyte-binary
@@ -1362,7 +1363,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 65e52b61d9d5af16c4217a1ea9f625d8d18e3251ede28f012cc14ef665412685
+        checksum/secret: bb7cf4a3936a88ae01743b6ee521faf8409839cc9687e41b9c57ec6b09405f78
       labels:
         app: docker-registry
         release: flyte-sandbox

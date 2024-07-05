@@ -23,7 +23,7 @@ func (_m MetricsInterface_GetExecutionMetrics) Return(_a0 *admin.WorkflowExecuti
 	return &MetricsInterface_GetExecutionMetrics{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *MetricsInterface) OnGetExecutionMetrics(ctx context.Context, request admin.WorkflowExecutionGetMetricsRequest) *MetricsInterface_GetExecutionMetrics {
+func (_m *MetricsInterface) OnGetExecutionMetrics(ctx context.Context, request *admin.WorkflowExecutionGetMetricsRequest) *MetricsInterface_GetExecutionMetrics {
 	c_call := _m.On("GetExecutionMetrics", ctx, request)
 	return &MetricsInterface_GetExecutionMetrics{Call: c_call}
 }
@@ -34,11 +34,11 @@ func (_m *MetricsInterface) OnGetExecutionMetricsMatch(matchers ...interface{}) 
 }
 
 // GetExecutionMetrics provides a mock function with given fields: ctx, request
-func (_m *MetricsInterface) GetExecutionMetrics(ctx context.Context, request admin.WorkflowExecutionGetMetricsRequest) (*admin.WorkflowExecutionGetMetricsResponse, error) {
+func (_m *MetricsInterface) GetExecutionMetrics(ctx context.Context, request *admin.WorkflowExecutionGetMetricsRequest) (*admin.WorkflowExecutionGetMetricsResponse, error) {
 	ret := _m.Called(ctx, request)
 
 	var r0 *admin.WorkflowExecutionGetMetricsResponse
-	if rf, ok := ret.Get(0).(func(context.Context, admin.WorkflowExecutionGetMetricsRequest) *admin.WorkflowExecutionGetMetricsResponse); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.WorkflowExecutionGetMetricsRequest) *admin.WorkflowExecutionGetMetricsResponse); ok {
 		r0 = rf(ctx, request)
 	} else {
 		if ret.Get(0) != nil {
@@ -47,7 +47,7 @@ func (_m *MetricsInterface) GetExecutionMetrics(ctx context.Context, request adm
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, admin.WorkflowExecutionGetMetricsRequest) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.WorkflowExecutionGetMetricsRequest) error); ok {
 		r1 = rf(ctx, request)
 	} else {
 		r1 = ret.Error(1)

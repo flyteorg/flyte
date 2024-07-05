@@ -112,7 +112,7 @@ func (_m WorkflowBuilder_GetCompiledSubWorkflow) Return(wf *core.CompiledWorkflo
 	return &WorkflowBuilder_GetCompiledSubWorkflow{Call: _m.Call.Return(wf, found)}
 }
 
-func (_m *WorkflowBuilder) OnGetCompiledSubWorkflow(id core.Identifier) *WorkflowBuilder_GetCompiledSubWorkflow {
+func (_m *WorkflowBuilder) OnGetCompiledSubWorkflow(id *core.Identifier) *WorkflowBuilder_GetCompiledSubWorkflow {
 	c_call := _m.On("GetCompiledSubWorkflow", id)
 	return &WorkflowBuilder_GetCompiledSubWorkflow{Call: c_call}
 }
@@ -123,11 +123,11 @@ func (_m *WorkflowBuilder) OnGetCompiledSubWorkflowMatch(matchers ...interface{}
 }
 
 // GetCompiledSubWorkflow provides a mock function with given fields: id
-func (_m *WorkflowBuilder) GetCompiledSubWorkflow(id core.Identifier) (*core.CompiledWorkflow, bool) {
+func (_m *WorkflowBuilder) GetCompiledSubWorkflow(id *core.Identifier) (*core.CompiledWorkflow, bool) {
 	ret := _m.Called(id)
 
 	var r0 *core.CompiledWorkflow
-	if rf, ok := ret.Get(0).(func(core.Identifier) *core.CompiledWorkflow); ok {
+	if rf, ok := ret.Get(0).(func(*core.Identifier) *core.CompiledWorkflow); ok {
 		r0 = rf(id)
 	} else {
 		if ret.Get(0) != nil {
@@ -136,7 +136,7 @@ func (_m *WorkflowBuilder) GetCompiledSubWorkflow(id core.Identifier) (*core.Com
 	}
 
 	var r1 bool
-	if rf, ok := ret.Get(1).(func(core.Identifier) bool); ok {
+	if rf, ok := ret.Get(1).(func(*core.Identifier) bool); ok {
 		r1 = rf(id)
 	} else {
 		r1 = ret.Get(1).(bool)
@@ -255,7 +255,7 @@ func (_m WorkflowBuilder_GetLaunchPlan) Return(wf common.InterfaceProvider, foun
 	return &WorkflowBuilder_GetLaunchPlan{Call: _m.Call.Return(wf, found)}
 }
 
-func (_m *WorkflowBuilder) OnGetLaunchPlan(id core.Identifier) *WorkflowBuilder_GetLaunchPlan {
+func (_m *WorkflowBuilder) OnGetLaunchPlan(id *core.Identifier) *WorkflowBuilder_GetLaunchPlan {
 	c_call := _m.On("GetLaunchPlan", id)
 	return &WorkflowBuilder_GetLaunchPlan{Call: c_call}
 }
@@ -266,11 +266,11 @@ func (_m *WorkflowBuilder) OnGetLaunchPlanMatch(matchers ...interface{}) *Workfl
 }
 
 // GetLaunchPlan provides a mock function with given fields: id
-func (_m *WorkflowBuilder) GetLaunchPlan(id core.Identifier) (common.InterfaceProvider, bool) {
+func (_m *WorkflowBuilder) GetLaunchPlan(id *core.Identifier) (common.InterfaceProvider, bool) {
 	ret := _m.Called(id)
 
 	var r0 common.InterfaceProvider
-	if rf, ok := ret.Get(0).(func(core.Identifier) common.InterfaceProvider); ok {
+	if rf, ok := ret.Get(0).(func(*core.Identifier) common.InterfaceProvider); ok {
 		r0 = rf(id)
 	} else {
 		if ret.Get(0) != nil {
@@ -279,7 +279,7 @@ func (_m *WorkflowBuilder) GetLaunchPlan(id core.Identifier) (common.InterfacePr
 	}
 
 	var r1 bool
-	if rf, ok := ret.Get(1).(func(core.Identifier) bool); ok {
+	if rf, ok := ret.Get(1).(func(*core.Identifier) bool); ok {
 		r1 = rf(id)
 	} else {
 		r1 = ret.Get(1).(bool)
@@ -405,7 +405,7 @@ func (_m WorkflowBuilder_GetSubWorkflow) Return(wf *core.CompiledWorkflow, found
 	return &WorkflowBuilder_GetSubWorkflow{Call: _m.Call.Return(wf, found)}
 }
 
-func (_m *WorkflowBuilder) OnGetSubWorkflow(id core.Identifier) *WorkflowBuilder_GetSubWorkflow {
+func (_m *WorkflowBuilder) OnGetSubWorkflow(id *core.Identifier) *WorkflowBuilder_GetSubWorkflow {
 	c_call := _m.On("GetSubWorkflow", id)
 	return &WorkflowBuilder_GetSubWorkflow{Call: c_call}
 }
@@ -416,11 +416,11 @@ func (_m *WorkflowBuilder) OnGetSubWorkflowMatch(matchers ...interface{}) *Workf
 }
 
 // GetSubWorkflow provides a mock function with given fields: id
-func (_m *WorkflowBuilder) GetSubWorkflow(id core.Identifier) (*core.CompiledWorkflow, bool) {
+func (_m *WorkflowBuilder) GetSubWorkflow(id *core.Identifier) (*core.CompiledWorkflow, bool) {
 	ret := _m.Called(id)
 
 	var r0 *core.CompiledWorkflow
-	if rf, ok := ret.Get(0).(func(core.Identifier) *core.CompiledWorkflow); ok {
+	if rf, ok := ret.Get(0).(func(*core.Identifier) *core.CompiledWorkflow); ok {
 		r0 = rf(id)
 	} else {
 		if ret.Get(0) != nil {
@@ -429,7 +429,7 @@ func (_m *WorkflowBuilder) GetSubWorkflow(id core.Identifier) (*core.CompiledWor
 	}
 
 	var r1 bool
-	if rf, ok := ret.Get(1).(func(core.Identifier) bool); ok {
+	if rf, ok := ret.Get(1).(func(*core.Identifier) bool); ok {
 		r1 = rf(id)
 	} else {
 		r1 = ret.Get(1).(bool)
@@ -446,7 +446,7 @@ func (_m WorkflowBuilder_GetTask) Return(task common.Task, found bool) *Workflow
 	return &WorkflowBuilder_GetTask{Call: _m.Call.Return(task, found)}
 }
 
-func (_m *WorkflowBuilder) OnGetTask(id core.Identifier) *WorkflowBuilder_GetTask {
+func (_m *WorkflowBuilder) OnGetTask(id *core.Identifier) *WorkflowBuilder_GetTask {
 	c_call := _m.On("GetTask", id)
 	return &WorkflowBuilder_GetTask{Call: c_call}
 }
@@ -457,11 +457,11 @@ func (_m *WorkflowBuilder) OnGetTaskMatch(matchers ...interface{}) *WorkflowBuil
 }
 
 // GetTask provides a mock function with given fields: id
-func (_m *WorkflowBuilder) GetTask(id core.Identifier) (common.Task, bool) {
+func (_m *WorkflowBuilder) GetTask(id *core.Identifier) (common.Task, bool) {
 	ret := _m.Called(id)
 
 	var r0 common.Task
-	if rf, ok := ret.Get(0).(func(core.Identifier) common.Task); ok {
+	if rf, ok := ret.Get(0).(func(*core.Identifier) common.Task); ok {
 		r0 = rf(id)
 	} else {
 		if ret.Get(0) != nil {
@@ -470,7 +470,7 @@ func (_m *WorkflowBuilder) GetTask(id core.Identifier) (common.Task, bool) {
 	}
 
 	var r1 bool
-	if rf, ok := ret.Get(1).(func(core.Identifier) bool); ok {
+	if rf, ok := ret.Get(1).(func(*core.Identifier) bool); ok {
 		r1 = rf(id)
 	} else {
 		r1 = ret.Get(1).(bool)
@@ -548,7 +548,7 @@ func (_m *WorkflowBuilder) GetUpstreamNodes() common.StringAdjacencyList {
 }
 
 // StoreCompiledSubWorkflow provides a mock function with given fields: id, compiledWorkflow
-func (_m *WorkflowBuilder) StoreCompiledSubWorkflow(id core.Identifier, compiledWorkflow *core.CompiledWorkflow) {
+func (_m *WorkflowBuilder) StoreCompiledSubWorkflow(id *core.Identifier, compiledWorkflow *core.CompiledWorkflow) {
 	_m.Called(id, compiledWorkflow)
 }
 

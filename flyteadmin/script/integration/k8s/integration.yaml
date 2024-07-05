@@ -351,6 +351,13 @@ data:
           domain: production
       qubolespark:
         - project: myProject3
+    projects:
+      - name: project
+        description: project description
+      - name: admintests
+        description: admintests description    
+      - name: flytekit
+        description: flytekit flytekit  
     domains:
       - id: development
         name: development
@@ -409,7 +416,7 @@ spec:
           image: flyteadmin:test
           imagePullPolicy: IfNotPresent
           command: ["flyteadmin", "migrate", "seed-projects",
-                    "project", "admintests", "flytekit", "--config", "/etc/flyte/config/flyteadmin_config.yaml",
+                    "--config", "/etc/flyte/config/flyteadmin_config.yaml",
                     "--server.kube-config", "/etc/flyte/config/flyteadmin_config.yaml"]
           volumeMounts:
             - name: config-volume

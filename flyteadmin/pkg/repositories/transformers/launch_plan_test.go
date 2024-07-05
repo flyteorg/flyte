@@ -27,7 +27,7 @@ var expectedOutputs = &core.VariableMap{
 	},
 }
 
-func getRequest() admin.LaunchPlanCreateRequest {
+func getRequest() *admin.LaunchPlanCreateRequest {
 	request := testutils.GetLaunchPlanRequest()
 	request.Spec.DefaultInputs = expectedInputs
 	return request
@@ -45,7 +45,7 @@ func TestCreateLaunchPlan(t *testing.T) {
 				ExpectedInputs:  expectedInputs,
 				ExpectedOutputs: expectedOutputs,
 			},
-		}, &launchPlan))
+		}, launchPlan))
 }
 
 func TestToLaunchPlanModel(t *testing.T) {
@@ -53,7 +53,7 @@ func TestToLaunchPlanModel(t *testing.T) {
 	workflowID := uint(11)
 	launchPlanDigest := []byte("launch plan")
 
-	launchPlan := admin.LaunchPlan{
+	launchPlan := &admin.LaunchPlan{
 		Id:   lpRequest.Id,
 		Spec: lpRequest.Spec,
 		Closure: &admin.LaunchPlanClosure{
@@ -95,12 +95,12 @@ func TestToLaunchPlanModelWithCronSchedule(t *testing.T) {
 	})
 }
 
-func testLaunchPlanWithCronInternal(t *testing.T, lpRequest admin.LaunchPlanCreateRequest) {
+func testLaunchPlanWithCronInternal(t *testing.T, lpRequest *admin.LaunchPlanCreateRequest) {
 	lpRequest.Spec.DefaultInputs = expectedInputs
 	workflowID := uint(11)
 	launchPlanDigest := []byte("launch plan")
 
-	launchPlan := admin.LaunchPlan{
+	launchPlan := &admin.LaunchPlan{
 		Id:   lpRequest.Id,
 		Spec: lpRequest.Spec,
 		Closure: &admin.LaunchPlanClosure{
@@ -136,7 +136,7 @@ func TestToLaunchPlanModelWithFixedRateSchedule(t *testing.T) {
 	workflowID := uint(11)
 	launchPlanDigest := []byte("launch plan")
 
-	launchPlan := admin.LaunchPlan{
+	launchPlan := &admin.LaunchPlan{
 		Id:   lpRequest.Id,
 		Spec: lpRequest.Spec,
 		Closure: &admin.LaunchPlanClosure{

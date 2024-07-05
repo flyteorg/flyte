@@ -11,6 +11,7 @@ type MockApplicationProvider struct {
 	schedulerConfig      interfaces.SchedulerConfig
 	remoteDataConfig     interfaces.RemoteDataConfig
 	notificationsConfig  interfaces.NotificationsConfig
+	projectsConfig       interfaces.ProjectsConfig
 	domainsConfig        interfaces.DomainsConfig
 	externalEventsConfig interfaces.ExternalEventsConfig
 	cloudEventConfig     interfaces.CloudEventsConfig
@@ -62,6 +63,14 @@ func (p *MockApplicationProvider) GetDomainsConfig() *interfaces.DomainsConfig {
 
 func (p *MockApplicationProvider) SetDomainsConfig(domainsConfig interfaces.DomainsConfig) {
 	p.domainsConfig = domainsConfig
+}
+
+func (p *MockApplicationProvider) GetProjectsConfig() *interfaces.ProjectsConfig {
+	return &p.projectsConfig
+}
+
+func (p *MockApplicationProvider) SetProjectsConfig(projectsConfig interfaces.ProjectsConfig) {
+	p.projectsConfig = projectsConfig
 }
 
 func (p *MockApplicationProvider) SetExternalEventsConfig(externalEventsConfig interfaces.ExternalEventsConfig) {

@@ -250,6 +250,14 @@ data:
       host: postgres
       port: 5432
       username: postgres
+  project.yaml: | 
+    projects:
+    - description: flytesnacks project
+      name: flytesnacks
+    - description: flytetester project
+      name: flytetester
+    - description: flyteexamples project
+      name: flyteexamples
   domain.yaml: | 
     domains:
     - id: development
@@ -6694,7 +6702,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "88625d852360c42642190e21751f32f7dd9501ce3d479fa68b86478995ff689"
+        configChecksum: "0d73cb37a51c69580abfb8c039040757c5825ac4f255473da43c44c266d26a4"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -6732,9 +6740,6 @@ spec:
           - /etc/flyte/config/*.yaml
           - migrate
           - seed-projects
-          - flytesnacks
-          - flytetester
-          - flyteexamples
           image: "cr.flyte.org/flyteorg/flyteadmin:v1.13.1"
           imagePullPolicy: "IfNotPresent"
           name: seed-projects
@@ -7087,7 +7092,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "88625d852360c42642190e21751f32f7dd9501ce3d479fa68b86478995ff689"
+        configChecksum: "0d73cb37a51c69580abfb8c039040757c5825ac4f255473da43c44c266d26a4"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte

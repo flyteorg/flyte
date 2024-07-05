@@ -19,7 +19,8 @@ flyte-core-components:
     disableClusterResourceManager: false
     # seedProjects flyte projects to create by default
     seedProjects:
-      - flytesnacks
+      - name: flytesnacks
+        description: "flytesnacks project"
   # propeller Configuration to disable propeller or any of its components
   propeller:
     # disabled Disables flytepropeller

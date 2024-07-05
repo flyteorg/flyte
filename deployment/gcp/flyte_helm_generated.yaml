@@ -134,6 +134,14 @@ data:
       passwordPath: /etc/db/pass.txt
       port: 5432
       username: flyteadmin
+  project.yaml: | 
+    projects:
+    - description: flytesnacks project
+      name: flytesnacks
+    - description: flytetester project
+      name: flytetester
+    - description: flyteexamples project
+      name: flyteexamples
   domain.yaml: | 
     domains:
     - id: development
@@ -910,7 +918,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "0705f122f2535babec96a6083827c3e6d27e6e9b0e460b4d07292c858079ac7"
+        configChecksum: "95d68684ffb58e443e3ab4d76b9eb577732449635254eac74e4f0c4823558b0"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -949,9 +957,6 @@ spec:
           - /etc/flyte/config/*.yaml
           - migrate
           - seed-projects
-          - flytesnacks
-          - flytetester
-          - flyteexamples
           image: "cr.flyte.org/flyteorg/flyteadmin:v1.13.1"
           imagePullPolicy: "IfNotPresent"
           name: seed-projects
@@ -1332,7 +1337,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "0705f122f2535babec96a6083827c3e6d27e6e9b0e460b4d07292c858079ac7"
+        configChecksum: "95d68684ffb58e443e3ab4d76b9eb577732449635254eac74e4f0c4823558b0"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte

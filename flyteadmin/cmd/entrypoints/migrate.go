@@ -6,6 +6,8 @@ import (
 	"github.com/spf13/cobra"
 	_ "gorm.io/driver/postgres" // Required to import database driver.
 
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/config"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/runtime"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/server"
 )
 
@@ -40,7 +42,22 @@ var seedProjectsCmd = &cobra.Command{
 	Short: "Seed projects in the database.",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		ctx := context.Background()
-		return server.SeedProjects(ctx, args)
+		configuration := runtime.NewConfigurationProvider()
+		projectConfig := configuration.ApplicationConfiguration().GetProjectsConfig()
+
+		var projectsMap = make(map[string]config.Project)
+
+		for _, project := range *projectConfig {
+			projectsMap[project.Name] = config.Project{Name: project.Name, Description: project.Description}
+		}
+
+		var projects = make([]config.Project, 0, len(projectsMap))
+
+		for _, project := range projectsMap {
+			projects = append(projects, project)
+		}
+
+		return server.SeedProjects(ctx, projects)
 	},
 }
 

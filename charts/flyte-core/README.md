@@ -107,6 +107,7 @@ helm install gateway bitnami/contour -n flyte
 | configmap.enabled_plugins.tasks.task-plugins.enabled-plugins | list | `["container","sidecar","k8s-array","agent-service","echo"]` | [Enabled Plugins](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/config#Config). Enable sagemaker*, athena if you install the backend plugins |
 | configmap.k8s | object | `{"plugins":{"k8s":{"default-cpus":"100m","default-env-vars":[],"default-memory":"100Mi"}}}` | Kubernetes specific Flyte configuration |
 | configmap.k8s.plugins.k8s | object | `{"default-cpus":"100m","default-env-vars":[],"default-memory":"100Mi"}` | Configuration section for all K8s specific plugins [Configuration structure](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/pluginmachinery/flytek8s/config) |
+| configmap.project | object | `{"projects":[{"description":"flytesnacks project","name":"flytesnacks"},{"description":"flytetester project","name":"flytetester"},{"description":"flyteexamples project","name":"flyteexamples"}]}` | Projects configuration for Flyte |
 | configmap.remoteData.remoteData.region | string | `"us-east-1"` |  |
 | configmap.remoteData.remoteData.scheme | string | `"local"` |  |
 | configmap.remoteData.remoteData.signedUrls.durationMinutes | int | `3` |  |
@@ -167,7 +168,6 @@ helm install gateway bitnami/contour -n flyte
 | flyteadmin.image.pullPolicy | string | `"IfNotPresent"` |  |
 | flyteadmin.image.repository | string | `"cr.flyte.org/flyteorg/flyteadmin"` | Docker image for Flyteadmin deployment |
 | flyteadmin.image.tag | string | `"v1.13.1"` |  |
-| flyteadmin.initialProjects | list | `["flytesnacks","flytetester","flyteexamples"]` | Initial projects to create |
 | flyteadmin.nodeSelector | object | `{}` | nodeSelector for Flyteadmin deployment |
 | flyteadmin.podAnnotations | object | `{}` | Annotations for Flyteadmin pods |
 | flyteadmin.podLabels | object | `{}` | Labels for Flyteadmin pods |

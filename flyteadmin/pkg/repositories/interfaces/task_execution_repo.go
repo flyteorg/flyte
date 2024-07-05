@@ -22,7 +22,7 @@ type TaskExecutionRepoInterface interface {
 }
 
 type GetTaskExecutionInput struct {
-	TaskExecutionID core.TaskExecutionIdentifier
+	TaskExecutionID *core.TaskExecutionIdentifier
 }
 
 // Response format for a query on task executions.

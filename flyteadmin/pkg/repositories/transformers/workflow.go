@@ -14,7 +14,7 @@ import (
 )
 
 // Transforms a WorkflowCreateRequest to a workflow model
-func CreateWorkflowModel(request admin.WorkflowCreateRequest, remoteClosureIdentifier string,
+func CreateWorkflowModel(request *admin.WorkflowCreateRequest, remoteClosureIdentifier string,
 	digest []byte) (models.Workflow, error) {
 	var typedInterface []byte
 	if request.Spec != nil && request.Spec.Template != nil && request.Spec.Template.Interface != nil {
