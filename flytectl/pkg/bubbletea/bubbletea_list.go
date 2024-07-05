@@ -94,6 +94,7 @@ func (m listModel) listUpdate(msg tea.Msg) (tea.Model, tea.Cmd) {
 			curArgs = append(curArgs, string(item))
 			err := makeListModel(&m, string(item))
 			if err != nil || m.quitting {
+				listErrMsg = err
 				return m, tea.Quit
 			}
 			return m, nil

@@ -104,7 +104,10 @@ func makeFlagListModel(m *listModel) error {
 		}
 	case "-d":
 		curArgs = append(curArgs, flag)
-		makeDomainListModel(m)
+		err := makeDomainListModel(m)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
