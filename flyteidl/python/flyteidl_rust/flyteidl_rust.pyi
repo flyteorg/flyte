@@ -1,33 +1,18 @@
 from flyteidl_rust import *
 
-__all__  = [AdminStub, DataProxyStub]
+__all__  = [RawSynchronousFlyteClient]
 
-class AdminStub:
+class RawSynchronousFlyteClient:
     """Main entrypoint for programmatically accessing a Flyte remote backend.
 
     The term 'remote' is synonymous with 'backend' or 'deployment' and refers to a hosted instance of the
     Flyte platform, which comes with a Flyte Admin server on some known URI.
     """
-    def __init__(self, dst: str) -> 'AdminStub':
+    def __init__(self, endpoint: str) -> 'RawSynchronousFlyteClient':
         """Initialize a FlyteRemote object.
 
-        Creates a AdminServiceClient based on destination endpoint that connects to Flyte gRPC Client.
+        Creates a RawSynchronousFlyteClient based on destination endpoint that connects to Flyte gRPC Server.
         
-        :param dst: destination endpoint of a AdminServiceClient to be connect to.
-        :return: a AdminServiceClient instance with default platform configuration.
-        """
-
-class DataProxyStub:
-    """Main entrypoint for programmatically accessing a Flyte remote backend.
-
-    The term 'remote' is synonymous with 'backend' or 'deployment' and refers to a hosted instance of the
-    Flyte platform, which comes with a Flyte Admin server on some known URI.
-    """
-    def __init__(self, dst: str) -> 'DataProxyStub':
-        """Initialize a FlyteRemote object.
-
-        Creates a DataProxyServiceClient based on destination endpoint that connects to Flyte gRPC Client.
-        
-        :param dst: destination endpoint of a DataProxyServiceClient to be connect to.
-        :return: a DataProxyServiceClient instance with default platform configuration.
+        :param endpoint: destination endpoint of a RawSynchronousFlyteClient to be connect to.
+        :return: a RawSynchronousFlyteClient instance with default platform configuration.
         """
