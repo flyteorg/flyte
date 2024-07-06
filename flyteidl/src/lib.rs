@@ -288,17 +288,24 @@ pub mod _flyteidl_rust {
     convert_foreign_prost_error!();
 
     #[pymodule]
+    pub mod protobuf {
+        #[pymodule_export]
+        use crate::google::protobuf::{Duration, Struct, Timestamp, Value};
+    }
+
+    #[pymodule]
     pub mod core {
         #[pymodule_export]
         use crate::flyteidl::core::{
-            task_node::Reference, task_template::Target, ArrayNode, CompiledTask, Container,
-            ContainerPort, DataLoadingConfig, ExecutionError, ExtendedResources, Identifier,
-            IoStrategy, KeyValuePair, Literal, LiteralMap, LiteralType, Node,
-            NodeExecutionIdentifier, NodeMetadata, Parameter, ParameterMap, Primitive,
-            ResourceType, Resources, RetryStrategy, RuntimeMetadata, Scalar, SecurityContext,
-            SimpleType, TaskMetadata, TaskNode, TaskNodeOverrides, TaskTemplate, TypeAnnotation,
-            TypeStructure, TypedInterface, Variable, VariableMap, WorkflowExecution,
-            WorkflowExecutionIdentifier,
+            task_node::Reference, task_template::Target, ArrayNode, Binary, BlobMetadata, BlobType,
+            CompiledTask, Container, ContainerPort, DataLoadingConfig, Error, ExecutionError,
+            ExtendedResources, Identifier, IoStrategy, KeyValuePair, Literal, LiteralMap,
+            LiteralType, Node, NodeExecutionIdentifier, NodeMetadata, Parameter, ParameterMap,
+            Primitive, ResourceType, Resources, RetryStrategy, RuntimeMetadata, Scalar, SchemaType,
+            SecurityContext, SimpleType, StructuredDataset, StructuredDatasetMetadata,
+            StructuredDatasetType, TaskMetadata, TaskNode, TaskNodeOverrides, TaskTemplate,
+            TypeAnnotation, TypeStructure, TypedInterface, Union, Variable, VariableMap,
+            WorkflowExecution, WorkflowExecutionIdentifier,
         };
     }
     #[pymodule]
@@ -361,7 +368,26 @@ pub mod _flyteidl_rust {
         #[pymodule_export]
         use crate::flyteidl::core::workflow_execution::Phase;
     }
-
+    #[pymodule]
+    pub mod schema_type {
+        #[pymodule_export]
+        use crate::flyteidl::core::schema_type::SchemaColumn;
+    }
+    #[pymodule]
+    pub mod schema_column {
+        #[pymodule_export]
+        use crate::flyteidl::core::schema_type::schema_column::SchemaColumnType;
+    }
+    #[pymodule]
+    pub mod structured_dataset_type {
+        #[pymodule_export]
+        use crate::flyteidl::core::structured_dataset_type::DatasetColumn;
+    }
+    #[pymodule]
+    pub mod blob_type {
+        #[pymodule_export]
+        use crate::flyteidl::core::blob_type::BlobDimensionality;
+    }
     #[pymodule]
     pub mod admin {
         #[pymodule_export]
@@ -494,10 +520,7 @@ pub mod _flyteidl_rust {
         ) -> PyResult<crate::flyteidl::admin::Task> {
             let res = (match self.runtime.block_on(self.admin_service.get_task(req)) {
                 Ok(res) => res,
-                Err(error) => panic!(
-                    "Failed at awaiting response from gRPC service server: {:?}",
-                    error
-                ),
+                Err(error) => panic!("Error responsed from gRPC service server: {:?}", error),
             })
             .into_inner();
             Ok(res)
@@ -509,10 +532,7 @@ pub mod _flyteidl_rust {
         ) -> PyResult<crate::flyteidl::admin::TaskCreateResponse> {
             let res = (match self.runtime.block_on(self.admin_service.create_task(req)) {
                 Ok(res) => res,
-                Err(error) => panic!(
-                    "Failed at awaiting response from gRPC service server: {:?}",
-                    error
-                ),
+                Err(error) => panic!("Error responsed from gRPC service server: {:?}", error),
             })
             .into_inner();
             Ok(res)
@@ -527,10 +547,7 @@ pub mod _flyteidl_rust {
                 .block_on(self.data_proxy_service.create_upload_location(req))
             {
                 Ok(res) => res,
-                Err(error) => panic!(
-                    "Failed at awaiting response from gRPC service server: {:?}",
-                    error
-                ),
+                Err(error) => panic!("Error responsed from gRPC service server: {:?}", error),
             })
             .into_inner();
             Ok(res)
@@ -545,10 +562,7 @@ pub mod _flyteidl_rust {
                 .block_on(self.admin_service.create_execution(req))
             {
                 Ok(res) => res,
-                Err(error) => panic!(
-                    "Failed at awaiting response from gRPC service server: {:?}",
-                    error
-                ),
+                Err(error) => panic!("Error responsed from gRPC service server: {:?}", error),
             })
             .into_inner();
             Ok(res)
@@ -560,10 +574,7 @@ pub mod _flyteidl_rust {
         ) -> PyResult<crate::flyteidl::admin::Execution> {
             let res = (match self.runtime.block_on(self.admin_service.get_execution(req)) {
                 Ok(res) => res,
-                Err(error) => panic!(
-                    "Failed at awaiting response from gRPC service server: {:?}",
-                    error
-                ),
+                Err(error) => panic!("Error responsed from gRPC service server: {:?}", error),
             })
             .into_inner();
             Ok(res)
@@ -578,10 +589,7 @@ pub mod _flyteidl_rust {
                 .block_on(self.admin_service.get_execution_data(req))
             {
                 Ok(res) => res,
-                Err(error) => panic!(
-                    "Failed at awaiting response from gRPC service server: {:?}",
-                    error
-                ),
+                Err(error) => panic!("Error responsed from gRPC service server: {:?}", error),
             })
             .into_inner();
             Ok(res)
@@ -596,10 +604,7 @@ pub mod _flyteidl_rust {
                 .block_on(self.admin_service.list_node_executions(req))
             {
                 Ok(res) => res,
-                Err(error) => panic!(
-                    "Failed at awaiting response from gRPC service server: {:?}",
-                    error
-                ),
+                Err(error) => panic!("Error responsed from gRPC service server: {:?}", error),
             })
             .into_inner();
             Ok(res)
@@ -614,10 +619,7 @@ pub mod _flyteidl_rust {
                 .block_on(self.admin_service.get_node_execution_data(req))
             {
                 Ok(res) => res,
-                Err(error) => panic!(
-                    "Failed at awaiting response from gRPC service server: {:?}",
-                    error
-                ),
+                Err(error) => panic!("Error responsed from gRPC service server: {:?}", error),
             })
             .into_inner();
             Ok(res)
@@ -632,10 +634,7 @@ pub mod _flyteidl_rust {
                 .block_on(self.admin_service.list_task_executions(req))
             {
                 Ok(res) => res,
-                Err(error) => panic!(
-                    "Failed at awaiting response from gRPC service server: {:?}",
-                    error
-                ),
+                Err(error) => panic!("Error responsed from gRPC service server: {:?}", error),
             })
             .into_inner();
             Ok(res)
@@ -650,28 +649,64 @@ pub mod _flyteidl_rust {
                 .block_on(self.admin_service.get_task_execution(req))
             {
                 Ok(res) => res,
-                Err(error) => panic!(
-                    "Failed at awaiting response from gRPC service server: {:?}",
-                    error
-                ),
+                Err(error) => panic!("Error responsed from gRPC service server: {:?}", error),
             })
             .into_inner();
             Ok(res)
         }
 
-        pub fn get_task_execution_data(
+        pub fn create_workflow(
             &mut self,
-            req: crate::flyteidl::admin::TaskExecutionGetDataRequest,
-        ) -> PyResult<crate::flyteidl::admin::TaskExecutionGetDataResponse> {
+            req: crate::flyteidl::admin::WorkflowCreateRequest,
+        ) -> PyResult<crate::flyteidl::admin::WorkflowCreateResponse> {
             let res = (match self
                 .runtime
-                .block_on(self.admin_service.get_task_execution_data(req))
+                .block_on(self.admin_service.create_workflow(req))
             {
                 Ok(res) => res,
-                Err(error) => panic!(
-                    "Failed at awaiting response from gRPC service server: {:?}",
-                    error
-                ),
+                Err(error) => panic!("Error responsed from gRPC service server: {:?}", error),
+            })
+            .into_inner();
+            Ok(res)
+        }
+
+        pub fn list_workflow_ids(
+            &mut self,
+            req: crate::flyteidl::admin::NamedEntityIdentifierListRequest,
+        ) -> PyResult<crate::flyteidl::admin::NamedEntityIdentifierList> {
+            let res = (match self
+                .runtime
+                .block_on(self.admin_service.list_workflow_ids(req))
+            {
+                Ok(res) => res,
+                Err(error) => panic!("Error responsed from gRPC service server: {:?}", error),
+            })
+            .into_inner();
+            Ok(res)
+        }
+
+        pub fn list_workflows(
+            &mut self,
+            req: crate::flyteidl::admin::ResourceListRequest,
+        ) -> PyResult<crate::flyteidl::admin::WorkflowList> {
+            let res = (match self
+                .runtime
+                .block_on(self.admin_service.list_workflows(req))
+            {
+                Ok(res) => res,
+                Err(error) => panic!("Error responsed from gRPC service server: {:?}", error),
+            })
+            .into_inner();
+            Ok(res)
+        }
+
+        pub fn get_workflow(
+            &mut self,
+            req: crate::flyteidl::admin::ObjectGetRequest,
+        ) -> PyResult<crate::flyteidl::admin::Workflow> {
+            let res = (match self.runtime.block_on(self.admin_service.get_workflow(req)) {
+                Ok(res) => res,
+                Err(error) => panic!("Error responsed from gRPC service server: {:?}", error),
             })
             .into_inner();
             Ok(res)
