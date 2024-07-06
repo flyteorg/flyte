@@ -395,14 +395,15 @@ pub mod _flyteidl_rust {
             AbortMetadata, Annotations, AuthRole, ClusterAssignment, Description,
             DescriptionEntity, Envs, Execution, ExecutionClosure, ExecutionClusterLabel,
             ExecutionCreateRequest, ExecutionCreateResponse, ExecutionMetadata, ExecutionSpec,
-            Labels, LiteralMapBlob, NodeExecution, NodeExecutionGetDataRequest,
-            NodeExecutionGetDataResponse, NodeExecutionList, NodeExecutionListRequest,
-            Notification, NotificationList, ObjectGetRequest, RawOutputDataConfig, SourceCode,
-            SystemMetadata, Task, TaskClosure, TaskCreateRequest, TaskCreateResponse,
-            TaskExecution, TaskExecutionGetDataRequest, TaskExecutionGetDataResponse,
-            TaskExecutionGetRequest, TaskExecutionList, TaskExecutionListRequest, TaskSpec,
-            WorkflowExecutionGetDataRequest, WorkflowExecutionGetDataResponse,
-            WorkflowExecutionGetRequest,
+            Labels, LiteralMapBlob, NamedEntityIdentifierList, NamedEntityIdentifierListRequest,
+            NodeExecution, NodeExecutionGetDataRequest, NodeExecutionGetDataResponse,
+            NodeExecutionList, NodeExecutionListRequest, Notification, NotificationList,
+            ObjectGetRequest, RawOutputDataConfig, ResourceListRequest, SourceCode, SystemMetadata,
+            Task, TaskClosure, TaskCreateRequest, TaskCreateResponse, TaskExecution,
+            TaskExecutionGetDataRequest, TaskExecutionGetDataResponse, TaskExecutionGetRequest,
+            TaskExecutionList, TaskExecutionListRequest, TaskSpec, Workflow, WorkflowCreateRequest,
+            WorkflowCreateResponse, WorkflowExecutionGetDataRequest,
+            WorkflowExecutionGetDataResponse, WorkflowExecutionGetRequest, WorkflowList,
         };
     }
     #[pymodule]
