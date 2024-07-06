@@ -797,6 +797,6 @@ pub mod _flyteidl_rust {
 //         flyteidl::service::CreateUploadLocationResponse
 //     )
 // );
-// m.add_class::<RawSynchronousFlyteClient>();
+// m.add_class::<AdminStub>();
 // Ok(())
 // }
