@@ -297,16 +297,60 @@ pub mod _flyteidl_rust {
     pub mod core {
         #[pymodule_export]
         use crate::flyteidl::core::{
-            task_node::Reference, task_template::Target, ArrayNode, Binary, BlobMetadata, BlobType,
-            CompiledTask, Container, ContainerPort, DataLoadingConfig, Error, ExecutionError,
-            ExtendedResources, Identifier, IoStrategy, KeyValuePair, Literal, LiteralMap,
-            LiteralType, Node, NodeExecutionIdentifier, NodeMetadata, Parameter, ParameterMap,
-            Primitive, ResourceType, Resources, RetryStrategy, RuntimeMetadata, Scalar, SchemaType,
-            SecurityContext, SimpleType, StructuredDataset, StructuredDatasetMetadata,
-            StructuredDatasetType, TaskMetadata, TaskNode, TaskNodeOverrides, TaskTemplate,
-            TypeAnnotation, TypeStructure, TypedInterface, Union, Variable, VariableMap,
-            WorkflowExecution, WorkflowExecutionIdentifier,
+            Alias, ApproveCondition, ArrayNode, Binary, Binding, BindingData,
+            BindingDataCollection, BlobMetadata, BlobType, BooleanExpression, BranchNode,
+            CompiledLaunchPlan, CompiledTask, CompiledWorkflow, CompiledWorkflowClosure, Container,
+            ContainerPort, DataLoadingConfig, Error, ExecutionError, ExtendedResources, GateNode,
+            Identifier, IfBlock, IfElseBlock, IoStrategy, KeyValuePair, Literal, LiteralMap,
+            LiteralType, Node, NodeExecutionIdentifier, NodeMetadata, OutputReference, Parameter,
+            ParameterMap, Primitive, PromiseAttribute, ResourceType, Resources, RetryStrategy,
+            RuntimeMetadata, Scalar, SchemaType, SecurityContext, SignalCondition, SimpleType,
+            SleepCondition, StructuredDataset, StructuredDatasetMetadata, StructuredDatasetType,
+            TaskMetadata, TaskNode, TaskNodeOverrides, TaskTemplate, TypeAnnotation, TypeStructure,
+            TypedInterface, Union, UnionInfo, Variable, VariableMap, WorkflowExecution,
+            WorkflowExecutionIdentifier, WorkflowMetadata, WorkflowMetadataDefaults, WorkflowNode,
+            WorkflowTemplate,
         };
+    }
+    #[pymodule]
+    pub mod workflow_metadata {
+        #[pymodule_export]
+        use crate::flyteidl::core::workflow_metadata::OnFailurePolicy;
+    }
+    #[pymodule]
+    pub mod promise_attribute {
+        #[pymodule_export]
+        use crate::flyteidl::core::promise_attribute::Value;
+    }
+    #[pymodule]
+    pub mod binding_data {
+        #[pymodule_export]
+        use crate::flyteidl::core::binding_data::Value;
+    }
+    #[pymodule]
+    pub mod gate_node {
+        #[pymodule_export]
+        use crate::flyteidl::core::gate_node::Condition;
+    }
+    #[pymodule]
+    pub mod if_else_block {
+        #[pymodule_export]
+        use crate::flyteidl::core::if_else_block::Default;
+    }
+    #[pymodule]
+    pub mod workflow_node {
+        #[pymodule_export]
+        use crate::flyteidl::core::workflow_node::Reference;
+    }
+    #[pymodule]
+    pub mod node {
+        #[pymodule_export]
+        use crate::flyteidl::core::node::Target;
+    }
+    #[pymodule]
+    pub mod task_node {
+        #[pymodule_export]
+        use crate::flyteidl::core::task_node::Reference;
     }
     #[pymodule]
     pub mod literal {
@@ -401,9 +445,10 @@ pub mod _flyteidl_rust {
             ObjectGetRequest, RawOutputDataConfig, ResourceListRequest, SourceCode, SystemMetadata,
             Task, TaskClosure, TaskCreateRequest, TaskCreateResponse, TaskExecution,
             TaskExecutionGetDataRequest, TaskExecutionGetDataResponse, TaskExecutionGetRequest,
-            TaskExecutionList, TaskExecutionListRequest, TaskSpec, Workflow, WorkflowCreateRequest,
-            WorkflowCreateResponse, WorkflowExecutionGetDataRequest,
+            TaskExecutionList, TaskExecutionListRequest, TaskSpec, Workflow, WorkflowClosure,
+            WorkflowCreateRequest, WorkflowCreateResponse, WorkflowExecutionGetDataRequest,
             WorkflowExecutionGetDataResponse, WorkflowExecutionGetRequest, WorkflowList,
+            WorkflowSpec,
         };
     }
     #[pymodule]
