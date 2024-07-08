@@ -32,9 +32,11 @@ class Project(_message.Message):
         ACTIVE: _ClassVar[Project.ProjectState]
         ARCHIVED: _ClassVar[Project.ProjectState]
         SYSTEM_GENERATED: _ClassVar[Project.ProjectState]
+        SYSTEM_ARCHIVED: _ClassVar[Project.ProjectState]
     ACTIVE: Project.ProjectState
     ARCHIVED: Project.ProjectState
     SYSTEM_GENERATED: Project.ProjectState
+    SYSTEM_ARCHIVED: Project.ProjectState
     ID_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     DOMAINS_FIELD_NUMBER: _ClassVar[int]
