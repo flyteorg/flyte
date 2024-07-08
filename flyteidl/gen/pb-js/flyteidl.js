@@ -46818,6 +46818,7 @@
                         case 0:
                         case 1:
                         case 2:
+                        case 3:
                             break;
                         }
                     if (message.org != null && message.hasOwnProperty("org"))
@@ -46833,12 +46834,14 @@
                  * @property {number} ACTIVE=0 ACTIVE value
                  * @property {number} ARCHIVED=1 ARCHIVED value
                  * @property {number} SYSTEM_GENERATED=2 SYSTEM_GENERATED value
+                 * @property {number} SYSTEM_ARCHIVED=3 SYSTEM_ARCHIVED value
                  */
                 Project.ProjectState = (function() {
                     var valuesById = {}, values = Object.create(valuesById);
                     values[valuesById[0] = "ACTIVE"] = 0;
                     values[valuesById[1] = "ARCHIVED"] = 1;
                     values[valuesById[2] = "SYSTEM_GENERATED"] = 2;
+                    values[valuesById[3] = "SYSTEM_ARCHIVED"] = 3;
                     return values;
                 })();
     
