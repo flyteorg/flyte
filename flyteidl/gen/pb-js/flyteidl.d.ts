@@ -17828,7 +17828,8 @@ export namespace flyteidl {
             enum ProjectState {
                 ACTIVE = 0,
                 ARCHIVED = 1,
-                SYSTEM_GENERATED = 2
+                SYSTEM_GENERATED = 2,
+                SYSTEM_ARCHIVED = 3
             }
         }
 
