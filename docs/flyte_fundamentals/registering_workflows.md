@@ -179,7 +179,7 @@ all user-defined code at the root of your project. In some cases, your project
 directory may contain datasets, model files, and other potentially large
 artifacts that you want to exclude from the tarball.
 
-You can do so by specifying these files in a `.flyteignore` file in th root
+You can do so by specifying these files in a `.flyteignore` file in the root
 of your project. You can also use `.gitignore` or `.dockerignore` if you'd like
 to avoid adding another file.
 ```
@@ -187,7 +187,7 @@ to avoid adding another file.
 ```{note}
 `WORKDIR`, `PYTHONPATH`, and `PATH`
 
-When executing any of the above commands, the archive that gets creates is extracted wherever the WORKDIR is set. This can be handled directly via the WORKDIR directive in a Dockerfile, or specified via source_root if using ImageSpec. This is important for discovering code and executables via PATH or PYTHONPATH. A common pattern for making your Python packages fully discoverable is to have a top-level src folder, adding that to your PYTHONPATH and making all your imports absolute. This avoids having to "install" your Python project in the image at any point e.g. via `pip install -e`.
+When executing any of the above commands, the archive that gets creates is extracted wherever the WORKDIR is set. This can be handled directly via the WORKDIR directive in a Dockerfile, or specified via `source_root` if using ImageSpec. This is important for discovering code and executables via `PATH` or `PYTHONPATH`. A common pattern for making your Python packages fully discoverable is to have a top-level `src` folder, adding that to your `PYTHONPATH`, and making all your imports absolute. This avoids having to "install" your Python project in the image at any point e.g. via `pip install -e`.
 ```
 
 ### Productionizing your workflows
