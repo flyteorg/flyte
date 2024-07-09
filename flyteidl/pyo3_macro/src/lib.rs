@@ -71,6 +71,7 @@ pub fn with_new(input: TokenStream) -> TokenStream {
                 quote! {
                     // Macro main entrypoint, `#name` is the name of the underlying structure.
                     use pyo3::prelude::*;
+
                     #[pyo3::pymethods]
                     impl #name {
                         // By default, it is not possible to create an instance of a custom class from Python code.
@@ -87,19 +88,23 @@ pub fn with_new(input: TokenStream) -> TokenStream {
                                 #all_values
                             }
                         }
-
                         // For the needs like `load_proto_from_file()`, `write_proto_to_file()` in `flytekit/core/utils.py`
-                        pub fn ParseFromString(&mut self, bytes_string: &pyo3::types::PyBytes) -> Result<#name, crate::_flyteidl_rust::MessageDecodeError> {
+                        pub fn ParseFromString(&mut self, bytes_string: &pyo3::types::PyBytes) -> Result<#name, crate::_flyteidl_rust::MessageDecodeError>
+                        {
                             let bt = bytes_string.as_bytes();
                             let de = prost::Message::decode(&bt.to_vec()[..]);
                             Ok(de?)
                         }
-                        // TODO:
-                        // pub fn SerializeToString(proto_obj: #name) -> Result<Vec<u8>, crate::flyteidl::MessageEncodeError> {
-                        //     let mut buf = vec![];
-                        //     proto_obj.encode(&mut buf)?;
-                        //     Ok(buf)
-                        // }
+                        pub fn SerializeToString(&self) -> Result<Vec<u8>, crate::_flyteidl_rust::MessageEncodeError>
+                        {
+                            // Bring `prost::Message` trait to scope here. Put it in outer impl block will leads to duplicated imports.
+                            use prost::Message;
+                            let mut buf = vec![];
+                            buf.reserve(self.encoded_len());
+                            // Unwrap is safe, since we have reserved sufficient capacity in the vector.
+                            self.encode(&mut buf).unwrap();
+                            Ok(buf)
+                        }
                     }
                 }
             } else {
