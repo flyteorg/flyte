@@ -177,8 +177,9 @@ all user-defined code at the root of your project. In some cases, your project
 directory may contain datasets, model files, and other potentially large
 artifacts that you want to exclude from the tarball.
 
-You can do so by specifying these files in a `.gitignore` or `.dockerignore`
-file in the root directory of your project.
+You can do so by specifying these files in a `.flyteignore` file in th root
+of your project. You can also use `.gitignore` or `.dockerignore` if you'd like
+to avoid adding another file.
 ```
 
 ### Productionizing your workflows
