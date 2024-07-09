@@ -71,7 +71,7 @@ pub struct BridgeArgs {
         short,
         long,
         value_name = "BACKLOG_LENGTH",
-        default_value = "5",
+        default_value = "0",
         help = "suggested number of tasks to buffer for future execution, the actual number may be higher"
     )]
     pub backlog_length: usize,

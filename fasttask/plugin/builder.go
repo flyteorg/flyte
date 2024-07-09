@@ -267,15 +267,13 @@ func (i *InMemoryEnvBuilder) createPod(ctx context.Context, fastTaskEnvironmentS
 
 	// append additional worker args before plugin args to ensure they are overridden
 	container.Args = append(container.Args, GetConfig().AdditionalWorkerArgs...)
-
-	if fastTaskEnvironmentSpec.GetBacklogLength() > 0 {
-		container.Args = append(container.Args, "--backlog-length", fmt.Sprintf("%d", fastTaskEnvironmentSpec.GetBacklogLength()))
-	}
 	if fastTaskEnvironmentSpec.GetParallelism() > 0 {
 		container.Args = append(container.Args, "--parallelism", fmt.Sprintf("%d", fastTaskEnvironmentSpec.GetParallelism()))
 	}
 
 	container.Args = append(container.Args,
+		"--backlog-length",
+		fmt.Sprintf("%d", fastTaskEnvironmentSpec.GetBacklogLength()),
 		"--queue-id",
 		executionEnvID,
 		"--worker-id",
