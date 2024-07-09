@@ -72,7 +72,7 @@ run it with the supplied arguments. As you can see from the expected output, you
 can visit the link to the Flyte console to see the progress of your running
 execution.
 
-You may also run `run --remote --copy-all`, which is very similar to the above command. As the name suggests, will copy the source tree rooted at the top-level __init__.py file. With this strategy, any modules discoverable on the PYTHONPATH will be importable.
+You may also run `run --remote --copy-all`, which is very similar to the above command. As the name suggests, this will copy the source tree rooted at the top-level `__init__.py` file. With this strategy, any modules discoverable on the `PYTHONPATH` will be importable.
 
 ```{note}
 `pyflyte run` supports Flyte workflows that import any other user-defined modules that
