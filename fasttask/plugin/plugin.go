@@ -463,11 +463,11 @@ func (p *Plugin) getTaskInfo(ctx context.Context, tCtx core.TaskExecutionContext
 
 	statusesMap := statuses.(map[string]*v1.Pod)
 	pod, ok := statusesMap[workerID]
-	if !ok {
-		return nil, flyteerrors.Errorf(flyteerrors.RuntimeFailure, "worker %s not found in status map", workerID)
-	}
-	if pod == nil {
-		// pod does not exist because it has not yet been populated in the kubeclient cache or was deleted
+	if !ok || pod == nil {
+		// `!ok` indicates that the status map does not have a worker status, since this works over
+		// an in-memory store the may occur during restarts.
+		// `pod == nil` may occur if it has not yet been populated in the kubeclient cache or was deleted
+		logger.Warnf(ctx, "Worker %q not found (exists=%s) in status map for queue '%s'", workerID, ok, queueID)
 		return &core.TaskInfo{}, nil
 	}
 
