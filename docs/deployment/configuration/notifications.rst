@@ -176,7 +176,7 @@ Config
 ------
 
 In the ``flyte-core`` values YAML, the top-level ``notifications`` config should be
-placed under ``workerflow_notifications``.
+placed under ``workflow_notifications``.
 
 .. code-block:: yaml
 
