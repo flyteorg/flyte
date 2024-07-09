@@ -79,7 +79,6 @@ func (m *AdminService) GetProject(ctx context.Context, request *admin.ProjectGet
 }
 
 func (m *AdminService) GetDomains(ctx context.Context, request *admin.GetDomainRequest) (*admin.GetDomainsResponse, error) {
-	defer m.interceptPanic(ctx, request)
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
