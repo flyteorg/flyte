@@ -97,7 +97,7 @@ func TestGetPluginLogs(t *testing.T) {
 	nCtx.OnNodeID().Return("foo")
 
 	// call `getPluginLogs`
-	logs, err := getPluginLogs(mapLogPlugin, nCtx, 1, 0)
+	logs, err := getPluginLogs(mapLogPlugin, nCtx, 1, 0, "")
 	assert.Nil(t, err)
 
 	assert.Equal(t, len(logConfig.Templates), len(logs))

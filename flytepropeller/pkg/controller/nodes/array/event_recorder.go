@@ -124,7 +124,11 @@ func (e *externalResourcesEventRecorder) process(ctx context.Context, nCtx inter
 	for _, taskExecutionEvent := range e.taskEvents {
 		if mapLogPlugin != nil && len(taskExecutionEvent.Logs) > 0 {
 			// override log links for subNode execution with map plugin
-			logs, err := getPluginLogs(mapLogPlugin, nCtx, index, retryAttempt)
+			var taskExecGeneratedName string
+			if taskExecutionEvent.Metadata != nil {
+				taskExecGeneratedName = taskExecutionEvent.Metadata.GeneratedName
+			}
+			logs, err := getPluginLogs(mapLogPlugin, nCtx, index, retryAttempt, taskExecGeneratedName)
 			if err != nil {
 				logger.Warnf(ctx, "failed to compute logs for ArrayNode:%s index:%d retryAttempt:%d with error:%v", nCtx.NodeID(), index, retryAttempt, err)
 			} else {
@@ -261,7 +265,7 @@ func newArrayEventRecorder(eventRecorder interfaces.EventRecorder) arrayEventRec
 	}
 }
 
-func getPluginLogs(logPlugin tasklog.Plugin, nCtx interfaces.NodeExecutionContext, index int, retryAttempt uint32) ([]*idlcore.TaskLog, error) {
+func getPluginLogs(logPlugin tasklog.Plugin, nCtx interfaces.NodeExecutionContext, index int, retryAttempt uint32, taskExecGeneratedName string) ([]*idlcore.TaskLog, error) {
 	subNodeSpec := nCtx.Node().GetArrayNode().GetSubNodeSpec()
 
 	// retrieve taskTemplate from subNode
@@ -305,11 +309,21 @@ func getPluginLogs(logPlugin tasklog.Plugin, nCtx interfaces.NodeExecutionContex
 		nodeID:        nodeID,
 	}
 
-	// compute podName and containerName
-	stCtx := mapplugin.NewSubTaskExecutionID(taskExecutionId, index, uint64(retryAttempt))
-
-	podName := stCtx.GetGeneratedName()
-	containerName := stCtx.GetGeneratedName()
+	var podName string
+	var containerName string
+	if taskExecGeneratedName == "" {
+		subNodeID := fmt.Sprintf("n%v", strconv.Itoa(index))
+		subNodeRetryAttemptStr := strconv.FormatUint(uint64(retryAttempt), 10)
+		generatedPodAndContainerName, err := encoding.FixedLengthUniqueIDForParts(length, []string{uniqueID, subNodeID, subNodeRetryAttemptStr})
+		if err != nil {
+			return nil, err
+		}
+		podName = generatedPodAndContainerName
+		containerName = generatedPodAndContainerName
+	} else {
+		podName = taskExecGeneratedName
+		containerName = taskExecGeneratedName
+	}
 
 	// initialize map plugin specific LogTemplateVars
 	extraLogTemplateVars := []tasklog.TemplateVar{
