@@ -12,6 +12,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories"
@@ -474,7 +475,7 @@ func TestResolvedSpec(t *testing.T) {
 		Name:    launchPlanIdentifier.Name,
 		Spec:    spec,
 	})
-	assert.Nil(t, err)
+	require.NoError(t, err)
 
 	resp, err := client.GetExecution(ctx, &admin.WorkflowExecutionGetRequest{
 		Id: &core.WorkflowExecutionIdentifier{
@@ -483,7 +484,7 @@ func TestResolvedSpec(t *testing.T) {
 			Name:    launchPlanIdentifier.Name,
 		},
 	})
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	spec.Interruptible = &wrapperspb.BoolValue{
 		Value: false,
 	}
