@@ -21,3 +21,22 @@ jobs:
       - name: Rust linting
         run: cargo fmt --all -- --check
         working-directory: fasttask/worker
+
+  unit_tests:
+    name: unit_test
+    runs-on: ubuntu-latest
+    needs: [lint]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            fasttask/worker/target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('fasttask/worker/Cargo.lock') }}
+      - name: Run Unit tests
+        run: cargo test
+        working-directory: fasttask/worker

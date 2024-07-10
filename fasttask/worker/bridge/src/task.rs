@@ -153,10 +153,10 @@ pub async fn execute(
     Ok(())
 }
 
-async fn is_executable(
-    executor_rx: &Receiver<Executor>,
+async fn is_executable<T>(
+    executor_rx: &Receiver<T>,
     backlog_tx: &Sender<()>,
-) -> Result<(Option<Executor>, bool), String> {
+) -> Result<(Option<T>, bool), String> {
     match executor_rx.try_recv() {
         Ok(executor) => return Ok((Some(executor), false)),
         Err(TryRecvError::Closed) => return Err("executor_rx is closed".into()),
@@ -395,5 +395,45 @@ async fn wait_in_backlog(
                 return Ok(None);
             },
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use async_channel::{bounded, unbounded};
+
+    #[tokio::test]
+    async fn test_is_executable() {
+        // This test uses a i32 instead of an Executor to check is_executable.
+
+        let (sender_executor, receiver_executor) = unbounded::<i32>();
+        let (sender_backlog, receiver_backlog) = unbounded::<()>();
+
+        // If nothing in exectuor_rx, then the backlog receives a message.
+        let result = is_executable(&receiver_executor, &sender_backlog).await;
+        assert_eq!(result.unwrap(), (None, true));
+        let backlog_item = receiver_backlog.try_recv();
+        assert!(backlog_item.is_ok());
+        assert!(receiver_backlog.is_empty());
+
+        // is_executable consumes values on from sender_executor
+        let result = sender_executor.send(4).await;
+        assert!(result.is_ok());
+
+        let result = is_executable(&receiver_executor, &sender_backlog).await;
+        assert_eq!(result.ok(), Some((Some(4), false)));
+        assert!(sender_executor.is_empty());
+
+        // Closed backlog_tx returns error
+        assert!(sender_backlog.close());
+        let result = is_executable(&receiver_executor, &sender_backlog).await;
+        assert!(result.is_err());
+
+        // Closed executor_rx returns error
+        let (sender_backlog, _) = unbounded::<()>();
+        assert!(sender_executor.close());
+        let result = is_executable(&receiver_executor, &sender_backlog).await;
+        assert!(result.is_err());
     }
 }
