@@ -167,7 +167,6 @@ func ShowCmdList(_rootCmd *cobra.Command) {
 		os.Exit(1)
 	}
 
-	// fmt.Println(append(curArgs, existingFlags...))
 	// Originally existed flags need to be append at last, so if any user input is wrong, it can be caught in the main logic
 	rootCmd.SetArgs(append(curArgs, existingFlags...))
 }

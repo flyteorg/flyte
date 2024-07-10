@@ -11,7 +11,6 @@ import (
 	cmdcore "github.com/flyteorg/flyte/flytectl/cmd/core"
 	"github.com/flyteorg/flyte/flytectl/pkg/pkce"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin"
-
 	"github.com/spf13/cobra"
 )
 
@@ -204,7 +203,7 @@ func initCmdCtx() error {
 func checkRunBubbleTea() (*cobra.Command, bool, error) {
 	cmd, flags, err := rootCmd.Find(os.Args[1:])
 	if err != nil {
-		return cmd, false, err
+		return nil, false, err
 	}
 	existingFlags = flags
 
@@ -214,11 +213,16 @@ func checkRunBubbleTea() (*cobra.Command, bool, error) {
 		tempCmd = tempCmd.Parent()
 	}
 
+	// Temporary solution because only support "get" for now
+	if !(len(curArgs) >= 1 && curArgs[0] == "get") {
+		return nil, false, nil
+	}
+
 	for _, flag := range flags {
 		if flag == "--interactive" || flag == "-i" {
 			return cmd, true, nil
 		}
 	}
 
-	return cmd, false, nil
+	return nil, false, nil
 }
