@@ -82,14 +82,8 @@ func (r *TaskExecutionRepo) Get(ctx context.Context, input interfaces.GetTaskExe
 
 func (r *TaskExecutionRepo) Update(ctx context.Context, execution models.TaskExecution) error {
 	timer := r.metrics.UpdateDuration.Start()
-<<<<<<< HEAD
 	tx := r.db.WithContext(ctx).WithContext(ctx).Model(&models.TaskExecution{}).Where(getIdFilter(execution.ID)).
 		Updates(&execution) // TODO @hmaersaw - need to add WithContext to all db calls to link otel spans
-||||||| parent of b63ce0ec5 (Use WithContext in all DB calls (#5538))
-	tx := r.db.WithContext(ctx).WithContext(ctx).Save(&execution) // TODO @hmaersaw - need to add WithContext to all db calls to link otel spans
-=======
-	tx := r.db.WithContext(ctx).WithContext(ctx).Save(&execution)
->>>>>>> b63ce0ec5 (Use WithContext in all DB calls (#5538))
 	timer.Stop()
 
 	if err := tx.Error; err != nil {
