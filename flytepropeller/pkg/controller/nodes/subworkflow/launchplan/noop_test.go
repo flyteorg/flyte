@@ -13,7 +13,7 @@ func TestFailFastWorkflowLauncher(t *testing.T) {
 	ctx := context.TODO()
 	f := NewFailFastLaunchPlanExecutor()
 	t.Run("getStatus", func(t *testing.T) {
-		a, _, err := f.GetStatus(ctx, &core.WorkflowExecutionIdentifier{
+		st, err := f.GetStatus(ctx, &core.WorkflowExecutionIdentifier{
 			Project: "p",
 			Domain:  "d",
 			Name:    "n",
@@ -21,7 +21,7 @@ func TestFailFastWorkflowLauncher(t *testing.T) {
 			Id: &core.Identifier{},
 		}, "",
 		)
-		assert.Nil(t, a)
+		assert.Empty(t, st)
 		assert.Error(t, err)
 	})
 

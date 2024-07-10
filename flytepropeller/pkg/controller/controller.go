@@ -29,7 +29,6 @@ import (
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin"
 	tokenCache "github.com/flyteorg/flyte/flyteidl/clients/go/admin/cache"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	flyteK8sConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/flyteorg/flyte/flytepropeller/events"
@@ -301,34 +300,20 @@ func newControllerMetrics(scope promutils.Scope) *metrics {
 	}
 }
 
-func getAdminClient(ctx context.Context) (client service.AdminServiceClient, signalClient service.SignalServiceClient, opt []grpc.DialOption, err error) {
-	cfg := admin.GetConfig(ctx)
-	tc := tokenCache.NewTokenCacheInMemoryProvider()
-	clients, err := admin.NewClientsetBuilder().WithConfig(cfg).WithTokenCache(tc).Build(ctx)
-	if err != nil {
-		return nil, nil, nil, fmt.Errorf("failed to initialize clientset. Error: %w", err)
-	}
-
-	credentialsFuture := admin.NewPerRPCCredentialsFuture()
-	opts := []grpc.DialOption{
-		grpc.WithChainUnaryInterceptor(admin.NewAuthInterceptor(cfg, tc, credentialsFuture, nil)),
-		grpc.WithPerRPCCredentials(credentialsFuture),
-	}
-
-	return clients.AdminClient(), clients.SignalServiceClient(), opts, nil
-}
-
 // New returns a new FlyteWorkflow controller
 func New(ctx context.Context, cfg *config.Config, kubeClientset kubernetes.Interface, flytepropellerClientset clientset.Interface,
 	flyteworkflowInformerFactory informers.SharedInformerFactory, informerFactory k8sInformers.SharedInformerFactory,
 	kubeClient executors.Client, scope promutils.Scope) (*Controller, error) {
 
-	adminClient, signalClient, authOpts, err := getAdminClient(ctx)
+	adminCfg := admin.GetConfig(ctx)
+	tc := tokenCache.NewTokenCacheInMemoryProvider()
+	clientSet, err := admin.NewClientsetBuilder().WithConfig(adminCfg).WithTokenCache(tc).Build(ctx)
 	if err != nil {
-		logger.Errorf(ctx, "failed to initialize Admin client, err :%s", err.Error())
-		return nil, err
+		return nil, fmt.Errorf("failed to initialize clientset: %w", err)
 	}
 
+	adminClient := clientSet.AdminClient()
+	signalClient := clientSet.SignalServiceClient()
 	sCfg := storage.GetConfig()
 	if sCfg == nil {
 		logger.Errorf(ctx, "Storage configuration missing.")
@@ -399,6 +384,11 @@ func New(ctx context.Context, cfg *config.Config, kubeClientset kubernetes.Inter
 	flytek8s.DefaultPodTemplateStore.SetDefaultNamespace(podNamespace)
 
 	logger.Info(ctx, "Setting up Cache client.")
+	credentialsFuture := admin.NewPerRPCCredentialsFuture()
+	authOpts := []grpc.DialOption{
+		grpc.WithChainUnaryInterceptor(admin.NewAuthInterceptor(adminCfg, tc, credentialsFuture, nil)),
+		grpc.WithPerRPCCredentials(credentialsFuture),
+	}
 	cacheClient, err := catalog.NewCacheClient(ctx, store, authOpts...)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Failed to create cache client")
@@ -422,6 +412,7 @@ func New(ctx context.Context, cfg *config.Config, kubeClientset kubernetes.Inter
 		launchPlanActor, err = launchplan.NewAdminLaunchPlanExecutor(ctx,
 			cfg,
 			adminClient,
+			clientSet.WatchServiceClient(),
 			launchplan.GetAdminConfig(),
 			scope.NewSubScope("admin_launcher"),
 			store,

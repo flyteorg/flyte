@@ -169,4 +169,46 @@ func TestAdminConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_watchConfig.enabled", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("watchConfig.enabled", testValue)
+			if vBool, err := cmdFlags.GetBool("watchConfig.enabled"); err == nil {
+				testDecodeJson_AdminConfig(t, fmt.Sprintf("%v", vBool), &actual.WatchConfig.Enabled)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_watchConfig.freshnessDuration", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := defaultAdminConfig.WatchConfig.FreshnessDuration.String()
+
+			cmdFlags.Set("watchConfig.freshnessDuration", testValue)
+			if vString, err := cmdFlags.GetString("watchConfig.freshnessDuration"); err == nil {
+				testDecodeJson_AdminConfig(t, fmt.Sprintf("%v", vString), &actual.WatchConfig.FreshnessDuration)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_watchConfig.reconnectDelay", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := defaultAdminConfig.WatchConfig.ReconnectDelay.String()
+
+			cmdFlags.Set("watchConfig.reconnectDelay", testValue)
+			if vString, err := cmdFlags.GetString("watchConfig.reconnectDelay"); err == nil {
+				testDecodeJson_AdminConfig(t, fmt.Sprintf("%v", vString), &actual.WatchConfig.ReconnectDelay)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }

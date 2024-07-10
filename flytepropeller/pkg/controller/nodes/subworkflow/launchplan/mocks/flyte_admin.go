@@ -66,8 +66,8 @@ type FlyteAdmin_GetStatus struct {
 	*mock.Call
 }
 
-func (_m FlyteAdmin_GetStatus) Return(_a0 *admin.ExecutionClosure, _a1 *core.LiteralMap, _a2 error) *FlyteAdmin_GetStatus {
-	return &FlyteAdmin_GetStatus{Call: _m.Call.Return(_a0, _a1, _a2)}
+func (_m FlyteAdmin_GetStatus) Return(_a0 launchplan.ExecutionStatus, _a1 error) *FlyteAdmin_GetStatus {
+	return &FlyteAdmin_GetStatus{Call: _m.Call.Return(_a0, _a1)}
 }
 
 func (_m *FlyteAdmin) OnGetStatus(ctx context.Context, executionID *core.WorkflowExecutionIdentifier, launchPlan v1alpha1.ExecutableLaunchPlan, parentWorkflowID string) *FlyteAdmin_GetStatus {
@@ -81,35 +81,24 @@ func (_m *FlyteAdmin) OnGetStatusMatch(matchers ...interface{}) *FlyteAdmin_GetS
 }
 
 // GetStatus provides a mock function with given fields: ctx, executionID, launchPlan, parentWorkflowID
-func (_m *FlyteAdmin) GetStatus(ctx context.Context, executionID *core.WorkflowExecutionIdentifier, launchPlan v1alpha1.ExecutableLaunchPlan, parentWorkflowID string) (*admin.ExecutionClosure, *core.LiteralMap, error) {
+func (_m *FlyteAdmin) GetStatus(ctx context.Context, executionID *core.WorkflowExecutionIdentifier, launchPlan v1alpha1.ExecutableLaunchPlan, parentWorkflowID string) (launchplan.ExecutionStatus, error) {
 	ret := _m.Called(ctx, executionID, launchPlan, parentWorkflowID)
 
-	var r0 *admin.ExecutionClosure
-	if rf, ok := ret.Get(0).(func(context.Context, *core.WorkflowExecutionIdentifier, v1alpha1.ExecutableLaunchPlan, string) *admin.ExecutionClosure); ok {
+	var r0 launchplan.ExecutionStatus
+	if rf, ok := ret.Get(0).(func(context.Context, *core.WorkflowExecutionIdentifier, v1alpha1.ExecutableLaunchPlan, string) launchplan.ExecutionStatus); ok {
 		r0 = rf(ctx, executionID, launchPlan, parentWorkflowID)
 	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*admin.ExecutionClosure)
-		}
+		r0 = ret.Get(0).(launchplan.ExecutionStatus)
 	}
 
-	var r1 *core.LiteralMap
-	if rf, ok := ret.Get(1).(func(context.Context, *core.WorkflowExecutionIdentifier, v1alpha1.ExecutableLaunchPlan, string) *core.LiteralMap); ok {
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *core.WorkflowExecutionIdentifier, v1alpha1.ExecutableLaunchPlan, string) error); ok {
 		r1 = rf(ctx, executionID, launchPlan, parentWorkflowID)
 	} else {
-		if ret.Get(1) != nil {
-			r1 = ret.Get(1).(*core.LiteralMap)
-		}
+		r1 = ret.Error(1)
 	}
 
-	var r2 error
-	if rf, ok := ret.Get(2).(func(context.Context, *core.WorkflowExecutionIdentifier, v1alpha1.ExecutableLaunchPlan, string) error); ok {
-		r2 = rf(ctx, executionID, launchPlan, parentWorkflowID)
-	} else {
-		r2 = ret.Error(2)
-	}
-
-	return r0, r1, r2
+	return r0, r1
 }
 
 type FlyteAdmin_Initialize struct {

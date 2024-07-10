@@ -19,8 +19,8 @@ require (
 	github.com/golang/protobuf v1.5.3
 	github.com/google/uuid v1.6.0
 	github.com/googleapis/gax-go/v2 v2.12.0
-	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
-	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
+	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
+	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.1-0.20210315223345-82c243799c99
 	github.com/hashicorp/golang-lru v0.5.4
 	github.com/imdario/mergo v0.3.13
 	github.com/magiconair/properties v1.8.6
@@ -126,7 +126,7 @@ require (
 	github.com/prometheus/common v0.53.0 // indirect
 	github.com/prometheus/procfs v0.15.1 // indirect
 	github.com/ray-project/kuberay/ray-operator v1.1.0-rc.1 // indirect
-	github.com/spf13/afero v1.8.2 // indirect
+	github.com/spf13/afero v1.9.2 // indirect
 	github.com/spf13/cast v1.4.1 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/viper v1.11.0 // indirect

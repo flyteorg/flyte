@@ -44,6 +44,11 @@ type AutoRefresh interface {
 	DeleteDelayed(id ItemID) error
 }
 
+type AutoRefreshWithUpdate interface {
+	AutoRefresh
+	Update(id ItemID, item Item) (ok bool)
+}
+
 type metrics struct {
 	SyncErrors  prometheus.Counter
 	Evictions   prometheus.Counter
@@ -175,15 +180,18 @@ func (w *autoRefresh) Start(ctx context.Context) error {
 	return nil
 }
 
-// Update updates the item only if it exists in the cache, return true if we updated the item.
+// Update updates the item only if it exists in the cache and is not terminal,
+// return true if we updated the item.
 func (w *autoRefresh) Update(id ItemID, item Item) (ok bool) {
 	w.lock.Lock()
 	defer w.lock.Unlock()
-	ok = w.lruMap.Contains(id)
-	if ok {
-		w.lruMap.Add(id, item)
+	val, ok := w.lruMap.Get(id)
+	if !ok || val.(Item).IsTerminal() {
+		return false
 	}
-	return ok
+
+	w.lruMap.Add(id, item)
+	return true
 }
 
 // Delete deletes the item from the cache if it exists.

@@ -165,7 +165,7 @@ func (l *launchPlanHandler) CheckLaunchPlanStatus(ctx context.Context, nCtx inte
 		return handler.DoTransition(handler.TransitionTypeEphemeral,
 			handler.PhaseInfoFailure(core.ExecutionError_SYSTEM, errors.BadSpecificationError, fmt.Sprintf("launch plan not found [%v]", launchPlanRefID), nil)), nil
 	}
-	wfStatusClosure, outputs, err := l.launchPlan.GetStatus(ctx, childID, launchPlan, nCtx.NodeExecutionMetadata().GetOwnerID().String())
+	execStatus, err := l.launchPlan.GetStatus(ctx, childID, launchPlan, nCtx.NodeExecutionMetadata().GetOwnerID().String())
 	if err != nil {
 		if launchplan.IsNotFound(err) { // NotFound
 			errorCode, _ := errors.GetErrorCode(err)
@@ -178,7 +178,7 @@ func (l *launchPlanHandler) CheckLaunchPlanStatus(ctx context.Context, nCtx inte
 		return handler.UnknownTransition, err
 	}
 
-	if wfStatusClosure == nil {
+	if execStatus.Phase == core.WorkflowExecution_UNDEFINED {
 		logger.Info(ctx, "Retrieved Launch Plan status is nil. This might indicate pressure on the admin cache."+
 			" Consider tweaking its size to allow for more concurrent executions to be cached."+
 			" Assuming LP is running, parallelism [%d].", nCtx.ExecutionContext().IncrementParallelism())
@@ -188,7 +188,7 @@ func (l *launchPlanHandler) CheckLaunchPlanStatus(ctx context.Context, nCtx inte
 	}
 
 	var wErr error
-	switch wfStatusClosure.GetPhase() {
+	switch execStatus.Phase {
 	case core.WorkflowExecution_ABORTED:
 		wErr = fmt.Errorf("launchplan execution aborted")
 		err = errors.Wrapf(errors.RemoteChildWorkflowExecutionFailed, nCtx.NodeID(), wErr, "launchplan [%s] aborted", childID.Name)
@@ -197,8 +197,8 @@ func (l *launchPlanHandler) CheckLaunchPlanStatus(ctx context.Context, nCtx inte
 		})), nil
 	case core.WorkflowExecution_FAILED:
 		execErr := &core.ExecutionError{Code: "LaunchPlanExecutionFailed", Message: "Unknown Error"}
-		if wfStatusClosure.GetError() != nil {
-			execErr = wfStatusClosure.GetError()
+		if execStatus.Error != nil {
+			execErr = execStatus.Error
 		}
 		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailureErr(execErr, &handler.ExecutionInfo{
 			WorkflowNodeInfo: &handler.WorkflowNodeInfo{LaunchedWorkflowID: childID},
@@ -207,9 +207,9 @@ func (l *launchPlanHandler) CheckLaunchPlanStatus(ctx context.Context, nCtx inte
 		// TODO do we need to massage the output to match the alias or is the alias resolution done at the downstream consumer
 		// nCtx.Node().GetOutputAlias()
 		var oInfo *handler.OutputInfo
-		if outputs != nil {
+		if execStatus.Outputs != nil {
 			outputFile := v1alpha1.GetOutputsFile(nCtx.NodeStatus().GetOutputDir())
-			if err := nCtx.DataStore().WriteProtobuf(ctx, outputFile, storage.Options{}, outputs); err != nil {
+			if err := nCtx.DataStore().WriteProtobuf(ctx, outputFile, storage.Options{}, execStatus.Outputs); err != nil {
 				logger.Debugf(ctx, "failed to write data to Storage, err: %v", err.Error())
 				return handler.UnknownTransition, errors.Wrapf(errors.CausedByError, nCtx.NodeID(), err, "failed to copy outputs for child workflow")
 			}
@@ -217,8 +217,8 @@ func (l *launchPlanHandler) CheckLaunchPlanStatus(ctx context.Context, nCtx inte
 			oInfo = &handler.OutputInfo{OutputURI: outputFile}
 		}
 		// DEBUG: CASE-643
-		if outputs.GetLiterals() == nil || len(outputs.GetLiterals()) == 0 {
-			logger.Debugf(ctx, "GetStatus() outputs empty for execution %v. Closure: %v. Outputs: %v", childID, wfStatusClosure, outputs)
+		if len(execStatus.Outputs.GetLiterals()) == 0 {
+			logger.Debugf(ctx, "GetStatus() outputs empty for execution %v. Phase: %v. Outputs: %v", childID, execStatus.Phase, execStatus.Outputs)
 		}
 
 		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoSuccess(&handler.ExecutionInfo{

@@ -26,6 +26,7 @@ import (
 // Clientset contains the clients exposed to communicate with various admin services.
 type Clientset struct {
 	adminServiceClient        service.AdminServiceClient
+	watchServiceClient        service.WatchServiceClient
 	authMetadataServiceClient service.AuthMetadataServiceClient
 	healthServiceClient       grpc_health_v1.HealthClient
 	identityServiceClient     service.IdentityServiceClient
@@ -37,6 +38,11 @@ type Clientset struct {
 // AdminClient retrieves the AdminServiceClient
 func (c Clientset) AdminClient() service.AdminServiceClient {
 	return c.adminServiceClient
+}
+
+// WatchServiceClient retrieves the WatchServiceClient
+func (c Clientset) WatchServiceClient() service.WatchServiceClient {
+	return c.watchServiceClient
 }
 
 // AuthMetadataClient retrieves the AuthMetadataServiceClient
@@ -210,6 +216,7 @@ func initializeClients(ctx context.Context, cfg *Config, tokenCache cache.TokenC
 	cs.dataProxyServiceClient = service.NewDataProxyServiceClient(adminConnection)
 	cs.signalServiceClient = service.NewSignalServiceClient(adminConnection)
 	cs.artifactServiceClient = artifacts.NewArtifactRegistryClient(adminConnection)
+	cs.watchServiceClient = service.NewWatchServiceClient(adminConnection)
 
 	return &cs, nil
 }

@@ -282,7 +282,6 @@ func TestSubWorkflowHandler_StartLaunchPlan(t *testing.T) {
 }
 
 func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
-
 	ctx := context.TODO()
 
 	attempts := uint32(1)
@@ -310,94 +309,79 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 	mockNodeStatus.On("GetOutputDir").Return(dataDir)
 
 	t.Run("stillRunning", func(t *testing.T) {
-
 		mockLPExec := &mocks.Executor{}
-
-		h := launchPlanHandler{
-			launchPlan: mockLPExec,
-		}
-		mockLPExec.On("GetStatus",
-			ctx,
-			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
-				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
-			}),
-			mock.MatchedBy(func(o v1alpha1.ExecutableLaunchPlan) bool { return true }),
-			mock.MatchedBy(func(o v1alpha1.WorkflowID) bool { return true }),
-		).Return(&admin.ExecutionClosure{
-			Phase: core.WorkflowExecution_RUNNING,
-		}, &core.LiteralMap{}, nil)
-
+		mockLPExec.
+			OnGetStatusMatch(ctx,
+				mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
+					return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
+				}),
+				mock.MatchedBy(func(o v1alpha1.ExecutableLaunchPlan) bool { return true }),
+				mock.MatchedBy(func(o v1alpha1.WorkflowID) bool { return true }),
+			).
+			Return(launchplan.ExecutionStatus{Phase: core.WorkflowExecution_RUNNING}, nil).
+			Once()
+		h := launchPlanHandler{launchPlan: mockLPExec}
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
+
 		s, err := h.CheckLaunchPlanStatus(ctx, nCtx)
 
 		assert.NoError(t, err)
 		assert.Equal(t, handler.EPhaseRunning, s.Info().GetPhase())
+		mockLPExec.AssertExpectations(t)
 	})
 
 	t.Run("successNoOutputs", func(t *testing.T) {
-
 		mockLPExec := &mocks.Executor{}
-
-		h := launchPlanHandler{
-			launchPlan: mockLPExec,
-		}
-		mockLPExec.On("GetStatus",
-			ctx,
-			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
-				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
-			}),
-			mock.MatchedBy(func(o v1alpha1.ExecutableLaunchPlan) bool { return true }),
-			mock.MatchedBy(func(o v1alpha1.WorkflowID) bool { return true }),
-		).Return(&admin.ExecutionClosure{
-			Phase: core.WorkflowExecution_SUCCEEDED,
-		}, nil, nil)
-
+		mockLPExec.
+			OnGetStatusMatch(ctx,
+				mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
+					return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
+				}),
+				mock.MatchedBy(func(o v1alpha1.ExecutableLaunchPlan) bool { return true }),
+				mock.MatchedBy(func(o v1alpha1.WorkflowID) bool { return true }),
+			).
+			Return(launchplan.ExecutionStatus{Phase: core.WorkflowExecution_SUCCEEDED}, nil).
+			Once()
+		h := launchPlanHandler{launchPlan: mockLPExec}
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
+
 		s, err := h.CheckLaunchPlanStatus(ctx, nCtx)
+
 		assert.NoError(t, err)
 		assert.Equal(t, handler.EPhaseSuccess, s.Info().GetPhase())
+		mockLPExec.AssertExpectations(t)
 	})
 
 	t.Run("successOutputURI", func(t *testing.T) {
-
 		mockStore := createInmemoryStore(t)
-		mockLPExec := &mocks.Executor{}
 		uri := storage.DataReference("uri")
-
-		// tODO ssingh: do we need mockStore
-		h := launchPlanHandler{
-			launchPlan:  mockLPExec,
-			eventConfig: eventConfig,
-		}
-
 		op := &core.LiteralMap{
 			Literals: map[string]*core.Literal{
 				"x": coreutils.MustMakePrimitiveLiteral(1),
 			},
 		}
+		mockLPExec := &mocks.Executor{}
+		mockLPExec.
+			OnGetStatusMatch(
+				ctx,
+				mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
+					return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
+				}),
+				mock.MatchedBy(func(o v1alpha1.ExecutableLaunchPlan) bool { return true }),
+				mock.MatchedBy(func(o v1alpha1.WorkflowID) bool { return true }),
+			).
+			Return(launchplan.ExecutionStatus{Phase: core.WorkflowExecution_SUCCEEDED, Outputs: op}, nil).
+			Once()
+		// tODO ssingh: do we need mockStore
+		h := launchPlanHandler{
+			launchPlan:  mockLPExec,
+			eventConfig: eventConfig,
+		}
 		err := mockStore.WriteProtobuf(ctx, uri, storage.Options{}, op)
 		assert.NoError(t, err)
-
-		mockLPExec.On("GetStatus",
-			ctx,
-			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
-				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
-			}),
-			mock.MatchedBy(func(o v1alpha1.ExecutableLaunchPlan) bool { return true }),
-			mock.MatchedBy(func(o v1alpha1.WorkflowID) bool { return true }),
-		).Return(&admin.ExecutionClosure{
-			Phase: core.WorkflowExecution_SUCCEEDED,
-			OutputResult: &admin.ExecutionClosure_Outputs{
-				Outputs: &admin.LiteralMapBlob{
-					Data: &admin.LiteralMapBlob_Uri{
-						Uri: uri.String(),
-					},
-				},
-			},
-		}, op, nil)
-
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
-		nCtx.OnDataStore().Return(mockStore)
+		nCtx.OnDataStore().Return(mockStore).Maybe()
+
 		s, err := h.CheckLaunchPlanStatus(ctx, nCtx)
 		assert.NoError(t, err)
 		assert.Equal(t, handler.EPhaseSuccess, s.Info().GetPhase())
@@ -406,43 +390,36 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 		v, ok := final.GetLiterals()["x"]
 		assert.True(t, ok)
 		assert.Equal(t, int64(1), v.GetScalar().GetPrimitive().GetInteger())
+		mockLPExec.AssertExpectations(t)
 	})
 
 	t.Run("successOutputs", func(t *testing.T) {
-
 		mockStore := createInmemoryStore(t)
-		mockLPExec := &mocks.Executor{}
-		h := launchPlanHandler{
-			launchPlan:  mockLPExec,
-			eventConfig: eventConfig,
-		}
-
 		op := &core.LiteralMap{
 			Literals: map[string]*core.Literal{
 				"x": coreutils.MustMakePrimitiveLiteral(1),
 			},
 		}
-		mockLPExec.On("GetStatus",
-			ctx,
-			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
-				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
-			}),
-			mock.MatchedBy(func(o v1alpha1.ExecutableLaunchPlan) bool { return true }),
-			mock.MatchedBy(func(o v1alpha1.WorkflowID) bool { return true }),
-		).Return(&admin.ExecutionClosure{
-			Phase: core.WorkflowExecution_SUCCEEDED,
-			OutputResult: &admin.ExecutionClosure_Outputs{
-				Outputs: &admin.LiteralMapBlob{
-					Data: &admin.LiteralMapBlob_Values{
-						Values: op,
-					},
-				},
-			},
-		}, op, nil)
-
+		mockLPExec := &mocks.Executor{}
+		mockLPExec.
+			OnGetStatusMatch(ctx,
+				mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
+					return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
+				}),
+				mock.MatchedBy(func(o v1alpha1.ExecutableLaunchPlan) bool { return true }),
+				mock.MatchedBy(func(o v1alpha1.WorkflowID) bool { return true }),
+			).
+			Return(launchplan.ExecutionStatus{Phase: core.WorkflowExecution_SUCCEEDED, Outputs: op}, nil).
+			Once()
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
 		nCtx.OnDataStore().Return(mockStore)
+		h := launchPlanHandler{
+			launchPlan:  mockLPExec,
+			eventConfig: eventConfig,
+		}
+
 		s, err := h.CheckLaunchPlanStatus(ctx, nCtx)
+
 		assert.NoError(t, err)
 		assert.Equal(t, s.Info().GetPhase(), handler.EPhaseSuccess)
 		final := &core.LiteralMap{}
@@ -450,214 +427,206 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 		v, ok := final.GetLiterals()["x"]
 		assert.True(t, ok)
 		assert.Equal(t, int64(1), v.GetScalar().GetPrimitive().GetInteger())
+		mockLPExec.AssertExpectations(t)
 	})
 
 	t.Run("failureError", func(t *testing.T) {
-
 		mockLPExec := &mocks.Executor{}
-
-		h := launchPlanHandler{
-			launchPlan:  mockLPExec,
-			eventConfig: eventConfig,
-		}
-
-		mockLPExec.On("GetStatus",
-			ctx,
-			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
-				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
-			}),
-			mock.MatchedBy(func(o v1alpha1.ExecutableLaunchPlan) bool { return true }),
-			mock.MatchedBy(func(o v1alpha1.WorkflowID) bool { return true }),
-		).Return(&admin.ExecutionClosure{
-			Phase: core.WorkflowExecution_FAILED,
-			OutputResult: &admin.ExecutionClosure_Error{
+		mockLPExec.
+			OnGetStatusMatch(
+				ctx,
+				mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
+					return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
+				}),
+				mock.MatchedBy(func(o v1alpha1.ExecutableLaunchPlan) bool { return true }),
+				mock.MatchedBy(func(o v1alpha1.WorkflowID) bool { return true }),
+			).
+			Return(launchplan.ExecutionStatus{
+				Phase: core.WorkflowExecution_FAILED,
 				Error: &core.ExecutionError{
 					Message: "msg",
 					Code:    "code",
 				},
-			},
-		}, &core.LiteralMap{}, nil)
-
+			}, nil).
+			Once()
+		h := launchPlanHandler{
+			launchPlan:  mockLPExec,
+			eventConfig: eventConfig,
+		}
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
+
 		s, err := h.CheckLaunchPlanStatus(ctx, nCtx)
+
 		assert.NoError(t, err)
 		assert.Equal(t, s.Info().GetPhase(), handler.EPhaseFailed)
+		mockLPExec.AssertExpectations(t)
 	})
 
 	t.Run("failureNoError", func(t *testing.T) {
-
 		mockLPExec := &mocks.Executor{}
-
+		mockLPExec.
+			OnGetStatusMatch(
+				ctx,
+				mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
+					return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
+				}),
+				mock.MatchedBy(func(o v1alpha1.ExecutableLaunchPlan) bool { return true }),
+				mock.MatchedBy(func(o v1alpha1.WorkflowID) bool { return true }),
+			).
+			Return(launchplan.ExecutionStatus{Phase: core.WorkflowExecution_FAILED}, nil).
+			Once()
 		h := launchPlanHandler{
 			launchPlan:  mockLPExec,
 			eventConfig: eventConfig,
 		}
-
-		mockLPExec.On("GetStatus",
-			ctx,
-			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
-				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
-			}),
-			mock.MatchedBy(func(o v1alpha1.ExecutableLaunchPlan) bool { return true }),
-			mock.MatchedBy(func(o v1alpha1.WorkflowID) bool { return true }),
-		).Return(&admin.ExecutionClosure{
-			Phase: core.WorkflowExecution_FAILED,
-		}, &core.LiteralMap{}, nil)
-
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
+
 		s, err := h.CheckLaunchPlanStatus(ctx, nCtx)
+
 		assert.NoError(t, err)
 		assert.Equal(t, s.Info().GetPhase(), handler.EPhaseFailed)
+		mockLPExec.AssertExpectations(t)
 	})
 
 	t.Run("aborted", func(t *testing.T) {
-
 		mockLPExec := &mocks.Executor{}
-
-		h := launchPlanHandler{
-			launchPlan:  mockLPExec,
-			eventConfig: eventConfig,
-		}
-
-		mockLPExec.On("GetStatus",
+		mockLPExec.OnGetStatusMatch(
 			ctx,
 			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
 				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
 			}),
 			mock.MatchedBy(func(o v1alpha1.ExecutableLaunchPlan) bool { return true }),
 			mock.MatchedBy(func(o v1alpha1.WorkflowID) bool { return true }),
-		).Return(&admin.ExecutionClosure{
-			Phase: core.WorkflowExecution_ABORTED,
-		}, &core.LiteralMap{}, nil)
-
+		).
+			Return(launchplan.ExecutionStatus{Phase: core.WorkflowExecution_ABORTED}, nil).
+			Once()
+		h := launchPlanHandler{
+			launchPlan:  mockLPExec,
+			eventConfig: eventConfig,
+		}
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
+
 		s, err := h.CheckLaunchPlanStatus(ctx, nCtx)
+
 		assert.NoError(t, err)
 		assert.Equal(t, s.Info().GetPhase(), handler.EPhaseFailed)
+		mockLPExec.AssertExpectations(t)
 	})
 
 	t.Run("notFound", func(t *testing.T) {
-
 		mockLPExec := &mocks.Executor{}
-
+		mockLPExec.
+			OnGetStatusMatch(ctx,
+				mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
+					return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
+				}),
+				mock.MatchedBy(func(o v1alpha1.ExecutableLaunchPlan) bool { return true }),
+				mock.MatchedBy(func(o v1alpha1.WorkflowID) bool { return true }),
+			).
+			Return(launchplan.ExecutionStatus{}, errors.Wrapf(launchplan.RemoteErrorNotFound, fmt.Errorf("some error"), "not found")).
+			Once()
 		h := launchPlanHandler{
 			launchPlan:  mockLPExec,
 			eventConfig: eventConfig,
 		}
-
-		mockLPExec.On("GetStatus",
-			ctx,
-			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
-				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
-			}),
-			mock.MatchedBy(func(o v1alpha1.ExecutableLaunchPlan) bool { return true }),
-			mock.MatchedBy(func(o v1alpha1.WorkflowID) bool { return true }),
-		).Return(nil, &core.LiteralMap{}, errors.Wrapf(launchplan.RemoteErrorNotFound, fmt.Errorf("some error"), "not found"))
-
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
+
 		s, err := h.CheckLaunchPlanStatus(ctx, nCtx)
+
 		assert.NoError(t, err)
 		assert.Equal(t, s.Info().GetPhase(), handler.EPhaseFailed)
+		mockLPExec.AssertExpectations(t)
 	})
 
 	t.Run("systemError", func(t *testing.T) {
-
 		mockLPExec := &mocks.Executor{}
-
+		mockLPExec.
+			OnGetStatusMatch(
+				ctx,
+				mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
+					return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
+				}),
+				mock.MatchedBy(func(o v1alpha1.ExecutableLaunchPlan) bool { return true }),
+				mock.MatchedBy(func(o v1alpha1.WorkflowID) bool { return true }),
+			).
+			Return(launchplan.ExecutionStatus{}, errors.Wrapf(launchplan.RemoteErrorSystem, fmt.Errorf("some error"), "not found")).
+			Once()
 		h := launchPlanHandler{
 			launchPlan:  mockLPExec,
 			eventConfig: eventConfig,
 		}
-
-		mockLPExec.On("GetStatus",
-			ctx,
-			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
-				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
-			}),
-			mock.MatchedBy(func(o v1alpha1.ExecutableLaunchPlan) bool { return true }),
-			mock.MatchedBy(func(o v1alpha1.WorkflowID) bool { return true }),
-		).Return(nil, &core.LiteralMap{}, errors.Wrapf(launchplan.RemoteErrorSystem, fmt.Errorf("some error"), "not found"))
-
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
+
 		s, err := h.CheckLaunchPlanStatus(ctx, nCtx)
+
 		assert.Error(t, err)
 		assert.Equal(t, s.Info().GetPhase(), handler.EPhaseUndefined)
+		mockLPExec.AssertExpectations(t)
 	})
 
 	t.Run("dataStoreFailure", func(t *testing.T) {
-
 		mockStore := storage.NewCompositeDataStore(storage.URLPathConstructor{}, storage.NewDefaultProtobufStore(utils.FailingRawStore{}, promutils.NewTestScope()))
-		mockLPExec := &mocks.Executor{}
-
-		h := launchPlanHandler{
-			launchPlan:  mockLPExec,
-			eventConfig: eventConfig,
-		}
-
 		op := &core.LiteralMap{
 			Literals: map[string]*core.Literal{
 				"x": coreutils.MustMakePrimitiveLiteral(1),
 			},
 		}
-		mockLPExec.On("GetStatus",
-			ctx,
-			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
-				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
-			}),
-			mock.MatchedBy(func(o v1alpha1.ExecutableLaunchPlan) bool { return true }),
-			mock.MatchedBy(func(o v1alpha1.WorkflowID) bool { return true }),
-		).Return(&admin.ExecutionClosure{
-			Phase: core.WorkflowExecution_SUCCEEDED,
-			OutputResult: &admin.ExecutionClosure_Outputs{
-				Outputs: &admin.LiteralMapBlob{
-					Data: &admin.LiteralMapBlob_Values{
-						Values: op,
-					},
-				},
-			},
-		}, &core.LiteralMap{}, nil)
-
-		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
-		nCtx.OnDataStore().Return(mockStore)
-		s, err := h.CheckLaunchPlanStatus(ctx, nCtx)
-		assert.Error(t, err)
-		assert.Equal(t, s.Info().GetPhase(), handler.EPhaseUndefined)
-	})
-
-	t.Run("outputURISystemError", func(t *testing.T) {
-
-		mockStore := storage.NewCompositeDataStore(storage.URLPathConstructor{}, storage.NewDefaultProtobufStore(utils.FailingRawStore{}, promutils.NewTestScope()))
 		mockLPExec := &mocks.Executor{}
-		uri := storage.DataReference("uri")
-
+		mockLPExec.
+			OnGetStatusMatch(ctx,
+				mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
+					return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
+				}),
+				mock.MatchedBy(func(o v1alpha1.ExecutableLaunchPlan) bool { return true }),
+				mock.MatchedBy(func(o v1alpha1.WorkflowID) bool { return true }),
+			).
+			Return(launchplan.ExecutionStatus{
+				Phase:   core.WorkflowExecution_SUCCEEDED,
+				Outputs: op,
+			}, nil).
+			Once()
 		h := launchPlanHandler{
 			launchPlan:  mockLPExec,
 			eventConfig: eventConfig,
 		}
-
-		mockLPExec.On("GetStatus",
-			ctx,
-			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
-				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
-			}),
-			mock.MatchedBy(func(o v1alpha1.ExecutableLaunchPlan) bool { return true }),
-			mock.MatchedBy(func(o v1alpha1.WorkflowID) bool { return true }),
-		).Return(&admin.ExecutionClosure{
-			Phase: core.WorkflowExecution_SUCCEEDED,
-			OutputResult: &admin.ExecutionClosure_Outputs{
-				Outputs: &admin.LiteralMapBlob{
-					Data: &admin.LiteralMapBlob_Uri{
-						Uri: uri.String(),
-					},
-				},
-			},
-		}, &core.LiteralMap{}, nil)
-
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
 		nCtx.OnDataStore().Return(mockStore)
+
 		s, err := h.CheckLaunchPlanStatus(ctx, nCtx)
+
+		assert.Error(t, err)
+		assert.Equal(t, s.Info().GetPhase(), handler.EPhaseUndefined)
+		mockLPExec.AssertExpectations(t)
+	})
+
+	t.Run("outputURISystemError", func(t *testing.T) {
+		mockStore := storage.NewCompositeDataStore(storage.URLPathConstructor{}, storage.NewDefaultProtobufStore(utils.FailingRawStore{}, promutils.NewTestScope()))
+		mockLPExec := &mocks.Executor{}
+		mockLPExec.
+			OnGetStatusMatch(ctx,
+				mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
+					return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
+				}),
+				mock.MatchedBy(func(o v1alpha1.ExecutableLaunchPlan) bool { return true }),
+				mock.MatchedBy(func(o v1alpha1.WorkflowID) bool { return true }),
+			).
+			Return(launchplan.ExecutionStatus{
+				Phase:   core.WorkflowExecution_SUCCEEDED,
+				Outputs: &core.LiteralMap{},
+			}, nil).
+			Once()
+		h := launchPlanHandler{
+			launchPlan:  mockLPExec,
+			eventConfig: eventConfig,
+		}
+		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
+		nCtx.OnDataStore().Return(mockStore)
+
+		s, err := h.CheckLaunchPlanStatus(ctx, nCtx)
+
 		assert.Error(t, err)
 		assert.Equal(t, s.Info().GetPhase().String(), handler.EPhaseUndefined.String())
+		mockLPExec.AssertExpectations(t)
 	})
 }
 

@@ -25,9 +25,9 @@ func (failFastWorkflowLauncher) Launch(ctx context.Context, launchCtx LaunchCont
 }
 
 func (failFastWorkflowLauncher) GetStatus(ctx context.Context, executionID *core.WorkflowExecutionIdentifier,
-	launchPlan v1alpha1.ExecutableLaunchPlan, parentWorkflowID v1alpha1.WorkflowID) (*admin.ExecutionClosure, *core.LiteralMap, error) {
+	launchPlan v1alpha1.ExecutableLaunchPlan, parentWorkflowID v1alpha1.WorkflowID) (ExecutionStatus, error) {
 	logger.Infof(ctx, "NOOP: Workflow Status ExecID [%s]", executionID.Name)
-	return nil, nil, errors.Wrapf(RemoteErrorUser, fmt.Errorf("badly configured system"), "please enable admin workflow launch to use launchplans")
+	return ExecutionStatus{}, errors.Wrapf(RemoteErrorUser, fmt.Errorf("badly configured system"), "please enable admin workflow launch to use launchplans")
 }
 
 func (failFastWorkflowLauncher) Kill(ctx context.Context, executionID *core.WorkflowExecutionIdentifier, reason string) error {

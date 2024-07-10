@@ -55,5 +55,8 @@ func (cfg AdminConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "cacheSize"), defaultAdminConfig.MaxCacheSize, "Maximum cache in terms of number of items stored.")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "workers"), defaultAdminConfig.Workers, "Number of parallel workers to work on the queue.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "cache-resync-duration"), defaultAdminConfig.CacheResyncDuration.String(), "Frequency of re-syncing launchplans within the auto refresh cache.")
+	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "watchConfig.enabled"), defaultAdminConfig.WatchConfig.Enabled, "True when propeller calls Watch API to populate auto-refresh cache with execution status updates")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "watchConfig.freshnessDuration"), defaultAdminConfig.WatchConfig.FreshnessDuration.String(), "How long a cache item should be used as-is without syncing")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "watchConfig.reconnectDelay"), defaultAdminConfig.WatchConfig.ReconnectDelay.String(), "How long to wait before attempting to connection to Watch API")
 	return cmdFlags
 }

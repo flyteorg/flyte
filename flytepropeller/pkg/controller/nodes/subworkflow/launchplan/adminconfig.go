@@ -18,6 +18,11 @@ var (
 		CacheResyncDuration: config.Duration{
 			Duration: 30 * time.Second,
 		},
+		WatchConfig: WatchConfig{
+			Enabled:           false,
+			FreshnessDuration: config.Duration{Duration: 3 * time.Minute},
+			ReconnectDelay:    config.Duration{Duration: time.Second},
+		},
 	}
 
 	adminConfigSection = ctrlConfig.MustRegisterSubSection("admin-launcher", defaultAdminConfig)
@@ -40,6 +45,16 @@ type AdminConfig struct {
 
 	// CacheResyncDuration defines the interval that the admin launcher should refresh the launchplan cache.
 	CacheResyncDuration config.Duration `json:"cache-resync-duration" pflag:",Frequency of re-syncing launchplans within the auto refresh cache."`
+
+	WatchConfig WatchConfig `json:"watchConfig" pflag:",Contains configuration for Watch API integration"`
+}
+
+type WatchConfig struct {
+	Enabled bool `json:"enabled" pflag:",True when propeller calls Watch API to populate auto-refresh cache with execution status updates"`
+
+	FreshnessDuration config.Duration `json:"freshnessDuration" pflag:",How long a cache item should be used as-is without syncing"`
+
+	ReconnectDelay config.Duration `json:"reconnectDelay" pflag:",How long to wait before attempting to connection to Watch API"`
 }
 
 func GetAdminConfig() *AdminConfig {

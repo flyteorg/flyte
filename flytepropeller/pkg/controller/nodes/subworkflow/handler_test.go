@@ -11,7 +11,6 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	mocks4 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
@@ -250,50 +249,53 @@ func TestWorkflowNodeHandler_CheckNodeStatus(t *testing.T) {
 	recoveryClient := &mocks5.Client{}
 
 	t.Run("stillRunning V0", func(t *testing.T) {
-
 		mockLPExec := &mocks.Executor{}
-
+		mockLPExec.
+			OnGetStatusMatch(
+				ctx,
+				mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
+					return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
+				}),
+				mock.MatchedBy(func(o v1alpha1.ExecutableLaunchPlan) bool { return true }),
+				mock.MatchedBy(func(o v1alpha1.WorkflowID) bool { return true }),
+			).
+			Return(launchplan.ExecutionStatus{Phase: core.WorkflowExecution_RUNNING}, nil).
+			Once()
 		h := New(nil, mockLPExec, recoveryClient, eventConfig, promutils.NewTestScope())
-		mockLPExec.OnGetStatusMatch(
-			ctx,
-			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
-				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
-			}),
-			mock.MatchedBy(func(o v1alpha1.ExecutableLaunchPlan) bool { return true }),
-			mock.MatchedBy(func(o v1alpha1.WorkflowID) bool { return true }),
-		).Return(&admin.ExecutionClosure{
-			Phase: core.WorkflowExecution_RUNNING,
-		}, &core.LiteralMap{}, nil)
-
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
+
 		s, err := h.Handle(ctx, nCtx)
+
 		assert.NoError(t, err)
 		assert.Equal(t, handler.EPhaseRunning, s.Info().GetPhase())
 		c := nCtx.ExecutionContext().(*execMocks.ExecutionContext)
 		c.AssertCalled(t, "IncrementParallelism")
+		mockLPExec.AssertExpectations(t)
 	})
+
 	t.Run("stillRunning V1", func(t *testing.T) {
-
 		mockLPExec := &mocks.Executor{}
-
+		mockLPExec.
+			OnGetStatusMatch(
+				ctx,
+				mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
+					return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
+				}),
+				mock.MatchedBy(func(o v1alpha1.ExecutableLaunchPlan) bool { return true }),
+				mock.MatchedBy(func(o v1alpha1.WorkflowID) bool { return true }),
+			).
+			Return(launchplan.ExecutionStatus{Phase: core.WorkflowExecution_RUNNING}, nil).
+			Once()
 		h := New(nil, mockLPExec, recoveryClient, eventConfig, promutils.NewTestScope())
-		mockLPExec.OnGetStatusMatch(
-			ctx,
-			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
-				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
-			}),
-			mock.MatchedBy(func(o v1alpha1.ExecutableLaunchPlan) bool { return true }),
-			mock.MatchedBy(func(o v1alpha1.WorkflowID) bool { return true }),
-		).Return(&admin.ExecutionClosure{
-			Phase: core.WorkflowExecution_RUNNING,
-		}, &core.LiteralMap{}, nil)
-
 		nCtx := createNodeContextV1(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
+
 		s, err := h.Handle(ctx, nCtx)
+
 		assert.NoError(t, err)
 		assert.Equal(t, handler.EPhaseRunning, s.Info().GetPhase())
 		c := nCtx.ExecutionContext().(*execMocks.ExecutionContext)
 		c.AssertCalled(t, "IncrementParallelism")
+		mockLPExec.AssertExpectations(t)
 	})
 }
 
