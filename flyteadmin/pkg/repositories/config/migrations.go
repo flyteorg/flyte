@@ -1265,6 +1265,23 @@ var UnionMigrations = []*gormigrate.Migration{
 			return tx.Table("executions").Migrator().DropIndex(&models.Execution{}, "idx_org_project_domain_phase_execution_created_at")
 		},
 	},
+	{
+		ID: "2024-06-13-add-watch-api-executions-index",
+		Migrate: func(tx *gorm.DB) error {
+			err := tx.AutoMigrate(&models.Execution{})
+			if err != nil {
+				return err
+			}
+			return tx.Exec("CREATE INDEX IF NOT EXISTS idx_parent_cluster_phase_id ON executions (parent_cluster, phase, id)").Error
+		},
+		Rollback: func(tx *gorm.DB) error {
+			err := tx.Table("executions").Migrator().DropIndex(&models.Execution{}, "idx_parent_cluster_phase_id")
+			if err != nil {
+				return err
+			}
+			return tx.Exec("ALTER TABLE executions DROP COLUMN IF EXISTS parent_cluster").Error
+		},
+	},
 }
 
 // ContinuedMigrations - Above are a series of migrations labeled as no-op migrations. These are migrations that we

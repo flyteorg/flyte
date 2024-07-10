@@ -26111,6 +26111,177 @@ export namespace flyteidl {
              */
             type SetSignalCallback = (error: (Error|null), response?: flyteidl.admin.SignalSetResponse) => void;
         }
+
+        /** Represents a WatchService */
+        class WatchService extends $protobuf.rpc.Service {
+
+            /**
+             * Constructs a new WatchService service.
+             * @param rpcImpl RPC implementation
+             * @param [requestDelimited=false] Whether requests are length-delimited
+             * @param [responseDelimited=false] Whether responses are length-delimited
+             */
+            constructor(rpcImpl: $protobuf.RPCImpl, requestDelimited?: boolean, responseDelimited?: boolean);
+
+            /**
+             * Creates new WatchService service using the specified rpc implementation.
+             * @param rpcImpl RPC implementation
+             * @param [requestDelimited=false] Whether requests are length-delimited
+             * @param [responseDelimited=false] Whether responses are length-delimited
+             * @returns RPC service. Useful where requests and/or responses are streamed.
+             */
+            public static create(rpcImpl: $protobuf.RPCImpl, requestDelimited?: boolean, responseDelimited?: boolean): WatchService;
+
+            /**
+             * Calls WatchExecutionStatusUpdates.
+             * @param request WatchExecutionStatusUpdatesRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and WatchExecutionStatusUpdatesResponse
+             */
+            public watchExecutionStatusUpdates(request: flyteidl.watch.IWatchExecutionStatusUpdatesRequest, callback: flyteidl.service.WatchService.WatchExecutionStatusUpdatesCallback): void;
+
+            /**
+             * Calls WatchExecutionStatusUpdates.
+             * @param request WatchExecutionStatusUpdatesRequest message or plain object
+             * @returns Promise
+             */
+            public watchExecutionStatusUpdates(request: flyteidl.watch.IWatchExecutionStatusUpdatesRequest): Promise<flyteidl.watch.WatchExecutionStatusUpdatesResponse>;
+        }
+
+        namespace WatchService {
+
+            /**
+             * Callback as used by {@link flyteidl.service.WatchService#watchExecutionStatusUpdates}.
+             * @param error Error, if any
+             * @param [response] WatchExecutionStatusUpdatesResponse
+             */
+            type WatchExecutionStatusUpdatesCallback = (error: (Error|null), response?: flyteidl.watch.WatchExecutionStatusUpdatesResponse) => void;
+        }
+    }
+
+    /** Namespace watch. */
+    namespace watch {
+
+        /** Properties of a WatchExecutionStatusUpdatesRequest. */
+        interface IWatchExecutionStatusUpdatesRequest {
+
+            /** WatchExecutionStatusUpdatesRequest cluster */
+            cluster?: (string|null);
+        }
+
+        /** Represents a WatchExecutionStatusUpdatesRequest. */
+        class WatchExecutionStatusUpdatesRequest implements IWatchExecutionStatusUpdatesRequest {
+
+            /**
+             * Constructs a new WatchExecutionStatusUpdatesRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.watch.IWatchExecutionStatusUpdatesRequest);
+
+            /** WatchExecutionStatusUpdatesRequest cluster. */
+            public cluster: string;
+
+            /**
+             * Creates a new WatchExecutionStatusUpdatesRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns WatchExecutionStatusUpdatesRequest instance
+             */
+            public static create(properties?: flyteidl.watch.IWatchExecutionStatusUpdatesRequest): flyteidl.watch.WatchExecutionStatusUpdatesRequest;
+
+            /**
+             * Encodes the specified WatchExecutionStatusUpdatesRequest message. Does not implicitly {@link flyteidl.watch.WatchExecutionStatusUpdatesRequest.verify|verify} messages.
+             * @param message WatchExecutionStatusUpdatesRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.watch.IWatchExecutionStatusUpdatesRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a WatchExecutionStatusUpdatesRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns WatchExecutionStatusUpdatesRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.watch.WatchExecutionStatusUpdatesRequest;
+
+            /**
+             * Verifies a WatchExecutionStatusUpdatesRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a WatchExecutionStatusUpdatesResponse. */
+        interface IWatchExecutionStatusUpdatesResponse {
+
+            /** WatchExecutionStatusUpdatesResponse id */
+            id?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
+
+            /** WatchExecutionStatusUpdatesResponse phase */
+            phase?: (flyteidl.core.WorkflowExecution.Phase|null);
+
+            /** WatchExecutionStatusUpdatesResponse outputUri */
+            outputUri?: (string|null);
+
+            /** WatchExecutionStatusUpdatesResponse error */
+            error?: (flyteidl.core.IExecutionError|null);
+        }
+
+        /** Represents a WatchExecutionStatusUpdatesResponse. */
+        class WatchExecutionStatusUpdatesResponse implements IWatchExecutionStatusUpdatesResponse {
+
+            /**
+             * Constructs a new WatchExecutionStatusUpdatesResponse.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.watch.IWatchExecutionStatusUpdatesResponse);
+
+            /** WatchExecutionStatusUpdatesResponse id. */
+            public id?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
+
+            /** WatchExecutionStatusUpdatesResponse phase. */
+            public phase: flyteidl.core.WorkflowExecution.Phase;
+
+            /** WatchExecutionStatusUpdatesResponse outputUri. */
+            public outputUri: string;
+
+            /** WatchExecutionStatusUpdatesResponse error. */
+            public error?: (flyteidl.core.IExecutionError|null);
+
+            /**
+             * Creates a new WatchExecutionStatusUpdatesResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns WatchExecutionStatusUpdatesResponse instance
+             */
+            public static create(properties?: flyteidl.watch.IWatchExecutionStatusUpdatesResponse): flyteidl.watch.WatchExecutionStatusUpdatesResponse;
+
+            /**
+             * Encodes the specified WatchExecutionStatusUpdatesResponse message. Does not implicitly {@link flyteidl.watch.WatchExecutionStatusUpdatesResponse.verify|verify} messages.
+             * @param message WatchExecutionStatusUpdatesResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.watch.IWatchExecutionStatusUpdatesResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a WatchExecutionStatusUpdatesResponse message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns WatchExecutionStatusUpdatesResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.watch.WatchExecutionStatusUpdatesResponse;
+
+            /**
+             * Verifies a WatchExecutionStatusUpdatesResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
     }
 }
 

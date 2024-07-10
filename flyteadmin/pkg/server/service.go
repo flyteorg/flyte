@@ -162,6 +162,9 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 		reflection.Register(grpcServer)
 	}
 
+	watchService := rpc.NewWatchService(ctx, cfg, scope.NewSubScope("watch_service"), configuration)
+	grpcService.RegisterWatchServiceServer(grpcServer, watchService)
+
 	return grpcServer, nil
 }
 

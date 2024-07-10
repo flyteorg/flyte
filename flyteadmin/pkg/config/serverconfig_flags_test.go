@@ -519,4 +519,60 @@ func TestServerConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_watchService.maxPageSize", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("watchService.maxPageSize", testValue)
+			if vInt, err := cmdFlags.GetInt("watchService.maxPageSize"); err == nil {
+				testDecodeJson_ServerConfig(t, fmt.Sprintf("%v", vInt), &actual.WatchService.MaxPageSize)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_watchService.pollInterval", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := defaultServerConfig.WatchService.PollInterval.String()
+
+			cmdFlags.Set("watchService.pollInterval", testValue)
+			if vString, err := cmdFlags.GetString("watchService.pollInterval"); err == nil {
+				testDecodeJson_ServerConfig(t, fmt.Sprintf("%v", vString), &actual.WatchService.PollInterval)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_watchService.maxActiveClusterConnections", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("watchService.maxActiveClusterConnections", testValue)
+			if vInt, err := cmdFlags.GetInt("watchService.maxActiveClusterConnections"); err == nil {
+				testDecodeJson_ServerConfig(t, fmt.Sprintf("%v", vInt), &actual.WatchService.MaxActiveClusterConnections)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_watchService.nonTerminalStatusUpdatesInterval", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := defaultServerConfig.WatchService.NonTerminalStatusUpdatesInterval.String()
+
+			cmdFlags.Set("watchService.nonTerminalStatusUpdatesInterval", testValue)
+			if vString, err := cmdFlags.GetString("watchService.nonTerminalStatusUpdatesInterval"); err == nil {
+				testDecodeJson_ServerConfig(t, fmt.Sprintf("%v", vString), &actual.WatchService.NonTerminalStatusUpdatesInterval)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }

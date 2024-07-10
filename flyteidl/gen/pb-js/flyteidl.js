@@ -61089,7 +61089,375 @@
                 return SignalService;
             })();
     
+            service.WatchService = (function() {
+    
+                /**
+                 * Constructs a new WatchService service.
+                 * @memberof flyteidl.service
+                 * @classdesc Represents a WatchService
+                 * @extends $protobuf.rpc.Service
+                 * @constructor
+                 * @param {$protobuf.RPCImpl} rpcImpl RPC implementation
+                 * @param {boolean} [requestDelimited=false] Whether requests are length-delimited
+                 * @param {boolean} [responseDelimited=false] Whether responses are length-delimited
+                 */
+                function WatchService(rpcImpl, requestDelimited, responseDelimited) {
+                    $protobuf.rpc.Service.call(this, rpcImpl, requestDelimited, responseDelimited);
+                }
+    
+                (WatchService.prototype = Object.create($protobuf.rpc.Service.prototype)).constructor = WatchService;
+    
+                /**
+                 * Creates new WatchService service using the specified rpc implementation.
+                 * @function create
+                 * @memberof flyteidl.service.WatchService
+                 * @static
+                 * @param {$protobuf.RPCImpl} rpcImpl RPC implementation
+                 * @param {boolean} [requestDelimited=false] Whether requests are length-delimited
+                 * @param {boolean} [responseDelimited=false] Whether responses are length-delimited
+                 * @returns {WatchService} RPC service. Useful where requests and/or responses are streamed.
+                 */
+                WatchService.create = function create(rpcImpl, requestDelimited, responseDelimited) {
+                    return new this(rpcImpl, requestDelimited, responseDelimited);
+                };
+    
+                /**
+                 * Callback as used by {@link flyteidl.service.WatchService#watchExecutionStatusUpdates}.
+                 * @memberof flyteidl.service.WatchService
+                 * @typedef WatchExecutionStatusUpdatesCallback
+                 * @type {function}
+                 * @param {Error|null} error Error, if any
+                 * @param {flyteidl.watch.WatchExecutionStatusUpdatesResponse} [response] WatchExecutionStatusUpdatesResponse
+                 */
+    
+                /**
+                 * Calls WatchExecutionStatusUpdates.
+                 * @function watchExecutionStatusUpdates
+                 * @memberof flyteidl.service.WatchService
+                 * @instance
+                 * @param {flyteidl.watch.IWatchExecutionStatusUpdatesRequest} request WatchExecutionStatusUpdatesRequest message or plain object
+                 * @param {flyteidl.service.WatchService.WatchExecutionStatusUpdatesCallback} callback Node-style callback called with the error, if any, and WatchExecutionStatusUpdatesResponse
+                 * @returns {undefined}
+                 * @variation 1
+                 */
+                Object.defineProperty(WatchService.prototype.watchExecutionStatusUpdates = function watchExecutionStatusUpdates(request, callback) {
+                    return this.rpcCall(watchExecutionStatusUpdates, $root.flyteidl.watch.WatchExecutionStatusUpdatesRequest, $root.flyteidl.watch.WatchExecutionStatusUpdatesResponse, request, callback);
+                }, "name", { value: "WatchExecutionStatusUpdates" });
+    
+                /**
+                 * Calls WatchExecutionStatusUpdates.
+                 * @function watchExecutionStatusUpdates
+                 * @memberof flyteidl.service.WatchService
+                 * @instance
+                 * @param {flyteidl.watch.IWatchExecutionStatusUpdatesRequest} request WatchExecutionStatusUpdatesRequest message or plain object
+                 * @returns {Promise<flyteidl.watch.WatchExecutionStatusUpdatesResponse>} Promise
+                 * @variation 2
+                 */
+    
+                return WatchService;
+            })();
+    
             return service;
+        })();
+    
+        flyteidl.watch = (function() {
+    
+            /**
+             * Namespace watch.
+             * @memberof flyteidl
+             * @namespace
+             */
+            var watch = {};
+    
+            watch.WatchExecutionStatusUpdatesRequest = (function() {
+    
+                /**
+                 * Properties of a WatchExecutionStatusUpdatesRequest.
+                 * @memberof flyteidl.watch
+                 * @interface IWatchExecutionStatusUpdatesRequest
+                 * @property {string|null} [cluster] WatchExecutionStatusUpdatesRequest cluster
+                 */
+    
+                /**
+                 * Constructs a new WatchExecutionStatusUpdatesRequest.
+                 * @memberof flyteidl.watch
+                 * @classdesc Represents a WatchExecutionStatusUpdatesRequest.
+                 * @implements IWatchExecutionStatusUpdatesRequest
+                 * @constructor
+                 * @param {flyteidl.watch.IWatchExecutionStatusUpdatesRequest=} [properties] Properties to set
+                 */
+                function WatchExecutionStatusUpdatesRequest(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * WatchExecutionStatusUpdatesRequest cluster.
+                 * @member {string} cluster
+                 * @memberof flyteidl.watch.WatchExecutionStatusUpdatesRequest
+                 * @instance
+                 */
+                WatchExecutionStatusUpdatesRequest.prototype.cluster = "";
+    
+                /**
+                 * Creates a new WatchExecutionStatusUpdatesRequest instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.watch.WatchExecutionStatusUpdatesRequest
+                 * @static
+                 * @param {flyteidl.watch.IWatchExecutionStatusUpdatesRequest=} [properties] Properties to set
+                 * @returns {flyteidl.watch.WatchExecutionStatusUpdatesRequest} WatchExecutionStatusUpdatesRequest instance
+                 */
+                WatchExecutionStatusUpdatesRequest.create = function create(properties) {
+                    return new WatchExecutionStatusUpdatesRequest(properties);
+                };
+    
+                /**
+                 * Encodes the specified WatchExecutionStatusUpdatesRequest message. Does not implicitly {@link flyteidl.watch.WatchExecutionStatusUpdatesRequest.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.watch.WatchExecutionStatusUpdatesRequest
+                 * @static
+                 * @param {flyteidl.watch.IWatchExecutionStatusUpdatesRequest} message WatchExecutionStatusUpdatesRequest message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                WatchExecutionStatusUpdatesRequest.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.cluster != null && message.hasOwnProperty("cluster"))
+                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.cluster);
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a WatchExecutionStatusUpdatesRequest message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.watch.WatchExecutionStatusUpdatesRequest
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.watch.WatchExecutionStatusUpdatesRequest} WatchExecutionStatusUpdatesRequest
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                WatchExecutionStatusUpdatesRequest.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.watch.WatchExecutionStatusUpdatesRequest();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.cluster = reader.string();
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a WatchExecutionStatusUpdatesRequest message.
+                 * @function verify
+                 * @memberof flyteidl.watch.WatchExecutionStatusUpdatesRequest
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                WatchExecutionStatusUpdatesRequest.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.cluster != null && message.hasOwnProperty("cluster"))
+                        if (!$util.isString(message.cluster))
+                            return "cluster: string expected";
+                    return null;
+                };
+    
+                return WatchExecutionStatusUpdatesRequest;
+            })();
+    
+            watch.WatchExecutionStatusUpdatesResponse = (function() {
+    
+                /**
+                 * Properties of a WatchExecutionStatusUpdatesResponse.
+                 * @memberof flyteidl.watch
+                 * @interface IWatchExecutionStatusUpdatesResponse
+                 * @property {flyteidl.core.IWorkflowExecutionIdentifier|null} [id] WatchExecutionStatusUpdatesResponse id
+                 * @property {flyteidl.core.WorkflowExecution.Phase|null} [phase] WatchExecutionStatusUpdatesResponse phase
+                 * @property {string|null} [outputUri] WatchExecutionStatusUpdatesResponse outputUri
+                 * @property {flyteidl.core.IExecutionError|null} [error] WatchExecutionStatusUpdatesResponse error
+                 */
+    
+                /**
+                 * Constructs a new WatchExecutionStatusUpdatesResponse.
+                 * @memberof flyteidl.watch
+                 * @classdesc Represents a WatchExecutionStatusUpdatesResponse.
+                 * @implements IWatchExecutionStatusUpdatesResponse
+                 * @constructor
+                 * @param {flyteidl.watch.IWatchExecutionStatusUpdatesResponse=} [properties] Properties to set
+                 */
+                function WatchExecutionStatusUpdatesResponse(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * WatchExecutionStatusUpdatesResponse id.
+                 * @member {flyteidl.core.IWorkflowExecutionIdentifier|null|undefined} id
+                 * @memberof flyteidl.watch.WatchExecutionStatusUpdatesResponse
+                 * @instance
+                 */
+                WatchExecutionStatusUpdatesResponse.prototype.id = null;
+    
+                /**
+                 * WatchExecutionStatusUpdatesResponse phase.
+                 * @member {flyteidl.core.WorkflowExecution.Phase} phase
+                 * @memberof flyteidl.watch.WatchExecutionStatusUpdatesResponse
+                 * @instance
+                 */
+                WatchExecutionStatusUpdatesResponse.prototype.phase = 0;
+    
+                /**
+                 * WatchExecutionStatusUpdatesResponse outputUri.
+                 * @member {string} outputUri
+                 * @memberof flyteidl.watch.WatchExecutionStatusUpdatesResponse
+                 * @instance
+                 */
+                WatchExecutionStatusUpdatesResponse.prototype.outputUri = "";
+    
+                /**
+                 * WatchExecutionStatusUpdatesResponse error.
+                 * @member {flyteidl.core.IExecutionError|null|undefined} error
+                 * @memberof flyteidl.watch.WatchExecutionStatusUpdatesResponse
+                 * @instance
+                 */
+                WatchExecutionStatusUpdatesResponse.prototype.error = null;
+    
+                /**
+                 * Creates a new WatchExecutionStatusUpdatesResponse instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.watch.WatchExecutionStatusUpdatesResponse
+                 * @static
+                 * @param {flyteidl.watch.IWatchExecutionStatusUpdatesResponse=} [properties] Properties to set
+                 * @returns {flyteidl.watch.WatchExecutionStatusUpdatesResponse} WatchExecutionStatusUpdatesResponse instance
+                 */
+                WatchExecutionStatusUpdatesResponse.create = function create(properties) {
+                    return new WatchExecutionStatusUpdatesResponse(properties);
+                };
+    
+                /**
+                 * Encodes the specified WatchExecutionStatusUpdatesResponse message. Does not implicitly {@link flyteidl.watch.WatchExecutionStatusUpdatesResponse.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.watch.WatchExecutionStatusUpdatesResponse
+                 * @static
+                 * @param {flyteidl.watch.IWatchExecutionStatusUpdatesResponse} message WatchExecutionStatusUpdatesResponse message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                WatchExecutionStatusUpdatesResponse.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.id != null && message.hasOwnProperty("id"))
+                        $root.flyteidl.core.WorkflowExecutionIdentifier.encode(message.id, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.phase != null && message.hasOwnProperty("phase"))
+                        writer.uint32(/* id 2, wireType 0 =*/16).int32(message.phase);
+                    if (message.outputUri != null && message.hasOwnProperty("outputUri"))
+                        writer.uint32(/* id 3, wireType 2 =*/26).string(message.outputUri);
+                    if (message.error != null && message.hasOwnProperty("error"))
+                        $root.flyteidl.core.ExecutionError.encode(message.error, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a WatchExecutionStatusUpdatesResponse message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.watch.WatchExecutionStatusUpdatesResponse
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.watch.WatchExecutionStatusUpdatesResponse} WatchExecutionStatusUpdatesResponse
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                WatchExecutionStatusUpdatesResponse.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.watch.WatchExecutionStatusUpdatesResponse();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.id = $root.flyteidl.core.WorkflowExecutionIdentifier.decode(reader, reader.uint32());
+                            break;
+                        case 2:
+                            message.phase = reader.int32();
+                            break;
+                        case 3:
+                            message.outputUri = reader.string();
+                            break;
+                        case 4:
+                            message.error = $root.flyteidl.core.ExecutionError.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a WatchExecutionStatusUpdatesResponse message.
+                 * @function verify
+                 * @memberof flyteidl.watch.WatchExecutionStatusUpdatesResponse
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                WatchExecutionStatusUpdatesResponse.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.id != null && message.hasOwnProperty("id")) {
+                        var error = $root.flyteidl.core.WorkflowExecutionIdentifier.verify(message.id);
+                        if (error)
+                            return "id." + error;
+                    }
+                    if (message.phase != null && message.hasOwnProperty("phase"))
+                        switch (message.phase) {
+                        default:
+                            return "phase: enum value expected";
+                        case 0:
+                        case 1:
+                        case 2:
+                        case 3:
+                        case 4:
+                        case 5:
+                        case 6:
+                        case 7:
+                        case 8:
+                        case 9:
+                            break;
+                        }
+                    if (message.outputUri != null && message.hasOwnProperty("outputUri"))
+                        if (!$util.isString(message.outputUri))
+                            return "outputUri: string expected";
+                    if (message.error != null && message.hasOwnProperty("error")) {
+                        var error = $root.flyteidl.core.ExecutionError.verify(message.error);
+                        if (error)
+                            return "error." + error;
+                    }
+                    return null;
+                };
+    
+                return WatchExecutionStatusUpdatesResponse;
+            })();
+    
+            return watch;
         })();
     
         return flyteidl;

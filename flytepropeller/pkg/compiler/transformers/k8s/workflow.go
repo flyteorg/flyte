@@ -30,6 +30,10 @@ const (
 	ShardKeyLabel = "shard-key"
 	// The fully qualified FlyteWorkflow name
 	WorkflowNameLabel = "workflow-name"
+	// The name of the cluster that spawned this child execution
+	ParentClusterLabel = "parent-cluster"
+	// Shard id of parent propeller that spawned this child execution
+	ParentShardLabel = "parent-shard"
 )
 
 func requiresInputs(w *core.WorkflowTemplate) bool {

@@ -1,0 +1,11 @@
+syntax = "proto3";
+package flyteidl.service;
+
+option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service";
+
+import "flyteidl/watch/executions.proto";
+
+service WatchService {
+  // Request stream of execution status updates for a given cluster
+  rpc WatchExecutionStatusUpdates (flyteidl.watch.WatchExecutionStatusUpdatesRequest) returns (stream flyteidl.watch.WatchExecutionStatusUpdatesResponse) {}
+}

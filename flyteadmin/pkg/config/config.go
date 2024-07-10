@@ -28,6 +28,7 @@ type ServerConfig struct {
 	DataProxy                DataProxyConfig  `json:"dataProxy" pflag:",Defines data proxy configuration."`
 	ReadHeaderTimeoutSeconds int              `json:"readHeaderTimeoutSeconds" pflag:",The amount of time allowed to read request headers."`
 	KubeClientConfig         KubeClientConfig `json:"kubeClientConfig" pflag:",Configuration to control the Kubernetes client"`
+	WatchService             WatchService     `json:"watchService" pflag:",Watch service related configs"`
 }
 
 type DataProxyConfig struct {
@@ -89,6 +90,13 @@ type SslOptions struct {
 	KeyFile         string `json:"keyFile"`
 }
 
+type WatchService struct {
+	MaxPageSize                      int             `json:"maxPageSize"`
+	PollInterval                     config.Duration `json:"pollInterval"`
+	MaxActiveClusterConnections      int             `json:"maxActiveClusterConnections"`
+	NonTerminalStatusUpdatesInterval config.Duration `json:"nonTerminalStatusUpdatesInterval"`
+}
+
 var defaultServerConfig = &ServerConfig{
 	HTTPPort: 8088,
 	Security: ServerSecurityOptions{
@@ -115,6 +123,12 @@ var defaultServerConfig = &ServerConfig{
 		QPS:     100,
 		Burst:   25,
 		Timeout: config.Duration{Duration: 30 * time.Second},
+	},
+	WatchService: WatchService{
+		MaxPageSize:                      50000,
+		PollInterval:                     config.Duration{Duration: time.Second},
+		MaxActiveClusterConnections:      5,
+		NonTerminalStatusUpdatesInterval: config.Duration{Duration: time.Minute},
 	},
 }
 var serverConfig = config.MustRegisterSection(SectionKey, defaultServerConfig)

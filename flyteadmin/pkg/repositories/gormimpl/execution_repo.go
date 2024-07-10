@@ -2,6 +2,7 @@ package gormimpl
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 
@@ -12,10 +13,27 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 const phase = "phase"
+
+var terminalPhases = []any{
+	core.WorkflowExecution_SUCCEEDED.String(),
+	core.WorkflowExecution_FAILED.String(),
+	core.WorkflowExecution_TIMED_OUT.String(),
+	core.WorkflowExecution_ABORTED.String(),
+}
+
+var nonTerminalExecutions = []any{
+	core.WorkflowExecution_UNDEFINED.String(),
+	core.WorkflowExecution_QUEUED.String(),
+	core.WorkflowExecution_RUNNING.String(),
+	core.WorkflowExecution_SUCCEEDING.String(),
+	core.WorkflowExecution_FAILING.String(),
+	core.WorkflowExecution_ABORTING.String(),
+}
 
 // Implementation of ExecutionInterface.
 type ExecutionRepo struct {
@@ -185,7 +203,66 @@ func (r *ExecutionRepo) CountByPhase(ctx context.Context, input interfaces.Count
 	return counts, nil
 }
 
-// Returns an instance of ExecutionRepoInterface
+func (r *ExecutionRepo) FindStatusUpdates(ctx context.Context, cluster string, id uint, limit, offset int) ([]interfaces.ExecutionStatus, error) {
+	defer r.metrics.FindStatusUpdates.Start().Stop()
+
+	var statuses []interfaces.ExecutionStatus
+	err := r.db.Model(&models.Execution{}).
+		WithContext(ctx).
+		Where("parent_cluster = ? AND id > ?", cluster, id).
+		Order("id ASC").
+		Limit(limit).
+		Offset(offset).
+		Find(&statuses).
+		Error
+	if err != nil {
+		logger.Errorf(ctx, "failed to find execution status updates: %v", err)
+		return nil, r.errorTransformer.ToFlyteAdminError(err)
+	}
+
+	return statuses, nil
+}
+
+// FindNextStatusUpdatesCheckpoint for a given parent cluster tries to find latest terminal execution
+// before earliest non-terminal execution after given id.
+// If there are no such, it tries to find just any latest terminal execution for given parent cluster after given id.
+// If table is empty, returns default value 0. DB auto-increment always starts from 1.
+func (r *ExecutionRepo) FindNextStatusUpdatesCheckpoint(ctx context.Context, cluster string, id uint) (uint, error) {
+	defer r.metrics.FindNextCheckpoint.Start().Stop()
+
+	var execIDs []uint
+	err := r.db.
+		WithContext(ctx).
+		Raw(`
+SELECT id 
+FROM executions
+WHERE parent_cluster = @parent_cluster AND phase IN @terminal_phases AND id > @id AND 
+    COALESCE(id < (
+		SELECT id FROM executions
+		WHERE parent_cluster = @parent_cluster AND phase IN @non_terminal_phases AND id > @id
+		ORDER BY id ASC
+		LIMIT 1
+	), TRUE)
+ORDER BY id DESC
+LIMIT 1`,
+			sql.Named("parent_cluster", cluster),
+			sql.Named("terminal_phases", terminalPhases),
+			sql.Named("non_terminal_phases", nonTerminalExecutions),
+			sql.Named("id", id)).
+		Scan(&execIDs).
+		Error
+	if err != nil {
+		logger.Errorf(ctx, "failed to find next status updates checkpoint: %v", err)
+		return 0, r.errorTransformer.ToFlyteAdminError(err)
+	}
+
+	if len(execIDs) == 0 {
+		return id, nil
+	}
+	return execIDs[0], nil
+}
+
+// NewExecutionRepo returns an instance of ExecutionRepoInterface
 func NewExecutionRepo(
 	db *gorm.DB, errorTransformer adminErrors.ErrorTransformer, scope promutils.Scope) interfaces.ExecutionRepoInterface {
 	metrics := newMetrics(scope)

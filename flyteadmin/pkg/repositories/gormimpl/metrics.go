@@ -17,6 +17,9 @@ type gormMetrics struct {
 	DeleteDuration          promutils.StopWatch
 	ExistsDuration          promutils.StopWatch
 	CountDuration           promutils.StopWatch
+	FindFirstCheckpoint     promutils.HistogramStopWatch
+	FindNextCheckpoint      promutils.HistogramStopWatch
+	FindStatusUpdates       promutils.HistogramStopWatch
 }
 
 func newMetrics(scope promutils.Scope) gormMetrics {
@@ -38,5 +41,11 @@ func newMetrics(scope promutils.Scope) gormMetrics {
 			"exists", "time taken to determine whether an individual entry exists", time.Millisecond),
 		CountDuration: scope.MustNewStopWatch(
 			"count", "time taken to count entries", time.Millisecond),
+		FindFirstCheckpoint: scope.MustNewHistogramStopWatch(
+			"find_first_checkpoint", "time taken to find first checkpoint for child execution status updates"),
+		FindNextCheckpoint: scope.MustNewHistogramStopWatch(
+			"find_next_checkpoint", "time taken to find next checkpoint for child execution status updates"),
+		FindStatusUpdates: scope.MustNewHistogramStopWatch(
+			"find_status_updates", "time taken to fetch child execution status updates"),
 	}
 }

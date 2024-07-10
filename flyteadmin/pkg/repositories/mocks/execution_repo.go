@@ -24,7 +24,7 @@ type MockExecutionRepo struct {
 	countByPhaseFunction CountByPhaseExecutionFunc
 }
 
-func (r *MockExecutionRepo) Create(ctx context.Context, input models.Execution, executionTagModel []*models.ExecutionTag) error {
+func (r *MockExecutionRepo) Create(ctx context.Context, input models.Execution, _ []*models.ExecutionTag) error {
 	if r.createFunction != nil {
 		return r.createFunction(ctx, input)
 	}
@@ -89,6 +89,18 @@ func (r *MockExecutionRepo) CountByPhase(ctx context.Context, input interfaces.C
 
 func (r *MockExecutionRepo) SetCountByPhaseCallback(countByPhaseFunction CountByPhaseExecutionFunc) {
 	r.countByPhaseFunction = countByPhaseFunction
+}
+
+func (r *MockExecutionRepo) FindFirstStatusUpdatesCheckpoint(ctx context.Context, cluster string) (uint, error) {
+	return 0, nil
+}
+
+func (r *MockExecutionRepo) FindNextStatusUpdatesCheckpoint(ctx context.Context, cluster string, checkpoint uint) (uint, error) {
+	return 0, nil
+}
+
+func (r *MockExecutionRepo) FindStatusUpdates(ctx context.Context, cluster string, checkpoint uint, limit, offset int) ([]interfaces.ExecutionStatus, error) {
+	return nil, nil
 }
 
 func NewMockExecutionRepo() interfaces.ExecutionRepoInterface {

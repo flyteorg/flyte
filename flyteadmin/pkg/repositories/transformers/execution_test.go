@@ -74,6 +74,7 @@ func TestCreateExecutionModel(t *testing.T) {
 	}
 	namespace := "ns"
 	t.Run("successful execution", func(t *testing.T) {
+		execRequest.Spec.Labels = &admin.Labels{Values: map[string]string{"parent-cluster": "foo"}}
 		execution, err := CreateExecutionModel(CreateExecutionModelInput{
 			WorkflowExecutionID: core.WorkflowExecutionIdentifier{
 				Project: "project",
@@ -133,6 +134,7 @@ func TestCreateExecutionModel(t *testing.T) {
 			ResolvedSpec: execRequest.Spec,
 		})
 		assert.Equal(t, expectedClosure, execution.Closure)
+		assert.Equal(t, "foo", execution.ParentCluster)
 	})
 	t.Run("failed with unknown error", func(t *testing.T) {
 		execErr := fmt.Errorf("bla-bla")
@@ -712,7 +714,7 @@ func TestGetExecutionIdentifier(t *testing.T) {
 		Domain:  "domain",
 		Name:    "name",
 		Org:     testOrg,
-	}, &actualIdentifier))
+	}, actualIdentifier))
 }
 
 func TestFromExecutionModel(t *testing.T) {

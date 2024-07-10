@@ -66,6 +66,8 @@ type Execution struct {
 	LaunchEntity string
 	// Tags associated with the execution
 	Tags []AdminTag `gorm:"many2many:execution_admin_tags;"`
+	// In case of a child execution, it contains name of a parent cluster/propeller which spawned this execution
+	ParentCluster string
 }
 
 type AdminTag struct {

@@ -20,6 +20,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/transformers/k8s"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
@@ -151,6 +152,10 @@ func CreateExecutionModel(input CreateExecutionModelInput) (*models.Execution, e
 	}
 	if input.RequestSpec.Metadata != nil {
 		executionModel.Mode = int32(input.RequestSpec.Metadata.Mode)
+	}
+	parentCluster := input.ResolvedSpec.GetLabels().GetValues()[k8s.ParentClusterLabel]
+	if parentCluster != "" {
+		executionModel.ParentCluster = parentCluster
 	}
 
 	return executionModel, nil
@@ -380,8 +385,8 @@ func SetExecutionAborting(execution *models.Execution, cause, principal string) 
 	return nil
 }
 
-func GetExecutionIdentifier(executionModel *models.Execution) core.WorkflowExecutionIdentifier {
-	return core.WorkflowExecutionIdentifier{
+func GetExecutionIdentifier(executionModel *models.Execution) *core.WorkflowExecutionIdentifier {
+	return &core.WorkflowExecutionIdentifier{
 		Project: executionModel.Project,
 		Domain:  executionModel.Domain,
 		Name:    executionModel.Name,
@@ -443,7 +448,7 @@ func FromExecutionModel(ctx context.Context, executionModel models.Execution, op
 	// spec.Inputs = nil
 	// closure.ComputedInputs = nil
 	return &admin.Execution{
-		Id:      &id,
+		Id:      id,
 		Spec:    &spec,
 		Closure: &closure,
 	}, nil

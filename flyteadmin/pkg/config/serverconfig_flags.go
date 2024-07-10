@@ -80,5 +80,9 @@ func (cfg ServerConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.Int32(fmt.Sprintf("%v%v", prefix, "kubeClientConfig.qps"), defaultServerConfig.KubeClientConfig.QPS, "Max QPS to the master for requests to KubeAPI. 0 defaults to 5.")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "kubeClientConfig.burst"), defaultServerConfig.KubeClientConfig.Burst, "Max burst rate for throttle. 0 defaults to 10")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "kubeClientConfig.timeout"), defaultServerConfig.KubeClientConfig.Timeout.String(), "Max duration allowed for every request to KubeAPI before giving up. 0 implies no timeout.")
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "watchService.maxPageSize"), defaultServerConfig.WatchService.MaxPageSize, "")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "watchService.pollInterval"), defaultServerConfig.WatchService.PollInterval.String(), "")
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "watchService.maxActiveClusterConnections"), defaultServerConfig.WatchService.MaxActiveClusterConnections, "")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "watchService.nonTerminalStatusUpdatesInterval"), defaultServerConfig.WatchService.NonTerminalStatusUpdatesInterval.String(), "")
 	return cmdFlags
 }

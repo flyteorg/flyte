@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package flyteidl.watch;
+
+option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/watch";
+
+import "google/protobuf/timestamp.proto";
+import "flyteidl/core/identifier.proto";
+import "flyteidl/core/execution.proto";
+
+message WatchExecutionStatusUpdatesRequest {
+  // In a multi-cluster setup, propeller should only request executions that were assigned to a given cluster
+  string cluster = 1;
+}
+
+message WatchExecutionStatusUpdatesResponse {
+  core.WorkflowExecutionIdentifier id = 1;
+  core.WorkflowExecution.Phase phase = 2;
+  // May only be returned when phase is SUCCEEDED
+  string output_uri = 3;
+  // May only be returned when phase is FAILED
+  core.ExecutionError error = 4;
+}

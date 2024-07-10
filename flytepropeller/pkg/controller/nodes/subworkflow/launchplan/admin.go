@@ -16,6 +16,7 @@ import (
 	evtErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/transformers/k8s"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytestdlib/cache"
 	stdErr "github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
@@ -33,6 +34,7 @@ func IsWorkflowTerminated(p core.WorkflowExecution_Phase) bool {
 
 // Executor for Launchplans that executes on a remote FlyteAdmin service (if configured)
 type adminLaunchPlanExecutor struct {
+	cfg             *config.Config
 	adminClient     service.AdminServiceClient
 	cache           cache.AutoRefresh
 	store           *storage.DataStore
@@ -128,6 +130,14 @@ func (a *adminLaunchPlanExecutor) Launch(ctx context.Context, launchCtx LaunchCo
 		}
 	}
 
+	if a.cfg.ClusterID != "" {
+		labels[k8s.ParentClusterLabel] = a.cfg.ClusterID
+	}
+	parentShardLabel := launchCtx.Labels[k8s.ShardKeyLabel]
+	if parentShardLabel != "" {
+		labels[k8s.ParentShardLabel] = parentShardLabel
+	}
+
 	req := &admin.ExecutionCreateRequest{
 		Project: executionID.Project,
 		Domain:  executionID.Domain,
@@ -160,7 +170,7 @@ func (a *adminLaunchPlanExecutor) Launch(ctx context.Context, launchCtx LaunchCo
 		}
 	}
 
-	hasOutputs := launchPlan.GetInterface() != nil && launchPlan.GetInterface().GetOutputs().GetVariables() != nil && len(launchPlan.GetInterface().GetOutputs().GetVariables()) > 0
+	hasOutputs := len(launchPlan.GetInterface().GetOutputs().GetVariables()) > 0
 	_, err = a.cache.GetOrCreate(executionID.String(), executionCacheItem{
 		WorkflowExecutionIdentifier: *executionID,
 		HasOutputs:                  hasOutputs,
@@ -365,16 +375,17 @@ func (a *adminLaunchPlanExecutor) syncItem(ctx context.Context, batch cache.Batc
 	return resp, nil
 }
 
-func NewAdminLaunchPlanExecutor(_ context.Context, client service.AdminServiceClient,
-	cfg *AdminConfig, scope promutils.Scope, store *storage.DataStore, enqueueWorkflow v1alpha1.EnqueueWorkflow) (FlyteAdmin, error) {
+func NewAdminLaunchPlanExecutor(_ context.Context, cfg *config.Config, client service.AdminServiceClient,
+	adminCfg *AdminConfig, scope promutils.Scope, store *storage.DataStore, enqueueWorkflow v1alpha1.EnqueueWorkflow) (FlyteAdmin, error) {
 	exec := &adminLaunchPlanExecutor{
+		cfg:             cfg,
 		adminClient:     client,
 		store:           store,
 		enqueueWorkflow: enqueueWorkflow,
 	}
 
-	rateLimiter := &workqueue.BucketRateLimiter{Limiter: rate.NewLimiter(rate.Limit(cfg.TPS), cfg.Burst)}
-	c, err := cache.NewAutoRefreshCache("admin-launcher", exec.syncItem, rateLimiter, cfg.CacheResyncDuration.Duration, cfg.Workers, cfg.MaxCacheSize, scope)
+	rateLimiter := &workqueue.BucketRateLimiter{Limiter: rate.NewLimiter(rate.Limit(adminCfg.TPS), adminCfg.Burst)}
+	c, err := cache.NewAutoRefreshCache("admin-launcher", exec.syncItem, rateLimiter, adminCfg.CacheResyncDuration.Duration, adminCfg.Workers, adminCfg.MaxCacheSize, scope)
 	if err != nil {
 		return nil, err
 	}
