@@ -403,15 +403,34 @@ func (m *ExecutionManager) getExecutionConfig(ctx context.Context, request *admi
 	return workflowExecConfig, nil
 }
 
-func (m *ExecutionManager) getClusterAssignment(ctx context.Context, request *admin.ExecutionCreateRequest) (
-	*admin.ClusterAssignment, error) {
-	if request.Spec.ClusterAssignment != nil {
-		return request.Spec.ClusterAssignment, nil
+func (m *ExecutionManager) getClusterAssignment(ctx context.Context, req *admin.ExecutionCreateRequest) (*admin.ClusterAssignment, error) {
+	storedAssignment, err := m.fetchClusterAssignment(ctx, req.Project, req.Domain)
+	if err != nil {
+		return nil, err
 	}
 
+	reqAssignment := req.GetSpec().GetClusterAssignment()
+	reqPool := reqAssignment.GetClusterPoolName()
+	storedPool := storedAssignment.GetClusterPoolName()
+	if reqPool == "" {
+		return storedAssignment, nil
+	}
+
+	if storedPool == "" {
+		return reqAssignment, nil
+	}
+
+	if reqPool != storedPool {
+		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "execution with project %q and domain %q cannot run on cluster pool %q, because its configured to run on pool %q", req.Project, req.Domain, reqPool, storedPool)
+	}
+
+	return storedAssignment, nil
+}
+
+func (m *ExecutionManager) fetchClusterAssignment(ctx context.Context, project, domain string) (*admin.ClusterAssignment, error) {
 	resource, err := m.resourceManager.GetResource(ctx, interfaces.ResourceRequest{
-		Project:      request.Project,
-		Domain:       request.Domain,
+		Project:      project,
+		Domain:       domain,
 		ResourceType: admin.MatchableResource_CLUSTER_ASSIGNMENT,
 	})
 	if err != nil && !errors.IsDoesNotExistError(err) {
@@ -421,11 +440,13 @@ func (m *ExecutionManager) getClusterAssignment(ctx context.Context, request *ad
 	if resource != nil && resource.Attributes.GetClusterAssignment() != nil {
 		return resource.Attributes.GetClusterAssignment(), nil
 	}
-	clusterPoolAssignment := m.config.ClusterPoolAssignmentConfiguration().GetClusterPoolAssignments()[request.GetDomain()]
 
-	return &admin.ClusterAssignment{
-		ClusterPoolName: clusterPoolAssignment.Pool,
-	}, nil
+	var clusterAssignment *admin.ClusterAssignment
+	domainAssignment := m.config.ClusterPoolAssignmentConfiguration().GetClusterPoolAssignments()[domain]
+	if domainAssignment.Pool != "" {
+		clusterAssignment = &admin.ClusterAssignment{ClusterPoolName: domainAssignment.Pool}
+	}
+	return clusterAssignment, nil
 }
 
 func (m *ExecutionManager) launchSingleTaskExecution(
