@@ -162,12 +162,6 @@ pyflyte run --remote \
 
 ## ArrayNode
 
-:::{important}
-This feature is experimental and the API is subject to breaking changes.
-If you encounter any issues, please submit a
-[bug report](https://github.com/flyteorg/flyte/issues/new?assignees=&labels=bug%2Cuntriaged&projects=&template=bug_report.yaml&title=%5BBUG%5D+).
-:::
-
 ArrayNode map tasks serve as a seamless substitution for regular map tasks, differing solely in the submodule
 utilized to import the `map_task` function. Specifically, you will need to import `map_task` from the experimental module as illustrated below:
 
