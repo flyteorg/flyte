@@ -777,6 +777,7 @@ func Test_task_Abort(t *testing.T) {
 			Kind: "sample",
 			Name: "name",
 		})
+		nm.OnIsInterruptible().Return(false)
 
 		taskID := &core.Identifier{}
 		tr := &nodeMocks.TaskReader{}
@@ -891,6 +892,7 @@ func Test_task_Abort(t *testing.T) {
 				defaultPlugin:   m,
 				resourceManager: noopRm,
 				agentService:    &pluginCore.AgentService{},
+				eventConfig:     eventConfig,
 			}
 			nCtx := createNodeCtx(tt.args.ev)
 			if err := tk.Abort(context.TODO(), nCtx, "reason"); (err != nil) != tt.wantErr {
@@ -939,6 +941,7 @@ func Test_task_Abort_v1(t *testing.T) {
 			Kind: "sample",
 			Name: "name",
 		})
+		nm.OnIsInterruptible().Return(false)
 
 		taskID := &core.Identifier{}
 		tr := &nodeMocks.TaskReader{}
@@ -1053,6 +1056,7 @@ func Test_task_Abort_v1(t *testing.T) {
 				defaultPlugin:   m,
 				resourceManager: noopRm,
 				agentService:    &pluginCore.AgentService{},
+				eventConfig:     eventConfig,
 			}
 			nCtx := createNodeCtx(tt.args.ev)
 			if err := tk.Abort(context.TODO(), nCtx, "reason"); (err != nil) != tt.wantErr {
