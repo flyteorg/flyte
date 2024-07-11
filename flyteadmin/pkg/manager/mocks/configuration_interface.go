@@ -134,108 +134,26 @@ func (_m *ConfigurationInterface) GetReadOnlyActiveDocument(ctx context.Context)
 	return r0, r1
 }
 
-type ConfigurationInterface_UpdateProjectConfiguration struct {
+type ConfigurationInterface_UpdateConfiguration struct {
 	*mock.Call
 }
 
-func (_m ConfigurationInterface_UpdateProjectConfiguration) Return(_a0 *admin.ConfigurationUpdateResponse, _a1 error) *ConfigurationInterface_UpdateProjectConfiguration {
-	return &ConfigurationInterface_UpdateProjectConfiguration{Call: _m.Call.Return(_a0, _a1)}
+func (_m ConfigurationInterface_UpdateConfiguration) Return(_a0 *admin.ConfigurationUpdateResponse, _a1 error) *ConfigurationInterface_UpdateConfiguration {
+	return &ConfigurationInterface_UpdateConfiguration{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *ConfigurationInterface) OnUpdateProjectConfiguration(ctx context.Context, request admin.ConfigurationUpdateRequest) *ConfigurationInterface_UpdateProjectConfiguration {
-	c_call := _m.On("UpdateProjectConfiguration", ctx, request)
-	return &ConfigurationInterface_UpdateProjectConfiguration{Call: c_call}
+func (_m *ConfigurationInterface) OnUpdateConfiguration(ctx context.Context, request admin.ConfigurationUpdateRequest) *ConfigurationInterface_UpdateConfiguration {
+	c_call := _m.On("UpdateConfiguration", ctx, request)
+	return &ConfigurationInterface_UpdateConfiguration{Call: c_call}
 }
 
-func (_m *ConfigurationInterface) OnUpdateProjectConfigurationMatch(matchers ...interface{}) *ConfigurationInterface_UpdateProjectConfiguration {
-	c_call := _m.On("UpdateProjectConfiguration", matchers...)
-	return &ConfigurationInterface_UpdateProjectConfiguration{Call: c_call}
+func (_m *ConfigurationInterface) OnUpdateConfigurationMatch(matchers ...interface{}) *ConfigurationInterface_UpdateConfiguration {
+	c_call := _m.On("UpdateConfiguration", matchers...)
+	return &ConfigurationInterface_UpdateConfiguration{Call: c_call}
 }
 
-// UpdateProjectConfiguration provides a mock function with given fields: ctx, request
-func (_m *ConfigurationInterface) UpdateProjectConfiguration(ctx context.Context, request admin.ConfigurationUpdateRequest) (*admin.ConfigurationUpdateResponse, error) {
-	ret := _m.Called(ctx, request)
-
-	var r0 *admin.ConfigurationUpdateResponse
-	if rf, ok := ret.Get(0).(func(context.Context, admin.ConfigurationUpdateRequest) *admin.ConfigurationUpdateResponse); ok {
-		r0 = rf(ctx, request)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*admin.ConfigurationUpdateResponse)
-		}
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, admin.ConfigurationUpdateRequest) error); ok {
-		r1 = rf(ctx, request)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-type ConfigurationInterface_UpdateProjectDomainConfiguration struct {
-	*mock.Call
-}
-
-func (_m ConfigurationInterface_UpdateProjectDomainConfiguration) Return(_a0 *admin.ConfigurationUpdateResponse, _a1 error) *ConfigurationInterface_UpdateProjectDomainConfiguration {
-	return &ConfigurationInterface_UpdateProjectDomainConfiguration{Call: _m.Call.Return(_a0, _a1)}
-}
-
-func (_m *ConfigurationInterface) OnUpdateProjectDomainConfiguration(ctx context.Context, request admin.ConfigurationUpdateRequest) *ConfigurationInterface_UpdateProjectDomainConfiguration {
-	c_call := _m.On("UpdateProjectDomainConfiguration", ctx, request)
-	return &ConfigurationInterface_UpdateProjectDomainConfiguration{Call: c_call}
-}
-
-func (_m *ConfigurationInterface) OnUpdateProjectDomainConfigurationMatch(matchers ...interface{}) *ConfigurationInterface_UpdateProjectDomainConfiguration {
-	c_call := _m.On("UpdateProjectDomainConfiguration", matchers...)
-	return &ConfigurationInterface_UpdateProjectDomainConfiguration{Call: c_call}
-}
-
-// UpdateProjectDomainConfiguration provides a mock function with given fields: ctx, request
-func (_m *ConfigurationInterface) UpdateProjectDomainConfiguration(ctx context.Context, request admin.ConfigurationUpdateRequest) (*admin.ConfigurationUpdateResponse, error) {
-	ret := _m.Called(ctx, request)
-
-	var r0 *admin.ConfigurationUpdateResponse
-	if rf, ok := ret.Get(0).(func(context.Context, admin.ConfigurationUpdateRequest) *admin.ConfigurationUpdateResponse); ok {
-		r0 = rf(ctx, request)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*admin.ConfigurationUpdateResponse)
-		}
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, admin.ConfigurationUpdateRequest) error); ok {
-		r1 = rf(ctx, request)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-type ConfigurationInterface_UpdateWorkflowConfiguration struct {
-	*mock.Call
-}
-
-func (_m ConfigurationInterface_UpdateWorkflowConfiguration) Return(_a0 *admin.ConfigurationUpdateResponse, _a1 error) *ConfigurationInterface_UpdateWorkflowConfiguration {
-	return &ConfigurationInterface_UpdateWorkflowConfiguration{Call: _m.Call.Return(_a0, _a1)}
-}
-
-func (_m *ConfigurationInterface) OnUpdateWorkflowConfiguration(ctx context.Context, request admin.ConfigurationUpdateRequest) *ConfigurationInterface_UpdateWorkflowConfiguration {
-	c_call := _m.On("UpdateWorkflowConfiguration", ctx, request)
-	return &ConfigurationInterface_UpdateWorkflowConfiguration{Call: c_call}
-}
-
-func (_m *ConfigurationInterface) OnUpdateWorkflowConfigurationMatch(matchers ...interface{}) *ConfigurationInterface_UpdateWorkflowConfiguration {
-	c_call := _m.On("UpdateWorkflowConfiguration", matchers...)
-	return &ConfigurationInterface_UpdateWorkflowConfiguration{Call: c_call}
-}
-
-// UpdateWorkflowConfiguration provides a mock function with given fields: ctx, request
-func (_m *ConfigurationInterface) UpdateWorkflowConfiguration(ctx context.Context, request admin.ConfigurationUpdateRequest) (*admin.ConfigurationUpdateResponse, error) {
+// UpdateConfiguration provides a mock function with given fields: ctx, request
+func (_m *ConfigurationInterface) UpdateConfiguration(ctx context.Context, request admin.ConfigurationUpdateRequest) (*admin.ConfigurationUpdateResponse, error) {
 	ret := _m.Called(ctx, request)
 
 	var r0 *admin.ConfigurationUpdateResponse

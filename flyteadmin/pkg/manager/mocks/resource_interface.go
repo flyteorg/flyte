@@ -17,6 +17,47 @@ type ResourceInterface struct {
 	mock.Mock
 }
 
+type ResourceInterface_DeleteOrgAttributes struct {
+	*mock.Call
+}
+
+func (_m ResourceInterface_DeleteOrgAttributes) Return(_a0 *admin.OrgAttributesDeleteResponse, _a1 error) *ResourceInterface_DeleteOrgAttributes {
+	return &ResourceInterface_DeleteOrgAttributes{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *ResourceInterface) OnDeleteOrgAttributes(ctx context.Context, request admin.OrgAttributesDeleteRequest) *ResourceInterface_DeleteOrgAttributes {
+	c_call := _m.On("DeleteOrgAttributes", ctx, request)
+	return &ResourceInterface_DeleteOrgAttributes{Call: c_call}
+}
+
+func (_m *ResourceInterface) OnDeleteOrgAttributesMatch(matchers ...interface{}) *ResourceInterface_DeleteOrgAttributes {
+	c_call := _m.On("DeleteOrgAttributes", matchers...)
+	return &ResourceInterface_DeleteOrgAttributes{Call: c_call}
+}
+
+// DeleteOrgAttributes provides a mock function with given fields: ctx, request
+func (_m *ResourceInterface) DeleteOrgAttributes(ctx context.Context, request admin.OrgAttributesDeleteRequest) (*admin.OrgAttributesDeleteResponse, error) {
+	ret := _m.Called(ctx, request)
+
+	var r0 *admin.OrgAttributesDeleteResponse
+	if rf, ok := ret.Get(0).(func(context.Context, admin.OrgAttributesDeleteRequest) *admin.OrgAttributesDeleteResponse); ok {
+		r0 = rf(ctx, request)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.OrgAttributesDeleteResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, admin.OrgAttributesDeleteRequest) error); ok {
+		r1 = rf(ctx, request)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type ResourceInterface_DeleteProjectAttributes struct {
 	*mock.Call
 }
@@ -132,6 +173,47 @@ func (_m *ResourceInterface) DeleteWorkflowAttributes(ctx context.Context, reque
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, admin.WorkflowAttributesDeleteRequest) error); ok {
+		r1 = rf(ctx, request)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type ResourceInterface_GetOrgAttributes struct {
+	*mock.Call
+}
+
+func (_m ResourceInterface_GetOrgAttributes) Return(_a0 *admin.OrgAttributesGetResponse, _a1 error) *ResourceInterface_GetOrgAttributes {
+	return &ResourceInterface_GetOrgAttributes{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *ResourceInterface) OnGetOrgAttributes(ctx context.Context, request admin.OrgAttributesGetRequest) *ResourceInterface_GetOrgAttributes {
+	c_call := _m.On("GetOrgAttributes", ctx, request)
+	return &ResourceInterface_GetOrgAttributes{Call: c_call}
+}
+
+func (_m *ResourceInterface) OnGetOrgAttributesMatch(matchers ...interface{}) *ResourceInterface_GetOrgAttributes {
+	c_call := _m.On("GetOrgAttributes", matchers...)
+	return &ResourceInterface_GetOrgAttributes{Call: c_call}
+}
+
+// GetOrgAttributes provides a mock function with given fields: ctx, request
+func (_m *ResourceInterface) GetOrgAttributes(ctx context.Context, request admin.OrgAttributesGetRequest) (*admin.OrgAttributesGetResponse, error) {
+	ret := _m.Called(ctx, request)
+
+	var r0 *admin.OrgAttributesGetResponse
+	if rf, ok := ret.Get(0).(func(context.Context, admin.OrgAttributesGetRequest) *admin.OrgAttributesGetResponse); ok {
+		r0 = rf(ctx, request)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.OrgAttributesGetResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, admin.OrgAttributesGetRequest) error); ok {
 		r1 = rf(ctx, request)
 	} else {
 		r1 = ret.Error(1)
@@ -337,6 +419,47 @@ func (_m *ResourceInterface) ListAll(ctx context.Context, request admin.ListMatc
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, admin.ListMatchableAttributesRequest) error); ok {
+		r1 = rf(ctx, request)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type ResourceInterface_UpdateOrgAttributes struct {
+	*mock.Call
+}
+
+func (_m ResourceInterface_UpdateOrgAttributes) Return(_a0 *admin.OrgAttributesUpdateResponse, _a1 error) *ResourceInterface_UpdateOrgAttributes {
+	return &ResourceInterface_UpdateOrgAttributes{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *ResourceInterface) OnUpdateOrgAttributes(ctx context.Context, request admin.OrgAttributesUpdateRequest) *ResourceInterface_UpdateOrgAttributes {
+	c_call := _m.On("UpdateOrgAttributes", ctx, request)
+	return &ResourceInterface_UpdateOrgAttributes{Call: c_call}
+}
+
+func (_m *ResourceInterface) OnUpdateOrgAttributesMatch(matchers ...interface{}) *ResourceInterface_UpdateOrgAttributes {
+	c_call := _m.On("UpdateOrgAttributes", matchers...)
+	return &ResourceInterface_UpdateOrgAttributes{Call: c_call}
+}
+
+// UpdateOrgAttributes provides a mock function with given fields: ctx, request
+func (_m *ResourceInterface) UpdateOrgAttributes(ctx context.Context, request admin.OrgAttributesUpdateRequest) (*admin.OrgAttributesUpdateResponse, error) {
+	ret := _m.Called(ctx, request)
+
+	var r0 *admin.OrgAttributesUpdateResponse
+	if rf, ok := ret.Get(0).(func(context.Context, admin.OrgAttributesUpdateRequest) *admin.OrgAttributesUpdateResponse); ok {
+		r0 = rf(ctx, request)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.OrgAttributesUpdateResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, admin.OrgAttributesUpdateRequest) error); ok {
 		r1 = rf(ctx, request)
 	} else {
 		r1 = ret.Error(1)

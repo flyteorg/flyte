@@ -16,6 +16,7 @@ import { TaskExecution, TaskExecutionGetDataRequest, TaskExecutionGetDataRespons
 import { ProjectDomainAttributesDeleteRequest, ProjectDomainAttributesDeleteResponse, ProjectDomainAttributesGetRequest, ProjectDomainAttributesGetResponse, ProjectDomainAttributesUpdateRequest, ProjectDomainAttributesUpdateResponse } from "../admin/project_domain_attributes_pb.js";
 import { ProjectAttributesDeleteRequest, ProjectAttributesDeleteResponse, ProjectAttributesGetRequest, ProjectAttributesGetResponse, ProjectAttributesUpdateRequest, ProjectAttributesUpdateResponse } from "../admin/project_attributes_pb.js";
 import { WorkflowAttributesDeleteRequest, WorkflowAttributesDeleteResponse, WorkflowAttributesGetRequest, WorkflowAttributesGetResponse, WorkflowAttributesUpdateRequest, WorkflowAttributesUpdateResponse } from "../admin/workflow_attributes_pb.js";
+import { OrgAttributesDeleteRequest, OrgAttributesDeleteResponse, OrgAttributesGetRequest, OrgAttributesGetResponse, OrgAttributesUpdateRequest, OrgAttributesUpdateResponse } from "../admin/org_attributes_pb.js";
 import { ListMatchableAttributesRequest, ListMatchableAttributesResponse } from "../admin/matchable_resource_pb.js";
 import { GetVersionRequest, GetVersionResponse } from "../admin/version_pb.js";
 import { DescriptionEntity, DescriptionEntityList, DescriptionEntityListRequest } from "../admin/description_entity_pb.js";
@@ -543,6 +544,39 @@ export const AdminService = {
       kind: MethodKind.Unary,
     },
     /**
+     * Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` at the org level
+     *
+     * @generated from rpc flyteidl.service.AdminService.UpdateOrgAttributes
+     */
+    updateOrgAttributes: {
+      name: "UpdateOrgAttributes",
+      I: OrgAttributesUpdateRequest,
+      O: OrgAttributesUpdateResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` at the org level
+     *
+     * @generated from rpc flyteidl.service.AdminService.GetOrgAttributes
+     */
+    getOrgAttributes: {
+      name: "GetOrgAttributes",
+      I: OrgAttributesGetRequest,
+      O: OrgAttributesGetResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` at the org level
+     *
+     * @generated from rpc flyteidl.service.AdminService.DeleteOrgAttributes
+     */
+    deleteOrgAttributes: {
+      name: "DeleteOrgAttributes",
+      I: OrgAttributesDeleteRequest,
+      O: OrgAttributesDeleteResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
      * Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.
      *
      * @generated from rpc flyteidl.service.AdminService.DeleteWorkflowAttributes
@@ -660,7 +694,7 @@ export const AdminService = {
       kind: MethodKind.Unary,
     },
     /**
-     * Fetch a unified project attribute.
+     * Fetch the entire unified attribute configuration.
      *
      * @generated from rpc flyteidl.service.AdminService.GetConfiguration
      */
@@ -671,13 +705,13 @@ export const AdminService = {
       kind: MethodKind.Unary,
     },
     /**
-     * Update a unified project attribute.
+     * Update the entire unified attribute configuration.
      * Requests will fail for stale values of version_to_update
      *
-     * @generated from rpc flyteidl.service.AdminService.UpdateProjectDomainConfiguration
+     * @generated from rpc flyteidl.service.AdminService.UpdateConfiguration
      */
-    updateProjectDomainConfiguration: {
-      name: "UpdateProjectDomainConfiguration",
+    updateConfiguration: {
+      name: "UpdateConfiguration",
       I: ConfigurationUpdateRequest,
       O: ConfigurationUpdateResponse,
       kind: MethodKind.Unary,

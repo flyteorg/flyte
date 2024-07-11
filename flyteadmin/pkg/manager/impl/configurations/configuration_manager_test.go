@@ -35,6 +35,8 @@ func TestGetReadOnlyActiveDocument(t *testing.T) {
 		ComposedProtobufStore: mockPBStore,
 		ReferenceConstructor:  &storageMocks.ReferenceConstructor{},
 	}
+	applicationConfig := &runtimeMocks.ApplicationConfiguration{}
+	mockConfig.On("ApplicationConfiguration").Return(applicationConfig)
 	configurationManager, err := NewConfigurationManager(ctx, db, mockConfig, mockStorage, plugins.NewRegistry(), ShouldNotBootstrapOrUpdateDefault)
 	assert.Nil(t, err)
 	db.ConfigurationRepo().(*mocks.ConfigurationRepoInterface).On("GetActive", mock.Anything).Return(models.ConfigurationDocumentMetadata{
@@ -94,6 +96,9 @@ func TestGetEditableActiveDocument(t *testing.T) {
 		ComposedProtobufStore: mockPBStore,
 		ReferenceConstructor:  &storageMocks.ReferenceConstructor{},
 	}
+	// mock config
+	applicationConfig := &runtimeMocks.ApplicationConfiguration{}
+	mockConfig.On("ApplicationConfiguration").Return(applicationConfig)
 	configurationManager, err := NewConfigurationManager(ctx, db, mockConfig, mockStorage, plugins.NewRegistry(), ShouldNotBootstrapOrUpdateDefault)
 	assert.Nil(t, err)
 	db.ConfigurationRepo().(*mocks.ConfigurationRepoInterface).On("GetActive", mock.Anything).Return(models.ConfigurationDocumentMetadata{
@@ -152,6 +157,9 @@ func TestGetActiveDocument_DBError(t *testing.T) {
 		ComposedProtobufStore: &storageMocks.ComposedProtobufStore{},
 		ReferenceConstructor:  &storageMocks.ReferenceConstructor{},
 	}
+	// mock config
+	applicationConfig := &runtimeMocks.ApplicationConfiguration{}
+	mockConfig.On("ApplicationConfiguration").Return(applicationConfig)
 	configurationManager, err := NewConfigurationManager(ctx, db, mockConfig, mockStorage, plugins.NewRegistry(), ShouldNotBootstrapOrUpdateDefault)
 	assert.Nil(t, err)
 	db.ConfigurationRepo().(*mocks.ConfigurationRepoInterface).On("GetActive", mock.Anything).Return(models.ConfigurationDocumentMetadata{}, assert.AnError)
@@ -171,6 +179,9 @@ func TestGetActiveDocument_StoreError(t *testing.T) {
 		ComposedProtobufStore: mockPBStore,
 		ReferenceConstructor:  &storageMocks.ReferenceConstructor{},
 	}
+	// mock config
+	applicationConfig := &runtimeMocks.ApplicationConfiguration{}
+	mockConfig.On("ApplicationConfiguration").Return(applicationConfig)
 	configurationManager, err := NewConfigurationManager(ctx, db, mockConfig, mockStorage, plugins.NewRegistry(), ShouldNotBootstrapOrUpdateDefault)
 	assert.Nil(t, err)
 	db.ConfigurationRepo().(*mocks.ConfigurationRepoInterface).On("GetActive", mock.Anything).Return(models.ConfigurationDocumentMetadata{
@@ -199,14 +210,6 @@ func TestGetConfiguration(t *testing.T) {
 	mockProjectConfigurationPlugin := utilMocks.MockProjectConfigurationPlugin{}
 	pluginRegistry := plugins.NewRegistry()
 	pluginRegistry.RegisterDefault(plugins.PluginIDProjectConfiguration, &mockProjectConfigurationPlugin)
-	configurationManager, err := NewConfigurationManager(ctx, db, mockConfig, mockStorage, pluginRegistry, ShouldNotBootstrapOrUpdateDefault)
-	assert.Nil(t, err)
-	// Mock repo
-	db.ConfigurationRepo().(*mocks.ConfigurationRepoInterface).On("GetActive", mock.Anything).Return(models.ConfigurationDocumentMetadata{
-		Version:          "v1",
-		DocumentLocation: s3Path,
-		Active:           true,
-	}, nil)
 	// Mock config
 	applicationConfig := &runtimeMocks.ApplicationConfiguration{}
 	applicationConfig.On("GetDomainsConfig").Return(&runtimeInterfaces.DomainsConfig{
@@ -216,6 +219,14 @@ func TestGetConfiguration(t *testing.T) {
 		},
 	})
 	mockConfig.On("ApplicationConfiguration").Return(applicationConfig)
+	configurationManager, err := NewConfigurationManager(ctx, db, mockConfig, mockStorage, pluginRegistry, ShouldNotBootstrapOrUpdateDefault)
+	assert.Nil(t, err)
+	// Mock repo
+	db.ConfigurationRepo().(*mocks.ConfigurationRepoInterface).On("GetActive", mock.Anything).Return(models.ConfigurationDocumentMetadata{
+		Version:          "v1",
+		DocumentLocation: s3Path,
+		Active:           true,
+	}, nil)
 	// Mock store
 	mockPBStore.On("ReadProtobuf", mock.Anything, mock.MatchedBy(func(reference storage.DataReference) bool {
 		return reference.String() == s3Path
@@ -252,7 +263,16 @@ func TestGetConfiguration(t *testing.T) {
 				MaxParallelism: 1,
 			},
 		}
-		globalKey, err := util.EncodeConfigurationDocumentKey(ctx, &admin.ConfigurationID{})
+		orgKey, err := util.EncodeConfigurationDocumentKey(ctx, &admin.ConfigurationID{
+			Org: "org",
+		})
+		assert.Nil(t, err)
+		configurations[orgKey] = &admin.Configuration{
+			ClusterAssignment: &admin.ClusterAssignment{
+				ClusterPoolName: "cluster",
+			},
+		}
+		globalKey, err := util.EncodeConfigurationDocumentKey(ctx, &util.GlobalConfigurationKey)
 		assert.Nil(t, err)
 		configurations[globalKey] = &admin.Configuration{
 			TaskResourceAttributes: &admin.TaskResourceAttributes{
@@ -341,8 +361,10 @@ func TestGetConfiguration(t *testing.T) {
 				IsMutable: false,
 			},
 			ClusterAssignment: &admin.ClusterAssignmentWithSource{
-				Source:    admin.AttributesSource_GLOBAL,
-				Value:     nil,
+				Source: admin.AttributesSource_ORG,
+				Value: &admin.ClusterAssignment{
+					ClusterPoolName: "cluster",
+				},
 				IsMutable: false,
 			},
 			ExternalResourceAttributes: &admin.ExternalResourceAttributesWithSource{
@@ -366,14 +388,6 @@ func TestGetDefaultConfiguration(t *testing.T) {
 	mockProjectConfigurationPlugin := utilMocks.MockProjectConfigurationPlugin{}
 	pluginRegistry := plugins.NewRegistry()
 	pluginRegistry.RegisterDefault(plugins.PluginIDProjectConfiguration, &mockProjectConfigurationPlugin)
-	configurationManager, err := NewConfigurationManager(ctx, db, mockConfig, mockStorage, pluginRegistry, ShouldNotBootstrapOrUpdateDefault)
-	assert.Nil(t, err)
-	// Mock repo
-	db.ConfigurationRepo().(*mocks.ConfigurationRepoInterface).On("GetActive", mock.Anything).Return(models.ConfigurationDocumentMetadata{
-		Version:          "v1",
-		DocumentLocation: s3Path,
-		Active:           true,
-	}, nil)
 	// Mock config
 	applicationConfig := &runtimeMocks.ApplicationConfiguration{}
 	applicationConfig.On("GetDomainsConfig").Return(&runtimeInterfaces.DomainsConfig{
@@ -383,6 +397,14 @@ func TestGetDefaultConfiguration(t *testing.T) {
 		},
 	})
 	mockConfig.On("ApplicationConfiguration").Return(applicationConfig)
+	configurationManager, err := NewConfigurationManager(ctx, db, mockConfig, mockStorage, pluginRegistry, ShouldNotBootstrapOrUpdateDefault)
+	assert.Nil(t, err)
+	// Mock repo
+	db.ConfigurationRepo().(*mocks.ConfigurationRepoInterface).On("GetActive", mock.Anything).Return(models.ConfigurationDocumentMetadata{
+		Version:          "v1",
+		DocumentLocation: s3Path,
+		Active:           true,
+	}, nil)
 	// Mock store
 	mockPBStore.On("ReadProtobuf", mock.Anything, mock.MatchedBy(func(reference storage.DataReference) bool {
 		return reference.String() == s3Path
@@ -428,7 +450,7 @@ func TestGetDefaultConfiguration(t *testing.T) {
 				MaxParallelism: 2,
 			},
 		}
-		globalKey, err := util.EncodeConfigurationDocumentKey(ctx, &admin.ConfigurationID{})
+		globalKey, err := util.EncodeConfigurationDocumentKey(ctx, &util.GlobalConfigurationKey)
 		assert.Nil(t, err)
 		configurations[globalKey] = &admin.Configuration{
 			TaskResourceAttributes: &admin.TaskResourceAttributes{
@@ -541,24 +563,6 @@ func TestUpdateProjectDomainConfiguration(t *testing.T) {
 	mockProjectConfigurationPlugin := utilMocks.MockProjectConfigurationPlugin{}
 	pluginRegistry := plugins.NewRegistry()
 	pluginRegistry.RegisterDefault(plugins.PluginIDProjectConfiguration, &mockProjectConfigurationPlugin)
-	configurationManager, err := NewConfigurationManager(ctx, db, mockConfig, mockStorage, pluginRegistry, ShouldNotBootstrapOrUpdateDefault)
-	assert.Nil(t, err)
-	// Mock repo
-	db.ConfigurationRepo().(*mocks.ConfigurationRepoInterface).On("GetActive", mock.Anything).Return(models.ConfigurationDocumentMetadata{
-		Version:          "v1",
-		DocumentLocation: "s3://bucket/v1",
-		Active:           true,
-	}, nil)
-	db.ConfigurationRepo().(*mocks.ConfigurationRepoInterface).On("Update", mock.Anything, mock.MatchedBy(func(input *interfaces.UpdateConfigurationInput) bool {
-		if input.VersionToUpdate != "v1" {
-			return false
-		}
-		return *input.NewConfigurationMetadata == models.ConfigurationDocumentMetadata{
-			Version:          "x/Jg9dpEFSgcOydAjamhQRezcQrJHq8FictmbduZX6A=",
-			DocumentLocation: "s3://bucket/v2",
-			Active:           true,
-		}
-	})).Return(nil)
 	// Mock config
 	applicationConfig := &runtimeMocks.ApplicationConfiguration{}
 	applicationConfig.On("GetDomainsConfig").Return(&runtimeInterfaces.DomainsConfig{
@@ -568,9 +572,27 @@ func TestUpdateProjectDomainConfiguration(t *testing.T) {
 		},
 	})
 	mockConfig.On("ApplicationConfiguration").Return(applicationConfig)
+	configurationManager, err := NewConfigurationManager(ctx, db, mockConfig, mockStorage, pluginRegistry, ShouldNotBootstrapOrUpdateDefault)
+	assert.Nil(t, err)
+	// Mock repo
+	db.ConfigurationRepo().(*mocks.ConfigurationRepoInterface).On("GetActive", mock.Anything).Return(models.ConfigurationDocumentMetadata{
+		Version:          "v1",
+		DocumentLocation: s3Path,
+		Active:           true,
+	}, nil)
+	db.ConfigurationRepo().(*mocks.ConfigurationRepoInterface).On("Update", mock.Anything, mock.MatchedBy(func(input *interfaces.UpdateConfigurationInput) bool {
+		if input.VersionToUpdate != "v1" {
+			return false
+		}
+		return *input.NewConfigurationMetadata == models.ConfigurationDocumentMetadata{
+			Version:          "/2q3/pKW4h7lf1uExxhntIXaoI3dj0wL+JwEIrTIHUg=",
+			DocumentLocation: "s3://bucket/v2",
+			Active:           true,
+		}
+	})).Return(nil)
 	// Mock store
 	mockPBStore.On("ReadProtobuf", mock.Anything, mock.MatchedBy(func(reference storage.DataReference) bool {
-		return reference.String() == "s3://bucket/v1"
+		return reference.String() == s3Path
 	}), mock.AnythingOfType("*admin.ConfigurationDocument")).Return(nil).Run(func(args mock.Arguments) {
 		args.Get(2).(proto.Message).(*admin.ConfigurationDocument).Version = "v1"
 		configurations := make(map[string]*admin.Configuration)
@@ -604,7 +626,7 @@ func TestUpdateProjectDomainConfiguration(t *testing.T) {
 				MaxParallelism: 1,
 			},
 		}
-		globalKey, err := util.EncodeConfigurationDocumentKey(ctx, &admin.ConfigurationID{})
+		globalKey, err := util.EncodeConfigurationDocumentKey(ctx, &util.GlobalConfigurationKey)
 		assert.Nil(t, err)
 		configurations[globalKey] = &admin.Configuration{
 			TaskResourceAttributes: &admin.TaskResourceAttributes{
@@ -639,7 +661,7 @@ func TestUpdateProjectDomainConfiguration(t *testing.T) {
 		), nil
 	})
 
-	response, err := configurationManager.UpdateProjectDomainConfiguration(ctx, admin.ConfigurationUpdateRequest{
+	response, err := configurationManager.UpdateConfiguration(ctx, admin.ConfigurationUpdateRequest{
 		Id: &admin.ConfigurationID{
 			Org:     "org",
 			Project: "project",
@@ -663,7 +685,7 @@ func TestUpdateProjectDomainConfiguration(t *testing.T) {
 
 	assert.True(t, proto.Equal(response, &admin.ConfigurationUpdateResponse{
 		Id:      &admin.ConfigurationID{Org: "org", Project: "project", Domain: "domain"},
-		Version: "x/Jg9dpEFSgcOydAjamhQRezcQrJHq8FictmbduZX6A=",
+		Version: "/2q3/pKW4h7lf1uExxhntIXaoI3dj0wL+JwEIrTIHUg=",
 		Configuration: &admin.ConfigurationWithSource{
 			TaskResourceAttributes: &admin.TaskResourceAttributesWithSource{
 				Source: admin.AttributesSource_PROJECT_DOMAIN,
@@ -738,14 +760,6 @@ func TestUpdateProjectDomainConfiguration_UpdatingMutableAttributesError(t *test
 	mockProjectConfigurationPlugin := utilMocks.MockProjectConfigurationPlugin{}
 	pluginRegistry := plugins.NewRegistry()
 	pluginRegistry.RegisterDefault(plugins.PluginIDProjectConfiguration, &mockProjectConfigurationPlugin)
-	configurationManager, err := NewConfigurationManager(ctx, db, mockConfig, mockStorage, pluginRegistry, ShouldNotBootstrapOrUpdateDefault)
-	assert.Nil(t, err)
-	// Mock repo
-	db.ConfigurationRepo().(*mocks.ConfigurationRepoInterface).On("GetActive", mock.Anything).Return(models.ConfigurationDocumentMetadata{
-		Version:          "v1",
-		DocumentLocation: "s3://bucket/v1",
-		Active:           true,
-	}, nil)
 	// Mock config
 	applicationConfig := &runtimeMocks.ApplicationConfiguration{}
 	applicationConfig.On("GetDomainsConfig").Return(&runtimeInterfaces.DomainsConfig{
@@ -754,16 +768,23 @@ func TestUpdateProjectDomainConfiguration_UpdatingMutableAttributesError(t *test
 			Name: "domain",
 		},
 	})
+	mockConfig.On("ApplicationConfiguration").Return(applicationConfig)
+	configurationManager, err := NewConfigurationManager(ctx, db, mockConfig, mockStorage, pluginRegistry, ShouldNotBootstrapOrUpdateDefault)
+	assert.Nil(t, err)
+	// Mock repo
+	db.ConfigurationRepo().(*mocks.ConfigurationRepoInterface).On("GetActive", mock.Anything).Return(models.ConfigurationDocumentMetadata{
+		Version:          "v1",
+		DocumentLocation: s3Path,
+		Active:           true,
+	}, nil)
 	// Mock store
 	mockPBStore.On("ReadProtobuf", mock.Anything, mock.MatchedBy(func(reference storage.DataReference) bool {
-		return reference.String() == "s3://bucket/v1"
+		return reference.String() == s3Path
 	}), mock.AnythingOfType("*admin.ConfigurationDocument")).Return(nil).Run(func(args mock.Arguments) {
 		args.Get(2).(proto.Message).(*admin.ConfigurationDocument).Version = "v1"
 		configurations := make(map[string]*admin.Configuration)
 		args.Get(2).(proto.Message).(*admin.ConfigurationDocument).Configurations = configurations
 	})
-	mockConfig.On("ApplicationConfiguration").Return(applicationConfig)
-	// Mock plugin
 	// Mock plugin
 	mockProjectConfigurationPlugin.SetGetMutableAttributesCallback(func(ctx context.Context, input *plugin.GetMutableAttributesInput) (sets.Set[admin.MatchableResource], error) {
 		return sets.New[admin.MatchableResource](
@@ -773,7 +794,7 @@ func TestUpdateProjectDomainConfiguration_UpdatingMutableAttributesError(t *test
 		), nil
 	})
 
-	_, err = configurationManager.UpdateProjectDomainConfiguration(ctx, admin.ConfigurationUpdateRequest{
+	_, err = configurationManager.UpdateConfiguration(ctx, admin.ConfigurationUpdateRequest{
 		Id: &admin.ConfigurationID{
 			Org:     "org",
 			Project: "project",
@@ -794,6 +815,189 @@ func TestUpdateProjectDomainConfiguration_UpdatingMutableAttributesError(t *test
 	db.ConfigurationRepo().(*mocks.ConfigurationRepoInterface).AssertExpectations(t)
 	applicationConfig.AssertExpectations(t)
 	mockPBStore.AssertExpectations(t)
+}
+
+func TestUpdateOrgConfiguration(t *testing.T) {
+	ctx := context.Background()
+	db := mocks.NewMockRepository()
+	mockConfig := &runtimeMocks.Configuration{}
+	mockPBStore := &storageMocks.ComposedProtobufStore{}
+	mockRefConstructor := &storageMocks.ReferenceConstructor{}
+	mockStorage := &storage.DataStore{
+		ComposedProtobufStore: mockPBStore,
+		ReferenceConstructor:  mockRefConstructor,
+	}
+	mockProjectConfigurationPlugin := utilMocks.MockProjectConfigurationPlugin{}
+	pluginRegistry := plugins.NewRegistry()
+	pluginRegistry.RegisterDefault(plugins.PluginIDProjectConfiguration, &mockProjectConfigurationPlugin)
+	// Mock config
+	applicationConfig := &runtimeMocks.ApplicationConfiguration{}
+	mockConfig.On("ApplicationConfiguration").Return(applicationConfig)
+	configurationManager, err := NewConfigurationManager(ctx, db, mockConfig, mockStorage, pluginRegistry, ShouldNotBootstrapOrUpdateDefault)
+	assert.Nil(t, err)
+	// Mock repo
+	db.ConfigurationRepo().(*mocks.ConfigurationRepoInterface).On("GetActive", mock.Anything).Return(models.ConfigurationDocumentMetadata{
+		Version:          "v1",
+		DocumentLocation: s3Path,
+		Active:           true,
+	}, nil)
+	db.ConfigurationRepo().(*mocks.ConfigurationRepoInterface).On("Update", mock.Anything, mock.MatchedBy(func(input *interfaces.UpdateConfigurationInput) bool {
+		if input.VersionToUpdate != "v1" {
+			return false
+		}
+		return *input.NewConfigurationMetadata == models.ConfigurationDocumentMetadata{
+			Version:          "xsqt/y06Uiiae023ZmNbFkYnQHNBtucHThzcj3i2aeE=",
+			DocumentLocation: "s3://bucket/v2",
+			Active:           true,
+		}
+	})).Return(nil)
+	// Mock store
+	mockPBStore.On("ReadProtobuf", mock.Anything, mock.MatchedBy(func(reference storage.DataReference) bool {
+		return reference.String() == s3Path
+	}), mock.AnythingOfType("*admin.ConfigurationDocument")).Return(nil).Run(func(args mock.Arguments) {
+		args.Get(2).(proto.Message).(*admin.ConfigurationDocument).Version = "v1"
+		configurations := make(map[string]*admin.Configuration)
+		projectKey, err := util.EncodeConfigurationDocumentKey(ctx, &admin.ConfigurationID{
+			Org:     "org",
+			Project: "project",
+		})
+		assert.Nil(t, err)
+		configurations[projectKey] = &admin.Configuration{
+			WorkflowExecutionConfig: &admin.WorkflowExecutionConfig{
+				MaxParallelism: 1,
+			},
+		}
+		orgKey, err := util.EncodeConfigurationDocumentKey(ctx, &admin.ConfigurationID{
+			Org: "org",
+		})
+		assert.Nil(t, err)
+		configurations[orgKey] = &admin.Configuration{
+			TaskResourceAttributes: &admin.TaskResourceAttributes{
+				Defaults: &admin.TaskResourceSpec{
+					Cpu: "1",
+					Gpu: "2",
+				},
+			},
+		}
+		globalKey, err := util.EncodeConfigurationDocumentKey(ctx, &util.GlobalConfigurationKey)
+		assert.Nil(t, err)
+		configurations[globalKey] = &admin.Configuration{
+			TaskResourceAttributes: &admin.TaskResourceAttributes{
+				Defaults: &admin.TaskResourceSpec{
+					Cpu: "3",
+					Gpu: "4",
+				},
+			},
+			ExecutionQueueAttributes: &admin.ExecutionQueueAttributes{
+				Tags: []string{
+					"foo", "bar", "baz",
+				},
+			},
+			WorkflowExecutionConfig: &admin.WorkflowExecutionConfig{
+				MaxParallelism: 2,
+			},
+		}
+		args.Get(2).(proto.Message).(*admin.ConfigurationDocument).Configurations = configurations
+	})
+	mockPBStore.On("GetBaseContainerFQN", mock.Anything).Return(storage.DataReference("s3://bucket"))
+	mockRefConstructor.On("ConstructReference", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(storage.DataReference("s3://bucket/v2"), nil)
+	mockMetadata := &storageMocks.Metadata{}
+	mockMetadata.On("Exists").Return(false)
+	mockPBStore.On("Head", mock.Anything, mock.Anything).Return(mockMetadata, nil)
+	mockPBStore.On("WriteProtobuf", mock.Anything, mock.MatchedBy(func(reference storage.DataReference) bool {
+		return reference.String() == "s3://bucket/v2"
+	}), mock.Anything, mock.AnythingOfType("*admin.ConfigurationDocument")).Return(nil)
+	// Mock plugin
+	mockProjectConfigurationPlugin.SetGetMutableAttributesCallback(func(ctx context.Context, input *plugin.GetMutableAttributesInput) (sets.Set[admin.MatchableResource], error) {
+		return sets.New[admin.MatchableResource](
+			admin.MatchableResource_TASK_RESOURCE,
+			admin.MatchableResource_CLUSTER_RESOURCE,
+			admin.MatchableResource_EXECUTION_QUEUE,
+			admin.MatchableResource_EXECUTION_CLUSTER_LABEL,
+		), nil
+	})
+
+	response, err := configurationManager.UpdateConfiguration(ctx, admin.ConfigurationUpdateRequest{
+		Id: &admin.ConfigurationID{
+			Org: "org",
+		},
+		VersionToUpdate: "v1",
+		Configuration: &admin.Configuration{
+			TaskResourceAttributes: &admin.TaskResourceAttributes{
+				Defaults: &admin.TaskResourceSpec{
+					Cpu: "5",
+					Gpu: "6",
+				},
+			},
+		},
+	})
+	assert.Nil(t, err)
+	db.ConfigurationRepo().(*mocks.ConfigurationRepoInterface).AssertExpectations(t)
+	mockRefConstructor.AssertExpectations(t)
+	mockPBStore.AssertExpectations(t)
+
+	assert.True(t, proto.Equal(response, &admin.ConfigurationUpdateResponse{
+		Id:      &admin.ConfigurationID{Org: "org"},
+		Version: "xsqt/y06Uiiae023ZmNbFkYnQHNBtucHThzcj3i2aeE=",
+		Configuration: &admin.ConfigurationWithSource{
+			TaskResourceAttributes: &admin.TaskResourceAttributesWithSource{
+				Source: admin.AttributesSource_ORG,
+				Value: &admin.TaskResourceAttributes{
+					Defaults: &admin.TaskResourceSpec{
+						Cpu: "5",
+						Gpu: "6",
+					},
+				},
+				IsMutable: true,
+			},
+			ClusterResourceAttributes: &admin.ClusterResourceAttributesWithSource{
+				Source:    admin.AttributesSource_GLOBAL,
+				Value:     nil,
+				IsMutable: true,
+			},
+			ExecutionQueueAttributes: &admin.ExecutionQueueAttributesWithSource{
+				Source: admin.AttributesSource_GLOBAL,
+				Value: &admin.ExecutionQueueAttributes{
+					Tags: []string{
+						"foo", "bar", "baz",
+					},
+				},
+				IsMutable: true,
+			},
+			ExecutionClusterLabel: &admin.ExecutionClusterLabelWithSource{
+				Source:    admin.AttributesSource_GLOBAL,
+				Value:     nil,
+				IsMutable: true,
+			},
+			QualityOfService: &admin.QualityOfServiceWithSource{
+				Source:    admin.AttributesSource_GLOBAL,
+				Value:     nil,
+				IsMutable: false,
+			},
+			PluginOverrides: &admin.PluginOverridesWithSource{
+				Source:    admin.AttributesSource_GLOBAL,
+				Value:     nil,
+				IsMutable: false,
+			},
+			WorkflowExecutionConfig: &admin.WorkflowExecutionConfigWithSource{
+				Source: admin.AttributesSource_GLOBAL,
+				Value: &admin.WorkflowExecutionConfig{
+					MaxParallelism: 2,
+				},
+				IsMutable: false,
+			},
+			ClusterAssignment: &admin.ClusterAssignmentWithSource{
+				Source:    admin.AttributesSource_GLOBAL,
+				Value:     nil,
+				IsMutable: false,
+			},
+			ExternalResourceAttributes: &admin.ExternalResourceAttributesWithSource{
+				Source:    admin.AttributesSource_GLOBAL,
+				Value:     nil,
+				IsMutable: false,
+			},
+		},
+	}))
 }
 
 func TestNewAttributes(t *testing.T) {

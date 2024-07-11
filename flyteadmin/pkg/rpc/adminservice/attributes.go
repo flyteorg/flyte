@@ -8,6 +8,7 @@ import (
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/rpc/adminservice/util"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 func (m *AdminService) UpdateWorkflowAttributes(ctx context.Context, request *admin.WorkflowAttributesUpdateRequest) (
@@ -122,11 +123,11 @@ func (m *AdminService) UpdateProjectAttributes(ctx context.Context, request *adm
 	}
 	var response *admin.ProjectAttributesUpdateResponse
 	var err error
-	m.Metrics.projectAttributesEndpointMetrics.get.Time(func() {
+	m.Metrics.projectAttributesEndpointMetrics.update.Time(func() {
 		response, err = m.ResourceManager.UpdateProjectAttributes(ctx, *request)
 	})
 	if err != nil {
-		return nil, util.TransformAndRecordError(err, &m.Metrics.projectAttributesEndpointMetrics.get)
+		return nil, util.TransformAndRecordError(err, &m.Metrics.projectAttributesEndpointMetrics.update)
 	}
 	return response, nil
 }
@@ -163,6 +164,63 @@ func (m *AdminService) DeleteProjectAttributes(ctx context.Context, request *adm
 	})
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.projectAttributesEndpointMetrics.delete)
+	}
+	return response, nil
+}
+
+func (m *AdminService) UpdateOrgAttributes(ctx context.Context, request *admin.OrgAttributesUpdateRequest) (
+	*admin.OrgAttributesUpdateResponse, error) {
+
+	defer m.interceptPanic(ctx, request)
+	if request == nil {
+		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
+	}
+	var response *admin.OrgAttributesUpdateResponse
+	var err error
+	m.Metrics.orgAttributesEndpointMetrics.update.Time(func() {
+		response, err = m.ResourceManager.UpdateOrgAttributes(ctx, *request)
+	})
+	if err != nil {
+		logger.Error(ctx, "Error updating org attributes", err)
+		return nil, util.TransformAndRecordError(err, &m.Metrics.orgAttributesEndpointMetrics.update)
+	}
+	return response, nil
+}
+
+func (m *AdminService) GetOrgAttributes(ctx context.Context, request *admin.OrgAttributesGetRequest) (
+	*admin.OrgAttributesGetResponse, error) {
+
+	defer m.interceptPanic(ctx, request)
+	if request == nil {
+		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
+	}
+	var response *admin.OrgAttributesGetResponse
+	var err error
+	m.Metrics.orgAttributesEndpointMetrics.get.Time(func() {
+		response, err = m.ResourceManager.GetOrgAttributes(ctx, *request)
+	})
+	if err != nil {
+		logger.Error(ctx, "Error getting org attributes", err)
+		return nil, util.TransformAndRecordError(err, &m.Metrics.orgAttributesEndpointMetrics.get)
+	}
+	return response, nil
+}
+
+func (m *AdminService) DeleteOrgAttributes(ctx context.Context, request *admin.OrgAttributesDeleteRequest) (
+	*admin.OrgAttributesDeleteResponse, error) {
+
+	defer m.interceptPanic(ctx, request)
+	if request == nil {
+		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
+	}
+	var response *admin.OrgAttributesDeleteResponse
+	var err error
+	m.Metrics.orgAttributesEndpointMetrics.delete.Time(func() {
+		response, err = m.ResourceManager.DeleteOrgAttributes(ctx, *request)
+	})
+	if err != nil {
+		logger.Error(ctx, "Error deleting org attributes", err)
+		return nil, util.TransformAndRecordError(err, &m.Metrics.orgAttributesEndpointMetrics.delete)
 	}
 	return response, nil
 }

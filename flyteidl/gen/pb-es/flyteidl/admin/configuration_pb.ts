@@ -49,6 +49,13 @@ export enum AttributesSource {
    * @generated from enum value: PROJECT_DOMAIN = 4;
    */
   PROJECT_DOMAIN = 4,
+
+  /**
+   * The configuration is a org configuration.
+   *
+   * @generated from enum value: ORG = 5;
+   */
+  ORG = 5,
 }
 // Retrieve enum metadata with: proto3.getEnumType(AttributesSource)
 proto3.util.setEnumType(AttributesSource, "flyteidl.admin.AttributesSource", [
@@ -57,6 +64,7 @@ proto3.util.setEnumType(AttributesSource, "flyteidl.admin.AttributesSource", [
   { no: 2, name: "DOMAIN" },
   { no: 3, name: "PROJECT" },
   { no: 4, name: "PROJECT_DOMAIN" },
+  { no: 5, name: "ORG" },
 ]);
 
 /**
@@ -97,6 +105,14 @@ export class ConfigurationID extends Message<ConfigurationID> {
    */
   workflow = "";
 
+  /**
+   * If it is a global configuration.
+   * +optional
+   *
+   * @generated from field: bool global = 5;
+   */
+  global = false;
+
   constructor(data?: PartialMessage<ConfigurationID>) {
     super();
     proto3.util.initPartial(data, this);
@@ -109,6 +125,7 @@ export class ConfigurationID extends Message<ConfigurationID> {
     { no: 2, name: "domain", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "project", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "workflow", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "global", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ConfigurationID {

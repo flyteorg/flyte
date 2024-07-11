@@ -1531,6 +1531,105 @@ pub mod admin_service_client {
                 );
             self.inner.unary(req, path, codec).await
         }
+        /** Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` at the org level
+*/
+        pub async fn update_org_attributes(
+            &mut self,
+            request: impl tonic::IntoRequest<
+                super::super::admin::OrgAttributesUpdateRequest,
+            >,
+        ) -> std::result::Result<
+            tonic::Response<super::super::admin::OrgAttributesUpdateResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/flyteidl.service.AdminService/UpdateOrgAttributes",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new(
+                        "flyteidl.service.AdminService",
+                        "UpdateOrgAttributes",
+                    ),
+                );
+            self.inner.unary(req, path, codec).await
+        }
+        /** Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` at the org level
+*/
+        pub async fn get_org_attributes(
+            &mut self,
+            request: impl tonic::IntoRequest<
+                super::super::admin::OrgAttributesGetRequest,
+            >,
+        ) -> std::result::Result<
+            tonic::Response<super::super::admin::OrgAttributesGetResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/flyteidl.service.AdminService/GetOrgAttributes",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new("flyteidl.service.AdminService", "GetOrgAttributes"),
+                );
+            self.inner.unary(req, path, codec).await
+        }
+        /** Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` at the org level
+*/
+        pub async fn delete_org_attributes(
+            &mut self,
+            request: impl tonic::IntoRequest<
+                super::super::admin::OrgAttributesDeleteRequest,
+            >,
+        ) -> std::result::Result<
+            tonic::Response<super::super::admin::OrgAttributesDeleteResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/flyteidl.service.AdminService/DeleteOrgAttributes",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new(
+                        "flyteidl.service.AdminService",
+                        "DeleteOrgAttributes",
+                    ),
+                );
+            self.inner.unary(req, path, codec).await
+        }
         /** Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.
 */
         pub async fn delete_workflow_attributes(
@@ -1881,7 +1980,7 @@ pub mod admin_service_client {
                 );
             self.inner.unary(req, path, codec).await
         }
-        /** Fetch a unified project attribute.
+        /** Fetch the entire unified attribute configuration.
 */
         pub async fn get_configuration(
             &mut self,
@@ -1912,10 +2011,10 @@ pub mod admin_service_client {
                 );
             self.inner.unary(req, path, codec).await
         }
-        /** Update a unified project attribute.
+        /** Update the entire unified attribute configuration.
  Requests will fail for stale values of version_to_update
 */
-        pub async fn update_project_domain_configuration(
+        pub async fn update_configuration(
             &mut self,
             request: impl tonic::IntoRequest<
                 super::super::admin::ConfigurationUpdateRequest,
@@ -1935,14 +2034,14 @@ pub mod admin_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/flyteidl.service.AdminService/UpdateProjectDomainConfiguration",
+                "/flyteidl.service.AdminService/UpdateConfiguration",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
                     GrpcMethod::new(
                         "flyteidl.service.AdminService",
-                        "UpdateProjectDomainConfiguration",
+                        "UpdateConfiguration",
                     ),
                 );
             self.inner.unary(req, path, codec).await
@@ -2388,6 +2487,33 @@ pub mod admin_service_server {
             tonic::Response<super::super::admin::WorkflowAttributesGetResponse>,
             tonic::Status,
         >;
+        /** Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` at the org level
+*/
+        async fn update_org_attributes(
+            &self,
+            request: tonic::Request<super::super::admin::OrgAttributesUpdateRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::super::admin::OrgAttributesUpdateResponse>,
+            tonic::Status,
+        >;
+        /** Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` at the org level
+*/
+        async fn get_org_attributes(
+            &self,
+            request: tonic::Request<super::super::admin::OrgAttributesGetRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::super::admin::OrgAttributesGetResponse>,
+            tonic::Status,
+        >;
+        /** Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` at the org level
+*/
+        async fn delete_org_attributes(
+            &self,
+            request: tonic::Request<super::super::admin::OrgAttributesDeleteRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::super::admin::OrgAttributesDeleteResponse>,
+            tonic::Status,
+        >;
         /** Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.
 */
         async fn delete_workflow_attributes(
@@ -2489,7 +2615,7 @@ pub mod admin_service_server {
             tonic::Response<super::super::admin::RunningExecutionsCountGetResponse>,
             tonic::Status,
         >;
-        /** Fetch a unified project attribute.
+        /** Fetch the entire unified attribute configuration.
 */
         async fn get_configuration(
             &self,
@@ -2498,10 +2624,10 @@ pub mod admin_service_server {
             tonic::Response<super::super::admin::ConfigurationGetResponse>,
             tonic::Status,
         >;
-        /** Update a unified project attribute.
+        /** Update the entire unified attribute configuration.
  Requests will fail for stale values of version_to_update
 */
-        async fn update_project_domain_configuration(
+        async fn update_configuration(
             &self,
             request: tonic::Request<super::super::admin::ConfigurationUpdateRequest>,
         ) -> std::result::Result<
@@ -4903,6 +5029,156 @@ pub mod admin_service_server {
                     };
                     Box::pin(fut)
                 }
+                "/flyteidl.service.AdminService/UpdateOrgAttributes" => {
+                    #[allow(non_camel_case_types)]
+                    struct UpdateOrgAttributesSvc<T: AdminService>(pub Arc<T>);
+                    impl<
+                        T: AdminService,
+                    > tonic::server::UnaryService<
+                        super::super::admin::OrgAttributesUpdateRequest,
+                    > for UpdateOrgAttributesSvc<T> {
+                        type Response = super::super::admin::OrgAttributesUpdateResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<
+                                super::super::admin::OrgAttributesUpdateRequest,
+                            >,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                <T as AdminService>::update_org_attributes(&inner, request)
+                                    .await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = UpdateOrgAttributesSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/flyteidl.service.AdminService/GetOrgAttributes" => {
+                    #[allow(non_camel_case_types)]
+                    struct GetOrgAttributesSvc<T: AdminService>(pub Arc<T>);
+                    impl<
+                        T: AdminService,
+                    > tonic::server::UnaryService<
+                        super::super::admin::OrgAttributesGetRequest,
+                    > for GetOrgAttributesSvc<T> {
+                        type Response = super::super::admin::OrgAttributesGetResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<
+                                super::super::admin::OrgAttributesGetRequest,
+                            >,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                <T as AdminService>::get_org_attributes(&inner, request)
+                                    .await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = GetOrgAttributesSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/flyteidl.service.AdminService/DeleteOrgAttributes" => {
+                    #[allow(non_camel_case_types)]
+                    struct DeleteOrgAttributesSvc<T: AdminService>(pub Arc<T>);
+                    impl<
+                        T: AdminService,
+                    > tonic::server::UnaryService<
+                        super::super::admin::OrgAttributesDeleteRequest,
+                    > for DeleteOrgAttributesSvc<T> {
+                        type Response = super::super::admin::OrgAttributesDeleteResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<
+                                super::super::admin::OrgAttributesDeleteRequest,
+                            >,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                <T as AdminService>::delete_org_attributes(&inner, request)
+                                    .await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = DeleteOrgAttributesSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
                 "/flyteidl.service.AdminService/DeleteWorkflowAttributes" => {
                     #[allow(non_camel_case_types)]
                     struct DeleteWorkflowAttributesSvc<T: AdminService>(pub Arc<T>);
@@ -5511,16 +5787,14 @@ pub mod admin_service_server {
                     };
                     Box::pin(fut)
                 }
-                "/flyteidl.service.AdminService/UpdateProjectDomainConfiguration" => {
+                "/flyteidl.service.AdminService/UpdateConfiguration" => {
                     #[allow(non_camel_case_types)]
-                    struct UpdateProjectDomainConfigurationSvc<T: AdminService>(
-                        pub Arc<T>,
-                    );
+                    struct UpdateConfigurationSvc<T: AdminService>(pub Arc<T>);
                     impl<
                         T: AdminService,
                     > tonic::server::UnaryService<
                         super::super::admin::ConfigurationUpdateRequest,
-                    > for UpdateProjectDomainConfigurationSvc<T> {
+                    > for UpdateConfigurationSvc<T> {
                         type Response = super::super::admin::ConfigurationUpdateResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
@@ -5534,10 +5808,7 @@ pub mod admin_service_server {
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as AdminService>::update_project_domain_configuration(
-                                        &inner,
-                                        request,
-                                    )
+                                <T as AdminService>::update_configuration(&inner, request)
                                     .await
                             };
                             Box::pin(fut)
@@ -5550,7 +5821,7 @@ pub mod admin_service_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = UpdateProjectDomainConfigurationSvc(inner);
+                        let method = UpdateConfigurationSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(

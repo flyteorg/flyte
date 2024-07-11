@@ -40,6 +40,21 @@ func validateMatchingAttributes(attributes *admin.MatchingAttributes, identifier
 		"Unrecognized matching attributes type for request %s", identifier)
 }
 
+func ValidateOrgAttributesUpdateRequest(ctx context.Context, request admin.OrgAttributesUpdateRequest) (admin.MatchableResource, error) {
+	if request.Attributes == nil {
+		return defaultMatchableResource, shared.GetMissingArgumentError(shared.Attributes)
+	}
+	return validateMatchingAttributes(request.Attributes.MatchingAttributes, request.Attributes.Org)
+}
+
+func ValidateOrgAttributesGetRequest(ctx context.Context, request admin.OrgAttributesGetRequest) error {
+	return nil
+}
+
+func ValidateOrgAttributesDeleteRequest(ctx context.Context, request admin.OrgAttributesDeleteRequest) error {
+	return nil
+}
+
 func ValidateProjectAttributesUpdateRequest(ctx context.Context,
 	db repositoryInterfaces.Repository,
 	request admin.ProjectAttributesUpdateRequest) (

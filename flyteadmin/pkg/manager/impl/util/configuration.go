@@ -15,6 +15,11 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
+// A special configuration key to represent the global configuration.
+var GlobalConfigurationKey = admin.ConfigurationID{
+	Global: true,
+}
+
 func addConfigurationSource(configuration *admin.Configuration, source admin.AttributesSource) *admin.ConfigurationWithSource {
 	configurationWithSource := &admin.ConfigurationWithSource{}
 	configurationWithSource.TaskResourceAttributes = &admin.TaskResourceAttributesWithSource{
@@ -107,35 +112,61 @@ func addConfigurationIsMutable(ctx context.Context, configuration *admin.Configu
 	return configuration, nil
 }
 
-// Merges the configuration from higher level to lower level.
+// GetConfigurationWithSource merges the configuration from higher level to lower level.
+// The order of precedence is org-project-domain > org-project > org > domain > global.
+// This is because org-project-domain, org-project, and org are users' overrides,
+// while domain and global are defaults from the config map.
 func GetConfigurationWithSource(ctx context.Context, document *admin.ConfigurationDocument, id *admin.ConfigurationID, projectConfigurationPlugin plugin.ProjectConfigurationPlugin) (*admin.ConfigurationWithSource, error) {
-	projectDomainConfiguration, err := GetConfigurationFromDocument(ctx, document, &admin.ConfigurationID{
-		Org:     id.Org,
-		Project: id.Project,
-		Domain:  id.Domain,
+	var err error
+	// org-project-domain
+	projectDomainConfiguration := admin.Configuration{}
+	if id.Project != "" && id.Domain != "" {
+		projectDomainConfiguration, err = GetConfigurationFromDocument(ctx, document, &admin.ConfigurationID{
+			Org:     id.Org,
+			Project: id.Project,
+			Domain:  id.Domain,
+		})
+		if err != nil {
+			return nil, err
+		}
+	}
+	// org-project
+	projectConfiguration := admin.Configuration{}
+	if id.Project != "" {
+		projectConfiguration, err = GetConfigurationFromDocument(ctx, document, &admin.ConfigurationID{
+			Org:     id.Org,
+			Project: id.Project,
+		})
+		if err != nil {
+			return nil, err
+		}
+	}
+	// org
+	orgConfiguration, err := GetConfigurationFromDocument(ctx, document, &admin.ConfigurationID{
+		Org: id.Org,
 	})
 	if err != nil {
 		return nil, err
 	}
-	projectConfiguration, err := GetConfigurationFromDocument(ctx, document, &admin.ConfigurationID{
-		Org:     id.Org,
-		Project: id.Project,
-	})
+	// domain
+	domainConfiguration := admin.Configuration{}
+	if id.Domain != "" {
+		domainConfiguration, err = GetConfigurationFromDocument(ctx, document, &admin.ConfigurationID{
+			Domain: id.Domain,
+		})
+		if err != nil {
+			return nil, err
+		}
+	}
+	// global
+	globalConfiguration, err := GetConfigurationFromDocument(ctx, document, &GlobalConfigurationKey)
 	if err != nil {
 		return nil, err
 	}
-	domainConfiguration, err := GetConfigurationFromDocument(ctx, document, &admin.ConfigurationID{
-		Domain: id.Domain,
-	})
-	if err != nil {
-		return nil, err
-	}
-	globalConfiguration, err := GetConfigurationFromDocument(ctx, document, &admin.ConfigurationID{})
-	if err != nil {
-		return nil, err
-	}
+	// Merge configurations from higher level to lower level
 	configuration := addConfigurationSource(&projectDomainConfiguration, admin.AttributesSource_PROJECT_DOMAIN)
 	configuration = mergeConfigurations(configuration, addConfigurationSource(&projectConfiguration, admin.AttributesSource_PROJECT))
+	configuration = mergeConfigurations(configuration, addConfigurationSource(&orgConfiguration, admin.AttributesSource_ORG))
 	configuration = mergeConfigurations(configuration, addConfigurationSource(&domainConfiguration, admin.AttributesSource_DOMAIN))
 	configuration = mergeConfigurations(configuration, addConfigurationSource(&globalConfiguration, admin.AttributesSource_GLOBAL))
 
@@ -149,7 +180,7 @@ func GetDefaultConfigurationWithSource(ctx context.Context, document *admin.Conf
 	if err != nil {
 		return nil, err
 	}
-	globalConfiguration, err := GetConfigurationFromDocument(ctx, document, &admin.ConfigurationID{})
+	globalConfiguration, err := GetConfigurationFromDocument(ctx, document, &GlobalConfigurationKey)
 	if err != nil {
 		return nil, err
 	}
@@ -213,7 +244,7 @@ func DecodeConfigurationDocumentKey(ctx context.Context, key string) (*admin.Con
 
 func UpdateDefaultConfigurationToDocument(ctx context.Context, document *admin.ConfigurationDocument, config runtimeInterfaces.Configuration) (*admin.ConfigurationDocument, error) {
 	// update global configuration
-	document, err := UpdateConfigurationToDocument(ctx, document, collectGlobalConfiguration(ctx, config), &admin.ConfigurationID{})
+	document, err := UpdateConfigurationToDocument(ctx, document, collectGlobalConfiguration(ctx, config), &GlobalConfigurationKey)
 	if err != nil {
 		return nil, err
 	}
@@ -312,4 +343,15 @@ func collectDomainConfiguration(ctx context.Context, config runtimeInterfaces.Co
 			ClusterPoolName: clusterPoolAssignment,
 		},
 	}
+}
+
+// A default configuration is either a global configuration or a domain configuration.
+// Both of them are from the config map.
+func IsDefaultConfigurationID(ctx context.Context, configurationID *admin.ConfigurationID) bool {
+	// Is a global configuration
+	if proto.Equal(configurationID, &GlobalConfigurationKey) {
+		return true
+	}
+	// Is a domain configuration
+	return configurationID.Workflow == "" && configurationID.Project == "" && configurationID.Domain != "" && configurationID.Org == ""
 }

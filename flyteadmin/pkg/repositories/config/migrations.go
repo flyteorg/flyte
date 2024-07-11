@@ -1527,8 +1527,8 @@ var ConfigurationsToResourcesMigration = &gormigrate.Migration{
 				return err
 			}
 
-			// If the project is empty, the configuration is a default one (domain or global). We can skip it.
-			if id.Project == "" {
+			// If the configuration is a default one (domain or global), we can skip it.
+			if util.IsDefaultConfigurationID(ctx, id) {
 				continue
 			}
 			for resourceTypeString, resourceType := range admin.MatchableResource_value {

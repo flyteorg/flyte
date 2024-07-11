@@ -429,3 +429,52 @@ func TestListAllMatchableAttributes(t *testing.T) {
 	}, response.Configurations[2]))
 
 }
+
+func TestUpdateOrgAttributes(t *testing.T) {
+	ctx := context.Background()
+	client, conn := GetTestAdminServiceClient()
+	defer conn.Close()
+	db, err := repositories.GetDB(ctx, getDbConfig(), getLoggerConfig())
+	assert.Nil(t, err)
+	configuration := runtime.NewConfigurationProvider()
+	if configuration.ApplicationConfiguration().GetTopLevelConfig().ResourceAttributesMode == runtimeIfaces.ResourceAttributesModeConfiguration {
+		rollbackToDefaultConfiguration(db)
+	} else {
+		truncateTableForTesting(db, "resources")
+	}
+	sqlDB, err := db.DB()
+	assert.Nil(t, err)
+	err = sqlDB.Close()
+	assert.Nil(t, err)
+
+	req := admin.OrgAttributesUpdateRequest{
+		Attributes: &admin.OrgAttributes{
+			MatchingAttributes: matchingTaskResourceAttributes,
+		},
+	}
+
+	_, err = client.UpdateOrgAttributes(ctx, &req)
+	assert.Nil(t, err)
+
+	response, err := client.GetOrgAttributes(ctx, &admin.OrgAttributesGetRequest{
+		ResourceType: admin.MatchableResource_TASK_RESOURCE,
+	})
+	assert.Nil(t, err)
+	assert.True(t, proto.Equal(&admin.OrgAttributesGetResponse{
+		Attributes: &admin.OrgAttributes{
+			MatchingAttributes: matchingTaskResourceAttributes,
+		},
+	}, response))
+
+	projectDomainResponse, err := client.GetProjectDomainAttributes(ctx, &admin.ProjectDomainAttributesGetRequest{
+		ResourceType: admin.MatchableResource_TASK_RESOURCE,
+		Project:      "admintests",
+		Domain:       "development",
+	})
+	assert.Nil(t, err)
+	assert.True(t, proto.Equal(&admin.ProjectDomainAttributesGetResponse{
+		Attributes: &admin.ProjectDomainAttributes{
+			MatchingAttributes: matchingTaskResourceAttributes,
+		},
+	}, projectDomainResponse))
+}

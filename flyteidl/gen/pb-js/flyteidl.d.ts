@@ -12415,6 +12415,9 @@ export namespace flyteidl {
 
             /** ConfigurationID workflow */
             workflow?: (string|null);
+
+            /** ConfigurationID global */
+            global?: (boolean|null);
         }
 
         /** Represents a ConfigurationID. */
@@ -12437,6 +12440,9 @@ export namespace flyteidl {
 
             /** ConfigurationID workflow. */
             public workflow: string;
+
+            /** ConfigurationID global. */
+            public global: boolean;
 
             /**
              * Creates a new ConfigurationID instance using the specified properties.
@@ -12477,7 +12483,8 @@ export namespace flyteidl {
             GLOBAL = 1,
             DOMAIN = 2,
             PROJECT = 3,
-            PROJECT_DOMAIN = 4
+            PROJECT_DOMAIN = 4,
+            ORG = 5
         }
 
         /** Properties of a TaskResourceAttributesWithSource. */
@@ -19184,6 +19191,376 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of an OrgAttributes. */
+        interface IOrgAttributes {
+
+            /** OrgAttributes matchingAttributes */
+            matchingAttributes?: (flyteidl.admin.IMatchingAttributes|null);
+
+            /** OrgAttributes org */
+            org?: (string|null);
+        }
+
+        /** Represents an OrgAttributes. */
+        class OrgAttributes implements IOrgAttributes {
+
+            /**
+             * Constructs a new OrgAttributes.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IOrgAttributes);
+
+            /** OrgAttributes matchingAttributes. */
+            public matchingAttributes?: (flyteidl.admin.IMatchingAttributes|null);
+
+            /** OrgAttributes org. */
+            public org: string;
+
+            /**
+             * Creates a new OrgAttributes instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns OrgAttributes instance
+             */
+            public static create(properties?: flyteidl.admin.IOrgAttributes): flyteidl.admin.OrgAttributes;
+
+            /**
+             * Encodes the specified OrgAttributes message. Does not implicitly {@link flyteidl.admin.OrgAttributes.verify|verify} messages.
+             * @param message OrgAttributes message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IOrgAttributes, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an OrgAttributes message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns OrgAttributes
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.OrgAttributes;
+
+            /**
+             * Verifies an OrgAttributes message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of an OrgAttributesUpdateRequest. */
+        interface IOrgAttributesUpdateRequest {
+
+            /** OrgAttributesUpdateRequest attributes */
+            attributes?: (flyteidl.admin.IOrgAttributes|null);
+        }
+
+        /** Represents an OrgAttributesUpdateRequest. */
+        class OrgAttributesUpdateRequest implements IOrgAttributesUpdateRequest {
+
+            /**
+             * Constructs a new OrgAttributesUpdateRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IOrgAttributesUpdateRequest);
+
+            /** OrgAttributesUpdateRequest attributes. */
+            public attributes?: (flyteidl.admin.IOrgAttributes|null);
+
+            /**
+             * Creates a new OrgAttributesUpdateRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns OrgAttributesUpdateRequest instance
+             */
+            public static create(properties?: flyteidl.admin.IOrgAttributesUpdateRequest): flyteidl.admin.OrgAttributesUpdateRequest;
+
+            /**
+             * Encodes the specified OrgAttributesUpdateRequest message. Does not implicitly {@link flyteidl.admin.OrgAttributesUpdateRequest.verify|verify} messages.
+             * @param message OrgAttributesUpdateRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IOrgAttributesUpdateRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an OrgAttributesUpdateRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns OrgAttributesUpdateRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.OrgAttributesUpdateRequest;
+
+            /**
+             * Verifies an OrgAttributesUpdateRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of an OrgAttributesUpdateResponse. */
+        interface IOrgAttributesUpdateResponse {
+        }
+
+        /** Represents an OrgAttributesUpdateResponse. */
+        class OrgAttributesUpdateResponse implements IOrgAttributesUpdateResponse {
+
+            /**
+             * Constructs a new OrgAttributesUpdateResponse.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IOrgAttributesUpdateResponse);
+
+            /**
+             * Creates a new OrgAttributesUpdateResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns OrgAttributesUpdateResponse instance
+             */
+            public static create(properties?: flyteidl.admin.IOrgAttributesUpdateResponse): flyteidl.admin.OrgAttributesUpdateResponse;
+
+            /**
+             * Encodes the specified OrgAttributesUpdateResponse message. Does not implicitly {@link flyteidl.admin.OrgAttributesUpdateResponse.verify|verify} messages.
+             * @param message OrgAttributesUpdateResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IOrgAttributesUpdateResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an OrgAttributesUpdateResponse message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns OrgAttributesUpdateResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.OrgAttributesUpdateResponse;
+
+            /**
+             * Verifies an OrgAttributesUpdateResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of an OrgAttributesGetRequest. */
+        interface IOrgAttributesGetRequest {
+
+            /** OrgAttributesGetRequest resourceType */
+            resourceType?: (flyteidl.admin.MatchableResource|null);
+
+            /** OrgAttributesGetRequest org */
+            org?: (string|null);
+        }
+
+        /** Represents an OrgAttributesGetRequest. */
+        class OrgAttributesGetRequest implements IOrgAttributesGetRequest {
+
+            /**
+             * Constructs a new OrgAttributesGetRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IOrgAttributesGetRequest);
+
+            /** OrgAttributesGetRequest resourceType. */
+            public resourceType: flyteidl.admin.MatchableResource;
+
+            /** OrgAttributesGetRequest org. */
+            public org: string;
+
+            /**
+             * Creates a new OrgAttributesGetRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns OrgAttributesGetRequest instance
+             */
+            public static create(properties?: flyteidl.admin.IOrgAttributesGetRequest): flyteidl.admin.OrgAttributesGetRequest;
+
+            /**
+             * Encodes the specified OrgAttributesGetRequest message. Does not implicitly {@link flyteidl.admin.OrgAttributesGetRequest.verify|verify} messages.
+             * @param message OrgAttributesGetRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IOrgAttributesGetRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an OrgAttributesGetRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns OrgAttributesGetRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.OrgAttributesGetRequest;
+
+            /**
+             * Verifies an OrgAttributesGetRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of an OrgAttributesGetResponse. */
+        interface IOrgAttributesGetResponse {
+
+            /** OrgAttributesGetResponse attributes */
+            attributes?: (flyteidl.admin.IOrgAttributes|null);
+        }
+
+        /** Represents an OrgAttributesGetResponse. */
+        class OrgAttributesGetResponse implements IOrgAttributesGetResponse {
+
+            /**
+             * Constructs a new OrgAttributesGetResponse.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IOrgAttributesGetResponse);
+
+            /** OrgAttributesGetResponse attributes. */
+            public attributes?: (flyteidl.admin.IOrgAttributes|null);
+
+            /**
+             * Creates a new OrgAttributesGetResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns OrgAttributesGetResponse instance
+             */
+            public static create(properties?: flyteidl.admin.IOrgAttributesGetResponse): flyteidl.admin.OrgAttributesGetResponse;
+
+            /**
+             * Encodes the specified OrgAttributesGetResponse message. Does not implicitly {@link flyteidl.admin.OrgAttributesGetResponse.verify|verify} messages.
+             * @param message OrgAttributesGetResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IOrgAttributesGetResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an OrgAttributesGetResponse message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns OrgAttributesGetResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.OrgAttributesGetResponse;
+
+            /**
+             * Verifies an OrgAttributesGetResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of an OrgAttributesDeleteRequest. */
+        interface IOrgAttributesDeleteRequest {
+
+            /** OrgAttributesDeleteRequest resourceType */
+            resourceType?: (flyteidl.admin.MatchableResource|null);
+
+            /** OrgAttributesDeleteRequest org */
+            org?: (string|null);
+        }
+
+        /** Represents an OrgAttributesDeleteRequest. */
+        class OrgAttributesDeleteRequest implements IOrgAttributesDeleteRequest {
+
+            /**
+             * Constructs a new OrgAttributesDeleteRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IOrgAttributesDeleteRequest);
+
+            /** OrgAttributesDeleteRequest resourceType. */
+            public resourceType: flyteidl.admin.MatchableResource;
+
+            /** OrgAttributesDeleteRequest org. */
+            public org: string;
+
+            /**
+             * Creates a new OrgAttributesDeleteRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns OrgAttributesDeleteRequest instance
+             */
+            public static create(properties?: flyteidl.admin.IOrgAttributesDeleteRequest): flyteidl.admin.OrgAttributesDeleteRequest;
+
+            /**
+             * Encodes the specified OrgAttributesDeleteRequest message. Does not implicitly {@link flyteidl.admin.OrgAttributesDeleteRequest.verify|verify} messages.
+             * @param message OrgAttributesDeleteRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IOrgAttributesDeleteRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an OrgAttributesDeleteRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns OrgAttributesDeleteRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.OrgAttributesDeleteRequest;
+
+            /**
+             * Verifies an OrgAttributesDeleteRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of an OrgAttributesDeleteResponse. */
+        interface IOrgAttributesDeleteResponse {
+        }
+
+        /** Represents an OrgAttributesDeleteResponse. */
+        class OrgAttributesDeleteResponse implements IOrgAttributesDeleteResponse {
+
+            /**
+             * Constructs a new OrgAttributesDeleteResponse.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IOrgAttributesDeleteResponse);
+
+            /**
+             * Creates a new OrgAttributesDeleteResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns OrgAttributesDeleteResponse instance
+             */
+            public static create(properties?: flyteidl.admin.IOrgAttributesDeleteResponse): flyteidl.admin.OrgAttributesDeleteResponse;
+
+            /**
+             * Encodes the specified OrgAttributesDeleteResponse message. Does not implicitly {@link flyteidl.admin.OrgAttributesDeleteResponse.verify|verify} messages.
+             * @param message OrgAttributesDeleteResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IOrgAttributesDeleteResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an OrgAttributesDeleteResponse message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns OrgAttributesDeleteResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.OrgAttributesDeleteResponse;
+
+            /**
+             * Verifies an OrgAttributesDeleteResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a Domain. */
         interface IDomain {
 
@@ -23522,6 +23899,48 @@ export namespace flyteidl {
             public getWorkflowAttributes(request: flyteidl.admin.IWorkflowAttributesGetRequest): Promise<flyteidl.admin.WorkflowAttributesGetResponse>;
 
             /**
+             * Calls UpdateOrgAttributes.
+             * @param request OrgAttributesUpdateRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and OrgAttributesUpdateResponse
+             */
+            public updateOrgAttributes(request: flyteidl.admin.IOrgAttributesUpdateRequest, callback: flyteidl.service.AdminService.UpdateOrgAttributesCallback): void;
+
+            /**
+             * Calls UpdateOrgAttributes.
+             * @param request OrgAttributesUpdateRequest message or plain object
+             * @returns Promise
+             */
+            public updateOrgAttributes(request: flyteidl.admin.IOrgAttributesUpdateRequest): Promise<flyteidl.admin.OrgAttributesUpdateResponse>;
+
+            /**
+             * Calls GetOrgAttributes.
+             * @param request OrgAttributesGetRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and OrgAttributesGetResponse
+             */
+            public getOrgAttributes(request: flyteidl.admin.IOrgAttributesGetRequest, callback: flyteidl.service.AdminService.GetOrgAttributesCallback): void;
+
+            /**
+             * Calls GetOrgAttributes.
+             * @param request OrgAttributesGetRequest message or plain object
+             * @returns Promise
+             */
+            public getOrgAttributes(request: flyteidl.admin.IOrgAttributesGetRequest): Promise<flyteidl.admin.OrgAttributesGetResponse>;
+
+            /**
+             * Calls DeleteOrgAttributes.
+             * @param request OrgAttributesDeleteRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and OrgAttributesDeleteResponse
+             */
+            public deleteOrgAttributes(request: flyteidl.admin.IOrgAttributesDeleteRequest, callback: flyteidl.service.AdminService.DeleteOrgAttributesCallback): void;
+
+            /**
+             * Calls DeleteOrgAttributes.
+             * @param request OrgAttributesDeleteRequest message or plain object
+             * @returns Promise
+             */
+            public deleteOrgAttributes(request: flyteidl.admin.IOrgAttributesDeleteRequest): Promise<flyteidl.admin.OrgAttributesDeleteResponse>;
+
+            /**
              * Calls DeleteWorkflowAttributes.
              * @param request WorkflowAttributesDeleteRequest message or plain object
              * @param callback Node-style callback called with the error, if any, and WorkflowAttributesDeleteResponse
@@ -23690,18 +24109,18 @@ export namespace flyteidl {
             public getConfiguration(request: flyteidl.admin.IConfigurationGetRequest): Promise<flyteidl.admin.ConfigurationGetResponse>;
 
             /**
-             * Calls UpdateProjectDomainConfiguration.
+             * Calls UpdateConfiguration.
              * @param request ConfigurationUpdateRequest message or plain object
              * @param callback Node-style callback called with the error, if any, and ConfigurationUpdateResponse
              */
-            public updateProjectDomainConfiguration(request: flyteidl.admin.IConfigurationUpdateRequest, callback: flyteidl.service.AdminService.UpdateProjectDomainConfigurationCallback): void;
+            public updateConfiguration(request: flyteidl.admin.IConfigurationUpdateRequest, callback: flyteidl.service.AdminService.UpdateConfigurationCallback): void;
 
             /**
-             * Calls UpdateProjectDomainConfiguration.
+             * Calls UpdateConfiguration.
              * @param request ConfigurationUpdateRequest message or plain object
              * @returns Promise
              */
-            public updateProjectDomainConfiguration(request: flyteidl.admin.IConfigurationUpdateRequest): Promise<flyteidl.admin.ConfigurationUpdateResponse>;
+            public updateConfiguration(request: flyteidl.admin.IConfigurationUpdateRequest): Promise<flyteidl.admin.ConfigurationUpdateResponse>;
         }
 
         namespace AdminService {
@@ -24029,6 +24448,27 @@ export namespace flyteidl {
             type GetWorkflowAttributesCallback = (error: (Error|null), response?: flyteidl.admin.WorkflowAttributesGetResponse) => void;
 
             /**
+             * Callback as used by {@link flyteidl.service.AdminService#updateOrgAttributes}.
+             * @param error Error, if any
+             * @param [response] OrgAttributesUpdateResponse
+             */
+            type UpdateOrgAttributesCallback = (error: (Error|null), response?: flyteidl.admin.OrgAttributesUpdateResponse) => void;
+
+            /**
+             * Callback as used by {@link flyteidl.service.AdminService#getOrgAttributes}.
+             * @param error Error, if any
+             * @param [response] OrgAttributesGetResponse
+             */
+            type GetOrgAttributesCallback = (error: (Error|null), response?: flyteidl.admin.OrgAttributesGetResponse) => void;
+
+            /**
+             * Callback as used by {@link flyteidl.service.AdminService#deleteOrgAttributes}.
+             * @param error Error, if any
+             * @param [response] OrgAttributesDeleteResponse
+             */
+            type DeleteOrgAttributesCallback = (error: (Error|null), response?: flyteidl.admin.OrgAttributesDeleteResponse) => void;
+
+            /**
              * Callback as used by {@link flyteidl.service.AdminService#deleteWorkflowAttributes}.
              * @param error Error, if any
              * @param [response] WorkflowAttributesDeleteResponse
@@ -24113,11 +24553,11 @@ export namespace flyteidl {
             type GetConfigurationCallback = (error: (Error|null), response?: flyteidl.admin.ConfigurationGetResponse) => void;
 
             /**
-             * Callback as used by {@link flyteidl.service.AdminService#updateProjectDomainConfiguration}.
+             * Callback as used by {@link flyteidl.service.AdminService#updateConfiguration}.
              * @param error Error, if any
              * @param [response] ConfigurationUpdateResponse
              */
-            type UpdateProjectDomainConfigurationCallback = (error: (Error|null), response?: flyteidl.admin.ConfigurationUpdateResponse) => void;
+            type UpdateConfigurationCallback = (error: (Error|null), response?: flyteidl.admin.ConfigurationUpdateResponse) => void;
         }
 
         /** Represents a SyncAgentService */

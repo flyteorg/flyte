@@ -26,6 +26,28 @@ type ConfigurationResourceManager struct {
 	configurationManager interfaces.ConfigurationInterface
 }
 
+type configurationWithVersion struct {
+	Configuration *admin.Configuration
+	Version       string
+}
+
+func (m *ConfigurationResourceManager) getConfigurationWithVersion(ctx context.Context, configurationID *admin.ConfigurationID) (*configurationWithVersion, error) {
+	activeDocument, err := m.configurationManager.GetReadOnlyActiveDocument(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	configuration, err := util.GetConfigurationFromDocument(ctx, &activeDocument, configurationID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &configurationWithVersion{
+		Configuration: &configuration,
+		Version:       activeDocument.Version,
+	}, nil
+}
+
 func (m *ConfigurationResourceManager) ListAll(ctx context.Context, request admin.ListMatchableAttributesRequest) (*admin.ListMatchableAttributesResponse, error) {
 	if err := validation.ValidateListAllMatchableAttributesRequest(request); err != nil {
 		return nil, err
@@ -43,8 +65,8 @@ func (m *ConfigurationResourceManager) ListAll(ctx context.Context, request admi
 			logger.Errorf(ctx, "Failed to decode document key [%s] with error: %v", level, err)
 			return nil, err
 		}
-		// If the project is empty, the configuration is a default one (domain or global). We can skip it.
-		if id.Project == "" {
+		// If the configuration is a default one (domain or global), we can skip it.
+		if util.IsDefaultConfigurationID(ctx, id) {
 			continue
 		}
 
@@ -73,7 +95,10 @@ func (m *ConfigurationResourceManager) ListAll(ctx context.Context, request admi
 		if response.Configurations[i].Domain != response.Configurations[j].Domain {
 			return response.Configurations[i].Domain > response.Configurations[j].Domain
 		}
-		return response.Configurations[i].Project > response.Configurations[j].Project
+		if response.Configurations[i].Project != response.Configurations[j].Project {
+			return response.Configurations[i].Project > response.Configurations[j].Project
+		}
+		return response.Configurations[i].Org > response.Configurations[j].Org
 	})
 	return response, nil
 }
@@ -156,7 +181,99 @@ func (m *ConfigurationResourceManager) GetResource(ctx context.Context, request 
 		}, nil
 	}
 
+	// Check org
+	configuration, err = util.GetConfigurationFromDocument(ctx, &activeDocument, &admin.ConfigurationID{
+		Org: request.Org,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	attributes, err = transformers.GetMatchingAttributesFromConfiguration(&configuration, request.ResourceType)
+	if err != nil && !errors.IsDoesNotExistError(err) {
+		return nil, err
+	}
+	if err == nil {
+		return &interfaces.ResourceResponse{
+			Org:          request.Org,
+			ResourceType: request.ResourceType.String(),
+			Attributes:   attributes,
+		}, nil
+	}
+
 	return nil, errors.NewFlyteAdminErrorf(codes.NotFound, fmt.Sprintf("Resource [{Project:%s Domain:%s Workflow:%s LaunchPlan:%s ResourceType:%s Org:}] not found", request.Project, request.Domain, request.Workflow, request.LaunchPlan, request.ResourceType.String()))
+}
+
+func (m *ConfigurationResourceManager) UpdateOrgAttributes(ctx context.Context, request admin.OrgAttributesUpdateRequest) (*admin.OrgAttributesUpdateResponse, error) {
+	var err error
+	if _, err = validation.ValidateOrgAttributesUpdateRequest(ctx, request); err != nil {
+		return nil, err
+	}
+
+	configurationWithVersion, err := m.getConfigurationWithVersion(ctx, &admin.ConfigurationID{
+		Org: request.Attributes.Org,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	configurationUpdateRequest, err := transformers.FromOrgAttributesUpdateRequest(&request, *configurationWithVersion.Configuration, configurationWithVersion.Version)
+	if err != nil {
+		logger.Debugf(ctx, "Failed to transform org attributes update request into configuration update request with error: %v", err)
+		return nil, err
+	}
+
+	_, err = m.configurationManager.UpdateConfiguration(ctx, *configurationUpdateRequest)
+	if err != nil {
+		return nil, err
+	}
+	return &admin.OrgAttributesUpdateResponse{}, nil
+}
+
+func (m *ConfigurationResourceManager) GetOrgAttributes(ctx context.Context, request admin.OrgAttributesGetRequest) (*admin.OrgAttributesGetResponse, error) {
+	if err := validation.ValidateOrgAttributesGetRequest(ctx, request); err != nil {
+		return nil, err
+	}
+
+	response, err := m.GetResource(ctx, interfaces.ResourceRequest{
+		Org:          request.Org,
+		ResourceType: request.ResourceType,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &admin.OrgAttributesGetResponse{
+		Attributes: &admin.OrgAttributes{
+			Org:                response.Org,
+			MatchingAttributes: response.Attributes,
+		},
+	}, nil
+}
+
+func (m *ConfigurationResourceManager) DeleteOrgAttributes(ctx context.Context, request admin.OrgAttributesDeleteRequest) (*admin.OrgAttributesDeleteResponse, error) {
+	if err := validation.ValidateOrgAttributesDeleteRequest(ctx, request); err != nil {
+		return nil, err
+	}
+
+	configurationWithVersion, err := m.getConfigurationWithVersion(ctx, &admin.ConfigurationID{
+		Org: request.Org,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	configurationUpdateRequest, err := transformers.FromOrgAttributesDeleteRequest(&request, *configurationWithVersion.Configuration, configurationWithVersion.Version)
+	if err != nil {
+		logger.Debugf(ctx, "Failed to transform org attributes delete request into configuration update request with error: %v", err)
+		return nil, err
+	}
+
+	_, err = m.configurationManager.UpdateConfiguration(ctx, *configurationUpdateRequest)
+	if err != nil {
+		return nil, err
+	}
+	return &admin.OrgAttributesDeleteResponse{}, nil
 }
 
 func (m *ConfigurationResourceManager) GetProjectAttributesBase(
@@ -190,16 +307,12 @@ func (m *ConfigurationResourceManager) GetProjectAttributes(
 	ctx context.Context, request admin.ProjectAttributesGetRequest) (
 	*admin.ProjectAttributesGetResponse, error) {
 	// Get global workflow execution config
-	activeDocument, err := m.configurationManager.GetReadOnlyActiveDocument(ctx)
+	globalConfigurationWithVersion, err := m.getConfigurationWithVersion(ctx, &util.GlobalConfigurationKey)
 	if err != nil {
 		return nil, err
 	}
-	globalConfiguration, err := util.GetConfigurationFromDocument(ctx, &activeDocument, &admin.ConfigurationID{})
-	if err != nil {
-		logger.Debugf(ctx, "Failed to get global configuration with error: %v", err)
-		return nil, err
-	}
-	_globalWorkflowExecutionConfig, err := transformers.GetMatchingAttributesFromConfiguration(&globalConfiguration, admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG)
+
+	_globalWorkflowExecutionConfig, err := transformers.GetMatchingAttributesFromConfiguration(globalConfigurationWithVersion.Configuration, admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to get global workflow execution config with error: %v", err)
 		return nil, err
@@ -253,12 +366,7 @@ func (m *ConfigurationResourceManager) UpdateProjectAttributes(
 		return nil, err
 	}
 
-	activeDocument, err := m.configurationManager.GetReadOnlyActiveDocument(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	configuration, err := util.GetConfigurationFromDocument(ctx, &activeDocument, &admin.ConfigurationID{
+	configurationWithVersion, err := m.getConfigurationWithVersion(ctx, &admin.ConfigurationID{
 		Org:     request.Attributes.Org,
 		Project: request.Attributes.Project,
 	})
@@ -266,13 +374,13 @@ func (m *ConfigurationResourceManager) UpdateProjectAttributes(
 		return nil, err
 	}
 
-	configurationUpdateRequest, err := transformers.FromProjectAttributesUpdateRequest(&request, configuration, activeDocument.Version)
+	configurationUpdateRequest, err := transformers.FromProjectAttributesUpdateRequest(&request, *configurationWithVersion.Configuration, configurationWithVersion.Version)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to transform project attributes update request into configuration update request with error: %v", err)
 		return nil, err
 	}
 
-	_, err = m.configurationManager.UpdateProjectConfiguration(ctx, configurationUpdateRequest)
+	_, err = m.configurationManager.UpdateConfiguration(ctx, *configurationUpdateRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -286,12 +394,7 @@ func (m *ConfigurationResourceManager) DeleteProjectAttributes(
 		return nil, err
 	}
 
-	activeDocument, err := m.configurationManager.GetReadOnlyActiveDocument(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	configuration, err := util.GetConfigurationFromDocument(ctx, &activeDocument, &admin.ConfigurationID{
+	configurationWithVersion, err := m.getConfigurationWithVersion(ctx, &admin.ConfigurationID{
 		Org:     request.Org,
 		Project: request.Project,
 	})
@@ -299,13 +402,13 @@ func (m *ConfigurationResourceManager) DeleteProjectAttributes(
 		return nil, err
 	}
 
-	configurationUpdateRequest, err := transformers.FromProjectAttributesDeleteRequest(&request, configuration, activeDocument.Version)
+	configurationUpdateRequest, err := transformers.FromProjectAttributesDeleteRequest(&request, *configurationWithVersion.Configuration, configurationWithVersion.Version)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to transform project attributes delete request into configuration update request with error: %v", err)
 		return nil, err
 	}
 
-	_, err = m.configurationManager.UpdateProjectConfiguration(ctx, configurationUpdateRequest)
+	_, err = m.configurationManager.UpdateConfiguration(ctx, *configurationUpdateRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -347,13 +450,7 @@ func (m *ConfigurationResourceManager) UpdateProjectDomainAttributes(
 		return nil, err
 	}
 
-	// get the active document
-	activeDocument, err := m.configurationManager.GetReadOnlyActiveDocument(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	configuration, err := util.GetConfigurationFromDocument(ctx, &activeDocument, &admin.ConfigurationID{
+	configurationWithVersion, err := m.getConfigurationWithVersion(ctx, &admin.ConfigurationID{
 		Org:     request.Attributes.Org,
 		Project: request.Attributes.Project,
 		Domain:  request.Attributes.Domain,
@@ -362,13 +459,13 @@ func (m *ConfigurationResourceManager) UpdateProjectDomainAttributes(
 		return nil, err
 	}
 
-	configurationUpdateRequest, err := transformers.FromProjectDomainAttributesUpdateRequest(&request, configuration, activeDocument.Version)
+	configurationUpdateRequest, err := transformers.FromProjectDomainAttributesUpdateRequest(&request, *configurationWithVersion.Configuration, configurationWithVersion.Version)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to transform project domain attributes update request into configuration update request with error: %v", err)
 		return nil, err
 	}
 
-	_, err = m.configurationManager.UpdateProjectDomainConfiguration(ctx, configurationUpdateRequest)
+	_, err = m.configurationManager.UpdateConfiguration(ctx, *configurationUpdateRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -382,12 +479,7 @@ func (m *ConfigurationResourceManager) DeleteProjectDomainAttributes(
 		return nil, err
 	}
 
-	activeDocument, err := m.configurationManager.GetReadOnlyActiveDocument(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	configuration, err := util.GetConfigurationFromDocument(ctx, &activeDocument, &admin.ConfigurationID{
+	configurationWithVersion, err := m.getConfigurationWithVersion(ctx, &admin.ConfigurationID{
 		Org:     request.Org,
 		Project: request.Project,
 		Domain:  request.Domain,
@@ -396,13 +488,13 @@ func (m *ConfigurationResourceManager) DeleteProjectDomainAttributes(
 		return nil, err
 	}
 
-	configurationUpdateRequest, err := transformers.FromProjectDomainAttributesDeleteRequest(&request, configuration, activeDocument.Version)
+	configurationUpdateRequest, err := transformers.FromProjectDomainAttributesDeleteRequest(&request, *configurationWithVersion.Configuration, configurationWithVersion.Version)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to transform project domain attributes delete request into configuration update request with error: %v", err)
 		return nil, err
 	}
 
-	_, err = m.configurationManager.UpdateProjectDomainConfiguration(ctx, configurationUpdateRequest)
+	_, err = m.configurationManager.UpdateConfiguration(ctx, *configurationUpdateRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -446,12 +538,7 @@ func (m *ConfigurationResourceManager) UpdateWorkflowAttributes(
 		return nil, err
 	}
 
-	activeDocument, err := m.configurationManager.GetReadOnlyActiveDocument(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	configuration, err := util.GetConfigurationFromDocument(ctx, &activeDocument, &admin.ConfigurationID{
+	configurationWithVersion, err := m.getConfigurationWithVersion(ctx, &admin.ConfigurationID{
 		Org:      request.Attributes.Org,
 		Project:  request.Attributes.Project,
 		Domain:   request.Attributes.Domain,
@@ -461,13 +548,13 @@ func (m *ConfigurationResourceManager) UpdateWorkflowAttributes(
 		return nil, err
 	}
 
-	configurationUpdateRequest, err := transformers.FromWorkflowAttributesUpdateRequest(&request, configuration, activeDocument.Version)
+	configurationUpdateRequest, err := transformers.FromWorkflowAttributesUpdateRequest(&request, *configurationWithVersion.Configuration, configurationWithVersion.Version)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to transform workflow attributes update request into configuration update request with error: %v", err)
 		return nil, err
 	}
 
-	_, err = m.configurationManager.UpdateWorkflowConfiguration(ctx, configurationUpdateRequest)
+	_, err = m.configurationManager.UpdateConfiguration(ctx, *configurationUpdateRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -481,12 +568,7 @@ func (m *ConfigurationResourceManager) DeleteWorkflowAttributes(
 		return nil, err
 	}
 
-	activeDocument, err := m.configurationManager.GetReadOnlyActiveDocument(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	configuration, err := util.GetConfigurationFromDocument(ctx, &activeDocument, &admin.ConfigurationID{
+	configurationWithVersion, err := m.getConfigurationWithVersion(ctx, &admin.ConfigurationID{
 		Org:      request.Org,
 		Project:  request.Project,
 		Domain:   request.Domain,
@@ -496,13 +578,13 @@ func (m *ConfigurationResourceManager) DeleteWorkflowAttributes(
 		return nil, err
 	}
 
-	configurationUpdateRequest, err := transformers.FromWorkflowAttributesDeleteRequest(&request, configuration, activeDocument.Version)
+	configurationUpdateRequest, err := transformers.FromWorkflowAttributesDeleteRequest(&request, *configurationWithVersion.Configuration, configurationWithVersion.Version)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to transform workflow attributes delete request into configuration update request with error: %v", err)
 		return nil, err
 	}
 
-	_, err = m.configurationManager.UpdateWorkflowConfiguration(ctx, configurationUpdateRequest)
+	_, err = m.configurationManager.UpdateConfiguration(ctx, *configurationUpdateRequest)
 	if err != nil {
 		return nil, err
 	}

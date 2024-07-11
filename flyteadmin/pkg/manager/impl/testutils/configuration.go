@@ -17,6 +17,9 @@ func EncodeDocumentKey(id *admin.ConfigurationID) (string, error) {
 	return key, nil
 }
 
+// Redefine GlobalConfigurationKey here to capture that if have a different representation of global configuration key
+var GlobalConfigurationKey = admin.ConfigurationID{Global: true}
+
 var WorkflowExecutionQueueAttributes = &admin.MatchingAttributes{
 	Target: &admin.MatchingAttributes_ExecutionQueueAttributes{
 		ExecutionQueueAttributes: &admin.ExecutionQueueAttributes{
@@ -92,6 +95,31 @@ var ProjectTaskResourceAttributes = &admin.MatchingAttributes{
 	},
 }
 
+var OrgExecutionQueueAttributes = &admin.MatchingAttributes{
+	Target: &admin.MatchingAttributes_ExecutionQueueAttributes{
+		ExecutionQueueAttributes: &admin.ExecutionQueueAttributes{
+			Tags: []string{
+				"10", "11", "12",
+			},
+		},
+	},
+}
+
+var OrgTaskResourceAttributes = &admin.MatchingAttributes{
+	Target: &admin.MatchingAttributes_TaskResourceAttributes{
+		TaskResourceAttributes: &admin.TaskResourceAttributes{
+			Defaults: &admin.TaskResourceSpec{
+				Cpu:    "7",
+				Memory: "7Gi",
+			},
+			Limits: &admin.TaskResourceSpec{
+				Cpu:    "8",
+				Memory: "8Gi",
+			},
+		},
+	},
+}
+
 var UpdateTaskResourceAttributes = &admin.MatchingAttributes{
 	Target: &admin.MatchingAttributes_TaskResourceAttributes{
 		TaskResourceAttributes: &admin.TaskResourceAttributes{
@@ -148,7 +176,18 @@ func MockConfigurations(org, project, domain, workflow string) (map[string]*admi
 		TaskResourceAttributes:   ProjectTaskResourceAttributes.GetTaskResourceAttributes(),
 	}
 
-	key, err = EncodeDocumentKey(&admin.ConfigurationID{})
+	key, err = EncodeDocumentKey(&admin.ConfigurationID{
+		Org: org,
+	})
+	if err != nil {
+		return nil, err
+	}
+	mockConfigurations[key] = &admin.Configuration{
+		ExecutionQueueAttributes: OrgExecutionQueueAttributes.GetExecutionQueueAttributes(),
+		TaskResourceAttributes:   OrgTaskResourceAttributes.GetTaskResourceAttributes(),
+	}
+
+	key, err = EncodeDocumentKey(&GlobalConfigurationKey)
 	if err != nil {
 		return nil, err
 	}

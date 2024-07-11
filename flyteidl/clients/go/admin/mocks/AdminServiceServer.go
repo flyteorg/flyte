@@ -302,6 +302,47 @@ func (_m *AdminServiceServer) CreateWorkflowEvent(_a0 context.Context, _a1 *admi
 	return r0, r1
 }
 
+type AdminServiceServer_DeleteOrgAttributes struct {
+	*mock.Call
+}
+
+func (_m AdminServiceServer_DeleteOrgAttributes) Return(_a0 *admin.OrgAttributesDeleteResponse, _a1 error) *AdminServiceServer_DeleteOrgAttributes {
+	return &AdminServiceServer_DeleteOrgAttributes{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminServiceServer) OnDeleteOrgAttributes(_a0 context.Context, _a1 *admin.OrgAttributesDeleteRequest) *AdminServiceServer_DeleteOrgAttributes {
+	c_call := _m.On("DeleteOrgAttributes", _a0, _a1)
+	return &AdminServiceServer_DeleteOrgAttributes{Call: c_call}
+}
+
+func (_m *AdminServiceServer) OnDeleteOrgAttributesMatch(matchers ...interface{}) *AdminServiceServer_DeleteOrgAttributes {
+	c_call := _m.On("DeleteOrgAttributes", matchers...)
+	return &AdminServiceServer_DeleteOrgAttributes{Call: c_call}
+}
+
+// DeleteOrgAttributes provides a mock function with given fields: _a0, _a1
+func (_m *AdminServiceServer) DeleteOrgAttributes(_a0 context.Context, _a1 *admin.OrgAttributesDeleteRequest) (*admin.OrgAttributesDeleteResponse, error) {
+	ret := _m.Called(_a0, _a1)
+
+	var r0 *admin.OrgAttributesDeleteResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.OrgAttributesDeleteRequest) *admin.OrgAttributesDeleteResponse); ok {
+		r0 = rf(_a0, _a1)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.OrgAttributesDeleteResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.OrgAttributesDeleteRequest) error); ok {
+		r1 = rf(_a0, _a1)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type AdminServiceServer_DeleteProjectAttributes struct {
 	*mock.Call
 }
@@ -909,6 +950,47 @@ func (_m *AdminServiceServer) GetNodeExecutionData(_a0 context.Context, _a1 *adm
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, *admin.NodeExecutionGetDataRequest) error); ok {
+		r1 = rf(_a0, _a1)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type AdminServiceServer_GetOrgAttributes struct {
+	*mock.Call
+}
+
+func (_m AdminServiceServer_GetOrgAttributes) Return(_a0 *admin.OrgAttributesGetResponse, _a1 error) *AdminServiceServer_GetOrgAttributes {
+	return &AdminServiceServer_GetOrgAttributes{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminServiceServer) OnGetOrgAttributes(_a0 context.Context, _a1 *admin.OrgAttributesGetRequest) *AdminServiceServer_GetOrgAttributes {
+	c_call := _m.On("GetOrgAttributes", _a0, _a1)
+	return &AdminServiceServer_GetOrgAttributes{Call: c_call}
+}
+
+func (_m *AdminServiceServer) OnGetOrgAttributesMatch(matchers ...interface{}) *AdminServiceServer_GetOrgAttributes {
+	c_call := _m.On("GetOrgAttributes", matchers...)
+	return &AdminServiceServer_GetOrgAttributes{Call: c_call}
+}
+
+// GetOrgAttributes provides a mock function with given fields: _a0, _a1
+func (_m *AdminServiceServer) GetOrgAttributes(_a0 context.Context, _a1 *admin.OrgAttributesGetRequest) (*admin.OrgAttributesGetResponse, error) {
+	ret := _m.Called(_a0, _a1)
+
+	var r0 *admin.OrgAttributesGetResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.OrgAttributesGetRequest) *admin.OrgAttributesGetResponse); ok {
+		r0 = rf(_a0, _a1)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.OrgAttributesGetResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.OrgAttributesGetRequest) error); ok {
 		r1 = rf(_a0, _a1)
 	} else {
 		r1 = ret.Error(1)
@@ -2106,6 +2188,47 @@ func (_m *AdminServiceServer) TerminateExecution(_a0 context.Context, _a1 *admin
 	return r0, r1
 }
 
+type AdminServiceServer_UpdateConfiguration struct {
+	*mock.Call
+}
+
+func (_m AdminServiceServer_UpdateConfiguration) Return(_a0 *admin.ConfigurationUpdateResponse, _a1 error) *AdminServiceServer_UpdateConfiguration {
+	return &AdminServiceServer_UpdateConfiguration{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminServiceServer) OnUpdateConfiguration(_a0 context.Context, _a1 *admin.ConfigurationUpdateRequest) *AdminServiceServer_UpdateConfiguration {
+	c_call := _m.On("UpdateConfiguration", _a0, _a1)
+	return &AdminServiceServer_UpdateConfiguration{Call: c_call}
+}
+
+func (_m *AdminServiceServer) OnUpdateConfigurationMatch(matchers ...interface{}) *AdminServiceServer_UpdateConfiguration {
+	c_call := _m.On("UpdateConfiguration", matchers...)
+	return &AdminServiceServer_UpdateConfiguration{Call: c_call}
+}
+
+// UpdateConfiguration provides a mock function with given fields: _a0, _a1
+func (_m *AdminServiceServer) UpdateConfiguration(_a0 context.Context, _a1 *admin.ConfigurationUpdateRequest) (*admin.ConfigurationUpdateResponse, error) {
+	ret := _m.Called(_a0, _a1)
+
+	var r0 *admin.ConfigurationUpdateResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.ConfigurationUpdateRequest) *admin.ConfigurationUpdateResponse); ok {
+		r0 = rf(_a0, _a1)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.ConfigurationUpdateResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.ConfigurationUpdateRequest) error); ok {
+		r1 = rf(_a0, _a1)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type AdminServiceServer_UpdateExecution struct {
 	*mock.Call
 }
@@ -2229,6 +2352,47 @@ func (_m *AdminServiceServer) UpdateNamedEntity(_a0 context.Context, _a1 *admin.
 	return r0, r1
 }
 
+type AdminServiceServer_UpdateOrgAttributes struct {
+	*mock.Call
+}
+
+func (_m AdminServiceServer_UpdateOrgAttributes) Return(_a0 *admin.OrgAttributesUpdateResponse, _a1 error) *AdminServiceServer_UpdateOrgAttributes {
+	return &AdminServiceServer_UpdateOrgAttributes{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminServiceServer) OnUpdateOrgAttributes(_a0 context.Context, _a1 *admin.OrgAttributesUpdateRequest) *AdminServiceServer_UpdateOrgAttributes {
+	c_call := _m.On("UpdateOrgAttributes", _a0, _a1)
+	return &AdminServiceServer_UpdateOrgAttributes{Call: c_call}
+}
+
+func (_m *AdminServiceServer) OnUpdateOrgAttributesMatch(matchers ...interface{}) *AdminServiceServer_UpdateOrgAttributes {
+	c_call := _m.On("UpdateOrgAttributes", matchers...)
+	return &AdminServiceServer_UpdateOrgAttributes{Call: c_call}
+}
+
+// UpdateOrgAttributes provides a mock function with given fields: _a0, _a1
+func (_m *AdminServiceServer) UpdateOrgAttributes(_a0 context.Context, _a1 *admin.OrgAttributesUpdateRequest) (*admin.OrgAttributesUpdateResponse, error) {
+	ret := _m.Called(_a0, _a1)
+
+	var r0 *admin.OrgAttributesUpdateResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.OrgAttributesUpdateRequest) *admin.OrgAttributesUpdateResponse); ok {
+		r0 = rf(_a0, _a1)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.OrgAttributesUpdateResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.OrgAttributesUpdateRequest) error); ok {
+		r1 = rf(_a0, _a1)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type AdminServiceServer_UpdateProject struct {
 	*mock.Call
 }
@@ -2344,47 +2508,6 @@ func (_m *AdminServiceServer) UpdateProjectDomainAttributes(_a0 context.Context,
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, *admin.ProjectDomainAttributesUpdateRequest) error); ok {
-		r1 = rf(_a0, _a1)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-type AdminServiceServer_UpdateProjectDomainConfiguration struct {
-	*mock.Call
-}
-
-func (_m AdminServiceServer_UpdateProjectDomainConfiguration) Return(_a0 *admin.ConfigurationUpdateResponse, _a1 error) *AdminServiceServer_UpdateProjectDomainConfiguration {
-	return &AdminServiceServer_UpdateProjectDomainConfiguration{Call: _m.Call.Return(_a0, _a1)}
-}
-
-func (_m *AdminServiceServer) OnUpdateProjectDomainConfiguration(_a0 context.Context, _a1 *admin.ConfigurationUpdateRequest) *AdminServiceServer_UpdateProjectDomainConfiguration {
-	c_call := _m.On("UpdateProjectDomainConfiguration", _a0, _a1)
-	return &AdminServiceServer_UpdateProjectDomainConfiguration{Call: c_call}
-}
-
-func (_m *AdminServiceServer) OnUpdateProjectDomainConfigurationMatch(matchers ...interface{}) *AdminServiceServer_UpdateProjectDomainConfiguration {
-	c_call := _m.On("UpdateProjectDomainConfiguration", matchers...)
-	return &AdminServiceServer_UpdateProjectDomainConfiguration{Call: c_call}
-}
-
-// UpdateProjectDomainConfiguration provides a mock function with given fields: _a0, _a1
-func (_m *AdminServiceServer) UpdateProjectDomainConfiguration(_a0 context.Context, _a1 *admin.ConfigurationUpdateRequest) (*admin.ConfigurationUpdateResponse, error) {
-	ret := _m.Called(_a0, _a1)
-
-	var r0 *admin.ConfigurationUpdateResponse
-	if rf, ok := ret.Get(0).(func(context.Context, *admin.ConfigurationUpdateRequest) *admin.ConfigurationUpdateResponse); ok {
-		r0 = rf(_a0, _a1)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*admin.ConfigurationUpdateResponse)
-		}
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, *admin.ConfigurationUpdateRequest) error); ok {
 		r1 = rf(_a0, _a1)
 	} else {
 		r1 = ret.Error(1)

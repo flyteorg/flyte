@@ -26,6 +26,10 @@ message ConfigurationID {
   // Name of the workflow the configuration belongs to.
   // +optional
   string workflow = 4;
+
+  // If it is a global configuration.
+  // +optional
+  bool global = 5;
 }
 
 // The source of an attribute. We may have other sources in the future.
@@ -44,6 +48,9 @@ enum AttributesSource {
 
   // The configuration is a project-domain configuration.
   PROJECT_DOMAIN = 4;
+
+  // The configuration is a org configuration.
+  ORG = 5;
 }
 
 message TaskResourceAttributesWithSource {

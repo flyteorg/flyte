@@ -10,6 +10,7 @@ from flyteidl.admin import execution_pb2 as flyteidl_dot_admin_dot_execution__pb
 from flyteidl.admin import launch_plan_pb2 as flyteidl_dot_admin_dot_launch__plan__pb2
 from flyteidl.admin import matchable_resource_pb2 as flyteidl_dot_admin_dot_matchable__resource__pb2
 from flyteidl.admin import node_execution_pb2 as flyteidl_dot_admin_dot_node__execution__pb2
+from flyteidl.admin import org_attributes_pb2 as flyteidl_dot_admin_dot_org__attributes__pb2
 from flyteidl.admin import project_attributes_pb2 as flyteidl_dot_admin_dot_project__attributes__pb2
 from flyteidl.admin import project_domain_attributes_pb2 as flyteidl_dot_admin_dot_project__domain__attributes__pb2
 from flyteidl.admin import project_pb2 as flyteidl_dot_admin_dot_project__pb2
@@ -261,6 +262,21 @@ class AdminServiceStub(object):
                 request_serializer=flyteidl_dot_admin_dot_workflow__attributes__pb2.WorkflowAttributesGetRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_admin_dot_workflow__attributes__pb2.WorkflowAttributesGetResponse.FromString,
                 )
+        self.UpdateOrgAttributes = channel.unary_unary(
+                '/flyteidl.service.AdminService/UpdateOrgAttributes',
+                request_serializer=flyteidl_dot_admin_dot_org__attributes__pb2.OrgAttributesUpdateRequest.SerializeToString,
+                response_deserializer=flyteidl_dot_admin_dot_org__attributes__pb2.OrgAttributesUpdateResponse.FromString,
+                )
+        self.GetOrgAttributes = channel.unary_unary(
+                '/flyteidl.service.AdminService/GetOrgAttributes',
+                request_serializer=flyteidl_dot_admin_dot_org__attributes__pb2.OrgAttributesGetRequest.SerializeToString,
+                response_deserializer=flyteidl_dot_admin_dot_org__attributes__pb2.OrgAttributesGetResponse.FromString,
+                )
+        self.DeleteOrgAttributes = channel.unary_unary(
+                '/flyteidl.service.AdminService/DeleteOrgAttributes',
+                request_serializer=flyteidl_dot_admin_dot_org__attributes__pb2.OrgAttributesDeleteRequest.SerializeToString,
+                response_deserializer=flyteidl_dot_admin_dot_org__attributes__pb2.OrgAttributesDeleteResponse.FromString,
+                )
         self.DeleteWorkflowAttributes = channel.unary_unary(
                 '/flyteidl.service.AdminService/DeleteWorkflowAttributes',
                 request_serializer=flyteidl_dot_admin_dot_workflow__attributes__pb2.WorkflowAttributesDeleteRequest.SerializeToString,
@@ -321,8 +337,8 @@ class AdminServiceStub(object):
                 request_serializer=flyteidl_dot_admin_dot_configuration__pb2.ConfigurationGetRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_admin_dot_configuration__pb2.ConfigurationGetResponse.FromString,
                 )
-        self.UpdateProjectDomainConfiguration = channel.unary_unary(
-                '/flyteidl.service.AdminService/UpdateProjectDomainConfiguration',
+        self.UpdateConfiguration = channel.unary_unary(
+                '/flyteidl.service.AdminService/UpdateConfiguration',
                 request_serializer=flyteidl_dot_admin_dot_configuration__pb2.ConfigurationUpdateRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_admin_dot_configuration__pb2.ConfigurationUpdateResponse.FromString,
                 )
@@ -661,6 +677,27 @@ class AdminServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def UpdateOrgAttributes(self, request, context):
+        """Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` at the org level
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetOrgAttributes(self, request, context):
+        """Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` at the org level
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def DeleteOrgAttributes(self, request, context):
+        """Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` at the org level
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
     def DeleteWorkflowAttributes(self, request, context):
         """Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.
         """
@@ -737,14 +774,14 @@ class AdminServiceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def GetConfiguration(self, request, context):
-        """Fetch a unified project attribute.
+        """Fetch the entire unified attribute configuration.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def UpdateProjectDomainConfiguration(self, request, context):
-        """Update a unified project attribute.
+    def UpdateConfiguration(self, request, context):
+        """Update the entire unified attribute configuration.
         Requests will fail for stale values of version_to_update
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -984,6 +1021,21 @@ def add_AdminServiceServicer_to_server(servicer, server):
                     request_deserializer=flyteidl_dot_admin_dot_workflow__attributes__pb2.WorkflowAttributesGetRequest.FromString,
                     response_serializer=flyteidl_dot_admin_dot_workflow__attributes__pb2.WorkflowAttributesGetResponse.SerializeToString,
             ),
+            'UpdateOrgAttributes': grpc.unary_unary_rpc_method_handler(
+                    servicer.UpdateOrgAttributes,
+                    request_deserializer=flyteidl_dot_admin_dot_org__attributes__pb2.OrgAttributesUpdateRequest.FromString,
+                    response_serializer=flyteidl_dot_admin_dot_org__attributes__pb2.OrgAttributesUpdateResponse.SerializeToString,
+            ),
+            'GetOrgAttributes': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetOrgAttributes,
+                    request_deserializer=flyteidl_dot_admin_dot_org__attributes__pb2.OrgAttributesGetRequest.FromString,
+                    response_serializer=flyteidl_dot_admin_dot_org__attributes__pb2.OrgAttributesGetResponse.SerializeToString,
+            ),
+            'DeleteOrgAttributes': grpc.unary_unary_rpc_method_handler(
+                    servicer.DeleteOrgAttributes,
+                    request_deserializer=flyteidl_dot_admin_dot_org__attributes__pb2.OrgAttributesDeleteRequest.FromString,
+                    response_serializer=flyteidl_dot_admin_dot_org__attributes__pb2.OrgAttributesDeleteResponse.SerializeToString,
+            ),
             'DeleteWorkflowAttributes': grpc.unary_unary_rpc_method_handler(
                     servicer.DeleteWorkflowAttributes,
                     request_deserializer=flyteidl_dot_admin_dot_workflow__attributes__pb2.WorkflowAttributesDeleteRequest.FromString,
@@ -1044,8 +1096,8 @@ def add_AdminServiceServicer_to_server(servicer, server):
                     request_deserializer=flyteidl_dot_admin_dot_configuration__pb2.ConfigurationGetRequest.FromString,
                     response_serializer=flyteidl_dot_admin_dot_configuration__pb2.ConfigurationGetResponse.SerializeToString,
             ),
-            'UpdateProjectDomainConfiguration': grpc.unary_unary_rpc_method_handler(
-                    servicer.UpdateProjectDomainConfiguration,
+            'UpdateConfiguration': grpc.unary_unary_rpc_method_handler(
+                    servicer.UpdateConfiguration,
                     request_deserializer=flyteidl_dot_admin_dot_configuration__pb2.ConfigurationUpdateRequest.FromString,
                     response_serializer=flyteidl_dot_admin_dot_configuration__pb2.ConfigurationUpdateResponse.SerializeToString,
             ),
@@ -1844,6 +1896,57 @@ class AdminService(object):
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
+    def UpdateOrgAttributes(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AdminService/UpdateOrgAttributes',
+            flyteidl_dot_admin_dot_org__attributes__pb2.OrgAttributesUpdateRequest.SerializeToString,
+            flyteidl_dot_admin_dot_org__attributes__pb2.OrgAttributesUpdateResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetOrgAttributes(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AdminService/GetOrgAttributes',
+            flyteidl_dot_admin_dot_org__attributes__pb2.OrgAttributesGetRequest.SerializeToString,
+            flyteidl_dot_admin_dot_org__attributes__pb2.OrgAttributesGetResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def DeleteOrgAttributes(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AdminService/DeleteOrgAttributes',
+            flyteidl_dot_admin_dot_org__attributes__pb2.OrgAttributesDeleteRequest.SerializeToString,
+            flyteidl_dot_admin_dot_org__attributes__pb2.OrgAttributesDeleteResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
     def DeleteWorkflowAttributes(request,
             target,
             options=(),
@@ -2048,7 +2151,7 @@ class AdminService(object):
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def UpdateProjectDomainConfiguration(request,
+    def UpdateConfiguration(request,
             target,
             options=(),
             channel_credentials=None,
@@ -2058,7 +2161,7 @@ class AdminService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AdminService/UpdateProjectDomainConfiguration',
+        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AdminService/UpdateConfiguration',
             flyteidl_dot_admin_dot_configuration__pb2.ConfigurationUpdateRequest.SerializeToString,
             flyteidl_dot_admin_dot_configuration__pb2.ConfigurationUpdateResponse.FromString,
             options, channel_credentials,

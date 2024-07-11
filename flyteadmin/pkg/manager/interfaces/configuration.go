@@ -11,9 +11,7 @@ import (
 // Interface for managing project configuration, which includes attributes such as task resource attributes
 type ConfigurationInterface interface {
 	GetConfiguration(ctx context.Context, request admin.ConfigurationGetRequest) (*admin.ConfigurationGetResponse, error)
-	UpdateWorkflowConfiguration(ctx context.Context, request admin.ConfigurationUpdateRequest) (*admin.ConfigurationUpdateResponse, error)
-	UpdateProjectDomainConfiguration(ctx context.Context, request admin.ConfigurationUpdateRequest) (*admin.ConfigurationUpdateResponse, error)
-	UpdateProjectConfiguration(ctx context.Context, request admin.ConfigurationUpdateRequest) (*admin.ConfigurationUpdateResponse, error)
+	UpdateConfiguration(ctx context.Context, request admin.ConfigurationUpdateRequest) (*admin.ConfigurationUpdateResponse, error)
 	GetReadOnlyActiveDocument(ctx context.Context) (admin.ConfigurationDocument, error)
 	GetEditableActiveDocument(ctx context.Context) (admin.ConfigurationDocument, error)
 }

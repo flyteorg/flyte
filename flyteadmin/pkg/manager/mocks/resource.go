@@ -7,6 +7,13 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
+type UpdateOrgAttrsFunc func(ctx context.Context, request admin.OrgAttributesUpdateRequest) (
+	*admin.OrgAttributesUpdateResponse, error)
+type GetOrgAttrFunc func(ctx context.Context, request admin.OrgAttributesGetRequest) (
+	*admin.OrgAttributesGetResponse, error)
+type DeleteOrgAttrFunc func(ctx context.Context, request admin.OrgAttributesDeleteRequest) (
+	*admin.OrgAttributesDeleteResponse, error)
+
 type UpdateProjectAttrsFunc func(ctx context.Context, request admin.ProjectAttributesUpdateRequest) (
 	*admin.ProjectAttributesUpdateResponse, error)
 type GetProjectAttrFunc func(ctx context.Context, request admin.ProjectAttributesGetRequest) (
@@ -33,6 +40,9 @@ type MockResourceManager struct {
 	updateProjectAttrsFunc  UpdateProjectAttrsFunc
 	getProjectAttrFunc      GetProjectAttrFunc
 	deleteProjectAttrFunc   DeleteProjectAttrFunc
+	updateOrgAttrsFunc      UpdateOrgAttrsFunc
+	getOrgAttrsFunc         GetOrgAttrFunc
+	deleteOrgAttrsFunc      DeleteOrgAttrFunc
 }
 
 func (m *MockResourceManager) GetResource(ctx context.Context, request interfaces.ResourceRequest) (*interfaces.ResourceResponse, error) {
@@ -120,6 +130,42 @@ func (m *MockResourceManager) DeleteProjectAttributes(ctx context.Context, reque
 	*admin.ProjectAttributesDeleteResponse, error) {
 	if m.deleteProjectAttrFunc != nil {
 		return m.deleteProjectAttrFunc(ctx, request)
+	}
+	return nil, nil
+}
+
+func (m *MockResourceManager) SetUpdateOrgAttributes(updateOrgAttrsFunc UpdateOrgAttrsFunc) {
+	m.updateOrgAttrsFunc = updateOrgAttrsFunc
+}
+
+func (m *MockResourceManager) UpdateOrgAttributes(ctx context.Context, request admin.OrgAttributesUpdateRequest) (
+	*admin.OrgAttributesUpdateResponse, error) {
+	if m.updateOrgAttrsFunc != nil {
+		return m.updateOrgAttrsFunc(ctx, request)
+	}
+	return nil, nil
+}
+
+func (m *MockResourceManager) SetGetOrgAttributes(getOrgAttrsFunc GetOrgAttrFunc) {
+	m.getOrgAttrsFunc = getOrgAttrsFunc
+}
+
+func (m *MockResourceManager) GetOrgAttributes(ctx context.Context, request admin.OrgAttributesGetRequest) (
+	*admin.OrgAttributesGetResponse, error) {
+	if m.getOrgAttrsFunc != nil {
+		return m.getOrgAttrsFunc(ctx, request)
+	}
+	return nil, nil
+}
+
+func (m *MockResourceManager) SetDeleteOrgAttributes(deleteOrgAttrsFunc DeleteOrgAttrFunc) {
+	m.deleteOrgAttrsFunc = deleteOrgAttrsFunc
+}
+
+func (m *MockResourceManager) DeleteOrgAttributes(ctx context.Context, request admin.OrgAttributesDeleteRequest) (
+	*admin.OrgAttributesDeleteResponse, error) {
+	if m.deleteOrgAttrsFunc != nil {
+		return m.deleteOrgAttrsFunc(ctx, request)
 	}
 	return nil, nil
 }

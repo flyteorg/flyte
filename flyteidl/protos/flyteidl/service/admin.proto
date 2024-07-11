@@ -7,6 +7,7 @@ import "google/api/annotations.proto";
 import "flyteidl/admin/project.proto";
 import "flyteidl/admin/project_domain_attributes.proto";
 import "flyteidl/admin/project_attributes.proto";
+import "flyteidl/admin/org_attributes.proto";
 import "flyteidl/admin/task.proto";
 import "flyteidl/admin/workflow.proto";
 import "flyteidl/admin/workflow_attributes.proto";
@@ -666,7 +667,7 @@ service AdminService {
       put: "/api/v1/project_attributes/{attributes.project}"
       body: "*"
       additional_bindings {
-        put: "/api/v1/org/project_domain_attributes/{attributes.org}/{attributes.project}"
+        put: "/api/v1/org/project_attributes/{attributes.org}/{attributes.project}"
         body: "*"
       }
     };
@@ -680,7 +681,7 @@ service AdminService {
     option (google.api.http) = {
       get: "/api/v1/project_attributes/{project}"
       additional_bindings {
-        get: "/api/v1/org/project_domain_attributes/{org}/{project}"
+        get: "/api/v1/org/project_attributes/{org}/{project}"
       }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -694,7 +695,7 @@ service AdminService {
       delete: "/api/v1/project_attributes/{project}"
       body: "*"
       additional_bindings {
-        delete: "/api/v1/org/project_domain_attributes/{org}/{project}"
+        delete: "/api/v1/org/project_attributes/{org}/{project}"
         body: "*"
       }
     };
@@ -727,6 +728,49 @@ service AdminService {
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       description: "Retrieve the customized resource attributes associated with a project, domain and workflow combination"
+    };
+  }
+
+  // Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` at the org level
+  rpc UpdateOrgAttributes (flyteidl.admin.OrgAttributesUpdateRequest) returns (flyteidl.admin.OrgAttributesUpdateResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/org_attributes"
+      body: "*"
+      additional_bindings {
+        put: "/api/v1/org/org_attributes/{attributes.org}"
+        body: "*"
+      }
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      description: "Update the customized resource attributes associated with a org"
+    };
+  }
+
+  // Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` at the org level
+  rpc GetOrgAttributes (flyteidl.admin.OrgAttributesGetRequest) returns (flyteidl.admin.OrgAttributesGetResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/org_attributes"
+      additional_bindings {
+        get: "/api/v1/org/org_attributes/{org}"
+      }
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      description: "Retrieve the customized resource attributes associated with a org"
+    };
+  }
+
+  // Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` at the org level
+  rpc DeleteOrgAttributes (flyteidl.admin.OrgAttributesDeleteRequest) returns (flyteidl.admin.OrgAttributesDeleteResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/org_attributes"
+      body: "*"
+      additional_bindings {
+        delete: "/api/v1/org/org_attributes/{org}"
+        body: "*"
+      }
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      description: "Delete the customized resource attributes associated with a org"
     };
   }
 
@@ -872,7 +916,7 @@ service AdminService {
     };
   }
 
-  // Fetch a unified project attribute.
+  // Fetch the entire unified attribute configuration.
   rpc GetConfiguration (flyteidl.admin.ConfigurationGetRequest) returns (flyteidl.admin.ConfigurationGetResponse) {
     option (google.api.http) = {
       get: "/api/v1/configuration/{id.project}/{id.domain}"
@@ -888,14 +932,33 @@ service AdminService {
     };
   }
 
-  // Update a unified project attribute.
+  // Update the entire unified attribute configuration.
   // Requests will fail for stale values of version_to_update
-  rpc UpdateProjectDomainConfiguration (flyteidl.admin.ConfigurationUpdateRequest) returns (flyteidl.admin.ConfigurationUpdateResponse) {
+  rpc UpdateConfiguration (flyteidl.admin.ConfigurationUpdateRequest) returns (flyteidl.admin.ConfigurationUpdateResponse) {
     option (google.api.http) = {
+      // project-domain
       post: "/api/v1/configuration/{id.project}/{id.domain}"
       body: "*"
       additional_bindings {
         post: "/api/v1/org/configuration/{id.org}/{id.project}/{id.domain}"
+        body: "*"
+      }
+      // project
+      additional_bindings {
+        post: "/api/v1/configuration/{id.project}"
+        body: "*"
+      }
+      additional_bindings {
+        post: "/api/v1/org/configuration/{id.org}/{id.project}"
+        body: "*"
+      }
+      // org
+      additional_bindings {
+        post: "/api/v1/configuration"
+        body: "*"
+      }
+      additional_bindings {
+        post: "/api/v1/org/configuration/{id.org}"
         body: "*"
       }
     };

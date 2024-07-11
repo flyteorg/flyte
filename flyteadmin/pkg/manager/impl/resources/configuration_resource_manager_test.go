@@ -12,6 +12,7 @@ import (
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/testutils"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/util"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
 	managerMocks "github.com/flyteorg/flyte/flyteadmin/pkg/manager/mocks"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/mocks"
@@ -56,7 +57,7 @@ func TestUpdateWorkflowAttributes_Configuration(t *testing.T) {
 			TaskResourceAttributes:   testutils.UpdateTaskResourceAttributes.GetTaskResourceAttributes(),
 		},
 	}
-	mockConfigManager.On("UpdateWorkflowConfiguration", mock.Anything, expectedConfigurationUpdateRequest).Return(&admin.ConfigurationUpdateResponse{}, nil)
+	mockConfigManager.On("UpdateConfiguration", mock.Anything, expectedConfigurationUpdateRequest).Return(&admin.ConfigurationUpdateResponse{}, nil)
 	_, err = manager.UpdateWorkflowAttributes(context.Background(), request)
 	assert.NoError(t, err)
 	mockConfigManager.AssertExpectations(t)
@@ -128,7 +129,7 @@ func TestDeleteWorkflowAttributes_Configuration(t *testing.T) {
 			TaskResourceAttributes: testutils.WorkflowTaskResourceAttributes.GetTaskResourceAttributes(),
 		},
 	}
-	mockConfigManager.On("UpdateWorkflowConfiguration", mock.Anything, expectedConfigurationUpdateRequest).Return(&admin.ConfigurationUpdateResponse{}, nil)
+	mockConfigManager.On("UpdateConfiguration", mock.Anything, expectedConfigurationUpdateRequest).Return(&admin.ConfigurationUpdateResponse{}, nil)
 	_, err = manager.DeleteWorkflowAttributes(context.Background(), request)
 	assert.Nil(t, err)
 	mockConfigManager.AssertExpectations(t)
@@ -167,7 +168,7 @@ func TestUpdateProjectDomainAttributes_Configuration(t *testing.T) {
 			TaskResourceAttributes:   testutils.UpdateTaskResourceAttributes.GetTaskResourceAttributes(),
 		},
 	}
-	mockConfigManager.On("UpdateProjectDomainConfiguration", mock.Anything, expectedConfigurationUpdateRequest).Return(&admin.ConfigurationUpdateResponse{}, nil)
+	mockConfigManager.On("UpdateConfiguration", mock.Anything, expectedConfigurationUpdateRequest).Return(&admin.ConfigurationUpdateResponse{}, nil)
 	_, err = manager.UpdateProjectDomainAttributes(context.Background(), request)
 	assert.NoError(t, err)
 	mockConfigManager.AssertExpectations(t)
@@ -235,7 +236,7 @@ func TestDeleteProjectDomainAttributes_Configuration(t *testing.T) {
 			TaskResourceAttributes: testutils.ProjectDomainTaskResourceAttributes.GetTaskResourceAttributes(),
 		},
 	}
-	mockConfigManager.On("UpdateProjectDomainConfiguration", mock.Anything, expectedConfigurationUpdateRequest).Return(&admin.ConfigurationUpdateResponse{}, nil)
+	mockConfigManager.On("UpdateConfiguration", mock.Anything, expectedConfigurationUpdateRequest).Return(&admin.ConfigurationUpdateResponse{}, nil)
 	_, err = manager.DeleteProjectDomainAttributes(context.Background(), request)
 	assert.Nil(t, err)
 	mockConfigManager.AssertExpectations(t)
@@ -272,7 +273,7 @@ func TestUpdateProjectAttributes_Configuration(t *testing.T) {
 			TaskResourceAttributes:   testutils.UpdateTaskResourceAttributes.GetTaskResourceAttributes(),
 		},
 	}
-	mockConfigManager.On("UpdateProjectConfiguration", mock.Anything, expectedConfigurationUpdateRequest).Return(&admin.ConfigurationUpdateResponse{}, nil)
+	mockConfigManager.On("UpdateConfiguration", mock.Anything, expectedConfigurationUpdateRequest).Return(&admin.ConfigurationUpdateResponse{}, nil)
 	_, err = manager.UpdateProjectAttributes(context.Background(), request)
 	assert.NoError(t, err)
 	mockConfigManager.AssertExpectations(t)
@@ -322,7 +323,7 @@ func TestGetProjectAttributes_ConfigLookup_Configuration(t *testing.T) {
 		manager := NewConfigurationResourceManager(db, testutils.GetApplicationConfigWithDefaultDomains(), mockConfigManager)
 		mockConfigurations, err := testutils.MockConfigurations(org, project, domain, workflow)
 		assert.Nil(t, err)
-		key, err := testutils.EncodeDocumentKey(&admin.ConfigurationID{})
+		key, err := testutils.EncodeDocumentKey(&util.GlobalConfigurationKey)
 		assert.Nil(t, err)
 		mockConfigurations[key] = &admin.Configuration{
 			WorkflowExecutionConfig: &admin.WorkflowExecutionConfig{
@@ -376,7 +377,7 @@ func TestGetProjectAttributes_ConfigLookup_Configuration(t *testing.T) {
 		manager := NewConfigurationResourceManager(db, testutils.GetApplicationConfigWithDefaultDomains(), mockConfigManager)
 		mockConfigurations, err := testutils.MockConfigurations(org, project, domain, workflow)
 		assert.Nil(t, err)
-		key, err := testutils.EncodeDocumentKey(&admin.ConfigurationID{})
+		key, err := testutils.EncodeDocumentKey(&util.GlobalConfigurationKey)
 		assert.Nil(t, err)
 		mockConfigurations[key] = &admin.Configuration{
 			WorkflowExecutionConfig: &admin.WorkflowExecutionConfig{
@@ -418,7 +419,7 @@ func TestGetProjectAttributes_ConfigLookup_Configuration(t *testing.T) {
 		manager := NewConfigurationResourceManager(db, testutils.GetApplicationConfigWithDefaultDomains(), mockConfigManager)
 		mockConfigurations, err := testutils.MockConfigurations(org, project, domain, workflow)
 		assert.Nil(t, err)
-		key, err := testutils.EncodeDocumentKey(&admin.ConfigurationID{})
+		key, err := testutils.EncodeDocumentKey(&util.GlobalConfigurationKey)
 		assert.Nil(t, err)
 		mockConfigurations[key] = &admin.Configuration{
 			WorkflowExecutionConfig: &admin.WorkflowExecutionConfig{
@@ -460,7 +461,7 @@ func TestGetProjectAttributes_ConfigLookup_Configuration(t *testing.T) {
 		manager := NewConfigurationResourceManager(db, testutils.GetApplicationConfigWithDefaultDomains(), mockConfigManager)
 		mockConfigurations, err := testutils.MockConfigurations(org, project, domain, workflow)
 		assert.Nil(t, err)
-		key, err := testutils.EncodeDocumentKey(&admin.ConfigurationID{})
+		key, err := testutils.EncodeDocumentKey(&util.GlobalConfigurationKey)
 		assert.Nil(t, err)
 		mockConfigurations[key] = &admin.Configuration{
 			WorkflowExecutionConfig: &admin.WorkflowExecutionConfig{
@@ -524,8 +525,103 @@ func TestDeleteProjectAttributes_Configuration(t *testing.T) {
 			TaskResourceAttributes: testutils.ProjectTaskResourceAttributes.GetTaskResourceAttributes(),
 		},
 	}
-	mockConfigManager.On("UpdateProjectConfiguration", mock.Anything, expectedConfigurationUpdateRequest).Return(&admin.ConfigurationUpdateResponse{}, nil)
+	mockConfigManager.On("UpdateConfiguration", mock.Anything, expectedConfigurationUpdateRequest).Return(&admin.ConfigurationUpdateResponse{}, nil)
 	_, err = manager.DeleteProjectAttributes(context.Background(), request)
+	assert.Nil(t, err)
+	mockConfigManager.AssertExpectations(t)
+}
+
+func TestUpdateOrgAttributes_Configuration(t *testing.T) {
+	request := admin.OrgAttributesUpdateRequest{
+		Attributes: &admin.OrgAttributes{
+			Org:                org,
+			MatchingAttributes: testutils.UpdateTaskResourceAttributes,
+		},
+	}
+	db := mocks.NewMockRepository()
+	mockConfigManager := new(managerMocks.ConfigurationInterface)
+	manager := NewConfigurationResourceManager(db, testutils.GetApplicationConfigWithDefaultDomains(), mockConfigManager)
+
+	mockConfigurations, err := testutils.MockConfigurations(org, project, domain, workflow)
+	assert.Nil(t, err)
+
+	mockConfigManager.On("GetReadOnlyActiveDocument", mock.Anything).Return(admin.ConfigurationDocument{
+		Configurations: mockConfigurations,
+		Version:        version,
+	}, nil)
+
+	expectedConfigurationUpdateRequest := admin.ConfigurationUpdateRequest{
+		Id: &admin.ConfigurationID{
+			Org: org,
+		},
+		VersionToUpdate: version,
+		Configuration: &admin.Configuration{
+			ExecutionQueueAttributes: testutils.OrgExecutionQueueAttributes.GetExecutionQueueAttributes(),
+			TaskResourceAttributes:   testutils.UpdateTaskResourceAttributes.GetTaskResourceAttributes(),
+		},
+	}
+	mockConfigManager.On("UpdateConfiguration", mock.Anything, expectedConfigurationUpdateRequest).Return(&admin.ConfigurationUpdateResponse{}, nil)
+	_, err = manager.UpdateOrgAttributes(context.Background(), request)
+	assert.NoError(t, err)
+	mockConfigManager.AssertExpectations(t)
+}
+
+func TestGetOrgAttributes_Configuration(t *testing.T) {
+	request := admin.OrgAttributesGetRequest{
+		Org:          org,
+		ResourceType: admin.MatchableResource_EXECUTION_QUEUE,
+	}
+	db := mocks.NewMockRepository()
+	mockConfigManager := new(managerMocks.ConfigurationInterface)
+	manager := NewConfigurationResourceManager(db, testutils.GetApplicationConfigWithDefaultDomains(), mockConfigManager)
+
+	mockConfigurations, err := testutils.MockConfigurations(org, project, domain, workflow)
+	assert.Nil(t, err)
+
+	mockConfigManager.On("GetReadOnlyActiveDocument", mock.Anything).Return(admin.ConfigurationDocument{
+		Configurations: mockConfigurations,
+		Version:        version,
+	}, nil)
+
+	response, err := manager.GetOrgAttributes(context.Background(), request)
+	assert.Nil(t, err)
+	assert.True(t, proto.Equal(&admin.OrgAttributesGetResponse{
+		Attributes: &admin.OrgAttributes{
+			Org:                org,
+			MatchingAttributes: testutils.OrgExecutionQueueAttributes,
+		},
+	}, response))
+	mockConfigManager.AssertExpectations(t)
+}
+
+func TestDeleteOrgAttributes_Configuration(t *testing.T) {
+	request := admin.OrgAttributesDeleteRequest{
+		Org:          org,
+		ResourceType: admin.MatchableResource_EXECUTION_QUEUE,
+	}
+	db := mocks.NewMockRepository()
+	mockConfigManager := new(managerMocks.ConfigurationInterface)
+	manager := NewConfigurationResourceManager(db, testutils.GetApplicationConfigWithDefaultDomains(), mockConfigManager)
+
+	mockConfigurations, err := testutils.MockConfigurations(org, project, domain, workflow)
+	assert.Nil(t, err)
+
+	mockConfigManager.On("GetReadOnlyActiveDocument", mock.Anything).Return(admin.ConfigurationDocument{
+		Configurations: mockConfigurations,
+		Version:        version,
+	}, nil)
+
+	expectedConfigurationUpdateRequest := admin.ConfigurationUpdateRequest{
+		Id: &admin.ConfigurationID{
+			Org: org,
+		},
+		VersionToUpdate: version,
+		Configuration: &admin.Configuration{
+			TaskResourceAttributes: testutils.OrgTaskResourceAttributes.GetTaskResourceAttributes(),
+		},
+	}
+	mockConfigManager.On("UpdateConfiguration", mock.Anything, expectedConfigurationUpdateRequest).Return(&admin.ConfigurationUpdateResponse{}, nil)
+	_, err = manager.DeleteOrgAttributes(context.Background(), request)
 	assert.Nil(t, err)
 	mockConfigManager.AssertExpectations(t)
 }
@@ -579,7 +675,7 @@ func TestListAll_Configuration(t *testing.T) {
 	})
 	assert.Nil(t, err)
 	assert.NotNil(t, response.Configurations)
-	assert.Len(t, response.Configurations, 3)
+	assert.Len(t, response.Configurations, 4)
 	assert.True(t, proto.Equal(&admin.MatchableAttributesConfiguration{
 		Org:        org,
 		Project:    project,
@@ -598,5 +694,9 @@ func TestListAll_Configuration(t *testing.T) {
 		Project:    project,
 		Attributes: testutils.ProjectExecutionQueueAttributes,
 	}, response.Configurations[2]))
+	assert.True(t, proto.Equal(&admin.MatchableAttributesConfiguration{
+		Org:        org,
+		Attributes: testutils.OrgExecutionQueueAttributes,
+	}, response.Configurations[3]))
 	mockConfigManager.AssertExpectations(t)
 }

@@ -30189,6 +30189,7 @@
                  * @property {string|null} [domain] ConfigurationID domain
                  * @property {string|null} [project] ConfigurationID project
                  * @property {string|null} [workflow] ConfigurationID workflow
+                 * @property {boolean|null} [global] ConfigurationID global
                  */
     
                 /**
@@ -30239,6 +30240,14 @@
                 ConfigurationID.prototype.workflow = "";
     
                 /**
+                 * ConfigurationID global.
+                 * @member {boolean} global
+                 * @memberof flyteidl.admin.ConfigurationID
+                 * @instance
+                 */
+                ConfigurationID.prototype.global = false;
+    
+                /**
                  * Creates a new ConfigurationID instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.ConfigurationID
@@ -30270,6 +30279,8 @@
                         writer.uint32(/* id 3, wireType 2 =*/26).string(message.project);
                     if (message.workflow != null && message.hasOwnProperty("workflow"))
                         writer.uint32(/* id 4, wireType 2 =*/34).string(message.workflow);
+                    if (message.global != null && message.hasOwnProperty("global"))
+                        writer.uint32(/* id 5, wireType 0 =*/40).bool(message.global);
                     return writer;
                 };
     
@@ -30303,6 +30314,9 @@
                         case 4:
                             message.workflow = reader.string();
                             break;
+                        case 5:
+                            message.global = reader.bool();
+                            break;
                         default:
                             reader.skipType(tag & 7);
                             break;
@@ -30334,6 +30348,9 @@
                     if (message.workflow != null && message.hasOwnProperty("workflow"))
                         if (!$util.isString(message.workflow))
                             return "workflow: string expected";
+                    if (message.global != null && message.hasOwnProperty("global"))
+                        if (typeof message.global !== "boolean")
+                            return "global: boolean expected";
                     return null;
                 };
     
@@ -30349,6 +30366,7 @@
              * @property {number} DOMAIN=2 DOMAIN value
              * @property {number} PROJECT=3 PROJECT value
              * @property {number} PROJECT_DOMAIN=4 PROJECT_DOMAIN value
+             * @property {number} ORG=5 ORG value
              */
             admin.AttributesSource = (function() {
                 var valuesById = {}, values = Object.create(valuesById);
@@ -30357,6 +30375,7 @@
                 values[valuesById[2] = "DOMAIN"] = 2;
                 values[valuesById[3] = "PROJECT"] = 3;
                 values[valuesById[4] = "PROJECT_DOMAIN"] = 4;
+                values[valuesById[5] = "ORG"] = 5;
                 return values;
             })();
     
@@ -30498,6 +30517,7 @@
                         case 2:
                         case 3:
                         case 4:
+                        case 5:
                             break;
                         }
                     if (message.value != null && message.hasOwnProperty("value")) {
@@ -30652,6 +30672,7 @@
                         case 2:
                         case 3:
                         case 4:
+                        case 5:
                             break;
                         }
                     if (message.value != null && message.hasOwnProperty("value")) {
@@ -30806,6 +30827,7 @@
                         case 2:
                         case 3:
                         case 4:
+                        case 5:
                             break;
                         }
                     if (message.value != null && message.hasOwnProperty("value")) {
@@ -30960,6 +30982,7 @@
                         case 2:
                         case 3:
                         case 4:
+                        case 5:
                             break;
                         }
                     if (message.value != null && message.hasOwnProperty("value")) {
@@ -31114,6 +31137,7 @@
                         case 2:
                         case 3:
                         case 4:
+                        case 5:
                             break;
                         }
                     if (message.value != null && message.hasOwnProperty("value")) {
@@ -31268,6 +31292,7 @@
                         case 2:
                         case 3:
                         case 4:
+                        case 5:
                             break;
                         }
                     if (message.value != null && message.hasOwnProperty("value")) {
@@ -31422,6 +31447,7 @@
                         case 2:
                         case 3:
                         case 4:
+                        case 5:
                             break;
                         }
                     if (message.value != null && message.hasOwnProperty("value")) {
@@ -31576,6 +31602,7 @@
                         case 2:
                         case 3:
                         case 4:
+                        case 5:
                             break;
                         }
                     if (message.value != null && message.hasOwnProperty("value")) {
@@ -31730,6 +31757,7 @@
                         case 2:
                         case 3:
                         case 4:
+                        case 5:
                             break;
                         }
                     if (message.value != null && message.hasOwnProperty("value")) {
@@ -46472,6 +46500,823 @@
                 return EmailMessage;
             })();
     
+            admin.OrgAttributes = (function() {
+    
+                /**
+                 * Properties of an OrgAttributes.
+                 * @memberof flyteidl.admin
+                 * @interface IOrgAttributes
+                 * @property {flyteidl.admin.IMatchingAttributes|null} [matchingAttributes] OrgAttributes matchingAttributes
+                 * @property {string|null} [org] OrgAttributes org
+                 */
+    
+                /**
+                 * Constructs a new OrgAttributes.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents an OrgAttributes.
+                 * @implements IOrgAttributes
+                 * @constructor
+                 * @param {flyteidl.admin.IOrgAttributes=} [properties] Properties to set
+                 */
+                function OrgAttributes(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * OrgAttributes matchingAttributes.
+                 * @member {flyteidl.admin.IMatchingAttributes|null|undefined} matchingAttributes
+                 * @memberof flyteidl.admin.OrgAttributes
+                 * @instance
+                 */
+                OrgAttributes.prototype.matchingAttributes = null;
+    
+                /**
+                 * OrgAttributes org.
+                 * @member {string} org
+                 * @memberof flyteidl.admin.OrgAttributes
+                 * @instance
+                 */
+                OrgAttributes.prototype.org = "";
+    
+                /**
+                 * Creates a new OrgAttributes instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.OrgAttributes
+                 * @static
+                 * @param {flyteidl.admin.IOrgAttributes=} [properties] Properties to set
+                 * @returns {flyteidl.admin.OrgAttributes} OrgAttributes instance
+                 */
+                OrgAttributes.create = function create(properties) {
+                    return new OrgAttributes(properties);
+                };
+    
+                /**
+                 * Encodes the specified OrgAttributes message. Does not implicitly {@link flyteidl.admin.OrgAttributes.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.OrgAttributes
+                 * @static
+                 * @param {flyteidl.admin.IOrgAttributes} message OrgAttributes message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                OrgAttributes.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.matchingAttributes != null && message.hasOwnProperty("matchingAttributes"))
+                        $root.flyteidl.admin.MatchingAttributes.encode(message.matchingAttributes, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.org != null && message.hasOwnProperty("org"))
+                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.org);
+                    return writer;
+                };
+    
+                /**
+                 * Decodes an OrgAttributes message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.OrgAttributes
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.OrgAttributes} OrgAttributes
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                OrgAttributes.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.OrgAttributes();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.matchingAttributes = $root.flyteidl.admin.MatchingAttributes.decode(reader, reader.uint32());
+                            break;
+                        case 2:
+                            message.org = reader.string();
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies an OrgAttributes message.
+                 * @function verify
+                 * @memberof flyteidl.admin.OrgAttributes
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                OrgAttributes.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.matchingAttributes != null && message.hasOwnProperty("matchingAttributes")) {
+                        var error = $root.flyteidl.admin.MatchingAttributes.verify(message.matchingAttributes);
+                        if (error)
+                            return "matchingAttributes." + error;
+                    }
+                    if (message.org != null && message.hasOwnProperty("org"))
+                        if (!$util.isString(message.org))
+                            return "org: string expected";
+                    return null;
+                };
+    
+                return OrgAttributes;
+            })();
+    
+            admin.OrgAttributesUpdateRequest = (function() {
+    
+                /**
+                 * Properties of an OrgAttributesUpdateRequest.
+                 * @memberof flyteidl.admin
+                 * @interface IOrgAttributesUpdateRequest
+                 * @property {flyteidl.admin.IOrgAttributes|null} [attributes] OrgAttributesUpdateRequest attributes
+                 */
+    
+                /**
+                 * Constructs a new OrgAttributesUpdateRequest.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents an OrgAttributesUpdateRequest.
+                 * @implements IOrgAttributesUpdateRequest
+                 * @constructor
+                 * @param {flyteidl.admin.IOrgAttributesUpdateRequest=} [properties] Properties to set
+                 */
+                function OrgAttributesUpdateRequest(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * OrgAttributesUpdateRequest attributes.
+                 * @member {flyteidl.admin.IOrgAttributes|null|undefined} attributes
+                 * @memberof flyteidl.admin.OrgAttributesUpdateRequest
+                 * @instance
+                 */
+                OrgAttributesUpdateRequest.prototype.attributes = null;
+    
+                /**
+                 * Creates a new OrgAttributesUpdateRequest instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.OrgAttributesUpdateRequest
+                 * @static
+                 * @param {flyteidl.admin.IOrgAttributesUpdateRequest=} [properties] Properties to set
+                 * @returns {flyteidl.admin.OrgAttributesUpdateRequest} OrgAttributesUpdateRequest instance
+                 */
+                OrgAttributesUpdateRequest.create = function create(properties) {
+                    return new OrgAttributesUpdateRequest(properties);
+                };
+    
+                /**
+                 * Encodes the specified OrgAttributesUpdateRequest message. Does not implicitly {@link flyteidl.admin.OrgAttributesUpdateRequest.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.OrgAttributesUpdateRequest
+                 * @static
+                 * @param {flyteidl.admin.IOrgAttributesUpdateRequest} message OrgAttributesUpdateRequest message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                OrgAttributesUpdateRequest.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.attributes != null && message.hasOwnProperty("attributes"))
+                        $root.flyteidl.admin.OrgAttributes.encode(message.attributes, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes an OrgAttributesUpdateRequest message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.OrgAttributesUpdateRequest
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.OrgAttributesUpdateRequest} OrgAttributesUpdateRequest
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                OrgAttributesUpdateRequest.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.OrgAttributesUpdateRequest();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.attributes = $root.flyteidl.admin.OrgAttributes.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies an OrgAttributesUpdateRequest message.
+                 * @function verify
+                 * @memberof flyteidl.admin.OrgAttributesUpdateRequest
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                OrgAttributesUpdateRequest.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.attributes != null && message.hasOwnProperty("attributes")) {
+                        var error = $root.flyteidl.admin.OrgAttributes.verify(message.attributes);
+                        if (error)
+                            return "attributes." + error;
+                    }
+                    return null;
+                };
+    
+                return OrgAttributesUpdateRequest;
+            })();
+    
+            admin.OrgAttributesUpdateResponse = (function() {
+    
+                /**
+                 * Properties of an OrgAttributesUpdateResponse.
+                 * @memberof flyteidl.admin
+                 * @interface IOrgAttributesUpdateResponse
+                 */
+    
+                /**
+                 * Constructs a new OrgAttributesUpdateResponse.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents an OrgAttributesUpdateResponse.
+                 * @implements IOrgAttributesUpdateResponse
+                 * @constructor
+                 * @param {flyteidl.admin.IOrgAttributesUpdateResponse=} [properties] Properties to set
+                 */
+                function OrgAttributesUpdateResponse(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * Creates a new OrgAttributesUpdateResponse instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.OrgAttributesUpdateResponse
+                 * @static
+                 * @param {flyteidl.admin.IOrgAttributesUpdateResponse=} [properties] Properties to set
+                 * @returns {flyteidl.admin.OrgAttributesUpdateResponse} OrgAttributesUpdateResponse instance
+                 */
+                OrgAttributesUpdateResponse.create = function create(properties) {
+                    return new OrgAttributesUpdateResponse(properties);
+                };
+    
+                /**
+                 * Encodes the specified OrgAttributesUpdateResponse message. Does not implicitly {@link flyteidl.admin.OrgAttributesUpdateResponse.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.OrgAttributesUpdateResponse
+                 * @static
+                 * @param {flyteidl.admin.IOrgAttributesUpdateResponse} message OrgAttributesUpdateResponse message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                OrgAttributesUpdateResponse.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes an OrgAttributesUpdateResponse message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.OrgAttributesUpdateResponse
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.OrgAttributesUpdateResponse} OrgAttributesUpdateResponse
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                OrgAttributesUpdateResponse.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.OrgAttributesUpdateResponse();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies an OrgAttributesUpdateResponse message.
+                 * @function verify
+                 * @memberof flyteidl.admin.OrgAttributesUpdateResponse
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                OrgAttributesUpdateResponse.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    return null;
+                };
+    
+                return OrgAttributesUpdateResponse;
+            })();
+    
+            admin.OrgAttributesGetRequest = (function() {
+    
+                /**
+                 * Properties of an OrgAttributesGetRequest.
+                 * @memberof flyteidl.admin
+                 * @interface IOrgAttributesGetRequest
+                 * @property {flyteidl.admin.MatchableResource|null} [resourceType] OrgAttributesGetRequest resourceType
+                 * @property {string|null} [org] OrgAttributesGetRequest org
+                 */
+    
+                /**
+                 * Constructs a new OrgAttributesGetRequest.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents an OrgAttributesGetRequest.
+                 * @implements IOrgAttributesGetRequest
+                 * @constructor
+                 * @param {flyteidl.admin.IOrgAttributesGetRequest=} [properties] Properties to set
+                 */
+                function OrgAttributesGetRequest(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * OrgAttributesGetRequest resourceType.
+                 * @member {flyteidl.admin.MatchableResource} resourceType
+                 * @memberof flyteidl.admin.OrgAttributesGetRequest
+                 * @instance
+                 */
+                OrgAttributesGetRequest.prototype.resourceType = 0;
+    
+                /**
+                 * OrgAttributesGetRequest org.
+                 * @member {string} org
+                 * @memberof flyteidl.admin.OrgAttributesGetRequest
+                 * @instance
+                 */
+                OrgAttributesGetRequest.prototype.org = "";
+    
+                /**
+                 * Creates a new OrgAttributesGetRequest instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.OrgAttributesGetRequest
+                 * @static
+                 * @param {flyteidl.admin.IOrgAttributesGetRequest=} [properties] Properties to set
+                 * @returns {flyteidl.admin.OrgAttributesGetRequest} OrgAttributesGetRequest instance
+                 */
+                OrgAttributesGetRequest.create = function create(properties) {
+                    return new OrgAttributesGetRequest(properties);
+                };
+    
+                /**
+                 * Encodes the specified OrgAttributesGetRequest message. Does not implicitly {@link flyteidl.admin.OrgAttributesGetRequest.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.OrgAttributesGetRequest
+                 * @static
+                 * @param {flyteidl.admin.IOrgAttributesGetRequest} message OrgAttributesGetRequest message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                OrgAttributesGetRequest.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.resourceType != null && message.hasOwnProperty("resourceType"))
+                        writer.uint32(/* id 1, wireType 0 =*/8).int32(message.resourceType);
+                    if (message.org != null && message.hasOwnProperty("org"))
+                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.org);
+                    return writer;
+                };
+    
+                /**
+                 * Decodes an OrgAttributesGetRequest message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.OrgAttributesGetRequest
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.OrgAttributesGetRequest} OrgAttributesGetRequest
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                OrgAttributesGetRequest.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.OrgAttributesGetRequest();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.resourceType = reader.int32();
+                            break;
+                        case 2:
+                            message.org = reader.string();
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies an OrgAttributesGetRequest message.
+                 * @function verify
+                 * @memberof flyteidl.admin.OrgAttributesGetRequest
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                OrgAttributesGetRequest.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.resourceType != null && message.hasOwnProperty("resourceType"))
+                        switch (message.resourceType) {
+                        default:
+                            return "resourceType: enum value expected";
+                        case 0:
+                        case 1:
+                        case 2:
+                        case 3:
+                        case 4:
+                        case 5:
+                        case 6:
+                        case 7:
+                        case 8:
+                            break;
+                        }
+                    if (message.org != null && message.hasOwnProperty("org"))
+                        if (!$util.isString(message.org))
+                            return "org: string expected";
+                    return null;
+                };
+    
+                return OrgAttributesGetRequest;
+            })();
+    
+            admin.OrgAttributesGetResponse = (function() {
+    
+                /**
+                 * Properties of an OrgAttributesGetResponse.
+                 * @memberof flyteidl.admin
+                 * @interface IOrgAttributesGetResponse
+                 * @property {flyteidl.admin.IOrgAttributes|null} [attributes] OrgAttributesGetResponse attributes
+                 */
+    
+                /**
+                 * Constructs a new OrgAttributesGetResponse.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents an OrgAttributesGetResponse.
+                 * @implements IOrgAttributesGetResponse
+                 * @constructor
+                 * @param {flyteidl.admin.IOrgAttributesGetResponse=} [properties] Properties to set
+                 */
+                function OrgAttributesGetResponse(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * OrgAttributesGetResponse attributes.
+                 * @member {flyteidl.admin.IOrgAttributes|null|undefined} attributes
+                 * @memberof flyteidl.admin.OrgAttributesGetResponse
+                 * @instance
+                 */
+                OrgAttributesGetResponse.prototype.attributes = null;
+    
+                /**
+                 * Creates a new OrgAttributesGetResponse instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.OrgAttributesGetResponse
+                 * @static
+                 * @param {flyteidl.admin.IOrgAttributesGetResponse=} [properties] Properties to set
+                 * @returns {flyteidl.admin.OrgAttributesGetResponse} OrgAttributesGetResponse instance
+                 */
+                OrgAttributesGetResponse.create = function create(properties) {
+                    return new OrgAttributesGetResponse(properties);
+                };
+    
+                /**
+                 * Encodes the specified OrgAttributesGetResponse message. Does not implicitly {@link flyteidl.admin.OrgAttributesGetResponse.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.OrgAttributesGetResponse
+                 * @static
+                 * @param {flyteidl.admin.IOrgAttributesGetResponse} message OrgAttributesGetResponse message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                OrgAttributesGetResponse.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.attributes != null && message.hasOwnProperty("attributes"))
+                        $root.flyteidl.admin.OrgAttributes.encode(message.attributes, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes an OrgAttributesGetResponse message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.OrgAttributesGetResponse
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.OrgAttributesGetResponse} OrgAttributesGetResponse
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                OrgAttributesGetResponse.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.OrgAttributesGetResponse();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.attributes = $root.flyteidl.admin.OrgAttributes.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies an OrgAttributesGetResponse message.
+                 * @function verify
+                 * @memberof flyteidl.admin.OrgAttributesGetResponse
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                OrgAttributesGetResponse.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.attributes != null && message.hasOwnProperty("attributes")) {
+                        var error = $root.flyteidl.admin.OrgAttributes.verify(message.attributes);
+                        if (error)
+                            return "attributes." + error;
+                    }
+                    return null;
+                };
+    
+                return OrgAttributesGetResponse;
+            })();
+    
+            admin.OrgAttributesDeleteRequest = (function() {
+    
+                /**
+                 * Properties of an OrgAttributesDeleteRequest.
+                 * @memberof flyteidl.admin
+                 * @interface IOrgAttributesDeleteRequest
+                 * @property {flyteidl.admin.MatchableResource|null} [resourceType] OrgAttributesDeleteRequest resourceType
+                 * @property {string|null} [org] OrgAttributesDeleteRequest org
+                 */
+    
+                /**
+                 * Constructs a new OrgAttributesDeleteRequest.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents an OrgAttributesDeleteRequest.
+                 * @implements IOrgAttributesDeleteRequest
+                 * @constructor
+                 * @param {flyteidl.admin.IOrgAttributesDeleteRequest=} [properties] Properties to set
+                 */
+                function OrgAttributesDeleteRequest(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * OrgAttributesDeleteRequest resourceType.
+                 * @member {flyteidl.admin.MatchableResource} resourceType
+                 * @memberof flyteidl.admin.OrgAttributesDeleteRequest
+                 * @instance
+                 */
+                OrgAttributesDeleteRequest.prototype.resourceType = 0;
+    
+                /**
+                 * OrgAttributesDeleteRequest org.
+                 * @member {string} org
+                 * @memberof flyteidl.admin.OrgAttributesDeleteRequest
+                 * @instance
+                 */
+                OrgAttributesDeleteRequest.prototype.org = "";
+    
+                /**
+                 * Creates a new OrgAttributesDeleteRequest instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.OrgAttributesDeleteRequest
+                 * @static
+                 * @param {flyteidl.admin.IOrgAttributesDeleteRequest=} [properties] Properties to set
+                 * @returns {flyteidl.admin.OrgAttributesDeleteRequest} OrgAttributesDeleteRequest instance
+                 */
+                OrgAttributesDeleteRequest.create = function create(properties) {
+                    return new OrgAttributesDeleteRequest(properties);
+                };
+    
+                /**
+                 * Encodes the specified OrgAttributesDeleteRequest message. Does not implicitly {@link flyteidl.admin.OrgAttributesDeleteRequest.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.OrgAttributesDeleteRequest
+                 * @static
+                 * @param {flyteidl.admin.IOrgAttributesDeleteRequest} message OrgAttributesDeleteRequest message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                OrgAttributesDeleteRequest.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.resourceType != null && message.hasOwnProperty("resourceType"))
+                        writer.uint32(/* id 1, wireType 0 =*/8).int32(message.resourceType);
+                    if (message.org != null && message.hasOwnProperty("org"))
+                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.org);
+                    return writer;
+                };
+    
+                /**
+                 * Decodes an OrgAttributesDeleteRequest message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.OrgAttributesDeleteRequest
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.OrgAttributesDeleteRequest} OrgAttributesDeleteRequest
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                OrgAttributesDeleteRequest.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.OrgAttributesDeleteRequest();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.resourceType = reader.int32();
+                            break;
+                        case 2:
+                            message.org = reader.string();
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies an OrgAttributesDeleteRequest message.
+                 * @function verify
+                 * @memberof flyteidl.admin.OrgAttributesDeleteRequest
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                OrgAttributesDeleteRequest.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.resourceType != null && message.hasOwnProperty("resourceType"))
+                        switch (message.resourceType) {
+                        default:
+                            return "resourceType: enum value expected";
+                        case 0:
+                        case 1:
+                        case 2:
+                        case 3:
+                        case 4:
+                        case 5:
+                        case 6:
+                        case 7:
+                        case 8:
+                            break;
+                        }
+                    if (message.org != null && message.hasOwnProperty("org"))
+                        if (!$util.isString(message.org))
+                            return "org: string expected";
+                    return null;
+                };
+    
+                return OrgAttributesDeleteRequest;
+            })();
+    
+            admin.OrgAttributesDeleteResponse = (function() {
+    
+                /**
+                 * Properties of an OrgAttributesDeleteResponse.
+                 * @memberof flyteidl.admin
+                 * @interface IOrgAttributesDeleteResponse
+                 */
+    
+                /**
+                 * Constructs a new OrgAttributesDeleteResponse.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents an OrgAttributesDeleteResponse.
+                 * @implements IOrgAttributesDeleteResponse
+                 * @constructor
+                 * @param {flyteidl.admin.IOrgAttributesDeleteResponse=} [properties] Properties to set
+                 */
+                function OrgAttributesDeleteResponse(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * Creates a new OrgAttributesDeleteResponse instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.OrgAttributesDeleteResponse
+                 * @static
+                 * @param {flyteidl.admin.IOrgAttributesDeleteResponse=} [properties] Properties to set
+                 * @returns {flyteidl.admin.OrgAttributesDeleteResponse} OrgAttributesDeleteResponse instance
+                 */
+                OrgAttributesDeleteResponse.create = function create(properties) {
+                    return new OrgAttributesDeleteResponse(properties);
+                };
+    
+                /**
+                 * Encodes the specified OrgAttributesDeleteResponse message. Does not implicitly {@link flyteidl.admin.OrgAttributesDeleteResponse.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.OrgAttributesDeleteResponse
+                 * @static
+                 * @param {flyteidl.admin.IOrgAttributesDeleteResponse} message OrgAttributesDeleteResponse message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                OrgAttributesDeleteResponse.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes an OrgAttributesDeleteResponse message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.OrgAttributesDeleteResponse
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.OrgAttributesDeleteResponse} OrgAttributesDeleteResponse
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                OrgAttributesDeleteResponse.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.OrgAttributesDeleteResponse();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies an OrgAttributesDeleteResponse message.
+                 * @function verify
+                 * @memberof flyteidl.admin.OrgAttributesDeleteResponse
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                OrgAttributesDeleteResponse.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    return null;
+                };
+    
+                return OrgAttributesDeleteResponse;
+            })();
+    
             admin.Domain = (function() {
     
                 /**
@@ -56477,6 +57322,105 @@
                  */
     
                 /**
+                 * Callback as used by {@link flyteidl.service.AdminService#updateOrgAttributes}.
+                 * @memberof flyteidl.service.AdminService
+                 * @typedef UpdateOrgAttributesCallback
+                 * @type {function}
+                 * @param {Error|null} error Error, if any
+                 * @param {flyteidl.admin.OrgAttributesUpdateResponse} [response] OrgAttributesUpdateResponse
+                 */
+    
+                /**
+                 * Calls UpdateOrgAttributes.
+                 * @function updateOrgAttributes
+                 * @memberof flyteidl.service.AdminService
+                 * @instance
+                 * @param {flyteidl.admin.IOrgAttributesUpdateRequest} request OrgAttributesUpdateRequest message or plain object
+                 * @param {flyteidl.service.AdminService.UpdateOrgAttributesCallback} callback Node-style callback called with the error, if any, and OrgAttributesUpdateResponse
+                 * @returns {undefined}
+                 * @variation 1
+                 */
+                Object.defineProperty(AdminService.prototype.updateOrgAttributes = function updateOrgAttributes(request, callback) {
+                    return this.rpcCall(updateOrgAttributes, $root.flyteidl.admin.OrgAttributesUpdateRequest, $root.flyteidl.admin.OrgAttributesUpdateResponse, request, callback);
+                }, "name", { value: "UpdateOrgAttributes" });
+    
+                /**
+                 * Calls UpdateOrgAttributes.
+                 * @function updateOrgAttributes
+                 * @memberof flyteidl.service.AdminService
+                 * @instance
+                 * @param {flyteidl.admin.IOrgAttributesUpdateRequest} request OrgAttributesUpdateRequest message or plain object
+                 * @returns {Promise<flyteidl.admin.OrgAttributesUpdateResponse>} Promise
+                 * @variation 2
+                 */
+    
+                /**
+                 * Callback as used by {@link flyteidl.service.AdminService#getOrgAttributes}.
+                 * @memberof flyteidl.service.AdminService
+                 * @typedef GetOrgAttributesCallback
+                 * @type {function}
+                 * @param {Error|null} error Error, if any
+                 * @param {flyteidl.admin.OrgAttributesGetResponse} [response] OrgAttributesGetResponse
+                 */
+    
+                /**
+                 * Calls GetOrgAttributes.
+                 * @function getOrgAttributes
+                 * @memberof flyteidl.service.AdminService
+                 * @instance
+                 * @param {flyteidl.admin.IOrgAttributesGetRequest} request OrgAttributesGetRequest message or plain object
+                 * @param {flyteidl.service.AdminService.GetOrgAttributesCallback} callback Node-style callback called with the error, if any, and OrgAttributesGetResponse
+                 * @returns {undefined}
+                 * @variation 1
+                 */
+                Object.defineProperty(AdminService.prototype.getOrgAttributes = function getOrgAttributes(request, callback) {
+                    return this.rpcCall(getOrgAttributes, $root.flyteidl.admin.OrgAttributesGetRequest, $root.flyteidl.admin.OrgAttributesGetResponse, request, callback);
+                }, "name", { value: "GetOrgAttributes" });
+    
+                /**
+                 * Calls GetOrgAttributes.
+                 * @function getOrgAttributes
+                 * @memberof flyteidl.service.AdminService
+                 * @instance
+                 * @param {flyteidl.admin.IOrgAttributesGetRequest} request OrgAttributesGetRequest message or plain object
+                 * @returns {Promise<flyteidl.admin.OrgAttributesGetResponse>} Promise
+                 * @variation 2
+                 */
+    
+                /**
+                 * Callback as used by {@link flyteidl.service.AdminService#deleteOrgAttributes}.
+                 * @memberof flyteidl.service.AdminService
+                 * @typedef DeleteOrgAttributesCallback
+                 * @type {function}
+                 * @param {Error|null} error Error, if any
+                 * @param {flyteidl.admin.OrgAttributesDeleteResponse} [response] OrgAttributesDeleteResponse
+                 */
+    
+                /**
+                 * Calls DeleteOrgAttributes.
+                 * @function deleteOrgAttributes
+                 * @memberof flyteidl.service.AdminService
+                 * @instance
+                 * @param {flyteidl.admin.IOrgAttributesDeleteRequest} request OrgAttributesDeleteRequest message or plain object
+                 * @param {flyteidl.service.AdminService.DeleteOrgAttributesCallback} callback Node-style callback called with the error, if any, and OrgAttributesDeleteResponse
+                 * @returns {undefined}
+                 * @variation 1
+                 */
+                Object.defineProperty(AdminService.prototype.deleteOrgAttributes = function deleteOrgAttributes(request, callback) {
+                    return this.rpcCall(deleteOrgAttributes, $root.flyteidl.admin.OrgAttributesDeleteRequest, $root.flyteidl.admin.OrgAttributesDeleteResponse, request, callback);
+                }, "name", { value: "DeleteOrgAttributes" });
+    
+                /**
+                 * Calls DeleteOrgAttributes.
+                 * @function deleteOrgAttributes
+                 * @memberof flyteidl.service.AdminService
+                 * @instance
+                 * @param {flyteidl.admin.IOrgAttributesDeleteRequest} request OrgAttributesDeleteRequest message or plain object
+                 * @returns {Promise<flyteidl.admin.OrgAttributesDeleteResponse>} Promise
+                 * @variation 2
+                 */
+    
+                /**
                  * Callback as used by {@link flyteidl.service.AdminService#deleteWorkflowAttributes}.
                  * @memberof flyteidl.service.AdminService
                  * @typedef DeleteWorkflowAttributesCallback
@@ -56873,31 +57817,31 @@
                  */
     
                 /**
-                 * Callback as used by {@link flyteidl.service.AdminService#updateProjectDomainConfiguration}.
+                 * Callback as used by {@link flyteidl.service.AdminService#updateConfiguration}.
                  * @memberof flyteidl.service.AdminService
-                 * @typedef UpdateProjectDomainConfigurationCallback
+                 * @typedef UpdateConfigurationCallback
                  * @type {function}
                  * @param {Error|null} error Error, if any
                  * @param {flyteidl.admin.ConfigurationUpdateResponse} [response] ConfigurationUpdateResponse
                  */
     
                 /**
-                 * Calls UpdateProjectDomainConfiguration.
-                 * @function updateProjectDomainConfiguration
+                 * Calls UpdateConfiguration.
+                 * @function updateConfiguration
                  * @memberof flyteidl.service.AdminService
                  * @instance
                  * @param {flyteidl.admin.IConfigurationUpdateRequest} request ConfigurationUpdateRequest message or plain object
-                 * @param {flyteidl.service.AdminService.UpdateProjectDomainConfigurationCallback} callback Node-style callback called with the error, if any, and ConfigurationUpdateResponse
+                 * @param {flyteidl.service.AdminService.UpdateConfigurationCallback} callback Node-style callback called with the error, if any, and ConfigurationUpdateResponse
                  * @returns {undefined}
                  * @variation 1
                  */
-                Object.defineProperty(AdminService.prototype.updateProjectDomainConfiguration = function updateProjectDomainConfiguration(request, callback) {
-                    return this.rpcCall(updateProjectDomainConfiguration, $root.flyteidl.admin.ConfigurationUpdateRequest, $root.flyteidl.admin.ConfigurationUpdateResponse, request, callback);
-                }, "name", { value: "UpdateProjectDomainConfiguration" });
+                Object.defineProperty(AdminService.prototype.updateConfiguration = function updateConfiguration(request, callback) {
+                    return this.rpcCall(updateConfiguration, $root.flyteidl.admin.ConfigurationUpdateRequest, $root.flyteidl.admin.ConfigurationUpdateResponse, request, callback);
+                }, "name", { value: "UpdateConfiguration" });
     
                 /**
-                 * Calls UpdateProjectDomainConfiguration.
-                 * @function updateProjectDomainConfiguration
+                 * Calls UpdateConfiguration.
+                 * @function updateConfiguration
                  * @memberof flyteidl.service.AdminService
                  * @instance
                  * @param {flyteidl.admin.IConfigurationUpdateRequest} request ConfigurationUpdateRequest message or plain object

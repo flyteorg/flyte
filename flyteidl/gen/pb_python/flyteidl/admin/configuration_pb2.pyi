@@ -16,11 +16,13 @@ class AttributesSource(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     DOMAIN: _ClassVar[AttributesSource]
     PROJECT: _ClassVar[AttributesSource]
     PROJECT_DOMAIN: _ClassVar[AttributesSource]
+    ORG: _ClassVar[AttributesSource]
 SOURCE_UNSPECIFIED: AttributesSource
 GLOBAL: AttributesSource
 DOMAIN: AttributesSource
 PROJECT: AttributesSource
 PROJECT_DOMAIN: AttributesSource
+ORG: AttributesSource
 
 class ConfigurationID(_message.Message):
     __slots__ = ["org", "domain", "project", "workflow"]
@@ -28,11 +30,12 @@ class ConfigurationID(_message.Message):
     DOMAIN_FIELD_NUMBER: _ClassVar[int]
     PROJECT_FIELD_NUMBER: _ClassVar[int]
     WORKFLOW_FIELD_NUMBER: _ClassVar[int]
+    GLOBAL_FIELD_NUMBER: _ClassVar[int]
     org: str
     domain: str
     project: str
     workflow: str
-    def __init__(self, org: _Optional[str] = ..., domain: _Optional[str] = ..., project: _Optional[str] = ..., workflow: _Optional[str] = ...) -> None: ...
+    def __init__(self, org: _Optional[str] = ..., domain: _Optional[str] = ..., project: _Optional[str] = ..., workflow: _Optional[str] = ..., **kwargs) -> None: ...
 
 class TaskResourceAttributesWithSource(_message.Message):
     __slots__ = ["source", "value", "is_mutable"]

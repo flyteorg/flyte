@@ -28,6 +28,7 @@ type ConfigurationManager struct {
 	storageClient  *storage.DataStore
 	cacheConfigDoc *configurationDocumentCache
 	pluginRegistry *plugins.Registry
+	validator      validation.ConfigurationValidator
 }
 
 const (
@@ -88,7 +89,7 @@ func (m *ConfigurationManager) GetConfiguration(
 	ctx context.Context, request admin.ConfigurationGetRequest) (
 	*admin.ConfigurationGetResponse, error) {
 	// Validate the request
-	if err := validation.ValidateConfigurationGetRequest(request); err != nil {
+	if err := m.validator.ValidateGetRequest(ctx, request); err != nil {
 		return nil, err
 	}
 	if request.Id.Domain != "" && request.Id.Project == "" && request.Id.Workflow == "" {
@@ -103,7 +104,7 @@ func (m *ConfigurationManager) getProjectDomainConfiguration(
 	ctx context.Context, request admin.ConfigurationGetRequest) (
 	*admin.ConfigurationGetResponse, error) {
 	// Validate the request
-	if err := validation.ValidateProjectDomainConfigurationGetRequest(ctx, m.db, m.config.ApplicationConfiguration(), request); err != nil {
+	if err := m.validator.ValidateProjectDomainGetRequest(ctx, request); err != nil {
 		return nil, err
 	}
 
@@ -131,7 +132,7 @@ func (m *ConfigurationManager) getDefaultConfiguration(
 	ctx context.Context, request admin.ConfigurationGetRequest) (
 	*admin.ConfigurationGetResponse, error) {
 	// Validate the request
-	if err := validation.ValidateDefaultConfigurationGetRequest(ctx, m.config.ApplicationConfiguration(), request); err != nil {
+	if err := m.validator.ValidateDefaultGetRequest(ctx, request); err != nil {
 		return nil, err
 	}
 
@@ -154,39 +155,11 @@ func (m *ConfigurationManager) getDefaultConfiguration(
 	return response, nil
 }
 
-func (m *ConfigurationManager) UpdateWorkflowConfiguration(
-	ctx context.Context, request admin.ConfigurationUpdateRequest) (
-	*admin.ConfigurationUpdateResponse, error) {
-	if err := validation.ValidateWorkflowConfigurationUpdateRequest(ctx, m.db, m.config.ApplicationConfiguration(), request); err != nil {
-		return nil, err
-	}
-
-	return m.updateConfiguration(ctx, request)
-}
-func (m *ConfigurationManager) UpdateProjectDomainConfiguration(
-	ctx context.Context, request admin.ConfigurationUpdateRequest) (
-	*admin.ConfigurationUpdateResponse, error) {
-	if err := validation.ValidateProjectDomainConfigurationUpdateRequest(ctx, m.db, m.config.ApplicationConfiguration(), request); err != nil {
-		return nil, err
-	}
-
-	return m.updateConfiguration(ctx, request)
-}
-func (m *ConfigurationManager) UpdateProjectConfiguration(
-	ctx context.Context, request admin.ConfigurationUpdateRequest) (
-	*admin.ConfigurationUpdateResponse, error) {
-	if err := validation.ValidateProjectConfigurationUpdateRequest(ctx, m.db, request); err != nil {
-		return nil, err
-	}
-
-	return m.updateConfiguration(ctx, request)
-}
-
-func (m *ConfigurationManager) updateConfiguration(
+func (m *ConfigurationManager) UpdateConfiguration(
 	ctx context.Context, request admin.ConfigurationUpdateRequest) (
 	*admin.ConfigurationUpdateResponse, error) {
 	// Validate the request
-	if err := validation.ValidateConfigurationUpdateRequest(request); err != nil {
+	if err := m.validator.ValidateUpdateRequest(ctx, request); err != nil {
 		return nil, err
 	}
 
@@ -383,6 +356,7 @@ func (m *ConfigurationManager) canEditAttributes(ctx context.Context, request ad
 // In the context of a flyteadmin, we expect to mutate the global configuration based on the values in configmap. At this scenario, we expect bootstrap to be true.
 // In the context of a cluster resource controller, we expect to read the configuration from the database and not mutate it. At this scenario, we expect bootstrap to be false.
 func NewConfigurationManager(ctx context.Context, db repositoryInterfaces.Repository, config runtimeInterfaces.Configuration, storageClient *storage.DataStore, pluginRegistry *plugins.Registry, bootstrapOrUpdateDefault bool) (interfaces.ConfigurationInterface, error) {
+	validator := validation.NewConfigurationValidator(db, config.ApplicationConfiguration())
 	configurationManager := &ConfigurationManager{
 		db:            db,
 		config:        config,
@@ -392,6 +366,7 @@ func NewConfigurationManager(ctx context.Context, db repositoryInterfaces.Reposi
 			mutex:     sync.RWMutex{},
 		},
 		pluginRegistry: pluginRegistry,
+		validator:      validator,
 	}
 	if bootstrapOrUpdateDefault {
 		logger.Debug(ctx, "Bootstrapping or updating default configuration document")

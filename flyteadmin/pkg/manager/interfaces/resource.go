@@ -28,6 +28,13 @@ type ResourceInterface interface {
 	DeleteProjectDomainAttributes(ctx context.Context, request admin.ProjectDomainAttributesDeleteRequest) (
 		*admin.ProjectDomainAttributesDeleteResponse, error)
 
+	UpdateOrgAttributes(ctx context.Context, request admin.OrgAttributesUpdateRequest) (
+		*admin.OrgAttributesUpdateResponse, error)
+	GetOrgAttributes(ctx context.Context, request admin.OrgAttributesGetRequest) (
+		*admin.OrgAttributesGetResponse, error)
+	DeleteOrgAttributes(ctx context.Context, request admin.OrgAttributesDeleteRequest) (
+		*admin.OrgAttributesDeleteResponse, error)
+
 	UpdateWorkflowAttributes(ctx context.Context, request admin.WorkflowAttributesUpdateRequest) (
 		*admin.WorkflowAttributesUpdateResponse, error)
 	GetWorkflowAttributes(ctx context.Context, request admin.WorkflowAttributesGetRequest) (

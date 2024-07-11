@@ -126,6 +126,7 @@ type AdminMetrics struct {
 	namedEntityEndpointMetrics             namedEntityEndpointMetrics
 	nodeExecutionEndpointMetrics           nodeExecutionEndpointMetrics
 	projectEndpointMetrics                 projectEndpointMetrics
+	orgAttributesEndpointMetrics           attributeEndpointMetrics
 	projectAttributesEndpointMetrics       attributeEndpointMetrics
 	projectDomainAttributesEndpointMetrics attributeEndpointMetrics
 	workflowAttributesEndpointMetrics      attributeEndpointMetrics
@@ -190,6 +191,12 @@ func InitMetrics(adminScope promutils.Scope) AdminMetrics {
 			list:     util.NewRequestMetrics(adminScope, "list_projects"),
 			update:   util.NewRequestMetrics(adminScope, "update_project"),
 			get:      util.NewRequestMetrics(adminScope, "get_project"),
+		},
+		orgAttributesEndpointMetrics: attributeEndpointMetrics{
+			scope:  adminScope,
+			update: util.NewRequestMetrics(adminScope, "update_org_attrs"),
+			get:    util.NewRequestMetrics(adminScope, "get_org_attrs"),
+			delete: util.NewRequestMetrics(adminScope, "delete_org_attrs"),
 		},
 		projectAttributesEndpointMetrics: attributeEndpointMetrics{
 			scope:  adminScope,

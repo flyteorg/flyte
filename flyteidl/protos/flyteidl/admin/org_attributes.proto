@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package flyteidl.admin;
+option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin";
+
+import "flyteidl/admin/matchable_resource.proto";
+
+// Defines a set of custom matching attributes at the org level.
+// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
+message OrgAttributes {
+  MatchingAttributes matching_attributes = 1;
+
+  // Optional, org key applied to the attributes.
+  string org = 2;
+}
+
+// Sets custom attributes for an org.
+// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
+message OrgAttributesUpdateRequest {
+  // +required
+  OrgAttributes attributes = 1;
+}
+
+// Purposefully empty, may be populated in the future.
+message OrgAttributesUpdateResponse {
+}
+
+// Request to get an individual org attribute override.
+// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
+message OrgAttributesGetRequest {
+  // Which type of matchable attributes to return.
+  // +required
+  MatchableResource resource_type = 1;
+
+  // Optional, org key applied to the attributes.
+  string org = 2;
+}
+
+// Response to get an individual org attribute override.
+// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
+message OrgAttributesGetResponse {
+  OrgAttributes attributes = 1;
+}
+
+// Request to delete a set matchable org attribute override.
+// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
+message OrgAttributesDeleteRequest {
+  // Which type of matchable attributes to delete.
+  // +required
+  MatchableResource resource_type = 1;
+
+  // Optional, org key applied to the attributes.
+  string org = 2;
+}
+
+// Purposefully empty, may be populated in the future.
+message OrgAttributesDeleteResponse {
+}

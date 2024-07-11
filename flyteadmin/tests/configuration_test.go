@@ -36,13 +36,17 @@ var executionQueueAttributes = &admin.ExecutionQueueAttributes{
 	},
 }
 
+var workflowExecutionConfig = &admin.WorkflowExecutionConfig{
+	MaxParallelism: 5,
+}
+
 func TestConfiguration(t *testing.T) {
 	ctx := context.Background()
 	client, conn := GetTestAdminServiceClient()
 	defer conn.Close()
 	db, err := repositories.GetDB(ctx, getDbConfig(), getLoggerConfig())
 	assert.Nil(t, err)
-
+	rollbackToDefaultConfiguration(db)
 	sqlDB, err := db.DB()
 	assert.Nil(t, err)
 	err = sqlDB.Close()
@@ -60,7 +64,7 @@ func TestConfiguration(t *testing.T) {
 	assert.NotNil(t, currentConfiguration)
 	assert.True(t, proto.Equal(configurationId, currentConfiguration.Id))
 
-	updatedConfiguration, err := client.UpdateProjectDomainConfiguration(ctx, &admin.ConfigurationUpdateRequest{
+	updatedConfiguration, err := client.UpdateConfiguration(ctx, &admin.ConfigurationUpdateRequest{
 		Id:              configurationId,
 		VersionToUpdate: currentConfiguration.Version,
 		Configuration: &admin.Configuration{
@@ -120,7 +124,7 @@ func TestDefaultConfiguration(t *testing.T) {
 
 	assert.Equal(t, defaultConfiguration.Configuration, currentConfiguration.Configuration)
 
-	updatedConfiguration, err := client.UpdateProjectDomainConfiguration(ctx, &admin.ConfigurationUpdateRequest{
+	updatedConfiguration, err := client.UpdateConfiguration(ctx, &admin.ConfigurationUpdateRequest{
 		Id:              configurationId,
 		VersionToUpdate: currentConfiguration.Version,
 		Configuration: &admin.Configuration{
@@ -192,7 +196,7 @@ func TestConcurrentConfiguration(t *testing.T) {
 					assert.NotNil(t, currentConfiguration)
 					assert.True(t, proto.Equal(configurationId, currentConfiguration.Id))
 
-					updatedConfiguration, err := client.UpdateProjectDomainConfiguration(ctx, &admin.ConfigurationUpdateRequest{
+					updatedConfiguration, err := client.UpdateConfiguration(ctx, &admin.ConfigurationUpdateRequest{
 						Id:              configurationId,
 						VersionToUpdate: currentConfiguration.Version,
 						Configuration:   configurations[counter%2],
@@ -258,7 +262,7 @@ func TestVersion(t *testing.T) {
 			Domain:  domains[i%3],
 		}
 
-		updatedConfiguration, err := client.UpdateProjectDomainConfiguration(ctx, &admin.ConfigurationUpdateRequest{
+		updatedConfiguration, err := client.UpdateConfiguration(ctx, &admin.ConfigurationUpdateRequest{
 			Id:              configurationId,
 			VersionToUpdate: currentVersion,
 			Configuration: &admin.Configuration{
@@ -278,7 +282,7 @@ func TestVersion(t *testing.T) {
 			Domain:  domains[i%3],
 		}
 
-		updatedConfiguration, err := client.UpdateProjectDomainConfiguration(ctx, &admin.ConfigurationUpdateRequest{
+		updatedConfiguration, err := client.UpdateConfiguration(ctx, &admin.ConfigurationUpdateRequest{
 			Id:              configurationId,
 			VersionToUpdate: currentVersion,
 			Configuration:   &admin.Configuration{},
@@ -289,4 +293,91 @@ func TestVersion(t *testing.T) {
 		currentVersion = updatedConfiguration.Version
 	}
 	assert.Equal(t, defaultVersion, currentVersion)
+}
+
+func TestUpdateConfiguration(t *testing.T) {
+	ctx := context.Background()
+	client, conn := GetTestAdminServiceClient()
+	defer conn.Close()
+	db, err := repositories.GetDB(ctx, getDbConfig(), getLoggerConfig())
+	assert.Nil(t, err)
+	rollbackToDefaultConfiguration(db)
+	sqlDB, err := db.DB()
+	assert.Nil(t, err)
+	err = sqlDB.Close()
+	assert.Nil(t, err)
+
+	currentConfiguration, err := client.GetConfiguration(ctx, &admin.ConfigurationGetRequest{
+		Id: &admin.ConfigurationID{
+			Project: "admintests",
+			Domain:  "development",
+		},
+	})
+	assert.Nil(t, err)
+	assert.NotNil(t, currentConfiguration)
+	assert.True(t, proto.Equal(&admin.ConfigurationID{
+		Project: "admintests",
+		Domain:  "development",
+	}, currentConfiguration.Id))
+
+	updatedConfiguration, err := client.UpdateConfiguration(ctx, &admin.ConfigurationUpdateRequest{
+		Id:              &admin.ConfigurationID{},
+		VersionToUpdate: currentConfiguration.Version,
+		Configuration: &admin.Configuration{
+			WorkflowExecutionConfig: workflowExecutionConfig,
+		},
+	})
+	assert.Nil(t, err)
+	assert.NotNil(t, updatedConfiguration)
+	assert.True(t, proto.Equal(&admin.ConfigurationID{}, updatedConfiguration.Id))
+
+	updatedConfiguration, err = client.UpdateConfiguration(ctx, &admin.ConfigurationUpdateRequest{
+		Id: &admin.ConfigurationID{
+			Project: "admintests",
+		},
+		VersionToUpdate: updatedConfiguration.Version,
+		Configuration: &admin.Configuration{
+			ExecutionQueueAttributes: executionQueueAttributes,
+		},
+	})
+	assert.Nil(t, err)
+	assert.NotNil(t, updatedConfiguration)
+	assert.True(t, proto.Equal(&admin.ConfigurationID{
+		Project: "admintests",
+	}, updatedConfiguration.Id))
+
+	updatedConfiguration, err = client.UpdateConfiguration(ctx, &admin.ConfigurationUpdateRequest{
+		Id: &admin.ConfigurationID{
+			Project: "admintests",
+			Domain:  "development",
+		},
+		VersionToUpdate: updatedConfiguration.Version,
+		Configuration: &admin.Configuration{
+			TaskResourceAttributes: taskResourceAttributes,
+		},
+	})
+	assert.Nil(t, err)
+	assert.NotNil(t, updatedConfiguration)
+	assert.True(t, proto.Equal(&admin.ConfigurationID{
+		Project: "admintests",
+		Domain:  "development",
+	}, updatedConfiguration.Id))
+
+	expectedConfiguration := currentConfiguration.Configuration
+	expectedConfiguration.TaskResourceAttributes = &admin.TaskResourceAttributesWithSource{
+		Source:    admin.AttributesSource_PROJECT_DOMAIN,
+		Value:     taskResourceAttributes,
+		IsMutable: true,
+	}
+	expectedConfiguration.ExecutionQueueAttributes = &admin.ExecutionQueueAttributesWithSource{
+		Source:    admin.AttributesSource_PROJECT,
+		Value:     executionQueueAttributes,
+		IsMutable: true,
+	}
+	expectedConfiguration.WorkflowExecutionConfig = &admin.WorkflowExecutionConfigWithSource{
+		Source:    admin.AttributesSource_ORG,
+		Value:     workflowExecutionConfig,
+		IsMutable: true,
+	}
+	assert.True(t, proto.Equal(expectedConfiguration, updatedConfiguration.Configuration))
 }

@@ -24,6 +24,18 @@ type ResourceManager struct {
 	config runtimeInterfaces.ApplicationConfiguration
 }
 
+func (m *ResourceManager) UpdateOrgAttributes(ctx context.Context, request admin.OrgAttributesUpdateRequest) (*admin.OrgAttributesUpdateResponse, error) {
+	return nil, errors.NotImplementError
+}
+
+func (m *ResourceManager) GetOrgAttributes(ctx context.Context, request admin.OrgAttributesGetRequest) (*admin.OrgAttributesGetResponse, error) {
+	return nil, errors.NotImplementError
+}
+
+func (m *ResourceManager) DeleteOrgAttributes(ctx context.Context, request admin.OrgAttributesDeleteRequest) (*admin.OrgAttributesDeleteResponse, error) {
+	return nil, errors.NotImplementError
+}
+
 func (m *ResourceManager) GetResource(ctx context.Context, request interfaces.ResourceRequest) (*interfaces.ResourceResponse, error) {
 	resource, err := m.db.ResourceRepo().Get(ctx, repo_interface.ResourceID{
 		ResourceType: request.ResourceType.String(),

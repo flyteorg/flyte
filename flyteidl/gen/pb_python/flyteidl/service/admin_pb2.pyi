@@ -2,6 +2,7 @@ from google.api import annotations_pb2 as _annotations_pb2
 from flyteidl.admin import project_pb2 as _project_pb2
 from flyteidl.admin import project_domain_attributes_pb2 as _project_domain_attributes_pb2
 from flyteidl.admin import project_attributes_pb2 as _project_attributes_pb2
+from flyteidl.admin import org_attributes_pb2 as _org_attributes_pb2
 from flyteidl.admin import task_pb2 as _task_pb2
 from flyteidl.admin import workflow_pb2 as _workflow_pb2
 from flyteidl.admin import workflow_attributes_pb2 as _workflow_attributes_pb2

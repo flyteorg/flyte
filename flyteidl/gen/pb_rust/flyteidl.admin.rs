@@ -1131,6 +1131,10 @@ pub struct ConfigurationId {
     /// +optional
     #[prost(string, tag="4")]
     pub workflow: ::prost::alloc::string::String,
+    /// If it is a global configuration.
+    /// +optional
+    #[prost(bool, tag="5")]
+    pub global: bool,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1347,6 +1351,8 @@ pub enum AttributesSource {
     Project = 3,
     /// The configuration is a project-domain configuration.
     ProjectDomain = 4,
+    /// The configuration is a org configuration.
+    Org = 5,
 }
 impl AttributesSource {
     /// String value of the enum field names used in the ProtoBuf definition.
@@ -1360,6 +1366,7 @@ impl AttributesSource {
             AttributesSource::Domain => "DOMAIN",
             AttributesSource::Project => "PROJECT",
             AttributesSource::ProjectDomain => "PROJECT_DOMAIN",
+            AttributesSource::Org => "ORG",
         }
     }
     /// Creates an enum from field names used in the ProtoBuf definition.
@@ -1370,6 +1377,7 @@ impl AttributesSource {
             "DOMAIN" => Some(Self::Domain),
             "PROJECT" => Some(Self::Project),
             "PROJECT_DOMAIN" => Some(Self::ProjectDomain),
+            "ORG" => Some(Self::Org),
             _ => None,
         }
     }
@@ -2833,6 +2841,70 @@ pub struct EmailMessage {
     /// This populates the BODY field.
     #[prost(string, tag="4")]
     pub body: ::prost::alloc::string::String,
+}
+/// Defines a set of custom matching attributes at the org level.
+/// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct OrgAttributes {
+    #[prost(message, optional, tag="1")]
+    pub matching_attributes: ::core::option::Option<MatchingAttributes>,
+    /// Optional, org key applied to the attributes.
+    #[prost(string, tag="2")]
+    pub org: ::prost::alloc::string::String,
+}
+/// Sets custom attributes for an org.
+/// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct OrgAttributesUpdateRequest {
+    /// +required
+    #[prost(message, optional, tag="1")]
+    pub attributes: ::core::option::Option<OrgAttributes>,
+}
+/// Purposefully empty, may be populated in the future.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct OrgAttributesUpdateResponse {
+}
+/// Request to get an individual org attribute override.
+/// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct OrgAttributesGetRequest {
+    /// Which type of matchable attributes to return.
+    /// +required
+    #[prost(enumeration="MatchableResource", tag="1")]
+    pub resource_type: i32,
+    /// Optional, org key applied to the attributes.
+    #[prost(string, tag="2")]
+    pub org: ::prost::alloc::string::String,
+}
+/// Response to get an individual org attribute override.
+/// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct OrgAttributesGetResponse {
+    #[prost(message, optional, tag="1")]
+    pub attributes: ::core::option::Option<OrgAttributes>,
+}
+/// Request to delete a set matchable org attribute override.
+/// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct OrgAttributesDeleteRequest {
+    /// Which type of matchable attributes to delete.
+    /// +required
+    #[prost(enumeration="MatchableResource", tag="1")]
+    pub resource_type: i32,
+    /// Optional, org key applied to the attributes.
+    #[prost(string, tag="2")]
+    pub org: ::prost::alloc::string::String,
+}
+/// Purposefully empty, may be populated in the future.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct OrgAttributesDeleteResponse {
 }
 /// Namespace within a project commonly used to differentiate between different service instances.
 /// e.g. "production", "development", etc.

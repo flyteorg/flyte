@@ -308,9 +308,43 @@
         ]
       }
     },
+    "/api/v1/configuration": {
+      "post": {
+        "summary": "Update the entire unified attribute configuration.\nRequests will fail for stale values of version_to_update",
+        "operationId": "AdminService_UpdateConfiguration5",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminConfigurationUpdateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "Request to update a configuration.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/adminConfigurationUpdateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
     "/api/v1/configuration/{id.domain}": {
       "get": {
-        "summary": "Fetch a unified project attribute.",
+        "summary": "Fetch the entire unified attribute configuration.",
         "operationId": "AdminService_GetConfiguration3",
         "responses": {
           "200": {
@@ -354,6 +388,53 @@
             "in": "query",
             "required": false,
             "type": "string"
+          },
+          {
+            "name": "id.global",
+            "description": "If it is a global configuration.\n+optional",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/configuration/{id.project}": {
+      "post": {
+        "summary": "Update the entire unified attribute configuration.\nRequests will fail for stale values of version_to_update",
+        "operationId": "AdminService_UpdateConfiguration3",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminConfigurationUpdateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.project",
+            "description": "Name of the project the configuration belongs to.\n+optional",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AdminServiceUpdateConfigurationBody"
+            }
           }
         ],
         "tags": [
@@ -363,7 +444,7 @@
     },
     "/api/v1/configuration/{id.project}/{id.domain}": {
       "get": {
-        "summary": "Fetch a unified project attribute.",
+        "summary": "Fetch the entire unified attribute configuration.",
         "operationId": "AdminService_GetConfiguration",
         "responses": {
           "200": {
@@ -407,6 +488,13 @@
             "in": "query",
             "required": false,
             "type": "string"
+          },
+          {
+            "name": "id.global",
+            "description": "If it is a global configuration.\n+optional",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
           }
         ],
         "tags": [
@@ -414,8 +502,8 @@
         ]
       },
       "post": {
-        "summary": "Update a unified project attribute.\nRequests will fail for stale values of version_to_update",
-        "operationId": "AdminService_UpdateProjectDomainConfiguration",
+        "summary": "Update the entire unified attribute configuration.\nRequests will fail for stale values of version_to_update",
+        "operationId": "AdminService_UpdateConfiguration",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -450,7 +538,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/AdminServiceUpdateProjectDomainConfigurationBody"
+              "$ref": "#/definitions/AdminServiceUpdateConfigurationBody"
             }
           }
         ],
@@ -2814,9 +2902,49 @@
         ]
       }
     },
+    "/api/v1/org/configuration/{id.org}": {
+      "post": {
+        "summary": "Update the entire unified attribute configuration.\nRequests will fail for stale values of version_to_update",
+        "operationId": "AdminService_UpdateConfiguration6",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminConfigurationUpdateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.org",
+            "description": "Name of the org the configuration belongs to.\n+optional",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AdminServiceUpdateConfigurationBody"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
     "/api/v1/org/configuration/{id.org}/{id.domain}": {
       "get": {
-        "summary": "Fetch a unified project attribute.",
+        "summary": "Fetch the entire unified attribute configuration.",
         "operationId": "AdminService_GetConfiguration4",
         "responses": {
           "200": {
@@ -2860,6 +2988,60 @@
             "in": "query",
             "required": false,
             "type": "string"
+          },
+          {
+            "name": "id.global",
+            "description": "If it is a global configuration.\n+optional",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/org/configuration/{id.org}/{id.project}": {
+      "post": {
+        "summary": "Update the entire unified attribute configuration.\nRequests will fail for stale values of version_to_update",
+        "operationId": "AdminService_UpdateConfiguration4",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminConfigurationUpdateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.org",
+            "description": "Name of the org the configuration belongs to.\n+optional",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.project",
+            "description": "Name of the project the configuration belongs to.\n+optional",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AdminServiceUpdateConfigurationBody"
+            }
           }
         ],
         "tags": [
@@ -2869,7 +3051,7 @@
     },
     "/api/v1/org/configuration/{id.org}/{id.project}/{id.domain}": {
       "get": {
-        "summary": "Fetch a unified project attribute.",
+        "summary": "Fetch the entire unified attribute configuration.",
         "operationId": "AdminService_GetConfiguration2",
         "responses": {
           "200": {
@@ -2913,6 +3095,13 @@
             "in": "query",
             "required": false,
             "type": "string"
+          },
+          {
+            "name": "id.global",
+            "description": "If it is a global configuration.\n+optional",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
           }
         ],
         "tags": [
@@ -2920,8 +3109,8 @@
         ]
       },
       "post": {
-        "summary": "Update a unified project attribute.\nRequests will fail for stale values of version_to_update",
-        "operationId": "AdminService_UpdateProjectDomainConfiguration2",
+        "summary": "Update the entire unified attribute configuration.\nRequests will fail for stale values of version_to_update",
+        "operationId": "AdminService_UpdateConfiguration2",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -2963,7 +3152,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/AdminServiceUpdateProjectDomainConfigurationBody"
+              "$ref": "#/definitions/AdminServiceUpdateConfigurationBody"
             }
           }
         ],
@@ -5105,7 +5294,139 @@
         ]
       }
     },
-    "/api/v1/org/project_domain_attributes/{attributes.org}/{attributes.project}": {
+    "/api/v1/org/org_attributes/{attributes.org}": {
+      "put": {
+        "summary": "Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` at the org level",
+        "description": "Update the customized resource attributes associated with a org",
+        "operationId": "AdminService_UpdateOrgAttributes2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminOrgAttributesUpdateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "attributes.org",
+            "description": "Optional, org key applied to the attributes.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AdminServiceUpdateOrgAttributesBody"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/org/org_attributes/{org}": {
+      "get": {
+        "summary": "Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` at the org level",
+        "description": "Retrieve the customized resource attributes associated with a org",
+        "operationId": "AdminService_GetOrgAttributes2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminOrgAttributesGetResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "org",
+            "description": "Optional, org key applied to the attributes.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "resource_type",
+            "description": "Which type of matchable attributes to return.\n+required\n\n - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.\n - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.\n - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.\n - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.\n - EXTERNAL_RESOURCE: Configures the task connection to be used by the agent to connect to external systems.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "TASK_RESOURCE",
+              "CLUSTER_RESOURCE",
+              "EXECUTION_QUEUE",
+              "EXECUTION_CLUSTER_LABEL",
+              "QUALITY_OF_SERVICE_SPECIFICATION",
+              "PLUGIN_OVERRIDE",
+              "WORKFLOW_EXECUTION_CONFIG",
+              "CLUSTER_ASSIGNMENT",
+              "EXTERNAL_RESOURCE"
+            ],
+            "default": "TASK_RESOURCE"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      },
+      "delete": {
+        "summary": "Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` at the org level",
+        "description": "Delete the customized resource attributes associated with a org",
+        "operationId": "AdminService_DeleteOrgAttributes2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminOrgAttributesDeleteResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "org",
+            "description": "Optional, org key applied to the attributes.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AdminServiceDeleteOrgAttributesBody"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/org/project_attributes/{attributes.org}/{attributes.project}": {
       "put": {
         "summary": "Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` at the project level",
         "description": "Update the customized resource attributes associated with a project",
@@ -5153,62 +5474,7 @@
         ]
       }
     },
-    "/api/v1/org/project_domain_attributes/{attributes.org}/{attributes.project}/{attributes.domain}": {
-      "put": {
-        "summary": "Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.",
-        "description": "Update the customized resource attributes associated with a project-domain combination",
-        "operationId": "AdminService_UpdateProjectDomainAttributes2",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/adminProjectDomainAttributesUpdateResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/googlerpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "attributes.org",
-            "description": "Optional, org key applied to the attributes.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "attributes.project",
-            "description": "Unique project id for which this set of attributes will be applied.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "attributes.domain",
-            "description": "Unique domain id for which this set of attributes will be applied.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/AdminServiceUpdateProjectDomainAttributesBody"
-            }
-          }
-        ],
-        "tags": [
-          "AdminService"
-        ]
-      }
-    },
-    "/api/v1/org/project_domain_attributes/{org}/{project}": {
+    "/api/v1/org/project_attributes/{org}/{project}": {
       "get": {
         "summary": "Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.",
         "description": "Retrieve the customized resource attributes associated with a project",
@@ -5305,6 +5571,61 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/AdminServiceDeleteProjectAttributesBody"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/org/project_domain_attributes/{attributes.org}/{attributes.project}/{attributes.domain}": {
+      "put": {
+        "summary": "Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.",
+        "description": "Update the customized resource attributes associated with a project-domain combination",
+        "operationId": "AdminService_UpdateProjectDomainAttributes2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminProjectDomainAttributesUpdateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "attributes.org",
+            "description": "Optional, org key applied to the attributes.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "attributes.project",
+            "description": "Unique project id for which this set of attributes will be applied.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "attributes.domain",
+            "description": "Unique domain id for which this set of attributes will be applied.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AdminServiceUpdateProjectDomainAttributesBody"
             }
           }
         ],
@@ -6888,6 +7209,122 @@
             "in": "query",
             "required": false,
             "type": "string"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/org_attributes": {
+      "get": {
+        "summary": "Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` at the org level",
+        "description": "Retrieve the customized resource attributes associated with a org",
+        "operationId": "AdminService_GetOrgAttributes",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminOrgAttributesGetResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "resource_type",
+            "description": "Which type of matchable attributes to return.\n+required\n\n - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.\n - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.\n - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.\n - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.\n - EXTERNAL_RESOURCE: Configures the task connection to be used by the agent to connect to external systems.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "TASK_RESOURCE",
+              "CLUSTER_RESOURCE",
+              "EXECUTION_QUEUE",
+              "EXECUTION_CLUSTER_LABEL",
+              "QUALITY_OF_SERVICE_SPECIFICATION",
+              "PLUGIN_OVERRIDE",
+              "WORKFLOW_EXECUTION_CONFIG",
+              "CLUSTER_ASSIGNMENT",
+              "EXTERNAL_RESOURCE"
+            ],
+            "default": "TASK_RESOURCE"
+          },
+          {
+            "name": "org",
+            "description": "Optional, org key applied to the attributes.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      },
+      "delete": {
+        "summary": "Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` at the org level",
+        "description": "Delete the customized resource attributes associated with a org",
+        "operationId": "AdminService_DeleteOrgAttributes",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminOrgAttributesDeleteResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/adminOrgAttributesDeleteRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      },
+      "put": {
+        "summary": "Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` at the org level",
+        "description": "Update the customized resource attributes associated with a org",
+        "operationId": "AdminService_UpdateOrgAttributes",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminOrgAttributesUpdateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/adminOrgAttributesUpdateRequest"
+            }
           }
         ],
         "tags": [
@@ -9063,6 +9500,16 @@
       },
       "description": "Request to send a notification that a workflow execution event has occurred."
     },
+    "AdminServiceDeleteOrgAttributesBody": {
+      "type": "object",
+      "properties": {
+        "resource_type": {
+          "$ref": "#/definitions/adminMatchableResource",
+          "title": "Which type of matchable attributes to delete.\n+required"
+        }
+      },
+      "title": "Request to delete a set matchable org attribute override.\nFor more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`"
+    },
     "AdminServiceDeleteProjectAttributesBody": {
       "type": "object",
       "properties": {
@@ -9210,6 +9657,42 @@
       },
       "description": "Request to terminate an in-progress execution.  This action is irreversible.\nIf an execution is already terminated, this request will simply be a no-op.\nThis request will fail if it references a non-existent execution.\nIf the request succeeds the phase \"ABORTED\" will be recorded for the termination\nwith the optional cause added to the output_result."
     },
+    "AdminServiceUpdateConfigurationBody": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "object",
+          "properties": {
+            "domain": {
+              "type": "string",
+              "title": "Name of the domain the configuration belongs to.\n+optional"
+            },
+            "project": {
+              "type": "string",
+              "title": "Name of the project the configuration belongs to.\n+optional"
+            },
+            "workflow": {
+              "type": "string",
+              "title": "Name of the workflow the configuration belongs to.\n+optional"
+            },
+            "global": {
+              "type": "boolean",
+              "title": "If it is a global configuration.\n+optional"
+            }
+          },
+          "title": "Identifier of the configuration to update.\n+required"
+        },
+        "version_to_update": {
+          "type": "string",
+          "title": "Version of the configuration to update, which should to be the version of the currently active document.\n+required"
+        },
+        "configuration": {
+          "$ref": "#/definitions/adminConfiguration",
+          "title": "Configuration to update.\n+required"
+        }
+      },
+      "description": "Request to update a configuration."
+    },
     "AdminServiceUpdateExecutionBody": {
       "type": "object",
       "properties": {
@@ -9257,6 +9740,21 @@
         }
       },
       "description": "Request to set the referenced named entity state to the configured value."
+    },
+    "AdminServiceUpdateOrgAttributesBody": {
+      "type": "object",
+      "properties": {
+        "attributes": {
+          "type": "object",
+          "properties": {
+            "matching_attributes": {
+              "$ref": "#/definitions/adminMatchingAttributes"
+            }
+          },
+          "title": "+required"
+        }
+      },
+      "title": "Sets custom attributes for an org.\nFor more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`"
     },
     "AdminServiceUpdateProjectAttributesBody": {
       "type": "object",
@@ -9314,30 +9812,6 @@
         }
       },
       "title": "Sets custom attributes for a project-domain combination.\nFor more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`"
-    },
-    "AdminServiceUpdateProjectDomainConfigurationBody": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "object",
-          "properties": {
-            "workflow": {
-              "type": "string",
-              "title": "Name of the workflow the configuration belongs to.\n+optional"
-            }
-          },
-          "title": "Identifier of the configuration to update.\n+required"
-        },
-        "version_to_update": {
-          "type": "string",
-          "title": "Version of the configuration to update, which should to be the version of the currently active document.\n+required"
-        },
-        "configuration": {
-          "$ref": "#/definitions/adminConfiguration",
-          "title": "Configuration to update.\n+required"
-        }
-      },
-      "description": "Request to update a configuration."
     },
     "AdminServiceUpdateWorkflowAttributesBody": {
       "type": "object",
@@ -9639,10 +10113,11 @@
         "GLOBAL",
         "DOMAIN",
         "PROJECT",
-        "PROJECT_DOMAIN"
+        "PROJECT_DOMAIN",
+        "ORG"
       ],
       "default": "SOURCE_UNSPECIFIED",
-      "description": "The source of an attribute. We may have other sources in the future.\n\n - SOURCE_UNSPECIFIED: The source is unspecified.\n - GLOBAL: The configuration is a global configuration.\n - DOMAIN: The configuration is a domain configuration.\n - PROJECT: The configuration is a project configuration.\n - PROJECT_DOMAIN: The configuration is a project-domain configuration."
+      "description": "The source of an attribute. We may have other sources in the future.\n\n - SOURCE_UNSPECIFIED: The source is unspecified.\n - GLOBAL: The configuration is a global configuration.\n - DOMAIN: The configuration is a domain configuration.\n - PROJECT: The configuration is a project configuration.\n - PROJECT_DOMAIN: The configuration is a project-domain configuration.\n - ORG: The configuration is a org configuration."
     },
     "adminAuth": {
       "type": "object",
@@ -9790,9 +10265,31 @@
         "workflow": {
           "type": "string",
           "title": "Name of the workflow the configuration belongs to.\n+optional"
+        },
+        "global": {
+          "type": "boolean",
+          "title": "If it is a global configuration.\n+optional"
         }
       },
       "description": "Identifier for a configuration."
+    },
+    "adminConfigurationUpdateRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/adminConfigurationID",
+          "title": "Identifier of the configuration to update.\n+required"
+        },
+        "version_to_update": {
+          "type": "string",
+          "title": "Version of the configuration to update, which should to be the version of the currently active document.\n+required"
+        },
+        "configuration": {
+          "$ref": "#/definitions/adminConfiguration",
+          "title": "Configuration to update.\n+required"
+        }
+      },
+      "description": "Request to update a configuration."
     },
     "adminConfigurationUpdateResponse": {
       "type": "object",
@@ -11085,6 +11582,60 @@
           }
         }
       }
+    },
+    "adminOrgAttributes": {
+      "type": "object",
+      "properties": {
+        "matching_attributes": {
+          "$ref": "#/definitions/adminMatchingAttributes"
+        },
+        "org": {
+          "type": "string",
+          "description": "Optional, org key applied to the attributes."
+        }
+      },
+      "title": "Defines a set of custom matching attributes at the org level.\nFor more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`"
+    },
+    "adminOrgAttributesDeleteRequest": {
+      "type": "object",
+      "properties": {
+        "resource_type": {
+          "$ref": "#/definitions/adminMatchableResource",
+          "title": "Which type of matchable attributes to delete.\n+required"
+        },
+        "org": {
+          "type": "string",
+          "description": "Optional, org key applied to the attributes."
+        }
+      },
+      "title": "Request to delete a set matchable org attribute override.\nFor more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`"
+    },
+    "adminOrgAttributesDeleteResponse": {
+      "type": "object",
+      "description": "Purposefully empty, may be populated in the future."
+    },
+    "adminOrgAttributesGetResponse": {
+      "type": "object",
+      "properties": {
+        "attributes": {
+          "$ref": "#/definitions/adminOrgAttributes"
+        }
+      },
+      "title": "Response to get an individual org attribute override.\nFor more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`"
+    },
+    "adminOrgAttributesUpdateRequest": {
+      "type": "object",
+      "properties": {
+        "attributes": {
+          "$ref": "#/definitions/adminOrgAttributes",
+          "title": "+required"
+        }
+      },
+      "title": "Sets custom attributes for an org.\nFor more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`"
+    },
+    "adminOrgAttributesUpdateResponse": {
+      "type": "object",
+      "description": "Purposefully empty, may be populated in the future."
     },
     "adminPagerDutyNotification": {
       "type": "object",

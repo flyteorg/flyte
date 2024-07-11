@@ -205,3 +205,4 @@ func IsDoesNotExistError(err error) bool {
 
 var ConfigurationDocumentStaleError = NewFlyteAdminErrorf(codes.InvalidArgument, "The document you are trying to update is outdated. Please try again.")
 var ActiveConfigurationDocumentAlreadyExistsError = NewFlyteAdminErrorf(codes.AlreadyExists, "There is already an active configuration document.")
+var NotImplementError = NewFlyteAdminErrorf(codes.Unimplemented, "Not implemented")
