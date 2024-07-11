@@ -8,7 +8,7 @@ import (
 
 // CustomHeaderTokenSource class is here because we cannot use the normal "github.com/grpc/grpc-go/credentials/oauth" package to satisfy
 // the credentials.PerRPCCredentials interface. This is because we want to be able to support a different 'header'
-// when passing the token in the gRPC call's metadata. The default is filled in in the constructor if none is supplied.
+// when passing the token in the gRPC call's metadata. The default is filled in the constructor if none is supplied.
 type CustomHeaderTokenSource struct {
 	tokenSource  oauth2.TokenSource
 	customHeader string

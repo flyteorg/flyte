@@ -25,7 +25,7 @@ type SignalRepo struct {
 func (s *SignalRepo) Get(ctx context.Context, input models.SignalKey) (models.Signal, error) {
 	var signal models.Signal
 	timer := s.metrics.GetDuration.Start()
-	tx := s.db.Where(&models.Signal{
+	tx := s.db.WithContext(ctx).Where(&models.Signal{
 		SignalKey: input,
 	}).Take(&signal)
 	timer.Stop()
@@ -41,7 +41,7 @@ func (s *SignalRepo) Get(ctx context.Context, input models.SignalKey) (models.Si
 // GetOrCreate returns a signal if it already exists, if not it creates a new one given the input
 func (s *SignalRepo) GetOrCreate(ctx context.Context, input *models.Signal) error {
 	timer := s.metrics.CreateDuration.Start()
-	tx := s.db.FirstOrCreate(&input, input)
+	tx := s.db.WithContext(ctx).FirstOrCreate(&input, input)
 	timer.Stop()
 	if tx.Error != nil {
 		return s.errorTransformer.ToFlyteAdminError(tx.Error)
@@ -56,7 +56,7 @@ func (s *SignalRepo) List(ctx context.Context, input interfaces.ListResourceInpu
 		return nil, err
 	}
 	var signals []models.Signal
-	tx := s.db.Limit(input.Limit).Offset(input.Offset)
+	tx := s.db.WithContext(ctx).Limit(input.Limit).Offset(input.Offset)
 
 	// Apply filters
 	tx, err := applyFilters(tx, input.InlineFilters, input.MapFilters)
@@ -85,7 +85,7 @@ func (s *SignalRepo) Update(ctx context.Context, input models.SignalKey, value [
 	}
 
 	timer := s.metrics.GetDuration.Start()
-	tx := s.db.Model(&signal).Select("value").Updates(signal)
+	tx := s.db.WithContext(ctx).Model(&signal).Select("value").Updates(signal)
 	timer.Stop()
 	if tx.Error != nil {
 		return s.errorTransformer.ToFlyteAdminError(tx.Error)

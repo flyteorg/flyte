@@ -1,12 +1,12 @@
 name: Upload flyteidl to PyPI and npm
 
 on:
-  release:
-    types: [published]
+  push:
+    tags:
+      - flyteidl/v*.*.*
 
 jobs:
   deploy-to-pypi:
-    if: "!startsWith(github.event.release.tag_name, 'flytectl/')"
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -29,7 +29,6 @@ jobs:
           python -m build
           twine upload dist/*
   deploy-to-npm:
-    if: "!startsWith(github.event.release.tag_name, 'flytectl/')"
     runs-on: ubuntu-latest
     defaults:
       run:

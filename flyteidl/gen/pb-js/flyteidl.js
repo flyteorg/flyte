@@ -18510,7 +18510,7 @@
                  * Properties of an ExecutionEnv.
                  * @memberof flyteidl.core
                  * @interface IExecutionEnv
-                 * @property {string|null} [id] ExecutionEnv id
+                 * @property {string|null} [name] ExecutionEnv name
                  * @property {string|null} [type] ExecutionEnv type
                  * @property {google.protobuf.IStruct|null} [extant] ExecutionEnv extant
                  * @property {google.protobuf.IStruct|null} [spec] ExecutionEnv spec
@@ -18533,12 +18533,12 @@
                 }
     
                 /**
-                 * ExecutionEnv id.
-                 * @member {string} id
+                 * ExecutionEnv name.
+                 * @member {string} name
                  * @memberof flyteidl.core.ExecutionEnv
                  * @instance
                  */
-                ExecutionEnv.prototype.id = "";
+                ExecutionEnv.prototype.name = "";
     
                 /**
                  * ExecutionEnv type.
@@ -18610,8 +18610,8 @@
                 ExecutionEnv.encode = function encode(message, writer) {
                     if (!writer)
                         writer = $Writer.create();
-                    if (message.id != null && message.hasOwnProperty("id"))
-                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.id);
+                    if (message.name != null && message.hasOwnProperty("name"))
+                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.name);
                     if (message.type != null && message.hasOwnProperty("type"))
                         writer.uint32(/* id 2, wireType 2 =*/18).string(message.type);
                     if (message.extant != null && message.hasOwnProperty("extant"))
@@ -18642,7 +18642,7 @@
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
                         case 1:
-                            message.id = reader.string();
+                            message.name = reader.string();
                             break;
                         case 2:
                             message.type = reader.string();
@@ -18676,9 +18676,9 @@
                     if (typeof message !== "object" || message === null)
                         return "object expected";
                     var properties = {};
-                    if (message.id != null && message.hasOwnProperty("id"))
-                        if (!$util.isString(message.id))
-                            return "id: string expected";
+                    if (message.name != null && message.hasOwnProperty("name"))
+                        if (!$util.isString(message.name))
+                            return "name: string expected";
                     if (message.type != null && message.hasOwnProperty("type"))
                         if (!$util.isString(message.type))
                             return "type: string expected";
@@ -43144,6 +43144,7 @@
                         case 0:
                         case 1:
                         case 2:
+                        case 3:
                             break;
                         }
                     if (message.org != null && message.hasOwnProperty("org"))
@@ -43159,12 +43160,14 @@
                  * @property {number} ACTIVE=0 ACTIVE value
                  * @property {number} ARCHIVED=1 ARCHIVED value
                  * @property {number} SYSTEM_GENERATED=2 SYSTEM_GENERATED value
+                 * @property {number} SYSTEM_ARCHIVED=3 SYSTEM_ARCHIVED value
                  */
                 Project.ProjectState = (function() {
                     var valuesById = {}, values = Object.create(valuesById);
                     values[valuesById[0] = "ACTIVE"] = 0;
                     values[valuesById[1] = "ARCHIVED"] = 1;
                     values[valuesById[2] = "SYSTEM_GENERATED"] = 2;
+                    values[valuesById[3] = "SYSTEM_ARCHIVED"] = 3;
                     return values;
                 })();
     

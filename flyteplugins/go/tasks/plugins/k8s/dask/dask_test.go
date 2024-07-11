@@ -7,7 +7,6 @@ import (
 	"time"
 
 	daskAPI "github.com/dask/dask-kubernetes/v2023/dask_kubernetes/operator/go_client/pkg/apis/kubernetes.dask.org/v1"
-	"github.com/golang/protobuf/jsonpb"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/protobuf/types/known/structpb"
@@ -25,6 +24,7 @@ import (
 	pluginIOMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
+	stdlibUtils "github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 const (
@@ -122,7 +122,7 @@ func dummyDaskTaskTemplate(customImage string, resources *core.Resources, podTem
 	}
 
 	structObj := structpb.Struct{}
-	err = jsonpb.UnmarshalString(daskJobJSON, &structObj)
+	err = stdlibUtils.UnmarshalStringToPb(daskJobJSON, &structObj)
 	if err != nil {
 		panic(err)
 	}

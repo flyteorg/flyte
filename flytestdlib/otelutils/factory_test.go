@@ -7,11 +7,12 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestRegisterTracerProvider(t *testing.T) {
+func TestRegisterTracerProviderWithContext(t *testing.T) {
+	ctx := context.Background()
 	serviceName := "foo"
 
 	// register tracer provider with no exporters
-	err := RegisterTracerProvider(serviceName, defaultConfig)
+	err := RegisterTracerProviderWithContext(ctx, serviceName, defaultConfig)
 	assert.Nil(t, err)
 
 	// validate no tracerProviders are registered
@@ -24,8 +25,11 @@ func TestRegisterTracerProvider(t *testing.T) {
 			Filename: "/dev/null",
 		},
 		JaegerConfig: JaegerConfig{},
+		SamplerConfig: SamplerConfig{
+			ParentSampler: AlwaysSample,
+		},
 	}
-	err = RegisterTracerProvider(serviceName, &fullConfig)
+	err = RegisterTracerProviderWithContext(ctx, serviceName, &fullConfig)
 	assert.Nil(t, err)
 
 	// validate tracerProvider is registered

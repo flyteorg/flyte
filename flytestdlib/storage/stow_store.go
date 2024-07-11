@@ -232,7 +232,7 @@ func (s *StowStore) Head(ctx context.Context, reference DataReference) (Metadata
 			t.Stop()
 			contentMD5, ok := metadata[strings.ToLower(FlyteContentMD5)].(string)
 			if !ok {
-				logger.Warningf(ctx, "Failed to cast contentMD5 [%v] to string", contentMD5)
+				logger.Infof(ctx, "Failed to cast contentMD5 [%v] to string", contentMD5)
 			}
 			return StowMetadata{
 				exists:     true,

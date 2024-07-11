@@ -4361,10 +4361,11 @@
       "enum": [
         "ACTIVE",
         "ARCHIVED",
-        "SYSTEM_GENERATED"
+        "SYSTEM_GENERATED",
+        "SYSTEM_ARCHIVED"
       ],
       "default": "ACTIVE",
-      "description": "The state of the project is used to control its visibility in the UI and validity.\n\n - ACTIVE: By default, all projects are considered active.\n - ARCHIVED: Archived projects are no longer visible in the UI and no longer valid.\n - SYSTEM_GENERATED: System generated projects that aren't explicitly created or managed by a user."
+      "description": "The state of the project is used to control its visibility in the UI and validity.\n\n - ACTIVE: By default, all projects are considered active.\n - ARCHIVED: Archived projects are no longer visible in the UI and no longer valid.\n - SYSTEM_GENERATED: System generated projects that aren't explicitly created or managed by a user.\n - SYSTEM_ARCHIVED: System archived projects that aren't explicitly archived by a user."
     },
     "QualityOfServiceTier": {
       "type": "string",
@@ -7076,9 +7077,9 @@
     "coreExecutionEnv": {
       "type": "object",
       "properties": {
-        "id": {
+        "name": {
           "type": "string",
-          "description": "id is a unique identifier for the execution environment."
+          "description": "name is a human-readable identifier for the execution environment. This is combined with the\nproject, domain, and version to uniquely identify an execution environment."
         },
         "type": {
           "type": "string",
@@ -8711,11 +8712,11 @@
         },
         "target_entity": {
           "$ref": "#/definitions/coreIdentifier",
-          "description": "Holding this field here for now, this will be upstreamed soon.\nSo that Admin doesn't have to rebuild the node execution graph to find the target entity, propeller will fill this\nin optionally - currently this is only filled in for subworkflows. This is the ID of the subworkflow corresponding\nto this node execution. It is difficult to find because Admin only sees one node at a time. A subworkflow could be\nnested multiple layers deep, and you'd need to access the correct workflow template to know the target subworkflow."
+          "description": "So that Admin doesn't have to rebuild the node execution graph to find the target entity, propeller will fill this\nin optionally - currently this is only filled in for subworkflows. This is the ID of the subworkflow corresponding\nto this node execution. It is difficult to find because Admin only sees one node at a time. A subworkflow could be\nnested multiple layers deep, and you'd need to access the correct workflow template to know the target subworkflow."
         },
         "is_in_dynamic_chain": {
           "type": "boolean",
-          "description": "Holding this field here for now, this will be upstreamed soon.\nTasks and subworkflows (but not launch plans) that are run within a dynamic task are effectively independent of\nthe tasks that are registered in Admin's db. Confusingly, they are often identical, but sometimes they are not\neven registered at all. Similar to the target_entity field, at the time Admin receives this event, it has no idea\nif the relevant execution entity is was registered, or dynamic. This field indicates that the target_entity ID,\nas well as task IDs in any corresponding Task Executions, should not be used to looked up the task in Admin's db."
+          "description": "Tasks and subworkflows (but not launch plans) that are run within a dynamic task are effectively independent of\nthe tasks that are registered in Admin's db. Confusingly, they are often identical, but sometimes they are not\neven registered at all. Similar to the target_entity field, at the time Admin receives this event, it has no idea\nif the relevant execution entity is was registered, or dynamic. This field indicates that the target_entity ID,\nas well as task IDs in any corresponding Task Executions, should not be used to looked up the task in Admin's db."
         }
       }
     },

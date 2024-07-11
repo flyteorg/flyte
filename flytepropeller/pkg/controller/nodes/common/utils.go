@@ -1,11 +1,15 @@
 package common
 
 import (
+	"context"
 	"strconv"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/encoding"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 const maxUniqueIDLength = 20
@@ -28,11 +32,38 @@ func GenerateUniqueID(parentInfo executors.ImmutableParentInfo, nodeID string) (
 
 // CreateParentInfo creates a unique parent id, the unique id of parent is dependent on the unique id and the current
 // attempt of the grandparent to track the lineage.
-func CreateParentInfo(grandParentInfo executors.ImmutableParentInfo, nodeID string, parentAttempt uint32) (executors.ImmutableParentInfo, error) {
+func CreateParentInfo(grandParentInfo executors.ImmutableParentInfo, nodeID string, parentAttempt uint32, nodeIsDynamic bool) (executors.ImmutableParentInfo, error) {
 	uniqueID, err := GenerateUniqueID(grandParentInfo, nodeID)
 	if err != nil {
 		return nil, err
 	}
-	return executors.NewParentInfo(uniqueID, parentAttempt), nil
+	if nodeIsDynamic || (grandParentInfo != nil && grandParentInfo.IsInDynamicChain()) {
+		return executors.NewParentInfo(uniqueID, parentAttempt, true), nil
+	}
 
+	return executors.NewParentInfo(uniqueID, parentAttempt, false), nil
+}
+
+func GetTargetEntity(ctx context.Context, nCtx interfaces.NodeExecutionContext) *core.Identifier {
+	var targetEntity *core.Identifier
+	if nCtx.Node().GetWorkflowNode() != nil {
+		subRef := nCtx.Node().GetWorkflowNode().GetSubWorkflowRef()
+		if subRef != nil && len(*subRef) > 0 {
+			// todo: uncomment this if Support caching subworkflows and launchplans (v2) is upstreamed
+			// for now, we can leave it empty
+			//nCtx.ExecutionContext().FindSubWorkflow(*subRef)
+			//targetEntity = subWorkflow.GetIdentifier()
+		} else if nCtx.Node().GetWorkflowNode().GetLaunchPlanRefID() != nil {
+			lpRef := nCtx.Node().GetWorkflowNode().GetLaunchPlanRefID()
+			targetEntity = lpRef.Identifier
+		}
+	} else if taskIDStr := nCtx.Node().GetTaskID(); taskIDStr != nil && len(*taskIDStr) > 0 {
+		taskID, err := nCtx.ExecutionContext().GetTask(*taskIDStr)
+		if err != nil {
+			// This doesn't feed a very important part of the node execution event, swallow it for now.
+			logger.Errorf(ctx, "Failed to get task [%v] with error [%v]", taskID, err)
+		}
+		targetEntity = taskID.CoreTask().Id
+	}
+	return targetEntity
 }
