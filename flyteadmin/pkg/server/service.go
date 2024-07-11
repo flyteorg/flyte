@@ -222,6 +222,9 @@ func newHTTPServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 	// This option sets subject in the user info response
 	gwmuxOptions = append(gwmuxOptions, runtime.WithForwardResponseOption(auth.GetUserInfoForwardResponseHandler()))
 
+	// Use custom header matcher to allow additional headers to be passed through
+	gwmuxOptions = append(gwmuxOptions, runtime.WithIncomingHeaderMatcher(auth.GetCustomHeaderMatcher(pluginRegistry)))
+
 	if cfg.Security.UseAuth {
 		// Add HTTP handlers for OIDC endpoints
 		auth.RegisterHandlers(ctx, mux, authCtx, pluginRegistry)
