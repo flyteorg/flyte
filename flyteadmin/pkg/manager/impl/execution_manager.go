@@ -409,16 +409,17 @@ func (m *ExecutionManager) getClusterAssignment(ctx context.Context, req *admin.
 		return nil, err
 	}
 
-	if req.GetSpec().GetClusterAssignment() == nil {
+	reqAssignment := req.GetSpec().GetClusterAssignment()
+	reqPool := reqAssignment.GetClusterPoolName()
+	storedPool := storedAssignment.GetClusterPoolName()
+	if reqPool == "" {
 		return storedAssignment, nil
 	}
 
-	if storedAssignment == nil {
-		return req.GetSpec().GetClusterAssignment(), nil
+	if storedPool == "" {
+		return reqAssignment, nil
 	}
 
-	reqPool := req.Spec.ClusterAssignment.GetClusterPoolName()
-	storedPool := storedAssignment.GetClusterPoolName()
 	if reqPool != storedPool {
 		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "execution with project %q and domain %q cannot run on cluster pool %q, because its configured to run on pool %q", req.Project, req.Domain, reqPool, storedPool)
 	}

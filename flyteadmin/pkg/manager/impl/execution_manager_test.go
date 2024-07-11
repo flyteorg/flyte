@@ -5983,6 +5983,32 @@ func TestGetClusterAssignment(t *testing.T) {
 		assert.NoError(t, err)
 		assert.True(t, proto.Equal(ca, &reqClusterAssignment))
 	})
+	t.Run("empty value in DB, takes value from request", func(t *testing.T) {
+		clusterPoolAsstProvider := &runtimeIFaceMocks.ClusterPoolAssignmentConfiguration{}
+		clusterPoolAsstProvider.OnGetClusterPoolAssignments().Return(runtimeInterfaces.ClusterPoolAssignments{
+			workflowIdentifier.GetDomain(): runtimeInterfaces.ClusterPoolAssignment{
+				Pool: "",
+			},
+		})
+		mockConfig := getMockExecutionsConfigProvider()
+		mockConfig.(*runtimeMocks.MockConfigurationProvider).AddClusterPoolAssignmentConfiguration(clusterPoolAsstProvider)
+
+		executionManager := ExecutionManager{
+			resourceManager: &managerMocks.MockResourceManager{},
+			config:          mockConfig,
+		}
+
+		reqClusterAssignment := admin.ClusterAssignment{ClusterPoolName: "gpu"}
+		ca, err := executionManager.getClusterAssignment(context.TODO(), &admin.ExecutionCreateRequest{
+			Project: workflowIdentifier.Project,
+			Domain:  workflowIdentifier.Domain,
+			Spec: &admin.ExecutionSpec{
+				ClusterAssignment: &reqClusterAssignment,
+			},
+		})
+		assert.NoError(t, err)
+		assert.True(t, proto.Equal(ca, &reqClusterAssignment))
+	})
 	t.Run("value from request doesn't match value from config", func(t *testing.T) {
 		reqClusterAssignment := admin.ClusterAssignment{ClusterPoolName: "swimming-pool"}
 		_, err := executionManager.getClusterAssignment(context.TODO(), &admin.ExecutionCreateRequest{
