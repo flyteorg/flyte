@@ -2,7 +2,7 @@
 ///
 /// Additional metadata as key-value pairs
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct KeyMapMetadata {
@@ -16,7 +16,7 @@ pub struct KeyMapMetadata {
 ///
 /// Metadata for cached outputs, including the source identifier and timestamps.
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Metadata {
@@ -38,7 +38,7 @@ pub struct Metadata {
 ///
 /// Represents cached output, either as literals or an URI, with associated metadata.
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CachedOutput {
@@ -51,7 +51,7 @@ pub struct CachedOutput {
 /// Nested message and enum types in `CachedOutput`.
 pub mod cached_output {
     #[pyo3::pyclass(get_all, set_all)]
-    #[derive(::pyo3_macro::WithNew)]
+    #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
     #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum Output {
@@ -66,7 +66,7 @@ pub mod cached_output {
 ///
 /// Request to retrieve cached data by key.
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GetCacheRequest {
@@ -77,7 +77,7 @@ pub struct GetCacheRequest {
 ///
 /// Response with cached data for a given key.
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GetCacheResponse {
@@ -88,7 +88,7 @@ pub struct GetCacheResponse {
 ///
 /// Request to store/update cached data by key.
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct PutCacheRequest {
@@ -107,14 +107,14 @@ pub struct PutCacheRequest {
 ///
 /// Empty, success indicated by no errors
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct PutCacheResponse {}
 ///
 /// Request to delete cached data by key.
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct DeleteCacheRequest {
@@ -127,13 +127,13 @@ pub struct DeleteCacheRequest {
 ///
 /// Empty, success indicated by no errors
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct DeleteCacheResponse {}
 /// A reservation including owner, heartbeat interval, expiration timestamp, and various metadata.
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Reservation {
@@ -155,7 +155,7 @@ pub struct Reservation {
 ///
 /// Request to get or extend a reservation for a cache key
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GetOrExtendReservationRequest {
@@ -174,7 +174,7 @@ pub struct GetOrExtendReservationRequest {
 ///
 /// Request to get or extend a reservation for a cache key
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GetOrExtendReservationResponse {
@@ -185,7 +185,7 @@ pub struct GetOrExtendReservationResponse {
 ///
 /// Request to release the reservation for a cache key
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ReleaseReservationRequest {
@@ -201,7 +201,7 @@ pub struct ReleaseReservationRequest {
 ///
 /// Empty, success indicated by no errors
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ReleaseReservationResponse {}

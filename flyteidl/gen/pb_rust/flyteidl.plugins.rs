@@ -2,7 +2,7 @@
 /// Describes a job that can process independent pieces of data concurrently. Multiple copies of the runnable component
 /// will be executed concurrently.
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ArrayJob {
@@ -22,7 +22,7 @@ pub struct ArrayJob {
 /// Nested message and enum types in `ArrayJob`.
 pub mod array_job {
     #[pyo3::pyclass(get_all, set_all)]
-    #[derive(::pyo3_macro::WithNew)]
+    #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
     #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum SuccessCriteria {
@@ -39,7 +39,7 @@ pub mod array_job {
 }
 /// Custom Proto for Dask Plugin.
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct DaskJob {
@@ -52,7 +52,7 @@ pub struct DaskJob {
 }
 /// Specification for the scheduler pod.
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct DaskScheduler {
@@ -64,7 +64,7 @@ pub struct DaskScheduler {
     pub resources: ::core::option::Option<super::core::Resources>,
 }
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct DaskWorkerGroup {
@@ -85,7 +85,7 @@ pub struct DaskWorkerGroup {
 /// MPI operator proposal <https://github.com/kubeflow/community/blob/master/proposals/mpi-operator-proposal.md>
 /// Custom proto for plugin that enables distributed training using <https://github.com/kubeflow/mpi-operator>
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct DistributedMpiTrainingTask {
@@ -104,7 +104,7 @@ pub struct DistributedMpiTrainingTask {
 /// This message works with the 'presto' task type in the SDK and is the object that will be in the 'custom' field
 /// of a Presto task's TaskTemplate
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct PrestoQuery {
@@ -120,7 +120,7 @@ pub struct PrestoQuery {
 /// Custom proto for torch elastic config for distributed training using
 /// <https://github.com/kubeflow/training-operator/blob/master/pkg/apis/kubeflow.org/v1/pytorch_types.go>
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ElasticConfig {
@@ -137,7 +137,7 @@ pub struct ElasticConfig {
 }
 /// Custom proto for plugin that enables distributed training using <https://github.com/kubeflow/pytorch-operator>
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct DistributedPyTorchTrainingTask {
@@ -151,7 +151,7 @@ pub struct DistributedPyTorchTrainingTask {
 }
 /// Defines a query to execute on a hive cluster.
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct HiveQuery {
@@ -164,7 +164,7 @@ pub struct HiveQuery {
 }
 /// Defines a collection of hive queries.
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct HiveQueryCollection {
@@ -174,7 +174,7 @@ pub struct HiveQueryCollection {
 /// This message works with the 'hive' task type in the SDK and is the object that will be in the 'custom' field
 /// of a hive task's TaskTemplate
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct QuboleHiveJob {
@@ -190,7 +190,7 @@ pub struct QuboleHiveJob {
 }
 /// RayJobSpec defines the desired state of RayJob
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct RayJob {
@@ -215,7 +215,7 @@ pub struct RayJob {
 }
 /// Define Ray cluster defines the desired state of RayCluster
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct RayCluster {
@@ -231,7 +231,7 @@ pub struct RayCluster {
 }
 /// HeadGroupSpec are the spec for the head pod
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct HeadGroupSpec {
@@ -245,7 +245,7 @@ pub struct HeadGroupSpec {
 }
 /// WorkerGroupSpec are the specs for the worker pods
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct WorkerGroupSpec {
@@ -270,14 +270,14 @@ pub struct WorkerGroupSpec {
     >,
 }
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct SparkApplication {}
 /// Nested message and enum types in `SparkApplication`.
 pub mod spark_application {
     #[pyo3::pyclass(get_all, set_all)]
-    #[derive(::pyo3_macro::WithNew)]
+    #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
     #[derive(
         Clone,
         Copy,
@@ -323,7 +323,7 @@ pub mod spark_application {
 }
 /// Custom Proto for Spark Plugin.
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct SparkJob {
@@ -361,7 +361,7 @@ pub struct SparkJob {
 }
 /// Custom proto for plugin that enables distributed training using <https://github.com/kubeflow/tf-operator>
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct DistributedTensorflowTrainingTask {
@@ -381,7 +381,7 @@ pub struct DistributedTensorflowTrainingTask {
 }
 /// Represents an Execution that was launched and could be waited on.
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Waitable {
