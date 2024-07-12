@@ -75,6 +75,7 @@ stringData:
   cookie_hash_key: "4EfCL3f4u3SEl7fGNd0hUqnfASxC6W1oFOQH7njT8NSFhZQV78Y4H/xRxa/ttF9QfTd/Th79s3W+w+ATo5IAlA"
   cookie_block_key: "FivnWNlPDsZ988UdMuUoS7SEghTA91QYfYHi7npCCP8"
   claim_symmetric_key: "qGeM76T9DLdOoFhoefC7sy9rzvm/EehF8bj2BDNvTU8"
+  oidc_client_secret: "foobar"
 ---
 # Source: flyte-core/templates/common/secret-auth.yaml
 apiVersion: v1
