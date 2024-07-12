@@ -10,7 +10,7 @@ macro_rules! convert_foreign_tonic_error {
 
         impl fmt::Display for GRPCError {
             fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-                write!(f, "GRPCError: {}", self.0)
+                write!(f, "{}", self.0)
             }
         }
 
@@ -21,8 +21,8 @@ macro_rules! convert_foreign_tonic_error {
         }
 
         impl std::convert::From<GRPCError> for PyErr {
-            fn from(err: GRPCError) -> PyErr {
-                PyOSError::new_err(err.to_string())
+            fn from(err: GRPCError) -> Self {
+                PyException::new_err(err.to_string())
             }
         }
     };
@@ -34,7 +34,7 @@ macro_rules! convert_foreign_prost_error {
     // Create a newtype wrapper, e.g. MyOtherError. Then implement From<MyOtherError> for PyErr (or PyErrArguments), as well as From<OtherError> for MyOtherError.
     () => {
         use prost::{DecodeError, EncodeError, Message};
-        use pyo3::exceptions::PyOSError;
+        use pyo3::exceptions::PyException;
         use pyo3::types::PyBytes;
         use pyo3::PyErr;
 
@@ -57,13 +57,13 @@ macro_rules! convert_foreign_prost_error {
 
         impl std::convert::From<MessageEncodeError> for PyErr {
             fn from(err: MessageEncodeError) -> PyErr {
-                PyOSError::new_err(err.to_string())
+                PyException::new_err(err.to_string())
             }
         }
 
         impl std::convert::From<MessageDecodeError> for PyErr {
             fn from(err: MessageDecodeError) -> PyErr {
-                PyOSError::new_err(err.to_string())
+                PyException::new_err(err.to_string())
             }
         }
 
@@ -442,19 +442,19 @@ pub mod _flyteidl_rust {
     pub mod admin {
         #[pymodule_export]
         use crate::flyteidl::admin::{
-            AbortMetadata, Annotations, AuthRole, ClusterAssignment, Description,
+            AbortMetadata, Annotations, AuthRole, ClusterAssignment, CronSchedule, Description,
             DescriptionEntity, Envs, Execution, ExecutionClosure, ExecutionClusterLabel,
             ExecutionCreateRequest, ExecutionCreateResponse, ExecutionMetadata, ExecutionSpec,
-            Labels, LaunchPlan, LaunchPlanCreateRequest, LaunchPlanCreateResponse,
-            LaunchPlanMetadata, LaunchPlanSpec, LiteralMapBlob, NamedEntityIdentifierList,
-            NamedEntityIdentifierListRequest, NodeExecution, NodeExecutionGetDataRequest,
-            NodeExecutionGetDataResponse, NodeExecutionList, NodeExecutionListRequest,
-            Notification, NotificationList, ObjectGetRequest, RawOutputDataConfig,
-            ResourceListRequest, Schedule, SourceCode, SystemMetadata, Task, TaskClosure,
-            TaskCreateRequest, TaskCreateResponse, TaskExecution, TaskExecutionGetDataRequest,
-            TaskExecutionGetDataResponse, TaskExecutionGetRequest, TaskExecutionList,
-            TaskExecutionListRequest, TaskSpec, Workflow, WorkflowClosure, WorkflowCreateRequest,
-            WorkflowCreateResponse, WorkflowExecutionGetDataRequest,
+            FixedRate, FixedRateUnit, Labels, LaunchPlan, LaunchPlanCreateRequest,
+            LaunchPlanCreateResponse, LaunchPlanMetadata, LaunchPlanSpec, LiteralMapBlob,
+            NamedEntityIdentifierList, NamedEntityIdentifierListRequest, NodeExecution,
+            NodeExecutionGetDataRequest, NodeExecutionGetDataResponse, NodeExecutionList,
+            NodeExecutionListRequest, Notification, NotificationList, ObjectGetRequest,
+            RawOutputDataConfig, ResourceListRequest, Schedule, SourceCode, SystemMetadata, Task,
+            TaskClosure, TaskCreateRequest, TaskCreateResponse, TaskExecution,
+            TaskExecutionGetDataRequest, TaskExecutionGetDataResponse, TaskExecutionGetRequest,
+            TaskExecutionList, TaskExecutionListRequest, TaskSpec, Workflow, WorkflowClosure,
+            WorkflowCreateRequest, WorkflowCreateResponse, WorkflowExecutionGetDataRequest,
             WorkflowExecutionGetDataResponse, WorkflowExecutionGetRequest, WorkflowList,
             WorkflowSpec,
         };
@@ -576,228 +576,176 @@ pub mod _flyteidl_rust {
         pub fn get_task(
             &mut self,
             req: crate::flyteidl::admin::ObjectGetRequest,
-        ) -> PyResult<crate::flyteidl::admin::Task> {
-            let res = (match self.runtime.block_on(self.admin_service.get_task(req)) {
-                Ok(res) => res,
-                Err(error) => panic!("Error responsed from gRPC server: {:?}", error),
-            })
-            .into_inner();
+        ) -> Result<crate::flyteidl::admin::Task, GRPCError> {
+            let res = self
+                .runtime
+                .block_on(self.admin_service.get_task(req))?
+                .into_inner();
             Ok(res)
         }
 
         pub fn create_task(
             &mut self,
             req: crate::flyteidl::admin::TaskCreateRequest,
-        ) -> PyResult<crate::flyteidl::admin::TaskCreateResponse> {
-            let res = (match self.runtime.block_on(self.admin_service.create_task(req)) {
-                Ok(res) => res,
-                Err(error) => panic!("Error responsed from gRPC server: {:?}", error),
-            })
-            .into_inner();
+        ) -> Result<crate::flyteidl::admin::TaskCreateResponse, GRPCError> {
+            let res = self
+                .runtime
+                .block_on(self.admin_service.create_task(req))?
+                .into_inner();
             Ok(res)
         }
 
         pub fn create_upload_location(
             &mut self,
             req: crate::flyteidl::service::CreateUploadLocationRequest,
-        ) -> PyResult<crate::flyteidl::service::CreateUploadLocationResponse> {
-            let res = (match self
+        ) -> Result<crate::flyteidl::service::CreateUploadLocationResponse, GRPCError> {
+            let res = self
                 .runtime
-                .block_on(self.data_proxy_service.create_upload_location(req))
-            {
-                Ok(res) => res,
-                Err(error) => panic!("Error responsed from gRPC server: {:?}", error),
-            })
-            .into_inner();
+                .block_on(self.data_proxy_service.create_upload_location(req))?
+                .into_inner();
             Ok(res)
         }
 
         pub fn create_execution(
             &mut self,
             req: crate::flyteidl::admin::ExecutionCreateRequest,
-        ) -> PyResult<crate::flyteidl::admin::ExecutionCreateResponse> {
-            let res = (match self
+        ) -> Result<crate::flyteidl::admin::ExecutionCreateResponse, GRPCError> {
+            let res = self
                 .runtime
-                .block_on(self.admin_service.create_execution(req))
-            {
-                Ok(res) => res,
-                Err(error) => panic!("Error responsed from gRPC server: {:?}", error),
-            })
-            .into_inner();
+                .block_on(self.admin_service.create_execution(req))?
+                .into_inner();
             Ok(res)
         }
 
         pub fn get_execution(
             &mut self,
             req: crate::flyteidl::admin::WorkflowExecutionGetRequest,
-        ) -> PyResult<crate::flyteidl::admin::Execution> {
-            let res = (match self.runtime.block_on(self.admin_service.get_execution(req)) {
-                Ok(res) => res,
-                Err(error) => panic!("Error responsed from gRPC server: {:?}", error),
-            })
-            .into_inner();
+        ) -> Result<crate::flyteidl::admin::Execution, GRPCError> {
+            let res = self
+                .runtime
+                .block_on(self.admin_service.get_execution(req))?
+                .into_inner();
             Ok(res)
         }
 
         pub fn get_execution_data(
             &mut self,
             req: crate::flyteidl::admin::WorkflowExecutionGetDataRequest,
-        ) -> PyResult<crate::flyteidl::admin::WorkflowExecutionGetDataResponse> {
-            let res = (match self
+        ) -> Result<crate::flyteidl::admin::WorkflowExecutionGetDataResponse, GRPCError> {
+            let res = self
                 .runtime
-                .block_on(self.admin_service.get_execution_data(req))
-            {
-                Ok(res) => res,
-                Err(error) => panic!("Error responsed from gRPC server: {:?}", error),
-            })
-            .into_inner();
+                .block_on(self.admin_service.get_execution_data(req))?
+                .into_inner();
             Ok(res)
         }
 
         pub fn list_node_executions(
             &mut self,
             req: crate::flyteidl::admin::NodeExecutionListRequest,
-        ) -> PyResult<crate::flyteidl::admin::NodeExecutionList> {
-            let res = (match self
+        ) -> Result<crate::flyteidl::admin::NodeExecutionList, GRPCError> {
+            let res = self
                 .runtime
-                .block_on(self.admin_service.list_node_executions(req))
-            {
-                Ok(res) => res,
-                Err(error) => panic!("Error responsed from gRPC server: {:?}", error),
-            })
-            .into_inner();
+                .block_on(self.admin_service.list_node_executions(req))?
+                .into_inner();
             Ok(res)
         }
 
         pub fn get_node_execution_data(
             &mut self,
             req: crate::flyteidl::admin::NodeExecutionGetDataRequest,
-        ) -> PyResult<crate::flyteidl::admin::NodeExecutionGetDataResponse> {
-            let res = (match self
+        ) -> Result<crate::flyteidl::admin::NodeExecutionGetDataResponse, GRPCError> {
+            let res = self
                 .runtime
-                .block_on(self.admin_service.get_node_execution_data(req))
-            {
-                Ok(res) => res,
-                Err(error) => panic!("Error responsed from gRPC server: {:?}", error),
-            })
-            .into_inner();
+                .block_on(self.admin_service.get_node_execution_data(req))?
+                .into_inner();
             Ok(res)
         }
 
         pub fn list_task_executions(
             &mut self,
             req: crate::flyteidl::admin::TaskExecutionListRequest,
-        ) -> PyResult<crate::flyteidl::admin::TaskExecutionList> {
-            let res = (match self
+        ) -> Result<crate::flyteidl::admin::TaskExecutionList, GRPCError> {
+            let res = self
                 .runtime
-                .block_on(self.admin_service.list_task_executions(req))
-            {
-                Ok(res) => res,
-                Err(error) => panic!("Error responsed from gRPC server: {:?}", error),
-            })
-            .into_inner();
+                .block_on(self.admin_service.list_task_executions(req))?
+                .into_inner();
             Ok(res)
         }
 
         pub fn get_task_execution(
             &mut self,
             req: crate::flyteidl::admin::TaskExecutionGetRequest,
-        ) -> PyResult<crate::flyteidl::admin::TaskExecution> {
-            let res = (match self
+        ) -> Result<crate::flyteidl::admin::TaskExecution, GRPCError> {
+            let res = self
                 .runtime
-                .block_on(self.admin_service.get_task_execution(req))
-            {
-                Ok(res) => res,
-                Err(error) => panic!("Error responsed from gRPC server: {:?}", error),
-            })
-            .into_inner();
+                .block_on(self.admin_service.get_task_execution(req))?
+                .into_inner();
             Ok(res)
         }
 
         pub fn create_workflow(
             &mut self,
             req: crate::flyteidl::admin::WorkflowCreateRequest,
-        ) -> PyResult<crate::flyteidl::admin::WorkflowCreateResponse> {
-            let res = (match self
+        ) -> Result<crate::flyteidl::admin::WorkflowCreateResponse, GRPCError> {
+            let res = self
                 .runtime
-                .block_on(self.admin_service.create_workflow(req))
-            {
-                Ok(res) => res,
-                Err(error) => panic!("Error responsed from gRPC server: {:?}", error),
-            })
-            .into_inner();
+                .block_on(self.admin_service.create_workflow(req))?
+                .into_inner();
             Ok(res)
         }
 
         pub fn list_workflow_ids(
             &mut self,
             req: crate::flyteidl::admin::NamedEntityIdentifierListRequest,
-        ) -> PyResult<crate::flyteidl::admin::NamedEntityIdentifierList> {
-            let res = (match self
+        ) -> Result<crate::flyteidl::admin::NamedEntityIdentifierList, GRPCError> {
+            let res = self
                 .runtime
-                .block_on(self.admin_service.list_workflow_ids(req))
-            {
-                Ok(res) => res,
-                Err(error) => panic!("Error responsed from gRPC server: {:?}", error),
-            })
-            .into_inner();
+                .block_on(self.admin_service.list_workflow_ids(req))?
+                .into_inner();
             Ok(res)
         }
 
         pub fn list_workflows(
             &mut self,
             req: crate::flyteidl::admin::ResourceListRequest,
-        ) -> PyResult<crate::flyteidl::admin::WorkflowList> {
-            let res = (match self
+        ) -> Result<crate::flyteidl::admin::WorkflowList, GRPCError> {
+            let res = self
                 .runtime
-                .block_on(self.admin_service.list_workflows(req))
-            {
-                Ok(res) => res,
-                Err(error) => panic!("Error responsed from gRPC server: {:?}", error),
-            })
-            .into_inner();
+                .block_on(self.admin_service.list_workflows(req))?
+                .into_inner();
             Ok(res)
         }
 
         pub fn get_workflow(
             &mut self,
             req: crate::flyteidl::admin::ObjectGetRequest,
-        ) -> PyResult<crate::flyteidl::admin::Workflow> {
-            let res = (match self.runtime.block_on(self.admin_service.get_workflow(req)) {
-                Ok(res) => res,
-                Err(error) => panic!("Error responsed from gRPC server: {:?}", error),
-            })
-            .into_inner();
+        ) -> Result<crate::flyteidl::admin::Workflow, GRPCError> {
+            let res = self
+                .runtime
+                .block_on(self.admin_service.get_workflow(req))?
+                .into_inner();
             Ok(res)
         }
 
         pub fn create_launch_plan(
             &mut self,
             req: crate::flyteidl::admin::LaunchPlanCreateRequest,
-        ) -> PyResult<crate::flyteidl::admin::LaunchPlanCreateResponse> {
-            let res = (match self
+        ) -> Result<crate::flyteidl::admin::LaunchPlanCreateResponse, GRPCError> {
+            let res = self
                 .runtime
-                .block_on(self.admin_service.create_launch_plan(req))
-            {
-                Ok(res) => res,
-                Err(error) => panic!("Error responsed from gRPC server: {:?}", error),
-            })
-            .into_inner();
+                .block_on(self.admin_service.create_launch_plan(req))?
+                .into_inner();
             Ok(res)
         }
 
         pub fn get_launch_plan(
             &mut self,
             req: crate::flyteidl::admin::ObjectGetRequest,
-        ) -> PyResult<crate::flyteidl::admin::LaunchPlan> {
-            let res = (match self
+        ) -> Result<crate::flyteidl::admin::LaunchPlan, GRPCError> {
+            let res = self
                 .runtime
-                .block_on(self.admin_service.get_launch_plan(req))
-            {
-                Ok(res) => res,
-                Err(error) => panic!("Error responsed from gRPC server: {:?}", error),
-            })
-            .into_inner();
+                .block_on(self.admin_service.get_launch_plan(req))?
+                .into_inner();
             Ok(res)
         }
     }
