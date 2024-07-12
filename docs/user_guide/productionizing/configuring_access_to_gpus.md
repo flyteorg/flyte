@@ -8,9 +8,9 @@
 
 Along with compute resources like CPU and Memory, you may want to configure and access GPU resources. 
 
-Flyte gives you multiple levels of granularity to request accelerator resources from your Task definition.
+Flyte provides different ways to request accelerator resources directly from the task decorator.
 
-## Requesting a generic accelerator
+>The examples in this section use [ImageSpec](https://docs.flyte.org/en/latest/user_guide/customizing_dependencies/imagespec.html#imagespec), a Flyte feature that builds a custom container image without a Dockerfile. Install it using `pip install flytekitplugins-envd`.
 
 Example:
 
@@ -30,7 +30,7 @@ image = ImageSpec(
 def gpu_available() -> bool:
    return torch.cuda.is_available()
 ```
-The goal here is to make a simple request of any available GPU device(s).
+The goal here is to request any available GPU device(s).
 
 ### How it works?
 
@@ -41,7 +41,7 @@ When this task is evaluated, `flyteproller` injects a [toleration](https://kuber
 ```yaml
 tolerations:    nvidia.com/gpu:NoSchedule op=Exists
 ```
-The Kubernetes scheduler will admit the pod if there are worker nodes with matching taints and available resources in the cluster.
+The Kubernetes scheduler will admit the pod if there are worker nodes in the cluster with a matching taint and available resources.
 
 The resource `nvidia.com/gpu` key name is not arbitrary. It corresponds to the [Extended Resource](https://kubernetes.io/docs/tasks/administer-cluster/extended-resource-node/) that the Kubernetes worker nodes advertise to the API server through the [device plugin](https://kubernetes.io/docs/tasks/manage-gpus/scheduling-gpus/#using-device-plugins).
 
@@ -95,7 +95,7 @@ configuration:
             value: "myvalue"
             effect: "NoSchedule" 
 ```
->For the above configuration, your worker nodes should have a `mykey=myvalue:NoSchedule` matching taint
+>For the above configuration, your worker nodes should be tainted with `mykey=myvalue:NoSchedule`.
 
 ## Requesting a specific GPU device
 
@@ -119,7 +119,7 @@ image = ImageSpec(
 def gpu_available() -> bool:
    return torch.cuda.is_available()
 ```
-Leveraging a flytekit feature, you can specify the accelerator device in the task decorator .
+Leveraging a flytekit feature, you can request a specific accelerator device from the task decorator .
 
 ### How it works?
 
@@ -173,41 +173,89 @@ configuration:
       k8s:
        gpu-device-node-label: "cloud.google.com/gke-accelerator" #change to match your node's config 
 ```
-While the `key` is arbitrary the `value` is not. flytekit has a set of [predefined](https://docs.flyte.org/en/latest/api/flytekit/extras.accelerators.html#predefined-accelerator-constants) constants and your node label has to use one of those keys. 
-
-
-
-
+While the `key` is arbitrary, the value (`nvidia-tesla-v100`) is not. `flytekit` has a set of [predefined](https://docs.flyte.org/en/latest/api/flytekit/extras.accelerators.html#predefined-accelerator-constants) constants and your node label has to use one of those values. 
 
 ## Requesting a GPU partition
 
-Flyte
-allows you to configure the GPU access policy for your cluster. GPUs are expensive and it would not be ideal to
-treat machines with GPUs and machines with CPUs equally. You may want to reserve machines with GPUs for tasks
-that explicitly request them. To achieve this, Flyte uses the Kubernetes concept of [taints and tolerations](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/).
+Example:
+```python
+from flytekit import ImageSpec, Resources, task
+from flytekit.extras.accelerators import A100
 
+image = ImageSpec(
+    base_image= "ghcr.io/flyteorg/flytekit:py3.10-1.10.2",
+     name="pytorch",
+     python_version="3.10",
+     packages=["torch"],
+     builder="envd",
+     registry="<YOUR_CONTAINER_REGISTRY>",
+ )
 
-
-Kubernetes can automatically apply tolerations for extended resources like GPUs using the [ExtendedResourceToleration plugin](https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/#extendedresourcetoleration), enabled by default in some cloud environments. Make sure the GPU nodes are tainted with a key matching the resource name, i.e., `key: nvidia.com/gpu`.
-
-You can also configure Flyte backend to apply specific tolerations. This configuration is controlled under generic  k8s plugin configuration as can be found [here](https://github.com/flyteorg/flyteplugins/blob/5a00b19d88b93f9636410a41f81a73356a711482/go/tasks/pluginmachinery/flytek8s/config/config.go#L120).
-
-The idea of this configuration is that whenever a task that can execute on Kubernetes requests for GPUs, it automatically
-adds the matching toleration for that resource (in this case, `gpu`) to the generated PodSpec.
-As it follows here, you can configure it to access specific resources using the tolerations for all resources supported by
-Kubernetes.
-
-Here's an example configuration:
+@task(requests=Resources( gpu="1"),
+              accelerator=A100.partition_2g_10gb, 
+              ) # 2 compute instances with 10GB memory slice
+def gpu_available() -> bool:
+   return torch.cuda.is_available()
+```
+### How it works?
+In this case, ``flytepropeller`` injects an additional nodeSelector to the resulting Pod spec, indicating the partition size:
 
 ```yaml
-plugins:
-  k8s:
-    resource-tolerations:
-      - nvidia.com/gpu:
-        - key: "key1"
-          operator: "Equal"
-          value: "value1"
-          effect: "NoSchedule"
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: nvidia.com/gpu.accelerator
+            operator: In
+            values:
+            - nvidia-tesla-a100
+          - key: nvidia.com/gpu.partition-size
+            operator: In
+            values:
+            - 2g.10gb
 ```
 
-Getting this configuration into your deployment will depend on how Flyte is deployed on your cluster. If you use the default Opta/Helm route, you'll need to amend your Helm chart values ([example](https://github.com/flyteorg/flyte/blob/cc127265aec490ad9537d29bd7baff828043c6f5/charts/flyte-core/values.yaml#L629)) so that they end up [here](https://github.com/flyteorg/flyte/blob/3d265f166fcdd8e20b07ff82b494c0a7f6b7b108/deployment/eks/flyte_helm_generated.yaml#L521).
+Plus and additional toleration:
+
+```yaml
+  tolerations:
+  - effect: NoSchedule
+    key: nvidia.com/gpu.accelerator
+    operator: Equal
+    value: nvidia-tesla-a100
+  - effect: NoSchedule
+    key: nvidia.com/gpu.partition-size
+    operator: Equal
+    value: 2g.10gb
+```
+In consequence, your nodes should have at least matching labels for the Kubernetes scheduler to admit the Pods. If you want to better control scheduling, add matching taints to the nodes.
+
+>NOTE: currently, ``flytekit`` supports partitions only for NVIDIA A100 devices
+
+In the previous example the ``nvidia.com/gpu.partition-size`` key is arbitrary and can be controlled from the Helm chart:
+
+**flyte-core**
+```yaml
+configmap:
+  k8s:
+    plugins:
+      k8s:
+        gpu-partition-size-node-label: "nvidia.com/gpu.partition-size" #change to match your node's config
+```
+**flyte-binary**
+```yaml
+configuration:
+  inline:
+    plugins:
+      k8s:
+       gpu-partition-size-node-label: "nvidia.com/gpu.partition-size" #change to match your node's config 
+```
+The ``2g.10gb`` value comes from the [NVIDIA A100 supported instance profiles](https://docs.nvidia.com/datacenter/tesla/mig-user-guide/index.html#concepts) and it's controlled from the Task decorator (``accelerator=A100.partition_2g_10gb`` in the above example). Depending on the profile requested in the Task, Flyte will inject the corresponding value for the node selector. Your nodes have to use matching labels:
+
+```yaml
+nvidia.com/gpu.partition-size: "2g.10gb"
+```
+
+>Learn more about the full list of ``flytekit`` supported partition profiles and task decorator options [here](https://docs.flyte.org/en/latest/api/flytekit/generated/flytekit.extras.accelerators.A100.html#flytekit.extras.accelerators.A100)
