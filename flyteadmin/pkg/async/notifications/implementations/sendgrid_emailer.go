@@ -34,7 +34,7 @@ func getSendgridEmail(adminEmail admin.EmailMessage) *mail.SGMailV3 {
 	m := mail.NewV3Mail()
 	// This from email address is really here as a formality. For sendgrid specifically, the sender email is determined
 	// from the api key that's used, not what you send along here.
-	from := mail.NewEmail("Flyte Notifications", adminEmail.SenderEmail)
+	from := mail.NewEmail("Union Cloud Notifications", adminEmail.SenderEmail)
 	content := mail.NewContent("text/html", adminEmail.Body)
 	m.SetFrom(from)
 	m.AddContent(content)
