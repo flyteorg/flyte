@@ -7076,9 +7076,9 @@
     "coreExecutionEnv": {
       "type": "object",
       "properties": {
-        "id": {
+        "name": {
           "type": "string",
-          "description": "id is a unique identifier for the execution environment."
+          "description": "name is a human-readable identifier for the execution environment. This is combined with the\nproject, domain, and version to uniquely identify an execution environment."
         },
         "type": {
           "type": "string",
@@ -7091,6 +7091,10 @@
         "spec": {
           "type": "object",
           "description": "spec is a specification of the environment."
+        },
+        "version": {
+          "type": "string",
+          "description": "version is the version of the execution environment. This may be used differently by each\nindividual environment type (ex. auto-generated or manually provided), but is intended to\nallow variance in environment specifications with the same ID."
         }
       },
       "description": "ExecutionEnv is a message that is used to specify the execution environment."
@@ -7294,6 +7298,9 @@
         "error": {
           "$ref": "#/definitions/coreError",
           "description": "An error to throw in case none of the branches were taken."
+        },
+        "noop": {
+          "$ref": "#/definitions/coreNoop"
         }
       },
       "description": "Defines a series of if/else blocks. The first branch whose condition evaluates to true is the one to execute.\nIf no conditions were satisfied, the else_node or the error will execute."
@@ -7604,6 +7611,9 @@
         }
       },
       "description": "Defines extra information about the Node."
+    },
+    "coreNoop": {
+      "type": "object"
     },
     "coreOAuth2Client": {
       "type": "object",

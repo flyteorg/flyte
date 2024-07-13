@@ -9640,6 +9640,99 @@
                 return IfBlock;
             })();
     
+            core.Noop = (function() {
+    
+                /**
+                 * Properties of a Noop.
+                 * @memberof flyteidl.core
+                 * @interface INoop
+                 */
+    
+                /**
+                 * Constructs a new Noop.
+                 * @memberof flyteidl.core
+                 * @classdesc Represents a Noop.
+                 * @implements INoop
+                 * @constructor
+                 * @param {flyteidl.core.INoop=} [properties] Properties to set
+                 */
+                function Noop(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * Creates a new Noop instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.core.Noop
+                 * @static
+                 * @param {flyteidl.core.INoop=} [properties] Properties to set
+                 * @returns {flyteidl.core.Noop} Noop instance
+                 */
+                Noop.create = function create(properties) {
+                    return new Noop(properties);
+                };
+    
+                /**
+                 * Encodes the specified Noop message. Does not implicitly {@link flyteidl.core.Noop.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.core.Noop
+                 * @static
+                 * @param {flyteidl.core.INoop} message Noop message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                Noop.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a Noop message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.core.Noop
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.core.Noop} Noop
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                Noop.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.Noop();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a Noop message.
+                 * @function verify
+                 * @memberof flyteidl.core.Noop
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                Noop.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    return null;
+                };
+    
+                return Noop;
+            })();
+    
             core.IfElseBlock = (function() {
     
                 /**
@@ -9650,6 +9743,7 @@
                  * @property {Array.<flyteidl.core.IIfBlock>|null} [other] IfElseBlock other
                  * @property {flyteidl.core.INode|null} [elseNode] IfElseBlock elseNode
                  * @property {flyteidl.core.IError|null} [error] IfElseBlock error
+                 * @property {flyteidl.core.INoop|null} [noop] IfElseBlock noop
                  */
     
                 /**
@@ -9700,17 +9794,25 @@
                  */
                 IfElseBlock.prototype.error = null;
     
+                /**
+                 * IfElseBlock noop.
+                 * @member {flyteidl.core.INoop|null|undefined} noop
+                 * @memberof flyteidl.core.IfElseBlock
+                 * @instance
+                 */
+                IfElseBlock.prototype.noop = null;
+    
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
     
                 /**
                  * IfElseBlock default.
-                 * @member {"elseNode"|"error"|undefined} default_
+                 * @member {"elseNode"|"error"|"noop"|undefined} default_
                  * @memberof flyteidl.core.IfElseBlock
                  * @instance
                  */
                 Object.defineProperty(IfElseBlock.prototype, "default", {
-                    get: $util.oneOfGetter($oneOfFields = ["elseNode", "error"]),
+                    get: $util.oneOfGetter($oneOfFields = ["elseNode", "error", "noop"]),
                     set: $util.oneOfSetter($oneOfFields)
                 });
     
@@ -9747,6 +9849,8 @@
                         $root.flyteidl.core.Node.encode(message.elseNode, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
                     if (message.error != null && message.hasOwnProperty("error"))
                         $root.flyteidl.core.Error.encode(message.error, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+                    if (message.noop != null && message.hasOwnProperty("noop"))
+                        $root.flyteidl.core.Noop.encode(message.noop, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
                     return writer;
                 };
     
@@ -9781,6 +9885,9 @@
                             break;
                         case 4:
                             message.error = $root.flyteidl.core.Error.decode(reader, reader.uint32());
+                            break;
+                        case 5:
+                            message.noop = $root.flyteidl.core.Noop.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -9832,6 +9939,16 @@
                             var error = $root.flyteidl.core.Error.verify(message.error);
                             if (error)
                                 return "error." + error;
+                        }
+                    }
+                    if (message.noop != null && message.hasOwnProperty("noop")) {
+                        if (properties["default"] === 1)
+                            return "default: multiple values";
+                        properties["default"] = 1;
+                        {
+                            var error = $root.flyteidl.core.Noop.verify(message.noop);
+                            if (error)
+                                return "noop." + error;
                         }
                     }
                     return null;

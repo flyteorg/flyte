@@ -54,6 +54,7 @@ type BranchNodeSpec struct {
 	ElseIf   []*IfBlock  `json:"elseIf,omitempty"`
 	Else     *NodeID     `json:"else,omitempty"`
 	ElseFail *core.Error `json:"elseFail,omitempty"`
+	Noop     *core.Noop  `json:"doNothing,omitempty"`
 }
 
 func (in *BranchNodeSpec) GetIf() ExecutableIfBlock {
@@ -74,4 +75,8 @@ func (in *BranchNodeSpec) GetElseIf() []ExecutableIfBlock {
 
 func (in *BranchNodeSpec) GetElseFail() *core.Error {
 	return in.ElseFail
+}
+
+func (in *BranchNodeSpec) GetNoop() *core.Noop {
+	return in.Noop
 }

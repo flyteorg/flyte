@@ -7298,6 +7298,9 @@
         "error": {
           "$ref": "#/definitions/coreError",
           "description": "An error to throw in case none of the branches were taken."
+        },
+        "noop": {
+          "$ref": "#/definitions/coreNoop"
         }
       },
       "description": "Defines a series of if/else blocks. The first branch whose condition evaluates to true is the one to execute.\nIf no conditions were satisfied, the else_node or the error will execute."
@@ -7608,6 +7611,9 @@
         }
       },
       "description": "Defines extra information about the Node."
+    },
+    "coreNoop": {
+      "type": "object"
     },
     "coreOAuth2Client": {
       "type": "object",

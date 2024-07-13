@@ -137,6 +137,8 @@ func DecideBranch(ctx context.Context, nl executors.NodeLookup, nodeID v1alpha1.
 	if selectedNodeID == nil {
 		if node.GetElseFail() != nil {
 			return nil, errors.Errorf(ErrorCodeUserProvidedError, node.GetElseFail().Message)
+		} else if node.GetNoop() != nil {
+			return nil, nil
 		}
 		return nil, errors.Errorf(ErrorCodeMalformedBranch, "No branch satisfied")
 	}

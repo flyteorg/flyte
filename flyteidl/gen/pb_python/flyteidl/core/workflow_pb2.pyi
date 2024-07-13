@@ -24,17 +24,23 @@ class IfBlock(_message.Message):
     then_node: Node
     def __init__(self, condition: _Optional[_Union[_condition_pb2.BooleanExpression, _Mapping]] = ..., then_node: _Optional[_Union[Node, _Mapping]] = ...) -> None: ...
 
+class Noop(_message.Message):
+    __slots__ = []
+    def __init__(self) -> None: ...
+
 class IfElseBlock(_message.Message):
-    __slots__ = ["case", "other", "else_node", "error"]
+    __slots__ = ["case", "other", "else_node", "error", "noop"]
     CASE_FIELD_NUMBER: _ClassVar[int]
     OTHER_FIELD_NUMBER: _ClassVar[int]
     ELSE_NODE_FIELD_NUMBER: _ClassVar[int]
     ERROR_FIELD_NUMBER: _ClassVar[int]
+    NOOP_FIELD_NUMBER: _ClassVar[int]
     case: IfBlock
     other: _containers.RepeatedCompositeFieldContainer[IfBlock]
     else_node: Node
     error: _types_pb2.Error
-    def __init__(self, case: _Optional[_Union[IfBlock, _Mapping]] = ..., other: _Optional[_Iterable[_Union[IfBlock, _Mapping]]] = ..., else_node: _Optional[_Union[Node, _Mapping]] = ..., error: _Optional[_Union[_types_pb2.Error, _Mapping]] = ...) -> None: ...
+    noop: Noop
+    def __init__(self, case: _Optional[_Union[IfBlock, _Mapping]] = ..., other: _Optional[_Iterable[_Union[IfBlock, _Mapping]]] = ..., else_node: _Optional[_Union[Node, _Mapping]] = ..., error: _Optional[_Union[_types_pb2.Error, _Mapping]] = ..., noop: _Optional[_Union[Noop, _Mapping]] = ...) -> None: ...
 
 class BranchNode(_message.Message):
     __slots__ = ["if_else"]

@@ -2260,6 +2260,10 @@ pub struct IfBlock {
     #[prost(message, optional, boxed, tag="2")]
     pub then_node: ::core::option::Option<::prost::alloc::boxed::Box<Node>>,
 }
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct Noop {
+}
 /// Defines a series of if/else blocks. The first branch whose condition evaluates to true is the one to execute.
 /// If no conditions were satisfied, the else_node or the error will execute.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -2272,7 +2276,7 @@ pub struct IfElseBlock {
     #[prost(message, repeated, tag="2")]
     pub other: ::prost::alloc::vec::Vec<IfBlock>,
     /// +required.
-    #[prost(oneof="if_else_block::Default", tags="3, 4")]
+    #[prost(oneof="if_else_block::Default", tags="3, 4, 5")]
     pub default: ::core::option::Option<if_else_block::Default>,
 }
 /// Nested message and enum types in `IfElseBlock`.
@@ -2287,6 +2291,8 @@ pub mod if_else_block {
         /// An error to throw in case none of the branches were taken.
         #[prost(message, tag="4")]
         Error(super::Error),
+        #[prost(message, tag="5")]
+        Noop(super::Noop),
     }
 }
 /// BranchNode is a special node that alter the flow of the workflow graph. It allows the control flow to branch at

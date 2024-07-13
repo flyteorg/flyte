@@ -21,6 +21,8 @@ message IfBlock {
     Node then_node = 2;
 }
 
+message Noop {}
+
 // Defines a series of if/else blocks. The first branch whose condition evaluates to true is the one to execute.
 // If no conditions were satisfied, the else_node or the error will execute.
 message IfElseBlock {
@@ -37,6 +39,8 @@ message IfElseBlock {
 
         // An error to throw in case none of the branches were taken.
         Error error = 4;
+
+        Noop noop = 5;
     }
 }
 

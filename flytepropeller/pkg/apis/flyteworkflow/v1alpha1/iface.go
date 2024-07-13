@@ -247,6 +247,7 @@ type ExecutableBranchNode interface {
 	GetElse() *NodeID
 	GetElseIf() []ExecutableIfBlock
 	GetElseFail() *core.Error
+	GetNoop() *core.Noop
 }
 
 type ExecutableGateNode interface {

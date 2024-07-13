@@ -54,6 +54,10 @@ func (b *branchHandler) HandleBranchNode(ctx context.Context, branchNode v1alpha
 			errMsg := fmt.Sprintf("Branch evaluation failed. Error [%s]", err)
 			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(core.ExecutionError_SYSTEM, errors.IllegalStateError, errMsg, nil)), nil
 		}
+		if finalNodeID == nil {
+			// Noop in the branch node if both finalNodeID and err are nil
+			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoSuccess(nil)), nil
+		}
 
 		branchNodeState := handler.BranchNodeState{FinalizedNodeID: finalNodeID, Phase: v1alpha1.BranchNodeSuccess}
 		err = nCtx.NodeStateWriter().PutBranchNode(branchNodeState)

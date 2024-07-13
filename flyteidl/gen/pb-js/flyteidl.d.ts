@@ -4017,6 +4017,52 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of a Noop. */
+        interface INoop {
+        }
+
+        /** Represents a Noop. */
+        class Noop implements INoop {
+
+            /**
+             * Constructs a new Noop.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.INoop);
+
+            /**
+             * Creates a new Noop instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns Noop instance
+             */
+            public static create(properties?: flyteidl.core.INoop): flyteidl.core.Noop;
+
+            /**
+             * Encodes the specified Noop message. Does not implicitly {@link flyteidl.core.Noop.verify|verify} messages.
+             * @param message Noop message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.INoop, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a Noop message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns Noop
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.Noop;
+
+            /**
+             * Verifies a Noop message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of an IfElseBlock. */
         interface IIfElseBlock {
 
@@ -4031,6 +4077,9 @@ export namespace flyteidl {
 
             /** IfElseBlock error */
             error?: (flyteidl.core.IError|null);
+
+            /** IfElseBlock noop */
+            noop?: (flyteidl.core.INoop|null);
         }
 
         /** Represents an IfElseBlock. */
@@ -4054,8 +4103,11 @@ export namespace flyteidl {
             /** IfElseBlock error. */
             public error?: (flyteidl.core.IError|null);
 
+            /** IfElseBlock noop. */
+            public noop?: (flyteidl.core.INoop|null);
+
             /** IfElseBlock default. */
-            public default_?: ("elseNode"|"error");
+            public default_?: ("elseNode"|"error"|"noop");
 
             /**
              * Creates a new IfElseBlock instance using the specified properties.

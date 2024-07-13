@@ -59,6 +59,37 @@ export class IfBlock extends Message<IfBlock> {
 }
 
 /**
+ * @generated from message flyteidl.core.Noop
+ */
+export class Noop extends Message<Noop> {
+  constructor(data?: PartialMessage<Noop>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.core.Noop";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Noop {
+    return new Noop().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Noop {
+    return new Noop().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Noop {
+    return new Noop().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: Noop | PlainMessage<Noop> | undefined, b: Noop | PlainMessage<Noop> | undefined): boolean {
+    return proto3.util.equals(Noop, a, b);
+  }
+}
+
+/**
  * Defines a series of if/else blocks. The first branch whose condition evaluates to true is the one to execute.
  * If no conditions were satisfied, the else_node or the error will execute.
  *
@@ -100,6 +131,12 @@ export class IfElseBlock extends Message<IfElseBlock> {
      */
     value: Error;
     case: "error";
+  } | {
+    /**
+     * @generated from field: flyteidl.core.Noop noop = 5;
+     */
+    value: Noop;
+    case: "noop";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   constructor(data?: PartialMessage<IfElseBlock>) {
@@ -114,6 +151,7 @@ export class IfElseBlock extends Message<IfElseBlock> {
     { no: 2, name: "other", kind: "message", T: IfBlock, repeated: true },
     { no: 3, name: "else_node", kind: "message", T: Node, oneof: "default" },
     { no: 4, name: "error", kind: "message", T: Error, oneof: "default" },
+    { no: 5, name: "noop", kind: "message", T: Noop, oneof: "default" },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): IfElseBlock {
