@@ -423,10 +423,21 @@ func (s *watchManagerSuite) Test_WatchExecutionStatusUpdates_MissingCluster() {
 	s.Equal(flyteAdminErrors.NewFlyteAdminError(codes.InvalidArgument, "missing 'cluster'"), err)
 }
 
-func (s *watchManagerSuite) Test_WatchExecutionStatusUpdates_FindFindNextStatusUpdatesCheckpointError() {
+func (s *watchManagerSuite) Test_WatchExecutionStatusUpdates_FindFirstStatusUpdatesCheckpointError() {
 	s.srv.OnContext().Return(s.ctx).Once()
 	expected := errors.New("fail")
 	s.repo.OnFindNextStatusUpdatesCheckpoint(s.ctx, cluster, uint(0)).Return(uint(0), expected).Once()
+
+	err := s.manager.WatchExecutionStatusUpdates(&watch.WatchExecutionStatusUpdatesRequest{Cluster: cluster}, s.srv)
+
+	s.Equal(expected, err)
+}
+
+func (s *watchManagerSuite) Test_WatchExecutionStatusUpdates_FindNextStatusUpdatesCheckpointError() {
+	s.srv.OnContext().Return(s.ctx).Once()
+	s.repo.OnFindNextStatusUpdatesCheckpoint(s.ctx, cluster, uint(0)).Return(uint(42), nil).Once()
+	expected := errors.New("fail")
+	s.repo.OnFindNextStatusUpdatesCheckpoint(s.ctx, cluster, uint(42)).Return(uint(0), expected).Once()
 
 	err := s.manager.WatchExecutionStatusUpdates(&watch.WatchExecutionStatusUpdatesRequest{Cluster: cluster}, s.srv)
 

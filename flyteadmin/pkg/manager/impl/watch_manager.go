@@ -80,8 +80,12 @@ func (e *WatchManager) WatchExecutionStatusUpdates(req *watch.WatchExecutionStat
 	ticker := time.NewTicker(e.pollInterval)
 	defer ticker.Stop()
 
-	var checkpoint uint
-	var err error
+	// find 1st terminal execution checkpoint
+	checkpoint, err := e.db.ExecutionRepo().FindNextStatusUpdatesCheckpoint(ctx, cluster, 0)
+	if err != nil {
+		return err
+	}
+
 	for {
 		checkpoint, err = e.readAndSendExecutions(ctx, cluster, checkpoint, alreadySent, srv)
 		if err != nil {
