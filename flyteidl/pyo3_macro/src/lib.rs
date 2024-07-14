@@ -52,26 +52,32 @@ pub fn with_new(input: TokenStream) -> TokenStream {
             };
 
             let combined_arguments =
-                if !required_field_names.is_empty() && !optional_field_names.is_empty() {
-                    quote! { #required_part, #optional_part }
+                if required_field_names.is_empty() && optional_field_names.is_empty() {
+                    quote! { kwargs: Option<&pyo3::types::PyDict> }
+                } else if required_field_names.is_empty() && !optional_field_names.is_empty() {
+                    quote! { #optional_part , kwargs: Option<&pyo3::types::PyDict> }
+                } else if !required_field_names.is_empty() && optional_field_names.is_empty() {
+                    quote! { #required_part , kwargs: Option<&pyo3::types::PyDict> }
                 } else {
-                    quote! { #required_part #optional_part }
+                    quote! { #required_part, #optional_part , kwargs: Option<&pyo3::types::PyDict> }
                 };
-            let combined_signatures =
-                if !required_field_names.is_empty() && !optional_field_names.is_empty() {
-                    quote! { #(#required_field_names),*, #(#optional_field_names = None),* }
-                } else if !required_field_names.is_empty() {
-                    quote! { #(#required_field_names),* }
-                } else {
-                    quote! { #(#optional_field_names = None),* }
-                };
+            let combined_signatures = if required_field_names.is_empty()
+                && optional_field_names.is_empty()
+            {
+                quote! { **kwargs }
+            } else if !required_field_names.is_empty() && optional_field_names.is_empty() {
+                quote! { #(#required_field_names),* , **kwargs }
+            } else if required_field_names.is_empty() && !optional_field_names.is_empty() {
+                quote! { #(#optional_field_names = None),* , **kwargs }
+            } else {
+                quote! { #(#required_field_names),*, #(#optional_field_names = None),* , **kwargs }
+            };
 
             if generic_params.is_empty() {
                 // Implement methods template of the `new()` constructor function
                 quote! {
                     // Macro main entrypoint, `#name` is the name of the underlying structure.
                     use pyo3::prelude::*;
-
                     #[pyo3::pymethods]
                     impl #name {
                         // By default, it is not possible to create an instance of a custom class from Python code.
@@ -89,13 +95,13 @@ pub fn with_new(input: TokenStream) -> TokenStream {
                             }
                         }
                         // For the needs like `load_proto_from_file()`, `write_proto_to_file()` in `flytekit/core/utils.py`
-                        pub fn ParseFromString(&mut self, bytes_string: &pyo3::types::PyBytes) -> Result<#name, crate::_flyteidl_rust::MessageDecodeError>
+                        pub fn ParseFromString(&mut self, bytes_string: &str) -> Result<#name, crate::_flyteidl_rust::MessageDecodeError>
                         {
                             let bt = bytes_string.as_bytes();
                             let de = prost::Message::decode(&bt.to_vec()[..]);
                             Ok(de?)
                         }
-                        pub fn SerializeToString(&self) -> Result<Vec<u8>, crate::_flyteidl_rust::MessageEncodeError>
+                        pub fn SerializeToString(&self) -> Result<String, crate::_flyteidl_rust::MessageEncodeError>
                         {
                             // Bring `prost::Message` trait to scope here. Put it in outer impl block will leads to duplicated imports.
                             use prost::Message;
@@ -103,7 +109,8 @@ pub fn with_new(input: TokenStream) -> TokenStream {
                             buf.reserve(self.encoded_len());
                             // Unwrap is safe, since we have reserved sufficient capacity in the vector.
                             self.encode(&mut buf).unwrap();
-                            Ok(buf)
+                            let result = String::from_utf8(buf).expect("Conversion to string failed");
+                            Ok(result)
                         }
                     }
                 }
