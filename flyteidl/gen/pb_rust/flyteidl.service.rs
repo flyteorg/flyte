@@ -2269,14 +2269,14 @@ pub mod agent_metadata_service_client {
     }
 }
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct OAuth2MetadataRequest {}
 /// OAuth2MetadataResponse defines an RFC-Compliant response for /.well-known/oauth-authorization-server metadata
 /// as defined in <https://tools.ietf.org/html/rfc8414>
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct OAuth2MetadataResponse {
@@ -2322,13 +2322,13 @@ pub struct OAuth2MetadataResponse {
     pub device_authorization_endpoint: ::prost::alloc::string::String,
 }
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct PublicClientAuthConfigRequest {}
 /// FlyteClientResponse encapsulates public information that flyte clients (CLIs... etc.) can use to authenticate users.
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct PublicClientAuthConfigResponse {
@@ -2508,7 +2508,7 @@ pub mod auth_metadata_service_client {
     }
 }
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CreateUploadLocationResponse {
@@ -2534,7 +2534,7 @@ pub struct CreateUploadLocationResponse {
 ///    - project/domain/(a deterministic str representation of the content_md5)/filename (if present); OR
 ///    - project/domain/filename_root (if present)/filename (if present).
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CreateUploadLocationRequest {
@@ -2577,7 +2577,7 @@ pub struct CreateUploadLocationRequest {
 }
 /// CreateDownloadLocationRequest specified request for the CreateDownloadLocation API.
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CreateDownloadLocationRequest {
@@ -2591,7 +2591,7 @@ pub struct CreateDownloadLocationRequest {
     pub expires_in: ::core::option::Option<super::super::google::protobuf::Duration>,
 }
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CreateDownloadLocationResponse {
@@ -2604,7 +2604,7 @@ pub struct CreateDownloadLocationResponse {
 }
 /// CreateDownloadLinkRequest defines the request parameters to create a download link (signed url)
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CreateDownloadLinkRequest {
@@ -2622,7 +2622,7 @@ pub struct CreateDownloadLinkRequest {
 /// Nested message and enum types in `CreateDownloadLinkRequest`.
 pub mod create_download_link_request {
     #[pyo3::pyclass(get_all, set_all)]
-    #[derive(::pyo3_macro::WithNew)]
+    #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
     #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum Source {
@@ -2634,7 +2634,7 @@ pub mod create_download_link_request {
 }
 /// CreateDownloadLinkResponse defines the response for the generated links
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CreateDownloadLinkResponse {
@@ -2652,7 +2652,7 @@ pub struct CreateDownloadLinkResponse {
 }
 /// Wrapper object since the message is shared across this and the GetDataResponse
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct PreSignedUrLs {
@@ -2665,7 +2665,7 @@ pub struct PreSignedUrLs {
 }
 /// General request artifact to retrieve data from a Flyte artifact url.
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GetDataRequest {
@@ -2678,7 +2678,7 @@ pub struct GetDataRequest {
     pub flyte_url: ::prost::alloc::string::String,
 }
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GetDataResponse {
@@ -2688,7 +2688,7 @@ pub struct GetDataResponse {
 /// Nested message and enum types in `GetDataResponse`.
 pub mod get_data_response {
     #[pyo3::pyclass(get_all, set_all)]
-    #[derive(::pyo3_macro::WithNew)]
+    #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
     #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum Data {
@@ -2706,7 +2706,7 @@ pub mod get_data_response {
 }
 /// ArtifactType
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]
 pub enum ArtifactType {
@@ -2944,7 +2944,7 @@ pub mod data_proxy_service_client {
 }
 /// Represents a request structure to create task.
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct TaskCreateRequest {
@@ -2962,7 +2962,7 @@ pub struct TaskCreateRequest {
 }
 /// Represents a create response structure.
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct TaskCreateResponse {
@@ -2971,7 +2971,7 @@ pub struct TaskCreateResponse {
 }
 /// A message used to fetch a job state from backend plugin server.
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct TaskGetRequest {
@@ -2984,7 +2984,7 @@ pub struct TaskGetRequest {
 }
 /// Response to get an individual task state.
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct TaskGetResponse {
@@ -2999,7 +2999,7 @@ pub struct TaskGetResponse {
 }
 /// A message used to delete a task.
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct TaskDeleteRequest {
@@ -3012,13 +3012,13 @@ pub struct TaskDeleteRequest {
 }
 /// Response to delete a task.
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct TaskDeleteResponse {}
 /// The state of the execution is used to control its visibility in the UI/CLI.
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]
 pub enum State {
@@ -3233,13 +3233,13 @@ pub mod external_plugin_service_client {
     }
 }
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct UserInfoRequest {}
 /// See the OpenID Connect spec at <https://openid.net/specs/openid-connect-core-1_0.html#UserInfoResponse> for more information.
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct UserInfoResponse {

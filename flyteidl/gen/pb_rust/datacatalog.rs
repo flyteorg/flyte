@@ -2,7 +2,7 @@
 ///
 /// Request message for creating a Dataset.
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CreateDatasetRequest {
@@ -12,7 +12,7 @@ pub struct CreateDatasetRequest {
 ///
 /// Response message for creating a Dataset
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CreateDatasetResponse {}
@@ -20,7 +20,7 @@ pub struct CreateDatasetResponse {}
 /// Request message for retrieving a Dataset. The Dataset is retrieved by it's unique identifier
 /// which is a combination of several fields.
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GetDatasetRequest {
@@ -31,7 +31,7 @@ pub struct GetDatasetRequest {
 /// Response message for retrieving a Dataset. The response will include the metadata for the
 /// Dataset.
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GetDatasetResponse {
@@ -43,7 +43,7 @@ pub struct GetDatasetResponse {
 /// can be one of artifact_id or tag. The result returned will include the artifact data and metadata
 /// associated with the artifact.
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GetArtifactRequest {
@@ -55,7 +55,7 @@ pub struct GetArtifactRequest {
 /// Nested message and enum types in `GetArtifactRequest`.
 pub mod get_artifact_request {
     #[pyo3::pyclass(get_all, set_all)]
-    #[derive(::pyo3_macro::WithNew)]
+    #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
     #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum QueryHandle {
@@ -69,7 +69,7 @@ pub mod get_artifact_request {
 /// Response message for retrieving an Artifact. The result returned will include the artifact data
 /// and metadata associated with the artifact.
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GetArtifactResponse {
@@ -79,7 +79,7 @@ pub struct GetArtifactResponse {
 ///
 /// Request message for creating an Artifact and its associated artifact Data.
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CreateArtifactRequest {
@@ -89,14 +89,14 @@ pub struct CreateArtifactRequest {
 ///
 /// Response message for creating an Artifact.
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CreateArtifactResponse {}
 ///
 /// Request message for tagging an Artifact.
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct AddTagRequest {
@@ -106,13 +106,13 @@ pub struct AddTagRequest {
 ///
 /// Response message for tagging an Artifact.
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct AddTagResponse {}
 /// List the artifacts that belong to the Dataset, optionally filtered using filtered expression.
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ListArtifactsRequest {
@@ -128,7 +128,7 @@ pub struct ListArtifactsRequest {
 }
 /// Response to list artifacts
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ListArtifactsResponse {
@@ -141,7 +141,7 @@ pub struct ListArtifactsResponse {
 }
 /// List the datasets for the given query
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ListDatasetsRequest {
@@ -154,7 +154,7 @@ pub struct ListDatasetsRequest {
 }
 /// List the datasets response with token for next pagination
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ListDatasetsResponse {
@@ -168,7 +168,7 @@ pub struct ListDatasetsResponse {
 ///
 /// Request message for updating an Artifact and overwriting its associated ArtifactData.
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct UpdateArtifactRequest {
@@ -190,7 +190,7 @@ pub struct UpdateArtifactRequest {
 pub mod update_artifact_request {
     /// Either ID of artifact or name of tag to retrieve existing artifact from
     #[pyo3::pyclass(get_all, set_all)]
-    #[derive(::pyo3_macro::WithNew)]
+    #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
     #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum QueryHandle {
@@ -203,7 +203,7 @@ pub mod update_artifact_request {
 ///
 /// Response message for updating an Artifact.
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct UpdateArtifactResponse {
@@ -214,7 +214,7 @@ pub struct UpdateArtifactResponse {
 ///
 /// ReservationID message that is composed of several string fields.
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ReservationId {
@@ -227,7 +227,7 @@ pub struct ReservationId {
 }
 /// Try to acquire or extend an artifact reservation. If an active reservation exists, retrieve that instance.
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GetOrExtendReservationRequest {
@@ -243,7 +243,7 @@ pub struct GetOrExtendReservationRequest {
 }
 /// A reservation including owner, heartbeat interval, expiration timestamp, and various metadata.
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Reservation {
@@ -265,7 +265,7 @@ pub struct Reservation {
 }
 /// Response including either a newly minted reservation or the existing reservation
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GetOrExtendReservationResponse {
@@ -275,7 +275,7 @@ pub struct GetOrExtendReservationResponse {
 }
 /// Request to release reservation
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ReleaseReservationRequest {
@@ -288,14 +288,14 @@ pub struct ReleaseReservationRequest {
 }
 /// Response to release reservation
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ReleaseReservationResponse {}
 ///
 /// Dataset message. It is uniquely identified by DatasetID.
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Dataset {
@@ -309,7 +309,7 @@ pub struct Dataset {
 ///
 /// An artifact could have multiple partitions and each partition can have an arbitrary string key/value pair
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Partition {
@@ -321,7 +321,7 @@ pub struct Partition {
 ///
 /// DatasetID message that is composed of several string fields.
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct DatasetId {
@@ -347,7 +347,7 @@ pub struct DatasetId {
 ///
 /// Artifact message. It is composed of several string fields.
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Artifact {
@@ -374,7 +374,7 @@ pub struct Artifact {
 ///
 /// ArtifactData that belongs to an artifact
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ArtifactData {
@@ -387,7 +387,7 @@ pub struct ArtifactData {
 /// Tag message that is unique to a Dataset. It is associated to a single artifact and
 /// can be retrieved by name later.
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Tag {
@@ -404,7 +404,7 @@ pub struct Tag {
 ///
 /// Metadata representation for artifacts and datasets
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Metadata {
@@ -417,7 +417,7 @@ pub struct Metadata {
 }
 /// Filter expression that is composed of a combination of single filters
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct FilterExpression {
@@ -426,7 +426,7 @@ pub struct FilterExpression {
 }
 /// A single property to filter on.
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct SinglePropertyFilter {
@@ -440,7 +440,7 @@ pub struct SinglePropertyFilter {
 pub mod single_property_filter {
     /// as use-cases come up we can add more operators, ex: gte, like, not eq etc.
     #[pyo3::pyclass(get_all, set_all)]
-    #[derive(::pyo3_macro::WithNew)]
+    #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
     #[derive(
         Clone,
         Copy,
@@ -475,7 +475,7 @@ pub mod single_property_filter {
         }
     }
     #[pyo3::pyclass(get_all, set_all)]
-    #[derive(::pyo3_macro::WithNew)]
+    #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
     #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum PropertyFilter {
@@ -491,7 +491,7 @@ pub mod single_property_filter {
 }
 /// Artifact properties we can filter by
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ArtifactPropertyFilter {
@@ -503,7 +503,7 @@ pub struct ArtifactPropertyFilter {
 pub mod artifact_property_filter {
     /// oneof because we can add more properties in the future
     #[pyo3::pyclass(get_all, set_all)]
-    #[derive(::pyo3_macro::WithNew)]
+    #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
     #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum Property {
@@ -513,7 +513,7 @@ pub mod artifact_property_filter {
 }
 /// Tag properties we can filter by
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct TagPropertyFilter {
@@ -523,7 +523,7 @@ pub struct TagPropertyFilter {
 /// Nested message and enum types in `TagPropertyFilter`.
 pub mod tag_property_filter {
     #[pyo3::pyclass(get_all, set_all)]
-    #[derive(::pyo3_macro::WithNew)]
+    #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
     #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum Property {
@@ -533,7 +533,7 @@ pub mod tag_property_filter {
 }
 /// Partition properties we can filter by
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct PartitionPropertyFilter {
@@ -543,7 +543,7 @@ pub struct PartitionPropertyFilter {
 /// Nested message and enum types in `PartitionPropertyFilter`.
 pub mod partition_property_filter {
     #[pyo3::pyclass(get_all, set_all)]
-    #[derive(::pyo3_macro::WithNew)]
+    #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
     #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum Property {
@@ -552,7 +552,7 @@ pub mod partition_property_filter {
     }
 }
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct KeyValuePair {
@@ -563,7 +563,7 @@ pub struct KeyValuePair {
 }
 /// Dataset properties we can filter by
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct DatasetPropertyFilter {
@@ -573,7 +573,7 @@ pub struct DatasetPropertyFilter {
 /// Nested message and enum types in `DatasetPropertyFilter`.
 pub mod dataset_property_filter {
     #[pyo3::pyclass(get_all, set_all)]
-    #[derive(::pyo3_macro::WithNew)]
+    #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
     #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum Property {
@@ -592,7 +592,7 @@ pub mod dataset_property_filter {
 }
 /// Pagination options for making list requests
 #[pyo3::pyclass(get_all, set_all)]
-#[derive(::pyo3_macro::WithNew)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct PaginationOptions {
@@ -612,7 +612,7 @@ pub struct PaginationOptions {
 /// Nested message and enum types in `PaginationOptions`.
 pub mod pagination_options {
     #[pyo3::pyclass(get_all, set_all)]
-    #[derive(::pyo3_macro::WithNew)]
+    #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
     #[derive(
         Clone,
         Copy,
@@ -650,7 +650,7 @@ pub mod pagination_options {
         }
     }
     #[pyo3::pyclass(get_all, set_all)]
-    #[derive(::pyo3_macro::WithNew)]
+    #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
     #[derive(
         Clone,
         Copy,
