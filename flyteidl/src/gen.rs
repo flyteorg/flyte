@@ -34,7 +34,10 @@ fn main() {
         .type_attribute(".", "#[pyo3::pyclass(get_all, set_all)]")
         // `enum` cannot be `subclass`
         // .enum_attribute(".", "#[pyclass(get_all, set_all)]")
-        .type_attribute(".", "#[derive(::pyo3_macro::WithNew)]")
+        .type_attribute(
+            ".",
+            "#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]",
+        )
         .compile_well_known_types(true)
         .compile(
             &protos
