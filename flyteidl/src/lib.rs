@@ -8,6 +8,7 @@ macro_rules! convert_foreign_tonic_error {
         pub struct GRPCError(Status);
         use std::fmt;
 
+        // TODO: Do we need this formatting (to string)?
         impl fmt::Display for GRPCError {
             fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
                 write!(f, "{}", self.0)
@@ -43,12 +44,14 @@ macro_rules! convert_foreign_prost_error {
         // An error indicates taht failing at deserializing object from bytes string, like `ParseFromString()` for python protos.
         pub struct MessageDecodeError(DecodeError);
 
+        // TODO: Do we need this formatting (to string)?
         impl fmt::Display for MessageEncodeError {
             fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
                 write!(f, "")
             }
         }
 
+        // TODO: Do we need this formatting (to string)?
         impl fmt::Display for MessageDecodeError {
             fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
                 write!(f, "")
@@ -299,19 +302,25 @@ pub mod _flyteidl_rust {
         use crate::flyteidl::core::{
             Alias, ApproveCondition, ArrayNode, Binary, Binding, BindingData,
             BindingDataCollection, BlobMetadata, BlobType, BooleanExpression, BranchNode,
-            CompiledLaunchPlan, CompiledTask, CompiledWorkflow, CompiledWorkflowClosure, Container,
-            ContainerPort, DataLoadingConfig, Error, ExecutionEnv, ExecutionEnvAssignment,
-            ExecutionError, ExtendedResources, GateNode, Identifier, IfBlock, IfElseBlock,
-            IoStrategy, KeyValuePair, Literal, LiteralMap, LiteralType, Node,
-            NodeExecutionIdentifier, NodeMetadata, OutputReference, Parameter, ParameterMap,
-            Primitive, PromiseAttribute, ResourceType, Resources, RetryStrategy, RuntimeMetadata,
-            Scalar, SchemaType, SecurityContext, SignalCondition, SimpleType, SleepCondition,
-            StructuredDataset, StructuredDatasetMetadata, StructuredDatasetType, TaskMetadata,
-            TaskNode, TaskNodeOverrides, TaskTemplate, TypeAnnotation, TypeStructure,
-            TypedInterface, Union, UnionInfo, Variable, VariableMap, WorkflowExecution,
-            WorkflowExecutionIdentifier, WorkflowMetadata, WorkflowMetadataDefaults, WorkflowNode,
-            WorkflowTemplate,
+            CatalogArtifactTag, CatalogMetadata, CompiledLaunchPlan, CompiledTask,
+            CompiledWorkflow, CompiledWorkflowClosure, Container, ContainerPort, DataLoadingConfig,
+            Error, ExecutionEnv, ExecutionEnvAssignment, ExecutionError, ExtendedResources,
+            GateNode, Identifier, IfBlock, IfElseBlock, IoStrategy, KeyValuePair, Literal,
+            LiteralMap, LiteralType, Node, NodeExecutionIdentifier, NodeMetadata, OutputReference,
+            Parameter, ParameterMap, Primitive, PromiseAttribute, ResourceType, Resources,
+            RetryStrategy, RuntimeMetadata, Scalar, SchemaType, SecurityContext, SignalCondition,
+            SimpleType, SleepCondition, StructuredDataset, StructuredDatasetMetadata,
+            StructuredDatasetType, TaskExecutionIdentifier, TaskMetadata, TaskNode,
+            TaskNodeOverrides, TaskTemplate, TypeAnnotation, TypeStructure, TypedInterface, Union,
+            UnionInfo, Variable, VariableMap, WorkflowExecution, WorkflowExecutionIdentifier,
+            WorkflowMetadata, WorkflowMetadataDefaults, WorkflowNode, WorkflowTemplate,
         };
+    }
+
+    #[pymodule]
+    pub mod catalog_metadata {
+        #[pymodule_export]
+        use crate::flyteidl::core::catalog_metadata::SourceExecution;
     }
     #[pymodule]
     pub mod parameter {
@@ -448,16 +457,22 @@ pub mod _flyteidl_rust {
             FixedRate, FixedRateUnit, Labels, LaunchPlan, LaunchPlanCreateRequest,
             LaunchPlanCreateResponse, LaunchPlanMetadata, LaunchPlanSpec, LiteralMapBlob,
             NamedEntityIdentifierList, NamedEntityIdentifierListRequest, NodeExecution,
-            NodeExecutionGetDataRequest, NodeExecutionGetDataResponse, NodeExecutionList,
-            NodeExecutionListRequest, Notification, NotificationList, ObjectGetRequest,
-            RawOutputDataConfig, ResourceListRequest, Schedule, SourceCode, SystemMetadata, Task,
-            TaskClosure, TaskCreateRequest, TaskCreateResponse, TaskExecution,
-            TaskExecutionGetDataRequest, TaskExecutionGetDataResponse, TaskExecutionGetRequest,
-            TaskExecutionList, TaskExecutionListRequest, TaskSpec, Workflow, WorkflowClosure,
-            WorkflowCreateRequest, WorkflowCreateResponse, WorkflowExecutionGetDataRequest,
+            NodeExecutionClosure, NodeExecutionGetDataRequest, NodeExecutionGetDataResponse,
+            NodeExecutionList, NodeExecutionListRequest, Notification, NotificationList,
+            ObjectGetRequest, RawOutputDataConfig, ResourceListRequest, Schedule, SourceCode,
+            SystemMetadata, Task, TaskClosure, TaskCreateRequest, TaskCreateResponse,
+            TaskExecution, TaskExecutionClosure, TaskExecutionGetDataRequest,
+            TaskExecutionGetDataResponse, TaskExecutionGetRequest, TaskExecutionList,
+            TaskExecutionListRequest, TaskSpec, Workflow, WorkflowClosure, WorkflowCreateRequest,
+            WorkflowCreateResponse, WorkflowExecutionGetDataRequest,
             WorkflowExecutionGetDataResponse, WorkflowExecutionGetRequest, WorkflowList,
             WorkflowSpec,
         };
+    }
+    #[pymodule]
+    pub mod task_execution_closure {
+        #[pymodule_export]
+        use crate::flyteidl::admin::task_execution_closure::OutputResult;
     }
     #[pymodule]
     pub mod schedule {
@@ -477,7 +492,7 @@ pub mod _flyteidl_rust {
     #[pymodule]
     pub mod node_execution_closure {
         #[pymodule_export]
-        use crate::flyteidl::admin::node_execution_closure::TargetMetadata;
+        use crate::flyteidl::admin::node_execution_closure::{OutputResult, TargetMetadata};
     }
     #[pymodule]
     pub mod execution_spec {
@@ -506,6 +521,84 @@ pub mod _flyteidl_rust {
         use crate::flyteidl::service::{CreateUploadLocationRequest, CreateUploadLocationResponse};
     }
 
+    use pyo3::exceptions::PyValueError;
+    use std::collections::HashMap;
+
+    // A customized simple implementation for parsing google protobuf types `Struct` and `Value`  from json string via deriving `serde::Deserialize`.
+    // Equivalent to things like: `google.protobuf._json_format.Parse(_json.dumps(self.custom), flyteidl.protobuf.Struct()) if self.custom else None`
+
+    #[pyfunction]
+    fn Parse(json_str: &str) -> PyResult<super::google::protobuf::Value> {
+        let parsed: serde_json::Value = serde_json::from_str(json_str)
+            .map_err(|e| PyValueError::new_err(format!("Invalid JSON: {}", e)))?;
+
+        let value = parse_json_value(&parsed)?;
+        Ok(value)
+    }
+
+    fn parse_json_value(
+        json_value: &serde_json::Value,
+    ) -> PyResult<super::google::protobuf::Value> {
+        use super::google::protobuf::value::Kind;
+
+        let kind = match json_value {
+            serde_json::Value::Null => super::google::protobuf::value::Kind::NullValue(0),
+            serde_json::Value::Bool(b) => super::google::protobuf::value::Kind::BoolValue(*b),
+            serde_json::Value::Number(num) => {
+                if let Some(i) = num.as_i64() {
+                    super::google::protobuf::value::Kind::NumberValue(i as f64)
+                } else if let Some(f) = num.as_f64() {
+                    super::google::protobuf::value::Kind::NumberValue(f)
+                } else {
+                    return Err(PyValueError::new_err("Invalid number type"));
+                }
+            }
+            serde_json::Value::String(s) => Kind::StringValue(s.clone()),
+            serde_json::Value::Array(arr) => {
+                let values = arr
+                    .iter()
+                    .map(parse_json_value)
+                    .collect::<Result<Vec<super::google::protobuf::Value>, _>>()?;
+                super::google::protobuf::value::Kind::ListValue(
+                    super::google::protobuf::ListValue { values },
+                )
+            }
+            serde_json::Value::Object(obj) => {
+                let fields = obj
+                    .iter()
+                    .map(|(k, v)| {
+                        let value = parse_json_value(v)?;
+                        Ok((k.clone(), value))
+                    })
+                    .collect::<Result<HashMap<String, super::google::protobuf::Value>, PyErr>>()?;
+                super::google::protobuf::value::Kind::StructValue(super::google::protobuf::Struct {
+                    fields,
+                })
+            }
+        };
+
+        Ok(super::google::protobuf::Value { kind: Some(kind) })
+    }
+
+    #[pyfunction]
+    fn ParseStruct(json_str: &str) -> PyResult<super::google::protobuf::Struct> {
+        let parsed: serde_json::Value = serde_json::from_str(json_str)
+            .map_err(|e| PyValueError::new_err(format!("Invalid JSON: {}", e)))?;
+
+        if let serde_json::Value::Object(obj) = parsed {
+            let fields = obj
+                .iter()
+                .map(|(k, v)| {
+                    let value = parse_json_value(v)?;
+                    Ok((k.clone(), value))
+                })
+                .collect::<Result<HashMap<String, super::google::protobuf::Value>, PyErr>>()?;
+            Ok(super::google::protobuf::Struct { fields })
+        } else {
+            Err(PyValueError::new_err("Expected a JSON object"))
+        }
+    }
+
     #[pyclass(subclass, name = "RawSynchronousFlyteClient")]
     pub struct RawSynchronousFlyteClient {
         admin_service: crate::flyteidl::service::admin_service_client::AdminServiceClient<
@@ -520,7 +613,7 @@ pub mod _flyteidl_rust {
 
     #[pymethods]
     impl RawSynchronousFlyteClient {
-        // We need this attribute to construct the `RawSynchronousFlyteClient` in Python.
+        // We need this `new` attribute to construct the `RawSynchronousFlyteClient` in Python.
         #[new]
         // TODO: Instead of accepting endpoint and kwargs dict as arguments, we should accept a path that reads platform configuration file.
         #[pyo3(signature = (endpoint, **kwargs))]
@@ -657,6 +750,17 @@ pub mod _flyteidl_rust {
             let res = self
                 .runtime
                 .block_on(self.admin_service.get_node_execution_data(req))?
+                .into_inner();
+            Ok(res)
+        }
+
+        pub fn get_task_execution_data(
+            &mut self,
+            req: crate::flyteidl::admin::TaskExecutionGetDataRequest,
+        ) -> Result<crate::flyteidl::admin::TaskExecutionGetDataResponse, GRPCError> {
+            let res = self
+                .runtime
+                .block_on(self.admin_service.get_task_execution_data(req))?
                 .into_inner();
             Ok(res)
         }
@@ -872,3 +976,5 @@ pub mod _flyteidl_rust {
 // m.add_class::<AdminStub>();
 // Ok(())
 // }
+
+// TODO: add Rust level tests
