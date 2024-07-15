@@ -3,6 +3,9 @@ package implementations
 import (
 	"crypto/tls"
 	"fmt"
+	"net/smtp"
+	"strings"
+
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
@@ -12,8 +15,6 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc/codes"
-	"net/smtp"
-	"strings"
 )
 
 type SMTPEmailer struct {

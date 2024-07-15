@@ -3,9 +3,10 @@ package notifications
 import (
 	"context"
 	"fmt"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"sync"
 	"time"
+
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 
 	"github.com/NYTimes/gizmo/pubsub"
 	gizmoAWS "github.com/NYTimes/gizmo/pubsub/aws"
