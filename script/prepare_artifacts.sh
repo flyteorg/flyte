@@ -30,6 +30,7 @@ grep -rlZ "version:[^P]*# VERSION" ./charts/flyteagent/Chart.yaml | xargs -0 sed
 sed "s/v0.1.10/${VERSION}/g" ./charts/flyteagent/README.md > temp.txt && mv temp.txt ./charts/flyteagent/README.md
 
 helm dep update ./charts/flyte
+helm dep update ./charts/flyte-core
 helm dep update ./charts/flyte-deps
 
 # bump latest release of flyte component in helm
