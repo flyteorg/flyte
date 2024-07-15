@@ -21,15 +21,19 @@ type ListLaunchPlanIdsFunc func(ctx context.Context, request admin.NamedEntityId
 	*admin.NamedEntityIdentifierList, error)
 type ListActiveLaunchPlansFunc func(ctx context.Context, request admin.ActiveLaunchPlanListRequest) (
 	*admin.LaunchPlanList, error)
+type CreateLaunchPlanFromNodeFunc func(
+	ctx context.Context, request admin.CreateLaunchPlanFromNodeRequest) (
+	*admin.CreateLaunchPlanFromNodeResponse, error)
 
 type MockLaunchPlanManager struct {
-	createLaunchPlanFunc      CreateLaunchPlanFunc
-	updateLaunchPlanFunc      UpdateLaunchPlanFunc
-	getLaunchPlanFunc         GetLaunchPlanFunc
-	getActiveLaunchPlanFunc   GetActiveLaunchPlanFunc
-	listLaunchPlansFunc       ListLaunchPlansFunc
-	listLaunchPlanIdsFunc     ListLaunchPlanIdsFunc
-	listActiveLaunchPlansFunc ListActiveLaunchPlansFunc
+	createLaunchPlanFunc         CreateLaunchPlanFunc
+	updateLaunchPlanFunc         UpdateLaunchPlanFunc
+	getLaunchPlanFunc            GetLaunchPlanFunc
+	getActiveLaunchPlanFunc      GetActiveLaunchPlanFunc
+	listLaunchPlansFunc          ListLaunchPlansFunc
+	listLaunchPlanIdsFunc        ListLaunchPlanIdsFunc
+	listActiveLaunchPlansFunc    ListActiveLaunchPlansFunc
+	CreateLaunchPlanFromNodeFunc CreateLaunchPlanFromNodeFunc
 }
 
 func (r *MockLaunchPlanManager) SetCreateCallback(createFunction CreateLaunchPlanFunc) {
@@ -105,6 +109,13 @@ func (r *MockLaunchPlanManager) ListLaunchPlanIds(ctx context.Context, request a
 	*admin.NamedEntityIdentifierList, error) {
 	if r.listLaunchPlanIdsFunc != nil {
 		return r.ListLaunchPlanIds(ctx, request)
+	}
+	return nil, nil
+}
+
+func (m *MockLaunchPlanManager) CreateLaunchPlanFromNode(ctx context.Context, request admin.CreateLaunchPlanFromNodeRequest) (*admin.CreateLaunchPlanFromNodeResponse, error) {
+	if m.CreateLaunchPlanFromNodeFunc != nil {
+		return m.CreateLaunchPlanFromNodeFunc(ctx, request)
 	}
 	return nil, nil
 }

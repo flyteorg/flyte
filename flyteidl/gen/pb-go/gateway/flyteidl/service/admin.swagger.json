@@ -1715,6 +1715,40 @@
         ]
       }
     },
+    "/api/v1/launch_plans/create_launch_plan_node": {
+      "post": {
+        "summary": "Triggers the creation of a :ref:`ref_flyteidl.admin.LaunchPlan`\nAlthough the request tasks a list of subNodes, we only support a single sudNode for now.",
+        "description": "Create or fetch a launch plan from a given node.",
+        "operationId": "AdminService_CreateLaunchPlanFromNode",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminCreateLaunchPlanFromNodeResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/adminCreateLaunchPlanFromNodeRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
     "/api/v1/launch_plans/{id.project}/{id.domain}": {
       "get": {
         "summary": "Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.",
@@ -4329,6 +4363,47 @@
             "in": "query",
             "required": false,
             "type": "string"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/org/launch_plans/create_launch_plan_node/{org}": {
+      "post": {
+        "summary": "Triggers the creation of a :ref:`ref_flyteidl.admin.LaunchPlan`\nAlthough the request tasks a list of subNodes, we only support a single sudNode for now.",
+        "description": "Create or fetch a launch plan from a given node.",
+        "operationId": "AdminService_CreateLaunchPlanFromNode2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminCreateLaunchPlanFromNodeResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "org",
+            "description": "optional org key\n+optional",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AdminServiceCreateLaunchPlanFromNodeBody"
+            }
           }
         ],
         "tags": [
@@ -9138,6 +9213,24 @@
       },
       "description": "Request to register a launch plan. The included LaunchPlanSpec may have a complete or incomplete set of inputs required\nto launch a workflow execution. By default all launch plans are registered in state INACTIVE. If you wish to\nset the state to ACTIVE, you must submit a LaunchPlanUpdateRequest, after you have successfully created a launch plan."
     },
+    "AdminServiceCreateLaunchPlanFromNodeBody": {
+      "type": "object",
+      "properties": {
+        "launch_plan_id": {
+          "$ref": "#/definitions/coreIdentifier",
+          "title": "ID of the launchplan that executed the workflow that contains the node to be re-run\n+required"
+        },
+        "sub_node_ids": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/adminSubNodeIdAsList"
+          },
+          "title": "List of sub node IDs to include in the execution. Utilized for re-running a node(s) within a workflow.\n+required"
+        }
+      },
+      "title": "Request to create or fetch a launch plan to re-run a node"
+    },
     "AdminServiceCreateNodeEventBody": {
       "type": "object",
       "properties": {
@@ -10341,6 +10434,37 @@
         }
       },
       "description": "Configuration with source information."
+    },
+    "adminCreateLaunchPlanFromNodeRequest": {
+      "type": "object",
+      "properties": {
+        "launch_plan_id": {
+          "$ref": "#/definitions/coreIdentifier",
+          "title": "ID of the launchplan that executed the workflow that contains the node to be re-run\n+required"
+        },
+        "sub_node_ids": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/adminSubNodeIdAsList"
+          },
+          "title": "List of sub node IDs to include in the execution. Utilized for re-running a node(s) within a workflow.\n+required"
+        },
+        "org": {
+          "type": "string",
+          "title": "optional org key\n+optional"
+        }
+      },
+      "title": "Request to create or fetch a launch plan to re-run a node"
+    },
+    "adminCreateLaunchPlanFromNodeResponse": {
+      "type": "object",
+      "properties": {
+        "launch_plan": {
+          "$ref": "#/definitions/adminLaunchPlan"
+        }
+      },
+      "title": "The launch plan that was created for or that already existed from re-running node(s) within a workflow"
     },
     "adminCronSchedule": {
       "type": "object",
@@ -11953,6 +12077,18 @@
         }
       },
       "title": "Link to source code used to define this entity"
+    },
+    "adminSubNodeIdAsList": {
+      "type": "object",
+      "properties": {
+        "sub_node_id": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "subNodeID for a node within a workflow. If more then one subMode ID is provided,\nthen it is assumed to be a subNode within a subWorkflow"
+        }
+      }
     },
     "adminSystemMetadata": {
       "type": "object",

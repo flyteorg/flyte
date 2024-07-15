@@ -28,13 +28,14 @@ type executionEndpointMetrics struct {
 type launchPlanEndpointMetrics struct {
 	scope promutils.Scope
 
-	create     util.RequestMetrics
-	update     util.RequestMetrics
-	get        util.RequestMetrics
-	getActive  util.RequestMetrics
-	list       util.RequestMetrics
-	listActive util.RequestMetrics
-	listIds    util.RequestMetrics
+	create       util.RequestMetrics
+	update       util.RequestMetrics
+	get          util.RequestMetrics
+	getActive    util.RequestMetrics
+	list         util.RequestMetrics
+	listActive   util.RequestMetrics
+	listIds      util.RequestMetrics
+	createLPNode util.RequestMetrics
 }
 
 type namedEntityEndpointMetrics struct {
@@ -160,14 +161,15 @@ func InitMetrics(adminScope promutils.Scope) AdminMetrics {
 			runningCount: util.NewRequestMetrics(adminScope, "count_running_execution"),
 		},
 		launchPlanEndpointMetrics: launchPlanEndpointMetrics{
-			scope:      adminScope,
-			create:     util.NewRequestMetrics(adminScope, "create_launch_plan"),
-			update:     util.NewRequestMetrics(adminScope, "update_launch_plan"),
-			get:        util.NewRequestMetrics(adminScope, "get_launch_plan"),
-			getActive:  util.NewRequestMetrics(adminScope, "get_active_launch_plan"),
-			list:       util.NewRequestMetrics(adminScope, "list_launch_plan"),
-			listActive: util.NewRequestMetrics(adminScope, "list_active_launch_plans"),
-			listIds:    util.NewRequestMetrics(adminScope, "list_launch_plan_ids"),
+			scope:        adminScope,
+			create:       util.NewRequestMetrics(adminScope, "create_launch_plan"),
+			update:       util.NewRequestMetrics(adminScope, "update_launch_plan"),
+			get:          util.NewRequestMetrics(adminScope, "get_launch_plan"),
+			getActive:    util.NewRequestMetrics(adminScope, "get_active_launch_plan"),
+			list:         util.NewRequestMetrics(adminScope, "list_launch_plan"),
+			listActive:   util.NewRequestMetrics(adminScope, "list_active_launch_plans"),
+			listIds:      util.NewRequestMetrics(adminScope, "list_launch_plan_ids"),
+			createLPNode: util.NewRequestMetrics(adminScope, "create_lp_Node"),
 		},
 		namedEntityEndpointMetrics: namedEntityEndpointMetrics{
 			scope:  adminScope,

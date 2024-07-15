@@ -113,6 +113,54 @@ func (_m *AdminServiceClient) CreateLaunchPlan(ctx context.Context, in *admin.La
 	return r0, r1
 }
 
+type AdminServiceClient_CreateLaunchPlanFromNode struct {
+	*mock.Call
+}
+
+func (_m AdminServiceClient_CreateLaunchPlanFromNode) Return(_a0 *admin.CreateLaunchPlanFromNodeResponse, _a1 error) *AdminServiceClient_CreateLaunchPlanFromNode {
+	return &AdminServiceClient_CreateLaunchPlanFromNode{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminServiceClient) OnCreateLaunchPlanFromNode(ctx context.Context, in *admin.CreateLaunchPlanFromNodeRequest, opts ...grpc.CallOption) *AdminServiceClient_CreateLaunchPlanFromNode {
+	c_call := _m.On("CreateLaunchPlanFromNode", ctx, in, opts)
+	return &AdminServiceClient_CreateLaunchPlanFromNode{Call: c_call}
+}
+
+func (_m *AdminServiceClient) OnCreateLaunchPlanFromNodeMatch(matchers ...interface{}) *AdminServiceClient_CreateLaunchPlanFromNode {
+	c_call := _m.On("CreateLaunchPlanFromNode", matchers...)
+	return &AdminServiceClient_CreateLaunchPlanFromNode{Call: c_call}
+}
+
+// CreateLaunchPlanFromNode provides a mock function with given fields: ctx, in, opts
+func (_m *AdminServiceClient) CreateLaunchPlanFromNode(ctx context.Context, in *admin.CreateLaunchPlanFromNodeRequest, opts ...grpc.CallOption) (*admin.CreateLaunchPlanFromNodeResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *admin.CreateLaunchPlanFromNodeResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.CreateLaunchPlanFromNodeRequest, ...grpc.CallOption) *admin.CreateLaunchPlanFromNodeResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.CreateLaunchPlanFromNodeResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.CreateLaunchPlanFromNodeRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type AdminServiceClient_CreateNodeEvent struct {
 	*mock.Call
 }

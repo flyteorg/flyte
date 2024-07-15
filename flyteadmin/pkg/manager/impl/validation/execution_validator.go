@@ -161,3 +161,19 @@ func ValidateWorkflowExecutionIdentifier(identifier *core.WorkflowExecutionIdent
 	}
 	return nil
 }
+
+func ValidateCreateLaunchPlanFromNodeRequest(request admin.CreateLaunchPlanFromNodeRequest) error {
+	if request.SubNodeIds == nil || len(request.SubNodeIds) == 0 {
+		return errors.NewFlyteAdminErrorf(codes.InvalidArgument, "subNodeIDs cannot be empty")
+	}
+
+	if len(request.SubNodeIds) > 1 {
+		return errors.NewFlyteAdminErrorf(codes.Unimplemented, "relaunching multiple nodes is not supported")
+	}
+
+	if request.LaunchPlanId.ResourceType != core.ResourceType_LAUNCH_PLAN {
+		return errors.NewFlyteAdminErrorf(codes.InvalidArgument, "relaunching a node is only supported from a launch plan")
+	}
+
+	return nil
+}

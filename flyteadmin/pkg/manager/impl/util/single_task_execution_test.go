@@ -4,8 +4,10 @@ import (
 	"context"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/codes"
 
@@ -28,6 +30,71 @@ func TestGenerateNodeNameFromTask(t *testing.T) {
 
 func TestGenerateWorkflowNameFromTask(t *testing.T) {
 	assert.EqualValues(t, ".flytegen.SingleTask", generateWorkflowNameFromTask("SingleTask"))
+}
+
+func TestGenerateWorkflowNameFromNode(t *testing.T) {
+	tests := []struct {
+		name         string
+		node         *core.Node
+		expectedName string
+		expectError  bool
+	}{
+		{
+			name: "TaskNode",
+			node: &core.Node{
+				Id: "n1",
+				Target: &core.Node_TaskNode{
+					TaskNode: &core.TaskNode{
+						Reference: &core.TaskNode_ReferenceId{
+							ReferenceId: &core.Identifier{Name: "TaskId"},
+						},
+					},
+				},
+			},
+			expectedName: ".flytegen.TaskId",
+		},
+		{
+			name: "ArrayNode",
+			node: &core.Node{
+				Id: "n1",
+				Target: &core.Node_ArrayNode{
+					ArrayNode: &core.ArrayNode{
+						Node: &core.Node{
+							Id: "subnode",
+							Target: &core.Node_TaskNode{
+								TaskNode: &core.TaskNode{
+									Reference: &core.TaskNode_ReferenceId{
+										ReferenceId: &core.Identifier{Name: "TaskId"},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			expectedName: ".flytegen.subnode",
+		},
+		{
+			name: "WorkflowNode",
+			node: &core.Node{
+				Id:     "n1",
+				Target: &core.Node_WorkflowNode{},
+			},
+			expectError: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			name, err := generateWorkflowNameFromNode(tt.node)
+			if tt.expectError {
+				assert.NotNil(t, err)
+			} else {
+				assert.Nil(t, err)
+				assert.EqualValues(t, tt.expectedName, name)
+			}
+		})
+	}
 }
 
 func TestGenerateBindings(t *testing.T) {
@@ -225,7 +292,7 @@ func TestCreateOrGetLaunchPlan(t *testing.T) {
 		},
 	}
 	launchPlan, err := CreateOrGetLaunchPlan(
-		context.Background(), repository, config, taskIdentifier, workflowInterface, workflowID, &spec)
+		context.Background(), repository, config, taskIdentifier, workflowInterface, workflowID, spec.AuthRole, spec.SecurityContext, nil)
 	assert.NoError(t, err)
 	assert.True(t, proto.Equal(&core.Identifier{
 		ResourceType: core.ResourceType_LAUNCH_PLAN,
@@ -236,4 +303,218 @@ func TestCreateOrGetLaunchPlan(t *testing.T) {
 	}, launchPlan.Id))
 	assert.True(t, proto.Equal(launchPlan.Closure.ExpectedOutputs, workflowInterface.Outputs))
 	assert.True(t, proto.Equal(launchPlan.Spec.AuthRole, spec.AuthRole))
+}
+
+func TestCreateOrGetWorkflowFromNode(t *testing.T) {
+
+	wfIdentifier := &core.Identifier{
+		ResourceType: core.ResourceType_WORKFLOW,
+		Project:      "flytekit",
+		Domain:       "production",
+		Name:         "app.workflows.MyWorkflow.my_task",
+		Version:      "12345",
+		Org:          "org",
+	}
+	tests := []struct {
+		name           string
+		node           *core.Node
+		expectedName   string
+		expectError    bool
+		typedInterface *core.TypedInterface
+	}{
+		{
+			name: "TaskNode",
+			node: &core.Node{
+				Target: &core.Node_TaskNode{
+					TaskNode: &core.TaskNode{
+						Reference: &core.TaskNode_ReferenceId{
+							ReferenceId: &core.Identifier{Name: "simple_task"},
+						},
+					},
+				},
+			},
+			expectedName: ".flytegen.simple_task",
+			typedInterface: &core.TypedInterface{
+				Inputs: &core.VariableMap{
+					Variables: map[string]*core.Variable{
+						"a": {
+							Type: &core.LiteralType{
+								Type: &core.LiteralType_Simple{
+									Simple: core.SimpleType_INTEGER,
+								},
+							},
+						},
+					},
+				},
+				Outputs: &core.VariableMap{
+					Variables: map[string]*core.Variable{
+						"b": {
+							Type: &core.LiteralType{
+								Type: &core.LiteralType_Simple{
+									Simple: core.SimpleType_INTEGER,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "ArrayNode with TaskNode",
+			node: &core.Node{
+				Target: &core.Node_ArrayNode{
+					ArrayNode: &core.ArrayNode{
+						Node: &core.Node{
+							Id: "subnodeID",
+							Target: &core.Node_TaskNode{
+								TaskNode: &core.TaskNode{
+									Reference: &core.TaskNode_ReferenceId{
+										ReferenceId: &core.Identifier{Name: "ref_1"},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			expectedName: ".flytegen.subnodeID",
+			typedInterface: &core.TypedInterface{
+				Inputs: &core.VariableMap{
+					Variables: map[string]*core.Variable{
+						"a": {
+							Type: &core.LiteralType{
+								Type: &core.LiteralType_CollectionType{
+									CollectionType: &core.LiteralType{
+										Type: &core.LiteralType_Simple{
+											Simple: core.SimpleType_INTEGER,
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+				Outputs: &core.VariableMap{
+					Variables: map[string]*core.Variable{
+						"b": {
+							Type: &core.LiteralType{
+								Type: &core.LiteralType_CollectionType{
+									CollectionType: &core.LiteralType{
+										Type: &core.LiteralType_Simple{
+											Simple: core.SimpleType_INTEGER,
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			repository := repositoryMocks.NewMockRepository()
+			var getCalledCount = 0
+			var newlyCreatedWorkflow models.Workflow
+			workflowcreateFunc := func(input models.Workflow, descriptionEntity *models.DescriptionEntity) error {
+				newlyCreatedWorkflow = input
+				return nil
+			}
+			repository.WorkflowRepo().(*repositoryMocks.MockWorkflowRepo).SetCreateCallback(workflowcreateFunc)
+
+			workflowGetFunc := func(input interfaces.Identifier) (models.Workflow, error) {
+				if getCalledCount == 0 {
+					getCalledCount++
+					return models.Workflow{}, flyteAdminErrors.NewFlyteAdminErrorf(codes.NotFound, "not found")
+				}
+				getCalledCount++
+				return newlyCreatedWorkflow, nil
+			}
+			repository.WorkflowRepo().(*repositoryMocks.MockWorkflowRepo).SetGetCallback(workflowGetFunc)
+			taskIdentifier := &core.Identifier{
+				ResourceType: core.ResourceType_TASK,
+				Project:      wfIdentifier.Project,
+				Domain:       wfIdentifier.Domain,
+				Name:         "simple_task",
+				Version:      wfIdentifier.Version,
+				Org:          wfIdentifier.Org,
+			}
+			repository.TaskRepo().(*repositoryMocks.MockTaskRepo).SetGetCallback(
+				func(input interfaces.Identifier) (models.Task, error) {
+					createdAt := time.Now()
+					createdAtProto, _ := ptypes.TimestampProto(createdAt)
+					taskClosure := &admin.TaskClosure{
+						CompiledTask: &core.CompiledTask{
+							Template: &core.TaskTemplate{
+								Id:   taskIdentifier,
+								Type: "python-task",
+								Metadata: &core.TaskMetadata{
+									Runtime: &core.RuntimeMetadata{
+										Type:    core.RuntimeMetadata_FLYTE_SDK,
+										Version: "0.6.2",
+										Flavor:  "python",
+									},
+									Timeout: ptypes.DurationProto(time.Second),
+								},
+								Interface: tt.typedInterface,
+								Custom:    nil,
+							},
+						},
+						CreatedAt: createdAtProto,
+					}
+					serializedTaskClosure, err := proto.Marshal(taskClosure)
+					assert.NoError(t, err)
+					return models.Task{
+						TaskKey: models.TaskKey{
+							Project: taskIdentifier.Project,
+							Domain:  taskIdentifier.Domain,
+							Name:    taskIdentifier.Name,
+							Version: taskIdentifier.Version,
+							Org:     taskIdentifier.Org,
+						},
+						Closure: serializedTaskClosure,
+						Digest:  []byte("simple_task"),
+						Type:    "python",
+					}, nil
+				})
+
+			mockWorkflowManager := managerMocks.MockWorkflowManager{}
+			mockWorkflowManager.SetCreateCallback(func(ctx context.Context, request admin.WorkflowCreateRequest) (*admin.WorkflowCreateResponse, error) {
+				assert.True(t, proto.Equal(request.Id, &core.Identifier{
+					ResourceType: core.ResourceType_WORKFLOW,
+					Project:      wfIdentifier.Project,
+					Domain:       wfIdentifier.Domain,
+					Name:         tt.expectedName,
+					Version:      wfIdentifier.Version,
+					Org:          wfIdentifier.Org,
+				}), fmt.Sprintf("%+v", request.Id))
+				assert.True(t, proto.Equal(tt.typedInterface, request.Spec.Template.Interface))
+				return &admin.WorkflowCreateResponse{}, nil
+			})
+			mockNamedEntityManager := managerMocks.NamedEntityManager{}
+			mockNamedEntityManager.UpdateNamedEntityFunc = func(ctx context.Context, request admin.NamedEntityUpdateRequest) (*admin.NamedEntityUpdateResponse, error) {
+				assert.Equal(t, request.ResourceType, core.ResourceType_WORKFLOW)
+				assert.True(t, proto.Equal(request.Id, &admin.NamedEntityIdentifier{
+					Project: wfIdentifier.Project,
+					Domain:  wfIdentifier.Domain,
+					Name:    wfIdentifier.Name,
+					Org:     wfIdentifier.Org,
+				}), fmt.Sprintf("%+v", request.Id))
+				assert.True(t, proto.Equal(request.Metadata, &admin.NamedEntityMetadata{
+					State: admin.NamedEntityState_SYSTEM_GENERATED,
+				}))
+				return &admin.NamedEntityUpdateResponse{}, nil
+			}
+
+			workflowModel, err := CreateOrGetWorkflowFromNode(context.Background(), tt.node, repository, &mockWorkflowManager, &mockNamedEntityManager, wfIdentifier)
+			if tt.expectError {
+				assert.NotNil(t, err)
+			} else {
+				assert.Nil(t, err)
+				assert.NotNil(t, workflowModel)
+			}
+		})
+	}
 }

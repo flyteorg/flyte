@@ -97,6 +97,47 @@ func (_m *AdminServiceServer) CreateLaunchPlan(_a0 context.Context, _a1 *admin.L
 	return r0, r1
 }
 
+type AdminServiceServer_CreateLaunchPlanFromNode struct {
+	*mock.Call
+}
+
+func (_m AdminServiceServer_CreateLaunchPlanFromNode) Return(_a0 *admin.CreateLaunchPlanFromNodeResponse, _a1 error) *AdminServiceServer_CreateLaunchPlanFromNode {
+	return &AdminServiceServer_CreateLaunchPlanFromNode{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminServiceServer) OnCreateLaunchPlanFromNode(_a0 context.Context, _a1 *admin.CreateLaunchPlanFromNodeRequest) *AdminServiceServer_CreateLaunchPlanFromNode {
+	c_call := _m.On("CreateLaunchPlanFromNode", _a0, _a1)
+	return &AdminServiceServer_CreateLaunchPlanFromNode{Call: c_call}
+}
+
+func (_m *AdminServiceServer) OnCreateLaunchPlanFromNodeMatch(matchers ...interface{}) *AdminServiceServer_CreateLaunchPlanFromNode {
+	c_call := _m.On("CreateLaunchPlanFromNode", matchers...)
+	return &AdminServiceServer_CreateLaunchPlanFromNode{Call: c_call}
+}
+
+// CreateLaunchPlanFromNode provides a mock function with given fields: _a0, _a1
+func (_m *AdminServiceServer) CreateLaunchPlanFromNode(_a0 context.Context, _a1 *admin.CreateLaunchPlanFromNodeRequest) (*admin.CreateLaunchPlanFromNodeResponse, error) {
+	ret := _m.Called(_a0, _a1)
+
+	var r0 *admin.CreateLaunchPlanFromNodeResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.CreateLaunchPlanFromNodeRequest) *admin.CreateLaunchPlanFromNodeResponse); ok {
+		r0 = rf(_a0, _a1)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.CreateLaunchPlanFromNodeResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.CreateLaunchPlanFromNodeRequest) error); ok {
+		r1 = rf(_a0, _a1)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type AdminServiceServer_CreateNodeEvent struct {
 	*mock.Call
 }

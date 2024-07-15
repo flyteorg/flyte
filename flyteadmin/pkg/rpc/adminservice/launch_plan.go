@@ -152,3 +152,21 @@ func (m *AdminService) ListLaunchPlanIds(ctx context.Context, request *admin.Nam
 	m.Metrics.launchPlanEndpointMetrics.listIds.Success()
 	return response, nil
 }
+
+func (m *AdminService) CreateLaunchPlanFromNode(
+	ctx context.Context, request *admin.CreateLaunchPlanFromNodeRequest) (*admin.CreateLaunchPlanFromNodeResponse, error) {
+	defer m.interceptPanic(ctx, request)
+	if request == nil {
+		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
+	}
+	var response *admin.CreateLaunchPlanFromNodeResponse
+	var err error
+	m.Metrics.executionEndpointMetrics.create.Time(func() {
+		response, err = m.LaunchPlanManager.CreateLaunchPlanFromNode(ctx, *request)
+	})
+	if err != nil {
+		return nil, util.TransformAndRecordError(err, &m.Metrics.launchPlanEndpointMetrics.createLPNode)
+	}
+	m.Metrics.launchPlanEndpointMetrics.createLPNode.Success()
+	return response, nil
+}

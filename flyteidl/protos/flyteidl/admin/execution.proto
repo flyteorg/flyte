@@ -5,6 +5,7 @@ option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin
 
 import "flyteidl/admin/cluster_assignment.proto";
 import "flyteidl/admin/common.proto";
+import "flyteidl/admin/launch_plan.proto";
 import "flyteidl/admin/matchable_resource.proto";
 import "flyteidl/core/literals.proto";
 import "flyteidl/core/execution.proto";
@@ -493,4 +494,31 @@ message RunningExecutionsCountGetRequest {
 message RunningExecutionsCountGetResponse {
     // Count of the running executions.
     int64 count = 1;
+}
+
+message SubNodeIdAsList {
+    // subNodeID for a node within a workflow. If more then one subMode ID is provided,
+    // then it is assumed to be a subNode within a subWorkflow
+    repeated string sub_node_id = 1;
+}
+
+
+// Request to create or fetch a launch plan to re-run a node
+message CreateLaunchPlanFromNodeRequest {
+    // ID of the launchplan that executed the workflow that contains the node to be re-run
+    // +required
+    core.Identifier launch_plan_id = 1;
+
+    // List of sub node IDs to include in the execution. Utilized for re-running a node(s) within a workflow.
+    // +required
+    repeated SubNodeIdAsList sub_node_ids = 2;
+
+    // optional org key
+    // +optional
+    string org = 3;
+}
+
+// The launch plan that was created for or that already existed from re-running node(s) within a workflow
+message CreateLaunchPlanFromNodeResponse {
+    admin.LaunchPlan launch_plan = 1;
 }

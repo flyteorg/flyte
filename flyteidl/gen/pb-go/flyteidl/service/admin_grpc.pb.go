@@ -35,6 +35,7 @@ const (
 	AdminService_ListLaunchPlanIds_FullMethodName             = "/flyteidl.service.AdminService/ListLaunchPlanIds"
 	AdminService_ListLaunchPlans_FullMethodName               = "/flyteidl.service.AdminService/ListLaunchPlans"
 	AdminService_UpdateLaunchPlan_FullMethodName              = "/flyteidl.service.AdminService/UpdateLaunchPlan"
+	AdminService_CreateLaunchPlanFromNode_FullMethodName      = "/flyteidl.service.AdminService/CreateLaunchPlanFromNode"
 	AdminService_CreateExecution_FullMethodName               = "/flyteidl.service.AdminService/CreateExecution"
 	AdminService_RelaunchExecution_FullMethodName             = "/flyteidl.service.AdminService/RelaunchExecution"
 	AdminService_RecoverExecution_FullMethodName              = "/flyteidl.service.AdminService/RecoverExecution"
@@ -118,6 +119,9 @@ type AdminServiceClient interface {
 	ListLaunchPlans(ctx context.Context, in *admin.ResourceListRequest, opts ...grpc.CallOption) (*admin.LaunchPlanList, error)
 	// Updates the status of a registered :ref:`ref_flyteidl.admin.LaunchPlan`.
 	UpdateLaunchPlan(ctx context.Context, in *admin.LaunchPlanUpdateRequest, opts ...grpc.CallOption) (*admin.LaunchPlanUpdateResponse, error)
+	// Triggers the creation of a :ref:`ref_flyteidl.admin.LaunchPlan`
+	// Although the request tasks a list of subNodes, we only support a single sudNode for now.
+	CreateLaunchPlanFromNode(ctx context.Context, in *admin.CreateLaunchPlanFromNodeRequest, opts ...grpc.CallOption) (*admin.CreateLaunchPlanFromNodeResponse, error)
 	// Triggers the creation of a :ref:`ref_flyteidl.admin.Execution`
 	CreateExecution(ctx context.Context, in *admin.ExecutionCreateRequest, opts ...grpc.CallOption) (*admin.ExecutionCreateResponse, error)
 	// Triggers the creation of an identical :ref:`ref_flyteidl.admin.Execution`
@@ -356,6 +360,15 @@ func (c *adminServiceClient) ListLaunchPlans(ctx context.Context, in *admin.Reso
 func (c *adminServiceClient) UpdateLaunchPlan(ctx context.Context, in *admin.LaunchPlanUpdateRequest, opts ...grpc.CallOption) (*admin.LaunchPlanUpdateResponse, error) {
 	out := new(admin.LaunchPlanUpdateResponse)
 	err := c.cc.Invoke(ctx, AdminService_UpdateLaunchPlan_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *adminServiceClient) CreateLaunchPlanFromNode(ctx context.Context, in *admin.CreateLaunchPlanFromNodeRequest, opts ...grpc.CallOption) (*admin.CreateLaunchPlanFromNodeResponse, error) {
+	out := new(admin.CreateLaunchPlanFromNodeResponse)
+	err := c.cc.Invoke(ctx, AdminService_CreateLaunchPlanFromNode_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -819,6 +832,9 @@ type AdminServiceServer interface {
 	ListLaunchPlans(context.Context, *admin.ResourceListRequest) (*admin.LaunchPlanList, error)
 	// Updates the status of a registered :ref:`ref_flyteidl.admin.LaunchPlan`.
 	UpdateLaunchPlan(context.Context, *admin.LaunchPlanUpdateRequest) (*admin.LaunchPlanUpdateResponse, error)
+	// Triggers the creation of a :ref:`ref_flyteidl.admin.LaunchPlan`
+	// Although the request tasks a list of subNodes, we only support a single sudNode for now.
+	CreateLaunchPlanFromNode(context.Context, *admin.CreateLaunchPlanFromNodeRequest) (*admin.CreateLaunchPlanFromNodeResponse, error)
 	// Triggers the creation of a :ref:`ref_flyteidl.admin.Execution`
 	CreateExecution(context.Context, *admin.ExecutionCreateRequest) (*admin.ExecutionCreateResponse, error)
 	// Triggers the creation of an identical :ref:`ref_flyteidl.admin.Execution`
@@ -968,6 +984,9 @@ func (UnimplementedAdminServiceServer) ListLaunchPlans(context.Context, *admin.R
 }
 func (UnimplementedAdminServiceServer) UpdateLaunchPlan(context.Context, *admin.LaunchPlanUpdateRequest) (*admin.LaunchPlanUpdateResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateLaunchPlan not implemented")
+}
+func (UnimplementedAdminServiceServer) CreateLaunchPlanFromNode(context.Context, *admin.CreateLaunchPlanFromNodeRequest) (*admin.CreateLaunchPlanFromNodeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateLaunchPlanFromNode not implemented")
 }
 func (UnimplementedAdminServiceServer) CreateExecution(context.Context, *admin.ExecutionCreateRequest) (*admin.ExecutionCreateResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateExecution not implemented")
@@ -1388,6 +1407,24 @@ func _AdminService_UpdateLaunchPlan_Handler(srv interface{}, ctx context.Context
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AdminServiceServer).UpdateLaunchPlan(ctx, req.(*admin.LaunchPlanUpdateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AdminService_CreateLaunchPlanFromNode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(admin.CreateLaunchPlanFromNodeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdminServiceServer).CreateLaunchPlanFromNode(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AdminService_CreateLaunchPlanFromNode_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdminServiceServer).CreateLaunchPlanFromNode(ctx, req.(*admin.CreateLaunchPlanFromNodeRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -2304,6 +2341,10 @@ var AdminService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateLaunchPlan",
 			Handler:    _AdminService_UpdateLaunchPlan_Handler,
+		},
+		{
+			MethodName: "CreateLaunchPlanFromNode",
+			Handler:    _AdminService_CreateLaunchPlanFromNode_Handler,
 		},
 		{
 			MethodName: "CreateExecution",

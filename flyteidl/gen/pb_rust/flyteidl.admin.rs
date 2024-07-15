@@ -1606,6 +1606,337 @@ pub struct TaskExecutionEventRequest {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct TaskExecutionEventResponse {
 }
+/// Option for schedules run at a certain frequency e.g. every 2 minutes.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct FixedRate {
+    #[prost(uint32, tag="1")]
+    pub value: u32,
+    #[prost(enumeration="FixedRateUnit", tag="2")]
+    pub unit: i32,
+}
+/// Options for schedules to run according to a cron expression.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct CronSchedule {
+    /// Standard/default cron implementation as described by <https://en.wikipedia.org/wiki/Cron#CRON_expression;>
+    /// Also supports nonstandard predefined scheduling definitions
+    /// as described by <https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html#CronExpressions>
+    /// except @reboot
+    #[prost(string, tag="1")]
+    pub schedule: ::prost::alloc::string::String,
+    /// ISO 8601 duration as described by <https://en.wikipedia.org/wiki/ISO_8601#Durations>
+    #[prost(string, tag="2")]
+    pub offset: ::prost::alloc::string::String,
+}
+/// Defines complete set of information required to trigger an execution on a schedule.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct Schedule {
+    /// Name of the input variable that the kickoff time will be supplied to when the workflow is kicked off.
+    #[prost(string, tag="3")]
+    pub kickoff_time_input_arg: ::prost::alloc::string::String,
+    #[prost(oneof="schedule::ScheduleExpression", tags="1, 2, 4")]
+    pub schedule_expression: ::core::option::Option<schedule::ScheduleExpression>,
+}
+/// Nested message and enum types in `Schedule`.
+pub mod schedule {
+    #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum ScheduleExpression {
+        /// Uses AWS syntax: Minutes Hours Day-of-month Month Day-of-week Year
+        /// e.g. for a schedule that runs every 15 minutes: 0/15 * * * ? *
+        #[prost(string, tag="1")]
+        CronExpression(::prost::alloc::string::String),
+        #[prost(message, tag="2")]
+        Rate(super::FixedRate),
+        #[prost(message, tag="4")]
+        CronSchedule(super::CronSchedule),
+    }
+}
+/// Represents a frequency at which to run a schedule.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+#[repr(i32)]
+pub enum FixedRateUnit {
+    Minute = 0,
+    Hour = 1,
+    Day = 2,
+}
+impl FixedRateUnit {
+    /// String value of the enum field names used in the ProtoBuf definition.
+    ///
+    /// The values are not transformed in any way and thus are considered stable
+    /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+    pub fn as_str_name(&self) -> &'static str {
+        match self {
+            FixedRateUnit::Minute => "MINUTE",
+            FixedRateUnit::Hour => "HOUR",
+            FixedRateUnit::Day => "DAY",
+        }
+    }
+    /// Creates an enum from field names used in the ProtoBuf definition.
+    pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+        match value {
+            "MINUTE" => Some(Self::Minute),
+            "HOUR" => Some(Self::Hour),
+            "DAY" => Some(Self::Day),
+            _ => None,
+        }
+    }
+}
+/// Request to register a launch plan. The included LaunchPlanSpec may have a complete or incomplete set of inputs required
+/// to launch a workflow execution. By default all launch plans are registered in state INACTIVE. If you wish to
+/// set the state to ACTIVE, you must submit a LaunchPlanUpdateRequest, after you have successfully created a launch plan.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct LaunchPlanCreateRequest {
+    /// Uniquely identifies a launch plan entity.
+    #[prost(message, optional, tag="1")]
+    pub id: ::core::option::Option<super::core::Identifier>,
+    /// User-provided launch plan details, including reference workflow, inputs and other metadata.
+    #[prost(message, optional, tag="2")]
+    pub spec: ::core::option::Option<LaunchPlanSpec>,
+}
+/// Purposefully empty, may be populated in the future.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct LaunchPlanCreateResponse {
+}
+/// A LaunchPlan provides the capability to templatize workflow executions.
+/// Launch plans simplify associating one or more schedules, inputs and notifications with your workflows.
+/// Launch plans can be shared and used to trigger executions with predefined inputs even when a workflow
+/// definition doesn't necessarily have a default value for said input.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct LaunchPlan {
+    /// Uniquely identifies a launch plan entity.
+    #[prost(message, optional, tag="1")]
+    pub id: ::core::option::Option<super::core::Identifier>,
+    /// User-provided launch plan details, including reference workflow, inputs and other metadata.
+    #[prost(message, optional, tag="2")]
+    pub spec: ::core::option::Option<LaunchPlanSpec>,
+    /// Values computed by the flyte platform after launch plan registration.
+    #[prost(message, optional, tag="3")]
+    pub closure: ::core::option::Option<LaunchPlanClosure>,
+}
+/// Response object for list launch plan requests.
+/// See :ref:`ref_flyteidl.admin.LaunchPlan` for more details
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct LaunchPlanList {
+    #[prost(message, repeated, tag="1")]
+    pub launch_plans: ::prost::alloc::vec::Vec<LaunchPlan>,
+    /// In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+    /// in a query. If there are no more results, this value will be empty.
+    #[prost(string, tag="2")]
+    pub token: ::prost::alloc::string::String,
+}
+/// Defines permissions associated with executions created by this launch plan spec.
+/// Use either of these roles when they have permissions required by your workflow execution.
+/// Deprecated.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct Auth {
+    /// Defines an optional iam role which will be used for tasks run in executions created with this launch plan.
+    #[prost(string, tag="1")]
+    pub assumable_iam_role: ::prost::alloc::string::String,
+    /// Defines an optional kubernetes service account which will be used for tasks run in executions created with this launch plan.
+    #[prost(string, tag="2")]
+    pub kubernetes_service_account: ::prost::alloc::string::String,
+}
+/// User-provided launch plan definition and configuration values.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct LaunchPlanSpec {
+    /// Reference to the Workflow template that the launch plan references
+    #[prost(message, optional, tag="1")]
+    pub workflow_id: ::core::option::Option<super::core::Identifier>,
+    /// Metadata for the Launch Plan
+    #[prost(message, optional, tag="2")]
+    pub entity_metadata: ::core::option::Option<LaunchPlanMetadata>,
+    /// Input values to be passed for the execution.
+    /// These can be overridden when an execution is created with this launch plan.
+    #[prost(message, optional, tag="3")]
+    pub default_inputs: ::core::option::Option<super::core::ParameterMap>,
+    /// Fixed, non-overridable inputs for the Launch Plan.
+    /// These can not be overridden when an execution is created with this launch plan.
+    #[prost(message, optional, tag="4")]
+    pub fixed_inputs: ::core::option::Option<super::core::LiteralMap>,
+    /// String to indicate the role to use to execute the workflow underneath
+    #[deprecated]
+    #[prost(string, tag="5")]
+    pub role: ::prost::alloc::string::String,
+    /// Custom labels to be applied to the execution resource.
+    #[prost(message, optional, tag="6")]
+    pub labels: ::core::option::Option<Labels>,
+    /// Custom annotations to be applied to the execution resource.
+    #[prost(message, optional, tag="7")]
+    pub annotations: ::core::option::Option<Annotations>,
+    /// Indicates the permission associated with workflow executions triggered with this launch plan.
+    #[deprecated]
+    #[prost(message, optional, tag="8")]
+    pub auth: ::core::option::Option<Auth>,
+    #[deprecated]
+    #[prost(message, optional, tag="9")]
+    pub auth_role: ::core::option::Option<AuthRole>,
+    /// Indicates security context for permissions triggered with this launch plan
+    #[prost(message, optional, tag="10")]
+    pub security_context: ::core::option::Option<super::core::SecurityContext>,
+    /// Indicates the runtime priority of the execution.
+    #[prost(message, optional, tag="16")]
+    pub quality_of_service: ::core::option::Option<super::core::QualityOfService>,
+    /// Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
+    #[prost(message, optional, tag="17")]
+    pub raw_output_data_config: ::core::option::Option<RawOutputDataConfig>,
+    /// Controls the maximum number of tasknodes that can be run in parallel for the entire workflow.
+    /// This is useful to achieve fairness. Note: MapTasks are regarded as one unit,
+    /// and parallelism/concurrency of MapTasks is independent from this.
+    #[prost(int32, tag="18")]
+    pub max_parallelism: i32,
+    /// Allows for the interruptible flag of a workflow to be overwritten for a single execution.
+    /// Omitting this field uses the workflow's value as a default.
+    /// As we need to distinguish between the field not being provided and its default value false, we have to use a wrapper
+    /// around the bool field.
+    #[prost(message, optional, tag="19")]
+    pub interruptible: ::core::option::Option<bool>,
+    /// Allows for all cached values of a workflow and its tasks to be overwritten for a single execution.
+    /// If enabled, all calculations are performed even if cached results would be available, overwriting the stored
+    /// data once execution finishes successfully.
+    #[prost(bool, tag="20")]
+    pub overwrite_cache: bool,
+    /// Environment variables to be set for the execution.
+    #[prost(message, optional, tag="21")]
+    pub envs: ::core::option::Option<Envs>,
+    /// Execution environment assignments to be set for the execution.
+    #[prost(message, repeated, tag="22")]
+    pub execution_env_assignments: ::prost::alloc::vec::Vec<super::core::ExecutionEnvAssignment>,
+}
+/// Values computed by the flyte platform after launch plan registration.
+/// These include expected_inputs required to be present in a CreateExecutionRequest
+/// to launch the reference workflow as well timestamp values associated with the launch plan.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct LaunchPlanClosure {
+    /// Indicate the Launch plan state. 
+    #[prost(enumeration="LaunchPlanState", tag="1")]
+    pub state: i32,
+    /// Indicates the set of inputs expected when creating an execution with the Launch plan
+    #[prost(message, optional, tag="2")]
+    pub expected_inputs: ::core::option::Option<super::core::ParameterMap>,
+    /// Indicates the set of outputs expected to be produced by creating an execution with the Launch plan
+    #[prost(message, optional, tag="3")]
+    pub expected_outputs: ::core::option::Option<super::core::VariableMap>,
+    /// Time at which the launch plan was created.
+    #[prost(message, optional, tag="4")]
+    pub created_at: ::core::option::Option<::prost_types::Timestamp>,
+    /// Time at which the launch plan was last updated.
+    #[prost(message, optional, tag="5")]
+    pub updated_at: ::core::option::Option<::prost_types::Timestamp>,
+}
+/// Additional launch plan attributes included in the LaunchPlanSpec not strictly required to launch
+/// the reference workflow.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct LaunchPlanMetadata {
+    /// Schedule to execute the Launch Plan
+    #[prost(message, optional, tag="1")]
+    pub schedule: ::core::option::Option<Schedule>,
+    /// List of notifications based on Execution status transitions
+    #[prost(message, repeated, tag="2")]
+    pub notifications: ::prost::alloc::vec::Vec<Notification>,
+    /// Additional metadata for how to launch the launch plan
+    #[prost(message, optional, tag="3")]
+    pub launch_conditions: ::core::option::Option<::prost_types::Any>,
+}
+/// Request to set the referenced launch plan state to the configured value.
+/// See :ref:`ref_flyteidl.admin.LaunchPlan` for more details
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct LaunchPlanUpdateRequest {
+    /// Identifier of launch plan for which to change state.
+    /// +required.
+    #[prost(message, optional, tag="1")]
+    pub id: ::core::option::Option<super::core::Identifier>,
+    /// Desired state to apply to the launch plan.
+    /// +required.
+    #[prost(enumeration="LaunchPlanState", tag="2")]
+    pub state: i32,
+}
+/// Purposefully empty, may be populated in the future.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct LaunchPlanUpdateResponse {
+}
+/// Represents a request struct for finding an active launch plan for a given NamedEntityIdentifier
+/// See :ref:`ref_flyteidl.admin.LaunchPlan` for more details
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ActiveLaunchPlanRequest {
+    /// +required.
+    #[prost(message, optional, tag="1")]
+    pub id: ::core::option::Option<NamedEntityIdentifier>,
+}
+/// Represents a request structure to list active launch plans within a project/domain and optional org.
+/// See :ref:`ref_flyteidl.admin.LaunchPlan` for more details
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ActiveLaunchPlanListRequest {
+    /// Name of the project that contains the identifiers.
+    /// +required.
+    #[prost(string, tag="1")]
+    pub project: ::prost::alloc::string::String,
+    /// Name of the domain the identifiers belongs to within the project.
+    /// +required.
+    #[prost(string, tag="2")]
+    pub domain: ::prost::alloc::string::String,
+    /// Indicates the number of resources to be returned.
+    /// +required.
+    #[prost(uint32, tag="3")]
+    pub limit: u32,
+    /// In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+    /// in a query.
+    /// +optional
+    #[prost(string, tag="4")]
+    pub token: ::prost::alloc::string::String,
+    /// Sort ordering.
+    /// +optional
+    #[prost(message, optional, tag="5")]
+    pub sort_by: ::core::option::Option<Sort>,
+    /// Optional, org key applied to the resource.
+    #[prost(string, tag="6")]
+    pub org: ::prost::alloc::string::String,
+}
+/// By default any launch plan regardless of state can be used to launch a workflow execution.
+/// However, at most one version of a launch plan
+/// (e.g. a NamedEntityIdentifier set of shared project, domain and name values) can be
+/// active at a time in regards to *schedules*. That is, at most one schedule in a NamedEntityIdentifier
+/// group will be observed and trigger executions at a defined cadence.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+#[repr(i32)]
+pub enum LaunchPlanState {
+    Inactive = 0,
+    Active = 1,
+}
+impl LaunchPlanState {
+    /// String value of the enum field names used in the ProtoBuf definition.
+    ///
+    /// The values are not transformed in any way and thus are considered stable
+    /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+    pub fn as_str_name(&self) -> &'static str {
+        match self {
+            LaunchPlanState::Inactive => "INACTIVE",
+            LaunchPlanState::Active => "ACTIVE",
+        }
+    }
+    /// Creates an enum from field names used in the ProtoBuf definition.
+    pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+        match value {
+            "INACTIVE" => Some(Self::Inactive),
+            "ACTIVE" => Some(Self::Active),
+            _ => None,
+        }
+    }
+}
 /// Request to launch an execution with the given project, domain and optionally-assigned name.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2181,6 +2512,38 @@ pub struct RunningExecutionsCountGetResponse {
     #[prost(int64, tag="1")]
     pub count: i64,
 }
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct SubNodeIdAsList {
+    /// subNodeID for a node within a workflow. If more then one subMode ID is provided,
+    /// then it is assumed to be a subNode within a subWorkflow
+    #[prost(string, repeated, tag="1")]
+    pub sub_node_id: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+}
+/// Request to create or fetch a launch plan to re-run a node
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct CreateLaunchPlanFromNodeRequest {
+    /// ID of the launchplan that executed the workflow that contains the node to be re-run
+    /// +required
+    #[prost(message, optional, tag="1")]
+    pub launch_plan_id: ::core::option::Option<super::core::Identifier>,
+    /// List of sub node IDs to include in the execution. Utilized for re-running a node(s) within a workflow.
+    /// +required
+    #[prost(message, repeated, tag="2")]
+    pub sub_node_ids: ::prost::alloc::vec::Vec<SubNodeIdAsList>,
+    /// optional org key
+    /// +optional
+    #[prost(string, tag="3")]
+    pub org: ::prost::alloc::string::String,
+}
+/// The launch plan that was created for or that already existed from re-running node(s) within a workflow
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct CreateLaunchPlanFromNodeResponse {
+    #[prost(message, optional, tag="1")]
+    pub launch_plan: ::core::option::Option<LaunchPlan>,
+}
 /// The state of the execution is used to control its visibility in the UI/CLI.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]
@@ -2206,337 +2569,6 @@ impl ExecutionState {
         match value {
             "EXECUTION_ACTIVE" => Some(Self::ExecutionActive),
             "EXECUTION_ARCHIVED" => Some(Self::ExecutionArchived),
-            _ => None,
-        }
-    }
-}
-/// Option for schedules run at a certain frequency e.g. every 2 minutes.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct FixedRate {
-    #[prost(uint32, tag="1")]
-    pub value: u32,
-    #[prost(enumeration="FixedRateUnit", tag="2")]
-    pub unit: i32,
-}
-/// Options for schedules to run according to a cron expression.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct CronSchedule {
-    /// Standard/default cron implementation as described by <https://en.wikipedia.org/wiki/Cron#CRON_expression;>
-    /// Also supports nonstandard predefined scheduling definitions
-    /// as described by <https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html#CronExpressions>
-    /// except @reboot
-    #[prost(string, tag="1")]
-    pub schedule: ::prost::alloc::string::String,
-    /// ISO 8601 duration as described by <https://en.wikipedia.org/wiki/ISO_8601#Durations>
-    #[prost(string, tag="2")]
-    pub offset: ::prost::alloc::string::String,
-}
-/// Defines complete set of information required to trigger an execution on a schedule.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct Schedule {
-    /// Name of the input variable that the kickoff time will be supplied to when the workflow is kicked off.
-    #[prost(string, tag="3")]
-    pub kickoff_time_input_arg: ::prost::alloc::string::String,
-    #[prost(oneof="schedule::ScheduleExpression", tags="1, 2, 4")]
-    pub schedule_expression: ::core::option::Option<schedule::ScheduleExpression>,
-}
-/// Nested message and enum types in `Schedule`.
-pub mod schedule {
-    #[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Oneof)]
-    pub enum ScheduleExpression {
-        /// Uses AWS syntax: Minutes Hours Day-of-month Month Day-of-week Year
-        /// e.g. for a schedule that runs every 15 minutes: 0/15 * * * ? *
-        #[prost(string, tag="1")]
-        CronExpression(::prost::alloc::string::String),
-        #[prost(message, tag="2")]
-        Rate(super::FixedRate),
-        #[prost(message, tag="4")]
-        CronSchedule(super::CronSchedule),
-    }
-}
-/// Represents a frequency at which to run a schedule.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
-#[repr(i32)]
-pub enum FixedRateUnit {
-    Minute = 0,
-    Hour = 1,
-    Day = 2,
-}
-impl FixedRateUnit {
-    /// String value of the enum field names used in the ProtoBuf definition.
-    ///
-    /// The values are not transformed in any way and thus are considered stable
-    /// (if the ProtoBuf definition does not change) and safe for programmatic use.
-    pub fn as_str_name(&self) -> &'static str {
-        match self {
-            FixedRateUnit::Minute => "MINUTE",
-            FixedRateUnit::Hour => "HOUR",
-            FixedRateUnit::Day => "DAY",
-        }
-    }
-    /// Creates an enum from field names used in the ProtoBuf definition.
-    pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
-        match value {
-            "MINUTE" => Some(Self::Minute),
-            "HOUR" => Some(Self::Hour),
-            "DAY" => Some(Self::Day),
-            _ => None,
-        }
-    }
-}
-/// Request to register a launch plan. The included LaunchPlanSpec may have a complete or incomplete set of inputs required
-/// to launch a workflow execution. By default all launch plans are registered in state INACTIVE. If you wish to
-/// set the state to ACTIVE, you must submit a LaunchPlanUpdateRequest, after you have successfully created a launch plan.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct LaunchPlanCreateRequest {
-    /// Uniquely identifies a launch plan entity.
-    #[prost(message, optional, tag="1")]
-    pub id: ::core::option::Option<super::core::Identifier>,
-    /// User-provided launch plan details, including reference workflow, inputs and other metadata.
-    #[prost(message, optional, tag="2")]
-    pub spec: ::core::option::Option<LaunchPlanSpec>,
-}
-/// Purposefully empty, may be populated in the future.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct LaunchPlanCreateResponse {
-}
-/// A LaunchPlan provides the capability to templatize workflow executions.
-/// Launch plans simplify associating one or more schedules, inputs and notifications with your workflows.
-/// Launch plans can be shared and used to trigger executions with predefined inputs even when a workflow
-/// definition doesn't necessarily have a default value for said input.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct LaunchPlan {
-    /// Uniquely identifies a launch plan entity.
-    #[prost(message, optional, tag="1")]
-    pub id: ::core::option::Option<super::core::Identifier>,
-    /// User-provided launch plan details, including reference workflow, inputs and other metadata.
-    #[prost(message, optional, tag="2")]
-    pub spec: ::core::option::Option<LaunchPlanSpec>,
-    /// Values computed by the flyte platform after launch plan registration.
-    #[prost(message, optional, tag="3")]
-    pub closure: ::core::option::Option<LaunchPlanClosure>,
-}
-/// Response object for list launch plan requests.
-/// See :ref:`ref_flyteidl.admin.LaunchPlan` for more details
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct LaunchPlanList {
-    #[prost(message, repeated, tag="1")]
-    pub launch_plans: ::prost::alloc::vec::Vec<LaunchPlan>,
-    /// In the case of multiple pages of results, the server-provided token can be used to fetch the next page
-    /// in a query. If there are no more results, this value will be empty.
-    #[prost(string, tag="2")]
-    pub token: ::prost::alloc::string::String,
-}
-/// Defines permissions associated with executions created by this launch plan spec.
-/// Use either of these roles when they have permissions required by your workflow execution.
-/// Deprecated.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct Auth {
-    /// Defines an optional iam role which will be used for tasks run in executions created with this launch plan.
-    #[prost(string, tag="1")]
-    pub assumable_iam_role: ::prost::alloc::string::String,
-    /// Defines an optional kubernetes service account which will be used for tasks run in executions created with this launch plan.
-    #[prost(string, tag="2")]
-    pub kubernetes_service_account: ::prost::alloc::string::String,
-}
-/// User-provided launch plan definition and configuration values.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct LaunchPlanSpec {
-    /// Reference to the Workflow template that the launch plan references
-    #[prost(message, optional, tag="1")]
-    pub workflow_id: ::core::option::Option<super::core::Identifier>,
-    /// Metadata for the Launch Plan
-    #[prost(message, optional, tag="2")]
-    pub entity_metadata: ::core::option::Option<LaunchPlanMetadata>,
-    /// Input values to be passed for the execution.
-    /// These can be overridden when an execution is created with this launch plan.
-    #[prost(message, optional, tag="3")]
-    pub default_inputs: ::core::option::Option<super::core::ParameterMap>,
-    /// Fixed, non-overridable inputs for the Launch Plan.
-    /// These can not be overridden when an execution is created with this launch plan.
-    #[prost(message, optional, tag="4")]
-    pub fixed_inputs: ::core::option::Option<super::core::LiteralMap>,
-    /// String to indicate the role to use to execute the workflow underneath
-    #[deprecated]
-    #[prost(string, tag="5")]
-    pub role: ::prost::alloc::string::String,
-    /// Custom labels to be applied to the execution resource.
-    #[prost(message, optional, tag="6")]
-    pub labels: ::core::option::Option<Labels>,
-    /// Custom annotations to be applied to the execution resource.
-    #[prost(message, optional, tag="7")]
-    pub annotations: ::core::option::Option<Annotations>,
-    /// Indicates the permission associated with workflow executions triggered with this launch plan.
-    #[deprecated]
-    #[prost(message, optional, tag="8")]
-    pub auth: ::core::option::Option<Auth>,
-    #[deprecated]
-    #[prost(message, optional, tag="9")]
-    pub auth_role: ::core::option::Option<AuthRole>,
-    /// Indicates security context for permissions triggered with this launch plan
-    #[prost(message, optional, tag="10")]
-    pub security_context: ::core::option::Option<super::core::SecurityContext>,
-    /// Indicates the runtime priority of the execution.
-    #[prost(message, optional, tag="16")]
-    pub quality_of_service: ::core::option::Option<super::core::QualityOfService>,
-    /// Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
-    #[prost(message, optional, tag="17")]
-    pub raw_output_data_config: ::core::option::Option<RawOutputDataConfig>,
-    /// Controls the maximum number of tasknodes that can be run in parallel for the entire workflow.
-    /// This is useful to achieve fairness. Note: MapTasks are regarded as one unit,
-    /// and parallelism/concurrency of MapTasks is independent from this.
-    #[prost(int32, tag="18")]
-    pub max_parallelism: i32,
-    /// Allows for the interruptible flag of a workflow to be overwritten for a single execution.
-    /// Omitting this field uses the workflow's value as a default.
-    /// As we need to distinguish between the field not being provided and its default value false, we have to use a wrapper
-    /// around the bool field.
-    #[prost(message, optional, tag="19")]
-    pub interruptible: ::core::option::Option<bool>,
-    /// Allows for all cached values of a workflow and its tasks to be overwritten for a single execution.
-    /// If enabled, all calculations are performed even if cached results would be available, overwriting the stored
-    /// data once execution finishes successfully.
-    #[prost(bool, tag="20")]
-    pub overwrite_cache: bool,
-    /// Environment variables to be set for the execution.
-    #[prost(message, optional, tag="21")]
-    pub envs: ::core::option::Option<Envs>,
-    /// Execution environment assignments to be set for the execution.
-    #[prost(message, repeated, tag="22")]
-    pub execution_env_assignments: ::prost::alloc::vec::Vec<super::core::ExecutionEnvAssignment>,
-}
-/// Values computed by the flyte platform after launch plan registration.
-/// These include expected_inputs required to be present in a CreateExecutionRequest
-/// to launch the reference workflow as well timestamp values associated with the launch plan.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct LaunchPlanClosure {
-    /// Indicate the Launch plan state. 
-    #[prost(enumeration="LaunchPlanState", tag="1")]
-    pub state: i32,
-    /// Indicates the set of inputs expected when creating an execution with the Launch plan
-    #[prost(message, optional, tag="2")]
-    pub expected_inputs: ::core::option::Option<super::core::ParameterMap>,
-    /// Indicates the set of outputs expected to be produced by creating an execution with the Launch plan
-    #[prost(message, optional, tag="3")]
-    pub expected_outputs: ::core::option::Option<super::core::VariableMap>,
-    /// Time at which the launch plan was created.
-    #[prost(message, optional, tag="4")]
-    pub created_at: ::core::option::Option<::prost_types::Timestamp>,
-    /// Time at which the launch plan was last updated.
-    #[prost(message, optional, tag="5")]
-    pub updated_at: ::core::option::Option<::prost_types::Timestamp>,
-}
-/// Additional launch plan attributes included in the LaunchPlanSpec not strictly required to launch
-/// the reference workflow.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct LaunchPlanMetadata {
-    /// Schedule to execute the Launch Plan
-    #[prost(message, optional, tag="1")]
-    pub schedule: ::core::option::Option<Schedule>,
-    /// List of notifications based on Execution status transitions
-    #[prost(message, repeated, tag="2")]
-    pub notifications: ::prost::alloc::vec::Vec<Notification>,
-    /// Additional metadata for how to launch the launch plan
-    #[prost(message, optional, tag="3")]
-    pub launch_conditions: ::core::option::Option<::prost_types::Any>,
-}
-/// Request to set the referenced launch plan state to the configured value.
-/// See :ref:`ref_flyteidl.admin.LaunchPlan` for more details
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct LaunchPlanUpdateRequest {
-    /// Identifier of launch plan for which to change state.
-    /// +required.
-    #[prost(message, optional, tag="1")]
-    pub id: ::core::option::Option<super::core::Identifier>,
-    /// Desired state to apply to the launch plan.
-    /// +required.
-    #[prost(enumeration="LaunchPlanState", tag="2")]
-    pub state: i32,
-}
-/// Purposefully empty, may be populated in the future.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct LaunchPlanUpdateResponse {
-}
-/// Represents a request struct for finding an active launch plan for a given NamedEntityIdentifier
-/// See :ref:`ref_flyteidl.admin.LaunchPlan` for more details
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct ActiveLaunchPlanRequest {
-    /// +required.
-    #[prost(message, optional, tag="1")]
-    pub id: ::core::option::Option<NamedEntityIdentifier>,
-}
-/// Represents a request structure to list active launch plans within a project/domain and optional org.
-/// See :ref:`ref_flyteidl.admin.LaunchPlan` for more details
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct ActiveLaunchPlanListRequest {
-    /// Name of the project that contains the identifiers.
-    /// +required.
-    #[prost(string, tag="1")]
-    pub project: ::prost::alloc::string::String,
-    /// Name of the domain the identifiers belongs to within the project.
-    /// +required.
-    #[prost(string, tag="2")]
-    pub domain: ::prost::alloc::string::String,
-    /// Indicates the number of resources to be returned.
-    /// +required.
-    #[prost(uint32, tag="3")]
-    pub limit: u32,
-    /// In the case of multiple pages of results, the server-provided token can be used to fetch the next page
-    /// in a query.
-    /// +optional
-    #[prost(string, tag="4")]
-    pub token: ::prost::alloc::string::String,
-    /// Sort ordering.
-    /// +optional
-    #[prost(message, optional, tag="5")]
-    pub sort_by: ::core::option::Option<Sort>,
-    /// Optional, org key applied to the resource.
-    #[prost(string, tag="6")]
-    pub org: ::prost::alloc::string::String,
-}
-/// By default any launch plan regardless of state can be used to launch a workflow execution.
-/// However, at most one version of a launch plan
-/// (e.g. a NamedEntityIdentifier set of shared project, domain and name values) can be
-/// active at a time in regards to *schedules*. That is, at most one schedule in a NamedEntityIdentifier
-/// group will be observed and trigger executions at a defined cadence.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
-#[repr(i32)]
-pub enum LaunchPlanState {
-    Inactive = 0,
-    Active = 1,
-}
-impl LaunchPlanState {
-    /// String value of the enum field names used in the ProtoBuf definition.
-    ///
-    /// The values are not transformed in any way and thus are considered stable
-    /// (if the ProtoBuf definition does not change) and safe for programmatic use.
-    pub fn as_str_name(&self) -> &'static str {
-        match self {
-            LaunchPlanState::Inactive => "INACTIVE",
-            LaunchPlanState::Active => "ACTIVE",
-        }
-    }
-    /// Creates an enum from field names used in the ProtoBuf definition.
-    pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
-        match value {
-            "INACTIVE" => Some(Self::Inactive),
-            "ACTIVE" => Some(Self::Active),
             _ => None,
         }
     }

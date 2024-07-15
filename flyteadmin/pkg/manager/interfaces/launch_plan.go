@@ -23,4 +23,6 @@ type LaunchPlanInterface interface {
 		*admin.LaunchPlanList, error)
 	ListLaunchPlanIds(ctx context.Context, request admin.NamedEntityIdentifierListRequest) (
 		*admin.NamedEntityIdentifierList, error)
+	CreateLaunchPlanFromNode(ctx context.Context, request admin.CreateLaunchPlanFromNodeRequest) (
+		*admin.CreateLaunchPlanFromNodeResponse, error)
 }

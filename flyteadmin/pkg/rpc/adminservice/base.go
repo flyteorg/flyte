@@ -136,8 +136,6 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 
 	pluginRegistry.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
 	logger.Debugf(ctx, "successfully registered default user properties plugin")
-	launchPlanManager := manager.NewLaunchPlanManager(
-		repo, configuration, eventScheduler, adminScope.NewSubScope("launch_plan_manager"), artifactRegistry, pluginRegistry)
 
 	// Configure admin-specific remote data handler (separate from storage)
 	remoteDataConfig := configuration.ApplicationConfiguration().GetRemoteDataConfig()
@@ -157,6 +155,10 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 		adminScope.NewSubScope("workflow_manager"), artifactRegistry)
 	namedEntityManager := manager.NewNamedEntityManager(repo, configuration, adminScope.NewSubScope("named_entity_manager"))
 	descriptionEntityManager := manager.NewDescriptionEntityManager(repo, configuration, adminScope.NewSubScope("description_entity_manager"))
+
+	launchPlanManager := manager.NewLaunchPlanManager(
+		repo, configuration, eventScheduler, adminScope.NewSubScope("launch_plan_manager"),
+		artifactRegistry, pluginRegistry, dataStorageClient, workflowManager, namedEntityManager)
 
 	executionEventWriter := eventWriter.NewWorkflowExecutionEventWriter(repo, applicationConfiguration.GetAsyncEventsBufferSize())
 	go func() {

@@ -8,7 +8,7 @@ import { MethodKind } from "@bufbuild/protobuf";
 import { NamedEntity, NamedEntityGetRequest, NamedEntityIdentifierList, NamedEntityIdentifierListRequest, NamedEntityList, NamedEntityListRequest, NamedEntityUpdateRequest, NamedEntityUpdateResponse, ObjectGetRequest, ResourceListRequest } from "../admin/common_pb.js";
 import { Workflow, WorkflowCreateRequest, WorkflowCreateResponse, WorkflowList } from "../admin/workflow_pb.js";
 import { ActiveLaunchPlanListRequest, ActiveLaunchPlanRequest, LaunchPlan, LaunchPlanCreateRequest, LaunchPlanCreateResponse, LaunchPlanList, LaunchPlanUpdateRequest, LaunchPlanUpdateResponse } from "../admin/launch_plan_pb.js";
-import { Execution, ExecutionCountsGetRequest, ExecutionCountsGetResponse, ExecutionCreateRequest, ExecutionCreateResponse, ExecutionList, ExecutionRecoverRequest, ExecutionRelaunchRequest, ExecutionTerminateRequest, ExecutionTerminateResponse, ExecutionUpdateRequest, ExecutionUpdateResponse, RunningExecutionsCountGetRequest, RunningExecutionsCountGetResponse, WorkflowExecutionGetDataRequest, WorkflowExecutionGetDataResponse, WorkflowExecutionGetMetricsRequest, WorkflowExecutionGetMetricsResponse, WorkflowExecutionGetRequest } from "../admin/execution_pb.js";
+import { CreateLaunchPlanFromNodeRequest, CreateLaunchPlanFromNodeResponse, Execution, ExecutionCountsGetRequest, ExecutionCountsGetResponse, ExecutionCreateRequest, ExecutionCreateResponse, ExecutionList, ExecutionRecoverRequest, ExecutionRelaunchRequest, ExecutionTerminateRequest, ExecutionTerminateResponse, ExecutionUpdateRequest, ExecutionUpdateResponse, RunningExecutionsCountGetRequest, RunningExecutionsCountGetResponse, WorkflowExecutionGetDataRequest, WorkflowExecutionGetDataResponse, WorkflowExecutionGetMetricsRequest, WorkflowExecutionGetMetricsResponse, WorkflowExecutionGetRequest } from "../admin/execution_pb.js";
 import { DynamicNodeWorkflowResponse, GetDynamicNodeWorkflowRequest, NodeExecution, NodeExecutionForTaskListRequest, NodeExecutionGetDataRequest, NodeExecutionGetDataResponse, NodeExecutionGetRequest, NodeExecutionList, NodeExecutionListRequest } from "../admin/node_execution_pb.js";
 import { Project, ProjectGetRequest, ProjectListRequest, ProjectRegisterRequest, ProjectRegisterResponse, Projects, ProjectUpdateResponse } from "../admin/project_pb.js";
 import { NodeExecutionEventRequest, NodeExecutionEventResponse, TaskExecutionEventRequest, TaskExecutionEventResponse, WorkflowExecutionEventRequest, WorkflowExecutionEventResponse } from "../admin/event_pb.js";
@@ -194,6 +194,18 @@ export const AdminService = {
       name: "UpdateLaunchPlan",
       I: LaunchPlanUpdateRequest,
       O: LaunchPlanUpdateResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * Triggers the creation of a :ref:`ref_flyteidl.admin.LaunchPlan`
+     * Although the request tasks a list of subNodes, we only support a single sudNode for now.
+     *
+     * @generated from rpc flyteidl.service.AdminService.CreateLaunchPlanFromNode
+     */
+    createLaunchPlanFromNode: {
+      name: "CreateLaunchPlanFromNode",
+      I: CreateLaunchPlanFromNodeRequest,
+      O: CreateLaunchPlanFromNodeResponse,
       kind: MethodKind.Unary,
     },
     /**

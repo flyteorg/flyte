@@ -107,6 +107,11 @@ class AdminServiceStub(object):
                 request_serializer=flyteidl_dot_admin_dot_launch__plan__pb2.LaunchPlanUpdateRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_admin_dot_launch__plan__pb2.LaunchPlanUpdateResponse.FromString,
                 )
+        self.CreateLaunchPlanFromNode = channel.unary_unary(
+                '/flyteidl.service.AdminService/CreateLaunchPlanFromNode',
+                request_serializer=flyteidl_dot_admin_dot_execution__pb2.CreateLaunchPlanFromNodeRequest.SerializeToString,
+                response_deserializer=flyteidl_dot_admin_dot_execution__pb2.CreateLaunchPlanFromNodeResponse.FromString,
+                )
         self.CreateExecution = channel.unary_unary(
                 '/flyteidl.service.AdminService/CreateExecution',
                 request_serializer=flyteidl_dot_admin_dot_execution__pb2.ExecutionCreateRequest.SerializeToString,
@@ -449,6 +454,14 @@ class AdminServiceServicer(object):
 
     def UpdateLaunchPlan(self, request, context):
         """Updates the status of a registered :ref:`ref_flyteidl.admin.LaunchPlan`.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def CreateLaunchPlanFromNode(self, request, context):
+        """Triggers the creation of a :ref:`ref_flyteidl.admin.LaunchPlan`
+        Although the request tasks a list of subNodes, we only support a single sudNode for now.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -865,6 +878,11 @@ def add_AdminServiceServicer_to_server(servicer, server):
                     servicer.UpdateLaunchPlan,
                     request_deserializer=flyteidl_dot_admin_dot_launch__plan__pb2.LaunchPlanUpdateRequest.FromString,
                     response_serializer=flyteidl_dot_admin_dot_launch__plan__pb2.LaunchPlanUpdateResponse.SerializeToString,
+            ),
+            'CreateLaunchPlanFromNode': grpc.unary_unary_rpc_method_handler(
+                    servicer.CreateLaunchPlanFromNode,
+                    request_deserializer=flyteidl_dot_admin_dot_execution__pb2.CreateLaunchPlanFromNodeRequest.FromString,
+                    response_serializer=flyteidl_dot_admin_dot_execution__pb2.CreateLaunchPlanFromNodeResponse.SerializeToString,
             ),
             'CreateExecution': grpc.unary_unary_rpc_method_handler(
                     servicer.CreateExecution,
@@ -1365,6 +1383,23 @@ class AdminService(object):
         return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AdminService/UpdateLaunchPlan',
             flyteidl_dot_admin_dot_launch__plan__pb2.LaunchPlanUpdateRequest.SerializeToString,
             flyteidl_dot_admin_dot_launch__plan__pb2.LaunchPlanUpdateResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def CreateLaunchPlanFromNode(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AdminService/CreateLaunchPlanFromNode',
+            flyteidl_dot_admin_dot_execution__pb2.CreateLaunchPlanFromNodeRequest.SerializeToString,
+            flyteidl_dot_admin_dot_execution__pb2.CreateLaunchPlanFromNodeResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 

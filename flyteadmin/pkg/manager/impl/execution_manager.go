@@ -547,7 +547,8 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 	}
 
 	launchPlan, err := util.CreateOrGetLaunchPlan(ctx, m.db, m.config, taskIdentifier,
-		workflow.Closure.CompiledWorkflow.Primary.Template.Interface, workflowModel.ID, request.Spec)
+		workflow.Closure.CompiledWorkflow.Primary.Template.Interface, workflowModel.ID,
+		request.Spec.AuthRole, request.Spec.SecurityContext, nil)
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -1468,7 +1469,7 @@ func (m *ExecutionManager) launchExecution(
 // Be sure to update this function when adding new fields to the execution spec.
 func completeResolvedSpec(spec *admin.ExecutionSpec, executionParameters *workflowengineInterfaces.ExecutionParameters) *admin.ExecutionSpec {
 	// We can skip fields that are in input spec, since they are already copied when proto.clone() is called.
-	// Skipped: LaunchPlan, Metadata, NotificationOverrides, tags
+	// Skipped: LaunchPlan, Metadata, NotificationOverrides, tags, sub_node_ids
 	spec.Labels = &admin.Labels{Values: executionParameters.Labels}
 	spec.Annotations = &admin.Annotations{Values: executionParameters.Annotations}
 	spec.SecurityContext = executionParameters.ExecutionConfig.SecurityContext

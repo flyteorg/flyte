@@ -6599,6 +6599,7 @@ func TestCompleteResolvedSpec(t *testing.T) {
 		"ExecutionClusterLabel",
 		"ExecutionEnvAssignments",
 		"TaskResourceAttributes",
+		"SubNodeIds",
 	)
 	specType := reflect.ValueOf(admin.ExecutionSpec{}).Type()
 	for i := 0; i < specType.NumField(); i++ {

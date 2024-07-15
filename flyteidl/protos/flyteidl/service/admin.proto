@@ -289,6 +289,22 @@ service AdminService {
     };
   }
 
+  // Triggers the creation of a :ref:`ref_flyteidl.admin.LaunchPlan`
+  // Although the request tasks a list of subNodes, we only support a single sudNode for now.
+  rpc CreateLaunchPlanFromNode (flyteidl.admin.CreateLaunchPlanFromNodeRequest) returns (flyteidl.admin.CreateLaunchPlanFromNodeResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/launch_plans/create_launch_plan_node"
+      body: "*"
+      additional_bindings {
+        post: "/api/v1/org/launch_plans/create_launch_plan_node/{org}"
+        body: "*"
+      }
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      description: "Create or fetch a launch plan from a given node."
+    };
+  }
+
   // Triggers the creation of a :ref:`ref_flyteidl.admin.Execution`
   rpc CreateExecution (flyteidl.admin.ExecutionCreateRequest) returns (flyteidl.admin.ExecutionCreateResponse) {
     option (google.api.http) = {

@@ -27,6 +27,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 type launchPlanMetrics struct {
@@ -38,12 +39,15 @@ type launchPlanMetrics struct {
 }
 
 type LaunchPlanManager struct {
-	db               repoInterfaces.Repository
-	config           runtimeInterfaces.Configuration
-	scheduler        scheduleInterfaces.EventScheduler
-	metrics          launchPlanMetrics
-	artifactRegistry *artifacts.ArtifactRegistry
-	pluginRegistry   *plugins.Registry
+	db                 repoInterfaces.Repository
+	config             runtimeInterfaces.Configuration
+	scheduler          scheduleInterfaces.EventScheduler
+	metrics            launchPlanMetrics
+	artifactRegistry   *artifacts.ArtifactRegistry
+	pluginRegistry     *plugins.Registry
+	storageClient      *storage.DataStore
+	workflowManager    interfaces.WorkflowInterface
+	namedEntityManager interfaces.NamedEntityInterface
 }
 
 func getLaunchPlanContext(ctx context.Context, identifier *core.Identifier) context.Context {
@@ -667,13 +671,107 @@ func (m *LaunchPlanManager) ListLaunchPlanIds(ctx context.Context, request admin
 	}, nil
 }
 
+func (m *LaunchPlanManager) CreateLaunchPlanFromNode(
+	ctx context.Context, request admin.CreateLaunchPlanFromNodeRequest) (*admin.CreateLaunchPlanFromNodeResponse, error) {
+
+	err := validation.ValidateCreateLaunchPlanFromNodeRequest(request)
+	if err != nil {
+		return nil, err
+	}
+
+	originalLaunchPlan, err := util.GetLaunchPlan(context.Background(), m.db, *request.LaunchPlanId)
+	if err != nil {
+		return nil, err
+	}
+
+	workflowIdentifier := originalLaunchPlan.Spec.WorkflowId
+	originalWorkflow, err := util.GetWorkflow(ctx, m.db, m.storageClient, *workflowIdentifier)
+	if err != nil {
+		return nil, err
+	}
+
+	var checkSubWorkflow bool
+	var subWorkflowNodeIDs []string
+	parentWfNodeID := request.SubNodeIds[0].SubNodeId[0]
+	if len(request.SubNodeIds[0].SubNodeId) > 1 {
+		checkSubWorkflow = true
+		subWorkflowNodeIDs = request.SubNodeIds[0].SubNodeId[1:]
+	}
+
+	var foundNode bool
+	var subNode *core.Node
+	for _, node := range originalWorkflow.Closure.CompiledWorkflow.Primary.Template.Nodes {
+		if parentWfNodeID == node.Id {
+			foundNode = true
+			subNode = node
+			break
+		}
+	}
+	if !foundNode {
+		return nil, errors.NewFlyteAdminErrorf(codes.NotFound, "subNodeID '%s' not found in the workflow", request.SubNodeIds[0])
+	}
+	if checkSubWorkflow {
+		if subNode.GetWorkflowNode() == nil || subNode.GetWorkflowNode().GetSubWorkflowRef() == nil {
+			return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "subNodeID '%s' is not a WorkflowNode that launches a SubWorkflow", request.SubNodeIds[0])
+		}
+
+		subWorkflowMap := make(map[string]*core.CompiledWorkflow)
+		for _, wf := range originalWorkflow.Closure.CompiledWorkflow.SubWorkflows {
+			subWorkflowMap[wf.Template.Id.String()] = wf
+		}
+
+		var foundSubWorkflowNode bool
+		for _, subWorkflowNodeID := range subWorkflowNodeIDs {
+			currSubWorkflowID := subNode.GetWorkflowNode().GetSubWorkflowRef().String()
+			foundSubWorkflowNode = false
+			if wf, exists := subWorkflowMap[currSubWorkflowID]; exists {
+				for _, node := range wf.Template.Nodes {
+					if subWorkflowNodeID == node.Id {
+						subNode = node
+						foundSubWorkflowNode = true
+						break
+					}
+				}
+			} else {
+				return nil, errors.NewFlyteAdminErrorf(codes.NotFound, "subNodeID '%s' not found in the workflow's SubWorkflows", request.SubNodeIds[0])
+			}
+			if !foundSubWorkflowNode {
+				return nil, errors.NewFlyteAdminErrorf(codes.NotFound, "subNodeID '%s' not found in the workflow's SubWorkflows", request.SubNodeIds[0])
+			}
+		}
+	}
+
+	workflowModel, err := util.CreateOrGetWorkflowFromNode(ctx, subNode, m.db, m.workflowManager, m.namedEntityManager, workflowIdentifier)
+	if err != nil {
+		return nil, err
+	}
+	workflow, err := transformers.FromWorkflowModel(*workflowModel)
+	if err != nil {
+		return nil, err
+	}
+
+	launchPlan, err := util.CreateOrGetLaunchPlan(ctx, m.db, m.config, workflow.Id,
+		workflow.Closure.CompiledWorkflow.Primary.Template.Interface, workflowModel.ID,
+		originalLaunchPlan.Spec.AuthRole, originalLaunchPlan.Spec.SecurityContext, subNode)
+	if err != nil {
+		return nil, err
+	}
+
+	return &admin.CreateLaunchPlanFromNodeResponse{
+		LaunchPlan: launchPlan,
+	}, nil
+}
+
 func NewLaunchPlanManager(
 	db repoInterfaces.Repository,
 	config runtimeInterfaces.Configuration,
 	scheduler scheduleInterfaces.EventScheduler,
 	scope promutils.Scope,
 	artifactRegistry *artifacts.ArtifactRegistry,
-	pluginRegistry *plugins.Registry) interfaces.LaunchPlanInterface {
+	pluginRegistry *plugins.Registry,
+	storageClient *storage.DataStore,
+	workflowManager interfaces.WorkflowInterface,
+	namedEntityManager interfaces.NamedEntityInterface) interfaces.LaunchPlanInterface {
 
 	metrics := launchPlanMetrics{
 		Scope: scope,
@@ -684,11 +782,14 @@ func NewLaunchPlanManager(
 		ClosureSizeBytes:     scope.MustNewSummary("closure_size_bytes", "size in bytes of serialized launch plan closure"),
 	}
 	return &LaunchPlanManager{
-		db:               db,
-		config:           config,
-		scheduler:        scheduler,
-		metrics:          metrics,
-		artifactRegistry: artifactRegistry,
-		pluginRegistry:   pluginRegistry,
+		db:                 db,
+		config:             config,
+		scheduler:          scheduler,
+		metrics:            metrics,
+		artifactRegistry:   artifactRegistry,
+		pluginRegistry:     pluginRegistry,
+		storageClient:      storageClient,
+		workflowManager:    workflowManager,
+		namedEntityManager: namedEntityManager,
 	}
 }
