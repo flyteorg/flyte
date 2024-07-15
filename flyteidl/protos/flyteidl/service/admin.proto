@@ -296,7 +296,7 @@ service AdminService {
       post: "/api/v1/launch_plans/create_launch_plan_node"
       body: "*"
       additional_bindings {
-        post: "/api/v1/org/launch_plans/create_launch_plan_node/{org}"
+        post: "/api/v1/org/launch_plans/create_launch_plan_node/{launch_plan_id.org}"
         body: "*"
       }
     };

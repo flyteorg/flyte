@@ -979,6 +979,163 @@ func (x *ActiveLaunchPlanListRequest) GetOrg() string {
 	return ""
 }
 
+type SubNodeIdAsList struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// subNodeID for a node within a workflow. If more then one subMode ID is provided,
+	// then it is assumed to be a subNode within a subWorkflow
+	SubNodeId []string `protobuf:"bytes,1,rep,name=sub_node_id,json=subNodeId,proto3" json:"sub_node_id,omitempty"`
+}
+
+func (x *SubNodeIdAsList) Reset() {
+	*x = SubNodeIdAsList{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_flyteidl_admin_launch_plan_proto_msgTypes[12]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *SubNodeIdAsList) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SubNodeIdAsList) ProtoMessage() {}
+
+func (x *SubNodeIdAsList) ProtoReflect() protoreflect.Message {
+	mi := &file_flyteidl_admin_launch_plan_proto_msgTypes[12]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SubNodeIdAsList.ProtoReflect.Descriptor instead.
+func (*SubNodeIdAsList) Descriptor() ([]byte, []int) {
+	return file_flyteidl_admin_launch_plan_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *SubNodeIdAsList) GetSubNodeId() []string {
+	if x != nil {
+		return x.SubNodeId
+	}
+	return nil
+}
+
+// Request to create or fetch a launch plan to re-run a node
+type CreateLaunchPlanFromNodeRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// ID of the launchplan that executed the workflow that contains the node to be re-run
+	// +required
+	LaunchPlanId *core.Identifier `protobuf:"bytes,1,opt,name=launch_plan_id,json=launchPlanId,proto3" json:"launch_plan_id,omitempty"`
+	// List of sub node IDs to include in the execution. Utilized for re-running a node(s) within a workflow.
+	// +required
+	SubNodeIds []*SubNodeIdAsList `protobuf:"bytes,2,rep,name=sub_node_ids,json=subNodeIds,proto3" json:"sub_node_ids,omitempty"`
+}
+
+func (x *CreateLaunchPlanFromNodeRequest) Reset() {
+	*x = CreateLaunchPlanFromNodeRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_flyteidl_admin_launch_plan_proto_msgTypes[13]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CreateLaunchPlanFromNodeRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateLaunchPlanFromNodeRequest) ProtoMessage() {}
+
+func (x *CreateLaunchPlanFromNodeRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_flyteidl_admin_launch_plan_proto_msgTypes[13]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateLaunchPlanFromNodeRequest.ProtoReflect.Descriptor instead.
+func (*CreateLaunchPlanFromNodeRequest) Descriptor() ([]byte, []int) {
+	return file_flyteidl_admin_launch_plan_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *CreateLaunchPlanFromNodeRequest) GetLaunchPlanId() *core.Identifier {
+	if x != nil {
+		return x.LaunchPlanId
+	}
+	return nil
+}
+
+func (x *CreateLaunchPlanFromNodeRequest) GetSubNodeIds() []*SubNodeIdAsList {
+	if x != nil {
+		return x.SubNodeIds
+	}
+	return nil
+}
+
+// The launch plan that was created for or that already existed from re-running node(s) within a workflow
+type CreateLaunchPlanFromNodeResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	LaunchPlan *LaunchPlan `protobuf:"bytes,1,opt,name=launch_plan,json=launchPlan,proto3" json:"launch_plan,omitempty"`
+}
+
+func (x *CreateLaunchPlanFromNodeResponse) Reset() {
+	*x = CreateLaunchPlanFromNodeResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_flyteidl_admin_launch_plan_proto_msgTypes[14]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CreateLaunchPlanFromNodeResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateLaunchPlanFromNodeResponse) ProtoMessage() {}
+
+func (x *CreateLaunchPlanFromNodeResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_flyteidl_admin_launch_plan_proto_msgTypes[14]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateLaunchPlanFromNodeResponse.ProtoReflect.Descriptor instead.
+func (*CreateLaunchPlanFromNodeResponse) Descriptor() ([]byte, []int) {
+	return file_flyteidl_admin_launch_plan_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *CreateLaunchPlanFromNodeResponse) GetLaunchPlan() *LaunchPlan {
+	if x != nil {
+		return x.LaunchPlan
+	}
+	return nil
+}
+
 var File_flyteidl_admin_launch_plan_proto protoreflect.FileDescriptor
 
 var file_flyteidl_admin_launch_plan_proto_rawDesc = []byte{
@@ -1167,22 +1324,42 @@ var file_flyteidl_admin_launch_plan_proto_rawDesc = []byte{
 	0x5f, 0x62, 0x79, 0x18, 0x05, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x14, 0x2e, 0x66, 0x6c, 0x79, 0x74,
 	0x65, 0x69, 0x64, 0x6c, 0x2e, 0x61, 0x64, 0x6d, 0x69, 0x6e, 0x2e, 0x53, 0x6f, 0x72, 0x74, 0x52,
 	0x06, 0x73, 0x6f, 0x72, 0x74, 0x42, 0x79, 0x12, 0x10, 0x0a, 0x03, 0x6f, 0x72, 0x67, 0x18, 0x06,
-	0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6f, 0x72, 0x67, 0x2a, 0x2b, 0x0a, 0x0f, 0x4c, 0x61, 0x75,
-	0x6e, 0x63, 0x68, 0x50, 0x6c, 0x61, 0x6e, 0x53, 0x74, 0x61, 0x74, 0x65, 0x12, 0x0c, 0x0a, 0x08,
-	0x49, 0x4e, 0x41, 0x43, 0x54, 0x49, 0x56, 0x45, 0x10, 0x00, 0x12, 0x0a, 0x0a, 0x06, 0x41, 0x43,
-	0x54, 0x49, 0x56, 0x45, 0x10, 0x01, 0x42, 0xbb, 0x01, 0x0a, 0x12, 0x63, 0x6f, 0x6d, 0x2e, 0x66,
-	0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x2e, 0x61, 0x64, 0x6d, 0x69, 0x6e, 0x42, 0x0f, 0x4c,
-	0x61, 0x75, 0x6e, 0x63, 0x68, 0x50, 0x6c, 0x61, 0x6e, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01,
-	0x5a, 0x3b, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x66, 0x6c, 0x79,
-	0x74, 0x65, 0x6f, 0x72, 0x67, 0x2f, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x2f, 0x66, 0x6c, 0x79, 0x74,
-	0x65, 0x69, 0x64, 0x6c, 0x2f, 0x67, 0x65, 0x6e, 0x2f, 0x70, 0x62, 0x2d, 0x67, 0x6f, 0x2f, 0x66,
-	0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x2f, 0x61, 0x64, 0x6d, 0x69, 0x6e, 0xa2, 0x02, 0x03,
-	0x46, 0x41, 0x58, 0xaa, 0x02, 0x0e, 0x46, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x2e, 0x41,
-	0x64, 0x6d, 0x69, 0x6e, 0xca, 0x02, 0x0e, 0x46, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x5c,
-	0x41, 0x64, 0x6d, 0x69, 0x6e, 0xe2, 0x02, 0x1a, 0x46, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c,
-	0x5c, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61,
-	0x74, 0x61, 0xea, 0x02, 0x0f, 0x46, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x3a, 0x3a, 0x41,
-	0x64, 0x6d, 0x69, 0x6e, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6f, 0x72, 0x67, 0x22, 0x31, 0x0a, 0x0f, 0x53, 0x75, 0x62,
+	0x4e, 0x6f, 0x64, 0x65, 0x49, 0x64, 0x41, 0x73, 0x4c, 0x69, 0x73, 0x74, 0x12, 0x1e, 0x0a, 0x0b,
+	0x73, 0x75, 0x62, 0x5f, 0x6e, 0x6f, 0x64, 0x65, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x03, 0x28,
+	0x09, 0x52, 0x09, 0x73, 0x75, 0x62, 0x4e, 0x6f, 0x64, 0x65, 0x49, 0x64, 0x22, 0xa5, 0x01, 0x0a,
+	0x1f, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x4c, 0x61, 0x75, 0x6e, 0x63, 0x68, 0x50, 0x6c, 0x61,
+	0x6e, 0x46, 0x72, 0x6f, 0x6d, 0x4e, 0x6f, 0x64, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x12, 0x3f, 0x0a, 0x0e, 0x6c, 0x61, 0x75, 0x6e, 0x63, 0x68, 0x5f, 0x70, 0x6c, 0x61, 0x6e, 0x5f,
+	0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65,
+	0x69, 0x64, 0x6c, 0x2e, 0x63, 0x6f, 0x72, 0x65, 0x2e, 0x49, 0x64, 0x65, 0x6e, 0x74, 0x69, 0x66,
+	0x69, 0x65, 0x72, 0x52, 0x0c, 0x6c, 0x61, 0x75, 0x6e, 0x63, 0x68, 0x50, 0x6c, 0x61, 0x6e, 0x49,
+	0x64, 0x12, 0x41, 0x0a, 0x0c, 0x73, 0x75, 0x62, 0x5f, 0x6e, 0x6f, 0x64, 0x65, 0x5f, 0x69, 0x64,
+	0x73, 0x18, 0x02, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x1f, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69,
+	0x64, 0x6c, 0x2e, 0x61, 0x64, 0x6d, 0x69, 0x6e, 0x2e, 0x53, 0x75, 0x62, 0x4e, 0x6f, 0x64, 0x65,
+	0x49, 0x64, 0x41, 0x73, 0x4c, 0x69, 0x73, 0x74, 0x52, 0x0a, 0x73, 0x75, 0x62, 0x4e, 0x6f, 0x64,
+	0x65, 0x49, 0x64, 0x73, 0x22, 0x5f, 0x0a, 0x20, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x4c, 0x61,
+	0x75, 0x6e, 0x63, 0x68, 0x50, 0x6c, 0x61, 0x6e, 0x46, 0x72, 0x6f, 0x6d, 0x4e, 0x6f, 0x64, 0x65,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x3b, 0x0a, 0x0b, 0x6c, 0x61, 0x75, 0x6e,
+	0x63, 0x68, 0x5f, 0x70, 0x6c, 0x61, 0x6e, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e,
+	0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x2e, 0x61, 0x64, 0x6d, 0x69, 0x6e, 0x2e, 0x4c,
+	0x61, 0x75, 0x6e, 0x63, 0x68, 0x50, 0x6c, 0x61, 0x6e, 0x52, 0x0a, 0x6c, 0x61, 0x75, 0x6e, 0x63,
+	0x68, 0x50, 0x6c, 0x61, 0x6e, 0x2a, 0x2b, 0x0a, 0x0f, 0x4c, 0x61, 0x75, 0x6e, 0x63, 0x68, 0x50,
+	0x6c, 0x61, 0x6e, 0x53, 0x74, 0x61, 0x74, 0x65, 0x12, 0x0c, 0x0a, 0x08, 0x49, 0x4e, 0x41, 0x43,
+	0x54, 0x49, 0x56, 0x45, 0x10, 0x00, 0x12, 0x0a, 0x0a, 0x06, 0x41, 0x43, 0x54, 0x49, 0x56, 0x45,
+	0x10, 0x01, 0x42, 0xbb, 0x01, 0x0a, 0x12, 0x63, 0x6f, 0x6d, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65,
+	0x69, 0x64, 0x6c, 0x2e, 0x61, 0x64, 0x6d, 0x69, 0x6e, 0x42, 0x0f, 0x4c, 0x61, 0x75, 0x6e, 0x63,
+	0x68, 0x50, 0x6c, 0x61, 0x6e, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x3b, 0x67, 0x69,
+	0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x6f, 0x72,
+	0x67, 0x2f, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x2f, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c,
+	0x2f, 0x67, 0x65, 0x6e, 0x2f, 0x70, 0x62, 0x2d, 0x67, 0x6f, 0x2f, 0x66, 0x6c, 0x79, 0x74, 0x65,
+	0x69, 0x64, 0x6c, 0x2f, 0x61, 0x64, 0x6d, 0x69, 0x6e, 0xa2, 0x02, 0x03, 0x46, 0x41, 0x58, 0xaa,
+	0x02, 0x0e, 0x46, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x2e, 0x41, 0x64, 0x6d, 0x69, 0x6e,
+	0xca, 0x02, 0x0e, 0x46, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x5c, 0x41, 0x64, 0x6d, 0x69,
+	0x6e, 0xe2, 0x02, 0x1a, 0x46, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x5c, 0x41, 0x64, 0x6d,
+	0x69, 0x6e, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02,
+	0x0f, 0x46, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x3a, 0x3a, 0x41, 0x64, 0x6d, 0x69, 0x6e,
+	0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -1198,79 +1375,85 @@ func file_flyteidl_admin_launch_plan_proto_rawDescGZIP() []byte {
 }
 
 var file_flyteidl_admin_launch_plan_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_flyteidl_admin_launch_plan_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
+var file_flyteidl_admin_launch_plan_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
 var file_flyteidl_admin_launch_plan_proto_goTypes = []interface{}{
-	(LaunchPlanState)(0),                // 0: flyteidl.admin.LaunchPlanState
-	(*LaunchPlanCreateRequest)(nil),     // 1: flyteidl.admin.LaunchPlanCreateRequest
-	(*LaunchPlanCreateResponse)(nil),    // 2: flyteidl.admin.LaunchPlanCreateResponse
-	(*LaunchPlan)(nil),                  // 3: flyteidl.admin.LaunchPlan
-	(*LaunchPlanList)(nil),              // 4: flyteidl.admin.LaunchPlanList
-	(*Auth)(nil),                        // 5: flyteidl.admin.Auth
-	(*LaunchPlanSpec)(nil),              // 6: flyteidl.admin.LaunchPlanSpec
-	(*LaunchPlanClosure)(nil),           // 7: flyteidl.admin.LaunchPlanClosure
-	(*LaunchPlanMetadata)(nil),          // 8: flyteidl.admin.LaunchPlanMetadata
-	(*LaunchPlanUpdateRequest)(nil),     // 9: flyteidl.admin.LaunchPlanUpdateRequest
-	(*LaunchPlanUpdateResponse)(nil),    // 10: flyteidl.admin.LaunchPlanUpdateResponse
-	(*ActiveLaunchPlanRequest)(nil),     // 11: flyteidl.admin.ActiveLaunchPlanRequest
-	(*ActiveLaunchPlanListRequest)(nil), // 12: flyteidl.admin.ActiveLaunchPlanListRequest
-	(*core.Identifier)(nil),             // 13: flyteidl.core.Identifier
-	(*core.ParameterMap)(nil),           // 14: flyteidl.core.ParameterMap
-	(*core.LiteralMap)(nil),             // 15: flyteidl.core.LiteralMap
-	(*Labels)(nil),                      // 16: flyteidl.admin.Labels
-	(*Annotations)(nil),                 // 17: flyteidl.admin.Annotations
-	(*AuthRole)(nil),                    // 18: flyteidl.admin.AuthRole
-	(*core.SecurityContext)(nil),        // 19: flyteidl.core.SecurityContext
-	(*core.QualityOfService)(nil),       // 20: flyteidl.core.QualityOfService
-	(*RawOutputDataConfig)(nil),         // 21: flyteidl.admin.RawOutputDataConfig
-	(*wrapperspb.BoolValue)(nil),        // 22: google.protobuf.BoolValue
-	(*Envs)(nil),                        // 23: flyteidl.admin.Envs
-	(*core.ExecutionEnvAssignment)(nil), // 24: flyteidl.core.ExecutionEnvAssignment
-	(*core.VariableMap)(nil),            // 25: flyteidl.core.VariableMap
-	(*timestamppb.Timestamp)(nil),       // 26: google.protobuf.Timestamp
-	(*Schedule)(nil),                    // 27: flyteidl.admin.Schedule
-	(*Notification)(nil),                // 28: flyteidl.admin.Notification
-	(*anypb.Any)(nil),                   // 29: google.protobuf.Any
-	(*NamedEntityIdentifier)(nil),       // 30: flyteidl.admin.NamedEntityIdentifier
-	(*Sort)(nil),                        // 31: flyteidl.admin.Sort
+	(LaunchPlanState)(0),                     // 0: flyteidl.admin.LaunchPlanState
+	(*LaunchPlanCreateRequest)(nil),          // 1: flyteidl.admin.LaunchPlanCreateRequest
+	(*LaunchPlanCreateResponse)(nil),         // 2: flyteidl.admin.LaunchPlanCreateResponse
+	(*LaunchPlan)(nil),                       // 3: flyteidl.admin.LaunchPlan
+	(*LaunchPlanList)(nil),                   // 4: flyteidl.admin.LaunchPlanList
+	(*Auth)(nil),                             // 5: flyteidl.admin.Auth
+	(*LaunchPlanSpec)(nil),                   // 6: flyteidl.admin.LaunchPlanSpec
+	(*LaunchPlanClosure)(nil),                // 7: flyteidl.admin.LaunchPlanClosure
+	(*LaunchPlanMetadata)(nil),               // 8: flyteidl.admin.LaunchPlanMetadata
+	(*LaunchPlanUpdateRequest)(nil),          // 9: flyteidl.admin.LaunchPlanUpdateRequest
+	(*LaunchPlanUpdateResponse)(nil),         // 10: flyteidl.admin.LaunchPlanUpdateResponse
+	(*ActiveLaunchPlanRequest)(nil),          // 11: flyteidl.admin.ActiveLaunchPlanRequest
+	(*ActiveLaunchPlanListRequest)(nil),      // 12: flyteidl.admin.ActiveLaunchPlanListRequest
+	(*SubNodeIdAsList)(nil),                  // 13: flyteidl.admin.SubNodeIdAsList
+	(*CreateLaunchPlanFromNodeRequest)(nil),  // 14: flyteidl.admin.CreateLaunchPlanFromNodeRequest
+	(*CreateLaunchPlanFromNodeResponse)(nil), // 15: flyteidl.admin.CreateLaunchPlanFromNodeResponse
+	(*core.Identifier)(nil),                  // 16: flyteidl.core.Identifier
+	(*core.ParameterMap)(nil),                // 17: flyteidl.core.ParameterMap
+	(*core.LiteralMap)(nil),                  // 18: flyteidl.core.LiteralMap
+	(*Labels)(nil),                           // 19: flyteidl.admin.Labels
+	(*Annotations)(nil),                      // 20: flyteidl.admin.Annotations
+	(*AuthRole)(nil),                         // 21: flyteidl.admin.AuthRole
+	(*core.SecurityContext)(nil),             // 22: flyteidl.core.SecurityContext
+	(*core.QualityOfService)(nil),            // 23: flyteidl.core.QualityOfService
+	(*RawOutputDataConfig)(nil),              // 24: flyteidl.admin.RawOutputDataConfig
+	(*wrapperspb.BoolValue)(nil),             // 25: google.protobuf.BoolValue
+	(*Envs)(nil),                             // 26: flyteidl.admin.Envs
+	(*core.ExecutionEnvAssignment)(nil),      // 27: flyteidl.core.ExecutionEnvAssignment
+	(*core.VariableMap)(nil),                 // 28: flyteidl.core.VariableMap
+	(*timestamppb.Timestamp)(nil),            // 29: google.protobuf.Timestamp
+	(*Schedule)(nil),                         // 30: flyteidl.admin.Schedule
+	(*Notification)(nil),                     // 31: flyteidl.admin.Notification
+	(*anypb.Any)(nil),                        // 32: google.protobuf.Any
+	(*NamedEntityIdentifier)(nil),            // 33: flyteidl.admin.NamedEntityIdentifier
+	(*Sort)(nil),                             // 34: flyteidl.admin.Sort
 }
 var file_flyteidl_admin_launch_plan_proto_depIdxs = []int32{
-	13, // 0: flyteidl.admin.LaunchPlanCreateRequest.id:type_name -> flyteidl.core.Identifier
+	16, // 0: flyteidl.admin.LaunchPlanCreateRequest.id:type_name -> flyteidl.core.Identifier
 	6,  // 1: flyteidl.admin.LaunchPlanCreateRequest.spec:type_name -> flyteidl.admin.LaunchPlanSpec
-	13, // 2: flyteidl.admin.LaunchPlan.id:type_name -> flyteidl.core.Identifier
+	16, // 2: flyteidl.admin.LaunchPlan.id:type_name -> flyteidl.core.Identifier
 	6,  // 3: flyteidl.admin.LaunchPlan.spec:type_name -> flyteidl.admin.LaunchPlanSpec
 	7,  // 4: flyteidl.admin.LaunchPlan.closure:type_name -> flyteidl.admin.LaunchPlanClosure
 	3,  // 5: flyteidl.admin.LaunchPlanList.launch_plans:type_name -> flyteidl.admin.LaunchPlan
-	13, // 6: flyteidl.admin.LaunchPlanSpec.workflow_id:type_name -> flyteidl.core.Identifier
+	16, // 6: flyteidl.admin.LaunchPlanSpec.workflow_id:type_name -> flyteidl.core.Identifier
 	8,  // 7: flyteidl.admin.LaunchPlanSpec.entity_metadata:type_name -> flyteidl.admin.LaunchPlanMetadata
-	14, // 8: flyteidl.admin.LaunchPlanSpec.default_inputs:type_name -> flyteidl.core.ParameterMap
-	15, // 9: flyteidl.admin.LaunchPlanSpec.fixed_inputs:type_name -> flyteidl.core.LiteralMap
-	16, // 10: flyteidl.admin.LaunchPlanSpec.labels:type_name -> flyteidl.admin.Labels
-	17, // 11: flyteidl.admin.LaunchPlanSpec.annotations:type_name -> flyteidl.admin.Annotations
+	17, // 8: flyteidl.admin.LaunchPlanSpec.default_inputs:type_name -> flyteidl.core.ParameterMap
+	18, // 9: flyteidl.admin.LaunchPlanSpec.fixed_inputs:type_name -> flyteidl.core.LiteralMap
+	19, // 10: flyteidl.admin.LaunchPlanSpec.labels:type_name -> flyteidl.admin.Labels
+	20, // 11: flyteidl.admin.LaunchPlanSpec.annotations:type_name -> flyteidl.admin.Annotations
 	5,  // 12: flyteidl.admin.LaunchPlanSpec.auth:type_name -> flyteidl.admin.Auth
-	18, // 13: flyteidl.admin.LaunchPlanSpec.auth_role:type_name -> flyteidl.admin.AuthRole
-	19, // 14: flyteidl.admin.LaunchPlanSpec.security_context:type_name -> flyteidl.core.SecurityContext
-	20, // 15: flyteidl.admin.LaunchPlanSpec.quality_of_service:type_name -> flyteidl.core.QualityOfService
-	21, // 16: flyteidl.admin.LaunchPlanSpec.raw_output_data_config:type_name -> flyteidl.admin.RawOutputDataConfig
-	22, // 17: flyteidl.admin.LaunchPlanSpec.interruptible:type_name -> google.protobuf.BoolValue
-	23, // 18: flyteidl.admin.LaunchPlanSpec.envs:type_name -> flyteidl.admin.Envs
-	24, // 19: flyteidl.admin.LaunchPlanSpec.execution_env_assignments:type_name -> flyteidl.core.ExecutionEnvAssignment
+	21, // 13: flyteidl.admin.LaunchPlanSpec.auth_role:type_name -> flyteidl.admin.AuthRole
+	22, // 14: flyteidl.admin.LaunchPlanSpec.security_context:type_name -> flyteidl.core.SecurityContext
+	23, // 15: flyteidl.admin.LaunchPlanSpec.quality_of_service:type_name -> flyteidl.core.QualityOfService
+	24, // 16: flyteidl.admin.LaunchPlanSpec.raw_output_data_config:type_name -> flyteidl.admin.RawOutputDataConfig
+	25, // 17: flyteidl.admin.LaunchPlanSpec.interruptible:type_name -> google.protobuf.BoolValue
+	26, // 18: flyteidl.admin.LaunchPlanSpec.envs:type_name -> flyteidl.admin.Envs
+	27, // 19: flyteidl.admin.LaunchPlanSpec.execution_env_assignments:type_name -> flyteidl.core.ExecutionEnvAssignment
 	0,  // 20: flyteidl.admin.LaunchPlanClosure.state:type_name -> flyteidl.admin.LaunchPlanState
-	14, // 21: flyteidl.admin.LaunchPlanClosure.expected_inputs:type_name -> flyteidl.core.ParameterMap
-	25, // 22: flyteidl.admin.LaunchPlanClosure.expected_outputs:type_name -> flyteidl.core.VariableMap
-	26, // 23: flyteidl.admin.LaunchPlanClosure.created_at:type_name -> google.protobuf.Timestamp
-	26, // 24: flyteidl.admin.LaunchPlanClosure.updated_at:type_name -> google.protobuf.Timestamp
-	27, // 25: flyteidl.admin.LaunchPlanMetadata.schedule:type_name -> flyteidl.admin.Schedule
-	28, // 26: flyteidl.admin.LaunchPlanMetadata.notifications:type_name -> flyteidl.admin.Notification
-	29, // 27: flyteidl.admin.LaunchPlanMetadata.launch_conditions:type_name -> google.protobuf.Any
-	13, // 28: flyteidl.admin.LaunchPlanUpdateRequest.id:type_name -> flyteidl.core.Identifier
+	17, // 21: flyteidl.admin.LaunchPlanClosure.expected_inputs:type_name -> flyteidl.core.ParameterMap
+	28, // 22: flyteidl.admin.LaunchPlanClosure.expected_outputs:type_name -> flyteidl.core.VariableMap
+	29, // 23: flyteidl.admin.LaunchPlanClosure.created_at:type_name -> google.protobuf.Timestamp
+	29, // 24: flyteidl.admin.LaunchPlanClosure.updated_at:type_name -> google.protobuf.Timestamp
+	30, // 25: flyteidl.admin.LaunchPlanMetadata.schedule:type_name -> flyteidl.admin.Schedule
+	31, // 26: flyteidl.admin.LaunchPlanMetadata.notifications:type_name -> flyteidl.admin.Notification
+	32, // 27: flyteidl.admin.LaunchPlanMetadata.launch_conditions:type_name -> google.protobuf.Any
+	16, // 28: flyteidl.admin.LaunchPlanUpdateRequest.id:type_name -> flyteidl.core.Identifier
 	0,  // 29: flyteidl.admin.LaunchPlanUpdateRequest.state:type_name -> flyteidl.admin.LaunchPlanState
-	30, // 30: flyteidl.admin.ActiveLaunchPlanRequest.id:type_name -> flyteidl.admin.NamedEntityIdentifier
-	31, // 31: flyteidl.admin.ActiveLaunchPlanListRequest.sort_by:type_name -> flyteidl.admin.Sort
-	32, // [32:32] is the sub-list for method output_type
-	32, // [32:32] is the sub-list for method input_type
-	32, // [32:32] is the sub-list for extension type_name
-	32, // [32:32] is the sub-list for extension extendee
-	0,  // [0:32] is the sub-list for field type_name
+	33, // 30: flyteidl.admin.ActiveLaunchPlanRequest.id:type_name -> flyteidl.admin.NamedEntityIdentifier
+	34, // 31: flyteidl.admin.ActiveLaunchPlanListRequest.sort_by:type_name -> flyteidl.admin.Sort
+	16, // 32: flyteidl.admin.CreateLaunchPlanFromNodeRequest.launch_plan_id:type_name -> flyteidl.core.Identifier
+	13, // 33: flyteidl.admin.CreateLaunchPlanFromNodeRequest.sub_node_ids:type_name -> flyteidl.admin.SubNodeIdAsList
+	3,  // 34: flyteidl.admin.CreateLaunchPlanFromNodeResponse.launch_plan:type_name -> flyteidl.admin.LaunchPlan
+	35, // [35:35] is the sub-list for method output_type
+	35, // [35:35] is the sub-list for method input_type
+	35, // [35:35] is the sub-list for extension type_name
+	35, // [35:35] is the sub-list for extension extendee
+	0,  // [0:35] is the sub-list for field type_name
 }
 
 func init() { file_flyteidl_admin_launch_plan_proto_init() }
@@ -1425,6 +1608,42 @@ func file_flyteidl_admin_launch_plan_proto_init() {
 				return nil
 			}
 		}
+		file_flyteidl_admin_launch_plan_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*SubNodeIdAsList); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_flyteidl_admin_launch_plan_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CreateLaunchPlanFromNodeRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_flyteidl_admin_launch_plan_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CreateLaunchPlanFromNodeResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -1432,7 +1651,7 @@ func file_flyteidl_admin_launch_plan_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_flyteidl_admin_launch_plan_proto_rawDesc,
 			NumEnums:      1,
-			NumMessages:   12,
+			NumMessages:   15,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

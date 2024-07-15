@@ -2007,7 +2007,6 @@ func TestCreateLaunchPlanFromNode(t *testing.T) {
 				SubNodeIds: []*admin.SubNodeIdAsList{
 					{SubNodeId: tt.subNodeID},
 				},
-				Org: request.Id.Org,
 			}
 
 			mockStorage := getMockStorageForExecTest(context.Background())

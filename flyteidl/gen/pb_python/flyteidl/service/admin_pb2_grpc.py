@@ -109,8 +109,8 @@ class AdminServiceStub(object):
                 )
         self.CreateLaunchPlanFromNode = channel.unary_unary(
                 '/flyteidl.service.AdminService/CreateLaunchPlanFromNode',
-                request_serializer=flyteidl_dot_admin_dot_execution__pb2.CreateLaunchPlanFromNodeRequest.SerializeToString,
-                response_deserializer=flyteidl_dot_admin_dot_execution__pb2.CreateLaunchPlanFromNodeResponse.FromString,
+                request_serializer=flyteidl_dot_admin_dot_launch__plan__pb2.CreateLaunchPlanFromNodeRequest.SerializeToString,
+                response_deserializer=flyteidl_dot_admin_dot_launch__plan__pb2.CreateLaunchPlanFromNodeResponse.FromString,
                 )
         self.CreateExecution = channel.unary_unary(
                 '/flyteidl.service.AdminService/CreateExecution',
@@ -881,8 +881,8 @@ def add_AdminServiceServicer_to_server(servicer, server):
             ),
             'CreateLaunchPlanFromNode': grpc.unary_unary_rpc_method_handler(
                     servicer.CreateLaunchPlanFromNode,
-                    request_deserializer=flyteidl_dot_admin_dot_execution__pb2.CreateLaunchPlanFromNodeRequest.FromString,
-                    response_serializer=flyteidl_dot_admin_dot_execution__pb2.CreateLaunchPlanFromNodeResponse.SerializeToString,
+                    request_deserializer=flyteidl_dot_admin_dot_launch__plan__pb2.CreateLaunchPlanFromNodeRequest.FromString,
+                    response_serializer=flyteidl_dot_admin_dot_launch__plan__pb2.CreateLaunchPlanFromNodeResponse.SerializeToString,
             ),
             'CreateExecution': grpc.unary_unary_rpc_method_handler(
                     servicer.CreateExecution,
@@ -1398,8 +1398,8 @@ class AdminService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AdminService/CreateLaunchPlanFromNode',
-            flyteidl_dot_admin_dot_execution__pb2.CreateLaunchPlanFromNodeRequest.SerializeToString,
-            flyteidl_dot_admin_dot_execution__pb2.CreateLaunchPlanFromNodeResponse.FromString,
+            flyteidl_dot_admin_dot_launch__plan__pb2.CreateLaunchPlanFromNodeRequest.SerializeToString,
+            flyteidl_dot_admin_dot_launch__plan__pb2.CreateLaunchPlanFromNodeResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 

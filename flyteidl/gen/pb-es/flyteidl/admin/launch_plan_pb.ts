@@ -812,3 +812,133 @@ export class ActiveLaunchPlanListRequest extends Message<ActiveLaunchPlanListReq
   }
 }
 
+/**
+ * @generated from message flyteidl.admin.SubNodeIdAsList
+ */
+export class SubNodeIdAsList extends Message<SubNodeIdAsList> {
+  /**
+   * subNodeID for a node within a workflow. If more then one subMode ID is provided,
+   * then it is assumed to be a subNode within a subWorkflow
+   *
+   * @generated from field: repeated string sub_node_id = 1;
+   */
+  subNodeId: string[] = [];
+
+  constructor(data?: PartialMessage<SubNodeIdAsList>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.admin.SubNodeIdAsList";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "sub_node_id", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SubNodeIdAsList {
+    return new SubNodeIdAsList().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SubNodeIdAsList {
+    return new SubNodeIdAsList().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SubNodeIdAsList {
+    return new SubNodeIdAsList().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: SubNodeIdAsList | PlainMessage<SubNodeIdAsList> | undefined, b: SubNodeIdAsList | PlainMessage<SubNodeIdAsList> | undefined): boolean {
+    return proto3.util.equals(SubNodeIdAsList, a, b);
+  }
+}
+
+/**
+ * Request to create or fetch a launch plan to re-run a node
+ *
+ * @generated from message flyteidl.admin.CreateLaunchPlanFromNodeRequest
+ */
+export class CreateLaunchPlanFromNodeRequest extends Message<CreateLaunchPlanFromNodeRequest> {
+  /**
+   * ID of the launchplan that executed the workflow that contains the node to be re-run
+   * +required
+   *
+   * @generated from field: flyteidl.core.Identifier launch_plan_id = 1;
+   */
+  launchPlanId?: Identifier;
+
+  /**
+   * List of sub node IDs to include in the execution. Utilized for re-running a node(s) within a workflow.
+   * +required
+   *
+   * @generated from field: repeated flyteidl.admin.SubNodeIdAsList sub_node_ids = 2;
+   */
+  subNodeIds: SubNodeIdAsList[] = [];
+
+  constructor(data?: PartialMessage<CreateLaunchPlanFromNodeRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.admin.CreateLaunchPlanFromNodeRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "launch_plan_id", kind: "message", T: Identifier },
+    { no: 2, name: "sub_node_ids", kind: "message", T: SubNodeIdAsList, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateLaunchPlanFromNodeRequest {
+    return new CreateLaunchPlanFromNodeRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CreateLaunchPlanFromNodeRequest {
+    return new CreateLaunchPlanFromNodeRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CreateLaunchPlanFromNodeRequest {
+    return new CreateLaunchPlanFromNodeRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: CreateLaunchPlanFromNodeRequest | PlainMessage<CreateLaunchPlanFromNodeRequest> | undefined, b: CreateLaunchPlanFromNodeRequest | PlainMessage<CreateLaunchPlanFromNodeRequest> | undefined): boolean {
+    return proto3.util.equals(CreateLaunchPlanFromNodeRequest, a, b);
+  }
+}
+
+/**
+ * The launch plan that was created for or that already existed from re-running node(s) within a workflow
+ *
+ * @generated from message flyteidl.admin.CreateLaunchPlanFromNodeResponse
+ */
+export class CreateLaunchPlanFromNodeResponse extends Message<CreateLaunchPlanFromNodeResponse> {
+  /**
+   * @generated from field: flyteidl.admin.LaunchPlan launch_plan = 1;
+   */
+  launchPlan?: LaunchPlan;
+
+  constructor(data?: PartialMessage<CreateLaunchPlanFromNodeResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.admin.CreateLaunchPlanFromNodeResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "launch_plan", kind: "message", T: LaunchPlan },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateLaunchPlanFromNodeResponse {
+    return new CreateLaunchPlanFromNodeResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CreateLaunchPlanFromNodeResponse {
+    return new CreateLaunchPlanFromNodeResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CreateLaunchPlanFromNodeResponse {
+    return new CreateLaunchPlanFromNodeResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: CreateLaunchPlanFromNodeResponse | PlainMessage<CreateLaunchPlanFromNodeResponse> | undefined, b: CreateLaunchPlanFromNodeResponse | PlainMessage<CreateLaunchPlanFromNodeResponse> | undefined): boolean {
+    return proto3.util.equals(CreateLaunchPlanFromNodeResponse, a, b);
+  }
+}
+

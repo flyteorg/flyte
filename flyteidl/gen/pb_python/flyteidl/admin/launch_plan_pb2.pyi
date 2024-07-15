@@ -157,3 +157,23 @@ class ActiveLaunchPlanListRequest(_message.Message):
     sort_by: _common_pb2.Sort
     org: str
     def __init__(self, project: _Optional[str] = ..., domain: _Optional[str] = ..., limit: _Optional[int] = ..., token: _Optional[str] = ..., sort_by: _Optional[_Union[_common_pb2.Sort, _Mapping]] = ..., org: _Optional[str] = ...) -> None: ...
+
+class SubNodeIdAsList(_message.Message):
+    __slots__ = ["sub_node_id"]
+    SUB_NODE_ID_FIELD_NUMBER: _ClassVar[int]
+    sub_node_id: _containers.RepeatedScalarFieldContainer[str]
+    def __init__(self, sub_node_id: _Optional[_Iterable[str]] = ...) -> None: ...
+
+class CreateLaunchPlanFromNodeRequest(_message.Message):
+    __slots__ = ["launch_plan_id", "sub_node_ids"]
+    LAUNCH_PLAN_ID_FIELD_NUMBER: _ClassVar[int]
+    SUB_NODE_IDS_FIELD_NUMBER: _ClassVar[int]
+    launch_plan_id: _identifier_pb2.Identifier
+    sub_node_ids: _containers.RepeatedCompositeFieldContainer[SubNodeIdAsList]
+    def __init__(self, launch_plan_id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., sub_node_ids: _Optional[_Iterable[_Union[SubNodeIdAsList, _Mapping]]] = ...) -> None: ...
+
+class CreateLaunchPlanFromNodeResponse(_message.Message):
+    __slots__ = ["launch_plan"]
+    LAUNCH_PLAN_FIELD_NUMBER: _ClassVar[int]
+    launch_plan: LaunchPlan
+    def __init__(self, launch_plan: _Optional[_Union[LaunchPlan, _Mapping]] = ...) -> None: ...

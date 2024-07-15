@@ -224,3 +224,25 @@ message ActiveLaunchPlanListRequest {
     // Optional, org key applied to the resource.
     string org = 6;
 }
+
+message SubNodeIdAsList {
+    // subNodeID for a node within a workflow. If more then one subMode ID is provided,
+    // then it is assumed to be a subNode within a subWorkflow
+    repeated string sub_node_id = 1;
+}
+
+// Request to create or fetch a launch plan to re-run a node
+message CreateLaunchPlanFromNodeRequest {
+    // ID of the launchplan that executed the workflow that contains the node to be re-run
+    // +required
+    core.Identifier launch_plan_id = 1;
+
+    // List of sub node IDs to include in the execution. Utilized for re-running a node(s) within a workflow.
+    // +required
+    repeated SubNodeIdAsList sub_node_ids = 2;
+}
+
+// The launch plan that was created for or that already existed from re-running node(s) within a workflow
+message CreateLaunchPlanFromNodeResponse {
+    admin.LaunchPlan launch_plan = 1;
+}

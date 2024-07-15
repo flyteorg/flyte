@@ -4370,7 +4370,7 @@
         ]
       }
     },
-    "/api/v1/org/launch_plans/create_launch_plan_node/{org}": {
+    "/api/v1/org/launch_plans/create_launch_plan_node/{launch_plan_id.org}": {
       "post": {
         "summary": "Triggers the creation of a :ref:`ref_flyteidl.admin.LaunchPlan`\nAlthough the request tasks a list of subNodes, we only support a single sudNode for now.",
         "description": "Create or fetch a launch plan from a given node.",
@@ -4391,8 +4391,8 @@
         },
         "parameters": [
           {
-            "name": "org",
-            "description": "optional org key\n+optional",
+            "name": "launch_plan_id.org",
+            "description": "Optional, org key applied to the resource.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -9217,7 +9217,29 @@
       "type": "object",
       "properties": {
         "launch_plan_id": {
-          "$ref": "#/definitions/coreIdentifier",
+          "type": "object",
+          "properties": {
+            "resource_type": {
+              "$ref": "#/definitions/coreResourceType",
+              "description": "Identifies the specific type of resource that this identifier corresponds to."
+            },
+            "project": {
+              "type": "string",
+              "description": "Name of the project the resource belongs to."
+            },
+            "domain": {
+              "type": "string",
+              "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project."
+            },
+            "name": {
+              "type": "string",
+              "description": "User provided value for the resource."
+            },
+            "version": {
+              "type": "string",
+              "description": "Specific version of the resource."
+            }
+          },
           "title": "ID of the launchplan that executed the workflow that contains the node to be re-run\n+required"
         },
         "sub_node_ids": {
@@ -10449,10 +10471,6 @@
             "$ref": "#/definitions/adminSubNodeIdAsList"
           },
           "title": "List of sub node IDs to include in the execution. Utilized for re-running a node(s) within a workflow.\n+required"
-        },
-        "org": {
-          "type": "string",
-          "title": "optional org key\n+optional"
         }
       },
       "title": "Request to create or fetch a launch plan to re-run a node"

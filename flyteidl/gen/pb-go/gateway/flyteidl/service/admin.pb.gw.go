@@ -3869,14 +3869,14 @@ func request_AdminService_CreateLaunchPlanFromNode_1(ctx context.Context, marsha
 		_   = err
 	)
 
-	val, ok = pathParams["org"]
+	val, ok = pathParams["launch_plan_id.org"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "org")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "launch_plan_id.org")
 	}
 
-	protoReq.Org, err = runtime.String(val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "launch_plan_id.org", val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "org", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "launch_plan_id.org", err)
 	}
 
 	msg, err := client.CreateLaunchPlanFromNode(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -3903,14 +3903,14 @@ func local_request_AdminService_CreateLaunchPlanFromNode_1(ctx context.Context, 
 		_   = err
 	)
 
-	val, ok = pathParams["org"]
+	val, ok = pathParams["launch_plan_id.org"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "org")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "launch_plan_id.org")
 	}
 
-	protoReq.Org, err = runtime.String(val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "launch_plan_id.org", val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "org", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "launch_plan_id.org", err)
 	}
 
 	msg, err := server.CreateLaunchPlanFromNode(ctx, &protoReq)
@@ -15321,7 +15321,7 @@ func RegisterAdminServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flyteidl.service.AdminService/CreateLaunchPlanFromNode", runtime.WithHTTPPathPattern("/api/v1/org/launch_plans/create_launch_plan_node/{org}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flyteidl.service.AdminService/CreateLaunchPlanFromNode", runtime.WithHTTPPathPattern("/api/v1/org/launch_plans/create_launch_plan_node/{launch_plan_id.org}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -18724,7 +18724,7 @@ func RegisterAdminServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl.service.AdminService/CreateLaunchPlanFromNode", runtime.WithHTTPPathPattern("/api/v1/org/launch_plans/create_launch_plan_node/{org}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl.service.AdminService/CreateLaunchPlanFromNode", runtime.WithHTTPPathPattern("/api/v1/org/launch_plans/create_launch_plan_node/{launch_plan_id.org}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -21040,7 +21040,7 @@ var (
 
 	pattern_AdminService_CreateLaunchPlanFromNode_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "launch_plans", "create_launch_plan_node"}, ""))
 
-	pattern_AdminService_CreateLaunchPlanFromNode_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 2}, []string{"api", "v1", "org", "launch_plans", "create_launch_plan_node"}, ""))
+	pattern_AdminService_CreateLaunchPlanFromNode_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"api", "v1", "org", "launch_plans", "create_launch_plan_node", "launch_plan_id.org"}, ""))
 
 	pattern_AdminService_CreateExecution_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "executions"}, ""))
 
