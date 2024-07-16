@@ -33,6 +33,10 @@ func (e *EchoPlugin) GetProperties() core.PluginProperties {
 func (e *EchoPlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (core.Transition, error) {
 	echoConfig := ConfigSection.GetConfig().(*Config)
 
+	if echoConfig.SleepDuration.Duration == time.Duration(0) {
+		return copyInputsToOutputs(ctx, tCtx)
+	}
+
 	var startTime time.Time
 	var exists bool
 	taskExecutionID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
@@ -50,39 +54,7 @@ func (e *EchoPlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext)
 	}
 
 	if time.Since(startTime) >= echoConfig.SleepDuration.Duration {
-		// copy inputs to outputs
-		inputToOutputVariableMappings, err := compileInputToOutputVariableMappings(ctx, tCtx)
-		if err != nil {
-			return core.UnknownTransition, err
-		}
-
-		if len(inputToOutputVariableMappings) > 0 {
-			inputLiterals, err := tCtx.InputReader().Get(ctx)
-			if err != nil {
-				return core.UnknownTransition, err
-			}
-
-			outputLiterals := make(map[string]*idlcore.Literal, len(inputToOutputVariableMappings))
-			for inputVariableName, outputVariableName := range inputToOutputVariableMappings {
-				outputLiterals[outputVariableName] = inputLiterals.Literals[inputVariableName]
-			}
-
-			outputLiteralMap := &idlcore.LiteralMap{
-				Literals: outputLiterals,
-			}
-
-			outputFile := tCtx.OutputWriter().GetOutputPath()
-			if err := tCtx.DataStore().WriteProtobuf(ctx, outputFile, storage.Options{}, outputLiteralMap); err != nil {
-				return core.UnknownTransition, err
-			}
-
-			or := ioutils.NewRemoteFileOutputReader(ctx, tCtx.DataStore(), tCtx.OutputWriter(), 0)
-			if err = tCtx.OutputWriter().Put(ctx, or); err != nil {
-				return core.UnknownTransition, err
-			}
-		}
-
-		return core.DoTransition(core.PhaseInfoSuccess(nil)), nil
+		return copyInputsToOutputs(ctx, tCtx)
 	}
 
 	return core.DoTransition(core.PhaseInfoRunning(core.DefaultPhaseVersion, nil)), nil
@@ -96,6 +68,40 @@ func (e *EchoPlugin) Finalize(ctx context.Context, tCtx core.TaskExecutionContex
 	taskExecutionID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
 	delete(e.taskStartTimes, taskExecutionID)
 	return nil
+}
+
+func copyInputsToOutputs(ctx context.Context, tCtx core.TaskExecutionContext) (core.Transition, error) {
+	inputToOutputVariableMappings, err := compileInputToOutputVariableMappings(ctx, tCtx)
+	if err != nil {
+		return core.UnknownTransition, err
+	}
+
+	if len(inputToOutputVariableMappings) > 0 {
+		inputLiterals, err := tCtx.InputReader().Get(ctx)
+		if err != nil {
+			return core.UnknownTransition, err
+		}
+
+		outputLiterals := make(map[string]*idlcore.Literal, len(inputToOutputVariableMappings))
+		for inputVariableName, outputVariableName := range inputToOutputVariableMappings {
+			outputLiterals[outputVariableName] = inputLiterals.Literals[inputVariableName]
+		}
+
+		outputLiteralMap := &idlcore.LiteralMap{
+			Literals: outputLiterals,
+		}
+
+		outputFile := tCtx.OutputWriter().GetOutputPath()
+		if err := tCtx.DataStore().WriteProtobuf(ctx, outputFile, storage.Options{}, outputLiteralMap); err != nil {
+			return core.UnknownTransition, err
+		}
+
+		or := ioutils.NewRemoteFileOutputReader(ctx, tCtx.DataStore(), tCtx.OutputWriter(), 0)
+		if err = tCtx.OutputWriter().Put(ctx, or); err != nil {
+			return core.UnknownTransition, err
+		}
+	}
+	return core.DoTransition(core.PhaseInfoSuccess(nil)), nil
 }
 
 func compileInputToOutputVariableMappings(ctx context.Context, tCtx core.TaskExecutionContext) (map[string]string, error) {
