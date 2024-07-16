@@ -24,6 +24,14 @@ type EchoPlugin struct {
 	sync.Mutex
 }
 
+func (e *EchoPlugin) GetID() string {
+	return echoTaskType
+}
+
+func (e *EchoPlugin) GetProperties() core.PluginProperties {
+	return core.PluginProperties{}
+}
+
 func (e *EchoPlugin) addTask(ctx context.Context, tCtx core.TaskExecutionContext) time.Time {
 	e.Lock()
 	defer e.Unlock()
@@ -50,14 +58,6 @@ func (e *EchoPlugin) removeTask(taskExecutionID string) {
 	e.Lock()
 	defer e.Unlock()
 	delete(e.taskStartTimes, taskExecutionID)
-}
-
-func (e *EchoPlugin) GetID() string {
-	return echoTaskType
-}
-
-func (e *EchoPlugin) GetProperties() core.PluginProperties {
-	return core.PluginProperties{}
 }
 
 func (e *EchoPlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (core.Transition, error) {
