@@ -1301,20 +1301,20 @@ func TestNodeExecutor_RecursiveNodeHandler_BranchNode(t *testing.T) {
 
 				tid := "tid"
 				eCtx := &mocks4.ExecutionContext{}
-				eCtx.EXPECT().GetTask(tid).Return(tk, nil)
+				eCtx.OnGetTask(tid).Return(tk, nil)
 
-				eCtx.EXPECT().IsInterruptible().Return(true)
-				eCtx.EXPECT().GetExecutionID().Return(v1alpha1.WorkflowExecutionIdentifier{WorkflowExecutionIdentifier: &core.WorkflowExecutionIdentifier{}})
-				eCtx.EXPECT().GetLabels().Return(nil)
-				eCtx.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion0)
-				eCtx.EXPECT().GetParentInfo().Return(nil)
-				eCtx.EXPECT().GetRawOutputDataConfig().Return(v1alpha1.RawOutputDataConfig{
+				eCtx.OnIsInterruptible().Return(true)
+				eCtx.OnGetExecutionID().Return(v1alpha1.WorkflowExecutionIdentifier{WorkflowExecutionIdentifier: &core.WorkflowExecutionIdentifier{}})
+				eCtx.OnGetLabels().Return(nil)
+				eCtx.OnGetEventVersion().Return(v1alpha1.EventVersion0)
+				eCtx.OnGetParentInfo().Return(nil)
+				eCtx.OnGetRawOutputDataConfig().Return(v1alpha1.RawOutputDataConfig{
 					RawOutputDataConfig: &admin.RawOutputDataConfig{OutputLocationPrefix: ""},
 				})
-				eCtx.EXPECT().IncrementParallelism().Return(0)
-				eCtx.EXPECT().CurrentParallelism().Return(0)
-				eCtx.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
-				eCtx.EXPECT().GetConsoleURL().Return("")
+				eCtx.OnIncrementParallelism().Return(0)
+				eCtx.OnCurrentParallelism().Return(0)
+				eCtx.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
+				eCtx.OnGetConsoleURL().Return("")
 
 				branchTakenNodeID := "branchTakenNode"
 				branchTakenNode := &mocks.ExecutableNode{}
@@ -1680,12 +1680,12 @@ func TestNodeExecutor_AbortHandler(t *testing.T) {
 		dag.OnFromNode(id).Return(make([]string, 0), nil)
 
 		execContext := mocks4.ExecutionContext{}
-		execContext.EXPECT().IsInterruptible().Return(false)
+		execContext.OnIsInterruptible().Return(false)
 		r := v1alpha1.RawOutputDataConfig{}
-		execContext.EXPECT().GetRawOutputDataConfig().Return(r)
-		execContext.EXPECT().GetExecutionID().Return(v1alpha1.WorkflowExecutionIdentifier{})
-		execContext.EXPECT().GetLabels().Return(nil)
-		execContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion0)
+		execContext.OnGetRawOutputDataConfig().Return(r)
+		execContext.OnGetExecutionID().Return(v1alpha1.WorkflowExecutionIdentifier{})
+		execContext.OnGetLabels().Return(nil)
+		execContext.OnGetEventVersion().Return(v1alpha1.EventVersion0)
 
 		et := &mocks.ExecutableTask{}
 		et.OnCoreTask().Return(&core.TaskTemplate{
@@ -1697,12 +1697,12 @@ func TestNodeExecutor_AbortHandler(t *testing.T) {
 				Version:      "v",
 			},
 		})
-		execContext.EXPECT().GetTask("id").Return(et, nil)
+		execContext.OnGetTask("id").Return(et, nil)
 		parentInfo := &mocks4.ImmutableParentInfo{}
 		parentInfo.OnGetUniqueID().Return("someunique1")
 		parentInfo.OnCurrentAttempt().Return(uint32(1))
 		parentInfo.OnIsInDynamicChain().Return(false)
-		execContext.EXPECT().GetParentInfo().Return(parentInfo)
+		execContext.OnGetParentInfo().Return(parentInfo)
 
 		assert.NoError(t, nExec.AbortHandler(ctx, &execContext, &dag, nl, n, "aborting"))
 	})
@@ -2076,12 +2076,12 @@ func TestRecover(t *testing.T) {
 	}
 
 	execContext := &mocks4.ExecutionContext{}
-	execContext.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{
+	execContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{
 		RecoveryExecution: v1alpha1.WorkflowExecutionIdentifier{
 			WorkflowExecutionIdentifier: recoveryID,
 		},
 	})
-	execContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion0)
+	execContext.OnGetEventVersion().Return(v1alpha1.EventVersion0)
 
 	nm := &nodemocks.NodeExecutionMetadata{}
 	nm.OnGetNodeExecutionID().Return(&core.NodeExecutionIdentifier{
@@ -2513,10 +2513,10 @@ func TestIsMaxParallelismAchieved(t *testing.T) {
 	// Creates an execution context for the test
 	createExecContext := func(maxParallelism, currentParallelism uint32) executors.ExecutionContext {
 		m := &mocks4.ExecutionContext{}
-		m.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{
+		m.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{
 			MaxParallelism: maxParallelism,
 		})
-		m.EXPECT().CurrentParallelism().Return(currentParallelism)
+		m.OnCurrentParallelism().Return(currentParallelism)
 		return m
 	}
 

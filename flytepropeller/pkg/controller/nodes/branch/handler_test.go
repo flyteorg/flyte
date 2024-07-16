@@ -185,7 +185,7 @@ func TestBranchHandler_RecurseDownstream(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			eCtx := &execMocks.ExecutionContext{}
-			eCtx.EXPECT().GetParentInfo().Return(parentInfo{})
+			eCtx.OnGetParentInfo().Return(parentInfo{})
 
 			mockNodeLookup := &execMocks.NodeLookup{}
 			if len(test.upstreamNodeID) > 0 {
@@ -309,7 +309,7 @@ func TestBranchHandler_AbortNode(t *testing.T) {
 			mock.Anything,
 			mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(fmt.Errorf("err"))
 		eCtx := &execMocks.ExecutionContext{}
-		eCtx.EXPECT().GetParentInfo().Return(nil)
+		eCtx.OnGetParentInfo().Return(nil)
 		nCtx, _ := createNodeContext(v1alpha1.BranchNodeError, nil, n, nil, nil, eCtx)
 		branch := New(mockNodeExecutor, eventConfig, promutils.NewTestScope())
 		err := branch.Abort(ctx, nCtx, "")
@@ -321,7 +321,7 @@ func TestBranchHandler_AbortNode(t *testing.T) {
 		mockNodeLookup := &execMocks.NodeLookup{}
 		mockNodeLookup.OnToNodeMatch(mock.Anything).Return(nil, nil)
 		eCtx := &execMocks.ExecutionContext{}
-		eCtx.EXPECT().GetParentInfo().Return(parentInfo{})
+		eCtx.OnGetParentInfo().Return(parentInfo{})
 		nCtx, s := createNodeContext(v1alpha1.BranchNodeSuccess, &n1, n, nil, mockNodeLookup, eCtx)
 		newParentInfo, _ := common.CreateParentInfo(parentInfo{}, nCtx.NodeID(), nCtx.CurrentAttempt(), false)
 		expectedExecContext := executors.NewExecutionContextWithParentInfo(nCtx.ExecutionContext(), newParentInfo)
@@ -382,7 +382,7 @@ func TestBranchHandler_HandleNode(t *testing.T) {
 			n.OnGetBranchNode().Return(nil)
 			n.OnGetID().Return("n1")
 			eCtx := &execMocks.ExecutionContext{}
-			eCtx.EXPECT().GetParentInfo().Return(nil)
+			eCtx.OnGetParentInfo().Return(nil)
 			nCtx, _ := createNodeContext(v1alpha1.BranchNodeSuccess, &childNodeID, n, inputs, nil, eCtx)
 
 			s, err := branch.Handle(ctx, nCtx)
