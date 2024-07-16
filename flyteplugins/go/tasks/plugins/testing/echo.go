@@ -3,6 +3,7 @@ package testing
 import (
 	"context"
 	"fmt"
+	"sync"
 	"time"
 
 	idlcore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -20,6 +21,35 @@ const (
 type EchoPlugin struct {
 	enqueueOwner   core.EnqueueOwner
 	taskStartTimes map[string]time.Time
+	sync.Mutex
+}
+
+func (e *EchoPlugin) addTask(ctx context.Context, tCtx core.TaskExecutionContext) time.Time {
+	e.Lock()
+	defer e.Unlock()
+	var startTime time.Time
+	var exists bool
+	taskExecutionID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
+	if startTime, exists = e.taskStartTimes[taskExecutionID]; !exists {
+		startTime = time.Now()
+		e.taskStartTimes[taskExecutionID] = startTime
+
+		// start timer to enqueue owner once task sleep duration has elapsed
+		go func() {
+			echoConfig := ConfigSection.GetConfig().(*Config)
+			time.Sleep(echoConfig.SleepDuration.Duration)
+			if err := e.enqueueOwner(tCtx.TaskExecutionMetadata().GetOwnerID()); err != nil {
+				logger.Warnf(ctx, "failed to enqueue owner [%s]: %v", tCtx.TaskExecutionMetadata().GetOwnerID(), err)
+			}
+		}()
+	}
+	return startTime
+}
+
+func (e *EchoPlugin) removeTask(taskExecutionID string) {
+	e.Lock()
+	defer e.Unlock()
+	delete(e.taskStartTimes, taskExecutionID)
 }
 
 func (e *EchoPlugin) GetID() string {
@@ -37,21 +67,7 @@ func (e *EchoPlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext)
 		return copyInputsToOutputs(ctx, tCtx)
 	}
 
-	var startTime time.Time
-	var exists bool
-	taskExecutionID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
-	if startTime, exists = e.taskStartTimes[taskExecutionID]; !exists {
-		startTime = time.Now()
-		e.taskStartTimes[taskExecutionID] = startTime
-
-		// start timer to enqueue owner once task sleep duration has elapsed
-		go func() {
-			time.Sleep(echoConfig.SleepDuration.Duration)
-			if err := e.enqueueOwner(tCtx.TaskExecutionMetadata().GetOwnerID()); err != nil {
-				logger.Warnf(ctx, "failed to enqueue owner [%s]: %v", tCtx.TaskExecutionMetadata().GetOwnerID(), err)
-			}
-		}()
-	}
+	startTime := e.addTask(ctx, tCtx)
 
 	if time.Since(startTime) >= echoConfig.SleepDuration.Duration {
 		return copyInputsToOutputs(ctx, tCtx)
@@ -66,7 +82,7 @@ func (e *EchoPlugin) Abort(ctx context.Context, tCtx core.TaskExecutionContext) 
 
 func (e *EchoPlugin) Finalize(ctx context.Context, tCtx core.TaskExecutionContext) error {
 	taskExecutionID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
-	delete(e.taskStartTimes, taskExecutionID)
+	e.removeTask(taskExecutionID)
 	return nil
 }
 
