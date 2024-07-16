@@ -32,6 +32,8 @@ func (e *EchoPlugin) GetProperties() core.PluginProperties {
 	return core.PluginProperties{}
 }
 
+// Enqueue the task to be re-evaluated after SleepDuration.
+// If the task is already enqueued, return the start time of the task.
 func (e *EchoPlugin) addTask(ctx context.Context, tCtx core.TaskExecutionContext) time.Time {
 	e.Lock()
 	defer e.Unlock()
@@ -54,6 +56,7 @@ func (e *EchoPlugin) addTask(ctx context.Context, tCtx core.TaskExecutionContext
 	return startTime
 }
 
+// Remove the task from the taskStartTimes map.
 func (e *EchoPlugin) removeTask(taskExecutionID string) {
 	e.Lock()
 	defer e.Unlock()
@@ -86,6 +89,7 @@ func (e *EchoPlugin) Finalize(ctx context.Context, tCtx core.TaskExecutionContex
 	return nil
 }
 
+// copyInputsToOutputs copies the input literals to the output location.
 func copyInputsToOutputs(ctx context.Context, tCtx core.TaskExecutionContext) (core.Transition, error) {
 	inputToOutputVariableMappings, err := compileInputToOutputVariableMappings(ctx, tCtx)
 	if err != nil {
