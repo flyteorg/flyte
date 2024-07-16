@@ -25,10 +25,11 @@ const (
 	EPhaseFailing
 	EPhaseDynamicRunning
 	EPhaseRecovered
+	EPhaseAborted
 )
 
 func (p EPhase) IsTerminal() bool {
-	if p == EPhaseFailed || p == EPhaseSuccess || p == EPhaseSkip || p == EPhaseTimedout || p == EPhaseRecovered {
+	if p == EPhaseFailed || p == EPhaseSuccess || p == EPhaseSkip || p == EPhaseTimedout || p == EPhaseRecovered || p == EPhaseAborted {
 		return true
 	}
 	return false
@@ -182,6 +183,10 @@ func PhaseInfoFailure(kind core.ExecutionError_ErrorKind, code, reason string, i
 
 func PhaseInfoFailureErr(err *core.ExecutionError, info *ExecutionInfo) PhaseInfo {
 	return phaseInfoFailed(EPhaseFailed, err, info)
+}
+
+func PhaseInfoAbortErr(err *core.ExecutionError, info *ExecutionInfo) PhaseInfo {
+	return phaseInfoFailed(EPhaseAborted, err, info)
 }
 
 func PhaseInfoFailingErr(err *core.ExecutionError, info *ExecutionInfo) PhaseInfo {

@@ -67,6 +67,8 @@ const (
 	NodePhaseTimedOut
 	NodePhaseDynamicRunning
 	NodePhaseRecovered
+	NodePhaseAborting
+	NodePhaseAborted
 )
 
 func (p NodePhase) String() string {
@@ -97,6 +99,10 @@ func (p NodePhase) String() string {
 		return "DynamicRunning"
 	case NodePhaseRecovered:
 		return "NodePhaseRecovered"
+	case NodePhaseAborting:
+		return "Aborting"
+	case NodePhaseAborted:
+		return "Aborted"
 	}
 
 	return "Unknown"

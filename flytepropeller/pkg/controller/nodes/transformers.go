@@ -67,6 +67,8 @@ func ToNodeExecEventPhase(p handler.EPhase) core.NodeExecution_Phase {
 		return core.NodeExecution_SUCCEEDED
 	case handler.EPhaseFailed:
 		return core.NodeExecution_FAILED
+	case handler.EPhaseAborted:
+		return core.NodeExecution_ABORTED
 	case handler.EPhaseRecovered:
 		return core.NodeExecution_RECOVERED
 	case handler.EPhaseTimedout:
@@ -220,6 +222,8 @@ func ToNodePhase(p handler.EPhase) (v1alpha1.NodePhase, error) {
 		return v1alpha1.NodePhaseSucceeding, nil
 	case handler.EPhaseFailed:
 		return v1alpha1.NodePhaseFailing, nil
+	case handler.EPhaseAborted:
+		return v1alpha1.NodePhaseAborting, nil
 	case handler.EPhaseTimedout:
 		return v1alpha1.NodePhaseTimingOut, nil
 	case handler.EPhaseRecovered:

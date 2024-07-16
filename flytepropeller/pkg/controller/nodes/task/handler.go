@@ -166,6 +166,9 @@ func (p *pluginRequestedTransition) FinalTransition(ctx context.Context) (handle
 	case pluginCore.PhasePermanentFailure:
 		logger.Debugf(ctx, "Transitioning to Failure")
 		return handler.DoTransition(p.ttype, handler.PhaseInfoFailureErr(p.pInfo.Err(), &p.execInfo)), nil
+	case pluginCore.PhaseAborted:
+		logger.Debugf(ctx, "Transitioning to Abort")
+		return handler.DoTransition(p.ttype, handler.PhaseInfoAbortErr(p.pInfo.Err(), &p.execInfo)), nil
 	case pluginCore.PhaseUndefined:
 		return handler.UnknownTransition, fmt.Errorf("error converting plugin phase, received [Undefined]")
 	}
@@ -504,6 +507,8 @@ func (t Handler) invokePlugin(ctx context.Context, p pluginCore.Plugin, tCtx *ta
 					CheckpointUri: tCtx.ow.GetCheckpointPrefix().String(),
 				})
 		}
+	case pluginCore.PhaseAborted:
+		fallthrough
 	case pluginCore.PhaseRetryableFailure:
 		fallthrough
 	case pluginCore.PhasePermanentFailure:

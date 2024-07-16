@@ -157,6 +157,8 @@ func ToPluginPhase(s core.Phase) (Phase, error) {
 		return PhaseResourcesCreated, nil
 	case core.PhaseSuccess:
 		return PhaseSucceeded, nil
+	case core.PhaseAborted:
+		fallthrough
 	case core.PhasePermanentFailure:
 		fallthrough
 	case core.PhaseRetryableFailure:

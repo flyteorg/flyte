@@ -57,6 +57,10 @@ func (s *subworkflowHandler) startAndHandleSubWorkflow(ctx context.Context, nCtx
 		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailureErr(startStatus.Err, nil)), nil
 	}
 
+	if startStatus.HasAborted() {
+		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoAbortErr(startStatus.Err, nil)), nil
+	}
+
 	return s.handleSubWorkflow(ctx, nCtx, subWorkflow, nl)
 }
 

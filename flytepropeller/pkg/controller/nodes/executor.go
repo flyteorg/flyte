@@ -135,6 +135,7 @@ func canHandleNode(phase v1alpha1.NodePhase) bool {
 		phase == v1alpha1.NodePhaseQueued ||
 		phase == v1alpha1.NodePhaseRunning ||
 		phase == v1alpha1.NodePhaseFailing ||
+		phase == v1alpha1.NodePhaseAborting ||
 		phase == v1alpha1.NodePhaseTimingOut ||
 		phase == v1alpha1.NodePhaseRetryableFailure ||
 		phase == v1alpha1.NodePhaseSucceeding ||
@@ -247,6 +248,14 @@ func (c *recursiveNodeExecutor) RecursiveNodeHandler(ctx context.Context, execCo
 		}
 
 		return interfaces.NodeStatusFailed(nodeStatus.GetExecutionError()), nil
+	} else if nodePhase == v1alpha1.NodePhaseAborted {
+		logger.Debugf(currentNodeCtx, "Node has aborted, traversing downstream.")
+		_, err := c.handleDownstream(ctx, execContext, dag, nl, currentNode)
+		if err != nil {
+			return interfaces.NodeStatusUndefined, err
+		}
+
+		return interfaces.NodeStatusAborted(nodeStatus.GetExecutionError()), nil
 	} else if nodePhase == v1alpha1.NodePhaseTimedOut {
 		logger.Debugf(currentNodeCtx, "Node has timed out, traversing downstream.")
 		_, err := c.handleDownstream(ctx, execContext, dag, nl, currentNode)
@@ -312,6 +321,10 @@ func (c *recursiveNodeExecutor) handleDownstream(ctx context.Context, execContex
 			} else {
 				return state, nil
 			}
+		} else if state.HasAborted() {
+			logger.Debugf(ctx, "Some downstream node has aborted. Error: [%s]", state.Err)
+			// Ignore WorkflowOnFailurePolicy if a downstream node has aborted
+			return state, nil
 		} else if !state.IsComplete() {
 			// A Failed/Timedout node is implicitly considered "complete" this means none of the downstream nodes from
 			// that node will ever be allowed to run.
@@ -1190,7 +1203,7 @@ func (c *nodeExecutor) handleQueuedOrRunningNode(ctx context.Context, nCtx inter
 		}
 		// When a node fails, we fail the workflow. Independent of number of nodes succeeding/failing, whenever a first node fails,
 		// the entire workflow is failed.
-		if np == v1alpha1.NodePhaseFailing {
+		if np == v1alpha1.NodePhaseFailing || np == v1alpha1.NodePhaseAborting {
 			if execErr.GetKind() == core.ExecutionError_SYSTEM {
 				nodeStatus.IncrementSystemFailures()
 				c.metrics.PermanentSystemErrorDuration.Observe(ctx, startTime, endTime)
@@ -1206,6 +1219,12 @@ func (c *nodeExecutor) handleQueuedOrRunningNode(ctx context.Context, nCtx inter
 		logger.Infof(ctx, "Finalize not required, moving node to Failed")
 		np = v1alpha1.NodePhaseFailed
 		finalStatus = interfaces.NodeStatusFailed(p.GetErr())
+	}
+
+	if np == v1alpha1.NodePhaseAborting && !h.FinalizeRequired() {
+		logger.Infof(ctx, "Finalize not required, moving node to Aborted")
+		np = v1alpha1.NodePhaseAborted
+		finalStatus = interfaces.NodeStatusAborted(p.GetErr())
 	}
 
 	if np == v1alpha1.NodePhaseTimingOut && !h.FinalizeRequired() {
@@ -1348,6 +1367,25 @@ func (c *nodeExecutor) HandleNode(ctx context.Context, dag executors.DAGStructur
 		return interfaces.NodeStatusFailed(nodeStatus.GetExecutionError()), nil
 	}
 
+	if currentPhase == v1alpha1.NodePhaseAborting {
+		logger.Debugf(ctx, "node aborting")
+		if err := c.Abort(ctx, h, nCtx, "node aborting", false); err != nil {
+			return interfaces.NodeStatusUndefined, err
+		}
+		t := metav1.Now()
+
+		startedAt := nodeStatus.GetStartedAt()
+		if startedAt == nil {
+			startedAt = &t
+		}
+		nodeStatus.UpdatePhase(v1alpha1.NodePhaseAborted, t, nodeStatus.GetMessage(), c.enableCRDebugMetadata, nodeStatus.GetExecutionError())
+		c.metrics.FailureDuration.Observe(ctx, startedAt.Time, nodeStatus.GetStoppedAt().Time)
+		if nCtx.NodeExecutionMetadata().IsInterruptible() {
+			c.metrics.InterruptibleNodesTerminated.Inc(ctx)
+		}
+		return interfaces.NodeStatusAborted(nodeStatus.GetExecutionError()), nil
+	}
+
 	if currentPhase == v1alpha1.NodePhaseTimingOut {
 		logger.Debugf(ctx, "node timing out")
 		if err := c.Abort(ctx, h, nCtx, "node timed out", false); err != nil {
@@ -1392,6 +1430,11 @@ func (c *nodeExecutor) HandleNode(ctx context.Context, dag executors.DAGStructur
 	if currentPhase == v1alpha1.NodePhaseFailed {
 		// This should never happen
 		return interfaces.NodeStatusFailed(nodeStatus.GetExecutionError()), nil
+	}
+
+	if currentPhase == v1alpha1.NodePhaseAborted {
+		// This should never happen
+		return interfaces.NodeStatusAborted(nodeStatus.GetExecutionError()), nil
 	}
 
 	return c.handleQueuedOrRunningNode(ctx, nCtx, h)

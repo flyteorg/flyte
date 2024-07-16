@@ -30,6 +30,8 @@ func ColorizeNodePhase(p v1alpha1.NodePhase) string {
 		return color.HiRedString("%s", p.String())
 	case v1alpha1.NodePhaseFailed:
 		return color.HiRedString("%s", p.String())
+	case v1alpha1.NodePhaseAborted:
+		return color.HiRedString("%s", p.String())
 	}
 	return color.CyanString("%s", p.String())
 }

@@ -84,5 +84,5 @@ func inferParallelism(ctx context.Context, parallelism *uint32, parallelismBehav
 
 func isTerminalNodePhase(nodePhase v1alpha1.NodePhase) bool {
 	return nodePhase == v1alpha1.NodePhaseSucceeded || nodePhase == v1alpha1.NodePhaseFailed || nodePhase == v1alpha1.NodePhaseTimedOut ||
-		nodePhase == v1alpha1.NodePhaseSkipped || nodePhase == v1alpha1.NodePhaseRecovered
+		nodePhase == v1alpha1.NodePhaseSkipped || nodePhase == v1alpha1.NodePhaseRecovered || nodePhase == v1alpha1.NodePhaseAborted
 }
