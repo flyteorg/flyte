@@ -2,7 +2,7 @@
 
 .. currentmodule:: {{ module }}
 
-{% if objname == 'FlyteFile' %}
+{% if objname == 'FlyteFile' or objname == 'FlyteDirectory' %}
 
 .. autoclass:: {{ objname }}
 
