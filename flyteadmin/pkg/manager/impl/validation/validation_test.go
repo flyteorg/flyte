@@ -419,15 +419,17 @@ func TestValidateOutputData(t *testing.T) {
 	t.Run("no output data", func(t *testing.T) {
 		assert.NoError(t, ValidateOutputData(nil, 100))
 	})
-	outputData := &core.LiteralMap{
-		Literals: map[string]*core.Literal{
-			"foo": {
-				Value: &core.Literal_Scalar{
-					Scalar: &core.Scalar{
-						Value: &core.Scalar_Primitive{
-							Primitive: &core.Primitive{
-								Value: &core.Primitive_Integer{
-									Integer: 4,
+	outputData := &core.OutputData{
+		Outputs: &core.LiteralMap{
+			Literals: map[string]*core.Literal{
+				"foo": {
+					Value: &core.Literal_Scalar{
+						Scalar: &core.Scalar{
+							Value: &core.Scalar_Primitive{
+								Primitive: &core.Primitive{
+									Value: &core.Primitive_Integer{
+										Integer: 4,
+									},
 								},
 							},
 						},

@@ -78,7 +78,7 @@ func TestLaunchSubTasks(t *testing.T) {
 
 	ir := &mocks3.InputReader{}
 	ir.OnGetInputPrefixPath().Return("/prefix/")
-	ir.OnGetInputPath().Return("/prefix/inputs.pb")
+	ir.OnGetInputDataPath().Return("/prefix/inputs.pb")
 	ir.OnGetMatch(mock.Anything).Return(nil, nil)
 
 	tCtx := &mocks.TaskExecutionContext{}

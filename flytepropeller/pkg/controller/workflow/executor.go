@@ -100,9 +100,21 @@ func (c *workflowExecutor) handleReadyWorkflow(ctx context.Context, w *v1alpha1.
 			Message: err.Error()}), nil
 	}
 	w.GetExecutionStatus().SetDataDir(ref)
-	var inputs *core.LiteralMap
-	if w.Inputs != nil {
-		inputs = w.Inputs.LiteralMap
+	var inputs *core.InputData
+	if w.InputData != nil {
+		inputs = w.InputData.InputData
+		if inputs == nil && w.Inputs.LiteralMap != nil {
+			inputs = &core.InputData{
+				Inputs: w.Inputs.LiteralMap,
+			}
+		}
+	} else if w.Inputs != nil {
+		inputs = &core.InputData{Inputs: w.Inputs.LiteralMap}
+		if inputs == nil && w.Inputs.LiteralMap != nil {
+			inputs = &core.InputData{
+				Inputs: w.Inputs.LiteralMap,
+			}
+		}
 	}
 	// Before starting the subworkflow, lets set the inputs for the Workflow. The inputs for a SubWorkflow are essentially
 	// Copy of the inputs to the Node

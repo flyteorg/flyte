@@ -158,6 +158,12 @@ message GetDataResponse {
     // Single literal will be returned. This is returned when the user/url requests a specific output or input
     // by name. See the o3 example above.
     core.Literal literal = 3;
+
+    // InputData is returned when the user/url requests the input data for an execution.
+    core.InputData input_data = 4;
+
+    // OutputData is returned when the user/url requests the output data for an execution.
+    core.OutputData output_data = 5;
   }
 }
 

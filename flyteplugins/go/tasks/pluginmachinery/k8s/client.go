@@ -29,6 +29,35 @@ func newKubeClient(c client.Client, cache cache.Cache) core.KubeClient {
 	return &kubeClient{client: c, cache: cache}
 }
 
+// ClientBuilder builder is the interface for the client builder.
+type ClientBuilder interface {
+	// WithUncached takes a list of runtime objects (plain or lists) that users don't want to cache
+	// for this client. This function can be called multiple times, it should append to an internal slice.
+	WithUncached(objs ...client.Object) ClientBuilder
+
+	// Build returns a new client.
+	Build(cache cache.Cache, config *rest.Config, options client.Options) (client.Client, error)
+}
+
+type fallbackClientBuilder struct {
+	uncached []client.Object
+}
+
+func (f *fallbackClientBuilder) WithUncached(objs ...client.Object) ClientBuilder {
+	f.uncached = append(f.uncached, objs...)
+	return f
+}
+
+func (f *fallbackClientBuilder) Build(_ cache.Cache, config *rest.Config, options client.Options) (client.Client, error) {
+	return client.New(config, options)
+}
+
+// Creates a new k8s client that uses the cached client for reads and falls back to making API
+// calls if it failed. Write calls will always go to raw client directly.
+func NewFallbackClientBuilder() ClientBuilder {
+	return &fallbackClientBuilder{}
+}
+
 type Options struct {
 	MapperProvider func(*rest.Config) (meta.RESTMapper, error)
 	CacheOptions   *cache.Options

@@ -262,6 +262,16 @@
       },
       "description": "Represents an error thrown from a node."
     },
+    "coreInputData": {
+      "type": "object",
+      "properties": {
+        "inputs": {
+          "$ref": "#/definitions/coreLiteralMap",
+          "description": "A map of input variables to their values."
+        }
+      },
+      "description": "InputData represents the inputs to a task or workflow. It's an envelope that contains a map of input variables to\ntheir values."
+    },
     "coreLiteral": {
       "type": "object",
       "properties": {
@@ -377,6 +387,16 @@
         }
       },
       "description": "Encapsulation of fields that identify a Flyte node execution entity."
+    },
+    "coreOutputData": {
+      "type": "object",
+      "properties": {
+        "outputs": {
+          "$ref": "#/definitions/coreLiteralMap",
+          "description": "A map of output variables to their values."
+        }
+      },
+      "description": "OutputData represents the outputs of a task or workflow. It's an envelope that contains a map of output variables to\ntheir values."
     },
     "corePrimitive": {
       "type": "object",
@@ -799,6 +819,14 @@
         "literal": {
           "$ref": "#/definitions/coreLiteral",
           "description": "Single literal will be returned. This is returned when the user/url requests a specific output or input\nby name. See the o3 example above."
+        },
+        "input_data": {
+          "$ref": "#/definitions/coreInputData",
+          "description": "InputData is returned when the user/url requests the input data for an execution."
+        },
+        "output_data": {
+          "$ref": "#/definitions/coreOutputData",
+          "description": "OutputData is returned when the user/url requests the output data for an execution."
         }
       }
     },

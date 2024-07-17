@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/ptypes/timestamp"
 	errs "github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -44,6 +45,21 @@ func (m mockBigDataProtoMessage) String() string {
 }
 
 func (mockBigDataProtoMessage) ProtoMessage() {
+}
+
+type mockProtoMessageWrapper struct {
+	Invalid *timestamp.Timestamp `protobuf:"bytes,1,opt,name=invalid,proto3" json:"invalid,omitempty"`
+	Inputs  *mockProtoMessage    `protobuf:"bytes,1,opt,name=inputs,proto3" json:"inputs,omitempty"`
+}
+
+func (mockProtoMessageWrapper) Reset() {
+}
+
+func (m mockProtoMessageWrapper) String() string {
+	return proto.CompactTextString(m)
+}
+
+func (mockProtoMessageWrapper) ProtoMessage() {
 }
 
 func TestDefaultProtobufStore(t *testing.T) {
@@ -136,7 +152,6 @@ func TestDefaultProtobufStore_BigDataReadAfterWrite(t *testing.T) {
 		err = s.ReadProtobuf(context.TODO(), DataReference("bigK"), m)
 		assert.NoError(t, err)
 		assert.Equal(t, bigD, m.X)
-
 	})
 }
 
@@ -169,5 +184,27 @@ func TestDefaultProtobufStore_HardErrors(t *testing.T) {
 		err := pbErroneousStore.ReadProtobuf(ctx, k1, m)
 		assert.False(t, IsFailedWriteToCache(err))
 		assert.Equal(t, dummyReadErrorMsg, errs.Cause(err).Error())
+	})
+}
+
+func TestReadProtobufAny(t *testing.T) {
+	t.Run("Read new type after writing old type", func(t *testing.T) {
+		testScope := promutils.NewTestScope()
+		s, err := NewDataStore(&Config{Type: TypeMemory}, testScope)
+		assert.NoError(t, err)
+
+		oldMsg := &mockProtoMessage{X: 5}
+		err = s.WriteProtobuf(context.TODO(), "hello", Options{}, oldMsg)
+		assert.NoError(t, err)
+
+		oldType := &mockProtoMessage{}
+		newType := &mockProtoMessageWrapper{}
+		msgIndex, err := s.ReadProtobufAny(context.TODO(), "hello", newType, oldType)
+		assert.NoError(t, err)
+		if !assert.Equal(t, 1, msgIndex) {
+			t.FailNow()
+		}
+
+		assert.Equal(t, int64(5), oldType.X)
 	})
 }

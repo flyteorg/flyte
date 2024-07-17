@@ -61,13 +61,18 @@ message CreateTaskRequest {
   // The inputs required to start the execution. All required inputs must be
   // included in this map. If not required and not provided, defaults apply.
   // +optional
-  core.LiteralMap inputs = 1;
+  // Deprecated: Use inputs instead.
+  core.LiteralMap deprecated_inputs = 1 [deprecated = true];
   // Template of the task that encapsulates all the metadata of the task.
   core.TaskTemplate template = 2;
   // Prefix for where task output data will be written. (e.g. s3://my-bucket/randomstring)
   string output_prefix = 3;
   // subset of runtime task execution metadata.
   TaskExecutionMetadata task_execution_metadata = 4;
+  // Inputs are the inputs required to start the execution. All required inputs must be
+  // included in this map. If not required and not provided, defaults apply.
+  // +optional
+  core.InputData inputs = 5;
 }
 
 // Represents a create response structure.
@@ -129,7 +134,8 @@ message Resource {
   // The outputs of the execution. It's typically used by sql task. Agent service will create a
   // Structured dataset pointing to the query result table.
   // +optional
-  core.LiteralMap outputs = 2;
+  // Deprecated: Use outputs instead.
+  core.LiteralMap deprecated_outputs = 2 [deprecated = true];
   // A descriptive message for the current state. e.g. waiting for cluster.
   string message = 3;
   // log information for the task execution.
@@ -138,6 +144,10 @@ message Resource {
   core.TaskExecution.Phase phase = 5;
   // Custom data specific to the agent.
   google.protobuf.Struct custom_info = 6;
+  // The outputs of the execution. It's typically used by sql task. Agent service will create a
+  // Structured dataset pointing to the query result table.
+  // +optional
+  core.OutputData outputs = 7;
 }
 
 // A message used to delete a task.

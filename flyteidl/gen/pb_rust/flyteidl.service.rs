@@ -225,7 +225,7 @@ pub struct GetDataRequest {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GetDataResponse {
-    #[prost(oneof="get_data_response::Data", tags="1, 2, 3")]
+    #[prost(oneof="get_data_response::Data", tags="1, 2, 3, 4, 5")]
     pub data: ::core::option::Option<get_data_response::Data>,
 }
 /// Nested message and enum types in `GetDataResponse`.
@@ -243,6 +243,12 @@ pub mod get_data_response {
         /// by name. See the o3 example above.
         #[prost(message, tag="3")]
         Literal(super::super::core::Literal),
+        /// InputData is returned when the user/url requests the input data for an execution.
+        #[prost(message, tag="4")]
+        InputData(super::super::core::InputData),
+        /// OutputData is returned when the user/url requests the output data for an execution.
+        #[prost(message, tag="5")]
+        OutputData(super::super::core::OutputData),
     }
 }
 /// ArtifactType
@@ -282,14 +288,21 @@ pub struct TaskCreateRequest {
     /// The inputs required to start the execution. All required inputs must be
     /// included in this map. If not required and not provided, defaults apply.
     /// +optional
+    /// Deprecated: please use inputs instead.
+    #[deprecated]
     #[prost(message, optional, tag="1")]
-    pub inputs: ::core::option::Option<super::core::LiteralMap>,
+    pub deprecated_inputs: ::core::option::Option<super::core::LiteralMap>,
     /// Template of the task that encapsulates all the metadata of the task.
     #[prost(message, optional, tag="2")]
     pub template: ::core::option::Option<super::core::TaskTemplate>,
     /// Prefix for where task output data will be written. (e.g. s3://my-bucket/randomstring)
     #[prost(string, tag="3")]
     pub output_prefix: ::prost::alloc::string::String,
+    /// The inputs required to start the execution. All required inputs must be
+    /// included in this map. If not required and not provided, defaults apply.
+    /// +optional
+    #[prost(message, optional, tag="4")]
+    pub inputs: ::core::option::Option<super::core::InputData>,
 }
 /// Represents a create response structure.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -319,8 +332,14 @@ pub struct TaskGetResponse {
     /// The outputs of the execution. It's typically used by sql task. Flyteplugins service will create a
     /// Structured dataset pointing to the query result table.
     /// +optional
+    /// Deprecated: Please use outputs instead
     #[prost(message, optional, tag="2")]
-    pub outputs: ::core::option::Option<super::core::LiteralMap>,
+    pub deprecated_outputs: ::core::option::Option<super::core::LiteralMap>,
+    /// The outputs of the execution. It's typically used by sql task. Flyteplugins service will create a
+    /// Structured dataset pointing to the query result table.
+    /// +optional
+    #[prost(message, optional, tag="3")]
+    pub outputs: ::core::option::Option<super::core::OutputData>,
 }
 /// A message used to delete a task.
 #[allow(clippy::derive_partial_eq_without_eq)]

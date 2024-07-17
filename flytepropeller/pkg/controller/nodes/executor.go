@@ -105,7 +105,7 @@ type recursiveNodeExecutor struct {
 	metrics            *nodeMetrics
 }
 
-func (c *recursiveNodeExecutor) SetInputsForStartNode(ctx context.Context, execContext executors.ExecutionContext, dag executors.DAGStructureWithStartNode, nl executors.NodeLookup, inputs *core.LiteralMap) (interfaces.NodeStatus, error) {
+func (c *recursiveNodeExecutor) SetInputsForStartNode(ctx context.Context, execContext executors.ExecutionContext, dag executors.DAGStructureWithStartNode, nl executors.NodeLookup, inputs *core.InputData) (interfaces.NodeStatus, error) {
 	startNode := dag.StartNode()
 	ctx = contextutils.WithNodeID(ctx, startNode.GetID())
 	if inputs == nil {
@@ -119,10 +119,13 @@ func (c *recursiveNodeExecutor) SetInputsForStartNode(ctx context.Context, execC
 	if len(nodeStatus.GetDataDir()) == 0 {
 		return interfaces.NodeStatusUndefined, errors.Errorf(errors.IllegalStateError, startNode.GetID(), "no data-dir set, cannot store inputs")
 	}
+
 	outputFile := v1alpha1.GetOutputsFile(nodeStatus.GetOutputDir())
 
 	so := storage.Options{}
-	if err := c.store.WriteProtobuf(ctx, outputFile, so, inputs); err != nil {
+	if err := c.store.WriteProtobuf(ctx, outputFile, so, &core.OutputData{
+		Outputs: inputs.GetInputs(),
+	}); err != nil {
 		logger.Errorf(ctx, "Failed to write protobuf (metadata). Error [%v]", err)
 		return interfaces.NodeStatusUndefined, errors.Wrapf(errors.CausedByError, startNode.GetID(), err, "Failed to store workflow inputs (as start node)")
 	}
@@ -519,29 +522,32 @@ func (c *nodeExecutor) RecordTransitionLatency(ctx context.Context, dag executor
 }
 
 func (c *nodeExecutor) recoverInputs(ctx context.Context, nCtx interfaces.NodeExecutionContext,
-	recovered *admin.NodeExecution, recoveredData *admin.NodeExecutionGetDataResponse) (*core.LiteralMap, error) {
+	recovered *admin.NodeExecution, recoveredData *admin.NodeExecutionGetDataResponse) (*core.InputData, error) {
 
-	nodeInputs := recoveredData.FullInputs
+	nodeInputs := recoveredData.InputData
 	if nodeInputs != nil {
-		if err := c.store.WriteProtobuf(ctx, nCtx.InputReader().GetInputPath(), storage.Options{}, nodeInputs); err != nil {
-			c.metrics.InputsWriteFailure.Inc(ctx)
-			logger.Errorf(ctx, "Failed to move recovered inputs for Node. Error [%v]. InputsFile [%s]", err, nCtx.InputReader().GetInputPath())
-			return nil, errors.Wrapf(errors.StorageError, nCtx.NodeID(), err, "Failed to store inputs for Node. InputsFile [%s]", nCtx.InputReader().GetInputPath())
+	} else if recoveredData.FullInputs != nil {
+		nodeInputs = &core.InputData{
+			Inputs: recoveredData.FullInputs,
 		}
 	} else if len(recovered.InputUri) > 0 {
 		// If the inputs are too large they won't be returned inline in the RecoverData call. We must fetch them before copying them.
-		nodeInputs = &core.LiteralMap{}
-		if recoveredData.FullInputs == nil {
-			if err := c.store.ReadProtobuf(ctx, storage.DataReference(recovered.InputUri), nodeInputs); err != nil {
-				return nil, errors.Wrapf(errors.InputsNotFoundError, nCtx.NodeID(), err, "failed to read data from dataDir [%v].", recovered.InputUri)
+		nodeInputs = &core.InputData{}
+		oldNodeInputs := &core.LiteralMap{}
+		if msgIndex, err := c.store.ReadProtobufAny(ctx, storage.DataReference(recovered.InputUri), nodeInputs, oldNodeInputs); err != nil {
+			return nil, errors.Wrapf(errors.InputsNotFoundError, nCtx.NodeID(), err, "failed to read data from dataDir [%v].", recovered.InputUri)
+		} else if msgIndex == 1 { // LiteralMap
+			nodeInputs = &core.InputData{
+				Inputs: oldNodeInputs,
 			}
 		}
+	}
 
-		if err := c.store.WriteProtobuf(ctx, nCtx.InputReader().GetInputPath(), storage.Options{}, nodeInputs); err != nil {
-			c.metrics.InputsWriteFailure.Inc(ctx)
-			logger.Errorf(ctx, "Failed to move recovered inputs for Node. Error [%v]. InputsFile [%s]", err, nCtx.InputReader().GetInputPath())
-			return nil, errors.Wrapf(errors.StorageError, nCtx.NodeID(), err, "Failed to store inputs for Node. InputsFile [%s]", nCtx.InputReader().GetInputPath())
-		}
+	// Write new inputs format
+	if err := c.store.WriteProtobuf(ctx, nCtx.InputReader().GetInputDataPath(), storage.Options{}, nodeInputs); err != nil {
+		c.metrics.InputsWriteFailure.Inc(ctx)
+		logger.Errorf(ctx, "Failed to move recovered inputs for Node. Error [%v]. InputsFile [%s]", err, nCtx.InputReader().GetInputDataPath())
+		return nil, errors.Wrapf(errors.StorageError, nCtx.NodeID(), err, "Failed to store inputs for Node. InputsFile [%s]", nCtx.InputReader().GetInputDataPath())
 	}
 
 	return nodeInputs, nil
@@ -741,7 +747,7 @@ func (c *nodeExecutor) preExecute(ctx context.Context, dag executors.DAGStructur
 		// TODO: Performance problem, we maybe in a retry loop and do not need to resolve the inputs again.
 		// For now we will do this
 		node := nCtx.Node()
-		var nodeInputs *core.LiteralMap
+		var nodeInputs *core.InputData
 		if !node.IsStartNode() {
 			if nCtx.ExecutionContext().GetExecutionConfig().RecoveryExecution.WorkflowExecutionIdentifier != nil {
 				phaseInfo, err := c.attemptRecovery(ctx, nCtx)
@@ -749,13 +755,13 @@ func (c *nodeExecutor) preExecute(ctx context.Context, dag executors.DAGStructur
 					return phaseInfo, err
 				}
 			}
+
 			nodeStatus := nCtx.NodeStatus()
 			dataDir := nodeStatus.GetDataDir()
 			t := c.metrics.NodeInputGatherLatency.Start(ctx)
 			defer t.Stop()
 			// Can execute
-			var err error
-			nodeInputs, err = Resolve(ctx, c.outputResolver, nCtx.ContextualNodeLookup(), node.GetID(), node.GetInputBindings())
+			nodeInputLiterals, err := Resolve(ctx, c.outputResolver, nCtx.ContextualNodeLookup(), node.GetID(), node.GetInputBindings())
 			// TODO we need to handle retryable, network errors here!!
 			if err != nil {
 				c.metrics.ResolutionFailure.Inc(ctx)
@@ -763,13 +769,17 @@ func (c *nodeExecutor) preExecute(ctx context.Context, dag executors.DAGStructur
 				return handler.PhaseInfoFailure(core.ExecutionError_SYSTEM, "BindingResolutionFailure", err.Error(), nil), nil
 			}
 
-			if nodeInputs != nil {
-				inputsFile := v1alpha1.GetInputsFile(dataDir)
-				if err := c.store.WriteProtobuf(ctx, inputsFile, storage.Options{}, nodeInputs); err != nil {
+			if nodeInputLiterals != nil {
+				nodeInputs = &core.InputData{
+					Inputs: nodeInputLiterals,
+				}
+
+				inputDataFile := v1alpha1.GetInputDataFile(dataDir)
+				if err := c.store.WriteProtobuf(ctx, inputDataFile, storage.Options{}, nodeInputs); err != nil {
 					c.metrics.InputsWriteFailure.Inc(ctx)
-					logger.Errorf(ctx, "Failed to store inputs for Node. Error [%v]. InputsFile [%s]", err, inputsFile)
+					logger.Errorf(ctx, "Failed to store inputs for Node. Error [%v]. InputsFile [%s]", err, inputDataFile)
 					return handler.PhaseInfoUndefined, errors.Wrapf(
-						errors.StorageError, node.GetID(), err, "Failed to store inputs for Node. InputsFile [%s]", inputsFile)
+						errors.StorageError, node.GetID(), err, "Failed to store inputs for Node. InputsFile [%s]", inputDataFile)
 				}
 			}
 
@@ -1014,7 +1024,7 @@ func (c *nodeExecutor) handleNotYetStartedNode(ctx context.Context, dag executor
 		targetEntity := common.GetTargetEntity(ctx, nCtx)
 
 		nev, err := ToNodeExecutionEvent(nCtx.NodeExecutionMetadata().GetNodeExecutionID(),
-			p, nCtx.InputReader().GetInputPath().String(), nodeStatus, nCtx.ExecutionContext().GetEventVersion(),
+			p, nCtx.InputReader().GetInputDataPath().String(), nodeStatus, nCtx.ExecutionContext().GetEventVersion(),
 			nCtx.ExecutionContext().GetParentInfo(), nCtx.Node(), c.clusterID, nCtx.NodeStateReader().GetDynamicNodeState().Phase,
 			c.eventConfig, targetEntity)
 		if err != nil {
@@ -1244,7 +1254,7 @@ func (c *nodeExecutor) handleQueuedOrRunningNode(ctx context.Context, nCtx inter
 		targetEntity := common.GetTargetEntity(ctx, nCtx)
 
 		nev, err := ToNodeExecutionEvent(nCtx.NodeExecutionMetadata().GetNodeExecutionID(),
-			p, nCtx.InputReader().GetInputPath().String(), nCtx.NodeStatus(), nCtx.ExecutionContext().GetEventVersion(),
+			p, nCtx.InputReader().GetInputDataPath().String(), nCtx.NodeStatus(), nCtx.ExecutionContext().GetEventVersion(),
 			nCtx.ExecutionContext().GetParentInfo(), nCtx.Node(), c.clusterID, nCtx.NodeStateReader().GetDynamicNodeState().Phase,
 			c.eventConfig, targetEntity)
 		if err != nil {

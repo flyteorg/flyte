@@ -74,15 +74,21 @@ func addTaskTerminalState(
 		closure.OutputResult = &admin.TaskExecutionClosure_OutputUri{
 			OutputUri: request.Event.GetOutputUri(),
 		}
-	} else if request.Event.GetOutputData() != nil {
+	} else if outputData := request.Event.GetOutputData(); outputData != nil || request.Event.GetDeprecatedOutputData() != nil {
+		if outputData == nil {
+			outputData = &core.OutputData{
+				Outputs: request.Event.GetDeprecatedOutputData(),
+			}
+		}
+
 		switch inlineEventDataPolicy {
 		case interfaces.InlineEventDataPolicyStoreInline:
-			closure.OutputResult = &admin.TaskExecutionClosure_OutputData{
-				OutputData: request.Event.GetOutputData(),
+			closure.OutputResult = &admin.TaskExecutionClosure_FullOutputs{
+				FullOutputs: outputData,
 			}
 		default:
 			logger.Debugf(ctx, "Offloading outputs per InlineEventDataPolicy")
-			uri, err := common.OffloadLiteralMap(ctx, storageClient, request.Event.GetOutputData(),
+			uri, err := common.OffloadData(ctx, storageClient, outputData,
 				request.Event.ParentNodeExecutionId.ExecutionId.Project, request.Event.ParentNodeExecutionId.ExecutionId.Domain,
 				request.Event.ParentNodeExecutionId.ExecutionId.Name, request.Event.ParentNodeExecutionId.NodeId,
 				request.Event.TaskId.Project, request.Event.TaskId.Domain, request.Event.TaskId.Name, request.Event.TaskId.Version,
@@ -555,7 +561,7 @@ func handleTaskExecutionInputs(ctx context.Context, taskExecutionModel *models.T
 	case *event.TaskExecutionEvent_InputUri:
 		taskExecutionModel.InputURI = request.GetEvent().GetInputUri()
 	case *event.TaskExecutionEvent_InputData:
-		uri, err := common.OffloadLiteralMap(ctx, storageClient, request.GetEvent().GetInputData(),
+		uri, err := common.OffloadData(ctx, storageClient, request.GetEvent().GetInputData(),
 			request.Event.ParentNodeExecutionId.ExecutionId.Project, request.Event.ParentNodeExecutionId.ExecutionId.Domain,
 			request.Event.ParentNodeExecutionId.ExecutionId.Name, request.Event.ParentNodeExecutionId.NodeId,
 			request.Event.TaskId.Project, request.Event.TaskId.Domain, request.Event.TaskId.Name, request.Event.TaskId.Version,

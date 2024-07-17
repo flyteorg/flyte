@@ -31,7 +31,7 @@ import (
 
 var update = flag.Bool("update", false, "Update .golden files")
 
-func makeDefaultInputs(iface *core.TypedInterface) *core.LiteralMap {
+func makeDefaultInputs(iface *core.TypedInterface) *core.InputData {
 	if iface == nil || iface.GetInputs() == nil {
 		return nil
 	}
@@ -60,8 +60,10 @@ func makeDefaultInputs(iface *core.TypedInterface) *core.LiteralMap {
 		}
 	}
 
-	return &core.LiteralMap{
-		Literals: res,
+	return &core.InputData{
+		Inputs: &core.LiteralMap{
+			Literals: res,
+		},
 	}
 }
 

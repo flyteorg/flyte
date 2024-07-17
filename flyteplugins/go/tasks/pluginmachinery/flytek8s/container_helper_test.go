@@ -377,9 +377,9 @@ func TestToK8sContainer(t *testing.T) {
 	taskReader.On("Read", mock.Anything).Return(taskTemplate, nil)
 
 	inputReader := &mocks2.InputReader{}
-	inputReader.OnGetInputPath().Return(storage.DataReference("test-data-reference"))
+	inputReader.OnGetInputDataPath().Return(storage.DataReference("test-data-reference"))
 	inputReader.OnGetInputPrefixPath().Return(storage.DataReference("test-data-reference-prefix"))
-	inputReader.OnGetMatch(mock.Anything).Return(&core.LiteralMap{}, nil)
+	inputReader.OnGetMatch(mock.Anything).Return(&core.InputData{}, nil)
 
 	outputWriter := &mocks2.OutputWriter{}
 	outputWriter.OnGetOutputPrefixPath().Return("")
@@ -483,7 +483,8 @@ func getTemplateParametersForTest(resourceRequirements, platformResources *v1.Re
 
 	mockInputReader := mocks2.InputReader{}
 	mockInputPath := storage.DataReference("s3://input/path")
-	mockInputReader.OnGetInputPath().Return(mockInputPath)
+	mockInputReader.OnGetInputDataPath().Return(mockInputPath)
+	mockInputReader.OnGetInputPathMatch(mock.Anything).Return(mockInputPath, nil)
 	mockInputReader.OnGetInputPrefixPath().Return(mockInputPath)
 	mockInputReader.On("Get", mock.Anything).Return(nil, nil)
 
@@ -499,6 +500,7 @@ func getTemplateParametersForTest(resourceRequirements, platformResources *v1.Re
 		Inputs:            &mockInputReader,
 		OutputPath:        &mockOutputPath,
 		IncludeConsoleURL: includeConsoleURL,
+		Runtime:           &core.RuntimeMetadata{},
 	}
 }
 
@@ -521,8 +523,8 @@ func TestAddFlyteCustomizationsToContainer(t *testing.T) {
 	}
 	err := AddFlyteCustomizationsToContainer(context.TODO(), templateParameters, ResourceCustomizationModeAssignResources, container)
 	assert.NoError(t, err)
-	assert.EqualValues(t, container.Args, []string{"s3://output/path"})
-	assert.EqualValues(t, container.Command, []string{"s3://input/path"})
+	assert.EqualValues(t, []string{"s3://output/path"}, container.Args)
+	assert.EqualValues(t, []string{"s3://input/path"}, container.Command)
 	assert.Len(t, container.Resources.Limits, 3)
 	assert.Len(t, container.Resources.Requests, 3)
 	assert.Len(t, container.Env, 12)

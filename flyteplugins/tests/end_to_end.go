@@ -54,7 +54,7 @@ func BuildTaskTemplate() *idlCore.TaskTemplate {
 }
 
 func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *idlCore.TaskTemplate,
-	inputs *idlCore.LiteralMap, expectedOutputs *idlCore.LiteralMap, expectedFailure *idlCore.ExecutionError,
+	inputs *idlCore.InputData, expectedOutputs *idlCore.OutputData, expectedFailure *idlCore.ExecutionError,
 	iterationUpdate func(ctx context.Context, tCtx pluginCore.TaskExecutionContext) error) pluginCore.PhaseInfo {
 
 	ctx := context.Background()
@@ -72,7 +72,8 @@ func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *i
 
 	inputReader := &ioMocks.InputReader{}
 	inputReader.OnGetInputPrefixPath().Return(basePrefix)
-	inputReader.OnGetInputPath().Return(basePrefix + "/inputs.pb")
+	inputReader.OnGetInputDataPath().Return(basePrefix + "/inputs.pb")
+	inputReader.OnGetInputDataPath().Return(basePrefix + "/inputs_data.pb")
 	inputReader.OnGetMatch(mock.Anything).Return(inputs, nil)
 
 	outputWriter := &ioMocks.OutputWriter{}
@@ -185,7 +186,7 @@ func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *i
 			or := &ioMocks.OutputReader{}
 			or.OnExistsMatch(mock.Anything).Return(true, nil)
 			or.OnIsErrorMatch(mock.Anything).Return(false, nil)
-			or.OnReadMatch(mock.Anything).Return(data.(*idlCore.LiteralMap), nil, nil)
+			or.OnReadMatch(mock.Anything).Return(data.(*idlCore.OutputData), nil, nil)
 			return or
 		},
 		func(ctx context.Context, key catalog.Key) error {
@@ -258,7 +259,7 @@ func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *i
 	assert.NoError(t, err)
 	if expectedOutputs != nil {
 		assert.True(t, trns.Info().Phase().IsSuccess())
-		actualOutputs := &idlCore.LiteralMap{}
+		actualOutputs := &idlCore.OutputData{}
 		assert.NoError(t, ds.ReadProtobuf(context.TODO(), outputWriter.GetOutputPath(), actualOutputs))
 
 		if diff := deep.Equal(expectedOutputs, actualOutputs); diff != nil {

@@ -15,6 +15,7 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 
 	commonMocks "github.com/flyteorg/flyte/flyteadmin/pkg/common/mocks"
+	commonTestUtils "github.com/flyteorg/flyte/flyteadmin/pkg/common/testutils"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
@@ -177,15 +178,17 @@ func TestAddTaskTerminalState_OutputURI(t *testing.T) {
 }
 
 func TestAddTaskTerminalState_OutputData(t *testing.T) {
-	outputData := &core.LiteralMap{
-		Literals: map[string]*core.Literal{
-			"foo": {
-				Value: &core.Literal_Scalar{
-					Scalar: &core.Scalar{
-						Value: &core.Scalar_Primitive{
-							Primitive: &core.Primitive{
-								Value: &core.Primitive_Integer{
-									Integer: 4,
+	outputData := &core.OutputData{
+		Outputs: &core.LiteralMap{
+			Literals: map[string]*core.Literal{
+				"foo": {
+					Value: &core.Literal_Scalar{
+						Scalar: &core.Scalar{
+							Value: &core.Scalar_Primitive{
+								Primitive: &core.Primitive{
+									Value: &core.Primitive_Integer{
+										Integer: 4,
+									},
 								},
 							},
 						},
@@ -194,6 +197,7 @@ func TestAddTaskTerminalState_OutputData(t *testing.T) {
 			},
 		},
 	}
+
 	request := admin.TaskExecutionEventRequest{
 		Event: &event.TaskExecutionEvent{
 			TaskId: &core.Identifier{
@@ -232,8 +236,8 @@ func TestAddTaskTerminalState_OutputData(t *testing.T) {
 
 		duration, err := ptypes.Duration(closure.GetDuration())
 		assert.Nil(t, err)
-		assert.EqualValues(t, request.Event.OutputResult, closure.OutputResult)
-		assert.True(t, proto.Equal(outputData, closure.GetOutputData()))
+		assert.EqualValues(t, request.Event.GetOutputData(), closure.GetFullOutputs())
+		commonTestUtils.AssertProtoEqual(t, outputData, closure.GetFullOutputs())
 		assert.EqualValues(t, time.Minute, duration)
 	})
 	t.Run("output data stored offloaded", func(t *testing.T) {
@@ -1918,10 +1922,10 @@ func TestHandleTaskExecutionInputs(t *testing.T) {
 		assert.NoError(t, err)
 		expectedOffloadedInputsLocation := "/metadata/project/domain/name/node-id/project/domain/task-id/task-v/1/offloaded_inputs"
 		assert.Equal(t, taskExecutionModel.InputURI, expectedOffloadedInputsLocation)
-		actualInputs := &core.LiteralMap{}
+		actualInputs := &core.InputData{}
 		err = ds.ReadProtobuf(ctx, storage.DataReference(expectedOffloadedInputsLocation), actualInputs)
 		assert.NoError(t, err)
-		assert.True(t, proto.Equal(actualInputs, testInputs))
+		commonTestUtils.AssertProtoEqual(t, testInputs, actualInputs)
 	})
 	t.Run("read event input uri", func(t *testing.T) {
 		taskExecutionModel := models.TaskExecution{}

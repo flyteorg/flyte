@@ -107,6 +107,9 @@ type ProtobufStore interface {
 	// ReadProtobuf retrieves the entire blob from blobstore and unmarshals it to the passed protobuf
 	ReadProtobuf(ctx context.Context, reference DataReference, msg proto.Message) error
 
+	// ReadProtobufAny retrieves the entire blob from blobstore and unmarshals it to the passed protobuf
+	ReadProtobufAny(ctx context.Context, reference DataReference, msg ...proto.Message) (int, error)
+
 	// WriteProtobuf serializes and stores the protobuf.
 	WriteProtobuf(ctx context.Context, reference DataReference, opts Options, msg proto.Message) error
 }

@@ -3556,6 +3556,110 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of an InputData. */
+        interface IInputData {
+
+            /** InputData inputs */
+            inputs?: (flyteidl.core.ILiteralMap|null);
+        }
+
+        /** Represents an InputData. */
+        class InputData implements IInputData {
+
+            /**
+             * Constructs a new InputData.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.IInputData);
+
+            /** InputData inputs. */
+            public inputs?: (flyteidl.core.ILiteralMap|null);
+
+            /**
+             * Creates a new InputData instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns InputData instance
+             */
+            public static create(properties?: flyteidl.core.IInputData): flyteidl.core.InputData;
+
+            /**
+             * Encodes the specified InputData message. Does not implicitly {@link flyteidl.core.InputData.verify|verify} messages.
+             * @param message InputData message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.IInputData, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an InputData message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns InputData
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.InputData;
+
+            /**
+             * Verifies an InputData message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of an OutputData. */
+        interface IOutputData {
+
+            /** OutputData outputs */
+            outputs?: (flyteidl.core.ILiteralMap|null);
+        }
+
+        /** Represents an OutputData. */
+        class OutputData implements IOutputData {
+
+            /**
+             * Constructs a new OutputData.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.IOutputData);
+
+            /** OutputData outputs. */
+            public outputs?: (flyteidl.core.ILiteralMap|null);
+
+            /**
+             * Creates a new OutputData instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns OutputData instance
+             */
+            public static create(properties?: flyteidl.core.IOutputData): flyteidl.core.OutputData;
+
+            /**
+             * Encodes the specified OutputData message. Does not implicitly {@link flyteidl.core.OutputData.verify|verify} messages.
+             * @param message OutputData message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.IOutputData, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an OutputData message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns OutputData
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.OutputData;
+
+            /**
+             * Verifies an OutputData message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a BindingDataCollection. */
         interface IBindingDataCollection {
 
@@ -8260,8 +8364,14 @@ export namespace flyteidl {
             /** WorkflowExecutionEvent error */
             error?: (flyteidl.core.IExecutionError|null);
 
+            /** WorkflowExecutionEvent deprecatedOutputData */
+            deprecatedOutputData?: (flyteidl.core.ILiteralMap|null);
+
             /** WorkflowExecutionEvent outputData */
-            outputData?: (flyteidl.core.ILiteralMap|null);
+            outputData?: (flyteidl.core.IOutputData|null);
+
+            /** WorkflowExecutionEvent eventVersion */
+            eventVersion?: (number|null);
         }
 
         /** Represents a WorkflowExecutionEvent. */
@@ -8291,11 +8401,17 @@ export namespace flyteidl {
             /** WorkflowExecutionEvent error. */
             public error?: (flyteidl.core.IExecutionError|null);
 
+            /** WorkflowExecutionEvent deprecatedOutputData. */
+            public deprecatedOutputData?: (flyteidl.core.ILiteralMap|null);
+
             /** WorkflowExecutionEvent outputData. */
-            public outputData?: (flyteidl.core.ILiteralMap|null);
+            public outputData?: (flyteidl.core.IOutputData|null);
+
+            /** WorkflowExecutionEvent eventVersion. */
+            public eventVersion: number;
 
             /** WorkflowExecutionEvent outputResult. */
-            public outputResult?: ("outputUri"|"error"|"outputData");
+            public outputResult?: ("outputUri"|"error"|"deprecatedOutputData"|"outputData");
 
             /**
              * Creates a new WorkflowExecutionEvent instance using the specified properties.
@@ -8348,8 +8464,11 @@ export namespace flyteidl {
             /** NodeExecutionEvent inputUri */
             inputUri?: (string|null);
 
+            /** NodeExecutionEvent deprecatedInputData */
+            deprecatedInputData?: (flyteidl.core.ILiteralMap|null);
+
             /** NodeExecutionEvent inputData */
-            inputData?: (flyteidl.core.ILiteralMap|null);
+            inputData?: (flyteidl.core.IInputData|null);
 
             /** NodeExecutionEvent outputUri */
             outputUri?: (string|null);
@@ -8357,8 +8476,11 @@ export namespace flyteidl {
             /** NodeExecutionEvent error */
             error?: (flyteidl.core.IExecutionError|null);
 
+            /** NodeExecutionEvent deprecatedOutputData */
+            deprecatedOutputData?: (flyteidl.core.ILiteralMap|null);
+
             /** NodeExecutionEvent outputData */
-            outputData?: (flyteidl.core.ILiteralMap|null);
+            outputData?: (flyteidl.core.IOutputData|null);
 
             /** NodeExecutionEvent workflowNodeMetadata */
             workflowNodeMetadata?: (flyteidl.event.IWorkflowNodeMetadata|null);
@@ -8430,8 +8552,11 @@ export namespace flyteidl {
             /** NodeExecutionEvent inputUri. */
             public inputUri: string;
 
+            /** NodeExecutionEvent deprecatedInputData. */
+            public deprecatedInputData?: (flyteidl.core.ILiteralMap|null);
+
             /** NodeExecutionEvent inputData. */
-            public inputData?: (flyteidl.core.ILiteralMap|null);
+            public inputData?: (flyteidl.core.IInputData|null);
 
             /** NodeExecutionEvent outputUri. */
             public outputUri: string;
@@ -8439,8 +8564,11 @@ export namespace flyteidl {
             /** NodeExecutionEvent error. */
             public error?: (flyteidl.core.IExecutionError|null);
 
+            /** NodeExecutionEvent deprecatedOutputData. */
+            public deprecatedOutputData?: (flyteidl.core.ILiteralMap|null);
+
             /** NodeExecutionEvent outputData. */
-            public outputData?: (flyteidl.core.ILiteralMap|null);
+            public outputData?: (flyteidl.core.IOutputData|null);
 
             /** NodeExecutionEvent workflowNodeMetadata. */
             public workflowNodeMetadata?: (flyteidl.event.IWorkflowNodeMetadata|null);
@@ -8488,10 +8616,10 @@ export namespace flyteidl {
             public isInDynamicChain: boolean;
 
             /** NodeExecutionEvent inputValue. */
-            public inputValue?: ("inputUri"|"inputData");
+            public inputValue?: ("inputUri"|"deprecatedInputData"|"inputData");
 
             /** NodeExecutionEvent outputResult. */
-            public outputResult?: ("outputUri"|"error"|"outputData");
+            public outputResult?: ("outputUri"|"error"|"deprecatedOutputData"|"outputData");
 
             /** NodeExecutionEvent targetMetadata. */
             public targetMetadata?: ("workflowNodeMetadata"|"taskNodeMetadata");
@@ -8910,8 +9038,11 @@ export namespace flyteidl {
             /** TaskExecutionEvent inputUri */
             inputUri?: (string|null);
 
+            /** TaskExecutionEvent deprecatedInputData */
+            deprecatedInputData?: (flyteidl.core.ILiteralMap|null);
+
             /** TaskExecutionEvent inputData */
-            inputData?: (flyteidl.core.ILiteralMap|null);
+            inputData?: (flyteidl.core.IInputData|null);
 
             /** TaskExecutionEvent outputUri */
             outputUri?: (string|null);
@@ -8919,8 +9050,11 @@ export namespace flyteidl {
             /** TaskExecutionEvent error */
             error?: (flyteidl.core.IExecutionError|null);
 
+            /** TaskExecutionEvent deprecatedOutputData */
+            deprecatedOutputData?: (flyteidl.core.ILiteralMap|null);
+
             /** TaskExecutionEvent outputData */
-            outputData?: (flyteidl.core.ILiteralMap|null);
+            outputData?: (flyteidl.core.IOutputData|null);
 
             /** TaskExecutionEvent customInfo */
             customInfo?: (google.protobuf.IStruct|null);
@@ -8980,8 +9114,11 @@ export namespace flyteidl {
             /** TaskExecutionEvent inputUri. */
             public inputUri: string;
 
+            /** TaskExecutionEvent deprecatedInputData. */
+            public deprecatedInputData?: (flyteidl.core.ILiteralMap|null);
+
             /** TaskExecutionEvent inputData. */
-            public inputData?: (flyteidl.core.ILiteralMap|null);
+            public inputData?: (flyteidl.core.IInputData|null);
 
             /** TaskExecutionEvent outputUri. */
             public outputUri: string;
@@ -8989,8 +9126,11 @@ export namespace flyteidl {
             /** TaskExecutionEvent error. */
             public error?: (flyteidl.core.IExecutionError|null);
 
+            /** TaskExecutionEvent deprecatedOutputData. */
+            public deprecatedOutputData?: (flyteidl.core.ILiteralMap|null);
+
             /** TaskExecutionEvent outputData. */
-            public outputData?: (flyteidl.core.ILiteralMap|null);
+            public outputData?: (flyteidl.core.IOutputData|null);
 
             /** TaskExecutionEvent customInfo. */
             public customInfo?: (google.protobuf.IStruct|null);
@@ -9017,10 +9157,10 @@ export namespace flyteidl {
             public reportedAt?: (google.protobuf.ITimestamp|null);
 
             /** TaskExecutionEvent inputValue. */
-            public inputValue?: ("inputUri"|"inputData");
+            public inputValue?: ("inputUri"|"deprecatedInputData"|"inputData");
 
             /** TaskExecutionEvent outputResult. */
-            public outputResult?: ("outputUri"|"error"|"outputData");
+            public outputResult?: ("outputUri"|"error"|"deprecatedOutputData"|"outputData");
 
             /**
              * Creates a new TaskExecutionEvent instance using the specified properties.
@@ -9408,8 +9548,8 @@ export namespace flyteidl {
         /** Properties of a CreateTaskRequest. */
         interface ICreateTaskRequest {
 
-            /** CreateTaskRequest inputs */
-            inputs?: (flyteidl.core.ILiteralMap|null);
+            /** CreateTaskRequest deprecatedInputs */
+            deprecatedInputs?: (flyteidl.core.ILiteralMap|null);
 
             /** CreateTaskRequest template */
             template?: (flyteidl.core.ITaskTemplate|null);
@@ -9419,6 +9559,9 @@ export namespace flyteidl {
 
             /** CreateTaskRequest taskExecutionMetadata */
             taskExecutionMetadata?: (flyteidl.admin.ITaskExecutionMetadata|null);
+
+            /** CreateTaskRequest inputs */
+            inputs?: (flyteidl.core.IInputData|null);
         }
 
         /** Represents a CreateTaskRequest. */
@@ -9430,8 +9573,8 @@ export namespace flyteidl {
              */
             constructor(properties?: flyteidl.admin.ICreateTaskRequest);
 
-            /** CreateTaskRequest inputs. */
-            public inputs?: (flyteidl.core.ILiteralMap|null);
+            /** CreateTaskRequest deprecatedInputs. */
+            public deprecatedInputs?: (flyteidl.core.ILiteralMap|null);
 
             /** CreateTaskRequest template. */
             public template?: (flyteidl.core.ITaskTemplate|null);
@@ -9441,6 +9584,9 @@ export namespace flyteidl {
 
             /** CreateTaskRequest taskExecutionMetadata. */
             public taskExecutionMetadata?: (flyteidl.admin.ITaskExecutionMetadata|null);
+
+            /** CreateTaskRequest inputs. */
+            public inputs?: (flyteidl.core.IInputData|null);
 
             /**
              * Creates a new CreateTaskRequest instance using the specified properties.
@@ -9893,8 +10039,8 @@ export namespace flyteidl {
             /** Resource state */
             state?: (flyteidl.admin.State|null);
 
-            /** Resource outputs */
-            outputs?: (flyteidl.core.ILiteralMap|null);
+            /** Resource deprecatedOutputs */
+            deprecatedOutputs?: (flyteidl.core.ILiteralMap|null);
 
             /** Resource message */
             message?: (string|null);
@@ -9907,6 +10053,9 @@ export namespace flyteidl {
 
             /** Resource customInfo */
             customInfo?: (google.protobuf.IStruct|null);
+
+            /** Resource outputs */
+            outputs?: (flyteidl.core.IOutputData|null);
         }
 
         /** Represents a Resource. */
@@ -9921,8 +10070,8 @@ export namespace flyteidl {
             /** Resource state. */
             public state: flyteidl.admin.State;
 
-            /** Resource outputs. */
-            public outputs?: (flyteidl.core.ILiteralMap|null);
+            /** Resource deprecatedOutputs. */
+            public deprecatedOutputs?: (flyteidl.core.ILiteralMap|null);
 
             /** Resource message. */
             public message: string;
@@ -9935,6 +10084,9 @@ export namespace flyteidl {
 
             /** Resource customInfo. */
             public customInfo?: (google.protobuf.IStruct|null);
+
+            /** Resource outputs. */
+            public outputs?: (flyteidl.core.IOutputData|null);
 
             /**
              * Creates a new Resource instance using the specified properties.
@@ -13165,6 +13317,9 @@ export namespace flyteidl {
 
             /** ExecutionCreateRequest org */
             org?: (string|null);
+
+            /** ExecutionCreateRequest inputData */
+            inputData?: (flyteidl.core.IInputData|null);
         }
 
         /** Represents an ExecutionCreateRequest. */
@@ -13193,6 +13348,9 @@ export namespace flyteidl {
 
             /** ExecutionCreateRequest org. */
             public org: string;
+
+            /** ExecutionCreateRequest inputData. */
+            public inputData?: (flyteidl.core.IInputData|null);
 
             /**
              * Creates a new ExecutionCreateRequest instance using the specified properties.
@@ -13718,6 +13876,9 @@ export namespace flyteidl {
             /** ExecutionClosure outputData */
             outputData?: (flyteidl.core.ILiteralMap|null);
 
+            /** ExecutionClosure fullOutputs */
+            fullOutputs?: (flyteidl.core.IOutputData|null);
+
             /** ExecutionClosure computedInputs */
             computedInputs?: (flyteidl.core.ILiteralMap|null);
 
@@ -13770,6 +13931,9 @@ export namespace flyteidl {
             /** ExecutionClosure outputData. */
             public outputData?: (flyteidl.core.ILiteralMap|null);
 
+            /** ExecutionClosure fullOutputs. */
+            public fullOutputs?: (flyteidl.core.IOutputData|null);
+
             /** ExecutionClosure computedInputs. */
             public computedInputs?: (flyteidl.core.ILiteralMap|null);
 
@@ -13798,7 +13962,7 @@ export namespace flyteidl {
             public stateChangeDetails?: (flyteidl.admin.IExecutionStateChangeDetails|null);
 
             /** ExecutionClosure outputResult. */
-            public outputResult?: ("outputs"|"error"|"abortCause"|"abortMetadata"|"outputData");
+            public outputResult?: ("outputs"|"error"|"abortCause"|"abortMetadata"|"outputData"|"fullOutputs");
 
             /**
              * Creates a new ExecutionClosure instance using the specified properties.
@@ -14384,6 +14548,12 @@ export namespace flyteidl {
 
             /** WorkflowExecutionGetDataResponse fullOutputs */
             fullOutputs?: (flyteidl.core.ILiteralMap|null);
+
+            /** WorkflowExecutionGetDataResponse inputData */
+            inputData?: (flyteidl.core.IInputData|null);
+
+            /** WorkflowExecutionGetDataResponse outputData */
+            outputData?: (flyteidl.core.IOutputData|null);
         }
 
         /** Represents a WorkflowExecutionGetDataResponse. */
@@ -14406,6 +14576,12 @@ export namespace flyteidl {
 
             /** WorkflowExecutionGetDataResponse fullOutputs. */
             public fullOutputs?: (flyteidl.core.ILiteralMap|null);
+
+            /** WorkflowExecutionGetDataResponse inputData. */
+            public inputData?: (flyteidl.core.IInputData|null);
+
+            /** WorkflowExecutionGetDataResponse outputData. */
+            public outputData?: (flyteidl.core.IOutputData|null);
 
             /**
              * Creates a new WorkflowExecutionGetDataResponse instance using the specified properties.
@@ -15883,6 +16059,9 @@ export namespace flyteidl {
 
             /** LaunchPlanSpec executionEnvAssignments */
             executionEnvAssignments?: (flyteidl.core.IExecutionEnvAssignment[]|null);
+
+            /** LaunchPlanSpec fixedInputData */
+            fixedInputData?: (flyteidl.core.IInputData|null);
         }
 
         /** Represents a LaunchPlanSpec. */
@@ -15944,6 +16123,9 @@ export namespace flyteidl {
 
             /** LaunchPlanSpec executionEnvAssignments. */
             public executionEnvAssignments: flyteidl.core.IExecutionEnvAssignment[];
+
+            /** LaunchPlanSpec fixedInputData. */
+            public fixedInputData?: (flyteidl.core.IInputData|null);
 
             /**
              * Creates a new LaunchPlanSpec instance using the specified properties.
@@ -16978,6 +17160,9 @@ export namespace flyteidl {
             /** NodeExecutionClosure outputData */
             outputData?: (flyteidl.core.ILiteralMap|null);
 
+            /** NodeExecutionClosure fullOutputs */
+            fullOutputs?: (flyteidl.core.IOutputData|null);
+
             /** NodeExecutionClosure phase */
             phase?: (flyteidl.core.NodeExecution.Phase|null);
 
@@ -17024,6 +17209,9 @@ export namespace flyteidl {
             /** NodeExecutionClosure outputData. */
             public outputData?: (flyteidl.core.ILiteralMap|null);
 
+            /** NodeExecutionClosure fullOutputs. */
+            public fullOutputs?: (flyteidl.core.IOutputData|null);
+
             /** NodeExecutionClosure phase. */
             public phase: flyteidl.core.NodeExecution.Phase;
 
@@ -17052,7 +17240,7 @@ export namespace flyteidl {
             public dynamicJobSpecUri: string;
 
             /** NodeExecutionClosure outputResult. */
-            public outputResult?: ("outputUri"|"error"|"outputData");
+            public outputResult?: ("outputUri"|"error"|"outputData"|"fullOutputs");
 
             /** NodeExecutionClosure targetMetadata. */
             public targetMetadata?: ("workflowNodeMetadata"|"taskNodeMetadata");
@@ -17337,6 +17525,12 @@ export namespace flyteidl {
             /** NodeExecutionGetDataResponse fullOutputs */
             fullOutputs?: (flyteidl.core.ILiteralMap|null);
 
+            /** NodeExecutionGetDataResponse inputData */
+            inputData?: (flyteidl.core.IInputData|null);
+
+            /** NodeExecutionGetDataResponse outputData */
+            outputData?: (flyteidl.core.IOutputData|null);
+
             /** NodeExecutionGetDataResponse dynamicWorkflow */
             dynamicWorkflow?: (flyteidl.admin.IDynamicWorkflowNodeMetadata|null);
 
@@ -17364,6 +17558,12 @@ export namespace flyteidl {
 
             /** NodeExecutionGetDataResponse fullOutputs. */
             public fullOutputs?: (flyteidl.core.ILiteralMap|null);
+
+            /** NodeExecutionGetDataResponse inputData. */
+            public inputData?: (flyteidl.core.IInputData|null);
+
+            /** NodeExecutionGetDataResponse outputData. */
+            public outputData?: (flyteidl.core.IOutputData|null);
 
             /** NodeExecutionGetDataResponse dynamicWorkflow. */
             public dynamicWorkflow?: (flyteidl.admin.IDynamicWorkflowNodeMetadata|null);
@@ -19933,6 +20133,9 @@ export namespace flyteidl {
             /** TaskExecutionClosure outputData */
             outputData?: (flyteidl.core.ILiteralMap|null);
 
+            /** TaskExecutionClosure fullOutputs */
+            fullOutputs?: (flyteidl.core.IOutputData|null);
+
             /** TaskExecutionClosure phase */
             phase?: (flyteidl.core.TaskExecution.Phase|null);
 
@@ -19988,6 +20191,9 @@ export namespace flyteidl {
             /** TaskExecutionClosure outputData. */
             public outputData?: (flyteidl.core.ILiteralMap|null);
 
+            /** TaskExecutionClosure fullOutputs. */
+            public fullOutputs?: (flyteidl.core.IOutputData|null);
+
             /** TaskExecutionClosure phase. */
             public phase: flyteidl.core.TaskExecution.Phase;
 
@@ -20025,7 +20231,7 @@ export namespace flyteidl {
             public reasons: flyteidl.admin.IReason[];
 
             /** TaskExecutionClosure outputResult. */
-            public outputResult?: ("outputUri"|"error"|"outputData");
+            public outputResult?: ("outputUri"|"error"|"outputData"|"fullOutputs");
 
             /**
              * Creates a new TaskExecutionClosure instance using the specified properties.
@@ -20185,6 +20391,12 @@ export namespace flyteidl {
             /** TaskExecutionGetDataResponse fullOutputs */
             fullOutputs?: (flyteidl.core.ILiteralMap|null);
 
+            /** TaskExecutionGetDataResponse inputData */
+            inputData?: (flyteidl.core.IInputData|null);
+
+            /** TaskExecutionGetDataResponse outputData */
+            outputData?: (flyteidl.core.IOutputData|null);
+
             /** TaskExecutionGetDataResponse flyteUrls */
             flyteUrls?: (flyteidl.admin.IFlyteURLs|null);
         }
@@ -20209,6 +20421,12 @@ export namespace flyteidl {
 
             /** TaskExecutionGetDataResponse fullOutputs. */
             public fullOutputs?: (flyteidl.core.ILiteralMap|null);
+
+            /** TaskExecutionGetDataResponse inputData. */
+            public inputData?: (flyteidl.core.IInputData|null);
+
+            /** TaskExecutionGetDataResponse outputData. */
+            public outputData?: (flyteidl.core.IOutputData|null);
 
             /** TaskExecutionGetDataResponse flyteUrls. */
             public flyteUrls?: (flyteidl.admin.IFlyteURLs|null);
@@ -23673,6 +23891,12 @@ export namespace flyteidl {
 
             /** GetDataResponse literal */
             literal?: (flyteidl.core.ILiteral|null);
+
+            /** GetDataResponse inputData */
+            inputData?: (flyteidl.core.IInputData|null);
+
+            /** GetDataResponse outputData */
+            outputData?: (flyteidl.core.IOutputData|null);
         }
 
         /** Represents a GetDataResponse. */
@@ -23693,8 +23917,14 @@ export namespace flyteidl {
             /** GetDataResponse literal. */
             public literal?: (flyteidl.core.ILiteral|null);
 
+            /** GetDataResponse inputData. */
+            public inputData?: (flyteidl.core.IInputData|null);
+
+            /** GetDataResponse outputData. */
+            public outputData?: (flyteidl.core.IOutputData|null);
+
             /** GetDataResponse data. */
-            public data?: ("literalMap"|"preSignedUrls"|"literal");
+            public data?: ("literalMap"|"preSignedUrls"|"literal"|"inputData"|"outputData");
 
             /**
              * Creates a new GetDataResponse instance using the specified properties.
@@ -23936,14 +24166,17 @@ export namespace flyteidl {
         /** Properties of a TaskCreateRequest. */
         interface ITaskCreateRequest {
 
-            /** TaskCreateRequest inputs */
-            inputs?: (flyteidl.core.ILiteralMap|null);
+            /** TaskCreateRequest deprecatedInputs */
+            deprecatedInputs?: (flyteidl.core.ILiteralMap|null);
 
             /** TaskCreateRequest template */
             template?: (flyteidl.core.ITaskTemplate|null);
 
             /** TaskCreateRequest outputPrefix */
             outputPrefix?: (string|null);
+
+            /** TaskCreateRequest inputs */
+            inputs?: (flyteidl.core.IInputData|null);
         }
 
         /** Represents a TaskCreateRequest. */
@@ -23955,14 +24188,17 @@ export namespace flyteidl {
              */
             constructor(properties?: flyteidl.service.ITaskCreateRequest);
 
-            /** TaskCreateRequest inputs. */
-            public inputs?: (flyteidl.core.ILiteralMap|null);
+            /** TaskCreateRequest deprecatedInputs. */
+            public deprecatedInputs?: (flyteidl.core.ILiteralMap|null);
 
             /** TaskCreateRequest template. */
             public template?: (flyteidl.core.ITaskTemplate|null);
 
             /** TaskCreateRequest outputPrefix. */
             public outputPrefix: string;
+
+            /** TaskCreateRequest inputs. */
+            public inputs?: (flyteidl.core.IInputData|null);
 
             /**
              * Creates a new TaskCreateRequest instance using the specified properties.
@@ -24113,8 +24349,11 @@ export namespace flyteidl {
             /** TaskGetResponse state */
             state?: (flyteidl.service.State|null);
 
+            /** TaskGetResponse deprecatedOutputs */
+            deprecatedOutputs?: (flyteidl.core.ILiteralMap|null);
+
             /** TaskGetResponse outputs */
-            outputs?: (flyteidl.core.ILiteralMap|null);
+            outputs?: (flyteidl.core.IOutputData|null);
         }
 
         /** Represents a TaskGetResponse. */
@@ -24129,8 +24368,11 @@ export namespace flyteidl {
             /** TaskGetResponse state. */
             public state: flyteidl.service.State;
 
+            /** TaskGetResponse deprecatedOutputs. */
+            public deprecatedOutputs?: (flyteidl.core.ILiteralMap|null);
+
             /** TaskGetResponse outputs. */
-            public outputs?: (flyteidl.core.ILiteralMap|null);
+            public outputs?: (flyteidl.core.IOutputData|null);
 
             /**
              * Creates a new TaskGetResponse instance using the specified properties.

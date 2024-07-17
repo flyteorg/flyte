@@ -5,7 +5,7 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { BoolValue, Duration, Message, proto3, Timestamp } from "@bufbuild/protobuf";
-import { LiteralMap } from "../core/literals_pb.js";
+import { InputData, LiteralMap, OutputData } from "../core/literals_pb.js";
 import { Identifier, NodeExecutionIdentifier, WorkflowExecutionIdentifier } from "../core/identifier_pb.js";
 import { ExecutionError, QualityOfService, WorkflowExecution_Phase } from "../core/execution_pb.js";
 import { Annotations, AuthRole, Envs, Labels, Notification, RawOutputDataConfig, UrlBlob } from "./common_pb.js";
@@ -86,8 +86,10 @@ export class ExecutionCreateRequest extends Message<ExecutionCreateRequest> {
    * The inputs required to start the execution. All required inputs must be
    * included in this map. If not required and not provided, defaults apply.
    * +optional
+   * Deprecated: Please use input_data instead.
    *
-   * @generated from field: flyteidl.core.LiteralMap inputs = 5;
+   * @generated from field: flyteidl.core.LiteralMap inputs = 5 [deprecated = true];
+   * @deprecated
    */
   inputs?: LiteralMap;
 
@@ -97,6 +99,15 @@ export class ExecutionCreateRequest extends Message<ExecutionCreateRequest> {
    * @generated from field: string org = 6;
    */
   org = "";
+
+  /**
+   * The inputs required to start the execution. All required inputs must be
+   * included in this map. If not required and not provided, defaults apply.
+   * +optional
+   *
+   * @generated from field: flyteidl.core.InputData input_data = 7;
+   */
+  inputData?: InputData;
 
   constructor(data?: PartialMessage<ExecutionCreateRequest>) {
     super();
@@ -112,6 +123,7 @@ export class ExecutionCreateRequest extends Message<ExecutionCreateRequest> {
     { no: 4, name: "spec", kind: "message", T: ExecutionSpec },
     { no: 5, name: "inputs", kind: "message", T: LiteralMap },
     { no: 6, name: "org", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 7, name: "input_data", kind: "message", T: InputData },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExecutionCreateRequest {
@@ -605,6 +617,15 @@ export class ExecutionClosure extends Message<ExecutionClosure> {
      */
     value: LiteralMap;
     case: "outputData";
+  } | {
+    /**
+     * Raw output data produced by this execution.
+     * DEPRECATED. Use GetExecutionData to fetch output data instead.
+     *
+     * @generated from field: flyteidl.core.OutputData full_outputs = 15;
+     */
+    value: OutputData;
+    case: "fullOutputs";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   /**
@@ -687,6 +708,7 @@ export class ExecutionClosure extends Message<ExecutionClosure> {
     { no: 10, name: "abort_cause", kind: "scalar", T: 9 /* ScalarType.STRING */, oneof: "output_result" },
     { no: 12, name: "abort_metadata", kind: "message", T: AbortMetadata, oneof: "output_result" },
     { no: 13, name: "output_data", kind: "message", T: LiteralMap, oneof: "output_result" },
+    { no: 15, name: "full_outputs", kind: "message", T: OutputData, oneof: "output_result" },
     { no: 3, name: "computed_inputs", kind: "message", T: LiteralMap },
     { no: 4, name: "phase", kind: "enum", T: proto3.getEnumType(WorkflowExecution_Phase) },
     { no: 5, name: "started_at", kind: "message", T: Timestamp },
@@ -1332,17 +1354,35 @@ export class WorkflowExecutionGetDataResponse extends Message<WorkflowExecutionG
 
   /**
    * Full_inputs will only be populated if they are under a configured size threshold.
+   * Deprecated: Please use input_data instead.
    *
-   * @generated from field: flyteidl.core.LiteralMap full_inputs = 3;
+   * @generated from field: flyteidl.core.LiteralMap full_inputs = 3 [deprecated = true];
+   * @deprecated
    */
   fullInputs?: LiteralMap;
 
   /**
    * Full_outputs will only be populated if they are under a configured size threshold.
+   * Deprecated: Please use output_data instead.
    *
-   * @generated from field: flyteidl.core.LiteralMap full_outputs = 4;
+   * @generated from field: flyteidl.core.LiteralMap full_outputs = 4 [deprecated = true];
+   * @deprecated
    */
   fullOutputs?: LiteralMap;
+
+  /**
+   * InputData will only be populated if they are under a configured size threshold.
+   *
+   * @generated from field: flyteidl.core.InputData input_data = 5;
+   */
+  inputData?: InputData;
+
+  /**
+   * OutputData will only be populated if they are under a configured size threshold.
+   *
+   * @generated from field: flyteidl.core.OutputData output_data = 6;
+   */
+  outputData?: OutputData;
 
   constructor(data?: PartialMessage<WorkflowExecutionGetDataResponse>) {
     super();
@@ -1356,6 +1396,8 @@ export class WorkflowExecutionGetDataResponse extends Message<WorkflowExecutionG
     { no: 2, name: "inputs", kind: "message", T: UrlBlob },
     { no: 3, name: "full_inputs", kind: "message", T: LiteralMap },
     { no: 4, name: "full_outputs", kind: "message", T: LiteralMap },
+    { no: 5, name: "input_data", kind: "message", T: InputData },
+    { no: 6, name: "output_data", kind: "message", T: OutputData },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): WorkflowExecutionGetDataResponse {

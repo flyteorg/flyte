@@ -7,6 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	commonTestUtils "github.com/flyteorg/flyte/flyteadmin/pkg/common/testutils"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/testutils"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
@@ -71,19 +72,23 @@ func TestGetExecutionInputs(t *testing.T) {
 	lpRequest := testutils.GetLaunchPlanRequest()
 
 	actualInputs, err := CheckAndFetchInputsForExecution(
-		executionRequest.Inputs,
-		lpRequest.Spec.FixedInputs,
+		executionRequest.GetInputData(),
+		executionRequest.GetInputs(),
+		lpRequest.Spec.GetFixedInputData(),
+		lpRequest.Spec.GetFixedInputs(),
 		lpRequest.Spec.DefaultInputs,
 	)
-	expectedMap := core.LiteralMap{
-		Literals: map[string]*core.Literal{
-			"foo": coreutils.MustMakeLiteral("foo-value-1"),
-			"bar": coreutils.MustMakeLiteral("bar-value"),
+	expectedMap := &core.InputData{
+		Inputs: &core.LiteralMap{
+			Literals: map[string]*core.Literal{
+				"foo": coreutils.MustMakeLiteral("foo-value-1"),
+				"bar": coreutils.MustMakeLiteral("bar-value"),
+			},
 		},
 	}
 	assert.Nil(t, err)
 	assert.NotNil(t, actualInputs)
-	assert.EqualValues(t, expectedMap, *actualInputs)
+	commonTestUtils.AssertProtoEqual(t, expectedMap, actualInputs)
 }
 
 func TestValidateExecInputsWrongType(t *testing.T) {
@@ -94,11 +99,18 @@ func TestValidateExecInputsWrongType(t *testing.T) {
 			"foo": coreutils.MustMakeLiteral(1),
 		},
 	}
+	executionRequest.InputData = &core.InputData{
+		Inputs: executionRequest.Inputs,
+	}
+
 	_, err := CheckAndFetchInputsForExecution(
-		executionRequest.Inputs,
-		lpRequest.Spec.FixedInputs,
+		executionRequest.GetInputData(),
+		executionRequest.GetInputs(),
+		lpRequest.Spec.GetFixedInputData(),
+		lpRequest.Spec.GetFixedInputs(),
 		lpRequest.Spec.DefaultInputs,
 	)
+
 	utils.AssertEqualWithSanitizedRegex(t, "invalid foo input wrong type. Expected simple:STRING, but got simple:INTEGER", err.Error())
 }
 
@@ -111,9 +123,15 @@ func TestValidateExecInputsExtraInputs(t *testing.T) {
 			"foo-extra": coreutils.MustMakeLiteral("foo-value-1"),
 		},
 	}
+	executionRequest.InputData = &core.InputData{
+		Inputs: executionRequest.Inputs,
+	}
+
 	_, err := CheckAndFetchInputsForExecution(
-		executionRequest.Inputs,
-		lpRequest.Spec.FixedInputs,
+		executionRequest.GetInputData(),
+		executionRequest.GetInputs(),
+		lpRequest.Spec.GetFixedInputData(),
+		lpRequest.Spec.GetFixedInputs(),
 		lpRequest.Spec.DefaultInputs,
 	)
 	assert.EqualError(t, err, "invalid input foo-extra")
@@ -128,9 +146,15 @@ func TestValidateExecInputsOverrideFixed(t *testing.T) {
 			"bar": coreutils.MustMakeLiteral("bar-value"),
 		},
 	}
+	executionRequest.InputData = &core.InputData{
+		Inputs: executionRequest.Inputs,
+	}
+
 	_, err := CheckAndFetchInputsForExecution(
-		executionRequest.Inputs,
-		lpRequest.Spec.FixedInputs,
+		executionRequest.GetInputData(),
+		executionRequest.GetInputs(),
+		lpRequest.Spec.GetFixedInputData(),
+		lpRequest.Spec.GetFixedInputs(),
 		lpRequest.Spec.DefaultInputs,
 	)
 	assert.EqualError(t, err, "invalid input bar")
@@ -140,20 +164,27 @@ func TestValidateExecEmptyInputs(t *testing.T) {
 	executionRequest := testutils.GetExecutionRequest()
 	lpRequest := testutils.GetLaunchPlanRequest()
 	executionRequest.Inputs = nil
+	executionRequest.InputData = nil
 	actualInputs, err := CheckAndFetchInputsForExecution(
-		executionRequest.Inputs,
-		lpRequest.Spec.FixedInputs,
+		executionRequest.GetInputData(),
+		executionRequest.GetInputs(),
+		lpRequest.Spec.GetFixedInputData(),
+		lpRequest.Spec.GetFixedInputs(),
 		lpRequest.Spec.DefaultInputs,
 	)
-	expectedMap := core.LiteralMap{
-		Literals: map[string]*core.Literal{
-			"foo": coreutils.MustMakeLiteral("foo-value"),
-			"bar": coreutils.MustMakeLiteral("bar-value"),
+
+	expectedMap := &core.InputData{
+		Inputs: &core.LiteralMap{
+			Literals: map[string]*core.Literal{
+				"foo": coreutils.MustMakeLiteral("foo-value"),
+				"bar": coreutils.MustMakeLiteral("bar-value"),
+			},
 		},
 	}
+
 	assert.Nil(t, err)
 	assert.NotNil(t, actualInputs)
-	assert.EqualValues(t, expectedMap, *actualInputs)
+	commonTestUtils.AssertProtoEqual(t, expectedMap, actualInputs)
 }
 
 func TestValidExecutionId(t *testing.T) {

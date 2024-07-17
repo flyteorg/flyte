@@ -12,6 +12,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/flytestdlib/bitarray"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
@@ -551,13 +552,17 @@ type NodeStatusVisitor interface {
 type EnqueueWorkflow func(workflowID WorkflowID)
 
 func GetOutputsFile(outputDir DataReference) DataReference {
-	return outputDir + "/outputs.pb"
+	return outputDir + "/" + ioutils.OutputsSuffix
 }
 
 func GetInputsFile(inputDir DataReference) DataReference {
-	return inputDir + "/inputs.pb"
+	return inputDir + "/" + ioutils.InputsSuffix
+}
+
+func GetInputDataFile(inputDir DataReference) DataReference {
+	return inputDir + "/" + ioutils.InputDataSuffix
 }
 
 func GetDeckFile(inputDir DataReference) DataReference {
-	return inputDir + "/deck.html"
+	return inputDir + "/" + ioutils.DeckSuffix
 }

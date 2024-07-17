@@ -31,16 +31,18 @@ func writeOutput(ctx context.Context, tCtx webapi.StatusContext, externalLocatio
 	}
 
 	return tCtx.OutputWriter().Put(ctx, ioutils.NewInMemoryOutputReader(
-		&pb.LiteralMap{
-			Literals: map[string]*pb.Literal{
-				"results": {
-					Value: &pb.Literal_Scalar{
-						Scalar: &pb.Scalar{Value: &pb.Scalar_Schema{
-							Schema: &pb.Schema{
-								Uri:  externalLocation,
-								Type: resultsSchema.GetType().GetSchema(),
+		&pb.OutputData{
+			Outputs: &pb.LiteralMap{
+				Literals: map[string]*pb.Literal{
+					"results": {
+						Value: &pb.Literal_Scalar{
+							Scalar: &pb.Scalar{Value: &pb.Scalar_Schema{
+								Schema: &pb.Schema{
+									Uri:  externalLocation,
+									Type: resultsSchema.GetType().GetSchema(),
+								},
 							},
-						},
+							},
 						},
 					},
 				},
@@ -102,6 +104,7 @@ func extractQueryInfo(ctx context.Context, tCtx webapi.TaskExecutionContextReade
 			Inputs:           tCtx.InputReader(),
 			OutputPath:       tCtx.OutputWriter(),
 			Task:             tCtx.TaskReader(),
+			Runtime:          task.GetMetadata().GetRuntime(),
 		})
 		if err != nil {
 			return QueryInfo{}, err
@@ -133,6 +136,7 @@ func extractQueryInfo(ctx context.Context, tCtx webapi.TaskExecutionContextReade
 			Inputs:           tCtx.InputReader(),
 			OutputPath:       tCtx.OutputWriter(),
 			Task:             tCtx.TaskReader(),
+			Runtime:          task.GetMetadata().GetRuntime(),
 		})
 		if err != nil {
 			return QueryInfo{}, err

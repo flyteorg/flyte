@@ -49,7 +49,10 @@ func TestEndToEnd(t *testing.T) {
 	plugin, err := pluginEntry.LoadPlugin(context.TODO(), newFakeSetupContext())
 	assert.NoError(t, err)
 
-	inputs, _ := coreutils.MakeLiteralMap(map[string]interface{}{"x": 1})
+	inputs := &flyteIdlCore.InputData{
+		Inputs: coreutils.MustMakeLiteral(map[string]interface{}{"x": 1}).GetMap(),
+	}
+
 	template := flyteIdlCore.TaskTemplate{
 		Type:   bigqueryQueryJobTask,
 		Target: &flyteIdlCore.TaskTemplate_Sql{Sql: &flyteIdlCore.Sql{Statement: "SELECT 1", Dialect: flyteIdlCore.Sql_ANSI}},

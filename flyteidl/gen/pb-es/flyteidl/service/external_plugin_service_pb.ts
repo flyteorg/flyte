@@ -5,7 +5,7 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
-import { LiteralMap } from "../core/literals_pb.js";
+import { InputData, LiteralMap, OutputData } from "../core/literals_pb.js";
 import { TaskTemplate } from "../core/tasks_pb.js";
 
 /**
@@ -60,10 +60,12 @@ export class TaskCreateRequest extends Message<TaskCreateRequest> {
    * The inputs required to start the execution. All required inputs must be
    * included in this map. If not required and not provided, defaults apply.
    * +optional
+   * Deprecated: please use inputs instead.
    *
-   * @generated from field: flyteidl.core.LiteralMap inputs = 1;
+   * @generated from field: flyteidl.core.LiteralMap deprecated_inputs = 1 [deprecated = true];
+   * @deprecated
    */
-  inputs?: LiteralMap;
+  deprecatedInputs?: LiteralMap;
 
   /**
    * Template of the task that encapsulates all the metadata of the task.
@@ -79,6 +81,15 @@ export class TaskCreateRequest extends Message<TaskCreateRequest> {
    */
   outputPrefix = "";
 
+  /**
+   * The inputs required to start the execution. All required inputs must be
+   * included in this map. If not required and not provided, defaults apply.
+   * +optional
+   *
+   * @generated from field: flyteidl.core.InputData inputs = 4;
+   */
+  inputs?: InputData;
+
   constructor(data?: PartialMessage<TaskCreateRequest>) {
     super();
     proto3.util.initPartial(data, this);
@@ -87,9 +98,10 @@ export class TaskCreateRequest extends Message<TaskCreateRequest> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "flyteidl.service.TaskCreateRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "inputs", kind: "message", T: LiteralMap },
+    { no: 1, name: "deprecated_inputs", kind: "message", T: LiteralMap },
     { no: 2, name: "template", kind: "message", T: TaskTemplate },
     { no: 3, name: "output_prefix", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "inputs", kind: "message", T: InputData },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TaskCreateRequest {
@@ -217,10 +229,20 @@ export class TaskGetResponse extends Message<TaskGetResponse> {
    * The outputs of the execution. It's typically used by sql task. Flyteplugins service will create a
    * Structured dataset pointing to the query result table.
    * +optional
+   * Deprecated: Please use outputs instead
    *
-   * @generated from field: flyteidl.core.LiteralMap outputs = 2;
+   * @generated from field: flyteidl.core.LiteralMap deprecated_outputs = 2;
    */
-  outputs?: LiteralMap;
+  deprecatedOutputs?: LiteralMap;
+
+  /**
+   * The outputs of the execution. It's typically used by sql task. Flyteplugins service will create a
+   * Structured dataset pointing to the query result table.
+   * +optional
+   *
+   * @generated from field: flyteidl.core.OutputData outputs = 3;
+   */
+  outputs?: OutputData;
 
   constructor(data?: PartialMessage<TaskGetResponse>) {
     super();
@@ -231,7 +253,8 @@ export class TaskGetResponse extends Message<TaskGetResponse> {
   static readonly typeName = "flyteidl.service.TaskGetResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "state", kind: "enum", T: proto3.getEnumType(State) },
-    { no: 2, name: "outputs", kind: "message", T: LiteralMap },
+    { no: 2, name: "deprecated_outputs", kind: "message", T: LiteralMap },
+    { no: 3, name: "outputs", kind: "message", T: OutputData },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TaskGetResponse {

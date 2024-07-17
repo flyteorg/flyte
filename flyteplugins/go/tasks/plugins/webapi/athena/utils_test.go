@@ -90,16 +90,18 @@ func Test_writeOutput(t *testing.T) {
 		ow := &mocks3.OutputWriter{}
 		externalLocation := "s3://my-external-bucket/key"
 		ow.OnPut(ctx, ioutils.NewInMemoryOutputReader(
-			&pb.LiteralMap{
-				Literals: map[string]*pb.Literal{
-					"results": {
-						Value: &pb.Literal_Scalar{
-							Scalar: &pb.Scalar{
-								Value: &pb.Scalar_Schema{
-									Schema: &pb.Schema{
-										Uri: externalLocation,
-										Type: &core.SchemaType{
-											Columns: []*core.SchemaType_SchemaColumn{},
+			&pb.OutputData{
+				Outputs: &pb.LiteralMap{
+					Literals: map[string]*pb.Literal{
+						"results": {
+							Value: &pb.Literal_Scalar{
+								Scalar: &pb.Scalar{
+									Value: &pb.Scalar_Schema{
+										Schema: &pb.Schema{
+											Uri: externalLocation,
+											Type: &core.SchemaType{
+												Columns: []*core.SchemaType_SchemaColumn{},
+											},
 										},
 									},
 								},
@@ -190,7 +192,7 @@ func Test_ExtractQueryInfo(t *testing.T) {
 
 			ir := &mocks3.InputReader{}
 			tCtx.OnInputReader().Return(ir)
-			ir.OnGetInputPath().Return(storage.DataReference("s3://something"))
+			ir.OnGetInputDataPath().Return(storage.DataReference("s3://something"))
 			ir.OnGetInputPrefixPath().Return(storage.DataReference("s3://something/2"))
 			ir.OnGet(ctx).Return(nil, nil)
 

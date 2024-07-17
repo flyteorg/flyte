@@ -324,8 +324,10 @@ func (m *TaskExecutionManager) GetTaskExecutionData(
 	response := &admin.TaskExecutionGetDataResponse{
 		Inputs:      inputURLBlob,
 		Outputs:     outputURLBlob,
-		FullInputs:  inputs,
-		FullOutputs: outputs,
+		FullInputs:  inputs.GetInputs(),
+		FullOutputs: outputs.GetOutputs(),
+		InputData:   inputs,
+		OutputData:  outputs,
 		FlyteUrls:   common.FlyteURLsFromTaskExecutionID(*request.Id, false),
 	}
 

@@ -4,10 +4,11 @@
 # TO OPT OUT OF UPDATES, SEE https://github.com/flyteorg/boilerplate/blob/master/Readme.rst
 
 LINT_FLAGS ?=
+export REPO_ROOT ?= $(shell pwd)
 
 .PHONY: download_tooling
 download_tooling: #download dependencies (including test deps) for the package
-	@../boilerplate/flyte/golang_test_targets/download_tooling.sh
+	@${REPO_ROOT}/boilerplate/flyte/golang_test_targets/download_tooling.sh
 
 .PHONY: generate
 generate: download_tooling #generate go code

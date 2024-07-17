@@ -14,6 +14,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/flyteorg/flyte/flytepropeller/events/mocks"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 	storageMocks "github.com/flyteorg/flyte/flytestdlib/storage/mocks"
 )
@@ -30,6 +31,7 @@ func getReferenceTaskEv() *event.TaskExecutionEvent {
 		TaskId:                taskID,
 		RetryAttempt:          1,
 		ParentNodeExecutionId: nodeExecID,
+		EventVersion:          int32(v1alpha1.EventVersion3),
 		OutputResult: &event.TaskExecutionEvent_OutputUri{
 			OutputUri: referenceURI,
 		},
@@ -41,6 +43,7 @@ func getRawOutputTaskEv() *event.TaskExecutionEvent {
 		TaskId:                taskID,
 		RetryAttempt:          1,
 		ParentNodeExecutionId: nodeExecID,
+		EventVersion:          int32(v1alpha1.EventVersion3),
 		OutputResult: &event.TaskExecutionEvent_OutputData{
 			OutputData: outputData,
 		},
@@ -71,14 +74,13 @@ func TestRecordTaskEvent_Success_InlineOutputs(t *testing.T) {
 	ctx := context.TODO()
 	eventRecorder := mocks.EventRecorder{}
 	eventRecorder.OnRecordTaskEventMatch(ctx, mock.MatchedBy(func(event *event.TaskExecutionEvent) bool {
-		assert.True(t, proto.Equal(event, getRawOutputTaskEv()))
-		return true
+		return AssertProtoEqual(t, getRawOutputTaskEv(), event)
 	})).Return(nil)
 	pbStore := &storageMocks.ComposedProtobufStore{}
-	pbStore.OnReadProtobufMatch(mock.Anything, mock.MatchedBy(func(ref storage.DataReference) bool {
+	pbStore.OnReadProtobufAnyMatch(mock.Anything, mock.MatchedBy(func(ref storage.DataReference) bool {
 		return ref.String() == referenceURI
-	}), mock.Anything).Return(nil).Run(func(args mock.Arguments) {
-		arg := args.Get(2).(*core.LiteralMap)
+	}), mock.Anything, mock.Anything).Return(0, nil).Run(func(args mock.Arguments) {
+		arg := args.Get(2).(*core.OutputData)
 		*arg = *outputData
 	})
 	mockStore := &storage.DataStore{
@@ -102,9 +104,9 @@ func TestRecordTaskEvent_Failure_FetchInlineOutputs(t *testing.T) {
 		return true
 	})).Return(nil)
 	pbStore := &storageMocks.ComposedProtobufStore{}
-	pbStore.OnReadProtobufMatch(mock.Anything, mock.MatchedBy(func(ref storage.DataReference) bool {
+	pbStore.OnReadProtobufAnyMatch(mock.Anything, mock.MatchedBy(func(ref storage.DataReference) bool {
 		return ref.String() == referenceURI
-	}), mock.Anything).Return(errors.New("foo"))
+	}), mock.Anything, mock.Anything).Return(-1, errors.New("foo"))
 	mockStore := &storage.DataStore{
 		ComposedProtobufStore: pbStore,
 		ReferenceConstructor:  &storageMocks.ReferenceConstructor{},
@@ -128,10 +130,10 @@ func TestRecordTaskEvent_Failure_FallbackReference_Retry(t *testing.T) {
 		return event.GetOutputData() == nil && proto.Equal(event, getReferenceTaskEv())
 	})).Return(nil)
 	pbStore := &storageMocks.ComposedProtobufStore{}
-	pbStore.OnReadProtobufMatch(mock.Anything, mock.MatchedBy(func(ref storage.DataReference) bool {
+	pbStore.OnReadProtobufAnyMatch(mock.Anything, mock.MatchedBy(func(ref storage.DataReference) bool {
 		return ref.String() == referenceURI
-	}), mock.Anything).Return(nil).Run(func(args mock.Arguments) {
-		arg := args.Get(2).(*core.LiteralMap)
+	}), mock.Anything, mock.Anything).Return(0, nil).Run(func(args mock.Arguments) {
+		arg := args.Get(2).(*core.OutputData)
 		*arg = *outputData
 	})
 	mockStore := &storage.DataStore{
@@ -152,10 +154,10 @@ func TestRecordTaskEvent_Failure_FallbackReference_Unretriable(t *testing.T) {
 	eventRecorder := mocks.EventRecorder{}
 	eventRecorder.OnRecordTaskEventMatch(ctx, mock.Anything).Return(errors.New("foo"))
 	pbStore := &storageMocks.ComposedProtobufStore{}
-	pbStore.OnReadProtobufMatch(mock.Anything, mock.MatchedBy(func(ref storage.DataReference) bool {
+	pbStore.OnReadProtobufAnyMatch(mock.Anything, mock.MatchedBy(func(ref storage.DataReference) bool {
 		return ref.String() == referenceURI
-	}), mock.Anything).Return(nil).Run(func(args mock.Arguments) {
-		arg := args.Get(2).(*core.LiteralMap)
+	}), mock.Anything, mock.Anything).Return(0, nil).Run(func(args mock.Arguments) {
+		arg := args.Get(2).(*core.OutputData)
 		*arg = *outputData
 	})
 	mockStore := &storage.DataStore{

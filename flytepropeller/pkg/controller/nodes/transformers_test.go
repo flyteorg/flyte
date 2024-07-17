@@ -97,9 +97,11 @@ func TestToNodeExecutionEvent(t *testing.T) {
 		assert.Equal(t, nodeExecutionEventVersion, nev.EventVersion)
 	})
 	t.Run("inline events", func(t *testing.T) {
-		inputs := &core.LiteralMap{
-			Literals: map[string]*core.Literal{
-				"foo": coreutils.MustMakeLiteral("bar"),
+		inputs := &core.InputData{
+			Inputs: &core.LiteralMap{
+				Literals: map[string]*core.Literal{
+					"foo": coreutils.MustMakeLiteral("bar"),
+				},
 			},
 		}
 		info := handler.PhaseInfoQueued("z", inputs)

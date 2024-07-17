@@ -42,7 +42,7 @@ type executionCacheItem struct {
 	core.WorkflowExecutionIdentifier
 	ExecutionClosure *admin.ExecutionClosure
 	SyncError        error
-	ExecutionOutputs *core.LiteralMap
+	ExecutionOutputs *core.OutputData
 }
 
 func (e executionCacheItem) IsTerminal() bool {
@@ -80,7 +80,7 @@ func (a *adminLaunchPlanExecutor) handleLaunchError(ctx context.Context, isRecov
 }
 
 func (a *adminLaunchPlanExecutor) Launch(ctx context.Context, launchCtx LaunchContext,
-	executionID *core.WorkflowExecutionIdentifier, launchPlanRef *core.Identifier, inputs *core.LiteralMap) error {
+	executionID *core.WorkflowExecutionIdentifier, launchPlanRef *core.Identifier, inputs *core.InputData) error {
 	var err error
 	if launchCtx.RecoveryExecution != nil {
 		_, err = a.adminClient.RecoverExecution(ctx, &admin.ExecutionRecoverRequest{
@@ -125,10 +125,11 @@ func (a *adminLaunchPlanExecutor) Launch(ctx context.Context, launchCtx LaunchCo
 	}
 
 	req := &admin.ExecutionCreateRequest{
-		Project: executionID.Project,
-		Domain:  executionID.Domain,
-		Name:    executionID.Name,
-		Inputs:  inputs,
+		Project:   executionID.Project,
+		Domain:    executionID.Domain,
+		Name:      executionID.Name,
+		Inputs:    inputs.GetInputs(),
+		InputData: inputs,
 		Spec: &admin.ExecutionSpec{
 			LaunchPlan: launchPlanRef,
 			Metadata: &admin.ExecutionMetadata{
@@ -164,7 +165,7 @@ func (a *adminLaunchPlanExecutor) Launch(ctx context.Context, launchCtx LaunchCo
 	return nil
 }
 
-func (a *adminLaunchPlanExecutor) GetStatus(ctx context.Context, executionID *core.WorkflowExecutionIdentifier) (*admin.ExecutionClosure, *core.LiteralMap, error) {
+func (a *adminLaunchPlanExecutor) GetStatus(ctx context.Context, executionID *core.WorkflowExecutionIdentifier) (*admin.ExecutionClosure, *core.OutputData, error) {
 	if executionID == nil {
 		return nil, nil, fmt.Errorf("nil executionID")
 	}
@@ -270,7 +271,7 @@ func (a *adminLaunchPlanExecutor) syncItem(ctx context.Context, batch cache.Batc
 			continue
 		}
 
-		var outputs = &core.LiteralMap{}
+		var outputs *core.OutputData
 		// Retrieve potential outputs only when the workflow succeeded.
 		// TODO: We can optimize further by only retrieving the outputs when the workflow has output variables in the
 		// 	interface.
@@ -301,7 +302,12 @@ func (a *adminLaunchPlanExecutor) syncItem(ctx context.Context, batch cache.Batc
 				}
 
 			} else {
-				outputs = execData.GetFullOutputs()
+				outputs = execData.GetOutputData()
+				if outputs == nil && execData.GetFullOutputs() != nil {
+					outputs = &core.OutputData{
+						Outputs: execData.GetFullOutputs(),
+					}
+				}
 			}
 		}
 

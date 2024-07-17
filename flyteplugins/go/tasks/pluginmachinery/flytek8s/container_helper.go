@@ -8,6 +8,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/rand"
 	"k8s.io/apimachinery/pkg/util/validation"
 
+	idlcore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	pluginscore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/template"
@@ -190,25 +191,19 @@ func ApplyResourceOverrides(resources, platformResources v1.ResourceRequirements
 }
 
 // BuildRawContainer constructs a Container based on the definition passed by the TaskExecutionContext.
-func BuildRawContainer(ctx context.Context, tCtx pluginscore.TaskExecutionContext) (*v1.Container, error) {
-	taskTemplate, err := tCtx.TaskReader().Read(ctx)
-	if err != nil {
-		logger.Warnf(ctx, "failed to read task information when trying to construct container, err: %s", err.Error())
-		return nil, err
-	}
-
+func BuildRawContainer(taskTemplate *idlcore.TaskTemplate, tCtx pluginscore.TaskExecutionMetadata) (*v1.Container, error) {
 	// validate arguments
 	taskContainer := taskTemplate.GetContainer()
 	if taskContainer == nil {
 		return nil, errors.Errorf(errors.BadTaskSpecification, "unable to create container with no definition in TaskTemplate")
 	}
-	if tCtx.TaskExecutionMetadata().GetOverrides() == nil || tCtx.TaskExecutionMetadata().GetOverrides().GetResources() == nil {
+	if tCtx.GetOverrides() == nil || tCtx.GetOverrides().GetResources() == nil {
 		return nil, errors.Errorf(errors.BadTaskSpecification, "resource requirements not found for container task, required!")
 	}
 
 	// Make the container name the same as the pod name, unless it violates K8s naming conventions
 	// Container names are subject to the DNS-1123 standard
-	containerName := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
+	containerName := tCtx.GetTaskExecutionID().GetGeneratedName()
 	if errs := validation.IsDNS1123Label(containerName); len(errs) > 0 {
 		containerName = rand.String(4)
 	}
@@ -235,8 +230,14 @@ func BuildRawContainer(ctx context.Context, tCtx pluginscore.TaskExecutionContex
 // ToK8sContainer builds a Container based on the definition passed by the TaskExecutionContext. This involves applying
 // all Flyte configuration including k8s plugins and resource requests.
 func ToK8sContainer(ctx context.Context, tCtx pluginscore.TaskExecutionContext) (*v1.Container, error) {
+	taskTemplate, err := tCtx.TaskReader().Read(ctx)
+	if err != nil {
+		logger.Warnf(ctx, "failed to read task information when trying to construct container, err: %s", err.Error())
+		return nil, err
+	}
+
 	// build raw container
-	container, err := BuildRawContainer(ctx, tCtx)
+	container, err := BuildRawContainer(taskTemplate, tCtx.TaskExecutionMetadata())
 	if err != nil {
 		return nil, err
 	}
@@ -251,6 +252,7 @@ func ToK8sContainer(ctx context.Context, tCtx pluginscore.TaskExecutionContext) 
 		Inputs:           tCtx.InputReader(),
 		OutputPath:       tCtx.OutputWriter(),
 		Task:             tCtx.TaskReader(),
+		Runtime:          taskTemplate.GetMetadata().GetRuntime(),
 	}
 
 	if err := AddFlyteCustomizationsToContainer(ctx, templateParameters, ResourceCustomizationModeMergeExistingResources, container); err != nil {
@@ -332,6 +334,14 @@ func AddFlyteCustomizationsToContainer(ctx context.Context, parameters template.
 		// this use the platformResources defaults to ensure that the container.Resources values are within the
 		// platformResources limits. it will not override any existing container.Resources values.
 		container.Resources = ApplyResourceOverrides(container.Resources, *platformResources, !assignIfUnset)
+	}
+
+	useNewFormat := template.IsInputOutputWrapperSupported(ctx, parameters.Runtime)
+	if useNewFormat {
+		container.Env = append(container.Env, v1.EnvVar{
+			Name:  "FLYTE_INPUT_OUTPUT_FORMAT",
+			Value: "VERSION_3",
+		})
 	}
 
 	logger.Infof(ctx, "Adjusted container resources [%v]", container.Resources)

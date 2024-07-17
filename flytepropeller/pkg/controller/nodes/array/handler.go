@@ -184,7 +184,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		}
 
 		size := -1
-		for _, variable := range literalMap.Literals {
+		for _, variable := range literalMap.GetInputs().GetLiterals() {
 			literalType := validators.LiteralTypeForLiteral(variable)
 			switch literalType.Type.(type) {
 			case *idlcore.LiteralType_CollectionType:
@@ -436,7 +436,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			gatherOutputsRequest := &gatherOutputsRequest{
 				ctx: ctx,
 				responseChannel: make(chan struct {
-					literalMap map[string]*idlcore.Literal
+					outputData *idlcore.OutputData
 					error
 				}, 1),
 			}
@@ -448,7 +448,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 				if err != nil {
 					// Should never happen
 					gatherOutputsRequest.responseChannel <- struct {
-						literalMap map[string]*idlcore.Literal
+						outputData *idlcore.OutputData
 						error
 					}{nil, err}
 					continue
@@ -461,9 +461,9 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 				}
 
 				gatherOutputsRequest.responseChannel <- struct {
-					literalMap map[string]*idlcore.Literal
+					outputData *idlcore.OutputData
 					error
-				}{outputLiterals, nil}
+				}{&idlcore.OutputData{Outputs: &idlcore.LiteralMap{Literals: outputLiterals}}, nil}
 			} else {
 				// initialize subNode reader
 				currentAttempt := int(arrayNodeState.SubNodeRetryAttempts.GetItem(i))
@@ -471,7 +471,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 					strconv.Itoa(i), strconv.Itoa(currentAttempt))
 				if err != nil {
 					gatherOutputsRequest.responseChannel <- struct {
-						literalMap map[string]*idlcore.Literal
+						outputData *idlcore.OutputData
 						error
 					}{nil, err}
 					continue
@@ -531,7 +531,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			}
 
 			// append literal for all output variables
-			for name, literal := range outputResponse.literalMap {
+			for name, literal := range outputResponse.outputData.GetOutputs().GetLiterals() {
 				appendLiteral(name, literal, outputLiterals, len(arrayNodeState.SubNodePhases.GetItems()))
 			}
 		}
@@ -541,12 +541,14 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			return handler.UnknownTransition, fmt.Errorf("worker error(s) encountered: %s", workerErrorCollector.Summary(events.MaxErrorMessageLength))
 		}
 
-		outputLiteralMap := &idlcore.LiteralMap{
-			Literals: outputLiterals,
+		outputs := &idlcore.OutputData{
+			Outputs: &idlcore.LiteralMap{
+				Literals: outputLiterals,
+			},
 		}
 
 		outputFile := v1alpha1.GetOutputsFile(nCtx.NodeStatus().GetOutputDir())
-		if err := nCtx.DataStore().WriteProtobuf(ctx, outputFile, storage.Options{}, outputLiteralMap); err != nil {
+		if err := nCtx.DataStore().WriteProtobuf(ctx, outputFile, storage.Options{}, outputs); err != nil {
 			return handler.UnknownTransition, err
 		}
 
@@ -659,12 +661,14 @@ func (a *arrayNodeHandler) buildArrayNodeContext(ctx context.Context, nCtx inter
 		return nil, nil, nil, nil, nil, nil, err
 	}
 
-	inputLiteralMap, err := constructLiteralMap(inputs, subNodeIndex)
+	inputLiteralMap, err := constructLiteralMap(inputs.GetInputs(), subNodeIndex)
 	if err != nil {
 		return nil, nil, nil, nil, nil, nil, err
 	}
 
-	inputReader := newStaticInputReader(nCtx.InputReader(), inputLiteralMap)
+	inputReader := newStaticInputReader(nCtx.InputReader(), &idlcore.InputData{
+		Inputs: inputLiteralMap,
+	})
 
 	// wrap node lookup
 	subNodeSpec := *arrayNode.GetSubNodeSpec()

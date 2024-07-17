@@ -133,7 +133,7 @@ func runDetermineDiscoverabilityTest(t testing.TB, taskTemplate *core.TaskTempla
 
 	ir := &ioMocks.InputReader{}
 	ir.OnGetInputPrefixPath().Return("/prefix/")
-	ir.On("Get", mock.Anything).Return(inputs, nil)
+	ir.On("Get", mock.Anything).Return(&core.InputData{Inputs: inputs}, nil)
 
 	ow := &ioMocks.OutputWriter{}
 	ow.OnGetOutputPrefixPath().Return("/prefix/")

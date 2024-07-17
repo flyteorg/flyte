@@ -8,6 +8,7 @@ import (
 	"github.com/golang/protobuf/ptypes"
 	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -50,7 +51,8 @@ func TestToTaskExecutionEvent(t *testing.T) {
 
 	in := &mocks.InputFilePaths{}
 	const inputPath = "in"
-	in.On("GetInputPath").Return(storage.DataReference(inputPath))
+	in.OnGetInputPathMatch(mock.Anything).Return(inputPath, nil)
+	in.OnGetInputDataPath().Return(inputPath)
 
 	out := &mocks.OutputFilePaths{}
 	const outputPath = "out"
@@ -196,11 +198,14 @@ func TestToTaskExecutionEvent(t *testing.T) {
 	assert.Equal(t, testClusterID, tev.ProducerId)
 
 	t.Run("inline event policy", func(t *testing.T) {
-		inputs := &core.LiteralMap{
-			Literals: map[string]*core.Literal{
-				"foo": coreutils.MustMakeLiteral("bar"),
+		inputs := &core.InputData{
+			Inputs: &core.LiteralMap{
+				Literals: map[string]*core.Literal{
+					"foo": coreutils.MustMakeLiteral("bar"),
+				},
 			},
 		}
+
 		tev, err := ToTaskExecutionEvent(ToTaskExecutionEventInputs{
 			TaskExecContext:       tCtx,
 			InputReader:           in,
@@ -242,11 +247,11 @@ func TestToTaskExecutionEventWithParent(t *testing.T) {
 
 	in := &mocks.InputFilePaths{}
 	const inputPath = "in"
-	in.On("GetInputPath").Return(storage.DataReference(inputPath))
+	in.OnGetInputDataPath().Return(storage.DataReference(inputPath))
 
 	out := &mocks.OutputFilePaths{}
 	const outputPath = "out"
-	out.On("GetOutputPath").Return(storage.DataReference(outputPath))
+	out.OnGetOutputPath().Return(storage.DataReference(outputPath))
 
 	nodeExecutionMetadata := nodemocks.NodeExecutionMetadata{}
 	nodeExecutionMetadata.OnIsInterruptible().Return(true)

@@ -35,8 +35,14 @@ message WorkflowExecutionEvent {
         core.ExecutionError error = 6;
 
         // Raw output data produced by this workflow execution.
-        core.LiteralMap output_data = 7;
+        // Deprecated: please use output_data instead
+        core.LiteralMap deprecated_output_data = 7 [deprecated = true];
+
+        // Raw output data produced by this workflow execution.
+        core.OutputData output_data = 8;
     }
+
+    int32 event_version = 9;
 }
 
 message NodeExecutionEvent {
@@ -56,7 +62,11 @@ message NodeExecutionEvent {
         string input_uri = 5;
 
         // Raw input data consumed by this node execution.
-        core.LiteralMap input_data = 20;
+        // Deprecated: please use input_data instead
+        core.LiteralMap deprecated_input_data = 20 [deprecated = true];
+
+        // Raw input data consumed by this node execution.
+        core.InputData input_data = 25;
     }
 
     oneof output_result {
@@ -67,8 +77,12 @@ message NodeExecutionEvent {
         // Error information for the execution
         core.ExecutionError error = 7;
 
-        // Raw output data produced by this node execution.
-        core.LiteralMap output_data = 15;
+        // Raw output data produced by this workflow execution.
+        // Deprecated: please use output_data instead
+        core.LiteralMap deprecated_output_data = 15 [deprecated = true];
+
+        // Raw output data produced by this workflow execution.
+        core.OutputData output_data = 26;
     }
 
     // Additional metadata to do with this event's node target based
@@ -210,8 +224,12 @@ message TaskExecutionEvent {
       // including Cloud source provider. ie., s3://...
       string input_uri = 8;
 
-      // Raw input data consumed by this task execution.
-      core.LiteralMap input_data = 19;
+        // Raw input data consumed by this node execution.
+        // Deprecated: please use input_data instead
+        core.LiteralMap deprecated_input_data = 19 [deprecated = true];
+
+        // Raw input data consumed by this node execution.
+        core.InputData input_data = 23;
     }
 
     oneof output_result {
@@ -222,8 +240,12 @@ message TaskExecutionEvent {
         // Error information for the execution
         core.ExecutionError error = 10;
 
-        // Raw output data produced by this task execution.
-        core.LiteralMap output_data = 17;
+        // Raw output data produced by this workflow execution.
+        // Deprecated: please use output_data instead
+        core.LiteralMap deprecated_output_data = 17 [deprecated = true];
+
+        // Raw output data produced by this workflow execution.
+        core.OutputData output_data = 22;
     }
 
     // Custom data that the task plugin sends back. This is extensible to allow various plugins in the system.

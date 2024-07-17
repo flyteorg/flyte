@@ -40,7 +40,7 @@ type ResourceWrapper struct {
 	Phase flyteIdl.TaskExecution_Phase
 	// Deprecated: Please Use Phase instead.
 	State    admin.State
-	Outputs  *flyteIdl.LiteralMap
+	Outputs  *flyteIdl.OutputData
 	Message  string
 	LogLinks []*flyteIdl.TaskLog
 }
@@ -91,6 +91,7 @@ func (p *Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContext
 			Inputs:           taskCtx.InputReader(),
 			OutputPath:       taskCtx.OutputWriter(),
 			Task:             taskCtx.TaskReader(),
+			Runtime:          taskTemplate.GetMetadata().GetRuntime(),
 		}
 		argTemplate = taskTemplate.GetContainer().Args
 		modifiedArgs, err := template.Render(ctx, taskTemplate.GetContainer().Args, templateParameters)
@@ -146,7 +147,7 @@ func (p *Plugin) ExecuteTaskSync(
 	ctx context.Context,
 	client service.SyncAgentServiceClient,
 	header *admin.CreateRequestHeader,
-	inputs *flyteIdl.LiteralMap,
+	inputs *flyteIdl.InputData,
 ) (webapi.ResourceMeta, webapi.Resource, error) {
 	stream, err := client.ExecuteTaskSync(ctx)
 	if err != nil {
@@ -165,7 +166,7 @@ func (p *Plugin) ExecuteTaskSync(
 	}
 	inputsProto := &admin.ExecuteTaskSyncRequest{
 		Part: &admin.ExecuteTaskSyncRequest_Inputs{
-			Inputs: inputs,
+			Inputs: inputs.GetInputs(),
 		},
 	}
 	err = stream.Send(inputsProto)
@@ -349,7 +350,7 @@ func (p *Plugin) getFinalAgent(taskCategory *admin.TaskCategory, cfg *Config) (*
 	return &cfg.DefaultAgent, false
 }
 
-func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, outputs *flyteIdl.LiteralMap) error {
+func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, outputs *flyteIdl.OutputData) error {
 	taskTemplate, err := taskCtx.TaskReader().Read(ctx)
 	if err != nil {
 		return err
@@ -368,6 +369,7 @@ func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, outputs *fly
 		logger.Debugf(ctx, "AgentDeployment didn't return any output, assuming file based outputs.")
 		opReader = ioutils.NewRemoteFileOutputReader(ctx, taskCtx.DataStore(), taskCtx.OutputWriter(), 0)
 	}
+
 	return taskCtx.OutputWriter().Put(ctx, opReader)
 }
 

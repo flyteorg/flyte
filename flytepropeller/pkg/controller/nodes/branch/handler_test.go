@@ -80,7 +80,7 @@ func (parentInfo) IsInDynamicChain() bool {
 }
 
 func createNodeContext(phase v1alpha1.BranchNodePhase, childNodeID *v1alpha1.NodeID, n v1alpha1.ExecutableNode,
-	inputs *core.LiteralMap, nl *execMocks.NodeLookup, eCtx executors.ExecutionContext) (*mocks.NodeExecutionContext, *branchNodeStateHolder) {
+	inputs *core.InputData, nl *execMocks.NodeLookup, eCtx executors.ExecutionContext) (*mocks.NodeExecutionContext, *branchNodeStateHolder) {
 	branchNodeState := handler.BranchNodeState{
 		FinalizedNodeID: childNodeID,
 		Phase:           phase,

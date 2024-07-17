@@ -7,7 +7,7 @@ import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialM
 import { Any, BoolValue, Message, proto3, Timestamp } from "@bufbuild/protobuf";
 import { Identifier } from "../core/identifier_pb.js";
 import { ParameterMap, VariableMap } from "../core/interface_pb.js";
-import { LiteralMap } from "../core/literals_pb.js";
+import { InputData, LiteralMap } from "../core/literals_pb.js";
 import { Annotations, AuthRole, Envs, Labels, NamedEntityIdentifier, Notification, RawOutputDataConfig, Sort } from "./common_pb.js";
 import { SecurityContext } from "../core/security_pb.js";
 import { QualityOfService } from "../core/execution_pb.js";
@@ -316,8 +316,10 @@ export class LaunchPlanSpec extends Message<LaunchPlanSpec> {
   /**
    * Fixed, non-overridable inputs for the Launch Plan.
    * These can not be overridden when an execution is created with this launch plan.
+   * Deprecated: Please use fixec_input_data instead
    *
-   * @generated from field: flyteidl.core.LiteralMap fixed_inputs = 4;
+   * @generated from field: flyteidl.core.LiteralMap fixed_inputs = 4 [deprecated = true];
+   * @deprecated
    */
   fixedInputs?: LiteralMap;
 
@@ -420,6 +422,14 @@ export class LaunchPlanSpec extends Message<LaunchPlanSpec> {
    */
   executionEnvAssignments: ExecutionEnvAssignment[] = [];
 
+  /**
+   * Fixed, non-overridable inputs for the Launch Plan.
+   * These can not be overridden when an execution is created with this launch plan.
+   *
+   * @generated from field: flyteidl.core.InputData fixed_input_data = 23;
+   */
+  fixedInputData?: InputData;
+
   constructor(data?: PartialMessage<LaunchPlanSpec>) {
     super();
     proto3.util.initPartial(data, this);
@@ -445,6 +455,7 @@ export class LaunchPlanSpec extends Message<LaunchPlanSpec> {
     { no: 20, name: "overwrite_cache", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 21, name: "envs", kind: "message", T: Envs },
     { no: 22, name: "execution_env_assignments", kind: "message", T: ExecutionEnvAssignment, repeated: true },
+    { no: 23, name: "fixed_input_data", kind: "message", T: InputData },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): LaunchPlanSpec {

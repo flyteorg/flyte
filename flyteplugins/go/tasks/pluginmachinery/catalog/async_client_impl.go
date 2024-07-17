@@ -40,15 +40,17 @@ func consistentHash(str string) (string, error) {
 }
 
 func hashInputs(ctx context.Context, key Key) (string, error) {
-	inputs := &core.LiteralMap{}
+	inputs := &core.InputData{}
 	if key.TypedInterface.Inputs != nil {
 		retInputs, err := key.InputReader.Get(ctx)
 		if err != nil {
 			return "", err
 		}
+
 		inputs = retInputs
 	}
-	return HashLiteralMap(ctx, inputs, key.CacheIgnoreInputVars)
+
+	return HashInputData(ctx, inputs, key.CacheIgnoreInputVars)
 }
 
 func (c AsyncClientImpl) Download(ctx context.Context, requests ...DownloadRequest) (outputFuture DownloadFuture, err error) {

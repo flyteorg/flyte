@@ -34,7 +34,7 @@ func (e K8sWorkflowExecutor) ID() string {
 }
 
 func (e K8sWorkflowExecutor) Execute(ctx context.Context, data interfaces.ExecutionData) (interfaces.ExecutionResponse, error) {
-	flyteWf, err := e.workflowBuilder.Build(data.WorkflowClosure, data.ExecutionParameters.Inputs, data.ExecutionID, data.Namespace)
+	flyteWf, err := e.workflowBuilder.Build(data.WorkflowClosure, data.ExecutionParameters.InputData, data.ExecutionID, data.Namespace)
 	if err != nil {
 		logger.Infof(ctx, "failed to build the workflow [%+v] %v",
 			data.WorkflowClosure.Primary.Template.Id, err)

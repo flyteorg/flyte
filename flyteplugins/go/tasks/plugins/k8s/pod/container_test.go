@@ -81,29 +81,29 @@ func dummyContainerTaskTemplateWithPodSpec(command []string, args []string) *cor
 
 func dummyContainerTaskMetadata(resources *v1.ResourceRequirements, extendedResources *core.ExtendedResources, returnsServiceAccount bool, containerImage string) pluginsCore.TaskExecutionMetadata {
 	taskMetadata := &pluginsCoreMock.TaskExecutionMetadata{}
-	taskMetadata.On("GetNamespace").Return("test-namespace")
-	taskMetadata.On("GetAnnotations").Return(map[string]string{"annotation-1": "val1"})
-	taskMetadata.On("GetLabels").Return(map[string]string{"label-1": "val1"})
-	taskMetadata.On("GetOwnerReference").Return(metav1.OwnerReference{
+	taskMetadata.OnGetNamespace().Return("test-namespace")
+	taskMetadata.OnGetAnnotations().Return(map[string]string{"annotation-1": "val1"})
+	taskMetadata.OnGetLabels().Return(map[string]string{"label-1": "val1"})
+	taskMetadata.OnGetOwnerReference().Return(metav1.OwnerReference{
 		Kind: "node",
 		Name: "blah",
 	})
 	if returnsServiceAccount {
-		taskMetadata.On("GetK8sServiceAccount").Return(serviceAccount)
+		taskMetadata.OnGetK8sServiceAccount().Return(serviceAccount)
 	} else {
-		taskMetadata.On("GetK8sServiceAccount").Return("")
+		taskMetadata.OnGetK8sServiceAccount().Return("")
 	}
-	taskMetadata.On("GetSecurityContext").Return(core.SecurityContext{
+	taskMetadata.OnGetSecurityContext().Return(core.SecurityContext{
 		RunAs: &core.Identity{K8SServiceAccount: securityContextServiceAccount},
 	})
-	taskMetadata.On("GetOwnerID").Return(types.NamespacedName{
+	taskMetadata.OnGetOwnerID().Return(types.NamespacedName{
 		Namespace: "test-namespace",
 		Name:      "test-owner-name",
 	})
 	taskMetadata.OnGetPlatformResources().Return(&v1.ResourceRequirements{})
 
 	tID := &pluginsCoreMock.TaskExecutionID{}
-	tID.On("GetID").Return(core.TaskExecutionIdentifier{
+	tID.OnGetID().Return(core.TaskExecutionIdentifier{
 		NodeExecutionId: &core.NodeExecutionIdentifier{
 			ExecutionId: &core.WorkflowExecutionIdentifier{
 				Name:    "my_name",
@@ -112,16 +112,16 @@ func dummyContainerTaskMetadata(resources *v1.ResourceRequirements, extendedReso
 			},
 		},
 	})
-	tID.On("GetGeneratedName").Return("my_project:my_domain:my_name")
-	taskMetadata.On("GetTaskExecutionID").Return(tID)
+	tID.OnGetGeneratedName().Return("my_project:my_domain:my_name")
+	taskMetadata.OnGetTaskExecutionID().Return(tID)
 
 	to := &pluginsCoreMock.TaskOverrides{}
-	to.On("GetResources").Return(resources)
-	to.On("GetExtendedResources").Return(extendedResources)
+	to.OnGetResources().Return(resources)
+	to.OnGetExtendedResources().Return(extendedResources)
 	to.OnGetContainerImage().Return(containerImage)
-	taskMetadata.On("GetOverrides").Return(to)
-	taskMetadata.On("IsInterruptible").Return(true)
-	taskMetadata.On("GetEnvironmentVariables").Return(nil)
+	taskMetadata.OnGetOverrides().Return(to)
+	taskMetadata.OnIsInterruptible().Return(true)
+	taskMetadata.OnGetEnvironmentVariables().Return(nil)
 	taskMetadata.OnGetConsoleURL().Return("")
 	return taskMetadata
 }
@@ -130,8 +130,9 @@ func dummyContainerTaskContext(taskTemplate *core.TaskTemplate, taskMetadata plu
 	taskCtx := &pluginsCoreMock.TaskExecutionContext{}
 	inputReader := &pluginsIOMock.InputReader{}
 	inputReader.OnGetInputPrefixPath().Return("test-data-reference")
-	inputReader.OnGetInputPath().Return("test-data-reference")
-	inputReader.OnGetMatch(mock.Anything).Return(&core.LiteralMap{}, nil)
+	inputReader.OnGetInputDataPath().Return("test-data-reference")
+	inputReader.OnGetInputPathMatch(mock.Anything).Return("test-data-reference", nil)
+	inputReader.OnGetMatch(mock.Anything).Return(&core.InputData{}, nil)
 	taskCtx.OnInputReader().Return(inputReader)
 
 	outputReader := &pluginsIOMock.OutputWriter{}

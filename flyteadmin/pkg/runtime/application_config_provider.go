@@ -28,7 +28,7 @@ var flyteAdminConfig = config.MustRegisterSection(flyteAdmin, &interfaces.Applic
 		contextutils.TaskTypeKey.String(), common.RuntimeTypeKey.String(), common.RuntimeVersionKey.String(),
 		contextutils.AppNameKey.String()},
 	MetadataStoragePrefix:       []string{"metadata", "admin"},
-	EventVersion:                2,
+	EventVersion:                3,
 	AsyncEventsBufferSize:       100,
 	MaxParallelism:              25,
 	K8SServiceAccount:           "",

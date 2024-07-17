@@ -64,7 +64,7 @@ func (e *EchoPlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext)
 
 			outputLiterals := make(map[string]*idlcore.Literal, len(inputToOutputVariableMappings))
 			for inputVariableName, outputVariableName := range inputToOutputVariableMappings {
-				outputLiterals[outputVariableName] = inputLiterals.Literals[inputVariableName]
+				outputLiterals[outputVariableName] = inputLiterals.GetInputs().GetLiterals()[inputVariableName]
 			}
 
 			outputLiteralMap := &idlcore.LiteralMap{

@@ -66,15 +66,21 @@ func addTerminalState(
 		closure.OutputResult = &admin.NodeExecutionClosure_OutputUri{
 			OutputUri: request.Event.GetOutputUri(),
 		}
-	} else if request.Event.GetOutputData() != nil {
+	} else if outputData := request.Event.GetOutputData(); outputData != nil || request.Event.GetDeprecatedOutputData() != nil {
+		if outputData == nil {
+			outputData = &core.OutputData{
+				Outputs: request.Event.GetDeprecatedOutputData(),
+			}
+		}
+
 		switch inlineEventDataPolicy {
 		case interfaces.InlineEventDataPolicyStoreInline:
-			closure.OutputResult = &admin.NodeExecutionClosure_OutputData{
-				OutputData: request.Event.GetOutputData(),
+			closure.OutputResult = &admin.NodeExecutionClosure_FullOutputs{
+				FullOutputs: outputData,
 			}
 		default:
 			logger.Debugf(ctx, "Offloading outputs per InlineEventDataPolicy")
-			uri, err := common.OffloadLiteralMap(ctx, storageClient, request.Event.GetOutputData(),
+			uri, err := common.OffloadData(ctx, storageClient, outputData,
 				request.Event.Id.ExecutionId.Project, request.Event.Id.ExecutionId.Domain, request.Event.Id.ExecutionId.Name,
 				request.Event.Id.NodeId, OutputsObjectSuffix)
 			if err != nil {
@@ -385,7 +391,7 @@ func handleNodeExecutionInputs(ctx context.Context,
 		logger.Debugf(ctx, "saving node execution input URI [%s]", request.Event.GetInputUri())
 		nodeExecutionModel.InputURI = request.Event.GetInputUri()
 	case *event.NodeExecutionEvent_InputData:
-		uri, err := common.OffloadLiteralMap(ctx, storageClient, request.Event.GetInputData(),
+		uri, err := common.OffloadData(ctx, storageClient, request.Event.GetInputData(),
 			request.Event.Id.ExecutionId.Project, request.Event.Id.ExecutionId.Domain, request.Event.Id.ExecutionId.Name,
 			request.Event.Id.NodeId, InputsObjectSuffix)
 		if err != nil {

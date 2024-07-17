@@ -54,10 +54,11 @@ class TaskExecutionList(_message.Message):
     def __init__(self, task_executions: _Optional[_Iterable[_Union[TaskExecution, _Mapping]]] = ..., token: _Optional[str] = ...) -> None: ...
 
 class TaskExecutionClosure(_message.Message):
-    __slots__ = ["output_uri", "error", "output_data", "phase", "logs", "started_at", "duration", "created_at", "updated_at", "custom_info", "reason", "task_type", "metadata", "event_version", "reasons"]
+    __slots__ = ["output_uri", "error", "output_data", "full_outputs", "phase", "logs", "started_at", "duration", "created_at", "updated_at", "custom_info", "reason", "task_type", "metadata", "event_version", "reasons"]
     OUTPUT_URI_FIELD_NUMBER: _ClassVar[int]
     ERROR_FIELD_NUMBER: _ClassVar[int]
     OUTPUT_DATA_FIELD_NUMBER: _ClassVar[int]
+    FULL_OUTPUTS_FIELD_NUMBER: _ClassVar[int]
     PHASE_FIELD_NUMBER: _ClassVar[int]
     LOGS_FIELD_NUMBER: _ClassVar[int]
     STARTED_AT_FIELD_NUMBER: _ClassVar[int]
@@ -73,6 +74,7 @@ class TaskExecutionClosure(_message.Message):
     output_uri: str
     error: _execution_pb2.ExecutionError
     output_data: _literals_pb2.LiteralMap
+    full_outputs: _literals_pb2.OutputData
     phase: _execution_pb2.TaskExecution.Phase
     logs: _containers.RepeatedCompositeFieldContainer[_execution_pb2.TaskLog]
     started_at: _timestamp_pb2.Timestamp
@@ -85,7 +87,7 @@ class TaskExecutionClosure(_message.Message):
     metadata: _event_pb2.TaskExecutionMetadata
     event_version: int
     reasons: _containers.RepeatedCompositeFieldContainer[Reason]
-    def __init__(self, output_uri: _Optional[str] = ..., error: _Optional[_Union[_execution_pb2.ExecutionError, _Mapping]] = ..., output_data: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., phase: _Optional[_Union[_execution_pb2.TaskExecution.Phase, str]] = ..., logs: _Optional[_Iterable[_Union[_execution_pb2.TaskLog, _Mapping]]] = ..., started_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., duration: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., updated_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., custom_info: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ..., reason: _Optional[str] = ..., task_type: _Optional[str] = ..., metadata: _Optional[_Union[_event_pb2.TaskExecutionMetadata, _Mapping]] = ..., event_version: _Optional[int] = ..., reasons: _Optional[_Iterable[_Union[Reason, _Mapping]]] = ...) -> None: ...
+    def __init__(self, output_uri: _Optional[str] = ..., error: _Optional[_Union[_execution_pb2.ExecutionError, _Mapping]] = ..., output_data: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., full_outputs: _Optional[_Union[_literals_pb2.OutputData, _Mapping]] = ..., phase: _Optional[_Union[_execution_pb2.TaskExecution.Phase, str]] = ..., logs: _Optional[_Iterable[_Union[_execution_pb2.TaskLog, _Mapping]]] = ..., started_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., duration: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., updated_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., custom_info: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ..., reason: _Optional[str] = ..., task_type: _Optional[str] = ..., metadata: _Optional[_Union[_event_pb2.TaskExecutionMetadata, _Mapping]] = ..., event_version: _Optional[int] = ..., reasons: _Optional[_Iterable[_Union[Reason, _Mapping]]] = ...) -> None: ...
 
 class Reason(_message.Message):
     __slots__ = ["occurred_at", "message"]
@@ -102,15 +104,19 @@ class TaskExecutionGetDataRequest(_message.Message):
     def __init__(self, id: _Optional[_Union[_identifier_pb2.TaskExecutionIdentifier, _Mapping]] = ...) -> None: ...
 
 class TaskExecutionGetDataResponse(_message.Message):
-    __slots__ = ["inputs", "outputs", "full_inputs", "full_outputs", "flyte_urls"]
+    __slots__ = ["inputs", "outputs", "full_inputs", "full_outputs", "input_data", "output_data", "flyte_urls"]
     INPUTS_FIELD_NUMBER: _ClassVar[int]
     OUTPUTS_FIELD_NUMBER: _ClassVar[int]
     FULL_INPUTS_FIELD_NUMBER: _ClassVar[int]
     FULL_OUTPUTS_FIELD_NUMBER: _ClassVar[int]
+    INPUT_DATA_FIELD_NUMBER: _ClassVar[int]
+    OUTPUT_DATA_FIELD_NUMBER: _ClassVar[int]
     FLYTE_URLS_FIELD_NUMBER: _ClassVar[int]
     inputs: _common_pb2.UrlBlob
     outputs: _common_pb2.UrlBlob
     full_inputs: _literals_pb2.LiteralMap
     full_outputs: _literals_pb2.LiteralMap
+    input_data: _literals_pb2.InputData
+    output_data: _literals_pb2.OutputData
     flyte_urls: _common_pb2.FlyteURLs
-    def __init__(self, inputs: _Optional[_Union[_common_pb2.UrlBlob, _Mapping]] = ..., outputs: _Optional[_Union[_common_pb2.UrlBlob, _Mapping]] = ..., full_inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., full_outputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., flyte_urls: _Optional[_Union[_common_pb2.FlyteURLs, _Mapping]] = ...) -> None: ...
+    def __init__(self, inputs: _Optional[_Union[_common_pb2.UrlBlob, _Mapping]] = ..., outputs: _Optional[_Union[_common_pb2.UrlBlob, _Mapping]] = ..., full_inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., full_outputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., input_data: _Optional[_Union[_literals_pb2.InputData, _Mapping]] = ..., output_data: _Optional[_Union[_literals_pb2.OutputData, _Mapping]] = ..., flyte_urls: _Optional[_Union[_common_pb2.FlyteURLs, _Mapping]] = ...) -> None: ...

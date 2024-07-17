@@ -554,7 +554,7 @@ func (t Handler) Handle(ctx context.Context, nCtx interfaces.NodeExecutionContex
 	// So now we will derive this from the plugin phase
 	// TODO @kumare re-evaluate this decision
 
-	var inputs *core.LiteralMap
+	var inputs *core.InputData
 	if ts.PluginPhase == pluginCore.PhaseUndefined && t.eventConfig.RawOutputPolicy == controllerConfig.RawOutputPolicyInline {
 		// The task should only reach undefined exactly once. Since we want to send the inputs inline at some point in the task execution flow (but not necessarily every event), we send them for this event transition only.
 		// The calls to read from the catalog below may call InputReader.Get subsequent times, but the underlying implementation uses a CachedInputReader that will

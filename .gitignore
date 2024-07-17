@@ -28,6 +28,8 @@ dist
 *.db
 vendor/
 /docker/sandbox-bundled/images/tar
+rsts/_tags/
+bin/
 **/bin/
 docs/_tags/
 docs/flytectl

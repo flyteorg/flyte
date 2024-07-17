@@ -11,6 +11,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
+	core2 "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
@@ -114,9 +115,11 @@ func advancePodPhases(ctx context.Context, store *storage.DataStore, outputWrite
 			}
 
 			err = store.WriteProtobuf(ctx, ref, storage.Options{},
-				coreutils.MustMakeLiteral(map[string]interface{}{
-					"x": 5,
-				}).GetMap())
+				&core2.OutputData{
+					Outputs: coreutils.MustMakeLiteral(map[string]interface{}{
+						"x": 5,
+					}).GetMap(),
+				})
 			if err != nil {
 				return err
 			}

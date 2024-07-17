@@ -170,7 +170,7 @@ func (p Plugin) createImpl(ctx context.Context, taskCtx webapi.TaskExecutionCont
 	return &resourceMeta, &resource, nil
 }
 
-func createQueryJob(jobID string, custom *structpb.Struct, inputs *flyteIdlCore.LiteralMap) (*bigquery.Job, error) {
+func createQueryJob(jobID string, custom *structpb.Struct, inputs *flyteIdlCore.InputData) (*bigquery.Job, error) {
 	queryJobConfig, err := unmarshalQueryJobConfig(custom)
 
 	if err != nil {
@@ -328,16 +328,18 @@ func writeOutput(ctx context.Context, tCtx webapi.StatusContext, OutputLocation 
 		return nil
 	}
 	return tCtx.OutputWriter().Put(ctx, ioutils.NewInMemoryOutputReader(
-		&flyteIdlCore.LiteralMap{
-			Literals: map[string]*flyteIdlCore.Literal{
-				"results": {
-					Value: &flyteIdlCore.Literal_Scalar{
-						Scalar: &flyteIdlCore.Scalar{
-							Value: &flyteIdlCore.Scalar_StructuredDataset{
-								StructuredDataset: &flyteIdlCore.StructuredDataset{
-									Uri: OutputLocation,
-									Metadata: &flyteIdlCore.StructuredDatasetMetadata{
-										StructuredDatasetType: resultsStructuredDatasetType.GetType().GetStructuredDatasetType(),
+		&flyteIdlCore.OutputData{
+			Outputs: &flyteIdlCore.LiteralMap{
+				Literals: map[string]*flyteIdlCore.Literal{
+					"results": {
+						Value: &flyteIdlCore.Literal_Scalar{
+							Scalar: &flyteIdlCore.Scalar{
+								Value: &flyteIdlCore.Scalar_StructuredDataset{
+									StructuredDataset: &flyteIdlCore.StructuredDataset{
+										Uri: OutputLocation,
+										Metadata: &flyteIdlCore.StructuredDatasetMetadata{
+											StructuredDatasetType: resultsStructuredDatasetType.GetType().GetStructuredDatasetType(),
+										},
 									},
 								},
 							},

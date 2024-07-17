@@ -1,5 +1,5 @@
 export REPOSITORY=flytestdlib
-export REPO_ROOT=..
+export REPO_ROOT ?= $(shell pwd)/../
 include ../boilerplate/flyte/golang_test_targets/Makefile
 
 .PHONY: update_boilerplate

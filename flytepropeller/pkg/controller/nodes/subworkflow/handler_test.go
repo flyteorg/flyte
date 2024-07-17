@@ -92,7 +92,7 @@ func createNodeContextWithVersion(phase v1alpha1.WorkflowNodePhase, n v1alpha1.E
 	})
 
 	ir := &mocks4.InputReader{}
-	inputs := &core.LiteralMap{}
+	inputs := &core.InputData{}
 	ir.OnGetMatch(mock.Anything).Return(inputs, nil)
 
 	nCtx := &mocks3.NodeExecutionContext{}
@@ -177,7 +177,7 @@ func TestWorkflowNodeHandler_StartNode_Launchplan(t *testing.T) {
 				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
 			}),
 			mock.MatchedBy(func(o *core.Identifier) bool { return lpID == o }),
-			mock.MatchedBy(func(o *core.LiteralMap) bool { return o.Literals == nil }),
+			mock.MatchedBy(func(o *core.InputData) bool { return o.GetInputs().GetLiterals() == nil }),
 		).Return(nil)
 
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseUndefined, mockNode, mockNodeStatus)
@@ -202,7 +202,7 @@ func TestWorkflowNodeHandler_StartNode_Launchplan(t *testing.T) {
 				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
 			}),
 			mock.MatchedBy(func(o *core.Identifier) bool { return lpID == o }),
-			mock.MatchedBy(func(o *core.LiteralMap) bool { return o.Literals == nil }),
+			mock.MatchedBy(func(o *core.InputData) bool { return o.GetInputs().GetLiterals() == nil }),
 		).Return(nil)
 
 		nCtx := createNodeContextV1(v1alpha1.WorkflowNodePhaseUndefined, mockNode, mockNodeStatus)
@@ -254,7 +254,7 @@ func TestWorkflowNodeHandler_CheckNodeStatus(t *testing.T) {
 			}),
 		).Return(&admin.ExecutionClosure{
 			Phase: core.WorkflowExecution_RUNNING,
-		}, &core.LiteralMap{}, nil)
+		}, &core.OutputData{}, nil)
 
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
 		s, err := h.Handle(ctx, nCtx)
@@ -275,7 +275,7 @@ func TestWorkflowNodeHandler_CheckNodeStatus(t *testing.T) {
 			}),
 		).Return(&admin.ExecutionClosure{
 			Phase: core.WorkflowExecution_RUNNING,
-		}, &core.LiteralMap{}, nil)
+		}, &core.OutputData{}, nil)
 
 		nCtx := createNodeContextV1(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
 		s, err := h.Handle(ctx, nCtx)

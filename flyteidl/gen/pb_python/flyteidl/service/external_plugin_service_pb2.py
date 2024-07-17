@@ -15,7 +15,7 @@ from flyteidl.core import literals_pb2 as flyteidl_dot_core_dot_literals__pb2
 from flyteidl.core import tasks_pb2 as flyteidl_dot_core_dot_tasks__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n.flyteidl/service/external_plugin_service.proto\x12\x10\x66lyteidl.service\x1a\x1c\x66lyteidl/core/literals.proto\x1a\x19\x66lyteidl/core/tasks.proto\"\xa8\x01\n\x11TaskCreateRequest\x12\x31\n\x06inputs\x18\x01 \x01(\x0b\x32\x19.flyteidl.core.LiteralMapR\x06inputs\x12\x37\n\x08template\x18\x02 \x01(\x0b\x32\x1b.flyteidl.core.TaskTemplateR\x08template\x12#\n\routput_prefix\x18\x03 \x01(\tR\x0coutputPrefix:\x02\x18\x01\"/\n\x12TaskCreateResponse\x12\x15\n\x06job_id\x18\x01 \x01(\tR\x05jobId:\x02\x18\x01\"H\n\x0eTaskGetRequest\x12\x1b\n\ttask_type\x18\x01 \x01(\tR\x08taskType\x12\x15\n\x06job_id\x18\x02 \x01(\tR\x05jobId:\x02\x18\x01\"y\n\x0fTaskGetResponse\x12-\n\x05state\x18\x01 \x01(\x0e\x32\x17.flyteidl.service.StateR\x05state\x12\x33\n\x07outputs\x18\x02 \x01(\x0b\x32\x19.flyteidl.core.LiteralMapR\x07outputs:\x02\x18\x01\"K\n\x11TaskDeleteRequest\x12\x1b\n\ttask_type\x18\x01 \x01(\tR\x08taskType\x12\x15\n\x06job_id\x18\x02 \x01(\tR\x05jobId:\x02\x18\x01\"\x18\n\x12TaskDeleteResponse:\x02\x18\x01*b\n\x05State\x12\x15\n\x11RETRYABLE_FAILURE\x10\x00\x12\x15\n\x11PERMANENT_FAILURE\x10\x01\x12\x0b\n\x07PENDING\x10\x02\x12\x0b\n\x07RUNNING\x10\x03\x12\r\n\tSUCCEEDED\x10\x04\x1a\x02\x18\x01\x32\xa8\x02\n\x15\x45xternalPluginService\x12\\\n\nCreateTask\x12#.flyteidl.service.TaskCreateRequest\x1a$.flyteidl.service.TaskCreateResponse\"\x03\x88\x02\x01\x12S\n\x07GetTask\x12 .flyteidl.service.TaskGetRequest\x1a!.flyteidl.service.TaskGetResponse\"\x03\x88\x02\x01\x12\\\n\nDeleteTask\x12#.flyteidl.service.TaskDeleteRequest\x1a$.flyteidl.service.TaskDeleteResponse\"\x03\x88\x02\x01\x42\xd2\x01\n\x14\x63om.flyteidl.serviceB\x1a\x45xternalPluginServiceProtoP\x01Z=github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service\xa2\x02\x03\x46SX\xaa\x02\x10\x46lyteidl.Service\xca\x02\x10\x46lyteidl\\Service\xe2\x02\x1c\x46lyteidl\\Service\\GPBMetadata\xea\x02\x11\x46lyteidl::Serviceb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n.flyteidl/service/external_plugin_service.proto\x12\x10\x66lyteidl.service\x1a\x1c\x66lyteidl/core/literals.proto\x1a\x19\x66lyteidl/core/tasks.proto\"\xf3\x01\n\x11TaskCreateRequest\x12J\n\x11\x64\x65precated_inputs\x18\x01 \x01(\x0b\x32\x19.flyteidl.core.LiteralMapB\x02\x18\x01R\x10\x64\x65precatedInputs\x12\x37\n\x08template\x18\x02 \x01(\x0b\x32\x1b.flyteidl.core.TaskTemplateR\x08template\x12#\n\routput_prefix\x18\x03 \x01(\tR\x0coutputPrefix\x12\x30\n\x06inputs\x18\x04 \x01(\x0b\x32\x18.flyteidl.core.InputDataR\x06inputs:\x02\x18\x01\"/\n\x12TaskCreateResponse\x12\x15\n\x06job_id\x18\x01 \x01(\tR\x05jobId:\x02\x18\x01\"H\n\x0eTaskGetRequest\x12\x1b\n\ttask_type\x18\x01 \x01(\tR\x08taskType\x12\x15\n\x06job_id\x18\x02 \x01(\tR\x05jobId:\x02\x18\x01\"\xc3\x01\n\x0fTaskGetResponse\x12-\n\x05state\x18\x01 \x01(\x0e\x32\x17.flyteidl.service.StateR\x05state\x12H\n\x12\x64\x65precated_outputs\x18\x02 \x01(\x0b\x32\x19.flyteidl.core.LiteralMapR\x11\x64\x65precatedOutputs\x12\x33\n\x07outputs\x18\x03 \x01(\x0b\x32\x19.flyteidl.core.OutputDataR\x07outputs:\x02\x18\x01\"K\n\x11TaskDeleteRequest\x12\x1b\n\ttask_type\x18\x01 \x01(\tR\x08taskType\x12\x15\n\x06job_id\x18\x02 \x01(\tR\x05jobId:\x02\x18\x01\"\x18\n\x12TaskDeleteResponse:\x02\x18\x01*b\n\x05State\x12\x15\n\x11RETRYABLE_FAILURE\x10\x00\x12\x15\n\x11PERMANENT_FAILURE\x10\x01\x12\x0b\n\x07PENDING\x10\x02\x12\x0b\n\x07RUNNING\x10\x03\x12\r\n\tSUCCEEDED\x10\x04\x1a\x02\x18\x01\x32\xa8\x02\n\x15\x45xternalPluginService\x12\\\n\nCreateTask\x12#.flyteidl.service.TaskCreateRequest\x1a$.flyteidl.service.TaskCreateResponse\"\x03\x88\x02\x01\x12S\n\x07GetTask\x12 .flyteidl.service.TaskGetRequest\x1a!.flyteidl.service.TaskGetResponse\"\x03\x88\x02\x01\x12\\\n\nDeleteTask\x12#.flyteidl.service.TaskDeleteRequest\x1a$.flyteidl.service.TaskDeleteResponse\"\x03\x88\x02\x01\x42\xd2\x01\n\x14\x63om.flyteidl.serviceB\x1a\x45xternalPluginServiceProtoP\x01Z=github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service\xa2\x02\x03\x46SX\xaa\x02\x10\x46lyteidl.Service\xca\x02\x10\x46lyteidl\\Service\xe2\x02\x1c\x46lyteidl\\Service\\GPBMetadata\xea\x02\x11\x46lyteidl::Serviceb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -26,6 +26,8 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._serialized_options = b'\n\024com.flyteidl.serviceB\032ExternalPluginServiceProtoP\001Z=github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service\242\002\003FSX\252\002\020Flyteidl.Service\312\002\020Flyteidl\\Service\342\002\034Flyteidl\\Service\\GPBMetadata\352\002\021Flyteidl::Service'
   _STATE._options = None
   _STATE._serialized_options = b'\030\001'
+  _TASKCREATEREQUEST.fields_by_name['deprecated_inputs']._options = None
+  _TASKCREATEREQUEST.fields_by_name['deprecated_inputs']._serialized_options = b'\030\001'
   _TASKCREATEREQUEST._options = None
   _TASKCREATEREQUEST._serialized_options = b'\030\001'
   _TASKCREATERESPONSE._options = None
@@ -44,20 +46,20 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _EXTERNALPLUGINSERVICE.methods_by_name['GetTask']._serialized_options = b'\210\002\001'
   _EXTERNALPLUGINSERVICE.methods_by_name['DeleteTask']._options = None
   _EXTERNALPLUGINSERVICE.methods_by_name['DeleteTask']._serialized_options = b'\210\002\001'
-  _globals['_STATE']._serialized_start=645
-  _globals['_STATE']._serialized_end=743
+  _globals['_STATE']._serialized_start=795
+  _globals['_STATE']._serialized_end=893
   _globals['_TASKCREATEREQUEST']._serialized_start=126
-  _globals['_TASKCREATEREQUEST']._serialized_end=294
-  _globals['_TASKCREATERESPONSE']._serialized_start=296
-  _globals['_TASKCREATERESPONSE']._serialized_end=343
-  _globals['_TASKGETREQUEST']._serialized_start=345
-  _globals['_TASKGETREQUEST']._serialized_end=417
-  _globals['_TASKGETRESPONSE']._serialized_start=419
-  _globals['_TASKGETRESPONSE']._serialized_end=540
-  _globals['_TASKDELETEREQUEST']._serialized_start=542
-  _globals['_TASKDELETEREQUEST']._serialized_end=617
-  _globals['_TASKDELETERESPONSE']._serialized_start=619
-  _globals['_TASKDELETERESPONSE']._serialized_end=643
-  _globals['_EXTERNALPLUGINSERVICE']._serialized_start=746
-  _globals['_EXTERNALPLUGINSERVICE']._serialized_end=1042
+  _globals['_TASKCREATEREQUEST']._serialized_end=369
+  _globals['_TASKCREATERESPONSE']._serialized_start=371
+  _globals['_TASKCREATERESPONSE']._serialized_end=418
+  _globals['_TASKGETREQUEST']._serialized_start=420
+  _globals['_TASKGETREQUEST']._serialized_end=492
+  _globals['_TASKGETRESPONSE']._serialized_start=495
+  _globals['_TASKGETRESPONSE']._serialized_end=690
+  _globals['_TASKDELETEREQUEST']._serialized_start=692
+  _globals['_TASKDELETEREQUEST']._serialized_end=767
+  _globals['_TASKDELETERESPONSE']._serialized_start=769
+  _globals['_TASKDELETERESPONSE']._serialized_end=793
+  _globals['_EXTERNALPLUGINSERVICE']._serialized_start=896
+  _globals['_EXTERNALPLUGINSERVICE']._serialized_end=1192
 # @@protoc_insertion_point(module_scope)

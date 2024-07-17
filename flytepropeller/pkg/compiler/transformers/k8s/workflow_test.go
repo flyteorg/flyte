@@ -157,10 +157,12 @@ func TestBuildFlyteWorkflow_withInputs(t *testing.T) {
 	assert.NoError(t, err)
 	stringLiteral, err := coreutils.MakePrimitiveLiteral("hello")
 	assert.NoError(t, err)
-	inputs := &core.LiteralMap{
-		Literals: map[string]*core.Literal{
-			"x": intLiteral,
-			"y": stringLiteral,
+	inputs := &core.InputData{
+		Inputs: &core.LiteralMap{
+			Literals: map[string]*core.Literal{
+				"x": intLiteral,
+				"y": stringLiteral,
+			},
 		},
 	}
 
@@ -222,10 +224,12 @@ func TestBuildFlyteWorkflow_withUnionInputs(t *testing.T) {
 	assert.NoError(t, err)
 	floatLiteral, err := coreutils.MakePrimitiveLiteral(1.0)
 	assert.NoError(t, err)
-	inputs := &core.LiteralMap{
-		Literals: map[string]*core.Literal{
-			"x": {Value: &core.Literal_Scalar{Scalar: &core.Scalar{Value: &core.Scalar_Union{Union: &core.Union{Value: floatLiteral, Type: &floatType}}}}},
-			"y": {Value: &core.Literal_Scalar{Scalar: &core.Scalar{Value: &core.Scalar_Union{Union: &core.Union{Value: stringLiteral, Type: &strType}}}}},
+	inputs := &core.InputData{
+		Inputs: &core.LiteralMap{
+			Literals: map[string]*core.Literal{
+				"x": {Value: &core.Literal_Scalar{Scalar: &core.Scalar{Value: &core.Scalar_Union{Union: &core.Union{Value: floatLiteral, Type: &floatType}}}}},
+				"y": {Value: &core.Literal_Scalar{Scalar: &core.Scalar{Value: &core.Scalar_Union{Union: &core.Union{Value: stringLiteral, Type: &strType}}}}},
+			},
 		},
 	}
 
@@ -338,9 +342,11 @@ func TestBuildFlyteWorkflow_withBranch(t *testing.T) {
 
 	wf, err := BuildFlyteWorkflow(
 		w,
-		&core.LiteralMap{
-			Literals: map[string]*core.Literal{
-				"my_input": coreutils.MustMakePrimitiveLiteral(1.0),
+		&core.InputData{
+			Inputs: &core.LiteralMap{
+				Literals: map[string]*core.Literal{
+					"my_input": coreutils.MustMakePrimitiveLiteral(1.0),
+				},
 			},
 		}, &core.WorkflowExecutionIdentifier{
 			Project: "p",

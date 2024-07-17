@@ -37,7 +37,7 @@ type gatherOutputsRequest struct {
 	ctx             context.Context
 	reader          *ioutils.RemoteFileOutputReader
 	responseChannel chan struct {
-		literalMap map[string]*idlcore.Literal
+		outputData *idlcore.OutputData
 		error
 	}
 }
@@ -74,7 +74,7 @@ func (w *worker) run() {
 				error
 			}{nodeStatus, err}
 		case gatherOutputsRequest := <-w.gatherOutputsRequestChannel:
-			var literalMap map[string]*idlcore.Literal
+			var outputData *idlcore.OutputData
 			var err error
 			func() {
 				defer func() {
@@ -92,14 +92,14 @@ func (w *worker) run() {
 				} else if executionErr != nil {
 					err = fmt.Errorf("%s", executionErr.String())
 				} else {
-					literalMap = outputs.GetLiterals()
+					outputData = outputs
 				}
 			}()
 
 			gatherOutputsRequest.responseChannel <- struct {
-				literalMap map[string]*idlcore.Literal
+				outputData *idlcore.OutputData
 				error
-			}{literalMap, nil}
+			}{outputData, nil}
 		}
 	}
 }

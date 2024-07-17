@@ -695,6 +695,90 @@ export class LiteralMap extends Message<LiteralMap> {
 }
 
 /**
+ * InputData represents the inputs to a task or workflow. It's an envelope that contains a map of input variables to
+ * their values.
+ *
+ * @generated from message flyteidl.core.InputData
+ */
+export class InputData extends Message<InputData> {
+  /**
+   * A map of input variables to their values.
+   *
+   * @generated from field: flyteidl.core.LiteralMap inputs = 1;
+   */
+  inputs?: LiteralMap;
+
+  constructor(data?: PartialMessage<InputData>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.core.InputData";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "inputs", kind: "message", T: LiteralMap },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): InputData {
+    return new InputData().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): InputData {
+    return new InputData().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): InputData {
+    return new InputData().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: InputData | PlainMessage<InputData> | undefined, b: InputData | PlainMessage<InputData> | undefined): boolean {
+    return proto3.util.equals(InputData, a, b);
+  }
+}
+
+/**
+ * OutputData represents the outputs of a task or workflow. It's an envelope that contains a map of output variables to
+ * their values.
+ *
+ * @generated from message flyteidl.core.OutputData
+ */
+export class OutputData extends Message<OutputData> {
+  /**
+   * A map of output variables to their values.
+   *
+   * @generated from field: flyteidl.core.LiteralMap outputs = 1;
+   */
+  outputs?: LiteralMap;
+
+  constructor(data?: PartialMessage<OutputData>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.core.OutputData";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "outputs", kind: "message", T: LiteralMap },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): OutputData {
+    return new OutputData().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): OutputData {
+    return new OutputData().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): OutputData {
+    return new OutputData().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: OutputData | PlainMessage<OutputData> | undefined, b: OutputData | PlainMessage<OutputData> | undefined): boolean {
+    return proto3.util.equals(OutputData, a, b);
+  }
+}
+
+/**
  * A collection of BindingData items.
  *
  * @generated from message flyteidl.core.BindingDataCollection

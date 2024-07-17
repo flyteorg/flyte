@@ -63,7 +63,7 @@ class Auth(_message.Message):
     def __init__(self, assumable_iam_role: _Optional[str] = ..., kubernetes_service_account: _Optional[str] = ...) -> None: ...
 
 class LaunchPlanSpec(_message.Message):
-    __slots__ = ["workflow_id", "entity_metadata", "default_inputs", "fixed_inputs", "role", "labels", "annotations", "auth", "auth_role", "security_context", "quality_of_service", "raw_output_data_config", "max_parallelism", "interruptible", "overwrite_cache", "envs", "execution_env_assignments"]
+    __slots__ = ["workflow_id", "entity_metadata", "default_inputs", "fixed_inputs", "role", "labels", "annotations", "auth", "auth_role", "security_context", "quality_of_service", "raw_output_data_config", "max_parallelism", "interruptible", "overwrite_cache", "envs", "execution_env_assignments", "fixed_input_data"]
     WORKFLOW_ID_FIELD_NUMBER: _ClassVar[int]
     ENTITY_METADATA_FIELD_NUMBER: _ClassVar[int]
     DEFAULT_INPUTS_FIELD_NUMBER: _ClassVar[int]
@@ -81,6 +81,7 @@ class LaunchPlanSpec(_message.Message):
     OVERWRITE_CACHE_FIELD_NUMBER: _ClassVar[int]
     ENVS_FIELD_NUMBER: _ClassVar[int]
     EXECUTION_ENV_ASSIGNMENTS_FIELD_NUMBER: _ClassVar[int]
+    FIXED_INPUT_DATA_FIELD_NUMBER: _ClassVar[int]
     workflow_id: _identifier_pb2.Identifier
     entity_metadata: LaunchPlanMetadata
     default_inputs: _interface_pb2.ParameterMap
@@ -98,7 +99,8 @@ class LaunchPlanSpec(_message.Message):
     overwrite_cache: bool
     envs: _common_pb2.Envs
     execution_env_assignments: _containers.RepeatedCompositeFieldContainer[_execution_envs_pb2.ExecutionEnvAssignment]
-    def __init__(self, workflow_id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., entity_metadata: _Optional[_Union[LaunchPlanMetadata, _Mapping]] = ..., default_inputs: _Optional[_Union[_interface_pb2.ParameterMap, _Mapping]] = ..., fixed_inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., role: _Optional[str] = ..., labels: _Optional[_Union[_common_pb2.Labels, _Mapping]] = ..., annotations: _Optional[_Union[_common_pb2.Annotations, _Mapping]] = ..., auth: _Optional[_Union[Auth, _Mapping]] = ..., auth_role: _Optional[_Union[_common_pb2.AuthRole, _Mapping]] = ..., security_context: _Optional[_Union[_security_pb2.SecurityContext, _Mapping]] = ..., quality_of_service: _Optional[_Union[_execution_pb2.QualityOfService, _Mapping]] = ..., raw_output_data_config: _Optional[_Union[_common_pb2.RawOutputDataConfig, _Mapping]] = ..., max_parallelism: _Optional[int] = ..., interruptible: _Optional[_Union[_wrappers_pb2.BoolValue, _Mapping]] = ..., overwrite_cache: bool = ..., envs: _Optional[_Union[_common_pb2.Envs, _Mapping]] = ..., execution_env_assignments: _Optional[_Iterable[_Union[_execution_envs_pb2.ExecutionEnvAssignment, _Mapping]]] = ...) -> None: ...
+    fixed_input_data: _literals_pb2.InputData
+    def __init__(self, workflow_id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., entity_metadata: _Optional[_Union[LaunchPlanMetadata, _Mapping]] = ..., default_inputs: _Optional[_Union[_interface_pb2.ParameterMap, _Mapping]] = ..., fixed_inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., role: _Optional[str] = ..., labels: _Optional[_Union[_common_pb2.Labels, _Mapping]] = ..., annotations: _Optional[_Union[_common_pb2.Annotations, _Mapping]] = ..., auth: _Optional[_Union[Auth, _Mapping]] = ..., auth_role: _Optional[_Union[_common_pb2.AuthRole, _Mapping]] = ..., security_context: _Optional[_Union[_security_pb2.SecurityContext, _Mapping]] = ..., quality_of_service: _Optional[_Union[_execution_pb2.QualityOfService, _Mapping]] = ..., raw_output_data_config: _Optional[_Union[_common_pb2.RawOutputDataConfig, _Mapping]] = ..., max_parallelism: _Optional[int] = ..., interruptible: _Optional[_Union[_wrappers_pb2.BoolValue, _Mapping]] = ..., overwrite_cache: bool = ..., envs: _Optional[_Union[_common_pb2.Envs, _Mapping]] = ..., execution_env_assignments: _Optional[_Iterable[_Union[_execution_envs_pb2.ExecutionEnvAssignment, _Mapping]]] = ..., fixed_input_data: _Optional[_Union[_literals_pb2.InputData, _Mapping]] = ...) -> None: ...
 
 class LaunchPlanClosure(_message.Message):
     __slots__ = ["state", "expected_inputs", "expected_outputs", "created_at", "updated_at"]

@@ -7,7 +7,7 @@ import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialM
 import { Message, proto3, Struct, Timestamp } from "@bufbuild/protobuf";
 import { Identifier, NodeExecutionIdentifier, TaskExecutionIdentifier, WorkflowExecutionIdentifier } from "../core/identifier_pb.js";
 import { ExecutionError, NodeExecution_Phase, TaskExecution_Phase, TaskLog, WorkflowExecution_Phase } from "../core/execution_pb.js";
-import { LiteralMap } from "../core/literals_pb.js";
+import { InputData, LiteralMap, OutputData } from "../core/literals_pb.js";
 import { CatalogCacheStatus, CatalogMetadata, CatalogReservation_Status } from "../core/catalog_pb.js";
 import { CompiledWorkflowClosure } from "../core/compiler_pb.js";
 
@@ -65,12 +65,27 @@ export class WorkflowExecutionEvent extends Message<WorkflowExecutionEvent> {
   } | {
     /**
      * Raw output data produced by this workflow execution.
+     * Deprecated: please use output_data instead
      *
-     * @generated from field: flyteidl.core.LiteralMap output_data = 7;
+     * @generated from field: flyteidl.core.LiteralMap deprecated_output_data = 7 [deprecated = true];
+     * @deprecated
      */
     value: LiteralMap;
+    case: "deprecatedOutputData";
+  } | {
+    /**
+     * Raw output data produced by this workflow execution.
+     *
+     * @generated from field: flyteidl.core.OutputData output_data = 8;
+     */
+    value: OutputData;
     case: "outputData";
   } | { case: undefined; value?: undefined } = { case: undefined };
+
+  /**
+   * @generated from field: int32 event_version = 9;
+   */
+  eventVersion = 0;
 
   constructor(data?: PartialMessage<WorkflowExecutionEvent>) {
     super();
@@ -86,7 +101,9 @@ export class WorkflowExecutionEvent extends Message<WorkflowExecutionEvent> {
     { no: 4, name: "occurred_at", kind: "message", T: Timestamp },
     { no: 5, name: "output_uri", kind: "scalar", T: 9 /* ScalarType.STRING */, oneof: "output_result" },
     { no: 6, name: "error", kind: "message", T: ExecutionError, oneof: "output_result" },
-    { no: 7, name: "output_data", kind: "message", T: LiteralMap, oneof: "output_result" },
+    { no: 7, name: "deprecated_output_data", kind: "message", T: LiteralMap, oneof: "output_result" },
+    { no: 8, name: "output_data", kind: "message", T: OutputData, oneof: "output_result" },
+    { no: 9, name: "event_version", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): WorkflowExecutionEvent {
@@ -149,10 +166,20 @@ export class NodeExecutionEvent extends Message<NodeExecutionEvent> {
   } | {
     /**
      * Raw input data consumed by this node execution.
+     * Deprecated: please use input_data instead
      *
-     * @generated from field: flyteidl.core.LiteralMap input_data = 20;
+     * @generated from field: flyteidl.core.LiteralMap deprecated_input_data = 20 [deprecated = true];
+     * @deprecated
      */
     value: LiteralMap;
+    case: "deprecatedInputData";
+  } | {
+    /**
+     * Raw input data consumed by this node execution.
+     *
+     * @generated from field: flyteidl.core.InputData input_data = 25;
+     */
+    value: InputData;
     case: "inputData";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
@@ -178,11 +205,21 @@ export class NodeExecutionEvent extends Message<NodeExecutionEvent> {
     case: "error";
   } | {
     /**
-     * Raw output data produced by this node execution.
+     * Raw output data produced by this workflow execution.
+     * Deprecated: please use output_data instead
      *
-     * @generated from field: flyteidl.core.LiteralMap output_data = 15;
+     * @generated from field: flyteidl.core.LiteralMap deprecated_output_data = 15 [deprecated = true];
+     * @deprecated
      */
     value: LiteralMap;
+    case: "deprecatedOutputData";
+  } | {
+    /**
+     * Raw output data produced by this workflow execution.
+     *
+     * @generated from field: flyteidl.core.OutputData output_data = 26;
+     */
+    value: OutputData;
     case: "outputData";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
@@ -320,10 +357,12 @@ export class NodeExecutionEvent extends Message<NodeExecutionEvent> {
     { no: 3, name: "phase", kind: "enum", T: proto3.getEnumType(NodeExecution_Phase) },
     { no: 4, name: "occurred_at", kind: "message", T: Timestamp },
     { no: 5, name: "input_uri", kind: "scalar", T: 9 /* ScalarType.STRING */, oneof: "input_value" },
-    { no: 20, name: "input_data", kind: "message", T: LiteralMap, oneof: "input_value" },
+    { no: 20, name: "deprecated_input_data", kind: "message", T: LiteralMap, oneof: "input_value" },
+    { no: 25, name: "input_data", kind: "message", T: InputData, oneof: "input_value" },
     { no: 6, name: "output_uri", kind: "scalar", T: 9 /* ScalarType.STRING */, oneof: "output_result" },
     { no: 7, name: "error", kind: "message", T: ExecutionError, oneof: "output_result" },
-    { no: 15, name: "output_data", kind: "message", T: LiteralMap, oneof: "output_result" },
+    { no: 15, name: "deprecated_output_data", kind: "message", T: LiteralMap, oneof: "output_result" },
+    { no: 26, name: "output_data", kind: "message", T: OutputData, oneof: "output_result" },
     { no: 8, name: "workflow_node_metadata", kind: "message", T: WorkflowNodeMetadata, oneof: "target_metadata" },
     { no: 14, name: "task_node_metadata", kind: "message", T: TaskNodeMetadata, oneof: "target_metadata" },
     { no: 9, name: "parent_task_metadata", kind: "message", T: ParentTaskExecutionMetadata },
@@ -722,11 +761,21 @@ export class TaskExecutionEvent extends Message<TaskExecutionEvent> {
     case: "inputUri";
   } | {
     /**
-     * Raw input data consumed by this task execution.
+     * Raw input data consumed by this node execution.
+     * Deprecated: please use input_data instead
      *
-     * @generated from field: flyteidl.core.LiteralMap input_data = 19;
+     * @generated from field: flyteidl.core.LiteralMap deprecated_input_data = 19 [deprecated = true];
+     * @deprecated
      */
     value: LiteralMap;
+    case: "deprecatedInputData";
+  } | {
+    /**
+     * Raw input data consumed by this node execution.
+     *
+     * @generated from field: flyteidl.core.InputData input_data = 23;
+     */
+    value: InputData;
     case: "inputData";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
@@ -752,11 +801,21 @@ export class TaskExecutionEvent extends Message<TaskExecutionEvent> {
     case: "error";
   } | {
     /**
-     * Raw output data produced by this task execution.
+     * Raw output data produced by this workflow execution.
+     * Deprecated: please use output_data instead
      *
-     * @generated from field: flyteidl.core.LiteralMap output_data = 17;
+     * @generated from field: flyteidl.core.LiteralMap deprecated_output_data = 17 [deprecated = true];
+     * @deprecated
      */
     value: LiteralMap;
+    case: "deprecatedOutputData";
+  } | {
+    /**
+     * Raw output data produced by this workflow execution.
+     *
+     * @generated from field: flyteidl.core.OutputData output_data = 22;
+     */
+    value: OutputData;
     case: "outputData";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
@@ -844,10 +903,12 @@ export class TaskExecutionEvent extends Message<TaskExecutionEvent> {
     { no: 6, name: "logs", kind: "message", T: TaskLog, repeated: true },
     { no: 7, name: "occurred_at", kind: "message", T: Timestamp },
     { no: 8, name: "input_uri", kind: "scalar", T: 9 /* ScalarType.STRING */, oneof: "input_value" },
-    { no: 19, name: "input_data", kind: "message", T: LiteralMap, oneof: "input_value" },
+    { no: 19, name: "deprecated_input_data", kind: "message", T: LiteralMap, oneof: "input_value" },
+    { no: 23, name: "input_data", kind: "message", T: InputData, oneof: "input_value" },
     { no: 9, name: "output_uri", kind: "scalar", T: 9 /* ScalarType.STRING */, oneof: "output_result" },
     { no: 10, name: "error", kind: "message", T: ExecutionError, oneof: "output_result" },
-    { no: 17, name: "output_data", kind: "message", T: LiteralMap, oneof: "output_result" },
+    { no: 17, name: "deprecated_output_data", kind: "message", T: LiteralMap, oneof: "output_result" },
+    { no: 22, name: "output_data", kind: "message", T: OutputData, oneof: "output_result" },
     { no: 11, name: "custom_info", kind: "message", T: Struct },
     { no: 12, name: "phase_version", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
     { no: 13, name: "reason", kind: "scalar", T: 9 /* ScalarType.STRING */ },

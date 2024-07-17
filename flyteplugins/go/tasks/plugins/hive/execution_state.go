@@ -275,6 +275,7 @@ func GetQueryInfo(ctx context.Context, tCtx core.TaskExecutionContext) (
 			Inputs:           tCtx.InputReader(),
 			OutputPath:       tCtx.OutputWriter(),
 			Task:             tCtx.TaskReader(),
+			Runtime:          taskTemplate.GetMetadata().GetRuntime(),
 		})
 	if err != nil {
 		return "", "", []string{}, 0, "", err
@@ -508,23 +509,27 @@ func WriteOutputs(ctx context.Context, tCtx core.TaskExecutionContext, currentSt
 	if len(outputs) != 0 && len(outputs) != 1 {
 		return currentState, errors.Errorf(errors.BadTaskSpecification, "Hive tasks must have zero or one output: [%d] found", len(outputs))
 	}
+
 	if len(outputs) == 1 {
 		if results, ok := outputs["results"]; ok {
 			if results.GetType().GetSchema() == nil {
 				return currentState, errors.Errorf(errors.BadTaskSpecification, "A non-SchemaType was found [%v]", results.GetType())
 			}
+
 			logger.Debugf(ctx, "Writing outputs file for Hive task at [%s]", tCtx.OutputWriter().GetOutputPrefixPath())
 			err = tCtx.OutputWriter().Put(ctx, ioutils.NewInMemoryOutputReader(
-				&idlCore.LiteralMap{
-					Literals: map[string]*idlCore.Literal{
-						"results": {
-							Value: &idlCore.Literal_Scalar{
-								Scalar: &idlCore.Scalar{Value: &idlCore.Scalar_Schema{
-									Schema: &idlCore.Schema{
-										Uri:  externalLocation.String(),
-										Type: results.GetType().GetSchema(),
+				&idlCore.OutputData{
+					Outputs: &idlCore.LiteralMap{
+						Literals: map[string]*idlCore.Literal{
+							"results": {
+								Value: &idlCore.Literal_Scalar{
+									Scalar: &idlCore.Scalar{Value: &idlCore.Scalar_Schema{
+										Schema: &idlCore.Schema{
+											Uri:  externalLocation.String(),
+											Type: results.GetType().GetSchema(),
+										},
 									},
-								},
+									},
 								},
 							},
 						},

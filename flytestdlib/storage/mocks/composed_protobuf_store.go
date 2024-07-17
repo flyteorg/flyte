@@ -226,6 +226,52 @@ func (_m *ComposedProtobufStore) ReadProtobuf(ctx context.Context, reference sto
 	return r0
 }
 
+type ComposedProtobufStore_ReadProtobufAny struct {
+	*mock.Call
+}
+
+func (_m ComposedProtobufStore_ReadProtobufAny) Return(_a0 int, _a1 error) *ComposedProtobufStore_ReadProtobufAny {
+	return &ComposedProtobufStore_ReadProtobufAny{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *ComposedProtobufStore) OnReadProtobufAny(ctx context.Context, reference storage.DataReference, msg ...protoiface.MessageV1) *ComposedProtobufStore_ReadProtobufAny {
+	c_call := _m.On("ReadProtobufAny", ctx, reference, msg)
+	return &ComposedProtobufStore_ReadProtobufAny{Call: c_call}
+}
+
+func (_m *ComposedProtobufStore) OnReadProtobufAnyMatch(matchers ...interface{}) *ComposedProtobufStore_ReadProtobufAny {
+	c_call := _m.On("ReadProtobufAny", matchers...)
+	return &ComposedProtobufStore_ReadProtobufAny{Call: c_call}
+}
+
+// ReadProtobufAny provides a mock function with given fields: ctx, reference, msg
+func (_m *ComposedProtobufStore) ReadProtobufAny(ctx context.Context, reference storage.DataReference, msg ...protoiface.MessageV1) (int, error) {
+	_va := make([]interface{}, len(msg))
+	for _i := range msg {
+		_va[_i] = msg[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, reference)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 int
+	if rf, ok := ret.Get(0).(func(context.Context, storage.DataReference, ...protoiface.MessageV1) int); ok {
+		r0 = rf(ctx, reference, msg...)
+	} else {
+		r0 = ret.Get(0).(int)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, storage.DataReference, ...protoiface.MessageV1) error); ok {
+		r1 = rf(ctx, reference, msg...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type ComposedProtobufStore_ReadRaw struct {
 	*mock.Call
 }

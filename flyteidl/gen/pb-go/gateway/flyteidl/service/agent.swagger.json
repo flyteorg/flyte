@@ -645,9 +645,9 @@
     "adminCreateTaskRequest": {
       "type": "object",
       "properties": {
-        "inputs": {
+        "deprecated_inputs": {
           "$ref": "#/definitions/coreLiteralMap",
-          "title": "The inputs required to start the execution. All required inputs must be\nincluded in this map. If not required and not provided, defaults apply.\n+optional"
+          "description": "The inputs required to start the execution. All required inputs must be\nincluded in this map. If not required and not provided, defaults apply.\n+optional\nDeprecated: Use inputs instead."
         },
         "template": {
           "$ref": "#/definitions/coreTaskTemplate",
@@ -660,6 +660,10 @@
         "task_execution_metadata": {
           "$ref": "#/definitions/flyteidladminTaskExecutionMetadata",
           "description": "subset of runtime task execution metadata."
+        },
+        "inputs": {
+          "$ref": "#/definitions/coreInputData",
+          "title": "Inputs are the inputs required to start the execution. All required inputs must be\nincluded in this map. If not required and not provided, defaults apply.\n+optional"
         }
       },
       "description": "Represents a request structure to create task."
@@ -794,9 +798,9 @@
           "$ref": "#/definitions/flyteidladminState",
           "description": "DEPRECATED. The state of the execution is used to control its visibility in the UI/CLI."
         },
-        "outputs": {
+        "deprecated_outputs": {
           "$ref": "#/definitions/coreLiteralMap",
-          "title": "The outputs of the execution. It's typically used by sql task. Agent service will create a\nStructured dataset pointing to the query result table.\n+optional"
+          "description": "The outputs of the execution. It's typically used by sql task. Agent service will create a\nStructured dataset pointing to the query result table.\n+optional\nDeprecated: Use outputs instead."
         },
         "message": {
           "type": "string",
@@ -817,6 +821,10 @@
         "custom_info": {
           "type": "object",
           "description": "Custom data specific to the agent."
+        },
+        "outputs": {
+          "$ref": "#/definitions/coreOutputData",
+          "title": "The outputs of the execution. It's typically used by sql task. Agent service will create a\nStructured dataset pointing to the query result table.\n+optional"
         }
       }
     },
@@ -1179,6 +1187,16 @@
         }
       }
     },
+    "coreInputData": {
+      "type": "object",
+      "properties": {
+        "inputs": {
+          "$ref": "#/definitions/coreLiteralMap",
+          "description": "A map of input variables to their values."
+        }
+      },
+      "description": "InputData represents the inputs to a task or workflow. It's an envelope that contains a map of input variables to\ntheir values."
+    },
     "coreK8sObjectMetadata": {
       "type": "object",
       "properties": {
@@ -1403,6 +1421,16 @@
       ],
       "default": "CLIENT_CREDENTIALS",
       "description": "Type of the token requested.\n\n - CLIENT_CREDENTIALS: CLIENT_CREDENTIALS indicates a 2-legged OAuth token requested using client credentials."
+    },
+    "coreOutputData": {
+      "type": "object",
+      "properties": {
+        "outputs": {
+          "$ref": "#/definitions/coreLiteralMap",
+          "description": "A map of output variables to their values."
+        }
+      },
+      "description": "OutputData represents the outputs of a task or workflow. It's an envelope that contains a map of output variables to\ntheir values."
     },
     "corePartitions": {
       "type": "object",

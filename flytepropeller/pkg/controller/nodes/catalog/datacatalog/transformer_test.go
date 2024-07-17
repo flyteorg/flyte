@@ -102,19 +102,17 @@ func TestVariableMapOrder(t *testing.T) {
 
 // Ensure correct format of ArtifactTagName
 func TestGenerateArtifactTagName(t *testing.T) {
-	literalMap, err := coreutils.MakeLiteralMap(map[string]interface{}{"1": 1, "2": 2})
-	assert.NoError(t, err)
+	literalMap := coreutils.MustMakeLiteral(map[string]interface{}{"1": 1, "2": 2})
 
-	tag, err := GenerateArtifactTagName(context.TODO(), literalMap, nil)
+	tag, err := GenerateArtifactTagName(context.TODO(), &core.InputData{Inputs: literalMap.GetMap()}, nil)
 	assert.NoError(t, err)
 	assert.Equal(t, "flyte_cached-GQid5LjHbakcW68DS3P2jp80QLbiF0olFHF2hTh5bg8", tag)
 }
 
 func TestGenerateArtifactTagNameWithIgnore(t *testing.T) {
-	literalMap, err := coreutils.MakeLiteralMap(map[string]interface{}{"1": 1, "2": 2, "3": 3})
-	assert.NoError(t, err)
+	inputData := &core.InputData{Inputs: coreutils.MustMakeLiteral(map[string]interface{}{"1": 1, "2": 2, "3": 3}).GetMap()}
 	cacheIgnoreInputVars := []string{"3"}
-	tag, err := GenerateArtifactTagName(context.TODO(), literalMap, cacheIgnoreInputVars)
+	tag, err := GenerateArtifactTagName(context.TODO(), inputData, cacheIgnoreInputVars)
 	assert.NoError(t, err)
 	assert.Equal(t, "flyte_cached-GQid5LjHbakcW68DS3P2jp80QLbiF0olFHF2hTh5bg8", tag)
 }

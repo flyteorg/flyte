@@ -226,6 +226,7 @@ func GetQueryInfo(ctx context.Context, tCtx core.TaskExecutionContext) (string, 
 		Inputs:           tCtx.InputReader(),
 		OutputPath:       tCtx.OutputWriter(),
 		Task:             tCtx.TaskReader(),
+		Runtime:          taskTemplate.GetMetadata().GetRuntime(),
 	})
 	if err != nil {
 		return "", "", "", "", err
@@ -443,16 +444,18 @@ func writeOutput(ctx context.Context, tCtx core.TaskExecutionContext, externalLo
 	results := taskTemplate.Interface.Outputs.Variables["results"]
 
 	return tCtx.OutputWriter().Put(ctx, ioutils.NewInMemoryOutputReader(
-		&pb.LiteralMap{
-			Literals: map[string]*pb.Literal{
-				"results": {
-					Value: &pb.Literal_Scalar{
-						Scalar: &pb.Scalar{Value: &pb.Scalar_Schema{
-							Schema: &pb.Schema{
-								Uri:  externalLocation,
-								Type: results.GetType().GetSchema(),
+		&pb.OutputData{
+			Outputs: &pb.LiteralMap{
+				Literals: map[string]*pb.Literal{
+					"results": {
+						Value: &pb.Literal_Scalar{
+							Scalar: &pb.Scalar{Value: &pb.Scalar_Schema{
+								Schema: &pb.Schema{
+									Uri:  externalLocation,
+									Type: results.GetType().GetSchema(),
+								},
 							},
-						},
+							},
 						},
 					},
 				},

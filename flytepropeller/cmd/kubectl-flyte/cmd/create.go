@@ -120,7 +120,7 @@ func marshal(message proto.Message, format format) (raw []byte, err error) {
 	return nil, errors.Errorf("Unknown format type")
 }
 
-func loadInputs(path string, format format) (c *core.LiteralMap, err error) {
+func loadInputs(path string, format format) (c *core.InputData, err error) {
 	// Support reading from s3, etc.?
 	var raw []byte
 	raw, err = ioutil.ReadFile(path)
@@ -128,7 +128,7 @@ func loadInputs(path string, format format) (c *core.LiteralMap, err error) {
 		return
 	}
 
-	c = &core.LiteralMap{}
+	c = &core.InputData{}
 	err = unmarshal(raw, format, c)
 	return
 }
@@ -170,7 +170,7 @@ func (c *CreateOpts) createWorkflowFromProto() error {
 		return err
 	}
 
-	var inputs *core.LiteralMap
+	var inputs *core.InputData
 	if c.inputsPath != "" {
 		inputs, err = loadInputs(c.inputsPath, c.format)
 		if err != nil {

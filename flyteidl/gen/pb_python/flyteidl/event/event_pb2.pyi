@@ -14,33 +14,39 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class WorkflowExecutionEvent(_message.Message):
-    __slots__ = ["execution_id", "producer_id", "phase", "occurred_at", "output_uri", "error", "output_data"]
+    __slots__ = ["execution_id", "producer_id", "phase", "occurred_at", "output_uri", "error", "deprecated_output_data", "output_data", "event_version"]
     EXECUTION_ID_FIELD_NUMBER: _ClassVar[int]
     PRODUCER_ID_FIELD_NUMBER: _ClassVar[int]
     PHASE_FIELD_NUMBER: _ClassVar[int]
     OCCURRED_AT_FIELD_NUMBER: _ClassVar[int]
     OUTPUT_URI_FIELD_NUMBER: _ClassVar[int]
     ERROR_FIELD_NUMBER: _ClassVar[int]
+    DEPRECATED_OUTPUT_DATA_FIELD_NUMBER: _ClassVar[int]
     OUTPUT_DATA_FIELD_NUMBER: _ClassVar[int]
+    EVENT_VERSION_FIELD_NUMBER: _ClassVar[int]
     execution_id: _identifier_pb2.WorkflowExecutionIdentifier
     producer_id: str
     phase: _execution_pb2.WorkflowExecution.Phase
     occurred_at: _timestamp_pb2.Timestamp
     output_uri: str
     error: _execution_pb2.ExecutionError
-    output_data: _literals_pb2.LiteralMap
-    def __init__(self, execution_id: _Optional[_Union[_identifier_pb2.WorkflowExecutionIdentifier, _Mapping]] = ..., producer_id: _Optional[str] = ..., phase: _Optional[_Union[_execution_pb2.WorkflowExecution.Phase, str]] = ..., occurred_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., output_uri: _Optional[str] = ..., error: _Optional[_Union[_execution_pb2.ExecutionError, _Mapping]] = ..., output_data: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ...) -> None: ...
+    deprecated_output_data: _literals_pb2.LiteralMap
+    output_data: _literals_pb2.OutputData
+    event_version: int
+    def __init__(self, execution_id: _Optional[_Union[_identifier_pb2.WorkflowExecutionIdentifier, _Mapping]] = ..., producer_id: _Optional[str] = ..., phase: _Optional[_Union[_execution_pb2.WorkflowExecution.Phase, str]] = ..., occurred_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., output_uri: _Optional[str] = ..., error: _Optional[_Union[_execution_pb2.ExecutionError, _Mapping]] = ..., deprecated_output_data: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., output_data: _Optional[_Union[_literals_pb2.OutputData, _Mapping]] = ..., event_version: _Optional[int] = ...) -> None: ...
 
 class NodeExecutionEvent(_message.Message):
-    __slots__ = ["id", "producer_id", "phase", "occurred_at", "input_uri", "input_data", "output_uri", "error", "output_data", "workflow_node_metadata", "task_node_metadata", "parent_task_metadata", "parent_node_metadata", "retry_group", "spec_node_id", "node_name", "event_version", "is_parent", "is_dynamic", "deck_uri", "reported_at", "is_array", "target_entity", "is_in_dynamic_chain"]
+    __slots__ = ["id", "producer_id", "phase", "occurred_at", "input_uri", "deprecated_input_data", "input_data", "output_uri", "error", "deprecated_output_data", "output_data", "workflow_node_metadata", "task_node_metadata", "parent_task_metadata", "parent_node_metadata", "retry_group", "spec_node_id", "node_name", "event_version", "is_parent", "is_dynamic", "deck_uri", "reported_at", "is_array", "target_entity", "is_in_dynamic_chain"]
     ID_FIELD_NUMBER: _ClassVar[int]
     PRODUCER_ID_FIELD_NUMBER: _ClassVar[int]
     PHASE_FIELD_NUMBER: _ClassVar[int]
     OCCURRED_AT_FIELD_NUMBER: _ClassVar[int]
     INPUT_URI_FIELD_NUMBER: _ClassVar[int]
+    DEPRECATED_INPUT_DATA_FIELD_NUMBER: _ClassVar[int]
     INPUT_DATA_FIELD_NUMBER: _ClassVar[int]
     OUTPUT_URI_FIELD_NUMBER: _ClassVar[int]
     ERROR_FIELD_NUMBER: _ClassVar[int]
+    DEPRECATED_OUTPUT_DATA_FIELD_NUMBER: _ClassVar[int]
     OUTPUT_DATA_FIELD_NUMBER: _ClassVar[int]
     WORKFLOW_NODE_METADATA_FIELD_NUMBER: _ClassVar[int]
     TASK_NODE_METADATA_FIELD_NUMBER: _ClassVar[int]
@@ -62,10 +68,12 @@ class NodeExecutionEvent(_message.Message):
     phase: _execution_pb2.NodeExecution.Phase
     occurred_at: _timestamp_pb2.Timestamp
     input_uri: str
-    input_data: _literals_pb2.LiteralMap
+    deprecated_input_data: _literals_pb2.LiteralMap
+    input_data: _literals_pb2.InputData
     output_uri: str
     error: _execution_pb2.ExecutionError
-    output_data: _literals_pb2.LiteralMap
+    deprecated_output_data: _literals_pb2.LiteralMap
+    output_data: _literals_pb2.OutputData
     workflow_node_metadata: WorkflowNodeMetadata
     task_node_metadata: TaskNodeMetadata
     parent_task_metadata: ParentTaskExecutionMetadata
@@ -81,7 +89,7 @@ class NodeExecutionEvent(_message.Message):
     is_array: bool
     target_entity: _identifier_pb2.Identifier
     is_in_dynamic_chain: bool
-    def __init__(self, id: _Optional[_Union[_identifier_pb2.NodeExecutionIdentifier, _Mapping]] = ..., producer_id: _Optional[str] = ..., phase: _Optional[_Union[_execution_pb2.NodeExecution.Phase, str]] = ..., occurred_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., input_uri: _Optional[str] = ..., input_data: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., output_uri: _Optional[str] = ..., error: _Optional[_Union[_execution_pb2.ExecutionError, _Mapping]] = ..., output_data: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., workflow_node_metadata: _Optional[_Union[WorkflowNodeMetadata, _Mapping]] = ..., task_node_metadata: _Optional[_Union[TaskNodeMetadata, _Mapping]] = ..., parent_task_metadata: _Optional[_Union[ParentTaskExecutionMetadata, _Mapping]] = ..., parent_node_metadata: _Optional[_Union[ParentNodeExecutionMetadata, _Mapping]] = ..., retry_group: _Optional[str] = ..., spec_node_id: _Optional[str] = ..., node_name: _Optional[str] = ..., event_version: _Optional[int] = ..., is_parent: bool = ..., is_dynamic: bool = ..., deck_uri: _Optional[str] = ..., reported_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., is_array: bool = ..., target_entity: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., is_in_dynamic_chain: bool = ...) -> None: ...
+    def __init__(self, id: _Optional[_Union[_identifier_pb2.NodeExecutionIdentifier, _Mapping]] = ..., producer_id: _Optional[str] = ..., phase: _Optional[_Union[_execution_pb2.NodeExecution.Phase, str]] = ..., occurred_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., input_uri: _Optional[str] = ..., deprecated_input_data: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., input_data: _Optional[_Union[_literals_pb2.InputData, _Mapping]] = ..., output_uri: _Optional[str] = ..., error: _Optional[_Union[_execution_pb2.ExecutionError, _Mapping]] = ..., deprecated_output_data: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., output_data: _Optional[_Union[_literals_pb2.OutputData, _Mapping]] = ..., workflow_node_metadata: _Optional[_Union[WorkflowNodeMetadata, _Mapping]] = ..., task_node_metadata: _Optional[_Union[TaskNodeMetadata, _Mapping]] = ..., parent_task_metadata: _Optional[_Union[ParentTaskExecutionMetadata, _Mapping]] = ..., parent_node_metadata: _Optional[_Union[ParentNodeExecutionMetadata, _Mapping]] = ..., retry_group: _Optional[str] = ..., spec_node_id: _Optional[str] = ..., node_name: _Optional[str] = ..., event_version: _Optional[int] = ..., is_parent: bool = ..., is_dynamic: bool = ..., deck_uri: _Optional[str] = ..., reported_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., is_array: bool = ..., target_entity: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., is_in_dynamic_chain: bool = ...) -> None: ...
 
 class WorkflowNodeMetadata(_message.Message):
     __slots__ = ["execution_id"]
@@ -134,7 +142,7 @@ class EventReason(_message.Message):
     def __init__(self, reason: _Optional[str] = ..., occurred_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
 
 class TaskExecutionEvent(_message.Message):
-    __slots__ = ["task_id", "parent_node_execution_id", "retry_attempt", "phase", "producer_id", "logs", "occurred_at", "input_uri", "input_data", "output_uri", "error", "output_data", "custom_info", "phase_version", "reason", "reasons", "task_type", "metadata", "event_version", "reported_at"]
+    __slots__ = ["task_id", "parent_node_execution_id", "retry_attempt", "phase", "producer_id", "logs", "occurred_at", "input_uri", "deprecated_input_data", "input_data", "output_uri", "error", "deprecated_output_data", "output_data", "custom_info", "phase_version", "reason", "reasons", "task_type", "metadata", "event_version", "reported_at"]
     TASK_ID_FIELD_NUMBER: _ClassVar[int]
     PARENT_NODE_EXECUTION_ID_FIELD_NUMBER: _ClassVar[int]
     RETRY_ATTEMPT_FIELD_NUMBER: _ClassVar[int]
@@ -143,9 +151,11 @@ class TaskExecutionEvent(_message.Message):
     LOGS_FIELD_NUMBER: _ClassVar[int]
     OCCURRED_AT_FIELD_NUMBER: _ClassVar[int]
     INPUT_URI_FIELD_NUMBER: _ClassVar[int]
+    DEPRECATED_INPUT_DATA_FIELD_NUMBER: _ClassVar[int]
     INPUT_DATA_FIELD_NUMBER: _ClassVar[int]
     OUTPUT_URI_FIELD_NUMBER: _ClassVar[int]
     ERROR_FIELD_NUMBER: _ClassVar[int]
+    DEPRECATED_OUTPUT_DATA_FIELD_NUMBER: _ClassVar[int]
     OUTPUT_DATA_FIELD_NUMBER: _ClassVar[int]
     CUSTOM_INFO_FIELD_NUMBER: _ClassVar[int]
     PHASE_VERSION_FIELD_NUMBER: _ClassVar[int]
@@ -163,10 +173,12 @@ class TaskExecutionEvent(_message.Message):
     logs: _containers.RepeatedCompositeFieldContainer[_execution_pb2.TaskLog]
     occurred_at: _timestamp_pb2.Timestamp
     input_uri: str
-    input_data: _literals_pb2.LiteralMap
+    deprecated_input_data: _literals_pb2.LiteralMap
+    input_data: _literals_pb2.InputData
     output_uri: str
     error: _execution_pb2.ExecutionError
-    output_data: _literals_pb2.LiteralMap
+    deprecated_output_data: _literals_pb2.LiteralMap
+    output_data: _literals_pb2.OutputData
     custom_info: _struct_pb2.Struct
     phase_version: int
     reason: str
@@ -175,7 +187,7 @@ class TaskExecutionEvent(_message.Message):
     metadata: TaskExecutionMetadata
     event_version: int
     reported_at: _timestamp_pb2.Timestamp
-    def __init__(self, task_id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., parent_node_execution_id: _Optional[_Union[_identifier_pb2.NodeExecutionIdentifier, _Mapping]] = ..., retry_attempt: _Optional[int] = ..., phase: _Optional[_Union[_execution_pb2.TaskExecution.Phase, str]] = ..., producer_id: _Optional[str] = ..., logs: _Optional[_Iterable[_Union[_execution_pb2.TaskLog, _Mapping]]] = ..., occurred_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., input_uri: _Optional[str] = ..., input_data: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., output_uri: _Optional[str] = ..., error: _Optional[_Union[_execution_pb2.ExecutionError, _Mapping]] = ..., output_data: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., custom_info: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ..., phase_version: _Optional[int] = ..., reason: _Optional[str] = ..., reasons: _Optional[_Iterable[_Union[EventReason, _Mapping]]] = ..., task_type: _Optional[str] = ..., metadata: _Optional[_Union[TaskExecutionMetadata, _Mapping]] = ..., event_version: _Optional[int] = ..., reported_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
+    def __init__(self, task_id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., parent_node_execution_id: _Optional[_Union[_identifier_pb2.NodeExecutionIdentifier, _Mapping]] = ..., retry_attempt: _Optional[int] = ..., phase: _Optional[_Union[_execution_pb2.TaskExecution.Phase, str]] = ..., producer_id: _Optional[str] = ..., logs: _Optional[_Iterable[_Union[_execution_pb2.TaskLog, _Mapping]]] = ..., occurred_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., input_uri: _Optional[str] = ..., deprecated_input_data: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., input_data: _Optional[_Union[_literals_pb2.InputData, _Mapping]] = ..., output_uri: _Optional[str] = ..., error: _Optional[_Union[_execution_pb2.ExecutionError, _Mapping]] = ..., deprecated_output_data: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., output_data: _Optional[_Union[_literals_pb2.OutputData, _Mapping]] = ..., custom_info: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ..., phase_version: _Optional[int] = ..., reason: _Optional[str] = ..., reasons: _Optional[_Iterable[_Union[EventReason, _Mapping]]] = ..., task_type: _Optional[str] = ..., metadata: _Optional[_Union[TaskExecutionMetadata, _Mapping]] = ..., event_version: _Optional[int] = ..., reported_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
 
 class ExternalResourceInfo(_message.Message):
     __slots__ = ["external_id", "index", "retry_attempt", "phase", "cache_status", "logs"]

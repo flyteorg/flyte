@@ -6,7 +6,7 @@
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Duration, Message, proto3, Timestamp } from "@bufbuild/protobuf";
 import { NodeExecutionIdentifier } from "../core/identifier_pb.js";
-import { Literal, LiteralMap } from "../core/literals_pb.js";
+import { InputData, Literal, LiteralMap, OutputData } from "../core/literals_pb.js";
 
 /**
  * ArtifactType
@@ -562,6 +562,22 @@ export class GetDataResponse extends Message<GetDataResponse> {
      */
     value: Literal;
     case: "literal";
+  } | {
+    /**
+     * InputData is returned when the user/url requests the input data for an execution.
+     *
+     * @generated from field: flyteidl.core.InputData input_data = 4;
+     */
+    value: InputData;
+    case: "inputData";
+  } | {
+    /**
+     * OutputData is returned when the user/url requests the output data for an execution.
+     *
+     * @generated from field: flyteidl.core.OutputData output_data = 5;
+     */
+    value: OutputData;
+    case: "outputData";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   constructor(data?: PartialMessage<GetDataResponse>) {
@@ -575,6 +591,8 @@ export class GetDataResponse extends Message<GetDataResponse> {
     { no: 1, name: "literal_map", kind: "message", T: LiteralMap, oneof: "data" },
     { no: 2, name: "pre_signed_urls", kind: "message", T: PreSignedURLs, oneof: "data" },
     { no: 3, name: "literal", kind: "message", T: Literal, oneof: "data" },
+    { no: 4, name: "input_data", kind: "message", T: InputData, oneof: "data" },
+    { no: 5, name: "output_data", kind: "message", T: OutputData, oneof: "data" },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetDataResponse {

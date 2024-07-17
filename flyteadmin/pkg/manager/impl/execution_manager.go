@@ -431,6 +431,9 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 	ctx context.Context, request admin.ExecutionCreateRequest, requestedAt time.Time) (
 	context.Context, *models.Execution, error) {
 
+	request.InputData = migrateInputData(request.GetInputData(), request.GetInputs())
+	request.Inputs = nil
+
 	taskModel, err := m.db.TaskRepo().Get(ctx, repositoryInterfaces.Identifier{
 		Project: request.Spec.LaunchPlan.Project,
 		Domain:  request.Spec.LaunchPlan.Domain,
@@ -471,9 +474,11 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 	}
 
 	executionInputs, err := validation.CheckAndFetchInputsForExecution(
-		request.Inputs,
-		launchPlan.Spec.FixedInputs,
-		launchPlan.Closure.ExpectedInputs,
+		request.GetInputData(),
+		request.GetInputs(),
+		launchPlan.Spec.GetFixedInputData(),
+		launchPlan.Spec.GetFixedInputs(),
+		launchPlan.Spec.GetDefaultInputs(),
 	)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to CheckAndFetchInputsForExecution with request.Inputs: %+v"+
@@ -515,11 +520,11 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 	// Dynamically assign execution queues.
 	m.populateExecutionQueue(ctx, *workflow.Id, workflow.Closure.CompiledWorkflow)
 
-	inputsURI, err := common.OffloadLiteralMap(ctx, m.storageClient, request.Inputs, workflowExecutionID.Project, workflowExecutionID.Domain, workflowExecutionID.Name, shared.Inputs)
+	inputsURI, err := common.OffloadData(ctx, m.storageClient, request.GetInputData(), workflowExecutionID.Project, workflowExecutionID.Domain, workflowExecutionID.Name, shared.Inputs)
 	if err != nil {
 		return nil, nil, err
 	}
-	userInputsURI, err := common.OffloadLiteralMap(ctx, m.storageClient, request.Inputs, workflowExecutionID.Project, workflowExecutionID.Domain, workflowExecutionID.Name, shared.UserInputs)
+	userInputsURI, err := common.OffloadData(ctx, m.storageClient, request.GetInputData(), workflowExecutionID.Project, workflowExecutionID.Domain, workflowExecutionID.Name, shared.UserInputs)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -558,13 +563,13 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 		executionClusterLabel = requestSpec.ExecutionClusterLabel
 	}
 	executionParameters := workflowengineInterfaces.ExecutionParameters{
-		Inputs:                executionInputs,
+		InputData:             executionInputs,
 		AcceptedAt:            requestedAt,
 		Labels:                labels,
 		Annotations:           annotations,
 		ExecutionConfig:       executionConfig,
 		TaskResources:         &platformTaskResources,
-		EventVersion:          m.config.ApplicationConfiguration().GetTopLevelConfig().EventVersion,
+		EventVersion:          m.config.ApplicationConfiguration().GetTopLevelConfig().GetEventVersion(),
 		RoleNameKey:           m.config.ApplicationConfiguration().GetTopLevelConfig().RoleNameKey,
 		RawOutputDataConfig:   rawOutputDataConfig,
 		ClusterAssignment:     clusterAssignment,
@@ -857,9 +862,11 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 	// Artifacts retrieved will need to be stored somewhere to ensure that we can re-emit events if necessary
 	// in the future, and also to make sure that relaunch and recover can use it if necessary.
 	executionInputs, err := validation.CheckAndFetchInputsForExecution(
-		request.Inputs,
-		launchPlan.Spec.FixedInputs,
-		lpExpectedInputs,
+		request.GetInputData(),
+		request.GetInputs(),
+		launchPlan.GetSpec().GetFixedInputData(),
+		launchPlan.GetSpec().GetFixedInputs(),
+		launchPlan.GetClosure().GetExpectedInputs(),
 	)
 
 	if err != nil {
@@ -918,11 +925,12 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 	// Dynamically assign execution queues.
 	m.populateExecutionQueue(ctx, *workflow.Id, workflow.Closure.CompiledWorkflow)
 
-	inputsURI, err := common.OffloadLiteralMap(ctx, m.storageClient, executionInputs, workflowExecutionID.Project, workflowExecutionID.Domain, workflowExecutionID.Name, shared.Inputs)
+	inputsURI, err := common.OffloadData(ctx, m.storageClient, executionInputs, workflowExecutionID.Project, workflowExecutionID.Domain, workflowExecutionID.Name, shared.Inputs)
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	userInputsURI, err := common.OffloadLiteralMap(ctx, m.storageClient, request.Inputs, workflowExecutionID.Project, workflowExecutionID.Domain, workflowExecutionID.Name, shared.UserInputs)
+
+	userInputsURI, err := common.OffloadData(ctx, m.storageClient, request.GetInputData(), workflowExecutionID.Project, workflowExecutionID.Domain, workflowExecutionID.Name, shared.UserInputs)
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -963,7 +971,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 	}
 
 	executionParameters := workflowengineInterfaces.ExecutionParameters{
-		Inputs:                executionInputs,
+		InputData:             executionInputs,
 		AcceptedAt:            requestedAt,
 		Labels:                labels,
 		Annotations:           annotations,
@@ -1081,14 +1089,29 @@ func (m *ExecutionManager) createExecutionModel(
 	return &workflowExecutionIdentifier, nil
 }
 
+func migrateInputData(newInputs *core.InputData, oldInputs *core.LiteralMap) *core.InputData {
+	if newInputs != nil {
+		return newInputs
+	}
+
+	return &core.InputData{
+		Inputs: oldInputs,
+	}
+}
+
 func (m *ExecutionManager) CreateExecution(
 	ctx context.Context, request admin.ExecutionCreateRequest, requestedAt time.Time) (
 	*admin.ExecutionCreateResponse, error) {
-
-	// Prior to flyteidl v0.15.0, Inputs was held in ExecutionSpec. Ensure older clients continue to work.
-	if request.Inputs == nil || len(request.Inputs.Literals) == 0 {
-		request.Inputs = request.GetSpec().GetInputs()
+	// Prior to  flyteidl v0.15.0, Inputs was held in ExecutionSpec. Ensure older clients continue to work.
+	if len(request.GetSpec().GetInputs().GetLiterals()) > 0 {
+		request.InputData = &core.InputData{
+			Inputs: request.GetSpec().GetInputs(),
+		}
 	}
+
+	request.InputData = migrateInputData(request.GetInputData(), request.GetInputs())
+	request.Inputs = nil
+
 	var executionModel *models.Execution
 	var executionTagModel []*models.ExecutionTag
 	var err error
@@ -1105,9 +1128,34 @@ func (m *ExecutionManager) CreateExecution(
 	}, nil
 }
 
+func readInputsFromExecutionModel(ctx context.Context, inputsURI storage.DataReference, specBytes []byte, storageClient storage.ProtobufStore) (*core.InputData, error) {
+	var inputData *core.InputData
+	if len(inputsURI) > 0 {
+		inputData = &core.InputData{}
+		inputs := &core.LiteralMap{}
+		if msgIndex, err := storageClient.ReadProtobufAny(ctx, inputsURI, inputData, inputs); err != nil {
+			return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to read inputs proto from [%v]. Error: %v", inputsURI, err)
+		} else if msgIndex == 1 {
+			inputData = migrateInputData(inputData, inputs)
+		}
+	} else {
+		// For old data, inputs are held in the spec
+		var spec admin.ExecutionSpec
+		err := proto.Unmarshal(specBytes, &spec)
+		if err != nil {
+			return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to unmarshal spec. Error: %v", err)
+		}
+
+		inputData = migrateInputData(nil, spec.GetInputs())
+	}
+
+	return inputData, nil
+}
+
 func (m *ExecutionManager) RelaunchExecution(
 	ctx context.Context, request admin.ExecutionRelaunchRequest, requestedAt time.Time) (
 	*admin.ExecutionCreateResponse, error) {
+
 	existingExecutionModel, err := util.GetExecutionModel(ctx, m.db, *request.Id)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to get execution model for request [%+v] with err %v", request, err)
@@ -1122,32 +1170,23 @@ func (m *ExecutionManager) RelaunchExecution(
 	if executionSpec.Metadata == nil {
 		executionSpec.Metadata = &admin.ExecutionMetadata{}
 	}
-	var inputs *core.LiteralMap
-	if len(existingExecutionModel.UserInputsURI) > 0 {
-		inputs = &core.LiteralMap{}
-		if err := m.storageClient.ReadProtobuf(ctx, existingExecutionModel.UserInputsURI, inputs); err != nil {
-			return nil, err
-		}
-	} else {
-		// For old data, inputs are held in the spec
-		var spec admin.ExecutionSpec
-		err = proto.Unmarshal(existingExecutionModel.Spec, &spec)
-		if err != nil {
-			return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to unmarshal spec")
-		}
-		inputs = spec.Inputs
+
+	inputData, err := readInputsFromExecutionModel(ctx, existingExecutionModel.UserInputsURI, existingExecutionModel.Spec, m.storageClient)
+	if err != nil {
+		return nil, err
 	}
+
 	executionSpec.Metadata.Mode = admin.ExecutionMetadata_RELAUNCH
 	executionSpec.Metadata.ReferenceExecution = existingExecution.Id
 	executionSpec.OverwriteCache = request.GetOverwriteCache()
 	var executionModel *models.Execution
 	var executionTagModel []*models.ExecutionTag
 	ctx, executionModel, executionTagModel, err = m.launchExecutionAndPrepareModel(ctx, admin.ExecutionCreateRequest{
-		Project: request.Id.Project,
-		Domain:  request.Id.Domain,
-		Name:    request.Name,
-		Spec:    executionSpec,
-		Inputs:  inputs,
+		Project:   request.Id.Project,
+		Domain:    request.Id.Domain,
+		Name:      request.Name,
+		Spec:      executionSpec,
+		InputData: inputData,
 	}, requestedAt)
 	if err != nil {
 		return nil, err
@@ -1180,13 +1219,12 @@ func (m *ExecutionManager) RecoverExecution(
 	if executionSpec.Metadata == nil {
 		executionSpec.Metadata = &admin.ExecutionMetadata{}
 	}
-	var inputs *core.LiteralMap
-	if len(existingExecutionModel.UserInputsURI) > 0 {
-		inputs = &core.LiteralMap{}
-		if err := m.storageClient.ReadProtobuf(ctx, existingExecutionModel.UserInputsURI, inputs); err != nil {
-			return nil, err
-		}
+
+	inputData, err := readInputsFromExecutionModel(ctx, existingExecutionModel.UserInputsURI, existingExecutionModel.Spec, m.storageClient)
+	if err != nil {
+		return nil, err
 	}
+
 	if request.Metadata != nil {
 		executionSpec.Metadata.ParentNodeExecution = request.Metadata.ParentNodeExecution
 	}
@@ -1195,11 +1233,11 @@ func (m *ExecutionManager) RecoverExecution(
 	var executionModel *models.Execution
 	var executionTagModel []*models.ExecutionTag
 	ctx, executionModel, executionTagModel, err = m.launchExecutionAndPrepareModel(ctx, admin.ExecutionCreateRequest{
-		Project: request.Id.Project,
-		Domain:  request.Id.Domain,
-		Name:    request.Name,
-		Spec:    executionSpec,
-		Inputs:  inputs,
+		Project:   request.Id.Project,
+		Domain:    request.Id.Domain,
+		Name:      request.Name,
+		Spec:      executionSpec,
+		InputData: inputData,
 	}, requestedAt)
 	if err != nil {
 		return nil, err
@@ -1247,14 +1285,21 @@ func (m *ExecutionManager) emitScheduledWorkflowMetrics(
 		return
 	}
 
-	var inputs core.LiteralMap
-	err = m.storageClient.ReadProtobuf(ctx, executionModel.InputsURI, &inputs)
+	var inputData *core.InputData
+	inputData, err = readInputsFromExecutionModel(ctx, executionModel.InputsURI, executionModel.Spec, m.storageClient)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to find inputs for emitting schedule delay event from uri: [%v]", executionModel.InputsURI)
 		return
 	}
-	scheduledKickoffTimeProto := inputs.Literals[launchPlan.Spec.EntityMetadata.Schedule.KickoffTimeInputArg]
-	if scheduledKickoffTimeProto == nil || scheduledKickoffTimeProto.GetScalar() == nil ||
+
+	if len(inputData.GetInputs().GetLiterals()) == 0 {
+		logger.Errorf(ctx, "no kickoff time to report for scheduled workflow execution [%+v]",
+			execution.Id)
+		return
+	}
+
+	scheduledKickoffTimeProto, found := inputData.GetInputs().GetLiterals()[launchPlan.Spec.EntityMetadata.Schedule.KickoffTimeInputArg]
+	if !found || scheduledKickoffTimeProto == nil || scheduledKickoffTimeProto.GetScalar() == nil ||
 		scheduledKickoffTimeProto.GetScalar().GetPrimitive() == nil ||
 		scheduledKickoffTimeProto.GetScalar().GetPrimitive().GetDatetime() == nil {
 		logger.Warningf(context.Background(),
@@ -1427,6 +1472,8 @@ func (m *ExecutionManager) CreateWorkflowEvent(ctx context.Context, request admi
 		go m.emitOverallWorkflowExecutionTime(executionModel, request.Event.OccurredAt)
 		if request.Event.GetOutputData() != nil {
 			m.userMetrics.WorkflowExecutionOutputBytes.Observe(float64(proto.Size(request.Event.GetOutputData())))
+		} else if request.Event.GetDeprecatedOutputData() != nil {
+			m.userMetrics.WorkflowExecutionOutputBytes.Observe(float64(proto.Size(request.Event.GetDeprecatedOutputData())))
 		}
 
 		err = m.publishNotifications(ctx, request, *executionModel)
@@ -1526,7 +1573,11 @@ func (m *ExecutionManager) GetExecutionData(
 		if err := proto.Unmarshal(executionModel.Closure, closure); err != nil {
 			return nil, err
 		}
-		newInputsURI, err := common.OffloadLiteralMap(ctx, m.storageClient, closure.ComputedInputs, request.Id.Project, request.Id.Domain, request.Id.Name, shared.Inputs)
+
+		inputData := &core.InputData{
+			Inputs: closure.ComputedInputs,
+		}
+		newInputsURI, err := common.OffloadData(ctx, m.storageClient, inputData, request.Id.Project, request.Id.Domain, request.Id.Name, shared.Inputs)
 		if err != nil {
 			return nil, err
 		}
@@ -1549,8 +1600,10 @@ func (m *ExecutionManager) GetExecutionData(
 	response := &admin.WorkflowExecutionGetDataResponse{
 		Inputs:      inputURLBlob,
 		Outputs:     outputURLBlob,
-		FullInputs:  inputs,
-		FullOutputs: outputs,
+		FullInputs:  inputs.GetInputs(),
+		FullOutputs: outputs.GetOutputs(),
+		InputData:   inputs,
+		OutputData:  outputs,
 	}
 
 	m.userMetrics.WorkflowExecutionInputBytes.Observe(float64(response.Inputs.Bytes))

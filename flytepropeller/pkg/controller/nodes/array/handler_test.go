@@ -75,7 +75,7 @@ func createArrayNodeHandler(ctx context.Context, t *testing.T, nodeHandler inter
 }
 
 func createNodeExecutionContext(dataStore *storage.DataStore, eventRecorder interfaces.EventRecorder, outputVariables []string,
-	inputLiteralMap *idlcore.LiteralMap, arrayNodeSpec *v1alpha1.NodeSpec, arrayNodeState *handler.ArrayNodeState,
+	inputLiteralMap *idlcore.InputData, arrayNodeSpec *v1alpha1.NodeSpec, arrayNodeState *handler.ArrayNodeState,
 	currentParallelism uint32, maxParallelism uint32) interfaces.NodeExecutionContext {
 
 	nCtx := &mocks.NodeExecutionContext{}
@@ -136,7 +136,7 @@ func createNodeExecutionContext(dataStore *storage.DataStore, eventRecorder inte
 
 	// InputReader
 	inputFilePaths := &pluginmocks.InputFilePaths{}
-	inputFilePaths.OnGetInputPath().Return(storage.DataReference("s3://bucket/input"))
+	inputFilePaths.OnGetInputDataPath().Return(storage.DataReference("s3://bucket/input"))
 	nCtx.OnInputReader().Return(
 		newStaticInputReader(
 			inputFilePaths,
@@ -263,7 +263,7 @@ func TestAbort(t *testing.T) {
 
 			// create NodeExecutionContext
 			eventRecorder := newBufferedEventRecorder()
-			nCtx := createNodeExecutionContext(dataStore, eventRecorder, nil, literalMap, &arrayNodeSpec, arrayNodeState, 0, workflowMaxParallelism)
+			nCtx := createNodeExecutionContext(dataStore, eventRecorder, nil, &idlcore.InputData{Inputs: literalMap}, &arrayNodeSpec, arrayNodeState, 0, workflowMaxParallelism)
 
 			// evaluate node
 			err := arrayNodeHandler.Abort(ctx, nCtx, "foo")
@@ -359,7 +359,7 @@ func TestFinalize(t *testing.T) {
 
 			// create NodeExecutionContext
 			eventRecorder := newBufferedEventRecorder()
-			nCtx := createNodeExecutionContext(dataStore, eventRecorder, nil, literalMap, &arrayNodeSpec, arrayNodeState, 0, workflowMaxParallelism)
+			nCtx := createNodeExecutionContext(dataStore, eventRecorder, nil, &idlcore.InputData{Inputs: literalMap}, &arrayNodeSpec, arrayNodeState, 0, workflowMaxParallelism)
 
 			// evaluate node
 			err := arrayNodeHandler.Finalize(ctx, nCtx)
@@ -430,7 +430,7 @@ func TestHandleArrayNodePhaseNone(t *testing.T) {
 			arrayNodeState := &handler.ArrayNodeState{
 				Phase: v1alpha1.ArrayNodePhaseNone,
 			}
-			nCtx := createNodeExecutionContext(dataStore, eventRecorder, nil, literalMap, &arrayNodeSpec, arrayNodeState, 0, workflowMaxParallelism)
+			nCtx := createNodeExecutionContext(dataStore, eventRecorder, nil, &idlcore.InputData{Inputs: literalMap}, &arrayNodeSpec, arrayNodeState, 0, workflowMaxParallelism)
 
 			// evaluate node
 			transition, err := arrayNodeHandler.Handle(ctx, nCtx)
@@ -716,7 +716,7 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 			nodeSpec.ArrayNode.Parallelism = test.parallelism
 			nodeSpec.ArrayNode.MinSuccessRatio = test.minSuccessRatio
 
-			nCtx := createNodeExecutionContext(dataStore, eventRecorder, nil, literalMap, &arrayNodeSpec, arrayNodeState, test.currentWfParallelism, workflowMaxParallelism)
+			nCtx := createNodeExecutionContext(dataStore, eventRecorder, nil, &idlcore.InputData{Inputs: literalMap}, &arrayNodeSpec, arrayNodeState, test.currentWfParallelism, workflowMaxParallelism)
 
 			// initialize ArrayNodeHandler
 			nodeHandler := &mocks.NodeHandler{}
@@ -839,7 +839,9 @@ func TestHandleArrayNodePhaseExecutingSubNodeFailures(t *testing.T) {
 			arrayNodeState := &handler.ArrayNodeState{
 				Phase: v1alpha1.ArrayNodePhaseNone,
 			}
-			nCtx := createNodeExecutionContext(dataStore, eventRecorder, nil, literalMap, &arrayNodeSpec, arrayNodeState, 0, workflowMaxParallelism)
+			nCtx := createNodeExecutionContext(dataStore, eventRecorder, nil, &idlcore.InputData{
+				Inputs: literalMap,
+			}, &arrayNodeSpec, arrayNodeState, 0, workflowMaxParallelism)
 
 			// initialize ArrayNodeHandler
 			nodeHandler := &mocks.NodeHandler{}
@@ -867,7 +869,9 @@ func TestHandleArrayNodePhaseExecutingSubNodeFailures(t *testing.T) {
 			// evaluate node until failure
 			attempts := 1
 			for {
-				nCtx := createNodeExecutionContext(dataStore, eventRecorder, nil, literalMap, &arrayNodeSpec, arrayNodeState, 0, workflowMaxParallelism)
+				nCtx := createNodeExecutionContext(dataStore, eventRecorder, nil, &idlcore.InputData{
+					Inputs: literalMap,
+				}, &arrayNodeSpec, arrayNodeState, 0, workflowMaxParallelism)
 				_, err = arrayNodeHandler.Handle(ctx, nCtx)
 				assert.NoError(t, err)
 
@@ -952,7 +956,7 @@ func TestHandleArrayNodePhaseSucceeding(t *testing.T) {
 			// create NodeExecutionContext
 			eventRecorder := newBufferedEventRecorder()
 			literalMap := &idlcore.LiteralMap{}
-			nCtx := createNodeExecutionContext(dataStore, eventRecorder, []string{test.outputVariable}, literalMap, &arrayNodeSpec, arrayNodeState, 0, workflowMaxParallelism)
+			nCtx := createNodeExecutionContext(dataStore, eventRecorder, []string{test.outputVariable}, &idlcore.InputData{Inputs: literalMap}, &arrayNodeSpec, arrayNodeState, 0, workflowMaxParallelism)
 
 			// write mocked output files
 			for i, outputValue := range test.outputValues {
@@ -961,15 +965,17 @@ func TestHandleArrayNodePhaseSucceeding(t *testing.T) {
 				}
 
 				outputFile := storage.DataReference(fmt.Sprintf("s3://bucket/output/%d/0/outputs.pb", i))
-				outputLiteralMap := &idlcore.LiteralMap{
-					Literals: map[string]*idlcore.Literal{
-						test.outputVariable: &idlcore.Literal{
-							Value: &idlcore.Literal_Scalar{
-								Scalar: &idlcore.Scalar{
-									Value: &idlcore.Scalar_Primitive{
-										Primitive: &idlcore.Primitive{
-											Value: &idlcore.Primitive_Integer{
-												Integer: int64(*outputValue),
+				outputLiteralMap := &idlcore.OutputData{
+					Outputs: &idlcore.LiteralMap{
+						Literals: map[string]*idlcore.Literal{
+							test.outputVariable: &idlcore.Literal{
+								Value: &idlcore.Literal_Scalar{
+									Scalar: &idlcore.Scalar{
+										Value: &idlcore.Scalar_Primitive{
+											Primitive: &idlcore.Primitive{
+												Value: &idlcore.Primitive_Integer{
+													Integer: int64(*outputValue),
+												},
 											},
 										},
 									},
@@ -992,14 +998,14 @@ func TestHandleArrayNodePhaseSucceeding(t *testing.T) {
 			assert.Equal(t, test.expectedTransitionPhase, transition.Info().GetPhase())
 
 			// validate output file
-			var outputs idlcore.LiteralMap
+			var outputs idlcore.OutputData
 			outputFile := v1alpha1.GetOutputsFile(nCtx.NodeStatus().GetOutputDir())
 			err = nCtx.DataStore().ReadProtobuf(ctx, outputFile, &outputs)
 			assert.NoError(t, err)
 
-			assert.Len(t, outputs.GetLiterals(), 1)
+			assert.Len(t, outputs.GetOutputs().GetLiterals(), 1)
 
-			collection := outputs.GetLiterals()[test.outputVariable].GetCollection()
+			collection := outputs.GetOutputs().GetLiterals()[test.outputVariable].GetCollection()
 			assert.NotNil(t, collection)
 
 			assert.Len(t, collection.GetLiterals(), len(test.outputValues))
@@ -1078,7 +1084,7 @@ func TestHandleArrayNodePhaseFailing(t *testing.T) {
 			// create NodeExecutionContext
 			eventRecorder := newBufferedEventRecorder()
 			literalMap := &idlcore.LiteralMap{}
-			nCtx := createNodeExecutionContext(dataStore, eventRecorder, nil, literalMap, &arrayNodeSpec, arrayNodeState, 0, workflowMaxParallelism)
+			nCtx := createNodeExecutionContext(dataStore, eventRecorder, nil, &idlcore.InputData{Inputs: literalMap}, &arrayNodeSpec, arrayNodeState, 0, workflowMaxParallelism)
 
 			// evaluate node
 			transition, err := arrayNodeHandler.Handle(ctx, nCtx)

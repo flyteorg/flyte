@@ -143,6 +143,18 @@ class LiteralMap(_message.Message):
     literals: _containers.MessageMap[str, Literal]
     def __init__(self, literals: _Optional[_Mapping[str, Literal]] = ...) -> None: ...
 
+class InputData(_message.Message):
+    __slots__ = ["inputs"]
+    INPUTS_FIELD_NUMBER: _ClassVar[int]
+    inputs: LiteralMap
+    def __init__(self, inputs: _Optional[_Union[LiteralMap, _Mapping]] = ...) -> None: ...
+
+class OutputData(_message.Message):
+    __slots__ = ["outputs"]
+    OUTPUTS_FIELD_NUMBER: _ClassVar[int]
+    outputs: LiteralMap
+    def __init__(self, outputs: _Optional[_Union[LiteralMap, _Mapping]] = ...) -> None: ...
+
 class BindingDataCollection(_message.Message):
     __slots__ = ["bindings"]
     BINDINGS_FIELD_NUMBER: _ClassVar[int]

@@ -271,8 +271,7 @@ func BuildRawPod(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v
 
 	switch target := taskTemplate.GetTarget().(type) {
 	case *core.TaskTemplate_Container:
-		// handles tasks defined by a single container
-		c, err := BuildRawContainer(ctx, tCtx)
+		c, err := BuildRawContainer(taskTemplate, tCtx.TaskExecutionMetadata())
 		if err != nil {
 			return nil, nil, "", err
 		}
@@ -345,6 +344,7 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 		OutputPath:        tCtx.OutputWriter(),
 		Task:              tCtx.TaskReader(),
 		TaskExecMetadata:  tCtx.TaskExecutionMetadata(),
+		Runtime:           taskTemplate.GetMetadata().GetRuntime(),
 		IncludeConsoleURL: hasExternalLinkType(taskTemplate),
 	}
 

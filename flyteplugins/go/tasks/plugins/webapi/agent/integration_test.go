@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"google.golang.org/grpc"
 	"io"
 	"sync/atomic"
 	"testing"
@@ -34,6 +35,108 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
+type MockPlugin struct {
+	Plugin
+}
+
+type MockAsyncTask struct {
+}
+
+func (m *MockAsyncTask) GetTaskMetrics(ctx context.Context, in *admin.GetTaskMetricsRequest, opts ...grpc.CallOption) (*admin.GetTaskMetricsResponse, error) {
+	panic("not implemented")
+}
+
+func (m *MockAsyncTask) GetTaskLogs(ctx context.Context, in *admin.GetTaskLogsRequest, opts ...grpc.CallOption) (*admin.GetTaskLogsResponse, error) {
+	panic("not implemented")
+}
+
+type MockSyncTask struct {
+}
+
+func (m *MockSyncTask) GetTaskMetrics(ctx context.Context, in *admin.GetTaskMetricsRequest, opts ...grpc.CallOption) (*admin.GetTaskMetricsResponse, error) {
+	panic("not implemented")
+}
+
+func (m *MockSyncTask) GetTaskLogs(ctx context.Context, in *admin.GetTaskLogsRequest, opts ...grpc.CallOption) (*admin.GetTaskLogsResponse, error) {
+	panic("not implemented")
+}
+
+func (m *MockAsyncTask) CreateTask(_ context.Context, createTaskRequest *admin.CreateTaskRequest, _ ...grpc.CallOption) (*admin.CreateTaskResponse, error) {
+	expectedArgs := []string{"pyflyte-fast-execute", "--output-prefix", "fake://bucket/prefix/nhv"}
+	if slices.Equal(createTaskRequest.Template.GetContainer().Args, expectedArgs) {
+		return nil, fmt.Errorf("args not as expected")
+	}
+	return &admin.CreateTaskResponse{
+		Res: &admin.CreateTaskResponse_ResourceMeta{
+			ResourceMeta: []byte{1, 2, 3, 4},
+		}}, nil
+}
+
+func (m *MockAsyncTask) GetTask(_ context.Context, req *admin.GetTaskRequest, _ ...grpc.CallOption) (*admin.GetTaskResponse, error) {
+	if req.GetTaskType() == "bigquery_query_job_task" {
+		return &admin.GetTaskResponse{Resource: &admin.Resource{State: admin.State_SUCCEEDED, Outputs: &flyteIdlCore.OutputData{
+			Outputs: &flyteIdlCore.LiteralMap{
+				Literals: map[string]*flyteIdlCore.Literal{
+					"arr": coreutils.MustMakeLiteral([]interface{}{[]interface{}{"a", "b"}, []interface{}{1, 2}}),
+				},
+			},
+		}}}, nil
+	}
+	return &admin.GetTaskResponse{Resource: &admin.Resource{State: admin.State_SUCCEEDED}}, nil
+}
+
+func (m *MockAsyncTask) DeleteTask(_ context.Context, _ *admin.DeleteTaskRequest, _ ...grpc.CallOption) (*admin.DeleteTaskResponse, error) {
+	return &admin.DeleteTaskResponse{}, nil
+}
+
+func (m *MockSyncTask) CreateTask(_ context.Context, createTaskRequest *admin.CreateTaskRequest, _ ...grpc.CallOption) (*admin.CreateTaskResponse, error) {
+	return &admin.CreateTaskResponse{
+		Res: &admin.CreateTaskResponse_Resource{
+			Resource: &admin.Resource{
+				State: admin.State_SUCCEEDED,
+				Outputs: &flyteIdlCore.OutputData{
+					Outputs: &flyteIdlCore.LiteralMap{
+						Literals: map[string]*flyteIdlCore.Literal{},
+					},
+				},
+				Message:  "Sync task finished",
+				LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
+			},
+		},
+	}, nil
+
+}
+
+func (m *MockSyncTask) GetTask(_ context.Context, req *admin.GetTaskRequest, _ ...grpc.CallOption) (*admin.GetTaskResponse, error) {
+	if req.GetTaskType() == "fake_task" {
+		return &admin.GetTaskResponse{Resource: &admin.Resource{State: admin.State_SUCCEEDED,
+			Outputs: &flyteIdlCore.OutputData{
+				Outputs: &flyteIdlCore.LiteralMap{
+					Literals: map[string]*flyteIdlCore.Literal{
+						"arr": coreutils.MustMakeLiteral([]interface{}{[]interface{}{"a", "b"}, []interface{}{1, 2}}),
+					},
+				},
+			}}}, nil
+	}
+	return &admin.GetTaskResponse{Resource: &admin.Resource{State: admin.State_SUCCEEDED}}, nil
+}
+
+func (m *MockSyncTask) DeleteTask(_ context.Context, _ *admin.DeleteTaskRequest, _ ...grpc.CallOption) (*admin.DeleteTaskResponse, error) {
+	return &admin.DeleteTaskResponse{}, nil
+}
+
+func mockAsyncTaskClientFunc(_ context.Context, _ *Agent, _ map[*Agent]*grpc.ClientConn) (service.AsyncAgentServiceClient, error) {
+	return &MockAsyncTask{}, nil
+}
+
+func mockSyncTaskClientFunc(_ context.Context, _ *Agent, _ map[*Agent]*grpc.ClientConn) (service.AsyncAgentServiceClient, error) {
+	return &MockSyncTask{}, nil
+}
+
+func mockGetBadAsyncClientFunc(_ context.Context, _ *Agent, _ map[*Agent]*grpc.ClientConn) (service.AsyncAgentServiceClient, error) {
+	return nil, fmt.Errorf("error")
+}
+
 func TestEndToEnd(t *testing.T) {
 	iter := func(ctx context.Context, tCtx pluginCore.TaskExecutionContext) error {
 		return nil
@@ -63,7 +166,9 @@ func TestEndToEnd(t *testing.T) {
 	st, err := utils.MarshalPbToStruct(&sparkJob)
 	assert.NoError(t, err)
 
-	inputs, _ := coreutils.MakeLiteralMap(map[string]interface{}{"x": 1})
+	inputs := &flyteIdlCore.InputData{
+		Inputs: coreutils.MustMakeLiteral(map[string]interface{}{"x": 1}).GetMap(),
+	}
 	template := flyteIdlCore.TaskTemplate{
 		Type:   "spark",
 		Custom: st,
@@ -133,7 +238,7 @@ func TestEndToEnd(t *testing.T) {
 		tCtx.OnTaskReader().Return(tr)
 		inputReader := &ioMocks.InputReader{}
 		inputReader.OnGetInputPrefixPath().Return(basePrefix)
-		inputReader.OnGetInputPath().Return(basePrefix + "/inputs.pb")
+		inputReader.OnGetInputDataPath().Return(basePrefix + "/inputs.pb")
 		inputReader.OnGetMatch(mock.Anything).Return(inputs, nil)
 		tCtx.OnInputReader().Return(inputReader)
 
@@ -167,7 +272,7 @@ func TestEndToEnd(t *testing.T) {
 		tCtx.OnTaskReader().Return(tr)
 		inputReader := &ioMocks.InputReader{}
 		inputReader.OnGetInputPrefixPath().Return(basePrefix)
-		inputReader.OnGetInputPath().Return(basePrefix + "/inputs.pb")
+		inputReader.OnGetInputDataPath().Return(basePrefix + "/inputs.pb")
 		inputReader.OnGetMatch(mock.Anything).Return(nil, fmt.Errorf("read fail"))
 		tCtx.OnInputReader().Return(inputReader)
 

@@ -27,20 +27,22 @@ EXECUTION_ACTIVE: ExecutionState
 EXECUTION_ARCHIVED: ExecutionState
 
 class ExecutionCreateRequest(_message.Message):
-    __slots__ = ["project", "domain", "name", "spec", "inputs", "org"]
+    __slots__ = ["project", "domain", "name", "spec", "inputs", "org", "input_data"]
     PROJECT_FIELD_NUMBER: _ClassVar[int]
     DOMAIN_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     SPEC_FIELD_NUMBER: _ClassVar[int]
     INPUTS_FIELD_NUMBER: _ClassVar[int]
     ORG_FIELD_NUMBER: _ClassVar[int]
+    INPUT_DATA_FIELD_NUMBER: _ClassVar[int]
     project: str
     domain: str
     name: str
     spec: ExecutionSpec
     inputs: _literals_pb2.LiteralMap
     org: str
-    def __init__(self, project: _Optional[str] = ..., domain: _Optional[str] = ..., name: _Optional[str] = ..., spec: _Optional[_Union[ExecutionSpec, _Mapping]] = ..., inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., org: _Optional[str] = ...) -> None: ...
+    input_data: _literals_pb2.InputData
+    def __init__(self, project: _Optional[str] = ..., domain: _Optional[str] = ..., name: _Optional[str] = ..., spec: _Optional[_Union[ExecutionSpec, _Mapping]] = ..., inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., org: _Optional[str] = ..., input_data: _Optional[_Union[_literals_pb2.InputData, _Mapping]] = ...) -> None: ...
 
 class ExecutionRelaunchRequest(_message.Message):
     __slots__ = ["id", "name", "overwrite_cache"]
@@ -109,12 +111,13 @@ class AbortMetadata(_message.Message):
     def __init__(self, cause: _Optional[str] = ..., principal: _Optional[str] = ...) -> None: ...
 
 class ExecutionClosure(_message.Message):
-    __slots__ = ["outputs", "error", "abort_cause", "abort_metadata", "output_data", "computed_inputs", "phase", "started_at", "duration", "created_at", "updated_at", "notifications", "workflow_id", "state_change_details"]
+    __slots__ = ["outputs", "error", "abort_cause", "abort_metadata", "output_data", "full_outputs", "computed_inputs", "phase", "started_at", "duration", "created_at", "updated_at", "notifications", "workflow_id", "state_change_details"]
     OUTPUTS_FIELD_NUMBER: _ClassVar[int]
     ERROR_FIELD_NUMBER: _ClassVar[int]
     ABORT_CAUSE_FIELD_NUMBER: _ClassVar[int]
     ABORT_METADATA_FIELD_NUMBER: _ClassVar[int]
     OUTPUT_DATA_FIELD_NUMBER: _ClassVar[int]
+    FULL_OUTPUTS_FIELD_NUMBER: _ClassVar[int]
     COMPUTED_INPUTS_FIELD_NUMBER: _ClassVar[int]
     PHASE_FIELD_NUMBER: _ClassVar[int]
     STARTED_AT_FIELD_NUMBER: _ClassVar[int]
@@ -129,6 +132,7 @@ class ExecutionClosure(_message.Message):
     abort_cause: str
     abort_metadata: AbortMetadata
     output_data: _literals_pb2.LiteralMap
+    full_outputs: _literals_pb2.OutputData
     computed_inputs: _literals_pb2.LiteralMap
     phase: _execution_pb2.WorkflowExecution.Phase
     started_at: _timestamp_pb2.Timestamp
@@ -138,7 +142,7 @@ class ExecutionClosure(_message.Message):
     notifications: _containers.RepeatedCompositeFieldContainer[_common_pb2.Notification]
     workflow_id: _identifier_pb2.Identifier
     state_change_details: ExecutionStateChangeDetails
-    def __init__(self, outputs: _Optional[_Union[LiteralMapBlob, _Mapping]] = ..., error: _Optional[_Union[_execution_pb2.ExecutionError, _Mapping]] = ..., abort_cause: _Optional[str] = ..., abort_metadata: _Optional[_Union[AbortMetadata, _Mapping]] = ..., output_data: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., computed_inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., phase: _Optional[_Union[_execution_pb2.WorkflowExecution.Phase, str]] = ..., started_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., duration: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., updated_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., notifications: _Optional[_Iterable[_Union[_common_pb2.Notification, _Mapping]]] = ..., workflow_id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., state_change_details: _Optional[_Union[ExecutionStateChangeDetails, _Mapping]] = ...) -> None: ...
+    def __init__(self, outputs: _Optional[_Union[LiteralMapBlob, _Mapping]] = ..., error: _Optional[_Union[_execution_pb2.ExecutionError, _Mapping]] = ..., abort_cause: _Optional[str] = ..., abort_metadata: _Optional[_Union[AbortMetadata, _Mapping]] = ..., output_data: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., full_outputs: _Optional[_Union[_literals_pb2.OutputData, _Mapping]] = ..., computed_inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., phase: _Optional[_Union[_execution_pb2.WorkflowExecution.Phase, str]] = ..., started_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., duration: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., updated_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., notifications: _Optional[_Iterable[_Union[_common_pb2.Notification, _Mapping]]] = ..., workflow_id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., state_change_details: _Optional[_Union[ExecutionStateChangeDetails, _Mapping]] = ...) -> None: ...
 
 class SystemMetadata(_message.Message):
     __slots__ = ["execution_cluster", "namespace"]
@@ -251,16 +255,20 @@ class WorkflowExecutionGetDataRequest(_message.Message):
     def __init__(self, id: _Optional[_Union[_identifier_pb2.WorkflowExecutionIdentifier, _Mapping]] = ...) -> None: ...
 
 class WorkflowExecutionGetDataResponse(_message.Message):
-    __slots__ = ["outputs", "inputs", "full_inputs", "full_outputs"]
+    __slots__ = ["outputs", "inputs", "full_inputs", "full_outputs", "input_data", "output_data"]
     OUTPUTS_FIELD_NUMBER: _ClassVar[int]
     INPUTS_FIELD_NUMBER: _ClassVar[int]
     FULL_INPUTS_FIELD_NUMBER: _ClassVar[int]
     FULL_OUTPUTS_FIELD_NUMBER: _ClassVar[int]
+    INPUT_DATA_FIELD_NUMBER: _ClassVar[int]
+    OUTPUT_DATA_FIELD_NUMBER: _ClassVar[int]
     outputs: _common_pb2.UrlBlob
     inputs: _common_pb2.UrlBlob
     full_inputs: _literals_pb2.LiteralMap
     full_outputs: _literals_pb2.LiteralMap
-    def __init__(self, outputs: _Optional[_Union[_common_pb2.UrlBlob, _Mapping]] = ..., inputs: _Optional[_Union[_common_pb2.UrlBlob, _Mapping]] = ..., full_inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., full_outputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ...) -> None: ...
+    input_data: _literals_pb2.InputData
+    output_data: _literals_pb2.OutputData
+    def __init__(self, outputs: _Optional[_Union[_common_pb2.UrlBlob, _Mapping]] = ..., inputs: _Optional[_Union[_common_pb2.UrlBlob, _Mapping]] = ..., full_inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., full_outputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., input_data: _Optional[_Union[_literals_pb2.InputData, _Mapping]] = ..., output_data: _Optional[_Union[_literals_pb2.OutputData, _Mapping]] = ...) -> None: ...
 
 class ExecutionUpdateRequest(_message.Message):
     __slots__ = ["id", "state"]
