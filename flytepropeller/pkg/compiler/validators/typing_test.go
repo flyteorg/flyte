@@ -893,3 +893,58 @@ func TestStructuredDatasetCasting(t *testing.T) {
 		assert.True(t, castable, "StructuredDataset are nullable")
 	})
 }
+
+func TestBlobCasting(t *testing.T) {
+	emptyBlob := &core.LiteralType{
+		Type: &core.LiteralType_Blob{
+			Blob: &core.BlobType{
+				Format: "",
+			},
+		},
+	}
+	genericBlob := &core.LiteralType{
+		Type: &core.LiteralType_Blob{
+			Blob: &core.BlobType{
+				Format: "csv",
+			},
+		},
+	}
+	mismatchedFormatBlob := &core.LiteralType{
+		Type: &core.LiteralType_Blob{
+			Blob: &core.BlobType{
+				Format: "pdf",
+			},
+		},
+	}
+
+	t.Run("BaseCase_GenericBlob", func(t *testing.T) {
+		castable := AreTypesCastable(genericBlob, genericBlob)
+		assert.True(t, castable, "Blob() should be castable to Blob()")
+	})
+
+	t.Run("GenericToEmptyFormat", func(t *testing.T) {
+		castable := AreTypesCastable(genericBlob, emptyBlob)
+		assert.True(t, castable, "Blob(format='csv') should be castable to Blob()")
+	})
+
+	t.Run("EmptyFormatToGeneric", func(t *testing.T) {
+		castable := AreTypesCastable(genericBlob, emptyBlob)
+		assert.True(t, castable, "Blob() should be castable to Blob(format='csv')")
+	})
+
+	t.Run("MismatchedFormat", func(t *testing.T) {
+		castable := AreTypesCastable(genericBlob, mismatchedFormatBlob)
+		assert.False(t, castable, "Blob(format='csv') should not be castable to Blob(format='pdf')")
+	})
+
+	t.Run("BlobsAreNullable", func(t *testing.T) {
+		castable := AreTypesCastable(
+			&core.LiteralType{
+				Type: &core.LiteralType_Simple{
+					Simple: core.SimpleType_NONE,
+				},
+			},
+			genericBlob)
+		assert.False(t, castable, "Blob is not nullable")
+	})
+}
