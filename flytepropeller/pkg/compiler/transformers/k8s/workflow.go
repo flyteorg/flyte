@@ -2,10 +2,10 @@
 package k8s
 
 import (
+	"context"
 	"fmt"
 	"hash/fnv"
 	"strings"
-	"time"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/rand"
@@ -14,7 +14,9 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/errors"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/utils"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 const (
@@ -161,15 +163,18 @@ func generateName(wfID *core.Identifier, execID *core.WorkflowExecutionIdentifie
 	}
 }
 
-const ExecutionIDSuffixLength = 21
-
-/* #nosec */
-func GetExecutionName(name string, seed int64) string {
-	rand.Seed(seed)
-	// K8s has a limitation of 63 chars
-	name = name[:minInt(63-ExecutionIDSuffixLength, len(name))]
-	execName := name + "-" + rand.String(ExecutionIDSuffixLength-1)
-	return execName
+func hashIdentifier(identifier core.Identifier) uint64 {
+	h := fnv.New64()
+	_, err := h.Write([]byte(fmt.Sprintf("%s:%s:%s",
+		identifier.Project, identifier.Domain, identifier.Name)))
+	if err != nil {
+		// This shouldn't occur.
+		logger.Errorf(context.Background(),
+			"failed to hash execution identifier: %+v with err: %v", identifier, err)
+		return 0
+	}
+	logger.Debugf(context.Background(), "Returning hash for [%+v]: %d", identifier, h.Sum64())
+	return h.Sum64()
 }
 
 // BuildFlyteWorkflow builds v1alpha1.FlyteWorkflow resource. Returned error, if not nil, is of type errors.CompilerErrors.
@@ -244,7 +249,19 @@ func BuildFlyteWorkflow(wfClosure *core.CompiledWorkflowClosure, inputs *core.Li
 		errs.Collect(errors.NewWorkflowBuildError(err))
 	}
 
-	obj.ObjectMeta.Name = GetExecutionName(name, time.Now().UnixNano())
+	hashedIdentifier := hashIdentifier(core.Identifier{
+		Project: project,
+		Domain:  domain,
+		Name:    name,
+	})
+	rand.Seed(int64(hashedIdentifier))
+
+	if workflowCRNameHashLength := config.GetConfig().WorkflowCRNameHashLength; workflowCRNameHashLength > 0 {
+		obj.ObjectMeta.Name = rand.String(workflowCRNameHashLength)
+	} else {
+		obj.ObjectMeta.Name = name
+	}
+
 	obj.ObjectMeta.GenerateName = generatedName
 	obj.ObjectMeta.Labels[ExecutionIDLabel] = label
 	obj.ObjectMeta.Labels[ProjectLabel] = project

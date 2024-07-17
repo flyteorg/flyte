@@ -165,10 +165,6 @@ func TestDynamic(t *testing.T) {
 					Name:    "name",
 				},
 				"namespace")
-			// make sure real CR has randomized suffix
-			assert.Regexp(t, regexp.MustCompile("name-[bcdfghjklmnpqrstvwxz2456789]{20}"), flyteWf.Name)
-			// then reset for the sake of serialization comparison
-			flyteWf.Name = "name"
 			if assert.NoError(t, err) {
 				raw, err := json.Marshal(flyteWf)
 				if assert.NoError(t, err) {
@@ -463,10 +459,6 @@ func runCompileTest(t *testing.T, dirName string) {
 				if !assert.NoError(t, err) {
 					t.FailNow()
 				}
-				// make sure real CR has randomized suffix
-				assert.Regexp(t, regexp.MustCompile("name-[bcdfghjklmnpqrstvwxz2456789]{20}"), flyteWf.Name)
-				// then reset for the sake of serialization comparison
-				flyteWf.Name = "name"
 
 				file := filepath.Join(filepath.Dir(filepath.Dir(p)), "k8s", strings.TrimRight(filepath.Base(p), filepath.Ext(p))+"_crd.json")
 				if !storeOrDiff(t, json.Marshal, flyteWf, file) {
