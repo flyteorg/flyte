@@ -43,7 +43,7 @@ func ValidateBooleanExpression(w c.WorkflowBuilder, node c.NodeBuilder, expr *fl
 				expr.GetComparison().GetLeftValue(), requireParamType, errs.NewScope())
 			if op1Valid && op2Valid && op1Type != nil && op2Type != nil {
 				if op1Type.String() != op2Type.String() {
-					errs.Collect(errors.NewMismatchingTypesErr(node.GetId(), "RightValue",
+					errs.Collect(errors.NewMismatchingTypesErr(node.GetId(), "", "RightValue",
 						op1Type.String(), op2Type.String()))
 				}
 			}

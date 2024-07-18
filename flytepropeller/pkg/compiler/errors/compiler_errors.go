@@ -202,10 +202,10 @@ func NewDuplicateIDFoundErr(nodeID string) *CompileError {
 	)
 }
 
-func NewMismatchingTypesErr(nodeID, fromVar, fromType, toType string) *CompileError {
+func NewMismatchingTypesErr(nodeID, fromVar, fromType, toVar, toType string) *CompileError {
 	return newError(
 		MismatchingTypes,
-		fmt.Sprintf("Variable [%v] (type [%v]) doesn't match expected type [%v].", fromVar, fromType,
+		fmt.Sprintf("The output variable '%v' has type [%v], but it's assigned to the input variable '%v' which has type type [%v].", fromVar, fromType, toVar,
 			toType),
 		nodeID,
 	)
