@@ -577,17 +577,19 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			taskPhase = idlcore.TaskExecution_FAILED
 		}
 
-		// if the ArrayNode phase has changed we need to reset the taskPhaseVersion to 0, otherwise
-		// increment it if we detect any changes in subNode state.
-		if currentArrayNodePhase != arrayNodeState.Phase {
-			arrayNodeState.TaskPhaseVersion = 0
-		} else if incrementTaskPhaseVersion {
+		// increment taskPhaseVersion if we detect any changes in subNode state.
+		if incrementTaskPhaseVersion {
 			arrayNodeState.TaskPhaseVersion = arrayNodeState.TaskPhaseVersion + 1
 		}
 
 		if err := eventRecorder.finalize(ctx, nCtx, taskPhase, arrayNodeState.TaskPhaseVersion, a.eventConfig); err != nil {
 			logger.Errorf(ctx, "ArrayNode event recording failed: [%s]", err.Error())
 			return handler.UnknownTransition, err
+		}
+
+		// if the ArrayNode phase has changed we need to reset the taskPhaseVersion to 0
+		if currentArrayNodePhase != arrayNodeState.Phase {
+			arrayNodeState.TaskPhaseVersion = 0
 		}
 	}
 
