@@ -667,7 +667,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 
 		// increment taskPhaseVersion if we detect any changes in subNode state.
 		if incrementTaskPhaseVersion {
-			arrayNodeState.TaskPhaseVersion++
+			arrayNodeState.TaskPhaseVersion = arrayNodeState.TaskPhaseVersion + 1
 		}
 
 		const maxRetries = 3
@@ -696,6 +696,11 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 				logger.Errorf(ctx, "ArrayNode event recording failed after %d retries: [%s]", maxRetries, err.Error())
 				return handler.UnknownTransition, err
 			}
+		}
+
+		// if the ArrayNode phase has changed we need to reset the taskPhaseVersion to 0
+		if currentArrayNodePhase != arrayNodeState.Phase {
+			arrayNodeState.TaskPhaseVersion = 0
 		}
 
 		// if the ArrayNode phase has changed we need to reset the taskPhaseVersion to 0
