@@ -1,35 +1,4 @@
 #[macro_export]
-macro_rules! convert_foreign_tonic_error {
-    // Foreign Rust error types: https://pyo3.rs/main/function/error-handling#foreign-rust-error-types
-    // Create a newtype wrapper, e.g. MyOtherError. Then implement From<MyOtherError> for PyErr (or PyErrArguments), as well as From<OtherError> for MyOtherError.
-    () => {
-        use tonic::Status;
-        // An error indicates taht failing at communicating between gRPC clients and servers.
-        pub struct GRPCError(Status);
-        use std::fmt;
-
-        // TODO: Do we need this formatting (to string)?
-        impl fmt::Display for GRPCError {
-            fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-                write!(f, "{}", self.0)
-            }
-        }
-
-        impl std::convert::From<Status> for GRPCError {
-            fn from(other: Status) -> Self {
-                Self(other)
-            }
-        }
-
-        impl std::convert::From<GRPCError> for PyErr {
-            fn from(err: GRPCError) -> Self {
-                PyException::new_err(err.to_string())
-            }
-        }
-    };
-}
-
-#[macro_export]
 macro_rules! convert_foreign_prost_error {
     // Foreign Rust error types: https://pyo3.rs/main/function/error-handling#foreign-rust-error-types
     // Create a newtype wrapper, e.g. MyOtherError. Then implement From<MyOtherError> for PyErr (or PyErrArguments), as well as From<OtherError> for MyOtherError.
@@ -285,10 +254,121 @@ use pyo3::prelude::*;
 #[pymodule]
 // #[pyo3(name="_flyteidl_rust")]
 pub mod _flyteidl_rust {
-    pub use pyo3::prelude::*;
 
-    convert_foreign_tonic_error!();
+    use pyo3::{
+        prelude::*,
+        types::{PyDict, PyTuple},
+    };
+    use std::fmt;
+    use tonic::Status;
+
     convert_foreign_prost_error!();
+
+    #[pyclass]
+    #[pyo3(name = "FlyteUserException", subclass, extends = pyo3::exceptions::PyException)] // or PyBaseException
+    pub struct PyFlyteUserException {}
+    #[pymethods]
+    impl PyFlyteUserException {
+        #[new]
+        #[pyo3(signature = (*_args, **_kwargs))]
+        fn new(
+            _args: Bound<'_, pyo3::types::PyTuple>,
+            _kwargs: Option<Bound<'_, pyo3::types::PyDict>>,
+        ) -> Self {
+            Self {}
+        }
+    }
+    #[pyclass(extends = pyo3::exceptions::PyException)]
+    pub struct FlyteEntityNotExistException {}
+    #[pymethods]
+    impl FlyteEntityNotExistException {
+        #[new]
+        #[pyo3(signature = (*_args, **_kwargs))]
+        fn new(
+            _args: Bound<'_, pyo3::types::PyTuple>,
+            _kwargs: Option<Bound<'_, pyo3::types::PyDict>>,
+        ) -> Self {
+            Self {}
+        }
+    }
+    #[pyclass(extends = pyo3::exceptions::PyException)]
+    pub struct FlyteEntityAlreadyExistsException {}
+    #[pymethods]
+    impl FlyteEntityAlreadyExistsException {
+        #[new]
+        #[pyo3(signature = (*_args, **_kwargs))]
+        fn new(
+            _args: Bound<'_, pyo3::types::PyTuple>,
+            _kwargs: Option<Bound<'_, pyo3::types::PyDict>>,
+        ) -> Self {
+            Self {}
+        }
+    }
+    #[pyclass(extends = pyo3::exceptions::PyException)]
+    pub struct FlyteAuthenticationException {}
+    #[pymethods]
+    impl FlyteAuthenticationException {
+        #[new]
+        #[pyo3(signature = (*_args, **_kwargs))]
+        fn new(
+            _args: Bound<'_, pyo3::types::PyTuple>,
+            _kwargs: Option<Bound<'_, pyo3::types::PyDict>>,
+        ) -> Self {
+            Self {}
+        }
+    }
+
+    #[pyclass(extends = pyo3::exceptions::PyException)]
+    pub struct FlyteInvalidInputException {}
+    #[pymethods]
+    impl FlyteInvalidInputException {
+        #[new]
+        #[pyo3(signature = (*_args, **_kwargs))]
+        fn new(
+            _args: Bound<'_, pyo3::types::PyTuple>,
+            _kwargs: Option<Bound<'_, pyo3::types::PyDict>>,
+        ) -> Self {
+            Self {}
+        }
+    }
+
+    // A wrapped error indicates failure at communicating between gRPC clients and servers.
+    pub struct GRPCError(Status);
+
+    // TODO: Do we need this formatting (to string)?
+    impl fmt::Display for GRPCError {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            write!(f, "{}", self.0)
+        }
+    }
+
+    impl std::convert::From<Status> for GRPCError {
+        fn from(other: Status) -> Self {
+            Self(other)
+        }
+    }
+
+    impl std::convert::From<GRPCError> for PyErr {
+        fn from(err: GRPCError) -> Self {
+            // Raise Python base error use `PyException::new_err(err.to_string())`
+            // We pattern match tonic status code to riase correspond Rust binding error here as an exception wrapper, and user can catch them later in Python
+            match err.0.code() {
+                tonic::Code::Unauthenticated => {
+                    return PyErr::new::<FlyteAuthenticationException, _>(err.to_string())
+                }
+                tonic::Code::AlreadyExists => {
+                    return PyErr::new::<FlyteEntityAlreadyExistsException, _>(err.to_string())
+                }
+                tonic::Code::NotFound => {
+                    return PyErr::new::<FlyteEntityNotExistException, _>(err.to_string())
+                }
+                tonic::Code::InvalidArgument => {
+                    return PyErr::new::<FlyteInvalidInputException, _>(err.to_string())
+                }
+                _ => todo!(),
+            }
+        }
+    }
 
     #[pymodule]
     pub mod protobuf {
@@ -306,17 +386,27 @@ pub mod _flyteidl_rust {
             CompiledWorkflow, CompiledWorkflowClosure, Container, ContainerPort, DataLoadingConfig,
             Error, ExecutionEnv, ExecutionEnvAssignment, ExecutionError, ExtendedResources,
             GateNode, Identifier, IfBlock, IfElseBlock, IoStrategy, KeyValuePair, Literal,
-            LiteralMap, LiteralType, Node, NodeExecutionIdentifier, NodeMetadata, OutputReference,
-            Parameter, ParameterMap, Primitive, PromiseAttribute, ResourceType, Resources,
-            RetryStrategy, RuntimeMetadata, Scalar, SchemaType, SecurityContext, SignalCondition,
-            SimpleType, SleepCondition, StructuredDataset, StructuredDatasetMetadata,
-            StructuredDatasetType, TaskExecutionIdentifier, TaskMetadata, TaskNode,
-            TaskNodeOverrides, TaskTemplate, TypeAnnotation, TypeStructure, TypedInterface, Union,
-            UnionInfo, Variable, VariableMap, WorkflowExecution, WorkflowExecutionIdentifier,
-            WorkflowMetadata, WorkflowMetadataDefaults, WorkflowNode, WorkflowTemplate,
+            LiteralCollection, LiteralMap, LiteralType, Node, NodeExecutionIdentifier,
+            NodeMetadata, OutputReference, Parameter, ParameterMap, Primitive, PromiseAttribute,
+            ResourceType, Resources, RetryStrategy, RuntimeMetadata, Scalar, SchemaType,
+            SecurityContext, SignalCondition, SimpleType, SleepCondition, StructuredDataset,
+            StructuredDatasetMetadata, StructuredDatasetType, TaskExecutionIdentifier,
+            TaskMetadata, TaskNode, TaskNodeOverrides, TaskTemplate, TypeAnnotation, TypeStructure,
+            TypedInterface, Union, UnionInfo, Variable, VariableMap, WorkflowExecution,
+            WorkflowExecutionIdentifier, WorkflowMetadata, WorkflowMetadataDefaults, WorkflowNode,
+            WorkflowTemplate,
         };
     }
-
+    #[pymodule]
+    pub mod execution_error {
+        #[pymodule_export]
+        use crate::flyteidl::core::execution_error::ErrorKind;
+    }
+    #[pymodule]
+    pub mod array_node {
+        #[pymodule_export]
+        use crate::flyteidl::core::array_node::{ParallelismOption, SuccessCriteria};
+    }
     #[pymodule]
     pub mod catalog_metadata {
         #[pymodule_export]
@@ -403,6 +493,11 @@ pub mod _flyteidl_rust {
         use crate::flyteidl::core::task_metadata::InterruptibleValue;
     }
     #[pymodule]
+    pub mod node_metadata {
+        #[pymodule_export]
+        use crate::flyteidl::core::node_metadata::InterruptibleValue;
+    }
+    #[pymodule]
     pub mod node_execution {
         #[pymodule_export]
         use crate::flyteidl::core::node_execution::Phase;
@@ -454,19 +549,19 @@ pub mod _flyteidl_rust {
             AbortMetadata, Annotations, AuthRole, ClusterAssignment, CronSchedule, Description,
             DescriptionEntity, Envs, Execution, ExecutionClosure, ExecutionClusterLabel,
             ExecutionCreateRequest, ExecutionCreateResponse, ExecutionMetadata, ExecutionSpec,
-            FixedRate, FixedRateUnit, Labels, LaunchPlan, LaunchPlanCreateRequest,
-            LaunchPlanCreateResponse, LaunchPlanMetadata, LaunchPlanSpec, LiteralMapBlob,
-            NamedEntityIdentifierList, NamedEntityIdentifierListRequest, NodeExecution,
-            NodeExecutionClosure, NodeExecutionGetDataRequest, NodeExecutionGetDataResponse,
-            NodeExecutionList, NodeExecutionListRequest, Notification, NotificationList,
-            ObjectGetRequest, RawOutputDataConfig, ResourceListRequest, Schedule, SourceCode,
-            SystemMetadata, Task, TaskClosure, TaskCreateRequest, TaskCreateResponse,
-            TaskExecution, TaskExecutionClosure, TaskExecutionGetDataRequest,
-            TaskExecutionGetDataResponse, TaskExecutionGetRequest, TaskExecutionList,
-            TaskExecutionListRequest, TaskSpec, Workflow, WorkflowClosure, WorkflowCreateRequest,
-            WorkflowCreateResponse, WorkflowExecutionGetDataRequest,
+            ExecutionTerminateRequest, FixedRate, FixedRateUnit, Labels, LaunchPlan,
+            LaunchPlanCreateRequest, LaunchPlanCreateResponse, LaunchPlanMetadata, LaunchPlanSpec,
+            LiteralMapBlob, NamedEntityIdentifierList, NamedEntityIdentifierListRequest,
+            NodeExecution, NodeExecutionClosure, NodeExecutionGetDataRequest,
+            NodeExecutionGetDataResponse, NodeExecutionList, NodeExecutionListRequest,
+            Notification, NotificationList, ObjectGetRequest, RawOutputDataConfig,
+            ResourceListRequest, Schedule, SourceCode, SystemMetadata, Task, TaskClosure,
+            TaskCreateRequest, TaskCreateResponse, TaskExecution, TaskExecutionClosure,
+            TaskExecutionGetDataRequest, TaskExecutionGetDataResponse, TaskExecutionGetRequest,
+            TaskExecutionList, TaskExecutionListRequest, TaskSpec, Workflow, WorkflowClosure,
+            WorkflowCreateRequest, WorkflowCreateResponse, WorkflowExecutionGetDataRequest,
             WorkflowExecutionGetDataResponse, WorkflowExecutionGetRequest, WorkflowList,
-            WorkflowSpec,
+            WorkflowNodeMetadata, WorkflowSpec,
         };
     }
     #[pymodule]
@@ -524,17 +619,9 @@ pub mod _flyteidl_rust {
     use pyo3::exceptions::PyValueError;
     use std::collections::HashMap;
 
-    // A customized simple implementation for parsing google protobuf types `Struct` and `Value`  from json string via deriving `serde::Deserialize`.
-    // Equivalent to things like: `google.protobuf._json_format.Parse(_json.dumps(self.custom), flyteidl.protobuf.Struct()) if self.custom else None`
-
-    #[pyfunction]
-    fn Parse(json_str: &str) -> PyResult<super::google::protobuf::Value> {
-        let parsed: serde_json::Value = serde_json::from_str(json_str)
-            .map_err(|e| PyValueError::new_err(format!("Invalid JSON: {}", e)))?;
-
-        let value = parse_json_value(&parsed)?;
-        Ok(value)
-    }
+    // A simple implementation for parsing google protobuf types `Struct` and `Value` from json string after deriving `serde::Deserialize` for structures.
+    // This should equivalent to `google.protobuf._json_format.Parse()`.
+    // For instance, `google.protobuf._json_format.Parse(_json.dumps(self.custom), flyteidl.protobuf.Struct()) if self.custom else None`
 
     fn parse_json_value(
         json_value: &serde_json::Value,
@@ -581,6 +668,15 @@ pub mod _flyteidl_rust {
     }
 
     #[pyfunction]
+    fn Parse(json_str: &str) -> PyResult<super::google::protobuf::Value> {
+        let parsed: serde_json::Value = serde_json::from_str(json_str)
+            .map_err(|e| PyValueError::new_err(format!("Invalid JSON: {}", e)))?;
+
+        let value = parse_json_value(&parsed)?;
+        Ok(value)
+    }
+
+    #[pyfunction]
     fn ParseStruct(json_str: &str) -> PyResult<super::google::protobuf::Struct> {
         let parsed: serde_json::Value = serde_json::from_str(json_str)
             .map_err(|e| PyValueError::new_err(format!("Invalid JSON: {}", e)))?;
@@ -613,9 +709,9 @@ pub mod _flyteidl_rust {
 
     #[pymethods]
     impl RawSynchronousFlyteClient {
-        // We need this `new` attribute to construct the `RawSynchronousFlyteClient` in Python.
+        // We need `new` attribute to construct the `RawSynchronousFlyteClient` in Python.
         #[new]
-        // TODO: Instead of accepting endpoint and kwargs dict as arguments, we should accept a path that reads platform configuration file.
+        // TODO: Instead of accepting endpoint and kwargs dict as arguments, we should take path as input that reads platform configuration file.
         #[pyo3(signature = (endpoint, **kwargs))]
         pub fn new(
             endpoint: &str,
@@ -641,6 +737,7 @@ pub mod _flyteidl_rust {
                         error
                     ),
                 };
+
             // `Channel::builder(endpoint_uri)` returns type `tonic::transport::Endpoint`.
             let channel =
                 match rt.block_on(tonic::transport::Channel::builder(endpoint_uri).connect()) {
@@ -650,7 +747,8 @@ pub mod _flyteidl_rust {
                         error
                     ),
                 };
-            // Binding connected channel into service client stubs.
+
+            // Binding connected channel to the service client stubs.
             let admin_stub =
                 crate::flyteidl::service::admin_service_client::AdminServiceClient::new(
                     channel.clone(),
@@ -659,6 +757,7 @@ pub mod _flyteidl_rust {
                 crate::flyteidl::service::data_proxy_service_client::DataProxyServiceClient::new(
                     channel.clone(),
                 );
+
             Ok(RawSynchronousFlyteClient {
                 runtime: rt, // The tokio runtime is used in a blocking manner for now.
                 admin_service: admin_stub,
@@ -852,8 +951,64 @@ pub mod _flyteidl_rust {
                 .into_inner();
             Ok(res)
         }
+        pub fn terminate_execution(
+            &mut self,
+            req: crate::flyteidl::admin::ExecutionTerminateRequest,
+        ) -> Result<crate::flyteidl::admin::ExecutionTerminateResponse, GRPCError> {
+            let res = self
+                .runtime
+                .block_on(self.admin_service.terminate_execution(req))?
+                .into_inner();
+            Ok(res)
+        }
     }
 }
+
+// mod service {
+//     use tonic::{Request, Response};
+//     use std::future::Future;
+//     use std::pin::Pin;
+//     use std::task::{Context, Poll};
+//     use tonic::body::BoxBody;
+//     use tonic::transport::Channel;
+//     use tower::Service;
+
+//     pub struct RetrySvc {
+//         inner: Channel,
+//     }
+
+//     impl RetrySvc {
+//         pub fn new(inner: Channel) -> Self {
+//             RetrySvc { inner }
+//         }
+//     }
+
+//     impl Service<Request<BoxBody>> for RetrySvc {
+//         type Response = Response<BoxBody>;
+//         type Error = Box<dyn std::error::Error + Send + Sync>;
+//         #[allow(clippy::type_complexity)]
+//         type Future = Pin<Box<dyn Future<Output = Result<Self::Response, Self::Error>> + Send>>;
+
+//         fn poll_ready(&mut self, cx: &mut Context<'_>) -> Poll<Result<(), Self::Error>> {
+//             self.inner.poll_ready(cx).map_err(Into::into)
+//         }
+
+//         fn call(&mut self, req: Request<BoxBody>) -> Self::Future {
+//             // This is necessary because tonic internally uses `tower::buffer::Buffer`.
+//             // See https://github.com/tower-rs/tower/issues/547#issuecomment-767629149
+//             // for details on why this is necessary
+//             let clone = self.inner.clone();
+//             let mut inner = std::mem::replace(&mut self.inner, clone);
+
+//             Box::pin(async move {
+//                 // Do extra async work here...
+//                 let response = inner.call(req).await?;
+
+//                 Ok(response)
+//             })
+//         }
+//     }
+// }
 
 // #[macro_export]
 // macro_rules! concrete_generic_structure {
