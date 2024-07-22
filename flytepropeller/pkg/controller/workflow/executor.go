@@ -77,6 +77,9 @@ type workflowExecutor struct {
 func (c *workflowExecutor) constructWorkflowMetadataPrefix(ctx context.Context, w *v1alpha1.FlyteWorkflow) (storage.DataReference, error) {
 	if w.GetExecutionID().WorkflowExecutionIdentifier != nil {
 		execID := fmt.Sprintf("%v-%v-%v", w.GetExecutionID().GetProject(), w.GetExecutionID().GetDomain(), w.GetExecutionID().GetName())
+		if len(w.GetExecutionID().GetOrg()) > 0 {
+			return c.store.ConstructReference(ctx, c.metadataPrefix, w.GetExecutionID().GetOrg(), execID)
+		}
 		return c.store.ConstructReference(ctx, c.metadataPrefix, execID)
 	}
 	// TODO should we use a random guid as the prefix? Otherwise we may get collisions
@@ -85,7 +88,6 @@ func (c *workflowExecutor) constructWorkflowMetadataPrefix(ctx context.Context, 
 }
 
 func (c *workflowExecutor) handleReadyWorkflow(ctx context.Context, w *v1alpha1.FlyteWorkflow) (Status, error) {
-
 	startNode := w.StartNode()
 	if startNode == nil {
 		return StatusFailing(&core.ExecutionError{
@@ -101,6 +103,7 @@ func (c *workflowExecutor) handleReadyWorkflow(ctx context.Context, w *v1alpha1.
 			Code:    "MetadataPrefixCreationFailure",
 			Message: err.Error()}), nil
 	}
+
 	w.GetExecutionStatus().SetDataDir(ref)
 	var inputs *core.LiteralMap
 	if w.Inputs != nil {

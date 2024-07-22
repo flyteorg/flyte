@@ -225,6 +225,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_rawoutput-suffix", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := join_Config(defaultConfig.DefaultRawOutputSuffix, ",")
+
+			cmdFlags.Set("rawoutput-suffix", testValue)
+			if vStringSlice, err := cmdFlags.GetStringSlice("rawoutput-suffix"); err == nil {
+				testDecodeRaw_Config(t, join_Config(vStringSlice, ","), &actual.DefaultRawOutputSuffix)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_queue.type", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {

@@ -257,7 +257,7 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Error(t *testing.T) {
 	handlerFactory, err := factory.NewHandlerFactory(ctx, adminClient, adminClient, fakeKubeClient, mockClientset, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, promutils.NewTestScope())
 	assert.NoError(t, err)
 
-	nodeExec, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, store, enqueueWorkflow, eventSink, adminClient, adminClient, "s3://bucket",
+	nodeExec, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, store, enqueueWorkflow, eventSink, adminClient, adminClient, "s3://bucket", make([]string, 0),
 		fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, handlerFactory, executionEnvClient, promutils.NewTestScope())
 	assert.NoError(t, err)
 	execStatsHolder, err := execStats.NewExecutionStatsHolder()
@@ -343,7 +343,7 @@ func TestWorkflowExecutor_HandleFlyteWorkflow(t *testing.T) {
 	handlerFactory, err := factory.NewHandlerFactory(ctx, adminClient, adminClient, fakeKubeClient, mockClientset, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, promutils.NewTestScope())
 	assert.NoError(t, err)
 
-	nodeExec, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, store, enqueueWorkflow, eventSink, adminClient, adminClient, "s3://bucket",
+	nodeExec, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, store, enqueueWorkflow, eventSink, adminClient, adminClient, "s3://bucket", make([]string, 0),
 		fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, handlerFactory, executionEnvClient, promutils.NewTestScope())
 	assert.NoError(t, err)
 
@@ -410,7 +410,7 @@ func BenchmarkWorkflowExecutor(b *testing.B) {
 	recoveryClient := &recoveryMocks.Client{}
 	adminClient := launchplan.NewFailFastLaunchPlanExecutor()
 	handlerFactory := &nodemocks.HandlerFactory{}
-	nodeExec, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, store, enqueueWorkflow, eventSink, adminClient, adminClient, "s3://bucket",
+	nodeExec, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, store, enqueueWorkflow, eventSink, adminClient, adminClient, "s3://bucket", make([]string, 0),
 		fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, handlerFactory, executionEnvClient, scope)
 	assert.NoError(b, err)
 
@@ -525,7 +525,7 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Failing(t *testing.T) {
 	handlerFactory.OnSetupMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
 	handlerFactory.OnGetHandlerMatch(mock.Anything).Return(h, nil)
 
-	nodeExec, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, store, enqueueWorkflow, eventSink, adminClient, adminClient, "s3://bucket",
+	nodeExec, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, store, enqueueWorkflow, eventSink, adminClient, adminClient, "s3://bucket", make([]string, 0),
 		fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, handlerFactory, executionEnvClient, promutils.NewTestScope())
 	assert.NoError(t, err)
 	execStatsHolder, err := execStats.NewExecutionStatsHolder()
@@ -630,7 +630,7 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Events(t *testing.T) {
 	handlerFactory, err := factory.NewHandlerFactory(ctx, adminClient, adminClient, fakeKubeClient, mockClientset, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, promutils.NewTestScope())
 	assert.NoError(t, err)
 
-	nodeExec, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, store, enqueueWorkflow, eventSink, adminClient, adminClient, "s3://bucket",
+	nodeExec, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, store, enqueueWorkflow, eventSink, adminClient, adminClient, "s3://bucket", make([]string, 0),
 		fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, handlerFactory, executionEnvClient, promutils.NewTestScope())
 	assert.NoError(t, err)
 	execStatsHolder, err := execStats.NewExecutionStatsHolder()
@@ -699,7 +699,7 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_EventFailure(t *testing.T) {
 	handlerFactory := &nodemocks.HandlerFactory{}
 	handlerFactory.OnSetupMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
 	handlerFactory.OnGetHandlerMatch(mock.Anything).Return(h, nil)
-	nodeExec, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, store, enqueueWorkflow, nodeEventSink, adminClient, adminClient, "s3://bucket",
+	nodeExec, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, store, enqueueWorkflow, nodeEventSink, adminClient, adminClient, "s3://bucket", make([]string, 0),
 		fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, handlerFactory, executionEnvClient, promutils.NewTestScope())
 	assert.NoError(t, err)
 

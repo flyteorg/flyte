@@ -496,6 +496,7 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 		nCtx.OnEnqueueOwnerFunc().Return(nil)
 
 		nCtx.OnRawOutputPrefix().Return("s3://sandbox/")
+		nCtx.OnRawOutputSuffix().Return(make([]string, 0))
 		nCtx.OnOutputShardSelector().Return(ioutils.NewConstantShardSelector([]string{"x"}))
 
 		executionContext := &mocks.ExecutionContext{}
@@ -817,6 +818,7 @@ func Test_task_Abort(t *testing.T) {
 		nCtx.OnExecutionContext().Return(executionContext)
 
 		nCtx.OnRawOutputPrefix().Return("s3://sandbox/")
+		nCtx.OnRawOutputSuffix().Return(make([]string, 0))
 		nCtx.OnOutputShardSelector().Return(ioutils.NewConstantShardSelector([]string{"x"}))
 
 		st := bytes.NewBuffer([]byte{})
@@ -978,6 +980,7 @@ func Test_task_Abort_v1(t *testing.T) {
 		nCtx.OnExecutionContext().Return(executionContext)
 
 		nCtx.OnRawOutputPrefix().Return("s3://sandbox/")
+		nCtx.OnRawOutputSuffix().Return(make([]string, 0))
 		nCtx.OnOutputShardSelector().Return(ioutils.NewConstantShardSelector([]string{"x"}))
 
 		st := bytes.NewBuffer([]byte{})
@@ -1159,6 +1162,7 @@ func Test_task_Finalize(t *testing.T) {
 		nCtx.OnExecutionContext().Return(executionContext)
 
 		nCtx.OnRawOutputPrefix().Return("s3://sandbox/")
+		nCtx.OnRawOutputSuffix().Return(make([]string, 0))
 		nCtx.OnOutputShardSelector().Return(ioutils.NewConstantShardSelector([]string{"x"}))
 
 		st := bytes.NewBuffer([]byte{})

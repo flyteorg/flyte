@@ -35,14 +35,20 @@ func TestNewShardedRawOutputPath(t *testing.T) {
 	ctx := context.TODO()
 	t.Run("", func(t *testing.T) {
 		ss := NewConstantShardSelector([]string{"x"})
-		sd, err := NewShardedRawOutputPath(ctx, ss, "s3://flyte", "unique", storage.URLPathConstructor{})
+		sd, err := NewShardedRawOutputPath(ctx, ss, "s3://flyte", make([]string, 0), "unique", storage.URLPathConstructor{})
 		assert.NoError(t, err)
 		assert.Equal(t, storage.DataReference("s3://flyte/x/unique"), sd.GetRawOutputPrefix())
+	})
+	t.Run("with suffix", func(t *testing.T) {
+		ss := NewConstantShardSelector([]string{"x"})
+		sd, err := NewShardedRawOutputPath(ctx, ss, "s3://flyte", []string{"suffix"}, "unique", storage.URLPathConstructor{})
+		assert.NoError(t, err)
+		assert.Equal(t, storage.DataReference("s3://flyte/x/suffix/unique"), sd.GetRawOutputPrefix())
 	})
 
 	t.Run("error", func(t *testing.T) {
 		ss := NewConstantShardSelector([]string{"s3:// abc"})
-		sd, err := NewShardedRawOutputPath(ctx, ss, "s3://bucket", "m", storage.URLPathConstructor{})
+		sd, err := NewShardedRawOutputPath(ctx, ss, "s3://bucket", make([]string, 0), "m", storage.URLPathConstructor{})
 		assert.Error(t, err, "%s", sd)
 	})
 }

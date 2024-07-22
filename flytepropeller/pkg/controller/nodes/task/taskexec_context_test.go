@@ -91,6 +91,7 @@ func dummyNodeExecutionContext(t *testing.T, parentInfo executors.ImmutableParen
 	nCtx.OnNodeID().Return(nodeID)
 	nCtx.OnEventsRecorder().Return(nil)
 	nCtx.OnEnqueueOwnerFunc().Return(nil)
+	nCtx.OnRawOutputSuffix().Return(make([]string, 0))
 
 	executionContext := &mocks2.ExecutionContext{}
 	executionContext.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
@@ -420,6 +421,7 @@ func TestComputeRawOutputPrefix(t *testing.T) {
 	assert.NoError(t, err)
 	nCtx.OnDataStore().Return(ds)
 	nCtx.OnNodeExecutionMetadata().Return(nm)
+	nCtx.OnRawOutputSuffix().Return(make([]string, 0))
 
 	pre, uid, err := ComputeRawOutputPrefix(context.TODO(), 100, nCtx, "n1", 0)
 	assert.NoError(t, err)
@@ -455,6 +457,7 @@ func TestComputePreviousCheckpointPath(t *testing.T) {
 	reader := &nodeMocks.NodeStateReader{}
 	reader.OnGetTaskNodeState().Return(handler.TaskNodeState{})
 	nCtx.OnNodeStateReader().Return(reader)
+	nCtx.OnRawOutputSuffix().Return(make([]string, 0))
 
 	t.Run("attempt-0-nCtx", func(t *testing.T) {
 		c, err := ComputePreviousCheckpointPath(context.TODO(), 100, nCtx, "n1", 0)
@@ -489,6 +492,7 @@ func TestComputePreviousCheckpointPath_Recovery(t *testing.T) {
 		PreviousNodeExecutionCheckpointURI: storage.DataReference("s3://sandbox/x/prevname-n1-0/_flytecheckpoints"),
 	})
 	nCtx.OnNodeStateReader().Return(reader)
+	nCtx.OnRawOutputSuffix().Return(make([]string, 0))
 
 	t.Run("recovery-attempt-0-nCtx", func(t *testing.T) {
 		c, err := ComputePreviousCheckpointPath(context.TODO(), 100, nCtx, "n1", 0)

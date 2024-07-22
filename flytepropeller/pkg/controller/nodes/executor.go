@@ -493,6 +493,7 @@ type nodeExecutor struct {
 	enableCRDebugMetadata           bool
 	defaultActiveDeadline           time.Duration
 	defaultDataSandbox              storage.DataReference
+	defaultDataSandboxSuffix        []string
 	defaultExecutionDeadline        time.Duration
 	enqueueWorkflow                 v1alpha1.EnqueueWorkflow
 	eventConfig                     *config.EventConfig
@@ -1474,7 +1475,7 @@ func (c *nodeExecutor) replaceRemotePrefix(ctx context.Context, s string) string
 }
 
 func NewExecutor(ctx context.Context, nodeConfig config.NodeConfig, store *storage.DataStore, enQWorkflow v1alpha1.EnqueueWorkflow, eventSink events.EventSink,
-	workflowLauncher launchplan.Executor, launchPlanReader launchplan.Reader, defaultRawOutputPrefix storage.DataReference, kubeClient executors.Client,
+	workflowLauncher launchplan.Executor, launchPlanReader launchplan.Reader, defaultRawOutputPrefix storage.DataReference, defaultRawOutputSuffix []string, kubeClient executors.Client,
 	cacheClient catalog.Client, recoveryClient recovery.Client, eventConfig *config.EventConfig, clusterID string, signalClient service.SignalServiceClient,
 	nodeHandlerFactory interfaces.HandlerFactory, executionEnvClient pluginscore.ExecutionEnvClient, scope promutils.Scope) (interfaces.Node, error) {
 
@@ -1525,6 +1526,7 @@ func NewExecutor(ctx context.Context, nodeConfig config.NodeConfig, store *stora
 		enableCRDebugMetadata:           nodeConfig.EnableCRDebugMetadata,
 		defaultActiveDeadline:           nodeConfig.DefaultDeadlines.DefaultNodeActiveDeadline.Duration,
 		defaultDataSandbox:              defaultRawOutputPrefix,
+		defaultDataSandboxSuffix:        defaultRawOutputSuffix,
 		defaultExecutionDeadline:        nodeConfig.DefaultDeadlines.DefaultNodeExecutionDeadline.Duration,
 		enqueueWorkflow:                 enQWorkflow,
 		eventConfig:                     eventConfig,

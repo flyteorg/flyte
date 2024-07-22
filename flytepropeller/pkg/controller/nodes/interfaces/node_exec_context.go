@@ -49,6 +49,7 @@ type NodeExecutionContext interface {
 	// available to the task at High Bandwidth (for example the base path of a sharded s3 bucket.
 	// This with a prefix based sharded strategy, could improve the throughput from S3 manifold)
 	RawOutputPrefix() storage.DataReference
+	RawOutputSuffix() []string
 
 	// Sharding strategy for the output data for this node execution.
 	OutputShardSelector() ioutils.ShardSelector

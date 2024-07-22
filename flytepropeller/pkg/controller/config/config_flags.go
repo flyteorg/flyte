@@ -59,6 +59,7 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "prof-port"), defaultConfig.ProfilerPort.String(), "Profiler port")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "metadata-prefix"), defaultConfig.MetadataPrefix, "MetadataPrefix should be used if all the metadata for Flyte executions should be stored under a specific prefix in CloudStorage. If not specified,  the data will be stored in the base container directly.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "rawoutput-prefix"), defaultConfig.DefaultRawOutputPrefix, "a fully qualified storage path of the form s3://flyte/abc/...,  where all data sandboxes should be stored.")
+	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "rawoutput-suffix"), defaultConfig.DefaultRawOutputSuffix, "path parts for a storage suffix that gets added to the raw output dir in the form foo/bar/baz...,  where all data sandboxes should be stored.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "queue.type"), defaultConfig.Queue.Type, "Type of composite queue to use for the WorkQueue")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "queue.queue.type"), defaultConfig.Queue.Queue.Type, "Type of RateLimiter to use for the WorkQueue")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "queue.queue.base-delay"), defaultConfig.Queue.Queue.BaseDelay.String(), "base backoff delay for failure")

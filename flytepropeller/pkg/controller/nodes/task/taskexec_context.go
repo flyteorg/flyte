@@ -242,7 +242,7 @@ func ComputeRawOutputPrefix(ctx context.Context, length int, nCtx interfaces.Nod
 		return nil, uniqueID, err
 	}
 
-	rawOutputPrefix, err := ioutils.NewShardedRawOutputPath(ctx, nCtx.OutputShardSelector(), nCtx.RawOutputPrefix(), uniqueID, nCtx.DataStore())
+	rawOutputPrefix, err := ioutils.NewShardedRawOutputPath(ctx, nCtx.OutputShardSelector(), nCtx.RawOutputPrefix(), nCtx.RawOutputSuffix(), uniqueID, nCtx.DataStore())
 	if err != nil {
 		return nil, uniqueID, errors.Wrapf(errors.StorageError, nCtx.NodeID(), err, "failed to create output sandbox for node execution")
 	}

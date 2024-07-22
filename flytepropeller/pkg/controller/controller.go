@@ -443,7 +443,7 @@ func New(ctx context.Context, cfg *config.Config, kubeClientset kubernetes.Inter
 	}
 
 	nodeExecutor, err := nodes.NewExecutor(ctx, cfg.NodeConfig, store, controller.enqueueWorkflowForNodeUpdates, eventSink,
-		launchPlanActor, launchPlanActor, storage.DataReference(cfg.DefaultRawOutputPrefix), kubeClient,
+		launchPlanActor, launchPlanActor, storage.DataReference(cfg.DefaultRawOutputPrefix), cfg.DefaultRawOutputSuffix, kubeClient,
 		cacheClient, recoveryClient, &cfg.EventConfig, cfg.ClusterID, signalClient, nodeHandlerFactory, executionEnvClient, scope)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Failed to create Controller.")

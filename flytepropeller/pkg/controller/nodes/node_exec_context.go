@@ -1,10 +1,12 @@
 package nodes
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"slices" // nolint:gci
 	"strconv"
+	"text/template"
 
 	_struct "github.com/golang/protobuf/ptypes/struct"
 	"github.com/pkg/errors"
@@ -133,6 +135,7 @@ type nodeExecContext struct {
 	nsm                *nodeStateManager
 	enqueueOwner       func() error
 	rawOutputPrefix    storage.DataReference
+	rawOutputSuffix    []string
 	shardSelector      ioutils.ShardSelector
 	nl                 executors.NodeLookup
 	ic                 executors.ExecutionContext
@@ -153,6 +156,10 @@ func (e nodeExecContext) OutputShardSelector() ioutils.ShardSelector {
 
 func (e nodeExecContext) RawOutputPrefix() storage.DataReference {
 	return e.rawOutputPrefix
+}
+
+func (e nodeExecContext) RawOutputSuffix() []string {
+	return e.rawOutputSuffix
 }
 
 func (e nodeExecContext) EnqueueOwnerFunc() func() error {
@@ -211,7 +218,7 @@ func (e nodeExecContext) GetExecutionEnvClient() pluginscore.ExecutionEnvClient 
 func newNodeExecContext(_ context.Context, store *storage.DataStore, execContext executors.ExecutionContext, nl executors.NodeLookup,
 	node v1alpha1.ExecutableNode, nodeStatus v1alpha1.ExecutableNodeStatus, inputs io.InputReader, interruptible bool, interruptibleFailureThreshold int32,
 	taskEventRecorder events.TaskEventRecorder, nodeEventRecorder events.NodeEventRecorder, tr interfaces.TaskReader, nsm *nodeStateManager,
-	enqueueOwner func() error, rawOutputPrefix storage.DataReference, outputShardSelector ioutils.ShardSelector,
+	enqueueOwner func() error, rawOutputPrefix storage.DataReference, rawOutputSuffix []string, outputShardSelector ioutils.ShardSelector,
 	executionEnvClient pluginscore.ExecutionEnvClient) *nodeExecContext {
 
 	md := nodeExecMetadata{
@@ -250,6 +257,7 @@ func newNodeExecContext(_ context.Context, store *storage.DataStore, execContext
 		nsm:                nsm,
 		enqueueOwner:       enqueueOwner,
 		rawOutputPrefix:    rawOutputPrefix,
+		rawOutputSuffix:    rawOutputSuffix,
 		shardSelector:      outputShardSelector,
 		nl:                 nl,
 		ic:                 execContext,
@@ -263,6 +271,30 @@ func isAboveInterruptibleFailureThreshold(numFailures uint32, maxAttempts uint32
 	}
 
 	return numFailures >= maxAttempts-uint32(-interruptibleThreshold)
+}
+
+type OrgTemplate struct {
+	Org     string
+	Domain  string
+	Project string
+}
+
+func getTemplatizedRawOutputSuffix(suffix []string, executionID v1alpha1.ExecutionID) ([]string, error) {
+	result := make([]string, len(suffix))
+	template := template.New("rawOutputPrefix")
+	for idx, suffixPart := range suffix {
+		tmpl, err := template.Parse(suffixPart)
+		if err != nil {
+			return nil, err
+		}
+		var tpl bytes.Buffer
+		if err := tmpl.Execute(&tpl, OrgTemplate{Org: executionID.Org, Domain: executionID.Domain, Project: executionID.Project}); err != nil {
+			return nil, err
+		}
+		result[idx] = tpl.String()
+	}
+
+	return result, nil
 }
 
 func (c *nodeExecutor) BuildNodeExecutionContext(ctx context.Context, executionContext executors.ExecutionContext,
@@ -339,6 +371,10 @@ func (c *nodeExecutor) BuildNodeExecutionContext(ctx context.Context, executionC
 	if executionContext.GetRawOutputDataConfig().RawOutputDataConfig != nil && len(executionContext.GetRawOutputDataConfig().OutputLocationPrefix) > 0 {
 		rawOutputPrefix = storage.DataReference(executionContext.GetRawOutputDataConfig().OutputLocationPrefix)
 	}
+	rawOutputSuffix, err := getTemplatizedRawOutputSuffix(c.defaultDataSandboxSuffix, executionContext.GetExecutionID())
+	if err != nil {
+		return nil, err
+	}
 
 	return newNodeExecContext(ctx, c.store, executionContext, nl, n, s,
 		ioutils.NewCachedInputReader(
@@ -361,6 +397,7 @@ func (c *nodeExecutor) BuildNodeExecutionContext(ctx context.Context, executionC
 		newNodeStateManager(ctx, s),
 		workflowEnqueuer,
 		rawOutputPrefix,
+		rawOutputSuffix,
 		c.shardSelector,
 		c.executionEnvClient,
 	), nil

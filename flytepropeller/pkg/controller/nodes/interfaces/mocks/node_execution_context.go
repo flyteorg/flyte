@@ -562,6 +562,40 @@ func (_m *NodeExecutionContext) RawOutputPrefix() storage.DataReference {
 	return r0
 }
 
+type NodeExecutionContext_RawOutputSuffix struct {
+	*mock.Call
+}
+
+func (_m NodeExecutionContext_RawOutputSuffix) Return(_a0 []string) *NodeExecutionContext_RawOutputSuffix {
+	return &NodeExecutionContext_RawOutputSuffix{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *NodeExecutionContext) OnRawOutputSuffix() *NodeExecutionContext_RawOutputSuffix {
+	c_call := _m.On("RawOutputSuffix")
+	return &NodeExecutionContext_RawOutputSuffix{Call: c_call}
+}
+
+func (_m *NodeExecutionContext) OnRawOutputSuffixMatch(matchers ...interface{}) *NodeExecutionContext_RawOutputSuffix {
+	c_call := _m.On("RawOutputSuffix", matchers...)
+	return &NodeExecutionContext_RawOutputSuffix{Call: c_call}
+}
+
+// RawOutputSuffix provides a mock function with given fields:
+func (_m *NodeExecutionContext) RawOutputSuffix() []string {
+	ret := _m.Called()
+
+	var r0 []string
+	if rf, ok := ret.Get(0).(func() []string); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]string)
+		}
+	}
+
+	return r0
+}
+
 type NodeExecutionContext_TaskReader struct {
 	*mock.Call
 }

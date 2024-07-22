@@ -109,7 +109,7 @@ func Test_NodeContext(t *testing.T) {
 	s, _ := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
 	p := parentInfo{}
 	execContext := executors.NewExecutionContext(w1, nil, nil, p, nil)
-	nCtx := newNodeExecContext(context.TODO(), s, execContext, w1, getTestNodeSpec(nil), nil, nil, false, 0, nil, nil, TaskReader{}, nil, nil, "s3://bucket", ioutils.NewConstantShardSelector([]string{"x"}), nil)
+	nCtx := newNodeExecContext(context.TODO(), s, execContext, w1, getTestNodeSpec(nil), nil, nil, false, 0, nil, nil, TaskReader{}, nil, nil, "s3://bucket", make([]string, 0), ioutils.NewConstantShardSelector([]string{"x"}), nil)
 	assert.Equal(t, "id", nCtx.NodeExecutionMetadata().GetLabels()["node-id"])
 	assert.Equal(t, "false", nCtx.NodeExecutionMetadata().GetLabels()["interruptible"])
 	assert.Equal(t, "task-name", nCtx.NodeExecutionMetadata().GetLabels()["task-name"])
@@ -553,4 +553,32 @@ func Test_NodeContext_IsInterruptible(t *testing.T) {
 			assert.Equal(t, tt.expectedInterruptible, nCtx.NodeExecutionMetadata().IsInterruptible())
 		})
 	}
+}
+
+func TestGetTemplatizedRawOutputPrefix(t *testing.T) {
+	const org = "union"
+	const domain = "development"
+	const proj = "flytesnacks"
+	t.Run("with org", func(t *testing.T) {
+		result, err := getTemplatizedRawOutputSuffix([]string{"{{.Org}}", "{{.Domain}}", "{{.Project}}", "foo", "bar"}, v1alpha1.ExecutionID{
+			WorkflowExecutionIdentifier: &core.WorkflowExecutionIdentifier{
+				Org:     org,
+				Domain:  domain,
+				Project: proj,
+			},
+		})
+		assert.NoError(t, err)
+		assert.Equal(t, []string{"union", "development", "flytesnacks", "foo", "bar"}, result)
+	})
+	t.Run("without org", func(t *testing.T) {
+		result, err := getTemplatizedRawOutputSuffix([]string{"foo", "bar"}, v1alpha1.ExecutionID{
+			WorkflowExecutionIdentifier: &core.WorkflowExecutionIdentifier{
+				Org:     org,
+				Domain:  domain,
+				Project: proj,
+			},
+		})
+		assert.NoError(t, err)
+		assert.Equal(t, []string{"foo", "bar"}, result)
+	})
 }

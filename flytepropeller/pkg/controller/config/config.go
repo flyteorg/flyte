@@ -149,6 +149,7 @@ type Config struct {
 	ProfilerPort             config.Port          `json:"prof-port" pflag:",Profiler port"`
 	MetadataPrefix           string               `json:"metadata-prefix,omitempty" pflag:",MetadataPrefix should be used if all the metadata for Flyte executions should be stored under a specific prefix in CloudStorage. If not specified, the data will be stored in the base container directly."`
 	DefaultRawOutputPrefix   string               `json:"rawoutput-prefix" pflag:",a fully qualified storage path of the form s3://flyte/abc/..., where all data sandboxes should be stored."`
+	DefaultRawOutputSuffix   []string             `json:"rawoutput-suffix" pflag:",path parts for a storage suffix that gets added to the raw output dir in the form foo/bar/baz..., where all data sandboxes should be stored."`
 	Queue                    CompositeQueueConfig `json:"queue,omitempty" pflag:",Workflow workqueue configuration, affects the way the work is consumed from the queue."`
 	MetricsPrefix            string               `json:"metrics-prefix" pflag:",An optional prefix for all published metrics."`
 	MetricKeys               []string             `json:"metrics-keys" pflag:",Metrics labels applied to prometheus metrics emitted by the service."`
