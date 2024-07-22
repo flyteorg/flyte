@@ -25,9 +25,9 @@ spec:
     spec:
       containers:
         - command:
-            - flyteadmin
+            - {{ .Values.cluster_resource_manager.rootCommand }}
             - --config
-            - {{ .Values.flyteadmin.configPath }}
+            - {{ .Values.cluster_resource_manager.configPath }}
             - clusterresource
             - run
           {{- if .Values.cluster_resource_manager.podEnv }}
@@ -36,8 +36,8 @@ spec:
             {{- toYaml . | nindent 10 }}
             {{- end }}
           {{- end }}
-          image: "{{ .Values.flyteadmin.image.repository }}:{{ .Values.flyteadmin.image.tag }}"
-          imagePullPolicy: "{{ .Values.flyteadmin.image.pullPolicy }}"
+          image: "{{ .Values.cluster_resource_manager.image.repository }}:{{ .Values.cluster_resource_manager.image.tag }}"
+          imagePullPolicy: "{{ .Values.cluster_resource_manager.image.pullPolicy }}"
           name: sync-cluster-resources
           {{- with .Values.cluster_resource_manager.resources }}
           resources:

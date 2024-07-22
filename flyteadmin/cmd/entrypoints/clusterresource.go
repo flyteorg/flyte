@@ -9,13 +9,12 @@ import (
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/clusterresource"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/runtime"
-	"github.com/flyteorg/flyte/flyteadmin/plugins"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/profutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
-var parentClusterResourceCmd = &cobra.Command{
+var ParentClusterResourceCmd = &cobra.Command{
 	Use:   "clusterresource",
 	Short: "This command administers the ClusterResourceController. Please choose a subcommand.",
 }
@@ -27,7 +26,7 @@ var controllerRunCmd = &cobra.Command{
 		ctx := context.Background()
 		configuration := runtime.NewConfigurationProvider()
 		scope := promutils.NewScope(configuration.ApplicationConfiguration().GetTopLevelConfig().MetricsScope).NewSubScope("clusterresource")
-		pluginRegistry := plugins.NewRegistry()
+		pluginRegistry := pluginRegistryStore.Load()
 		clusterResourceController, err := clusterresource.NewClusterResourceControllerFromConfig(ctx, scope, configuration, pluginRegistry)
 		if err != nil {
 			return err
@@ -56,7 +55,7 @@ var controllerSyncCmd = &cobra.Command{
 		ctx := context.Background()
 		configuration := runtime.NewConfigurationProvider()
 		scope := promutils.NewScope(configuration.ApplicationConfiguration().GetTopLevelConfig().MetricsScope).NewSubScope("clusterresource")
-		pluginRegistry := plugins.NewRegistry()
+		pluginRegistry := pluginRegistryStore.Load()
 		clusterResourceController, err := clusterresource.NewClusterResourceControllerFromConfig(ctx, scope, configuration, pluginRegistry)
 		if err != nil {
 			return err
@@ -71,7 +70,7 @@ var controllerSyncCmd = &cobra.Command{
 }
 
 func init() {
-	RootCmd.AddCommand(parentClusterResourceCmd)
-	parentClusterResourceCmd.AddCommand(controllerRunCmd)
-	parentClusterResourceCmd.AddCommand(controllerSyncCmd)
+	RootCmd.AddCommand(ParentClusterResourceCmd)
+	ParentClusterResourceCmd.AddCommand(controllerRunCmd)
+	ParentClusterResourceCmd.AddCommand(controllerSyncCmd)
 }
