@@ -8,9 +8,9 @@ import (
 )
 
 func TestGenerateTaskGroupName(t *testing.T) {
-	var tests = []struct{
+	var tests = []struct {
 		master bool
-		index int
+		index  int
 		expect string
 	}{
 		{true, 0, fmt.Sprintf("%s-%s", GenerateTaskGroupName, "head")},
@@ -27,8 +27,8 @@ func TestGenerateTaskGroupName(t *testing.T) {
 }
 
 func TestRemoveGangSchedulingAnnotations(t *testing.T) {
-	var tests = []struct{
-		input *metav1.ObjectMeta
+	var tests = []struct {
+		input  *metav1.ObjectMeta
 		expect int
 	}{
 		{input: &metav1.ObjectMeta{"others": "extra", TaskGroupNameKey: "TGName", TaskGroupsKey: "TGs", TaskGroupPrarameters: "parameters"}, 1},
@@ -38,7 +38,7 @@ func TestRemoveGangSchedulingAnnotations(t *testing.T) {
 		{input: &metav1.ObjectMeta{}, 0},
 	}
 	for _, tt := range tests {
-		t.Run("Remove Gang scheduling labels", func(t *testing.T){
+		t.Run("Remove Gang scheduling labels", func(t *testing.T) {
 			RemoveGangSchedulingAnnotations(tt.input)
 			if got := len(tt.input); got != tt.expect {
 				t.Errorf("got %d, expect %d", got, tt.expect)
@@ -46,4 +46,3 @@ func TestRemoveGangSchedulingAnnotations(t *testing.T) {
 		})
 	}
 }
-
