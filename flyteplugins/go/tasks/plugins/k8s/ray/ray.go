@@ -28,6 +28,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/ray/batchscheduler"
 )
 
 const (
@@ -119,7 +120,6 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 	podSpec.ServiceAccountName = cfg.ServiceAccount
 
 	headPodSpec := podSpec.DeepCopy()
-
 	rayjob, err := constructRayJob(taskCtx, rayJob, objectMeta, *podSpec, headPodSpec, headNodeRayStartParams, primaryContainerIdx, *primaryContainer)
 
 	return rayjob, err
@@ -128,6 +128,18 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob plugins.RayJob, objectMeta *metav1.ObjectMeta, podSpec v1.PodSpec, headPodSpec *v1.PodSpec, headNodeRayStartParams map[string]string, primaryContainerIdx int, primaryContainer v1.Container) (*rayv1.RayJob, error) {
 	enableIngress := true
 	cfg := GetConfig()
+	TGAnnotations := batchscheduler.SetSchedulerNameAndBuildGangInfo(
+		cfg.BatchScheduler,
+		objectMeta,
+		rayJob.RayCluster.WorkerGroupSpec,
+		&podSpec,
+		headPodSpec,
+	)
+	batchscheduler.AddGangSchedulingAnnotations(
+		batchscheduler.GenerateTaskGroupName(true, 0),
+		objectMeta,
+		TGAnnotations,
+	)
 	rayClusterSpec := rayv1.RayClusterSpec{
 		HeadGroupSpec: rayv1.HeadGroupSpec{
 			Template: buildHeadPodTemplate(
@@ -143,9 +155,15 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob plugins.Ra
 		WorkerGroupSpecs:        []rayv1.WorkerGroupSpec{},
 		EnableInTreeAutoscaling: &rayJob.RayCluster.EnableAutoscaling,
 	}
+	batchscheduler.RemoveGangSchedulingAnnotations(objectMeta)
 
-	for _, spec := range rayJob.RayCluster.WorkerGroupSpec {
+	for index, spec := range rayJob.RayCluster.WorkerGroupSpec {
 		workerPodSpec := podSpec.DeepCopy()
+		batchscheduler.AddGangSchedulingAnnotations(
+			batchscheduler.GenerateTaskGroupName(false, index),
+			objectMeta,
+			TGAnnotations,
+		)
 		workerPodTemplate := buildWorkerPodTemplate(
 			&workerPodSpec.Containers[primaryContainerIdx],
 			workerPodSpec,
@@ -188,6 +206,7 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob plugins.Ra
 
 		rayClusterSpec.WorkerGroupSpecs = append(rayClusterSpec.WorkerGroupSpecs, workerNodeSpec)
 	}
+	batchscheduler.RemoveGangSchedulingAnnotations(objectMeta)
 
 	serviceAccountName := flytek8s.GetServiceAccountNameFromTaskExecutionMetadata(taskCtx.TaskExecutionMetadata())
 	if len(serviceAccountName) == 0 {
