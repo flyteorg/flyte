@@ -24,29 +24,16 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
+const ID = "agent-service"
+
 type Registry map[string]map[int32]*Agent // map[taskTypeName][taskTypeVersion] => Agent
-
-var (
-	agentRegistry Registry
-	mu            sync.RWMutex
-)
-
-func getAgentRegistry() Registry {
-	mu.Lock()
-	defer mu.Unlock()
-	return agentRegistry
-}
-
-func setAgentRegistry(r Registry) {
-	mu.Lock()
-	defer mu.Unlock()
-	agentRegistry = r
-}
 
 type Plugin struct {
 	metricScope promutils.Scope
 	cfg         *Config
 	cs          *ClientSet
+	registry    Registry
+	mu          sync.RWMutex
 }
 
 type ResourceWrapper struct {
@@ -69,18 +56,24 @@ type ResourceMetaWrapper struct {
 	TaskCategory      admin.TaskCategory
 }
 
-func (p Plugin) GetConfig() webapi.PluginConfig {
+func (p *Plugin) setRegistry(r Registry) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	p.registry = r
+}
+
+func (p *Plugin) GetConfig() webapi.PluginConfig {
 	return GetConfig().WebAPI
 }
 
-func (p Plugin) ResourceRequirements(_ context.Context, _ webapi.TaskExecutionContextReader) (
+func (p *Plugin) ResourceRequirements(_ context.Context, _ webapi.TaskExecutionContextReader) (
 	namespace core.ResourceNamespace, constraints core.ResourceConstraintsSpec, err error) {
 
 	// Resource requirements are assumed to be the same.
 	return "default", p.cfg.ResourceConstraints, nil
 }
 
-func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextReader) (webapi.ResourceMeta,
+func (p *Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextReader) (webapi.ResourceMeta,
 	webapi.Resource, error) {
 	taskTemplate, err := taskCtx.TaskReader().Read(ctx)
 	if err != nil {
@@ -113,7 +106,7 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 	outputPrefix := taskCtx.OutputWriter().GetOutputPrefixPath().String()
 
 	taskCategory := admin.TaskCategory{Name: taskTemplate.Type, Version: taskTemplate.TaskTypeVersion}
-	agent, isSync := getFinalAgent(&taskCategory, p.cfg)
+	agent, isSync := p.getFinalAgent(&taskCategory, p.cfg)
 
 	taskExecutionMetadata := buildTaskExecutionMetadata(taskCtx.TaskExecutionMetadata())
 
@@ -149,7 +142,7 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 	}, nil, nil
 }
 
-func (p Plugin) ExecuteTaskSync(
+func (p *Plugin) ExecuteTaskSync(
 	ctx context.Context,
 	client service.SyncAgentServiceClient,
 	header *admin.CreateRequestHeader,
@@ -206,9 +199,9 @@ func (p Plugin) ExecuteTaskSync(
 	}, err
 }
 
-func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest webapi.Resource, err error) {
+func (p *Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest webapi.Resource, err error) {
 	metadata := taskCtx.ResourceMeta().(ResourceMetaWrapper)
-	agent, _ := getFinalAgent(&metadata.TaskCategory, p.cfg)
+	agent, _ := p.getFinalAgent(&metadata.TaskCategory, p.cfg)
 
 	client, err := p.getAsyncAgentClient(ctx, agent)
 	if err != nil {
@@ -236,12 +229,12 @@ func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest weba
 	}, nil
 }
 
-func (p Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error {
+func (p *Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error {
 	if taskCtx.ResourceMeta() == nil {
 		return nil
 	}
 	metadata := taskCtx.ResourceMeta().(ResourceMetaWrapper)
-	agent, _ := getFinalAgent(&metadata.TaskCategory, p.cfg)
+	agent, _ := p.getFinalAgent(&metadata.TaskCategory, p.cfg)
 
 	client, err := p.getAsyncAgentClient(ctx, agent)
 	if err != nil {
@@ -259,7 +252,7 @@ func (p Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error 
 	return err
 }
 
-func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase core.PhaseInfo, err error) {
+func (p *Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase core.PhaseInfo, err error) {
 	resource := taskCtx.Resource().(ResourceWrapper)
 	taskInfo := &core.TaskInfo{Logs: resource.LogLinks}
 
@@ -311,7 +304,7 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 	return core.PhaseInfoUndefined, pluginErrors.Errorf(core.SystemErrorCode, "unknown execution state [%v].", resource.State)
 }
 
-func (p Plugin) getSyncAgentClient(ctx context.Context, agent *Deployment) (service.SyncAgentServiceClient, error) {
+func (p *Plugin) getSyncAgentClient(ctx context.Context, agent *Deployment) (service.SyncAgentServiceClient, error) {
 	client, ok := p.cs.syncAgentClients[agent.Endpoint]
 	if !ok {
 		conn, err := getGrpcConnection(ctx, agent)
@@ -324,7 +317,7 @@ func (p Plugin) getSyncAgentClient(ctx context.Context, agent *Deployment) (serv
 	return client, nil
 }
 
-func (p Plugin) getAsyncAgentClient(ctx context.Context, agent *Deployment) (service.AsyncAgentServiceClient, error) {
+func (p *Plugin) getAsyncAgentClient(ctx context.Context, agent *Deployment) (service.AsyncAgentServiceClient, error) {
 	client, ok := p.cs.asyncAgentClients[agent.Endpoint]
 	if !ok {
 		conn, err := getGrpcConnection(ctx, agent)
@@ -337,11 +330,23 @@ func (p Plugin) getAsyncAgentClient(ctx context.Context, agent *Deployment) (ser
 	return client, nil
 }
 
-func (p Plugin) watchAgents(ctx context.Context) {
+func (p *Plugin) watchAgents(ctx context.Context, agentService *core.AgentService) {
 	go wait.Until(func() {
 		clientSet := getAgentClientSets(ctx)
-		updateAgentRegistry(ctx, clientSet)
+		agentRegistry := getAgentRegistry(ctx, clientSet)
+		p.setRegistry(agentRegistry)
+		agentService.SetSupportedTaskType(maps.Keys(agentRegistry))
 	}, p.cfg.PollInterval.Duration, ctx.Done())
+}
+
+func (p *Plugin) getFinalAgent(taskCategory *admin.TaskCategory, cfg *Config) (*Deployment, bool) {
+	p.mu.RLock()
+	defer p.mu.RUnlock()
+
+	if agent, exists := p.registry[taskCategory.Name][taskCategory.Version]; exists {
+		return agent.AgentDeployment, agent.IsSync
+	}
+	return &cfg.DefaultAgent, false
 }
 
 func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, outputs *flyteIdl.LiteralMap) error {
@@ -366,14 +371,6 @@ func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, outputs *fly
 	return taskCtx.OutputWriter().Put(ctx, opReader)
 }
 
-func getFinalAgent(taskCategory *admin.TaskCategory, cfg *Config) (*Deployment, bool) {
-	r := getAgentRegistry()
-	if agent, exists := r[taskCategory.Name][taskCategory.Version]; exists {
-		return agent.AgentDeployment, agent.IsSync
-	}
-	return &cfg.DefaultAgent, false
-}
-
 func buildTaskExecutionMetadata(taskExecutionMetadata core.TaskExecutionMetadata) admin.TaskExecutionMetadata {
 	taskExecutionID := taskExecutionMetadata.GetTaskExecutionID().GetID()
 
@@ -388,13 +385,12 @@ func buildTaskExecutionMetadata(taskExecutionMetadata core.TaskExecutionMetadata
 	}
 }
 
-func newAgentPlugin() webapi.PluginEntry {
+func newAgentPlugin(agentService *core.AgentService) webapi.PluginEntry {
 	ctx := context.Background()
 	cfg := GetConfig()
-
 	clientSet := getAgentClientSets(ctx)
-	updateAgentRegistry(ctx, clientSet)
-	supportedTaskTypes := append(maps.Keys(getAgentRegistry()), cfg.SupportedTaskTypes...)
+	agentRegistry := getAgentRegistry(ctx, clientSet)
+	supportedTaskTypes := maps.Keys(agentRegistry)
 
 	return webapi.PluginEntry{
 		ID:                 "agent-service",
@@ -404,15 +400,16 @@ func newAgentPlugin() webapi.PluginEntry {
 				metricScope: iCtx.MetricsScope(),
 				cfg:         cfg,
 				cs:          clientSet,
+				registry:    agentRegistry,
 			}
-			plugin.watchAgents(ctx)
+			plugin.watchAgents(ctx, agentService)
 			return plugin, nil
 		},
 	}
 }
 
-func RegisterAgentPlugin() {
+func RegisterAgentPlugin(agentService *core.AgentService) {
 	gob.Register(ResourceMetaWrapper{})
 	gob.Register(ResourceWrapper{})
-	pluginmachinery.PluginRegistry().RegisterRemotePlugin(newAgentPlugin())
+	pluginmachinery.PluginRegistry().RegisterRemotePlugin(newAgentPlugin(agentService))
 }

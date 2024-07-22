@@ -94,6 +94,7 @@ func (a *arrayNodeHandler) Abort(ctx context.Context, nCtx interfaces.NodeExecut
 			} else {
 				// record events transitioning subNodes to aborted
 				retryAttempt := uint32(arrayNodeState.SubNodeRetryAttempts.GetItem(i))
+
 				if err := sendEvents(ctx, nCtx, i, retryAttempt, idlcore.NodeExecution_ABORTED, idlcore.TaskExecution_ABORTED, eventRecorder, a.eventConfig); err != nil {
 					logger.Warnf(ctx, "failed to record ArrayNode events: %v", err)
 				}
@@ -576,17 +577,19 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			taskPhase = idlcore.TaskExecution_FAILED
 		}
 
-		// if the ArrayNode phase has changed we need to reset the taskPhaseVersion to 0, otherwise
-		// increment it if we detect any changes in subNode state.
-		if currentArrayNodePhase != arrayNodeState.Phase {
-			arrayNodeState.TaskPhaseVersion = 0
-		} else if incrementTaskPhaseVersion {
+		// increment taskPhaseVersion if we detect any changes in subNode state.
+		if incrementTaskPhaseVersion {
 			arrayNodeState.TaskPhaseVersion = arrayNodeState.TaskPhaseVersion + 1
 		}
 
 		if err := eventRecorder.finalize(ctx, nCtx, taskPhase, arrayNodeState.TaskPhaseVersion, a.eventConfig); err != nil {
 			logger.Errorf(ctx, "ArrayNode event recording failed: [%s]", err.Error())
 			return handler.UnknownTransition, err
+		}
+
+		// if the ArrayNode phase has changed we need to reset the taskPhaseVersion to 0
+		if currentArrayNodePhase != arrayNodeState.Phase {
+			arrayNodeState.TaskPhaseVersion = 0
 		}
 	}
 
@@ -707,7 +710,7 @@ func (a *arrayNodeHandler) buildArrayNodeContext(ctx context.Context, nCtx inter
 	// initialize mocks
 	arrayNodeLookup := newArrayNodeLookup(nCtx.ContextualNodeLookup(), subNodeID, &subNodeSpec, subNodeStatus)
 
-	newParentInfo, err := common.CreateParentInfo(nCtx.ExecutionContext().GetParentInfo(), nCtx.NodeID(), nCtx.CurrentAttempt())
+	newParentInfo, err := common.CreateParentInfo(nCtx.ExecutionContext().GetParentInfo(), nCtx.NodeID(), nCtx.CurrentAttempt(), false)
 	if err != nil {
 		return nil, nil, nil, nil, nil, nil, err
 	}

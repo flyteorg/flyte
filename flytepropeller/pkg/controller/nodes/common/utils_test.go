@@ -9,8 +9,9 @@ import (
 )
 
 type ParentInfo struct {
-	uniqueID string
-	attempt  uint32
+	uniqueID         string
+	attempt          uint32
+	isInDynamicChain bool
 }
 
 func (p ParentInfo) GetUniqueID() v1alpha1.NodeID {
@@ -19,6 +20,10 @@ func (p ParentInfo) GetUniqueID() v1alpha1.NodeID {
 
 func (p ParentInfo) CurrentAttempt() uint32 {
 	return p.attempt
+}
+
+func (p ParentInfo) IsInDynamicChain() bool {
+	return p.isInDynamicChain
 }
 
 func TestGenerateUniqueID(t *testing.T) {
@@ -43,18 +48,21 @@ func TestGenerateUniqueIDLong(t *testing.T) {
 
 func TestCreateParentInfo(t *testing.T) {
 	gp := ParentInfo{
-		uniqueID: "u1",
-		attempt:  uint32(2),
+		uniqueID:         "u1",
+		attempt:          uint32(2),
+		isInDynamicChain: true,
 	}
-	parent, err := CreateParentInfo(gp, "n1", uint32(1))
+	parent, err := CreateParentInfo(gp, "n1", uint32(1), false)
 	assert.Nil(t, err)
 	assert.Equal(t, "u1-2-n1", parent.GetUniqueID())
 	assert.Equal(t, uint32(1), parent.CurrentAttempt())
+	assert.True(t, parent.IsInDynamicChain())
 }
 
 func TestCreateParentInfoNil(t *testing.T) {
-	parent, err := CreateParentInfo(nil, "n1", uint32(1))
+	parent, err := CreateParentInfo(nil, "n1", uint32(1), true)
 	assert.Nil(t, err)
 	assert.Equal(t, "n1", parent.GetUniqueID())
 	assert.Equal(t, uint32(1), parent.CurrentAttempt())
+	assert.True(t, parent.IsInDynamicChain())
 }

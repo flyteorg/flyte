@@ -22,8 +22,9 @@ message ExecutionEnvAssignment {
 
 // ExecutionEnv is a message that is used to specify the execution environment.
 message ExecutionEnv {
-  // id is a unique identifier for the execution environment.
-  string id = 1;
+  // name is a human-readable identifier for the execution environment. This is combined with the
+  // project, domain, and version to uniquely identify an execution environment.
+  string name = 1;
 
   // type is the type of the execution environment.
   string type = 2;

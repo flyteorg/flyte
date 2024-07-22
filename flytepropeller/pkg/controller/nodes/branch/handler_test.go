@@ -75,6 +75,10 @@ func (parentInfo) CurrentAttempt() uint32 {
 	return uint32(2)
 }
 
+func (parentInfo) IsInDynamicChain() bool {
+	return false
+}
+
 func createNodeContext(phase v1alpha1.BranchNodePhase, childNodeID *v1alpha1.NodeID, n v1alpha1.ExecutableNode,
 	inputs *core.LiteralMap, nl *execMocks.NodeLookup, eCtx executors.ExecutionContext) (*mocks.NodeExecutionContext, *branchNodeStateHolder) {
 	branchNodeState := handler.BranchNodeState{
@@ -181,7 +185,7 @@ func TestBranchHandler_RecurseDownstream(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			eCtx := &execMocks.ExecutionContext{}
-			eCtx.EXPECT().GetParentInfo().Return(parentInfo{})
+			eCtx.OnGetParentInfo().Return(parentInfo{})
 
 			mockNodeLookup := &execMocks.NodeLookup{}
 			if len(test.upstreamNodeID) > 0 {
@@ -191,7 +195,7 @@ func TestBranchHandler_RecurseDownstream(t *testing.T) {
 			}
 
 			nCtx, _ := createNodeContext(v1alpha1.BranchNodeNotYetEvaluated, &childNodeID, n, nil, mockNodeLookup, eCtx)
-			newParentInfo, _ := common.CreateParentInfo(parentInfo{}, nCtx.NodeID(), nCtx.CurrentAttempt())
+			newParentInfo, _ := common.CreateParentInfo(parentInfo{}, nCtx.NodeID(), nCtx.CurrentAttempt(), false)
 			expectedExecContext := executors.NewExecutionContextWithParentInfo(nCtx.ExecutionContext(), newParentInfo)
 			mockNodeExecutor := &mocks.Node{}
 			mockNodeExecutor.OnRecursiveNodeHandlerMatch(
@@ -305,7 +309,7 @@ func TestBranchHandler_AbortNode(t *testing.T) {
 			mock.Anything,
 			mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(fmt.Errorf("err"))
 		eCtx := &execMocks.ExecutionContext{}
-		eCtx.EXPECT().GetParentInfo().Return(nil)
+		eCtx.OnGetParentInfo().Return(nil)
 		nCtx, _ := createNodeContext(v1alpha1.BranchNodeError, nil, n, nil, nil, eCtx)
 		branch := New(mockNodeExecutor, eventConfig, promutils.NewTestScope())
 		err := branch.Abort(ctx, nCtx, "")
@@ -317,9 +321,9 @@ func TestBranchHandler_AbortNode(t *testing.T) {
 		mockNodeLookup := &execMocks.NodeLookup{}
 		mockNodeLookup.OnToNodeMatch(mock.Anything).Return(nil, nil)
 		eCtx := &execMocks.ExecutionContext{}
-		eCtx.EXPECT().GetParentInfo().Return(parentInfo{})
+		eCtx.OnGetParentInfo().Return(parentInfo{})
 		nCtx, s := createNodeContext(v1alpha1.BranchNodeSuccess, &n1, n, nil, mockNodeLookup, eCtx)
-		newParentInfo, _ := common.CreateParentInfo(parentInfo{}, nCtx.NodeID(), nCtx.CurrentAttempt())
+		newParentInfo, _ := common.CreateParentInfo(parentInfo{}, nCtx.NodeID(), nCtx.CurrentAttempt(), false)
 		expectedExecContext := executors.NewExecutionContextWithParentInfo(nCtx.ExecutionContext(), newParentInfo)
 		mockNodeExecutor.OnAbortHandlerMatch(mock.Anything,
 			mock.MatchedBy(func(e executors.ExecutionContext) bool { return assert.Equal(t, e, expectedExecContext) }),
@@ -378,7 +382,7 @@ func TestBranchHandler_HandleNode(t *testing.T) {
 			n.OnGetBranchNode().Return(nil)
 			n.OnGetID().Return("n1")
 			eCtx := &execMocks.ExecutionContext{}
-			eCtx.EXPECT().GetParentInfo().Return(nil)
+			eCtx.OnGetParentInfo().Return(nil)
 			nCtx, _ := createNodeContext(v1alpha1.BranchNodeSuccess, &childNodeID, n, inputs, nil, eCtx)
 
 			s, err := branch.Handle(ctx, nCtx)

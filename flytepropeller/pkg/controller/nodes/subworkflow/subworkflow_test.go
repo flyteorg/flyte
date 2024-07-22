@@ -30,7 +30,7 @@ func TestGetSubWorkflow(t *testing.T) {
 		ectx := &execMocks.ExecutionContext{}
 
 		swf := &coreMocks.ExecutableSubWorkflow{}
-		ectx.EXPECT().FindSubWorkflow("x").Return(swf)
+		ectx.OnFindSubWorkflow("x").Return(swf)
 
 		nCtx := &mocks.NodeExecutionContext{}
 		nCtx.OnNode().Return(node)
@@ -60,7 +60,7 @@ func TestGetSubWorkflow(t *testing.T) {
 
 		swf := &coreMocks.ExecutableSubWorkflow{}
 		swf.OnGetOnFailureNode().Return(failureNode)
-		ectx.EXPECT().FindSubWorkflow("x").Return(swf)
+		ectx.OnFindSubWorkflow("x").Return(swf)
 
 		nCtx := &mocks.NodeExecutionContext{}
 		nCtx.OnNode().Return(node)
@@ -82,7 +82,7 @@ func TestGetSubWorkflow(t *testing.T) {
 
 		ectx := &execMocks.ExecutionContext{}
 
-		ectx.EXPECT().FindSubWorkflow("x").Return(nil)
+		ectx.OnFindSubWorkflow("x").Return(nil)
 
 		nCtx := &mocks.NodeExecutionContext{}
 		nCtx.OnNode().Return(node)
@@ -107,7 +107,7 @@ func Test_subworkflowHandler_HandleAbort(t *testing.T) {
 
 		swf := &coreMocks.ExecutableSubWorkflow{}
 		ectx := &execMocks.ExecutionContext{}
-		ectx.EXPECT().FindSubWorkflow("x").Return(swf)
+		ectx.OnFindSubWorkflow("x").Return(swf)
 
 		ns := &coreMocks.ExecutableNodeStatus{}
 		nCtx := &mocks.NodeExecutionContext{}
@@ -138,8 +138,8 @@ func Test_subworkflowHandler_HandleAbort(t *testing.T) {
 		swf.OnStartNode().Return(&coreMocks.ExecutableNode{})
 
 		ectx := &execMocks.ExecutionContext{}
-		ectx.EXPECT().FindSubWorkflow("x").Return(swf)
-		ectx.EXPECT().GetParentInfo().Return(nil)
+		ectx.OnFindSubWorkflow("x").Return(swf)
+		ectx.OnGetParentInfo().Return(nil)
 
 		ns := &coreMocks.ExecutableNodeStatus{}
 		nCtx := &mocks.NodeExecutionContext{}
@@ -153,7 +153,7 @@ func Test_subworkflowHandler_HandleAbort(t *testing.T) {
 		s := newSubworkflowHandler(nodeExec, eventConfig)
 		n := &coreMocks.ExecutableNode{}
 		swf.OnGetID().Return("swf")
-		newParentInfo, _ := common.CreateParentInfo(nil, nCtx.NodeID(), nCtx.CurrentAttempt())
+		newParentInfo, _ := common.CreateParentInfo(nil, nCtx.NodeID(), nCtx.CurrentAttempt(), false)
 		expectedExecContext := executors.NewExecutionContextWithParentInfo(nCtx.ExecutionContext(), newParentInfo)
 		nodeExec.OnAbortHandlerMatch(mock.Anything, expectedExecContext, swf, mock.Anything, n, "reason").Return(fmt.Errorf("err"))
 		assert.Error(t, s.HandleAbort(ctx, nCtx, "reason"))
@@ -172,8 +172,8 @@ func Test_subworkflowHandler_HandleAbort(t *testing.T) {
 		swf.OnStartNode().Return(&coreMocks.ExecutableNode{})
 
 		ectx := &execMocks.ExecutionContext{}
-		ectx.EXPECT().FindSubWorkflow("x").Return(swf)
-		ectx.EXPECT().GetParentInfo().Return(nil)
+		ectx.OnFindSubWorkflow("x").Return(swf)
+		ectx.OnGetParentInfo().Return(nil)
 
 		ns := &coreMocks.ExecutableNodeStatus{}
 		nCtx := &mocks.NodeExecutionContext{}
@@ -187,7 +187,7 @@ func Test_subworkflowHandler_HandleAbort(t *testing.T) {
 		s := newSubworkflowHandler(nodeExec, eventConfig)
 		n := &coreMocks.ExecutableNode{}
 		swf.OnGetID().Return("swf")
-		newParentInfo, _ := common.CreateParentInfo(nil, nCtx.NodeID(), nCtx.CurrentAttempt())
+		newParentInfo, _ := common.CreateParentInfo(nil, nCtx.NodeID(), nCtx.CurrentAttempt(), false)
 		expectedExecContext := executors.NewExecutionContextWithParentInfo(nCtx.ExecutionContext(), newParentInfo)
 		nodeExec.OnAbortHandlerMatch(mock.Anything, expectedExecContext, swf, mock.Anything, n, "reason").Return(nil)
 		assert.NoError(t, s.HandleAbort(ctx, nCtx, "reason"))

@@ -50,6 +50,9 @@ message Project {
 
         // System generated projects that aren't explicitly created or managed by a user.
         SYSTEM_GENERATED = 2;
+
+        // System archived projects that aren't explicitly archived by a user.
+        SYSTEM_ARCHIVED = 3;
     }
     ProjectState state = 6;
 
