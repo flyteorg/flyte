@@ -17,6 +17,7 @@ const (
 	TaskGroupNameKey     = "yunikorn.apache.org/task-group-name"
 	TaskGroupsKey        = "yunikorn.apache.org/task-groups"
 	TaskGroupPrarameters = "yunikorn.apache.org/schedulingPolicyParameters"
+	TaskGroupGenericName = "task-group"
 )
 
 type TaskGroup struct {
@@ -32,11 +33,10 @@ type TaskGroup struct {
 }
 
 func GenerateTaskGroupName(master bool, index int) string {
-	tgName := "task-group"
 	if master {
-		return fmt.Sprintf("%s-%s", tgName, "head")
+		return fmt.Sprintf("%s-%s", TaskGroupGenericName, "head")
 	}
-	return fmt.Sprintf("%s-%s-%d", tgName, "worker", index)
+	return fmt.Sprintf("%s-%s-%d", TaskGroupGenericName, "worker", index)
 }
 
 func SetSchedulerNameAndBuildGangInfo(config BatchSchedulerConfig, metadata *metav1.ObjectMeta, workerGroupsSpec []*plugins.WorkerGroupSpec, head, worker *v1.PodSpec) (map[string]map[string]string, error) {
@@ -102,13 +102,13 @@ func AddGangSchedulingAnnotations(name string, metadata *metav1.ObjectMeta, TGAn
 	}
 
 	annotations := TGAnnotations[name]
-	if _, ok := metadata.Annotations[TaskGroupNameKey]; !ok {
+	if _, ok := metadata.Annotations[TaskGroupNameKey]; ok {
 		metadata.Annotations[TaskGroupNameKey] = annotations[TaskGroupNameKey]
 	}
-	if _, ok := metadata.Annotations[TaskGroupsKey]; !ok {
+	if _, ok := metadata.Annotations[TaskGroupsKey]; ok {
 		metadata.Annotations[TaskGroupsKey] = annotations[TaskGroupsKey]
 	}
-	if _, ok := metadata.Annotations[TaskGroupPrarameters]; !ok {
+	if _, ok := metadata.Annotations[TaskGroupPrarameters]; ok {
 		if _, ok = annotations[TaskGroupPrarameters]; !ok {
 			return
 		}
