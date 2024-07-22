@@ -109,7 +109,7 @@ pub fn with_new(input: TokenStream) -> TokenStream {
                             buf.reserve(self.encoded_len());
                             // Unwrap is safe, since we have reserved sufficient capacity in the vector.
                             self.encode(&mut buf).unwrap();
-                            let result = String::from_utf8(buf).expect("Conversion to string failed");
+                            let result = base64::encode(&buf);
                             Ok(result)
                         }
                     }
