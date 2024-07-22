@@ -2401,7 +2401,8 @@ pub struct ArrayNode {
     /// node is the sub-node that will be executed for each element in the array.
     #[prost(message, optional, boxed, tag="1")]
     pub node: ::core::option::Option<::prost::alloc::boxed::Box<Node>>,
-    /// execution_version determines the sub-node state store
+    /// execution_version determines the execution path for ArrayNode. The default, 0, will
+    /// utilize the minimized storage implementation. 1 will utilize full subNode status storage.
     #[prost(uint32, tag="5")]
     pub execution_version: u32,
     #[prost(oneof="array_node::ParallelismOption", tags="2")]

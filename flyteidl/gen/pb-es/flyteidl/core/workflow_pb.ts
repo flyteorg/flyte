@@ -548,7 +548,8 @@ export class ArrayNode extends Message<ArrayNode> {
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   /**
-   * execution_version determines the sub-node state store
+   * execution_version determines the execution path for ArrayNode. The default, 0, will
+   * utilize the minimized storage implementation. 1 will utilize full subNode status storage.
    *
    * @generated from field: uint32 execution_version = 5;
    */

@@ -6559,7 +6559,7 @@
         "execution_version": {
           "type": "integer",
           "format": "int64",
-          "title": "execution_version determines the sub-node state store"
+          "description": "execution_version determines the execution path for ArrayNode. The default, 0, will\nutilize the minimized storage implementation. 1 will utilize full subNode status storage."
         }
       },
       "description": "ArrayNode is a Flyte node type that simplifies the execution of a sub-node over a list of input\nvalues. An ArrayNode can be executed with configurable parallelism (separate from the parent\nworkflow) and can be configured to succeed when a certain number of sub-nodes succeed."

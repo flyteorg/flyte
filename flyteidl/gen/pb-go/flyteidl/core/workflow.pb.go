@@ -733,7 +733,8 @@ type ArrayNode struct {
 	//	*ArrayNode_MinSuccesses
 	//	*ArrayNode_MinSuccessRatio
 	SuccessCriteria isArrayNode_SuccessCriteria `protobuf_oneof:"success_criteria"`
-	// execution_version determines the sub-node state store
+	// execution_version determines the execution path for ArrayNode. The default, 0, will
+	// utilize the minimized storage implementation. 1 will utilize full subNode status storage.
 	ExecutionVersion uint32 `protobuf:"varint,5,opt,name=execution_version,json=executionVersion,proto3" json:"execution_version,omitempty"`
 }
 

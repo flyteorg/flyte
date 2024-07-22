@@ -135,7 +135,8 @@ message ArrayNode {
         float min_success_ratio = 4;
     }
 
-    // execution_version determines the sub-node state store
+    // execution_version determines the execution path for ArrayNode. The default, 0, will
+    // utilize the minimized storage implementation. 1 will utilize full subNode status storage.
     uint32 execution_version = 5;
 }
 
