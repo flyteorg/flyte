@@ -273,8 +273,6 @@ helm install gateway bitnami/contour -n flyte
 | flytepropeller.podLabels | object | `{}` | Labels for Flytepropeller pods |
 | flytepropeller.priorityClassName | string | `""` | Sets priorityClassName for propeller pod(s). |
 | flytepropeller.prometheus.enabled | bool | `false` |  |
-| flytepropeller.prometheus.path | string | `"/metrics"` |  |
-| flytepropeller.prometheus.port | int | `10254` |  |
 | flytepropeller.replicaCount | int | `1` | Replicas count for Flytepropeller deployment |
 | flytepropeller.resources | object | `{"limits":{"cpu":"200m","ephemeral-storage":"100Mi","memory":"200Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"100Mi"}}` | Default resources requests and limits for Flytepropeller deployment |
 | flytepropeller.securityContext | object | `{"fsGroup":65534,"fsGroupChangePolicy":"Always","runAsUser":1001}` | Sets securityContext for flytepropeller pod(s). |
@@ -351,8 +349,6 @@ helm install gateway bitnami/contour -n flyte
 | webhook.podLabels | object | `{}` | Labels for webhook pods |
 | webhook.priorityClassName | string | `""` | Sets priorityClassName for webhook pod |
 | webhook.prometheus.enabled | bool | `false` |  |
-| webhook.prometheus.path | string | `"/metrics"` |  |
-| webhook.prometheus.port | int | `10254` |  |
 | webhook.resources.requests.cpu | string | `"200m"` |  |
 | webhook.resources.requests.ephemeral-storage | string | `"500Mi"` |  |
 | webhook.resources.requests.memory | string | `"500Mi"` |  |

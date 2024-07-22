@@ -34,8 +34,8 @@ spec:
         {{- with .Values.webhook.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-        prometheus.io/path: {{ .Values.webhook.prometheus.path | quote }}
-        prometheus.io/port: {{ .Values.webhook.prometheus.port | quote }}
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: {{ index .Values.configmap.core.propeller "prof-port" | quote }}
         {{- with .Values.webhook.prometheus.enabled }}
         prometheus.io/scrape: "true"
         {{- end }}
@@ -108,7 +108,7 @@ spec:
           ports:
           - containerPort: 9443
           {{- if .Values.webhook.prometheus.enabled }}
-          - containerPort: {{ .Values.webhook.prometheus.port }}
+          - containerPort: {{ index .Values.configmap.core.propeller "prof-port" }}
             name: debug
             protocol: TCP
           {{- end }}
