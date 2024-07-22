@@ -9,6 +9,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
 	pluginmachinery "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/ray/batchscheduler"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 )
 
@@ -23,6 +24,10 @@ var (
 		DashboardHost:            "0.0.0.0",
 		EnableUsageStats:         false,
 		ServiceAccount:           "default",
+		BatchScheduler: batchscheduler.BatchSchedulerConfig{
+			Scheduler:  "yunikorn",
+			Parameters: "timeout=10",
+		},
 		Defaults: DefaultConfig{
 			HeadNode: NodeConfig{
 				StartParameters: map[string]string{
@@ -75,6 +80,8 @@ type Config struct {
 	// DashboardHost the host to bind the dashboard server to, either localhost (127.0.0.1)
 	// or 0.0.0.0 (available from all interfaces). By default, this is localhost.
 	DashboardHost string `json:"dashboardHost,omitempty"`
+
+	BatchScheduler batchscheduler.BatchSchedulerConfig `json:"batchSchedulerConfig,omitempty"`
 
 	// DeprecatedNodeIPAddress the IP address of the head node. By default, this is pod ip address.
 	DeprecatedNodeIPAddress string `json:"nodeIPAddress,omitempty" pflag:"-,DEPRECATED. Please use DefaultConfig.[HeadNode|WorkerNode].IPAddress"`
