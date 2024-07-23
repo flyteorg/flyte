@@ -49,7 +49,7 @@ func SetSchedulerNameAndBuildGangInfo(config BatchSchedulerConfig, metadata *met
 	TaskGroupsAnnotations := make(map[string]map[string]string, 0)
 	// Parsing placeholders from the pod resource among head and workers
 	TaskGroups := make([]TaskGroup, 0)
-	headName := GenerateTaskGroupNameFromMaster(metadata.Name, true, 0)
+	headName := GenerateTaskGroupName(true, 0)
 	TaskGroups = append(TaskGroups, TaskGroup{
 		Name:                      headName,
 		MinMember:                 1,
@@ -62,7 +62,7 @@ func SetSchedulerNameAndBuildGangInfo(config BatchSchedulerConfig, metadata *met
 	})
 
 	for index, spec := range workerGroupsSpec {
-		name := GenerateTaskGroupNameFromMaster(metadata.Name, false, index)
+		name := GenerateTaskGroupName(false, index)
 		tg := TaskGroup{
 			Name:                      name,
 			MinMember:                 spec.Replicas,
@@ -80,7 +80,7 @@ func SetSchedulerNameAndBuildGangInfo(config BatchSchedulerConfig, metadata *met
 	}
 
 	// Yunikorn head gang scheduling annotations
-	info, _ := json.Marshal(TaskGroups)
+	info, err := json.Marshal(TaskGroups)
 	if err != nil {
 		return nil, err
 	}
