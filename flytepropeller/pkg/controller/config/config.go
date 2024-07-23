@@ -162,7 +162,7 @@ type Config struct {
 	CreateFlyteWorkflowCRD   bool                 `json:"create-flyteworkflow-crd" pflag:",Enable creation of the FlyteWorkflow CRD on startup"`
 	NodeExecutionWorkerCount int                  `json:"node-execution-worker-count" pflag:",Number of workers to evaluate node executions, currently only used for array nodes"`
 	ArrayNode                ArrayNodeConfig      `json:"array-node-config,omitempty" pflag:",Configuration for array nodes"`
-	WorkflowCRNameHashLength int                  `json:"workflow-cr-name-hash-length" pflag:",If 0, the execution ID will be used as the workflow CR name. Otherwise, a hash of the execution ID, project, domain will be used as the CR name, and WorkflowCRNameHashLength sets the length of this hash. Recommended: 0, or 32-63."`
+	WorkflowCRNameHashLength int                  `json:"workflow-cr-name-hash-length" pflag:",If 0, the execution ID will be used as the workflow CR name. Otherwise, a hash of the execution ID, project, domain will be used as the CR name, and WorkflowCRNameHashLength sets the length of this hash. Set between 0 to 63."`
 }
 
 // KubeClientConfig contains the configuration used by flytepropeller to configure its internal Kubernetes Client.

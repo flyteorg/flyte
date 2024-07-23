@@ -34,6 +34,9 @@ const (
 	ShardKeyLabel = "shard-key"
 	// The fully qualified FlyteWorkflow name
 	WorkflowNameLabel = "workflow-name"
+
+	// Maximum length of a Kubernetes label
+	allowedExecutionNameLength = 63
 )
 
 func requiresInputs(w *core.WorkflowTemplate) bool {
@@ -249,15 +252,21 @@ func BuildFlyteWorkflow(wfClosure *core.CompiledWorkflowClosure, inputs *core.Li
 		errs.Collect(errors.NewWorkflowBuildError(err))
 	}
 
-	hashedIdentifier := hashIdentifier(core.Identifier{
-		Project: project,
-		Domain:  domain,
-		Name:    name,
-	})
-	rand.Seed(int64(hashedIdentifier))
-
 	if workflowCRNameHashLength := config.GetConfig().WorkflowCRNameHashLength; workflowCRNameHashLength > 0 {
-		obj.ObjectMeta.Name = rand.String(workflowCRNameHashLength)
+		// Seed the randomness before generating the name with random suffix
+		hashedIdentifier := hashIdentifier(core.Identifier{
+			Project: project,
+			Domain:  domain,
+			Name:    name,
+		})
+		rand.Seed(int64(hashedIdentifier))
+
+		base := name + "-"
+		maxNameLength := allowedExecutionNameLength - workflowCRNameHashLength
+		if len(base) > maxNameLength {
+			base = base[:maxNameLength]
+		}
+		obj.ObjectMeta.Name = fmt.Sprintf("%s%s", base, rand.String(workflowCRNameHashLength))
 	} else {
 		obj.ObjectMeta.Name = name
 	}
