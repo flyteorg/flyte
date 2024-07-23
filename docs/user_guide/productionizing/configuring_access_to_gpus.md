@@ -6,13 +6,14 @@
 .. tags:: Deployment, Infrastructure, GPU, Intermediate
 ```
 
-Along with compute resources like CPU and Memory, you may want to configure and access GPU resources. 
+Along with compute resources like CPU and memory, you may want to configure and access GPU resources. 
 
 Flyte provides different ways to request accelerator resources directly from the task decorator.
 
 >The examples in this section use [ImageSpec](https://docs.flyte.org/en/latest/user_guide/customizing_dependencies/imagespec.html#imagespec), a Flyte feature that builds a custom container image without a Dockerfile. Install it using `pip install flytekitplugins-envd`.
 
-Example:
+## Requesting any available GPU device(s)
+The goal here is to  run the task on a single GPU device:
 
 ```python
 from flytekit import ImageSpec, Resources, task
@@ -28,9 +29,9 @@ image = ImageSpec(
 
 @task(requests=Resources( gpu="1"))
 def gpu_available() -> bool:
-   return torch.cuda.is_available()
+   return torch.cuda.is_available() # returns True if CUDA (provided by a GPU) is available
 ```
-The goal here is to request any available GPU device(s).
+
 
 ### How it works?
 
@@ -43,11 +44,11 @@ tolerations:    nvidia.com/gpu:NoSchedule op=Exists
 ```
 The Kubernetes scheduler will admit the pod if there are worker nodes in the cluster with a matching taint and available resources.
 
-The resource `nvidia.com/gpu` key name is not arbitrary. It corresponds to the [Extended Resource](https://kubernetes.io/docs/tasks/administer-cluster/extended-resource-node/) that the Kubernetes worker nodes advertise to the API server through the [device plugin](https://kubernetes.io/docs/tasks/manage-gpus/scheduling-gpus/#using-device-plugins).
+The resource `nvidia.com/gpu` key name is not arbitrary though. It corresponds to the [Extended Resource](https://kubernetes.io/docs/tasks/administer-cluster/extended-resource-node/) that the Kubernetes worker nodes advertise to the API server through the [device plugin](https://kubernetes.io/docs/tasks/manage-gpus/scheduling-gpus/#using-device-plugins).
 
->NVIDIA maintains a [GPU operator](https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/index.html) that automates the management of all software prerequisites on Kubernetes.
+>NVIDIA maintains a [GPU operator](https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/index.html) that automates the management of all software prerequisites on Kubernetes, including the device plugin.
 
-If your GPU accelerators expose a different resource name, adjust the following key in the Helm values file:
+``flytekit`` assumes by default that `nvidia.com/gpu` is the resource name for your GPUs. If your GPU accelerators expose a different resource name, adjust the following key in the Helm values file:
 
 **flyte-core**
 ```yaml
@@ -95,11 +96,13 @@ configuration:
             value: "myvalue"
             effect: "NoSchedule" 
 ```
->For the above configuration, your worker nodes should be tainted with `mykey=myvalue:NoSchedule`.
+>For the above configuration, your worker nodes should have a  `mykey=myvalue:NoSchedule` configured [taint](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/).
 
 ## Requesting a specific GPU device
 
-Example:
+The goal is to run the task on a specific type of accelerator: NVIDIA Tesla V100 in the following example:
+
+
 ```python
 from flytekit import ImageSpec, Resources, task
 from flytekit.extras.accelerators import V100
@@ -119,11 +122,11 @@ image = ImageSpec(
 def gpu_available() -> bool:
    return torch.cuda.is_available()
 ```
-Leveraging a flytekit feature, you can request a specific accelerator device from the task decorator .
+
 
 ### How it works?
 
-When this task is evaluated, `flytepropeller` injects both a toleration and a nodeSelector for a more flexible scheduling configuration.
+When this task is evaluated, `flytepropeller` injects both a toleration and a [nodeSelector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector) for a more flexible scheduling configuration.
 
 An example pod spec on GKE would include the following:
 
@@ -155,7 +158,7 @@ spec:
     effect: NoSchedule
 ```
 ### Configuring the nodeSelector
-The `key` that the injected node selector uses corresponds to an arbitrary label that your Kubernetes worker nodes should apply. In the above example it's `cloud.google.com/gke-accelerator` but, depending on your cloud provider it could be any other value. You can inform Flyte about the labels your worker nodes use by adjusting the Helm values:
+The `key` that the injected node selector uses corresponds to an arbitrary label that your Kubernetes worker nodes should already have. In the above example it's `cloud.google.com/gke-accelerator` but, depending on your cloud provider it could be any other value. You can inform Flyte about the labels your worker nodes use by adjusting the Helm values:
 
 **flyte-core**
 ```yaml
@@ -176,6 +179,8 @@ configuration:
 While the `key` is arbitrary, the value (`nvidia-tesla-v100`) is not. `flytekit` has a set of [predefined](https://docs.flyte.org/en/latest/api/flytekit/extras.accelerators.html#predefined-accelerator-constants) constants and your node label has to use one of those values. 
 
 ## Requesting a GPU partition
+
+`flytekit` supports [Multi-Instance GPU partitioning](https://developer.nvidia.com/blog/getting-the-most-out-of-the-a100-gpu-with-multi-instance-gpu/#mig_partitioning_and_gpu_instance_profiles) on NVIDIA A100 devices for optimal resource utilization.
 
 Example:
 ```python
@@ -198,7 +203,7 @@ def gpu_available() -> bool:
    return torch.cuda.is_available()
 ```
 ### How it works?
-In this case, ``flytepropeller`` injects an additional nodeSelector to the resulting Pod spec, indicating the partition size:
+In this case, ``flytepropeller`` injects an additional node selector expression to the resulting pod spec, indicating the partition size:
 
 ```yaml
 spec:
@@ -230,11 +235,18 @@ Plus and additional toleration:
     operator: Equal
     value: 2g.10gb
 ```
-In consequence, your nodes should have at least matching labels for the Kubernetes scheduler to admit the Pods. If you want to better control scheduling, add matching taints to the nodes.
+In consequence, your Kubernetes worker nodes should have matching labels so the Kubernetes scheduler can admit the Pods:
 
->NOTE: currently, ``flytekit`` supports partitions only for NVIDIA A100 devices
+Node labels (example):
+```yaml
+nvidia.com/gpu.partition-size: "2g.10gb"
+nvidia.com/gpu.accelerator: "nvidia-tesla-a100"
+```
 
-In the previous example the ``nvidia.com/gpu.partition-size`` key is arbitrary and can be controlled from the Helm chart:
+ If you want to better control scheduling, configure your worker nodes with taints that match the tolerations injected to the pods.
+
+
+In the example the ``nvidia.com/gpu.partition-size`` key is arbitrary and can be controlled from the Helm chart:
 
 **flyte-core**
 ```yaml
@@ -252,10 +264,6 @@ configuration:
       k8s:
        gpu-partition-size-node-label: "nvidia.com/gpu.partition-size" #change to match your node's config 
 ```
-The ``2g.10gb`` value comes from the [NVIDIA A100 supported instance profiles](https://docs.nvidia.com/datacenter/tesla/mig-user-guide/index.html#concepts) and it's controlled from the Task decorator (``accelerator=A100.partition_2g_10gb`` in the above example). Depending on the profile requested in the Task, Flyte will inject the corresponding value for the node selector. Your nodes have to use matching labels:
-
-```yaml
-nvidia.com/gpu.partition-size: "2g.10gb"
-```
+The ``2g.10gb`` value comes from the [NVIDIA A100 supported instance profiles](https://docs.nvidia.com/datacenter/tesla/mig-user-guide/index.html#concepts) and it's controlled from the Task decorator (``accelerator=A100.partition_2g_10gb`` in the above example). Depending on the profile requested in the Task, Flyte will inject the corresponding value for the node selector.
 
 >Learn more about the full list of ``flytekit`` supported partition profiles and task decorator options [here](https://docs.flyte.org/en/latest/api/flytekit/generated/flytekit.extras.accelerators.A100.html#flytekit.extras.accelerators.A100)
