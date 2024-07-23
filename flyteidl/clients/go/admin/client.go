@@ -6,6 +6,9 @@ import (
 	"crypto/x509"
 	"errors"
 	"fmt"
+	"reflect"
+
+	"github.com/golang/protobuf/proto"
 
 	grpcRetry "github.com/grpc-ecosystem/go-grpc-middleware/retry"
 	grpcPrometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
@@ -189,6 +192,74 @@ func InitializeAdminClient(ctx context.Context, cfg *Config, opts ...grpc.DialOp
 	return set.AdminClient()
 }
 
+// replaceOrgFieldIfEmpty recursively replaces "Org" field values in proto messages if they are empty
+func replaceOrgFieldIfEmpty(msg proto.Message, org string) {
+	visited := make(map[uintptr]bool)
+	replaceOrgIfEmptyHelper(reflect.ValueOf(msg).Elem(), visited, org)
+}
+
+func replaceOrgIfEmptyHelper(val reflect.Value, visited map[uintptr]bool, org string) {
+	if !val.IsValid() {
+		return
+	}
+	// Only mark the actual struct instances as visited
+	if val.Kind() == reflect.Ptr && !val.IsNil() {
+		addr := val.Pointer()
+		if visited[addr] {
+			return
+		}
+		visited[addr] = true
+	}
+
+	switch val.Kind() {
+	case reflect.Ptr:
+		if !val.IsNil() {
+			replaceOrgIfEmptyHelper(val.Elem(), visited, org)
+		}
+	case reflect.Struct:
+		for i := 0; i < val.NumField(); i++ {
+			field := val.Field(i)
+			fieldType := val.Type().Field(i)
+			if fieldType.Name == "Org" && field.Kind() == reflect.String && field.String() == "" {
+				field.SetString(org)
+			} else if fieldType.Tag.Get("protobuf_oneof") != "" {
+				// Handle oneof fields
+				if !field.IsNil() {
+					oneofField := field.Elem()
+					replaceOrgIfEmptyHelper(oneofField, visited, org)
+				}
+			} else {
+				replaceOrgIfEmptyHelper(field, visited, org)
+			}
+		}
+	case reflect.Slice:
+		for i := 0; i < val.Len(); i++ {
+			replaceOrgIfEmptyHelper(val.Index(i), visited, org)
+		}
+	case reflect.Interface:
+		if !val.IsNil() {
+			replaceOrgIfEmptyHelper(val.Elem(), visited, org)
+		}
+	}
+}
+
+// addOrgUnaryClientInterceptor intercepts unary RPC calls and checks if org field is empty then adds the
+func addOrgUnaryClientInterceptor(org string) grpc.UnaryClientInterceptor {
+	return func(
+		ctx context.Context,
+		method string,
+		req, reply interface{},
+		cc *grpc.ClientConn,
+		invoker grpc.UnaryInvoker,
+		opts ...grpc.CallOption,
+	) error {
+		if protoMsg, ok := req.(proto.Message); ok {
+			replaceOrgFieldIfEmpty(protoMsg, org)
+		}
+		return invoker(ctx, method, req, reply, cc, opts...)
+	}
+}
+
 // initializeClients creates an AdminClient, AuthServiceClient and IdentityServiceClient with a shared Admin connection
 // for the process. Note that if called with different cfg/dialoptions, it will not refresh the connection.
 func initializeClients(ctx context.Context, cfg *Config, tokenCache cache.TokenCache, opts ...grpc.DialOption) (*Clientset, error) {
@@ -199,6 +270,9 @@ func initializeClients(ctx context.Context, cfg *Config, tokenCache cache.TokenC
 		grpc.WithChainUnaryInterceptor(NewAuthInterceptor(cfg, tokenCache, credentialsFuture, proxyCredentialsFuture)),
 		grpc.WithPerRPCCredentials(credentialsFuture))
 
+	if len(cfg.DefaultOrg) > 0 {
+		opts = append(opts, grpc.WithChainUnaryInterceptor(addOrgUnaryClientInterceptor(cfg.DefaultOrg)))
+	}
 	if cfg.DefaultServiceConfig != "" {
 		opts = append(opts, grpc.WithDefaultServiceConfig(cfg.DefaultServiceConfig))
 	}

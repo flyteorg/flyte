@@ -9,6 +9,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"google.golang.org/grpc"
+
 	"github.com/jinzhu/copier"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -25,6 +29,10 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+)
+
+const (
+	testOrg = "testOrg"
 )
 
 func TestInitializeAndGetAdminClient(t *testing.T) {
@@ -353,4 +361,64 @@ func ExampleClientSetBuilder() {
 	_ = clientSet.AdminClient()
 	_ = clientSet.AuthMetadataClient()
 	_ = clientSet.IdentityClient()
+}
+
+func TestAddOrgUnaryClientInterceptor(t *testing.T) {
+	interceptor := addOrgUnaryClientInterceptor(testOrg)
+	req := &admin.WorkflowCreateRequest{
+		Id: &core.Identifier{
+			ResourceType: core.ResourceType_WORKFLOW,
+			Project:      "testProject",
+			Domain:       "testDomain",
+			Name:         "testName",
+			Version:      "testVersion",
+		},
+		Spec: &admin.WorkflowSpec{
+			Template: &core.WorkflowTemplate{
+				Id: &core.Identifier{
+					ResourceType: core.ResourceType_WORKFLOW,
+					Project:      "testProject",
+					Domain:       "testDomain",
+					Name:         "testName",
+					Version:      "testVersion",
+				},
+				Nodes: []*core.Node{
+					{
+						Target: &core.Node_TaskNode{
+							TaskNode: &core.TaskNode{
+								Reference: &core.TaskNode_ReferenceId{
+									ReferenceId: &core.Identifier{
+										ResourceType: core.ResourceType_TASK,
+										Project:      "testProject",
+										Domain:       "testDomain",
+										Name:         "testName",
+										Version:      "testVersion",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	err := interceptor(context.TODO(), "method", req, &admin.WorkflowCreateResponse{}, nil, func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, opts ...grpc.CallOption) error {
+		if reqProto, ok := req.(*admin.WorkflowCreateRequest); ok {
+			if reqProto.Id.Org != testOrg {
+				t.Errorf("Expected Org field to be 'testOrg', got %s", reqProto.Id.Org)
+			}
+			if reqProto.Spec.Template.Id.Org != testOrg {
+				t.Errorf("Expected Org field to be 'testOrg', got %s", reqProto.Spec.Template.Id.Org)
+			}
+			if reqProto.Spec.Template.Nodes[0].GetTaskNode().GetReferenceId().Org != testOrg {
+				t.Errorf("Expected Org field to be 'testOrg', got %s", reqProto.Spec.Template.Nodes[0].GetTaskNode().GetReferenceId().Org)
+			}
+
+		} else {
+			t.Error("Expected req to be of type *service.PublicClientAuthConfigRequest")
+		}
+		return nil
+	})
+	assert.NoError(t, err)
+
 }

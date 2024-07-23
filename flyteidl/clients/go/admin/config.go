@@ -85,6 +85,8 @@ type Config struct {
 
 	// HTTPProxyURL allows operators to access external OAuth2 servers using an external HTTP Proxy
 	HTTPProxyURL config.URL `json:"httpProxyURL" pflag:",OPTIONAL: HTTP Proxy to be used for OAuth requests."`
+
+	DefaultOrg string `json:"defaultOrg" pflag:",OPTIONAL: Default org to use to support non-org based cli's.'."`
 }
 
 var (

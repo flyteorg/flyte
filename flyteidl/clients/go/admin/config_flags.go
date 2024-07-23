@@ -79,5 +79,6 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "proxyCommand"), defaultConfig.ProxyCommand, "Command for external proxy-authorization token generation")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "defaultServiceConfig"), defaultConfig.DefaultServiceConfig, "")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "httpProxyURL"), defaultConfig.HTTPProxyURL.String(), "OPTIONAL: HTTP Proxy to be used for OAuth requests.")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "defaultOrg"), defaultConfig.DefaultOrg, "OPTIONAL: Default org to use to support non-org based cli's.'.")
 	return cmdFlags
 }
