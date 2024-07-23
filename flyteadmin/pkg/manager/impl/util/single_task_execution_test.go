@@ -176,6 +176,9 @@ func TestCreateOrGetWorkflowModel(t *testing.T) {
 			Name:         ".flytegen.app.workflows.MyWorkflow.my_task",
 			Version:      "12345",
 		}), fmt.Sprintf("%+v", request.Id))
+		assert.Len(t, request.GetSpec().GetTemplate().GetNodes(), 1)
+		assert.Equal(t, request.GetSpec().GetTemplate().GetNodes()[0].GetMetadata().GetRetries().GetRetries(), uint32(2))
+
 		return &admin.WorkflowCreateResponse{}, nil
 	})
 	taskIdentifier := &core.Identifier{
@@ -213,6 +216,11 @@ func TestCreateOrGetWorkflowModel(t *testing.T) {
 									},
 								},
 							},
+						},
+					},
+					Metadata: &core.TaskMetadata{
+						Retries: &core.RetryStrategy{
+							Retries: 2,
 						},
 					},
 				},
