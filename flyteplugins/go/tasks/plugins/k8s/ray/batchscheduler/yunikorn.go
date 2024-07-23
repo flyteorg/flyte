@@ -102,13 +102,13 @@ func AddGangSchedulingAnnotations(name string, metadata *metav1.ObjectMeta, TGAn
 	}
 
 	annotations := TGAnnotations[name]
-	if _, ok := metadata.Annotations[TaskGroupNameKey]; ok {
+	if _, ok := metadata.Annotations[TaskGroupNameKey]; !ok {
 		metadata.Annotations[TaskGroupNameKey] = annotations[TaskGroupNameKey]
 	}
-	if _, ok := metadata.Annotations[TaskGroupsKey]; ok {
+	if _, ok := metadata.Annotations[TaskGroupsKey]; !ok {
 		metadata.Annotations[TaskGroupsKey] = annotations[TaskGroupsKey]
 	}
-	if _, ok := metadata.Annotations[TaskGroupPrarameters]; ok {
+	if _, ok := metadata.Annotations[TaskGroupPrarameters]; !ok {
 		if _, ok = annotations[TaskGroupPrarameters]; !ok {
 			return
 		}
