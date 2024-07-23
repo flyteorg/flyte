@@ -21,7 +21,7 @@ The pyflyte run command has been slightly updated to not need a `:` when selecti
     $ pyflyte run --remote example.py wf --n 500 --mean 42 --sigma 2
     ```
 * Script mode: register and run workflows all in one command using a pre-defined base image
-* Flyte remote GA: register workflows and interact with Flyte execution artifacts programmmatically
+* Flyte remote GA: register workflows and interact with Flyte execution artifacts programmatically
 * Configuration overhaul: use the same config across flytekit and flytectl
 * Fast register without having AWS/GCP or other cloud credentials on your laptop, all you need is Flyte access
 
