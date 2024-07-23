@@ -250,6 +250,18 @@ func MakeDefaultLiteralForType(typ *core.LiteralType) (*core.Literal, error) {
 					},
 				},
 			}, nil
+		case core.SimpleType_JSON:
+			return &core.Literal{
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Json{
+							Json: &core.Json{
+								Value: []byte("{}"),
+							},
+						},
+					},
+				},
+			}, nil
 		}
 		return nil, errors.Errorf("Not yet implemented. Default creation is not yet implemented for [%s] ", t.Simple.String())
 	case *core.LiteralType_Blob:
@@ -384,6 +396,12 @@ func MakeLiteralForSimpleType(t core.SimpleType, s string) (*core.Literal, error
 		}
 		scalar.Value = &core.Scalar_Generic{
 			Generic: st,
+		}
+	case core.SimpleType_JSON:
+		scalar.Value = &core.Scalar_Json{
+			Json: &core.Json{
+				Value: []byte(s),
+			},
 		}
 	case core.SimpleType_BINARY:
 		scalar.Value = &core.Scalar_Binary{
