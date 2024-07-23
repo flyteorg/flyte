@@ -8,12 +8,12 @@
 
 Along with compute resources like CPU and memory, you may want to configure and access GPU resources. 
 
-Flyte provides different ways to request accelerator resources directly from the task decorator.
+Flyte provides different ways to request accelerator resources directly from the task decorator. This page covers the requirements and procedures to leverage them. 
 
 >The examples in this section use [ImageSpec](https://docs.flyte.org/en/latest/user_guide/customizing_dependencies/imagespec.html#imagespec), a Flyte feature that builds a custom container image without a Dockerfile. Install it using `pip install flytekitplugins-envd`.
 
-## Requesting any available GPU device(s)
-The goal here is to  run the task on a single GPU device:
+## Requesting a GPU with no preference for device
+The goal in this example is to run the task on a single available GPU :
 
 ```python
 from flytekit import ImageSpec, Resources, task
@@ -31,8 +31,6 @@ image = ImageSpec(
 def gpu_available() -> bool:
    return torch.cuda.is_available() # returns True if CUDA (provided by a GPU) is available
 ```
-
-
 ### How it works?
 
 ![](https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/deployment/gpus/generic_gpu_access.png)
@@ -100,7 +98,7 @@ configuration:
 
 ## Requesting a specific GPU device
 
-The goal is to run the task on a specific type of accelerator: NVIDIA Tesla V100 in the following example:
+In this example, the goal is to run the task on a specific type of accelerator: NVIDIA Tesla V100 :
 
 
 ```python
@@ -267,3 +265,146 @@ configuration:
 The ``2g.10gb`` value comes from the [NVIDIA A100 supported instance profiles](https://docs.nvidia.com/datacenter/tesla/mig-user-guide/index.html#concepts) and it's controlled from the Task decorator (``accelerator=A100.partition_2g_10gb`` in the above example). Depending on the profile requested in the Task, Flyte will inject the corresponding value for the node selector.
 
 >Learn more about the full list of ``flytekit`` supported partition profiles and task decorator options [here](https://docs.flyte.org/en/latest/api/flytekit/generated/flytekit.extras.accelerators.A100.html#flytekit.extras.accelerators.A100)
+
+## Additional use cases
+
+### Request an A100 device with no preference for partition configuration
+
+Example:
+
+```python
+from flytekit import ImageSpec, Resources, task
+from flytekit.extras.accelerators import A100
+
+image = ImageSpec(
+    base_image= "ghcr.io/flyteorg/flytekit:py3.10-1.10.2",
+     name="pytorch",
+     python_version="3.10",
+     packages=["torch"],
+     builder="envd",
+     registry="<YOUR_CONTAINER_REGISTRY>",
+ )
+
+@task(requests=Resources( gpu="1"),
+              accelerator=A100, 
+              ) 
+def gpu_available() -> bool:
+   return torch.cuda.is_available()
+```
+
+#### How it works?
+
+By default, the task is scheduled on a `2g.10gb` MIG partition.
+
+`flytepropeller` only injects the node selector that matches nodes with an `A100` device:
+
+```yaml
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: nvidia.com/gpu.accelerator
+            operator: In
+            values:
+            - nvidia-tesla-a100
+```
+
+
+### Request an unpartitioned A100 device
+The goal is to run the task using the resources of the entire A100 GPU:
+
+```python
+from flytekit import ImageSpec, Resources, task
+from flytekit.extras.accelerators import A100
+
+image = ImageSpec(
+    base_image= "ghcr.io/flyteorg/flytekit:py3.10-1.10.2",
+     name="pytorch",
+     python_version="3.10",
+     packages=["torch"],
+     builder="envd",
+     registry="<YOUR_CONTAINER_REGISTRY>",
+ )
+
+@task(requests=Resources( gpu="1"),
+              accelerator=A100.unpartitioned, 
+              ) # request the entire A100 device
+def gpu_available() -> bool:
+   return torch.cuda.is_available()
+```
+
+#### How it works?
+
+When this task is evaluated `flytepropeller` injects a node selector expression that only matches nodes where the label specifying a partition size is **not** present:
+
+```yaml
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: nvidia.com/gpu.accelerator
+            operator: In
+            values:
+            - nvidia-tesla-a100
+          - key: nvidia.com/gpu.partition-size
+            operator: DoesNotExist
+```
+The expression can be controlled from the Helm values:
+
+
+**flyte-core**
+```yaml
+configmap:
+  k8s:
+    plugins:
+      k8s:
+        gpu-unpartitioned-node-selector-requirement :
+          key: cloud.google.com/gke-gpu-partition-size #change to match your node label configuration
+          operator: Equal
+          value: DoesNotExist
+```
+**flyte-binary**
+```yaml
+configuration:
+  inline:
+    plugins:
+      k8s:
+        gpu-unpartitioned-toleration:
+          gpu-unpartitioned-node-selector-requirement :
+          key: cloud.google.com/gke-gpu-partition-size #change to match your node label configuration
+          operator: Equal
+          value: DoesNotExist
+```
+
+
+Scheduling can be further controlled by setting in the Helm chart a toleration that `flytepropeller` injects into the task pods:
+
+**flyte-core**
+```yaml
+configmap:
+  k8s:
+    plugins:
+      k8s:
+        gpu-unpartitioned-toleration:
+          effect: NoSchedule
+          key: cloud.google.com/gke-gpu-partition-size
+          operator: Equal
+          value: DoesNotExist
+```
+**flyte-binary**
+```yaml
+configuration:
+  inline:
+    plugins:
+      k8s:
+        gpu-unpartitioned-toleration:
+          effect: NoSchedule
+          key: cloud.google.com/gke-gpu-partition-size
+          operator: Equal
+          value: DoesNotExist
+```
+In case your Kubernetes worker nodes are using taints, they need to match the above configuration.
