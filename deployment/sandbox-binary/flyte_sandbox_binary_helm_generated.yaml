@@ -165,6 +165,7 @@ rules:
     - namespaces
     - resourcequotas
     - secrets
+    - serviceaccounts
     verbs:
     - create
     - get
