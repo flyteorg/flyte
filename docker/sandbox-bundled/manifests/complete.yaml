@@ -114,6 +114,7 @@ rules:
   - namespaces
   - resourcequotas
   - secrets
+  - serviceaccounts
   verbs:
   - create
   - get
@@ -855,7 +856,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: ajVocEJoZnNOcjVqVzRjQg==
+  haSharedSecret: OGUyWXlNMG1yOVJ1WmRZRQ==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1441,7 +1442,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 32ebcdc2ea3ace8f1a9e61da6c07023c195367cc5d996ad282df1efe53d1476f
+        checksum/secret: 83127823d75598b2d035d7e21df594b5bd5c7fc5a8ef45098cb7d55444621b7b
       labels:
         app: docker-registry
         release: flyte-sandbox
