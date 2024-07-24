@@ -132,7 +132,7 @@ type Config struct {
 	Workers                  int                  `json:"workers" pflag:",Number of threads to process workflows"`
 	WorkflowReEval           config.Duration      `json:"workflow-reeval-duration" pflag:",Frequency of re-evaluating workflows"`
 	DownstreamEval           config.Duration      `json:"downstream-eval-duration" pflag:",Frequency of re-evaluating downstream tasks"`
-	LimitNamespace           string               `json:"limit-namespace" pflag:",Namespaces to watch for this propeller"`
+	LimitNamespace           string               `json:"limit-namespace" pflag:",Namespaces to watch for this propeller (comma separated)"`
 	ProfilerPort             config.Port          `json:"prof-port" pflag:",Profiler port"`
 	MetadataPrefix           string               `json:"metadata-prefix,omitempty" pflag:",MetadataPrefix should be used if all the metadata for Flyte executions should be stored under a specific prefix in CloudStorage. If not specified, the data will be stored in the base container directly."`
 	DefaultRawOutputPrefix   string               `json:"rawoutput-prefix" pflag:",a fully qualified storage path of the form s3://flyte/abc/..., where all data sandboxes should be stored."`

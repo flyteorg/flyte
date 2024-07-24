@@ -44,19 +44,30 @@ func (g *GarbageCollector) deleteWorkflows(ctx context.Context) error {
 		s.MatchExpressions = append(s.MatchExpressions, g.labelSelectorRequirements...)
 	}
 
-	// Delete doesn't support 'all' namespaces. Let's fetch namespaces and loop over each.
-	if g.namespace == "" || strings.ToLower(g.namespace) == "all" || strings.ToLower(g.namespace) == "all-namespaces" {
+	// Delete doesn't support 'all' namespaces and comma-separated namespaces. Let's fetch namespaces and loop over each.
+	if g.namespace == "" || strings.ToLower(g.namespace) == "all" || strings.ToLower(g.namespace) == "all-namespaces" || strings.Contains(g.namespace, ",") {
 		namespaceList, err := g.namespaceClient.List(ctx, v1.ListOptions{})
 		if err != nil {
 			return err
 		}
-		for _, n := range namespaceList.Items {
-			namespaceCtx := contextutils.WithNamespace(ctx, n.GetName())
-			logger.Infof(namespaceCtx, "Triggering Workflow delete for namespace: [%s]", n.GetName())
 
-			if err := g.deleteWorkflowsForNamespace(ctx, n.GetName(), s); err != nil {
+		var namespaces []string
+		if strings.Contains(g.namespace, ",") {
+			namespaces = strings.Split(g.namespace, ",")
+		} else {
+			namespaces = make([]string, 0)
+			for _, n := range namespaceList.Items {
+				namespaces = append(namespaces, n.GetName())
+			}
+		}
+
+		for _, namespace := range namespaces {
+			namespaceCtx := contextutils.WithNamespace(ctx, namespace)
+			logger.Infof(namespaceCtx, "Triggering Workflow delete for namespace: [%s]", namespace)
+
+			if err := g.deleteWorkflowsForNamespace(ctx, namespace, s); err != nil {
 				g.metrics.gcRoundFailure.Inc(namespaceCtx)
-				logger.Errorf(namespaceCtx, "Garbage collection failed for for namespace: [%s]. Error : [%v]", n.GetName(), err)
+				logger.Errorf(namespaceCtx, "Garbage collection failed for for namespace: [%s]. Error : [%v]", namespace, err)
 			} else {
 				g.metrics.gcRoundSuccess.Inc(namespaceCtx)
 			}
@@ -81,19 +92,30 @@ func (g *GarbageCollector) deprecatedDeleteWorkflows(ctx context.Context) error 
 		s.MatchExpressions = append(s.MatchExpressions, g.labelSelectorRequirements...)
 	}
 
-	// Delete doesn't support 'all' namespaces. Let's fetch namespaces and loop over each.
-	if g.namespace == "" || strings.ToLower(g.namespace) == "all" || strings.ToLower(g.namespace) == "all-namespaces" {
+	// Delete doesn't support 'all' namespaces and comma-separated namespaces. Let's fetch namespaces and loop over each.
+	if g.namespace == "" || strings.ToLower(g.namespace) == "all" || strings.ToLower(g.namespace) == "all-namespaces" || strings.Contains(g.namespace, ",") {
 		namespaceList, err := g.namespaceClient.List(ctx, v1.ListOptions{})
 		if err != nil {
 			return err
 		}
-		for _, n := range namespaceList.Items {
-			namespaceCtx := contextutils.WithNamespace(ctx, n.GetName())
-			logger.Infof(namespaceCtx, "Triggering Workflow delete for namespace: [%s]", n.GetName())
 
-			if err := g.deleteWorkflowsForNamespace(ctx, n.GetName(), s); err != nil {
+		var namespaces []string
+		if strings.Contains(g.namespace, ",") {
+			namespaces = strings.Split(g.namespace, ",")
+		} else {
+			namespaces = make([]string, 0)
+			for _, n := range namespaceList.Items {
+				namespaces = append(namespaces, n.GetName())
+			}
+		}
+
+		for _, namespace := range namespaces {
+			namespaceCtx := contextutils.WithNamespace(ctx, namespace)
+			logger.Infof(namespaceCtx, "Triggering Workflow delete for namespace: [%s]", namespace)
+
+			if err := g.deleteWorkflowsForNamespace(ctx, namespace, s); err != nil {
 				g.metrics.gcRoundFailure.Inc(namespaceCtx)
-				logger.Errorf(namespaceCtx, "Garbage collection failed for for namespace: [%s]. Error : [%v]", n.GetName(), err)
+				logger.Errorf(namespaceCtx, "Garbage collection failed for for namespace: [%s]. Error : [%v]", namespace, err)
 			} else {
 				g.metrics.gcRoundSuccess.Inc(namespaceCtx)
 			}

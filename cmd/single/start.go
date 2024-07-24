@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"os"
+	"strings"
 
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 	ctrlWebhook "sigs.k8s.io/controller-runtime/pkg/webhook"
@@ -108,13 +109,12 @@ func startAdmin(ctx context.Context, cfg Admin) error {
 
 func startPropeller(ctx context.Context, cfg Propeller) error {
 	propellerCfg := propellerConfig.GetConfig()
-	propellerScope := promutils.NewScope(propellerConfig.GetConfig().MetricsPrefix).NewSubScope("propeller").NewSubScope(propellerCfg.LimitNamespace)
-	limitNamespace := ""
-	var namespaceConfigs map[string]cache.Config
+	propellerScope := promutils.NewScope(propellerConfig.GetConfig().MetricsPrefix).NewSubScope("propeller").NewSubScope(strings.Replace(propellerCfg.LimitNamespace, ",", "-", -1))
+	namespaceConfigs := make(map[string]cache.Config)
 	if propellerCfg.LimitNamespace != defaultNamespace {
-		limitNamespace = propellerCfg.LimitNamespace
-		namespaceConfigs = map[string]cache.Config{
-			limitNamespace: {},
+		limitNamespaces := strings.Split(propellerCfg.LimitNamespace, ",")
+		for _, limitNamespace := range limitNamespaces {
+			namespaceConfigs[limitNamespace] = cache.Config{}
 		}
 	}
 
