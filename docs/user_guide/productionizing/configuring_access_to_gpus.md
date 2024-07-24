@@ -8,7 +8,7 @@
 
 Along with compute resources like CPU and memory, you may want to configure and access GPU resources. 
 
-Flyte provides different ways to request accelerator resources directly from the task decorator. This page covers the requirements and procedures to leverage them. 
+Flyte provides different ways to request accelerator resources directly from the task decorator.
 
 >The examples in this section use [ImageSpec](https://docs.flyte.org/en/latest/user_guide/customizing_dependencies/imagespec.html#imagespec), a Flyte feature that builds a custom container image without a Dockerfile. Install it using `pip install flytekitplugins-envd`.
 
@@ -23,7 +23,7 @@ image = ImageSpec(
      name="pytorch",
      python_version="3.10",
      packages=["torch"],
-     builder="envd",
+     builder="default",
      registry="<YOUR_CONTAINER_REGISTRY>",
  )
 
@@ -98,7 +98,7 @@ configuration:
 
 ## Requesting a specific GPU device
 
-In this example, the goal is to run the task on a specific type of accelerator: NVIDIA Tesla V100 :
+The goal is to run the task on a specific type of accelerator: NVIDIA Tesla V100 in the following example:
 
 
 ```python
@@ -110,7 +110,7 @@ image = ImageSpec(
      name="pytorch",
      python_version="3.10",
      packages=["torch"],
-     builder="envd",
+     builder="default",
      registry="<YOUR_CONTAINER_REGISTRY>",
  )
 
@@ -190,7 +190,7 @@ image = ImageSpec(
      name="pytorch",
      python_version="3.10",
      packages=["torch"],
-     builder="envd",
+     builder="default",
      registry="<YOUR_CONTAINER_REGISTRY>",
  )
 
@@ -268,7 +268,7 @@ The ``2g.10gb`` value comes from the [NVIDIA A100 supported instance profiles](h
 
 ## Additional use cases
 
-### Request an A100 device with no preference for partition configuration
+### Request an A100 device with no preference on partition configuration
 
 Example:
 
@@ -281,7 +281,7 @@ image = ImageSpec(
      name="pytorch",
      python_version="3.10",
      packages=["torch"],
-     builder="envd",
+     builder="default",
      registry="<YOUR_CONTAINER_REGISTRY>",
  )
 
@@ -294,21 +294,13 @@ def gpu_available() -> bool:
 
 #### How it works?
 
-By default, the task is scheduled on a `2g.10gb` MIG partition.
+In this case, the task is scheduled with a `2g.10gb` MIG instance profile by default.
 
 `flytepropeller` only injects the node selector that matches nodes with an `A100` device:
 
 ```yaml
-spec:
-  affinity:
-    nodeAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-        nodeSelectorTerms:
-        - matchExpressions:
-          - key: nvidia.com/gpu.accelerator
-            operator: In
-            values:
-            - nvidia-tesla-a100
+
+
 ```
 
 
@@ -324,7 +316,7 @@ image = ImageSpec(
      name="pytorch",
      python_version="3.10",
      packages=["torch"],
-     builder="envd",
+     builder="default",
      registry="<YOUR_CONTAINER_REGISTRY>",
  )
 
