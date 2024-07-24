@@ -42,7 +42,7 @@ tolerations:    nvidia.com/gpu:NoSchedule op=Exists
 ```
 The Kubernetes scheduler will admit the pod if there are worker nodes in the cluster with a matching taint and available resources.
 
-The resource `nvidia.com/gpu` key name is not arbitrary though. It corresponds to the [Extended Resource](https://kubernetes.io/docs/tasks/administer-cluster/extended-resource-node/) that the Kubernetes worker nodes advertise to the API server through the [device plugin](https://kubernetes.io/docs/tasks/manage-gpus/scheduling-gpus/#using-device-plugins).
+The resource `nvidia.com/gpu` key name is not arbitrary though. It corresponds to the [Extended Resource](https://kubernetes.io/docs/tasks/administer-cluster/extended-resource-node/) that the Kubernetes worker nodes advertise to the API server through the [device plugin](https://kubernetes.io/docs/tasks/manage-gpus/scheduling-gpus/#using-device-plugins). Using the information provided by the device plugin, the Kubernetes scheduler allocates an available accelerator to the Pod.
 
 >NVIDIA maintains a [GPU operator](https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/index.html) that automates the management of all software prerequisites on Kubernetes, including the device plugin.
 
