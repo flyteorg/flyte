@@ -101,18 +101,22 @@ func AddGangSchedulingAnnotations(name string, metadata *metav1.ObjectMeta, TGAn
 		return
 	}
 
+	// Updating Yunikorn gang scheduling annotations
 	annotations := TGAnnotations[name]
 	if _, ok := metadata.Annotations[TaskGroupNameKey]; !ok {
-		metadata.Annotations[TaskGroupNameKey] = annotations[TaskGroupNameKey]
+		if _, ok = annotations[TaskGroupNameKey]; ok {
+			metadata.Annotations[TaskGroupNameKey] = annotations[TaskGroupNameKey]
+		}
 	}
 	if _, ok := metadata.Annotations[TaskGroupsKey]; !ok {
-		metadata.Annotations[TaskGroupsKey] = annotations[TaskGroupsKey]
+		if _, ok = annotations[TaskGroupsKey]; ok {
+			metadata.Annotations[TaskGroupsKey] = annotations[TaskGroupsKey]
+		}
 	}
 	if _, ok := metadata.Annotations[TaskGroupPrarameters]; !ok {
-		if _, ok = annotations[TaskGroupPrarameters]; !ok {
-			return
+		if _, ok = annotations[TaskGroupPrarameters]; ok {
+			metadata.Annotations[TaskGroupPrarameters] = annotations[TaskGroupPrarameters]
 		}
-		metadata.Annotations[TaskGroupPrarameters] = annotations[TaskGroupPrarameters]
 	}
 	return
 }
