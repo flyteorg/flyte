@@ -1,0 +1,9 @@
+ignore:
+  - "flytekit/bin"
+  - "flytekit/clis/**/*"
+  - "test_*.py"
+  - "tests/**/*"
+  - "setup.py"
+  - "plugins/tests/**/*"
+  - "plugins/setup.py"
+  - "plugins/**/setup.py"
