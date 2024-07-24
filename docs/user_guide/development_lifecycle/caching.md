@@ -19,7 +19,7 @@ Let's watch a brief explanation of caching and a demo in this video, followed by
 
 ```
 
-There are four parameters and one command-line flag that pertain to caching.
+There are four parameters and one command-line flag related to caching.
 
 ## Parameters
 
