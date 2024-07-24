@@ -19,11 +19,9 @@ Let's watch a brief explanation of caching and a demo in this video, followed by
 
 ```
 
-## Caching configuration
+There are four parameters and one command-line flag that pertain to caching.
 
-There are four parameters and one command-line flag that pertain to caching:
-
-### Parameters
+## Parameters
 
 * `cache`(`bool`): Enables or disables caching of the workflow, task, or launch plan.
 By default, caching is disabled to avoid unintended consequences when caching executions with side effects.
@@ -39,17 +37,13 @@ This allows the initial instance to cache its result and lets the later instance
 Cache serialization is disabled by default.
 * `cache_ignore_input_vars` (`Tuple[str, ...]`): Input variables that should not be included when calculating hash for cache. By default, no input variables are ignored. This parameter only applies to task serialization.
 
-### Command-line flag `overwrite-cache`
+Task caching parameters can be specified at task definition time within `@task` decorator or at task invocation time using `with_overrides` method.
 
-*  `overwrite-cache` (`bool`): Invalidates the cache and forces re-execution of the task. This flag can be used when launching an execution from [the command line](#overwrite-cache-on-the-command-line), [the UI](#overwrite-cache-in-the-ui), or [programmatically through `FlyteRemote`](#overwrite-cache-programmatically).
+## Command-line flag `overwrite-cache`
 
-## Where to specify caching parameters
+*  `overwrite-cache` (`bool`): Invalidates the cache and forces re-execution of the task.
 
-* Task caching parameters can be specified at task definition time within `@task` decorator or at task invocation time using `with_overrides` method.
-
-## Where to use the `overwrite-cache` flag
-
-When launching the execution of a workflow, launch plan or task, you can use the `overwrite-cache` flag to invalidate the cache and force re-execution for all tasks being executed.
+This flag can be used when launching an execution from [the command line](#overwrite-cache-on-the-command-line), [the UI](#overwrite-cache-in-the-ui), or [programmatically through `FlyteRemote`](#overwrite-cache-programmatically).
 
 ### Overwrite cache on the command line
 
