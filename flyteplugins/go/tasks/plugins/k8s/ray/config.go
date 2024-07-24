@@ -25,8 +25,8 @@ var (
 		EnableUsageStats:         false,
 		ServiceAccount:           "default",
 		BatchScheduler: batchscheduler.BatchSchedulerConfig{
-			Scheduler:  "yunikorn",
-			Parameters: "timeout=10",
+			Scheduler:  "",
+			Parameters: "",
 		},
 		Defaults: DefaultConfig{
 			HeadNode: NodeConfig{
