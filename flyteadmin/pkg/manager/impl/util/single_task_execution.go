@@ -147,9 +147,7 @@ func CreateOrGetWorkflowModel(
 	})
 
 	var retryStrategy *core.RetryStrategy
-	if task.GetClosure().GetCompiledTask().GetTemplate() != nil &&
-		task.GetClosure().GetCompiledTask().GetTemplate().GetMetadata() != nil &&
-		task.GetClosure().GetCompiledTask().GetTemplate().GetMetadata().GetRetries() != nil {
+	if task.GetClosure().GetCompiledTask().GetTemplate().GetMetadata().GetRetries() != nil {
 		retryStrategy = task.GetClosure().GetCompiledTask().GetTemplate().GetMetadata().GetRetries()
 	} else {
 		retryStrategy = &defaultRetryStrategy
