@@ -206,8 +206,8 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob plugins.Ra
 		}
 
 		rayClusterSpec.WorkerGroupSpecs = append(rayClusterSpec.WorkerGroupSpecs, workerNodeSpec)
+		batchscheduler.RemoveGangSchedulingAnnotations(objectMeta)
 	}
-	batchscheduler.RemoveGangSchedulingAnnotations(objectMeta)
 
 	serviceAccountName := flytek8s.GetServiceAccountNameFromTaskExecutionMetadata(taskCtx.TaskExecutionMetadata())
 	if len(serviceAccountName) == 0 {
