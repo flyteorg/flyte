@@ -31,6 +31,7 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 	var resources *core.Resources
 	var extendedResources *v1alpha1.ExtendedResources
 	var containerImage string
+	var overrideSecurityContext *core.SecurityContext
 	if n.GetTaskNode() != nil {
 		taskID := n.GetTaskNode().GetReferenceId().String()
 		// TODO: Use task index for quick lookup
@@ -59,6 +60,10 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 
 			if len(overrides.GetContainerImage()) > 0 {
 				containerImage = overrides.GetContainerImage()
+			}
+
+			if overrides.GetOverrideSecurityContext() != nil {
+				overrideSecurityContext = overrides.GetOverrideSecurityContext()
 			}
 		}
 	}
@@ -91,17 +96,18 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 	}
 
 	nodeSpec := &v1alpha1.NodeSpec{
-		ID:                n.GetId(),
-		Name:              name,
-		RetryStrategy:     computeRetryStrategy(n, task),
-		ExecutionDeadline: timeout,
-		Resources:         res,
-		ExtendedResources: extendedResources,
-		OutputAliases:     toAliasValueArray(n.GetOutputAliases()),
-		InputBindings:     toBindingValueArray(n.GetInputs()),
-		ActiveDeadline:    activeDeadline,
-		Interruptible:     interruptible,
-		ContainerImage:    containerImage,
+		ID:                      n.GetId(),
+		Name:                    name,
+		RetryStrategy:           computeRetryStrategy(n, task),
+		ExecutionDeadline:       timeout,
+		Resources:               res,
+		ExtendedResources:       extendedResources,
+		OutputAliases:           toAliasValueArray(n.GetOutputAliases()),
+		InputBindings:           toBindingValueArray(n.GetInputs()),
+		ActiveDeadline:          activeDeadline,
+		Interruptible:           interruptible,
+		ContainerImage:          containerImage,
+		OverrideSecurityContext: overrideSecurityContext,
 	}
 
 	switch v := n.GetTarget().(type) {

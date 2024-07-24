@@ -114,6 +114,40 @@ func (_m *TaskOverrides) GetExtendedResources() *flyteidlcore.ExtendedResources 
 	return r0
 }
 
+type TaskOverrides_GetOverrideSecurityContext struct {
+	*mock.Call
+}
+
+func (_m TaskOverrides_GetOverrideSecurityContext) Return(_a0 *flyteidlcore.SecurityContext) *TaskOverrides_GetOverrideSecurityContext {
+	return &TaskOverrides_GetOverrideSecurityContext{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *TaskOverrides) OnGetOverrideSecurityContext() *TaskOverrides_GetOverrideSecurityContext {
+	c_call := _m.On("GetOverrideSecurityContext")
+	return &TaskOverrides_GetOverrideSecurityContext{Call: c_call}
+}
+
+func (_m *TaskOverrides) OnGetOverrideSecurityContextMatch(matchers ...interface{}) *TaskOverrides_GetOverrideSecurityContext {
+	c_call := _m.On("GetOverrideSecurityContext", matchers...)
+	return &TaskOverrides_GetOverrideSecurityContext{Call: c_call}
+}
+
+// GetOverrideSecurityContext provides a mock function with given fields:
+func (_m *TaskOverrides) GetOverrideSecurityContext() *flyteidlcore.SecurityContext {
+	ret := _m.Called()
+
+	var r0 *flyteidlcore.SecurityContext
+	if rf, ok := ret.Get(0).(func() *flyteidlcore.SecurityContext); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*flyteidlcore.SecurityContext)
+		}
+	}
+
+	return r0
+}
+
 type TaskOverrides_GetResources struct {
 	*mock.Call
 }

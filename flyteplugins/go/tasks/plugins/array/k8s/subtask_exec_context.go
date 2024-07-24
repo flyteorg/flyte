@@ -252,7 +252,19 @@ func NewSubTaskExecutionMetadata(taskExecutionMetadata pluginsCore.TaskExecution
 	var err error
 	secretsMap := make(map[string]string)
 	injectSecretsLabel := make(map[string]string)
-	if taskTemplate.SecurityContext != nil && len(taskTemplate.SecurityContext.Secrets) > 0 {
+	if taskExecutionMetadata.GetOverrides().GetOverrideSecurityContext() != nil {
+		if len(taskExecutionMetadata.GetOverrides().GetOverrideSecurityContext().GetSecrets()) > 0 {
+			secretsMap, err = secrets.MarshalSecretsToMapStrings(taskExecutionMetadata.GetOverrides().GetOverrideSecurityContext().GetSecrets())
+
+			if err != nil {
+				return SubTaskExecutionMetadata{}, err
+			}
+
+			injectSecretsLabel = map[string]string{
+				secrets.PodLabel: secrets.PodLabelValue,
+			}
+		}
+	} else if taskTemplate.SecurityContext != nil && len(taskTemplate.SecurityContext.Secrets) > 0 {
 		secretsMap, err = secrets.MarshalSecretsToMapStrings(taskTemplate.SecurityContext.Secrets)
 		if err != nil {
 			return SubTaskExecutionMetadata{}, err

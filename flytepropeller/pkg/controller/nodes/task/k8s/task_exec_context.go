@@ -50,7 +50,17 @@ func newTaskExecutionMetadata(tCtx pluginsCore.TaskExecutionMetadata, taskTmpl *
 	var err error
 	secretsMap := make(map[string]string)
 	injectLabels := make(map[string]string)
-	if taskTmpl.SecurityContext != nil && len(taskTmpl.SecurityContext.Secrets) > 0 {
+	if tCtx.GetOverrides().GetOverrideSecurityContext() != nil {
+		if len(tCtx.GetOverrides().GetOverrideSecurityContext().GetSecrets()) > 0 {
+			secretsMap, err = secrets.MarshalSecretsToMapStrings(tCtx.GetOverrides().GetOverrideSecurityContext().GetSecrets())
+
+			if err != nil {
+				return TaskExecutionMetadata{}, err
+			}
+
+			injectLabels[secrets.PodLabel] = secrets.PodLabelValue
+		}
+	} else if taskTmpl.SecurityContext != nil && len(taskTmpl.SecurityContext.Secrets) > 0 {
 		secretsMap, err = secrets.MarshalSecretsToMapStrings(taskTmpl.SecurityContext.Secrets)
 		if err != nil {
 			return TaskExecutionMetadata{}, err

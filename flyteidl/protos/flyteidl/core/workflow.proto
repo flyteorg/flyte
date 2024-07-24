@@ -303,6 +303,9 @@ message TaskNodeOverrides {
 
     // Override for the image used by task pods.
     string container_image = 3;
+
+    // Override for the security context of the task pod.
+    SecurityContext override_security_context = 4;
 }
 
 // A structure that uniquely identifies a launch plan in the system.

@@ -13,6 +13,7 @@ type TaskOverrides interface {
 	GetResources() *v1.ResourceRequirements
 	GetExtendedResources() *core.ExtendedResources
 	GetContainerImage() string
+	GetOverrideSecurityContext() *core.SecurityContext
 	GetConfig() *v1.ConfigMap
 }
 
