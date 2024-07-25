@@ -43,7 +43,7 @@ Task caching parameters can be specified at task definition time within `@task` 
 
 *  `overwrite-cache` (`bool`): Invalidates the cache and forces re-execution of the task.
 
-This flag can be used when launching an execution from the command line, the UI, or programmatically through `FlyteRemote`.
+This flag can be used when launching an execution from [the command line](#overwrite-cache-on-the-command-line), [the UI](#overwrite-cache-in-the-ui), or programmatically [through `FlyteRemote`](#overwrite-cache-programmatically).
 
 ### Overwrite cache on the command line
 
