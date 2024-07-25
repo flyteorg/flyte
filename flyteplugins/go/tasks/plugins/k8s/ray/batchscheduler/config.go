@@ -1,21 +1,21 @@
 package batchscheduler
 
-type BatchSchedulerConfig struct {
+type Config struct {
 	Scheduler  string `json:"scheduler,omitempty"`
 	Parameters string `json:"parameters,omitempty"`
 }
 
-func NewDefaultBatchSchedulerConfig() BatchSchedulerConfig {
-	return BatchSchedulerConfig{
+func NewConfig() Config {
+	return Config{
 		Scheduler:  "",
 		Parameters: "",
 	}
 }
 
-func (b *BatchSchedulerConfig) GetScheduler() string {
+func (b *Config) GetScheduler() string {
 	return b.Scheduler
 }
 
-func (b *BatchSchedulerConfig) GetParameters() string {
+func (b *Config) GetParameters() string {
 	return b.Parameters
 }

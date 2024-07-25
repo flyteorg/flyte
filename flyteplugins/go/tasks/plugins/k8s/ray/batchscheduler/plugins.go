@@ -8,13 +8,13 @@ import (
 
 type SchedulerPlugin interface {
 	GetSchedulerName() string
-	ParseJob(config *BatchSchedulerConfig, metadata *metav1.ObjectMeta, workerGroupsSpec []*plugins.WorkerGroupSpec, pod *v1.PodSpec, primaryContainerIdx int) error
+	ParseJob(config *Config, metadata *metav1.ObjectMeta, workerGroupsSpec []*plugins.WorkerGroupSpec, pod *v1.PodSpec, primaryContainerIdx int) error
 	ProcessHead(metadata *metav1.ObjectMeta, head *v1.PodSpec)
 	ProcessWorker(metadata *metav1.ObjectMeta, worker *v1.PodSpec, index int)
 	AfterProcess(metadata *metav1.ObjectMeta)
 }
 
-func NewSchedulerPlugin(config *BatchSchedulerConfig) SchedulerPlugin {
+func NewSchedulerPlugin(config *Config) SchedulerPlugin {
 	switch config.GetScheduler() {
 	case Yunikorn:
 		return NewYunikornPlugin()

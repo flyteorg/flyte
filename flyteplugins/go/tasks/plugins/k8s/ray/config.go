@@ -24,7 +24,7 @@ var (
 		DashboardHost:            "0.0.0.0",
 		EnableUsageStats:         false,
 		ServiceAccount:           "default",
-		BatchScheduler:           batchscheduler.NewDefaultBatchSchedulerConfig(),
+		BatchScheduler:           batchscheduler.NewConfig(),
 		Defaults: DefaultConfig{
 			HeadNode: NodeConfig{
 				StartParameters: map[string]string{
@@ -78,7 +78,7 @@ type Config struct {
 	// or 0.0.0.0 (available from all interfaces). By default, this is localhost.
 	DashboardHost string `json:"dashboardHost,omitempty"`
 
-	BatchScheduler batchscheduler.BatchSchedulerConfig `json:"BatchScheduler,omitempty"`
+	BatchScheduler batchscheduler.Config `json:"BatchScheduler,omitempty"`
 
 	// DeprecatedNodeIPAddress the IP address of the head node. By default, this is pod ip address.
 	DeprecatedNodeIPAddress string `json:"nodeIPAddress,omitempty" pflag:"-,DEPRECATED. Please use DefaultConfig.[HeadNode|WorkerNode].IPAddress"`
