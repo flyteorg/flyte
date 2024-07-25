@@ -182,7 +182,17 @@ func (s Service) CreateDownloadLink(ctx context.Context, req *service.CreateDown
 		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "no deckUrl found for request [%+v]", req)
 	}
 
-	signedURLResp, err := s.dataStore.CreateSignedURL(ctx, storage.DataReference(nativeURL), storage.SignedURLProperties{
+	ref := storage.DataReference(nativeURL)
+	meta, err := s.dataStore.Head(ctx, ref)
+	if err != nil {
+		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to head object before signing url. Error: %v", err)
+	}
+
+	if !meta.Exists() {
+		return nil, errors.NewFlyteAdminErrorf(codes.NotFound, "object not found")
+	}
+
+	signedURLResp, err := s.dataStore.CreateSignedURL(ctx, ref, storage.SignedURLProperties{
 		Scope:     stow.ClientMethodGet,
 		ExpiresIn: req.ExpiresIn.AsDuration(),
 	})
