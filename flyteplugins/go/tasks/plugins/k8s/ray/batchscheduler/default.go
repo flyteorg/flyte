@@ -1,9 +1,10 @@
 package batchscheduler
 
 import (
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
 )
 
 var (
@@ -27,6 +28,6 @@ func (d *DefaultPlugin) ParseJob(
 ) error {
 	return nil
 }
-func (d *DefaultPlugin) ProcessHead(metadata *metav1.ObjectMeta, head *v1.PodSpec) {}
+func (d *DefaultPlugin) ProcessHead(metadata *metav1.ObjectMeta, head *v1.PodSpec)                {}
 func (d *DefaultPlugin) ProcessWorker(metadata *metav1.ObjectMeta, worker *v1.PodSpec, index int) {}
-func (d *DefaultPlugin) AfterProcess(metadata *metav1.ObjectMeta) {}
+func (d *DefaultPlugin) AfterProcess(metadata *metav1.ObjectMeta)                                 {}

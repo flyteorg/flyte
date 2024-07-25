@@ -1,9 +1,10 @@
 package batchscheduler
 
 import (
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
 )
 
 type SchedulerPlugin interface {

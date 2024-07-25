@@ -4,9 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
 )
 
 const (
@@ -20,7 +21,7 @@ const (
 
 type YunikornGangSchedulingConfig struct {
 	Annotations map[string]map[string]string
-	Parameters string
+	Parameters  string
 }
 
 func NewYunikornPlugin() *YunikornGangSchedulingConfig {
