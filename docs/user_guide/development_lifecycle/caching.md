@@ -30,7 +30,7 @@ To enable caching set `cache=True`.
 A change to this parameter will invalidate the cache.
 This allows you to explicitly indicate when a change has been made to the task that should invalidate any existing cached results.
 Note that this is not the only change that will invalidate the cache (see below).
-Also, note that you can manually trigger cache invalidation per execution using the `overwrite-cache` flag.
+Also, note that you can manually trigger cache invalidation per execution using the [`overwrite-cache` flag](#overwrite-cache-flag).
 * `cache_serialize` (`bool`): Enables or disables [cache serialization](./cache_serializing).
 When enabled, Flyte ensures that a single instance of the task is run before any other instances that would otherwise run concurrently.
 This allows the initial instance to cache its result and lets the later instances reuse the resulting cached outputs.
