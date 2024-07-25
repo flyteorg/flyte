@@ -126,21 +126,21 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 }
 
 func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob plugins.RayJob, objectMeta *metav1.ObjectMeta, podSpec v1.PodSpec, headPodSpec *v1.PodSpec, headNodeRayStartParams map[string]string, primaryContainerIdx int, primaryContainer v1.Container) (*rayv1.RayJob, error) {
+	var err error
 	enableIngress := true
 	cfg := GetConfig()
-	var err error
-	TGAnnotations, err := batchscheduler.SetSchedulerNameAndBuildGangInfo(
-		cfg.BatchScheduler,
+	schedulerPlugin := batchscheduler.NewSchedulerPlugin(&cfg.BatchScheduler)
+	err = schedulerPlugin.ParseJob(
+		&cfg.BatchScheduler,
 		objectMeta,
 		rayJob.RayCluster.WorkerGroupSpec,
 		&podSpec,
-		headPodSpec,
+		primaryContainerIdx,
 	)
-	batchscheduler.AddGangSchedulingAnnotations(
-		batchscheduler.GenerateTaskGroupName(true, 0),
-		objectMeta,
-		TGAnnotations,
-	)
+	if err != nil {
+		return nil, err
+	}
+	schedulerPlugin.ProcessHead(objectMeta, headPodSpec)
 	rayClusterSpec := rayv1.RayClusterSpec{
 		HeadGroupSpec: rayv1.HeadGroupSpec{
 			Template: buildHeadPodTemplate(
@@ -156,15 +156,11 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob plugins.Ra
 		WorkerGroupSpecs:        []rayv1.WorkerGroupSpec{},
 		EnableInTreeAutoscaling: &rayJob.RayCluster.EnableAutoscaling,
 	}
-	batchscheduler.RemoveGangSchedulingAnnotations(objectMeta)
+	schedulerPlugin.AfterProcess(objectMeta)
 
 	for index, spec := range rayJob.RayCluster.WorkerGroupSpec {
 		workerPodSpec := podSpec.DeepCopy()
-		batchscheduler.AddGangSchedulingAnnotations(
-			batchscheduler.GenerateTaskGroupName(false, index),
-			objectMeta,
-			TGAnnotations,
-		)
+		schedulerPlugin.ProcessWorker(objectMeta, workerPodSpec, index)
 		workerPodTemplate := buildWorkerPodTemplate(
 			&workerPodSpec.Containers[primaryContainerIdx],
 			workerPodSpec,
@@ -206,7 +202,7 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob plugins.Ra
 		}
 
 		rayClusterSpec.WorkerGroupSpecs = append(rayClusterSpec.WorkerGroupSpecs, workerNodeSpec)
-		batchscheduler.RemoveGangSchedulingAnnotations(objectMeta)
+		schedulerPlugin.AfterProcess(objectMeta)
 	}
 
 	serviceAccountName := flytek8s.GetServiceAccountNameFromTaskExecutionMetadata(taskCtx.TaskExecutionMetadata())

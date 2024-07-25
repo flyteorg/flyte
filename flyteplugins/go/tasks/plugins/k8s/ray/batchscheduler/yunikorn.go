@@ -11,14 +11,44 @@ import (
 
 const (
 	// Pod lebel
-	BatchSchedulerLabel  = "batch-scheduler"
-	SchedulerLabel       = "scheduler"
-	SchedulerName        = "yunikorn"
+	Yunikorn             = "yunikorn"
 	TaskGroupNameKey     = "yunikorn.apache.org/task-group-name"
 	TaskGroupsKey        = "yunikorn.apache.org/task-groups"
 	TaskGroupPrarameters = "yunikorn.apache.org/schedulingPolicyParameters"
 	TaskGroupGenericName = "task-group"
 )
+
+type YunikornGangSchedulingConfig struct {
+	Annotations map[string]map[string]string
+	Parameters string
+}
+
+func NewYunikornPlugin() *YunikornGangSchedulingConfig {
+	return &YunikornGangSchedulingConfig{
+		Annotations: nil,
+	}
+}
+
+func (s *YunikornGangSchedulingConfig) GetSchedulerName() string { return Yunikorn }
+
+func (s *YunikornGangSchedulingConfig) ParseJob(config *BatchSchedulerConfig, metadata *metav1.ObjectMeta, workerGroupsSpec []*plugins.WorkerGroupSpec, pod *v1.PodSpec, primaryContainerIdx int) error {
+	s.Parameters = config.GetParameters()
+	return s.BuildGangInfo(metadata, workerGroupsSpec, pod, primaryContainerIdx)
+}
+
+func (s *YunikornGangSchedulingConfig) ProcessHead(metadata *metav1.ObjectMeta, head *v1.PodSpec) {
+	s.SetSchedulerName(head)
+	s.AddGangSchedulingAnnotations(GenerateTaskGroupName(true, 0), metadata)
+}
+
+func (s *YunikornGangSchedulingConfig) ProcessWorker(metadata *metav1.ObjectMeta, worker *v1.PodSpec, index int) {
+	s.SetSchedulerName(worker)
+	s.AddGangSchedulingAnnotations(GenerateTaskGroupName(false, index), metadata)
+}
+
+func (s *YunikornGangSchedulingConfig) AfterProcess(metadata *metav1.ObjectMeta) {
+	RemoveGangSchedulingAnnotations(metadata)
+}
 
 type TaskGroup struct {
 	Name                      string
@@ -39,15 +69,18 @@ func GenerateTaskGroupName(master bool, index int) string {
 	return fmt.Sprintf("%s-%s-%d", TaskGroupGenericName, "worker", index)
 }
 
-func SetSchedulerNameAndBuildGangInfo(config BatchSchedulerConfig, metadata *metav1.ObjectMeta, workerGroupsSpec []*plugins.WorkerGroupSpec, head, worker *v1.PodSpec) (map[string]map[string]string, error) {
-	if config.Scheduler != SchedulerName {
-		return nil, nil
-	}
-	head.SchedulerName = SchedulerName
-	worker.SchedulerName = SchedulerName
+func (s *YunikornGangSchedulingConfig) SetSchedulerName(spec *v1.PodSpec) {
+	spec.SchedulerName = s.GetSchedulerName()
+}
 
-	TaskGroupsAnnotations := make(map[string]map[string]string, 0)
+func (s *YunikornGangSchedulingConfig) BuildGangInfo(
+	metadata *metav1.ObjectMeta,
+	workerGroupsSpec []*plugins.WorkerGroupSpec,
+	pod *v1.PodSpec,
+	primaryContainerIdx int,
+) error {
 	// Parsing placeholders from the pod resource among head and workers
+	s.Annotations = make(map[string]map[string]string, 0)
 	TaskGroups := make([]TaskGroup, 0)
 	headName := GenerateTaskGroupName(true, 0)
 	TaskGroups = append(TaskGroups, TaskGroup{
@@ -55,12 +88,11 @@ func SetSchedulerNameAndBuildGangInfo(config BatchSchedulerConfig, metadata *met
 		MinMember:                 1,
 		Labels:                    metadata.Labels,
 		Annotations:               metadata.Annotations,
-		MinResource:               head.Containers[0].Resources.Requests,
-		NodeSelector:              head.NodeSelector,
-		Affinity:                  head.Affinity,
-		TopologySpreadConstraints: head.TopologySpreadConstraints,
+		MinResource:               pod.Containers[primaryContainerIdx].Resources.Requests,
+		NodeSelector:              pod.NodeSelector,
+		Affinity:                  pod.Affinity,
+		TopologySpreadConstraints: pod.TopologySpreadConstraints,
 	})
-
 	for index, spec := range workerGroupsSpec {
 		name := GenerateTaskGroupName(false, index)
 		tg := TaskGroup{
@@ -68,41 +100,42 @@ func SetSchedulerNameAndBuildGangInfo(config BatchSchedulerConfig, metadata *met
 			MinMember:                 spec.Replicas,
 			Labels:                    metadata.Labels,
 			Annotations:               metadata.Annotations,
-			MinResource:               worker.Containers[0].Resources.Requests,
-			NodeSelector:              worker.NodeSelector,
-			Affinity:                  worker.Affinity,
-			TopologySpreadConstraints: worker.TopologySpreadConstraints,
+			MinResource:               pod.Containers[primaryContainerIdx].Resources.Requests,
+			NodeSelector:              pod.NodeSelector,
+			Affinity:                  pod.Affinity,
+			TopologySpreadConstraints: pod.TopologySpreadConstraints,
 		}
-		TaskGroupsAnnotations[name] = map[string]string{
+		s.Annotations[name] = map[string]string{
 			TaskGroupNameKey: name,
 		}
 		TaskGroups = append(TaskGroups, tg)
 	}
-
 	// Yunikorn head gang scheduling annotations
-	info, err := json.Marshal(TaskGroups)
-	if err != nil {
-		return nil, err
+	var info []byte
+	var err error
+	if info, err = json.Marshal(TaskGroups); err != nil {
+		s.Annotations = nil
+		return err
 	}
 	headAnnotations := make(map[string]string, 0)
 	headAnnotations[TaskGroupNameKey] = headName
 	headAnnotations[TaskGroupsKey] = string(info[:])
-	headAnnotations[TaskGroupPrarameters] = config.Parameters
-	TaskGroupsAnnotations[headName] = headAnnotations
-	return TaskGroupsAnnotations, nil
+	headAnnotations[TaskGroupPrarameters] = s.Parameters
+	s.Annotations[headName] = headAnnotations
+	return nil
 }
 
-func AddGangSchedulingAnnotations(name string, metadata *metav1.ObjectMeta, TGAnnotations map[string]map[string]string) {
-	if TGAnnotations == nil {
+func (s *YunikornGangSchedulingConfig) AddGangSchedulingAnnotations(name string, metadata *metav1.ObjectMeta) {
+	if s.Annotations == nil {
 		return
 	}
 
-	if _, ok := TGAnnotations[name]; !ok {
+	if _, ok := s.Annotations[name]; !ok {
 		return
 	}
 
 	// Updating Yunikorn gang scheduling annotations
-	annotations := TGAnnotations[name]
+	annotations := s.Annotations[name]
 	if _, ok := metadata.Annotations[TaskGroupNameKey]; !ok {
 		if _, ok = annotations[TaskGroupNameKey]; ok {
 			metadata.Annotations[TaskGroupNameKey] = annotations[TaskGroupNameKey]
@@ -118,18 +151,13 @@ func AddGangSchedulingAnnotations(name string, metadata *metav1.ObjectMeta, TGAn
 			metadata.Annotations[TaskGroupPrarameters] = annotations[TaskGroupPrarameters]
 		}
 	}
-	return
 }
 
 func RemoveGangSchedulingAnnotations(metadata *metav1.ObjectMeta) {
-	if _, ok := metadata.Annotations[TaskGroupNameKey]; ok {
-		delete(metadata.Annotations, TaskGroupNameKey)
+	if metadata == nil {
+		return
 	}
-	if _, ok := metadata.Annotations[TaskGroupsKey]; ok {
-		delete(metadata.Annotations, TaskGroupsKey)
-	}
-	if _, ok := metadata.Annotations[TaskGroupPrarameters]; ok {
-		delete(metadata.Annotations, TaskGroupPrarameters)
-	}
-	return
+	delete(metadata.Annotations, TaskGroupNameKey)
+	delete(metadata.Annotations, TaskGroupsKey)
+	delete(metadata.Annotations, TaskGroupPrarameters)
 }
