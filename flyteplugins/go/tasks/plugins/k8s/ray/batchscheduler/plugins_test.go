@@ -2,6 +2,8 @@ package batchscheduler
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestCreateSchedulerPlugin(t *testing.T) {
@@ -15,9 +17,8 @@ func TestCreateSchedulerPlugin(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run("New scheduler plugin", func(t *testing.T) {
-			if got := NewSchedulerPlugin(tt.input); got.GetSchedulerName() != tt.expect {
-				t.Errorf("got %s, expect %s", got, tt.expect)
-			}
+			p := NewSchedulerPlugin(tt.input)
+			assert.Equal(t, tt.expect, p.GetSchedulerName())
 		})
 	}
 }
