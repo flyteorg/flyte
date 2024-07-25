@@ -19,7 +19,7 @@ var (
 			Duration: 30 * time.Second,
 		},
 		WatchConfig: WatchConfig{
-			Enabled:           false,
+			Enabled:           true,
 			FreshnessDuration: config.Duration{Duration: 3 * time.Minute},
 			ReconnectDelay:    config.Duration{Duration: time.Second},
 		},
