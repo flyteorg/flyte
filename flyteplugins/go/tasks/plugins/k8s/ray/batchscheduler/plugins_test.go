@@ -7,13 +7,13 @@ import (
 )
 
 func TestCreateSchedulerPlugin(t *testing.T) {
-	var tests = []struct{
-		input *Config
+	var tests = []struct {
+		input  *Config
 		expect string
 	}{
 		{input: &Config{Scheduler: DefaultScheduler}, expect: DefaultScheduler},
 		{input: &Config{Scheduler: Yunikorn}, expect: Yunikorn},
-		{input: &Config{Scheduler:"Unknown"}, expect: DefaultScheduler},
+		{input: &Config{Scheduler: "Unknown"}, expect: DefaultScheduler},
 	}
 	for _, tt := range tests {
 		t.Run("New scheduler plugin", func(t *testing.T) {
