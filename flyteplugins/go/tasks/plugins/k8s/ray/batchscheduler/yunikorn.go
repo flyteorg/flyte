@@ -31,7 +31,7 @@ func NewYunikornPlugin() *YunikornGangSchedulingConfig {
 
 func (s *YunikornGangSchedulingConfig) GetSchedulerName() string { return Yunikorn }
 
-func (s *YunikornGangSchedulingConfig) ParseJob(config *BatchSchedulerConfig, metadata *metav1.ObjectMeta, workerGroupsSpec []*plugins.WorkerGroupSpec, pod *v1.PodSpec, primaryContainerIdx int) error {
+func (s *YunikornGangSchedulingConfig) ParseJob(config *Config, metadata *metav1.ObjectMeta, workerGroupsSpec []*plugins.WorkerGroupSpec, pod *v1.PodSpec, primaryContainerIdx int) error {
 	s.Annotations = nil
 	s.Parameters = config.GetParameters()
 	return s.BuildGangInfo(metadata, workerGroupsSpec, pod, primaryContainerIdx)

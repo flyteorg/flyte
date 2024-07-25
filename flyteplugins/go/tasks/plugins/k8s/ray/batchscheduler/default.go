@@ -19,7 +19,7 @@ func NewDefaultPlugin() *DefaultPlugin {
 func (d *DefaultPlugin) GetSchedulerName() string { return DefaultScheduler }
 
 func (d *DefaultPlugin) ParseJob(
-	config *BatchSchedulerConfig,
+	config *Config,
 	metadata *metav1.ObjectMeta,
 	workerGroupsSpec []*plugins.WorkerGroupSpec,
 	pod *v1.PodSpec,
