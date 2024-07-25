@@ -294,15 +294,20 @@ def gpu_available() -> bool:
 
 #### How it works?
 
-In this case, the task is scheduled with a `2g.10gb` MIG instance profile by default.
-
-`flytepropeller` only injects the node selector that matches nodes with an `A100` device:
+flytekit uses a default `2g.10gb`partition size and `flytepropeller`  injects the node selector that matches labels on nodes with an `A100` device:
 
 ```yaml
-
-
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: nvidia.com/gpu.accelerator
+            operator: In
+            values:
+            - nvidia-tesla-a100
 ```
-
 
 ### Request an unpartitioned A100 device
 The goal is to run the task using the resources of the entire A100 GPU:
