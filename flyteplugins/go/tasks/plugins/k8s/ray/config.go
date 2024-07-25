@@ -78,7 +78,7 @@ type Config struct {
 	// or 0.0.0.0 (available from all interfaces). By default, this is localhost.
 	DashboardHost string `json:"dashboardHost,omitempty"`
 
-	BatchScheduler batchscheduler.BatchSchedulerConfig `json:"batchSchedulerConfig,omitempty"`
+	BatchScheduler batchscheduler.BatchSchedulerConfig `json:"BatchScheduler,omitempty"`
 
 	// DeprecatedNodeIPAddress the IP address of the head node. By default, this is pod ip address.
 	DeprecatedNodeIPAddress string `json:"nodeIPAddress,omitempty" pflag:"-,DEPRECATED. Please use DefaultConfig.[HeadNode|WorkerNode].IPAddress"`
