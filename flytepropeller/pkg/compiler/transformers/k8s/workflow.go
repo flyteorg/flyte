@@ -35,8 +35,10 @@ const (
 	// The fully qualified FlyteWorkflow name
 	WorkflowNameLabel = "workflow-name"
 
-	// Maximum length of a Kubernetes label
-	allowedExecutionNameLength = 63
+	// Length of hash to use as a suffix on the workflow CR name. Used when config.UseWorkflowCRNameSuffix is true.
+	// The workflow CR name should be at or under 63 characters long, here it is 52 + 1 + 10 = 63
+	workflowCRNameHashLength = 10
+	workflowCRNameSuffixFmt  = "%.52s-%s"
 )
 
 func requiresInputs(w *core.WorkflowTemplate) bool {
@@ -252,7 +254,7 @@ func BuildFlyteWorkflow(wfClosure *core.CompiledWorkflowClosure, inputs *core.Li
 		errs.Collect(errors.NewWorkflowBuildError(err))
 	}
 
-	if workflowCRNameHashLength := config.GetConfig().WorkflowCRNameHashLength; workflowCRNameHashLength > 0 {
+	if config.GetConfig().UseWorkflowCRNameSuffix {
 		// Seed the randomness before generating the name with random suffix
 		hashedIdentifier := hashIdentifier(core.Identifier{
 			Project: project,
@@ -260,13 +262,7 @@ func BuildFlyteWorkflow(wfClosure *core.CompiledWorkflowClosure, inputs *core.Li
 			Name:    name,
 		})
 		rand.Seed(int64(hashedIdentifier))
-
-		base := name + "-"
-		maxNameLength := allowedExecutionNameLength - workflowCRNameHashLength
-		if len(base) > maxNameLength {
-			base = base[:maxNameLength]
-		}
-		obj.ObjectMeta.Name = fmt.Sprintf("%s%s", base, rand.String(workflowCRNameHashLength))
+		obj.ObjectMeta.Name = fmt.Sprintf(workflowCRNameSuffixFmt, name, rand.String(workflowCRNameHashLength))
 	} else {
 		obj.ObjectMeta.Name = name
 	}

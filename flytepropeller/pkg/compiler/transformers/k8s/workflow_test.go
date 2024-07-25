@@ -254,21 +254,21 @@ func TestBuildFlyteWorkflow_withUnionInputs(t *testing.T) {
 
 func TestBuildFlyteWorkflow_setWorkflowCRNameHashLength(t *testing.T) {
 	for name, tt := range map[string]struct {
-		hashLength int
-		expected   string
+		useSuffix bool
+		expected  string
 	}{
 		"default does not use hash as workflow CR name": {
-			hashLength: 0,
-			expected:   "",
+			useSuffix: false,
+			expected:  "",
 		},
 		"use hash as workflow CR name": {
-			hashLength: 63,
-			expected:   "x6m7gswrdlbj7nmv9zq8nq7ck78qtt8dxv9469q9llblmh9fb2pgggnxfs72n84",
+			useSuffix: true,
+			expected:  "-x6m7gswrdl",
 		},
 	} {
 		t.Run(name, func(t *testing.T) {
 			flyteConfig := config.GetConfig()
-			flyteConfig.WorkflowCRNameHashLength = tt.hashLength
+			flyteConfig.UseWorkflowCRNameSuffix = tt.useSuffix
 
 			w := createSampleMockWorkflow()
 
