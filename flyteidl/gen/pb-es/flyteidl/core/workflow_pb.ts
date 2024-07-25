@@ -548,12 +548,11 @@ export class ArrayNode extends Message<ArrayNode> {
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   /**
-   * execution_version determines the execution path for ArrayNode. The default, 0, will
-   * utilize the minimized storage implementation. 1 will utilize full subNode status storage.
+   * execution_mode determines the execution path for ArrayNode.
    *
-   * @generated from field: uint32 execution_version = 5;
+   * @generated from field: flyteidl.core.ArrayNode.ExecutionMode execution_mode = 5;
    */
-  executionVersion = 0;
+  executionMode = ArrayNode_ExecutionMode.MINIMAL_STATE;
 
   constructor(data?: PartialMessage<ArrayNode>) {
     super();
@@ -567,7 +566,7 @@ export class ArrayNode extends Message<ArrayNode> {
     { no: 2, name: "parallelism", kind: "scalar", T: 13 /* ScalarType.UINT32 */, oneof: "parallelism_option" },
     { no: 3, name: "min_successes", kind: "scalar", T: 13 /* ScalarType.UINT32 */, oneof: "success_criteria" },
     { no: 4, name: "min_success_ratio", kind: "scalar", T: 2 /* ScalarType.FLOAT */, oneof: "success_criteria" },
-    { no: 5, name: "execution_version", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 5, name: "execution_mode", kind: "enum", T: proto3.getEnumType(ArrayNode_ExecutionMode) },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ArrayNode {
@@ -586,6 +585,32 @@ export class ArrayNode extends Message<ArrayNode> {
     return proto3.util.equals(ArrayNode, a, b);
   }
 }
+
+/**
+ * @generated from enum flyteidl.core.ArrayNode.ExecutionMode
+ */
+export enum ArrayNode_ExecutionMode {
+  /**
+   * Indicates the ArrayNode will store minimal state for the sub-nodes.
+   * This is more efficient, but only supports a subset of Flyte entities.
+   *
+   * @generated from enum value: MINIMAL_STATE = 0;
+   */
+  MINIMAL_STATE = 0,
+
+  /**
+   * Indicates the ArrayNode will store full state for the sub-nodes.
+   * This supports a wider range of Flyte entities.
+   *
+   * @generated from enum value: FULL_STATE = 1;
+   */
+  FULL_STATE = 1,
+}
+// Retrieve enum metadata with: proto3.getEnumType(ArrayNode_ExecutionMode)
+proto3.util.setEnumType(ArrayNode_ExecutionMode, "flyteidl.core.ArrayNode.ExecutionMode", [
+  { no: 0, name: "MINIMAL_STATE" },
+  { no: 1, name: "FULL_STATE" },
+]);
 
 /**
  * Defines extra information about the Node.

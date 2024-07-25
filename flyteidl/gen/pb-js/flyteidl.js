@@ -10811,7 +10811,7 @@
                  * @property {number|null} [parallelism] ArrayNode parallelism
                  * @property {number|null} [minSuccesses] ArrayNode minSuccesses
                  * @property {number|null} [minSuccessRatio] ArrayNode minSuccessRatio
-                 * @property {number|null} [executionVersion] ArrayNode executionVersion
+                 * @property {flyteidl.core.ArrayNode.ExecutionMode|null} [executionMode] ArrayNode executionMode
                  */
     
                 /**
@@ -10862,12 +10862,12 @@
                 ArrayNode.prototype.minSuccessRatio = 0;
     
                 /**
-                 * ArrayNode executionVersion.
-                 * @member {number} executionVersion
+                 * ArrayNode executionMode.
+                 * @member {flyteidl.core.ArrayNode.ExecutionMode} executionMode
                  * @memberof flyteidl.core.ArrayNode
                  * @instance
                  */
-                ArrayNode.prototype.executionVersion = 0;
+                ArrayNode.prototype.executionMode = 0;
     
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
@@ -10926,8 +10926,8 @@
                         writer.uint32(/* id 3, wireType 0 =*/24).uint32(message.minSuccesses);
                     if (message.minSuccessRatio != null && message.hasOwnProperty("minSuccessRatio"))
                         writer.uint32(/* id 4, wireType 5 =*/37).float(message.minSuccessRatio);
-                    if (message.executionVersion != null && message.hasOwnProperty("executionVersion"))
-                        writer.uint32(/* id 5, wireType 0 =*/40).uint32(message.executionVersion);
+                    if (message.executionMode != null && message.hasOwnProperty("executionMode"))
+                        writer.uint32(/* id 5, wireType 0 =*/40).int32(message.executionMode);
                     return writer;
                 };
     
@@ -10962,7 +10962,7 @@
                             message.minSuccessRatio = reader.float();
                             break;
                         case 5:
-                            message.executionVersion = reader.uint32();
+                            message.executionMode = reader.int32();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -11006,11 +11006,30 @@
                         if (typeof message.minSuccessRatio !== "number")
                             return "minSuccessRatio: number expected";
                     }
-                    if (message.executionVersion != null && message.hasOwnProperty("executionVersion"))
-                        if (!$util.isInteger(message.executionVersion))
-                            return "executionVersion: integer expected";
+                    if (message.executionMode != null && message.hasOwnProperty("executionMode"))
+                        switch (message.executionMode) {
+                        default:
+                            return "executionMode: enum value expected";
+                        case 0:
+                        case 1:
+                            break;
+                        }
                     return null;
                 };
+    
+                /**
+                 * ExecutionMode enum.
+                 * @name flyteidl.core.ArrayNode.ExecutionMode
+                 * @enum {string}
+                 * @property {number} MINIMAL_STATE=0 MINIMAL_STATE value
+                 * @property {number} FULL_STATE=1 FULL_STATE value
+                 */
+                ArrayNode.ExecutionMode = (function() {
+                    var valuesById = {}, values = Object.create(valuesById);
+                    values[valuesById[0] = "MINIMAL_STATE"] = 0;
+                    values[valuesById[1] = "FULL_STATE"] = 1;
+                    return values;
+                })();
     
                 return ArrayNode;
             })();

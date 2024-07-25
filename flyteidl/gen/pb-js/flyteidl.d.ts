@@ -4514,8 +4514,8 @@ export namespace flyteidl {
             /** ArrayNode minSuccessRatio */
             minSuccessRatio?: (number|null);
 
-            /** ArrayNode executionVersion */
-            executionVersion?: (number|null);
+            /** ArrayNode executionMode */
+            executionMode?: (flyteidl.core.ArrayNode.ExecutionMode|null);
         }
 
         /** Represents an ArrayNode. */
@@ -4539,8 +4539,8 @@ export namespace flyteidl {
             /** ArrayNode minSuccessRatio. */
             public minSuccessRatio: number;
 
-            /** ArrayNode executionVersion. */
-            public executionVersion: number;
+            /** ArrayNode executionMode. */
+            public executionMode: flyteidl.core.ArrayNode.ExecutionMode;
 
             /** ArrayNode parallelismOption. */
             public parallelismOption?: "parallelism";
@@ -4579,6 +4579,15 @@ export namespace flyteidl {
              * @returns `null` if valid, otherwise the reason why it is not
              */
             public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        namespace ArrayNode {
+
+            /** ExecutionMode enum. */
+            enum ExecutionMode {
+                MINIMAL_STATE = 0,
+                FULL_STATE = 1
+            }
         }
 
         /** Properties of a NodeMetadata. */
