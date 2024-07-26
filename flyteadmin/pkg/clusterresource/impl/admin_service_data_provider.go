@@ -36,7 +36,7 @@ func (p serviceAdminProvider) GetClusterResourceAttributes(ctx context.Context, 
 // We want both active and system generated projects
 var activeProjectsFilter = fmt.Sprintf("ne(state,%d)", admin.Project_ARCHIVED)
 
-var archivedProjectsFilter = fmt.Sprintf("eq(state,%d)", admin.Project_ARCHIVED)
+var archivedProjectsFilter = fmt.Sprintf("eq(state,%d)", admin.Project_SYSTEM_ARCHIVED)
 
 var descUpdatedAtSortParam = admin.Sort{
 	Direction: admin.Sort_DESCENDING,
