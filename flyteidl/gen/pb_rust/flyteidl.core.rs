@@ -2401,6 +2401,9 @@ pub struct ArrayNode {
     /// node is the sub-node that will be executed for each element in the array.
     #[prost(message, optional, boxed, tag="1")]
     pub node: ::core::option::Option<::prost::alloc::boxed::Box<Node>>,
+    /// execution_mode determines the execution path for ArrayNode.
+    #[prost(enumeration="array_node::ExecutionMode", tag="5")]
+    pub execution_mode: i32,
     #[prost(oneof="array_node::ParallelismOption", tags="2")]
     pub parallelism_option: ::core::option::Option<array_node::ParallelismOption>,
     #[prost(oneof="array_node::SuccessCriteria", tags="3, 4")]
@@ -2408,6 +2411,36 @@ pub struct ArrayNode {
 }
 /// Nested message and enum types in `ArrayNode`.
 pub mod array_node {
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+    #[repr(i32)]
+    pub enum ExecutionMode {
+        /// Indicates the ArrayNode will store minimal state for the sub-nodes.
+        /// This is more efficient, but only supports a subset of Flyte entities.
+        MinimalState = 0,
+        /// Indicates the ArrayNode will store full state for the sub-nodes.
+        /// This supports a wider range of Flyte entities.
+        FullState = 1,
+    }
+    impl ExecutionMode {
+        /// String value of the enum field names used in the ProtoBuf definition.
+        ///
+        /// The values are not transformed in any way and thus are considered stable
+        /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+        pub fn as_str_name(&self) -> &'static str {
+            match self {
+                ExecutionMode::MinimalState => "MINIMAL_STATE",
+                ExecutionMode::FullState => "FULL_STATE",
+            }
+        }
+        /// Creates an enum from field names used in the ProtoBuf definition.
+        pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+            match value {
+                "MINIMAL_STATE" => Some(Self::MinimalState),
+                "FULL_STATE" => Some(Self::FullState),
+                _ => None,
+            }
+        }
+    }
     #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum ParallelismOption {
