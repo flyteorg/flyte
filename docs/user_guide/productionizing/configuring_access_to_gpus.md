@@ -370,10 +370,10 @@ configuration:
   inline:
     plugins:
       k8s:
-        gpu-unpartitioned-node-selector-requirement :
-        key: cloud.google.com/gke-gpu-partition-size #change to match your node label configuration
-        operator: Equal
-        value: DoesNotExist
+        gpu-unpartitioned-node-selector-requirement:
+          key: cloud.google.com/gke-gpu-partition-size #change to match your node label configuration
+          operator: Equal
+          value: DoesNotExist
 ```
 
 
