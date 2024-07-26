@@ -81,7 +81,7 @@ func (a *arrayTaskReader) Read(ctx context.Context) (*core.TaskTemplate, error) 
 
 type arrayNodeExecutionContext struct {
 	interfaces.NodeExecutionContext
-	eventRecorder    arrayEventRecorder
+	eventRecorder    ArrayEventRecorder
 	executionContext executors.ExecutionContext
 	inputReader      io.InputReader
 	nodeStatus       *v1alpha1.NodeStatus
@@ -109,7 +109,7 @@ func (a *arrayNodeExecutionContext) TaskReader() interfaces.TaskReader {
 }
 
 func newArrayNodeExecutionContext(nodeExecutionContext interfaces.NodeExecutionContext, inputReader io.InputReader,
-	eventRecorder arrayEventRecorder, subNodeIndex int, nodeStatus *v1alpha1.NodeStatus) *arrayNodeExecutionContext {
+	eventRecorder ArrayEventRecorder, subNodeIndex int, nodeStatus *v1alpha1.NodeStatus) *arrayNodeExecutionContext {
 
 	arrayExecutionContext := newArrayExecutionContext(nodeExecutionContext.ExecutionContext(), subNodeIndex)
 	return &arrayNodeExecutionContext{

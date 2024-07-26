@@ -30,7 +30,10 @@ func getParentNodeExecutionID(nCtx interfaces.NodeExecutionContext) (*core.NodeE
 	nodeExecID := &core.NodeExecutionIdentifier{
 		ExecutionId: nCtx.NodeExecutionMetadata().GetNodeExecutionID().ExecutionId,
 	}
-	if nCtx.ExecutionContext().GetEventVersion() != v1alpha1.EventVersion0 {
+	if nCtx.ExecutionContext().GetParentInfo() != nil && nCtx.ExecutionContext().GetParentInfo().IsInArrayChain() && config.GetConfig().ArrayNode.EventVersion == 0 {
+		// set parent node ID for ArrayNode as we don't emit CreateNodeEvents
+		nodeExecID.NodeId = nCtx.ExecutionContext().GetParentInfo().GetUniqueID()
+	} else if nCtx.ExecutionContext().GetEventVersion() != v1alpha1.EventVersion0 {
 		var err error
 		currentNodeUniqueID, err := common.GenerateUniqueID(nCtx.ExecutionContext().GetParentInfo(), nCtx.NodeExecutionMetadata().GetNodeExecutionID().NodeId)
 		if err != nil {
@@ -128,18 +131,27 @@ func (l *launchPlanHandler) StartLaunchPlan(ctx context.Context, nCtx interfaces
 }
 
 func GetChildWorkflowExecutionIDForExecution(parentNodeExecID *core.NodeExecutionIdentifier, nCtx interfaces.NodeExecutionContext) (*core.WorkflowExecutionIdentifier, error) {
+	var childID *core.WorkflowExecutionIdentifier
+	var err error
 	// Handle launch plan
 	if nCtx.ExecutionContext().GetDefinitionVersion() == v1alpha1.WorkflowDefinitionVersion0 {
-		return GetChildWorkflowExecutionID(
+		childID, err = GetChildWorkflowExecutionID(
+			parentNodeExecID,
+			nCtx.CurrentAttempt(),
+		)
+	} else {
+		childID, err = GetChildWorkflowExecutionIDV2(
 			parentNodeExecID,
 			nCtx.CurrentAttempt(),
 		)
 	}
 
-	return GetChildWorkflowExecutionIDV2(
-		parentNodeExecID,
-		nCtx.CurrentAttempt(),
-	)
+	// we need a unique name since we set the array node as the parent
+	if nCtx.ExecutionContext().GetParentInfo() != nil && nCtx.ExecutionContext().GetParentInfo().IsInArrayChain() && config.GetConfig().ArrayNode.EventVersion == 0 {
+		childID.Name = childID.Name + "-" + nCtx.NodeExecutionMetadata().GetNodeExecutionID().NodeId
+	}
+
+	return childID, err
 }
 
 func (l *launchPlanHandler) CheckLaunchPlanStatus(ctx context.Context, nCtx interfaces.NodeExecutionContext) (handler.Transition, error) {

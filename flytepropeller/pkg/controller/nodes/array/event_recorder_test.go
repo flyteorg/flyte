@@ -58,9 +58,9 @@ func TestGetPluginLogs(t *testing.T) {
 	nCtx.OnCurrentAttempt().Return(uint32(0))
 
 	executionContext := &execmocks.ExecutionContext{}
-	executionContext.EXPECT().GetEventVersion().Return(1)
-	executionContext.EXPECT().GetParentInfo().Return(nil)
-	executionContext.EXPECT().GetTask(taskRef).Return(
+	executionContext.OnGetEventVersion().Return(1)
+	executionContext.OnGetParentInfo().Return(nil)
+	executionContext.OnGetTask(taskRef).Return(
 		&v1alpha1.TaskSpec{
 			TaskTemplate: &idlcore.TaskTemplate{
 				Id: &idlcore.Identifier{
@@ -76,7 +76,7 @@ func TestGetPluginLogs(t *testing.T) {
 	)
 	nCtx.OnExecutionContext().Return(executionContext)
 
-	nCtx.OnNode().Return(&arrayNodeSpec)
+	nCtx.OnNode().Return(&arrayNodeSpecTaskMinStore)
 
 	nodeExecutionMetadata := &mocks.NodeExecutionMetadata{}
 	nodeExecutionMetadata.OnGetNamespace().Return("node_namespace")

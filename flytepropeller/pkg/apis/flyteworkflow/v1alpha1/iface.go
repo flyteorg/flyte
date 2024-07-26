@@ -261,6 +261,7 @@ type ExecutableArrayNode interface {
 	GetParallelism() *uint32
 	GetMinSuccesses() *uint32
 	GetMinSuccessRatio() *float32
+	GetExecutionMode() core.ArrayNode_ExecutionMode
 }
 
 type ExecutableWorkflowNodeStatus interface {

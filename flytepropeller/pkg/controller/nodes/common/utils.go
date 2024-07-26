@@ -32,16 +32,15 @@ func GenerateUniqueID(parentInfo executors.ImmutableParentInfo, nodeID string) (
 
 // CreateParentInfo creates a unique parent id, the unique id of parent is dependent on the unique id and the current
 // attempt of the grandparent to track the lineage.
-func CreateParentInfo(grandParentInfo executors.ImmutableParentInfo, nodeID string, parentAttempt uint32, nodeIsDynamic bool) (executors.ImmutableParentInfo, error) {
+func CreateParentInfo(grandParentInfo executors.ImmutableParentInfo, nodeID string, parentAttempt uint32, nodeIsDynamic bool, nodeIsArray bool) (executors.ImmutableParentInfo, error) {
 	uniqueID, err := GenerateUniqueID(grandParentInfo, nodeID)
 	if err != nil {
 		return nil, err
 	}
-	if nodeIsDynamic || (grandParentInfo != nil && grandParentInfo.IsInDynamicChain()) {
-		return executors.NewParentInfo(uniqueID, parentAttempt, true), nil
-	}
+	isInDynamicChain := nodeIsDynamic || (grandParentInfo != nil && grandParentInfo.IsInDynamicChain())
+	isInArrayChain := nodeIsArray || (grandParentInfo != nil && grandParentInfo.IsInArrayChain())
 
-	return executors.NewParentInfo(uniqueID, parentAttempt, false), nil
+	return executors.NewParentInfo(uniqueID, parentAttempt, isInDynamicChain, isInArrayChain), nil
 }
 
 func GetTargetEntity(ctx context.Context, nCtx interfaces.NodeExecutionContext) *core.Identifier {

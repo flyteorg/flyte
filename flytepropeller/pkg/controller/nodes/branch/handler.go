@@ -116,7 +116,7 @@ func (b *branchHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecutio
 }
 
 func (b *branchHandler) getExecutionContextForDownstream(nCtx interfaces.NodeExecutionContext) (executors.ExecutionContext, error) {
-	newParentInfo, err := common.CreateParentInfo(nCtx.ExecutionContext().GetParentInfo(), nCtx.NodeID(), nCtx.CurrentAttempt(), false)
+	newParentInfo, err := common.CreateParentInfo(nCtx.ExecutionContext().GetParentInfo(), nCtx.NodeID(), nCtx.CurrentAttempt(), false, false)
 	if err != nil {
 		return nil, err
 	}

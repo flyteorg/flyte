@@ -164,7 +164,7 @@ func TestGetTargetEntity_SubWorkflowNode(t *testing.T) {
 	exSubWf := &mocks.ExecutableSubWorkflow{}
 	exSubWf.OnGetIdentifier().Return(id)
 	ec := mocks2.ExecutionContext{}
-	ec.EXPECT().FindSubWorkflow("sub-workflow").Return(exSubWf)
+	ec.OnFindSubWorkflow("sub-workflow").Return(exSubWf)
 
 	subWfNode := &mocks.ExecutableWorkflowNode{}
 	subWfID := "sub-workflow"
@@ -229,7 +229,7 @@ func TestGetTargetEntity_Task(t *testing.T) {
 	exTask := &mocks.ExecutableTask{}
 	exTask.OnCoreTask().Return(taskTemplate)
 	ec := mocks2.ExecutionContext{}
-	ec.EXPECT().GetTask(taskID).Return(exTask, nil)
+	ec.OnGetTask(taskID).Return(exTask, nil)
 
 	nCtx := &mocks3.NodeExecutionContext{}
 	nCtx.OnNode().Return(n)

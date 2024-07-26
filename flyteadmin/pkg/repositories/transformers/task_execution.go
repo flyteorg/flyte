@@ -313,6 +313,9 @@ func mergeExternalResource(existing, latest *event.ExternalResourceInfo) *event.
 		existing.CacheStatus = latest.CacheStatus
 	}
 	existing.Logs = mergeLogs(existing.Logs, latest.Logs)
+	if existing.GetTargetMetadata() == nil && latest.GetTargetMetadata() != nil {
+		existing.TargetMetadata = latest.GetTargetMetadata()
+	}
 
 	return existing
 }

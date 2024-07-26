@@ -25,7 +25,7 @@ type nodeExecutionRequest struct {
 	nodeLookup         executors.NodeLookup
 	subNodeSpec        *v1alpha1.NodeSpec
 	subNodeStatus      *v1alpha1.NodeStatus
-	arrayEventRecorder arrayEventRecorder
+	arrayEventRecorder ArrayEventRecorder
 	responseChannel    chan struct {
 		interfaces.NodeStatus
 		error

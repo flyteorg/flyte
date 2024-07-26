@@ -4,7 +4,7 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 )
 
-//go:generate mockery-v2 --case=underscore --with-expecter --name ExecutionContext --output=mocks
+//go:generate mockery -all -case=underscore
 
 type TaskDetailsGetter interface {
 	GetTask(id v1alpha1.TaskID) (v1alpha1.ExecutableTask, error)
@@ -30,6 +30,7 @@ type ImmutableParentInfo interface {
 	GetUniqueID() v1alpha1.NodeID
 	CurrentAttempt() uint32
 	IsInDynamicChain() bool
+	IsInArrayChain() bool
 }
 
 type ControlFlow interface {
@@ -65,6 +66,7 @@ type parentExecutionInfo struct {
 	uniqueID         v1alpha1.NodeID
 	currentAttempts  uint32
 	isInDynamicChain bool
+	isInArrayChain   bool
 }
 
 func (p *parentExecutionInfo) GetUniqueID() v1alpha1.NodeID {
@@ -73,6 +75,10 @@ func (p *parentExecutionInfo) GetUniqueID() v1alpha1.NodeID {
 
 func (p *parentExecutionInfo) IsInDynamicChain() bool {
 	return p.isInDynamicChain
+}
+
+func (p *parentExecutionInfo) IsInArrayChain() bool {
+	return p.isInArrayChain
 }
 
 func (p *parentExecutionInfo) CurrentAttempt() uint32 {
@@ -136,11 +142,12 @@ func NewExecutionContext(immExecContext ImmutableExecutionContext, tasksGetter T
 	}
 }
 
-func NewParentInfo(uniqueID string, currentAttempts uint32, isInDynamicChain bool) ImmutableParentInfo {
+func NewParentInfo(uniqueID string, currentAttempts uint32, isInDynamicChain bool, isInArrayChain bool) ImmutableParentInfo {
 	return &parentExecutionInfo{
 		currentAttempts:  currentAttempts,
 		uniqueID:         uniqueID,
 		isInDynamicChain: isInDynamicChain,
+		isInArrayChain:   isInArrayChain,
 	}
 }
 

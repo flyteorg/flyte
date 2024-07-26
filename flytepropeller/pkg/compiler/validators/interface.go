@@ -157,9 +157,38 @@ func ValidateUnderlyingInterface(w c.WorkflowBuilder, node c.NodeBuilder, errs e
 		arrayNode := node.GetArrayNode()
 		underlyingNodeBuilder := w.GetOrCreateNodeBuilder(arrayNode.Node)
 		if underlyingIface, ok := ValidateUnderlyingInterface(w, underlyingNodeBuilder, errs.NewScope()); ok {
-			// ArrayNode interface should be inferred from the underlying node interface. flytekit
-			// will correct wrap variables in collections as needed, leaving partials as is.
-			iface = underlyingIface
+			// ArrayNode interface should be inferred from the underlying node interface. `ExecutionVersion`
+			// indicates whether the interface needs to be wrapping in a collection.
+			if arrayNode.GetExecutionMode() == core.ArrayNode_FULL_STATE {
+				iface = &core.TypedInterface{
+					Inputs: &core.VariableMap{
+						Variables: make(map[string]*core.Variable),
+					},
+					Outputs: &core.VariableMap{
+						Variables: make(map[string]*core.Variable),
+					},
+				}
+				for key, variable := range underlyingIface.Inputs.Variables {
+					iface.Inputs.Variables[key] = &core.Variable{
+						Type: &core.LiteralType{
+							Type: &core.LiteralType_CollectionType{
+								CollectionType: variable.Type,
+							},
+						},
+					}
+				}
+				for key, variable := range underlyingIface.Outputs.Variables {
+					iface.Outputs.Variables[key] = &core.Variable{
+						Type: &core.LiteralType{
+							Type: &core.LiteralType_CollectionType{
+								CollectionType: variable.Type,
+							},
+						},
+					}
+				}
+			} else {
+				iface = underlyingIface
+			}
 		}
 	default:
 		errs.Collect(errors.NewValueRequiredErr(node.GetId(), "Target"))

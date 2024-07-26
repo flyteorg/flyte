@@ -66,20 +66,26 @@ func TestExecutionContext(t *testing.T) {
 
 func TestParentExecutionInfo_GetUniqueID(t *testing.T) {
 	expectedID := "testID"
-	parentInfo := NewParentInfo(expectedID, 1, false)
+	parentInfo := NewParentInfo(expectedID, 1, false, false)
 	assert.Equal(t, expectedID, parentInfo.GetUniqueID())
 }
 
 func TestParentExecutionInfo_CurrentAttempt(t *testing.T) {
 	expectedAttempt := uint32(123465)
-	parentInfo := NewParentInfo("testID", expectedAttempt, false)
+	parentInfo := NewParentInfo("testID", expectedAttempt, false, false)
 	assert.Equal(t, expectedAttempt, parentInfo.CurrentAttempt())
 }
 
 func TestParentExecutionInfo_DynamicChain(t *testing.T) {
 	expectedAttempt := uint32(123465)
-	parentInfo := NewParentInfo("testID", expectedAttempt, true)
+	parentInfo := NewParentInfo("testID", expectedAttempt, true, false)
 	assert.True(t, parentInfo.IsInDynamicChain())
+}
+
+func TestParentExecutionInfo_ArrayChain(t *testing.T) {
+	expectedAttempt := uint32(123465)
+	parentInfo := NewParentInfo("testID", expectedAttempt, false, true)
+	assert.True(t, parentInfo.IsInArrayChain())
 }
 
 func TestControlFlow_ControlFlowParallelism(t *testing.T) {
@@ -94,7 +100,7 @@ func TestControlFlow_ControlFlowParallelism(t *testing.T) {
 func TestNewParentInfo(t *testing.T) {
 	expectedID := "testID"
 	expectedAttempt := uint32(123465)
-	parentInfo := NewParentInfo(expectedID, expectedAttempt, false).(*parentExecutionInfo)
+	parentInfo := NewParentInfo(expectedID, expectedAttempt, false, false).(*parentExecutionInfo)
 	assert.Equal(t, expectedID, parentInfo.uniqueID)
 	assert.Equal(t, expectedAttempt, parentInfo.currentAttempts)
 }

@@ -10811,6 +10811,7 @@
                  * @property {number|null} [parallelism] ArrayNode parallelism
                  * @property {number|null} [minSuccesses] ArrayNode minSuccesses
                  * @property {number|null} [minSuccessRatio] ArrayNode minSuccessRatio
+                 * @property {flyteidl.core.ArrayNode.ExecutionMode|null} [executionMode] ArrayNode executionMode
                  */
     
                 /**
@@ -10859,6 +10860,14 @@
                  * @instance
                  */
                 ArrayNode.prototype.minSuccessRatio = 0;
+    
+                /**
+                 * ArrayNode executionMode.
+                 * @member {flyteidl.core.ArrayNode.ExecutionMode} executionMode
+                 * @memberof flyteidl.core.ArrayNode
+                 * @instance
+                 */
+                ArrayNode.prototype.executionMode = 0;
     
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
@@ -10917,6 +10926,8 @@
                         writer.uint32(/* id 3, wireType 0 =*/24).uint32(message.minSuccesses);
                     if (message.minSuccessRatio != null && message.hasOwnProperty("minSuccessRatio"))
                         writer.uint32(/* id 4, wireType 5 =*/37).float(message.minSuccessRatio);
+                    if (message.executionMode != null && message.hasOwnProperty("executionMode"))
+                        writer.uint32(/* id 5, wireType 0 =*/40).int32(message.executionMode);
                     return writer;
                 };
     
@@ -10949,6 +10960,9 @@
                             break;
                         case 4:
                             message.minSuccessRatio = reader.float();
+                            break;
+                        case 5:
+                            message.executionMode = reader.int32();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -10992,8 +11006,30 @@
                         if (typeof message.minSuccessRatio !== "number")
                             return "minSuccessRatio: number expected";
                     }
+                    if (message.executionMode != null && message.hasOwnProperty("executionMode"))
+                        switch (message.executionMode) {
+                        default:
+                            return "executionMode: enum value expected";
+                        case 0:
+                        case 1:
+                            break;
+                        }
                     return null;
                 };
+    
+                /**
+                 * ExecutionMode enum.
+                 * @name flyteidl.core.ArrayNode.ExecutionMode
+                 * @enum {string}
+                 * @property {number} MINIMAL_STATE=0 MINIMAL_STATE value
+                 * @property {number} FULL_STATE=1 FULL_STATE value
+                 */
+                ArrayNode.ExecutionMode = (function() {
+                    var valuesById = {}, values = Object.create(valuesById);
+                    values[valuesById[0] = "MINIMAL_STATE"] = 0;
+                    values[valuesById[1] = "FULL_STATE"] = 1;
+                    return values;
+                })();
     
                 return ArrayNode;
             })();
@@ -22373,6 +22409,7 @@
                  * @property {flyteidl.core.TaskExecution.Phase|null} [phase] ExternalResourceInfo phase
                  * @property {flyteidl.core.CatalogCacheStatus|null} [cacheStatus] ExternalResourceInfo cacheStatus
                  * @property {Array.<flyteidl.core.ITaskLog>|null} [logs] ExternalResourceInfo logs
+                 * @property {flyteidl.event.IWorkflowNodeMetadata|null} [workflowNodeMetadata] ExternalResourceInfo workflowNodeMetadata
                  */
     
                 /**
@@ -22440,6 +22477,28 @@
                 ExternalResourceInfo.prototype.logs = $util.emptyArray;
     
                 /**
+                 * ExternalResourceInfo workflowNodeMetadata.
+                 * @member {flyteidl.event.IWorkflowNodeMetadata|null|undefined} workflowNodeMetadata
+                 * @memberof flyteidl.event.ExternalResourceInfo
+                 * @instance
+                 */
+                ExternalResourceInfo.prototype.workflowNodeMetadata = null;
+    
+                // OneOf field names bound to virtual getters and setters
+                var $oneOfFields;
+    
+                /**
+                 * ExternalResourceInfo targetMetadata.
+                 * @member {"workflowNodeMetadata"|undefined} targetMetadata
+                 * @memberof flyteidl.event.ExternalResourceInfo
+                 * @instance
+                 */
+                Object.defineProperty(ExternalResourceInfo.prototype, "targetMetadata", {
+                    get: $util.oneOfGetter($oneOfFields = ["workflowNodeMetadata"]),
+                    set: $util.oneOfSetter($oneOfFields)
+                });
+    
+                /**
                  * Creates a new ExternalResourceInfo instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.event.ExternalResourceInfo
@@ -22476,6 +22535,8 @@
                     if (message.logs != null && message.logs.length)
                         for (var i = 0; i < message.logs.length; ++i)
                             $root.flyteidl.core.TaskLog.encode(message.logs[i], writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
+                    if (message.workflowNodeMetadata != null && message.hasOwnProperty("workflowNodeMetadata"))
+                        $root.flyteidl.event.WorkflowNodeMetadata.encode(message.workflowNodeMetadata, writer.uint32(/* id 7, wireType 2 =*/58).fork()).ldelim();
                     return writer;
                 };
     
@@ -22517,6 +22578,9 @@
                                 message.logs = [];
                             message.logs.push($root.flyteidl.core.TaskLog.decode(reader, reader.uint32()));
                             break;
+                        case 7:
+                            message.workflowNodeMetadata = $root.flyteidl.event.WorkflowNodeMetadata.decode(reader, reader.uint32());
+                            break;
                         default:
                             reader.skipType(tag & 7);
                             break;
@@ -22536,6 +22600,7 @@
                 ExternalResourceInfo.verify = function verify(message) {
                     if (typeof message !== "object" || message === null)
                         return "object expected";
+                    var properties = {};
                     if (message.externalId != null && message.hasOwnProperty("externalId"))
                         if (!$util.isString(message.externalId))
                             return "externalId: string expected";
@@ -22580,6 +22645,14 @@
                             var error = $root.flyteidl.core.TaskLog.verify(message.logs[i]);
                             if (error)
                                 return "logs." + error;
+                        }
+                    }
+                    if (message.workflowNodeMetadata != null && message.hasOwnProperty("workflowNodeMetadata")) {
+                        properties.targetMetadata = 1;
+                        {
+                            var error = $root.flyteidl.event.WorkflowNodeMetadata.verify(message.workflowNodeMetadata);
+                            if (error)
+                                return "workflowNodeMetadata." + error;
                         }
                     }
                     return null;

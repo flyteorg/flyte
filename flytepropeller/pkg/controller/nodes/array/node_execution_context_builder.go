@@ -15,7 +15,7 @@ type arrayNodeExecutionContextBuilder struct {
 	subNodeIndex  int
 	subNodeStatus *v1alpha1.NodeStatus
 	inputReader   io.InputReader
-	eventRecorder arrayEventRecorder
+	eventRecorder ArrayEventRecorder
 }
 
 func (a *arrayNodeExecutionContextBuilder) BuildNodeExecutionContext(ctx context.Context, executionContext executors.ExecutionContext,
@@ -36,7 +36,7 @@ func (a *arrayNodeExecutionContextBuilder) BuildNodeExecutionContext(ctx context
 }
 
 func newArrayNodeExecutionContextBuilder(nCtxBuilder interfaces.NodeExecutionContextBuilder, subNodeID v1alpha1.NodeID, subNodeIndex int,
-	subNodeStatus *v1alpha1.NodeStatus, inputReader io.InputReader, eventRecorder arrayEventRecorder) interfaces.NodeExecutionContextBuilder {
+	subNodeStatus *v1alpha1.NodeStatus, inputReader io.InputReader, eventRecorder ArrayEventRecorder) interfaces.NodeExecutionContextBuilder {
 
 	return &arrayNodeExecutionContextBuilder{
 		nCtxBuilder:   nCtxBuilder,

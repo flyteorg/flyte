@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/protobuf/types/known/durationpb"
@@ -375,87 +376,260 @@ func TestValidateUnderlyingInterface(t *testing.T) {
 	})
 
 	t.Run("ArrayNode", func(t *testing.T) {
-		// mock underlying task node
-		iface := &core.TypedInterface{
-			Inputs: &core.VariableMap{
-				Variables: map[string]*core.Variable{
-					"foo": {
-						Type: &core.LiteralType{
-							Type: &core.LiteralType_Simple{
-								Simple: core.SimpleType_INTEGER,
+		nodeID := "node_1"
+		t.Run("Task", func(t *testing.T) {
+			// mock underlying task node
+			iface := &core.TypedInterface{
+				Inputs: &core.VariableMap{
+					Variables: map[string]*core.Variable{
+						"foo": {
+							Type: &core.LiteralType{
+								Type: &core.LiteralType_Simple{
+									Simple: core.SimpleType_INTEGER,
+								},
 							},
 						},
 					},
 				},
-			},
-			Outputs: &core.VariableMap{
+				Outputs: &core.VariableMap{
+					Variables: map[string]*core.Variable{
+						"bar": {
+							Type: &core.LiteralType{
+								Type: &core.LiteralType_Simple{
+									Simple: core.SimpleType_FLOAT,
+								},
+							},
+						},
+					},
+				},
+			}
+
+			taskNode := &core.Node{
+				Id: nodeID,
+				Target: &core.Node_TaskNode{
+					TaskNode: &core.TaskNode{
+						Reference: &core.TaskNode_ReferenceId{
+							ReferenceId: &core.Identifier{
+								Name: "Task_1",
+							},
+						},
+					},
+				},
+			}
+
+			task := mocks.Task{}
+			task.On("GetInterface").Return(iface)
+
+			taskNodeBuilder := &mocks.NodeBuilder{}
+			taskNodeBuilder.On("GetCoreNode").Return(taskNode)
+			taskNodeBuilder.On("GetId").Return(taskNode.Id)
+			taskNodeBuilder.On("GetTaskNode").Return(taskNode.Target.(*core.Node_TaskNode).TaskNode)
+			taskNodeBuilder.On("GetInterface").Return(nil)
+			taskNodeBuilder.On("SetInterface", mock.AnythingOfType("*core.TypedInterface")).Return(nil)
+
+			wfBuilder := mocks.WorkflowBuilder{}
+			wfBuilder.On("GetTask", mock.MatchedBy(func(id core.Identifier) bool {
+				return id.String() == (&core.Identifier{
+					Name: "Task_1",
+				}).String()
+			})).Return(&task, true)
+			wfBuilder.On("GetOrCreateNodeBuilder", mock.MatchedBy(func(node *core.Node) bool {
+				return node.Id == nodeID
+			})).Return(taskNodeBuilder)
+
+			// mock array node
+			arrayNode := &core.Node{
+				Id: "node_2",
+				Target: &core.Node_ArrayNode{
+					ArrayNode: &core.ArrayNode{
+						Node: taskNode,
+					},
+				},
+			}
+
+			nodeBuilder := mocks.NodeBuilder{}
+			nodeBuilder.On("GetArrayNode").Return(arrayNode.Target.(*core.Node_ArrayNode).ArrayNode)
+			nodeBuilder.On("GetCoreNode").Return(arrayNode)
+			nodeBuilder.On("GetId").Return(arrayNode.Id)
+			nodeBuilder.On("GetInterface").Return(nil)
+			nodeBuilder.On("SetInterface", mock.Anything).Return()
+
+			// compute arrayNode interface
+			errs := errors.NewCompileErrors()
+			arrayNodeIface, ifaceOk := ValidateUnderlyingInterface(&wfBuilder, &nodeBuilder, errs.NewScope())
+			assertNonEmptyInterface(t, arrayNodeIface, ifaceOk, errs)
+			assert.True(t, reflect.DeepEqual(arrayNodeIface, iface))
+		})
+
+		t.Run("LaunchPlan", func(t *testing.T) {
+			expectedInterface := &core.TypedInterface{
+				Inputs: &core.VariableMap{
+					Variables: map[string]*core.Variable{
+						"foo": {
+							Type: LiteralTypeForLiteral(coreutils.MustMakeLiteral([]interface{}{5})),
+						},
+					},
+				},
+				Outputs: &core.VariableMap{
+					Variables: map[string]*core.Variable{
+						"bar": {
+							Type: LiteralTypeForLiteral(coreutils.MustMakeLiteral([]interface{}{5})),
+						},
+					},
+				},
+			}
+
+			workflowNode := &core.Node{
+				Id: nodeID,
+				Target: &core.Node_WorkflowNode{
+					WorkflowNode: &core.WorkflowNode{
+						Reference: &core.WorkflowNode_LaunchplanRef{
+							LaunchplanRef: &core.Identifier{
+								Name: "Ref_1",
+							},
+						},
+					},
+				},
+			}
+
+			lp := mocks.InterfaceProvider{}
+			lp.On("GetExpectedInputs").Return(&core.ParameterMap{
+				Parameters: map[string]*core.Parameter{
+					"foo": {
+						Var: &core.Variable{
+							Type: LiteralTypeForLiteral(coreutils.MustMakeLiteral(5)),
+						},
+						Behavior: &core.Parameter_Required{
+							Required: true,
+						},
+					},
+				},
+			})
+			lp.On("GetExpectedOutputs").Return(&core.VariableMap{
 				Variables: map[string]*core.Variable{
 					"bar": {
-						Type: &core.LiteralType{
-							Type: &core.LiteralType_Simple{
-								Simple: core.SimpleType_FLOAT,
+						Type: LiteralTypeForLiteral(coreutils.MustMakeLiteral(5)),
+					},
+				},
+			})
+
+			workflowNodeBuilder := &mocks.NodeBuilder{}
+			workflowNodeBuilder.On("GetCoreNode").Return(workflowNode)
+			workflowNodeBuilder.On("GetId").Return(workflowNode.Id)
+			workflowNodeBuilder.On("GetWorkflowNode").Return(workflowNode.Target.(*core.Node_WorkflowNode).WorkflowNode)
+			workflowNodeBuilder.On("GetInterface").Return(nil)
+			workflowNodeBuilder.On("SetInterface", mock.AnythingOfType("*core.TypedInterface")).Return(nil)
+
+			wfBuilder := mocks.WorkflowBuilder{}
+			wfBuilder.On("GetCoreWorkflow").Return(&core.CompiledWorkflow{
+				Template: &core.WorkflowTemplate{
+					Id: &core.Identifier{
+						Name: "Parent Ref",
+					},
+				},
+			})
+			wfBuilder.On("GetLaunchPlan", matchIdentifier(core.Identifier{Name: "Ref_1"})).Return(&lp, true)
+			wfBuilder.On("GetOrCreateNodeBuilder", mock.MatchedBy(func(node *core.Node) bool {
+				return node.Id == nodeID
+			})).Return(workflowNodeBuilder)
+
+			// mock array node
+			arrayNode := &core.Node{
+				Id: "node_2",
+				Target: &core.Node_ArrayNode{
+					ArrayNode: &core.ArrayNode{
+						ExecutionMode: core.ArrayNode_FULL_STATE,
+						Node:          workflowNode,
+					},
+				},
+			}
+
+			nodeBuilder := mocks.NodeBuilder{}
+			nodeBuilder.On("GetArrayNode").Return(arrayNode.Target.(*core.Node_ArrayNode).ArrayNode)
+			nodeBuilder.On("GetCoreNode").Return(arrayNode)
+			nodeBuilder.On("GetId").Return(arrayNode.Id)
+			nodeBuilder.On("GetInterface").Return(nil)
+			nodeBuilder.On("SetInterface", mock.Anything).Return()
+
+			// compute arrayNode interface
+			errs := errors.NewCompileErrors()
+			arrayNodeIface, ifaceOk := ValidateUnderlyingInterface(&wfBuilder, &nodeBuilder, errs.NewScope())
+			assertNonEmptyInterface(t, arrayNodeIface, ifaceOk, errs)
+
+			assert.True(t, proto.Equal(expectedInterface, arrayNodeIface))
+		})
+
+		t.Run("LaunchPlan Empty", func(t *testing.T) {
+			expectedInterface := &core.TypedInterface{
+				Inputs:  &core.VariableMap{},
+				Outputs: &core.VariableMap{},
+			}
+
+			workflowNode := &core.Node{
+				Id: nodeID,
+				Target: &core.Node_WorkflowNode{
+					WorkflowNode: &core.WorkflowNode{
+						Reference: &core.WorkflowNode_LaunchplanRef{
+							LaunchplanRef: &core.Identifier{
+								Name: "Ref_1",
 							},
 						},
 					},
 				},
-			},
-		}
+			}
 
-		taskNode := &core.Node{
-			Id: "node_1",
-			Target: &core.Node_TaskNode{
-				TaskNode: &core.TaskNode{
-					Reference: &core.TaskNode_ReferenceId{
-						ReferenceId: &core.Identifier{
-							Name: "Task_1",
-						},
+			lp := mocks.InterfaceProvider{}
+			lp.On("GetExpectedInputs").Return(&core.ParameterMap{
+				Parameters: map[string]*core.Parameter{},
+			})
+			lp.On("GetExpectedOutputs").Return(&core.VariableMap{
+				Variables: map[string]*core.Variable{},
+			})
+
+			workflowNodeBuilder := &mocks.NodeBuilder{}
+			workflowNodeBuilder.On("GetCoreNode").Return(workflowNode)
+			workflowNodeBuilder.On("GetId").Return(workflowNode.Id)
+			workflowNodeBuilder.On("GetWorkflowNode").Return(workflowNode.Target.(*core.Node_WorkflowNode).WorkflowNode)
+			workflowNodeBuilder.On("GetInterface").Return(nil)
+			workflowNodeBuilder.On("SetInterface", mock.AnythingOfType("*core.TypedInterface")).Return(nil)
+
+			wfBuilder := mocks.WorkflowBuilder{}
+			wfBuilder.On("GetCoreWorkflow").Return(&core.CompiledWorkflow{
+				Template: &core.WorkflowTemplate{
+					Id: &core.Identifier{
+						Name: "Parent Ref",
 					},
 				},
-			},
-		}
+			})
+			wfBuilder.On("GetLaunchPlan", matchIdentifier(core.Identifier{Name: "Ref_1"})).Return(&lp, true)
+			wfBuilder.On("GetOrCreateNodeBuilder", mock.MatchedBy(func(node *core.Node) bool {
+				return node.Id == nodeID
+			})).Return(workflowNodeBuilder)
 
-		task := mocks.Task{}
-		task.On("GetInterface").Return(iface)
-
-		taskNodeBuilder := &mocks.NodeBuilder{}
-		taskNodeBuilder.On("GetCoreNode").Return(taskNode)
-		taskNodeBuilder.On("GetId").Return(taskNode.Id)
-		taskNodeBuilder.On("GetTaskNode").Return(taskNode.Target.(*core.Node_TaskNode).TaskNode)
-		taskNodeBuilder.On("GetInterface").Return(nil)
-		taskNodeBuilder.On("SetInterface", mock.AnythingOfType("*core.TypedInterface")).Return(nil)
-
-		wfBuilder := mocks.WorkflowBuilder{}
-		wfBuilder.On("GetTask", mock.MatchedBy(func(id core.Identifier) bool {
-			return id.String() == (&core.Identifier{
-				Name: "Task_1",
-			}).String()
-		})).Return(&task, true)
-		wfBuilder.On("GetOrCreateNodeBuilder", mock.MatchedBy(func(node *core.Node) bool {
-			return node.Id == "node_1"
-		})).Return(taskNodeBuilder)
-
-		// mock array node
-		arrayNode := &core.Node{
-			Id: "node_2",
-			Target: &core.Node_ArrayNode{
-				ArrayNode: &core.ArrayNode{
-					Node: taskNode,
+			// mock array node
+			arrayNode := &core.Node{
+				Id: "node_2",
+				Target: &core.Node_ArrayNode{
+					ArrayNode: &core.ArrayNode{
+						Node: workflowNode,
+					},
 				},
-			},
-		}
+			}
 
-		nodeBuilder := mocks.NodeBuilder{}
-		nodeBuilder.On("GetArrayNode").Return(arrayNode.Target.(*core.Node_ArrayNode).ArrayNode)
-		nodeBuilder.On("GetCoreNode").Return(arrayNode)
-		nodeBuilder.On("GetId").Return(arrayNode.Id)
-		nodeBuilder.On("GetInterface").Return(nil)
-		nodeBuilder.On("SetInterface", mock.Anything).Return()
+			nodeBuilder := mocks.NodeBuilder{}
+			nodeBuilder.On("GetArrayNode").Return(arrayNode.Target.(*core.Node_ArrayNode).ArrayNode)
+			nodeBuilder.On("GetCoreNode").Return(arrayNode)
+			nodeBuilder.On("GetId").Return(arrayNode.Id)
+			nodeBuilder.On("GetInterface").Return(nil)
+			nodeBuilder.On("SetInterface", mock.Anything).Return()
 
-		// compute arrayNode interface
-		errs := errors.NewCompileErrors()
-		arrayNodeIface, ifaceOk := ValidateUnderlyingInterface(&wfBuilder, &nodeBuilder, errs.NewScope())
-		assertNonEmptyInterface(t, arrayNodeIface, ifaceOk, errs)
-		assert.True(t, reflect.DeepEqual(arrayNodeIface, iface))
+			// compute arrayNode interface
+			errs := errors.NewCompileErrors()
+			arrayNodeIface, ifaceOk := ValidateUnderlyingInterface(&wfBuilder, &nodeBuilder, errs.NewScope())
+			assertNonEmptyInterface(t, arrayNodeIface, ifaceOk, errs)
+
+			assert.True(t, proto.Equal(expectedInterface, arrayNodeIface))
+		})
 	})
 }
 
