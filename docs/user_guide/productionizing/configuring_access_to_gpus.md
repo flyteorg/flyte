@@ -8,11 +8,11 @@
 
 Along with compute resources like CPU and memory, you may want to configure and access GPU resources. 
 
-Flyte provides different ways to request accelerator resources directly from the task decorator.
+This section describes the different ways Flyte provides to request accelerator resources directly from the task decorator. 
 
 >The examples in this section use [ImageSpec](https://docs.flyte.org/en/latest/user_guide/customizing_dependencies/imagespec.html#imagespec), a Flyte feature that builds a custom container image without a Dockerfile. Install it using `pip install flytekitplugins-envd`.
 
-## Requesting a GPU with no preference for device
+## Requesting a GPU with no device preference
 The goal in this example is to run the task on a single available GPU :
 
 ```python
@@ -31,11 +31,11 @@ image = ImageSpec(
 def gpu_available() -> bool:
    return torch.cuda.is_available() # returns True if CUDA (provided by a GPU) is available
 ```
-### How it works?
+### How it works
 
 ![](https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/deployment/gpus/generic_gpu_access.png)
 
-When this task is evaluated, `flyteproller` injects a [toleration](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) in the pod spec:
+When this task is evaluated, `flytepropeller` injects a [toleration](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) in the pod spec:
 
 ```yaml
 tolerations:    nvidia.com/gpu:NoSchedule op=Exists
@@ -122,7 +122,7 @@ def gpu_available() -> bool:
 ```
 
 
-### How it works?
+### How it works
 
 When this task is evaluated, `flytepropeller` injects both a toleration and a [nodeSelector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector) for a more flexible scheduling configuration.
 
@@ -200,7 +200,7 @@ image = ImageSpec(
 def gpu_available() -> bool:
    return torch.cuda.is_available()
 ```
-### How it works?
+### How it works
 In this case, ``flytepropeller`` injects an additional node selector expression to the resulting pod spec, indicating the partition size:
 
 ```yaml
@@ -268,7 +268,7 @@ The ``2g.10gb`` value comes from the [NVIDIA A100 supported instance profiles](h
 
 ## Additional use cases
 
-### Request an A100 device with no preference on partition configuration
+### Request an A100 device with no preference for partition configuration
 
 Example:
 
@@ -332,7 +332,7 @@ def gpu_available() -> bool:
    return torch.cuda.is_available()
 ```
 
-#### How it works?
+#### How it works
 
 When this task is evaluated `flytepropeller` injects a node selector expression that only matches nodes where the label specifying a partition size is **not** present:
 
@@ -370,11 +370,10 @@ configuration:
   inline:
     plugins:
       k8s:
-        gpu-unpartitioned-toleration:
-          gpu-unpartitioned-node-selector-requirement :
-          key: cloud.google.com/gke-gpu-partition-size #change to match your node label configuration
-          operator: Equal
-          value: DoesNotExist
+        gpu-unpartitioned-node-selector-requirement :
+        key: cloud.google.com/gke-gpu-partition-size #change to match your node label configuration
+        operator: Equal
+        value: DoesNotExist
 ```
 
 
