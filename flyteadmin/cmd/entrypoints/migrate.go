@@ -44,9 +44,19 @@ var seedProjectsCmd = &cobra.Command{
 	},
 }
 
+var seedResourcesCmd = &cobra.Command{
+	Use:   "seed-resources",
+	Short: "Seed matcheable resources in the database.",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		ctx := context.Background()
+		return server.SeedMatcheableResources(ctx)
+	},
+}
+
 func init() {
 	RootCmd.AddCommand(parentMigrateCmd)
 	parentMigrateCmd.AddCommand(migrateCmd)
 	parentMigrateCmd.AddCommand(rollbackCmd)
 	parentMigrateCmd.AddCommand(seedProjectsCmd)
+	parentMigrateCmd.AddCommand(seedResourcesCmd)
 }

@@ -76,3 +76,12 @@ func SeedProjects(ctx context.Context, projects []string) error {
 		return nil
 	})
 }
+
+func SeedMatcheableResources(ctx context.Context) error {
+	return withDB(ctx, func(db *gorm.DB) error {
+
+		matcheableResourcesConfig := config.GetConfig()
+
+		return config.SeedMatchableResources(ctx, db, *matcheableResourcesConfig)
+	})
+}
