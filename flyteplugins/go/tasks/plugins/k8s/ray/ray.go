@@ -140,7 +140,7 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob plugins.Ra
 	if err != nil {
 		return nil, err
 	}
-	schedulerPlugin.ProcessHead(objectMeta, headPodSpec)
+	schedulerPlugin.ProcessHead(objectMeta, headPodSpec, primaryContainerIdx)
 	rayClusterSpec := rayv1.RayClusterSpec{
 		HeadGroupSpec: rayv1.HeadGroupSpec{
 			Template: buildHeadPodTemplate(

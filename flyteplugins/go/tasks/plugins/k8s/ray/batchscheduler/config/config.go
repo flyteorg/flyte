@@ -1,4 +1,4 @@
-package batchscheduler
+package config
 
 type Config struct {
 	Scheduler  string `json:"scheduler,omitempty"`
