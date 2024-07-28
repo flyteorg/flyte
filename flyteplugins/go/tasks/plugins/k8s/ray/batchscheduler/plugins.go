@@ -5,21 +5,24 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
+	schedulerConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/ray/batchscheduler/config"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/ray/batchscheduler/scheduler/kubernetes"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/ray/batchscheduler/scheduler/yunikorn"
 )
 
 type SchedulerPlugin interface {
 	GetSchedulerName() string
-	ParseJob(config *Config, metadata *metav1.ObjectMeta, workerGroupsSpec []*plugins.WorkerGroupSpec, pod *v1.PodSpec, primaryContainerIdx int) error
-	ProcessHead(metadata *metav1.ObjectMeta, head *v1.PodSpec)
+	ParseJob(config *schedulerConfig.Config, metadata *metav1.ObjectMeta, workerGroupsSpec []*plugins.WorkerGroupSpec, pod *v1.PodSpec, primaryContainerIdx int) error
+	ProcessHead(metadata *metav1.ObjectMeta, head *v1.PodSpec, index int)
 	ProcessWorker(metadata *metav1.ObjectMeta, worker *v1.PodSpec, index int)
 	AfterProcess(metadata *metav1.ObjectMeta)
 }
 
-func NewSchedulerPlugin(config *Config) SchedulerPlugin {
+func NewSchedulerPlugin(config *schedulerConfig.Config) SchedulerPlugin {
 	switch config.GetScheduler() {
-	case Yunikorn:
-		return NewYunikornPlugin()
+	case yunikorn.Yunikorn:
+		return yunikorn.NewYunikornPlugin()
 	default:
-		return NewDefaultPlugin()
+		return kubernetes.NewDefaultPlugin()
 	}
 }
