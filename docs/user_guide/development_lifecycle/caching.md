@@ -4,7 +4,7 @@
 .. tags:: Basic
 ```
 
-Flyte provides the ability to cache the output of task executions to make the subsequent executions faster. A well-behaved Flyte task should generate deterministic output given the same inputs and task functionality.
+Flyte provides the ability to cache the output of task executions to make the subsequent executions faster.
 
 Task caching is useful when a user knows that many executions with the same inputs may occur. For example, consider the following scenarios:
 
@@ -18,6 +18,50 @@ Let's watch a brief explanation of caching and a demo in this video, followed by
 .. youtube:: WNkThCp-gqo
 
 ```
+
+There are four parameters and one command-line flag related to caching.
+
+## Parameters
+
+* `cache`(`bool`): Enables or disables caching of the workflow, task, or launch plan.
+By default, caching is disabled to avoid unintended consequences when caching executions with side effects.
+To enable caching set `cache=True`.
+* `cache_version` (`str`): Part of the cache key.
+A change to this parameter will invalidate the cache.
+This allows you to explicitly indicate when a change has been made to the task that should invalidate any existing cached results.
+Note that this is not the only change that will invalidate the cache (see below).
+Also, note that you can manually trigger cache invalidation per execution using the [`overwrite-cache` flag](#overwrite-cache-flag).
+* `cache_serialize` (`bool`): Enables or disables [cache serialization](./cache_serializing).
+When enabled, Flyte ensures that a single instance of the task is run before any other instances that would otherwise run concurrently.
+This allows the initial instance to cache its result and lets the later instances reuse the resulting cached outputs.
+Cache serialization is disabled by default.
+* `cache_ignore_input_vars` (`Tuple[str, ...]`): Input variables that should not be included when calculating hash for cache. By default, no input variables are ignored. This parameter only applies to task serialization.
+
+Task caching parameters can be specified at task definition time within `@task` decorator or at task invocation time using `with_overrides` method.
+
+## Overwrite cache flag
+
+*  `overwrite-cache` (`bool`): Invalidates the cache and forces re-execution of the task.
+
+This flag can be used when launching an execution from [the command line](#overwrite-cache-on-the-command-line), [the UI](#overwrite-cache-in-the-ui), or programmatically [through `FlyteRemote`](#overwrite-cache-programmatically).
+
+### Overwrite cache on the command line
+
+The `overwrite-cache` flag can be used from the command line with the `pyflyte run` command. For example:
+
+```{code-block} shell
+$ pyflyte run --remote  --overwrite-cache example.py wf
+```
+
+### Overwrite cache in the UI
+
+You can also trigger cache invalidation when launching an execution from the UI, in the launch modal, by checking the **Overwrite cache** checkbox.
+
+### Overwrite cache programmatically
+
+When using `FlyteRemote`, you can use the `overwrite_cache` parameter in the [`flytekit.remote.remote.FlyteRemote.execute`](https://docs.flyte.org/en/latest/api/flytekit/generated/flytekit.remote.remote.FlyteRemote.html#flytekit.remote.remote.FlyteRemote.execute) method.
+
+## Examples
 
 ```{note}
 To clone and run the example code on this page, see the [Flytesnacks repo][flytesnacks].
@@ -36,12 +80,6 @@ For any {py:func}`flytekit.task` in Flyte, there is always one required import, 
 :caption: development_lifecycle/task_cache.py
 :lines: 8-10
 ```
-
-Task caching is disabled by default to avoid unintended consequences of caching tasks with side effects. To enable caching and control its behavior, use the `cache` and `cache_version` parameters when constructing a task.
-`cache` is a switch to enable or disable the cache, and `cache_version` pertains to the version of the cache.
-`cache_version` field indicates that the task functionality has changed.
-Bumping the `cache_version` is akin to invalidating the cache.
-You can manually update this version and Flyte caches the next execution instead of relying on the old cache.
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/development_lifecycle/development_lifecycle/task_cache.py
 :caption: development_lifecycle/task_cache.py
@@ -77,10 +115,11 @@ The cache keys for remote task execution are composed of **Project**, **Domain**
 - **Task Signature:** The cache is specific to the task signature associated with the execution. The signature constitutes the task name, input parameter names/types, and the output parameter name/type.
 - **Task Input Values:** A well-formed Flyte task always produces deterministic outputs. This means, given a set of input values, every execution should have identical outputs. When task execution is cached, the input values are part of the cache key.
 
-The remote cache for a particular task is invalidated in two ways:
+The remote cache for a particular task is invalidated in three ways:
 
 1. Modifying the `cache_version`;
 2. Updating the task signature.
+3. Using the `overwrite_cache` flag.
 
 :::{note}
 Task executions can be cached across different versions of the task because a change in SHA does not necessarily mean that it correlates to a change in the task functionality.
