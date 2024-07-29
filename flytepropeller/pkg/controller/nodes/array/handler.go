@@ -70,6 +70,11 @@ func (a *arrayNodeHandler) Abort(ctx context.Context, nCtx interfaces.NodeExecut
 
 	eventRecorder := newArrayEventRecorder(nCtx.EventsRecorder())
 	messageCollector := errorcollector.NewErrorMessageCollector()
+
+	taskPhase := idlcore.TaskExecution_ABORTED
+	if arrayNodeState.Phase == v1alpha1.ArrayNodePhaseFailing {
+		taskPhase = idlcore.TaskExecution_FAILED
+	}
 	switch arrayNodeState.Phase {
 	case v1alpha1.ArrayNodePhaseExecuting, v1alpha1.ArrayNodePhaseFailing:
 		for i, nodePhaseUint64 := range arrayNodeState.SubNodePhases.GetItems() {
@@ -111,7 +116,7 @@ func (a *arrayNodeHandler) Abort(ctx context.Context, nCtx interfaces.NodeExecut
 	}
 
 	// update state for subNodes
-	if err := eventRecorder.finalize(ctx, nCtx, idlcore.TaskExecution_ABORTED, 0, a.eventConfig); err != nil {
+	if err := eventRecorder.finalize(ctx, nCtx, taskPhase, 0, a.eventConfig); err != nil {
 		logger.Errorf(ctx, "ArrayNode event recording failed: [%s]", err.Error())
 		return err
 	}
@@ -418,6 +423,12 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			return handler.UnknownTransition, err
 		}
 
+		// ensure task_execution set to failed
+		if err := eventRecorder.finalize(ctx, nCtx, idlcore.TaskExecution_FAILED, 0, a.eventConfig); err != nil {
+			logger.Errorf(ctx, "ArrayNode event recording failed: [%s]", err.Error())
+			return handler.UnknownTransition, err
+		}
+
 		// fail with reported error if one exists
 		if arrayNodeState.Error != nil {
 			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailureErr(arrayNodeState.Error, nil)), nil
@@ -547,6 +558,12 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 
 		outputFile := v1alpha1.GetOutputsFile(nCtx.NodeStatus().GetOutputDir())
 		if err := nCtx.DataStore().WriteProtobuf(ctx, outputFile, storage.Options{}, outputLiteralMap); err != nil {
+			return handler.UnknownTransition, err
+		}
+
+		// ensure task_execution set to succeeded
+		if err := eventRecorder.finalize(ctx, nCtx, idlcore.TaskExecution_SUCCEEDED, 0, a.eventConfig); err != nil {
+			logger.Errorf(ctx, "ArrayNode event recording failed: [%s]", err.Error())
 			return handler.UnknownTransition, err
 		}
 
