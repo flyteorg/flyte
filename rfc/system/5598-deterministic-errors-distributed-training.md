@@ -78,7 +78,7 @@ We don't see any drawbacks to making the error handling of distributed training 
 
 ## 6 Alternatives
 
-*What are other ways of achieving the same outcome?*
+A poor man's version would be to not override the error file if it already exists. While this is a worse solution than proposed above as there still is a race condition, this would still better than the current behavior because at least we would *favor* earlier errors instead of later ones.
 
 ## 7 Potential Impact and Dependencies
 
