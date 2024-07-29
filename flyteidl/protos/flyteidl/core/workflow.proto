@@ -134,6 +134,19 @@ message ArrayNode {
         // to determine when an ArrayNode can be marked successful.
         float min_success_ratio = 4;
     }
+
+    enum ExecutionMode {
+        // Indicates the ArrayNode will store minimal state for the sub-nodes.
+        // This is more efficient, but only supports a subset of Flyte entities.
+        MINIMAL_STATE = 0;
+
+        // Indicates the ArrayNode will store full state for the sub-nodes.
+        // This supports a wider range of Flyte entities.
+        FULL_STATE = 1;
+    }
+
+    // execution_mode determines the execution path for ArrayNode.
+    ExecutionMode execution_mode = 5;
 }
 
 // Defines extra information about the Node.

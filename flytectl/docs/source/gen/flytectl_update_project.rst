@@ -53,7 +53,7 @@ Then, pass it in using the *file* flag:
 
 To archive or activate (unarchive) a project using a *yaml* file:
 
-* Add a state field, with a value of *0* for activated (unarchived) or *1* for archived, at the top level of the the *yaml* file.
+* Add a state field, with a value of *0* for activated (unarchived) or *1* for archived, at the top level of the *yaml* file.
 
 * Add the *archive* flag to the command.
 

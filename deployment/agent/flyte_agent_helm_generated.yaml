@@ -79,7 +79,7 @@ spec:
         - pyflyte
         - serve
         - agent
-        image: "cr.flyte.org/flyteorg/flyteagent:1.12.3"
+        image: "cr.flyte.org/flyteorg/flyteagent:1.13.0"
         imagePullPolicy: "IfNotPresent"
         name: flyteagent
         volumeMounts:
@@ -99,7 +99,7 @@ spec:
           limits:
             cpu: 500m
             ephemeral-storage: 200Mi
-            memory: 200Mi
+            memory: 300Mi
           requests:
             cpu: 500m
             ephemeral-storage: 200Mi

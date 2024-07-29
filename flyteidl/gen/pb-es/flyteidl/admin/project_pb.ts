@@ -239,12 +239,20 @@ export enum Project_ProjectState {
    * @generated from enum value: SYSTEM_GENERATED = 2;
    */
   SYSTEM_GENERATED = 2,
+
+  /**
+   * System archived projects that aren't explicitly archived by a user.
+   *
+   * @generated from enum value: SYSTEM_ARCHIVED = 3;
+   */
+  SYSTEM_ARCHIVED = 3,
 }
 // Retrieve enum metadata with: proto3.getEnumType(Project_ProjectState)
 proto3.util.setEnumType(Project_ProjectState, "flyteidl.admin.Project.ProjectState", [
   { no: 0, name: "ACTIVE" },
   { no: 1, name: "ARCHIVED" },
   { no: 2, name: "SYSTEM_GENERATED" },
+  { no: 3, name: "SYSTEM_ARCHIVED" },
 ]);
 
 /**

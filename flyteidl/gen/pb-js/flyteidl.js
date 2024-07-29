@@ -10811,6 +10811,7 @@
                  * @property {number|null} [parallelism] ArrayNode parallelism
                  * @property {number|null} [minSuccesses] ArrayNode minSuccesses
                  * @property {number|null} [minSuccessRatio] ArrayNode minSuccessRatio
+                 * @property {flyteidl.core.ArrayNode.ExecutionMode|null} [executionMode] ArrayNode executionMode
                  */
     
                 /**
@@ -10859,6 +10860,14 @@
                  * @instance
                  */
                 ArrayNode.prototype.minSuccessRatio = 0;
+    
+                /**
+                 * ArrayNode executionMode.
+                 * @member {flyteidl.core.ArrayNode.ExecutionMode} executionMode
+                 * @memberof flyteidl.core.ArrayNode
+                 * @instance
+                 */
+                ArrayNode.prototype.executionMode = 0;
     
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
@@ -10917,6 +10926,8 @@
                         writer.uint32(/* id 3, wireType 0 =*/24).uint32(message.minSuccesses);
                     if (message.minSuccessRatio != null && message.hasOwnProperty("minSuccessRatio"))
                         writer.uint32(/* id 4, wireType 5 =*/37).float(message.minSuccessRatio);
+                    if (message.executionMode != null && message.hasOwnProperty("executionMode"))
+                        writer.uint32(/* id 5, wireType 0 =*/40).int32(message.executionMode);
                     return writer;
                 };
     
@@ -10949,6 +10960,9 @@
                             break;
                         case 4:
                             message.minSuccessRatio = reader.float();
+                            break;
+                        case 5:
+                            message.executionMode = reader.int32();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -10992,8 +11006,30 @@
                         if (typeof message.minSuccessRatio !== "number")
                             return "minSuccessRatio: number expected";
                     }
+                    if (message.executionMode != null && message.hasOwnProperty("executionMode"))
+                        switch (message.executionMode) {
+                        default:
+                            return "executionMode: enum value expected";
+                        case 0:
+                        case 1:
+                            break;
+                        }
                     return null;
                 };
+    
+                /**
+                 * ExecutionMode enum.
+                 * @name flyteidl.core.ArrayNode.ExecutionMode
+                 * @enum {string}
+                 * @property {number} MINIMAL_STATE=0 MINIMAL_STATE value
+                 * @property {number} FULL_STATE=1 FULL_STATE value
+                 */
+                ArrayNode.ExecutionMode = (function() {
+                    var valuesById = {}, values = Object.create(valuesById);
+                    values[valuesById[0] = "MINIMAL_STATE"] = 0;
+                    values[valuesById[1] = "FULL_STATE"] = 1;
+                    return values;
+                })();
     
                 return ArrayNode;
             })();
@@ -43144,6 +43180,7 @@
                         case 0:
                         case 1:
                         case 2:
+                        case 3:
                             break;
                         }
                     if (message.org != null && message.hasOwnProperty("org"))
@@ -43159,12 +43196,14 @@
                  * @property {number} ACTIVE=0 ACTIVE value
                  * @property {number} ARCHIVED=1 ARCHIVED value
                  * @property {number} SYSTEM_GENERATED=2 SYSTEM_GENERATED value
+                 * @property {number} SYSTEM_ARCHIVED=3 SYSTEM_ARCHIVED value
                  */
                 Project.ProjectState = (function() {
                     var valuesById = {}, values = Object.create(valuesById);
                     values[valuesById[0] = "ACTIVE"] = 0;
                     values[valuesById[1] = "ARCHIVED"] = 1;
                     values[valuesById[2] = "SYSTEM_GENERATED"] = 2;
+                    values[valuesById[3] = "SYSTEM_ARCHIVED"] = 3;
                     return values;
                 })();
     

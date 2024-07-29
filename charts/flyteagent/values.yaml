@@ -23,7 +23,7 @@ image:
   # -- Docker image for flyteagent deployment
   repository: cr.flyte.org/flyteorg/flyteagent  # FLYTEAGENT_IMAGE
   # -- Docker image tag
-  tag: 1.12.3  # FLYTEAGENT_TAG
+  tag: 1.13.0  # FLYTEAGENT_TAG
   # -- Docker image pull policy
   pullPolicy: IfNotPresent
 ports:
@@ -34,7 +34,7 @@ resources:
   limits:
     cpu: 500m
     ephemeral-storage: 200Mi
-    memory: 200Mi
+    memory: 300Mi
   requests:
     cpu: 500m
     ephemeral-storage: 200Mi

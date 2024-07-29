@@ -1,7 +1,6 @@
 package test
 
 import (
-	"bytes"
 	"encoding/json"
 	"flag"
 	"io/ioutil"
@@ -27,6 +26,7 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/errors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/transformers/k8s"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/visualize"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 var update = flag.Bool("update", false, "Update .golden files")
@@ -117,7 +117,7 @@ func TestDynamic(t *testing.T) {
 			raw, err := ioutil.ReadFile(path)
 			assert.NoError(t, err)
 			wf := &core.DynamicJobSpec{}
-			err = jsonpb.UnmarshalString(string(raw), wf)
+			err = utils.UnmarshalBytesToPb(raw, wf)
 			if !assert.NoError(t, err) {
 				t.FailNow()
 			}
@@ -362,8 +362,7 @@ func runCompileTest(t *testing.T, dirName string) {
 				taskBytes, err := os.ReadFile(taskFile)
 				assert.NoError(t, err)
 				compiledTaskFromFile := &core.CompiledTask{}
-				reader := bytes.NewReader(taskBytes)
-				err = jsonpb.Unmarshal(reader, compiledTaskFromFile)
+				err = utils.UnmarshalBytesToPb(taskBytes, compiledTaskFromFile)
 				assert.NoError(t, err)
 				assert.True(t, proto.Equal(task, compiledTaskFromFile))
 			})
@@ -440,7 +439,7 @@ func runCompileTest(t *testing.T, dirName string) {
 				}
 
 				compiledWfc := &core.CompiledWorkflowClosure{}
-				if !assert.NoError(t, jsonpb.UnmarshalString(string(raw), compiledWfc)) {
+				if !assert.NoError(t, utils.UnmarshalBytesToPb(raw, compiledWfc)) {
 					t.FailNow()
 				}
 

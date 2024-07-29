@@ -501,11 +501,11 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 		nCtx.OnOutputShardSelector().Return(ioutils.NewConstantShardSelector([]string{"x"}))
 
 		executionContext := &mocks.ExecutionContext{}
-		executionContext.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
-		executionContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion0)
-		executionContext.EXPECT().GetParentInfo().Return(nil)
+		executionContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
+		executionContext.OnGetEventVersion().Return(v1alpha1.EventVersion0)
+		executionContext.OnGetParentInfo().Return(nil)
 		if allowIncrementParallelism {
-			executionContext.EXPECT().IncrementParallelism().Return(1)
+			executionContext.OnIncrementParallelism().Return(1)
 		}
 		nCtx.OnExecutionContext().Return(executionContext)
 
@@ -777,6 +777,7 @@ func Test_task_Abort(t *testing.T) {
 			Kind: "sample",
 			Name: "name",
 		})
+		nm.OnIsInterruptible().Return(false)
 
 		taskID := &core.Identifier{}
 		tr := &nodeMocks.TaskReader{}
@@ -814,9 +815,9 @@ func Test_task_Abort(t *testing.T) {
 		nCtx.OnEventsRecorder().Return(ev)
 
 		executionContext := &mocks.ExecutionContext{}
-		executionContext.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
-		executionContext.EXPECT().GetParentInfo().Return(nil)
-		executionContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion0)
+		executionContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
+		executionContext.OnGetParentInfo().Return(nil)
+		executionContext.OnGetEventVersion().Return(v1alpha1.EventVersion0)
 		nCtx.OnExecutionContext().Return(executionContext)
 
 		nCtx.OnRawOutputPrefix().Return("s3://sandbox/")
@@ -891,6 +892,7 @@ func Test_task_Abort(t *testing.T) {
 				defaultPlugin:   m,
 				resourceManager: noopRm,
 				agentService:    &pluginCore.AgentService{},
+				eventConfig:     eventConfig,
 			}
 			nCtx := createNodeCtx(tt.args.ev)
 			if err := tk.Abort(context.TODO(), nCtx, "reason"); (err != nil) != tt.wantErr {
@@ -939,6 +941,7 @@ func Test_task_Abort_v1(t *testing.T) {
 			Kind: "sample",
 			Name: "name",
 		})
+		nm.OnIsInterruptible().Return(false)
 
 		taskID := &core.Identifier{}
 		tr := &nodeMocks.TaskReader{}
@@ -976,9 +979,9 @@ func Test_task_Abort_v1(t *testing.T) {
 		nCtx.OnEventsRecorder().Return(ev)
 
 		executionContext := &mocks.ExecutionContext{}
-		executionContext.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
-		executionContext.EXPECT().GetParentInfo().Return(nil)
-		executionContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion1)
+		executionContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
+		executionContext.OnGetParentInfo().Return(nil)
+		executionContext.OnGetEventVersion().Return(v1alpha1.EventVersion1)
 		nCtx.OnExecutionContext().Return(executionContext)
 
 		nCtx.OnRawOutputPrefix().Return("s3://sandbox/")
@@ -1053,6 +1056,7 @@ func Test_task_Abort_v1(t *testing.T) {
 				defaultPlugin:   m,
 				resourceManager: noopRm,
 				agentService:    &pluginCore.AgentService{},
+				eventConfig:     eventConfig,
 			}
 			nCtx := createNodeCtx(tt.args.ev)
 			if err := tk.Abort(context.TODO(), nCtx, "reason"); (err != nil) != tt.wantErr {
@@ -1158,9 +1162,9 @@ func Test_task_Finalize(t *testing.T) {
 		nCtx.OnEnqueueOwnerFunc().Return(nil)
 
 		executionContext := &mocks.ExecutionContext{}
-		executionContext.EXPECT().GetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
-		executionContext.EXPECT().GetParentInfo().Return(nil)
-		executionContext.EXPECT().GetEventVersion().Return(v1alpha1.EventVersion0)
+		executionContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
+		executionContext.OnGetParentInfo().Return(nil)
+		executionContext.OnGetEventVersion().Return(v1alpha1.EventVersion0)
 		nCtx.OnExecutionContext().Return(executionContext)
 
 		nCtx.OnRawOutputPrefix().Return("s3://sandbox/")
