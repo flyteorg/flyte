@@ -55,6 +55,8 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "serviceType"), defaultConfig.ServiceType, "")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "includeDashboard"), defaultConfig.IncludeDashboard, "")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "dashboardHost"), defaultConfig.DashboardHost, "")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "batchScheduler.scheduler"), defaultConfig.BatchScheduler.Scheduler, "")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "batchScheduler.parameters"), defaultConfig.BatchScheduler.Parameters, "")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "remoteClusterConfig.name"), defaultConfig.RemoteClusterConfig.Name, "Friendly name of the remote cluster")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "remoteClusterConfig.endpoint"), defaultConfig.RemoteClusterConfig.Endpoint, " Remote K8s cluster endpoint")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "remoteClusterConfig.enabled"), defaultConfig.RemoteClusterConfig.Enabled, " Boolean flag to enable or disable")
