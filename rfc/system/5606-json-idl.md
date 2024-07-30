@@ -270,7 +270,7 @@ class Json(_common.FlyteIdlEntity):
 ##### Before
 ###### Convert Python Value to Literal
 Uses `mashumaro JSON Encoder` to turn a dataclass value to a JSON string, and store it to protobuf `Struct` .
-Note: For `FlyteTypes`, we will inherit mashumaro `SerializableType` to define our own serialization behvaior, which includes upload file to remote storage.
+Note: For `FlyteTypes`, we will inherit mashumaro `SerializableType` to define our own serialization behavior, which includes upload file to remote storage.
 
 ###### Convert Literal to Python Value
 Uses `mashumaro JSON Decoder` to turn a JSON string to a python value, and recursively fixed int attributes to int (it will be float because we stored it in to `Struct`).
