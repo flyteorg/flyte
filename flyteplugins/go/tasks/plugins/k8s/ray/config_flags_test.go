@@ -169,6 +169,34 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_batchScheduler.scheduler", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("batchScheduler.scheduler", testValue)
+			if vString, err := cmdFlags.GetString("batchScheduler.scheduler"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.BatchScheduler.Scheduler)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_batchScheduler.parameters", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("batchScheduler.parameters", testValue)
+			if vString, err := cmdFlags.GetString("batchScheduler.parameters"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.BatchScheduler.Parameters)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_remoteClusterConfig.name", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
