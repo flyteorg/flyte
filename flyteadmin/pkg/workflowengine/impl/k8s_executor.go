@@ -54,6 +54,10 @@ func (e K8sWorkflowExecutor) Execute(ctx context.Context, data interfaces.Execut
 		flyteWf.SubWorkflows = nil
 		flyteWf.Tasks = nil
 	}
+	if e.config.ApplicationConfiguration().GetTopLevelConfig().UseOffloadedInputs {
+		flyteWf.OffloadedInputs = data.OffloadedInputsReference
+		flyteWf.Inputs = nil
+	}
 
 	if consoleURL := e.config.ApplicationConfiguration().GetTopLevelConfig().ConsoleURL; len(consoleURL) > 0 {
 		flyteWf.ConsoleURL = consoleURL
