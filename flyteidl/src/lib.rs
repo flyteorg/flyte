@@ -1,93 +1,4 @@
-#[macro_export]
-macro_rules! convert_foreign_prost_error {
-    // Foreign Rust error types: https://pyo3.rs/main/function/error-handling#foreign-rust-error-types
-    // Create a newtype wrapper, e.g. MyOtherError. Then implement From<MyOtherError> for PyErr (or PyErrArguments), as well as From<OtherError> for MyOtherError.
-    () => {
-        use prost::{DecodeError, EncodeError, Message};
-        use pyo3::exceptions::PyException;
-        use pyo3::types::PyBytes;
-        use pyo3::PyErr;
-
-        // An error indicates taht failing at serializing object to bytes string, like `SerializTOString()` for python protos.
-        pub struct MessageEncodeError(EncodeError);
-        // An error indicates taht failing at deserializing object from bytes string, like `ParseFromString()` for python protos.
-        pub struct MessageDecodeError(DecodeError);
-
-        // TODO: Do we need this formatting (to string)?
-        impl fmt::Display for MessageEncodeError {
-            fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-                write!(f, "")
-            }
-        }
-
-        // TODO: Do we need this formatting (to string)?
-        impl fmt::Display for MessageDecodeError {
-            fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-                write!(f, "")
-            }
-        }
-
-        impl std::convert::From<MessageEncodeError> for PyErr {
-            fn from(err: MessageEncodeError) -> PyErr {
-                PyException::new_err(err.to_string())
-            }
-        }
-
-        impl std::convert::From<MessageDecodeError> for PyErr {
-            fn from(err: MessageDecodeError) -> PyErr {
-                PyException::new_err(err.to_string())
-            }
-        }
-
-        impl std::convert::From<EncodeError> for MessageEncodeError {
-            fn from(other: EncodeError) -> Self {
-                Self(other)
-            }
-        }
-
-        impl std::convert::From<DecodeError> for MessageDecodeError {
-            fn from(other: DecodeError) -> Self {
-                Self(other)
-            }
-        }
-
-        pub trait ProtobufDecoder<T>
-        where
-            T: Message + Default,
-        {
-            fn ParseFromString(&self, bytes_obj: &PyBytes) -> Result<T, MessageDecodeError>;
-        }
-
-        pub trait ProtobufEncoder<T>
-        where
-            T: Message + Default,
-        {
-            fn SerializeToString(&self, res: T) -> Result<Vec<u8>, MessageEncodeError>;
-        }
-
-        impl<T> ProtobufDecoder<T> for T
-        where
-            T: Message + Default,
-        {
-            fn ParseFromString(&self, bytes_obj: &PyBytes) -> Result<T, MessageDecodeError> {
-                let bytes = bytes_obj.as_bytes();
-                let de = Message::decode(&bytes.to_vec()[..]);
-                Ok(de?)
-            }
-        }
-
-        impl<T> ProtobufEncoder<T> for T
-        where
-            T: Message + Default,
-        {
-            fn SerializeToString(&self, res: T) -> Result<Vec<u8>, MessageEncodeError> {
-                let mut buf = vec![];
-                res.encode(&mut buf)?;
-                Ok(buf)
-            }
-        }
-    };
-}
+pub mod auth;
 
 pub mod google {
     pub mod protobuf {
@@ -99,6 +10,9 @@ pub mod flyteidl {
     pub mod admin {
         include!("../gen/pb_rust/flyteidl.admin.rs");
     }
+
+    // Recursive types, such as `ArrayNode`, can hold references to other Nodes and are converted to `ArrayNode {node: Option<Box<Node>>, ...}`.
+    // This poses a challenge for PyO3, as it requires a PyClass to hold a reference to another PyClass. This is a Rust Non-lifetime-free issue.
     pub mod core {
         impl pyo3::conversion::IntoPy<pyo3::PyObject> for Box<Node> {
             fn into_py(self, py: pyo3::marker::Python<'_>) -> pyo3::PyObject {
@@ -251,21 +165,118 @@ pub mod flyteidl {
 
 use pyo3::prelude::*;
 
+// Set up maturin configuration in `pyproject.toml`
+// python-source = "python"
+// module-name = "flyteidl_rust._flyteidl_rust"
 #[pymodule]
-// #[pyo3(name="_flyteidl_rust")]
 pub mod _flyteidl_rust {
-
-    use pyo3::{
-        prelude::*,
-        types::{PyDict, PyTuple},
-    };
+    use std::collections::HashMap;
     use std::fmt;
-    use tonic::Status;
+    use std::fs::File;
 
-    convert_foreign_prost_error!();
+    use keyring::Entry;
+    use prost::{DecodeError, EncodeError, Message};
+    use pyo3::{
+        exceptions::{PyException, PyValueError},
+        prelude::*,
+        types::PyBytes,
+        types::{PyDict, PyTuple},
+        PyErr,
+    };
+    use tonic::{
+        metadata::MetadataValue,
+        service::interceptor::InterceptedService,
+        service::Interceptor,
+        transport::{Certificate, Channel, ClientTlsConfig, Endpoint, Uri},
+        Request, Response, Status,
+    };
+
+    use crate::auth;
+
+    // Foreign Rust error types: https://pyo3.rs/main/function/error-handling#foreign-rust-error-types
+    // Create a newtype wrapper, e.g. MyOtherError. Then implement From<MyOtherError> for PyErr (or PyErrArguments), as well as From<OtherError> for MyOtherError.
+
+    // An error indicates taht failing at serializing object to bytes string, like `SerializToString()` for python protos.
+    pub struct MessageEncodeError(EncodeError);
+    // An error indicates taht failing at deserializing object from bytes string, like `ParseFromString()` for python protos.
+    pub struct MessageDecodeError(DecodeError);
+
+    // TODO: Do we need this formatting (to string)?
+    impl fmt::Display for MessageEncodeError {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            write!(f, "")
+        }
+    }
+
+    // TODO: Do we need this formatting (to string)?
+    impl fmt::Display for MessageDecodeError {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            write!(f, "")
+        }
+    }
+
+    impl std::convert::From<MessageEncodeError> for PyErr {
+        fn from(err: MessageEncodeError) -> PyErr {
+            PyException::new_err(err.to_string())
+        }
+    }
+
+    impl std::convert::From<MessageDecodeError> for PyErr {
+        fn from(err: MessageDecodeError) -> PyErr {
+            PyException::new_err(err.to_string())
+        }
+    }
+
+    impl std::convert::From<EncodeError> for MessageEncodeError {
+        fn from(other: EncodeError) -> Self {
+            Self(other)
+        }
+    }
+
+    impl std::convert::From<DecodeError> for MessageDecodeError {
+        fn from(other: DecodeError) -> Self {
+            Self(other)
+        }
+    }
+
+    pub trait ProtobufDecoder<T>
+    where
+        T: Message + Default,
+    {
+        fn ParseFromString(&self, bytes_obj: &PyBytes) -> Result<T, MessageDecodeError>;
+    }
+
+    pub trait ProtobufEncoder<T>
+    where
+        T: Message + Default,
+    {
+        fn SerializeToString(&self, res: T) -> Result<Vec<u8>, MessageEncodeError>;
+    }
+
+    impl<T> ProtobufDecoder<T> for T
+    where
+        T: Message + Default,
+    {
+        fn ParseFromString(&self, bytes_obj: &PyBytes) -> Result<T, MessageDecodeError> {
+            let bytes = bytes_obj.as_bytes();
+            let de = Message::decode(&bytes.to_vec()[..]);
+            Ok(de?)
+        }
+    }
+
+    impl<T> ProtobufEncoder<T> for T
+    where
+        T: Message + Default,
+    {
+        fn SerializeToString(&self, res: T) -> Result<Vec<u8>, MessageEncodeError> {
+            let mut buf = vec![];
+            res.encode(&mut buf)?;
+            Ok(buf)
+        }
+    }
 
     #[pyclass]
-    #[pyo3(name = "FlyteUserException", subclass, extends = pyo3::exceptions::PyException)] // or PyBaseException
+    #[pyo3(name = "FlyteUserException", subclass, extends = pyo3::exceptions::PyException)] // or PyBaseException (https://github.com/PyO3/pyo3/discussions/4165#discussioncomment-10073433)
     pub struct PyFlyteUserException {}
     #[pymethods]
     impl PyFlyteUserException {
@@ -350,8 +361,8 @@ pub mod _flyteidl_rust {
 
     impl std::convert::From<GRPCError> for PyErr {
         fn from(err: GRPCError) -> Self {
-            // Raise Python base error use `PyException::new_err(err.to_string())`
-            // We pattern match tonic status code to riase correspond Rust binding error here as an exception wrapper, and user can catch them later in Python
+            // Optional: Raise Python primitive error via `PyException::new_err(err.to_string())`
+            // Pattern match tonic status code to riase correspond Rust binding error here, and user can catch them later in Python side.
             match err.0.code() {
                 tonic::Code::Unauthenticated => {
                     return PyErr::new::<FlyteAuthenticationException, _>(err.to_string())
@@ -616,9 +627,6 @@ pub mod _flyteidl_rust {
         use crate::flyteidl::service::{CreateUploadLocationRequest, CreateUploadLocationResponse};
     }
 
-    use pyo3::exceptions::PyValueError;
-    use std::collections::HashMap;
-
     // A simple implementation for parsing google protobuf types `Struct` and `Value` from json string after deriving `serde::Deserialize` for structures.
     // This should equivalent to `google.protobuf._json_format.Parse()`.
     // For instance, `google.protobuf._json_format.Parse(_json.dumps(self.custom), flyteidl.protobuf.Struct()) if self.custom else None`
@@ -668,7 +676,8 @@ pub mod _flyteidl_rust {
     }
 
     #[pyfunction]
-    fn Parse(json_str: &str) -> PyResult<super::google::protobuf::Value> {
+    #[pyo3(name = "ParseValue")]
+    pub fn parse_value(json_str: &str) -> PyResult<super::google::protobuf::Value> {
         let parsed: serde_json::Value = serde_json::from_str(json_str)
             .map_err(|e| PyValueError::new_err(format!("Invalid JSON: {}", e)))?;
 
@@ -677,7 +686,8 @@ pub mod _flyteidl_rust {
     }
 
     #[pyfunction]
-    fn ParseStruct(json_str: &str) -> PyResult<super::google::protobuf::Struct> {
+    #[pyo3(name = "ParseStruct")]
+    pub fn parse_struct(json_str: &str) -> PyResult<super::google::protobuf::Struct> {
         let parsed: serde_json::Value = serde_json::from_str(json_str)
             .map_err(|e| PyValueError::new_err(format!("Invalid JSON: {}", e)))?;
 
@@ -695,26 +705,50 @@ pub mod _flyteidl_rust {
         }
     }
 
+    // You can also use the `Interceptor` trait to create an interceptor type
+    // that is easy to name
+    #[derive(Clone)]
+    pub struct UnaryAuthInterceptor {
+        _access_token: String,
+    }
+
+    impl Interceptor for UnaryAuthInterceptor {
+        fn call(&mut self, mut request: Request<()>) -> Result<Request<()>, Status> {
+            // println!("access_token:\t{}\n", self._access_token.clone());
+            let metadata_token: MetadataValue<_> =
+                match format!("Bearer {}", self._access_token).parse::<MetadataValue<_>>() {
+                    Ok(metadata_token) => metadata_token,
+                    Err(error) => panic!("{}", error),
+                };
+            // println!("metadata_token:\t{:?}\n", metadata_token.clone());
+            request
+                .metadata_mut()
+                .insert("flyte-authorization", metadata_token.clone());
+            Ok(request)
+        }
+    }
+
     #[pyclass(subclass, name = "RawSynchronousFlyteClient")]
     pub struct RawSynchronousFlyteClient {
         admin_service: crate::flyteidl::service::admin_service_client::AdminServiceClient<
-            tonic::transport::Channel,
+            InterceptedService<Channel, UnaryAuthInterceptor>,
         >,
         data_proxy_service:
             crate::flyteidl::service::data_proxy_service_client::DataProxyServiceClient<
-                tonic::transport::Channel,
+                InterceptedService<Channel, UnaryAuthInterceptor>,
             >,
         runtime: tokio::runtime::Runtime,
     }
 
     #[pymethods]
     impl RawSynchronousFlyteClient {
-        // We need `new` attribute to construct the `RawSynchronousFlyteClient` in Python.
+        // It's necessary `new` attribute to construct the `RawSynchronousFlyteClient` in Python.
         #[new]
         // TODO: Instead of accepting endpoint and kwargs dict as arguments, we should take path as input that reads platform configuration file.
-        #[pyo3(signature = (endpoint, **kwargs))]
+        #[pyo3(signature = (endpoint, insecure, **kwargs))]
         pub fn new(
             endpoint: &str,
+            insecure: bool,
             kwargs: Option<&Bound<'_, pyo3::types::PyDict>>,
         ) -> PyResult<RawSynchronousFlyteClient> {
             // Use Atomic Reference Counting abstractions as a cheap way to pass string reference into another thread that outlives the scope.
@@ -727,36 +761,74 @@ pub mod _flyteidl_rust {
                 Ok(rt) => rt,
                 Err(error) => panic!("Failed to initiate Tokio multi-thread runtime: {:?}", error),
             };
-            // Check details for constructing `channel`: https://docs.rs/tonic/latest/tonic/transport/struct.Channel.html#method.builder
-            // TODO: generally handle more protocols, like the secured one, i.e., `https://`
-            let endpoint_uri =
-                match format!("http://{}", *s.clone()).parse::<tonic::transport::Uri>() {
-                    Ok(uri) => uri,
-                    Err(error) => panic!(
-                        "Got invalid endpoint when parsing endpoint_uri: {:?}",
-                        error
-                    ),
-                };
 
-            // `Channel::builder(endpoint_uri)` returns type `tonic::transport::Endpoint`.
-            let channel =
-                match rt.block_on(tonic::transport::Channel::builder(endpoint_uri).connect()) {
+            let endpoint_uri: Uri = auth::Auth::bootstrap_uri_from_endpoint(endpoint, &insecure);
+
+            if !insecure {
+                let cert: Certificate = auth::Auth::bootstrap_creds_from_server(&endpoint_uri);
+                let tls: ClientTlsConfig = ClientTlsConfig::new()
+                    .ca_certificate(cert)
+                    .domain_name((*endpoint).to_string());
+
+                let channel = match rt.block_on(
+                    Channel::builder(endpoint_uri.clone())
+                        .tls_config(tls)
+                        .unwrap()
+                        .connect(),
+                ) {
                     Ok(ch) => ch,
                     Err(error) => panic!(
-                        "Failed at connecting to endpoint when constructing channel: {:?}",
+                        "Failed at connecting to endpoint when constructing secured channel: {:?}",
                         error
                     ),
                 };
 
-            // Binding connected channel to the service client stubs.
+                let mut oauth_client: auth::Auth::OAuthClient =
+                    auth::Auth::OAuthClient::new(endpoint, &insecure);
+                // TODO: swithch by AuthMode flag
+                oauth_client.client_secret_authenticate();
+                // oauth_client.pkce_authenticate();
+            }
+
+            // Check details on constructing `channel`: https://docs.rs/tonic/latest/tonic/transport/struct.Channel.html#method.builder
+            // `Channel::builder(endpoint_uri)` returns type `tonic::transport::Endpoint`.
+
+            let channel = match rt.block_on(Channel::builder(endpoint_uri.clone()).connect()) {
+                Ok(ch) => ch,
+                Err(error) => panic!(
+                    "Failed at connecting to endpoint when constructing insecured channel: {:?}",
+                    error
+                ),
+            };
+            let credentials_for_endpoint: &str = endpoint; // TODO: The default key in flytekit is `flyte-default``
+            let credentials_access_token_key: &str = "access_token";
+            // println!("{:?}", credentials_for_endpoint);
+            let entry: Entry =
+                match Entry::new(credentials_for_endpoint, credentials_access_token_key) {
+                    Ok(entry) => entry,
+                    Err(err) => {
+                        // println!("{}", credentials_access_token_key);
+                        panic!("Failed at initializing keyring, not available.");
+                    }
+                };
+
+            let access_token: String = match entry.get_password() {
+                Ok(access_token) => {
+                    // println!("keyring retrieved successfully.");
+                    access_token
+                }
+                Err(error) => panic!("Failed at retrieving keyring: {:?}", error),
+            };
+
+            let mut interceptor: UnaryAuthInterceptor = UnaryAuthInterceptor {
+                _access_token: access_token,
+            };
+
+            // Binding established channel to the service client stubs.
             let admin_stub =
-                crate::flyteidl::service::admin_service_client::AdminServiceClient::new(
-                    channel.clone(),
-                );
+                crate::flyteidl::service::admin_service_client::AdminServiceClient::with_interceptor(channel.clone(), interceptor.clone());
             let data_proxy_stub =
-                crate::flyteidl::service::data_proxy_service_client::DataProxyServiceClient::new(
-                    channel.clone(),
-                );
+                crate::flyteidl::service::data_proxy_service_client::DataProxyServiceClient::with_interceptor(channel.clone(), interceptor.clone());
 
             Ok(RawSynchronousFlyteClient {
                 runtime: rt, // The tokio runtime is used in a blocking manner for now.
@@ -964,51 +1036,9 @@ pub mod _flyteidl_rust {
     }
 }
 
-// mod service {
-//     use tonic::{Request, Response};
-//     use std::future::Future;
-//     use std::pin::Pin;
-//     use std::task::{Context, Poll};
-//     use tonic::body::BoxBody;
-//     use tonic::transport::Channel;
-//     use tower::Service;
-
-//     pub struct RetrySvc {
-//         inner: Channel,
-//     }
-
-//     impl RetrySvc {
-//         pub fn new(inner: Channel) -> Self {
-//             RetrySvc { inner }
-//         }
-//     }
-
-//     impl Service<Request<BoxBody>> for RetrySvc {
-//         type Response = Response<BoxBody>;
-//         type Error = Box<dyn std::error::Error + Send + Sync>;
-//         #[allow(clippy::type_complexity)]
-//         type Future = Pin<Box<dyn Future<Output = Result<Self::Response, Self::Error>> + Send>>;
-
-//         fn poll_ready(&mut self, cx: &mut Context<'_>) -> Poll<Result<(), Self::Error>> {
-//             self.inner.poll_ready(cx).map_err(Into::into)
-//         }
-
-//         fn call(&mut self, req: Request<BoxBody>) -> Self::Future {
-//             // This is necessary because tonic internally uses `tower::buffer::Buffer`.
-//             // See https://github.com/tower-rs/tower/issues/547#issuecomment-767629149
-//             // for details on why this is necessary
-//             let clone = self.inner.clone();
-//             let mut inner = std::mem::replace(&mut self.inner, clone);
-
-//             Box::pin(async move {
-//                 // Do extra async work here...
-//                 let response = inner.call(req).await?;
-
-//                 Ok(response)
-//             })
-//         }
-//     }
-// }
+// At present, we don't need to specify the concrete type for generics parameterization.
+// Since we output the whole wrapped `FlyteRemote` as binding class instead of each gRPC stubs.
+// So the macro `concrete_generic_structure` is commented out.
 
 // #[macro_export]
 // macro_rules! concrete_generic_structure {
