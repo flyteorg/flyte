@@ -9,7 +9,7 @@
 
 ## 1 Executive Summary
 
-Use json byte string in protobuf instead of json string to fix int is not supported in protobuf struct.
+Use byte string in protobuf instead of json string to fix int is not supported in protobuf struct.
 
 
 ## 2 Motivation
