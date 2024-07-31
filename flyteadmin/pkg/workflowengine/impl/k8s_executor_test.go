@@ -3,7 +3,6 @@ package impl
 import (
 	"context"
 	"errors"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
 	"regexp"
 	"testing"
 
@@ -26,6 +25,7 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	flyteclient "github.com/flyteorg/flyte/flytepropeller/pkg/client/clientset/versioned"
 	v1alpha12 "github.com/flyteorg/flyte/flytepropeller/pkg/client/clientset/versioned/typed/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 var fakeFlyteWF = FakeFlyteWorkflowV1alpha1{}
