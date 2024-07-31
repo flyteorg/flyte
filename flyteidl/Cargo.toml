@@ -44,5 +44,5 @@ base64 = "0.22.1"
 oauth2 ={ version = "4.4.2", features = ["ureq"] }
 url = "2.5.0"
 keyring = "2.3.3"
-openssl = "0.10.64"
+openssl = "0.10.66"
 anyhow = "1.0.86"
