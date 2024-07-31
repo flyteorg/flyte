@@ -33,7 +33,7 @@ For distributed training tasks, the [pod entrypoint `pyflyte-execute`](https://g
 
 For this purpose, we propose that `flyteplugins` injects the environment variable `FLYTE_INTERNAL_POD_NAME` using the Kubernetes [downward api](https://kubernetes.io/docs/concepts/workloads/pods/downward-api/#downwardapi-fieldRef).
 
-Furthermore, we propose that distributed task plugins in `flyteplugins` inject the environment variable `FLYTE_INTERNAL_ERROR_PROPAGATION=earlist` (where `earliest` is the first of potentially multiple strategies to determine the root cause error, see below).
+Furthermore, we propose that distributed task plugins in `flyteplugins` inject the environment variable `FLYTE_INTERNAL_ERROR_PROPAGATION=earliest` (where `earliest` is the first of potentially multiple strategies to determine the root cause error, see below).
 
 If the `FLYTE_INTERNAL_ERROR_PROPAGATION` environment variable is set, `pyflyte-execute` includes the pod name in the error file.
 
@@ -65,7 +65,7 @@ Open questions:
     Currently, [here](https://github.com/flyteorg/flyte/blob/4514860cf56ba62717f6c207f269410a8c1a5461/flytepropeller/pkg/controller/nodes/task/k8s/plugin_manager.go#L290) in the plugin manager, where we call `NewRemoteFileOutputReader`, we do have access to `e.plugin`, and thus to `PluginProperties` and could make use of that information to instantiate another output reader.
     * Could we alternatively add an `OutputReader` to the [`PluginContext`](https://github.com/flyteorg/flyte/blob/4514860cf56ba62717f6c207f269410a8c1a5461/flyteplugins/go/tasks/pluginmachinery/k8s/plugin.go#L51)? Where would we customize this plugin context for e.g. the kubeflow plugins?
 
-#### Backwards compatability
+#### Backwards compatibility
 We propose that the new `MultiErrorFileRemoteFileOutputReader` falls back to reading the `error.pb` if no `error-<pod-name>.pb` files are found in order to solve the problem of backwards compatibility:
 
 * If flytekit uses a version that supports multiple error files but the backend does not yet, `pyflyte-execute` will not upload multiple error files for distributed tasks since the `FLYTE_INTERNAL_ERROR_PROPAGATION` environment variable will not be set.
