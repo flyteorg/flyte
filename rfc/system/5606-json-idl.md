@@ -4,6 +4,8 @@
 
 - [@Han-Ru](https://github.com/future-outlier)
 - [@Ping-Su](https://github.com/pingsutw)
+- [@Fabio M. Graetz](https://github.com/fg91)
+- [@Yee Hing Tong](https://github.com/wild-endeavor)
 
 ## 1 Executive Summary
 
@@ -25,24 +27,24 @@ This feature can solve them all.
 @task
 def t1() -> dict:
   ...
-  return {"a": 1} -> protobuf Struct {"a": 1.0}
+  return {"a": 1} # protobuf Struct {"a": 1.0}
 
 @task
-def t2(a: <dict>):
-  print(a["integer"]) # wrong, will be float point
+def t2(a: dict):
+  print(a["integer"]) # wrong, will be a float
 ```
 #### After
 ```python
 Json = "json"
 
 @task
-def t1() -> Annotated[dict, Json]: // Json Byte Strings
+def t1() -> Annotated[dict, Json]: # Json Byte Strings
   ...
   return {"a": 1} -> protobuf Json b'{"a": 1}'
 
 @task
-def t2(a: <dict>):
-  print(a["integer"]) # wrong
+def t2(a: Annotated[dict, Json]):
+  print(a["integer"]) # correct, it will be a integer
 ```
 
 #### Note
@@ -220,33 +222,10 @@ func MakeDefaultLiteralForType(typ *core.LiteralType) (*core.Literal, error) {
 }
 ```
 ### FlyteKit
-#### Add class Json as FlyteIdlEntity
-```python
-class Json(_common.FlyteIdlEntity):
-    def __init__(self, value: bytes):
-        self._value = value
+#### pyflyte run
+The behavior will remain unchanged. 
+We will pass the value to our class, which inherits from `click.ParamType`, and use the corresponding type transformer to convert the input to the correct type.
 
-    @property
-    def value(self):
-        """
-        :rtype: bytes
-        """
-        return self._value
-
-    def to_flyte_idl(self):
-        """
-        :rtype: flyteidl.core.literals_pb2.Json
-        """
-        return _literals_pb2.Json(value=self.value)
-
-    @classmethod
-    def from_flyte_idl(cls, proto):
-        """
-        :param flyteidl.core.literals_pb2.Json proto:
-        :rtype: Json
-        """
-        return cls(value=proto.value)
-```
 #### Dict Transformer
 ##### Before
 ###### Convert Python Value to Literal
