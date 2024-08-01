@@ -287,11 +287,12 @@ func validateParameterMap(inputMap *core.ParameterMap, fieldName string) error {
 				if inputType == nil {
 					return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 						fmt.Sprintf(
-							"Flyte Propeller encountered an issue while determining\n"+
+							"Flyte encountered an issue while determining\n"+
 								"the type of the default value for Parameter '%s' in '%s'.\n"+
-								"Registered type from FlyteKit: [%s].\n"+
-								"FlytePropeller needs to support latest FlyteIDL to support this type.\n"+
-								"Suggested solution: Please update your Flyte Propeller image to the latest version and try again.",
+								"Registered type: [%s].\n"+
+								"Flyte needs to support the latest FlyteIDL to support this type.\n"+
+								"Suggested solution: Please update all of your Flyte images to the latest version and "+
+								"try again.",
 							name, fieldName, defaultInput.GetVar().GetType().String(),
 						),
 					)

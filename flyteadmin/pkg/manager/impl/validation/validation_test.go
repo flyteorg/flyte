@@ -329,9 +329,11 @@ func TestValidateParameterMap(t *testing.T) {
 			},
 		}
 
+		name := "foo"
+		fieldName := "test_field_name"
 		exampleMap := core.ParameterMap{
 			Parameters: map[string]*core.Parameter{
-				"foo": {
+				name: {
 					Var: &core.Variable{
 						// 1000 means an unsupported type
 						Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: 1000}},
@@ -342,14 +344,18 @@ func TestValidateParameterMap(t *testing.T) {
 				},
 			},
 		}
-		err := validateParameterMap(&exampleMap, "test_field_name")
+		err := validateParameterMap(&exampleMap, fieldName)
 		assert.Error(t, err)
 		fmt.Println(err.Error())
-		expectedErrMsg := "Flyte Propeller encountered an issue while determining\n" +
-			"the type of the default value for Parameter 'foo' in 'test_field_name'.\n" +
-			"Registered type from FlyteKit: [simple:1000].\n" +
-			"FlytePropeller needs to support latest FlyteIDL to support this type.\n" +
-			"Suggested solution: Please update your Flyte Propeller image to the latest version and try again."
+		expectedErrMsg := fmt.Sprintf(
+			"Flyte encountered an issue while determining\n"+
+				"the type of the default value for Parameter '%s' in '%s'.\n"+
+				"Registered type: [%s].\n"+
+				"Flyte needs to support the latest FlyteIDL to support this type.\n"+
+				"Suggested solution: Please update all of your Flyte images to the latest version and "+
+				"try again.",
+			name, fieldName, exampleMap.Parameters[name].GetVar().GetType().String(),
+		)
 		assert.Equal(t, expectedErrMsg, err.Error())
 	})
 }
