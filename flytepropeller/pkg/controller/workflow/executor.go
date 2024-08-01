@@ -100,9 +100,23 @@ func (c *workflowExecutor) handleReadyWorkflow(ctx context.Context, w *v1alpha1.
 			Message: err.Error()}), nil
 	}
 	w.GetExecutionStatus().SetDataDir(ref)
-	var inputs *core.LiteralMap
+	inputs := &core.LiteralMap{}
 	if w.Inputs != nil {
+		if len(w.OffloadedInputs) > 0 {
+			return StatusFailing(&core.ExecutionError{
+				Kind:    core.ExecutionError_SYSTEM,
+				Code:    errors.BadSpecificationError.String(),
+				Message: "cannot specify inline inputs AND offloaded inputs"}), nil
+		}
 		inputs = w.Inputs.LiteralMap
+	} else if len(w.OffloadedInputs) > 0 {
+		err = c.store.ReadProtobuf(ctx, w.OffloadedInputs, inputs)
+		if err != nil {
+			return StatusFailing(&core.ExecutionError{
+				Kind:    core.ExecutionError_SYSTEM,
+				Code:    "OffloadedInputsReadFailure",
+				Message: err.Error()}), nil
+		}
 	}
 	// Before starting the subworkflow, lets set the inputs for the Workflow. The inputs for a SubWorkflow are essentially
 	// Copy of the inputs to the Node
