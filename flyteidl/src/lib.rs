@@ -817,7 +817,7 @@ pub mod _flyteidl_rust {
                     // println!("keyring retrieved successfully.");
                     access_token
                 }
-                Err(error) => panic!("Failed at retrieving keyring: {:?}", error),
+                Err(error) => {println!("Failed at retrieving keyring: {:?}", error); "".to_string()},
             };
 
             let mut interceptor: UnaryAuthInterceptor = UnaryAuthInterceptor {
