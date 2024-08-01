@@ -320,6 +320,38 @@ func TestValidateParameterMap(t *testing.T) {
 		err := validateParameterMap(&exampleMap, "some text")
 		assert.NoError(t, err)
 	})
+	t.Run("invalid because inputType is nil", func(t *testing.T) {
+		// Create a literal that will cause LiteralTypeForLiteral to return nil.
+		// For example, a scalar with no value.
+		unsupportedLiteral := &core.Literal{
+			Value: &core.Literal_Scalar{
+				Scalar: &core.Scalar{},
+			},
+		}
+
+		exampleMap := core.ParameterMap{
+			Parameters: map[string]*core.Parameter{
+				"foo": {
+					Var: &core.Variable{
+						// 1000 means an unsupported type
+						Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: 1000}},
+					},
+					Behavior: &core.Parameter_Default{
+						Default: unsupportedLiteral,
+					},
+				},
+			},
+		}
+		err := validateParameterMap(&exampleMap, "test_field_name")
+		assert.Error(t, err)
+		fmt.Println(err.Error())
+		expectedErrMsg := "Flyte Propeller encountered an issue while determining\n" +
+			"the type of the default value for Parameter 'foo' in 'test_field_name'.\n" +
+			"Registered type from FlyteKit: [simple:1000].\n" +
+			"FlytePropeller needs to support latest FlyteIDL to support this type.\n" +
+			"Suggested solution: Please update your Flyte Propeller image to the latest version and try again."
+		assert.Equal(t, expectedErrMsg, err.Error())
+	})
 }
 
 func TestValidateToken(t *testing.T) {
