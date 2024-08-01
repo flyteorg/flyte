@@ -811,7 +811,11 @@ pub mod _flyteidl_rust {
                         panic!("Failed at initializing keyring, not available.");
                     }
                 };
-
+            // dummy write access_token when unauthenticated
+            match entry.set_password("") {
+                Ok(()) => println!("KeyRing set successfully."),
+                Err(err) => println!("KeyRing set not available."),
+            };
             let access_token: String = match entry.get_password() {
                 Ok(access_token) => {
                     // println!("keyring retrieved successfully.");
