@@ -9,6 +9,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+
 	"github.com/gorilla/handlers"
 	grpcmiddleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpcauth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
@@ -80,7 +82,7 @@ func SetMetricKeys(appConfig *runtimeIfaces.ApplicationConfig) {
 // Creates a new gRPC Server with all the configuration
 func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *config.ServerConfig,
 	storageCfg *storage.Config, authCtx interfaces.AuthenticationContext,
-	scope promutils.Scope, opts ...grpc.ServerOption) (*grpc.Server, error) {
+	scope promutils.Scope, sm core.SecretManager, opts ...grpc.ServerOption) (*grpc.Server, error) {
 
 	logger.Infof(ctx, "Registering default middleware with blanket auth validation")
 	pluginRegistry.RegisterDefault(plugins.PluginIDUnaryServiceMiddleware, grpcmiddleware.ChainUnaryServer(
@@ -131,7 +133,7 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 	}
 
 	configuration := runtime2.NewConfigurationProvider()
-	adminServer := adminservice.NewAdminServer(ctx, pluginRegistry, configuration, cfg.KubeConfig, cfg.Master, dataStorageClient, scope.NewSubScope("admin"))
+	adminServer := adminservice.NewAdminServer(ctx, pluginRegistry, configuration, cfg.KubeConfig, cfg.Master, dataStorageClient, scope.NewSubScope("admin"), sm)
 	grpcService.RegisterAdminServiceServer(grpcServer, adminServer)
 	if cfg.Security.UseAuth {
 		grpcService.RegisterAuthMetadataServiceServer(grpcServer, authCtx.AuthMetadataService())
@@ -315,12 +317,15 @@ func serveGatewayInsecure(ctx context.Context, pluginRegistry *plugins.Registry,
 	// This will parse configuration and create the necessary objects for dealing with auth
 	var authCtx interfaces.AuthenticationContext
 	var err error
+
+	sm := secretmanager.NewFileEnvSecretManager(secretmanager.GetConfig())
+
 	// This code is here to support authentication without SSL. This setup supports a network topology where
 	// Envoy does the SSL termination. The final hop is made over localhost only on a trusted machine.
 	// Warning: Running authentication without SSL in any other topology is a severe security flaw.
 	// See the auth.Config object for additional settings as well.
 	if cfg.Security.UseAuth {
-		sm := secretmanager.NewFileEnvSecretManager(secretmanager.GetConfig())
+
 		var oauth2Provider interfaces.OAuth2Provider
 		var oauth2ResourceServer interfaces.OAuth2ResourceServer
 		if authCfg.AppAuth.AuthServerType == authConfig.AuthorizationServerTypeSelf {
@@ -349,7 +354,7 @@ func serveGatewayInsecure(ctx context.Context, pluginRegistry *plugins.Registry,
 		}
 	}
 
-	grpcServer, err := newGRPCServer(ctx, pluginRegistry, cfg, storageConfig, authCtx, scope)
+	grpcServer, err := newGRPCServer(ctx, pluginRegistry, cfg, storageConfig, authCtx, scope, sm)
 	if err != nil {
 		return fmt.Errorf("failed to create a newGRPCServer. Error: %w", err)
 	}
@@ -424,13 +429,14 @@ func serveGatewaySecure(ctx context.Context, pluginRegistry *plugins.Registry, c
 	additionalHandlers map[string]func(http.ResponseWriter, *http.Request),
 	scope promutils.Scope) error {
 	certPool, cert, err := GetSslCredentials(ctx, cfg.Security.Ssl.CertificateFile, cfg.Security.Ssl.KeyFile)
+	sm := secretmanager.NewFileEnvSecretManager(secretmanager.GetConfig())
+
 	if err != nil {
 		return err
 	}
 	// This will parse configuration and create the necessary objects for dealing with auth
 	var authCtx interfaces.AuthenticationContext
 	if cfg.Security.UseAuth {
-		sm := secretmanager.NewFileEnvSecretManager(secretmanager.GetConfig())
 		var oauth2Provider interfaces.OAuth2Provider
 		var oauth2ResourceServer interfaces.OAuth2ResourceServer
 		if authCfg.AppAuth.AuthServerType == authConfig.AuthorizationServerTypeSelf {
@@ -459,7 +465,7 @@ func serveGatewaySecure(ctx context.Context, pluginRegistry *plugins.Registry, c
 		}
 	}
 
-	grpcServer, err := newGRPCServer(ctx, pluginRegistry, cfg, storageCfg, authCtx, scope, grpc.Creds(credentials.NewServerTLSFromCert(cert)))
+	grpcServer, err := newGRPCServer(ctx, pluginRegistry, cfg, storageCfg, authCtx, scope, sm, grpc.Creds(credentials.NewServerTLSFromCert(cert)))
 	if err != nil {
 		return fmt.Errorf("failed to create a newGRPCServer. Error: %w", err)
 	}

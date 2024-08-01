@@ -4,12 +4,12 @@ import (
 	"context"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/implementations"
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/stretchr/testify/assert"
 )
 
 var (
@@ -38,7 +38,7 @@ func TestGetEmailer(t *testing.T) {
 		},
 	}
 
-	GetEmailer(cfg, promutils.NewTestScope())
+	GetEmailer(cfg, promutils.NewTestScope(), &mocks.SecretManager{})
 
 	// shouldn't reach here
 	t.Errorf("did not panic")
@@ -47,7 +47,7 @@ func TestGetEmailer(t *testing.T) {
 func TestNewNotificationPublisherAndProcessor(t *testing.T) {
 	testSandboxPublisher := NewNotificationsPublisher(notificationsConfig, scope)
 	assert.IsType(t, testSandboxPublisher, &implementations.SandboxPublisher{})
-	testSandboxProcessor := NewNotificationsProcessor(notificationsConfig, scope)
+	testSandboxProcessor := NewNotificationsProcessor(notificationsConfig, scope, &mocks.SecretManager{})
 	assert.IsType(t, testSandboxProcessor, &implementations.SandboxProcessor{})
 
 	go func() {
