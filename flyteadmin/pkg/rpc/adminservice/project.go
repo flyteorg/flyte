@@ -12,7 +12,6 @@ import (
 
 func (m *AdminService) RegisterProject(ctx context.Context, request *admin.ProjectRegisterRequest) (
 	*admin.ProjectRegisterResponse, error) {
-	defer m.interceptPanic(ctx, request)
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
@@ -29,7 +28,6 @@ func (m *AdminService) RegisterProject(ctx context.Context, request *admin.Proje
 }
 
 func (m *AdminService) ListProjects(ctx context.Context, request *admin.ProjectListRequest) (*admin.Projects, error) {
-	defer m.interceptPanic(ctx, request)
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
@@ -48,7 +46,6 @@ func (m *AdminService) ListProjects(ctx context.Context, request *admin.ProjectL
 
 func (m *AdminService) UpdateProject(ctx context.Context, request *admin.Project) (
 	*admin.ProjectUpdateResponse, error) {
-	defer m.interceptPanic(ctx, request)
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
@@ -65,7 +62,6 @@ func (m *AdminService) UpdateProject(ctx context.Context, request *admin.Project
 }
 
 func (m *AdminService) GetProject(ctx context.Context, request *admin.ProjectGetRequest) (*admin.Project, error) {
-	defer m.interceptPanic(ctx, request)
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
@@ -83,7 +79,6 @@ func (m *AdminService) GetProject(ctx context.Context, request *admin.ProjectGet
 }
 
 func (m *AdminService) GetDomains(ctx context.Context, request *admin.GetDomainRequest) (*admin.GetDomainsResponse, error) {
-	defer m.interceptPanic(ctx, request)
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
