@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 	sandboxCmdConfig "github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/sandbox"
 	"github.com/flyteorg/flyte/flytectl/pkg/docker"
 	"github.com/flyteorg/flyte/flytectl/pkg/docker/mocks"
@@ -27,19 +28,19 @@ func TestTearDownFunc(t *testing.T) {
 	ctx := context.Background()
 
 	mockDocker := &mocks.Docker{}
-	mockDocker.OnContainerList(ctx, types.ContainerListOptions{All: true}).Return(containers, nil)
-	mockDocker.OnContainerRemove(ctx, mock.Anything, types.ContainerRemoveOptions{Force: true}).Return(fmt.Errorf("err"))
+	mockDocker.OnContainerList(ctx, container.ListOptions{All: true}).Return(containers, nil)
+	mockDocker.OnContainerRemove(ctx, mock.Anything, container.RemoveOptions{Force: true}).Return(fmt.Errorf("err"))
 	err := Teardown(ctx, mockDocker, sandboxCmdConfig.DefaultTeardownFlags)
 	assert.NotNil(t, err)
 
 	mockDocker = &mocks.Docker{}
-	mockDocker.OnContainerList(ctx, types.ContainerListOptions{All: true}).Return(nil, fmt.Errorf("err"))
+	mockDocker.OnContainerList(ctx, container.ListOptions{All: true}).Return(nil, fmt.Errorf("err"))
 	err = Teardown(ctx, mockDocker, sandboxCmdConfig.DefaultTeardownFlags)
 	assert.NotNil(t, err)
 
 	mockDocker = &mocks.Docker{}
-	mockDocker.OnContainerList(ctx, types.ContainerListOptions{All: true}).Return(containers, nil)
-	mockDocker.OnContainerRemove(ctx, mock.Anything, types.ContainerRemoveOptions{Force: true}).Return(nil)
+	mockDocker.OnContainerList(ctx, container.ListOptions{All: true}).Return(containers, nil)
+	mockDocker.OnContainerRemove(ctx, mock.Anything, container.RemoveOptions{Force: true}).Return(nil)
 	mockK8sContextMgr := &k8sMocks.ContextOps{}
 	mockK8sContextMgr.OnRemoveContext(mock.Anything).Return(nil)
 	k8s.ContextMgr = mockK8sContextMgr
