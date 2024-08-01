@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
 	"github.com/flyteorg/flyte/flytectl/pkg/docker"
 	"github.com/flyteorg/flyte/flytectl/pkg/docker/mocks"
@@ -33,7 +34,7 @@ var fakePod = corev1.Pod{
 func sandboxSetup(ctx context.Context, legacy bool) {
 	mockDocker := &mocks.Docker{}
 	docker.Client = mockDocker
-	mockDocker.OnContainerList(ctx, types.ContainerListOptions{All: true}).Return([]types.Container{
+	mockDocker.OnContainerList(ctx, container.ListOptions{All: true}).Return([]types.Container{
 		{
 			ID: docker.FlyteSandboxClusterName,
 			Names: []string{

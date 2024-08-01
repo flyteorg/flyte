@@ -74,7 +74,7 @@ func GetDockerClient() (Docker, error) {
 
 // GetSandbox will return sandbox container if it exist
 func GetSandbox(ctx context.Context, cli Docker) (*types.Container, error) {
-	containers, err := cli.ContainerList(ctx, types.ContainerListOptions{
+	containers, err := cli.ContainerList(ctx, container.ListOptions{
 		All: true,
 	})
 	if err != nil {
@@ -97,7 +97,7 @@ func RemoveSandbox(ctx context.Context, cli Docker, reader io.Reader) error {
 
 	if c != nil {
 		if docker.DefaultConfig.Force || cmdUtil.AskForConfirmation("delete existing sandbox cluster", reader) {
-			err := cli.ContainerRemove(context.Background(), c.ID, types.ContainerRemoveOptions{
+			err := cli.ContainerRemove(context.Background(), c.ID, container.RemoveOptions{
 				Force: true,
 			})
 			return err
@@ -273,7 +273,7 @@ func StartContainer(ctx context.Context, cli Docker, volumes []mount.Mount, expo
 		return "", err
 	}
 
-	if err := cli.ContainerStart(context.Background(), resp.ID, types.ContainerStartOptions{}); err != nil {
+	if err := cli.ContainerStart(context.Background(), resp.ID, container.StartOptions{}); err != nil {
 		return "", err
 	}
 	return resp.ID, nil
@@ -287,7 +287,7 @@ func CopyContainerFile(ctx context.Context, cli Docker, source, destination, nam
 	}
 	var removeErr error
 	defer func() {
-		removeErr = cli.ContainerRemove(context.Background(), resp.ID, types.ContainerRemoveOptions{
+		removeErr = cli.ContainerRemove(context.Background(), resp.ID, container.RemoveOptions{
 			Force: true,
 		})
 	}()
@@ -320,7 +320,7 @@ func CopyContainerFile(ctx context.Context, cli Docker, source, destination, nam
 
 // ReadLogs will return io scanner for reading the logs of a container
 func ReadLogs(ctx context.Context, cli Docker, id string) (*bufio.Scanner, error) {
-	reader, err := cli.ContainerLogs(ctx, id, types.ContainerLogsOptions{
+	reader, err := cli.ContainerLogs(ctx, id, container.LogsOptions{
 		ShowStderr: true,
 		ShowStdout: true,
 		Timestamps: true,
