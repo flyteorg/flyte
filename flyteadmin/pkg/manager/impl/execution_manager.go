@@ -592,6 +592,7 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 		WorkflowClosure:          workflow.Closure.CompiledWorkflow,
 		WorkflowClosureReference: storage.DataReference(workflowModel.RemoteClosureIdentifier),
 		ExecutionParameters:      executionParameters,
+		OffloadedInputsReference: inputsURI,
 	})
 
 	if err != nil {
@@ -1032,6 +1033,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		WorkflowClosure:          workflow.Closure.CompiledWorkflow,
 		WorkflowClosureReference: storage.DataReference(workflowModel.RemoteClosureIdentifier),
 		ExecutionParameters:      executionParameters,
+		OffloadedInputsReference: inputsURI,
 	})
 	if execErr != nil {
 		createExecModelInput.Error = execErr
