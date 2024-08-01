@@ -376,7 +376,7 @@ pub mod _flyteidl_rust {
                 tonic::Code::InvalidArgument => {
                     return PyErr::new::<FlyteInvalidInputException, _>(err.to_string())
                 }
-                _ => todo!(),
+                _ => return PyErr::new::<PyFlyteUserException, _>(err.to_string()),
             }
         }
     }
