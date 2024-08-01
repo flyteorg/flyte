@@ -129,10 +129,10 @@ func TestStartFunc(t *testing.T) {
 
 	t.Run("Successfully run demo cluster", func(t *testing.T) {
 		sandboxSetup()
-		mockDocker.OnContainerList(ctx, types.ContainerListOptions{All: true}).Return([]types.Container{}, nil)
+		mockDocker.OnContainerList(ctx, container.ListOptions{All: true}).Return([]types.Container{}, nil)
 		mockDocker.OnImagePullMatch(ctx, mock.Anything, types.ImagePullOptions{}).Return(dummyReader(), nil)
-		mockDocker.OnContainerStart(ctx, "Hello", types.ContainerStartOptions{}).Return(nil)
-		mockDocker.OnContainerLogsMatch(ctx, mock.Anything, types.ContainerLogsOptions{
+		mockDocker.OnContainerStart(ctx, "Hello", container.StartOptions{}).Return(nil)
+		mockDocker.OnContainerLogsMatch(ctx, mock.Anything, container.LogsOptions{
 			ShowStderr: true,
 			ShowStdout: true,
 			Timestamps: true,
@@ -145,7 +145,7 @@ func TestStartFunc(t *testing.T) {
 	})
 	t.Run("Successfully exit when demo cluster exist", func(t *testing.T) {
 		sandboxSetup()
-		mockDocker.OnContainerList(ctx, types.ContainerListOptions{All: true}).Return([]types.Container{
+		mockDocker.OnContainerList(ctx, container.ListOptions{All: true}).Return([]types.Container{
 			{
 				ID: docker.FlyteSandboxClusterName,
 				Names: []string{
@@ -154,8 +154,8 @@ func TestStartFunc(t *testing.T) {
 			},
 		}, nil)
 		mockDocker.OnImagePullMatch(ctx, mock.Anything, types.ImagePullOptions{}).Return(dummyReader(), nil)
-		mockDocker.OnContainerStart(ctx, "Hello", types.ContainerStartOptions{}).Return(nil)
-		mockDocker.OnContainerLogsMatch(ctx, mock.Anything, types.ContainerLogsOptions{
+		mockDocker.OnContainerStart(ctx, "Hello", container.StartOptions{}).Return(nil)
+		mockDocker.OnContainerLogsMatch(ctx, mock.Anything, container.LogsOptions{
 			ShowStderr: true,
 			ShowStdout: true,
 			Timestamps: true,
@@ -169,10 +169,10 @@ func TestStartFunc(t *testing.T) {
 		sandboxCmdConfig.DefaultConfig.DeprecatedSource = f.UserHomeDir()
 		sandboxCmdConfig.DefaultConfig.Version = ""
 		sandboxSetup()
-		mockDocker.OnContainerList(ctx, types.ContainerListOptions{All: true}).Return([]types.Container{}, nil)
-		mockDocker.OnContainerStart(ctx, "Hello", types.ContainerStartOptions{}).Return(nil)
+		mockDocker.OnContainerList(ctx, container.ListOptions{All: true}).Return([]types.Container{}, nil)
+		mockDocker.OnContainerStart(ctx, "Hello", container.StartOptions{}).Return(nil)
 		mockDocker.OnImagePullMatch(ctx, mock.Anything, types.ImagePullOptions{}).Return(dummyReader(), nil)
-		mockDocker.OnContainerLogsMatch(ctx, mock.Anything, types.ContainerLogsOptions{
+		mockDocker.OnContainerLogsMatch(ctx, mock.Anything, container.LogsOptions{
 			ShowStderr: true,
 			ShowStdout: true,
 			Timestamps: true,
@@ -185,10 +185,10 @@ func TestStartFunc(t *testing.T) {
 		sandboxCmdConfig.DefaultConfig.DeprecatedSource = "../"
 		sandboxCmdConfig.DefaultConfig.Version = ""
 		sandboxSetup()
-		mockDocker.OnContainerList(ctx, types.ContainerListOptions{All: true}).Return([]types.Container{}, nil)
-		mockDocker.OnContainerStart(ctx, "Hello", types.ContainerStartOptions{}).Return(nil)
+		mockDocker.OnContainerList(ctx, container.ListOptions{All: true}).Return([]types.Container{}, nil)
+		mockDocker.OnContainerStart(ctx, "Hello", container.StartOptions{}).Return(nil)
 		mockDocker.OnImagePullMatch(ctx, mock.Anything, types.ImagePullOptions{}).Return(dummyReader(), nil)
-		mockDocker.OnContainerLogsMatch(ctx, mock.Anything, types.ContainerLogsOptions{
+		mockDocker.OnContainerLogsMatch(ctx, mock.Anything, container.LogsOptions{
 			ShowStderr: true,
 			ShowStdout: true,
 			Timestamps: true,
@@ -199,10 +199,10 @@ func TestStartFunc(t *testing.T) {
 	})
 	t.Run("Successfully run demo cluster with specific version", func(t *testing.T) {
 		sandboxSetup()
-		mockDocker.OnContainerList(ctx, types.ContainerListOptions{All: true}).Return([]types.Container{}, nil)
-		mockDocker.OnContainerStart(ctx, "Hello", types.ContainerStartOptions{}).Return(nil)
+		mockDocker.OnContainerList(ctx, container.ListOptions{All: true}).Return([]types.Container{}, nil)
+		mockDocker.OnContainerStart(ctx, "Hello", container.StartOptions{}).Return(nil)
 		mockDocker.OnImagePullMatch(ctx, mock.Anything, types.ImagePullOptions{}).Return(dummyReader(), nil)
-		mockDocker.OnContainerLogsMatch(ctx, mock.Anything, types.ContainerLogsOptions{
+		mockDocker.OnContainerLogsMatch(ctx, mock.Anything, container.LogsOptions{
 			ShowStderr: true,
 			ShowStdout: true,
 			Timestamps: true,
@@ -220,7 +220,7 @@ func TestStartFunc(t *testing.T) {
 	})
 	t.Run("Failed run demo cluster with wrong version", func(t *testing.T) {
 		sandboxSetup()
-		mockDocker.OnContainerList(ctx, types.ContainerListOptions{All: true}).Return([]types.Container{}, nil)
+		mockDocker.OnContainerList(ctx, container.ListOptions{All: true}).Return([]types.Container{}, nil)
 		sandboxCmdConfig.DefaultConfig.Image = ""
 		githubMock.OnGetReleaseByTagMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil, nil, fmt.Errorf("non-existent-tag"))
 		_, err := startSandbox(ctx, mockDocker, githubMock, dummyReader(), sandboxCmdConfig.DefaultConfig, sandboxImageName, defaultImagePrefix, exposedPorts, portBindings, util.SandBoxConsolePort)
@@ -229,7 +229,7 @@ func TestStartFunc(t *testing.T) {
 	})
 	t.Run("Error in pulling image", func(t *testing.T) {
 		sandboxSetup()
-		mockDocker.OnContainerList(ctx, types.ContainerListOptions{All: true}).Return([]types.Container{}, nil)
+		mockDocker.OnContainerList(ctx, container.ListOptions{All: true}).Return([]types.Container{}, nil)
 		mockDocker.OnImagePullMatch(ctx, mock.Anything, types.ImagePullOptions{}).Return(dummyReader(), fmt.Errorf("failed to pull"))
 		sandboxCmdConfig.DefaultConfig.Image = ""
 		tag := "v0.15.0"
@@ -244,7 +244,7 @@ func TestStartFunc(t *testing.T) {
 	})
 	t.Run("Error in  removing existing cluster", func(t *testing.T) {
 		sandboxSetup()
-		mockDocker.OnContainerList(ctx, types.ContainerListOptions{All: true}).Return([]types.Container{
+		mockDocker.OnContainerList(ctx, container.ListOptions{All: true}).Return([]types.Container{
 			{
 				ID: docker.FlyteSandboxClusterName,
 				Names: []string{
@@ -253,26 +253,26 @@ func TestStartFunc(t *testing.T) {
 			},
 		}, nil)
 		mockDocker.OnImagePullMatch(ctx, mock.Anything, types.ImagePullOptions{}).Return(dummyReader(), nil)
-		mockDocker.OnContainerRemove(ctx, mock.Anything, types.ContainerRemoveOptions{Force: true}).Return(fmt.Errorf("failed to remove container"))
+		mockDocker.OnContainerRemove(ctx, mock.Anything, container.RemoveOptions{Force: true}).Return(fmt.Errorf("failed to remove container"))
 		_, err := startSandbox(ctx, mockDocker, githubMock, strings.NewReader("y"), sandboxCmdConfig.DefaultConfig, sandboxImageName, defaultImagePrefix, exposedPorts, portBindings, util.SandBoxConsolePort)
 		assert.NotNil(t, err)
 		assert.Equal(t, "failed to remove container", err.Error())
 	})
 	t.Run("Error in start container", func(t *testing.T) {
 		sandboxSetup()
-		mockDocker.OnContainerList(ctx, types.ContainerListOptions{All: true}).Return([]types.Container{}, nil)
+		mockDocker.OnContainerList(ctx, container.ListOptions{All: true}).Return([]types.Container{}, nil)
 		mockDocker.OnImagePullMatch(ctx, mock.Anything, types.ImagePullOptions{}).Return(dummyReader(), nil)
-		mockDocker.OnContainerStart(ctx, "Hello", types.ContainerStartOptions{}).Return(fmt.Errorf("failed to run container"))
+		mockDocker.OnContainerStart(ctx, "Hello", container.StartOptions{}).Return(fmt.Errorf("failed to run container"))
 		_, err := startSandbox(ctx, mockDocker, githubMock, dummyReader(), sandboxCmdConfig.DefaultConfig, sandboxImageName, defaultImagePrefix, exposedPorts, portBindings, util.SandBoxConsolePort)
 		assert.NotNil(t, err)
 		assert.Equal(t, "failed to run container", err.Error())
 	})
 	t.Run("Error in reading logs", func(t *testing.T) {
 		sandboxSetup()
-		mockDocker.OnContainerList(ctx, types.ContainerListOptions{All: true}).Return([]types.Container{}, nil)
+		mockDocker.OnContainerList(ctx, container.ListOptions{All: true}).Return([]types.Container{}, nil)
 		mockDocker.OnImagePullMatch(ctx, mock.Anything, types.ImagePullOptions{}).Return(dummyReader(), nil)
-		mockDocker.OnContainerStart(ctx, "Hello", types.ContainerStartOptions{}).Return(nil)
-		mockDocker.OnContainerLogsMatch(ctx, mock.Anything, types.ContainerLogsOptions{
+		mockDocker.OnContainerStart(ctx, "Hello", container.StartOptions{}).Return(nil)
+		mockDocker.OnContainerLogsMatch(ctx, mock.Anything, container.LogsOptions{
 			ShowStderr: true,
 			ShowStdout: true,
 			Timestamps: true,
@@ -286,8 +286,8 @@ func TestStartFunc(t *testing.T) {
 		sandboxSetup()
 		mockDocker.OnContainerListMatch(mock.Anything, mock.Anything).Return([]types.Container{}, fmt.Errorf("failed to list containers"))
 		mockDocker.OnImagePullMatch(ctx, mock.Anything, types.ImagePullOptions{}).Return(dummyReader(), nil)
-		mockDocker.OnContainerStart(ctx, "Hello", types.ContainerStartOptions{}).Return(nil)
-		mockDocker.OnContainerLogsMatch(ctx, mock.Anything, types.ContainerLogsOptions{
+		mockDocker.OnContainerStart(ctx, "Hello", container.StartOptions{}).Return(nil)
+		mockDocker.OnContainerLogsMatch(ctx, mock.Anything, container.LogsOptions{
 			ShowStderr: true,
 			ShowStdout: true,
 			Timestamps: true,
@@ -312,12 +312,12 @@ func TestStartFunc(t *testing.T) {
 			t.Error(err)
 		}
 		sandboxSetup()
-		mockDocker.OnContainerList(ctx, types.ContainerListOptions{All: true}).Return([]types.Container{}, nil)
+		mockDocker.OnContainerList(ctx, container.ListOptions{All: true}).Return([]types.Container{}, nil)
 		mockDocker.OnImagePullMatch(mock.Anything, mock.Anything, mock.Anything).Return(dummyReader(), nil)
-		mockDocker.OnContainerStart(ctx, "Hello", types.ContainerStartOptions{}).Return(nil)
+		mockDocker.OnContainerStart(ctx, "Hello", container.StartOptions{}).Return(nil)
 		stringReader := strings.NewReader(docker.SuccessMessage)
 		reader := ioutil.NopCloser(stringReader)
-		mockDocker.OnContainerLogsMatch(ctx, mock.Anything, types.ContainerLogsOptions{
+		mockDocker.OnContainerLogsMatch(ctx, mock.Anything, container.LogsOptions{
 			ShowStderr: true,
 			ShowStdout: true,
 			Timestamps: true,
@@ -341,8 +341,8 @@ func TestStartFunc(t *testing.T) {
 		docker.Client = mockDocker
 		mockDocker.OnContainerListMatch(mock.Anything, mock.Anything).Return([]types.Container{}, fmt.Errorf("failed to list containers"))
 		mockDocker.OnImagePullMatch(ctx, mock.Anything, types.ImagePullOptions{}).Return(dummyReader(), nil)
-		mockDocker.OnContainerStart(ctx, "Hello", types.ContainerStartOptions{}).Return(nil)
-		mockDocker.OnContainerLogsMatch(ctx, mock.Anything, types.ContainerLogsOptions{
+		mockDocker.OnContainerStart(ctx, "Hello", container.StartOptions{}).Return(nil)
+		mockDocker.OnContainerLogsMatch(ctx, mock.Anything, container.LogsOptions{
 			ShowStderr: true,
 			ShowStdout: true,
 			Timestamps: true,
