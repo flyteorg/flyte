@@ -16,6 +16,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 	"github.com/flyteorg/flyte/flytectl/pkg/docker"
 	"github.com/flyteorg/flyte/flytectl/pkg/docker/mocks"
 	"github.com/stretchr/testify/mock"
@@ -29,7 +30,7 @@ func TestDemoClusterExec(t *testing.T) {
 	cmdCtx := cmdCore.NewCommandContext(mockClient, *mockOutStream)
 	reader := bufio.NewReader(strings.NewReader("test"))
 
-	mockDocker.OnContainerList(ctx, types.ContainerListOptions{All: true}).Return([]types.Container{
+	mockDocker.OnContainerList(ctx, container.ListOptions{All: true}).Return([]types.Container{
 		{
 			ID: docker.FlyteSandboxClusterName,
 			Names: []string{
@@ -57,7 +58,7 @@ func TestSandboxClusterExecWithoutCmd(t *testing.T) {
 
 	ctx := s.Ctx
 
-	mockDocker.OnContainerList(ctx, types.ContainerListOptions{All: true}).Return([]types.Container{
+	mockDocker.OnContainerList(ctx, container.ListOptions{All: true}).Return([]types.Container{
 		{
 			ID: docker.FlyteSandboxClusterName,
 			Names: []string{

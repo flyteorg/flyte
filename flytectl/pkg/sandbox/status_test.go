@@ -6,6 +6,7 @@ import (
 	"github.com/flyteorg/flyte/flytectl/cmd/testutils"
 
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 	"github.com/flyteorg/flyte/flytectl/pkg/docker"
 	"github.com/flyteorg/flyte/flytectl/pkg/docker/mocks"
 	"github.com/stretchr/testify/assert"
@@ -16,7 +17,7 @@ func TestSandboxStatus(t *testing.T) {
 		mockDocker := &mocks.Docker{}
 		s := testutils.Setup()
 		defer s.TearDown()
-		mockDocker.OnContainerList(s.Ctx, types.ContainerListOptions{All: true}).Return([]types.Container{}, nil)
+		mockDocker.OnContainerList(s.Ctx, container.ListOptions{All: true}).Return([]types.Container{}, nil)
 		err := PrintStatus(s.Ctx, mockDocker)
 		assert.Nil(t, err)
 	})
@@ -25,7 +26,7 @@ func TestSandboxStatus(t *testing.T) {
 		defer s.TearDown()
 		ctx := s.Ctx
 		mockDocker := &mocks.Docker{}
-		mockDocker.OnContainerList(ctx, types.ContainerListOptions{All: true}).Return([]types.Container{
+		mockDocker.OnContainerList(ctx, container.ListOptions{All: true}).Return([]types.Container{
 			{
 				ID: docker.FlyteSandboxClusterName,
 				Names: []string{
