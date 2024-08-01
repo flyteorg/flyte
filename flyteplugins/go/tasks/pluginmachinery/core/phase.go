@@ -292,6 +292,10 @@ func PhaseInfoSystemRetryableFailureWithCleanup(code, reason string, info *TaskI
 	return phaseInfoFailed(PhaseRetryableFailure, &core.ExecutionError{Code: code, Message: reason, Kind: core.ExecutionError_SYSTEM}, info, true)
 }
 
+func PhaseInfoAborted(code, reason string, info *TaskInfo) PhaseInfo {
+	return phaseInfoFailed(PhaseAborted, &core.ExecutionError{Code: code, Message: reason, Kind: core.ExecutionError_USER}, info, false)
+}
+
 // Creates a new PhaseInfo with phase set to PhaseWaitingForCache
 func PhaseInfoWaitingForCache(version uint32, info *TaskInfo) PhaseInfo {
 	return phaseInfo(PhaseWaitingForCache, version, nil, info, false)

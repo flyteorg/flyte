@@ -37,6 +37,7 @@ const (
 	NodePhaseTimedOut
 	// Node recovered from a prior execution.
 	NodePhaseRecovered
+	NodePhaseAborted
 )
 
 func (p NodePhase) String() string {
@@ -115,6 +116,10 @@ func (n *NodeStatus) HasFailed() bool {
 	return n.NodePhase == NodePhaseFailed
 }
 
+func (n *NodeStatus) HasAborted() bool {
+	return n.NodePhase == NodePhaseAborted
+}
+
 func (n *NodeStatus) HasTimedOut() bool {
 	return n.NodePhase == NodePhaseTimedOut
 }
@@ -134,4 +139,8 @@ var NodeStatusRecovered = NodeStatus{NodePhase: NodePhaseRecovered}
 
 func NodeStatusFailed(err *core.ExecutionError) NodeStatus {
 	return NodeStatus{NodePhase: NodePhaseFailed, Err: err}
+}
+
+func NodeStatusAborted(err *core.ExecutionError) NodeStatus {
+	return NodeStatus{NodePhase: NodePhaseAborted, Err: err}
 }

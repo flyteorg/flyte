@@ -163,6 +163,10 @@ func (b *branchHandler) recurseDownstream(ctx context.Context, nCtx interfaces.N
 		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailureErr(downstreamStatus.Err, nil)), nil
 	}
 
+	if downstreamStatus.HasAborted() {
+		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoAbortErr(downstreamStatus.Err, nil)), nil
+	}
+
 	phase := handler.PhaseInfoRunning(nil)
 	return handler.DoTransition(handler.TransitionTypeEphemeral, phase), nil
 }

@@ -64,6 +64,8 @@ func (n NextPhaseStatePlugin) Handle(ctx context.Context, tCtx pluginCore.TaskEx
 		return pluginCore.DoTransition(pluginCore.PhaseInfoFailure("failed", "message", s.TaskInfo)), nil
 	case pluginCore.PhaseRetryableFailure:
 		return pluginCore.DoTransition(pluginCore.PhaseInfoRetryableFailure("failed", "message", s.TaskInfo)), nil
+	case pluginCore.PhaseAborted:
+		return pluginCore.DoTransition(pluginCore.PhaseInfoAborted("aborted", "message", s.TaskInfo)), nil
 	case pluginCore.PhaseNotReady:
 		return pluginCore.DoTransition(pluginCore.PhaseInfoNotReady(time.Now(), s.PhaseVersion, "not-ready")), nil
 	case pluginCore.PhaseInitializing:

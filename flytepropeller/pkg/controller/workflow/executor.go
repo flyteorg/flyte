@@ -59,6 +59,10 @@ func StatusFailed(err *core.ExecutionError) Status {
 	return Status{TransitionToPhase: v1alpha1.WorkflowPhaseFailed, Err: err}
 }
 
+func StatusAborted(err *core.ExecutionError) Status {
+	return Status{TransitionToPhase: v1alpha1.WorkflowPhaseAborted, Err: err}
+}
+
 type workflowExecutor struct {
 	enqueueWorkflow  v1alpha1.EnqueueWorkflow
 	store            *storage.DataStore
@@ -148,6 +152,9 @@ func (c *workflowExecutor) handleReadyWorkflow(ctx context.Context, w *v1alpha1.
 	if s.HasFailed() {
 		return StatusFailing(s.Err), nil
 	}
+	if s.HasAborted() {
+		return StatusAborted(s.Err), nil
+	}
 	return StatusRunning, nil
 }
 
@@ -182,6 +189,10 @@ func (c *workflowExecutor) handleRunningWorkflow(ctx context.Context, w *v1alpha
 		logger.Infof(ctx, "Workflow has failed. Error [%s]", state.Err.String())
 		return StatusFailing(state.Err), nil
 	}
+	if state.HasAborted() {
+		logger.Infof(ctx, "Workflow has aborted. Error [%s]", state.Err.String())
+		return StatusAborted(state.Err), nil
+	}
 	if state.HasTimedOut() {
 		return StatusFailing(&core.ExecutionError{
 			Kind:    core.ExecutionError_USER,
@@ -214,6 +225,8 @@ func (c *workflowExecutor) handleFailureNode(ctx context.Context, w *v1alpha1.Fl
 	switch state.NodePhase {
 	case interfaces.NodePhaseFailed:
 		return StatusFailed(state.Err), nil
+	case interfaces.NodePhaseAborted:
+		return StatusAborted(state.Err), nil
 	case interfaces.NodePhaseTimedOut:
 		return StatusFailed(&core.ExecutionError{
 			Kind:    core.ExecutionError_USER,
