@@ -40,7 +40,7 @@ Json = "json"
 @task
 def t1() -> Annotated[dict, Json]: # Json Byte Strings
   ...
-  return {"a": 1} -> protobuf Json b'{"a": 1}'
+  return {"a": 1}  # -> protobuf Json b'{"a": 1}'
 
 @task
 def t2(a: Annotated[dict, Json]):
