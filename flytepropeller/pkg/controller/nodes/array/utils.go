@@ -86,3 +86,14 @@ func isTerminalNodePhase(nodePhase v1alpha1.NodePhase) bool {
 	return nodePhase == v1alpha1.NodePhaseSucceeded || nodePhase == v1alpha1.NodePhaseFailed || nodePhase == v1alpha1.NodePhaseTimedOut ||
 		nodePhase == v1alpha1.NodePhaseSkipped || nodePhase == v1alpha1.NodePhaseRecovered
 }
+
+func shouldIncrementTaskPhaseVersion(subNodeStatus *v1alpha1.NodeStatus, previousNodePhase v1alpha1.NodePhase, previousTaskPhase int) bool {
+	if subNodeStatus.GetPhase() != previousNodePhase {
+		return true
+	} else if subNodeStatus.GetTaskNodeStatus() != nil &&
+		subNodeStatus.GetTaskNodeStatus().GetPhase() != previousTaskPhase {
+		return true
+	}
+	return subNodeStatus.GetWorkflowNodeStatus() != nil &&
+		subNodeStatus.GetWorkflowNodeStatus().GetWorkflowNodePhase() != v1alpha1.WorkflowNodePhase(previousTaskPhase)
+}

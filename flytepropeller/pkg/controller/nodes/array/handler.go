@@ -360,17 +360,8 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			arrayNodeStateStore.persistArraySubNodeState(ctx, nCtx, subNodeStatus, index)
 
 			// increment task phase version if subNode phase or task phase changed
-			if subNodeStatus.GetPhase() != nodeExecutionRequest.nodePhase {
-				if subNodeStatus.GetTaskNodeStatus() != nil && subNodeStatus.GetTaskNodeStatus().GetPhase() != nodeExecutionRequest.taskPhase {
-					incrementTaskPhaseVersion = true
-				}
-				if subNodeKind == v1alpha1.NodeKindWorkflow {
-					if subNodeStatus.GetWorkflowNodeStatus() != nil && subNodeStatus.GetWorkflowNodeStatus().GetWorkflowNodePhase() != v1alpha1.WorkflowNodePhase(nodeExecutionRequest.taskPhase) {
-						incrementTaskPhaseVersion = true
-					} else if isTerminalNodePhase(subNodeStatus.Phase) {
-						incrementTaskPhaseVersion = true
-					}
-				}
+			if !incrementTaskPhaseVersion && shouldIncrementTaskPhaseVersion(subNodeStatus, nodeExecutionRequest.nodePhase, nodeExecutionRequest.taskPhase) {
+				incrementTaskPhaseVersion = true
 			}
 		}
 
