@@ -29,17 +29,15 @@ jobs:
     steps:
       - name: Fetch flyte code
         uses: actions/checkout@v4
-      - name: 'Clear action cache'
-        uses: ./.github/actions/clear-action-cache
-      - name: Fetch flyte code
-        uses: actions/checkout@v4
         with:
-          path: "${{ github.workspace }}/flyte"
+          path: flyte
+      - name: 'Clear action cache'
+        uses: flyte/.github/actions/clear-action-cache
       - name: Fetch flytekit code
         uses: actions/checkout@v4
         with:
           repository: flyteorg/flytekit
-          path: "${{ github.workspace }}/flytekit"
+          path: flytekit
       - uses: conda-incubator/setup-miniconda@v3
         with:
           auto-update-conda: true
