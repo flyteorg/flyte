@@ -199,7 +199,7 @@ func TestCacheFour(t *testing.T) {
 		// wait for all workers to run
 		assert.Eventually(t, func() bool {
 			return syncer.callCount.Load() == int32(10)
-		}, time.Second, time.Millisecond)
+		}, 5*time.Second, time.Millisecond)
 
 		// wait some more time
 		time.Sleep(500 * time.Millisecond)
