@@ -2417,7 +2417,7 @@ func (m *ExecutionManager) TerminateExecution(
 	}
 
 	if common.IsExecutionTerminal(core.WorkflowExecution_Phase(core.WorkflowExecution_Phase_value[executionModel.Phase])) {
-		return nil, errors.NewAlreadyInTerminalStateError(ctx, "Cannot abort an already terminate workflow execution", executionModel.Phase)
+		return nil, errors.NewAlreadyInTerminalStateError(ctx, "Cannot abort an already terminated workflow execution", executionModel.Phase)
 	}
 
 	err = transformers.SetExecutionAborting(&executionModel, request.Cause, getUser(ctx))
