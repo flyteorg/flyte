@@ -59,7 +59,6 @@ Specify agent configuration
       Create a file named ``values-override.yaml`` and add the following configuration to it.
 
       .. code-block:: yaml
-          :emphasize-lines: 10,14,19
 
         configmap:
           enabled_plugins:
@@ -107,7 +106,6 @@ Upgrade the Flyte Helm release
       helm upgrade <RELEASE_NAME> flyte/flyte-core -n <YOUR_NAMESPACE> --values values-override.yaml
 
     Replace ``<RELEASE_NAME>`` with the name of your release (e.g., ``flyte``)
-
     and ``<YOUR_NAMESPACE>`` with the name of your namespace (e.g., ``flyte``).
 
 For Snowflake agent on the Flyte cluster, see `Snowflake agent <https://docs.flyte.org/en/latest/flytesnacks/examples/snowflake_agent/index.html>`_.
