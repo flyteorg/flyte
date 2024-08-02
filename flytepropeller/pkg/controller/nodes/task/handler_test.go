@@ -126,6 +126,8 @@ func Test_task_Setup(t *testing.T) {
 	k8sPluginDefault := &pluginK8sMocks.Plugin{}
 	k8sPluginDefault.OnGetProperties().Return(pluginK8s.PluginProperties{})
 
+	loadErrorPluginType := "loadError"
+
 	corePluginEntry := pluginCore.PluginEntry{
 		ID:                  corePluginType,
 		RegisteredTaskTypes: []pluginCore.TaskType{corePluginType},
@@ -153,6 +155,13 @@ func Test_task_Setup(t *testing.T) {
 		Plugin:              k8sPluginDefault,
 		RegisteredTaskTypes: []pluginCore.TaskType{k8sPluginDefaultType},
 		ResourceToWatch:     &v1.Pod{},
+	}
+	loadErrorPluginEntry := pluginCore.PluginEntry{
+		ID:                  loadErrorPluginType,
+		RegisteredTaskTypes: []pluginCore.TaskType{loadErrorPluginType},
+		LoadPlugin: func(ctx context.Context, iCtx pluginCore.SetupContext) (pluginCore.Plugin, error) {
+			return nil, fmt.Errorf("test")
+		},
 	}
 
 	type wantFields struct {
@@ -232,6 +241,15 @@ func Test_task_Setup(t *testing.T) {
 				},
 			},
 			false},
+		{"load-error",
+			testPluginRegistry{
+				core: []pluginCore.PluginEntry{loadErrorPluginEntry},
+				k8s:  []pluginK8s.PluginEntry{},
+			},
+			[]string{loadErrorPluginType},
+			map[string]string{corePluginType: loadErrorPluginType},
+			wantFields{},
+			true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
