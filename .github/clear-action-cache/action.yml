@@ -1,0 +1,11 @@
+name: 'Clear action cache'
+description: 'As suggested by GitHub to prevent low disk space: https://github.com/actions/runner-images/issues/2840#issuecomment-790492173'
+runs:
+  using: 'composite'
+  steps:
+    - shell: bash
+      run: |
+        rm -rf /usr/share/dotnet
+        rm -rf /opt/ghc
+        rm -rf "/usr/local/share/boost"
+        rm -rf "$AGENT_TOOLSDIRECTORY"

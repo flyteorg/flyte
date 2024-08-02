@@ -27,6 +27,8 @@ jobs:
   docs:
     runs-on: ubuntu-latest
     steps:
+      - name: 'Clear action cache'
+        uses: ./.github/actions/clear-action-cache
       - name: Fetch flyte code
         uses: actions/checkout@v4
         with:
