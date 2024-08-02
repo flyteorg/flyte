@@ -13,6 +13,10 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
+const (
+	foo = "foo"
+)
+
 var lpApplicationConfig = testutils.GetApplicationConfigWithDefaultDomains()
 
 // Define constant for reused string
@@ -397,7 +401,7 @@ func TestValidateSchedule_KickoffTimeArgPointsAtWrongType(t *testing.T) {
 	request := testutils.GetLaunchPlanRequestWithDeprecatedCronSchedule("* * * * * *")
 	inputMap := &core.ParameterMap{
 		Parameters: map[string]*core.Parameter{
-			"foo": {
+			foo: {
 				Var: &core.Variable{
 					Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING}},
 				},
@@ -417,7 +421,7 @@ func TestValidateSchedule_NoRequired(t *testing.T) {
 	request := testutils.GetLaunchPlanRequestWithDeprecatedCronSchedule("* * * * * *")
 	inputMap := &core.ParameterMap{
 		Parameters: map[string]*core.Parameter{
-			"foo": {
+			foo: {
 				Var: &core.Variable{
 					Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING}},
 				},
@@ -436,7 +440,7 @@ func TestValidateSchedule_KickoffTimeBound(t *testing.T) {
 	request := testutils.GetLaunchPlanRequestWithDeprecatedCronSchedule("* * * * * *")
 	inputMap := &core.ParameterMap{
 		Parameters: map[string]*core.Parameter{
-			"foo": {
+			foo: {
 				Var: &core.Variable{
 					Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_DATETIME}},
 				},
@@ -446,7 +450,7 @@ func TestValidateSchedule_KickoffTimeBound(t *testing.T) {
 			},
 		},
 	}
-	request.Spec.EntityMetadata.Schedule.KickoffTimeInputArg = "foo"
+	request.Spec.EntityMetadata.Schedule.KickoffTimeInputArg = foo
 
 	err := validateSchedule(request, inputMap)
 	assert.Nil(t, err)
