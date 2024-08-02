@@ -569,10 +569,10 @@ pub mod _flyteidl_rust {
             ResourceListRequest, Schedule, SourceCode, SystemMetadata, Task, TaskClosure,
             TaskCreateRequest, TaskCreateResponse, TaskExecution, TaskExecutionClosure,
             TaskExecutionGetDataRequest, TaskExecutionGetDataResponse, TaskExecutionGetRequest,
-            TaskExecutionList, TaskExecutionListRequest, TaskSpec, Workflow, WorkflowClosure,
-            WorkflowCreateRequest, WorkflowCreateResponse, WorkflowExecutionGetDataRequest,
-            WorkflowExecutionGetDataResponse, WorkflowExecutionGetRequest, WorkflowList,
-            WorkflowNodeMetadata, WorkflowSpec,
+            TaskExecutionList, TaskExecutionListRequest, TaskSpec, UrlBlob, Workflow,
+            WorkflowClosure, WorkflowCreateRequest, WorkflowCreateResponse,
+            WorkflowExecutionGetDataRequest, WorkflowExecutionGetDataResponse,
+            WorkflowExecutionGetRequest, WorkflowList, WorkflowNodeMetadata, WorkflowSpec,
         };
     }
     #[pymodule]
