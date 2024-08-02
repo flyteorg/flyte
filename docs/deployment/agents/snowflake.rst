@@ -6,7 +6,7 @@ Snowflake agent
 This guide provides an overview of how to set up the Snowflake agent in your Flyte deployment.
 
 1. Set up the key pair authentication in Snowflake. For more details, see the `Snowflake key-pair authentication and key-pair rotation guide <https://docs.snowflake.com/en/user-guide/key-pair-auth>`__.
-2. Create a secret with the group "private_key" and the key "snowflake".
+2. Create a secret with the group "private-key" and the key "snowflake".
    This is hardcoded in the flytekit sdk, since we can't know the group and key name in advance.
    This is for permission to upload and download data with structured dataset in python task pod.
 
