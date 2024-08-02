@@ -248,13 +248,14 @@ func (t *Handler) Setup(ctx context.Context, sCtx interfaces.SetupContext) error
 		logger.Infof(ctx, "Loading Plugin [%s] ENABLED", p.ID)
 		cp, err := pluginCore.LoadPlugin(ctx, sCtxFinal, p)
 
+		if err != nil {
+			return regErrors.Wrapf(err, "failed to load plugin - %s", p.ID)
+		}
+
 		if cp.GetID() == agent.ID {
 			t.agentService.CorePlugin = cp
 		}
 
-		if err != nil {
-			return regErrors.Wrapf(err, "failed to load plugin - %s", p.ID)
-		}
 		// For every default plugin for a task type specified in flytepropeller config we validate that the plugin's
 		// static definition includes that task type as something it is registered to handle.
 		for _, tt := range p.RegisteredTaskTypes {
