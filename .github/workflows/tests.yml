@@ -32,7 +32,7 @@ jobs:
         with:
           path: flyte
       - name: 'Clear action cache'
-        uses: flyte/.github/actions/clear-action-cache
+        uses: ./flyte/.github/actions/clear-action-cache
       - name: Fetch flytekit code
         uses: actions/checkout@v4
         with:
