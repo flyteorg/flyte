@@ -1,11 +1,9 @@
 package validators
 
 import (
-	"strings"
-
-	structpb "github.com/golang/protobuf/ptypes/struct"
-
 	flyte "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	structpb "github.com/golang/protobuf/ptypes/struct"
+	"strings"
 )
 
 type typeChecker interface {
@@ -38,13 +36,16 @@ func (t trivialChecker) CastsFrom(upstreamType *flyte.LiteralType) bool {
 	// Ignore metadata when comparing types.
 	upstreamTypeCopy := *upstreamType
 	downstreamTypeCopy := *t.literalType
-	upstreamTypeCopy.Structure = &flyte.TypeStructure{}
-	downstreamTypeCopy.Structure = &flyte.TypeStructure{}
+	if upstreamTypeCopy.GetUnionType() == nil && downstreamTypeCopy.GetUnionType() == nil {
+		upstreamTypeCopy.Structure = &flyte.TypeStructure{}
+		downstreamTypeCopy.Structure = &flyte.TypeStructure{}
+	}
+
 	upstreamTypeCopy.Metadata = &structpb.Struct{}
 	downstreamTypeCopy.Metadata = &structpb.Struct{}
 	upstreamTypeCopy.Annotation = &flyte.TypeAnnotation{}
 	downstreamTypeCopy.Annotation = &flyte.TypeAnnotation{}
-	return upstreamTypeCopy.String() == downstreamTypeCopy.String()
+	return upstreamTypeCopy.String() == downstreamTypeCopy.String() && upstreamTypeCopy.GetStructure() == downstreamTypeCopy.GetStructure()
 }
 
 type noneTypeChecker struct{}
