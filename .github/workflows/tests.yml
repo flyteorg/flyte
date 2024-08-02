@@ -35,8 +35,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: "${{ github.workspace }}/flyte"
-      - name: 'Clear action cache'
-        uses: "${{ github.workspace }}/flyte/.github/actions/clear-action-cache"
       - name: Fetch flytekit code
         uses: actions/checkout@v4
         with:
