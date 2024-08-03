@@ -33,7 +33,7 @@ func TestGenerateTaskGroupName(t *testing.T) {
 			expect: fmt.Sprintf("%s-%s-%d", TaskGroupGenericName, "worker", 1),
 		},
 	}
-	t.Run("Gernerate ray task group name", func(t *testing.T) {
+	t.Run("Generate ray task group name", func(t *testing.T) {
 		for _, tt := range tests {
 			got := GenerateTaskGroupName(tt.input.isMaster, tt.input.index)
 			assert.Equal(t, tt.expect, got)
