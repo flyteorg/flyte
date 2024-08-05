@@ -237,7 +237,7 @@ deployment:
   resources:
     requests:
       cpu: "4"
-      memory: "4G"
+      memory: "4Gi"
   # podSecurityContext Specify security context for Flyte pod
   # See: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
   podSecurityContext:
