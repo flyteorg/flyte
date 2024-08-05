@@ -9406,6 +9406,7 @@
                  * @memberof flyteidl.core
                  * @interface IRetryStrategy
                  * @property {number|null} [retries] RetryStrategy retries
+                 * @property {google.protobuf.IDuration|null} [retryDelay] RetryStrategy retryDelay
                  */
     
                 /**
@@ -9430,6 +9431,14 @@
                  * @instance
                  */
                 RetryStrategy.prototype.retries = 0;
+    
+                /**
+                 * RetryStrategy retryDelay.
+                 * @member {google.protobuf.IDuration|null|undefined} retryDelay
+                 * @memberof flyteidl.core.RetryStrategy
+                 * @instance
+                 */
+                RetryStrategy.prototype.retryDelay = null;
     
                 /**
                  * Creates a new RetryStrategy instance using the specified properties.
@@ -9457,6 +9466,8 @@
                         writer = $Writer.create();
                     if (message.retries != null && message.hasOwnProperty("retries"))
                         writer.uint32(/* id 5, wireType 0 =*/40).uint32(message.retries);
+                    if (message.retryDelay != null && message.hasOwnProperty("retryDelay"))
+                        $root.google.protobuf.Duration.encode(message.retryDelay, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
                     return writer;
                 };
     
@@ -9481,6 +9492,9 @@
                         case 5:
                             message.retries = reader.uint32();
                             break;
+                        case 6:
+                            message.retryDelay = $root.google.protobuf.Duration.decode(reader, reader.uint32());
+                            break;
                         default:
                             reader.skipType(tag & 7);
                             break;
@@ -9503,6 +9517,11 @@
                     if (message.retries != null && message.hasOwnProperty("retries"))
                         if (!$util.isInteger(message.retries))
                             return "retries: integer expected";
+                    if (message.retryDelay != null && message.hasOwnProperty("retryDelay")) {
+                        var error = $root.google.protobuf.Duration.verify(message.retryDelay);
+                        if (error)
+                            return "retryDelay." + error;
+                    }
                     return null;
                 };
     

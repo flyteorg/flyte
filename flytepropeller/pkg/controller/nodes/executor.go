@@ -201,6 +201,16 @@ func (c *recursiveNodeExecutor) RecursiveNodeHandler(ctx context.Context, execCo
 		// 6. Thus we can get rid of SetInputs for StartNode as well
 		logger.Debugf(currentNodeCtx, "Handling node Status [%v]", nodeStatus.GetPhase().String())
 
+		// if it's configured to retry with delay, we should sleep before retrying
+		if nodeStatus.GetPhase() == v1alpha1.NodePhaseRetryableFailure {
+			if currentNode.GetRetryStrategy().RetryDelay != nil {
+				sleepDuration := time.Until(nodeStatus.GetTaskNodeStatus().GetLastPhaseUpdatedAt().Add(currentNode.GetRetryStrategy().RetryDelay.Duration))
+				if sleepDuration > 0 {
+					logger.Infof(currentNodeCtx, "Sleeping for [%v] before retrying", sleepDuration)
+					time.Sleep(sleepDuration)
+				}
+			}
+		}
 		t := c.metrics.NodeExecutionTime.Start(ctx)
 		defer t.Stop()
 

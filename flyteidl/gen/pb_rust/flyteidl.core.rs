@@ -600,6 +600,9 @@ pub struct RetryStrategy {
     /// The number of retries must be less than or equals to 10.
     #[prost(uint32, tag="5")]
     pub retries: u32,
+    /// Delay between retries.
+    #[prost(message, optional, tag="6")]
+    pub retry_delay: ::core::option::Option<::prost_types::Duration>,
 }
 /// Encapsulation of fields that uniquely identifies a Flyte resource.
 #[allow(clippy::derive_partial_eq_without_eq)]
