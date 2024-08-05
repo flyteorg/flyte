@@ -2,13 +2,13 @@ package get
 
 import (
 	"context"
+	"fmt"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
+	"google.golang.org/grpc"
 
-	"github.com/flyteorg/flyte/flytectl/cmd/config"
-	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/project"
 	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
 	"github.com/flyteorg/flyte/flytectl/pkg/printer"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/golang/protobuf/proto"
 )
 
@@ -75,28 +75,15 @@ func ProjectToProtoMessages(l []*admin.Project) []proto.Message {
 }
 
 func getProjectsFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
-	adminPrinter := printer.Printer{}
 
-	projects, err := cmdCtx.AdminFetcherExt().ListProjects(ctx, project.DefaultConfig.Filter)
-	if err != nil {
-		return err
+	clientSet := cmdCtx.ClientSet()
+
+	opts := []grpc.CallOption{
+		grpc.MaxRecvMsgSizeCallOption{MaxRecvMsgSize: 20 * 1024 * 1024},
 	}
+	req := service.GetDataRequest{FlyteUrl: "flyte://v1/daniel/development/fafa413ee6d26467fbee/n0/o"}
+	_, err := clientSet.DataProxyClient().GetData(ctx, &req, opts...)
+	fmt.Printf("err: %v\n", err)
 
-	if len(args) == 1 {
-		id := args[0]
-		logger.Debugf(ctx, "Retrieved %v projects", len(projects.Projects))
-		for _, v := range projects.Projects {
-			if v.Id == id {
-				err := adminPrinter.Print(config.GetConfig().MustOutputFormat(), projectColumns, v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}
-		}
-		return nil
-	}
-
-	logger.Debugf(ctx, "Retrieved %v projects", len(projects.Projects))
-	return adminPrinter.Print(config.GetConfig().MustOutputFormat(), projectColumns, ProjectToProtoMessages(projects.Projects)...)
+	return err
 }
