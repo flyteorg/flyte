@@ -39,4 +39,3 @@ docs/_src
 docs/_projects
 docs/api
 docs/tests
-flyteidl/gen/pb_rust/
