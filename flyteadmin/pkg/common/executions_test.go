@@ -31,8 +31,8 @@ func TestGetExecutionName_HumanHash(t *testing.T) {
 	for i := 0; i < len(randString); i++ {
 		assert.Contains(t, AllowedExecutionIDHumanHashChars, rune(randString[i]))
 	}
-    hyphenCount := strings.Count(randString, "-")
-    assert.Equal(t, 2, hyphenCount, "HumanHash should contain exactly two hyphens")
-    words := strings.Split(randString, "-")
-    assert.Equal(t, 3, len(words), "HumanHash should be split into exactly three words")
+	hyphenCount := strings.Count(randString, "-")
+	assert.Equal(t, 2, hyphenCount, "HumanHash should contain exactly two hyphens")
+	words := strings.Split(randString, "-")
+	assert.Equal(t, 3, len(words), "HumanHash should be split into exactly three words")
 }
