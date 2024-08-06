@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: "version name. example v1.2.3"
+        description: "version. Do *not* use the `flyteidl/` prefix, e.g. `flyteidl/v1.2.3`, instead use only `v1.2.3` (including the `v`)"
         required: true
 
 jobs:
