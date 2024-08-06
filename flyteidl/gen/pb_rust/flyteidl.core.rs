@@ -410,8 +410,8 @@ pub struct Binary {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Json {
-    #[prost(string, tag="1")]
-    pub value: ::prost::alloc::string::String,
+    #[prost(bytes="vec", tag="1")]
+    pub value: ::prost::alloc::vec::Vec<u8>,
 }
 /// A strongly typed schema that defines the interface of data retrieved from the underlying storage medium.
 #[allow(clippy::derive_partial_eq_without_eq)]

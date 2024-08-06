@@ -7328,7 +7328,8 @@
       "type": "object",
       "properties": {
         "value": {
-          "type": "string"
+          "type": "string",
+          "format": "byte"
         }
       }
     },

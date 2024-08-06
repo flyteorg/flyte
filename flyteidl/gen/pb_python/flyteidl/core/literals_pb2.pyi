@@ -54,8 +54,8 @@ class Binary(_message.Message):
 class Json(_message.Message):
     __slots__ = ["value"]
     VALUE_FIELD_NUMBER: _ClassVar[int]
-    value: str
-    def __init__(self, value: _Optional[str] = ...) -> None: ...
+    value: bytes
+    def __init__(self, value: _Optional[bytes] = ...) -> None: ...
 
 class Schema(_message.Message):
     __slots__ = ["uri", "type"]

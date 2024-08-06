@@ -258,9 +258,9 @@ export class Binary extends Message<Binary> {
  */
 export class Json extends Message<Json> {
   /**
-   * @generated from field: string value = 1;
+   * @generated from field: bytes value = 1;
    */
-  value = "";
+  value = new Uint8Array(0);
 
   constructor(data?: PartialMessage<Json>) {
     super();
@@ -270,7 +270,7 @@ export class Json extends Message<Json> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "flyteidl.core.Json";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "value", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 1, name: "value", kind: "scalar", T: 12 /* ScalarType.BYTES */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Json {

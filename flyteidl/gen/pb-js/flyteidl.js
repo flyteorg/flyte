@@ -7280,7 +7280,7 @@
                  * Properties of a Json.
                  * @memberof flyteidl.core
                  * @interface IJson
-                 * @property {string|null} [value] Json value
+                 * @property {Uint8Array|null} [value] Json value
                  */
     
                 /**
@@ -7300,11 +7300,11 @@
     
                 /**
                  * Json value.
-                 * @member {string} value
+                 * @member {Uint8Array} value
                  * @memberof flyteidl.core.Json
                  * @instance
                  */
-                Json.prototype.value = "";
+                Json.prototype.value = $util.newBuffer([]);
     
                 /**
                  * Creates a new Json instance using the specified properties.
@@ -7331,7 +7331,7 @@
                     if (!writer)
                         writer = $Writer.create();
                     if (message.value != null && message.hasOwnProperty("value"))
-                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.value);
+                        writer.uint32(/* id 1, wireType 2 =*/10).bytes(message.value);
                     return writer;
                 };
     
@@ -7354,7 +7354,7 @@
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
                         case 1:
-                            message.value = reader.string();
+                            message.value = reader.bytes();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -7376,8 +7376,8 @@
                     if (typeof message !== "object" || message === null)
                         return "object expected";
                     if (message.value != null && message.hasOwnProperty("value"))
-                        if (!$util.isString(message.value))
-                            return "value: string expected";
+                        if (!(message.value && typeof message.value.length === "number" || $util.isString(message.value)))
+                            return "value: buffer expected";
                     return null;
                 };
     

@@ -3049,7 +3049,7 @@ export namespace flyteidl {
         interface IJson {
 
             /** Json value */
-            value?: (string|null);
+            value?: (Uint8Array|null);
         }
 
         /** Represents a Json. */
@@ -3062,7 +3062,7 @@ export namespace flyteidl {
             constructor(properties?: flyteidl.core.IJson);
 
             /** Json value. */
-            public value: string;
+            public value: Uint8Array;
 
             /**
              * Creates a new Json instance using the specified properties.

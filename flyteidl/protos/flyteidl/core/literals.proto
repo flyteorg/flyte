@@ -47,7 +47,7 @@ message Binary {
 }
 
 message Json {
-    string value = 1;
+    bytes value = 1;
 }
 
 // A strongly typed schema that defines the interface of data retrieved from the underlying storage medium.
