@@ -272,6 +272,10 @@ Specify plugin configuration
                      - container: container
                      - container_array: k8s-array
                      - ray: ray
+               plugins:
+                ray:
+                  // Shutdown Ray cluster after 1 hour of inactivity
+                  ttlSecondsAfterFinished: 3600
 
       .. group-tab:: Flyte core
 
@@ -294,6 +298,10 @@ Specify plugin configuration
                     sidecar: sidecar
                     container_array: k8s-array
                     ray: ray
+              plugins:
+                ray:
+                  // Shutdown Ray cluster after 1 hour of inactivity
+                  ttlSecondsAfterFinished: 3600
 
   .. group-tab:: Spark
 
