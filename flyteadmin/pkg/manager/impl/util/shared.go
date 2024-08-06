@@ -13,6 +13,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/validation"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
 	repoInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
+	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/transformers"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
@@ -21,11 +22,11 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
-func GetExecutionName(request admin.ExecutionCreateRequest) string {
+func GetExecutionName(request admin.ExecutionCreateRequest, config runtimeInterfaces.ApplicationConfiguration) string {
 	if request.Name != "" {
 		return request.Name
 	}
-	return common.GetExecutionName(time.Now().UnixNano())
+	return common.GetExecutionName(time.Now().UnixNano(), config.GetTopLevelConfig().FeatureGates.EnableHumanHash)
 }
 
 func GetTask(ctx context.Context, repo repoInterfaces.Repository, identifier core.Identifier) (
