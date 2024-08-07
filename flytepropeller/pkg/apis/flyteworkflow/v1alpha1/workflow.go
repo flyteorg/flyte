@@ -79,6 +79,11 @@ type FlyteWorkflow struct {
 
 	// Flyteconsole url
 	ConsoleURL string `json:"consoleUrl,omitempty"`
+
+	// Much like WorkflowClosureReference, this field represents the location of offloaded inputs. If this exists,
+	// then the literal Inputs must not be populated. Flytepropeller must retrieve and parse the static inputs prior to
+	// processing.
+	OffloadedInputs DataReference `json:"offloadedInputs,omitempty"`
 }
 
 func (in *FlyteWorkflow) GetSecurityContext() core.SecurityContext {

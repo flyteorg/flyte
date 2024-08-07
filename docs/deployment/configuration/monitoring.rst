@@ -133,7 +133,7 @@ This is especially true if you plan to use the Service Monitors provided by the 
 
 .. note::
 
-   By default, the ``ServiceMonitor`` is configured with a ``scrapeTimeout`` of 30s and and ``interval`` of 60s. You can customize these values if needed.
+   By default, the ``ServiceMonitor`` is configured with a ``scrapeTimeout`` of 30s and ``interval`` of 60s. You can customize these values if needed.
 
 With the above configuration in place you should be able to import the dashboards in your Grafana instance.
 

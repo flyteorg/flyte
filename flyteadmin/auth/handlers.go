@@ -5,11 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/textproto"
 	"net/url"
 	"strings"
 	"time"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware/util/metautils"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"golang.org/x/oauth2"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -22,6 +24,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyte/flyteadmin/plugins"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
+	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
@@ -31,6 +34,8 @@ const (
 	FromHTTPKey          = "from_http"
 	FromHTTPVal          = "true"
 )
+
+var XRequestID = textproto.CanonicalMIMEHeaderKey(contextutils.RequestIDKey.String())
 
 type PreRedirectHookError struct {
 	Message string
@@ -531,5 +536,20 @@ func GetUserInfoForwardResponseHandler() UserInfoForwardResponseHandler {
 			w.Header().Set("X-User-Subject", info.Subject)
 		}
 		return nil
+	}
+}
+
+func GetCustomHeaderMatcher(pluginRegistry *plugins.Registry) runtime.HeaderMatcherFunc {
+	if fn := plugins.Get[runtime.HeaderMatcherFunc](pluginRegistry, plugins.PluginIDCustomerHeaderMatcher); fn != nil {
+		return fn
+	}
+	return func(key string) (string, bool) {
+		canonicalKey := textproto.CanonicalMIMEHeaderKey(key)
+		switch canonicalKey {
+		case XRequestID:
+			return canonicalKey, true
+		default:
+			return runtime.DefaultHeaderMatcher(key)
+		}
 	}
 }

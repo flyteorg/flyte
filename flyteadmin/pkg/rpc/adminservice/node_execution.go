@@ -14,7 +14,6 @@ import (
 
 func (m *AdminService) CreateNodeEvent(
 	ctx context.Context, request *admin.NodeExecutionEventRequest) (*admin.NodeExecutionEventResponse, error) {
-	defer m.interceptPanic(ctx, request)
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
@@ -32,7 +31,6 @@ func (m *AdminService) CreateNodeEvent(
 
 func (m *AdminService) GetNodeExecution(
 	ctx context.Context, request *admin.NodeExecutionGetRequest) (*admin.NodeExecution, error) {
-	defer m.interceptPanic(ctx, request)
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
@@ -49,7 +47,6 @@ func (m *AdminService) GetNodeExecution(
 }
 
 func (m *AdminService) GetDynamicNodeWorkflow(ctx context.Context, request *admin.GetDynamicNodeWorkflowRequest) (*admin.DynamicNodeWorkflowResponse, error) {
-	defer m.interceptPanic(ctx, request)
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
@@ -68,7 +65,6 @@ func (m *AdminService) GetDynamicNodeWorkflow(ctx context.Context, request *admi
 
 func (m *AdminService) ListNodeExecutions(
 	ctx context.Context, request *admin.NodeExecutionListRequest) (*admin.NodeExecutionList, error) {
-	defer m.interceptPanic(ctx, request)
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
@@ -86,7 +82,6 @@ func (m *AdminService) ListNodeExecutions(
 
 func (m *AdminService) ListNodeExecutionsForTask(
 	ctx context.Context, request *admin.NodeExecutionForTaskListRequest) (*admin.NodeExecutionList, error) {
-	defer m.interceptPanic(ctx, request)
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
@@ -111,7 +106,6 @@ func (m *AdminService) ListNodeExecutionsForTask(
 
 func (m *AdminService) GetNodeExecutionData(
 	ctx context.Context, request *admin.NodeExecutionGetDataRequest) (*admin.NodeExecutionGetDataResponse, error) {
-	defer m.interceptPanic(ctx, request)
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}

@@ -4311,20 +4311,6 @@
       "default": "UNKNOWN",
       "title": "Error type: System or User"
     },
-    "ExecutionMetadataExecutionMode": {
-      "type": "string",
-      "enum": [
-        "MANUAL",
-        "SCHEDULED",
-        "SYSTEM",
-        "RELAUNCH",
-        "CHILD_WORKFLOW",
-        "RECOVERED",
-        "TRIGGER"
-      ],
-      "default": "MANUAL",
-      "description": "The method by which this execution was launched.\n\n - MANUAL: The default execution mode, MANUAL implies that an execution was launched by an individual.\n - SCHEDULED: A schedule triggered this execution launch.\n - SYSTEM: A system process was responsible for launching this execution rather an individual.\n - RELAUNCH: This execution was launched with identical inputs as a previous execution.\n - CHILD_WORKFLOW: This execution was triggered by another execution.\n - RECOVERED: This execution was recovered from another execution.\n - TRIGGER: Execution was kicked off by the artifact trigger system"
-    },
     "IOStrategyDownloadMode": {
       "type": "string",
       "enum": [
@@ -4885,7 +4871,7 @@
       "type": "object",
       "properties": {
         "mode": {
-          "$ref": "#/definitions/ExecutionMetadataExecutionMode"
+          "$ref": "#/definitions/adminExecutionMetadataExecutionMode"
         },
         "principal": {
           "type": "string",
@@ -4923,6 +4909,20 @@
         }
       },
       "description": "Represents attributes about an execution which are not required to launch the execution but are useful to record.\nThese attributes are assigned at launch time and do not change."
+    },
+    "adminExecutionMetadataExecutionMode": {
+      "type": "string",
+      "enum": [
+        "MANUAL",
+        "SCHEDULED",
+        "SYSTEM",
+        "RELAUNCH",
+        "CHILD_WORKFLOW",
+        "RECOVERED",
+        "TRIGGER"
+      ],
+      "default": "MANUAL",
+      "description": "The method by which this execution was launched.\n\n - MANUAL: The default execution mode, MANUAL implies that an execution was launched by an individual.\n - SCHEDULED: A schedule triggered this execution launch.\n - SYSTEM: A system process was responsible for launching this execution rather an individual.\n - RELAUNCH: This execution was launched with identical inputs as a previous execution.\n - CHILD_WORKFLOW: This execution was triggered by another execution.\n - RECOVERED: This execution was recovered from another execution.\n - TRIGGER: Execution was kicked off by the artifact trigger system"
     },
     "adminExecutionQueueAttributes": {
       "type": "object",
@@ -6556,9 +6556,22 @@
           "type": "number",
           "format": "float",
           "description": "If the array job size is not known beforehand, the min_success_ratio can instead be used\nto determine when an ArrayNode can be marked successful."
+        },
+        "execution_mode": {
+          "$ref": "#/definitions/coreArrayNodeExecutionMode",
+          "description": "execution_mode determines the execution path for ArrayNode."
         }
       },
       "description": "ArrayNode is a Flyte node type that simplifies the execution of a sub-node over a list of input\nvalues. An ArrayNode can be executed with configurable parallelism (separate from the parent\nworkflow) and can be configured to succeed when a certain number of sub-nodes succeed."
+    },
+    "coreArrayNodeExecutionMode": {
+      "type": "string",
+      "enum": [
+        "MINIMAL_STATE",
+        "FULL_STATE"
+      ],
+      "default": "MINIMAL_STATE",
+      "description": " - MINIMAL_STATE: Indicates the ArrayNode will store minimal state for the sub-nodes.\nThis is more efficient, but only supports a subset of Flyte entities.\n - FULL_STATE: Indicates the ArrayNode will store full state for the sub-nodes.\nThis supports a wider range of Flyte entities."
     },
     "coreArtifactBindingData": {
       "type": "object",

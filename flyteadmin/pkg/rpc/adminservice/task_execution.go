@@ -15,7 +15,6 @@ import (
 
 func (m *AdminService) CreateTaskEvent(
 	ctx context.Context, request *admin.TaskExecutionEventRequest) (*admin.TaskExecutionEventResponse, error) {
-	defer m.interceptPanic(ctx, request)
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
@@ -34,7 +33,6 @@ func (m *AdminService) CreateTaskEvent(
 
 func (m *AdminService) GetTaskExecution(
 	ctx context.Context, request *admin.TaskExecutionGetRequest) (*admin.TaskExecution, error) {
-	defer m.interceptPanic(ctx, request)
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
@@ -62,7 +60,6 @@ func (m *AdminService) GetTaskExecution(
 
 func (m *AdminService) ListTaskExecutions(
 	ctx context.Context, request *admin.TaskExecutionListRequest) (*admin.TaskExecutionList, error) {
-	defer m.interceptPanic(ctx, request)
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Nil request")
 	}
@@ -84,7 +81,6 @@ func (m *AdminService) ListTaskExecutions(
 
 func (m *AdminService) GetTaskExecutionData(
 	ctx context.Context, request *admin.TaskExecutionGetDataRequest) (*admin.TaskExecutionGetDataResponse, error) {
-	defer m.interceptPanic(ctx, request)
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}

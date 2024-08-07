@@ -386,8 +386,6 @@ flytepropeller:
 
   prometheus:
     enabled: false
-    path: "/metrics"
-    port: 10254
 
 #
 # FLYTECONSOLE SETTINGS
@@ -541,8 +539,6 @@ webhook:
 
   prometheus:
     enabled: false
-    path: "/metrics"
-    port: 10254
 
 # ------------------------------------------------
 #
