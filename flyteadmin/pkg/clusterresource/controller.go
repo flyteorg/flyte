@@ -363,8 +363,8 @@ func (c *controller) syncNamespace(ctx context.Context, project *admin.Project, 
 				continue
 			}
 
-			logger.Debugf(ctx, "Attempting to create resource [%+v] in cluster [%v] for namespace [%s] and templateFileName: %+v",
-				dynamicObj.obj.GetKind(), target.ID, namespace, templateFileName)
+			logger.Debugf(ctx, "Attempting to create resource [%+v] in cluster [%v] for namespace [%s] and templateFileName: %+v with k8sManifest %v",
+				dynamicObj.obj.GetKind(), target.ID, namespace, templateFileName, k8sManifest)
 
 			dr := getDynamicResourceInterface(dynamicObj.mapping, target.DynamicClient, namespace)
 			_, err = dr.Create(ctx, dynamicObj.obj, metav1.CreateOptions{})
@@ -586,11 +586,11 @@ func (c *controller) createResourceFromTemplate(ctx context.Context, templateDir
 	templateValues[fmt.Sprintf(templateVariableFormat, domainVariable)] = domain.Id
 
 	var k8sManifest = string(template)
-	for templateKey, templateValue := range templateValues {
+	for templateKey, templateValue := range customTemplateValues {
 		k8sManifest = strings.Replace(k8sManifest, templateKey, templateValue, replaceAllInstancesOfString)
 	}
 	// Replace remaining template variables from domain specific defaults.
-	for templateKey, templateValue := range customTemplateValues {
+	for templateKey, templateValue := range templateValues {
 		k8sManifest = strings.Replace(k8sManifest, templateKey, templateValue, replaceAllInstancesOfString)
 	}
 
