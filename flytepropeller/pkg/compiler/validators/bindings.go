@@ -173,7 +173,7 @@ func validateBinding(w c.WorkflowBuilder, node c.Node, nodeParam string, binding
 		if literalType == nil {
 			errs.Collect(errors.NewUnrecognizedValueErr(nodeID, reflect.TypeOf(val.Scalar.GetValue()).String()))
 		} else if validateParamTypes && !AreTypesCastable(literalType, expectedType) {
-			errs.Collect(errors.NewMismatchingTypesErr(nodeID, "", nodeParam, literalType.String(), expectedType.String()))
+			errs.Collect(errors.NewMismatchingTypesErr(nodeID, nodeParam, literalType.String(), "", expectedType.String()))
 		}
 
 		if expectedType.GetEnumType() != nil {
