@@ -29,7 +29,7 @@ import pandas as pd
 from flytekit import task, workflow
 
 
-@task(enable_deck=False)
+@task(enable_deck=True)
 def iris_data() -> pd.DataFrame:
     ...
 ```
@@ -51,7 +51,7 @@ from typing import Optional
 from flytekit import task, workflow
 
 
-@task(enable_deck=False)
+@task(enable_deck=True)
 def iris_data(
     sample_frac: Optional[float] = None,
     random_state: Optional[int] = None,
@@ -168,7 +168,7 @@ function. In the following example, we extend the `iris_data` task with:
 import flytekit
 from flytekitplugins.deck.renderer import MarkdownRenderer, BoxRenderer
 
-@task(enable_deck=False)
+@task(enable_deck=True)
 def iris_data(
     sample_frac: Optional[float] = None,
     random_state: Optional[int] = None,
@@ -220,7 +220,7 @@ except ImportError:
     from typing_extensions import Annotated
 
 
-@task(enable_deck=False)
+@task(enable_deck=True)
 def iris_data(
     sample_frac: Optional[float] = None,
     random_state: Optional[int] = None,
