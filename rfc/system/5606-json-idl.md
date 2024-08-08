@@ -254,6 +254,7 @@ We will pass the value to our class, which inherits from `click.ParamType`, and 
 ##### Before
 ###### Convert Python Value to Literal
 Uses `mashumaro JSON Encoder` to turn a dataclass value to a JSON string, and store it to protobuf `Struct` .
+
 Note: For `FlyteTypes`, we will inherit mashumaro `SerializableType` to define our own serialization behavior, which includes upload file to remote storage.
 
 ###### Convert Literal to Python Value
@@ -264,6 +265,7 @@ Note: For `FlyteTypes`, we will inherit the mashumaro `SerializableType` to defi
 ###### Convert Python Value to Literal
 ~~Uses `msgpack.dumps()` to turn a Python value into a byte string.~~
 Uses `mashumaro JSON Encoder` to turn a dataclass value to a JSON string, and uses `msgpack.dumps()` to turn the JSON string into a byte string, and store it to protobuf `Json`.
+
 Note: For `FlyteTypes`, we will need to customize serialization behavior by msgpack reference here.
 
 https://github.com/msgpack/msgpack-python?tab=readme-ov-file#packingunpacking-of-custom-data-type 
@@ -272,6 +274,7 @@ https://github.com/msgpack/msgpack-python?tab=readme-ov-file#packingunpacking-of
 
 ~~Uses `msgpack.loads()` to turn a byte string into a Python value.~~
 Uses `msgpack.loads()` to turn a byte string into a JSON string, and uses `mashumaro JSON Decoder` to turn the JSON string into a Python value.
+
 Note: For `FlyteTypes`, we will need to customize deserialization behavior by `msgpack` reference here.
 
 https://github.com/msgpack/msgpack-python?tab=readme-ov-file#packingunpacking-of-custom-data-type 
@@ -285,6 +288,7 @@ Convert Protobuf `Struct` to a JSON string and then convert it to a `BaseModel`.
 ##### After
 ###### Convert Python Value to Literal
 ~~Convert the Pydantic `BaseModel` to a JSON string, then convert the JSON string to a `dictionary`, and finally, convert it to a `byte string` using msgpack.~~
+
 Convert the Pydantic `BaseModel` to a JSON string, then convert the JSON string to a `byte string` using msgpack.
 ###### Convert Literal to Python Value
 ~~Convert `byte string` to a `dictionary` using `msgpack`, then convert dictionary to a JSON string, and finally, convert it to Pydantic `BaseModel`.~~
