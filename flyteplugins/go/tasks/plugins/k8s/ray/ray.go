@@ -28,6 +28,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/ray/batchscheduler"
 )
 
 const (
@@ -119,15 +120,27 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 	podSpec.ServiceAccountName = cfg.ServiceAccount
 
 	headPodSpec := podSpec.DeepCopy()
-
 	rayjob, err := constructRayJob(taskCtx, rayJob, objectMeta, *podSpec, headPodSpec, headNodeRayStartParams, primaryContainerIdx, *primaryContainer)
 
 	return rayjob, err
 }
 
 func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob plugins.RayJob, objectMeta *metav1.ObjectMeta, podSpec v1.PodSpec, headPodSpec *v1.PodSpec, headNodeRayStartParams map[string]string, primaryContainerIdx int, primaryContainer v1.Container) (*rayv1.RayJob, error) {
+	var err error
 	enableIngress := true
 	cfg := GetConfig()
+	schedulerPlugin := batchscheduler.NewSchedulerPlugin(&cfg.BatchScheduler)
+	err = schedulerPlugin.ParseJob(
+		&cfg.BatchScheduler,
+		objectMeta,
+		rayJob.RayCluster.WorkerGroupSpec,
+		&podSpec,
+		primaryContainerIdx,
+	)
+	if err != nil {
+		return nil, err
+	}
+	schedulerPlugin.ProcessHead(objectMeta, headPodSpec, primaryContainerIdx)
 	rayClusterSpec := rayv1.RayClusterSpec{
 		HeadGroupSpec: rayv1.HeadGroupSpec{
 			Template: buildHeadPodTemplate(
@@ -143,9 +156,11 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob plugins.Ra
 		WorkerGroupSpecs:        []rayv1.WorkerGroupSpec{},
 		EnableInTreeAutoscaling: &rayJob.RayCluster.EnableAutoscaling,
 	}
+	schedulerPlugin.AfterProcess(objectMeta)
 
-	for _, spec := range rayJob.RayCluster.WorkerGroupSpec {
+	for index, spec := range rayJob.RayCluster.WorkerGroupSpec {
 		workerPodSpec := podSpec.DeepCopy()
+		schedulerPlugin.ProcessWorker(objectMeta, workerPodSpec, index)
 		workerPodTemplate := buildWorkerPodTemplate(
 			&workerPodSpec.Containers[primaryContainerIdx],
 			workerPodSpec,
@@ -187,6 +202,7 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob plugins.Ra
 		}
 
 		rayClusterSpec.WorkerGroupSpecs = append(rayClusterSpec.WorkerGroupSpecs, workerNodeSpec)
+		schedulerPlugin.AfterProcess(objectMeta)
 	}
 
 	serviceAccountName := flytek8s.GetServiceAccountNameFromTaskExecutionMetadata(taskCtx.TaskExecutionMetadata())
@@ -209,7 +225,6 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob plugins.Ra
 	submitterPodTemplate := buildSubmitterPodTemplate(headPodSpec, objectMeta, taskCtx)
 
 	// TODO: This is for backward compatibility. Remove this block once runtime_env is removed from ray proto.
-	var err error
 	var runtimeEnvYaml string
 	runtimeEnvYaml = rayJob.RuntimeEnvYaml
 	// If runtime_env exists but runtime_env_yaml does not, convert runtime_env to runtime_env_yaml

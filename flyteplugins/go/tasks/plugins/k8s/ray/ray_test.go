@@ -27,6 +27,8 @@ import (
 	mocks2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
+	schedulerConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/ray/batchscheduler/config"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/ray/batchscheduler/scheduler/yunikorn"
 )
 
 const (
@@ -472,6 +474,36 @@ func TestDefaultStartParameters(t *testing.T) {
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Annotations, map[string]string{"annotation-1": "val1"})
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Labels, map[string]string{"label-1": "val1"})
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec.Tolerations, toleration)
+}
+
+func TestYunikornAnnotationsCreate(t *testing.T) {
+	assert.NoError(t, SetConfig(&Config{
+		BatchScheduler: schedulerConfig.Config{
+			Scheduler:  "yunikorn",
+			Parameters: "gangSchedulingStyle=Soft",
+		},
+	}))
+	rayJobResourceHandler := rayJobResourceHandler{}
+	rayJob := &plugins.RayJob{
+		RayCluster: &plugins.RayCluster{
+			HeadGroupSpec:     &plugins.HeadGroupSpec{},
+			WorkerGroupSpec:   []*plugins.WorkerGroupSpec{{GroupName: workerGroupName, Replicas: 3, MinReplicas: 3, MaxReplicas: 3}},
+			EnableAutoscaling: true,
+		},
+		ShutdownAfterJobFinishes: true,
+		TtlSecondsAfterFinished:  120,
+	}
+
+	taskTemplate := dummyRayTaskTemplate("ray-id", rayJob)
+	RayResource, err := rayJobResourceHandler.BuildResource(context.TODO(), dummyRayTaskContext(taskTemplate, resourceRequirements, nil, "", serviceAccount))
+	assert.Nil(t, err)
+	ray, ok := RayResource.(*rayv1.RayJob)
+	assert.True(t, ok)
+	headAnnotations := ray.Spec.RayClusterSpec.HeadGroupSpec.Template.ObjectMeta.Annotations
+	workerAnnotations := ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.ObjectMeta.Annotations
+	assert.Equal(t, yunikorn.GenerateTaskGroupName(true, 0), headAnnotations[yunikorn.TaskGroupNameKey])
+	assert.Equal(t, "gangSchedulingStyle=Soft", headAnnotations[yunikorn.TaskGroupPrarameters])
+	assert.Equal(t, yunikorn.GenerateTaskGroupName(false, 0), workerAnnotations[yunikorn.TaskGroupNameKey])
 }
 
 func TestInjectLogsSidecar(t *testing.T) {
