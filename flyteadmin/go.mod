@@ -3,7 +3,7 @@ module github.com/flyteorg/flyte/flyteadmin
 go 1.21
 
 require (
-	cloud.google.com/go/iam v1.1.5
+	cloud.google.com/go/iam v1.1.6
 	cloud.google.com/go/storage v1.36.0
 	github.com/IBM/sarama v1.40.1
 	github.com/NYTimes/gizmo v1.3.6
@@ -58,8 +58,8 @@ require (
 	golang.org/x/oauth2 v0.18.0
 	golang.org/x/sync v0.7.0
 	golang.org/x/time v0.5.0
-	google.golang.org/api v0.155.0
-	google.golang.org/genproto v0.0.0-20240123012728-ef4313101c80
+	google.golang.org/api v0.160.0
+	google.golang.org/genproto v0.0.0-20240205150955-31a09d347014
 	google.golang.org/grpc v1.62.1
 	google.golang.org/protobuf v1.34.1
 	gorm.io/driver/mysql v1.4.4
@@ -75,10 +75,10 @@ require (
 
 require (
 	cloud.google.com/go v0.112.0 // indirect
-	cloud.google.com/go/compute v1.23.3 // indirect
+	cloud.google.com/go/compute v1.23.4 // indirect
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
-	cloud.google.com/go/pubsub v1.34.0 // indirect
-	cloud.google.com/go/secretmanager v1.11.4 // indirect
+	cloud.google.com/go/pubsub v1.36.1 // indirect
+	cloud.google.com/go/secretmanager v1.11.5 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.8.0 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.3.1 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/internal v1.3.0 // indirect
@@ -204,7 +204,7 @@ require (
 	github.com/tidwall/pretty v1.2.0 // indirect
 	github.com/tidwall/sjson v1.2.5 // indirect
 	go.opencensus.io v0.24.0 // indirect
-	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.46.1 // indirect
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.47.0 // indirect
 	go.opentelemetry.io/otel/exporters/jaeger v1.17.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.24.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.24.0 // indirect
@@ -224,8 +224,8 @@ require (
 	golang.org/x/tools v0.20.0 // indirect
 	gomodules.xyz/jsonpatch/v2 v2.4.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20240123012728-ef4313101c80 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20240123012728-ef4313101c80 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20240125205218-1f4bbc51befe // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20240213162025-012b6fc9bca9 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/ini.v1 v1.66.4 // indirect
 	gopkg.in/jcmturner/aescts.v1 v1.0.1 // indirect

@@ -133,6 +133,7 @@ go-tidy:
 	make -C datacatalog go-tidy
 	make -C fasttask/plugin go-tidy
 	make -C flyteadmin go-tidy
+	make -C flytectl go-tidy
 	make -C flyteidl go-tidy
 	make -C flytepropeller go-tidy
 	make -C flyteplugins go-tidy

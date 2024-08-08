@@ -9,6 +9,9 @@ import (
 	"runtime/pprof"
 	"time"
 
+	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors"
+	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/retry"
+	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/selector"
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
@@ -307,7 +310,20 @@ func New(ctx context.Context, cfg *config.Config, kubeClientset kubernetes.Inter
 
 	adminCfg := admin.GetConfig(ctx)
 	tc := tokenCache.NewTokenCacheInMemoryProvider()
-	clientSet, err := admin.NewClientsetBuilder().WithConfig(adminCfg).WithTokenCache(tc).Build(ctx)
+
+	retryOptions := []retry.CallOption{
+		retry.WithBackoff(retry.BackoffExponential(time.Millisecond * 50)),
+		retry.WithMax(8),
+	}
+	opt := grpc.WithChainStreamInterceptor(
+		selector.StreamClientInterceptor(retry.StreamClientInterceptor(retryOptions...), selector.MatchFunc(
+			func(_ context.Context, c interceptors.CallMeta) bool {
+				return c.FullMethod() == "/flyteidl.service.WatchService/WatchExecutionStatusUpdates"
+			},
+		)),
+	)
+
+	clientSet, err := admin.NewClientsetBuilder().WithConfig(adminCfg).WithTokenCache(tc).WithDialOptions(opt).Build(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize clientset: %w", err)
 	}
