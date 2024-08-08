@@ -22,7 +22,6 @@ import (
 )
 
 func GetExecutionName(request admin.ExecutionCreateRequest) string {
-
 	if request.Name != "" {
 		return request.Name
 	}
