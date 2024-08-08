@@ -38,36 +38,41 @@ def t2(a: dict):
 Json = "json"
 
 @task
-def t1() -> Annotated[dict, Json]: # Json Byte Strings
+def t1() -> dict: # Json Byte Strings
   ...
-  return {"a": 1}  # -> protobuf Json b'{"a": 1}'
+  return {"a": 1}  # protobuf Json b'{"a": 1}'
 
 @task
-def t2(a: Annotated[dict, Json]):
+def t2(a: dict):
   print(a["integer"]) # correct, it will be a integer
 ```
 
 #### Note
-- We use Annotated[dict, Json]  instead of dict to ensure backward compatibility.
-    - This helps us avoid breaking changes.
-- It makes it easier for the frontend to support JSON IDL after these features are merged.
-- If users only upgrade Flytekit, we can ensure they won’t face error when using dict only.
-(Since we have to upgrade both flytepropeller, flyteidl and flytekit to support JSON IDL.)
-
+- ~~We use Annotated[dict, Json]  instead of dict to ensure backward compatibility.~~
+    ~~- This helps us avoid breaking changes.~~
+- ~~It makes it easier for the frontend to support JSON IDL after these features are merged.~~
+- ~~If users only upgrade Flytekit, we can ensure they won’t face error when using dict only.
+(Since we have to upgrade both flytepropeller, flyteidl and flytekit to support JSON IDL.)~~
+- We will use the same type interface, but ensure the backward compatibility.
 
 ### How to create a byte string?
 #### Use MsgPack to convert value to a byte string
 ##### Python
 ```python
 import msgpack
+import json
+
 # Encode
 def to_literal():
-  json_bytes = msgpack.dumps(v)
+  json_str = json.dumps(python_val)
+  json_bytes = msgpack.dumps(json_str)
   return Literal(scalar=Scalar(json=Json(json_bytes)), metadata={"format": "json"})
+
 # Decode
 def to_python_value():
   json_bytes = lv.scalar.json.value
-  return msgpack.loads(json_bytes)
+  json_str = msgpack.loads(json_bytes)
+  return json.loads(json_str)
 ```
 reference: https://github.com/msgpack/msgpack-python 
 
@@ -155,8 +160,8 @@ message Scalar {
 ```
 
 ### FlytePropeller
-1. Attribute Access for dictionary, Datalcass, and Pydantic in workflow.
-Dict[type, type] is supported already, we have to support Datalcass and Pydantic now.
+1. Attribute Access for dictionary, Dataclass, and Pydantic in workflow.
+Dict[type, type] is supported already, we have to support Dataclass and Pydantic now.
 ```python
 from flytekit import task, workflow
 from dataclasses import dataclass
@@ -184,8 +189,7 @@ def wf():
 func literalTypeForScalar(scalar *core.Scalar) *core.LiteralType {
   ...
   case *core.Scalar_Json:
-		literalType = &core.LiteralType\
-			{Type: &core.LiteralType_Simple{Simple: core.SimpleType_JSON}}
+		literalType = &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_JSON}}
   ...
   return literalType 
 }
@@ -237,13 +241,14 @@ We will pass the value to our class, which inherits from `click.ParamType`, and 
 ##### After
 ###### Convert Python Value to Literal
 - `Dict[type, type]` stays the same.
-- `dict` uses `msgpack.dumps` to turn a dict value to a JSON byte string, and store is to protobuf Json .
+- ~~`dict` uses `msgpack.dumps` to turn a dict value to a JSON byte string, and store is to protobuf Json .~~
+- `dict` uses `msgpack.dumps` to turn a JSON string to a byte string, and store is to protobuf Json .
 
 ###### Convert Literal to Python Value
-
-`Dict[type, type]` uses type hints to convert LiteralMap to Python Value.
-
-`dict` uses `msgpack.loads` to turn a JSON byte string to a `dict` value and store it to protobuf `Struct` .
+- `Dict[type, type]` uses type hints to convert LiteralMap to Python Value.
+- ~~`dict` uses `msgpack.loads` to turn a byte string to a JSON string and `dict` value and store it to protobuf 
+  `Struct` .~~
+- `dict` conversion: byte string -> JSON string -> dict value, method: `msgpack.loads` -> `json.loads`
 
 #### Dataclass Transformer
 ##### Before
@@ -257,19 +262,19 @@ Uses `mashumaro JSON Decoder` to turn a JSON string to a python value, and recur
 Note: For `FlyteTypes`, we will inherit the mashumaro `SerializableType` to define our own serialization behavior, which includes uploading files to remote storage.
 ##### After
 ###### Convert Python Value to Literal
-Uses `msgpack.dumps()` to turn a Python value into a byte string.
+~~Uses `msgpack.dumps()` to turn a Python value into a byte string.~~
+Uses `mashumaro JSON Encoder` to turn a dataclass value to a JSON string, and uses `msgpack.dumps()` to turn the JSON string into a byte string, and store it to protobuf `Json`.
 Note: For `FlyteTypes`, we will need to customize serialization behavior by msgpack reference here.
 
 https://github.com/msgpack/msgpack-python?tab=readme-ov-file#packingunpacking-of-custom-data-type 
 
 ###### Convert Literal to Python Value
 
-Uses `msgpack.loads()` to turn a byte string into a Python value.
-
+~~Uses `msgpack.loads()` to turn a byte string into a Python value.~~
+Uses `msgpack.loads()` to turn a byte string into a JSON string, and uses `mashumaro JSON Decoder` to turn the JSON string into a Python value.
 Note: For `FlyteTypes`, we will need to customize deserialization behavior by `msgpack` reference here.
 
 https://github.com/msgpack/msgpack-python?tab=readme-ov-file#packingunpacking-of-custom-data-type 
-
 
 #### Pydantic Transformer
 ##### Before
@@ -279,10 +284,11 @@ Convert `BaseModel` to a JSON string, and then convert it to a Protobuf `Struct`
 Convert Protobuf `Struct` to a JSON string and then convert it to a `BaseModel`.
 ##### After
 ###### Convert Python Value to Literal
-Convert the Pydantic `BaseModel` to a JSON string, then convert the JSON string to a `dictionary`, and finally, convert it to a `byte string` using msgpack.
+~~Convert the Pydantic `BaseModel` to a JSON string, then convert the JSON string to a `dictionary`, and finally, convert it to a `byte string` using msgpack.~~
+Convert the Pydantic `BaseModel` to a JSON string, then convert the JSON string to a `byte string` using msgpack.
 ###### Convert Literal to Python Value
-Convert `byte string` to a `dictionary` using `msgpack`, then convert dictionary to a JSON string, and finally, convert it to Pydantic `BaseModel`.
-
+~~Convert `byte string` to a `dictionary` using `msgpack`, then convert dictionary to a JSON string, and finally, convert it to Pydantic `BaseModel`.~~
+Convert `byte string` to a JSON string using `msgpack`, then convert it to Pydantic `BaseModel`.
 ### FlyteCtl
 In Flytectl, we can construct input for the execution, so we have to make sure the values we passed to FlyteAdmin can all be constructed to Literal.
 
@@ -295,7 +301,6 @@ We will get node’s input output literal value by FlyteAdmin’s API, and get t
 We can use MsgPack dumps the json byte string to a dictionary, and shows it to the flyteconsole.
 #### Construct Input
 We should use `msgpack.encode` to encode input value and store it to the literal’s json field.
-
 
 
 ## 4 Metrics & Dashboards
