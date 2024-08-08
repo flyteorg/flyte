@@ -398,7 +398,6 @@ func MakeLiteralForSimpleType(t core.SimpleType, s string) (*core.Literal, error
 			Generic: st,
 		}
 	case core.SimpleType_JSON:
-		fmt.Println("@@@ JSON STRING: ", s)
 		scalar.Value = &core.Scalar_Json{
 			Json: &core.Json{
 				Value: []byte(s),
