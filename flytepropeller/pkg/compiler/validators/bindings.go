@@ -109,6 +109,10 @@ func validateBinding(w c.WorkflowBuilder, node c.Node, nodeParam string, binding
 			return nil, nil, !errs.HasErrors()
 		}
 
+		outputNode, _ := w.GetNode(val.Promise.NodeId)
+		outputVar := fmt.Sprintf("%s.%s", outputNode.GetTask().GetID().Name, val.Promise.Var)
+		inputVar := fmt.Sprintf("%s.%s", node.GetSubWorkflow().GetCoreWorkflow().GetTemplate().GetId().Name, nodeParam)
+
 		if upNode, found := validateNodeID(w, val.Promise.NodeId, errs.NewScope()); found {
 			v, err := typing.ParseVarName(val.Promise.GetVar())
 			if err != nil {
@@ -121,7 +125,7 @@ func validateBinding(w c.WorkflowBuilder, node c.Node, nodeParam string, binding
 				// If the variable has an index. We expect param to be a collection.
 				if v.Index != nil {
 					if cType := param.GetType().GetCollectionType(); cType == nil {
-						errs.Collect(errors.NewMismatchingTypesErr(nodeID, "", val.Promise.Var, param.Type.String(), expectedType.String()))
+						errs.Collect(errors.NewMismatchingTypesErr(nodeID, outputVar, param.Type.String(), inputVar, expectedType.String()))
 					} else {
 						sourceType = cType
 					}
@@ -154,9 +158,6 @@ func validateBinding(w c.WorkflowBuilder, node c.Node, nodeParam string, binding
 					return param.GetType(), []c.NodeID{val.Promise.NodeId}, true
 				}
 
-				outputNode, _ := w.GetNode(val.Promise.NodeId)
-				outputVar := fmt.Sprintf("%s.%s", outputNode.GetTask().GetID().Name, val.Promise.Var)
-				inputVar := fmt.Sprintf("%s.%s", node.GetSubWorkflow().GetCoreWorkflow().GetTemplate().GetId().Name, nodeParam)
 				errs.Collect(errors.NewMismatchingTypesErr(node.GetId(), outputVar, sourceType.String(), inputVar, expectedType.String()))
 				return nil, nil, !errs.HasErrors()
 			}
@@ -169,11 +170,14 @@ func validateBinding(w c.WorkflowBuilder, node c.Node, nodeParam string, binding
 			return nil, nil, !errs.HasErrors()
 		}
 
+		//inputVar := fmt.Sprintf("%s.%s", node.GetSubWorkflow().GetCoreWorkflow().GetTemplate().GetId().Name, nodeParam)
+		//inputVar := fmt.Sprintf("%s.%s", node.GetSubWorkflow().GetCoreWorkflow().GetTemplate().GetId().Name, nodeParam)
+
 		literalType := literalTypeForScalar(val.Scalar)
 		if literalType == nil {
 			errs.Collect(errors.NewUnrecognizedValueErr(nodeID, reflect.TypeOf(val.Scalar.GetValue()).String()))
 		} else if validateParamTypes && !AreTypesCastable(literalType, expectedType) {
-			errs.Collect(errors.NewMismatchingTypesErr(nodeID, nodeParam, literalType.String(), "", expectedType.String()))
+			errs.Collect(errors.NewMismatchingTypesErr(nodeID, nodeParam, literalType.String(), nodeParam, expectedType.String()))
 		}
 
 		if expectedType.GetEnumType() != nil {
