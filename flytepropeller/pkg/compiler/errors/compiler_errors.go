@@ -203,12 +203,16 @@ func NewDuplicateIDFoundErr(nodeID string) *CompileError {
 }
 
 func NewMismatchingTypesErr(nodeID, fromVar, fromType, toVar, toType string) *CompileError {
-	return newError(
-		MismatchingTypes,
-		fmt.Sprintf("The output variable '%v' has type [%v], but it's assigned to the input variable '%v' which has type type [%v].", fromVar, fromType, toVar,
-			toType),
-		nodeID,
-	)
+	var errMsg string
+	if len(toVar) == 0 {
+		errMsg = fmt.Sprintf("Variable [%v] (type [%v]) doesn't match expected type [%v].", fromVar, fromType,
+			toType)
+	} else {
+		errMsg = fmt.Sprintf("The output variable '%v' has type [%v], but it's assigned to"+
+			" the input variable '%v' which has type type [%v].", fromVar, fromType, toVar, toType)
+	}
+
+	return newError(MismatchingTypes, errMsg, nodeID)
 }
 
 func NewMismatchingBindingsErr(nodeID, sinkParam, expectedType, receivedType string) *CompileError {
