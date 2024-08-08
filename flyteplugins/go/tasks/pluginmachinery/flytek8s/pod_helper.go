@@ -571,6 +571,31 @@ func mergePodSpecs(basePodSpec *v1.PodSpec, podSpec *v1.PodSpec, primaryContaine
 	}
 
 	mergedPodSpec.Containers = mergedContainers
+
+	// merge PodTemplate InitContainers
+	var mergedInitContainers []v1.Container
+	for _, container := range podSpec.InitContainers {
+		// if applicable start with defaultContainerTemplate
+		var mergedContainer *v1.Container
+		if defaultContainerTemplate != nil {
+			mergedContainer = defaultContainerTemplate.DeepCopy()
+		}
+
+		// if applicable merge with existing container
+		if mergedContainer == nil {
+			mergedInitContainers = append(mergedInitContainers, container)
+		} else {
+			err := mergo.Merge(mergedContainer, container, mergo.WithOverride, mergo.WithAppendSlice)
+			if err != nil {
+				return nil, err
+			}
+
+			mergedInitContainers = append(mergedInitContainers, *mergedContainer)
+		}
+	}
+
+	mergedPodSpec.InitContainers = mergedInitContainers
+
 	return mergedPodSpec, nil
 }
 
