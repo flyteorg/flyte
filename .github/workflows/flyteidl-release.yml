@@ -66,8 +66,8 @@ jobs:
           registry-url: "https://registry.npmjs.org"
       - name: Set version in npm package
         run: |
-          # from refs/tags/v1.2.3 get 1.2.3
-          VERSION=$(echo ${{ inputs.version }} | sed 's#.*/v##')
+          # v1.2.3 get 1.2.3
+          VERSION=$(echo ${{ inputs.version }} | sed 's#.*v##')
           VERSION=$VERSION make update_npmversion
         shell: bash
       - run: |
