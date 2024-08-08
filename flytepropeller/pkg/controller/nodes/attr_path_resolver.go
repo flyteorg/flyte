@@ -174,14 +174,20 @@ func convertInterfaceToLiteral(nodeID string, obj interface{}) (*core.Literal, e
 
 	switch obj := obj.(type) {
 	case map[string]interface{}:
-		newSt, err := structpb.NewStruct(obj)
+		jsonBytes, err := json.Marshal(obj)
+		if err != nil {
+			return nil, err
+		}
+		jsonBytes, err = msgpack.Marshal(jsonBytes)
 		if err != nil {
 			return nil, err
 		}
 		literal.Value = &core.Literal_Scalar{
 			Scalar: &core.Scalar{
-				Value: &core.Scalar_Generic{
-					Generic: newSt,
+				Value: &core.Scalar_Json{
+					Json: &core.Json{
+						Value: jsonBytes,
+					},
 				},
 			},
 		}
