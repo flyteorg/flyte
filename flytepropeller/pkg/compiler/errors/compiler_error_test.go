@@ -23,7 +23,7 @@ func TestErrorCodes(t *testing.T) {
 		VariableNameNotFound:       NewVariableNameNotFoundErr("", "", ""),
 		DuplicateAlias:             NewDuplicateAliasErr("", ""),
 		DuplicateNodeID:            NewDuplicateIDFoundErr(""),
-		MismatchingTypes:           NewMismatchingTypesErr("", "", "", ""),
+		MismatchingTypes:           NewMismatchingTypesErr("", "", "", "", ""),
 		MismatchingInterfaces:      NewMismatchingInterfacesErr("", ""),
 		InconsistentTypes:          NewInconsistentTypesErr("", "", ""),
 		ParameterBoundMoreThanOnce: NewParameterBoundMoreThanOnceErr("", ""),
