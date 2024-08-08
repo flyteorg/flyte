@@ -54,6 +54,7 @@ type ResourceMetaWrapper struct {
 	OutputPrefix      string
 	AgentResourceMeta []byte
 	TaskCategory      admin.TaskCategory
+	Connection        flyteIdl.Connection
 }
 
 func (p *Plugin) setRegistry(r Registry) {
@@ -75,6 +76,7 @@ func (p *Plugin) ResourceRequirements(_ context.Context, _ webapi.TaskExecutionC
 
 func (p *Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextReader) (webapi.ResourceMeta,
 	webapi.Resource, error) {
+
 	taskTemplate, err := taskCtx.TaskReader().Read(ctx)
 	if err != nil {
 		return nil, nil, err
@@ -108,6 +110,24 @@ func (p *Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContext
 	taskCategory := admin.TaskCategory{Name: taskTemplate.Type, Version: taskTemplate.TaskTypeVersion}
 	agent, isSync := p.getFinalAgent(&taskCategory, p.cfg)
 
+	connection := flyteIdl.Connection{}
+	if taskTemplate.SecurityContext != nil && taskTemplate.SecurityContext.GetConnectionRef() != "" {
+		conn, ok := taskCtx.TaskExecutionMetadata().GetExternalResourceAttributes().GetConnections()[taskTemplate.SecurityContext.GetConnectionRef()]
+		if ok {
+			for k, v := range conn.GetSecrets() {
+				secretVal, err := taskCtx.SecretManager().Get(ctx, v)
+				if err != nil {
+					logger.Errorf(ctx, "Failed to get secret with error: %v", err)
+					return nil, nil, err
+				}
+				conn.Secrets[k] = secretVal
+			}
+		} else {
+			return nil, nil, fmt.Errorf("connection [%s] not found in the task execution metadata", taskTemplate.SecurityContext.GetConnectionRef())
+		}
+		connection = *conn
+	}
+
 	taskExecutionMetadata := buildTaskExecutionMetadata(taskCtx.TaskExecutionMetadata())
 
 	if isSync {
@@ -117,7 +137,12 @@ func (p *Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContext
 		if err != nil {
 			return nil, nil, err
 		}
-		header := &admin.CreateRequestHeader{Template: taskTemplate, OutputPrefix: outputPrefix, TaskExecutionMetadata: &taskExecutionMetadata}
+		header := &admin.CreateRequestHeader{
+			Template:              taskTemplate,
+			OutputPrefix:          outputPrefix,
+			TaskExecutionMetadata: &taskExecutionMetadata,
+			Connection:            &connection,
+		}
 		return p.ExecuteTaskSync(finalCtx, client, header, inputs)
 	}
 
@@ -129,7 +154,13 @@ func (p *Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContext
 	if err != nil {
 		return nil, nil, err
 	}
-	request := &admin.CreateTaskRequest{Inputs: inputs, Template: taskTemplate, OutputPrefix: outputPrefix, TaskExecutionMetadata: &taskExecutionMetadata}
+	request := &admin.CreateTaskRequest{
+		Inputs:                inputs,
+		Template:              taskTemplate,
+		OutputPrefix:          outputPrefix,
+		TaskExecutionMetadata: &taskExecutionMetadata,
+		Connection:            &connection,
+	}
 	res, err := client.CreateTask(finalCtx, request)
 	if err != nil {
 		return nil, nil, err
@@ -139,6 +170,7 @@ func (p *Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContext
 		OutputPrefix:      outputPrefix,
 		AgentResourceMeta: res.GetResourceMeta(),
 		TaskCategory:      taskCategory,
+		Connection:        connection,
 	}, nil, nil
 }
 
@@ -214,6 +246,7 @@ func (p *Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest web
 		TaskType:     metadata.TaskCategory.Name,
 		TaskCategory: &metadata.TaskCategory,
 		ResourceMeta: metadata.AgentResourceMeta,
+		Connection:   &metadata.Connection,
 	}
 	res, err := client.GetTask(finalCtx, request)
 	if err != nil {
@@ -247,6 +280,7 @@ func (p *Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error
 		TaskType:     metadata.TaskCategory.Name,
 		TaskCategory: &metadata.TaskCategory,
 		ResourceMeta: metadata.AgentResourceMeta,
+		Connection:   &metadata.Connection,
 	}
 	_, err = client.DeleteTask(finalCtx, request)
 	return err
