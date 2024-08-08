@@ -63,7 +63,7 @@ func ExtractFromLiteral(literal *core.Literal) (interface{}, error) {
 		case *core.Scalar_StructuredDataset:
 			return scalarValue.StructuredDataset.Uri, nil
 		case *core.Scalar_Json:
-			return scalarValue.Json, nil
+			return scalarValue.Json.GetValue(), nil
 		case *core.Scalar_Union:
 			// extract the value of the union but not the actual union object
 			extractedVal, err := ExtractFromLiteral(scalarValue.Union.Value)
