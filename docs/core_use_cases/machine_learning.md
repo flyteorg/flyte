@@ -112,7 +112,7 @@ There are many ways to extend your workloads:
     {ref}`Kubeflow Pytorch<kf-pytorch-op>` and {doc}`more <_tags/DistributedComputing>` to do distributed training.
 * - **🔎 Experiment Tracking**
   - Auto-capture training logs with the {py:func}`~flytekitplugins.mlflow.mlflow_autolog`
-    decorator, which can be viewed as Flyte Decks with `@task(disable_decks=False)`.
+    decorator, which can be viewed as Flyte Decks with `@task(enable_deck=True)`.
 * - **⏩ Inference Acceleration**
   - Serialize your models in ONNX format using the {ref}`ONNX plugin <onnx>`, which
     supports ScikitLearn, TensorFlow, and PyTorch.
