@@ -8010,7 +8010,8 @@
         "DURATION",
         "BINARY",
         "ERROR",
-        "STRUCT"
+        "STRUCT",
+        "ANY"
       ],
       "default": "NONE",
       "description": "Define a set of simple types."

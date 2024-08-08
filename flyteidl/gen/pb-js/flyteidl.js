@@ -4545,6 +4545,7 @@
              * @property {number} BINARY=7 BINARY value
              * @property {number} ERROR=8 ERROR value
              * @property {number} STRUCT=9 STRUCT value
+             * @property {number} ANY=10 ANY value
              */
             core.SimpleType = (function() {
                 var valuesById = {}, values = Object.create(valuesById);
@@ -4558,6 +4559,7 @@
                 values[valuesById[7] = "BINARY"] = 7;
                 values[valuesById[8] = "ERROR"] = 8;
                 values[valuesById[9] = "STRUCT"] = 9;
+                values[valuesById[10] = "ANY"] = 10;
                 return values;
             })();
     
@@ -6049,6 +6051,7 @@
                         case 7:
                         case 8:
                         case 9:
+                        case 10:
                             break;
                         }
                     }

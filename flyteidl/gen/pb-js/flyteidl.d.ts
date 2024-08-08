@@ -1906,7 +1906,8 @@ export namespace flyteidl {
             DURATION = 6,
             BINARY = 7,
             ERROR = 8,
-            STRUCT = 9
+            STRUCT = 9,
+            ANY = 10
         }
 
         /** Properties of a SchemaType. */
