@@ -3,17 +3,24 @@ package common
 import (
 	"fmt"
 
+	"github.com/wolfeidau/humanhash"
 	"k8s.io/apimachinery/pkg/util/rand"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 const ExecutionIDLength = 20
+const ExecutionIDLengthLimit = 45
 const ExecutionStringFormat = "a%s"
 
 /* #nosec */
-func GetExecutionName(seed int64) string {
+func GetExecutionName(seed int64, enableHumanHash bool) string {
 	rand.Seed(seed)
+	if enableHumanHash {
+		hashKey := []byte(rand.String(20))
+		result, _ := humanhash.Humanize(hashKey, 3)
+		return result
+	}
 	return fmt.Sprintf(ExecutionStringFormat, rand.String(ExecutionIDLength-1))
 }
 

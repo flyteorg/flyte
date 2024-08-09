@@ -35,14 +35,15 @@ const resourceType = core.ResourceType_WORKFLOW
 const remoteClosureIdentifier = "remote closure id"
 
 var errExpected = errors.New("expected error")
+var lpApplicationConfig = testutils.GetApplicationConfigWithDefaultDomains()
 
 func TestPopulateExecutionID(t *testing.T) {
 	name := GetExecutionName(admin.ExecutionCreateRequest{
 		Project: "project",
 		Domain:  "domain",
-	})
+	}, lpApplicationConfig)
 	assert.NotEmpty(t, name)
-	assert.Len(t, name, common.ExecutionIDLength)
+	assert.LessOrEqual(t, len(name), common.ExecutionIDLengthLimit)
 }
 
 func TestPopulateExecutionID_ExistingName(t *testing.T) {
@@ -50,7 +51,7 @@ func TestPopulateExecutionID_ExistingName(t *testing.T) {
 		Project: "project",
 		Domain:  "domain",
 		Name:    "name",
-	})
+	}, lpApplicationConfig)
 	assert.Equal(t, "name", name)
 }
 
