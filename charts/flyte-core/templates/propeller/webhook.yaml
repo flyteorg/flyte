@@ -1,12 +1,42 @@
 {{- if .Values.flytepropeller.enabled }}
 {{- if .Values.webhook.enabled }}
-# Create an empty secret that the first propeller pod will populate
+{{- $secret := (lookup "v1" "Secret" (include "flyte.namespace" .) "flyte-pod-webhook") -}}
 apiVersion: v1
 kind: Secret
 metadata:
   name: flyte-pod-webhook
   namespace: {{ template "flyte.namespace" . }}
 type: Opaque
+data:
+{{- if $secret }}
+  tls.crt: |
+    {{ index $secret.data "tls.crt" }}
+  tls.key: |
+    {{ index $secret.data "tls.key" }}
+  ca.crt: |
+    {{ index $secret.data "ca.crt" }}
+{{- else -}}
+{{/* Produces a 99 year valid CA and cert signed by the CA like:
+    https://github.com/flyteorg/flyte/blob/81afb76b44931d827f8e898d097a7e8054a5b836/flytepropeller/cmd/controller/cmd/init_certs.go#L14-L36
+*/}}
+{{- $certValid := 36135 -}}
+{{- $name := include "flyte-pod-webhook.name" . -}}
+{{- $namespace := include "flyte.namespace" . -}}
+{{- $svc := (printf "%v.%v" $name $namespace) -}}
+{{- $cn := (printf "%v.svc" $svc) -}}
+{{- $altnames := (list $name $svc $cn) -}}
+{{- $ca := genCA "flyte-ca" $certValid -}}
+{{- $cert := genSignedCert $cn nil $altnames $certValid $ca }}
+  # ca issued cert
+  tls.crt: |
+    {{ $cert.Cert | b64enc }}
+  # private key for cert
+  tls.key: |
+    {{ $cert.Key | b64enc }}
+  # ca cert since the CA is generated here
+  ca.crt: |
+    {{ $ca.Cert | b64enc }}
+{{- end }}
 ---
 # Create the actual deployment
 apiVersion: apps/v1
@@ -47,40 +77,6 @@ spec:
       {{- if .Values.webhook.priorityClassName }}
       priorityClassName: {{ .Values.webhook.priorityClassName }}
       {{- end }}
-{{- if .Values.webhook.enabled }}
-      initContainers:
-      - name: generate-secrets
-        image: "{{ .Values.flytepropeller.image.repository }}:{{ .Values.flytepropeller.image.tag }}"
-        imagePullPolicy: "{{ .Values.flytepropeller.image.pullPolicy }}"
-        command:
-          - flytepropeller
-        args:
-          - webhook
-          - init-certs
-          - --config
-          - /etc/flyte/config/*.yaml
-        env:
-          - name: POD_NAME
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.name
-          - name: POD_NAMESPACE
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.namespace
-        {{- if .Values.webhook.podEnv -}}
-        {{- with .Values.webhook.podEnv -}}
-        {{- toYaml . | nindent 10 }}
-        {{- end }}
-        {{- end }}
-        securityContext:
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop: ["ALL"]
-        volumeMounts:
-          - name: config-volume
-            mountPath: /etc/flyte/config
-{{- end }}
       containers:
         - name: webhook
           image: "{{ .Values.flytepropeller.image.repository }}:{{ .Values.flytepropeller.image.tag }}"

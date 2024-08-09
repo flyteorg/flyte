@@ -56,7 +56,8 @@ ${GOPATH:-~/go}/bin/helm-docs -c ${DIR}/../charts/
 
 # This section is used by GitHub workflow to ensure that the generation step was run
 if [ -n "$DELTA_CHECK" ]; then
-	DIRTY=$(git status --porcelain)
+	# find only deleted or removed lines, not replaced values
+	DIRTY=$(git diff --word-diff | grep "^[{\[]")
 	if [ -n "$DIRTY" ]; then
 		echo "FAILED: helm code updated without committing generated code."
 		echo "Ensure make helm has run and all changes are committed."
