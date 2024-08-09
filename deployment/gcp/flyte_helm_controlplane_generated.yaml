@@ -251,7 +251,7 @@ data:
     cacheservice:
       heartbeat-grace-period-multiplier: 3
       max-reservation-heartbeat: 30s
-      metrics-scope: cacheservice
+      metrics-scope: flyte
       profiler-port: 10254
       storage-prefix: cached_outputs
   storage.yaml: | 
@@ -434,7 +434,7 @@ data:
     datacatalog:
       heartbeat-grace-period-multiplier: 3
       max-reservation-heartbeat: 30s
-      metrics-scope: datacatalog
+      metrics-scope: flyte
       profiler-port: 10254
       storage-prefix: metadata/datacatalog
   storage.yaml: | 
@@ -599,6 +599,9 @@ spec:
     port: 89
     protocol: TCP
     targetPort: 8089
+  - name: http-metrics
+    protocol: TCP
+    port: 10254
   selector: 
     app.kubernetes.io/name: cacheservice
     app.kubernetes.io/instance: flyte
@@ -650,6 +653,9 @@ spec:
     port: 89
     protocol: TCP
     targetPort: 8089
+  - name: http-metrics
+    protocol: TCP
+    port: 10254
   selector: 
     app.kubernetes.io/name: datacatalog
     app.kubernetes.io/instance: flyte
@@ -871,7 +877,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "fe74fb4513ed628bed79fe35842c263da0e3d31bda1880e725836c1d8562307"
+        configChecksum: "93200ab71e498c6b2fa5221f8db1c38a5a485b7dd8172358aea9f1886ef2a0f"
       labels: 
         app.kubernetes.io/name: cacheservice
         app.kubernetes.io/instance: flyte
@@ -1098,7 +1104,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "537b12b49584e5eb9da85bbf0d8d8d21d8edce0560b0b53f595485f2cdb1cb6"
+        configChecksum: "c3c0a1dfd6dd98c04bb7235bd2c4f29de2d14a61130884cba6b53a90ae235d8"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte

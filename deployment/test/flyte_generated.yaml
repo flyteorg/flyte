@@ -228,7 +228,7 @@ data:
   server.yaml: |
     datacatalog:
       storage-prefix: metadata/datacatalog
-      metrics-scope: "datacatalog"
+      metrics-scope: "flyte"
       profiler-port: 10254
     application:
       grpcPort: 8089

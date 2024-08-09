@@ -21,5 +21,11 @@ spec:
     port: 89
     protocol: TCP
     targetPort: 8089
+  - name: http-metrics
+    protocol: TCP
+    port: 10254
+  {{- with .Values.cacheservice.service.additionalPorts -}}
+  {{ tpl (toYaml .) $ | nindent 2 }}
+  {{- end }}
   selector: {{ include "cacheservice.selectorLabels" . | nindent 4 }}
 {{- end }}

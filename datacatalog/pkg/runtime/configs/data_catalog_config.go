@@ -10,7 +10,7 @@ import (
 
 var defaultConfig = &DataCatalogConfig{
 	StoragePrefix:                  "metadata",
-	MetricsScope:                   "datacatalog",
+	MetricsScope:                   "flyte",
 	ProfilerPort:                   10254,
 	HeartbeatGracePeriodMultiplier: 3,
 	MaxReservationHeartbeat:        config.Duration{Duration: time.Second * 10},

@@ -484,7 +484,7 @@ flyte:
     datacatalogServer:
       datacatalog:
         storage-prefix: metadata/datacatalog
-        metrics-scope: datacatalog
+        metrics-scope: flyte
         profiler-port: 10254
       application:
         grpcPort: 8089
@@ -495,7 +495,7 @@ flyte:
     cacheserviceServer:
       cacheservice:
         storage-prefix: cached_outputs
-        metrics-scope: cacheservice
+        metrics-scope: flyte
         profiler-port: 10254
       cache-server:
         grpcPort: 8089

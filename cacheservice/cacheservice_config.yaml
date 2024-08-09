@@ -9,7 +9,7 @@ cache-server:
   grpcServerReflection: true
 cacheservice:
   storage-prefix: "cached_outputs"
-  metrics-scope: "cacheservice"
+  metrics-scope: "flyte"
   profiler-port: 10254
   heartbeat-grace-period-multiplier: 3
   max-reservation-heartbeat: 10s

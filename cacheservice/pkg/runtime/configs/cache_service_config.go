@@ -17,7 +17,7 @@ const (
 
 var defaultConfig = &CacheServiceConfig{
 	StoragePrefix:                  "cached_outputs",
-	MetricsScope:                   "cacheservice",
+	MetricsScope:                   "flyte",
 	ProfilerPort:                   10254,
 	HeartbeatGracePeriodMultiplier: 3,
 	MaxReservationHeartbeat:        config.Duration{Duration: time.Second * 10},

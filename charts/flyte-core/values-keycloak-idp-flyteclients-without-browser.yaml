@@ -617,7 +617,7 @@ configmap:
   datacatalogServer:
     datacatalog:
       storage-prefix: metadata/datacatalog
-      metrics-scope: datacatalog
+      metrics-scope: flyte
       profiler-port: 10254
       heartbeat-grace-period-multiplier: 3
       max-reservation-heartbeat: 30s
@@ -630,7 +630,7 @@ configmap:
   cacheserviceServer:
     cacheservice:
       storage-prefix: cached_outputs
-      metrics-scope: cacheservice
+      metrics-scope: flyte
       profiler-port: 10254
       heartbeat-grace-period-multiplier: 3
       max-reservation-heartbeat: 30s
