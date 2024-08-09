@@ -444,6 +444,27 @@ func TestMakeLiteralForType(t *testing.T) {
 		assert.Equal(t, expectedVal, actualVal)
 	})
 
+	t.Run("SimpleJson", func(t *testing.T) {
+		var literalType = &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_JSON}}
+		input := `{"key": "value"}`
+		val, err := MakeLiteralForType(literalType, input)
+		assert.NoError(t, err)
+		literalVal := &core.Literal{
+			Value: &core.Literal_Scalar{
+				Scalar: &core.Scalar{
+					Value: &core.Scalar_Json{
+						Json: &core.Json{
+							Value: []byte(input),
+						},
+					},
+				},
+			},
+		}
+		expectedVal, _ := ExtractFromLiteral(literalVal)
+		actualVal, _ := ExtractFromLiteral(val)
+		assert.Equal(t, expectedVal, actualVal)
+	})
+
 	t.Run("ArrayStrings", func(t *testing.T) {
 		var literalType = &core.LiteralType{Type: &core.LiteralType_CollectionType{
 			CollectionType: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING}}}}

@@ -4,19 +4,19 @@ package coreutils
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/vmihailenco/msgpack/v5"
 	"math"
 	"reflect"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/ptypes"
 	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/pkg/errors"
-
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 func MakePrimitive(v interface{}) (*core.Primitive, error) {
@@ -250,6 +250,18 @@ func MakeDefaultLiteralForType(typ *core.LiteralType) (*core.Literal, error) {
 					},
 				},
 			}, nil
+		case core.SimpleType_JSON:
+			return &core.Literal{
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Json{
+							Json: &core.Json{
+								Value: []byte(""),
+							},
+						},
+					},
+				},
+			}, nil
 		}
 		return nil, errors.Errorf("Not yet implemented. Default creation is not yet implemented for [%s] ", t.Simple.String())
 	case *core.LiteralType_Blob:
@@ -384,6 +396,12 @@ func MakeLiteralForSimpleType(t core.SimpleType, s string) (*core.Literal, error
 		}
 		scalar.Value = &core.Scalar_Generic{
 			Generic: st,
+		}
+	case core.SimpleType_JSON:
+		scalar.Value = &core.Scalar_Json{
+			Json: &core.Json{
+				Value: []byte(s),
+			},
 		}
 	case core.SimpleType_BINARY:
 		scalar.Value = &core.Scalar_Binary{
@@ -565,6 +583,19 @@ func MakeLiteralForType(t *core.LiteralType, v interface{}) (*core.Literal, erro
 					return nil, fmt.Errorf("unable to marshal to json string for struct value %v", v)
 				}
 				strValue = string(byteValue)
+			}
+		}
+		if newT.Simple == core.SimpleType_JSON {
+			if _, isValueStringType := v.(string); !isValueStringType {
+				jsonBytes, err := json.Marshal(v)
+				if err != nil {
+					return nil, fmt.Errorf("unable to marshal to json string for json value %v", v)
+				}
+				jsonBytes, err = msgpack.Marshal(jsonBytes)
+				if err != nil {
+					return nil, fmt.Errorf("unable to marshal to msgpack bytes for json value %v", v)
+				}
+				strValue = string(jsonBytes)
 			}
 		}
 		lv, err := MakeLiteralForSimpleType(newT.Simple, strValue)

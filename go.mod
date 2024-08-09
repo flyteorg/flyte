@@ -14,6 +14,7 @@ require (
 	golang.org/x/sync v0.7.0
 	gorm.io/driver/postgres v1.5.3
 	sigs.k8s.io/controller-runtime v0.16.3
+
 )
 
 require (
@@ -177,6 +178,8 @@ require (
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.0 // indirect
 	github.com/tidwall/sjson v1.2.5 // indirect
+	github.com/vmihailenco/msgpack/v5 v5.4.1 // indirect; indirects
+	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	github.com/wI2L/jsondiff v0.5.0 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.47.0 // indirect

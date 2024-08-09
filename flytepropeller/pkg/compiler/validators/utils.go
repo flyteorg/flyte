@@ -79,6 +79,8 @@ func literalTypeForScalar(scalar *core.Scalar) *core.LiteralType {
 				},
 			},
 		}
+	case *core.Scalar_Json:
+		literalType = &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_JSON}}
 	default:
 		return nil
 	}

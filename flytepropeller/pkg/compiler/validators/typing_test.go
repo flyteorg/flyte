@@ -22,6 +22,18 @@ func TestSimpleLiteralCasting(t *testing.T) {
 		assert.True(t, castable, "Integers should be castable to other integers")
 	})
 
+	t.Run("BaseCase_Json", func(t *testing.T) {
+		castable := AreTypesCastable(
+			&core.LiteralType{
+				Type: &core.LiteralType_Simple{Simple: core.SimpleType_JSON},
+			},
+			&core.LiteralType{
+				Type: &core.LiteralType_Simple{Simple: core.SimpleType_JSON},
+			},
+		)
+		assert.True(t, castable, "Json should be castable to other Json")
+	})
+
 	t.Run("IntegerToFloat", func(t *testing.T) {
 		castable := AreTypesCastable(
 			&core.LiteralType{
