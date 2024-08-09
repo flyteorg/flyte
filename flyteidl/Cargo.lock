@@ -731,6 +731,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c118b1bc529b034aad851808f41f49a69a337d10e112039e7f342e5fd514635b"
 dependencies = [
  "dbus-secret-service",
+ "linux-keyutils",
  "openssl",
 ]
 
@@ -748,6 +749,16 @@ checksum = "06085512b750d640299b79be4bad3d2fa90a9c00b1fd9e1b46364f66f0485c72"
 dependencies = [
  "cc",
  "pkg-config",
+]
+
+[[package]]
+name = "linux-keyutils"
+version = "0.2.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "761e49ec5fd8a5a463f9b84e877c373d888935b71c6be78f3767fe2ae6bed18e"
+dependencies = [
+ "bitflags 2.5.0",
+ "libc",
 ]
 
 [[package]]
