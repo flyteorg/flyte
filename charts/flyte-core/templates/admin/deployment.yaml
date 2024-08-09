@@ -107,31 +107,6 @@ spec:
             {{- end }}
             {{- end }}
         {{- end }}
-        - name: generate-secrets
-          image: "{{ .Values.flyteadmin.image.repository }}:{{ .Values.flyteadmin.image.tag }}"
-          imagePullPolicy: "{{ .Values.flyteadmin.image.pullPolicy }}"
-          command: ["/bin/sh", "-c"]
-          args:
-            [
-                "flyteadmin --config={{ .Values.flyteadmin.configPath }} secrets init --localPath /etc/scratch/secrets && flyteadmin --config=/etc/flyte/config/*.yaml secrets create --name flyte-admin-secrets --fromPath /etc/scratch/secrets",
-            ]
-          securityContext:
-            allowPrivilegeEscalation: false
-            capabilities:
-              drop: ["ALL"]
-          volumeMounts:
-            - mountPath: /etc/flyte/config
-              name: base-config-volume
-            - mountPath: /etc/scratch
-              name: scratch
-          env:
-            - name: POD_NAMESPACE
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.namespace
-            {{- with .Values.flyteadmin.env -}}
-            {{- tpl (toYaml .) $ | nindent 12 }}
-            {{- end }}
       containers:
       - command:
         - flyteadmin
