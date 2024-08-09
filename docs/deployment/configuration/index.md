@@ -5,22 +5,7 @@
 This section will cover how to configure your Flyte cluster for features like
 authentication, monitoring, and notifications.
 
-````{important}
-The configuration instructions in this section are for the `flyte` and `flyte-core` Helm charts, which is for
-the {ref}`multi-cluster setup <deployment-deployment-multicluster>`.
 
-If you're using the `flyte-binary` chart for the  {ref}`single cluster setup <deployment-deployment-cloud-simple>`,
-instead of specifying configuration under a yaml file like `cloud_events.yaml` in {ref}`deployment-configuration-cloud-event`,
-you'll need to add the configuration settings under the `inline` section in the `eks-production.yaml` file:
-
-```{eval-rst}
-.. literalinclude:: ../../../charts/flyte-binary/eks-production.yaml
-   :language: yaml
-   :lines: 30-41
-   :caption: charts/flyte-binary/eks-production.yaml
-```
-
-````
 
 
 ```{list-table}
