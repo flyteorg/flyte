@@ -9220,6 +9220,12 @@ export namespace flyteidl {
 
             /** ExternalResourceInfo logs */
             logs?: (flyteidl.core.ITaskLog[]|null);
+
+            /** ExternalResourceInfo workflowNodeMetadata */
+            workflowNodeMetadata?: (flyteidl.event.IWorkflowNodeMetadata|null);
+
+            /** ExternalResourceInfo customInfo */
+            customInfo?: (google.protobuf.IStruct|null);
         }
 
         /** Represents an ExternalResourceInfo. */
@@ -9248,6 +9254,15 @@ export namespace flyteidl {
 
             /** ExternalResourceInfo logs. */
             public logs: flyteidl.core.ITaskLog[];
+
+            /** ExternalResourceInfo workflowNodeMetadata. */
+            public workflowNodeMetadata?: (flyteidl.event.IWorkflowNodeMetadata|null);
+
+            /** ExternalResourceInfo customInfo. */
+            public customInfo?: (google.protobuf.IStruct|null);
+
+            /** ExternalResourceInfo targetMetadata. */
+            public targetMetadata?: "workflowNodeMetadata";
 
             /**
              * Creates a new ExternalResourceInfo instance using the specified properties.
