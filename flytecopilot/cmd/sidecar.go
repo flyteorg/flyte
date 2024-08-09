@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	stderrors "errors"
 	"fmt"
 	"time"
 
@@ -144,10 +145,13 @@ func (u *UploadOptions) Sidecar(ctx context.Context) error {
 
 	if err := u.uploader(ctx); err != nil {
 		logger.Errorf(ctx, "Uploading failed, err %s", err)
-		if err := u.UploadError(ctx, "OutputUploadFailed", err, storage.DataReference(u.remoteOutputsPrefix)); err != nil {
-			logger.Errorf(ctx, "Failed to write error document, err :%s", err)
-			return err
+		if uerr := u.UploadError(ctx, "OutputUploadFailed", err, storage.DataReference(u.remoteOutputsPrefix)); uerr != nil {
+			logger.Errorf(ctx, "Failed to write error document, err :%s", uerr)
+			return stderrors.Join(uerr, err)
 		}
+
+		// failure to upload should still return err exit code from process
+		return err
 	}
 	return nil
 }
