@@ -381,6 +381,10 @@ spec:
                 echo waiting for database
                 sleep 0.1
               done
+          resources:
+            requests:
+              cpu: "4"
+              memory: 4Gi
       containers:
         - name: flyte
           image: "cr.flyte.org/flyteorg/flyte-binary:latest"
@@ -415,6 +419,10 @@ spec:
               path: /healthcheck
               port: http
             initialDelaySeconds: 30
+          resources:
+            requests:
+              cpu: "4"
+              memory: 4Gi
           volumeMounts:
             - name: cluster-resource-templates
               mountPath: /etc/flyte/cluster-resource-templates
