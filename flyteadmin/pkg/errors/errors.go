@@ -202,3 +202,15 @@ func IsDoesNotExistError(err error) bool {
 	adminError, ok := err.(FlyteAdminError)
 	return ok && adminError.Code() == codes.NotFound
 }
+
+func NewInactiveProjectError(ctx context.Context, id string) FlyteAdminError {
+	errMsg := fmt.Sprintf("project [%s] is not active", id)
+	statusErr, transformationErr := NewFlyteAdminError(codes.InvalidArgument, errMsg).WithDetails(&admin.InactiveProject{
+		Id: id,
+	})
+	if transformationErr != nil {
+		logger.Errorf(ctx, "failed to wrap grpc status in type 'Error': %v", transformationErr)
+		return NewFlyteAdminErrorf(codes.InvalidArgument, errMsg)
+	}
+	return statusErr
+}

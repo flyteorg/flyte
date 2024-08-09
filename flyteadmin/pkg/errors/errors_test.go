@@ -310,3 +310,15 @@ func TestIsNotDoesNotExistError(t *testing.T) {
 func TestIsNotDoesNotExistErrorBecauseOfNoneAdminError(t *testing.T) {
 	assert.False(t, IsDoesNotExistError(errors.New("foo")))
 }
+
+func TestNewInactiveProjectError(t *testing.T) {
+	err := NewInactiveProjectError(context.TODO(), identifier.GetProject())
+	statusErr, ok := status.FromError(err)
+
+	assert.True(t, ok)
+
+	details, ok := statusErr.Details()[0].(*admin.InactiveProject)
+
+	assert.True(t, ok)
+	assert.Equal(t, identifier.GetProject(), details.Id)
+}
