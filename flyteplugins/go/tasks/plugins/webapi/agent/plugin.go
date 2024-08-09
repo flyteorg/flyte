@@ -22,6 +22,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	structpb "github.com/golang/protobuf/ptypes/struct"
 )
 
 const ID = "agent-service"
@@ -43,6 +44,8 @@ type ResourceWrapper struct {
 	Outputs  *flyteIdl.LiteralMap
 	Message  string
 	LogLinks []*flyteIdl.TaskLog
+	// TODO: should there also be a CustomInfo here?
+	CustomInfo *structpb.Struct
 }
 
 // IsTerminal is used to avoid making network calls to the agent service if the resource is already in a terminal state.
@@ -192,10 +195,11 @@ func (p *Plugin) ExecuteTaskSync(
 	}
 
 	return nil, ResourceWrapper{
-		Phase:    resource.Phase,
-		Outputs:  resource.Outputs,
-		Message:  resource.Message,
-		LogLinks: resource.LogLinks,
+		Phase:      resource.Phase,
+		Outputs:    resource.Outputs,
+		Message:    resource.Message,
+		LogLinks:   resource.LogLinks,
+		CustomInfo: resource.CustomInfo,
 	}, err
 }
 
@@ -221,11 +225,12 @@ func (p *Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest web
 	}
 
 	return ResourceWrapper{
-		Phase:    res.Resource.Phase,
-		State:    res.Resource.State,
-		Outputs:  res.Resource.Outputs,
-		Message:  res.Resource.Message,
-		LogLinks: res.Resource.LogLinks,
+		Phase:      res.Resource.Phase,
+		State:      res.Resource.State,
+		Outputs:    res.Resource.Outputs,
+		Message:    res.Resource.Message,
+		LogLinks:   res.Resource.LogLinks,
+		CustomInfo: res.Resource.CustomInfo,
 	}, nil
 }
 
@@ -254,7 +259,9 @@ func (p *Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error
 
 func (p *Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase core.PhaseInfo, err error) {
 	resource := taskCtx.Resource().(ResourceWrapper)
-	taskInfo := &core.TaskInfo{Logs: resource.LogLinks}
+	// taskInfo := &core.TaskInfo{Logs: resource.LogLinks}
+	// TODO: should this actually be something like this?
+	taskInfo := &core.TaskInfo{Logs: resource.LogLinks, CustomInfo: resource.CustomInfo}
 
 	switch resource.Phase {
 	case flyteIdl.TaskExecution_QUEUED:

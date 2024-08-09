@@ -152,6 +152,7 @@ func CreateTaskExecutionModel(ctx context.Context, input CreateTaskExecutionMode
 		UpdatedAt:    reportedAt,
 		CreatedAt:    input.Request.Event.OccurredAt,
 		Logs:         input.Request.Event.Logs,
+		// TODO: does this help us pass CustomInfo at all?
 		CustomInfo:   input.Request.Event.CustomInfo,
 		TaskType:     input.Request.Event.TaskType,
 		Metadata:     metadata,
@@ -287,6 +288,8 @@ func mergeCustom(existing, latest *_struct.Struct) (*_struct.Struct, error) {
 	}
 	return &response, nil
 }
+
+// TODO: this merging seems to accumulate logs -- should it also  accumulate CustomInfo?
 
 // mergeExternalResource combines the latest ExternalResourceInfo proto with an existing instance
 // by updating fields and merging logs.
