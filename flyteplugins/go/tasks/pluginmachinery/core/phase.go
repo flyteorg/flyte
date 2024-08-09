@@ -89,6 +89,8 @@ type ExternalResource struct {
 	RetryAttempt uint32
 	// Phase (if exists) associated with the external resource
 	Phase Phase
+	// Extensible field for custom, plugin-specific info
+	CustomInfo *structpb.Struct
 }
 
 type ReasonInfo struct {
