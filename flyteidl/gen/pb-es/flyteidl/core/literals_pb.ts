@@ -435,6 +435,49 @@ export class StructuredDataset extends Message<StructuredDataset> {
 }
 
 /**
+ * @generated from message flyteidl.core.Any
+ */
+export class Any extends Message<Any> {
+  /**
+   * @generated from field: flyteidl.core.Literal value = 1;
+   */
+  value?: Literal;
+
+  /**
+   * @generated from field: flyteidl.core.LiteralType type = 2;
+   */
+  type?: LiteralType;
+
+  constructor(data?: PartialMessage<Any>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.core.Any";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "value", kind: "message", T: Literal },
+    { no: 2, name: "type", kind: "message", T: LiteralType },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Any {
+    return new Any().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Any {
+    return new Any().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Any {
+    return new Any().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: Any | PlainMessage<Any> | undefined, b: Any | PlainMessage<Any> | undefined): boolean {
+    return proto3.util.equals(Any, a, b);
+  }
+}
+
+/**
  * @generated from message flyteidl.core.Scalar
  */
 export class Scalar extends Message<Scalar> {
@@ -495,6 +538,12 @@ export class Scalar extends Message<Scalar> {
      */
     value: Union;
     case: "union";
+  } | {
+    /**
+     * @generated from field: flyteidl.core.Any any = 10;
+     */
+    value: Any;
+    case: "any";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   constructor(data?: PartialMessage<Scalar>) {
@@ -514,6 +563,7 @@ export class Scalar extends Message<Scalar> {
     { no: 7, name: "generic", kind: "message", T: Struct, oneof: "value" },
     { no: 8, name: "structured_dataset", kind: "message", T: StructuredDataset, oneof: "value" },
     { no: 9, name: "union", kind: "message", T: Union, oneof: "value" },
+    { no: 10, name: "any", kind: "message", T: Any, oneof: "value" },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Scalar {

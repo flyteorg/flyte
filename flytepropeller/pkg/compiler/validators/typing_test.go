@@ -34,6 +34,18 @@ func TestSimpleLiteralCasting(t *testing.T) {
 		assert.False(t, castable, "Integers should not be castable to floats")
 	})
 
+	t.Run("IntegerToAny", func(t *testing.T) {
+		castable := AreTypesCastable(
+			&core.LiteralType{
+				Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER},
+			},
+			&core.LiteralType{
+				Type: &core.LiteralType_AnyType{},
+			},
+		)
+		assert.True(t, castable, "Integers should be castable to Any")
+	})
+
 	t.Run("FloatToInteger", func(t *testing.T) {
 		castable := AreTypesCastable(
 			&core.LiteralType{

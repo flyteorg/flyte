@@ -108,6 +108,12 @@ message UnionType {
     repeated LiteralType variants = 1;
 }
 
+message AnyType {
+    // Any type is a special type that can be used to represent any type
+    // This is useful when the type is not known at compile time
+    LiteralType type = 1;
+}
+
 // Hints to improve type matching
 // e.g. allows distinguishing output from custom type transformers
 // even if the underlying IDL serialization matches.
@@ -154,6 +160,9 @@ message LiteralType {
 
         // Defines an union type with pre-defined LiteralTypes.
         UnionType union_type = 10;
+
+        // Any Type
+        AnyType any_type = 12;
     }
 
     // This field contains type metadata that is descriptive of the type, but is NOT considered in type-checking.  This might be used by
