@@ -86,7 +86,7 @@ func resolveAttrPathInPbStruct(nodeID string, st *structpb.Struct, bindAttrPath 
 	}
 
 	// After resolve, convert the interface to literal
-	literal, err := convertInterfaceToLiteral(nodeID, currVal)
+	literal, err := convertInterfaceToLiteral(nodeID, currVal, false)
 
 	return literal, err
 }
@@ -136,7 +136,7 @@ func resolveAttrPathInJson(nodeID string, json_byte []byte, bindAttrPath []*core
 	}
 
 	// After resolve, convert the interface to literal
-	literal, err := convertInterfaceToLiteral(nodeID, currVal)
+	literal, err := convertInterfaceToLiteral(nodeID, currVal, true)
 
 	return literal, err
 }
@@ -168,34 +168,48 @@ func convertNumbers(v interface{}) interface{} {
 }
 
 // convertInterfaceToLiteral converts the protobuf struct (e.g. dataclass) to literal
-func convertInterfaceToLiteral(nodeID string, obj interface{}) (*core.Literal, error) {
+func convertInterfaceToLiteral(nodeID string, obj interface{}, isJson bool) (*core.Literal, error) {
 
 	literal := &core.Literal{}
 
 	switch obj := obj.(type) {
 	case map[string]interface{}:
-		jsonBytes, err := json.Marshal(obj)
-		if err != nil {
-			return nil, err
-		}
-		jsonBytes, err = msgpack.Marshal(jsonBytes)
-		if err != nil {
-			return nil, err
-		}
-		literal.Value = &core.Literal_Scalar{
-			Scalar: &core.Scalar{
-				Value: &core.Scalar_Json{
-					Json: &core.Json{
-						Value: jsonBytes,
+		if isJson {
+			jsonBytes, err := json.Marshal(obj)
+			if err != nil {
+				return nil, err
+			}
+			jsonBytes, err = msgpack.Marshal(jsonBytes)
+			if err != nil {
+				return nil, err
+			}
+			literal.Value = &core.Literal_Scalar{
+				Scalar: &core.Scalar{
+					Value: &core.Scalar_Json{
+						Json: &core.Json{
+							Value: jsonBytes,
+						},
 					},
 				},
-			},
+			}
+		} else {
+			newSt, err := structpb.NewStruct(obj)
+			if err != nil {
+				return nil, err
+			}
+			literal.Value = &core.Literal_Scalar{
+				Scalar: &core.Scalar{
+					Value: &core.Scalar_Generic{
+						Generic: newSt,
+					},
+				},
+			}
 		}
 	case []interface{}:
 		literals := []*core.Literal{}
 		for _, v := range obj {
 			// recursively convert the interface to literal
-			literal, err := convertInterfaceToLiteral(nodeID, v)
+			literal, err := convertInterfaceToLiteral(nodeID, v, isJson)
 			if err != nil {
 				return nil, err
 			}
