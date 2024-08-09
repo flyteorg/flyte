@@ -11,6 +11,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/samber/lo"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/structpb"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -330,7 +331,12 @@ func (p *Plugin) trySubmitTask(ctx context.Context, tCtx core.TaskExecutionConte
 		pluginState.PhaseVersion = core.DefaultPhaseVersion
 		pluginState.SubmittedAt = now
 		pluginState.LastUpdated = now
-		phaseInfo = core.PhaseInfoQueued(now, pluginState.PhaseVersion, fmt.Sprintf("task offered to worker %s", workerID))
+
+		taskInfo, err := p.getTaskInfo(ctx, tCtx, initialState.SubmittedAt, time.Now(), executionEnv, queueID, workerID)
+		if err != nil {
+			return nil, core.PhaseInfoUndefined, err
+		}
+		phaseInfo = core.PhaseInfoQueuedWithTaskInfo(pluginState.PhaseVersion, fmt.Sprintf("task offered to worker %s", workerID), taskInfo)
 	} else {
 		// task was not submmitted, get the status from the replicas
 		phaseInfo, err = p.getPhaseInfoFromReplicas(ctx, tCtx, executionEnv, queueID, &pluginState)
@@ -351,6 +357,12 @@ func (p *Plugin) getPhaseInfoFromReplicas(ctx context.Context, tCtx core.TaskExe
 		return core.PhaseInfoUndefined, err
 	}
 
+	workerID := "" // no worker assigned yet
+	taskInfo, err := p.getTaskInfo(ctx, tCtx, pluginState.SubmittedAt, time.Now(), executionEnv, queueID, workerID)
+	if err != nil {
+		return core.PhaseInfoUndefined, err
+	}
+
 	// fail if all replicas for this environment are in a failed state
 	allReplicasFailed := true
 	messageCollector := errorcollector.NewErrorMessageCollector()
@@ -365,8 +377,7 @@ func (p *Plugin) getPhaseInfoFromReplicas(ctx context.Context, tCtx core.TaskExe
 			break
 		}
 
-		now := time.Now()
-		phaseInfo, err = podplugin.DemystifyPodStatus(pod, core.TaskInfo{OccurredAt: &now})
+		phaseInfo, err = podplugin.DemystifyPodStatus(pod, *taskInfo)
 		if err != nil {
 			return core.PhaseInfoUndefined, err
 		}
@@ -390,10 +401,10 @@ func (p *Plugin) getPhaseInfoFromReplicas(ctx context.Context, tCtx core.TaskExe
 		p.metrics.allReplicasFailed.Inc()
 
 		phaseInfo = core.PhaseInfoSystemFailure("unknown", fmt.Sprintf("all workers have failed for queue %s\n%s",
-			queueID, messageCollector.Summary(maxErrorMessageLength)), nil)
+			queueID, messageCollector.Summary(maxErrorMessageLength)), taskInfo)
 	} else {
 		pluginState.PhaseVersion = core.DefaultPhaseVersion
-		phaseInfo = core.PhaseInfoWaitingForResourcesInfo(time.Now(), pluginState.PhaseVersion, "no workers available", nil)
+		phaseInfo = core.PhaseInfoWaitingForResourcesInfo(time.Now(), pluginState.PhaseVersion, "no workers available", taskInfo)
 	}
 	return phaseInfo, nil
 }
@@ -453,6 +464,26 @@ func (p *Plugin) monitorTask(ctx context.Context, tCtx core.TaskExecutionContext
 
 func (p *Plugin) getTaskInfo(ctx context.Context, tCtx core.TaskExecutionContext,
 	start, end time.Time, executionEnv *idlcore.ExecutionEnv, queueID, workerID string) (*core.TaskInfo, error) {
+	assignmentInfo := &pb.FastTaskAssignment{
+		EnvironmentId:  queueID,
+		AssignedWorker: workerID,
+	}
+	customInfo := structpb.Struct{}
+	err := utils.MarshalStruct(assignmentInfo, &customInfo)
+	if err != nil {
+		return nil, err
+	}
+	now := time.Now()
+	taskInfo := core.TaskInfo{
+		OccurredAt: &now,
+		ExternalResources: []*core.ExternalResource{
+			{CustomInfo: &customInfo},
+		},
+	}
+
+	if workerID == "" {
+		return &taskInfo, nil
+	}
 
 	taskExecutionID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID()
 	executionEnvID := buildExecutionEnvID(taskExecutionID.GetTaskId(), executionEnv)
@@ -468,7 +499,7 @@ func (p *Plugin) getTaskInfo(ctx context.Context, tCtx core.TaskExecutionContext
 		// an in-memory store the may occur during restarts.
 		// `pod == nil` may occur if it has not yet been populated in the kubeclient cache or was deleted
 		logger.Warnf(ctx, "Worker %q not found (exists=%s) in status map for queue '%s'", workerID, ok, queueID)
-		return &core.TaskInfo{}, nil
+		return &taskInfo, nil
 	}
 
 	taskTemplate, err := tCtx.TaskReader().Read(ctx)
@@ -501,10 +532,8 @@ func (p *Plugin) getTaskInfo(ctx context.Context, tCtx core.TaskExecutionContext
 		return nil, err
 	}
 
-	return &core.TaskInfo{
-		Logs: logs.TaskLogs,
-	}, nil
-
+	taskInfo.Logs = logs.TaskLogs
+	return &taskInfo, nil
 }
 
 // Abort halts the specified task execution.

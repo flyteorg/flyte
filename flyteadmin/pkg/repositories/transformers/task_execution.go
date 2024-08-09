@@ -11,6 +11,7 @@ import (
 	_struct "github.com/golang/protobuf/ptypes/struct"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
@@ -315,6 +316,11 @@ func mergeExternalResource(existing, latest *event.ExternalResourceInfo) *event.
 	existing.Logs = mergeLogs(existing.Logs, latest.Logs)
 	if existing.GetTargetMetadata() == nil && latest.GetTargetMetadata() != nil {
 		existing.TargetMetadata = latest.GetTargetMetadata()
+	}
+
+	// Overwrite custom info if provided
+	if latest.GetCustomInfo() != nil {
+		existing.CustomInfo = proto.Clone(latest.GetCustomInfo()).(*structpb.Struct)
 	}
 
 	return existing

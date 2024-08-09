@@ -2,6 +2,7 @@ package pod
 
 import (
 	"context"
+	"time"
 
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -211,7 +212,7 @@ func DemystifyPodStatus(pod *v1.Pod, info pluginsCore.TaskInfo) (pluginsCore.Pha
 	case v1.PodPending:
 		phaseInfo, err = flytek8s.DemystifyPending(pod.Status)
 	case v1.PodReasonUnschedulable:
-		phaseInfo = pluginsCore.PhaseInfoQueued(*info.OccurredAt, pluginsCore.DefaultPhaseVersion, "pod unschedulable")
+		phaseInfo = pluginsCore.PhaseInfoQueued(*timeOrNow(info.OccurredAt), pluginsCore.DefaultPhaseVersion, "pod unschedulable")
 	case v1.PodUnknown:
 		// DO NOTHING
 	default:
@@ -257,6 +258,14 @@ func DemystifyPodStatus(pod *v1.Pod, info pluginsCore.TaskInfo) (pluginsCore.Pha
 	}
 
 	return phaseInfo, err
+}
+
+func timeOrNow(t *time.Time) *time.Time {
+	if t != nil {
+		return t
+	}
+	now := time.Now()
+	return &now
 }
 
 func init() {

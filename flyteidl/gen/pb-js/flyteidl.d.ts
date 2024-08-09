@@ -9151,6 +9151,9 @@ export namespace flyteidl {
 
             /** ExternalResourceInfo workflowNodeMetadata */
             workflowNodeMetadata?: (flyteidl.event.IWorkflowNodeMetadata|null);
+
+            /** ExternalResourceInfo customInfo */
+            customInfo?: (google.protobuf.IStruct|null);
         }
 
         /** Represents an ExternalResourceInfo. */
@@ -9182,6 +9185,9 @@ export namespace flyteidl {
 
             /** ExternalResourceInfo workflowNodeMetadata. */
             public workflowNodeMetadata?: (flyteidl.event.IWorkflowNodeMetadata|null);
+
+            /** ExternalResourceInfo customInfo. */
+            public customInfo?: (google.protobuf.IStruct|null);
 
             /** ExternalResourceInfo targetMetadata. */
             public targetMetadata?: "workflowNodeMetadata";

@@ -1,0 +1,11 @@
+version: v1
+lint:
+  # Lints that are not enforced today
+  except:
+    - ENUM_VALUE_PREFIX
+    - ENUM_ZERO_VALUE_SUFFIX
+    - PACKAGE_DIRECTORY_MATCH
+    - PACKAGE_VERSION_SUFFIX
+  ignore_only:
+    SERVICE_SUFFIX:
+      - fasttask.proto

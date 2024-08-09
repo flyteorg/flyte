@@ -14778,6 +14778,10 @@
         },
         "workflow_node_metadata": {
           "$ref": "#/definitions/flyteidleventWorkflowNodeMetadata"
+        },
+        "custom_info": {
+          "type": "object",
+          "title": "Extensible field for custom, plugin-specific info"
         }
       },
       "description": "This message contains metadata about external resources produced or used by a specific task execution."

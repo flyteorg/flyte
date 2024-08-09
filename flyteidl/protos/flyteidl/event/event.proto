@@ -291,6 +291,9 @@ message ExternalResourceInfo {
     oneof target_metadata {
         WorkflowNodeMetadata workflow_node_metadata = 7;
     }
+
+    // Extensible field for custom, plugin-specific info
+    google.protobuf.Struct custom_info = 8;
 }
 
 

@@ -4,34 +4,32 @@ package fasttask;
 
 option go_package = "pb/";
 
-import "google/protobuf/struct.proto";
-
 message TaskStatus {
-    string taskId = 1;
+    string task_id = 1;
     string namespace = 2;
-    string workflowId = 3;
+    string workflow_id = 3;
     int32 phase = 4;
     string reason = 5;
 }
 
 message Capacity {
-    int32 executionCount = 1;
-    int32 executionLimit = 2;
-    int32 backlogCount = 3;
-    int32 backlogLimit = 4;
+    int32 execution_count = 1;
+    int32 execution_limit = 2;
+    int32 backlog_count = 3;
+    int32 backlog_limit = 4;
 }
 
 message HeartbeatRequest {
-    string workerId = 1;
-    string queueId = 2;
+    string worker_id = 1;
+    string queue_id = 2;
     Capacity capacity = 3;
-    repeated TaskStatus taskStatuses = 4;
+    repeated TaskStatus task_statuses = 4;
 }
 
 message HeartbeatResponse {
-    string taskId = 1;
+    string task_id = 1;
     string namespace = 2;
-    string workflowId = 3;
+    string workflow_id = 3;
     repeated string cmd = 4;
 
     enum Operation {
@@ -60,4 +58,12 @@ message FastTaskEnvironmentSpec {
     oneof termination_criteria {
         int32 ttl_seconds = 6;
     }
+}
+
+message FastTaskAssignment {
+    // Environment ID for this fast task
+    string environment_id = 1;
+
+    // The assigned worker pod name for this fast task, if available
+    string assigned_worker = 2;
 }

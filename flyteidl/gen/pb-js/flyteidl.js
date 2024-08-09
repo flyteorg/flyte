@@ -22410,6 +22410,7 @@
                  * @property {flyteidl.core.CatalogCacheStatus|null} [cacheStatus] ExternalResourceInfo cacheStatus
                  * @property {Array.<flyteidl.core.ITaskLog>|null} [logs] ExternalResourceInfo logs
                  * @property {flyteidl.event.IWorkflowNodeMetadata|null} [workflowNodeMetadata] ExternalResourceInfo workflowNodeMetadata
+                 * @property {google.protobuf.IStruct|null} [customInfo] ExternalResourceInfo customInfo
                  */
     
                 /**
@@ -22484,6 +22485,14 @@
                  */
                 ExternalResourceInfo.prototype.workflowNodeMetadata = null;
     
+                /**
+                 * ExternalResourceInfo customInfo.
+                 * @member {google.protobuf.IStruct|null|undefined} customInfo
+                 * @memberof flyteidl.event.ExternalResourceInfo
+                 * @instance
+                 */
+                ExternalResourceInfo.prototype.customInfo = null;
+    
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
     
@@ -22537,6 +22546,8 @@
                             $root.flyteidl.core.TaskLog.encode(message.logs[i], writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
                     if (message.workflowNodeMetadata != null && message.hasOwnProperty("workflowNodeMetadata"))
                         $root.flyteidl.event.WorkflowNodeMetadata.encode(message.workflowNodeMetadata, writer.uint32(/* id 7, wireType 2 =*/58).fork()).ldelim();
+                    if (message.customInfo != null && message.hasOwnProperty("customInfo"))
+                        $root.google.protobuf.Struct.encode(message.customInfo, writer.uint32(/* id 8, wireType 2 =*/66).fork()).ldelim();
                     return writer;
                 };
     
@@ -22580,6 +22591,9 @@
                             break;
                         case 7:
                             message.workflowNodeMetadata = $root.flyteidl.event.WorkflowNodeMetadata.decode(reader, reader.uint32());
+                            break;
+                        case 8:
+                            message.customInfo = $root.google.protobuf.Struct.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -22654,6 +22668,11 @@
                             if (error)
                                 return "workflowNodeMetadata." + error;
                         }
+                    }
+                    if (message.customInfo != null && message.hasOwnProperty("customInfo")) {
+                        var error = $root.google.protobuf.Struct.verify(message.customInfo);
+                        if (error)
+                            return "customInfo." + error;
                     }
                     return null;
                 };

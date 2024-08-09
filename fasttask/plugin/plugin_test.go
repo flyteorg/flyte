@@ -520,6 +520,12 @@ func TestHandleNotYetStarted(t *testing.T) {
 			assert.Equal(t, test.expectedReason, transition.Info().Reason())
 			assert.Len(t, transition.Info().Info().Logs, 0)
 
+			require.Len(t, transition.Info().Info().ExternalResources, 1)
+			assignment := pb.FastTaskAssignment{}
+			require.NoError(t, utils.UnmarshalStruct(transition.Info().Info().ExternalResources[0].CustomInfo, &assignment))
+			assert.Equal(t, "foo", assignment.GetEnvironmentId())
+			assert.Equal(t, test.workerID, assignment.GetAssignedWorker())
+
 			if len(test.workerID) > 0 {
 				assert.Equal(t, test.workerID, arrayNodeStateOutput.WorkerID)
 			}
@@ -745,6 +751,12 @@ func TestHandleRunning(t *testing.T) {
 			} else {
 				assert.Len(t, transition.Info().Info().Logs, 0)
 			}
+
+			require.Len(t, transition.Info().Info().ExternalResources, 1)
+			assignment := pb.FastTaskAssignment{}
+			require.NoError(t, utils.UnmarshalStruct(transition.Info().Info().ExternalResources[0].CustomInfo, &assignment))
+			assert.Equal(t, "foo", assignment.GetEnvironmentId())
+			assert.Equal(t, "w0", assignment.GetAssignedWorker())
 		})
 	}
 }

@@ -115,5 +115,15 @@ pub mod fast_task_environment_spec {
         TtlSeconds(i32),
     }
 }
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct FastTaskAssignment {
+    /// Environment ID for this fast task
+    #[prost(string, tag = "1")]
+    pub environment_id: ::prost::alloc::string::String,
+    /// The assigned worker pod name for this fast task, if available
+    #[prost(string, tag = "2")]
+    pub assigned_worker: ::prost::alloc::string::String,
+}
 include!("fasttask.tonic.rs");
 // @@protoc_insertion_point(module)
