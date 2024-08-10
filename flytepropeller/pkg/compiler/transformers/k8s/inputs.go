@@ -1,12 +1,11 @@
 package k8s
 
 import (
-	"k8s.io/apimachinery/pkg/util/sets"
-
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/errors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/validators"
+	"k8s.io/apimachinery/pkg/util/sets"
 )
 
 func validateInputs(nodeID common.NodeID, iface *core.TypedInterface, inputs core.LiteralMap, errs errors.CompileErrors) (ok bool) {
@@ -36,6 +35,7 @@ func validateInputs(nodeID common.NodeID, iface *core.TypedInterface, inputs cor
 		}
 
 		inputType := validators.LiteralTypeForLiteral(inputVal)
+		// todo: add a new error for idl type not found
 		if !validators.AreTypesCastable(inputType, v.Type) {
 			errs.Collect(errors.NewMismatchingTypesErr(nodeID, inputVar, v.Type.String(), inputType.String()))
 			continue

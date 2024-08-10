@@ -2,6 +2,7 @@ package validation
 
 import (
 	"context"
+	"fmt"
 
 	"google.golang.org/grpc/codes"
 
@@ -143,6 +144,17 @@ func checkAndFetchExpectedInputForLaunchPlan(
 			return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "unexpected fixed_input %s", name)
 		}
 		inputType := validators.LiteralTypeForLiteral(fixedInput)
+		if inputType == nil {
+			return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
+				fmt.Sprintf(
+					"invalid %s input wrong type.\n"+
+						"Expected %s, but got %s.\n"+
+						"Suggested solution: Please update all of your Flyte images to the latest version and try"+
+						" again.",
+					name, value.GetType().String(), inputType,
+				),
+			)
+		}
 		if !validators.AreTypesCastable(inputType, value.GetType()) {
 			return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 				"invalid fixed_input wrong type %s, expected %v, got %v instead", name, value.GetType(), inputType)

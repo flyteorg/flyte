@@ -186,6 +186,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		size := -1
 		for _, variable := range literalMap.Literals {
 			literalType := validators.LiteralTypeForLiteral(variable)
+			// TODO: Add a new error for idl type not found
 			switch literalType.Type.(type) {
 			case *idlcore.LiteralType_CollectionType:
 				collectionLength := len(variable.GetCollection().Literals)
