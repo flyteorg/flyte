@@ -95,13 +95,14 @@ pub fn with_new(input: TokenStream) -> TokenStream {
                             }
                         }
                         // For the needs like `load_proto_from_file()`, `write_proto_to_file()` in `flytekit/core/utils.py`
-                        pub fn ParseFromString(&mut self, bytes_string: &str) -> Result<#name, crate::_flyteidl_rust::MessageDecodeError>
+                        pub fn ParseFromString(&mut self, bytes_string: &pyo3::types::PyBytes) -> Result<#name, crate::_flyteidl_rust::MessageDecodeError>
                         {
-                            let bt = bytes_string.as_bytes();
-                            let de = prost::Message::decode(&bt.to_vec()[..]);
+                            use prost::Message;
+                            let bytes = bytes_string.as_bytes();
+                            let de = Message::decode(&bytes.to_vec()[..]);
                             Ok(de?)
                         }
-                        pub fn SerializeToString(&self) -> Result<String, crate::_flyteidl_rust::MessageEncodeError>
+                        pub fn SerializeToString(&self, py: Python) -> Result<PyObject, crate::_flyteidl_rust::MessageEncodeError>
                         {
                             // Bring `prost::Message` trait to scope here. Put it in outer impl block will leads to duplicated imports.
                             use prost::Message;
@@ -109,8 +110,7 @@ pub fn with_new(input: TokenStream) -> TokenStream {
                             buf.reserve(self.encoded_len());
                             // Unwrap is safe, since we have reserved sufficient capacity in the vector.
                             self.encode(&mut buf).unwrap();
-                            let result = base64::encode(&buf);
-                            Ok(result)
+                            Ok(pyo3::types::PyBytes::new_bound(py, &buf).into())
                         }
                     }
                 }
