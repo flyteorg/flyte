@@ -38,10 +38,28 @@ pub fn with_new(input: TokenStream) -> TokenStream {
                 optional_fields.iter().map(|(name, _)| name).collect();
             let optional_field_types: Vec<_> = optional_fields.iter().map(|(_, ty)| ty).collect();
 
-            let all_values = quote! { #(#field_names),*};
+            // Generate the struct's field initialization
+            // Use default value for required fields and omit the optional fields
+            let all_values = if required_field_names.is_empty() && optional_field_names.is_empty() {
+                quote! {}
+            } else if required_field_names.is_empty() && !optional_field_names.is_empty() {
+                quote! {
+                    #(#optional_field_names: #optional_field_names),*
+                }
+            } else if !required_field_names.is_empty() && optional_field_names.is_empty() {
+                quote! {
+                    #(#required_field_names: #required_field_names.unwrap_or_default()),*
+                }
+            } else {
+                quote! {
+                    #(#required_field_names: #required_field_names.unwrap_or_default()),*,
+                    #(#optional_field_names: #optional_field_names),*
+                }
+            };
 
+            // Make required fields optional, so we can treat trailing Option<T> arguments as having a default of None.
             let required_part = if !required_field_names.is_empty() {
-                quote! { #(#required_field_names: #required_field_types),* }
+                quote! { #(#required_field_names: Option<#required_field_types>),* }
             } else {
                 quote! {}
             };
@@ -87,8 +105,8 @@ pub fn with_new(input: TokenStream) -> TokenStream {
                         // Most arguments are required by default, except for trailing Option<_> arguments, which are implicitly given a default of None.
                         // This behaviour can be configured by the #[pyo3(signature = (...))] option which allows writing a signature in Python syntax.
                         // https://pyo3.rs/v0.21.2/function/signature#trailing-optional-arguments
+                        // As a convenience, functions without a #[pyo3(signature = (...))] option will treat trailing Option<T> arguments as having a default of None.
                         #[new]
-                        #[pyo3(signature = ( #combined_signatures ) )]
                         pub fn new(#combined_arguments) -> Self {
                             Self {
                                 #all_values
