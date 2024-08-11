@@ -15,8 +15,10 @@ import (
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async"
 	scheduleInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/async/schedule/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/runtime"
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -121,9 +123,23 @@ func (e *workflowExecutor) getActiveLaunchPlanVersion(launchPlanIdentifier *admi
 	return *launchPlans.LaunchPlans[0], nil
 }
 
+func generateExecutionName(launchPlan admin.LaunchPlan, kickoffTime time.Time) string {
+	hashedIdentifier := hashIdentifier(core.Identifier{
+		Project: launchPlan.Id.Project,
+		Domain:  launchPlan.Id.Domain,
+		Name:    launchPlan.Id.Name,
+	})
+	randomSeed := kickoffTime.UnixNano() + int64(hashedIdentifier)
+	config := runtime.NewApplicationConfigurationProvider()
+	return common.GetExecutionName(randomSeed, config.GetTopLevelConfig().FeatureGates.EnableHumanHash)
+}
+
 func (e *workflowExecutor) formulateExecutionCreateRequest(
 	launchPlan admin.LaunchPlan, kickoffTime time.Time) admin.ExecutionCreateRequest {
 	// Deterministically assign a name based on the schedule kickoff time/launch plan definition.
+	name := generateExecutionName(launchPlan, kickoffTime)
+	logger.Debugf(context.Background(), "generated name [%s] for scheduled execution with launch plan [%+v]",
+		name, launchPlan.Id)
 	kickoffTimeProto, err := ptypes.TimestampProto(kickoffTime)
 	if err != nil {
 		// We expected that kickoff times are valid (in order for a scheduled event to fire).
@@ -136,6 +152,7 @@ func (e *workflowExecutor) formulateExecutionCreateRequest(
 	executionRequest := admin.ExecutionCreateRequest{
 		Project: launchPlan.Id.Project,
 		Domain:  launchPlan.Id.Domain,
+		Name:    name,
 		Spec: &admin.ExecutionSpec{
 			LaunchPlan: launchPlan.Id,
 			Metadata: &admin.ExecutionMetadata{
@@ -192,7 +209,6 @@ func (e *workflowExecutor) run() error {
 			continue
 		}
 		executionRequest := e.formulateExecutionCreateRequest(launchPlan, scheduledWorkflowExecutionRequest.KickoffTime)
-
 		ctx = contextutils.WithWorkflowID(ctx, fmt.Sprintf(workflowIdentifierFmt, executionRequest.Project,
 			executionRequest.Domain, executionRequest.Name))
 		err = e.resolveKickoffTimeArg(scheduledWorkflowExecutionRequest, launchPlan, &executionRequest)
