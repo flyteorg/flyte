@@ -10,14 +10,14 @@ import (
 )
 
 const ExecutionIDLength = 20
-const ExecutionIDLengthLimit = 45
+const ExecutionIDLengthLimit = 63
 const ExecutionStringFormat = "a%s"
 
 /* #nosec */
 func GetExecutionName(seed int64, enableHumanHash bool) string {
 	rand.Seed(seed)
 	if enableHumanHash {
-		hashKey := []byte(rand.String(20))
+		hashKey := []byte(rand.String(ExecutionIDLength))
 		result, _ := humanhash.Humanize(hashKey, 3)
 		return result
 	}
