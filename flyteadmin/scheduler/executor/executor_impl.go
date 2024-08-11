@@ -12,6 +12,8 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/util/retry"
 
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/runtime"
 	"github.com/flyteorg/flyte/flyteadmin/scheduler/identifier"
 	"github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/models"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
@@ -66,10 +68,18 @@ func (w *executor) Execute(ctx context.Context, scheduledTime time.Time, s model
 		return err
 	}
 
+	executionName := ""
+	config := runtime.NewApplicationConfigurationProvider()
+	if config.GetTopLevelConfig().FeatureGates.EnableHumanHash {
+		executionName = common.GetExecutionName(time.Now().UnixNano(), config.GetTopLevelConfig().FeatureGates.EnableHumanHash)
+	} else {
+		executionName = "f" + strings.ReplaceAll(executionIdentifier.String(), "-", "")[:19]
+	}
+
 	executionRequest := &admin.ExecutionCreateRequest{
 		Project: s.Project,
 		Domain:  s.Domain,
-		Name:    "f" + strings.ReplaceAll(executionIdentifier.String(), "-", "")[:19],
+		Name:    executionName,
 		Spec: &admin.ExecutionSpec{
 			LaunchPlan: &core.Identifier{
 				ResourceType: core.ResourceType_LAUNCH_PLAN,
