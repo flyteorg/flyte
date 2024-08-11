@@ -392,7 +392,7 @@ pub mod _flyteidl_rust {
         #[pymodule_export]
         use crate::flyteidl::core::{
             Alias, ApproveCondition, ArrayNode, Binary, Binding, BindingData,
-            BindingDataCollection, BlobMetadata, BlobType, BooleanExpression, BranchNode,
+            BindingDataCollection, Blob, BlobMetadata, BlobType, BooleanExpression, BranchNode,
             CatalogArtifactTag, CatalogMetadata, CompiledLaunchPlan, CompiledTask,
             CompiledWorkflow, CompiledWorkflowClosure, Container, ContainerError, ContainerPort,
             DataLoadingConfig, Error, ErrorDocument, ExecutionEnv, ExecutionEnvAssignment,
