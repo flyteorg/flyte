@@ -482,7 +482,7 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 		return nil, nil, err
 	}
 
-	name := util.GetExecutionName(request, m.config.ApplicationConfiguration())
+	name := util.GetExecutionName(request)
 	workflowExecutionID := core.WorkflowExecutionIdentifier{
 		Project: request.Project,
 		Domain:  request.Domain,
@@ -888,7 +888,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 	closure.CreatedAt = workflow.Closure.CreatedAt
 	workflow.Closure = closure
 
-	name := util.GetExecutionName(request, m.config.ApplicationConfiguration())
+	name := util.GetExecutionName(request)
 	workflowExecutionID := core.WorkflowExecutionIdentifier{
 		Project: request.Project,
 		Domain:  request.Domain,

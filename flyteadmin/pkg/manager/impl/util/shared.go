@@ -15,17 +15,18 @@ import (
 	repoInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/transformers"
-	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/runtime"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
-func GetExecutionName(request admin.ExecutionCreateRequest, config runtimeInterfaces.ApplicationConfiguration) string {
+func GetExecutionName(request admin.ExecutionCreateRequest) string {
 	if request.Name != "" {
 		return request.Name
 	}
+	config := runtime.NewApplicationConfigurationProvider()
 	return common.GetExecutionName(time.Now().UnixNano(), config.GetTopLevelConfig().FeatureGates.EnableHumanHash)
 }
 
