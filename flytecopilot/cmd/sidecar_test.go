@@ -90,7 +90,7 @@ func TestUploadOptions_Upload(t *testing.T) {
 		assert.NoError(t, ioutil.WriteFile(success, []byte("done"), os.ModePerm))
 		ok, err := containerwatcher.FileExists(success)
 		assert.NoError(t, err)
-		assert.True(t, ok, "sucessfile not created")
+		assert.True(t, ok, "successfile not created")
 		assert.NoError(t, uopts.Sidecar(ctx))
 		v, err := store.Head(ctx, "/output/errors.pb")
 		assert.NoError(t, err)
