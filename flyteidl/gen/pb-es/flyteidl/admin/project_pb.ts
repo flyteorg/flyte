@@ -547,7 +547,8 @@ export class ProjectGetRequest extends Message<ProjectGetRequest> {
  */
 export class InactiveProject extends Message<InactiveProject> {
   /**
-   * Globally unique project name.
+   * Indicates a unique project.
+   * +required
    *
    * @generated from field: string id = 1;
    */
@@ -556,7 +557,7 @@ export class InactiveProject extends Message<InactiveProject> {
   /**
    * Optional, org key applied to the resource.
    *
-   * @generated from field: string org = 5;
+   * @generated from field: string org = 2;
    */
   org = "";
 
@@ -569,7 +570,7 @@ export class InactiveProject extends Message<InactiveProject> {
   static readonly typeName = "flyteidl.admin.InactiveProject";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 5, name: "org", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "org", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): InactiveProject {

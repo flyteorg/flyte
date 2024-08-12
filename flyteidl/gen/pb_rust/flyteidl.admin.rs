@@ -2619,11 +2619,12 @@ pub struct ProjectGetRequest {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct InactiveProject {
-    /// Globally unique project name.
+    /// Indicates a unique project.
+    /// +required
     #[prost(string, tag="1")]
     pub id: ::prost::alloc::string::String,
     /// Optional, org key applied to the resource.
-    #[prost(string, tag="5")]
+    #[prost(string, tag="2")]
     pub org: ::prost::alloc::string::String,
 }
 /// Defines a set of custom matching attributes at the project level.

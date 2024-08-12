@@ -122,9 +122,11 @@ message ProjectGetRequest {
 
 // Error returned for inactive projects
 message InactiveProject {
-    // Globally unique project name.
-    string id               = 1;
+    // Indicates a unique project.
+    // +required
+    string id = 1;
 
     // Optional, org key applied to the resource.
-    string org = 5;
+    string org = 2;
 }
+
