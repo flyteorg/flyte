@@ -1405,7 +1405,16 @@ var ContinuedMigrations = []*gormigrate.Migration{
 			return tx.Migrator().DropTable("execution_tags")
 		},
 	},
-
+	{
+		ID: "2024-08-08-remove-input-uri-for-start-nodes",
+		Migrate: func(db *gorm.DB) error {
+			return db.Exec("UPDATE node_executions SET input_uri = '' WHERE node_id = 'start-node'").Error
+		},
+		Rollback: func(db *gorm.DB) error {
+			// can't rollback missing data
+			return nil
+		},
+	},
 	// TODO: Drop the table after we have successfully migrated the execution tags tables and confirmed there are no issues in production.
 	//{
 	//	ID: "2024-06-06-drop-execution_admin-tags",
