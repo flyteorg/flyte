@@ -71,7 +71,11 @@ func (w *executor) Execute(ctx context.Context, scheduledTime time.Time, s model
 	executionName := ""
 	config := runtime.NewApplicationConfigurationProvider()
 	if config.GetTopLevelConfig().FeatureGates.EnableHumanHash {
-		executionName = common.GetExecutionName(time.Now().UnixNano(), config.GetTopLevelConfig().FeatureGates.EnableHumanHash)
+		executionName, err = common.GetExecutionName(time.Now().UnixNano(), config.GetTopLevelConfig().FeatureGates.EnableHumanHash)
+		if err != nil {
+			logger.Errorf(ctx, "failed to generate execution name for schedule %+v due to %v", s, err)
+			return err
+		}
 	} else {
 		executionName = "f" + strings.ReplaceAll(executionIdentifier.String(), "-", "")[:19]
 	}

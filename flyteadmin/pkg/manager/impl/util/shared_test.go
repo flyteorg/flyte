@@ -37,20 +37,26 @@ const remoteClosureIdentifier = "remote closure id"
 var errExpected = errors.New("expected error")
 
 func TestPopulateExecutionID(t *testing.T) {
-	name := GetExecutionName(admin.ExecutionCreateRequest{
+	name, err := GetExecutionName(admin.ExecutionCreateRequest{
 		Project: "project",
 		Domain:  "domain",
 	})
+	if err != nil {
+		t.Errorf("unexpected error generating execution name: %v", err)
+	}
 	assert.NotEmpty(t, name)
 	assert.LessOrEqual(t, len(name), common.ExecutionIDLengthLimit)
 }
 
 func TestPopulateExecutionID_ExistingName(t *testing.T) {
-	name := GetExecutionName(admin.ExecutionCreateRequest{
+	name, err := GetExecutionName(admin.ExecutionCreateRequest{
 		Project: "project",
 		Domain:  "domain",
 		Name:    "name",
 	})
+	if err != nil {
+		t.Errorf("unexpected error generating execution name: %v", err)
+	}
 	assert.Equal(t, "name", name)
 }
 

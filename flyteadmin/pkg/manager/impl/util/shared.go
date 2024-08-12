@@ -22,12 +22,16 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
-func GetExecutionName(request admin.ExecutionCreateRequest) string {
+func GetExecutionName(request admin.ExecutionCreateRequest) (string, error) {
 	if request.Name != "" {
-		return request.Name
+		return request.Name, nil
 	}
 	config := runtime.NewApplicationConfigurationProvider()
-	return common.GetExecutionName(time.Now().UnixNano(), config.GetTopLevelConfig().FeatureGates.EnableHumanHash)
+	executionName, err := common.GetExecutionName(time.Now().UnixNano(), config.GetTopLevelConfig().FeatureGates.EnableHumanHash)
+	if err != nil {
+		return "", err
+	}
+	return executionName, nil
 }
 
 func GetTask(ctx context.Context, repo repoInterfaces.Repository, identifier core.Identifier) (

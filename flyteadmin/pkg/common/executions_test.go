@@ -17,7 +17,10 @@ var AllowedExecutionIDAlphanumerics = []rune(AllowedExecutionIDAlphanumericStr)
 var AllowedExecutionIDHumanHashChars = []rune(AllowedExecutionIDHumanHashStr)
 
 func TestGetExecutionName(t *testing.T) {
-	randString := GetExecutionName(time.Now().UnixNano(), false)
+	randString, err := GetExecutionName(time.Now().UnixNano(), false)
+	if err != nil {
+		t.Errorf("unexpected error generating execution name with random string style: %v", err)
+	}
 	assert.Len(t, randString, ExecutionIDLength)
 	assert.Contains(t, AllowedExecutionIDAlphabets, rune(randString[0]))
 	for i := 1; i < len(randString); i++ {
@@ -26,7 +29,10 @@ func TestGetExecutionName(t *testing.T) {
 }
 
 func TestGetExecutionName_HumanHash(t *testing.T) {
-	randString := GetExecutionName(time.Now().UnixNano(), true)
+	randString, err := GetExecutionName(time.Now().UnixNano(), true)
+	if err != nil {
+		t.Errorf("unexpected error generating execution name with humanhash style: %v", err)
+	}
 	assert.LessOrEqual(t, len(randString), ExecutionIDLengthLimit)
 	for i := 0; i < len(randString); i++ {
 		assert.Contains(t, AllowedExecutionIDHumanHashChars, rune(randString[i]))
