@@ -246,6 +246,7 @@ func TestValidateBindings(t *testing.T) {
 	t.Run("Promises", func(t *testing.T) {
 		n := &mocks.NodeBuilder{}
 		n.OnGetId().Return("node1")
+		n.OnGetMetadata().Return(&core.NodeMetadata{Name: "node1"})
 		n.OnGetInterface().Return(&core.TypedInterface{
 			Inputs: &core.VariableMap{
 				Variables: map[string]*core.Variable{},
@@ -257,6 +258,7 @@ func TestValidateBindings(t *testing.T) {
 
 		n2 := &mocks.NodeBuilder{}
 		n2.OnGetId().Return("node2")
+		n2.OnGetMetadata().Return(&core.NodeMetadata{Name: "node2"})
 		n2.OnGetOutputAliases().Return(nil)
 		n2.OnGetInterface().Return(&core.TypedInterface{
 			Inputs: &core.VariableMap{
@@ -310,6 +312,7 @@ func TestValidateBindings(t *testing.T) {
 
 		n := &mocks.NodeBuilder{}
 		n.OnGetId().Return("node1")
+		n.OnGetMetadata().Return(&core.NodeMetadata{Name: "node1"})
 		n.OnGetInterface().Return(&core.TypedInterface{
 			Inputs: &core.VariableMap{
 				Variables: map[string]*core.Variable{},
@@ -321,6 +324,7 @@ func TestValidateBindings(t *testing.T) {
 
 		n2 := &mocks.NodeBuilder{}
 		n2.OnGetId().Return("node2")
+		n2.OnGetMetadata().Return(&core.NodeMetadata{Name: "node2"})
 		n2.OnGetOutputAliases().Return(nil)
 		n2.OnGetInterface().Return(&core.TypedInterface{
 			Inputs: &core.VariableMap{
@@ -382,6 +386,7 @@ func TestValidateBindings(t *testing.T) {
 
 		n := &mocks.NodeBuilder{}
 		n.OnGetId().Return("node1")
+		n.OnGetMetadata().Return(&core.NodeMetadata{Name: "node1"})
 		n.OnGetInterface().Return(&core.TypedInterface{
 			Inputs: &core.VariableMap{
 				Variables: map[string]*core.Variable{},
@@ -393,6 +398,7 @@ func TestValidateBindings(t *testing.T) {
 
 		n2 := &mocks.NodeBuilder{}
 		n2.OnGetId().Return("node2")
+		n2.OnGetMetadata().Return(&core.NodeMetadata{Name: "node2"})
 		n2.OnGetOutputAliases().Return(nil)
 		literalType := LiteralTypeForLiteral(coreutils.MustMakeLiteral(&structpb.Struct{}))
 		literalType.Structure = &core.TypeStructure{}
@@ -718,6 +724,7 @@ func TestValidateBindings(t *testing.T) {
 		wf := &mocks.WorkflowBuilder{}
 		n := &mocks.NodeBuilder{}
 		n.OnGetId().Return("node1")
+		n.OnGetMetadata().Return(&core.NodeMetadata{Name: "node1"})
 
 		bindings := []*core.Binding{
 			{
@@ -1038,6 +1045,7 @@ func TestValidateBindings(t *testing.T) {
 	t.Run("Union Promise Unambiguous", func(t *testing.T) {
 		n := &mocks.NodeBuilder{}
 		n.OnGetId().Return("node1")
+		n.OnGetMetadata().Return(&core.NodeMetadata{Name: "node1"})
 		n.OnGetInterface().Return(&core.TypedInterface{
 			Inputs: &core.VariableMap{
 				Variables: map[string]*core.Variable{},
@@ -1049,6 +1057,7 @@ func TestValidateBindings(t *testing.T) {
 
 		n2 := &mocks.NodeBuilder{}
 		n2.OnGetId().Return("node2")
+		n2.OnGetMetadata().Return(&core.NodeMetadata{Name: "node2"})
 		n2.OnGetOutputAliases().Return(nil)
 		n2.OnGetInterface().Return(&core.TypedInterface{
 			Inputs: &core.VariableMap{
@@ -1119,7 +1128,7 @@ func TestValidateBindings(t *testing.T) {
 	t.Run("Union Promise Ambiguous", func(t *testing.T) {
 		n := &mocks.NodeBuilder{}
 		n.OnGetId().Return("node1")
-		n.OnGetMetadata().Return(&core.NodeMetadata{Name: "node1"})
+		n.OnGetMetadata().Return(&core.NodeMetadata{Name: "n"})
 		n.OnGetInterface().Return(&core.TypedInterface{
 			Inputs: &core.VariableMap{
 				Variables: map[string]*core.Variable{},
@@ -1202,7 +1211,7 @@ func TestValidateBindings(t *testing.T) {
 		assert.False(t, ok)
 		assert.Equal(t, "MismatchingTypes", string(compileErrors.Errors().List()[0].Code()))
 		assert.Equal(t, "Code: MismatchingTypes, Node Id: node1, Description: The output variable 'n2.n2_out'"+
-			" has type [simple:INTEGER], but it's assigned to the input variable 'node1.x' which has type type"+
+			" has type [simple:INTEGER], but it's assigned to the input variable 'n.x' which has type type"+
 			" [union_type:{variants:{simple:STRING structure:{tag:\"str\"}} variants:{simple:INTEGER structure:{tag:\"int1\"}}"+
 			" variants:{simple:INTEGER structure:{tag:\"int2\"}}}].", compileErrors.Errors().List()[0].Error())
 	})
@@ -1210,6 +1219,7 @@ func TestValidateBindings(t *testing.T) {
 	t.Run("Union Promise Union Literal", func(t *testing.T) {
 		n := &mocks.NodeBuilder{}
 		n.OnGetId().Return("node1")
+		n.OnGetMetadata().Return(&core.NodeMetadata{Name: "node1"})
 		n.OnGetInterface().Return(&core.TypedInterface{
 			Inputs: &core.VariableMap{
 				Variables: map[string]*core.Variable{},
@@ -1221,6 +1231,7 @@ func TestValidateBindings(t *testing.T) {
 
 		n2 := &mocks.NodeBuilder{}
 		n2.OnGetId().Return("node2")
+		n2.OnGetMetadata().Return(&core.NodeMetadata{Name: "node2"})
 		n2.OnGetOutputAliases().Return(nil)
 		n2.OnGetInterface().Return(&core.TypedInterface{
 			Inputs: &core.VariableMap{
