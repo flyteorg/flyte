@@ -296,6 +296,38 @@ metadata:
 `,
 			wantErr: false,
 		},
+		{
+			name: "test create resource from templatized imagepullsecrets.yaml",
+			args: args{
+				ctx:              context.Background(),
+				templateDir:      "testdata",
+				templateFileName: "imagepullsecrets_templatized.yaml",
+				project: &admin.Project{
+					Name: "my-project",
+					Id:   "my-project",
+				},
+				domain: &admin.Domain{
+					Id:   "dev",
+					Name: "dev",
+				},
+				namespace: "my-project-dev",
+				templateValues: templateValuesType{
+					"{{ imagePullSecretsName }}": "default",
+				},
+				customTemplateValues: templateValuesType{
+					"{{ imagePullSecretsName }}": "custom",
+				},
+			},
+			wantK8sManifest: `apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: default
+  namespace: my-project-dev
+imagePullSecrets:
+  - name: custom
+`,
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
