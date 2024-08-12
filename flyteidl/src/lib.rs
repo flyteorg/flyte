@@ -396,17 +396,22 @@ pub mod _flyteidl_rust {
             CatalogArtifactTag, CatalogMetadata, CompiledLaunchPlan, CompiledTask,
             CompiledWorkflow, CompiledWorkflowClosure, Container, ContainerError, ContainerPort,
             DataLoadingConfig, Error, ErrorDocument, ExecutionEnv, ExecutionEnvAssignment,
-            ExecutionError, ExtendedResources, GateNode, Identifier, IfBlock, IfElseBlock,
-            IoStrategy, KeyValuePair, Literal, LiteralCollection, LiteralMap, LiteralType, Node,
-            NodeExecutionIdentifier, NodeMetadata, OutputReference, Parameter, ParameterMap,
-            Primitive, PromiseAttribute, ResourceType, Resources, RetryStrategy, RuntimeMetadata,
-            Scalar, SchemaType, SecurityContext, SignalCondition, SimpleType, SleepCondition,
-            StructuredDataset, StructuredDatasetMetadata, StructuredDatasetType,
+            ExecutionError, ExtendedResources, GateNode, GpuAccelerator, Identifier, IfBlock,
+            IfElseBlock, IoStrategy, KeyValuePair, Literal, LiteralCollection, LiteralMap,
+            LiteralType, Node, NodeExecutionIdentifier, NodeMetadata, OutputReference, Parameter,
+            ParameterMap, Primitive, PromiseAttribute, ResourceType, Resources, RetryStrategy,
+            RuntimeMetadata, Scalar, SchemaType, SecurityContext, SignalCondition, SimpleType,
+            SleepCondition, StructuredDataset, StructuredDatasetMetadata, StructuredDatasetType,
             TaskExecutionIdentifier, TaskMetadata, TaskNode, TaskNodeOverrides, TaskTemplate,
             TypeAnnotation, TypeStructure, TypedInterface, Union, UnionInfo, Variable, VariableMap,
             WorkflowExecution, WorkflowExecutionIdentifier, WorkflowMetadata,
             WorkflowMetadataDefaults, WorkflowNode, WorkflowTemplate,
         };
+    }
+    #[pymodule]
+    pub mod label_value {
+        #[pymodule_export]
+        use crate::flyteidl::core::label_value::Value;
     }
     #[pymodule]
     pub mod container_error {
