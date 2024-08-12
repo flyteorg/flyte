@@ -2615,6 +2615,18 @@ pub struct ProjectGetRequest {
     #[prost(string, tag="2")]
     pub org: ::prost::alloc::string::String,
 }
+/// Error returned for inactive projects
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct InactiveProject {
+    /// Indicates a unique project.
+    /// +required
+    #[prost(string, tag="1")]
+    pub id: ::prost::alloc::string::String,
+    /// Optional, org key applied to the resource.
+    #[prost(string, tag="2")]
+    pub org: ::prost::alloc::string::String,
+}
 /// Defines a set of custom matching attributes at the project level.
 /// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
 #[allow(clippy::derive_partial_eq_without_eq)]
