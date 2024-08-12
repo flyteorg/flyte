@@ -6,15 +6,15 @@ In this guide, you will create and run a Flyte workflow in a local Python enviro
 ````{dropdown} Try Flyte in your browser
 :animate: fade-in-slide-down
 
-```{button-link} https://sandbox.union.ai/
+```{button-link} https://serverless.union.ai/
 :expand:
 :color: warning
 
-Hosted Flyte sandbox
+Union Serverless
 ```
 
 ```{div} text-muted
-*Courtesy of [Union.ai](https://www.union.ai/)*
+*Courtesy of [Union](https://www.union.ai/)*
 ```
 ````
 
