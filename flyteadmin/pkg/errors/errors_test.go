@@ -144,7 +144,7 @@ func TestNewTaskExistsDifferentStructureError(t *testing.T) {
 	s, ok := status.FromError(statusErr)
 	assert.True(t, ok)
 	assert.Equal(t, codes.InvalidArgument, s.Code())
-	assert.Equal(t, "t1 task with different structure already exists:\n\t\t- /template/Target/Container/resources/requests/0/value: 150m -> 250m", s.Message())
+	assert.Equal(t, "t1 task with different structure already exists. (Please register a new version of the task):\n/template/Target/Container/resources/requests/0/value:\n\t- 150m \n\t+ 250m", s.Message())
 }
 
 func TestNewTaskExistsIdenticalStructureError(t *testing.T) {
@@ -225,7 +225,7 @@ func TestNewWorkflowExistsDifferentStructureError(t *testing.T) {
 	s, ok := status.FromError(statusErr)
 	assert.True(t, ok)
 	assert.Equal(t, codes.InvalidArgument, s.Code())
-	assert.Equal(t, "hello workflow with different structure already exists:\n\t\t- /primary/connections/upstream/bar: <nil> -> map[ids:[start-node]]\n\t\t- /primary/connections/upstream/end-node/ids/0: foo -> bar\n\t\t- /primary/connections/upstream/foo: map[ids:[start-node]] -> <nil>\n\t\t- /primary/template/nodes/0/id: foo -> bar", s.Message())
+	assert.Equal(t, "hello workflow with different structure already exists. (Please register a new version of the workflow):\n/primary/connections/upstream/bar:\n\t- <nil> \n\t+ map[ids:[start-node]]\n/primary/connections/upstream/end-node/ids/0:\n\t- foo \n\t+ bar\n/primary/connections/upstream/foo:\n\t- map[ids:[start-node]] \n\t+ <nil>\n/primary/template/nodes/0/id:\n\t- foo \n\t+ bar", s.Message())
 
 	details, ok := s.Details()[0].(*admin.CreateWorkflowFailureReason)
 	assert.True(t, ok)
@@ -284,7 +284,7 @@ func TestNewLaunchPlanExistsDifferentStructureError(t *testing.T) {
 	s, ok := status.FromError(statusErr)
 	assert.True(t, ok)
 	assert.Equal(t, codes.InvalidArgument, s.Code())
-	assert.Equal(t, "launch plan with different structure already exists:\n\t\t- /workflow_id/version: ver1 -> ver2", s.Message())
+	assert.Equal(t, "t1 launch plan with different structure already exists. (Please register a new version of the launch plan):\n/workflow_id/version:\n\t- ver1 \n\t+ ver2", s.Message())
 }
 
 func TestNewLaunchPlanExistsIdenticalStructureError(t *testing.T) {
