@@ -4,14 +4,12 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
-	"strings"
 
 	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
 	cmdGet "github.com/flyteorg/flyte/flytectl/cmd/get"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/google/uuid"
 	"sigs.k8s.io/yaml"
 )
 
@@ -53,7 +51,7 @@ func createExecutionRequestForWorkflow(ctx context.Context, workflowName, projec
 		}
 	}
 
-	return createExecutionRequest(lp.Id, inputs, envs, securityContext, authRole, targetExecName, executionConfig.TargetExecutionCluster), nil
+	return createExecutionRequest(lp.Id, inputs, envs, securityContext, authRole, executionConfig.TargetExecutionCluster), nil
 }
 
 func createExecutionRequestForTask(ctx context.Context, taskName string, project string, domain string,
@@ -101,7 +99,7 @@ func createExecutionRequestForTask(ctx context.Context, taskName string, project
 		Version:      task.Id.Version,
 	}
 
-	return createExecutionRequest(id, inputs, envs, securityContext, authRole, targetExecName, executionConfig.TargetExecutionCluster), nil
+	return createExecutionRequest(id, inputs, envs, securityContext, authRole, executionConfig.TargetExecutionCluster), nil
 }
 
 func relaunchExecution(ctx context.Context, executionName string, project string, domain string,
@@ -147,11 +145,8 @@ func recoverExecution(ctx context.Context, executionName string, project string,
 	return nil
 }
 
-func createExecutionRequest(ID *core.Identifier, inputs *core.LiteralMap, envs *admin.Envs, securityContext *core.SecurityContext, authRole *admin.AuthRole, targetExecName string, targetExecutionCluster string) *admin.ExecutionCreateRequest {
+func createExecutionRequest(ID *core.Identifier, inputs *core.LiteralMap, envs *admin.Envs, securityContext *core.SecurityContext, authRole *admin.AuthRole, targetExecutionCluster string) *admin.ExecutionCreateRequest {
 
-	if len(targetExecName) == 0 {
-		targetExecName = "f" + strings.ReplaceAll(uuid.New().String(), "-", "")[:19]
-	}
 	var clusterAssignment *admin.ClusterAssignment
 	if executionConfig.ClusterPool != "" {
 		clusterAssignment = &admin.ClusterAssignment{ClusterPoolName: executionConfig.ClusterPool}
@@ -163,7 +158,6 @@ func createExecutionRequest(ID *core.Identifier, inputs *core.LiteralMap, envs *
 	return &admin.ExecutionCreateRequest{
 		Project: executionConfig.TargetProject,
 		Domain:  executionConfig.TargetDomain,
-		Name:    targetExecName,
 		Spec: &admin.ExecutionSpec{
 			LaunchPlan: ID,
 			Metadata: &admin.ExecutionMetadata{
