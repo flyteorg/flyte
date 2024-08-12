@@ -635,7 +635,11 @@ pub mod _flyteidl_rust {
     #[pymodule]
     pub mod service {
         #[pymodule_export]
-        use crate::flyteidl::service::{CreateUploadLocationRequest, CreateUploadLocationResponse};
+        use crate::flyteidl::service::{
+            CreateDownloadLocationRequest, CreateDownloadLocationResponse,
+            CreateUploadLocationRequest, CreateUploadLocationResponse, GetDataRequest,
+            GetDataResponse,
+        };
     }
 
     // A simple implementation for parsing google protobuf types `Struct` and `Value` from json string after deriving `serde::Deserialize` for structures.
