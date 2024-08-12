@@ -562,22 +562,28 @@ pub mod _flyteidl_rust {
     pub mod admin {
         #[pymodule_export]
         use crate::flyteidl::admin::{
-            AbortMetadata, Annotations, AuthRole, ClusterAssignment, CronSchedule, Description,
-            DescriptionEntity, Envs, Execution, ExecutionClosure, ExecutionClusterLabel,
-            ExecutionCreateRequest, ExecutionCreateResponse, ExecutionMetadata, ExecutionSpec,
+            AbortMetadata, ActiveLaunchPlanRequest, Annotations, AuthRole, ClusterAssignment,
+            CronSchedule, Description, DescriptionEntity, Envs, Execution, ExecutionClosure,
+            ExecutionClusterLabel, ExecutionCreateRequest, ExecutionCreateResponse,
+            ExecutionMetadata, ExecutionRecoverRequest, ExecutionRelaunchRequest, ExecutionSpec,
             ExecutionTerminateRequest, FixedRate, FixedRateUnit, Labels, LaunchPlan,
             LaunchPlanCreateRequest, LaunchPlanCreateResponse, LaunchPlanMetadata, LaunchPlanSpec,
-            LiteralMapBlob, NamedEntityIdentifierList, NamedEntityIdentifierListRequest,
-            NodeExecution, NodeExecutionClosure, NodeExecutionGetDataRequest,
+            LaunchPlanUpdateRequest, ListMatchableAttributesRequest, LiteralMapBlob,
+            NamedEntityIdentifierList, NamedEntityIdentifierListRequest, NodeExecution,
+            NodeExecutionClosure, NodeExecutionForTaskListRequest, NodeExecutionGetDataRequest,
             NodeExecutionGetDataResponse, NodeExecutionList, NodeExecutionListRequest,
             NodeExecutionMetaData, Notification, NotificationList, ObjectGetRequest,
+            ProjectDomainAttributes, ProjectDomainAttributesGetRequest,
+            ProjectDomainAttributesUpdateRequest, ProjectListRequest, ProjectRegisterRequest,
             RawOutputDataConfig, ResourceListRequest, Schedule, SourceCode, SystemMetadata, Task,
             TaskClosure, TaskCreateRequest, TaskCreateResponse, TaskExecution,
             TaskExecutionClosure, TaskExecutionGetDataRequest, TaskExecutionGetDataResponse,
             TaskExecutionGetRequest, TaskExecutionList, TaskExecutionListRequest, TaskSpec,
-            UrlBlob, Workflow, WorkflowClosure, WorkflowCreateRequest, WorkflowCreateResponse,
-            WorkflowExecutionGetDataRequest, WorkflowExecutionGetDataResponse,
-            WorkflowExecutionGetRequest, WorkflowList, WorkflowNodeMetadata, WorkflowSpec,
+            UrlBlob, Workflow, WorkflowAttributes, WorkflowAttributesGetRequest,
+            WorkflowAttributesUpdateRequest, WorkflowClosure, WorkflowCreateRequest,
+            WorkflowCreateResponse, WorkflowExecutionGetDataRequest,
+            WorkflowExecutionGetDataResponse, WorkflowExecutionGetRequest, WorkflowList,
+            WorkflowNodeMetadata, WorkflowSpec,
         };
     }
     #[pymodule]
@@ -767,10 +773,27 @@ pub mod _flyteidl_rust {
                 Err(error) => panic!("Failed to initiate Tokio multi-thread runtime: {:?}", error),
             };
 
-            let endpoint_uri: Uri = auth::Auth::bootstrap_uri_from_endpoint(endpoint, &insecure);
+            let endpoint_uri: Uri = auth::auth::bootstrap_uri_from_endpoint(endpoint, &insecure);
+
+            let credentials_for_endpoint: &str = endpoint; // TODO: The default key in flytekit is `flyte-default``
+            let credentials_access_token_key: &str = "access_token";
+            // println!("{:?}", credentials_for_endpoint);
+            let entry: Entry =
+                match Entry::new(credentials_for_endpoint, credentials_access_token_key) {
+                    Ok(entry) => entry,
+                    Err(err) => {
+                        // println!("{}", credentials_access_token_key);
+                        panic!("Failed at initializing keyring, not available.");
+                    }
+                };
+            // dummy write access_token when unauthenticated
+            match entry.set_password("") {
+                Ok(()) => println!("KeyRing set successfully."),
+                Err(err) => println!("KeyRing set not available."),
+            };
 
             if !insecure {
-                let cert: Certificate = auth::Auth::bootstrap_creds_from_server(&endpoint_uri);
+                let cert: Certificate = auth::auth::bootstrap_creds_from_server(&endpoint_uri);
                 let tls: ClientTlsConfig = ClientTlsConfig::new()
                     .ca_certificate(cert)
                     .domain_name((*endpoint).to_string());
@@ -788,8 +811,8 @@ pub mod _flyteidl_rust {
                     ),
                 };
 
-                let mut oauth_client: auth::Auth::OAuthClient =
-                    auth::Auth::OAuthClient::new(endpoint, &insecure);
+                let mut oauth_client: auth::auth::OAuthClient =
+                    auth::auth::OAuthClient::new(endpoint, &insecure);
                 // TODO: swithch by AuthMode flag
                 oauth_client.client_secret_authenticate();
                 // oauth_client.pkce_authenticate();
@@ -805,32 +828,19 @@ pub mod _flyteidl_rust {
                     error
                 ),
             };
-            // let credentials_for_endpoint: &str = endpoint; // TODO: The default key in flytekit is `flyte-default``
-            // let credentials_access_token_key: &str = "access_token";
-            // // println!("{:?}", credentials_for_endpoint);
-            // let entry: Entry =
-            //     match Entry::new(credentials_for_endpoint, credentials_access_token_key) {
-            //         Ok(entry) => entry,
-            //         Err(err) => {
-            //             // println!("{}", credentials_access_token_key);
-            //             panic!("Failed at initializing keyring, not available.");
-            //         }
-            //     };
-            // // dummy write access_token when unauthenticated
-            // match entry.set_password("") {
-            //     Ok(()) => println!("KeyRing set successfully."),
-            //     Err(err) => println!("KeyRing set not available."),
-            // };
-            // let access_token: String = match entry.get_password() {
-            //     Ok(access_token) => {
-            //         // println!("keyring retrieved successfully.");
-            //         access_token
-            //     }
-            //     Err(error) => {panic!("Failed at retrieving keyring: {:?}", error);},
-            // };
+
+            let access_token: String = match entry.get_password() {
+                Ok(access_token) => {
+                    // println!("keyring retrieved successfully.");
+                    access_token
+                }
+                Err(error) => {
+                    panic!("Failed at retrieving keyring: {:?}", error);
+                }
+            };
 
             let mut interceptor: UnaryAuthInterceptor = UnaryAuthInterceptor {
-                _access_token: "".to_string(),
+                _access_token: access_token,
             };
 
             // Binding established channel to the service client stubs.
