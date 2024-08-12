@@ -14,7 +14,7 @@ import (
 )
 
 func createExecutionRequestForWorkflow(ctx context.Context, workflowName, project, domain string,
-	cmdCtx cmdCore.CommandContext, executionConfig *ExecutionConfig, targetExecName string) (*admin.ExecutionCreateRequest, error) {
+	cmdCtx cmdCore.CommandContext, executionConfig *ExecutionConfig) (*admin.ExecutionCreateRequest, error) {
 	// Fetch the launch plan
 	lp, err := cmdCtx.AdminFetcherExt().FetchLPVersion(ctx, workflowName, executionConfig.Version, project, domain)
 	if err != nil {
@@ -55,7 +55,7 @@ func createExecutionRequestForWorkflow(ctx context.Context, workflowName, projec
 }
 
 func createExecutionRequestForTask(ctx context.Context, taskName string, project string, domain string,
-	cmdCtx cmdCore.CommandContext, executionConfig *ExecutionConfig, targetExecName string) (*admin.ExecutionCreateRequest, error) {
+	cmdCtx cmdCore.CommandContext, executionConfig *ExecutionConfig) (*admin.ExecutionCreateRequest, error) {
 	// Fetch the task
 	task, err := cmdCtx.AdminFetcherExt().FetchTaskVersion(ctx, taskName, executionConfig.Version, project, domain)
 	if err != nil {
@@ -103,7 +103,7 @@ func createExecutionRequestForTask(ctx context.Context, taskName string, project
 }
 
 func relaunchExecution(ctx context.Context, executionName string, project string, domain string,
-	cmdCtx cmdCore.CommandContext, executionConfig *ExecutionConfig, targetExecutionName string) error {
+	cmdCtx cmdCore.CommandContext, executionConfig *ExecutionConfig) error {
 	if executionConfig.DryRun {
 		logger.Debugf(ctx, "skipping RelaunchExecution request (DryRun)")
 		return nil
@@ -114,7 +114,6 @@ func relaunchExecution(ctx context.Context, executionName string, project string
 			Project: project,
 			Domain:  domain,
 		},
-		Name:           targetExecutionName,
 		OverwriteCache: executionConfig.OverwriteCache,
 	})
 	if err != nil {
@@ -125,7 +124,7 @@ func relaunchExecution(ctx context.Context, executionName string, project string
 }
 
 func recoverExecution(ctx context.Context, executionName string, project string, domain string,
-	cmdCtx cmdCore.CommandContext, executionConfig *ExecutionConfig, targetExecName string) error {
+	cmdCtx cmdCore.CommandContext, executionConfig *ExecutionConfig) error {
 	if executionConfig.DryRun {
 		logger.Debugf(ctx, "skipping RecoverExecution request (DryRun)")
 		return nil
@@ -136,7 +135,6 @@ func recoverExecution(ctx context.Context, executionName string, project string,
 			Project: project,
 			Domain:  domain,
 		},
-		Name: targetExecName,
 	})
 	if err != nil {
 		return err

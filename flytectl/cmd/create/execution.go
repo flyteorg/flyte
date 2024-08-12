@@ -223,12 +223,6 @@ var executionConfig = &ExecutionConfig{}
 func createExecutionCommand(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
 	sourceProject := config.GetConfig().Project
 	sourceDomain := config.GetConfig().Domain
-
-	var targetExecName string
-	if len(args) > 0 {
-		targetExecName = args[0]
-	}
-
 	execParams, err := readConfigAndValidate(config.GetConfig().Project, config.GetConfig().Domain)
 	if err != nil {
 		return err
@@ -236,16 +230,16 @@ func createExecutionCommand(ctx context.Context, args []string, cmdCtx cmdCore.C
 	var executionRequest *admin.ExecutionCreateRequest
 	switch execParams.execType {
 	case Relaunch:
-		return relaunchExecution(ctx, execParams.name, sourceProject, sourceDomain, cmdCtx, executionConfig, targetExecName)
+		return relaunchExecution(ctx, execParams.name, sourceProject, sourceDomain, cmdCtx, executionConfig)
 	case Recover:
-		return recoverExecution(ctx, execParams.name, sourceProject, sourceDomain, cmdCtx, executionConfig, targetExecName)
+		return recoverExecution(ctx, execParams.name, sourceProject, sourceDomain, cmdCtx, executionConfig)
 	case Task:
-		executionRequest, err = createExecutionRequestForTask(ctx, execParams.name, sourceProject, sourceDomain, cmdCtx, executionConfig, targetExecName)
+		executionRequest, err = createExecutionRequestForTask(ctx, execParams.name, sourceProject, sourceDomain, cmdCtx, executionConfig)
 		if err != nil {
 			return err
 		}
 	case Workflow:
-		executionRequest, err = createExecutionRequestForWorkflow(ctx, execParams.name, sourceProject, sourceDomain, cmdCtx, executionConfig, targetExecName)
+		executionRequest, err = createExecutionRequestForWorkflow(ctx, execParams.name, sourceProject, sourceDomain, cmdCtx, executionConfig)
 		if err != nil {
 			return err
 		}
