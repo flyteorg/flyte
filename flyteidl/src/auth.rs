@@ -1,4 +1,4 @@
-pub mod Auth {
+pub mod auth {
 
     use openssl::ssl::{SslConnector, SslMethod, SslStream};
     use std::net::{TcpListener, TcpStream};
