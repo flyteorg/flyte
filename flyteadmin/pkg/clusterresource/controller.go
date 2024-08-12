@@ -602,7 +602,6 @@ func (c *controller) createResourceFromTemplate(ctx context.Context, templateDir
 	for templateKey, templateValue := range templateValues {
 		k8sManifest = strings.Replace(k8sManifest, templateKey, templateValue, replaceAllInstancesOfString)
 	}
-
 	return k8sManifest, nil
 }
 

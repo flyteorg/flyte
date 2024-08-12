@@ -333,7 +333,7 @@ metadata:
   name: default
   namespace: my-project-dev
 imagePullSecrets:
-- name: custom
+  - name: custom
 `,
 			wantErr: false,
 		},
