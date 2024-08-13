@@ -20,7 +20,7 @@ A Helm chart for Flyte agent
 | fullnameOverride | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
 | image.repository | string | `"cr.flyte.org/flyteorg/flyteagent"` | Docker image for flyteagent deployment |
-| image.tag | string | `"1.13.0"` | Docker image tag |
+| image.tag | string | `"1.13.3"` | Docker image tag |
 | nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` | nodeSelector for flyteagent deployment |
 | podAnnotations | object | `{}` | Annotations for flyteagent pods |
