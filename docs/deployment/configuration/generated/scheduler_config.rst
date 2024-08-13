@@ -2181,6 +2181,18 @@ A URL pointing to the flyteconsole instance used to hit this flyteadmin instance
   ""
   
 
+useOffloadedInputs (bool)
+------------------------------------------------------------------------------------------------------------------------
+
+Use offloaded inputs for workflows.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
 interfaces.FeatureGates
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
