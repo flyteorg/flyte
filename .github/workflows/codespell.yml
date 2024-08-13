@@ -2,7 +2,7 @@
 name: Codespell
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
 on:
@@ -21,8 +21,9 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Codespell
         uses: codespell-project/actions-codespell@v2
         with:
-          skip: "*.pb,monodocs-environment.lock.yaml"
+          skip: "*.pb,monodocs-environment.lock.yaml,.git,*.pdf,*.svg,go.sum,go.mod,*requirements.txt,gen"
+          ignore_words_file: .github/codespell-ignored-words

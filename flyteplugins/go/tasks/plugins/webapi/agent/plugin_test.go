@@ -2,7 +2,6 @@ package agent
 
 import (
 	"context"
-	"sort"
 	"testing"
 	"time"
 
@@ -35,9 +34,12 @@ func TestPlugin(t *testing.T) {
 	cfg.AgentDeployments = map[string]*Deployment{"spark_agent": {Endpoint: "localhost:80"}}
 	cfg.AgentForTaskTypes = map[string]string{"spark": "spark_agent", "bar": "bar_agent"}
 
+	agent := &Agent{AgentDeployment: &Deployment{Endpoint: "localhost:80"}}
+	agentRegistry := Registry{"spark": {defaultTaskTypeVersion: agent}}
 	plugin := Plugin{
 		metricScope: fakeSetupContext.MetricsScope(),
 		cfg:         GetConfig(),
+		registry:    agentRegistry,
 	}
 	t.Run("get config", func(t *testing.T) {
 		err := SetConfig(&cfg)
@@ -59,31 +61,40 @@ func TestPlugin(t *testing.T) {
 	})
 
 	t.Run("test getFinalAgent", func(t *testing.T) {
-		agent := &Agent{AgentDeployment: &Deployment{Endpoint: "localhost:80"}}
-		agentRegistry := Registry{"spark": {defaultTaskTypeVersion: agent}}
 		spark := &admin.TaskCategory{Name: "spark", Version: defaultTaskTypeVersion}
 		foo := &admin.TaskCategory{Name: "foo", Version: defaultTaskTypeVersion}
 		bar := &admin.TaskCategory{Name: "bar", Version: defaultTaskTypeVersion}
-		agentDeployment, _ := getFinalAgent(spark, &cfg, agentRegistry)
+		agentDeployment, _ := plugin.getFinalAgent(spark, &cfg)
 		assert.Equal(t, agentDeployment.Endpoint, "localhost:80")
-		agentDeployment, _ = getFinalAgent(foo, &cfg, agentRegistry)
+		agentDeployment, _ = plugin.getFinalAgent(foo, &cfg)
 		assert.Equal(t, agentDeployment.Endpoint, cfg.DefaultAgent.Endpoint)
-		agentDeployment, _ = getFinalAgent(bar, &cfg, agentRegistry)
+		agentDeployment, _ = plugin.getFinalAgent(bar, &cfg)
 		assert.Equal(t, agentDeployment.Endpoint, cfg.DefaultAgent.Endpoint)
 	})
 
 	t.Run("test getFinalTimeout", func(t *testing.T) {
 		timeout := getFinalTimeout("CreateTask", &Deployment{Endpoint: "localhost:8080", Timeouts: map[string]config.Duration{"CreateTask": {Duration: 1 * time.Millisecond}}})
 		assert.Equal(t, 1*time.Millisecond, timeout.Duration)
+		timeout = getFinalTimeout("GetTask", &Deployment{Endpoint: "localhost:8080", Timeouts: map[string]config.Duration{"GetTask": {Duration: 1 * time.Millisecond}}})
+		assert.Equal(t, 1*time.Millisecond, timeout.Duration)
 		timeout = getFinalTimeout("DeleteTask", &Deployment{Endpoint: "localhost:8080", DefaultTimeout: config.Duration{Duration: 10 * time.Second}})
 		assert.Equal(t, 10*time.Second, timeout.Duration)
+		timeout = getFinalTimeout("ExecuteTaskSync", &Deployment{Endpoint: "localhost:8080", Timeouts: map[string]config.Duration{"ExecuteTaskSync": {Duration: 1 * time.Millisecond}}})
+		assert.Equal(t, 1*time.Millisecond, timeout.Duration)
 	})
 
 	t.Run("test getFinalContext", func(t *testing.T) {
-		ctx, _ := getFinalContext(context.TODO(), "DeleteTask", &Deployment{})
+
+		ctx, _ := getFinalContext(context.TODO(), "CreateTask", &Deployment{Endpoint: "localhost:8080", Timeouts: map[string]config.Duration{"CreateTask": {Duration: 1 * time.Millisecond}}})
+		assert.NotEqual(t, context.TODO(), ctx)
+
+		ctx, _ = getFinalContext(context.TODO(), "GetTask", &Deployment{Endpoint: "localhost:8080", Timeouts: map[string]config.Duration{"GetTask": {Duration: 1 * time.Millisecond}}})
+		assert.NotEqual(t, context.TODO(), ctx)
+
+		ctx, _ = getFinalContext(context.TODO(), "DeleteTask", &Deployment{})
 		assert.Equal(t, context.TODO(), ctx)
 
-		ctx, _ = getFinalContext(context.TODO(), "CreateTask", &Deployment{Endpoint: "localhost:8080", Timeouts: map[string]config.Duration{"CreateTask": {Duration: 1 * time.Millisecond}}})
+		ctx, _ = getFinalContext(context.TODO(), "ExecuteTaskSync", &Deployment{Endpoint: "localhost:8080", Timeouts: map[string]config.Duration{"ExecuteTaskSync": {Duration: 10 * time.Second}}})
 		assert.NotEqual(t, context.TODO(), ctx)
 	})
 
@@ -307,12 +318,12 @@ func TestInitializeAgentRegistry(t *testing.T) {
 	cfg.AgentForTaskTypes = map[string]string{"task1": "agent-deployment-1", "task2": "agent-deployment-2"}
 	err := SetConfig(&cfg)
 	assert.NoError(t, err)
-	agentRegistry, err := initializeAgentRegistry(cs)
-	assert.NoError(t, err)
 
-	// In golang, the order of keys in a map is random. So, we sort the keys before asserting.
+	agentRegistry := getAgentRegistry(context.Background(), cs)
 	agentRegistryKeys := maps.Keys(agentRegistry)
-	sort.Strings(agentRegistryKeys)
+	expectedKeys := []string{"task1", "task2", "task3", "task_type_1", "task_type_2"}
 
-	assert.Equal(t, agentRegistryKeys, []string{"task1", "task2", "task3"})
+	for _, key := range expectedKeys {
+		assert.Contains(t, agentRegistryKeys, key)
+	}
 }

@@ -72,3 +72,35 @@ func (_m *ImmutableParentInfo) GetUniqueID() string {
 
 	return r0
 }
+
+type ImmutableParentInfo_IsInDynamicChain struct {
+	*mock.Call
+}
+
+func (_m ImmutableParentInfo_IsInDynamicChain) Return(_a0 bool) *ImmutableParentInfo_IsInDynamicChain {
+	return &ImmutableParentInfo_IsInDynamicChain{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ImmutableParentInfo) OnIsInDynamicChain() *ImmutableParentInfo_IsInDynamicChain {
+	c_call := _m.On("IsInDynamicChain")
+	return &ImmutableParentInfo_IsInDynamicChain{Call: c_call}
+}
+
+func (_m *ImmutableParentInfo) OnIsInDynamicChainMatch(matchers ...interface{}) *ImmutableParentInfo_IsInDynamicChain {
+	c_call := _m.On("IsInDynamicChain", matchers...)
+	return &ImmutableParentInfo_IsInDynamicChain{Call: c_call}
+}
+
+// IsInDynamicChain provides a mock function with given fields:
+func (_m *ImmutableParentInfo) IsInDynamicChain() bool {
+	ret := _m.Called()
+
+	var r0 bool
+	if rf, ok := ret.Get(0).(func() bool); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	return r0
+}

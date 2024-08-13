@@ -1,0 +1,95 @@
+project_name: flytectl
+
+monorepo:
+  tag_prefix: flytectl/
+  dir: flytectl
+
+before:
+  hooks:
+    - go mod download
+builds:
+  - env:
+      - CGO_ENABLED=0
+    main: ./main.go
+    binary: flytectl
+    id: flytectl-darwin
+    goos:
+      - darwin
+    goarch:
+      - arm64
+      - amd64
+    ldflags:
+      - -s -w -X github.com/flyteorg/flyte/flytestdlib/version.Version={{.Version}} -X github.com/flyteorg/flyte/flytestdlib/version.Build={{.ShortCommit}} -X github.com/flyteorg/flyte/flytestdlib/version.BuildTime={{.Date}}
+  - env:
+      - CGO_ENABLED=0
+    main: ./main.go
+    binary: flytectl
+    id: flytectl-linux
+    goos:
+      - linux
+    goarch:
+      - arm64
+      - amd64
+    ldflags:
+      - -s -w -X github.com/flyteorg/flyte/flytestdlib/version.Version={{.Version}} -X github.com/flyteorg/flyte/flytestdlib/version.Build={{.ShortCommit}} -X github.com/flyteorg/flyte/flytestdlib/version.BuildTime={{.Date}}
+  - env:
+      - CGO_ENABLED=0
+    main: ./main.go
+    binary: flytectl
+    id: flytectl-windows
+    goos:
+      - windows
+    ldflags:
+      - -s -w -X github.com/flyteorg/flyte/flytestdlib/version.Version={{.Version}} -X github.com/flyteorg/flyte/flytestdlib/version.Build={{.ShortCommit}} -X github.com/flyteorg/flyte/flytestdlib/version.BuildTime={{.Date}}
+archives:
+  - name_template: |-
+      {{ .ProjectName }}_
+      {{- if eq .Os "darwin" }}Darwin
+      {{- else if eq .Os "linux" }}Linux
+      {{- else if eq .Os "windows" }}Windows
+      {{- else }}{{ .Os }}{{ end }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    format_overrides:
+      - goos: windows
+        format: zip
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ .Tag }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+brews:
+  - # Name template of the recipe
+    # Default to project name
+    name: flytectl
+
+    folder: Formula
+    
+    # Github repository to push the tap to.
+    tap:
+      owner: flyteorg
+      name: homebrew-tap
+
+    # Git author used to commit to the repository.
+    # Defaults are shown.
+    commit_author:
+      name: Flyte-Bot
+      email: admin@flyte.org
+
+    # Your app's homepage.
+    # Default is empty.
+    homepage: "https://docs.flyte.org/en/latest/flytectl/docs_index.html"
+
+    # Your app's description.
+    # Default is empty.
+    description: "FlyteCtl is a command line tool to interact with a Flyte cluster."
+
+    # Default is false.
+    skip_upload: auto

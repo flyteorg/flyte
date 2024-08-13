@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+package flyteidl.core;
+
+option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core";
+
+import "google/protobuf/struct.proto";
+
+// ExecutionEnvAssignment is a message that is used to assign an execution environment to a set of
+// nodes.
+message ExecutionEnvAssignment {
+  // node_ids is a list of node ids that are being assigned the execution environment.
+  repeated string node_ids = 1;
+
+  // task_type is the type of task that is being assigned. This is used to override which Flyte
+  // plugin will be used during execution.
+  string task_type = 2;
+
+  // execution_env is the environment that is being assigned to the nodes.
+  ExecutionEnv execution_env = 3;
+}
+
+// ExecutionEnv is a message that is used to specify the execution environment.
+message ExecutionEnv {
+  // name is a human-readable identifier for the execution environment. This is combined with the
+  // project, domain, and version to uniquely identify an execution environment.
+  string name = 1;
+
+  // type is the type of the execution environment.
+  string type = 2;
+
+  // environment is a oneof field that can be used to specify the environment in different ways.
+  oneof environment {
+    // extant is a reference to an existing environment.
+    google.protobuf.Struct extant = 3;
+
+    // spec is a specification of the environment.
+    google.protobuf.Struct spec = 4;
+  }
+
+  // version is the version of the execution environment. This may be used differently by each
+  // individual environment type (ex. auto-generated or manually provided), but is intended to
+  // allow variance in environment specifications with the same ID.
+  string version = 5;
+}

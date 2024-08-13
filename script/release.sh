@@ -3,10 +3,7 @@
 set -ex
 
 FLYTEKIT_TAG=$(curl --silent "https://api.github.com/repos/flyteorg/flytekit/releases/latest" | jq -r .tag_name | sed 's/^v//')
-# The flyteconsole revamp is not released yet (we need "schedules" to be present before we can release it). In the meantime
-# we are using the latest release (v1.10.3) as the tag for flyteconsole.
-# FLYTECONSOLE_TAG=$(curl --silent "https://api.github.com/repos/flyteorg/flyteconsole/releases/latest" | jq -r .tag_name)
-FLYTECONSOLE_TAG=v1.10.3
+FLYTECONSOLE_TAG=$(curl --silent "https://api.github.com/repos/flyteorg/flyteconsole/releases/latest" | jq -r .tag_name)
 
 # bump latest release of flyte component in helm
 sed -i "s,tag:[^P]*# FLYTEADMIN_TAG,tag: ${VERSION}  # FLYTEADMIN_TAG," ./charts/flyte/values.yaml

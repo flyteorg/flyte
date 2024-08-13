@@ -1,22 +1,3 @@
----
-jupytext:
-  cell_metadata_filter: all
-  formats: md:myst
-  main_language: python
-  notebook_metadata_filter: all
-  text_representation:
-    extension: .md
-    format_name: myst
-    format_version: 0.13
-    jupytext_version: 1.16.1
-kernelspec:
-  display_name: Python 3
-  language: python
-  name: python3
----
-
-+++ {"lines_to_next_cell": 0}
-
 (shell_task)=
 
 # Shell tasks
@@ -28,72 +9,25 @@ kernelspec:
 To execute bash scripts within Flyte, you can utilize the {py:class}`~flytekit.extras.tasks.shell.ShellTask` class.
 This example includes three shell tasks to execute bash commands.
 
-First, import the necessary libraries.
-
-```{code-cell}
-from pathlib import Path
-from typing import Tuple
-
-import flytekit
-from flytekit import kwtypes, task, workflow
-from flytekit.extras.tasks.shell import OutputLocation, ShellTask
-from flytekit.types.directory import FlyteDirectory
-from flytekit.types.file import FlyteFile
+```{note}
+To clone and run the example code on this page, see the [Flytesnacks repo][flytesnacks].
 ```
 
-+++ {"lines_to_next_cell": 0}
+First, import the necessary libraries:
+
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/shell_task.py
+:caption: basics/shell_task.py
+:lines: 1-8
+```
 
 With the required imports in place, you can proceed to define a shell task.
 To create a shell task, provide a name for it, specify the bash script to be executed,
-and define inputs and outputs if needed.
+and define inputs and outputs if needed:
 
-```{code-cell}
-t1 = ShellTask(
-    name="task_1",
-    debug=True,
-    script="""
-    set -ex
-    echo "Hey there! Let's run some bash scripts using Flyte's ShellTask."
-    echo "Showcasing Flyte's Shell Task." >> {inputs.x}
-    if grep "Flyte" {inputs.x}
-    then
-        echo "Found it!" >> {inputs.x}
-    else
-        echo "Not found!"
-    fi
-    """,
-    inputs=kwtypes(x=FlyteFile),
-    output_locs=[OutputLocation(var="i", var_type=FlyteFile, location="{inputs.x}")],
-)
-
-
-t2 = ShellTask(
-    name="task_2",
-    debug=True,
-    script="""
-    set -ex
-    cp {inputs.x} {inputs.y}
-    tar -zcvf {outputs.j} {inputs.y}
-    """,
-    inputs=kwtypes(x=FlyteFile, y=FlyteDirectory),
-    output_locs=[OutputLocation(var="j", var_type=FlyteFile, location="{inputs.y}.tar.gz")],
-)
-
-
-t3 = ShellTask(
-    name="task_3",
-    debug=True,
-    script="""
-    set -ex
-    tar -zxvf {inputs.z}
-    cat {inputs.y}/$(basename {inputs.x}) | wc -m > {outputs.k}
-    """,
-    inputs=kwtypes(x=FlyteFile, y=FlyteDirectory, z=FlyteFile),
-    output_locs=[OutputLocation(var="k", var_type=FlyteFile, location="output.txt")],
-)
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/shell_task.py
+:caption: basics/shell_task.py
+:lines: 13-55
 ```
-
-+++ {"lines_to_next_cell": 0}
 
 Here's a breakdown of the parameters of the `ShellTask`:
 
@@ -104,42 +38,25 @@ Here's a breakdown of the parameters of the `ShellTask`:
 - The `debug` parameter is helpful for debugging purposes
 
 We define a task to instantiate `FlyteFile` and `FlyteDirectory`.
-A `.gitkeep` file is created in the FlyteDirectory as a placeholder to ensure the directory exists.
+A `.gitkeep` file is created in the FlyteDirectory as a placeholder to ensure the directory exists:
 
-```{code-cell}
-@task
-def create_entities() -> Tuple[FlyteFile, FlyteDirectory]:
-    working_dir = Path(flytekit.current_context().working_directory)
-    flytefile = working_dir / "test.txt"
-    flytefile.touch()
-
-    flytedir = working_dir / "testdata"
-    flytedir.mkdir(exist_ok=True)
-
-    flytedir_file = flytedir / ".gitkeep"
-    flytedir_file.touch()
-    return flytefile, flytedir
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/shell_task.py
+:caption: basics/shell_task.py
+:pyobject: create_entities
 ```
 
-+++ {"lines_to_next_cell": 0}
+We create a workflow to define the dependencies between the tasks:
 
-We create a workflow to define the dependencies between the tasks.
-
-```{code-cell}
-@workflow
-def shell_task_wf() -> FlyteFile:
-    x, y = create_entities()
-    t1_out = t1(x=x)
-    t2_out = t2(x=t1_out, y=y)
-    t3_out = t3(x=x, y=y, z=t2_out)
-    return t3_out
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/shell_task.py
+:caption: basics/shell_task.py
+:pyobject: shell_task_wf
 ```
 
-+++ {"lines_to_next_cell": 0}
+You can run the workflow locally:
 
-You can run the workflow locally.
-
-```{code-cell}
-if __name__ == "__main__":
-    print(f"Running shell_task_wf() {shell_task_wf()}")
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/shell_task.py
+:caption: basics/shell_task.py
+:lines: 85-86
 ```
+
+[flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/basics/

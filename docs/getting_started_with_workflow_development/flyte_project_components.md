@@ -1,3 +1,4 @@
+(flyte_project_components)=
 # Flyte project components
 
 A Flyte project is a directory containing task and workflow code, internal Python source code, configuration files, and other artifacts required to package up your code so that it can be run on a Flyte cluster.
@@ -26,13 +27,13 @@ You can specify pip-installable Python dependencies in your project by adding th
 `requirements.txt` file.
 
 ```{note}
-We recommend using [pip-compile](https://pip-tools.readthedocs.io/en/latest/) to
+We recommend using [pip-compile](https://pip-tools.readthedocs.io/en/stable/) to
 manage your project's Python requirements.
 ```
 
 ````{dropdown} See requirements.txt
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytekit-python-template/main/simple-example/%7B%7Bcookiecutter.project_name%7D%7D/requirements.txt
+```{rli} https://raw.githubusercontent.com/flyteorg/flytekit-python-template/main/basic-template-imagespec/%7B%7Bcookiecutter.project_name%7D%7D/requirements.txt
 :caption: requirements.txt
 ```
 

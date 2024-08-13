@@ -171,6 +171,7 @@ func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *i
 	tMeta.OnGetPlatformResources().Return(&v1.ResourceRequirements{})
 	tMeta.OnGetInterruptibleFailureThreshold().Return(2)
 	tMeta.OnGetEnvironmentVariables().Return(nil)
+	tMeta.OnGetConsoleURL().Return("")
 
 	catClient := &catalogMocks.Client{}
 	catData := sync.Map{}
@@ -243,7 +244,6 @@ func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *i
 	tCtx.OnCatalog().Return(cat)
 	tCtx.OnEventsRecorder().Return(eRecorder)
 	tCtx.OnResourceManager().Return(resourceManager)
-	tCtx.OnMaxDatasetSizeBytes().Return(1000000)
 	tCtx.OnSecretManager().Return(secretManager)
 
 	trns := pluginCore.DoTransition(pluginCore.PhaseInfoQueued(time.Now(), 0, ""))

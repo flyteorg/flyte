@@ -52,7 +52,7 @@ func Test_validateConfig(t *testing.T) {
 
 		err := validateConfig(cfg)
 		assert.Error(t, err)
-		assert.Equal(t, "\ncache size is expected to be between 10 and 500000. Provided value is 0\nworkers count is expected to be between 1 and 100. Provided value is 0\nresync interval is expected to be between 5 and 3600. Provided value is 0\nread burst is expected to be between 5 and 10000. Provided value is 0\nread qps is expected to be between 1 and 100000. Provided value is 0\nwrite burst is expected to be between 5 and 10000. Provided value is 0\nwrite qps is expected to be between 1 and 100000. Provided value is 0", err.Error())
+		assert.Equal(t, "\ncache size is expected to be between 10 and 500000. Provided value is 0\nworkers count is expected to be between 1 and 10000. Provided value is 0\nresync interval is expected to be between 5 and 3600. Provided value is 0\nread burst is expected to be between 5 and 10000. Provided value is 0\nread qps is expected to be between 1 and 100000. Provided value is 0\nwrite burst is expected to be between 5 and 10000. Provided value is 0\nwrite qps is expected to be between 1 and 100000. Provided value is 0", err.Error())
 	})
 
 	t.Run("Above max", func(t *testing.T) {
@@ -74,7 +74,7 @@ func Test_validateConfig(t *testing.T) {
 
 		err := validateConfig(cfg)
 		assert.Error(t, err)
-		assert.Equal(t, "\ncache size is expected to be between 10 and 500000. Provided value is 1000000000\nworkers count is expected to be between 1 and 100. Provided value is 1000000000\nresync interval is expected to be between 5 and 3600. Provided value is 3.6e+07\nread burst is expected to be between 5 and 10000. Provided value is 1000000\nwrite burst is expected to be between 5 and 10000. Provided value is 1000000", err.Error())
+		assert.Equal(t, "\ncache size is expected to be between 10 and 500000. Provided value is 1000000000\nworkers count is expected to be between 1 and 10000. Provided value is 1000000000\nresync interval is expected to be between 5 and 3600. Provided value is 3.6e+07\nread burst is expected to be between 5 and 10000. Provided value is 1000000\nwrite burst is expected to be between 5 and 10000. Provided value is 1000000", err.Error())
 	})
 }
 

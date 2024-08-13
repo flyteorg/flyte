@@ -95,6 +95,8 @@ func FlyteTaskToBatchInput(ctx context.Context, tCtx pluginCore.TaskExecutionCon
 	if platformResources == nil {
 		platformResources = &v1.ResourceRequirements{}
 	}
+
+	flytek8s.SanitizeGPUResourceRequirements(res)
 	resources := flytek8s.ApplyResourceOverrides(*res, *platformResources, assignResources)
 
 	submitJobInput := &batch.SubmitJobInput{}
@@ -136,7 +138,7 @@ func UpdateBatchInputForArray(_ context.Context, batchInput *batch.SubmitJobInpu
 
 func getEnvVarsForTask(ctx context.Context, execID pluginCore.TaskExecutionID, containerEnvVars []*core.KeyValuePair,
 	defaultEnvVars map[string]string) []v1.EnvVar {
-	envVars, _ := flytek8s.DecorateEnvVars(ctx, flytek8s.ToK8sEnvVar(containerEnvVars), nil, execID)
+	envVars, _ := flytek8s.DecorateEnvVars(ctx, flytek8s.ToK8sEnvVar(containerEnvVars), nil, nil, execID, "")
 	m := make(map[string]string, len(envVars))
 	for _, envVar := range envVars {
 		m[envVar.Name] = envVar.Value

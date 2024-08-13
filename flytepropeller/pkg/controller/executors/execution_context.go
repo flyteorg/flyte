@@ -4,7 +4,7 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 )
 
-// go:generate mockery -case=underscore
+//go:generate mockery -all -case=underscore
 
 type TaskDetailsGetter interface {
 	GetTask(id v1alpha1.TaskID) (v1alpha1.ExecutableTask, error)
@@ -28,11 +28,16 @@ type ParentInfoGetter interface {
 type ImmutableParentInfo interface {
 	GetUniqueID() v1alpha1.NodeID
 	CurrentAttempt() uint32
+	IsInDynamicChain() bool
 }
 
 type ControlFlow interface {
 	CurrentParallelism() uint32
 	IncrementParallelism() uint32
+	CurrentNodeExecutionCount() uint32
+	IncrementNodeExecutionCount() uint32
+	CurrentTaskExecutionCount() uint32
+	IncrementTaskExecutionCount() uint32
 }
 
 type ExecutionContext interface {
@@ -56,12 +61,17 @@ func (e execContext) GetParentInfo() ImmutableParentInfo {
 }
 
 type parentExecutionInfo struct {
-	uniqueID        v1alpha1.NodeID
-	currentAttempts uint32
+	uniqueID         v1alpha1.NodeID
+	currentAttempts  uint32
+	isInDynamicChain bool
 }
 
 func (p *parentExecutionInfo) GetUniqueID() v1alpha1.NodeID {
 	return p.uniqueID
+}
+
+func (p *parentExecutionInfo) IsInDynamicChain() bool {
+	return p.isInDynamicChain
 }
 
 func (p *parentExecutionInfo) CurrentAttempt() uint32 {
@@ -71,16 +81,36 @@ func (p *parentExecutionInfo) CurrentAttempt() uint32 {
 type controlFlow struct {
 	// We could use atomic.Uint32, but this is not required for current Propeller. As every round is run in a single
 	// thread and using atomic will introduce memory barriers
-	v uint32
+	parallelism        uint32
+	nodeExecutionCount uint32
+	taskExecutionCount uint32
 }
 
 func (c *controlFlow) CurrentParallelism() uint32 {
-	return c.v
+	return c.parallelism
 }
 
 func (c *controlFlow) IncrementParallelism() uint32 {
-	c.v = c.v + 1
-	return c.v
+	c.parallelism = c.parallelism + 1
+	return c.parallelism
+}
+
+func (c *controlFlow) CurrentNodeExecutionCount() uint32 {
+	return c.nodeExecutionCount
+}
+
+func (c *controlFlow) IncrementNodeExecutionCount() uint32 {
+	c.nodeExecutionCount++
+	return c.nodeExecutionCount
+}
+
+func (c *controlFlow) CurrentTaskExecutionCount() uint32 {
+	return c.taskExecutionCount
+}
+
+func (c *controlFlow) IncrementTaskExecutionCount() uint32 {
+	c.taskExecutionCount++
+	return c.taskExecutionCount
 }
 
 func NewExecutionContextWithTasksGetter(prevExecContext ExecutionContext, taskGetter TaskDetailsGetter) ExecutionContext {
@@ -105,15 +135,18 @@ func NewExecutionContext(immExecContext ImmutableExecutionContext, tasksGetter T
 	}
 }
 
-func NewParentInfo(uniqueID string, currentAttempts uint32) ImmutableParentInfo {
+func NewParentInfo(uniqueID string, currentAttempts uint32, isInDynamicChain bool) ImmutableParentInfo {
 	return &parentExecutionInfo{
-		currentAttempts: currentAttempts,
-		uniqueID:        uniqueID,
+		currentAttempts:  currentAttempts,
+		uniqueID:         uniqueID,
+		isInDynamicChain: isInDynamicChain,
 	}
 }
 
 func InitializeControlFlow() ControlFlow {
 	return &controlFlow{
-		v: 0,
+		parallelism:        0,
+		nodeExecutionCount: 0,
+		taskExecutionCount: 0,
 	}
 }

@@ -1,20 +1,3 @@
----
-jupytext:
-  cell_metadata_filter: all
-  formats: md:myst
-  main_language: python
-  notebook_metadata_filter: all
-  text_representation:
-    extension: .md
-    format_name: myst
-    format_version: 0.13
-    jupytext_version: 1.16.1
-kernelspec:
-  display_name: Python 3
-  language: python
-  name: python3
----
-
 (multi_images)=
 
 # Multiple images in a workflow
@@ -31,33 +14,13 @@ To modify this behavior, use the `container_image` parameter available in the {p
 If the Docker image is not available publicly, refer to {ref}`Pulling Private Images<private_images>`.
 :::
 
-```{code-cell}
-:lines_to_next_cell: 2
+```{note}
+To clone and run the example code on this page, see the [Flytesnacks repo][flytesnacks].
+```
 
-import numpy as np
-from flytekit import task, workflow
-
-
-@task(container_image="{{.image.mindmeld.fqn}}:{{.image.mindmeld.version}}")
-def get_data() -> np.ndarray:
-    # here we're importing scikit learn within the Flyte task
-    from sklearn import datasets
-
-    iris = datasets.load_iris()
-    X = iris.data[:, :2]
-    return X
-
-
-@task(container_image="{{.image.borebuster.fqn}}:{{.image.borebuster.version}}")
-def normalize(X: np.ndarray) -> np.ndarray:
-    return (X - X.mean(axis=0)) / X.std(axis=0)
-
-
-@workflow
-def multi_images_wf() -> np.ndarray:
-    X = get_data()
-    X = normalize(X=X)
-    return X
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/customizing_dependencies/customizing_dependencies/multi_images.py
+:caption: customizing_dependencies/multi_images.py
+:lines: 1-24
 ```
 
 Observe how the `sklearn` library is imported in the context of a Flyte task.
@@ -108,3 +71,5 @@ Send the name of the configuration file to your `pyflyte run` command as follows
 ```
 pyflyte --config $HOME/.flyte/config.yaml run --remote multi_images.py multi_images_wf
 ```
+
+[flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/customizing_dependencies/

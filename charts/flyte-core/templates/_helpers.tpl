@@ -79,7 +79,6 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{ toYaml . }}
 {{- end }}
 {{- end -}}
-
 {{- define "datacatalog.name" -}}
 datacatalog
 {{- end -}}
@@ -98,28 +97,6 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- define "datacatalog.podLabels" -}}
 {{ include "datacatalog.labels" . }}
 {{- with .Values.datacatalog.podLabels }}
-{{ toYaml . }}
-{{- end }}
-{{- end -}}
-
-{{- define "flyteagent.name" -}}
-flyteagent
-{{- end -}}
-
-{{- define "flyteagent.selectorLabels" -}}
-app.kubernetes.io/name: {{ template "flyteagent.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
-{{- end -}}
-
-{{- define "flyteagent.labels" -}}
-{{ include "flyteagent.selectorLabels" . }}
-helm.sh/chart: {{ include "flyte.chart" . }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
-{{- end -}}
-
-{{- define "flyteagent.podLabels" -}}
-{{ include "flyteagent.labels" . }}
-{{- with .Values.flyteagent.podLabels }}
 {{ toYaml . }}
 {{- end }}
 {{- end -}}

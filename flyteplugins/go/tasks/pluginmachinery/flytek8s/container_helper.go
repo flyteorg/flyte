@@ -129,11 +129,24 @@ func adjustResourceRequirement(resourceName v1.ResourceName, resourceRequirement
 	resourceRequirements.Limits[resourceName] = resourceValue.Limit
 }
 
+// Convert GPU resource requirements named 'gpu' the recognized 'nvidia.com/gpu' identifier.
+func SanitizeGPUResourceRequirements(resources *v1.ResourceRequirements) {
+	gpuResourceName := config.GetK8sPluginConfig().GpuResourceName
+
+	if res, found := resources.Requests[resourceGPU]; found {
+		resources.Requests[gpuResourceName] = res
+		delete(resources.Requests, resourceGPU)
+	}
+
+	if res, found := resources.Limits[resourceGPU]; found {
+		resources.Limits[gpuResourceName] = res
+		delete(resources.Limits, resourceGPU)
+	}
+}
+
 // ApplyResourceOverrides handles resource resolution, allocation and validation. Primarily, it ensures that container
 // resources do not exceed defined platformResource limits and in the case of assignIfUnset, ensures that limits and
 // requests are sensibly set for resources of all types.
-// Furthermore, this function handles some clean-up such as converting GPU resources to the recognized Nvidia gpu
-// resource name and deleting unsupported Storage-type resources.
 func ApplyResourceOverrides(resources, platformResources v1.ResourceRequirements, assignIfUnset bool) v1.ResourceRequirements {
 	if len(resources.Requests) == 0 {
 		resources.Requests = make(v1.ResourceList)
@@ -166,19 +179,6 @@ func ApplyResourceOverrides(resources, platformResources v1.ResourceRequirements
 	_, gpuRequested := resources.Requests[gpuResourceName]
 	_, gpuLimited := resources.Limits[gpuResourceName]
 	if gpuRequested || gpuLimited {
-		shouldAdjustGPU = true
-	}
-
-	// Override GPU
-	if res, found := resources.Requests[resourceGPU]; found {
-		resources.Requests[gpuResourceName] = res
-		delete(resources.Requests, resourceGPU)
-		shouldAdjustGPU = true
-	}
-
-	if res, found := resources.Limits[resourceGPU]; found {
-		resources.Limits[gpuResourceName] = res
-		delete(resources.Limits, resourceGPU)
 		shouldAdjustGPU = true
 	}
 
@@ -226,6 +226,7 @@ func BuildRawContainer(ctx context.Context, tCtx pluginscore.TaskExecutionContex
 		Env:                      ToK8sEnvVar(taskContainer.GetEnv()),
 		TerminationMessagePolicy: v1.TerminationMessageFallbackToLogsOnError,
 		Resources:                *res,
+		ImagePullPolicy:          config.GetK8sPluginConfig().ImagePullPolicy,
 	}
 
 	return container, nil
@@ -291,7 +292,12 @@ func AddFlyteCustomizationsToContainer(ctx context.Context, parameters template.
 	}
 	container.Args = modifiedArgs
 
-	container.Env, container.EnvFrom = DecorateEnvVars(ctx, container.Env, parameters.TaskExecMetadata.GetEnvironmentVariables(), parameters.TaskExecMetadata.GetTaskExecutionID())
+	// The flyteconsole url is added based on the `IncludeConsoleURL` bit set via the task template
+	consoleURL := ""
+	if parameters.IncludeConsoleURL {
+		consoleURL = parameters.TaskExecMetadata.GetConsoleURL()
+	}
+	container.Env, container.EnvFrom = DecorateEnvVars(ctx, container.Env, container.EnvFrom, parameters.TaskExecMetadata.GetEnvironmentVariables(), parameters.TaskExecMetadata.GetTaskExecutionID(), consoleURL)
 
 	// retrieve platformResources and overrideResources to use when aggregating container resources
 	platformResources := parameters.TaskExecMetadata.GetPlatformResources()
@@ -306,6 +312,8 @@ func AddFlyteCustomizationsToContainer(ctx context.Context, parameters template.
 	if overrideResources == nil {
 		overrideResources = &v1.ResourceRequirements{}
 	}
+
+	SanitizeGPUResourceRequirements(&container.Resources)
 
 	logger.Infof(ctx, "ApplyResourceOverrides with Resources [%v], Platform Resources [%v] and Container"+
 		" Resources [%v] with mode [%v]", overrideResources, platformResources, container.Resources, mode)

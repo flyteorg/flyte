@@ -9,81 +9,54 @@ The failure node feature enables you to designate a specific node to execute in 
 
 For example, a workflow involves creating a cluster at the beginning, followed by the execution of tasks, and concludes with the deletion of the cluster once all tasks are completed. However, if any task within the workflow encounters an error, flyte will abort the entire workflow and won’t delete the cluster. This poses a challenge if you still need to clean up the cluster even in a task failure.
 
-To address this issue, you can add a failure node into your workflow. This ensures that critical actions, such as deleting the cluster, are executed even in the event of failures occurring throughout the workflow execution:
+To address this issue, you can add a failure node into your workflow. This ensures that critical actions, such as deleting the cluster, are executed even in the event of failures occurring throughout the workflow execution
 
-```python
-from flytekit import WorkflowFailurePolicy, task, workflow
+```{note}
+To clone and run the example code on this page, see the [Flytesnacks repo][flytesnacks].
+```
 
-
-@task
-def create_cluster(name: str):
-    print(f"Creating cluster: {name}")
-
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/development_lifecycle/development_lifecycle/failure_node.py
+:caption: development_lifecycle/failure_node.py
+:lines: 1-6
 ```
 
 Create a task that will fail during execution:
 
-```python
-@task
-def t1(a: int, b: str):
-    print(f"{a} {b}")
-    raise ValueError("Fail!")
-
-
-@task
-def delete_cluster(name: str):
-    print(f"Deleting cluster {name}")
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/development_lifecycle/development_lifecycle/failure_node.py
+:caption: development_lifecycle/failure_node.py
+:lines: 10-18
 ```
 
 Create a task that will be executed if any of the tasks in the workflow fail:
 
-```python
-@task
-def clean_up(name: str):
-    print(f"Cleaning up cluster {name}")
-
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/development_lifecycle/development_lifecycle/failure_node.py
+:caption: development_lifecycle/failure_node.py
+:pyobject: clean_up
 ```
 
 Specify the `on_failure` to a cleanup task. This task will be executed if any of the tasks in the workflow fail:
-
 
 :::{note}
 The input of `clean_up` should be the exact same as the input of the workflow.
 :::
 
-```python
-@workflow(on_failure=clean_up)
-def subwf(name: str):
-    c = create_cluster(name=name)
-    t = t1(a=1, b="2")
-    d = delete_cluster(name=name)
-    c >> t >> d
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/development_lifecycle/development_lifecycle/failure_node.py
+:caption: development_lifecycle/failure_node.py
+:pyobject: subwf
 ```
 
 By setting the failure policy to `FAIL_AFTER_EXECUTABLE_NODES_COMPLETE` to ensure that the `wf1` is executed even if the subworkflow fails. In this case, both parent and child workflows will fail, resulting in the `clean_up` task being executed twice:
 
-```python
-@workflow(on_failure=clean_up, failure_policy=WorkflowFailurePolicy.FAIL_AFTER_EXECUTABLE_NODES_COMPLETE)
-def wf1(name: str = "my_cluster"):
-    c = create_cluster(name=name)
-    subwf(name="another_cluster")
-    t = t1(a=1, b="2")
-    d = delete_cluster(name=name)
-    c >> t >> d
-
-
-@workflow
-def clean_up_wf(name: str):
-    return clean_up(name=name)
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/development_lifecycle/development_lifecycle/failure_node.py
+:caption: development_lifecycle/failure_node.py
+:lines: 42-53
 ```
 
 You can also set the `on_failure` to a workflow. This workflow will be executed if any of the tasks in the workflow fail:
 
-```python
-@workflow(on_failure=clean_up_wf)
-def wf2(name: str = "my_cluster"):
-    c = create_cluster(name=name)
-    t = t1(a=1, b="2")
-    d = delete_cluster(name=name)
-    c >> t >> d
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/development_lifecycle/development_lifecycle/failure_node.py
+:caption: development_lifecycle/failure_node.py
+:pyobject: wf2
 ```
+
+[flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/development_lifecycle/

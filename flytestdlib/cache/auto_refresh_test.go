@@ -19,11 +19,12 @@ import (
 const fakeCacheItemValueLimit = 10
 
 type fakeCacheItem struct {
-	val int
+	val        int
+	isTerminal bool
 }
 
 func (f fakeCacheItem) IsTerminal() bool {
-	return false
+	return f.isTerminal
 }
 
 type terminalCacheItem struct {
@@ -42,11 +43,15 @@ func syncFakeItem(_ context.Context, batch Batch) ([]ItemSyncResponse, error) {
 			// After the item has gone through ten update cycles, leave it unchanged
 			continue
 		}
-
+		isTerminal := false
+		if item.val == fakeCacheItemValueLimit-1 {
+			isTerminal = true
+		}
 		items = append(items, ItemSyncResponse{
 			ID: obj.GetID(),
 			Item: fakeCacheItem{
-				val: item.val + 1,
+				val:        item.val + 1,
+				isTerminal: isTerminal,
 			},
 			Action: Update,
 		})
@@ -59,8 +64,17 @@ func syncTerminalItem(_ context.Context, batch Batch) ([]ItemSyncResponse, error
 	panic("This should never be called")
 }
 
+type panickingSyncer struct {
+	callCount atomic.Int32
+}
+
+func (p *panickingSyncer) sync(_ context.Context, _ Batch) ([]ItemSyncResponse, error) {
+	p.callCount.Inc()
+	panic("testing")
+}
+
 func TestCacheFour(t *testing.T) {
-	testResyncPeriod := time.Millisecond
+	testResyncPeriod := 10 * time.Millisecond
 	rateLimiter := workqueue.DefaultControllerRateLimiter()
 
 	t.Run("normal operation", func(t *testing.T) {
@@ -79,13 +93,13 @@ func TestCacheFour(t *testing.T) {
 			assert.NoError(t, err)
 		}
 
-		// Wait half a second for all resync periods to complete
-		time.Sleep(500 * time.Millisecond)
-		for i := 1; i <= 10; i++ {
-			item, err := cache.Get(fmt.Sprintf("%d", i))
-			assert.NoError(t, err)
-			assert.Equal(t, 10, item.(fakeCacheItem).val)
-		}
+		assert.EventuallyWithT(t, func(c *assert.CollectT) {
+			for i := 1; i <= 10; i++ {
+				item, err := cache.Get(fmt.Sprintf("%d", i))
+				assert.NoError(c, err)
+				assert.Equal(c, 10, item.(fakeCacheItem).val)
+			}
+		}, 3*time.Second, 100*time.Millisecond)
 		cancel()
 	})
 
@@ -167,6 +181,34 @@ func TestCacheFour(t *testing.T) {
 
 		cancel()
 	})
+
+	t.Run("Test panic on sync and shutdown", func(t *testing.T) {
+		syncer := &panickingSyncer{}
+		cache, err := NewAutoRefreshCache("fake3", syncer.sync, rateLimiter, testResyncPeriod, 10, 2, promutils.NewTestScope())
+		assert.NoError(t, err)
+
+		ctx, cancel := context.WithCancel(context.Background())
+		assert.NoError(t, cache.Start(ctx))
+
+		itemID := "dummy_id"
+		_, err = cache.GetOrCreate(itemID, fakeCacheItem{
+			val: 0,
+		})
+		assert.NoError(t, err)
+
+		// wait for all workers to run
+		assert.Eventually(t, func() bool {
+			return syncer.callCount.Load() == int32(10)
+		}, 5*time.Second, time.Millisecond)
+
+		// wait some more time
+		time.Sleep(500 * time.Millisecond)
+
+		// all workers should have shut down.
+		assert.Equal(t, int32(10), syncer.callCount.Load())
+
+		cancel()
+	})
 }
 
 func TestQueueBuildUp(t *testing.T) {
@@ -204,4 +246,23 @@ func TestQueueBuildUp(t *testing.T) {
 	assert.NoError(t, cache.Start(ctx))
 	time.Sleep(5 * time.Second)
 	assert.Equal(t, int32(size), syncCount.Load())
+}
+
+func TestInProcessing(t *testing.T) {
+
+	syncPeriod := time.Millisecond
+	cache := &autoRefresh{
+		processing: &sync.Map{},
+		syncPeriod: syncPeriod,
+	}
+
+	assert.False(t, cache.inProcessing("test"))
+
+	cache.processing.Store("test", time.Now())
+	assert.True(t, cache.inProcessing("test"))
+
+	cache.processing.Store("test1", time.Now().Add(syncPeriod*-11))
+	assert.False(t, cache.inProcessing("test1"))
+	_, found := cache.processing.Load("test1")
+	assert.False(t, found)
 }

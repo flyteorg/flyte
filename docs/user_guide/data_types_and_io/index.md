@@ -99,8 +99,7 @@ Here's a breakdown of these mappings:
     * - ``@dataclass``
       - ``Struct``
       - Automatic
-      - The class should be a pure value class that inherits from Mashumaro's DataClassJSONMixin,
-        and be annotated with the ``@dataclass`` decorator.
+      - The class should be a pure value class annotated with the ``@dataclass`` decorator.
     * - ``np.ndarray``
       - File
       - Automatic
@@ -133,7 +132,7 @@ Here's a breakdown of these mappings:
       - Any
       - Custom transformers
       - The ``FlytePickle`` transformer is the default option, but you can also define custom transformers.
-        **For instructions on building custom type transformers, please refer to :ref:`this section <advanced_custom_types>`**.
+        For instructions on building custom type transformers, please refer to :ref:`this section <advanced_custom_types>`.
 ```
 
 ```{toctree}

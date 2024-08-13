@@ -75,6 +75,10 @@ func (parentInfo) CurrentAttempt() uint32 {
 	return uint32(2)
 }
 
+func (parentInfo) IsInDynamicChain() bool {
+	return false
+}
+
 func createNodeContext(phase v1alpha1.BranchNodePhase, childNodeID *v1alpha1.NodeID, n v1alpha1.ExecutableNode,
 	inputs *core.LiteralMap, nl *execMocks.NodeLookup, eCtx executors.ExecutionContext) (*mocks.NodeExecutionContext, *branchNodeStateHolder) {
 	branchNodeState := handler.BranchNodeState{
@@ -118,7 +122,6 @@ func createNodeContext(phase v1alpha1.BranchNodePhase, childNodeID *v1alpha1.Nod
 	tmpDataStore, _ := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
 	nCtx.OnDataStore().Return(tmpDataStore)
 	nCtx.OnCurrentAttempt().Return(uint32(1))
-	nCtx.OnMaxDatasetSizeBytes().Return(int64(1))
 	nCtx.OnNodeStatus().Return(ns)
 
 	nCtx.OnNodeID().Return("n1")
@@ -192,7 +195,7 @@ func TestBranchHandler_RecurseDownstream(t *testing.T) {
 			}
 
 			nCtx, _ := createNodeContext(v1alpha1.BranchNodeNotYetEvaluated, &childNodeID, n, nil, mockNodeLookup, eCtx)
-			newParentInfo, _ := common.CreateParentInfo(parentInfo{}, nCtx.NodeID(), nCtx.CurrentAttempt())
+			newParentInfo, _ := common.CreateParentInfo(parentInfo{}, nCtx.NodeID(), nCtx.CurrentAttempt(), false)
 			expectedExecContext := executors.NewExecutionContextWithParentInfo(nCtx.ExecutionContext(), newParentInfo)
 			mockNodeExecutor := &mocks.Node{}
 			mockNodeExecutor.OnRecursiveNodeHandlerMatch(
@@ -320,7 +323,7 @@ func TestBranchHandler_AbortNode(t *testing.T) {
 		eCtx := &execMocks.ExecutionContext{}
 		eCtx.OnGetParentInfo().Return(parentInfo{})
 		nCtx, s := createNodeContext(v1alpha1.BranchNodeSuccess, &n1, n, nil, mockNodeLookup, eCtx)
-		newParentInfo, _ := common.CreateParentInfo(parentInfo{}, nCtx.NodeID(), nCtx.CurrentAttempt())
+		newParentInfo, _ := common.CreateParentInfo(parentInfo{}, nCtx.NodeID(), nCtx.CurrentAttempt(), false)
 		expectedExecContext := executors.NewExecutionContextWithParentInfo(nCtx.ExecutionContext(), newParentInfo)
 		mockNodeExecutor.OnAbortHandlerMatch(mock.Anything,
 			mock.MatchedBy(func(e executors.ExecutionContext) bool { return assert.Equal(t, e, expectedExecContext) }),

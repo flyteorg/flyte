@@ -174,7 +174,8 @@ data:
       testing:
         host: http://flyteadmin
     server:
-      grpcPort: 8089
+      grpc:
+        port: 8089
       httpPort: 8088
       security:
         allowCors: true
@@ -201,7 +202,7 @@ data:
           json: ""
           project_id: <PROJECT-ID>
           scopes: https://www.googleapis.com/auth/cloud-platform
-      container: "<BUCKETNAME>"
+      container: "<METADATA_BUCKET_NAME>"
       enable-multicontainer: false
       limits:
         maxDownloadMBs: 10
@@ -403,7 +404,7 @@ data:
           json: ""
           project_id: <PROJECT-ID>
           scopes: https://www.googleapis.com/auth/cloud-platform
-      container: "<BUCKETNAME>"
+      container: "<METADATA_BUCKET_NAME>"
       enable-multicontainer: false
       limits:
         maxDownloadMBs: 10
@@ -473,7 +474,7 @@ data:
     plugins:
       k8s:
         co-pilot:
-          image: cr.flyte.org/flyteorg/flytecopilot:v1.11.0-b0
+          image: cr.flyte.org/flyteorg/flytecopilot:v1.13.0
           name: flyte-copilot-
           start-timeout: 30s
   core.yaml: | 
@@ -516,7 +517,7 @@ data:
           rate: 100
           type: bucket
         type: batch
-      rawoutput-prefix: gs://<BUCKETNAME>/
+      rawoutput-prefix: gs://<RAW_DATA_BUCKET_NAME>/
       workers: 40
       workflow-reeval-duration: 30s
     webhook:
@@ -553,7 +554,7 @@ data:
           json: ""
           project_id: <PROJECT-ID>
           scopes: https://www.googleapis.com/auth/cloud-platform
-      container: "<BUCKETNAME>"
+      container: "<METADATA_BUCKET_NAME>"
       enable-multicontainer: false
       limits:
         maxDownloadMBs: 10
@@ -797,17 +798,22 @@ spec:
     - name: http
       port: 80
       protocol: TCP
+      appProtocol: TCP
       targetPort: 8088
     - name: grpc
       port: 81
       protocol: TCP
+      # intentionally set to TCP instead of grpc
+      appProtocol: TCP
       targetPort: 8089
     - name: redoc
       protocol: TCP
+      appProtocol: TCP
       port: 87
       targetPort: 8087
     - name: http-metrics
       protocol: TCP
+      appProtocol: TCP
       port: 10254
   selector: 
     app.kubernetes.io/name: flyteadmin
@@ -830,6 +836,7 @@ spec:
   - name: http
     port: 80
     protocol: TCP
+    appProtocol: TCP
     targetPort: 8080
   selector: 
     app.kubernetes.io/name: flyteconsole
@@ -902,7 +909,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "2e169a911a8234dd42d06ca0887279093f4ed36033d0543749ce126b26b50f3"
+        configChecksum: "0705f122f2535babec96a6083827c3e6d27e6e9b0e460b4d07292c858079ac7"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -923,7 +930,7 @@ spec:
           - /etc/flyte/config/*.yaml
           - migrate
           - run
-          image: "cr.flyte.org/flyteorg/flyteadmin:v1.11.0-b0"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v1.13.0"
           imagePullPolicy: "IfNotPresent"
           name: run-migrations
           securityContext:
@@ -944,7 +951,7 @@ spec:
           - flytesnacks
           - flytetester
           - flyteexamples
-          image: "cr.flyte.org/flyteorg/flyteadmin:v1.11.0-b0"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v1.13.0"
           imagePullPolicy: "IfNotPresent"
           name: seed-projects
           securityContext:
@@ -962,7 +969,7 @@ spec:
           - /etc/flyte/config/*.yaml
           - clusterresource
           - sync
-          image: "cr.flyte.org/flyteorg/flyteadmin:v1.11.0-b0"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v1.13.0"
           imagePullPolicy: "IfNotPresent"
           name: sync-cluster-resources
           securityContext:
@@ -979,7 +986,7 @@ spec:
           - mountPath: /etc/secrets/
             name: admin-secrets
         - name: generate-secrets
-          image: "cr.flyte.org/flyteorg/flyteadmin:v1.11.0-b0"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v1.13.0"
           imagePullPolicy: "IfNotPresent"
           command: ["/bin/sh", "-c"]
           args:
@@ -1006,7 +1013,7 @@ spec:
         - --config
         - /etc/flyte/config/*.yaml
         - serve
-        image: "cr.flyte.org/flyteorg/flyteadmin:v1.11.0-b0"
+        image: "cr.flyte.org/flyteorg/flyteadmin:v1.13.0"
         imagePullPolicy: "IfNotPresent"
         name: flyteadmin
         ports:
@@ -1098,6 +1105,8 @@ spec:
     metadata:
       annotations:
         configChecksum: "dc18f5d54e0770c574e6b0693724047e22063030259104eebb554398d63209f"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "10254"
       labels: 
         app.kubernetes.io/name: flyteclusterresourcesync
         app.kubernetes.io/instance: flyte
@@ -1111,7 +1120,7 @@ spec:
             - /etc/flyte/config/*.yaml
             - clusterresource
             - run
-          image: "cr.flyte.org/flyteorg/flyteadmin:v1.11.0-b0"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v1.13.0"
           imagePullPolicy: "IfNotPresent"
           name: sync-cluster-resources
           volumeMounts:
@@ -1167,7 +1176,7 @@ spec:
         seLinuxOptions:
           type: spc_t
       containers:
-      - image: "cr.flyte.org/flyteorg/flyteconsole:v1.10.3"
+      - image: "cr.flyte.org/flyteorg/flyteconsole:v1.15.1"
         imagePullPolicy: "IfNotPresent"
         name: flyteconsole
         envFrom:
@@ -1220,7 +1229,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "bc69ed841506b28a42ac19bd0884d483472b3d11fe85fe7e546b879aeb30a85"
+        configChecksum: "905a2a911a85dbf8d4f1dc3be24b9c4fd7bb46481db0e174274d6aea6129b4c"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte
@@ -1241,7 +1250,7 @@ spec:
         - /etc/datacatalog/config/*.yaml
         - migrate
         - run
-        image: "cr.flyte.org/flyteorg/datacatalog:v1.11.0-b0"
+        image: "cr.flyte.org/flyteorg/datacatalog:v1.13.0"
         imagePullPolicy: "IfNotPresent"
         name: run-migrations
         volumeMounts:
@@ -1259,11 +1268,11 @@ spec:
         - --config
         - /etc/datacatalog/config/*.yaml
         - serve
-        image: "cr.flyte.org/flyteorg/datacatalog:v1.11.0-b0"
+        image: "cr.flyte.org/flyteorg/datacatalog:v1.13.0"
         imagePullPolicy: "IfNotPresent"
         name: datacatalog
         ports:
-        - containerPort: 8088
+        - containerPort: 8080
         - containerPort: 8089
         - containerPort: 10254
         securityContext:
@@ -1322,7 +1331,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "2e169a911a8234dd42d06ca0887279093f4ed36033d0543749ce126b26b50f3"
+        configChecksum: "0705f122f2535babec96a6083827c3e6d27e6e9b0e460b4d07292c858079ac7"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte
@@ -1342,7 +1351,7 @@ spec:
         - precheck
         - --config
         - /etc/flyte/config/*.yaml
-        image: "cr.flyte.org/flyteorg/flytescheduler:v1.11.0-b0"
+        image: "cr.flyte.org/flyteorg/flytescheduler:v1.13.0"
         imagePullPolicy: "IfNotPresent"
         name: flytescheduler-check
         securityContext:
@@ -1362,7 +1371,7 @@ spec:
         - run
         - --config
         - /etc/flyte/config/*.yaml
-        image: "cr.flyte.org/flyteorg/flytescheduler:v1.11.0-b0"
+        image: "cr.flyte.org/flyteorg/flytescheduler:v1.13.0"
         imagePullPolicy: "IfNotPresent"
         name: flytescheduler
         ports:
@@ -1421,7 +1430,9 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "264352d1a15b63cdaca7bb2eb3a63e415d89e01d75a81be6afba718c241a441"
+        configChecksum: "e63d877e1ff27d18ac7c4af4c6e4ca6106fc337a13ce00d9beb8efed8548493"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "10254"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -1446,7 +1457,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: "cr.flyte.org/flyteorg/flytepropeller:v1.11.0-b0"
+        image: "cr.flyte.org/flyteorg/flytepropeller:v1.13.0"
         imagePullPolicy: "IfNotPresent"
         name: flytepropeller
         ports:
@@ -1500,9 +1511,11 @@ spec:
       labels:
         app: flyte-pod-webhook
         app.kubernetes.io/name: flyte-pod-webhook
-        app.kubernetes.io/version: v1.11.0-b0
+        app.kubernetes.io/version: v1.13.0
       annotations:
-        configChecksum: "264352d1a15b63cdaca7bb2eb3a63e415d89e01d75a81be6afba718c241a441"
+        configChecksum: "e63d877e1ff27d18ac7c4af4c6e4ca6106fc337a13ce00d9beb8efed8548493"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "10254"
     spec:
       securityContext: 
         fsGroup: 65534
@@ -1514,7 +1527,7 @@ spec:
       serviceAccountName: flyte-pod-webhook
       initContainers:
       - name: generate-secrets
-        image: "cr.flyte.org/flyteorg/flytepropeller:v1.11.0-b0"
+        image: "cr.flyte.org/flyteorg/flytepropeller:v1.13.0"
         imagePullPolicy: "IfNotPresent"
         command:
           - flytepropeller
@@ -1541,7 +1554,7 @@ spec:
             mountPath: /etc/flyte/config
       containers:
         - name: webhook
-          image: "cr.flyte.org/flyteorg/flytepropeller:v1.11.0-b0"
+          image: "cr.flyte.org/flyteorg/flytepropeller:v1.13.0"
           imagePullPolicy: "IfNotPresent"
           command:
             - flytepropeller
@@ -1594,6 +1607,7 @@ metadata:
     cert-manager.io/issuer: letsencrypt-production
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/app-root: /console
+    nginx.ingress.kubernetes.io/service-upstream: "true"
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
 spec:
   ingressClassName: 
@@ -1755,6 +1769,7 @@ metadata:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/app-root: /console
     nginx.ingress.kubernetes.io/backend-protocol: GRPC
+    nginx.ingress.kubernetes.io/service-upstream: "true"
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
 spec:
   ingressClassName: 

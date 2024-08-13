@@ -1,22 +1,3 @@
----
-jupytext:
-  cell_metadata_filter: all
-  formats: md:myst
-  main_language: python
-  notebook_metadata_filter: all
-  text_representation:
-    extension: .md
-    format_name: myst
-    format_version: 0.13
-    jupytext_version: 1.16.1
-kernelspec:
-  display_name: Python 3
-  language: python
-  name: python3
----
-
-+++ {"lines_to_next_cell": 0}
-
 # Waiting for external inputs
 
 *New in Flyte 1.3.0*
@@ -58,30 +39,14 @@ Though this type of node may not be used often in a production setting,
 you might want to use it, for example, if you want to simulate a delay in
 your workflow to mock out the behavior of some long-running computation.
 
-```{code-cell}
-from datetime import timedelta
-
-from flytekit import sleep, task, workflow
-
-
-@task
-def long_running_computation(num: int) -> int:
-    """A mock task pretending to be a long-running computation."""
-    return num
-
-
-@workflow
-def sleep_wf(num: int) -> int:
-    """Simulate a "long-running" computation with sleep."""
-
-    # increase the sleep duration to actually make it long-running
-    sleeping = sleep(timedelta(seconds=10))
-    result = long_running_computation(num=num)
-    sleeping >> result
-    return result
+```{note}
+To clone and run the example code on this page, see the [Flytesnacks repo][flytesnacks].
 ```
 
-+++ {"lines_to_next_cell": 0}
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/waiting_for_external_inputs.py
+:caption: advanced_composition/waiting_for_external_inputs.py
+:lines: 1-20
+```
 
 As you can see above, we define a simple `add_one` task and a `sleep_wf`
 workflow. We first create a `sleeping` and `result` node, then
@@ -97,6 +62,10 @@ You can learn more about the `>>` chaining operator
 Now that you have a general sense of how this works, let's move onto the
 {func}`~flytekit.wait_for_input` workflow node.
 
+```{note}
+To clone and run the example code on this page, see the [Flytesnacks repo][flytesnacks].
+```
+
 ## Supply external inputs with `wait_for_input`
 
 With the {py:func}`~flytekit.wait_for_input` node, you can pause a
@@ -106,33 +75,9 @@ but before publishing it you want to give it a custom title. You can achieve
 this by defining a `wait_for_input` node that takes a `str` input and
 finalizes the report:
 
-```{code-cell}
-import typing
-
-from flytekit import wait_for_input
-
-
-@task
-def create_report(data: typing.List[float]) -> dict:  # o0
-    """A toy report task."""
-    return {
-        "mean": sum(data) / len(data),
-        "length": len(data),
-        "max": max(data),
-        "min": min(data),
-    }
-
-
-@task
-def finalize_report(report: dict, title: str) -> dict:
-    return {"title": title, **report}
-
-
-@workflow
-def reporting_wf(data: typing.List[float]) -> dict:
-    report = create_report(data=data)
-    title_input = wait_for_input("title", timeout=timedelta(hours=1), expected_type=str)
-    return finalize_report(report=report, title=title_input)
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/waiting_for_external_inputs.py
+:caption: advanced_composition/waiting_for_external_inputs.py
+:lines: 24-49
 ```
 
 Let's breakdown what's happening in the code above:
@@ -162,22 +107,10 @@ an explicit approval signal before continuing execution. Going back to our
 report-publishing use case, suppose that we want to block the publishing of
 a report for some reason (e.g. if they don't appear to be valid):
 
-```{code-cell}
-from flytekit import approve
-
-
-@workflow
-def reporting_with_approval_wf(data: typing.List[float]) -> dict:
-    report = create_report(data=data)
-    title_input = wait_for_input("title", timeout=timedelta(hours=1), expected_type=str)
-    final_report = finalize_report(report=report, title=title_input)
-
-    # approve the final report, where the output of approve is the final_report
-    # dictionary.
-    return approve(final_report, "approve-final-report", timeout=timedelta(hours=2))
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/waiting_for_external_inputs.py
+:caption: advanced_composition/waiting_for_external_inputs.py
+:lines: 53-64
 ```
-
-+++ {"lines_to_next_cell": 0}
 
 The `approve` node will pass the `final_report` promise through as the
 output of the workflow, provided that the `approve-final-report` gets an
@@ -187,24 +120,10 @@ You can also use the output of the `approve` function as a promise, feeding
 it to a subsequent task. Let's create a version of our report-publishing
 workflow where the approval happens after `create_report`:
 
-```{code-cell}
-@workflow
-def approval_as_promise_wf(data: typing.List[float]) -> dict:
-    report = create_report(data=data)
-    title_input = wait_for_input("title", timeout=timedelta(hours=1), expected_type=str)
-
-    # wait for report to run so that the user can view it before adding a custom
-    # title to the report
-    report >> title_input
-
-    final_report = finalize_report(
-        report=approve(report, "raw-report-approval", timeout=timedelta(hours=2)),
-        title=title_input,
-    )
-    return final_report
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/waiting_for_external_inputs.py
+:caption: advanced_composition/waiting_for_external_inputs.py
+:pyobject: approval_as_promise_wf
 ```
-
-+++ {"lines_to_next_cell": 0}
 
 ## Working with conditionals
 
@@ -214,36 +133,9 @@ useful when we combine them with other Flyte constructs, like {ref}`conditionals
 To illustrate this, let's extend the report-publishing use case so that we
 produce an "invalid report" output in case we don't approve the final report:
 
-```{code-cell}
-:lines_to_next_cell: 2
-
-from flytekit import conditional
-
-
-@task
-def invalid_report() -> dict:
-    return {"invalid_report": True}
-
-
-@workflow
-def conditional_wf(data: typing.List[float]) -> dict:
-    report = create_report(data=data)
-    title_input = wait_for_input("title-input", timeout=timedelta(hours=1), expected_type=str)
-
-    # Define a "review-passes" wait_for_input node so that a human can review
-    # the report before finalizing it.
-    review_passed = wait_for_input("review-passes", timeout=timedelta(hours=2), expected_type=bool)
-    report >> review_passed
-
-    # This conditional returns the finalized report if the review passes,
-    # otherwise it returns an invalid report output.
-    return (
-        conditional("final-report-condition")
-        .if_(review_passed.is_true())
-        .then(finalize_report(report=report, title=title_input))
-        .else_()
-        .then(invalid_report())
-    )
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/waiting_for_external_inputs.py
+:caption: advanced_composition/waiting_for_external_inputs.py
+:lines: 88-114
 ```
 
 On top of the `approved` node, which we use in the `conditional` to
@@ -312,3 +204,5 @@ remote.set_signal("title-input", execution.id.name, "my report")
 # node is in the `signals` list above
 remote.set_signal("review-passes", execution.id.name, True)
 ```
+
+[flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/advanced_composition/

@@ -33,6 +33,51 @@ pub mod array_job {
         MinSuccessRatio(f32),
     }
 }
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct CommonReplicaSpec {
+    /// Number of replicas
+    #[prost(int32, tag="1")]
+    pub replicas: i32,
+    /// Image used for the replica group
+    #[prost(string, tag="2")]
+    pub image: ::prost::alloc::string::String,
+    /// Resources required for the replica group
+    #[prost(message, optional, tag="3")]
+    pub resources: ::core::option::Option<super::core::Resources>,
+    /// RestartPolicy determines whether pods will be restarted when they exit
+    #[prost(enumeration="RestartPolicy", tag="4")]
+    pub restart_policy: i32,
+}
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+#[repr(i32)]
+pub enum RestartPolicy {
+    Never = 0,
+    OnFailure = 1,
+    Always = 2,
+}
+impl RestartPolicy {
+    /// String value of the enum field names used in the ProtoBuf definition.
+    ///
+    /// The values are not transformed in any way and thus are considered stable
+    /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+    pub fn as_str_name(&self) -> &'static str {
+        match self {
+            RestartPolicy::Never => "RESTART_POLICY_NEVER",
+            RestartPolicy::OnFailure => "RESTART_POLICY_ON_FAILURE",
+            RestartPolicy::Always => "RESTART_POLICY_ALWAYS",
+        }
+    }
+    /// Creates an enum from field names used in the ProtoBuf definition.
+    pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+        match value {
+            "RESTART_POLICY_NEVER" => Some(Self::Never),
+            "RESTART_POLICY_ON_FAILURE" => Some(Self::OnFailure),
+            "RESTART_POLICY_ALWAYS" => Some(Self::Always),
+            _ => None,
+        }
+    }
+}
 /// Custom Proto for Dask Plugin.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -173,6 +218,7 @@ pub struct RayJob {
     pub ray_cluster: ::core::option::Option<RayCluster>,
     /// runtime_env is base64 encoded.
     /// Ray runtime environments: <https://docs.ray.io/en/latest/ray-core/handling-dependencies.html#runtime-environments>
+    #[deprecated]
     #[prost(string, tag="2")]
     pub runtime_env: ::prost::alloc::string::String,
     /// shutdown_after_job_finishes specifies whether the RayCluster should be deleted after the RayJob finishes.
@@ -181,6 +227,10 @@ pub struct RayJob {
     /// ttl_seconds_after_finished specifies the number of seconds after which the RayCluster will be deleted after the RayJob finishes.
     #[prost(int32, tag="4")]
     pub ttl_seconds_after_finished: i32,
+    /// RuntimeEnvYAML represents the runtime environment configuration
+    /// provided as a multi-line YAML string.
+    #[prost(string, tag="5")]
+    pub runtime_env_yaml: ::prost::alloc::string::String,
 }
 /// Define Ray cluster defines the desired state of RayCluster
 #[allow(clippy::derive_partial_eq_without_eq)]
