@@ -74,7 +74,7 @@ func TestJsonDifferHasDiffError(t *testing.T) {
 	diff, _ := jsondiff.Compare(oldSpec, newSpec)
 	rdiff, _ := jsondiff.Compare(newSpec, oldSpec)
 	rs := compareJsons(diff, rdiff)
-	assert.Equal(t, "\t\t- /four: 4 -> 0", strings.Join(rs, "\n"))
+	assert.Equal(t, "/four:\n\t- 4 \n\t+ 0", strings.Join(rs, "\n"))
 }
 
 func TestJsonDifferNoDiffError(t *testing.T) {
