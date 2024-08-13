@@ -160,7 +160,7 @@ func TestNewTaskExistsIdenticalStructureError(t *testing.T) {
 }
 
 func TestNewWorkflowExistsDifferentStructureError(t *testing.T) {
-	identifier = core.Identifier{
+	identifier := core.Identifier{
 		ResourceType: core.ResourceType_WORKFLOW,
 		Project:      "testProj",
 		Domain:       "domain",
