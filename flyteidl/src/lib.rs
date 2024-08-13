@@ -405,7 +405,7 @@ pub mod _flyteidl_rust {
             StructuredDatasetType, TaskExecutionIdentifier, TaskMetadata, TaskNode,
             TaskNodeOverrides, TaskTemplate, TypeAnnotation, TypeStructure, TypedInterface, Union,
             UnionInfo, Variable, VariableMap, WorkflowExecution, WorkflowExecutionIdentifier,
-            WorkflowMetadata, WorkflowMetadataDefaults, WorkflowNode, WorkflowTemplate,
+            WorkflowMetadata, WorkflowMetadataDefaults, WorkflowNode, WorkflowTemplate, RuntimeBinding, Granularity
         };
     }
     #[pymodule]
@@ -695,6 +695,35 @@ pub mod _flyteidl_rust {
         Ok(super::google::protobuf::Value { kind: Some(kind) })
     }
 
+    fn dump_protobuf_value(value: &super::google::protobuf::Value) -> PyResult<String> {
+        let json_value = match value.kind.as_ref() {
+            Some(super::google::protobuf::value::Kind::NullValue(_)) => serde_json::Value::Null,
+            Some(super::google::protobuf::value::Kind::NumberValue(v)) => serde_json::Value::Number(
+                serde_json::Number::from_f64(*v).ok_or_else(|| {
+                    PyValueError::new_err("Failed to convert number to JSON number")
+                })?,
+            ),
+            Some(super::google::protobuf::value::Kind::StringValue(v)) => serde_json::Value::String(v.clone()),
+            Some(super::google::protobuf::value::Kind::BoolValue(v)) => serde_json::Value::Bool(*v),
+            Some(super::google::protobuf::value::Kind::StructValue(v)) => {
+                let json_str = dump_struct(v)?;
+                serde_json::from_str(&json_str).map_err(|e| PyValueError::new_err(format!("Failed to parse JSON: {}", e)))?
+            }
+            Some(super::google::protobuf::value::Kind::ListValue(v)) => {
+                let json_values: Result<Vec<serde_json::Value>, PyErr> = v
+                   .values
+                   .iter()
+                   .map(|val| serde_json::from_str(&dump_protobuf_value(val)?).map_err(|e| PyValueError::new_err(format!("Failed to parse JSON: {}", e))))
+                   .collect();
+                serde_json::Value::Array(json_values?)
+            }
+            None => return Err(PyValueError::new_err("Invalid or unsupported value type")),
+        };
+        
+        // Convert the JSON value to a string
+        serde_json::to_string(&json_value).map_err(|e| PyValueError::new_err(format!("Failed to serialize JSON: {}", e)))
+    }
+
     #[pyfunction]
     #[pyo3(name = "ParseValue")]
     pub fn parse_value(json_str: &str) -> PyResult<super::google::protobuf::Value> {
@@ -703,6 +732,20 @@ pub mod _flyteidl_rust {
 
         let value = parse_json_value(&parsed)?;
         Ok(value)
+    }
+
+    #[pyfunction]
+    #[pyo3(name = "DumpStruct")]
+    pub fn dump_struct(proto_struct: &super::google::protobuf::Struct) -> PyResult<String> {
+        let mut json_map = serde_json::Map::new();
+        
+        for (key, value) in &proto_struct.fields {
+            let json_value = serde_json::from_str(&dump_protobuf_value(value)?).map_err(|e| PyValueError::new_err(format!("Failed to parse JSON: {}", e)))?;
+            json_map.insert(key.clone(), json_value);
+        }
+        
+        let json_value = serde_json::Value::Object(json_map);
+        serde_json::to_string(&json_value).map_err(|e| PyValueError::new_err(format!("Failed to serialize JSON: {}", e)))
     }
 
     #[pyfunction]
