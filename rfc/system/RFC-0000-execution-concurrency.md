@@ -85,9 +85,9 @@ At a broad level
 
 Introduce an async reconciliation loop in FlyteAdmin to poll for all pending executions:
 1. Query all pending executions by timestamp ascending (open question, should we prefer more recent executions instead? should we make this configurable?)
-   1. as an optimization, could even parallelize this into goroutines, one per launch plan distinct launch plan ID that has any `PENDING` execution
+   1. as an optimization, could even parallelize this into goroutines, one per distinct launch plan ID that has any `PENDING` execution
 2. Check the database to see if there are fewer than `MAX_CONCURRENCY` non-terminal executions with an identical launch plan ID
-3. If there are none, select the oldest pending execution for that launch plan
+3. If there are fewer than `MAX_CONCURRENCY` executions running, select the oldest pending execution for that launch plan
    1. create the workflow CRD
    1. open question: also update its phase in the database to `QUEUED`?
    1. let execution proceed
