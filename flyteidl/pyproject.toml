@@ -4,7 +4,7 @@ build-backend = "maturin"
 
 [project]
 name = "flyteidl_rust"
-requires-python = ">=3.11"
+requires-python = ">=3.9"
 classifiers = [
     "Programming Language :: Rust",
     "Programming Language :: Python :: Implementation :: CPython",
