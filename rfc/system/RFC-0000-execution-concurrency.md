@@ -79,9 +79,9 @@ message ExecutionStateChangeDetails  {
 ### FlyteAdmin
 At a broad level
 1. At CreateExecution time, if the launch plan in the ExecutionSpec has a concurrency policy
-   2. Create the execution in the database with a new `PENDING` execution phase and reason populated in `ExecutionStateChangeDetails`.
-      3. or fail the request when the concurrency policy is set to `ABORT`
-   3. Do not create the workflow CRD
+   1. Create the execution in the database with a new `PENDING` execution phase and reason populated in `ExecutionStateChangeDetails`.
+      1. or fail the request when the concurrency policy is set to `ABORT`
+   1. Do not create the workflow CRD
 
 Introduce an async reconciliation loop in FlyteAdmin to poll for all pending executions:
 1. Query all pending executions by timestamp ascending (open question, should we prefer more recent executions instead? should we make this configurable?)
