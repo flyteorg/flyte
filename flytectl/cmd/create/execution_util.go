@@ -4,17 +4,19 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
+	"strings"
 
 	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
 	cmdGet "github.com/flyteorg/flyte/flytectl/cmd/get"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/google/uuid"
 	"sigs.k8s.io/yaml"
 )
 
 func createExecutionRequestForWorkflow(ctx context.Context, workflowName, project, domain string,
-	cmdCtx cmdCore.CommandContext, executionConfig *ExecutionConfig) (*admin.ExecutionCreateRequest, error) {
+	cmdCtx cmdCore.CommandContext, executionConfig *ExecutionConfig, targetExecName string) (*admin.ExecutionCreateRequest, error) {
 	// Fetch the launch plan
 	lp, err := cmdCtx.AdminFetcherExt().FetchLPVersion(ctx, workflowName, executionConfig.Version, project, domain)
 	if err != nil {
@@ -51,11 +53,11 @@ func createExecutionRequestForWorkflow(ctx context.Context, workflowName, projec
 		}
 	}
 
-	return createExecutionRequest(lp.Id, inputs, envs, securityContext, authRole, executionConfig.TargetExecutionCluster), nil
+	return createExecutionRequest(lp.Id, inputs, envs, securityContext, authRole, targetExecName, executionConfig.TargetExecutionCluster), nil
 }
 
 func createExecutionRequestForTask(ctx context.Context, taskName string, project string, domain string,
-	cmdCtx cmdCore.CommandContext, executionConfig *ExecutionConfig) (*admin.ExecutionCreateRequest, error) {
+	cmdCtx cmdCore.CommandContext, executionConfig *ExecutionConfig, targetExecName string) (*admin.ExecutionCreateRequest, error) {
 	// Fetch the task
 	task, err := cmdCtx.AdminFetcherExt().FetchTaskVersion(ctx, taskName, executionConfig.Version, project, domain)
 	if err != nil {
@@ -99,11 +101,11 @@ func createExecutionRequestForTask(ctx context.Context, taskName string, project
 		Version:      task.Id.Version,
 	}
 
-	return createExecutionRequest(id, inputs, envs, securityContext, authRole, executionConfig.TargetExecutionCluster), nil
+	return createExecutionRequest(id, inputs, envs, securityContext, authRole, targetExecName, executionConfig.TargetExecutionCluster), nil
 }
 
 func relaunchExecution(ctx context.Context, executionName string, project string, domain string,
-	cmdCtx cmdCore.CommandContext, executionConfig *ExecutionConfig) error {
+	cmdCtx cmdCore.CommandContext, executionConfig *ExecutionConfig, targetExecutionName string) error {
 	if executionConfig.DryRun {
 		logger.Debugf(ctx, "skipping RelaunchExecution request (DryRun)")
 		return nil
@@ -114,6 +116,7 @@ func relaunchExecution(ctx context.Context, executionName string, project string
 			Project: project,
 			Domain:  domain,
 		},
+		Name:           targetExecutionName,
 		OverwriteCache: executionConfig.OverwriteCache,
 	})
 	if err != nil {
@@ -124,7 +127,7 @@ func relaunchExecution(ctx context.Context, executionName string, project string
 }
 
 func recoverExecution(ctx context.Context, executionName string, project string, domain string,
-	cmdCtx cmdCore.CommandContext, executionConfig *ExecutionConfig) error {
+	cmdCtx cmdCore.CommandContext, executionConfig *ExecutionConfig, targetExecName string) error {
 	if executionConfig.DryRun {
 		logger.Debugf(ctx, "skipping RecoverExecution request (DryRun)")
 		return nil
@@ -135,6 +138,7 @@ func recoverExecution(ctx context.Context, executionName string, project string,
 			Project: project,
 			Domain:  domain,
 		},
+		Name: targetExecName,
 	})
 	if err != nil {
 		return err
@@ -143,8 +147,7 @@ func recoverExecution(ctx context.Context, executionName string, project string,
 	return nil
 }
 
-func createExecutionRequest(ID *core.Identifier, inputs *core.LiteralMap, envs *admin.Envs, securityContext *core.SecurityContext, authRole *admin.AuthRole, targetExecutionCluster string) *admin.ExecutionCreateRequest {
-
+func createExecutionRequest(ID *core.Identifier, inputs *core.LiteralMap, envs *admin.Envs, securityContext *core.SecurityContext, authRole *admin.AuthRole, targetExecName string, targetExecutionCluster string) *admin.ExecutionCreateRequest {
 	var clusterAssignment *admin.ClusterAssignment
 	if executionConfig.ClusterPool != "" {
 		clusterAssignment = &admin.ClusterAssignment{ClusterPoolName: executionConfig.ClusterPool}
@@ -156,6 +159,7 @@ func createExecutionRequest(ID *core.Identifier, inputs *core.LiteralMap, envs *
 	return &admin.ExecutionCreateRequest{
 		Project: executionConfig.TargetProject,
 		Domain:  executionConfig.TargetDomain,
+		Name:    targetExecName,
 		Spec: &admin.ExecutionSpec{
 			LaunchPlan: ID,
 			Metadata: &admin.ExecutionMetadata{
