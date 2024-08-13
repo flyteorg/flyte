@@ -206,3 +206,15 @@ func IsDoesNotExistError(err error) bool {
 var ConfigurationDocumentStaleError = NewFlyteAdminErrorf(codes.InvalidArgument, "The document you are trying to update is outdated. Please try again.")
 var ActiveConfigurationDocumentAlreadyExistsError = NewFlyteAdminErrorf(codes.AlreadyExists, "There is already an active configuration document.")
 var NotImplementError = NewFlyteAdminErrorf(codes.Unimplemented, "Not implemented")
+
+func NewInactiveProjectError(ctx context.Context, id string) FlyteAdminError {
+	errMsg := fmt.Sprintf("project [%s] is not active", id)
+	statusErr, transformationErr := NewFlyteAdminError(codes.InvalidArgument, errMsg).WithDetails(&admin.InactiveProject{
+		Id: id,
+	})
+	if transformationErr != nil {
+		logger.Errorf(ctx, "failed to wrap grpc status in type 'Error': %v", transformationErr)
+		return NewFlyteAdminErrorf(codes.InvalidArgument, errMsg)
+	}
+	return statusErr
+}

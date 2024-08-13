@@ -78,7 +78,10 @@ func ValidateProjectAndDomain(
 	if err := ValidateProjectExistsAndActive(ctx, db, projectID, org); err != nil {
 		return err
 	}
-	return ValidateDomainExists(ctx, config, domainID)
+	if err := ValidateDomainExists(ctx, config, domainID); err != nil {
+		return err
+	}
+	return nil
 }
 
 func ValidateProjectExistsAndActive(
@@ -91,8 +94,7 @@ func ValidateProjectExistsAndActive(
 			projectID, getOrgForErrorMsg(org), err)
 	}
 	if *project.State != int32(admin.Project_ACTIVE) {
-		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
-			"project [%s] is not active", projectID)
+		return errors.NewInactiveProjectError(ctx, projectID)
 	}
 	return nil
 }
