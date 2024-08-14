@@ -898,7 +898,8 @@ pub mod _flyteidl_rust {
                     access_token
                 }
                 Err(error) => {
-                    panic!("Failed at retrieving keyring: {:?}", error);
+                    println!("Failed at retrieving keyring: {:?}", error);
+                    "".to_string()
                 }
             };
 
