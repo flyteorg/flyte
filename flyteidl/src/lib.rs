@@ -840,12 +840,12 @@ pub mod _flyteidl_rust {
 
             let credentials_for_endpoint: &str = endpoint; // TODO: The default key in flytekit is `flyte-default``
             let credentials_access_token_key: &str = "access_token";
-            // println!("{:?}", credentials_for_endpoint);
+            println!("{:?}", credentials_for_endpoint);
             let entry: Entry =
                 match Entry::new(credentials_for_endpoint, credentials_access_token_key) {
                     Ok(entry) => entry,
                     Err(err) => {
-                        // println!("{}", credentials_access_token_key);
+                        println!("{}", credentials_access_token_key);
                         panic!("Failed at initializing keyring, not available.");
                     }
                 };
@@ -894,7 +894,7 @@ pub mod _flyteidl_rust {
 
             let access_token: String = match entry.get_password() {
                 Ok(access_token) => {
-                    // println!("keyring retrieved successfully.");
+                    println!("keyring retrieved successfully.");
                     access_token
                 }
                 Err(error) => {
