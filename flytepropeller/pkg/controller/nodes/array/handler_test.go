@@ -14,6 +14,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	plugincoremocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	pluginiomocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	eventsErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
 	eventmocks "github.com/flyteorg/flyte/flytepropeller/events/mocks"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
@@ -78,7 +79,7 @@ func createArrayNodeHandler(ctx context.Context, t *testing.T, nodeHandler inter
 	// mock components
 	adminClient := launchplan.NewFailFastLaunchPlanExecutor()
 	enqueueWorkflowFunc := func(workflowID v1alpha1.WorkflowID) {}
-	eventConfig := &config.EventConfig{}
+	eventConfig := &config.EventConfig{ErrorOnAlreadyExists: true}
 	mockEventSink := eventmocks.NewMockEventSink()
 	mockHandlerFactory := &mocks.HandlerFactory{}
 	mockHandlerFactory.OnGetHandlerMatch(mock.Anything).Return(nodeHandler, nil)
@@ -544,6 +545,24 @@ func uint32Ptr(v uint32) *uint32 {
 	return &v
 }
 
+type fakeEventRecorder struct {
+	taskErr                  error
+	phaseVersionFailures     uint32
+	recordTaskEventCallCount int
+}
+
+func (f *fakeEventRecorder) RecordNodeEvent(ctx context.Context, event *event.NodeExecutionEvent, eventConfig *config.EventConfig) error {
+	return nil
+}
+
+func (f *fakeEventRecorder) RecordTaskEvent(ctx context.Context, event *event.TaskExecutionEvent, eventConfig *config.EventConfig) error {
+	f.recordTaskEventCallCount++
+	if f.phaseVersionFailures == 0 || event.PhaseVersion < f.phaseVersionFailures {
+		return f.taskErr
+	}
+	return nil
+}
+
 func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 	ctx := context.Background()
 
@@ -582,6 +601,12 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 		currentWfParallelism           uint32
 		maxWfParallelism               uint32
 		incrementParallelismCount      uint32
+		useFakeEventRecorder           bool
+		eventRecorderFailures          uint32
+		eventRecorderError             error
+		expectedTaskPhaseVersion       uint32
+		expectHandleError              bool
+		expectedEventingCalls          int
 	}{
 		{
 			name:        "StartAllSubNodes",
@@ -599,6 +624,7 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(&handler.ExecutionInfo{})),
 			},
 			expectedArrayNodePhase:         v1alpha1.ArrayNodePhaseExecuting,
+			expectedTaskPhaseVersion:       1,
 			expectedTransitionPhase:        handler.EPhaseRunning,
 			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_RUNNING, idlcore.TaskExecution_RUNNING},
 			incrementParallelismCount:      1,
@@ -618,6 +644,7 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(&handler.ExecutionInfo{})),
 			},
 			expectedArrayNodePhase:         v1alpha1.ArrayNodePhaseExecuting,
+			expectedTaskPhaseVersion:       1,
 			expectedTransitionPhase:        handler.EPhaseRunning,
 			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_RUNNING},
 			incrementParallelismCount:      1,
@@ -638,6 +665,7 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(&handler.ExecutionInfo{})),
 			},
 			expectedArrayNodePhase:         v1alpha1.ArrayNodePhaseExecuting,
+			expectedTaskPhaseVersion:       1,
 			expectedTransitionPhase:        handler.EPhaseRunning,
 			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_RUNNING, idlcore.TaskExecution_RUNNING},
 			currentWfParallelism:           0,
@@ -658,6 +686,7 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(&handler.ExecutionInfo{})),
 			},
 			expectedArrayNodePhase:         v1alpha1.ArrayNodePhaseExecuting,
+			expectedTaskPhaseVersion:       1,
 			expectedTransitionPhase:        handler.EPhaseRunning,
 			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_RUNNING},
 			currentWfParallelism:           workflowMaxParallelism - 1,
@@ -676,6 +705,7 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 			},
 			subNodeTransitions:             []handler.Transition{},
 			expectedArrayNodePhase:         v1alpha1.ArrayNodePhaseExecuting,
+			expectedTaskPhaseVersion:       0,
 			expectedTransitionPhase:        handler.EPhaseRunning,
 			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{},
 			currentWfParallelism:           workflowMaxParallelism,
@@ -697,6 +727,7 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(&handler.ExecutionInfo{})),
 			},
 			expectedArrayNodePhase:         v1alpha1.ArrayNodePhaseExecuting,
+			expectedTaskPhaseVersion:       1,
 			expectedTransitionPhase:        handler.EPhaseRunning,
 			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_RUNNING, idlcore.TaskExecution_RUNNING},
 			incrementParallelismCount:      1,
@@ -717,6 +748,7 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoSuccess(&handler.ExecutionInfo{})),
 			},
 			expectedArrayNodePhase:         v1alpha1.ArrayNodePhaseSucceeding,
+			expectedTaskPhaseVersion:       0,
 			expectedTransitionPhase:        handler.EPhaseRunning,
 			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_SUCCEEDED, idlcore.TaskExecution_SUCCEEDED},
 		},
@@ -737,6 +769,7 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(0, "", "", &handler.ExecutionInfo{})),
 			},
 			expectedArrayNodePhase:         v1alpha1.ArrayNodePhaseSucceeding,
+			expectedTaskPhaseVersion:       0,
 			expectedTransitionPhase:        handler.EPhaseRunning,
 			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_SUCCEEDED, idlcore.TaskExecution_FAILED},
 		},
@@ -756,8 +789,77 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoSuccess(&handler.ExecutionInfo{})),
 			},
 			expectedArrayNodePhase:         v1alpha1.ArrayNodePhaseFailing,
+			expectedTaskPhaseVersion:       0,
 			expectedTransitionPhase:        handler.EPhaseRunning,
 			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_FAILED, idlcore.TaskExecution_SUCCEEDED},
+		},
+		{
+			name:        "EventingAlreadyExists_EventuallySucceeds",
+			parallelism: uint32Ptr(0),
+			subNodePhases: []v1alpha1.NodePhase{
+				v1alpha1.NodePhaseQueued,
+				v1alpha1.NodePhaseQueued,
+			},
+			subNodeTaskPhases: []core.Phase{
+				core.PhaseRunning,
+				core.PhaseRunning,
+			},
+			subNodeTransitions: []handler.Transition{
+				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(&handler.ExecutionInfo{})),
+				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(&handler.ExecutionInfo{})),
+			},
+			expectedArrayNodePhase:         v1alpha1.ArrayNodePhaseExecuting,
+			expectedTaskPhaseVersion:       2,
+			expectedTransitionPhase:        handler.EPhaseRunning,
+			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_RUNNING, idlcore.TaskExecution_RUNNING},
+			useFakeEventRecorder:           true,
+			eventRecorderFailures:          2,
+			eventRecorderError:             &eventsErr.EventError{Code: eventsErr.AlreadyExists, Cause: fmt.Errorf("err")},
+			incrementParallelismCount:      1,
+			expectedEventingCalls:          2,
+		},
+		{
+			name:        "EventingAlreadyExists_EventuallyFails",
+			parallelism: uint32Ptr(0),
+			subNodePhases: []v1alpha1.NodePhase{
+				v1alpha1.NodePhaseQueued,
+				v1alpha1.NodePhaseQueued,
+			},
+			subNodeTaskPhases: []core.Phase{
+				core.PhaseRunning,
+				core.PhaseRunning,
+			},
+			subNodeTransitions: []handler.Transition{
+				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(&handler.ExecutionInfo{})),
+				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(&handler.ExecutionInfo{})),
+			},
+			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_RUNNING, idlcore.TaskExecution_RUNNING},
+			useFakeEventRecorder:           true,
+			eventRecorderFailures:          5,
+			eventRecorderError:             &eventsErr.EventError{Code: eventsErr.AlreadyExists, Cause: fmt.Errorf("err")},
+			expectHandleError:              true,
+			expectedEventingCalls:          4,
+		},
+		{
+			name:        "EventingFails",
+			parallelism: uint32Ptr(0),
+			subNodePhases: []v1alpha1.NodePhase{
+				v1alpha1.NodePhaseQueued,
+				v1alpha1.NodePhaseQueued,
+			},
+			subNodeTaskPhases: []core.Phase{
+				core.PhaseRunning,
+				core.PhaseRunning,
+			},
+			subNodeTransitions: []handler.Transition{
+				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(&handler.ExecutionInfo{})),
+				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(&handler.ExecutionInfo{})),
+			},
+			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_RUNNING, idlcore.TaskExecution_RUNNING},
+			useFakeEventRecorder:           true,
+			eventRecorderError:             fmt.Errorf("err"),
+			expectHandleError:              true,
+			expectedEventingCalls:          1,
 		},
 	}
 
@@ -770,6 +872,15 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 				}, scope)
 				assert.NoError(t, err)
 
+				var eventRecorder interfaces.EventRecorder
+				if test.useFakeEventRecorder {
+					eventRecorder = &fakeEventRecorder{
+						phaseVersionFailures: test.eventRecorderFailures,
+						taskErr:              test.eventRecorderError,
+					}
+				} else {
+					eventRecorder = newBufferedEventRecorder()
+				}
 				// initialize ArrayNodeState
 				arrayNodeState := &handler.ArrayNodeState{
 					Phase: v1alpha1.ArrayNodePhaseExecuting,
@@ -797,9 +908,6 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 					arrayNodeState.SubNodePhases.SetItem(i, bitarray.Item(nodePhase))
 				}
 
-				// create NodeExecutionContext
-				eventRecorder := newBufferedEventRecorder()
-
 				nodeSpec := arrayNodeSpec
 				nodeSpec.ArrayNode.Parallelism = test.parallelism
 				nodeSpec.ArrayNode.MinSuccessRatio = test.minSuccessRatio
@@ -813,6 +921,7 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 						subNodeStatus[getSubNodeID(i)] = nodeStatus
 					}
 				}
+
 				nCtx := createNodeExecutionContext(dataStore, eventRecorder, nil, literalMap, nodeSpec, arrayNodeState, test.currentWfParallelism, workflowMaxParallelism, subNodeStatus)
 
 				// initialize ArrayNodeHandler
@@ -842,22 +951,37 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 
 				// evaluate node
 				transition, err := arrayNodeHandler.Handle(ctx, nCtx)
-				assert.NoError(t, err)
+
+				fakeEventRecorder, ok := eventRecorder.(*fakeEventRecorder)
+				if ok {
+					assert.Equal(t, test.expectedEventingCalls, fakeEventRecorder.recordTaskEventCallCount)
+				}
+
+				if test.expectHandleError {
+					assert.Error(t, err)
+					return
+				} else {
+					assert.NoError(t, err)
+				}
 
 				// validate results
 				assert.Equal(t, test.expectedArrayNodePhase, arrayNodeState.Phase)
 				assert.Equal(t, test.expectedTransitionPhase, transition.Info().GetPhase())
+				assert.Equal(t, test.expectedTaskPhaseVersion, arrayNodeState.TaskPhaseVersion)
 
-				if len(test.expectedExternalResourcePhases) > 0 {
-					assert.Equal(t, 1, len(eventRecorder.taskExecutionEvents))
+				bufferedEventRecorder, ok := eventRecorder.(*bufferedEventRecorder)
+				if ok {
+					if len(test.expectedExternalResourcePhases) > 0 {
+						assert.Equal(t, 1, len(bufferedEventRecorder.taskExecutionEvents))
 
-					externalResources := eventRecorder.taskExecutionEvents[0].Metadata.GetExternalResources()
-					assert.Equal(t, len(test.expectedExternalResourcePhases), len(externalResources))
-					for i, expectedPhase := range test.expectedExternalResourcePhases {
-						assert.Equal(t, expectedPhase, externalResources[i].Phase)
+						externalResources := bufferedEventRecorder.taskExecutionEvents[0].Metadata.GetExternalResources()
+						assert.Equal(t, len(test.expectedExternalResourcePhases), len(externalResources))
+						for i, expectedPhase := range test.expectedExternalResourcePhases {
+							assert.Equal(t, expectedPhase, externalResources[i].Phase)
+						}
+					} else {
+						assert.Equal(t, 0, len(bufferedEventRecorder.taskExecutionEvents))
 					}
-				} else {
-					assert.Equal(t, 0, len(eventRecorder.taskExecutionEvents))
 				}
 
 				nCtx.ExecutionContext().(*execmocks.ExecutionContext).AssertNumberOfCalls(t, "IncrementParallelism", int(test.incrementParallelismCount))

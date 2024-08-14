@@ -184,13 +184,16 @@ func TestAdminFilterContains(t *testing.T) {
 	filter.OnContainsMatch(mock.Anything, mock.Anything).Return(true)
 
 	wfErr := adminEventSink.Sink(ctx, wfEvent)
-	assert.NoError(t, wfErr)
+	assert.Error(t, wfErr)
+	assert.True(t, errors.IsAlreadyExists(wfErr))
 
 	nodeErr := adminEventSink.Sink(ctx, nodeEvent)
-	assert.NoError(t, nodeErr)
+	assert.Error(t, nodeErr)
+	assert.True(t, errors.IsAlreadyExists(nodeErr))
 
 	taskErr := adminEventSink.Sink(ctx, taskEvent)
-	assert.NoError(t, taskErr)
+	assert.Error(t, taskErr)
+	assert.True(t, errors.IsAlreadyExists(taskErr))
 }
 
 func TestIDFromMessage(t *testing.T) {
