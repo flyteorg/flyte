@@ -787,6 +787,10 @@
           "type": "integer",
           "format": "int64",
           "description": "Number of retries. Retries will be consumed when the job fails with a recoverable error.\nThe number of retries must be less than or equals to 10."
+        },
+        "retry_delay": {
+          "type": "string",
+          "description": "Delay between retries."
         }
       },
       "description": "Retry strategy associated with an executable unit."

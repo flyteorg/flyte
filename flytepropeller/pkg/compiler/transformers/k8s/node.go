@@ -89,11 +89,16 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 		}
 		name = n.GetMetadata().Name
 	}
+	retryStrategy, err := computeRetryStrategy(n, task)
+	if err != nil {
+		errs.Collect(errors.NewSyntaxError(n.GetId(), "node:metadata:retryStrategy", nil))
+		return nil, !errs.HasErrors()
+	}
 
 	nodeSpec := &v1alpha1.NodeSpec{
 		ID:                n.GetId(),
 		Name:              name,
-		RetryStrategy:     computeRetryStrategy(n, task),
+		RetryStrategy:     retryStrategy,
 		ExecutionDeadline: timeout,
 		Resources:         res,
 		ExtendedResources: extendedResources,
