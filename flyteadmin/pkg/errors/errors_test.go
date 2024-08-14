@@ -251,6 +251,11 @@ func TestNewWorkflowExistsIdenticalStructureError(t *testing.T) {
 }
 
 func TestNewLaunchPlanExistsDifferentStructureError(t *testing.T) {
+	identifier := core.Identifier{
+		ResourceType: core.ResourceType_LAUNCH_PLAN,
+		Name:         "lp_name",
+	}
+
 	req := &admin.LaunchPlanCreateRequest{
 		Id: &identifier,
 	}
@@ -284,7 +289,7 @@ func TestNewLaunchPlanExistsDifferentStructureError(t *testing.T) {
 	s, ok := status.FromError(statusErr)
 	assert.True(t, ok)
 	assert.Equal(t, codes.InvalidArgument, s.Code())
-	assert.Equal(t, "t1 launch plan with different structure already exists. (Please register a new version of the launch plan):\n/workflow_id/version:\n\t- ver1 \n\t+ ver2", s.Message())
+	assert.Equal(t, "lp_name launch plan with different structure already exists. (Please register a new version of the launch plan):\n/workflow_id/version:\n\t- ver1 \n\t+ ver2", s.Message())
 }
 
 func TestNewLaunchPlanExistsIdenticalStructureError(t *testing.T) {
