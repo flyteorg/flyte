@@ -8105,6 +8105,8 @@
                  * @property {flyteidl.core.ILiteralMap|null} [map] Literal map
                  * @property {string|null} [hash] Literal hash
                  * @property {Object.<string,string>|null} [metadata] Literal metadata
+                 * @property {string|null} [uri] Literal uri
+                 * @property {Long|null} [sizeBytes] Literal sizeBytes
                  */
     
                 /**
@@ -8163,6 +8165,22 @@
                  */
                 Literal.prototype.metadata = $util.emptyObject;
     
+                /**
+                 * Literal uri.
+                 * @member {string} uri
+                 * @memberof flyteidl.core.Literal
+                 * @instance
+                 */
+                Literal.prototype.uri = "";
+    
+                /**
+                 * Literal sizeBytes.
+                 * @member {Long} sizeBytes
+                 * @memberof flyteidl.core.Literal
+                 * @instance
+                 */
+                Literal.prototype.sizeBytes = $util.Long ? $util.Long.fromBits(0,0,true) : 0;
+    
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
     
@@ -8212,6 +8230,10 @@
                     if (message.metadata != null && message.hasOwnProperty("metadata"))
                         for (var keys = Object.keys(message.metadata), i = 0; i < keys.length; ++i)
                             writer.uint32(/* id 5, wireType 2 =*/42).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]).uint32(/* id 2, wireType 2 =*/18).string(message.metadata[keys[i]]).ldelim();
+                    if (message.uri != null && message.hasOwnProperty("uri"))
+                        writer.uint32(/* id 6, wireType 2 =*/50).string(message.uri);
+                    if (message.sizeBytes != null && message.hasOwnProperty("sizeBytes"))
+                        writer.uint32(/* id 7, wireType 0 =*/56).uint64(message.sizeBytes);
                     return writer;
                 };
     
@@ -8252,6 +8274,12 @@
                             key = reader.string();
                             reader.pos++;
                             message.metadata[key] = reader.string();
+                            break;
+                        case 6:
+                            message.uri = reader.string();
+                            break;
+                        case 7:
+                            message.sizeBytes = reader.uint64();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -8312,6 +8340,12 @@
                             if (!$util.isString(message.metadata[key[i]]))
                                 return "metadata: string{k:string} expected";
                     }
+                    if (message.uri != null && message.hasOwnProperty("uri"))
+                        if (!$util.isString(message.uri))
+                            return "uri: string expected";
+                    if (message.sizeBytes != null && message.hasOwnProperty("sizeBytes"))
+                        if (!$util.isInteger(message.sizeBytes) && !(message.sizeBytes && $util.isInteger(message.sizeBytes.low) && $util.isInteger(message.sizeBytes.high)))
+                            return "sizeBytes: integer|Long expected";
                     return null;
                 };
     

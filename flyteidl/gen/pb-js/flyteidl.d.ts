@@ -3390,6 +3390,12 @@ export namespace flyteidl {
 
             /** Literal metadata */
             metadata?: ({ [k: string]: string }|null);
+
+            /** Literal uri */
+            uri?: (string|null);
+
+            /** Literal sizeBytes */
+            sizeBytes?: (Long|null);
         }
 
         /** Represents a Literal. */
@@ -3415,6 +3421,12 @@ export namespace flyteidl {
 
             /** Literal metadata. */
             public metadata: { [k: string]: string };
+
+            /** Literal uri. */
+            public uri: string;
+
+            /** Literal sizeBytes. */
+            public sizeBytes: Long;
 
             /** Literal value. */
             public value?: ("scalar"|"collection"|"map");
