@@ -57,7 +57,7 @@ func (s *adminEventSink) Sink(ctx context.Context, message proto.Message) error 
 
 	if s.filter.Contains(ctx, id) {
 		logger.Debugf(ctx, "event '%s' has already been sent", string(id))
-		return nil
+		return &errors.EventError{Code: errors.AlreadyExists}
 	}
 
 	// Validate submission with rate limiter and send admin event
