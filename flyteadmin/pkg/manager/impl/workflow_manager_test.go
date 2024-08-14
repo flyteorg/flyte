@@ -187,7 +187,7 @@ func TestCreateWorkflow_ExistingWorkflow(t *testing.T) {
 		getMockWorkflowConfigProvider(), getMockWorkflowCompiler(), mockStorageClient, storagePrefix, mockScope.NewTestScope())
 	request := testutils.GetWorkflowRequest()
 	response, err := workflowManager.CreateWorkflow(context.Background(), request)
-	assert.EqualError(t, err, "name workflow with different structure already exists:\n\t\t- /primary/template/id: <nil> -> map[domain:domain name:name project:project resource_type:2 version:version]\n\t\t- /primary/template/interface/inputs: <nil> -> map[variables:map[foo:map[type:map[Type:map[Simple:3]]]]]\n\t\t- /primary/template/interface/outputs: <nil> -> map[variables:map[bar:map[type:map[Type:map[Simple:3]]]]]\n\t\t- /primary/template/nodes: <nil> -> [map[Target:<nil> id:node 1] map[Target:<nil> id:node 2]]")
+	assert.EqualError(t, err, "name workflow with different structure already exists. (Please register a new version of the workflow):\n/primary/template/id:\n\t- <nil> \n\t+ map[domain:domain name:name project:project resource_type:2 version:version]\n/primary/template/interface/inputs:\n\t- <nil> \n\t+ map[variables:map[foo:map[type:map[Type:map[Simple:3]]]]]\n/primary/template/interface/outputs:\n\t- <nil> \n\t+ map[variables:map[bar:map[type:map[Type:map[Simple:3]]]]]\n/primary/template/nodes:\n\t- <nil> \n\t+ [map[Target:<nil> id:node 1] map[Target:<nil> id:node 2]]")
 	assert.Nil(t, response)
 }
 
@@ -205,7 +205,7 @@ func TestCreateWorkflow_ExistingWorkflow_Different(t *testing.T) {
 
 	request := testutils.GetWorkflowRequest()
 	response, err := workflowManager.CreateWorkflow(context.Background(), request)
-	assert.EqualError(t, err, "name workflow with different structure already exists:\n\t\t- /primary/template/id: <nil> -> map[domain:domain name:name project:project resource_type:2 version:version]\n\t\t- /primary/template/interface/inputs: <nil> -> map[variables:map[foo:map[type:map[Type:map[Simple:3]]]]]\n\t\t- /primary/template/interface/outputs: <nil> -> map[variables:map[bar:map[type:map[Type:map[Simple:3]]]]]\n\t\t- /primary/template/nodes: <nil> -> [map[Target:<nil> id:node 1] map[Target:<nil> id:node 2]]")
+	assert.EqualError(t, err, "name workflow with different structure already exists. (Please register a new version of the workflow):\n/primary/template/id:\n\t- <nil> \n\t+ map[domain:domain name:name project:project resource_type:2 version:version]\n/primary/template/interface/inputs:\n\t- <nil> \n\t+ map[variables:map[foo:map[type:map[Type:map[Simple:3]]]]]\n/primary/template/interface/outputs:\n\t- <nil> \n\t+ map[variables:map[bar:map[type:map[Type:map[Simple:3]]]]]\n/primary/template/nodes:\n\t- <nil> \n\t+ [map[Target:<nil> id:node 1] map[Target:<nil> id:node 2]]")
 	flyteErr := err.(flyteErrors.FlyteAdminError)
 	assert.Equal(t, codes.InvalidArgument, flyteErr.Code())
 	assert.Nil(t, response)
