@@ -488,6 +488,12 @@ pub struct Literal {
     /// Additional metadata for literals.
     #[prost(map="string, string", tag="5")]
     pub metadata: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
+    /// If this literal is offloaded, this field will contain metadata including the offload location.
+    #[prost(string, tag="6")]
+    pub uri: ::prost::alloc::string::String,
+    /// Includes information about the size of the literal.
+    #[prost(uint64, tag="7")]
+    pub size_bytes: u64,
     #[prost(oneof="literal::Value", tags="1, 2, 3")]
     pub value: ::core::option::Option<literal::Value>,
 }
