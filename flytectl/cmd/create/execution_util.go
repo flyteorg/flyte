@@ -4,14 +4,12 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
-	"strings"
 
 	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
 	cmdGet "github.com/flyteorg/flyte/flytectl/cmd/get"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/google/uuid"
 	"sigs.k8s.io/yaml"
 )
 
