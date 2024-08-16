@@ -36,7 +36,7 @@ author = "Flyte"
 # The short X.Y version
 version = ""
 # The full version, including alpha/beta/rc tags
-release = "1.13.0"
+release = "1.13.1-rc0"
 
 # -- General configuration ---------------------------------------------------
 
@@ -294,6 +294,7 @@ intersphinx_mapping = {
 }
 
 myst_enable_extensions = ["colon_fence"]
+myst_heading_anchors = 6
 
 # Sphinx-mermaid config
 mermaid_output_format = "raw"

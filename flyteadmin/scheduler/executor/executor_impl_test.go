@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/models"
@@ -97,4 +98,15 @@ func TestExecutorInactiveSchedule(t *testing.T) {
 	mockAdminClient.OnCreateExecutionMatch(context.Background(), mock.Anything).Return(&admin.ExecutionCreateResponse{}, nil)
 	err := executor.Execute(context.Background(), time.Now(), schedule)
 	assert.Nil(t, err)
+}
+
+func TestIsInactiveProjectError(t *testing.T) {
+	statusErr := status.New(codes.InvalidArgument, "foo")
+	var transformationErr error
+	statusErr, transformationErr = statusErr.WithDetails(&admin.InactiveProject{
+		Id: "project",
+	})
+	assert.NoError(t, transformationErr)
+
+	assert.True(t, isInactiveProjectError(statusErr.Err()))
 }

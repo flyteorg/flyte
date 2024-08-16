@@ -16,9 +16,9 @@ jobs:
       - name: Fetch the code
         uses: actions/checkout@v4
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
-          go-version: "1.21"
+          go-version: "1.22"
       - name: Compile
         run: make compile
       - name: Run tests
@@ -30,12 +30,14 @@ jobs:
       - name: Fetch flyte code
         uses: actions/checkout@v4
         with:
-          path: "${{ github.workspace }}/flyte"
+          path: flyte
+      - name: 'Clear action cache'
+        uses: ./flyte/.github/actions/clear-action-cache
       - name: Fetch flytekit code
         uses: actions/checkout@v4
         with:
           repository: flyteorg/flytekit
-          path: "${{ github.workspace }}/flytekit"
+          path: flytekit
       - uses: conda-incubator/setup-miniconda@v3
         with:
           auto-update-conda: true
@@ -75,8 +77,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-go@v4
+      - uses: actions/setup-go@v5
         with:
-          go-version: "1.21"
+          go-version: "1.22"
       - name: Helm and diff
         run: DELTA_CHECK=true make helm

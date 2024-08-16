@@ -71,8 +71,7 @@ func ValidateProjectAndDomain(
 			projectID, domainID, err)
 	}
 	if *project.State != int32(admin.Project_ACTIVE) {
-		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
-			"project [%s] is not active", projectID)
+		return errors.NewInactiveProjectError(ctx, projectID)
 	}
 	var validDomain bool
 	domains := config.GetDomainsConfig()

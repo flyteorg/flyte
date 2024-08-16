@@ -3,6 +3,7 @@ package cache
 import (
 	"context"
 	"fmt"
+	"runtime/debug"
 	"sync"
 	"time"
 
@@ -290,9 +291,9 @@ func (w *autoRefresh) sync(ctx context.Context) (err error) {
 		}
 
 		if err, isErr = rVal.(error); isErr {
-			err = fmt.Errorf("worker panic'd and is shutting down. Error: %w", err)
+			err = fmt.Errorf("worker panic'd and is shutting down. Error: %w with Stack: %v", err, string(debug.Stack()))
 		} else {
-			err = fmt.Errorf("worker panic'd and is shutting down. Panic value: %v", rVal)
+			err = fmt.Errorf("worker panic'd and is shutting down. Panic value: %v with Stack: %v", rVal, string(debug.Stack()))
 		}
 
 		logger.Error(ctx, err)

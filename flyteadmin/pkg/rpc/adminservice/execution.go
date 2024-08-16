@@ -13,7 +13,6 @@ import (
 
 func (m *AdminService) CreateExecution(
 	ctx context.Context, request *admin.ExecutionCreateRequest) (*admin.ExecutionCreateResponse, error) {
-	defer m.interceptPanic(ctx, request)
 	requestedAt := time.Now()
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
@@ -32,7 +31,6 @@ func (m *AdminService) CreateExecution(
 
 func (m *AdminService) RelaunchExecution(
 	ctx context.Context, request *admin.ExecutionRelaunchRequest) (*admin.ExecutionCreateResponse, error) {
-	defer m.interceptPanic(ctx, request)
 	requestedAt := time.Now()
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
@@ -51,7 +49,6 @@ func (m *AdminService) RelaunchExecution(
 
 func (m *AdminService) RecoverExecution(
 	ctx context.Context, request *admin.ExecutionRecoverRequest) (*admin.ExecutionCreateResponse, error) {
-	defer m.interceptPanic(ctx, request)
 	requestedAt := time.Now()
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
@@ -70,7 +67,6 @@ func (m *AdminService) RecoverExecution(
 
 func (m *AdminService) CreateWorkflowEvent(
 	ctx context.Context, request *admin.WorkflowExecutionEventRequest) (*admin.WorkflowExecutionEventResponse, error) {
-	defer m.interceptPanic(ctx, request)
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
@@ -89,7 +85,6 @@ func (m *AdminService) CreateWorkflowEvent(
 
 func (m *AdminService) GetExecution(
 	ctx context.Context, request *admin.WorkflowExecutionGetRequest) (*admin.Execution, error) {
-	defer m.interceptPanic(ctx, request)
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
@@ -107,7 +102,6 @@ func (m *AdminService) GetExecution(
 
 func (m *AdminService) UpdateExecution(
 	ctx context.Context, request *admin.ExecutionUpdateRequest) (*admin.ExecutionUpdateResponse, error) {
-	defer m.interceptPanic(ctx, request)
 	requestedAt := time.Now()
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
@@ -126,7 +120,6 @@ func (m *AdminService) UpdateExecution(
 
 func (m *AdminService) GetExecutionData(
 	ctx context.Context, request *admin.WorkflowExecutionGetDataRequest) (*admin.WorkflowExecutionGetDataResponse, error) {
-	defer m.interceptPanic(ctx, request)
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
@@ -144,7 +137,6 @@ func (m *AdminService) GetExecutionData(
 
 func (m *AdminService) GetExecutionMetrics(
 	ctx context.Context, request *admin.WorkflowExecutionGetMetricsRequest) (*admin.WorkflowExecutionGetMetricsResponse, error) {
-	defer m.interceptPanic(ctx, request)
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
@@ -162,7 +154,6 @@ func (m *AdminService) GetExecutionMetrics(
 
 func (m *AdminService) ListExecutions(
 	ctx context.Context, request *admin.ResourceListRequest) (*admin.ExecutionList, error) {
-	defer m.interceptPanic(ctx, request)
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
@@ -180,7 +171,6 @@ func (m *AdminService) ListExecutions(
 
 func (m *AdminService) TerminateExecution(
 	ctx context.Context, request *admin.ExecutionTerminateRequest) (*admin.ExecutionTerminateResponse, error) {
-	defer m.interceptPanic(ctx, request)
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}

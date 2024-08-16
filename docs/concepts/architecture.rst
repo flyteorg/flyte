@@ -32,7 +32,7 @@ Flyte components are separated into 3 logical planes. The planes are summarized 
 |                   | It stores information such as current and past running workflows, and provides that information upon request. |
 |                   | It also accepts requests to execute workflows, but offloads the work to the Data Plane.                       |
 +-------------------+---------------------------------------------------------------------------------------------------------------+
-| **Data Plane**    | The sole responsibility of the the Data Plane is to fulfill workflows.                                        |
+| **Data Plane**    | The sole responsibility of the Data Plane is to fulfill workflows.                                            |
 |                   | It accepts workflow requests from the Control Plane and guides the workflow to completion,                    |
 |                   | launching tasks on a cluster of machines as necessary based on the workflow graph.                            |
 |                   | It sends status events back to the control plane so the information can be stored and surfaced to end-users.  |

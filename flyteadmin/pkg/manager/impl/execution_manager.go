@@ -592,6 +592,7 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 		WorkflowClosure:          workflow.Closure.CompiledWorkflow,
 		WorkflowClosureReference: storage.DataReference(workflowModel.RemoteClosureIdentifier),
 		ExecutionParameters:      executionParameters,
+		OffloadedInputsReference: inputsURI,
 	})
 
 	if err != nil {
@@ -1032,6 +1033,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		WorkflowClosure:          workflow.Closure.CompiledWorkflow,
 		WorkflowClosureReference: storage.DataReference(workflowModel.RemoteClosureIdentifier),
 		ExecutionParameters:      executionParameters,
+		OffloadedInputsReference: inputsURI,
 	})
 	if execErr != nil {
 		createExecModelInput.Error = execErr
@@ -1717,7 +1719,7 @@ func (m *ExecutionManager) TerminateExecution(
 	}
 
 	if common.IsExecutionTerminal(core.WorkflowExecution_Phase(core.WorkflowExecution_Phase_value[executionModel.Phase])) {
-		return nil, errors.NewAlreadyInTerminalStateError(ctx, "Cannot abort an already terminate workflow execution", executionModel.Phase)
+		return nil, errors.NewAlreadyInTerminalStateError(ctx, "Cannot abort an already terminated workflow execution", executionModel.Phase)
 	}
 
 	err = transformers.SetExecutionAborting(&executionModel, request.Cause, getUser(ctx))
