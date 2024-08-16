@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"runtime/pprof"
+	"strings"
 	"time"
 
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
@@ -528,7 +529,10 @@ func SharedInformerOptions(cfg *config.Config, defaultNamespace string) []inform
 	}
 
 	if cfg.LimitNamespace != defaultNamespace {
-		opts = append(opts, informers.WithNamespace(cfg.LimitNamespace))
+		limitNamespaces := strings.Split(cfg.LimitNamespace, ",")
+		for _, limitNamespace := range limitNamespaces {
+			opts = append(opts, informers.WithNamespace(limitNamespace))
+		}
 	}
 	return opts
 }
