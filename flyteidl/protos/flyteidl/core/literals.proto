@@ -111,6 +111,12 @@ message Literal {
 
     // Additional metadata for literals.
     map<string, string> metadata = 5;
+
+    // If this literal is offloaded, this field will contain metadata including the offload location.
+    string uri = 6;
+
+    // Includes information about the size of the literal.
+    uint64 size_bytes = 7;
 }
 
 // A collection of literals. This is a workaround since oneofs in proto messages cannot contain a repeated field.

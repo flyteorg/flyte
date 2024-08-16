@@ -22,14 +22,14 @@ how to generate an HTML report from some Python object.
 
 ## Enabling Flyte decks
 
-To enable Flyte decks, simply set `disable_deck=False` in the `@task` decorator:
+To enable Flyte decks, simply set `enable_deck=True` in the `@task` decorator:
 
 ```{code-cell} ipython3
 import pandas as pd
 from flytekit import task, workflow
 
 
-@task(disable_deck=False)
+@task(enable_deck=True)
 def iris_data() -> pd.DataFrame:
     ...
 ```
@@ -51,7 +51,7 @@ from typing import Optional
 from flytekit import task, workflow
 
 
-@task(disable_deck=False)
+@task(enable_deck=True)
 def iris_data(
     sample_frac: Optional[float] = None,
     random_state: Optional[int] = None,
@@ -168,7 +168,7 @@ function. In the following example, we extend the `iris_data` task with:
 import flytekit
 from flytekitplugins.deck.renderer import MarkdownRenderer, BoxRenderer
 
-@task(disable_deck=False)
+@task(enable_deck=True)
 def iris_data(
     sample_frac: Optional[float] = None,
     random_state: Optional[int] = None,
@@ -220,7 +220,7 @@ except ImportError:
     from typing_extensions import Annotated
 
 
-@task(disable_deck=False)
+@task(enable_deck=True)
 def iris_data(
     sample_frac: Optional[float] = None,
     random_state: Optional[int] = None,

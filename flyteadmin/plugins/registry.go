@@ -9,12 +9,13 @@ import (
 type PluginID = string
 
 const (
-	PluginIDWorkflowExecutor       PluginID = "WorkflowExecutor"
-	PluginIDDataProxy              PluginID = "DataProxy"
-	PluginIDUnaryServiceMiddleware PluginID = "UnaryServiceMiddleware"
-	PluginIDPreRedirectHook        PluginID = "PreRedirectHook"
-	PluginIDLogoutHook             PluginID = "LogoutHook"
 	PluginIDAdditionalGRPCService  PluginID = "AdditionalGRPCService"
+	PluginIDCustomerHeaderMatcher  PluginID = "CustomerHeaderMatcher"
+	PluginIDDataProxy              PluginID = "DataProxy"
+	PluginIDLogoutHook             PluginID = "LogoutHook"
+	PluginIDPreRedirectHook        PluginID = "PreRedirectHook"
+	PluginIDUnaryServiceMiddleware PluginID = "UnaryServiceMiddleware"
+	PluginIDWorkflowExecutor       PluginID = "WorkflowExecutor"
 )
 
 type AtomicRegistry struct {

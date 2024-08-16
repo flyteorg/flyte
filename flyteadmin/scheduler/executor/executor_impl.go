@@ -114,6 +114,10 @@ func (w *executor) Execute(ctx context.Context, scheduledTime time.Time, s model
 		},
 		func() error {
 			_, execErr := w.adminServiceClient.CreateExecution(context.Background(), executionRequest)
+			if isInactiveProjectError(execErr) {
+				logger.Debugf(ctx, "project %+v is inactive, ignoring schedule create failure for %+v", s.Project, s)
+				return nil
+			}
 			return execErr
 		},
 	)
@@ -143,4 +147,19 @@ func getExecutorMetrics(scope promutils.Scope) executorMetrics {
 		SuccessfulExecutionCounter: scope.MustNewCounter("successful_execution_counter",
 			"count of successful attempts to fire execution for a schedules"),
 	}
+}
+
+func isInactiveProjectError(err error) bool {
+	statusErr, ok := status.FromError(err)
+	if !ok {
+		return false
+	}
+	if len(statusErr.Details()) > 0 {
+		for _, detail := range statusErr.Details() {
+			if _, ok := detail.(*admin.InactiveProject); ok {
+				return true
+			}
+		}
+	}
+	return false
 }

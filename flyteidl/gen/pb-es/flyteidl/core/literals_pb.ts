@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
-import { Duration, Message, proto3, Struct, Timestamp } from "@bufbuild/protobuf";
+import { Duration, Message, proto3, protoInt64, Struct, Timestamp } from "@bufbuild/protobuf";
 import { BlobType, Error, LiteralType, OutputReference, SchemaType, StructuredDatasetType } from "./types_pb.js";
 
 /**
@@ -584,6 +584,20 @@ export class Literal extends Message<Literal> {
    */
   metadata: { [key: string]: string } = {};
 
+  /**
+   * If this literal is offloaded, this field will contain metadata including the offload location.
+   *
+   * @generated from field: string uri = 6;
+   */
+  uri = "";
+
+  /**
+   * Includes information about the size of the literal.
+   *
+   * @generated from field: uint64 size_bytes = 7;
+   */
+  sizeBytes = protoInt64.zero;
+
   constructor(data?: PartialMessage<Literal>) {
     super();
     proto3.util.initPartial(data, this);
@@ -597,6 +611,8 @@ export class Literal extends Message<Literal> {
     { no: 3, name: "map", kind: "message", T: LiteralMap, oneof: "value" },
     { no: 4, name: "hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 5, name: "metadata", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
+    { no: 6, name: "uri", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 7, name: "size_bytes", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Literal {

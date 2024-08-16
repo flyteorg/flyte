@@ -48,7 +48,7 @@ of the map. In this case, we normalize the `people_vaccinated` by the
 `population` count of each country:
 
 ```{code-cell} ipython3
-@task(disable_deck=False)
+@task(enable_deck=True)
 def plot(df: pd.DataFrame):
     """Render a Choropleth map."""
     df["text"] = df["location"] + "<br>" + "Last updated on: " + df["date"]

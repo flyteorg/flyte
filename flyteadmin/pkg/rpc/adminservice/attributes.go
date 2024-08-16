@@ -12,7 +12,6 @@ import (
 
 func (m *AdminService) UpdateWorkflowAttributes(ctx context.Context, request *admin.WorkflowAttributesUpdateRequest) (
 	*admin.WorkflowAttributesUpdateResponse, error) {
-	defer m.interceptPanic(ctx, request)
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
@@ -30,7 +29,6 @@ func (m *AdminService) UpdateWorkflowAttributes(ctx context.Context, request *ad
 
 func (m *AdminService) GetWorkflowAttributes(ctx context.Context, request *admin.WorkflowAttributesGetRequest) (
 	*admin.WorkflowAttributesGetResponse, error) {
-	defer m.interceptPanic(ctx, request)
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
@@ -48,7 +46,6 @@ func (m *AdminService) GetWorkflowAttributes(ctx context.Context, request *admin
 
 func (m *AdminService) DeleteWorkflowAttributes(ctx context.Context, request *admin.WorkflowAttributesDeleteRequest) (
 	*admin.WorkflowAttributesDeleteResponse, error) {
-	defer m.interceptPanic(ctx, request)
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
@@ -66,7 +63,6 @@ func (m *AdminService) DeleteWorkflowAttributes(ctx context.Context, request *ad
 
 func (m *AdminService) UpdateProjectDomainAttributes(ctx context.Context, request *admin.ProjectDomainAttributesUpdateRequest) (
 	*admin.ProjectDomainAttributesUpdateResponse, error) {
-	defer m.interceptPanic(ctx, request)
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
@@ -84,7 +80,6 @@ func (m *AdminService) UpdateProjectDomainAttributes(ctx context.Context, reques
 
 func (m *AdminService) GetProjectDomainAttributes(ctx context.Context, request *admin.ProjectDomainAttributesGetRequest) (
 	*admin.ProjectDomainAttributesGetResponse, error) {
-	defer m.interceptPanic(ctx, request)
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
@@ -102,7 +97,6 @@ func (m *AdminService) GetProjectDomainAttributes(ctx context.Context, request *
 
 func (m *AdminService) DeleteProjectDomainAttributes(ctx context.Context, request *admin.ProjectDomainAttributesDeleteRequest) (
 	*admin.ProjectDomainAttributesDeleteResponse, error) {
-	defer m.interceptPanic(ctx, request)
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
@@ -121,7 +115,6 @@ func (m *AdminService) DeleteProjectDomainAttributes(ctx context.Context, reques
 func (m *AdminService) UpdateProjectAttributes(ctx context.Context, request *admin.ProjectAttributesUpdateRequest) (
 	*admin.ProjectAttributesUpdateResponse, error) {
 
-	defer m.interceptPanic(ctx, request)
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
@@ -140,7 +133,6 @@ func (m *AdminService) UpdateProjectAttributes(ctx context.Context, request *adm
 func (m *AdminService) GetProjectAttributes(ctx context.Context, request *admin.ProjectAttributesGetRequest) (
 	*admin.ProjectAttributesGetResponse, error) {
 
-	defer m.interceptPanic(ctx, request)
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
@@ -159,7 +151,6 @@ func (m *AdminService) GetProjectAttributes(ctx context.Context, request *admin.
 func (m *AdminService) DeleteProjectAttributes(ctx context.Context, request *admin.ProjectAttributesDeleteRequest) (
 	*admin.ProjectAttributesDeleteResponse, error) {
 
-	defer m.interceptPanic(ctx, request)
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
@@ -177,7 +168,6 @@ func (m *AdminService) DeleteProjectAttributes(ctx context.Context, request *adm
 
 func (m *AdminService) ListMatchableAttributes(ctx context.Context, request *admin.ListMatchableAttributesRequest) (
 	*admin.ListMatchableAttributesResponse, error) {
-	defer m.interceptPanic(ctx, request)
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
