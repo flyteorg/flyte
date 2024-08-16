@@ -3,6 +3,7 @@ package logs
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"time"
 
 	v1 "k8s.io/api/core/v1"
@@ -39,6 +40,15 @@ func GetLogsForContainerInPod(ctx context.Context, logPlugin tasklog.Plugin, tas
 	startTime := pod.CreationTimestamp.Unix()
 	finishTime := time.Now().Unix()
 
+	enableVscode := false
+	if v, ok := pod.Labels["FLYTE_ENABLE_VSCODE"]; ok {
+		var err error
+		enableVscode, err = strconv.ParseBool(v)
+		if err != nil {
+			logger.Errorf(ctx, "failed to parse vscode label [%s] for pod [%s]", v, pod.Name)
+		}
+	}
+
 	logs, err := logPlugin.GetTaskLogs(
 		tasklog.Input{
 			PodName:              pod.Name,
@@ -55,6 +65,7 @@ func GetLogsForContainerInPod(ctx context.Context, logPlugin tasklog.Plugin, tas
 			ExtraTemplateVars:    extraLogTemplateVars,
 			TaskTemplate:         taskTemplate,
 			HostName:             pod.Spec.Hostname,
+			EnableVscode:         enableVscode,
 		},
 	)
 

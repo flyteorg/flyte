@@ -2,6 +2,7 @@ package tasklog
 
 import (
 	"fmt"
+	"k8s.io/utils/strings/slices"
 	"regexp"
 	"strconv"
 	"strings"
@@ -180,11 +181,11 @@ func (input Input) templateVars() []TemplateVar {
 	return vars
 }
 
-func getDynamicLogLinkTypes(taskTemplate *core.TaskTemplate) []string {
-	if taskTemplate == nil {
+func getDynamicLogLinkTypes(input Input) []string {
+	if input.TaskTemplate == nil {
 		return nil
 	}
-	config := taskTemplate.GetConfig()
+	config := input.TaskTemplate.GetConfig()
 	if config == nil {
 		return nil
 	}
@@ -192,7 +193,14 @@ func getDynamicLogLinkTypes(taskTemplate *core.TaskTemplate) []string {
 	if linkType == "" {
 		return nil
 	}
-	return strings.Split(linkType, ",")
+
+	dynamicLogLinkTypes := strings.Split(linkType, ",")
+
+	if input.EnableVscode && !slices.Contains(dynamicLogLinkTypes, "vscode") {
+		dynamicLogLinkTypes = append(dynamicLogLinkTypes, "vscode")
+	}
+
+	return dynamicLogLinkTypes
 }
 
 func (p TemplateLogPlugin) GetTaskLogs(input Input) (Output, error) {
@@ -208,7 +216,7 @@ func (p TemplateLogPlugin) GetTaskLogs(input Input) (Output, error) {
 		})
 	}
 
-	for _, dynamicLogLinkType := range getDynamicLogLinkTypes(input.TaskTemplate) {
+	for _, dynamicLogLinkType := range getDynamicLogLinkTypes(input) {
 		for _, dynamicTemplateURI := range p.DynamicTemplateURIs {
 			if p.Name == dynamicLogLinkType {
 				for _, match := range taskConfigVarRegex.FindAllStringSubmatch(dynamicTemplateURI, -1) {
