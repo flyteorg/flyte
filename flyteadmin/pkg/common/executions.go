@@ -5,10 +5,10 @@ import (
 	"fmt"
 
 	"github.com/wolfeidau/humanhash"
+	"k8s.io/apimachinery/pkg/util/rand"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"k8s.io/apimachinery/pkg/util/rand"
 )
 
 const ExecutionIDLength = 20
