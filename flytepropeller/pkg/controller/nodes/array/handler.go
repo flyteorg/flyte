@@ -117,6 +117,10 @@ func (a *arrayNodeHandler) Abort(ctx context.Context, nCtx interfaces.NodeExecut
 
 	// update state for subNodes
 	if err := eventRecorder.finalize(ctx, nCtx, idlcore.TaskExecution_ABORTED, 0, a.eventConfig); err != nil {
+		// a task event with abort phase is already emitted when handling ArrayNodePhaseFailing
+		if eventsErr.IsAlreadyExists(err) {
+			return nil
+		}
 		logger.Errorf(ctx, "ArrayNode event recording failed: [%s]", err.Error())
 		return err
 	}
