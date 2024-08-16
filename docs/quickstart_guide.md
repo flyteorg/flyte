@@ -6,18 +6,14 @@ In this guide, you will create and run a Flyte workflow in a local Python enviro
 ````{dropdown} Try Flyte in your browser
 :animate: fade-in-slide-down
 
-Union Serverless is a hosted version of Flyte that you can try in your browser. To get started, see the [Union Serverless Quickstart guide](https://docs.union.ai/serverless/quick-start).
+Union Serverless is a version of Flyte hosted by [Union](https://www.union.ai/) that you can try in your browser. To get started, sign up below and check out the [Union Serverless Quickstart guide](https://docs.union.ai/serverless/quick-start).
 
-```{button-link} https://serverless.union.ai/
-:expand:
+```{button-link} https://signup.union.ai/
 :color: warning
 
 Sign up for Union Serverless
 ```
 
-```{div} text-muted
-*Courtesy of [Union](https://www.union.ai/)*
-```
 ````
 
 
