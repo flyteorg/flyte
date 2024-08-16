@@ -273,6 +273,8 @@ func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionCon
 			logLinks = phaseInfo.Info().Logs
 		}
 
+		// TODO: it looks like this is where .CustomInfo should be used
+
 		externalResources = append(externalResources, &core.ExternalResource{
 			ExternalID:   podName,
 			Index:        uint32(originalIdx),

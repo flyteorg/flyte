@@ -178,8 +178,10 @@ func MapArrayStateToPluginPhase(_ context.Context, state *State, logLinks []*idl
 	t := time.Now()
 
 	nowTaskInfo := &core.TaskInfo{
-		OccurredAt:        &t,
-		Logs:              logLinks,
+		OccurredAt: &t,
+		Logs:       logLinks,
+		// TODO: is this missing CustomInfo ? Should it be copied from externalResources? Or passed as a param?
+		// CustomInfo:        &structpb.Struct{Fields: map[string]*structpb.Value{}},
 		ExternalResources: externalResources,
 	}
 

@@ -178,6 +178,7 @@ func ToTaskExecutionEvent(input ToTaskExecutionEventInputs) (*event.TaskExecutio
 
 	if input.Info.Info() != nil {
 		tev.Logs = input.Info.Info().Logs
+		//  TODO: this is one place whre CustomInfo is actually used
 		tev.CustomInfo = input.Info.Info().CustomInfo
 	}
 
