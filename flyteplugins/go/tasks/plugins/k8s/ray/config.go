@@ -24,7 +24,7 @@ var (
 		DashboardHost:            "0.0.0.0",
 		EnableUsageStats:         false,
 		ServiceAccount:           "default",
-		BatchScheduler:           schedulerConfig.NewConfig(),
+		BatchScheduler:           schedulerConfig.Config{},
 		Defaults: DefaultConfig{
 			HeadNode: NodeConfig{
 				StartParameters: map[string]string{
