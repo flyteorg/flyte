@@ -1,8 +1,8 @@
 package config
 
 type Config struct {
-	Scheduler  string `json:"scheduler,omitempty"`
-	Parameters string `json:"parameters,omitempty"`
+	Scheduler  string `json:"scheduler,omitempty" pflag:", Specify batch scheduler to"`
+	Parameters string `json:"parameters,omitempty" pflag:", Specify static parameters"`
 }
 
 func NewConfig() Config {
