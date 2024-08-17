@@ -183,6 +183,7 @@ pub mod _flyteidl_rust {
         types::{PyDict, PyTuple},
         PyErr,
     };
+    use serde_json;
     use tonic::{
         metadata::MetadataValue,
         service::interceptor::InterceptedService,
@@ -195,6 +196,22 @@ pub mod _flyteidl_rust {
 
     // Foreign Rust error types: https://pyo3.rs/main/function/error-handling#foreign-rust-error-types
     // Create a newtype wrapper, e.g. MyOtherError. Then implement From<MyOtherError> for PyErr (or PyErrArguments), as well as From<OtherError> for MyOtherError.
+    pub struct MessageJsonError(serde_json::Error);
+    impl fmt::Display for MessageJsonError {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            write!(f, "")
+        }
+    }
+    impl std::convert::From<MessageJsonError> for PyErr {
+        fn from(err: MessageJsonError) -> PyErr {
+            PyException::new_err(err.to_string())
+        }
+    }
+    impl std::convert::From<serde_json::Error> for MessageJsonError {
+        fn from(other: serde_json::Error) -> Self {
+            Self(other)
+        }
+    }
 
     // An error indicates taht failing at serializing object to bytes string, like `SerializToString()` for python protos.
     pub struct MessageEncodeError(EncodeError);
@@ -384,7 +401,7 @@ pub mod _flyteidl_rust {
     #[pymodule]
     pub mod protobuf {
         #[pymodule_export]
-        use crate::google::protobuf::{Any, Duration, Struct, Timestamp, Value};
+        pub use crate::google::protobuf::{Any, Duration, Struct, Timestamp, Value};
     }
 
     #[pymodule]
@@ -648,11 +665,17 @@ pub mod _flyteidl_rust {
         };
     }
 
+    #[pymodule]
+    pub mod plugin {
+        #[pymodule_export]
+        use crate::flyteidl::plugins::ArrayJob;
+    }
+
     // A simple implementation for parsing google protobuf types `Struct` and `Value` from json string after deriving `serde::Deserialize` for structures.
     // This should equivalent to `google.protobuf._json_format.Parse()`.
     // For instance, `google.protobuf._json_format.Parse(_json.dumps(self.custom), flyteidl.protobuf.Struct()) if self.custom else None`
 
-    fn parse_json_value(
+    pub fn parse_json_string(
         json_value: &serde_json::Value,
     ) -> PyResult<super::google::protobuf::Value> {
         use super::google::protobuf::value::Kind;
@@ -673,7 +696,7 @@ pub mod _flyteidl_rust {
             serde_json::Value::Array(arr) => {
                 let values = arr
                     .iter()
-                    .map(parse_json_value)
+                    .map(parse_json_string)
                     .collect::<Result<Vec<super::google::protobuf::Value>, _>>()?;
                 super::google::protobuf::value::Kind::ListValue(
                     super::google::protobuf::ListValue { values },
@@ -683,7 +706,7 @@ pub mod _flyteidl_rust {
                 let fields = obj
                     .iter()
                     .map(|(k, v)| {
-                        let value = parse_json_value(v)?;
+                        let value = parse_json_string(v)?;
                         Ok((k.clone(), value))
                     })
                     .collect::<Result<HashMap<String, super::google::protobuf::Value>, PyErr>>()?;
@@ -696,7 +719,7 @@ pub mod _flyteidl_rust {
         Ok(super::google::protobuf::Value { kind: Some(kind) })
     }
 
-    fn dump_protobuf_value(value: &super::google::protobuf::Value) -> PyResult<String> {
+    pub fn dump_protobuf_value(value: &super::google::protobuf::Value) -> PyResult<String> {
         let json_value = match value.kind.as_ref() {
             Some(super::google::protobuf::value::Kind::NullValue(_)) => serde_json::Value::Null,
             Some(super::google::protobuf::value::Kind::NumberValue(v)) => {
@@ -733,15 +756,15 @@ pub mod _flyteidl_rust {
             .map_err(|e| PyValueError::new_err(format!("Failed to serialize JSON: {}", e)))
     }
 
-    #[pyfunction]
-    #[pyo3(name = "ParseValue")]
-    pub fn parse_value(json_str: &str) -> PyResult<super::google::protobuf::Value> {
-        let parsed: serde_json::Value = serde_json::from_str(json_str)
-            .map_err(|e| PyValueError::new_err(format!("Invalid JSON: {}", e)))?;
+    // #[pyfunction]
+    // #[pyo3(name = "ParseValue")]
+    // pub fn parse_value(json_str: &str) -> PyResult<super::google::protobuf::Value> {
+    //     let parsed: serde_json::Value = serde_json::from_str(json_str)
+    //         .map_err(|e| PyValueError::new_err(format!("Invalid JSON: {}", e)))?;
 
-        let value = parse_json_value(&parsed)?;
-        Ok(value)
-    }
+    //     let value = parse_json_value(&parsed)?;
+    //     Ok(value)
+    // }
 
     #[pyfunction]
     #[pyo3(name = "DumpStruct")]
@@ -769,7 +792,7 @@ pub mod _flyteidl_rust {
             let fields = obj
                 .iter()
                 .map(|(k, v)| {
-                    let value = parse_json_value(v)?;
+                    let value = parse_json_string(v)?;
                     Ok((k.clone(), value))
                 })
                 .collect::<Result<HashMap<String, super::google::protobuf::Value>, PyErr>>()?;

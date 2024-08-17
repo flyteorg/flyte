@@ -79,17 +79,17 @@ pub fn with_new(input: TokenStream) -> TokenStream {
                 } else {
                     quote! { #required_part, #optional_part , kwargs: Option<&pyo3::types::PyDict> }
                 };
-            let combined_signatures = if required_field_names.is_empty()
-                && optional_field_names.is_empty()
-            {
-                quote! { **kwargs }
-            } else if !required_field_names.is_empty() && optional_field_names.is_empty() {
-                quote! { #(#required_field_names),* , **kwargs }
-            } else if required_field_names.is_empty() && !optional_field_names.is_empty() {
-                quote! { #(#optional_field_names = None),* , **kwargs }
-            } else {
-                quote! { #(#required_field_names),*, #(#optional_field_names = None),* , **kwargs }
-            };
+            // let combined_signatures = if required_field_names.is_empty()
+            //     && optional_field_names.is_empty()
+            // {
+            //     quote! { **kwargs }
+            // } else if !required_field_names.is_empty() && optional_field_names.is_empty() {
+            //     quote! { #(#required_field_names),* , **kwargs }
+            // } else if required_field_names.is_empty() && !optional_field_names.is_empty() {
+            //     quote! { #(#optional_field_names = None),* , **kwargs }
+            // } else {
+            //     quote! { #(#required_field_names),*, #(#optional_field_names = None),* , **kwargs }
+            // };
 
             if generic_params.is_empty() {
                 // Implement methods template of the `new()` constructor function
@@ -112,23 +112,42 @@ pub fn with_new(input: TokenStream) -> TokenStream {
                                 #all_values
                             }
                         }
-                        // For the needs like `load_proto_from_file()`, `write_proto_to_file()` in `flytekit/core/utils.py`
-                        pub fn ParseFromString(&mut self, bytes_string: &pyo3::types::PyBytes) -> Result<#name, crate::_flyteidl_rust::MessageDecodeError>
+                        // For the needs of `load_proto_from_file()` in `flytekit/core/utils.py`
+                        // Deserialize/Decode from protobuf binary encoding format
+                        #[pyo3(name = "ParseFromString")]
+                        pub fn deserialize_from_string(&self, bytes_string: &pyo3::types::PyBytes) -> Result<#name, crate::_flyteidl_rust::MessageDecodeError>
                         {
                             use prost::Message;
                             let bytes = bytes_string.as_bytes();
                             let de = Message::decode(&bytes.to_vec()[..]);
                             Ok(de?)
                         }
-                        pub fn SerializeToString(&self, py: Python) -> Result<PyObject, crate::_flyteidl_rust::MessageEncodeError>
+                        // For the needs of `write_proto_to_file()` in `flytekit/core/utils.py`
+                        // Serialize/Encode to protobuf binary encoding format
+                        #[pyo3(name = "SerializeToString")]
+                        pub fn serialize_to_string(&self, py: Python) -> Result<PyObject, crate::_flyteidl_rust::MessageEncodeError>
                         {
-                            // Bring `prost::Message` trait to scope here. Put it in outer impl block will leads to duplicated imports.
+                            // Bring `prost::Message` trait to the scope here.
+                            // Otherwise put it in outer impl block will lead to duplicated imports.
                             use prost::Message;
                             let mut buf = vec![];
                             buf.reserve(self.encoded_len());
                             // Unwrap is safe, since we have reserved sufficient capacity in the vector.
                             self.encode(&mut buf).unwrap();
                             Ok(pyo3::types::PyBytes::new_bound(py, &buf).into())
+                        }
+
+                        // Convert/Dump a Protobuf message to a JSON string.
+                        #[pyo3(name = "DumpToJsonString")]
+                        fn proto_to_json_string(&self, py: Python) -> Result<PyObject, crate::_flyteidl_rust::MessageJsonError> {
+                            let json_string = serde_json::to_string(self)?;
+                            Ok(pyo3::types::PyString::new_bound(py, json_string.as_str()).into())
+                        }
+                        // Convert/Parse a JSON string to a Protobuf message.
+                        #[pyo3(name = "LoadFromJsonString")]
+                        fn json_string_to_proto(&self, json_string: &str) -> Result<#name, crate::_flyteidl_rust::MessageJsonError> {
+                            let proto:#name = serde_json::from_str(json_string)?;
+                            Ok(proto)
                         }
                     }
                 }
