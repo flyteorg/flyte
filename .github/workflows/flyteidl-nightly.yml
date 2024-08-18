@@ -28,7 +28,7 @@ jobs:
           - runner: ubuntu-latest
             target: x86_64
           - runner: ubuntu-latest
-            target: aarch64
+            target: armv7
           - runner: ubuntu-latest
             target: ppc64le
     steps:
