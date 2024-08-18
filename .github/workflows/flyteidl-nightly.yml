@@ -1,9 +1,10 @@
-name: CI
+name: Release
 
 on:
+  release:
+    types: [published]
   schedule:
-    # Run at midnight UTC every day
-    - cron: "0 0 * * *"
+    - cron: '0 0 * * *'  # This schedules the workflow to run nightly at midnight UTC
   push:
     branches:
       - main
@@ -27,13 +28,7 @@ jobs:
           - runner: ubuntu-latest
             target: x86_64
           - runner: ubuntu-latest
-            target: x86
-          - runner: ubuntu-latest
             target: aarch64
-          - runner: ubuntu-latest
-            target: armv7
-          - runner: ubuntu-latest
-            target: s390x
           - runner: ubuntu-latest
             target: ppc64le
     steps:
@@ -41,13 +36,17 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: 3.x
+      - name: Install deps
+        run: | 
+          sudo apt update && sudo apt upgrade -y
+          sudo apt install -y pkg-config libssl-dev libz-dev
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.platform.target }}
+          command: build
           args: --release --out dist --find-interpreter -m flyteidl/Cargo.toml
           sccache: 'true'
-          manylinux: auto
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
