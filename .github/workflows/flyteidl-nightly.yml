@@ -27,14 +27,14 @@ jobs:
         platform:
           - runner: ubuntu-latest
             target: x86_64
-          - runner: ubuntu-latest
-            target: x86
-          - runner: ubuntu-latest
-            target: aarch64
+          # - runner: ubuntu-latest
+          #   target: x86
+          # - runner: ubuntu-latest
+          #   target: aarch64
           - runner: ubuntu-latest
             target: armv7
-          - runner: ubuntu-latest
-            target: s390x
+          # - runner: ubuntu-latest
+          #   target: s390x
           - runner: ubuntu-latest
             target: ppc64le
     steps:
@@ -48,19 +48,27 @@ jobs:
           target: ${{ matrix.platform.target }}
           command: build
           args: --release --out dist --find-interpreter -m flyteidl/Cargo.toml
-          sccache: 'true'
-          manylinux: '2014'
           before-script-linux: |
             case "${{ matrix.target }}" in
               "aarch64" | "armv7" | "s390x" | "ppc64le")
                 # NOTE: pypa/manylinux docker images are Debian based
-                sudo apt-get update
-                sudo apt-get install -y pkg-config libssl-dev
+                sudo apt update
+                # NOTE: install openssl deps
+                sudo apt install -y pkg-config libssl-dev
+                # NOTE: install protoc deps
+                sudo apt install -y protobuf-compiler libprotobuf-dev
+                # NOTE: generate rust protobuf
+                rm -rf ${{ github.workspace }}/flyte/flyteidl/gen/pb_rust/* && cargo run --bin gen_flyteidl
                 ;;
               "x86" | "x86_64")
                 # NOTE: rust-cross/manylinux docker images are CentOS based
                 yum update -y
+                # NOTE: install openssl deps
                 yum install -y openssl openssl-devel
+                # NOTE: install protoc deps
+                yum install -y protobuf protobuf-devel
+                # NOTE: generate rust protobuf
+                rm -rf ${{ github.workspace }}/flyte/flyteidl/gen/pb_rust/* && cargo run --bin gen_flyteidl
                 ;;
             esac
       - name: Upload wheels
