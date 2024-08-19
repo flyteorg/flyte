@@ -1936,7 +1936,7 @@ pub struct ExecutionSpec {
     pub envs: ::core::option::Option<Envs>,
     /// Tags to be set for the execution.
     #[deprecated]
-    #[prost(string, repeated, tag="24")]
+    #[prost(string, repeated, tag = "24")]
     pub tags: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
     /// Execution cluster label to be set for the execution.
     #[prost(message, optional, tag = "25")]
@@ -2813,10 +2813,11 @@ pub struct EmailMessage {
     pub body: ::prost::alloc::string::String,
 }
 /// Empty request for GetDomain
+#[pyo3::pyclass(get_all, set_all)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct GetDomainRequest {
-}
+pub struct GetDomainRequest {}
 /// Namespace within a project commonly used to differentiate between different service instances.
 /// e.g. "production", "development", etc.
 #[pyo3::pyclass(get_all, set_all)]
@@ -2832,10 +2833,12 @@ pub struct Domain {
     pub name: ::prost::alloc::string::String,
 }
 /// Represents a list of domains.
+#[pyo3::pyclass(get_all, set_all)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GetDomainsResponse {
-    #[prost(message, repeated, tag="1")]
+    #[prost(message, repeated, tag = "1")]
     pub domains: ::prost::alloc::vec::Vec<Domain>,
 }
 /// Top-level namespace used to classify different entities like workflows and executions.
@@ -2996,15 +2999,17 @@ pub struct ProjectGetRequest {
     pub org: ::prost::alloc::string::String,
 }
 /// Error returned for inactive projects
+#[pyo3::pyclass(get_all, set_all)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct InactiveProject {
     /// Indicates a unique project.
     /// +required
-    #[prost(string, tag="1")]
+    #[prost(string, tag = "1")]
     pub id: ::prost::alloc::string::String,
     /// Optional, org key applied to the resource.
-    #[prost(string, tag="2")]
+    #[prost(string, tag = "2")]
     pub org: ::prost::alloc::string::String,
 }
 /// Defines a set of custom matching attributes at the project level.

@@ -37,22 +37,26 @@ pub mod array_job {
         MinSuccessRatio(f32),
     }
 }
+#[pyo3::pyclass(get_all, set_all)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CommonReplicaSpec {
     /// Number of replicas
-    #[prost(int32, tag="1")]
+    #[prost(int32, tag = "1")]
     pub replicas: i32,
     /// Image used for the replica group
-    #[prost(string, tag="2")]
+    #[prost(string, tag = "2")]
     pub image: ::prost::alloc::string::String,
     /// Resources required for the replica group
-    #[prost(message, optional, tag="3")]
+    #[prost(message, optional, tag = "3")]
     pub resources: ::core::option::Option<super::core::Resources>,
     /// RestartPolicy determines whether pods will be restarted when they exit
-    #[prost(enumeration="RestartPolicy", tag="4")]
+    #[prost(enumeration = "RestartPolicy", tag = "4")]
     pub restart_policy: i32,
 }
+#[pyo3::pyclass(get_all, set_all)]
+#[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]
 pub enum RestartPolicy {

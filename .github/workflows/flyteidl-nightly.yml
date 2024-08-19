@@ -48,6 +48,7 @@ jobs:
           target: ${{ matrix.platform.target }}
           command: build
           args: --release --out dist --find-interpreter -m flyteidl/Cargo.toml
+          before-script-linux: sudo apt update && sudo apt install -y protobuf protobuf-devel && (cd ${{ github.workspace }}/flyteidl && rm -rf ./gen/pb_rust/* && cargo run --bin gen_flyteidl && cd ../)
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:

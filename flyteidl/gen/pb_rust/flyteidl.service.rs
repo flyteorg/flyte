@@ -1031,6 +1031,31 @@ pub mod admin_service_client {
                 );
             self.inner.unary(req, path, codec).await
         }
+        pub async fn get_domains(
+            &mut self,
+            request: impl tonic::IntoRequest<super::super::admin::GetDomainRequest>,
+        ) -> std::result::Result<
+            tonic::Response<super::super::admin::GetDomainsResponse>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/flyteidl.service.AdminService/GetDomains",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("flyteidl.service.AdminService", "GetDomains"));
+            self.inner.unary(req, path, codec).await
+        }
         /// Indicates a :ref:`ref_flyteidl.event.WorkflowExecutionEvent` has occurred.
         pub async fn create_workflow_event(
             &mut self,
