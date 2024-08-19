@@ -60,7 +60,7 @@ jobs:
                 # NOTE: install protoc deps
                 sudo apt install -y protobuf-compiler libprotobuf-dev
                 # NOTE: generate rust protobuf
-                (cd ${{ github.workspace }}/flyte/flyteidl && rm -rf ./gen/pb_rust/* && cargo run --bin gen_flyteidl)
+                (cd ${{ github.workspace }}/flyteidl && rm -rf ./gen/pb_rust/* && cargo run --bin gen_flyteidl)
                 ;;
               "x86" | "x86_64")
                 echo "Running on a CentOS-based system"
@@ -71,7 +71,7 @@ jobs:
                 # NOTE: install protoc deps
                 yum install -y protobuf protobuf-devel
                 # NOTE: generate rust protobuf
-                (cd ${{ github.workspace }}/flyte/flyteidl && rm -rf ./gen/pb_rust/* && cargo run --bin gen_flyteidl)
+                (cd ${{ github.workspace }}/flyteidl && rm -rf ./gen/pb_rust/* && cargo run --bin gen_flyteidl)
                 ;;
             esac
       - name: Upload wheels
