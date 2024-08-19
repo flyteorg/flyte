@@ -44,5 +44,6 @@ base64 = "0.22.1"
 oauth2 ={ version = "4.4.2", features = [ "ureq" ] }
 url = "2.5.0"
 keyring = { version = "3.2.0", features = [ "vendored"] }
+openssl-sys = "0.9"
 openssl = { version = "0.10.64", features = [ "vendored" ] } 
 anyhow = "1.0.86"
