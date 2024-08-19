@@ -330,8 +330,8 @@ func TestWorkflowNodeHandler_AbortNode(t *testing.T) {
 
 		eCtx := &execMocks.ExecutionContext{}
 		eCtx.OnGetDefinitionVersion().Return(v1alpha1.WorkflowDefinitionVersion1)
-		nCtx.OnExecutionContext().Return(eCtx)
 		eCtx.OnGetName().Return("test")
+		nCtx.OnExecutionContext().Return(eCtx)
 		err := h.Abort(ctx, nCtx, "test")
 		assert.NoError(t, err)
 	})
@@ -352,8 +352,8 @@ func TestWorkflowNodeHandler_AbortNode(t *testing.T) {
 
 		eCtx := &execMocks.ExecutionContext{}
 		eCtx.OnGetDefinitionVersion().Return(v1alpha1.WorkflowDefinitionVersion1)
-		nCtx.OnExecutionContext().Return(eCtx)
 		eCtx.OnGetName().Return("test")
+		nCtx.OnExecutionContext().Return(eCtx)
 		err := h.Abort(ctx, nCtx, "test")
 		assert.NoError(t, err)
 	})
@@ -373,8 +373,8 @@ func TestWorkflowNodeHandler_AbortNode(t *testing.T) {
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
 		eCtx := &execMocks.ExecutionContext{}
 		eCtx.OnGetDefinitionVersion().Return(v1alpha1.WorkflowDefinitionVersion1)
-		nCtx.OnExecutionContext().Return(eCtx)
 		eCtx.OnGetName().Return("test")
+		nCtx.OnExecutionContext().Return(eCtx)
 
 		err := h.Abort(ctx, nCtx, "test")
 		assert.Error(t, err)

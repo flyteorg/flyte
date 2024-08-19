@@ -16,7 +16,7 @@ flyteadmin:
   image:
     # -- Docker image for Flyteadmin deployment
     repository: cr.flyte.org/flyteorg/flyteadmin  # FLYTEADMIN_IMAGE
-    tag: v1.12.1-rc0  # FLYTEADMIN_TAG
+    tag: v1.13.1-rc0  # FLYTEADMIN_TAG
     pullPolicy: IfNotPresent
   # -- Additional flyteadmin container environment variables
   #
@@ -144,7 +144,7 @@ flytescheduler:
     # -- Docker image for Flytescheduler deployment
     repository: cr.flyte.org/flyteorg/flytescheduler  # FLYTESCHEDULER_IMAGE
     # -- Docker image tag
-    tag: v1.12.1-rc0  # FLYTESCHEDULER_TAG
+    tag: v1.13.1-rc0  # FLYTESCHEDULER_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytescheduler deployment
@@ -210,7 +210,7 @@ datacatalog:
     # -- Docker image for Datacatalog deployment
     repository: cr.flyte.org/flyteorg/datacatalog  # DATACATALOG_IMAGE
     # -- Docker image tag
-    tag: v1.12.1-rc0  # DATACATALOG_TAG
+    tag: v1.13.1-rc0  # DATACATALOG_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Datacatalog deployment
@@ -309,7 +309,7 @@ flytepropeller:
   image:
     # -- Docker image for Flytepropeller deployment
     repository: cr.flyte.org/flyteorg/flytepropeller  # FLYTEPROPELLER_IMAGE
-    tag: v1.12.1-rc0  # FLYTEPROPELLER_TAG
+    tag: v1.13.1-rc0  # FLYTEPROPELLER_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytepropeller deployment
   resources:
@@ -383,6 +383,10 @@ flytepropeller:
     interval: 60s
     # -- Sets the timeout after which request to scrape metrics will time out
     scrapeTimeout: 30s
+
+  prometheus:
+    enabled: false
+
 #
 # FLYTECONSOLE SETTINGS
 #
@@ -394,7 +398,7 @@ flyteconsole:
   image:
     # -- Docker image for Flyteconsole deployment
     repository: cr.flyte.org/flyteorg/flyteconsole  # FLYTECONSOLE_IMAGE
-    tag: v1.14.0  # FLYTECONSOLE_TAG
+    tag: v1.17.1  # FLYTECONSOLE_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flyteconsole deployment
   resources:
@@ -435,6 +439,21 @@ flyteconsole:
     fsGroupChangePolicy: "OnRootMismatch"
     seLinuxOptions:
       type: spc_t
+
+  # -- Settings for flyteconsole service monitor
+  serviceMonitor:
+    # -- If enabled create the flyteconsole service monitor
+    enabled: false
+    # -- Sets the interval at which metrics will be scraped by prometheus
+    interval: 60s
+    # -- Sets the timeout after which request to scrape metrics will time out
+    scrapeTimeout: 30s
+    # -- Sets the labels for the service monitor which are required by the
+    # prometheus to auto-detect the service monitor and start scrapping the metrics
+    labels: {}
+
+  livenessProbe: {}
+  readinessProbe: {}
 
 # It will enable the redoc route in ingress
 deployRedoc: false
@@ -477,6 +496,14 @@ webhook:
     annotations:
       projectcontour.io/upstream-protocol.h2c: grpc
     type: ClusterIP
+  # -- Annotations for webhook pods
+  podAnnotations: {}
+  # -- Additional webhook container environment variables
+  podEnv: {}
+  # -- Labels for webhook pods
+  podLabels: {}
+  # -- nodeSelector for webhook deployment
+  nodeSelector: {}
   # -- Sets securityContext for webhook pod(s).
   securityContext:
     fsGroup: 65534
@@ -491,6 +518,27 @@ webhook:
       cpu: 200m
       ephemeral-storage: 500Mi
       memory: 500Mi
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 10
+    metrics:
+      - type: Resource
+        resource:
+          name: cpu
+          target:
+            type: Utilization
+            averageUtilization: 80
+      - type: Resource
+        resource:
+          name: memory
+          target:
+            type: Utilization
+            averageUtilization: 80
+
+  prometheus:
+    enabled: false
 
 # ------------------------------------------------
 #
@@ -518,6 +566,7 @@ common:
     # --- Ingress annotations applied to both HTTP and GRPC ingresses.
     annotations:
       nginx.ingress.kubernetes.io/app-root: /console
+      nginx.ingress.kubernetes.io/service-upstream: "true"
     # --- albSSLRedirect adds a special route for ssl redirect. Only useful in combination with the AWS LoadBalancer Controller.
     albSSLRedirect: false
     # --- Ingress hostname
@@ -752,7 +801,7 @@ configmap:
         # -- Structure documented [here](https://pkg.go.dev/github.com/lyft/flyteplugins@v0.5.28/go/tasks/pluginmachinery/flytek8s/config#FlyteCoPilotConfig)
         co-pilot:
           name: flyte-copilot-
-          image: cr.flyte.org/flyteorg/flytecopilot:v1.12.1-rc0  # FLYTECOPILOT_IMAGE
+          image: cr.flyte.org/flyteorg/flytecopilot:v1.13.1-rc0  # FLYTECOPILOT_IMAGE
           start-timeout: 30s
 
   # -- Core propeller configuration
@@ -950,6 +999,11 @@ cluster_resource_manager:
                 value: "4"
             - projectQuotaMemory:
                 value: "3000Mi"
+
+  prometheus:
+    enabled: false
+    path: "/metrics"
+    port: 10254
 
   # -- Resource templates that should be applied
   templates:

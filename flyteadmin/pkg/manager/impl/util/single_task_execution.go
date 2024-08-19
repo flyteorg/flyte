@@ -85,6 +85,13 @@ func CreateOrGetWorkflowModel(
 		Version: workflowIdentifier.Version,
 	})
 
+	var retryStrategy *core.RetryStrategy
+	if task.GetClosure().GetCompiledTask().GetTemplate().GetMetadata().GetRetries() != nil {
+		retryStrategy = task.GetClosure().GetCompiledTask().GetTemplate().GetMetadata().GetRetries()
+	} else {
+		retryStrategy = &defaultRetryStrategy
+	}
+
 	if err != nil {
 		if ferr, ok := err.(errors.FlyteAdminError); !ok || ferr.Code() != codes.NotFound {
 			return nil, err
@@ -99,7 +106,7 @@ func CreateOrGetWorkflowModel(
 						Id: generateNodeNameFromTask(taskIdentifier.Name),
 						Metadata: &core.NodeMetadata{
 							Name:    generateNodeNameFromTask(taskIdentifier.Name),
-							Retries: &defaultRetryStrategy,
+							Retries: retryStrategy,
 						},
 						Inputs: generateBindings(*task.Closure.CompiledTask.Template.Interface.Inputs, noInputNodeID),
 						Target: &core.Node_TaskNode{

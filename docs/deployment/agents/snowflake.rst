@@ -1,16 +1,25 @@
 .. _deployment-agent-setup-snowflake:
 
 Snowflake agent
-=================
+===============
 
 This guide provides an overview of how to set up the Snowflake agent in your Flyte deployment.
 
 1. Set up the key pair authentication in Snowflake. For more details, see the `Snowflake key-pair authentication and key-pair rotation guide <https://docs.snowflake.com/en/user-guide/key-pair-auth>`__.
-2. Create a secret with the group "snowflake" and the key "private_key". For more details, see `"Using Secrets in a Task" <https://https://docs.flyte.org/en/latest/flytesnacks/examples/productionizing/use_secrets.html>`__.
+2. Create a secret with the group "private-key" and the key "snowflake".
+   This is hardcoded in the flytekit sdk, since we can't know the group and key name in advance.
+   This is for permission to upload and download data with structured dataset in python task pod.
 
 .. code-block:: bash
 
-   kubectl create secret generic snowflake-private-key --namespace=flytesnacks-development --from-file=your_private_key_above
+   kubectl create secret generic private-key --from-file=snowflake=<YOUR PRIVATE KEY FILE> --namespace=flytesnacks-development
+
+3. Create a secret in the flyteagent's pod, this is for execution snowflake query in the agent pod.
+
+.. code-block:: bash
+
+   ENCODED_VALUE=$(cat <YOUR PRIVATE KEY FILE> | base64) && kubectl patch secret flyteagent -n flyte --patch "{\"data\":{\"snowflake_private_key\":\"$ENCODED_VALUE\"}}"
+
 
 Specify agent configuration
 ----------------------------
@@ -73,7 +82,7 @@ Specify agent configuration
                 supportedTaskTypes:
                 - snowflake
 
-Ensure that the propeller has the correct service account for BigQuery.
+Ensure that the propeller has the correct service account for Snowflake.
 
 Upgrade the Flyte Helm release
 ------------------------------
@@ -97,7 +106,6 @@ Upgrade the Flyte Helm release
       helm upgrade <RELEASE_NAME> flyte/flyte-core -n <YOUR_NAMESPACE> --values values-override.yaml
 
     Replace ``<RELEASE_NAME>`` with the name of your release (e.g., ``flyte``)
-
     and ``<YOUR_NAMESPACE>`` with the name of your namespace (e.g., ``flyte``).
 
 For Snowflake agent on the Flyte cluster, see `Snowflake agent <https://docs.flyte.org/en/latest/flytesnacks/examples/snowflake_agent/index.html>`_.

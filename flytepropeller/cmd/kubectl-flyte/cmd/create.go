@@ -1,14 +1,12 @@
 package cmd
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 
 	"github.com/ghodss/yaml"
-	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -20,6 +18,7 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
 	compilerErrors "github.com/flyteorg/flyte/flytepropeller/pkg/compiler/errors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/transformers/k8s"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 const (
@@ -89,7 +88,7 @@ func unmarshal(in []byte, format format, message proto.Message) (err error) {
 	case formatProto:
 		err = proto.Unmarshal(in, message)
 	case formatJSON:
-		err = jsonpb.Unmarshal(bytes.NewReader(in), message)
+		err = utils.UnmarshalBytesToPb(in, message)
 		if err != nil {
 			err = errors.Wrapf(err, "Failed to unmarshal converted Json. [%v]", string(in))
 		}
@@ -105,19 +104,12 @@ func unmarshal(in []byte, format format, message proto.Message) (err error) {
 	return
 }
 
-var jsonPbMarshaler = jsonpb.Marshaler{}
-
 func marshal(message proto.Message, format format) (raw []byte, err error) {
 	switch format {
 	case formatProto:
 		return proto.Marshal(message)
 	case formatJSON:
-		b := &bytes.Buffer{}
-		err := jsonPbMarshaler.Marshal(b, message)
-		if err != nil {
-			return nil, errors.Wrapf(err, "Failed to marshal Json.")
-		}
-		return b.Bytes(), nil
+		return utils.MarshalPbToBytes(message)
 	case formatYaml:
 		b, err := marshal(message, formatJSON)
 		if err != nil {

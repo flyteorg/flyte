@@ -11,7 +11,6 @@ import (
 )
 
 func (m *AdminService) GetNamedEntity(ctx context.Context, request *admin.NamedEntityGetRequest) (*admin.NamedEntity, error) {
-	defer m.interceptPanic(ctx, request)
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
@@ -31,7 +30,6 @@ func (m *AdminService) GetNamedEntity(ctx context.Context, request *admin.NamedE
 
 func (m *AdminService) UpdateNamedEntity(ctx context.Context, request *admin.NamedEntityUpdateRequest) (
 	*admin.NamedEntityUpdateResponse, error) {
-	defer m.interceptPanic(ctx, request)
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
@@ -50,7 +48,6 @@ func (m *AdminService) UpdateNamedEntity(ctx context.Context, request *admin.Nam
 
 func (m *AdminService) ListNamedEntities(ctx context.Context, request *admin.NamedEntityListRequest) (
 	*admin.NamedEntityList, error) {
-	defer m.interceptPanic(ctx, request)
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}

@@ -1,0 +1,17 @@
+{{- if .Values.webhook.autoscaling.enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ template "flyte-pod-webhook.name" . }}
+  labels:
+    app: {{ template "flyte-pod-webhook.name" . }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ template "flyte-pod-webhook.name" . }}
+  minReplicas: {{ .Values.webhook.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.webhook.autoscaling.maxReplicas }}
+  metrics:
+    {{ .Values.webhook.autoscaling.metrics | toYaml | nindent 4 }}
+{{- end }}

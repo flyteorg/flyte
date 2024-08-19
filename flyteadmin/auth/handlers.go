@@ -5,11 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/textproto"
 	"net/url"
 	"strings"
 	"time"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware/util/metautils"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"golang.org/x/oauth2"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -22,6 +24,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyte/flyteadmin/plugins"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
+	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
@@ -31,6 +34,8 @@ const (
 	FromHTTPKey          = "from_http"
 	FromHTTPVal          = "true"
 )
+
+var XRequestID = textproto.CanonicalMIMEHeaderKey(contextutils.RequestIDKey.String())
 
 type PreRedirectHookError struct {
 	Message string
@@ -260,9 +265,10 @@ func GetAuthenticationCustomMetadataInterceptor(authCtx interfaces.Authenticatio
 		if authCtx.Options().GrpcAuthorizationHeader != DefaultAuthorizationHeader {
 			md, ok := metadata.FromIncomingContext(ctx)
 			if ok {
-				existingHeader := md.Get(authCtx.Options().GrpcAuthorizationHeader)
+				grpcAuthzHeader := authCtx.Options().GrpcAuthorizationHeader
+				existingHeader := md.Get(grpcAuthzHeader)
 				if len(existingHeader) > 0 {
-					logger.Debugf(ctx, "Found existing metadata %s", existingHeader[0])
+					logger.Debugf(ctx, "Found existing metadata header %s", grpcAuthzHeader)
 					newAuthorizationMetadata := metadata.Pairs(DefaultAuthorizationHeader, existingHeader[0])
 					joinedMetadata := metadata.Join(md, newAuthorizationMetadata)
 					newCtx := metadata.NewIncomingContext(ctx, joinedMetadata)
@@ -484,7 +490,7 @@ func QueryUserInfoUsingAccessToken(ctx context.Context, originalRequest *http.Re
 // See https://tools.ietf.org/html/rfc8414 for more information.
 func GetOIdCMetadataEndpointRedirectHandler(ctx context.Context, authCtx interfaces.AuthenticationContext) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
-		metadataURL := authCtx.Options().UserAuth.OpenID.BaseURL.ResolveReference(authCtx.GetOIdCMetadataURL())
+		metadataURL := authCtx.Options().UserAuth.OpenID.BaseURL.JoinPath("/").ResolveReference(authCtx.GetOIdCMetadataURL())
 		http.Redirect(writer, request, metadataURL.String(), http.StatusSeeOther)
 	}
 }
@@ -530,5 +536,20 @@ func GetUserInfoForwardResponseHandler() UserInfoForwardResponseHandler {
 			w.Header().Set("X-User-Subject", info.Subject)
 		}
 		return nil
+	}
+}
+
+func GetCustomHeaderMatcher(pluginRegistry *plugins.Registry) runtime.HeaderMatcherFunc {
+	if fn := plugins.Get[runtime.HeaderMatcherFunc](pluginRegistry, plugins.PluginIDCustomerHeaderMatcher); fn != nil {
+		return fn
+	}
+	return func(key string) (string, bool) {
+		canonicalKey := textproto.CanonicalMIMEHeaderKey(key)
+		switch canonicalKey {
+		case XRequestID:
+			return canonicalKey, true
+		default:
+			return runtime.DefaultHeaderMatcher(key)
+		}
 	}
 }

@@ -72,6 +72,26 @@ func (t mapTypeChecker) CastsFrom(upstreamType *flyte.LiteralType) bool {
 	return false
 }
 
+type blobTypeChecker struct {
+	literalType *flyte.LiteralType
+}
+
+// CastsFrom checks that the target blob type can be cast to the current blob type. When the blob has no format
+// specified, it accepts all blob inputs since it is generic.
+func (t blobTypeChecker) CastsFrom(upstreamType *flyte.LiteralType) bool {
+	blobType := upstreamType.GetBlob()
+	if blobType == nil {
+		return false
+	}
+
+	// Empty blobs should match any blob.
+	if blobType.GetFormat() == "" || t.literalType.GetBlob().GetFormat() == "" {
+		return true
+	}
+
+	return blobType.GetFormat() == t.literalType.GetBlob().GetFormat()
+}
+
 type collectionTypeChecker struct {
 	literalType *flyte.LiteralType
 }
@@ -331,6 +351,10 @@ func getTypeChecker(t *flyte.LiteralType) typeChecker {
 		}
 	case *flyte.LiteralType_MapValueType:
 		return mapTypeChecker{
+			literalType: t,
+		}
+	case *flyte.LiteralType_Blob:
+		return blobTypeChecker{
 			literalType: t,
 		}
 	case *flyte.LiteralType_Schema:

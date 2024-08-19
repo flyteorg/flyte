@@ -4,7 +4,7 @@ include ../boilerplate/flyte/docker_build/Makefile
 include ../boilerplate/flyte/golang_test_targets/Makefile
 include ../boilerplate/flyte/end2end/Makefile
 
-GIT_VERSION := $(shell git describe --always --tags)
+GIT_VERSION := $(shell git describe --dirty --tags --long --match 'flytectl/*' --first-parent | sed 's/^flytectl\///')
 GIT_HASH := $(shell git rev-parse --short HEAD)
 TIMESTAMP := $(shell date '+%Y-%m-%d')
 PACKAGE ?=github.com/flyteorg/flyte/flytestdlib
@@ -29,10 +29,6 @@ update_boilerplate:
 .PHONY: install-piptools
 install-piptools:
 	pip install -U pip-tools
-
-.PHONY: doc-requirements.txt
-doc-requirements.txt: doc-requirements.in install-piptools
-	$(call PIP_COMPILE,doc-requirements.in)
 
 .PHONY: test_unit_without_flag
 test_unit_without_flag:

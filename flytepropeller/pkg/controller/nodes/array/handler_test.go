@@ -111,7 +111,7 @@ func createNodeExecutionContext(dataStore *storage.DataStore, eventRecorder inte
 	for _, outputVariable := range outputVariables {
 		outputVariableMap[outputVariable] = &idlcore.Variable{}
 	}
-	executionContext.OnGetTaskMatch(taskRef).Return(
+	executionContext.OnGetTask(taskRef).Return(
 		&v1alpha1.TaskSpec{
 			TaskTemplate: &idlcore.TaskTemplate{
 				Interface: &idlcore.TypedInterface{

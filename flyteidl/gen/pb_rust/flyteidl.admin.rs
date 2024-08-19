@@ -1935,7 +1935,8 @@ pub struct ExecutionSpec {
     #[prost(message, optional, tag = "23")]
     pub envs: ::core::option::Option<Envs>,
     /// Tags to be set for the execution.
-    #[prost(string, repeated, tag = "24")]
+    #[deprecated]
+    #[prost(string, repeated, tag="24")]
     pub tags: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
     /// Execution cluster label to be set for the execution.
     #[prost(message, optional, tag = "25")]
@@ -2811,6 +2812,11 @@ pub struct EmailMessage {
     #[prost(string, tag = "4")]
     pub body: ::prost::alloc::string::String,
 }
+/// Empty request for GetDomain
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetDomainRequest {
+}
 /// Namespace within a project commonly used to differentiate between different service instances.
 /// e.g. "production", "development", etc.
 #[pyo3::pyclass(get_all, set_all)]
@@ -2824,6 +2830,13 @@ pub struct Domain {
     /// Display name.
     #[prost(string, tag = "2")]
     pub name: ::prost::alloc::string::String,
+}
+/// Represents a list of domains.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetDomainsResponse {
+    #[prost(message, repeated, tag="1")]
+    pub domains: ::prost::alloc::vec::Vec<Domain>,
 }
 /// Top-level namespace used to classify different entities like workflows and executions.
 #[pyo3::pyclass(get_all, set_all)]
@@ -2875,6 +2888,8 @@ pub mod project {
         Archived = 1,
         /// System generated projects that aren't explicitly created or managed by a user.
         SystemGenerated = 2,
+        /// System archived projects that aren't explicitly archived by a user.
+        SystemArchived = 3,
     }
     impl ProjectState {
         /// String value of the enum field names used in the ProtoBuf definition.
@@ -2886,6 +2901,7 @@ pub mod project {
                 ProjectState::Active => "ACTIVE",
                 ProjectState::Archived => "ARCHIVED",
                 ProjectState::SystemGenerated => "SYSTEM_GENERATED",
+                ProjectState::SystemArchived => "SYSTEM_ARCHIVED",
             }
         }
         /// Creates an enum from field names used in the ProtoBuf definition.
@@ -2894,6 +2910,7 @@ pub mod project {
                 "ACTIVE" => Some(Self::Active),
                 "ARCHIVED" => Some(Self::Archived),
                 "SYSTEM_GENERATED" => Some(Self::SystemGenerated),
+                "SYSTEM_ARCHIVED" => Some(Self::SystemArchived),
                 _ => None,
             }
         }
@@ -2976,6 +2993,18 @@ pub struct ProjectGetRequest {
     pub id: ::prost::alloc::string::String,
     /// Optional, org key applied to the resource.
     #[prost(string, tag = "2")]
+    pub org: ::prost::alloc::string::String,
+}
+/// Error returned for inactive projects
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct InactiveProject {
+    /// Indicates a unique project.
+    /// +required
+    #[prost(string, tag="1")]
+    pub id: ::prost::alloc::string::String,
+    /// Optional, org key applied to the resource.
+    #[prost(string, tag="2")]
     pub org: ::prost::alloc::string::String,
 }
 /// Defines a set of custom matching attributes at the project level.
