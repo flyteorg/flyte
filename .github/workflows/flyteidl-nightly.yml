@@ -48,7 +48,6 @@ jobs:
           target: ${{ matrix.platform.target }}
           command: build
           args: --release --out dist --find-interpreter -m flyteidl/Cargo.toml
-          sccache: 'true'
           manylinux: auto
           before-script-linux: |
             echo "Starting before-script-linux for target: ${{ matrix.platform.target }}"
