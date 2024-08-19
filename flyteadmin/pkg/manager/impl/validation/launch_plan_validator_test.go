@@ -40,6 +40,12 @@ func TestValidateLpEmptyName(t *testing.T) {
 	assert.EqualError(t, err, "missing name")
 }
 
+func TestValidateLpSystemArchivedProject(t *testing.T) {
+	request := testutils.GetLaunchPlanRequest()
+	err := ValidateLaunchPlan(context.Background(), request, testutils.GetRepoWithDefaultSystemArchivedProject(), lpApplicationConfig, getWorkflowInterface())
+	assert.Nil(t, err)
+}
+
 func TestValidateLpLabels(t *testing.T) {
 	request := testutils.GetLaunchPlanRequest()
 	request.Spec.Labels = &admin.Labels{

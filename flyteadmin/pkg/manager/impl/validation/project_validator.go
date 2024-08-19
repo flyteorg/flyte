@@ -86,14 +86,43 @@ func ValidateProjectAndDomain(
 
 func ValidateProjectExistsAndActive(
 	ctx context.Context, db repositoryInterfaces.Repository, projectID, org string) error {
-
 	project, err := db.ProjectRepo().Get(ctx, projectID, org)
 	if err != nil {
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 			"failed to validate that project [%s]%s is registered, err: [%+v]",
 			projectID, getOrgForErrorMsg(org), err)
 	}
+
 	if *project.State != int32(admin.Project_ACTIVE) {
+		return errors.NewInactiveProjectError(ctx, projectID)
+	}
+	return nil
+}
+
+// ValidateProjectAndDomainForRegistration validates that a specified project and domain combination has been registered and exists in the db.
+// This method is used for task and workflow creation or registration, where the project may be in a system archived state.
+func ValidateProjectAndDomainForRegistration(
+	ctx context.Context, db repositoryInterfaces.Repository, config runtimeInterfaces.ApplicationConfiguration, projectID, domainID, org string) error {
+	if err := ValidateProjectExistsAndActiveOrSystemArchived(ctx, db, projectID, org); err != nil {
+		return err
+	}
+	if err := ValidateDomainExists(ctx, config, domainID); err != nil {
+		return err
+	}
+	return nil
+}
+
+// ValidateProjectExistsAndActiveOrSystemArchived validates that a specified project exists and is either active or system archived.
+func ValidateProjectExistsAndActiveOrSystemArchived(
+	ctx context.Context, db repositoryInterfaces.Repository, projectID, org string) error {
+	project, err := db.ProjectRepo().Get(ctx, projectID, org)
+	if err != nil {
+		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
+			"failed to validate that project [%s]%s is registered, err: [%+v]",
+			projectID, getOrgForErrorMsg(org), err)
+	}
+
+	if *project.State != int32(admin.Project_ACTIVE) && *project.State != int32(admin.Project_SYSTEM_ARCHIVED) {
 		return errors.NewInactiveProjectError(ctx, projectID)
 	}
 	return nil

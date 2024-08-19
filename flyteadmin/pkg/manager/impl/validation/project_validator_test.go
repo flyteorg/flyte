@@ -365,6 +365,51 @@ func TestValidateProjectExistsDb(t *testing.T) {
 	})
 }
 
+func TestValidateProjectAndDomainForRegistration(t *testing.T) {
+	mockRepo := repositoryMocks.NewMockRepository()
+	t.Run("base case", func(t *testing.T) {
+		mockRepo.ProjectRepo().(*repositoryMocks.MockProjectRepo).GetFunction = func(
+			ctx context.Context, projectID string) (models.Project, error) {
+			assert.Equal(t, projectID, "flyte-project-id")
+			activeState := int32(admin.Project_ACTIVE)
+			return models.Project{State: &activeState}, nil
+		}
+		err := ValidateProjectAndDomainForRegistration(context.Background(), mockRepo, testutils.GetApplicationConfigWithDefaultDomains(), "flyte-project-id", "domain", "org")
+
+		assert.Nil(t, err)
+	})
+
+	t.Run("error getting", func(t *testing.T) {
+		mockRepo.ProjectRepo().(*repositoryMocks.MockProjectRepo).GetFunction = func(
+			ctx context.Context, projectID string) (models.Project, error) {
+
+			return models.Project{}, errors.New("missing")
+		}
+		err := ValidateProjectAndDomainForRegistration(context.Background(), mockRepo, testutils.GetApplicationConfigWithDefaultDomains(), "flyte-project-id", "domain", "org")
+		assert.Error(t, err)
+	})
+
+	t.Run("success system archived", func(t *testing.T) {
+		mockRepo.ProjectRepo().(*repositoryMocks.MockProjectRepo).GetFunction = func(
+			ctx context.Context, projectID string) (models.Project, error) {
+			state := int32(admin.Project_SYSTEM_ARCHIVED)
+			return models.Project{State: &state}, nil
+		}
+		err := ValidateProjectAndDomainForRegistration(context.Background(), mockRepo, testutils.GetApplicationConfigWithDefaultDomains(), "flyte-project-id", "domain", "org")
+		assert.Nil(t, err)
+	})
+
+	t.Run("error archived", func(t *testing.T) {
+		mockRepo.ProjectRepo().(*repositoryMocks.MockProjectRepo).GetFunction = func(
+			ctx context.Context, projectID string) (models.Project, error) {
+			state := int32(admin.Project_ARCHIVED)
+			return models.Project{State: &state}, nil
+		}
+		err := ValidateProjectAndDomainForRegistration(context.Background(), mockRepo, testutils.GetApplicationConfigWithDefaultDomains(), "flyte-project-id", "domain", "org")
+		assert.Error(t, err)
+	})
+}
+
 func TestValidateProjectGetRequest(t *testing.T) {
 	t.Run("base case", func(t *testing.T) {
 		assert.Nil(t, ValidateProjectGetRequest(admin.ProjectGetRequest{

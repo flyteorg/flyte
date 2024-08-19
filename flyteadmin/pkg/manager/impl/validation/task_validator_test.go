@@ -166,6 +166,14 @@ func TestValidateTaskEmptyImage(t *testing.T) {
 	assert.EqualError(t, err, "missing image")
 }
 
+func TestValidateWithSystemArchivedProject(t *testing.T) {
+	request := testutils.GetValidTaskRequest()
+	err := ValidateTask(context.Background(), request, testutils.GetRepoWithDefaultSystemArchivedProject(),
+		getMockTaskResources(), mockWhitelistConfigProvider, taskApplicationConfigProvider)
+	assert.Nil(t, err)
+
+}
+
 func TestValidateTaskTypeWhitelist(t *testing.T) {
 	whitelistConfig := runtimeMocks.NewMockWhitelistConfiguration()
 	whitelistConfig.(*runtimeMocks.MockWhitelistConfiguration).TaskTypeWhitelist = runtimeInterfaces.TaskTypeWhitelist{

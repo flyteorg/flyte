@@ -28,3 +28,13 @@ func GetRepoWithDefaultProject() repositoryInterfaces.Repository {
 	}
 	return repo
 }
+
+func GetRepoWithDefaultSystemArchivedProject() repositoryInterfaces.Repository {
+	repo := repositoryMocks.NewMockRepository()
+	repo.ProjectRepo().(*repositoryMocks.MockProjectRepo).GetFunction = func(
+		ctx context.Context, projectID string) (models.Project, error) {
+		activeState := int32(admin.Project_SYSTEM_ARCHIVED)
+		return models.Project{State: &activeState}, nil
+	}
+	return repo
+}
