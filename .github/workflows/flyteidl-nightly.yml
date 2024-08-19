@@ -48,41 +48,6 @@ jobs:
           target: ${{ matrix.platform.target }}
           command: build
           args: --release --out dist --find-interpreter -m flyteidl/Cargo.toml
-          # manylinux: auto
-          before-script-linux: |
-            echo "Starting before-script-linux for target: ${{ matrix.platform.target }}"
-
-            # Detect OS type
-            if [ -f /etc/os-release ]; then
-              . /etc/os-release
-              case "$ID" in
-                debian|ubuntu)
-                  echo "Running on a Debian-based system"
-                  apt update -y
-                  apt install pkg-config libssl-dev protobuf-compiler libprotobuf-dev -y
-                  openssl version
-                  ;;
-                centos|rhel|fedora)
-                  echo "Running on a CentOS-based system"
-                  yum update -y
-                  yum install openssl openssl-devel protobuf protobuf-devel -y
-                  openssl version
-                  ;;
-                *)
-                  echo "Unsupported distribution: $ID"
-                  exit 1
-                  ;;
-              esac
-            else
-              echo "Cannot determine the operating system type."
-              exit 1
-            fi
-
-            # Generate Rust protobuf
-            (cd ${{ github.workspace }}/flyteidl && rm -rf ./gen/pb_rust/* && cargo run --bin gen_flyteidl)
-
-            echo "Completed before-script-linux for target: ${{ matrix.platform.target }} with OpenSSL version: $(openssl version)"
-
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
