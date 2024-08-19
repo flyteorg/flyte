@@ -59,13 +59,13 @@ jobs:
               case "$ID" in
                 debian|ubuntu)
                   echo "Running on a Debian-based system"
-                  sudo apt update
-                  sudo apt install -y pkg-config libssl-dev protobuf-compiler libprotobuf-dev
+                  apt update
+                  apt install -y pkg-config libssl-dev protobuf-compiler libprotobuf-dev
                   ;;
                 centos|rhel|fedora)
                   echo "Running on a CentOS-based system"
-                  sudo yum update -y
-                  sudo yum install -y openssl openssl-devel protobuf protobuf-devel
+                  yum update -y
+                  yum install -y openssl openssl-devel protobuf protobuf-devel
                   ;;
                 *)
                   echo "Unsupported distribution: $ID"
