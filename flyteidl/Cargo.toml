@@ -36,7 +36,7 @@ tonic-build = "0.11.0"
 tonic ={ version = "0.11.0", features = ["tls", "tls-roots"] }
 glob = "0.3.1"
 pyo3_macro = { path = "./pyo3_macro" }
-pyo3 =  { version = "0.22.1", features = [ "extension-module", "multiple-pymethods", "experimental-async", "gil-refs", "experimental-inspect" ] }
+pyo3 =  { version = "0.22.1", features = [ "extension-module", "multiple-pymethods", "experimental-async", "gil-refs", "experimental-inspect", "abi3-py39" ] }
 tokio = { version = "1.0", features = ["macros", "rt-multi-thread"] }
 serde_json = "1.0.120"
 serde = { version = "1.0.204", features = ["serde_derive"]}
