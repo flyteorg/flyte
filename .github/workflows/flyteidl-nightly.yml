@@ -49,7 +49,7 @@ jobs:
           command: build
           args: --release --out dist --find-interpreter -m flyteidl/Cargo.toml
           sccache: 'true'
-          manylinux: auto
+          manylinux: '2014'
           before-script-linux: |
             case "${{ matrix.target }}" in
               "aarch64" | "armv7" | "s390x" | "ppc64le")
