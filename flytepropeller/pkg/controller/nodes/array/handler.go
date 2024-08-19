@@ -68,9 +68,15 @@ func (a *arrayNodeHandler) Abort(ctx context.Context, nCtx interfaces.NodeExecut
 
 	var arrayNodeStateStore arrayNodeStateStore
 	if arrayNode.GetExecutionMode() == idlcore.ArrayNode_MINIMAL_STATE {
-		arrayNodeStateStore = &minStateStore{arrayNodeHandler: a}
+		arrayNodeStateStore = &minStateStore{
+			arrayNodeHandler:   a,
+			arrayNodeStateCopy: &arrayNodeState,
+		}
 	} else {
-		arrayNodeStateStore = &fullStateStore{arrayNodeHandler: a}
+		arrayNodeStateStore = &fullStateStore{
+			arrayNodeHandler:   a,
+			arrayNodeStateCopy: &arrayNodeState,
+		}
 	}
 
 	eventRecorder := newArrayEventRecorder(nCtx.EventsRecorder(), arrayNode.GetSubNodeSpec().GetKind() == v1alpha1.NodeKindTask)
@@ -135,9 +141,15 @@ func (a *arrayNodeHandler) Finalize(ctx context.Context, nCtx interfaces.NodeExe
 
 	var arrayNodeStateStore arrayNodeStateStore
 	if arrayNode.GetExecutionMode() == idlcore.ArrayNode_MINIMAL_STATE {
-		arrayNodeStateStore = &minStateStore{arrayNodeHandler: a}
+		arrayNodeStateStore = &minStateStore{
+			arrayNodeHandler:   a,
+			arrayNodeStateCopy: &arrayNodeState,
+		}
 	} else {
-		arrayNodeStateStore = &fullStateStore{arrayNodeHandler: a}
+		arrayNodeStateStore = &fullStateStore{
+			arrayNodeHandler:   a,
+			arrayNodeStateCopy: &arrayNodeState,
+		}
 	}
 
 	messageCollector := errorcollector.NewErrorMessageCollector()
@@ -190,9 +202,15 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 
 	var arrayNodeStateStore arrayNodeStateStore
 	if arrayNode.GetExecutionMode() == idlcore.ArrayNode_MINIMAL_STATE {
-		arrayNodeStateStore = &minStateStore{arrayNodeHandler: a}
+		arrayNodeStateStore = &minStateStore{
+			arrayNodeHandler:   a,
+			arrayNodeStateCopy: &arrayNodeState,
+		}
 	} else {
-		arrayNodeStateStore = &fullStateStore{arrayNodeHandler: a}
+		arrayNodeStateStore = &fullStateStore{
+			arrayNodeHandler:   a,
+			arrayNodeStateCopy: &arrayNodeState,
+		}
 	}
 
 	incrementTaskPhaseVersion := false
@@ -249,7 +267,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			maxAttemptsValue += maxSystemFailuresValue
 		}
 
-		err = arrayNodeStateStore.initArrayNodeState(&arrayNodeState, maxAttemptsValue, maxSystemFailuresValue, size)
+		err = arrayNodeStateStore.initArrayNodeState(maxAttemptsValue, maxSystemFailuresValue, size)
 		if err != nil {
 			return handler.UnknownTransition, err
 		}

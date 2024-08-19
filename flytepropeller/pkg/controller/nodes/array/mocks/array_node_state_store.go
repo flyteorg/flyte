@@ -9,8 +9,6 @@ import (
 
 	executors "github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
 
-	handler "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
-
 	interfaces "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
 
 	mock "github.com/stretchr/testify/mock"
@@ -181,8 +179,8 @@ func (_m arrayNodeStateStore_initArrayNodeState) Return(_a0 error) *arrayNodeSta
 	return &arrayNodeStateStore_initArrayNodeState{Call: _m.Call.Return(_a0)}
 }
 
-func (_m *arrayNodeStateStore) OninitArrayNodeState(arrayNodeState *handler.ArrayNodeState, maxAttemptsValue int, maxSystemFailuresValue int, size int) *arrayNodeStateStore_initArrayNodeState {
-	c_call := _m.On("initArrayNodeState", arrayNodeState, maxAttemptsValue, maxSystemFailuresValue, size)
+func (_m *arrayNodeStateStore) OninitArrayNodeState(maxAttemptsValue int, maxSystemFailuresValue int, size int) *arrayNodeStateStore_initArrayNodeState {
+	c_call := _m.On("initArrayNodeState", maxAttemptsValue, maxSystemFailuresValue, size)
 	return &arrayNodeStateStore_initArrayNodeState{Call: c_call}
 }
 
@@ -191,13 +189,13 @@ func (_m *arrayNodeStateStore) OninitArrayNodeStateMatch(matchers ...interface{}
 	return &arrayNodeStateStore_initArrayNodeState{Call: c_call}
 }
 
-// initArrayNodeState provides a mock function with given fields: arrayNodeState, maxAttemptsValue, maxSystemFailuresValue, size
-func (_m *arrayNodeStateStore) initArrayNodeState(arrayNodeState *handler.ArrayNodeState, maxAttemptsValue int, maxSystemFailuresValue int, size int) error {
-	ret := _m.Called(arrayNodeState, maxAttemptsValue, maxSystemFailuresValue, size)
+// initArrayNodeState provides a mock function with given fields: maxAttemptsValue, maxSystemFailuresValue, size
+func (_m *arrayNodeStateStore) initArrayNodeState(maxAttemptsValue int, maxSystemFailuresValue int, size int) error {
+	ret := _m.Called(maxAttemptsValue, maxSystemFailuresValue, size)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(*handler.ArrayNodeState, int, int, int) error); ok {
-		r0 = rf(arrayNodeState, maxAttemptsValue, maxSystemFailuresValue, size)
+	if rf, ok := ret.Get(0).(func(int, int, int) error); ok {
+		r0 = rf(maxAttemptsValue, maxSystemFailuresValue, size)
 	} else {
 		r0 = ret.Error(0)
 	}

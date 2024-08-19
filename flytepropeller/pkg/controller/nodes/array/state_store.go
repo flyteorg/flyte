@@ -17,7 +17,7 @@ import (
 //go:generate mockery -all -case=underscore
 
 type arrayNodeStateStore interface {
-	initArrayNodeState(arrayNodeState *handler.ArrayNodeState, maxAttemptsValue int, maxSystemFailuresValue int, size int) error
+	initArrayNodeState(maxAttemptsValue int, maxSystemFailuresValue int, size int) error
 	buildArrayNodeContext(ctx context.Context, nCtx interfaces.NodeExecutionContext, arrayNode v1alpha1.ExecutableArrayNode, subNodeIndex int, eventRecorder ArrayEventRecorder) (
 		interfaces.Node, executors.ExecutionContext, executors.DAGStructure, executors.NodeLookup, *v1alpha1.NodeSpec, *v1alpha1.NodeStatus, error)
 	persistArraySubNodeState(ctx context.Context, nCtx interfaces.NodeExecutionContext, subNodeStatus *v1alpha1.NodeStatus, index int)
@@ -30,17 +30,18 @@ func getSubNodeID(index int) string {
 }
 
 type fullStateStore struct {
-	arrayNodeHandler *arrayNodeHandler
+	arrayNodeHandler   *arrayNodeHandler
+	arrayNodeStateCopy *handler.ArrayNodeState
 }
 
-func (f *fullStateStore) initArrayNodeState(arrayNodeState *handler.ArrayNodeState, maxAttemptsValue int, maxSystemFailuresValue int, size int) error {
+func (f *fullStateStore) initArrayNodeState(maxAttemptsValue int, maxSystemFailuresValue int, size int) error {
 	for _, item := range []struct {
 		arrayReference *bitarray.CompactArray
 		maxValue       int
 	}{
 		// we use NodePhaseRecovered for the `maxValue` of `SubNodePhases` because `Phase` is
 		// defined as an `iota` so it is impossible to programmatically get largest value
-		{arrayReference: &arrayNodeState.SubNodePhases, maxValue: int(v1alpha1.NodePhaseRecovered)},
+		{arrayReference: &f.arrayNodeStateCopy.SubNodePhases, maxValue: int(v1alpha1.NodePhaseRecovered)},
 	} {
 		var err error
 		*item.arrayReference, err = bitarray.NewCompactArray(uint(size), bitarray.Item(item.maxValue))
@@ -52,8 +53,7 @@ func (f *fullStateStore) initArrayNodeState(arrayNodeState *handler.ArrayNodeSta
 }
 
 func (f *fullStateStore) persistArraySubNodeState(ctx context.Context, nCtx interfaces.NodeExecutionContext, subNodeStatus *v1alpha1.NodeStatus, index int) {
-	arrayNodeState := nCtx.NodeStateReader().GetArrayNodeState()
-	arrayNodeState.SubNodePhases.SetItem(index, uint64(subNodeStatus.GetPhase()))
+	f.arrayNodeStateCopy.SubNodePhases.SetItem(index, uint64(subNodeStatus.GetPhase()))
 
 	subNodeStatusAddress := nCtx.NodeStatus().GetNodeExecutionStatus(ctx, getSubNodeID(index)).(*v1alpha1.NodeStatus)
 	*subNodeStatusAddress = *subNodeStatus
@@ -138,20 +138,21 @@ func (f *fullStateStore) getTaskPhase(ctx context.Context, nCtx interfaces.NodeE
 }
 
 type minStateStore struct {
-	arrayNodeHandler *arrayNodeHandler
+	arrayNodeHandler   *arrayNodeHandler
+	arrayNodeStateCopy *handler.ArrayNodeState
 }
 
-func (m *minStateStore) initArrayNodeState(arrayNodeState *handler.ArrayNodeState, maxAttemptsValue int, maxSystemFailuresValue int, size int) error {
+func (m *minStateStore) initArrayNodeState(maxAttemptsValue int, maxSystemFailuresValue int, size int) error {
 	for _, item := range []struct {
 		arrayReference *bitarray.CompactArray
 		maxValue       int
 	}{
 		// we use NodePhaseRecovered for the `maxValue` of `SubNodePhases` because `Phase` is
 		// defined as an `iota` so it is impossible to programmatically get largest value
-		{arrayReference: &arrayNodeState.SubNodePhases, maxValue: int(v1alpha1.NodePhaseRecovered)},
-		{arrayReference: &arrayNodeState.SubNodeTaskPhases, maxValue: len(core.Phases) - 1},
-		{arrayReference: &arrayNodeState.SubNodeRetryAttempts, maxValue: maxAttemptsValue},
-		{arrayReference: &arrayNodeState.SubNodeSystemFailures, maxValue: maxSystemFailuresValue},
+		{arrayReference: &m.arrayNodeStateCopy.SubNodePhases, maxValue: int(v1alpha1.NodePhaseRecovered)},
+		{arrayReference: &m.arrayNodeStateCopy.SubNodeTaskPhases, maxValue: len(core.Phases) - 1},
+		{arrayReference: &m.arrayNodeStateCopy.SubNodeRetryAttempts, maxValue: maxAttemptsValue},
+		{arrayReference: &m.arrayNodeStateCopy.SubNodeSystemFailures, maxValue: maxSystemFailuresValue},
 	} {
 		var err error
 		*item.arrayReference, err = bitarray.NewCompactArray(uint(size), bitarray.Item(item.maxValue))
@@ -163,16 +164,15 @@ func (m *minStateStore) initArrayNodeState(arrayNodeState *handler.ArrayNodeStat
 }
 
 func (m *minStateStore) persistArraySubNodeState(ctx context.Context, nCtx interfaces.NodeExecutionContext, subNodeStatus *v1alpha1.NodeStatus, index int) {
-	arrayNodeState := nCtx.NodeStateReader().GetArrayNodeState()
-	arrayNodeState.SubNodePhases.SetItem(index, uint64(subNodeStatus.GetPhase()))
+	m.arrayNodeStateCopy.SubNodePhases.SetItem(index, uint64(subNodeStatus.GetPhase()))
 	if subNodeStatus.GetTaskNodeStatus() == nil {
 		// resetting task phase because during retries we clear the GetTaskNodeStatus
-		arrayNodeState.SubNodeTaskPhases.SetItem(index, uint64(0))
+		m.arrayNodeStateCopy.SubNodeTaskPhases.SetItem(index, uint64(0))
 	} else {
-		arrayNodeState.SubNodeTaskPhases.SetItem(index, uint64(subNodeStatus.GetTaskNodeStatus().GetPhase()))
+		m.arrayNodeStateCopy.SubNodeTaskPhases.SetItem(index, uint64(subNodeStatus.GetTaskNodeStatus().GetPhase()))
 	}
-	arrayNodeState.SubNodeRetryAttempts.SetItem(index, uint64(subNodeStatus.GetAttempts()))
-	arrayNodeState.SubNodeSystemFailures.SetItem(index, uint64(subNodeStatus.GetSystemFailures()))
+	m.arrayNodeStateCopy.SubNodeRetryAttempts.SetItem(index, uint64(subNodeStatus.GetAttempts()))
+	m.arrayNodeStateCopy.SubNodeSystemFailures.SetItem(index, uint64(subNodeStatus.GetSystemFailures()))
 }
 
 // buildArrayNodeContext creates a custom environment to execute the ArrayNode subnode. This is uniquely required for
@@ -182,9 +182,8 @@ func (m *minStateStore) persistArraySubNodeState(ctx context.Context, nCtx inter
 // each subnode individually it sends a single event for the whole ArrayNode, and many more.
 func (m *minStateStore) buildArrayNodeContext(ctx context.Context, nCtx interfaces.NodeExecutionContext, arrayNode v1alpha1.ExecutableArrayNode, subNodeIndex int, eventRecorder ArrayEventRecorder) (
 	interfaces.Node, executors.ExecutionContext, executors.DAGStructure, executors.NodeLookup, *v1alpha1.NodeSpec, *v1alpha1.NodeStatus, error) {
-	arrayNodeState := nCtx.NodeStateReader().GetArrayNodeState()
-	nodePhase := v1alpha1.NodePhase(arrayNodeState.SubNodePhases.GetItem(subNodeIndex))
-	taskPhase := int(arrayNodeState.SubNodeTaskPhases.GetItem(subNodeIndex))
+	nodePhase := v1alpha1.NodePhase(m.arrayNodeStateCopy.SubNodePhases.GetItem(subNodeIndex))
+	taskPhase := int(m.arrayNodeStateCopy.SubNodeTaskPhases.GetItem(subNodeIndex))
 
 	// need to initialize the inputReader every time to ensure TaskHandler can access for cache lookups / population
 	inputs, err := nCtx.InputReader().Get(ctx)
@@ -220,7 +219,7 @@ func (m *minStateStore) buildArrayNodeContext(ctx context.Context, nCtx interfac
 	}
 
 	// construct output references
-	currentAttempt := uint32(arrayNodeState.SubNodeRetryAttempts.GetItem(subNodeIndex))
+	currentAttempt := uint32(m.arrayNodeStateCopy.SubNodeRetryAttempts.GetItem(subNodeIndex))
 	subDataDir, subOutputDir, err := constructOutputReferences(ctx, nCtx, strconv.Itoa(subNodeIndex), strconv.Itoa(int(currentAttempt)))
 	if err != nil {
 		return nil, nil, nil, nil, nil, nil, err
@@ -231,7 +230,7 @@ func (m *minStateStore) buildArrayNodeContext(ctx context.Context, nCtx interfac
 		DataDir:        subDataDir,
 		OutputDir:      subOutputDir,
 		Attempts:       currentAttempt,
-		SystemFailures: uint32(arrayNodeState.SubNodeSystemFailures.GetItem(subNodeIndex)),
+		SystemFailures: uint32(m.arrayNodeStateCopy.SubNodeSystemFailures.GetItem(subNodeIndex)),
 		TaskNodeStatus: &v1alpha1.TaskNodeStatus{
 			Phase:       taskPhase,
 			PluginState: pluginStateBytes,
@@ -258,11 +257,9 @@ func (m *minStateStore) buildArrayNodeContext(ctx context.Context, nCtx interfac
 }
 
 func (m *minStateStore) getAttempts(ctx context.Context, nCtx interfaces.NodeExecutionContext, index int) uint32 {
-	arrayNodeState := nCtx.NodeStateReader().GetArrayNodeState()
-	return uint32(arrayNodeState.SubNodeRetryAttempts.GetItem(index))
+	return uint32(m.arrayNodeStateCopy.SubNodeRetryAttempts.GetItem(index))
 }
 
 func (m *minStateStore) getTaskPhase(ctx context.Context, nCtx interfaces.NodeExecutionContext, index int) int {
-	arrayNodeState := nCtx.NodeStateReader().GetArrayNodeState()
-	return int(arrayNodeState.SubNodeTaskPhases.GetItem(index))
+	return int(m.arrayNodeStateCopy.SubNodeTaskPhases.GetItem(index))
 }

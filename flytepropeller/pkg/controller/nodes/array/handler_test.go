@@ -596,6 +596,7 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 		subNodeTaskPhases              []core.Phase
 		subNodeTransitions             []handler.Transition
 		expectedArrayNodePhase         v1alpha1.ArrayNodePhase
+		expectedArrayNodeSubPhases     []v1alpha1.NodePhase
 		expectedTransitionPhase        handler.EPhase
 		expectedExternalResourcePhases []idlcore.TaskExecution_Phase
 		currentWfParallelism           uint32
@@ -623,7 +624,11 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(&handler.ExecutionInfo{})),
 				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(&handler.ExecutionInfo{})),
 			},
-			expectedArrayNodePhase:         v1alpha1.ArrayNodePhaseExecuting,
+			expectedArrayNodePhase: v1alpha1.ArrayNodePhaseExecuting,
+			expectedArrayNodeSubPhases: []v1alpha1.NodePhase{
+				v1alpha1.NodePhaseRunning,
+				v1alpha1.NodePhaseRunning,
+			},
 			expectedTaskPhaseVersion:       1,
 			expectedTransitionPhase:        handler.EPhaseRunning,
 			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_RUNNING, idlcore.TaskExecution_RUNNING},
@@ -643,7 +648,11 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 			subNodeTransitions: []handler.Transition{
 				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(&handler.ExecutionInfo{})),
 			},
-			expectedArrayNodePhase:         v1alpha1.ArrayNodePhaseExecuting,
+			expectedArrayNodePhase: v1alpha1.ArrayNodePhaseExecuting,
+			expectedArrayNodeSubPhases: []v1alpha1.NodePhase{
+				v1alpha1.NodePhaseRunning,
+				v1alpha1.NodePhaseQueued,
+			},
 			expectedTaskPhaseVersion:       1,
 			expectedTransitionPhase:        handler.EPhaseRunning,
 			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_RUNNING},
@@ -664,7 +673,11 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(&handler.ExecutionInfo{})),
 				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(&handler.ExecutionInfo{})),
 			},
-			expectedArrayNodePhase:         v1alpha1.ArrayNodePhaseExecuting,
+			expectedArrayNodePhase: v1alpha1.ArrayNodePhaseExecuting,
+			expectedArrayNodeSubPhases: []v1alpha1.NodePhase{
+				v1alpha1.NodePhaseRunning,
+				v1alpha1.NodePhaseRunning,
+			},
 			expectedTaskPhaseVersion:       1,
 			expectedTransitionPhase:        handler.EPhaseRunning,
 			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_RUNNING, idlcore.TaskExecution_RUNNING},
@@ -685,7 +698,11 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 			subNodeTransitions: []handler.Transition{
 				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(&handler.ExecutionInfo{})),
 			},
-			expectedArrayNodePhase:         v1alpha1.ArrayNodePhaseExecuting,
+			expectedArrayNodePhase: v1alpha1.ArrayNodePhaseExecuting,
+			expectedArrayNodeSubPhases: []v1alpha1.NodePhase{
+				v1alpha1.NodePhaseRunning,
+				v1alpha1.NodePhaseQueued,
+			},
 			expectedTaskPhaseVersion:       1,
 			expectedTransitionPhase:        handler.EPhaseRunning,
 			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_RUNNING},
@@ -703,8 +720,12 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 				core.PhaseUndefined,
 				core.PhaseUndefined,
 			},
-			subNodeTransitions:             []handler.Transition{},
-			expectedArrayNodePhase:         v1alpha1.ArrayNodePhaseExecuting,
+			subNodeTransitions:     []handler.Transition{},
+			expectedArrayNodePhase: v1alpha1.ArrayNodePhaseExecuting,
+			expectedArrayNodeSubPhases: []v1alpha1.NodePhase{
+				v1alpha1.NodePhaseQueued,
+				v1alpha1.NodePhaseQueued,
+			},
 			expectedTaskPhaseVersion:       0,
 			expectedTransitionPhase:        handler.EPhaseRunning,
 			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{},
@@ -726,7 +747,11 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(&handler.ExecutionInfo{})),
 				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(&handler.ExecutionInfo{})),
 			},
-			expectedArrayNodePhase:         v1alpha1.ArrayNodePhaseExecuting,
+			expectedArrayNodePhase: v1alpha1.ArrayNodePhaseExecuting,
+			expectedArrayNodeSubPhases: []v1alpha1.NodePhase{
+				v1alpha1.NodePhaseRunning,
+				v1alpha1.NodePhaseRunning,
+			},
 			expectedTaskPhaseVersion:       1,
 			expectedTransitionPhase:        handler.EPhaseRunning,
 			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_RUNNING, idlcore.TaskExecution_RUNNING},
@@ -747,7 +772,11 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoSuccess(&handler.ExecutionInfo{})),
 				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoSuccess(&handler.ExecutionInfo{})),
 			},
-			expectedArrayNodePhase:         v1alpha1.ArrayNodePhaseSucceeding,
+			expectedArrayNodePhase: v1alpha1.ArrayNodePhaseSucceeding,
+			expectedArrayNodeSubPhases: []v1alpha1.NodePhase{
+				v1alpha1.NodePhaseSucceeded,
+				v1alpha1.NodePhaseSucceeded,
+			},
 			expectedTaskPhaseVersion:       0,
 			expectedTransitionPhase:        handler.EPhaseRunning,
 			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_SUCCEEDED, idlcore.TaskExecution_SUCCEEDED},
@@ -767,6 +796,10 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 			subNodeTransitions: []handler.Transition{
 				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoSuccess(&handler.ExecutionInfo{})),
 				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(0, "", "", &handler.ExecutionInfo{})),
+			},
+			expectedArrayNodeSubPhases: []v1alpha1.NodePhase{
+				v1alpha1.NodePhaseSucceeded,
+				v1alpha1.NodePhaseFailed,
 			},
 			expectedArrayNodePhase:         v1alpha1.ArrayNodePhaseSucceeding,
 			expectedTaskPhaseVersion:       0,
@@ -788,7 +821,11 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(0, "", "", &handler.ExecutionInfo{})),
 				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoSuccess(&handler.ExecutionInfo{})),
 			},
-			expectedArrayNodePhase:         v1alpha1.ArrayNodePhaseFailing,
+			expectedArrayNodePhase: v1alpha1.ArrayNodePhaseFailing,
+			expectedArrayNodeSubPhases: []v1alpha1.NodePhase{
+				v1alpha1.NodePhaseFailed,
+				v1alpha1.NodePhaseSucceeded,
+			},
 			expectedTaskPhaseVersion:       0,
 			expectedTransitionPhase:        handler.EPhaseRunning,
 			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_FAILED, idlcore.TaskExecution_SUCCEEDED},
@@ -808,7 +845,11 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(&handler.ExecutionInfo{})),
 				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(&handler.ExecutionInfo{})),
 			},
-			expectedArrayNodePhase:         v1alpha1.ArrayNodePhaseExecuting,
+			expectedArrayNodePhase: v1alpha1.ArrayNodePhaseExecuting,
+			expectedArrayNodeSubPhases: []v1alpha1.NodePhase{
+				v1alpha1.NodePhaseRunning,
+				v1alpha1.NodePhaseRunning,
+			},
 			expectedTaskPhaseVersion:       2,
 			expectedTransitionPhase:        handler.EPhaseRunning,
 			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_RUNNING, idlcore.TaskExecution_RUNNING},
@@ -833,6 +874,10 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(&handler.ExecutionInfo{})),
 				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(&handler.ExecutionInfo{})),
 			},
+			expectedArrayNodeSubPhases: []v1alpha1.NodePhase{
+				v1alpha1.NodePhaseQueued,
+				v1alpha1.NodePhaseQueued,
+			},
 			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_RUNNING, idlcore.TaskExecution_RUNNING},
 			useFakeEventRecorder:           true,
 			eventRecorderFailures:          5,
@@ -854,6 +899,10 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 			subNodeTransitions: []handler.Transition{
 				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(&handler.ExecutionInfo{})),
 				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(&handler.ExecutionInfo{})),
+			},
+			expectedArrayNodeSubPhases: []v1alpha1.NodePhase{
+				v1alpha1.NodePhaseQueued,
+				v1alpha1.NodePhaseQueued,
 			},
 			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_RUNNING, idlcore.TaskExecution_RUNNING},
 			useFakeEventRecorder:           true,
@@ -968,6 +1017,12 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 				assert.Equal(t, test.expectedArrayNodePhase, arrayNodeState.Phase)
 				assert.Equal(t, test.expectedTransitionPhase, transition.Info().GetPhase())
 				assert.Equal(t, test.expectedTaskPhaseVersion, arrayNodeState.TaskPhaseVersion)
+
+				if test.expectedArrayNodeSubPhases != nil {
+					for i, expectedPhase := range test.expectedArrayNodeSubPhases {
+						assert.Equal(t, expectedPhase, v1alpha1.NodePhase(arrayNodeState.SubNodePhases.GetItem(i)))
+					}
+				}
 
 				bufferedEventRecorder, ok := eventRecorder.(*bufferedEventRecorder)
 				if ok {
