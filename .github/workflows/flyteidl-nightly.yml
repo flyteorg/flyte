@@ -49,8 +49,10 @@ jobs:
           command: build
           args: --release --out dist --find-interpreter -m flyteidl/Cargo.toml
           before-script-linux: |
+            echo "Starting before-script-linux for target: ${{ matrix.target }}"
             case "${{ matrix.target }}" in
               "aarch64" | "armv7" | "s390x" | "ppc64le")
+                echo "Running on a Debian-based system"
                 # NOTE: pypa/manylinux docker images are Debian based
                 sudo apt update
                 # NOTE: install openssl deps
@@ -58,9 +60,10 @@ jobs:
                 # NOTE: install protoc deps
                 sudo apt install -y protobuf-compiler libprotobuf-dev
                 # NOTE: generate rust protobuf
-                rm -rf ${{ github.workspace }}/flyte/flyteidl/gen/pb_rust/* && cargo run --bin gen_flyteidl
+                (cd ${{ github.workspace }}/flyte/flyteidl && rm -rf ./gen/pb_rust/* && cargo run --bin gen_flyteidl)
                 ;;
               "x86" | "x86_64")
+                echo "Running on a CentOS-based system"
                 # NOTE: rust-cross/manylinux docker images are CentOS based
                 yum update -y
                 # NOTE: install openssl deps
@@ -68,7 +71,7 @@ jobs:
                 # NOTE: install protoc deps
                 yum install -y protobuf protobuf-devel
                 # NOTE: generate rust protobuf
-                rm -rf ${{ github.workspace }}/flyte/flyteidl/gen/pb_rust/* && cargo run --bin gen_flyteidl
+                (cd ${{ github.workspace }}/flyte/flyteidl && rm -rf ./gen/pb_rust/* && cargo run --bin gen_flyteidl)
                 ;;
             esac
       - name: Upload wheels
