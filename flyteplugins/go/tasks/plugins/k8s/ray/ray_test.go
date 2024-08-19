@@ -27,8 +27,8 @@ import (
 	mocks2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
-	schedulerConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/ray/batchscheduler/config"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/ray/batchscheduler/scheduler/yunikorn"
+	schedulerConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/batchscheduler/config"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/batchscheduler/scheduler/yunikorn"
 )
 
 const (
