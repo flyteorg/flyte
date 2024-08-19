@@ -14,7 +14,7 @@ import (
 func TestRegisterHandlers(t *testing.T) {
 	t.Run("No OAuth2 Provider, no registration required", func(t *testing.T) {
 		registerer := &mocks.HandlerRegisterer{}
-		RegisterHandlers(registerer, auth.Context{})
+		RegisterHandlers(registerer, &auth.Context{})
 	})
 
 	t.Run("Register 4 endpoints", func(t *testing.T) {

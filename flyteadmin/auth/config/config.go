@@ -72,6 +72,7 @@ var (
 					"openid",
 					"profile",
 				},
+				OnlyStartIfOIDCIsAvailable: true,
 			},
 			CookieSetting: CookieSettings{
 				Domain:         "",
@@ -271,6 +272,9 @@ type OpenIDOptions struct {
 	// be supported by any OIdC server. Refer to https://openid.net/specs/openid-connect-core-1_0.html#ScopeClaims for
 	// a complete list. Other providers might support additional scopes that you can define in a config.
 	Scopes []string `json:"scopes"`
+
+	// Blocks flyte from starting up until the OIDC provider is healthy and available
+	OnlyStartIfOIDCIsAvailable bool `json:"onlyStartIfOIDCIsAvailable"`
 }
 
 func GetConfig() *Config {
