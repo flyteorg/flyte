@@ -49,8 +49,8 @@ jobs:
           command: build
           args: --release --out dist --find-interpreter -m flyteidl/Cargo.toml
           before-script-linux: |
-            echo "Starting before-script-linux for target: ${{ matrix.target }}"
-            case "${{ matrix.target }}" in
+            echo "Starting before-script-linux for target: ${{ matrix.platform.target }}"
+            case "${{ matrix.platform.target }}" in
               "aarch64" | "armv7" | "s390x" | "ppc64le")
                 echo "Running on a Debian-based system"
                 # NOTE: pypa/manylinux docker images are Debian based
