@@ -27,10 +27,6 @@ jobs:
         platform:
           - runner: ubuntu-latest
             target: x86_64
-          - runner: ubuntu-latest
-            target: armv7
-          - runner: ubuntu-latest
-            target: ppc64le
         python-version: 
           - '3.9'
           - '3.10'
@@ -53,7 +49,6 @@ jobs:
             rm -rf ./gen/pb_rust/*
             cargo run --bin gen_flyteidl
             cd ../
-            export PYO3_CROSS_PYTHON_VERSION=${{ matrix.python-version }}
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
