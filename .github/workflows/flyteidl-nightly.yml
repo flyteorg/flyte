@@ -55,12 +55,12 @@ jobs:
               "aarch64" | "armv7" | "s390x" | "ppc64le")
                 # NOTE: pypa/manylinux docker images are Debian based
                 sudo apt-get update
-                sudo apt-get install -y pkg-config libssl-dev
+                sudo apt-get install -y pkg-config libssl-dev libkrb5-dev
                 ;;
               "x86" | "x86_64")
                 # NOTE: rust-cross/manylinux docker images are CentOS based
                 yum update -y
-                yum install -y openssl openssl-devel
+                yum install -y openssl openssl-devel krb5-devel
                 ;;
             esac
       - name: Upload wheels
