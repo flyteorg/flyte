@@ -117,7 +117,7 @@ data:
         stackdriver-enabled: false
       k8s:
         co-pilot:
-          image: "cr.flyte.org/flyteorg/flytecopilot:v1.13.0"
+          image: "cr.flyte.org/flyteorg/flytecopilot:v1.13.1-rc0"
       k8s-array:
         logs:
           config:
@@ -360,7 +360,7 @@ spec:
         app.kubernetes.io/instance: flyte
         app.kubernetes.io/component: flyte-binary
       annotations:
-        checksum/configuration: 807720e9e2010abdad27679b5c87780ed30b8d4668d3773542a31795cf727708
+        checksum/configuration: c7a38eb6b15d0c6d0030e88cbd1750bc31bda831d7ea3c3494f4a90a05a3597f
         checksum/configuration-secret: d5d93f4e67780b21593dc3799f0f6682aab0765e708e4020939975d14d44f929
         checksum/cluster-resource-templates: 7dfa59f3d447e9c099b8f8ffad3af466fecbc9cf9f8c97295d9634254a55d4ae
     spec:

@@ -61,6 +61,15 @@ func GetExecutionEnvVars(id pluginsCore.TaskExecutionID, consoleURL string) []v1
 			Value: nodeExecutionID.Domain,
 		},
 		{
+			// FLYTE_INTERNAL_POD_NAME
+			Name: "_F_PN",
+			ValueFrom: &v1.EnvVarSource{
+				FieldRef: &v1.ObjectFieldSelector{
+					FieldPath: "metadata.name",
+				},
+			},
+		},
+		{
 			Name:  "FLYTE_ATTEMPT_NUMBER",
 			Value: attemptNumber,
 		},

@@ -15,7 +15,6 @@ import (
 func (m *AdminService) CreateWorkflow(
 	ctx context.Context,
 	request *admin.WorkflowCreateRequest) (*admin.WorkflowCreateResponse, error) {
-	defer m.interceptPanic(ctx, request)
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
@@ -32,7 +31,6 @@ func (m *AdminService) CreateWorkflow(
 }
 
 func (m *AdminService) GetWorkflow(ctx context.Context, request *admin.ObjectGetRequest) (*admin.Workflow, error) {
-	defer m.interceptPanic(ctx, request)
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
@@ -56,7 +54,6 @@ func (m *AdminService) GetWorkflow(ctx context.Context, request *admin.ObjectGet
 
 func (m *AdminService) ListWorkflowIds(ctx context.Context, request *admin.NamedEntityIdentifierListRequest) (
 	*admin.NamedEntityIdentifierList, error) {
-	defer m.interceptPanic(ctx, request)
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
@@ -75,7 +72,6 @@ func (m *AdminService) ListWorkflowIds(ctx context.Context, request *admin.Named
 }
 
 func (m *AdminService) ListWorkflows(ctx context.Context, request *admin.ResourceListRequest) (*admin.WorkflowList, error) {
-	defer m.interceptPanic(ctx, request)
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}

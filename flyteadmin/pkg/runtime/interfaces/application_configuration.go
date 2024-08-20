@@ -106,6 +106,9 @@ type ApplicationConfig struct {
 
 	// A URL pointing to the flyteconsole instance used to hit this flyteadmin instance.
 	ConsoleURL string `json:"consoleUrl,omitempty" pflag:",A URL pointing to the flyteconsole instance used to hit this flyteadmin instance."`
+
+	// Enabling this will instruct operator to use storage (s3/gcs/etc) to offload workflow execution inputs instead of storing them inline in the CRD.
+	UseOffloadedInputs bool `json:"useOffloadedInputs" pflag:",Use offloaded inputs for workflows."`
 }
 
 func (a *ApplicationConfig) GetRoleNameKey() string {

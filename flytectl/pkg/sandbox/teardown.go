@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 	"github.com/enescakir/emoji"
 	sandboxCmdConfig "github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/sandbox"
 	"github.com/flyteorg/flyte/flytectl/pkg/configutil"
@@ -19,7 +19,7 @@ func Teardown(ctx context.Context, cli docker.Docker, teardownFlags *sandboxCmdC
 		return err
 	}
 	if c != nil {
-		if err := cli.ContainerRemove(context.Background(), c.ID, types.ContainerRemoveOptions{
+		if err := cli.ContainerRemove(context.Background(), c.ID, container.RemoveOptions{
 			Force: true,
 		}); err != nil {
 			return err
