@@ -525,7 +525,7 @@ func TestAddFlyteCustomizationsToContainer(t *testing.T) {
 	assert.EqualValues(t, container.Command, []string{"s3://input/path"})
 	assert.Len(t, container.Resources.Limits, 3)
 	assert.Len(t, container.Resources.Requests, 3)
-	assert.Len(t, container.Env, 12)
+	assert.Len(t, container.Env, 13)
 }
 
 func TestAddFlyteCustomizationsToContainer_Resources(t *testing.T) {
