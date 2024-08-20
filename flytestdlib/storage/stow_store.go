@@ -126,6 +126,16 @@ func (s StowMetadata) ContentMD5() string {
 	return s.contentMD5
 }
 
+type StowCursor struct {
+	value string
+}
+
+func (s StowCursor) IsStartCursor() bool
+
+IsEndCursor() bool
+MoveToStart()
+MoveToEnd()
+
 // Implements DataStore to talk to stow location store.
 type StowStore struct {
 	copyImpl
@@ -249,6 +259,10 @@ func (s *StowStore) Head(ctx context.Context, reference DataReference) (Metadata
 
 	incFailureCounterForError(ctx, s.metrics.HeadFailure, err)
 	return StowMetadata{exists: false}, errs.Wrapf(err, "path:%v", k)
+}
+
+func (s *StowStore) List(ctx context.Context, reference DataReference, maxItems int, cursor Cursor) ([]Metadata, Cursor, error) {
+	// TODO
 }
 
 func (s *StowStore) ReadRaw(ctx context.Context, reference DataReference) (io.ReadCloser, error) {
