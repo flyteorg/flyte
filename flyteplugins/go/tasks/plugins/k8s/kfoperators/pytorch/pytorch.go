@@ -56,6 +56,7 @@ func (pytorchOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx
 	var elasticPolicy *kubeflowv1.ElasticPolicy
 
 	var masterReplicaSpec, workerReplicaSpec *commonOp.ReplicaSpec
+	var metadataLabels map[string]string
 
 	if taskTemplate.TaskTypeVersion == 0 {
 		pytorchTaskExtraArgs := plugins.DistributedPyTorchTrainingTask{}
@@ -107,6 +108,8 @@ func (pytorchOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx
 		if elasticConfig != nil {
 			elasticPolicy = ParseElasticConfig(elasticConfig)
 		}
+
+		metadataLabels = kfPytorchTaskExtraArgs.GetMetadataLabels()
 	} else {
 		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification,
 			"Invalid TaskSpecification, unsupported task template version [%v] key", taskTemplate.TaskTypeVersion)
@@ -136,6 +139,9 @@ func (pytorchOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx
 			APIVersion: kubeflowv1.SchemeGroupVersion.String(),
 		},
 		Spec: jobSpec,
+	}
+	if metadataLabels != nil {
+		job.ObjectMeta.Labels = metadataLabels
 	}
 
 	return job, nil

@@ -32,6 +32,9 @@ message DistributedPyTorchTrainingTask {
 
   // config for an elastic pytorch job
   ElasticConfig elastic_config = 4;
+
+  // custom metadata labels useful for scheduler integrations
+  map<string, string> metadata_labels = 5;
 }
 
 message DistributedPyTorchTrainingReplicaSpec {

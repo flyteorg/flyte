@@ -109,6 +109,11 @@ export class DistributedPyTorchTrainingTask extends Message<DistributedPyTorchTr
    */
   elasticConfig?: ElasticConfig;
 
+  /**
+   * @generated from field: map<string, string> metadata_labels = 5;
+   */
+  metadataLabels: { [key: string]: string } = {};
+
   constructor(data?: PartialMessage<DistributedPyTorchTrainingTask>) {
     super();
     proto3.util.initPartial(data, this);
@@ -121,6 +126,7 @@ export class DistributedPyTorchTrainingTask extends Message<DistributedPyTorchTr
     { no: 2, name: "master_replicas", kind: "message", T: DistributedPyTorchTrainingReplicaSpec },
     { no: 3, name: "run_policy", kind: "message", T: RunPolicy },
     { no: 4, name: "elastic_config", kind: "message", T: ElasticConfig },
+    { no: 5, name: "metadata_labels", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DistributedPyTorchTrainingTask {

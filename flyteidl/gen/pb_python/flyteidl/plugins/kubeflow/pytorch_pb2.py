@@ -19,7 +19,7 @@ except AttributeError:
   flyteidl_dot_plugins_dot_common__pb2 = flyteidl_dot_plugins_dot_kubeflow_dot_common__pb2.flyteidl.plugins.common_pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\'flyteidl/plugins/kubeflow/pytorch.proto\x12\x19\x66lyteidl.plugins.kubeflow\x1a\x19\x66lyteidl/core/tasks.proto\x1a&flyteidl/plugins/kubeflow/common.proto\"\xc1\x01\n\rElasticConfig\x12!\n\x0crdzv_backend\x18\x01 \x01(\tR\x0brdzvBackend\x12!\n\x0cmin_replicas\x18\x02 \x01(\x05R\x0bminReplicas\x12!\n\x0cmax_replicas\x18\x03 \x01(\x05R\x0bmaxReplicas\x12$\n\x0enproc_per_node\x18\x04 \x01(\x05R\x0cnprocPerNode\x12!\n\x0cmax_restarts\x18\x05 \x01(\x05R\x0bmaxRestarts\"\x8c\x03\n\x1e\x44istributedPyTorchTrainingTask\x12i\n\x0fworker_replicas\x18\x01 \x01(\x0b\x32@.flyteidl.plugins.kubeflow.DistributedPyTorchTrainingReplicaSpecR\x0eworkerReplicas\x12i\n\x0fmaster_replicas\x18\x02 \x01(\x0b\x32@.flyteidl.plugins.kubeflow.DistributedPyTorchTrainingReplicaSpecR\x0emasterReplicas\x12\x43\n\nrun_policy\x18\x03 \x01(\x0b\x32$.flyteidl.plugins.kubeflow.RunPolicyR\trunPolicy\x12O\n\x0e\x65lastic_config\x18\x04 \x01(\x0b\x32(.flyteidl.plugins.kubeflow.ElasticConfigR\relasticConfig\"\xa6\x02\n%DistributedPyTorchTrainingReplicaSpec\x12\x1e\n\x08replicas\x18\x01 \x01(\x05\x42\x02\x18\x01R\x08replicas\x12\x18\n\x05image\x18\x02 \x01(\tB\x02\x18\x01R\x05image\x12:\n\tresources\x18\x03 \x01(\x0b\x32\x18.flyteidl.core.ResourcesB\x02\x18\x01R\tresources\x12J\n\x0erestart_policy\x18\x04 \x01(\x0e\x32\x1f.flyteidl.plugins.RestartPolicyB\x02\x18\x01R\rrestartPolicy\x12;\n\x06\x63ommon\x18\x05 \x01(\x0b\x32#.flyteidl.plugins.CommonReplicaSpecR\x06\x63ommonB\xfb\x01\n\x1d\x63om.flyteidl.plugins.kubeflowB\x0cPytorchProtoP\x01ZFgithub.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins/kubeflow\xa2\x02\x03\x46PK\xaa\x02\x19\x46lyteidl.Plugins.Kubeflow\xca\x02\x19\x46lyteidl\\Plugins\\Kubeflow\xe2\x02%Flyteidl\\Plugins\\Kubeflow\\GPBMetadata\xea\x02\x1b\x46lyteidl::Plugins::Kubeflowb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\'flyteidl/plugins/kubeflow/pytorch.proto\x12\x19\x66lyteidl.plugins.kubeflow\x1a\x19\x66lyteidl/core/tasks.proto\x1a&flyteidl/plugins/kubeflow/common.proto\"\xc1\x01\n\rElasticConfig\x12!\n\x0crdzv_backend\x18\x01 \x01(\tR\x0brdzvBackend\x12!\n\x0cmin_replicas\x18\x02 \x01(\x05R\x0bminReplicas\x12!\n\x0cmax_replicas\x18\x03 \x01(\x05R\x0bmaxReplicas\x12$\n\x0enproc_per_node\x18\x04 \x01(\x05R\x0cnprocPerNode\x12!\n\x0cmax_restarts\x18\x05 \x01(\x05R\x0bmaxRestarts\"\xc7\x04\n\x1e\x44istributedPyTorchTrainingTask\x12i\n\x0fworker_replicas\x18\x01 \x01(\x0b\x32@.flyteidl.plugins.kubeflow.DistributedPyTorchTrainingReplicaSpecR\x0eworkerReplicas\x12i\n\x0fmaster_replicas\x18\x02 \x01(\x0b\x32@.flyteidl.plugins.kubeflow.DistributedPyTorchTrainingReplicaSpecR\x0emasterReplicas\x12\x43\n\nrun_policy\x18\x03 \x01(\x0b\x32$.flyteidl.plugins.kubeflow.RunPolicyR\trunPolicy\x12O\n\x0e\x65lastic_config\x18\x04 \x01(\x0b\x32(.flyteidl.plugins.kubeflow.ElasticConfigR\relasticConfig\x12v\n\x0fmetadata_labels\x18\x05 \x03(\x0b\x32M.flyteidl.plugins.kubeflow.DistributedPyTorchTrainingTask.MetadataLabelsEntryR\x0emetadataLabels\x1a\x41\n\x13MetadataLabelsEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\"\xa6\x02\n%DistributedPyTorchTrainingReplicaSpec\x12\x1e\n\x08replicas\x18\x01 \x01(\x05\x42\x02\x18\x01R\x08replicas\x12\x18\n\x05image\x18\x02 \x01(\tB\x02\x18\x01R\x05image\x12:\n\tresources\x18\x03 \x01(\x0b\x32\x18.flyteidl.core.ResourcesB\x02\x18\x01R\tresources\x12J\n\x0erestart_policy\x18\x04 \x01(\x0e\x32\x1f.flyteidl.plugins.RestartPolicyB\x02\x18\x01R\rrestartPolicy\x12;\n\x06\x63ommon\x18\x05 \x01(\x0b\x32#.flyteidl.plugins.CommonReplicaSpecR\x06\x63ommonB\xfb\x01\n\x1d\x63om.flyteidl.plugins.kubeflowB\x0cPytorchProtoP\x01ZFgithub.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins/kubeflow\xa2\x02\x03\x46PK\xaa\x02\x19\x46lyteidl.Plugins.Kubeflow\xca\x02\x19\x46lyteidl\\Plugins\\Kubeflow\xe2\x02%Flyteidl\\Plugins\\Kubeflow\\GPBMetadata\xea\x02\x1b\x46lyteidl::Plugins::Kubeflowb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -28,6 +28,8 @@ if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
   DESCRIPTOR._serialized_options = b'\n\035com.flyteidl.plugins.kubeflowB\014PytorchProtoP\001ZFgithub.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins/kubeflow\242\002\003FPK\252\002\031Flyteidl.Plugins.Kubeflow\312\002\031Flyteidl\\Plugins\\Kubeflow\342\002%Flyteidl\\Plugins\\Kubeflow\\GPBMetadata\352\002\033Flyteidl::Plugins::Kubeflow'
+  _DISTRIBUTEDPYTORCHTRAININGTASK_METADATALABELSENTRY._options = None
+  _DISTRIBUTEDPYTORCHTRAININGTASK_METADATALABELSENTRY._serialized_options = b'8\001'
   _DISTRIBUTEDPYTORCHTRAININGREPLICASPEC.fields_by_name['replicas']._options = None
   _DISTRIBUTEDPYTORCHTRAININGREPLICASPEC.fields_by_name['replicas']._serialized_options = b'\030\001'
   _DISTRIBUTEDPYTORCHTRAININGREPLICASPEC.fields_by_name['image']._options = None
@@ -39,7 +41,9 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['_ELASTICCONFIG']._serialized_start=138
   _globals['_ELASTICCONFIG']._serialized_end=331
   _globals['_DISTRIBUTEDPYTORCHTRAININGTASK']._serialized_start=334
-  _globals['_DISTRIBUTEDPYTORCHTRAININGTASK']._serialized_end=730
-  _globals['_DISTRIBUTEDPYTORCHTRAININGREPLICASPEC']._serialized_start=733
-  _globals['_DISTRIBUTEDPYTORCHTRAININGREPLICASPEC']._serialized_end=1027
+  _globals['_DISTRIBUTEDPYTORCHTRAININGTASK']._serialized_end=917
+  _globals['_DISTRIBUTEDPYTORCHTRAININGTASK_METADATALABELSENTRY']._serialized_start=852
+  _globals['_DISTRIBUTEDPYTORCHTRAININGTASK_METADATALABELSENTRY']._serialized_end=917
+  _globals['_DISTRIBUTEDPYTORCHTRAININGREPLICASPEC']._serialized_start=920
+  _globals['_DISTRIBUTEDPYTORCHTRAININGREPLICASPEC']._serialized_end=1214
 # @@protoc_insertion_point(module_scope)

@@ -787,6 +787,7 @@ func TestBuildResourcePytorchV1(t *testing.T) {
 					},
 				},
 			},
+			MetadataLabels: map[string]string{"some": "label"},
 		},
 		{
 			MasterReplicas: &kfplugins.DistributedPyTorchTrainingReplicaSpec{
@@ -823,7 +824,7 @@ func TestBuildResourcePytorchV1(t *testing.T) {
 		},
 	}
 
-	for _, taskConfig := range taskConfigs {
+	for index, taskConfig := range taskConfigs {
 		masterResourceRequirements := &corev1.ResourceRequirements{
 			Requests: corev1.ResourceList{
 				corev1.ResourceCPU:    resource.MustParse("250m"),
@@ -876,6 +877,12 @@ func TestBuildResourcePytorchV1(t *testing.T) {
 		assert.Nil(t, pytorchJob.Spec.RunPolicy.ActiveDeadlineSeconds)
 
 		assert.Nil(t, pytorchJob.Spec.ElasticPolicy)
+
+		if index == 0 {
+			assert.Equal(t, pytorchJob.ObjectMeta.Labels, map[string]string{"some": "label"})
+		} else {
+			assert.Nil(t, pytorchJob.ObjectMeta.Labels)
+		}
 	}
 }
 

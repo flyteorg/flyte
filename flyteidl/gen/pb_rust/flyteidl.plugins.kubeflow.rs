@@ -126,6 +126,8 @@ pub struct DistributedPyTorchTrainingTask {
     /// config for an elastic pytorch job
     #[prost(message, optional, tag="4")]
     pub elastic_config: ::core::option::Option<ElasticConfig>,
+    #[prost(map="string, string", tag="5")]
+    pub metadata_labels: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]

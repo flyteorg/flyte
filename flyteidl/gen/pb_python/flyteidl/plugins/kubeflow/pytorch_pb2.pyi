@@ -1,6 +1,7 @@
 from flyteidl.core import tasks_pb2 as _tasks_pb2
 from flyteidl.plugins.kubeflow import common_pb2 as _common_pb2
 from flyteidl.plugins import common_pb2 as _common_pb2_1
+from google.protobuf.internal import containers as _containers
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from typing import ClassVar as _ClassVar, Mapping as _Mapping, Optional as _Optional, Union as _Union
@@ -22,16 +23,25 @@ class ElasticConfig(_message.Message):
     def __init__(self, rdzv_backend: _Optional[str] = ..., min_replicas: _Optional[int] = ..., max_replicas: _Optional[int] = ..., nproc_per_node: _Optional[int] = ..., max_restarts: _Optional[int] = ...) -> None: ...
 
 class DistributedPyTorchTrainingTask(_message.Message):
-    __slots__ = ["worker_replicas", "master_replicas", "run_policy", "elastic_config"]
+    __slots__ = ["worker_replicas", "master_replicas", "run_policy", "elastic_config", "metadata_labels"]
+    class MetadataLabelsEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
     WORKER_REPLICAS_FIELD_NUMBER: _ClassVar[int]
     MASTER_REPLICAS_FIELD_NUMBER: _ClassVar[int]
     RUN_POLICY_FIELD_NUMBER: _ClassVar[int]
     ELASTIC_CONFIG_FIELD_NUMBER: _ClassVar[int]
+    METADATA_LABELS_FIELD_NUMBER: _ClassVar[int]
     worker_replicas: DistributedPyTorchTrainingReplicaSpec
     master_replicas: DistributedPyTorchTrainingReplicaSpec
     run_policy: _common_pb2.RunPolicy
     elastic_config: ElasticConfig
-    def __init__(self, worker_replicas: _Optional[_Union[DistributedPyTorchTrainingReplicaSpec, _Mapping]] = ..., master_replicas: _Optional[_Union[DistributedPyTorchTrainingReplicaSpec, _Mapping]] = ..., run_policy: _Optional[_Union[_common_pb2.RunPolicy, _Mapping]] = ..., elastic_config: _Optional[_Union[ElasticConfig, _Mapping]] = ...) -> None: ...
+    metadata_labels: _containers.ScalarMap[str, str]
+    def __init__(self, worker_replicas: _Optional[_Union[DistributedPyTorchTrainingReplicaSpec, _Mapping]] = ..., master_replicas: _Optional[_Union[DistributedPyTorchTrainingReplicaSpec, _Mapping]] = ..., run_policy: _Optional[_Union[_common_pb2.RunPolicy, _Mapping]] = ..., elastic_config: _Optional[_Union[ElasticConfig, _Mapping]] = ..., metadata_labels: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class DistributedPyTorchTrainingReplicaSpec(_message.Message):
     __slots__ = ["replicas", "image", "resources", "restart_policy", "common"]
