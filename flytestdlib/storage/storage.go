@@ -40,6 +40,8 @@ type Metadata interface {
 	ContentMD5() string
 }
 
+// DataStore is a simplified interface for accessing and storing data in one of the Cloud stores.
+// Today we rely on Stow for multi-cloud support, but this interface abstracts that part
 type DataStore struct {
 	ComposedProtobufStore
 	ReferenceConstructor
