@@ -118,7 +118,8 @@ type DistributedPyTorchTrainingTask struct {
 	// active.
 	RunPolicy *RunPolicy `protobuf:"bytes,3,opt,name=run_policy,json=runPolicy,proto3" json:"run_policy,omitempty"`
 	// config for an elastic pytorch job
-	ElasticConfig  *ElasticConfig    `protobuf:"bytes,4,opt,name=elastic_config,json=elasticConfig,proto3" json:"elastic_config,omitempty"`
+	ElasticConfig *ElasticConfig `protobuf:"bytes,4,opt,name=elastic_config,json=elasticConfig,proto3" json:"elastic_config,omitempty"`
+	// custom metadata labels useful for scheduler integrations
 	MetadataLabels map[string]string `protobuf:"bytes,5,rep,name=metadata_labels,json=metadataLabels,proto3" json:"metadata_labels,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 }
 

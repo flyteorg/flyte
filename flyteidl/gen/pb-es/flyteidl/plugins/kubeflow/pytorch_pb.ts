@@ -110,6 +110,8 @@ export class DistributedPyTorchTrainingTask extends Message<DistributedPyTorchTr
   elasticConfig?: ElasticConfig;
 
   /**
+   * custom metadata labels useful for scheduler integrations
+   *
    * @generated from field: map<string, string> metadata_labels = 5;
    */
   metadataLabels: { [key: string]: string } = {};

@@ -126,6 +126,7 @@ pub struct DistributedPyTorchTrainingTask {
     /// config for an elastic pytorch job
     #[prost(message, optional, tag="4")]
     pub elastic_config: ::core::option::Option<ElasticConfig>,
+    /// custom metadata labels useful for scheduler integrations
     #[prost(map="string, string", tag="5")]
     pub metadata_labels: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
 }
