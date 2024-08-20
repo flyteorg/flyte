@@ -126,16 +126,6 @@ func (s StowMetadata) ContentMD5() string {
 	return s.contentMD5
 }
 
-type StowCursor struct {
-	value string
-}
-
-func (s StowCursor) IsStartCursor() bool
-
-IsEndCursor() bool
-MoveToStart()
-MoveToEnd()
-
 // Implements DataStore to talk to stow location store.
 type StowStore struct {
 	copyImpl

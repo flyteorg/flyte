@@ -40,13 +40,6 @@ type Metadata interface {
 	ContentMD5() string
 }
 
-type Cursor interface {
-	IsStartCursor() bool
-	IsEndCursor() bool
-	MoveToStart()
-	MoveToEnd()
-}
-
 type DataStore struct {
 	ComposedProtobufStore
 	ReferenceConstructor
@@ -82,9 +75,6 @@ type RawStore interface {
 
 	// Head gets metadata about the reference. This should generally be a light weight operation.
 	Head(ctx context.Context, reference DataReference) (Metadata, error)
-
-	// List gets a list of items given a prefix, using a paginated API
-	List(ctx context.Context, reference DataReference, maxItems int, cursor Cursor) ([]Metadata, Cursor, error)
 
 	// ReadRaw retrieves a byte array from the Blob store or an error
 	ReadRaw(ctx context.Context, reference DataReference) (io.ReadCloser, error)
