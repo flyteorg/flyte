@@ -68,6 +68,9 @@ func ValidateExecutionRequest(ctx context.Context, request admin.ExecutionCreate
 			return err
 		}
 	}
+	if err := validateLabels(request.Spec.Labels); err != nil {
+		return err
+	}
 	return nil
 }
 
