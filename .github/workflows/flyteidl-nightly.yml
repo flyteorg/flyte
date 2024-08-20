@@ -13,7 +13,7 @@ on:
 permissions:
   contents: write
   actions: read
-        
+
 jobs:
   release-nightly:
     if: github.repository == 'austin362667/flyte'
@@ -21,7 +21,6 @@ jobs:
     permissions:
       contents: write
       actions: read
-    needs: [linux, musllinux, windows, macos, sdist]
     steps:
       - uses: actions/download-artifact@v4
       - name: Publish to PyPI
