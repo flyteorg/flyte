@@ -163,13 +163,15 @@ jobs:
       contents: write
     steps:
       - uses: actions/download-artifact@v4
+        with:
+          path: ./wheels
       - name: Publish to PyPI
         uses: PyO3/maturin-action@v1
         env:
           MATURIN_PYPI_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
         with:
           command: upload
-          args: --non-interactive --skip-existing --index-url https://test.pypi.org/simple/ wheels-*/*
+          args: --non-interactive --skip-existing --repository-url https://test.pypi.org/legacy/ ./wheels/*
 
 
   nightly:
@@ -181,10 +183,12 @@ jobs:
       actions: read
     steps:
       - uses: actions/download-artifact@v4
+        with:
+          path: ./wheels
       - name: Publish to PyPI
         uses: PyO3/maturin-action@v1
         env:
           MATURIN_PYPI_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
         with:
           command: upload
-          args: --non-interactive --skip-existing --index-url https://test.pypi.org/simple/ wheels-*/*
+          args: --non-interactive --skip-existing --repository-url https://test.pypi.org/legacy/ ./wheels/*
