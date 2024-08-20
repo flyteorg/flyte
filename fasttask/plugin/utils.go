@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"k8s.io/api/core/v1"
+	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 
@@ -39,4 +40,8 @@ func isValidEnvironmentSpec(executionEnvironmentID core.ExecutionEnvID, fastTask
 	}
 
 	return nil
+}
+
+func isPodNotFoundErr(err error) bool {
+	return k8serrors.IsNotFound(err) || k8serrors.IsGone(err)
 }

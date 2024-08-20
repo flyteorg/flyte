@@ -41,23 +41,39 @@ const (
 	EXECUTION_ENV_ID   = "execution-env-id"
 	EXECUTION_ENV_TYPE = "execution-env-type"
 	TTL_SECONDS        = "ttl-seconds"
+	PROJECT_LABEL      = "project"
+	DOMAIN_LABEL       = "domain"
+	ORGANIZATION_LABEL = "organization"
 )
 
 // builderMetrics is a collection of metrics for the InMemoryEnvBuilder.
 type builderMetrics struct {
-	environmentsCreated        prometheus.Counter
-	environmentsGCed           prometheus.Counter
-	environmentOrphansDetected prometheus.Counter
-	environmentsRepaired       prometheus.Counter
+	environmentsCreated        *prometheus.CounterVec
+	environmentsGCed           *prometheus.CounterVec
+	environmentOrphansDetected *prometheus.CounterVec
+	environmentsRepaired       *prometheus.CounterVec
+	podsCreated                *prometheus.CounterVec
+	podCreationErrors          *prometheus.CounterVec
+	podsDeleted                *prometheus.CounterVec
+	podsDeletionErrors         *prometheus.CounterVec
 }
 
 // newBuilderMetrics creates a new builderMetrics with the given scope.
 func newBuilderMetrics(scope promutils.Scope) builderMetrics {
 	return builderMetrics{
-		environmentsCreated:        scope.MustNewCounter("env_created", "The number of environments created"),
-		environmentsGCed:           scope.MustNewCounter("env_gced", "The number of environments garbage collected"),
-		environmentOrphansDetected: scope.MustNewCounter("env_orphans_detected", "The number of orphaned environments detected"),
-		environmentsRepaired:       scope.MustNewCounter("env_repaired", "The number of environments repaired"),
+		environmentsCreated:        scope.MustNewCounterVec("env_created", "The number of environments created", "project", "domain"),
+		environmentsGCed:           scope.MustNewCounterVec("env_gced", "The number of environments garbage collected", "project", "domain"),
+		environmentOrphansDetected: scope.MustNewCounterVec("env_orphans_detected", "The number of orphaned environments detected", "project", "domain"),
+		environmentsRepaired: scope.MustNewCounterVec("environments_repaired_total",
+			"Total number of environments successfully repaired", "project", "domain"),
+		podsCreated: scope.MustNewCounterVec("pods_created_total",
+			"Total number of pods recreated during repair", "project", "domain", "purpose"),
+		podCreationErrors: scope.MustNewCounterVec("pod_creation_errors_total",
+			"Total number of errors encountered during pod creation", "project", "domain", "purpose"),
+		podsDeleted: scope.MustNewCounterVec("pods_deleted_total",
+			"Total number of pods deleted", "project", "domain", "purpose"),
+		podsDeletionErrors: scope.MustNewCounterVec("pod_deletion_errors_total",
+			"Total number of errors encountered during pod deletion", "project", "domain", "purpose"),
 	}
 }
 
@@ -70,6 +86,8 @@ type environment struct {
 	replicas       []string
 	spec           *pb.FastTaskEnvironmentSpec
 	state          state
+	// Adds the execution environment ID to the environment struct as well for easier lookup
+	executionEnvID core.ExecutionEnvID
 }
 
 // InMemoryEnvBuilder is an in-memory implementation of the ExecutionEnvBuilder interface. It is
@@ -94,6 +112,7 @@ func (i *InMemoryEnvBuilder) Get(ctx context.Context, executionEnvID core.Execut
 			return environment.extant
 		}
 	}
+	logger.Debugf(ctx, "environment '%s' not found", executionEnvID)
 	return nil
 }
 
@@ -128,7 +147,7 @@ func (i *InMemoryEnvBuilder) Create(ctx context.Context, executionEnvID core.Exe
 	env, exists := i.environments[executionEnvID.String()]
 	if exists && env.state != ORPHANED {
 		i.lock.Unlock()
-
+		logger.Debugf(ctx, "environment '%s' already exists", executionEnvID)
 		// if exists we created from another task in race condition between `Get` and `Create`
 		return env.extant, nil
 	}
@@ -148,35 +167,45 @@ func (i *InMemoryEnvBuilder) Create(ctx context.Context, executionEnvID core.Exe
 		replicas:       replicas,
 		spec:           fastTaskEnvironmentSpec,
 		state:          HEALTHY,
+		executionEnvID: executionEnvID,
 	}
 
 	podNames := make([]string, 0)
 	for replica := len(env.replicas); replica < int(fastTaskEnvironmentSpec.GetReplicaCount()); replica++ {
-		nonceBytes := make([]byte, (GetConfig().NonceLength+1)/2)
-		if _, err := i.randSource.Read(nonceBytes); err != nil {
-			return nil, err
-		}
-
-		podName := fmt.Sprintf("%s-%s", env.name, hex.EncodeToString(nonceBytes)[:GetConfig().NonceLength])
+		podName := i.getPodName(env.name)
 		env.replicas = append(env.replicas, podName)
 		podNames = append(podNames, podName)
 	}
 
 	i.environments[executionEnvID.String()] = env
-	i.metrics.environmentsCreated.Inc()
+	metricLabels := []string{executionEnvID.Project, executionEnvID.Domain}
+	i.metrics.environmentsCreated.WithLabelValues(metricLabels...).Inc()
 
 	i.lock.Unlock()
 
+	metricLabels = append(metricLabels, "create")
 	// create replicas
 	for _, podName := range podNames {
 		logger.Debugf(ctx, "creating pod '%s' for environment '%s'", podName, executionEnvID)
 		if err := i.createPod(ctx, fastTaskEnvironmentSpec, executionEnvID.String(), podName); err != nil {
 			logger.Warnf(ctx, "failed to create pod '%s' for environment '%s' [%v]", podName, executionEnvID, err)
+			i.metrics.podCreationErrors.WithLabelValues(metricLabels...).Inc()
+		} else {
+			i.metrics.podsCreated.WithLabelValues(metricLabels...).Inc()
 		}
 	}
 
 	logger.Infof(ctx, "created environment '%s'", executionEnvID)
 	return env.extant, nil
+}
+
+func (i *InMemoryEnvBuilder) getPodName(envName string) string {
+	nonceBytes := make([]byte, (GetConfig().NonceLength+1)/2)
+	if _, err := i.randSource.Read(nonceBytes); err != nil {
+		return ""
+	}
+
+	return fmt.Sprintf("%s-%s", envName, hex.EncodeToString(nonceBytes)[:GetConfig().NonceLength])
 }
 
 // Status returns the status of the environment with the given execution environment ID. This
@@ -188,6 +217,7 @@ func (i *InMemoryEnvBuilder) Status(ctx context.Context, executionEnvID core.Exe
 	// check if environment exists
 	environment, exists := i.environments[executionEnvID.String()]
 	if !exists {
+		logger.Debugf(ctx, "environment '%s' not found", executionEnvID)
 		return nil, nil
 	}
 
@@ -207,7 +237,7 @@ func (i *InMemoryEnvBuilder) Status(ctx context.Context, executionEnvID core.Exe
 			Namespace: podTemplateSpec.Namespace,
 		}, &pod)
 
-		if k8serrors.IsNotFound(err) || k8serrors.IsGone(err) {
+		if isPodNotFoundErr(err) {
 			statuses[podName] = nil
 		} else {
 			statuses[podName] = &pod
@@ -392,12 +422,16 @@ func (i *InMemoryEnvBuilder) gcEnvironments(ctx context.Context) error {
 	deletedEnvironments := make([]string, 0)
 	for environmentID, podNames := range environmentReplicas {
 		deleted := true
+		metricLabels := append(i.getMetricLabels(environmentID), "gc")
 		for _, podName := range podNames {
 			logger.Debugf(ctx, "deleting pod '%s' for environment '%s'", podName, environmentID)
 			err := i.deletePod(ctx, podName)
 			if err != nil && !k8serrors.IsNotFound(err) {
 				logger.Warnf(ctx, "failed to gc pod '%s' for environment '%s' [%v]", podName, environmentID, err)
 				deleted = false
+				i.metrics.podsDeletionErrors.WithLabelValues(metricLabels...).Inc()
+			} else {
+				i.metrics.podsDeleted.WithLabelValues(metricLabels...).Inc()
 			}
 		}
 
@@ -409,14 +443,23 @@ func (i *InMemoryEnvBuilder) gcEnvironments(ctx context.Context) error {
 	// remove deleted environments
 	i.lock.Lock()
 	for _, environmentID := range deletedEnvironments {
+		metricLabels := i.getMetricLabels(environmentID)
 		logger.Infof(ctx, "garbage collected environment '%s'", environmentID)
-		i.metrics.environmentsGCed.Inc()
-
+		i.metrics.environmentsGCed.WithLabelValues(metricLabels...).Inc()
 		delete(i.environments, environmentID)
 	}
 	i.lock.Unlock()
 
 	return nil
+}
+
+// getMetricLabels returns the metric labels for the given environment ID.
+func (i *InMemoryEnvBuilder) getMetricLabels(environmentID string) []string {
+	environment, exists := i.environments[environmentID]
+	if !exists {
+		return nil
+	}
+	return []string{environment.executionEnvID.Project, environment.executionEnvID.Domain}
 }
 
 // repairEnvironments repairs environments that have been externally modified (ie. pod deletion).
@@ -446,7 +489,7 @@ func (i *InMemoryEnvBuilder) repairEnvironments(ctx context.Context) error {
 				Namespace: podTemplateSpec.Namespace,
 			}, pod)
 
-			if k8serrors.IsNotFound(err) || k8serrors.IsGone(err) {
+			if isPodNotFoundErr(err) {
 				nonceBytes := make([]byte, (GetConfig().NonceLength+1)/2)
 				if _, err := i.randSource.Read(nonceBytes); err != nil {
 					return err
@@ -469,10 +512,14 @@ func (i *InMemoryEnvBuilder) repairEnvironments(ctx context.Context) error {
 
 	// attempt to repair replicas
 	for environmentID, environmentSpec := range environmentSpecs {
+		metricLabels := append(i.getMetricLabels(environmentID), "repair")
 		for _, podName := range environmentReplicas[environmentID] {
 			logger.Debugf(ctx, "creating pod '%s' for environment '%s'", podName, environmentID)
 			if err := i.createPod(ctx, &environmentSpec, environmentID, podName); err != nil {
 				logger.Warnf(ctx, "failed to create pod '%s' for environment '%s' [%v]", podName, environmentID, err)
+				i.metrics.podCreationErrors.WithLabelValues(metricLabels...).Inc()
+			} else {
+				i.metrics.podsCreated.WithLabelValues(metricLabels...).Inc()
 			}
 		}
 	}
@@ -487,9 +534,8 @@ func (i *InMemoryEnvBuilder) repairEnvironments(ctx context.Context) error {
 			logger.Warnf(ctx, "environment '%s' was deleted during repair operation", environmentID)
 			continue
 		}
-
 		logger.Infof(ctx, "repaired environment '%s'", environmentID)
-		i.metrics.environmentsRepaired.Inc()
+		i.metrics.environmentsRepaired.WithLabelValues(i.getMetricLabels(environmentID)...).Inc()
 
 		environment.state = HEALTHY
 	}
@@ -580,7 +626,8 @@ func (i *InMemoryEnvBuilder) detectOrphanedEnvironments(ctx context.Context, k8s
 						TtlSeconds: int32(ttlSeconds),
 					},
 				},
-				state: ORPHANED,
+				state:          ORPHANED,
+				executionEnvID: core.ExecutionEnvID{Project: pod.GetLabels()[PROJECT_LABEL], Domain: pod.GetLabels()[DOMAIN_LABEL], Org: pod.GetLabels()[ORGANIZATION_LABEL], Name: environmentID},
 			}
 
 			orphanedEnvironments[environmentID] = orphanedEnvironment
@@ -592,9 +639,10 @@ func (i *InMemoryEnvBuilder) detectOrphanedEnvironments(ctx context.Context, k8s
 	// copy orphaned environments to env builder
 	for environmentID, orphanedEnvironment := range orphanedEnvironments {
 		logger.Infof(ctx, "detected orphaned environment '%s'", environmentID)
-		i.metrics.environmentOrphansDetected.Inc()
-
 		i.environments[environmentID] = orphanedEnvironment
+		// Get the labels after adding to environments map.
+		metricsLabels := i.getMetricLabels(environmentID)
+		i.metrics.environmentOrphansDetected.WithLabelValues(metricsLabels...).Inc()
 	}
 
 	for environmentID, podNames := range orphanedPods {

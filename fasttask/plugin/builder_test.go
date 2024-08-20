@@ -177,7 +177,10 @@ func TestDetectOrphanedEnvironments(t *testing.T) {
 			ObjectMeta: metav1.ObjectMeta{
 				Name: "bar",
 				Labels: map[string]string{
-					EXECUTION_ENV_ID: "foo",
+					EXECUTION_ENV_ID:   "foo",
+					PROJECT_LABEL:      "project",
+					DOMAIN_LABEL:       "domain",
+					ORGANIZATION_LABEL: "",
 				},
 				Annotations: map[string]string{
 					TTL_SECONDS: "60",
@@ -188,7 +191,10 @@ func TestDetectOrphanedEnvironments(t *testing.T) {
 			ObjectMeta: metav1.ObjectMeta{
 				Name: "baz",
 				Labels: map[string]string{
-					EXECUTION_ENV_ID: "foo",
+					EXECUTION_ENV_ID:   "foo",
+					PROJECT_LABEL:      "project",
+					DOMAIN_LABEL:       "domain",
+					ORGANIZATION_LABEL: "",
 				},
 				Annotations: map[string]string{
 					TTL_SECONDS: "60",
