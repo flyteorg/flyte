@@ -1,18 +1,26 @@
 name: Update flyteidl-rust nightly
 
 on:
+  push:
+    branches:
+      - main
+      - master
+      - flyrs
   workflow_dispatch:  # Allow manual triggers
   schedule:
     - cron: "0 * * * *"
 
-permissions: {}
+permissions:
+  contents: write
+  actions: read
         
 jobs:
   release-nightly:
-    if: github.repository == 'tensorflow/tensorflow' # Don't do this in forks
+    if: github.repository == 'austin362667/flyte'
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      actions: read
     needs: [linux, musllinux, windows, macos, sdist]
     steps:
       - uses: actions/download-artifact@v4
