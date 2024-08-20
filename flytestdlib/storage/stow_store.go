@@ -251,10 +251,6 @@ func (s *StowStore) Head(ctx context.Context, reference DataReference) (Metadata
 	return StowMetadata{exists: false}, errs.Wrapf(err, "path:%v", k)
 }
 
-func (s *StowStore) List(ctx context.Context, reference DataReference, maxItems int, cursor Cursor) ([]Metadata, Cursor, error) {
-	// TODO
-}
-
 func (s *StowStore) ReadRaw(ctx context.Context, reference DataReference) (io.ReadCloser, error) {
 	_, c, k, err := reference.Split()
 	if err != nil {
