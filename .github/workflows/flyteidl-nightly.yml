@@ -4,7 +4,7 @@ on:
   release:
     types: [published]
   schedule:
-    - cron: '0 0 * * *'  # This schedules the workflow to run nightly at midnight UTC
+    - cron: '15 * * * *'  # This schedules the workflow to run nightly at midnight UTC
   push:
     branches:
       - main
@@ -167,4 +167,4 @@ jobs:
           MATURIN_PYPI_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
         with:
           command: upload
-          args: --non-interactive --skip-existing --repository testpypi wheels-*/*
+          args: --non-interactive --skip-existing --repository-url https://test.pypi.org/simple/ wheels-*/*
