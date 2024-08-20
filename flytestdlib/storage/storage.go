@@ -40,6 +40,40 @@ type Metadata interface {
 	ContentMD5() string
 }
 
+type CursorPosition int
+
+const (
+	StartCursorPos  CursorPosition = 0
+	EndCursorPos    CursorPosition = 1
+	CustomCursorPos CursorPosition = 2
+)
+
+type Cursor struct {
+	cursorPos   CursorPosition
+	customState string
+}
+
+func NewCursorFromCustomState(customState string) Cursor {
+	return Cursor{
+		cursorPos:   CustomCursorPos,
+		customState: customState,
+	}
+}
+
+func NewCursorAtStart() Cursor {
+	return Cursor{
+		cursorPos:   StartCursorPos,
+		customState: "",
+	}
+}
+
+func NewCursorAtEnd() Cursor {
+	return Cursor{
+		cursorPos:   EndCursorPos,
+		customState: "",
+	}
+}
+
 // DataStore is a simplified interface for accessing and storing data in one of the Cloud stores.
 // Today we rely on Stow for multi-cloud support, but this interface abstracts that part
 type DataStore struct {
@@ -77,6 +111,9 @@ type RawStore interface {
 
 	// Head gets metadata about the reference. This should generally be a light weight operation.
 	Head(ctx context.Context, reference DataReference) (Metadata, error)
+
+	// List gets a list of items given a prefix, using a paginated API
+	List(ctx context.Context, reference DataReference, maxItems int, cursor Cursor) ([]DataReference, Cursor, error)
 
 	// ReadRaw retrieves a byte array from the Blob store or an error
 	ReadRaw(ctx context.Context, reference DataReference) (io.ReadCloser, error)
