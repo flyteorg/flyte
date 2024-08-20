@@ -4,7 +4,7 @@ on:
   release:
     types: [published]
   schedule:
-    - cron: '15 * * * *'  # This schedules the workflow to run nightly at midnight UTC
+    - cron: '20 * * * *'  # This schedules the workflow to run nightly at midnight UTC
   push:
     branches:
       - main
@@ -157,7 +157,7 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
-    if: "startsWith(github.ref, 'refs/tags/')"
+    # if: "startsWith(github.ref, 'refs/tags/')"
     needs: [linux, musllinux, windows, macos, sdist]
     steps:
       - uses: actions/download-artifact@v4
