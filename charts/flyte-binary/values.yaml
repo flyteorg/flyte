@@ -402,6 +402,7 @@ enabled_plugins:
         - sidecar
         - k8s-array
         - agent-service
+        - fast-task
       default-for-task-types:
         container: container
         sidecar: sidecar

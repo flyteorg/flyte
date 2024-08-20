@@ -451,6 +451,7 @@ data:
         - sidecar
         - k8s-array
         - agent-service
+        - fast-task
     plugins:
       logs:
         kubernetes-enabled: true
@@ -467,6 +468,8 @@ data:
             kubernetes-template-uri: http://localhost:30080/kubernetes-dashboard/#/log/{{.namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}
             cloudwatch-enabled: false
             stackdriver-enabled: false
+      fasttask:
+        callback-uri: http://flyte-sandbox-fasttask.flyte.svc.cluster.local:15605
   002-database.yaml: |
     database:
       postgres:
@@ -851,7 +854,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: OTVHRW1zS1NOM3VkbzdPdw==
+  haSharedSecret: OWMzSXh4b2k5cDc3cUpkUg==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -954,6 +957,28 @@ spec:
     app: docker-registry
     release: flyte-sandbox
   type: NodePort
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-sandbox
+    app.kubernetes.io/version: 1.16.0
+    helm.sh/chart: flyte-binary-v0.1.10
+  name: flyte-sandbox-fasttask
+  namespace: flyte
+spec:
+  ports:
+  - name: fast-task
+    port: 15605
+    protocol: TCP
+  selector:
+    app.kubernetes.io/component: flyte-binary
+    app.kubernetes.io/instance: flyte-sandbox
+    app.kubernetes.io/name: flyte-sandbox
+  type: ClusterIP
 ---
 apiVersion: v1
 kind: Service
@@ -1249,7 +1274,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: 6fd9b172465e3089fcc59f738b92b8dc4d8939360c19de8ee65f68b0e7422035
-        checksum/configuration: df18e2879e3e5c8c81a1328c0fdb264998e2e3afe18ab2055060cb44336c7ecd
+        checksum/configuration: b0b5b916050b3717eff573bb9ab8b57cd3e5ba815e044fa546101a246c73b90a
         checksum/configuration-secret: 09216ffaa3d29e14f88b1f30af580d02a2a5e014de4d750b7f275cc07ed4e914
       labels:
         app.kubernetes.io/component: flyte-binary
@@ -1415,7 +1440,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: fd5f872aa3c151c77baa36e8295d90a435b8bc9f9d1c34f965904eedfb8d792c
+        checksum/secret: 71a497b1e4f7d7ebbf082301e153e37dc8decff67255c35b595dd00bbb65adf6
       labels:
         app: docker-registry
         release: flyte-sandbox

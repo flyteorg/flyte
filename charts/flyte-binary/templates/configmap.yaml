@@ -61,6 +61,8 @@ data:
       k8s-array:
         logs:
           config: {{- include "flyte-binary.configuration.logging.plugins" . | nindent 12 }}
+      fasttask:
+        callback-uri: http://{{ include "flyte-binary.fullname" . }}-fasttask.{{ .Release.Namespace }}.svc.cluster.local:15605
       {{- if .Values.flyteagent.enabled }}
       agent-service:
       {{- tpl ( .Values.configuration.agentService | toYaml ) . | nindent 8 }}

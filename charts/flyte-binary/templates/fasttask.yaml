@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "flyte-binary.fullname" . }}-fasttask
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "flyte-binary.labels" . | nindent 4 }}
+    {{- if .Values.commonLabels }}
+    {{- tpl ( .Values.commonLabels | toYaml ) . | nindent 4 }}
+    {{- end }}
+    {{- if .Values.rbac.labels }}
+    {{- tpl ( .Values.rbac.labels | toYaml ) . | nindent 4 }}
+    {{- end }}
+spec:
+  ports:
+  - name: fast-task
+    port: 15605
+    protocol: TCP
+  type: ClusterIP
+  selector: {{- include "flyte-binary.selectorLabels" . | nindent 4 }}
