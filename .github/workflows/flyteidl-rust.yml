@@ -121,9 +121,11 @@ jobs:
             target: aarch64
     steps:
       - uses: actions/checkout@v4
+      - name: 'Clear action cache'
+        uses: ./.github/actions/clear-action-cache 
       - uses: actions/setup-python@v5
         with:
-          python-version: 3.x
+          python-version: 3.9
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
