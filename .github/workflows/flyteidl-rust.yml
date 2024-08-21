@@ -191,8 +191,6 @@ jobs:
           MATURIN_PYPI_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
         with:
           command: upload
-          args: |
-            --non-interactive 
-            --skip-existing 
-            --repository-url https://test.pypi.org/legacy/ 
-            wheels-*/*
+          # DON'T put trailing slash in --repository-url
+          args: --non-interactive --skip-existing --repository-url "https://test.pypi.org/legacy" wheels-*/*.whl
+
