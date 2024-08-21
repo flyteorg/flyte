@@ -7,7 +7,7 @@ import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialM
 import { Duration, Message, proto3, protoInt64, Struct, Timestamp } from "@bufbuild/protobuf";
 import { TaskExecutionIdentifier } from "../core/identifier_pb.js";
 import { TaskNodeOverrides } from "../core/workflow_pb.js";
-import { Identity } from "../core/security_pb.js";
+import { Connection, Identity } from "../core/security_pb.js";
 import { LiteralMap } from "../core/literals_pb.js";
 import { TaskTemplate } from "../core/tasks_pb.js";
 import { TaskExecution_Phase, TaskLog } from "../core/execution_pb.js";
@@ -216,6 +216,15 @@ export class CreateTaskRequest extends Message<CreateTaskRequest> {
    */
   taskExecutionMetadata?: TaskExecutionMetadata;
 
+  /**
+   * Connection (secret and config) required by the agent.
+   * Agent will use the secret and config in the taskTemplate if it's None.
+   * +optional
+   *
+   * @generated from field: flyteidl.core.Connection connection = 5;
+   */
+  connection?: Connection;
+
   constructor(data?: PartialMessage<CreateTaskRequest>) {
     super();
     proto3.util.initPartial(data, this);
@@ -228,6 +237,7 @@ export class CreateTaskRequest extends Message<CreateTaskRequest> {
     { no: 2, name: "template", kind: "message", T: TaskTemplate },
     { no: 3, name: "output_prefix", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "task_execution_metadata", kind: "message", T: TaskExecutionMetadata },
+    { no: 5, name: "connection", kind: "message", T: Connection },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateTaskRequest {
@@ -320,6 +330,15 @@ export class CreateRequestHeader extends Message<CreateRequestHeader> {
    */
   maxDatasetSizeBytes = protoInt64.zero;
 
+  /**
+   * Connection (secret and config) required by the agent.
+   * Agent will use the secret and config in the taskTemplate if it's None.
+   * +optional
+   *
+   * @generated from field: flyteidl.core.Connection connection = 5;
+   */
+  connection?: Connection;
+
   constructor(data?: PartialMessage<CreateRequestHeader>) {
     super();
     proto3.util.initPartial(data, this);
@@ -332,6 +351,7 @@ export class CreateRequestHeader extends Message<CreateRequestHeader> {
     { no: 2, name: "output_prefix", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "task_execution_metadata", kind: "message", T: TaskExecutionMetadata },
     { no: 4, name: "max_dataset_size_bytes", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+    { no: 5, name: "connection", kind: "message", T: Connection },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateRequestHeader {
@@ -519,6 +539,15 @@ export class GetTaskRequest extends Message<GetTaskRequest> {
    */
   taskCategory?: TaskCategory;
 
+  /**
+   * Connection (secret and config) required by the agent.
+   * Agent will use the secret and config in the taskTemplate if it's None.
+   * +optional
+   *
+   * @generated from field: flyteidl.core.Connection connection = 5;
+   */
+  connection?: Connection;
+
   constructor(data?: PartialMessage<GetTaskRequest>) {
     super();
     proto3.util.initPartial(data, this);
@@ -530,6 +559,7 @@ export class GetTaskRequest extends Message<GetTaskRequest> {
     { no: 1, name: "task_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "resource_meta", kind: "scalar", T: 12 /* ScalarType.BYTES */ },
     { no: 3, name: "task_category", kind: "message", T: TaskCategory },
+    { no: 5, name: "connection", kind: "message", T: Connection },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetTaskRequest {
@@ -698,6 +728,15 @@ export class DeleteTaskRequest extends Message<DeleteTaskRequest> {
    */
   taskCategory?: TaskCategory;
 
+  /**
+   * Connection (secret and config) required by the agent.
+   * Agent will use the secret and config in the taskTemplate if it's None.
+   * +optional
+   *
+   * @generated from field: flyteidl.core.Connection connection = 5;
+   */
+  connection?: Connection;
+
   constructor(data?: PartialMessage<DeleteTaskRequest>) {
     super();
     proto3.util.initPartial(data, this);
@@ -709,6 +748,7 @@ export class DeleteTaskRequest extends Message<DeleteTaskRequest> {
     { no: 1, name: "task_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "resource_meta", kind: "scalar", T: 12 /* ScalarType.BYTES */ },
     { no: 3, name: "task_category", kind: "message", T: TaskCategory },
+    { no: 5, name: "connection", kind: "message", T: Connection },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeleteTaskRequest {
