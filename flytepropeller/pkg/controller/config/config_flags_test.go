@@ -799,6 +799,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_event-config.error-on-already-exists", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("event-config.error-on-already-exists", testValue)
+			if vBool, err := cmdFlags.GetBool("event-config.error-on-already-exists"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.EventConfig.ErrorOnAlreadyExists)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_include-shard-key-label", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
