@@ -667,7 +667,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 
 		// increment taskPhaseVersion if we detect any changes in subNode state.
 		if incrementTaskPhaseVersion {
-			arrayNodeState.TaskPhaseVersion = arrayNodeState.TaskPhaseVersion + 1
+			arrayNodeState.TaskPhaseVersion++
 		}
 
 		const maxRetries = 3
