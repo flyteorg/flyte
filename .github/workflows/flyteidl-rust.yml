@@ -178,7 +178,7 @@ jobs:
 
   nightly:
     name: Publish to PyPI(test) Nightly
-    runs-on: ubuntu-latest
+    runs-on: macos-14
     needs: [macos]
     permissions:
       contents: write
@@ -194,5 +194,5 @@ jobs:
           args: |
             --non-interactive 
             --skip-existing 
-            --repository-url https://test.pypi.org/legacy/ 
+            --repository testpypi
             wheels-*/*
