@@ -84,18 +84,39 @@ At a broad level
    1. Do not create the workflow CRD
 
 Introduce an async reconciliation loop in FlyteAdmin to poll for all pending executions:
-1. Query all pending executions by timestamp ascending
-   1. as an optimization, could even parallelize this into goroutines, one per distinct launch plan ID that has any `PENDING` execution
-2. Check the database to see if there are fewer than `MAX_CONCURRENCY` non-terminal executions with an identical launch plan ID
-3. If there are fewer than `MAX_CONCURRENCY` executions running, select the oldest pending execution for that launch plan
-   1. create the workflow CRD
-   1. open question: also update its phase in the database to `QUEUED`?
-   1. let execution proceed
+1. 1x a minute: Query all pending executions by timestamp ascending, grouped by launch plan ID, roughly something like
+```sql
+SELECT e.*
+FROM   executions AS e
+WHERE  ( launch_plan_id, created_at ) IN (SELECT launch_plan_id,
+                                                 Min(created_at)
+                                          FROM   executions
+                                          WHERE  phase = 'PENDING'
+                                          GROUP  BY launch_plan_id); 
+```
+2. For each execution returned by the above query, `Add()` the pending execution to a [rate limiting workqueue](https://github.com/kubernetes/client-go/blob/master/util/workqueue/rate_limiting_queue.go#L27-L40) (as a suggestion)
+3. In a separate goroutine, fetch items from the workqueue and individually process each execution entry
+   1. Check the database to see if there are fewer than `MAX_CONCURRENCY` non-terminal executions matching the launch plan ID in the pending execution model
+   ```sql
+   select count(launch_plan_id) from executions where phase not in ('SUCCEEDED', 'FAILED', 'ABORTED', 'TIMED_OUT') group by launch_plan_id;
+   ```
+   1. If there are fewer than `MAX_CONCURRENCY` executions running
+      1. check that the execution is still in `PENDING`
+      1. create the workflow CRD
+          1. if the CRD already exists because we've previously processed this pending execution before we had a chance to update the DB state, swallow the already exists error gracefully
+      1. conditionally mark the execution as `QUEUED` in the db if it's already in `PENDING` or  `QUEUED` to not overwrite any events should the execution have already reported progress in the interim
+      1. If creating the workflow CRD fails: mark the execution as `FAILED` in the db (and swallow any errors if the workflow is already in a terminal state should we have previously reported the failure after re-enqueuing the pending execution a previous loop). This will remove its eligiblity from the pending loop
+   1. If there are already `MAX_CONCURRENCY` executions running, simply proceed to (iii.)
+   1. Finally, always mark the queue item as [Done()](https://github.com/kubernetes/client-go/blob/master/util/workqueue/queue.go#L33) 
+
+If we wanted further parallelization here, we could introduce a worker pool rather than having one async process read from the workqueue.
 
 We should consider adding an index to the executions table to include
 - launch_plan_id
 - phase
 - created_at
+
+
 
 #### Prior Art
 The flyteadmin native scheduler (https://github.com/flyteorg/flyte/tree/master/flyteadmin/scheduler) already implements a reconciliation loop to catch up on any missed schedules.
@@ -123,12 +144,6 @@ type Execution struct {
 
 Then the reconciliation loop would query executions in a non-terminal phase matching the launch plan named entity ID instead of LaunchPlanID.
 
-#### Open Questions
-- Should we always attempt to schedule pending executions in ascending order of creation time?
-  - Decision: We'll use FIFO scheduling by default but can extend scheduling behavior with an enum going forward.
-- Should we propagate concurrency policies to child executions?
-  - Decision: no. Child executions can define concurrency at the child launch plan level if necessary.
-
 ## 4 Metrics & Dashboards
 - Time spent in PENDING: It's useful to understand the duration spent in PENDING before a launch plan transitions to RUNNING
 - It may be useful for Flyte platform operators to also configure alerts if an execution stays in PENDING for too long of a threshold
@@ -152,7 +167,32 @@ We could as an alternative, repurpose the existing launch plan index to include 
 
 ## 6 Alternatives
 
-*What are other ways of achieving the same outcome?*
+### Scheduling
+This proposal purposefully uses FIFO scheduling but there is a chance we may want to define other scheduling orders or catch-up policies.
+
+To accomplish this, we can extend the `ConcurrenyPolicy` proto message to encapsulate scheduling behavior
+
+```protobuf
+message Concurrency {
+  // Defines how many executions with this launch plan can run in parallel
+  uint32 max = 1;
+  
+  // Defines how to handle the execution when the max concurrency is reached.
+  ConcurrencyPolicy policy = 2;
+
+  ConcurrencyScheduling scheduling = 3;
+}
+
+
+type ConcurrencyScheduling enum {
+  FIFO = 0;
+  FILO = 1;
+  ...
+}
+```
+
+Furthermore, we may want to introduce a max pending period to fail executions that have been in `PENDING` for too long
+
 
 ## 7 Potential Impact and Dependencies
 
@@ -163,36 +203,22 @@ We could as an alternative, repurpose the existing launch plan index to include 
 
 ## 8 Unresolved questions
 
-*What parts of the proposal are still being defined or not covered by this proposal?*
+- Should we always attempt to schedule pending executions in ascending order of creation time?
+    - Decision: We'll use FIFO scheduling by default but can extend scheduling behavior with an enum going forward.
+- Should we propagate concurrency policies to child executions?
+    - Decision: no. Child executions can define concurrency at the child launch plan level if necessary.
 
 ## 9 Conclusion
 
-*Here, we briefly outline why this is the right decision to make at this time and move forward!*
+This is a simple and lightweight means for limiting execution concurrency that we can build upon, for flexible scheduling policies and even limiting task execution concurrency.
 
-## 10 RFC Process Guide, remove this section when done
-
-*By writing an RFC, you're giving insight to your team on the direction you're taking. There may not be a right or better decision in many cases, but we will likely learn from it. By authoring, you're making a decision on where you want us to go and are looking for feedback on this direction from your team members, but ultimately the decision is yours.*
-
-This document is a:
-
-- thinking exercise, prototype with words.
-- historical record, its value may decrease over time.
-- way to broadcast information.
-- mechanism to build trust.
-- tool to empower.
-- communication channel.
-
-This document is not:
-
-- a request for permission.
-- the most up to date representation of any process or system
 
 **Checklist:**
 
-- [ ]  Copy template
-- [ ]  Draft RFC (think of it as a wireframe)
-- [ ]  Share as WIP with folks you trust to gut-check
-- [ ]  Send pull request when comfortable
+- [x]  Copy template
+- [x]  Draft RFC (think of it as a wireframe)
+- [x]  Share as WIP with folks you trust to gut-check
+- [x]  Send pull request when comfortable
 - [ ]  Label accordingly
 - [ ]  Assign reviewers
 - [ ]  Merge PR
