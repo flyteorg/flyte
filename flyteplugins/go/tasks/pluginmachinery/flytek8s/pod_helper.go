@@ -349,7 +349,7 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 	}
 
 	// iterate over the initContainers first
-	for index, container := range podSpec.InitContainers {
+	for index := range podSpec.InitContainers {
 		var resourceMode = ResourceCustomizationModeEnsureExistingResourcesInRange
 
 		if err := AddFlyteCustomizationsToContainer(ctx, templateParameters, resourceMode, &podSpec.InitContainers[index]); err != nil {
