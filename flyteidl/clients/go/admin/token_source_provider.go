@@ -51,6 +51,7 @@ func NewTokenSourceProvider(ctx context.Context, cfg *Config, tokenCache cache.T
 			}
 
 			tokenURL = metadata.TokenEndpoint
+			cfg.TokenURL = metadata.TokenEndpoint
 		}
 
 		scopes := cfg.Scopes
@@ -64,10 +65,13 @@ func NewTokenSourceProvider(ctx context.Context, cfg *Config, tokenCache cache.T
 			// Update scopes from publicClientConfig
 			if len(scopes) == 0 {
 				scopes = publicClientConfig.Scopes
+				cfg.Scopes = publicClientConfig.Scopes
 			}
 			// Update audience from publicClientConfig
 			if cfg.UseAudienceFromAdmin {
 				audienceValue = publicClientConfig.Audience
+				cfg.Audience = publicClientConfig.Audience
+				cfg.UseAudienceFromAdmin = false
 			}
 		}
 

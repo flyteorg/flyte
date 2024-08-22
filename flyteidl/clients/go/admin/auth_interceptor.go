@@ -39,6 +39,8 @@ func MaterializeCredentials(ctx context.Context, cfg *Config, tokenCache cache.T
 			return fmt.Errorf("failed to fetch client metadata. Error: %v", err)
 		}
 		authorizationMetadataKey = clientMetadata.AuthorizationMetadataKey
+		// Cache the value
+		cfg.AuthorizationHeader = clientMetadata.AuthorizationMetadataKey
 	}
 
 	tokenSource, err := tokenSourceProvider.GetTokenSource(ctx)
