@@ -120,11 +120,10 @@ func (a *arrayNodeHandler) Abort(ctx context.Context, nCtx interfaces.NodeExecut
 	// update state for subNodes
 	if err := eventRecorder.finalize(ctx, nCtx, taskPhase, 0, a.eventConfig); err != nil {
 		// a task event with abort phase is already emitted when handling ArrayNodePhaseFailing
-		if eventsErr.IsAlreadyExists(err) {
-			return nil
+		if !eventsErr.IsAlreadyExists(err) {
+			logger.Errorf(ctx, "ArrayNode event recording failed: [%s]", err.Error())
+			return err
 		}
-		logger.Errorf(ctx, "ArrayNode event recording failed: [%s]", err.Error())
-		return err
 	}
 
 	return nil
@@ -429,10 +428,12 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			return handler.UnknownTransition, err
 		}
 
-		// ensure task_execution set to failed
+		// ensure task_execution set to failed - this should already be sent by the abort handler
 		if err := eventRecorder.finalize(ctx, nCtx, idlcore.TaskExecution_FAILED, 0, a.eventConfig); err != nil {
-			logger.Errorf(ctx, "ArrayNode event recording failed: [%s]", err.Error())
-			return handler.UnknownTransition, err
+			if !eventsErr.IsAlreadyExists(err) {
+				logger.Errorf(ctx, "ArrayNode event recording failed: [%s]", err.Error())
+				return handler.UnknownTransition, err
+			}
 		}
 
 		// fail with reported error if one exists
@@ -569,8 +570,10 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 
 		// ensure task_execution set to succeeded
 		if err := eventRecorder.finalize(ctx, nCtx, idlcore.TaskExecution_SUCCEEDED, 0, a.eventConfig); err != nil {
-			logger.Errorf(ctx, "ArrayNode event recording failed: [%s]", err.Error())
-			return handler.UnknownTransition, err
+			if !eventsErr.IsAlreadyExists(err) {
+				logger.Errorf(ctx, "ArrayNode event recording failed: [%s]", err.Error())
+				return handler.UnknownTransition, err
+			}
 		}
 
 		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoSuccess(
