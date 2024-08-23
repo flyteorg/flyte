@@ -24,6 +24,7 @@ import (
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/cache/mocks"
 	adminMocks "github.com/flyteorg/flyte/flyteidl/clients/go/admin/mocks"
+
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
@@ -141,11 +142,34 @@ func Test_newAuthInterceptor(t *testing.T) {
 	err := json.Unmarshal(plan, &tokenData)
 	assert.NoError(t, err)
 	t.Run("Other Error", func(t *testing.T) {
+		ctx := context.Background()
+		httpPort := rand.IntnRange(10000, 60000)
+		grpcPort := rand.IntnRange(10000, 60000)
+		m := &adminMocks.AuthMetadataServiceServer{}
+		m.OnGetOAuth2MetadataMatch(mock.Anything, mock.Anything).Return(&service.OAuth2MetadataResponse{
+			AuthorizationEndpoint: fmt.Sprintf("http://localhost:%d/oauth2/authorize", httpPort),
+			TokenEndpoint:         fmt.Sprintf("http://localhost:%d/oauth2/token", httpPort),
+			JwksUri:               fmt.Sprintf("http://localhost:%d/oauth2/jwks", httpPort),
+		}, nil)
+
+		m.OnGetPublicClientConfigMatch(mock.Anything, mock.Anything).Return(&service.PublicClientAuthConfigResponse{
+			Scopes: []string{"all"},
+		}, nil)
+
+		s := newAuthMetadataServer(t, grpcPort, httpPort, m)
+		assert.NoError(t, s.Start(ctx))
+		defer s.Close()
+		u, err := url.Parse(fmt.Sprintf("dns:///localhost:%d", grpcPort))
+		assert.NoError(t, err)
 		f := NewPerRPCCredentialsFuture()
 		p := NewPerRPCCredentialsFuture()
 		mockTokenCache := &mocks.TokenCache{}
 		mockTokenCache.OnGetTokenMatch().Return(&tokenData, nil)
-		interceptor := NewAuthInterceptor(&Config{}, mockTokenCache, f, p)
+		mockTokenCache.OnSaveTokenMatch(mock.Anything).Return(nil)
+		interceptor := NewAuthInterceptor(&Config{
+			Endpoint:              config.URL{URL: *u},
+			UseInsecureConnection: true,
+		}, mockTokenCache, f, p)
 		otherError := func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, opts ...grpc.CallOption) error {
 			return status.New(codes.Canceled, "").Err()
 		}
@@ -209,6 +233,14 @@ func Test_newAuthInterceptor(t *testing.T) {
 		httpPort := rand.IntnRange(10000, 60000)
 		grpcPort := rand.IntnRange(10000, 60000)
 		m := &adminMocks.AuthMetadataServiceServer{}
+		m.OnGetOAuth2MetadataMatch(mock.Anything, mock.Anything).Return(&service.OAuth2MetadataResponse{
+			AuthorizationEndpoint: fmt.Sprintf("http://localhost:%d/oauth2/authorize", httpPort),
+			TokenEndpoint:         fmt.Sprintf("http://localhost:%d/oauth2/token", httpPort),
+			JwksUri:               fmt.Sprintf("http://localhost:%d/oauth2/jwks", httpPort),
+		}, nil)
+		m.OnGetPublicClientConfigMatch(mock.Anything, mock.Anything).Return(&service.PublicClientAuthConfigResponse{
+			Scopes: []string{"all"},
+		}, nil)
 		s := newAuthMetadataServer(t, grpcPort, httpPort, m)
 		ctx := context.Background()
 		assert.NoError(t, s.Start(ctx))
@@ -283,12 +315,13 @@ func Test_newAuthInterceptor(t *testing.T) {
 	})
 }
 
-func TestMaterializeCredentials(t *testing.T) {
+func TestNewAuthInterceptorAndMaterialize(t *testing.T) {
 	t.Run("No oauth2 metadata endpoint or Public client config lookup", func(t *testing.T) {
 		httpPort := rand.IntnRange(10000, 60000)
 		grpcPort := rand.IntnRange(10000, 60000)
+		fakeToken := &oauth2.Token{}
 		c := &mocks.TokenCache{}
-		c.OnGetTokenMatch().Return(nil, nil)
+		c.OnGetTokenMatch().Return(fakeToken, nil)
 		c.OnSaveTokenMatch(mock.Anything).Return(nil)
 		m := &adminMocks.AuthMetadataServiceServer{}
 		m.OnGetOAuth2MetadataMatch(mock.Anything, mock.Anything).Return(nil, errors.New("unexpected call to get oauth2 metadata"))
@@ -304,7 +337,7 @@ func TestMaterializeCredentials(t *testing.T) {
 		f := NewPerRPCCredentialsFuture()
 		p := NewPerRPCCredentialsFuture()
 
-		err = MaterializeCredentials(ctx, &Config{
+		cfg := &Config{
 			Endpoint:              config.URL{URL: *u},
 			UseInsecureConnection: true,
 			AuthType:              AuthTypeClientSecret,
@@ -312,14 +345,22 @@ func TestMaterializeCredentials(t *testing.T) {
 			Scopes:                []string{"all"},
 			Audience:              "http://localhost:30081",
 			AuthorizationHeader:   "authorization",
-		}, c, f, p)
+		}
+
+		intercept := NewAuthInterceptor(cfg, c, f, p)
+		// Invoke Materialize inside the intercept
+		err = intercept(ctx, "GET", nil, nil, nil, func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, opts ...grpc.CallOption) error {
+			return nil
+		})
 		assert.NoError(t, err)
 	})
+
 	t.Run("Failed to fetch client metadata", func(t *testing.T) {
 		httpPort := rand.IntnRange(10000, 60000)
 		grpcPort := rand.IntnRange(10000, 60000)
 		c := &mocks.TokenCache{}
-		c.OnGetTokenMatch().Return(nil, nil)
+		fakeToken := &oauth2.Token{}
+		c.OnGetTokenMatch().Return(fakeToken, nil)
 		c.OnSaveTokenMatch(mock.Anything).Return(nil)
 		m := &adminMocks.AuthMetadataServiceServer{}
 		m.OnGetOAuth2MetadataMatch(mock.Anything, mock.Anything).Return(nil, errors.New("unexpected call to get oauth2 metadata"))
@@ -333,17 +374,44 @@ func TestMaterializeCredentials(t *testing.T) {
 		u, err := url.Parse(fmt.Sprintf("dns:///localhost:%d", grpcPort))
 		assert.NoError(t, err)
 
-		f := NewPerRPCCredentialsFuture()
-		p := NewPerRPCCredentialsFuture()
-
-		err = MaterializeCredentials(ctx, &Config{
+		cfg := &Config{
 			Endpoint:              config.URL{URL: *u},
 			UseInsecureConnection: true,
 			AuthType:              AuthTypeClientSecret,
 			TokenURL:              fmt.Sprintf("http://localhost:%d/api/v1/token", httpPort),
 			Scopes:                []string{"all"},
-		}, c, f, p)
+		}
+		f := NewPerRPCCredentialsFuture()
+		p := NewPerRPCCredentialsFuture()
+		intercept := NewAuthInterceptor(cfg, c, f, p)
+		err = intercept(ctx, "GET", nil, nil, nil, func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, opts ...grpc.CallOption) error {
+			return nil
+		})
 		assert.EqualError(t, err, "failed to fetch client metadata. Error: rpc error: code = Unknown desc = expected err")
+	})
+}
+
+func TestSimpleMaterializeCredentials(t *testing.T) {
+	t.Run("simple materialize", func(t *testing.T) {
+		httpPort := rand.IntnRange(10000, 60000)
+		grpcPort := rand.IntnRange(10000, 60000)
+		u, err := url.Parse(fmt.Sprintf("dns:///localhost:%d", grpcPort))
+		assert.NoError(t, err)
+
+		f := NewPerRPCCredentialsFuture()
+
+		dummySource := DummyTestTokenSource{}
+
+		err = MaterializeCredentials(dummySource, &Config{
+			Endpoint:              config.URL{URL: *u},
+			UseInsecureConnection: true,
+			AuthType:              AuthTypeClientSecret,
+			TokenURL:              fmt.Sprintf("http://localhost:%d/oauth2/token", httpPort),
+			Scopes:                []string{"all"},
+			Audience:              "http://localhost:30081",
+			AuthorizationHeader:   "authorization",
+		}, "authorization", f)
+		assert.NoError(t, err)
 	})
 }
 
