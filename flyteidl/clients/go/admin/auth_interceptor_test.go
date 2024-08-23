@@ -24,6 +24,7 @@ import (
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/cache/mocks"
 	adminMocks "github.com/flyteorg/flyte/flyteidl/clients/go/admin/mocks"
+
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
@@ -145,7 +146,8 @@ func Test_newAuthInterceptor(t *testing.T) {
 		p := NewPerRPCCredentialsFuture()
 		mockTokenCache := &mocks.TokenCache{}
 		mockTokenCache.OnGetTokenMatch().Return(&tokenData, nil)
-		interceptor := NewAuthInterceptor(&Config{}, mockTokenCache, f, p)
+		interceptor, err := NewAuthInterceptor(&Config{}, mockTokenCache, f, p)
+		assert.NoError(t, err)
 		otherError := func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, opts ...grpc.CallOption) error {
 			return status.New(codes.Canceled, "").Err()
 		}
@@ -187,11 +189,12 @@ func Test_newAuthInterceptor(t *testing.T) {
 		c.On("CondBroadcast").Return()
 		c.On("Unlock").Return()
 		c.OnPurgeIfEqualsMatch(mock.Anything).Return(true, nil)
-		interceptor := NewAuthInterceptor(&Config{
+		interceptor, err := NewAuthInterceptor(&Config{
 			Endpoint:              config.URL{URL: *u},
 			UseInsecureConnection: true,
 			AuthType:              AuthTypeClientSecret,
 		}, c, f, p)
+		assert.NoError(t, err)
 		unauthenticated := func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, opts ...grpc.CallOption) error {
 			return status.New(codes.Unauthenticated, "").Err()
 		}
@@ -221,11 +224,12 @@ func Test_newAuthInterceptor(t *testing.T) {
 		p := NewPerRPCCredentialsFuture()
 		c := &mocks.TokenCache{}
 		c.OnGetTokenMatch().Return(nil, nil)
-		interceptor := NewAuthInterceptor(&Config{
+		interceptor, err := NewAuthInterceptor(&Config{
 			Endpoint:              config.URL{URL: *u},
 			UseInsecureConnection: true,
 			AuthType:              AuthTypeClientSecret,
 		}, c, f, p)
+		assert.NoError(t, err)
 		authenticated := func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, opts ...grpc.CallOption) error {
 			return nil
 		}
@@ -268,11 +272,12 @@ func Test_newAuthInterceptor(t *testing.T) {
 		c.OnTryLockMatch().Return(true)
 		c.OnSaveTokenMatch(mock.Anything).Return(nil)
 		c.OnPurgeIfEqualsMatch(mock.Anything).Return(true, nil)
-		interceptor := NewAuthInterceptor(&Config{
+		interceptor, err := NewAuthInterceptor(&Config{
 			Endpoint:              config.URL{URL: *u},
 			UseInsecureConnection: true,
 			AuthType:              AuthTypeClientSecret,
 		}, c, f, p)
+		assert.NoError(t, err)
 		unauthenticated := func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, opts ...grpc.CallOption) error {
 			return status.New(codes.Aborted, "").Err()
 		}
@@ -302,9 +307,13 @@ func TestMaterializeCredentials(t *testing.T) {
 		assert.NoError(t, err)
 
 		f := NewPerRPCCredentialsFuture()
-		p := NewPerRPCCredentialsFuture()
+		//p := NewPerRPCCredentialsFuture()
 
-		err = MaterializeCredentials(ctx, &Config{
+		dummySource := DummyTestTokenSource{}
+
+		// MaterializeCredentials(tokenSource oauth2.TokenSource, cfg *Config, authorizationMetadataKey string,
+		//	perRPCCredentials *PerRPCCredentialsFuture)
+		err = MaterializeCredentials(dummySource, &Config{
 			Endpoint:              config.URL{URL: *u},
 			UseInsecureConnection: true,
 			AuthType:              AuthTypeClientSecret,
@@ -312,9 +321,10 @@ func TestMaterializeCredentials(t *testing.T) {
 			Scopes:                []string{"all"},
 			Audience:              "http://localhost:30081",
 			AuthorizationHeader:   "authorization",
-		}, c, f, p)
+		}, "authorization", f)
 		assert.NoError(t, err)
 	})
+
 	t.Run("Failed to fetch client metadata", func(t *testing.T) {
 		httpPort := rand.IntnRange(10000, 60000)
 		grpcPort := rand.IntnRange(10000, 60000)
@@ -333,16 +343,17 @@ func TestMaterializeCredentials(t *testing.T) {
 		u, err := url.Parse(fmt.Sprintf("dns:///localhost:%d", grpcPort))
 		assert.NoError(t, err)
 
+		dummySource := DummyTestTokenSource{}
 		f := NewPerRPCCredentialsFuture()
-		p := NewPerRPCCredentialsFuture()
+		//p := NewPerRPCCredentialsFuture()
 
-		err = MaterializeCredentials(ctx, &Config{
+		err = MaterializeCredentials(dummySource, &Config{
 			Endpoint:              config.URL{URL: *u},
 			UseInsecureConnection: true,
 			AuthType:              AuthTypeClientSecret,
 			TokenURL:              fmt.Sprintf("http://localhost:%d/api/v1/token", httpPort),
 			Scopes:                []string{"all"},
-		}, c, f, p)
+		}, "authorization", f)
 		assert.EqualError(t, err, "failed to fetch client metadata. Error: rpc error: code = Unknown desc = expected err")
 	})
 }

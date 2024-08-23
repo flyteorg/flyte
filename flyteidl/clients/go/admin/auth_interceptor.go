@@ -20,35 +20,10 @@ const ProxyAuthorizationHeader = "proxy-authorization"
 
 // MaterializeCredentials will attempt to build a TokenSource given the anonymously available information exposed by the server.
 // Once established, it'll invoke PerRPCCredentialsFuture.Store() on perRPCCredentials to populate it with the appropriate values.
-func MaterializeCredentials(ctx context.Context, cfg *Config, tokenCache cache.TokenCache,
-	perRPCCredentials *PerRPCCredentialsFuture, proxyCredentialsFuture *PerRPCCredentialsFuture) error {
-	authMetadataClient, err := InitializeAuthMetadataClient(ctx, cfg, proxyCredentialsFuture)
-	if err != nil {
-		return fmt.Errorf("failed to initialized Auth Metadata Client. Error: %w", err)
-	}
+func MaterializeCredentials(tokenSource oauth2.TokenSource, cfg *Config, authorizationMetadataKey string,
+	perRPCCredentials *PerRPCCredentialsFuture) error {
 
-	tokenSourceProvider, err := NewTokenSourceProvider(ctx, cfg, tokenCache, authMetadataClient)
-	if err != nil {
-		return fmt.Errorf("failed to initialized token source provider. Err: %w", err)
-	}
-
-	authorizationMetadataKey := cfg.AuthorizationHeader
-	if len(authorizationMetadataKey) == 0 {
-		clientMetadata, err := authMetadataClient.GetPublicClientConfig(ctx, &service.PublicClientAuthConfigRequest{})
-		if err != nil {
-			return fmt.Errorf("failed to fetch client metadata. Error: %v", err)
-		}
-		authorizationMetadataKey = clientMetadata.AuthorizationMetadataKey
-		// Cache the value
-		cfg.AuthorizationHeader = clientMetadata.AuthorizationMetadataKey
-	}
-
-	tokenSource, err := tokenSourceProvider.GetTokenSource(ctx)
-	if err != nil {
-		return fmt.Errorf("failed to get token source. Error: %w", err)
-	}
-
-	_, err = tokenSource.Token()
+	_, err := tokenSource.Token()
 	if err != nil {
 		return fmt.Errorf("failed to issue token. Error: %w", err)
 	}
@@ -139,14 +114,41 @@ func setHTTPClientContext(ctx context.Context, cfg *Config, proxyCredentialsFutu
 // more. It'll fail hard if it couldn't do so (i.e. it will no longer attempt to send an unauthenticated request). Once
 // a token source has been created, it'll invoke the grpc pipeline again, this time the grpc.PerRPCCredentials should
 // be able to find and acquire a valid AccessToken to annotate the request with.
-func NewAuthInterceptor(cfg *Config, tokenCache cache.TokenCache, credentialsFuture *PerRPCCredentialsFuture, proxyCredentialsFuture *PerRPCCredentialsFuture) grpc.UnaryClientInterceptor {
+func NewAuthInterceptor(cfg *Config, tokenCache cache.TokenCache, credentialsFuture *PerRPCCredentialsFuture, proxyCredentialsFuture *PerRPCCredentialsFuture) (grpc.UnaryClientInterceptor, error) {
+	// can add to inputs
+	ctx := context.Background()
+
+	authMetadataClient, err := InitializeAuthMetadataClient(ctx, cfg, proxyCredentialsFuture)
+	if err != nil {
+		return nil, fmt.Errorf("failed to initialized Auth Metadata Client. Error: %w", err)
+	}
+
+	tokenSourceProvider, err := NewTokenSourceProvider(ctx, cfg, tokenCache, authMetadataClient)
+	if err != nil {
+		return nil, fmt.Errorf("failed to initialized token source provider. Err: %w", err)
+	}
+
+	authorizationMetadataKey := cfg.AuthorizationHeader
+	if len(authorizationMetadataKey) == 0 {
+		clientMetadata, err := authMetadataClient.GetPublicClientConfig(ctx, &service.PublicClientAuthConfigRequest{})
+		if err != nil {
+			return nil, fmt.Errorf("failed to fetch client metadata. Error: %v", err)
+		}
+		authorizationMetadataKey = clientMetadata.AuthorizationMetadataKey
+	}
+
+	tokenSource, err := tokenSourceProvider.GetTokenSource(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get token source. Error: %w", err)
+	}
+
 	return func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
 		ctx = setHTTPClientContext(ctx, cfg, proxyCredentialsFuture)
 
 		// If there is already a token in the cache (e.g. key-ring), we should use it immediately...
 		t, _ := tokenCache.GetToken()
 		if t != nil {
-			err := MaterializeCredentials(ctx, cfg, tokenCache, credentialsFuture, proxyCredentialsFuture)
+			err := MaterializeCredentials(tokenSource, cfg, authorizationMetadataKey, credentialsFuture)
 			if err != nil {
 				return fmt.Errorf("failed to materialize credentials. Error: %v", err)
 			}
@@ -173,7 +175,7 @@ func NewAuthInterceptor(cfg *Config, tokenCache cache.TokenCache, credentialsFut
 						}
 
 						logger.Debugf(ctx, "Request failed due to [%v]. Attempting to establish an authenticated connection and trying again.", st.Code())
-						newErr := MaterializeCredentials(ctx, cfg, tokenCache, credentialsFuture, proxyCredentialsFuture)
+						newErr := MaterializeCredentials(tokenSource, cfg, authorizationMetadataKey, credentialsFuture)
 						if newErr != nil {
 							errString := fmt.Sprintf("authentication error! Original Error: %v, Auth Error: %v", err, newErr)
 							logger.Errorf(ctx, errString)
@@ -193,7 +195,7 @@ func NewAuthInterceptor(cfg *Config, tokenCache cache.TokenCache, credentialsFut
 		}
 
 		return err
-	}
+	}, nil
 }
 
 func NewProxyAuthInterceptor(cfg *Config, proxyCredentialsFuture *PerRPCCredentialsFuture) grpc.UnaryClientInterceptor {
