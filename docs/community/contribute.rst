@@ -155,20 +155,10 @@ To understand how the below components interact with each other, refer to :ref:`
 
 To build the Flyte docs locally you will need the following prerequisites:
 
-* Install ``conda``.
-    *  We recommend Miniconda installed with an `official installer <https://docs.conda.io/projects/miniconda/en/latest/index.html#latest-miniconda-installer-links>`__.
 * Install `conda-lock <https://github.com/conda/conda-lock>`__.
-* In the ``flyteorg/flyte`` root directory run:
-    * ``conda-lock install --name monodocs-env monodocs-environment.lock.yaml``
-    * ``conda activate monodocs-env``
-    * ``pip install ./flyteidl``
-
-This will set up the Python virtual environment for building the docs. Here we called it ``monodocs-env``.
-
-To actually build the docs, activate ``monodocs-env`` and (in the ``flyteorg/flyte`` root directory) run:
-    * ``make docs``
-
-The resulting ``html`` files will be in ``docs/_build/html``. You can view them by running `open docs/_build/html/index.html`
+* In the ``flyteorg/flyte`` root directory you can run:
+    * ``make dev-docs`` to build the documentation locally. The build will be in the ``docs/_build/html`` directory. See `the script <https://github.com/flyteorg/flyte/blob/master/script/local_build_docs.sh>`__ for additional environment variables that can be set.
+        * For example, to use the local flytekit source code instead of the source code from the flyteorg/flytekit repo, run ``export FLYTEKIT_LOCAL_PATH=/path/to/flytekit`` before running ``make dev-docs``.
 
 ``flyteidl``
 ************
@@ -194,7 +184,7 @@ The resulting ``html`` files will be in ``docs/_build/html``. You can view them 
         * Run the following commands:
            * ``make generate``
            * ``make test_unit``
-           * ``make link``
+           * ``make lint``
         * To compile, run ``make compile``
 
 ``flyteadmin``
@@ -262,7 +252,7 @@ The resulting ``html`` files will be in ``docs/_build/html``. You can view them 
         * Run the following commands:
             * ``make generate``
             * ``make test_unit``
-            * ``make link``
+            * ``make lint``
 
 ``flytestdlib``
 ***************
@@ -397,7 +387,7 @@ that integrates all Flyte components into a single binary.
    # The version of each component/library used to build the single binary are defined in `go.mod`.
    sudo apt-get -y install jq # You may need to install jq
    make clean # (Optional) Run this only if you want to run the newest version of flyteconsole
-   go mod tidy
+   make go-tidy
    make compile
 
    # Step 3: Prepare a namespace template for the cluster resource controller.
@@ -447,7 +437,7 @@ The following instructions provide guidance on how to build single binary with y
    cd flyte/flyteadmin
 
    # Step 3: Now, you can build the single binary. Go back to Flyte directory.
-   go mod tidy
+   make go-tidy
    make compile
    POD_NAMESPACE=flyte ./flyte start --config flyte-single-binary-local.yaml
 

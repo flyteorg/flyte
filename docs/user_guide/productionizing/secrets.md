@@ -1,20 +1,3 @@
----
-jupytext:
-  cell_metadata_filter: all
-  formats: md:myst
-  main_language: python
-  notebook_metadata_filter: all
-  text_representation:
-    extension: .md
-    format_name: myst
-    format_version: 0.13
-    jupytext_version: 1.16.1
-kernelspec:
-  display_name: Python 3
-  language: python
-  name: python3
----
-
 (secrets)=
 
 # Secrets
@@ -31,8 +14,6 @@ This example explains how you can access secrets in a Flyte Task. Flyte provides
 different types of secrets, but for users writing Python tasks, you can only access
 secure secrets either as environment variables or as a file injected into the
 running container.
-
-+++
 
 ## Creating secrets with a secrets manager
 
@@ -71,27 +52,19 @@ define secrets using a [configuration file](https://kubernetes.io/docs/tasks/con
 or tools like [Kustomize](https://kubernetes.io/docs/tasks/configmap-secret/managing-secret-using-kustomize/).
 :::
 
-+++
-
 ## Using secrets in tasks
+
+```{note}
+To clone and run the example code on this page, see the [Flytesnacks repo][flytesnacks].
+```
 
 Once you've defined a secret on the Flyte backend, `flytekit` exposes a class
 called {py:class}`~flytekit.Secret`s, which allows you to request a secret
-from the configured secret manager.
+from the configured secret manager:
 
-```{code-cell}
-import os
-from typing import Tuple
-
-import flytekit
-from flytekit import Secret, task, workflow
-from flytekit.testing import SecretsManager
-
-secret = Secret(
-    group="<SECRET_GROUP>",
-    key="<SECRET_KEY>",
-    mount_requirement=Secret.MountType.ENV_VAR,
-)
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/productionizing/productionizing/use_secrets.py
+:caption: productionizing/use_secrets.py
+:lines: 1-6, 49-53
 ```
 
 Secrets consists of `group`, `key`, and `mounting_requirement` arguments,
@@ -103,9 +76,9 @@ In the code below we specify two variables, `SECRET_GROUP` and
 `SECRET_NAME`, which maps onto the `user-info` secret that we created
 with `kubectl` above, with a key called `user_secret`.
 
-```{code-cell}
-SECRET_GROUP = "user-info"
-SECRET_NAME = "user_secret"
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/productionizing/productionizing/use_secrets.py
+:caption: productionizing/use_secrets.py
+:lines: 66-67
 ```
 
 Now we declare the secret in the `secret_requests` argument of the
@@ -119,13 +92,9 @@ invoking the {py:func}`flytekit.current_context` function, as shown below.
 At runtime, flytekit looks inside the task pod for an environment variable or
 a mounted file with a predefined name/path and loads the value.
 
-```{code-cell}
-@task(secret_requests=[Secret(group=SECRET_GROUP, key=SECRET_NAME)])
-def secret_task() -> str:
-    context = flytekit.current_context()
-    secret_val = context.secrets.get(SECRET_GROUP, SECRET_NAME)
-    print(secret_val)
-    return secret_val
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/productionizing/productionizing/use_secrets.py
+:caption: productionizing/use_secrets.py
+:pyobject: secret_task
 ```
 
 :::{warning}
@@ -156,30 +125,18 @@ the same secret:
 ```
 
 In this case, the secret group will be `user-info`, with three available
-secret keys: `user_secret`, `username`, and `password`.
+secret keys: `user_secret`, `username`, and `password`:
 
-```{code-cell}
-USERNAME_SECRET = "username"
-PASSWORD_SECRET = "password"
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/productionizing/productionizing/use_secrets.py
+:caption: productionizing/use_secrets.py
+:lines: 107-108
 ```
-
-+++ {"lines_to_next_cell": 0}
 
 The Secret structure allows passing two fields, matching the key and the group, as previously described:
 
-```{code-cell}
-@task(
-    secret_requests=[
-        Secret(key=USERNAME_SECRET, group=SECRET_GROUP),
-        Secret(key=PASSWORD_SECRET, group=SECRET_GROUP),
-    ]
-)
-def user_info_task() -> Tuple[str, str]:
-    context = flytekit.current_context()
-    secret_username = context.secrets.get(SECRET_GROUP, USERNAME_SECRET)
-    secret_pwd = context.secrets.get(SECRET_GROUP, PASSWORD_SECRET)
-    print(f"{secret_username}={secret_pwd}")
-    return secret_username, secret_pwd
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/productionizing/productionizing/use_secrets.py
+:caption: productionizing/use_secrets.py
+:lines: 113-124
 ```
 
 :::{warning}
@@ -198,40 +155,16 @@ In these scenarios you can specify the `mount_requirement=Secret.MountType.FILE`
 
 In the following example we force the mounting to be an environment variable:
 
-```{code-cell}
-@task(
-    secret_requests=[
-        Secret(
-            group=SECRET_GROUP,
-            key=SECRET_NAME,
-            mount_requirement=Secret.MountType.ENV_VAR,
-        )
-    ]
-)
-def secret_file_task() -> Tuple[str, str]:
-    secret_manager = flytekit.current_context().secrets
-
-    # get the secrets filename
-    f = secret_manager.get_secrets_file(SECRET_GROUP, SECRET_NAME)
-
-    # get secret value from an environment variable
-    secret_val = secret_manager.get(SECRET_GROUP, SECRET_NAME)
-
-    # returning the filename and the secret_val
-    return f, secret_val
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/productionizing/productionizing/use_secrets.py
+:caption: productionizing/use_secrets.py
+:lines: 139-158
 ```
-
-+++ {"lines_to_next_cell": 0}
 
 These tasks can be used in your workflow as usual
 
-```{code-cell}
-@workflow
-def my_secret_workflow() -> Tuple[str, str, str, str, str]:
-    x = secret_task()
-    y, z = user_info_task()
-    f, s = secret_file_task()
-    return x, y, z, f, s
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/productionizing/productionizing/use_secrets.py
+:caption: productionizing/use_secrets.py
+:pyobject: my_secret_workflow
 ```
 
 ### Testing with mock secrets
@@ -239,18 +172,9 @@ def my_secret_workflow() -> Tuple[str, str, str, str, str]:
 The simplest way to test secret accessibility is to export the secret as an
 environment variable. There are some helper methods available to do so:
 
-```{code-cell}
-if __name__ == "__main__":
-    sec = SecretsManager()
-    os.environ[sec.get_secrets_env_var(SECRET_GROUP, SECRET_NAME)] = "value"
-    os.environ[sec.get_secrets_env_var(SECRET_GROUP, USERNAME_SECRET)] = "username_value"
-    os.environ[sec.get_secrets_env_var(SECRET_GROUP, PASSWORD_SECRET)] = "password_value"
-    x, y, z, f, s = my_secret_workflow()
-    assert x == "value"
-    assert y == "username_value"
-    assert z == "password_value"
-    assert f == sec.get_secrets_file(SECRET_GROUP, SECRET_NAME)
-    assert s == "value"
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/productionizing/productionizing/use_secrets.py
+:caption: productionizing/use_secrets.py
+:lines: 172-182
 ```
 
 ## Using secrets in task templates
@@ -291,8 +215,6 @@ sql_query = SQLAlchemyTask(
 )
 ```
 
-+++
-
 :::{note}
 Here the `secret_connect_args` map to the
 [SQLAlchemy engine configuration](https://docs.sqlalchemy.org/en/20/core/engines.html)
@@ -302,7 +224,6 @@ argument names for the username and password.
 You can then use the `sql_query` task inside a workflow to grab data and
 perform downstream transformations on it.
 
-+++
 
 ## How secrets injection works
 
@@ -386,18 +307,15 @@ When using the AWS secret management plugin, secrets need to be specified by nam
 
 ### Vault secrets manager
 
-When using the Vault secret manager, make sure you have Vault Agent deployed on your cluster as described in this
-[step-by-step tutorial](https://learn.hashicorp.com/tutorials/vault/kubernetes-sidecar).
+When using the Vault secret manager, make sure you have Vault Agent deployed on your cluster as described in this [step-by-step tutorial](https://learn.hashicorp.com/tutorials/vault/kubernetes-sidecar).
 Vault secrets can only be mounted as files and will become available under `"/etc/flyte/secrets/SECRET_GROUP/SECRET_NAME"`.
 
 Vault comes with various secrets engines. Currently Flyte supports working with both version 1 and 2 of the `Key Vault engine <https://developer.hashicorp.com/vault/docs/secrets/kv>` as well as the `databases secrets engine <https://developer.hashicorp.com/vault/docs/secrets/databases>`.
 You can use use the `group_version` parameter to specify which secret backend engine to use. Available choices are: "kv1", "kv2", "db":
 
-+++ {"lines_to_next_cell": 0}
+#### Requesting secrets with the Vault secret manager
 
-How to request secrets with the Vault secret manager
-
-```{code-cell}
+```python
 secret = Secret(
     group="<Vault path>",
     key="<Secret key for KV engine>",
@@ -434,12 +352,11 @@ If Flyte administrator wants to set up annotations for the entire system, they c
 
 ### Vertical scaling
 
-To scale the Webhook to be able to process the number/rate of pods you need, you may need to configure a vertical [pod
-autoscaler](https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler).
+To scale the Webhook to be able to process the number/rate of pods you need, you may need to configure a vertical [pod autoscaler](https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler).
 
 ### Horizontal scaling
 
-The Webhook does not make any external API Requests in response to Pod mutation requests. It should be able to handle traffic
-quickly. For horizontal scaling, adding additional replicas for the Pod in the
-deployment should be sufficient. A single `MutatingWebhookConfiguration` object will be used, the same TLS certificate
-will be shared across the pods and the Service created will automatically load balance traffic across the available pods.
+The Webhook does not make any external API Requests in response to Pod mutation requests. It should be able to handle traffic quickly. For horizontal scaling, adding additional replicas for the Pod in the
+deployment should be sufficient. A single `MutatingWebhookConfiguration` object will be used, the same TLS certificate will be shared across the pods and the Service created will automatically load balance traffic across the available pods.
+
+[flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/productionizing/

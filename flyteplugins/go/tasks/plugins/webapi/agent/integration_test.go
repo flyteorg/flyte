@@ -113,11 +113,12 @@ func TestEndToEnd(t *testing.T) {
 	t.Run("failed to create a job", func(t *testing.T) {
 		agentPlugin := newMockAsyncAgentPlugin()
 		agentPlugin.PluginLoader = func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
-			return Plugin{
+			return &Plugin{
 				metricScope: iCtx.MetricsScope(),
 				cfg:         GetConfig(),
 				cs: &ClientSet{
 					asyncAgentClients:    map[string]service.AsyncAgentServiceClient{},
+					syncAgentClients:     map[string]service.SyncAgentServiceClient{},
 					agentMetadataClients: map[string]service.AgentMetadataServiceClient{},
 				},
 			}, nil
@@ -227,6 +228,9 @@ func getTaskContext(t *testing.T) *pluginCoreMocks.TaskExecutionContext {
 	tMeta.OnGetAnnotations().Return(map[string]string{"foo": "bar"})
 	tMeta.OnGetK8sServiceAccount().Return("k8s-account")
 	tMeta.OnGetEnvironmentVariables().Return(map[string]string{"foo": "bar"})
+	tMeta.OnGetSecurityContext().Return(flyteIdlCore.SecurityContext{
+		RunAs: &flyteIdlCore.Identity{ExecutionIdentity: "execution-identity"},
+	})
 	resourceManager := &pluginCoreMocks.ResourceManager{}
 	resourceManager.OnAllocateResourceMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(pluginCore.AllocationStatusGranted, nil)
 	resourceManager.OnReleaseResourceMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
@@ -251,6 +255,9 @@ func getTaskContext(t *testing.T) *pluginCoreMocks.TaskExecutionContext {
 
 func newMockAsyncAgentPlugin() webapi.PluginEntry {
 	asyncAgentClient := new(agentMocks.AsyncAgentServiceClient)
+	agentRegistry := Registry{
+		"spark": {defaultTaskTypeVersion: {AgentDeployment: &Deployment{Endpoint: defaultAgentEndpoint}, IsSync: false}},
+	}
 
 	mockCreateRequestMatcher := mock.MatchedBy(func(request *admin.CreateTaskRequest) bool {
 		expectedArgs := []string{"pyflyte-fast-execute", "--output-prefix", "/tmp/123"}
@@ -275,7 +282,7 @@ func newMockAsyncAgentPlugin() webapi.PluginEntry {
 		ID:                 "agent-service",
 		SupportedTaskTypes: []core.TaskType{"bigquery_query_job_task", "spark"},
 		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
-			return Plugin{
+			return &Plugin{
 				metricScope: iCtx.MetricsScope(),
 				cfg:         &cfg,
 				cs: &ClientSet{
@@ -283,12 +290,17 @@ func newMockAsyncAgentPlugin() webapi.PluginEntry {
 						defaultAgentEndpoint: asyncAgentClient,
 					},
 				},
+				registry: agentRegistry,
 			}, nil
 		},
 	}
 }
 
 func newMockSyncAgentPlugin() webapi.PluginEntry {
+	agentRegistry := Registry{
+		"openai": {defaultTaskTypeVersion: {AgentDeployment: &Deployment{Endpoint: defaultAgentEndpoint}, IsSync: true}},
+	}
+
 	syncAgentClient := new(agentMocks.SyncAgentServiceClient)
 	output, _ := coreutils.MakeLiteralMap(map[string]interface{}{"x": 1})
 	resource := &admin.Resource{Phase: flyteIdlCore.TaskExecution_SUCCEEDED, Outputs: output}
@@ -315,7 +327,7 @@ func newMockSyncAgentPlugin() webapi.PluginEntry {
 		ID:                 "agent-service",
 		SupportedTaskTypes: []core.TaskType{"openai"},
 		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
-			return Plugin{
+			return &Plugin{
 				metricScope: iCtx.MetricsScope(),
 				cfg:         &cfg,
 				cs: &ClientSet{
@@ -323,7 +335,7 @@ func newMockSyncAgentPlugin() webapi.PluginEntry {
 						defaultAgentEndpoint: syncAgentClient,
 					},
 				},
-				agentRegistry: Registry{"openai": {defaultTaskTypeVersion: {AgentDeployment: &Deployment{Endpoint: defaultAgentEndpoint}, IsSync: true}}},
+				registry: agentRegistry,
 			}, nil
 		},
 	}

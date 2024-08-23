@@ -49,6 +49,8 @@ type ExecutionData struct {
 	WorkflowClosureReference storage.DataReference
 	// Additional parameters used to build a workflow execution
 	ExecutionParameters ExecutionParameters
+	// Storage data reference of the execution inputs
+	OffloadedInputsReference storage.DataReference
 }
 
 // ExecutionResponse is returned when a Flyte workflow execution is successfully created.

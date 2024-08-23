@@ -1,22 +1,3 @@
----
-jupytext:
-  cell_metadata_filter: all
-  formats: md:myst
-  main_language: python
-  notebook_metadata_filter: all
-  text_representation:
-    extension: .md
-    format_name: myst
-    format_version: 0.13
-    jupytext_version: 1.16.1
-kernelspec:
-  display_name: Python 3
-  language: python
-  name: python3
----
-
-+++ {"lines_to_next_cell": 0}
-
 (launch_plan)=
 
 # Launch plans
@@ -40,73 +21,67 @@ When a workflow is serialized and registered, a _default launch plan_ is generat
 This default launch plan can bind default workflow inputs and runtime options defined
 in the project's flytekit configuration (such as user role).
 
-To begin, import the necessary libraries.
-
-```{code-cell}
-from flytekit import LaunchPlan, current_context
+```{note}
+To clone and run the example code on this page, see the [Flytesnacks repo][flytesnacks].
 ```
 
-+++ {"lines_to_next_cell": 0}
+To begin, import the necessary libraries:
 
-We import the workflow from the `workflow.py` file for which we're going to create a launch plan.
-
-```{code-cell}
-from .workflow import simple_wf
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/launch_plan.py
+:caption: basics/launch_plan.py
+:lines: 1
 ```
 
-+++ {"lines_to_next_cell": 0}
+We import the workflow from the `workflow.py` file for which we're going to create a launch plan:
 
-Create a default launch plan with no inputs during serialization.
-
-```{code-cell}
-default_lp = LaunchPlan.get_default_launch_plan(current_context(), simple_wf)
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/launch_plan.py
+:caption: basics/launch_plan.py
+:lines: 5
 ```
 
-+++ {"lines_to_next_cell": 0}
+Create a default launch plan with no inputs during serialization:
+
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/launch_plan.py
+:caption: basics/launch_plan.py
+:lines: 8
+```
 
 You can run the launch plan locally as follows:
 
-```{code-cell}
-default_lp(x=[-3, 0, 3], y=[7, 4, -2])
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/launch_plan.py
+:caption: basics/launch_plan.py
+:lines: 11
 ```
 
-+++ {"lines_to_next_cell": 0}
+Create a launch plan and specify the default inputs:
 
-Create a launch plan and specify the default inputs.
-
-```{code-cell}
-simple_wf_lp = LaunchPlan.create(
-    name="simple_wf_lp", workflow=simple_wf, default_inputs={"x": [-3, 0, 3], "y": [7, 4, -2]}
-)
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/launch_plan.py
+:caption: basics/launch_plan.py
+:lines: 14-16
 ```
-
-+++ {"lines_to_next_cell": 0}
 
 You can trigger the launch plan locally as follows:
 
-```{code-cell}
-simple_wf_lp()
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/launch_plan.py
+:caption: basics/launch_plan.py
+:lines: 19
 ```
-
-+++ {"lines_to_next_cell": 0}
 
 You can override the defaults as follows:
 
-```{code-cell}
-simple_wf_lp(x=[3, 5, 3], y=[-3, 2, -2])
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/launch_plan.py
+:caption: basics/launch_plan.py
+:lines: 22
 ```
 
-+++ {"lines_to_next_cell": 0}
+It's possible to lock launch plan inputs, preventing them from being overridden during execution:
 
-It's possible to lock launch plan inputs, preventing them from being overridden during execution.
-
-```{code-cell}
-simple_wf_lp_fixed_inputs = LaunchPlan.get_or_create(
-    name="fixed_inputs", workflow=simple_wf, fixed_inputs={"x": [-3, 0, 3]}
-)
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/launch_plan.py
+:caption: basics/launch_plan.py
+:lines: 25-27
 ```
 
-Attempting to modify the inputs will result in an error being raised by Flyte.
+Attempting to modify the inputs will result in an error being raised by Flyte:
 
 :::{note}
 You can employ default and fixed inputs in conjunction in a launch plan.
@@ -114,3 +89,5 @@ You can employ default and fixed inputs in conjunction in a launch plan.
 
 Launch plans can also be used to run workflows on a specific cadence.
 For more information, refer to the {ref}`scheduling_launch_plan` documentation.
+
+[flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/basics/

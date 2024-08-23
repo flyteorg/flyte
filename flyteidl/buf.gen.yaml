@@ -10,6 +10,8 @@ plugins:
     out: gen/pb_python
   - plugin: buf.build/community/neoeinstein-prost
     out: gen/pb_rust
+  - plugin: buf.build/community/neoeinstein-tonic:v0.4.0
+    out: gen/pb_rust
   - plugin: buf.build/protocolbuffers/go:v1.30.0
     out: gen/pb-go
     opt:

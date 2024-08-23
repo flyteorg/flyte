@@ -32,6 +32,31 @@ Depending on the contents of the logs or the `Events`, you can try different thi
 Debugging common execution errors
 ----------------------------------
 
+``Error: Cannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docker daemon running?``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This error will show if you are not running Docker with the native Docker engine in a Linux machine. Most probably you are running Docker via Docker Desktop.
+
+- If you are using Docker Desktop in MacOs, run:
+
+.. prompt:: bash $
+
+ sudo ln -s ~/Library/Containers/com.docker.docker/Data/docker.raw.sock /var/run/docker.sock
+
+- If you are using Docker Desktop in Linux, run:
+
+.. prompt:: bash $
+
+ sudo ln -s ~$USER/.docker/desktop/docker.sock /var/run/docker.sock
+
+- If you are using another tool to run Docker, you need to make sure that ``/var/run/docker.sock`` is linked to the correct socket file.
+
+  For example, if you are using Rancher Desktop on Linux, run:
+
+  .. prompt:: bash $
+
+   sudo ln -s ~$USER/.rd/docker.sock /var/run/docker.sock
+
 ``message: '0/1 nodes are available: 1 Insufficient cpu. preemption: 0/1 nodes are available: 1 No preemption victims found for incoming pod.'``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

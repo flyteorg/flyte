@@ -1,7 +1,7 @@
 name: Build & Push Flyte Single Binary Images
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
 on:
@@ -16,10 +16,10 @@ jobs:
   test-bootstrap:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-go@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
         with:
-          go-version: "1.21"
+          go-version: "1.22"
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3
         with:
@@ -38,7 +38,7 @@ jobs:
     needs: [test-bootstrap]
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Setup Golang caches
         uses: actions/cache@v3
         with:
@@ -132,7 +132,7 @@ jobs:
           FLYTESNACKS_VERSION="$(curl --silent https://api.github.com/repos/flyteorg/flytesnacks/releases/latest | jq -r .tag_name)"
           echo "FLYTESNACKS_VERSION=${FLYTESNACKS_VERSION}" >> ${GITHUB_ENV}
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - uses: actions/download-artifact@v3
         with:
           name: single-binary-image
@@ -157,7 +157,7 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: "3.12"
-      - uses: unionai/flytectl-setup-action@v0.0.1
+      - uses: unionai/flytectl-setup-action@v0.0.3
       - name: Setup sandbox
         run: |
           mkdir -p ~/.flyte/sandbox
@@ -174,10 +174,11 @@ jobs:
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install flytekit flytekitplugins-deck-standard
-          pip freeze
+          pip install uv
+          uv pip install --system flytekit flytekitplugins-deck-standard flytekitplugins-envd "numpy<2.0.0" pyarrow
+          uv pip freeze
       - name: Checkout flytesnacks
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: flyteorg/flytesnacks
           path: flytesnacks
@@ -205,7 +206,7 @@ jobs:
     needs: [build-and-push-single-binary-image]
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - uses: actions/download-artifact@v3
         with:
           name: single-binary-image

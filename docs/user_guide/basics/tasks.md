@@ -1,22 +1,3 @@
----
-jupytext:
-  cell_metadata_filter: all
-  formats: md:myst
-  main_language: python
-  notebook_metadata_filter: all
-  text_representation:
-    extension: .md
-    format_name: myst
-    format_version: 0.13
-    jupytext_version: 1.16.1
-kernelspec:
-  display_name: Python 3
-  language: python
-  name: python3
----
-
-+++ {"lines_to_next_cell": 0}
-
 (task)=
 
 # Tasks
@@ -47,30 +28,27 @@ Flyte offers numerous plugins for tasks, including backend plugins like
 This example demonstrates how to write and execute a
 [Python function task](https://github.com/flyteorg/flytekit/blob/master/flytekit/core/python_function_task.py#L75).
 
-To begin, import `task` from the `flytekit` library.
-
-```{code-cell}
-from flytekit import task
+```{note}
+To clone and run the example code on this page, see the [Flytesnacks repo][flytesnacks].
 ```
 
-+++ {"lines_to_next_cell": 0}
+To begin, import `task` from the `flytekit` library:
+
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/task.py
+:caption: basics/task.py
+:lines: 1
+```
 
 The use of the {py:func}`~flytekit.task` decorator is mandatory for a ``PythonFunctionTask``.
 A task is essentially a regular Python function, with the exception that all inputs and outputs must be clearly annotated with their types.
 Learn more about the supported types in the {ref}`type-system section <python_to_flyte_type_mapping>`.
 
-We create a task that computes the slope of a regression line.
+We create a task that computes the slope of a regression line:
 
-```{code-cell}
-@task
-def slope(x: list[int], y: list[int]) -> float:
-    sum_xy = sum([x[i] * y[i] for i in range(len(x))])
-    sum_x_squared = sum([x[i] ** 2 for i in range(len(x))])
-    n = len(x)
-    return (n * sum_xy - sum(x) * sum(y)) / (n * sum_x_squared - sum(x) ** 2)
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/task.py
+:caption: basics/task.py
+:pyobject: slope
 ```
-
-+++ {"lines_to_next_cell": 0}
 
 :::{note}
 Flytekit will assign a default name to the output variable like `out0`.
@@ -78,11 +56,11 @@ In case of multiple outputs, each output will be numbered in the order
 starting with 0, e.g., -> `out0, out1, out2, ...`.
 :::
 
-You can execute a Flyte task just like any regular Python function.
+You can execute a Flyte task just like any regular Python function:
 
-```{code-cell}
-if __name__ == "__main__":
-    print(slope(x=[-3, 0, 3], y=[7, 4, -2]))
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/task.py
+:caption: basics/task.py
+:lines: 14-15
 ```
 
 :::{note}
@@ -95,7 +73,7 @@ the values for the corresponding parameters.
 To run it locally, you can use the following `pyflyte run` command:
 ```
 pyflyte run \
-  https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/task.py \
+  https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/task.py \
   slope --x '[-3,0,3]' --y '[7,4,-2]'
 ```
 
@@ -103,6 +81,8 @@ If you want to run it remotely on the Flyte cluster,
 simply add the `--remote flag` to the `pyflyte run` command:
 ```
 pyflyte run --remote \
-  https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/task.py \
+  https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/basics/basics/task.py \
   slope --x '[-3,0,3]' --y '[7,4,-2]'
 ```
+
+[flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/basics/

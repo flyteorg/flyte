@@ -1,22 +1,3 @@
----
-jupytext:
-  cell_metadata_filter: all
-  formats: md:myst
-  main_language: python
-  notebook_metadata_filter: all
-  text_representation:
-    extension: .md
-    format_name: myst
-    format_version: 0.13
-    jupytext_version: 1.16.1
-kernelspec:
-  display_name: Python 3
-  language: python
-  name: python3
----
-
-+++ {"lines_to_next_cell": 0}
-
 (decks)=
 
 # Decks
@@ -41,16 +22,16 @@ Additionally, you can create new decks to render your data using custom renderer
 Flyte Decks is an opt-in feature; to enable it, set `enable_deck` to `True` in the task parameters.
 :::
 
-To begin, import the dependencies.
-
-```{code-cell}
-import flytekit
-from flytekit import ImageSpec, task
-from flytekitplugins.deck.renderer import MarkdownRenderer
-from sklearn.decomposition import PCA
+```{note}
+To clone and run the example code on this page, see the [Flytesnacks repo][flytesnacks].
 ```
 
-+++ {"lines_to_next_cell": 0}
+To begin, import the dependencies:
+
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/development_lifecycle/development_lifecycle/decks.py
+:caption: development_lifecycle/decks.py
+:lines: 1-4
+```
 
 We create a new deck named `pca` and render Markdown content along with a
 [PCA](https://en.wikipedia.org/wiki/Principal_component_analysis) plot.
@@ -58,15 +39,10 @@ We create a new deck named `pca` and render Markdown content along with a
 You can begin by initializing an {ref}`ImageSpec <image_spec_example>` object to encompass all the necessary dependencies.
 This approach automatically triggers a Docker build, alleviating the need for you to manually create a Docker image.
 
-```{code-cell}
-custom_image = ImageSpec(name="flyte-decks-example", packages=["plotly"], registry="ghcr.io/flyteorg")
-
-if custom_image.is_container():
-    import plotly
-    import plotly.express as px
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/development_lifecycle/development_lifecycle/decks.py
+:caption: development_lifecycle/decks.py
+:lines: 15-19
 ```
-
-+++ {"lines_to_next_cell": 0}
 
 :::{important}
 Replace `ghcr.io/flyteorg` with a container registry you've access to publish to.
@@ -75,28 +51,10 @@ To upload the image to the local registry in the demo cluster, indicate the regi
 
 Note the usage of `append` to append the Plotly deck to the Markdown deck.
 
-```{code-cell}
-@task(enable_deck=True, container_image=custom_image)
-def pca_plot():
-    iris_df = px.data.iris()
-    X = iris_df[["sepal_length", "sepal_width", "petal_length", "petal_width"]]
-    pca = PCA(n_components=3)
-    components = pca.fit_transform(X)
-    total_var = pca.explained_variance_ratio_.sum() * 100
-    fig = px.scatter_3d(
-        components,
-        x=0,
-        y=1,
-        z=2,
-        color=iris_df["species"],
-        title=f"Total Explained Variance: {total_var:.2f}%",
-        labels={"0": "PC 1", "1": "PC 2", "2": "PC 3"},
-    )
-    main_deck = flytekit.Deck("pca", MarkdownRenderer().to_html("### Principal Component Analysis"))
-    main_deck.append(plotly.io.to_html(fig))
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/development_lifecycle/development_lifecycle/decks.py
+:caption: development_lifecycle/decks.py
+:pyobject: pca_plot
 ```
-
-+++ {"lines_to_next_cell": 0}
 
 :::{Important}
 To view the log output locally, the `FLYTE_SDK_LOGGING_LEVEL` environment variable should be set to 20.
@@ -138,43 +96,27 @@ When the task connected with a deck object is executed, these objects employ ren
 
 Creates a profile report from a Pandas DataFrame.
 
-```{code-cell}
-import pandas as pd
-from flytekitplugins.deck.renderer import FrameProfilingRenderer
-
-
-@task(enable_deck=True)
-def frame_renderer() -> None:
-    df = pd.DataFrame(data={"col1": [1, 2], "col2": [3, 4]})
-    flytekit.Deck("Frame Renderer", FrameProfilingRenderer().to_html(df=df))
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/development_lifecycle/development_lifecycle/decks.py
+:caption: development_lifecycle/decks.py
+:lines: 44-51
 ```
-
-+++ {"lines_to_next_cell": 0}
 
 :::{figure} https://raw.githubusercontent.com/flyteorg/static-resources/main/flytesnacks/user_guide/flyte_decks_frame_renderer.png
 :alt: Frame renderer
 :class: with-shadow
 :::
 
-+++ {"lines_to_next_cell": 0}
+
 
 #### Top-frame renderer
 
 Renders DataFrame as an HTML table.
 This renderer doesn't necessitate plugin installation since it's accessible within the flytekit library.
 
-```{code-cell}
-from typing import Annotated
-
-from flytekit.deck import TopFrameRenderer
-
-
-@task(enable_deck=True)
-def top_frame_renderer() -> Annotated[pd.DataFrame, TopFrameRenderer(1)]:
-    return pd.DataFrame(data={"col1": [1, 2], "col2": [3, 4]})
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/development_lifecycle/development_lifecycle/decks.py
+:caption: development_lifecycle/decks.py
+:lines: 57-64
 ```
-
-+++ {"lines_to_next_cell": 0}
 
 :::{figure} https://raw.githubusercontent.com/flyteorg/static-resources/main/flytesnacks/user_guide/flyte_decks_top_frame_renderer.png
 :alt: Top frame renderer
@@ -185,15 +127,10 @@ def top_frame_renderer() -> Annotated[pd.DataFrame, TopFrameRenderer(1)]:
 
 Converts a Markdown string into HTML, producing HTML as a Unicode string.
 
-```{code-cell}
-@task(enable_deck=True)
-def markdown_renderer() -> None:
-    flytekit.current_context().default_deck.append(
-        MarkdownRenderer().to_html("You can install flytekit using this command: ```import flytekit```")
-    )
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/development_lifecycle/development_lifecycle/decks.py
+:caption: development_lifecycle/decks.py
+:pyobject: markdown_renderer
 ```
-
-+++ {"lines_to_next_cell": 0}
 
 :::{figure} https://raw.githubusercontent.com/flyteorg/static-resources/main/flytesnacks/user_guide/flyte_decks_markdown_renderer.png
 :alt: Markdown renderer
@@ -210,17 +147,10 @@ The median (Q2) is indicated by a line within the box.
 Typically, the whiskers extend to the edges of the box,
 plus or minus 1.5 times the interquartile range (IQR: Q3-Q1).
 
-```{code-cell}
-from flytekitplugins.deck.renderer import BoxRenderer
-
-
-@task(enable_deck=True)
-def box_renderer() -> None:
-    iris_df = px.data.iris()
-    flytekit.Deck("Box Plot", BoxRenderer("sepal_length").to_html(iris_df))
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/development_lifecycle/development_lifecycle/decks.py
+:caption: development_lifecycle/decks.py
+:lines: 85-91
 ```
-
-+++ {"lines_to_next_cell": 0}
 
 :::{figure} https://raw.githubusercontent.com/flyteorg/static-resources/main/flytesnacks/user_guide/flyte_decks_box_renderer.png
 :alt: Box renderer
@@ -232,25 +162,10 @@ def box_renderer() -> None:
 Converts a {ref}`FlyteFile <files>` or `PIL.Image.Image` object into an HTML string,
 where the image data is encoded as a base64 string.
 
-```{code-cell}
-from flytekit import workflow
-from flytekit.types.file import FlyteFile
-from flytekitplugins.deck.renderer import ImageRenderer
-
-
-@task(enable_deck=True)
-def image_renderer(image: FlyteFile) -> None:
-    flytekit.Deck("Image Renderer", ImageRenderer().to_html(image_src=image))
-
-
-@workflow
-def image_renderer_wf(
-    image: FlyteFile = "https://bit.ly/3KZ95q4",
-) -> None:
-    image_renderer(image=image)
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/development_lifecycle/development_lifecycle/decks.py
+:caption: development_lifecycle/decks.py
+:lines: 97-111
 ```
-
-+++ {"lines_to_next_cell": 0}
 
 :::{figure} https://raw.githubusercontent.com/flyteorg/static-resources/main/flytesnacks/user_guide/flyte_decks_image_renderer.png
 :alt: Image renderer
@@ -261,50 +176,13 @@ def image_renderer_wf(
 
 Converts a Pandas dataframe into an HTML table.
 
-```{code-cell}
-from flytekitplugins.deck.renderer import TableRenderer
-
-
-@task(enable_deck=True)
-def table_renderer() -> None:
-    flytekit.Deck(
-        "Table Renderer",
-        TableRenderer().to_html(df=pd.DataFrame(data={"col1": [1, 2], "col2": [3, 4]}), table_width=50),
-    )
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/development_lifecycle/development_lifecycle/decks.py
+:caption: development_lifecycle/decks.py
+:lines: 115-123
 ```
-
-+++ {"lines_to_next_cell": 0}
 
 :::{figure} https://raw.githubusercontent.com/flyteorg/static-resources/main/flytesnacks/user_guide/flyte_decks_table_renderer.png
 :alt: Table renderer
-:class: with-shadow
-:::
-
-#### Source code renderer
-
-Converts source code to HTML and renders it as a Unicode string on the deck.
-
-```{code-cell}
-:lines_to_next_cell: 2
-
-import inspect
-
-from flytekitplugins.deck.renderer import SourceCodeRenderer
-
-
-@task(enable_deck=True)
-def source_code_renderer() -> None:
-    file_path = inspect.getsourcefile(frame_renderer.__wrapped__)
-    with open(file_path, "r") as f:
-        source_code = f.read()
-    flytekit.Deck(
-        "Source Code Renderer",
-        SourceCodeRenderer().to_html(source_code),
-    )
-```
-
-:::{figure} https://raw.githubusercontent.com/flyteorg/static-resources/main/flytesnacks/user_guide/flyte_decks_source_code_renderer.png
-:alt: Source code renderer
 :class: with-shadow
 :::
 
@@ -314,3 +192,5 @@ Don't hesitate to integrate a new renderer into
 [renderer.py](https://github.com/flyteorg/flytekit/blob/master/plugins/flytekit-deck-standard/flytekitplugins/deck/renderer.py)
 if your deck renderers can enhance data visibility.
 Feel encouraged to open a pull request and play a part in enhancing the Flyte deck renderer ecosystem!
+
+[flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/development_lifecycle/

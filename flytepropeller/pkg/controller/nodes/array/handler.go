@@ -11,6 +11,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/errorcollector"
 	"github.com/flyteorg/flyte/flytepropeller/events"
+	eventsErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/validators"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
@@ -21,6 +22,7 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/k8s"
 	"github.com/flyteorg/flyte/flytestdlib/bitarray"
+	stdConfig "github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
@@ -99,6 +101,7 @@ func (a *arrayNodeHandler) Abort(ctx context.Context, nCtx interfaces.NodeExecut
 			} else {
 				// record events transitioning subNodes to aborted
 				retryAttempt := uint32(arrayNodeState.SubNodeRetryAttempts.GetItem(i))
+
 				if err := sendEvents(ctx, nCtx, i, retryAttempt, idlcore.NodeExecution_ABORTED, idlcore.TaskExecution_ABORTED, eventRecorder, a.eventConfig); err != nil {
 					logger.Warnf(ctx, "failed to record ArrayNode events: %v", err)
 				}
@@ -116,6 +119,10 @@ func (a *arrayNodeHandler) Abort(ctx context.Context, nCtx interfaces.NodeExecut
 
 	// update state for subNodes
 	if err := eventRecorder.finalize(ctx, nCtx, taskPhase, 0, a.eventConfig); err != nil {
+		// a task event with abort phase is already emitted when handling ArrayNodePhaseFailing
+		if eventsErr.IsAlreadyExists(err) {
+			return nil
+		}
 		logger.Errorf(ctx, "ArrayNode event recording failed: [%s]", err.Error())
 		return err
 	}
@@ -257,13 +264,17 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		arrayNodeState.Phase = v1alpha1.ArrayNodePhaseExecuting
 	case v1alpha1.ArrayNodePhaseExecuting:
 		// process array node subNodes
-		currentParallelism := int(arrayNode.GetParallelism())
-		if currentParallelism == 0 {
-			currentParallelism = len(arrayNodeState.SubNodePhases.GetItems())
-		}
+		remainingWorkflowParallelism := int(nCtx.ExecutionContext().GetExecutionConfig().MaxParallelism - nCtx.ExecutionContext().CurrentParallelism())
+		incrementWorkflowParallelism, maxParallelism := inferParallelism(ctx, arrayNode.GetParallelism(),
+			config.GetConfig().ArrayNode.DefaultParallelismBehavior, remainingWorkflowParallelism, len(arrayNodeState.SubNodePhases.GetItems()))
 
-		nodeExecutionRequests := make([]*nodeExecutionRequest, 0, currentParallelism)
+		nodeExecutionRequests := make([]*nodeExecutionRequest, 0, maxParallelism)
+		currentParallelism := 0
 		for i, nodePhaseUint64 := range arrayNodeState.SubNodePhases.GetItems() {
+			if currentParallelism >= maxParallelism {
+				break
+			}
+
 			nodePhase := v1alpha1.NodePhase(nodePhaseUint64)
 			taskPhase := int(arrayNodeState.SubNodeTaskPhases.GetItem(i))
 
@@ -303,11 +314,11 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 
 			// TODO - this is a naive implementation of parallelism, if we want to support more
 			// complex subNodes (ie. dynamics / subworkflows) we need to revisit this so that
-			// parallelism is handled during subNode evaluations.
-			currentParallelism--
-			if currentParallelism == 0 {
-				break
+			// parallelism is handled during subNode evaluations + avoid deadlocks
+			if incrementWorkflowParallelism {
+				nCtx.ExecutionContext().IncrementParallelism()
 			}
+			currentParallelism++
 		}
 
 		workerErrorCollector := errorcollector.NewErrorMessageCollector()
@@ -407,6 +418,12 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			// wait until all tasks have completed before declaring success
 			arrayNodeState.Phase = v1alpha1.ArrayNodePhaseSucceeding
 		}
+
+		// if incrementWorkflowParallelism is not set then we need to increment the parallelism by one
+		// to indicate that the overall ArrayNode is still running
+		if !incrementWorkflowParallelism && arrayNodeState.Phase == v1alpha1.ArrayNodePhaseExecuting {
+			nCtx.ExecutionContext().IncrementParallelism()
+		}
 	case v1alpha1.ArrayNodePhaseFailing:
 		if err := a.Abort(ctx, nCtx, "ArrayNodeFailing"); err != nil {
 			return handler.UnknownTransition, err
@@ -480,7 +497,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 				// checkpoint paths are not computed here because this function is only called when writing
 				// existing cached outputs. if this functionality changes this will need to be revisited.
 				outputPaths := ioutils.NewCheckpointRemoteFilePaths(ctx, nCtx.DataStore(), subOutputDir, ioutils.NewRawOutputPaths(ctx, subDataDir), "")
-				reader := ioutils.NewRemoteFileOutputReader(ctx, nCtx.DataStore(), outputPaths, nCtx.MaxDatasetSizeBytes())
+				reader := ioutils.NewRemoteFileOutputReader(ctx, nCtx.DataStore(), outputPaths, 0)
 
 				gatherOutputsRequest.reader = &reader
 				a.gatherOutputsRequestChannel <- gatherOutputsRequest
@@ -583,17 +600,42 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			taskPhase = idlcore.TaskExecution_FAILED
 		}
 
-		// if the ArrayNode phase has changed we need to reset the taskPhaseVersion to 0, otherwise
-		// increment it if we detect any changes in subNode state.
-		if currentArrayNodePhase != arrayNodeState.Phase {
-			arrayNodeState.TaskPhaseVersion = 0
-		} else if incrementTaskPhaseVersion {
-			arrayNodeState.TaskPhaseVersion = arrayNodeState.TaskPhaseVersion + 1
+		// increment taskPhaseVersion if we detect any changes in subNode state.
+		if incrementTaskPhaseVersion {
+			arrayNodeState.TaskPhaseVersion++
 		}
 
-		if err := eventRecorder.finalize(ctx, nCtx, taskPhase, arrayNodeState.TaskPhaseVersion, a.eventConfig); err != nil {
-			logger.Errorf(ctx, "ArrayNode event recording failed: [%s]", err.Error())
-			return handler.UnknownTransition, err
+		const maxRetries = 3
+		retries := 0
+		for retries <= maxRetries {
+			err := eventRecorder.finalize(ctx, nCtx, taskPhase, arrayNodeState.TaskPhaseVersion, a.eventConfig)
+
+			if err == nil {
+				break
+			}
+
+			// Handle potential race condition if FlyteWorkflow CRD fails to get synced
+			if eventsErr.IsAlreadyExists(err) {
+				if !incrementTaskPhaseVersion {
+					break
+				}
+				logger.Warnf(ctx, "Event version already exists, bumping version and retrying (%d/%d): [%s]", retries+1, maxRetries, err.Error())
+				arrayNodeState.TaskPhaseVersion++
+			} else {
+				logger.Errorf(ctx, "ArrayNode event recording failed: [%s]", err.Error())
+				return handler.UnknownTransition, err
+			}
+
+			retries++
+			if retries > maxRetries {
+				logger.Errorf(ctx, "ArrayNode event recording failed after %d retries: [%s]", maxRetries, err.Error())
+				return handler.UnknownTransition, err
+			}
+		}
+
+		// if the ArrayNode phase has changed we need to reset the taskPhaseVersion to 0
+		if currentArrayNodePhase != arrayNodeState.Phase {
+			arrayNodeState.TaskPhaseVersion = 0
 		}
 	}
 
@@ -636,9 +678,21 @@ func New(nodeExecutor interfaces.Node, eventConfig *config.EventConfig, scope pr
 		return nil, err
 	}
 
+	eventConfigCopy, err := stdConfig.DeepCopyConfig(eventConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	deepCopiedEventConfig, ok := eventConfigCopy.(*config.EventConfig)
+	if !ok {
+		return nil, fmt.Errorf("deep copy error: expected *config.EventConfig, but got %T", eventConfigCopy)
+	}
+
+	deepCopiedEventConfig.ErrorOnAlreadyExists = true
+
 	arrayScope := scope.NewSubScope("array")
 	return &arrayNodeHandler{
-		eventConfig:                 eventConfig,
+		eventConfig:                 deepCopiedEventConfig,
 		gatherOutputsRequestChannel: make(chan *gatherOutputsRequest),
 		metrics:                     newMetrics(arrayScope),
 		nodeExecutionRequestChannel: make(chan *nodeExecutionRequest),
@@ -714,7 +768,7 @@ func (a *arrayNodeHandler) buildArrayNodeContext(ctx context.Context, nCtx inter
 	// initialize mocks
 	arrayNodeLookup := newArrayNodeLookup(nCtx.ContextualNodeLookup(), subNodeID, &subNodeSpec, subNodeStatus)
 
-	newParentInfo, err := common.CreateParentInfo(nCtx.ExecutionContext().GetParentInfo(), nCtx.NodeID(), nCtx.CurrentAttempt())
+	newParentInfo, err := common.CreateParentInfo(nCtx.ExecutionContext().GetParentInfo(), nCtx.NodeID(), nCtx.CurrentAttempt(), false)
 	if err != nil {
 		return nil, nil, nil, nil, nil, nil, err
 	}

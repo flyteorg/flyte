@@ -98,7 +98,7 @@ You can also run the code directly from a remote source:
 
 ```
 pyflyte run --remote \
-    https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/hello_world.py \
+    https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/basics/basics/hello_world.py \
     hello_world_wf
 ```
 
@@ -118,7 +118,7 @@ Finally, run a workflow that takes some inputs, for example the `workflow.py` ex
 
 ```{prompt} bash
 pyflyte run --remote \
-    https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/workflow.py \
+    https://raw.githubusercontent.com/flyteorg/flytesnacks/master/example_code/basics/basics/workflow.py \
     simple_wf --x '[-3,0,3]' --y '[7,4,-2]'
 ```
 
@@ -235,6 +235,7 @@ before you submit your workflow, you will need to inform `envd` how to push the 
 This can be done via:
 
 ```
+pip install flytekitplugins-envd
 envd context create --name flyte-sandbox --builder tcp --builder-address localhost:30003 --use
 ```
 

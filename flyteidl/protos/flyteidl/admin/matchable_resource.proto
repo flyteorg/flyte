@@ -6,6 +6,7 @@ option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin
 import "flyteidl/admin/common.proto";
 import "flyteidl/admin/cluster_assignment.proto";
 import "flyteidl/core/execution.proto";
+import "flyteidl/core/execution_envs.proto";
 import "flyteidl/core/security.proto";
 import "google/protobuf/wrappers.proto";
 
@@ -131,6 +132,9 @@ message WorkflowExecutionConfig {
 
   // Environment variables to be set for the execution.
   Envs envs = 8;
+
+  // Execution environment assignments to be set for the execution.
+  repeated core.ExecutionEnvAssignment execution_env_assignments = 9;
 }
 
 // Generic container for encapsulating all types of the above attributes messages.

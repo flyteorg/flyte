@@ -1,9 +1,10 @@
 // @generated
 /// Represents a subset of runtime task execution metadata that are relevant to external plugins.
+///
+/// ID of the task execution
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct TaskExecutionMetadata {
-    /// ID of the task execution
     #[prost(message, optional, tag="1")]
     pub task_execution_id: ::core::option::Option<super::core::TaskExecutionIdentifier>,
     /// k8s namespace where the task is executed in
@@ -38,6 +39,9 @@ pub struct TaskExecutionMetadata {
     /// These overrides can be used to customize the behavior of the task node.
     #[prost(message, optional, tag="10")]
     pub overrides: ::core::option::Option<super::core::TaskNodeOverrides>,
+    /// Identity of user running this task execution
+    #[prost(message, optional, tag="11")]
+    pub identity: ::core::option::Option<super::core::Identity>,
 }
 /// Represents a request structure to create task.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -1167,6 +1171,9 @@ pub struct WorkflowExecutionConfig {
     /// Environment variables to be set for the execution.
     #[prost(message, optional, tag="8")]
     pub envs: ::core::option::Option<Envs>,
+    /// Execution environment assignments to be set for the execution.
+    #[prost(message, repeated, tag="9")]
+    pub execution_env_assignments: ::prost::alloc::vec::Vec<super::core::ExecutionEnvAssignment>,
 }
 /// Generic container for encapsulating all types of the above attributes messages.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -1666,11 +1673,15 @@ pub struct ExecutionSpec {
     #[prost(message, optional, tag="23")]
     pub envs: ::core::option::Option<Envs>,
     /// Tags to be set for the execution.
+    #[deprecated]
     #[prost(string, repeated, tag="24")]
     pub tags: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
     /// Execution cluster label to be set for the execution.
     #[prost(message, optional, tag="25")]
     pub execution_cluster_label: ::core::option::Option<ExecutionClusterLabel>,
+    /// Execution environment assignments to be set for the execution.
+    #[prost(message, repeated, tag="26")]
+    pub execution_env_assignments: ::prost::alloc::vec::Vec<super::core::ExecutionEnvAssignment>,
     #[prost(oneof="execution_spec::NotificationOverrides", tags="5, 6")]
     pub notification_overrides: ::core::option::Option<execution_spec::NotificationOverrides>,
 }
@@ -2016,6 +2027,9 @@ pub struct LaunchPlanSpec {
     /// Environment variables to be set for the execution.
     #[prost(message, optional, tag="21")]
     pub envs: ::core::option::Option<Envs>,
+    /// Execution environment assignments to be set for the execution.
+    #[prost(message, repeated, tag="22")]
+    pub execution_env_assignments: ::prost::alloc::vec::Vec<super::core::ExecutionEnvAssignment>,
 }
 /// Values computed by the flyte platform after launch plan registration.
 /// These include expected_inputs required to be present in a CreateExecutionRequest
@@ -2444,6 +2458,11 @@ pub struct EmailMessage {
     #[prost(string, tag="4")]
     pub body: ::prost::alloc::string::String,
 }
+/// Empty request for GetDomain
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetDomainRequest {
+}
 /// Namespace within a project commonly used to differentiate between different service instances.
 /// e.g. "production", "development", etc.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -2455,6 +2474,13 @@ pub struct Domain {
     /// Display name.
     #[prost(string, tag="2")]
     pub name: ::prost::alloc::string::String,
+}
+/// Represents a list of domains.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetDomainsResponse {
+    #[prost(message, repeated, tag="1")]
+    pub domains: ::prost::alloc::vec::Vec<Domain>,
 }
 /// Top-level namespace used to classify different entities like workflows and executions.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -2492,6 +2518,8 @@ pub mod project {
         Archived = 1,
         /// System generated projects that aren't explicitly created or managed by a user.
         SystemGenerated = 2,
+        /// System archived projects that aren't explicitly archived by a user.
+        SystemArchived = 3,
     }
     impl ProjectState {
         /// String value of the enum field names used in the ProtoBuf definition.
@@ -2503,6 +2531,7 @@ pub mod project {
                 ProjectState::Active => "ACTIVE",
                 ProjectState::Archived => "ARCHIVED",
                 ProjectState::SystemGenerated => "SYSTEM_GENERATED",
+                ProjectState::SystemArchived => "SYSTEM_ARCHIVED",
             }
         }
         /// Creates an enum from field names used in the ProtoBuf definition.
@@ -2511,6 +2540,7 @@ pub mod project {
                 "ACTIVE" => Some(Self::Active),
                 "ARCHIVED" => Some(Self::Archived),
                 "SYSTEM_GENERATED" => Some(Self::SystemGenerated),
+                "SYSTEM_ARCHIVED" => Some(Self::SystemArchived),
                 _ => None,
             }
         }
@@ -2577,6 +2607,18 @@ pub struct ProjectUpdateResponse {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ProjectGetRequest {
+    /// Indicates a unique project.
+    /// +required
+    #[prost(string, tag="1")]
+    pub id: ::prost::alloc::string::String,
+    /// Optional, org key applied to the resource.
+    #[prost(string, tag="2")]
+    pub org: ::prost::alloc::string::String,
+}
+/// Error returned for inactive projects
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct InactiveProject {
     /// Indicates a unique project.
     /// +required
     #[prost(string, tag="1")]

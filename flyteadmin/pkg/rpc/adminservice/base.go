@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"runtime/debug"
 
-	"github.com/golang/protobuf/proto"
-
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/cloudevent"
 	eventWriter "github.com/flyteorg/flyte/flyteadmin/pkg/async/events/implementations"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications"
@@ -42,17 +40,6 @@ type AdminService struct {
 	DescriptionEntityManager interfaces.DescriptionEntityInterface
 	MetricsManager           interfaces.MetricsInterface
 	Metrics                  AdminMetrics
-}
-
-// Intercepts all admin requests to handle panics during execution.
-func (m *AdminService) interceptPanic(ctx context.Context, request proto.Message) {
-	err := recover()
-	if err == nil {
-		return
-	}
-
-	m.Metrics.PanicCounter.Inc()
-	logger.Fatalf(ctx, "panic-ed for request: [%+v] with err: %v with Stack: %v", request, err, string(debug.Stack()))
 }
 
 const defaultRetries = 3

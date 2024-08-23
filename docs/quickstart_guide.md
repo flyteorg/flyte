@@ -4,18 +4,16 @@
 In this guide, you will create and run a Flyte workflow in a local Python environment to generate the output "Hello, world!"
 
 ````{dropdown} Try Flyte in your browser
-:title: text-muted
 :animate: fade-in-slide-down
 
-```{link-button} https://sandbox.union.ai/
----
-classes: try-hosted-flyte btn-warning btn-block
-text: Hosted Flyte sandbox
----
+Union Serverless is a version of Flyte hosted by [Union](https://www.union.ai/) that you can try in your browser. Sign up for the waitlist below and check out the [Union Serverless Quickstart guide](https://docs.union.ai/serverless/quick-start).
+
+```{button-link} https://signup.union.ai/
+:color: warning
+
+Join the Union Serverless waitlist
 ```
-```{div} text-muted
-*Courtesy of [Union.ai](https://www.union.ai/)*
-```
+
 ````
 
 

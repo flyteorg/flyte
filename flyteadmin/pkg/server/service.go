@@ -12,6 +12,7 @@ import (
 	"github.com/gorilla/handlers"
 	grpcmiddleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpcauth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
+	grpcrecovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	grpcprometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/pkg/errors"
@@ -35,6 +36,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/config"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/rpc"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/rpc/adminservice"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/rpc/adminservice/middleware"
 	runtime2 "github.com/flyteorg/flyte/flyteadmin/pkg/runtime"
 	runtimeIfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/plugins"
@@ -98,11 +100,18 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 		otelgrpc.WithPropagators(propagation.TraceContext{}),
 	)
 
+	adminScope := scope.NewSubScope("admin")
+	recoveryInterceptor := middleware.NewRecoveryInterceptor(adminScope)
+
 	var chainedUnaryInterceptors grpc.UnaryServerInterceptor
 	if cfg.Security.UseAuth {
 		logger.Infof(ctx, "Creating gRPC server with authentication")
 		middlewareInterceptors := plugins.Get[grpc.UnaryServerInterceptor](pluginRegistry, plugins.PluginIDUnaryServiceMiddleware)
-		chainedUnaryInterceptors = grpcmiddleware.ChainUnaryServer(grpcprometheus.UnaryServerInterceptor,
+		chainedUnaryInterceptors = grpcmiddleware.ChainUnaryServer(
+			// recovery interceptor should always be first in order to handle any panics in the middleware or server
+			recoveryInterceptor.UnaryServerInterceptor(),
+			grpcrecovery.UnaryServerInterceptor(),
+			grpcprometheus.UnaryServerInterceptor,
 			otelUnaryServerInterceptor,
 			auth.GetAuthenticationCustomMetadataInterceptor(authCtx),
 			grpcauth.UnaryServerInterceptor(auth.GetAuthenticationInterceptor(authCtx)),
@@ -111,15 +120,27 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 		)
 	} else {
 		logger.Infof(ctx, "Creating gRPC server without authentication")
-		chainedUnaryInterceptors = grpcmiddleware.ChainUnaryServer(grpcprometheus.UnaryServerInterceptor, otelUnaryServerInterceptor)
+		chainedUnaryInterceptors = grpcmiddleware.ChainUnaryServer(
+			// recovery interceptor should always be first in order to handle any panics in the middleware or server
+			recoveryInterceptor.UnaryServerInterceptor(),
+			grpcprometheus.UnaryServerInterceptor,
+			otelUnaryServerInterceptor,
+		)
 	}
 
+	chainedStreamInterceptors := grpcmiddleware.ChainStreamServer(
+		// recovery interceptor should always be first in order to handle any panics in the middleware or server
+		recoveryInterceptor.StreamServerInterceptor(),
+		grpcprometheus.StreamServerInterceptor,
+	)
+
 	serverOpts := []grpc.ServerOption{
-		grpc.StreamInterceptor(grpcprometheus.StreamServerInterceptor),
+		// recovery interceptor should always be first in order to handle any panics in the middleware or server
+		grpc.StreamInterceptor(chainedStreamInterceptors),
 		grpc.UnaryInterceptor(chainedUnaryInterceptors),
 	}
 	if cfg.GrpcConfig.MaxMessageSizeBytes > 0 {
-		serverOpts = append(serverOpts, grpc.MaxRecvMsgSize(cfg.GrpcConfig.MaxMessageSizeBytes))
+		serverOpts = append(serverOpts, grpc.MaxRecvMsgSize(cfg.GrpcConfig.MaxMessageSizeBytes), grpc.MaxSendMsgSize(cfg.GrpcConfig.MaxMessageSizeBytes))
 	}
 	serverOpts = append(serverOpts, opts...)
 	grpcServer := grpc.NewServer(serverOpts...)
@@ -131,7 +152,7 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 	}
 
 	configuration := runtime2.NewConfigurationProvider()
-	adminServer := adminservice.NewAdminServer(ctx, pluginRegistry, configuration, cfg.KubeConfig, cfg.Master, dataStorageClient, scope.NewSubScope("admin"))
+	adminServer := adminservice.NewAdminServer(ctx, pluginRegistry, configuration, cfg.KubeConfig, cfg.Master, dataStorageClient, adminScope)
 	grpcService.RegisterAdminServiceServer(grpcServer, adminServer)
 	if cfg.Security.UseAuth {
 		grpcService.RegisterAuthMetadataServiceServer(grpcServer, authCtx.AuthMetadataService())
@@ -218,6 +239,9 @@ func newHTTPServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 
 	// This option sets subject in the user info response
 	gwmuxOptions = append(gwmuxOptions, runtime.WithForwardResponseOption(auth.GetUserInfoForwardResponseHandler()))
+
+	// Use custom header matcher to allow additional headers to be passed through
+	gwmuxOptions = append(gwmuxOptions, runtime.WithIncomingHeaderMatcher(auth.GetCustomHeaderMatcher(pluginRegistry)))
 
 	if cfg.Security.UseAuth {
 		// Add HTTP handlers for OIDC endpoints

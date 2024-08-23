@@ -337,4 +337,32 @@ func TestK8sPluginConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_update-base-backoff-duration", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("update-base-backoff-duration", testValue)
+			if vInt, err := cmdFlags.GetInt("update-base-backoff-duration"); err == nil {
+				testDecodeJson_K8sPluginConfig(t, fmt.Sprintf("%v", vInt), &actual.UpdateBaseBackoffDuration)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_update-backoff-retries", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("update-backoff-retries", testValue)
+			if vInt, err := cmdFlags.GetInt("update-backoff-retries"); err == nil {
+				testDecodeJson_K8sPluginConfig(t, fmt.Sprintf("%v", vInt), &actual.UpdateBackoffRetries)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }

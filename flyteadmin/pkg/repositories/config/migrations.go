@@ -17,6 +17,7 @@ import (
 
 // TODO: add a way to get these list of tables directly from the gorm loaded models
 var (
+	// Tables are ordererd by creation. Migration code relies on this ordering.
 	tables = []string{"execution_events", "executions", "launch_plans", "named_entity_metadata",
 		"node_execution_events", "node_executions", "projects", "resources", "schedulable_entities",
 		"schedule_entities_snapshots", "task_executions", "tasks", "workflows", "description_entities"}
@@ -347,6 +348,7 @@ var LegacyMigrations = []*gormigrate.Migration{
 
 	// For any new table, Please use the following pattern due to a bug
 	// in the postgres gorm layer https://github.com/go-gorm/postgres/issues/65
+	// The 13th table in tables was created before this migration.
 	{
 		ID: "2022-01-11-id-to-bigint",
 		Migrate: func(tx *gorm.DB) error {
@@ -354,14 +356,14 @@ var LegacyMigrations = []*gormigrate.Migration{
 			if err != nil {
 				return err
 			}
-			return alterTableColumnType(db, "id", "bigint")
+			return alterTableColumnType(db, "id", "bigint", tables[:13])
 		},
 		Rollback: func(tx *gorm.DB) error {
 			db, err := tx.DB()
 			if err != nil {
 				return err
 			}
-			return alterTableColumnType(db, "id", "int")
+			return alterTableColumnType(db, "id", "int", tables[:13])
 		},
 	},
 
@@ -1220,12 +1222,67 @@ var ContinuedMigrations = []*gormigrate.Migration{
 			return tx.Table("launch_plans").Migrator().DropColumn(&models.LaunchPlan{}, "launch_condition_type")
 		},
 	},
+
+	{
+		ID: "2024-06-06-execution-tags",
+		Migrate: func(tx *gorm.DB) error {
+			type ExecutionKey struct {
+				Project string `gorm:"primary_key;column:execution_project;size:255"`
+				Domain  string `gorm:"primary_key;column:execution_domain;size:255"`
+				Name    string `gorm:"primary_key;column:execution_name;size:255"`
+			}
+
+			type ExecutionTag struct {
+				ID        uint       `gorm:"index;autoIncrement;not null"`
+				CreatedAt time.Time  `gorm:"type:time"`
+				UpdatedAt time.Time  `gorm:"type:time"`
+				DeletedAt *time.Time `gorm:"index"`
+				ExecutionKey
+				Key   string `gorm:"primary_key;index:tag_key;size:255"`
+				Value string `gorm:"primary_key;index:tag_value;size:255"`
+			}
+
+			return tx.Transaction(func(_ *gorm.DB) error {
+				// Create an execution_tags Table
+				if err := tx.AutoMigrate(&ExecutionTag{}); err != nil {
+					return err
+				}
+				// Drop execution_admin_tags and admin_tags tables, and create a new table execution_tags
+				// to store tags associated with executions.
+				sql := "INSERT INTO execution_tags (execution_project, execution_domain, execution_name, created_at, updated_at, deleted_at, key, value)" +
+					" SELECT execution_project, execution_domain, execution_name, created_at, updated_at, deleted_at, name as key, '' as value" +
+					" FROM execution_admin_tags" +
+					" INNER JOIN admin_tags a on execution_admin_tags.admin_tag_id = a.id;"
+				if err := tx.Exec(sql).Error; err != nil {
+					return err
+				}
+				return nil
+			})
+		},
+		Rollback: func(tx *gorm.DB) error {
+			return tx.Migrator().DropTable("execution_tags")
+		},
+	},
+
+	{
+		ID: "2024-06-06-drop-execution_admin-tags",
+		Migrate: func(tx *gorm.DB) error {
+			return tx.Migrator().DropTable("execution_admin_tags")
+		},
+	},
+
+	{
+		ID: "2024-06-06-drop-admin-tags",
+		Migrate: func(tx *gorm.DB) error {
+			return tx.Migrator().DropTable("admin_tags")
+		},
+	},
 }
 
 var m = append(LegacyMigrations, NoopMigrations...)
 var Migrations = append(m, ContinuedMigrations...)
 
-func alterTableColumnType(db *sql.DB, columnName, columnType string) error {
+func alterTableColumnType(db *sql.DB, columnName, columnType string, tables []string) error {
 	var err error
 	for _, table := range tables {
 		if _, err = db.Exec(fmt.Sprintf(`ALTER TABLE IF EXISTS %s ALTER COLUMN "%s" TYPE %s`, table, columnName,

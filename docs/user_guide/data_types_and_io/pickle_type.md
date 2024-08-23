@@ -1,22 +1,3 @@
----
-jupytext:
-  cell_metadata_filter: all
-  formats: md:myst
-  main_language: python
-  notebook_metadata_filter: all
-  text_representation:
-    extension: .md
-    format_name: myst
-    format_version: 0.13
-    jupytext_version: 1.16.1
-kernelspec:
-  display_name: Python 3
-  language: python
-  name: python3
----
-
-+++ {"lines_to_next_cell": 0}
-
 (pickle_type)=
 
 # Pickle type
@@ -42,11 +23,14 @@ or register a custom transformer, as using pickle types can result in lower perf
 
 This example demonstrates how you can utilize custom objects without registering a transformer.
 
-```{code-cell}
-from flytekit import task, workflow
+```{note}
+To clone and run the example code on this page, see the [Flytesnacks repo][flytesnacks].
 ```
 
-+++ {"lines_to_next_cell": 0}
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/pickle_type.py
+:caption: data_types_and_io/pickle_type.py
+:lines: 1
+```
 
 `Superhero` represents a user-defined complex type that can be serialized to a pickle file by Flytekit
 and transferred between tasks as both input and output data.
@@ -56,30 +40,10 @@ Alternatively, you can {ref}`turn this object into a dataclass <dataclass>` for 
 We have used a simple object here for demonstration purposes.
 :::
 
-```{code-cell}
-class Superhero:
-    def __init__(self, name, power):
-        self.name = name
-        self.power = power
-
-
-@task
-def welcome_superhero(name: str, power: str) -> Superhero:
-    return Superhero(name, power)
-
-
-@task
-def greet_superhero(superhero: Superhero) -> str:
-    return f"👋 Hello {superhero.name}! Your superpower is {superhero.power}."
-
-
-@workflow
-def superhero_wf(name: str = "Thor", power: str = "Flight") -> str:
-    superhero = welcome_superhero(name=name, power=power)
-    return greet_superhero(superhero=superhero)
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/pickle_type.py
+:caption: data_types_and_io/pickle_type.py
+:lines: 7-26
 ```
-
-+++ {"lines_to_next_cell": 0}
 
 ## Batch size
 
@@ -89,34 +53,10 @@ or significant list elements, you can specify a batch size.
 This feature allows for the processing of each batch as a separate pickle file.
 The following example demonstrates how to set the batch size.
 
-```{code-cell}
-from typing import Iterator
-
-from flytekit.types.pickle.pickle import BatchSize
-from typing_extensions import Annotated
-
-
-@task
-def welcome_superheroes(names: list[str], powers: list[str]) -> Annotated[list[Superhero], BatchSize(3)]:
-    return [Superhero(name, power) for name, power in zip(names, powers)]
-
-
-@task
-def greet_superheroes(superheroes: list[Superhero]) -> Iterator[str]:
-    for superhero in superheroes:
-        yield f"👋 Hello {superhero.name}! Your superpower is {superhero.power}."
-
-
-@workflow
-def superheroes_wf(
-    names: list[str] = ["Thor", "Spiderman", "Hulk"],
-    powers: list[str] = ["Flight", "Surface clinger", "Shapeshifting"],
-) -> Iterator[str]:
-    superheroes = welcome_superheroes(names=names, powers=powers)
-    return greet_superheroes(superheroes=superheroes)
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/pickle_type.py
+:caption: data_types_and_io/pickle_type.py
+:lines: 35-58
 ```
-
-+++ {"lines_to_next_cell": 0}
 
 :::{note}
 The `welcome_superheroes` task will generate two pickle files: one containing two superheroes and the other containing one superhero.
@@ -124,8 +64,9 @@ The `welcome_superheroes` task will generate two pickle files: one containing tw
 
 You can run the workflows locally as follows:
 
-```{code-cell}
-if __name__ == "__main__":
-    print(f"Superhero wf: {superhero_wf()}")
-    print(f"Superhero(es) wf: {superheroes_wf()}")
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/pickle_type.py
+:caption: data_types_and_io/pickle_type.py
+:lines: 62-64
 ```
+
+[flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/data_types_and_io/

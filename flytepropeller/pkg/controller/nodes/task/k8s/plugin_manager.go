@@ -3,7 +3,6 @@ package k8s
 import (
 	"context"
 	"fmt"
-	"reflect"
 	"time"
 
 	"golang.org/x/time/rate"
@@ -14,9 +13,9 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	k8stypes "k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/validation"
+	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/scheme"
-	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/event"
@@ -94,9 +93,11 @@ type PluginManager struct {
 	kubeClient      pluginsCore.KubeClient
 	metrics         PluginMetrics
 	// Per namespace-resource
-	backOffController    *backoff.Controller
-	resourceLevelMonitor *ResourceLevelMonitor
-	eventWatcher         EventWatcher
+	backOffController         *backoff.Controller
+	resourceLevelMonitor      *ResourceLevelMonitor
+	eventWatcher              EventWatcher
+	updateBaseBackoffDuration int
+	updateBackoffRetries      int
 }
 
 func (e *PluginManager) addObjectMetadata(taskCtx pluginsCore.TaskExecutionMetadata, o client.Object, cfg *config.K8sPluginConfig) {
@@ -289,7 +290,7 @@ func (e *PluginManager) checkResourcePhase(ctx context.Context, tCtx pluginsCore
 		var opReader io.OutputReader
 		if pCtx.ow == nil {
 			logger.Infof(ctx, "Plugin [%s] returned no outputReader, assuming file based outputs", e.id)
-			opReader = ioutils.NewRemoteFileOutputReader(ctx, tCtx.DataStore(), tCtx.OutputWriter(), tCtx.MaxDatasetSizeBytes())
+			opReader = ioutils.NewRemoteFileOutputReader(ctx, tCtx.DataStore(), tCtx.OutputWriter(), 0)
 		} else {
 			logger.Infof(ctx, "Plugin [%s] returned outputReader", e.id)
 			opReader = pCtx.ow.GetReader()
@@ -465,25 +466,48 @@ func (e *PluginManager) Finalize(ctx context.Context, tCtx pluginsCore.TaskExecu
 	}
 	nsName = k8stypes.NamespacedName{Namespace: o.GetNamespace(), Name: o.GetName()}
 
+	retryBackoff := wait.Backoff{
+		Duration: time.Duration(e.updateBaseBackoffDuration) * time.Millisecond,
+		Factor:   2.0,
+		Jitter:   0.1,
+		Steps:    e.updateBackoffRetries,
+	}
+
 	// Attempt to cleanup finalizers so that the object may be deleted/garbage collected. We try to clear them for all
 	// objects, regardless of whether or not InjectFinalizer is configured to handle all cases where InjectFinalizer is
 	// enabled/disabled during object execution.
-	if err := e.kubeClient.GetClient().Get(ctx, nsName, o); err != nil {
-		if isK8sObjectNotExists(err) {
-			return nil
+	var lastErr error
+	_ = wait.ExponentialBackoff(retryBackoff, func() (bool, error) {
+		lastErr = nil
+		if err := e.kubeClient.GetClient().Get(ctx, nsName, o); err != nil {
+			if isK8sObjectNotExists(err) {
+				return true, nil
+			}
+			lastErr = err
+			// This happens sometimes because a node gets removed and K8s deletes the pod. This will result in a
+			// Pod does not exist error. This should be retried using the retry policy
+			logger.Warningf(ctx, "Failed in finalizing get Resource with name: %v. Error: %v", nsName, err)
+			return true, err
 		}
-		// This happens sometimes because a node gets removed and K8s deletes the pod. This will result in a
-		// Pod does not exist error. This should be retried using the retry policy
-		logger.Warningf(ctx, "Failed in finalizing get Resource with name: %v. Error: %v", nsName, err)
-		return err
-	}
 
-	// This must happen after sending admin event. It's safe against partial failures because if the event failed, we will
-	// simply retry in the next round. If the event succeeded but this failed, we will try again the next round to send
-	// the same event (idempotent) and then come here again...
-	err = e.clearFinalizers(ctx, o)
-	if err != nil {
-		errs.Append(err)
+		// This must happen after sending admin event. It's safe against partial failures because if the event failed, we will
+		// simply retry in the next round. If the event succeeded but this failed, we will try again the next round to send
+		// the same event (idempotent) and then come here again...
+		if err := e.clearFinalizers(ctx, o); err != nil {
+			lastErr = err
+			// retry is if there is a conflict in case the informer cache is out of sync
+			if k8serrors.IsConflict(err) {
+				logger.Warningf(ctx, "Failed to clear finalizers for Resource with name: %v. Error: %v. Retrying..", nsName, err)
+				return false, nil
+			}
+			logger.Warningf(ctx, "Failed to clear finalizers for Resource with name: %v. Error: %v", nsName, err)
+			return true, err
+		}
+		return true, nil
+	})
+
+	if lastErr != nil {
+		errs.Append(lastErr)
 	}
 
 	// If we should delete the resource when finalize is called, do a best effort delete.
@@ -632,8 +656,9 @@ func NewPluginManager(ctx context.Context, iCtx pluginsCore.SetupContext, entry 
 		return nil, err
 	}
 
+	k8sConfig := config.GetK8sPluginConfig()
 	var eventWatcher EventWatcher
-	if config.GetK8sPluginConfig().SendObjectEvents {
+	if k8sConfig.SendObjectEvents {
 		eventWatcher, err = NewEventWatcher(ctx, gvk, kubeClientset)
 		if err != nil {
 			return nil, err
@@ -641,22 +666,21 @@ func NewPluginManager(ctx context.Context, iCtx pluginsCore.SetupContext, entry 
 	}
 
 	// Construct the collector that will emit a gauge indicating current levels of the resource that this K8s plugin operates on
-	pluginInformer, err := getPluginSharedInformer(ctx, kubeClient, entry.ResourceToWatch)
-	if err != nil {
-		return nil, err
-	}
-	rm := monitorIndex.GetOrCreateResourceLevelMonitor(ctx, metricsScope, pluginInformer, gvk)
+	rm := monitorIndex.GetOrCreateResourceLevelMonitor(ctx, metricsScope, kubeClient.GetCache(), gvk)
+
 	// Start the poller and gauge emitter
 	rm.RunCollectorOnce(ctx)
 
 	return &PluginManager{
-		id:                   entry.ID,
-		plugin:               entry.Plugin,
-		resourceToWatch:      entry.ResourceToWatch,
-		metrics:              newPluginMetrics(metricsScope),
-		kubeClient:           kubeClient,
-		resourceLevelMonitor: rm,
-		eventWatcher:         eventWatcher,
+		id:                        entry.ID,
+		plugin:                    entry.Plugin,
+		resourceToWatch:           entry.ResourceToWatch,
+		metrics:                   newPluginMetrics(metricsScope),
+		kubeClient:                kubeClient,
+		resourceLevelMonitor:      rm,
+		eventWatcher:              eventWatcher,
+		updateBaseBackoffDuration: k8sConfig.UpdateBaseBackoffDuration,
+		updateBackoffRetries:      k8sConfig.UpdateBackoffRetries,
 	}, nil
 }
 
@@ -666,18 +690,4 @@ func getPluginGvk(resourceToWatch runtime.Object) (schema.GroupVersionKind, erro
 		return schema.GroupVersionKind{}, errors.Errorf(errors.PluginInitializationFailed, "No kind in schema for %v", resourceToWatch)
 	}
 	return kinds[0], nil
-}
-
-func getPluginSharedInformer(ctx context.Context, kubeClient pluginsCore.KubeClient, resourceToWatch client.Object) (cache.SharedIndexInformer, error) {
-	i, err := kubeClient.GetCache().GetInformer(ctx, resourceToWatch)
-	if err != nil {
-		return nil, errors.Wrapf(errors.PluginInitializationFailed, err, "Error getting informer for %s", reflect.TypeOf(i))
-	}
-
-	si, casted := i.(cache.SharedIndexInformer)
-	if !casted {
-		return nil, errors.Errorf(errors.PluginInitializationFailed, "wrong type. Actual: %v", reflect.TypeOf(i))
-	}
-
-	return si, nil
 }

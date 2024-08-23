@@ -1265,6 +1265,15 @@
             "type": "string"
           },
           "description": "Additional metadata for literals."
+        },
+        "uri": {
+          "type": "string",
+          "description": "If this literal is offloaded, this field will contain metadata including the offload location."
+        },
+        "size_bytes": {
+          "type": "string",
+          "format": "uint64",
+          "description": "Includes information about the size of the literal."
         }
       },
       "description": "A simple value. This supports any level of nesting (e.g. array of array of array of Blobs) as well as simple primitives."
@@ -1724,6 +1733,12 @@
         },
         "ttl": {
           "type": "string"
+        },
+        "ShowWhilePending": {
+          "type": "boolean"
+        },
+        "HideOnceFinished": {
+          "type": "boolean"
         }
       },
       "title": "Log information for the task that is specific to a log sink\nWhen our log story is flushed out, we may have more metadata here like log link expiry"
@@ -2023,8 +2038,7 @@
       "type": "object",
       "properties": {
         "task_execution_id": {
-          "$ref": "#/definitions/coreTaskExecutionIdentifier",
-          "title": "ID of the task execution"
+          "$ref": "#/definitions/coreTaskExecutionIdentifier"
         },
         "namespace": {
           "type": "string",
@@ -2072,9 +2086,13 @@
         "overrides": {
           "$ref": "#/definitions/coreTaskNodeOverrides",
           "description": "Overrides for specific properties of the task node.\nThese overrides can be used to customize the behavior of the task node."
+        },
+        "identity": {
+          "$ref": "#/definitions/coreIdentity",
+          "title": "Identity of user running this task execution"
         }
       },
-      "description": "Represents a subset of runtime task execution metadata that are relevant to external plugins."
+      "description": "Represents a subset of runtime task execution metadata that are relevant to external plugins.\n\nID of the task execution"
     },
     "flyteidlcoreEnumType": {
       "type": "object",

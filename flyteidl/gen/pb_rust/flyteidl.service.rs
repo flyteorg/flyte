@@ -408,4 +408,5 @@ pub struct UserInfoResponse {
     #[prost(message, optional, tag="8")]
     pub additional_claims: ::core::option::Option<::prost_types::Struct>,
 }
+include!("flyteidl.service.tonic.rs");
 // @@protoc_insertion_point(module)

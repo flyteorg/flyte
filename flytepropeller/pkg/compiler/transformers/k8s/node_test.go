@@ -296,7 +296,9 @@ func TestBuildNodeSpec(t *testing.T) {
 						},
 					},
 				},
-				Parallelism: 10,
+				ParallelismOption: &core.ArrayNode_Parallelism{
+					Parallelism: 10,
+				},
 				SuccessCriteria: &core.ArrayNode_MinSuccessRatio{
 					MinSuccessRatio: 0.5,
 				},
@@ -304,6 +306,35 @@ func TestBuildNodeSpec(t *testing.T) {
 		}
 
 		mustBuild(t, n, 1, errs.NewScope())
+		specs, ok := buildNodeSpec(n.GetCoreNode(), tasks, errs)
+		assert.True(t, ok)
+		assert.Len(t, specs, 1)
+		assert.Equal(t, *specs[0].ArrayNode.Parallelism, uint32(10))
+
+		n.Node.Target = &core.Node_ArrayNode{
+			ArrayNode: &core.ArrayNode{
+				Node: &core.Node{
+					Id: "foo",
+					Target: &core.Node_TaskNode{
+						TaskNode: &core.TaskNode{
+							Reference: &core.TaskNode_ReferenceId{
+								ReferenceId: &core.Identifier{Name: "ref_1"},
+							},
+						},
+					},
+				},
+				ParallelismOption: nil,
+				SuccessCriteria: &core.ArrayNode_MinSuccessRatio{
+					MinSuccessRatio: 0.5,
+				},
+			},
+		}
+
+		mustBuild(t, n, 1, errs.NewScope())
+		specs, ok = buildNodeSpec(n.GetCoreNode(), tasks, errs)
+		assert.True(t, ok)
+		assert.Len(t, specs, 1)
+		assert.Nil(t, specs[0].ArrayNode.Parallelism)
 	})
 }
 

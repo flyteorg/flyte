@@ -10,13 +10,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
-
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/ptypes"
 	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/pkg/errors"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 func MakePrimitive(v interface{}) (*core.Primitive, error) {
@@ -377,7 +377,8 @@ func MakeLiteralForSimpleType(t core.SimpleType, s string) (*core.Literal, error
 	switch t {
 	case core.SimpleType_STRUCT:
 		st := &structpb.Struct{}
-		err := jsonpb.UnmarshalString(s, st)
+		unmarshaler := jsonpb.Unmarshaler{AllowUnknownFields: true}
+		err := unmarshaler.Unmarshal(strings.NewReader(s), st)
 		if err != nil {
 			return nil, errors.Wrapf(err, "failed to load generic type as json.")
 		}

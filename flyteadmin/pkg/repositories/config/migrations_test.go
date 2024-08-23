@@ -20,7 +20,7 @@ func TestAlterTableColumnType(t *testing.T) {
 		`ALTER TABLE IF EXISTS execution_events ALTER COLUMN "id" TYPE bigint`)
 	assert.NoError(t, err)
 	tables = []string{"execution_events"}
-	_ = alterTableColumnType(db, "id", "bigint")
+	_ = alterTableColumnType(db, "id", "bigint", tables)
 	assert.True(t, query.Triggered)
 }
 
