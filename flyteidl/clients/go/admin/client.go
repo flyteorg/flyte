@@ -179,10 +179,7 @@ func initializeClients(ctx context.Context, cfg *Config, tokenCache cache.TokenC
 	credentialsFuture := NewPerRPCCredentialsFuture()
 	proxyCredentialsFuture := NewPerRPCCredentialsFuture()
 
-	authInterceptor, err := NewAuthInterceptor(cfg, tokenCache, credentialsFuture, proxyCredentialsFuture)
-	if err != nil {
-		return nil, err
-	}
+	authInterceptor := NewAuthInterceptor(cfg, tokenCache, credentialsFuture, proxyCredentialsFuture)
 	opts = append(opts,
 		grpc.WithChainUnaryInterceptor(authInterceptor),
 		grpc.WithPerRPCCredentials(credentialsFuture))

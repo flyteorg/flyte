@@ -166,11 +166,10 @@ func Test_newAuthInterceptor(t *testing.T) {
 		mockTokenCache := &mocks.TokenCache{}
 		mockTokenCache.OnGetTokenMatch().Return(&tokenData, nil)
 		mockTokenCache.OnSaveTokenMatch(mock.Anything).Return(nil)
-		interceptor, err := NewAuthInterceptor(&Config{
+		interceptor := NewAuthInterceptor(&Config{
 			Endpoint:              config.URL{URL: *u},
 			UseInsecureConnection: true,
 		}, mockTokenCache, f, p)
-		assert.NoError(t, err)
 		otherError := func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, opts ...grpc.CallOption) error {
 			return status.New(codes.Canceled, "").Err()
 		}
@@ -212,12 +211,11 @@ func Test_newAuthInterceptor(t *testing.T) {
 		c.On("CondBroadcast").Return()
 		c.On("Unlock").Return()
 		c.OnPurgeIfEqualsMatch(mock.Anything).Return(true, nil)
-		interceptor, err := NewAuthInterceptor(&Config{
+		interceptor := NewAuthInterceptor(&Config{
 			Endpoint:              config.URL{URL: *u},
 			UseInsecureConnection: true,
 			AuthType:              AuthTypeClientSecret,
 		}, c, f, p)
-		assert.NoError(t, err)
 		unauthenticated := func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, opts ...grpc.CallOption) error {
 			return status.New(codes.Unauthenticated, "").Err()
 		}
@@ -255,12 +253,11 @@ func Test_newAuthInterceptor(t *testing.T) {
 		p := NewPerRPCCredentialsFuture()
 		c := &mocks.TokenCache{}
 		c.OnGetTokenMatch().Return(nil, nil)
-		interceptor, err := NewAuthInterceptor(&Config{
+		interceptor := NewAuthInterceptor(&Config{
 			Endpoint:              config.URL{URL: *u},
 			UseInsecureConnection: true,
 			AuthType:              AuthTypeClientSecret,
 		}, c, f, p)
-		assert.NoError(t, err)
 		authenticated := func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, opts ...grpc.CallOption) error {
 			return nil
 		}
@@ -303,12 +300,11 @@ func Test_newAuthInterceptor(t *testing.T) {
 		c.OnTryLockMatch().Return(true)
 		c.OnSaveTokenMatch(mock.Anything).Return(nil)
 		c.OnPurgeIfEqualsMatch(mock.Anything).Return(true, nil)
-		interceptor, err := NewAuthInterceptor(&Config{
+		interceptor := NewAuthInterceptor(&Config{
 			Endpoint:              config.URL{URL: *u},
 			UseInsecureConnection: true,
 			AuthType:              AuthTypeClientSecret,
 		}, c, f, p)
-		assert.NoError(t, err)
 		unauthenticated := func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, opts ...grpc.CallOption) error {
 			return status.New(codes.Aborted, "").Err()
 		}
@@ -351,8 +347,7 @@ func TestNewAuthInterceptorAndMaterialize(t *testing.T) {
 			AuthorizationHeader:   "authorization",
 		}
 
-		intercept, err := NewAuthInterceptor(cfg, c, f, p)
-		assert.NoError(t, err)
+		intercept := NewAuthInterceptor(cfg, c, f, p)
 		// Invoke Materialize inside the intercept
 		err = intercept(ctx, "GET", nil, nil, nil, func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, opts ...grpc.CallOption) error {
 			return nil
@@ -387,7 +382,10 @@ func TestNewAuthInterceptorAndMaterialize(t *testing.T) {
 		}
 		f := NewPerRPCCredentialsFuture()
 		p := NewPerRPCCredentialsFuture()
-		_, err = NewAuthInterceptor(cfg, c, f, p)
+		intercept := NewAuthInterceptor(cfg, c, f, p)
+		err = intercept(ctx, "GET", nil, nil, nil, func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, opts ...grpc.CallOption) error {
+			return nil
+		})
 		assert.EqualError(t, err, "failed to fetch client metadata. Error: rpc error: code = Unknown desc = expected err")
 	})
 }

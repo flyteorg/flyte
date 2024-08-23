@@ -310,10 +310,7 @@ func getAdminClient(ctx context.Context) (client service.AdminServiceClient, sig
 	}
 
 	credentialsFuture := admin.NewPerRPCCredentialsFuture()
-	authIntercept, err := admin.NewAuthInterceptor(cfg, tc, credentialsFuture, nil)
-	if err != nil {
-		return nil, nil, nil, fmt.Errorf("failed to create auth interceptor. Error: %w", err)
-	}
+	authIntercept := admin.NewAuthInterceptor(cfg, tc, credentialsFuture, nil)
 	opts := []grpc.DialOption{
 		grpc.WithChainUnaryInterceptor(authIntercept),
 		grpc.WithPerRPCCredentials(credentialsFuture),

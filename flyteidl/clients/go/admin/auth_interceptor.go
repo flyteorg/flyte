@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"sync"
 
 	"golang.org/x/oauth2"
 	"google.golang.org/grpc"
@@ -104,6 +105,60 @@ func setHTTPClientContext(ctx context.Context, cfg *Config, proxyCredentialsFutu
 	return context.WithValue(ctx, oauth2.HTTPClient, httpClient)
 }
 
+type OauthMetadataProvider struct {
+	authorizationMetadataKey string
+	tokenSource              oauth2.TokenSource
+	once                     sync.Once
+}
+
+func (o *OauthMetadataProvider) getTokenSourceAndMetadata(cfg *Config, tokenCache cache.TokenCache, proxyCredentialsFuture *PerRPCCredentialsFuture) error {
+	ctx := context.Background()
+
+	authMetadataClient, err := InitializeAuthMetadataClient(ctx, cfg, proxyCredentialsFuture)
+	if err != nil {
+		return fmt.Errorf("failed to initialized Auth Metadata Client. Error: %w", err)
+	}
+
+	tokenSourceProvider, err := NewTokenSourceProvider(ctx, cfg, tokenCache, authMetadataClient)
+	if err != nil {
+		return fmt.Errorf("failed to initialized token source provider. Err: %w", err)
+	}
+
+	authorizationMetadataKey := cfg.AuthorizationHeader
+	if len(authorizationMetadataKey) == 0 {
+		clientMetadata, err := authMetadataClient.GetPublicClientConfig(ctx, &service.PublicClientAuthConfigRequest{})
+		if err != nil {
+			return fmt.Errorf("failed to fetch client metadata. Error: %v", err)
+		}
+		authorizationMetadataKey = clientMetadata.AuthorizationMetadataKey
+	}
+
+	tokenSource, err := tokenSourceProvider.GetTokenSource(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to get token source. Error: %w", err)
+	}
+
+	o.authorizationMetadataKey = authorizationMetadataKey
+	o.tokenSource = tokenSource
+
+	return nil
+}
+
+func (o *OauthMetadataProvider) GetOauthMetadata(cfg *Config, tokenCache cache.TokenCache, proxyCredentialsFuture *PerRPCCredentialsFuture) error {
+	// Ensure loadTokenRelated() is only executed once
+	var err error
+	o.once.Do(func() {
+		err = o.getTokenSourceAndMetadata(cfg, tokenCache, proxyCredentialsFuture)
+		if err != nil {
+			logger.Errorf(context.Background(), "Failed to load token related config. Error: %v", err)
+		}
+	})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // NewAuthInterceptor creates a new grpc.UnaryClientInterceptor that forwards the grpc call and inspects the error.
 // It will first invoke the grpc pipeline (to proceed with the request) with no modifications. It's expected for the grpc
 // pipeline to already have a grpc.WithPerRPCCredentials() DialOption. If the perRPCCredentials has already been initialized,
@@ -114,34 +169,21 @@ func setHTTPClientContext(ctx context.Context, cfg *Config, proxyCredentialsFutu
 // more. It'll fail hard if it couldn't do so (i.e. it will no longer attempt to send an unauthenticated request). Once
 // a token source has been created, it'll invoke the grpc pipeline again, this time the grpc.PerRPCCredentials should
 // be able to find and acquire a valid AccessToken to annotate the request with.
-func NewAuthInterceptor(cfg *Config, tokenCache cache.TokenCache, credentialsFuture *PerRPCCredentialsFuture, proxyCredentialsFuture *PerRPCCredentialsFuture) (grpc.UnaryClientInterceptor, error) {
-	ctx := context.Background()
+func NewAuthInterceptor(cfg *Config, tokenCache cache.TokenCache, credentialsFuture *PerRPCCredentialsFuture, proxyCredentialsFuture *PerRPCCredentialsFuture) grpc.UnaryClientInterceptor {
 
-	authMetadataClient, err := InitializeAuthMetadataClient(ctx, cfg, proxyCredentialsFuture)
-	if err != nil {
-		return nil, fmt.Errorf("failed to initialized Auth Metadata Client. Error: %w", err)
-	}
-
-	tokenSourceProvider, err := NewTokenSourceProvider(ctx, cfg, tokenCache, authMetadataClient)
-	if err != nil {
-		return nil, fmt.Errorf("failed to initialized token source provider. Err: %w", err)
-	}
-
-	authorizationMetadataKey := cfg.AuthorizationHeader
-	if len(authorizationMetadataKey) == 0 {
-		clientMetadata, err := authMetadataClient.GetPublicClientConfig(ctx, &service.PublicClientAuthConfigRequest{})
-		if err != nil {
-			return nil, fmt.Errorf("failed to fetch client metadata. Error: %v", err)
-		}
-		authorizationMetadataKey = clientMetadata.AuthorizationMetadataKey
-	}
-
-	tokenSource, err := tokenSourceProvider.GetTokenSource(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get token source. Error: %w", err)
+	oauthMetadataProvider := OauthMetadataProvider{
+		once: sync.Once{},
 	}
 
 	return func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
+
+		err := oauthMetadataProvider.GetOauthMetadata(cfg, tokenCache, proxyCredentialsFuture)
+		if err != nil {
+			return err
+		}
+		authorizationMetadataKey := oauthMetadataProvider.authorizationMetadataKey
+		tokenSource := oauthMetadataProvider.tokenSource
+
 		ctx = setHTTPClientContext(ctx, cfg, proxyCredentialsFuture)
 
 		// If there is already a token in the cache (e.g. key-ring), we should use it immediately...
@@ -153,7 +195,7 @@ func NewAuthInterceptor(cfg *Config, tokenCache cache.TokenCache, credentialsFut
 			}
 		}
 
-		err := invoker(ctx, method, req, reply, cc, opts...)
+		err = invoker(ctx, method, req, reply, cc, opts...)
 		if err != nil {
 			logger.Debugf(ctx, "Request failed due to [%v]. If it's an unauthenticated error, we will attempt to establish an authenticated context.", err)
 
@@ -194,7 +236,7 @@ func NewAuthInterceptor(cfg *Config, tokenCache cache.TokenCache, credentialsFut
 		}
 
 		return err
-	}, nil
+	}
 }
 
 func NewProxyAuthInterceptor(cfg *Config, proxyCredentialsFuture *PerRPCCredentialsFuture) grpc.UnaryClientInterceptor {
