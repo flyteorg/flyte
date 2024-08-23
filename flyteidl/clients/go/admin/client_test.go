@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	adminMocks "github.com/flyteorg/flyte/flyteidl/clients/go/admin/mocks"
 	"io/ioutil"
+	"k8s.io/apimachinery/pkg/util/rand"
 	"net/http"
 	"net/url"
 	"os"
@@ -30,13 +32,30 @@ import (
 )
 
 func TestInitializeAndGetAdminClient(t *testing.T) {
+	httpPort := rand.IntnRange(10000, 60000)
+	grpcPort := rand.IntnRange(10000, 60000)
+	m := &adminMocks.AuthMetadataServiceServer{}
+	m.OnGetOAuth2MetadataMatch(mock.Anything, mock.Anything).Return(&service.OAuth2MetadataResponse{
+		AuthorizationEndpoint: fmt.Sprintf("http://localhost:%d/oauth2/authorize", httpPort),
+		TokenEndpoint:         fmt.Sprintf("http://localhost:%d/oauth2/token", httpPort),
+		JwksUri:               fmt.Sprintf("http://localhost:%d/oauth2/jwks", httpPort),
+	}, nil)
+	m.OnGetPublicClientConfigMatch(mock.Anything, mock.Anything).Return(&service.PublicClientAuthConfigResponse{
+		Scopes: []string{"all"},
+	}, nil)
+	u, err := url.Parse(fmt.Sprintf("dns:///localhost:%d", grpcPort))
+	assert.NoError(t, err)
 
-	ctx := context.TODO()
+	s := newAuthMetadataServer(t, grpcPort, httpPort, m)
+	ctx := context.Background()
+	assert.NoError(t, s.Start(ctx))
+	defer s.Close()
+
 	t.Run("legal", func(t *testing.T) {
-		u, err := url.Parse("http://localhost:8089")
 		assert.NoError(t, err)
 		assert.NotNil(t, InitializeAdminClient(ctx, &Config{
-			Endpoint: config.URL{URL: *u},
+			Endpoint:              config.URL{URL: *u},
+			UseInsecureConnection: true,
 		}))
 	})
 }
@@ -52,9 +71,26 @@ func TestInitializeMockAdminClient(t *testing.T) {
 	c := InitializeMockAdminClient()
 	assert.NotNil(t, c)
 }
+func TestBasicClientSet(t *testing.T) {
+	httpPort := rand.IntnRange(10000, 60000)
+	grpcPort := rand.IntnRange(10000, 60000)
+	m := &adminMocks.AuthMetadataServiceServer{}
+	m.OnGetOAuth2MetadataMatch(mock.Anything, mock.Anything).Return(&service.OAuth2MetadataResponse{
+		AuthorizationEndpoint: fmt.Sprintf("http://localhost:%d/oauth2/authorize", httpPort),
+		TokenEndpoint:         fmt.Sprintf("http://localhost:%d/oauth2/token", httpPort),
+		JwksUri:               fmt.Sprintf("http://localhost:%d/oauth2/jwks", httpPort),
+	}, nil)
+	m.OnGetPublicClientConfigMatch(mock.Anything, mock.Anything).Return(&service.PublicClientAuthConfigResponse{
+		Scopes: []string{"all"},
+	}, nil)
+	u, err := url.Parse(fmt.Sprintf("dns:///localhost:%d", grpcPort))
+	assert.NoError(t, err)
 
-func TestGetAdditionalAdminClientConfigOptions(t *testing.T) {
-	u, _ := url.Parse("localhost:8089")
+	s := newAuthMetadataServer(t, grpcPort, httpPort, m)
+	ctx := context.Background()
+	assert.NoError(t, s.Start(ctx))
+	defer s.Close()
+
 	adminServiceConfig := &Config{
 		Endpoint:              config.URL{URL: *u},
 		UseInsecureConnection: true,
@@ -63,11 +99,8 @@ func TestGetAdditionalAdminClientConfigOptions(t *testing.T) {
 
 	assert.NoError(t, SetConfig(adminServiceConfig))
 
-	ctx := context.Background()
 	t.Run("legal", func(t *testing.T) {
-		u, err := url.Parse("http://localhost:8089")
-		assert.NoError(t, err)
-		clientSet, err := ClientSetBuilder().WithConfig(&Config{Endpoint: config.URL{URL: *u}}).Build(ctx)
+		clientSet, err := ClientSetBuilder().WithConfig(adminServiceConfig).Build(ctx)
 		assert.NoError(t, err)
 		assert.NotNil(t, clientSet)
 		assert.NotNil(t, clientSet.AdminClient())
@@ -75,31 +108,39 @@ func TestGetAdditionalAdminClientConfigOptions(t *testing.T) {
 		assert.NotNil(t, clientSet.IdentityClient())
 		assert.NotNil(t, clientSet.HealthServiceClient())
 	})
+}
+
+func TestGetAdditionalAdminClientConfigOptions(t *testing.T) {
+	u, _ := url.Parse("localhost:8089")
+
+	ctx := context.Background()
+	adminServiceConfig := &Config{
+		Endpoint:              config.URL{URL: *u},
+		UseInsecureConnection: true,
+		PerRetryTimeout:       config.Duration{Duration: 1 * time.Second},
+	}
+
+	assert.NoError(t, SetConfig(adminServiceConfig))
 
 	t.Run("legal-from-config", func(t *testing.T) {
 		u, _ := url.Parse("localhost:8089")
-		clientSet, err := initializeClients(ctx, &Config{InsecureSkipVerify: true, Endpoint: config.URL{URL: *u}}, nil)
+		p := NewPerRPCCredentialsFuture()
+		cfg := &Config{InsecureSkipVerify: true, Endpoint: config.URL{URL: *u}}
+		c, err := NewAdminConnection(ctx, cfg, p)
 		assert.NoError(t, err)
-		assert.NotNil(t, clientSet)
-		assert.NotNil(t, clientSet.AuthMetadataClient())
-		assert.NotNil(t, clientSet.AdminClient())
-		assert.NotNil(t, clientSet.HealthServiceClient())
+		assert.NotNil(t, c)
 	})
+
 	t.Run("legal-from-config-with-cacerts", func(t *testing.T) {
 		u, _ := url.Parse("localhost:8089")
-		clientSet, err := initializeClients(ctx, &Config{CACertFilePath: "testdata/root.pem", Endpoint: config.URL{URL: *u}}, nil)
+		cfg := &Config{CACertFilePath: "testdata/root.pem", Endpoint: config.URL{URL: *u}}
+		p := NewPerRPCCredentialsFuture()
+		c, err := NewAdminConnection(ctx, cfg, p)
 		assert.NoError(t, err)
-		assert.NotNil(t, clientSet)
-		assert.NotNil(t, clientSet.AuthMetadataClient())
-		assert.NotNil(t, clientSet.AdminClient())
+		assert.NotNil(t, c)
 	})
 
 	t.Run("legal-from-config-with-invalid-cacerts", func(t *testing.T) {
-		defer func() {
-			if r := recover(); r == nil {
-				t.Errorf("The code did not panic")
-			}
-		}()
 		newAdminServiceConfig := &Config{
 			Endpoint:              config.URL{URL: *u},
 			UseInsecureConnection: false,
@@ -108,9 +149,10 @@ func TestGetAdditionalAdminClientConfigOptions(t *testing.T) {
 		}
 
 		assert.NoError(t, SetConfig(newAdminServiceConfig))
-		clientSet, err := initializeClients(ctx, newAdminServiceConfig, nil)
-		assert.NotNil(t, err)
-		assert.Nil(t, clientSet)
+		p := NewPerRPCCredentialsFuture()
+		c, err := NewAdminConnection(ctx, newAdminServiceConfig, p)
+		assert.Error(t, err)
+		assert.Nil(t, c)
 	})
 }
 
@@ -314,19 +356,34 @@ func Test_getPkceAuthTokenSource(t *testing.T) {
 }
 
 func TestGetDefaultServiceConfig(t *testing.T) {
-	u, _ := url.Parse("localhost:8089")
+	httpPort := rand.IntnRange(10000, 60000)
+	grpcPort := rand.IntnRange(10000, 60000)
+	m := &adminMocks.AuthMetadataServiceServer{}
+	m.OnGetOAuth2MetadataMatch(mock.Anything, mock.Anything).Return(&service.OAuth2MetadataResponse{
+		AuthorizationEndpoint: fmt.Sprintf("http://localhost:%d/oauth2/authorize", httpPort),
+		TokenEndpoint:         fmt.Sprintf("http://localhost:%d/oauth2/token", httpPort),
+		JwksUri:               fmt.Sprintf("http://localhost:%d/oauth2/jwks", httpPort),
+	}, nil)
+	m.OnGetPublicClientConfigMatch(mock.Anything, mock.Anything).Return(&service.PublicClientAuthConfigResponse{
+		Scopes: []string{"all"},
+	}, nil)
+	u, err := url.Parse(fmt.Sprintf("dns:///localhost:%d", grpcPort))
+	assert.NoError(t, err)
+
+	s := newAuthMetadataServer(t, grpcPort, httpPort, m)
+	ctx := context.Background()
+	assert.NoError(t, s.Start(ctx))
+	defer s.Close()
 	adminServiceConfig := &Config{
-		Endpoint:             config.URL{URL: *u},
-		DefaultServiceConfig: `{"loadBalancingConfig": [{"round_robin":{}}]}`,
+		Endpoint:              config.URL{URL: *u},
+		DefaultServiceConfig:  `{"loadBalancingConfig": [{"round_robin":{}}]}`,
+		UseInsecureConnection: true,
 	}
 
 	assert.NoError(t, SetConfig(adminServiceConfig))
 
-	ctx := context.Background()
 	t.Run("legal", func(t *testing.T) {
-		u, err := url.Parse("http://localhost:8089")
-		assert.NoError(t, err)
-		clientSet, err := ClientSetBuilder().WithConfig(&Config{Endpoint: config.URL{URL: *u}, DefaultServiceConfig: `{"loadBalancingConfig": [{"round_robin":{}}]}`}).Build(ctx)
+		clientSet, err := ClientSetBuilder().WithConfig(&Config{Endpoint: config.URL{URL: *u}, DefaultServiceConfig: `{"loadBalancingConfig": [{"round_robin":{}}]}`, UseInsecureConnection: true}).Build(ctx)
 		assert.NoError(t, err)
 		assert.NotNil(t, clientSet)
 		assert.NotNil(t, clientSet.AdminClient())
@@ -341,9 +398,8 @@ func TestGetDefaultServiceConfig(t *testing.T) {
 			}
 		}()
 
-		u, err := url.Parse("http://localhost:8089")
 		assert.NoError(t, err)
-		clientSet, err := ClientSetBuilder().WithConfig(&Config{Endpoint: config.URL{URL: *u}, DefaultServiceConfig: `{"loadBalancingConfig": [{"foo":{}}]}`}).Build(ctx)
+		clientSet, err := ClientSetBuilder().WithConfig(&Config{Endpoint: config.URL{URL: *u}, DefaultServiceConfig: `{"loadBalancingConfig": [{"foo":{}}]}`, UseInsecureConnection: true}).Build(ctx)
 		assert.Error(t, err)
 		assert.Nil(t, clientSet)
 	})

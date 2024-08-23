@@ -115,7 +115,6 @@ func setHTTPClientContext(ctx context.Context, cfg *Config, proxyCredentialsFutu
 // a token source has been created, it'll invoke the grpc pipeline again, this time the grpc.PerRPCCredentials should
 // be able to find and acquire a valid AccessToken to annotate the request with.
 func NewAuthInterceptor(cfg *Config, tokenCache cache.TokenCache, credentialsFuture *PerRPCCredentialsFuture, proxyCredentialsFuture *PerRPCCredentialsFuture) (grpc.UnaryClientInterceptor, error) {
-	// can add to inputs
 	ctx := context.Background()
 
 	authMetadataClient, err := InitializeAuthMetadataClient(ctx, cfg, proxyCredentialsFuture)
