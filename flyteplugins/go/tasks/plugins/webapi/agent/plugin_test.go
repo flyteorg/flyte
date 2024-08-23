@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"golang.org/x/exp/maps"
+	"google.golang.org/protobuf/types/known/structpb"
 
 	agentMocks "github.com/flyteorg/flyte/flyteidl/clients/go/admin/mocks"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
@@ -114,17 +115,24 @@ func TestPlugin(t *testing.T) {
 	})
 
 	t.Run("test RUNNING Status", func(t *testing.T) {
+		simpleStruct := structpb.Struct{
+			Fields: map[string]*structpb.Value{
+				"foo": {Kind: &structpb.Value_StringValue{StringValue: "foo"}},
+			},
+		}
 		taskContext := new(webapiPlugin.StatusContext)
 		taskContext.On("Resource").Return(ResourceWrapper{
-			State:    admin.State_RUNNING,
-			Outputs:  nil,
-			Message:  "Job is running",
-			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
+			State:      admin.State_RUNNING,
+			Outputs:    nil,
+			Message:    "Job is running",
+			LogLinks:   []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
+			CustomInfo: &simpleStruct,
 		})
 
 		phase, err := plugin.Status(context.Background(), taskContext)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseRunning, phase.Phase())
+		assert.Equal(t, &simpleStruct, phase.Info().CustomInfo)
 	})
 
 	t.Run("test PERMANENT_FAILURE Status", func(t *testing.T) {
