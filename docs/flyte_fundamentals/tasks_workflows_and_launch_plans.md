@@ -266,7 +266,7 @@ Learn more about chaining flyte entities in the {ref}`User Guide <chain_flyte_en
 A launch plan in Flyte is a mechanism to define and manage the execution of workflows with 
 predefined or fixed inputs, schedules, and runtime overrides, like notifications. Launch plans allow
 workflows to be executed with specific configurations and can be shared for consistent and 
-reproducible executions. Each workflow has a default launch plan generated upon registration, 
+reproducible executions. Each workflow has a default launch plan generated upon registration, with the same name as the workflow, 
 but custom launch plans can also be created to meet different requirements.
 
 Create a launch plan like so:
