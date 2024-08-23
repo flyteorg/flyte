@@ -177,31 +177,38 @@ func NewAuthInterceptor(cfg *Config, tokenCache cache.TokenCache, credentialsFut
 
 	return func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
 
-		err := oauthMetadataProvider.GetOauthMetadata(cfg, tokenCache, proxyCredentialsFuture)
-		if err != nil {
-			return err
-		}
-		authorizationMetadataKey := oauthMetadataProvider.authorizationMetadataKey
-		tokenSource := oauthMetadataProvider.tokenSource
-
 		ctx = setHTTPClientContext(ctx, cfg, proxyCredentialsFuture)
 
 		// If there is already a token in the cache (e.g. key-ring), we should use it immediately...
 		t, _ := tokenCache.GetToken()
 		if t != nil {
-			err := MaterializeCredentials(tokenSource, cfg, authorizationMetadataKey, credentialsFuture)
+			err := oauthMetadataProvider.GetOauthMetadata(cfg, tokenCache, proxyCredentialsFuture)
+			if err != nil {
+				return err
+			}
+			authorizationMetadataKey := oauthMetadataProvider.authorizationMetadataKey
+			tokenSource := oauthMetadataProvider.tokenSource
+
+			err = MaterializeCredentials(tokenSource, cfg, authorizationMetadataKey, credentialsFuture)
 			if err != nil {
 				return fmt.Errorf("failed to materialize credentials. Error: %v", err)
 			}
 		}
 
-		err = invoker(ctx, method, req, reply, cc, opts...)
+		err := invoker(ctx, method, req, reply, cc, opts...)
 		if err != nil {
 			logger.Debugf(ctx, "Request failed due to [%v]. If it's an unauthenticated error, we will attempt to establish an authenticated context.", err)
 
 			if st, ok := status.FromError(err); ok {
 				// If the error we receive from executing the request expects
 				if shouldAttemptToAuthenticate(st.Code()) {
+					err := oauthMetadataProvider.GetOauthMetadata(cfg, tokenCache, proxyCredentialsFuture)
+					if err != nil {
+						return err
+					}
+					authorizationMetadataKey := oauthMetadataProvider.authorizationMetadataKey
+					tokenSource := oauthMetadataProvider.tokenSource
+
 					err = func() error {
 						if !tokenCache.TryLock() {
 							tokenCache.CondWait()

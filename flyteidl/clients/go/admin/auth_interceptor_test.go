@@ -359,7 +359,8 @@ func TestNewAuthInterceptorAndMaterialize(t *testing.T) {
 		httpPort := rand.IntnRange(10000, 60000)
 		grpcPort := rand.IntnRange(10000, 60000)
 		c := &mocks.TokenCache{}
-		c.OnGetTokenMatch().Return(nil, nil)
+		fakeToken := &oauth2.Token{}
+		c.OnGetTokenMatch().Return(fakeToken, nil)
 		c.OnSaveTokenMatch(mock.Anything).Return(nil)
 		m := &adminMocks.AuthMetadataServiceServer{}
 		m.OnGetOAuth2MetadataMatch(mock.Anything, mock.Anything).Return(nil, errors.New("unexpected call to get oauth2 metadata"))
