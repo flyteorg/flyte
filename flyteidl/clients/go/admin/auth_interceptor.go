@@ -121,7 +121,7 @@ func (o *OauthMetadataProvider) getTokenSourceAndMetadata(cfg *Config, tokenCach
 
 	tokenSourceProvider, err := NewTokenSourceProvider(ctx, cfg, tokenCache, authMetadataClient)
 	if err != nil {
-		return fmt.Errorf("failed to initialized token source provider. Err: %w", err)
+		return fmt.Errorf("failed to initialize token source provider. Err: %w", err)
 	}
 
 	authorizationMetadataKey := cfg.AuthorizationHeader
