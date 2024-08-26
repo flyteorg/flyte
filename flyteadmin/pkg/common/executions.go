@@ -1,34 +1,8 @@
 package common
 
 import (
-	"context"
-	"fmt"
-
-	"github.com/wolfeidau/humanhash"
-	"k8s.io/apimachinery/pkg/util/rand"
-
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
-
-const ExecutionIDLength = 20
-const ExecutionIDLengthLimit = 63
-const ExecutionStringFormat = "a%s"
-
-/* #nosec */
-func GetExecutionName(seed int64, enableHumanHash bool) (string, error) {
-	rand.Seed(seed)
-	if enableHumanHash {
-		hashKey := []byte(rand.String(ExecutionIDLength))
-		result, err := humanhash.Humanize(hashKey, 3)
-		if err != nil {
-			logger.Errorf(context.Background(), "failed to generate execution name using key %v: %v", hashKey, err)
-			return "", err
-		}
-		return result, nil
-	}
-	return fmt.Sprintf(ExecutionStringFormat, rand.String(ExecutionIDLength-1)), nil
-}
 
 var terminalExecutionPhases = map[core.WorkflowExecution_Phase]bool{
 	core.WorkflowExecution_SUCCEEDED: true,
