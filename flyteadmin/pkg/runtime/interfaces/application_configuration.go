@@ -50,7 +50,7 @@ type PostgresConfig struct {
 
 type FeatureGates struct {
 	EnableArtifacts bool `json:"enableArtifacts" pflag:",Enable artifacts feature."`
-	EnableHumanHash bool `json:"enableHumanHash" pflag:",Enable humanhash feature."`
+	EnableFriendlyNames bool `json:"enableFriendlyNames" pflag:",Enable generation of friendly execution names feature."`
 }
 
 // ApplicationConfig is the base configuration to start admin
