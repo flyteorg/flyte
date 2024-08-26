@@ -90,6 +90,7 @@ type ExecutionManager struct {
 	notificationClient        notificationInterfaces.Publisher
 	urlData                   dataInterfaces.RemoteURLInterface
 	workflowManager           interfaces.WorkflowInterface
+	launchPlanManager         interfaces.LaunchPlanInterface
 	namedEntityManager        interfaces.NamedEntityInterface
 	resourceManager           interfaces.ResourceInterface
 	qualityOfServiceAllocator executions.QualityOfServiceAllocator
@@ -517,7 +518,6 @@ func (m *ExecutionManager) getExternalResourceAttributes(ctx context.Context, re
 func (m *ExecutionManager) launchSingleTaskExecution(
 	ctx context.Context, request admin.ExecutionCreateRequest, requestedAt time.Time) (
 	context.Context, *models.Execution, []*models.ExecutionTag, error) {
-
 	taskModel, err := m.db.TaskRepo().Get(ctx, repositoryInterfaces.Identifier{
 		Org:     request.Spec.LaunchPlan.Org,
 		Project: request.Spec.LaunchPlan.Project,
@@ -1136,6 +1136,30 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 	}
 
 	if request.Spec.LaunchPlan.ResourceType == core.ResourceType_TASK {
+		nodeId := request.GetSpec().GetMetadata().GetParentNodeExecution().GetNodeId()
+		executionId := request.GetSpec().GetMetadata().GetParentNodeExecution().GetExecutionId()
+		if nodeId != "" && executionId != nil {
+			execution, err := m.GetExecution(ctx, admin.WorkflowExecutionGetRequest{
+				Id: executionId,
+			})
+			if err != nil {
+				return nil, nil, nil, err
+			}
+			createLaunchPlanResponse, err := m.launchPlanManager.CreateLaunchPlanFromNode(ctx, admin.CreateLaunchPlanFromNodeRequest{
+				LaunchPlanId: execution.GetClosure().GetResolvedSpec().GetLaunchPlan(),
+				SubNodeIds: []*admin.SubNodeIdAsList{
+					{
+						SubNodeId: []string{nodeId},
+					},
+				},
+			})
+			if err != nil {
+				return nil, nil, nil, err
+			}
+			request.Spec.LaunchPlan = createLaunchPlanResponse.LaunchPlan.Id
+			logger.Debugf(ctx, "Launching single task execution with [%+v]", request.Spec.LaunchPlan)
+			return m.launchExecution(ctx, request, requestedAt)
+		}
 		logger.Debugf(ctx, "Launching single task execution with [%+v]", request.Spec.LaunchPlan)
 		// When tasks can have defaults this will need to handle Artifacts as well.
 		return m.launchSingleTaskExecution(ctx, request, requestedAt)
@@ -2363,7 +2387,7 @@ func newExecutionSystemMetrics(scope promutils.Scope) executionSystemMetrics {
 func NewExecutionManager(db repositoryInterfaces.Repository, pluginRegistry *plugins.Registry, config runtimeInterfaces.Configuration,
 	storageClient *storage.DataStore, systemScope promutils.Scope, userScope promutils.Scope,
 	publisher notificationInterfaces.Publisher, urlData dataInterfaces.RemoteURLInterface,
-	workflowManager interfaces.WorkflowInterface, namedEntityManager interfaces.NamedEntityInterface,
+	workflowManager interfaces.WorkflowInterface, launchPlanManager interfaces.LaunchPlanInterface, namedEntityManager interfaces.NamedEntityInterface,
 	eventPublisher notificationInterfaces.Publisher, cloudEventPublisher cloudeventInterfaces.Publisher,
 	eventWriter eventWriter.WorkflowExecutionEventWriter, artifactRegistry *artifacts.ArtifactRegistry, resourceManager interfaces.ResourceInterface) interfaces.ExecutionInterface {
 
@@ -2391,6 +2415,7 @@ func NewExecutionManager(db repositoryInterfaces.Repository, pluginRegistry *plu
 		notificationClient:        publisher,
 		urlData:                   urlData,
 		workflowManager:           workflowManager,
+		launchPlanManager:         launchPlanManager,
 		namedEntityManager:        namedEntityManager,
 		resourceManager:           resourceManager,
 		qualityOfServiceAllocator: executions.NewQualityOfServiceAllocator(config, resourceManager),

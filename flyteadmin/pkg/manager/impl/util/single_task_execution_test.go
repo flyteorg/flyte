@@ -23,9 +23,13 @@ import (
 )
 
 func TestGenerateNodeNameFromTask(t *testing.T) {
-	assert.EqualValues(t, "foo-12345", generateNodeNameFromTask("foo@`!=+- 1,2$3(4)5"))
-	assert.EqualValues(t, "nametoadefinedtasksomewhereincodeveryverynestedcrazy",
-		generateNodeNameFromTask("app.long.path.name.to.a.defined.task.somewhere.in.code.very.very.nested.crazy"))
+	nodeID, err := generateNodeNameFromTask("foo@`!=+- 1,2$3(4)5")
+	assert.NoError(t, err)
+	assert.EqualValues(t, "foo-12345", nodeID)
+
+	nodeID, err = generateNodeNameFromTask("app.long.path.name.to.a.defined.task.somewhere.in.code.very.very.nested.crazy")
+	assert.NoError(t, err)
+	assert.EqualValues(t, "fch4xs5i", nodeID)
 }
 
 func TestGenerateWorkflowNameFromTask(t *testing.T) {
