@@ -47,8 +47,6 @@ def t2(a: dict):
 ```
 #### After
 ```python
-Json = "json"
-
 @task
 def t1() -> dict: # Json Byte Strings
   ...
