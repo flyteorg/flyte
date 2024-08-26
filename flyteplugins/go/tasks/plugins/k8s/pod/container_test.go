@@ -49,6 +49,13 @@ func dummyContainerTaskTemplate(command []string, args []string) *core.TaskTempl
 func dummyContainerTaskTemplateWithPodSpec(command []string, args []string) *core.TaskTemplate {
 
 	podSpec := v1.PodSpec{
+		InitContainers: []v1.Container{
+			v1.Container{
+				Name:    "test-image",
+				Command: command,
+				Args:    args,
+			},
+		},
 		Containers: []v1.Container{
 			v1.Container{
 				Name:    "test-image",
@@ -212,6 +219,11 @@ func TestContainerTaskExecutor_BuildResource(t *testing.T) {
 
 			assert.Equal(t, command, j.Spec.Containers[0].Command)
 			assert.Equal(t, []string{"test-data-reference"}, j.Spec.Containers[0].Args)
+
+			if tc.name == "BuildResource_PodTemplate" {
+				assert.Equal(t, command, j.Spec.InitContainers[0].Command)
+				assert.Equal(t, []string{"test-data-reference"}, j.Spec.InitContainers[0].Args)
+			}
 
 			assert.Equal(t, tc.expectServiceAccount, j.Spec.ServiceAccountName)
 		})
