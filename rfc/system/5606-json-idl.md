@@ -24,8 +24,8 @@ Use byte string in protobuf instead of json string to fix case that int is not s
 
 ## 2 Motivation
 
-In Flytekit, when handling dataclasses, Pydantic base models, and dictionaries, we store data using JSON strings within struct protobuf.
-This approach causes issues with integers, as protobuf does not support int types, leading to their conversion to floats.
+In Flytekit, when handling dataclasses, Pydantic base models, and dictionaries, we store data using JSON strings within protobuf struct datatype.
+This approach causes issues with integers, as protobuf struct does not support int types, leading to their conversion to floats.
 This results in performance issues since we need to recursively iterate through all attributes/keys in dataclasses and dictionaries to ensure floats types are converted to int. In addition to performance issues, the required code is complicated and error prone.
 
 Note: We have more than 10 issues about dict, dataclass and Pydantic.
