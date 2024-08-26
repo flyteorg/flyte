@@ -160,11 +160,27 @@ func (n nodeStateManager) GetArrayNodeState() handler.ArrayNodeState {
 	if an != nil {
 		as.Phase = an.GetArrayNodePhase()
 		as.Error = an.GetExecutionError()
-		as.SubNodePhases = an.GetSubNodePhases()
-		as.SubNodeTaskPhases = an.GetSubNodeTaskPhases()
-		as.SubNodeRetryAttempts = an.GetSubNodeRetryAttempts()
-		as.SubNodeSystemFailures = an.GetSubNodeSystemFailures()
 		as.TaskPhaseVersion = an.GetTaskPhaseVersion()
+
+		subNodePhases := an.GetSubNodePhases()
+		if subNodePhasesCopy := subNodePhases.DeepCopy(); subNodePhasesCopy != nil {
+			as.SubNodePhases = *subNodePhasesCopy
+		}
+
+		subNodeTaskPhases := an.GetSubNodeTaskPhases()
+		if subNodeTaskPhasesCopy := subNodeTaskPhases.DeepCopy(); subNodeTaskPhasesCopy != nil {
+			as.SubNodeTaskPhases = *subNodeTaskPhasesCopy
+		}
+
+		subNodeRetryAttempts := an.GetSubNodeRetryAttempts()
+		if subNodeRetryAttemptsCopy := subNodeRetryAttempts.DeepCopy(); subNodeRetryAttemptsCopy != nil {
+			as.SubNodeRetryAttempts = *subNodeRetryAttemptsCopy
+		}
+
+		subNodeSystemFailures := an.GetSubNodeSystemFailures()
+		if subNodeSystemFailuresCopy := subNodeSystemFailures.DeepCopy(); subNodeSystemFailuresCopy != nil {
+			as.SubNodeSystemFailures = *subNodeSystemFailuresCopy
+		}
 	}
 	return as
 }

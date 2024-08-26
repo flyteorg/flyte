@@ -259,6 +259,8 @@ const (
 type EventConfig struct {
 	RawOutputPolicy           RawOutputPolicy `json:"raw-output-policy" pflag:",How output data should be passed along in execution events."`
 	FallbackToOutputReference bool            `json:"fallback-to-output-reference" pflag:",Whether output data should be sent by reference when it is too large to be sent inline in execution events."`
+	// only meant to be overridden for certain node types that have different eventing behavior such as ArrayNode
+	ErrorOnAlreadyExists bool `json:"-"`
 }
 
 // ParallelismBehavior defines how ArrayNode should handle subNode parallelism by default

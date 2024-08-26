@@ -179,8 +179,9 @@ func initializeClients(ctx context.Context, cfg *Config, tokenCache cache.TokenC
 	credentialsFuture := NewPerRPCCredentialsFuture()
 	proxyCredentialsFuture := NewPerRPCCredentialsFuture()
 
+	authInterceptor := NewAuthInterceptor(cfg, tokenCache, credentialsFuture, proxyCredentialsFuture)
 	opts = append(opts,
-		grpc.WithChainUnaryInterceptor(NewAuthInterceptor(cfg, tokenCache, credentialsFuture, proxyCredentialsFuture)),
+		grpc.WithChainUnaryInterceptor(authInterceptor),
 		grpc.WithPerRPCCredentials(credentialsFuture))
 
 	if cfg.DefaultServiceConfig != "" {
