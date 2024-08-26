@@ -8,6 +8,7 @@ import (
 	"google.golang.org/grpc/codes"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common/naming"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/shared"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/validation"
@@ -15,23 +16,17 @@ import (
 	repoInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/transformers"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/runtime"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
-func GetExecutionName(request admin.ExecutionCreateRequest) (string, error) {
+func GetExecutionName(request admin.ExecutionCreateRequest) string {
 	if request.Name != "" {
-		return request.Name, nil
+		return request.Name
 	}
-	config := runtime.NewApplicationConfigurationProvider()
-	executionName, err := common.GetExecutionName(time.Now().UnixNano(), config.GetTopLevelConfig().FeatureGates.EnableHumanHash)
-	if err != nil {
-		return "", err
-	}
-	return executionName, nil
+	return naming.GetExecutionName(time.Now().UnixNano())
 }
 
 func GetTask(ctx context.Context, repo repoInterfaces.Repository, identifier core.Identifier) (

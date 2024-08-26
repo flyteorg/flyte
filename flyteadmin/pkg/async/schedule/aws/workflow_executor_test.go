@@ -197,10 +197,7 @@ func TestFormulateExecutionCreateRequest(t *testing.T) {
 		Id: &launchPlanIdentifier,
 	}
 	testExecutor := newWorkflowExecutorForTest(nil, nil, nil)
-	executionRequest, err := testExecutor.formulateExecutionCreateRequest(launchPlan, time.Unix(1543607788, 0))
-	if err != nil {
-		t.Errorf("unexpected error generating execution name: %v", err)
-	}
+	executionRequest := testExecutor.formulateExecutionCreateRequest(launchPlan, time.Unix(1543607788, 0))
 	assert.Equal(t, "foo", executionRequest.Project)
 	assert.Equal(t, "bar", executionRequest.Domain)
 	assert.Equal(t, "a2k4s9v5j246kwmdmh4t", executionRequest.Name)
