@@ -300,7 +300,7 @@ func TestGetLogsForContainerInPod_LegacyTemplate(t *testing.T) {
 			{
 				Uri:           "https://sd-my-log-server/my-namespace/my-pod/ContainerName/ContainerID",
 				MessageFormat: core.TaskLog_JSON,
-				Name:          "Stackdriver Logs my-Suffix",
+				Name:          "Google Cloud Logs my-Suffix",
 			},
 		}, "")
 	})
@@ -313,7 +313,7 @@ func TestGetLogsForContainerInPod_LegacyTemplate(t *testing.T) {
 			{
 				Uri:           "https://sd-my-log-server/my-namespace/my-pod/ContainerName/ContainerID",
 				MessageFormat: core.TaskLog_JSON,
-				Name:          "Stackdriver Logs my-Suffix",
+				Name:          "Google Cloud Logs my-Suffix",
 			},
 		}, "")
 	})

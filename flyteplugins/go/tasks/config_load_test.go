@@ -95,8 +95,13 @@ func TestLoadConfig(t *testing.T) {
 	})
 
 	t.Run("logs-config-test", func(t *testing.T) {
-		assert.NotNil(t, logs.GetLogConfig())
-		assert.True(t, logs.GetLogConfig().IsKubernetesEnabled)
+		logsConfig := logs.GetLogConfig()
+		assert.NotNil(t, logsConfig)
+		assert.True(t, logsConfig.IsKubernetesEnabled)
+
+		assert.Equal(t, 1, len(logsConfig.AzureLogTemplates))
+		assert.Equal(t, "Test Azure Logs", logsConfig.AzureLogTemplates[0].DisplayName)
+		assert.Equal(t, "https://portal.azure.com#@TEST_AZURE_URI/q/", logsConfig.AzureLogTemplates[0].TemplateURIs[0])
 	})
 
 	t.Run("spark-config-test", func(t *testing.T) {

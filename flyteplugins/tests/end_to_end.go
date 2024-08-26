@@ -183,7 +183,7 @@ func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *i
 	tMeta.OnGetPlatformResources().Return(&v1.ResourceRequirements{})
 	tMeta.OnGetInterruptibleFailureThreshold().Return(2)
 	tMeta.OnGetEnvironmentVariables().Return(nil)
-	tMeta.OnGetExternalResource().Return(pluginCore.ExternalResourceAttributes{Connections: connections})
+	tMeta.OnGetExternalResourceAttributes().Return(pluginCore.ExternalResourceAttributes{Connections: connections})
 	tMeta.OnGetConsoleURL().Return("")
 
 	catClient := &catalogMocks.Client{}

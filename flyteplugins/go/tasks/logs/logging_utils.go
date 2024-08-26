@@ -13,6 +13,12 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
+const (
+	kubernetesLogsDisplayName     = "Kubernetes Logs"
+	cloudwatchLoggingDisplayName  = "Cloudwatch Logs"
+	googleCloudLoggingDisplayName = "Google Cloud Logs"
+)
+
 // Internal
 func GetLogsForContainerInPod(ctx context.Context, logPlugin tasklog.Plugin, taskExecID pluginsCore.TaskExecutionID, pod *v1.Pod, index uint32, nameSuffix string, extraLogTemplateVars []tasklog.TemplateVar, taskTemplate *core.TaskTemplate) ([]*core.TaskLog, error) {
 	if logPlugin == nil {
@@ -64,8 +70,8 @@ func GetLogsForContainerInPod(ctx context.Context, logPlugin tasklog.Plugin, tas
 }
 
 type templateLogPluginCollection struct {
-	plugins        []tasklog.TemplateLogPlugin
-	dynamicPlugins []tasklog.TemplateLogPlugin
+	plugins        []tasklog.Plugin
+	dynamicPlugins []tasklog.Plugin
 }
 
 func (t templateLogPluginCollection) GetTaskLogs(input tasklog.Input) (tasklog.Output, error) {
@@ -85,30 +91,30 @@ func (t templateLogPluginCollection) GetTaskLogs(input tasklog.Input) (tasklog.O
 // InitializeLogPlugins initializes log plugin based on config.
 func InitializeLogPlugins(cfg *LogConfig) (tasklog.Plugin, error) {
 	// Use a list to maintain order.
-	var plugins []tasklog.TemplateLogPlugin
-	var dynamicPlugins []tasklog.TemplateLogPlugin
+	var plugins []tasklog.Plugin
+	var dynamicPlugins []tasklog.Plugin
 
 	if cfg.IsKubernetesEnabled {
 		if len(cfg.KubernetesTemplateURI) > 0 {
-			plugins = append(plugins, tasklog.TemplateLogPlugin{DisplayName: "Kubernetes Logs", TemplateURIs: []tasklog.TemplateURI{cfg.KubernetesTemplateURI}, MessageFormat: core.TaskLog_JSON})
+			plugins = append(plugins, tasklog.TemplateLogPlugin{DisplayName: kubernetesLogsDisplayName, TemplateURIs: []tasklog.TemplateURI{cfg.KubernetesTemplateURI}, MessageFormat: core.TaskLog_JSON})
 		} else {
-			plugins = append(plugins, tasklog.TemplateLogPlugin{DisplayName: "Kubernetes Logs", TemplateURIs: []tasklog.TemplateURI{fmt.Sprintf("%s/#!/log/{{ .namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}", cfg.KubernetesURL)}, MessageFormat: core.TaskLog_JSON})
+			plugins = append(plugins, tasklog.TemplateLogPlugin{DisplayName: kubernetesLogsDisplayName, TemplateURIs: []tasklog.TemplateURI{fmt.Sprintf("%s/#!/log/{{ .namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}", cfg.KubernetesURL)}, MessageFormat: core.TaskLog_JSON})
 		}
 	}
 
 	if cfg.IsCloudwatchEnabled {
 		if len(cfg.CloudwatchTemplateURI) > 0 {
-			plugins = append(plugins, tasklog.TemplateLogPlugin{DisplayName: "Cloudwatch Logs", TemplateURIs: []tasklog.TemplateURI{cfg.CloudwatchTemplateURI}, MessageFormat: core.TaskLog_JSON})
+			plugins = append(plugins, tasklog.TemplateLogPlugin{DisplayName: cloudwatchLoggingDisplayName, TemplateURIs: []tasklog.TemplateURI{cfg.CloudwatchTemplateURI}, MessageFormat: core.TaskLog_JSON})
 		} else {
-			plugins = append(plugins, tasklog.TemplateLogPlugin{DisplayName: "Cloudwatch Logs", TemplateURIs: []tasklog.TemplateURI{fmt.Sprintf("https://console.aws.amazon.com/cloudwatch/home?region=%s#logEventViewer:group=%s;stream=var.log.containers.{{ .podName }}_{{ .namespace }}_{{ .containerName }}-{{ .containerId }}.log", cfg.CloudwatchRegion, cfg.CloudwatchLogGroup)}, MessageFormat: core.TaskLog_JSON})
+			plugins = append(plugins, tasklog.TemplateLogPlugin{DisplayName: cloudwatchLoggingDisplayName, TemplateURIs: []tasklog.TemplateURI{fmt.Sprintf("https://console.aws.amazon.com/cloudwatch/home?region=%s#logEventViewer:group=%s;stream=var.log.containers.{{ .podName }}_{{ .namespace }}_{{ .containerName }}-{{ .containerId }}.log", cfg.CloudwatchRegion, cfg.CloudwatchLogGroup)}, MessageFormat: core.TaskLog_JSON})
 		}
 	}
 
 	if cfg.IsStackDriverEnabled {
 		if len(cfg.StackDriverTemplateURI) > 0 {
-			plugins = append(plugins, tasklog.TemplateLogPlugin{DisplayName: "Stackdriver Logs", TemplateURIs: []tasklog.TemplateURI{cfg.StackDriverTemplateURI}, MessageFormat: core.TaskLog_JSON})
+			plugins = append(plugins, tasklog.TemplateLogPlugin{DisplayName: googleCloudLoggingDisplayName, TemplateURIs: []tasklog.TemplateURI{cfg.StackDriverTemplateURI}, MessageFormat: core.TaskLog_JSON})
 		} else {
-			plugins = append(plugins, tasklog.TemplateLogPlugin{DisplayName: "Stackdriver Logs", TemplateURIs: []tasklog.TemplateURI{fmt.Sprintf("https://console.cloud.google.com/logs/viewer?project=%s&angularJsUrl=%%2Flogs%%2Fviewer%%3Fproject%%3D%s&resource=%s&advancedFilter=resource.labels.pod_name%%3D{{ .podName }}", cfg.GCPProjectName, cfg.GCPProjectName, cfg.StackdriverLogResourceName)}, MessageFormat: core.TaskLog_JSON})
+			plugins = append(plugins, tasklog.TemplateLogPlugin{DisplayName: googleCloudLoggingDisplayName, TemplateURIs: []tasklog.TemplateURI{fmt.Sprintf("https://console.cloud.google.com/logs/viewer?project=%s&angularJsUrl=%%2Flogs%%2Fviewer%%3Fproject%%3D%s&resource=%s&advancedFilter=resource.labels.pod_name%%3D{{ .podName }}", cfg.GCPProjectName, cfg.GCPProjectName, cfg.StackdriverLogResourceName)}, MessageFormat: core.TaskLog_JSON})
 		}
 	}
 
@@ -123,6 +129,23 @@ func InitializeLogPlugins(cfg *LogConfig) (tasklog.Plugin, error) {
 			})
 	}
 
-	plugins = append(plugins, cfg.Templates...)
+	plugins = append(plugins, azureTemplatePluginsToPluginSlice(cfg.AzureLogTemplates)...)
+	plugins = append(plugins, templatePluginToPluginSlice(cfg.Templates)...)
 	return templateLogPluginCollection{plugins: plugins, dynamicPlugins: dynamicPlugins}, nil
+}
+
+func templatePluginToPluginSlice(templatePlugins []tasklog.TemplateLogPlugin) []tasklog.Plugin {
+	plugins := make([]tasklog.Plugin, len(templatePlugins))
+	for i := range templatePlugins {
+		plugins[i] = &templatePlugins[i]
+	}
+	return plugins
+}
+
+func azureTemplatePluginsToPluginSlice(templatePlugins []tasklog.AzureLogsTemplatePlugin) []tasklog.Plugin {
+	plugins := make([]tasklog.Plugin, len(templatePlugins))
+	for i := range templatePlugins {
+		plugins[i] = &templatePlugins[i]
+	}
+	return plugins
 }
