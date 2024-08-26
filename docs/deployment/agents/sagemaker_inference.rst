@@ -33,11 +33,6 @@ Specify agent configuration
               - container_array: k8s-array
               - boto: agent-service
               - sagemaker-endpoint: agent-service
-        plugins:
-          agent-service:
-            supportedTaskTypes:
-            - boto
-            - sagemaker-endpoint
 
     .. group-tab:: Flyte core
 
@@ -61,11 +56,6 @@ Specify agent configuration
                   container_array: k8s-array
                   boto: agent-service
                   sagemaker-endpoint: agent-service
-            plugins:
-              agent-service:
-                supportedTaskTypes:
-                - boto
-                - sagemaker-endpoint
 
 AWS credentials
 ---------------

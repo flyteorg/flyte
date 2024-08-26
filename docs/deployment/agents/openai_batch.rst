@@ -32,10 +32,6 @@ Specify agent configuration
               - container: container
               - container_array: k8s-array
               - openai-batch: agent-service
-        plugins:
-          agent-service:
-            supportedTaskTypes:
-            - openai-batch
 
     .. group-tab:: Flyte core
 
@@ -58,10 +54,6 @@ Specify agent configuration
                   sidecar: sidecar
                   container_array: k8s-array
                   openai-batch: agent-service
-            plugins:
-              agent-service:
-                supportedTaskTypes:
-                - openai-batch
 
 Add the OpenAI API token
 ------------------------

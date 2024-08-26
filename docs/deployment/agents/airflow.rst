@@ -35,11 +35,6 @@ Specify agent configuration
               - container_array: k8s-array
               - airflow: agent-service
 
-        plugins:
-          agent-service:
-            supportedTaskTypes:
-            - airflow
-
     .. group-tab:: Flyte core
 
       Create a file named ``values-override.yaml`` and add the following configuration to it.
@@ -63,10 +58,6 @@ Specify agent configuration
                   sidecar: sidecar
                   container_array: k8s-array
                   airflow: agent-service
-            plugins:
-              agent-service:
-                supportedTaskTypes:
-                - airflow
 
 
 Upgrade the Flyte Helm release

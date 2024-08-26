@@ -49,11 +49,6 @@ Specify agent configuration
               - container_array: k8s-array
               - snowflake: agent-service
 
-        plugins:
-          agent-service:
-            supportedTaskTypes:
-            - snowflake
-
     .. group-tab:: Flyte core
 
       Create a file named ``values-override.yaml`` and add the following configuration to it.
@@ -77,10 +72,6 @@ Specify agent configuration
                   sidecar: sidecar
                   container_array: k8s-array
                   snowflake: agent-service
-            plugins:
-              agent-service:
-                supportedTaskTypes:
-                - snowflake
 
 Ensure that the propeller has the correct service account for Snowflake.
 

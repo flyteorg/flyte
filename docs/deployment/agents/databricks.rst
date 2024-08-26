@@ -153,10 +153,6 @@ Specify agent configuration
                 - sidecar
                 - k8s-array
                 - agent-service
-          plugins:
-            agent-service:
-              supportedTaskTypes:
-              - spark
 
       .. group-tab:: Helm chart
 
@@ -176,10 +172,6 @@ Specify agent configuration
                 - container: container
                 - container_array: k8s-array
                 - spark: agent-service
-            plugins:
-              agent-service:
-                supportedTaskTypes:
-                - spark
 
   .. group-tab:: Flyte core
 
@@ -201,10 +193,6 @@ Specify agent configuration
                 sidecar: sidecar
                 container_array: k8s-array
                 spark: agent-service
-          plugins:
-            agent-service:
-              supportedTaskTypes:
-              - spark
 
 Add the Databricks access token
 -------------------------------

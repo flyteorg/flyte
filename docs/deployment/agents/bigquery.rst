@@ -42,11 +42,6 @@ Specify agent configuration
               - container: container
               - container_array: k8s-array
               - bigquery_query_job_task: agent-service
-        
-        plugins:
-          agent-service:
-            supportedTaskTypes:
-            - bigquery_query_job_task
 
     .. group-tab:: Flyte core
 
@@ -71,10 +66,6 @@ Specify agent configuration
                   sidecar: sidecar
                   container_array: k8s-array
                   bigquery_query_job_task: agent-service
-            plugins:
-              agent-service:
-                supportedTaskTypes:
-                - bigquery_query_job_task
 
 Ensure that the propeller has the correct service account for BigQuery.
 
