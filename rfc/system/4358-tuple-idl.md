@@ -8,116 +8,117 @@
 
 Goals:
 
-- Implement support for tuple types (list of different types) in FlyteIDL
-  - Example: `a : Tuple[int, str, float]` must be assigned with integer for first element, string for second element, and floating value for third element.
-- Implement support for new Python types in Flytekit
-  - `typing.NamedTuple`
-    - `typing.NamedTuple("NAME", ("K1": T1), ("K2": T2))`
-  - `typing.Tuple`:
-    - `typing.Tuple[T1, T2, T3]` (Simplify case for NamedTuple)
-    - `typing.Tuple[T1, ...]` (Not the goal of this tuple IDL, since it is quite similar to `typing.List[T1]`)
+- Implement support for tuple types (lists of different types) in FlyteIDL.
+	- Example: a : Tuple[int, str, float] must be assigned an integer for the first element, a string for the second element, and a floating value for the third element.
+- Implement support for new Python types in Flytekit:
+	- `typing.NamedTuple`
+	    - `typing.NamedTuple("NAME", ("K1", T1), ("K2", T2))`
+	- `typing.Tuple`
+	    - `typing.Tuple[T1, T2, T3]` (Simplified case for NamedTuple)
+	    - `typing.Tuple[T1, ...]` (It is quite similar to `typing.List[T1]`, we can address it in this RFC or use `LiteralType_CollectionType` to support it for now.)
 
 Implementation:
 
-- Each element in the tuple should be considered independently, while the order of elements should be preserved. In order to support NamedTuple, we need to store the name of each element.
-  ```proto
-  message LiteralField {
-      string name = 1;
-      Literal literal = 2;
-  }
-  ```
+-  A new `LiteralType` will be introduced to represent tuple types in FlyteIDL. Each element in the tuple will be considered independently, preserving the order of elements. For NamedTuple, the name of each element will be stored along with its type, while for regular tuples, the names will be left empty.
+    ```proto
+    message TupleFieldType {
+        string name = 1;
+        LiteralType type = 2;
+    }
+
+    message TupleType {
+        string tuple_name = 1;
+        repeated TupleFieldType fields = 2;
+    }
+
+    message LiteralType {
+        oneof type {
+            // ...
+            TupleType tuple_type = 11;
+        }
+        // ...
+    }
+    ```
 
 ## 2 Motivation
 
-Flytekit restricts the support of tuple types currently, which are commonly used in Python. This RFC aims to add support for tuple types in FlyteIDL and Flytekit.
+Flytekit currently restricts the support of tuple types, which are commonly used in Python. This RFC aims to add support for tuple types in FlyteIDL and Flytekit.
 
-Note: We have several issues about NamedTuple and tuple support in Flytekit.
+Note: Several issues regarding `NamedTuple` and `tuple` support in Flytekit have been identified:
 
 - [#1337](https://github.com/flyteorg/flyte/issues/1337)
 - [#3158](https://github.com/flyteorg/flyte/issues/3158)
 - [#4358](https://github.com/flyteorg/flyte/issues/4358)
 
-This feature can solve them all.
+This feature aims to resolve all these issues.
 
 ## 3 Proposed Implementation
 
 ### FlyteIDL
 
-#### Literal of NamedTuple & Tuple
-
-- Each field in the tuple should be considered independently, while the order of fields should be preserved. In order to support NamedTuple, we need to store the name of each field. Each field of the tuple should be stored in a `LiteralField` message.
-
-  ```proto
-   message LiteralField {
-       string name = 1;
-       Literal literal = 2;
-   }
-  ```
-
-- The tuple should be stored in a `LiteralFieldCollection` message.
-
-  ```proto
-  message LiteralFieldCollection {
-      string name = 1;
-      repeated LiteralField fields = 1;
-  }
-
-  message Literal {
-      oneof value {
-          // ...
-          LiteralFieldCollection tuple = 4;
-      }
-      // ...
-  }
-  ```
-
-- Similarly, we have to add it to binding data for reference in the output.
-
-  ```proto
-  message BindingDataField {
-      string name = 1;
-      BindingData binding = 2;
-  }
-
-  message BindingDataFieldCollection {
-      string name = 1;
-      repeated BindingDataField fields = 2;
-  }
-
-  message BindingData {
-      oneof data {
-          // ...
-          BindingDataFieldCollection tuple = 4;
-      }
-      // ...
-  }
-  ```
-
-- These messages types should be added to [flyteidl/protos/flyteidl/core/types.proto](https://github.com/flyteorg/flyte/blob/master/flyteidl/protos/flyteidl/core/literals.proto)
-
 #### Type of NamedTuple and Tuple
 
-- The type of NamedTuple and Tuple should be stored in a `TupleType` message.
+- To support NamedTuple, we need to store the name of each field and the name of the tuple itself. We will create a new message type `TupleFieldType` to store the name and type of each field. For `Tuple`, we can use the same `TupleType`, but the `name` and `tuple_name` will be empty strings.
 
-  ```proto
-  message TupleType {
-      repeated LiteralType types = 1;
-  }
+    ```proto
+    message TupleFieldType {
+        string name = 1;
+        LiteralType type = 2;
+    }
 
-  message LiteralType {
-      oneof type {
-          // ...
-          TupleType tuple_type = 11;
-      }
-      // ...
-  }
-  ```
+    message TupleType {
+        string tuple_name = 1;
+        repeated TupleFieldType fields = 2;
+    }
 
-- The above codes should be added to [flyteidl/protos/flyteidl/core/types.proto](https://github.com/flyteorg/flyte/blob/master/flyteidl/protos/flyteidl/core/types.proto). However, the proposed `TupleType` is exactly the same as `UnionType` in the current FlyteIDL except for the name and the variable name. We may need to consider whether to merge them or not.
+    message LiteralType {
+        oneof type {
+            // ...
+            TupleType tuple_type = 11;
+        }
+        // ...
+    }
+    ```
+
+- We could also consider supporting `typing.Tuple[T1, ...]` in the future by adding an additional field `is_univariate` in `TupleType`. However, the performance of `typing.Tuple[T1, ...]` is closely related to `typing.List[T1]`, so this use case could be covered by `LiteralType_CollectionType` for now. (#TO_DISCUSS)
+
+    ```proto
+    message TupleType {
+        string tuple_name = 1;
+        bool is_univariate = 2;
+        repeated TupleFieldType fields = 3;
+    }
+    ```
+
+- The above code should be added to [flyteidl/protos/flyteidl/core/types.proto](https://github.com/flyteorg/flyte/blob/master/flyteidl/protos/flyteidl/core/types.proto).
+
+#### Literal of NamedTuple & Tuple
+
+- Since the type, including the names of the fields and the tuple, is stored in `LiteralType`, we only need to store the value of each field in the tuple. We can use the existing `LiteralCollection` message from [flyteidl/protos/flyteidl/core/types.proto](https://github.com/flyteorg/flyte/blob/master/flyteidl/protos/flyteidl/core/literals.proto) to store the value of each field.
+
+    ```proto
+    message LiteralCollection {
+        repeated Literal literals = 1;
+    }
+
+    message Literal {
+        oneof value {
+            // ...
+            // A collection of literals to allow nesting.
+            LiteralCollection collection = 2;
+            // ...
+        }
+        // ...
+    }
+    ```
+
+#### Other Changes
+
+- Update `MakeDefaultLiteralForType()` and `MakeLiteralForType()` functions in [flyteidl/clients/go/coreutils/literals.go](https://github.com/flyteorg/flyte/blob/master/flyteidl/clients/go/coreutils/literals.go)
 
 ### FlytePropeller
 
-1. Implement a new type checker in [flytepropeller/pkg/compiler/validators/typing.go](https://github.com/flyteorg/flyte/blob/master/flytepropeller/pkg/compiler/validators/typing.go)
+1. Implement a new type checker in [flytepropeller/pkg/compiler/validators/typing.go](https://github.com/flyteorg/flyte/blob/master/flytepropeller/pkg/compiler/validators/typing.go). We need to discuss whether to check the name of each field and the tuple itself, as this will affect the casting between NamedTuple and Tuple. (#TO_DISCUSS)
 
    ```go
     type tupleTypeChecker struct {
@@ -129,18 +130,28 @@ This feature can solve them all.
         upstreamTupleType := upstreamType.GetTupleType()
 
         if upstreamTupleType != nil && tupleType != nil {
-            // For each field in the tuple, check if the upstream type can be casted to the downstream type
-            tupleTypes := tupleType.GetTypes()
-                upstreamTupleTypes := upstreamTupleType.GetTypes()
-                if len(tupleTypes) == len(upstreamTupleTypes) {
-                    for i, downstreamType := range tupleTypes {
-                        if !getTypeChecker(downstreamType).CastsFrom(upstreamTupleTypes[i]) {
-                            return false
-                        }
-                    }
-                    return true
-                }
+            // TO_DISCUSS: Should we check the name of the tuple?
+            if tupleType.GetTupleName() != upstreamTupleType.GetTupleName() {
+                return false
+            }
 
+            // For each field in the tuple, check if the upstream type can be casted to the downstream type
+            tupleFields := tupleType.GetFields()
+            upstreamTupleFields := upstreamTupleType.GetFields()
+            if len(tupleFields) == len(upstreamTupleFields) {
+                for i, downstreamType := range tupleFields {
+                    // TO_DISCUSS: Should we check the name of each field?
+                    if downstreamType.GetName() != upstreamTupleFields[i].GetName() {
+                        return false
+                    }
+
+                    // Check if the upstream type can be casted to the downstream type
+                    if !getTypeChecker(downstreamType).CastsFrom(upstreamTupleFields[i]) {
+                        return false
+                    }
+                }
+                return true
+            }
         }
         return false
     }
@@ -157,142 +168,93 @@ This feature can solve them all.
     }
    ```
 
-2. Update the bindings type validation code in [flytepropeller/pkg/compiler/validators/bindings.go](https://github.com/flyteorg/flyte/blob/master/flytepropeller/pkg/compiler/validators/bindings.go)
+2. Update the collection bindings type validation code in [flytepropeller/pkg/compiler/validators/bindings.go](https://github.com/flyteorg/flyte/blob/master/flytepropeller/pkg/compiler/validators/bindings.go). Similarly, we need to discuss whether we should keep the names of each field and the tuple. (#TO_DISCUSS)
 
-   ```go
+    ```go
     func validateBinding(w c.WorkflowBuilder, nodeID c.NodeID, nodeParam string, binding *flyte.BindingData,
         expectedType *flyte.LiteralType, errs errors.CompileErrors, validateParamTypes bool) (
         resolvedType *flyte.LiteralType, upstreamNodes []c.NodeID, ok bool) {
 
-        switch binding.GetValue().(type) {
         // ...
-       case *flyte.BindingData_Tuple:
-            // Goes through union-aware AreTypesCastable
-   	    break
-        default:
-            // ...
-        }
 
         switch val := binding.GetValue().(type) {
-        // ...
-        case *flyte.BindingData_Tuple:
-            if val.Tuple == nil {
-                errs.Collect(errors.NewValueRequiredErr(nodeID, nodeParam))
+        case *flyte.BindingData_Collection:
+            if val.Collection == nil {
+                errs.Collect(errors.NewParameterNotBoundErr(nodeID, nodeParam))
                 return nil, nil, !errs.HasErrors()
             }
 
+            if expectedType.GetCollectionType() != nil {
+                // ...
+            }
+
             if expectedType.GetTupleType() != nil {
-                allNodeIds := make([]c.NodeID, 0, len(val.Tuple.GetFields()))
-                var subTypes []*flyte.LiteralType
-                for i, f := range val.Tuple.GetFields() {
-                    if resolvedType, nodeIds, ok := validateBinding(w, nodeID, nodeParam, f.GetBinding(), expectedType.GetTupleType().GetTypes()[i], errs.NewScope(), validateParamTypes); ok {
+                allNodeIds := make([]c.NodeID, 0, len(val.Collection.GetBindings()))
+                var fieldTypes []*flyte.TupleFieldType
+                for i, v := range val.Collection.GetBindings() {
+                    if resolvedType, nodeIds, ok := validateBinding(w, nodeID, nodeParam, v, expectedType.GetTupleType().GetFields()[i].GetType(), errs.NewScope(), validateParamTypes); ok {
                         allNodeIds = append(allNodeIds, nodeIds...)
-                        subTypes = append(subTypes, resolvedType)
+                        fieldTypes = append(fieldTypes, &flyte.TupleFieldType{
+                            Name: expectedType.GetTupleType().GetFields()[i].GetName(),   // TO_DISCUSS: Should we keep the name of each field?
+                            Type: resolvedType,
+                        })
                     }
                 }
 
                 return &flyte.LiteralType{
                     Type: &flyte.LiteralType_TupleType{
                         TupleType: &flyte.TupleType{
-                            Types: subTypes,
+                            TupleName: expectedType.GetTupleType().GetTupleName(),  // TO_DISCUSS: Should we keep the name of the tuple?
+                            Fields: fieldTypes,
                     },
-                }, allNodeIds, !errs.HasErrors()
+                    }, allNodeIds, !errs.HasErrors()
+                }
             }
 
             errs.Collect(errors.NewMismatchingBindingsErr(nodeID, nodeParam, expectedType.String(), val.Collection.String()))
+        // ...
         }
-
+        // ...
     }
-   ```
+    ```
+
+3. Update the type metadata stripping code in [flytepropeller/pkg/compiler/transformers/k8s/utils.go](https://github.com/flyteorg/flyte/blob/master/flytepropeller/pkg/compiler/transformers/k8s/utils.go).
+
+    ```go
+    func stripTypeMetadata(t *flyte.LiteralType) *flyte.LiteralType {
+        // ...
+        switch underlyingType := c.Type.(type) {
+        case *flyte.LiteralType_TupleType:
+            fields := make([]*flyte.TupleFieldType, 0, len(t.GetTupleType().GetFields()))
+            for _, f := range t.GetTupleType().GetFields() {
+                fields = append(fields, &flyte.TupleFieldType{
+                    Name: f.GetName(),
+                    Type: StripTypeMetadata(f.GetType()),
+                })
+            }
+            return &flyte.LiteralType{
+                Type: &flyte.LiteralType_TupleType{
+                    TupleType: &flyte.TupleType{
+                        TupleName: t.GetTupleType().GetTupleName(),
+                        Fields: fields,
+                    },
+                },
+            }
+        }
+        // ...
+    }
+    ```
+
+4. Update `LiteralTypeForLiteral()` and `buildMultipleTypeUnion()` functions in [flytepropeller/pkg/compiler/validators/utils.go](https://github.com/flyteorg/flyte/blob/master/flytepropeller/pkg/compiler/validators/utils.go) to correctly handle the type.
 
 ### FlyteKit
 
 - Supporting the following types in Flytekit:
-  - `NamedTuple("a", [("x", int), ("y", str)])` could be stored as
-    ```proto
-    LiteralFieldCollection {
-        name: "a"
-        fields: [
-            LiteralField {
-                name: "x"
-                literal: Literal { scalar: Scalar { primitive: Primitive { integer: 1 } } }
-            }
-            LiteralField {
-                name: "y"
-                literal: Literal { scalar: Scalar { primitive: Primitive { string_value: "hello" } } }
-            }
-        ]
-    }
-    ```
-  - `Tuple[int, str]` could be stored as
-    ```proto
-    LiteralFieldCollection {
-        name: ""
-        fields: [
-            LiteralField {
-                name: ""
-                literal: Literal { scalar: Scalar { primitive: Primitive { integer: 1 } } }
-            }
-            LiteralField {
-                name: ""
-                literal: Literal { scalar: Scalar { primitive: Primitive { string_value: "hello" } } }
-            }
-        ]
-    }
-    ```
-
----
-
-#### pyflyte run
-
-The behavior will remain unchanged.
-We will pass the value to our class, which inherits from `click.ParamType`, and use the corresponding type transformer to convert the input to the correct type.
-
-### Dict Transformer
-
-| **Stage**  | **Conversion**          | **Description**                                                                                                                                                                                                                                                                                                               |
-| ---------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Before** | Python Value to Literal | 1. `Dict[type, type]` uses type hints to construct a LiteralMap. <br> 2. `dict` uses `json.dumps` to turn a `dict` value to a JSON string, and store it to protobuf Struct.                                                                                                                                                   |
-|            | Literal to Python Value | 1. `Dict[type, type]` uses type hints to convert LiteralMap to Python Value. <br> 2. `dict` uses `json.loads` to turn a JSON string to a dict value and store it to protobuf Struct.                                                                                                                                          |
-| **After**  | Python Value to Literal | 1. `Dict[type, type]` stays the same. <br> 2. ~~`dict` uses `msgpack.dumps` to turn a dict value to a JSON byte string, and store is to protobuf Json.~~ <br> 3. `dict` uses `msgpack.dumps` to turn a JSON string to a byte string, and store is to protobuf Json.                                                           |
-|            | Literal to Python Value | 1. `Dict[type, type]` uses type hints to convert LiteralMap to Python Value. <br> 2. ~~`dict` uses `msgpack.loads` to turn a byte string to a JSON string and `dict` value and store it to protobuf `Struct`.~~ <br> 3. `dict` conversion: byte string -> JSON string -> dict value, method: `msgpack.loads` -> `json.loads`. |
-
-### Dataclass Transformer
-
-| **Stage**  | **Conversion**          | **Description**                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| ---------- | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Before** | Python Value to Literal | Uses `mashumaro JSON Encoder` to turn a dataclass value to a JSON string, and store it to protobuf `Struct`. <br><br> ~~Note: For `FlyteTypes`, we will inherit mashumaro `SerializableType` to define our own serialization behavior, which includes uploading files to remote storage.~~                                                                                                                                                                                         |
-|            | Literal to Python Value | Uses `mashumaro JSON Decoder` to turn a JSON string to a python value, and recursively fixed int attributes to int (it will be float because we stored it in to `Struct`). <br><br> ~~Note: For `FlyteTypes`, we will inherit the mashumaro `SerializableType` to define our own deserialization behavior, which includes download file from remote storage.~~                                                                                                                     |
-| **After**  | Python Value to Literal | ~~Uses `msgpack.dumps()` to turn a Python value into a byte string.~~ <br> Uses `mashumaro JSON Encoder` to turn a dataclass value to a JSON string, and uses `msgpack.dumps()` to turn the JSON string into a byte string, and store it to protobuf `Json`. <br><br> ~~Note: For `FlyteTypes`, we will need to customize serialization behavior by msgpack reference [here](https://github.com/msgpack/msgpack-python?tab=readme-ov-file#packingunpacking-of-custom-data-type).~~ |
-|            | Literal to Python Value | ~~Uses `msgpack.loads()` to turn a byte string into a Python value.~~ <br> Uses `msgpack.loads()` to turn a byte string into a JSON string, and uses `mashumaro JSON Decoder` to turn the JSON string into a Python value. <br><br> ~~Note: For `FlyteTypes`, we will need to customize deserialization behavior by `msgpack` reference [here](https://github.com/msgpack/msgpack-python?tab=readme-ov-file#packingunpacking-of-custom-data-type).~~                               |
-
-### Pydantic Transformer
-
-| **Stage**  | **Conversion**          | **Description**                                                                                                                                                                                                                                                                         |
-| ---------- | ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Before** | Python Value to Literal | Convert `BaseModel` to a JSON string, and then convert it to a Protobuf `Struct`.                                                                                                                                                                                                       |
-|            | Literal to Python Value | Convert Protobuf `Struct` to a JSON string and then convert it to a `BaseModel`.                                                                                                                                                                                                        |
-| **After**  | Python Value to Literal | ~~Convert the Pydantic `BaseModel` to a JSON string, then convert the JSON string to a `dictionary`, and finally, convert it to a `byte string` using msgpack.~~ <br> Convert the Pydantic `BaseModel` to a JSON string, then convert the JSON string to a `byte string` using msgpack. |
-|            | Literal to Python Value | ~~Convert `byte string` to a `dictionary` using `msgpack`, then convert dictionary to a JSON string, and finally, convert it to Pydantic `BaseModel`.~~ <br> Convert `byte string` to a JSON string using `msgpack`, then convert it to Pydantic `BaseModel`.                           |
-
-### FlyteCtl
-
-In FlyteCtl, we can construct input for the execution, so we have to make sure the values we passed to FlyteAdmin
-can all be constructed to Literal.
-
-https://github.com/flyteorg/flytectl/blob/131d6a20c7db601ca9156b8d43d243bc88669829/cmd/create/serialization_utils.go#L48
-
-### FlyteConsole
-
-#### Show input/output on FlyteConsole
-
-We will get node’s input output literal value by FlyteAdmin’s API, and get the json byte string in the literal value.
-
-We can use MsgPack dumps the json byte string to a dictionary, and shows it to the flyteconsole.
-
-#### Construct Input
-
-We should use `msgpack.encode` to encode input value and store it to the literal’s json field.
+    - `NamedTuple("NAME", ("K1": T1), ("K2": T2))`
+    - `Tuple[T1, T2]`
+    - [#TO_DISCUSS] `Tuple[T1, ...]`: There are two potential approaches to support this type:
+        - Add a field `is_univariate` in `TupleType`.
+        - Treat it as a list, given that the performance is quite similar to `List[T1]`. However, this approach may lead to confusion with `List[T1]`.
 
 ## 4 Metrics & Dashboards
 
@@ -300,28 +262,23 @@ None
 
 ## 5 Drawbacks
 
-~~There's no breaking changes if we use `Annotated[dict, Json]`, but we need to be very careful about will there be any breaking changes.~~
-
 None
 
 ## 6 Alternatives
 
-~~Use UTF-8 format to encode and decode, this will be more easier for implementation, but maybe will cause performance issue when using Pydantic Transformer.~~
-None, it's doable.
+None
 
 ## 7 Potential Impact and Dependencies
 
-_Here, we aim to be mindful of our environment and generate empathy towards others who may be impacted by our decisions._
-
-- _What other systems or teams are affected by this proposal?_
-- _How could this be exploited by malicious attackers?_
+- This feature will affect FlyteIDL, FlytePropeller, and FlyteKit.
+- It will enable the support of NamedTuple and Tuple in Flytekit, which are common types in Python.
 
 ## 8 Unresolved questions
 
-~~I am not sure use UTF-8 format or msgpack to encode and decode is a better option.~~
-MsgPack is better because it's more smaller and faster.
+1. Should we check the names of each field and the tuple when casting between `NamedTuple` and `Tuple`?
+2. Should we use `is_univariate` to support `Tuple[int, ...]`, given its similarity to `List[int]`?
+3. The specification of the new IDL for the Tuple type is open for further discussion.
 
 ## 9 Conclusion
 
-~~Whether use UTF-8 format or msgpack to encode and decode, we will definitely do it.~~
-We will use msgpack to do it.
+We need a new IDL for the Tuple type to support the usage of `NamedTuple` and `Tuple` in Flytekit.
