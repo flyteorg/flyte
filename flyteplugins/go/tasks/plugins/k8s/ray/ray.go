@@ -121,7 +121,10 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 
 	headPodSpec := podSpec.DeepCopy()
 	rayjob, err := constructRayJob(taskCtx, rayJob, objectMeta, *podSpec, headPodSpec, headNodeRayStartParams, primaryContainerIdx, *primaryContainer)
-
+	if err != nil {
+		return rayjob, err
+	}
+	err = batchscheduler.NewSchedulerPlugin(&cfg.BatchScheduler).Process(rayjob)
 	return rayjob, err
 }
 
@@ -129,18 +132,6 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob plugins.Ra
 	var err error
 	enableIngress := true
 	cfg := GetConfig()
-	schedulerPlugin := batchscheduler.NewSchedulerPlugin(&cfg.BatchScheduler)
-	err = schedulerPlugin.ParseJob(
-		&cfg.BatchScheduler,
-		objectMeta,
-		rayJob.RayCluster.WorkerGroupSpec,
-		&podSpec,
-		primaryContainerIdx,
-	)
-	if err != nil {
-		return nil, err
-	}
-	schedulerPlugin.ProcessHead(objectMeta, headPodSpec, primaryContainerIdx)
 	rayClusterSpec := rayv1.RayClusterSpec{
 		HeadGroupSpec: rayv1.HeadGroupSpec{
 			Template: buildHeadPodTemplate(
@@ -156,11 +147,9 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob plugins.Ra
 		WorkerGroupSpecs:        []rayv1.WorkerGroupSpec{},
 		EnableInTreeAutoscaling: &rayJob.RayCluster.EnableAutoscaling,
 	}
-	schedulerPlugin.AfterProcess(objectMeta)
 
-	for index, spec := range rayJob.RayCluster.WorkerGroupSpec {
+	for _, spec := range rayJob.RayCluster.WorkerGroupSpec {
 		workerPodSpec := podSpec.DeepCopy()
-		schedulerPlugin.ProcessWorker(objectMeta, workerPodSpec, index)
 		workerPodTemplate := buildWorkerPodTemplate(
 			&workerPodSpec.Containers[primaryContainerIdx],
 			workerPodSpec,
@@ -202,7 +191,6 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob plugins.Ra
 		}
 
 		rayClusterSpec.WorkerGroupSpecs = append(rayClusterSpec.WorkerGroupSpecs, workerNodeSpec)
-		schedulerPlugin.AfterProcess(objectMeta)
 	}
 
 	serviceAccountName := flytek8s.GetServiceAccountNameFromTaskExecutionMetadata(taskCtx.TaskExecutionMetadata())
