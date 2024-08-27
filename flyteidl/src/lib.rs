@@ -408,23 +408,71 @@ pub mod _flyteidl_rust {
     pub mod core {
         #[pymodule_export]
         use crate::flyteidl::core::{
-            Alias, ApproveCondition, ArrayNode, Binary, Binding, BindingData,
-            BindingDataCollection, Blob, BlobMetadata, BlobType, BooleanExpression, BranchNode,
-            CatalogArtifactTag, CatalogMetadata, CompiledLaunchPlan, CompiledTask,
-            CompiledWorkflow, CompiledWorkflowClosure, Container, ContainerError, ContainerPort,
-            DataLoadingConfig, Error, ErrorDocument, ExecutionEnv, ExecutionEnvAssignment,
-            ExecutionError, ExtendedResources, GateNode, GpuAccelerator, Granularity, Identifier,
-            IfBlock, IfElseBlock, IoStrategy, KeyValuePair, LabelValue, Literal, LiteralCollection,
-            LiteralMap, LiteralType, Node, NodeExecutionIdentifier, NodeMetadata, OutputReference,
-            Parameter, ParameterMap, Primitive, PromiseAttribute, ResourceType, Resources,
-            RetryStrategy, RuntimeBinding, RuntimeMetadata, Scalar, SchemaType, SecurityContext,
-            SignalCondition, SimpleType, SleepCondition, StructuredDataset,
-            StructuredDatasetMetadata, StructuredDatasetType, TaskExecutionIdentifier,
-            TaskMetadata, TaskNode, TaskNodeOverrides, TaskTemplate, TypeAnnotation, TypeStructure,
-            TypedInterface, Union, UnionInfo, Variable, VariableMap, WorkflowExecution,
-            WorkflowExecutionIdentifier, WorkflowMetadata, WorkflowMetadataDefaults, WorkflowNode,
-            WorkflowTemplate,
+            Alias, ApproveCondition, ArrayNode, ArtifactId, ArtifactKey, ArtifactQuery,
+            ArtifactTag, Binary, Binding, BindingData, BindingDataCollection, BindingDataMap, Blob,
+            BlobMetadata, BlobType, BooleanExpression, BranchNode, CatalogArtifactTag,
+            CatalogMetadata, CompiledLaunchPlan, CompiledTask, CompiledWorkflow,
+            CompiledWorkflowClosure, ConnectionSet, Container, ContainerError, ContainerPort,
+            DataLoadingConfig, DynamicJobSpec, EnumType, Error, ErrorDocument, ExecutionEnv,
+            ExecutionEnvAssignment, ExecutionError, ExtendedResources, GateNode, GpuAccelerator,
+            Granularity, Identifier, Identity, IfBlock, IfElseBlock, InputBindingData, IoStrategy,
+            K8sObjectMetadata, K8sPod, KeyValuePair, LabelValue, Literal, LiteralCollection,
+            LiteralMap, LiteralType, Node, NodeExecutionIdentifier, NodeMetadata, OAuth2Client,
+            OAuth2TokenRequest, Operand, Operator, OutputReference, Parameter, ParameterMap,
+            Partitions, Primitive, PromiseAttribute, ResourceType, Resources, RetryStrategy,
+            RuntimeBinding, RuntimeMetadata, Scalar, SchemaType, Secret, SecurityContext,
+            SignalCondition, SignalIdentifier, SimpleType, SleepCondition, Sql, StructuredDataset,
+            StructuredDatasetMetadata, StructuredDatasetType, TaskExecutionIdentifier, TaskLog,
+            TaskMetadata, TaskNode, TaskNodeOverrides, TaskTemplate, TimePartition, TypeAnnotation,
+            TypeStructure, TypedInterface, Union, UnionInfo, UnionType, Variable, VariableMap,
+            Void, WorkflowExecution, WorkflowExecutionIdentifier, WorkflowMetadata,
+            WorkflowMetadataDefaults, WorkflowNode, WorkflowTemplate,
         };
+    }
+    #[pymodule]
+    pub mod artifact_query {
+        #[pymodule_export]
+        use crate::flyteidl::core::artifact_query::Identifier;
+    }
+    #[pymodule]
+    pub mod task_log {
+        #[pymodule_export]
+        use crate::flyteidl::core::task_log::MessageFormat;
+    }
+    #[pymodule]
+    pub mod conjunction_expression {
+        #[pymodule_export]
+        use crate::flyteidl::core::conjunction_expression::LogicalOperator;
+    }
+    #[pymodule]
+    pub mod operand {
+        #[pymodule_export]
+        use crate::flyteidl::core::operand::Val;
+    }
+    #[pymodule]
+    pub mod comparison_expression {
+        #[pymodule_export]
+        use crate::flyteidl::core::comparison_expression::Operator;
+    }
+    #[pymodule]
+    pub mod connection_set {
+        #[pymodule_export]
+        use crate::flyteidl::core::connection_set::IdList;
+    }
+    #[pymodule]
+    pub mod io_strategy {
+        #[pymodule_export]
+        use crate::flyteidl::core::io_strategy::{DownloadMode, UploadMode};
+    }
+    #[pymodule]
+    pub mod secret {
+        #[pymodule_export]
+        use crate::flyteidl::core::secret::MountType;
+    }
+    #[pymodule]
+    pub mod o_auth2_token_request {
+        #[pymodule_export]
+        use crate::flyteidl::core::o_auth2_token_request::Type;
     }
     #[pymodule]
     pub mod label_value {
@@ -581,30 +629,35 @@ pub mod _flyteidl_rust {
         #[pymodule_export]
         use crate::flyteidl::core::blob_type::BlobDimensionality;
     }
+
     #[pymodule]
     pub mod admin {
         #[pymodule_export]
         use crate::flyteidl::admin::{
-            AbortMetadata, ActiveLaunchPlanRequest, Annotations, AuthRole, ClusterAssignment,
-            CronSchedule, Description, DescriptionEntity, Envs, Execution, ExecutionClosure,
-            ExecutionClusterLabel, ExecutionCreateRequest, ExecutionCreateResponse,
-            ExecutionMetadata, ExecutionRecoverRequest, ExecutionRelaunchRequest, ExecutionSpec,
-            ExecutionTerminateRequest, FixedRate, FixedRateUnit, Labels, LaunchPlan,
-            LaunchPlanCreateRequest, LaunchPlanCreateResponse, LaunchPlanMetadata, LaunchPlanSpec,
-            LaunchPlanUpdateRequest, ListMatchableAttributesRequest, LiteralMapBlob,
-            NamedEntityIdentifierList, NamedEntityIdentifierListRequest, NodeExecution,
-            NodeExecutionClosure, NodeExecutionForTaskListRequest, NodeExecutionGetDataRequest,
-            NodeExecutionGetDataResponse, NodeExecutionList, NodeExecutionListRequest,
-            NodeExecutionMetaData, Notification, NotificationList, ObjectGetRequest,
+            AbortMetadata, ActiveLaunchPlanRequest, Annotations, Auth, AuthRole, ClusterAssignment,
+            ClusterResourceAttributes, CronSchedule, Description, DescriptionEntity,
+            EmailNotification, Envs, Execution, ExecutionClosure, ExecutionClusterLabel,
+            ExecutionCreateRequest, ExecutionCreateResponse, ExecutionMetadata,
+            ExecutionQueueAttributes, ExecutionRecoverRequest, ExecutionRelaunchRequest,
+            ExecutionSpec, ExecutionTerminateRequest, FixedRate, FixedRateUnit, Labels, LaunchPlan,
+            LaunchPlanClosure, LaunchPlanCreateRequest, LaunchPlanCreateResponse,
+            LaunchPlanMetadata, LaunchPlanSpec, LaunchPlanState, LaunchPlanUpdateRequest,
+            ListMatchableAttributesRequest, LiteralMapBlob, MatchableResource,
+            NamedEntityIdentifierList, NamedEntityIdentifierListRequest, NamedEntityState,
+            NodeExecution, NodeExecutionClosure, NodeExecutionForTaskListRequest,
+            NodeExecutionGetDataRequest, NodeExecutionGetDataResponse, NodeExecutionList,
+            NodeExecutionListRequest, NodeExecutionMetaData, Notification, NotificationList,
+            ObjectGetRequest, PagerDutyNotification, PluginOverride, Project,
             ProjectDomainAttributes, ProjectDomainAttributesGetRequest,
             ProjectDomainAttributesUpdateRequest, ProjectListRequest, ProjectRegisterRequest,
-            RawOutputDataConfig, ResourceListRequest, Schedule, SourceCode, SystemMetadata, Task,
+            RawOutputDataConfig, ResourceListRequest, Schedule, Signal, SignalListRequest,
+            SignalSetRequest, SlackNotification, Sort, SourceCode, SystemMetadata, Task,
             TaskClosure, TaskCreateRequest, TaskCreateResponse, TaskExecution,
             TaskExecutionClosure, TaskExecutionGetDataRequest, TaskExecutionGetDataResponse,
-            TaskExecutionGetRequest, TaskExecutionList, TaskExecutionListRequest, TaskSpec,
-            UrlBlob, Workflow, WorkflowAttributes, WorkflowAttributesGetRequest,
-            WorkflowAttributesUpdateRequest, WorkflowClosure, WorkflowCreateRequest,
-            WorkflowCreateResponse, WorkflowExecutionGetDataRequest,
+            TaskExecutionGetRequest, TaskExecutionList, TaskExecutionListRequest,
+            TaskExecutionMetadata, TaskSpec, UrlBlob, Workflow, WorkflowAttributes,
+            WorkflowAttributesGetRequest, WorkflowAttributesUpdateRequest, WorkflowClosure,
+            WorkflowCreateRequest, WorkflowCreateResponse, WorkflowExecutionGetDataRequest,
             WorkflowExecutionGetDataResponse, WorkflowExecutionGetRequest, WorkflowList,
             WorkflowNodeMetadata, WorkflowSpec,
         };
@@ -654,6 +707,21 @@ pub mod _flyteidl_rust {
         #[pymodule_export]
         use crate::flyteidl::admin::notification::Type;
     }
+    #[pymodule]
+    pub mod plugin_override {
+        #[pymodule_export]
+        use crate::flyteidl::admin::plugin_override::MissingPluginBehavior;
+    }
+    #[pymodule]
+    pub mod project {
+        #[pymodule_export]
+        use crate::flyteidl::admin::project::ProjectState;
+    }
+    #[pymodule]
+    pub mod sort {
+        #[pymodule_export]
+        use crate::flyteidl::admin::sort::Direction;
+    }
 
     #[pymodule]
     pub mod service {
@@ -666,9 +734,16 @@ pub mod _flyteidl_rust {
     }
 
     #[pymodule]
-    pub mod plugin {
+    pub mod plugins {
         #[pymodule_export]
-        use crate::flyteidl::plugins::ArrayJob;
+        use crate::flyteidl::plugins::{
+            ArrayJob, HiveQuery, HiveQueryCollection, PrestoQuery, QuboleHiveJob,
+        };
+    }
+    #[pymodule]
+    pub mod array_job {
+        #[pymodule_export]
+        use crate::flyteidl::plugins::array_job::SuccessCriteria;
     }
 
     // A simple implementation for parsing google protobuf types `Struct` and `Value` from json string after deriving `serde::Deserialize` for structures.
