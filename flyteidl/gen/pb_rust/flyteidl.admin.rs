@@ -2,7 +2,7 @@
 /// Represents a subset of runtime task execution metadata that are relevant to external plugins.
 ///
 /// ID of the task execution
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -55,7 +55,7 @@ pub struct TaskExecutionMetadata {
     pub identity: ::core::option::Option<super::core::Identity>,
 }
 /// Represents a request structure to create task.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -76,7 +76,7 @@ pub struct CreateTaskRequest {
     pub task_execution_metadata: ::core::option::Option<TaskExecutionMetadata>,
 }
 /// Represents a create response structure.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -85,7 +85,7 @@ pub struct CreateTaskResponse {
     #[prost(bytes = "vec", tag = "1")]
     pub resource_meta: ::prost::alloc::vec::Vec<u8>,
 }
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -103,7 +103,7 @@ pub struct CreateRequestHeader {
     #[prost(int64, tag = "4")]
     pub max_dataset_size_bytes: i64,
 }
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -113,7 +113,7 @@ pub struct ExecuteTaskSyncRequest {
 }
 /// Nested message and enum types in `ExecuteTaskSyncRequest`.
 pub mod execute_task_sync_request {
-    #[pyo3::pyclass(get_all, set_all)]
+    #[pyo3::pyclass(dict, get_all, set_all)]
     #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
     #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
@@ -124,7 +124,7 @@ pub mod execute_task_sync_request {
         Inputs(super::super::core::LiteralMap),
     }
 }
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -132,7 +132,7 @@ pub struct ExecuteTaskSyncResponseHeader {
     #[prost(message, optional, tag = "1")]
     pub resource: ::core::option::Option<Resource>,
 }
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -146,7 +146,7 @@ pub struct ExecuteTaskSyncResponse {
 pub mod execute_task_sync_response {
     /// Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
     /// Resource is for synchronous task execution.
-    #[pyo3::pyclass(get_all, set_all)]
+    #[pyo3::pyclass(dict, get_all, set_all)]
     #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
     #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
@@ -158,7 +158,7 @@ pub mod execute_task_sync_response {
     }
 }
 /// A message used to fetch a job resource from flyte agent server.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -175,7 +175,7 @@ pub struct GetTaskRequest {
     pub task_category: ::core::option::Option<TaskCategory>,
 }
 /// Response to get an individual task resource.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -183,7 +183,7 @@ pub struct GetTaskResponse {
     #[prost(message, optional, tag = "1")]
     pub resource: ::core::option::Option<Resource>,
 }
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -211,7 +211,7 @@ pub struct Resource {
     pub custom_info: ::core::option::Option<super::super::google::protobuf::Struct>,
 }
 /// A message used to delete a task.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -228,13 +228,13 @@ pub struct DeleteTaskRequest {
     pub task_category: ::core::option::Option<TaskCategory>,
 }
 /// Response to delete a task.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct DeleteTaskResponse {}
 /// A message containing the agent metadata.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -257,7 +257,7 @@ pub struct Agent {
     #[prost(message, repeated, tag = "4")]
     pub supported_task_categories: ::prost::alloc::vec::Vec<TaskCategory>,
 }
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -270,7 +270,7 @@ pub struct TaskCategory {
     pub version: i32,
 }
 /// A request to get an agent.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -280,7 +280,7 @@ pub struct GetAgentRequest {
     pub name: ::prost::alloc::string::String,
 }
 /// A response containing an agent.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -289,13 +289,13 @@ pub struct GetAgentResponse {
     pub agent: ::core::option::Option<Agent>,
 }
 /// A request to list all agents.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ListAgentsRequest {}
 /// A response containing a list of agents.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -304,7 +304,7 @@ pub struct ListAgentsResponse {
     pub agents: ::prost::alloc::vec::Vec<Agent>,
 }
 /// A request to get the metrics from a task execution.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -334,7 +334,7 @@ pub struct GetTaskMetricsRequest {
     pub task_category: ::core::option::Option<TaskCategory>,
 }
 /// A response containing a list of metrics for a task execution.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -344,7 +344,7 @@ pub struct GetTaskMetricsResponse {
     pub results: ::prost::alloc::vec::Vec<super::core::ExecutionMetricResult>,
 }
 /// A request to get the log from a task execution.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -367,7 +367,7 @@ pub struct GetTaskLogsRequest {
     #[prost(message, optional, tag = "5")]
     pub task_category: ::core::option::Option<TaskCategory>,
 }
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -377,7 +377,7 @@ pub struct GetTaskLogsResponseHeader {
     #[prost(string, tag = "1")]
     pub token: ::prost::alloc::string::String,
 }
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -387,7 +387,7 @@ pub struct GetTaskLogsResponseBody {
     pub results: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
 }
 /// A response containing the logs for a task execution.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -397,7 +397,7 @@ pub struct GetTaskLogsResponse {
 }
 /// Nested message and enum types in `GetTaskLogsResponse`.
 pub mod get_task_logs_response {
-    #[pyo3::pyclass(get_all, set_all)]
+    #[pyo3::pyclass(dict, get_all, set_all)]
     #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
     #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
@@ -409,7 +409,7 @@ pub mod get_task_logs_response {
     }
 }
 /// The state of the execution is used to control its visibility in the UI/CLI.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]
@@ -447,7 +447,7 @@ impl State {
     }
 }
 /// Encapsulates specifications for routing an execution onto a specific cluster.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -459,7 +459,7 @@ pub struct ClusterAssignment {
 /// A Flyte resource can be a task, workflow or launch plan.
 /// A resource can internally have multiple versions and is uniquely identified
 /// by project, domain, and name.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -481,7 +481,7 @@ pub struct NamedEntityIdentifier {
     pub org: ::prost::alloc::string::String,
 }
 /// Additional metadata around a named entity.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -498,7 +498,7 @@ pub struct NamedEntityMetadata {
 /// Encapsulates information common to a NamedEntity, a Flyte resource such as a task,
 /// workflow or launch plan. A NamedEntity is exclusively identified by its resource type
 /// and identifier.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -513,7 +513,7 @@ pub struct NamedEntity {
     pub metadata: ::core::option::Option<NamedEntityMetadata>,
 }
 /// Specifies sort ordering in a list request.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -529,7 +529,7 @@ pub struct Sort {
 }
 /// Nested message and enum types in `Sort`.
 pub mod sort {
-    #[pyo3::pyclass(get_all, set_all)]
+    #[pyo3::pyclass(dict, get_all, set_all)]
     #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
     #[derive(
         Clone,
@@ -570,7 +570,7 @@ pub mod sort {
     }
 }
 /// Represents a request structure to list NamedEntityIdentifiers.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -605,7 +605,7 @@ pub struct NamedEntityIdentifierListRequest {
     pub org: ::prost::alloc::string::String,
 }
 /// Represents a request structure to list NamedEntity objects
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -642,7 +642,7 @@ pub struct NamedEntityListRequest {
     pub org: ::prost::alloc::string::String,
 }
 /// Represents a list of NamedEntityIdentifiers.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -656,7 +656,7 @@ pub struct NamedEntityIdentifierList {
     pub token: ::prost::alloc::string::String,
 }
 /// Represents a list of NamedEntityIdentifiers.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -670,7 +670,7 @@ pub struct NamedEntityList {
     pub token: ::prost::alloc::string::String,
 }
 /// A request to retrieve the metadata associated with a NamedEntityIdentifier
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -685,7 +685,7 @@ pub struct NamedEntityGetRequest {
     pub id: ::core::option::Option<NamedEntityIdentifier>,
 }
 /// Request to set the referenced named entity state to the configured value.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -704,14 +704,14 @@ pub struct NamedEntityUpdateRequest {
     pub metadata: ::core::option::Option<NamedEntityMetadata>,
 }
 /// Purposefully empty, may be populated in the future.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct NamedEntityUpdateResponse {}
 /// Shared request structure to fetch a single resource.
 /// Resources include: Task, Workflow, LaunchPlan
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -723,7 +723,7 @@ pub struct ObjectGetRequest {
 }
 /// Shared request structure to retrieve a list of resources.
 /// Resources include: Task, Workflow, LaunchPlan
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -752,7 +752,7 @@ pub struct ResourceListRequest {
     pub sort_by: ::core::option::Option<Sort>,
 }
 /// Defines an email notification specification.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -763,7 +763,7 @@ pub struct EmailNotification {
     pub recipients_email: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
 }
 /// Defines a pager duty notification specification.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -774,7 +774,7 @@ pub struct PagerDutyNotification {
     pub recipients_email: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
 }
 /// Defines a slack notification specification.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -787,7 +787,7 @@ pub struct SlackNotification {
 /// Represents a structure for notifications based on execution status.
 /// The notification content is configured within flyte admin but can be templatized.
 /// Future iterations could expose configuring notifications with custom content.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -805,7 +805,7 @@ pub struct Notification {
 pub mod notification {
     /// The type of notification to trigger.
     /// +required
-    #[pyo3::pyclass(get_all, set_all)]
+    #[pyo3::pyclass(dict, get_all, set_all)]
     #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
     #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
@@ -819,7 +819,7 @@ pub mod notification {
     }
 }
 /// Represents a string url and associated metadata used throughout the platform.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -834,7 +834,7 @@ pub struct UrlBlob {
 /// Label values to be applied to an execution resource.
 /// In the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined
 /// to specify how to merge labels defined at registration and execution time.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -849,7 +849,7 @@ pub struct Labels {
 /// Annotation values to be applied to an execution resource.
 /// In the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined
 /// to specify how to merge annotations defined at registration and execution time.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -864,7 +864,7 @@ pub struct Annotations {
 /// Environment variable values to be applied to an execution resource.
 /// In the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined
 /// to specify how to merge environment variables defined at registration and execution time.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -876,7 +876,7 @@ pub struct Envs {
 /// Defines permissions associated with executions created by this launch plan spec.
 /// Use either of these roles when they have permissions required by your workflow execution.
 /// Deprecated.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -890,7 +890,7 @@ pub struct AuthRole {
 }
 /// Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
 /// See <https://github.com/flyteorg/flyte/issues/211> for more background information.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -901,7 +901,7 @@ pub struct RawOutputDataConfig {
     pub output_location_prefix: ::prost::alloc::string::String,
 }
 /// These URLs are returned as part of node and task execution data requests.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -914,7 +914,7 @@ pub struct FlyteUrLs {
     pub deck: ::prost::alloc::string::String,
 }
 /// The status of the named entity is used to control its visibility in the UI.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]
@@ -950,7 +950,7 @@ impl NamedEntityState {
 }
 /// DescriptionEntity contains detailed description for the task/workflow.
 /// Documentation could provide insight into the algorithms, business use case, etc.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -975,7 +975,7 @@ pub struct DescriptionEntity {
 /// Full user description with formatting preserved. This can be rendered
 /// by clients, such as the console or command line tools with in-tact
 /// formatting.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -991,7 +991,7 @@ pub struct Description {
 }
 /// Nested message and enum types in `Description`.
 pub mod description {
-    #[pyo3::pyclass(get_all, set_all)]
+    #[pyo3::pyclass(dict, get_all, set_all)]
     #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
     #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
@@ -1006,7 +1006,7 @@ pub mod description {
     }
 }
 /// Link to source code used to define this entity
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1016,7 +1016,7 @@ pub struct SourceCode {
 }
 /// Represents a list of DescriptionEntities returned from the admin.
 /// See :ref:`ref_flyteidl.admin.DescriptionEntity` for more details
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1031,7 +1031,7 @@ pub struct DescriptionEntityList {
 }
 /// Represents a request structure to retrieve a list of DescriptionEntities.
 /// See :ref:`ref_flyteidl.admin.DescriptionEntity` for more details
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1063,7 +1063,7 @@ pub struct DescriptionEntityListRequest {
     pub sort_by: ::core::option::Option<Sort>,
 }
 /// The format of the long description
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]
@@ -1101,7 +1101,7 @@ impl DescriptionFormat {
 /// Indicates that a sent event was not used to update execution state due to
 /// the referenced execution already being terminated (and therefore ineligible
 /// for further state transitions).
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1112,7 +1112,7 @@ pub struct EventErrorAlreadyInTerminalState {
 }
 /// Indicates an event was rejected because it came from a different cluster than
 /// is on record as running the execution.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1123,7 +1123,7 @@ pub struct EventErrorIncompatibleCluster {
     pub cluster: ::prost::alloc::string::String,
 }
 /// Indicates why a sent event was not used to update execution.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1135,7 +1135,7 @@ pub struct EventFailureReason {
 /// Nested message and enum types in `EventFailureReason`.
 pub mod event_failure_reason {
     /// +required
-    #[pyo3::pyclass(get_all, set_all)]
+    #[pyo3::pyclass(dict, get_all, set_all)]
     #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
     #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
@@ -1147,7 +1147,7 @@ pub mod event_failure_reason {
     }
 }
 /// Request to send a notification that a workflow execution event has occurred.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1160,13 +1160,13 @@ pub struct WorkflowExecutionEventRequest {
     pub event: ::core::option::Option<super::event::WorkflowExecutionEvent>,
 }
 /// Purposefully empty, may be populated in the future.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct WorkflowExecutionEventResponse {}
 /// Request to send a notification that a node execution event has occurred.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1179,13 +1179,13 @@ pub struct NodeExecutionEventRequest {
     pub event: ::core::option::Option<super::event::NodeExecutionEvent>,
 }
 /// Purposefully empty, may be populated in the future.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct NodeExecutionEventResponse {}
 /// Request to send a notification that a task execution event has occurred.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1198,13 +1198,13 @@ pub struct TaskExecutionEventRequest {
     pub event: ::core::option::Option<super::event::TaskExecutionEvent>,
 }
 /// Purposefully empty, may be populated in the future.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct TaskExecutionEventResponse {}
 /// Defines a set of overridable task resource attributes set during task registration.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1221,7 +1221,7 @@ pub struct TaskResourceSpec {
     pub ephemeral_storage: ::prost::alloc::string::String,
 }
 /// Defines task resource defaults and limits that will be applied at task registration.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1231,7 +1231,7 @@ pub struct TaskResourceAttributes {
     #[prost(message, optional, tag = "2")]
     pub limits: ::core::option::Option<TaskResourceSpec>,
 }
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1245,7 +1245,7 @@ pub struct ClusterResourceAttributes {
         ::prost::alloc::string::String,
     >,
 }
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1254,7 +1254,7 @@ pub struct ExecutionQueueAttributes {
     #[prost(string, repeated, tag = "1")]
     pub tags: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
 }
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1266,7 +1266,7 @@ pub struct ExecutionClusterLabel {
 /// This MatchableAttribute configures selecting alternate plugin implementations for a given task type.
 /// In addition to an override implementation a selection of fallbacks can be provided or other modes
 /// for handling cases where the desired plugin override is not enabled in a given Flyte deployment.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1283,7 +1283,7 @@ pub struct PluginOverride {
 }
 /// Nested message and enum types in `PluginOverride`.
 pub mod plugin_override {
-    #[pyo3::pyclass(get_all, set_all)]
+    #[pyo3::pyclass(dict, get_all, set_all)]
     #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
     #[derive(
         Clone,
@@ -1324,7 +1324,7 @@ pub mod plugin_override {
         }
     }
 }
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1333,7 +1333,7 @@ pub struct PluginOverrides {
     pub overrides: ::prost::alloc::vec::Vec<PluginOverride>,
 }
 /// Adds defaults for customizable workflow-execution specifications and overrides.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1374,7 +1374,7 @@ pub struct WorkflowExecutionConfig {
     >,
 }
 /// Generic container for encapsulating all types of the above attributes messages.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1384,7 +1384,7 @@ pub struct MatchingAttributes {
 }
 /// Nested message and enum types in `MatchingAttributes`.
 pub mod matching_attributes {
-    #[pyo3::pyclass(get_all, set_all)]
+    #[pyo3::pyclass(dict, get_all, set_all)]
     #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
     #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
@@ -1411,7 +1411,7 @@ pub mod matching_attributes {
 /// or domain, project and workflow name (and optional org).
 /// These are used to override system level defaults for kubernetes cluster resource management,
 /// default execution values, and more all across different levels of specificity.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1432,7 +1432,7 @@ pub struct MatchableAttributesConfiguration {
 }
 /// Request all matching resource attributes for a resource type.
 /// See :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for more details
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1446,7 +1446,7 @@ pub struct ListMatchableAttributesRequest {
 }
 /// Response for a request for all matching resource attributes for a resource type.
 /// See :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for more details
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1456,7 +1456,7 @@ pub struct ListMatchableAttributesResponse {
 }
 /// Defines a resource that can be configured by customizable Project-, ProjectDomain- or WorkflowAttributes
 /// based on matching tags.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]
@@ -1515,7 +1515,7 @@ impl MatchableResource {
     }
 }
 /// Request to launch an execution with the given project, domain and optionally-assigned name.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1548,7 +1548,7 @@ pub struct ExecutionCreateRequest {
     pub org: ::prost::alloc::string::String,
 }
 /// Request to relaunch the referenced execution.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1569,7 +1569,7 @@ pub struct ExecutionRelaunchRequest {
     pub overwrite_cache: bool,
 }
 /// Request to recover the referenced execution.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1588,7 +1588,7 @@ pub struct ExecutionRecoverRequest {
 }
 /// The unique identifier for a successfully created execution.
 /// If the name was *not* specified in the create request, this identifier will include a generated name.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1598,7 +1598,7 @@ pub struct ExecutionCreateResponse {
 }
 /// A message used to fetch a single workflow execution entity.
 /// See :ref:`ref_flyteidl.admin.Execution` for more details
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1610,7 +1610,7 @@ pub struct WorkflowExecutionGetRequest {
 /// A workflow execution represents an instantiated workflow, including all inputs and additional
 /// metadata as well as computed results included state, outputs, and duration-based attributes.
 /// Used as a response object used in Get and List execution requests.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1627,7 +1627,7 @@ pub struct Execution {
 }
 /// Used as a response for request to list executions.
 /// See :ref:`ref_flyteidl.admin.Execution` for more details
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1640,7 +1640,7 @@ pub struct ExecutionList {
     pub token: ::prost::alloc::string::String,
 }
 /// Input/output data can represented by actual values or a link to where values are stored
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1650,7 +1650,7 @@ pub struct LiteralMapBlob {
 }
 /// Nested message and enum types in `LiteralMapBlob`.
 pub mod literal_map_blob {
-    #[pyo3::pyclass(get_all, set_all)]
+    #[pyo3::pyclass(dict, get_all, set_all)]
     #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
     #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
@@ -1664,7 +1664,7 @@ pub mod literal_map_blob {
     }
 }
 /// Specifies metadata around an aborted workflow execution.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1677,7 +1677,7 @@ pub struct AbortMetadata {
     pub principal: ::prost::alloc::string::String,
 }
 /// Encapsulates the results of the Execution
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1722,7 +1722,7 @@ pub struct ExecutionClosure {
 pub mod execution_closure {
     /// A result produced by a terminated execution.
     /// A pending (non-terminal) execution will not have any output result.
-    #[pyo3::pyclass(get_all, set_all)]
+    #[pyo3::pyclass(dict, get_all, set_all)]
     #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
     #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
@@ -1747,7 +1747,7 @@ pub mod execution_closure {
     }
 }
 /// Represents system, rather than user-facing, metadata about an execution.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1761,7 +1761,7 @@ pub struct SystemMetadata {
 }
 /// Represents attributes about an execution which are not required to launch the execution but are useful to record.
 /// These attributes are assigned at launch time and do not change.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1806,7 +1806,7 @@ pub struct ExecutionMetadata {
 /// Nested message and enum types in `ExecutionMetadata`.
 pub mod execution_metadata {
     /// The method by which this execution was launched.
-    #[pyo3::pyclass(get_all, set_all)]
+    #[pyo3::pyclass(dict, get_all, set_all)]
     #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
     #[derive(
         Clone,
@@ -1867,7 +1867,7 @@ pub mod execution_metadata {
         }
     }
 }
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1877,7 +1877,7 @@ pub struct NotificationList {
 }
 /// An ExecutionSpec encompasses all data used to launch this execution. The Spec does not change over the lifetime
 /// of an execution as it progresses across phase changes.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1953,7 +1953,7 @@ pub struct ExecutionSpec {
 }
 /// Nested message and enum types in `ExecutionSpec`.
 pub mod execution_spec {
-    #[pyo3::pyclass(get_all, set_all)]
+    #[pyo3::pyclass(dict, get_all, set_all)]
     #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
     #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
@@ -1973,7 +1973,7 @@ pub mod execution_spec {
 /// This request will fail if it references a non-existent execution.
 /// If the request succeeds the phase "ABORTED" will be recorded for the termination
 /// with the optional cause added to the output_result.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1986,14 +1986,14 @@ pub struct ExecutionTerminateRequest {
     pub cause: ::prost::alloc::string::String,
 }
 /// Purposefully empty, may be populated in the future.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ExecutionTerminateResponse {}
 /// Request structure to fetch inputs, output and other data produced by an execution.
 /// By default this data is not returned inline in :ref:`ref_flyteidl.admin.WorkflowExecutionGetRequest`
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2003,7 +2003,7 @@ pub struct WorkflowExecutionGetDataRequest {
     pub id: ::core::option::Option<super::core::WorkflowExecutionIdentifier>,
 }
 /// Response structure for WorkflowExecutionGetDataRequest which contains inputs and outputs for an execution.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2025,7 +2025,7 @@ pub struct WorkflowExecutionGetDataResponse {
     #[prost(message, optional, tag = "4")]
     pub full_outputs: ::core::option::Option<super::core::LiteralMap>,
 }
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2037,7 +2037,7 @@ pub struct ExecutionUpdateRequest {
     #[prost(enumeration = "ExecutionState", tag = "2")]
     pub state: i32,
 }
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2052,13 +2052,13 @@ pub struct ExecutionStateChangeDetails {
     #[prost(string, tag = "3")]
     pub principal: ::prost::alloc::string::String,
 }
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ExecutionUpdateResponse {}
 /// WorkflowExecutionGetMetricsRequest represents a request to retrieve metrics for the specified workflow execution.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2071,7 +2071,7 @@ pub struct WorkflowExecutionGetMetricsRequest {
     pub depth: i32,
 }
 /// WorkflowExecutionGetMetricsResponse represents the response containing metrics for the specified workflow execution.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2082,7 +2082,7 @@ pub struct WorkflowExecutionGetMetricsResponse {
     pub span: ::core::option::Option<super::core::Span>,
 }
 /// The state of the execution is used to control its visibility in the UI/CLI.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]
@@ -2113,7 +2113,7 @@ impl ExecutionState {
     }
 }
 /// Option for schedules run at a certain frequency e.g. every 2 minutes.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2124,7 +2124,7 @@ pub struct FixedRate {
     pub unit: i32,
 }
 /// Options for schedules to run according to a cron expression.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2140,7 +2140,7 @@ pub struct CronSchedule {
     pub offset: ::prost::alloc::string::String,
 }
 /// Defines complete set of information required to trigger an execution on a schedule.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2153,7 +2153,7 @@ pub struct Schedule {
 }
 /// Nested message and enum types in `Schedule`.
 pub mod schedule {
-    #[pyo3::pyclass(get_all, set_all)]
+    #[pyo3::pyclass(dict, get_all, set_all)]
     #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
     #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
@@ -2169,7 +2169,7 @@ pub mod schedule {
     }
 }
 /// Represents a frequency at which to run a schedule.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]
@@ -2203,7 +2203,7 @@ impl FixedRateUnit {
 /// Request to register a launch plan. The included LaunchPlanSpec may have a complete or incomplete set of inputs required
 /// to launch a workflow execution. By default all launch plans are registered in state INACTIVE. If you wish to
 /// set the state to ACTIVE, you must submit a LaunchPlanUpdateRequest, after you have successfully created a launch plan.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2216,7 +2216,7 @@ pub struct LaunchPlanCreateRequest {
     pub spec: ::core::option::Option<LaunchPlanSpec>,
 }
 /// Purposefully empty, may be populated in the future.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2225,7 +2225,7 @@ pub struct LaunchPlanCreateResponse {}
 /// Launch plans simplify associating one or more schedules, inputs and notifications with your workflows.
 /// Launch plans can be shared and used to trigger executions with predefined inputs even when a workflow
 /// definition doesn't necessarily have a default value for said input.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2242,7 +2242,7 @@ pub struct LaunchPlan {
 }
 /// Response object for list launch plan requests.
 /// See :ref:`ref_flyteidl.admin.LaunchPlan` for more details
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2257,7 +2257,7 @@ pub struct LaunchPlanList {
 /// Defines permissions associated with executions created by this launch plan spec.
 /// Use either of these roles when they have permissions required by your workflow execution.
 /// Deprecated.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2270,7 +2270,7 @@ pub struct Auth {
     pub kubernetes_service_account: ::prost::alloc::string::String,
 }
 /// User-provided launch plan definition and configuration values.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2343,7 +2343,7 @@ pub struct LaunchPlanSpec {
 /// Values computed by the flyte platform after launch plan registration.
 /// These include expected_inputs required to be present in a CreateExecutionRequest
 /// to launch the reference workflow as well timestamp values associated with the launch plan.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2366,7 +2366,7 @@ pub struct LaunchPlanClosure {
 }
 /// Additional launch plan attributes included in the LaunchPlanSpec not strictly required to launch
 /// the reference workflow.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2383,7 +2383,7 @@ pub struct LaunchPlanMetadata {
 }
 /// Request to set the referenced launch plan state to the configured value.
 /// See :ref:`ref_flyteidl.admin.LaunchPlan` for more details
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2398,14 +2398,14 @@ pub struct LaunchPlanUpdateRequest {
     pub state: i32,
 }
 /// Purposefully empty, may be populated in the future.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct LaunchPlanUpdateResponse {}
 /// Represents a request struct for finding an active launch plan for a given NamedEntityIdentifier
 /// See :ref:`ref_flyteidl.admin.LaunchPlan` for more details
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2416,7 +2416,7 @@ pub struct ActiveLaunchPlanRequest {
 }
 /// Represents a request structure to list active launch plans within a project/domain and optional org.
 /// See :ref:`ref_flyteidl.admin.LaunchPlan` for more details
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2451,7 +2451,7 @@ pub struct ActiveLaunchPlanListRequest {
 /// (e.g. a NamedEntityIdentifier set of shared project, domain and name values) can be
 /// active at a time in regards to *schedules*. That is, at most one schedule in a NamedEntityIdentifier
 /// group will be observed and trigger executions at a defined cadence.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]
@@ -2481,7 +2481,7 @@ impl LaunchPlanState {
 }
 /// A message used to fetch a single node execution entity.
 /// See :ref:`ref_flyteidl.admin.NodeExecution` for more details
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2493,7 +2493,7 @@ pub struct NodeExecutionGetRequest {
 }
 /// Represents a request structure to retrieve a list of node execution entities.
 /// See :ref:`ref_flyteidl.admin.NodeExecution` for more details
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2526,7 +2526,7 @@ pub struct NodeExecutionListRequest {
 }
 /// Represents a request structure to retrieve a list of node execution entities launched by a specific task.
 /// This can arise when a task yields a subworkflow.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2558,7 +2558,7 @@ pub struct NodeExecutionForTaskListRequest {
 /// A node represents a component in the overall workflow graph. A node launch a task, multiple tasks, an entire nested
 /// sub-workflow, or even a separate child-workflow execution.
 /// The same task can be called repeatedly in a single workflow but each node is unique.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2577,7 +2577,7 @@ pub struct NodeExecution {
     pub metadata: ::core::option::Option<NodeExecutionMetaData>,
 }
 /// Represents additional attributes related to a Node Execution
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2606,7 +2606,7 @@ pub struct NodeExecutionMetaData {
 }
 /// Request structure to retrieve a list of node execution entities.
 /// See :ref:`ref_flyteidl.admin.NodeExecution` for more details
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2619,7 +2619,7 @@ pub struct NodeExecutionList {
     pub token: ::prost::alloc::string::String,
 }
 /// Container for node execution details and results.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2658,7 +2658,7 @@ pub struct NodeExecutionClosure {
 /// Nested message and enum types in `NodeExecutionClosure`.
 pub mod node_execution_closure {
     /// Only a node in a terminal state will have a non-empty output_result.
-    #[pyo3::pyclass(get_all, set_all)]
+    #[pyo3::pyclass(dict, get_all, set_all)]
     #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
     #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
@@ -2677,7 +2677,7 @@ pub mod node_execution_closure {
     }
     /// Store metadata for what the node launched.
     /// for ex: if this is a workflow node, we store information for the launched workflow.
-    #[pyo3::pyclass(get_all, set_all)]
+    #[pyo3::pyclass(dict, get_all, set_all)]
     #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
     #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
@@ -2689,7 +2689,7 @@ pub mod node_execution_closure {
     }
 }
 /// Metadata for a WorkflowNode
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2699,7 +2699,7 @@ pub struct WorkflowNodeMetadata {
     pub execution_id: ::core::option::Option<super::core::WorkflowExecutionIdentifier>,
 }
 /// Metadata for the case in which the node is a TaskNode
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2715,7 +2715,7 @@ pub struct TaskNodeMetadata {
     pub checkpoint_uri: ::prost::alloc::string::String,
 }
 /// For dynamic workflow nodes we capture information about the dynamic workflow definition that gets generated.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2733,7 +2733,7 @@ pub struct DynamicWorkflowNodeMetadata {
 }
 /// Request structure to fetch inputs and output for a node execution.
 /// By default, these are not returned in :ref:`ref_flyteidl.admin.NodeExecutionGetRequest`
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2743,7 +2743,7 @@ pub struct NodeExecutionGetDataRequest {
     pub id: ::core::option::Option<super::core::NodeExecutionIdentifier>,
 }
 /// Response structure for NodeExecutionGetDataRequest which contains inputs and outputs for a node execution.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2770,7 +2770,7 @@ pub struct NodeExecutionGetDataResponse {
     #[prost(message, optional, tag = "17")]
     pub flyte_urls: ::core::option::Option<FlyteUrLs>,
 }
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2778,7 +2778,7 @@ pub struct GetDynamicNodeWorkflowRequest {
     #[prost(message, optional, tag = "1")]
     pub id: ::core::option::Option<super::core::NodeExecutionIdentifier>,
 }
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2789,7 +2789,7 @@ pub struct DynamicNodeWorkflowResponse {
 /// Represents the Email object that is sent to a publisher/subscriber
 /// to forward the notification.
 /// Note: This is internal to Admin and doesn't need to be exposed to other components.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2813,14 +2813,14 @@ pub struct EmailMessage {
     pub body: ::prost::alloc::string::String,
 }
 /// Empty request for GetDomain
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GetDomainRequest {}
 /// Namespace within a project commonly used to differentiate between different service instances.
 /// e.g. "production", "development", etc.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2833,7 +2833,7 @@ pub struct Domain {
     pub name: ::prost::alloc::string::String,
 }
 /// Represents a list of domains.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2842,7 +2842,7 @@ pub struct GetDomainsResponse {
     pub domains: ::prost::alloc::vec::Vec<Domain>,
 }
 /// Top-level namespace used to classify different entities like workflows and executions.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2870,7 +2870,7 @@ pub struct Project {
 /// Nested message and enum types in `Project`.
 pub mod project {
     /// The state of the project is used to control its visibility in the UI and validity.
-    #[pyo3::pyclass(get_all, set_all)]
+    #[pyo3::pyclass(dict, get_all, set_all)]
     #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
     #[derive(
         Clone,
@@ -2921,7 +2921,7 @@ pub mod project {
 }
 /// Represents a list of projects.
 /// See :ref:`ref_flyteidl.admin.Project` for more details
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2935,7 +2935,7 @@ pub struct Projects {
 }
 /// Request to retrieve a list of projects matching specified filters.
 /// See :ref:`ref_flyteidl.admin.Project` for more details
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2964,7 +2964,7 @@ pub struct ProjectListRequest {
 }
 /// Adds a new user-project within the Flyte deployment.
 /// See :ref:`ref_flyteidl.admin.Project` for more details
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2974,18 +2974,18 @@ pub struct ProjectRegisterRequest {
     pub project: ::core::option::Option<Project>,
 }
 /// Purposefully empty, may be updated in the future.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ProjectRegisterResponse {}
 /// Purposefully empty, may be updated in the future.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ProjectUpdateResponse {}
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2999,7 +2999,7 @@ pub struct ProjectGetRequest {
     pub org: ::prost::alloc::string::String,
 }
 /// Error returned for inactive projects
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -3014,7 +3014,7 @@ pub struct InactiveProject {
 }
 /// Defines a set of custom matching attributes at the project level.
 /// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -3030,7 +3030,7 @@ pub struct ProjectAttributes {
 }
 /// Sets custom attributes for a project
 /// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -3040,14 +3040,14 @@ pub struct ProjectAttributesUpdateRequest {
     pub attributes: ::core::option::Option<ProjectAttributes>,
 }
 /// Purposefully empty, may be populated in the future.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ProjectAttributesUpdateResponse {}
 /// Request to get an individual project level attribute override.
 /// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -3066,7 +3066,7 @@ pub struct ProjectAttributesGetRequest {
 }
 /// Response to get an individual project level attribute override.
 /// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -3076,7 +3076,7 @@ pub struct ProjectAttributesGetResponse {
 }
 /// Request to delete a set matchable project level attribute override.
 /// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -3094,14 +3094,14 @@ pub struct ProjectAttributesDeleteRequest {
     pub org: ::prost::alloc::string::String,
 }
 /// Purposefully empty, may be populated in the future.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ProjectAttributesDeleteResponse {}
 /// Defines a set of custom matching attributes which defines resource defaults for a project and domain.
 /// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -3120,7 +3120,7 @@ pub struct ProjectDomainAttributes {
 }
 /// Sets custom attributes for a project-domain combination.
 /// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -3130,14 +3130,14 @@ pub struct ProjectDomainAttributesUpdateRequest {
     pub attributes: ::core::option::Option<ProjectDomainAttributes>,
 }
 /// Purposefully empty, may be populated in the future.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ProjectDomainAttributesUpdateResponse {}
 /// Request to get an individual project domain attribute override.
 /// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -3160,7 +3160,7 @@ pub struct ProjectDomainAttributesGetRequest {
 }
 /// Response to get an individual project domain attribute override.
 /// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -3170,7 +3170,7 @@ pub struct ProjectDomainAttributesGetResponse {
 }
 /// Request to delete a set matchable project domain attribute override.
 /// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -3192,14 +3192,14 @@ pub struct ProjectDomainAttributesDeleteRequest {
     pub org: ::prost::alloc::string::String,
 }
 /// Purposefully empty, may be populated in the future.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ProjectDomainAttributesDeleteResponse {}
 /// SignalGetOrCreateRequest represents a request structure to retrieve or create a signal.
 /// See :ref:`ref_flyteidl.admin.Signal` for more details
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -3213,7 +3213,7 @@ pub struct SignalGetOrCreateRequest {
 }
 /// SignalListRequest represents a request structure to retrieve a collection of signals.
 /// See :ref:`ref_flyteidl.admin.Signal` for more details
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -3244,7 +3244,7 @@ pub struct SignalListRequest {
 }
 /// SignalList represents collection of signals along with the token of the last result.
 /// See :ref:`ref_flyteidl.admin.Signal` for more details
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -3260,7 +3260,7 @@ pub struct SignalList {
 /// SignalSetRequest represents a request structure to set the value on a signal. Setting a signal
 /// effetively satisfies the signal condition within a Flyte workflow.
 /// See :ref:`ref_flyteidl.admin.Signal` for more details
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -3275,7 +3275,7 @@ pub struct SignalSetRequest {
 /// SignalSetResponse represents a response structure if signal setting succeeds.
 ///
 /// Purposefully empty, may be populated in the future.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -3283,7 +3283,7 @@ pub struct SignalSetResponse {}
 /// Signal encapsulates a unique identifier, associated metadata, and a value for a single Flyte
 /// signal. Signals may exist either without a set value (representing a signal request) or with a
 /// populated value (indicating the signal has been given).
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -3301,7 +3301,7 @@ pub struct Signal {
 }
 /// Represents a request structure to create a revision of a task.
 /// See :ref:`ref_flyteidl.admin.Task` for more details
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -3318,7 +3318,7 @@ pub struct TaskCreateRequest {
 /// Represents a response structure if task creation succeeds.
 ///
 /// Purposefully empty, may be populated in the future.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -3326,7 +3326,7 @@ pub struct TaskCreateResponse {}
 /// Flyte workflows are composed of many ordered tasks. That is small, reusable, self-contained logical blocks
 /// arranged to process workflow inputs and produce a deterministic set of outputs.
 /// Tasks can come in many varieties tuned for specialized behavior.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -3343,7 +3343,7 @@ pub struct Task {
 }
 /// Represents a list of tasks returned from the admin.
 /// See :ref:`ref_flyteidl.admin.Task` for more details
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -3357,7 +3357,7 @@ pub struct TaskList {
     pub token: ::prost::alloc::string::String,
 }
 /// Represents a structure that encapsulates the user-configured specification of the task.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -3371,7 +3371,7 @@ pub struct TaskSpec {
 }
 /// Compute task attributes which include values derived from the TaskSpec, as well as plugin-specific data
 /// and task metadata.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -3385,7 +3385,7 @@ pub struct TaskClosure {
 }
 /// A message used to fetch a single task execution entity.
 /// See :ref:`ref_flyteidl.admin.TaskExecution` for more details
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -3397,7 +3397,7 @@ pub struct TaskExecutionGetRequest {
 }
 /// Represents a request structure to retrieve a list of task execution entities yielded by a specific node execution.
 /// See :ref:`ref_flyteidl.admin.TaskExecution` for more details
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -3428,7 +3428,7 @@ pub struct TaskExecutionListRequest {
 /// Encapsulates all details for a single task execution entity.
 /// A task execution represents an instantiated task, including all inputs and additional
 /// metadata as well as computed results included state, outputs, and duration-based attributes.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -3448,7 +3448,7 @@ pub struct TaskExecution {
 }
 /// Response structure for a query to list of task execution entities.
 /// See :ref:`ref_flyteidl.admin.TaskExecution` for more details
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -3461,7 +3461,7 @@ pub struct TaskExecutionList {
     pub token: ::prost::alloc::string::String,
 }
 /// Container for task execution details and results.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -3511,7 +3511,7 @@ pub struct TaskExecutionClosure {
 }
 /// Nested message and enum types in `TaskExecutionClosure`.
 pub mod task_execution_closure {
-    #[pyo3::pyclass(get_all, set_all)]
+    #[pyo3::pyclass(dict, get_all, set_all)]
     #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
     #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
@@ -3530,7 +3530,7 @@ pub mod task_execution_closure {
     }
 }
 /// Reason is a single message annotated with a timestamp to indicate the instant the reason occurred.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -3544,7 +3544,7 @@ pub struct Reason {
 }
 /// Request structure to fetch inputs and output for a task execution.
 /// By default this data is not returned inline in :ref:`ref_flyteidl.admin.TaskExecutionGetRequest`
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -3555,7 +3555,7 @@ pub struct TaskExecutionGetDataRequest {
     pub id: ::core::option::Option<super::core::TaskExecutionIdentifier>,
 }
 /// Response structure for TaskExecutionGetDataRequest which contains inputs and outputs for a task execution.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -3582,7 +3582,7 @@ pub struct TaskExecutionGetDataResponse {
     pub flyte_urls: ::core::option::Option<FlyteUrLs>,
 }
 /// Response for the GetVersion API
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -3593,7 +3593,7 @@ pub struct GetVersionResponse {
     pub control_plane_version: ::core::option::Option<Version>,
 }
 /// Provides Version information for a component
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -3609,14 +3609,14 @@ pub struct Version {
     pub build_time: ::prost::alloc::string::String,
 }
 /// Empty request for GetVersion
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GetVersionRequest {}
 /// Represents a request structure to create a revision of a workflow.
 /// See :ref:`ref_flyteidl.admin.Workflow` for more details
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -3631,7 +3631,7 @@ pub struct WorkflowCreateRequest {
     pub spec: ::core::option::Option<WorkflowSpec>,
 }
 /// Purposefully empty, may be populated in the future.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -3639,7 +3639,7 @@ pub struct WorkflowCreateResponse {}
 /// Represents the workflow structure stored in the Admin
 /// A workflow is created by ordering tasks and associating outputs to inputs
 /// in order to produce a directed-acyclic execution graph.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -3656,7 +3656,7 @@ pub struct Workflow {
 }
 /// Represents a list of workflows returned from the admin.
 /// See :ref:`ref_flyteidl.admin.Workflow` for more details
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -3670,7 +3670,7 @@ pub struct WorkflowList {
     pub token: ::prost::alloc::string::String,
 }
 /// Represents a structure that encapsulates the specification of the workflow.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -3688,7 +3688,7 @@ pub struct WorkflowSpec {
     pub description: ::core::option::Option<DescriptionEntity>,
 }
 /// A container holding the compiled workflow produced from the WorkflowSpec and additional metadata.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -3701,7 +3701,7 @@ pub struct WorkflowClosure {
     pub created_at: ::core::option::Option<super::super::google::protobuf::Timestamp>,
 }
 /// The workflow id is already used and the structure is different
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -3710,7 +3710,7 @@ pub struct WorkflowErrorExistsDifferentStructure {
     pub id: ::core::option::Option<super::core::Identifier>,
 }
 /// The workflow id is already used with an identical sctructure
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -3719,7 +3719,7 @@ pub struct WorkflowErrorExistsIdenticalStructure {
     pub id: ::core::option::Option<super::core::Identifier>,
 }
 /// When a CreateWorkflowRequest fails due to matching id
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -3729,7 +3729,7 @@ pub struct CreateWorkflowFailureReason {
 }
 /// Nested message and enum types in `CreateWorkflowFailureReason`.
 pub mod create_workflow_failure_reason {
-    #[pyo3::pyclass(get_all, set_all)]
+    #[pyo3::pyclass(dict, get_all, set_all)]
     #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
     #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
@@ -3742,7 +3742,7 @@ pub mod create_workflow_failure_reason {
 }
 /// Defines a set of custom matching attributes which defines resource defaults for a project, domain and workflow.
 /// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -3764,7 +3764,7 @@ pub struct WorkflowAttributes {
 }
 /// Sets custom attributes for a project, domain and workflow combination.
 /// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -3773,14 +3773,14 @@ pub struct WorkflowAttributesUpdateRequest {
     pub attributes: ::core::option::Option<WorkflowAttributes>,
 }
 /// Purposefully empty, may be populated in the future.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct WorkflowAttributesUpdateResponse {}
 /// Request to get an individual workflow attribute override.
 /// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -3806,7 +3806,7 @@ pub struct WorkflowAttributesGetRequest {
     pub org: ::prost::alloc::string::String,
 }
 /// Response to get an individual workflow attribute override.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -3816,7 +3816,7 @@ pub struct WorkflowAttributesGetResponse {
 }
 /// Request to delete a set matchable workflow attribute override.
 /// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -3842,7 +3842,7 @@ pub struct WorkflowAttributesDeleteRequest {
     pub org: ::prost::alloc::string::String,
 }
 /// Purposefully empty, may be populated in the future.
-#[pyo3::pyclass(get_all, set_all)]
+#[pyo3::pyclass(dict, get_all, set_all)]
 #[derive(::pyo3_macro::WithNew, serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
