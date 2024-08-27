@@ -28,6 +28,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin"
+	tokenCache "github.com/flyteorg/flyte/flyteidl/clients/go/admin/cache"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	flyteK8sConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
@@ -302,14 +303,15 @@ func newControllerMetrics(scope promutils.Scope) *metrics {
 
 func getAdminClient(ctx context.Context) (client service.AdminServiceClient, signalClient service.SignalServiceClient, opt []grpc.DialOption, err error) {
 	cfg := admin.GetConfig(ctx)
-	clients, err := admin.NewClientsetBuilder().WithConfig(cfg).Build(ctx)
+	tc := tokenCache.NewTokenCacheInMemoryProvider()
+	clients, err := admin.NewClientsetBuilder().WithConfig(cfg).WithTokenCache(tc).Build(ctx)
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("failed to initialize clientset. Error: %w", err)
 	}
 
 	credentialsFuture := admin.NewPerRPCCredentialsFuture()
 	opts := []grpc.DialOption{
-		grpc.WithChainUnaryInterceptor(admin.NewAuthInterceptor(cfg, nil, credentialsFuture, nil)),
+		grpc.WithChainUnaryInterceptor(admin.NewAuthInterceptor(cfg, tc, credentialsFuture, nil)),
 		grpc.WithPerRPCCredentials(credentialsFuture),
 	}
 

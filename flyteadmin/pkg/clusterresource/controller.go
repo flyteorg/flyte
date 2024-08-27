@@ -485,14 +485,13 @@ func (c *controller) createResourceFromTemplate(ctx context.Context, templateDir
 	templateValues[fmt.Sprintf(templateVariableFormat, domainVariable)] = domain.Id
 
 	var k8sManifest = string(template)
-	for templateKey, templateValue := range templateValues {
-		k8sManifest = strings.Replace(k8sManifest, templateKey, templateValue, replaceAllInstancesOfString)
-	}
-	// Replace remaining template variables from domain specific defaults.
 	for templateKey, templateValue := range customTemplateValues {
 		k8sManifest = strings.Replace(k8sManifest, templateKey, templateValue, replaceAllInstancesOfString)
 	}
-
+	// Replace remaining template variables from domain specific defaults.
+	for templateKey, templateValue := range templateValues {
+		k8sManifest = strings.Replace(k8sManifest, templateKey, templateValue, replaceAllInstancesOfString)
+	}
 	return k8sManifest, nil
 }
 

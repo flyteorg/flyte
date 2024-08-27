@@ -846,6 +846,10 @@ type Literal struct {
 	Hash string `protobuf:"bytes,4,opt,name=hash,proto3" json:"hash,omitempty"`
 	// Additional metadata for literals.
 	Metadata map[string]string `protobuf:"bytes,5,rep,name=metadata,proto3" json:"metadata,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	// If this literal is offloaded, this field will contain metadata including the offload location.
+	Uri string `protobuf:"bytes,6,opt,name=uri,proto3" json:"uri,omitempty"`
+	// Includes information about the size of the literal.
+	SizeBytes uint64 `protobuf:"varint,7,opt,name=size_bytes,json=sizeBytes,proto3" json:"size_bytes,omitempty"`
 }
 
 func (x *Literal) Reset() {
@@ -920,6 +924,20 @@ func (x *Literal) GetMetadata() map[string]string {
 		return x.Metadata
 	}
 	return nil
+}
+
+func (x *Literal) GetUri() string {
+	if x != nil {
+		return x.Uri
+	}
+	return ""
+}
+
+func (x *Literal) GetSizeBytes() uint64 {
+	if x != nil {
+		return x.SizeBytes
+	}
+	return 0
 }
 
 type isLiteral_Value interface {
