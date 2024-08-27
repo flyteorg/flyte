@@ -12,9 +12,9 @@ const (
 
 func GenerateTaskGroupName(master bool, index int) string {
 	if master {
-		return fmt.Sprintf("%s-%s-%s", TaskGroupGenericName, "head")
+		return fmt.Sprintf("%s-%s", TaskGroupGenericName, "head")
 	}
-	return fmt.Sprintf("%s-%s-%d-%s", TaskGroupGenericName, "worker", index)
+	return fmt.Sprintf("%s-%s-%d", TaskGroupGenericName, "worker", index)
 }
 
 func GenerateTaskGroupAppID() string {
