@@ -4,12 +4,13 @@ package coreutils
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/vmihailenco/msgpack/v5"
 	"math"
 	"reflect"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/vmihailenco/msgpack/v5"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/storage"

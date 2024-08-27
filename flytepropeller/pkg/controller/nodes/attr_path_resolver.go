@@ -2,11 +2,13 @@ package nodes
 
 import (
 	"encoding/json"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/errors"
+	"strings"
+
 	"github.com/vmihailenco/msgpack/v5"
 	"google.golang.org/protobuf/types/known/structpb"
-	"strings"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/errors"
 )
 
 // resolveAttrPathInPromise resolves the literal with attribute path
@@ -44,7 +46,7 @@ func resolveAttrPathInPromise(nodeID string, literal *core.Literal, bindAttrPath
 		var err error
 
 		if json := scalar.GetJson(); json != nil {
-			currVal, err = resolveAttrPathInJson(nodeID, json.GetValue(), bindAttrPath[count:])
+			currVal, err = resolveAttrPathInJSON(nodeID, json.GetValue(), bindAttrPath[count:])
 		} else if generic := scalar.GetGeneric(); generic != nil {
 			currVal, err = resolveAttrPathInPbStruct(nodeID, generic, bindAttrPath[count:])
 		}
@@ -91,8 +93,8 @@ func resolveAttrPathInPbStruct(nodeID string, st *structpb.Struct, bindAttrPath 
 	return literal, err
 }
 
-// resolveAttrPathInJson resolves the msgpack bytes (e.g. dataclass) with attribute path
-func resolveAttrPathInJson(nodeID string, json_byte []byte, bindAttrPath []*core.PromiseAttribute) (*core.Literal,
+// resolveAttrPathInJSON resolves the msgpack bytes (e.g. dataclass) with attribute path
+func resolveAttrPathInJSON(nodeID string, jsonByte []byte, bindAttrPath []*core.PromiseAttribute) (*core.Literal,
 	error) {
 
 	var currVal interface{}
@@ -100,7 +102,7 @@ func resolveAttrPathInJson(nodeID string, json_byte []byte, bindAttrPath []*core
 	var exist bool
 	var jsonStr string
 
-	err := msgpack.Unmarshal(json_byte, &jsonStr)
+	err := msgpack.Unmarshal(jsonByte, &jsonStr)
 	if err != nil {
 		return nil, err
 	}
@@ -168,13 +170,13 @@ func convertNumbers(v interface{}) interface{} {
 }
 
 // convertInterfaceToLiteral converts the protobuf struct (e.g. dataclass) to literal
-func convertInterfaceToLiteral(nodeID string, obj interface{}, isJson bool) (*core.Literal, error) {
+func convertInterfaceToLiteral(nodeID string, obj interface{}, isJSON bool) (*core.Literal, error) {
 
 	literal := &core.Literal{}
 
 	switch obj := obj.(type) {
 	case map[string]interface{}:
-		if isJson {
+		if isJSON {
 			jsonBytes, err := json.Marshal(obj)
 			if err != nil {
 				return nil, err
@@ -209,7 +211,7 @@ func convertInterfaceToLiteral(nodeID string, obj interface{}, isJson bool) (*co
 		literals := []*core.Literal{}
 		for _, v := range obj {
 			// recursively convert the interface to literal
-			literal, err := convertInterfaceToLiteral(nodeID, v, isJson)
+			literal, err := convertInterfaceToLiteral(nodeID, v, isJSON)
 			if err != nil {
 				return nil, err
 			}
