@@ -7,8 +7,8 @@ import (
 	rayv1 "github.com/ray-project/kuberay/ray-operator/apis/ray/v1"
 )
 
-func ProcessRay(paras string, app *rayv1.RayJob) error {
-	jobname :=  GenerateTaskGroupName(true, 0)
+func ProcessRay(parameters string, app *rayv1.RayJob) error {
+	jobname :=  GenerateTaskGroupAppID()
 	rayjobSpec := &app.Spec
 	appSpec := rayjobSpec.RayClusterSpec
 	TaskGroups := make([]TaskGroup, 1)
@@ -52,7 +52,7 @@ func ProcessRay(paras string, app *rayv1.RayJob) error {
 		return err
 	}
 	meta.Annotations[TaskGroupsKey] = string(info[:])
-	meta.Annotations[TaskGroupPrarameters] = paras
+	meta.Annotations[TaskGroupPrarameters] = parameters
 	meta.Annotations[AppID] = jobname
 	return nil
 }

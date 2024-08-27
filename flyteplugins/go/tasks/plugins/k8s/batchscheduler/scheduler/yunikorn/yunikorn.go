@@ -26,7 +26,7 @@ func NewPlugin(parameters string) *Plugin {
 func (p *Plugin) Process(app interface{}) error {
 	switch v := app.(type) {
 	case *rayv1.RayJob:
-		return ProcessRay(p.Parameters , v)
+		return ProcessRay(p.Parameters, v)
 	default:
 		return nil
 	}

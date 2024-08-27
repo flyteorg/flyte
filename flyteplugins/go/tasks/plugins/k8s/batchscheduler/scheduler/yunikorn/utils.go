@@ -11,9 +11,13 @@ const (
 )
 
 func GenerateTaskGroupName(master bool, index int) string {
-	uid := uuid.New().String()
 	if master {
-		return fmt.Sprintf("%s-%s-%s", TaskGroupGenericName, "head", uid)
+		return fmt.Sprintf("%s-%s-%s", TaskGroupGenericName, "head")
 	}
-	return fmt.Sprintf("%s-%s-%d-%s", TaskGroupGenericName, "worker", index, uid)
+	return fmt.Sprintf("%s-%s-%d-%s", TaskGroupGenericName, "worker", index)
+}
+
+func GenerateTaskGroupAppID() string {
+	uid := uuid.New().String()
+	return fmt.Sprintf("%s-%s", TaskGroupGenericName, uid)
 }
