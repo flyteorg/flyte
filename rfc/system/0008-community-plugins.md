@@ -20,12 +20,22 @@ The Flyte community as a self-governed and productive collective of individuals,
 - Create a `community` folder under `flytekit/plugins` and keep releasing the plugins in that folder as separate `pypi` packages.
 - Configure CI to only run tests on `plugins/community` when there are changes.
 - Keep releasing plugins alongside flytekit.
-- Update [CODEOWNERS](https://github.com/flyteorg/flytekit/blob/master/CODEOWNERS), enabling contributors to merge community plugins (it requires granting Write permissions to contributors on `flytekit`).
+- Update [CODEOWNERS](https://github.com/flyteorg/flytekit/blob/master/CODEOWNERS) for the `plugins/community` folder, enabling contributors to merge community plugins (it requires granting Write permissions to contributors on `flytekit`).
+- Explicitly mark them as community maintained in the import via `import flytekitplugins.contrib.x`
 
-### Promotion process to "core"/"official" plugin
+### Promotion process to official plugin
 
-@pryce-tuner [proposed criteria](https://github.com/flyteorg/flytekit/pull/2615/files#diff-c26d70784719ec01ce402e532a281a3e509d47523c3a1eba9b2c8d02933886a4R21) to promote plugins to be part of core flytekit, including the effects.
-- The supermajority of the TSC should approve publicly before promoting a plugin.
+An official plugin is one that is maintained by the core Flyte team and is made part of the official `flytekit` documentation.
+
+- Plugins maintainers or community members can propose the promotion of a plugin to official by creating an Issue on the `flytekit` repo.
+- The supermajority of the TSC must approve publicly before promoting a plugin.
+
+To consider it for promotion, a plugin must meet the following criteria:
+
+- Production readiness testing performed by the core Flyte team or documented by plugin users or maintainers
+- Evidence of ongoing usage through Github issues or Slack threads
+
+
 
 ## 4 Drawbacks
 
