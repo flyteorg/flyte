@@ -19,11 +19,11 @@ class FlyteUserDashboard(object):
             collapse=collapse,
             panels=[
                 Graph(
-                    title="Accepted Workflow",
+                    title="Accepted Workflows (avg)",
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr='sum(rate(flyte:propeller:all:workflow:accepted{project=~"$project", domain=~"$domain", wf=~"$workflow"}[5m]))',
+                            expr='avg(flyte:propeller:all:workflow:accepted{project=~"$project", domain=~"$domain", wf=~"$workflow"})',
                             refId='A',
                         ),
                     ],
@@ -33,18 +33,15 @@ class FlyteUserDashboard(object):
                     ),
                 ),
                 Graph(
-                    title="Successful Workflow",
+                    title="Successful Workflow execution time (ms)",
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr='sum(rate(flyte:propeller:all:workflow:success_duration_ms_count{project=~"$project", domain=~"$domain", wf=~"$workflow"}[5m]))',
+                            expr='sum(rate(flyte:propeller:all:workflow:event_recording:success_duration_ms_count{project=~"$project", domain=~"$domain", wf=~"$workflow"}[5m]))',
                             refId='A',
                         ),
                     ],
-                    yAxes=YAxes(
-                        YAxis(format=OPS_FORMAT),
-                        YAxis(format=SHORT_FORMAT),
-                    ),
+                   yAxes=single_y_axis(format=MILLISECONDS_FORMAT),
                 ),
                 Graph(
                     title="Failed Workflow",
