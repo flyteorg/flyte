@@ -99,6 +99,7 @@ configuration:
           - container
           - sidecar
           - K8S-ARRAY #used for MapTasks
+          - echo
         default-for-task-types:
           - container: container
           - container_array: K8S-ARRAY

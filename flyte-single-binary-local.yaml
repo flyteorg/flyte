@@ -48,6 +48,7 @@ tasks:
       - sidecar
       - K8S-ARRAY
       - fast-task
+      - echo
     default-for-task-types:
       - container: container
       - container_array: K8S-ARRAY
