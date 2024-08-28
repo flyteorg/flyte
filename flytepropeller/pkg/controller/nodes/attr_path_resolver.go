@@ -94,7 +94,7 @@ func resolveAttrPathInPbStruct(nodeID string, st *structpb.Struct, bindAttrPath 
 }
 
 // resolveAttrPathInJSON resolves the msgpack bytes (e.g. dataclass) with attribute path
-func resolveAttrPathInJSON(nodeID string, jsonByte []byte, bindAttrPath []*core.PromiseAttribute) (*core.Literal,
+func resolveAttrPathInJSON(nodeID string, msgpackBytes []byte, bindAttrPath []*core.PromiseAttribute) (*core.Literal,
 	error) {
 
 	var currVal interface{}
@@ -102,7 +102,7 @@ func resolveAttrPathInJSON(nodeID string, jsonByte []byte, bindAttrPath []*core.
 	var exist bool
 	var jsonStr string
 
-	err := msgpack.Unmarshal(jsonByte, &jsonStr)
+	err := msgpack.Unmarshal(msgpackBytes, &jsonStr)
 	if err != nil {
 		return nil, err
 	}
@@ -112,6 +112,7 @@ func resolveAttrPathInJSON(nodeID string, jsonByte []byte, bindAttrPath []*core.
 
 	decoder := json.NewDecoder(strings.NewReader(jsonStr))
 	decoder.UseNumber()
+
 	err = decoder.Decode(&tmpVal)
 	if err != nil {
 		return nil, err
@@ -181,7 +182,7 @@ func convertInterfaceToLiteral(nodeID string, obj interface{}, isJSON bool) (*co
 			if err != nil {
 				return nil, err
 			}
-			jsonBytes, err = msgpack.Marshal(jsonBytes)
+			msgpackBytes, err := msgpack.Marshal(jsonBytes)
 			if err != nil {
 				return nil, err
 			}
@@ -189,7 +190,7 @@ func convertInterfaceToLiteral(nodeID string, obj interface{}, isJSON bool) (*co
 				Scalar: &core.Scalar{
 					Value: &core.Scalar_Json{
 						Json: &core.Json{
-							Value: jsonBytes,
+							Value: msgpackBytes,
 						},
 					},
 				},

@@ -592,11 +592,11 @@ func MakeLiteralForType(t *core.LiteralType, v interface{}) (*core.Literal, erro
 				if err != nil {
 					return nil, fmt.Errorf("unable to marshal to json string for json value %v: %w", v, err)
 				}
-				msgpackJSONBytes, err := msgpack.Marshal(jsonBytes)
+				msgpackBytes, err := msgpack.Marshal(jsonBytes)
 				if err != nil {
 					return nil, fmt.Errorf("unable to marshal to msgpack bytes for json string %v: %w", v, err)
 				}
-				strValue = string(msgpackJSONBytes)
+				strValue = string(msgpackBytes)
 			}
 		}
 		lv, err := MakeLiteralForSimpleType(newT.Simple, strValue)

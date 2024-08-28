@@ -474,9 +474,9 @@ func TestMakeLiteralForType(t *testing.T) {
 		assert.NoError(t, err)
 		jsonBytes, err := json.Marshal(v)
 		assert.NoError(t, err)
-		msgpackJSONBytes, err := msgpack.Marshal(jsonBytes)
+		msgpackBytes, err := msgpack.Marshal(jsonBytes)
 		assert.NoError(t, err)
-		strValue := string(msgpackJSONBytes)
+		strValue := string(msgpackBytes)
 		literalVal := &core.Literal{
 			Value: &core.Literal_Scalar{
 				Scalar: &core.Scalar{
