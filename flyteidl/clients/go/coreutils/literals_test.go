@@ -4,11 +4,14 @@
 package coreutils
 
 import (
+	"encoding/json"
 	"fmt"
 	"reflect"
 	"strconv"
 	"testing"
 	"time"
+
+	"github.com/vmihailenco/msgpack/v5"
 
 	"github.com/go-test/deep"
 	"github.com/golang/protobuf/ptypes"
@@ -250,6 +253,14 @@ func TestMakeDefaultLiteralForType(t *testing.T) {
 		assert.NotNil(t, l.GetScalar().GetGeneric())
 	})
 
+	t.Run("json", func(t *testing.T) {
+		l, err := MakeDefaultLiteralForType(&core.LiteralType{Type: &core.LiteralType_Simple{
+			Simple: core.SimpleType_JSON,
+		}})
+		assert.NoError(t, err)
+		assert.NotNil(t, l.GetScalar().GetJson())
+	})
+
 	t.Run("enum", func(t *testing.T) {
 		l, err := MakeDefaultLiteralForType(&core.LiteralType{Type: &core.LiteralType_EnumType{
 			EnumType: &core.EnumType{Values: []string{"x", "y", "z"}},
@@ -446,22 +457,42 @@ func TestMakeLiteralForType(t *testing.T) {
 
 	t.Run("SimpleJson", func(t *testing.T) {
 		var literalType = &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_JSON}}
-		input := `{"key": "value"}`
-		val, err := MakeLiteralForType(literalType, input)
+		v := map[string]interface{}{
+			"a": 1,
+			"b": 3.14,
+			"c": "example_string",
+			"d": map[string]interface{}{
+				"1": 100,
+				"2": 200,
+			},
+			"e": map[string]interface{}{
+				"a": 1,
+				"b": 3.14,
+			},
+		}
+		val, err := MakeLiteralForType(literalType, v)
 		assert.NoError(t, err)
+		jsonBytes, err := json.Marshal(v)
+		assert.NoError(t, err)
+		msgpackJSONBytes, err := msgpack.Marshal(jsonBytes)
+		assert.NoError(t, err)
+		strValue := string(msgpackJSONBytes)
 		literalVal := &core.Literal{
 			Value: &core.Literal_Scalar{
 				Scalar: &core.Scalar{
 					Value: &core.Scalar_Json{
 						Json: &core.Json{
-							Value: []byte(input),
+							Value: []byte(strValue),
 						},
 					},
 				},
 			},
 		}
-		expectedVal, _ := ExtractFromLiteral(literalVal)
-		actualVal, _ := ExtractFromLiteral(val)
+
+		expectedVal, err := ExtractFromLiteral(literalVal)
+		assert.NoError(t, err)
+		actualVal, err := ExtractFromLiteral(val)
+		assert.NoError(t, err)
 		assert.Equal(t, expectedVal, actualVal)
 	})
 
