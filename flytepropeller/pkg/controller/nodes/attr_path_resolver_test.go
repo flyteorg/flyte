@@ -1,6 +1,8 @@
 package nodes
 
 import (
+	"encoding/json"
+	"github.com/vmihailenco/msgpack/v5"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -31,7 +33,7 @@ func NewStructFromMap(m map[string]interface{}) *structpb.Struct {
 	return st
 }
 
-func TestResolveAttrPathIn(t *testing.T) {
+func TestResolveAttrPathInStruct(t *testing.T) {
 
 	args := []struct {
 		literal  *core.Literal
@@ -308,6 +310,273 @@ func TestResolveAttrPathIn(t *testing.T) {
 					},
 				},
 				&core.PromiseAttribute{
+					Value: &core.PromiseAttribute_IntValue{
+						IntValue: 100,
+					},
+				},
+			},
+			expected: &core.Literal{},
+			hasError: true,
+		},
+	}
+
+	for i, arg := range args {
+		resolved, err := resolveAttrPathInPromise("", arg.literal, arg.path)
+		if arg.hasError {
+			assert.Error(t, err, i)
+			assert.ErrorContains(t, err, errors.PromiseAttributeResolveError, i)
+		} else {
+			assert.Equal(t, arg.expected, resolved, i)
+		}
+	}
+}
+
+func TestResolveAttrPathInJson(t *testing.T) {
+	// Helper function to convert a map to JSON and then to msgpack
+	toJsonMsgpack := func(m map[string]interface{}) []byte {
+		jsonBytes, _ := json.Marshal(m)
+		msgpackBytes, _ := msgpack.Marshal(jsonBytes)
+		return msgpackBytes
+	}
+
+	args := []struct {
+		literal  *core.Literal
+		path     []*core.PromiseAttribute
+		expected *core.Literal
+		hasError bool
+	}{
+		// - map {"foo": "bar"}
+		{
+			literal: &core.Literal{
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Json{
+							Json: &core.Json{
+								Value: toJsonMsgpack(map[string]interface{}{"foo": "bar"}),
+							},
+						},
+					},
+				},
+			},
+			path: []*core.PromiseAttribute{
+				{
+					Value: &core.PromiseAttribute_StringValue{
+						StringValue: "foo",
+					},
+				},
+			},
+			expected: NewScalarLiteral("bar"),
+			hasError: false,
+		},
+		// - struct2 {"foo": ["bar1", "bar2"]}
+		{
+			literal: &core.Literal{
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Json{
+							Json: &core.Json{
+								Value: toJsonMsgpack(map[string]interface{}{
+									"foo": []interface{}{"bar1", "bar2"},
+								}),
+							},
+						},
+					},
+				},
+			},
+			path: []*core.PromiseAttribute{
+				{
+					Value: &core.PromiseAttribute_StringValue{
+						StringValue: "foo",
+					},
+				},
+				{
+					Value: &core.PromiseAttribute_IntValue{
+						IntValue: 1,
+					},
+				},
+			},
+			expected: NewScalarLiteral("bar2"),
+			hasError: false,
+		},
+		// - nested list struct {"foo": [["bar1", "bar2"]]}
+		{
+			literal: &core.Literal{
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Json{
+							Json: &core.Json{
+								Value: toJsonMsgpack(map[string]interface{}{
+									"foo": []interface{}{[]interface{}{"bar1", "bar2"}},
+								}),
+							},
+						},
+					},
+				},
+			},
+			path: []*core.PromiseAttribute{
+				{
+					Value: &core.PromiseAttribute_StringValue{
+						StringValue: "foo",
+					},
+				},
+			},
+			expected: &core.Literal{
+				Value: &core.Literal_Collection{
+					Collection: &core.LiteralCollection{
+						Literals: []*core.Literal{
+							{
+								Value: &core.Literal_Collection{
+									Collection: &core.LiteralCollection{
+										Literals: []*core.Literal{
+											NewScalarLiteral("bar1"),
+											NewScalarLiteral("bar2"),
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			hasError: false,
+		},
+		// - map+collection+struct {"foo": [{"bar": "car"}]}
+		{
+			literal: &core.Literal{
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Json{
+							Json: &core.Json{
+								Value: toJsonMsgpack(map[string]interface{}{
+									"foo": []interface{}{
+										map[string]interface{}{
+											"bar": "car",
+										},
+									},
+								}),
+							},
+						},
+					},
+				},
+			},
+			path: []*core.PromiseAttribute{
+				{
+					Value: &core.PromiseAttribute_StringValue{
+						StringValue: "foo",
+					},
+				},
+				{
+					Value: &core.PromiseAttribute_IntValue{
+						IntValue: 0,
+					},
+				},
+				{
+					Value: &core.PromiseAttribute_StringValue{
+						StringValue: "bar",
+					},
+				},
+			},
+			expected: NewScalarLiteral("car"),
+			hasError: false,
+		},
+		// - exception key error with map
+		{
+			literal: &core.Literal{
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Json{
+							Json: &core.Json{
+								Value: toJsonMsgpack(map[string]interface{}{"foo": "bar"}),
+							},
+						},
+					},
+				},
+			},
+			path: []*core.PromiseAttribute{
+				{
+					Value: &core.PromiseAttribute_StringValue{
+						StringValue: "random",
+					},
+				},
+			},
+			expected: &core.Literal{},
+			hasError: true,
+		},
+		// - exception out of range with collection
+		{
+			literal: &core.Literal{
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Json{
+							Json: &core.Json{
+								Value: toJsonMsgpack(map[string]interface{}{
+									"foo": []interface{}{"bar1", "bar2"},
+								}),
+							},
+						},
+					},
+				},
+			},
+			path: []*core.PromiseAttribute{
+				{
+					Value: &core.PromiseAttribute_StringValue{
+						StringValue: "foo",
+					},
+				},
+				{
+					Value: &core.PromiseAttribute_IntValue{
+						IntValue: 2,
+					},
+				},
+			},
+			expected: &core.Literal{},
+			hasError: true,
+		},
+		// - exception key error with struct
+		{
+			literal: &core.Literal{
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Json{
+							Json: &core.Json{
+								Value: toJsonMsgpack(map[string]interface{}{"foo": "bar"}),
+							},
+						},
+					},
+				},
+			},
+			path: []*core.PromiseAttribute{
+				{
+					Value: &core.PromiseAttribute_StringValue{
+						StringValue: "random",
+					},
+				},
+			},
+			expected: &core.Literal{},
+			hasError: true,
+		},
+		// - exception out of range with struct
+		{
+			literal: &core.Literal{
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Json{
+							Json: &core.Json{
+								Value: toJsonMsgpack(map[string]interface{}{
+									"foo": []interface{}{"bar1", "bar2"},
+								}),
+							},
+						},
+					},
+				},
+			},
+			path: []*core.PromiseAttribute{
+				{
+					Value: &core.PromiseAttribute_StringValue{
+						StringValue: "foo",
+					},
+				},
+				{
 					Value: &core.PromiseAttribute_IntValue{
 						IntValue: 100,
 					},
