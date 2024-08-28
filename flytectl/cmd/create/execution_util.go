@@ -3,7 +3,6 @@ package create
 import (
 	"context"
 	"fmt"
-	"github.com/google/uuid"
 	"io/ioutil"
 	"strings"
 
@@ -12,6 +11,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/google/uuid"
 	"sigs.k8s.io/yaml"
 )
 
@@ -148,6 +148,7 @@ func recoverExecution(ctx context.Context, executionName string, project string,
 }
 
 func createExecutionRequest(ID *core.Identifier, inputs *core.LiteralMap, envs *admin.Envs, securityContext *core.SecurityContext, authRole *admin.AuthRole, targetExecName string, targetExecutionCluster string) *admin.ExecutionCreateRequest {
+
 	if len(targetExecName) == 0 {
 		targetExecName = "f" + strings.ReplaceAll(uuid.New().String(), "-", "")[:19]
 	}
