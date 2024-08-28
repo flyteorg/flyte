@@ -791,3 +791,11 @@ func TestMergeIntoExecConfig(t *testing.T) {
 		})
 	}
 }
+
+func TestGetSubNodesFromSubNodeId(t *testing.T) {
+	assert.Equal(t, []string{"n1", "n0"}, GetSubNodesFromSubNodeId("n1-0-n0"))
+	assert.Equal(t, []string{"n1", "n0"}, GetSubNodesFromSubNodeId("n1-0-n0-1"))
+	assert.Equal(t, []string{"n1"}, GetSubNodesFromSubNodeId("n1"))
+	assert.Equal(t, []string{"n1"}, GetSubNodesFromSubNodeId("n1-0"))
+	assert.Equal(t, []string{""}, GetSubNodesFromSubNodeId(""))
+}

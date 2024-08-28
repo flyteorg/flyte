@@ -1149,7 +1149,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 				LaunchPlanId: execution.GetClosure().GetResolvedSpec().GetLaunchPlan(),
 				SubNodeIds: []*admin.SubNodeIdAsList{
 					{
-						SubNodeId: []string{nodeId},
+						SubNodeId: util.GetSubNodesFromSubNodeId(nodeId),
 					},
 				},
 			})
