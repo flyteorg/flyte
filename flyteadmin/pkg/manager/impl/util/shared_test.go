@@ -42,7 +42,7 @@ func TestPopulateExecutionID(t *testing.T) {
 		Domain:  "domain",
 	})
 	assert.NotEmpty(t, name)
-	assert.LessOrEqual(t, len(name), naming.ExecutionIDLengthLimit)
+	assert.Len(t, name, naming.ExecutionIDLength)
 }
 
 func TestPopulateExecutionID_ExistingName(t *testing.T) {
