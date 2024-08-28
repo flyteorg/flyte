@@ -2,10 +2,10 @@ package nodes
 
 import (
 	"encoding/json"
-	"github.com/vmihailenco/msgpack/v5"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/vmihailenco/msgpack/v5"
 	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -380,7 +380,7 @@ func TestResolveAttrPathInStruct(t *testing.T) {
 
 func TestResolveAttrPathInJson(t *testing.T) {
 	// Helper function to convert a map to JSON and then to msgpack
-	toJsonMsgpack := func(m map[string]interface{}) []byte {
+	toJSONMsgpack := func(m map[string]interface{}) []byte {
 		jsonBytes, _ := json.Marshal(m)
 		msgpackBytes, _ := msgpack.Marshal(jsonBytes)
 		return msgpackBytes
@@ -399,7 +399,7 @@ func TestResolveAttrPathInJson(t *testing.T) {
 					Scalar: &core.Scalar{
 						Value: &core.Scalar_Json{
 							Json: &core.Json{
-								Value: toJsonMsgpack(map[string]interface{}{
+								Value: toJSONMsgpack(map[string]interface{}{
 									"foo": map[string]interface{}{
 										"bar": 42,
 										"baz": map[string]interface{}{
@@ -446,7 +446,7 @@ func TestResolveAttrPathInJson(t *testing.T) {
 					Scalar: &core.Scalar{
 						Value: &core.Scalar_Json{
 							Json: &core.Json{
-								Value: toJsonMsgpack(map[string]interface{}{
+								Value: toJSONMsgpack(map[string]interface{}{
 									"foo": map[string]interface{}{
 										"bar": 42,
 										"baz": map[string]interface{}{
@@ -498,7 +498,7 @@ func TestResolveAttrPathInJson(t *testing.T) {
 					Scalar: &core.Scalar{
 						Value: &core.Scalar_Json{
 							Json: &core.Json{
-								Value: toJsonMsgpack(map[string]interface{}{
+								Value: toJSONMsgpack(map[string]interface{}{
 									"foo": map[string]interface{}{
 										"bar": 42,
 										"baz": map[string]interface{}{
@@ -540,7 +540,7 @@ func TestResolveAttrPathInJson(t *testing.T) {
 					Scalar: &core.Scalar{
 						Value: &core.Scalar_Json{
 							Json: &core.Json{
-								Value: toJsonMsgpack(map[string]interface{}{
+								Value: toJSONMsgpack(map[string]interface{}{
 									"foo": []interface{}{42, 3.14, "str"},
 								}),
 							},
@@ -581,7 +581,7 @@ func TestResolveAttrPathInJson(t *testing.T) {
 					Scalar: &core.Scalar{
 						Value: &core.Scalar_Json{
 							Json: &core.Json{
-								Value: toJsonMsgpack(map[string]interface{}{
+								Value: toJSONMsgpack(map[string]interface{}{
 									"foo": []interface{}{42, 3.14, "str"},
 								}),
 							},
@@ -622,7 +622,7 @@ func TestResolveAttrPathInJson(t *testing.T) {
 					Scalar: &core.Scalar{
 						Value: &core.Scalar_Json{
 							Json: &core.Json{
-								Value: toJsonMsgpack(map[string]interface{}{
+								Value: toJSONMsgpack(map[string]interface{}{
 									"foo": []interface{}{42, 3.14, "str"},
 								}),
 							},
@@ -653,7 +653,7 @@ func TestResolveAttrPathInJson(t *testing.T) {
 					Scalar: &core.Scalar{
 						Value: &core.Scalar_Json{
 							Json: &core.Json{
-								Value: toJsonMsgpack(map[string]interface{}{
+								Value: toJSONMsgpack(map[string]interface{}{
 									"foo": map[string]interface{}{
 										"bar": map[string]interface{}{
 											"baz": 42,
@@ -683,7 +683,7 @@ func TestResolveAttrPathInJson(t *testing.T) {
 					Scalar: &core.Scalar{
 						Value: &core.Scalar_Json{
 							Json: &core.Json{
-								Value: toJsonMsgpack(map[string]interface{}{
+								Value: toJSONMsgpack(map[string]interface{}{
 									"baz": 42,
 								}),
 							},
@@ -700,7 +700,7 @@ func TestResolveAttrPathInJson(t *testing.T) {
 					Scalar: &core.Scalar{
 						Value: &core.Scalar_Json{
 							Json: &core.Json{
-								Value: toJsonMsgpack(map[string]interface{}{
+								Value: toJSONMsgpack(map[string]interface{}{
 									"foo": map[string]interface{}{
 										"bar": 42,
 										"baz": map[string]interface{}{
@@ -742,7 +742,7 @@ func TestResolveAttrPathInJson(t *testing.T) {
 					Scalar: &core.Scalar{
 						Value: &core.Scalar_Json{
 							Json: &core.Json{
-								Value: toJsonMsgpack(map[string]interface{}{
+								Value: toJSONMsgpack(map[string]interface{}{
 									"foo": []interface{}{42, 3.14, "str"},
 								}),
 							},
