@@ -53,7 +53,7 @@ func TestResolveAttrPathInStruct(t *testing.T) {
 				},
 			},
 			path: []*core.PromiseAttribute{
-				&core.PromiseAttribute{
+				{
 					Value: &core.PromiseAttribute_StringValue{
 						StringValue: "foo",
 					},
@@ -75,7 +75,7 @@ func TestResolveAttrPathInStruct(t *testing.T) {
 				},
 			},
 			path: []*core.PromiseAttribute{
-				&core.PromiseAttribute{
+				{
 					Value: &core.PromiseAttribute_IntValue{
 						IntValue: 1,
 					},
@@ -96,7 +96,7 @@ func TestResolveAttrPathInStruct(t *testing.T) {
 				},
 			},
 			path: []*core.PromiseAttribute{
-				&core.PromiseAttribute{
+				{
 					Value: &core.PromiseAttribute_StringValue{
 						StringValue: "foo",
 					},
@@ -121,12 +121,12 @@ func TestResolveAttrPathInStruct(t *testing.T) {
 				},
 			},
 			path: []*core.PromiseAttribute{
-				&core.PromiseAttribute{
+				{
 					Value: &core.PromiseAttribute_StringValue{
 						StringValue: "foo",
 					},
 				},
-				&core.PromiseAttribute{
+				{
 					Value: &core.PromiseAttribute_IntValue{
 						IntValue: 1,
 					},
@@ -151,7 +151,7 @@ func TestResolveAttrPathInStruct(t *testing.T) {
 				},
 			},
 			path: []*core.PromiseAttribute{
-				&core.PromiseAttribute{
+				{
 					Value: &core.PromiseAttribute_StringValue{
 						StringValue: "foo",
 					},
@@ -161,7 +161,7 @@ func TestResolveAttrPathInStruct(t *testing.T) {
 				Value: &core.Literal_Collection{
 					Collection: &core.LiteralCollection{
 						Literals: []*core.Literal{
-							&core.Literal{
+							{
 								Value: &core.Literal_Collection{
 									Collection: &core.LiteralCollection{
 										Literals: []*core.Literal{
@@ -183,11 +183,11 @@ func TestResolveAttrPathInStruct(t *testing.T) {
 				Value: &core.Literal_Map{
 					Map: &core.LiteralMap{
 						Literals: map[string]*core.Literal{
-							"foo": &core.Literal{
+							"foo": {
 								Value: &core.Literal_Collection{
 									Collection: &core.LiteralCollection{
 										Literals: []*core.Literal{
-											&core.Literal{
+											{
 												Value: &core.Literal_Scalar{
 													Scalar: &core.Scalar{
 														Value: &core.Scalar_Generic{
@@ -205,23 +205,70 @@ func TestResolveAttrPathInStruct(t *testing.T) {
 				},
 			},
 			path: []*core.PromiseAttribute{
-				&core.PromiseAttribute{
+				{
 					Value: &core.PromiseAttribute_StringValue{
 						StringValue: "foo",
 					},
 				},
-				&core.PromiseAttribute{
+				{
 					Value: &core.PromiseAttribute_IntValue{
 						IntValue: 0,
 					},
 				},
-				&core.PromiseAttribute{
+				{
 					Value: &core.PromiseAttribute_StringValue{
 						StringValue: "bar",
 					},
 				},
 			},
 			expected: NewScalarLiteral("car"),
+			hasError: false,
+		},
+		// - nested map {"foo": {"bar": {"baz": 42}}}
+		{
+			literal: &core.Literal{
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Generic{
+							Generic: NewStructFromMap(
+								map[string]interface{}{
+									"foo": map[string]interface{}{
+										"bar": map[string]interface{}{
+											"baz": 42,
+										},
+									},
+								},
+							),
+						},
+					},
+				},
+			},
+			// Test accessing the entire nested map at foo.bar
+			path: []*core.PromiseAttribute{
+				{
+					Value: &core.PromiseAttribute_StringValue{
+						StringValue: "foo",
+					},
+				},
+				{
+					Value: &core.PromiseAttribute_StringValue{
+						StringValue: "bar",
+					},
+				},
+			},
+			expected: &core.Literal{
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Generic{
+							Generic: NewStructFromMap(
+								map[string]interface{}{
+									"baz": 42,
+								},
+							),
+						},
+					},
+				},
+			},
 			hasError: false,
 		},
 		// - exception key error with map
@@ -236,7 +283,7 @@ func TestResolveAttrPathInStruct(t *testing.T) {
 				},
 			},
 			path: []*core.PromiseAttribute{
-				&core.PromiseAttribute{
+				{
 					Value: &core.PromiseAttribute_StringValue{
 						StringValue: "random",
 					},
@@ -258,7 +305,7 @@ func TestResolveAttrPathInStruct(t *testing.T) {
 				},
 			},
 			path: []*core.PromiseAttribute{
-				&core.PromiseAttribute{
+				{
 					Value: &core.PromiseAttribute_IntValue{
 						IntValue: 2,
 					},
@@ -279,7 +326,7 @@ func TestResolveAttrPathInStruct(t *testing.T) {
 				},
 			},
 			path: []*core.PromiseAttribute{
-				&core.PromiseAttribute{
+				{
 					Value: &core.PromiseAttribute_StringValue{
 						StringValue: "random",
 					},
@@ -304,12 +351,12 @@ func TestResolveAttrPathInStruct(t *testing.T) {
 				},
 			},
 			path: []*core.PromiseAttribute{
-				&core.PromiseAttribute{
+				{
 					Value: &core.PromiseAttribute_StringValue{
 						StringValue: "foo",
 					},
 				},
-				&core.PromiseAttribute{
+				{
 					Value: &core.PromiseAttribute_IntValue{
 						IntValue: 100,
 					},
@@ -345,30 +392,7 @@ func TestResolveAttrPathInJson(t *testing.T) {
 		expected *core.Literal
 		hasError bool
 	}{
-		// - map {"foo": "bar"}
-		{
-			literal: &core.Literal{
-				Value: &core.Literal_Scalar{
-					Scalar: &core.Scalar{
-						Value: &core.Scalar_Json{
-							Json: &core.Json{
-								Value: toJsonMsgpack(map[string]interface{}{"foo": "bar"}),
-							},
-						},
-					},
-				},
-			},
-			path: []*core.PromiseAttribute{
-				{
-					Value: &core.PromiseAttribute_StringValue{
-						StringValue: "foo",
-					},
-				},
-			},
-			expected: NewScalarLiteral("bar"),
-			hasError: false,
-		},
-		// - struct2 {"foo": ["bar1", "bar2"]}
+		// - nested map {"foo": {"bar": 42, "baz": {"qux": 3.14, "quux": "str"}}}
 		{
 			literal: &core.Literal{
 				Value: &core.Literal_Scalar{
@@ -376,13 +400,196 @@ func TestResolveAttrPathInJson(t *testing.T) {
 						Value: &core.Scalar_Json{
 							Json: &core.Json{
 								Value: toJsonMsgpack(map[string]interface{}{
-									"foo": []interface{}{"bar1", "bar2"},
+									"foo": map[string]interface{}{
+										"bar": 42,
+										"baz": map[string]interface{}{
+											"qux":  3.14,
+											"quux": "str",
+										},
+									},
 								}),
 							},
 						},
 					},
 				},
 			},
+			// Test accessing the int value at foo.bar
+			path: []*core.PromiseAttribute{
+				{
+					Value: &core.PromiseAttribute_StringValue{
+						StringValue: "foo",
+					},
+				},
+				{
+					Value: &core.PromiseAttribute_StringValue{
+						StringValue: "bar",
+					},
+				},
+			},
+			expected: &core.Literal{
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Primitive{
+							Primitive: &core.Primitive{
+								Value: &core.Primitive_Integer{Integer: 42},
+							},
+						},
+					},
+				},
+			},
+			hasError: false,
+		},
+		// - nested map {"foo": {"bar": 42, "baz": {"qux": 3.14, "quux": "str"}}}
+		{
+			literal: &core.Literal{
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Json{
+							Json: &core.Json{
+								Value: toJsonMsgpack(map[string]interface{}{
+									"foo": map[string]interface{}{
+										"bar": 42,
+										"baz": map[string]interface{}{
+											"qux":  3.14,
+											"quux": "str",
+										},
+									},
+								}),
+							},
+						},
+					},
+				},
+			},
+			// Test accessing the float value at foo.baz.qux
+			path: []*core.PromiseAttribute{
+				{
+					Value: &core.PromiseAttribute_StringValue{
+						StringValue: "foo",
+					},
+				},
+				{
+					Value: &core.PromiseAttribute_StringValue{
+						StringValue: "baz",
+					},
+				},
+				{
+					Value: &core.PromiseAttribute_StringValue{
+						StringValue: "qux",
+					},
+				},
+			},
+			expected: &core.Literal{
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Primitive{
+							Primitive: &core.Primitive{
+								Value: &core.Primitive_FloatValue{FloatValue: 3.14},
+							},
+						},
+					},
+				},
+			},
+			hasError: false,
+		},
+		// - nested map {"foo": {"bar": 42, "baz": {"qux": 3.14, "quux": "str"}}}
+		{
+			literal: &core.Literal{
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Json{
+							Json: &core.Json{
+								Value: toJsonMsgpack(map[string]interface{}{
+									"foo": map[string]interface{}{
+										"bar": 42,
+										"baz": map[string]interface{}{
+											"qux":  3.14,
+											"quux": "str",
+										},
+									},
+								}),
+							},
+						},
+					},
+				},
+			},
+			// Test accessing the string value at foo.baz.quux
+			path: []*core.PromiseAttribute{
+				{
+					Value: &core.PromiseAttribute_StringValue{
+						StringValue: "foo",
+					},
+				},
+				{
+					Value: &core.PromiseAttribute_StringValue{
+						StringValue: "baz",
+					},
+				},
+				{
+					Value: &core.PromiseAttribute_StringValue{
+						StringValue: "quux",
+					},
+				},
+			},
+			expected: NewScalarLiteral("str"),
+			hasError: false,
+		},
+		// - nested list {"foo": [42, 3.14, "str"]}
+		{
+			literal: &core.Literal{
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Json{
+							Json: &core.Json{
+								Value: toJsonMsgpack(map[string]interface{}{
+									"foo": []interface{}{42, 3.14, "str"},
+								}),
+							},
+						},
+					},
+				},
+			},
+			// Test accessing the int value at foo[0]
+			path: []*core.PromiseAttribute{
+				{
+					Value: &core.PromiseAttribute_StringValue{
+						StringValue: "foo",
+					},
+				},
+				{
+					Value: &core.PromiseAttribute_IntValue{
+						IntValue: 0,
+					},
+				},
+			},
+			expected: &core.Literal{
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Primitive{
+							Primitive: &core.Primitive{
+								Value: &core.Primitive_Integer{Integer: 42},
+							},
+						},
+					},
+				},
+			},
+			hasError: false,
+		},
+		// - nested list {"foo": [42, 3.14, "str"]}
+		{
+			literal: &core.Literal{
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Json{
+							Json: &core.Json{
+								Value: toJsonMsgpack(map[string]interface{}{
+									"foo": []interface{}{42, 3.14, "str"},
+								}),
+							},
+						},
+					},
+				},
+			},
+			// Test accessing the float value at foo[1]
 			path: []*core.PromiseAttribute{
 				{
 					Value: &core.PromiseAttribute_StringValue{
@@ -395,44 +602,12 @@ func TestResolveAttrPathInJson(t *testing.T) {
 					},
 				},
 			},
-			expected: NewScalarLiteral("bar2"),
-			hasError: false,
-		},
-		// - nested list struct {"foo": [["bar1", "bar2"]]}
-		{
-			literal: &core.Literal{
-				Value: &core.Literal_Scalar{
-					Scalar: &core.Scalar{
-						Value: &core.Scalar_Json{
-							Json: &core.Json{
-								Value: toJsonMsgpack(map[string]interface{}{
-									"foo": []interface{}{[]interface{}{"bar1", "bar2"}},
-								}),
-							},
-						},
-					},
-				},
-			},
-			path: []*core.PromiseAttribute{
-				{
-					Value: &core.PromiseAttribute_StringValue{
-						StringValue: "foo",
-					},
-				},
-			},
 			expected: &core.Literal{
-				Value: &core.Literal_Collection{
-					Collection: &core.LiteralCollection{
-						Literals: []*core.Literal{
-							{
-								Value: &core.Literal_Collection{
-									Collection: &core.LiteralCollection{
-										Literals: []*core.Literal{
-											NewScalarLiteral("bar1"),
-											NewScalarLiteral("bar2"),
-										},
-									},
-								},
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Primitive{
+							Primitive: &core.Primitive{
+								Value: &core.Primitive_FloatValue{FloatValue: 3.14},
 							},
 						},
 					},
@@ -440,7 +615,7 @@ func TestResolveAttrPathInJson(t *testing.T) {
 			},
 			hasError: false,
 		},
-		// - map+collection+struct {"foo": [{"bar": "car"}]}
+		// - nested list {"foo": [42, 3.14, "str"]}
 		{
 			literal: &core.Literal{
 				Value: &core.Literal_Scalar{
@@ -448,75 +623,14 @@ func TestResolveAttrPathInJson(t *testing.T) {
 						Value: &core.Scalar_Json{
 							Json: &core.Json{
 								Value: toJsonMsgpack(map[string]interface{}{
-									"foo": []interface{}{
-										map[string]interface{}{
-											"bar": "car",
-										},
-									},
+									"foo": []interface{}{42, 3.14, "str"},
 								}),
 							},
 						},
 					},
 				},
 			},
-			path: []*core.PromiseAttribute{
-				{
-					Value: &core.PromiseAttribute_StringValue{
-						StringValue: "foo",
-					},
-				},
-				{
-					Value: &core.PromiseAttribute_IntValue{
-						IntValue: 0,
-					},
-				},
-				{
-					Value: &core.PromiseAttribute_StringValue{
-						StringValue: "bar",
-					},
-				},
-			},
-			expected: NewScalarLiteral("car"),
-			hasError: false,
-		},
-		// - exception key error with map
-		{
-			literal: &core.Literal{
-				Value: &core.Literal_Scalar{
-					Scalar: &core.Scalar{
-						Value: &core.Scalar_Json{
-							Json: &core.Json{
-								Value: toJsonMsgpack(map[string]interface{}{"foo": "bar"}),
-							},
-						},
-					},
-				},
-			},
-			path: []*core.PromiseAttribute{
-				{
-					Value: &core.PromiseAttribute_StringValue{
-						StringValue: "random",
-					},
-				},
-			},
-			expected: &core.Literal{},
-			hasError: true,
-		},
-		// - exception out of range with collection
-		{
-			literal: &core.Literal{
-				Value: &core.Literal_Scalar{
-					Scalar: &core.Scalar{
-						Value: &core.Scalar_Json{
-							Json: &core.Json{
-								Value: toJsonMsgpack(map[string]interface{}{
-									"foo": []interface{}{"bar1", "bar2"},
-								}),
-							},
-						},
-					},
-				},
-			},
+			// Test accessing the string value at foo[2]
 			path: []*core.PromiseAttribute{
 				{
 					Value: &core.PromiseAttribute_StringValue{
@@ -529,33 +643,10 @@ func TestResolveAttrPathInJson(t *testing.T) {
 					},
 				},
 			},
-			expected: &core.Literal{},
-			hasError: true,
+			expected: NewScalarLiteral("str"),
+			hasError: false,
 		},
-		// - exception key error with struct
-		{
-			literal: &core.Literal{
-				Value: &core.Literal_Scalar{
-					Scalar: &core.Scalar{
-						Value: &core.Scalar_Json{
-							Json: &core.Json{
-								Value: toJsonMsgpack(map[string]interface{}{"foo": "bar"}),
-							},
-						},
-					},
-				},
-			},
-			path: []*core.PromiseAttribute{
-				{
-					Value: &core.PromiseAttribute_StringValue{
-						StringValue: "random",
-					},
-				},
-			},
-			expected: &core.Literal{},
-			hasError: true,
-		},
-		// - exception out of range with struct
+		// - test extracting a nested map as a JSON object {"foo": {"bar": {"baz": 42}}}
 		{
 			literal: &core.Literal{
 				Value: &core.Literal_Scalar{
@@ -563,13 +654,103 @@ func TestResolveAttrPathInJson(t *testing.T) {
 						Value: &core.Scalar_Json{
 							Json: &core.Json{
 								Value: toJsonMsgpack(map[string]interface{}{
-									"foo": []interface{}{"bar1", "bar2"},
+									"foo": map[string]interface{}{
+										"bar": map[string]interface{}{
+											"baz": 42,
+										},
+									},
 								}),
 							},
 						},
 					},
 				},
 			},
+			// Test accessing the entire nested map at foo.bar
+			path: []*core.PromiseAttribute{
+				{
+					Value: &core.PromiseAttribute_StringValue{
+						StringValue: "foo",
+					},
+				},
+				{
+					Value: &core.PromiseAttribute_StringValue{
+						StringValue: "bar",
+					},
+				},
+			},
+			expected: &core.Literal{
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Json{
+							Json: &core.Json{
+								Value: toJsonMsgpack(map[string]interface{}{
+									"baz": 42,
+								}),
+							},
+						},
+					},
+				},
+			},
+			hasError: false,
+		},
+		// - exception case with non-existing key in nested map
+		{
+			literal: &core.Literal{
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Json{
+							Json: &core.Json{
+								Value: toJsonMsgpack(map[string]interface{}{
+									"foo": map[string]interface{}{
+										"bar": 42,
+										"baz": map[string]interface{}{
+											"qux":  3.14,
+											"quux": "str",
+										},
+									},
+								}),
+							},
+						},
+					},
+				},
+			},
+			// Test accessing a non-existing key in the nested map
+			path: []*core.PromiseAttribute{
+				{
+					Value: &core.PromiseAttribute_StringValue{
+						StringValue: "foo",
+					},
+				},
+				{
+					Value: &core.PromiseAttribute_StringValue{
+						StringValue: "baz",
+					},
+				},
+				{
+					Value: &core.PromiseAttribute_StringValue{
+						StringValue: "unknown",
+					},
+				},
+			},
+			expected: &core.Literal{},
+			hasError: true,
+		},
+		// - exception case with out-of-range index in list
+		{
+			literal: &core.Literal{
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Json{
+							Json: &core.Json{
+								Value: toJsonMsgpack(map[string]interface{}{
+									"foo": []interface{}{42, 3.14, "str"},
+								}),
+							},
+						},
+					},
+				},
+			},
+			// Test accessing an out-of-range index in the list
 			path: []*core.PromiseAttribute{
 				{
 					Value: &core.PromiseAttribute_StringValue{
@@ -578,7 +759,7 @@ func TestResolveAttrPathInJson(t *testing.T) {
 				},
 				{
 					Value: &core.PromiseAttribute_IntValue{
-						IntValue: 100,
+						IntValue: 10,
 					},
 				},
 			},
