@@ -33,7 +33,7 @@ type MockLaunchPlanManager struct {
 	listLaunchPlansFunc          ListLaunchPlansFunc
 	listLaunchPlanIdsFunc        ListLaunchPlanIdsFunc
 	listActiveLaunchPlansFunc    ListActiveLaunchPlansFunc
-	createLaunchPlanFromNodeFunc CreateLaunchPlanFromNodeFunc
+	CreateLaunchPlanFromNodeFunc CreateLaunchPlanFromNodeFunc
 }
 
 func (r *MockLaunchPlanManager) SetCreateCallback(createFunction CreateLaunchPlanFunc) {
@@ -113,13 +113,9 @@ func (r *MockLaunchPlanManager) ListLaunchPlanIds(ctx context.Context, request a
 	return nil, nil
 }
 
-func (r *MockLaunchPlanManager) SetCreateLaunchPlanFromNode(createFunction CreateLaunchPlanFromNodeFunc) {
-	r.createLaunchPlanFromNodeFunc = createFunction
-}
-
 func (m *MockLaunchPlanManager) CreateLaunchPlanFromNode(ctx context.Context, request admin.CreateLaunchPlanFromNodeRequest) (*admin.CreateLaunchPlanFromNodeResponse, error) {
-	if m.createLaunchPlanFromNodeFunc != nil {
-		return m.createLaunchPlanFromNodeFunc(ctx, request)
+	if m.CreateLaunchPlanFromNodeFunc != nil {
+		return m.CreateLaunchPlanFromNodeFunc(ctx, request)
 	}
 	return nil, nil
 }

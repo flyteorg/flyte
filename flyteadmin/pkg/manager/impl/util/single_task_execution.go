@@ -17,11 +17,10 @@ import (
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/encoding"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
-const maxNodeIDLength = 20
+const maxNodeIDLength = 63
 
 var defaultRetryStrategy = core.RetryStrategy{
 	Retries: 3,
@@ -31,18 +30,17 @@ const systemNamePrefix = ".flytegen.%s"
 
 const noInputNodeID = ""
 
-func generateNodeNameFromTask(taskName string) (string, error) {
+func generateNodeNameFromTask(taskName string) string {
+	if len(taskName) >= maxNodeIDLength {
+		taskName = taskName[len(taskName)-maxNodeIDLength:]
+	}
 	nodeNameBuilder := strings.Builder{}
 	for _, i := range taskName {
 		if i == '-' || unicode.IsLetter(i) || unicode.IsNumber(i) {
 			nodeNameBuilder.WriteRune(i)
 		}
 	}
-	id, err := encoding.FixedLengthUniqueID(nodeNameBuilder.String(), maxNodeIDLength)
-	if err != nil {
-		return "", err
-	}
-	return id, nil
+	return nodeNameBuilder.String()
 }
 
 func generateWorkflowNameFromTask(taskName string) string {
@@ -161,19 +159,15 @@ func CreateOrGetWorkflowModel(
 			return nil, err
 		}
 		// If we got this far, there is no existing workflow. Create a skeleton one now.
-		nodeID, err := generateNodeNameFromTask(taskIdentifier.Name)
-		if err != nil {
-			return nil, err
-		}
 		workflowSpec := admin.WorkflowSpec{
 			Template: &core.WorkflowTemplate{
 				Id:        &workflowIdentifier,
 				Interface: task.Closure.CompiledTask.Template.Interface,
 				Nodes: []*core.Node{
 					{
-						Id: nodeID,
+						Id: generateNodeNameFromTask(taskIdentifier.Name),
 						Metadata: &core.NodeMetadata{
-							Name:    nodeID,
+							Name:    generateNodeNameFromTask(taskIdentifier.Name),
 							Retries: retryStrategy,
 						},
 						Inputs: generateBindings(*task.Closure.CompiledTask.Template.Interface.Inputs, noInputNodeID),
@@ -187,7 +181,7 @@ func CreateOrGetWorkflowModel(
 					},
 				},
 
-				Outputs: generateBindings(*task.Closure.CompiledTask.Template.Interface.Outputs, nodeID),
+				Outputs: generateBindings(*task.Closure.CompiledTask.Template.Interface.Outputs, generateNodeNameFromTask(taskIdentifier.Name)),
 			},
 		}
 
@@ -315,16 +309,12 @@ func CreateOrGetWorkflowFromNode(
 				return nil, err
 			}
 			wfInterface = task.Closure.CompiledTask.Template.Interface
-			nodeID, err := generateNodeNameFromTask(task.Id.Name)
-			if err != nil {
-				return nil, err
-			}
-			wfOutputs = generateBindings(*task.Closure.CompiledTask.Template.Interface.Outputs, nodeID)
+			wfOutputs = generateBindings(*task.Closure.CompiledTask.Template.Interface.Outputs, generateNodeNameFromTask(task.Id.Name))
 			nodes = []*core.Node{
 				{
-					Id: nodeID,
+					Id: generateNodeNameFromTask(task.Id.Name),
 					Metadata: &core.NodeMetadata{
-						Name:    nodeID,
+						Name:    generateNodeNameFromTask(task.Id.Name),
 						Retries: &defaultRetryStrategy,
 					},
 					Inputs: generateBindings(*task.Closure.CompiledTask.Template.Interface.Inputs, noInputNodeID),
@@ -350,16 +340,12 @@ func CreateOrGetWorkflowFromNode(
 				}
 				taskInterface := task.Closure.CompiledTask.Template.Interface
 				wfInterface = taskInterface
-				nodeID, err := generateNodeNameFromTask(task.Id.Name)
-				if err != nil {
-					return nil, err
-				}
-				wfOutputs = generateBindings(*taskInterface.Outputs, nodeID)
+				wfOutputs = generateBindings(*taskInterface.Outputs, generateNodeNameFromTask(task.Id.Name))
 				nodes = []*core.Node{
 					{
-						Id: nodeID,
+						Id: generateNodeNameFromTask(task.Id.Name),
 						Metadata: &core.NodeMetadata{
-							Name:    nodeID,
+							Name:    generateNodeNameFromTask(task.Id.Name),
 							Retries: &defaultRetryStrategy,
 						},
 						Inputs: generateBindings(*taskInterface.Inputs, noInputNodeID),

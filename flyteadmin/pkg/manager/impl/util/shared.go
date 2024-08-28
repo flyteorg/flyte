@@ -3,7 +3,6 @@ package util
 
 import (
 	"context"
-	"strings"
 	"time"
 
 	"google.golang.org/grpc/codes"
@@ -352,15 +351,4 @@ func MergeIntoExecConfig(workflowExecConfig admin.WorkflowExecutionConfig, spec 
 	}
 
 	return workflowExecConfig
-}
-
-func GetSubNodesFromSubNodeId(subNodeId string) []string {
-	parts := strings.Split(subNodeId, "-")
-	var nestedSubNodes []string
-	for i := range parts {
-		if i%2 == 0 {
-			nestedSubNodes = append(nestedSubNodes, parts[i])
-		}
-	}
-	return nestedSubNodes
 }
