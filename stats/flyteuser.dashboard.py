@@ -48,12 +48,11 @@ class FlyteUserDashboard(object):
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr='sum(rate(flyte:propeller:all:workflow:failure_duration_ms_count{project=~"$project", domain=~"$domain", wf=~"$workflow"}[5m]))',
+                            expr='avg(flyte:propeller:all:workflow:event_recording:failure_duration_ms_count{project=~"$project", domain=~"$domain", wf=~"$workflow"})',
                             refId='A',
                         ),
                     ],
                     yAxes=YAxes(
-                        YAxis(format=OPS_FORMAT),
                         YAxis(format=SHORT_FORMAT),
                     ),
                 ),
