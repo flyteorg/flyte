@@ -3,7 +3,9 @@ package create
 import (
 	"context"
 	"fmt"
+	"github.com/google/uuid"
 	"io/ioutil"
+	"strings"
 
 	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
 	cmdGet "github.com/flyteorg/flyte/flytectl/cmd/get"
@@ -146,6 +148,9 @@ func recoverExecution(ctx context.Context, executionName string, project string,
 }
 
 func createExecutionRequest(ID *core.Identifier, inputs *core.LiteralMap, envs *admin.Envs, securityContext *core.SecurityContext, authRole *admin.AuthRole, targetExecName string, targetExecutionCluster string) *admin.ExecutionCreateRequest {
+	if len(targetExecName) == 0 {
+		targetExecName = "f" + strings.ReplaceAll(uuid.New().String(), "-", "")[:19]
+	}
 	var clusterAssignment *admin.ClusterAssignment
 	if executionConfig.ClusterPool != "" {
 		clusterAssignment = &admin.ClusterAssignment{ClusterPoolName: executionConfig.ClusterPool}
