@@ -66,6 +66,25 @@ func TestValidateExecInvalidProjectAndDomain(t *testing.T) {
 	assert.EqualError(t, err, "failed to validate that project [project] and domain [domain] are registered, err: [foo]")
 }
 
+func TestValidateExecInvalidLabels(t *testing.T) {
+	request := testutils.GetExecutionRequest()
+	request.Spec.Labels = &admin.Labels{
+		Values: map[string]string{
+			"foo": "#bar",
+		},
+	}
+	err := ValidateExecutionRequest(context.Background(), request, testutils.GetRepoWithDefaultProject(), execConfig)
+	assert.ErrorContains(t, err, "invalid label value [#bar]:")
+
+	request.Spec.Labels = &admin.Labels{
+		Values: map[string]string{
+			"#foo": "bar",
+		},
+	}
+	err = ValidateExecutionRequest(context.Background(), request, testutils.GetRepoWithDefaultProject(), execConfig)
+	assert.ErrorContains(t, err, "invalid label key [#foo]:")
+}
+
 func TestGetExecutionInputs(t *testing.T) {
 	executionRequest := testutils.GetExecutionRequest()
 	lpRequest := testutils.GetLaunchPlanRequest()

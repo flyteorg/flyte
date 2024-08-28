@@ -112,7 +112,7 @@ func NewIncompatibleClusterError(ctx context.Context, errorMsg, curCluster strin
 }
 
 func compareJsons(jsonArray1 jsondiff.Patch, jsonArray2 jsondiff.Patch) []string {
-	results := []string{}
+	var results []string
 	map1 := make(map[string]jsondiff.Operation)
 	for _, obj := range jsonArray1 {
 		map1[obj.Path] = obj
@@ -120,7 +120,7 @@ func compareJsons(jsonArray1 jsondiff.Patch, jsonArray2 jsondiff.Patch) []string
 
 	for _, obj := range jsonArray2 {
 		if val, ok := map1[obj.Path]; ok {
-			result := fmt.Sprintf("\t\t- %v: %v -> %v", obj.Path, obj.Value, val.Value)
+			result := fmt.Sprintf("%v:\n\t- %v \n\t+ %v", obj.Path, obj.Value, val.Value)
 			results = append(results, result)
 		}
 	}
@@ -128,7 +128,7 @@ func compareJsons(jsonArray1 jsondiff.Patch, jsonArray2 jsondiff.Patch) []string
 }
 
 func NewTaskExistsDifferentStructureError(ctx context.Context, request *admin.TaskCreateRequest, oldSpec *core.CompiledTask, newSpec *core.CompiledTask) FlyteAdminError {
-	errorMsg := fmt.Sprintf("%v task with different structure already exists:\n", request.Id.Name)
+	errorMsg := fmt.Sprintf("%v task with different structure already exists. (Please register a new version of the task):\n", request.Id.Name)
 	diff, _ := jsondiff.Compare(oldSpec, newSpec)
 	rdiff, _ := jsondiff.Compare(newSpec, oldSpec)
 	rs := compareJsons(diff, rdiff)
@@ -136,7 +136,6 @@ func NewTaskExistsDifferentStructureError(ctx context.Context, request *admin.Ta
 	errorMsg += strings.Join(rs, "\n")
 
 	return NewFlyteAdminErrorf(codes.InvalidArgument, errorMsg)
-
 }
 
 func NewTaskExistsIdenticalStructureError(ctx context.Context, request *admin.TaskCreateRequest) FlyteAdminError {
@@ -145,7 +144,7 @@ func NewTaskExistsIdenticalStructureError(ctx context.Context, request *admin.Ta
 }
 
 func NewWorkflowExistsDifferentStructureError(ctx context.Context, request *admin.WorkflowCreateRequest, oldSpec *core.CompiledWorkflowClosure, newSpec *core.CompiledWorkflowClosure) FlyteAdminError {
-	errorMsg := fmt.Sprintf("%v workflow with different structure already exists:\n", request.Id.Name)
+	errorMsg := fmt.Sprintf("%v workflow with different structure already exists. (Please register a new version of the workflow):\n", request.Id.Name)
 	diff, _ := jsondiff.Compare(oldSpec, newSpec)
 	rdiff, _ := jsondiff.Compare(newSpec, oldSpec)
 	rs := compareJsons(diff, rdiff)
@@ -183,7 +182,7 @@ func NewWorkflowExistsIdenticalStructureError(ctx context.Context, request *admi
 }
 
 func NewLaunchPlanExistsDifferentStructureError(ctx context.Context, request *admin.LaunchPlanCreateRequest, oldSpec *admin.LaunchPlanSpec, newSpec *admin.LaunchPlanSpec) FlyteAdminError {
-	errorMsg := "launch plan with different structure already exists:\n"
+	errorMsg := fmt.Sprintf("%v launch plan with different structure already exists. (Please register a new version of the launch plan):\n", request.Id.Name)
 	diff, _ := jsondiff.Compare(oldSpec, newSpec)
 	rdiff, _ := jsondiff.Compare(newSpec, oldSpec)
 	rs := compareJsons(diff, rdiff)
@@ -201,4 +200,16 @@ func NewLaunchPlanExistsIdenticalStructureError(ctx context.Context, request *ad
 func IsDoesNotExistError(err error) bool {
 	adminError, ok := err.(FlyteAdminError)
 	return ok && adminError.Code() == codes.NotFound
+}
+
+func NewInactiveProjectError(ctx context.Context, id string) FlyteAdminError {
+	errMsg := fmt.Sprintf("project [%s] is not active", id)
+	statusErr, transformationErr := NewFlyteAdminError(codes.InvalidArgument, errMsg).WithDetails(&admin.InactiveProject{
+		Id: id,
+	})
+	if transformationErr != nil {
+		logger.Errorf(ctx, "failed to wrap grpc status in type 'Error': %v", transformationErr)
+		return NewFlyteAdminErrorf(codes.InvalidArgument, errMsg)
+	}
+	return statusErr
 }

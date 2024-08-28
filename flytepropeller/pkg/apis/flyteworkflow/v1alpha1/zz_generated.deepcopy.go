@@ -548,6 +548,10 @@ func (in *NodeStatus) DeepCopyInto(out *NodeStatus) {
 		*out = new(DynamicNodeStatus)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.ArrayNodeStatus != nil {
+		in, out := &in.ArrayNodeStatus, &out.ArrayNodeStatus
+		*out = (*in).DeepCopy()
+	}
 	if in.Error != nil {
 		in, out := &in.Error, &out.Error
 		*out = (*in).DeepCopy()

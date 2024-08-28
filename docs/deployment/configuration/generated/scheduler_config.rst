@@ -2181,6 +2181,18 @@ A URL pointing to the flyteconsole instance used to hit this flyteadmin instance
   ""
   
 
+useOffloadedInputs (bool)
+------------------------------------------------------------------------------------------------------------------------
+
+Use offloaded inputs for workflows.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
 interfaces.FeatureGates
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -2744,6 +2756,8 @@ k8s (`config.K8sPluginConfig`_)
   resource-tolerations: null
   scheduler-name: ""
   send-object-events: false
+  update-backoff-retries: 5
+  update-base-backoff-duration: 10
   
 
 catalog.Config
@@ -3214,6 +3228,30 @@ If true, will send k8s object events in TaskExecutionEvent updates.
 .. code-block:: yaml
 
   "false"
+  
+
+update-base-backoff-duration (int)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Initial delay in exponential backoff when updating a resource in milliseconds.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "10"
+  
+
+update-backoff-retries (int)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Number of retries for exponential backoff when updating a resource.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "5"
   
 
 config.FlyteCoPilotConfig
@@ -4038,6 +4076,16 @@ fallback-to-output-reference (bool)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 Whether output data should be sent by reference when it is too large to be sent inline in execution events.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+ErrorOnAlreadyExists (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 **Default Value**: 
 

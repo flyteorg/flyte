@@ -7,7 +7,7 @@ The main features of this 1.3 release are
 * Signaling/gate node support (human in the loop tasks)
 * User documentation support (backend and flytekit only, limited types)
 
-The latter two are pending some work in Flyte console, they will be piped through fully by the end of Q1. Support for setting and approving gate nodes is supported in `FlyteRemote` however, though only a limited set of types can be passed in.
+The latter two are pending some work in Flyte console, they will be piped through fully by the end of Q1. Support for setting and approving gate nodes is supported in `FlyteRemote` however, only a limited set of types can be passed in.
 
 ## Notes
 There are a couple things to point out with this release.

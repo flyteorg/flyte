@@ -3390,6 +3390,12 @@ export namespace flyteidl {
 
             /** Literal metadata */
             metadata?: ({ [k: string]: string }|null);
+
+            /** Literal uri */
+            uri?: (string|null);
+
+            /** Literal sizeBytes */
+            sizeBytes?: (Long|null);
         }
 
         /** Represents a Literal. */
@@ -3415,6 +3421,12 @@ export namespace flyteidl {
 
             /** Literal metadata. */
             public metadata: { [k: string]: string };
+
+            /** Literal uri. */
+            public uri: string;
+
+            /** Literal sizeBytes. */
+            public sizeBytes: Long;
 
             /** Literal value. */
             public value?: ("scalar"|"collection"|"map");
@@ -18178,6 +18190,64 @@ export namespace flyteidl {
 
             /**
              * Verifies a ProjectGetRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of an InactiveProject. */
+        interface IInactiveProject {
+
+            /** InactiveProject id */
+            id?: (string|null);
+
+            /** InactiveProject org */
+            org?: (string|null);
+        }
+
+        /** Represents an InactiveProject. */
+        class InactiveProject implements IInactiveProject {
+
+            /**
+             * Constructs a new InactiveProject.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IInactiveProject);
+
+            /** InactiveProject id. */
+            public id: string;
+
+            /** InactiveProject org. */
+            public org: string;
+
+            /**
+             * Creates a new InactiveProject instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns InactiveProject instance
+             */
+            public static create(properties?: flyteidl.admin.IInactiveProject): flyteidl.admin.InactiveProject;
+
+            /**
+             * Encodes the specified InactiveProject message. Does not implicitly {@link flyteidl.admin.InactiveProject.verify|verify} messages.
+             * @param message InactiveProject message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IInactiveProject, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an InactiveProject message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns InactiveProject
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.InactiveProject;
+
+            /**
+             * Verifies an InactiveProject message.
              * @param message Plain object to verify
              * @returns `null` if valid, otherwise the reason why it is not
              */
