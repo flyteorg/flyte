@@ -336,6 +336,28 @@ func TestLiteralTypeForLiterals(t *testing.T) {
 		assert.True(t, proto.Equal(expectedLt, lt))
 	})
 
+	t.Run("json type", func(t *testing.T) {
+		jsonLiteral := &core.Literal{
+			Value: &core.Literal_Scalar{
+				Scalar: &core.Scalar{
+					Value: &core.Scalar_Json{
+						Json: &core.Json{
+							Value: []byte(`{"key": "value"}`),
+						},
+					},
+				},
+			},
+		}
+
+		lt := literalTypeForScalar(jsonLiteral.GetScalar())
+		expectedLt := &core.LiteralType{
+			Type: &core.LiteralType_Simple{
+				Simple: core.SimpleType_JSON,
+			},
+		}
+
+		assert.True(t, proto.Equal(expectedLt, lt), "LiteralType should be of type JSON")
+	})
 }
 
 func TestJoinVariableMapsUniqueKeys(t *testing.T) {
