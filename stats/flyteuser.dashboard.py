@@ -33,15 +33,15 @@ class FlyteUserDashboard(object):
                     ),
                 ),
                 Graph(
-                    title="Successful Workflow execution time (ms)",
+                    title="Successful Workflow executions (avg)",
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr='sum(rate(flyte:propeller:all:workflow:event_recording:success_duration_ms_count{project=~"$project", domain=~"$domain", wf=~"$workflow"}[5m]))',
+                            expr='avg(flyte:propeller:all:workflow:event_recording:success_duration_ms_count{project=~"$project", domain=~"$domain", wf=~"$workflow"})',
                             refId='A',
                         ),
                     ],
-                   yAxes=single_y_axis(format=MILLISECONDS_FORMAT),
+                   yAxes=single_y_axis(format=SHORT_FORMAT),
                 ),
                 Graph(
                     title="Failed Workflow",
