@@ -185,7 +185,6 @@ jobs:
           ref: ${{ env.FLYTESNACKS_VERSION }}
       - name: Register specific tests
         run: |
-          export FLYTE_PUSH_IMAGE_SPEC=${{ github.event_name != 'pull_request' }}
           flytekit_version=$(pip show flytekit | grep -i version | awk '{ print $2 }')
           while read -r line;
           do
