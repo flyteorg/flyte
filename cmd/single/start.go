@@ -274,6 +274,6 @@ func init() {
 	RootCmd.AddCommand(startCmd)
 	// Set Keys
 	labeled.SetMetricKeys(contextutils.AppNameKey, contextutils.ProjectKey, contextutils.DomainKey,
-		contextutils.ExecIDKey, contextutils.WorkflowIDKey, contextutils.NodeIDKey, contextutils.TaskIDKey,
+		contextutils.WorkflowIDKey, contextutils.NodeIDKey, contextutils.TaskIDKey,
 		contextutils.TaskTypeKey, common.RuntimeTypeKey, common.RuntimeVersionKey, storage.FailureTypeLabel)
 }
