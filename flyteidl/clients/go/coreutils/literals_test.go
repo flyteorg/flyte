@@ -469,6 +469,7 @@ func TestMakeLiteralForType(t *testing.T) {
 				"a": 1,
 				"b": 3.14,
 			},
+			"f": []string{"a", "b", "c"},
 		}
 		val, err := MakeLiteralForType(literalType, v)
 		assert.NoError(t, err)

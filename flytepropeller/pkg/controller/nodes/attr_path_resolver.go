@@ -88,7 +88,7 @@ func resolveAttrPathInPbStruct(nodeID string, st *structpb.Struct, bindAttrPath 
 	}
 
 	// After resolve, convert the interface to literal
-	literal, err := convertInterfaceToLiteral(nodeID, currVal, false)
+	literal, err := convertStructToLiteral(nodeID, currVal)
 
 	return literal, err
 }
@@ -139,12 +139,13 @@ func resolveAttrPathInJSON(nodeID string, msgpackBytes []byte, bindAttrPath []*c
 	}
 
 	// After resolve, convert the interface to literal
-	literal, err := convertInterfaceToLiteral(nodeID, currVal, true)
+	literal, err := convertJSONToLiteral(nodeID, currVal)
 
 	return literal, err
 }
 
-// convertNumbers recursively converts json.Number to int64 or float64
+// json will automatically convert numbers to float64, so we need to convert it back to int64 if possible
+// convertNumbers recursively converts json.Number to int4 or float646
 func convertNumbers(v interface{}) interface{} {
 	switch vv := v.(type) {
 	case map[string]interface{}:
@@ -170,49 +171,79 @@ func convertNumbers(v interface{}) interface{} {
 	return v
 }
 
-// convertInterfaceToLiteral converts the protobuf struct (e.g. dataclass) to literal
-func convertInterfaceToLiteral(nodeID string, obj interface{}, isJSON bool) (*core.Literal, error) {
+// convertStructToLiteral converts the protobuf struct (e.g. dataclass) to literal
+func convertStructToLiteral(nodeID string, obj interface{}) (*core.Literal, error) {
 
 	literal := &core.Literal{}
 
 	switch obj := obj.(type) {
 	case map[string]interface{}:
-		if isJSON {
-			jsonBytes, err := json.Marshal(obj)
-			if err != nil {
-				return nil, err
-			}
-			msgpackBytes, err := msgpack.Marshal(jsonBytes)
-			if err != nil {
-				return nil, err
-			}
-			literal.Value = &core.Literal_Scalar{
-				Scalar: &core.Scalar{
-					Value: &core.Scalar_Json{
-						Json: &core.Json{
-							Value: msgpackBytes,
-						},
-					},
+		newSt, err := structpb.NewStruct(obj)
+		if err != nil {
+			return nil, err
+		}
+		literal.Value = &core.Literal_Scalar{
+			Scalar: &core.Scalar{
+				Value: &core.Scalar_Generic{
+					Generic: newSt,
 				},
-			}
-		} else {
-			newSt, err := structpb.NewStruct(obj)
-			if err != nil {
-				return nil, err
-			}
-			literal.Value = &core.Literal_Scalar{
-				Scalar: &core.Scalar{
-					Value: &core.Scalar_Generic{
-						Generic: newSt,
-					},
-				},
-			}
+			},
 		}
 	case []interface{}:
 		literals := []*core.Literal{}
 		for _, v := range obj {
 			// recursively convert the interface to literal
-			literal, err := convertInterfaceToLiteral(nodeID, v, isJSON)
+			literal, err := convertStructToLiteral(nodeID, v)
+			if err != nil {
+				return nil, err
+			}
+			literals = append(literals, literal)
+		}
+		literal.Value = &core.Literal_Collection{
+			Collection: &core.LiteralCollection{
+				Literals: literals,
+			},
+		}
+	case interface{}:
+		scalar, err := convertInterfaceToLiteralScalar(nodeID, obj)
+		if err != nil {
+			return nil, err
+		}
+		literal.Value = scalar
+	}
+
+	return literal, nil
+}
+
+// convertJSONToLiteral converts the protobuf struct (e.g. dataclass) to literal
+func convertJSONToLiteral(nodeID string, obj interface{}) (*core.Literal, error) {
+
+	literal := &core.Literal{}
+
+	switch obj := obj.(type) {
+	case map[string]interface{}:
+		jsonBytes, err := json.Marshal(obj)
+		if err != nil {
+			return nil, err
+		}
+		msgpackBytes, err := msgpack.Marshal(jsonBytes)
+		if err != nil {
+			return nil, err
+		}
+		literal.Value = &core.Literal_Scalar{
+			Scalar: &core.Scalar{
+				Value: &core.Scalar_Json{
+					Json: &core.Json{
+						Value: msgpackBytes,
+					},
+				},
+			},
+		}
+	case []interface{}:
+		literals := []*core.Literal{}
+		for _, v := range obj {
+			// recursively convert the interface to literal
+			literal, err := convertJSONToLiteral(nodeID, v)
 			if err != nil {
 				return nil, err
 			}

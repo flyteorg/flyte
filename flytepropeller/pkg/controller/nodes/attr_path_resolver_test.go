@@ -766,6 +766,48 @@ func TestResolveAttrPathInJson(t *testing.T) {
 			expected: &core.Literal{},
 			hasError: true,
 		},
+		// - nested list struct {"foo": [["bar1", "bar2"]]}
+		{
+			literal: &core.Literal{
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Json{
+							Json: &core.Json{
+								Value: toJSONMsgpack(map[string]interface{}{
+									"foo": []interface{}{[]interface{}{"bar1", "bar2"}},
+								}),
+							},
+						},
+					},
+				},
+			},
+			path: []*core.PromiseAttribute{
+				{
+					Value: &core.PromiseAttribute_StringValue{
+						StringValue: "foo",
+					},
+				},
+			},
+			expected: &core.Literal{
+				Value: &core.Literal_Collection{
+					Collection: &core.LiteralCollection{
+						Literals: []*core.Literal{
+							{
+								Value: &core.Literal_Collection{
+									Collection: &core.LiteralCollection{
+										Literals: []*core.Literal{
+											NewScalarLiteral("bar1"),
+											NewScalarLiteral("bar2"),
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			hasError: false,
+		},
 	}
 
 	for i, arg := range args {
