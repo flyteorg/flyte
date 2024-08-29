@@ -619,7 +619,7 @@
       "properties": {
         "uri": {
           "type": "string",
-          "title": "The location of the offloaded literals value"
+          "description": "The location of the offloaded core.Literal."
         },
         "size_bytes": {
           "type": "string",

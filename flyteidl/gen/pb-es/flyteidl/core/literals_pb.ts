@@ -633,7 +633,7 @@ export class Literal extends Message<Literal> {
  */
 export class LiteralOffloadedMetadata extends Message<LiteralOffloadedMetadata> {
   /**
-   * The location of the offloaded literals value
+   * The location of the offloaded core.Literal.
    *
    * @generated from field: string uri = 1;
    */

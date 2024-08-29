@@ -516,7 +516,7 @@ pub mod literal {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct LiteralOffloadedMetadata {
-    /// The location of the offloaded literals value
+    /// The location of the offloaded core.Literal.
     #[prost(string, tag="1")]
     pub uri: ::prost::alloc::string::String,
     /// The size of the offloaded data.
