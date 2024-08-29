@@ -890,6 +890,7 @@ type Literal_Map struct {
 
 type Literal_OffloadedMetadata struct {
 	// Offloaded literal metadata
+	// When you deserialize the offloaded metadata, it would be of Literal and its type would be defined by LiteralType stored in offloaded_metadata.
 	OffloadedMetadata *LiteralOffloadedMetadata `protobuf:"bytes,6,opt,name=offloaded_metadata,json=offloadedMetadata,proto3,oneof"`
 }
 

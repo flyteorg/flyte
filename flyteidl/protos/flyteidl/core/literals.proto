@@ -104,6 +104,7 @@ message Literal {
         LiteralMap map = 3;
 
         // Offloaded literal metadata
+        // When you deserialize the offloaded metadata, it would be of Literal and its type would be defined by LiteralType stored in offloaded_metadata.
         LiteralOffloadedMetadata offloaded_metadata = 6;
     }
 

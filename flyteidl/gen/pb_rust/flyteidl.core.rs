@@ -507,6 +507,7 @@ pub mod literal {
         #[prost(message, tag="3")]
         Map(super::LiteralMap),
         /// Offloaded literal metadata
+        /// When you deserialize the offloaded metadata, it would be of Literal and its type would be defined by LiteralType stored in offloaded_metadata.
         #[prost(message, tag="6")]
         OffloadedMetadata(super::LiteralOffloadedMetadata),
     }

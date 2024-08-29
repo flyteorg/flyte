@@ -569,6 +569,7 @@ export class Literal extends Message<Literal> {
   } | {
     /**
      * Offloaded literal metadata
+     * When you deserialize the offloaded metadata, it would be of Literal and its type would be defined by LiteralType stored in offloaded_metadata.
      *
      * @generated from field: flyteidl.core.LiteralOffloadedMetadata offloaded_metadata = 6;
      */
