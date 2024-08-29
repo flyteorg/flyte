@@ -119,7 +119,7 @@ message Literal {
 
 // A message that contains the metadata of the offloaded data.
 message LiteralOffloadedMetadata {
-    // The location of the offloaded data.
+    // The location of the offloaded literals value
     string uri = 1;
 
     // The size of the offloaded data.
