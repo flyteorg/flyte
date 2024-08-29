@@ -34,7 +34,7 @@ To consider it for promotion, a plugin must meet the following criteria:
 
 - Production readiness testing performed by the core Flyte team or documented by plugin users or maintainers
 - Evidence of ongoing usage through Github issues or Slack threads
-
+- Documented in flytekit's documentation
 
 
 ## 4 Drawbacks
