@@ -20,7 +20,7 @@ const (
 	WorkflowIDKey Key = "wf"
 	NodeIDKey     Key = "node"
 	TaskIDKey     Key = "task"
-	// Adding this label to a metric will cause higher cardinality. Use with caution.
+	// Adding the ExecIDKey label to a metric will cause higher cardinality. Use with caution.
 	ExecIDKey          Key = "exec_id"
 	JobIDKey           Key = "job_id"
 	PhaseKey           Key = "phase"
