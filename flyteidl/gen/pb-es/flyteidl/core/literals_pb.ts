@@ -571,7 +571,7 @@ export class Literal extends Message<Literal> {
      * Offloaded literal metadata
      * When you deserialize the offloaded metadata, it would be of Literal and its type would be defined by LiteralType stored in offloaded_metadata.
      *
-     * @generated from field: flyteidl.core.LiteralOffloadedMetadata offloaded_metadata = 6;
+     * @generated from field: flyteidl.core.LiteralOffloadedMetadata offloaded_metadata = 8;
      */
     value: LiteralOffloadedMetadata;
     case: "offloadedMetadata";
@@ -604,7 +604,7 @@ export class Literal extends Message<Literal> {
     { no: 1, name: "scalar", kind: "message", T: Scalar, oneof: "value" },
     { no: 2, name: "collection", kind: "message", T: LiteralCollection, oneof: "value" },
     { no: 3, name: "map", kind: "message", T: LiteralMap, oneof: "value" },
-    { no: 6, name: "offloaded_metadata", kind: "message", T: LiteralOffloadedMetadata, oneof: "value" },
+    { no: 8, name: "offloaded_metadata", kind: "message", T: LiteralOffloadedMetadata, oneof: "value" },
     { no: 4, name: "hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 5, name: "metadata", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
   ]);

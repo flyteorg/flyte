@@ -8222,7 +8222,7 @@
                         for (var keys = Object.keys(message.metadata), i = 0; i < keys.length; ++i)
                             writer.uint32(/* id 5, wireType 2 =*/42).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]).uint32(/* id 2, wireType 2 =*/18).string(message.metadata[keys[i]]).ldelim();
                     if (message.offloadedMetadata != null && message.hasOwnProperty("offloadedMetadata"))
-                        $root.flyteidl.core.LiteralOffloadedMetadata.encode(message.offloadedMetadata, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
+                        $root.flyteidl.core.LiteralOffloadedMetadata.encode(message.offloadedMetadata, writer.uint32(/* id 8, wireType 2 =*/66).fork()).ldelim();
                     return writer;
                 };
     
@@ -8253,7 +8253,7 @@
                         case 3:
                             message.map = $root.flyteidl.core.LiteralMap.decode(reader, reader.uint32());
                             break;
-                        case 6:
+                        case 8:
                             message.offloadedMetadata = $root.flyteidl.core.LiteralOffloadedMetadata.decode(reader, reader.uint32());
                             break;
                         case 4:

@@ -93,6 +93,7 @@ message Scalar {
 
 // A simple value. This supports any level of nesting (e.g. array of array of array of Blobs) as well as simple primitives.
 message Literal {
+    reserved 6, 7;
     oneof value {
         // A simple value.
         Scalar scalar = 1;
@@ -105,7 +106,7 @@ message Literal {
 
         // Offloaded literal metadata
         // When you deserialize the offloaded metadata, it would be of Literal and its type would be defined by LiteralType stored in offloaded_metadata.
-        LiteralOffloadedMetadata offloaded_metadata = 6;
+        LiteralOffloadedMetadata offloaded_metadata = 8;
     }
 
     // A hash representing this literal.

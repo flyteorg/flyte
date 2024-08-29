@@ -489,7 +489,7 @@ pub struct Literal {
     /// Additional metadata for literals.
     #[prost(map="string, string", tag="5")]
     pub metadata: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
-    #[prost(oneof="literal::Value", tags="1, 2, 3, 6")]
+    #[prost(oneof="literal::Value", tags="1, 2, 3, 8")]
     pub value: ::core::option::Option<literal::Value>,
 }
 /// Nested message and enum types in `Literal`.
@@ -508,7 +508,7 @@ pub mod literal {
         Map(super::LiteralMap),
         /// Offloaded literal metadata
         /// When you deserialize the offloaded metadata, it would be of Literal and its type would be defined by LiteralType stored in offloaded_metadata.
-        #[prost(message, tag="6")]
+        #[prost(message, tag="8")]
         OffloadedMetadata(super::LiteralOffloadedMetadata),
     }
 }
