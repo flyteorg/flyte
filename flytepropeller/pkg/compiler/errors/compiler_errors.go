@@ -96,6 +96,9 @@ const (
 
 	// Field not found in the dataclass
 	FieldNotFoundError ErrorCode = "FieldNotFound"
+
+	// IDL not found when variable binding
+	IDLNotFoundError ErrorCode = "IDLTypeNotFound"
 )
 
 func NewBranchNodeNotSpecified(branchNodeID string) *CompileError {
@@ -207,6 +210,14 @@ func NewMismatchingTypesErr(nodeID, fromVar, fromType, toType string) *CompileEr
 		MismatchingTypes,
 		fmt.Sprintf("Variable [%v] (type [%v]) doesn't match expected type [%v].", fromVar, fromType,
 			toType),
+		nodeID,
+	)
+}
+
+func NewIDLTypeNotFoundErr(nodeID string) *CompileError {
+	return newError(
+		IDLNotFoundError,
+		"Input is an invalid type, please update all of your Flyte images to the latest version and try again.",
 		nodeID,
 	)
 }

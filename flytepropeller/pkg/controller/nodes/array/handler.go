@@ -186,7 +186,11 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		size := -1
 		for _, variable := range literalMap.Literals {
 			literalType := validators.LiteralTypeForLiteral(variable)
-			// TODO: Add a new error for idl type not found
+			if literalType == nil {
+				return handler.DoTransition(handler.TransitionTypeEphemeral,
+					handler.PhaseInfoFailure(idlcore.ExecutionError_USER, errors.IDLNotFoundErr, "Input is an invalid type, please update all of your Flyte images to the latest version and try again.", nil),
+				), nil
+			}
 			switch literalType.Type.(type) {
 			case *idlcore.LiteralType_CollectionType:
 				collectionLength := len(variable.GetCollection().Literals)
