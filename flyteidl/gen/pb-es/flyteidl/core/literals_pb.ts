@@ -647,11 +647,11 @@ export class LiteralOffloadedMetadata extends Message<LiteralOffloadedMetadata> 
   sizeBytes = protoInt64.zero;
 
   /**
-   * The literal type of the offloaded data.
+   * The inferred literal type of the offloaded data.
    *
-   * @generated from field: flyteidl.core.LiteralType type = 3;
+   * @generated from field: flyteidl.core.LiteralType inferred_type = 3;
    */
-  type?: LiteralType;
+  inferredType?: LiteralType;
 
   constructor(data?: PartialMessage<LiteralOffloadedMetadata>) {
     super();
@@ -663,7 +663,7 @@ export class LiteralOffloadedMetadata extends Message<LiteralOffloadedMetadata> 
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "uri", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "size_bytes", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
-    { no: 3, name: "type", kind: "message", T: LiteralType },
+    { no: 3, name: "inferred_type", kind: "message", T: LiteralType },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): LiteralOffloadedMetadata {

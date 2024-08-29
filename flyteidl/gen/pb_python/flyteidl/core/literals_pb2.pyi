@@ -127,14 +127,14 @@ class Literal(_message.Message):
     def __init__(self, scalar: _Optional[_Union[Scalar, _Mapping]] = ..., collection: _Optional[_Union[LiteralCollection, _Mapping]] = ..., map: _Optional[_Union[LiteralMap, _Mapping]] = ..., offloaded_metadata: _Optional[_Union[LiteralOffloadedMetadata, _Mapping]] = ..., hash: _Optional[str] = ..., metadata: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class LiteralOffloadedMetadata(_message.Message):
-    __slots__ = ["uri", "size_bytes", "type"]
+    __slots__ = ["uri", "size_bytes", "inferred_type"]
     URI_FIELD_NUMBER: _ClassVar[int]
     SIZE_BYTES_FIELD_NUMBER: _ClassVar[int]
-    TYPE_FIELD_NUMBER: _ClassVar[int]
+    INFERRED_TYPE_FIELD_NUMBER: _ClassVar[int]
     uri: str
     size_bytes: int
-    type: _types_pb2.LiteralType
-    def __init__(self, uri: _Optional[str] = ..., size_bytes: _Optional[int] = ..., type: _Optional[_Union[_types_pb2.LiteralType, _Mapping]] = ...) -> None: ...
+    inferred_type: _types_pb2.LiteralType
+    def __init__(self, uri: _Optional[str] = ..., size_bytes: _Optional[int] = ..., inferred_type: _Optional[_Union[_types_pb2.LiteralType, _Mapping]] = ...) -> None: ...
 
 class LiteralCollection(_message.Message):
     __slots__ = ["literals"]

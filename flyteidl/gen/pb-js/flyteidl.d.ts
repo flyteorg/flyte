@@ -3467,8 +3467,8 @@ export namespace flyteidl {
             /** LiteralOffloadedMetadata sizeBytes */
             sizeBytes?: (Long|null);
 
-            /** LiteralOffloadedMetadata type */
-            type?: (flyteidl.core.ILiteralType|null);
+            /** LiteralOffloadedMetadata inferredType */
+            inferredType?: (flyteidl.core.ILiteralType|null);
         }
 
         /** Represents a LiteralOffloadedMetadata. */
@@ -3486,8 +3486,8 @@ export namespace flyteidl {
             /** LiteralOffloadedMetadata sizeBytes. */
             public sizeBytes: Long;
 
-            /** LiteralOffloadedMetadata type. */
-            public type?: (flyteidl.core.ILiteralType|null);
+            /** LiteralOffloadedMetadata inferredType. */
+            public inferredType?: (flyteidl.core.ILiteralType|null);
 
             /**
              * Creates a new LiteralOffloadedMetadata instance using the specified properties.

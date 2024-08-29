@@ -522,9 +522,9 @@ pub struct LiteralOffloadedMetadata {
     /// The size of the offloaded data.
     #[prost(uint64, tag="2")]
     pub size_bytes: u64,
-    /// The literal type of the offloaded data.
+    /// The inferred literal type of the offloaded data.
     #[prost(message, optional, tag="3")]
-    pub r#type: ::core::option::Option<LiteralType>,
+    pub inferred_type: ::core::option::Option<LiteralType>,
 }
 /// A collection of literals. This is a workaround since oneofs in proto messages cannot contain a repeated field.
 #[allow(clippy::derive_partial_eq_without_eq)]

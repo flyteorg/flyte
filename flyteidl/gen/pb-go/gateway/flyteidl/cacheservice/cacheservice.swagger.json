@@ -272,9 +272,9 @@
           "format": "uint64",
           "description": "The size of the offloaded data."
         },
-        "type": {
+        "inferred_type": {
           "$ref": "#/definitions/coreLiteralType",
-          "description": "The literal type of the offloaded data."
+          "description": "The inferred literal type of the offloaded data."
         }
       },
       "description": "A message that contains the metadata of the offloaded data."

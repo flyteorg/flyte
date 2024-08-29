@@ -8350,7 +8350,7 @@
                  * @interface ILiteralOffloadedMetadata
                  * @property {string|null} [uri] LiteralOffloadedMetadata uri
                  * @property {Long|null} [sizeBytes] LiteralOffloadedMetadata sizeBytes
-                 * @property {flyteidl.core.ILiteralType|null} [type] LiteralOffloadedMetadata type
+                 * @property {flyteidl.core.ILiteralType|null} [inferredType] LiteralOffloadedMetadata inferredType
                  */
     
                 /**
@@ -8385,12 +8385,12 @@
                 LiteralOffloadedMetadata.prototype.sizeBytes = $util.Long ? $util.Long.fromBits(0,0,true) : 0;
     
                 /**
-                 * LiteralOffloadedMetadata type.
-                 * @member {flyteidl.core.ILiteralType|null|undefined} type
+                 * LiteralOffloadedMetadata inferredType.
+                 * @member {flyteidl.core.ILiteralType|null|undefined} inferredType
                  * @memberof flyteidl.core.LiteralOffloadedMetadata
                  * @instance
                  */
-                LiteralOffloadedMetadata.prototype.type = null;
+                LiteralOffloadedMetadata.prototype.inferredType = null;
     
                 /**
                  * Creates a new LiteralOffloadedMetadata instance using the specified properties.
@@ -8420,8 +8420,8 @@
                         writer.uint32(/* id 1, wireType 2 =*/10).string(message.uri);
                     if (message.sizeBytes != null && message.hasOwnProperty("sizeBytes"))
                         writer.uint32(/* id 2, wireType 0 =*/16).uint64(message.sizeBytes);
-                    if (message.type != null && message.hasOwnProperty("type"))
-                        $root.flyteidl.core.LiteralType.encode(message.type, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                    if (message.inferredType != null && message.hasOwnProperty("inferredType"))
+                        $root.flyteidl.core.LiteralType.encode(message.inferredType, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
                     return writer;
                 };
     
@@ -8450,7 +8450,7 @@
                             message.sizeBytes = reader.uint64();
                             break;
                         case 3:
-                            message.type = $root.flyteidl.core.LiteralType.decode(reader, reader.uint32());
+                            message.inferredType = $root.flyteidl.core.LiteralType.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -8477,10 +8477,10 @@
                     if (message.sizeBytes != null && message.hasOwnProperty("sizeBytes"))
                         if (!$util.isInteger(message.sizeBytes) && !(message.sizeBytes && $util.isInteger(message.sizeBytes.low) && $util.isInteger(message.sizeBytes.high)))
                             return "sizeBytes: integer|Long expected";
-                    if (message.type != null && message.hasOwnProperty("type")) {
-                        var error = $root.flyteidl.core.LiteralType.verify(message.type);
+                    if (message.inferredType != null && message.hasOwnProperty("inferredType")) {
+                        var error = $root.flyteidl.core.LiteralType.verify(message.inferredType);
                         if (error)
-                            return "type." + error;
+                            return "inferredType." + error;
                     }
                     return null;
                 };

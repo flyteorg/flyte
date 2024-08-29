@@ -125,8 +125,8 @@ message LiteralOffloadedMetadata {
     // The size of the offloaded data.
     uint64 size_bytes = 2;
 
-    // The literal type of the offloaded data.
-    LiteralType type = 3;
+    // The inferred literal type of the offloaded data.
+    LiteralType inferred_type = 3;
 }
 
 // A collection of literals. This is a workaround since oneofs in proto messages cannot contain a repeated field.
