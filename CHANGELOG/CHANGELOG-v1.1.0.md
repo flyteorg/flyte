@@ -17,7 +17,7 @@ Support for [Optional types](https://github.com/flyteorg/flyte/issues/2426). Wit
 
 ### Bug Fixes
 * [Propeller](https://github.com/flyteorg/flyte/issues/2298) calling finalize rather than abort
-* [Propeller](https://github.com/flyteorg/flyte/issues/2404) correctly identify error when requesting a launch plan that does not exist.
+* [Propeller](https://github.com/flyteorg/flyte/issues/2404) correctly identifies an error when requesting a launch plan that does not exist.
 * Better handle [execution CRDs](https://github.com/flyteorg/flyte/issues/2275) that don't exist in Admin.
 * [Fix panic](https://github.com/flyteorg/flyte/issues/2597) when creating additional label options.
 * Check [validity](https://github.com/flyteorg/flyte/issues/2601) of notifications.

@@ -80,6 +80,7 @@ func Test_task_setDefault(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			tk := &Handler{
 				defaultPlugin: tt.fields.defaultPlugin,
+				agentService:  &pluginCore.AgentService{},
 			}
 			if err := tk.setDefault(context.TODO(), tt.args.p); (err != nil) != tt.wantErr {
 				t.Errorf("Handler.setDefault() error = %v, wantErr %v", err, tt.wantErr)
@@ -125,6 +126,8 @@ func Test_task_Setup(t *testing.T) {
 	k8sPluginDefault := &pluginK8sMocks.Plugin{}
 	k8sPluginDefault.OnGetProperties().Return(pluginK8s.PluginProperties{})
 
+	loadErrorPluginType := "loadError"
+
 	corePluginEntry := pluginCore.PluginEntry{
 		ID:                  corePluginType,
 		RegisteredTaskTypes: []pluginCore.TaskType{corePluginType},
@@ -152,6 +155,13 @@ func Test_task_Setup(t *testing.T) {
 		Plugin:              k8sPluginDefault,
 		RegisteredTaskTypes: []pluginCore.TaskType{k8sPluginDefaultType},
 		ResourceToWatch:     &v1.Pod{},
+	}
+	loadErrorPluginEntry := pluginCore.PluginEntry{
+		ID:                  loadErrorPluginType,
+		RegisteredTaskTypes: []pluginCore.TaskType{loadErrorPluginType},
+		LoadPlugin: func(ctx context.Context, iCtx pluginCore.SetupContext) (pluginCore.Plugin, error) {
+			return nil, fmt.Errorf("test")
+		},
 	}
 
 	type wantFields struct {
@@ -231,6 +241,15 @@ func Test_task_Setup(t *testing.T) {
 				},
 			},
 			false},
+		{"load-error",
+			testPluginRegistry{
+				core: []pluginCore.PluginEntry{loadErrorPluginEntry},
+				k8s:  []pluginK8s.PluginEntry{},
+			},
+			[]string{loadErrorPluginType},
+			map[string]string{corePluginType: loadErrorPluginType},
+			wantFields{},
+			true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -330,6 +349,7 @@ func Test_task_ResolvePlugin(t *testing.T) {
 				defaultPlugins: tt.fields.plugins,
 				defaultPlugin:  tt.fields.defaultPlugin,
 				pluginsForType: tt.fields.pluginsForType,
+				agentService:   &pluginCore.AgentService{},
 			}
 			got, err := tk.ResolvePlugin(context.TODO(), tt.args.ttype, tt.args.executionConfig)
 			if (err != nil) != tt.wantErr {
@@ -702,6 +722,7 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 				resourceManager: noopRm,
 				taskMetricsMap:  make(map[MetricKey]*taskMetrics),
 				eventConfig:     eventConfig,
+				agentService:    &pluginCore.AgentService{},
 			}
 			got, err := tk.Handle(context.TODO(), nCtx)
 			if (err != nil) != tt.want.wantErr {
@@ -774,6 +795,7 @@ func Test_task_Abort(t *testing.T) {
 			Kind: "sample",
 			Name: "name",
 		})
+		nm.OnIsInterruptible().Return(false)
 
 		taskID := &core.Identifier{}
 		tr := &nodeMocks.TaskReader{}
@@ -887,6 +909,8 @@ func Test_task_Abort(t *testing.T) {
 			tk := Handler{
 				defaultPlugin:   m,
 				resourceManager: noopRm,
+				agentService:    &pluginCore.AgentService{},
+				eventConfig:     eventConfig,
 			}
 			nCtx := createNodeCtx(tt.args.ev)
 			if err := tk.Abort(context.TODO(), nCtx, "reason"); (err != nil) != tt.wantErr {
@@ -935,6 +959,7 @@ func Test_task_Abort_v1(t *testing.T) {
 			Kind: "sample",
 			Name: "name",
 		})
+		nm.OnIsInterruptible().Return(false)
 
 		taskID := &core.Identifier{}
 		tr := &nodeMocks.TaskReader{}
@@ -1048,6 +1073,8 @@ func Test_task_Abort_v1(t *testing.T) {
 			tk := Handler{
 				defaultPlugin:   m,
 				resourceManager: noopRm,
+				agentService:    &pluginCore.AgentService{},
+				eventConfig:     eventConfig,
 			}
 			nCtx := createNodeCtx(tt.args.ev)
 			if err := tk.Abort(context.TODO(), nCtx, "reason"); (err != nil) != tt.wantErr {

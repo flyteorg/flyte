@@ -15,9 +15,15 @@ type WorkflowNodeSpec struct {
 }
 
 func (in *WorkflowNodeSpec) GetLaunchPlanRefID() *LaunchPlanRefID {
-	return in.LaunchPlanRefID
+	if in != nil {
+		return in.LaunchPlanRefID
+	}
+	return nil
 }
 
 func (in *WorkflowNodeSpec) GetSubWorkflowRef() *WorkflowID {
-	return in.SubWorkflowReference
+	if in != nil {
+		return in.SubWorkflowReference
+	}
+	return nil
 }

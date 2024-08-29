@@ -16,7 +16,7 @@
 - RawOutputDirectories created in FlytePropeller
 - Improve visibility and observability
 - User/System error differentiation
-- Optional interruptible tasks (lets use spot instances, reduce cost)
+- Optional interruptible tasks (let's use spot instances, to reduce cost)
 - Caps on queue time for workflows
 - Multi cluster improvements
 - Visibility into execution cluster for the execution

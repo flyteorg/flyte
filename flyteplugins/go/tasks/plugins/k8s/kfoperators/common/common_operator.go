@@ -49,11 +49,11 @@ func ExtractCurrentCondition(jobConditions []commonOp.JobCondition) (commonOp.Jo
 func GetPhaseInfo(currentCondition commonOp.JobCondition, occurredAt time.Time,
 	taskPhaseInfo pluginsCore.TaskInfo) (pluginsCore.PhaseInfo, error) {
 	if len(currentCondition.Type) == 0 {
-		return pluginsCore.PhaseInfoQueued(occurredAt, pluginsCore.DefaultPhaseVersion, "JobCreated"), nil
+		return pluginsCore.PhaseInfoQueuedWithTaskInfo(occurredAt, pluginsCore.DefaultPhaseVersion, "JobCreated", &taskPhaseInfo), nil
 	}
 	switch currentCondition.Type {
 	case commonOp.JobCreated:
-		return pluginsCore.PhaseInfoQueued(occurredAt, pluginsCore.DefaultPhaseVersion, "JobCreated"), nil
+		return pluginsCore.PhaseInfoQueuedWithTaskInfo(occurredAt, pluginsCore.DefaultPhaseVersion, "JobCreated", &taskPhaseInfo), nil
 	case commonOp.JobRunning:
 		return pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, &taskPhaseInfo), nil
 	case commonOp.JobSucceeded:
@@ -73,7 +73,7 @@ func GetMPIPhaseInfo(currentCondition commonOp.JobCondition, occurredAt time.Tim
 	taskPhaseInfo pluginsCore.TaskInfo) (pluginsCore.PhaseInfo, error) {
 	switch currentCondition.Type {
 	case commonOp.JobCreated:
-		return pluginsCore.PhaseInfoQueued(occurredAt, pluginsCore.DefaultPhaseVersion, "New job name submitted to MPI operator"), nil
+		return pluginsCore.PhaseInfoQueuedWithTaskInfo(occurredAt, pluginsCore.DefaultPhaseVersion, "New job name submitted to MPI operator", &taskPhaseInfo), nil
 	case commonOp.JobRunning:
 		return pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, &taskPhaseInfo), nil
 	case commonOp.JobSucceeded:
@@ -294,6 +294,7 @@ type kfDistributedReplicaSpec interface {
 	GetImage() string
 	GetResources() *core.Resources
 	GetRestartPolicy() kfplugins.RestartPolicy
+	GetCommon() *kfplugins.CommonReplicaSpec
 }
 
 type allowsCommandOverride interface {
@@ -301,9 +302,29 @@ type allowsCommandOverride interface {
 }
 
 func ToReplicaSpecWithOverrides(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext, rs kfDistributedReplicaSpec, primaryContainerName string, isMaster bool) (*commonOp.ReplicaSpec, error) {
+	var replicas int32
+	var image string
+	var resources *core.Resources
+	var restartPolicy kfplugins.RestartPolicy
+
+	// replicas, image, resources, restartPolicy are deprecated since the common replica spec is introduced.
+	// Therefore, if the common replica spec is set, use that to get the common fields
+	common := rs.GetCommon()
+	if common != nil {
+		replicas = common.GetReplicas()
+		image = common.GetImage()
+		resources = common.GetResources()
+		restartPolicy = common.GetRestartPolicy()
+	} else {
+		replicas = rs.GetReplicas()
+		image = rs.GetImage()
+		resources = rs.GetResources()
+		restartPolicy = rs.GetRestartPolicy()
+	}
+
 	taskCtxOptions := []flytek8s.PluginTaskExecutionContextOption{}
-	if rs != nil && rs.GetResources() != nil {
-		resources, err := flytek8s.ToK8sResourceRequirements(rs.GetResources())
+	if resources != nil {
+		resources, err := flytek8s.ToK8sResourceRequirements(resources)
 		if err != nil {
 			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification on Resources [%v], Err: [%v]", resources, err.Error())
 		}
@@ -321,26 +342,23 @@ func ToReplicaSpecWithOverrides(ctx context.Context, taskCtx pluginsCore.TaskExe
 		replicaSpec.Replicas = &replicas
 	}
 
-	if rs != nil {
-		var command []string
-		if v, ok := rs.(allowsCommandOverride); ok {
-			command = v.GetCommand()
-		}
-		if err := OverrideContainerSpec(
-			&replicaSpec.Template.Spec,
-			primaryContainerName,
-			rs.GetImage(),
-			command,
-		); err != nil {
-			return nil, err
-		}
+	var command []string
+	if v, ok := rs.(allowsCommandOverride); ok {
+		command = v.GetCommand()
+	}
+	if err := OverrideContainerSpec(
+		&replicaSpec.Template.Spec,
+		primaryContainerName,
+		image,
+		command,
+	); err != nil {
+		return nil, err
+	}
 
-		replicaSpec.RestartPolicy = ParseRestartPolicy(rs.GetRestartPolicy())
+	replicaSpec.RestartPolicy = ParseRestartPolicy(restartPolicy)
 
-		if !isMaster {
-			replicas := rs.GetReplicas()
-			replicaSpec.Replicas = &replicas
-		}
+	if !isMaster {
+		replicaSpec.Replicas = &replicas
 	}
 
 	return replicaSpec, nil

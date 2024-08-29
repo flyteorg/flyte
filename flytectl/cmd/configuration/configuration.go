@@ -8,13 +8,11 @@ import (
 	"os"
 	"strings"
 
-	"github.com/flyteorg/flyte/flytectl/pkg/util"
-
-	"github.com/flyteorg/flyte/flytectl/pkg/configutil"
-
 	initConfig "github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/config"
 	cmdcore "github.com/flyteorg/flyte/flytectl/cmd/core"
 	cmdUtil "github.com/flyteorg/flyte/flytectl/pkg/commandutils"
+	"github.com/flyteorg/flyte/flytectl/pkg/configutil"
+	"github.com/flyteorg/flyte/flytectl/pkg/util"
 	"github.com/flyteorg/flyte/flytestdlib/config/viper"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
 	"github.com/spf13/cobra"
@@ -65,9 +63,13 @@ func CreateConfigCommand() *cobra.Command {
 	configCmd := viper.GetConfigCommand()
 
 	getResourcesFuncs := map[string]cmdcore.CommandEntry{
-		"init": {CmdFunc: configInitFunc, Aliases: []string{""}, ProjectDomainNotRequired: true,
-			Short: initCmdShort,
-			Long:  initCmdLong, PFlagProvider: initConfig.DefaultConfig},
+		"init": {
+			CmdFunc:                  configInitFunc,
+			Aliases:                  []string{""},
+			ProjectDomainNotRequired: true,
+			DisableFlyteClient:       true,
+			Short:                    initCmdShort,
+			Long:                     initCmdLong, PFlagProvider: initConfig.DefaultConfig},
 	}
 
 	configCmd.Flags().BoolVar(&initConfig.DefaultConfig.Force, "force", false, "Force to overwrite the default config file without confirmation")

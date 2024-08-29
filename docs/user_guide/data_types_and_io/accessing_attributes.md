@@ -15,7 +15,7 @@ To clone and run the example code on this page, see the [Flytesnacks repo][flyte
 
 To begin, import the required dependencies and define a common task for subsequent use:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/data_types_and_io/data_types_and_io/attribute_access.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/attribute_access.py
 :caption: data_types_and_io/attribute_access.py
 :lines: 1-10
 ```
@@ -27,7 +27,7 @@ You can access an output list using index notation.
 Flyte currently does not support output promise access through list slicing.
 :::
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/data_types_and_io/data_types_and_io/attribute_access.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/attribute_access.py
 :caption: data_types_and_io/attribute_access.py
 :lines: 14-23
 ```
@@ -35,7 +35,7 @@ Flyte currently does not support output promise access through list slicing.
 ## Dictionary
 Access the output dictionary by specifying the key.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/data_types_and_io/data_types_and_io/attribute_access.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/attribute_access.py
 :caption: data_types_and_io/attribute_access.py
 :lines: 27-35
 ```
@@ -43,7 +43,7 @@ Access the output dictionary by specifying the key.
 ## Data class
 Directly access an attribute of a dataclass.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/data_types_and_io/data_types_and_io/attribute_access.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/attribute_access.py
 :caption: data_types_and_io/attribute_access.py
 :lines: 39-53
 ```
@@ -51,14 +51,14 @@ Directly access an attribute of a dataclass.
 ## Complex type
 Combinations of list, dict and dataclass also work effectively.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/data_types_and_io/data_types_and_io/attribute_access.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/attribute_access.py
 :caption: data_types_and_io/attribute_access.py
 :lines: 57-80
 ```
 
 You can run all the workflows locally as follows:
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/data_types_and_io/data_types_and_io/attribute_access.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/attribute_access.py
 :caption: data_types_and_io/attribute_access.py
 :lines: 84-88
 ```

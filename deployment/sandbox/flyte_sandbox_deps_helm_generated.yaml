@@ -527,28 +527,6 @@ spec:
     app.kubernetes.io/name: postgres
     app.kubernetes.io/instance: flyte
 ---
-# Source: flyte-deps/templates/redoc/service.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: redoc
-  namespace: flyte
-  labels: 
-    app.kubernetes.io/name: redoc
-    app.kubernetes.io/instance: flyte
-    helm.sh/chart: flyte-deps-v0.1.10
-    app.kubernetes.io/managed-by: Helm
-spec:
-  type: ClusterIP
-  ports:
-    - name: redoc
-      protocol: TCP
-      port: 87
-      targetPort: 8087
-  selector: 
-    app.kubernetes.io/name: redoc
-    app.kubernetes.io/instance: flyte
----
 # Source: flyte-deps/templates/webhook/service.yaml
 apiVersion: v1
 kind: Service

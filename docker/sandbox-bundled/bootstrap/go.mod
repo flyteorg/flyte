@@ -1,6 +1,6 @@
 module github.com/flyteorg/flyte/docker/sandbox-bundled/bootstrap
 
-go 1.21
+go 1.22
 
 require (
 	github.com/stretchr/testify v1.8.0

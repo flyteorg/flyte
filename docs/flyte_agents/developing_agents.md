@@ -166,14 +166,13 @@ You can test your agent in a {ref}`local Python environment <testing_agents_loca
 The following is a sample Dockerfile for building an image for a Flyte agent:
 
 ```Dockerfile
-FROM python:3.9-slim-buster
+FROM python:3.10-slim-bookworm
 
 MAINTAINER Flyte Team <users@flyte.org>
 LABEL org.opencontainers.image.source=https://github.com/flyteorg/flytekit
 
-WORKDIR /root
-ENV PYTHONPATH /root
-
+# additional dependencies for running in k8s
+RUN pip install prometheus-client grpcio-health-checking
 # flytekit will autoload the agent if package is installed.
 RUN pip install flytekitplugins-bigquery
 CMD pyflyte serve agent --port 8000

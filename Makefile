@@ -141,6 +141,10 @@ lint-helm-charts:
 	# This pressuposes that you have act installed
 	act pull_request -W .github/workflows/validate-helm-charts.yaml --container-architecture linux/amd64 -e charts/event.json
 
+.PHONY: spellcheck
+spellcheck:
+	act pull_request --container-architecture linux/amd64 -W .github/workflows/codespell.yml
+
 .PHONY: clean
 clean: ## Remove the HTML files related to the Flyteconsole and Makefile
 	rm -rf cmd/single/dist .tmp_build

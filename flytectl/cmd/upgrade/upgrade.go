@@ -8,17 +8,13 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/flyteorg/flyte/flytectl/pkg/util"
-
-	stdlibversion "github.com/flyteorg/flyte/flytestdlib/version"
-
-	"github.com/flyteorg/flyte/flytectl/pkg/github"
-
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/mouuff/go-rocket-update/pkg/updater"
-
 	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
+	"github.com/flyteorg/flyte/flytectl/pkg/github"
 	"github.com/flyteorg/flyte/flytectl/pkg/platformutil"
+	"github.com/flyteorg/flyte/flytectl/pkg/util"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	stdlibversion "github.com/flyteorg/flyte/flytestdlib/version"
+	"github.com/mouuff/go-rocket-update/pkg/updater"
 	"github.com/spf13/cobra"
 )
 
@@ -114,7 +110,7 @@ func upgrade(u *updater.Updater) (string, error) {
 }
 
 func isUpgradeSupported(goos platformutil.Platform) (bool, error) {
-	latest, err := github.FlytectlReleaseConfig.GetLatestVersion()
+	latest, err := github.FlytectlReleaseConfig.Provider.(*github.GHProvider).GetCleanLatestVersion()
 	if err != nil {
 		return false, err
 	}

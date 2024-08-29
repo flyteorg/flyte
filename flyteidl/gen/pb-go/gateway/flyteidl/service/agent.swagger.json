@@ -1265,6 +1265,15 @@
             "type": "string"
           },
           "description": "Additional metadata for literals."
+        },
+        "uri": {
+          "type": "string",
+          "description": "If this literal is offloaded, this field will contain metadata including the offload location."
+        },
+        "size_bytes": {
+          "type": "string",
+          "format": "uint64",
+          "description": "Includes information about the size of the literal."
         }
       },
       "description": "A simple value. This supports any level of nesting (e.g. array of array of array of Blobs) as well as simple primitives."
@@ -1724,6 +1733,12 @@
         },
         "ttl": {
           "type": "string"
+        },
+        "ShowWhilePending": {
+          "type": "boolean"
+        },
+        "HideOnceFinished": {
+          "type": "boolean"
         }
       },
       "title": "Log information for the task that is specific to a log sink\nWhen our log story is flushed out, we may have more metadata here like log link expiry"

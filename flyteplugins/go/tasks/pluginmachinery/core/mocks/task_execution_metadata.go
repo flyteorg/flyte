@@ -54,6 +54,38 @@ func (_m *TaskExecutionMetadata) GetAnnotations() map[string]string {
 	return r0
 }
 
+type TaskExecutionMetadata_GetConsoleURL struct {
+	*mock.Call
+}
+
+func (_m TaskExecutionMetadata_GetConsoleURL) Return(_a0 string) *TaskExecutionMetadata_GetConsoleURL {
+	return &TaskExecutionMetadata_GetConsoleURL{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *TaskExecutionMetadata) OnGetConsoleURL() *TaskExecutionMetadata_GetConsoleURL {
+	c_call := _m.On("GetConsoleURL")
+	return &TaskExecutionMetadata_GetConsoleURL{Call: c_call}
+}
+
+func (_m *TaskExecutionMetadata) OnGetConsoleURLMatch(matchers ...interface{}) *TaskExecutionMetadata_GetConsoleURL {
+	c_call := _m.On("GetConsoleURL", matchers...)
+	return &TaskExecutionMetadata_GetConsoleURL{Call: c_call}
+}
+
+// GetConsoleURL provides a mock function with given fields:
+func (_m *TaskExecutionMetadata) GetConsoleURL() string {
+	ret := _m.Called()
+
+	var r0 string
+	if rf, ok := ret.Get(0).(func() string); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	return r0
+}
+
 type TaskExecutionMetadata_GetEnvironmentVariables struct {
 	*mock.Call
 }

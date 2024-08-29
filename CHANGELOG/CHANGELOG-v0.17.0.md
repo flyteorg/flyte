@@ -8,7 +8,7 @@
 
 ## Flytekit
 1. Great Expectations Integration ([docs](https://docs.flyte.org/en/latest/flytesnacks/examples/greatexpectations_plugin/index.html)).
-1. Access to durable blob stores (AWS/GCS/etc) are now pluggable.
+1. Access to durable blob stores (AWS/GCS/etc) is now pluggable.
 1. Local task execution has been updated to also trigger the type engine.
 1. Tasks that have `cache=True` should now be cached when running locally as well ([docs](https://docs.flyte.org/en/latest/user_guide/development_lifecycle/caching.html#how-does-local-caching-work)).
 

@@ -7,7 +7,6 @@ import (
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin"
 	"github.com/flyteorg/flyte/flytestdlib/config"
-
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 )
@@ -22,7 +21,7 @@ func TestGenerateCommandFunc(t *testing.T) {
 		adminCfg.Endpoint = config.URL{URL: url.URL{Host: "dummyHost"}}
 		adminCfg.AuthType = admin.AuthTypePkce
 		rootCmd := &cobra.Command{}
-		cmdEntry := CommandEntry{CmdFunc: testCommandFunc, ProjectDomainNotRequired: true}
+		cmdEntry := CommandEntry{CmdFunc: testCommandFunc, ProjectDomainNotRequired: true, DisableFlyteClient: true}
 		fn := generateCommandFunc(cmdEntry)
 		assert.Nil(t, fn(rootCmd, []string{}))
 	})
@@ -31,7 +30,7 @@ func TestGenerateCommandFunc(t *testing.T) {
 		adminCfg := admin.GetConfig(context.Background())
 		adminCfg.Endpoint = config.URL{URL: url.URL{Host: ""}}
 		rootCmd := &cobra.Command{}
-		cmdEntry := CommandEntry{CmdFunc: testCommandFunc, ProjectDomainNotRequired: true}
+		cmdEntry := CommandEntry{CmdFunc: testCommandFunc, ProjectDomainNotRequired: true, DisableFlyteClient: true}
 		fn := generateCommandFunc(cmdEntry)
 		assert.Nil(t, fn(rootCmd, []string{}))
 	})

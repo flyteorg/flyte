@@ -750,6 +750,47 @@ func (_m *AdminFetcherExtInterface) FetchWorkflowVersion(ctx context.Context, na
 	return r0, r1
 }
 
+type AdminFetcherExtInterface_GetDomains struct {
+	*mock.Call
+}
+
+func (_m AdminFetcherExtInterface_GetDomains) Return(_a0 *admin.GetDomainsResponse, _a1 error) *AdminFetcherExtInterface_GetDomains {
+	return &AdminFetcherExtInterface_GetDomains{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminFetcherExtInterface) OnGetDomains(ctx context.Context) *AdminFetcherExtInterface_GetDomains {
+	c_call := _m.On("GetDomains", ctx)
+	return &AdminFetcherExtInterface_GetDomains{Call: c_call}
+}
+
+func (_m *AdminFetcherExtInterface) OnGetDomainsMatch(matchers ...interface{}) *AdminFetcherExtInterface_GetDomains {
+	c_call := _m.On("GetDomains", matchers...)
+	return &AdminFetcherExtInterface_GetDomains{Call: c_call}
+}
+
+// GetDomains provides a mock function with given fields: ctx
+func (_m *AdminFetcherExtInterface) GetDomains(ctx context.Context) (*admin.GetDomainsResponse, error) {
+	ret := _m.Called(ctx)
+
+	var r0 *admin.GetDomainsResponse
+	if rf, ok := ret.Get(0).(func(context.Context) *admin.GetDomainsResponse); ok {
+		r0 = rf(ctx)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.GetDomainsResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type AdminFetcherExtInterface_GetProjectByID struct {
 	*mock.Call
 }
