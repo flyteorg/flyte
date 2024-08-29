@@ -282,6 +282,7 @@ configmap:
           - sidecar
           - k8s-array
           - agent-service
+          - echo
         #          - sagemaker_hyperparameter_tuning
         #          - sagemaker_custom_training
         #          - sagemaker_training
