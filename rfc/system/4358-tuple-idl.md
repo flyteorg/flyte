@@ -77,6 +77,53 @@ This feature aims to resolve all these issues.
 
 ## 3 Proposed Implementation
 
+### FlyteKit Examples
+
+
+#### `NamedTuple("NAME", ("K1": T1), ("K2": T2))`
+    
+```python
+from typing import NamedTuple
+
+class MyNamedTuple(NamedTuple):
+    key1: int
+    key2: str
+
+@task
+def my_task() -> (MyNamedTuple, str):
+    return MyNamedTuple(1, "foo"), "bar"
+    # protobuf: {
+    #     o1: {
+    #         tuple_name: "MyNamedTuple"
+    #         fields: [
+    #             {name: "key1", value: 1},
+    #             {name: "key2", value: "foo"}
+    #         ]
+    #     }
+    #     o2: "bar"
+    # }
+```
+
+#### `Tuple[T1, T2]`
+    
+```python
+from typing import Tuple
+
+@task
+def my_task() -> Tuple[int, str], str:
+    return (1, "foo"), "bar"
+    # protobuf: {
+    #     o1: {
+    #         tuple_name: ""
+    #         fields: [
+    #             {name: "", value: 1},
+    #             {name: "", value: "foo"}
+    #         ]
+    #     }
+    #     o2: "bar"
+    # }
+``` 
+
 ### FlyteIDL
 
 #### Type of NamedTuple and Tuple
@@ -157,7 +204,7 @@ This feature aims to resolve all these issues.
 
 - The above code should be added to [flyteidl/protos/flyteidl/core/literals.proto](https://github.com/flyteorg/flyte/blob/master/flyteidl/protos/flyteidl/core/literals.proto).
 
-#### Code that may affect Flytectl
+#### Code that may affect Flytectl Execution
 
 - Update `MakeDefaultLiteralForType()` function in [flyteidl/clients/go/coreutils/literals.go](https://github.com/flyteorg/flyte/blob/master/flyteidl/clients/go/coreutils/literals.go)
     
@@ -263,7 +310,7 @@ This feature aims to resolve all these issues.
     }
     ```
 
-### FlyteAdmin & FlytePropeller
+### FlytePropeller
 
 1. Update `LiteralTypeForLiteral()` functions in [flytepropeller/pkg/compiler/validators/utils.go](https://github.com/flyteorg/flyte/blob/master/flytepropeller/pkg/compiler/validators/utils.go) to correctly handle the type.
 
@@ -425,54 +472,91 @@ This feature aims to resolve all these issues.
     }
     ```
 
-### FlyteKit
+### FlyteConsole
 
-- Supporting the following types in Flytekit:
-    - `NamedTuple("NAME", ("K1": T1), ("K2": T2))`
-    - `Tuple[T1, T2]`
-    - [#TO_DISCUSS] `Tuple[T1, ...]`: There are two potential approaches to support this type:
-        - Add a field `is_univariate` in `TupleType` and `TupleFieldType`.
-            ```proto
-            // types.proto
-            message TupleType {
-                string tuple_name = 1;
-                bool is_univariate = 2;
-                repeated TupleFieldType fields = 3;
+The FlyteConsole will need to be updated to display the tuple type correctly.
+
+### Other Discussion
+
+#### Should we support `Tuple[T1, ...]`?
+
+- Flytekit example:
+
+    ```python
+    from typing import Tuple
+
+    @task
+    def my_tuple_task() -> Tuple[int, ...], str:
+        return (1, 2, 3), "bar"
+
+
+    @task
+    def my_list_task() -> List[int], str:
+        return [1, 2, 3], "bar"
+    ```
+    
+- There are three potential approaches to support this type:
+    - Add a field `is_univariate` in `TupleType` and `TupleFieldType`.
+
+        ```proto
+        // types.proto
+        message TupleType {
+            string tuple_name = 1;
+            bool is_univariate = 2;
+            repeated TupleFieldType fields = 3;
+        }
+
+        // literals.proto
+        message LiteralFieldCollection {
+            string tuple_name = 1;
+            bool is_univariate = 2;
+            repeated LiteralField fields = 1;
+        }
+        ```
+
+    - Treat it as a list, given that the performance is quite similar to `List[T1]`. However, this approach may lead to confusion with `List[T1]`.
+    - Add a extra `LiteralType univariate_tuple_type` to `LiteralType` and `LiteralCollection univariate_tuple` to `Literal`.
+
+        ```proto
+        // types.proto
+        message LiteralType {
+            oneof type {
+                // ...
+                TupleType tuple_type = 11;
+                LiteralType univariate_tuple_type = 12;
             }
+            // ...
+        }
 
-            // literals.proto
-            message LiteralFieldCollection {
-                string tuple_name = 1;
-                bool is_univariate = 2;
-                repeated LiteralField fields = 1;
+        // literals.proto
+        message Literal {
+            oneof value {
+                // ...
+                // A tuple of literals.
+                LiteralFieldCollection tuple = 4;
+                LiteralCollection univariate_tuple = 5;
             }
-            ```
-        - Treat it as a list, given that the performance is quite similar to `List[T1]`. However, this approach may lead to confusion with `List[T1]`.
+            // ...
+        }
+        ```
 
-## 4 Metrics & Dashboards
+- If we support univariate tuple, we also need to discuss the casting between different types of NamedTuple & Tuple or casting between List and univariate tuple.
 
-None
-
-## 5 Drawbacks
-
-None
-
-## 6 Alternatives
-
-None
-
-## 7 Potential Impact and Dependencies
+## 4 Potential Impact and Dependencies
 
 - This feature will affect FlyteIDL, FlytePropeller, FlyteKit, Flytectl, and FlyteConsole.
 - It will enable the support of NamedTuple and Tuple in Flytekit, which are common types in Python.
 
-## 8 Unresolved questions
+## 5 To Discuss Questions
 
 1. Should we check the names of each field and the tuple when casting between `NamedTuple` and `Tuple`?
-2. Should we use `is_univariate` to support `Tuple[int, ...]`, given its similarity to `List[int]`?
+2. [Univariate Tuple](#should-we-support-tuplet1-): Should we support `Tuple[int, ...]`, given its similarity to `List[int]`? If so, how should we implement it?
+    - Add a field `is_univariate` in `TupleType` and `TupleFieldType`.
+    - Treat it as a list.
+    - Add a new `LiteralType univariate_tuple_type` to `LiteralType` and `LiteralCollection univariate_tuple` to `Literal`.
 3. [Literal of NamedTuple & Tuple](#literal-of-namedtuple--tuple): Is there any better way to store the literal of NamedTuple and Tuple? Is it necessary to keep names of the fields and tuple in both `Literal` and `LiteralType`?
 4. The specification of the new IDL for the Tuple Literal and LiteralType is open for further discussion.
 
-## 9 Conclusion
+## 6 Conclusion
 
 We need a new IDL for the Tuple Literal and LiteralType to support the usage of `NamedTuple` and `Tuple` in Flytekit.
