@@ -277,6 +277,10 @@
           "$ref": "#/definitions/coreLiteralMap",
           "description": "A map of strings to literals."
         },
+        "offloaded_metadata": {
+          "$ref": "#/definitions/coreLiteralOffloadedMetadata",
+          "description": "Offloaded literal metadata\nWhen you deserialize the offloaded metadata, it would be of Literal and its type would be defined by LiteralType stored in offloaded_metadata."
+        },
         "hash": {
           "type": "string",
           "title": "A hash representing this literal.\nThis is used for caching purposes. For more details refer to RFC 1893\n(https://github.com/flyteorg/flyte/blob/master/rfc/system/1893-caching-of-offloaded-objects.md)"
@@ -315,6 +319,25 @@
         }
       },
       "description": "A map of literals. This is a workaround since oneofs in proto messages cannot contain a repeated field."
+    },
+    "coreLiteralOffloadedMetadata": {
+      "type": "object",
+      "properties": {
+        "uri": {
+          "type": "string",
+          "description": "The location of the offloaded core.Literal."
+        },
+        "size_bytes": {
+          "type": "string",
+          "format": "uint64",
+          "description": "The size of the offloaded data."
+        },
+        "inferred_type": {
+          "$ref": "#/definitions/coreLiteralType",
+          "description": "The inferred literal type of the offloaded data."
+        }
+      },
+      "description": "A message that contains the metadata of the offloaded data."
     },
     "coreLiteralType": {
       "type": "object",

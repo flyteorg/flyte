@@ -3385,6 +3385,9 @@ export namespace flyteidl {
             /** Literal map */
             map?: (flyteidl.core.ILiteralMap|null);
 
+            /** Literal offloadedMetadata */
+            offloadedMetadata?: (flyteidl.core.ILiteralOffloadedMetadata|null);
+
             /** Literal hash */
             hash?: (string|null);
 
@@ -3410,6 +3413,9 @@ export namespace flyteidl {
             /** Literal map. */
             public map?: (flyteidl.core.ILiteralMap|null);
 
+            /** Literal offloadedMetadata. */
+            public offloadedMetadata?: (flyteidl.core.ILiteralOffloadedMetadata|null);
+
             /** Literal hash. */
             public hash: string;
 
@@ -3417,7 +3423,7 @@ export namespace flyteidl {
             public metadata: { [k: string]: string };
 
             /** Literal value. */
-            public value?: ("scalar"|"collection"|"map");
+            public value?: ("scalar"|"collection"|"map"|"offloadedMetadata");
 
             /**
              * Creates a new Literal instance using the specified properties.
@@ -3446,6 +3452,70 @@ export namespace flyteidl {
 
             /**
              * Verifies a Literal message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a LiteralOffloadedMetadata. */
+        interface ILiteralOffloadedMetadata {
+
+            /** LiteralOffloadedMetadata uri */
+            uri?: (string|null);
+
+            /** LiteralOffloadedMetadata sizeBytes */
+            sizeBytes?: (Long|null);
+
+            /** LiteralOffloadedMetadata inferredType */
+            inferredType?: (flyteidl.core.ILiteralType|null);
+        }
+
+        /** Represents a LiteralOffloadedMetadata. */
+        class LiteralOffloadedMetadata implements ILiteralOffloadedMetadata {
+
+            /**
+             * Constructs a new LiteralOffloadedMetadata.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.ILiteralOffloadedMetadata);
+
+            /** LiteralOffloadedMetadata uri. */
+            public uri: string;
+
+            /** LiteralOffloadedMetadata sizeBytes. */
+            public sizeBytes: Long;
+
+            /** LiteralOffloadedMetadata inferredType. */
+            public inferredType?: (flyteidl.core.ILiteralType|null);
+
+            /**
+             * Creates a new LiteralOffloadedMetadata instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns LiteralOffloadedMetadata instance
+             */
+            public static create(properties?: flyteidl.core.ILiteralOffloadedMetadata): flyteidl.core.LiteralOffloadedMetadata;
+
+            /**
+             * Encodes the specified LiteralOffloadedMetadata message. Does not implicitly {@link flyteidl.core.LiteralOffloadedMetadata.verify|verify} messages.
+             * @param message LiteralOffloadedMetadata message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.ILiteralOffloadedMetadata, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a LiteralOffloadedMetadata message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns LiteralOffloadedMetadata
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.LiteralOffloadedMetadata;
+
+            /**
+             * Verifies a LiteralOffloadedMetadata message.
              * @param message Plain object to verify
              * @returns `null` if valid, otherwise the reason why it is not
              */
@@ -18178,6 +18248,64 @@ export namespace flyteidl {
 
             /**
              * Verifies a ProjectGetRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of an InactiveProject. */
+        interface IInactiveProject {
+
+            /** InactiveProject id */
+            id?: (string|null);
+
+            /** InactiveProject org */
+            org?: (string|null);
+        }
+
+        /** Represents an InactiveProject. */
+        class InactiveProject implements IInactiveProject {
+
+            /**
+             * Constructs a new InactiveProject.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IInactiveProject);
+
+            /** InactiveProject id. */
+            public id: string;
+
+            /** InactiveProject org. */
+            public org: string;
+
+            /**
+             * Creates a new InactiveProject instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns InactiveProject instance
+             */
+            public static create(properties?: flyteidl.admin.IInactiveProject): flyteidl.admin.InactiveProject;
+
+            /**
+             * Encodes the specified InactiveProject message. Does not implicitly {@link flyteidl.admin.InactiveProject.verify|verify} messages.
+             * @param message InactiveProject message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IInactiveProject, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an InactiveProject message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns InactiveProject
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.InactiveProject;
+
+            /**
+             * Verifies an InactiveProject message.
              * @param message Plain object to verify
              * @returns `null` if valid, otherwise the reason why it is not
              */

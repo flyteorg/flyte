@@ -339,8 +339,9 @@ func hydrateTaskSpec(task *admin.TaskSpec, sourceUploadedLocation storage.DataRe
 		}
 		task.Template.Target = &core.TaskTemplate_K8SPod{
 			K8SPod: &core.K8SPod{
-				Metadata: task.Template.GetK8SPod().Metadata,
-				PodSpec:  podSpecStruct,
+				Metadata:   task.Template.GetK8SPod().Metadata,
+				PodSpec:    podSpecStruct,
+				DataConfig: task.Template.GetK8SPod().DataConfig,
 			},
 		}
 	}
