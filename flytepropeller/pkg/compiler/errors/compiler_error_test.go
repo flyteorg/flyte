@@ -49,6 +49,6 @@ func TestIncludeSource(t *testing.T) {
 
 	SetConfig(Config{IncludeSource: true})
 	e = NewCycleDetectedInWorkflowErr("", "")
-	assert.Equal(t, e.source, "compiler_error_test.go:50")
+	assert.Equal(t, e.source, "compiler_error_test.go:51")
 	SetConfig(Config{})
 }
