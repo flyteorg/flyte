@@ -12,14 +12,15 @@ import (
 type Key string
 
 const (
-	AppNameKey         Key = "app_name"
-	NamespaceKey       Key = "ns"
-	TaskTypeKey        Key = "tasktype"
-	ProjectKey         Key = "project"
-	DomainKey          Key = "domain"
-	WorkflowIDKey      Key = "wf"
-	NodeIDKey          Key = "node"
-	TaskIDKey          Key = "task"
+	AppNameKey    Key = "app_name"
+	NamespaceKey  Key = "ns"
+	TaskTypeKey   Key = "tasktype"
+	ProjectKey    Key = "project"
+	DomainKey     Key = "domain"
+	WorkflowIDKey Key = "wf"
+	NodeIDKey     Key = "node"
+	TaskIDKey     Key = "task"
+	// Adding the ExecIDKey label to a metric will cause higher cardinality. Use with caution.
 	ExecIDKey          Key = "exec_id"
 	JobIDKey           Key = "job_id"
 	PhaseKey           Key = "phase"
