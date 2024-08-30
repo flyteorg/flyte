@@ -138,7 +138,7 @@ task-plugins:
 ```
 :::
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/conditional.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/89bf7bc7788802097904c5f9ffb75ba70ef980a6/examples/advanced_composition/advanced_composition/conditional.py
 :caption: advanced_composition/conditional.py
 :lines: 197-209
 ```
@@ -191,7 +191,7 @@ pyflyte run --remote \
 
 ```
 pyflyte run --remote \
-  https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/advanced_composition/advanced_composition/conditional.py \
+  https://raw.githubusercontent.com/flyteorg/flytesnacks/89bf7bc7788802097904c5f9ffb75ba70ef980a6/examples/advanced_composition/advanced_composition/conditional.py \
   noop_in_conditional --radius 0.4 --seed 5
 ```
 
