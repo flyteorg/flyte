@@ -1018,10 +1018,8 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 				assert.Equal(t, test.expectedTransitionPhase, transition.Info().GetPhase())
 				assert.Equal(t, test.expectedTaskPhaseVersion, arrayNodeState.TaskPhaseVersion)
 
-				if test.expectedArrayNodeSubPhases != nil {
-					for i, expectedPhase := range test.expectedArrayNodeSubPhases {
-						assert.Equal(t, expectedPhase, v1alpha1.NodePhase(arrayNodeState.SubNodePhases.GetItem(i)))
-					}
+				for i, expectedPhase := range test.expectedArrayNodeSubPhases {
+					assert.Equal(t, expectedPhase, v1alpha1.NodePhase(arrayNodeState.SubNodePhases.GetItem(i)))
 				}
 
 				bufferedEventRecorder, ok := eventRecorder.(*bufferedEventRecorder)
