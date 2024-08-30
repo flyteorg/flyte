@@ -49,7 +49,8 @@ type PostgresConfig struct {
 }
 
 type FeatureGates struct {
-	EnableArtifacts bool `json:"enableArtifacts" pflag:",Enable artifacts feature."`
+	EnableArtifacts     bool `json:"enableArtifacts" pflag:",Enable artifacts feature."`
+	EnableFriendlyNames bool `json:"enableFriendlyNames" pflag:",Enable generation of friendly execution names feature."`
 }
 
 type ResourceAttributesMode int
