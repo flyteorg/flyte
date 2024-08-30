@@ -336,7 +336,7 @@ func TestEventCatalogMetadata(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := EventCatalogMetadata(tt.args.datasetID, tt.args.tag, tt.args.sourceID); !reflect.DeepEqual(got, tt.want) {
+			if got := EventCatalogMetadata(tt.args.datasetID, tt.args.tag, tt.args.sourceID, nil); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("EventCatalogMetadata() = %v, want %v", got, tt.want)
 			}
 		})

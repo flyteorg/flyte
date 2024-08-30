@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
-import { Message, proto3 } from "@bufbuild/protobuf";
+import { Message, proto3, Timestamp } from "@bufbuild/protobuf";
 import { Identifier, TaskExecutionIdentifier } from "./identifier_pb.js";
 
 /**
@@ -163,6 +163,11 @@ export class CatalogMetadata extends Message<CatalogMetadata> {
     case: "sourceTaskExecution";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
+  /**
+   * @generated from field: google.protobuf.Timestamp created_at = 4;
+   */
+  createdAt?: Timestamp;
+
   constructor(data?: PartialMessage<CatalogMetadata>) {
     super();
     proto3.util.initPartial(data, this);
@@ -174,6 +179,7 @@ export class CatalogMetadata extends Message<CatalogMetadata> {
     { no: 1, name: "dataset_id", kind: "message", T: Identifier },
     { no: 2, name: "artifact_tag", kind: "message", T: CatalogArtifactTag },
     { no: 3, name: "source_task_execution", kind: "message", T: TaskExecutionIdentifier, oneof: "source_execution" },
+    { no: 4, name: "created_at", kind: "message", T: Timestamp },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CatalogMetadata {

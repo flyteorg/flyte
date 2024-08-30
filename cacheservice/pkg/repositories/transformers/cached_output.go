@@ -38,10 +38,16 @@ func CreateCachedOutputModel(ctx context.Context, key string, cachedOutput *cach
 		return nil, errors.NewCacheServiceErrorf(codes.Internal, "Failed to marshal output metadata with error %v", err)
 	}
 
+	baseModel := models.BaseModel{
+		ID: key,
+	}
+
+	if createdAt := cachedOutput.GetMetadata().GetCreatedAt(); createdAt != nil {
+		baseModel.CreatedAt = createdAt.AsTime()
+	}
+
 	return &models.CachedOutput{
-		BaseModel: models.BaseModel{
-			ID: key,
-		},
+		BaseModel:     baseModel,
 		OutputURI:     cachedOutput.GetOutputUri(),
 		OutputLiteral: outputLiteralBytes,
 		Identifier: models.Identifier{

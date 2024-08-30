@@ -85,7 +85,9 @@ func (c *FallbackClient) Get(ctx context.Context, key catalog.Key) (catalog.Entr
 		return catalog.Entry{}, err
 	}
 
-	metadata := catalog.Metadata{}
+	metadata := catalog.Metadata{
+		CreatedAt: catalogEntry.GetStatus().GetMetadata().GetCreatedAt(),
+	}
 	identifier := catalogEntry.GetStatus().GetMetadata().GetSourceExecution()
 	// TODO - pvditt update this when sub-workflow caching is supported
 	switch identifier.(type) {

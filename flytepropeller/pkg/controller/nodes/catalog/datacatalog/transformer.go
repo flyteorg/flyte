@@ -8,6 +8,8 @@ import (
 	"strconv"
 	"strings"
 
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
@@ -267,9 +269,10 @@ func GetSourceFromMetadata(datasetMd, artifactMd *datacatalog.Metadata, currentI
 }
 
 // Given the Catalog Information (returned from a Catalog call), returns the CatalogMetadata that is populated in the event.
-func EventCatalogMetadata(datasetID *datacatalog.DatasetID, tag *datacatalog.Tag, sourceID *core.TaskExecutionIdentifier) *core.CatalogMetadata {
+func EventCatalogMetadata(datasetID *datacatalog.DatasetID, tag *datacatalog.Tag, sourceID *core.TaskExecutionIdentifier, createdAt *timestamppb.Timestamp) *core.CatalogMetadata {
 	md := &core.CatalogMetadata{
 		DatasetId: DatasetIDToIdentifier(datasetID),
+		CreatedAt: createdAt,
 	}
 
 	if tag != nil {

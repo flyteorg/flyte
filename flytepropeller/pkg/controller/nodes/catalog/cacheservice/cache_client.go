@@ -145,6 +145,7 @@ func (c *CacheClient) put(ctx context.Context, key catalog.Key, reader io.Output
 		return catalog.Status{}, errors.Wrapf(err, "Failed to generate cache key for %v", key.Identifier.String())
 	}
 
+	cacheMetadata := GenerateCacheMetadata(key, metadata)
 	var cacheRequest *cacheservice.PutCacheRequest
 	if c.inlineCache {
 		outputs, executionErr, err := reader.Read(ctx)
@@ -162,7 +163,7 @@ func (c *CacheClient) put(ctx context.Context, key catalog.Key, reader io.Output
 				Output: &cacheservice.CachedOutput_OutputLiterals{
 					OutputLiterals: outputs,
 				},
-				Metadata: GenerateCacheMetadata(key, metadata),
+				Metadata: cacheMetadata,
 			},
 			Overwrite: &cacheservice.OverwriteOutput{
 				Overwrite:  overwrite,
@@ -192,7 +193,7 @@ func (c *CacheClient) put(ctx context.Context, key catalog.Key, reader io.Output
 				Output: &cacheservice.CachedOutput_OutputUri{
 					OutputUri: outputURI.String(),
 				},
-				Metadata: GenerateCacheMetadata(key, metadata),
+				Metadata: cacheMetadata,
 			},
 			Overwrite: &cacheservice.OverwriteOutput{
 				Overwrite:  overwrite,

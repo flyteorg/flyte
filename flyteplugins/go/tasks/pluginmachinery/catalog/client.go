@@ -7,6 +7,7 @@ import (
 
 	"google.golang.org/grpc/codes"
 	grpcStatus "google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
@@ -20,6 +21,7 @@ type Metadata struct {
 	WorkflowExecutionIdentifier *core.WorkflowExecutionIdentifier
 	NodeExecutionIdentifier     *core.NodeExecutionIdentifier
 	TaskExecutionIdentifier     *core.TaskExecutionIdentifier
+	CreatedAt                   *timestamppb.Timestamp
 }
 
 // An identifier for a catalog object.

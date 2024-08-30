@@ -137,7 +137,7 @@ func (m *CatalogClient) Get(ctx context.Context, key catalog.Key) (catalog.Entry
 		return catalog.Entry{}, fmt.Errorf("failed to get source from metadata. Error: %w", err)
 	}
 
-	md := EventCatalogMetadata(dataset.GetId(), relevantTag, source)
+	md := EventCatalogMetadata(dataset.GetId(), relevantTag, source, artifact.CreatedAt)
 
 	outputs, err := GenerateTaskOutputsFromArtifact(key.Identifier, key.TypedInterface, artifact)
 	if err != nil {
@@ -262,7 +262,7 @@ func (m *CatalogClient) createArtifact(ctx context.Context, key catalog.Key, dat
 	}
 
 	logger.Debugf(ctx, "Successfully created artifact %+v for key %+v, dataset %+v and execution %+v", cachedArtifact, key, datasetID, metadata)
-	return catalog.NewStatus(core.CatalogCacheStatus_CACHE_POPULATED, EventCatalogMetadata(datasetID, tag, nil)), nil
+	return catalog.NewStatus(core.CatalogCacheStatus_CACHE_POPULATED, EventCatalogMetadata(datasetID, tag, nil, nil)), nil
 }
 
 // updateArtifact overwrites the ArtifactData of an existing artifact with the provided data in datacatalog.
@@ -308,7 +308,7 @@ func (m *CatalogClient) updateArtifact(ctx context.Context, key catalog.Key, dat
 	}
 
 	logger.Debugf(ctx, "Successfully updated artifact with ID %v and %d outputs for key %+v, dataset %+v and execution %+v", tag.ArtifactId, len(artifactDataList), key, datasetID, metadata)
-	return catalog.NewStatus(core.CatalogCacheStatus_CACHE_POPULATED, EventCatalogMetadata(datasetID, tag, source)), nil
+	return catalog.NewStatus(core.CatalogCacheStatus_CACHE_POPULATED, EventCatalogMetadata(datasetID, tag, source, nil)), nil
 }
 
 // Put stores the result of a task execution as a cached Artifact and associates it with the data by tagging it with

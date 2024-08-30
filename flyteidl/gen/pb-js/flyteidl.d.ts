@@ -1125,6 +1125,9 @@ export namespace flyteidl {
 
             /** CatalogMetadata sourceTaskExecution */
             sourceTaskExecution?: (flyteidl.core.ITaskExecutionIdentifier|null);
+
+            /** CatalogMetadata createdAt */
+            createdAt?: (google.protobuf.ITimestamp|null);
         }
 
         /** Represents a CatalogMetadata. */
@@ -1144,6 +1147,9 @@ export namespace flyteidl {
 
             /** CatalogMetadata sourceTaskExecution. */
             public sourceTaskExecution?: (flyteidl.core.ITaskExecutionIdentifier|null);
+
+            /** CatalogMetadata createdAt. */
+            public createdAt?: (google.protobuf.ITimestamp|null);
 
             /** CatalogMetadata sourceExecution. */
             public sourceExecution?: "sourceTaskExecution";

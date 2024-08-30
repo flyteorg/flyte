@@ -1,4 +1,5 @@
 from flyteidl.core import identifier_pb2 as _identifier_pb2
+from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
@@ -34,14 +35,16 @@ class CatalogArtifactTag(_message.Message):
     def __init__(self, artifact_id: _Optional[str] = ..., name: _Optional[str] = ...) -> None: ...
 
 class CatalogMetadata(_message.Message):
-    __slots__ = ["dataset_id", "artifact_tag", "source_task_execution"]
+    __slots__ = ["dataset_id", "artifact_tag", "source_task_execution", "created_at"]
     DATASET_ID_FIELD_NUMBER: _ClassVar[int]
     ARTIFACT_TAG_FIELD_NUMBER: _ClassVar[int]
     SOURCE_TASK_EXECUTION_FIELD_NUMBER: _ClassVar[int]
+    CREATED_AT_FIELD_NUMBER: _ClassVar[int]
     dataset_id: _identifier_pb2.Identifier
     artifact_tag: CatalogArtifactTag
     source_task_execution: _identifier_pb2.TaskExecutionIdentifier
-    def __init__(self, dataset_id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., artifact_tag: _Optional[_Union[CatalogArtifactTag, _Mapping]] = ..., source_task_execution: _Optional[_Union[_identifier_pb2.TaskExecutionIdentifier, _Mapping]] = ...) -> None: ...
+    created_at: _timestamp_pb2.Timestamp
+    def __init__(self, dataset_id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., artifact_tag: _Optional[_Union[CatalogArtifactTag, _Mapping]] = ..., source_task_execution: _Optional[_Union[_identifier_pb2.TaskExecutionIdentifier, _Mapping]] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
 
 class CatalogReservation(_message.Message):
     __slots__ = []

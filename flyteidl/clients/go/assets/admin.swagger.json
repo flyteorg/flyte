@@ -12955,6 +12955,10 @@
         "source_task_execution": {
           "$ref": "#/definitions/coreTaskExecutionIdentifier",
           "title": "Today we only support TaskExecutionIdentifier as a source, as catalog caching only works for task executions"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
         }
       },
       "title": "Catalog artifact information with specific metadata"

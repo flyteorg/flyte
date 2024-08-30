@@ -48,6 +48,7 @@ func GenerateCacheMetadata(key catalog.Key, metadata catalog.Metadata) *cacheser
 	if metadata.TaskExecutionIdentifier != nil {
 		return &cacheservice.Metadata{
 			SourceIdentifier: &key.Identifier,
+			CreatedAt:        metadata.CreatedAt,
 			KeyMap: &cacheservice.KeyMapMetadata{
 				Values: map[string]string{
 					datacatalog.TaskVersionKey:     metadata.TaskExecutionIdentifier.TaskId.GetVersion(),
@@ -63,6 +64,7 @@ func GenerateCacheMetadata(key catalog.Key, metadata catalog.Metadata) *cacheser
 	} else if metadata.NodeExecutionIdentifier != nil {
 		return &cacheservice.Metadata{
 			SourceIdentifier: &key.Identifier,
+			CreatedAt:        metadata.CreatedAt,
 			KeyMap: &cacheservice.KeyMapMetadata{
 				Values: map[string]string{
 					datacatalog.ExecProjectKey: metadata.NodeExecutionIdentifier.GetExecutionId().GetProject(),
@@ -76,6 +78,7 @@ func GenerateCacheMetadata(key catalog.Key, metadata catalog.Metadata) *cacheser
 	}
 
 	return &cacheservice.Metadata{
+		CreatedAt:        metadata.CreatedAt,
 		SourceIdentifier: &key.Identifier,
 	}
 }

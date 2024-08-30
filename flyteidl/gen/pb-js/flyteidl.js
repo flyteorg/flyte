@@ -2666,6 +2666,7 @@
                  * @property {flyteidl.core.IIdentifier|null} [datasetId] CatalogMetadata datasetId
                  * @property {flyteidl.core.ICatalogArtifactTag|null} [artifactTag] CatalogMetadata artifactTag
                  * @property {flyteidl.core.ITaskExecutionIdentifier|null} [sourceTaskExecution] CatalogMetadata sourceTaskExecution
+                 * @property {google.protobuf.ITimestamp|null} [createdAt] CatalogMetadata createdAt
                  */
     
                 /**
@@ -2706,6 +2707,14 @@
                  * @instance
                  */
                 CatalogMetadata.prototype.sourceTaskExecution = null;
+    
+                /**
+                 * CatalogMetadata createdAt.
+                 * @member {google.protobuf.ITimestamp|null|undefined} createdAt
+                 * @memberof flyteidl.core.CatalogMetadata
+                 * @instance
+                 */
+                CatalogMetadata.prototype.createdAt = null;
     
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
@@ -2751,6 +2760,8 @@
                         $root.flyteidl.core.CatalogArtifactTag.encode(message.artifactTag, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
                     if (message.sourceTaskExecution != null && message.hasOwnProperty("sourceTaskExecution"))
                         $root.flyteidl.core.TaskExecutionIdentifier.encode(message.sourceTaskExecution, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                    if (message.createdAt != null && message.hasOwnProperty("createdAt"))
+                        $root.google.protobuf.Timestamp.encode(message.createdAt, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
                     return writer;
                 };
     
@@ -2780,6 +2791,9 @@
                             break;
                         case 3:
                             message.sourceTaskExecution = $root.flyteidl.core.TaskExecutionIdentifier.decode(reader, reader.uint32());
+                            break;
+                        case 4:
+                            message.createdAt = $root.google.protobuf.Timestamp.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -2818,6 +2832,11 @@
                             if (error)
                                 return "sourceTaskExecution." + error;
                         }
+                    }
+                    if (message.createdAt != null && message.hasOwnProperty("createdAt")) {
+                        var error = $root.google.protobuf.Timestamp.verify(message.createdAt);
+                        if (error)
+                            return "createdAt." + error;
                     }
                     return null;
                 };

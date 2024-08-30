@@ -5,6 +5,7 @@ package flyteidl.core;
 option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core";
 
 import "flyteidl/core/identifier.proto";
+import "google/protobuf/timestamp.proto";
 
 // Indicates the status of CatalogCaching. The reason why this is not embedded in TaskNodeMetadata is, that we may use for other types of nodes as well in the future
 enum CatalogCacheStatus {
@@ -44,6 +45,7 @@ message CatalogMetadata {
        // Today we only support TaskExecutionIdentifier as a source, as catalog caching only works for task executions
        TaskExecutionIdentifier source_task_execution = 3;
     }
+    google.protobuf.Timestamp created_at = 4;
 };
 
 message CatalogReservation {
