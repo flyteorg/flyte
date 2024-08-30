@@ -209,7 +209,6 @@ func TestValidateExecUnknownIDLInputs(t *testing.T) {
 
 	expectedErrorMsg := "invalid foo input wrong type.\nExpected simple:1000, but got <nil>.\nSuggested solution: Please update all of your Flyte images to the latest version and try again."
 	assert.Equal(t, expectedErrorMsg, err.Error())
-
 }
 
 func TestValidExecutionId(t *testing.T) {
