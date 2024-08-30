@@ -345,7 +345,8 @@
           "type": "string",
           "format": "byte"
         }
-      }
+      },
+      "description": "Represents a JSON object encoded as a byte array.\nThis field is intended to store JSON-serialized data such as dataclasses,\ndictionaries, pydantic models, or other structures that can be represented\nas JSON objects. The data should be deserialized into its corresponding\nstructure when used.\nThis design guarantees that the data is stored in a format that can be 100% reconstructed."
     },
     "coreLiteral": {
       "type": "object",

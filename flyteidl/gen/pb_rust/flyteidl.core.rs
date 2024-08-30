@@ -408,6 +408,12 @@ pub struct Binary {
     #[prost(string, tag="2")]
     pub tag: ::prost::alloc::string::String,
 }
+/// Represents a JSON object encoded as a byte array.
+/// This field is intended to store JSON-serialized data such as dataclasses,
+/// dictionaries, pydantic models, or other structures that can be represented
+/// as JSON objects. The data should be deserialized into its corresponding
+/// structure when used.
+/// This design guarantees that the data is stored in a format that can be 100% reconstructed.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Json {
