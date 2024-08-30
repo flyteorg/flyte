@@ -3,6 +3,7 @@ package array
 import (
 	"context"
 	"fmt"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -937,6 +938,68 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 			}
 
 			nCtx.ExecutionContext().(*execmocks.ExecutionContext).AssertNumberOfCalls(t, "IncrementParallelism", int(test.incrementParallelismCount))
+		})
+	}
+}
+
+func TestHandle_InvalidLiteralType(t *testing.T) {
+	ctx := context.Background()
+	scope := promutils.NewTestScope()
+	dataStore, err := storage.NewDataStore(&storage.Config{
+		Type: storage.TypeMemory,
+	}, scope)
+	assert.NoError(t, err)
+	nodeHandler := &mocks.NodeHandler{}
+
+	// Initialize ArrayNodeHandler
+	arrayNodeHandler, err := createArrayNodeHandler(ctx, t, nodeHandler, dataStore, scope)
+	assert.NoError(t, err)
+
+	// Test cases
+	tests := []struct {
+		name                   string
+		inputLiteral           *idlcore.Literal
+		expectedTransitionType handler.TransitionType
+		expectedPhase          handler.EPhase
+		expectedErrorCode      string
+		expectedErrorMessage   string
+	}{
+		{
+			name: "InvalidLiteralType",
+			inputLiteral: &idlcore.Literal{
+				Value: &idlcore.Literal_Scalar{
+					Scalar: &idlcore.Scalar{},
+				},
+			},
+			expectedTransitionType: handler.TransitionTypeEphemeral,
+			expectedPhase:          handler.EPhaseFailed,
+			expectedErrorCode:      errors.IDLNotFoundErr,
+			expectedErrorMessage:   "Input is an invalid type, please update all of your Flyte images to the latest version and try again.",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			// Create NodeExecutionContext
+			literalMap := &idlcore.LiteralMap{
+				Literals: map[string]*idlcore.Literal{
+					"invalidInput": test.inputLiteral,
+				},
+			}
+			arrayNodeState := &handler.ArrayNodeState{
+				Phase: v1alpha1.ArrayNodePhaseNone,
+			}
+			nCtx := createNodeExecutionContext(dataStore, newBufferedEventRecorder(), nil, literalMap, &arrayNodeSpec, arrayNodeState, 0, workflowMaxParallelism)
+
+			// Evaluate node
+			transition, err := arrayNodeHandler.Handle(ctx, nCtx)
+			assert.NoError(t, err)
+
+			// Validate results
+			assert.Equal(t, test.expectedTransitionType, transition.Type())
+			assert.Equal(t, test.expectedPhase, transition.Info().GetPhase())
+			assert.Equal(t, test.expectedErrorCode, transition.Info().GetErr().Code)
+			assert.Equal(t, test.expectedErrorMessage, transition.Info().GetErr().Message)
 		})
 	}
 }
