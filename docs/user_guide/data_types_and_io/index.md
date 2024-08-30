@@ -1,6 +1,6 @@
 (data_types_and_io)=
 
-# Data Types and IO
+# Data Types and I/O
 
 Flyte being a data-aware orchestration platform, types play a vital role within it.
 This section provides an introduction to the wide range of data types that Flyte supports.

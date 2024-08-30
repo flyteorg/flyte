@@ -24,13 +24,16 @@ from sphinx.util import logging as sphinx_logging
 
 sys.path.insert(0, str(Path("../").resolve(strict=True)))
 sys.path.append(str(Path("./_ext").resolve(strict=True)))
+sys.path.append(str(Path("/Users/nikkieverett/projects/repos/flytekit")))
+
+import flytekit
 
 sphinx.application.ExtensionError = sphinx.errors.ExtensionError
 
 # -- Project information -----------------------------------------------------
 
 project = "Flyte"
-copyright = "2022, Flyte Authors"
+copyright = "2024, Flyte Authors"
 author = "Flyte"
 
 # The short X.Y version
@@ -75,8 +78,8 @@ extensions = [
     "sphinx_tags",
     "myst_nb",
     # custom extensions
-    "auto_examples",
-    "import_projects",
+    # "auto_examples",
+    # "import_projects",
 ]
 
 source_suffix = {
@@ -139,7 +142,6 @@ exclude_patterns = [
     "jupyter_execute/**",
     "README.md",
     "_projects/**",
-    "_src/**",
     "examples/**",
     "flytesnacks/index.md",
     "flytesnacks/bioinformatics_examples.md",
@@ -150,14 +152,17 @@ exclude_patterns = [
     "flytesnacks/README.md",
     "flytekit/**/README.md",
     "flytekit/_templates/**",
+    "flytekit/**/*.rst",
+    "flytekit/*.md",
+    "flytekit/**/*ipynb",
+    "flytekit/**/*.md",
     "flytectl/index.rst",
     "protos/boilerplate/**",
-    "protos/tmp/**",
-    "protos/gen/**",
-    "protos/docs/**/index.rst",
-    "protos/index.rst",
-    "api/flytekit/_templates/**",
-    "api/flytekit/index.rst",
+    "api_reference/protos/tmp/**",
+    "api_reference/protos/gen/**",
+    "api_reference/protos/README.md",
+    # "protos/docs/**/index.rst",
+    # "protos/index.rst"
 ]
 
 # -- Options for HTML output -------------------------------------------------
@@ -167,23 +172,20 @@ exclude_patterns = [
 #
 html_favicon = "images/favicon-flyte-docs.png"
 html_logo = "images/favicon-flyte-docs.png"
-html_theme = "furo"
+html_theme = "pydata_sphinx_theme"
 html_title = "Flyte"
+html_sidebars = {
+    "api_reference/*": ["sidebars/api_reference"],
+    "community/*": ["sidebars/community"],
+    "cluster_deployment/*": ["sidebars/cluster_deployment"],
+}
 
 templates_path = ["_templates"]
 
-pygments_style = "tango"
-pygments_dark_style = "native"
+# pygments_style = "tango"
+# pygments_dark_style = "native"
 
 html_theme_options = {
-    "light_css_variables": {
-        "color-brand-primary": "#4300c9",
-        "color-brand-content": "#4300c9",
-    },
-    "dark_css_variables": {
-        "color-brand-primary": "#9D68E4",
-        "color-brand-content": "#9D68E4",
-    },
     # custom flyteorg furo theme options
     # "github_repo": "flyte",
     # "github_username": "flyteorg",
@@ -242,7 +244,11 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, "Flyte.tex", "Flyte Documentation", "Flyte Authors", "manual"),
+    (master_doc, 
+     "Flyte.tex",
+     "Flyte Documentation",
+     "Flyte Authors",
+     "manual"),
 ]
 
 # -- Options for manual page output ------------------------------------------
@@ -276,7 +282,7 @@ autosectionlabel_maxdepth = 2
 tags_create_tags = True
 tags_extension = ["md", "rst"]
 tags_page_title = "Tag"
-tags_overview_title = "Pages by Tags"
+tags_overview_title = "Pages by tags"
 
 # -- Options for intersphinx extension ---------------------------------------
 
