@@ -1,6 +1,7 @@
 package validators
 
 import (
+	"fmt"
 	"reflect"
 
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -11,9 +12,10 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/typing"
 )
 
-func validateBinding(w c.WorkflowBuilder, nodeID c.NodeID, nodeParam string, binding *flyte.BindingData,
+func validateBinding(w c.WorkflowBuilder, node c.Node, nodeParam string, binding *flyte.BindingData,
 	expectedType *flyte.LiteralType, errs errors.CompileErrors, validateParamTypes bool) (
 	resolvedType *flyte.LiteralType, upstreamNodes []c.NodeID, ok bool) {
+	nodeID := node.GetId()
 
 	// Non-scalar bindings will fail to introspect the type through a union type so we resolve them beforehand
 	switch binding.GetValue().(type) {
@@ -31,7 +33,7 @@ func validateBinding(w c.WorkflowBuilder, nodeID c.NodeID, nodeParam string, bin
 			var ok bool
 
 			for _, t := range expectedType.GetUnionType().GetVariants() {
-				resolvedType1, nodeIds1, ok1 := validateBinding(w, nodeID, nodeParam, binding, t, errors.NewCompileErrors(), validateParamTypes)
+				resolvedType1, nodeIds1, ok1 := validateBinding(w, node, nodeParam, binding, t, errors.NewCompileErrors(), validateParamTypes)
 				if ok1 {
 					if ok {
 						errs.Collect(errors.NewAmbiguousBindingUnionValue(nodeID, nodeParam, expectedType.String(), binding.String(), matchingType.String(), t.String()))
@@ -63,7 +65,7 @@ func validateBinding(w c.WorkflowBuilder, nodeID c.NodeID, nodeParam string, bin
 			allNodeIds := make([]c.NodeID, 0, len(val.Collection.GetBindings()))
 			var subType *flyte.LiteralType
 			for _, v := range val.Collection.GetBindings() {
-				if resolvedType, nodeIds, ok := validateBinding(w, nodeID, nodeParam, v, expectedType.GetCollectionType(), errs.NewScope(), validateParamTypes); ok {
+				if resolvedType, nodeIds, ok := validateBinding(w, node, nodeParam, v, expectedType.GetCollectionType(), errs.NewScope(), validateParamTypes); ok {
 					allNodeIds = append(allNodeIds, nodeIds...)
 					subType = resolvedType
 				}
@@ -87,7 +89,7 @@ func validateBinding(w c.WorkflowBuilder, nodeID c.NodeID, nodeParam string, bin
 			allNodeIds := make([]c.NodeID, 0, len(val.Map.GetBindings()))
 			var subType *flyte.LiteralType
 			for _, v := range val.Map.GetBindings() {
-				if resolvedType, nodeIds, ok := validateBinding(w, nodeID, nodeParam, v, expectedType.GetMapValueType(), errs.NewScope(), validateParamTypes); ok {
+				if resolvedType, nodeIds, ok := validateBinding(w, node, nodeParam, v, expectedType.GetMapValueType(), errs.NewScope(), validateParamTypes); ok {
 					allNodeIds = append(allNodeIds, nodeIds...)
 					subType = resolvedType
 				}
@@ -114,12 +116,22 @@ func validateBinding(w c.WorkflowBuilder, nodeID c.NodeID, nodeParam string, bin
 				return nil, nil, !errs.HasErrors()
 			}
 
+			inputVar := nodeParam
+			outputVar := val.Promise.Var
+
+			if node.GetMetadata() != nil {
+				inputVar = fmt.Sprintf("%s.%s", node.GetMetadata().Name, nodeParam)
+			}
+			if upNode.GetMetadata() != nil {
+				outputVar = fmt.Sprintf("%s.%s", upNode.GetMetadata().Name, val.Promise.Var)
+			}
+
 			if param, paramFound := validateOutputVar(upNode, v.Name, errs.NewScope()); paramFound {
 				sourceType := param.Type
 				// If the variable has an index. We expect param to be a collection.
 				if v.Index != nil {
 					if cType := param.GetType().GetCollectionType(); cType == nil {
-						errs.Collect(errors.NewMismatchingTypesErr(nodeID, val.Promise.Var, param.Type.String(), expectedType.String()))
+						errs.Collect(errors.NewMismatchingVariablesErr(nodeID, outputVar, param.Type.String(), inputVar, expectedType.String()))
 					} else {
 						sourceType = cType
 					}
@@ -152,7 +164,8 @@ func validateBinding(w c.WorkflowBuilder, nodeID c.NodeID, nodeParam string, bin
 					return param.GetType(), []c.NodeID{val.Promise.NodeId}, true
 				}
 
-				errs.Collect(errors.NewMismatchingTypesErr(nodeID, val.Promise.Var, sourceType.String(), expectedType.String()))
+				errs.Collect(errors.NewMismatchingVariablesErr(node.GetId(), outputVar, sourceType.String(), inputVar, expectedType.String()))
+				return nil, nil, !errs.HasErrors()
 			}
 		}
 
@@ -223,7 +236,7 @@ func ValidateBindings(w c.WorkflowBuilder, node c.Node, bindings []*flyte.Bindin
 			}
 
 			providedBindings.Insert(binding.GetVar())
-			if resolvedType, upstreamNodes, bindingOk := validateBinding(w, node.GetId(), binding.GetVar(), binding.GetBinding(),
+			if resolvedType, upstreamNodes, bindingOk := validateBinding(w, node, binding.GetVar(), binding.GetBinding(),
 				param.Type, errs.NewScope(), validateParamTypes); bindingOk {
 				for _, upNode := range upstreamNodes {
 					// Add implicit Edges

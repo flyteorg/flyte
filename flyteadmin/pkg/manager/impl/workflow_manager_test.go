@@ -231,7 +231,7 @@ func TestCreateWorkflow_CompilerGetRequirementsError(t *testing.T) {
 	response, err := workflowManager.CreateWorkflow(context.Background(), request)
 	utils.AssertEqualWithSanitizedRegex(t, fmt.Sprintf(
 		"failed to compile workflow for [resource_type:WORKFLOW project:\"project\" domain:\"domain\" "+
-			"name:\"name\" version:\"version\" org:\"org\" ] with err %v", expectedErr.Error()), err.Error())
+			"name:\"name\" version:\"version\" org:\"org\" ] with err: %v", expectedErr.Error()), err.Error())
 	assert.Nil(t, response)
 }
 
@@ -255,7 +255,7 @@ func TestCreateWorkflow_CompileWorkflowError(t *testing.T) {
 	assert.Equal(t, codes.InvalidArgument, s.Code())
 	utils.AssertEqualWithSanitizedRegex(t, fmt.Sprintf(
 		"failed to compile workflow for [resource_type:WORKFLOW project:\"project\" domain:\"domain\" "+
-			"name:\"name\" version:\"version\" org:\"org\" ] with err %v", expectedErr.Error()), err.Error())
+			"name:\"name\" version:\"version\" org:\"org\" ] with err: %v", expectedErr.Error()), err.Error())
 }
 
 func TestCreateWorkflow_DatabaseError(t *testing.T) {
