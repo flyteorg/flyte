@@ -124,6 +124,25 @@ You can run the workflow locally as follows:
 :lines: 181-188
 ```
 
+## Running a noop task in a conditional
+
+In some cases, you may want to skip the execution of a conditional workflow if a certain condition is not met.
+You can achieve this by using the `echo` task, which simply returns the input value.
+
+:::{note}
+To enable the echo plugin in the backend, add the plugin to Flyte's configuration file.
+```yaml
+task-plugins:
+  enabled-plugins:
+    - echo
+```
+:::
+
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/89bf7bc7788802097904c5f9ffb75ba70ef980a6/examples/advanced_composition/advanced_composition/conditional.py
+:caption: advanced_composition/conditional.py
+:lines: 197-209
+```
+
 ## Run the example on the Flyte cluster
 
 To run the provided workflows on the Flyte cluster, use the following commands:
@@ -168,6 +187,12 @@ pyflyte run --remote \
 pyflyte run --remote \
   https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/conditional.py \
   consume_task_output --radius 0.4 --seed 7
+```
+
+```
+pyflyte run --remote \
+  https://raw.githubusercontent.com/flyteorg/flytesnacks/89bf7bc7788802097904c5f9ffb75ba70ef980a6/examples/advanced_composition/advanced_composition/conditional.py \
+  noop_in_conditional --radius 0.4 --seed 5
 ```
 
 [flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/advanced_composition
