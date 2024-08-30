@@ -552,7 +552,7 @@ pub mod _flyteidl_rust {
     #[pymodule]
     pub mod resources {
         #[pymodule_export]
-        use crate::flyteidl::core::resources::ResourceName;
+        use crate::flyteidl::core::resources::{ResourceEntry, ResourceName};
     }
     #[pymodule]
     pub mod primitive {
