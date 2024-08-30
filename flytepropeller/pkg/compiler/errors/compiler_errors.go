@@ -224,7 +224,7 @@ func NewMismatchingVariablesErr(nodeID, fromVar, fromType, toVar, toType string)
 func NewIDLTypeNotFoundErr(nodeID string) *CompileError {
 	return newError(
 		IDLTypeNotFoundError,
-		"Input is an invalid type, please update all of your Flyte images to the latest version and try again.",
+		"Input type IDL is not found, please update all of your Flyte images to the latest version and try again.",
 		nodeID,
 	)
 }
