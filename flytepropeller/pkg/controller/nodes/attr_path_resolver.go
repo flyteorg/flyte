@@ -68,7 +68,6 @@ func resolveAttrPathInPbStruct(nodeID string, st *structpb.Struct, bindAttrPath 
 
 	currVal = st.AsMap()
 
-	// Turn the current value to a map so it can be resolved more easily
 	for _, attr := range bindAttrPath {
 		switch resolvedVal := currVal.(type) {
 		// map
@@ -217,7 +216,7 @@ func convertStructToLiteral(nodeID string, obj interface{}) (*core.Literal, erro
 	return literal, nil
 }
 
-// convertJSONToLiteral converts the protobuf struct (e.g. dataclass) to literal
+// convertJSONToLiteral converts the JSON (e.g. dataclass) to literal
 func convertJSONToLiteral(nodeID string, obj interface{}) (*core.Literal, error) {
 
 	literal := &core.Literal{}
