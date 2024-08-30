@@ -1,0 +1,3 @@
+admin:
+  endpoint: localhost:30080
+  insecure: true

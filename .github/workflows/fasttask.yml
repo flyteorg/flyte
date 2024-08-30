@@ -40,3 +40,214 @@ jobs:
       - name: Run Unit tests
         run: cargo test
         working-directory: fasttask/worker
+
+  build-single-binary-image:
+    runs-on: ubuntu-latest
+    needs: [lint]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Go Build Cache for Docker
+        uses: actions/cache@v4
+        id: cache
+        with:
+          path: |
+            go-build-cache
+            go-mod-cache
+          key: ${{ runner.os }}-go-cache-${{ hashFiles('**/go.sum') }}
+
+      - name: inject go-build-cache into docker
+        uses: reproducible-containers/buildkit-cache-dance@v3.1.0
+        with:
+          cache-map: |
+            {
+              "go-build-cache": "/root/.cache/go-build",
+              "go-mod-cache": "/root/go/pkg/mod"
+            }
+          skip-extraction: ${{ steps.cache.outputs.cache-hit }}
+
+      - name: Setup destination directories for image tarballs
+        run: |
+          mkdir -p docker/sandbox-bundled/images/tar/amd64
+
+      - name: Build and save
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          file: Dockerfile
+          platforms: linux/amd64
+          tags: flyte-binary:sandbox
+          outputs: type=docker,dest=docker/sandbox-bundled/images/tar/amd64/flyte-binary.tar
+          build-args: |
+            FLYTECONSOLE_VERSION=latest
+            FLYTE_VERSION=latest
+
+      - name: Upload single binary image
+        uses: actions/upload-artifact@v4
+        with:
+          name: single-binary-image
+          path: docker/sandbox-bundled/images/tar
+
+
+  build-sandbox-bundled-image:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    needs: [build-single-binary-image]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: single-binary-image
+          path: docker/sandbox-bundled/images/tar
+
+      - name: Go Build Cache for Docker
+        uses: actions/cache@v4
+        id: cache
+        with:
+          path: |
+            go-build-cache
+            go-mod-cache
+          key: ${{ runner.os }}-go-cache-${{ hashFiles('**/go.sum') }}
+
+      - name: inject go-build-cache into docker
+        uses: reproducible-containers/buildkit-cache-dance@v3.1.0
+        with:
+          cache-map: |
+            {
+              "go-build-cache": "/root/.cache/go-build",
+              "go-mod-cache": "/root/go/pkg/mod"
+            }
+          skip-extraction: ${{ steps.cache.outputs.cache-hit }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: image=moby/buildkit:master
+          buildkitd-flags: "--allow-insecure-entitlement security.insecure"
+
+      - name: Build sandbox image for functional tests
+        uses: docker/build-push-action@v5
+        with:
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          context: docker/sandbox-bundled
+          platforms: linux/amd64
+          load: true
+          allow: "security.insecure"
+          tags: flyte-sandbox-bundled:local
+          outputs: type=docker,dest=flyte-sandbox-bundled.tar
+
+      - name: Upload sandbox image
+        uses: actions/upload-artifact@v4
+        with:
+          name: tars-flyte-sandbox-bundled
+          path: flyte-sandbox-bundled.tar
+
+  build-runtime-image:
+    runs-on: ubuntu-latest
+    needs: [lint]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Rust and UV Cache for Docker
+        uses: actions/cache@v4
+        id: cache
+        with:
+          path: |
+            uv-cache
+            cargo-registry
+            cargo-project-target
+          key: ${{ runner.os }}-uv-cache-${{ hashFiles('fasttask/worker/**') }}
+
+      - name: inject go-build-cache into docker
+        uses: reproducible-containers/buildkit-cache-dance@v3.1.0
+        with:
+          cache-map: |
+            {
+              "uv-cache": "/root/.cache/uv",
+              "cargo-registry": "/root/.cargo/registry",
+              "cargo-project-target": "/home/project/target"
+            }
+          skip-extraction: ${{ steps.cache.outputs.cache-hit }}
+
+      - name: Build and save
+        uses: docker/build-push-action@v5
+        with:
+          context: fasttask/worker
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64
+          tags: localhost:30000/union-python-sdk:latest
+          outputs: type=docker,dest=union-python-sdk.tar
+
+      - name: Upload union-python-sdk image
+        uses: actions/upload-artifact@v4
+        with:
+          name: tars-union-python-sdk
+          path: union-python-sdk.tar
+
+
+  functional-tests:
+    runs-on: ubuntu-latest
+    needs: [build-sandbox-bundled-image, build-runtime-image]
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download union python sdk image
+        uses: actions/download-artifact@v4
+        with:
+          path: tars
+          pattern: tars-*
+          merge-multiple: true
+
+      - name: Load docker images
+        run: |
+          docker image load -i tars/union-python-sdk.tar
+          docker image load -i tars/flyte-sandbox-bundled.tar
+
+      - uses: unionai/flytectl-setup-action@v0.0.3
+      - name: Setup sandbox
+        run: |
+          mkdir -p ~/.flyte/sandbox
+          cat << EOF > ~/.flyte/sandbox/config.yaml
+          task_resources:
+            defaults:
+              cpu: 500m
+              memory: 500Mi
+            limits:
+              cpu: 2
+              memory: 4Gi
+          EOF
+          flytectl demo start --image flyte-sandbox-bundled:local --imagePullPolicy Never
+
+      - name: Upload runtime image for testing
+        run: |
+          docker image push localhost:30000/union-python-sdk:latest
+
+      - name: Set up uv
+        run: |
+          curl -LsSf https://astral.sh/uv/0.3.5/install.sh | sh
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Setup python environment
+        run: |
+          uv pip install --system -r tests-requirements.txt
+        working-directory: fasttask/worker
+
+      - name: Setup python environment
+        run: |
+          pytest functional-tests
+        env:
+          UNION_RUNTIME_TEST_IMAGE: localhost:30000/union-python-sdk:latest
+        working-directory: fasttask/worker

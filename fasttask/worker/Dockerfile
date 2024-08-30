@@ -1,4 +1,4 @@
-#syntax=docker/dockerfile:1.5
+#syntax=docker/dockerfile:1.9
 
 # If you are running with the cache run:
 # docker builder prune --filter type=exec.cachemount
@@ -31,7 +31,7 @@ COPY --from=build /dist /dist
 COPY --from=build /usr/local/bin/uv /usr/local/bin/uv
 
 RUN --mount=type=cache,sharing=locked,mode=0777,target=/root/.cache/uv \
-    uv pip install --system unionai /dist/$(ls /dist) \
+    uv pip install --system union /dist/$(ls /dist) \
     && useradd -u 1000 flytekit \
     && chown flytekit: /root \
     && chown flytekit: /home
