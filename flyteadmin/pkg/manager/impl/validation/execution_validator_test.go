@@ -175,6 +175,43 @@ func TestValidateExecEmptyInputs(t *testing.T) {
 	assert.EqualValues(t, expectedMap, *actualInputs)
 }
 
+func TestValidateExecUnknownIDLInputs(t *testing.T) {
+	unsupportedLiteral := &core.Literal{
+		Value: &core.Literal_Scalar{
+			Scalar: &core.Scalar{},
+		},
+	}
+	defaultInputs := &core.ParameterMap{
+		Parameters: map[string]*core.Parameter{
+			"foo": {
+				Var: &core.Variable{
+					// 1000 means an unsupported type
+					Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: 1000}},
+				},
+				Behavior: &core.Parameter_Default{
+					Default: unsupportedLiteral,
+				},
+			},
+		},
+	}
+	userInputs := &core.LiteralMap{
+		Literals: map[string]*core.Literal{
+			"foo": unsupportedLiteral, // This will lead to a nil inputType
+		},
+	}
+
+	_, err := CheckAndFetchInputsForExecution(
+		userInputs,
+		nil,
+		defaultInputs,
+	)
+	assert.NotNil(t, err)
+
+	expectedErrorMsg := "invalid foo input wrong type.\nExpected simple:1000, but got <nil>.\nSuggested solution: Please update all of your Flyte images to the latest version and try again."
+	assert.Equal(t, expectedErrorMsg, err.Error())
+
+}
+
 func TestValidExecutionId(t *testing.T) {
 	err := CheckValidExecutionID("abcde123", "a")
 	assert.Nil(t, err)
