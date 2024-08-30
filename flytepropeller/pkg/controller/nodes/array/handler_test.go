@@ -3,7 +3,6 @@ package array
 import (
 	"context"
 	"fmt"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -21,6 +20,7 @@ import (
 	execmocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors/mocks"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/catalog"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/errors"
 	gatemocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/gate/mocks"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
