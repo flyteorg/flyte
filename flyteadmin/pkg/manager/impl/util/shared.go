@@ -8,6 +8,7 @@ import (
 	"google.golang.org/grpc/codes"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common/naming"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/shared"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/validation"
@@ -25,7 +26,7 @@ func GetExecutionName(request admin.ExecutionCreateRequest) string {
 	if request.Name != "" {
 		return request.Name
 	}
-	return common.GetExecutionName(time.Now().UnixNano())
+	return naming.GetExecutionName(time.Now().UnixNano())
 }
 
 func GetTask(ctx context.Context, repo repoInterfaces.Repository, identifier core.Identifier) (

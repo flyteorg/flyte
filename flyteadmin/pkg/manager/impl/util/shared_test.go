@@ -12,8 +12,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/codes"
 
-	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	commonMocks "github.com/flyteorg/flyte/flyteadmin/pkg/common/mocks"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common/naming"
 	flyteAdminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/testutils"
 	managerInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
@@ -42,7 +42,7 @@ func TestPopulateExecutionID(t *testing.T) {
 		Domain:  "domain",
 	})
 	assert.NotEmpty(t, name)
-	assert.Len(t, name, common.ExecutionIDLength)
+	assert.Len(t, name, naming.ExecutionIDLength)
 }
 
 func TestPopulateExecutionID_ExistingName(t *testing.T) {
