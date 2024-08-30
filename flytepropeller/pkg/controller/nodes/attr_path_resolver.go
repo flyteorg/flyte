@@ -145,7 +145,9 @@ func resolveAttrPathInJSON(nodeID string, msgpackBytes []byte, bindAttrPath []*c
 }
 
 // json will automatically convert numbers to float64, so we need to convert it back to int64 if possible
-// convertNumbers recursively converts json.Number to int4 or float646
+// convertNumbers recursively converts json.Number to int64 or float64
+// flytekit can accept int64 as float transformer's input:
+// https://github.com/flyteorg/flytekit/blob/master/flytekit/core/type_engine.py#L1914-L1919
 func convertNumbers(v interface{}) interface{} {
 	switch vv := v.(type) {
 	case map[string]interface{}:
