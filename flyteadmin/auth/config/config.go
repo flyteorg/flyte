@@ -267,6 +267,12 @@ type OpenIDOptions struct {
 	// will look something like https://company.okta.com/oauth2/abcdef123456789/
 	BaseURL config.URL `json:"baseUrl"`
 
+	// Allows discovery to work when the issuer_url reported by upstream is mismatched with baseUrl. This may be the
+	// case with Azure *or* when baseUrl refers to an in-cluster service like https://keycloak/auth/realms/MyRealm but
+	// the issuer is a public ingress address accessible to the OIDC client
+	// Refer to https://github.com/coreos/go-oidc/pull/315 for additional details
+	IssuerURL config.URL `json:"issuerUrl" pflag:",OPTIONAL: Use this issuer URL for request validation rather than baseUrl."`
+
 	// Provides a list of scopes to request from the IDP when authenticating. Default value requests claims that should
 	// be supported by any OIdC server. Refer to https://openid.net/specs/openid-connect-core-1_0.html#ScopeClaims for
 	// a complete list. Other providers might support additional scopes that you can define in a config.
