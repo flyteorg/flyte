@@ -41,6 +41,7 @@ type Input struct {
 	TaskExecutionID      pluginsCore.TaskExecutionID
 	ExtraTemplateVars    []TemplateVar
 	TaskTemplate         *core.TaskTemplate
+	EnableVscode         bool
 }
 
 // Output contains all task logs a plugin generates for a given Input.

@@ -151,6 +151,12 @@ func TestGetLogsForContainerInPod_K8s(t *testing.T) {
 	logPlugin, err := InitializeLogPlugins(&LogConfig{
 		IsKubernetesEnabled: true,
 		KubernetesURL:       "k8s.com",
+		DynamicLogLinks: map[string]tasklog.TemplateLogPlugin{
+			"vscode": {
+				TemplateURIs:  []tasklog.TemplateURI{"vscode://flyteinteractive:{{ .taskConfig.port }}/{{ .podName }}"},
+				MessageFormat: core.TaskLog_JSON,
+			},
+		},
 	})
 	assert.NoError(t, err)
 
@@ -159,6 +165,12 @@ func TestGetLogsForContainerInPod_K8s(t *testing.T) {
 			Containers: []v1.Container{
 				{
 					Name: "ContainerName",
+					Env: []v1.EnvVar{
+						{
+							Name:  flyteEnableVscode,
+							Value: "True",
+						},
+					},
 				},
 			},
 		},
@@ -172,9 +184,9 @@ func TestGetLogsForContainerInPod_K8s(t *testing.T) {
 	}
 	pod.Name = podName
 
-	logs, err := GetLogsForContainerInPod(context.TODO(), logPlugin, dummyTaskExecID(), pod, 0, " Suffix", nil, nil)
+	logs, err := GetLogsForContainerInPod(context.TODO(), logPlugin, dummyTaskExecID(), pod, 0, " Suffix", nil, &core.TaskTemplate{})
 	assert.Nil(t, err)
-	assert.Len(t, logs, 1)
+	assert.Len(t, logs, 2)
 }
 
 func TestGetLogsForContainerInPod_All(t *testing.T) {

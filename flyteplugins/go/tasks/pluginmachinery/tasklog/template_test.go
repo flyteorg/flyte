@@ -489,7 +489,7 @@ func TestTemplateLogPlugin(t *testing.T) {
 		{
 			"flyteinteractive",
 			TemplateLogPlugin{
-				Name:                "vscode",
+				Name:                vscode,
 				DynamicTemplateURIs: []TemplateURI{"vscode://flyteinteractive:{{ .taskConfig.port }}/{{ .podName }}"},
 				MessageFormat:       core.TaskLog_JSON,
 			},
@@ -498,7 +498,7 @@ func TestTemplateLogPlugin(t *testing.T) {
 					PodName: "my-pod-name",
 					TaskTemplate: &core.TaskTemplate{
 						Config: map[string]string{
-							"link_type": "vscode",
+							"link_type": vscode,
 							"port":      "1234",
 						},
 					},
@@ -516,7 +516,7 @@ func TestTemplateLogPlugin(t *testing.T) {
 		{
 			"flyteinteractive - no link_type in task template",
 			TemplateLogPlugin{
-				Name:                "vscode",
+				Name:                vscode,
 				DynamicTemplateURIs: []TemplateURI{"vscode://flyteinteractive:{{ .taskConfig.port }}/{{ .podName }}"},
 				MessageFormat:       core.TaskLog_JSON,
 				DisplayName:         "Flyteinteractive Logs",
@@ -566,4 +566,32 @@ func TestTemplateLogPlugin(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestGetDynamicLogLinkTypes(t *testing.T) {
+	linkTypes := getDynamicLogLinkTypes(Input{})
+	assert.Nil(t, linkTypes)
+
+	linkTypes = getDynamicLogLinkTypes(Input{
+		PodName:      "my-pod-name",
+		TaskTemplate: &core.TaskTemplate{},
+	})
+	assert.Nil(t, linkTypes)
+
+	linkTypes = getDynamicLogLinkTypes(Input{
+		EnableVscode: true,
+		TaskTemplate: &core.TaskTemplate{},
+	})
+	assert.Equal(t, []string{vscode}, linkTypes)
+
+	linkTypes = getDynamicLogLinkTypes(Input{
+		PodName: "my-pod-name",
+		TaskTemplate: &core.TaskTemplate{
+			Config: map[string]string{
+				"link_type": vscode,
+				"port":      "8080",
+			},
+		},
+	})
+	assert.Equal(t, []string{vscode}, linkTypes)
 }

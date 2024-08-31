@@ -3,6 +3,7 @@ package logs
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"time"
 
 	v1 "k8s.io/api/core/v1"
@@ -17,6 +18,7 @@ const (
 	kubernetesLogsDisplayName     = "Kubernetes Logs"
 	cloudwatchLoggingDisplayName  = "Cloudwatch Logs"
 	googleCloudLoggingDisplayName = "Google Cloud Logs"
+	flyteEnableVscode             = "_F_E_VS"
 )
 
 // Internal
@@ -43,6 +45,18 @@ func GetLogsForContainerInPod(ctx context.Context, logPlugin tasklog.Plugin, tas
 	startTime := pod.CreationTimestamp.Unix()
 	finishTime := time.Now().Unix()
 
+	enableVscode := false
+	for _, env := range pod.Spec.Containers[index].Env {
+		if env.Name != flyteEnableVscode {
+			continue
+		}
+		var err error
+		enableVscode, err = strconv.ParseBool(env.Value)
+		if err != nil {
+			logger.Errorf(ctx, "failed to parse %s env var [%s] for pod [%s]", flyteEnableVscode, env.Value, pod.Name)
+		}
+	}
+
 	logs, err := logPlugin.GetTaskLogs(
 		tasklog.Input{
 			PodName:              pod.Name,
@@ -59,6 +73,7 @@ func GetLogsForContainerInPod(ctx context.Context, logPlugin tasklog.Plugin, tas
 			ExtraTemplateVars:    extraLogTemplateVars,
 			TaskTemplate:         taskTemplate,
 			HostName:             pod.Spec.Hostname,
+			EnableVscode:         enableVscode,
 		},
 	)
 

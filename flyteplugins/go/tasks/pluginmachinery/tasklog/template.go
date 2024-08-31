@@ -9,6 +9,8 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
+const vscode = "vscode"
+
 func MustCreateRegex(varName string) *regexp.Regexp {
 	return regexp.MustCompile(fmt.Sprintf(`(?i){{\s*[\.$]%s\s*}}`, varName))
 }
@@ -192,17 +194,23 @@ func (input Input) templateVars() []TemplateVar {
 	return vars
 }
 
-func getDynamicLogLinkTypes(taskTemplate *core.TaskTemplate) []string {
-	if taskTemplate == nil {
+func getDynamicLogLinkTypes(input Input) []string {
+	if input.TaskTemplate == nil {
 		return nil
 	}
-	config := taskTemplate.GetConfig()
+
+	var dynamicLogLinkTypes []string
+	if input.EnableVscode {
+		dynamicLogLinkTypes = []string{vscode}
+	}
+
+	config := input.TaskTemplate.GetConfig()
 	if config == nil {
-		return nil
+		return dynamicLogLinkTypes
 	}
 	linkType := config["link_type"]
 	if linkType == "" {
-		return nil
+		return dynamicLogLinkTypes
 	}
 	return strings.Split(linkType, ",")
 }
@@ -218,7 +226,7 @@ func (p TemplateLogPlugin) GetTaskLogs(input Input) (Output, error) {
 		})
 	}
 
-	for _, dynamicLogLinkType := range getDynamicLogLinkTypes(input.TaskTemplate) {
+	for _, dynamicLogLinkType := range getDynamicLogLinkTypes(input) {
 		for _, dynamicTemplateURI := range p.DynamicTemplateURIs {
 			if p.Name == dynamicLogLinkType {
 				for _, match := range taskConfigVarRegex.FindAllStringSubmatch(dynamicTemplateURI, -1) {
