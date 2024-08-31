@@ -56,7 +56,7 @@ Enable the sensor agent by adding the following config to the relevant YAML file
         kubectl edit configmap flyte-sandbox-config -n flyte
 
       .. code-block:: yaml
-        :emphasize-lines: 7,11,16
+        :emphasize-lines: 7,11
   
         tasks:
           task-plugins:

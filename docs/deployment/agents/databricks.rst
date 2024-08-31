@@ -139,7 +139,7 @@ Specify agent configuration
           kubectl edit configmap flyte-sandbox-config -n flyte
 
         .. code-block:: yaml
-          :emphasize-lines: 7,12,16
+          :emphasize-lines: 7,12
 
           tasks:
             task-plugins:
@@ -159,7 +159,7 @@ Specify agent configuration
         Edit the relevant YAML file to specify the plugin.
 
         .. code-block:: yaml
-          :emphasize-lines: 7,11,15
+          :emphasize-lines: 7,11
 
           tasks:
             task-plugins:
@@ -178,7 +178,7 @@ Specify agent configuration
     Create a file named ``values-override.yaml`` and add the following config to it:
 
     .. code-block:: yaml
-      :emphasize-lines: 9,14-17
+      :emphasize-lines: 9
 
         enabled_plugins:
           tasks:
