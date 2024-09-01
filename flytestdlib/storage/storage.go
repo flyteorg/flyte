@@ -81,6 +81,9 @@ type RawStore interface {
 	// ReadRaw retrieves a byte array from the Blob store or an error
 	ReadRaw(ctx context.Context, reference DataReference) (io.ReadCloser, error)
 
+	// ReadDirectory retrieves a stow item array from the Blob store or an error
+	ReadDirectory(ctx context.Context, reference DataReference) ([]stow.Item, error)
+
 	// WriteRaw stores a raw byte array.
 	WriteRaw(ctx context.Context, reference DataReference, size int64, opts Options, raw io.Reader) error
 

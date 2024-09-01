@@ -285,6 +285,40 @@ func (s *StowStore) ReadRaw(ctx context.Context, reference DataReference) (io.Re
 	return item.Open()
 }
 
+func (s *StowStore) ReadDirectory(ctx context.Context, reference DataReference) ([]stow.Item, error) {
+	_, containerName, prefix, err := reference.Split()
+	if err != nil {
+		s.metrics.BadReference.Inc(ctx)
+		return nil, err
+	}
+
+	container, err := s.getContainer(ctx, locationIDMain, containerName)
+	if err != nil {
+		return nil, err
+	}
+
+	var items []stow.Item
+	cursor := stow.CursorStart
+
+	for {
+		// List items with the given prefix
+		pageItems, nextCursor, err := container.Items(prefix, cursor, 100)
+		if err != nil {
+			logger.Errorf(ctx, "failed to list items with prefix: %s", prefix)
+			return nil, err
+		}
+
+		items = append(items, pageItems...)
+
+		if stow.IsCursorEnd(nextCursor) {
+			break
+		}
+		cursor = nextCursor
+	}
+
+	return items, nil
+}
+
 func (s *StowStore) WriteRaw(ctx context.Context, reference DataReference, size int64, opts Options, raw io.Reader) error {
 	_, c, k, err := reference.Split()
 	if err != nil {
