@@ -43,11 +43,11 @@ func ProcessRay(parameters string, app *rayv1.RayJob) error {
 			v1.ResourceCPU:    resource.MustParse("500m"),
 			v1.ResourceMemory: resource.MustParse("512Mi"),
 		}
-		tmp, _ := json.Marshal(res2)
-		meta.Annotations["tmp"] = string(tmp)
-		tmp, _ = json.Marshal(Add(res, res2))
-		meta.Annotations["Sum"] = string(tmp)
-		//res = Add(res, res2)
+		//tmp, _ := json.Marshal(res2)
+		//meta.Annotations["tmp"] = string(tmp)
+		//tmp, _ = json.Marshal(Add(res, res2))
+		//meta.Annotations["Sum"] = string(tmp)
+		res = Add(res, res2)
 	}
 	TaskGroups[0] = TaskGroup{
 		Name:                      headName,
