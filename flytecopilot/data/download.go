@@ -11,7 +11,6 @@ import (
 	"path/filepath"
 	"reflect"
 	"strconv"
-	"strings"
 
 	"github.com/ghodss/yaml"
 	"github.com/golang/protobuf/jsonpb"
@@ -37,96 +36,77 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 	ref := storage.DataReference(blob.Uri)
 	scheme, _, _, err := ref.Split()
 	if err != nil {
-		return nil, errors.Wrapf(err, "Blob uri incorrectly formatted: %s", blob.Uri)
+		return nil, errors.Wrapf(err, "Blob uri incorrectly formatted")
 	}
 
 	// Handle multipart blob
 	if blob.GetMetadata().GetType().Dimensionality == core.BlobType_MULTIPART {
-		items, err := d.store.ReadDirectory(ctx, ref)
+		err = os.Mkdir(toPath, os.ModePerm)
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed to list parts for multipart blob [%s]", ref)
+			logger.Errorf(ctx, "failed to create directories for path %s: %v", toPath, err)
+			return nil, err
+		}
+		parts, err := d.store.ReadParts(ctx, ref)
+		if err != nil {
+			logger.Errorf(ctx, "failed to read parts for multipart blob [%s]", ref)
+			return nil, err
 		}
 
-		if len(items) == 0 {
-			return nil, errors.Errorf("no parts found for multipart blob [%s]", ref)
+		// Recursively processes all subparts within the directory
+		for _, relativePath := range parts {
+			joinPath := filepath.Join(toPath, relativePath)
+
+			// Check subpart's type
+			dim := core.BlobType_SINGLE
+			isMultiPart, err := d.store.IsMultiPart(ctx, storage.DataReference(joinPath))
+			if err != nil {
+				logger.Errorf(ctx, "failed to check type for part [%s] in multipart blob [%s]", relativePath, ref)
+				continue
+			}
+			if isMultiPart {
+				dim = core.BlobType_MULTIPART
+			}
+			d.handleBlob(ctx, &core.Blob{Metadata: &core.BlobMetadata{Type: &core.BlobType{Dimensionality: dim}}, Uri: joinPath}, joinPath)
 		}
-
-		for _, item := range items {
-			// Get relative path
-			relativePath := strings.TrimPrefix(item.URL().Path, ref.String())
-			relativePath = strings.TrimPrefix(relativePath, "/") // ensure no leading slash
-
-			// Construct local file path
-			destPath := filepath.Join(toPath, relativePath)
-
-			// Create necessary directories
-			err = os.MkdirAll(filepath.Dir(destPath), os.ModePerm)
-			if err != nil {
-				logger.Errorf(ctx, "failed to create directories for path %s: %v", destPath, err)
-				continue
-			}
-
-			// Download part
-			partReader, err := item.Open()
-			if err != nil {
-				logger.Errorf(ctx, "failed to open item %s: %v", item.ID(), err)
-				continue
-			}
-
-			// Create local file
-			partWriter, err := os.Create(destPath)
-			if err != nil {
-				logger.Errorf(ctx, "failed to create file at path %s: %v", destPath, err)
-				partReader.Close()
-				continue
-			}
-
-			// Copy content
-			_, err = io.Copy(partWriter, partReader)
-			if err != nil {
-				logger.Errorf(ctx, "failed to write to file %s: %v", destPath, err)
-			}
-
-			// Close readers and writers
-			partReader.Close()
-			partWriter.Close()
-
-			logger.Infof(ctx, "Successfully downloaded part to [%s]", destPath)
-		}
-
-		logger.Infof(ctx, "Successfully downloaded all parts of multipart blob [%s] to directory [%s]", ref, toPath)
 		return toPath, nil
 	}
-
 	var reader io.ReadCloser
 	if scheme == "http" || scheme == "https" {
 		reader, err = DownloadFileFromHTTP(ctx, ref)
-	} else if blob.GetMetadata().GetType().Dimensionality == core.BlobType_SINGLE {
+	} else {
 		// Handle single part blob
 		reader, err = DownloadFileFromStorage(ctx, ref, d.store)
 	}
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to download blob from ref [%s]", ref)
+		logger.Errorf(ctx, "Failed to download from ref [%s]", ref)
+		return nil, err
 	}
-	defer reader.Close()
+	defer func() {
+		err := reader.Close()
+		if err != nil {
+			logger.Errorf(ctx, "failed to close Blob read stream @ref [%s]. Error: %s", ref, err)
+		}
+	}()
 
 	writer, err := os.Create(toPath)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to create file at path %s", toPath)
+		return nil, errors.Wrapf(err, "failed to open file at path %s", toPath)
 	}
-	defer writer.Close()
-
-	bytesCopied, err := io.Copy(writer, reader)
+	defer func() {
+		err := writer.Close()
+		if err != nil {
+			logger.Errorf(ctx, "failed to close File write stream. Error: %s", err)
+		}
+	}()
+	v, err := io.Copy(writer, reader)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to write blob data to local filesystem")
+		return nil, errors.Wrapf(err, "failed to write remote data to local filesystem")
 	}
-
-	logger.Infof(ctx, "Successfully copied [%d] bytes of blob data from [%s] to [%s]", bytesCopied, ref, toPath)
+	logger.Infof(ctx, "Successfully copied [%d] bytes remote data from [%s] to local [%s]", v, ref, toPath)
 	return toPath, nil
 }
 
 func (d Downloader) handleSchema(ctx context.Context, schema *core.Schema, toFilePath string) (interface{}, error) {
-	// TODO Handle schema type
 	return d.handleBlob(ctx, &core.Blob{Uri: schema.Uri, Metadata: &core.BlobMetadata{Type: &core.BlobType{Dimensionality: core.BlobType_MULTIPART}}}, toFilePath)
 }
 

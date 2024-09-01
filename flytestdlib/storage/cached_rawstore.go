@@ -5,6 +5,7 @@ import (
 	"context"
 	"io"
 	"runtime/debug"
+	"strings"
 	"time"
 
 	"github.com/coocood/freecache"
@@ -86,6 +87,27 @@ func (s *cachedRawStore) ReadRaw(ctx context.Context, reference DataReference) (
 	}
 
 	return ioutils.NewBytesReadCloser(b), err
+}
+
+func (s *cachedRawStore) IsMultiPart(ctx context.Context, reference DataReference) (bool, error) {
+	// Check in the cache first
+	key := []byte(reference)
+	if _, err := s.cache.Get(key); err == nil {
+		if strings.HasSuffix(reference.String(), "/") {
+			// If the reference ends with '/', it might indicate a directory (multipart blob)
+			return true, nil
+		}
+		// Alternatively, you could parse oRaw to see if it contains metadata indicating a multipart blob
+		return false, nil
+	}
+
+	// If not in cache, check the underlying RawStore
+	return s.RawStore.IsMultiPart(ctx, reference)
+}
+
+func (s *cachedRawStore) ReadParts(ctx context.Context, reference DataReference) ([]string, error) {
+	// Cache might not have individual parts, so we rely on the underlying RawStore
+	return s.RawStore.ReadParts(ctx, reference)
 }
 
 // WriteRaw stores a raw byte array.

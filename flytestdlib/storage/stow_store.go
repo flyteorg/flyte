@@ -285,7 +285,34 @@ func (s *StowStore) ReadRaw(ctx context.Context, reference DataReference) (io.Re
 	return item.Open()
 }
 
-func (s *StowStore) ReadDirectory(ctx context.Context, reference DataReference) ([]stow.Item, error) {
+func (s *StowStore) IsMultiPart(ctx context.Context, reference DataReference) (bool, error) {
+	_, containerName, prefix, err := reference.Split()
+	if err != nil {
+		s.metrics.BadReference.Inc(ctx)
+		return false, err
+	}
+
+	container, err := s.getContainer(ctx, locationIDMain, containerName)
+	if err != nil {
+		return false, err
+	}
+
+	cursor := stow.CursorStart
+
+	pageItems, _, err := container.Items(prefix, cursor, 100)
+	if err != nil {
+		logger.Errorf(ctx, "failed to list items with prefix: %s", prefix)
+		return false, err
+	}
+
+	if len(pageItems) == 0 {
+		return false, nil
+	} else {
+		return true, nil
+	}
+}
+
+func (s *StowStore) ReadParts(ctx context.Context, reference DataReference) ([]string, error) {
 	_, containerName, prefix, err := reference.Split()
 	if err != nil {
 		s.metrics.BadReference.Inc(ctx)
@@ -297,7 +324,7 @@ func (s *StowStore) ReadDirectory(ctx context.Context, reference DataReference) 
 		return nil, err
 	}
 
-	var items []stow.Item
+	var parts []string
 	cursor := stow.CursorStart
 
 	for {
@@ -308,7 +335,10 @@ func (s *StowStore) ReadDirectory(ctx context.Context, reference DataReference) 
 			return nil, err
 		}
 
-		items = append(items, pageItems...)
+		for _, item := range pageItems {
+			part := item.URL().String()
+			parts = append(parts, part)
+		}
 
 		if stow.IsCursorEnd(nextCursor) {
 			break
@@ -316,7 +346,7 @@ func (s *StowStore) ReadDirectory(ctx context.Context, reference DataReference) 
 		cursor = nextCursor
 	}
 
-	return items, nil
+	return parts, nil
 }
 
 func (s *StowStore) WriteRaw(ctx context.Context, reference DataReference, size int64, opts Options, raw io.Reader) error {

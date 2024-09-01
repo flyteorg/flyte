@@ -9,6 +9,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"strings"
 )
 
 type rawFile = []byte
@@ -60,6 +61,33 @@ func (s *InMemoryStore) ReadRaw(ctx context.Context, reference DataReference) (i
 	}
 
 	return nil, os.ErrNotExist
+}
+
+func (s *InMemoryStore) IsMultiPart(ctx context.Context, reference DataReference) (bool, error) {
+	// Iterate over all keys in the cache to see if any key starts with "reference/"
+	for key := range s.cache {
+		if strings.HasPrefix(key.String(), string(reference)+"/") {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
+func (s *InMemoryStore) ReadParts(ctx context.Context, reference DataReference) ([]string, error) {
+	var parts []string
+	prefix := string(reference) + "/"
+
+	for key := range s.cache {
+		if strings.HasPrefix(key.String(), prefix) {
+			parts = append(parts, key.String())
+		}
+	}
+
+	if len(parts) == 0 {
+		return nil, os.ErrNotExist
+	}
+
+	return parts, nil
 }
 
 // Delete removes the referenced data from the cache map.
