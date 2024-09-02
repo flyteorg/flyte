@@ -162,6 +162,27 @@ func MakeGenericLiteral(v *structpb.Struct) *core.Literal {
 		}}
 }
 
+func MakeLiteralForTuple(name string, v map[string]interface{}) (*core.Literal, error) {
+	literals := make(map[string]*core.Literal, len(v))
+	for key, val := range v {
+		l, err := MakeLiteral(val)
+		if err != nil {
+			return nil, err
+		}
+
+		literals[key] = l
+	}
+
+	return &core.Literal{
+		Value: &core.Literal_Tuple{
+			Tuple: &core.LiteralTupleMap{
+				TupleName: name,
+				Literals: literals,
+			},
+		},
+	}, nil
+}
+
 func MakeLiteral(v interface{}) (*core.Literal, error) {
 	if v == nil {
 		return &core.Literal{
@@ -180,6 +201,15 @@ func MakeLiteral(v interface{}) (*core.Literal, error) {
 	case []interface{}:
 		return MakeLiteralForCollection(o)
 	case map[string]interface{}:
+		// if tuple_name and fields in the map, seen it as tuple
+		if len(o) == 2 {
+			tupleName, hasTupleName := o["tuple_name"].(string)
+			fields, hasFields := o["fields"].(map[string]interface{})
+		
+			if hasTupleName && hasFields {
+				return MakeLiteralForTuple(tupleName, fields)
+			}
+		}
 		return MakeLiteralForMap(o)
 	case []byte:
 		return MakeBinaryLiteral(v.([]byte)), nil
@@ -321,6 +351,8 @@ func MakeDefaultLiteralForType(typ *core.LiteralType) (*core.Literal, error) {
 			},
 		}
 		return res, nil
+	case *core.LiteralType_TupleType:
+		return MakeLiteralForType(typ, nil)
 	}
 
 	return nil, fmt.Errorf("failed to convert to a known Literal. Input Type [%v] not supported", typ.String())
@@ -636,6 +668,47 @@ func MakeLiteralForType(t *core.LiteralType, v interface{}) (*core.Literal, erro
 		if !found {
 			return nil, fmt.Errorf("incorrect union value [%s], supported values %+v", v, newT.UnionType.Variants)
 		}
+
+	case *core.LiteralType_TupleType:
+        // TO_DISCUSS: How to handle the tuple interface in Inputs field of flytectl?
+        // 
+        // [Example usage]
+        // inputs:
+        //     tuple_data:
+        //         key1: "foo"
+		//         key2: 123
+
+        vMap, ok := v.(map[string]interface{})
+        if !ok {
+            return nil, errors.Errorf("Expected a map[string]interface{} for tuple type, got [%v]", v)
+        }
+		// check whether all the key provided by vMap is valid.
+		for key := range vMap {
+			if _, ok := t.GetTupleType().Fields[key]; !ok {
+				return nil, fmt.Errorf("key %s not found in tuple type", key)
+			}
+		}
+
+		literals := make(map[string]*core.Literal, len(vMap))
+		// iterate over the fields in the tuple type
+		for key, fieldType := range t.GetTupleType().Fields {
+			l, err := MakeLiteralForType(fieldType, vMap[key])
+			if err != nil {
+				return nil, err
+			}
+			literals[key] = l
+		}
+		l = &core.Literal{
+			Value: &core.Literal_Tuple{
+				Tuple: &core.LiteralTupleMap{
+					TupleName: t.GetTupleType().TupleName,
+					Literals: literals,
+				},
+			},
+		}
+
+		return l, nil
+		
 
 	default:
 		return nil, fmt.Errorf("unsupported type %s", t.String())

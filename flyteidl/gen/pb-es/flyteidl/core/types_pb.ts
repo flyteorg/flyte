@@ -487,6 +487,52 @@ export class UnionType extends Message<UnionType> {
 }
 
 /**
+ * Defines a named tuple type
+ * TODO: Add more docs
+ *
+ * @generated from message flyteidl.core.TupleType
+ */
+export class TupleType extends Message<TupleType> {
+  /**
+   * @generated from field: string tuple_name = 1;
+   */
+  tupleName = "";
+
+  /**
+   * @generated from field: map<string, flyteidl.core.LiteralType> fields = 2;
+   */
+  fields: { [key: string]: LiteralType } = {};
+
+  constructor(data?: PartialMessage<TupleType>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.core.TupleType";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "tuple_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "fields", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: LiteralType} },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TupleType {
+    return new TupleType().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): TupleType {
+    return new TupleType().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): TupleType {
+    return new TupleType().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: TupleType | PlainMessage<TupleType> | undefined, b: TupleType | PlainMessage<TupleType> | undefined): boolean {
+    return proto3.util.equals(TupleType, a, b);
+  }
+}
+
+/**
  * Hints to improve type matching
  * e.g. allows distinguishing output from custom type transformers
  * even if the underlying IDL serialization matches.
@@ -655,6 +701,14 @@ export class LiteralType extends Message<LiteralType> {
      */
     value: UnionType;
     case: "unionType";
+  } | {
+    /**
+     * Defines a named tuple type
+     *
+     * @generated from field: flyteidl.core.TupleType tuple_type = 12;
+     */
+    value: TupleType;
+    case: "tupleType";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   /**
@@ -696,6 +750,7 @@ export class LiteralType extends Message<LiteralType> {
     { no: 7, name: "enum_type", kind: "message", T: EnumType, oneof: "type" },
     { no: 8, name: "structured_dataset_type", kind: "message", T: StructuredDatasetType, oneof: "type" },
     { no: 10, name: "union_type", kind: "message", T: UnionType, oneof: "type" },
+    { no: 12, name: "tuple_type", kind: "message", T: TupleType, oneof: "type" },
     { no: 6, name: "metadata", kind: "message", T: Struct },
     { no: 9, name: "annotation", kind: "message", T: TypeAnnotation },
     { no: 11, name: "structure", kind: "message", T: TypeStructure },

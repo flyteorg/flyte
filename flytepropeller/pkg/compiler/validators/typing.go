@@ -241,6 +241,26 @@ func (t unionTypeChecker) CastsFrom(upstreamType *flyte.LiteralType) bool {
 	return foundOne
 }
 
+type tupleTypeChecker struct {
+	literalType *flyte.LiteralType
+}
+
+func (t tupleTypeChecker) CastsFrom(upstreamType *flyte.LiteralType) bool {
+	tupleType := t.literalType.GetTupleType()
+	upstreamTupleType := upstreamType.GetTupleType()
+	if upstreamTupleType != nil {
+		if (len(upstreamTupleType.GetFields()) == len(tupleType.GetFields()) && upstreamTupleType.GetTupleName() == tupleType.GetTupleName()) {
+			for k, downstreamType := range tupleType.GetFields() {
+				if upstreamFieldType, ok := upstreamTupleType.GetFields()[k]; !ok || !getTypeChecker(downstreamType).CastsFrom(upstreamFieldType) {
+					return false
+				}
+			}
+			return true
+		}
+	}
+	return false
+}
+
 // Upstream (structuredDatasetType) -> downstream (structuredDatasetType)
 func structuredDatasetCastFromStructuredDataset(upstream *flyte.StructuredDatasetType, downstream *flyte.StructuredDatasetType) bool {
 	// Skip the format check here when format is empty. https://github.com/flyteorg/flyte/issues/2864
@@ -367,6 +387,10 @@ func getTypeChecker(t *flyte.LiteralType) typeChecker {
 		}
 	case *flyte.LiteralType_StructuredDatasetType:
 		return structuredDatasetChecker{
+			literalType: t,
+		}
+	case *flyte.LiteralType_TupleType:
+		return tupleTypeChecker{
 			literalType: t,
 		}
 	default:

@@ -102,6 +102,9 @@ message Literal {
 
         // A map of strings to literals.
         LiteralMap map = 3;
+
+        // A field for tuple literal.
+        LiteralTupleMap tuple = 8;
     }
 
     // A hash representing this literal.
@@ -129,6 +132,12 @@ message LiteralMap {
     map<string, Literal> literals = 1;
 }
 
+// A collection of fields for tuple literal.
+message LiteralTupleMap {
+    string tuple_name = 1;
+    map<string, Literal> literals = 2;
+}
+
 // A collection of BindingData items.
 message BindingDataCollection {
     repeated BindingData bindings = 1;
@@ -137,6 +146,12 @@ message BindingDataCollection {
 // A map of BindingData items.
 message BindingDataMap {
     map<string, BindingData> bindings = 1;
+}
+
+// A collection of fields for tuple binding data.
+message BindingDataTupleMap {
+    string tuple_name = 1;
+    map<string, BindingData> bindings = 2;
 }
 
 message UnionInfo {
@@ -158,6 +173,9 @@ message BindingData {
 
         // A map of bindings. The key is always a string.
         BindingDataMap map = 4;
+
+        // A field for tuple binding data.
+        BindingDataTupleMap tuple = 6;
     }
 
     UnionInfo union = 5;

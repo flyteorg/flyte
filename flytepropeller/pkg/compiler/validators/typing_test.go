@@ -948,3 +948,338 @@ func TestBlobCasting(t *testing.T) {
 		assert.False(t, castable, "Blob is not nullable")
 	})
 }
+
+func TestTupleCasting(t *testing.T) {
+	t.Run("BaseCase_GenericTuple", func(t *testing.T) {
+		castable := AreTypesCastable(
+			&core.LiteralType{
+				Type: &core.LiteralType_TupleType{
+					TupleType: &core.TupleType{
+						TupleName: "DefaultTupleName",
+						Fields: map[string]*core.LiteralType{
+							"int_field": {
+								Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER},
+							},
+							"str_field": {
+								Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING},
+							},
+							"float_field": {
+								Type: &core.LiteralType_Simple{Simple: core.SimpleType_FLOAT},
+							},
+							"tuple_field": {
+								Type: &core.LiteralType_TupleType{
+									TupleType: &core.TupleType{
+										TupleName: "NestedTuple",
+										Fields: map[string]*core.LiteralType{
+											"nested_int_field": {
+												Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			&core.LiteralType{
+				Type: &core.LiteralType_TupleType{
+					TupleType: &core.TupleType{
+						TupleName: "DefaultTupleName",
+						Fields: map[string]*core.LiteralType{
+							"int_field": {
+								Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER},
+							},
+							"str_field": {
+								Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING},
+							},
+							"float_field": {
+								Type: &core.LiteralType_Simple{Simple: core.SimpleType_FLOAT},
+							},
+							"tuple_field": {
+								Type: &core.LiteralType_TupleType{
+									TupleType: &core.TupleType{
+										TupleName: "NestedTuple",
+										Fields: map[string]*core.LiteralType{
+											"nested_int_field": {
+												Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		)
+		assert.True(t, castable, "Tuple() should be castable to Tuple()")
+	})
+
+	t.Run("TupleFieldKeyNameMismatch", func(t *testing.T) {
+		castable := AreTypesCastable(
+			&core.LiteralType{
+				Type: &core.LiteralType_TupleType{
+					TupleType: &core.TupleType{
+						TupleName: "DefaultTupleName",
+						Fields: map[string]*core.LiteralType{
+							// key mismatch
+							"int_field_foo": {
+								Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER},
+							},
+							"str_field": {
+								Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING},
+							},
+							"float_field": {
+								Type: &core.LiteralType_Simple{Simple: core.SimpleType_FLOAT},
+							},
+							"tuple_field": {
+								Type: &core.LiteralType_TupleType{
+									TupleType: &core.TupleType{
+										TupleName: "NestedTuple",
+										Fields: map[string]*core.LiteralType{
+											"nested_int_field": {
+												Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			&core.LiteralType{
+				Type: &core.LiteralType_TupleType{
+					TupleType: &core.TupleType{
+						TupleName: "DefaultTupleName",
+						Fields: map[string]*core.LiteralType{
+							"int_field_bar": {
+								Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER},
+							},
+							"str_field": {
+								Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING},
+							},
+							"float_field": {
+								Type: &core.LiteralType_Simple{Simple: core.SimpleType_FLOAT},
+							},
+							"tuple_field": {
+								Type: &core.LiteralType_TupleType{
+									TupleType: &core.TupleType{
+										TupleName: "NestedTuple",
+										Fields: map[string]*core.LiteralType{
+											"nested_int_field": {
+												Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		)
+		assert.False(t, castable, "Tuple() should not be castable to Tuple() with key mismatch")
+	})
+	
+	t.Run("TupleFieldTypeMismatch", func(t *testing.T) {
+		castable := AreTypesCastable(
+			&core.LiteralType{
+				Type: &core.LiteralType_TupleType{
+					TupleType: &core.TupleType{
+						TupleName: "DefaultTupleName",
+						Fields: map[string]*core.LiteralType{
+							"int_field": {
+								Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER},
+							},
+							"str_field": {
+								Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING},
+							},
+							"float_field": {
+								Type: &core.LiteralType_Simple{Simple: core.SimpleType_FLOAT},
+							},
+							"tuple_field": {
+								Type: &core.LiteralType_TupleType{
+									TupleType: &core.TupleType{
+										TupleName: "NestedTuple",
+										Fields: map[string]*core.LiteralType{
+											"nested_int_field": {
+												Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			&core.LiteralType{
+				Type: &core.LiteralType_TupleType{
+					TupleType: &core.TupleType{
+						TupleName: "DefaultTupleName",
+						Fields: map[string]*core.LiteralType{
+							"int_field": {
+								// Type mismatch
+								Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING},
+							},
+							"str_field": {
+								Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING},
+							},
+							"float_field": {
+								Type: &core.LiteralType_Simple{Simple: core.SimpleType_FLOAT},
+							},
+							"tuple_field": {
+								Type: &core.LiteralType_TupleType{
+									TupleType: &core.TupleType{
+										TupleName: "NestedTuple",
+										Fields: map[string]*core.LiteralType{
+											"nested_int_field": {
+												Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		)
+		assert.False(t, castable, "Tuple() should not be castable to Tuple() with field type mismatch")
+	})
+
+	t.Run("TupleFieldsNumberMismatch", func(t *testing.T) {
+		castable := AreTypesCastable(
+			&core.LiteralType{
+				Type: &core.LiteralType_TupleType{
+					TupleType: &core.TupleType{
+						TupleName: "DefaultTupleName",
+						Fields: map[string]*core.LiteralType{
+							"int_field": {
+								Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER},
+							},
+							"str_field": {
+								Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING},
+							},
+							"float_field": {
+								Type: &core.LiteralType_Simple{Simple: core.SimpleType_FLOAT},
+							},
+							"tuple_field": {
+								Type: &core.LiteralType_TupleType{
+									TupleType: &core.TupleType{
+										TupleName: "NestedTuple",
+										Fields: map[string]*core.LiteralType{
+											"nested_int_field": {
+												Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			&core.LiteralType{
+				Type: &core.LiteralType_TupleType{
+					TupleType: &core.TupleType{
+						TupleName: "DefaultTupleName",
+						Fields: map[string]*core.LiteralType{
+							// missing int_field
+							"str_field": {
+								Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING},
+							},
+							"float_field": {
+								Type: &core.LiteralType_Simple{Simple: core.SimpleType_FLOAT},
+							},
+							"tuple_field": {
+								Type: &core.LiteralType_TupleType{
+									TupleType: &core.TupleType{
+										TupleName: "NestedTuple",
+										Fields: map[string]*core.LiteralType{
+											"nested_int_field": {
+												Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		)
+		assert.False(t, castable, "Tuple() should not be castable to Tuple() with fields num mismatch")
+	})
+	
+	t.Run("TupleNameMismatch", func(t *testing.T) {
+		castable := AreTypesCastable(
+			&core.LiteralType{
+				Type: &core.LiteralType_TupleType{
+					TupleType: &core.TupleType{
+						// TupleName mismatch
+						TupleName: "FooTupleName",
+						Fields: map[string]*core.LiteralType{
+							"int_field": {
+								Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER},
+							},
+							"str_field": {
+								Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING},
+							},
+							"float_field": {
+								Type: &core.LiteralType_Simple{Simple: core.SimpleType_FLOAT},
+							},
+							"tuple_field": {
+								Type: &core.LiteralType_TupleType{
+									TupleType: &core.TupleType{
+										TupleName: "NestedTuple",
+										Fields: map[string]*core.LiteralType{
+											"nested_int_field": {
+												Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			&core.LiteralType{
+				Type: &core.LiteralType_TupleType{
+					TupleType: &core.TupleType{
+						TupleName: "DefaultTupleName",
+						Fields: map[string]*core.LiteralType{
+							"int_field": {
+								Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER},
+							},
+							"str_field": {
+								Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING},
+							},
+							"float_field": {
+								Type: &core.LiteralType_Simple{Simple: core.SimpleType_FLOAT},
+							},
+							"tuple_field": {
+								Type: &core.LiteralType_TupleType{
+									TupleType: &core.TupleType{
+										TupleName: "NestedTuple",
+										Fields: map[string]*core.LiteralType{
+											"nested_int_field": {
+												Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		)
+		assert.False(t, castable, "Tuple() should not be castable to Tuple() with tuple name mismatch")
+	})
+	
+	
+}

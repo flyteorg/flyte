@@ -566,6 +566,14 @@ export class Literal extends Message<Literal> {
      */
     value: LiteralMap;
     case: "map";
+  } | {
+    /**
+     * A field for tuple literal.
+     *
+     * @generated from field: flyteidl.core.LiteralTupleMap tuple = 8;
+     */
+    value: LiteralTupleMap;
+    case: "tuple";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   /**
@@ -609,6 +617,7 @@ export class Literal extends Message<Literal> {
     { no: 1, name: "scalar", kind: "message", T: Scalar, oneof: "value" },
     { no: 2, name: "collection", kind: "message", T: LiteralCollection, oneof: "value" },
     { no: 3, name: "map", kind: "message", T: LiteralMap, oneof: "value" },
+    { no: 8, name: "tuple", kind: "message", T: LiteralTupleMap, oneof: "value" },
     { no: 4, name: "hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 5, name: "metadata", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
     { no: 6, name: "uri", kind: "scalar", T: 9 /* ScalarType.STRING */ },
@@ -711,6 +720,51 @@ export class LiteralMap extends Message<LiteralMap> {
 }
 
 /**
+ * A collection of fields for tuple literal.
+ *
+ * @generated from message flyteidl.core.LiteralTupleMap
+ */
+export class LiteralTupleMap extends Message<LiteralTupleMap> {
+  /**
+   * @generated from field: string tuple_name = 1;
+   */
+  tupleName = "";
+
+  /**
+   * @generated from field: map<string, flyteidl.core.Literal> literals = 2;
+   */
+  literals: { [key: string]: Literal } = {};
+
+  constructor(data?: PartialMessage<LiteralTupleMap>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.core.LiteralTupleMap";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "tuple_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "literals", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: Literal} },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): LiteralTupleMap {
+    return new LiteralTupleMap().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): LiteralTupleMap {
+    return new LiteralTupleMap().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): LiteralTupleMap {
+    return new LiteralTupleMap().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: LiteralTupleMap | PlainMessage<LiteralTupleMap> | undefined, b: LiteralTupleMap | PlainMessage<LiteralTupleMap> | undefined): boolean {
+    return proto3.util.equals(LiteralTupleMap, a, b);
+  }
+}
+
+/**
  * A collection of BindingData items.
  *
  * @generated from message flyteidl.core.BindingDataCollection
@@ -785,6 +839,51 @@ export class BindingDataMap extends Message<BindingDataMap> {
 
   static equals(a: BindingDataMap | PlainMessage<BindingDataMap> | undefined, b: BindingDataMap | PlainMessage<BindingDataMap> | undefined): boolean {
     return proto3.util.equals(BindingDataMap, a, b);
+  }
+}
+
+/**
+ * A collection of fields for tuple binding data.
+ *
+ * @generated from message flyteidl.core.BindingDataTupleMap
+ */
+export class BindingDataTupleMap extends Message<BindingDataTupleMap> {
+  /**
+   * @generated from field: string tuple_name = 1;
+   */
+  tupleName = "";
+
+  /**
+   * @generated from field: map<string, flyteidl.core.BindingData> bindings = 2;
+   */
+  bindings: { [key: string]: BindingData } = {};
+
+  constructor(data?: PartialMessage<BindingDataTupleMap>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.core.BindingDataTupleMap";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "tuple_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "bindings", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: BindingData} },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): BindingDataTupleMap {
+    return new BindingDataTupleMap().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): BindingDataTupleMap {
+    return new BindingDataTupleMap().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): BindingDataTupleMap {
+    return new BindingDataTupleMap().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: BindingDataTupleMap | PlainMessage<BindingDataTupleMap> | undefined, b: BindingDataTupleMap | PlainMessage<BindingDataTupleMap> | undefined): boolean {
+    return proto3.util.equals(BindingDataTupleMap, a, b);
   }
 }
 
@@ -867,6 +966,14 @@ export class BindingData extends Message<BindingData> {
      */
     value: BindingDataMap;
     case: "map";
+  } | {
+    /**
+     * A field for tuple binding data.
+     *
+     * @generated from field: flyteidl.core.BindingDataTupleMap tuple = 6;
+     */
+    value: BindingDataTupleMap;
+    case: "tuple";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   /**
@@ -886,6 +993,7 @@ export class BindingData extends Message<BindingData> {
     { no: 2, name: "collection", kind: "message", T: BindingDataCollection, oneof: "value" },
     { no: 3, name: "promise", kind: "message", T: OutputReference, oneof: "value" },
     { no: 4, name: "map", kind: "message", T: BindingDataMap, oneof: "value" },
+    { no: 6, name: "tuple", kind: "message", T: BindingDataTupleMap, oneof: "value" },
     { no: 5, name: "union", kind: "message", T: UnionInfo },
   ]);
 

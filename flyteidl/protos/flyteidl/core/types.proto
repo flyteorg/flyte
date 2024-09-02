@@ -108,6 +108,13 @@ message UnionType {
     repeated LiteralType variants = 1;
 }
 
+// Defines a named tuple type
+// TODO: Add more docs
+message TupleType {
+    string tuple_name = 1;
+    map<string, LiteralType> fields = 2;
+}
+
 // Hints to improve type matching
 // e.g. allows distinguishing output from custom type transformers
 // even if the underlying IDL serialization matches.
@@ -154,6 +161,9 @@ message LiteralType {
 
         // Defines an union type with pre-defined LiteralTypes.
         UnionType union_type = 10;
+
+        // Defines a named tuple type
+        TupleType tuple_type = 12;
     }
 
     // This field contains type metadata that is descriptive of the type, but is NOT considered in type-checking.  This might be used by

@@ -49,6 +49,20 @@ func LiteralToBinding(l *core.Literal) *core.BindingData {
 				},
 			},
 		}
+	case *core.Literal_Tuple:
+		x := make(map[string]*core.BindingData, len(l.GetTuple().Literals))
+		for key, val := range l.GetTuple().Literals {
+			x[key] = LiteralToBinding(val)
+		}
+
+		return &core.BindingData{
+			Value: &core.BindingData_Tuple{
+				Tuple: &core.BindingDataTupleMap{
+					TupleName: l.GetTuple().TupleName,
+					Bindings: x,
+				},
+			},
+		}
 	}
 
 	return nil
@@ -1324,4 +1338,252 @@ func TestValidateBindings(t *testing.T) {
 			assert.NoError(t, compileErrors)
 		}
 	})
+
+	t.Run("Tuple", func(t *testing.T) {
+		wf := &mocks.WorkflowBuilder{}
+		n := &mocks.NodeBuilder{}
+		n.OnGetId().Return("node1")
+
+		bindings := []*core.Binding{
+			{
+				Var: "x",
+				Binding: LiteralToBinding(coreutils.MustMakeLiteral(
+					map[string]interface{}{
+						"tuple_name": "DefaultNamedTuple",
+						"fields": map[string]interface{}{
+							"int": 5,
+							"str": "foo",
+							"collection": []interface{}{1, 2, 3},
+							"map": map[string]interface{}{
+								"key": "value",
+							},
+							"tuple": map[string]interface{}{
+								"tuple_name": "DefaultNamedTuple",
+								"fields": map[string]interface{}{
+									"int": 5,
+									"str": "foo",
+									"collection": []interface{}{1, 2, 3},
+									"map": map[string]interface{}{
+										"key": "value",
+									},
+								},
+							},
+						},
+					},
+				)),
+			},
+		}
+
+		vars := &core.VariableMap{
+			Variables: map[string]*core.Variable{
+				"x": {
+					Type: LiteralTypeForLiteral(coreutils.MustMakeLiteral(
+						map[string]interface{}{
+							"tuple_name": "DefaultNamedTuple",
+							"fields": map[string]interface{}{
+								"int": 5,
+								"str": "foo",
+								"collection": []interface{}{1, 2, 3},
+								"map": map[string]interface{}{
+									"key": "value",
+								},
+								"tuple": map[string]interface{}{
+									"tuple_name": "DefaultNamedTuple",
+									"fields": map[string]interface{}{
+										"int": 5,
+										"str": "foo",
+										"collection": []interface{}{1, 2, 3},
+										"map": map[string]interface{}{
+											"key": "value",
+										},
+									},
+								},
+							},
+						},
+					)),
+				},
+			},
+		}
+
+		compileErrors := compilerErrors.NewCompileErrors()
+		_, ok := ValidateBindings(wf, n, bindings, vars, true, c.EdgeDirectionBidirectional, compileErrors)
+		assert.True(t, ok)
+		if compileErrors.HasErrors() {
+			assert.NoError(t, compileErrors)
+		}
+	})
+
+	t.Run("Tuple mismatch key", func(t *testing.T) {
+		wf := &mocks.WorkflowBuilder{}
+		n := &mocks.NodeBuilder{}
+		n.OnGetId().Return("node1")
+
+		bindings := []*core.Binding{
+			{
+				Var: "x",
+				Binding: LiteralToBinding(coreutils.MustMakeLiteral(
+					map[string]interface{}{
+						"tuple_name": "DefaultNamedTuple",
+						"fields": map[string]interface{}{
+							"int": 5,
+							"str": "foo",
+							"collection": []interface{}{1, 2, 3},
+							"map": map[string]interface{}{
+								"key": "value",
+							},
+							"tuple": map[string]interface{}{
+								"tuple_name": "DefaultNamedTuple",
+								"fields": map[string]interface{}{
+									// Here is the mismatch key
+									"int_foo": 5,
+									"str": "foo",
+									"collection": []interface{}{1, 2, 3},
+									"map": map[string]interface{}{
+										"key": "value",
+									},
+								},
+							},
+						},
+					},
+				)),
+			},
+		}
+
+		vars := &core.VariableMap{
+			Variables: map[string]*core.Variable{
+				"x": {
+					Type: LiteralTypeForLiteral(coreutils.MustMakeLiteral(
+						map[string]interface{}{
+							"tuple_name": "DefaultNamedTuple",
+							"fields": map[string]interface{}{
+								"int": 5,
+								"str": "foo",
+								"collection": []interface{}{1, 2, 3},
+								"map": map[string]interface{}{
+									"key": "value",
+								},
+								"tuple": map[string]interface{}{
+									"tuple_name": "DefaultNamedTuple",
+									"fields": map[string]interface{}{
+										"int_bar": 5,
+										"str": "foo",
+										"collection": []interface{}{1, 2, 3},
+										"map": map[string]interface{}{
+											"key": "value",
+										},
+									},
+								},
+							},
+						},
+					)),
+				},
+			},
+		}
+
+		compileErrors := compilerErrors.NewCompileErrors()
+		_, ok := ValidateBindings(wf, n, bindings, vars, true, c.EdgeDirectionBidirectional, compileErrors)
+		assert.False(t, ok)
+		assert.Equal(t, "FieldNotFound", string(compileErrors.Errors().List()[0].Code()))
+	})
+
+	t.Run("Tuple mismatch number", func(t *testing.T) {
+		wf := &mocks.WorkflowBuilder{}
+		n := &mocks.NodeBuilder{}
+		n.OnGetId().Return("node1")
+
+		bindings := []*core.Binding{
+			{
+				Var: "x",
+				Binding: LiteralToBinding(coreutils.MustMakeLiteral(
+					map[string]interface{}{
+						"tuple_name": "DefaultNamedTuple",
+						"fields": map[string]interface{}{
+							"int": 5,
+							"collection": []interface{}{1, 2, 3},
+							"map": map[string]interface{}{
+								"key": "value",
+							},
+						},
+					},
+				)),
+			},
+		}
+
+		vars := &core.VariableMap{
+			Variables: map[string]*core.Variable{
+				"x": {
+					Type: LiteralTypeForLiteral(coreutils.MustMakeLiteral(
+						map[string]interface{}{
+							"tuple_name": "DefaultNamedTuple",
+							"fields": map[string]interface{}{
+								"int": 5,
+								// Here is the extra field
+								"str": "foo",
+								"collection": []interface{}{1, 2, 3},
+								"map": map[string]interface{}{
+									"key": "value",
+								},
+							},
+						},
+					)),
+				},
+			},
+		}
+
+		compileErrors := compilerErrors.NewCompileErrors()
+		_, ok := ValidateBindings(wf, n, bindings, vars, true, c.EdgeDirectionBidirectional, compileErrors)
+		assert.False(t, ok)
+		assert.Equal(t, "MismatchingBindings", string(compileErrors.Errors().List()[0].Code()))
+	})
+
+	t.Run("Tuple mismatch tuple name", func(t *testing.T) {
+		wf := &mocks.WorkflowBuilder{}
+		n := &mocks.NodeBuilder{}
+		n.OnGetId().Return("node1")
+
+		bindings := []*core.Binding{
+			{
+				Var: "x",
+				Binding: LiteralToBinding(coreutils.MustMakeLiteral(
+					map[string]interface{}{
+						"tuple_name": "NamedTuple",
+						"fields": map[string]interface{}{
+							"int": 5,
+							"str": "foo",
+							"collection": []interface{}{1, 2, 3},
+							"map": map[string]interface{}{
+								"key": "value",
+							},
+						},
+					},
+				)),
+			},
+		}
+
+		vars := &core.VariableMap{
+			Variables: map[string]*core.Variable{
+				"x": {
+					Type: LiteralTypeForLiteral(coreutils.MustMakeLiteral(
+						map[string]interface{}{
+							"tuple_name": "DefaultNamedTuple",
+							"fields": map[string]interface{}{
+								"int": 5,
+								"str": "foo",
+								"collection": []interface{}{1, 2, 3},
+								"map": map[string]interface{}{
+									"key": "value",
+								},
+							},
+						},
+					)),
+				},
+			},
+		}
+
+		compileErrors := compilerErrors.NewCompileErrors()
+		_, ok := ValidateBindings(wf, n, bindings, vars, true, c.EdgeDirectionBidirectional, compileErrors)
+		assert.False(t, ok)
+		assert.Equal(t, "MismatchingBindings", string(compileErrors.Errors().List()[0].Code()))
+	})
+
 }

@@ -165,6 +165,16 @@ pub struct UnionType {
     #[prost(message, repeated, tag="1")]
     pub variants: ::prost::alloc::vec::Vec<LiteralType>,
 }
+/// Defines a named tuple type
+/// TODO: Add more docs
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct TupleType {
+    #[prost(string, tag="1")]
+    pub tuple_name: ::prost::alloc::string::String,
+    #[prost(map="string, message", tag="2")]
+    pub fields: ::std::collections::HashMap<::prost::alloc::string::String, LiteralType>,
+}
 /// Hints to improve type matching
 /// e.g. allows distinguishing output from custom type transformers
 /// even if the underlying IDL serialization matches.
@@ -205,7 +215,7 @@ pub struct LiteralType {
     /// Hints to improve type matching.
     #[prost(message, optional, tag="11")]
     pub structure: ::core::option::Option<TypeStructure>,
-    #[prost(oneof="literal_type::Type", tags="1, 2, 3, 4, 5, 7, 8, 10")]
+    #[prost(oneof="literal_type::Type", tags="1, 2, 3, 4, 5, 7, 8, 10, 12")]
     pub r#type: ::core::option::Option<literal_type::Type>,
 }
 /// Nested message and enum types in `LiteralType`.
@@ -237,6 +247,9 @@ pub mod literal_type {
         /// Defines an union type with pre-defined LiteralTypes.
         #[prost(message, tag="10")]
         UnionType(super::UnionType),
+        /// Defines a named tuple type
+        #[prost(message, tag="12")]
+        TupleType(super::TupleType),
     }
 }
 /// A reference to an output produced by a node. The type can be retrieved -and validated- from
@@ -495,7 +508,7 @@ pub struct Literal {
     /// Includes information about the size of the literal.
     #[prost(uint64, tag="7")]
     pub size_bytes: u64,
-    #[prost(oneof="literal::Value", tags="1, 2, 3")]
+    #[prost(oneof="literal::Value", tags="1, 2, 3, 8")]
     pub value: ::core::option::Option<literal::Value>,
 }
 /// Nested message and enum types in `Literal`.
@@ -512,6 +525,9 @@ pub mod literal {
         /// A map of strings to literals.
         #[prost(message, tag="3")]
         Map(super::LiteralMap),
+        /// A field for tuple literal.
+        #[prost(message, tag="8")]
+        Tuple(super::LiteralTupleMap),
     }
 }
 /// A collection of literals. This is a workaround since oneofs in proto messages cannot contain a repeated field.
@@ -528,6 +544,15 @@ pub struct LiteralMap {
     #[prost(map="string, message", tag="1")]
     pub literals: ::std::collections::HashMap<::prost::alloc::string::String, Literal>,
 }
+/// A collection of fields for tuple literal.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct LiteralTupleMap {
+    #[prost(string, tag="1")]
+    pub tuple_name: ::prost::alloc::string::String,
+    #[prost(map="string, message", tag="2")]
+    pub literals: ::std::collections::HashMap<::prost::alloc::string::String, Literal>,
+}
 /// A collection of BindingData items.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -542,6 +567,15 @@ pub struct BindingDataMap {
     #[prost(map="string, message", tag="1")]
     pub bindings: ::std::collections::HashMap<::prost::alloc::string::String, BindingData>,
 }
+/// A collection of fields for tuple binding data.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct BindingDataTupleMap {
+    #[prost(string, tag="1")]
+    pub tuple_name: ::prost::alloc::string::String,
+    #[prost(map="string, message", tag="2")]
+    pub bindings: ::std::collections::HashMap<::prost::alloc::string::String, BindingData>,
+}
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct UnionInfo {
@@ -554,7 +588,7 @@ pub struct UnionInfo {
 pub struct BindingData {
     #[prost(message, optional, tag="5")]
     pub union: ::core::option::Option<UnionInfo>,
-    #[prost(oneof="binding_data::Value", tags="1, 2, 3, 4")]
+    #[prost(oneof="binding_data::Value", tags="1, 2, 3, 4, 6")]
     pub value: ::core::option::Option<binding_data::Value>,
 }
 /// Nested message and enum types in `BindingData`.
@@ -575,6 +609,9 @@ pub mod binding_data {
         /// A map of bindings. The key is always a string.
         #[prost(message, tag="4")]
         Map(super::BindingDataMap),
+        /// A field for tuple binding data.
+        #[prost(message, tag="6")]
+        Tuple(super::BindingDataTupleMap),
     }
 }
 /// An input/output binding of a variable to either static value or a node output.

@@ -242,6 +242,15 @@ func literalTypeForLiterals(literals []*core.Literal) *core.LiteralType {
 	return buildMultipleTypeUnion(innerType)
 }
 
+func TupleFieldTypesForLiterals(fields map[string]*core.Literal) map[string]*core.LiteralType {
+	res := make(map[string]*core.LiteralType, len(fields))
+	for k, v := range fields {
+		res[k] = LiteralTypeForLiteral(v)
+	}
+
+	return res
+}
+
 // LiteralTypeForLiteral gets LiteralType for literal, nil if the value of literal is unknown, or type collection/map of
 // type None if the literal is a non-homogeneous type.
 func LiteralTypeForLiteral(l *core.Literal) *core.LiteralType {
@@ -258,6 +267,16 @@ func LiteralTypeForLiteral(l *core.Literal) *core.LiteralType {
 		return &core.LiteralType{
 			Type: &core.LiteralType_MapValueType{
 				MapValueType: literalTypeForLiterals(maps.Values(l.GetMap().Literals)),
+			},
+		}
+	case *core.Literal_Tuple:
+		fields := TupleFieldTypesForLiterals(l.GetTuple().Literals)
+		return &core.LiteralType{
+			Type: &core.LiteralType_TupleType{
+				TupleType: &core.TupleType{
+					TupleName: l.GetTuple().TupleName,
+					Fields:    fields,
+				},
 			},
 		}
 	}

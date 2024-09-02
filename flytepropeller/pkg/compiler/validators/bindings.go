@@ -186,6 +186,45 @@ func validateBinding(w c.WorkflowBuilder, nodeID c.NodeID, nodeParam string, bin
 		}
 
 		return literalType, []c.NodeID{}, !errs.HasErrors()
+	case *flyte.BindingData_Tuple:
+		if val.Tuple == nil {
+			errs.Collect(errors.NewParameterNotBoundErr(nodeID, nodeParam))
+			return nil, nil, !errs.HasErrors()
+		}
+
+		if val.Tuple.TupleName != expectedType.GetTupleType().GetTupleName() {
+			errs.Collect(errors.NewMismatchingBindingsErr(nodeID, nodeParam, expectedType.String(), val.Tuple.String()))
+			return nil, nil, !errs.HasErrors()
+		}
+
+		if expectedType.GetTupleType() != nil {
+			allNodeIds := make([]c.NodeID, 0, len(val.Tuple.GetBindings()))
+			fields := make(map[string]*flyte.LiteralType, len(val.Tuple.GetBindings()))
+			if len(val.Tuple.GetBindings()) != len(expectedType.GetTupleType().GetFields()) {
+				errs.Collect(errors.NewMismatchingBindingsErr(nodeID, nodeParam, expectedType.String(), val.Tuple.String()))
+				return nil, nil, !errs.HasErrors()
+			}
+			for k, v := range val.Tuple.GetBindings() {
+				if expectedField, ok := expectedType.GetTupleType().GetFields()[k]; !ok {
+					errs.Collect(errors.NewFieldNotFoundErr(nodeID, nodeParam, expectedType.String(), k))
+				}else{
+					if fieldType, nodeIds, ok := validateBinding(w, nodeID, nodeParam, v, expectedField, errs.NewScope(), validateParamTypes); ok {
+						allNodeIds = append(allNodeIds, nodeIds...)
+						fields[k] = fieldType
+					}
+				}
+			}
+
+			return &flyte.LiteralType{
+				Type: &flyte.LiteralType_TupleType{
+					TupleType: &flyte.TupleType{
+						TupleName: expectedType.GetTupleType().GetTupleName(),
+						Fields: fields,
+					},
+				},
+			}, allNodeIds, !errs.HasErrors()
+		}
+
 	default:
 		bindingType := ""
 		if val != nil {

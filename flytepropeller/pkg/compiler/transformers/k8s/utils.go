@@ -113,6 +113,14 @@ func StripTypeMetadata(t *core.LiteralType) *core.LiteralType {
 		}
 
 		underlyingType.StructuredDatasetType.Columns = columns
+	case *core.LiteralType_TupleType:
+		fields := make(map[string]*core.LiteralType, len(c.GetTupleType().Fields))
+		for k, field := range c.GetTupleType().Fields {
+			fields[k] = StripTypeMetadata(field)
+		}
+
+		underlyingType.TupleType.TupleName = c.GetTupleType().TupleName
+		underlyingType.TupleType.Fields = fields
 	}
 
 	return &c

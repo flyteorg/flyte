@@ -353,6 +353,10 @@
           "$ref": "#/definitions/coreLiteralMap",
           "description": "A map of strings to literals."
         },
+        "tuple": {
+          "$ref": "#/definitions/coreLiteralTupleMap",
+          "description": "A field for tuple literal."
+        },
         "hash": {
           "type": "string",
           "title": "A hash representing this literal.\nThis is used for caching purposes. For more details refer to RFC 1893\n(https://github.com/flyteorg/flyte/blob/master/rfc/system/1893-caching-of-offloaded-objects.md)"
@@ -401,6 +405,21 @@
       },
       "description": "A map of literals. This is a workaround since oneofs in proto messages cannot contain a repeated field."
     },
+    "coreLiteralTupleMap": {
+      "type": "object",
+      "properties": {
+        "tuple_name": {
+          "type": "string"
+        },
+        "literals": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/coreLiteral"
+          }
+        }
+      },
+      "description": "A collection of fields for tuple literal."
+    },
     "coreLiteralType": {
       "type": "object",
       "properties": {
@@ -435,6 +454,10 @@
         "union_type": {
           "$ref": "#/definitions/coreUnionType",
           "description": "Defines an union type with pre-defined LiteralTypes."
+        },
+        "tuple_type": {
+          "$ref": "#/definitions/coreTupleType",
+          "title": "Defines a named tuple type"
         },
         "metadata": {
           "type": "object",
@@ -601,6 +624,21 @@
           "description": "The serialized bytes of a third-party schema library like Arrow.\nThis is an optional field that will not be used for type checking."
         }
       }
+    },
+    "coreTupleType": {
+      "type": "object",
+      "properties": {
+        "tuple_name": {
+          "type": "string"
+        },
+        "fields": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/coreLiteralType"
+          }
+        }
+      },
+      "title": "Defines a named tuple type\nTODO: Add more docs"
     },
     "coreTypeAnnotation": {
       "type": "object",

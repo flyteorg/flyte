@@ -2337,6 +2337,64 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of a TupleType. */
+        interface ITupleType {
+
+            /** TupleType tupleName */
+            tupleName?: (string|null);
+
+            /** TupleType fields */
+            fields?: ({ [k: string]: flyteidl.core.ILiteralType }|null);
+        }
+
+        /** Represents a TupleType. */
+        class TupleType implements ITupleType {
+
+            /**
+             * Constructs a new TupleType.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.ITupleType);
+
+            /** TupleType tupleName. */
+            public tupleName: string;
+
+            /** TupleType fields. */
+            public fields: { [k: string]: flyteidl.core.ILiteralType };
+
+            /**
+             * Creates a new TupleType instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns TupleType instance
+             */
+            public static create(properties?: flyteidl.core.ITupleType): flyteidl.core.TupleType;
+
+            /**
+             * Encodes the specified TupleType message. Does not implicitly {@link flyteidl.core.TupleType.verify|verify} messages.
+             * @param message TupleType message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.ITupleType, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a TupleType message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns TupleType
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.TupleType;
+
+            /**
+             * Verifies a TupleType message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a TypeStructure. */
         interface ITypeStructure {
 
@@ -2474,6 +2532,9 @@ export namespace flyteidl {
             /** LiteralType unionType */
             unionType?: (flyteidl.core.IUnionType|null);
 
+            /** LiteralType tupleType */
+            tupleType?: (flyteidl.core.ITupleType|null);
+
             /** LiteralType metadata */
             metadata?: (google.protobuf.IStruct|null);
 
@@ -2517,6 +2578,9 @@ export namespace flyteidl {
             /** LiteralType unionType. */
             public unionType?: (flyteidl.core.IUnionType|null);
 
+            /** LiteralType tupleType. */
+            public tupleType?: (flyteidl.core.ITupleType|null);
+
             /** LiteralType metadata. */
             public metadata?: (google.protobuf.IStruct|null);
 
@@ -2527,7 +2591,7 @@ export namespace flyteidl {
             public structure?: (flyteidl.core.ITypeStructure|null);
 
             /** LiteralType type. */
-            public type?: ("simple"|"schema"|"collectionType"|"mapValueType"|"blob"|"enumType"|"structuredDatasetType"|"unionType");
+            public type?: ("simple"|"schema"|"collectionType"|"mapValueType"|"blob"|"enumType"|"structuredDatasetType"|"unionType"|"tupleType");
 
             /**
              * Creates a new LiteralType instance using the specified properties.
@@ -3385,6 +3449,9 @@ export namespace flyteidl {
             /** Literal map */
             map?: (flyteidl.core.ILiteralMap|null);
 
+            /** Literal tuple */
+            tuple?: (flyteidl.core.ILiteralTupleMap|null);
+
             /** Literal hash */
             hash?: (string|null);
 
@@ -3416,6 +3483,9 @@ export namespace flyteidl {
             /** Literal map. */
             public map?: (flyteidl.core.ILiteralMap|null);
 
+            /** Literal tuple. */
+            public tuple?: (flyteidl.core.ILiteralTupleMap|null);
+
             /** Literal hash. */
             public hash: string;
 
@@ -3429,7 +3499,7 @@ export namespace flyteidl {
             public sizeBytes: Long;
 
             /** Literal value. */
-            public value?: ("scalar"|"collection"|"map");
+            public value?: ("scalar"|"collection"|"map"|"tuple");
 
             /**
              * Creates a new Literal instance using the specified properties.
@@ -3568,6 +3638,64 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of a LiteralTupleMap. */
+        interface ILiteralTupleMap {
+
+            /** LiteralTupleMap tupleName */
+            tupleName?: (string|null);
+
+            /** LiteralTupleMap literals */
+            literals?: ({ [k: string]: flyteidl.core.ILiteral }|null);
+        }
+
+        /** Represents a LiteralTupleMap. */
+        class LiteralTupleMap implements ILiteralTupleMap {
+
+            /**
+             * Constructs a new LiteralTupleMap.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.ILiteralTupleMap);
+
+            /** LiteralTupleMap tupleName. */
+            public tupleName: string;
+
+            /** LiteralTupleMap literals. */
+            public literals: { [k: string]: flyteidl.core.ILiteral };
+
+            /**
+             * Creates a new LiteralTupleMap instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns LiteralTupleMap instance
+             */
+            public static create(properties?: flyteidl.core.ILiteralTupleMap): flyteidl.core.LiteralTupleMap;
+
+            /**
+             * Encodes the specified LiteralTupleMap message. Does not implicitly {@link flyteidl.core.LiteralTupleMap.verify|verify} messages.
+             * @param message LiteralTupleMap message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.ILiteralTupleMap, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a LiteralTupleMap message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns LiteralTupleMap
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.LiteralTupleMap;
+
+            /**
+             * Verifies a LiteralTupleMap message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a BindingDataCollection. */
         interface IBindingDataCollection {
 
@@ -3672,6 +3800,64 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of a BindingDataTupleMap. */
+        interface IBindingDataTupleMap {
+
+            /** BindingDataTupleMap tupleName */
+            tupleName?: (string|null);
+
+            /** BindingDataTupleMap bindings */
+            bindings?: ({ [k: string]: flyteidl.core.IBindingData }|null);
+        }
+
+        /** Represents a BindingDataTupleMap. */
+        class BindingDataTupleMap implements IBindingDataTupleMap {
+
+            /**
+             * Constructs a new BindingDataTupleMap.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.IBindingDataTupleMap);
+
+            /** BindingDataTupleMap tupleName. */
+            public tupleName: string;
+
+            /** BindingDataTupleMap bindings. */
+            public bindings: { [k: string]: flyteidl.core.IBindingData };
+
+            /**
+             * Creates a new BindingDataTupleMap instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns BindingDataTupleMap instance
+             */
+            public static create(properties?: flyteidl.core.IBindingDataTupleMap): flyteidl.core.BindingDataTupleMap;
+
+            /**
+             * Encodes the specified BindingDataTupleMap message. Does not implicitly {@link flyteidl.core.BindingDataTupleMap.verify|verify} messages.
+             * @param message BindingDataTupleMap message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.IBindingDataTupleMap, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a BindingDataTupleMap message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns BindingDataTupleMap
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.BindingDataTupleMap;
+
+            /**
+             * Verifies a BindingDataTupleMap message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of an UnionInfo. */
         interface IUnionInfo {
 
@@ -3739,6 +3925,9 @@ export namespace flyteidl {
             /** BindingData map */
             map?: (flyteidl.core.IBindingDataMap|null);
 
+            /** BindingData tuple */
+            tuple?: (flyteidl.core.IBindingDataTupleMap|null);
+
             /** BindingData union */
             union?: (flyteidl.core.IUnionInfo|null);
         }
@@ -3764,11 +3953,14 @@ export namespace flyteidl {
             /** BindingData map. */
             public map?: (flyteidl.core.IBindingDataMap|null);
 
+            /** BindingData tuple. */
+            public tuple?: (flyteidl.core.IBindingDataTupleMap|null);
+
             /** BindingData union. */
             public union?: (flyteidl.core.IUnionInfo|null);
 
             /** BindingData value. */
-            public value?: ("scalar"|"collection"|"promise"|"map");
+            public value?: ("scalar"|"collection"|"promise"|"map"|"tuple");
 
             /**
              * Creates a new BindingData instance using the specified properties.
