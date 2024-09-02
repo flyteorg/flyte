@@ -55,7 +55,7 @@ type AdminFetcherExtInterface interface {
 	FetchAllVerOfWorkflow(ctx context.Context, name, project, domain string, filter filters.Filters) ([]*admin.Workflow, error)
 
 	// FetchWorkflowLatestVersion fetches latest version of workflow in a  project, domain
-	FetchWorkflowLatestVersion(ctx context.Context, name, project, domain string, filter filters.Filters) (*admin.Workflow, error)
+	FetchWorkflowLatestVersion(ctx context.Context, name, project, domain string) (*admin.Workflow, error)
 
 	// FetchWorkflowVersion fetches particular version of workflow in a  project, domain
 	FetchWorkflowVersion(ctx context.Context, name, version, project, domain string) (*admin.Workflow, error)
