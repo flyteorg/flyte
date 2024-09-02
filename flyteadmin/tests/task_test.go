@@ -70,7 +70,7 @@ func TestCreateTaskWithoutContainer(t *testing.T) {
 	req.Id.Version = "TestCreateTaskWithoutContainer"
 	req.Spec.Template.Target = nil
 
-	_, err := client.CreateTask(ctx, &req)
+	_, err := client.CreateTask(ctx, req)
 	assert.Nil(t, err)
 }
 
