@@ -777,8 +777,8 @@ func TestValidateBindings(t *testing.T) {
 		assert.False(t, ok)
 		assert.Equal(t, "MismatchingTypes", string(compileErrors.Errors().List()[0].Code()))
 		assert.Equal(t, "Code: MismatchingTypes, Node Id: node1, Description: Variable [x]"+
-			" (type [union_type:{variants:{simple:INTEGER  structure:{tag:\"int\"}}}]) doesn't match expected type"+
-			" [union_type:{variants:{simple:INTEGER  structure:{tag:\"int_other\"}}}].", compileErrors.Errors().List()[0].Error())
+			" (type [union_type:{variants:{simple:INTEGER structure:{tag:\"int\"}}}]) doesn't match expected type"+
+			" [union_type:{variants:{simple:INTEGER structure:{tag:\"int_other\"}}}].", compileErrors.Errors().List()[0].Error())
 	})
 
 	t.Run("List of Int to List of Unions Binding", func(t *testing.T) {
@@ -1212,8 +1212,8 @@ func TestValidateBindings(t *testing.T) {
 		assert.Equal(t, "MismatchingTypes", string(compileErrors.Errors().List()[0].Code()))
 		assert.Equal(t, "Code: MismatchingTypes, Node Id: node1, Description: The output variable 'n2.n2_out'"+
 			" has type [simple:INTEGER], but it's assigned to the input variable 'n.x' which has type"+
-			" type [union_type:{variants:{simple:STRING  structure:{tag:\"str\"}}  variants:{simple:INTEGER  structure:{tag:\"int1\"}}"+
-			"  variants:{simple:INTEGER  structure:{tag:\"int2\"}}}].", compileErrors.Errors().List()[0].Error())
+			" type [union_type:{variants:{simple:STRING structure:{tag:\"str\"}} variants:{simple:INTEGER structure:{tag:\"int1\"}}"+
+			" variants:{simple:INTEGER structure:{tag:\"int2\"}}}].", compileErrors.Errors().List()[0].Error())
 	})
 
 	t.Run("Union Promise Union Literal", func(t *testing.T) {
