@@ -676,8 +676,8 @@ func (_m AdminFetcherExtInterface_FetchWorkflowLatestVersion) Return(_a0 *admin.
 	return &AdminFetcherExtInterface_FetchWorkflowLatestVersion{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *AdminFetcherExtInterface) OnFetchWorkflowLatestVersion(ctx context.Context, name string, project string, domain string, filter filters.Filters) *AdminFetcherExtInterface_FetchWorkflowLatestVersion {
-	c_call := _m.On("FetchWorkflowLatestVersion", ctx, name, project, domain, filter)
+func (_m *AdminFetcherExtInterface) OnFetchWorkflowLatestVersion(ctx context.Context, name string, project string, domain string) *AdminFetcherExtInterface_FetchWorkflowLatestVersion {
+	c_call := _m.On("FetchWorkflowLatestVersion", ctx, name, project, domain)
 	return &AdminFetcherExtInterface_FetchWorkflowLatestVersion{Call: c_call}
 }
 
