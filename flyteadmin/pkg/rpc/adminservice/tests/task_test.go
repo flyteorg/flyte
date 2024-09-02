@@ -27,7 +27,7 @@ func TestTaskHappyCase(t *testing.T) {
 	mockTaskManager := mocks.MockTaskManager{}
 	mockTaskManager.SetCreateCallback(
 		func(ctx context.Context,
-			request admin.TaskCreateRequest) (*admin.TaskCreateResponse, error) {
+			request *admin.TaskCreateRequest) (*admin.TaskCreateResponse, error) {
 			return &admin.TaskCreateResponse{}, nil
 		},
 	)
@@ -48,7 +48,7 @@ func TestTaskError(t *testing.T) {
 	mockTaskManager := mocks.MockTaskManager{}
 	mockTaskManager.SetCreateCallback(
 		func(ctx context.Context,
-			request admin.TaskCreateRequest) (*admin.TaskCreateResponse, error) {
+			request *admin.TaskCreateRequest) (*admin.TaskCreateResponse, error) {
 			return nil, errors.GetMissingEntityError(core.ResourceType_TASK.String(), request.Id)
 		},
 	)
@@ -74,7 +74,7 @@ func TestListUniqueTaskIds(t *testing.T) {
 	ctx := context.Background()
 
 	mockTaskManager := mocks.MockTaskManager{}
-	mockTaskManager.SetListUniqueIdsFunc(func(ctx context.Context, request admin.NamedEntityIdentifierListRequest) (
+	mockTaskManager.SetListUniqueIdsFunc(func(ctx context.Context, request *admin.NamedEntityIdentifierListRequest) (
 		*admin.NamedEntityIdentifierList, error) {
 
 		assert.Equal(t, "staging", request.Domain)

@@ -21,7 +21,7 @@ type AwsEmailer struct {
 	awsEmail      sesiface.SESAPI
 }
 
-func FlyteEmailToSesEmailInput(email admin.EmailMessage) ses.SendEmailInput {
+func FlyteEmailToSesEmailInput(email *admin.EmailMessage) ses.SendEmailInput {
 	var toAddress []*string
 	for _, toEmail := range email.RecipientsEmail {
 		// SES email input takes an array of pointers to strings so we have to create a new one for each email
@@ -51,7 +51,7 @@ func FlyteEmailToSesEmailInput(email admin.EmailMessage) ses.SendEmailInput {
 	}
 }
 
-func (e *AwsEmailer) SendEmail(ctx context.Context, email admin.EmailMessage) error {
+func (e *AwsEmailer) SendEmail(ctx context.Context, email *admin.EmailMessage) error {
 	emailInput := FlyteEmailToSesEmailInput(email)
 	_, err := e.awsEmail.SendEmail(&emailInput)
 	e.systemMetrics.SendTotal.Inc()

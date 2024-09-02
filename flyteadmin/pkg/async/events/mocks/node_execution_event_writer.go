@@ -19,6 +19,6 @@ func (_m *NodeExecutionEventWriter) Run() {
 }
 
 // Write provides a mock function with given fields: nodeExecutionEvent
-func (_m *NodeExecutionEventWriter) Write(nodeExecutionEvent admin.NodeExecutionEventRequest) {
+func (_m *NodeExecutionEventWriter) Write(nodeExecutionEvent *admin.NodeExecutionEventRequest) {
 	_m.Called(nodeExecutionEvent)
 }

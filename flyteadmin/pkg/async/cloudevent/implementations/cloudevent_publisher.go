@@ -204,8 +204,8 @@ func getNodeExecutionContext(ctx context.Context, identifier *core.NodeExecution
 
 // This is a rough copy of the ListTaskExecutions function in TaskExecutionManager. It can be deprecated once we move the processing out of Admin itself.
 // Just return the highest retry attempt.
-func (c *CloudEventWrappedPublisher) getLatestTaskExecutions(ctx context.Context, nodeExecutionID core.NodeExecutionIdentifier) (*admin.TaskExecution, error) {
-	ctx = getNodeExecutionContext(ctx, &nodeExecutionID)
+func (c *CloudEventWrappedPublisher) getLatestTaskExecutions(ctx context.Context, nodeExecutionID *core.NodeExecutionIdentifier) (*admin.TaskExecution, error) {
+	ctx = getNodeExecutionContext(ctx, nodeExecutionID)
 
 	identifierFilters, err := util.GetNodeExecutionIdentifierFilters(ctx, nodeExecutionID)
 	if err != nil {
@@ -283,7 +283,7 @@ func (c *CloudEventWrappedPublisher) TransformNodeExecutionEvent(ctx context.Con
 	var taskExecID *core.TaskExecutionIdentifier
 	var typedInterface *core.TypedInterface
 
-	lte, err := c.getLatestTaskExecutions(ctx, *rawEvent.Id)
+	lte, err := c.getLatestTaskExecutions(ctx, rawEvent.Id)
 	if err != nil {
 		logger.Errorf(ctx, "failed to get latest task execution for node exec id [%+v] with err: %v", rawEvent.Id, err)
 		return nil, err
@@ -353,7 +353,7 @@ func (c *CloudEventWrappedPublisher) Publish(ctx context.Context, notificationTy
 		phase = e.Phase.String()
 		eventTime = e.OccurredAt.AsTime()
 
-		dummyNodeExecutionID := core.NodeExecutionIdentifier{
+		dummyNodeExecutionID := &core.NodeExecutionIdentifier{
 			NodeId:      "end-node",
 			ExecutionId: e.ExecutionId,
 		}
@@ -378,7 +378,7 @@ func (c *CloudEventWrappedPublisher) Publish(ctx context.Context, notificationTy
 		if e.ParentNodeExecutionId == nil {
 			return fmt.Errorf("parent node execution id is nil for task execution [%+v]", e)
 		}
-		eventSource = common.FlyteURLKeyFromNodeExecutionIDRetry(*e.ParentNodeExecutionId,
+		eventSource = common.FlyteURLKeyFromNodeExecutionIDRetry(e.ParentNodeExecutionId,
 			int(e.RetryAttempt))
 		finalMsg, err = c.TransformTaskExecutionEvent(ctx, e)
 		if err != nil {
@@ -392,7 +392,7 @@ func (c *CloudEventWrappedPublisher) Publish(ctx context.Context, notificationTy
 		phase = e.Phase.String()
 		eventTime = e.OccurredAt.AsTime()
 		eventID = fmt.Sprintf("%v.%v", executionID, phase)
-		eventSource = common.FlyteURLKeyFromNodeExecutionID(*msgType.Event.Id)
+		eventSource = common.FlyteURLKeyFromNodeExecutionID(msgType.Event.Id)
 		finalMsg, err = c.TransformNodeExecutionEvent(ctx, e)
 		if err != nil {
 			logger.Errorf(ctx, "Failed to transform node execution event with error: %v", err)

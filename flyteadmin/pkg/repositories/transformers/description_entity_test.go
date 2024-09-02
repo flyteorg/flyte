@@ -26,7 +26,7 @@ func TestToDescriptionEntityExecutionModel(t *testing.T) {
 		SourceCode:       sourceCode,
 	}
 
-	id := core.Identifier{
+	id := &core.Identifier{
 		ResourceType: core.ResourceType_TASK,
 		Project:      "project",
 		Domain:       "domain",

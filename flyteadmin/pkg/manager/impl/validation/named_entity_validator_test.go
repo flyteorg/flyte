@@ -12,7 +12,7 @@ import (
 )
 
 func TestValidateNamedEntityGetRequest(t *testing.T) {
-	assert.Nil(t, ValidateNamedEntityGetRequest(admin.NamedEntityGetRequest{
+	assert.Nil(t, ValidateNamedEntityGetRequest(&admin.NamedEntityGetRequest{
 		ResourceType: core.ResourceType_WORKFLOW,
 		Id: &admin.NamedEntityIdentifier{
 			Project: "project",
@@ -21,7 +21,7 @@ func TestValidateNamedEntityGetRequest(t *testing.T) {
 		},
 	}))
 
-	assert.NotNil(t, ValidateNamedEntityGetRequest(admin.NamedEntityGetRequest{
+	assert.NotNil(t, ValidateNamedEntityGetRequest(&admin.NamedEntityGetRequest{
 		ResourceType: core.ResourceType_WORKFLOW,
 		Id: &admin.NamedEntityIdentifier{
 			Domain: "domain",
@@ -29,7 +29,7 @@ func TestValidateNamedEntityGetRequest(t *testing.T) {
 		},
 	}))
 
-	assert.NotNil(t, ValidateNamedEntityGetRequest(admin.NamedEntityGetRequest{
+	assert.NotNil(t, ValidateNamedEntityGetRequest(&admin.NamedEntityGetRequest{
 		ResourceType: core.ResourceType_WORKFLOW,
 		Id: &admin.NamedEntityIdentifier{
 			Project: "project",
@@ -37,7 +37,7 @@ func TestValidateNamedEntityGetRequest(t *testing.T) {
 		},
 	}))
 
-	assert.NotNil(t, ValidateNamedEntityGetRequest(admin.NamedEntityGetRequest{
+	assert.NotNil(t, ValidateNamedEntityGetRequest(&admin.NamedEntityGetRequest{
 		ResourceType: core.ResourceType_WORKFLOW,
 		Id: &admin.NamedEntityIdentifier{
 			Project: "project",
@@ -45,7 +45,7 @@ func TestValidateNamedEntityGetRequest(t *testing.T) {
 		},
 	}))
 
-	assert.NotNil(t, ValidateNamedEntityGetRequest(admin.NamedEntityGetRequest{
+	assert.NotNil(t, ValidateNamedEntityGetRequest(&admin.NamedEntityGetRequest{
 		Id: &admin.NamedEntityIdentifier{
 			Project: "project",
 			Domain:  "domain",
@@ -55,7 +55,7 @@ func TestValidateNamedEntityGetRequest(t *testing.T) {
 }
 
 func TestValidateNamedEntityUpdateRequest(t *testing.T) {
-	assert.Nil(t, ValidateNamedEntityUpdateRequest(admin.NamedEntityUpdateRequest{
+	assert.Nil(t, ValidateNamedEntityUpdateRequest(&admin.NamedEntityUpdateRequest{
 		ResourceType: core.ResourceType_WORKFLOW,
 		Id: &admin.NamedEntityIdentifier{
 			Project: "project",
@@ -67,7 +67,7 @@ func TestValidateNamedEntityUpdateRequest(t *testing.T) {
 		},
 	}))
 
-	assert.NotNil(t, ValidateNamedEntityUpdateRequest(admin.NamedEntityUpdateRequest{
+	assert.NotNil(t, ValidateNamedEntityUpdateRequest(&admin.NamedEntityUpdateRequest{
 		ResourceType: core.ResourceType_WORKFLOW,
 		Id: &admin.NamedEntityIdentifier{
 			Domain: "domain",
@@ -78,7 +78,7 @@ func TestValidateNamedEntityUpdateRequest(t *testing.T) {
 		},
 	}))
 
-	assert.NotNil(t, ValidateNamedEntityUpdateRequest(admin.NamedEntityUpdateRequest{
+	assert.NotNil(t, ValidateNamedEntityUpdateRequest(&admin.NamedEntityUpdateRequest{
 		ResourceType: core.ResourceType_WORKFLOW,
 		Id: &admin.NamedEntityIdentifier{
 			Project: "project",
@@ -89,7 +89,7 @@ func TestValidateNamedEntityUpdateRequest(t *testing.T) {
 		},
 	}))
 
-	assert.NotNil(t, ValidateNamedEntityUpdateRequest(admin.NamedEntityUpdateRequest{
+	assert.NotNil(t, ValidateNamedEntityUpdateRequest(&admin.NamedEntityUpdateRequest{
 		ResourceType: core.ResourceType_WORKFLOW,
 		Id: &admin.NamedEntityIdentifier{
 			Project: "project",
@@ -100,7 +100,7 @@ func TestValidateNamedEntityUpdateRequest(t *testing.T) {
 		},
 	}))
 
-	assert.NotNil(t, ValidateNamedEntityUpdateRequest(admin.NamedEntityUpdateRequest{
+	assert.NotNil(t, ValidateNamedEntityUpdateRequest(&admin.NamedEntityUpdateRequest{
 		ResourceType: core.ResourceType_WORKFLOW,
 		Id: &admin.NamedEntityIdentifier{
 			Project: "project",
@@ -108,7 +108,7 @@ func TestValidateNamedEntityUpdateRequest(t *testing.T) {
 			Name:    "name",
 		},
 	}))
-	assert.Equal(t, codes.InvalidArgument, ValidateNamedEntityUpdateRequest(admin.NamedEntityUpdateRequest{
+	assert.Equal(t, codes.InvalidArgument, ValidateNamedEntityUpdateRequest(&admin.NamedEntityUpdateRequest{
 		ResourceType: core.ResourceType_LAUNCH_PLAN,
 		Id: &admin.NamedEntityIdentifier{
 			Project: "project",
@@ -119,7 +119,7 @@ func TestValidateNamedEntityUpdateRequest(t *testing.T) {
 			State: admin.NamedEntityState_NAMED_ENTITY_ARCHIVED,
 		},
 	}).(errors.FlyteAdminError).Code())
-	assert.Nil(t, ValidateNamedEntityUpdateRequest(admin.NamedEntityUpdateRequest{
+	assert.Nil(t, ValidateNamedEntityUpdateRequest(&admin.NamedEntityUpdateRequest{
 		ResourceType: core.ResourceType_WORKFLOW,
 		Id: &admin.NamedEntityIdentifier{
 			Project: "project",
@@ -130,7 +130,7 @@ func TestValidateNamedEntityUpdateRequest(t *testing.T) {
 			State: admin.NamedEntityState_NAMED_ENTITY_ARCHIVED,
 		},
 	}))
-	assert.Nil(t, ValidateNamedEntityUpdateRequest(admin.NamedEntityUpdateRequest{
+	assert.Nil(t, ValidateNamedEntityUpdateRequest(&admin.NamedEntityUpdateRequest{
 		ResourceType: core.ResourceType_TASK,
 		Id: &admin.NamedEntityIdentifier{
 			Project: "project",
@@ -144,32 +144,32 @@ func TestValidateNamedEntityUpdateRequest(t *testing.T) {
 }
 
 func TestValidateNamedEntityListRequest(t *testing.T) {
-	assert.Nil(t, ValidateNamedEntityListRequest(admin.NamedEntityListRequest{
+	assert.Nil(t, ValidateNamedEntityListRequest(&admin.NamedEntityListRequest{
 		ResourceType: core.ResourceType_WORKFLOW,
 		Project:      "project",
 		Domain:       "domain",
 		Limit:        2,
 	}))
 
-	assert.NotNil(t, ValidateNamedEntityListRequest(admin.NamedEntityListRequest{
+	assert.NotNil(t, ValidateNamedEntityListRequest(&admin.NamedEntityListRequest{
 		Project: "project",
 		Domain:  "domain",
 		Limit:   2,
 	}))
 
-	assert.NotNil(t, ValidateNamedEntityListRequest(admin.NamedEntityListRequest{
+	assert.NotNil(t, ValidateNamedEntityListRequest(&admin.NamedEntityListRequest{
 		ResourceType: core.ResourceType_WORKFLOW,
 		Domain:       "domain",
 		Limit:        2,
 	}))
 
-	assert.NotNil(t, ValidateNamedEntityListRequest(admin.NamedEntityListRequest{
+	assert.NotNil(t, ValidateNamedEntityListRequest(&admin.NamedEntityListRequest{
 		ResourceType: core.ResourceType_WORKFLOW,
 		Project:      "project",
 		Limit:        2,
 	}))
 
-	assert.NotNil(t, ValidateNamedEntityListRequest(admin.NamedEntityListRequest{
+	assert.NotNil(t, ValidateNamedEntityListRequest(&admin.NamedEntityListRequest{
 		ResourceType: core.ResourceType_WORKFLOW,
 		Project:      "project",
 		Domain:       "domain",

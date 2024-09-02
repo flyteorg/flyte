@@ -52,7 +52,7 @@ var workflowExecution = &admin.Execution{
 
 func TestSubstituteEmailParameters(t *testing.T) {
 	message := "{{ unused }}. {{project }} and {{ domain }} and {{ name }} ended up in {{ phase }}.{{ error }}"
-	request := admin.WorkflowExecutionEventRequest{
+	request := &admin.WorkflowExecutionEventRequest{
 		Event: &event.WorkflowExecutionEvent{
 			Phase: core.WorkflowExecution_SUCCEEDED,
 		},
@@ -88,7 +88,7 @@ func TestSubstituteAllTemplates(t *testing.T) {
 		messageTemplate = append(messageTemplate, template)
 		desiredResult = append(desiredResult, result)
 	}
-	request := admin.WorkflowExecutionEventRequest{
+	request := &admin.WorkflowExecutionEventRequest{
 		Event: &event.WorkflowExecutionEvent{
 			Phase: core.WorkflowExecution_SUCCEEDED,
 		},
@@ -117,7 +117,7 @@ func TestSubstituteAllTemplatesNoSpaces(t *testing.T) {
 		messageTemplate = append(messageTemplate, template)
 		desiredResult = append(desiredResult, result)
 	}
-	request := admin.WorkflowExecutionEventRequest{
+	request := &admin.WorkflowExecutionEventRequest{
 		Event: &event.WorkflowExecutionEvent{
 			Phase: core.WorkflowExecution_SUCCEEDED,
 		},
@@ -136,12 +136,12 @@ func TestToEmailMessageFromWorkflowExecutionEvent(t *testing.T) {
 			Subject: "Notice: Execution \"{{ name }}\" has succeeded in \"{{ domain }}\".",
 		},
 	}
-	emailNotification := admin.EmailNotification{
+	emailNotification := &admin.EmailNotification{
 		RecipientsEmail: []string{
 			"a@example.com", "b@example.org",
 		},
 	}
-	request := admin.WorkflowExecutionEventRequest{
+	request := &admin.WorkflowExecutionEventRequest{
 		Event: &event.WorkflowExecutionEvent{
 			Phase: core.WorkflowExecution_ABORTED,
 		},

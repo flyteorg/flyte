@@ -160,7 +160,7 @@ func TestCreateUploadLocationMore(t *testing.T) {
 func TestCreateDownloadLink(t *testing.T) {
 	dataStore := commonMocks.GetMockStorageClient()
 	nodeExecutionManager := &mocks.MockNodeExecutionManager{}
-	nodeExecutionManager.SetGetNodeExecutionFunc(func(ctx context.Context, request admin.NodeExecutionGetRequest) (*admin.NodeExecution, error) {
+	nodeExecutionManager.SetGetNodeExecutionFunc(func(ctx context.Context, request *admin.NodeExecutionGetRequest) (*admin.NodeExecution, error) {
 		return &admin.NodeExecution{
 			Closure: &admin.NodeExecutionClosure{
 				DeckUri: "s3://something/something",
@@ -282,14 +282,14 @@ func TestService_GetData(t *testing.T) {
 	}
 
 	nodeExecutionManager.SetGetNodeExecutionDataFunc(
-		func(ctx context.Context, request admin.NodeExecutionGetDataRequest) (*admin.NodeExecutionGetDataResponse, error) {
+		func(ctx context.Context, request *admin.NodeExecutionGetDataRequest) (*admin.NodeExecutionGetDataResponse, error) {
 			return &admin.NodeExecutionGetDataResponse{
 				FullInputs:  inputsLM,
 				FullOutputs: outputsLM,
 			}, nil
 		},
 	)
-	taskExecutionManager.SetListTaskExecutionsCallback(func(ctx context.Context, request admin.TaskExecutionListRequest) (*admin.TaskExecutionList, error) {
+	taskExecutionManager.SetListTaskExecutionsCallback(func(ctx context.Context, request *admin.TaskExecutionListRequest) (*admin.TaskExecutionList, error) {
 		return &admin.TaskExecutionList{
 			TaskExecutions: []*admin.TaskExecution{
 				{
@@ -315,7 +315,7 @@ func TestService_GetData(t *testing.T) {
 			},
 		}, nil
 	})
-	taskExecutionManager.SetGetTaskExecutionDataCallback(func(ctx context.Context, request admin.TaskExecutionGetDataRequest) (*admin.TaskExecutionGetDataResponse, error) {
+	taskExecutionManager.SetGetTaskExecutionDataCallback(func(ctx context.Context, request *admin.TaskExecutionGetDataRequest) (*admin.TaskExecutionGetDataResponse, error) {
 		return &admin.TaskExecutionGetDataResponse{
 			FullInputs:  inputsLM,
 			FullOutputs: outputsLM,
@@ -388,10 +388,10 @@ func TestService_Error(t *testing.T) {
 	assert.NoError(t, err)
 
 	t.Run("get a working set of urls without retry attempt", func(t *testing.T) {
-		taskExecutionManager.SetListTaskExecutionsCallback(func(ctx context.Context, request admin.TaskExecutionListRequest) (*admin.TaskExecutionList, error) {
+		taskExecutionManager.SetListTaskExecutionsCallback(func(ctx context.Context, request *admin.TaskExecutionListRequest) (*admin.TaskExecutionList, error) {
 			return nil, errors.NewFlyteAdminErrorf(1, "not found")
 		})
-		nodeExecID := core.NodeExecutionIdentifier{
+		nodeExecID := &core.NodeExecutionIdentifier{
 			NodeId: "n0",
 			ExecutionId: &core.WorkflowExecutionIdentifier{
 				Project: "proj",
@@ -404,13 +404,13 @@ func TestService_Error(t *testing.T) {
 	})
 
 	t.Run("get a working set of urls without retry attempt", func(t *testing.T) {
-		taskExecutionManager.SetListTaskExecutionsCallback(func(ctx context.Context, request admin.TaskExecutionListRequest) (*admin.TaskExecutionList, error) {
+		taskExecutionManager.SetListTaskExecutionsCallback(func(ctx context.Context, request *admin.TaskExecutionListRequest) (*admin.TaskExecutionList, error) {
 			return &admin.TaskExecutionList{
 				TaskExecutions: nil,
 				Token:          "",
 			}, nil
 		})
-		nodeExecID := core.NodeExecutionIdentifier{
+		nodeExecID := &core.NodeExecutionIdentifier{
 			NodeId: "n0",
 			ExecutionId: &core.WorkflowExecutionIdentifier{
 				Project: "proj",

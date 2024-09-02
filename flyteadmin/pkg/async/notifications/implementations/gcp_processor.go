@@ -39,12 +39,12 @@ func (p *GcpProcessor) StartProcessing() {
 }
 
 func (p *GcpProcessor) run() error {
-	var emailMessage admin.EmailMessage
+	emailMessage := &admin.EmailMessage{}
 
 	for msg := range p.sub.Start() {
 		p.systemMetrics.MessageTotal.Inc()
 
-		if err := proto.Unmarshal(msg.Message(), &emailMessage); err != nil {
+		if err := proto.Unmarshal(msg.Message(), emailMessage); err != nil {
 			logger.Debugf(context.Background(), "failed to unmarshal to notification object message [%s] with err: %v", string(msg.Message()), err)
 			p.systemMetrics.MessageDecodingError.Inc()
 			p.markMessageDone(msg)

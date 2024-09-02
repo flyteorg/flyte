@@ -118,19 +118,19 @@ func (g *GCPRemoteURL) signURL(ctx context.Context, gcsURI GCPGCSObject) (string
 	return gcs.SignedURL(gcsURI.bucket, gcsURI.object, opts)
 }
 
-func (g *GCPRemoteURL) Get(ctx context.Context, uri string) (admin.UrlBlob, error) {
+func (g *GCPRemoteURL) Get(ctx context.Context, uri string) (*admin.UrlBlob, error) {
 	logger.Debugf(ctx, "Getting signed url for - %s", uri)
 	gcsURI, err := g.splitURI(ctx, uri)
 	if err != nil {
 		logger.Debugf(ctx, "failed to extract gcs bucket and object from uri: %s", uri)
-		return admin.UrlBlob{}, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "invalid uri: %s", uri)
+		return &admin.UrlBlob{}, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "invalid uri: %s", uri)
 	}
 
 	// First, get the size of the url blob.
 	attrs, err := g.gcsClient.Bucket(gcsURI.bucket).Object(gcsURI.object).Attrs(ctx)
 	if err != nil {
 		logger.Debugf(ctx, "failed to get object size for %s with %v", uri, err)
-		return admin.UrlBlob{}, errors.NewFlyteAdminErrorf(
+		return &admin.UrlBlob{}, errors.NewFlyteAdminErrorf(
 			codes.Internal, "failed to get object size for %s with %v", uri, err)
 	}
 
@@ -138,10 +138,10 @@ func (g *GCPRemoteURL) Get(ctx context.Context, uri string) (admin.UrlBlob, erro
 	if err != nil {
 		logger.Warning(ctx,
 			"failed to presign url for uri [%s] for %v with err %v", uri, g.signDuration, err)
-		return admin.UrlBlob{}, errors.NewFlyteAdminErrorf(codes.Internal,
+		return &admin.UrlBlob{}, errors.NewFlyteAdminErrorf(codes.Internal,
 			"failed to presign url for uri [%s] for %v with err %v", uri, g.signDuration, err)
 	}
-	return admin.UrlBlob{
+	return &admin.UrlBlob{
 		Url:   urlStr,
 		Bytes: attrs.Size,
 	}, nil
