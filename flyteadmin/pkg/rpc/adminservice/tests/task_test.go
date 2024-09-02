@@ -13,7 +13,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
-var taskIdentifier = core.Identifier{
+var taskIdentifier = &core.Identifier{
 	ResourceType: core.ResourceType_TASK,
 	Name:         "Name",
 	Domain:       "Domain",
@@ -36,7 +36,7 @@ func TestTaskHappyCase(t *testing.T) {
 	})
 
 	resp, err := mockServer.CreateTask(ctx, &admin.TaskCreateRequest{
-		Id: &taskIdentifier,
+		Id: taskIdentifier,
 	})
 	assert.NotNil(t, resp)
 	assert.NoError(t, err)

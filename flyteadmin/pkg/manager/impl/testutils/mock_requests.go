@@ -47,8 +47,8 @@ func GetValidTaskRequest() *admin.TaskCreateRequest {
 	}
 }
 
-func GetValidTaskRequestWithOverrides(project string, domain string, name string, version string) admin.TaskCreateRequest {
-	return admin.TaskCreateRequest{
+func GetValidTaskRequestWithOverrides(project string, domain string, name string, version string) *admin.TaskCreateRequest {
+	return &admin.TaskCreateRequest{
 		Id: &core.Identifier{
 			ResourceType: core.ResourceType_TASK,
 			Project:      project,
@@ -76,11 +76,6 @@ func GetValidTaskRequestWithOverrides(project string, domain string, name string
 			},
 		},
 	}
-}
-
-func GetValidTaskSpecBytes() []byte {
-	bytes, _ := proto.Marshal(GetValidTaskRequest().Spec)
-	return bytes
 }
 
 func GetWorkflowRequest() *admin.WorkflowCreateRequest {
