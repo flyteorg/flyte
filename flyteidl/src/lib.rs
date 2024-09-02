@@ -734,6 +734,12 @@ pub mod _flyteidl_rust {
     }
 
     #[pymodule]
+    pub mod get_data_response {
+        #[pymodule_export]
+        use crate::flyteidl::service::get_data_response::Data;
+    }
+
+    #[pymodule]
     pub mod plugins {
         #[pymodule_export]
         use crate::flyteidl::plugins::{
