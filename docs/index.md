@@ -12,5 +12,6 @@ tutorials/index
 integrations/index
 cluster_deployment/index
 api_reference/index
+ecosystem/index
 community/index
 ```
