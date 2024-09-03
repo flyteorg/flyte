@@ -176,8 +176,12 @@ html_theme = "pydata_sphinx_theme"
 html_title = "Flyte"
 html_sidebars = {
     "api_reference/*": ["sidebars/api_reference"],
-    "community/*": ["sidebars/community"],
     "cluster_deployment/*": ["sidebars/cluster_deployment"],
+    "community/*": ["sidebars/community"],
+    "ecosystem/*": ["sidebar/ecosystem"],
+    "integrations/*": ["sidebar/integrations"],
+    "tutorials/*": ["sidebar/tutorials"],
+    "user_guide/*": ["tutorials/user_guide"]
 }
 
 templates_path = ["_templates"]
