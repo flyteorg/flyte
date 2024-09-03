@@ -57,7 +57,7 @@ Raw Data Prefix
 Every task can read/write its own data files. If ``FlyteFile`` or any natively supported type like ``pandas.DataFrame`` is used, Flyte will automatically offload and download
 data from the configured object-store paths. These paths are completely customizable per `LaunchPlan` or `Execution`.
 
-- The default Rawoutput path (prefix in an object store like S3/GCS) can be configured during registration as shown in :std:ref:`flytectl_register_files`.
+- The default Rawoutput path (prefix in an object store like S3/GCS) can be configured during registration as shown in :ref:`flytectl_register_files`.
   The argument ``--outputLocationPrefix`` allows us to set the destination directory for all the raw data produced. Flyte will create randomized folders in this path to store the data.
 - To override the ``RawOutput`` path (prefix in an object store like S3/GCS), you can specify an alternate location when invoking a Flyte execution, as shown in the following screenshot of the LaunchForm in FlyteConsole:
 
@@ -79,8 +79,8 @@ Thus, metadata is restricted due to its omnipresence. Each `meta output`/`input`
 SERIALIZATION TIME
 ^^^^^^^^^^^^^^^^^^
 
-When a task is declared with inputs and outputs, Flyte extracts the interface of the task and converts it to an internal representation called a :std:ref:`ref_flyteidl.core.typedinterface`.
-For each variable, a corresponding :std:ref:`ref_flyteidl.core.literaltype` is created.
+When a task is declared with inputs and outputs, Flyte extracts the interface of the task and converts it to an internal representation called a :ref:`ref_flyteidl.core.typedinterface`.
+For each variable, a corresponding :ref:`ref_flyteidl.core.literaltype` is created.
 
 For example, the following Python function's interface is transformed as follows:
 
@@ -138,8 +138,8 @@ For example, the following Python function's interface is transformed as follows
 RUNTIME
 ^^^^^^^
 
-At runtime, data passes through Flyte using :std:ref:`ref_flyteidl.core.literal` where the values are set.
-For files, the corresponding ``Literal`` is called ``LiteralBlob`` (:std:ref:`ref_flyteidl.core.blob`) which is a binary large object.
+At runtime, data passes through Flyte using :ref:`ref_flyteidl.core.literal` where the values are set.
+For files, the corresponding ``Literal`` is called ``LiteralBlob`` (:ref:`ref_flyteidl.core.blob`) which is a binary large object.
 Many different objects can be mapped to the underlying `Blob` or `Struct` types. For example, an image is a Blob, a ``pandas.DataFrame`` is a Blob of type parquet, etc.
 
 Data Movement

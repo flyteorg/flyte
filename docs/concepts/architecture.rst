@@ -13,7 +13,7 @@ FlyteIDL
 
 In Flyte, entities like "Workflows", "Tasks", "Launch Plans", and "Schedules" are recognized by multiple system components. For components to communicate effectively, they need a shared understanding about the structure of these entities.
 
-Flyteidl (Interface Definition Language) is where shared Flyte entities are defined. It also defines the RPC service definition for the :std:ref:`core Flyte API <ref_flyteidl/service/admin.proto>`.
+Flyteidl (Interface Definition Language) is where shared Flyte entities are defined. It also defines the RPC service definition for the :ref:`core Flyte API <ref_flyteidl/service/admin.proto>`.
 
 Flyteidl uses the `protobuf <https://developers.google.com/protocol-buffers/>`_ schema to describe entities. Clients are generated for Python, Golang, and JavaScript and imported by Flyte components.
 

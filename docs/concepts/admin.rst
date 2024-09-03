@@ -20,7 +20,7 @@ RPC
 ---
 
 FlyteAdmin uses the `grpc-gateway <https://github.com/grpc-ecosystem/grpc-gateway>`__ library to serve incoming gRPC and HTTP requests with identical handlers.
-Refer to the admin service :std:ref:`definition <ref_flyteidl/service/admin.proto>` for a detailed API overview, including request and response entities. 
+Refer to the admin service :ref:`definition <ref_flyteidl/service/admin.proto>` for a detailed API overview, including request and response entities. 
 The RPC handlers are thin shims that enforce request structure validation and call out to the appropriate :ref:`manager <divedeep-admin-manager>` methods to process requests.
 
 You can find a detailed explanation of the service in the :ref:`admin service <divedeep-admin-service>` page.
@@ -146,7 +146,7 @@ FlyteAdmin Service Background
 Entities
 ---------
 
-The :std:ref:`admin service definition <ref_flyteidl/service/admin.proto>` defines REST operations for the entities that
+The :ref:`admin service definition <ref_flyteidl/service/admin.proto>` defines REST operations for the entities that
 FlyteAdmin administers.
 
 As a refresher, the primary :ref:`entities <divedeep>` across Flyte maps to FlyteAdmin entities.
@@ -166,11 +166,11 @@ Permitted operations include:
 - Get
 - List
 
-The above entities are designated by an :std:ref:`identifier <ref_flyteidl.core.Identifier>`
+The above entities are designated by an :ref:`identifier <ref_flyteidl.core.Identifier>`
 that consists of a project, domain, name, and version specification. These entities are, for the most part, immutable. To update one of these entities, the updated
 version must be re-registered with a unique and new version identifier attribute.
 
-One caveat is that the launch plan can toggle between :std:ref:`ACTIVE and INACTIVE <ref_flyteidl.admin.LaunchPlan>` states.
+One caveat is that the launch plan can toggle between :ref:`ACTIVE and INACTIVE <ref_flyteidl.admin.LaunchPlan>` states.
 At a given point in time, only one launch plan version across a shared {Project, Domain, Name} specification can be active. The state affects the scheduled launch plans only.
 An inactive launch plan can be used to launch individual executions. However, only an active launch plan runs on a schedule (given it has a schedule defined).
 
@@ -178,9 +178,9 @@ An inactive launch plan can be used to launch individual executions. However, on
 Static entities metadata (Named Entities)
 +++++++++++++++++++++++++++++++++++++++++
 
-A :std:ref:`named entity <ref_flyteidl.admin.NamedEntity>` includes metadata for one of the above entities
+A :ref:`named entity <ref_flyteidl.admin.NamedEntity>` includes metadata for one of the above entities
 (workflow, task or launch plan) across versions. It also includes a resource type (workflow, task or launch plan) and an
-:std:ref:`id <ref_flyteidl.admin.NamedEntityIdentifier>` which is composed of project, domain and name.
+:ref:`id <ref_flyteidl.admin.NamedEntityIdentifier>` which is composed of project, domain and name.
 The named entity also includes metadata, which are mutable attributes about the referenced entity.
 
 This metadata includes:
@@ -213,7 +213,7 @@ Permitted operations include:
 
 After an execution begins, FlytePropeller monitors the execution and sends the events which the admin uses to update the above executions. 
 
-These :std:ref:`events <ref_flyteidl/event/event.proto>` include
+These :ref:`events <ref_flyteidl/event/event.proto>` include
 
 - WorkflowExecutionEvent
 - NodeExecutionEvent
@@ -303,12 +303,12 @@ Filterable fields vary based on entity types:
   - updated_at  
   - workflows.{any workflow field above} (for example: workflow.domain) 
   - state (you must use the integer enum, for example: 1)  
-     - States are defined in :std:ref:`launchplanstate <ref_flyteidl.admin.LaunchPlanState>`.
+     - States are defined in :ref:`launchplanstate <ref_flyteidl.admin.LaunchPlanState>`.
      
 - Named Entity Metadata
 
   - state (you must use the integer enum, for example: 1)  
-     - States are defined in :std:ref:`namedentitystate <ref_flyteidl.admin.NamedEntityState>`.
+     - States are defined in :ref:`namedentitystate <ref_flyteidl.admin.NamedEntityState>`.
      
 - Executions (Workflow executions)  
 
@@ -318,12 +318,12 @@ Filterable fields vary based on entity types:
   - workflow.{any workflow field above} (for example: workflow.domain)  
   - launch_plan.{any launch plan field above} (for example: launch_plan.name) 
   - phase (you must use the upper-cased string name, for example: ``RUNNING``) 
-     - Phases are defined in :std:ref:`workflowexecution.phase <ref_flyteidl.core.WorkflowExecution.Phase>`.
+     - Phases are defined in :ref:`workflowexecution.phase <ref_flyteidl.core.WorkflowExecution.Phase>`.
   - execution_created_at  
   - execution_updated_at  
   - duration (in seconds) 
   - mode (you must use the integer enum, for example: 1)  
-     - Modes are defined in :std:ref:`executionmode <ref_flyteidl.admin.ExecutionMetadata.ExecutionMode>`.
+     - Modes are defined in :ref:`executionmode <ref_flyteidl.admin.ExecutionMetadata.ExecutionMode>`.
   - user (authenticated user or role from flytekit config)
 
 - Node Executions 
@@ -331,7 +331,7 @@ Filterable fields vary based on entity types:
   - node_id 
   - execution.{any execution field above} (for example: execution.domain) 
   - phase (you must use the upper-cased string name, for example: ``QUEUED``) 
-     - Phases are defined in :std:ref:`nodeexecution.phase <ref_flyteidl.core.NodeExecution.Phase>`.
+     - Phases are defined in :ref:`nodeexecution.phase <ref_flyteidl.core.NodeExecution.Phase>`.
   - started_at  
   - node_execution_created_at 
   - node_execution_updated_at 
@@ -344,7 +344,7 @@ Filterable fields vary based on entity types:
   - execution.{any execution field above} (for example: execution.domain) 
   - node_execution.{any node execution field above} (for example: node_execution.phase) 
   - phase (you must use the upper-cased string name, for example: ``SUCCEEDED``)  
-     - Phases are defined in :std:ref:`taskexecution.phase <ref_flyteidl.core.TaskExecution.Phase>`.
+     - Phases are defined in :ref:`taskexecution.phase <ref_flyteidl.core.TaskExecution.Phase>`.
   - started_at  
   - task_execution_created_at 
   - task_execution_updated_at 
@@ -404,7 +404,7 @@ Only a subset of fields are supported for sorting list queries. The explicit lis
   - created_at  
   - updated_at  
   - state (you must use the integer enum, for example: 1) 
-     - States are defined in :std:ref:`launchplanstate <ref_flyteidl.admin.LaunchPlanState>`.
+     - States are defined in :ref:`launchplanstate <ref_flyteidl.admin.LaunchPlanState>`.
      
 - ListWorkflowIds 
 
@@ -417,19 +417,19 @@ Only a subset of fields are supported for sorting list queries. The explicit lis
   - domain  
   - name  
   - phase (you must use the upper-cased string name, for example: ``RUNNING``)  
-     - Phases are defined in :std:ref:`workflowexecution.phase <ref_flyteidl.core.WorkflowExecution.Phase>`.
+     - Phases are defined in :ref:`workflowexecution.phase <ref_flyteidl.core.WorkflowExecution.Phase>`.
   - execution_created_at  
   - execution_updated_at  
   - duration (in seconds) 
   - mode (you must use the integer enum, for example: 1)  
-     - Modes are defined :std:ref:`execution.proto <ref_flyteidl.admin.ExecutionMetadata.ExecutionMode>`.
+     - Modes are defined :ref:`execution.proto <ref_flyteidl.admin.ExecutionMetadata.ExecutionMode>`.
      
 - ListNodeExecutions  
 
   - node_id 
   - retry_attempt 
   - phase (you must use the upper-cased string name, for example: ``QUEUED``) 
-     - Phases are defined in :std:ref:`nodeexecution.phase <ref_flyteidl.core.NodeExecution.Phase>`.
+     - Phases are defined in :ref:`nodeexecution.phase <ref_flyteidl.core.NodeExecution.Phase>`.
   - started_at  
   - node_execution_created_at 
   - node_execution_updated_at 
@@ -439,7 +439,7 @@ Only a subset of fields are supported for sorting list queries. The explicit lis
 
   - retry_attempt 
   - phase (you must use the upper-cased string name, for example: ``SUCCEEDED``)  
-     - Phases are defined in :std:ref:`taskexecution.phase <ref_flyteidl.core.TaskExecution.Phase>`.
+     - Phases are defined in :ref:`taskexecution.phase <ref_flyteidl.core.TaskExecution.Phase>`.
   - started_at  
   - task_execution_created_at 
   - task_execution_updated_at 

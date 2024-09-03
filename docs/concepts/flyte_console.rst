@@ -36,7 +36,7 @@ The UI should be accessible at http://localhost:30081/console.
 
 |
 
-The end-to-end process from writing code to registering workflows is present in the :std:ref:`getting-started`.
+The end-to-end process from writing code to registering workflows is present in the :ref:`getting-started`.
 
 A pop-up window appears with input fields that the execution requires upon clicking the **Launch Workflow** button.
 If the default inputs are given, they will be auto-populated.
@@ -150,7 +150,7 @@ Logs are accessible as well.
 Every execution has two views: Nodes and Graph.
 
 A node in the nodes view encapsulates an instance of a task, but it can also contain an entire subworkflow or trigger an external workflow.
-More about nodes can be found in :std:ref:`divedeep-nodes`.
+More about nodes can be found in :ref:`divedeep-nodes`.
 
 |
 

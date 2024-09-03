@@ -20,8 +20,8 @@ A Flyte task is characterized by:
 
    For tasks to exchange data with each other, a task can define a signature (much like a function/method
    signature in programming languages). A task interface defines the input and output variables —
-   :std:ref:`variablesentry <ref_flyteidl.core.VariableMap.VariablesEntry>`
-   and their types, :std:ref:`literaltype <ref_flyteidl.core.LiteralType>`.
+   :ref:`variablesentry <ref_flyteidl.core.VariableMap.VariablesEntry>`
+   and their types, :ref:`literaltype <ref_flyteidl.core.LiteralType>`.
 
 Can "X" Be a Flyte Task?
 -------------------------
@@ -66,7 +66,7 @@ Types
 
 It is impossible to define the unit of execution of a task in the same way for all tasks. Hence, Flyte allows for different task
 types in the system. Flyte has a set of defined, battle-tested task types. It allows for a flexible model to
-:std:ref:`define new types <cookbook:plugins_extend>`.
+:ref:`define new types <plugins_extend>`.
 
 Inherent Features
 -----------------
@@ -122,4 +122,4 @@ Caching/Memoization
 ^^^^^^^^^^^^^^^^^^^
 
 Flyte supports memoization of task outputs to ensure that identical invocations of a task are not executed repeatedly, thereby saving compute resources and execution time. For example, if you wish to run the same piece of code multiple times, you can reuse the output instead of re-computing it.
-For more information on memoization, refer to the :std:doc:`/user_guide/development_lifecycle/caching`.
+For more information on memoization, refer to the :doc:`/user_guide/development_cycle/caching`.

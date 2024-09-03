@@ -11,10 +11,10 @@ Introduction
 Any workflow engine needs functionality to support scheduled executions. Flyte
 fulfills this using an in-built native scheduler, which schedules fixed rate and
 cron-based schedules. The workflow author specifies the schedule during the
-:ref:`launchplan creation <cookbook:cron-schedules>`
-and :ref:`activates or deactivates <cookbook:activating-schedules>`
+:ref:`launchplan creation <cron-schedules>`
+and :ref:`activates or deactivates <activating-schedules>`
 the schedule using the
-:ref:`admin APIs <flyteidl:ref_flyteidl.admin.LaunchPlanUpdateRequest>`
+:ref:`admin APIs <ref_flyteidl.admin.LaunchPlanUpdateRequest>`
 exposed for the launch plan.
 
 Characteristics
