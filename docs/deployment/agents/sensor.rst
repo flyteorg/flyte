@@ -56,7 +56,7 @@ Enable the sensor agent by adding the following config to the relevant YAML file
         kubectl edit configmap flyte-sandbox-config -n flyte
 
       .. code-block:: yaml
-        :emphasize-lines: 7,11,16
+        :emphasize-lines: 7,11
   
         tasks:
           task-plugins:
@@ -69,11 +69,6 @@ Enable the sensor agent by adding the following config to the relevant YAML file
               - container: container
               - container_array: k8s-array
               - sensor: agent-service
-        
-        plugins:
-          agent-service:
-            supportedTaskTypes:
-            - sensor
 
     .. group-tab:: Flyte core
 
@@ -98,10 +93,6 @@ Enable the sensor agent by adding the following config to the relevant YAML file
                   sidecar: sidecar
                   container_array: k8s-array
                   sensor: agent-service
-            plugins:
-              agent-service:
-                supportedTaskTypes:
-                - sensor
 
 
 Upgrade the deployment
