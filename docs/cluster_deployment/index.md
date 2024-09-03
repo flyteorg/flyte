@@ -35,4 +35,5 @@ agents/index
 configuration/index
 configuration/generated/index
 security/index
+swagger
 ```
