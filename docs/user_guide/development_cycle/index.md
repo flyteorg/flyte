@@ -19,6 +19,7 @@ running_workflows
 running_launch_plans
 registering_workflows
 optimizing_tasks
+testing/index
 inspecting_executions
 debugging_executions
 migrating_from_airflow_to_flyte

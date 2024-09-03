@@ -215,10 +215,10 @@ html_sidebars = {
     "api_reference/*": ["sidebars/api_reference"],
     "cluster_deployment/*": ["sidebars/cluster_deployment"],
     "community/*": ["sidebars/community"],
-    "ecosystem/*": ["sidebar/ecosystem"],
-    "integrations/*": ["sidebar/integrations"],
-    "tutorials/*": ["sidebar/tutorials"],
-    "user_guide/*": ["tutorials/user_guide"]
+    "ecosystem/*": ["sidebars/ecosystem"],
+    "integrations/*": ["sidebars/integrations"],
+    "tutorials/*": ["sidebars/tutorials"],
+    "user_guide/*": ["sidebars/user_guide"]
 }
 
 # -- Options for HTMLHelp output ---------------------------------------------

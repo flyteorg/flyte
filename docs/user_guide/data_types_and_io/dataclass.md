@@ -52,8 +52,8 @@ Once declared, a dataclass can be returned as an output or accepted as an input.
 ```
 
 ## Flyte types
-We also define a data class that accepts {std:ref}`StructuredDataset <structured_dataset>`,
-{std:ref}`FlyteFile <files>` and {std:ref}`FlyteDirectory <folder>`.
+We also define a data class that accepts {ref}`StructuredDataset <structured_dataset>`,
+{ref}`FlyteFile <files>` and {ref}`FlyteDirectory <folder>`.
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/dataclass.py
 :caption: data_types_and_io/dataclass.py

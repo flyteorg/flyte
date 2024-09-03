@@ -12,7 +12,7 @@ To streamline the communication between Flyte tasks, particularly when dealing w
 
 ## Tensors and modules
 
-At times, you may find the need to pass tensors and modules (models) within your workflow. Without native support for PyTorch tensors and modules, Flytekit relies on {std:ref}`pickle <pickle_type>` for serializing and deserializing these entities, as well as any unknown types. However, this approach isn't the most efficient. As a result, we've integrated PyTorch's serialization and deserialization support into the Flyte type system.
+At times, you may find the need to pass tensors and modules (models) within your workflow. Without native support for PyTorch tensors and modules, Flytekit relies on {ref}`pickle <pickle_type>` for serializing and deserializing these entities, as well as any unknown types. However, this approach isn't the most efficient. As a result, we've integrated PyTorch's serialization and deserialization support into the Flyte type system.
 
 ```{note}
 To clone and run the example code on this page, see the [Flytesnacks repo][flytesnacks].

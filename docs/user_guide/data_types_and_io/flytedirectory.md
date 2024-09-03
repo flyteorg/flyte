@@ -21,7 +21,7 @@ To begin, import the libraries:
 :lines: 1-10
 ```
 
-Building upon the previous example demonstrated in the {std:ref}`file <file>` section,
+Building upon the previous example demonstrated in the {ref}`file <file>` section,
 let's continue by considering the normalization of columns in a CSV file.
 
 The following task downloads a list of URLs pointing to CSV files

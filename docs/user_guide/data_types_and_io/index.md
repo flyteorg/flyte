@@ -15,7 +15,7 @@ They enable:
 - Auto generated CLI and launch UI
 
 For a more comprehensive understanding of how Flyte manages data, refer to the
-{std:ref}`Understand How Flyte Handles Data <flyte:divedeep-data-management>` guide.
+{ref}`Understand How Flyte Handles Data <divedeep-data-management>` guide.
 
 (python_to_flyte_type_mapping)=
 
