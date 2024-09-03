@@ -1,3 +1,5 @@
+(user_guide)=
+
 # User guide
 
 ```{toctree}
@@ -6,4 +8,7 @@
 
 core_concepts/index
 data_types_and_io/index
+development_cycle/index
+productionizing/index
+extending/index
 ```
