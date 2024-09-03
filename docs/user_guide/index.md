@@ -34,7 +34,7 @@ Flyte is made up of a user plane, control plane, and data plane.
 :hidden:
 
 quickstart_guide
-first_workflow
+first_workflow/index
 core_concepts/index
 data_types_and_io/index
 development_cycle/index
