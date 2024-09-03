@@ -128,13 +128,13 @@ func getAgentRegistry(ctx context.Context, cs *ClientSet) Registry {
 			continue
 		}
 
-		var agentSupportedTaskCategories []string
+		agentSupportedTaskCategories := make(map[string]struct{})
 		for _, agent := range res.GetAgents() {
 			deprecatedSupportedTaskTypes := agent.SupportedTaskTypes
-			agentSupportedTaskCategories = append(agentSupportedTaskCategories, deprecatedSupportedTaskTypes...)
 			for _, supportedTaskType := range deprecatedSupportedTaskTypes {
 				agent := &Agent{AgentDeployment: agentDeployment, IsSync: agent.IsSync}
 				newAgentRegistry[supportedTaskType] = map[int32]*Agent{defaultTaskTypeVersion: agent}
+				agentSupportedTaskCategories[supportedTaskType] = struct{}{}
 			}
 
 			supportedTaskCategories := agent.SupportedTaskCategories
@@ -142,11 +142,12 @@ func getAgentRegistry(ctx context.Context, cs *ClientSet) Registry {
 				agent := &Agent{AgentDeployment: agentDeployment, IsSync: agent.IsSync}
 				supportedCategoryName := supportedCategory.GetName()
 				newAgentRegistry[supportedCategoryName] = map[int32]*Agent{supportedCategory.GetVersion(): agent}
-				agentSupportedTaskCategories = append(agentSupportedTaskCategories, supportedCategoryName)
+				agentSupportedTaskCategories[supportedCategoryName] = struct{}{}
 			}
 
 		}
-		logger.Infof(ctx, "AgentDeployment [%v] supports the following task types: [%v]", agentDeployment.Endpoint, strings.Join(agentSupportedTaskCategories, ", "))
+		logger.Infof(ctx, "AgentDeployment [%v] supports the following task types: [%v]", agentDeployment.Endpoint,
+			strings.Join(maps.Keys(agentSupportedTaskCategories), ", "))
 	}
 
 	// If the agent doesn't implement the metadata service, we construct the registry based on the configuration
