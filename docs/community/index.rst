@@ -106,6 +106,7 @@ Messages that don't follow these rules will be deleted.
     :maxdepth: 1
     :hidden:
 
+    Contributing documentation <contributing_documentation.md>
     Roadmap <roadmap>
     Frequently asked questions <https://github.com/flyteorg/flyte/discussions/categories/q-a>
     Troubleshooting guide <troubleshoot>
