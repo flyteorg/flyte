@@ -156,11 +156,11 @@ exclude_patterns = [
     "flytekit/*.md",
     "flytekit/**/*ipynb",
     "flytekit/**/*.md",
-    "flytectl/index.rst",
-    "protos/boilerplate/**",
-    "api_reference/protos/tmp/**",
-    "api_reference/protos/gen/**",
-    "api_reference/protos/README.md",
+    # "flytectl/index.rst",
+    "api_reference/flyteidl/boilerplate/**",
+    "api_reference/flyteidl/tmp/**",
+    "api_reference/flyteidl/gen/**",
+    "api_reference/flyteidl/README.md",
     # "protos/docs/**/index.rst",
     # "protos/index.rst"
 ]
@@ -340,14 +340,14 @@ PROTO_REF_REPLACE = r"\1/protos/docs"
 REPLACE_PATTERNS = {
 
     r"<flyte:deployment/index>": r"</deployment/index>",
-    r"<flytectl:index>": r"</flytectl/overview>",
+    #r"<flytectl:index>": r"</flytectl/overview>",
     INTERSPHINX_REFS_PATTERN: INTERSPHINX_REFS_REPLACE,
     r"<auto_examples": r"<flytesnacks/examples",
     r"<protos/docs/core/core:taskmetadata>": r"<ref_flyteidl.core.TaskMetadata>",
     r"<protos/docs/core/core:tasktemplate>": r"<ref_flyteidl.core.TaskTemplate>",
     r"<flytesnacks/examples": r"</flytesnacks/examples",
     r"<auto_examples/basics/index>": r"</flytesnacks/examples/basics/index>",
-    r"<deploy-sandbox-local>": r"<deployment-deployment-sandbox>",
+    # r"<deploy-sandbox-local>": r"<deployment-deployment-sandbox>",
     r"<deployment/configuration/general:configurable resource types>": r"<deployment-configuration-general>",
     r"<_tags/DistributedComputing>": r"</_tags/DistributedComputing>",
     r"{ref}`bioinformatics <bioinformatics>`": r"bioinformatics",
@@ -427,15 +427,15 @@ import_projects = [
         "name": "flytectl",
         "source": "../flytectl",
         "docs_path": "docs/source",
-        "dest": "flytectl",
+        "dest": "api_reference/flytectl_cli",
         "local": True,
     },
     {
         "name": "flyteidl",
         "source": "../flyteidl",
         "docs_path": "protos",
-        "dest": "protos",  # to stay compatible with flyteidl docs path naming
-        "cmd": ["cp", "../flyteidl/README.md", "protos/README.md"],
+        "dest": "api_reference/flyteidl",
+        "cmd": ["cp", "../flyteidl/README.md", "api_reference/flyteidl/README.md"],
         "local": True,
     }
 ]
