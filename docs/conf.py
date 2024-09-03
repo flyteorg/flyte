@@ -78,8 +78,8 @@ extensions = [
     "sphinx_tags",
     "myst_nb",
     # custom extensions
-    # "auto_examples",
-    # "import_projects",
+    "auto_examples",
+    "import_projects",
 ]
 
 source_suffix = {
