@@ -39,5 +39,6 @@ core_concepts/index
 data_types_and_io/index
 development_cycle/index
 productionizing/index
+flyte_agents/index
 extending/index
 ```
