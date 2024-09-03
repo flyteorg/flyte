@@ -20,7 +20,7 @@ Specify agent configuration
         kubectl edit configmap flyte-sandbox-config -n flyte
 
       .. code-block:: yaml
-        :emphasize-lines: 7,11,16
+        :emphasize-lines: 7,11
 
         tasks:
           task-plugins:
@@ -36,8 +36,6 @@ Specify agent configuration
 
         plugins:
           agent-service:
-            supportedTaskTypes:
-            - chatgpt
             # Configuring the timeout is optional.
             # Tasks like using ChatGPT with a large model might require a longer time, 
             # so we have the option to adjust the timeout setting here.
@@ -70,8 +68,6 @@ Specify agent configuration
                   chatgpt: agent-service
             plugins:
               agent-service:
-                supportedTaskTypes:
-                - chatgpt
                 # Configuring the timeout is optional.
                 # Tasks like using ChatGPT with a large model might require a longer time, 
                 # so we have the option to adjust the timeout setting here.

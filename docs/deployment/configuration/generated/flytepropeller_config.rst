@@ -994,9 +994,6 @@ agent-service (`agent.Config`_)
       Value: 50
     ProjectScopeResourceConstraint:
       Value: 100
-  supportedTaskTypes:
-  - task_type_1
-  - task_type_2
   webApi:
     caching:
       maxSystemFailures: 5

@@ -358,11 +358,9 @@ flyteagent:
           endpoint: "dns:///flyteagent.flyte.svc.cluster.local:8000"
           # -- Whether the connection from propeller to the agent service should use TLS.
           insecure: true
-        # -- The task types supported by the default agent.
-        supportedTaskTypes:
-        - sensor
-        # -- Uncomment to enable task type that uses Flyte Agent
-        # - bigquery_query_job_task
+        # -- The task types supported by the default agent. As of #5460 these are discovered automatically and don't
+        # need to be configured.
+        supportedTaskTypes: []
   # -- Labels for flyteagent pods
   podLabels: {}
 

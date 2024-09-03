@@ -139,7 +139,7 @@ Specify agent configuration
           kubectl edit configmap flyte-sandbox-config -n flyte
 
         .. code-block:: yaml
-          :emphasize-lines: 7,12,16
+          :emphasize-lines: 7,12
 
           tasks:
             task-plugins:
@@ -153,17 +153,13 @@ Specify agent configuration
                 - sidecar
                 - k8s-array
                 - agent-service
-          plugins:
-            agent-service:
-              supportedTaskTypes:
-              - spark
 
       .. group-tab:: Helm chart
 
         Edit the relevant YAML file to specify the plugin.
 
         .. code-block:: yaml
-          :emphasize-lines: 7,11,15
+          :emphasize-lines: 7,11
 
           tasks:
             task-plugins:
@@ -176,17 +172,13 @@ Specify agent configuration
                 - container: container
                 - container_array: k8s-array
                 - spark: agent-service
-            plugins:
-              agent-service:
-                supportedTaskTypes:
-                - spark
 
   .. group-tab:: Flyte core
 
     Create a file named ``values-override.yaml`` and add the following config to it:
 
     .. code-block:: yaml
-      :emphasize-lines: 9,14-17
+      :emphasize-lines: 9
 
         enabled_plugins:
           tasks:
@@ -201,10 +193,6 @@ Specify agent configuration
                 sidecar: sidecar
                 container_array: k8s-array
                 spark: agent-service
-          plugins:
-            agent-service:
-              supportedTaskTypes:
-              - spark
 
 Add the Databricks access token
 -------------------------------
