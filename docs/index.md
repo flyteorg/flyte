@@ -8,6 +8,8 @@ Hello world.
 
 user_guide/index
 concepts/index
+tutorials/index
+integrations/index
 cluster_deployment/index
 api_reference/index
 community/index
