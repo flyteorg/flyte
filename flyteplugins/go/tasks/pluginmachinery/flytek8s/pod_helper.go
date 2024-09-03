@@ -348,6 +348,15 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 		IncludeConsoleURL: hasExternalLinkType(taskTemplate),
 	}
 
+	// iterate over the initContainers first
+	for index := range podSpec.InitContainers {
+		var resourceMode = ResourceCustomizationModeEnsureExistingResourcesInRange
+
+		if err := AddFlyteCustomizationsToContainer(ctx, templateParameters, resourceMode, &podSpec.InitContainers[index]); err != nil {
+			return nil, nil, err
+		}
+	}
+
 	resourceRequests := make([]v1.ResourceRequirements, 0, len(podSpec.Containers))
 	var primaryContainer *v1.Container
 	for index, container := range podSpec.Containers {
