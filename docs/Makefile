@@ -20,4 +20,4 @@ help:
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
 clean:
-	rm -rf _build _src _tags api flytectl flytekit flytesnacks protos examples tests _projects
+	rm -rf _build _tags flytesnacks examples api_reference/flytekit_sdk/generated api_reference/flytectl api_reference/flyteidl
