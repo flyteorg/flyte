@@ -17,6 +17,8 @@ creating_a_new_project
 running_tasks
 running_workflows
 running_launch_plans
+registering_workflows
+optimizing_tasks
 inspecting_executions
 debugging_executions
 migrating_from_airflow_to_flyte
