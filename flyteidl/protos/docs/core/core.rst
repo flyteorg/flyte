@@ -1745,7 +1745,7 @@ A collection of fields for tuple binding data.
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "tuple_name", ":ref:`ref_string`", "", ""
+   "type", ":ref:`ref_flyteidl.core.TupleType`", "", ""
    "bindings", ":ref:`ref_flyteidl.core.BindingDataTupleMap.BindingsEntry`", "repeated", ""
 
 
@@ -1969,7 +1969,7 @@ A collection of fields for tuple literal.
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "tuple_name", ":ref:`ref_string`", "", ""
+   "type", ":ref:`ref_flyteidl.core.TupleType`", "", ""
    "literals", ":ref:`ref_flyteidl.core.LiteralTupleMap.LiteralsEntry`", "repeated", ""
 
 
@@ -3293,6 +3293,7 @@ TODO: Add more docs
    :widths: auto
 
    "tuple_name", ":ref:`ref_string`", "", ""
+   "order", ":ref:`ref_string`", "repeated", ""
    "fields", ":ref:`ref_flyteidl.core.TupleType.FieldsEntry`", "repeated", ""
 
 

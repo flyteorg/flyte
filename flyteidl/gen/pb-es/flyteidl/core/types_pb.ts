@@ -499,7 +499,12 @@ export class TupleType extends Message<TupleType> {
   tupleName = "";
 
   /**
-   * @generated from field: map<string, flyteidl.core.LiteralType> fields = 2;
+   * @generated from field: repeated string order = 2;
+   */
+  order: string[] = [];
+
+  /**
+   * @generated from field: map<string, flyteidl.core.LiteralType> fields = 3;
    */
   fields: { [key: string]: LiteralType } = {};
 
@@ -512,7 +517,8 @@ export class TupleType extends Message<TupleType> {
   static readonly typeName = "flyteidl.core.TupleType";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "tuple_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "fields", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: LiteralType} },
+    { no: 2, name: "order", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 3, name: "fields", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: LiteralType} },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TupleType {

@@ -249,7 +249,17 @@ func (t tupleTypeChecker) CastsFrom(upstreamType *flyte.LiteralType) bool {
 	tupleType := t.literalType.GetTupleType()
 	upstreamTupleType := upstreamType.GetTupleType()
 	if upstreamTupleType != nil {
-		if (len(upstreamTupleType.GetFields()) == len(tupleType.GetFields()) && upstreamTupleType.GetTupleName() == tupleType.GetTupleName()) {
+		// check order
+		if len(upstreamTupleType.GetOrder()) != len(tupleType.GetOrder()) {
+			return false
+		}
+		for i, upstreamField := range upstreamTupleType.GetOrder() {
+			if upstreamField != tupleType.GetOrder()[i] {
+				return false
+			}
+		}
+
+		if len(upstreamTupleType.GetFields()) == len(tupleType.GetFields()) && upstreamTupleType.GetTupleName() == tupleType.GetTupleName() {
 			for k, downstreamType := range tupleType.GetFields() {
 				if upstreamFieldType, ok := upstreamTupleType.GetFields()[k]; !ok || !getTypeChecker(downstreamType).CastsFrom(upstreamFieldType) {
 					return false

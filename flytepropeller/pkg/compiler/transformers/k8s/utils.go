@@ -120,6 +120,7 @@ func StripTypeMetadata(t *core.LiteralType) *core.LiteralType {
 		}
 
 		underlyingType.TupleType.TupleName = c.GetTupleType().TupleName
+		underlyingType.TupleType.Order = c.GetTupleType().Order
 		underlyingType.TupleType.Fields = fields
 	}
 

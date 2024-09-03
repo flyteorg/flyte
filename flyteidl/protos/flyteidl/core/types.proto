@@ -112,7 +112,8 @@ message UnionType {
 // TODO: Add more docs
 message TupleType {
     string tuple_name = 1;
-    map<string, LiteralType> fields = 2;
+    repeated string order = 2;
+    map<string, LiteralType> fields = 3;
 }
 
 // Hints to improve type matching

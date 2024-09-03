@@ -761,4 +761,54 @@ func TestMakeLiteralForType(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, expectedVal, actualVal)
 	})
+
+	t.Run("Tuple", func(t *testing.T) {
+		var literalType = &core.LiteralType{
+			Type: &core.LiteralType_TupleType{
+				TupleType: &core.TupleType{
+					TupleName: "DefaultTupleName",
+					Order: []string{
+						"int_field",
+						"str_field",
+					},
+					Fields: map[string]*core.LiteralType{
+						"str_field": {Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING}},
+						"int_field": {Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}},
+					},
+				},
+			},
+		}
+		expectedLV := &core.Literal{Value: &core.Literal_Tuple{
+			Tuple: &core.LiteralTupleMap{
+				Type: &core.TupleType{
+					TupleName: "DefaultTupleName",
+					Order: []string{
+						"int_field",
+						"str_field",
+					},
+					Fields: map[string]*core.LiteralType{
+						"str_field": {Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING}},
+						"int_field": {Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}},
+					},
+				},
+				Literals: map[string]*core.Literal{
+					"int_field": {Value: &core.Literal_Scalar{Scalar: &core.Scalar{
+						Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_Integer{Integer: 1}}}}}},
+					"str_field": {Value: &core.Literal_Scalar{Scalar: &core.Scalar{
+						Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_StringValue{StringValue: "hello"}}}}}},
+				},
+			},
+		}}
+		lv, err := MakeLiteralForType(literalType, map[string]interface{}{
+			"int_field": 1,
+			"str_field": "hello",
+		})
+		assert.NoError(t, err)
+		assert.Equal(t, expectedLV, lv)
+		expectedVal, err := ExtractFromLiteral(expectedLV)
+		assert.NoError(t, err)
+		actualVal, err := ExtractFromLiteral(lv)
+		assert.NoError(t, err)
+		assert.Equal(t, expectedVal, actualVal)
+	})
 }

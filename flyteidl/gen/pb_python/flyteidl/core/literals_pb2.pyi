@@ -150,7 +150,7 @@ class LiteralMap(_message.Message):
     def __init__(self, literals: _Optional[_Mapping[str, Literal]] = ...) -> None: ...
 
 class LiteralTupleMap(_message.Message):
-    __slots__ = ["tuple_name", "literals"]
+    __slots__ = ["type", "literals"]
     class LiteralsEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -158,11 +158,11 @@ class LiteralTupleMap(_message.Message):
         key: str
         value: Literal
         def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[Literal, _Mapping]] = ...) -> None: ...
-    TUPLE_NAME_FIELD_NUMBER: _ClassVar[int]
+    TYPE_FIELD_NUMBER: _ClassVar[int]
     LITERALS_FIELD_NUMBER: _ClassVar[int]
-    tuple_name: str
+    type: _types_pb2.TupleType
     literals: _containers.MessageMap[str, Literal]
-    def __init__(self, tuple_name: _Optional[str] = ..., literals: _Optional[_Mapping[str, Literal]] = ...) -> None: ...
+    def __init__(self, type: _Optional[_Union[_types_pb2.TupleType, _Mapping]] = ..., literals: _Optional[_Mapping[str, Literal]] = ...) -> None: ...
 
 class BindingDataCollection(_message.Message):
     __slots__ = ["bindings"]
@@ -184,7 +184,7 @@ class BindingDataMap(_message.Message):
     def __init__(self, bindings: _Optional[_Mapping[str, BindingData]] = ...) -> None: ...
 
 class BindingDataTupleMap(_message.Message):
-    __slots__ = ["tuple_name", "bindings"]
+    __slots__ = ["type", "bindings"]
     class BindingsEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -192,11 +192,11 @@ class BindingDataTupleMap(_message.Message):
         key: str
         value: BindingData
         def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[BindingData, _Mapping]] = ...) -> None: ...
-    TUPLE_NAME_FIELD_NUMBER: _ClassVar[int]
+    TYPE_FIELD_NUMBER: _ClassVar[int]
     BINDINGS_FIELD_NUMBER: _ClassVar[int]
-    tuple_name: str
+    type: _types_pb2.TupleType
     bindings: _containers.MessageMap[str, BindingData]
-    def __init__(self, tuple_name: _Optional[str] = ..., bindings: _Optional[_Mapping[str, BindingData]] = ...) -> None: ...
+    def __init__(self, type: _Optional[_Union[_types_pb2.TupleType, _Mapping]] = ..., bindings: _Optional[_Mapping[str, BindingData]] = ...) -> None: ...
 
 class UnionInfo(_message.Message):
     __slots__ = ["targetType"]

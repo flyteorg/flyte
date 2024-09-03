@@ -172,7 +172,9 @@ pub struct UnionType {
 pub struct TupleType {
     #[prost(string, tag="1")]
     pub tuple_name: ::prost::alloc::string::String,
-    #[prost(map="string, message", tag="2")]
+    #[prost(string, repeated, tag="2")]
+    pub order: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    #[prost(map="string, message", tag="3")]
     pub fields: ::std::collections::HashMap<::prost::alloc::string::String, LiteralType>,
 }
 /// Hints to improve type matching
@@ -548,8 +550,8 @@ pub struct LiteralMap {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct LiteralTupleMap {
-    #[prost(string, tag="1")]
-    pub tuple_name: ::prost::alloc::string::String,
+    #[prost(message, optional, tag="1")]
+    pub r#type: ::core::option::Option<TupleType>,
     #[prost(map="string, message", tag="2")]
     pub literals: ::std::collections::HashMap<::prost::alloc::string::String, Literal>,
 }
@@ -571,8 +573,8 @@ pub struct BindingDataMap {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct BindingDataTupleMap {
-    #[prost(string, tag="1")]
-    pub tuple_name: ::prost::alloc::string::String,
+    #[prost(message, optional, tag="1")]
+    pub r#type: ::core::option::Option<TupleType>,
     #[prost(map="string, message", tag="2")]
     pub bindings: ::std::collections::HashMap<::prost::alloc::string::String, BindingData>,
 }

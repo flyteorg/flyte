@@ -103,7 +103,7 @@ class UnionType(_message.Message):
     def __init__(self, variants: _Optional[_Iterable[_Union[LiteralType, _Mapping]]] = ...) -> None: ...
 
 class TupleType(_message.Message):
-    __slots__ = ["tuple_name", "fields"]
+    __slots__ = ["tuple_name", "order", "fields"]
     class FieldsEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -112,10 +112,12 @@ class TupleType(_message.Message):
         value: LiteralType
         def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[LiteralType, _Mapping]] = ...) -> None: ...
     TUPLE_NAME_FIELD_NUMBER: _ClassVar[int]
+    ORDER_FIELD_NUMBER: _ClassVar[int]
     FIELDS_FIELD_NUMBER: _ClassVar[int]
     tuple_name: str
+    order: _containers.RepeatedScalarFieldContainer[str]
     fields: _containers.MessageMap[str, LiteralType]
-    def __init__(self, tuple_name: _Optional[str] = ..., fields: _Optional[_Mapping[str, LiteralType]] = ...) -> None: ...
+    def __init__(self, tuple_name: _Optional[str] = ..., order: _Optional[_Iterable[str]] = ..., fields: _Optional[_Mapping[str, LiteralType]] = ...) -> None: ...
 
 class TypeStructure(_message.Message):
     __slots__ = ["tag", "dataclass_type"]

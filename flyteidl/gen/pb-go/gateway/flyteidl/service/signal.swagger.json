@@ -408,8 +408,8 @@
     "coreLiteralTupleMap": {
       "type": "object",
       "properties": {
-        "tuple_name": {
-          "type": "string"
+        "type": {
+          "$ref": "#/definitions/coreTupleType"
         },
         "literals": {
           "type": "object",
@@ -630,6 +630,12 @@
       "properties": {
         "tuple_name": {
           "type": "string"
+        },
+        "order": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         },
         "fields": {
           "type": "object",

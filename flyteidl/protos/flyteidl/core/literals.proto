@@ -134,7 +134,7 @@ message LiteralMap {
 
 // A collection of fields for tuple literal.
 message LiteralTupleMap {
-    string tuple_name = 1;
+    TupleType type = 1;
     map<string, Literal> literals = 2;
 }
 
@@ -150,7 +150,7 @@ message BindingDataMap {
 
 // A collection of fields for tuple binding data.
 message BindingDataTupleMap {
-    string tuple_name = 1;
+    TupleType type = 1;
     map<string, BindingData> bindings = 2;
 }
 

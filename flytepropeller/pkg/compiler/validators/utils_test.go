@@ -302,6 +302,88 @@ func TestLiteralTypeForLiterals(t *testing.T) {
 		assert.True(t, proto.Equal(expectedLt, lt))
 	})
 
+	t.Run("tuple type", func(t *testing.T) {
+		literals := &core.Literal{
+			Value: &core.Literal_Tuple{
+				Tuple: &core.LiteralTupleMap{
+					Type: &core.TupleType{
+						TupleName: "DefaultTupleName",
+						Order: []string{
+							"a", "b",
+						},
+						Fields: map[string]*core.LiteralType{
+							"a": {
+								Type: &core.LiteralType_Simple{
+									Simple: core.SimpleType_INTEGER,
+								},
+							},
+							"b": {
+								Type: &core.LiteralType_Simple{
+									Simple: core.SimpleType_STRING,
+								},
+							},
+						},
+					},
+					Literals: map[string]*core.Literal{
+						"a": {
+							Value: &core.Literal_Scalar{
+								Scalar: &core.Scalar{
+									Value: &core.Scalar_Primitive{
+										Primitive: &core.Primitive{
+											Value: &core.Primitive_Integer{
+												Integer: 1,
+											},
+										},
+									},
+								},
+							},
+						},
+						"b": {
+							Value: &core.Literal_Scalar{
+								Scalar: &core.Scalar{
+									Value: &core.Scalar_Primitive{
+										Primitive: &core.Primitive{
+											Value: &core.Primitive_StringValue{
+												StringValue: "foo",
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+
+		expectedLt := &core.LiteralType{
+			Type: &core.LiteralType_TupleType{
+				TupleType: &core.TupleType{
+					TupleName: "DefaultTupleName",
+					Order: []string{
+						"a", "b",
+					},
+					Fields: map[string]*core.LiteralType{
+						"a": {
+							Type: &core.LiteralType_Simple{
+								Simple: core.SimpleType_INTEGER,
+							},
+						},
+						"b": {
+							Type: &core.LiteralType_Simple{
+								Simple: core.SimpleType_STRING,
+							},
+						},
+					},
+				},
+			},
+		}
+
+		lt := LiteralTypeForLiteral(literals)
+
+		assert.True(t, proto.Equal(expectedLt, lt))
+	})
+
 	t.Run("empty nested listed", func(t *testing.T) {
 		literals := &core.Literal{
 			Value: &core.Literal_Collection{

@@ -5530,6 +5530,7 @@
                  * @memberof flyteidl.core
                  * @interface ITupleType
                  * @property {string|null} [tupleName] TupleType tupleName
+                 * @property {Array.<string>|null} [order] TupleType order
                  * @property {Object.<string,flyteidl.core.ILiteralType>|null} [fields] TupleType fields
                  */
     
@@ -5542,6 +5543,7 @@
                  * @param {flyteidl.core.ITupleType=} [properties] Properties to set
                  */
                 function TupleType(properties) {
+                    this.order = [];
                     this.fields = {};
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
@@ -5556,6 +5558,14 @@
                  * @instance
                  */
                 TupleType.prototype.tupleName = "";
+    
+                /**
+                 * TupleType order.
+                 * @member {Array.<string>} order
+                 * @memberof flyteidl.core.TupleType
+                 * @instance
+                 */
+                TupleType.prototype.order = $util.emptyArray;
     
                 /**
                  * TupleType fields.
@@ -5591,9 +5601,12 @@
                         writer = $Writer.create();
                     if (message.tupleName != null && message.hasOwnProperty("tupleName"))
                         writer.uint32(/* id 1, wireType 2 =*/10).string(message.tupleName);
+                    if (message.order != null && message.order.length)
+                        for (var i = 0; i < message.order.length; ++i)
+                            writer.uint32(/* id 2, wireType 2 =*/18).string(message.order[i]);
                     if (message.fields != null && message.hasOwnProperty("fields"))
                         for (var keys = Object.keys(message.fields), i = 0; i < keys.length; ++i) {
-                            writer.uint32(/* id 2, wireType 2 =*/18).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]);
+                            writer.uint32(/* id 3, wireType 2 =*/26).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]);
                             $root.flyteidl.core.LiteralType.encode(message.fields[keys[i]], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim().ldelim();
                         }
                     return writer;
@@ -5621,6 +5634,11 @@
                             message.tupleName = reader.string();
                             break;
                         case 2:
+                            if (!(message.order && message.order.length))
+                                message.order = [];
+                            message.order.push(reader.string());
+                            break;
+                        case 3:
                             reader.skip().pos++;
                             if (message.fields === $util.emptyObject)
                                 message.fields = {};
@@ -5650,6 +5668,13 @@
                     if (message.tupleName != null && message.hasOwnProperty("tupleName"))
                         if (!$util.isString(message.tupleName))
                             return "tupleName: string expected";
+                    if (message.order != null && message.hasOwnProperty("order")) {
+                        if (!Array.isArray(message.order))
+                            return "order: array expected";
+                        for (var i = 0; i < message.order.length; ++i)
+                            if (!$util.isString(message.order[i]))
+                                return "order: string[] expected";
+                    }
                     if (message.fields != null && message.hasOwnProperty("fields")) {
                         if (!$util.isObject(message.fields))
                             return "fields: object expected";
@@ -8795,7 +8820,7 @@
                  * Properties of a LiteralTupleMap.
                  * @memberof flyteidl.core
                  * @interface ILiteralTupleMap
-                 * @property {string|null} [tupleName] LiteralTupleMap tupleName
+                 * @property {flyteidl.core.ITupleType|null} [type] LiteralTupleMap type
                  * @property {Object.<string,flyteidl.core.ILiteral>|null} [literals] LiteralTupleMap literals
                  */
     
@@ -8816,12 +8841,12 @@
                 }
     
                 /**
-                 * LiteralTupleMap tupleName.
-                 * @member {string} tupleName
+                 * LiteralTupleMap type.
+                 * @member {flyteidl.core.ITupleType|null|undefined} type
                  * @memberof flyteidl.core.LiteralTupleMap
                  * @instance
                  */
-                LiteralTupleMap.prototype.tupleName = "";
+                LiteralTupleMap.prototype.type = null;
     
                 /**
                  * LiteralTupleMap literals.
@@ -8855,8 +8880,8 @@
                 LiteralTupleMap.encode = function encode(message, writer) {
                     if (!writer)
                         writer = $Writer.create();
-                    if (message.tupleName != null && message.hasOwnProperty("tupleName"))
-                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.tupleName);
+                    if (message.type != null && message.hasOwnProperty("type"))
+                        $root.flyteidl.core.TupleType.encode(message.type, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
                     if (message.literals != null && message.hasOwnProperty("literals"))
                         for (var keys = Object.keys(message.literals), i = 0; i < keys.length; ++i) {
                             writer.uint32(/* id 2, wireType 2 =*/18).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]);
@@ -8884,7 +8909,7 @@
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
                         case 1:
-                            message.tupleName = reader.string();
+                            message.type = $root.flyteidl.core.TupleType.decode(reader, reader.uint32());
                             break;
                         case 2:
                             reader.skip().pos++;
@@ -8913,9 +8938,11 @@
                 LiteralTupleMap.verify = function verify(message) {
                     if (typeof message !== "object" || message === null)
                         return "object expected";
-                    if (message.tupleName != null && message.hasOwnProperty("tupleName"))
-                        if (!$util.isString(message.tupleName))
-                            return "tupleName: string expected";
+                    if (message.type != null && message.hasOwnProperty("type")) {
+                        var error = $root.flyteidl.core.TupleType.verify(message.type);
+                        if (error)
+                            return "type." + error;
+                    }
                     if (message.literals != null && message.hasOwnProperty("literals")) {
                         if (!$util.isObject(message.literals))
                             return "literals: object expected";
@@ -9184,7 +9211,7 @@
                  * Properties of a BindingDataTupleMap.
                  * @memberof flyteidl.core
                  * @interface IBindingDataTupleMap
-                 * @property {string|null} [tupleName] BindingDataTupleMap tupleName
+                 * @property {flyteidl.core.ITupleType|null} [type] BindingDataTupleMap type
                  * @property {Object.<string,flyteidl.core.IBindingData>|null} [bindings] BindingDataTupleMap bindings
                  */
     
@@ -9205,12 +9232,12 @@
                 }
     
                 /**
-                 * BindingDataTupleMap tupleName.
-                 * @member {string} tupleName
+                 * BindingDataTupleMap type.
+                 * @member {flyteidl.core.ITupleType|null|undefined} type
                  * @memberof flyteidl.core.BindingDataTupleMap
                  * @instance
                  */
-                BindingDataTupleMap.prototype.tupleName = "";
+                BindingDataTupleMap.prototype.type = null;
     
                 /**
                  * BindingDataTupleMap bindings.
@@ -9244,8 +9271,8 @@
                 BindingDataTupleMap.encode = function encode(message, writer) {
                     if (!writer)
                         writer = $Writer.create();
-                    if (message.tupleName != null && message.hasOwnProperty("tupleName"))
-                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.tupleName);
+                    if (message.type != null && message.hasOwnProperty("type"))
+                        $root.flyteidl.core.TupleType.encode(message.type, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
                     if (message.bindings != null && message.hasOwnProperty("bindings"))
                         for (var keys = Object.keys(message.bindings), i = 0; i < keys.length; ++i) {
                             writer.uint32(/* id 2, wireType 2 =*/18).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]);
@@ -9273,7 +9300,7 @@
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
                         case 1:
-                            message.tupleName = reader.string();
+                            message.type = $root.flyteidl.core.TupleType.decode(reader, reader.uint32());
                             break;
                         case 2:
                             reader.skip().pos++;
@@ -9302,9 +9329,11 @@
                 BindingDataTupleMap.verify = function verify(message) {
                     if (typeof message !== "object" || message === null)
                         return "object expected";
-                    if (message.tupleName != null && message.hasOwnProperty("tupleName"))
-                        if (!$util.isString(message.tupleName))
-                            return "tupleName: string expected";
+                    if (message.type != null && message.hasOwnProperty("type")) {
+                        var error = $root.flyteidl.core.TupleType.verify(message.type);
+                        if (error)
+                            return "type." + error;
+                    }
                     if (message.bindings != null && message.hasOwnProperty("bindings")) {
                         if (!$util.isObject(message.bindings))
                             return "bindings: object expected";
