@@ -174,15 +174,6 @@ html_favicon = "images/favicon-flyte-docs.png"
 html_logo = "images/favicon-flyte-docs.png"
 html_theme = "pydata_sphinx_theme"
 html_title = "Flyte"
-html_sidebars = {
-    "api_reference/*": ["sidebars/api_reference"],
-    "cluster_deployment/*": ["sidebars/cluster_deployment"],
-    "community/*": ["sidebars/community"],
-    "ecosystem/*": ["sidebar/ecosystem"],
-    "integrations/*": ["sidebar/integrations"],
-    "tutorials/*": ["sidebar/tutorials"],
-    "user_guide/*": ["tutorials/user_guide"]
-}
 
 templates_path = ["_templates"]
 
@@ -220,7 +211,15 @@ html_js_files = ["custom.js"]
 # default: ``['localtoc.html', 'relations.html', 'sourcelink.html',
 # 'searchbox.html']``.
 #
-# html_sidebars = {"**": ["logo-text.html", "globaltoc.html", "localtoc.html", "searchbox.html"]}
+html_sidebars = {
+    "api_reference/*": ["sidebars/api_reference"],
+    "cluster_deployment/*": ["sidebars/cluster_deployment"],
+    "community/*": ["sidebars/community"],
+    "ecosystem/*": ["sidebar/ecosystem"],
+    "integrations/*": ["sidebar/integrations"],
+    "tutorials/*": ["sidebar/tutorials"],
+    "user_guide/*": ["tutorials/user_guide"]
+}
 
 # -- Options for HTMLHelp output ---------------------------------------------
 
@@ -332,20 +331,20 @@ nb_custom_formats = {
 #
 # - :ref:`cookbook:label` -> :ref:`label`
 # - :ref:`Text <cookbook:label>` -> :ref:`Text <label>`
-INTERSPHINX_REFS_PATTERN = r"([`<])(flyte:|flytekit:|flytectl:|flyteidl:|cookbook:|idl:)"
-INTERSPHINX_REFS_REPLACE = r"\1"
+# INTERSPHINX_REFS_PATTERN = r"([`<])(flyte:|flytekit:|flytectl:|flyteidl:|cookbook:|idl:)"
+# INTERSPHINX_REFS_REPLACE = r"\1"
 
 # Pattern for replacing all ref/doc labels that point to protos/docs with /protos/docs
-PROTO_REF_PATTERN = r"([:<])(protos/docs)"
-PROTO_REF_REPLACE = r"\1/protos/docs"
+# PROTO_REF_PATTERN = r"([:<])(protos/docs)"
+# PROTO_REF_REPLACE = r"\1/protos/docs"
 
 # These patterns are used to replace values in source files that are imported
 # from other repos.
 REPLACE_PATTERNS = {
 
     r"<flyte:deployment/index>": r"</deployment/index>",
-    #r"<flytectl:index>": r"</flytectl/overview>",
-    INTERSPHINX_REFS_PATTERN: INTERSPHINX_REFS_REPLACE,
+    # r"<flytectl:index>": r"</flytectl/overview>",
+    # INTERSPHINX_REFS_PATTERN: INTERSPHINX_REFS_REPLACE,
     r"<auto_examples": r"<flytesnacks/examples",
     r"<protos/docs/core/core:taskmetadata>": r"<ref_flyteidl.core.TaskMetadata>",
     r"<protos/docs/core/core:tasktemplate>": r"<ref_flyteidl.core.TaskTemplate>",
@@ -355,8 +354,8 @@ REPLACE_PATTERNS = {
     r"<deployment/configuration/general:configurable resource types>": r"<deployment-configuration-general>",
     r"<_tags/DistributedComputing>": r"</_tags/DistributedComputing>",
     r"{ref}`bioinformatics <bioinformatics>`": r"bioinformatics",
-    PROTO_REF_PATTERN: PROTO_REF_REPLACE,
-    r"/protos/docs/service/index": r"/protos/docs/service/service",
+    # PROTO_REF_PATTERN: PROTO_REF_REPLACE,
+    # r"/protos/docs/service/index": r"/protos/docs/service/service",
     r"<weather_forecasting>": r"</flytesnacks/weather_forecasting>",
 }
 
@@ -364,7 +363,7 @@ REPLACE_PATTERNS = {
 
 import_projects_config = {
     "clone_dir": "_projects",
-    "flytekit_api_dir": "_src/flytekit/",
+    # "flytekit_api_dir": "_src/flytekit/",
     "source_regex_mapping": REPLACE_PATTERNS,
     "list_table_toc": [
        "flytesnacks/tutorials",
@@ -376,10 +375,10 @@ import_projects_config = {
 # Define these environment variables to use local copies of the projects. This
 # is useful for building the docs in the CI/CD of the corresponding repos.
 flytesnacks_local_path = os.environ.get("FLYTESNACKS_LOCAL_PATH", None)
-flytekit_local_path = os.environ.get("FLYTEKIT_LOCAL_PATH", None)
+# flytekit_local_path = os.environ.get("FLYTEKIT_LOCAL_PATH", None)
 
 flytesnacks_path = flytesnacks_local_path or "_projects/flytesnacks"
-flytekit_path = flytekit_local_path or "_projects/api/flytekit"
+# flytekit_path = flytekit_local_path or "_projects/api/flytekit"
 
 import_projects = [
     {
@@ -415,23 +414,10 @@ import_projects = [
         "local": flytesnacks_local_path is not None,
     },
     {
-        "name": "flytekit",
-        "source": flytekit_local_path or "https://github.com/flyteorg/flytekit",
-        "docs_path": "docs/source",
-        "dest": "api/flytekit",
-        "cmd": [
-            ["mkdir", "-p", import_projects_config["flytekit_api_dir"]],
-            ["cp", "-R", f"{flytekit_path}/flytekit", import_projects_config["flytekit_api_dir"]],
-            ["cp", "-R", f"{flytekit_path}/plugins", import_projects_config["flytekit_api_dir"]],
-            ["cp", "-R", f"{flytekit_path}/tests", "./tests"],
-        ],
-        "local": flytekit_local_path is not None,
-    },
-    {
         "name": "flytectl",
         "source": "../flytectl",
         "docs_path": "docs/source",
-        "dest": "api_reference/flytectl_cli",
+        "dest": "api_reference/flytectl",
         "local": True,
     },
     {
