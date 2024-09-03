@@ -686,13 +686,13 @@ func (_m *AdminFetcherExtInterface) OnFetchWorkflowLatestVersionMatch(matchers .
 	return &AdminFetcherExtInterface_FetchWorkflowLatestVersion{Call: c_call}
 }
 
-// FetchWorkflowLatestVersion provides a mock function with given fields: ctx, name, project, domain, filter
-func (_m *AdminFetcherExtInterface) FetchWorkflowLatestVersion(ctx context.Context, name string, project string, domain string, filter filters.Filters) (*admin.Workflow, error) {
-	ret := _m.Called(ctx, name, project, domain, filter)
+// FetchWorkflowLatestVersion provides a mock function with given fields: ctx, name, project, domain
+func (_m *AdminFetcherExtInterface) FetchWorkflowLatestVersion(ctx context.Context, name string, project string, domain string) (*admin.Workflow, error) {
+	ret := _m.Called(ctx, name, project, domain)
 
 	var r0 *admin.Workflow
-	if rf, ok := ret.Get(0).(func(context.Context, string, string, string, filters.Filters) *admin.Workflow); ok {
-		r0 = rf(ctx, name, project, domain, filter)
+	if rf, ok := ret.Get(0).(func(context.Context, string, string, string) *admin.Workflow); ok {
+		r0 = rf(ctx, name, project, domain)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*admin.Workflow)
@@ -700,8 +700,8 @@ func (_m *AdminFetcherExtInterface) FetchWorkflowLatestVersion(ctx context.Conte
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, string, string, string, filters.Filters) error); ok {
-		r1 = rf(ctx, name, project, domain, filter)
+	if rf, ok := ret.Get(1).(func(context.Context, string, string, string) error); ok {
+		r1 = rf(ctx, name, project, domain)
 	} else {
 		r1 = ret.Error(1)
 	}
