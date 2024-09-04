@@ -2,6 +2,7 @@ package executor
 
 import (
 	"context"
+	"github.com/flyteorg/flyte/flyteadmin/scheduler/identifier"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -52,7 +53,15 @@ func (w *executor) Execute(ctx context.Context, scheduledTime time.Time, s model
 		}
 	}
 
-	executionName := naming.GetExecutionName(time.Now().UnixNano())
+	// Making the identifier deterministic using the hash of the identifier and scheduled time
+	hashValue := identifier.HashScheduledTimeStamp(ctx, core.Identifier{
+		Project: s.Project,
+		Domain:  s.Domain,
+		Name:    s.Name,
+		Version: s.Version,
+	}, scheduledTime)
+
+	executionName := naming.GetExecutionName(int64(hashValue))
 	executionRequest := &admin.ExecutionCreateRequest{
 		Project: s.Project,
 		Domain:  s.Domain,

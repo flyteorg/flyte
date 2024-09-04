@@ -1,6 +1,9 @@
 package naming
 
 import (
+	"context"
+	"github.com/flyteorg/flyte/flyteadmin/scheduler/identifier"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"strings"
 	"testing"
 	"time"
@@ -61,4 +64,15 @@ func TestGetExecutionName(t *testing.T) {
 		assert.Equal(t, 4, len(words), "FriendlyName should be split into exactly four words")
 	})
 
+	t.Run("deterministic name", func(t *testing.T) {
+		hashValue := identifier.HashScheduledTimeStamp(context.Background(), core.Identifier{
+			Project: "Project",
+			Domain:  "Domain",
+			Name:    "Name",
+			Version: "Version",
+		}, time.Time{})
+
+		name := GetExecutionName(int64(hashValue))
+		assert.Equal(t, name, "armjb5hlhssvkmrrhrdl")
+	})
 }
