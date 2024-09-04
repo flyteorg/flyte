@@ -116,16 +116,54 @@ We should consider adding an index to the executions table to include
 - phase
 - created_at
 
-
-
-#### Prior Art
-The flyteadmin native scheduler (https://github.com/flyteorg/flyte/tree/master/flyteadmin/scheduler) already implements a reconciliation loop to catch up on any missed schedules.
-
-#### Caveats
+##### Concurrency across launch plan versions
 Executions are always tied to the versioned launch plan that triggered them (see [here](https://github.com/flyteorg/flyte/blob/38883c721dac2875bdd2333f4cd56e757e81ea5f/flyteadmin/pkg/repositories/models/execution.go#L26))
 Therefore, this proposal only applies concurrency at the versioned launch plan level.
 
-If we wanted to support concurrency across launch plan versions we could add another index to the Executions table to include the launch plan named entity, that is the entry in the [NamedEntity table](https://github.com/flyteorg/flyte/blob/38883c721dac2875bdd2333f4cd56e757e81ea5f/flyteadmin/pkg/repositories/models/named_entity.go#L39-L42) corresponding to the launch plan project, domain & name
+If we wanted to support concurrency across launch plan versions:
+
+We could update usage like so
+
+```python
+my_lp = LaunchPlan.get_or_create(
+    name="my_serial_lp",
+    workflow=my_wf,
+    ...
+    concurrency=Concurrency(
+        max=1,  # defines how many executions with this launch plan can run in parallel
+        policy=ConcurrencyPolicy.WAIT  # defines the policy to apply when the max concurrency is reached
+        precision=ConcurrencyPrecision.LAUNCH_PLAN
+    )
+)
+```
+
+and by default, when the precision is omitted the SDK could register the launch plan using `ConcurrencyPrecision.LAUNCH_PLAN_VERSION`
+
+We could update the concurrency protobuf definition like so:
+```protobuf
+message Concurrency {
+   // Defines how many executions with this launch plan can run in parallel
+   uint32 max = 1;
+
+   // Defines how to handle the execution when the max concurrency is reached.
+   ConcurrencyPolicy policy = 2;
+
+   ConcurrencyLevel level = 3;
+}
+
+enum ConcurrencyPrecision {
+  UNSPECIFIED = 0;
+  
+  // Applies concurrency limits across all launch plan versions.
+  LAUNCH_PLAN = 1;
+  
+  // Applies concurrency at the versioned launch plan level
+  LAUNCH_PLAN_VERSION = 2;
+}
+```
+
+
+We could add another index to the Executions table to include the launch plan named entity, that is the entry in the [NamedEntity table](https://github.com/flyteorg/flyte/blob/38883c721dac2875bdd2333f4cd56e757e81ea5f/flyteadmin/pkg/repositories/models/named_entity.go#L39-L42) corresponding to the launch plan project, domain & name
 
 In models/execution.go:
 ```go
@@ -140,9 +178,15 @@ type Execution struct {
 	
 }
 
+
 ```
 
 Then the reconciliation loop would query executions in a non-terminal phase matching the launch plan named entity ID instead of LaunchPlanID.
+
+
+#### Prior Art
+The flyteadmin native scheduler (https://github.com/flyteorg/flyte/tree/master/flyteadmin/scheduler) already implements a reconciliation loop to catch up on any missed schedules.
+
 
 ## 4 Metrics & Dashboards
 - Time spent in PENDING: It's useful to understand the duration spent in PENDING before a launch plan transitions to RUNNING
@@ -168,7 +212,7 @@ We could as an alternative, repurpose the existing launch plan index to include 
 ## 6 Alternatives
 
 ### Scheduling
-This proposal purposefully uses FIFO scheduling but there is a chance we may want to define other scheduling orders or catch-up policies.
+This proposal purposefully uses FIFO scheduling. But this does not preclude defining other scheduling orders or catch-up policies in the future.
 
 To accomplish this, we can extend the `ConcurrenyPolicy` proto message to encapsulate scheduling behavior
 
@@ -192,6 +236,31 @@ type ConcurrencyScheduling enum {
 ```
 
 Furthermore, we may want to introduce a max pending period to fail executions that have been in `PENDING` for too long
+
+### Other concurrency policies: Terminate priors on execution
+
+What if we actually want to terminate existing executions when the concurrency limit is reached?
+
+In practice this could work by adding a new `ConcurrencyPolicy` enum for `RUN_IMMEDIATELY`
+
+And the reconciliation loop would now proceed like so
+
+In a separate goroutine, fetch items from the workqueue and individually process each execution entry
+1. Check the database to see if there are fewer than `MAX_CONCURRENCY` non-terminal executions matching the launch plan ID in the pending execution model
+   ```sql
+   select count(launch_plan_id) from executions where phase not in ('SUCCEEDED', 'FAILED', 'ABORTED', 'TIMED_OUT') group by launch_plan_id;
+   ```
+1. If there are fewer than `MAX_CONCURRENCY` executions running
+   1. check that the execution is still in `PENDING`
+   1. create the workflow CRD
+      1. if the CRD already exists because we've previously processed this pending execution before we had a chance to update the DB state, swallow the already exists error gracefully
+   1. conditionally mark the execution as `QUEUED` in the db if it's already in `PENDING` or  `QUEUED` to not overwrite any events should the execution have already reported progress in the interim
+   1. If creating the workflow CRD fails: mark the execution as `FAILED` in the db (and swallow any errors if the workflow is already in a terminal state should we have previously reported the failure after re-enqueuing the pending execution a previous loop). This will remove its eligiblity from the pending loop
+1. If there are already `MAX_CONCURRENCY` executions running
+   1. Retrieve n executions where n = count(actively running executions) - MAX_CONCURRENCY (ordered by creation time, ascending so we kill the oldest executions first)
+   2. Kill each execution
+   3. Proceed to (1) above.
+1. Finally, always mark the queue item as [Done()](https://github.com/kubernetes/client-go/blob/master/util/workqueue/queue.go#L33)
 
 
 ## 7 Potential Impact and Dependencies
