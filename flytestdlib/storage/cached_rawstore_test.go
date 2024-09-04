@@ -73,16 +73,12 @@ func (d *dummyStore) Head(ctx context.Context, reference DataReference) (Metadat
 	return d.HeadCb(ctx, reference)
 }
 
+func (d *dummyStore) GetItems(ctx context.Context, reference DataReference) ([]string, error) {
+	return d.GetItems(ctx, reference)
+}
+
 func (d *dummyStore) ReadRaw(ctx context.Context, reference DataReference) (io.ReadCloser, error) {
 	return d.ReadRawCb(ctx, reference)
-}
-
-func (d *dummyStore) IsMultiPart(ctx context.Context, reference DataReference) (bool, error) {
-	return d.IsMultiPart(ctx, reference)
-}
-
-func (d *dummyStore) ReadParts(ctx context.Context, reference DataReference) ([]string, error) {
-	return d.ReadParts(ctx, reference)
 }
 
 func (d *dummyStore) WriteRaw(ctx context.Context, reference DataReference, size int64, opts Options, raw io.Reader) error {

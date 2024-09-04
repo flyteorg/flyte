@@ -54,6 +54,11 @@ func (t *TestDataStore) CreateSignedURL(ctx context.Context, reference storage.D
 	return storage.SignedURLResponse{URL: *signedURL}, nil
 }
 
+func (t *TestDataStore) GetItems(ctx context.Context, reference storage.DataReference) ([]string, error) {
+	var s []string
+	return s, nil
+}
+
 // Retrieves a byte array from the Blob store or an error
 func (t *TestDataStore) ReadRaw(ctx context.Context, reference storage.DataReference) (io.ReadCloser, error) {
 	return NopCloser{}, nil

@@ -78,14 +78,11 @@ type RawStore interface {
 	// Head gets metadata about the reference. This should generally be a light weight operation.
 	Head(ctx context.Context, reference DataReference) (Metadata, error)
 
+	// GetItems retrieves the paths of all items from the Blob store or an error
+	GetItems(ctx context.Context, reference DataReference) ([]string, error)
+
 	// ReadRaw retrieves a byte array from the Blob store or an error
 	ReadRaw(ctx context.Context, reference DataReference) (io.ReadCloser, error)
-
-	// IsMultiPart checks if the subpart is a multipart blob
-	IsMultiPart(ctx context.Context, reference DataReference) (bool, error)
-
-	// ReadParts retrieves the paths of all subparts from the Blob store or an error
-	ReadParts(ctx context.Context, reference DataReference) ([]string, error)
 
 	// WriteRaw stores a raw byte array.
 	WriteRaw(ctx context.Context, reference DataReference, size int64, opts Options, raw io.Reader) error

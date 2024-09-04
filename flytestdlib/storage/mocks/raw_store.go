@@ -210,6 +210,11 @@ func (_m *RawStore) OnReadRawMatch(matchers ...interface{}) *RawStore_ReadRaw {
 	return &RawStore_ReadRaw{Call: c_call}
 }
 
+func (_m *RawStore) GetItems(ctx context.Context, reference storage.DataReference) ([]string, error) {
+	var s []string
+	return s, nil
+}
+
 // ReadRaw provides a mock function with given fields: ctx, reference
 func (_m *RawStore) ReadRaw(ctx context.Context, reference storage.DataReference) (io.ReadCloser, error) {
 	ret := _m.Called(ctx, reference)

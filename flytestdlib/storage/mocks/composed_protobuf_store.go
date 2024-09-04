@@ -244,6 +244,11 @@ func (_m *ComposedProtobufStore) OnReadRawMatch(matchers ...interface{}) *Compos
 	return &ComposedProtobufStore_ReadRaw{Call: c_call}
 }
 
+func (_m *ComposedProtobufStore) GetItems(ctx context.Context, reference storage.DataReference) ([]string, error) {
+	var s []string
+	return s, nil
+}
+
 // ReadRaw provides a mock function with given fields: ctx, reference
 func (_m *ComposedProtobufStore) ReadRaw(ctx context.Context, reference storage.DataReference) (io.ReadCloser, error) {
 	ret := _m.Called(ctx, reference)
