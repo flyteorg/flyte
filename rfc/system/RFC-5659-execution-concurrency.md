@@ -151,7 +151,7 @@ message Concurrency {
    ConcurrencyLevel level = 3;
 }
 
-enum ConcurrencyPrecision {
+enum ConcurrencyLevel {
   UNSPECIFIED = 0;
   
   // Applies concurrency limits across all launch plan versions.
@@ -184,6 +184,16 @@ type Execution struct {
 ```
 
 Then the reconciliation loop would query executions in a non-terminal phase matching the launch plan named entity ID instead of LaunchPlanID based on the ConcurrencyLevel.
+
+```sql
+SELECT e.*
+FROM   executions AS e
+WHERE  ( launch_plan_named_entity_id, created_at ) IN (SELECT launch_plan_named_entity_id,
+                                                 Min(created_at)
+                                          FROM   executions
+                                          WHERE  phase = 'PENDING' AND concurrency_level = 2;
+                                          GROUP  BY launch_plan_named_entity_id); 
+```
 
 
 #### Prior Art
