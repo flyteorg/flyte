@@ -49,6 +49,7 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 		}
 
 		success := 0
+		var mu sync.Mutex
 		var wg sync.WaitGroup
 		for _, absPath := range items {
 			absPath := absPath // capture range variable
@@ -81,9 +82,12 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 				}
 				newPath := filepath.Join(toPath, relativePath)
 				dir := filepath.Dir(newPath)
+				
+				mu.Lock()
 				// 0755: the directory can be read by anyone but can only be written by the owner
 				os.MkdirAll(dir, 0755)
 				writer, err := os.Create(newPath)
+				mu.Unlock()
 				if err != nil {
 					logger.Errorf(ctx, "failed to open file at path %s", newPath)
 					return
