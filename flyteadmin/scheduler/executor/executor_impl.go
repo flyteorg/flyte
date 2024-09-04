@@ -4,8 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/flyteorg/flyte/flyteadmin/scheduler/identifier"
-
 	"github.com/prometheus/client_golang/prometheus"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -14,6 +12,7 @@ import (
 	"k8s.io/client-go/util/retry"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common/naming"
+	"github.com/flyteorg/flyte/flyteadmin/scheduler/identifier"
 	"github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/models"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
