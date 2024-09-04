@@ -6,6 +6,7 @@
 - [@Ping-Su](https://github.com/pingsutw)
 - [@Fabio M. Graetz](https://github.com/fg91)
 - [@Yee Hing Tong](https://github.com/wild-endeavor)
+- [@Eduardo Apolinario](https://github.com/eapolinario)
 
 ## 1 Executive Summary
 - To Literal
@@ -33,8 +34,7 @@ Note: We have more than 10 issues about dict, dataclass and Pydantic.
 This feature can solve them all.
 
 ## 3 Proposed Implementation
-### Flytekit Example
-#### Before
+### Before
 ```python
 @task
 def t1() -> dict:
@@ -45,7 +45,7 @@ def t1() -> dict:
 def t2(a: dict):
   print(a["integer"]) # wrong, will be a float
 ```
-#### After
+### After
 ```python
 @task
 def t1() -> dict: # Json Byte Strings
@@ -282,21 +282,28 @@ We should use `msgpack.encode` to encode input value and store it to the literal
 
 None
 
-## 5 Drawbacks
-None
+## 5 Drawbacks  
+Our current implementation double-encodes objects (first with Mashumaro, then with MsgPack), which is somewhat inefficient for the following reasons:
+
+1. We need to define custom encode/decode methods for dataclasses when using MsgPack, which is inconvenient for users. Alternatively, users must inherit from `DataClassMessagePackMixin` for each dataclass.
+2. Supporting the Flyte console becomes easier, as most of the logic remains the same when using a JSON string converted into a protobuf `Struct`.
+3. Backend checks are simplified.
+4. It's feasible to define custom encode/decode methods in private forks of Flyte and Flytekit, so users with performance requirements can implement their own solutions.
+
+References:
+1. [MsgPack Packing/unpacking of custom data types](https://github.com/msgpack/msgpack-python?tab=readme-ov-file#packingunpacking-of-custom-data-type)
+2. Mashumaro includes a mixin called [DataClassMessagePackMixin](https://github.com/Fatal1ty/mashumaro/blob/master/mashumaro/mixins/msgpack.py#L36), but forcing users to inherit from it is also inconvenient.
+
 
 ## 6 Alternatives
 None, it's doable.
 
 ## 7 Potential Impact and Dependencies
-
-*Here, we aim to be mindful of our environment and generate empathy towards others who may be impacted by our decisions.*
-
-- *What other systems or teams are affected by this proposal?*
-- *How could this be exploited by malicious attackers?*
+None.
 
 ## 8 Unresolved questions
-MsgPack is better because it's more smaller and faster.
+None.
 
 ## 9 Conclusion
+MsgPack is better because it's more smaller and faster.
 We will use msgpack to do it.
