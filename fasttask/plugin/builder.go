@@ -287,7 +287,7 @@ func (i *InMemoryEnvBuilder) createPod(ctx context.Context, fastTaskEnvironmentS
 	if objectMeta.Annotations == nil {
 		objectMeta.Annotations = make(map[string]string, 0)
 	}
-	objectMeta.Annotations[TTL_SECONDS] = fmt.Sprintf("%d", fastTaskEnvironmentSpec.GetTtlSeconds())
+	objectMeta.Annotations[TTL_SECONDS] = fmt.Sprintf("%d", int(getTTLOrDefault(fastTaskEnvironmentSpec).Seconds()))
 
 	// update primary container arguments and volume mounts
 	container := &podSpec.Containers[primaryContainerIndex]
@@ -382,7 +382,6 @@ func (i *InMemoryEnvBuilder) Start(ctx context.Context) error {
 // criteria.
 func (i *InMemoryEnvBuilder) gcEnvironments(ctx context.Context) error {
 	// identify environments that have expired
-	now_seconds := time.Now().Unix()
 	environmentReplicas := make(map[string][]types.NamespacedName, 0)
 
 	i.lock.Lock()
@@ -391,29 +390,28 @@ func (i *InMemoryEnvBuilder) gcEnvironments(ctx context.Context) error {
 			continue
 		}
 
-		// if the environment has a ttlSeconds termination criteria then check if it has expired
-		if ttlCriteria, ok := environment.spec.GetTerminationCriteria().(*pb.FastTaskEnvironmentSpec_TtlSeconds); ok {
-			if environment.state == TOMBSTONED || now_seconds-environment.lastAccessedAt.Unix() >= int64(ttlCriteria.TtlSeconds) {
-				environment.state = TOMBSTONED
+		// currently ttlSeconds is the only supported termination criteria for environments. if more are
+		// added this logic will need to be updated.
+		if environment.state == TOMBSTONED || time.Since(environment.lastAccessedAt) >= getTTLOrDefault(environment.spec) {
+			environment.state = TOMBSTONED
 
-				podTemplateSpec := &v1.PodTemplateSpec{}
-				if err := json.Unmarshal(environment.spec.GetPodTemplateSpec(), podTemplateSpec); err != nil {
-					return flyteerrors.Errorf(flyteerrors.BadTaskSpecification,
-						"unable to unmarshal PodTemplateSpec [%v], Err: [%v]", environment.spec.GetPodTemplateSpec(), err.Error())
-				}
-
-				podNames := make([]types.NamespacedName, 0)
-				for _, podName := range environment.replicas {
-					podNames = append(podNames,
-						types.NamespacedName{
-							Name:      podName,
-							Namespace: podTemplateSpec.Namespace,
-						})
-				}
-
-				logger.Infof(ctx, "tombstoning environment '%s'", environmentID)
-				environmentReplicas[environmentID] = podNames
+			podTemplateSpec := &v1.PodTemplateSpec{}
+			if err := json.Unmarshal(environment.spec.GetPodTemplateSpec(), podTemplateSpec); err != nil {
+				return flyteerrors.Errorf(flyteerrors.BadTaskSpecification,
+					"unable to unmarshal PodTemplateSpec [%v], Err: [%v]", environment.spec.GetPodTemplateSpec(), err.Error())
 			}
+
+			podNames := make([]types.NamespacedName, 0)
+			for _, podName := range environment.replicas {
+				podNames = append(podNames,
+					types.NamespacedName{
+						Name:      podName,
+						Namespace: podTemplateSpec.Namespace,
+					})
+			}
+
+			logger.Infof(ctx, "tombstoning environment '%s'", environmentID)
+			environmentReplicas[environmentID] = podNames
 		}
 	}
 	i.lock.Unlock()

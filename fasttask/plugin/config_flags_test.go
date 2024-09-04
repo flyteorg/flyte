@@ -99,6 +99,20 @@ func TestConfig_SetFlags(t *testing.T) {
 	cmdFlags := actual.GetPFlagSet("")
 	assert.True(t, cmdFlags.HasFlags())
 
+	t.Run("Test_additional-worker-args", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := join_Config(defaultConfig.AdditionalWorkerArgs, ",")
+
+			cmdFlags.Set("additional-worker-args", testValue)
+			if vStringSlice, err := cmdFlags.GetStringSlice("additional-worker-args"); err == nil {
+				testDecodeRaw_Config(t, join_Config(vStringSlice, ","), &actual.AdditionalWorkerArgs)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_callback-uri", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
@@ -107,6 +121,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			cmdFlags.Set("callback-uri", testValue)
 			if vString, err := cmdFlags.GetString("callback-uri"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.CallbackURI)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_default-ttl", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := defaultConfig.DefaultTTL.String()
+
+			cmdFlags.Set("default-ttl", testValue)
+			if vString, err := cmdFlags.GetString("default-ttl"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.DefaultTTL)
 
 			} else {
 				assert.FailNow(t, err.Error())
@@ -191,48 +219,6 @@ func TestConfig_SetFlags(t *testing.T) {
 			cmdFlags.Set("heartbeat-buffer-size", testValue)
 			if vInt, err := cmdFlags.GetInt("heartbeat-buffer-size"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.HeartbeatBufferSize)
-
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
-	})
-	t.Run("Test_nonce-length", func(t *testing.T) {
-
-		t.Run("Override", func(t *testing.T) {
-			testValue := "1"
-
-			cmdFlags.Set("nonce-length", testValue)
-			if vInt, err := cmdFlags.GetInt("nonce-length"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.NonceLength)
-
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
-	})
-	t.Run("Test_task-status-buffer-size", func(t *testing.T) {
-
-		t.Run("Override", func(t *testing.T) {
-			testValue := "1"
-
-			cmdFlags.Set("task-status-buffer-size", testValue)
-			if vInt, err := cmdFlags.GetInt("task-status-buffer-size"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.TaskStatusBufferSize)
-
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
-	})
-	t.Run("Test_additional-worker-args", func(t *testing.T) {
-
-		t.Run("Override", func(t *testing.T) {
-			testValue := join_Config(defaultConfig.AdditionalWorkerArgs, ",")
-
-			cmdFlags.Set("additional-worker-args", testValue)
-			if vStringSlice, err := cmdFlags.GetStringSlice("additional-worker-args"); err == nil {
-				testDecodeRaw_Config(t, join_Config(vStringSlice, ","), &actual.AdditionalWorkerArgs)
 
 			} else {
 				assert.FailNow(t, err.Error())
@@ -387,6 +373,34 @@ func TestConfig_SetFlags(t *testing.T) {
 			cmdFlags.Set("logs.stackdriver-template-uri", testValue)
 			if vString, err := cmdFlags.GetString("logs.stackdriver-template-uri"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.Logs.StackDriverTemplateURI)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_nonce-length", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("nonce-length", testValue)
+			if vInt, err := cmdFlags.GetInt("nonce-length"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.NonceLength)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_task-status-buffer-size", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("task-status-buffer-size", testValue)
+			if vInt, err := cmdFlags.GetInt("task-status-buffer-size"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.TaskStatusBufferSize)
 
 			} else {
 				assert.FailNow(t, err.Error())

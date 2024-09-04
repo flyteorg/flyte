@@ -3,6 +3,7 @@ package plugin
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
@@ -30,6 +31,13 @@ func isValidEnvironmentSpec(executionEnvironmentID core.ExecutionEnvID, fastTask
 		return fmt.Errorf("parallelism must be greater than 0")
 	}
 
+	// currently the only supported termination criteria is ttlSeconds. if more are added, this
+	// logic will need to be updated. we expect either `nil` termination criteria or a non-zero
+	// ttlSeconds.
+	if fastTaskEnvironmentSpec.GetTerminationCriteria() != nil && fastTaskEnvironmentSpec.GetTtlSeconds() == 0 {
+		return fmt.Errorf("ttlSeconds must be greater than 0 if terminationCriteria is set")
+	}
+
 	podTemplateSpec := &v1.PodTemplateSpec{}
 	if err := json.Unmarshal(fastTaskEnvironmentSpec.GetPodTemplateSpec(), podTemplateSpec); err != nil {
 		return fmt.Errorf("unable to unmarshal PodTemplateSpec [%v], Err: [%v]", fastTaskEnvironmentSpec.GetPodTemplateSpec(), err.Error())
@@ -40,6 +48,16 @@ func isValidEnvironmentSpec(executionEnvironmentID core.ExecutionEnvID, fastTask
 	}
 
 	return nil
+}
+
+// getTTLOrDefault returns the TTL for the given FastTaskEnvironmentSpec. If the termination criteria is not
+// set, the default TTL is returned.
+func getTTLOrDefault(fastTaskEnvironmentSpec *pb.FastTaskEnvironmentSpec) time.Duration {
+	if fastTaskEnvironmentSpec.GetTerminationCriteria() == nil {
+		return GetConfig().DefaultTTL.Duration
+	}
+
+	return time.Second * time.Duration(fastTaskEnvironmentSpec.GetTtlSeconds())
 }
 
 func isPodNotFoundErr(err error) bool {
