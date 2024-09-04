@@ -37,6 +37,7 @@ import (
 	"github.com/unionai/flyte/fasttask/plugin/pb"
 )
 
+const actorTaskType = "actor"
 const fastTaskType = "fast-task"
 const maxErrorMessageLength = 102400 // 100kb
 
@@ -564,7 +565,7 @@ func init() {
 	pluginmachinery.PluginRegistry().RegisterCorePlugin(
 		core.PluginEntry{
 			ID:                  fastTaskType,
-			RegisteredTaskTypes: []core.TaskType{fastTaskType},
+			RegisteredTaskTypes: []core.TaskType{actorTaskType, fastTaskType},
 			LoadPlugin: func(ctx context.Context, iCtx core.SetupContext) (core.Plugin, error) {
 				// open tcp listener
 				listener, err := net.Listen("tcp", GetConfig().Endpoint)
