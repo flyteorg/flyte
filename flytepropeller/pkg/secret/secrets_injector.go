@@ -40,6 +40,8 @@ func newSecretsInjector(
 			return nil, err
 		}
 		return NewEmbeddedSecretManagerInjector(webhookConfig.EmbeddedSecretManagerConfig, secretFetcher), nil
+	case config.SecretManagerTypeAzure:
+		return NewAzureSecretManagerInjector(webhookConfig.AzureSecretManagerConfig), nil
 	default:
 		return nil, fmt.Errorf("unrecognized secret manager type [%v]", secretManagerType)
 	}

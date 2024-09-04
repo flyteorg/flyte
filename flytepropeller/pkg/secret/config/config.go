@@ -50,6 +50,19 @@ var (
 				},
 			},
 		},
+		AzureSecretManagerConfig: AzureSecretManagerConfig{
+			SidecarImage: "mcr.microsoft.com/azure-cli:cbl-mariner2.0",
+			Resources: corev1.ResourceRequirements{
+				Requests: corev1.ResourceList{
+					corev1.ResourceMemory: resource.MustParse("500Mi"),
+					corev1.ResourceCPU:    resource.MustParse("200m"),
+				},
+				Limits: corev1.ResourceList{
+					corev1.ResourceMemory: resource.MustParse("500Mi"),
+					corev1.ResourceCPU:    resource.MustParse("200m"),
+				},
+			},
+		},
 		VaultSecretManagerConfig: VaultSecretManagerConfig{
 			Role:      "flyte",
 			KVVersion: KVVersion2,
@@ -100,6 +113,9 @@ const (
 	// Without using sidecar. This type directly calls into the secrets manager for the configured provider directly.
 	// Currently supported only for AWS.
 	SecretManagerTypeEmbedded
+
+	// SecretManagerTypeAzure defines a secret manager webhook that injects a side car to pull secrets from Azure Key Vault
+	SecretManagerTypeAzure
 )
 
 // Defines with KV Engine Version to use with VaultSecretManager - https://www.vaultproject.io/docs/secrets/kv#kv-secrets-engine
@@ -127,6 +143,7 @@ type Config struct {
 	GCPSecretManagerConfig      GCPSecretManagerConfig      `json:"gcpSecretManager" pflag:",GCP Secret Manager config."`
 	VaultSecretManagerConfig    VaultSecretManagerConfig    `json:"vaultSecretManager" pflag:",Vault Secret Manager config."`
 	EmbeddedSecretManagerConfig EmbeddedSecretManagerConfig `json:"embeddedSecretManagerConfig" pflag:",Embedded Secret Manager config without sidecar and which calls into the supported providers directly."`
+	AzureSecretManagerConfig    AzureSecretManagerConfig    `json:"azureSecretManager" pflag:",Azure Secret Manager config."`
 
 	// Ignore PFlag for Image Builder
 	ImageBuilderConfig *ImageBuilderConfig `json:"imageBuilderConfig,omitempty" pflag:"-,"`
@@ -170,6 +187,11 @@ type AWSSecretManagerConfig struct {
 }
 
 type GCPSecretManagerConfig struct {
+	SidecarImage string                      `json:"sidecarImage" pflag:",Specifies the sidecar docker image to use"`
+	Resources    corev1.ResourceRequirements `json:"resources" pflag:"-,Specifies resource requirements for the init container."`
+}
+
+type AzureSecretManagerConfig struct {
 	SidecarImage string                      `json:"sidecarImage" pflag:",Specifies the sidecar docker image to use"`
 	Resources    corev1.ResourceRequirements `json:"resources" pflag:"-,Specifies resource requirements for the init container."`
 }
