@@ -57,16 +57,15 @@ class FlyteUserDashboard(object):
                     ),
                 ),
                 Graph(
-                    title="Aborted Workflow",
+                    title="Aborted Workflows (avg)",
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr='sum(rate(flyte:propeller:all:workflow:workflow_aborted{project=~"$project", domain=~"$domain", wf=~"$workflow"}[5m]))',
+                            expr='avg(flyte:propeller:all:workflow:workflow_aborted_unlabeled{project=~"$project", domain=~"$domain", wf=~"$workflow"})',
                             refId='A',
                         ),
                     ],
                     yAxes=YAxes(
-                        YAxis(format=OPS_FORMAT),
                         YAxis(format=SHORT_FORMAT),
                     ),
                 ),
@@ -75,7 +74,7 @@ class FlyteUserDashboard(object):
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr='sum(flyte:propeller:all:workflow:success_duration_ms{project=~"$project", domain=~"$domain", wf=~"$workflow"}) by (quantile)',
+                            expr='sum(flyte:propeller:all:workflow:event_recording:success_duration_ms{project=~"$project", domain=~"$domain", wf=~"$workflow"}) by (quantile)',
                             refId='A',
                         ),
                     ],
@@ -86,7 +85,7 @@ class FlyteUserDashboard(object):
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr='sum(flyte:propeller:all:workflow:failure_duration_ms{project=~"$project", domain=~"$domain", wf=~"$workflow"}) by (quantile)',
+                            expr='sum(flyte:propeller:all:workflow:event_recording:failure_duration_ms{project=~"$project", domain=~"$domain", wf=~"$workflow"}) by (quantile)',
                             refId='A',
                         ),
                     ],
