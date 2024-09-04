@@ -73,6 +73,6 @@ func TestGetExecutionName(t *testing.T) {
 		}, time.Time{})
 
 		name := GetExecutionName(int64(hashValue))
-		assert.Equal(t, name, "armjb5hlhssvkmrrhrdl")
+		assert.Equal(t, name, "carpet-juliet-kentucky-kentucky")
 	})
 }
