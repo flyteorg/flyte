@@ -51,11 +51,12 @@ func (s *cachedRawStore) Head(ctx context.Context, reference DataReference) (Met
 }
 
 func (s *cachedRawStore) GetItems(ctx context.Context, reference DataReference) ([]string, error) {
-	ctx, span := otelutils.NewSpan(ctx, otelutils.BlobstoreClientTracer, "flytestdlib.storage.cachedRawStore/GetItems")
+	_, span := otelutils.NewSpan(ctx, otelutils.BlobstoreClientTracer, "flytestdlib.storage.cachedRawStore/GetItems")
 	defer span.End()
 
 	// freecache does not support full cache scanning
-	return s.RawStore.GetItems(ctx, reference)
+	var items []string
+	return items, nil
 }
 
 // ReadRaw retrieves a byte array from the Blob store or an error
