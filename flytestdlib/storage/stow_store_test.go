@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -73,8 +74,16 @@ func (m mockStowContainer) Item(id string) (stow.Item, error) {
 	return nil, stow.ErrNotFound
 }
 
-func (mockStowContainer) Items(prefix, cursor string, count int) ([]stow.Item, string, error) {
-	return []stow.Item{}, "", nil
+func (m mockStowContainer) Items(prefix, cursor string, count int) ([]stow.Item, string, error) {
+	var result []stow.Item
+	// Ignore cursor and count
+	for id, item := range m.items {
+		if strings.HasPrefix(id, prefix + "/") {
+			result = append(result, item)
+		}
+	}
+
+	return result, "", nil
 }
 
 func (m mockStowContainer) RemoveItem(id string) error {
@@ -223,6 +232,88 @@ func TestStowStore_CreateSignedURL(t *testing.T) {
 
 		_, err = s.CreateSignedURL(context.TODO(), DataReference("s3://container2/path"), SignedURLProperties{})
 		assert.Error(t, err)
+	})
+}
+
+func TestStowStore_GetItems(t *testing.T) {
+	const container = "container"
+
+	t.Run("Correct Query with Items", func(t *testing.T) {
+		ctx := context.Background()
+		fn := fQNFn["s3"]
+		s, err := NewStowRawStore(fn(container), &mockStowLoc{
+			ContainerCb: func(id string) (stow.Container, error) {
+				if id == container {
+					return newMockStowContainer(container), nil
+				}
+				return nil, fmt.Errorf("container is not supported")
+			},
+			CreateContainerCb: func(name string) (stow.Container, error) {
+				if name == container {
+					return newMockStowContainer(container), nil
+				}
+				return nil, fmt.Errorf("container is not supported")
+			},
+		}, nil, false, metrics)
+		assert.NoError(t, err)
+		writeTestFile(ctx, t, s, "s3://container/folder/file1")
+		writeTestFile(ctx, t, s, "s3://container/folder/file2")
+		dataReference := DataReference("s3://container/folder")
+		items, err := s.GetItems(ctx, dataReference)
+		assert.NoError(t, err)
+		assert.Equal(t, 2, len(items))
+		assert.Equal(t, "s3://container/folder/file1", items[0])
+		assert.Equal(t, "s3://container/folder/file2", items[1])
+	})
+
+	t.Run("Empty Reference", func(t *testing.T) {
+		ctx := context.Background()
+		fn := fQNFn["s3"]
+		s, err := NewStowRawStore(fn(container), &mockStowLoc{
+			ContainerCb: func(id string) (stow.Container, error) {
+				if id == container {
+					return newMockStowContainer(container), nil
+				}
+				return nil, fmt.Errorf("container is not supported")
+			},
+			CreateContainerCb: func(name string) (stow.Container, error) {
+				if name == container {
+					return newMockStowContainer(container), nil
+				}
+				return nil, fmt.Errorf("container is not supported")
+			},
+		}, nil, false, metrics)
+		assert.NoError(t, err)
+		dataReference := DataReference("s3://container/folder")
+		items, err := s.GetItems(ctx, dataReference)
+		assert.NoError(t, err)
+		assert.Equal(t, 0, len(items))
+	})
+
+	t.Run("Bad Reference", func(t *testing.T) {
+		ctx := context.Background()
+		fn := fQNFn["s3"]
+		s, err := NewStowRawStore(fn(container), &mockStowLoc{
+			ContainerCb: func(id string) (stow.Container, error) {
+				if id == container {
+					return newMockStowContainer(container), nil
+				}
+				return nil, fmt.Errorf("container is not supported")
+			},
+			CreateContainerCb: func(name string) (stow.Container, error) {
+				if name == container {
+					return newMockStowContainer(container), nil
+				}
+				return nil, fmt.Errorf("container is not supported")
+			},
+		}, nil, false, metrics)
+		assert.NoError(t, err)
+		writeTestFile(ctx, t, s, "s3://container/folder/file1")
+		writeTestFile(ctx, t, s, "s3://container/folder/file2")
+		dataReference := DataReference("s3://container/bad-folder")
+		items, err := s.GetItems(ctx, dataReference)
+		assert.NoError(t, err)
+		assert.Equal(t, 0, len(items))
 	})
 }
 
