@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"reflect"
 	"strconv"
+	"sync"
 
 	"github.com/ghodss/yaml"
 	"github.com/golang/protobuf/jsonpb"
@@ -39,42 +40,78 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 		return nil, errors.Wrapf(err, "Blob uri incorrectly formatted")
 	}
 
-	// Handle multipart blob
+	var reader io.ReadCloser
 	if blob.GetMetadata().GetType().Dimensionality == core.BlobType_MULTIPART {
-		err = os.Mkdir(toPath, os.ModePerm)
-		if err != nil {
-			logger.Errorf(ctx, "failed to create directories for path %s: %v", toPath, err)
-			return nil, err
-		}
-		parts, err := d.store.ReadParts(ctx, ref)
-		if err != nil {
-			logger.Errorf(ctx, "failed to read parts for multipart blob [%s]", ref)
+		items, err := d.store.GetItems(ctx, ref)
+		if err != nil || len(items) == 0 {
+			logger.Errorf(ctx, "failed to collect items from multipart blob [%s]", ref)
 			return nil, err
 		}
 
-		// Recursively processes all subparts within the directory
-		for _, relativePath := range parts {
-			joinPath := filepath.Join(toPath, relativePath)
+		success := 0
+		var wg sync.WaitGroup
+		for _, absPath := range items {
+			absPath := absPath // capture range variable
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+				defer func() {
+					if err := recover(); err != nil {
+						logger.Errorf(ctx,"recover receives error: %s", err)
+					}
+				}()
 
-			// Check subpart's type
-			dim := core.BlobType_SINGLE
-			isMultiPart, err := d.store.IsMultiPart(ctx, storage.DataReference(joinPath))
-			if err != nil {
-				logger.Errorf(ctx, "failed to check type for part [%s] in multipart blob [%s]", relativePath, ref)
-				continue
-			}
-			if isMultiPart {
-				dim = core.BlobType_MULTIPART
-			}
-			d.handleBlob(ctx, &core.Blob{Metadata: &core.BlobMetadata{Type: &core.BlobType{Dimensionality: dim}}, Uri: joinPath}, joinPath)
+				ref = storage.DataReference(absPath)
+				reader, err = DownloadFileFromStorage(ctx, ref, d.store)
+				if err != nil {
+					logger.Errorf(ctx, "Failed to download from ref [%s]", ref)
+					return
+				}
+				defer func() {
+					err := reader.Close()
+					if err != nil {
+						logger.Errorf(ctx, "failed to close Blob read stream @ref [%s]. Error: %s", ref, err)
+					}
+				}()
+
+				_, _, relativePath, err := ref.Split()
+				if err != nil {
+					logger.Errorf(ctx, "Failed to parse ref [%s]", ref)
+					return
+				}
+				newPath := filepath.Join(toPath, relativePath)
+				dir := filepath.Dir(newPath)
+				// 0755: the directory can be read by anyone but can only be written by the owner
+				os.MkdirAll(dir, 0755)
+				writer, err := os.Create(newPath)
+				if err != nil {
+					logger.Errorf(ctx, "failed to open file at path %s", newPath)
+					return
+				}
+				defer func() {
+					err := writer.Close()
+					if err != nil {
+						logger.Errorf(ctx, "failed to close File write stream. Error: %s", err)
+					}
+				}()
+
+				_, err = io.Copy(writer, reader)
+				if err != nil {
+					logger.Errorf(ctx, "failed to write remote data to local filesystem")
+					return
+				}
+				success += 1
+			}()
 		}
+		wg.Wait()
+		ref = storage.DataReference(blob.Uri)
+		logger.Infof(ctx, "Successfully copied [%d] remote files from [%s] to local [%s]", success, ref, toPath)
 		return toPath, nil
 	}
-	var reader io.ReadCloser
+	
 	if scheme == "http" || scheme == "https" {
 		reader, err = DownloadFileFromHTTP(ctx, ref)
 	} else {
-		// Handle single part blob
 		reader, err = DownloadFileFromStorage(ctx, ref, d.store)
 	}
 	if err != nil {
