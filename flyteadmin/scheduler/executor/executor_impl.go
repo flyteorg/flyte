@@ -2,8 +2,9 @@ package executor
 
 import (
 	"context"
-	"github.com/flyteorg/flyte/flyteadmin/scheduler/identifier"
 	"time"
+
+	"github.com/flyteorg/flyte/flyteadmin/scheduler/identifier"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"google.golang.org/grpc/codes"

@@ -2,8 +2,6 @@ package naming
 
 import (
 	"context"
-	"github.com/flyteorg/flyte/flyteadmin/scheduler/identifier"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"strings"
 	"testing"
 	"time"
@@ -12,6 +10,8 @@ import (
 
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	runtimeMocks "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/mocks"
+	"github.com/flyteorg/flyte/flyteadmin/scheduler/identifier"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 const AllowedExecutionIDAlphabetStr = "abcdefghijklmnopqrstuvwxyz"
