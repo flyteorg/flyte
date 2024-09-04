@@ -437,18 +437,11 @@ func (p *Plugin) monitorTask(ctx context.Context, tCtx core.TaskExecutionContext
 		pluginState.LastUpdated = time.Now()
 		switch phase {
 		case core.PhaseSuccess:
-			taskTemplate, err := tCtx.TaskReader().Read(ctx)
+			// gather outputs or errors
+			outputReader := ioutils.NewRemoteFileOutputReader(ctx, tCtx.DataStore(), tCtx.OutputWriter(), 0)
+			err = tCtx.OutputWriter().Put(ctx, outputReader)
 			if err != nil {
 				return nil, core.PhaseInfoUndefined, err
-			}
-
-			// gather outputs if they exist
-			if taskTemplate.GetInterface() != nil && taskTemplate.GetInterface().GetOutputs() != nil && taskTemplate.GetInterface().GetOutputs().GetVariables() != nil {
-				outputReader := ioutils.NewRemoteFileOutputReader(ctx, tCtx.DataStore(), tCtx.OutputWriter(), 0)
-				err = tCtx.OutputWriter().Put(ctx, outputReader)
-				if err != nil {
-					return nil, core.PhaseInfoUndefined, err
-				}
 			}
 
 			phaseInfo = core.PhaseInfoSuccess(taskInfo)

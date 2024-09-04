@@ -26,7 +26,10 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils/secrets"
+	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 
 	"github.com/unionai/flyte/fasttask/plugin/mocks"
 	"github.com/unionai/flyte/fasttask/plugin/pb"
@@ -696,9 +699,22 @@ func TestHandleRunning(t *testing.T) {
 			tCtx.OnTaskExecutionMetadata().Return(taskMetadata)
 			tCtx.OnTaskReader().Return(taskReader)
 
+			dataStore, err := storage.NewDataStore(
+				&storage.Config{
+					Type: storage.TypeMemory,
+				},
+				scope,
+			)
+			assert.NoError(t, err)
+			tCtx.OnDataStoreMatch().Return(dataStore)
+
 			executionEnvClient := &coremocks.ExecutionEnvClient{}
 			executionEnvClient.OnStatusMatch(ctx, mock.Anything).Return(test.executionEnvStatus, nil)
 			tCtx.OnGetExecutionEnvClient().Return(executionEnvClient)
+
+			outputWriter := &iomocks.OutputWriter{}
+			outputWriter.OnPutMatch(ctx, mock.Anything).Return(nil)
+			tCtx.OnOutputWriterMatch().Return(outputWriter)
 
 			arrayNodeStateInput := &State{
 				SubmissionPhase: Submitted,
@@ -839,4 +855,9 @@ func TestGetTaskInfo(t *testing.T) {
 	require.Len(t, taskInfo.Logs, 1)
 	assert.Equal(t, "Custom Logs (worker)", taskInfo.Logs[0].GetName())
 	assert.Equal(t, "http://foo.com/pod=namespace/pod-name", taskInfo.Logs[0].GetUri())
+}
+
+func init() {
+	labeled.SetMetricKeys(contextutils.ProjectKey, contextutils.DomainKey, contextutils.WorkflowIDKey,
+		contextutils.TaskIDKey)
 }
