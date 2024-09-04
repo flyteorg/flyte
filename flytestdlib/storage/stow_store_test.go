@@ -78,7 +78,7 @@ func (m mockStowContainer) Items(prefix, cursor string, count int) ([]stow.Item,
 	var result []stow.Item
 	// Ignore cursor and count
 	for id, item := range m.items {
-		if strings.HasPrefix(id, prefix + "/") {
+		if strings.HasPrefix(id, prefix+"/") {
 			result = append(result, item)
 		}
 	}
