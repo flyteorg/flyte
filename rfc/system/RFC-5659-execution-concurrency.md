@@ -175,13 +175,15 @@ type Execution struct {
 	LaunchPlanID uint   `gorm:"index"`
 	// New field to make querying on the named entity 
 	LaunchPlanNamedEntityID uint `gorm:"index"`
+	// New field to make querying on concurrency policy by the reconciliation loop easier
+	ConcurrencyLevel uint32
 	
 }
 
 
 ```
 
-Then the reconciliation loop would query executions in a non-terminal phase matching the launch plan named entity ID instead of LaunchPlanID.
+Then the reconciliation loop would query executions in a non-terminal phase matching the launch plan named entity ID instead of LaunchPlanID based on the ConcurrencyLevel.
 
 
 #### Prior Art
