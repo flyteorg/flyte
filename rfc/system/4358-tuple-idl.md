@@ -19,49 +19,7 @@ Goals:
 
 Implementation:
 
-- A new `LiteralType` and `Literal` will be introduced to represent tuple types in FlyteIDL. Each element in the tuple will be considered independently, preserving the order of elements. For NamedTuple, the name of each element will be stored along with its type, while for regular tuples, the names will be left empty.
-
-    - `LiteralType`
-        ```proto
-        message TupleFieldType {
-            string name = 1;
-            LiteralType type = 2;
-        }
-
-        message TupleType {
-            string tuple_name = 1;
-            repeated TupleFieldType fields = 2;
-        }
-
-        message LiteralType {
-            oneof type {
-                // ...
-                TupleType tuple_type = 11;
-            }
-            // ...
-        }
-        ```
-    - `Literal`
-        ```proto
-        message LiteralField {
-            string name = 1;
-            Literal value = 2;
-        }
-
-        message LiteralFieldCollection {
-            string tuple_name = 1;
-            repeated LiteralField fields = 1;
-        }
-
-        message Literal {
-            oneof value {
-                // ...
-                // A tuple of literals.
-                LiteralFieldCollection tuple = 4;
-            }
-            // ...
-        }
-        ```
+- Introduced new `Literal` and `LiteralType` messages in FlyteIDL to support tuple types.
 
 ## 2 Motivation
 
