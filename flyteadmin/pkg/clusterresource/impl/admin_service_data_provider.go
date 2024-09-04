@@ -34,7 +34,7 @@ func (p serviceAdminProvider) GetClusterResourceAttributes(ctx context.Context, 
 }
 
 // We want both active and system generated projects
-var activeProjectsFilter = fmt.Sprintf("ne(state,%d)", admin.Project_ARCHIVED)
+var activeProjectsFilter = fmt.Sprintf("value_in(state,%d;%d)", admin.Project_ACTIVE, admin.Project_SYSTEM_GENERATED)
 
 var archivedProjectsFilter = fmt.Sprintf("eq(state,%d)", admin.Project_SYSTEM_ARCHIVED)
 
