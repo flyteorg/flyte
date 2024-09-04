@@ -27,6 +27,10 @@ func (FailingRawStore) Head(ctx context.Context, reference storage.DataReference
 	return nil, fmt.Errorf("failed metadata fetch")
 }
 
+func (FailingRawStore) GetItems(ctx context.Context, reference storage.DataReference) ([]string, error) {
+	return nil, fmt.Errorf("failed get items")
+}
+
 func (FailingRawStore) ReadRaw(ctx context.Context, reference storage.DataReference) (io.ReadCloser, error) {
 	return nil, fmt.Errorf("failed read raw")
 }
