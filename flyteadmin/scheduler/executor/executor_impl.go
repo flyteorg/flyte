@@ -12,6 +12,7 @@ import (
 	"k8s.io/client-go/util/retry"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common/naming"
+	"github.com/flyteorg/flyte/flyteadmin/scheduler/identifier"
 	"github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/models"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -52,7 +53,15 @@ func (w *executor) Execute(ctx context.Context, scheduledTime time.Time, s model
 		}
 	}
 
-	executionName := naming.GetExecutionName(time.Now().UnixNano())
+	// Making the identifier deterministic using the hash of the identifier and scheduled time
+	hashValue := identifier.HashScheduledTimeStamp(ctx, &core.Identifier{
+		Project: s.Project,
+		Domain:  s.Domain,
+		Name:    s.Name,
+		Version: s.Version,
+	}, scheduledTime)
+
+	executionName := naming.GetExecutionName(int64(hashValue))
 	executionRequest := &admin.ExecutionCreateRequest{
 		Project: s.Project,
 		Domain:  s.Domain,
