@@ -56,7 +56,7 @@ concurrent, scalable and reproducible workflows for data processing, machine
 learning and analytics.
 
 Flyte provides first-class support for
-{doc}`Python <api_reference/flytekit/index>` and has a community-driven [Java and Scala SDK](https://github.com/flyteorg/flytekit-java). 
+{doc}`Python <api/flytekit/index>` and has a community-driven [Java and Scala SDK](https://github.com/flyteorg/flytekit-java). 
 Data Scientists and ML Engineers in the industry use Flyte to create:
 
 - Data pipelines for processing petabyte-scale data.
@@ -97,11 +97,11 @@ Below are the API reference to the different components of Flyte:
 :header-rows: 0
 :widths: 20 30
 
-* - {doc}`Flytekit <api_reference/flytekit/index>`
+* - {doc}`Flytekit <api/flytekit/index>`
   - Flyte's official Python SDK.
-* - {doc}`FlyteCTL <api_reference/flytectl/index>`
+* - {doc}`FlyteCTL <api/flytectl/index>`
   - Flyte's command-line interface for interacting with a Flyte cluster.
-* - {doc}`FlyteIDL <api_reference/flyteidl/index>`
+* - {doc}`FlyteIDL <api/flyteidl/index>`
   - Flyte's core specification language.
 ```
 
@@ -135,7 +135,7 @@ concepts/index
 tutorials/index
 integrations/index
 cluster_deployment/index
-api_reference/index
+api/index
 ecosystem/index
 community/index
 ```
