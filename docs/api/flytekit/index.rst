@@ -15,6 +15,7 @@ Flytekit API Reference
    extras.accelerators/index
    extend/index
    deck/index
+   plugins/index
    tasks.extend/index
    types.extend/index
    experimental/index
