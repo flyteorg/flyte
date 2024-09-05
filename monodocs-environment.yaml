@@ -5,13 +5,13 @@ dependencies:
   - python=3.9
   - pip
   - codespell
-  - furo
   - gitpython
   - ipython!=8.7.0
   - graphviz
   - jupytext
   - myst-nb
   - psycopg2-binary
+  - pydata-sphinx-theme
   - recommonmark
   - sphinx
   - sphinx-prompt
@@ -59,7 +59,7 @@ dependencies:
   - openai                      # chatgpt
 
   - pip:
-    - flytekit>=1.12.1b2
+    - flytekit>=1.13.1
     - readthedocs-sphinx-ext
     - sphinx-code-include
     - sphinxext-remoteliteralinclude
