@@ -41,6 +41,7 @@ tasks:
       - container
       - sidecar
       - K8S-ARRAY
+      - echo
     default-for-task-types:
       - container: container
       - container_array: K8S-ARRAY
@@ -56,6 +57,7 @@ plugins:
       - FLYTE_AWS_ENDPOINT: http://flyte-sandbox-minio.flyte:9000
       - FLYTE_AWS_ACCESS_KEY_ID: minio
       - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
+    image-pull-policy: Always # Helps in better iteration of flytekit changes
   k8s-array:
     logs:
       config:
