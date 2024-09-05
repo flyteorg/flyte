@@ -22,7 +22,6 @@ __version__ = "0.0.0"
 @dataclass
 class ImportProjectsConfig:
     clone_dir: str
-    # flytekit_api_dir: str
     source_regex_mapping: dict = field(default_factory=dict)
     list_table_toc: List[str] = field(default_factory=list)
     dev_build: bool = False
@@ -81,28 +80,6 @@ class ListTableToc(SphinxDirective):
         return container
 
 
-"""
-def update_sys_path_for_flytekit(import_project_config: ImportProjectsConfig):
-    flytekit_dir = Path(import_project_config.flytekit_api_dir).resolve(strict=True)
-    flytekit_src_dir = flytekit_dir / "flytekit"
-    plugins_dir = flytekit_dir / "plugins"
-
-    # create flytekit/_version.py file manually
-    with (flytekit_src_dir / "_version.py").open("w") as f:
-        f.write(f'__version__ = "dev"')
-
-    # add flytekit to python path
-    sys.path.insert(0, str(flytekit_src_dir))
-    sys.path.insert(0, str(flytekit_dir))
-
-    # add plugins to python path
-    for possible_plugin_dir in plugins_dir.iterdir():
-        plugin_path = possible_plugin_dir / "flytekitplugins"
-        if possible_plugin_dir.is_dir() and plugin_path.exists():
-            sys.path.insert(0, str(possible_plugin_dir))
-"""
-
-
 def update_html_context(project: Project, tag: str, commit: str, config: Config):
     tag_url = "#" if tag == "dev" else f"{project.source}/releases/tag/{tag}"
     commit_url = f"{project.source}/tree/{commit}"
@@ -122,7 +99,6 @@ def import_projects(app: Sphinx, config: Config):
 
     for _dir in (
         import_projects_config.clone_dir,
-        # import_projects_config.flytekit_api_dir,
     ):
         (srcdir / _dir).mkdir(parents=True, exist_ok=True)
 
@@ -181,9 +157,6 @@ def import_projects(app: Sphinx, config: Config):
 
     # remove cloned directories
     shutil.rmtree(import_projects_config.clone_dir)
-
-    # add flytekit and plugins to path so that API reference can build
-    # update_sys_path_for_flytekit(import_projects_config)
 
     # add functions to clean up source and docstring refs
     for i, (patt, repl) in enumerate(
