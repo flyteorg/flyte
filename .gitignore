@@ -30,11 +30,10 @@ vendor/
 /docker/sandbox-bundled/images/tar
 **/bin/
 docs/_tags/
-docs/api_reference/flytectl
-docs/api_reference/flyteidl
-docs/api_reference/flytekit/generated
+docs/api/flytectl
+docs/api/flyteidl
+docs/api/flytekit/*/generated
 docs/flytesnacks
 docs/examples
 docs/_src
 docs/_projects
-docs/api
