@@ -26,7 +26,7 @@ sys.path.insert(0, str(Path("../").resolve(strict=True)))
 sys.path.append(str(Path("./_ext").resolve(strict=True)))
 sys.path.append(str(Path("/Users/nikkieverett/projects/repos/flytekit")))
 
-import flytekit
+# import flytekit
 
 sphinx.application.ExtensionError = sphinx.errors.ExtensionError
 
@@ -142,8 +142,10 @@ exclude_patterns = [
     "jupyter_execute/**",
     "README.md",
     "_projects/**",
+    "_src/**",
     "examples/**",
     "flytesnacks/index.md",
+    "flytesnacks/contribute.md",
     "flytesnacks/bioinformatics_examples.md",
     "flytesnacks/feature_engineering.md",
     "flytesnacks/flyte_lab.md",
@@ -156,13 +158,10 @@ exclude_patterns = [
     "flytekit/*.md",
     "flytekit/**/*ipynb",
     "flytekit/**/*.md",
-    # "flytectl/index.rst",
-    "api_reference/flyteidl/boilerplate/**",
-    "api_reference/flyteidl/tmp/**",
-    "api_reference/flyteidl/gen/**",
-    "api_reference/flyteidl/README.md",
-    # "protos/docs/**/index.rst",
-    # "protos/index.rst"
+    "api/flyteidl/boilerplate/**",
+    "api/flyteidl/tmp/**",
+    "api/flyteidl/gen/**",
+    "api/flyteidl/README.md",
 ]
 
 # -- Options for HTML output -------------------------------------------------
@@ -177,24 +176,19 @@ html_title = "Flyte"
 
 templates_path = ["_templates"]
 
-# pygments_style = "tango"
-# pygments_dark_style = "native"
+pygments_style = "tango"
+pygments_dark_style = "native"
 
 html_theme_options = {
-    # custom flyteorg furo theme options
-    # "github_repo": "flyte",
-    # "github_username": "flyteorg",
-    # "github_commit": "master",
-    # "docs_path": "rsts",  # path to documentation source
-    # "sphinx_gallery_src_dir": "cookbook",  # path to directory of sphinx gallery source files relative to repo root
-    # "sphinx_gallery_dest_dir": "auto",  # path to root directory containing auto-generated sphinx gallery examples
+    # custom flyteorg pydata theme options
+    "github_url": "https://github.com/flyteorg/flyte",
+    "icon_links": [
+        {
+            "name": "GitHub",
+            "url": "https://github.com/flyteorg/flyte",
+        }
+    ]
 }
-
-# Theme options are theme-specific and customize the look and feel of a theme
-# further.  For a list of options available for each theme, see the
-# documentation.
-#
-# html_theme_options = {}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -211,14 +205,16 @@ html_js_files = ["custom.js"]
 # default: ``['localtoc.html', 'relations.html', 'sourcelink.html',
 # 'searchbox.html']``.
 #
+
 html_sidebars = {
-    "api_reference/*": ["sidebars/api_reference"],
-    "cluster_deployment/*": ["sidebars/cluster_deployment"],
-    "community/*": ["sidebars/community"],
-    "ecosystem/*": ["sidebars/ecosystem"],
-    "integrations/*": ["sidebars/integrations"],
-    "tutorials/*": ["sidebars/tutorials"],
-    "user_guide/*": ["sidebars/user_guide"]
+    "api/**": ["sidebar"],
+    "cluster_deployment/**": ["sidebar"],
+    "community/**": ["sidebar"],
+    "concepts/**": ["sidebar"],
+    "ecosystem/**": ["sidebar"],
+    "integrations/**": ["sidebar"],
+    "tutorials/**": ["sidebar"],
+    "user_guide/**": ["sidebar"]
 }
 
 # -- Options for HTMLHelp output ---------------------------------------------
@@ -247,7 +243,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 
+    (master_doc,
      "Flyte.tex",
      "Flyte Documentation",
      "Flyte Authors",
@@ -318,7 +314,7 @@ copybutton_exclude = 'style[type="text/css"]'
 
 nb_execution_mode = "off"
 nb_execution_excludepatterns = [
-    "flytekit/**/*",
+    "api/flytekit/**/*",
     "flytesnacks/**/*",
     "examples/**/*",
 ]
@@ -326,44 +322,15 @@ nb_custom_formats = {
     ".md": ["jupytext.reads", {"fmt": "md:myst"}],
 }
 
-# Pattern for removing intersphinx references from source files.
-# This should handle cases like:
-#
-# - :ref:`cookbook:label` -> :ref:`label`
-# - :ref:`Text <cookbook:label>` -> :ref:`Text <label>`
-# INTERSPHINX_REFS_PATTERN = r"([`<])(flyte:|flytekit:|flytectl:|flyteidl:|cookbook:|idl:)"
-# INTERSPHINX_REFS_REPLACE = r"\1"
-
-# Pattern for replacing all ref/doc labels that point to protos/docs with /protos/docs
-# PROTO_REF_PATTERN = r"([:<])(protos/docs)"
-# PROTO_REF_REPLACE = r"\1/protos/docs"
-
 # These patterns are used to replace values in source files that are imported
 # from other repos.
 REPLACE_PATTERNS = {
-
-    r"<flyte:deployment/index>": r"</deployment/index>",
-    # r"<flytectl:index>": r"</flytectl/overview>",
-    # INTERSPHINX_REFS_PATTERN: INTERSPHINX_REFS_REPLACE,
     r"<auto_examples": r"<flytesnacks/examples",
-    r"<protos/docs/core/core:taskmetadata>": r"<ref_flyteidl.core.TaskMetadata>",
-    r"<protos/docs/core/core:tasktemplate>": r"<ref_flyteidl.core.TaskTemplate>",
-    r"<flytesnacks/examples": r"</flytesnacks/examples",
-    r"<auto_examples/basics/index>": r"</flytesnacks/examples/basics/index>",
-    # r"<deploy-sandbox-local>": r"<deployment-deployment-sandbox>",
-    r"<deployment/configuration/general:configurable resource types>": r"<deployment-configuration-general>",
-    r"<_tags/DistributedComputing>": r"</_tags/DistributedComputing>",
-    r"{ref}`bioinformatics <bioinformatics>`": r"bioinformatics",
-    # PROTO_REF_PATTERN: PROTO_REF_REPLACE,
-    # r"/protos/docs/service/index": r"/protos/docs/service/service",
-    r"<weather_forecasting>": r"</flytesnacks/weather_forecasting>",
+    r"<flytesnacks/examples": r"</flytesnacks/examples"
 }
-
-# r"<environment_setup>": r"</flytesnacks/environment_setup>",
 
 import_projects_config = {
     "clone_dir": "_projects",
-    # "flytekit_api_dir": "_src/flytekit/",
     "source_regex_mapping": REPLACE_PATTERNS,
     "list_table_toc": [
        "flytesnacks/tutorials",
@@ -375,10 +342,10 @@ import_projects_config = {
 # Define these environment variables to use local copies of the projects. This
 # is useful for building the docs in the CI/CD of the corresponding repos.
 flytesnacks_local_path = os.environ.get("FLYTESNACKS_LOCAL_PATH", None)
-# flytekit_local_path = os.environ.get("FLYTEKIT_LOCAL_PATH", None)
+flytekit_local_path = os.environ.get("FLYTEKIT_LOCAL_PATH", None)
 
 flytesnacks_path = flytesnacks_local_path or "_projects/flytesnacks"
-# flytekit_path = flytekit_local_path or "_projects/api/flytekit"
+flytekit_path = flytekit_local_path or "_projects/api/flytekit"
 
 import_projects = [
     {
@@ -417,15 +384,15 @@ import_projects = [
         "name": "flytectl",
         "source": "../flytectl",
         "docs_path": "docs/source",
-        "dest": "api_reference/flytectl",
+        "dest": "api/flytectl",
         "local": True,
     },
     {
         "name": "flyteidl",
         "source": "../flyteidl",
         "docs_path": "protos",
-        "dest": "api_reference/flyteidl",
-        "cmd": ["cp", "../flyteidl/README.md", "api_reference/flyteidl/README.md"],
+        "dest": "api/flyteidl",
+        "cmd": ["cp", "../flyteidl/README.md", "api/flyteidl/README.md"],
         "local": True,
     }
 ]
