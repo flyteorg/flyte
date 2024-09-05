@@ -200,7 +200,7 @@ If the example code can be run locally, just use `python <my_file>.py` to run it
 
 ### Testing on a cluster
 
-Install {doc}`flytectl <../api_reference/flytectl/index>`, the commandline interface for flyte.
+Install {doc}`flytectl <../api/flytectl/index>`, the commandline interface for flyte.
 
 :::{note}
 Learn more about installation and configuration of Flytectl [here](https://docs.flyte.org/en/latest/flytectl/index.html).
