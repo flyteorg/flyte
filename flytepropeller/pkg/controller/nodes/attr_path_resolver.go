@@ -2,8 +2,6 @@ package nodes
 
 import (
 	"encoding/json"
-	"strings"
-
 	"github.com/vmihailenco/msgpack/v5"
 	"google.golang.org/protobuf/types/known/structpb"
 
@@ -45,8 +43,8 @@ func resolveAttrPathInPromise(nodeID string, literal *core.Literal, bindAttrPath
 		// start from index "count"
 		var err error
 
-		if json := scalar.GetJson(); json != nil {
-			currVal, err = resolveAttrPathInJSON(nodeID, json.GetValue(), bindAttrPath[count:])
+		if jsonIDL := scalar.GetJson(); jsonIDL != nil {
+			currVal, err = resolveAttrPathInJSON(nodeID, jsonIDL.GetValue(), bindAttrPath[count:])
 		} else if generic := scalar.GetGeneric(); generic != nil {
 			currVal, err = resolveAttrPathInPbStruct(nodeID, generic, bindAttrPath[count:])
 		}
@@ -99,24 +97,11 @@ func resolveAttrPathInJSON(nodeID string, msgpackBytes []byte, bindAttrPath []*c
 	var currVal interface{}
 	var tmpVal interface{}
 	var exist bool
-	var jsonStr string
 
-	err := msgpack.Unmarshal(msgpackBytes, &jsonStr)
+	err := msgpack.Unmarshal(msgpackBytes, &currVal)
 	if err != nil {
 		return nil, err
 	}
-
-	// Golang has problem with unmarshalling integer as float64
-	// reference: https://stackoverflow.com/questions/22343083/json-unmarshaling-with-long-numbers-gives-floating-point-number
-
-	decoder := json.NewDecoder(strings.NewReader(jsonStr))
-	decoder.UseNumber()
-
-	err = decoder.Decode(&tmpVal)
-	if err != nil {
-		return nil, err
-	}
-	currVal = convertNumbers(tmpVal)
 
 	// Turn the current value to a map so it can be resolved more easily
 	for _, attr := range bindAttrPath {
@@ -223,11 +208,7 @@ func convertJSONToLiteral(nodeID string, obj interface{}) (*core.Literal, error)
 
 	switch obj := obj.(type) {
 	case map[string]interface{}:
-		jsonBytes, err := json.Marshal(obj)
-		if err != nil {
-			return nil, err
-		}
-		msgpackBytes, err := msgpack.Marshal(jsonBytes)
+		msgpackBytes, err := msgpack.Marshal(obj)
 		if err != nil {
 			return nil, err
 		}
@@ -274,6 +255,8 @@ func convertInterfaceToLiteralScalar(nodeID string, obj interface{}) (*core.Lite
 	case string:
 		value.Value = &core.Primitive_StringValue{StringValue: obj}
 	case int:
+		value.Value = &core.Primitive_Integer{Integer: int64(obj)}
+	case int8:
 		value.Value = &core.Primitive_Integer{Integer: int64(obj)}
 	case int64:
 		value.Value = &core.Primitive_Integer{Integer: obj}
