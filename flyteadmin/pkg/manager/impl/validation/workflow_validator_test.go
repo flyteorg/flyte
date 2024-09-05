@@ -48,7 +48,7 @@ func TestValidateCompiledWorkflow(t *testing.T) {
 	mockConfig := runtimeMocks.MockRegistrationValidationProvider{
 		WorkflowSizeLimit: "1",
 	}
-	workflowClosure := admin.WorkflowClosure{
+	workflowClosure := &admin.WorkflowClosure{
 		CompiledWorkflow: &core.CompiledWorkflowClosure{
 			Primary: &core.CompiledWorkflow{
 				Connections: &core.ConnectionSet{
@@ -75,7 +75,7 @@ func TestValidateCompiledWorkflow(t *testing.T) {
 			},
 		},
 	}
-	err := ValidateCompiledWorkflow(core.Identifier{}, workflowClosure, &mockConfig)
+	err := ValidateCompiledWorkflow(&core.Identifier{}, workflowClosure, &mockConfig)
 	assert.NotNil(t, err)
 	assert.EqualError(t, err, "Workflow closure size exceeds max limit [1]")
 }

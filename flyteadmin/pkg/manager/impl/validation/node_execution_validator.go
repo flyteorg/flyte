@@ -56,7 +56,7 @@ func ValidateNodeExecutionEventRequest(request *admin.NodeExecutionEventRequest,
 	return nil
 }
 
-func ValidateNodeExecutionListRequest(request admin.NodeExecutionListRequest) error {
+func ValidateNodeExecutionListRequest(request *admin.NodeExecutionListRequest) error {
 	if err := ValidateWorkflowExecutionIdentifier(request.WorkflowExecutionId); err != nil {
 		return shared.GetMissingArgumentError(shared.ExecutionID)
 	}
@@ -66,7 +66,7 @@ func ValidateNodeExecutionListRequest(request admin.NodeExecutionListRequest) er
 	return nil
 }
 
-func ValidateNodeExecutionForTaskListRequest(request admin.NodeExecutionForTaskListRequest) error {
+func ValidateNodeExecutionForTaskListRequest(request *admin.NodeExecutionForTaskListRequest) error {
 	if err := ValidateTaskExecutionIdentifier(request.TaskExecutionId); err != nil {
 		return err
 	}

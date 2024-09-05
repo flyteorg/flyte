@@ -7,7 +7,7 @@ import (
 )
 
 type Empty struct{}
-type Identifier = core.Identifier
+type Identifier = *core.Identifier
 type IdentifierSet map[string]Identifier
 
 // NewString creates a String from a list of values.

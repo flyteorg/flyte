@@ -144,7 +144,7 @@ func ValidateVersion(version string) error {
 	return nil
 }
 
-func ValidateResourceListRequest(request admin.ResourceListRequest) error {
+func ValidateResourceListRequest(request *admin.ResourceListRequest) error {
 	if request.Id == nil {
 		return shared.GetMissingArgumentError(shared.ID)
 	}
@@ -160,7 +160,7 @@ func ValidateResourceListRequest(request admin.ResourceListRequest) error {
 	return nil
 }
 
-func ValidateDescriptionEntityListRequest(request admin.DescriptionEntityListRequest) error {
+func ValidateDescriptionEntityListRequest(request *admin.DescriptionEntityListRequest) error {
 	if request.Id == nil {
 		return shared.GetMissingArgumentError(shared.ID)
 	}
@@ -179,7 +179,7 @@ func ValidateDescriptionEntityListRequest(request admin.DescriptionEntityListReq
 	return nil
 }
 
-func ValidateActiveLaunchPlanRequest(request admin.ActiveLaunchPlanRequest) error {
+func ValidateActiveLaunchPlanRequest(request *admin.ActiveLaunchPlanRequest) error {
 	if err := ValidateEmptyStringField(request.Id.Project, shared.Project); err != nil {
 		return err
 	}
@@ -192,7 +192,7 @@ func ValidateActiveLaunchPlanRequest(request admin.ActiveLaunchPlanRequest) erro
 	return nil
 }
 
-func ValidateActiveLaunchPlanListRequest(request admin.ActiveLaunchPlanListRequest) error {
+func ValidateActiveLaunchPlanListRequest(request *admin.ActiveLaunchPlanListRequest) error {
 	if err := ValidateEmptyStringField(request.Project, shared.Project); err != nil {
 		return err
 	}
@@ -205,7 +205,7 @@ func ValidateActiveLaunchPlanListRequest(request admin.ActiveLaunchPlanListReque
 	return nil
 }
 
-func ValidateNamedEntityIdentifierListRequest(request admin.NamedEntityIdentifierListRequest) error {
+func ValidateNamedEntityIdentifierListRequest(request *admin.NamedEntityIdentifierListRequest) error {
 	if err := ValidateEmptyStringField(request.Project, shared.Project); err != nil {
 		return err
 	}
@@ -218,7 +218,7 @@ func ValidateNamedEntityIdentifierListRequest(request admin.NamedEntityIdentifie
 	return nil
 }
 
-func ValidateDescriptionEntityGetRequest(request admin.ObjectGetRequest) error {
+func ValidateDescriptionEntityGetRequest(request *admin.ObjectGetRequest) error {
 	if err := ValidateResourceType(request.Id.ResourceType); err != nil {
 		return err
 	}

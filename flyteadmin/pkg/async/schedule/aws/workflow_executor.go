@@ -61,7 +61,7 @@ var doNotconsumeBase64 = false
 // The kickoff time argument isn't required for scheduled workflows. However, if it exists we substitute the kick-off
 // time value for the input argument.
 func (e *workflowExecutor) resolveKickoffTimeArg(
-	request ScheduledWorkflowExecutionRequest, launchPlan admin.LaunchPlan,
+	request ScheduledWorkflowExecutionRequest, launchPlan *admin.LaunchPlan,
 	executionRequest *admin.ExecutionCreateRequest) error {
 	if request.KickoffTimeArg == "" || launchPlan.Closure.ExpectedInputs == nil {
 		logger.Debugf(context.Background(), "No kickoff time to resolve for scheduled workflow execution: [%s/%s/%s]",
@@ -100,8 +100,8 @@ func (e *workflowExecutor) resolveKickoffTimeArg(
 	return nil
 }
 
-func (e *workflowExecutor) getActiveLaunchPlanVersion(launchPlanIdentifier *admin.NamedEntityIdentifier) (admin.LaunchPlan, error) {
-	launchPlans, err := e.launchPlanManager.ListLaunchPlans(context.Background(), admin.ResourceListRequest{
+func (e *workflowExecutor) getActiveLaunchPlanVersion(launchPlanIdentifier *admin.NamedEntityIdentifier) (*admin.LaunchPlan, error) {
+	launchPlans, err := e.launchPlanManager.ListLaunchPlans(context.Background(), &admin.ResourceListRequest{
 		Id:      launchPlanIdentifier,
 		Filters: activeLaunchPlanFilter,
 		Limit:   1,
@@ -110,20 +110,20 @@ func (e *workflowExecutor) getActiveLaunchPlanVersion(launchPlanIdentifier *admi
 		logger.Warningf(context.Background(), "failed to find active launch plan with identifier [%+v]",
 			launchPlanIdentifier)
 		e.metrics.NoActiveLaunchPlanVersionsFound.Inc()
-		return admin.LaunchPlan{}, err
+		return &admin.LaunchPlan{}, err
 	}
 	if len(launchPlans.LaunchPlans) != 1 {
 		e.metrics.GreaterThan1LaunchPlanVersionsFound.Inc()
 		logger.Warningf(context.Background(), "failed to get exactly one active launch plan for identifier: %+v",
 			launchPlanIdentifier)
-		return admin.LaunchPlan{}, errors.NewFlyteAdminErrorf(codes.Internal,
+		return &admin.LaunchPlan{}, errors.NewFlyteAdminErrorf(codes.Internal,
 			"failed to get exactly one active launch plan for identifier: %+v", launchPlanIdentifier)
 	}
-	return *launchPlans.LaunchPlans[0], nil
+	return launchPlans.LaunchPlans[0], nil
 }
 
-func generateExecutionName(launchPlan admin.LaunchPlan, kickoffTime time.Time) string {
-	hashedIdentifier := hashIdentifier(core.Identifier{
+func generateExecutionName(launchPlan *admin.LaunchPlan, kickoffTime time.Time) string {
+	hashedIdentifier := hashIdentifier(&core.Identifier{
 		Project: launchPlan.Id.Project,
 		Domain:  launchPlan.Id.Domain,
 		Name:    launchPlan.Id.Name,
@@ -133,7 +133,7 @@ func generateExecutionName(launchPlan admin.LaunchPlan, kickoffTime time.Time) s
 }
 
 func (e *workflowExecutor) formulateExecutionCreateRequest(
-	launchPlan admin.LaunchPlan, kickoffTime time.Time) admin.ExecutionCreateRequest {
+	launchPlan *admin.LaunchPlan, kickoffTime time.Time) *admin.ExecutionCreateRequest {
 	// Deterministically assign a name based on the schedule kickoff time/launch plan definition.
 	name := generateExecutionName(launchPlan, kickoffTime)
 	logger.Debugf(context.Background(), "generated name [%s] for scheduled execution with launch plan [%+v]",
@@ -147,7 +147,7 @@ func (e *workflowExecutor) formulateExecutionCreateRequest(
 		logger.Warningf(context.Background(), "failed to serialize kickoff time [%v] to proto with err: %v",
 			kickoffTime, err)
 	}
-	executionRequest := admin.ExecutionCreateRequest{
+	executionRequest := &admin.ExecutionCreateRequest{
 		Project: launchPlan.Id.Project,
 		Domain:  launchPlan.Id.Domain,
 		Name:    name,
@@ -189,7 +189,7 @@ func (e *workflowExecutor) run() error {
 
 		logger.Debugf(context.Background(), "Processing scheduled workflow execution event: %+v",
 			scheduledWorkflowExecutionRequest)
-		launchPlan, err := e.getActiveLaunchPlanVersion(&scheduledWorkflowExecutionRequest.LaunchPlanIdentifier)
+		launchPlan, err := e.getActiveLaunchPlanVersion(scheduledWorkflowExecutionRequest.LaunchPlanIdentifier)
 		if err != nil {
 			// In the rare case that a scheduled event fires right before a user disables the currently active launch
 			// plan version (and triggers deleting the schedule rule) there may be no active launch plans. This is fine,
@@ -209,7 +209,7 @@ func (e *workflowExecutor) run() error {
 		executionRequest := e.formulateExecutionCreateRequest(launchPlan, scheduledWorkflowExecutionRequest.KickoffTime)
 		ctx = contextutils.WithWorkflowID(ctx, fmt.Sprintf(workflowIdentifierFmt, executionRequest.Project,
 			executionRequest.Domain, executionRequest.Name))
-		err = e.resolveKickoffTimeArg(scheduledWorkflowExecutionRequest, launchPlan, &executionRequest)
+		err = e.resolveKickoffTimeArg(scheduledWorkflowExecutionRequest, launchPlan, executionRequest)
 		if err != nil {
 			e.metrics.FailedResolveKickoffTimeArg.Inc()
 			logger.Error(context.Background(), err.Error())

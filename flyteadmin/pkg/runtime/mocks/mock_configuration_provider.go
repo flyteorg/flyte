@@ -89,7 +89,7 @@ func NewMockConfigurationProvider(
 
 	mockQualityOfServiceConfiguration := &ifaceMocks.QualityOfServiceConfiguration{}
 	mockQualityOfServiceConfiguration.OnGetDefaultTiers().Return(make(map[string]core.QualityOfService_Tier))
-	mockQualityOfServiceConfiguration.OnGetTierExecutionValues().Return(make(map[core.QualityOfService_Tier]core.QualityOfServiceSpec))
+	mockQualityOfServiceConfiguration.OnGetTierExecutionValues().Return(make(map[core.QualityOfService_Tier]*core.QualityOfServiceSpec))
 
 	mockClusterPoolAssignmentConfiguration := &ifaceMocks.ClusterPoolAssignmentConfiguration{}
 	mockClusterPoolAssignmentConfiguration.OnGetClusterPoolAssignments().Return(make(map[string]interfaces.ClusterPoolAssignment))

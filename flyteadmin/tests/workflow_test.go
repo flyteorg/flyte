@@ -28,7 +28,7 @@ func TestCreateWorkflow(t *testing.T) {
 	taskCreateReq.Id.Project = "admintests"
 	taskCreateReq.Id.Domain = "development"
 	taskCreateReq.Id.Name = "simple task"
-	_, err := client.CreateTask(ctx, &taskCreateReq)
+	_, err := client.CreateTask(ctx, taskCreateReq)
 	assert.NoError(t, err)
 
 	identifier := core.Identifier{

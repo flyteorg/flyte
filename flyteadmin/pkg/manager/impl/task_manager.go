@@ -48,7 +48,7 @@ func getTaskContext(ctx context.Context, identifier *core.Identifier) context.Co
 	return contextutils.WithTaskID(ctx, identifier.Name)
 }
 
-func setDefaults(request admin.TaskCreateRequest) (admin.TaskCreateRequest, error) {
+func setDefaults(request *admin.TaskCreateRequest) (*admin.TaskCreateRequest, error) {
 	if request.Id == nil {
 		return request, errors.NewFlyteAdminError(codes.InvalidArgument,
 			"missing identifier for TaskCreateRequest")
@@ -60,7 +60,7 @@ func setDefaults(request admin.TaskCreateRequest) (admin.TaskCreateRequest, erro
 
 func (t *TaskManager) CreateTask(
 	ctx context.Context,
-	request admin.TaskCreateRequest) (*admin.TaskCreateResponse, error) {
+	request *admin.TaskCreateRequest) (*admin.TaskCreateResponse, error) {
 	platformTaskResources := util.GetTaskResources(ctx, request.Id, t.resourceManager, t.config.TaskResourceConfiguration())
 	if err := validation.ValidateTask(ctx, request, t.db, platformTaskResources,
 		t.config.WhitelistConfiguration(), t.config.ApplicationConfiguration()); err != nil {
@@ -92,16 +92,16 @@ func (t *TaskManager) CreateTask(
 	existingTaskModel, err := util.GetTaskModel(ctx, t.db, request.Spec.Template.Id)
 	if err == nil {
 		if bytes.Equal(taskDigest, existingTaskModel.Digest) {
-			return nil, errors.NewTaskExistsIdenticalStructureError(ctx, &request)
+			return nil, errors.NewTaskExistsIdenticalStructureError(ctx, request)
 		}
 		existingTask, transformerErr := transformers.FromTaskModel(*existingTaskModel)
 		if transformerErr != nil {
 			logger.Errorf(ctx, "failed to transform task from task model")
 			return nil, transformerErr
 		}
-		return nil, errors.NewTaskExistsDifferentStructureError(ctx, &request, existingTask.Closure.GetCompiledTask(), compiledTask)
+		return nil, errors.NewTaskExistsDifferentStructureError(ctx, request, existingTask.Closure.GetCompiledTask(), compiledTask)
 	}
-	taskModel, err := transformers.CreateTaskModel(finalizedRequest, admin.TaskClosure{
+	taskModel, err := transformers.CreateTaskModel(finalizedRequest, &admin.TaskClosure{
 		CompiledTask: compiledTask,
 		CreatedAt:    createdAt,
 	}, taskDigest)
@@ -111,7 +111,7 @@ func (t *TaskManager) CreateTask(
 		return nil, err
 	}
 
-	descriptionModel, err := transformers.CreateDescriptionEntityModel(request.Spec.Description, *request.Id)
+	descriptionModel, err := transformers.CreateDescriptionEntityModel(request.Spec.Description, request.Id)
 	if err != nil {
 		logger.Errorf(ctx,
 			"Failed to transform description model [%+v] with err: %v", request.Spec.Description, err)
@@ -137,12 +137,12 @@ func (t *TaskManager) CreateTask(
 	return &admin.TaskCreateResponse{}, nil
 }
 
-func (t *TaskManager) GetTask(ctx context.Context, request admin.ObjectGetRequest) (*admin.Task, error) {
+func (t *TaskManager) GetTask(ctx context.Context, request *admin.ObjectGetRequest) (*admin.Task, error) {
 	if err := validation.ValidateIdentifier(request.Id, common.Task); err != nil {
 		logger.Debugf(ctx, "invalid identifier [%+v]: %v", request.Id, err)
 	}
 	ctx = getTaskContext(ctx, request.Id)
-	task, err := util.GetTask(ctx, t.db, *request.Id)
+	task, err := util.GetTask(ctx, t.db, request.Id)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to get task with id [%+v] with err %v", err, request.Id)
 		return nil, err
@@ -150,7 +150,7 @@ func (t *TaskManager) GetTask(ctx context.Context, request admin.ObjectGetReques
 	return task, nil
 }
 
-func (t *TaskManager) ListTasks(ctx context.Context, request admin.ResourceListRequest) (*admin.TaskList, error) {
+func (t *TaskManager) ListTasks(ctx context.Context, request *admin.ResourceListRequest) (*admin.TaskList, error) {
 	// Check required fields
 	if err := validation.ValidateResourceListRequest(request); err != nil {
 		logger.Debugf(ctx, "Invalid request [%+v]: %v", request, err)
@@ -211,7 +211,7 @@ func (t *TaskManager) ListTasks(ctx context.Context, request admin.ResourceListR
 
 // This queries the unique tasks for the given query parameters.  At least the project and domain must be specified.
 // It will return all tasks, but only the one of each even if there are multiple versions.
-func (t *TaskManager) ListUniqueTaskIdentifiers(ctx context.Context, request admin.NamedEntityIdentifierListRequest) (
+func (t *TaskManager) ListUniqueTaskIdentifiers(ctx context.Context, request *admin.NamedEntityIdentifierListRequest) (
 	*admin.NamedEntityIdentifierList, error) {
 	if err := validation.ValidateNamedEntityIdentifierListRequest(request); err != nil {
 		logger.Debugf(ctx, "invalid request [%+v]: %v", request, err)

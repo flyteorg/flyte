@@ -35,13 +35,13 @@ type ScheduledWorkflowExecutionRequest struct {
 	// The name of the kickoff time input argument in the workflow definition. This will be filled with kickoff time.
 	KickoffTimeArg string
 	// The desired launch plan identifier to trigger on schedule event firings.
-	LaunchPlanIdentifier admin.NamedEntityIdentifier
+	LaunchPlanIdentifier *admin.NamedEntityIdentifier
 }
 
 // This produces a function that is used to serialize messages enqueued on the cloudwatch scheduler.
 func SerializeScheduleWorkflowPayload(
-	kickoffTimeArg string, launchPlanIdentifier admin.NamedEntityIdentifier) (*string, error) {
-	payload, err := proto.Marshal(&launchPlanIdentifier)
+	kickoffTimeArg string, launchPlanIdentifier *admin.NamedEntityIdentifier) (*string, error) {
+	payload, err := proto.Marshal(launchPlanIdentifier)
 	if err != nil {
 		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "failed to marshall launch plan with err: %v", err)
 	}
@@ -81,6 +81,6 @@ func DeserializeScheduleWorkflowPayload(payload []byte) (ScheduledWorkflowExecut
 	return ScheduledWorkflowExecutionRequest{
 		KickoffTime:          kickoffTime,
 		KickoffTimeArg:       scheduleWorkflowPayload.KickoffTimeArg,
-		LaunchPlanIdentifier: launchPlanIdentifier,
+		LaunchPlanIdentifier: &launchPlanIdentifier,
 	}, nil
 }

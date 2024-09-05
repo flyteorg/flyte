@@ -38,7 +38,7 @@ func getSignalContext(ctx context.Context, identifier *core.SignalIdentifier) co
 	return contextutils.WithSignalID(ctx, identifier.SignalId)
 }
 
-func (s *SignalManager) GetOrCreateSignal(ctx context.Context, request admin.SignalGetOrCreateRequest) (*admin.Signal, error) {
+func (s *SignalManager) GetOrCreateSignal(ctx context.Context, request *admin.SignalGetOrCreateRequest) (*admin.Signal, error) {
 	if err := validation.ValidateSignalGetOrCreateRequest(ctx, request); err != nil {
 		logger.Debugf(ctx, "invalid request [%+v]: %v", request, err)
 		return nil, err
@@ -62,17 +62,17 @@ func (s *SignalManager) GetOrCreateSignal(ctx context.Context, request admin.Sig
 		return nil, err
 	}
 
-	return &signal, nil
+	return signal, nil
 }
 
-func (s *SignalManager) ListSignals(ctx context.Context, request admin.SignalListRequest) (*admin.SignalList, error) {
+func (s *SignalManager) ListSignals(ctx context.Context, request *admin.SignalListRequest) (*admin.SignalList, error) {
 	if err := validation.ValidateSignalListRequest(ctx, request); err != nil {
 		logger.Debugf(ctx, "ListSignals request [%+v] is invalid: %v", request, err)
 		return nil, err
 	}
 	ctx = getExecutionContext(ctx, request.WorkflowExecutionId)
 
-	identifierFilters, err := util.GetWorkflowExecutionIdentifierFilters(ctx, *request.WorkflowExecutionId)
+	identifierFilters, err := util.GetWorkflowExecutionIdentifierFilters(ctx, request.WorkflowExecutionId)
 	if err != nil {
 		return nil, err
 	}
@@ -120,7 +120,7 @@ func (s *SignalManager) ListSignals(ctx context.Context, request admin.SignalLis
 	}, nil
 }
 
-func (s *SignalManager) SetSignal(ctx context.Context, request admin.SignalSetRequest) (*admin.SignalSetResponse, error) {
+func (s *SignalManager) SetSignal(ctx context.Context, request *admin.SignalSetRequest) (*admin.SignalSetResponse, error) {
 	if err := validation.ValidateSignalSetRequest(ctx, s.db, request); err != nil {
 		return nil, err
 	}

@@ -18,15 +18,15 @@ type MockEventScheduler struct {
 }
 
 func (s *MockEventScheduler) CreateScheduleInput(ctx context.Context, appConfig *runtimeInterfaces.SchedulerConfig,
-	identifier core.Identifier, schedule *admin.Schedule) (interfaces.AddScheduleInput, error) {
+	identifier *core.Identifier, schedule *admin.Schedule) (interfaces.AddScheduleInput, error) {
 	payload, _ := aws.SerializeScheduleWorkflowPayload(
 		schedule.GetKickoffTimeInputArg(),
-		admin.NamedEntityIdentifier{
+		&admin.NamedEntityIdentifier{
 			Project: identifier.Project,
 			Domain:  identifier.Domain,
 			Name:    identifier.Name,
 		})
-	return interfaces.AddScheduleInput{Identifier: identifier, ScheduleExpression: *schedule, Payload: payload}, nil
+	return interfaces.AddScheduleInput{Identifier: identifier, ScheduleExpression: schedule, Payload: payload}, nil
 }
 
 func (s *MockEventScheduler) AddSchedule(ctx context.Context, input interfaces.AddScheduleInput) error {
