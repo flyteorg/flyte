@@ -23,16 +23,16 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
-func GetExecutionName(request admin.ExecutionCreateRequest) string {
+func GetExecutionName(request *admin.ExecutionCreateRequest) string {
 	if request.Name != "" {
 		return request.Name
 	}
 	return naming.GetExecutionName(time.Now().UnixNano())
 }
 
-func GetTask(ctx context.Context, repo repoInterfaces.Repository, identifier core.Identifier) (
+func GetTask(ctx context.Context, repo repoInterfaces.Repository, identifier *core.Identifier) (
 	*admin.Task, error) {
-	taskModel, err := GetTaskModel(ctx, repo, &identifier)
+	taskModel, err := GetTaskModel(ctx, repo, identifier)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +46,7 @@ func GetTask(ctx context.Context, repo repoInterfaces.Repository, identifier cor
 }
 
 func GetWorkflowModel(
-	ctx context.Context, repo repoInterfaces.Repository, identifier core.Identifier) (models.Workflow, error) {
+	ctx context.Context, repo repoInterfaces.Repository, identifier *core.Identifier) (models.Workflow, error) {
 	workflowModel, err := (repo).WorkflowRepo().Get(ctx, repoInterfaces.Identifier{
 		Org:     identifier.Org,
 		Project: identifier.Project,
@@ -77,7 +77,7 @@ func GetWorkflow(
 	ctx context.Context,
 	repo repoInterfaces.Repository,
 	store *storage.DataStore,
-	identifier core.Identifier) (*admin.Workflow, error) {
+	identifier *core.Identifier) (*admin.Workflow, error) {
 	workflowModel, err := GetWorkflowModel(ctx, repo, identifier)
 	if err != nil {
 		return nil, err
@@ -96,7 +96,7 @@ func GetWorkflow(
 }
 
 func GetLaunchPlanModel(
-	ctx context.Context, repo repoInterfaces.Repository, identifier core.Identifier) (models.LaunchPlan, error) {
+	ctx context.Context, repo repoInterfaces.Repository, identifier *core.Identifier) (models.LaunchPlan, error) {
 	launchPlanModel, err := (repo).LaunchPlanRepo().Get(ctx, repoInterfaces.Identifier{
 		Org:     identifier.Org,
 		Project: identifier.Project,
@@ -111,7 +111,7 @@ func GetLaunchPlanModel(
 }
 
 func GetLaunchPlan(
-	ctx context.Context, repo repoInterfaces.Repository, identifier core.Identifier) (*admin.LaunchPlan, error) {
+	ctx context.Context, repo repoInterfaces.Repository, identifier *core.Identifier) (*admin.LaunchPlan, error) {
 	launchPlanModel, err := GetLaunchPlanModel(ctx, repo, identifier)
 	if err != nil {
 		return nil, err
@@ -120,7 +120,7 @@ func GetLaunchPlan(
 }
 
 func GetNamedEntityModel(
-	ctx context.Context, repo repoInterfaces.Repository, resourceType core.ResourceType, identifier admin.NamedEntityIdentifier) (models.NamedEntity, error) {
+	ctx context.Context, repo repoInterfaces.Repository, resourceType core.ResourceType, identifier *admin.NamedEntityIdentifier) (models.NamedEntity, error) {
 	metadataModel, err := (repo).NamedEntityRepo().Get(ctx, repoInterfaces.GetNamedEntityInput{
 		ResourceType: resourceType,
 		Org:          identifier.Org,
@@ -135,7 +135,7 @@ func GetNamedEntityModel(
 }
 
 func GetNamedEntity(
-	ctx context.Context, repo repoInterfaces.Repository, resourceType core.ResourceType, identifier admin.NamedEntityIdentifier) (*admin.NamedEntity, error) {
+	ctx context.Context, repo repoInterfaces.Repository, resourceType core.ResourceType, identifier *admin.NamedEntityIdentifier) (*admin.NamedEntity, error) {
 	metadataModel, err := GetNamedEntityModel(ctx, repo, resourceType, identifier)
 	if err != nil {
 		return nil, err
@@ -145,7 +145,7 @@ func GetNamedEntity(
 }
 
 func GetDescriptionEntityModel(
-	ctx context.Context, repo repoInterfaces.Repository, identifier core.Identifier) (models.DescriptionEntity, error) {
+	ctx context.Context, repo repoInterfaces.Repository, identifier *core.Identifier) (models.DescriptionEntity, error) {
 	descriptionEntityModel, err := (repo).DescriptionEntityRepo().Get(ctx, repoInterfaces.GetDescriptionEntityInput{
 		ResourceType: identifier.ResourceType,
 		Org:          identifier.Org,
@@ -161,7 +161,7 @@ func GetDescriptionEntityModel(
 }
 
 func GetDescriptionEntity(
-	ctx context.Context, repo repoInterfaces.Repository, identifier core.Identifier) (*admin.DescriptionEntity, error) {
+	ctx context.Context, repo repoInterfaces.Repository, identifier *core.Identifier) (*admin.DescriptionEntity, error) {
 	descriptionEntityModel, err := GetDescriptionEntityModel(ctx, repo, identifier)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to get description entity [%+v]: %v", identifier, err)
@@ -222,7 +222,7 @@ func ListActiveLaunchPlanVersionsFilters(org, project, domain string) ([]common.
 }
 
 func GetExecutionModel(
-	ctx context.Context, repo repoInterfaces.Repository, identifier core.WorkflowExecutionIdentifier) (
+	ctx context.Context, repo repoInterfaces.Repository, identifier *core.WorkflowExecutionIdentifier) (
 	*models.Execution, error) {
 	executionModel, err := repo.ExecutionRepo().Get(ctx, repoInterfaces.Identifier{
 		Org:     identifier.Org,
@@ -239,7 +239,7 @@ func GetExecutionModel(
 func GetNodeExecutionModel(ctx context.Context, repo repoInterfaces.Repository, nodeExecutionIdentifier *core.NodeExecutionIdentifier) (
 	*models.NodeExecution, error) {
 	nodeExecutionModel, err := repo.NodeExecutionRepo().Get(ctx, repoInterfaces.NodeExecutionResource{
-		NodeExecutionIdentifier: *nodeExecutionIdentifier,
+		NodeExecutionIdentifier: nodeExecutionIdentifier,
 	})
 
 	if err != nil {
@@ -272,7 +272,7 @@ func GetTaskExecutionModel(
 	}
 
 	taskExecutionModel, err := repo.TaskExecutionRepo().Get(ctx, repoInterfaces.GetTaskExecutionInput{
-		TaskExecutionID: *taskExecutionID,
+		TaskExecutionID: taskExecutionID,
 	})
 	if err != nil {
 		logger.Debugf(ctx, "Failed to get task execution with id [%+v] with err %v", taskExecutionID, err)
@@ -303,7 +303,7 @@ func GetMatchableResource(ctx context.Context, resourceManager interfaces.Resour
 // MergeIntoExecConfig into workflowExecConfig (higher priority) from spec (lower priority) and return the
 // new object with the merged changes.
 // After settings project is done, can move this function back to execution manager. Currently shared with resource.
-func MergeIntoExecConfig(workflowExecConfig admin.WorkflowExecutionConfig, spec shared.WorkflowExecutionConfigInterface) admin.WorkflowExecutionConfig {
+func MergeIntoExecConfig(workflowExecConfig *admin.WorkflowExecutionConfig, spec shared.WorkflowExecutionConfigInterface) *admin.WorkflowExecutionConfig {
 	if workflowExecConfig.GetMaxParallelism() == 0 && spec.GetMaxParallelism() > 0 {
 		workflowExecConfig.MaxParallelism = spec.GetMaxParallelism()
 	}

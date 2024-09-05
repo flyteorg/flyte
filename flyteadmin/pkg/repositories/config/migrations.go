@@ -1472,7 +1472,7 @@ var ResourcesToConfigurationsMigration = &gormigrate.Migration{
 			Configurations: configurationsMap,
 		}
 		var err error
-		configurationDocument.Version, err = util.GetConfigurationDocumentStringDigest(ctx, *configurationDocument)
+		configurationDocument.Version, err = util.GetConfigurationDocumentStringDigest(ctx, configurationDocument)
 		if err != nil {
 			logger.Errorf(ctx, "failed to generate version for document %+v:, error: %v", configurationDocument.Configurations, err)
 			return err

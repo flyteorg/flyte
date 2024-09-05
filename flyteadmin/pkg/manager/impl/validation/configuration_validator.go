@@ -14,14 +14,14 @@ type ConfigurationValidator struct {
 	config runtimeInterfaces.ApplicationConfiguration
 }
 
-func (v ConfigurationValidator) ValidateGetRequest(ctx context.Context, request admin.ConfigurationGetRequest) error {
+func (v ConfigurationValidator) ValidateGetRequest(ctx context.Context, request *admin.ConfigurationGetRequest) error {
 	if request.Id == nil {
 		return shared.GetMissingArgumentError(shared.ID)
 	}
 	return v.validateConfigurationID(ctx, request.Id)
 }
 
-func (v ConfigurationValidator) ValidateUpdateRequest(ctx context.Context, request admin.ConfigurationUpdateRequest) error {
+func (v ConfigurationValidator) ValidateUpdateRequest(ctx context.Context, request *admin.ConfigurationUpdateRequest) error {
 	if request.Id == nil {
 		return shared.GetMissingArgumentError(shared.ID)
 	}

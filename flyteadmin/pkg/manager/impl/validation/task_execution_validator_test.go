@@ -17,7 +17,7 @@ var taskEventOccurredAtProto, _ = ptypes.TimestampProto(taskEventOccurredAt)
 var maxOutputSizeInBytes = int64(1000000)
 
 func TestValidateTaskExecutionRequest(t *testing.T) {
-	assert.Nil(t, ValidateTaskExecutionRequest(admin.TaskExecutionEventRequest{
+	assert.Nil(t, ValidateTaskExecutionRequest(&admin.TaskExecutionEventRequest{
 		Event: &event.TaskExecutionEvent{
 			OccurredAt: taskEventOccurredAtProto,
 			TaskId: &core.Identifier{
@@ -41,7 +41,7 @@ func TestValidateTaskExecutionRequest(t *testing.T) {
 }
 
 func TestValidateTaskExecutionRequest_MissingFields(t *testing.T) {
-	err := ValidateTaskExecutionRequest(admin.TaskExecutionEventRequest{
+	err := ValidateTaskExecutionRequest(&admin.TaskExecutionEventRequest{
 		Event: &event.TaskExecutionEvent{
 			TaskId: &core.Identifier{
 				ResourceType: core.ResourceType_TASK,
@@ -63,7 +63,7 @@ func TestValidateTaskExecutionRequest_MissingFields(t *testing.T) {
 	}, maxOutputSizeInBytes)
 	assert.EqualError(t, err, "missing occurred_at")
 
-	err = ValidateTaskExecutionRequest(admin.TaskExecutionEventRequest{
+	err = ValidateTaskExecutionRequest(&admin.TaskExecutionEventRequest{
 		Event: &event.TaskExecutionEvent{
 			OccurredAt: taskEventOccurredAtProto,
 			TaskId: &core.Identifier{
@@ -85,7 +85,7 @@ func TestValidateTaskExecutionRequest_MissingFields(t *testing.T) {
 	}, maxOutputSizeInBytes)
 	assert.EqualError(t, err, "missing version")
 
-	err = ValidateTaskExecutionRequest(admin.TaskExecutionEventRequest{
+	err = ValidateTaskExecutionRequest(&admin.TaskExecutionEventRequest{
 		Event: &event.TaskExecutionEvent{
 			OccurredAt: taskEventOccurredAtProto,
 			TaskId: &core.Identifier{
@@ -107,7 +107,7 @@ func TestValidateTaskExecutionRequest_MissingFields(t *testing.T) {
 	}, maxOutputSizeInBytes)
 	assert.EqualError(t, err, "missing node_id")
 
-	err = ValidateTaskExecutionRequest(admin.TaskExecutionEventRequest{}, maxOutputSizeInBytes)
+	err = ValidateTaskExecutionRequest(&admin.TaskExecutionEventRequest{}, maxOutputSizeInBytes)
 	assert.EqualError(t, err, "missing event")
 }
 
@@ -133,7 +133,7 @@ func TestValidateTaskExecutionIdentifier(t *testing.T) {
 }
 
 func TestValidateTaskExecutionListRequest(t *testing.T) {
-	assert.Nil(t, ValidateTaskExecutionListRequest(admin.TaskExecutionListRequest{
+	assert.Nil(t, ValidateTaskExecutionListRequest(&admin.TaskExecutionListRequest{
 		NodeExecutionId: &core.NodeExecutionIdentifier{
 			NodeId: "nodey",
 			ExecutionId: &core.WorkflowExecutionIdentifier{
@@ -147,7 +147,7 @@ func TestValidateTaskExecutionListRequest(t *testing.T) {
 }
 
 func TestValidateTaskExecutionListRequest_MissingFields(t *testing.T) {
-	err := ValidateTaskExecutionListRequest(admin.TaskExecutionListRequest{
+	err := ValidateTaskExecutionListRequest(&admin.TaskExecutionListRequest{
 		NodeExecutionId: &core.NodeExecutionIdentifier{
 			NodeId: "nodey",
 			ExecutionId: &core.WorkflowExecutionIdentifier{
@@ -159,7 +159,7 @@ func TestValidateTaskExecutionListRequest_MissingFields(t *testing.T) {
 	})
 	assert.EqualError(t, err, "missing domain")
 
-	err = ValidateTaskExecutionListRequest(admin.TaskExecutionListRequest{
+	err = ValidateTaskExecutionListRequest(&admin.TaskExecutionListRequest{
 		NodeExecutionId: &core.NodeExecutionIdentifier{
 			NodeId: "nodey",
 			ExecutionId: &core.WorkflowExecutionIdentifier{

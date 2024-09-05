@@ -26,7 +26,7 @@ var acceptedReferenceLaunchTypes = map[core.ResourceType]interface{}{
 	core.ResourceType_TASK:        nil,
 }
 
-func ValidateExecutionRequest(ctx context.Context, request admin.ExecutionCreateRequest,
+func ValidateExecutionRequest(ctx context.Context, request *admin.ExecutionCreateRequest,
 	db repositoryInterfaces.Repository, config runtimeInterfaces.ApplicationConfiguration) error {
 	if err := ValidateEmptyStringField(request.Project, shared.Project); err != nil {
 		return err
@@ -139,7 +139,7 @@ func CheckValidExecutionID(executionID, fieldName string) error {
 	return nil
 }
 
-func ValidateCreateWorkflowEventRequest(request admin.WorkflowExecutionEventRequest, maxOutputSizeInBytes int64) error {
+func ValidateCreateWorkflowEventRequest(request *admin.WorkflowExecutionEventRequest, maxOutputSizeInBytes int64) error {
 	if request.Event == nil {
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 			"Workflow event handler was called without event")
@@ -169,7 +169,7 @@ func ValidateWorkflowExecutionIdentifier(identifier *core.WorkflowExecutionIdent
 	return nil
 }
 
-func ValidateCreateLaunchPlanFromNodeRequest(request admin.CreateLaunchPlanFromNodeRequest) error {
+func ValidateCreateLaunchPlanFromNodeRequest(request *admin.CreateLaunchPlanFromNodeRequest) error {
 	if request.GetSubNodeIds() != nil {
 		if len(request.GetSubNodeIds().GetSubNodeIds()) == 0 {
 			return errors.NewFlyteAdminErrorf(codes.InvalidArgument, "subNodeIDs cannot be empty")

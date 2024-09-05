@@ -19,7 +19,7 @@ func TestCreateLaunchPlanHappyCase(t *testing.T) {
 	mockLaunchPlanManager := mocks.MockLaunchPlanManager{}
 	mockLaunchPlanManager.SetCreateCallback(
 		func(ctx context.Context,
-			request admin.LaunchPlanCreateRequest) (*admin.LaunchPlanCreateResponse, error) {
+			request *admin.LaunchPlanCreateRequest) (*admin.LaunchPlanCreateResponse, error) {
 			return &admin.LaunchPlanCreateResponse{}, nil
 		},
 	)
@@ -46,7 +46,7 @@ func TestCreateLaunchPlanError(t *testing.T) {
 	mockLaunchPlanManager := mocks.MockLaunchPlanManager{}
 	mockLaunchPlanManager.SetCreateCallback(
 		func(ctx context.Context,
-			request admin.LaunchPlanCreateRequest) (*admin.LaunchPlanCreateResponse, error) {
+			request *admin.LaunchPlanCreateRequest) (*admin.LaunchPlanCreateResponse, error) {
 			return nil, errors.GetMissingEntityError(core.ResourceType_LAUNCH_PLAN.String(), request.Id)
 		},
 	)
@@ -74,7 +74,7 @@ func TestGetActiveLaunchPlan(t *testing.T) {
 	mockLaunchPlanManager := mocks.MockLaunchPlanManager{}
 	mockLaunchPlanManager.SetGetActiveLaunchPlanCallback(
 		func(ctx context.Context,
-			request admin.ActiveLaunchPlanRequest) (*admin.LaunchPlan, error) {
+			request *admin.ActiveLaunchPlanRequest) (*admin.LaunchPlan, error) {
 			return &admin.LaunchPlan{}, nil
 		},
 	)
@@ -99,7 +99,7 @@ func TestGetActiveLaunchPlan_Error(t *testing.T) {
 	mockLaunchPlanManager := mocks.MockLaunchPlanManager{}
 	mockLaunchPlanManager.SetGetActiveLaunchPlanCallback(
 		func(ctx context.Context,
-			request admin.ActiveLaunchPlanRequest) (*admin.LaunchPlan, error) {
+			request *admin.ActiveLaunchPlanRequest) (*admin.LaunchPlan, error) {
 			return nil, errors.GetInvalidInputError("invalid input")
 		},
 	)
@@ -124,7 +124,7 @@ func TestListActiveLaunchPlans(t *testing.T) {
 	mockLaunchPlanManager := mocks.MockLaunchPlanManager{}
 	mockLaunchPlanManager.SetListActiveLaunchPlansCallback(
 		func(ctx context.Context,
-			request admin.ActiveLaunchPlanListRequest) (*admin.LaunchPlanList, error) {
+			request *admin.ActiveLaunchPlanListRequest) (*admin.LaunchPlanList, error) {
 			return &admin.LaunchPlanList{}, nil
 		},
 	)
@@ -146,7 +146,7 @@ func TestListActiveLaunchPlans_Error(t *testing.T) {
 	mockLaunchPlanManager := mocks.MockLaunchPlanManager{}
 	mockLaunchPlanManager.SetListActiveLaunchPlansCallback(
 		func(ctx context.Context,
-			request admin.ActiveLaunchPlanListRequest) (*admin.LaunchPlanList, error) {
+			request *admin.ActiveLaunchPlanListRequest) (*admin.LaunchPlanList, error) {
 			return nil, errors.GetInvalidInputError("oops")
 		},
 	)

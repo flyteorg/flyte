@@ -29,7 +29,7 @@ var matchingClusterResourceAttributes = &admin.MatchingAttributes{
 	},
 }
 
-var workflowAttributes = admin.WorkflowAttributes{
+var workflowAttributes = &admin.WorkflowAttributes{
 	Project:            resourceProject,
 	Domain:             resourceDomain,
 	Workflow:           resourceWorkflow,
@@ -49,7 +49,7 @@ var matchingExecutionQueueAttributes = &admin.MatchingAttributes{
 	},
 }
 
-var projectDomainAttributes = admin.ProjectDomainAttributes{
+var projectDomainAttributes = &admin.ProjectDomainAttributes{
 	Project:            resourceProject,
 	Domain:             resourceDomain,
 	MatchingAttributes: matchingExecutionQueueAttributes,
@@ -141,7 +141,7 @@ func TestFromProjectDomainAttributesModel(t *testing.T) {
 	}
 	unmarshalledAttributes, err := FromResourceModelToProjectDomainAttributes(model)
 	assert.Nil(t, err)
-	assert.True(t, proto.Equal(&projectDomainAttributes, &unmarshalledAttributes))
+	assert.True(t, proto.Equal(projectDomainAttributes, &unmarshalledAttributes))
 }
 
 func TestFromProjectDomainAttributesModel_InvalidResourceAttributes(t *testing.T) {
@@ -243,7 +243,7 @@ func TestFromWorkflowAttributesModel(t *testing.T) {
 	}
 	unmarshalledAttributes, err := FromResourceModelToWorkflowAttributes(model)
 	assert.Nil(t, err)
-	assert.True(t, proto.Equal(&workflowAttributes, &unmarshalledAttributes))
+	assert.True(t, proto.Equal(workflowAttributes, &unmarshalledAttributes))
 }
 
 func TestFromWorkflowAttributesModel_InvalidResourceAttributes(t *testing.T) {
@@ -261,7 +261,7 @@ func TestFromWorkflowAttributesModel_InvalidResourceAttributes(t *testing.T) {
 }
 
 func TestProjectAttributesToResourceModel(t *testing.T) {
-	pa := admin.ProjectAttributes{
+	pa := &admin.ProjectAttributes{
 		Project:            resourceProject,
 		MatchingAttributes: matchingClusterResourceAttributes,
 		Org:                testOrg,

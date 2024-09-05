@@ -218,7 +218,7 @@ func getNodeExecutionContext(ctx context.Context, identifier *core.NodeExecution
 func (c *CloudEventWrappedPublisher) getLatestTaskExecutions(ctx context.Context, nodeExecutionID *core.NodeExecutionIdentifier) (*admin.TaskExecution, error) {
 	ctx = getNodeExecutionContext(ctx, nodeExecutionID)
 
-	identifierFilters, err := util.GetNodeExecutionIdentifierFilters(ctx, *nodeExecutionID, common.TaskExecution)
+	identifierFilters, err := util.GetNodeExecutionIdentifierFilters(ctx, nodeExecutionID, common.TaskExecution)
 	if err != nil {
 		return nil, err
 	}
@@ -447,7 +447,7 @@ func (c *CloudEventWrappedPublisher) Publish(ctx context.Context, notificationTy
 		phase = e.Phase.String()
 		eventTime = e.OccurredAt.AsTime()
 
-		dummyNodeExecutionID := core.NodeExecutionIdentifier{
+		dummyNodeExecutionID := &core.NodeExecutionIdentifier{
 			NodeId:      "end-node",
 			ExecutionId: e.ExecutionId,
 		}
@@ -472,7 +472,7 @@ func (c *CloudEventWrappedPublisher) Publish(ctx context.Context, notificationTy
 		if e.ParentNodeExecutionId == nil {
 			return fmt.Errorf("parent node execution id is nil for task execution [%+v]", e)
 		}
-		eventSource = common.FlyteURLKeyFromNodeExecutionIDRetry(*e.ParentNodeExecutionId,
+		eventSource = common.FlyteURLKeyFromNodeExecutionIDRetry(e.ParentNodeExecutionId,
 			int(e.RetryAttempt))
 		finalMsg, err = c.TransformTaskExecutionEvent(ctx, e)
 		if err != nil {
@@ -486,7 +486,7 @@ func (c *CloudEventWrappedPublisher) Publish(ctx context.Context, notificationTy
 		phase = e.Phase.String()
 		eventTime = e.OccurredAt.AsTime()
 		eventID = fmt.Sprintf("%v.%v", executionID, phase)
-		eventSource = common.FlyteURLKeyFromNodeExecutionID(*msgType.Event.Id)
+		eventSource = common.FlyteURLKeyFromNodeExecutionID(msgType.Event.Id)
 		finalMsg, err = c.TransformNodeExecutionEvent(ctx, e)
 		if err != nil {
 			logger.Errorf(ctx, "Failed to transform node execution event with error: %v", err)

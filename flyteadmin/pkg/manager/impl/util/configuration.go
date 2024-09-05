@@ -179,7 +179,7 @@ func getConfigurationWithSourceAndMetadata(ctx context.Context, document *admin.
 		if err != nil {
 			return err
 		}
-		configurations = append(configurations, &configuration)
+		configurations = append(configurations, configuration)
 		configurationLevels = append(configurationLevels, configurationLevel)
 		return nil
 	}
@@ -231,17 +231,17 @@ func getConfigurationWithSourceAndMetadata(ctx context.Context, document *admin.
 	return addConfigurationIsMutable(ctx, configuration, id, projectConfigurationPlugin)
 }
 
-func GetConfigurationFromDocument(ctx context.Context, document *admin.ConfigurationDocument, id *admin.ConfigurationID) (admin.Configuration, error) {
+func GetConfigurationFromDocument(ctx context.Context, document *admin.ConfigurationDocument, id *admin.ConfigurationID) (*admin.Configuration, error) {
 	logger.Debugf(ctx, "Getting configuration for org: %s, project: %s, domain: %s, workflow: %s", id.Org, id.Project, id.Domain, id.Workflow)
 	documentKey, err := EncodeConfigurationDocumentKey(ctx, id)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to encode document key: %+v, error: %v", id, err)
-		return admin.Configuration{}, err
+		return &admin.Configuration{}, err
 	}
 	if _, ok := document.Configurations[documentKey]; !ok {
-		return admin.Configuration{}, nil
+		return &admin.Configuration{}, nil
 	}
-	return *document.Configurations[documentKey], nil
+	return document.Configurations[documentKey], nil
 }
 
 func UpdateConfigurationToDocument(ctx context.Context, document *admin.ConfigurationDocument, configuration *admin.Configuration, id *admin.ConfigurationID) (*admin.ConfigurationDocument, error) {
@@ -337,7 +337,7 @@ func collectGlobalConfiguration(ctx context.Context, config runtimeInterfaces.Co
 		ExecutionClusterLabel:      nil,
 		QualityOfService:           nil,
 		PluginOverrides:            nil,
-		WorkflowExecutionConfig:    &workflowExecutionConfig,
+		WorkflowExecutionConfig:    workflowExecutionConfig,
 		ClusterAssignment:          nil, // handle in domain level
 		ExternalResourceAttributes: &ExternalResourceAttributes,
 	}

@@ -60,12 +60,12 @@ func TestCreateSignalModel(t *testing.T) {
 	tests := []struct {
 		name  string
 		model models.Signal
-		proto admin.Signal
+		proto *admin.Signal
 	}{
 		{
 			name:  "Empty",
 			model: models.Signal{},
-			proto: admin.Signal{},
+			proto: &admin.Signal{},
 		},
 		{
 			name: "Full",
@@ -74,7 +74,7 @@ func TestCreateSignalModel(t *testing.T) {
 				Type:      booleanTypeBytes,
 				Value:     booleanValueBytes,
 			},
-			proto: admin.Signal{
+			proto: &admin.Signal{
 				Id:    &signalID,
 				Type:  &booleanType,
 				Value: &booleanValue,
@@ -99,12 +99,12 @@ func TestFromSignalModel(t *testing.T) {
 	tests := []struct {
 		name  string
 		model models.Signal
-		proto admin.Signal
+		proto *admin.Signal
 	}{
 		{
 			name:  "Empty",
 			model: models.Signal{},
-			proto: admin.Signal{},
+			proto: &admin.Signal{},
 		},
 		{
 			name: "Full",
@@ -113,7 +113,7 @@ func TestFromSignalModel(t *testing.T) {
 				Type:      booleanTypeBytes,
 				Value:     booleanValueBytes,
 			},
-			proto: admin.Signal{
+			proto: &admin.Signal{
 				Id:    &signalID,
 				Type:  &booleanType,
 				Value: &booleanValue,
@@ -127,7 +127,7 @@ func TestFromSignalModel(t *testing.T) {
 			signal, err := FromSignalModel(test.model)
 			assert.NoError(t, err)
 
-			assert.True(t, proto.Equal(&test.proto, &signal))
+			assert.True(t, proto.Equal(test.proto, signal))
 		})
 	}
 }

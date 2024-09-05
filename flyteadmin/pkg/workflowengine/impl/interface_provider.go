@@ -19,9 +19,9 @@ type InterfaceProvider = common.InterfaceProvider
 
 type LaunchPlanInterfaceProvider struct {
 	identifier      *core.Identifier
-	expectedInputs  core.ParameterMap
-	fixedInputs     core.LiteralMap
-	expectedOutputs core.VariableMap
+	expectedInputs  *core.ParameterMap
+	fixedInputs     *core.LiteralMap
+	expectedOutputs *core.VariableMap
 }
 
 func (p *LaunchPlanInterfaceProvider) GetID() *core.Identifier {
@@ -29,18 +29,18 @@ func (p *LaunchPlanInterfaceProvider) GetID() *core.Identifier {
 }
 
 func (p *LaunchPlanInterfaceProvider) GetExpectedInputs() *core.ParameterMap {
-	return &p.expectedInputs
+	return p.expectedInputs
 }
 
 func (p *LaunchPlanInterfaceProvider) GetFixedInputs() *core.LiteralMap {
-	return &p.fixedInputs
+	return p.fixedInputs
 }
 
 func (p *LaunchPlanInterfaceProvider) GetExpectedOutputs() *core.VariableMap {
-	return &p.expectedOutputs
+	return p.expectedOutputs
 }
 
-func NewLaunchPlanInterfaceProvider(launchPlan models.LaunchPlan, identifier core.Identifier) (common.InterfaceProvider, error) {
+func NewLaunchPlanInterfaceProvider(launchPlan models.LaunchPlan, identifier *core.Identifier) (common.InterfaceProvider, error) {
 	var closure admin.LaunchPlanClosure
 	if err := proto.Unmarshal(launchPlan.Closure, &closure); err != nil {
 		logger.Errorf(context.TODO(), "Failed to transform launch plan: %v", err)
@@ -51,14 +51,14 @@ func NewLaunchPlanInterfaceProvider(launchPlan models.LaunchPlan, identifier cor
 		logger.Errorf(context.TODO(), "Failed to transform launch plan: %v", err)
 		return &LaunchPlanInterfaceProvider{}, err
 	}
-	fixedInputs := core.LiteralMap{}
+	fixedInputs := &core.LiteralMap{}
 	if spec.FixedInputs != nil {
-		fixedInputs = *spec.FixedInputs
+		fixedInputs = spec.FixedInputs
 	}
 	return &LaunchPlanInterfaceProvider{
-		identifier:      &identifier,
-		expectedInputs:  *closure.ExpectedInputs,
+		identifier:      identifier,
+		expectedInputs:  closure.ExpectedInputs,
 		fixedInputs:     fixedInputs,
-		expectedOutputs: *closure.ExpectedOutputs,
+		expectedOutputs: closure.ExpectedOutputs,
 	}, nil
 }

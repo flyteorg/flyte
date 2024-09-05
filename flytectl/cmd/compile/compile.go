@@ -112,7 +112,7 @@ func handleWorkflow(
 
 	// Check if all the subworkflows referenced by launchplan are compiled
 	for i := range reqs.GetRequiredLaunchPlanIds() {
-		lpID := &reqs.GetRequiredLaunchPlanIds()[i]
+		lpID := reqs.GetRequiredLaunchPlanIds()[i]
 		lpWfName := plans[lpID.Name].Spec.WorkflowId.Name
 		missingWorkflow := workflows[lpWfName]
 		if compiledWorkflows[lpWfName] == nil {
@@ -152,7 +152,7 @@ func handleWorkflow(
 			plan.Closure.ExpectedInputs = &core.ParameterMap{
 				Parameters: newMap,
 			}
-			compiledLaunchPlanProviders = append(compiledLaunchPlanProviders, compiler.NewLaunchPlanInterfaceProvider(*plan))
+			compiledLaunchPlanProviders = append(compiledLaunchPlanProviders, compiler.NewLaunchPlanInterfaceProvider(plan))
 		}
 	}
 

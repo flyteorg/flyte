@@ -18,7 +18,7 @@ var taskDigest = []byte("task digest")
 
 func TestCreateTask(t *testing.T) {
 	request := testutils.GetValidTaskRequest()
-	task, err := CreateTaskModel(request, *testutils.GetTaskClosure(), taskDigest)
+	task, err := CreateTaskModel(request, testutils.GetTaskClosure(), taskDigest)
 	assert.NoError(t, err)
 	assert.Equal(t, "project", task.Project)
 	assert.Equal(t, "domain", task.Domain)

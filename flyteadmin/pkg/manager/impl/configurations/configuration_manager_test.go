@@ -69,7 +69,7 @@ func TestGetReadOnlyActiveDocument(t *testing.T) {
 	assert.Nil(t, err)
 	db.ConfigurationRepo().(*mocks.ConfigurationRepoInterface).AssertExpectations(t)
 	mockPBStore.AssertExpectations(t)
-	assert.True(t, proto.Equal(&activeDocument, &admin.ConfigurationDocument{
+	assert.True(t, proto.Equal(activeDocument, &admin.ConfigurationDocument{
 		Version: "v1",
 		Configurations: map[string]*admin.Configuration{
 			"key": {
@@ -131,7 +131,7 @@ func TestGetEditableActiveDocument(t *testing.T) {
 	assert.Nil(t, err)
 	db.ConfigurationRepo().(*mocks.ConfigurationRepoInterface).AssertExpectations(t)
 	mockPBStore.AssertExpectations(t)
-	assert.True(t, proto.Equal(&activeDocument, &admin.ConfigurationDocument{
+	assert.True(t, proto.Equal(activeDocument, &admin.ConfigurationDocument{
 		Version: "v1",
 		Configurations: map[string]*admin.Configuration{
 			"key": {
@@ -167,7 +167,7 @@ func TestGetActiveDocument_DBError(t *testing.T) {
 
 	activeDocument, err := configurationManager.GetReadOnlyActiveDocument(ctx)
 	assert.NotNil(t, err)
-	assert.True(t, proto.Equal(&activeDocument, &admin.ConfigurationDocument{}))
+	assert.True(t, proto.Equal(activeDocument, &admin.ConfigurationDocument{}))
 	db.ConfigurationRepo().(*mocks.ConfigurationRepoInterface).AssertExpectations(t)
 }
 
@@ -194,7 +194,7 @@ func TestGetActiveDocument_StoreError(t *testing.T) {
 
 	activeDocument, err := configurationManager.GetReadOnlyActiveDocument(ctx)
 	assert.NotNil(t, err)
-	assert.True(t, proto.Equal(&activeDocument, &admin.ConfigurationDocument{}))
+	assert.True(t, proto.Equal(activeDocument, &admin.ConfigurationDocument{}))
 	db.ConfigurationRepo().(*mocks.ConfigurationRepoInterface).AssertExpectations(t)
 	mockPBStore.AssertExpectations(t)
 }
@@ -328,7 +328,7 @@ func TestGetConfiguration(t *testing.T) {
 		}, nil
 	})
 
-	response, err := configurationManager.GetConfiguration(ctx, admin.ConfigurationGetRequest{
+	response, err := configurationManager.GetConfiguration(ctx, &admin.ConfigurationGetRequest{
 		Id: &admin.ConfigurationID{
 			Org:     "org",
 			Project: "project",
@@ -585,7 +585,7 @@ func TestUpdateProjectDomainConfiguration(t *testing.T) {
 		}, nil
 	})
 
-	response, err := configurationManager.UpdateConfiguration(ctx, admin.ConfigurationUpdateRequest{
+	response, err := configurationManager.UpdateConfiguration(ctx, &admin.ConfigurationUpdateRequest{
 		Id: &admin.ConfigurationID{
 			Org:     "org",
 			Project: "project",
@@ -790,7 +790,7 @@ func TestUpdateProjectDomainConfiguration_UpdatingMutableAttributesError(t *test
 		}, nil
 	})
 
-	_, err = configurationManager.UpdateConfiguration(ctx, admin.ConfigurationUpdateRequest{
+	_, err = configurationManager.UpdateConfiguration(ctx, &admin.ConfigurationUpdateRequest{
 		Id: &admin.ConfigurationID{
 			Org:     "org",
 			Project: "project",
@@ -941,7 +941,7 @@ func TestUpdateOrgConfiguration(t *testing.T) {
 		}, nil
 	})
 
-	response, err := configurationManager.UpdateConfiguration(ctx, admin.ConfigurationUpdateRequest{
+	response, err := configurationManager.UpdateConfiguration(ctx, &admin.ConfigurationUpdateRequest{
 		Id: &admin.ConfigurationID{
 			Org: "org",
 		},

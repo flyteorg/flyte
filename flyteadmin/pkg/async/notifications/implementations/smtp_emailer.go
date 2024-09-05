@@ -142,7 +142,7 @@ func NewSMTPEmailer(ctx context.Context, config runtimeInterfaces.NotificationsC
 
 	// #nosec G402
 	tlsConfiguration = &tls.Config{
-		InsecureSkipVerify: emailConf.SMTPSkipTLSVerify,
+		InsecureSkipVerify: emailConf.SMTPSkipTLSVerify, // #nosec G402
 		ServerName:         emailConf.SMTPServer,
 	}
 

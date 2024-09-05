@@ -38,7 +38,7 @@ var outputs = core.VariableMap{
 	},
 }
 
-func getDummyLaunchPlan() admin.LaunchPlan {
+func getDummyLaunchPlan() *admin.LaunchPlan {
 	launchPlanSpec := admin.LaunchPlanSpec{
 		FixedInputs: &core.LiteralMap{},
 	}
@@ -46,7 +46,7 @@ func getDummyLaunchPlan() admin.LaunchPlan {
 		ExpectedInputs:  &inputs,
 		ExpectedOutputs: &outputs,
 	}
-	return admin.LaunchPlan{
+	return &admin.LaunchPlan{
 		Id:      &launchPlanIdentifier,
 		Spec:    &launchPlanSpec,
 		Closure: &launchPlanClosure,

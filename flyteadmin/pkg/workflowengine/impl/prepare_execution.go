@@ -1,6 +1,7 @@
 package impl
 
 import (
+	"github.com/golang/protobuf/proto"
 	"google.golang.org/grpc/codes"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -28,7 +29,9 @@ func addPermissions(securityCtx *core.SecurityContext, roleNameKey string, flyte
 	if securityCtx == nil || securityCtx.RunAs == nil {
 		return
 	}
-	flyteWf.SecurityContext = *securityCtx
+
+	securityCtxCopy, _ := proto.Clone(securityCtx).(*core.SecurityContext)
+	flyteWf.SecurityContext = *securityCtxCopy
 	if len(securityCtx.RunAs.IamRole) > 0 {
 		if flyteWf.Annotations == nil {
 			flyteWf.Annotations = map[string]string{}

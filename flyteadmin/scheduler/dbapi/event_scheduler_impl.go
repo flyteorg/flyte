@@ -20,11 +20,11 @@ type eventScheduler struct {
 }
 
 func (s *eventScheduler) CreateScheduleInput(ctx context.Context, appConfig *runtimeInterfaces.SchedulerConfig,
-	identifier core.Identifier, schedule *admin.Schedule) (interfaces.AddScheduleInput, error) {
+	identifier *core.Identifier, schedule *admin.Schedule) (interfaces.AddScheduleInput, error) {
 
 	addScheduleInput := scheduleInterfaces.AddScheduleInput{
 		Identifier:         identifier,
-		ScheduleExpression: *schedule,
+		ScheduleExpression: schedule,
 	}
 	return addScheduleInput, nil
 }

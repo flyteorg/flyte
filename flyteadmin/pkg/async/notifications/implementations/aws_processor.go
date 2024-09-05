@@ -36,7 +36,7 @@ func (p *Processor) StartProcessing() {
 }
 
 func (p *Processor) run() error {
-	var emailMessage admin.EmailMessage
+	emailMessage := &admin.EmailMessage{}
 	var err error
 	for msg := range p.sub.Start() {
 		p.systemMetrics.MessageTotal.Inc()
@@ -83,7 +83,7 @@ func (p *Processor) run() error {
 			continue
 		}
 
-		if err = proto.Unmarshal(notificationBytes, &emailMessage); err != nil {
+		if err = proto.Unmarshal(notificationBytes, emailMessage); err != nil {
 			logger.Debugf(context.Background(), "failed to unmarshal to notification object from decoded string[%s] from message [%s] with err: %v", valueString, stringMsg, err)
 			p.systemMetrics.MessageDecodingError.Inc()
 			p.markMessageDone(msg)

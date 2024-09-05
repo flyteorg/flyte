@@ -25,7 +25,7 @@ func (_m ResourceInterface_DeleteOrgAttributes) Return(_a0 *admin.OrgAttributesD
 	return &ResourceInterface_DeleteOrgAttributes{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *ResourceInterface) OnDeleteOrgAttributes(ctx context.Context, request admin.OrgAttributesDeleteRequest) *ResourceInterface_DeleteOrgAttributes {
+func (_m *ResourceInterface) OnDeleteOrgAttributes(ctx context.Context, request *admin.OrgAttributesDeleteRequest) *ResourceInterface_DeleteOrgAttributes {
 	c_call := _m.On("DeleteOrgAttributes", ctx, request)
 	return &ResourceInterface_DeleteOrgAttributes{Call: c_call}
 }
@@ -36,11 +36,11 @@ func (_m *ResourceInterface) OnDeleteOrgAttributesMatch(matchers ...interface{})
 }
 
 // DeleteOrgAttributes provides a mock function with given fields: ctx, request
-func (_m *ResourceInterface) DeleteOrgAttributes(ctx context.Context, request admin.OrgAttributesDeleteRequest) (*admin.OrgAttributesDeleteResponse, error) {
+func (_m *ResourceInterface) DeleteOrgAttributes(ctx context.Context, request *admin.OrgAttributesDeleteRequest) (*admin.OrgAttributesDeleteResponse, error) {
 	ret := _m.Called(ctx, request)
 
 	var r0 *admin.OrgAttributesDeleteResponse
-	if rf, ok := ret.Get(0).(func(context.Context, admin.OrgAttributesDeleteRequest) *admin.OrgAttributesDeleteResponse); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.OrgAttributesDeleteRequest) *admin.OrgAttributesDeleteResponse); ok {
 		r0 = rf(ctx, request)
 	} else {
 		if ret.Get(0) != nil {
@@ -49,7 +49,7 @@ func (_m *ResourceInterface) DeleteOrgAttributes(ctx context.Context, request ad
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, admin.OrgAttributesDeleteRequest) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.OrgAttributesDeleteRequest) error); ok {
 		r1 = rf(ctx, request)
 	} else {
 		r1 = ret.Error(1)
@@ -66,7 +66,7 @@ func (_m ResourceInterface_DeleteProjectAttributes) Return(_a0 *admin.ProjectAtt
 	return &ResourceInterface_DeleteProjectAttributes{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *ResourceInterface) OnDeleteProjectAttributes(ctx context.Context, request admin.ProjectAttributesDeleteRequest) *ResourceInterface_DeleteProjectAttributes {
+func (_m *ResourceInterface) OnDeleteProjectAttributes(ctx context.Context, request *admin.ProjectAttributesDeleteRequest) *ResourceInterface_DeleteProjectAttributes {
 	c_call := _m.On("DeleteProjectAttributes", ctx, request)
 	return &ResourceInterface_DeleteProjectAttributes{Call: c_call}
 }
@@ -77,11 +77,11 @@ func (_m *ResourceInterface) OnDeleteProjectAttributesMatch(matchers ...interfac
 }
 
 // DeleteProjectAttributes provides a mock function with given fields: ctx, request
-func (_m *ResourceInterface) DeleteProjectAttributes(ctx context.Context, request admin.ProjectAttributesDeleteRequest) (*admin.ProjectAttributesDeleteResponse, error) {
+func (_m *ResourceInterface) DeleteProjectAttributes(ctx context.Context, request *admin.ProjectAttributesDeleteRequest) (*admin.ProjectAttributesDeleteResponse, error) {
 	ret := _m.Called(ctx, request)
 
 	var r0 *admin.ProjectAttributesDeleteResponse
-	if rf, ok := ret.Get(0).(func(context.Context, admin.ProjectAttributesDeleteRequest) *admin.ProjectAttributesDeleteResponse); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.ProjectAttributesDeleteRequest) *admin.ProjectAttributesDeleteResponse); ok {
 		r0 = rf(ctx, request)
 	} else {
 		if ret.Get(0) != nil {
@@ -90,7 +90,7 @@ func (_m *ResourceInterface) DeleteProjectAttributes(ctx context.Context, reques
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, admin.ProjectAttributesDeleteRequest) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.ProjectAttributesDeleteRequest) error); ok {
 		r1 = rf(ctx, request)
 	} else {
 		r1 = ret.Error(1)
@@ -107,7 +107,7 @@ func (_m ResourceInterface_DeleteProjectDomainAttributes) Return(_a0 *admin.Proj
 	return &ResourceInterface_DeleteProjectDomainAttributes{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *ResourceInterface) OnDeleteProjectDomainAttributes(ctx context.Context, request admin.ProjectDomainAttributesDeleteRequest) *ResourceInterface_DeleteProjectDomainAttributes {
+func (_m *ResourceInterface) OnDeleteProjectDomainAttributes(ctx context.Context, request *admin.ProjectDomainAttributesDeleteRequest) *ResourceInterface_DeleteProjectDomainAttributes {
 	c_call := _m.On("DeleteProjectDomainAttributes", ctx, request)
 	return &ResourceInterface_DeleteProjectDomainAttributes{Call: c_call}
 }
@@ -118,11 +118,11 @@ func (_m *ResourceInterface) OnDeleteProjectDomainAttributesMatch(matchers ...in
 }
 
 // DeleteProjectDomainAttributes provides a mock function with given fields: ctx, request
-func (_m *ResourceInterface) DeleteProjectDomainAttributes(ctx context.Context, request admin.ProjectDomainAttributesDeleteRequest) (*admin.ProjectDomainAttributesDeleteResponse, error) {
+func (_m *ResourceInterface) DeleteProjectDomainAttributes(ctx context.Context, request *admin.ProjectDomainAttributesDeleteRequest) (*admin.ProjectDomainAttributesDeleteResponse, error) {
 	ret := _m.Called(ctx, request)
 
 	var r0 *admin.ProjectDomainAttributesDeleteResponse
-	if rf, ok := ret.Get(0).(func(context.Context, admin.ProjectDomainAttributesDeleteRequest) *admin.ProjectDomainAttributesDeleteResponse); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.ProjectDomainAttributesDeleteRequest) *admin.ProjectDomainAttributesDeleteResponse); ok {
 		r0 = rf(ctx, request)
 	} else {
 		if ret.Get(0) != nil {
@@ -131,7 +131,7 @@ func (_m *ResourceInterface) DeleteProjectDomainAttributes(ctx context.Context, 
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, admin.ProjectDomainAttributesDeleteRequest) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.ProjectDomainAttributesDeleteRequest) error); ok {
 		r1 = rf(ctx, request)
 	} else {
 		r1 = ret.Error(1)
@@ -148,7 +148,7 @@ func (_m ResourceInterface_DeleteWorkflowAttributes) Return(_a0 *admin.WorkflowA
 	return &ResourceInterface_DeleteWorkflowAttributes{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *ResourceInterface) OnDeleteWorkflowAttributes(ctx context.Context, request admin.WorkflowAttributesDeleteRequest) *ResourceInterface_DeleteWorkflowAttributes {
+func (_m *ResourceInterface) OnDeleteWorkflowAttributes(ctx context.Context, request *admin.WorkflowAttributesDeleteRequest) *ResourceInterface_DeleteWorkflowAttributes {
 	c_call := _m.On("DeleteWorkflowAttributes", ctx, request)
 	return &ResourceInterface_DeleteWorkflowAttributes{Call: c_call}
 }
@@ -159,11 +159,11 @@ func (_m *ResourceInterface) OnDeleteWorkflowAttributesMatch(matchers ...interfa
 }
 
 // DeleteWorkflowAttributes provides a mock function with given fields: ctx, request
-func (_m *ResourceInterface) DeleteWorkflowAttributes(ctx context.Context, request admin.WorkflowAttributesDeleteRequest) (*admin.WorkflowAttributesDeleteResponse, error) {
+func (_m *ResourceInterface) DeleteWorkflowAttributes(ctx context.Context, request *admin.WorkflowAttributesDeleteRequest) (*admin.WorkflowAttributesDeleteResponse, error) {
 	ret := _m.Called(ctx, request)
 
 	var r0 *admin.WorkflowAttributesDeleteResponse
-	if rf, ok := ret.Get(0).(func(context.Context, admin.WorkflowAttributesDeleteRequest) *admin.WorkflowAttributesDeleteResponse); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.WorkflowAttributesDeleteRequest) *admin.WorkflowAttributesDeleteResponse); ok {
 		r0 = rf(ctx, request)
 	} else {
 		if ret.Get(0) != nil {
@@ -172,7 +172,7 @@ func (_m *ResourceInterface) DeleteWorkflowAttributes(ctx context.Context, reque
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, admin.WorkflowAttributesDeleteRequest) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.WorkflowAttributesDeleteRequest) error); ok {
 		r1 = rf(ctx, request)
 	} else {
 		r1 = ret.Error(1)
@@ -189,7 +189,7 @@ func (_m ResourceInterface_GetOrgAttributes) Return(_a0 *admin.OrgAttributesGetR
 	return &ResourceInterface_GetOrgAttributes{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *ResourceInterface) OnGetOrgAttributes(ctx context.Context, request admin.OrgAttributesGetRequest) *ResourceInterface_GetOrgAttributes {
+func (_m *ResourceInterface) OnGetOrgAttributes(ctx context.Context, request *admin.OrgAttributesGetRequest) *ResourceInterface_GetOrgAttributes {
 	c_call := _m.On("GetOrgAttributes", ctx, request)
 	return &ResourceInterface_GetOrgAttributes{Call: c_call}
 }
@@ -200,11 +200,11 @@ func (_m *ResourceInterface) OnGetOrgAttributesMatch(matchers ...interface{}) *R
 }
 
 // GetOrgAttributes provides a mock function with given fields: ctx, request
-func (_m *ResourceInterface) GetOrgAttributes(ctx context.Context, request admin.OrgAttributesGetRequest) (*admin.OrgAttributesGetResponse, error) {
+func (_m *ResourceInterface) GetOrgAttributes(ctx context.Context, request *admin.OrgAttributesGetRequest) (*admin.OrgAttributesGetResponse, error) {
 	ret := _m.Called(ctx, request)
 
 	var r0 *admin.OrgAttributesGetResponse
-	if rf, ok := ret.Get(0).(func(context.Context, admin.OrgAttributesGetRequest) *admin.OrgAttributesGetResponse); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.OrgAttributesGetRequest) *admin.OrgAttributesGetResponse); ok {
 		r0 = rf(ctx, request)
 	} else {
 		if ret.Get(0) != nil {
@@ -213,7 +213,7 @@ func (_m *ResourceInterface) GetOrgAttributes(ctx context.Context, request admin
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, admin.OrgAttributesGetRequest) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.OrgAttributesGetRequest) error); ok {
 		r1 = rf(ctx, request)
 	} else {
 		r1 = ret.Error(1)
@@ -230,7 +230,7 @@ func (_m ResourceInterface_GetProjectAttributes) Return(_a0 *admin.ProjectAttrib
 	return &ResourceInterface_GetProjectAttributes{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *ResourceInterface) OnGetProjectAttributes(ctx context.Context, request admin.ProjectAttributesGetRequest) *ResourceInterface_GetProjectAttributes {
+func (_m *ResourceInterface) OnGetProjectAttributes(ctx context.Context, request *admin.ProjectAttributesGetRequest) *ResourceInterface_GetProjectAttributes {
 	c_call := _m.On("GetProjectAttributes", ctx, request)
 	return &ResourceInterface_GetProjectAttributes{Call: c_call}
 }
@@ -241,11 +241,11 @@ func (_m *ResourceInterface) OnGetProjectAttributesMatch(matchers ...interface{}
 }
 
 // GetProjectAttributes provides a mock function with given fields: ctx, request
-func (_m *ResourceInterface) GetProjectAttributes(ctx context.Context, request admin.ProjectAttributesGetRequest) (*admin.ProjectAttributesGetResponse, error) {
+func (_m *ResourceInterface) GetProjectAttributes(ctx context.Context, request *admin.ProjectAttributesGetRequest) (*admin.ProjectAttributesGetResponse, error) {
 	ret := _m.Called(ctx, request)
 
 	var r0 *admin.ProjectAttributesGetResponse
-	if rf, ok := ret.Get(0).(func(context.Context, admin.ProjectAttributesGetRequest) *admin.ProjectAttributesGetResponse); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.ProjectAttributesGetRequest) *admin.ProjectAttributesGetResponse); ok {
 		r0 = rf(ctx, request)
 	} else {
 		if ret.Get(0) != nil {
@@ -254,7 +254,7 @@ func (_m *ResourceInterface) GetProjectAttributes(ctx context.Context, request a
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, admin.ProjectAttributesGetRequest) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.ProjectAttributesGetRequest) error); ok {
 		r1 = rf(ctx, request)
 	} else {
 		r1 = ret.Error(1)
@@ -271,7 +271,7 @@ func (_m ResourceInterface_GetProjectDomainAttributes) Return(_a0 *admin.Project
 	return &ResourceInterface_GetProjectDomainAttributes{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *ResourceInterface) OnGetProjectDomainAttributes(ctx context.Context, request admin.ProjectDomainAttributesGetRequest) *ResourceInterface_GetProjectDomainAttributes {
+func (_m *ResourceInterface) OnGetProjectDomainAttributes(ctx context.Context, request *admin.ProjectDomainAttributesGetRequest) *ResourceInterface_GetProjectDomainAttributes {
 	c_call := _m.On("GetProjectDomainAttributes", ctx, request)
 	return &ResourceInterface_GetProjectDomainAttributes{Call: c_call}
 }
@@ -282,11 +282,11 @@ func (_m *ResourceInterface) OnGetProjectDomainAttributesMatch(matchers ...inter
 }
 
 // GetProjectDomainAttributes provides a mock function with given fields: ctx, request
-func (_m *ResourceInterface) GetProjectDomainAttributes(ctx context.Context, request admin.ProjectDomainAttributesGetRequest) (*admin.ProjectDomainAttributesGetResponse, error) {
+func (_m *ResourceInterface) GetProjectDomainAttributes(ctx context.Context, request *admin.ProjectDomainAttributesGetRequest) (*admin.ProjectDomainAttributesGetResponse, error) {
 	ret := _m.Called(ctx, request)
 
 	var r0 *admin.ProjectDomainAttributesGetResponse
-	if rf, ok := ret.Get(0).(func(context.Context, admin.ProjectDomainAttributesGetRequest) *admin.ProjectDomainAttributesGetResponse); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.ProjectDomainAttributesGetRequest) *admin.ProjectDomainAttributesGetResponse); ok {
 		r0 = rf(ctx, request)
 	} else {
 		if ret.Get(0) != nil {
@@ -295,7 +295,7 @@ func (_m *ResourceInterface) GetProjectDomainAttributes(ctx context.Context, req
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, admin.ProjectDomainAttributesGetRequest) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.ProjectDomainAttributesGetRequest) error); ok {
 		r1 = rf(ctx, request)
 	} else {
 		r1 = ret.Error(1)
@@ -353,7 +353,7 @@ func (_m ResourceInterface_GetWorkflowAttributes) Return(_a0 *admin.WorkflowAttr
 	return &ResourceInterface_GetWorkflowAttributes{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *ResourceInterface) OnGetWorkflowAttributes(ctx context.Context, request admin.WorkflowAttributesGetRequest) *ResourceInterface_GetWorkflowAttributes {
+func (_m *ResourceInterface) OnGetWorkflowAttributes(ctx context.Context, request *admin.WorkflowAttributesGetRequest) *ResourceInterface_GetWorkflowAttributes {
 	c_call := _m.On("GetWorkflowAttributes", ctx, request)
 	return &ResourceInterface_GetWorkflowAttributes{Call: c_call}
 }
@@ -364,11 +364,11 @@ func (_m *ResourceInterface) OnGetWorkflowAttributesMatch(matchers ...interface{
 }
 
 // GetWorkflowAttributes provides a mock function with given fields: ctx, request
-func (_m *ResourceInterface) GetWorkflowAttributes(ctx context.Context, request admin.WorkflowAttributesGetRequest) (*admin.WorkflowAttributesGetResponse, error) {
+func (_m *ResourceInterface) GetWorkflowAttributes(ctx context.Context, request *admin.WorkflowAttributesGetRequest) (*admin.WorkflowAttributesGetResponse, error) {
 	ret := _m.Called(ctx, request)
 
 	var r0 *admin.WorkflowAttributesGetResponse
-	if rf, ok := ret.Get(0).(func(context.Context, admin.WorkflowAttributesGetRequest) *admin.WorkflowAttributesGetResponse); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.WorkflowAttributesGetRequest) *admin.WorkflowAttributesGetResponse); ok {
 		r0 = rf(ctx, request)
 	} else {
 		if ret.Get(0) != nil {
@@ -377,7 +377,7 @@ func (_m *ResourceInterface) GetWorkflowAttributes(ctx context.Context, request 
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, admin.WorkflowAttributesGetRequest) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.WorkflowAttributesGetRequest) error); ok {
 		r1 = rf(ctx, request)
 	} else {
 		r1 = ret.Error(1)
@@ -394,7 +394,7 @@ func (_m ResourceInterface_ListAll) Return(_a0 *admin.ListMatchableAttributesRes
 	return &ResourceInterface_ListAll{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *ResourceInterface) OnListAll(ctx context.Context, request admin.ListMatchableAttributesRequest) *ResourceInterface_ListAll {
+func (_m *ResourceInterface) OnListAll(ctx context.Context, request *admin.ListMatchableAttributesRequest) *ResourceInterface_ListAll {
 	c_call := _m.On("ListAll", ctx, request)
 	return &ResourceInterface_ListAll{Call: c_call}
 }
@@ -405,11 +405,11 @@ func (_m *ResourceInterface) OnListAllMatch(matchers ...interface{}) *ResourceIn
 }
 
 // ListAll provides a mock function with given fields: ctx, request
-func (_m *ResourceInterface) ListAll(ctx context.Context, request admin.ListMatchableAttributesRequest) (*admin.ListMatchableAttributesResponse, error) {
+func (_m *ResourceInterface) ListAll(ctx context.Context, request *admin.ListMatchableAttributesRequest) (*admin.ListMatchableAttributesResponse, error) {
 	ret := _m.Called(ctx, request)
 
 	var r0 *admin.ListMatchableAttributesResponse
-	if rf, ok := ret.Get(0).(func(context.Context, admin.ListMatchableAttributesRequest) *admin.ListMatchableAttributesResponse); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.ListMatchableAttributesRequest) *admin.ListMatchableAttributesResponse); ok {
 		r0 = rf(ctx, request)
 	} else {
 		if ret.Get(0) != nil {
@@ -418,7 +418,7 @@ func (_m *ResourceInterface) ListAll(ctx context.Context, request admin.ListMatc
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, admin.ListMatchableAttributesRequest) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.ListMatchableAttributesRequest) error); ok {
 		r1 = rf(ctx, request)
 	} else {
 		r1 = ret.Error(1)
@@ -435,7 +435,7 @@ func (_m ResourceInterface_UpdateOrgAttributes) Return(_a0 *admin.OrgAttributesU
 	return &ResourceInterface_UpdateOrgAttributes{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *ResourceInterface) OnUpdateOrgAttributes(ctx context.Context, request admin.OrgAttributesUpdateRequest) *ResourceInterface_UpdateOrgAttributes {
+func (_m *ResourceInterface) OnUpdateOrgAttributes(ctx context.Context, request *admin.OrgAttributesUpdateRequest) *ResourceInterface_UpdateOrgAttributes {
 	c_call := _m.On("UpdateOrgAttributes", ctx, request)
 	return &ResourceInterface_UpdateOrgAttributes{Call: c_call}
 }
@@ -446,11 +446,11 @@ func (_m *ResourceInterface) OnUpdateOrgAttributesMatch(matchers ...interface{})
 }
 
 // UpdateOrgAttributes provides a mock function with given fields: ctx, request
-func (_m *ResourceInterface) UpdateOrgAttributes(ctx context.Context, request admin.OrgAttributesUpdateRequest) (*admin.OrgAttributesUpdateResponse, error) {
+func (_m *ResourceInterface) UpdateOrgAttributes(ctx context.Context, request *admin.OrgAttributesUpdateRequest) (*admin.OrgAttributesUpdateResponse, error) {
 	ret := _m.Called(ctx, request)
 
 	var r0 *admin.OrgAttributesUpdateResponse
-	if rf, ok := ret.Get(0).(func(context.Context, admin.OrgAttributesUpdateRequest) *admin.OrgAttributesUpdateResponse); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.OrgAttributesUpdateRequest) *admin.OrgAttributesUpdateResponse); ok {
 		r0 = rf(ctx, request)
 	} else {
 		if ret.Get(0) != nil {
@@ -459,7 +459,7 @@ func (_m *ResourceInterface) UpdateOrgAttributes(ctx context.Context, request ad
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, admin.OrgAttributesUpdateRequest) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.OrgAttributesUpdateRequest) error); ok {
 		r1 = rf(ctx, request)
 	} else {
 		r1 = ret.Error(1)
@@ -476,7 +476,7 @@ func (_m ResourceInterface_UpdateProjectAttributes) Return(_a0 *admin.ProjectAtt
 	return &ResourceInterface_UpdateProjectAttributes{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *ResourceInterface) OnUpdateProjectAttributes(ctx context.Context, request admin.ProjectAttributesUpdateRequest) *ResourceInterface_UpdateProjectAttributes {
+func (_m *ResourceInterface) OnUpdateProjectAttributes(ctx context.Context, request *admin.ProjectAttributesUpdateRequest) *ResourceInterface_UpdateProjectAttributes {
 	c_call := _m.On("UpdateProjectAttributes", ctx, request)
 	return &ResourceInterface_UpdateProjectAttributes{Call: c_call}
 }
@@ -487,11 +487,11 @@ func (_m *ResourceInterface) OnUpdateProjectAttributesMatch(matchers ...interfac
 }
 
 // UpdateProjectAttributes provides a mock function with given fields: ctx, request
-func (_m *ResourceInterface) UpdateProjectAttributes(ctx context.Context, request admin.ProjectAttributesUpdateRequest) (*admin.ProjectAttributesUpdateResponse, error) {
+func (_m *ResourceInterface) UpdateProjectAttributes(ctx context.Context, request *admin.ProjectAttributesUpdateRequest) (*admin.ProjectAttributesUpdateResponse, error) {
 	ret := _m.Called(ctx, request)
 
 	var r0 *admin.ProjectAttributesUpdateResponse
-	if rf, ok := ret.Get(0).(func(context.Context, admin.ProjectAttributesUpdateRequest) *admin.ProjectAttributesUpdateResponse); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.ProjectAttributesUpdateRequest) *admin.ProjectAttributesUpdateResponse); ok {
 		r0 = rf(ctx, request)
 	} else {
 		if ret.Get(0) != nil {
@@ -500,7 +500,7 @@ func (_m *ResourceInterface) UpdateProjectAttributes(ctx context.Context, reques
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, admin.ProjectAttributesUpdateRequest) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.ProjectAttributesUpdateRequest) error); ok {
 		r1 = rf(ctx, request)
 	} else {
 		r1 = ret.Error(1)
@@ -517,7 +517,7 @@ func (_m ResourceInterface_UpdateProjectDomainAttributes) Return(_a0 *admin.Proj
 	return &ResourceInterface_UpdateProjectDomainAttributes{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *ResourceInterface) OnUpdateProjectDomainAttributes(ctx context.Context, request admin.ProjectDomainAttributesUpdateRequest) *ResourceInterface_UpdateProjectDomainAttributes {
+func (_m *ResourceInterface) OnUpdateProjectDomainAttributes(ctx context.Context, request *admin.ProjectDomainAttributesUpdateRequest) *ResourceInterface_UpdateProjectDomainAttributes {
 	c_call := _m.On("UpdateProjectDomainAttributes", ctx, request)
 	return &ResourceInterface_UpdateProjectDomainAttributes{Call: c_call}
 }
@@ -528,11 +528,11 @@ func (_m *ResourceInterface) OnUpdateProjectDomainAttributesMatch(matchers ...in
 }
 
 // UpdateProjectDomainAttributes provides a mock function with given fields: ctx, request
-func (_m *ResourceInterface) UpdateProjectDomainAttributes(ctx context.Context, request admin.ProjectDomainAttributesUpdateRequest) (*admin.ProjectDomainAttributesUpdateResponse, error) {
+func (_m *ResourceInterface) UpdateProjectDomainAttributes(ctx context.Context, request *admin.ProjectDomainAttributesUpdateRequest) (*admin.ProjectDomainAttributesUpdateResponse, error) {
 	ret := _m.Called(ctx, request)
 
 	var r0 *admin.ProjectDomainAttributesUpdateResponse
-	if rf, ok := ret.Get(0).(func(context.Context, admin.ProjectDomainAttributesUpdateRequest) *admin.ProjectDomainAttributesUpdateResponse); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.ProjectDomainAttributesUpdateRequest) *admin.ProjectDomainAttributesUpdateResponse); ok {
 		r0 = rf(ctx, request)
 	} else {
 		if ret.Get(0) != nil {
@@ -541,7 +541,7 @@ func (_m *ResourceInterface) UpdateProjectDomainAttributes(ctx context.Context, 
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, admin.ProjectDomainAttributesUpdateRequest) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.ProjectDomainAttributesUpdateRequest) error); ok {
 		r1 = rf(ctx, request)
 	} else {
 		r1 = ret.Error(1)
@@ -558,7 +558,7 @@ func (_m ResourceInterface_UpdateWorkflowAttributes) Return(_a0 *admin.WorkflowA
 	return &ResourceInterface_UpdateWorkflowAttributes{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *ResourceInterface) OnUpdateWorkflowAttributes(ctx context.Context, request admin.WorkflowAttributesUpdateRequest) *ResourceInterface_UpdateWorkflowAttributes {
+func (_m *ResourceInterface) OnUpdateWorkflowAttributes(ctx context.Context, request *admin.WorkflowAttributesUpdateRequest) *ResourceInterface_UpdateWorkflowAttributes {
 	c_call := _m.On("UpdateWorkflowAttributes", ctx, request)
 	return &ResourceInterface_UpdateWorkflowAttributes{Call: c_call}
 }
@@ -569,11 +569,11 @@ func (_m *ResourceInterface) OnUpdateWorkflowAttributesMatch(matchers ...interfa
 }
 
 // UpdateWorkflowAttributes provides a mock function with given fields: ctx, request
-func (_m *ResourceInterface) UpdateWorkflowAttributes(ctx context.Context, request admin.WorkflowAttributesUpdateRequest) (*admin.WorkflowAttributesUpdateResponse, error) {
+func (_m *ResourceInterface) UpdateWorkflowAttributes(ctx context.Context, request *admin.WorkflowAttributesUpdateRequest) (*admin.WorkflowAttributesUpdateResponse, error) {
 	ret := _m.Called(ctx, request)
 
 	var r0 *admin.WorkflowAttributesUpdateResponse
-	if rf, ok := ret.Get(0).(func(context.Context, admin.WorkflowAttributesUpdateRequest) *admin.WorkflowAttributesUpdateResponse); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.WorkflowAttributesUpdateRequest) *admin.WorkflowAttributesUpdateResponse); ok {
 		r0 = rf(ctx, request)
 	} else {
 		if ret.Get(0) != nil {
@@ -582,7 +582,7 @@ func (_m *ResourceInterface) UpdateWorkflowAttributes(ctx context.Context, reque
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, admin.WorkflowAttributesUpdateRequest) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.WorkflowAttributesUpdateRequest) error); ok {
 		r1 = rf(ctx, request)
 	} else {
 		r1 = ret.Error(1)

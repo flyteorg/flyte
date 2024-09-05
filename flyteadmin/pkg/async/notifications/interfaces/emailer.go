@@ -9,5 +9,5 @@ import (
 // The implementation of Emailer needs to be passed to the implementation of Processor
 // in order for emails to be sent.
 type Emailer interface {
-	SendEmail(ctx context.Context, email admin.EmailMessage) error
+	SendEmail(ctx context.Context, email *admin.EmailMessage) error
 }

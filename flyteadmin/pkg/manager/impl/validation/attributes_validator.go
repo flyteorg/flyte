@@ -40,24 +40,24 @@ func validateMatchingAttributes(attributes *admin.MatchingAttributes, identifier
 		"Unrecognized matching attributes type for request %s", identifier)
 }
 
-func ValidateOrgAttributesUpdateRequest(ctx context.Context, request admin.OrgAttributesUpdateRequest) (admin.MatchableResource, error) {
+func ValidateOrgAttributesUpdateRequest(ctx context.Context, request *admin.OrgAttributesUpdateRequest) (admin.MatchableResource, error) {
 	if request.Attributes == nil {
 		return defaultMatchableResource, shared.GetMissingArgumentError(shared.Attributes)
 	}
 	return validateMatchingAttributes(request.Attributes.MatchingAttributes, request.Attributes.Org)
 }
 
-func ValidateOrgAttributesGetRequest(ctx context.Context, request admin.OrgAttributesGetRequest) error {
+func ValidateOrgAttributesGetRequest(ctx context.Context, request *admin.OrgAttributesGetRequest) error {
 	return nil
 }
 
-func ValidateOrgAttributesDeleteRequest(ctx context.Context, request admin.OrgAttributesDeleteRequest) error {
+func ValidateOrgAttributesDeleteRequest(ctx context.Context, request *admin.OrgAttributesDeleteRequest) error {
 	return nil
 }
 
 func ValidateProjectAttributesUpdateRequest(ctx context.Context,
 	db repositoryInterfaces.Repository,
-	request admin.ProjectAttributesUpdateRequest) (
+	request *admin.ProjectAttributesUpdateRequest) (
 	admin.MatchableResource, error) {
 
 	if request.Attributes == nil {
@@ -71,7 +71,7 @@ func ValidateProjectAttributesUpdateRequest(ctx context.Context,
 }
 
 func ValidateProjectAttributesGetRequest(ctx context.Context, db repositoryInterfaces.Repository,
-	request admin.ProjectAttributesGetRequest) error {
+	request *admin.ProjectAttributesGetRequest) error {
 	if err := ValidateProjectExistsAndActive(ctx, db, request.Project, request.Org); err != nil {
 		return err
 	}
@@ -80,7 +80,7 @@ func ValidateProjectAttributesGetRequest(ctx context.Context, db repositoryInter
 
 func ValidateProjectAttributesDeleteRequest(ctx context.Context,
 	db repositoryInterfaces.Repository,
-	request admin.ProjectAttributesDeleteRequest) error {
+	request *admin.ProjectAttributesDeleteRequest) error {
 	if err := ValidateProjectExistsAndActive(ctx, db, request.Project, request.Org); err != nil {
 		return err
 	}
@@ -89,7 +89,7 @@ func ValidateProjectAttributesDeleteRequest(ctx context.Context,
 
 func ValidateProjectDomainAttributesUpdateRequest(ctx context.Context,
 	db repositoryInterfaces.Repository, config runtimeInterfaces.ApplicationConfiguration,
-	request admin.ProjectDomainAttributesUpdateRequest) (
+	request *admin.ProjectDomainAttributesUpdateRequest) (
 	admin.MatchableResource, error) {
 	if request.Attributes == nil {
 		return defaultMatchableResource, shared.GetMissingArgumentError(shared.Attributes)
@@ -103,7 +103,7 @@ func ValidateProjectDomainAttributesUpdateRequest(ctx context.Context,
 }
 
 func ValidateProjectDomainAttributesGetRequest(ctx context.Context, db repositoryInterfaces.Repository,
-	config runtimeInterfaces.ApplicationConfiguration, request admin.ProjectDomainAttributesGetRequest) error {
+	config runtimeInterfaces.ApplicationConfiguration, request *admin.ProjectDomainAttributesGetRequest) error {
 	if err := ValidateProjectAndDomain(ctx, db, config, request.Project, request.Domain, request.Org); err != nil {
 		return err
 	}
@@ -112,7 +112,7 @@ func ValidateProjectDomainAttributesGetRequest(ctx context.Context, db repositor
 }
 
 func ValidateProjectDomainAttributesDeleteRequest(ctx context.Context, db repositoryInterfaces.Repository,
-	config runtimeInterfaces.ApplicationConfiguration, request admin.ProjectDomainAttributesDeleteRequest) error {
+	config runtimeInterfaces.ApplicationConfiguration, request *admin.ProjectDomainAttributesDeleteRequest) error {
 	if err := ValidateProjectAndDomain(ctx, db, config, request.Project, request.Domain, request.Org); err != nil {
 		return err
 	}
@@ -121,7 +121,7 @@ func ValidateProjectDomainAttributesDeleteRequest(ctx context.Context, db reposi
 }
 
 func ValidateWorkflowAttributesUpdateRequest(ctx context.Context, db repositoryInterfaces.Repository,
-	config runtimeInterfaces.ApplicationConfiguration, request admin.WorkflowAttributesUpdateRequest) (
+	config runtimeInterfaces.ApplicationConfiguration, request *admin.WorkflowAttributesUpdateRequest) (
 	admin.MatchableResource, error) {
 	if request.Attributes == nil {
 		return defaultMatchableResource, shared.GetMissingArgumentError(shared.Attributes)
@@ -138,7 +138,7 @@ func ValidateWorkflowAttributesUpdateRequest(ctx context.Context, db repositoryI
 }
 
 func ValidateWorkflowAttributesGetRequest(ctx context.Context, db repositoryInterfaces.Repository,
-	config runtimeInterfaces.ApplicationConfiguration, request admin.WorkflowAttributesGetRequest) error {
+	config runtimeInterfaces.ApplicationConfiguration, request *admin.WorkflowAttributesGetRequest) error {
 	if err := ValidateProjectAndDomain(ctx, db, config, request.Project, request.Domain, request.Org); err != nil {
 		return err
 	}
@@ -150,7 +150,7 @@ func ValidateWorkflowAttributesGetRequest(ctx context.Context, db repositoryInte
 }
 
 func ValidateWorkflowAttributesDeleteRequest(ctx context.Context, db repositoryInterfaces.Repository,
-	config runtimeInterfaces.ApplicationConfiguration, request admin.WorkflowAttributesDeleteRequest) error {
+	config runtimeInterfaces.ApplicationConfiguration, request *admin.WorkflowAttributesDeleteRequest) error {
 	if err := ValidateProjectAndDomain(ctx, db, config, request.Project, request.Domain, request.Org); err != nil {
 		return err
 	}
@@ -161,7 +161,7 @@ func ValidateWorkflowAttributesDeleteRequest(ctx context.Context, db repositoryI
 	return nil
 }
 
-func ValidateListAllMatchableAttributesRequest(request admin.ListMatchableAttributesRequest) error {
+func ValidateListAllMatchableAttributesRequest(request *admin.ListMatchableAttributesRequest) error {
 	if _, ok := admin.MatchableResource_name[int32(request.ResourceType)]; !ok {
 		return shared.GetInvalidArgumentError(shared.ResourceType)
 	}

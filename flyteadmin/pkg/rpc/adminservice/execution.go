@@ -15,13 +15,10 @@ import (
 func (m *AdminService) CreateExecution(
 	ctx context.Context, request *admin.ExecutionCreateRequest) (*admin.ExecutionCreateResponse, error) {
 	requestedAt := time.Now()
-	if request == nil {
-		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
-	}
 	var response *admin.ExecutionCreateResponse
 	var err error
 	m.Metrics.executionEndpointMetrics.create.Time(func() {
-		response, err = m.ExecutionManager.CreateExecution(ctx, *request, requestedAt)
+		response, err = m.ExecutionManager.CreateExecution(ctx, request, requestedAt)
 	})
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.executionEndpointMetrics.create)
@@ -33,13 +30,10 @@ func (m *AdminService) CreateExecution(
 func (m *AdminService) RelaunchExecution(
 	ctx context.Context, request *admin.ExecutionRelaunchRequest) (*admin.ExecutionCreateResponse, error) {
 	requestedAt := time.Now()
-	if request == nil {
-		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
-	}
 	var response *admin.ExecutionCreateResponse
 	var err error
 	m.Metrics.executionEndpointMetrics.relaunch.Time(func() {
-		response, err = m.ExecutionManager.RelaunchExecution(ctx, *request, requestedAt)
+		response, err = m.ExecutionManager.RelaunchExecution(ctx, request, requestedAt)
 	})
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.executionEndpointMetrics.relaunch)
@@ -51,13 +45,10 @@ func (m *AdminService) RelaunchExecution(
 func (m *AdminService) RecoverExecution(
 	ctx context.Context, request *admin.ExecutionRecoverRequest) (*admin.ExecutionCreateResponse, error) {
 	requestedAt := time.Now()
-	if request == nil {
-		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
-	}
 	var response *admin.ExecutionCreateResponse
 	var err error
 	m.Metrics.executionEndpointMetrics.recover.Time(func() {
-		response, err = m.ExecutionManager.RecoverExecution(ctx, *request, requestedAt)
+		response, err = m.ExecutionManager.RecoverExecution(ctx, request, requestedAt)
 	})
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.executionEndpointMetrics.relaunch)
@@ -68,13 +59,10 @@ func (m *AdminService) RecoverExecution(
 
 func (m *AdminService) CreateWorkflowEvent(
 	ctx context.Context, request *admin.WorkflowExecutionEventRequest) (*admin.WorkflowExecutionEventResponse, error) {
-	if request == nil {
-		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
-	}
 	var response *admin.WorkflowExecutionEventResponse
 	var err error
 	m.Metrics.executionEndpointMetrics.createEvent.Time(func() {
-		response, err = m.ExecutionManager.CreateWorkflowEvent(ctx, *request)
+		response, err = m.ExecutionManager.CreateWorkflowEvent(ctx, request)
 	})
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.executionEndpointMetrics.createEvent)
@@ -86,13 +74,10 @@ func (m *AdminService) CreateWorkflowEvent(
 
 func (m *AdminService) GetExecution(
 	ctx context.Context, request *admin.WorkflowExecutionGetRequest) (*admin.Execution, error) {
-	if request == nil {
-		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
-	}
 	var response *admin.Execution
 	var err error
 	m.Metrics.executionEndpointMetrics.get.Time(func() {
-		response, err = m.ExecutionManager.GetExecution(ctx, *request)
+		response, err = m.ExecutionManager.GetExecution(ctx, request)
 	})
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.executionEndpointMetrics.get)
@@ -104,13 +89,10 @@ func (m *AdminService) GetExecution(
 func (m *AdminService) UpdateExecution(
 	ctx context.Context, request *admin.ExecutionUpdateRequest) (*admin.ExecutionUpdateResponse, error) {
 	requestedAt := time.Now()
-	if request == nil {
-		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
-	}
 	var response *admin.ExecutionUpdateResponse
 	var err error
 	m.Metrics.executionEndpointMetrics.update.Time(func() {
-		response, err = m.ExecutionManager.UpdateExecution(ctx, *request, requestedAt)
+		response, err = m.ExecutionManager.UpdateExecution(ctx, request, requestedAt)
 	})
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.executionEndpointMetrics.update)
@@ -121,13 +103,10 @@ func (m *AdminService) UpdateExecution(
 
 func (m *AdminService) GetExecutionData(
 	ctx context.Context, request *admin.WorkflowExecutionGetDataRequest) (*admin.WorkflowExecutionGetDataResponse, error) {
-	if request == nil {
-		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
-	}
 	var response *admin.WorkflowExecutionGetDataResponse
 	var err error
 	m.Metrics.executionEndpointMetrics.getData.Time(func() {
-		response, err = m.ExecutionManager.GetExecutionData(ctx, *request)
+		response, err = m.ExecutionManager.GetExecutionData(ctx, request)
 	})
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.executionEndpointMetrics.getData)
@@ -142,13 +121,10 @@ func (m *AdminService) GetExecutionData(
 
 func (m *AdminService) GetExecutionMetrics(
 	ctx context.Context, request *admin.WorkflowExecutionGetMetricsRequest) (*admin.WorkflowExecutionGetMetricsResponse, error) {
-	if request == nil {
-		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
-	}
 	var response *admin.WorkflowExecutionGetMetricsResponse
 	var err error
 	m.Metrics.executionEndpointMetrics.getMetrics.Time(func() {
-		response, err = m.MetricsManager.GetExecutionMetrics(ctx, *request)
+		response, err = m.MetricsManager.GetExecutionMetrics(ctx, request)
 	})
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.executionEndpointMetrics.getMetrics)
@@ -159,13 +135,10 @@ func (m *AdminService) GetExecutionMetrics(
 
 func (m *AdminService) ListExecutions(
 	ctx context.Context, request *admin.ResourceListRequest) (*admin.ExecutionList, error) {
-	if request == nil {
-		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
-	}
 	var response *admin.ExecutionList
 	var err error
 	m.Metrics.executionEndpointMetrics.list.Time(func() {
-		response, err = m.ExecutionManager.ListExecutions(ctx, *request)
+		response, err = m.ExecutionManager.ListExecutions(ctx, request)
 	})
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.executionEndpointMetrics.list)
@@ -176,13 +149,10 @@ func (m *AdminService) ListExecutions(
 
 func (m *AdminService) TerminateExecution(
 	ctx context.Context, request *admin.ExecutionTerminateRequest) (*admin.ExecutionTerminateResponse, error) {
-	if request == nil {
-		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
-	}
 	var response *admin.ExecutionTerminateResponse
 	var err error
 	m.Metrics.executionEndpointMetrics.terminate.Time(func() {
-		response, err = m.ExecutionManager.TerminateExecution(ctx, *request)
+		response, err = m.ExecutionManager.TerminateExecution(ctx, request)
 	})
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.executionEndpointMetrics.terminate)
@@ -193,14 +163,13 @@ func (m *AdminService) TerminateExecution(
 
 func (m *AdminService) GetExecutionCounts(
 	ctx context.Context, request *admin.ExecutionCountsGetRequest) (*admin.ExecutionCountsGetResponse, error) {
-	defer m.interceptPanic(ctx, request)
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
 	var response *admin.ExecutionCountsGetResponse
 	var err error
 	m.Metrics.executionEndpointMetrics.count.Time(func() {
-		response, err = m.ExecutionManager.GetExecutionCounts(ctx, *request)
+		response, err = m.ExecutionManager.GetExecutionCounts(ctx, request)
 	})
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.executionEndpointMetrics.count)
@@ -211,14 +180,13 @@ func (m *AdminService) GetExecutionCounts(
 
 func (m *AdminService) GetRunningExecutionsCount(
 	ctx context.Context, request *admin.RunningExecutionsCountGetRequest) (*admin.RunningExecutionsCountGetResponse, error) {
-	defer m.interceptPanic(ctx, request)
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
 	var response *admin.RunningExecutionsCountGetResponse
 	var err error
 	m.Metrics.executionEndpointMetrics.runningCount.Time(func() {
-		response, err = m.ExecutionManager.GetRunningExecutionsCount(ctx, *request)
+		response, err = m.ExecutionManager.GetRunningExecutionsCount(ctx, request)
 	})
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.executionEndpointMetrics.runningCount)

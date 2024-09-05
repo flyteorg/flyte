@@ -136,7 +136,7 @@ func ValidateNode(w c.WorkflowBuilder, n c.NodeBuilder, validateConditionTypes b
 			}
 		}
 	} else if workflowN := n.GetWorkflowNode(); workflowN != nil && workflowN.GetSubWorkflowRef() != nil {
-		workflowID := *workflowN.GetSubWorkflowRef()
+		workflowID := workflowN.GetSubWorkflowRef()
 		// Only compile the subworkflow if it has not been error-free compiled before.
 		if _, wfOk := w.GetCompiledSubWorkflow(workflowID); !wfOk {
 			if wf, wfOk := w.GetSubWorkflow(workflowID); wfOk {
@@ -153,7 +153,7 @@ func ValidateNode(w c.WorkflowBuilder, n c.NodeBuilder, validateConditionTypes b
 			}
 		}
 	} else if taskN := n.GetTaskNode(); taskN != nil && taskN.GetReferenceId() != nil {
-		if task, found := w.GetTask(*taskN.GetReferenceId()); found {
+		if task, found := w.GetTask(taskN.GetReferenceId()); found {
 			n.SetTask(task)
 		} else if taskN.GetReferenceId() == nil {
 			errs.Collect(errors.NewValueRequiredErr(n.GetId(), "TaskNode.ReferenceId"))

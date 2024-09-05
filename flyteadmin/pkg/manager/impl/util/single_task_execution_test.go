@@ -103,7 +103,7 @@ func TestGenerateWorkflowNameFromNode(t *testing.T) {
 
 func TestGenerateBindings(t *testing.T) {
 	nodeID := "nodeID"
-	outputs := core.VariableMap{
+	outputs := &core.VariableMap{
 		Variables: map[string]*core.Variable{
 			"output1": {},
 			"output2": {},
@@ -158,7 +158,7 @@ func TestCreateOrGetWorkflowModel(t *testing.T) {
 	repository.WorkflowRepo().(*repositoryMocks.MockWorkflowRepo).SetGetCallback(workflowGetFunc)
 
 	mockNamedEntityManager := managerMocks.NamedEntityManager{}
-	mockNamedEntityManager.UpdateNamedEntityFunc = func(ctx context.Context, request admin.NamedEntityUpdateRequest) (*admin.NamedEntityUpdateResponse, error) {
+	mockNamedEntityManager.UpdateNamedEntityFunc = func(ctx context.Context, request *admin.NamedEntityUpdateRequest) (*admin.NamedEntityUpdateResponse, error) {
 		assert.Equal(t, request.ResourceType, core.ResourceType_WORKFLOW)
 		assert.True(t, proto.Equal(request.Id, &admin.NamedEntityIdentifier{
 			Project: "flytekit",
@@ -172,7 +172,7 @@ func TestCreateOrGetWorkflowModel(t *testing.T) {
 	}
 
 	mockWorkflowManager := managerMocks.MockWorkflowManager{}
-	mockWorkflowManager.SetCreateCallback(func(ctx context.Context, request admin.WorkflowCreateRequest) (*admin.WorkflowCreateResponse, error) {
+	mockWorkflowManager.SetCreateCallback(func(ctx context.Context, request *admin.WorkflowCreateRequest) (*admin.WorkflowCreateResponse, error) {
 		assert.True(t, proto.Equal(request.Id, &core.Identifier{
 			ResourceType: core.ResourceType_WORKFLOW,
 			Project:      "flytekit",
@@ -231,14 +231,7 @@ func TestCreateOrGetWorkflowModel(t *testing.T) {
 			},
 		},
 	}
-	workflowModel, err := CreateOrGetWorkflowModel(context.Background(), admin.ExecutionCreateRequest{
-		Project: "flytekit",
-		Domain:  "production",
-		Name:    "SingleTaskExecution",
-		Spec: &admin.ExecutionSpec{
-			LaunchPlan: taskIdentifier,
-		},
-	}, repository, &mockWorkflowManager, &mockNamedEntityManager, taskIdentifier, task)
+	workflowModel, err := CreateOrGetWorkflowModel(context.Background(), repository, &mockWorkflowManager, &mockNamedEntityManager, taskIdentifier, task)
 	assert.NoError(t, err)
 	assert.EqualValues(t, workflowModel, &newlyCreatedWorkflow)
 }
@@ -290,7 +283,7 @@ func TestCreateOrGetLaunchPlan(t *testing.T) {
 	workflowID := uint(12)
 
 	mockNamedEntityManager := managerMocks.NamedEntityManager{}
-	mockNamedEntityManager.UpdateNamedEntityFunc = func(ctx context.Context, request admin.NamedEntityUpdateRequest) (*admin.NamedEntityUpdateResponse, error) {
+	mockNamedEntityManager.UpdateNamedEntityFunc = func(ctx context.Context, request *admin.NamedEntityUpdateRequest) (*admin.NamedEntityUpdateResponse, error) {
 		assert.Equal(t, request.ResourceType, core.ResourceType_LAUNCH_PLAN)
 		assert.True(t, proto.Equal(request.Id, &admin.NamedEntityIdentifier{
 			Project: "flytekit",
@@ -560,7 +553,7 @@ func TestCreateOrGetWorkflowFromNode(t *testing.T) {
 				})
 
 			mockWorkflowManager := managerMocks.MockWorkflowManager{}
-			mockWorkflowManager.SetCreateCallback(func(ctx context.Context, request admin.WorkflowCreateRequest) (*admin.WorkflowCreateResponse, error) {
+			mockWorkflowManager.SetCreateCallback(func(ctx context.Context, request *admin.WorkflowCreateRequest) (*admin.WorkflowCreateResponse, error) {
 				assert.True(t, proto.Equal(request.Id, &core.Identifier{
 					ResourceType: core.ResourceType_WORKFLOW,
 					Project:      wfIdentifier.Project,
@@ -577,7 +570,7 @@ func TestCreateOrGetWorkflowFromNode(t *testing.T) {
 				return &admin.WorkflowCreateResponse{}, nil
 			})
 			mockNamedEntityManager := managerMocks.NamedEntityManager{}
-			mockNamedEntityManager.UpdateNamedEntityFunc = func(ctx context.Context, request admin.NamedEntityUpdateRequest) (*admin.NamedEntityUpdateResponse, error) {
+			mockNamedEntityManager.UpdateNamedEntityFunc = func(ctx context.Context, request *admin.NamedEntityUpdateRequest) (*admin.NamedEntityUpdateResponse, error) {
 				assert.Equal(t, request.ResourceType, core.ResourceType_WORKFLOW)
 				assert.True(t, proto.Equal(request.Id, &admin.NamedEntityIdentifier{
 					Project: wfIdentifier.Project,

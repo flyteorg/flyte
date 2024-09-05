@@ -14,10 +14,10 @@ import (
 // events, node execution processing doesn't have to wait on these to be committed.
 type nodeExecutionEventWriter struct {
 	db     repositoryInterfaces.Repository
-	events chan admin.NodeExecutionEventRequest
+	events chan *admin.NodeExecutionEventRequest
 }
 
-func (w *nodeExecutionEventWriter) Write(event admin.NodeExecutionEventRequest) {
+func (w *nodeExecutionEventWriter) Write(event *admin.NodeExecutionEventRequest) {
 	w.events <- event
 }
 
@@ -40,6 +40,6 @@ func (w *nodeExecutionEventWriter) Run() {
 func NewNodeExecutionEventWriter(db repositoryInterfaces.Repository, bufferSize int) interfaces.NodeExecutionEventWriter {
 	return &nodeExecutionEventWriter{
 		db:     db,
-		events: make(chan admin.NodeExecutionEventRequest, bufferSize),
+		events: make(chan *admin.NodeExecutionEventRequest, bufferSize),
 	}
 }

@@ -3,9 +3,6 @@ package adminservice
 import (
 	"context"
 
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-
 	"github.com/flyteorg/flyte/flyteadmin/pkg/rpc/adminservice/util"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -14,13 +11,10 @@ import (
 
 func (m *AdminService) CreateNodeEvent(
 	ctx context.Context, request *admin.NodeExecutionEventRequest) (*admin.NodeExecutionEventResponse, error) {
-	if request == nil {
-		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
-	}
 	var response *admin.NodeExecutionEventResponse
 	var err error
 	m.Metrics.nodeExecutionEndpointMetrics.createEvent.Time(func() {
-		response, err = m.NodeExecutionManager.CreateNodeEvent(ctx, *request)
+		response, err = m.NodeExecutionManager.CreateNodeEvent(ctx, request)
 	})
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.nodeExecutionEndpointMetrics.createEvent)
@@ -31,13 +25,10 @@ func (m *AdminService) CreateNodeEvent(
 
 func (m *AdminService) GetNodeExecution(
 	ctx context.Context, request *admin.NodeExecutionGetRequest) (*admin.NodeExecution, error) {
-	if request == nil {
-		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
-	}
 	var response *admin.NodeExecution
 	var err error
 	m.Metrics.nodeExecutionEndpointMetrics.get.Time(func() {
-		response, err = m.NodeExecutionManager.GetNodeExecution(ctx, *request)
+		response, err = m.NodeExecutionManager.GetNodeExecution(ctx, request)
 	})
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.nodeExecutionEndpointMetrics.get)
@@ -47,14 +38,10 @@ func (m *AdminService) GetNodeExecution(
 }
 
 func (m *AdminService) GetDynamicNodeWorkflow(ctx context.Context, request *admin.GetDynamicNodeWorkflowRequest) (*admin.DynamicNodeWorkflowResponse, error) {
-	if request == nil {
-		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
-	}
-
 	var response *admin.DynamicNodeWorkflowResponse
 	var err error
 	m.Metrics.nodeExecutionEndpointMetrics.getDynamicNodeWorkflow.Time(func() {
-		response, err = m.NodeExecutionManager.GetDynamicNodeWorkflow(ctx, *request)
+		response, err = m.NodeExecutionManager.GetDynamicNodeWorkflow(ctx, request)
 	})
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.workflowEndpointMetrics.get)
@@ -65,13 +52,10 @@ func (m *AdminService) GetDynamicNodeWorkflow(ctx context.Context, request *admi
 
 func (m *AdminService) ListNodeExecutions(
 	ctx context.Context, request *admin.NodeExecutionListRequest) (*admin.NodeExecutionList, error) {
-	if request == nil {
-		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
-	}
 	var response *admin.NodeExecutionList
 	var err error
 	m.Metrics.nodeExecutionEndpointMetrics.list.Time(func() {
-		response, err = m.NodeExecutionManager.ListNodeExecutions(ctx, *request)
+		response, err = m.NodeExecutionManager.ListNodeExecutions(ctx, request)
 	})
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.nodeExecutionEndpointMetrics.list)
@@ -82,9 +66,6 @@ func (m *AdminService) ListNodeExecutions(
 
 func (m *AdminService) ListNodeExecutionsForTask(
 	ctx context.Context, request *admin.NodeExecutionForTaskListRequest) (*admin.NodeExecutionList, error) {
-	if request == nil {
-		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
-	}
 	// NOTE: When the Get HTTP endpoint is called the resource type is implicit (from the URL) so we must add it
 	// to the request.
 	if request.TaskExecutionId != nil && request.TaskExecutionId.TaskId != nil &&
@@ -95,7 +76,7 @@ func (m *AdminService) ListNodeExecutionsForTask(
 	var response *admin.NodeExecutionList
 	var err error
 	m.Metrics.nodeExecutionEndpointMetrics.listChildren.Time(func() {
-		response, err = m.NodeExecutionManager.ListNodeExecutionsForTask(ctx, *request)
+		response, err = m.NodeExecutionManager.ListNodeExecutionsForTask(ctx, request)
 	})
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.nodeExecutionEndpointMetrics.listChildren)
@@ -106,13 +87,10 @@ func (m *AdminService) ListNodeExecutionsForTask(
 
 func (m *AdminService) GetNodeExecutionData(
 	ctx context.Context, request *admin.NodeExecutionGetDataRequest) (*admin.NodeExecutionGetDataResponse, error) {
-	if request == nil {
-		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
-	}
 	var response *admin.NodeExecutionGetDataResponse
 	var err error
 	m.Metrics.nodeExecutionEndpointMetrics.getData.Time(func() {
-		response, err = m.NodeExecutionManager.GetNodeExecutionData(ctx, *request)
+		response, err = m.NodeExecutionManager.GetNodeExecutionData(ctx, request)
 	})
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.nodeExecutionEndpointMetrics.getData)

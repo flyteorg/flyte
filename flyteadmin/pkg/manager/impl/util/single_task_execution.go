@@ -48,7 +48,7 @@ func generateWorkflowNameFromTask(taskName string) string {
 	return fmt.Sprintf(systemNamePrefix, taskName)
 }
 
-func generateBindings(outputs core.VariableMap, nodeID string) []*core.Binding {
+func generateBindings(outputs *core.VariableMap, nodeID string) []*core.Binding {
 	bindings := make([]*core.Binding, 0, len(outputs.Variables))
 	for key := range outputs.Variables {
 		binding := &core.Binding{
@@ -83,10 +83,10 @@ func generateWorkflowNameFromNode(node *core.Node) (string, error) {
 
 func createAndUpdateWorkflowModel(ctx context.Context, db repositoryInterfaces.Repository,
 	workflowManager interfaces.WorkflowInterface, namedEntityManager interfaces.NamedEntityInterface,
-	workflowIdentifier core.Identifier, workflowSpec admin.WorkflowSpec) (models.Workflow, error) {
-	_, err := workflowManager.CreateWorkflow(ctx, admin.WorkflowCreateRequest{
-		Id:   &workflowIdentifier,
-		Spec: &workflowSpec,
+	workflowIdentifier *core.Identifier, workflowSpec *admin.WorkflowSpec) (models.Workflow, error) {
+	_, err := workflowManager.CreateWorkflow(ctx, &admin.WorkflowCreateRequest{
+		Id:   workflowIdentifier,
+		Spec: workflowSpec,
 	})
 	if err != nil {
 		// In the case of race conditions, if the workflow already exists we can safely ignore the corresponding
@@ -96,7 +96,7 @@ func createAndUpdateWorkflowModel(ctx context.Context, db repositoryInterfaces.R
 		}
 	}
 	// Now, set the newly created skeleton workflow to 'SYSTEM_GENERATED'.
-	_, err = namedEntityManager.UpdateNamedEntity(ctx, admin.NamedEntityUpdateRequest{
+	_, err = namedEntityManager.UpdateNamedEntity(ctx, &admin.NamedEntityUpdateRequest{
 		ResourceType: core.ResourceType_WORKFLOW,
 		Id: &admin.NamedEntityIdentifier{
 			Org:     workflowIdentifier.Org,
@@ -127,10 +127,10 @@ func createAndUpdateWorkflowModel(ctx context.Context, db repositoryInterfaces.R
 }
 
 func CreateOrGetWorkflowModel(
-	ctx context.Context, request admin.ExecutionCreateRequest, db repositoryInterfaces.Repository,
+	ctx context.Context, db repositoryInterfaces.Repository,
 	workflowManager interfaces.WorkflowInterface, namedEntityManager interfaces.NamedEntityInterface, taskIdentifier *core.Identifier,
 	task *admin.Task) (*models.Workflow, error) {
-	workflowIdentifier := core.Identifier{
+	workflowIdentifier := &core.Identifier{
 		ResourceType: core.ResourceType_WORKFLOW,
 		Org:          taskIdentifier.Org,
 		Project:      taskIdentifier.Project,
@@ -162,9 +162,9 @@ func CreateOrGetWorkflowModel(
 		if err != nil {
 			return nil, err
 		}
-		workflowSpec := admin.WorkflowSpec{
+		workflowSpec := &admin.WorkflowSpec{
 			Template: &core.WorkflowTemplate{
-				Id:        &workflowIdentifier,
+				Id:        workflowIdentifier,
 				Interface: task.Closure.CompiledTask.Template.Interface,
 				Nodes: []*core.Node{
 					{
@@ -173,7 +173,7 @@ func CreateOrGetWorkflowModel(
 							Name:    nodeID,
 							Retries: retryStrategy,
 						},
-						Inputs: generateBindings(*task.Closure.CompiledTask.Template.Interface.Inputs, noInputNodeID),
+						Inputs: generateBindings(task.Closure.CompiledTask.Template.Interface.Inputs, noInputNodeID),
 						Target: &core.Node_TaskNode{
 							TaskNode: &core.TaskNode{
 								Reference: &core.TaskNode_ReferenceId{
@@ -184,7 +184,7 @@ func CreateOrGetWorkflowModel(
 					},
 				},
 
-				Outputs: generateBindings(*task.Closure.CompiledTask.Template.Interface.Outputs, nodeID),
+				Outputs: generateBindings(task.Closure.CompiledTask.Template.Interface.Outputs, nodeID),
 			},
 		}
 
@@ -202,7 +202,7 @@ func CreateOrGetLaunchPlan(ctx context.Context,
 	workflowInterface *core.TypedInterface, workflowID uint, authRole *admin.AuthRole, securityContext *core.SecurityContext) (*admin.LaunchPlan, error) {
 	var launchPlan *admin.LaunchPlan
 	var err error
-	launchPlanIdentifier := core.Identifier{
+	launchPlanIdentifier := &core.Identifier{
 		ResourceType: core.ResourceType_LAUNCH_PLAN,
 		Name:         identifier.Name,
 		Org:          identifier.Org,
@@ -220,8 +220,8 @@ func CreateOrGetLaunchPlan(ctx context.Context,
 		}
 
 		// Create launch plan.
-		generatedCreateLaunchPlanReq := admin.LaunchPlanCreateRequest{
-			Id: &launchPlanIdentifier,
+		generatedCreateLaunchPlanReq := &admin.LaunchPlanCreateRequest{
+			Id: launchPlanIdentifier,
 			Spec: &admin.LaunchPlanSpec{
 				WorkflowId: &core.Identifier{
 					ResourceType: core.ResourceType_WORKFLOW,
@@ -245,14 +245,14 @@ func CreateOrGetLaunchPlan(ctx context.Context,
 			return nil, err
 		}
 		transformedLaunchPlan := transformers.CreateLaunchPlan(generatedCreateLaunchPlanReq, workflowInterface.Outputs)
-		launchPlan = &transformedLaunchPlan
+		launchPlan = transformedLaunchPlan
 		launchPlanDigest, err := GetLaunchPlanDigest(ctx, launchPlan)
 		if err != nil {
 			logger.Errorf(ctx, "failed to compute launch plan digest for [%+v] with err: %v", launchPlan.Id, err)
 			return nil, err
 		}
 		launchPlanModel, err :=
-			transformers.CreateLaunchPlanModel(*launchPlan, workflowID, launchPlanDigest, admin.LaunchPlanState_INACTIVE)
+			transformers.CreateLaunchPlanModel(launchPlan, workflowID, launchPlanDigest, admin.LaunchPlanState_INACTIVE)
 		if err != nil {
 			logger.Errorf(ctx,
 				"Failed to transform launch plan model [%+v], and workflow outputs [%+v] with err: %v",
@@ -264,7 +264,7 @@ func CreateOrGetLaunchPlan(ctx context.Context,
 			logger.Errorf(ctx, "Failed to save launch plan model [%+v] with err: %v", launchPlanIdentifier, err)
 			return nil, err
 		}
-		_, err = namedEntityManager.UpdateNamedEntity(ctx, admin.NamedEntityUpdateRequest{
+		_, err = namedEntityManager.UpdateNamedEntity(ctx, &admin.NamedEntityUpdateRequest{
 			ResourceType: core.ResourceType_LAUNCH_PLAN,
 			Id: &admin.NamedEntityIdentifier{
 				Project: launchPlan.GetId().GetProject(),
@@ -326,13 +326,13 @@ func CreateOrGetWorkflowFromNode(
 		case *core.Node_TaskNode:
 			taskNodeWrapper := subNode.Target.(*core.Node_TaskNode)
 			taskNodeReference := taskNodeWrapper.TaskNode.Reference.(*core.TaskNode_ReferenceId)
-			task, err := GetTask(ctx, db, *taskNodeReference.ReferenceId)
+			task, err := GetTask(ctx, db, taskNodeReference.ReferenceId)
 			if err != nil {
 				return nil, err
 			}
 			wfInterface = task.Closure.CompiledTask.Template.Interface
-			wfOutputs = generateBindings(*task.Closure.CompiledTask.Template.Interface.Outputs, subNode.GetId())
-			subNode.Inputs = generateBindings(*task.Closure.CompiledTask.Template.Interface.Inputs, noInputNodeID)
+			wfOutputs = generateBindings(task.Closure.CompiledTask.Template.Interface.Outputs, subNode.GetId())
+			subNode.Inputs = generateBindings(task.Closure.CompiledTask.Template.Interface.Inputs, noInputNodeID)
 		case *core.Node_ArrayNode:
 			arrayNodeWrapper := subNode.Target.(*core.Node_ArrayNode)
 			arrayNode := arrayNodeWrapper.ArrayNode.Node
@@ -340,14 +340,14 @@ func CreateOrGetWorkflowFromNode(
 			case *core.Node_TaskNode:
 				taskNodeWrapper := arrayNode.Target.(*core.Node_TaskNode)
 				taskNodeReference := taskNodeWrapper.TaskNode.Reference.(*core.TaskNode_ReferenceId)
-				task, err := GetTask(ctx, db, *taskNodeReference.ReferenceId)
+				task, err := GetTask(ctx, db, taskNodeReference.ReferenceId)
 				if err != nil {
 					return nil, err
 				}
 				taskInterface := task.Closure.CompiledTask.Template.Interface
 				wfInterface = taskInterface
-				wfOutputs = generateBindings(*taskInterface.Outputs, subNode.GetId())
-				subNode.Inputs = generateBindings(*task.Closure.CompiledTask.Template.Interface.Inputs, noInputNodeID)
+				wfOutputs = generateBindings(taskInterface.Outputs, subNode.GetId())
+				subNode.Inputs = generateBindings(task.Closure.CompiledTask.Template.Interface.Inputs, noInputNodeID)
 			case *core.Node_WorkflowNode:
 				// TODO - pvditt implement as part of mapping over launch plan PRs
 				return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "Only Task and Workflow Nodes are supported for Array Nodes")
@@ -358,7 +358,7 @@ func CreateOrGetWorkflowFromNode(
 			return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "Only Task and Array Nodes are supported for relaunching")
 		}
 
-		workflowSpec := admin.WorkflowSpec{
+		workflowSpec := &admin.WorkflowSpec{
 			Template: &core.WorkflowTemplate{
 				Id:        workflowIdentifier,
 				Interface: wfInterface,
@@ -366,7 +366,7 @@ func CreateOrGetWorkflowFromNode(
 				Outputs:   wfOutputs,
 			},
 		}
-		workflowModel, err = createAndUpdateWorkflowModel(ctx, db, workflowManager, namedEntityManager, *workflowIdentifier, workflowSpec)
+		workflowModel, err = createAndUpdateWorkflowModel(ctx, db, workflowManager, namedEntityManager, workflowIdentifier, workflowSpec)
 		if err != nil {
 			return nil, err
 		}

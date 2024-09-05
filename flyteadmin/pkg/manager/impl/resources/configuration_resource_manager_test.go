@@ -23,7 +23,7 @@ import (
 const version = "v1"
 
 func TestUpdateWorkflowAttributes_Configuration(t *testing.T) {
-	request := admin.WorkflowAttributesUpdateRequest{
+	request := &admin.WorkflowAttributesUpdateRequest{
 		Attributes: &admin.WorkflowAttributes{
 			Org:                org,
 			Project:            project,
@@ -39,12 +39,12 @@ func TestUpdateWorkflowAttributes_Configuration(t *testing.T) {
 	mockConfigurations, err := testutils.MockConfigurations(org, project, domain, workflow)
 	assert.Nil(t, err)
 
-	mockConfigManager.On("GetReadOnlyActiveDocument", mock.Anything).Return(admin.ConfigurationDocument{
+	mockConfigManager.On("GetReadOnlyActiveDocument", mock.Anything).Return(&admin.ConfigurationDocument{
 		Configurations: mockConfigurations,
 		Version:        version,
 	}, nil)
 
-	expectedConfigurationUpdateRequest := admin.ConfigurationUpdateRequest{
+	expectedConfigurationUpdateRequest := &admin.ConfigurationUpdateRequest{
 		Id: &admin.ConfigurationID{
 			Org:      org,
 			Project:  project,
@@ -64,7 +64,7 @@ func TestUpdateWorkflowAttributes_Configuration(t *testing.T) {
 }
 
 func TestGetWorkflowAttributes_Configuration(t *testing.T) {
-	request := admin.WorkflowAttributesGetRequest{
+	request := &admin.WorkflowAttributesGetRequest{
 		Org:          org,
 		Project:      project,
 		Domain:       domain,
@@ -78,7 +78,7 @@ func TestGetWorkflowAttributes_Configuration(t *testing.T) {
 	mockConfigurations, err := testutils.MockConfigurations(org, project, domain, workflow)
 	assert.Nil(t, err)
 
-	mockConfigManager.On("GetReadOnlyActiveDocument", mock.Anything).Return(admin.ConfigurationDocument{
+	mockConfigManager.On("GetReadOnlyActiveDocument", mock.Anything).Return(&admin.ConfigurationDocument{
 		Configurations: mockConfigurations,
 		Version:        version,
 	}, nil)
@@ -98,7 +98,7 @@ func TestGetWorkflowAttributes_Configuration(t *testing.T) {
 }
 
 func TestDeleteWorkflowAttributes_Configuration(t *testing.T) {
-	request := admin.WorkflowAttributesDeleteRequest{
+	request := &admin.WorkflowAttributesDeleteRequest{
 		Org:          org,
 		Project:      project,
 		Domain:       domain,
@@ -112,12 +112,12 @@ func TestDeleteWorkflowAttributes_Configuration(t *testing.T) {
 	mockConfigurations, err := testutils.MockConfigurations(org, project, domain, workflow)
 	assert.Nil(t, err)
 
-	mockConfigManager.On("GetReadOnlyActiveDocument", mock.Anything).Return(admin.ConfigurationDocument{
+	mockConfigManager.On("GetReadOnlyActiveDocument", mock.Anything).Return(&admin.ConfigurationDocument{
 		Configurations: mockConfigurations,
 		Version:        version,
 	}, nil)
 
-	expectedConfigurationUpdateRequest := admin.ConfigurationUpdateRequest{
+	expectedConfigurationUpdateRequest := &admin.ConfigurationUpdateRequest{
 		Id: &admin.ConfigurationID{
 			Org:      org,
 			Project:  project,
@@ -136,7 +136,7 @@ func TestDeleteWorkflowAttributes_Configuration(t *testing.T) {
 }
 
 func TestUpdateProjectDomainAttributes_Configuration(t *testing.T) {
-	request := admin.ProjectDomainAttributesUpdateRequest{
+	request := &admin.ProjectDomainAttributesUpdateRequest{
 		Attributes: &admin.ProjectDomainAttributes{
 			Org:                org,
 			Project:            project,
@@ -151,12 +151,12 @@ func TestUpdateProjectDomainAttributes_Configuration(t *testing.T) {
 	mockConfigurations, err := testutils.MockConfigurations(org, project, domain, workflow)
 	assert.Nil(t, err)
 
-	mockConfigManager.On("GetReadOnlyActiveDocument", mock.Anything).Return(admin.ConfigurationDocument{
+	mockConfigManager.On("GetReadOnlyActiveDocument", mock.Anything).Return(&admin.ConfigurationDocument{
 		Configurations: mockConfigurations,
 		Version:        version,
 	}, nil)
 
-	expectedConfigurationUpdateRequest := admin.ConfigurationUpdateRequest{
+	expectedConfigurationUpdateRequest := &admin.ConfigurationUpdateRequest{
 		Id: &admin.ConfigurationID{
 			Org:     org,
 			Project: project,
@@ -175,7 +175,7 @@ func TestUpdateProjectDomainAttributes_Configuration(t *testing.T) {
 }
 
 func TestGetProjectDomainAttributes_Configuration(t *testing.T) {
-	request := admin.ProjectDomainAttributesGetRequest{
+	request := &admin.ProjectDomainAttributesGetRequest{
 		Org:          org,
 		Project:      project,
 		Domain:       domain,
@@ -188,7 +188,7 @@ func TestGetProjectDomainAttributes_Configuration(t *testing.T) {
 	mockConfigurations, err := testutils.MockConfigurations(org, project, domain, workflow)
 	assert.Nil(t, err)
 
-	mockConfigManager.On("GetReadOnlyActiveDocument", mock.Anything).Return(admin.ConfigurationDocument{
+	mockConfigManager.On("GetReadOnlyActiveDocument", mock.Anything).Return(&admin.ConfigurationDocument{
 		Configurations: mockConfigurations,
 		Version:        version,
 	}, nil)
@@ -207,7 +207,7 @@ func TestGetProjectDomainAttributes_Configuration(t *testing.T) {
 }
 
 func TestDeleteProjectDomainAttributes_Configuration(t *testing.T) {
-	request := admin.ProjectDomainAttributesDeleteRequest{
+	request := &admin.ProjectDomainAttributesDeleteRequest{
 		Org:          org,
 		Project:      project,
 		Domain:       domain,
@@ -220,12 +220,12 @@ func TestDeleteProjectDomainAttributes_Configuration(t *testing.T) {
 	mockConfigurations, err := testutils.MockConfigurations(org, project, domain, workflow)
 	assert.Nil(t, err)
 
-	mockConfigManager.On("GetReadOnlyActiveDocument", mock.Anything).Return(admin.ConfigurationDocument{
+	mockConfigManager.On("GetReadOnlyActiveDocument", mock.Anything).Return(&admin.ConfigurationDocument{
 		Configurations: mockConfigurations,
 		Version:        version,
 	}, nil)
 
-	expectedConfigurationUpdateRequest := admin.ConfigurationUpdateRequest{
+	expectedConfigurationUpdateRequest := &admin.ConfigurationUpdateRequest{
 		Id: &admin.ConfigurationID{
 			Org:     org,
 			Project: project,
@@ -243,7 +243,7 @@ func TestDeleteProjectDomainAttributes_Configuration(t *testing.T) {
 }
 
 func TestUpdateProjectAttributes_Configuration(t *testing.T) {
-	request := admin.ProjectAttributesUpdateRequest{
+	request := &admin.ProjectAttributesUpdateRequest{
 		Attributes: &admin.ProjectAttributes{
 			Org:                org,
 			Project:            project,
@@ -257,12 +257,12 @@ func TestUpdateProjectAttributes_Configuration(t *testing.T) {
 	mockConfigurations, err := testutils.MockConfigurations(org, project, domain, workflow)
 	assert.Nil(t, err)
 
-	mockConfigManager.On("GetReadOnlyActiveDocument", mock.Anything).Return(admin.ConfigurationDocument{
+	mockConfigManager.On("GetReadOnlyActiveDocument", mock.Anything).Return(&admin.ConfigurationDocument{
 		Configurations: mockConfigurations,
 		Version:        version,
 	}, nil)
 
-	expectedConfigurationUpdateRequest := admin.ConfigurationUpdateRequest{
+	expectedConfigurationUpdateRequest := &admin.ConfigurationUpdateRequest{
 		Id: &admin.ConfigurationID{
 			Org:     org,
 			Project: project,
@@ -280,7 +280,7 @@ func TestUpdateProjectAttributes_Configuration(t *testing.T) {
 }
 
 func TestGetProjectAttributes_Configuration(t *testing.T) {
-	request := admin.ProjectAttributesGetRequest{
+	request := &admin.ProjectAttributesGetRequest{
 		Org:          org,
 		Project:      project,
 		ResourceType: admin.MatchableResource_EXECUTION_QUEUE,
@@ -292,7 +292,7 @@ func TestGetProjectAttributes_Configuration(t *testing.T) {
 	mockConfigurations, err := testutils.MockConfigurations(org, project, domain, workflow)
 	assert.Nil(t, err)
 
-	mockConfigManager.On("GetReadOnlyActiveDocument", mock.Anything).Return(admin.ConfigurationDocument{
+	mockConfigManager.On("GetReadOnlyActiveDocument", mock.Anything).Return(&admin.ConfigurationDocument{
 		Configurations: mockConfigurations,
 		Version:        version,
 	}, nil)
@@ -310,7 +310,7 @@ func TestGetProjectAttributes_Configuration(t *testing.T) {
 }
 
 func TestGetProjectAttributes_ConfigLookup_Configuration(t *testing.T) {
-	request := admin.ProjectAttributesGetRequest{
+	request := &admin.ProjectAttributesGetRequest{
 		Org:          org,
 		Project:      project,
 		ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG,
@@ -339,7 +339,7 @@ func TestGetProjectAttributes_ConfigLookup_Configuration(t *testing.T) {
 				},
 			},
 		}
-		mockConfigManager.On("GetReadOnlyActiveDocument", mock.Anything).Return(admin.ConfigurationDocument{
+		mockConfigManager.On("GetReadOnlyActiveDocument", mock.Anything).Return(&admin.ConfigurationDocument{
 			Configurations: mockConfigurations,
 			Version:        version,
 		}, nil)
@@ -387,7 +387,7 @@ func TestGetProjectAttributes_ConfigLookup_Configuration(t *testing.T) {
 				},
 			},
 		}
-		mockConfigManager.On("GetReadOnlyActiveDocument", mock.Anything).Return(admin.ConfigurationDocument{
+		mockConfigManager.On("GetReadOnlyActiveDocument", mock.Anything).Return(&admin.ConfigurationDocument{
 			Configurations: mockConfigurations,
 			Version:        version,
 		}, nil)
@@ -429,7 +429,7 @@ func TestGetProjectAttributes_ConfigLookup_Configuration(t *testing.T) {
 				},
 			},
 		}
-		mockConfigManager.On("GetReadOnlyActiveDocument", mock.Anything).Return(admin.ConfigurationDocument{
+		mockConfigManager.On("GetReadOnlyActiveDocument", mock.Anything).Return(&admin.ConfigurationDocument{
 			Configurations: mockConfigurations,
 			Version:        version,
 		}, nil)
@@ -477,12 +477,12 @@ func TestGetProjectAttributes_ConfigLookup_Configuration(t *testing.T) {
 				},
 			},
 		}
-		mockConfigManager.On("GetReadOnlyActiveDocument", mock.Anything).Return(admin.ConfigurationDocument{
+		mockConfigManager.On("GetReadOnlyActiveDocument", mock.Anything).Return(&admin.ConfigurationDocument{
 			Configurations: mockConfigurations,
 			Version:        version,
 		}, nil)
 
-		request := admin.ProjectAttributesGetRequest{
+		request := &admin.ProjectAttributesGetRequest{
 			Org:          org,
 			Project:      project,
 			ResourceType: admin.MatchableResource_CLUSTER_RESOURCE,
@@ -498,7 +498,7 @@ func TestGetProjectAttributes_ConfigLookup_Configuration(t *testing.T) {
 }
 
 func TestDeleteProjectAttributes_Configuration(t *testing.T) {
-	request := admin.ProjectAttributesDeleteRequest{
+	request := &admin.ProjectAttributesDeleteRequest{
 		Org:          org,
 		Project:      project,
 		ResourceType: admin.MatchableResource_EXECUTION_QUEUE,
@@ -510,12 +510,12 @@ func TestDeleteProjectAttributes_Configuration(t *testing.T) {
 	mockConfigurations, err := testutils.MockConfigurations(org, project, domain, workflow)
 	assert.Nil(t, err)
 
-	mockConfigManager.On("GetReadOnlyActiveDocument", mock.Anything).Return(admin.ConfigurationDocument{
+	mockConfigManager.On("GetReadOnlyActiveDocument", mock.Anything).Return(&admin.ConfigurationDocument{
 		Configurations: mockConfigurations,
 		Version:        version,
 	}, nil)
 
-	expectedConfigurationUpdateRequest := admin.ConfigurationUpdateRequest{
+	expectedConfigurationUpdateRequest := &admin.ConfigurationUpdateRequest{
 		Id: &admin.ConfigurationID{
 			Org:     org,
 			Project: project,
@@ -532,7 +532,7 @@ func TestDeleteProjectAttributes_Configuration(t *testing.T) {
 }
 
 func TestUpdateOrgAttributes_Configuration(t *testing.T) {
-	request := admin.OrgAttributesUpdateRequest{
+	request := &admin.OrgAttributesUpdateRequest{
 		Attributes: &admin.OrgAttributes{
 			Org:                org,
 			MatchingAttributes: testutils.UpdateTaskResourceAttributes,
@@ -545,12 +545,12 @@ func TestUpdateOrgAttributes_Configuration(t *testing.T) {
 	mockConfigurations, err := testutils.MockConfigurations(org, project, domain, workflow)
 	assert.Nil(t, err)
 
-	mockConfigManager.On("GetReadOnlyActiveDocument", mock.Anything).Return(admin.ConfigurationDocument{
+	mockConfigManager.On("GetReadOnlyActiveDocument", mock.Anything).Return(&admin.ConfigurationDocument{
 		Configurations: mockConfigurations,
 		Version:        version,
 	}, nil)
 
-	expectedConfigurationUpdateRequest := admin.ConfigurationUpdateRequest{
+	expectedConfigurationUpdateRequest := &admin.ConfigurationUpdateRequest{
 		Id: &admin.ConfigurationID{
 			Org: org,
 		},
@@ -567,7 +567,7 @@ func TestUpdateOrgAttributes_Configuration(t *testing.T) {
 }
 
 func TestGetOrgAttributes_Configuration(t *testing.T) {
-	request := admin.OrgAttributesGetRequest{
+	request := &admin.OrgAttributesGetRequest{
 		Org:          org,
 		ResourceType: admin.MatchableResource_EXECUTION_QUEUE,
 	}
@@ -578,7 +578,7 @@ func TestGetOrgAttributes_Configuration(t *testing.T) {
 	mockConfigurations, err := testutils.MockConfigurations(org, project, domain, workflow)
 	assert.Nil(t, err)
 
-	mockConfigManager.On("GetReadOnlyActiveDocument", mock.Anything).Return(admin.ConfigurationDocument{
+	mockConfigManager.On("GetReadOnlyActiveDocument", mock.Anything).Return(&admin.ConfigurationDocument{
 		Configurations: mockConfigurations,
 		Version:        version,
 	}, nil)
@@ -595,7 +595,7 @@ func TestGetOrgAttributes_Configuration(t *testing.T) {
 }
 
 func TestDeleteOrgAttributes_Configuration(t *testing.T) {
-	request := admin.OrgAttributesDeleteRequest{
+	request := &admin.OrgAttributesDeleteRequest{
 		Org:          org,
 		ResourceType: admin.MatchableResource_EXECUTION_QUEUE,
 	}
@@ -606,12 +606,12 @@ func TestDeleteOrgAttributes_Configuration(t *testing.T) {
 	mockConfigurations, err := testutils.MockConfigurations(org, project, domain, workflow)
 	assert.Nil(t, err)
 
-	mockConfigManager.On("GetReadOnlyActiveDocument", mock.Anything).Return(admin.ConfigurationDocument{
+	mockConfigManager.On("GetReadOnlyActiveDocument", mock.Anything).Return(&admin.ConfigurationDocument{
 		Configurations: mockConfigurations,
 		Version:        version,
 	}, nil)
 
-	expectedConfigurationUpdateRequest := admin.ConfigurationUpdateRequest{
+	expectedConfigurationUpdateRequest := &admin.ConfigurationUpdateRequest{
 		Id: &admin.ConfigurationID{
 			Org: org,
 		},
@@ -641,7 +641,7 @@ func TestGetResource_Configuration(t *testing.T) {
 	mockConfigurations, err := testutils.MockConfigurations(org, project, domain, workflow)
 	assert.Nil(t, err)
 
-	mockConfigManager.On("GetReadOnlyActiveDocument", mock.Anything).Return(admin.ConfigurationDocument{
+	mockConfigManager.On("GetReadOnlyActiveDocument", mock.Anything).Return(&admin.ConfigurationDocument{
 		Configurations: mockConfigurations,
 		Version:        version,
 	}, nil)
@@ -665,12 +665,12 @@ func TestListAll_Configuration(t *testing.T) {
 	mockConfigurations, err := testutils.MockConfigurations(org, project, domain, workflow)
 	assert.Nil(t, err)
 
-	mockConfigManager.On("GetReadOnlyActiveDocument", mock.Anything).Return(admin.ConfigurationDocument{
+	mockConfigManager.On("GetReadOnlyActiveDocument", mock.Anything).Return(&admin.ConfigurationDocument{
 		Configurations: mockConfigurations,
 		Version:        version,
 	}, nil)
 
-	response, err := manager.ListAll(context.Background(), admin.ListMatchableAttributesRequest{
+	response, err := manager.ListAll(context.Background(), &admin.ListMatchableAttributesRequest{
 		ResourceType: admin.MatchableResource_EXECUTION_QUEUE,
 	})
 	assert.Nil(t, err)

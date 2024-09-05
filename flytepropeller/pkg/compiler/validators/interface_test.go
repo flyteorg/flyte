@@ -93,7 +93,7 @@ func TestValidateUnderlyingInterface(t *testing.T) {
 		task.On("GetInterface").Return(nil)
 
 		wfBuilder := mocks.WorkflowBuilder{}
-		wfBuilder.On("GetTask", mock.MatchedBy(func(id core.Identifier) bool {
+		wfBuilder.On("GetTask", mock.MatchedBy(func(id *core.Identifier) bool {
 			return id.String() == (&core.Identifier{
 				Name: "Task_1",
 			}).String()
@@ -230,7 +230,7 @@ func TestValidateUnderlyingInterface(t *testing.T) {
 				},
 			})
 
-			wfBuilder.On("GetLaunchPlan", matchIdentifier(core.Identifier{Name: "Ref_1"})).Return(&lp, true)
+			wfBuilder.On("GetLaunchPlan", matchIdentifier(&core.Identifier{Name: "Ref_1"})).Return(&lp, true)
 
 			errs = errors.NewCompileErrors()
 			iface, ifaceOk := ValidateUnderlyingInterface(&wfBuilder, &nodeBuilder, errs.NewScope())
@@ -271,7 +271,7 @@ func TestValidateUnderlyingInterface(t *testing.T) {
 				},
 			})
 
-			wfBuilder.On("GetSubWorkflow", matchIdentifier(core.Identifier{Name: "Ref_1"})).Return(&subWf, true)
+			wfBuilder.On("GetSubWorkflow", matchIdentifier(&core.Identifier{Name: "Ref_1"})).Return(&subWf, true)
 
 			workflowNode.Reference = &core.WorkflowNode_SubWorkflowRef{
 				SubWorkflowRef: &core.Identifier{Name: "Ref_1"},
@@ -429,7 +429,7 @@ func TestValidateUnderlyingInterface(t *testing.T) {
 			taskNodeBuilder.On("SetInterface", mock.AnythingOfType("*core.TypedInterface")).Return(nil)
 
 			wfBuilder := mocks.WorkflowBuilder{}
-			wfBuilder.On("GetTask", mock.MatchedBy(func(id core.Identifier) bool {
+			wfBuilder.On("GetTask", mock.MatchedBy(func(id *core.Identifier) bool {
 				return id.String() == (&core.Identifier{
 					Name: "Task_1",
 				}).String()
@@ -529,7 +529,7 @@ func TestValidateUnderlyingInterface(t *testing.T) {
 					},
 				},
 			})
-			wfBuilder.On("GetLaunchPlan", matchIdentifier(core.Identifier{Name: "Ref_1"})).Return(&lp, true)
+			wfBuilder.On("GetLaunchPlan", matchIdentifier(&core.Identifier{Name: "Ref_1"})).Return(&lp, true)
 			wfBuilder.On("GetOrCreateNodeBuilder", mock.MatchedBy(func(node *core.Node) bool {
 				return node.Id == nodeID
 			})).Return(workflowNodeBuilder)
@@ -604,7 +604,7 @@ func TestValidateUnderlyingInterface(t *testing.T) {
 					},
 				},
 			})
-			wfBuilder.On("GetLaunchPlan", matchIdentifier(core.Identifier{Name: "Ref_1"})).Return(&lp, true)
+			wfBuilder.On("GetLaunchPlan", matchIdentifier(&core.Identifier{Name: "Ref_1"})).Return(&lp, true)
 			wfBuilder.On("GetOrCreateNodeBuilder", mock.MatchedBy(func(node *core.Node) bool {
 				return node.Id == nodeID
 			})).Return(workflowNodeBuilder)
@@ -636,8 +636,8 @@ func TestValidateUnderlyingInterface(t *testing.T) {
 	})
 }
 
-func matchIdentifier(id core.Identifier) interface{} {
-	return mock.MatchedBy(func(arg core.Identifier) bool {
+func matchIdentifier(id *core.Identifier) interface{} {
+	return mock.MatchedBy(func(arg *core.Identifier) bool {
 		return arg.String() == id.String()
 	})
 }

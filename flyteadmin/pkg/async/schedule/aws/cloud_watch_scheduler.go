@@ -68,7 +68,7 @@ type cloudWatchScheduler struct {
 	metrics cloudWatchSchedulerMetrics
 }
 
-func getScheduleName(scheduleNamePrefix string, identifier core.Identifier) string {
+func getScheduleName(scheduleNamePrefix string, identifier *core.Identifier) string {
 	hashedIdentifier := hashIdentifier(identifier)
 	if len(scheduleNamePrefix) > 0 {
 		return fmt.Sprintf(scheduleNameFormat, scheduleNamePrefix, hashedIdentifier)
@@ -76,12 +76,12 @@ func getScheduleName(scheduleNamePrefix string, identifier core.Identifier) stri
 	return fmt.Sprintf("%d", hashedIdentifier)
 }
 
-func getScheduleDescription(identifier core.Identifier) string {
+func getScheduleDescription(identifier *core.Identifier) string {
 	return fmt.Sprintf(scheduleDescriptionFormat,
 		identifier.Project, identifier.Domain, identifier.Name)
 }
 
-func getScheduleExpression(schedule admin.Schedule) (string, error) {
+func getScheduleExpression(schedule *admin.Schedule) (string, error) {
 	if schedule.GetCronExpression() != "" {
 		return fmt.Sprintf(cronExpression, schedule.GetCronExpression()), nil
 	}
@@ -171,11 +171,11 @@ func (s *cloudWatchScheduler) AddSchedule(ctx context.Context, input scheduleInt
 }
 
 func (s *cloudWatchScheduler) CreateScheduleInput(ctx context.Context, appConfig *appInterfaces.SchedulerConfig,
-	identifier core.Identifier, schedule *admin.Schedule) (scheduleInterfaces.AddScheduleInput, error) {
+	identifier *core.Identifier, schedule *admin.Schedule) (scheduleInterfaces.AddScheduleInput, error) {
 
 	payload, err := SerializeScheduleWorkflowPayload(
 		schedule.GetKickoffTimeInputArg(),
-		admin.NamedEntityIdentifier{
+		&admin.NamedEntityIdentifier{
 			Project: identifier.Project,
 			Domain:  identifier.Domain,
 			Name:    identifier.Name,
@@ -194,7 +194,7 @@ func (s *cloudWatchScheduler) CreateScheduleInput(ctx context.Context, appConfig
 
 	addScheduleInput := scheduleInterfaces.AddScheduleInput{
 		Identifier:         identifier,
-		ScheduleExpression: *schedule,
+		ScheduleExpression: schedule,
 		Payload:            payload,
 		ScheduleNamePrefix: scheduleNamePrefix,
 	}
