@@ -146,7 +146,7 @@ func (m *NodeExecutionManager) updateNodeExecutionWithEvent(
 			logger.Errorf(ctx, "Invalid execution ID: %s with err: %v",
 				childExecutionID, err)
 		}
-		_, err = util.GetExecutionModel(ctx, m.db, *childExecutionID)
+		_, err = util.GetExecutionModel(ctx, m.db, childExecutionID)
 		if err != nil {
 			logger.Errorf(ctx, "The node execution launched an execution but it does not exist: %s with err: %v",
 				childExecutionID, err)
@@ -200,9 +200,9 @@ func (m *NodeExecutionManager) uploadDynamicWorkflowClosure(
 	return remoteClosureDataRef, nil
 }
 
-func (m *NodeExecutionManager) CreateNodeEvent(ctx context.Context, request admin.NodeExecutionEventRequest) (
+func (m *NodeExecutionManager) CreateNodeEvent(ctx context.Context, request *admin.NodeExecutionEventRequest) (
 	*admin.NodeExecutionEventResponse, error) {
-	if err := validation.ValidateNodeExecutionEventRequest(&request, m.config.ApplicationConfiguration().GetRemoteDataConfig().MaxSizeInBytes); err != nil {
+	if err := validation.ValidateNodeExecutionEventRequest(request, m.config.ApplicationConfiguration().GetRemoteDataConfig().MaxSizeInBytes); err != nil {
 		logger.Debugf(ctx, "CreateNodeEvent called with invalid identifier [%+v]: %v", request.Event.Id, err)
 	}
 	ctx = getNodeExecutionContext(ctx, request.Event.Id)
@@ -243,7 +243,7 @@ func (m *NodeExecutionManager) CreateNodeEvent(ctx context.Context, request admi
 	}
 
 	nodeExecutionModel, err := m.db.NodeExecutionRepo().Get(ctx, repoInterfaces.NodeExecutionResource{
-		NodeExecutionIdentifier: *request.Event.Id,
+		NodeExecutionIdentifier: request.Event.Id,
 	})
 	if err != nil {
 		if err.(errors.FlyteAdminError).Code() != codes.NotFound {
@@ -251,14 +251,14 @@ func (m *NodeExecutionManager) CreateNodeEvent(ctx context.Context, request admi
 				request.Event.Id, err)
 			return nil, err
 		}
-		err = m.createNodeExecutionWithEvent(ctx, &request, dynamicWorkflowRemoteClosureReference)
+		err = m.createNodeExecutionWithEvent(ctx, request, dynamicWorkflowRemoteClosureReference)
 		if err != nil {
 			return nil, err
 		}
 		m.metrics.NodeExecutionsCreated.Inc()
 	} else {
 		phase := core.NodeExecution_Phase(core.NodeExecution_Phase_value[nodeExecutionModel.Phase])
-		updateStatus, err := m.updateNodeExecutionWithEvent(ctx, &request, &nodeExecutionModel, dynamicWorkflowRemoteClosureReference)
+		updateStatus, err := m.updateNodeExecutionWithEvent(ctx, request, &nodeExecutionModel, dynamicWorkflowRemoteClosureReference)
 		if err != nil {
 			return nil, err
 		}
@@ -282,14 +282,14 @@ func (m *NodeExecutionManager) CreateNodeEvent(ctx context.Context, request admi
 	}
 	m.metrics.NodeExecutionEventsCreated.Inc()
 
-	if err := m.eventPublisher.Publish(ctx, proto.MessageName(&request), &request); err != nil {
+	if err := m.eventPublisher.Publish(ctx, proto.MessageName(request), request); err != nil {
 		m.metrics.PublishEventError.Inc()
 		logger.Infof(ctx, "error publishing event [%+v] with err: [%v]", request.RequestId, err)
 	}
 
 	go func() {
 		ceCtx := context.TODO()
-		if err := m.cloudEventPublisher.Publish(ceCtx, proto.MessageName(&request), &request); err != nil {
+		if err := m.cloudEventPublisher.Publish(ceCtx, proto.MessageName(request), request); err != nil {
 			logger.Infof(ctx, "error publishing cloud event [%+v] with err: [%v]", request.RequestId, err)
 		}
 	}()
@@ -297,7 +297,7 @@ func (m *NodeExecutionManager) CreateNodeEvent(ctx context.Context, request admi
 	return &admin.NodeExecutionEventResponse{}, nil
 }
 
-func (m *NodeExecutionManager) GetDynamicNodeWorkflow(ctx context.Context, request admin.GetDynamicNodeWorkflowRequest) (*admin.DynamicNodeWorkflowResponse, error) {
+func (m *NodeExecutionManager) GetDynamicNodeWorkflow(ctx context.Context, request *admin.GetDynamicNodeWorkflowRequest) (*admin.DynamicNodeWorkflowResponse, error) {
 	if err := validation.ValidateNodeExecutionIdentifier(request.Id); err != nil {
 		logger.Debugf(ctx, "can't get node execution data with invalid identifier [%+v]: %v", request.Id, err)
 	}
@@ -333,7 +333,7 @@ func (m *NodeExecutionManager) transformNodeExecutionModel(ctx context.Context, 
 	if internalData.EventVersion == 0 {
 		// Issue more expensive query to determine whether this node is a parent and/or dynamic node.
 		nodeExecutionModel, err = m.db.NodeExecutionRepo().GetWithChildren(ctx, repoInterfaces.NodeExecutionResource{
-			NodeExecutionIdentifier: *nodeExecutionID,
+			NodeExecutionIdentifier: nodeExecutionID,
 		})
 		if err != nil {
 			return nil, err
@@ -368,7 +368,7 @@ func (m *NodeExecutionManager) transformNodeExecutionModelList(ctx context.Conte
 }
 
 func (m *NodeExecutionManager) GetNodeExecution(
-	ctx context.Context, request admin.NodeExecutionGetRequest) (*admin.NodeExecution, error) {
+	ctx context.Context, request *admin.NodeExecutionGetRequest) (*admin.NodeExecution, error) {
 	if err := validation.ValidateNodeExecutionIdentifier(request.Id); err != nil {
 		logger.Debugf(ctx, "get node execution called with invalid identifier [%+v]: %v", request.Id, err)
 	}
@@ -437,14 +437,14 @@ func (m *NodeExecutionManager) listNodeExecutions(
 }
 
 func (m *NodeExecutionManager) ListNodeExecutions(
-	ctx context.Context, request admin.NodeExecutionListRequest) (*admin.NodeExecutionList, error) {
+	ctx context.Context, request *admin.NodeExecutionListRequest) (*admin.NodeExecutionList, error) {
 	// Check required fields
 	if err := validation.ValidateNodeExecutionListRequest(request); err != nil {
 		return nil, err
 	}
 	ctx = getExecutionContext(ctx, request.WorkflowExecutionId)
 
-	identifierFilters, err := util.GetWorkflowExecutionIdentifierFilters(ctx, *request.WorkflowExecutionId)
+	identifierFilters, err := util.GetWorkflowExecutionIdentifierFilters(ctx, request.WorkflowExecutionId)
 	if err != nil {
 		return nil, err
 	}
@@ -475,14 +475,14 @@ func (m *NodeExecutionManager) ListNodeExecutions(
 // Filters on node executions matching the execution parameters (execution project, domain, and name) as well as the
 // parent task execution id corresponding to the task execution identified in the request params.
 func (m *NodeExecutionManager) ListNodeExecutionsForTask(
-	ctx context.Context, request admin.NodeExecutionForTaskListRequest) (*admin.NodeExecutionList, error) {
+	ctx context.Context, request *admin.NodeExecutionForTaskListRequest) (*admin.NodeExecutionList, error) {
 	// Check required fields
 	if err := validation.ValidateNodeExecutionForTaskListRequest(request); err != nil {
 		return nil, err
 	}
 	ctx = getTaskExecutionContext(ctx, request.TaskExecutionId)
 	identifierFilters, err := util.GetWorkflowExecutionIdentifierFilters(
-		ctx, *request.TaskExecutionId.NodeExecutionId.ExecutionId)
+		ctx, request.TaskExecutionId.NodeExecutionId.ExecutionId)
 	if err != nil {
 		return nil, err
 	}
@@ -501,7 +501,7 @@ func (m *NodeExecutionManager) ListNodeExecutionsForTask(
 }
 
 func (m *NodeExecutionManager) GetNodeExecutionData(
-	ctx context.Context, request admin.NodeExecutionGetDataRequest) (*admin.NodeExecutionGetDataResponse, error) {
+	ctx context.Context, request *admin.NodeExecutionGetDataRequest) (*admin.NodeExecutionGetDataResponse, error) {
 	if err := validation.ValidateNodeExecutionIdentifier(request.Id); err != nil {
 		logger.Debugf(ctx, "can't get node execution data with invalid identifier [%+v]: %v", request.Id, err)
 	}
@@ -537,7 +537,7 @@ func (m *NodeExecutionManager) GetNodeExecutionData(
 		Outputs:     outputURLBlob,
 		FullInputs:  inputs,
 		FullOutputs: outputs,
-		FlyteUrls:   common.FlyteURLsFromNodeExecutionID(*request.Id, nodeExecution.GetClosure() != nil && nodeExecution.GetClosure().GetDeckUri() != ""),
+		FlyteUrls:   common.FlyteURLsFromNodeExecutionID(request.Id, nodeExecution.GetClosure() != nil && nodeExecution.GetClosure().GetDeckUri() != ""),
 	}
 
 	if len(nodeExecutionModel.DynamicWorkflowRemoteClosureReference) > 0 {

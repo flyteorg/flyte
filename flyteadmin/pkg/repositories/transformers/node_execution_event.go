@@ -10,7 +10,7 @@ import (
 )
 
 // Transforms a NodeExecutionEventRequest to a NodeExecutionEvent model
-func CreateNodeExecutionEventModel(request admin.NodeExecutionEventRequest) (*models.NodeExecutionEvent, error) {
+func CreateNodeExecutionEventModel(request *admin.NodeExecutionEventRequest) (*models.NodeExecutionEvent, error) {
 	occurredAt, err := ptypes.Timestamp(request.Event.OccurredAt)
 	if err != nil {
 		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to marshal occurred at timestamp")

@@ -34,7 +34,7 @@ func TestCreateScheduleInput(t *testing.T) {
 		},
 		KickoffTimeInputArg: "kickoff_time",
 	}
-	addScheduleInput, err := eventScheduler.CreateScheduleInput(context.Background(), nil, core.Identifier{
+	addScheduleInput, err := eventScheduler.CreateScheduleInput(context.Background(), nil, &core.Identifier{
 		Project: "project",
 		Domain:  "domain",
 		Name:    "scheduled_wroflow",
@@ -51,7 +51,7 @@ func TestRemoveSchedule(t *testing.T) {
 	scheduleEntitiesRepo.OnDeactivateMatch(mock.Anything, mock.Anything).Return(nil)
 
 	err := eventScheduler.RemoveSchedule(context.Background(), interfaces.RemoveScheduleInput{
-		Identifier: core.Identifier{
+		Identifier: &core.Identifier{
 			Project: "project",
 			Domain:  "domain",
 			Name:    "scheduled_wroflow",
@@ -64,7 +64,7 @@ func TestRemoveSchedule(t *testing.T) {
 func TestAddSchedule(t *testing.T) {
 	t.Run("schedule_rate", func(t *testing.T) {
 		eventScheduler := setupEventScheduler()
-		schedule := admin.Schedule{
+		schedule := &admin.Schedule{
 			ScheduleExpression: &admin.Schedule_Rate{
 				Rate: &admin.FixedRate{
 					Value: 1,
@@ -78,7 +78,7 @@ func TestAddSchedule(t *testing.T) {
 		scheduleEntitiesRepo.OnActivateMatch(mock.Anything, mock.Anything).Return(nil)
 
 		err := eventScheduler.AddSchedule(context.Background(), interfaces.AddScheduleInput{
-			Identifier: core.Identifier{
+			Identifier: &core.Identifier{
 				Project: "project",
 				Domain:  "domain",
 				Name:    "scheduled_wroflow",
@@ -91,7 +91,7 @@ func TestAddSchedule(t *testing.T) {
 
 	t.Run("cron_schedule", func(t *testing.T) {
 		eventScheduler := setupEventScheduler()
-		schedule := admin.Schedule{
+		schedule := &admin.Schedule{
 			ScheduleExpression: &admin.Schedule_CronSchedule{
 				CronSchedule: &admin.CronSchedule{
 					Schedule: "*/1 * * * *",
@@ -104,7 +104,7 @@ func TestAddSchedule(t *testing.T) {
 		scheduleEntitiesRepo.OnActivateMatch(mock.Anything, mock.Anything).Return(nil)
 
 		err := eventScheduler.AddSchedule(context.Background(), interfaces.AddScheduleInput{
-			Identifier: core.Identifier{
+			Identifier: &core.Identifier{
 				Project: "project",
 				Domain:  "domain",
 				Name:    "scheduled_wroflow",
@@ -117,7 +117,7 @@ func TestAddSchedule(t *testing.T) {
 
 	t.Run("cron_expression_unsupported", func(t *testing.T) {
 		eventScheduler := setupEventScheduler()
-		schedule := admin.Schedule{
+		schedule := &admin.Schedule{
 			ScheduleExpression: &admin.Schedule_CronExpression{
 				CronExpression: "* */1 * * * *",
 			},
@@ -128,7 +128,7 @@ func TestAddSchedule(t *testing.T) {
 		scheduleEntitiesRepo.OnActivateMatch(mock.Anything, mock.Anything).Return(nil)
 
 		err := eventScheduler.AddSchedule(context.Background(), interfaces.AddScheduleInput{
-			Identifier: core.Identifier{
+			Identifier: &core.Identifier{
 				Project: "project",
 				Domain:  "domain",
 				Name:    "scheduled_wroflow",

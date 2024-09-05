@@ -54,7 +54,7 @@ func TestGetOrCreateSignal(t *testing.T) {
 		mockRepository.SignalRepo().(*repositoryMocks.SignalRepoInterface).OnGetOrCreateMatch(mock.Anything, mock.Anything).Return(nil)
 
 		signalManager := NewSignalManager(mockRepository, mockScope.NewTestScope())
-		request := admin.SignalGetOrCreateRequest{
+		request := &admin.SignalGetOrCreateRequest{
 			Id:   signalID,
 			Type: signalType,
 		}
@@ -71,7 +71,7 @@ func TestGetOrCreateSignal(t *testing.T) {
 	t.Run("ValidationError", func(t *testing.T) {
 		mockRepository := repositoryMocks.NewMockRepository()
 		signalManager := NewSignalManager(mockRepository, mockScope.NewTestScope())
-		request := admin.SignalGetOrCreateRequest{
+		request := &admin.SignalGetOrCreateRequest{
 			Type: signalType,
 		}
 
@@ -84,7 +84,7 @@ func TestGetOrCreateSignal(t *testing.T) {
 		mockRepository.SignalRepo().(*repositoryMocks.SignalRepoInterface).OnGetOrCreateMatch(mock.Anything, mock.Anything).Return(errors.New("foo"))
 
 		signalManager := NewSignalManager(mockRepository, mockScope.NewTestScope())
-		request := admin.SignalGetOrCreateRequest{
+		request := &admin.SignalGetOrCreateRequest{
 			Id:   signalID,
 			Type: signalType,
 		}
@@ -107,7 +107,7 @@ func TestListSignals(t *testing.T) {
 		)
 
 		signalManager := NewSignalManager(mockRepository, mockScope.NewTestScope())
-		request := admin.SignalListRequest{
+		request := &admin.SignalListRequest{
 			WorkflowExecutionId: &core.WorkflowExecutionIdentifier{
 				Project: "project",
 				Domain:  "domain",
@@ -135,7 +135,7 @@ func TestListSignals(t *testing.T) {
 	t.Run("ValidationError", func(t *testing.T) {
 		mockRepository := repositoryMocks.NewMockRepository()
 		signalManager := NewSignalManager(mockRepository, mockScope.NewTestScope())
-		request := admin.SignalListRequest{
+		request := &admin.SignalListRequest{
 			WorkflowExecutionId: &core.WorkflowExecutionIdentifier{
 				Project: "project",
 				Domain:  "domain",
@@ -153,7 +153,7 @@ func TestListSignals(t *testing.T) {
 			OnListMatch(mock.Anything, mock.Anything).Return(nil, errors.New("foo"))
 
 		signalManager := NewSignalManager(mockRepository, mockScope.NewTestScope())
-		request := admin.SignalListRequest{
+		request := &admin.SignalListRequest{
 			WorkflowExecutionId: &core.WorkflowExecutionIdentifier{
 				Project: "project",
 				Domain:  "domain",
@@ -179,7 +179,7 @@ func TestSetSignal(t *testing.T) {
 			OnUpdateMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
 		signalManager := NewSignalManager(mockRepository, mockScope.NewTestScope())
-		request := admin.SignalSetRequest{
+		request := &admin.SignalSetRequest{
 			Id:    signalID,
 			Value: signalValue,
 		}
@@ -193,7 +193,7 @@ func TestSetSignal(t *testing.T) {
 	t.Run("ValidationError", func(t *testing.T) {
 		mockRepository := repositoryMocks.NewMockRepository()
 		signalManager := NewSignalManager(mockRepository, mockScope.NewTestScope())
-		request := admin.SignalSetRequest{
+		request := &admin.SignalSetRequest{
 			Value: signalValue,
 		}
 
@@ -210,7 +210,7 @@ func TestSetSignal(t *testing.T) {
 		)
 
 		signalManager := NewSignalManager(mockRepository, mockScope.NewTestScope())
-		request := admin.SignalSetRequest{
+		request := &admin.SignalSetRequest{
 			Id:    signalID,
 			Value: signalValue,
 		}
@@ -227,7 +227,7 @@ func TestSetSignal(t *testing.T) {
 			OnUpdateMatch(mock.Anything, mock.Anything, mock.Anything).Return(errors.New("foo"))
 
 		signalManager := NewSignalManager(mockRepository, mockScope.NewTestScope())
-		request := admin.SignalSetRequest{
+		request := &admin.SignalSetRequest{
 			Id:    signalID,
 			Value: signalValue,
 		}
