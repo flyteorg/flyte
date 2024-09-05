@@ -315,6 +315,54 @@ func TestStowStore_GetItems(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, 0, len(items))
 	})
+
+	t.Run("Broken Reference", func(t *testing.T) {
+		ctx := context.Background()
+		fn := fQNFn["s3"]
+		s, err := NewStowRawStore(fn(container), &mockStowLoc{
+			ContainerCb: func(id string) (stow.Container, error) {
+				if id == container {
+					return newMockStowContainer(container), nil
+				}
+				return nil, fmt.Errorf("container is not supported")
+			},
+			CreateContainerCb: func(name string) (stow.Container, error) {
+				if name == container {
+					return newMockStowContainer(container), nil
+				}
+				return nil, fmt.Errorf("container is not supported")
+			},
+		}, nil, false, metrics)
+		assert.NoError(t, err)
+		dataReference := DataReference("s3://")
+		items, err := s.GetItems(ctx, dataReference)
+		assert.Error(t, err)
+		assert.Nil(t, items)
+	})
+
+	t.Run("Non-exist Container", func(t *testing.T) {
+		ctx := context.Background()
+		fn := fQNFn["s3"]
+		s, err := NewStowRawStore(fn(container), &mockStowLoc{
+			ContainerCb: func(id string) (stow.Container, error) {
+				if id == container {
+					return newMockStowContainer(container), nil
+				}
+				return nil, fmt.Errorf("container is not supported")
+			},
+			CreateContainerCb: func(name string) (stow.Container, error) {
+				if name == container {
+					return newMockStowContainer(container), nil
+				}
+				return nil, fmt.Errorf("container is not supported")
+			},
+		}, nil, false, metrics)
+		assert.NoError(t, err)
+		dataReference := DataReference("s3://bad-container/folder")
+		items, err := s.GetItems(ctx, dataReference)
+		assert.Error(t, err)
+		assert.Nil(t, items)
+	})
 }
 
 func TestStowStore_ReadRaw(t *testing.T) {

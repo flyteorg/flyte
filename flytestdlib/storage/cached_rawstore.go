@@ -50,6 +50,7 @@ func (s *cachedRawStore) Head(ctx context.Context, reference DataReference) (Met
 	return s.RawStore.Head(ctx, reference)
 }
 
+// GetItems retrieves the paths of all items from the Blob store or an error
 func (s *cachedRawStore) GetItems(ctx context.Context, reference DataReference) ([]string, error) {
 	_, span := otelutils.NewSpan(ctx, otelutils.BlobstoreClientTracer, "flytestdlib.storage.cachedRawStore/GetItems")
 	defer span.End()

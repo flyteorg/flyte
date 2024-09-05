@@ -110,6 +110,14 @@ func TestCachedRawStore(t *testing.T) {
 			}
 			return MemoryMetadata{}, fmt.Errorf("err")
 		},
+		GetItemsCb: func(ctx context.Context, reference DataReference) ([]string, error) {
+			var s []string
+			if reference == "k1" {
+				s = append(s, "item")
+				return s, nil
+			}
+			return s, fmt.Errorf("err")
+		},
 		WriteRawCb: func(ctx context.Context, reference DataReference, size int64, opts Options, raw io.Reader) error {
 			if writeCalled {
 				assert.FailNow(t, "Should not be writeCalled")
@@ -163,6 +171,18 @@ func TestCachedRawStore(t *testing.T) {
 		m, err := cStore.Head(ctx, k2)
 		assert.Error(t, err)
 		assert.False(t, m.Exists())
+	})
+
+	t.Run("Get Items", func(t *testing.T) {
+		items, err := cStore.GetItems(ctx, k1)
+		assert.NoError(t, err)
+		assert.Equal(t, 1, len(items))
+	})
+
+	t.Run("No Items", func(t *testing.T) {
+		items, err := cStore.GetItems(ctx, k2)
+		assert.Error(t, err)
+		assert.Equal(t, 0, len(items))
 	})
 
 	t.Run("ReadCachePopulate", func(t *testing.T) {
