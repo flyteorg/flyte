@@ -19,6 +19,9 @@ func TestFailingRawStore(t *testing.T) {
 	c := f.GetBaseContainerFQN(ctx)
 	assert.Equal(t, storage.DataReference(""), c)
 
+	_, err = f.GetItems(ctx, "")
+	assert.Error(t, err)
+
 	_, err = f.ReadRaw(ctx, "")
 	assert.Error(t, err)
 
