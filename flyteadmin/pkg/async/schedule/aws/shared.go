@@ -9,7 +9,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
-func hashIdentifier(identifier core.Identifier) uint64 {
+func hashIdentifier(identifier *core.Identifier) uint64 {
 	h := fnv.New64()
 	_, err := h.Write([]byte(fmt.Sprintf(scheduleNameInputsFormat,
 		identifier.Project, identifier.Domain, identifier.Name)))

@@ -34,7 +34,7 @@ func TestGcpProcessor_StartProcessing(t *testing.T) {
 
 	testGcpProcessor := NewGcpProcessor(&testGcpSubscriber, &mockGcpEmailer, promutils.NewTestScope())
 
-	sendEmailValidationFunc := func(ctx context.Context, email admin.EmailMessage) error {
+	sendEmailValidationFunc := func(ctx context.Context, email *admin.EmailMessage) error {
 		assert.Equal(t, email.Body, testEmail.Body)
 		assert.Equal(t, email.RecipientsEmail, testEmail.RecipientsEmail)
 		assert.Equal(t, email.SubjectLine, testEmail.SubjectLine)
@@ -81,7 +81,7 @@ func TestGcpProcessor_StartProcessingError(t *testing.T) {
 func TestGcpProcessor_StartProcessingEmailError(t *testing.T) {
 	initializeGcpSubscriber()
 	emailError := errors.New("error sending email")
-	sendEmailErrorFunc := func(ctx context.Context, email admin.EmailMessage) error {
+	sendEmailErrorFunc := func(ctx context.Context, email *admin.EmailMessage) error {
 		return emailError
 	}
 	mockGcpEmailer.SetSendEmailFunc(sendEmailErrorFunc)

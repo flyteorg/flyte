@@ -24,7 +24,7 @@ const (
 
 // GetScheduleName generate the schedule name to be used as unique identification string within the scheduler
 func GetScheduleName(ctx context.Context, s models.SchedulableEntity) string {
-	return strconv.FormatUint(hashIdentifier(ctx, core.Identifier{
+	return strconv.FormatUint(hashIdentifier(ctx, &core.Identifier{
 		Project: s.Project,
 		Domain:  s.Domain,
 		Name:    s.Name,
@@ -41,7 +41,7 @@ func GetExecutionIdentifier(ctx context.Context, identifier core.Identifier, sch
 }
 
 // hashIdentifier returns the hash of the identifier
-func hashIdentifier(ctx context.Context, identifier core.Identifier) uint64 {
+func hashIdentifier(ctx context.Context, identifier *core.Identifier) uint64 {
 	h := fnv.New64()
 	_, err := h.Write([]byte(fmt.Sprintf(scheduleNameInputsFormat,
 		identifier.Project, identifier.Domain, identifier.Name, identifier.Version)))

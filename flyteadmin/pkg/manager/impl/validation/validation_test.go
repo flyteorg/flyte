@@ -73,30 +73,30 @@ func TestValidateIdentifier(t *testing.T) {
 }
 
 func TestValidateNamedEntityIdentifierListRequest(t *testing.T) {
-	assert.Nil(t, ValidateNamedEntityIdentifierListRequest(admin.NamedEntityIdentifierListRequest{
+	assert.Nil(t, ValidateNamedEntityIdentifierListRequest(&admin.NamedEntityIdentifierListRequest{
 		Project: "project",
 		Domain:  "domain",
 		Limit:   2,
 	}))
 
-	assert.NotNil(t, ValidateNamedEntityIdentifierListRequest(admin.NamedEntityIdentifierListRequest{
+	assert.NotNil(t, ValidateNamedEntityIdentifierListRequest(&admin.NamedEntityIdentifierListRequest{
 		Domain: "domain",
 		Limit:  2,
 	}))
 
-	assert.NotNil(t, ValidateNamedEntityIdentifierListRequest(admin.NamedEntityIdentifierListRequest{
+	assert.NotNil(t, ValidateNamedEntityIdentifierListRequest(&admin.NamedEntityIdentifierListRequest{
 		Project: "project",
 		Limit:   2,
 	}))
 
-	assert.NotNil(t, ValidateNamedEntityIdentifierListRequest(admin.NamedEntityIdentifierListRequest{
+	assert.NotNil(t, ValidateNamedEntityIdentifierListRequest(&admin.NamedEntityIdentifierListRequest{
 		Project: "project",
 		Domain:  "domain",
 	}))
 }
 
 func TestValidateDescriptionEntityIdentifierGetRequest(t *testing.T) {
-	assert.Nil(t, ValidateDescriptionEntityGetRequest(admin.ObjectGetRequest{
+	assert.Nil(t, ValidateDescriptionEntityGetRequest(&admin.ObjectGetRequest{
 		Id: &core.Identifier{
 			ResourceType: core.ResourceType_WORKFLOW,
 			Project:      "project",
@@ -106,13 +106,13 @@ func TestValidateDescriptionEntityIdentifierGetRequest(t *testing.T) {
 		},
 	}))
 
-	assert.NotNil(t, ValidateDescriptionEntityGetRequest(admin.ObjectGetRequest{
+	assert.NotNil(t, ValidateDescriptionEntityGetRequest(&admin.ObjectGetRequest{
 		Id: &core.Identifier{
 			Project: "project",
 		},
 	}))
 
-	assert.NotNil(t, ValidateDescriptionEntityGetRequest(admin.ObjectGetRequest{
+	assert.NotNil(t, ValidateDescriptionEntityGetRequest(&admin.ObjectGetRequest{
 		Id: &core.Identifier{
 			ResourceType: core.ResourceType_WORKFLOW,
 			Project:      "project",
@@ -121,7 +121,7 @@ func TestValidateDescriptionEntityIdentifierGetRequest(t *testing.T) {
 }
 
 func TestValidateDescriptionEntityListRequest(t *testing.T) {
-	assert.Nil(t, ValidateDescriptionEntityListRequest(admin.DescriptionEntityListRequest{
+	assert.Nil(t, ValidateDescriptionEntityListRequest(&admin.DescriptionEntityListRequest{
 		ResourceType: core.ResourceType_WORKFLOW,
 		Id: &admin.NamedEntityIdentifier{
 			Project: "project",
@@ -131,7 +131,7 @@ func TestValidateDescriptionEntityListRequest(t *testing.T) {
 		Limit: 1,
 	}))
 
-	assert.NotNil(t, ValidateDescriptionEntityListRequest(admin.DescriptionEntityListRequest{
+	assert.NotNil(t, ValidateDescriptionEntityListRequest(&admin.DescriptionEntityListRequest{
 		ResourceType: core.ResourceType_WORKFLOW,
 		Id: &admin.NamedEntityIdentifier{
 			Project: "project",
@@ -140,30 +140,30 @@ func TestValidateDescriptionEntityListRequest(t *testing.T) {
 		},
 	}))
 
-	assert.NotNil(t, ValidateDescriptionEntityListRequest(admin.DescriptionEntityListRequest{
+	assert.NotNil(t, ValidateDescriptionEntityListRequest(&admin.DescriptionEntityListRequest{
 		Id: nil,
 	}))
 
-	assert.NotNil(t, ValidateDescriptionEntityListRequest(admin.DescriptionEntityListRequest{
+	assert.NotNil(t, ValidateDescriptionEntityListRequest(&admin.DescriptionEntityListRequest{
 		ResourceType: core.ResourceType_WORKFLOW,
 		Id:           nil,
 	}))
 
-	assert.NotNil(t, ValidateDescriptionEntityListRequest(admin.DescriptionEntityListRequest{
+	assert.NotNil(t, ValidateDescriptionEntityListRequest(&admin.DescriptionEntityListRequest{
 		ResourceType: core.ResourceType_WORKFLOW,
 		Id: &admin.NamedEntityIdentifier{
 			Domain: "domain",
 		},
 	}))
 
-	assert.NotNil(t, ValidateDescriptionEntityListRequest(admin.DescriptionEntityListRequest{
+	assert.NotNil(t, ValidateDescriptionEntityListRequest(&admin.DescriptionEntityListRequest{
 		ResourceType: core.ResourceType_WORKFLOW,
 		Id: &admin.NamedEntityIdentifier{
 			Project: "project",
 		},
 	}))
 
-	assert.NotNil(t, ValidateDescriptionEntityListRequest(admin.DescriptionEntityListRequest{
+	assert.NotNil(t, ValidateDescriptionEntityListRequest(&admin.DescriptionEntityListRequest{
 		ResourceType: core.ResourceType_WORKFLOW,
 		Id: &admin.NamedEntityIdentifier{
 			Project: "project",
@@ -186,7 +186,7 @@ func TestValidateVersion(t *testing.T) {
 }
 
 func TestValidateListTaskRequest(t *testing.T) {
-	request := admin.ResourceListRequest{
+	request := &admin.ResourceListRequest{
 		Id: &admin.NamedEntityIdentifier{
 			Project: "project",
 			Domain:  "domain",
@@ -198,7 +198,7 @@ func TestValidateListTaskRequest(t *testing.T) {
 }
 
 func TestValidateListTaskRequest_MissingProject(t *testing.T) {
-	request := admin.ResourceListRequest{
+	request := &admin.ResourceListRequest{
 		Id: &admin.NamedEntityIdentifier{
 			Domain: "domain",
 			Name:   "name",
@@ -209,7 +209,7 @@ func TestValidateListTaskRequest_MissingProject(t *testing.T) {
 }
 
 func TestValidateListTaskRequest_MissingDomain(t *testing.T) {
-	request := admin.ResourceListRequest{
+	request := &admin.ResourceListRequest{
 		Id: &admin.NamedEntityIdentifier{
 			Project: "project",
 			Name:    "name",
@@ -220,7 +220,7 @@ func TestValidateListTaskRequest_MissingDomain(t *testing.T) {
 }
 
 func TestValidateListTaskRequest_MissingName(t *testing.T) {
-	request := admin.ResourceListRequest{
+	request := &admin.ResourceListRequest{
 		Id: &admin.NamedEntityIdentifier{
 			Project: "project",
 			Domain:  "domain",
@@ -231,7 +231,7 @@ func TestValidateListTaskRequest_MissingName(t *testing.T) {
 }
 
 func TestValidateListTaskRequest_MissingLimit(t *testing.T) {
-	request := admin.ResourceListRequest{
+	request := &admin.ResourceListRequest{
 		Id: &admin.NamedEntityIdentifier{
 			Project: "project",
 			Domain:  "domain",
@@ -378,7 +378,7 @@ func TestValidateToken(t *testing.T) {
 
 func TestValidateActiveLaunchPlanRequest(t *testing.T) {
 	err := ValidateActiveLaunchPlanRequest(
-		admin.ActiveLaunchPlanRequest{
+		&admin.ActiveLaunchPlanRequest{
 			Id: &admin.NamedEntityIdentifier{
 				Project: "p",
 				Domain:  "d",
@@ -389,7 +389,7 @@ func TestValidateActiveLaunchPlanRequest(t *testing.T) {
 	assert.Nil(t, err)
 
 	err = ValidateActiveLaunchPlanRequest(
-		admin.ActiveLaunchPlanRequest{
+		&admin.ActiveLaunchPlanRequest{
 			Id: &admin.NamedEntityIdentifier{
 				Domain: "d",
 				Name:   "n",
@@ -399,7 +399,7 @@ func TestValidateActiveLaunchPlanRequest(t *testing.T) {
 	assert.Error(t, err)
 
 	err = ValidateActiveLaunchPlanRequest(
-		admin.ActiveLaunchPlanRequest{
+		&admin.ActiveLaunchPlanRequest{
 			Id: &admin.NamedEntityIdentifier{
 				Project: "p",
 				Name:    "n",
@@ -409,7 +409,7 @@ func TestValidateActiveLaunchPlanRequest(t *testing.T) {
 	assert.Error(t, err)
 
 	err = ValidateActiveLaunchPlanRequest(
-		admin.ActiveLaunchPlanRequest{
+		&admin.ActiveLaunchPlanRequest{
 			Id: &admin.NamedEntityIdentifier{
 				Project: "p",
 				Domain:  "d",
@@ -421,7 +421,7 @@ func TestValidateActiveLaunchPlanRequest(t *testing.T) {
 
 func TestValidateActiveLaunchPlanListRequest(t *testing.T) {
 	err := ValidateActiveLaunchPlanListRequest(
-		admin.ActiveLaunchPlanListRequest{
+		&admin.ActiveLaunchPlanListRequest{
 			Project: "p",
 			Domain:  "d",
 			Limit:   2,
@@ -430,21 +430,21 @@ func TestValidateActiveLaunchPlanListRequest(t *testing.T) {
 	assert.Nil(t, err)
 
 	err = ValidateActiveLaunchPlanListRequest(
-		admin.ActiveLaunchPlanListRequest{
+		&admin.ActiveLaunchPlanListRequest{
 			Domain: "d",
 		},
 	)
 	assert.Error(t, err)
 
 	err = ValidateActiveLaunchPlanListRequest(
-		admin.ActiveLaunchPlanListRequest{
+		&admin.ActiveLaunchPlanListRequest{
 			Project: "p",
 		},
 	)
 	assert.Error(t, err)
 
 	err = ValidateActiveLaunchPlanListRequest(
-		admin.ActiveLaunchPlanListRequest{
+		&admin.ActiveLaunchPlanListRequest{
 			Project: "p",
 			Domain:  "d",
 			Limit:   0,

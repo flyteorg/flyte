@@ -32,7 +32,7 @@ func TestGenerateWorkflowNameFromTask(t *testing.T) {
 
 func TestGenerateBindings(t *testing.T) {
 	nodeID := "nodeID"
-	outputs := core.VariableMap{
+	outputs := &core.VariableMap{
 		Variables: map[string]*core.Variable{
 			"output1": {},
 			"output2": {},
@@ -87,7 +87,7 @@ func TestCreateOrGetWorkflowModel(t *testing.T) {
 	repository.WorkflowRepo().(*repositoryMocks.MockWorkflowRepo).SetGetCallback(workflowGetFunc)
 
 	mockNamedEntityManager := managerMocks.NamedEntityManager{}
-	mockNamedEntityManager.UpdateNamedEntityFunc = func(ctx context.Context, request admin.NamedEntityUpdateRequest) (*admin.NamedEntityUpdateResponse, error) {
+	mockNamedEntityManager.UpdateNamedEntityFunc = func(ctx context.Context, request *admin.NamedEntityUpdateRequest) (*admin.NamedEntityUpdateResponse, error) {
 		assert.Equal(t, request.ResourceType, core.ResourceType_WORKFLOW)
 		assert.True(t, proto.Equal(request.Id, &admin.NamedEntityIdentifier{
 			Project: "flytekit",
@@ -101,7 +101,7 @@ func TestCreateOrGetWorkflowModel(t *testing.T) {
 	}
 
 	mockWorkflowManager := managerMocks.MockWorkflowManager{}
-	mockWorkflowManager.SetCreateCallback(func(ctx context.Context, request admin.WorkflowCreateRequest) (*admin.WorkflowCreateResponse, error) {
+	mockWorkflowManager.SetCreateCallback(func(ctx context.Context, request *admin.WorkflowCreateRequest) (*admin.WorkflowCreateResponse, error) {
 		assert.True(t, proto.Equal(request.Id, &core.Identifier{
 			ResourceType: core.ResourceType_WORKFLOW,
 			Project:      "flytekit",
@@ -160,7 +160,7 @@ func TestCreateOrGetWorkflowModel(t *testing.T) {
 			},
 		},
 	}
-	workflowModel, err := CreateOrGetWorkflowModel(context.Background(), admin.ExecutionCreateRequest{
+	workflowModel, err := CreateOrGetWorkflowModel(context.Background(), &admin.ExecutionCreateRequest{
 		Project: "flytekit",
 		Domain:  "production",
 		Name:    "SingleTaskExecution",

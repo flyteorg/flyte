@@ -57,7 +57,7 @@ func TestNamedEntityManager_Get(t *testing.T) {
 		}, nil
 	}
 	repository.NamedEntityRepo().(*repositoryMocks.MockNamedEntityRepo).SetGetCallback(getFunction)
-	response, err := manager.GetNamedEntity(context.Background(), admin.NamedEntityGetRequest{
+	response, err := manager.GetNamedEntity(context.Background(), &admin.NamedEntityGetRequest{
 		ResourceType: resourceType,
 		Id:           &namedEntityIdentifier,
 	})
@@ -69,14 +69,14 @@ func TestNamedEntityManager_Get_BadRequest(t *testing.T) {
 	repository := getMockRepositoryForNETest()
 	manager := NewNamedEntityManager(repository, getMockConfigForNETest(), mockScope.NewTestScope())
 
-	response, err := manager.GetNamedEntity(context.Background(), admin.NamedEntityGetRequest{
+	response, err := manager.GetNamedEntity(context.Background(), &admin.NamedEntityGetRequest{
 		ResourceType: core.ResourceType_UNSPECIFIED,
 		Id:           &namedEntityIdentifier,
 	})
 	assert.Error(t, err)
 	assert.Nil(t, response)
 
-	response, err = manager.GetNamedEntity(context.Background(), admin.NamedEntityGetRequest{
+	response, err = manager.GetNamedEntity(context.Background(), &admin.NamedEntityGetRequest{
 		ResourceType: resourceType,
 		Id:           &badIdentifier,
 	})
@@ -125,7 +125,7 @@ func TestNamedEntityManager_Update(t *testing.T) {
 	updatedMetadata := admin.NamedEntityMetadata{
 		Description: updatedDescription,
 	}
-	response, err := manager.UpdateNamedEntity(context.Background(), admin.NamedEntityUpdateRequest{
+	response, err := manager.UpdateNamedEntity(context.Background(), &admin.NamedEntityUpdateRequest{
 		Metadata:     &updatedMetadata,
 		ResourceType: resourceType,
 		Id:           &namedEntityIdentifier,
@@ -143,7 +143,7 @@ func TestNamedEntityManager_Update_BadRequest(t *testing.T) {
 	updatedMetadata := admin.NamedEntityMetadata{
 		Description: updatedDescription,
 	}
-	response, err := manager.UpdateNamedEntity(context.Background(), admin.NamedEntityUpdateRequest{
+	response, err := manager.UpdateNamedEntity(context.Background(), &admin.NamedEntityUpdateRequest{
 		Metadata:     &updatedMetadata,
 		ResourceType: core.ResourceType_UNSPECIFIED,
 		Id:           &namedEntityIdentifier,
@@ -151,7 +151,7 @@ func TestNamedEntityManager_Update_BadRequest(t *testing.T) {
 	assert.Error(t, err)
 	assert.Nil(t, response)
 
-	response, err = manager.UpdateNamedEntity(context.Background(), admin.NamedEntityUpdateRequest{
+	response, err = manager.UpdateNamedEntity(context.Background(), &admin.NamedEntityUpdateRequest{
 		Metadata:     &updatedMetadata,
 		ResourceType: resourceType,
 		Id:           &badIdentifier,

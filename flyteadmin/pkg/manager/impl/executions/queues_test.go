@@ -67,22 +67,22 @@ func TestGetQueue(t *testing.T) {
 	queueConfig := singleQueueConfiguration{
 		DynamicQueue: "queue dynamic",
 	}
-	assert.Equal(t, queueConfig, queueAllocator.GetQueue(context.Background(), core.Identifier{
+	assert.Equal(t, queueConfig, queueAllocator.GetQueue(context.Background(), &core.Identifier{
 		Project: "project",
 		Domain:  "domain",
 		Name:    "name",
 	}))
-	assert.EqualValues(t, singleQueueConfiguration{}, queueAllocator.GetQueue(context.Background(), core.Identifier{
+	assert.EqualValues(t, singleQueueConfiguration{}, queueAllocator.GetQueue(context.Background(), &core.Identifier{
 		Project: "project",
 		Domain:  "domain",
 		Name:    "name2",
 	}))
-	assert.EqualValues(t, singleQueueConfiguration{}, queueAllocator.GetQueue(context.Background(), core.Identifier{
+	assert.EqualValues(t, singleQueueConfiguration{}, queueAllocator.GetQueue(context.Background(), &core.Identifier{
 		Project: "project",
 		Domain:  "domain2",
 		Name:    "name",
 	}))
-	assert.EqualValues(t, singleQueueConfiguration{}, queueAllocator.GetQueue(context.Background(), core.Identifier{
+	assert.EqualValues(t, singleQueueConfiguration{}, queueAllocator.GetQueue(context.Background(), &core.Identifier{
 		Project: "project2",
 		Domain:  "domain",
 		Name:    "name",
@@ -174,7 +174,7 @@ func TestGetQueueDefaults(t *testing.T) {
 	assert.Equal(t, singleQueueConfiguration{
 		DynamicQueue: "default dynamic",
 	}, queueAllocator.GetQueue(
-		context.Background(), core.Identifier{
+		context.Background(), &core.Identifier{
 			Project: "unmatched",
 			Domain:  "domain",
 			Name:    "workflow",
@@ -182,7 +182,7 @@ func TestGetQueueDefaults(t *testing.T) {
 	assert.EqualValues(t, singleQueueConfiguration{
 		DynamicQueue: "queue1 dynamic",
 	}, queueAllocator.GetQueue(
-		context.Background(), core.Identifier{
+		context.Background(), &core.Identifier{
 			Project: "project",
 			Domain:  "UNMATCHED",
 			Name:    "workflow",
@@ -190,7 +190,7 @@ func TestGetQueueDefaults(t *testing.T) {
 	assert.EqualValues(t, singleQueueConfiguration{
 		DynamicQueue: "queue2 dynamic",
 	}, queueAllocator.GetQueue(
-		context.Background(), core.Identifier{
+		context.Background(), &core.Identifier{
 			Project: "project",
 			Domain:  "domain",
 			Name:    "UNMATCHED",
@@ -198,7 +198,7 @@ func TestGetQueueDefaults(t *testing.T) {
 	assert.Equal(t, singleQueueConfiguration{
 		DynamicQueue: "queue3 dynamic",
 	}, queueAllocator.GetQueue(
-		context.Background(), core.Identifier{
+		context.Background(), &core.Identifier{
 			Project: "project",
 			Domain:  "domain",
 			Name:    "workflow",

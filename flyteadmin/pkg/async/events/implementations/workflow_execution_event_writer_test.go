@@ -12,7 +12,7 @@ import (
 func TestWorkflowExecutionEventWriter(t *testing.T) {
 	db := mocks.NewMockRepository()
 
-	event := admin.WorkflowExecutionEventRequest{
+	event := &admin.WorkflowExecutionEventRequest{
 		RequestId: "request_id",
 		Event: &event2.WorkflowExecutionEvent{
 			ExecutionId: &core.WorkflowExecutionIdentifier{

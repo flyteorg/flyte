@@ -168,7 +168,7 @@ func TestGetTask(t *testing.T) {
 	repository.TaskRepo().(*repositoryMocks.MockTaskRepo).SetGetCallback(taskGetFunc)
 	taskManager := NewTaskManager(repository, getMockConfigForTaskTest(), getMockTaskCompiler(), mockScope.NewTestScope())
 
-	task, err := taskManager.GetTask(context.Background(), admin.ObjectGetRequest{
+	task, err := taskManager.GetTask(context.Background(), &admin.ObjectGetRequest{
 		Id: &taskIdentifier,
 	})
 	assert.NoError(t, err)
@@ -187,7 +187,7 @@ func TestGetTask_DatabaseError(t *testing.T) {
 	}
 	repository.TaskRepo().(*repositoryMocks.MockTaskRepo).SetGetCallback(taskGetFunc)
 	taskManager := NewTaskManager(repository, getMockConfigForTaskTest(), getMockTaskCompiler(), mockScope.NewTestScope())
-	task, err := taskManager.GetTask(context.Background(), admin.ObjectGetRequest{
+	task, err := taskManager.GetTask(context.Background(), &admin.ObjectGetRequest{
 		Id: &taskIdentifier,
 	})
 	assert.Nil(t, task)
@@ -214,7 +214,7 @@ func TestGetTask_TransformerError(t *testing.T) {
 	repository.TaskRepo().(*repositoryMocks.MockTaskRepo).SetGetCallback(taskGetFunc)
 	taskManager := NewTaskManager(repository, getMockConfigForTaskTest(), getMockTaskCompiler(), mockScope.NewTestScope())
 
-	task, err := taskManager.GetTask(context.Background(), admin.ObjectGetRequest{
+	task, err := taskManager.GetTask(context.Background(), &admin.ObjectGetRequest{
 		Id: &taskIdentifier,
 	})
 	assert.Nil(t, task)
@@ -273,7 +273,7 @@ func TestListTasks(t *testing.T) {
 	repository.TaskRepo().(*repositoryMocks.MockTaskRepo).SetListCallback(taskListFunc)
 	taskManager := NewTaskManager(repository, getMockConfigForTaskTest(), getMockTaskCompiler(), mockScope.NewTestScope())
 
-	taskList, err := taskManager.ListTasks(context.Background(), admin.ResourceListRequest{
+	taskList, err := taskManager.ListTasks(context.Background(), &admin.ResourceListRequest{
 		Id: &admin.NamedEntityIdentifier{
 			Project: projectValue,
 			Domain:  domainValue,
@@ -304,7 +304,7 @@ func TestListTasks(t *testing.T) {
 func TestListTasks_MissingParameters(t *testing.T) {
 	repository := getMockTaskRepository()
 	taskManager := NewTaskManager(repository, getMockConfigForTaskTest(), getMockTaskCompiler(), mockScope.NewTestScope())
-	_, err := taskManager.ListTasks(context.Background(), admin.ResourceListRequest{
+	_, err := taskManager.ListTasks(context.Background(), &admin.ResourceListRequest{
 		Id: &admin.NamedEntityIdentifier{
 			Domain: domainValue,
 			Name:   nameValue,
@@ -314,7 +314,7 @@ func TestListTasks_MissingParameters(t *testing.T) {
 	assert.Error(t, err)
 	assert.Equal(t, codes.InvalidArgument, err.(adminErrors.FlyteAdminError).Code())
 
-	_, err = taskManager.ListTasks(context.Background(), admin.ResourceListRequest{
+	_, err = taskManager.ListTasks(context.Background(), &admin.ResourceListRequest{
 		Id: &admin.NamedEntityIdentifier{
 			Project: projectValue,
 			Name:    nameValue,
@@ -334,7 +334,7 @@ func TestListTasks_DatabaseError(t *testing.T) {
 
 	repository.TaskRepo().(*repositoryMocks.MockTaskRepo).SetListCallback(taskListFunc)
 	taskManager := NewTaskManager(repository, getMockConfigForTaskTest(), getMockTaskCompiler(), mockScope.NewTestScope())
-	_, err := taskManager.ListTasks(context.Background(), admin.ResourceListRequest{
+	_, err := taskManager.ListTasks(context.Background(), &admin.ResourceListRequest{
 		Id: &admin.NamedEntityIdentifier{
 			Project: projectValue,
 			Domain:  domainValue,
@@ -389,7 +389,7 @@ func TestListUniqueTaskIdentifiers(t *testing.T) {
 
 	repository.TaskRepo().(*repositoryMocks.MockTaskRepo).SetListTaskIdentifiersCallback(listFunc)
 
-	resp, err := taskManager.ListUniqueTaskIdentifiers(context.Background(), admin.NamedEntityIdentifierListRequest{
+	resp, err := taskManager.ListUniqueTaskIdentifiers(context.Background(), &admin.NamedEntityIdentifierListRequest{
 		Project: projectValue,
 		Domain:  domainValue,
 		Limit:   limit,

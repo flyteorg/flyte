@@ -52,15 +52,15 @@ func (m *LaunchPlanManager) getNamedEntityContext(ctx context.Context, identifie
 
 func (m *LaunchPlanManager) CreateLaunchPlan(
 	ctx context.Context,
-	request admin.LaunchPlanCreateRequest) (*admin.LaunchPlanCreateResponse, error) {
+	request *admin.LaunchPlanCreateRequest) (*admin.LaunchPlanCreateResponse, error) {
 	if err := validation.ValidateIdentifier(request.GetSpec().GetWorkflowId(), common.Workflow); err != nil {
 		logger.Debugf(ctx, "Failed to validate provided workflow ID for CreateLaunchPlan with err: %v", err)
 		return nil, err
 	}
-	workflowModel, err := util.GetWorkflowModel(ctx, m.db, *request.Spec.WorkflowId)
+	workflowModel, err := util.GetWorkflowModel(ctx, m.db, request.Spec.WorkflowId)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to get workflow with id [%+v] for CreateLaunchPlan with id [%+v] with err %v",
-			*request.Spec.WorkflowId, request.Id)
+			request.Spec.WorkflowId, request.Id)
 		return nil, err
 	}
 	var workflowInterface core.TypedInterface
@@ -69,7 +69,7 @@ func (m *LaunchPlanManager) CreateLaunchPlan(
 		if err != nil {
 			logger.Errorf(ctx,
 				"Failed to unmarshal TypedInterface for workflow [%+v] with err: %v",
-				*request.Spec.WorkflowId, err)
+				request.Spec.WorkflowId, err)
 			return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to unmarshal workflow inputs")
 		}
 	}
@@ -79,16 +79,16 @@ func (m *LaunchPlanManager) CreateLaunchPlan(
 	}
 	ctx = getLaunchPlanContext(ctx, request.Id)
 	launchPlan := transformers.CreateLaunchPlan(request, workflowInterface.Outputs)
-	launchPlanDigest, err := util.GetLaunchPlanDigest(ctx, &launchPlan)
+	launchPlanDigest, err := util.GetLaunchPlanDigest(ctx, launchPlan)
 	if err != nil {
 		logger.Errorf(ctx, "failed to compute launch plan digest for [%+v] with err: %v", launchPlan.Id, err)
 		return nil, err
 	}
 
-	existingLaunchPlanModel, err := util.GetLaunchPlanModel(ctx, m.db, *request.Id)
+	existingLaunchPlanModel, err := util.GetLaunchPlanModel(ctx, m.db, request.Id)
 	if err == nil {
 		if bytes.Equal(existingLaunchPlanModel.Digest, launchPlanDigest) {
-			return nil, errors.NewLaunchPlanExistsIdenticalStructureError(ctx, &request)
+			return nil, errors.NewLaunchPlanExistsIdenticalStructureError(ctx, request)
 		}
 		existingLaunchPlan, transformerErr := transformers.FromLaunchPlanModel(existingLaunchPlanModel)
 		if transformerErr != nil {
@@ -96,7 +96,7 @@ func (m *LaunchPlanManager) CreateLaunchPlan(
 			return nil, transformerErr
 		}
 		// A launch plan exists with different structure
-		return nil, errors.NewLaunchPlanExistsDifferentStructureError(ctx, &request, existingLaunchPlan.Spec, launchPlan.Spec)
+		return nil, errors.NewLaunchPlanExistsDifferentStructureError(ctx, request, existingLaunchPlan.Spec, launchPlan.Spec)
 	}
 
 	launchPlanModel, err :=
@@ -138,7 +138,7 @@ func (m *LaunchPlanManager) updateLaunchPlanModelState(launchPlan *models.Launch
 	return nil
 }
 
-func isScheduleEmpty(launchPlanSpec admin.LaunchPlanSpec) bool {
+func isScheduleEmpty(launchPlanSpec *admin.LaunchPlanSpec) bool {
 	schedule := launchPlanSpec.GetEntityMetadata().GetSchedule()
 	if schedule == nil {
 		return true
@@ -155,8 +155,8 @@ func isScheduleEmpty(launchPlanSpec admin.LaunchPlanSpec) bool {
 	return true
 }
 
-func (m *LaunchPlanManager) enableSchedule(ctx context.Context, launchPlanIdentifier core.Identifier,
-	launchPlanSpec admin.LaunchPlanSpec) error {
+func (m *LaunchPlanManager) enableSchedule(ctx context.Context, launchPlanIdentifier *core.Identifier,
+	launchPlanSpec *admin.LaunchPlanSpec) error {
 
 	addScheduleInput, err := m.scheduler.CreateScheduleInput(ctx,
 		m.config.ApplicationConfiguration().GetSchedulerConfig(), launchPlanIdentifier,
@@ -169,7 +169,7 @@ func (m *LaunchPlanManager) enableSchedule(ctx context.Context, launchPlanIdenti
 }
 
 func (m *LaunchPlanManager) disableSchedule(
-	ctx context.Context, launchPlanIdentifier core.Identifier) error {
+	ctx context.Context, launchPlanIdentifier *core.Identifier) error {
 	return m.scheduler.RemoveSchedule(ctx, scheduleInterfaces.RemoveScheduleInput{
 		Identifier:         launchPlanIdentifier,
 		ScheduleNamePrefix: m.config.ApplicationConfiguration().GetSchedulerConfig().EventSchedulerConfig.ScheduleNamePrefix,
@@ -178,21 +178,21 @@ func (m *LaunchPlanManager) disableSchedule(
 
 func (m *LaunchPlanManager) updateSchedules(
 	ctx context.Context, newlyActiveLaunchPlan models.LaunchPlan, formerlyActiveLaunchPlan *models.LaunchPlan) error {
-	var newlyActiveLaunchPlanSpec admin.LaunchPlanSpec
-	err := proto.Unmarshal(newlyActiveLaunchPlan.Spec, &newlyActiveLaunchPlanSpec)
+	newlyActiveLaunchPlanSpec := &admin.LaunchPlanSpec{}
+	err := proto.Unmarshal(newlyActiveLaunchPlan.Spec, newlyActiveLaunchPlanSpec)
 	if err != nil {
 		logger.Errorf(ctx, "failed to unmarshal newly enabled launch plan spec")
 		return errors.NewFlyteAdminErrorf(codes.Internal, "failed to unmarshal newly enabled launch plan spec")
 	}
-	launchPlanIdentifier := core.Identifier{
+	launchPlanIdentifier := &core.Identifier{
 		Project: newlyActiveLaunchPlan.Project,
 		Domain:  newlyActiveLaunchPlan.Domain,
 		Name:    newlyActiveLaunchPlan.Name,
 		Version: newlyActiveLaunchPlan.Version,
 	}
-	var formerlyActiveLaunchPlanSpec admin.LaunchPlanSpec
+	formerlyActiveLaunchPlanSpec := &admin.LaunchPlanSpec{}
 	if formerlyActiveLaunchPlan != nil {
-		err = proto.Unmarshal(formerlyActiveLaunchPlan.Spec, &formerlyActiveLaunchPlanSpec)
+		err = proto.Unmarshal(formerlyActiveLaunchPlan.Spec, formerlyActiveLaunchPlanSpec)
 		if err != nil {
 			return errors.NewFlyteAdminErrorf(codes.Internal, "failed to unmarshal formerly enabled launch plan spec")
 		}
@@ -200,7 +200,7 @@ func (m *LaunchPlanManager) updateSchedules(
 
 	if !isScheduleEmpty(formerlyActiveLaunchPlanSpec) {
 		// Disable previous schedule
-		formerlyActiveLaunchPlanIdentifier := core.Identifier{
+		formerlyActiveLaunchPlanIdentifier := &core.Identifier{
 			Project: formerlyActiveLaunchPlan.Project,
 			Domain:  formerlyActiveLaunchPlan.Domain,
 			Name:    formerlyActiveLaunchPlan.Name,
@@ -221,13 +221,13 @@ func (m *LaunchPlanManager) updateSchedules(
 	return nil
 }
 
-func (m *LaunchPlanManager) disableLaunchPlan(ctx context.Context, request admin.LaunchPlanUpdateRequest) (
+func (m *LaunchPlanManager) disableLaunchPlan(ctx context.Context, request *admin.LaunchPlanUpdateRequest) (
 	*admin.LaunchPlanUpdateResponse, error) {
 	if err := validation.ValidateIdentifier(request.Id, common.LaunchPlan); err != nil {
 		logger.Debugf(ctx, "can't disable launch plan [%+v] with invalid identifier: %v", request.Id, err)
 		return nil, err
 	}
-	launchPlanModel, err := util.GetLaunchPlanModel(ctx, m.db, *request.Id)
+	launchPlanModel, err := util.GetLaunchPlanModel(ctx, m.db, request.Id)
 	if err != nil {
 		logger.Debugf(ctx, "couldn't find launch plan [%+v] to disable with err: %v", request.Id, err)
 		return nil, err
@@ -247,7 +247,7 @@ func (m *LaunchPlanManager) disableLaunchPlan(ctx context.Context, request admin
 			"failed to unmarshal launch plan spec when disabling schedule for %+v", request.Id)
 	}
 	if launchPlanSpec.EntityMetadata != nil && launchPlanSpec.EntityMetadata.Schedule != nil {
-		err = m.disableSchedule(ctx, core.Identifier{
+		err = m.disableSchedule(ctx, &core.Identifier{
 			Project: launchPlanModel.Project,
 			Domain:  launchPlanModel.Domain,
 			Name:    launchPlanModel.Name,
@@ -266,7 +266,7 @@ func (m *LaunchPlanManager) disableLaunchPlan(ctx context.Context, request admin
 	return &admin.LaunchPlanUpdateResponse{}, nil
 }
 
-func (m *LaunchPlanManager) enableLaunchPlan(ctx context.Context, request admin.LaunchPlanUpdateRequest) (
+func (m *LaunchPlanManager) enableLaunchPlan(ctx context.Context, request *admin.LaunchPlanUpdateRequest) (
 	*admin.LaunchPlanUpdateResponse, error) {
 	newlyActiveLaunchPlanModel, err := m.db.LaunchPlanRepo().Get(ctx, repoInterfaces.Identifier{
 		Project: request.Id.Project,
@@ -329,7 +329,7 @@ func (m *LaunchPlanManager) enableLaunchPlan(ctx context.Context, request admin.
 
 }
 
-func (m *LaunchPlanManager) UpdateLaunchPlan(ctx context.Context, request admin.LaunchPlanUpdateRequest) (
+func (m *LaunchPlanManager) UpdateLaunchPlan(ctx context.Context, request *admin.LaunchPlanUpdateRequest) (
 	*admin.LaunchPlanUpdateResponse, error) {
 	if err := validation.ValidateIdentifier(request.Id, common.LaunchPlan); err != nil {
 		logger.Debugf(ctx, "can't update launch plan [%+v] state, invalid identifier: %v", request.Id, err)
@@ -347,17 +347,17 @@ func (m *LaunchPlanManager) UpdateLaunchPlan(ctx context.Context, request admin.
 	}
 }
 
-func (m *LaunchPlanManager) GetLaunchPlan(ctx context.Context, request admin.ObjectGetRequest) (
+func (m *LaunchPlanManager) GetLaunchPlan(ctx context.Context, request *admin.ObjectGetRequest) (
 	*admin.LaunchPlan, error) {
 	if err := validation.ValidateIdentifier(request.Id, common.LaunchPlan); err != nil {
 		logger.Debugf(ctx, "can't get launch plan [%+v] with invalid identifier: %v", request.Id, err)
 		return nil, err
 	}
 	ctx = getLaunchPlanContext(ctx, request.Id)
-	return util.GetLaunchPlan(ctx, m.db, *request.Id)
+	return util.GetLaunchPlan(ctx, m.db, request.Id)
 }
 
-func (m *LaunchPlanManager) GetActiveLaunchPlan(ctx context.Context, request admin.ActiveLaunchPlanRequest) (
+func (m *LaunchPlanManager) GetActiveLaunchPlan(ctx context.Context, request *admin.ActiveLaunchPlanRequest) (
 	*admin.LaunchPlan, error) {
 	if err := validation.ValidateActiveLaunchPlanRequest(request); err != nil {
 		logger.Debugf(ctx, "can't get active launch plan [%+v] with invalid request: %v", request.Id, err)
@@ -389,7 +389,7 @@ func (m *LaunchPlanManager) GetActiveLaunchPlan(ctx context.Context, request adm
 	return transformers.FromLaunchPlanModel(output.LaunchPlans[0])
 }
 
-func (m *LaunchPlanManager) ListLaunchPlans(ctx context.Context, request admin.ResourceListRequest) (
+func (m *LaunchPlanManager) ListLaunchPlans(ctx context.Context, request *admin.ResourceListRequest) (
 	*admin.LaunchPlanList, error) {
 
 	// Check required fields
@@ -447,7 +447,7 @@ func (m *LaunchPlanManager) ListLaunchPlans(ctx context.Context, request admin.R
 	}, nil
 }
 
-func (m *LaunchPlanManager) ListActiveLaunchPlans(ctx context.Context, request admin.ActiveLaunchPlanListRequest) (
+func (m *LaunchPlanManager) ListActiveLaunchPlans(ctx context.Context, request *admin.ActiveLaunchPlanListRequest) (
 	*admin.LaunchPlanList, error) {
 
 	// Check required fields
@@ -501,7 +501,7 @@ func (m *LaunchPlanManager) ListActiveLaunchPlans(ctx context.Context, request a
 }
 
 // At least project name and domain must be specified along with limit.
-func (m *LaunchPlanManager) ListLaunchPlanIds(ctx context.Context, request admin.NamedEntityIdentifierListRequest) (
+func (m *LaunchPlanManager) ListLaunchPlanIds(ctx context.Context, request *admin.NamedEntityIdentifierListRequest) (
 	*admin.NamedEntityIdentifierList, error) {
 	ctx = contextutils.WithProjectDomain(ctx, request.Project, request.Domain)
 	filters, err := util.GetDbFilters(util.FilterSpec{
