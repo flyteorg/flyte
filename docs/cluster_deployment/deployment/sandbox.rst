@@ -106,7 +106,7 @@ such as workflow executions. The default values are enough to let you connect an
    will create a config file at `~/.flyte/config.yaml`.
 
    Learn more about the configuration settings in the
-   {ref}`Deployment Guide <flyte:flyteadmin-config-specification>`
+   {ref}`Deployment Guide <flyteadmin-config-specification>`
 
 
 

@@ -1,6 +1,6 @@
 (deployment)=
 
-# Deployment Guide
+# Cluster deployment
 
 These *Deployment Guides* are primarily for platform and devops engineers to learn how to deploy and administer Flyte.
 
