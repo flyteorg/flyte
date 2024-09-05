@@ -33,7 +33,7 @@ func TestInMemoryStore_GetItems(t *testing.T) {
 	t.Run("Nil Path", func(t *testing.T) {
 		s, err := NewInMemoryRawStore(context.TODO(), &Config{}, metrics)
 		assert.NoError(t, err)
-		
+
 		items, err := s.GetItems(context.TODO(), DataReference("hello"))
 		assert.Error(t, err)
 		assert.Nil(t, items)
