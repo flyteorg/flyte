@@ -55,6 +55,7 @@ func dummyCacheStore(t *testing.T, store RawStore, metrics *cacheMetrics) *cache
 type dummyStore struct {
 	copyImpl
 	HeadCb     func(ctx context.Context, reference DataReference) (Metadata, error)
+	GetItemsCb func(ctx context.Context, reference DataReference) ([]string, error)
 	ReadRawCb  func(ctx context.Context, reference DataReference) (io.ReadCloser, error)
 	WriteRawCb func(ctx context.Context, reference DataReference, size int64, opts Options, raw io.Reader) error
 	DeleteCb   func(ctx context.Context, reference DataReference) error
@@ -74,7 +75,7 @@ func (d *dummyStore) Head(ctx context.Context, reference DataReference) (Metadat
 }
 
 func (d *dummyStore) GetItems(ctx context.Context, reference DataReference) ([]string, error) {
-	return d.GetItems(ctx, reference)
+	return d.GetItemsCb(ctx, reference)
 }
 
 func (d *dummyStore) ReadRaw(ctx context.Context, reference DataReference) (io.ReadCloser, error) {

@@ -55,8 +55,7 @@ func (s *cachedRawStore) GetItems(ctx context.Context, reference DataReference) 
 	defer span.End()
 
 	// freecache does not support full cache scanning
-	var items []string
-	return items, nil
+	return s.RawStore.GetItems(ctx, reference)
 }
 
 // ReadRaw retrieves a byte array from the Blob store or an error
