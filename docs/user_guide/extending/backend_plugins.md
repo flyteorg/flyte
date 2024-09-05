@@ -33,11 +33,11 @@ specification, `flytekit` plugin implementation, and `flytepropeller` plugin imp
 
 ### Interface specification
 
-Usually Flyte extensions need information that is not covered by a {ref}`Flyte TaskTemplate <protos/docs/core/core:tasktemplate>`. The TaskTemplate consists of a
+Usually Flyte extensions need information that is not covered by a {ref}`Flyte TaskTemplate <ref_flyteidl.core.TaskTemplate>`. The TaskTemplate consists of a
 the interface, task_type identifier, some metadata and other fields.
 
 ```{note}
-An important field to note here is {ref}`custom <protos/docs/core/core:tasktemplate>`. The custom field is essentially an unstructured JSON. This makes it possible to extend a task-template beyond the default supported targets {ref}`container <protos/docs/core/core:tasktemplate>`.
+An important field to note here is {ref}`custom <ref_flyteidl.core.TaskTemplate>`. The custom field is essentially an unstructured JSON. This makes it possible to extend a task-template beyond the default supported targets {ref}`container <ref_flyteidl.core.TaskTemplate>`.
 
 The motivation of the `custom`` field is to marshal a JSON structure that specifies information beyond what a regular TaskTemplate can capture. The actual structure of the JSON is known only to the implemented backend-plugin and the SDK components. The core Flyte platform, does not understand of look into the specifics of this structure.
 ```

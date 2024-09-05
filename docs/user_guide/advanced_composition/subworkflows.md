@@ -65,7 +65,7 @@ These external invocations of a workflow, initiated using launch plans from a pa
 are termed as external workflows. They may have separate parallelism constraints since the context is not shared.
 
 :::{tip}
-If your deployment uses {ref}`multiple Kubernetes clusters <flyte:deployment-deployment-multicluster>`,
+If your deployment uses {ref}`multiple Kubernetes clusters <deployment-deployment-multicluster>`,
 external workflows may offer a way to distribute the workload of a workflow across multiple clusters.
 :::
 

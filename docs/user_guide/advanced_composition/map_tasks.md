@@ -28,7 +28,7 @@ To begin, import the required libraries:
 :lines: 1
 ```
 
-Here's a simple workflow that uses {py:func}`map_task <flytekit:flytekit.map_task>`:
+Here's a simple workflow that uses {py:func}`map_task <flytekit.map_task>`:
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/advanced_composition/advanced_composition/map_task.py
 :caption: advanced_composition/map_task.py

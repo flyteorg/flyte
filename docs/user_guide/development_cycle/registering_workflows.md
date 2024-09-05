@@ -13,7 +13,7 @@ pre-defined cadence, and leverage the Flyte backend plugins like Spark.
 This guide assumes that you:
 
 - Have a local Flyte cluster running with `flytectl demo start` as described in {ref}`"Running workflows locally" <getting_started_running_workflow_local_cluster>` guide.
-- Followed the {doc}`Creating a Flyte project <../getting_started_with_workflow_development/creating_a_flyte_project>`
+- Followed the {doc}`Creating a Flyte project <../first_workflow/creating_a_flyte_project>`
   guide to create a minimal Flyte project.
 ```
 
@@ -48,7 +48,7 @@ The following diagram provides a summarized view of the different registration p
 
 The quickest way to register a task or workflow to a Flyte cluster is with the
 `pyflyte run` CLI command. Assuming that you're inside the `my_project` directory
-that we created in {doc}`Creating a Flyte project <../getting_started_with_workflow_development/creating_a_flyte_project>`,
+that we created in {doc}`Creating a Flyte project <../first_workflow/creating_a_flyte_project>`,
 you can invoke it like so:
 
 ```{prompt} bash $
@@ -342,7 +342,7 @@ you're:
 
 You can also perform the equivalent of the three methods of registration using
 a {py:class}`~flytekit.remote.remote.FlyteRemote` object. You can learn more
-about how to do this {ref}`here <flytekit:design-control-plane>`.
+about how to do this {ref}`here <design-control-plane>`.
 ```
 
 ## CI/CD with Flyte and GitHub Actions

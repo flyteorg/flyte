@@ -5,7 +5,7 @@
 ## Prerequisites
 
 - Make sure you have [docker](https://docs.docker.com/get-docker/) and [git](https://git-scm.com/) installed.
-- Install {doc}`flytectl <flytectl:index>`, the commandline interface for Flyte.
+- Install {doc}`flytectl <../api/flytectl/index>`, the commandline interface for Flyte.
 
 ## Repo setup
 
@@ -167,7 +167,7 @@ These examples will explicitly show you which images to use for running these ex
 image you want to use with the `--image` option in `pyflyte run`.
 :::
 
-🎉 Congrats! Now you can run all the examples in the {ref}`userguide` 🎉!
+🎉 Congrats! Now you can run all the examples in the {ref}`user_guide` 🎉!
 
 ## Configuring the demo cluster to use additional resources
 
