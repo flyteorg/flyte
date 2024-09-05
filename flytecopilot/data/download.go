@@ -40,7 +40,6 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 		return nil, errors.Wrapf(err, "Blob uri incorrectly formatted")
 	}
 
-	var reader io.ReadCloser
 	if blob.GetMetadata().GetType().Dimensionality == core.BlobType_MULTIPART {
 		items, err := d.store.GetItems(ctx, ref)
 		if err != nil || len(items) == 0 {
@@ -52,18 +51,20 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 		var mu sync.Mutex
 		var wg sync.WaitGroup
 		for _, absPath := range items {
-			absPath := absPath // capture range variable
+			// capture range variable
+			absPath := absPath
+
 			wg.Add(1)
 			go func() {
 				defer wg.Done()
 				defer func() {
 					if err := recover(); err != nil {
-						logger.Errorf(ctx,"recover receives error: %s", err)
+						logger.Errorf(ctx, "recover receives error: %s", err)
 					}
 				}()
 
-				ref = storage.DataReference(absPath)
-				reader, err = DownloadFileFromStorage(ctx, ref, d.store)
+				ref := storage.DataReference(absPath)
+				reader, err := DownloadFileFromStorage(ctx, ref, d.store)
 				if err != nil {
 					logger.Errorf(ctx, "Failed to download from ref [%s]", ref)
 					return
@@ -82,7 +83,7 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 				}
 				newPath := filepath.Join(toPath, relativePath)
 				dir := filepath.Dir(newPath)
-				
+
 				mu.Lock()
 				// 0755: the directory can be read by anyone but can only be written by the owner
 				os.MkdirAll(dir, 0755)
@@ -104,7 +105,9 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 					logger.Errorf(ctx, "failed to write remote data to local filesystem")
 					return
 				}
+				mu.Lock()
 				success += 1
+				mu.Unlock()
 			}()
 		}
 		wg.Wait()
@@ -112,7 +115,9 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 		logger.Infof(ctx, "Successfully copied [%d] remote files from [%s] to local [%s]", success, ref, toPath)
 		return toPath, nil
 	}
-	
+
+	// reader should be declared here (avoid being shared across all goroutines)
+	var reader io.ReadCloser
 	if scheme == "http" || scheme == "https" {
 		reader, err = DownloadFileFromHTTP(ctx, ref)
 	} else {
