@@ -65,7 +65,7 @@ func TestGetExecutionName(t *testing.T) {
 	})
 
 	t.Run("deterministic name", func(t *testing.T) {
-		hashValue := identifier.HashScheduledTimeStamp(context.Background(), core.Identifier{
+		hashValue := identifier.HashScheduledTimeStamp(context.Background(), &core.Identifier{
 			Project: "Project",
 			Domain:  "Domain",
 			Name:    "Name",
