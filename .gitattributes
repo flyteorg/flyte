@@ -1,5 +1,5 @@
+**/go.sum linguist-generated=true
 docs/**/*html linguist-generated=true
 flyteidl/gen/** linguist-generated=true
 flyteidl/protos/**/*.rst linguist-generated=true
 flyteidl/clients/go/assets/admin.swagger.json linguist-generated=true
-
