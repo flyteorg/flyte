@@ -1,6 +1,6 @@
 import typing
 from grafanalib.core import (
-    Alert, AlertCondition, Dashboard, Graph,
+    Alert, AlertCondition, Dashboard, Graph,BarChart,
     GreaterThan, OP_AND, OPS_FORMAT, Row, RTYPE_SUM, SECONDS_FORMAT,
     SHORT_FORMAT, single_y_axis, Target, TimeRange, YAxes, YAxis, MILLISECONDS_FORMAT, Templating, Template,
     DataSourceInput
@@ -169,27 +169,28 @@ class FlyteUserDashboard(object):
                     ],
                     yAxes=single_y_axis(format=SHORT_FORMAT),
                 ),
-                Graph(
-                    title="Memory Usage Percentage",
+                BarChart(
+                    title="Task Memory Usage (%)",
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
                             expr='(100 * max(container_memory_working_set_bytes * on(pod) group_left( label_task_name, label_node_id, label_workflow_name) kube_pod_labels{namespace=~"$project-$domain",label_workflow_name=~"$workflow"} * on(pod) group_left(phase) kube_pod_status_phase{phase="Running"}) by (namespace, pod, label_task_name, label_node_id, label_workflow_name) / max(cluster:namespace:pod_memory:active:kube_pod_container_resource_limits{container!=""} * on(pod) group_left(label_task_name, label_node_id, label_workflow_name) kube_pod_labels * on(pod) group_left(phase) kube_pod_status_phase{phase="Running"}) by (namespace, pod, label_task_name, label_node_id, label_workflow_name)) > 0 ',
                             refId='A',
                         ),
+
                     ],
-                    yAxes=single_y_axis(format=SHORT_FORMAT),
-                ),
-                Graph(
-                    title="CPU Usage Percentage",
+                      showValue='true',
+                     ),
+                BarChart(
+                    title="Task CPU Usage (%)",
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr='(100* sum(rate(container_cpu_usage_seconds_total{image!=""}[2m]) * on(pod) group_left(label_execution_id, label_task_name, label_node_id, label_workflow_name) kube_pod_labels{label_execution_id !="",namespace=~"$project-$domain",label_workflow_name=~"$workflow"} * on(pod) group_left(phase) kube_pod_status_phase{phase="Running"}) by (namespace, pod, label_execution_id, label_task_name, label_node_id, label_workflow_name) / sum(kube_pod_container_resource_limits_cpu_cores{container!=""} * on(pod) group_left(label_execution_id, label_task_name, label_node_id, label_workflow_name) kube_pod_labels{label_execution_id !=""} * on(pod) group_left(phase) kube_pod_status_phase{phase="Running"}) by (namespace, pod, label_execution_id, label_task_name, label_node_id, label_workflow_name)) > 0',
+                            expr='(100* sum(rate(container_cpu_usage_seconds_total[2m]) * on(pod) group_left(label_task_name, label_node_id, label_workflow_name) kube_pod_labels{namespace=~"$project-$domain",label_workflow_name=~"$workflow"} * on(pod) group_left(phase) kube_pod_status_phase{phase="Running"}) by (namespace, pod, label_task_name, label_node_id, label_workflow_name) / sum(cluster:namespace:pod_cpu:active:kube_pod_container_resource_limits * on(pod) group_left(label_task_name, label_node_id, label_workflow_name) kube_pod_labels * on(pod) group_left(phase) kube_pod_status_phase{phase="Running"}) by (namespace, pod, label_task_name, label_node_id, label_workflow_name)) > 0',
                             refId='A',
                         ),
                     ],
-                    yAxes=single_y_axis(format=SHORT_FORMAT),
+                    showValue='true',
                 ),
             ])
 
