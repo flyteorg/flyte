@@ -135,6 +135,11 @@ message LiteralMap {
 // A collection of fields for tuple literal.
 message LiteralTupleMap {
     TupleType type = 1;
+
+    // TODO: Change to this
+    // string tuple_name = 1;
+    // repeated string order = 2;
+    
     map<string, Literal> literals = 2;
 }
 

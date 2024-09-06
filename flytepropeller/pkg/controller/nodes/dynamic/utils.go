@@ -51,6 +51,13 @@ func updateBindingNodeIDsWithLineage(parentNodeID, retryAttempt string, binding 
 				return err
 			}
 		}
+	case *core.BindingData_Tuple:
+		for _, item := range b.Tuple.Bindings {
+			err = updateBindingNodeIDsWithLineage(parentNodeID, retryAttempt, item)
+			if err != nil {
+				return err
+			}
+		}
 	}
 
 	return nil

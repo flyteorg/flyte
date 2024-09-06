@@ -81,6 +81,26 @@ func ResolveBindingData(ctx context.Context, outputResolver OutputResolver, nl e
 		}
 
 		return outputResolver.ExtractOutput(ctx, nl, n, bindToVar, bindAttrPath)
+	case *core.BindingData_Tuple:
+		logger.Debugf(ctx, "bindingData.GetValue() [%v] is of type Tuple", bindingData.GetValue())
+		literalMap := make(map[string]*core.Literal, len(bindingData.GetTuple().GetBindings()))
+		for k, v := range bindingData.GetTuple().GetBindings() {
+			l, err := ResolveBindingData(ctx, outputResolver, nl, v)
+			if err != nil {
+				logger.Debugf(ctx, "Failed to resolve binding data. Error: [%v]", err)
+				return nil, err
+			}
+
+			literalMap[k] = l
+		}
+
+		literal.Value = &core.Literal_Tuple{
+			Tuple: &core.LiteralTupleMap{
+				Type:   bindingData.GetTuple().GetType(),
+				Literals: literalMap,
+			},
+		}
+
 	case *core.BindingData_Scalar:
 		logger.Debugf(ctx, "bindingData.GetValue() [%v] is of type Scalar", bindingData.GetValue())
 		literal.Value = &core.Literal_Scalar{Scalar: bindingData.GetScalar()}

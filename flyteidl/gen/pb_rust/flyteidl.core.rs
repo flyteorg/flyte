@@ -552,6 +552,10 @@ pub struct LiteralMap {
 pub struct LiteralTupleMap {
     #[prost(message, optional, tag="1")]
     pub r#type: ::core::option::Option<TupleType>,
+    // TODO: Change to this
+    // string tuple_name = 1;
+    // repeated string order = 2;
+
     #[prost(map="string, message", tag="2")]
     pub literals: ::std::collections::HashMap<::prost::alloc::string::String, Literal>,
 }

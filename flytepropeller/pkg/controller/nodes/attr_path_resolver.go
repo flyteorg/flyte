@@ -31,6 +31,22 @@ func resolveAttrPathInPromise(nodeID string, literal *core.Literal, bindAttrPath
 			}
 			currVal = currVal.GetCollection().GetLiterals()[attr.GetIntValue()]
 			count++
+		case *core.Literal_Tuple:
+			var key string
+			if attr.GetStringValue() != "" {
+				key = attr.GetStringValue()
+			} else {
+				if int(attr.GetIntValue()) >= len(currVal.GetTuple().GetType().GetOrder()) {
+					return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID, "index [%v] is out of range of %v", attr.GetIntValue(), currVal.GetTuple().GetType().Order)
+				}
+				key = currVal.GetTuple().GetType().GetOrder()[attr.GetIntValue()]
+			}
+			tmpVal, exist = currVal.GetTuple().GetLiterals()[key]
+			if !exist {
+				return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID, "key [%v] does not exist in literal %v", key, currVal.GetTuple().GetLiterals())
+			}
+			currVal = tmpVal
+			count++
 		// scalar is always the leaf, so we can break here
 		case *core.Literal_Scalar:
 			break
