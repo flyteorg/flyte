@@ -183,3 +183,49 @@ func TestGetTTLSeconds(t *testing.T) {
 		})
 	}
 }
+
+func TestSanitizePodName(t *testing.T) {
+	tests := []struct {
+		name   string
+		input  string
+		output string
+	}{
+		{
+			name:   "Base",
+			input:  "test",
+			output: "test",
+		},
+		{
+			name:   "ReplaceUnderScoreWithDash",
+			input:  "t_e_s_t",
+			output: "t-e-s-t",
+		},
+		{
+			name:   "ToLower",
+			input:  "TEST",
+			output: "test",
+		},
+		{
+			name:   "RemoveSpecialCharacters",
+			input:  "t!e@s#t$",
+			output: "test",
+		},
+		{
+			name:   "StripLeadingDashOrDot",
+			input:  "-.test",
+			output: "test",
+		},
+		{
+			name:   "CutOffLongName",
+			input:  "testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest",
+			output: "testtesttesttesttesttesttesttesttesttesttesttestte",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			output := sanitizeEnvName(test.input)
+			assert.Equal(t, test.output, output)
+		})
+	}
+}

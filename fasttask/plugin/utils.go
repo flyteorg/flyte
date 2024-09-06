@@ -3,6 +3,8 @@ package plugin
 import (
 	"encoding/json"
 	"fmt"
+	"regexp"
+	"strings"
 	"time"
 
 	"k8s.io/api/core/v1"
@@ -13,10 +15,17 @@ import (
 	"github.com/unionai/flyte/fasttask/plugin/pb"
 )
 
+var nonLowerAlphanumericDashOrDotRegex = regexp.MustCompile(`[^a-z0-9\.\-]+`)
+
 // isValidEnvironmentSpec validates the FastTaskEnvironmentSpec
 func isValidEnvironmentSpec(executionEnvironmentID core.ExecutionEnvID, fastTaskEnvironmentSpec *pb.FastTaskEnvironmentSpec) error {
 	if len(executionEnvironmentID.Name) == 0 {
 		return fmt.Errorf("execution environment name is required")
+	}
+
+	if len(sanitizeEnvName(executionEnvironmentID.Name)) == 0 {
+		return fmt.Errorf("sanitizing execution environment name '%s' results in an invalid k8s pod name '%s', it must adhere to RFC 1123.",
+			executionEnvironmentID.Name, sanitizeEnvName(executionEnvironmentID.Name))
 	}
 
 	if len(executionEnvironmentID.Version) == 0 {
@@ -62,4 +71,27 @@ func getTTLOrDefault(fastTaskEnvironmentSpec *pb.FastTaskEnvironmentSpec) time.D
 
 func isPodNotFoundErr(err error) bool {
 	return k8serrors.IsNotFound(err) || k8serrors.IsGone(err)
+}
+
+// sanitizeEnvName sanitizes the environment name to be a valid k8s pod name. This means it converts
+// the name to lowercase, replaces all underscores with dashes, removes all non-alphanumeric or dash
+// characters, strips leading dashes, and truncates the name to be 63 characters with the appended
+// nonce value.
+func sanitizeEnvName(name string) string {
+	// convert to lowercase
+	lowerName := strings.ToLower(name)
+
+	// replace all underscores with dashes
+	dashedName := strings.ReplaceAll(lowerName, "_", "-")
+
+	// remove all non-alphanumeric or dash characters
+	cleanedName := nonLowerAlphanumericDashOrDotRegex.ReplaceAllString(dashedName, "")
+
+	// strip leading dashes or periods
+	for strings.HasPrefix(cleanedName, "-") || strings.HasPrefix(cleanedName, ".") {
+		cleanedName = cleanedName[1:]
+	}
+
+	// return the first `N` characters where `N` is 63 characters minus the nonce length and dash
+	return cleanedName[:min(len(cleanedName), 63-(GetConfig().NonceLength+1))]
 }

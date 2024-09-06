@@ -205,7 +205,7 @@ func (i *InMemoryEnvBuilder) getPodName(envName string) string {
 		return ""
 	}
 
-	return fmt.Sprintf("%s-%s", envName, hex.EncodeToString(nonceBytes)[:GetConfig().NonceLength])
+	return fmt.Sprintf("%s-%s", sanitizeEnvName(envName), hex.EncodeToString(nonceBytes)[:GetConfig().NonceLength])
 }
 
 // Status returns the status of the environment with the given execution environment ID. This
@@ -488,12 +488,13 @@ func (i *InMemoryEnvBuilder) repairEnvironments(ctx context.Context) error {
 			}, pod)
 
 			if isPodNotFoundErr(err) {
-				nonceBytes := make([]byte, (GetConfig().NonceLength+1)/2)
+				newPodName := i.getPodName(env.name)
+				/*nonceBytes := make([]byte, (GetConfig().NonceLength+1)/2)
 				if _, err := i.randSource.Read(nonceBytes); err != nil {
 					return err
 				}
 
-				newPodName := fmt.Sprintf("%s-%s", env.name, hex.EncodeToString(nonceBytes)[:GetConfig().NonceLength])
+				newPodName := fmt.Sprintf("%s-%s", env.name, hex.EncodeToString(nonceBytes)[:GetConfig().NonceLength])*/
 				env.replicas[index] = newPodName
 				podNames = append(podNames, newPodName)
 			}
