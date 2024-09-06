@@ -96,7 +96,7 @@ class FlyteUserDashboard(object):
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr='sum(flyte:propeller:all:node:queueing_latency_ms{project=~"$project", domain=~"$domain", wf=~"$workflow"}) by (quantile)',
+                            expr='(flyte:propeller:all:node:queueing_latency_ms{project=~"$project", domain=~"$domain", wf=~"$workflow"}) by (quantile)',
                             refId='A',
                         ),
                     ],
@@ -163,7 +163,7 @@ class FlyteUserDashboard(object):
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr='sum(kube_pod_container_status_waiting * on(pod) group_left(label_execution_id, label_task_name, label_node_id, label_workflow_name) kube_pod_labels{label_execution_id !="",namespace=~"$project-$domain",label_workflow_name=~"$workflow"}) by (namespace, label_execution_id, label_task_name, label_node_id, label_workflow_name) > 0',
+                            expr='sum(kube_pod_status_phase{phase="Pending"} * on(pod) group_left(label_task_name, label_node_id, label_workflow_name) kube_pod_labels{label_workflow_name=~"$workflow"}) by (namespace, label_task_name, label_node_id, label_workflow_name) > 0',
                             refId='A',
                         ),
                     ],
@@ -174,7 +174,7 @@ class FlyteUserDashboard(object):
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr='(100 * max(container_memory_rss{image!=""} * on(pod) group_left(label_execution_id, label_task_name, label_node_id, label_workflow_name) kube_pod_labels{label_execution_id !="",namespace=~"$project-$domain",label_workflow_name=~"$workflow"} * on(pod) group_left(phase) kube_pod_status_phase{phase="Running"}) by (namespace, pod, label_execution_id, label_task_name, label_node_id, label_workflow_name) / max(kube_pod_container_resource_limits_memory_bytes{container!=""} * on(pod) group_left(label_execution_id, label_task_name, label_node_id, label_workflow_name) kube_pod_labels{label_execution_id !=""} * on(pod) group_left(phase) kube_pod_status_phase{phase="Running"}) by (namespace, pod, label_execution_id, label_task_name, label_node_id, label_workflow_name)) > 0',
+                            expr='(100 * max(container_memory_rss * on(pod) group_left(label_execution_id, label_task_name, label_node_id, label_workflow_name) kube_pod_labels{label_execution_id !="",namespace=~"$project-$domain",label_workflow_name=~"$workflow"} * on(pod) group_left(phase) kube_pod_status_phase{phase="Running"}) by (namespace, pod, label_execution_id, label_task_name, label_node_id, label_workflow_name) / max(kube_pod_container_resource_limits_memory_bytes{container!=""} * on(pod) group_left(label_execution_id, label_task_name, label_node_id, label_workflow_name) kube_pod_labels{label_execution_id !=""} * on(pod) group_left(phase) kube_pod_status_phase{phase="Running"}) by (namespace, pod, label_execution_id, label_task_name, label_node_id, label_workflow_name)) > 0',
                             refId='A',
                         ),
                     ],
