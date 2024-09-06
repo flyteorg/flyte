@@ -91,17 +91,6 @@ class FlyteUserDashboard(object):
                     ],
                     yAxes=single_y_axis(format=MILLISECONDS_FORMAT),
                 ),
-                Graph(
-                    title="Node queuing latency by Quantile",
-                    dataSource=DATASOURCE,
-                    targets=[
-                        Target(
-                            expr='(flyte:propeller:all:node:queueing_latency_ms{project=~"$project", domain=~"$domain", wf=~"$workflow"}) by (quantile)',
-                            refId='A',
-                        ),
-                    ],
-                    yAxes=single_y_axis(format=MILLISECONDS_FORMAT),
-                ),
             ])
 
     @staticmethod
@@ -186,7 +175,7 @@ class FlyteUserDashboard(object):
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr='(100* sum(rate(container_cpu_usage_seconds_total[2m]) * on(pod) group_left(label_task_name, label_node_id, label_workflow_name) kube_pod_labels{namespace=~"$project-$domain",label_workflow_name=~"$workflow"} * on(pod) group_left(phase) kube_pod_status_phase{phase="Running"}) by (namespace, pod, label_task_name, label_node_id, label_workflow_name) / sum(cluster:namespace:pod_cpu:active:kube_pod_container_resource_limits * on(pod) group_left(label_task_name, label_node_id, label_workflow_name) kube_pod_labels * on(pod) group_left(phase) kube_pod_status_phase{phase="Running"}) by (namespace, pod, label_task_name, label_node_id, label_workflow_name)) > 0',
+                            expr='(max(container_cpu_usage_seconds_total * on(pod) group_left(label_task_name, label_node_id, label_workflow_name) kube_pod_labels{namespace=~"$project-$domain",label_workflow_name=~"$workflow"} * on(pod) group_left(phase) kube_pod_status_phase{phase="Running"}) by (namespace, pod, label_task_name, label_node_id, label_workflow_name) / max(cluster:namespace:pod_cpu:active:kube_pod_container_resource_limits * on(pod) group_left(label_task_name, label_node_id, label_workflow_name) kube_pod_labels * on(pod) group_left(phase) kube_pod_status_phase{phase="Running"}) by (namespace, pod, label_task_name, label_node_id, label_workflow_name)) > 0',
                             refId='A',
                         ),
                     ],
