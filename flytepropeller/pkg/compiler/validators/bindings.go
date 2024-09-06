@@ -134,6 +134,19 @@ func validateBinding(w c.WorkflowBuilder, nodeID c.NodeID, nodeParam string, bin
 						sourceType = sourceType.GetCollectionType()
 					} else if sourceType.GetMapValueType() != nil {
 						sourceType = sourceType.GetMapValueType()
+					} else if sourceType.GetTupleType() != nil {
+						var key string
+						if attr.GetStringValue() != "" {
+							key = attr.GetStringValue()
+						} else {
+							key = sourceType.GetTupleType().Order[attr.GetIntValue()]
+						}
+						sourceType, exist = sourceType.GetTupleType().GetFields()[key]
+						if !exist {
+							errs.Collect(errors.NewFieldNotFoundErr(nodeID, val.Promise.Var, sourceType.String(), key))
+							return nil, nil, !errs.HasErrors()
+						}
+
 					} else if sourceType.GetStructure() != nil && sourceType.GetStructure().GetDataclassType() != nil {
 
 						tmpType, exist = sourceType.GetStructure().GetDataclassType()[attr.GetStringValue()]
