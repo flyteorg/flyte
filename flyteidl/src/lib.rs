@@ -492,7 +492,7 @@ pub mod _flyteidl_rust {
     #[pymodule]
     pub mod array_node {
         #[pymodule_export]
-        use crate::flyteidl::core::array_node::{ParallelismOption, SuccessCriteria};
+        use crate::flyteidl::core::array_node::{ParallelismOption, SuccessCriteria, ExecutionMode};
     }
     #[pymodule]
     pub mod catalog_metadata {
