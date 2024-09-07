@@ -453,6 +453,25 @@ func MakeLiteralMap(v map[string]interface{}) (*core.LiteralMap, error) {
 	}, nil
 }
 
+func MakeLiteralTuple(name string, order []string, v map[string]interface{}) (*core.LiteralTupleMap, error) {
+	literals := make(map[string]*core.Literal, len(v))
+	for key, val := range v {
+		l, err := MakeLiteral(val)
+		if err != nil {
+			return nil, err
+		}
+
+		literals[key] = l
+	}
+
+	return &core.LiteralTupleMap{
+		TupleName: name,
+		Order: order,
+		Literals: literals,
+	}, nil
+
+}
+
 func MakeLiteralForSchema(path storage.DataReference, columns []*core.SchemaType_SchemaColumn) *core.Literal {
 	return &core.Literal{
 		Value: &core.Literal_Scalar{
@@ -663,14 +682,14 @@ func MakeLiteralForType(t *core.LiteralType, v interface{}) (*core.Literal, erro
 		}
 		// check whether all the key provided by vMap is valid.
 		for key := range vMap {
-			if _, ok := t.GetTupleType().Fields[key]; !ok {
+			if _, ok := t.GetTupleType().GetFields()[key]; !ok {
 				return nil, fmt.Errorf("key %s not found in tuple type", key)
 			}
 		}
 
 		literals := make(map[string]*core.Literal, len(vMap))
 		// iterate over the fields in the tuple type
-		for key, fieldType := range t.GetTupleType().Fields {
+		for key, fieldType := range t.GetTupleType().GetFields() {
 			l, err := MakeLiteralForType(fieldType, vMap[key])
 			if err != nil {
 				return nil, err
@@ -680,8 +699,9 @@ func MakeLiteralForType(t *core.LiteralType, v interface{}) (*core.Literal, erro
 		l = &core.Literal{
 			Value: &core.Literal_Tuple{
 				Tuple: &core.LiteralTupleMap{
-					Type:     t.GetTupleType(),
-					Literals: literals,
+					TupleName: t.GetTupleType().GetTupleName(),
+					Order:     t.GetTupleType().GetOrder(),
+					Literals:  literals,
 				},
 			},
 		}

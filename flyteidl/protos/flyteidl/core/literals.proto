@@ -134,13 +134,14 @@ message LiteralMap {
 
 // A collection of fields for tuple literal.
 message LiteralTupleMap {
-    TupleType type = 1;
+    // The name of the NamedTuple. If it is original tuple, it would be empty string.
+    string tuple_name = 1;
 
-    // TODO: Change to this
-    // string tuple_name = 1;
-    // repeated string order = 2;
+    // The order of each fields stored in the tuple.
+    repeated string order = 2;
     
-    map<string, Literal> literals = 2;
+    // A map of literals.
+    map<string, Literal> literals = 3;
 }
 
 // A collection of BindingData items.
@@ -155,8 +156,14 @@ message BindingDataMap {
 
 // A collection of fields for tuple binding data.
 message BindingDataTupleMap {
-    TupleType type = 1;
-    map<string, BindingData> bindings = 2;
+    // The name of the NamedTuple. If it is original tuple, it would be empty string.
+    string tuple_name = 1;
+
+    // The order of each fields stored in the tuple.
+    repeated string order = 2;
+    
+    // A map of BindingData items.
+    map<string, BindingData> bindings = 3;
 }
 
 message UnionInfo {

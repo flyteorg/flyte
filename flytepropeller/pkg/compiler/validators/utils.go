@@ -274,8 +274,8 @@ func LiteralTypeForLiteral(l *core.Literal) *core.LiteralType {
 		return &core.LiteralType{
 			Type: &core.LiteralType_TupleType{
 				TupleType: &core.TupleType{
-					TupleName: l.GetTuple().GetType().GetTupleName(),
-					Order:     l.GetTuple().GetType().GetOrder(),
+					TupleName: l.GetTuple().GetTupleName(),
+					Order:     l.GetTuple().GetOrder(),
 					Fields:    fields,
 				},
 			},

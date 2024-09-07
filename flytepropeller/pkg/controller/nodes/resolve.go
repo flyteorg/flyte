@@ -96,8 +96,9 @@ func ResolveBindingData(ctx context.Context, outputResolver OutputResolver, nl e
 
 		literal.Value = &core.Literal_Tuple{
 			Tuple: &core.LiteralTupleMap{
-				Type:   bindingData.GetTuple().GetType(),
-				Literals: literalMap,
+				TupleName: bindingData.GetTuple().GetTupleName(),
+				Order:     bindingData.GetTuple().GetOrder(),
+				Literals:  literalMap,
 			},
 		}
 

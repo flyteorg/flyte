@@ -222,6 +222,54 @@ func TestResolveAttrPathIn(t *testing.T) {
 			expected: NewScalarLiteral("car"),
 			hasError: false,
 		},
+		// - tuple with string index (foo1: "bar1", foo2: "bar2")
+		{
+			literal: &core.Literal{
+				Value: &core.Literal_Tuple{
+					Tuple: &core.LiteralTupleMap{
+						TupleName: "DefaultTuple",
+						Order:     []string{"foo1", "foo2"},
+						Literals: map[string]*core.Literal{
+							"foo1": NewScalarLiteral("bar1"),
+							"foo2": NewScalarLiteral("bar2"),
+						},
+					},
+				},
+			},
+			path: []*core.PromiseAttribute{
+				&core.PromiseAttribute{
+					Value: &core.PromiseAttribute_StringValue{
+						StringValue: "foo1",
+					},
+				},
+			},
+			expected: NewScalarLiteral("bar1"),
+			hasError: false,
+		},
+		// - tuple with int index (foo1: "bar1", foo2: "bar2")
+		{
+			literal: &core.Literal{
+				Value: &core.Literal_Tuple{
+					Tuple: &core.LiteralTupleMap{
+						TupleName: "DefaultTuple",
+						Order:     []string{"foo1", "foo2"},
+						Literals: map[string]*core.Literal{
+							"foo2": NewScalarLiteral("bar2"),
+							"foo1": NewScalarLiteral("bar1"),
+						},
+					},
+				},
+			},
+			path: []*core.PromiseAttribute{
+				&core.PromiseAttribute{
+					Value: &core.PromiseAttribute_IntValue{
+						IntValue: 1,
+					},
+				},
+			},
+			expected: NewScalarLiteral("bar2"),
+			hasError: false,
+		},
 		// - exception key error with map
 		{
 			literal: &core.Literal{
@@ -310,6 +358,54 @@ func TestResolveAttrPathIn(t *testing.T) {
 				&core.PromiseAttribute{
 					Value: &core.PromiseAttribute_IntValue{
 						IntValue: 100,
+					},
+				},
+			},
+			expected: &core.Literal{},
+			hasError: true,
+		},
+		// - exception string index not found with tuple
+		{
+			literal: &core.Literal{
+				Value: &core.Literal_Tuple{
+					Tuple: &core.LiteralTupleMap{
+						TupleName: "DefaultTuple",
+						Order:     []string{"foo1", "foo2"},
+						Literals: map[string]*core.Literal{
+							"foo1": NewScalarLiteral("bar1"),
+							"foo2": NewScalarLiteral("bar2"),
+						},
+					},
+				},
+			},
+			path: []*core.PromiseAttribute{
+				&core.PromiseAttribute{
+					Value: &core.PromiseAttribute_StringValue{
+						StringValue: "foo3",
+					},
+				},
+			},
+			expected: &core.Literal{},
+			hasError: true,
+		},
+		// - exception int index out of range with tuple
+		{
+			literal: &core.Literal{
+				Value: &core.Literal_Tuple{
+					Tuple: &core.LiteralTupleMap{
+						TupleName: "DefaultTuple",
+						Order:     []string{"foo1", "foo2"},
+						Literals: map[string]*core.Literal{
+							"foo2": NewScalarLiteral("bar2"),
+							"foo1": NewScalarLiteral("bar1"),
+						},
+					},
+				},
+			},
+			path: []*core.PromiseAttribute{
+				&core.PromiseAttribute{
+					Value: &core.PromiseAttribute_IntValue{
+						IntValue: 2,
 					},
 				},
 			},

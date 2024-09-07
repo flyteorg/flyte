@@ -56,6 +56,24 @@ func MakeBindingDataMap(pairs ...Pair) *core.BindingData {
 	}
 }
 
+func MakeBindingDataTuple(tupleName string, pairs []Pair) *core.BindingData {
+	bindingsMap := map[string]*core.BindingData{}
+	order := []string{}
+	for _, p := range pairs {
+		bindingsMap[p.K] = p.V
+		order = append(order, p.K)
+	}
+	return &core.BindingData{
+		Value: &core.BindingData_Tuple{
+			Tuple: &core.BindingDataTupleMap{
+				TupleName: tupleName,
+				Order:     order,
+				Bindings:  bindingsMap,
+			},
+		},
+	}
+}
+
 func MakePrimitiveBindingData(v interface{}) (*core.BindingData, error) {
 	p, err := coreutils.MakePrimitive(v)
 	if err != nil {

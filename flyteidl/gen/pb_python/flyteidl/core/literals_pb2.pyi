@@ -150,7 +150,7 @@ class LiteralMap(_message.Message):
     def __init__(self, literals: _Optional[_Mapping[str, Literal]] = ...) -> None: ...
 
 class LiteralTupleMap(_message.Message):
-    __slots__ = ["type", "literals"]
+    __slots__ = ["tuple_name", "order", "literals"]
     class LiteralsEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -158,11 +158,13 @@ class LiteralTupleMap(_message.Message):
         key: str
         value: Literal
         def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[Literal, _Mapping]] = ...) -> None: ...
-    TYPE_FIELD_NUMBER: _ClassVar[int]
+    TUPLE_NAME_FIELD_NUMBER: _ClassVar[int]
+    ORDER_FIELD_NUMBER: _ClassVar[int]
     LITERALS_FIELD_NUMBER: _ClassVar[int]
-    type: _types_pb2.TupleType
+    tuple_name: str
+    order: _containers.RepeatedScalarFieldContainer[str]
     literals: _containers.MessageMap[str, Literal]
-    def __init__(self, type: _Optional[_Union[_types_pb2.TupleType, _Mapping]] = ..., literals: _Optional[_Mapping[str, Literal]] = ...) -> None: ...
+    def __init__(self, tuple_name: _Optional[str] = ..., order: _Optional[_Iterable[str]] = ..., literals: _Optional[_Mapping[str, Literal]] = ...) -> None: ...
 
 class BindingDataCollection(_message.Message):
     __slots__ = ["bindings"]
@@ -184,7 +186,7 @@ class BindingDataMap(_message.Message):
     def __init__(self, bindings: _Optional[_Mapping[str, BindingData]] = ...) -> None: ...
 
 class BindingDataTupleMap(_message.Message):
-    __slots__ = ["type", "bindings"]
+    __slots__ = ["tuple_name", "order", "bindings"]
     class BindingsEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -192,11 +194,13 @@ class BindingDataTupleMap(_message.Message):
         key: str
         value: BindingData
         def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[BindingData, _Mapping]] = ...) -> None: ...
-    TYPE_FIELD_NUMBER: _ClassVar[int]
+    TUPLE_NAME_FIELD_NUMBER: _ClassVar[int]
+    ORDER_FIELD_NUMBER: _ClassVar[int]
     BINDINGS_FIELD_NUMBER: _ClassVar[int]
-    type: _types_pb2.TupleType
+    tuple_name: str
+    order: _containers.RepeatedScalarFieldContainer[str]
     bindings: _containers.MessageMap[str, BindingData]
-    def __init__(self, type: _Optional[_Union[_types_pb2.TupleType, _Mapping]] = ..., bindings: _Optional[_Mapping[str, BindingData]] = ...) -> None: ...
+    def __init__(self, tuple_name: _Optional[str] = ..., order: _Optional[_Iterable[str]] = ..., bindings: _Optional[_Mapping[str, BindingData]] = ...) -> None: ...
 
 class UnionInfo(_message.Message):
     __slots__ = ["targetType"]

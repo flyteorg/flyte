@@ -138,6 +138,60 @@ func TestMakeBindingDataMap(t *testing.T) {
 
 }
 
+func TestMakeBindingDataTuple(t *testing.T) {
+	v1 := int64(1)
+	v2 := primitiveString
+	tupleName := string("DefaultTupleName")
+	c := MakeBindingDataCollection(
+		MustMakePrimitiveBindingData(v1),
+		MustMakePrimitiveBindingData(v2),
+	)
+
+	m := MakeBindingDataTuple(
+		tupleName,
+		[]Pair{
+			NewPair("x", MustMakePrimitiveBindingData(v1)),
+			NewPair("y", c),
+		},
+	)
+
+	m2 := MakeBindingDataTuple(
+		tupleName,
+		[]Pair{
+			NewPair("x", MustMakePrimitiveBindingData(v1)),
+			NewPair("y", m),
+		},
+	)
+	assert.NotNil(t, m.GetTuple())
+	assert.Equal(t, 2, len(m.GetTuple().GetBindings()))
+	{
+		p := m.GetTuple().GetBindings()["x"]
+		assert.NotNil(t, p.GetScalar())
+		assert.Equal(t, "*core.Primitive_Integer", reflect.TypeOf(p.GetScalar().GetPrimitive().Value).String())
+		assert.Equal(t, v1, p.GetScalar().GetPrimitive().GetInteger())
+	}
+	{
+		p := m.GetTuple().GetBindings()["y"]
+		assert.NotNil(t, p.GetCollection())
+		assert.Equal(t, c.GetCollection(), p.GetCollection())
+	}
+
+	assert.NotNil(t, m2.GetTuple())
+	assert.Equal(t, 2, len(m2.GetTuple().GetBindings()))
+	{
+		p := m2.GetTuple().GetBindings()["x"]
+		assert.NotNil(t, p.GetScalar())
+		assert.Equal(t, "*core.Primitive_Integer", reflect.TypeOf(p.GetScalar().GetPrimitive().Value).String())
+		assert.Equal(t, v1, p.GetScalar().GetPrimitive().GetInteger())
+	}
+	{
+		p := m2.GetTuple().GetBindings()["y"]
+		assert.NotNil(t, p.GetTuple())
+		assert.Equal(t, m.GetTuple(), p.GetTuple())
+	}
+
+}
+
 func TestMakeBindingPromise(t *testing.T) {
 	p := MakeBindingPromise("n1", "x", "y")
 	assert.NotNil(t, p)

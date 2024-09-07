@@ -3647,8 +3647,11 @@ export namespace flyteidl {
         /** Properties of a LiteralTupleMap. */
         interface ILiteralTupleMap {
 
-            /** LiteralTupleMap type */
-            type?: (flyteidl.core.ITupleType|null);
+            /** LiteralTupleMap tupleName */
+            tupleName?: (string|null);
+
+            /** LiteralTupleMap order */
+            order?: (string[]|null);
 
             /** LiteralTupleMap literals */
             literals?: ({ [k: string]: flyteidl.core.ILiteral }|null);
@@ -3663,8 +3666,11 @@ export namespace flyteidl {
              */
             constructor(properties?: flyteidl.core.ILiteralTupleMap);
 
-            /** LiteralTupleMap type. */
-            public type?: (flyteidl.core.ITupleType|null);
+            /** LiteralTupleMap tupleName. */
+            public tupleName: string;
+
+            /** LiteralTupleMap order. */
+            public order: string[];
 
             /** LiteralTupleMap literals. */
             public literals: { [k: string]: flyteidl.core.ILiteral };
@@ -3809,8 +3815,11 @@ export namespace flyteidl {
         /** Properties of a BindingDataTupleMap. */
         interface IBindingDataTupleMap {
 
-            /** BindingDataTupleMap type */
-            type?: (flyteidl.core.ITupleType|null);
+            /** BindingDataTupleMap tupleName */
+            tupleName?: (string|null);
+
+            /** BindingDataTupleMap order */
+            order?: (string[]|null);
 
             /** BindingDataTupleMap bindings */
             bindings?: ({ [k: string]: flyteidl.core.IBindingData }|null);
@@ -3825,8 +3834,11 @@ export namespace flyteidl {
              */
             constructor(properties?: flyteidl.core.IBindingDataTupleMap);
 
-            /** BindingDataTupleMap type. */
-            public type?: (flyteidl.core.ITupleType|null);
+            /** BindingDataTupleMap tupleName. */
+            public tupleName: string;
+
+            /** BindingDataTupleMap order. */
+            public order: string[];
 
             /** BindingDataTupleMap bindings. */
             public bindings: { [k: string]: flyteidl.core.IBindingData };

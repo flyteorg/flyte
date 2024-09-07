@@ -80,3 +80,19 @@ func EqualLiteralCollection(t *testing.T, l1 *core.LiteralCollection, l2 *core.L
 		}
 	}
 }
+
+func EqualLiteralTupleMap(t *testing.T, l1 *core.LiteralTupleMap, l2 *core.LiteralTupleMap) {
+	if assert.NotNil(t, l1, "l1 is nil") && assert.NotNil(t, l2, "l2 is nil") {
+		assert.Equal(t, len(l1.Literals), len(l2.Literals))
+		for k, v := range l1.Literals {
+			actual, ok := l2.Literals[k]
+			assert.True(t, ok)
+			EqualLiterals(t, v, actual)
+		}
+		assert.Equal(t, l1.TupleName, l2.TupleName)
+		assert.Equal(t, len(l1.Order), len(l2.Order))
+		for i, f1 := range l1.Order {
+			assert.Equal(t, f1, l2.Order[i])
+		}
+	}
+}

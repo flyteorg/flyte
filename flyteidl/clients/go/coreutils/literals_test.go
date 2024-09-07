@@ -780,16 +780,10 @@ func TestMakeLiteralForType(t *testing.T) {
 		}
 		expectedLV := &core.Literal{Value: &core.Literal_Tuple{
 			Tuple: &core.LiteralTupleMap{
-				Type: &core.TupleType{
-					TupleName: "DefaultTupleName",
-					Order: []string{
-						"int_field",
-						"str_field",
-					},
-					Fields: map[string]*core.LiteralType{
-						"str_field": {Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING}},
-						"int_field": {Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}},
-					},
+				TupleName: "DefaultTupleName",
+				Order: []string{
+					"int_field",
+					"str_field",
 				},
 				Literals: map[string]*core.Literal{
 					"int_field": {Value: &core.Literal_Scalar{Scalar: &core.Scalar{

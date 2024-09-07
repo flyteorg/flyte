@@ -6740,14 +6740,23 @@
     "coreBindingDataTupleMap": {
       "type": "object",
       "properties": {
-        "type": {
-          "$ref": "#/definitions/coreTupleType"
+        "tuple_name": {
+          "type": "string",
+          "description": "The name of the NamedTuple. If it is original tuple, it would be empty string."
+        },
+        "order": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The order of each fields stored in the tuple."
         },
         "bindings": {
           "type": "object",
           "additionalProperties": {
             "$ref": "#/definitions/coreBindingData"
-          }
+          },
+          "description": "A map of BindingData items."
         }
       },
       "description": "A collection of fields for tuple binding data."
@@ -7492,14 +7501,23 @@
     "coreLiteralTupleMap": {
       "type": "object",
       "properties": {
-        "type": {
-          "$ref": "#/definitions/coreTupleType"
+        "tuple_name": {
+          "type": "string",
+          "description": "The name of the NamedTuple. If it is original tuple, it would be empty string."
+        },
+        "order": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The order of each fields stored in the tuple."
         },
         "literals": {
           "type": "object",
           "additionalProperties": {
             "$ref": "#/definitions/coreLiteral"
-          }
+          },
+          "description": "A map of literals."
         }
       },
       "description": "A collection of fields for tuple literal."

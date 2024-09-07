@@ -205,16 +205,16 @@ func validateBinding(w c.WorkflowBuilder, nodeID c.NodeID, nodeParam string, bin
 			return nil, nil, !errs.HasErrors()
 		}
 
-		if val.Tuple.GetType().TupleName != expectedType.GetTupleType().TupleName {
+		if val.Tuple.TupleName != expectedType.GetTupleType().TupleName {
 			errs.Collect(errors.NewMismatchingBindingsErr(nodeID, nodeParam, expectedType.String(), val.Tuple.String()))
 			return nil, nil, !errs.HasErrors()
 		}
 
-		if len(val.Tuple.GetType().Order) != len(expectedType.GetTupleType().Order) {
+		if len(val.Tuple.Order) != len(expectedType.GetTupleType().Order) {
 			errs.Collect(errors.NewMismatchingBindingsErr(nodeID, nodeParam, expectedType.String(), val.Tuple.String()))
 			return nil, nil, !errs.HasErrors()
 		}
-		for i, v := range val.Tuple.GetType().Order {
+		for i, v := range val.Tuple.Order {
 			if v != expectedType.GetTupleType().Order[i] {
 				errs.Collect(errors.NewMismatchingBindingsErr(nodeID, nodeParam, expectedType.String(), val.Tuple.String()))
 				return nil, nil, !errs.HasErrors()

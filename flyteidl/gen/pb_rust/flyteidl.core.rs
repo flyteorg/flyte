@@ -550,13 +550,14 @@ pub struct LiteralMap {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct LiteralTupleMap {
-    #[prost(message, optional, tag="1")]
-    pub r#type: ::core::option::Option<TupleType>,
-    // TODO: Change to this
-    // string tuple_name = 1;
-    // repeated string order = 2;
-
-    #[prost(map="string, message", tag="2")]
+    /// The name of the NamedTuple. If it is original tuple, it would be empty string.
+    #[prost(string, tag="1")]
+    pub tuple_name: ::prost::alloc::string::String,
+    /// The order of each fields stored in the tuple.
+    #[prost(string, repeated, tag="2")]
+    pub order: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    /// A map of literals.
+    #[prost(map="string, message", tag="3")]
     pub literals: ::std::collections::HashMap<::prost::alloc::string::String, Literal>,
 }
 /// A collection of BindingData items.
@@ -577,9 +578,14 @@ pub struct BindingDataMap {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct BindingDataTupleMap {
-    #[prost(message, optional, tag="1")]
-    pub r#type: ::core::option::Option<TupleType>,
-    #[prost(map="string, message", tag="2")]
+    /// The name of the NamedTuple. If it is original tuple, it would be empty string.
+    #[prost(string, tag="1")]
+    pub tuple_name: ::prost::alloc::string::String,
+    /// The order of each fields stored in the tuple.
+    #[prost(string, repeated, tag="2")]
+    pub order: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    /// A map of BindingData items.
+    #[prost(map="string, message", tag="3")]
     pub bindings: ::std::collections::HashMap<::prost::alloc::string::String, BindingData>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]

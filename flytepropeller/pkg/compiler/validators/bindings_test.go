@@ -58,8 +58,9 @@ func LiteralToBinding(l *core.Literal) *core.BindingData {
 		return &core.BindingData{
 			Value: &core.BindingData_Tuple{
 				Tuple: &core.BindingDataTupleMap{
-					Type:     l.GetTuple().Type,
-					Bindings: x,
+					TupleName: l.GetTuple().TupleName,
+					Order:     l.GetTuple().Order,
+					Bindings:  x,
 				},
 			},
 		}

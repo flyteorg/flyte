@@ -237,4 +237,30 @@ func TestFetchLiteral(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Nil(t, extractedLiteralVal)
 	})
+
+	t.Run("Tuple", func(t *testing.T) {
+		literalVal := map[string]interface{}{
+			"field1": int64(1),
+			"field2": "string_value",
+		}
+		var literalType = &core.LiteralType{
+			Type: &core.LiteralType_TupleType{
+				TupleType: &core.TupleType{
+					TupleName: "DefaultTupleName",
+					Order: []string{
+						"field1", "field2",
+					},
+					Fields: map[string]*core.LiteralType{
+						"field1": {Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}},
+						"field2": {Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING}},
+					},
+				},
+			},
+		}
+		lit, err := MakeLiteralForType(literalType, literalVal)
+		assert.NoError(t, err)
+		extractedLiteralVal, err := ExtractFromLiteral(lit)
+		assert.NoError(t, err)
+		assert.Equal(t, literalVal, extractedLiteralVal)
+	})
 }

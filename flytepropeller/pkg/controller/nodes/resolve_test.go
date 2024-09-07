@@ -376,6 +376,35 @@ func TestResolveBindingData(t *testing.T) {
 		assert.Error(t, err)
 
 	})
+
+	t.Run("BindingDataTupleMap", func(t *testing.T) {
+		store := createInmemoryDataStore(t, testScope.NewSubScope("BindingDataTupleMap"))
+		r := remoteFileOutputResolver{store: store}
+		// Store output of previous
+		m, err := coreutils.MakeLiteralMap(map[string]interface{}{"x": 1})
+		assert.NoError(t, err)
+		assert.NoError(t, store.WriteProtobuf(ctx, outputPath, storage.Options{}, m))
+		m2 := &core.LiteralTupleMap{}
+		assert.NoError(t, store.ReadProtobuf(ctx, outputPath, m2))
+		// Output of current
+		b := utils.MakeBindingDataTuple(
+			"tuple",
+			[]utils.Pair{
+				utils.NewPair("x", utils.MakeBindingDataPromise("n2", "x")),
+				utils.NewPair("z", utils.MustMakePrimitiveBindingData(5)),
+			},
+		)
+		l, err := ResolveBindingData(ctx, r, w, b)
+		if assert.NoError(t, err) {
+			expected, err := coreutils.MakeLiteralTuple(
+				"tuple",
+				[]string{"x", "z"},
+				map[string]interface{}{"x": 1, "z": 5},
+			)
+			assert.NoError(t, err)
+			flyteassert.EqualLiteralTupleMap(t, expected, l.GetTuple())
+		}
+	})
 }
 
 func TestResolve(t *testing.T) {

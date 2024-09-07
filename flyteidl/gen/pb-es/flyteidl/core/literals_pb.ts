@@ -5,7 +5,7 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Duration, Message, proto3, protoInt64, Struct, Timestamp } from "@bufbuild/protobuf";
-import { BlobType, Error, LiteralType, OutputReference, SchemaType, StructuredDatasetType, TupleType } from "./types_pb.js";
+import { BlobType, Error, LiteralType, OutputReference, SchemaType, StructuredDatasetType } from "./types_pb.js";
 
 /**
  * Primitive Types
@@ -726,12 +726,23 @@ export class LiteralMap extends Message<LiteralMap> {
  */
 export class LiteralTupleMap extends Message<LiteralTupleMap> {
   /**
-   * @generated from field: flyteidl.core.TupleType type = 1;
+   * The name of the NamedTuple. If it is original tuple, it would be empty string.
+   *
+   * @generated from field: string tuple_name = 1;
    */
-  type?: TupleType;
+  tupleName = "";
 
   /**
-   * @generated from field: map<string, flyteidl.core.Literal> literals = 2;
+   * The order of each fields stored in the tuple.
+   *
+   * @generated from field: repeated string order = 2;
+   */
+  order: string[] = [];
+
+  /**
+   * A map of literals.
+   *
+   * @generated from field: map<string, flyteidl.core.Literal> literals = 3;
    */
   literals: { [key: string]: Literal } = {};
 
@@ -743,8 +754,9 @@ export class LiteralTupleMap extends Message<LiteralTupleMap> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "flyteidl.core.LiteralTupleMap";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "type", kind: "message", T: TupleType },
-    { no: 2, name: "literals", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: Literal} },
+    { no: 1, name: "tuple_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "order", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 3, name: "literals", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: Literal} },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): LiteralTupleMap {
@@ -849,12 +861,23 @@ export class BindingDataMap extends Message<BindingDataMap> {
  */
 export class BindingDataTupleMap extends Message<BindingDataTupleMap> {
   /**
-   * @generated from field: flyteidl.core.TupleType type = 1;
+   * The name of the NamedTuple. If it is original tuple, it would be empty string.
+   *
+   * @generated from field: string tuple_name = 1;
    */
-  type?: TupleType;
+  tupleName = "";
 
   /**
-   * @generated from field: map<string, flyteidl.core.BindingData> bindings = 2;
+   * The order of each fields stored in the tuple.
+   *
+   * @generated from field: repeated string order = 2;
+   */
+  order: string[] = [];
+
+  /**
+   * A map of BindingData items.
+   *
+   * @generated from field: map<string, flyteidl.core.BindingData> bindings = 3;
    */
   bindings: { [key: string]: BindingData } = {};
 
@@ -866,8 +889,9 @@ export class BindingDataTupleMap extends Message<BindingDataTupleMap> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "flyteidl.core.BindingDataTupleMap";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "type", kind: "message", T: TupleType },
-    { no: 2, name: "bindings", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: BindingData} },
+    { no: 1, name: "tuple_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "order", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 3, name: "bindings", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "message", T: BindingData} },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): BindingDataTupleMap {

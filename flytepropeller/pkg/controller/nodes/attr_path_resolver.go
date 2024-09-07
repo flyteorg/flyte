@@ -36,10 +36,10 @@ func resolveAttrPathInPromise(nodeID string, literal *core.Literal, bindAttrPath
 			if attr.GetStringValue() != "" {
 				key = attr.GetStringValue()
 			} else {
-				if int(attr.GetIntValue()) >= len(currVal.GetTuple().GetType().GetOrder()) {
-					return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID, "index [%v] is out of range of %v", attr.GetIntValue(), currVal.GetTuple().GetType().Order)
+				if int(attr.GetIntValue()) >= len(currVal.GetTuple().GetOrder()) {
+					return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID, "index [%v] is out of range of %v", attr.GetIntValue(), currVal.GetTuple().GetOrder())
 				}
-				key = currVal.GetTuple().GetType().GetOrder()[attr.GetIntValue()]
+				key = currVal.GetTuple().GetOrder()[attr.GetIntValue()]
 			}
 			tmpVal, exist = currVal.GetTuple().GetLiterals()[key]
 			if !exist {

@@ -306,23 +306,9 @@ func TestLiteralTypeForLiterals(t *testing.T) {
 		literals := &core.Literal{
 			Value: &core.Literal_Tuple{
 				Tuple: &core.LiteralTupleMap{
-					Type: &core.TupleType{
-						TupleName: "DefaultTupleName",
-						Order: []string{
-							"a", "b",
-						},
-						Fields: map[string]*core.LiteralType{
-							"a": {
-								Type: &core.LiteralType_Simple{
-									Simple: core.SimpleType_INTEGER,
-								},
-							},
-							"b": {
-								Type: &core.LiteralType_Simple{
-									Simple: core.SimpleType_STRING,
-								},
-							},
-						},
+					TupleName: "DefaultTupleName",
+					Order: []string{
+						"a", "b",
 					},
 					Literals: map[string]*core.Literal{
 						"a": {
