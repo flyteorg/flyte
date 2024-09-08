@@ -43,7 +43,20 @@ func resolveAttrPathInPromise(nodeID string, literal *core.Literal, bindAttrPath
 		var err error
 
 		if jsonIDL := scalar.GetJson(); jsonIDL != nil {
-			currVal, err = resolveAttrPathInJSON(nodeID, jsonIDL.GetValue(), bindAttrPath[count:])
+			metadata := currVal.GetMetadata()
+
+			if metadata == nil {
+				return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID,
+					"metadata is not provided in literal JSON's metadata")
+			}
+
+			format, ok := metadata["format"]
+			if !ok {
+				return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID,
+					"format is not specified in literal JSON's metadata")
+			}
+
+			currVal, err = resolveAttrPathInJSON(nodeID, jsonIDL.GetValue(), bindAttrPath[count:], format)
 		} else if generic := scalar.GetGeneric(); generic != nil {
 			currVal, err = resolveAttrPathInPbStruct(nodeID, generic, bindAttrPath[count:])
 		}
@@ -90,16 +103,23 @@ func resolveAttrPathInPbStruct(nodeID string, st *structpb.Struct, bindAttrPath 
 }
 
 // resolveAttrPathInJSON resolves the msgpack bytes (e.g. dataclass) with attribute path
-func resolveAttrPathInJSON(nodeID string, msgpackBytes []byte, bindAttrPath []*core.PromiseAttribute) (*core.Literal,
+func resolveAttrPathInJSON(nodeID string, msgpackBytes []byte, bindAttrPath []*core.PromiseAttribute,
+	format string) (*core.Literal,
 	error) {
 
 	var currVal interface{}
 	var tmpVal interface{}
 	var exist bool
 
-	err := msgpack.Unmarshal(msgpackBytes, &currVal)
-	if err != nil {
-		return nil, err
+	if format == "msgpack" {
+		err := msgpack.Unmarshal(msgpackBytes, &currVal)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID,
+			"Unsupported format '%v' found for literal value.\n"+
+				"Please ensure the format is supported.", format)
 	}
 
 	// Turn the current value to a map so it can be resolved more easily
@@ -122,7 +142,7 @@ func resolveAttrPathInJSON(nodeID string, msgpackBytes []byte, bindAttrPath []*c
 	}
 
 	// After resolve, convert the interface to literal
-	literal, err := convertJSONToLiteral(nodeID, currVal)
+	literal, err := convertJSONToLiteral(nodeID, currVal, format)
 
 	return literal, err
 }
@@ -172,30 +192,37 @@ func convertStructToLiteral(nodeID string, obj interface{}) (*core.Literal, erro
 }
 
 // convertJSONToLiteral converts the JSON (e.g. dataclass) to literal
-func convertJSONToLiteral(nodeID string, obj interface{}) (*core.Literal, error) {
+func convertJSONToLiteral(nodeID string, obj interface{}, format string) (*core.Literal, error) {
 
 	literal := &core.Literal{}
 
 	switch obj := obj.(type) {
 	case map[string]interface{}:
-		msgpackBytes, err := msgpack.Marshal(obj)
-		if err != nil {
-			return nil, err
-		}
-		literal.Value = &core.Literal_Scalar{
-			Scalar: &core.Scalar{
-				Value: &core.Scalar_Json{
-					Json: &core.Json{
-						Value: msgpackBytes,
+		if format == "msgpack" {
+			msgpackBytes, err := msgpack.Marshal(obj)
+			if err != nil {
+				return nil, err
+			}
+			literal.Value = &core.Literal_Scalar{
+				Scalar: &core.Scalar{
+					Value: &core.Scalar_Json{
+						Json: &core.Json{
+							Value: msgpackBytes,
+						},
 					},
 				},
-			},
+			}
+			literal.Metadata = map[string]string{"format": format}
+		} else {
+			return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID,
+				"Unsupported format '%v' found for literal value.\n"+
+					"Please ensure the format is supported.", format)
 		}
 	case []interface{}:
 		literals := []*core.Literal{}
 		for _, v := range obj {
 			// recursively convert the interface to literal
-			literal, err := convertJSONToLiteral(nodeID, v)
+			literal, err := convertJSONToLiteral(nodeID, v, format)
 			if err != nil {
 				return nil, err
 			}
@@ -217,6 +244,7 @@ func convertJSONToLiteral(nodeID string, obj interface{}) (*core.Literal, error)
 	return literal, nil
 }
 
+// TODO: We should support Blob Types in the future.
 // convertInterfaceToLiteralScalar converts the a single value to a literal scalar
 func convertInterfaceToLiteralScalar(nodeID string, obj interface{}) (*core.Literal_Scalar, error) {
 	value := &core.Primitive{}
