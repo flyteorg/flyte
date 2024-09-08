@@ -166,7 +166,7 @@ kubectl set image deployment/flyteagent flyteagent=ghcr.io/flyteorg/flyteagent:l
 ```
 
 :::{note}
-Please make sure your propeller's image is >= 1.13.0 so that the propeller can automatically fetch the supported task types from your agent deployment.
+Please make sure your propeller's image version is >= 1.13.0 so that the propeller can automatically fetch the supported task types from your agent deployment.
 :::
 
 ### 5. Canary deployment
