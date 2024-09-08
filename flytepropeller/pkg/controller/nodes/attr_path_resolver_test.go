@@ -1,7 +1,6 @@
 package nodes
 
 import (
-	"encoding/json"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -380,9 +379,8 @@ func TestResolveAttrPathInStruct(t *testing.T) {
 
 func TestResolveAttrPathInJson(t *testing.T) {
 	// Helper function to convert a map to JSON and then to msgpack
-	toJSONMsgpack := func(m map[string]interface{}) []byte {
-		jsonBytes, _ := json.Marshal(m)
-		msgpackBytes, _ := msgpack.Marshal(jsonBytes)
+	toMsgpackBytes := func(m map[string]interface{}) []byte {
+		msgpackBytes, _ := msgpack.Marshal(m)
 		return msgpackBytes
 	}
 
@@ -399,9 +397,9 @@ func TestResolveAttrPathInJson(t *testing.T) {
 					Scalar: &core.Scalar{
 						Value: &core.Scalar_Json{
 							Json: &core.Json{
-								Value: toJSONMsgpack(map[string]interface{}{
+								Value: toMsgpackBytes(map[string]interface{}{
 									"foo": map[string]interface{}{
-										"bar": 42,
+										"bar": int64(42),
 										"baz": map[string]interface{}{
 											"qux":  3.14,
 											"quux": "str",
@@ -412,6 +410,7 @@ func TestResolveAttrPathInJson(t *testing.T) {
 						},
 					},
 				},
+				Metadata: map[string]string{"format": "msgpack"},
 			},
 			// Test accessing the int value at foo.bar
 			path: []*core.PromiseAttribute{
@@ -431,7 +430,7 @@ func TestResolveAttrPathInJson(t *testing.T) {
 					Scalar: &core.Scalar{
 						Value: &core.Scalar_Primitive{
 							Primitive: &core.Primitive{
-								Value: &core.Primitive_Integer{Integer: 42},
+								Value: &core.Primitive_Integer{Integer: int64(42)},
 							},
 						},
 					},
@@ -446,9 +445,9 @@ func TestResolveAttrPathInJson(t *testing.T) {
 					Scalar: &core.Scalar{
 						Value: &core.Scalar_Json{
 							Json: &core.Json{
-								Value: toJSONMsgpack(map[string]interface{}{
+								Value: toMsgpackBytes(map[string]interface{}{
 									"foo": map[string]interface{}{
-										"bar": 42,
+										"bar": int64(42),
 										"baz": map[string]interface{}{
 											"qux":  3.14,
 											"quux": "str",
@@ -459,6 +458,7 @@ func TestResolveAttrPathInJson(t *testing.T) {
 						},
 					},
 				},
+				Metadata: map[string]string{"format": "msgpack"},
 			},
 			// Test accessing the float value at foo.baz.qux
 			path: []*core.PromiseAttribute{
@@ -498,9 +498,9 @@ func TestResolveAttrPathInJson(t *testing.T) {
 					Scalar: &core.Scalar{
 						Value: &core.Scalar_Json{
 							Json: &core.Json{
-								Value: toJSONMsgpack(map[string]interface{}{
+								Value: toMsgpackBytes(map[string]interface{}{
 									"foo": map[string]interface{}{
-										"bar": 42,
+										"bar": int64(42),
 										"baz": map[string]interface{}{
 											"qux":  3.14,
 											"quux": "str",
@@ -511,6 +511,7 @@ func TestResolveAttrPathInJson(t *testing.T) {
 						},
 					},
 				},
+				Metadata: map[string]string{"format": "msgpack"},
 			},
 			// Test accessing the string value at foo.baz.quux
 			path: []*core.PromiseAttribute{
@@ -540,13 +541,14 @@ func TestResolveAttrPathInJson(t *testing.T) {
 					Scalar: &core.Scalar{
 						Value: &core.Scalar_Json{
 							Json: &core.Json{
-								Value: toJSONMsgpack(map[string]interface{}{
-									"foo": []interface{}{42, 3.14, "str"},
+								Value: toMsgpackBytes(map[string]interface{}{
+									"foo": []interface{}{int64(42), 3.14, "str"},
 								}),
 							},
 						},
 					},
 				},
+				Metadata: map[string]string{"format": "msgpack"},
 			},
 			// Test accessing the int value at foo[0]
 			path: []*core.PromiseAttribute{
@@ -566,7 +568,7 @@ func TestResolveAttrPathInJson(t *testing.T) {
 					Scalar: &core.Scalar{
 						Value: &core.Scalar_Primitive{
 							Primitive: &core.Primitive{
-								Value: &core.Primitive_Integer{Integer: 42},
+								Value: &core.Primitive_Integer{Integer: int64(42)},
 							},
 						},
 					},
@@ -581,13 +583,14 @@ func TestResolveAttrPathInJson(t *testing.T) {
 					Scalar: &core.Scalar{
 						Value: &core.Scalar_Json{
 							Json: &core.Json{
-								Value: toJSONMsgpack(map[string]interface{}{
-									"foo": []interface{}{42, 3.14, "str"},
+								Value: toMsgpackBytes(map[string]interface{}{
+									"foo": []interface{}{int64(42), 3.14, "str"},
 								}),
 							},
 						},
 					},
 				},
+				Metadata: map[string]string{"format": "msgpack"},
 			},
 			// Test accessing the float value at foo[1]
 			path: []*core.PromiseAttribute{
@@ -622,13 +625,14 @@ func TestResolveAttrPathInJson(t *testing.T) {
 					Scalar: &core.Scalar{
 						Value: &core.Scalar_Json{
 							Json: &core.Json{
-								Value: toJSONMsgpack(map[string]interface{}{
-									"foo": []interface{}{42, 3.14, "str"},
+								Value: toMsgpackBytes(map[string]interface{}{
+									"foo": []interface{}{int64(42), 3.14, "str"},
 								}),
 							},
 						},
 					},
 				},
+				Metadata: map[string]string{"format": "msgpack"},
 			},
 			// Test accessing the string value at foo[2]
 			path: []*core.PromiseAttribute{
@@ -653,10 +657,10 @@ func TestResolveAttrPathInJson(t *testing.T) {
 					Scalar: &core.Scalar{
 						Value: &core.Scalar_Json{
 							Json: &core.Json{
-								Value: toJSONMsgpack(map[string]interface{}{
+								Value: toMsgpackBytes(map[string]interface{}{
 									"foo": map[string]interface{}{
 										"bar": map[string]interface{}{
-											"baz": 42,
+											"baz": int64(42),
 										},
 									},
 								}),
@@ -664,6 +668,7 @@ func TestResolveAttrPathInJson(t *testing.T) {
 						},
 					},
 				},
+				Metadata: map[string]string{"format": "msgpack"},
 			},
 			// Test accessing the entire nested map at foo.bar
 			path: []*core.PromiseAttribute{
@@ -683,13 +688,14 @@ func TestResolveAttrPathInJson(t *testing.T) {
 					Scalar: &core.Scalar{
 						Value: &core.Scalar_Json{
 							Json: &core.Json{
-								Value: toJSONMsgpack(map[string]interface{}{
-									"baz": 42,
+								Value: toMsgpackBytes(map[string]interface{}{
+									"baz": int64(42),
 								}),
 							},
 						},
 					},
 				},
+				Metadata: map[string]string{"format": "msgpack"},
 			},
 			hasError: false,
 		},
@@ -700,9 +706,9 @@ func TestResolveAttrPathInJson(t *testing.T) {
 					Scalar: &core.Scalar{
 						Value: &core.Scalar_Json{
 							Json: &core.Json{
-								Value: toJSONMsgpack(map[string]interface{}{
+								Value: toMsgpackBytes(map[string]interface{}{
 									"foo": map[string]interface{}{
-										"bar": 42,
+										"bar": int64(42),
 										"baz": map[string]interface{}{
 											"qux":  3.14,
 											"quux": "str",
@@ -713,6 +719,7 @@ func TestResolveAttrPathInJson(t *testing.T) {
 						},
 					},
 				},
+				Metadata: map[string]string{"format": "msgpack"},
 			},
 			// Test accessing a non-existing key in the nested map
 			path: []*core.PromiseAttribute{
@@ -742,13 +749,14 @@ func TestResolveAttrPathInJson(t *testing.T) {
 					Scalar: &core.Scalar{
 						Value: &core.Scalar_Json{
 							Json: &core.Json{
-								Value: toJSONMsgpack(map[string]interface{}{
-									"foo": []interface{}{42, 3.14, "str"},
+								Value: toMsgpackBytes(map[string]interface{}{
+									"foo": []interface{}{int64(42), 3.14, "str"},
 								}),
 							},
 						},
 					},
 				},
+				Metadata: map[string]string{"format": "msgpack"},
 			},
 			// Test accessing an out-of-range index in the list
 			path: []*core.PromiseAttribute{
@@ -773,13 +781,14 @@ func TestResolveAttrPathInJson(t *testing.T) {
 					Scalar: &core.Scalar{
 						Value: &core.Scalar_Json{
 							Json: &core.Json{
-								Value: toJSONMsgpack(map[string]interface{}{
+								Value: toMsgpackBytes(map[string]interface{}{
 									"foo": []interface{}{[]interface{}{"bar1", "bar2"}},
 								}),
 							},
 						},
 					},
 				},
+				Metadata: map[string]string{"format": "msgpack"},
 			},
 			path: []*core.PromiseAttribute{
 				{

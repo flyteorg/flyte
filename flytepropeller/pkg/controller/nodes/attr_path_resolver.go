@@ -199,6 +199,8 @@ func convertJSONToLiteral(nodeID string, obj interface{}, format string) (*core.
 	switch obj := obj.(type) {
 	case map[string]interface{}:
 		if format == "msgpack" {
+			literal.Metadata = map[string]string{"format": format}
+
 			msgpackBytes, err := msgpack.Marshal(obj)
 			if err != nil {
 				return nil, err
@@ -212,7 +214,6 @@ func convertJSONToLiteral(nodeID string, obj interface{}, format string) (*core.
 					},
 				},
 			}
-			literal.Metadata = map[string]string{"format": format}
 		} else {
 			return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID,
 				"Unsupported format '%v' found for literal value.\n"+
