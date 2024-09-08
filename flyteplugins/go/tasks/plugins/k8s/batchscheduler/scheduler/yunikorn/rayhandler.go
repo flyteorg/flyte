@@ -1,15 +1,26 @@
 package yunikorn
 
 import (
+	"context"
 	"encoding/json"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"k8s.io/apimachinery/pkg/api/resource"
-	v1 "k8s.io/api/core/v1"
 	rayv1 "github.com/ray-project/kuberay/ray-operator/apis/ray/v1"
+	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 )
 
+type RayHandler struct {
+	parameters string
+}
+
+func (h *RayHandler) Mutate(ctx context.Context, object client.Object) error {
+	rayJob := object.(*rayv1.RayJob)
+	return ProcessRay(h.parameters, rayJob)
+}
+
 func ProcessRay(parameters string, app *rayv1.RayJob) error {
-	jobname :=  GenerateTaskGroupAppID()
+	appID := GenerateTaskGroupAppID()
 	rayjobSpec := &app.Spec
 	appSpec := rayjobSpec.RayClusterSpec
 	TaskGroups := make([]TaskGroup, 1)
@@ -20,17 +31,17 @@ func ProcessRay(parameters string, app *rayv1.RayJob) error {
 		spec := worker.Template.Spec
 		name := GenerateTaskGroupName(false, index)
 		TaskGroups = append(TaskGroups, TaskGroup{
-			Name:                      name,
-			MinMember:                 *worker.Replicas, 
+			Name:      name,
+			MinMember: *worker.Replicas,
 			//Labels:                    meta.Labels,
 			//Annotations:               meta.Annotations,
-			MinResource:               Allocation(spec.Containers),
+			MinResource: Allocation(spec.Containers),
 			//NodeSelector:              spec.NodeSelector,
 			//Affinity:                  spec.Affinity,
 			//TopologySpreadConstraints: spec.TopologySpreadConstraints,
 		})
-		meta.Annotations[TaskGroupNameKey] =  name
-		meta.Annotations[AppID] = jobname
+		meta.Annotations[TaskGroupNameKey] = name
+		meta.Annotations[AppID] = appID
 	}
 	headSpec := &appSpec.HeadGroupSpec
 	headSpec.Template.Spec.SchedulerName = Yunikorn
@@ -50,11 +61,11 @@ func ProcessRay(parameters string, app *rayv1.RayJob) error {
 		res = Add(res, res2)
 	}
 	TaskGroups[0] = TaskGroup{
-		Name:                      headName,
-		MinMember:                 1,
+		Name:      headName,
+		MinMember: 1,
 		//Labels:                    meta.Labels,
 		//Annotations:               meta.Annotations,
-		MinResource:               res,
+		MinResource: res,
 		//NodeSelector:              spec.NodeSelector,
 		//Affinity:                  spec.Affinity,
 		//TopologySpreadConstraints: spec.TopologySpreadConstraints,
@@ -65,25 +76,25 @@ func ProcessRay(parameters string, app *rayv1.RayJob) error {
 		return err
 	}
 	meta.Annotations[TaskGroupsKey] = string(info[:])
-	meta.Annotations[TaskGroupPrarameters] = parameters
-	meta.Annotations[AppID] = jobname
+	meta.Annotations[TaskGroupParameters] = parameters
+	meta.Annotations[AppID] = appID
 	return nil
 }
 
 func Allocation(containers []v1.Container) v1.ResourceList {
-    totalResources := v1.ResourceList{}
-    for _, c := range containers {
-        for name, q := range c.Resources.Limits {
-            if _, exists := totalResources[name]; !exists {
+	totalResources := v1.ResourceList{}
+	for _, c := range containers {
+		for name, q := range c.Resources.Limits {
+			if _, exists := totalResources[name]; !exists {
 				totalResources[name] = q.DeepCopy()
 				continue
-            }
+			}
 			total := totalResources[name]
 			total.Add(q)
 			totalResources[name] = total
-        }
-    }
-    return totalResources
+		}
+	}
+	return totalResources
 }
 
 func Add(a v1.ResourceList, b v1.ResourceList) v1.ResourceList {
@@ -103,4 +114,8 @@ func Add(a v1.ResourceList, b v1.ResourceList) v1.ResourceList {
 		}
 	}
 	return result
+}
+
+func NewRayHandler(parameters string) *RayHandler {
+	return &RayHandler{parameters: parameters}
 }

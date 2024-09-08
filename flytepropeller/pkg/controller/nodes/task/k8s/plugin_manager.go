@@ -3,6 +3,7 @@ package k8s
 import (
 	"context"
 	"fmt"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/batchscheduler"
 	"time"
 
 	"golang.org/x/time/rate"
@@ -90,6 +91,7 @@ type PluginManager struct {
 	plugin          k8s.Plugin
 	resourceToWatch runtime.Object
 	kubeClient      pluginsCore.KubeClient
+	scheduler       batchscheduler.SchedulerPlugin
 	metrics         PluginMetrics
 	// Per namespace-resource
 	backOffController    *backoff.Controller
@@ -202,6 +204,12 @@ func (e *PluginManager) launchResource(ctx context.Context, tCtx pluginsCore.Tas
 	logger.Infof(ctx, "Creating Object: Type:[%v], Object:[%v/%v]", o.GetObjectKind().GroupVersionKind(), o.GetNamespace(), o.GetName())
 
 	key := backoff.ComposeResourceKey(o)
+
+	err = e.scheduler.Mutate(ctx, o)
+	if err != nil {
+		logger.Errorf(ctx, "Scheduler plugin failed to process object with error: %v", err)
+		return pluginsCore.Transition{}, err
+	}
 
 	pod, casted := o.(*v1.Pod)
 	if e.backOffController != nil && casted {
@@ -536,6 +544,13 @@ func NewPluginManager(ctx context.Context, iCtx pluginsCore.SetupContext, entry 
 		return nil, errors.Errorf(errors.PluginInitializationFailed, "Failed to initialize K8sResource Plugin, Kubeclient cannot be nil!")
 	}
 
+	var scheduler batchscheduler.SchedulerPlugin
+	if entry.Scheduler != nil {
+		scheduler = entry.Scheduler(ctx)
+	} else {
+		scheduler = batchscheduler.NewNoopSchedulerPlugin()
+	}
+
 	logger.Infof(ctx, "Initializing K8s plugin [%s]", entry.ID)
 	src := source.Kind(iCtx.KubeClient().GetCache(), entry.ResourceToWatch)
 
@@ -650,6 +665,7 @@ func NewPluginManager(ctx context.Context, iCtx pluginsCore.SetupContext, entry 
 		resourceToWatch:      entry.ResourceToWatch,
 		metrics:              newPluginMetrics(metricsScope),
 		kubeClient:           kubeClient,
+		scheduler:            scheduler,
 		resourceLevelMonitor: rm,
 		eventWatcher:         eventWatcher,
 	}, nil

@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
@@ -121,10 +122,6 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 
 	headPodSpec := podSpec.DeepCopy()
 	rayjob, err := constructRayJob(taskCtx, rayJob, objectMeta, *podSpec, headPodSpec, headNodeRayStartParams, primaryContainerIdx, *primaryContainer)
-	if err != nil {
-		return rayjob, err
-	}
-	err = batchscheduler.NewSchedulerPlugin(&cfg.BatchScheduler).Process(rayjob)
 	return rayjob, err
 }
 
@@ -619,6 +616,10 @@ func init() {
 				}
 
 				return k8s.NewDefaultKubeClient(kubeConfig)
+			},
+			Scheduler: func(ctx context.Context) batchscheduler.SchedulerPlugin {
+				cfg := GetConfig().BatchScheduler
+				return batchscheduler.NewSchedulerPlugin(reflect.TypeOf(rayv1.RayJob{}), &cfg)
 			},
 		})
 }
