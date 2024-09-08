@@ -1,7 +1,6 @@
 package nodes
 
 import (
-	"encoding/json"
 	"github.com/vmihailenco/msgpack/v5"
 	"google.golang.org/protobuf/types/known/structpb"
 
@@ -126,35 +125,6 @@ func resolveAttrPathInJSON(nodeID string, msgpackBytes []byte, bindAttrPath []*c
 	literal, err := convertJSONToLiteral(nodeID, currVal)
 
 	return literal, err
-}
-
-// json will automatically convert numbers to float64, so we need to convert it back to int64 if possible
-// convertNumbers recursively converts json.Number to int64 or float64
-// flytekit can accept int64 as float transformer's input:
-// https://github.com/flyteorg/flytekit/blob/master/flytekit/core/type_engine.py#L1914-L1919
-func convertNumbers(v interface{}) interface{} {
-	switch vv := v.(type) {
-	case map[string]interface{}:
-		for key, value := range vv {
-			vv[key] = convertNumbers(value)
-		}
-		return vv
-	case []interface{}:
-		for i, value := range vv {
-			vv[i] = convertNumbers(value)
-		}
-		return vv
-	case json.Number:
-		// Try to convert to int64 first
-		if intVal, err := vv.Int64(); err == nil {
-			return intVal
-		}
-		// If it fails, fall back to float64
-		if floatVal, err := vv.Float64(); err == nil {
-			return floatVal
-		}
-	}
-	return v
 }
 
 // convertStructToLiteral converts the protobuf struct (e.g. dataclass) to literal
