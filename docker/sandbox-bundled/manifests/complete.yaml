@@ -857,7 +857,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: aG1peWd2cXBWOGhBUUlkQQ==
+  haSharedSecret: Q3BDekMwb0JHM1pxaXAycg==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
