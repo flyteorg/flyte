@@ -1,25 +1,13 @@
 package yunikorn
 
 import (
-	"context"
 	"encoding/json"
-	"sigs.k8s.io/controller-runtime/pkg/client"
-
 	rayv1 "github.com/ray-project/kuberay/ray-operator/apis/ray/v1"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 )
 
-type RayHandler struct {
-	parameters string
-}
-
-func (h *RayHandler) Mutate(ctx context.Context, object client.Object) error {
-	rayJob := object.(*rayv1.RayJob)
-	return ProcessRay(h.parameters, rayJob)
-}
-
-func ProcessRay(parameters string, app *rayv1.RayJob) error {
+func MutateRayJob(parameters string, app *rayv1.RayJob) error {
 	appID := GenerateTaskGroupAppID()
 	rayjobSpec := &app.Spec
 	appSpec := rayjobSpec.RayClusterSpec
@@ -114,8 +102,4 @@ func Add(a v1.ResourceList, b v1.ResourceList) v1.ResourceList {
 		}
 	}
 	return result
-}
-
-func NewRayHandler(parameters string) *RayHandler {
-	return &RayHandler{parameters: parameters}
 }

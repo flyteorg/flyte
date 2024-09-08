@@ -5,7 +5,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
@@ -29,7 +28,6 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/batchscheduler"
 )
 
 const (
@@ -616,10 +614,6 @@ func init() {
 				}
 
 				return k8s.NewDefaultKubeClient(kubeConfig)
-			},
-			Scheduler: func(ctx context.Context) batchscheduler.SchedulerPlugin {
-				cfg := GetConfig().BatchScheduler
-				return batchscheduler.NewSchedulerPlugin(reflect.TypeOf(rayv1.RayJob{}), &cfg)
 			},
 		})
 }

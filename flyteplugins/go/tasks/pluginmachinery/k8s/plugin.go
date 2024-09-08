@@ -30,7 +30,7 @@ type PluginEntry struct {
 	// Returns a new KubeClient to be used instead of the internal controller-runtime client.
 	CustomKubeClient func(ctx context.Context) (pluginsCore.KubeClient, error)
 	// Return a new scheduler plugin to be used instead of the default k8s scheduler.
-	Scheduler func(ctx context.Context) batchscheduler.SchedulerPlugin
+	Scheduler func(ctx context.Context) batchscheduler.SchedulerManager
 }
 
 // System level properties that this Plugin supports

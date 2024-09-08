@@ -6,6 +6,7 @@
 package config
 
 import (
+	schedulerConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/batchscheduler"
 	"time"
 
 	v1 "k8s.io/api/core/v1"
@@ -206,6 +207,8 @@ type K8sPluginConfig struct {
 
 	// SendObjectEvents indicates whether to send k8s object events in TaskExecutionEvent updates (similar to kubectl get events).
 	SendObjectEvents bool `json:"send-object-events" pflag:",If true, will send k8s object events in TaskExecutionEvent updates."`
+
+	BatchScheduler schedulerConfig.Config `json:"batchScheduler,omitempty"`
 }
 
 // FlyteCoPilotConfig specifies configuration for the Flyte CoPilot system. FlyteCoPilot, allows running flytekit-less containers

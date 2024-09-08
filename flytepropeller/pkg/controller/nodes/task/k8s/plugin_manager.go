@@ -91,7 +91,7 @@ type PluginManager struct {
 	plugin          k8s.Plugin
 	resourceToWatch runtime.Object
 	kubeClient      pluginsCore.KubeClient
-	scheduler       batchscheduler.SchedulerPlugin
+	scheduler       batchscheduler.SchedulerManager
 	metrics         PluginMetrics
 	// Per namespace-resource
 	backOffController    *backoff.Controller
@@ -544,12 +544,7 @@ func NewPluginManager(ctx context.Context, iCtx pluginsCore.SetupContext, entry 
 		return nil, errors.Errorf(errors.PluginInitializationFailed, "Failed to initialize K8sResource Plugin, Kubeclient cannot be nil!")
 	}
 
-	var scheduler batchscheduler.SchedulerPlugin
-	if entry.Scheduler != nil {
-		scheduler = entry.Scheduler(ctx)
-	} else {
-		scheduler = batchscheduler.NewNoopSchedulerPlugin()
-	}
+	scheduler := batchscheduler.NewSchedulerManager(&config.GetK8sPluginConfig().BatchScheduler)
 
 	logger.Infof(ctx, "Initializing K8s plugin [%s]", entry.ID)
 	src := source.Kind(iCtx.KubeClient().GetCache(), entry.ResourceToWatch)

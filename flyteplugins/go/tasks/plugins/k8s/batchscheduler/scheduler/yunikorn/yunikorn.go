@@ -1,9 +1,10 @@
 package yunikorn
 
 import (
+	"context"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/batchscheduler"
 	rayv1 "github.com/ray-project/kuberay/ray-operator/apis/ray/v1"
-	"reflect"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 const (
@@ -14,11 +15,20 @@ const (
 	TaskGroupParameters = "yunikorn.apache.org/schedulingPolicyParameters"
 )
 
-func NewPlugin(t reflect.Type, parameters string) batchscheduler.SchedulerPlugin {
-	switch t {
-	case reflect.TypeOf(rayv1.RayJob{}):
-		return NewRayHandler(parameters)
+type YunikornSchedulerManager struct {
+	parameters string
+}
+
+func (y *YunikornSchedulerManager) Mutate(ctx context.Context, object client.Object) error {
+	switch object.(type) {
+	case *rayv1.RayJob:
+		return MutateRayJob(y.parameters, object.(*rayv1.RayJob))
 	default:
-		return batchscheduler.NewNoopSchedulerPlugin()
+
 	}
+	return nil
+}
+
+func NewSchedulerManager(cfg *batchscheduler.Config) batchscheduler.SchedulerManager {
+	return &YunikornSchedulerManager{parameters: cfg.Parameters}
 }

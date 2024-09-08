@@ -1,4 +1,4 @@
-package config
+package batchscheduler
 
 type Config struct {
 	Scheduler  string `json:"scheduler,omitempty" pflag:", Specify batch scheduler to"`
