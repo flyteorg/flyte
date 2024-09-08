@@ -260,13 +260,12 @@ metadata/configuration, it's more secure if they're private.
 Learn more about how to pull private image in the {ref}`User Guide <private_images>`.
 ```
 
-##### Relationship between ImageSpec and Fast Registration
-The `ImageSpec` construct available in flytekit also has a mechanism to copy files into the image being built. By default, the way it works is
-* if fast register is used, then it's assumed that you don't also want to copy source files into built image.
-* if fast register is not used (which is the default for `pyflyte package`, or if `pyflyte register --copy none` is specified), then it's assumed that
-  you do want source files copied.
+##### Relationship between ImageSpec and fast registration
+The `ImageSpec` construct available in flytekit also has a mechanism to copy files into the image being built. Its behavior depends on the type of registration used:
+* If fast register is used, then it's assumed that you don't also want to copy source files into the built image.
+* If fast register is not used (which is the default for `pyflyte package`, or if `pyflyte register --copy none` is specified), then it's assumed that you do want source files copied into the built image.
 
-In any case, if your `ImageSpec` constructor specifies a `source_root` and the `copy` argument set to something other than `CopyFileDetection.NO_COPY`, then files will be copied regardless of fast registration status.
+If your `ImageSpec` constructor specifies a `source_root` and the `copy` argument is set to something other than `CopyFileDetection.NO_COPY`, then files will be copied regardless of fast registration status.
 
 #### Package your project with `pyflyte package`
 
