@@ -48,6 +48,7 @@ tasks:
       - sidecar
       - K8S-ARRAY
       - fast-task
+      - agent-service
       - echo
     default-for-task-types:
       - container: container
