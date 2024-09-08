@@ -10,14 +10,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/vmihailenco/msgpack/v5"
-
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/ptypes"
 	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/pkg/errors"
+	"github.com/vmihailenco/msgpack/v5"
 )
 
 func MakePrimitive(v interface{}) (*core.Primitive, error) {
@@ -386,6 +385,7 @@ func MakePrimitiveForType(t core.SimpleType, s string) (*core.Primitive, error) 
 
 func MakeLiteralForSimpleType(t core.SimpleType, s string) (*core.Literal, error) {
 	s = strings.Trim(s, " \n\t")
+	lv := &core.Literal{}
 	scalar := &core.Scalar{}
 	switch t {
 	case core.SimpleType_STRUCT:
@@ -404,6 +404,7 @@ func MakeLiteralForSimpleType(t core.SimpleType, s string) (*core.Literal, error
 				Value: []byte(s),
 			},
 		}
+		lv.Metadata = map[string]string{"format": "msgpack"}
 	case core.SimpleType_BINARY:
 		scalar.Value = &core.Scalar_Binary{
 			Binary: &core.Binary{
@@ -428,11 +429,10 @@ func MakeLiteralForSimpleType(t core.SimpleType, s string) (*core.Literal, error
 		}
 		scalar.Value = &core.Scalar_Primitive{Primitive: p}
 	}
-	return &core.Literal{
-		Value: &core.Literal_Scalar{
-			Scalar: scalar,
-		},
-	}, nil
+	lv.Value = &core.Literal_Scalar{
+		Scalar: scalar,
+	}
+	return lv, nil
 }
 
 func MustMakeLiteral(v interface{}) *core.Literal {
@@ -587,22 +587,30 @@ func MakeLiteralForType(t *core.LiteralType, v interface{}) (*core.Literal, erro
 			}
 		}
 		if newT.Simple == core.SimpleType_JSON {
+			// Return literal value here because this is the most efficient way to serialize json type
 			if _, isValueStringType := v.(string); !isValueStringType {
-				jsonBytes, err := json.Marshal(v)
+				msgpackBytes, err := msgpack.Marshal(v)
 				if err != nil {
-					return nil, fmt.Errorf("unable to marshal to json string for json value %v: %w", v, err)
+					return nil, fmt.Errorf("unable to marshal to msgpack bytes for value %v: %w", v, err)
 				}
-				msgpackBytes, err := msgpack.Marshal(jsonBytes)
-				if err != nil {
-					return nil, fmt.Errorf("unable to marshal to msgpack bytes for json string %v: %w", v, err)
+				l.Value = &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Json{
+							Json: &core.Json{
+								Value: msgpackBytes,
+							},
+						},
+					},
 				}
-				strValue = string(msgpackBytes)
+				l.Metadata = map[string]string{"format": "msgpack"}
+				return l, nil
 			}
 		}
 		lv, err := MakeLiteralForSimpleType(newT.Simple, strValue)
 		if err != nil {
 			return nil, err
 		}
+
 		return lv, nil
 
 	case *core.LiteralType_Blob:

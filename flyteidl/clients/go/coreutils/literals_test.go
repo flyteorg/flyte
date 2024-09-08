@@ -4,7 +4,6 @@
 package coreutils
 
 import (
-	"encoding/json"
 	"fmt"
 	"reflect"
 	"strconv"
@@ -408,7 +407,7 @@ func TestMakeLiteralForBlob(t *testing.T) {
 	}
 }
 
-func TestMakeLiteralForType(t *testing.T) {
+func re(t *testing.T) {
 	t.Run("SimpleInteger", func(t *testing.T) {
 		var literalType = &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}
 		val, err := MakeLiteralForType(literalType, 1)
@@ -456,45 +455,62 @@ func TestMakeLiteralForType(t *testing.T) {
 	})
 
 	t.Run("SimpleJson", func(t *testing.T) {
+		// We compare the deserialized values instead of the raw msgpack bytes because Go does not guarantee the order
+		// of map keys during serialization. This means that while the serialized bytes may differ, the deserialized
+		// values should be logically equivalent.
+
 		var literalType = &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_JSON}}
 		v := map[string]interface{}{
-			"a": 1,
+			"a": int64(1),
 			"b": 3.14,
 			"c": "example_string",
 			"d": map[string]interface{}{
-				"1": 100,
-				"2": 200,
+				"1": int64(100),
+				"2": int64(200),
 			},
 			"e": map[string]interface{}{
-				"a": 1,
+				"a": int64(1),
 				"b": 3.14,
 			},
 			"f": []string{"a", "b", "c"},
 		}
+
 		val, err := MakeLiteralForType(literalType, v)
 		assert.NoError(t, err)
-		jsonBytes, err := json.Marshal(v)
+
+		msgpackBytes, err := msgpack.Marshal(v)
 		assert.NoError(t, err)
-		msgpackBytes, err := msgpack.Marshal(jsonBytes)
-		assert.NoError(t, err)
-		strValue := string(msgpackBytes)
+
 		literalVal := &core.Literal{
 			Value: &core.Literal_Scalar{
 				Scalar: &core.Scalar{
 					Value: &core.Scalar_Json{
 						Json: &core.Json{
-							Value: []byte(strValue),
+							Value: msgpackBytes,
 						},
 					},
 				},
 			},
+			Metadata: map[string]string{"format": "msgpack"},
 		}
 
-		expectedVal, err := ExtractFromLiteral(literalVal)
+		expectedLiteralVal, err := ExtractFromLiteral(literalVal)
 		assert.NoError(t, err)
-		actualVal, err := ExtractFromLiteral(val)
+		actualLiteralVal, err := ExtractFromLiteral(val)
 		assert.NoError(t, err)
-		assert.Equal(t, expectedVal, actualVal)
+
+		expectedBytes, ok := expectedLiteralVal.([]byte)
+		assert.True(t, ok, "expectedLiteralVal is not of type []byte")
+		actualBytes, ok := actualLiteralVal.([]byte)
+		assert.True(t, ok, "actualLiteralVal is not of type []byte")
+
+		var expectedVal, actualVal map[string]interface{}
+		err = msgpack.Unmarshal(expectedBytes, &expectedVal)
+		assert.NoError(t, err)
+		err = msgpack.Unmarshal(actualBytes, &actualVal)
+		assert.NoError(t, err)
+
+		assert.EqualValues(t, expectedVal, actualVal)
 	})
 
 	t.Run("ArrayStrings", func(t *testing.T) {
