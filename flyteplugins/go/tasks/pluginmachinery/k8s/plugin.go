@@ -2,8 +2,6 @@ package k8s
 
 import (
 	"context"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/batchscheduler"
-
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
@@ -29,8 +27,6 @@ type PluginEntry struct {
 	IsDefault bool
 	// Returns a new KubeClient to be used instead of the internal controller-runtime client.
 	CustomKubeClient func(ctx context.Context) (pluginsCore.KubeClient, error)
-	// Return a new scheduler plugin to be used instead of the default k8s scheduler.
-	Scheduler func(ctx context.Context) batchscheduler.SchedulerManager
 }
 
 // System level properties that this Plugin supports

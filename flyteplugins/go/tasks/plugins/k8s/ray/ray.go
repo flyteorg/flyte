@@ -124,7 +124,6 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 }
 
 func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob plugins.RayJob, objectMeta *metav1.ObjectMeta, podSpec v1.PodSpec, headPodSpec *v1.PodSpec, headNodeRayStartParams map[string]string, primaryContainerIdx int, primaryContainer v1.Container) (*rayv1.RayJob, error) {
-	var err error
 	enableIngress := true
 	cfg := GetConfig()
 	rayClusterSpec := rayv1.RayClusterSpec{
@@ -210,6 +209,7 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob plugins.Ra
 	// TODO: This is for backward compatibility. Remove this block once runtime_env is removed from ray proto.
 	var runtimeEnvYaml string
 	runtimeEnvYaml = rayJob.RuntimeEnvYaml
+	var err error
 	// If runtime_env exists but runtime_env_yaml does not, convert runtime_env to runtime_env_yaml
 	if rayJob.RuntimeEnv != "" && rayJob.RuntimeEnvYaml == "" {
 		runtimeEnvYaml, err = convertBase64RuntimeEnvToYaml(rayJob.RuntimeEnv)
