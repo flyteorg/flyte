@@ -21,6 +21,7 @@ import (
 
 	flyteerrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
@@ -289,8 +290,13 @@ func (i *InMemoryEnvBuilder) createPod(ctx context.Context, fastTaskEnvironmentS
 	}
 	objectMeta.Annotations[TTL_SECONDS] = fmt.Sprintf("%d", int(getTTLOrDefault(fastTaskEnvironmentSpec).Seconds()))
 
-	// update primary container arguments and volume mounts
+	// update primaryContainer
 	container := &podSpec.Containers[primaryContainerIndex]
+	container.Name = podName
+	if _, exists := objectMeta.Annotations[flytek8s.PrimaryContainerKey]; exists {
+		objectMeta.Annotations[flytek8s.PrimaryContainerKey] = container.Name
+	}
+
 	container.Args = []string{
 		"unionai-actor-bridge",
 	}
