@@ -183,7 +183,7 @@ func FetchWorkflowForName(ctx context.Context, fetcher ext.AdminFetcherExtInterf
 	domain string) (workflows []*admin.Workflow, isList bool, err error) {
 	var workflow *admin.Workflow
 	if workflowconfig.DefaultConfig.Latest {
-		if workflow, err = fetcher.FetchWorkflowLatestVersion(ctx, name, project, domain, workflowconfig.DefaultConfig.Filter); err != nil {
+		if workflow, err = fetcher.FetchWorkflowLatestVersion(ctx, name, project, domain); err != nil {
 			return nil, false, err
 		}
 		workflows = append(workflows, workflow)

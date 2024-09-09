@@ -147,7 +147,7 @@ func TestFetchWorkflowLatestVersion(t *testing.T) {
 	getWorkflowFetcherSetup()
 	adminClient.OnGetWorkflowMatch(mock.Anything, mock.Anything).Return(workflowResponse, nil)
 	adminClient.OnListWorkflowsMatch(mock.Anything, mock.Anything).Return(workflowListResponse, nil)
-	_, err := adminFetcherExt.FetchWorkflowLatestVersion(ctx, "workflowName", "project", "domain", workflowFilter)
+	_, err := adminFetcherExt.FetchWorkflowLatestVersion(ctx, "workflowName", "project", "domain")
 	assert.Nil(t, err)
 }
 
@@ -155,6 +155,6 @@ func TestFetchWorkflowLatestVersionError(t *testing.T) {
 	workflowListResponse := &admin.WorkflowList{}
 	getWorkflowFetcherSetup()
 	adminClient.OnListWorkflowsMatch(mock.Anything, mock.Anything).Return(workflowListResponse, nil)
-	_, err := adminFetcherExt.FetchWorkflowLatestVersion(ctx, "workflowName", "project", "domain", workflowFilter)
+	_, err := adminFetcherExt.FetchWorkflowLatestVersion(ctx, "workflowName", "project", "domain")
 	assert.Equal(t, fmt.Errorf("no workflow retrieved for workflowName"), err)
 }
