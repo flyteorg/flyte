@@ -13,20 +13,20 @@
 
 | Before                            | Now                                          |
 |-----------------------------------|----------------------------------------------|
-| JSON String -> Protobuf Struct    | JSON String -> Byte String -> Protobuf Json  |
+| Python Val -> JSON String -> Protobuf Struct | Python Val -> Bytes -> Protobuf JSON  |
 
 - To Python Value
 
 | Before                            | Now                                          |
 |-----------------------------------|----------------------------------------------|
-| Protobuf Struct -> JSON String | Protobuf Json -> Byte String -> JSON String  |
+| Protobuf Struct -> JSON String -> Python Val | Protobuf JSON -> Bytes -> Python Val |
 
-Use byte string in protobuf instead of json string to fix case that int is not supported in protobuf struct.
+Use bytes in Protobuf instead of a JSON string to fix case that int is not supported in Protobuf struct.
 
 ## 2 Motivation
 
-In Flytekit, when handling dataclasses, Pydantic base models, and dictionaries, we store data using JSON strings within protobuf struct datatype.
-This approach causes issues with integers, as protobuf struct does not support int types, leading to their conversion to floats.
+In Flytekit, when handling dataclasses, Pydantic base models, and dictionaries, we store data using a JSON string within Protobuf struct datatype.
+This approach causes issues with integers, as Protobuf struct does not support int types, leading to their conversion to floats.
 This results in performance issues since we need to recursively iterate through all attributes/keys in dataclasses and dictionaries to ensure floats types are converted to int. In addition to performance issues, the required code is complicated and error prone.
 
 Note: We have more than 10 issues about dict, dataclass and Pydantic.
@@ -39,7 +39,7 @@ This feature can solve them all.
 @task
 def t1() -> dict:
   ...
-  return {"a": 1} # protobuf Struct {"a": 1.0}
+  return {"a": 1} # Protobuf Struct {"a": 1.0}
 
 @task
 def t2(a: dict):
@@ -48,9 +48,9 @@ def t2(a: dict):
 ### After
 ```python
 @task
-def t1() -> dict: # Json Byte Strings
+def t1() -> dict: # JSON Bytes
   ...
-  return {"a": 1}  # protobuf Json b'{"a": 1}'
+  return {"a": 1}  # Protobuf JSON b'\x81\xa1a\x01', produced by msgpack
 
 @task
 def t2(a: dict):
@@ -60,24 +60,23 @@ def t2(a: dict):
 #### Note
 - We will use the same type interface and ensure the backward compatibility.
 
-### How to create a byte string?
+### How to turn a value to bytes?
 #### Use MsgPack to convert value to a byte string
 ##### Python
 ```python
 import msgpack
-import json
+import JSON
 
 # Encode
 def to_literal():
-  json_str = json.dumps(python_val)
-  json_bytes = msgpack.dumps(json_str)
-  return Literal(scalar=Scalar(json=Json(json_bytes)), metadata={"format": "json"})
+  msgpack_bytes = msgpack.dumps(python_val)
+  return Literal(scalar=Scalar(json=Json(value=msgpack_bytes, serialization_format="msgpack")))
 
 # Decode
 def to_python_value():
-  json_bytes = lv.scalar.json.value
-  json_str = msgpack.loads(json_bytes)
-  return json.loads(json_str)
+  if lv.scalar.json.serialization_format == "msgpack":
+    msgpack_bytes = lv.scalar.json.value
+    return msgpack.loads(msgpack_bytes)
 ```
 reference: https://github.com/msgpack/msgpack-python 
 
@@ -144,9 +143,28 @@ reference: https://github.com/msgpack/msgpack-javascript
 
 ### FlyteIDL
 ```proto
+// Represents a JSON object encoded as a byte array.
+// This field is used to store JSON-serialized data, which can include
+// dataclasses, dictionaries, Pydantic models, or other structures that
+// can be represented as JSON objects. When utilized, the data should be
+// deserialized into its corresponding structure.
+// This design ensures that the data is stored in a format that can be
+// fully reconstructed without loss of information.
 message Json {
+    // The JSON object serialized as a byte array.
     bytes value = 1;
+
+    // The format used to serialize the byte array.
+    // This field identifies the specific format of the serialized JSON data,
+    // allowing future flexibility in supporting different JSON variants.
+    string serialization_format = 2;
+
+    // Placeholder for future extensions to support other types of JSON objects,
+    // such as "eJSON" or "ndJSON".
+    // reference: https://stackoverflow.com/questions/18692060/different-types-of-json
+    // string json_type = 3;
 }
+
 
 message Scalar {
     oneof value {
@@ -156,7 +174,7 @@ message Scalar {
         Schema schema = 4;
         Void none_type = 5;
         Error error = 6;
-        google.protobuf.Struct generic = 7;
+        google.Protobuf.Struct generic = 7;
         StructuredDataset structured_dataset = 8;
         Union union = 9;
         Json json = 10; // New Type
@@ -166,7 +184,7 @@ message Scalar {
 
 ### FlytePropeller
 1. Attribute Access for dictionary, Dataclass, and Pydantic in workflow.
-Dict[type, type] is supported already, we have to support Dataclass and Pydantic now.
+Dict[type, type] is supported already, we have to support Dataclass, Pydantic and dict now.
 ```python
 from flytekit import task, workflow
 from dataclasses import dataclass
@@ -193,7 +211,7 @@ def wf():
 ```go
 func literalTypeForScalar(scalar *core.Scalar) *core.LiteralType {
   ...
-  case *core.Scalar_Json:
+  case *core.Scalar_JSON:
 		literalType = &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_JSON}}
   ...
   return literalType 
@@ -206,12 +224,12 @@ func ExtractFromLiteral(literal *core.Literal) (interface{}, error) {
     switch literalValue := literal.Value.(type) {
         case *core.Literal_Scalar:
         ...
-            case *core.Scalar_Json:
-                return scalarValue.Json.Value, nil
+            case *core.Scalar_JSON:
+                return scalarValue.Json.GetValue(), nil
     }
 }
 // Default Input
-func MakeDefaultLiteralForType(typ *core.LiteralType) (*core.Literal, error) {
+func MakeDefaultLiteralForType(type *core.LiteralType) (*core.Literal, error) {
     switch t := typ.GetType().(type) {
 	case *core.LiteralType_Simple:
         ...
@@ -219,10 +237,11 @@ func MakeDefaultLiteralForType(typ *core.LiteralType) (*core.Literal, error) {
                         return &core.Literal{
                             Value: &core.Literal_Scalar{
                                 Scalar: &core.Scalar{
-                                    Value: &core.Scalar_Json{
-                                        Json: &core.Json{
-                                            Value: []byte("{}"),
+                                    Value: &core.Scalar_JSON{
+                                        JSON: &core.JSON{
+                                            Value: []byte(""),
                                         },
+										SerializationFormat: "msgpack",
                                     },
                                 },
                             },
@@ -239,18 +258,18 @@ We will pass the value to our class, which inherits from `click.ParamType`, and 
 
 | **Stage** | **Conversion** | **Description**                                                                                                                                                                                                                                                                                                               |
 | --- | --- |-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Before** | Python Value to Literal | 1. `Dict[type, type]` uses type hints to construct a LiteralMap. <br> 2. `dict` uses `json.dumps` to turn a `dict` value to a JSON string, and store it to protobuf Struct.                                                                                                                                                   |
-| | Literal to Python Value | 1. `Dict[type, type]` uses type hints to convert LiteralMap to Python Value. <br> 2. `dict` uses `json.loads` to turn a JSON string to a dict value and store it to protobuf Struct.                                                                                                                                          |
-| **After** | Python Value to Literal | 1. `Dict[type, type]` stays the same. <br> 2. `dict` uses `msgpack.dumps` to turn a JSON string to a byte string, and store is to protobuf Json. |
-| | Literal to Python Value | 1. `Dict[type, type]` uses type hints to convert LiteralMap to Python Value. <br> 2.  `dict` conversion: byte string -> JSON string -> dict value, method: `msgpack.loads` -> `json.loads`. |
+| **Before** | Python Value to Literal | 1. `Dict[type, type]` uses type hints to construct a LiteralMap. <br> 2. `dict` uses `JSON.dumps` to turn a `dict` value to a JSON string, and store it to Protobuf Struct.                                                                                                                                                   |
+| | Literal to Python Value | 1. `Dict[type, type]` uses type hints to convert LiteralMap to Python Value. <br> 2. `dict` uses `JSON.loads` to turn a JSON string to a dict value and store it to Protobuf Struct.                                                                                                                                          |
+| **After** | Python Value to Literal | 1. `Dict[type, type]` stays the same. <br> 2. `dict` uses `msgpack.dumps` to turn a JSON string to a byte string, and store is to Protobuf JSON. |
+| | Literal to Python Value | 1. `Dict[type, type]` uses type hints to convert LiteralMap to Python Value. <br> 2.  `dict` conversion: byte string -> JSON string -> dict value, method: `msgpack.loads` -> `JSON.loads`. |
 
 ### Dataclass Transformer
 
 | **Stage** | **Conversion** | **Description**                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | --- | --- |-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Before** | Python Value to Literal | Uses `mashumaro JSON Encoder` to turn a dataclass value to a JSON string, and store it to protobuf `Struct`. |
+| **Before** | Python Value to Literal | Uses `mashumaro JSON Encoder` to turn a dataclass value to a JSON string, and store it to Protobuf `Struct`. |
 | | Literal to Python Value | Uses `mashumaro JSON Decoder` to turn a JSON string to a python value, and recursively fixed int attributes to int (it will be float because we stored it in to `Struct`). |
-| **After** | Python Value to Literal | Uses `mashumaro JSON Encoder` to turn a dataclass value to a JSON string, and uses `msgpack.dumps()` to turn the JSON string into a byte string, and store it to protobuf `Json`. |
+| **After** | Python Value to Literal | Uses `mashumaro JSON Encoder` to turn a dataclass value to a JSON string, and uses `msgpack.dumps()` to turn the JSON string into a byte string, and store it to Protobuf `JSON`. |
 | | Literal to Python Value | Uses `msgpack.loads()` to turn a byte string into a JSON string, and uses `mashumaro JSON Decoder` to turn the JSON string into a Python value. |
 
 ### Pydantic Transformer
@@ -271,11 +290,11 @@ reference: https://github.com/flyteorg/flytectl/blob/131d6a20c7db601ca9156b8d43d
 
 ### FlyteConsole
 #### Show input/output on FlyteConsole
-We will get node’s input output literal value by FlyteAdmin’s API, and get the json byte string in the literal value.
+We will get node’s input output literal value by FlyteAdmin’s API, and get the JSON byte string in the literal value.
 
-We can use MsgPack dumps the json byte string to a dictionary, and shows it to the flyteconsole.
+We can use MsgPack dumps the JSON byte string to a dictionary, and shows it to the flyteconsole.
 #### Construct Input
-We should use `msgpack.encode` to encode input value and store it to the literal’s json field.
+We should use `msgpack.encode` to encode input value and store it to the literal’s JSON field.
 
 
 ## 4 Metrics & Dashboards
@@ -286,7 +305,7 @@ None
 Our current implementation double-encodes objects (first with Mashumaro, then with MsgPack), which is somewhat inefficient for the following reasons:
 
 1. We need to define custom encode/decode methods for dataclasses when using MsgPack, which is inconvenient for users. Alternatively, users must inherit from `DataClassMessagePackMixin` for each dataclass.
-2. Supporting the Flyte console becomes easier, as most of the logic remains the same when using a JSON string converted into a protobuf `Struct`.
+2. Supporting the Flyte console becomes easier, as most of the logic remains the same when using a JSON string converted into a Protobuf `Struct`.
 3. Backend checks are simplified.
 4. It's feasible to define custom encode/decode methods in private forks of Flyte and Flytekit, so users with performance requirements can implement their own solutions.
 
