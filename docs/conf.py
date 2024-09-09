@@ -162,6 +162,7 @@ exclude_patterns = [
     "api/flyteidl/tmp/**",
     "api/flyteidl/gen/**",
     "api/flyteidl/README.md",
+    "flytesnacks/sg_execution_times.rst"
 ]
 
 # -- Options for HTML output -------------------------------------------------
@@ -194,7 +195,8 @@ html_theme_options = {
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
-html_css_files = ["custom.css", "flyte.css", "algolia.css"]
+html_css_files = ["algolia.css"]
+# html_css_files = ["custom.css", "flyte.css", "algolia.css"]
 html_js_files = ["custom.js"]
 
 # Custom sidebar templates, must be a dictionary that maps document names
@@ -204,17 +206,16 @@ html_js_files = ["custom.js"]
 # defined by theme itself.  Builtin themes are using these templates by
 # default: ``['localtoc.html', 'relations.html', 'sourcelink.html',
 # 'searchbox.html']``.
-#
 
 html_sidebars = {
-    "api/**": ["sidebar"],
-    "cluster_deployment/**": ["sidebar"],
-    "community/**": ["sidebar"],
-    "concepts/**": ["sidebar"],
-    "ecosystem/**": ["sidebar"],
-    "integrations/**": ["sidebar"],
-    "tutorials/**": ["sidebar"],
-    "user_guide/**": ["sidebar"]
+    "api/**": ["custom_sidebar"],
+    "cluster_deployment/**": ["custom_sidebar"],
+    "community/**": ["custom_sidebar"],
+    "concepts/**": ["custom_sidebar"],
+    "ecosystem/**": ["custom_sidebar"],
+    "integrations/**": ["custom_sidebar"],
+    "tutorials/**": ["custom_sidebar"],
+    "user_guide/**": ["custom_sidebar"]
 }
 
 # -- Options for HTMLHelp output ---------------------------------------------
