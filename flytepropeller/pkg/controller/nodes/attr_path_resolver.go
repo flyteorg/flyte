@@ -11,7 +11,7 @@ import (
 // resolveAttrPathInPromise resolves the literal with attribute path
 // If the promise is chained with attributes (e.g. promise.a["b"][0]), then we need to resolve the promise
 func resolveAttrPathInPromise(nodeID string, literal *core.Literal, bindAttrPath []*core.PromiseAttribute) (*core.Literal, error) {
-	var currVal *core.Literal = literal
+	var currVal = literal
 	var tmpVal *core.Literal
 	var exist bool
 	count := 0
@@ -110,7 +110,7 @@ func resolveAttrPathInJSON(nodeID string, msgpackBytes []byte, bindAttrPath []*c
 				"Please ensure the serialization format is supported.", serializationFormat)
 	}
 
-	// Turn the current value to a map so it can be resolved more easily
+	// Turn the current value to a map, so it can be resolved more easily
 	for _, attr := range bindAttrPath {
 		switch resolvedVal := currVal.(type) {
 		// map

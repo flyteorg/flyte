@@ -406,6 +406,7 @@ func TestResolveAttrPathInJson(t *testing.T) {
 										},
 									},
 								}),
+								SerializationFormat: "msgpack",
 							},
 						},
 					},
@@ -454,11 +455,11 @@ func TestResolveAttrPathInJson(t *testing.T) {
 										},
 									},
 								}),
+								SerializationFormat: "msgpack",
 							},
 						},
 					},
 				},
-				Metadata: map[string]string{"format": "msgpack"},
 			},
 			// Test accessing the float value at foo.baz.qux
 			path: []*core.PromiseAttribute{
@@ -507,6 +508,7 @@ func TestResolveAttrPathInJson(t *testing.T) {
 										},
 									},
 								}),
+								SerializationFormat: "msgpack",
 							},
 						},
 					},
@@ -544,11 +546,11 @@ func TestResolveAttrPathInJson(t *testing.T) {
 								Value: toMsgpackBytes(map[string]interface{}{
 									"foo": []interface{}{int64(42), 3.14, "str"},
 								}),
+								SerializationFormat: "msgpack",
 							},
 						},
 					},
 				},
-				Metadata: map[string]string{"format": "msgpack"},
 			},
 			// Test accessing the int value at foo[0]
 			path: []*core.PromiseAttribute{
@@ -586,6 +588,7 @@ func TestResolveAttrPathInJson(t *testing.T) {
 								Value: toMsgpackBytes(map[string]interface{}{
 									"foo": []interface{}{int64(42), 3.14, "str"},
 								}),
+								SerializationFormat: "msgpack",
 							},
 						},
 					},
@@ -628,11 +631,11 @@ func TestResolveAttrPathInJson(t *testing.T) {
 								Value: toMsgpackBytes(map[string]interface{}{
 									"foo": []interface{}{int64(42), 3.14, "str"},
 								}),
+								SerializationFormat: "msgpack",
 							},
 						},
 					},
 				},
-				Metadata: map[string]string{"format": "msgpack"},
 			},
 			// Test accessing the string value at foo[2]
 			path: []*core.PromiseAttribute{
@@ -664,11 +667,11 @@ func TestResolveAttrPathInJson(t *testing.T) {
 										},
 									},
 								}),
+								SerializationFormat: "msgpack",
 							},
 						},
 					},
 				},
-				Metadata: map[string]string{"format": "msgpack"},
 			},
 			// Test accessing the entire nested map at foo.bar
 			path: []*core.PromiseAttribute{
@@ -691,11 +694,11 @@ func TestResolveAttrPathInJson(t *testing.T) {
 								Value: toMsgpackBytes(map[string]interface{}{
 									"baz": int64(42),
 								}),
+								SerializationFormat: "msgpack",
 							},
 						},
 					},
 				},
-				Metadata: map[string]string{"format": "msgpack"},
 			},
 			hasError: false,
 		},
@@ -715,11 +718,11 @@ func TestResolveAttrPathInJson(t *testing.T) {
 										},
 									},
 								}),
+								SerializationFormat: "msgpack",
 							},
 						},
 					},
 				},
-				Metadata: map[string]string{"format": "msgpack"},
 			},
 			// Test accessing a non-existing key in the nested map
 			path: []*core.PromiseAttribute{
@@ -752,11 +755,11 @@ func TestResolveAttrPathInJson(t *testing.T) {
 								Value: toMsgpackBytes(map[string]interface{}{
 									"foo": []interface{}{int64(42), 3.14, "str"},
 								}),
+								SerializationFormat: "msgpack",
 							},
 						},
 					},
 				},
-				Metadata: map[string]string{"format": "msgpack"},
 			},
 			// Test accessing an out-of-range index in the list
 			path: []*core.PromiseAttribute{
@@ -784,11 +787,11 @@ func TestResolveAttrPathInJson(t *testing.T) {
 								Value: toMsgpackBytes(map[string]interface{}{
 									"foo": []interface{}{[]interface{}{"bar1", "bar2"}},
 								}),
+								SerializationFormat: "msgpack",
 							},
 						},
 					},
 				},
-				Metadata: map[string]string{"format": "msgpack"},
 			},
 			path: []*core.PromiseAttribute{
 				{
