@@ -42,8 +42,13 @@ func (a *AdminFetcherExtClient) FetchAllWorkflows(ctx context.Context, project, 
 }
 
 // FetchWorkflowLatestVersion fetches latest version for given workflow name
-func (a *AdminFetcherExtClient) FetchWorkflowLatestVersion(ctx context.Context, name, project, domain string, filter filters.Filters) (*admin.Workflow, error) {
+func (a *AdminFetcherExtClient) FetchWorkflowLatestVersion(ctx context.Context, name, project, domain string) (*admin.Workflow, error) {
 	// Fetch the latest version of the workflow.
+	filter := filters.Filters{
+		SortBy: "created_at",
+		Limit:  1,
+		Asc:    false,
+	}
 	wVersions, err := a.FetchAllVerOfWorkflow(ctx, name, project, domain, filter)
 	if err != nil {
 		return nil, err

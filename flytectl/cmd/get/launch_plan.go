@@ -219,7 +219,7 @@ func FetchLPForName(ctx context.Context, fetcher ext.AdminFetcherExtInterface, n
 	var lp *admin.LaunchPlan
 	var err error
 	if launchplan.DefaultConfig.Latest {
-		if lp, err = fetcher.FetchLPLatestVersion(ctx, name, project, domain, launchplan.DefaultConfig.Filter); err != nil {
+		if lp, err = fetcher.FetchLPLatestVersion(ctx, name, project, domain); err != nil {
 			return nil, err
 		}
 		launchPlans = append(launchPlans, lp)

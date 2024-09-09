@@ -293,11 +293,10 @@ func TestGetLaunchPlanFuncLatest(t *testing.T) {
 	defer s.TearDown()
 	getLaunchPlanSetup()
 	launchplan.DefaultConfig.Latest = true
-	launchplan.DefaultConfig.Filter = filters.Filters{}
-	s.FetcherExt.OnFetchLPLatestVersionMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(launchPlan2, nil)
+	s.FetcherExt.OnFetchLPLatestVersionMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(launchPlan2, nil)
 	err := getLaunchPlanFunc(s.Ctx, argsLp, s.CmdCtx)
 	assert.Nil(t, err)
-	s.FetcherExt.AssertCalled(t, "FetchLPLatestVersion", s.Ctx, "launchplan1", projectValue, domainValue, launchplan.DefaultConfig.Filter)
+	s.FetcherExt.AssertCalled(t, "FetchLPLatestVersion", s.Ctx, "launchplan1", projectValue, domainValue)
 	s.TearDownAndVerify(t, `{"id": {"name": "launchplan1","version": "v2"},"spec": {"workflowId": {"name": "workflow2"},"defaultInputs": {"parameters": {"generic": {"var": {"type": {"simple": "STRUCT"},"description": "generic"},"default": {"scalar": {"generic": {"foo": "foo"}}}},"numbers": {"var": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "short desc"}},"numbers_count": {"var": {"type": {"simple": "INTEGER"},"description": "long description will be truncated in table"}},"run_local_at_count": {"var": {"type": {"simple": "INTEGER"},"description": "run_local_at_count"},"default": {"scalar": {"primitive": {"integer": "10"}}}}}}},"closure": {"expectedInputs": {"parameters": {"generic": {"var": {"type": {"simple": "STRUCT"},"description": "generic"},"default": {"scalar": {"generic": {"foo": "foo"}}}},"numbers": {"var": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "short desc"}},"numbers_count": {"var": {"type": {"simple": "INTEGER"},"description": "long description will be truncated in table"}},"run_local_at_count": {"var": {"type": {"simple": "INTEGER"},"description": "run_local_at_count"},"default": {"scalar": {"primitive": {"integer": "10"}}}}}},"createdAt": "1970-01-01T00:00:01Z"}}`)
 }
 
