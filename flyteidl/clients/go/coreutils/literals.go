@@ -256,7 +256,8 @@ func MakeDefaultLiteralForType(typ *core.LiteralType) (*core.Literal, error) {
 					Scalar: &core.Scalar{
 						Value: &core.Scalar_Json{
 							Json: &core.Json{
-								Value: []byte(""),
+								Value:               []byte(""),
+								SerializationFormat: "msgpack",
 							},
 						},
 					},
