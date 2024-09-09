@@ -282,3 +282,100 @@ func TestParseFlyteURLToExecution(t *testing.T) {
 		assert.Error(t, err)
 	})
 }
+
+func TestParseFlyteURLToExecution_OrgAware(t *testing.T) {
+	t.Run("node and attempt url with output", func(t *testing.T) {
+		x, err := ParseFlyteURLToExecution("flyte://v1/org/system/fs/dev/abc/n0/3/o/o0")
+		assert.NoError(t, err)
+		assert.Nil(t, x.NodeExecID)
+		assert.Nil(t, x.PartialTaskExecID.TaskId)
+		assert.Equal(t, "system", x.PartialTaskExecID.NodeExecutionId.ExecutionId.Org)
+		assert.Equal(t, "fs", x.PartialTaskExecID.NodeExecutionId.ExecutionId.Project)
+		assert.Equal(t, "dev", x.PartialTaskExecID.NodeExecutionId.ExecutionId.Domain)
+		assert.Equal(t, "abc", x.PartialTaskExecID.NodeExecutionId.ExecutionId.Name)
+		assert.Equal(t, "n0", x.PartialTaskExecID.NodeExecutionId.NodeId)
+		assert.Equal(t, uint32(3), x.PartialTaskExecID.GetRetryAttempt())
+		assert.Equal(t, "o0", x.LiteralName)
+	})
+
+	t.Run("node and attempt url no output", func(t *testing.T) {
+		x, err := ParseFlyteURLToExecution("flyte://v1/org/system/fs/dev/abc/n0/3/o")
+		assert.NoError(t, err)
+		assert.Nil(t, x.NodeExecID)
+		assert.Nil(t, x.PartialTaskExecID.TaskId)
+		assert.Equal(t, "system", x.PartialTaskExecID.NodeExecutionId.ExecutionId.Org)
+		assert.Equal(t, "fs", x.PartialTaskExecID.NodeExecutionId.ExecutionId.Project)
+		assert.Equal(t, "dev", x.PartialTaskExecID.NodeExecutionId.ExecutionId.Domain)
+		assert.Equal(t, "abc", x.PartialTaskExecID.NodeExecutionId.ExecutionId.Name)
+		assert.Equal(t, "n0", x.PartialTaskExecID.NodeExecutionId.NodeId)
+		assert.Equal(t, uint32(3), x.PartialTaskExecID.GetRetryAttempt())
+		assert.Equal(t, "", x.LiteralName)
+	})
+
+	t.Run("node url with output", func(t *testing.T) {
+		x, err := ParseFlyteURLToExecution("flyte://v1/org/system/fs/dev/abc/n0/o/o0")
+		assert.NoError(t, err)
+		assert.NotNil(t, x.NodeExecID)
+		assert.Nil(t, x.PartialTaskExecID)
+		assert.Equal(t, "system", x.NodeExecID.ExecutionId.Org)
+		assert.Equal(t, "fs", x.NodeExecID.ExecutionId.Project)
+		assert.Equal(t, "dev", x.NodeExecID.ExecutionId.Domain)
+		assert.Equal(t, "abc", x.NodeExecID.ExecutionId.Name)
+		assert.Equal(t, "n0", x.NodeExecID.NodeId)
+		assert.Equal(t, "o0", x.LiteralName)
+	})
+
+	t.Run("node url no output", func(t *testing.T) {
+		x, err := ParseFlyteURLToExecution("flyte://v1/org/system/fs/dev/abc/n0/o")
+		assert.NoError(t, err)
+		assert.NotNil(t, x.NodeExecID)
+		assert.Nil(t, x.PartialTaskExecID)
+		assert.Equal(t, "system", x.NodeExecID.ExecutionId.Org)
+		assert.Equal(t, "fs", x.NodeExecID.ExecutionId.Project)
+		assert.Equal(t, "dev", x.NodeExecID.ExecutionId.Domain)
+		assert.Equal(t, "abc", x.NodeExecID.ExecutionId.Name)
+		assert.Equal(t, "n0", x.NodeExecID.NodeId)
+		assert.Equal(t, "", x.LiteralName)
+	})
+
+	t.Run("node url all inputs", func(t *testing.T) {
+		x, err := ParseFlyteURLToExecution("flyte://v1/org/system/fs/dev/abc/n0/i")
+		assert.NoError(t, err)
+		assert.NotNil(t, x.NodeExecID)
+		assert.Nil(t, x.PartialTaskExecID)
+		assert.Equal(t, "system", x.NodeExecID.ExecutionId.Org)
+		assert.Equal(t, "fs", x.NodeExecID.ExecutionId.Project)
+		assert.Equal(t, "dev", x.NodeExecID.ExecutionId.Domain)
+		assert.Equal(t, "abc", x.NodeExecID.ExecutionId.Name)
+		assert.Equal(t, "n0", x.NodeExecID.NodeId)
+		assert.Equal(t, "", x.LiteralName)
+		assert.Equal(t, ArtifactTypeI, x.IOType)
+	})
+
+	t.Run("node url all inputs", func(t *testing.T) {
+		x, err := ParseFlyteURLToExecution("flyte://v1/org/system/fs/dev/abc/n0/d")
+		assert.NoError(t, err)
+		assert.NotNil(t, x.NodeExecID)
+		assert.Nil(t, x.PartialTaskExecID)
+		assert.Equal(t, "system", x.NodeExecID.ExecutionId.Org)
+		assert.Equal(t, "fs", x.NodeExecID.ExecutionId.Project)
+		assert.Equal(t, "dev", x.NodeExecID.ExecutionId.Domain)
+		assert.Equal(t, "abc", x.NodeExecID.ExecutionId.Name)
+		assert.Equal(t, "n0", x.NodeExecID.NodeId)
+		assert.Equal(t, "", x.LiteralName)
+		assert.Equal(t, ArtifactTypeD, x.IOType)
+	})
+
+	t.Run("invalid", func(t *testing.T) {
+		// more than one character
+		_, err := ParseFlyteURLToExecution("flyte://v1/org/system/fs/dev/abc/n0/0/od")
+		assert.Error(t, err)
+
+		_, err = ParseFlyteURLToExecution("flyte://v1/org/system/fs/dev/abc/n0/input")
+		assert.Error(t, err)
+
+		// non integer for attempt
+		_, err = ParseFlyteURLToExecution("flyte://v1/org/system/fs/dev/ab/n0/a/i")
+		assert.Error(t, err)
+	})
+}

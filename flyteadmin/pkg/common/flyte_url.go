@@ -26,6 +26,10 @@ var re = regexp.MustCompile("flyte://v1/(?P<project>[a-zA-Z0-9_-]+)/(?P<domain>[
 
 var reSpecificOutput = regexp.MustCompile("flyte://v1/(?P<project>[a-zA-Z0-9_-]+)/(?P<domain>[a-zA-Z0-9_-]+)/(?P<exec>[a-zA-Z0-9_-]+)/(?P<node>[a-zA-Z0-9_-]+)(?:/(?P<attempt>[0-9]+))?/(?P<ioType>[io])/(?P<literalName>[a-zA-Z0-9_-]+)$")
 
+var orgAwareRe = regexp.MustCompile("flyte://v1/org/(?P<org>[a-zA-Z0-9_-]+)/(?P<project>[a-zA-Z0-9_-]+)/(?P<domain>[a-zA-Z0-9_-]+)/(?P<exec>[a-zA-Z0-9_-]+)/(?P<node>[a-zA-Z0-9_-]+)(?:/(?P<attempt>[0-9]+))?/(?P<ioType>[iod])$")
+
+var orgAwareReSpecificOutput = regexp.MustCompile("flyte://v1/org/(?P<org>[a-zA-Z0-9_-]+)/(?P<project>[a-zA-Z0-9_-]+)/(?P<domain>[a-zA-Z0-9_-]+)/(?P<exec>[a-zA-Z0-9_-]+)/(?P<node>[a-zA-Z0-9_-]+)(?:/(?P<attempt>[0-9]+))?/(?P<ioType>[io])/(?P<literalName>[a-zA-Z0-9_-]+)$")
+
 func MatchRegex(reg *regexp.Regexp, input string) map[string]string {
 	names := reg.SubexpNames()
 	res := reg.FindAllStringSubmatch(input, -1)
@@ -56,11 +60,16 @@ type ParsedExecution struct {
 func tryMatches(flyteURL string) map[string]string {
 	var matches map[string]string
 
-	if matches = MatchRegex(re, flyteURL); len(matches) > 0 {
+	if matches = MatchRegex(orgAwareRe, flyteURL); len(matches) > 0 {
+		return matches
+	} else if matches = MatchRegex(orgAwareReSpecificOutput, flyteURL); len(matches) > 0 {
+		return matches
+	} else if matches = MatchRegex(re, flyteURL); len(matches) > 0 {
 		return matches
 	} else if matches = MatchRegex(reSpecificOutput, flyteURL); len(matches) > 0 {
 		return matches
 	}
+
 	return nil
 }
 
@@ -71,6 +80,12 @@ func ParseFlyteURLToExecution(flyteURL string) (ParsedExecution, error) {
 	//  flyte://v1/project/domain/execution_id/node_id/[io]/output_name
 	//  flyte://v1/project/domain/execution_id/node_id/[iod]
 
+	// In serverless contexts it can be of the form
+	//  flyte://v1/org/{org}/project/domain/execution_id/node_id/attempt/[iod]
+	//  flyte://v1/org/{org}/project/domain/execution_id/node_id/attempt/[io]/output_name
+	//  flyte://v1/org/{org}/project/domain/execution_id/node_id/[io]/output_name
+	//  flyte://v1/org/{org}/project/domain/execution_id/node_id/[iod]
+
 	// where i stands for inputs.pb o for outputs.pb and d for the flyte deck
 	// If the retry attempt is missing, the io requested is assumed to be for the node instead of the task execution
 
@@ -79,6 +94,7 @@ func ParseFlyteURLToExecution(flyteURL string) (ParsedExecution, error) {
 		return ParsedExecution{}, fmt.Errorf("failed to parse [%s]", flyteURL)
 	}
 
+	org := matches["org"]
 	proj := matches["project"]
 	domain := matches["domain"]
 	executionID := matches["exec"]
@@ -93,6 +109,7 @@ func ParseFlyteURLToExecution(flyteURL string) (ParsedExecution, error) {
 	nodeExecID := core.NodeExecutionIdentifier{
 		NodeId: nodeID,
 		ExecutionId: &core.WorkflowExecutionIdentifier{
+			Org:     org,
 			Project: proj,
 			Domain:  domain,
 			Name:    executionID,
