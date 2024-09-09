@@ -43,20 +43,8 @@ func resolveAttrPathInPromise(nodeID string, literal *core.Literal, bindAttrPath
 		var err error
 
 		if jsonIDL := scalar.GetJson(); jsonIDL != nil {
-			metadata := currVal.GetMetadata()
-
-			if metadata == nil {
-				return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID,
-					"metadata is not provided in literal JSON's metadata")
-			}
-
-			format, ok := metadata["format"]
-			if !ok {
-				return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID,
-					"format is not specified in literal JSON's metadata")
-			}
-
-			currVal, err = resolveAttrPathInJSON(nodeID, jsonIDL.GetValue(), bindAttrPath[count:], format)
+			serializationFormat := jsonIDL.GetSerializationFormat()
+			currVal, err = resolveAttrPathInJSON(nodeID, jsonIDL.GetValue(), bindAttrPath[count:], serializationFormat)
 		} else if generic := scalar.GetGeneric(); generic != nil {
 			currVal, err = resolveAttrPathInPbStruct(nodeID, generic, bindAttrPath[count:])
 		}
@@ -104,14 +92,14 @@ func resolveAttrPathInPbStruct(nodeID string, st *structpb.Struct, bindAttrPath 
 
 // resolveAttrPathInJSON resolves the msgpack bytes (e.g. dataclass) with attribute path
 func resolveAttrPathInJSON(nodeID string, msgpackBytes []byte, bindAttrPath []*core.PromiseAttribute,
-	format string) (*core.Literal,
+	serializationFormat string) (*core.Literal,
 	error) {
 
 	var currVal interface{}
 	var tmpVal interface{}
 	var exist bool
 
-	if format == "msgpack" {
+	if serializationFormat == "msgpack" {
 		err := msgpack.Unmarshal(msgpackBytes, &currVal)
 		if err != nil {
 			return nil, err
@@ -119,7 +107,7 @@ func resolveAttrPathInJSON(nodeID string, msgpackBytes []byte, bindAttrPath []*c
 	} else {
 		return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID,
 			"Unsupported format '%v' found for literal value.\n"+
-				"Please ensure the format is supported.", format)
+				"Please ensure the serialization format is supported.", serializationFormat)
 	}
 
 	// Turn the current value to a map so it can be resolved more easily
@@ -142,7 +130,7 @@ func resolveAttrPathInJSON(nodeID string, msgpackBytes []byte, bindAttrPath []*c
 	}
 
 	// After resolve, convert the interface to literal
-	literal, err := convertJSONToLiteral(nodeID, currVal, format)
+	literal, err := convertJSONToLiteral(nodeID, currVal, serializationFormat)
 
 	return literal, err
 }
@@ -192,15 +180,12 @@ func convertStructToLiteral(nodeID string, obj interface{}) (*core.Literal, erro
 }
 
 // convertJSONToLiteral converts the JSON (e.g. dataclass) to literal
-func convertJSONToLiteral(nodeID string, obj interface{}, format string) (*core.Literal, error) {
-
+func convertJSONToLiteral(nodeID string, obj interface{}, serializationFormat string) (*core.Literal, error) {
 	literal := &core.Literal{}
 
 	switch obj := obj.(type) {
 	case map[string]interface{}:
-		if format == "msgpack" {
-			literal.Metadata = map[string]string{"format": format}
-
+		if serializationFormat == "msgpack" {
 			msgpackBytes, err := msgpack.Marshal(obj)
 			if err != nil {
 				return nil, err
@@ -209,21 +194,22 @@ func convertJSONToLiteral(nodeID string, obj interface{}, format string) (*core.
 				Scalar: &core.Scalar{
 					Value: &core.Scalar_Json{
 						Json: &core.Json{
-							Value: msgpackBytes,
+							Value:               msgpackBytes,
+							SerializationFormat: serializationFormat,
 						},
 					},
 				},
 			}
 		} else {
 			return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID,
-				"Unsupported format '%v' found for literal value.\n"+
-					"Please ensure the format is supported.", format)
+				"Unsupported serialization format '%v' found for literal value.\n"+
+					"Please ensure the serialization format is supported.", serializationFormat)
 		}
 	case []interface{}:
 		literals := []*core.Literal{}
 		for _, v := range obj {
 			// recursively convert the interface to literal
-			literal, err := convertJSONToLiteral(nodeID, v, format)
+			literal, err := convertJSONToLiteral(nodeID, v, serializationFormat)
 			if err != nil {
 				return nil, err
 			}

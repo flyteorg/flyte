@@ -401,10 +401,10 @@ func MakeLiteralForSimpleType(t core.SimpleType, s string) (*core.Literal, error
 	case core.SimpleType_JSON:
 		scalar.Value = &core.Scalar_Json{
 			Json: &core.Json{
-				Value: []byte(s),
+				Value:               []byte(s),
+				SerializationFormat: "msgpack",
 			},
 		}
-		lv.Metadata = map[string]string{"format": "msgpack"}
 	case core.SimpleType_BINARY:
 		scalar.Value = &core.Scalar_Binary{
 			Binary: &core.Binary{
@@ -597,12 +597,12 @@ func MakeLiteralForType(t *core.LiteralType, v interface{}) (*core.Literal, erro
 					Scalar: &core.Scalar{
 						Value: &core.Scalar_Json{
 							Json: &core.Json{
-								Value: msgpackBytes,
+								Value:               msgpackBytes,
+								SerializationFormat: "msgpack",
 							},
 						},
 					},
 				}
-				l.Metadata = map[string]string{"format": "msgpack"}
 				return l, nil
 			}
 		}
