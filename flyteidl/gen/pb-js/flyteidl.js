@@ -7281,6 +7281,7 @@
                  * @memberof flyteidl.core
                  * @interface IJson
                  * @property {Uint8Array|null} [value] Json value
+                 * @property {string|null} [serializationFormat] Json serializationFormat
                  */
     
                 /**
@@ -7305,6 +7306,14 @@
                  * @instance
                  */
                 Json.prototype.value = $util.newBuffer([]);
+    
+                /**
+                 * Json serializationFormat.
+                 * @member {string} serializationFormat
+                 * @memberof flyteidl.core.Json
+                 * @instance
+                 */
+                Json.prototype.serializationFormat = "";
     
                 /**
                  * Creates a new Json instance using the specified properties.
@@ -7332,6 +7341,8 @@
                         writer = $Writer.create();
                     if (message.value != null && message.hasOwnProperty("value"))
                         writer.uint32(/* id 1, wireType 2 =*/10).bytes(message.value);
+                    if (message.serializationFormat != null && message.hasOwnProperty("serializationFormat"))
+                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.serializationFormat);
                     return writer;
                 };
     
@@ -7356,6 +7367,9 @@
                         case 1:
                             message.value = reader.bytes();
                             break;
+                        case 2:
+                            message.serializationFormat = reader.string();
+                            break;
                         default:
                             reader.skipType(tag & 7);
                             break;
@@ -7378,6 +7392,9 @@
                     if (message.value != null && message.hasOwnProperty("value"))
                         if (!(message.value && typeof message.value.length === "number" || $util.isString(message.value)))
                             return "value: buffer expected";
+                    if (message.serializationFormat != null && message.hasOwnProperty("serializationFormat"))
+                        if (!$util.isString(message.serializationFormat))
+                            return "serializationFormat: string expected";
                     return null;
                 };
     

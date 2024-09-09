@@ -207,10 +207,15 @@
       "properties": {
         "value": {
           "type": "string",
-          "format": "byte"
+          "format": "byte",
+          "description": "The JSON object serialized as a byte array."
+        },
+        "serialization_format": {
+          "type": "string",
+          "description": "The format used to serialize the byte array.\nThis field identifies the specific format of the serialized JSON data,\nallowing future flexibility in supporting different JSON variants."
         }
       },
-      "description": "Represents a JSON object encoded as a byte array.\nThis field is intended to store JSON-serialized data such as dataclasses,\ndictionaries, pydantic models, or other structures that can be represented\nas JSON objects. The data should be deserialized into its corresponding\nstructure when used.\nThis design guarantees that the data is stored in a format that can be 100% reconstructed."
+      "description": "Represents a JSON object encoded as a byte array.\nThis field is used to store JSON-serialized data, which can include\ndataclasses, dictionaries, Pydantic models, or other structures that\ncan be represented as JSON objects. When utilized, the data should be\ndeserialized into its corresponding structure.\nThis design ensures that the data is stored in a format that can be\nfully reconstructed without loss of information."
     },
     "coreLiteral": {
       "type": "object",

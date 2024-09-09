@@ -3050,6 +3050,9 @@ export namespace flyteidl {
 
             /** Json value */
             value?: (Uint8Array|null);
+
+            /** Json serializationFormat */
+            serializationFormat?: (string|null);
         }
 
         /** Represents a Json. */
@@ -3063,6 +3066,9 @@ export namespace flyteidl {
 
             /** Json value. */
             public value: Uint8Array;
+
+            /** Json serializationFormat. */
+            public serializationFormat: string;
 
             /**
              * Creates a new Json instance using the specified properties.

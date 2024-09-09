@@ -255,19 +255,31 @@ export class Binary extends Message<Binary> {
 
 /**
  * Represents a JSON object encoded as a byte array.
- * This field is intended to store JSON-serialized data such as dataclasses,
- * dictionaries, pydantic models, or other structures that can be represented
- * as JSON objects. The data should be deserialized into its corresponding
- * structure when used.
- * This design guarantees that the data is stored in a format that can be 100% reconstructed.
+ * This field is used to store JSON-serialized data, which can include
+ * dataclasses, dictionaries, Pydantic models, or other structures that
+ * can be represented as JSON objects. When utilized, the data should be
+ * deserialized into its corresponding structure.
+ * This design ensures that the data is stored in a format that can be
+ * fully reconstructed without loss of information.
  *
  * @generated from message flyteidl.core.Json
  */
 export class Json extends Message<Json> {
   /**
+   * The JSON object serialized as a byte array.
+   *
    * @generated from field: bytes value = 1;
    */
   value = new Uint8Array(0);
+
+  /**
+   * The format used to serialize the byte array.
+   * This field identifies the specific format of the serialized JSON data,
+   * allowing future flexibility in supporting different JSON variants.
+   *
+   * @generated from field: string serialization_format = 2;
+   */
+  serializationFormat = "";
 
   constructor(data?: PartialMessage<Json>) {
     super();
@@ -278,6 +290,7 @@ export class Json extends Message<Json> {
   static readonly typeName = "flyteidl.core.Json";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "value", kind: "scalar", T: 12 /* ScalarType.BYTES */ },
+    { no: 2, name: "serialization_format", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Json {

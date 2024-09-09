@@ -409,16 +409,23 @@ pub struct Binary {
     pub tag: ::prost::alloc::string::String,
 }
 /// Represents a JSON object encoded as a byte array.
-/// This field is intended to store JSON-serialized data such as dataclasses,
-/// dictionaries, pydantic models, or other structures that can be represented
-/// as JSON objects. The data should be deserialized into its corresponding
-/// structure when used.
-/// This design guarantees that the data is stored in a format that can be 100% reconstructed.
+/// This field is used to store JSON-serialized data, which can include
+/// dataclasses, dictionaries, Pydantic models, or other structures that
+/// can be represented as JSON objects. When utilized, the data should be
+/// deserialized into its corresponding structure.
+/// This design ensures that the data is stored in a format that can be
+/// fully reconstructed without loss of information.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Json {
+    /// The JSON object serialized as a byte array.
     #[prost(bytes="vec", tag="1")]
     pub value: ::prost::alloc::vec::Vec<u8>,
+    /// The format used to serialize the byte array.
+    /// This field identifies the specific format of the serialized JSON data,
+    /// allowing future flexibility in supporting different JSON variants.
+    #[prost(string, tag="2")]
+    pub serialization_format: ::prost::alloc::string::String,
 }
 /// A strongly typed schema that defines the interface of data retrieved from the underlying storage medium.
 #[allow(clippy::derive_partial_eq_without_eq)]

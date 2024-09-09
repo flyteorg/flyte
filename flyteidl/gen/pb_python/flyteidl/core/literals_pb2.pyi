@@ -52,10 +52,12 @@ class Binary(_message.Message):
     def __init__(self, value: _Optional[bytes] = ..., tag: _Optional[str] = ...) -> None: ...
 
 class Json(_message.Message):
-    __slots__ = ["value"]
+    __slots__ = ["value", "serialization_format"]
     VALUE_FIELD_NUMBER: _ClassVar[int]
+    SERIALIZATION_FORMAT_FIELD_NUMBER: _ClassVar[int]
     value: bytes
-    def __init__(self, value: _Optional[bytes] = ...) -> None: ...
+    serialization_format: str
+    def __init__(self, value: _Optional[bytes] = ..., serialization_format: _Optional[str] = ...) -> None: ...
 
 class Schema(_message.Message):
     __slots__ = ["uri", "type"]
