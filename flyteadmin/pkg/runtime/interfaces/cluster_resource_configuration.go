@@ -50,6 +50,7 @@ type ClusterResourceConfig struct {
 	CustomData             map[DomainName]TemplateData `json:"customData"`
 	StandaloneDeployment   bool                        `json:"standaloneDeployment" pflag:", Whether the cluster resource sync is running in a standalone deployment and should call flyteadmin service endpoints"`
 	UnionProjectSyncConfig UnionProjectSyncConfig      `json:"unionProjectSyncConfig"`
+	IsSelfServe            bool                        `json:"isSelfServe" pflag:", Whether the tenant is a self-serve tenant"`
 }
 
 type ClusterResourceConfiguration interface {
@@ -59,4 +60,5 @@ type ClusterResourceConfiguration interface {
 	GetCustomTemplateData() map[DomainName]TemplateData
 	IsStandaloneDeployment() bool
 	GetUnionProjectSyncConfig() UnionProjectSyncConfig
+	IsSelfServe() bool
 }

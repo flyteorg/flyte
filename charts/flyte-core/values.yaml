@@ -1031,6 +1031,7 @@ cloud_events:
 cluster_resource_manager:
   # -- Enables the Cluster resource manager component
   enabled: true
+  unionCallbackEnabled: false
   standaloneDeployment: false
   rootCommand: flyteadmin
   image:
@@ -1077,6 +1078,8 @@ cluster_resource_manager:
                 value: "4"
             - projectQuotaMemory:
                 value: "3000Mi"
+  secretName: "unionCloudSecretAuth"
+
 
   prometheus:
     enabled: false

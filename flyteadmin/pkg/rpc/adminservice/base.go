@@ -17,6 +17,7 @@ import (
 	manager "github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/configurations"
 	projectConfigurationPlugin "github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/configurations/plugin"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/executions"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/resources"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/shared"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
@@ -165,6 +166,8 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 		executionEventWriter.Run()
 	}()
 
+	noopPreExecutionValidationPlugin := executions.NewNoopPreExecutionValidationPlugin()
+	pluginRegistry.RegisterDefault(plugins.PluginIDPreExecutionValidation, noopPreExecutionValidationPlugin)
 	executionManager := manager.NewExecutionManager(repo, pluginRegistry, configuration, dataStorageClient,
 		adminScope.NewSubScope("execution_manager"), adminScope.NewSubScope("user_execution_metrics"),
 		publisher, urlData, workflowManager, namedEntityManager, eventPublisher, cloudEventPublisher, executionEventWriter, artifactRegistry, resourceManager)

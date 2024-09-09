@@ -19,6 +19,8 @@ const (
 	PluginIDUnaryServiceMiddleware PluginID = "UnaryServiceMiddleware"
 	PluginIDUserProperties         PluginID = "UserProperties"
 	PluginIDWorkflowExecutor       PluginID = "WorkflowExecutor"
+	PluginIDClusterResource        PluginID = "ClusterResource"
+	PluginIDPreExecutionValidation PluginID = "PreExecutionValidation"
 )
 
 type AtomicRegistry struct {

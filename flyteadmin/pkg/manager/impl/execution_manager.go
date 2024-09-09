@@ -1135,6 +1135,13 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		return nil, nil, nil, err
 	}
 
+	// This section is for serverless user namespace checking. In BYOC, ValidateUserOrg always returns nil.
+	err = plugins.Get[executions.PreExecutionValidationPlugin](m.pluginRegistry, plugins.PluginIDPreExecutionValidation).ValidateCreateExecutionRequest(ctx, request)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to validate execution request [%+v] with err %v", request, err)
+		return nil, nil, nil, err
+	}
+
 	if request.Spec.LaunchPlan.ResourceType == core.ResourceType_TASK {
 		logger.Debugf(ctx, "Launching single task execution with [%+v]", request.Spec.LaunchPlan)
 		// When tasks can have defaults this will need to handle Artifacts as well.

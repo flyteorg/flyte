@@ -28,6 +28,7 @@ import (
 	artifactMocks "github.com/flyteorg/flyte/flyteadmin/pkg/artifacts/mocks"
 	eventWriterMocks "github.com/flyteorg/flyte/flyteadmin/pkg/async/events/mocks"
 	notificationMocks "github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/mocks"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/clusterresource/plugin"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	commonMocks "github.com/flyteorg/flyte/flyteadmin/pkg/common/mocks"
 	commonTestUtils "github.com/flyteorg/flyte/flyteadmin/pkg/common/testutils"
@@ -103,6 +104,18 @@ var resourceDefaults = runtimeInterfaces.TaskResourceSet{
 var resourceLimits = runtimeInterfaces.TaskResourceSet{
 	CPU:    resource.MustParse("300m"),
 	Memory: resource.MustParse("500Gi"),
+}
+
+var noopSelfServeServicePlugin = plugin.NewNoopClusterResourcePlugin()
+var noopPreExecutionValidationPlugin = executions.NewNoopPreExecutionValidationPlugin()
+
+func getDefaultPluginRegistry() *plugins.Registry {
+	r := plugins.NewRegistry()
+	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
+	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
+	r.RegisterDefault(plugins.PluginIDClusterResource, noopSelfServeServicePlugin)
+	r.RegisterDefault(plugins.PluginIDPreExecutionValidation, noopPreExecutionValidationPlugin)
+	return r
 }
 
 func getNoopMockResourceManager() managerInterfaces.ResourceInterface {
@@ -379,9 +392,8 @@ func TestCreateExecution(t *testing.T) {
 		Cluster: testCluster,
 	}, nil)
 	mockExecutor.OnID().Return("customMockExecutor")
-	r := plugins.NewRegistry()
+	r := getDefaultPluginRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
 
 	qosProvider := &runtimeIFaceMocks.QualityOfServiceConfiguration{}
 	qosProvider.OnGetTierExecutionValues().Return(map[core.QualityOfService_Tier]core.QualityOfServiceSpec{
@@ -580,9 +592,8 @@ func TestCreateExecutionFromWorkflowNode(t *testing.T) {
 		Cluster: testCluster,
 	}, nil)
 	mockExecutor.OnID().Return("customMockExecutor")
-	r := plugins.NewRegistry()
+	r := getDefaultPluginRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
 
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
@@ -619,9 +630,8 @@ func TestCreateExecution_NoAssignedName(t *testing.T) {
 		Cluster: testCluster,
 	}, nil)
 	mockExecutor.OnID().Return("customMockExecutor")
-	r := plugins.NewRegistry()
+	r := getDefaultPluginRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
 
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
@@ -673,9 +683,8 @@ func TestCreateExecution_TaggedQueue(t *testing.T) {
 		Cluster: testCluster,
 	}, nil)
 	mockExecutor.OnID().Return("customMockExecutor")
-	r := plugins.NewRegistry()
+	r := getDefaultPluginRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, configProvider, getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 
@@ -693,9 +702,7 @@ func TestCreateExecution_TaggedQueue(t *testing.T) {
 func TestCreateExecutionValidationError(t *testing.T) {
 	repository := getMockRepositoryForExecTest()
 	setDefaultLpCallbackForExecTest(repository)
-	r := plugins.NewRegistry()
-	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
+	r := getDefaultPluginRegistry()
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 
@@ -709,9 +716,7 @@ func TestCreateExecutionValidationError(t *testing.T) {
 func TestCreateExecution_InvalidLpIdentifier(t *testing.T) {
 	repository := getMockRepositoryForExecTest()
 	setDefaultLpCallbackForExecTest(repository)
-	r := plugins.NewRegistry()
-	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
+	r := getDefaultPluginRegistry()
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 
@@ -725,9 +730,7 @@ func TestCreateExecution_InvalidLpIdentifier(t *testing.T) {
 func TestCreateExecutionInCompatibleInputs(t *testing.T) {
 	repository := getMockRepositoryForExecTest()
 	setDefaultLpCallbackForExecTest(repository)
-	r := plugins.NewRegistry()
-	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
+	r := getDefaultPluginRegistry()
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 
@@ -749,9 +752,8 @@ func TestCreateExecutionPropellerFailure(t *testing.T) {
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
 	mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, expectedErr)
 	mockExecutor.OnID().Return("customMockExecutor")
-	r := plugins.NewRegistry()
+	r := getDefaultPluginRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
 	qosProvider := &runtimeIFaceMocks.QualityOfServiceConfiguration{}
 	qosProvider.OnGetTierExecutionValues().Return(map[core.QualityOfService_Tier]core.QualityOfServiceSpec{
 		core.QualityOfService_HIGH: {
@@ -796,9 +798,8 @@ func TestCreateExecutionDatabaseFailure(t *testing.T) {
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
 	mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
 	mockExecutor.OnID().Return("customMockExecutor")
-	r := plugins.NewRegistry()
+	r := getDefaultPluginRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
 	repository := getMockRepositoryForExecTest()
 	setDefaultLpCallbackForExecTest(repository)
 	expectedErr := flyteAdminErrors.NewFlyteAdminErrorf(codes.Internal, "ABCD")
@@ -874,9 +875,8 @@ func TestCreateExecutionVerifyDbModel(t *testing.T) {
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
 	mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
 	mockExecutor.OnID().Return("testMockExecutor")
-	r := plugins.NewRegistry()
+	r := getDefaultPluginRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), storageClient, mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 
@@ -919,9 +919,8 @@ func TestCreateExecutionDefaultNotifications(t *testing.T) {
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
 	mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
 	mockExecutor.OnID().Return("testMockExecutor")
-	r := plugins.NewRegistry()
+	r := getDefaultPluginRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 
@@ -960,9 +959,8 @@ func TestCreateExecutionDisableNotifications(t *testing.T) {
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
 	mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
 	mockExecutor.OnID().Return("testMockExecutor")
-	r := plugins.NewRegistry()
+	r := getDefaultPluginRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 
@@ -1032,9 +1030,8 @@ func TestCreateExecutionNoNotifications(t *testing.T) {
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
 	mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
 	mockExecutor.OnID().Return("testMockExecutor")
-	r := plugins.NewRegistry()
+	r := getDefaultPluginRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 
@@ -1063,9 +1060,8 @@ func TestCreateExecutionDynamicLabelsAndAnnotations(t *testing.T) {
 		return true
 	})).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
 	mockExecutor.OnID().Return("customMockExecutor")
-	r := plugins.NewRegistry()
+	r := getDefaultPluginRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 	request := testutils.GetExecutionRequest()
@@ -1184,9 +1180,8 @@ func TestCreateExecutionInterruptible(t *testing.T) {
 			mockExecutor := workflowengineMocks.WorkflowExecutor{}
 			mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
 			mockExecutor.OnID().Return("testMockExecutor")
-			r := plugins.NewRegistry()
+			r := getDefaultPluginRegistry()
 			r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
-			r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
 			mockResourceManager := getNoopMockResourceManager()
 			execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 
@@ -1266,9 +1261,8 @@ func TestCreateExecutionOverwriteCache(t *testing.T) {
 			mockExecutor := workflowengineMocks.WorkflowExecutor{}
 			mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
 			mockExecutor.OnID().Return("testMockExecutor")
-			r := plugins.NewRegistry()
+			r := getDefaultPluginRegistry()
 			r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
-			r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
 			mockResourceManager := getNoopMockResourceManager()
 			execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 
@@ -1352,9 +1346,8 @@ func TestCreateExecutionWithEnvs(t *testing.T) {
 			mockExecutor := workflowengineMocks.WorkflowExecutor{}
 			mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
 			mockExecutor.OnID().Return("testMockExecutor")
-			r := plugins.NewRegistry()
+			r := getDefaultPluginRegistry()
 			r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
-			r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
 			mockResourceManager := getNoopMockResourceManager()
 			execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 
@@ -1384,9 +1377,8 @@ func TestCreateExecution_CustomNamespaceMappingConfig(t *testing.T) {
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
 	mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
 	mockExecutor.OnID().Return("testMockExecutor")
-	r := plugins.NewRegistry()
+	r := getDefaultPluginRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
 
 	mockNs := runtimeMocks.NamespaceMappingConfiguration{}
 	mockNs.OnGetNamespaceTemplate().Return("{{ project }}")
@@ -1571,9 +1563,8 @@ func TestRelaunchExecution(t *testing.T) {
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
 	mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
 	mockExecutor.OnID().Return("testMockExecutor")
-	r := plugins.NewRegistry()
+	r := getDefaultPluginRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 	startTime := time.Now()
@@ -1633,9 +1624,7 @@ func TestRelaunchExecution_GetExistingFailure(t *testing.T) {
 	repository := getMockRepositoryForExecTest()
 	setDefaultLpCallbackForExecTest(repository)
 
-	r := plugins.NewRegistry()
-	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
+	r := getDefaultPluginRegistry()
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 
@@ -1674,9 +1663,8 @@ func TestRelaunchExecution_CreateFailure(t *testing.T) {
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
 	mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
 	mockExecutor.OnID().Return("testMockExecutor")
-	r := plugins.NewRegistry()
+	r := getDefaultPluginRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 	startTime := time.Now()
@@ -1716,9 +1704,8 @@ func TestRelaunchExecutionInterruptibleOverride(t *testing.T) {
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
 	mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
 	mockExecutor.OnID().Return("testMockExecutor")
-	r := plugins.NewRegistry()
+	r := getDefaultPluginRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 	startTime := time.Now()
@@ -1769,9 +1756,8 @@ func TestRelaunchExecutionOverwriteCacheOverride(t *testing.T) {
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
 	mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
 	mockExecutor.OnID().Return("testMockExecutor")
-	r := plugins.NewRegistry()
+	r := getDefaultPluginRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 	startTime := time.Now()
@@ -1894,9 +1880,8 @@ func TestRelaunchExecutionEnvsOverride(t *testing.T) {
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
 	mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
 	mockExecutor.OnID().Return("testMockExecutor")
-	r := plugins.NewRegistry()
+	r := getDefaultPluginRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 	startTime := time.Now()
@@ -1948,9 +1933,8 @@ func TestRecoverExecution(t *testing.T) {
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
 	mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
 	mockExecutor.OnID().Return("testMockExecutor")
-	r := plugins.NewRegistry()
+	r := getDefaultPluginRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 	startTime := time.Now()
@@ -2009,9 +1993,8 @@ func TestRecoverExecution_RecoveredChildNode(t *testing.T) {
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
 	mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
 	mockExecutor.OnID().Return("testMockExecutor")
-	r := plugins.NewRegistry()
+	r := getDefaultPluginRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 	startTime := time.Now()
@@ -2112,9 +2095,7 @@ func TestRecoverExecution_GetExistingFailure(t *testing.T) {
 	// Set up mocks.
 	repository := getMockRepositoryForExecTest()
 	setDefaultLpCallbackForExecTest(repository)
-	r := plugins.NewRegistry()
-	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
+	r := getDefaultPluginRegistry()
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 
@@ -2161,9 +2142,7 @@ func TestRecoverExecution_GetExistingInputsFailure(t *testing.T) {
 		ctx context.Context, reference storage.DataReference, opts storage.Options, msg proto.Message) error {
 		return nil
 	}
-	r := plugins.NewRegistry()
-	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
+	r := getDefaultPluginRegistry()
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), mockStorage, mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 	startTime := time.Now()
@@ -2197,9 +2176,8 @@ func TestRecoverExecutionInterruptibleOverride(t *testing.T) {
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
 	mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
 	mockExecutor.OnID().Return("testMockExecutor")
-	r := plugins.NewRegistry()
+	r := getDefaultPluginRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 	startTime := time.Now()
@@ -2262,9 +2240,8 @@ func TestRecoverExecutionOverwriteCacheOverride(t *testing.T) {
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
 	mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
 	mockExecutor.OnID().Return("testMockExecutor")
-	r := plugins.NewRegistry()
+	r := getDefaultPluginRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 	startTime := time.Now()
@@ -2325,9 +2302,8 @@ func TestRecoverExecutionEnvsOverride(t *testing.T) {
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
 	mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
 	mockExecutor.OnID().Return("testMockExecutor")
-	r := plugins.NewRegistry()
+	r := getDefaultPluginRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 	startTime := time.Now()
@@ -2440,9 +2416,7 @@ func TestCreateWorkflowEvent(t *testing.T) {
 	}
 	mockDbEventWriter := &eventWriterMocks.WorkflowExecutionEventWriter{}
 	mockDbEventWriter.On("Write", request)
-	r := plugins.NewRegistry()
-	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
+	r := getDefaultPluginRegistry()
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, &mockPublisher, &mockPublisher, mockDbEventWriter, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 	resp, err := execManager.CreateWorkflowEvent(context.Background(), request)
@@ -2472,9 +2446,7 @@ func TestCreateWorkflowEvent_TerminalState(t *testing.T) {
 		return nil
 	}
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetUpdateCallback(updateExecutionFunc)
-	r := plugins.NewRegistry()
-	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
+	r := getDefaultPluginRegistry()
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 
@@ -2514,9 +2486,7 @@ func TestCreateWorkflowEvent_NoRunningToQueued(t *testing.T) {
 		return nil
 	}
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetUpdateCallback(updateExecutionFunc)
-	r := plugins.NewRegistry()
-	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
+	r := getDefaultPluginRegistry()
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 
@@ -2564,9 +2534,7 @@ func TestCreateWorkflowEvent_CurrentlyAborting(t *testing.T) {
 
 	mockDbEventWriter := &eventWriterMocks.WorkflowExecutionEventWriter{}
 	mockDbEventWriter.On("Write", req)
-	r := plugins.NewRegistry()
-	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
+	r := getDefaultPluginRegistry()
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, &mockPublisher, &mockPublisher, mockDbEventWriter, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 
@@ -2635,9 +2603,7 @@ func TestCreateWorkflowEvent_StartedRunning(t *testing.T) {
 	}
 	mockDbEventWriter := &eventWriterMocks.WorkflowExecutionEventWriter{}
 	mockDbEventWriter.On("Write", request)
-	r := plugins.NewRegistry()
-	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
+	r := getDefaultPluginRegistry()
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, &mockPublisher, &mockPublisher, mockDbEventWriter, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 	resp, err := execManager.CreateWorkflowEvent(context.Background(), request)
@@ -2670,9 +2636,7 @@ func TestCreateWorkflowEvent_DuplicateRunning(t *testing.T) {
 		},
 	)
 
-	r := plugins.NewRegistry()
-	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
+	r := getDefaultPluginRegistry()
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 	occurredAtTimestamp, _ := ptypes.TimestampProto(occurredAt)
@@ -2715,9 +2679,7 @@ func TestCreateWorkflowEvent_InvalidPhaseChange(t *testing.T) {
 		},
 	)
 
-	r := plugins.NewRegistry()
-	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
+	r := getDefaultPluginRegistry()
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 	occurredAtTimestamp, _ := ptypes.TimestampProto(occurredAt)
@@ -2784,9 +2746,7 @@ func TestCreateWorkflowEvent_ClusterReassignmentOnQueued(t *testing.T) {
 		},
 	}
 	mockDbEventWriter.On("Write", request)
-	r := plugins.NewRegistry()
-	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
+	r := getDefaultPluginRegistry()
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, &mockPublisher, &mockPublisher, mockDbEventWriter, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 
@@ -2809,9 +2769,7 @@ func TestCreateWorkflowEvent_InvalidEvent(t *testing.T) {
 		return nil
 	}
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetUpdateCallback(updateExecutionFunc)
-	r := plugins.NewRegistry()
-	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
+	r := getDefaultPluginRegistry()
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 	resp, err := execManager.CreateWorkflowEvent(context.Background(), admin.WorkflowExecutionEventRequest{
@@ -2841,9 +2799,7 @@ func TestCreateWorkflowEvent_UpdateModelError(t *testing.T) {
 		Message: "bar baz",
 	}
 
-	r := plugins.NewRegistry()
-	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
+	r := getDefaultPluginRegistry()
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 	resp, err := execManager.CreateWorkflowEvent(context.Background(), admin.WorkflowExecutionEventRequest{
@@ -2878,9 +2834,7 @@ func TestCreateWorkflowEvent_DatabaseGetError(t *testing.T) {
 		Code:    "foo",
 		Message: "bar baz",
 	}
-	r := plugins.NewRegistry()
-	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
+	r := getDefaultPluginRegistry()
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 	resp, err := execManager.CreateWorkflowEvent(context.Background(), admin.WorkflowExecutionEventRequest{
@@ -2916,9 +2870,7 @@ func TestCreateWorkflowEvent_DatabaseUpdateError(t *testing.T) {
 		return expectedErr
 	}
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetUpdateCallback(updateExecutionFunc)
-	r := plugins.NewRegistry()
-	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
+	r := getDefaultPluginRegistry()
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 	resp, err := execManager.CreateWorkflowEvent(context.Background(), admin.WorkflowExecutionEventRequest{
@@ -2963,9 +2915,7 @@ func TestCreateWorkflowEvent_IncompatibleCluster(t *testing.T) {
 		},
 	)
 
-	r := plugins.NewRegistry()
-	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
+	r := getDefaultPluginRegistry()
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 	occurredAtTimestamp, _ := ptypes.TimestampProto(occurredAt)
@@ -3023,9 +2973,7 @@ func TestGetExecution(t *testing.T) {
 		}, nil
 	}
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(executionGetFunc)
-	r := plugins.NewRegistry()
-	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
+	r := getDefaultPluginRegistry()
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 	execution, err := execManager.GetExecution(context.Background(), admin.WorkflowExecutionGetRequest{
@@ -3048,9 +2996,7 @@ func TestGetExecution_DatabaseError(t *testing.T) {
 		return models.Execution{}, expectedErr
 	}
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(executionGetFunc)
-	r := plugins.NewRegistry()
-	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
+	r := getDefaultPluginRegistry()
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 	execution, err := execManager.GetExecution(context.Background(), admin.WorkflowExecutionGetRequest{
@@ -3082,9 +3028,7 @@ func TestGetExecution_TransformerError(t *testing.T) {
 		}, nil
 	}
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(executionGetFunc)
-	r := plugins.NewRegistry()
-	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
+	r := getDefaultPluginRegistry()
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 	execution, err := execManager.GetExecution(context.Background(), admin.WorkflowExecutionGetRequest{
@@ -3097,8 +3041,7 @@ func TestGetExecution_TransformerError(t *testing.T) {
 func TestUpdateExecution(t *testing.T) {
 	t.Run("invalid execution identifier", func(t *testing.T) {
 		repository := repositoryMocks.NewMockRepository()
-		r := plugins.NewRegistry()
-		r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
+		r := getDefaultPluginRegistry()
 		mockResourceManager := getNoopMockResourceManager()
 		execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 		_, err := execManager.UpdateExecution(context.Background(), admin.ExecutionUpdateRequest{
@@ -3120,8 +3063,7 @@ func TestUpdateExecution(t *testing.T) {
 			return nil
 		}
 		repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetUpdateCallback(updateExecFunc)
-		r := plugins.NewRegistry()
-		r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
+		r := getDefaultPluginRegistry()
 		mockResourceManager := getNoopMockResourceManager()
 		execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 		updateResponse, err := execManager.UpdateExecution(context.Background(), admin.ExecutionUpdateRequest{
@@ -3142,8 +3084,7 @@ func TestUpdateExecution(t *testing.T) {
 			return nil
 		}
 		repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetUpdateCallback(updateExecFunc)
-		r := plugins.NewRegistry()
-		r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
+		r := getDefaultPluginRegistry()
 		mockResourceManager := getNoopMockResourceManager()
 		execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 		updateResponse, err := execManager.UpdateExecution(context.Background(), admin.ExecutionUpdateRequest{
@@ -3161,8 +3102,7 @@ func TestUpdateExecution(t *testing.T) {
 			return fmt.Errorf("some db error")
 		}
 		repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetUpdateCallback(updateExecFunc)
-		r := plugins.NewRegistry()
-		r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
+		r := getDefaultPluginRegistry()
 		mockResourceManager := getNoopMockResourceManager()
 		execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 		_, err := execManager.UpdateExecution(context.Background(), admin.ExecutionUpdateRequest{
@@ -3179,8 +3119,7 @@ func TestUpdateExecution(t *testing.T) {
 			return models.Execution{}, fmt.Errorf("some db error")
 		}
 		repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(getExecFunc)
-		r := plugins.NewRegistry()
-		r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
+		r := getDefaultPluginRegistry()
 		mockResourceManager := getNoopMockResourceManager()
 		execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 		_, err := execManager.UpdateExecution(context.Background(), admin.ExecutionUpdateRequest{
@@ -3250,9 +3189,7 @@ func TestListExecutions(t *testing.T) {
 		}, nil
 	}
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetListCallback(executionListFunc)
-	r := plugins.NewRegistry()
-	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
+	r := getDefaultPluginRegistry()
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 
@@ -3285,9 +3222,7 @@ func TestListExecutions(t *testing.T) {
 }
 
 func TestListExecutions_MissingParameters(t *testing.T) {
-	r := plugins.NewRegistry()
-	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
+	r := getDefaultPluginRegistry()
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repositoryMocks.NewMockRepository(), r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 
@@ -3327,9 +3262,7 @@ func TestListExecutions_DatabaseError(t *testing.T) {
 		return interfaces.ExecutionCollectionOutput{}, expectedErr
 	}
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetListCallback(executionListFunc)
-	r := plugins.NewRegistry()
-	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
+	r := getDefaultPluginRegistry()
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 	_, err := execManager.ListExecutions(context.Background(), admin.ResourceListRequest{
@@ -3362,9 +3295,7 @@ func TestListExecutions_TransformerError(t *testing.T) {
 		}, nil
 	}
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetListCallback(executionListFunc)
-	r := plugins.NewRegistry()
-	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
+	r := getDefaultPluginRegistry()
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 
@@ -3420,9 +3351,7 @@ func TestGetExecutionCounts(t *testing.T) {
 		}, nil
 	}
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetCountByPhaseCallback(getExecutionCountsFunc)
-	r := plugins.NewRegistry()
-	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
+	r := getDefaultPluginRegistry()
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 
@@ -3444,9 +3373,7 @@ func TestGetExecutionCounts(t *testing.T) {
 }
 
 func TestGetExecutionCounts_MissingParameters(t *testing.T) {
-	r := plugins.NewRegistry()
-	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
+	r := getDefaultPluginRegistry()
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repositoryMocks.NewMockRepository(), r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 
@@ -3482,9 +3409,7 @@ func TestGetExecutionCounts_DatabaseError(t *testing.T) {
 		return interfaces.ExecutionCountsByPhaseOutput{}, expectedErr
 	}
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetCountByPhaseCallback(getExecutionCountsFunc)
-	r := plugins.NewRegistry()
-	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
+	r := getDefaultPluginRegistry()
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 	_, err := execManager.GetExecutionCounts(context.Background(), admin.ExecutionCountsGetRequest{
@@ -3507,9 +3432,7 @@ func TestGetExecutionCounts_TransformerError(t *testing.T) {
 		}, nil
 	}
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetCountByPhaseCallback(getExecutionCountsFunc)
-	r := plugins.NewRegistry()
-	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
+	r := getDefaultPluginRegistry()
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 
@@ -3550,9 +3473,7 @@ func TestGetRunningExecutionsCount(t *testing.T) {
 		return 3, nil
 	}
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetCountCallback(getRunningExecutionsCountFunc)
-	r := plugins.NewRegistry()
-	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
+	r := getDefaultPluginRegistry()
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 
@@ -3567,9 +3488,7 @@ func TestGetRunningExecutionsCount(t *testing.T) {
 }
 
 func TestGetRunningExecutionsCount_MissingParameters(t *testing.T) {
-	r := plugins.NewRegistry()
-	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
+	r := getDefaultPluginRegistry()
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repositoryMocks.NewMockRepository(), r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 
@@ -3594,9 +3513,7 @@ func TestGetRunningExecutionsCount_DatabaseError(t *testing.T) {
 		return 0, expectedErr
 	}
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetCountCallback(getRunningExecutionsCountFunc)
-	r := plugins.NewRegistry()
-	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
+	r := getDefaultPluginRegistry()
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 	_, err := execManager.GetRunningExecutionsCount(context.Background(), admin.RunningExecutionsCountGetRequest{
@@ -3900,9 +3817,8 @@ func TestTerminateExecution(t *testing.T) {
 		return true
 	})).Return(nil)
 	mockExecutor.OnID().Return("customMockExecutor")
-	r := plugins.NewRegistry()
+	r := getDefaultPluginRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 
@@ -3928,9 +3844,8 @@ func TestTerminateExecution_PropellerError(t *testing.T) {
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
 	mockExecutor.OnAbortMatch(mock.Anything, mock.Anything).Return(expectedError)
 	mockExecutor.OnID().Return("customMockExecutor")
-	r := plugins.NewRegistry()
+	r := getDefaultPluginRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
 
 	updateCalled := false
 	repository := repositoryMocks.NewMockRepository()
@@ -3971,9 +3886,8 @@ func TestTerminateExecution_DatabaseError(t *testing.T) {
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
 	mockExecutor.OnAbortMatch(mock.Anything, mock.Anything).Return(nil)
 	mockExecutor.OnID().Return("testMockExecutor")
-	r := plugins.NewRegistry()
+	r := getDefaultPluginRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 	resp, err := execManager.TerminateExecution(context.Background(), admin.ExecutionTerminateRequest{
@@ -3995,9 +3909,8 @@ func TestTerminateExecution_AlreadyTerminated(t *testing.T) {
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
 	mockExecutor.OnAbortMatch(mock.Anything, mock.Anything).Return(expectedError)
 	mockExecutor.OnID().Return("customMockExecutor")
-	r := plugins.NewRegistry()
+	r := getDefaultPluginRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
 
 	repository := repositoryMocks.NewMockRepository()
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(
@@ -4093,9 +4006,7 @@ func TestGetExecutionData(t *testing.T) {
 	}
 
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(executionGetFunc)
-	r := plugins.NewRegistry()
-	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
+	r := getDefaultPluginRegistry()
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), mockStorage, mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 
@@ -4159,9 +4070,7 @@ func TestAddPluginOverrides(t *testing.T) {
 		}),
 	}, nil)
 
-	r := plugins.NewRegistry()
-	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
+	r := getDefaultPluginRegistry()
 
 	execManager := NewExecutionManager(db, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 
@@ -4193,9 +4102,7 @@ func TestPluginOverrides_ResourceGetFailure(t *testing.T) {
 	mockResourceManager := new(managerMocks.ResourceInterface)
 	mockResourceManager.On("GetResource", mock.Anything, mock.Anything).Return(&managerInterfaces.ResourceResponse{}, errors.New("uh oh"))
 
-	r := plugins.NewRegistry()
-	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
+	r := getDefaultPluginRegistry()
 	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
 	execManager := NewExecutionManager(db, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 
@@ -4229,9 +4136,7 @@ func TestGetExecution_Legacy(t *testing.T) {
 		}, nil
 	}
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(executionGetFunc)
-	r := plugins.NewRegistry()
-	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
+	r := getDefaultPluginRegistry()
 	mockResourceManager := getNoopMockResourceManager()
 
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
@@ -4296,9 +4201,7 @@ func TestGetExecutionData_LegacyModel(t *testing.T) {
 
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(executionGetFunc)
 	storageClient := getMockStorageForExecTest(context.Background())
-	r := plugins.NewRegistry()
-	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
+	r := getDefaultPluginRegistry()
 
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), storageClient, mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
@@ -4337,9 +4240,8 @@ func TestCreateExecution_LegacyClient(t *testing.T) {
 		Cluster: testCluster,
 	}, nil)
 	mockExecutor.OnID().Return("customMockExecutor")
-	r := plugins.NewRegistry()
+	r := getDefaultPluginRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 	response, err := execManager.CreateExecution(context.Background(), *getLegacyExecutionRequest(), requestedAt)
@@ -4361,9 +4263,8 @@ func TestRelaunchExecution_LegacyModel(t *testing.T) {
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
 	mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
 	mockExecutor.OnID().Return("testMockExecutor")
-	r := plugins.NewRegistry()
+	r := getDefaultPluginRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), storageClient, mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 	startTime := time.Now()
@@ -4483,9 +4384,7 @@ func TestListExecutions_LegacyModel(t *testing.T) {
 		}, nil
 	}
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetListCallback(executionListFunc)
-	r := plugins.NewRegistry()
-	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
+	r := getDefaultPluginRegistry()
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 
@@ -4541,9 +4440,7 @@ func TestSetDefaults(t *testing.T) {
 		},
 	}
 
-	r := plugins.NewRegistry()
-	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
+	r := getDefaultPluginRegistry()
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repositoryMocks.NewMockRepository(), r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 
@@ -4629,9 +4526,7 @@ func TestSetDefaults_MissingRequests_ExistingRequestsPreserved(t *testing.T) {
 		},
 	}
 
-	r := plugins.NewRegistry()
-	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
+	r := getDefaultPluginRegistry()
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repositoryMocks.NewMockRepository(), r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 
@@ -4710,8 +4605,7 @@ func TestSetDefaults_OptionalRequiredResources(t *testing.T) {
 		},
 	}
 	t.Run("don't inject ephemeral storage or gpu when only the limit is set in config", func(t *testing.T) {
-		r := plugins.NewRegistry()
-		r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
+		r := getDefaultPluginRegistry()
 		mockResourceManager := getNoopMockResourceManager()
 		execManager := NewExecutionManager(repositoryMocks.NewMockRepository(), r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 
@@ -4751,8 +4645,7 @@ func TestSetDefaults_OptionalRequiredResources(t *testing.T) {
 	})
 
 	t.Run("respect non-required resources when defaults exist in config", func(t *testing.T) {
-		r := plugins.NewRegistry()
-		r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
+		r := getDefaultPluginRegistry()
 		mockResourceManager := getNoopMockResourceManager()
 		execManager := NewExecutionManager(repositoryMocks.NewMockRepository(), r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 
@@ -4959,9 +4852,8 @@ func TestCreateSingleTaskExecution(t *testing.T) {
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
 	mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
 	mockExecutor.OnID().Return("testMockExecutor")
-	r := plugins.NewRegistry()
+	r := getDefaultPluginRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
-	r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
 	mockResourceManager := getNoopMockResourceManager()
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), mockStorage, mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, workflowManager, namedEntityManager, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil), mockResourceManager)
 
@@ -6615,8 +6507,7 @@ func TestCompleteResolvedSpec(t *testing.T) {
 
 func TestValidateActiveExecutions(t *testing.T) {
 	t.Run("no active executions limit", func(t *testing.T) {
-		r := plugins.NewRegistry()
-		r.RegisterDefault(plugins.PluginIDUserProperties, shared.DefaultGetUserPropertiesFunc)
+		r := getDefaultPluginRegistry()
 
 		execManager := ExecutionManager{
 			pluginRegistry: r,
@@ -6634,7 +6525,7 @@ func TestValidateActiveExecutions(t *testing.T) {
 			}
 		}
 
-		r := plugins.NewRegistry()
+		r := getDefaultPluginRegistry()
 		r.RegisterDefault(plugins.PluginIDUserProperties, getUserProperties)
 
 		repository := repositoryMocks.NewMockRepository()
@@ -6685,7 +6576,7 @@ func TestValidateActiveExecutions(t *testing.T) {
 			}
 		}
 
-		r := plugins.NewRegistry()
+		r := getDefaultPluginRegistry()
 		r.RegisterDefault(plugins.PluginIDUserProperties, getUserProperties)
 
 		repository := repositoryMocks.NewMockRepository()

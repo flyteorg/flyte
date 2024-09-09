@@ -60,6 +60,10 @@ spec:
           - mountPath: /var/run/credentials
             name: cluster-secrets
           {{- end }}
+          {{- if .Values.cluster_resource_manager.unionCallbackEnabled }}
+          - mountPath: /etc/union/secret
+            name: union-cloud-auth
+          {{- end }}
           {{- if .Values.cluster_resource_manager.prometheus.enabled }}
           ports:
           - containerPort: {{ .Values.cluster_resource_manager.prometheus.port }}
@@ -85,6 +89,11 @@ spec:
           secret:
             secretName: {{ .Values.secrets.adminOauthClientCredentials.secretName }}
         {{- end }}
+        {{- end }}
+        {{- if .Values.cluster_resource_manager.unionCallbackEnabled }}
+        - name: union-cloud-auth
+          secret:
+            secretName: {{ .Values.cluster_resource_manager.secretName }}
         {{- end }}
       {{- with .Values.cluster_resource_manager.nodeSelector }}
       nodeSelector: {{ tpl (toYaml .) $ | nindent 8 }}

@@ -19,6 +19,7 @@ var clusterResourceConfig = config.MustRegisterSection(clusterResourceKey, &inte
 	UnionProjectSyncConfig: interfaces.UnionProjectSyncConfig{
 		BatchSize: 10,
 	},
+	IsSelfServe: false,
 })
 
 // Implementation of an interfaces.ClusterResourceConfiguration
@@ -46,6 +47,10 @@ func (p *ClusterResourceConfigurationProvider) IsStandaloneDeployment() bool {
 
 func (p *ClusterResourceConfigurationProvider) GetUnionProjectSyncConfig() interfaces.UnionProjectSyncConfig {
 	return clusterResourceConfig.GetConfig().(*interfaces.ClusterResourceConfig).UnionProjectSyncConfig
+}
+
+func (p *ClusterResourceConfigurationProvider) IsSelfServe() bool {
+	return clusterResourceConfig.GetConfig().(*interfaces.ClusterResourceConfig).IsSelfServe
 }
 
 func NewClusterResourceConfigurationProvider() interfaces.ClusterResourceConfiguration {

@@ -31,6 +31,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/jsonmergepatch"
 	"k8s.io/apimachinery/pkg/util/mergepatch"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/strategicpatch"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/discovery"
@@ -42,6 +43,7 @@ import (
 
 	impl2 "github.com/flyteorg/flyte/flyteadmin/pkg/clusterresource/impl"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/clusterresource/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/clusterresource/plugin"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/config"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
@@ -69,6 +71,7 @@ const domainVariable = "domain"
 const templateVariableFormat = "{{ %s }}"
 const replaceAllInstancesOfString = -1
 const noChange = "{}"
+const reportNamespaceProvisionedBatchSize = 16
 
 var (
 	deleteImmediately      = int64(0)
@@ -84,21 +87,23 @@ type Controller interface {
 }
 
 type controllerMetrics struct {
-	Scope                           promutils.Scope
-	SyncErrors                      prometheus.Counter
-	SyncStarted                     prometheus.Counter
-	SyncsCompleted                  prometheus.Counter
-	KubernetesResourcesCreated      prometheus.Counter
-	KubernetesResourcesCreateErrors prometheus.Counter
-	KubernetesNamespaceDeleteErrors prometheus.Counter
-	ResourcesAdded                  prometheus.Counter
-	NamespacesDeleted               prometheus.Counter
-	ResourceAddErrors               prometheus.Counter
-	TemplateReadErrors              prometheus.Counter
-	TemplateDecodeErrors            prometheus.Counter
-	AppliedTemplateExists           prometheus.Counter
-	TemplateUpdateErrors            prometheus.Counter
-	Panics                          prometheus.Counter
+	Scope                            promutils.Scope
+	SyncErrors                       prometheus.Counter
+	SyncStarted                      prometheus.Counter
+	SyncsCompleted                   prometheus.Counter
+	KubernetesResourcesCreated       prometheus.Counter
+	KubernetesResourcesCreateErrors  prometheus.Counter
+	KubernetesNamespaceDeleteErrors  prometheus.Counter
+	ResourcesAdded                   prometheus.Counter
+	NamespacesDeleted                prometheus.Counter
+	ResourceAddErrors                prometheus.Counter
+	TemplateReadErrors               prometheus.Counter
+	TemplateDecodeErrors             prometheus.Counter
+	AppliedTemplateExists            prometheus.Counter
+	TemplateUpdateErrors             prometheus.Counter
+	Panics                           prometheus.Counter
+	ReportNamespaceProvisioned       prometheus.Counter
+	ReportNamespaceProvisionedErrors prometheus.Counter
 }
 
 type FileName = string
@@ -117,6 +122,7 @@ type controller struct {
 	appliedNamespaceTemplateChecksums sync.Map
 	adminDataProvider                 interfaces.FlyteAdminDataProvider
 	listTargets                       executionclusterIfaces.ListTargetsInterface
+	pluginRegistry                    *plugins.Registry
 }
 
 // templateAlreadyApplied checks if there is an applied template with the same checksum
@@ -692,18 +698,61 @@ func (c *controller) newSyncNamespacer(templateValues templateValuesType, domain
 	}
 }
 
+// Report to self serve service that the namespaces have been provisioned
+func (c *controller) reportNamespaceProvisioned(ctx context.Context, orgs sets.Set[string]) {
+	clusterResourcePlugin := plugins.Get[plugin.ClusterResourcePlugin](c.pluginRegistry, plugins.PluginIDClusterResource)
+	if orgs.Has("") {
+		// TODO: Investigate why this is happening and remove this once the root cause is fixed
+		logger.Debugf(ctx, "orgs set contains empty string, removing it to avoid proto validation error")
+		orgs.Delete("")
+	}
+	// Report provisioned for orgs in batches
+	orgsList := orgs.UnsortedList()
+	for i := 0; i < len(orgsList); i += reportNamespaceProvisionedBatchSize {
+		batchOrgs := orgsList[i:min(i+reportNamespaceProvisionedBatchSize, len(orgsList))]
+		logger.Debugf(ctx, "reporting provisioned for orgs [%v]", batchOrgs)
+		batchUpdateProvisionedRequest := &plugin.BatchUpdateProvisionedInput{
+			OrgsName: batchOrgs,
+		}
+		_, batchUpdateProvisionedErrors, err := clusterResourcePlugin.BatchUpdateProvisioned(ctx, batchUpdateProvisionedRequest)
+		if err != nil {
+			c.metrics.ReportNamespaceProvisionedErrors.Inc()
+			logger.Errorf(ctx, "failed to report provisioned for orgs [%v] with err: %v", batchOrgs, err)
+			// we don't error out here, in order to not block other namespaces from being reported
+			continue
+		}
+		if len(batchUpdateProvisionedErrors) > 0 {
+			c.metrics.ReportNamespaceProvisionedErrors.Inc()
+			for _, updateProvisionedError := range batchUpdateProvisionedErrors {
+				logger.Errorf(ctx, "failed to report provisioned for org [%s] with err: %s %v", updateProvisionedError.OrgName, updateProvisionedError.ErrorCode, updateProvisionedError.ErrorMessage)
+			}
+			continue
+		}
+		c.metrics.ReportNamespaceProvisioned.Inc()
+	}
+}
+
+// TODO: Remove this when implementing COR-1531
+// This is a temporary solution to avoid update org status to provisioned when deleting namespaces
+// We are going to provision namespaces based on org status for serverless
+const (
+	ShouldReportNameSpaceProvisioned    = true
+	ShouldNotReportNameSpaceProvisioned = false
+)
+
 // processProjects accepts a generic project processor and applies it to all projects in the input list,
 // optionally batching and parallelizing their processing for greater perf.
-func (c *controller) processProjects(ctx context.Context, stats ResourceSyncStats, projects []*admin.Project, processor syncNamespaceProcessor) (ResourceSyncStats, error) {
+func (c *controller) processProjects(ctx context.Context, stats ResourceSyncStats, projects []*admin.Project, processor syncNamespaceProcessor, reportNamespaceProvisioned bool) (ResourceSyncStats, error) {
 	if len(projects) == 0 {
 		// Nothing to do
 		return stats, nil
 	}
-
+	orgs := sets.Set[string]{}
 	if c.config.ClusterResourceConfiguration().GetUnionProjectSyncConfig().BatchSize == 0 {
 		logger.Debugf(ctx, "processing projects serially")
 		for _, project := range projects {
 			for _, domain := range project.Domains {
+				orgs.Insert(project.Org)
 				namespace := common.GetNamespaceName(c.config.NamespaceMappingConfiguration().GetNamespaceTemplate(), project.Org, project.Id, domain.Name)
 				newStats, err := processor(ctx, project, domain, namespace)
 				if err != nil {
@@ -712,6 +761,9 @@ func (c *controller) processProjects(ctx context.Context, stats ResourceSyncStat
 				stats.Add(newStats)
 				logger.Infof(ctx, "Completed cluster resource creation loop for namespace [%s] with stats: [%+v]", namespace, newStats)
 			}
+		}
+		if c.config.ClusterResourceConfiguration().IsSelfServe() && reportNamespaceProvisioned {
+			c.reportNamespaceProvisioned(ctx, orgs)
 		}
 		return stats, nil
 	}
@@ -729,6 +781,7 @@ func (c *controller) processProjects(ctx context.Context, stats ResourceSyncStat
 				// redefine variables for loop closure
 				i := i
 				org := project.Org
+				orgs.Insert(org)
 				project := project
 				domain := domain
 				domainIdx := domainIdx
@@ -760,6 +813,9 @@ func (c *controller) processProjects(ctx context.Context, stats ResourceSyncStat
 				i, i+batchSize, err)
 		}
 		logger.Debugf(ctx, "processed projects batch {%d...%d} when syncing namespaces", i, i+batchSize)
+	}
+	if c.config.ClusterResourceConfiguration().IsSelfServe() && reportNamespaceProvisioned {
+		c.reportNamespaceProvisioned(ctx, orgs)
 	}
 	statsSummary := lo.Reduce(statsEntries, func(existing ResourceSyncStats, item ResourceSyncStats, _ int) ResourceSyncStats {
 		existing.Add(item)
@@ -797,7 +853,7 @@ func (c *controller) Sync(ctx context.Context) error {
 
 	stats := ResourceSyncStats{}
 	syncNamespaceProcessorFunc := c.newSyncNamespacer(templateValues, domainTemplateValues)
-	stats, err = c.processProjects(ctx, stats, projects.GetProjects(), syncNamespaceProcessorFunc)
+	stats, err = c.processProjects(ctx, stats, projects.GetProjects(), syncNamespaceProcessorFunc, ShouldReportNameSpaceProvisioned)
 	if err != nil {
 		logger.Warningf(ctx, "Failed to process projects when syncing namespaces: %v", err)
 		return err
@@ -810,7 +866,7 @@ func (c *controller) Sync(ctx context.Context) error {
 			logger.Warningf(ctx, "failed to get archived projects: %v", err)
 			return err
 		}
-		stats, err = c.processProjects(ctx, stats, archivedProjects.GetProjects(), c.deleteNamespace)
+		stats, err = c.processProjects(ctx, stats, archivedProjects.GetProjects(), c.deleteNamespace, ShouldNotReportNameSpaceProvisioned)
 		if err != nil {
 			logger.Warningf(ctx, "Failed to process projects when deleting namespaces: %v", err)
 			return err
@@ -871,10 +927,14 @@ func newMetrics(scope promutils.Scope) controllerMetrics {
 				"file failed"),
 		Panics: scope.MustNewCounter("panics",
 			"overall count of panics encountered in primary ClusterResourceController loop"),
+		ReportNamespaceProvisioned: scope.MustNewCounter("report_namespace_provisioned",
+			"overall count of successful reports of namespace provisioned"),
+		ReportNamespaceProvisionedErrors: scope.MustNewCounter("report_namespace_provision_errors",
+			"overall count of errors encountered reporting namespace provisioned"),
 	}
 }
 
-func NewClusterResourceController(adminDataProvider interfaces.FlyteAdminDataProvider, listTargets executionclusterIfaces.ListTargetsInterface, scope promutils.Scope) Controller {
+func NewClusterResourceController(adminDataProvider interfaces.FlyteAdminDataProvider, listTargets executionclusterIfaces.ListTargetsInterface, scope promutils.Scope, pluginRegistry *plugins.Registry) Controller {
 	cfg := runtime.NewConfigurationProvider()
 	return &controller{
 		adminDataProvider: adminDataProvider,
@@ -882,6 +942,7 @@ func NewClusterResourceController(adminDataProvider interfaces.FlyteAdminDataPro
 		listTargets:       listTargets,
 		poller:            make(chan struct{}),
 		metrics:           newMetrics(scope),
+		pluginRegistry:    pluginRegistry,
 	}
 }
 
@@ -938,5 +999,6 @@ func NewClusterResourceControllerFromConfig(ctx context.Context, scope promutils
 		adminDataProvider = impl2.NewDatabaseAdminDataProvider(repo, configuration, resourceManager)
 	}
 
-	return NewClusterResourceController(adminDataProvider, listTargetsProvider, scope), nil
+	pluginRegistry.RegisterDefault(plugins.PluginIDClusterResource, plugin.NewNoopClusterResourcePlugin())
+	return NewClusterResourceController(adminDataProvider, listTargetsProvider, scope, pluginRegistry), nil
 }

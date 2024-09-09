@@ -12,6 +12,7 @@ type MockClusterResourceConfiguration struct {
 	RefreshInterval      time.Duration
 	CustomTemplateData   map[interfaces.DomainName]interfaces.TemplateData
 	StandaloneDeployment bool
+	SelfServe            bool
 }
 
 func (c MockClusterResourceConfiguration) GetTemplatePath() string {
@@ -39,6 +40,10 @@ func (c MockClusterResourceConfiguration) GetArchiveProjectConfig() interfaces.U
 
 func (c MockClusterResourceConfiguration) GetUnionProjectSyncConfig() interfaces.UnionProjectSyncConfig {
 	return interfaces.UnionProjectSyncConfig{}
+}
+
+func (c MockClusterResourceConfiguration) IsSelfServe() bool {
+	return c.SelfServe
 }
 
 func NewMockClusterResourceConfiguration() interfaces.ClusterResourceConfiguration {
