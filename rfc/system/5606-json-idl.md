@@ -249,6 +249,12 @@ func MakeDefaultLiteralForType(type *core.LiteralType) (*core.Literal, error) {
     }
 }
 ```
+4. Compiler (Backward Compatibility with `Struct` type)
+```go
+if upstreamTypeCopy.GetSimple() == flyte.SimpleType_STRUCT && downstreamTypeCopy.GetSimple() == flyte.SimpleType_JSON {
+		return true
+	}
+```
 ### FlyteKit
 #### pyflyte run
 The behavior will remain unchanged. 
@@ -256,12 +262,12 @@ We will pass the value to our class, which inherits from `click.ParamType`, and 
 
 ### Dict Transformer
 
-| **Stage** | **Conversion** | **Description**                                                                                                                                                                                                                                                                                                               |
-| --- | --- |-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Before** | Python Value to Literal | 1. `Dict[type, type]` uses type hints to construct a LiteralMap. <br> 2. `dict` uses `JSON.dumps` to turn a `dict` value to a JSON string, and store it to Protobuf Struct.                                                                                                                                                   |
-| | Literal to Python Value | 1. `Dict[type, type]` uses type hints to convert LiteralMap to Python Value. <br> 2. `dict` uses `JSON.loads` to turn a JSON string to a dict value and store it to Protobuf Struct.                                                                                                                                          |
-| **After** | Python Value to Literal | 1. `Dict[type, type]` stays the same. <br> 2. `dict` uses `msgpack.dumps` to turn a JSON string to a byte string, and store is to Protobuf JSON. |
-| | Literal to Python Value | 1. `Dict[type, type]` uses type hints to convert LiteralMap to Python Value. <br> 2.  `dict` conversion: byte string -> JSON string -> dict value, method: `msgpack.loads` -> `JSON.loads`. |
+| **Stage** | **Conversion** | **Description**                                                                                                                                                                             |
+| --- | --- |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Before** | Python Value to Literal | 1. `Dict[type, type]` uses type hints to construct a LiteralMap. <br> 2. `dict` uses `JSON.dumps` to turn a `dict` value to a JSON string, and store it to Protobuf Struct.                 |
+| | Literal to Python Value | 1. `Dict[type, type]` uses type hints to convert LiteralMap to Python Value. <br> 2. `dict` uses `JSON.loads` to turn a JSON string to a dict value and store it to Protobuf Struct.     |
+| **After** | Python Value to Literal | 1. `Dict[type, type]` stays the same. <br> 2. `dict` uses `msgpack.dumps` to turn a dict to msgpack bytes, and store is to Protobuf JSON.                                            |
+| | Literal to Python Value | 1. `Dict[type, type]` uses type hints to convert LiteralMap to Python Value. <br> 2.  `dict` conversion: msgpack bytes -> dict value, method: `msgpack.loads`. |
 
 ### Dataclass Transformer
 
@@ -269,8 +275,8 @@ We will pass the value to our class, which inherits from `click.ParamType`, and 
 | --- | --- |-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **Before** | Python Value to Literal | Uses `mashumaro JSON Encoder` to turn a dataclass value to a JSON string, and store it to Protobuf `Struct`. |
 | | Literal to Python Value | Uses `mashumaro JSON Decoder` to turn a JSON string to a python value, and recursively fixed int attributes to int (it will be float because we stored it in to `Struct`). |
-| **After** | Python Value to Literal | Uses `mashumaro JSON Encoder` to turn a dataclass value to a JSON string, and uses `msgpack.dumps()` to turn the JSON string into a byte string, and store it to Protobuf `JSON`. |
-| | Literal to Python Value | Uses `msgpack.loads()` to turn a byte string into a JSON string, and uses `mashumaro JSON Decoder` to turn the JSON string into a Python value. |
+| **After** | Python Value to Literal | Uses `mashumaro MessagePackEncoder` to convert a dataclass value into msgpack bytes, storing them in the Protobuf `JSON` field. |
+| | Literal to Python Value | Uses `mashumaro MessagePackDecoder` to convert msgpack bytes back into a Python value. |
 
 ### Pydantic Transformer
 
@@ -278,9 +284,8 @@ We will pass the value to our class, which inherits from `click.ParamType`, and 
 | --- | --- | --- |
 | **Before** | Python Value to Literal | Convert `BaseModel` to a JSON string, and then convert it to a Protobuf `Struct`. |
 | | Literal to Python Value | Convert Protobuf `Struct` to a JSON string and then convert it to a `BaseModel`. |
-| **After** | Python Value to Literal | Convert the Pydantic `BaseModel` to a JSON string, then convert the JSON string to a `byte string` using msgpack. |
-| | Literal to Python Value | Convert `byte string` to a JSON string using `msgpack`, then convert it to Pydantic `BaseModel`. |
-
+| **After** | Python Value to Literal | Converts the Pydantic `BaseModel` to a dictionary, then serializes it into msgpack bytes using `msgpack.dumps`. |
+| | Literal to Python Value | Deserializes `msgpack` bytes into a dictionary, then converts it back into a Pydantic `BaseModel`. |
 
 ### FlyteCtl
 In FlyteCtl, we can construct input for the execution, so we have to make sure the values we passed to FlyteAdmin 
@@ -292,7 +297,7 @@ reference: https://github.com/flyteorg/flytectl/blob/131d6a20c7db601ca9156b8d43d
 #### Show input/output on FlyteConsole
 We will get node’s input output literal value by FlyteAdmin’s API, and get the JSON byte string in the literal value.
 
-We can use MsgPack dumps the JSON byte string to a dictionary, and shows it to the flyteconsole.
+We can use MsgPack dumps the MsgPack to a dictionary, and shows it to the flyteconsole.
 #### Construct Input
 We should use `msgpack.encode` to encode input value and store it to the literal’s JSON field.
 
@@ -302,27 +307,27 @@ We should use `msgpack.encode` to encode input value and store it to the literal
 None
 
 ## 5 Drawbacks  
-Our current implementation double-encodes objects (first with Mashumaro, then with MsgPack), which is somewhat inefficient for the following reasons:
 
-1. We need to define custom encode/decode methods for dataclasses when using MsgPack, which is inconvenient for users. Alternatively, users must inherit from `DataClassMessagePackMixin` for each dataclass.
-2. Supporting the Flyte console becomes easier, as most of the logic remains the same when using a JSON string converted into a Protobuf `Struct`.
-3. Backend checks are simplified.
-4. It's feasible to define custom encode/decode methods in private forks of Flyte and Flytekit, so users with performance requirements can implement their own solutions.
-
-References:
-1. [MsgPack Packing/unpacking of custom data types](https://github.com/msgpack/msgpack-python?tab=readme-ov-file#packingunpacking-of-custom-data-type)
-2. Mashumaro includes a mixin called [DataClassMessagePackMixin](https://github.com/Fatal1ty/mashumaro/blob/master/mashumaro/mixins/msgpack.py#L36), but forcing users to inherit from it is also inconvenient.
-
+None
 
 ## 6 Alternatives
 None, it's doable.
 
+
 ## 7 Potential Impact and Dependencies
-None.
+We should check whether `serialization_format` is specified and supported in the Flyte backend, Flytekit, and Flyteconsole. Currently, we use `msgpack` as our default serialization format.
+
+In the future, we might want to support different JSON types such as "eJSON" or "ndJSON." We can add `json_type` to the JSON IDL to accommodate this.
+
+There are 3 reasons why we add `serialization_format` to the JSON IDL rather than the literal's `metadata`:
+1. Metadata use cases are more related to when the data is created, where the data is stored, etc.
+2. This is required information for all JSON IDLs, and it will seem more important if we include it as a field in the IDL.
+3. If we want to add `json_type` or other JSON IDL-specific use cases in the future, we can include them in the JSON IDL field, making it more readable.
 
 ## 8 Unresolved questions
 None.
 
 ## 9 Conclusion
 MsgPack is better because it's more smaller and faster.
-We will use msgpack to do it.
+You can see the performance comparison here: https://github.com/flyteorg/flyte/pull/5607#issuecomment-2333174325
+We will use `msgpack` to do it.
