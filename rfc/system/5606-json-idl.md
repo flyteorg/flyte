@@ -61,7 +61,7 @@ def t2(a: dict):
 - We will use the same type interface and ensure the backward compatibility.
 
 ### How to turn a value to bytes?
-#### Use MsgPack to convert value to a byte string
+#### Use MsgPack to convert a value into bytes
 ##### Python
 ```python
 import msgpack
@@ -217,7 +217,7 @@ func literalTypeForScalar(scalar *core.Scalar) *core.LiteralType {
   return literalType 
 }
 ```
-3. Support input and default input
+3. Support input and default input.
 ```go
 // Literal Input
 func ExtractFromLiteral(literal *core.Literal) (interface{}, error) {
@@ -229,7 +229,7 @@ func ExtractFromLiteral(literal *core.Literal) (interface{}, error) {
     }
 }
 // Default Input
-func MakeDefaultLiteralForType(type *core.LiteralType) (*core.Literal, error) {
+func MakeDefaultLiteralForType(typ *core.LiteralType) (*core.Literal, error) {
     switch t := typ.GetType().(type) {
 	case *core.LiteralType_Simple:
         ...
@@ -265,8 +265,8 @@ We will pass the value to our class, which inherits from `click.ParamType`, and 
 | **Stage** | **Conversion** | **Description**                                                                                                                                                                             |
 | --- | --- |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **Before** | Python Value to Literal | 1. `Dict[type, type]` uses type hints to construct a LiteralMap. <br> 2. `dict` uses `JSON.dumps` to turn a `dict` value to a JSON string, and store it to Protobuf Struct.                 |
-| | Literal to Python Value | 1. `Dict[type, type]` uses type hints to convert LiteralMap to Python Value. <br> 2. `dict` uses `JSON.loads` to turn a JSON string to a dict value and store it to Protobuf Struct.     |
-| **After** | Python Value to Literal | 1. `Dict[type, type]` stays the same. <br> 2. `dict` uses `msgpack.dumps` to turn a dict to msgpack bytes, and store is to Protobuf JSON.                                            |
+| | Literal to Python Value | 1. `Dict[type, type]` uses type hints to convert LiteralMap to Python Value. <br> 2. `dict` uses `JSON.loads` to turn a JSON string into a dict value and store it to Protobuf Struct.     |
+| **After** | Python Value to Literal | 1. `Dict[type, type]` stays the same. <br> 2. `dict` uses `msgpack.dumps` to turn a dict into msgpack bytes, and store it to Protobuf JSON.                                            |
 | | Literal to Python Value | 1. `Dict[type, type]` uses type hints to convert LiteralMap to Python Value. <br> 2.  `dict` conversion: msgpack bytes -> dict value, method: `msgpack.loads`. |
 
 ### Dataclass Transformer
@@ -287,6 +287,8 @@ We will pass the value to our class, which inherits from `click.ParamType`, and 
 | **After** | Python Value to Literal | Converts the Pydantic `BaseModel` to a dictionary, then serializes it into msgpack bytes using `msgpack.dumps`. |
 | | Literal to Python Value | Deserializes `msgpack` bytes into a dictionary, then converts it back into a Pydantic `BaseModel`. |
 
+Note: Pydantic BaseModel can't be serialized directly by `msgpack`, but this implementation will still ensure 100% correct.
+
 ### FlyteCtl
 In FlyteCtl, we can construct input for the execution, so we have to make sure the values we passed to FlyteAdmin 
 can all be constructed to Literal.
@@ -295,12 +297,11 @@ reference: https://github.com/flyteorg/flytectl/blob/131d6a20c7db601ca9156b8d43d
 
 ### FlyteConsole
 #### Show input/output on FlyteConsole
-We will get node’s input output literal value by FlyteAdmin’s API, and get the JSON byte string in the literal value.
+We will get the node's input and output literal values by FlyteAdmin’s API, and obtain the JSON IDL bytes from the literal value.
 
-We can use MsgPack dumps the MsgPack to a dictionary, and shows it to the flyteconsole.
+We can use MsgPack dumps the MsgPack into a dictionary, and shows it to the flyteconsole.
 #### Construct Input
 We should use `msgpack.encode` to encode input value and store it to the literal’s JSON field.
-
 
 ## 4 Metrics & Dashboards
 
@@ -311,6 +312,7 @@ None
 None
 
 ## 6 Alternatives
+
 None, it's doable.
 
 
