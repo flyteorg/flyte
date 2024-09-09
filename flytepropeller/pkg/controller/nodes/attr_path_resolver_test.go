@@ -411,7 +411,6 @@ func TestResolveAttrPathInJson(t *testing.T) {
 						},
 					},
 				},
-				Metadata: map[string]string{"format": "msgpack"},
 			},
 			// Test accessing the int value at foo.bar
 			path: []*core.PromiseAttribute{
@@ -513,7 +512,6 @@ func TestResolveAttrPathInJson(t *testing.T) {
 						},
 					},
 				},
-				Metadata: map[string]string{"format": "msgpack"},
 			},
 			// Test accessing the string value at foo.baz.quux
 			path: []*core.PromiseAttribute{
@@ -593,7 +591,6 @@ func TestResolveAttrPathInJson(t *testing.T) {
 						},
 					},
 				},
-				Metadata: map[string]string{"format": "msgpack"},
 			},
 			// Test accessing the float value at foo[1]
 			path: []*core.PromiseAttribute{

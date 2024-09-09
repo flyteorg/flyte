@@ -258,6 +258,8 @@ func TestMakeDefaultLiteralForType(t *testing.T) {
 		}})
 		assert.NoError(t, err)
 		assert.NotNil(t, l.GetScalar().GetJson())
+		assert.NotNil(t, l.GetScalar().GetJson().GetValue())
+		assert.NotNil(t, l.GetScalar().GetJson().GetSerializationFormat())
 	})
 
 	t.Run("enum", func(t *testing.T) {
@@ -407,7 +409,7 @@ func TestMakeLiteralForBlob(t *testing.T) {
 	}
 }
 
-func re(t *testing.T) {
+func TestMakeLiteralForType(t *testing.T) {
 	t.Run("SimpleInteger", func(t *testing.T) {
 		var literalType = &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}
 		val, err := MakeLiteralForType(literalType, 1)
@@ -486,12 +488,12 @@ func re(t *testing.T) {
 				Scalar: &core.Scalar{
 					Value: &core.Scalar_Json{
 						Json: &core.Json{
-							Value: msgpackBytes,
+							Value:               msgpackBytes,
+							SerializationFormat: "msgpack",
 						},
 					},
 				},
 			},
-			Metadata: map[string]string{"format": "msgpack"},
 		}
 
 		expectedLiteralVal, err := ExtractFromLiteral(literalVal)
@@ -510,7 +512,7 @@ func re(t *testing.T) {
 		err = msgpack.Unmarshal(actualBytes, &actualVal)
 		assert.NoError(t, err)
 
-		assert.EqualValues(t, expectedVal, actualVal)
+		assert.Equal(t, expectedVal, actualVal)
 	})
 
 	t.Run("ArrayStrings", func(t *testing.T) {

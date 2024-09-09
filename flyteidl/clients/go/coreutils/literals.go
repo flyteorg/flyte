@@ -386,7 +386,6 @@ func MakePrimitiveForType(t core.SimpleType, s string) (*core.Primitive, error) 
 
 func MakeLiteralForSimpleType(t core.SimpleType, s string) (*core.Literal, error) {
 	s = strings.Trim(s, " \n\t")
-	lv := &core.Literal{}
 	scalar := &core.Scalar{}
 	switch t {
 	case core.SimpleType_STRUCT:
@@ -430,10 +429,11 @@ func MakeLiteralForSimpleType(t core.SimpleType, s string) (*core.Literal, error
 		}
 		scalar.Value = &core.Scalar_Primitive{Primitive: p}
 	}
-	lv.Value = &core.Literal_Scalar{
-		Scalar: scalar,
-	}
-	return lv, nil
+	return &core.Literal{
+		Value: &core.Literal_Scalar{
+			Scalar: scalar,
+		},
+	}, nil
 }
 
 func MustMakeLiteral(v interface{}) *core.Literal {
