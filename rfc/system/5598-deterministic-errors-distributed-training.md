@@ -49,7 +49,7 @@ For distributed training tasks, the [pod entrypoint `pyflyte-execute`](https://g
 
 #### Providing relevant error information to the backend an UI
 
-The pod entrypoint needs to provide the information in which worker the error occurred in order to display the name in the UI. For the strategy `"earliest"`, it needs to also provide the timestamp when the error occured.
+The pod entrypoint needs to provide the information in which worker the error occurred in order to display the name in the UI. For the strategy `"earliest"`, it needs to also provide the timestamp when the error occurred.
 
 We therefore propose to add optional attributes `worker` and `timestamp` (unix epoch time with micro- or nanoseconds granularity) to flyteidl's [`message ContainerError`](https://github.com/flyteorg/flyte/blob/30d33149159c90d0de44f6351b8d5d7309242e59/flyteidl/protos/flyteidl/core/errors.proto#L11).
 
@@ -88,7 +88,7 @@ We propose to implement a new `MultiErrorFileRemoteFileOutputReader` which (for 
 
 If in [the plugin manager](https://github.com/flyteorg/flyte/blob/4514860cf56ba62717f6c207f269410a8c1a5461/flytepropeller/pkg/controller/nodes/task/k8s/plugin_manager.go#L290) the respective plugin is found to configure an error aggregation strategy other than `Default`, we instantiate such a `MultiErrorFileRemoteFileOutputReader` reader (instead of the existing `RemoteFileOutputReader`) and configure it with the respective strategy.
 
-For the strategy `Earliest`, it will determine the `ContainerError` with the earlist timestamp, will use this one to determine retriability, and will communicate this specific error message to flyteadmin (and finally the UI).
+For the strategy `Earliest`, it will determine the `ContainerError` with the earliest timestamp, will use this one to determine retriability, and will communicate this specific error message to flyteadmin (and finally the UI).
 
 #### Backwards compatibility
 We propose that the new `MultiErrorFileRemoteFileOutputReader` falls back to reading the `error.pb` (behaviour of the default `RemoteFileOutputReader`) if no `error-<pod-name>.pb` files are found in order to solve the problem of backwards compatibility:
