@@ -202,6 +202,21 @@
       },
       "description": "Encapsulation of fields that uniquely identifies a Flyte resource."
     },
+    "coreJson": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string",
+          "format": "byte",
+          "description": "The JSON string serialized as a byte array."
+        },
+        "serialization_format": {
+          "type": "string",
+          "description": "The format used to serialize the JSON string.\nThis field identifies the specific format of the serialized JSON data,\nallowing for future flexibility in supporting different JSON variants.\nSerialization formats need to be supported in Python, Go, Rust, Java, and JavaScript\nto ensure the full Flyte experience."
+        }
+      },
+      "description": "Represents a JSON string encoded as a byte array.\nThis field is used to store JSON-serialized data, which can include\ndataclasses, dictionaries, Pydantic models, or other structures that\ncan be represented as JSON strings. When used, the data should be\ndeserialized into its corresponding structure.\nThis design ensures that the data is stored in a format that can be\nfully reconstructed without loss of information."
+    },
     "coreLiteral": {
       "type": "object",
       "properties": {
@@ -397,6 +412,9 @@
         },
         "union": {
           "$ref": "#/definitions/coreUnion"
+        },
+        "json": {
+          "$ref": "#/definitions/coreJson"
         }
       }
     },
@@ -426,7 +444,8 @@
         "DURATION",
         "BINARY",
         "ERROR",
-        "STRUCT"
+        "STRUCT",
+        "JSON"
       ],
       "default": "NONE",
       "description": "Define a set of simple types."

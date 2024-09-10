@@ -46,6 +46,31 @@ message Binary {
     string tag = 2;
 }
 
+// Represents a JSON string encoded as a byte array.
+// This field is used to store JSON-serialized data, which can include
+// dataclasses, dictionaries, Pydantic models, or other structures that
+// can be represented as JSON strings. When used, the data should be
+// deserialized into its corresponding structure.
+// This design ensures that the data is stored in a format that can be
+// fully reconstructed without loss of information.
+message Json {
+    // The JSON string serialized as a byte array.
+    bytes value = 1;
+
+    // The format used to serialize the JSON string.
+    // This field identifies the specific format of the serialized JSON data,
+    // allowing for future flexibility in supporting different JSON variants.
+    // Serialization formats need to be supported in Python, Go, Rust, Java, and JavaScript
+    // to ensure the full Flyte experience.
+    string serialization_format = 2;
+
+    // A placeholder for future extensions to support other types of JSON objects,
+    // such as "eJSON" or "ndJSON."
+    // Reference: https://stackoverflow.com/questions/18692060/different-types-of-json
+    // string json_type = 3;
+}
+
+
 // A strongly typed schema that defines the interface of data retrieved from the underlying storage medium.
 message Schema {
     string uri = 1;
@@ -88,6 +113,7 @@ message Scalar {
         google.protobuf.Struct generic = 7;
         StructuredDataset structured_dataset = 8;
         Union union = 9;
+        Json json = 10;
     }
 }
 

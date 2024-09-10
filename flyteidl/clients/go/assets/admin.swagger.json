@@ -7324,6 +7324,21 @@
         }
       }
     },
+    "coreJson": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string",
+          "format": "byte",
+          "description": "The JSON string serialized as a byte array."
+        },
+        "serialization_format": {
+          "type": "string",
+          "description": "The format used to serialize the JSON string.\nThis field identifies the specific format of the serialized JSON data,\nallowing for future flexibility in supporting different JSON variants.\nSerialization formats need to be supported in Python, Go, Rust, Java, and JavaScript\nto ensure the full Flyte experience."
+        }
+      },
+      "description": "Represents a JSON string encoded as a byte array.\nThis field is used to store JSON-serialized data, which can include\ndataclasses, dictionaries, Pydantic models, or other structures that\ncan be represented as JSON strings. When used, the data should be\ndeserialized into its corresponding structure.\nThis design ensures that the data is stored in a format that can be\nfully reconstructed without loss of information."
+    },
     "coreK8sObjectMetadata": {
       "type": "object",
       "properties": {
@@ -7418,6 +7433,10 @@
           "$ref": "#/definitions/coreLiteralMap",
           "description": "A map of strings to literals."
         },
+        "offloaded_metadata": {
+          "$ref": "#/definitions/coreLiteralOffloadedMetadata",
+          "description": "Offloaded literal metadata\nWhen you deserialize the offloaded metadata, it would be of Literal and its type would be defined by LiteralType stored in offloaded_metadata."
+        },
         "hash": {
           "type": "string",
           "title": "A hash representing this literal.\nThis is used for caching purposes. For more details refer to RFC 1893\n(https://github.com/flyteorg/flyte/blob/master/rfc/system/1893-caching-of-offloaded-objects.md)"
@@ -7428,15 +7447,6 @@
             "type": "string"
           },
           "description": "Additional metadata for literals."
-        },
-        "uri": {
-          "type": "string",
-          "description": "If this literal is offloaded, this field will contain metadata including the offload location."
-        },
-        "size_bytes": {
-          "type": "string",
-          "format": "uint64",
-          "description": "Includes information about the size of the literal."
         }
       },
       "description": "A simple value. This supports any level of nesting (e.g. array of array of array of Blobs) as well as simple primitives."
@@ -7465,6 +7475,25 @@
         }
       },
       "description": "A map of literals. This is a workaround since oneofs in proto messages cannot contain a repeated field."
+    },
+    "coreLiteralOffloadedMetadata": {
+      "type": "object",
+      "properties": {
+        "uri": {
+          "type": "string",
+          "description": "The location of the offloaded core.Literal."
+        },
+        "size_bytes": {
+          "type": "string",
+          "format": "uint64",
+          "description": "The size of the offloaded data."
+        },
+        "inferred_type": {
+          "$ref": "#/definitions/coreLiteralType",
+          "description": "The inferred literal type of the offloaded data."
+        }
+      },
+      "description": "A message that contains the metadata of the offloaded data."
     },
     "coreLiteralType": {
       "type": "object",
@@ -7924,6 +7953,9 @@
         },
         "union": {
           "$ref": "#/definitions/coreUnion"
+        },
+        "json": {
+          "$ref": "#/definitions/coreJson"
         }
       }
     },
@@ -8019,7 +8051,8 @@
         "DURATION",
         "BINARY",
         "ERROR",
-        "STRUCT"
+        "STRUCT",
+        "JSON"
       ],
       "default": "NONE",
       "description": "Define a set of simple types."

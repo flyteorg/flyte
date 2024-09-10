@@ -1906,7 +1906,8 @@ export namespace flyteidl {
             DURATION = 6,
             BINARY = 7,
             ERROR = 8,
-            STRUCT = 9
+            STRUCT = 9,
+            JSON = 10
         }
 
         /** Properties of a SchemaType. */
@@ -3044,6 +3045,64 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of a Json. */
+        interface IJson {
+
+            /** Json value */
+            value?: (Uint8Array|null);
+
+            /** Json serializationFormat */
+            serializationFormat?: (string|null);
+        }
+
+        /** Represents a Json. */
+        class Json implements IJson {
+
+            /**
+             * Constructs a new Json.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.IJson);
+
+            /** Json value. */
+            public value: Uint8Array;
+
+            /** Json serializationFormat. */
+            public serializationFormat: string;
+
+            /**
+             * Creates a new Json instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns Json instance
+             */
+            public static create(properties?: flyteidl.core.IJson): flyteidl.core.Json;
+
+            /**
+             * Encodes the specified Json message. Does not implicitly {@link flyteidl.core.Json.verify|verify} messages.
+             * @param message Json message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.IJson, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a Json message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns Json
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.Json;
+
+            /**
+             * Verifies a Json message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a Schema. */
         interface ISchema {
 
@@ -3299,6 +3358,9 @@ export namespace flyteidl {
 
             /** Scalar union */
             union?: (flyteidl.core.IUnion|null);
+
+            /** Scalar json */
+            json?: (flyteidl.core.IJson|null);
         }
 
         /** Represents a Scalar. */
@@ -3337,8 +3399,11 @@ export namespace flyteidl {
             /** Scalar union. */
             public union?: (flyteidl.core.IUnion|null);
 
+            /** Scalar json. */
+            public json?: (flyteidl.core.IJson|null);
+
             /** Scalar value. */
-            public value?: ("primitive"|"blob"|"binary"|"schema"|"noneType"|"error"|"generic"|"structuredDataset"|"union");
+            public value?: ("primitive"|"blob"|"binary"|"schema"|"noneType"|"error"|"generic"|"structuredDataset"|"union"|"json");
 
             /**
              * Creates a new Scalar instance using the specified properties.

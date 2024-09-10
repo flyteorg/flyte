@@ -254,6 +254,65 @@ export class Binary extends Message<Binary> {
 }
 
 /**
+ * Represents a JSON string encoded as a byte array.
+ * This field is used to store JSON-serialized data, which can include
+ * dataclasses, dictionaries, Pydantic models, or other structures that
+ * can be represented as JSON strings. When used, the data should be
+ * deserialized into its corresponding structure.
+ * This design ensures that the data is stored in a format that can be
+ * fully reconstructed without loss of information.
+ *
+ * @generated from message flyteidl.core.Json
+ */
+export class Json extends Message<Json> {
+  /**
+   * The JSON string serialized as a byte array.
+   *
+   * @generated from field: bytes value = 1;
+   */
+  value = new Uint8Array(0);
+
+  /**
+   * The format used to serialize the JSON string.
+   * This field identifies the specific format of the serialized JSON data,
+   * allowing for future flexibility in supporting different JSON variants.
+   * Serialization formats need to be supported in Python, Go, Rust, Java, and JavaScript
+   * to ensure the full Flyte experience.
+   *
+   * @generated from field: string serialization_format = 2;
+   */
+  serializationFormat = "";
+
+  constructor(data?: PartialMessage<Json>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.core.Json";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "value", kind: "scalar", T: 12 /* ScalarType.BYTES */ },
+    { no: 2, name: "serialization_format", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Json {
+    return new Json().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Json {
+    return new Json().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Json {
+    return new Json().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: Json | PlainMessage<Json> | undefined, b: Json | PlainMessage<Json> | undefined): boolean {
+    return proto3.util.equals(Json, a, b);
+  }
+}
+
+/**
  * A strongly typed schema that defines the interface of data retrieved from the underlying storage medium.
  *
  * @generated from message flyteidl.core.Schema
@@ -495,6 +554,12 @@ export class Scalar extends Message<Scalar> {
      */
     value: Union;
     case: "union";
+  } | {
+    /**
+     * @generated from field: flyteidl.core.Json json = 10;
+     */
+    value: Json;
+    case: "json";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   constructor(data?: PartialMessage<Scalar>) {
@@ -514,6 +579,7 @@ export class Scalar extends Message<Scalar> {
     { no: 7, name: "generic", kind: "message", T: Struct, oneof: "value" },
     { no: 8, name: "structured_dataset", kind: "message", T: StructuredDataset, oneof: "value" },
     { no: 9, name: "union", kind: "message", T: Union, oneof: "value" },
+    { no: 10, name: "json", kind: "message", T: Json, oneof: "value" },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Scalar {

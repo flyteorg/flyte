@@ -306,6 +306,7 @@ pub enum SimpleType {
     Binary = 7,
     Error = 8,
     Struct = 9,
+    Json = 10,
 }
 impl SimpleType {
     /// String value of the enum field names used in the ProtoBuf definition.
@@ -324,6 +325,7 @@ impl SimpleType {
             SimpleType::Binary => "BINARY",
             SimpleType::Error => "ERROR",
             SimpleType::Struct => "STRUCT",
+            SimpleType::Json => "JSON",
         }
     }
     /// Creates an enum from field names used in the ProtoBuf definition.
@@ -339,6 +341,7 @@ impl SimpleType {
             "BINARY" => Some(Self::Binary),
             "ERROR" => Some(Self::Error),
             "STRUCT" => Some(Self::Struct),
+            "JSON" => Some(Self::Json),
             _ => None,
         }
     }
@@ -405,6 +408,27 @@ pub struct Binary {
     #[prost(string, tag="2")]
     pub tag: ::prost::alloc::string::String,
 }
+/// Represents a JSON string encoded as a byte array.
+/// This field is used to store JSON-serialized data, which can include
+/// dataclasses, dictionaries, Pydantic models, or other structures that
+/// can be represented as JSON strings. When used, the data should be
+/// deserialized into its corresponding structure.
+/// This design ensures that the data is stored in a format that can be
+/// fully reconstructed without loss of information.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct Json {
+    /// The JSON string serialized as a byte array.
+    #[prost(bytes="vec", tag="1")]
+    pub value: ::prost::alloc::vec::Vec<u8>,
+    /// The format used to serialize the JSON string.
+    /// This field identifies the specific format of the serialized JSON data,
+    /// allowing for future flexibility in supporting different JSON variants.
+    /// Serialization formats need to be supported in Python, Go, Rust, Java, and JavaScript
+    /// to ensure the full Flyte experience.
+    #[prost(string, tag="2")]
+    pub serialization_format: ::prost::alloc::string::String,
+}
 /// A strongly typed schema that defines the interface of data retrieved from the underlying storage medium.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -449,7 +473,7 @@ pub struct StructuredDataset {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Scalar {
-    #[prost(oneof="scalar::Value", tags="1, 2, 3, 4, 5, 6, 7, 8, 9")]
+    #[prost(oneof="scalar::Value", tags="1, 2, 3, 4, 5, 6, 7, 8, 9, 10")]
     pub value: ::core::option::Option<scalar::Value>,
 }
 /// Nested message and enum types in `Scalar`.
@@ -475,6 +499,8 @@ pub mod scalar {
         StructuredDataset(super::StructuredDataset),
         #[prost(message, tag="9")]
         Union(::prost::alloc::boxed::Box<super::Union>),
+        #[prost(message, tag="10")]
+        Json(super::Json),
     }
 }
 /// A simple value. This supports any level of nesting (e.g. array of array of array of Blobs) as well as simple primitives.

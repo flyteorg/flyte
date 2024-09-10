@@ -51,6 +51,14 @@ class Binary(_message.Message):
     tag: str
     def __init__(self, value: _Optional[bytes] = ..., tag: _Optional[str] = ...) -> None: ...
 
+class Json(_message.Message):
+    __slots__ = ["value", "serialization_format"]
+    VALUE_FIELD_NUMBER: _ClassVar[int]
+    SERIALIZATION_FORMAT_FIELD_NUMBER: _ClassVar[int]
+    value: bytes
+    serialization_format: str
+    def __init__(self, value: _Optional[bytes] = ..., serialization_format: _Optional[str] = ...) -> None: ...
+
 class Schema(_message.Message):
     __slots__ = ["uri", "type"]
     URI_FIELD_NUMBER: _ClassVar[int]
@@ -82,7 +90,7 @@ class StructuredDataset(_message.Message):
     def __init__(self, uri: _Optional[str] = ..., metadata: _Optional[_Union[StructuredDatasetMetadata, _Mapping]] = ...) -> None: ...
 
 class Scalar(_message.Message):
-    __slots__ = ["primitive", "blob", "binary", "schema", "none_type", "error", "generic", "structured_dataset", "union"]
+    __slots__ = ["primitive", "blob", "binary", "schema", "none_type", "error", "generic", "structured_dataset", "union", "json"]
     PRIMITIVE_FIELD_NUMBER: _ClassVar[int]
     BLOB_FIELD_NUMBER: _ClassVar[int]
     BINARY_FIELD_NUMBER: _ClassVar[int]
@@ -92,6 +100,7 @@ class Scalar(_message.Message):
     GENERIC_FIELD_NUMBER: _ClassVar[int]
     STRUCTURED_DATASET_FIELD_NUMBER: _ClassVar[int]
     UNION_FIELD_NUMBER: _ClassVar[int]
+    JSON_FIELD_NUMBER: _ClassVar[int]
     primitive: Primitive
     blob: Blob
     binary: Binary
@@ -101,7 +110,8 @@ class Scalar(_message.Message):
     generic: _struct_pb2.Struct
     structured_dataset: StructuredDataset
     union: Union
-    def __init__(self, primitive: _Optional[_Union[Primitive, _Mapping]] = ..., blob: _Optional[_Union[Blob, _Mapping]] = ..., binary: _Optional[_Union[Binary, _Mapping]] = ..., schema: _Optional[_Union[Schema, _Mapping]] = ..., none_type: _Optional[_Union[Void, _Mapping]] = ..., error: _Optional[_Union[_types_pb2.Error, _Mapping]] = ..., generic: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ..., structured_dataset: _Optional[_Union[StructuredDataset, _Mapping]] = ..., union: _Optional[_Union[Union, _Mapping]] = ...) -> None: ...
+    json: Json
+    def __init__(self, primitive: _Optional[_Union[Primitive, _Mapping]] = ..., blob: _Optional[_Union[Blob, _Mapping]] = ..., binary: _Optional[_Union[Binary, _Mapping]] = ..., schema: _Optional[_Union[Schema, _Mapping]] = ..., none_type: _Optional[_Union[Void, _Mapping]] = ..., error: _Optional[_Union[_types_pb2.Error, _Mapping]] = ..., generic: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ..., structured_dataset: _Optional[_Union[StructuredDataset, _Mapping]] = ..., union: _Optional[_Union[Union, _Mapping]] = ..., json: _Optional[_Union[Json, _Mapping]] = ...) -> None: ...
 
 class Literal(_message.Message):
     __slots__ = ["scalar", "collection", "map", "offloaded_metadata", "hash", "metadata"]
