@@ -2,8 +2,6 @@ module github.com/flyteorg/flyte/flytectl
 
 go 1.22
 
-toolchain go1.22.0
-
 require (
 	github.com/apoorvam/goterminal v0.0.0-20180523175556-614d345c47e5
 	github.com/avast/retry-go v3.0.0+incompatible
