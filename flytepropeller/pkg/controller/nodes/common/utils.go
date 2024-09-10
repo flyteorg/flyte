@@ -148,7 +148,7 @@ func CheckOffloadingCompat(ctx context.Context, nCtx interfaces.NodeExecutionCon
 		return &phaseInfo
 	}
 	runtimeData := taskNode.CoreTask().GetMetadata().GetRuntime()
-	if consumesOffloadLiteral && !literalOffloadingConfig.IsSupportedSDKVersion(runtimeData.GetType().String(), runtimeData.GetVersion()) {
+	if !literalOffloadingConfig.IsSupportedSDKVersion(runtimeData.GetType().String(), runtimeData.GetVersion()) {
 		if !literalOffloadingConfig.Enabled {
 			errMsg := fmt.Sprintf("task [%s] is trying to consume offloaded literals but feature is not enabled", taskID)
 			logger.Errorf(ctx, errMsg)
