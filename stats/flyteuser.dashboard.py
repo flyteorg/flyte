@@ -1,6 +1,6 @@
 import typing
 from grafanalib.core import (
-    Alert, AlertCondition, Dashboard, Graph,BarChart,
+    Alert, AlertCondition, Dashboard, Graph,BarChart,BarGauge,
     GreaterThan, OP_AND, OPS_FORMAT, Row, RTYPE_SUM, SECONDS_FORMAT,
     SHORT_FORMAT, single_y_axis, Target, TimeRange, YAxes, YAxis, MILLISECONDS_FORMAT, Templating, Template,
     DataSourceInput
@@ -44,7 +44,7 @@ class FlyteUserDashboard(object):
                    yAxes=single_y_axis(format=SHORT_FORMAT),
                 ),
                 Graph(
-                    title="Failed Workflow",
+                    title="Failed Workflows (avg)",
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
@@ -69,16 +69,17 @@ class FlyteUserDashboard(object):
                         YAxis(format=SHORT_FORMAT),
                     ),
                 ),
-                Graph(
-                    title="Successful workflow execution time by Quantile",
+                BarGauge(
+                    title="Successful wf execution duration by quantile (s)",
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr='sum(flyte:propeller:all:workflow:event_recording:success_duration_ms{project=~"$project", domain=~"$domain", wf=~"$workflow"}) by (quantile)',
+                            expr='avg((flyte:propeller:all:workflow:success_duration_ms{project=~"$project", domain=~"$domain", wf=~"$workflow"})/1000) by(quantile)',
                             refId='A',
                         ),
                     ],
-                    yAxes=single_y_axis(format=MILLISECONDS_FORMAT),
+                    orientation='horizontal',
+                   format=SECONDS_FORMAT
                 ),
                 Graph(
                     title="Failed workflow execution time by Quantile",
