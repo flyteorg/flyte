@@ -82,7 +82,7 @@ func GetTargetEntity(ctx context.Context, nCtx interfaces.NodeExecutionContext) 
 // OffloadLargeLiteral offloads the large literal if meets the threshold conditions
 func OffloadLargeLiteral(ctx context.Context, datastore *storage.DataStore, dataReference storage.DataReference,
 	toBeOffloaded *idlcore.Literal, literalOffloadingConfig config.LiteralOffloadingConfig) error {
-	literalSizeBytes := uint64(proto.Size(toBeOffloaded))
+	literalSizeBytes := int64(proto.Size(toBeOffloaded))
 	literalSizeMB := literalSizeBytes / MB
 	// check if the literal is large
 	if literalSizeMB >= literalOffloadingConfig.MaxSizeInMBForOffloading {
@@ -112,7 +112,7 @@ func OffloadLargeLiteral(ctx context.Context, datastore *storage.DataStore, data
 	toBeOffloaded.Value = &idlcore.Literal_OffloadedMetadata{
 		OffloadedMetadata: &idlcore.LiteralOffloadedMetadata{
 			Uri:          dataReference.String(),
-			SizeBytes:    literalSizeBytes,
+			SizeBytes:    uint64(literalSizeBytes),
 			InferredType: inferredType,
 		},
 	}
