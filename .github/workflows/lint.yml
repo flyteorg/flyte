@@ -22,6 +22,6 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: ${{ inputs.go-version }}
+          go-version-file: ${{ inputs.component }}/go.mod
       - name: Lint
         run: make install && make lint
