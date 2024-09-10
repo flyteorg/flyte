@@ -546,7 +546,7 @@ func TestHandleRunning(t *testing.T) {
 		Spec: v1.PodSpec{
 			Containers: []v1.Container{
 				{
-					Name: "container-name",
+					Name: "pod-name",
 				},
 			},
 			Hostname: "hostname",
@@ -780,54 +780,6 @@ func TestHandleRunning(t *testing.T) {
 func TestGetTaskInfo(t *testing.T) {
 	ctx := context.TODO()
 
-	executionEnvClient := &coremocks.ExecutionEnvClient{}
-	executionEnvClient.OnStatusMatch(ctx, mock.Anything).Return(map[string]*v1.Pod{
-		"w0": {
-			ObjectMeta: metav1.ObjectMeta{
-				Namespace: "namespace",
-				Name:      "pod-name",
-			},
-			Spec: v1.PodSpec{
-				Containers: []v1.Container{
-					{
-						Name: "container-name",
-					},
-				},
-				Hostname: "hostname",
-			},
-			Status: v1.PodStatus{
-				ContainerStatuses: []v1.ContainerStatus{
-					{
-						ContainerID: "container-id",
-					},
-				},
-			},
-		},
-	}, nil)
-	tCtx := &coremocks.TaskExecutionContext{}
-	tCtx.OnGetExecutionEnvClient().Return(executionEnvClient)
-
-	taskMetadata := &coremocks.TaskExecutionMetadata{}
-	taskMetadata.OnGetOwnerIDMatch().Return(types.NamespacedName{
-		Namespace: "namespace",
-		Name:      "execution_id",
-	})
-	taskExecutionID := &coremocks.TaskExecutionID{}
-	taskExecutionID.OnGetID().Return(idlcore.TaskExecutionIdentifier{
-		TaskId: &idlcore.Identifier{
-			Project: "project",
-			Domain:  "domain",
-		},
-	})
-	taskExecutionID.OnGetGeneratedNameWithMatch(mock.Anything, mock.Anything).Return("task-id", nil)
-	taskMetadata.OnGetTaskExecutionID().Return(taskExecutionID)
-	tCtx.OnTaskExecutionMetadata().Return(taskMetadata)
-
-	taskTemplate := getBaseFasttaskTaskTemplate(t)
-	taskReader := &coremocks.TaskReader{}
-	taskReader.OnReadMatch(mock.Anything).Return(taskTemplate, nil)
-	tCtx.OnTaskReader().Return(taskReader)
-
 	now := time.Now()
 	start := now.Add(-5 * time.Second)
 	executionEnv := &idlcore.ExecutionEnv{
@@ -849,12 +801,151 @@ func TestGetTaskInfo(t *testing.T) {
 			},
 		},
 	}
-	taskInfo, err := plugin.getTaskInfo(ctx, tCtx, start, now, executionEnv, queueID, workerID)
 
-	require.Nil(t, err)
-	require.Len(t, taskInfo.Logs, 1)
-	assert.Equal(t, "Custom Logs (worker)", taskInfo.Logs[0].GetName())
-	assert.Equal(t, "http://foo.com/pod=namespace/pod-name", taskInfo.Logs[0].GetUri())
+	t.Run("available", func(t *testing.T) {
+		executionEnvClient := &coremocks.ExecutionEnvClient{}
+		executionEnvClient.OnStatusMatch(ctx, mock.Anything).Return(map[string]*v1.Pod{
+			"w0": {
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "namespace",
+					Name:      "pod-name",
+				},
+				Spec: v1.PodSpec{
+					Containers: []v1.Container{
+						{
+							Name: "pod-name",
+						},
+					},
+					Hostname: "hostname",
+				},
+				Status: v1.PodStatus{
+					ContainerStatuses: []v1.ContainerStatus{
+						{
+							ContainerID: "container-id",
+						},
+					},
+				},
+			},
+		}, nil)
+		tCtx := &coremocks.TaskExecutionContext{}
+		tCtx.OnGetExecutionEnvClient().Return(executionEnvClient)
+
+		taskMetadata := &coremocks.TaskExecutionMetadata{}
+		taskMetadata.OnGetOwnerIDMatch().Return(types.NamespacedName{
+			Namespace: "namespace",
+			Name:      "execution_id",
+		})
+		taskExecutionID := &coremocks.TaskExecutionID{}
+		taskExecutionID.OnGetID().Return(idlcore.TaskExecutionIdentifier{
+			TaskId: &idlcore.Identifier{
+				Project: "project",
+				Domain:  "domain",
+			},
+		})
+		taskExecutionID.OnGetGeneratedNameWithMatch(mock.Anything, mock.Anything).Return("task-id", nil)
+		taskMetadata.OnGetTaskExecutionID().Return(taskExecutionID)
+		tCtx.OnTaskExecutionMetadata().Return(taskMetadata)
+
+		taskTemplate := getBaseFasttaskTaskTemplate(t)
+		taskReader := &coremocks.TaskReader{}
+		taskReader.OnReadMatch(mock.Anything).Return(taskTemplate, nil)
+		tCtx.OnTaskReader().Return(taskReader)
+
+		taskInfo, err := plugin.getTaskInfo(ctx, tCtx, start, now, executionEnv, queueID, workerID)
+
+		require.Nil(t, err)
+		require.Len(t, taskInfo.Logs, 1)
+		assert.Equal(t, "Custom Logs (worker)", taskInfo.Logs[0].GetName())
+		assert.Equal(t, "http://foo.com/pod=namespace/pod-name", taskInfo.Logs[0].GetUri())
+	})
+
+	t.Run("mismatched container name", func(t *testing.T) {
+		executionEnvClient := &coremocks.ExecutionEnvClient{}
+		executionEnvClient.OnStatusMatch(ctx, mock.Anything).Return(map[string]*v1.Pod{
+			"w0": {
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "namespace",
+					Name:      "pod-name",
+				},
+				Spec: v1.PodSpec{
+					Containers: []v1.Container{
+						{
+							Name: "container-name",
+						},
+					},
+					Hostname: "hostname",
+				},
+				Status: v1.PodStatus{},
+			},
+		}, nil)
+		tCtx := &coremocks.TaskExecutionContext{}
+		tCtx.OnGetExecutionEnvClient().Return(executionEnvClient)
+
+		taskMetadata := &coremocks.TaskExecutionMetadata{}
+		taskMetadata.OnGetOwnerIDMatch().Return(types.NamespacedName{
+			Namespace: "namespace",
+			Name:      "execution_id",
+		})
+		taskExecutionID := &coremocks.TaskExecutionID{}
+		taskExecutionID.OnGetID().Return(idlcore.TaskExecutionIdentifier{
+			TaskId: &idlcore.Identifier{
+				Project: "project",
+				Domain:  "domain",
+			},
+		})
+		taskExecutionID.OnGetGeneratedNameWithMatch(mock.Anything, mock.Anything).Return("task-id", nil)
+		taskMetadata.OnGetTaskExecutionID().Return(taskExecutionID)
+		tCtx.OnTaskExecutionMetadata().Return(taskMetadata)
+
+		taskInfo, err := plugin.getTaskInfo(ctx, tCtx, start, now, executionEnv, queueID, workerID)
+
+		require.Nil(t, err)
+		require.Empty(t, taskInfo.Logs)
+	})
+
+	t.Run("no container id", func(t *testing.T) {
+		executionEnvClient := &coremocks.ExecutionEnvClient{}
+		executionEnvClient.OnStatusMatch(ctx, mock.Anything).Return(map[string]*v1.Pod{
+			"w0": {
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "namespace",
+					Name:      "pod-name",
+				},
+				Spec: v1.PodSpec{
+					Containers: []v1.Container{
+						{
+							Name: "pod-name",
+						},
+					},
+					Hostname: "hostname",
+				},
+				Status: v1.PodStatus{},
+			},
+		}, nil)
+		tCtx := &coremocks.TaskExecutionContext{}
+		tCtx.OnGetExecutionEnvClient().Return(executionEnvClient)
+
+		taskMetadata := &coremocks.TaskExecutionMetadata{}
+		taskMetadata.OnGetOwnerIDMatch().Return(types.NamespacedName{
+			Namespace: "namespace",
+			Name:      "execution_id",
+		})
+		taskExecutionID := &coremocks.TaskExecutionID{}
+		taskExecutionID.OnGetID().Return(idlcore.TaskExecutionIdentifier{
+			TaskId: &idlcore.Identifier{
+				Project: "project",
+				Domain:  "domain",
+			},
+		})
+		taskExecutionID.OnGetGeneratedNameWithMatch(mock.Anything, mock.Anything).Return("task-id", nil)
+		taskMetadata.OnGetTaskExecutionID().Return(taskExecutionID)
+		tCtx.OnTaskExecutionMetadata().Return(taskMetadata)
+
+		taskInfo, err := plugin.getTaskInfo(ctx, tCtx, start, now, executionEnv, queueID, workerID)
+
+		require.Nil(t, err)
+		require.Empty(t, taskInfo.Logs)
+	})
 }
 
 func init() {

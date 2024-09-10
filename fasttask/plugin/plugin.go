@@ -496,12 +496,28 @@ func (p *Plugin) getTaskInfo(ctx context.Context, tCtx core.TaskExecutionContext
 		return &taskInfo, nil
 	}
 
+	containerIndex := -1
+	for i := range pod.Spec.Containers {
+		if pod.Spec.Containers[i].Name == pod.GetName() {
+			containerIndex = i
+			break
+		}
+	}
+	if containerIndex == -1 {
+		logger.Warnf(ctx, "Container %q not found in pod %q", pod.GetName(), pod.GetName())
+		return &taskInfo, nil
+	}
+
+	if len(pod.Status.ContainerStatuses) <= containerIndex {
+		// no container id yet
+		return &taskInfo, nil
+	}
+
 	taskTemplate, err := tCtx.TaskReader().Read(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	containerIndex := 0
 	in := tasklog.Input{
 		Namespace:            pod.Namespace,
 		PodName:              pod.Name,
