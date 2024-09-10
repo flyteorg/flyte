@@ -499,7 +499,6 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		// attempt best effort at initializing outputLiterals with output variable names. currently
 		// only TaskNode and WorkflowNode contain node interfaces.
 		outputLiterals := make(map[string]*idlcore.Literal)
-		canOffloadLiteral := false
 		switch arrayNode.GetSubNodeSpec().GetKind() {
 		case v1alpha1.NodeKindTask:
 			taskID := *arrayNode.GetSubNodeSpec().TaskRef
@@ -508,9 +507,6 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 				return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(idlcore.ExecutionError_SYSTEM,
 					errors.BadSpecificationError, fmt.Sprintf("failed to find ArrayNode subNode task with id: '%s'", taskID), nil)), nil
 			}
-			runtimeData := taskNode.CoreTask().GetMetadata().GetRuntime()
-			// check if the literal can be offloaded based on the runtime data and the offloading config
-			canOffloadLiteral = a.literalOffloadingConfig.Enabled && a.literalOffloadingConfig.IsSupportedSDKVersion(runtimeData.GetType().String(), runtimeData.GetVersion())
 
 			if outputs := taskNode.CoreTask().GetInterface().GetOutputs(); outputs != nil {
 				for name := range outputs.Variables {
@@ -552,7 +548,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		}
 
 		// only offload literal if canOffloadLiteral is true which currently checks if the sdk is compatible to use with this backend change.
-		if canOffloadLiteral {
+		if a.literalOffloadingConfig.Enabled {
 			for outputLiteralKey, outputLiteral := range outputLiterals {
 				// if the size of the output Literal is > threshold then we write the literal to the offloaded store and populate the literal with its zero value and update the offloaded url
 				// use the OffloadLargeLiteralKey to create  {OffloadLargeLiteralKey}_offloaded_metadata.pb file in the datastore.

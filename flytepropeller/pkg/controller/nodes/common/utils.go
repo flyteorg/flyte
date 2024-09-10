@@ -136,7 +136,6 @@ func CheckOffloadingCompat(ctx context.Context, nCtx interfaces.NodeExecutionCon
 
 	// Return early if the node is not of type NodeKindTask
 	if node.GetKind() != v1alpha1.NodeKindTask {
-		logger.Warnf(ctx, "literal offloading : skipping sdk version check for node kind [%s'] with id [%v] ", node.GetKind(), node.GetID())
 		return nil
 	}
 
