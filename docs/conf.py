@@ -37,7 +37,7 @@ copyright = "2024, Flyte Authors"
 author = "Flyte"
 
 # The short X.Y version
-version = ""
+version = "1.13.1"
 # The full version, including alpha/beta/rc tags
 release = "1.13.1"
 
