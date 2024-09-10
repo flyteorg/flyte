@@ -66,6 +66,7 @@ extensions = [
     "sphinx.ext.extlinks",
     "sphinx-prompt",
     "sphinx_copybutton",
+    "sphinx_docsearch",
     "sphinxext.remoteliteralinclude",
     "sphinx_issues",
     "sphinx_click",
@@ -195,8 +196,7 @@ html_theme_options = {
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
-html_css_files = ["algolia.css"]
-# html_css_files = ["custom.css", "flyte.css", "algolia.css"]
+html_css_files = ["custom.css", "flyte.css", "algolia.css"]
 html_js_files = ["custom.js"]
 
 # Custom sidebar templates, must be a dictionary that maps document names
@@ -273,6 +273,11 @@ texinfo_documents = [
         "Miscellaneous",
     ),
 ]
+
+# Algolia docsearch credentials
+docsearch_app_id = "WLG0MZB58Q"
+docsearch_api_key = "28bf9bfd4a77a7d6b3ab7e98c671e781"
+docsearch_index_name = "flyte"
 
 # -- Extension configuration -------------------------------------------------
 # autosectionlabel_prefix_document = True

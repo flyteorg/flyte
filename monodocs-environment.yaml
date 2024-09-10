@@ -16,7 +16,6 @@ dependencies:
   - sphinx
   - sphinx-prompt
   - sphinx-click
-  - sphinx-autoapi
   - sphinx-copybutton
   - sphinx-issues
   - sphinx_fontawesome
@@ -61,6 +60,7 @@ dependencies:
   - pip:
     - flytekit>=1.13.1
     - readthedocs-sphinx-ext
+    - sphinx-docsearch
     - sphinx-code-include
     - sphinxext-remoteliteralinclude
     - sphinx_markdown_tables
