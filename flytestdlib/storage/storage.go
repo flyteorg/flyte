@@ -40,37 +40,38 @@ type Metadata interface {
 	ContentMD5() string
 }
 
-type CursorPosition int
+type CursorState int
 
 const (
-	StartCursorPos  CursorPosition = 0
-	EndCursorPos    CursorPosition = 1
-	CustomCursorPos CursorPosition = 2
+	// Enum representing state of the cursor
+	AtStartCursorState     CursorState = 0
+	AtEndCursorState       CursorState = 1
+	AtCustomPosCursorState CursorState = 2
 )
 
 type Cursor struct {
-	cursorPos   CursorPosition
-	customState string
-}
-
-func NewCursorFromCustomState(customState string) Cursor {
-	return Cursor{
-		cursorPos:   CustomCursorPos,
-		customState: customState,
-	}
+	cursorState    CursorState
+	customPosition string
 }
 
 func NewCursorAtStart() Cursor {
 	return Cursor{
-		cursorPos:   StartCursorPos,
-		customState: "",
+		cursorState:    AtStartCursorState,
+		customPosition: "",
 	}
 }
 
 func NewCursorAtEnd() Cursor {
 	return Cursor{
-		cursorPos:   EndCursorPos,
-		customState: "",
+		cursorState:    AtEndCursorState,
+		customPosition: "",
+	}
+}
+
+func NewCursorFromCustomPosition(customPosition string) Cursor {
+	return Cursor{
+		cursorState:    AtCustomPosCursorState,
+		customPosition: customPosition,
 	}
 }
 
