@@ -9,8 +9,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-
 	"github.com/gorilla/handlers"
 	grpcmiddleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpcauth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
@@ -45,6 +43,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/clients/go/assets"
 	grpcService "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/gateway/flyteidl/service"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/secretmanager"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
