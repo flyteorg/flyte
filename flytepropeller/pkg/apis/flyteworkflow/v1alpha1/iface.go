@@ -554,6 +554,10 @@ func GetOutputsFile(outputDir DataReference) DataReference {
 	return outputDir + "/outputs.pb"
 }
 
+func GetOutputsLiteralMetadataFile(literalKey string, outputDir DataReference) DataReference {
+	return outputDir + DataReference(fmt.Sprintf("/%s_offloaded_metadata.pb", literalKey))
+}
+
 func GetInputsFile(inputDir DataReference) DataReference {
 	return inputDir + "/inputs.pb"
 }
