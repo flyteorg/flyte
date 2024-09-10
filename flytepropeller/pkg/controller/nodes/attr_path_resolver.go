@@ -1,6 +1,7 @@
 package nodes
 
 import (
+	"encoding/json"
 	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -12,7 +13,6 @@ import (
 func resolveAttrPathInPromise(nodeID string, literal *core.Literal, bindAttrPath []*core.PromiseAttribute) (*core.Literal, error) {
 	var currVal *core.Literal = literal
 	var tmpVal *core.Literal
-	var err error
 	var exist bool
 	count := 0
 
@@ -38,16 +38,94 @@ func resolveAttrPathInPromise(nodeID string, literal *core.Literal, bindAttrPath
 	}
 
 	// resolve dataclass
-	if currVal.GetScalar() != nil && currVal.GetScalar().GetGeneric() != nil {
-		st := currVal.GetScalar().GetGeneric()
+	if scalar := currVal.GetScalar(); scalar != nil {
 		// start from index "count"
-		currVal, err = resolveAttrPathInPbStruct(nodeID, st, bindAttrPath[count:])
+		var err error
+
+		if jsonIDL := scalar.GetJson(); jsonIDL != nil {
+			serializationFormat := jsonIDL.GetSerializationFormat()
+			currVal, err = resolveAttrPathInJSON(nodeID, jsonIDL.GetValue(), bindAttrPath[count:], serializationFormat)
+		} else if generic := scalar.GetGeneric(); generic != nil {
+			currVal, err = resolveAttrPathInPbStruct(nodeID, generic, bindAttrPath[count:])
+		}
 		if err != nil {
 			return nil, err
 		}
+
 	}
 
 	return currVal, nil
+}
+
+// resolveAttrPathInJSON resolves the json str bytes (e.g. dataclass) with attribute path
+func resolveAttrPathInJSON(nodeID string, jsonBytes []byte, bindAttrPath []*core.PromiseAttribute,
+	serializationFormat string) (*core.Literal,
+	error) {
+
+	var currVal interface{}
+	var tmpVal interface{}
+	var exist bool
+
+	// Ensure the serialization format is supported
+	if serializationFormat == "UTF-8" {
+		// Unmarshal JSON bytes into a generic interface
+		err := json.Unmarshal(jsonBytes, &currVal)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		// Unsupported serialization format
+		return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID,
+			"Unsupported format '%v' found for literal value.\n"+
+				"Please ensure the serialization format is supported.", serializationFormat)
+	}
+
+	// Turn the current value to a map, so it can be resolved more easily
+	for _, attr := range bindAttrPath {
+		switch resolvedVal := currVal.(type) {
+		// map
+		case map[string]interface{}:
+			tmpVal, exist = resolvedVal[attr.GetStringValue()]
+			if !exist {
+				return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID, "key [%v] does not exist in literal %v", attr.GetStringValue(), currVal)
+			}
+			currVal = tmpVal
+		// list
+		case []interface{}:
+			if int(attr.GetIntValue()) >= len(resolvedVal) {
+				return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID, "index [%v] is out of range of %v", attr.GetIntValue(), currVal)
+			}
+			currVal = resolvedVal[attr.GetIntValue()]
+		}
+	}
+
+	// After resolving, convert the interface to a JSON-encoded literal
+	if serializationFormat == "UTF-8" {
+		// Marshal the current value to JSON bytes
+		resolvedJSONBytes, err := json.Marshal(currVal)
+		if err != nil {
+			return nil, err
+		}
+		return &core.Literal{
+			Value: &core.Literal_Scalar{
+				Scalar: &core.Scalar{
+					Value: &core.Scalar_Json{
+						Json: &core.Json{
+							Value:               resolvedJSONBytes,
+							SerializationFormat: "UTF-8",
+						},
+					},
+				},
+			},
+		}, nil
+	} else {
+		// Unsupported serialization format
+		return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID,
+			"Unsupported format '%v' found for literal value.\n"+
+				"Please ensure the serialization format is supported.", serializationFormat)
+
+	}
+
 }
 
 // resolveAttrPathInPbStruct resolves the protobuf struct (e.g. dataclass) with attribute path
