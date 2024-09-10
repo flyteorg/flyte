@@ -129,31 +129,38 @@ func CheckOffloadingCompat(ctx context.Context, nCtx interfaces.NodeExecutionCon
 			break
 		}
 	}
-	var phaseInfo handler.PhaseInfo
-	switch node.GetKind() {
-	case v1alpha1.NodeKindTask:
-		taskID := *node.GetTaskID()
-		taskNode, err := nCtx.ExecutionContext().GetTask(taskID)
-		if err != nil {
-			phaseInfo = handler.PhaseInfoFailure(core.ExecutionError_SYSTEM, "GetTaskIDFailure", err.Error(), nil)
-			return &phaseInfo
-		}
-		runtimeData := taskNode.CoreTask().GetMetadata().GetRuntime()
-		if consumesOffloadLiteral && !literalOffloadingConfig.IsSupportedSDKVersion(runtimeData.GetType().String(), runtimeData.GetVersion()) {
-			if !literalOffloadingConfig.Enabled {
-				errMsg := fmt.Sprintf("task [%s] is trying to consume offloaded literals but feature is not enabled", taskID)
-				logger.Errorf(ctx, errMsg)
-				phaseInfo = handler.PhaseInfoFailure(core.ExecutionError_USER, "LiteralOffloadingDisabled", errMsg, nil)
-				return &phaseInfo
-			}
-			leastSupportedVersion := literalOffloadingConfig.GetSupportedSDKVersion(runtimeData.GetType().String())
-			errMsg := fmt.Sprintf("Literal offloading is not supported for this task as its registered with SDK version [%s] which is less than the least supported version [%s] for this feature", runtimeData.GetVersion(), leastSupportedVersion)
-			logger.Errorf(ctx, errMsg)
-			phaseInfo = handler.PhaseInfoFailure(core.ExecutionError_USER, "LiteralOffloadingNotSupported", errMsg, nil)
-			return &phaseInfo
-		}
-	default:
-		logger.Warnf(ctx, "literal offloading : skipping sdk version check for node kind '%s'", node.GetKind())
+	if !consumesOffloadLiteral {
+		return nil
 	}
+	var phaseInfo handler.PhaseInfo
+
+	// Return early if the node is not of type NodeKindTask
+	if node.GetKind() != v1alpha1.NodeKindTask {
+		logger.Warnf(ctx, "literal offloading : skipping sdk version check for node kind [%s'] with id [%v] ", node.GetKind(), node.GetID())
+		return nil
+	}
+
+	// Process NodeKindTask
+	taskID := *node.GetTaskID()
+	taskNode, err := nCtx.ExecutionContext().GetTask(taskID)
+	if err != nil {
+		phaseInfo = handler.PhaseInfoFailure(core.ExecutionError_SYSTEM, "GetTaskIDFailure", err.Error(), nil)
+		return &phaseInfo
+	}
+	runtimeData := taskNode.CoreTask().GetMetadata().GetRuntime()
+	if consumesOffloadLiteral && !literalOffloadingConfig.IsSupportedSDKVersion(runtimeData.GetType().String(), runtimeData.GetVersion()) {
+		if !literalOffloadingConfig.Enabled {
+			errMsg := fmt.Sprintf("task [%s] is trying to consume offloaded literals but feature is not enabled", taskID)
+			logger.Errorf(ctx, errMsg)
+			phaseInfo = handler.PhaseInfoFailure(core.ExecutionError_USER, "LiteralOffloadingDisabled", errMsg, nil)
+			return &phaseInfo
+		}
+		leastSupportedVersion := literalOffloadingConfig.GetSupportedSDKVersion(runtimeData.GetType().String())
+		errMsg := fmt.Sprintf("Literal offloading is not supported for this task as its registered with SDK version [%s] which is less than the least supported version [%s] for this feature", runtimeData.GetVersion(), leastSupportedVersion)
+		logger.Errorf(ctx, errMsg)
+		phaseInfo = handler.PhaseInfoFailure(core.ExecutionError_USER, "LiteralOffloadingNotSupported", errMsg, nil)
+		return &phaseInfo
+	}
+
 	return nil
 }
