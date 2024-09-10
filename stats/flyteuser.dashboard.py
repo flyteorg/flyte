@@ -79,66 +79,62 @@ class FlyteUserDashboard(object):
                         ),
                     ],
                     orientation='horizontal',
-                   format=SECONDS_FORMAT
+                   format=SECONDS_FORMAT,
                 ),
-                Graph(
+                BarGauge(
                     title="Failed workflow execution time by Quantile",
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr='sum(flyte:propeller:all:workflow:event_recording:failure_duration_ms{project=~"$project", domain=~"$domain", wf=~"$workflow"}) by (quantile)',
+                            expr='avg(flyte:propeller:all:workflow:failure_duration_ms{project=~"$project", domain=~"$domain", wf=~"$workflow"}) by (quantile)',
                             refId='A',
                         ),
                     ],
-                    yAxes=single_y_axis(format=MILLISECONDS_FORMAT),
+                    orientation='horizontal',
+                    format=SECONDS_FORMAT,
                 ),
             ])
 
     @staticmethod
     def quota_stats(collapse: bool) -> Row:
         return Row(
-            title="Kubernetes Quota Usage stats",
+            title="Kubernetes Resource Quota Usage",
             collapse=collapse,
             panels=[
                 Graph(
-                    title="CPU Limits vs usage",
+                    title="CPU Limits vs requested by namespace",
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
                             expr='kube_resourcequota{resource="limits.cpu", namespace="$project-$domain", type="hard"}',
                             refId='A',
-                            legendFormat="max cpu",
+                            legendFormat="CPU limit",
                         ),
                         Target(
                             expr='kube_resourcequota{resource="limits.cpu", namespace="$project-$domain", type="used"}',
                             refId='B',
-                            legendFormat="used cpu",
+                            legendFormat="CPU requested",
                         ),
                     ],
                     yAxes=YAxes(
-                        YAxis(format=OPS_FORMAT),
                         YAxis(format=SHORT_FORMAT),
                     ),
                 ),
                 Graph(
-                    title="Mem Limits vs usage",
+                    title="Memory limit vs requested by namespace (MiB)",
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr='kube_resourcequota{resource="limits.memory", namespace="$project-$domain", type="hard"}',
+                            expr='(kube_resourcequota{resource="limits.memory", namespace="$project-$domain", type="hard"})*9.5367e-7',
                             refId='A',
-                            legendFormat="max mem",
+                            legendFormat="Memory limit (MiB)",
                         ),
                         Target(
-                            expr='kube_resourcequota{resource="limits.memory", namespace="$project-$domain", type="used"}',
+                            expr='(kube_resourcequota{resource="limits.memory", namespace="$project-$domain", type="used"})*9.5367e-7',
                             refId='B',
-                            legendFormat="used mem",
+                            legendFormat="Memory requested (MiB)",
                         ),
                     ],
-                    yAxes=YAxes(
-                        YAxis(format=OPS_FORMAT),
-                        YAxis(format=SHORT_FORMAT),
-                    ),
                 ),
             ])
 
@@ -149,7 +145,7 @@ class FlyteUserDashboard(object):
             collapse=collapse,
             panels=[
                 Graph(
-                    title="Pending tasks",
+                    title="# of Pending Tasks",
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
@@ -160,7 +156,7 @@ class FlyteUserDashboard(object):
                     yAxes=single_y_axis(format=SHORT_FORMAT),
                 ),
                 BarChart(
-                    title="Task Memory Usage (%)",
+                    title="Memory Usage per Task(%)",
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
@@ -172,7 +168,7 @@ class FlyteUserDashboard(object):
                       showValue='true',
                      ),
                 BarChart(
-                    title="Task CPU Usage (%)",
+                    title="CPU Usage per Task(%)",
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
