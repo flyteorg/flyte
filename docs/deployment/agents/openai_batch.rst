@@ -19,7 +19,7 @@ Specify agent configuration
         kubectl edit configmap flyte-sandbox-config -n flyte
 
       .. code-block:: yaml
-        :emphasize-lines: 7,11,15
+        :emphasize-lines: 7,11
 
         tasks:
           task-plugins:
@@ -32,17 +32,13 @@ Specify agent configuration
               - container: container
               - container_array: k8s-array
               - openai-batch: agent-service
-        plugins:
-          agent-service:
-            supportedTaskTypes:
-            - openai-batch
 
     .. group-tab:: Flyte core
 
       Create a file named ``values-override.yaml`` and add the following configuration to it:
 
       .. code-block:: yaml
-        :emphasize-lines: 9,14,18
+        :emphasize-lines: 9,14
 
         configmap:
           enabled_plugins:
@@ -58,10 +54,6 @@ Specify agent configuration
                   sidecar: sidecar
                   container_array: k8s-array
                   openai-batch: agent-service
-            plugins:
-              agent-service:
-                supportedTaskTypes:
-                - openai-batch
 
 Add the OpenAI API token
 ------------------------

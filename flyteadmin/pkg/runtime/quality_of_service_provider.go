@@ -21,12 +21,12 @@ var qualityOfServiceConfig = config.MustRegisterSection(qualityOfServiceKey, &in
 type QualityOfServiceConfigProvider struct {
 }
 
-func (p *QualityOfServiceConfigProvider) GetTierExecutionValues() map[core.QualityOfService_Tier]core.QualityOfServiceSpec {
-	tierExecutionValues := make(map[core.QualityOfService_Tier]core.QualityOfServiceSpec)
+func (p *QualityOfServiceConfigProvider) GetTierExecutionValues() map[core.QualityOfService_Tier]*core.QualityOfServiceSpec {
+	tierExecutionValues := make(map[core.QualityOfService_Tier]*core.QualityOfServiceSpec)
 	configValues := qualityOfServiceConfig.GetConfig().(*interfaces.QualityOfServiceConfig).TierExecutionValues
 	for tierName, spec := range configValues {
 		tierExecutionValues[core.QualityOfService_Tier(core.QualityOfService_Tier_value[tierName])] =
-			core.QualityOfServiceSpec{
+			&core.QualityOfServiceSpec{
 				QueueingBudget: ptypes.DurationProto(spec.QueueingBudget.Duration),
 			}
 	}

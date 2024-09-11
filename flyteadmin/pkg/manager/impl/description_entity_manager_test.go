@@ -46,13 +46,13 @@ func TestDescriptionEntityManager_Get(t *testing.T) {
 	repository := getMockRepositoryForDETest()
 	manager := NewDescriptionEntityManager(repository, getMockConfigForDETest(), mockScope.NewTestScope())
 
-	response, err := manager.GetDescriptionEntity(context.Background(), admin.ObjectGetRequest{
+	response, err := manager.GetDescriptionEntity(context.Background(), &admin.ObjectGetRequest{
 		Id: &descriptionEntityIdentifier,
 	})
 	assert.NoError(t, err)
 	assert.NotNil(t, response)
 
-	response, err = manager.GetDescriptionEntity(context.Background(), admin.ObjectGetRequest{
+	response, err = manager.GetDescriptionEntity(context.Background(), &admin.ObjectGetRequest{
 		Id: &badDescriptionEntityIdentifier,
 	})
 	assert.Error(t, err)
@@ -64,7 +64,7 @@ func TestDescriptionEntityManager_List(t *testing.T) {
 	manager := NewDescriptionEntityManager(repository, getMockConfigForDETest(), mockScope.NewTestScope())
 
 	t.Run("failed to validate a request", func(t *testing.T) {
-		response, err := manager.ListDescriptionEntity(context.Background(), admin.DescriptionEntityListRequest{
+		response, err := manager.ListDescriptionEntity(context.Background(), &admin.DescriptionEntityListRequest{
 			Id: &admin.NamedEntityIdentifier{
 				Name: "flyte",
 			},
@@ -74,7 +74,7 @@ func TestDescriptionEntityManager_List(t *testing.T) {
 	})
 
 	t.Run("failed to sort description entity", func(t *testing.T) {
-		response, err := manager.ListDescriptionEntity(context.Background(), admin.DescriptionEntityListRequest{
+		response, err := manager.ListDescriptionEntity(context.Background(), &admin.DescriptionEntityListRequest{
 			ResourceType: core.ResourceType_TASK,
 			Id: &admin.NamedEntityIdentifier{
 				Name:    "flyte",
@@ -89,7 +89,7 @@ func TestDescriptionEntityManager_List(t *testing.T) {
 	})
 
 	t.Run("failed to validate token", func(t *testing.T) {
-		response, err := manager.ListDescriptionEntity(context.Background(), admin.DescriptionEntityListRequest{
+		response, err := manager.ListDescriptionEntity(context.Background(), &admin.DescriptionEntityListRequest{
 			ResourceType: core.ResourceType_TASK,
 			Id: &admin.NamedEntityIdentifier{
 				Name:    "flyte",
@@ -104,7 +104,7 @@ func TestDescriptionEntityManager_List(t *testing.T) {
 	})
 
 	t.Run("list description entities in the task", func(t *testing.T) {
-		response, err := manager.ListDescriptionEntity(context.Background(), admin.DescriptionEntityListRequest{
+		response, err := manager.ListDescriptionEntity(context.Background(), &admin.DescriptionEntityListRequest{
 			ResourceType: core.ResourceType_TASK,
 			Id: &admin.NamedEntityIdentifier{
 				Name:    "flyte",
@@ -118,7 +118,7 @@ func TestDescriptionEntityManager_List(t *testing.T) {
 	})
 
 	t.Run("list description entities in the workflow", func(t *testing.T) {
-		response, err := manager.ListDescriptionEntity(context.Background(), admin.DescriptionEntityListRequest{
+		response, err := manager.ListDescriptionEntity(context.Background(), &admin.DescriptionEntityListRequest{
 			ResourceType: core.ResourceType_WORKFLOW,
 			Id: &admin.NamedEntityIdentifier{
 				Name:    "flyte",
@@ -132,7 +132,7 @@ func TestDescriptionEntityManager_List(t *testing.T) {
 	})
 
 	t.Run("failed to get filter", func(t *testing.T) {
-		response, err := manager.ListDescriptionEntity(context.Background(), admin.DescriptionEntityListRequest{
+		response, err := manager.ListDescriptionEntity(context.Background(), &admin.DescriptionEntityListRequest{
 			ResourceType: core.ResourceType_WORKFLOW,
 			Id: &admin.NamedEntityIdentifier{
 				Name:    "flyte",

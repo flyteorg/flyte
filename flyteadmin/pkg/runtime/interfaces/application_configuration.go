@@ -49,7 +49,8 @@ type PostgresConfig struct {
 }
 
 type FeatureGates struct {
-	EnableArtifacts bool `json:"enableArtifacts" pflag:",Enable artifacts feature."`
+	EnableArtifacts     bool `json:"enableArtifacts" pflag:",Enable artifacts feature."`
+	EnableFriendlyNames bool `json:"enableFriendlyNames" pflag:",Enable generation of friendly execution names feature."`
 }
 
 // ApplicationConfig is the base configuration to start admin
@@ -195,10 +196,10 @@ func (a *ApplicationConfig) GetEnvs() *admin.Envs {
 }
 
 // GetAsWorkflowExecutionConfig returns the WorkflowExecutionConfig as extracted from this object
-func (a *ApplicationConfig) GetAsWorkflowExecutionConfig() admin.WorkflowExecutionConfig {
+func (a *ApplicationConfig) GetAsWorkflowExecutionConfig() *admin.WorkflowExecutionConfig {
 	// These values should always be set as their fallback values equals to their zero value or nil,
 	// providing a sensible default even if the actual value was not set.
-	wec := admin.WorkflowExecutionConfig{
+	wec := &admin.WorkflowExecutionConfig{
 		MaxParallelism: a.GetMaxParallelism(),
 		OverwriteCache: a.GetOverwriteCache(),
 		Interruptible:  a.GetInterruptible(),

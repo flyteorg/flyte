@@ -316,6 +316,27 @@ func (in *ArrayNodeStatus) SetTaskPhaseVersion(taskPhaseVersion uint32) {
 	}
 }
 
+func (in *ArrayNodeStatus) DeepCopyInto(out *ArrayNodeStatus) {
+	*out = *in
+	out.MutableStruct = in.MutableStruct
+
+	if in.ExecutionError != nil {
+		in, out := &in.ExecutionError, &out.ExecutionError
+		*out = new(core.ExecutionError)
+		*out = *in
+	}
+}
+
+func (in *ArrayNodeStatus) DeepCopy() *ArrayNodeStatus {
+	if in == nil {
+		return nil
+	}
+
+	out := &ArrayNodeStatus{}
+	in.DeepCopyInto(out)
+	return out
+}
+
 type NodeStatus struct {
 	MutableStruct
 	Phase                NodePhase     `json:"phase,omitempty"`

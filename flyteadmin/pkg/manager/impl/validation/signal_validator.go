@@ -14,11 +14,11 @@ import (
 	propellervalidators "github.com/flyteorg/flyte/flytepropeller/pkg/compiler/validators"
 )
 
-func ValidateSignalGetOrCreateRequest(ctx context.Context, request admin.SignalGetOrCreateRequest) error {
+func ValidateSignalGetOrCreateRequest(ctx context.Context, request *admin.SignalGetOrCreateRequest) error {
 	if request.Id == nil {
 		return shared.GetMissingArgumentError("id")
 	}
-	if err := ValidateSignalIdentifier(*request.Id); err != nil {
+	if err := ValidateSignalIdentifier(request.Id); err != nil {
 		return err
 	}
 	if request.Type == nil {
@@ -28,7 +28,7 @@ func ValidateSignalGetOrCreateRequest(ctx context.Context, request admin.SignalG
 	return nil
 }
 
-func ValidateSignalIdentifier(identifier core.SignalIdentifier) error {
+func ValidateSignalIdentifier(identifier *core.SignalIdentifier) error {
 	if identifier.ExecutionId == nil {
 		return shared.GetMissingArgumentError(shared.ExecutionID)
 	}
@@ -39,7 +39,7 @@ func ValidateSignalIdentifier(identifier core.SignalIdentifier) error {
 	return ValidateWorkflowExecutionIdentifier(identifier.ExecutionId)
 }
 
-func ValidateSignalListRequest(ctx context.Context, request admin.SignalListRequest) error {
+func ValidateSignalListRequest(ctx context.Context, request *admin.SignalListRequest) error {
 	if err := ValidateWorkflowExecutionIdentifier(request.WorkflowExecutionId); err != nil {
 		return shared.GetMissingArgumentError(shared.ExecutionID)
 	}
@@ -49,11 +49,11 @@ func ValidateSignalListRequest(ctx context.Context, request admin.SignalListRequ
 	return nil
 }
 
-func ValidateSignalSetRequest(ctx context.Context, db repositoryInterfaces.Repository, request admin.SignalSetRequest) error {
+func ValidateSignalSetRequest(ctx context.Context, db repositoryInterfaces.Repository, request *admin.SignalSetRequest) error {
 	if request.Id == nil {
 		return shared.GetMissingArgumentError("id")
 	}
-	if err := ValidateSignalIdentifier(*request.Id); err != nil {
+	if err := ValidateSignalIdentifier(request.Id); err != nil {
 		return err
 	}
 	if request.Value == nil {

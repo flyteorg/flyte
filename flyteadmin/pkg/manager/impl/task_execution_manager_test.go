@@ -48,7 +48,7 @@ var sampleNodeExecID = &core.NodeExecutionIdentifier{
 	},
 }
 
-var taskEventRequest = admin.TaskExecutionEventRequest{
+var taskEventRequest = &admin.TaskExecutionEventRequest{
 	RequestId: "request id",
 	Event: &event.TaskExecutionEvent{
 		ProducerId:            "propeller",
@@ -554,7 +554,7 @@ func TestGetTaskExecution(t *testing.T) {
 			}, nil
 		})
 	taskExecManager := NewTaskExecutionManager(repository, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockTaskExecutionRemoteURL, nil, nil)
-	taskExecution, err := taskExecManager.GetTaskExecution(context.Background(), admin.TaskExecutionGetRequest{
+	taskExecution, err := taskExecManager.GetTaskExecution(context.Background(), &admin.TaskExecutionGetRequest{
 		Id: &core.TaskExecutionIdentifier{
 			TaskId:          sampleTaskID,
 			NodeExecutionId: sampleNodeExecID,
@@ -603,7 +603,7 @@ func TestGetTaskExecution_TransformerError(t *testing.T) {
 			}, nil
 		})
 	taskExecManager := NewTaskExecutionManager(repository, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockTaskExecutionRemoteURL, nil, nil)
-	taskExecution, err := taskExecManager.GetTaskExecution(context.Background(), admin.TaskExecutionGetRequest{
+	taskExecution, err := taskExecManager.GetTaskExecution(context.Background(), &admin.TaskExecutionGetRequest{
 		Id: &core.TaskExecutionIdentifier{
 			TaskId:          sampleTaskID,
 			NodeExecutionId: sampleNodeExecID,
@@ -716,7 +716,7 @@ func TestListTaskExecutions(t *testing.T) {
 			}, nil
 		})
 	taskExecManager := NewTaskExecutionManager(repository, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockTaskExecutionRemoteURL, nil, nil)
-	taskExecutions, err := taskExecManager.ListTaskExecutions(context.Background(), admin.TaskExecutionListRequest{
+	taskExecutions, err := taskExecManager.ListTaskExecutions(context.Background(), &admin.TaskExecutionListRequest{
 		NodeExecutionId: &core.NodeExecutionIdentifier{
 			NodeId: "nodey b",
 			ExecutionId: &core.WorkflowExecutionIdentifier{
@@ -787,7 +787,7 @@ func TestListTaskExecutions_NoFilters(t *testing.T) {
 			return interfaces.TaskExecutionCollectionOutput{}, nil
 		})
 	taskExecManager := NewTaskExecutionManager(repository, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockTaskExecutionRemoteURL, nil, nil)
-	_, err := taskExecManager.ListTaskExecutions(context.Background(), admin.TaskExecutionListRequest{
+	_, err := taskExecManager.ListTaskExecutions(context.Background(), &admin.TaskExecutionListRequest{
 		Token: "1",
 		Limit: 99,
 	})
@@ -805,7 +805,7 @@ func TestListTaskExecutions_NoLimit(t *testing.T) {
 			return interfaces.TaskExecutionCollectionOutput{}, nil
 		})
 	taskExecManager := NewTaskExecutionManager(repository, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockTaskExecutionRemoteURL, nil, nil)
-	_, err := taskExecManager.ListTaskExecutions(context.Background(), admin.TaskExecutionListRequest{
+	_, err := taskExecManager.ListTaskExecutions(context.Background(), &admin.TaskExecutionListRequest{
 		Limit: 0,
 	})
 	assert.NotNil(t, err)
@@ -836,7 +836,7 @@ func TestListTaskExecutions_NothingToReturn(t *testing.T) {
 			return interfaces.TaskCollectionOutput{}, nil
 		})
 	taskExecManager := NewTaskExecutionManager(repository, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockTaskExecutionRemoteURL, nil, nil)
-	_, err := taskExecManager.ListTaskExecutions(context.Background(), admin.TaskExecutionListRequest{
+	_, err := taskExecManager.ListTaskExecutions(context.Background(), &admin.TaskExecutionListRequest{
 		NodeExecutionId: &core.NodeExecutionIdentifier{
 			ExecutionId: &core.WorkflowExecutionIdentifier{
 				Project: "exec project b",
@@ -898,20 +898,20 @@ func TestGetTaskExecutionData(t *testing.T) {
 			}, nil
 		})
 	mockTaskExecutionRemoteURL = dataMocks.NewMockRemoteURL()
-	mockTaskExecutionRemoteURL.(*dataMocks.MockRemoteURL).GetCallback = func(ctx context.Context, uri string) (admin.UrlBlob, error) {
+	mockTaskExecutionRemoteURL.(*dataMocks.MockRemoteURL).GetCallback = func(ctx context.Context, uri string) (*admin.UrlBlob, error) {
 		if uri == "input-uri.pb" {
-			return admin.UrlBlob{
+			return &admin.UrlBlob{
 				Url:   "inputs",
 				Bytes: 100,
 			}, nil
 		} else if uri == "test-output.pb" {
-			return admin.UrlBlob{
+			return &admin.UrlBlob{
 				Url:   "outputs",
 				Bytes: 200,
 			}, nil
 		}
 
-		return admin.UrlBlob{}, errors.New("unexpected input")
+		return &admin.UrlBlob{}, errors.New("unexpected input")
 	}
 	mockStorage := commonMocks.GetMockStorageClient()
 	fullInputs := &core.LiteralMap{
@@ -938,7 +938,7 @@ func TestGetTaskExecutionData(t *testing.T) {
 		return fmt.Errorf("unexpected call to find value in storage [%v]", reference.String())
 	}
 	taskExecManager := NewTaskExecutionManager(repository, getMockExecutionsConfigProvider(), mockStorage, mockScope.NewTestScope(), mockTaskExecutionRemoteURL, nil, nil)
-	dataResponse, err := taskExecManager.GetTaskExecutionData(context.Background(), admin.TaskExecutionGetDataRequest{
+	dataResponse, err := taskExecManager.GetTaskExecutionData(context.Background(), &admin.TaskExecutionGetDataRequest{
 		Id: &core.TaskExecutionIdentifier{
 			TaskId:          sampleTaskID,
 			NodeExecutionId: sampleNodeExecID,

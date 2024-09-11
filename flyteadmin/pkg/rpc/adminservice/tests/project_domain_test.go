@@ -17,7 +17,7 @@ func TestUpdateProjectDomain(t *testing.T) {
 	var updateCalled bool
 	mockProjectDomainManager.SetUpdateProjectDomainAttributes(
 		func(ctx context.Context,
-			request admin.ProjectDomainAttributesUpdateRequest) (*admin.ProjectDomainAttributesUpdateResponse, error) {
+			request *admin.ProjectDomainAttributesUpdateRequest) (*admin.ProjectDomainAttributesUpdateResponse, error) {
 			updateCalled = true
 			return &admin.ProjectDomainAttributesUpdateResponse{}, nil
 		},
@@ -44,7 +44,7 @@ func TestUpdateProjectAttr(t *testing.T) {
 	var updateCalled bool
 	mockProjectDomainManager.SetUpdateProjectAttributes(
 		func(ctx context.Context,
-			request admin.ProjectAttributesUpdateRequest) (*admin.ProjectAttributesUpdateResponse, error) {
+			request *admin.ProjectAttributesUpdateRequest) (*admin.ProjectAttributesUpdateResponse, error) {
 			updateCalled = true
 			return &admin.ProjectAttributesUpdateResponse{}, nil
 		},
@@ -70,7 +70,7 @@ func TestDeleteProjectAttr(t *testing.T) {
 	var deleteCalled bool
 	mockProjectDomainManager.SetDeleteProjectAttributes(
 		func(ctx context.Context,
-			request admin.ProjectAttributesDeleteRequest) (*admin.ProjectAttributesDeleteResponse, error) {
+			request *admin.ProjectAttributesDeleteRequest) (*admin.ProjectAttributesDeleteResponse, error) {
 			deleteCalled = true
 			return &admin.ProjectAttributesDeleteResponse{}, nil
 		},
@@ -95,7 +95,7 @@ func TestGetProjectAttr(t *testing.T) {
 	var getCalled bool
 	mockProjectDomainManager.SetGetProjectAttributes(
 		func(ctx context.Context,
-			request admin.ProjectAttributesGetRequest) (*admin.ProjectAttributesGetResponse, error) {
+			request *admin.ProjectAttributesGetRequest) (*admin.ProjectAttributesGetResponse, error) {
 			getCalled = true
 			return &admin.ProjectAttributesGetResponse{}, nil
 		},
