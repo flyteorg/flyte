@@ -560,9 +560,10 @@ data:
       limits:
         maxDownloadMBs: 10
   cache.yaml: |
-    cache:
-      max_size_mbs: 1024
-      target_gc_percent: 70
+    storage:
+      cache:
+        max_size_mbs: 1024
+        target_gc_percent: 70
   task_logs.yaml: | 
     plugins:
       k8s-array:
@@ -1431,7 +1432,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "64a3f5e546eddd8126d03c005460b964f428a0da31c0bfac5f70c63fbf3d635"
+        configChecksum: "b11d6c5dd0dd16bced82fb44fd2fb31c2f27a134543ab7edaf060da42ab27e4"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "10254"
       labels: 
@@ -1514,7 +1515,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v1.13.1
       annotations:
-        configChecksum: "64a3f5e546eddd8126d03c005460b964f428a0da31c0bfac5f70c63fbf3d635"
+        configChecksum: "b11d6c5dd0dd16bced82fb44fd2fb31c2f27a134543ab7edaf060da42ab27e4"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "10254"
     spec:
