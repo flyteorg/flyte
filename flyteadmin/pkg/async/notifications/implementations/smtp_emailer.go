@@ -52,7 +52,7 @@ func (s *SMTPEmailer) createClient(ctx context.Context) (*smtp.Client, error) {
 	return newClient, nil
 }
 
-func (s *SMTPEmailer) SendEmail(ctx context.Context, email admin.EmailMessage) error {
+func (s *SMTPEmailer) SendEmail(ctx context.Context, email *admin.EmailMessage) error {
 
 	if s.smtpClient == nil || s.smtpClient.Noop() != nil {
 
@@ -109,7 +109,7 @@ func (s *SMTPEmailer) emailError(ctx context.Context, error string) error {
 	return errors.NewFlyteAdminErrorf(codes.Internal, "errors were seen while sending emails")
 }
 
-func createMailBody(emailSender string, email admin.EmailMessage) string {
+func createMailBody(emailSender string, email *admin.EmailMessage) string {
 	headerMap := make(map[string]string)
 	headerMap["From"] = emailSender
 	headerMap["To"] = strings.Join(email.RecipientsEmail, ",")
