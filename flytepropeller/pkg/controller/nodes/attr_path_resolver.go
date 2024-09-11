@@ -43,8 +43,7 @@ func resolveAttrPathInPromise(nodeID string, literal *core.Literal, bindAttrPath
 		var err error
 
 		if jsonIDL := scalar.GetJson(); jsonIDL != nil {
-			serializationFormat := jsonIDL.GetSerializationFormat()
-			currVal, err = resolveAttrPathInJSON(nodeID, jsonIDL.GetValue(), bindAttrPath[count:], serializationFormat)
+			currVal, err = resolveAttrPathInJSON(nodeID, jsonIDL, bindAttrPath[count:])
 		} else if generic := scalar.GetGeneric(); generic != nil {
 			currVal, err = resolveAttrPathInPbStruct(nodeID, generic, bindAttrPath[count:])
 		}
@@ -58,10 +57,9 @@ func resolveAttrPathInPromise(nodeID string, literal *core.Literal, bindAttrPath
 }
 
 // resolveAttrPathInJSON resolves the json str bytes (e.g. dataclass) with attribute path
-func resolveAttrPathInJSON(nodeID string, jsonBytes []byte, bindAttrPath []*core.PromiseAttribute,
-	serializationFormat string) (*core.Literal,
-	error) {
-
+func resolveAttrPathInJSON(nodeID string, jsonIDL *core.Json, bindAttrPath []*core.PromiseAttribute) (*core.Literal, error) {
+	jsonBytes := jsonIDL.GetValue()
+	serializationFormat := jsonIDL.GetSerializationFormat()
 	var currVal interface{}
 	var tmpVal interface{}
 	var exist bool
@@ -106,18 +104,7 @@ func resolveAttrPathInJSON(nodeID string, jsonBytes []byte, bindAttrPath []*core
 		if err != nil {
 			return nil, err
 		}
-		return &core.Literal{
-			Value: &core.Literal_Scalar{
-				Scalar: &core.Scalar{
-					Value: &core.Scalar_Json{
-						Json: &core.Json{
-							Value:               resolvedJSONBytes,
-							SerializationFormat: "UTF-8",
-						},
-					},
-				},
-			},
-		}, nil
+		return constructResolvedJson(resolvedJSONBytes, serializationFormat), nil
 	} else {
 		// Unsupported serialization format
 		return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID,
@@ -126,6 +113,21 @@ func resolveAttrPathInJSON(nodeID string, jsonBytes []byte, bindAttrPath []*core
 
 	}
 
+}
+
+func constructResolvedJson(resolvedJSONBytes []byte, serializationFormat string) *core.Literal {
+	return &core.Literal{
+		Value: &core.Literal_Scalar{
+			Scalar: &core.Scalar{
+				Value: &core.Scalar_Json{
+					Json: &core.Json{
+						Value:               resolvedJSONBytes,
+						SerializationFormat: serializationFormat,
+					},
+				},
+			},
+		},
+	}
 }
 
 // resolveAttrPathInPbStruct resolves the protobuf struct (e.g. dataclass) with attribute path
