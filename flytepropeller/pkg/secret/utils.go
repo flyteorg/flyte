@@ -13,6 +13,20 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/secret/config"
 )
 
+const (
+	SecretFieldSeparator              = "__"
+	ValueFormatter                    = "%s"
+	SecretsStorageUnionPrefix         = "u"
+	SecretsOrgDelimiter               = "org"
+	SecretsDomainDelimiter            = "domain"
+	SecretsProjectDelimiter           = "project"
+	SecretsKeyDelimiter               = "key"
+	SecretsStorageOrgPrefixFormat     = SecretsStorageUnionPrefix + SecretFieldSeparator + SecretsOrgDelimiter + SecretFieldSeparator + ValueFormatter
+	SecretsStorageDomainPrefixFormat  = SecretsStorageOrgPrefixFormat + SecretFieldSeparator + SecretsDomainDelimiter + SecretFieldSeparator + ValueFormatter
+	SecretsStorageProjectPrefixFormat = SecretsStorageDomainPrefixFormat + SecretFieldSeparator + SecretsProjectDelimiter + SecretFieldSeparator + ValueFormatter
+	SecretsStorageFormat              = SecretsStorageProjectPrefixFormat + SecretFieldSeparator + SecretsKeyDelimiter + SecretFieldSeparator + ValueFormatter
+)
+
 // If env var exists in the existing list of envVars then return the index for it or else return -1
 func hasEnvVar(envVars []corev1.EnvVar, envVarKey string) int {
 	for index, e := range envVars {
@@ -169,4 +183,37 @@ func CreateVaultAnnotationsForSecret(secret *core.Secret, kvversion config.KVVer
 
 	}
 	return secretVaultAnnotations
+}
+
+type SecretNameComponents struct {
+	Org     string
+	Domain  string
+	Project string
+	Name    string // Secret name
+}
+
+func EncodeSecretName(components SecretNameComponents) string {
+	return fmt.Sprintf(SecretsStorageFormat, components.Org, components.Domain, components.Project, components.Name)
+}
+
+func DecodeSecretName(encodedSecretName string) (*SecretNameComponents, error) {
+	parts := strings.Split(encodedSecretName, SecretFieldSeparator)
+
+	// We need at least 5 parts: u, org, <org>, domain, <secret-name>
+	if len(parts) < 9 {
+		return nil, fmt.Errorf("name %s has an invalid format: not enough parts", encodedSecretName)
+	}
+
+	if parts[0] != SecretsStorageUnionPrefix || parts[1] != SecretsOrgDelimiter || parts[3] != SecretsDomainDelimiter || parts[5] != SecretsProjectDelimiter || parts[7] != SecretsKeyDelimiter {
+		return nil, fmt.Errorf("name %s has an invalid format: unexpected parts", encodedSecretName)
+	}
+
+	result := &SecretNameComponents{
+		Org:     parts[2],
+		Domain:  parts[4],
+		Project: parts[6],
+		Name:    strings.Join(parts[8:], SecretFieldSeparator),
+	}
+
+	return result, nil
 }

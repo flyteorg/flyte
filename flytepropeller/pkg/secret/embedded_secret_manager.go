@@ -33,17 +33,10 @@ const (
 	//		...
 	EmbeddedSecretsFileMountInitContainerEnvVariableName = "SECRETS" // #nosec G101
 
-	SecretFieldSeparator              = "__"
-	ValueFormatter                    = "%s"
-	SecretsStorageUnionPrefix         = "u"
-	SecretsStorageOrgPrefixFormat     = SecretsStorageUnionPrefix + SecretFieldSeparator + "org" + SecretFieldSeparator + ValueFormatter
-	SecretsStorageDomainPrefixFormat  = SecretsStorageOrgPrefixFormat + SecretFieldSeparator + "domain" + SecretFieldSeparator + ValueFormatter
-	SecretsStorageProjectPrefixFormat = SecretsStorageDomainPrefixFormat + SecretFieldSeparator + "project" + SecretFieldSeparator + ValueFormatter
-	SecretsStorageFormat              = SecretsStorageProjectPrefixFormat + SecretFieldSeparator + "key" + SecretFieldSeparator + ValueFormatter
-	ProjectLabel                      = "project"
-	DomainLabel                       = "domain"
-	OrganizationLabel                 = "organization"
-	EmptySecretScope                  = ""
+	ProjectLabel      = "project"
+	DomainLabel       = "domain"
+	OrganizationLabel = "organization"
+	EmptySecretScope  = ""
 
 	SecretNotFoundErrorFormat                                   = "secret %v not found in the secret manager"                                // #nosec G101
 	SecretReadFailureErrorFormat                                = "secret %v failed to be read from secret manager"                          // #nosec G101

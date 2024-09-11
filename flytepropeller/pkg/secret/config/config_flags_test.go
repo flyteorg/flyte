@@ -281,6 +281,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_embeddedSecretManagerConfig.azureConfig.vaultURI", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("embeddedSecretManagerConfig.azureConfig.vaultURI", testValue)
+			if vString, err := cmdFlags.GetString("embeddedSecretManagerConfig.azureConfig.vaultURI"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.EmbeddedSecretManagerConfig.AzureConfig.VaultURI)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_embeddedSecretManagerConfig.fileMountInitContainer.image", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {

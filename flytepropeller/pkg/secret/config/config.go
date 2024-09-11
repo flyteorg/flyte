@@ -155,12 +155,14 @@ type EmbeddedSecretManagerType uint8
 const (
 	EmbeddedSecretManagerTypeAWS EmbeddedSecretManagerType = iota
 	EmbeddedSecretManagerTypeGCP
+	EmbeddedSecretManagerTypeAzure
 )
 
 type EmbeddedSecretManagerConfig struct {
 	Type                   EmbeddedSecretManagerType    `json:"type" pflags:"-,Type of embedded secret manager to initialize"`
 	AWSConfig              AWSConfig                    `json:"awsConfig" pflag:",Config for AWS settings"`
 	GCPConfig              GCPConfig                    `json:"gcpConfig" pflag:",Config for GCP settings"`
+	AzureConfig            AzureConfig                  `json:"azureConfig" pflag:",Config for Azure settings"`
 	FileMountInitContainer FileMountInitContainerConfig `json:"fileMountInitContainer" pflag:",Init container configuration to use for mounting secrets as files."`
 }
 
@@ -170,6 +172,10 @@ type AWSConfig struct {
 
 type GCPConfig struct {
 	Project string `json:"project" pflag:",GCP project to be used for secret manager"`
+}
+
+type AzureConfig struct {
+	VaultURI string `json:"vaultURI" pflag:",Azure Vault URI"`
 }
 
 type FileMountInitContainerConfig struct {
