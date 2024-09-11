@@ -2,6 +2,7 @@ package executor
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -11,7 +12,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/util/retry"
 
-	"github.com/flyteorg/flyte/flyteadmin/pkg/common/naming"
+	"github.com/flyteorg/flyte/flyteadmin/scheduler/identifier"
 	"github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/models"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -52,11 +53,23 @@ func (w *executor) Execute(ctx context.Context, scheduledTime time.Time, s model
 		}
 	}
 
-	executionName := naming.GetExecutionName(time.Now().UnixNano())
+	// Making the identifier deterministic using the hash of the identifier and scheduled time
+	executionIdentifier, err := identifier.GetExecutionIdentifier(ctx, core.Identifier{
+		Project: s.Project,
+		Domain:  s.Domain,
+		Name:    s.Name,
+		Version: s.Version,
+	}, scheduledTime)
+
+	if err != nil {
+		logger.Errorf(ctx, "failed to generate execution identifier for schedule %+v due to %v", s, err)
+		return err
+	}
+
 	executionRequest := &admin.ExecutionCreateRequest{
 		Project: s.Project,
 		Domain:  s.Domain,
-		Name:    executionName,
+		Name:    "f" + strings.ReplaceAll(executionIdentifier.String(), "-", "")[:19],
 		Spec: &admin.ExecutionSpec{
 			LaunchPlan: &core.Identifier{
 				ResourceType: core.ResourceType_LAUNCH_PLAN,
@@ -84,7 +97,7 @@ func (w *executor) Execute(ctx context.Context, scheduledTime time.Time, s model
 
 	// Do maximum of 30 retries on failures with constant backoff factor
 	opts := wait.Backoff{Duration: 3000, Factor: 2.0, Steps: 30}
-	err := retry.OnError(opts,
+	err = retry.OnError(opts,
 		func(err error) bool {
 			// For idempotent behavior ignore the AlreadyExists error which happens if we try to schedule a launchplan
 			// for execution at the same time which is already available in admin.
