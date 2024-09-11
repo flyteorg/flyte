@@ -195,7 +195,7 @@ html_theme_options = {
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ["_static"]
+# html_static_path = ["_static"]
 
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.
@@ -206,14 +206,27 @@ html_static_path = ["_static"]
 # 'searchbox.html']``.
 
 html_sidebars = {
-    "api/**": ["custom_sidebar"],
-    "cluster_deployment/**": ["custom_sidebar"],
-    "community/**": ["custom_sidebar"],
-    "concepts/**": ["custom_sidebar"],
-    "ecosystem/**": ["custom_sidebar"],
-    "integrations/**": ["custom_sidebar"],
-    "tutorials/**": ["custom_sidebar"],
-    "user_guide/**": ["custom_sidebar"]
+    "api/**": ["sidebars/custom"],
+    "cluster_deployment/**": ["sidebars/custom"],
+    "community/**": ["sidebars/custom"],
+    "concepts/**": ["sidebars/custom"],
+    "ecosystem/**": ["sidebars/custom"],
+    "flytesnacks/integrations/**": ["sidebars/integrations"],
+    "flytesnacks/tutorials/**": ["sidebars/tutorials"],
+    "user_guide/**": ["sidebars/custom"]
+}
+
+html_context = {
+    "dir_to_title": {
+        "api": "API",
+        "cluster_deployment": "Cluster deployment",
+        "community": "Community",
+        "concepts": "Flyte concepts",
+        "ecosystem": "Ecosystem",
+        "integrations": "Integrations",
+        "tutorials": "Tutorials",
+        "user_guide": "User guide"
+    }
 }
 
 # -- Options for HTMLHelp output ---------------------------------------------
@@ -329,17 +342,14 @@ nb_custom_formats = {
 # These patterns are used to replace values in source files that are imported
 # from other repos.
 REPLACE_PATTERNS = {
-    r"<auto_examples": r"<flytesnacks/examples",
+    r"</auto_examples": r"</flytesnacks/examples",
+    r"/auto_examples": r"/flytesnacks/examples",
     r"<flytesnacks/examples": r"</flytesnacks/examples"
 }
 
 import_projects_config = {
     "clone_dir": "_projects",
     "source_regex_mapping": REPLACE_PATTERNS,
-    "list_table_toc": [
-       "flytesnacks/tutorials",
-       "flytesnacks/integrations"
-    ],
     "dev_build": bool(int(os.environ.get("MONODOCS_DEV_BUILD", 1))),
 }
 

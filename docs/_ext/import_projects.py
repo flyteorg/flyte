@@ -1,8 +1,6 @@
-import inspect
 import re
 import shutil
 import subprocess
-import sys
 from dataclasses import dataclass, field
 from functools import partial
 from pathlib import Path
@@ -10,11 +8,8 @@ from typing import Optional, List, Union
 
 import git
 from git import Repo
-from docutils import nodes
-from docutils.statemachine import StringList, string2lines
 from sphinx.application import Sphinx
 from sphinx.config import Config
-from sphinx.util.docutils import SphinxDirective
 
 __version__ = "0.0.0"
 
@@ -53,31 +48,6 @@ TABLE_TEMPLATE = """
 """
 
 VERSION_PATTERN = r"^v[0-9]+.[0-9]+.[0-9]+$"
-
-
-class ListTableToc(SphinxDirective):
-    """Custom directive to convert list-table into both list-table and toctree."""
-
-    has_content = True
-
-    def run(self) -> list:
-        return [self.parse()]
-
-    def parse(self):
-        """Parses the list-table and adds a toctree"""
-        toc = ""
-
-        # finds all doc references in the form <doc/path>
-        for doc in re.findall(r"<(.+)>", self.block_text):
-            toc += f"\n{doc}"
-
-        container = nodes.container("")
-        toc = inspect.cleandoc(TOC_TEMPLATE.format(toc=toc))
-        table = inspect.cleandoc(TABLE_TEMPLATE.format(content=self.block_text))
-        content = f"{toc}\n\n{table}"
-
-        self.state.nested_parse(StringList(string2lines(content)), 0, container)
-        return container
 
 
 def update_html_context(project: Project, tag: str, commit: str, config: Config):
@@ -206,24 +176,10 @@ def replace_refs_in_docstrings(
         lines[i] = text
 
 
-def add_list_table_toc(app: Sphinx, docname: str, source: List[str]):
-    """This replaces list-table directives in specific documents with list-table-toc.
-
-    This is important for automatically generating a toctree and list-table from
-    a list-table.
-    """
-    if docname in app.config.import_projects_config["list_table_toc"]:
-        text = source[0]
-        text = re.sub(r"{list-table}", r"{list-table-toc}", text)
-        source[0] = text
-
-
 def setup(app: Sphinx) -> dict:
     app.add_config_value("import_projects_config", None, False)
     app.add_config_value("import_projects", None, False)
-    app.add_directive("list-table-toc", ListTableToc)
     app.connect("config-inited", import_projects, priority=0)
-    app.connect("source-read", add_list_table_toc, priority=0)
 
     return {
         "version": __version__,

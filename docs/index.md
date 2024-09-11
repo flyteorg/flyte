@@ -76,10 +76,10 @@ contribute its architecture and design. You can also access the
 
 * - {doc}`📖 User Guide <user_guide/index>`
   - Get your first workflow running, learn about the Flyte development lifecycle, and get a comprehensive view of Flyte's functionality for data and ML practitioners.
-* - {doc}`📚 Tutorials <flytesnacks/tutorials>`
+* - {doc}`📚 Tutorials <flytesnacks/tutorials/index>`
   - End-to-end examples of Flyte for data/feature engineering, machine learning,
     bioinformatics, and more.
-* - {doc}`🔌 Integrations <integrations/index>`
+* - {doc}`🔌 Integrations <flytesnacks/integrations/index>`
   - Leverage a rich ecosystem of third-party tools and libraries to make your
     Flyte workflows even more effective.
 * - {ref}`🚀 Deployment Guide <deployment>`
@@ -130,12 +130,12 @@ Have questions or need support? The best way to reach us is through Slack:
 :maxdepth: 1
 :hidden:
 
-user_guide/index
-concepts/index
-tutorials/index
-integrations/index
-cluster_deployment/index
-api/index
-ecosystem/index
-community/index
+User guide <user_guide/index>
+Flyte concepts <concepts/index>
+Tutorials <flytesnacks/tutorials/index>
+Integrations <flytesnacks/integrations/index>
+Cluster deployment <cluster_deployment/index>
+API <api/index>
+Ecosystem <ecosystem/index>
+Community <community/index>
 ```
