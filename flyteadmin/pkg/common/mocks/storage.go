@@ -33,7 +33,7 @@ func (t *TestDataStore) Head(ctx context.Context, reference storage.DataReferenc
 	return t.HeadCb(ctx, reference)
 }
 
-func (s *TestDataStore) List(ctx context.Context, reference storage.DataReference, maxItems int, cursor storage.Cursor) ([]storage.DataReference, storage.Cursor, error) {
+func (t *TestDataStore) List(ctx context.Context, reference storage.DataReference, maxItems int, cursor storage.Cursor) ([]storage.DataReference, storage.Cursor, error) {
 	return nil, storage.NewCursorAtEnd(), fmt.Errorf("Not implemented yet")
 }
 
