@@ -59,6 +59,10 @@ func (s *InMemoryStore) Head(ctx context.Context, reference DataReference) (Meta
 	}, nil
 }
 
+func (s *InMemoryStore) List(ctx context.Context, reference DataReference, maxItems int, cursor Cursor) ([]DataReference, Cursor, error) {
+	return nil, NewCursorAtEnd(), fmt.Errorf("Not implemented yet")
+}
+
 func (s *InMemoryStore) ReadRaw(ctx context.Context, reference DataReference) (io.ReadCloser, error) {
 	s.rwMutex.RLock()
 	defer s.rwMutex.RUnlock()
