@@ -315,6 +315,13 @@ func (t trivialChecker) CastsFrom(upstreamType *flyte.LiteralType) bool {
 }
 ```
 ### FlyteKit
+#### Attribute Access
+In most transformers, we should create a function `from_binary` to convert the Binary IDL Object into the desired type.
+
+When performing attribute access, Propeller will deserialize the msgpack bytes into a map object, retrieve the attribute, and then serialize it back into msgpack bytes (a Binary IDL Object containing msgpack bytes).
+
+This means that when converting a literal to a Python value, we will receive `msgpack bytes` instead of our `expected Python type`.
+
 #### pyflyte run
 The behavior will remain unchanged. 
 We will pass the value to our class, which inherits from `click.ParamType`, and use the corresponding type transformer to convert the input to the correct type.
@@ -438,15 +445,17 @@ if newT.Simple == core.SimpleType_STRUCT {
 3. Use Tag to determine how to deserialize `Bytes`, and show the deserialized value in FlyteConsole.
 
 #### Copy Input
-
+Return `MessagePack Bytes` to your clipboard, it can be used in `Input Bytes` below.
 
 #### Construct Input
 ##### Input Bytes
-1. Encode
-
-We should use `msgpack.encode` to encode input value and store it to the literal’s JSON field.
+1. Input `MessagePack Bytes` to the console, for example, `{"a": 1}` in python will be `b'\x81\xa1a\x01'`.
+2. Tag can only use `msgpack`, it's forced now.
 
 ##### Launch Form
+1. Use `JSON Schema` to know what every input field, and make users input it 1 by 1.
+2. Serialize the input value into `MessagePack Bytes`
+3. Create a `Binary IDL Object`, value is `MessagePack Bytes` and tag is `msgpack`.
 
 ## 4 Metrics & Dashboards
 
