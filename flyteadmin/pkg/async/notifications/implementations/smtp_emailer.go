@@ -19,15 +19,16 @@ import (
 )
 
 type SMTPEmailer struct {
-	config        *runtimeInterfaces.NotificationsEmailerConfig
-	systemMetrics emailMetrics
-	tlsConf       *tls.Config
-	auth          *smtp.Auth
-	smtpClient    *smtp.Client
+	config               *runtimeInterfaces.NotificationsEmailerConfig
+	systemMetrics        emailMetrics
+	tlsConf              *tls.Config
+	auth                 *smtp.Auth
+	smtpClient           interfaces.SMTPClient
+	CreateSMTPClientFunc func(connectString string) (interfaces.SMTPClient, error)
 }
 
-func (s *SMTPEmailer) createClient(ctx context.Context) (*smtp.Client, error) {
-	newClient, err := smtp.Dial(s.config.EmailerConfig.SMTPServer + ":" + s.config.EmailerConfig.SMTPPort)
+func (s *SMTPEmailer) createClient(ctx context.Context) (interfaces.SMTPClient, error) {
+	newClient, err := s.CreateSMTPClientFunc(s.config.EmailerConfig.SMTPServer + ":" + s.config.EmailerConfig.SMTPPort)
 
 	if err != nil {
 		return nil, s.emailError(ctx, fmt.Sprintf("Error creating email client: %s", err))
@@ -39,7 +40,7 @@ func (s *SMTPEmailer) createClient(ctx context.Context) (*smtp.Client, error) {
 
 	if ok, _ := newClient.Extension("STARTTLS"); ok {
 		if err = newClient.StartTLS(s.tlsConf); err != nil {
-			return nil, err
+			return nil, s.emailError(ctx, fmt.Sprintf("Error initiating connection to SMTP server: %s", err))
 		}
 	}
 
@@ -77,7 +78,7 @@ func (s *SMTPEmailer) SendEmail(ctx context.Context, email *admin.EmailMessage) 
 
 	for _, recipient := range email.RecipientsEmail {
 		if err := s.smtpClient.Rcpt(recipient); err != nil {
-			logger.Errorf(ctx, "Error adding email recipient: %s", err)
+			return s.emailError(ctx, fmt.Sprintf("Error adding email recipient: %s", err))
 		}
 	}
 
@@ -150,5 +151,8 @@ func NewSMTPEmailer(ctx context.Context, config runtimeInterfaces.NotificationsC
 		systemMetrics: newEmailMetrics(scope.NewSubScope("smtp")),
 		tlsConf:       tlsConfiguration,
 		auth:          &auth,
+		CreateSMTPClientFunc: func(connectString string) (interfaces.SMTPClient, error) {
+			return smtp.Dial(connectString)
+		},
 	}
 }
