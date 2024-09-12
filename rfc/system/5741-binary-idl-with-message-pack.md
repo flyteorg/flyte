@@ -165,43 +165,34 @@ reference: https://github.com/msgpack/msgpack-javascript
 
 
 ### FlyteIDL
+#### Literal Value
 ```proto
-// Represents a JSON object encoded as a byte array.
-// This field is used to store JSON-serialized data, which can include
-// dataclasses, dictionaries, Pydantic models, or other structures that
-// can be represented as JSON objects. When utilized, the data should be
-// deserialized into its corresponding structure.
-// This design ensures that the data is stored in a format that can be
-// fully reconstructed without loss of information.
-message Json {
-    // The JSON object serialized as a byte array.
-    bytes value = 1;
-
-    // The format used to serialize the byte array.
-    // This field identifies the specific format of the serialized JSON data,
-    // allowing future flexibility in supporting different JSON variants.
-    string serialization_format = 2;
-
-    // Placeholder for future extensions to support other types of JSON objects,
-    // such as "eJSON" or "ndJSON".
-    // reference: https://stackoverflow.com/questions/18692060/different-types-of-json
-    // string json_type = 3;
+// A simple byte array with a tag to help different parts of the system communicate about what is in the byte array.
+// It's strongly advisable that consumers of this type define a unique tag and validate the tag before parsing the data.
+message Binary {
+    bytes value = 1; // Serialized data (MessagePack) for supported types like Dataclass, Pydantic BaseModel, and dict.
+    string tag = 2; // The serialization format identifier (e.g., MessagePack). Consumers must define unique tags and validate them before deserialization.
 }
+```
+#### Literal Type
+```proto
+import "google/protobuf/struct.proto";
 
-
-message Scalar {
-    oneof value {
-        Primitive primitive = 1;
-        Blob blob = 2;
-        Binary binary = 3;
-        Schema schema = 4;
-        Void none_type = 5;
-        Error error = 6;
-        google.Protobuf.Struct generic = 7;
-        StructuredDataset structured_dataset = 8;
-        Union union = 9;
-        Json json = 10; // New Type
-    }
+enum SimpleType {
+    NONE = 0;
+    INTEGER = 1;
+    FLOAT = 2;
+    STRING = 3;
+    BOOLEAN = 4;
+    DATETIME = 5;
+    DURATION = 6;
+    BINARY = 7;
+    ERROR = 8;
+    STRUCT = 9; // Use this one.
+}
+message LiteralType {
+    SimpleType simple = 1; // Use this one.
+    google.protobuf.Struct metadata = 6; // Store Json Schema to differentiate different dataclass.
 }
 ```
 
