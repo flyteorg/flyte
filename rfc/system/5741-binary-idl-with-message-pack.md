@@ -12,6 +12,7 @@
 ## 1 Executive Summary
 ### Literal Value
 Literal Value will be `Binary`.
+
 Use `bytes` in `Binary` instead of `Protobuf struct`.
 
 - To Literal
@@ -46,8 +47,12 @@ Note: The `metadata` of `Literal Type` and `Literal Value` are not the same.
 ## 2 Motivation
 
 In Flytekit, when handling dataclasses, Pydantic base models, and dictionaries, we store data using a JSON string within Protobuf struct datatype.
+
 This approach causes issues with integers, as Protobuf struct does not support int types, leading to their conversion to floats.
-This results in performance issues since we need to recursively iterate through all attributes/keys in dataclasses and dictionaries to ensure floats types are converted to int. In addition to performance issues, the required code is complicated and error prone.
+
+This results in performance issues since we need to recursively iterate through all attributes/keys in dataclasses and dictionaries to ensure floats types are converted to int.
+
+In addition to performance issues, the required code is complicated and error prone.
 
 Note: We have more than 10 issues about dict, dataclass and Pydantic.
 
@@ -316,18 +321,20 @@ func (t trivialChecker) CastsFrom(upstreamType *flyte.LiteralType) bool {
 ```
 ### FlyteKit
 #### Attribute Access
-In most transformers, we should create a function `from_binary` to convert the Binary IDL Object into the desired type.
+In most transformers, we should create a function `from_binary_idl` to convert the Binary IDL Object into the desired type.
 
 When performing attribute access, Propeller will deserialize the msgpack bytes into a map object, retrieve the attribute, and then serialize it back into msgpack bytes (a Binary IDL Object containing msgpack bytes).
 
 This means that when converting a literal to a Python value, we will receive `msgpack bytes` instead of our `expected Python type`.
 
 #### pyflyte run
-The behavior will remain unchanged. 
+The behavior will remain unchanged.
+
 We will pass the value to our class, which inherits from `click.ParamType`, and use the corresponding type transformer to convert the input to the correct type.
 
 ### Dict Transformer
 There are 2 cases in Dict Transformer, `Dict[type, type]` and `dict`.
+
 For `Dict[type, type]`, we will stay everything the same as before.
 
 #### Literal Value
@@ -478,5 +485,6 @@ None.
 
 ## 9 Conclusion
 MsgPack is a good choice because it's more smaller and faster than UTF-8 Encoded JSON String.
+
 You can see the performance comparison here: https://github.com/flyteorg/flyte/pull/5607#issuecomment-2333174325
 We will use `msgpack` to do it.
