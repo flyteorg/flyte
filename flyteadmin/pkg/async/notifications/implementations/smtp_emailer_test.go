@@ -44,7 +44,7 @@ func TestEmailCreation(t *testing.T) {
 		SenderEmail:     "sender@sender.com",
 	}
 
-	body := createMailBody("sender@sender.com", email)
+	body := createMailBody("sender@sender.com", &email)
 	assert.Equal(t, "From: sender@sender.com\r\nTo: john@doe.com,teresa@tester.com\r\nSubject: subject\r\nContent-Type: text/html; charset=\"UTF-8\"\r\n\r\nEmail Body", body)
 }
 
