@@ -90,7 +90,7 @@ func (m mockStowContainer) Items(prefix, cursor string, count int) ([]stow.Item,
 	index := 0
 	for key := range m.items {
 		itemKeys[index] = key
-		index += 1
+		index++
 	}
 	sort.Strings(itemKeys)
 
@@ -447,7 +447,7 @@ func TestStowStore_List(t *testing.T) {
 		items, cursor, err := s.List(ctx, dataReference, maxResults, NewCursorAtStart())
 		assert.NoError(t, err)
 		assert.Equal(t, []DataReference{"a/1"}, items)
-		items, cursor, err = s.List(ctx, dataReference, maxResults, cursor)
+		items, _, err = s.List(ctx, dataReference, maxResults, cursor)
 		assert.NoError(t, err)
 		assert.Equal(t, []DataReference{"a/2"}, items)
 	})

@@ -73,7 +73,7 @@ func (d *dummyStore) Head(ctx context.Context, reference DataReference) (Metadat
 	return d.HeadCb(ctx, reference)
 }
 
-func (s *dummyStore) List(ctx context.Context, reference DataReference, maxItems int, cursor Cursor) ([]DataReference, Cursor, error) {
+func (d *dummyStore) List(ctx context.Context, reference DataReference, maxItems int, cursor Cursor) ([]DataReference, Cursor, error) {
 	return nil, NewCursorAtEnd(), fmt.Errorf("Not implemented yet")
 }
 

@@ -27,7 +27,7 @@ func (FailingRawStore) Head(ctx context.Context, reference storage.DataReference
 	return nil, fmt.Errorf("failed metadata fetch")
 }
 
-func (s *FailingRawStore) List(ctx context.Context, reference storage.DataReference, maxItems int, cursor storage.Cursor) ([]storage.DataReference, storage.Cursor, error) {
+func (FailingRawStore) List(ctx context.Context, reference storage.DataReference, maxItems int, cursor storage.Cursor) ([]storage.DataReference, storage.Cursor, error) {
 	return nil, storage.NewCursorAtEnd(), fmt.Errorf("Not implemented yet")
 }
 
