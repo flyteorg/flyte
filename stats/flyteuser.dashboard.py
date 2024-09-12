@@ -102,7 +102,7 @@ class FlyteUserDashboard(object):
             collapse=collapse,
             panels=[
                 Graph(
-                    title="CPU Limits vs requested by namespace",
+                    title="CPU Limit vs requested by namespace",
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
@@ -145,7 +145,7 @@ class FlyteUserDashboard(object):
             collapse=collapse,
             panels=[
                 Graph(
-                    title="# of Pending Tasks",
+                    title="Pending Tasks",
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
@@ -183,7 +183,7 @@ class FlyteUserDashboard(object):
     @staticmethod
     def errors(collapse: bool) -> Row:
         return Row(
-            title="Error (System vs user)",
+            title="Error (System vs User)",
             collapse=collapse,
             panels=[
                 Graph(
@@ -262,7 +262,7 @@ dashboard = Dashboard(
         domain_template,
         wf_template,
     ]),
-    description="Flyte User Dashboard. This is great to get a birds-eye and drill down view of executions in your Flyte cluster. Useful for the user.",
+    description="Flyte User Dashboard. It's designed to give an overview of execution status and resource consumption.",
 ).auto_panel_ids()
 
 if __name__ == "__main__":
