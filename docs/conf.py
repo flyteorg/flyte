@@ -100,19 +100,16 @@ extlinks = {
 
 # redirects
 redirects = {
-    "flytesnacks/deprecated_integrations": "../deprecated_integrations/index.html",
-    "flytesnacks/examples/bigquery_plugin/index": "../../../deprecated_integrations/bigquery_plugin/index.html",
-    "flytesnacks/examples/bigquery_plugin/bigquery_plugin_example": "../../../deprecated_integrations/bigquery_plugin/biquery_plugin_example.html",
-    "flytesnacks/examples/databricks_plugin/index": "../../../deprecated_integrations/databricks_plugin/index.html",
-    "flytesnacks/examples/databricks_plugin/databricks_plugin_example": "../../../deprecated_integrations/databricks_plugin/databricks_plugin_example.html",
-    "flytesnacks/examples/mmcloud_plugin/index": "../../../deprecated_integrations/mmcloud_plugin/index.html",
-    "flytesnacks/examples/mmcloud_plugin/mmcloud_plugin_example": "../../../deprecated_integrations/mmcloud_plugin/mmcloud_plugin_example.html",
-    "flytesnacks/examples/snowflake_plugin/index": "../../../deprecated_integrations/snowflake_plugin/index.html",
-    "flytesnacks/examples/snowflake_plugin/snowflake_plugin_example": "../../../deprecated_integrations/snowflake_plugin/snowflake_plugin_example.html",
+    "deprecated_integrations/index": "../../flytesnacks/deprecated_integrations/index.html",
     "deprecated_integrations/mmcloud_plugin/index": "../../flytesnacks/examples/mmcloud_agent/index.html",
-    "deprecated_integrations/mmcloud_plugin/mmcloud_plugin_example": "../../flytesnacks/examples/mmcloud_agent/index.html"
+    "deprecated_integrations/mmcloud_plugin/mmcloud_plugin_example": "../../flytesnacks/examples/mmcloud_agent/index.html",
+    "deprecated_integrations/bigquery_plugin/index": "../../flytesnacks/deprecated_integrations/bigquery_plugin/index.html",
+    "deprecated_integrations/bigquery_plugin/bigquery_plugin_example": "../../flytesnacks/deprecated_integrations/bigquery_plugin/bigquery_plugin_example.html",
+    "deprecated_integrations/databricks_plugin/index": "../../flytesnacks/deprecated_integrations/databricks_plugin/index.html",
+    "deprecated_integrations/databricks_plugin/databricks_plugin_example": "../../flytesnacks/deprecated_integrations/databricks_plugin/databricks_plugin_example.html",
+    "deprecated_integrations/snowflake_plugin/index": "../../flytesnacks/deprecated_integrations/snowflake_plugin/index.html",
+    "deprecated_integrations/snowflake_plugin/snowflake_plugin_example": "../../flytesnacks/deprecated_integrations/snowflake_plugin/snowflake_plugin_example.html",
 }
-
 
 autosummary_generate = True
 suppress_warnings = ["autosectionlabel.*", "myst.header"]
@@ -146,12 +143,6 @@ exclude_patterns = [
     "_src/**",
     "examples/**",
     "flytesnacks/index.md",
-    "flytesnacks/contribute.md",
-    "flytesnacks/bioinformatics_examples.md",
-    "flytesnacks/feature_engineering.md",
-    "flytesnacks/flyte_lab.md",
-    "flytesnacks/ml_training.md",
-    "flytesnacks/deprecated_integrations.md",
     "flytesnacks/README.md",
     "flytekit/**/README.md",
     "flytekit/_templates/**",
@@ -385,11 +376,7 @@ import_projects = [
                 "examples/development_lifecycle",
                 "examples/extending",
                 "examples/productionizing",
-                "examples/testing",
-                "examples/bigquery_plugin",
-                "examples/databricks_plugin",
-                "examples/mmcloud_plugin",
-                "examples/snowflake_plugin",
+                "examples/testing"
             ]
         ],
         "local": flytesnacks_local_path is not None,
