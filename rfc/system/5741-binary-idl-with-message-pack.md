@@ -414,15 +414,39 @@ my_dc.model_json_schema()
 
 ### FlyteCtl
 In FlyteCtl, we can construct input for the execution.
-We can 
+
+We can construct a `Binary IDL Object` when we receive `Literal Type Struct`.
+
+In `flyteidl/clients/go/coreutils/literals.go`:
+```go
+if newT.Simple == core.SimpleType_STRUCT {
+    if _, isValueStringType := v.(string); !isValueStringType {
+        byteValue, err := msgpack.Marshal(v)
+        if err != nil {
+            return nil, fmt.Errorf("unable to marshal to json string for struct value %v", v)
+        }
+        strValue = string(byteValue)
+    }
+}
+``` 
 
 ### FlyteConsole
 #### Show input/output on FlyteConsole
-We will get the node's input and output literal values by FlyteAdmin’s API, and obtain the JSON IDL bytes from the literal value.
 
-We can use MsgPack dumps the MsgPack into a dictionary, and shows it to the flyteconsole.
+1. Get Bytes from the Binary IDL Object.
+2. Get Tag from the Binary IDL Object.
+3. Use Tag to determine how to deserialize `Bytes`, and show the deserialized value in FlyteConsole.
+
+#### Copy Input
+
+
 #### Construct Input
+##### Input Bytes
+1. Encode
+
 We should use `msgpack.encode` to encode input value and store it to the literal’s JSON field.
+
+##### Launch Form
 
 ## 4 Metrics & Dashboards
 
@@ -438,19 +462,12 @@ None, it's doable.
 
 
 ## 7 Potential Impact and Dependencies
-We should check whether `serialization_format` is specified and supported in the Flyte backend, Flytekit, and Flyteconsole. Currently, we use `msgpack` as our default serialization format.
-
-In the future, we might want to support different JSON types such as "eJSON" or "ndJSON." We can add `json_type` to the JSON IDL to accommodate this.
-
-There are 3 reasons why we add `serialization_format` to the JSON IDL rather than the literal's `metadata`:
-1. Metadata use cases are more related to when the data is created, where the data is stored, etc.
-2. This is required information for all JSON IDLs, and it will seem more important if we include it as a field in the IDL.
-3. If we want to add `json_type` or other JSON IDL-specific use cases in the future, we can include them in the JSON IDL field, making it more readable.
+None.
 
 ## 8 Unresolved questions
 None.
 
 ## 9 Conclusion
-MsgPack is better because it's more smaller and faster.
+MsgPack is a good choice because it's more smaller and faster than UTF-8 Encoded JSON String.
 You can see the performance comparison here: https://github.com/flyteorg/flyte/pull/5607#issuecomment-2333174325
 We will use `msgpack` to do it.
