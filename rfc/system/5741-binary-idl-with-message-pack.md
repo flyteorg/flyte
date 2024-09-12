@@ -225,8 +225,8 @@ def wf():
 ```go
 func literalTypeForScalar(scalar *core.Scalar) *core.LiteralType {
   ...
-  case *core.Scalar_JSON:
-		literalType = &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_JSON}}
+  case *core.Scalar_Binary:
+		literalType = &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_BINARY}}
   ...
   return literalType 
 }
@@ -238,36 +238,81 @@ func ExtractFromLiteral(literal *core.Literal) (interface{}, error) {
     switch literalValue := literal.Value.(type) {
         case *core.Literal_Scalar:
         ...
-            case *core.Scalar_JSON:
-                return scalarValue.Json.GetValue(), nil
+            case *core.Scalar_Binary:
+			    return scalarValue.Binary, nil
     }
 }
 // Default Input
 func MakeDefaultLiteralForType(typ *core.LiteralType) (*core.Literal, error) {
-    switch t := typ.GetType().(type) {
+	switch t := typ.GetType().(type) {
 	case *core.LiteralType_Simple:
-        ...
-        case core.SimpleType_JSON:
-                        return &core.Literal{
-                            Value: &core.Literal_Scalar{
-                                Scalar: &core.Scalar{
-                                    Value: &core.Scalar_JSON{
-                                        JSON: &core.JSON{
-                                            Value: []byte(""),
-                                        },
-										SerializationFormat: "msgpack",
-                                    },
-                                },
-                            },
-                        }, nil
+        case core.SimpleType_BINARY:
+			return MakeLiteral([]byte{})
     }
 }
-```
-4. Compiler (Backward Compatibility with `Struct` type)
-```go
-if upstreamTypeCopy.GetSimple() == flyte.SimpleType_STRUCT && downstreamTypeCopy.GetSimple() == flyte.SimpleType_JSON {
-		return true
+// Use Message Pack as Default Tag for deserialization.
+func MakeBinaryLiteral(v []byte) *core.Literal {
+	return &core.Literal{
+		Value: &core.Literal_Scalar{
+			Scalar: &core.Scalar{
+				Value: &core.Scalar_Binary{
+					Binary: &core.Binary{
+						Value: v,
+						Tag:   "msgpack",
+					},
+				},
+			},
+		},
 	}
+}
+```
+4. Compiler
+```go
+func (t trivialChecker) CastsFrom(upstreamType *flyte.LiteralType) bool {
+	if upstreamType.GetEnumType() != nil {
+		if t.literalType.GetSimple() == flyte.SimpleType_STRING {
+			return true
+		}
+	}
+
+    if t.literalType.GetEnumType() != nil {
+        if upstreamType.GetSimple() == flyte.SimpleType_STRING {
+            return true
+        }
+    }
+
+	if GetTagForType(upstreamType) != "" && GetTagForType(t.literalType) != GetTagForType(upstreamType) {
+		return false
+	}
+
+    // Here is the new way to check if dataclass/pydantic BaseModel are castable or not.
+    if upstreamTypeCopy.GetSimple() == flyte.SimpleType_STRUCT &&\
+         downstreamTypeCopy.GetSimple() == flyte.SimpleType_STRUCT {
+        // Json Schema is stored in Metadata
+        upstreamMetadata := upstreamTypeCopy.GetMetadata()
+        downstreamMetadata := downstreamTypeCopy.GetMetadata()
+
+        // There's bug in flytekit's dataclass Transformer to generate JSON Scheam before,
+        // in some case, we the JSON Schema will be nil, so we can only pass it to support
+        // backward compatible. (reference task should be supported.)
+        if upstreamMetadata == nil || downstreamMetadata == nil {
+            return true
+        }
+
+        return isSameTypeInJSON(upstreamMetadata, downstreamMetadata) ||\
+                 isSuperTypeInJSON(upstreamMetadata, downstreamMetadata)
+    }
+
+	upstreamTypeCopy := *upstreamType
+	downstreamTypeCopy := *t.literalType
+	upstreamTypeCopy.Structure = &flyte.TypeStructure{}
+	downstreamTypeCopy.Structure = &flyte.TypeStructure{}
+	upstreamTypeCopy.Metadata = &structpb.Struct{}
+	downstreamTypeCopy.Metadata = &structpb.Struct{}
+	upstreamTypeCopy.Annotation = &flyte.TypeAnnotation{}
+	downstreamTypeCopy.Annotation = &flyte.TypeAnnotation{}
+	return upstreamTypeCopy.String() == downstreamTypeCopy.String()
+}
 ```
 ### FlyteKit
 #### pyflyte run
@@ -275,39 +320,101 @@ The behavior will remain unchanged.
 We will pass the value to our class, which inherits from `click.ParamType`, and use the corresponding type transformer to convert the input to the correct type.
 
 ### Dict Transformer
+There are 2 cases in Dict Transformer, `Dict[type, type]` and `dict`.
+For `Dict[type, type]`, we will stay everything the same as before.
 
-| **Stage** | **Conversion** | **Description**                                                                                                                                                                             |
-| --- | --- |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Before** | Python Value to Literal | 1. `Dict[type, type]` uses type hints to construct a LiteralMap. <br> 2. `dict` uses `JSON.dumps` to turn a `dict` value to a JSON string, and store it to Protobuf Struct.                 |
-| | Literal to Python Value | 1. `Dict[type, type]` uses type hints to convert LiteralMap to Python Value. <br> 2. `dict` uses `JSON.loads` to turn a JSON string into a dict value and store it to Protobuf Struct.     |
-| **After** | Python Value to Literal | 1. `Dict[type, type]` stays the same. <br> 2. `dict` uses `msgpack.dumps` to turn a dict into msgpack bytes, and store it to Protobuf JSON.                                            |
-| | Literal to Python Value | 1. `Dict[type, type]` uses type hints to convert LiteralMap to Python Value. <br> 2.  `dict` conversion: msgpack bytes -> dict value, method: `msgpack.loads`. |
+#### Literal Value
+For `dict`, the life cycle of it will be as below.
 
+Before:
+- `to_literal`: `dict` -> `JSON String` -> `Protobuf Struct`
+- `to_python_val`: `Protobuf Struct` -> `JSON String` -> `dict`
+
+After:
+- `to_literal`: `dict` -> `msgpack bytes` -> `Binary(value=b'msgpack_bytes', tag="msgpack")`
+- `to_python_val`: `Binary(value=b'msgpack_bytes', tag="msgpack")` -> `msgpack bytes` -> `dict`
+
+#### JSON Schema
+The JSON Schema of `dict` will be empty.
 ### Dataclass Transformer
+#### Literal Value
+Before:
+- `to_literal`: `dataclass` -> `JSON String` -> `Protobuf Struct`
+- `to_python_val`: `Protobuf Struct` -> `JSON String` -> `dataclass`
 
-| **Stage** | **Conversion** | **Description**                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| --- | --- |-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Before** | Python Value to Literal | Uses `mashumaro JSON Encoder` to turn a dataclass value to a JSON string, and store it to Protobuf `Struct`. |
-| | Literal to Python Value | Uses `mashumaro JSON Decoder` to turn a JSON string to a python value, and recursively fixed int attributes to int (it will be float because we stored it in to `Struct`). |
-| **After** | Python Value to Literal | Uses `mashumaro MessagePackEncoder` to convert a dataclass value into msgpack bytes, storing them in the Protobuf `JSON` field. |
-| | Literal to Python Value | Uses `mashumaro MessagePackDecoder` to convert msgpack bytes back into a Python value. |
+After:
+- `to_literal`: `dataclass` -> `msgpack bytes` -> `Binary(value=b'msgpack_bytes', tag="msgpack")`
+- `to_python_val`: `Binary(value=b'msgpack_bytes', tag="msgpack")` -> `msgpack bytes` -> `dataclass`
+
+Note: We will use mashumaro's `MessagePackEncoder` and `MessagePackDecoder` to serialize and deserialize dataclass value in python.
+```python
+from mashumaro.codecs.msgpack import MessagePackDecoder, MessagePackEncoder
+```
+
+#### JSON Schema
+The JSON Schema of `dataclass` will be generated by `marshmallow` or `mashumaro`.
+Check here: https://github.com/flyteorg/flytekit/blob/8c6f6f0f17d113447e1b10b03e25a34bad79685c/flytekit/core/type_engine.py#L442-L474
 
 ### Pydantic Transformer
+#### Literal Value
+Pydantic can't be serialized to `msgpack bytes` directly.
+But `dict` can.
 
-| **Stage** | **Conversion** | **Description** |
-| --- | --- | --- |
-| **Before** | Python Value to Literal | Convert `BaseModel` to a JSON string, and then convert it to a Protobuf `Struct`. |
-| | Literal to Python Value | Convert Protobuf `Struct` to a JSON string and then convert it to a `BaseModel`. |
-| **After** | Python Value to Literal | Converts the Pydantic `BaseModel` to a dictionary, then serializes it into msgpack bytes using `msgpack.dumps`. |
-| | Literal to Python Value | Deserializes `msgpack` bytes into a dictionary, then converts it back into a Pydantic `BaseModel`. |
+- `to_literal`: `BaseModel` -> `dict` -> `msgpack bytes` -> `Binary(value=b'msgpack_bytes', tag="msgpack")`
+- `to_python_val`: `Binary(value=b'msgpack_bytes', tag="msgpack")` -> `msgpack bytes` -> `dict` -> `BaseModel`
 
 Note: Pydantic BaseModel can't be serialized directly by `msgpack`, but this implementation will still ensure 100% correct.
 
-### FlyteCtl
-In FlyteCtl, we can construct input for the execution, so we have to make sure the values we passed to FlyteAdmin 
-can all be constructed to Literal.
+```python
+@dataclass
+class DC_inside:
+    a: int
+    b: float
 
-reference: https://github.com/flyteorg/flytectl/blob/131d6a20c7db601ca9156b8d43d243bc88669829/cmd/create/serialization_utils.go#L48 
+@dataclass
+class DC:
+    a: int
+    b: float
+    c: str
+    d: Dict[str, int]
+    e: DC_inside
+
+class MyDCModel(BaseModel):
+    dc: DC
+
+my_dc = MyDCModel(dc=DC(a=1, b=2.0, c="3", d={"4": 5}, e=DC_inside(a=6, b=7.0)))
+# {'dc': {'a': 1, 'b': 2.0, 'c': '3', 'd': {'4': 5}, 'e': {'a': 6, 'b': 7.0}}}
+```
+
+#### JSON Schema
+The JSON Schema of `BaseModel` will be generated by Pydantic's API.
+```python
+@dataclass
+class DC_inside:
+    a: int
+    b: float
+
+@dataclass
+class DC:
+    a: int
+    b: float
+    c: str
+    d: Dict[str, int]
+    e: DC_inside
+
+class MyDCModel(BaseModel):
+    dc: DC
+
+my_dc = MyDCModel(dc=DC(a=1, b=2.0, c="3", d={"4": 5}, e=DC_inside(a=6, b=7.0)))
+my_dc.model_json_schema()
+"""
+{'$defs': {'DC': {'properties': {'a': {'title': 'A', 'type': 'integer'}, 'b': {'title': 'B', 'type': 'number'}, 'c': {'title': 'C', 'type': 'string'}, 'd': {'additionalProperties': {'type': 'integer'}, 'title': 'D', 'type': 'object'}, 'e': {'$ref': '#/$defs/DC_inside'}}, 'required': ['a', 'b', 'c', 'd', 'e'], 'title': 'DC', 'type': 'object'}, 'DC_inside': {'properties': {'a': {'title': 'A', 'type': 'integer'}, 'b': {'title': 'B', 'type': 'number'}}, 'required': ['a', 'b'], 'title': 'DC_inside', 'type': 'object'}}, 'properties': {'dc': {'$ref': '#/$defs/DC'}}, 'required': ['dc'], 'title': 'MyDCModel', 'type': 'object'}
+"""
+```
+
+### FlyteCtl
+In FlyteCtl, we can construct input for the execution.
+We can 
 
 ### FlyteConsole
 #### Show input/output on FlyteConsole
