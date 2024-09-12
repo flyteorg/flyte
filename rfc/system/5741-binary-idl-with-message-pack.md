@@ -11,22 +11,37 @@
 
 ## 1 Executive Summary
 ### Literal Value
+Literal Value will be `Binary`.
+Use `bytes` in `Binary` instead of `Protobuf struct`.
+
 - To Literal
 
 | Before                            | Now                                          |
 |-----------------------------------|----------------------------------------------|
-| Python Val -> JSON String -> Protobuf Struct | Python Val -> Bytes -> Protobuf Binary (value: MessagePack Bytes, tag: msgpack) |
+| Python Val -> JSON String -> Protobuf Struct | Python Val -> (Dict ->) Bytes -> Binary (value: MessagePack Bytes, tag: msgpack) IDL Object |
 
 - To Python Value
 
 | Before                            | Now                                          |
 |-----------------------------------|----------------------------------------------|
-| Protobuf Struct -> JSON String -> Python Val | Protobuf JSON -> Bytes -> Python Val |
+| Protobuf Struct -> JSON String -> Python Val | Binary (value: MessagePack Bytes, tag: msgpack) IDL Object -> Bytes -> (Dict ->) -> Python Val |
 
-Use bytes in Protobuf instead of a JSON string to fix case that int is not supported in Protobuf struct.
+Note: if a python value can't directly be converted to `MessagePack Bytes`, we can convert it to `Dict`, and then convert it to `MessagePack Bytes`.
+
+For example, the pydantic to literal function will be `BaseModel` -> `dict` -> `MessagePack Bytes` -> `Binary (value: MessagePack Bytes, tag: msgpack) IDL Object`.
+
+For pure `dict` in python, the to literal function will be `dict` -> `MessagePack Bytes` -> `Binary (value: MessagePack Bytes, tag: msgpack) IDL Object`.
 
 ### Literal Type
-1. 
+Literal Type will be `Protobuf struct`.
+`Json Schema` will be stored in `Literal Type's metadata`.
+
+1. Dataclass, Pydantic BaseModel and pure dict in python will all use `Protobuf Struct`.
+2. We will put `Json Schema` in Literal Type's `metadata` field, this will be used in flytekit remote api to construct dataclass/Pydantic BaseModel by `Json Schema`.
+3. We will use libraries written in golang to compare `Json Schema` to solve this issue: ["[BUG] Union types fail for e.g. two different dataclasses"](https://github.com/flyteorg/flyte/issues/5489).
+
+
+Note: The `metadata` of `Literal Type` and `Literal Value` are not the same.
 
 ## 2 Motivation
 
@@ -53,9 +68,9 @@ def t2(a: dict):
 ### After
 ```python
 @task
-def t1() -> dict: # JSON Bytes
+def t1() -> dict: # Literal(scalar=Scalar(binary=Binary(value=b'msgpack_bytes', tag="msgpack")))
   ...
-  return {"a": 1}  # Protobuf JSON b'\x81\xa1a\x01', produced by msgpack
+  return {"a": 1}  # Protobuf Binary value=b'\x81\xa1a\x01', produced by msgpack
 
 @task
 def t2(a: dict):
@@ -63,24 +78,27 @@ def t2(a: dict):
 ```
 
 #### Note
-- We will use the same type interface and ensure the backward compatibility.
+- We will use implement `to_python_value` to every type transformer to ensure backward compatibility.
+For example, `Binary IDL Object` -> python value and `Protobuf Struct IDL Object` -> python value are both supported.
 
 ### How to turn a value to bytes?
 #### Use MsgPack to convert a value into bytes
 ##### Python
 ```python
 import msgpack
-import JSON
 
 # Encode
 def to_literal():
   msgpack_bytes = msgpack.dumps(python_val)
-  return Literal(scalar=Scalar(json=Json(value=msgpack_bytes, serialization_format="msgpack")))
+  return Literal(scalar=Scalar(binary=Binary(value=b'msgpack_bytes', tag="msgpack")))
 
 # Decode
 def to_python_value():
-  if lv.scalar.json.serialization_format == "msgpack":
-    msgpack_bytes = lv.scalar.json.value
+    # lv: literal value
+    if lv.scalar.binary.tag == "msgpack":
+        msgpack_bytes = lv.scalar.json.value
+    else:
+        raise ValueError(f"{tag} is not supported to decode this Binary Literal: {lv.scalar.binary}.")
     return msgpack.loads(msgpack_bytes)
 ```
 reference: https://github.com/msgpack/msgpack-python 
