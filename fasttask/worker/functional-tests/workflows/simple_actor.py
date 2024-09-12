@@ -5,7 +5,6 @@ import os
 
 actor = ActorEnvironment(
     name="simple-actor",
-    parallelism=1,
     replica_count=1,
     ttl_seconds=100,
     container_image=os.getenv("UNION_RUNTIME_TEST_IMAGE"),
