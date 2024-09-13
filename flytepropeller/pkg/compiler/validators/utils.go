@@ -44,7 +44,11 @@ func literalTypeForScalar(scalar *core.Scalar) *core.LiteralType {
 
 		literalType = &core.LiteralType{Type: &core.LiteralType_Blob{Blob: scalar.GetBlob().GetMetadata().GetType()}}
 	case *core.Scalar_Binary:
-		literalType = &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_BINARY}}
+		if len(v.Binary.Tag) > 0 {
+			literalType = &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRUCT}}
+		} else {
+			literalType = &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_BINARY}}
+		}
 	case *core.Scalar_Schema:
 		literalType = &core.LiteralType{
 			Type: &core.LiteralType_Schema{
