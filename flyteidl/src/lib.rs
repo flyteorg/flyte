@@ -923,10 +923,11 @@ pub mod _flyteidl_rust {
         // It's necessary `new` attribute to construct the `RawSynchronousFlyteClient` in Python.
         #[new]
         // TODO: Instead of accepting endpoint and kwargs dict as arguments, we should take path as input that reads platform configuration file.
-        #[pyo3(signature = (endpoint, insecure, **kwargs))]
+        #[pyo3(signature = (endpoint, insecure, auth_mode, **kwargs))]
         pub fn new(
             endpoint: &str,
             insecure: bool,
+            auth_mode: &str,
             kwargs: Option<&Bound<'_, pyo3::types::PyDict>>,
         ) -> PyResult<RawSynchronousFlyteClient> {
             // Use Atomic Reference Counting abstractions as a cheap way to pass string reference into another thread that outlives the scope.
@@ -981,8 +982,14 @@ pub mod _flyteidl_rust {
                 let mut oauth_client: auth::auth::OAuthClient =
                     auth::auth::OAuthClient::new(endpoint, &insecure);
                 // TODO: swithch by AuthMode flag
-                oauth_client.client_secret_authenticate();
-                // oauth_client.pkce_authenticate();
+                println!("AuthMode: {:?}", auth_mode);
+                if auth_mode == "Pkce" {
+                    oauth_client.pkce_authenticate();
+                } else  if auth_mode == "client_credentials" || auth_mode == "ClientSecret" {
+                    oauth_client.client_secret_authenticate();
+                } else {
+                    todo!();
+                }
             }
 
             // Check details on constructing `channel`: https://docs.rs/tonic/latest/tonic/transport/struct.Channel.html#method.builder
