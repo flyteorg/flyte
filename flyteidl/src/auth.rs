@@ -1,6 +1,6 @@
 pub mod auth {
 
-    use openssl::ssl::{SslConnector, SslMethod, SslStream};
+    use openssl::ssl::{SslConnector, SslMethod, SslStream, SslVerifyMode};
     use std::net::{TcpListener, TcpStream};
     use url::Url;
 
@@ -125,8 +125,12 @@ pub mod auth {
             None => format!("{}:{}", hostname, "443"),
         };
 
+        // Create a connector that doesn't verify the server's certificate
+        let mut connector_builder = SslConnector::builder(SslMethod::tls()).unwrap();
+        connector_builder.set_verify(SslVerifyMode::NONE);
         // Initialize insecure TCP connection
-        let connector: SslConnector = SslConnector::builder(SslMethod::tls()).unwrap().build();
+        let connector = connector_builder.build();
+
         // Connect to the server and extract the TLS session
         let stream: TcpStream = TcpStream::connect(server_address).unwrap();
         let ssl_stream: SslStream<TcpStream> = connector.connect(&hostname, stream).unwrap();
