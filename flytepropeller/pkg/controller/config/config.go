@@ -125,7 +125,7 @@ var (
 			DefaultParallelismBehavior: ParallelismBehaviorUnlimited,
 		},
 		LiteralOffloadingConfig: LiteralOffloadingConfig{
-			Enabled: true, // Default keep this enabled and in case of issues allow users to disable using config map.
+			Enabled: false, // Default keep this disabled and we will followup when flytekit is released with the offloaded changes.
 			SupportedSDKVersions: map[string]string{ // The key is the SDK name (matches the supported SDK in core.RuntimeMetadata_RuntimeType)  and the value is the minimum supported version
 				"FLYTE_SDK": "1.13.5", // Expected release number with flytekit support from this PR https://github.com/flyteorg/flytekit/pull/2685
 			},
