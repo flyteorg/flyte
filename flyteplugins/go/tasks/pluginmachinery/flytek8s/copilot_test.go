@@ -40,8 +40,9 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 		StartTimeout: config2.Duration{
 			Duration: time.Second * 1,
 		},
-		CPU:    "1024m",
-		Memory: "1024Mi",
+		CPU:                    "1024m",
+		Memory:                 "1024Mi",
+		AddSysPTraceCapability: false,
 	}
 
 	t.Run("happy", func(t *testing.T) {
@@ -55,6 +56,7 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 		assert.Equal(t, "/", c.WorkingDir)
 		assert.Equal(t, 2, len(c.Resources.Limits))
 		assert.Equal(t, 2, len(c.Resources.Requests))
+		assert.NotContains(t, c.SecurityContext.Capabilities.Add, pTraceCapability)
 	})
 
 	t.Run("happy stow backend", func(t *testing.T) {
@@ -72,6 +74,7 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 		assert.Equal(t, "/", c.WorkingDir)
 		assert.Equal(t, 2, len(c.Resources.Limits))
 		assert.Equal(t, 2, len(c.Resources.Requests))
+		assert.NotContains(t, c.SecurityContext.Capabilities.Add, pTraceCapability)
 	})
 
 	t.Run("happy-vols", func(t *testing.T) {
@@ -106,6 +109,15 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 		_, err := FlyteCoPilotContainer("x", cfg, []string{"hello"}, v1.VolumeMount{Name: "X", MountPath: "/"})
 		assert.Error(t, err)
 		cfg.Memory = old
+	})
+
+	t.Run("sys-ptrace-add", func(t *testing.T) {
+		old := cfg.AddSysPTraceCapability
+		cfg.AddSysPTraceCapability = true
+		c, err := FlyteCoPilotContainer("x", cfg, []string{"hello"})
+		assert.NoError(t, err)
+		assert.Contains(t, c.SecurityContext.Capabilities.Add, pTraceCapability)
+		cfg.AddSysPTraceCapability = old
 	})
 }
 
