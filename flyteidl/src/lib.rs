@@ -492,7 +492,9 @@ pub mod _flyteidl_rust {
     #[pymodule]
     pub mod array_node {
         #[pymodule_export]
-        use crate::flyteidl::core::array_node::{ParallelismOption, SuccessCriteria, ExecutionMode};
+        use crate::flyteidl::core::array_node::{
+            ExecutionMode, ParallelismOption, SuccessCriteria,
+        };
     }
     #[pymodule]
     pub mod catalog_metadata {
@@ -923,11 +925,13 @@ pub mod _flyteidl_rust {
         // It's necessary `new` attribute to construct the `RawSynchronousFlyteClient` in Python.
         #[new]
         // TODO: Instead of accepting endpoint and kwargs dict as arguments, we should take path as input that reads platform configuration file.
-        #[pyo3(signature = (endpoint, insecure, auth_mode, **kwargs))]
+        #[pyo3(signature = (endpoint, insecure, auth_mode, client_id, client_credentials_secret, **kwargs))]
         pub fn new(
             endpoint: &str,
             insecure: bool,
             auth_mode: &str,
+            client_id: &str,
+            client_credentials_secret: &str,
             kwargs: Option<&Bound<'_, pyo3::types::PyDict>>,
         ) -> PyResult<RawSynchronousFlyteClient> {
             // Use Atomic Reference Counting abstractions as a cheap way to pass string reference into another thread that outlives the scope.
@@ -942,24 +946,24 @@ pub mod _flyteidl_rust {
             };
 
             let endpoint_uri: Uri = auth::auth::bootstrap_uri_from_endpoint(endpoint, &insecure);
-
-            let credentials_for_endpoint: &str = endpoint; // TODO: The default key in flytekit is `flyte-default``
-            let credentials_access_token_key: &str = "access_token";
-            println!("{:?}", credentials_for_endpoint);
-            let entry: Entry =
-                match Entry::new(credentials_for_endpoint, credentials_access_token_key) {
-                    Ok(entry) => entry,
-                    Err(err) => {
-                        println!("{}", credentials_access_token_key);
-                        panic!("Failed at initializing keyring, not available.");
-                    }
-                };
+            // println!("RawSynchronousFlyteClient.endpoint: {}", endpoint);
+            // let credentials_for_endpoint: &str = endpoint; // TODO: The default key in flytekit is `flyte-default``
+            // let credentials_access_token_key: &str = "access_token";
+            // println!("{:?}", credentials_for_endpoint);
+            // let entry: Entry =
+            //     match Entry::new(credentials_for_endpoint, credentials_access_token_key) {
+            //         Ok(entry) => entry,
+            //         Err(err) => {
+            //             println!("{}", credentials_access_token_key);
+            //             panic!("Failed at initializing keyring, not available.");
+            //         }
+            //     };
             // dummy write access_token when unauthenticated
-            match entry.set_password("") {
-                Ok(()) => println!("KeyRing set successfully."),
-                Err(err) => println!("KeyRing set not available."),
-            };
-
+            // match entry.set_password("") {
+            //     Ok(()) => println!("KeyRing set successfully."),
+            //     Err(err) => println!("KeyRing set not available."),
+            // };
+            let mut access_token: String = "".to_string();
             if !insecure {
                 let cert: Certificate = auth::auth::bootstrap_creds_from_server(&endpoint_uri);
                 let tls: ClientTlsConfig = ClientTlsConfig::new()
@@ -979,14 +983,18 @@ pub mod _flyteidl_rust {
                     ),
                 };
 
-                let mut oauth_client: auth::auth::OAuthClient =
-                    auth::auth::OAuthClient::new(endpoint, &insecure);
+                let mut oauth_client: auth::auth::OAuthClient = auth::auth::OAuthClient::new(
+                    endpoint,
+                    &insecure,
+                    Some(client_id),
+                    Some(client_credentials_secret),
+                );
                 // TODO: swithch by AuthMode flag
                 println!("AuthMode: {:?}", auth_mode);
                 if auth_mode == "Pkce" {
-                    oauth_client.pkce_authenticate();
-                } else  if auth_mode == "client_credentials" || auth_mode == "ClientSecret" {
-                    oauth_client.client_secret_authenticate();
+                    access_token = oauth_client.pkce_authenticate().unwrap();
+                } else if auth_mode == "client_credentials" || auth_mode == "ClientSecret" {
+                    access_token = oauth_client.client_secret_authenticate().unwrap();
                 } else {
                     todo!();
                 }
@@ -1003,16 +1011,16 @@ pub mod _flyteidl_rust {
                 ),
             };
 
-            let access_token: String = match entry.get_password() {
-                Ok(access_token) => {
-                    println!("keyring retrieved successfully.");
-                    access_token
-                }
-                Err(error) => {
-                    println!("Failed at retrieving keyring: {:?}", error);
-                    "".to_string()
-                }
-            };
+            // let access_token: String = match entry.get_password() {
+            //     Ok(access_token) => {
+            //         println!("keyring retrieved successfully.{}", access_token);
+            //         access_token
+            //     }
+            //     Err(error) => {
+            //         println!("Failed at retrieving keyring: {:?}", error);
+            //         "".to_string()
+            //     }
+            // };
 
             let mut interceptor: UnaryAuthInterceptor = UnaryAuthInterceptor {
                 _access_token: access_token,

@@ -158,7 +158,12 @@ pub mod auth {
 
     // OAuth2 Authorization Client
     impl OAuthClient {
-        pub fn new(endpoint: &str, insecure: &bool) -> OAuthClient {
+        pub fn new(
+            endpoint: &str,
+            insecure: &bool,
+            client_id: Option<&str>,
+            client_credentials_secret: Option<&str>,
+        ) -> OAuthClient {
             // Check details for constructing Tokio asynchronous `runtime`: https://docs.rs/tokio/latest/tokio/runtime/struct.Builder.html#method.new_current_thread
             let rt = match Builder::new_current_thread().enable_all().build() {
                 Ok(rt) => rt,
@@ -232,11 +237,16 @@ pub mod auth {
             let mut credentials = Credential::default();
             // Create an OAuth2 client (auth0 from Okta) by specifying the client ID, client secret, authorization URL and token URL.
             let client = BasicClient::new(
+                // (client_config.clone().client_id)
                 ClientId::new(
-                    env::var("CLIENT_ID").unwrap_or_else(|_| (client_config.clone().client_id)),
+                    client_id
+                        .map(|s| s.to_string())
+                        .unwrap_or_else(|| env::var("CLIENT_ID").unwrap_or_default()),
                 ),
                 Some(ClientSecret::new(
-                    env::var("CLIENT_SECRET").unwrap_or_else(|_| "".to_string()),
+                    client_credentials_secret
+                        .map(|s| s.to_string())
+                        .unwrap_or_else(|| env::var("CLIENT_SECRET").unwrap_or_default()),
                 )),
                 AuthUrl::new((client_config.clone()).authorization_endpoint).unwrap(),
                 // Be careful that the `TokenUrl` endpoint in the official documeantion is `<BASE_DOMAIN>/token`.
@@ -266,11 +276,12 @@ pub mod auth {
         }
 
         // Client Credential flow
-        pub fn client_secret_authenticate(&mut self) -> Result<()> {
+        pub fn client_secret_authenticate(&mut self) -> Result<String> {
             let pub_cfg: ClientConfig = self.client_config.clone();
 
             println!(
-                "PublicClientAuthConfig.redirect_uri:\t{}\nPublicClientAuthConfig.client_id:\t{}\nOAuth2Metadata.token_endpoint:\t{}\nOAuth2Metadata.authorization_endpoint:\t{}",
+                "PublicClientAuthConfig.server_endpoint:\t{}\nPublicClientAuthConfig.redirect_uri:\t{}\nPublicClientAuthConfig.client_id:\t{}\nOAuth2Metadata.token_endpoint:\t{}\nOAuth2Metadata.authorization_endpoint:\t{}",
+                (pub_cfg.clone()).server_endpoint,
                 (pub_cfg.clone()).redirect_uri,
                 (pub_cfg.clone()).client_id,
                 (pub_cfg.clone()).token_endpoint,
@@ -302,11 +313,11 @@ pub mod auth {
                 Err(err) => println!("KeyRing set not available."),
             };
 
-            Ok(())
+            Ok(access_token.clone())
         }
 
         // PKCE flow
-        pub fn pkce_authenticate(&mut self) -> Result<()> {
+        pub fn pkce_authenticate(&mut self) -> Result<String> {
             // Generate a PKCE challenge.
             let (pkce_challenge, pkce_verifier) = PkceCodeChallenge::new_random_sha256();
 
@@ -395,7 +406,7 @@ pub mod auth {
             //     None => token_response.access_token().into(), // TODO: mitigate ambiguous token
             // };
 
-            Ok(())
+            Ok(token_response.access_token().secret().clone())
         }
     }
 }
