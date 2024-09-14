@@ -5,7 +5,7 @@ members = [
 
 [package]
 name = "flyteidl"
-version = "0.1.5"
+version = "0.1.6"
 edition = "2021"
 license-file = "LICENSE"
 homepage = "https://flyte.org"
