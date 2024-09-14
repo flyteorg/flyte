@@ -6,9 +6,17 @@
 .. tags:: Containerization, Intermediate
 ```
 
-`ImageSpec` is a way to specify how to build a container image without a Dockerfile. The `ImageSpec` by default will be
-converted to an [Envd](https://envd.tensorchord.ai/) config, and the [Envd builder](https://github.com/flyteorg/flytekit/blob/master/plugins/flytekit-envd/flytekitplugins/envd/image_builder.py#L12-L34) will build the image for you. However, you can also register your own builder to build
-the image using other tools.
+This guide demonstrates how to use the `ImageSpec` to customize the container image for your Flyte tasks.
+
+`ImageSpec` is a mechanism that allows you to specify how to build a container image without requiring a Dockerfile.
+This feature provides a flexible and user-friendly way to define the containerization process.
+One of the significant advantages of using ImageSpec is the potential to build smaller, more efficient images at a faster speed.
+
+By default, the `ImageSpec` will be built using the `default` builder associated with Flytekit.
+However, you have the option to register your own builder, enabling you to build the image using alternative tools.
+
+For example, [flytekitplugins-envd](https://github.com/flyteorg/flytekit/blob/c06ef30518dec2057e554fbed375dfa43b985c60/plugins/flytekit-envd/flytekitplugins/envd/image_builder.py#L25) is another image builder that uses envd to build the ImageSpec.
+This flexibility allows you to tailor the image-building process according to your specific needs and tool preferences.
 
 For every {py:class}`flytekit.PythonFunctionTask` task or a task decorated with the `@task` decorator,
 you can specify rules for binding container images. By default, flytekit binds a single container image, i.e.,
@@ -16,7 +24,9 @@ the [default Docker image](https://ghcr.io/flyteorg/flytekit), to all tasks. To 
 use the `container_image` parameter available in the {py:func}`flytekit.task` decorator, and pass an
 `ImageSpec`.
 
-Before building the image, Flytekit checks the container registry first to see if the image already exists. By doing so, it avoids having to rebuild the image over and over again. If the image does not exist, flytekit will build the image before registering the workflow, and replace the image name in the task template with the newly built image name.
+Before building the image, Flytekit checks the container registry first to see if the image already exists.
+By doing so, it avoids having to rebuild the image over and over again. If the image does not exist,
+flytekit will build the image before registering the workflow, and replace the image name in the task template with the newly built image name.
 
 ```{note}
 To clone and run the example code on this page, see the [Flytesnacks repo][flytesnacks].
@@ -30,43 +40,153 @@ To clone and run the example code on this page, see the [Flytesnacks repo][flyte
 :::{admonition} Prerequisites
 :class: important
 
-- Install [flytekitplugins-envd](https://github.com/flyteorg/flytekit/tree/master/plugins/flytekit-envd) to build the `ImageSpec`.
-- To build the image on remote machine, check this [doc](https://envd.tensorchord.ai/teams/context.html#start-remote-buildkitd-on-builder-machine).
+- Make sure `docker` is running on your local machine.
 - When using a registry in ImageSpec, `docker login` is required to push the image
 :::
 
-You can specify python packages, apt packages, and environment variables in the `ImageSpec`.
+## Install Python or APT packages
+You can specify python packages and apt packages in the `ImageSpec`.
 These specified packages will be added on top of the [default image](https://github.com/flyteorg/flytekit/blob/master/Dockerfile), which can be found in the Flytekit Dockerfile.
 More specifically, flytekit invokes [DefaultImages.default_image()](https://github.com/flyteorg/flytekit/blob/f2cfef0ec098d4ae8f042ab915b0b30d524092c6/flytekit/configuration/default_images.py#L26-L27) function.
-This function determines and returns the default image based on the Python version and flytekit version. For example, if you are using python 3.8 and flytekit 0.16.0, the default image assigned will be `ghcr.io/flyteorg/flytekit:py3.8-1.6.0`.
-If desired, you can also override the default image by providing a custom `base_image` parameter when using the `ImageSpec`.
-
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/customizing_dependencies/customizing_dependencies/image_spec.py
-:caption: customizing_dependencies/image_spec.py
-:lines: 6-19
-```
+This function determines and returns the default image based on the Python version and flytekit version.
+For example, if you are using python 3.8 and flytekit 1.6.0, the default image assigned will be `ghcr.io/flyteorg/flytekit:py3.8-1.6.0`.
 
 :::{important}
 Replace `ghcr.io/flyteorg` with a container registry you can publish to.
 To upload the image to the local registry in the demo cluster, indicate the registry as `localhost:30000`.
 :::
 
-`is_container` is used to determine whether the task is utilizing the image constructed from the `ImageSpec`.
-If the task is indeed using the image built from the `ImageSpec`, it will then import Tensorflow.
+```python
+from flytekit import ImageSpec
+
+sklearn_image_spec = ImageSpec(
+  packages=["scikit-learn", "tensorflow==2.5.0"],
+  apt_packages=["curl", "wget"],
+  registry="ghcr.io/flyteorg",
+)
+```
+
+## Install the package from the specific channel with conda
+Define the ImageSpec to install packages from a specific conda channel.
+```python
+image_spec = ImageSpec(
+  conda_packages=["langchain"],
+  conda_channels=["conda-forge"],  # List of channels to pull packages from.
+  registry="ghcr.io/flyteorg",
+)
+```
+
+## Use different Python versions in the image
+You can specify the Python version in the `ImageSpec` to build the image with a different Python version.
+
+```python
+image_spec = ImageSpec(
+  packages=["pandas"],
+  python_version="3.9",
+  registry="ghcr.io/flyteorg",
+)
+```
+
+## Import modules only in a specify imageSpec environment
+
+`is_container()` is used to determine whether the task is utilizing the image constructed from the `ImageSpec`.
+If the task is indeed using the image built from the `ImageSpec`, it will return true.
 This approach helps minimize module loading time and prevents unnecessary dependency installation within a single image.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/customizing_dependencies/customizing_dependencies/image_spec.py
-:caption: customizing_dependencies/image_spec.py
-:lines: 21-22
+In the following example, both `task1` and `task2` will import the `pandas` module. However, `Tensorflow` will only be imported in `task2`.
+
+```python
+from flytekit import ImageSpec, task
+import pandas as pd
+
+pandas_image_spec = ImageSpec(
+  packages=["pandas"],
+  registry="ghcr.io/flyteorg",
+)
+
+tensorflow_image_spec = ImageSpec(
+  packages=["tensorflow", "pandas"],
+  registry="ghcr.io/flyteorg",
+)
+
+# Return if and only if the task is using the image built from tensorflow_image_spec.
+if tensorflow_image_spec.is_container(): 
+  import tensorflow as tf
+
+@task(container_image=pandas_image_spec)
+def task1() -> pd.DataFrame:
+  return pd.DataFrame({"Name": ["Tom", "Joseph"], "Age": [1, 22]})
+
+
+@task(container_image=tensorflow_image_spec)
+def task2() -> int:
+  num_gpus = len(tf.config.list_physical_devices('GPU'))
+  print("Num GPUs Available: ", num_gpus)
+  return num_gpus
 ```
 
-To enable tasks to utilize the images built with `ImageSpec`, you can specify the `container_image` parameter for those tasks.
+## Install CUDA in the image
+There are few ways to install CUDA in the image.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/customizing_dependencies/customizing_dependencies/image_spec.py
-:caption: customizing_dependencies/image_spec.py
-:lines: 27-56
+### Use Nvidia docker image
+CUDA is pre-installed in the Nvidia docker image. You can specify the base image in the `ImageSpec`.
+```python
+image_spec = ImageSpec(
+  base_image="nvidia/cuda:12.6.1-cudnn-devel-ubuntu22.04",
+  packages=["tensorflow", "pandas"],
+  python_version="3.9",
+  registry="ghcr.io/flyteorg",
+)
 ```
 
+### Build image in different architecture
+You can specify the platform in the `ImageSpec` to build the image in a different architecture, such as `linux/arm64` or `darwin/arm64`.
+```python
+image_spec = ImageSpec(
+  packages=["pandas"],
+  platform="linux/arm64",
+  registry="ghcr.io/flyteorg",
+)
+```
+
+### Install packages from extra index
+CUDA can be installed by specifying the `pip_extra_index_url` in the `ImageSpec`.
+```python
+image_spec = ImageSpec(
+  name="pytorch-mnist",
+  packages=["torch", "torchvision", "flytekitplugins-kfpytorch"],
+  pip_extra_index_url=["https://download.pytorch.org/whl/cu118"],
+  registry="ghcr.io/flyteorg",
+)
+```
+
+## Install flytekit from GitHub
+When you update the flytekit, you may want to test the changes with your tasks.
+You can install the flytekit from a specific commit hash in the `ImageSpec`.
+
+```python
+new_flytekit = "git+https://github.com/flyteorg/flytekit@90a4455c2cc2b3e171dfff69f605f47d48ea1ff1"
+
+image_spec = ImageSpec(
+  apt_packages=["git"],
+  packages=[new_flytekit],
+  registry="ghcr.io/flyteorg",
+)
+```
+
+## Customize the tag of the image
+You can customize the tag of the image by specifying the `tag_format` in the `ImageSpec`.
+In the following example, the full qualified image name will be `ghcr.io/flyteorg/my-image:<spec_hash>-dev`.
+```python
+image_spec = ImageSpec(
+  name="my-image",
+  packages=["pandas"],
+  tag_format="{spec_hash}-dev",
+  registry="ghcr.io/flyteorg",
+)
+```
+
+## Define ImageSpec in a YAML File
 There exists an option to override the container image by providing an Image Spec YAML file to the `pyflyte run` or `pyflyte register` command.
 This allows for greater flexibility in specifying a custom container image. For example:
 
@@ -91,7 +211,9 @@ If you only want to build the image without registering the workflow, you can us
 pyflyte build --remote image_spec.py wf
 ```
 
-In some cases, you may want to force an image to rebuild, even if the image spec hasn’t changed. If you want to overwrite an existing image, you can pass the `FLYTE_FORCE_PUSH_IMAGE_SPEC=True` to `pyflyte` command or add `force_push()` to the ImageSpec.
+## Force Push an Image
+In some cases, you may want to force an image to rebuild, even if the image spec hasn’t changed.
+If you want to overwrite an existing image, you can pass the `FLYTE_FORCE_PUSH_IMAGE_SPEC=True` to `pyflyte` command or add `force_push()` to the ImageSpec.
 
 ```bash
 FLYTE_FORCE_PUSH_IMAGE_SPEC=True pyflyte run --remote image_spec.py wf
