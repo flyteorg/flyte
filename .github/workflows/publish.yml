@@ -59,7 +59,7 @@ jobs:
       - name: Before Build
         run: ${{ inputs.before-build }}
       - name: Build and Push Image
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v6
         with:
           context: .
           file: ${{ inputs.dockerfile }}
