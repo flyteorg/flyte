@@ -581,7 +581,7 @@ func mergePodSpecs(basePodSpec *v1.PodSpec, podSpec *v1.PodSpec, primaryContaine
 			}
 		}
 
-		// if applicable merge with existing initContainer
+		// if applicable merge with existing container
 		if mergedContainer == nil {
 			mergedContainers = append(mergedContainers, container)
 		} else {
