@@ -29,44 +29,6 @@ func TestInMemoryStore_Head(t *testing.T) {
 	})
 }
 
-func TestInMemoryStore_GetItems(t *testing.T) {
-	t.Run("Nil Path", func(t *testing.T) {
-		s, err := NewInMemoryRawStore(context.TODO(), &Config{}, metrics)
-		assert.NoError(t, err)
-
-		items, err := s.GetItems(context.TODO(), DataReference("hello"))
-		assert.Error(t, err)
-		assert.Nil(t, items)
-	})
-
-	t.Run("No Items", func(t *testing.T) {
-		s, err := NewInMemoryRawStore(context.TODO(), &Config{}, metrics)
-		assert.NoError(t, err)
-		err = s.WriteRaw(context.TODO(), DataReference("folder"), 0, Options{}, bytes.NewReader([]byte{}))
-		assert.NoError(t, err)
-
-		items, err := s.GetItems(context.TODO(), DataReference("folder"))
-		assert.Error(t, err)
-		assert.Nil(t, items)
-	})
-
-	t.Run("Existing Items", func(t *testing.T) {
-		s, err := NewInMemoryRawStore(context.TODO(), &Config{}, metrics)
-		assert.NoError(t, err)
-		err = s.WriteRaw(context.TODO(), DataReference("folder/file1"), 0, Options{}, bytes.NewReader([]byte{}))
-		assert.NoError(t, err)
-
-		err = s.WriteRaw(context.TODO(), DataReference("folder/file2"), 0, Options{}, bytes.NewReader([]byte{}))
-		assert.NoError(t, err)
-
-		items, err := s.GetItems(context.TODO(), DataReference("folder"))
-		assert.NoError(t, err)
-		assert.Equal(t, 2, len(items))
-		assert.Equal(t, "folder/file1", items[0])
-		assert.Equal(t, "folder/file2", items[1])
-	})
-}
-
 func TestInMemoryStore_ReadRaw(t *testing.T) {
 	t.Run("Empty store", func(t *testing.T) {
 		s, err := NewInMemoryRawStore(context.TODO(), &Config{}, metrics)

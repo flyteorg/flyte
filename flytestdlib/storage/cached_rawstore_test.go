@@ -173,18 +173,6 @@ func TestCachedRawStore(t *testing.T) {
 		assert.False(t, m.Exists())
 	})
 
-	t.Run("Get Items", func(t *testing.T) {
-		items, err := cStore.GetItems(ctx, k1)
-		assert.NoError(t, err)
-		assert.Equal(t, 1, len(items))
-	})
-
-	t.Run("No Items", func(t *testing.T) {
-		items, err := cStore.GetItems(ctx, k2)
-		assert.Error(t, err)
-		assert.Equal(t, 0, len(items))
-	})
-
 	t.Run("ReadCachePopulate", func(t *testing.T) {
 		o, err := cStore.ReadRaw(ctx, k1)
 		assert.NoError(t, err)

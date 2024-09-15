@@ -50,15 +50,6 @@ func (s *cachedRawStore) Head(ctx context.Context, reference DataReference) (Met
 	return s.RawStore.Head(ctx, reference)
 }
 
-// GetItems retrieves the paths of all items from the Blob store or an error
-func (s *cachedRawStore) GetItems(ctx context.Context, reference DataReference) ([]string, error) {
-	_, span := otelutils.NewSpan(ctx, otelutils.BlobstoreClientTracer, "flytestdlib.storage.cachedRawStore/GetItems")
-	defer span.End()
-
-	// freecache does not support full cache scanning
-	return s.RawStore.GetItems(ctx, reference)
-}
-
 // ReadRaw retrieves a byte array from the Blob store or an error
 func (s *cachedRawStore) ReadRaw(ctx context.Context, reference DataReference) (io.ReadCloser, error) {
 	ctx, span := otelutils.NewSpan(ctx, otelutils.BlobstoreClientTracer, "flytestdlib.storage.cachedRawStore/ReadRaw")

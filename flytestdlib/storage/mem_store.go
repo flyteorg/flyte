@@ -9,7 +9,6 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
-	"strings"
 )
 
 type rawFile = []byte
