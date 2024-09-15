@@ -14,7 +14,7 @@ import (
 // Email to use when there is no email configuration.
 type NoopEmail struct{}
 
-func (n *NoopEmail) SendEmail(ctx context.Context, email admin.EmailMessage) error {
+func (n *NoopEmail) SendEmail(ctx context.Context, email *admin.EmailMessage) error {
 	logger.Debugf(ctx, "received noop SendEmail request with subject [%s] and recipient [%s]",
 		email.SubjectLine, strings.Join(email.RecipientsEmail, ","))
 	return nil

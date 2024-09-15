@@ -26,7 +26,7 @@ var expectedError = flyteAdminErrors.NewFlyteAdminError(codes.Internal, "foo")
 
 var testSerializedPayload = fmt.Sprintf("event triggered at '%s'", awsTimestampPlaceholder)
 
-var testSchedulerIdentifier = core.Identifier{
+var testSchedulerIdentifier = &core.Identifier{
 	Project: "project",
 	Domain:  "domain",
 	Name:    "name",
@@ -55,7 +55,7 @@ func TestGetScheduleDescription(t *testing.T) {
 }
 
 func TestGetScheduleExpression(t *testing.T) {
-	expression, err := getScheduleExpression(admin.Schedule{
+	expression, err := getScheduleExpression(&admin.Schedule{
 		ScheduleExpression: &admin.Schedule_CronExpression{
 			CronExpression: "foo",
 		},
@@ -63,7 +63,7 @@ func TestGetScheduleExpression(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, "cron(foo)", expression)
 
-	expression, err = getScheduleExpression(admin.Schedule{
+	expression, err = getScheduleExpression(&admin.Schedule{
 		ScheduleExpression: &admin.Schedule_Rate{
 			Rate: &admin.FixedRate{
 				Value: 1,
@@ -74,7 +74,7 @@ func TestGetScheduleExpression(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, "rate(1 day)", expression)
 
-	expression, err = getScheduleExpression(admin.Schedule{
+	expression, err = getScheduleExpression(&admin.Schedule{
 		ScheduleExpression: &admin.Schedule_Rate{
 			Rate: &admin.FixedRate{
 				Value: 2,
@@ -85,7 +85,7 @@ func TestGetScheduleExpression(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, "rate(2 hours)", expression)
 
-	_, err = getScheduleExpression(admin.Schedule{})
+	_, err = getScheduleExpression(&admin.Schedule{})
 	assert.Equal(t, codes.InvalidArgument, err.(flyteAdminErrors.FlyteAdminError).Code())
 }
 
@@ -133,7 +133,7 @@ func TestAddSchedule(t *testing.T) {
 	assert.Nil(t, scheduler.AddSchedule(context.Background(),
 		scheduleInterfaces.AddScheduleInput{
 			Identifier: testSchedulerIdentifier,
-			ScheduleExpression: admin.Schedule{
+			ScheduleExpression: &admin.Schedule{
 				ScheduleExpression: &admin.Schedule_Rate{
 					Rate: &admin.FixedRate{
 						Value: 1,
@@ -168,7 +168,7 @@ func TestAddSchedule_PutRuleError(t *testing.T) {
 	err := scheduler.AddSchedule(context.Background(),
 		scheduleInterfaces.AddScheduleInput{
 			Identifier: testSchedulerIdentifier,
-			ScheduleExpression: admin.Schedule{
+			ScheduleExpression: &admin.Schedule{
 				ScheduleExpression: &admin.Schedule_Rate{
 					Rate: &admin.FixedRate{
 						Value: 1,
@@ -195,7 +195,7 @@ func TestAddSchedule_PutTargetsError(t *testing.T) {
 	err := scheduler.AddSchedule(context.Background(),
 		scheduleInterfaces.AddScheduleInput{
 			Identifier: testSchedulerIdentifier,
-			ScheduleExpression: admin.Schedule{
+			ScheduleExpression: &admin.Schedule{
 				ScheduleExpression: &admin.Schedule_Rate{
 					Rate: &admin.FixedRate{
 						Value: 1,

@@ -7,7 +7,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
-func ValidateTaskExecutionRequest(request admin.TaskExecutionEventRequest, maxOutputSizeInBytes int64) error {
+func ValidateTaskExecutionRequest(request *admin.TaskExecutionEventRequest, maxOutputSizeInBytes int64) error {
 	if request.Event == nil {
 		return shared.GetMissingArgumentError(shared.Event)
 	}
@@ -48,7 +48,7 @@ func ValidateTaskExecutionIdentifier(identifier *core.TaskExecutionIdentifier) e
 	return nil
 }
 
-func ValidateTaskExecutionListRequest(request admin.TaskExecutionListRequest) error {
+func ValidateTaskExecutionListRequest(request *admin.TaskExecutionListRequest) error {
 	if err := ValidateNodeExecutionIdentifier(request.NodeExecutionId); err != nil {
 		return err
 	}

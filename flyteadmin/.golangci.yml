@@ -36,5 +36,6 @@ linters-settings:
       - prefix(github.com/flyteorg)
     skip-generated: true
 issues:
-  exclude:
-    - copylocks
+  exclude-rules:
+    - path: pkg/workflowengine/impl/prepare_execution.go
+      text: "copies lock"

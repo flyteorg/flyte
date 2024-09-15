@@ -16,7 +16,7 @@ import (
 )
 
 func ValidateLaunchPlan(ctx context.Context,
-	request admin.LaunchPlanCreateRequest, db repositoryInterfaces.Repository,
+	request *admin.LaunchPlanCreateRequest, db repositoryInterfaces.Repository,
 	config runtimeInterfaces.ApplicationConfiguration, workflowInterface *core.TypedInterface) error {
 	if err := ValidateIdentifier(request.Id, common.LaunchPlan); err != nil {
 		return err
@@ -70,7 +70,7 @@ func ValidateLaunchPlan(ctx context.Context,
 	return nil
 }
 
-func validateSchedule(request admin.LaunchPlanCreateRequest, expectedInputs *core.ParameterMap) error {
+func validateSchedule(request *admin.LaunchPlanCreateRequest, expectedInputs *core.ParameterMap) error {
 	schedule := request.GetSpec().GetEntityMetadata().GetSchedule()
 	if schedule.GetCronExpression() != "" || schedule.GetRate() != nil || schedule.GetCronSchedule() != nil {
 		for key, value := range expectedInputs.Parameters {

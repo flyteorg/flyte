@@ -24,7 +24,7 @@ func (_m *SignalInterface) EXPECT() *SignalInterface_Expecter {
 }
 
 // GetOrCreateSignal provides a mock function with given fields: ctx, request
-func (_m *SignalInterface) GetOrCreateSignal(ctx context.Context, request admin.SignalGetOrCreateRequest) (*admin.Signal, error) {
+func (_m *SignalInterface) GetOrCreateSignal(ctx context.Context, request *admin.SignalGetOrCreateRequest) (*admin.Signal, error) {
 	ret := _m.Called(ctx, request)
 
 	if len(ret) == 0 {
@@ -33,10 +33,10 @@ func (_m *SignalInterface) GetOrCreateSignal(ctx context.Context, request admin.
 
 	var r0 *admin.Signal
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, admin.SignalGetOrCreateRequest) (*admin.Signal, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.SignalGetOrCreateRequest) (*admin.Signal, error)); ok {
 		return rf(ctx, request)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, admin.SignalGetOrCreateRequest) *admin.Signal); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.SignalGetOrCreateRequest) *admin.Signal); ok {
 		r0 = rf(ctx, request)
 	} else {
 		if ret.Get(0) != nil {
@@ -44,7 +44,7 @@ func (_m *SignalInterface) GetOrCreateSignal(ctx context.Context, request admin.
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, admin.SignalGetOrCreateRequest) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.SignalGetOrCreateRequest) error); ok {
 		r1 = rf(ctx, request)
 	} else {
 		r1 = ret.Error(1)
@@ -60,14 +60,14 @@ type SignalInterface_GetOrCreateSignal_Call struct {
 
 // GetOrCreateSignal is a helper method to define mock.On call
 //   - ctx context.Context
-//   - request admin.SignalGetOrCreateRequest
+//   - request *admin.SignalGetOrCreateRequest
 func (_e *SignalInterface_Expecter) GetOrCreateSignal(ctx interface{}, request interface{}) *SignalInterface_GetOrCreateSignal_Call {
 	return &SignalInterface_GetOrCreateSignal_Call{Call: _e.mock.On("GetOrCreateSignal", ctx, request)}
 }
 
-func (_c *SignalInterface_GetOrCreateSignal_Call) Run(run func(ctx context.Context, request admin.SignalGetOrCreateRequest)) *SignalInterface_GetOrCreateSignal_Call {
+func (_c *SignalInterface_GetOrCreateSignal_Call) Run(run func(ctx context.Context, request *admin.SignalGetOrCreateRequest)) *SignalInterface_GetOrCreateSignal_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(admin.SignalGetOrCreateRequest))
+		run(args[0].(context.Context), args[1].(*admin.SignalGetOrCreateRequest))
 	})
 	return _c
 }
@@ -77,13 +77,13 @@ func (_c *SignalInterface_GetOrCreateSignal_Call) Return(_a0 *admin.Signal, _a1 
 	return _c
 }
 
-func (_c *SignalInterface_GetOrCreateSignal_Call) RunAndReturn(run func(context.Context, admin.SignalGetOrCreateRequest) (*admin.Signal, error)) *SignalInterface_GetOrCreateSignal_Call {
+func (_c *SignalInterface_GetOrCreateSignal_Call) RunAndReturn(run func(context.Context, *admin.SignalGetOrCreateRequest) (*admin.Signal, error)) *SignalInterface_GetOrCreateSignal_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // ListSignals provides a mock function with given fields: ctx, request
-func (_m *SignalInterface) ListSignals(ctx context.Context, request admin.SignalListRequest) (*admin.SignalList, error) {
+func (_m *SignalInterface) ListSignals(ctx context.Context, request *admin.SignalListRequest) (*admin.SignalList, error) {
 	ret := _m.Called(ctx, request)
 
 	if len(ret) == 0 {
@@ -92,10 +92,10 @@ func (_m *SignalInterface) ListSignals(ctx context.Context, request admin.Signal
 
 	var r0 *admin.SignalList
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, admin.SignalListRequest) (*admin.SignalList, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.SignalListRequest) (*admin.SignalList, error)); ok {
 		return rf(ctx, request)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, admin.SignalListRequest) *admin.SignalList); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.SignalListRequest) *admin.SignalList); ok {
 		r0 = rf(ctx, request)
 	} else {
 		if ret.Get(0) != nil {
@@ -103,7 +103,7 @@ func (_m *SignalInterface) ListSignals(ctx context.Context, request admin.Signal
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, admin.SignalListRequest) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.SignalListRequest) error); ok {
 		r1 = rf(ctx, request)
 	} else {
 		r1 = ret.Error(1)
@@ -119,14 +119,14 @@ type SignalInterface_ListSignals_Call struct {
 
 // ListSignals is a helper method to define mock.On call
 //   - ctx context.Context
-//   - request admin.SignalListRequest
+//   - request *admin.SignalListRequest
 func (_e *SignalInterface_Expecter) ListSignals(ctx interface{}, request interface{}) *SignalInterface_ListSignals_Call {
 	return &SignalInterface_ListSignals_Call{Call: _e.mock.On("ListSignals", ctx, request)}
 }
 
-func (_c *SignalInterface_ListSignals_Call) Run(run func(ctx context.Context, request admin.SignalListRequest)) *SignalInterface_ListSignals_Call {
+func (_c *SignalInterface_ListSignals_Call) Run(run func(ctx context.Context, request *admin.SignalListRequest)) *SignalInterface_ListSignals_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(admin.SignalListRequest))
+		run(args[0].(context.Context), args[1].(*admin.SignalListRequest))
 	})
 	return _c
 }
@@ -136,13 +136,13 @@ func (_c *SignalInterface_ListSignals_Call) Return(_a0 *admin.SignalList, _a1 er
 	return _c
 }
 
-func (_c *SignalInterface_ListSignals_Call) RunAndReturn(run func(context.Context, admin.SignalListRequest) (*admin.SignalList, error)) *SignalInterface_ListSignals_Call {
+func (_c *SignalInterface_ListSignals_Call) RunAndReturn(run func(context.Context, *admin.SignalListRequest) (*admin.SignalList, error)) *SignalInterface_ListSignals_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // SetSignal provides a mock function with given fields: ctx, request
-func (_m *SignalInterface) SetSignal(ctx context.Context, request admin.SignalSetRequest) (*admin.SignalSetResponse, error) {
+func (_m *SignalInterface) SetSignal(ctx context.Context, request *admin.SignalSetRequest) (*admin.SignalSetResponse, error) {
 	ret := _m.Called(ctx, request)
 
 	if len(ret) == 0 {
@@ -151,10 +151,10 @@ func (_m *SignalInterface) SetSignal(ctx context.Context, request admin.SignalSe
 
 	var r0 *admin.SignalSetResponse
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, admin.SignalSetRequest) (*admin.SignalSetResponse, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.SignalSetRequest) (*admin.SignalSetResponse, error)); ok {
 		return rf(ctx, request)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, admin.SignalSetRequest) *admin.SignalSetResponse); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.SignalSetRequest) *admin.SignalSetResponse); ok {
 		r0 = rf(ctx, request)
 	} else {
 		if ret.Get(0) != nil {
@@ -162,7 +162,7 @@ func (_m *SignalInterface) SetSignal(ctx context.Context, request admin.SignalSe
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, admin.SignalSetRequest) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.SignalSetRequest) error); ok {
 		r1 = rf(ctx, request)
 	} else {
 		r1 = ret.Error(1)
@@ -178,14 +178,14 @@ type SignalInterface_SetSignal_Call struct {
 
 // SetSignal is a helper method to define mock.On call
 //   - ctx context.Context
-//   - request admin.SignalSetRequest
+//   - request *admin.SignalSetRequest
 func (_e *SignalInterface_Expecter) SetSignal(ctx interface{}, request interface{}) *SignalInterface_SetSignal_Call {
 	return &SignalInterface_SetSignal_Call{Call: _e.mock.On("SetSignal", ctx, request)}
 }
 
-func (_c *SignalInterface_SetSignal_Call) Run(run func(ctx context.Context, request admin.SignalSetRequest)) *SignalInterface_SetSignal_Call {
+func (_c *SignalInterface_SetSignal_Call) Run(run func(ctx context.Context, request *admin.SignalSetRequest)) *SignalInterface_SetSignal_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(admin.SignalSetRequest))
+		run(args[0].(context.Context), args[1].(*admin.SignalSetRequest))
 	})
 	return _c
 }
@@ -195,7 +195,7 @@ func (_c *SignalInterface_SetSignal_Call) Return(_a0 *admin.SignalSetResponse, _
 	return _c
 }
 
-func (_c *SignalInterface_SetSignal_Call) RunAndReturn(run func(context.Context, admin.SignalSetRequest) (*admin.SignalSetResponse, error)) *SignalInterface_SetSignal_Call {
+func (_c *SignalInterface_SetSignal_Call) RunAndReturn(run func(context.Context, *admin.SignalSetRequest) (*admin.SignalSetResponse, error)) *SignalInterface_SetSignal_Call {
 	_c.Call.Return(run)
 	return _c
 }

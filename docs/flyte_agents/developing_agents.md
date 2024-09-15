@@ -197,10 +197,6 @@ you can route particular task requests to designated agent services by adjusting
 ```yaml
  plugins:
    agent-service:
-     supportedTaskTypes:
-       - bigquery_query_job_task
-       - default_task
-       - custom_task
      # By default, all requests will be sent to the default agent.
      defaultAgent:
        endpoint: "dns:///flyteagent.flyte.svc.cluster.local:8000"
