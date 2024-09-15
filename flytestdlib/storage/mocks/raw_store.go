@@ -200,39 +200,6 @@ func (_m RawStore_GetItems) Return(_a0 error) *RawStore_GetItems {
 	return &RawStore_GetItems{Call: _m.Call.Return(_a0)}
 }
 
-func (_m *RawStore) OnGetItems(ctx context.Context, reference storage.DataReference) *RawStore_GetItems {
-	c_call := _m.On("GetItems", ctx, reference)
-	return &RawStore_GetItems{Call: c_call}
-}
-
-func (_m *RawStore) OnGetItemsMatch(matchers ...interface{}) *RawStore_GetItems {
-	c_call := _m.On("GetItems", matchers...)
-	return &RawStore_GetItems{Call: c_call}
-}
-
-// GetItems provides a mock function with given fields: ctx, reference
-func (_m *RawStore) GetItems(ctx context.Context, reference storage.DataReference) ([]string, error) {
-	ret := _m.Called(ctx, reference)
-
-	var r0 []string
-	if rf, ok := ret.Get(0).(func(context.Context, storage.DataReference) []string); ok {
-		r0 = rf(ctx, reference)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]string)
-		}
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, storage.DataReference) error); ok {
-		r1 = rf(ctx, reference)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
 type RawStore_ReadRaw struct {
 	*mock.Call
 }
