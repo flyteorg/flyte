@@ -192,14 +192,6 @@ func (_m *RawStore) Head(ctx context.Context, reference storage.DataReference) (
 	return r0, r1
 }
 
-type RawStore_GetItems struct {
-	*mock.Call
-}
-
-func (_m RawStore_GetItems) Return(_a0 error) *RawStore_GetItems {
-	return &RawStore_GetItems{Call: _m.Call.Return(_a0)}
-}
-
 type RawStore_ReadRaw struct {
 	*mock.Call
 }
