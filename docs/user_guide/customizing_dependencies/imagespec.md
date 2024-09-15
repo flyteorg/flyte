@@ -10,7 +10,9 @@ This guide demonstrates how to use the `ImageSpec` to customize the container im
 
 `ImageSpec` is a mechanism that allows you to specify how to build a container image without requiring a Dockerfile.
 This feature provides a flexible and user-friendly way to define the containerization process.
-One of the significant advantages of using ImageSpec is the potential to build smaller, more efficient images at a faster speed.
+One of the significant advantages of using ImageSpec is its ability to optimize the image-building process by reusing previously
+downloaded packages from the PyPI and APT caches, thereby speeding up the entire build process.
+This efficient caching mechanism minimizes redundant downloads, reducing both the time and resources required to construct the container image.
 
 By default, the `ImageSpec` will be built using the `default` builder associated with Flytekit.
 However, you have the option to register your own builder, enabling you to build the image using alternative tools.
@@ -27,15 +29,6 @@ use the `container_image` parameter available in the {py:func}`flytekit.task` de
 Before building the image, Flytekit checks the container registry first to see if the image already exists.
 By doing so, it avoids having to rebuild the image over and over again. If the image does not exist,
 flytekit will build the image before registering the workflow, and replace the image name in the task template with the newly built image name.
-
-```{note}
-To clone and run the example code on this page, see the [Flytesnacks repo][flytesnacks].
-```
-
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/customizing_dependencies/customizing_dependencies/image_spec.py
-:caption: customizing_dependencies/image_spec.py
-:lines: 1-4
-```
 
 :::{admonition} Prerequisites
 :class: important
@@ -66,7 +59,7 @@ sklearn_image_spec = ImageSpec(
 )
 ```
 
-## Install the package from the specific channel with conda
+## Install Conda packages
 Define the ImageSpec to install packages from a specific conda channel.
 ```python
 image_spec = ImageSpec(
@@ -139,16 +132,6 @@ image_spec = ImageSpec(
 )
 ```
 
-### Build image in different architecture
-You can specify the platform in the `ImageSpec` to build the image in a different architecture, such as `linux/arm64` or `darwin/arm64`.
-```python
-image_spec = ImageSpec(
-  packages=["pandas"],
-  platform="linux/arm64",
-  registry="ghcr.io/flyteorg",
-)
-```
-
 ### Install packages from extra index
 CUDA can be installed by specifying the `pip_extra_index_url` in the `ImageSpec`.
 ```python
@@ -156,6 +139,16 @@ image_spec = ImageSpec(
   name="pytorch-mnist",
   packages=["torch", "torchvision", "flytekitplugins-kfpytorch"],
   pip_extra_index_url=["https://download.pytorch.org/whl/cu118"],
+  registry="ghcr.io/flyteorg",
+)
+```
+
+## Build an image in different architecture
+You can specify the platform in the `ImageSpec` to build the image in a different architecture, such as `linux/arm64` or `darwin/arm64`.
+```python
+image_spec = ImageSpec(
+  packages=["pandas"],
+  platform="linux/arm64",
   registry="ghcr.io/flyteorg",
 )
 ```
@@ -177,6 +170,7 @@ image_spec = ImageSpec(
 ## Customize the tag of the image
 You can customize the tag of the image by specifying the `tag_format` in the `ImageSpec`.
 In the following example, the full qualified image name will be `ghcr.io/flyteorg/my-image:<spec_hash>-dev`.
+
 ```python
 image_spec = ImageSpec(
   name="my-image",
@@ -187,7 +181,7 @@ image_spec = ImageSpec(
 ```
 
 ## Define ImageSpec in a YAML File
-There exists an option to override the container image by providing an Image Spec YAML file to the `pyflyte run` or `pyflyte register` command.
+There is an option to override the container image by providing an ImageSpec YAML file to the  `pyflyte run` or `pyflyte register` command.
 This allows for greater flexibility in specifying a custom container image. For example:
 
 ```yaml
@@ -205,6 +199,7 @@ env:
 pyflyte run --remote --image image.yaml image_spec.py wf
 ```
 
+## Build the image without registering the workflow
 If you only want to build the image without registering the workflow, you can use the `pyflyte build` command.
 
 ```
@@ -213,13 +208,13 @@ pyflyte build --remote image_spec.py wf
 
 ## Force Push an Image
 In some cases, you may want to force an image to rebuild, even if the image spec hasn’t changed.
-If you want to overwrite an existing image, you can pass the `FLYTE_FORCE_PUSH_IMAGE_SPEC=True` to `pyflyte` command or add `force_push()` to the ImageSpec.
+If you want to overwrite an existing image, you can pass the `FLYTE_FORCE_PUSH_IMAGE_SPEC=True` to `pyflyte` command.
 
 ```bash
 FLYTE_FORCE_PUSH_IMAGE_SPEC=True pyflyte run --remote image_spec.py wf
 ```
 
-or
+You can also force push an image in the Python code by calling the `force_push()` method.
 
 ```python
 image = ImageSpec(registry="ghcr.io/flyteorg", packages=["pandas"]).force_push()
