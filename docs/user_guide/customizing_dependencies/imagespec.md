@@ -159,10 +159,11 @@ You can install the flytekit from a specific commit hash in the `ImageSpec`.
 
 ```python
 new_flytekit = "git+https://github.com/flyteorg/flytekit@90a4455c2cc2b3e171dfff69f605f47d48ea1ff1"
+new_spark_plugins = f"git+https://github.com/flyteorg/flytekit.git@90a4455c2cc2b3e171dfff69f605f47d48ea1ff1#subdirectory=plugins/flytekit-spark"
 
 image_spec = ImageSpec(
   apt_packages=["git"],
-  packages=[new_flytekit],
+  packages=[new_flytekit, new_spark_plugins],
   registry="ghcr.io/flyteorg",
 )
 ```
