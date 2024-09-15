@@ -74,8 +74,8 @@ func (d *dummyStore) Head(ctx context.Context, reference DataReference) (Metadat
 	return d.HeadCb(ctx, reference)
 }
 
-func (d *dummyStore) GetItems(ctx context.Context, reference DataReference) ([]string, error) {
-	return d.GetItemsCb(ctx, reference)
+func (d *dummyStore) List(ctx context.Context, reference DataReference, maxItems int, cursor Cursor) ([]DataReference, Cursor, error) {
+	return nil, NewCursorAtEnd(), fmt.Errorf("Not implemented yet")
 }
 
 func (d *dummyStore) ReadRaw(ctx context.Context, reference DataReference) (io.ReadCloser, error) {

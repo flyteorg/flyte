@@ -92,6 +92,9 @@ type stowMetrics struct {
 	HeadFailure labeled.Counter
 	HeadLatency labeled.StopWatch
 
+	ListFailure labeled.Counter
+	ListLatency labeled.StopWatch
+
 	ReadFailure     labeled.Counter
 	ReadOpenLatency labeled.StopWatch
 
@@ -251,40 +254,44 @@ func (s *StowStore) Head(ctx context.Context, reference DataReference) (Metadata
 	return StowMetadata{exists: false}, errs.Wrapf(err, "path:%v", k)
 }
 
-func (s *StowStore) GetItems(ctx context.Context, reference DataReference) ([]string, error) {
-	scheme, c, k, err := reference.Split()
+func (s *StowStore) List(ctx context.Context, reference DataReference, maxItems int, cursor Cursor) ([]DataReference, Cursor, error) {
+	_, c, k, err := reference.Split()
 	if err != nil {
 		s.metrics.BadReference.Inc(ctx)
-		return nil, err
+		return nil, NewCursorAtEnd(), err
 	}
 
 	container, err := s.getContainer(ctx, locationIDMain, c)
 	if err != nil {
-		return nil, err
+		return nil, NewCursorAtEnd(), err
 	}
 
-	var items []string
-	cursor := stow.CursorStart
-
-	for {
-		// List items with the given key
-		pageItems, nextCursor, err := container.Items(k, cursor, 100)
-		if err != nil {
-			logger.Errorf(ctx, "failed to list container [%s] items with key [%s]", c, k)
-			return nil, err
-		}
-
-		for _, item := range pageItems {
-			URL := fmt.Sprintf("%s://%s/%s", scheme, c, item.URL().String())
-			items = append(items, URL)
-		}
-
-		if stow.IsCursorEnd(nextCursor) {
-			break
-		}
-		cursor = nextCursor
+	t := s.metrics.ListLatency.Start(ctx)
+	var stowCursor string
+	if cursor.cursorState == AtStartCursorState {
+		stowCursor = stow.CursorStart
+	} else if cursor.cursorState == AtEndCursorState {
+		return nil, NewCursorAtEnd(), fmt.Errorf("Cursor cannot be at end for the List call")
+	} else {
+		stowCursor = cursor.customPosition
 	}
-	return items, nil
+	items, stowCursor, err := container.Items(k, stowCursor, maxItems)
+	if err == nil {
+		results := make([]DataReference, len(items))
+		for index, item := range items {
+			results[index] = DataReference(item.URL().String())
+		}
+		if stow.IsCursorEnd(stowCursor) {
+			cursor = NewCursorAtEnd()
+		} else {
+			cursor = NewCursorFromCustomPosition(stowCursor)
+		}
+		t.Stop()
+		return results, cursor, nil
+	}
+
+	incFailureCounterForError(ctx, s.metrics.ListFailure, err)
+	return nil, NewCursorAtEnd(), errs.Wrapf(err, "path:%v", k)
 }
 
 func (s *StowStore) ReadRaw(ctx context.Context, reference DataReference) (io.ReadCloser, error) {
@@ -469,6 +476,9 @@ func newStowMetrics(scope promutils.Scope) *stowMetrics {
 
 		HeadFailure: labeled.NewCounter("head_failure", "Indicates failure in HEAD for a given reference", scope, labeled.EmitUnlabeledMetric),
 		HeadLatency: labeled.NewStopWatch("head", "Indicates time to fetch metadata using the Head API", time.Millisecond, scope, labeled.EmitUnlabeledMetric),
+
+		ListFailure: labeled.NewCounter("list_failure", "Indicates failure in item listing for a given reference", scope, labeled.EmitUnlabeledMetric),
+		ListLatency: labeled.NewStopWatch("list", "Indicates time to fetch item listing using the List API", time.Millisecond, scope, labeled.EmitUnlabeledMetric),
 
 		ReadFailure:     labeled.NewCounter("read_failure", "Indicates failure in GET for a given reference", scope, labeled.EmitUnlabeledMetric, failureTypeOption),
 		ReadOpenLatency: labeled.NewStopWatch("read_open", "Indicates time to first byte when reading", time.Millisecond, scope, labeled.EmitUnlabeledMetric),

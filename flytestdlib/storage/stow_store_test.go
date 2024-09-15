@@ -10,7 +10,8 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
-	"strings"
+	"sort"
+	"strconv"
 	"testing"
 	"time"
 
@@ -75,15 +76,36 @@ func (m mockStowContainer) Item(id string) (stow.Item, error) {
 }
 
 func (m mockStowContainer) Items(prefix, cursor string, count int) ([]stow.Item, string, error) {
-	var result []stow.Item
-	// Ignore cursor and count
-	for id, item := range m.items {
-		if strings.HasPrefix(id, prefix+"/") {
-			result = append(result, item)
+	startIndex := 0
+	if cursor != "" {
+		index, err := strconv.Atoi(cursor)
+		if err != nil {
+			return nil, "", fmt.Errorf("Invalid cursor '%s'", cursor)
 		}
+		startIndex = index
+	}
+	endIndexExc := min(len(m.items), startIndex+count)
+
+	itemKeys := make([]string, len(m.items))
+	index := 0
+	for key := range m.items {
+		itemKeys[index] = key
+		index++
+	}
+	sort.Strings(itemKeys)
+
+	numItems := endIndexExc - startIndex
+	results := make([]stow.Item, numItems)
+	for index, itemKey := range itemKeys[startIndex:endIndexExc] {
+		results[index] = m.items[itemKey]
 	}
 
-	return result, "", nil
+	if endIndexExc == len(m.items) {
+		cursor = ""
+	} else {
+		cursor = fmt.Sprintf("%d", endIndexExc)
+	}
+	return results, cursor, nil
 }
 
 func (m mockStowContainer) RemoveItem(id string) error {
@@ -497,6 +519,67 @@ func TestStowStore_ReadRaw(t *testing.T) {
 		assert.Error(t, err)
 		_, err = s.ReadRaw(context.TODO(), "s3://bad-container/path")
 		assert.Error(t, err)
+	})
+}
+
+func TestStowStore_List(t *testing.T) {
+	const container = "container"
+	t.Run("Listing", func(t *testing.T) {
+		ctx := context.Background()
+		fn := fQNFn["s3"]
+		s, err := NewStowRawStore(fn(container), &mockStowLoc{
+			ContainerCb: func(id string) (stow.Container, error) {
+				if id == container {
+					return newMockStowContainer(container), nil
+				}
+				return nil, fmt.Errorf("container is not supported")
+			},
+			CreateContainerCb: func(name string) (stow.Container, error) {
+				if name == container {
+					return newMockStowContainer(container), nil
+				}
+				return nil, fmt.Errorf("container is not supported")
+			},
+		}, nil, false, metrics)
+		assert.NoError(t, err)
+		writeTestFile(ctx, t, s, "s3://container/a/1")
+		writeTestFile(ctx, t, s, "s3://container/a/2")
+		var maxResults = 10
+		var dataReference DataReference = "s3://container/a"
+		items, cursor, err := s.List(ctx, dataReference, maxResults, NewCursorAtStart())
+		assert.NoError(t, err)
+		assert.Equal(t, NewCursorAtEnd(), cursor)
+		assert.Equal(t, []DataReference{"a/1", "a/2"}, items)
+	})
+
+	t.Run("Listing with pagination", func(t *testing.T) {
+		ctx := context.Background()
+		fn := fQNFn["s3"]
+		s, err := NewStowRawStore(fn(container), &mockStowLoc{
+			ContainerCb: func(id string) (stow.Container, error) {
+				if id == container {
+					return newMockStowContainer(container), nil
+				}
+				return nil, fmt.Errorf("container is not supported")
+			},
+			CreateContainerCb: func(name string) (stow.Container, error) {
+				if name == container {
+					return newMockStowContainer(container), nil
+				}
+				return nil, fmt.Errorf("container is not supported")
+			},
+		}, nil, false, metrics)
+		assert.NoError(t, err)
+		writeTestFile(ctx, t, s, "s3://container/a/1")
+		writeTestFile(ctx, t, s, "s3://container/a/2")
+		var maxResults = 1
+		var dataReference DataReference = "s3://container/a"
+		items, cursor, err := s.List(ctx, dataReference, maxResults, NewCursorAtStart())
+		assert.NoError(t, err)
+		assert.Equal(t, []DataReference{"a/1"}, items)
+		items, _, err = s.List(ctx, dataReference, maxResults, cursor)
+		assert.NoError(t, err)
+		assert.Equal(t, []DataReference{"a/2"}, items)
 	})
 }
 

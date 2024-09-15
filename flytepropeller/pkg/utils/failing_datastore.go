@@ -27,8 +27,8 @@ func (FailingRawStore) Head(ctx context.Context, reference storage.DataReference
 	return nil, fmt.Errorf("failed metadata fetch")
 }
 
-func (FailingRawStore) GetItems(ctx context.Context, reference storage.DataReference) ([]string, error) {
-	return nil, fmt.Errorf("failed get items")
+func (FailingRawStore) List(ctx context.Context, reference storage.DataReference, maxItems int, cursor storage.Cursor) ([]storage.DataReference, storage.Cursor, error) {
+	return nil, storage.NewCursorAtEnd(), fmt.Errorf("Not implemented yet")
 }
 
 func (FailingRawStore) ReadRaw(ctx context.Context, reference storage.DataReference) (io.ReadCloser, error) {

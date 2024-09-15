@@ -55,21 +55,8 @@ func (s *InMemoryStore) Head(ctx context.Context, reference DataReference) (Meta
 	}, nil
 }
 
-func (s *InMemoryStore) GetItems(ctx context.Context, reference DataReference) ([]string, error) {
-	var items []string
-	prefix := string(reference) + "/"
-
-	for key := range s.cache {
-		if strings.HasPrefix(key.String(), prefix) {
-			items = append(items, key.String())
-		}
-	}
-
-	if len(items) == 0 {
-		return nil, os.ErrNotExist
-	}
-
-	return items, nil
+func (s *InMemoryStore) List(ctx context.Context, reference DataReference, maxItems int, cursor Cursor) ([]DataReference, Cursor, error) {
+	return nil, NewCursorAtEnd(), fmt.Errorf("Not implemented yet")
 }
 
 func (s *InMemoryStore) ReadRaw(ctx context.Context, reference DataReference) (io.ReadCloser, error) {

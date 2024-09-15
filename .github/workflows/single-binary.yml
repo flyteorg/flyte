@@ -94,7 +94,7 @@ jobs:
           file: Dockerfile
           outputs: type=docker,dest=docker/sandbox-bundled/images/tar/amd64/flyte-binary.tar
       - name: Upload single binary image
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: single-binary-image
           path: docker/sandbox-bundled/images/tar
@@ -133,7 +133,7 @@ jobs:
           echo "FLYTESNACKS_VERSION=${FLYTESNACKS_VERSION}" >> ${GITHUB_ENV}
       - name: Checkout
         uses: actions/checkout@v4
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: single-binary-image
           path: docker/sandbox-bundled/images/tar
@@ -207,7 +207,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: single-binary-image
           path: docker/sandbox-bundled/images/tar
