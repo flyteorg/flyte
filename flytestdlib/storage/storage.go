@@ -76,10 +76,7 @@ func NewCursorFromCustomPosition(customPosition string) Cursor {
 }
 
 func IsCursorEnd(cursor Cursor) bool {
-	if cursor.cursorState == AtEndCursorState {
-		return true
-	}
-	return false
+	return cursor.cursorState == AtEndCursorState
 }
 
 // DataStore is a simplified interface for accessing and storing data in one of the Cloud stores.
