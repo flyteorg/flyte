@@ -54,7 +54,7 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 			for _, item := range items {
 				keys = append(keys, item.String())
 			}
-			if cursor.cursorState == storage.AtEndCursorState {
+			if storage.IsCursorEnd(cursor) {
 				break
 			}
 		}
