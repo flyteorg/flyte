@@ -95,16 +95,16 @@ func TestCreateClient(t *testing.T) {
 		MinVersion:         tls.VersionTLS13,
 	}
 
-	smtpClient := notification_mocks.NewSMTPClient(t)
-	smtpClient.EXPECT().Hello("localhost").Return(nil).Times(1)
-	smtpClient.EXPECT().Extension("STARTTLS").Return(true, "").Times(1)
-	smtpClient.EXPECT().StartTLS(&tls.Config{
+	smtpClient := &notification_mocks.SMTPClient{}
+	smtpClient.On("Hello", "localhost").Return(nil)
+	smtpClient.On("Extension", "STARTTLS").Return(true, "")
+	smtpClient.On("StartTLS", &tls.Config{
 		InsecureSkipVerify: false,
 		ServerName:         "localhost",
 		MinVersion:         tls.VersionTLS13,
-	}).Return(nil).Times(1)
-	smtpClient.EXPECT().Extension("AUTH").Return(true, "").Times(1)
-	smtpClient.EXPECT().Auth(auth).Return(nil).Times(1)
+	}).Return(nil)
+	smtpClient.On("Extension", "AUTH").Return(true, "")
+	smtpClient.On("Auth", auth).Return(nil)
 
 	smtpEmailer := createSMTPEmailer(smtpClient, &tlsConf, &auth, nil)
 
@@ -124,7 +124,7 @@ func TestCreateClientErrorCreatingClient(t *testing.T) {
 		MinVersion:         tls.VersionTLS13,
 	}
 
-	smtpClient := notification_mocks.NewSMTPClient(t)
+	smtpClient := &notification_mocks.SMTPClient{}
 
 	smtpEmailer := createSMTPEmailer(smtpClient, &tlsConf, &auth, errors.New("error creating client"))
 
@@ -144,8 +144,8 @@ func TestCreateClientErrorHello(t *testing.T) {
 		MinVersion:         tls.VersionTLS13,
 	}
 
-	smtpClient := notification_mocks.NewSMTPClient(t)
-	smtpClient.EXPECT().Hello("localhost").Return(errors.New("Error with hello")).Times(1)
+	smtpClient := &notification_mocks.SMTPClient{}
+	smtpClient.On("Hello", "localhost").Return(errors.New("Error with hello"))
 
 	smtpEmailer := createSMTPEmailer(smtpClient, &tlsConf, &auth, nil)
 
@@ -165,10 +165,10 @@ func TestCreateClientErrorStartTLS(t *testing.T) {
 		MinVersion:         tls.VersionTLS13,
 	}
 
-	smtpClient := notification_mocks.NewSMTPClient(t)
-	smtpClient.EXPECT().Hello("localhost").Return(nil).Times(1)
-	smtpClient.EXPECT().Extension("STARTTLS").Return(true, "").Times(1)
-	smtpClient.EXPECT().StartTLS(&tls.Config{
+	smtpClient := &notification_mocks.SMTPClient{}
+	smtpClient.On("Hello", "localhost").Return(nil).Times(1)
+	smtpClient.On("Extension", "STARTTLS").Return(true, "").Times(1)
+	smtpClient.On("StartTLS", &tls.Config{
 		InsecureSkipVerify: false,
 		ServerName:         "localhost",
 		MinVersion:         tls.VersionTLS13,
@@ -192,16 +192,16 @@ func TestCreateClientErrorAuth(t *testing.T) {
 		MinVersion:         tls.VersionTLS13,
 	}
 
-	smtpClient := notification_mocks.NewSMTPClient(t)
-	smtpClient.EXPECT().Hello("localhost").Return(nil).Times(1)
-	smtpClient.EXPECT().Extension("STARTTLS").Return(true, "").Times(1)
-	smtpClient.EXPECT().StartTLS(&tls.Config{
+	smtpClient := &notification_mocks.SMTPClient{}
+	smtpClient.On("Hello", "localhost").Return(nil).Times(1)
+	smtpClient.On("Extension", "STARTTLS").Return(true, "").Times(1)
+	smtpClient.On("StartTLS", &tls.Config{
 		InsecureSkipVerify: false,
 		ServerName:         "localhost",
 		MinVersion:         tls.VersionTLS13,
 	}).Return(nil).Times(1)
-	smtpClient.EXPECT().Extension("AUTH").Return(true, "").Times(1)
-	smtpClient.EXPECT().Auth(auth).Return(errors.New("Error with hello")).Times(1)
+	smtpClient.On("Extension", "AUTH").Return(true, "").Times(1)
+	smtpClient.On("Auth", auth).Return(errors.New("Error with hello")).Times(1)
 
 	smtpEmailer := createSMTPEmailer(smtpClient, &tlsConf, &auth, nil)
 
@@ -223,22 +223,22 @@ func TestSendMail(t *testing.T) {
 
 	stringWriter := StringWriter{buffer: ""}
 
-	smtpClient := notification_mocks.NewSMTPClient(t)
-	smtpClient.EXPECT().Noop().Return(errors.New("no connection")).Times(1)
-	smtpClient.EXPECT().Close().Return(nil).Times(1)
-	smtpClient.EXPECT().Hello("localhost").Return(nil).Times(1)
-	smtpClient.EXPECT().Extension("STARTTLS").Return(true, "").Times(1)
-	smtpClient.EXPECT().StartTLS(&tls.Config{
+	smtpClient := &notification_mocks.SMTPClient{}
+	smtpClient.On("Noop").Return(errors.New("no connection")).Times(1)
+	smtpClient.On("Close").Return(nil).Times(1)
+	smtpClient.On("Hello", "localhost").Return(nil).Times(1)
+	smtpClient.On("Extension", "STARTTLS").Return(true, "").Times(1)
+	smtpClient.On("StartTLS", &tls.Config{
 		InsecureSkipVerify: false,
 		ServerName:         "localhost",
 		MinVersion:         tls.VersionTLS13,
 	}).Return(nil).Times(1)
-	smtpClient.EXPECT().Extension("AUTH").Return(true, "").Times(1)
-	smtpClient.EXPECT().Auth(auth).Return(nil).Times(1)
-	smtpClient.EXPECT().Mail("flyte@flyte.org").Return(nil).Times(1)
-	smtpClient.EXPECT().Rcpt("alice@flyte.org").Return(nil).Times(1)
-	smtpClient.EXPECT().Rcpt("bob@flyte.org").Return(nil).Times(1)
-	smtpClient.EXPECT().Data().Return(&stringWriter, nil).Times(1)
+	smtpClient.On("Extension", "AUTH").Return(true, "").Times(1)
+	smtpClient.On("Auth", auth).Return(nil).Times(1)
+	smtpClient.On("Mail", "flyte@flyte.org").Return(nil).Times(1)
+	smtpClient.On("Rcpt", "alice@flyte.org").Return(nil).Times(1)
+	smtpClient.On("Rcpt", "bob@flyte.org").Return(nil).Times(1)
+	smtpClient.On("Data").Return(&stringWriter, nil).Times(1)
 
 	smtpEmailer := createSMTPEmailer(smtpClient, &tlsConf, &auth, nil)
 
@@ -266,10 +266,10 @@ func TestSendMailCreateClientError(t *testing.T) {
 		MinVersion:         tls.VersionTLS13,
 	}
 
-	smtpClient := notification_mocks.NewSMTPClient(t)
-	smtpClient.EXPECT().Noop().Return(errors.New("no connection")).Times(1)
-	smtpClient.EXPECT().Close().Return(nil).Times(1)
-	smtpClient.EXPECT().Hello("localhost").Return(errors.New("error hello")).Times(1)
+	smtpClient := &notification_mocks.SMTPClient{}
+	smtpClient.On("Noop").Return(errors.New("no connection")).Times(1)
+	smtpClient.On("Close").Return(nil).Times(1)
+	smtpClient.On("Hello", "localhost").Return(errors.New("error hello")).Times(1)
 
 	smtpEmailer := createSMTPEmailer(smtpClient, &tlsConf, &auth, nil)
 
@@ -292,19 +292,19 @@ func TestSendMailErrorMail(t *testing.T) {
 		MinVersion:         tls.VersionTLS13,
 	}
 
-	smtpClient := notification_mocks.NewSMTPClient(t)
-	smtpClient.EXPECT().Noop().Return(errors.New("no connection")).Times(1)
-	smtpClient.EXPECT().Close().Return(nil).Times(1)
-	smtpClient.EXPECT().Hello("localhost").Return(nil).Times(1)
-	smtpClient.EXPECT().Extension("STARTTLS").Return(true, "").Times(1)
-	smtpClient.EXPECT().StartTLS(&tls.Config{
+	smtpClient := &notification_mocks.SMTPClient{}
+	smtpClient.On("Noop").Return(errors.New("no connection")).Times(1)
+	smtpClient.On("Close").Return(nil).Times(1)
+	smtpClient.On("Hello", "localhost").Return(nil).Times(1)
+	smtpClient.On("Extension", "STARTTLS").Return(true, "").Times(1)
+	smtpClient.On("StartTLS", &tls.Config{
 		InsecureSkipVerify: false,
 		ServerName:         "localhost",
 		MinVersion:         tls.VersionTLS13,
 	}).Return(nil).Times(1)
-	smtpClient.EXPECT().Extension("AUTH").Return(true, "").Times(1)
-	smtpClient.EXPECT().Auth(auth).Return(nil).Times(1)
-	smtpClient.EXPECT().Mail("flyte@flyte.org").Return(errors.New("error sending mail")).Times(1)
+	smtpClient.On("Extension", "AUTH").Return(true, "").Times(1)
+	smtpClient.On("Auth", auth).Return(nil).Times(1)
+	smtpClient.On("Mail", "flyte@flyte.org").Return(errors.New("error sending mail")).Times(1)
 
 	smtpEmailer := createSMTPEmailer(smtpClient, &tlsConf, &auth, nil)
 
@@ -327,20 +327,20 @@ func TestSendMailErrorRecipient(t *testing.T) {
 		MinVersion:         tls.VersionTLS13,
 	}
 
-	smtpClient := notification_mocks.NewSMTPClient(t)
-	smtpClient.EXPECT().Noop().Return(errors.New("no connection")).Times(1)
-	smtpClient.EXPECT().Close().Return(nil).Times(1)
-	smtpClient.EXPECT().Hello("localhost").Return(nil).Times(1)
-	smtpClient.EXPECT().Extension("STARTTLS").Return(true, "").Times(1)
-	smtpClient.EXPECT().StartTLS(&tls.Config{
+	smtpClient := &notification_mocks.SMTPClient{}
+	smtpClient.On("Noop").Return(errors.New("no connection")).Times(1)
+	smtpClient.On("Close").Return(nil).Times(1)
+	smtpClient.On("Hello", "localhost").Return(nil).Times(1)
+	smtpClient.On("Extension", "STARTTLS").Return(true, "").Times(1)
+	smtpClient.On("StartTLS", &tls.Config{
 		InsecureSkipVerify: false,
 		ServerName:         "localhost",
 		MinVersion:         tls.VersionTLS13,
 	}).Return(nil).Times(1)
-	smtpClient.EXPECT().Extension("AUTH").Return(true, "").Times(1)
-	smtpClient.EXPECT().Auth(auth).Return(nil).Times(1)
-	smtpClient.EXPECT().Mail("flyte@flyte.org").Return(nil).Times(1)
-	smtpClient.EXPECT().Rcpt("alice@flyte.org").Return(errors.New("error adding recipient")).Times(1)
+	smtpClient.On("Extension", "AUTH").Return(true, "").Times(1)
+	smtpClient.On("Auth", auth).Return(nil).Times(1)
+	smtpClient.On("Mail", "flyte@flyte.org").Return(nil).Times(1)
+	smtpClient.On("Rcpt", "alice@flyte.org").Return(errors.New("error adding recipient")).Times(1)
 
 	smtpEmailer := createSMTPEmailer(smtpClient, &tlsConf, &auth, nil)
 
@@ -363,22 +363,22 @@ func TestSendMailErrorData(t *testing.T) {
 		MinVersion:         tls.VersionTLS13,
 	}
 
-	smtpClient := notification_mocks.NewSMTPClient(t)
-	smtpClient.EXPECT().Noop().Return(errors.New("no connection")).Times(1)
-	smtpClient.EXPECT().Close().Return(nil).Times(1)
-	smtpClient.EXPECT().Hello("localhost").Return(nil).Times(1)
-	smtpClient.EXPECT().Extension("STARTTLS").Return(true, "").Times(1)
-	smtpClient.EXPECT().StartTLS(&tls.Config{
+	smtpClient := &notification_mocks.SMTPClient{}
+	smtpClient.On("Noop").Return(errors.New("no connection")).Times(1)
+	smtpClient.On("Close").Return(nil).Times(1)
+	smtpClient.On("Hello", "localhost").Return(nil).Times(1)
+	smtpClient.On("Extension", "STARTTLS").Return(true, "").Times(1)
+	smtpClient.On("StartTLS", &tls.Config{
 		InsecureSkipVerify: false,
 		ServerName:         "localhost",
 		MinVersion:         tls.VersionTLS13,
 	}).Return(nil).Times(1)
-	smtpClient.EXPECT().Extension("AUTH").Return(true, "").Times(1)
-	smtpClient.EXPECT().Auth(auth).Return(nil).Times(1)
-	smtpClient.EXPECT().Mail("flyte@flyte.org").Return(nil).Times(1)
-	smtpClient.EXPECT().Rcpt("alice@flyte.org").Return(nil).Times(1)
-	smtpClient.EXPECT().Rcpt("bob@flyte.org").Return(nil).Times(1)
-	smtpClient.EXPECT().Data().Return(nil, errors.New("error creating data writer")).Times(1)
+	smtpClient.On("Extension", "AUTH").Return(true, "").Times(1)
+	smtpClient.On("Auth", auth).Return(nil).Times(1)
+	smtpClient.On("Mail", "flyte@flyte.org").Return(nil).Times(1)
+	smtpClient.On("Rcpt", "alice@flyte.org").Return(nil).Times(1)
+	smtpClient.On("Rcpt", "bob@flyte.org").Return(nil).Times(1)
+	smtpClient.On("Data").Return(nil, errors.New("error creating data writer")).Times(1)
 
 	smtpEmailer := createSMTPEmailer(smtpClient, &tlsConf, &auth, nil)
 
@@ -404,22 +404,22 @@ func TestSendMailErrorWriting(t *testing.T) {
 
 	stringWriter := StringWriter{buffer: "", writeErr: errors.New("error writing"), closeErr: nil}
 
-	smtpClient := notification_mocks.NewSMTPClient(t)
-	smtpClient.EXPECT().Noop().Return(errors.New("no connection")).Times(1)
-	smtpClient.EXPECT().Close().Return(nil).Times(1)
-	smtpClient.EXPECT().Hello("localhost").Return(nil).Times(1)
-	smtpClient.EXPECT().Extension("STARTTLS").Return(true, "").Times(1)
-	smtpClient.EXPECT().StartTLS(&tls.Config{
+	smtpClient := &notification_mocks.SMTPClient{}
+	smtpClient.On("Noop").Return(errors.New("no connection")).Times(1)
+	smtpClient.On("Close").Return(nil).Times(1)
+	smtpClient.On("Hello", "localhost").Return(nil).Times(1)
+	smtpClient.On("Extension", "STARTTLS").Return(true, "").Times(1)
+	smtpClient.On("StartTLS", &tls.Config{
 		InsecureSkipVerify: false,
 		ServerName:         "localhost",
 		MinVersion:         tls.VersionTLS13,
 	}).Return(nil).Times(1)
-	smtpClient.EXPECT().Extension("AUTH").Return(true, "").Times(1)
-	smtpClient.EXPECT().Auth(auth).Return(nil).Times(1)
-	smtpClient.EXPECT().Mail("flyte@flyte.org").Return(nil).Times(1)
-	smtpClient.EXPECT().Rcpt("alice@flyte.org").Return(nil).Times(1)
-	smtpClient.EXPECT().Rcpt("bob@flyte.org").Return(nil).Times(1)
-	smtpClient.EXPECT().Data().Return(&stringWriter, nil).Times(1)
+	smtpClient.On("Extension", "AUTH").Return(true, "").Times(1)
+	smtpClient.On("Auth", auth).Return(nil).Times(1)
+	smtpClient.On("Mail", "flyte@flyte.org").Return(nil).Times(1)
+	smtpClient.On("Rcpt", "alice@flyte.org").Return(nil).Times(1)
+	smtpClient.On("Rcpt", "bob@flyte.org").Return(nil).Times(1)
+	smtpClient.On("Data").Return(&stringWriter, nil).Times(1)
 
 	smtpEmailer := createSMTPEmailer(smtpClient, &tlsConf, &auth, nil)
 
@@ -445,22 +445,22 @@ func TestSendMailErrorClose(t *testing.T) {
 
 	stringWriter := StringWriter{buffer: "", writeErr: nil, closeErr: errors.New("error writing")}
 
-	smtpClient := notification_mocks.NewSMTPClient(t)
-	smtpClient.EXPECT().Noop().Return(errors.New("no connection")).Times(1)
-	smtpClient.EXPECT().Close().Return(nil).Times(1)
-	smtpClient.EXPECT().Hello("localhost").Return(nil).Times(1)
-	smtpClient.EXPECT().Extension("STARTTLS").Return(true, "").Times(1)
-	smtpClient.EXPECT().StartTLS(&tls.Config{
+	smtpClient := &notification_mocks.SMTPClient{}
+	smtpClient.On("Noop").Return(errors.New("no connection")).Times(1)
+	smtpClient.On("Close").Return(nil).Times(1)
+	smtpClient.On("Hello", "localhost").Return(nil).Times(1)
+	smtpClient.On("Extension", "STARTTLS").Return(true, "").Times(1)
+	smtpClient.On("StartTLS", &tls.Config{
 		InsecureSkipVerify: false,
 		ServerName:         "localhost",
 		MinVersion:         tls.VersionTLS13,
 	}).Return(nil).Times(1)
-	smtpClient.EXPECT().Extension("AUTH").Return(true, "").Times(1)
-	smtpClient.EXPECT().Auth(auth).Return(nil).Times(1)
-	smtpClient.EXPECT().Mail("flyte@flyte.org").Return(nil).Times(1)
-	smtpClient.EXPECT().Rcpt("alice@flyte.org").Return(nil).Times(1)
-	smtpClient.EXPECT().Rcpt("bob@flyte.org").Return(nil).Times(1)
-	smtpClient.EXPECT().Data().Return(&stringWriter, nil).Times(1)
+	smtpClient.On("Extension", "AUTH").Return(true, "").Times(1)
+	smtpClient.On("Auth", auth).Return(nil).Times(1)
+	smtpClient.On("Mail", "flyte@flyte.org").Return(nil).Times(1)
+	smtpClient.On("Rcpt", "alice@flyte.org").Return(nil).Times(1)
+	smtpClient.On("Rcpt", "bob@flyte.org").Return(nil).Times(1)
+	smtpClient.On("Data").Return(&stringWriter, nil).Times(1)
 
 	smtpEmailer := createSMTPEmailer(smtpClient, &tlsConf, &auth, nil)
 
