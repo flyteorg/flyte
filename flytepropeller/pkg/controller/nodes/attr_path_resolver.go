@@ -96,7 +96,7 @@ func resolveAttrPathInBinary(nodeID string, binaryIDL *core.Binary, bindAttrPath
 	Literal,
 	error) {
 
-	//binaryBytes := binaryIDL.GetValue()
+	binaryBytes := binaryIDL.GetValue()
 	serializationFormat := binaryIDL.GetTag()
 
 	var currVal interface{}
@@ -104,7 +104,7 @@ func resolveAttrPathInBinary(nodeID string, binaryIDL *core.Binary, bindAttrPath
 	var exist bool
 
 	if serializationFormat == "msgpack" {
-		err := msgpack.Unmarshal(binaryIDL.GetValue(), &currVal)
+		err := msgpack.Unmarshal(binaryBytes, &currVal)
 		if err != nil {
 			return nil, err
 
@@ -134,13 +134,13 @@ func resolveAttrPathInBinary(nodeID string, binaryIDL *core.Binary, bindAttrPath
 		}
 	}
 
-	// After resolving, convert the interface to a binary-encoded literal
 	if serializationFormat == "msgpack" {
-		// Marshal the current value to JSON bytes
+		// Marshal the current value to MessagePack bytes
 		resolvedBinaryBytes, err := msgpack.Marshal(currVal)
 		if err != nil {
 			return nil, err
 		}
+		// Construct and return the binary-encoded literal
 		return constructResolvedBinary(resolvedBinaryBytes, serializationFormat), nil
 	} else {
 		// Unsupported serialization format
