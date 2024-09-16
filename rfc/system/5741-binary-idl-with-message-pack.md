@@ -506,8 +506,17 @@ None, it's doable.
 ## 7 Potential Impact and Dependencies
 None.
 
-## 8 Unresolved questions
-None.
+## 8. Unresolved Questions
+
+Currently, our support for `DataClass/BaseModel/Dict[type, type]` within conditional branches is incomplete. At present, we only support comparisons of primitive types. However, there are two key challenges when attempting to handle these more complex types:
+
+1. **Primitive Type Comparison vs. Binary IDL Object:**
+   - In conditional branches, we receive a `Binary IDL Object` during type comparison, which needs to be converted into a `Primitive IDL Object`. 
+   - The issue is that we don't know the expected Python type or primitive type beforehand, making this conversion ambiguous.
+
+2. **MsgPack Incompatibility with `Primitive_Datetime` and `Primitive_Duration`:**
+   - MsgPack does not natively support the `Primitive_Datetime` and `Primitive_Duration` types, and instead converts them to strings.
+   - This can lead to inconsistencies in comparison logic. One potential workaround is to convert both types to strings for comparison. However, it is uncertain whether this approach is the best solution.
 
 ## 9 Conclusion
 MsgPack is a good choice because it's more smaller and faster than UTF-8 Encoded JSON String.
