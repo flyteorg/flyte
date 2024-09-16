@@ -547,7 +547,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			return handler.UnknownTransition, fmt.Errorf("worker error(s) encountered: %s", workerErrorCollector.Summary(events.MaxErrorMessageLength))
 		}
 
-		// only offload literal if canOffloadLiteral is true which currently checks if the sdk is compatible to use with this backend change.
+		// only offload literal if config is enabled for this feature.
 		if a.literalOffloadingConfig.Enabled {
 			for outputLiteralKey, outputLiteral := range outputLiterals {
 				// if the size of the output Literal is > threshold then we write the literal to the offloaded store and populate the literal with its zero value and update the offloaded url
