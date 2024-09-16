@@ -172,6 +172,23 @@ templates_path = ["_templates"]
 pygments_style = "tango"
 pygments_dark_style = "native"
 
+html_context = {
+    "dir_to_title": {
+        "api": "API",
+        "cluster_deployment": "Cluster deployment",
+        "community": "Community",
+        "concepts": "Flyte concepts",
+        "ecosystem": "Ecosystem",
+        "integrations": "Integrations",
+        "tutorials": "Tutorials",
+        "user_guide": "User guide",
+    },
+    "github_user": "flyteorg",
+    "github_repo": "flyte",
+    "github_version": "master",
+    "doc_path": "docs",
+}
+
 html_theme_options = {
     # custom flyteorg pydata theme options
     "github_url": "https://github.com/flyteorg/flyte",
@@ -180,7 +197,9 @@ html_theme_options = {
             "name": "GitHub",
             "url": "https://github.com/flyteorg/flyte",
         }
-    ]
+    ],
+    "use_edit_page_button": True,
+    "secondary_sidebar_items": ["page-toc", "edit-this-page"]
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
@@ -205,19 +224,6 @@ html_sidebars = {
     "flytesnacks/integrations/**": ["sidebars/integrations"],
     "flytesnacks/tutorials/**": ["sidebars/tutorials"],
     "user_guide/**": ["sidebars/custom"]
-}
-
-html_context = {
-    "dir_to_title": {
-        "api": "API",
-        "cluster_deployment": "Cluster deployment",
-        "community": "Community",
-        "concepts": "Flyte concepts",
-        "ecosystem": "Ecosystem",
-        "integrations": "Integrations",
-        "tutorials": "Tutorials",
-        "user_guide": "User guide"
-    }
 }
 
 # -- Options for HTMLHelp output ---------------------------------------------
@@ -300,7 +306,7 @@ intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
     "numpy": ("https://numpy.org/doc/stable", None),
     "pandas": ("https://pandas.pydata.org/pandas-docs/stable/", None),
-    "torch": ("https://pytorch.org/docs/master/", None),
+    "torch": ("https://pytorch.org/docs/main/", None),
     "scipy": ("https://docs.scipy.org/doc/scipy/", None),
     "matplotlib": ("https://matplotlib.org/stable/", None),
     "pandera": ("https://pandera.readthedocs.io/en/stable/", None),
