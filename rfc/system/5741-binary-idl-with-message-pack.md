@@ -27,11 +27,19 @@ Use `bytes` in `Binary` instead of `Protobuf struct`.
 |-----------------------------------|----------------------------------------------|
 | Protobuf Struct -> JSON String -> Python Val | Binary (value: MessagePack Bytes, tag: msgpack) IDL Object -> Bytes -> (Dict ->) -> Python Val |
 
-Note: if a python value can't directly be converted to `MessagePack Bytes`, we can convert it to `Dict`, and then convert it to `MessagePack Bytes`.
 
-For example, the pydantic to literal function will be `BaseModel` -> `dict` -> `MessagePack Bytes` -> `Binary (value: MessagePack Bytes, tag: msgpack) IDL Object`.
+Note:
 
-For pure `dict` in python, the to literal function will be `dict` -> `MessagePack Bytes` -> `Binary (value: MessagePack Bytes, tag: msgpack) IDL Object`.
+1. If a Python value can't be directly converted to `MessagePack Bytes`, we can first convert it to a `Dict`, and then convert it to `MessagePack Bytes`.
+
+   - **For example:** The Pydantic-to-literal function workflow will be:
+     `BaseModel` -> `dict` -> `MessagePack Bytes` -> `Binary (value: MessagePack Bytes, tag: msgpack) IDL Object`.
+
+   - **For pure `dict` in Python:** The to-literal function workflow will be:
+     `dict` -> `MessagePack Bytes` -> `Binary (value: MessagePack Bytes, tag: msgpack) IDL Object`.
+
+2. There is **NO JSON** involved in the new type at all. Only **JSON Schema** is used to construct `DataClass` or `Pydantic BaseModel`.
+
 
 ### Literal Type
 Literal Type will be `Protobuf struct`.
