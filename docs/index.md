@@ -121,7 +121,7 @@ Have questions or need support? The best way to reach us is through Slack:
   - Tell us about yourself. We'd love to know about you and what brings you to Flyte.
 * - [💭 Share ideas](https://flyte-org.slack.com/archives/CPQ3ZFQ84>)
   - Share any suggestions or feedback you have on how to make Flyte better.
-* - [🛠 Get help with deploment](https://flyte-org.slack.com/archives/C01P3B761A6>)
+* - [🛠 Get help with deployment](https://flyte-org.slack.com/archives/C01P3B761A6>)
   - If you need any help with Flyte deployment, hit us up.
 ```
 
