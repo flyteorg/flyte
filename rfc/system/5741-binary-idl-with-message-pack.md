@@ -161,10 +161,10 @@ Notes:
    - The library [github.com/vmihailenco/msgpack](https://github.com/vmihailenco/msgpack) doesn't support strict type deserialization (for example, `map[int]string`), but `"github.com/shamaton/msgpack/v2"` supports this feature. This is super important for backward copmatibility.
 
 3. **Library Popularity**: 
-   - While `"github.com/shamaton/msgpack/v2"` has fewer stars on GitHub, it has proven to be reliable in various test cases. All cases created by me have passed successfully, which you can find in this [pull request](https://github.com/flyteorg/flytekit/pull/2751).
+   - While [github.com/shamaton/msgpack/v2](https://github.com/shamaton/msgpack) has fewer stars on GitHub, it has proven to be reliable in various test cases. All cases created by me have passed successfully, which you can find in this [pull request](https://github.com/flyteorg/flytekit/pull/2751).
 
 4. **Project Activity**: 
-   - `"github.com/shamaton/msgpack/v2"` is still an actively maintained project. The author responds quickly to issues and questions, making it a well-supported choice for projects requiring ongoing maintenance and active support.
+   - [github.com/shamaton/msgpack/v2](https://github.com/shamaton/msgpack) is still an actively maintained project. The author responds quickly to issues and questions, making it a well-supported choice for projects requiring ongoing maintenance and active support.
 
 5. **Testing Process**: 
    - I initially started with [github.com/vmihailenco/msgpack](https://github.com/vmihailenco/msgpack) but switched to `"github.com/shamaton/msgpack/v2"` due to its better support for strict typing and the active support provided by the author.
