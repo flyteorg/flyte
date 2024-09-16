@@ -507,8 +507,13 @@ type NotificationsProcessorConfig struct {
 type EmailServerConfig struct {
 	ServiceName string `json:"serviceName"`
 	// Only one of these should be set.
-	APIKeyEnvVar   string `json:"apiKeyEnvVar"`
-	APIKeyFilePath string `json:"apiKeyFilePath"`
+	APIKeyEnvVar           string `json:"apiKeyEnvVar"`
+	APIKeyFilePath         string `json:"apiKeyFilePath"`
+	SMTPServer             string `json:"smtpServer"`
+	SMTPPort               string `json:"smtpPort"`
+	SMTPSkipTLSVerify      bool   `json:"smtpSkipTLSVerify"`
+	SMTPUsername           string `json:"smtpUsername"`
+	SMTPPasswordSecretName string `json:"smtpPasswordSecretName"`
 }
 
 // This section handles the configuration of notifications emails.
