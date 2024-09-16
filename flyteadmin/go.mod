@@ -82,6 +82,7 @@ require (
 	cloud.google.com/go/pubsub v1.34.0 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.7.0 // indirect
 	github.com/AzureAD/microsoft-authentication-library-for-go v1.2.2 // indirect
+	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20200428143746-21a406dcc535 // indirect
 	github.com/benlaurie/objecthash v0.0.0-20180202135721-d1e3d6079fc1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
