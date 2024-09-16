@@ -33,44 +33,40 @@ class FlyteUserDashboard(object):
                     ),
                 ),
                 Graph(
-                    title="Successful Workflow executions (avg)",
+                    title="Workflow success rate",
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr='avg(flyte:propeller:all:workflow:event_recording:success_duration_ms_count{project=~"$project", domain=~"$domain", wf=~"$workflow"})',
+                            expr='sum(rate(flyte:propeller:all:workflow:success_duration_ms_count{project=~"$project", domain=~"$domain", wf=~"$workflow"}[5m]))',
                             refId='A',
                         ),
                     ],
-                   yAxes=single_y_axis(format=SHORT_FORMAT),
+                   yAxes=single_y_axis(format=OPS_FORMAT),
                 ),
                 Graph(
-                    title="Failed Workflows (avg)",
+                    title="Workflow failure rate",
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr='avg(flyte:propeller:all:workflow:event_recording:failure_duration_ms_count{project=~"$project", domain=~"$domain", wf=~"$workflow"})',
+                            expr='sum(rate(flyte:propeller:all:workflow:failure_duration_ms_count{project=~"$project", domain=~"$domain", wf=~"$workflow"}[5m]))',
                             refId='A',
                         ),
                     ],
-                    yAxes=YAxes(
-                        YAxis(format=SHORT_FORMAT),
-                    ),
+                    yAxes=single_y_axis(format=OPS_FORMAT),
                 ),
                 Graph(
                     title="Aborted Workflows (avg)",
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr='avg(flyte:propeller:all:workflow:workflow_aborted{project=~"$project", domain=~"$domain", wf=~"$workflow"})',
+                            expr='avg_over_time(flyte:propeller:all:workflow:workflow_aborted{project=~"$project", domain=~"$domain", wf=~"$workflow"}[5m])',
                             refId='A',
                         ),
                     ],
-                    yAxes=YAxes(
-                        YAxis(format=SHORT_FORMAT),
-                    ),
+                      yAxes=single_y_axis(format=SHORT_FORMAT),
                 ),
                 BarGauge(
-                    title="Successful wf execution duration by quantile (s)",
+                    title="Successful wf execution duration by quantile",
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
@@ -82,11 +78,11 @@ class FlyteUserDashboard(object):
                    format=SECONDS_FORMAT,
                 ),
                 BarGauge(
-                    title="Failed workflow execution time by Quantile",
+                    title="Failed wf execution duration by quantile",
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr='avg(flyte:propeller:all:workflow:failure_duration_ms{project=~"$project", domain=~"$domain", wf=~"$workflow"}) by (quantile)',
+                            expr='avg((flyte:propeller:all:workflow:failure_duration_ms{project=~"$project", domain=~"$domain", wf=~"$workflow"})/1000) by(quantile)',
                             refId='A',
                         ),
                     ],
