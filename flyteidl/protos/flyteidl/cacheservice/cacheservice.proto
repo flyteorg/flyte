@@ -76,6 +76,7 @@ message GetCacheResponse {
 message OverwriteOutput {
   bool overwrite = 1; // Overwrite flag
   bool delete_blob = 2; // Delete existing blob
+  google.protobuf.Duration max_age = 3; // Maximum age of the cached output since last update
 }
 
 /*

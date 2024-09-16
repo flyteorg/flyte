@@ -59,12 +59,14 @@ class GetCacheResponse(_message.Message):
     def __init__(self, output: _Optional[_Union[CachedOutput, _Mapping]] = ...) -> None: ...
 
 class OverwriteOutput(_message.Message):
-    __slots__ = ["overwrite", "delete_blob"]
+    __slots__ = ["overwrite", "delete_blob", "max_age"]
     OVERWRITE_FIELD_NUMBER: _ClassVar[int]
     DELETE_BLOB_FIELD_NUMBER: _ClassVar[int]
+    MAX_AGE_FIELD_NUMBER: _ClassVar[int]
     overwrite: bool
     delete_blob: bool
-    def __init__(self, overwrite: bool = ..., delete_blob: bool = ...) -> None: ...
+    max_age: _duration_pb2.Duration
+    def __init__(self, overwrite: bool = ..., delete_blob: bool = ..., max_age: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ...) -> None: ...
 
 class PutCacheRequest(_message.Message):
     __slots__ = ["key", "output", "overwrite"]

@@ -118,6 +118,10 @@
         "delete_blob": {
           "type": "boolean",
           "title": "Delete existing blob"
+        },
+        "max_age": {
+          "type": "string",
+          "title": "Maximum age of the cached output since last update"
         }
       }
     },

@@ -113,7 +113,7 @@ func (m *cacheManager) Put(ctx context.Context, request *cacheservice.PutCacheRe
 	}
 
 	// TODO - @pvditt - can do this in single transaction w/ postgres client - move logic to client (still need to delete blob)
-	cachedOutput, err := m.dataStore.Get(ctx, request.Key)
+	outputModel, err := m.dataStore.Get(ctx, request.Key)
 	var notFound bool
 	if err != nil {
 		if status.Code(err) != codes.NotFound {
@@ -122,14 +122,37 @@ func (m *cacheManager) Put(ctx context.Context, request *cacheservice.PutCacheRe
 		}
 		notFound = true
 	}
-	if !notFound && cachedOutput != nil {
-		if request.Overwrite == nil || !request.Overwrite.Overwrite {
+
+	if !notFound && outputModel != nil {
+		cachedOutput, err := transformers.FromCachedOutputModel(ctx, outputModel)
+		if err != nil {
+			logger.Errorf(ctx, "Failed to transform output model to cached output, err: %v", err)
+			m.systemMetrics.getFailureCounter.Inc(ctx)
+			return nil, errors.NewCacheServiceErrorf(codes.Internal, "Failed to transform output model to cached output, err: %v", err)
+		}
+		var expired bool
+		maxAge := request.GetOverwrite().GetMaxAge()
+		updatedAt := cachedOutput.GetMetadata().GetLastUpdatedAt()
+		// should never happen but in case of corrupted data, we should overwrite it
+		if updatedAt == nil {
+			expired = true
+		} else if maxAge != nil && updatedAt != nil {
+			expired = time.Since(updatedAt.AsTime()) > maxAge.AsDuration()
+		}
+		if !request.GetOverwrite().GetOverwrite() && !expired {
 			m.systemMetrics.alreadyExistsCount.Inc(ctx)
 			logger.Errorf(ctx, "Output with key %v already exists", request.Key)
 			return nil, errors.NewCacheServiceErrorf(codes.AlreadyExists, "Output with key %v already exists", request.Key)
 		}
-		if cachedOutput.OutputURI != "" && request.Overwrite.DeleteBlob {
-			err = m.outputStore.Delete(ctx, cachedOutput.OutputURI)
+
+		logMsg := "Overwriting existing output with key %v"
+		if expired {
+			logMsg = "Overwriting expired output with key %v"
+		}
+		logger.Debugf(ctx, logMsg, request.Key)
+
+		if cachedOutput.GetOutputUri() != "" && request.Overwrite.DeleteBlob {
+			err = m.outputStore.Delete(ctx, cachedOutput.GetOutputUri())
 			if err != nil {
 				logger.Errorf(ctx, "Failed to delete output in blob store before overwriting, err: %v", err)
 				return nil, err

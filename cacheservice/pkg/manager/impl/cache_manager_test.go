@@ -414,6 +414,71 @@ func TestCacheManager_Put(t *testing.T) {
 			expectedErrorStatusCode: codes.Internal,
 		},
 		{
+			name: "output exists, expired, no error",
+			mockRequest: &cacheservice.PutCacheRequest{
+				Key: sampleKey,
+				Output: &cacheservice.CachedOutput{
+					Output: &cacheservice.CachedOutput_OutputUri{
+						OutputUri: sampleOutputURI,
+					},
+					Metadata: validMetadata,
+				},
+				Overwrite: &cacheservice.OverwriteOutput{
+					MaxAge: durationpb.New(1 * time.Hour),
+				},
+			},
+			dataGetReturn: &models.CachedOutput{
+				OutputURI: sampleOutputURI,
+				BaseModel: models.BaseModel{
+					UpdatedAt: time.Now().Add(-2 * time.Hour),
+				},
+			},
+			dataGetError: nil,
+			dataPutMatchOutputFunc: func(cachedOutput *models.CachedOutput) bool {
+				return assert.EqualValues(t, sampleOutputURI, cachedOutput.OutputURI) && assert.Nil(t, cachedOutput.OutputLiteral)
+			},
+			outputDeleteMatchOutputFunc: func(outputUri string) bool {
+				return assert.EqualValues(t, sampleOutputURI, outputUri)
+			},
+			outputDeleteError: nil,
+			outputCreateError: nil,
+			dataPutError:      nil,
+			expectError:       false,
+		},
+		{
+			name: "output exists, not-expired, already exist error",
+			mockRequest: &cacheservice.PutCacheRequest{
+				Key: sampleKey,
+				Output: &cacheservice.CachedOutput{
+					Output: &cacheservice.CachedOutput_OutputUri{
+						OutputUri: sampleOutputURI,
+					},
+					Metadata: validMetadata,
+				},
+				Overwrite: &cacheservice.OverwriteOutput{
+					MaxAge: durationpb.New(1 * time.Hour),
+				},
+			},
+			dataGetReturn: &models.CachedOutput{
+				OutputURI: sampleOutputURI,
+				BaseModel: models.BaseModel{
+					UpdatedAt: time.Now(),
+				},
+			},
+			dataGetError: nil,
+			dataPutMatchOutputFunc: func(cachedOutput *models.CachedOutput) bool {
+				return assert.EqualValues(t, sampleOutputURI, cachedOutput.OutputURI) && assert.Nil(t, cachedOutput.OutputLiteral)
+			},
+			outputDeleteMatchOutputFunc: func(outputUri string) bool {
+				return assert.EqualValues(t, sampleOutputURI, outputUri)
+			},
+			outputDeleteError:       nil,
+			outputCreateError:       nil,
+			dataPutError:            nil,
+			expectError:             true,
+			expectedErrorStatusCode: codes.AlreadyExists,
+		},
+		{
 			name: "get error, error",
 			mockRequest: &cacheservice.PutCacheRequest{
 				Key: sampleKey,
@@ -471,6 +536,8 @@ func TestCacheManager_Put(t *testing.T) {
 
 			if tc.expectOutputDelete {
 				mockOutputStore.AssertCalled(t, "Delete", mock.Anything, mock.Anything)
+			} else {
+				mockOutputStore.AssertNotCalled(t, "Delete", mock.Anything, mock.Anything)
 			}
 		})
 	}

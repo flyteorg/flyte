@@ -78,6 +78,9 @@ pub struct OverwriteOutput {
     /// Delete existing blob
     #[prost(bool, tag="2")]
     pub delete_blob: bool,
+    /// Maximum age of the cached output since last update
+    #[prost(message, optional, tag="3")]
+    pub max_age: ::core::option::Option<::prost_types::Duration>,
 }
 ///
 /// Request to store/update cached data by key.

@@ -283,6 +283,13 @@ export class OverwriteOutput extends Message<OverwriteOutput> {
    */
   deleteBlob = false;
 
+  /**
+   * Maximum age of the cached output since last update
+   *
+   * @generated from field: google.protobuf.Duration max_age = 3;
+   */
+  maxAge?: Duration;
+
   constructor(data?: PartialMessage<OverwriteOutput>) {
     super();
     proto3.util.initPartial(data, this);
@@ -293,6 +300,7 @@ export class OverwriteOutput extends Message<OverwriteOutput> {
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "overwrite", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 2, name: "delete_blob", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 3, name: "max_age", kind: "message", T: Duration },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): OverwriteOutput {

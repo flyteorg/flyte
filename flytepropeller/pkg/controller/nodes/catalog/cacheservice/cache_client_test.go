@@ -73,9 +73,9 @@ func TestCache_Get(t *testing.T) {
 
 	sampleCatalogKey, sampleCatalogKeyErr, sampleCacheKey := generateCatalogKeys(ctx, t)
 
-	nonExpiredCreatedAt, err := ptypes.TimestampProto(time.Now().Add(time.Minute * 1))
+	nonExpiredUpdatedAt, err := ptypes.TimestampProto(time.Now().Add(time.Minute * 1))
 	assert.NoError(t, err)
-	expiredCreatedAt, err := ptypes.TimestampProto(time.Now().Add(time.Minute * -61))
+	expiredUpdatedAt, err := ptypes.TimestampProto(time.Now().Add(time.Minute * -61))
 	assert.NoError(t, err)
 	sampleOutputLiteral, err := coreutils.MakeLiteralMap(map[string]interface{}{"c": 3})
 	assert.NoError(t, err)
@@ -90,7 +90,7 @@ func TestCache_Get(t *testing.T) {
 		Output: &cacheservice.CachedOutput{
 			Output: &cacheservice.CachedOutput_OutputLiterals{},
 			Metadata: &cacheservice.Metadata{
-				CreatedAt: expiredCreatedAt,
+				LastUpdatedAt: expiredUpdatedAt,
 			},
 		},
 	}
@@ -98,7 +98,7 @@ func TestCache_Get(t *testing.T) {
 		Output: &cacheservice.CachedOutput{
 			Output: outputLiteral,
 			Metadata: &cacheservice.Metadata{
-				CreatedAt:        nonExpiredCreatedAt,
+				LastUpdatedAt:    nonExpiredUpdatedAt,
 				SourceIdentifier: &sampleIdentifier,
 			},
 		},
@@ -107,7 +107,7 @@ func TestCache_Get(t *testing.T) {
 		Output: &cacheservice.CachedOutput{
 			Output: outputURI,
 			Metadata: &cacheservice.Metadata{
-				CreatedAt:        nonExpiredCreatedAt,
+				LastUpdatedAt:    nonExpiredUpdatedAt,
 				SourceIdentifier: &sampleIdentifier,
 			},
 		},
@@ -115,7 +115,7 @@ func TestCache_Get(t *testing.T) {
 	malformedOutputResponse := &cacheservice.GetCacheResponse{
 		Output: &cacheservice.CachedOutput{
 			Metadata: &cacheservice.Metadata{
-				CreatedAt:        nonExpiredCreatedAt,
+				LastUpdatedAt:    nonExpiredUpdatedAt,
 				SourceIdentifier: &sampleIdentifier,
 			},
 		},
@@ -133,7 +133,7 @@ func TestCache_Get(t *testing.T) {
 				OutputUri: "s3://some-bucket/some-key",
 			},
 			Metadata: &cacheservice.Metadata{
-				CreatedAt:        nonExpiredCreatedAt,
+				LastUpdatedAt:    nonExpiredUpdatedAt,
 				SourceIdentifier: nil,
 			},
 		},

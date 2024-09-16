@@ -17,6 +17,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/cacheservice"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -105,9 +106,9 @@ func (c *CacheClient) Get(ctx context.Context, key catalog.Key) (catalog.Entry, 
 	}
 
 	if c.maxCacheAge > time.Duration(0) {
-		if time.Since(resp.GetOutput().GetMetadata().CreatedAt.AsTime()) > c.maxCacheAge {
-			logger.Infof(ctx, "Expired Cached Output %v created on %v, older than max age %v",
-				resp.GetOutput().GetMetadata().GetSourceIdentifier(), resp.GetOutput().GetMetadata().GetCreatedAt(), c.maxCacheAge)
+		if time.Since(resp.GetOutput().GetMetadata().GetLastUpdatedAt().AsTime()) > c.maxCacheAge {
+			logger.Infof(ctx, "Expired Cached Output %v updated on %v, older than max age %v",
+				resp.GetOutput().GetMetadata().GetSourceIdentifier(), resp.GetOutput().GetMetadata().GetLastUpdatedAt(), c.maxCacheAge)
 			return catalog.Entry{}, status.Error(codes.NotFound, "Artifact over age limit")
 		}
 	}
@@ -168,6 +169,7 @@ func (c *CacheClient) put(ctx context.Context, key catalog.Key, reader io.Output
 			Overwrite: &cacheservice.OverwriteOutput{
 				Overwrite:  overwrite,
 				DeleteBlob: false,
+				MaxAge:     durationpb.New(c.maxCacheAge),
 			},
 		}
 	} else {
@@ -198,6 +200,7 @@ func (c *CacheClient) put(ctx context.Context, key catalog.Key, reader io.Output
 			Overwrite: &cacheservice.OverwriteOutput{
 				Overwrite:  overwrite,
 				DeleteBlob: false,
+				MaxAge:     durationpb.New(c.maxCacheAge),
 			},
 		}
 	}

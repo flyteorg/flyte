@@ -71,6 +71,20 @@ func FromCachedOutputModel(ctx context.Context, cachedOutputModel *models.Cached
 	}
 
 	createdAt := timestamppb.New(cachedOutputModel.CreatedAt)
+	updatedAt := timestamppb.New(cachedOutputModel.UpdatedAt)
+	metadata := &cacheservice.Metadata{
+		SourceIdentifier: &core.Identifier{
+			ResourceType: cachedOutputModel.Identifier.ResourceType,
+			Project:      cachedOutputModel.Identifier.Project,
+			Domain:       cachedOutputModel.Identifier.Domain,
+			Name:         cachedOutputModel.Identifier.Name,
+			Version:      cachedOutputModel.Identifier.Version,
+			Org:          cachedOutputModel.Identifier.Org,
+		},
+		KeyMap:        &keyMapMetadata,
+		CreatedAt:     createdAt,
+		LastUpdatedAt: updatedAt,
+	}
 
 	if cachedOutputModel.OutputLiteral != nil {
 		outputLiteral := &core.LiteralMap{}
@@ -81,35 +95,13 @@ func FromCachedOutputModel(ctx context.Context, cachedOutputModel *models.Cached
 		}
 
 		return &cacheservice.CachedOutput{
-			Output: &cacheservice.CachedOutput_OutputLiterals{OutputLiterals: outputLiteral},
-			Metadata: &cacheservice.Metadata{
-				SourceIdentifier: &core.Identifier{
-					ResourceType: cachedOutputModel.Identifier.ResourceType,
-					Project:      cachedOutputModel.Identifier.Project,
-					Domain:       cachedOutputModel.Identifier.Domain,
-					Name:         cachedOutputModel.Identifier.Name,
-					Version:      cachedOutputModel.Identifier.Version,
-					Org:          cachedOutputModel.Identifier.Org,
-				},
-				KeyMap:    &keyMapMetadata,
-				CreatedAt: createdAt,
-			},
+			Output:   &cacheservice.CachedOutput_OutputLiterals{OutputLiterals: outputLiteral},
+			Metadata: metadata,
 		}, nil
 	}
 
 	return &cacheservice.CachedOutput{
-		Output: &cacheservice.CachedOutput_OutputUri{OutputUri: cachedOutputModel.OutputURI},
-		Metadata: &cacheservice.Metadata{
-			SourceIdentifier: &core.Identifier{
-				ResourceType: cachedOutputModel.Identifier.ResourceType,
-				Project:      cachedOutputModel.Identifier.Project,
-				Domain:       cachedOutputModel.Identifier.Domain,
-				Name:         cachedOutputModel.Identifier.Name,
-				Version:      cachedOutputModel.Identifier.Version,
-				Org:          cachedOutputModel.Identifier.Org,
-			},
-			KeyMap:    &keyMapMetadata,
-			CreatedAt: createdAt,
-		},
+		Output:   &cacheservice.CachedOutput_OutputUri{OutputUri: cachedOutputModel.OutputURI},
+		Metadata: metadata,
 	}, nil
 }
