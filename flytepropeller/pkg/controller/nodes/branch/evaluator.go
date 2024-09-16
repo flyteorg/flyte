@@ -17,6 +17,8 @@ const ErrorCodeMalformedBranch = "MalformedBranchUserError"
 const ErrorCodeCompilerError = "CompilerError"
 const ErrorCodeFailedFetchOutputs = "FailedFetchOutputs"
 
+// TODO: IF THERE'S BINARY, CONVERT IT TO PRIMITIVE.
+// NEED ERROR HANDLING FOR NON-PRIMITIVE TYPES
 func EvaluateComparison(expr *core.ComparisonExpression, nodeInputs *core.LiteralMap) (bool, error) {
 	var lValue *core.Literal
 	var rValue *core.Literal
