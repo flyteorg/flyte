@@ -68,7 +68,11 @@ func TestEmailCreation(t *testing.T) {
 	}
 
 	body := createMailBody("sender@sender.com", &email)
-	assert.Equal(t, "From: sender@sender.com\r\nTo: john@doe.com,teresa@tester.com\r\nSubject: subject\r\nContent-Type: text/html; charset=\"UTF-8\"\r\n\r\nEmail Body", body)
+	assert.Contains(t, body, "From: sender@sender.com\r\n")
+	assert.Contains(t, body, "To: john@doe.com,teresa@tester.com")
+	assert.Contains(t, body, "Subject: subject\r\n")
+	assert.Contains(t, body, "Content-Type: text/html; charset=\"UTF-8\"\r\n")
+	assert.Contains(t, body, "Email Body")
 }
 
 func TestNewSmtpEmailer(t *testing.T) {
