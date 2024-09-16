@@ -116,7 +116,7 @@ helm install gateway bitnami/contour -n flyte
 | configmap.adminServer.server.security.secure | bool | `false` | Controls whether to serve requests over SSL/TLS. |
 | configmap.adminServer.server.security.useAuth | bool | `false` | Controls whether to enforce authentication. Follow the guide in https://docs.flyte.org/ on how to setup authentication. |
 | configmap.cacheserviceServer | object | `{"cache-server":{"grpcPort":8089,"grpcServerReflection":true,"httpPort":8080},"cacheservice":{"heartbeat-grace-period-multiplier":3,"max-reservation-heartbeat":"30s","metrics-scope":"flyte","profiler-port":10254,"storage-prefix":"cached_outputs"}}` | Cacheservice server config |
-| configmap.catalog | object | `{"catalog-cache":{"endpoint":"datacatalog:89","insecure":true,"type":"datacatalog"}}` | Catalog Client configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/catalog#Config) Additional advanced Catalog configuration [here](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/pluginmachinery/catalog#Config) |
+| configmap.catalog | object | `{"catalog-cache":{"cache-endpoint":"cacheservice:89","endpoint":"datacatalog:89","insecure":true,"type":"fallback"}}` | Catalog Client configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/catalog#Config) Additional advanced Catalog configuration [here](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/pluginmachinery/catalog#Config) |
 | configmap.clusters.clusterConfigs | list | `[]` |  |
 | configmap.clusters.labelClusterMap | object | `{}` |  |
 | configmap.console | object | `{"BASE_URL":"/console","CONFIG_DIR":"/etc/flyte/config"}` | Configuration for Flyte console UI |

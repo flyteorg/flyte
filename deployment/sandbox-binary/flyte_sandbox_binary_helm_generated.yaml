@@ -69,8 +69,9 @@ data:
       insecure: true
     catalog-cache:
       endpoint: localhost:8081
+      cache-endpoint: localhost:8091
       insecure: true
-      type: datacatalog
+      type: fallback
     cluster_resources:
       standaloneDeployment: false
       templatePath: /etc/flyte/cluster-resource-templates
@@ -386,7 +387,7 @@ spec:
         app.kubernetes.io/instance: flyte
         app.kubernetes.io/component: flyte-binary
       annotations:
-        checksum/configuration: dc4f4264a1e83f99f23f59ca6755439412582f9c35001e12d20221d75b38a271
+        checksum/configuration: 64ca6d2682937f5072d5408f337ad39102724647463ae52c4b35061ae2aece56
         checksum/configuration-secret: d5d93f4e67780b21593dc3799f0f6682aab0765e708e4020939975d14d44f929
         checksum/cluster-resource-templates: 7dfa59f3d447e9c099b8f8ffad3af466fecbc9cf9f8c97295d9634254a55d4ae
     spec:

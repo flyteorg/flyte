@@ -409,8 +409,9 @@ data:
       insecure: true
     catalog-cache:
       endpoint: localhost:8081
+      cache-endpoint: localhost:8091
       insecure: true
-      type: datacatalog
+      type: fallback
     cluster_resources:
       standaloneDeployment: false
       templatePath: /etc/flyte/cluster-resource-templates
@@ -854,7 +855,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: SnUwaDRXV0tmcU1oSzlJUw==
+  haSharedSecret: OW9VTVlBQ2xmNHN4RWx5RA==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1274,7 +1275,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: 6fd9b172465e3089fcc59f738b92b8dc4d8939360c19de8ee65f68b0e7422035
-        checksum/configuration: b0b5b916050b3717eff573bb9ab8b57cd3e5ba815e044fa546101a246c73b90a
+        checksum/configuration: 9f3ac64d3ca416e265765c3cc5aadf166b2d7240c05ca2e2fa84f8ac9f34234e
         checksum/configuration-secret: 09216ffaa3d29e14f88b1f30af580d02a2a5e014de4d750b7f275cc07ed4e914
       labels:
         app.kubernetes.io/component: flyte-binary
@@ -1440,7 +1441,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: ae6fb8cc8c5d93fcbf2f1a79346af98f1d3e5fec543580c0ec288e084420f9f0
+        checksum/secret: 764c17ca401d9bfc737ca9be50f8528c77224a022040973ad0d7f7b4033cbd20
       labels:
         app: docker-registry
         release: flyte-sandbox

@@ -14,7 +14,7 @@ catalog-cache:
   endpoint: localhost:8081
   cache-endpoint: localhost:8091
   insecure: true
-  type: cacheservice
+  type: fallback
 
 cluster_resources:
   standaloneDeployment: false

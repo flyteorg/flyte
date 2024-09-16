@@ -103,6 +103,7 @@ admin:
 catalog-cache:
   type: noop
   endpoint: datacatalog:8089
+  cache-endpoint: cacheservice:8089
   insecure: true
   default-service-config: '{"loadBalancingConfig": [{"round_robin":{}}]}'
 logger:

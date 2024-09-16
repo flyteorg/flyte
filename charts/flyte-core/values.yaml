@@ -856,7 +856,8 @@ configmap:
   catalog:
     catalog-cache:
       endpoint: datacatalog:89
-      type: datacatalog
+      cache-endpoint: cacheservice:89
+      type: fallback
       insecure: true
 
   # -- Copilot configuration

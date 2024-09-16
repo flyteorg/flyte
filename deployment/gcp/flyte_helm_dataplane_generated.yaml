@@ -208,9 +208,10 @@ data:
       type: admin
   catalog.yaml: | 
     catalog-cache:
+      cache-endpoint: cacheservice:89
       endpoint: datacatalog:89
       insecure: true
-      type: datacatalog
+      type: fallback
   copilot.yaml: | 
     plugins:
       k8s:
@@ -556,7 +557,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "440df784b0ea8efb61f3e213b584afa6597df2478322b789fe87e10faee1e0a"
+        configChecksum: "a2f2d1579750a1520d5ff8c6a44cbeb6490008563bd90f6b8a4ce8905b4ab4d"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "10254"
       labels: 
@@ -639,7 +640,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v1.12.0
       annotations:
-        configChecksum: "440df784b0ea8efb61f3e213b584afa6597df2478322b789fe87e10faee1e0a"
+        configChecksum: "a2f2d1579750a1520d5ff8c6a44cbeb6490008563bd90f6b8a4ce8905b4ab4d"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "10254"
     spec:

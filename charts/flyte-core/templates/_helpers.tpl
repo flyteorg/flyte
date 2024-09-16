@@ -101,7 +101,6 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 {{- end -}}
 
-<<<<<<< HEAD
 {{- define "cacheservice.name" -}}
 cacheservice
 {{- end -}}

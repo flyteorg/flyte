@@ -31,8 +31,9 @@ data:
       insecure: true
     catalog-cache:
       endpoint: localhost:8081
+      cache-endpoint: localhost:8091
       insecure: true
-      type: datacatalog
+      type: fallback
     cluster_resources:
       standaloneDeployment: false
       templatePath: /etc/flyte/cluster-resource-templates
