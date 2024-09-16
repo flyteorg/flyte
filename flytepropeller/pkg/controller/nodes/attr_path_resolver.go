@@ -1,10 +1,11 @@
 package nodes
 
 import (
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/errors"
 	"github.com/shamaton/msgpack/v2"
 	"google.golang.org/protobuf/types/known/structpb"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/errors"
 )
 
 // resolveAttrPathInPromise resolves the literal with attribute path
@@ -142,13 +143,11 @@ func resolveAttrPathInBinary(nodeID string, binaryIDL *core.Binary, bindAttrPath
 		}
 		// Construct and return the binary-encoded literal
 		return constructResolvedBinary(resolvedBinaryBytes, serializationFormat), nil
-	} else {
-		// Unsupported serialization format
-		return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID,
-			"Unsupported format '%v' found for literal value.\n"+
-				"Please ensure the serialization format is supported.", serializationFormat)
-
 	}
+	// Unsupported serialization format
+	return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID,
+		"Unsupported format '%v' found for literal value.\n"+
+			"Please ensure the serialization format is supported.", serializationFormat)
 }
 
 func constructResolvedBinary(resolvedBinaryBytes []byte, serializationFormat string) *core.Literal {
