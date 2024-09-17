@@ -2720,7 +2720,7 @@ k8s (`config.K8sPluginConfig`_)
     output-vol-name: flyte-outputs
     start-timeout: 1m40s
     storage: ""
-    add-sys-ptrace-capability: false
+    add-sys-ptrace-capability: true
   create-container-config-error-grace-period: 0s
   create-container-error-grace-period: 3m0s
   default-annotations:
@@ -3041,7 +3041,7 @@ Co-Pilot Configuration
   output-vol-name: flyte-outputs
   start-timeout: 1m40s
   storage: ""
-  add-sys-ptrace-capability: false
+  add-sys-ptrace-capability: true
   
 
 delete-resource-on-finalize (bool)
@@ -3386,7 +3386,7 @@ Used to enable SYS_PTRACE for co-pilot containers
 
 .. code-block:: yaml
 
-  "false"
+  "true"
   
 
 resource.Quantity

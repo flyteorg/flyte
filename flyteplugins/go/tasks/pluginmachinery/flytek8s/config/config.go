@@ -40,7 +40,7 @@ var (
 			OutputVolumeName:       "flyte-outputs",
 			CPU:                    "500m",
 			Memory:                 "128Mi",
-			AddSysPTraceCapability: false,
+			AddSysPTraceCapability: true,
 			StartTimeout: config2.Duration{
 				Duration: time.Second * 100,
 			},
