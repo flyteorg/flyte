@@ -287,14 +287,13 @@ intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
     "numpy": ("https://numpy.org/doc/stable", None),
     "pandas": ("https://pandas.pydata.org/pandas-docs/stable/", None),
-    "torch": ("https://pytorch.org/docs/master/", None),
+    "torch": ("https://pytorch.org/docs/main/", None),
     "scipy": ("https://docs.scipy.org/doc/scipy/reference", None),
     "matplotlib": ("https://matplotlib.org", None),
     "pandera": ("https://pandera.readthedocs.io/en/stable/", None),
 }
 
 myst_enable_extensions = ["colon_fence"]
-myst_heading_anchors = 6
 
 # Sphinx-mermaid config
 mermaid_output_format = "raw"
