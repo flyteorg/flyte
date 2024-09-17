@@ -54,7 +54,7 @@ Note: The `metadata` of `Literal Type` and `Literal Value` are not the same.
 
 ## 2 Motivation
 
-In Flytekit, when handling dataclasses, Pydantic base models, and dictionaries, we store data using a JSON string within Protobuf struct datatype.
+Currently, before this RFC, in flytekit, when handling dataclasses, Pydantic base models, and dictionaries, we store data using a JSON string within Protobuf struct datatype.
 
 This approach causes issues with integers, as Protobuf struct does not support int types, leading to their conversion to floats.
 
