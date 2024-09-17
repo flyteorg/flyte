@@ -196,14 +196,10 @@ reference: https://github.com/msgpack/msgpack-javascript
 
 ### FlyteIDL
 #### Literal Value
-```proto
-// A simple byte array with a tag to help different parts of the system communicate about what is in the byte array.
-// It's strongly advisable that consumers of this type define a unique tag and validate the tag before parsing the data.
-message Binary {
-    bytes value = 1; // Serialized data (MessagePack) for supported types like Dataclass, Pydantic BaseModel, and dict.
-    string tag = 2; // The serialization format identifier (e.g., MessagePack). Consumers must define unique tags and validate them before deserialization.
-}
-```
+
+Here is the [IDL definition](https://github.com/flyteorg/flyte/blob/7989209e15600b56fcf0f4c4a7c9af7bfeab6f3e/flyteidl/protos/flyteidl/core/literals.proto#L42-L47).
+
+The `bytes` field is used for serialized data, and the `tag` field specifies the serialization format identifier.
 #### Literal Type
 ```proto
 import "google/protobuf/struct.proto";
