@@ -108,7 +108,7 @@ def to_literal():
 def to_python_value():
     # lv: literal value
     if lv.scalar.binary.tag == "msgpack":
-        msgpack_bytes = lv.scalar.json.value
+        msgpack_bytes = lv.scalar.binary.value
     else:
         raise ValueError(f"{tag} is not supported to decode this Binary Literal: {lv.scalar.binary}.")
     return msgpack.loads(msgpack_bytes)
@@ -157,7 +157,7 @@ Notes:
    - We can explore all MessagePack implementations for Golang at the [MessagePack official website](https://msgpack.org/index.html).
 
 2. **Library Comparison**: 
-   - The library [github.com/vmihailenco/msgpack](https://github.com/vmihailenco/msgpack) doesn't support strict type deserialization (for example, `map[int]string`), but [github.com/shamaton/msgpack/v2](https://github.com/shamaton/msgpack) supports this feature. This is super important for backward copmatibility.
+   - The library [github.com/vmihailenco/msgpack](https://github.com/vmihailenco/msgpack) doesn't support strict type deserialization (for example, `map[int]string`), but [github.com/shamaton/msgpack/v2](https://github.com/shamaton/msgpack) supports this feature. This is super important for backward compatibility.
 
 3. **Library Popularity**: 
    - While [github.com/shamaton/msgpack/v2](https://github.com/shamaton/msgpack) has fewer stars on GitHub, it has proven to be reliable in various test cases. All cases created by me have passed successfully, which you can find in this [pull request](https://github.com/flyteorg/flytekit/pull/2751).
@@ -342,11 +342,48 @@ func (t trivialChecker) CastsFrom(upstreamType *flyte.LiteralType) bool {
 ```
 ### FlyteKit
 #### Attribute Access
-In most transformers, we should create a function `from_binary_idl` to convert the Binary IDL Object into the desired type.
 
-When performing attribute access, Propeller will deserialize the msgpack bytes into a map object, retrieve the attribute, and then serialize it back into msgpack bytes (a Binary IDL Object containing msgpack bytes).
+In all transformers, we should implement a function called `from_binary_idl` to convert the Binary IDL Object into the desired type.
 
-This means that when converting a literal to a Python value, we will receive `msgpack bytes` instead of our `expected Python type`.
+A base method can be added to the `TypeTransformer` class, allowing child classes to override it as needed.
+
+During attribute access, Flyte Propeller will deserialize the msgpack bytes into a map object in golang, retrieve the specific attribute, and then serialize it back into msgpack bytes (resulting in a Binary IDL Object containing msgpack bytes).
+
+This implies that when converting a literal to a Python value, we will receive `msgpack bytes` instead of the `expected Python type`.
+
+```python
+# In Mashumaro, the default encoder uses strict_map_key=False, while the default decoder uses strict_map_key=True.
+# This is relevant for cases like Dict[int, str].
+# If strict_map_key=False is not used, the decoder will raise an error when trying to decode keys that are not strictly typed.
+def _default_flytekit_decoder(data: bytes) -> Any:
+    return msgpack.unpackb(data, raw=False, strict_map_key=False)
+
+
+def from_binary_idl(self, binary_idl_object: Binary, expected_python_type: Type[T]) -> Optional[T]:
+    # Handle msgpack serialization
+    if binary_idl_object.tag == "msgpack":
+        try:
+            # Retrieve the existing decoder for the expected type
+            decoder = self._msgpack_decoder[expected_python_type]
+        except KeyError:
+            # Create a new decoder if not already cached
+            decoder = MessagePackDecoder(expected_python_type, pre_decoder_func=_default_flytekit_decoder)
+            self._msgpack_decoder[expected_python_type] = decoder
+        # Decode the binary IDL object into the expected Python type
+        return decoder.decode(binary_idl_object.value)
+    else:
+        # Raise an error if the binary format is not supported
+        raise TypeTransformerFailedError(f"Unsupported binary format {binary_idl_object.tag}")
+```
+
+Note: 
+1. This base method can handle primitive types, nested typed dictionaries, nested typed lists, and combinations of nested typed dictionaries and lists.
+
+2. Dataclass transformer needs its own `from_binary_idl` method to handle specific cases such as [discriminated classes](https://github.com/flyteorg/flyte/issues/5588).
+
+3. Flyte types (e.g., FlyteFile, FlyteDirectory, StructuredDataset, and FlyteSchema) will need their own `from_binary_idl` methods, as they must handle downloading files from remote object storage when converting literals to Python values.
+
+For example, see the FlyteFile implementation: https://github.com/flyteorg/flytekit/pull/2751/files#diff-22cf9c7153b54371b4a77331ddf276a082cf4b3c5e7bd1595dd67232288594fdR522-R552
 
 #### pyflyte run
 The behavior will remain unchanged.
