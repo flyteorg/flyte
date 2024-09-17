@@ -49,12 +49,11 @@ Literal Type will be `SimpleType.STRUCT`.
 2. We will put `Json Schema` in Literal Type's `metadata` field, this will be used in flytekit remote api to construct dataclass/Pydantic BaseModel by `Json Schema`.
 3. We will use libraries written in golang to compare `Json Schema` to solve this issue: ["[BUG] Union types fail for e.g. two different dataclasses"](https://github.com/flyteorg/flyte/issues/5489).
 
-
 Note: The `metadata` of `Literal Type` and `Literal Value` are not the same.
 
 ## 2 Motivation
 
-Currently, before this RFC, in flytekit, when handling dataclasses, Pydantic base models, and dictionaries, we store data using a JSON string within Protobuf struct datatype.
+Prior to this RFC, in flytekit, when handling dataclasses, Pydantic base models, and dictionaries, we store data using a JSON string within Protobuf struct datatype.
 
 This approach causes issues with integers, as Protobuf struct does not support int types, leading to their conversion to floats.
 
