@@ -542,38 +542,21 @@ When FlyteConsole receives a literal type of `SimpleType.STRUCT`, the input meth
 
 1. No JSON Schema provided:
 
-The input is expected as an `Object` (e.g., `{"a": 1}`).
+Input is expected as an `Object` (e.g., `{"a": 1}`).
 
 2. JSON Schema provided:
 
-Users can input values according to the expected type defined by the schema, and construct an appropriate `Object`.
+Users can input values based on the schema's expected type and construct an appropriate `Object`.
 
 Note:
 
-1. For dataclass and Pydantic BaseModel, we will provide JSON Schema in their literal type, and construct the input form for them.
+For `dataclass` and Pydantic `BaseModel`, a JSON schema will be provided in their literal type, and the input form will be constructed accordingly.
 
-#### How inputs/outputs are shown in the console?
-We should use `msgpack` to deserialize bytes to an `Object`, and show it in the Flyte Console.
+#### Displaying Inputs/Outputs in the Console
+Use `msgpack` to deserialize bytes into an Object and display it in Flyte Console.
 
-
-#### Show input/output on FlyteConsole
-
-1. Get Bytes from the Binary IDL Object.
-2. Get Tag from the Binary IDL Object.
-3. Use Tag to determine how to deserialize `Bytes`, and show the deserialized value in FlyteConsole.
-
-#### Copy Input
-Return `MessagePack Bytes` to your clipboard, it can be used in `Input Bytes` below.
-
-#### Construct Input
-##### Input Bytes
-1. Input `MessagePack Bytes` to the console, for example, `{"a": 1}` in python will be `b'\x81\xa1a\x01'`.
-2. Tag can only use `msgpack`, it's forced now.
-
-##### Launch Form
-1. Use `JSON Schema` to know what every input field, and make users input it 1 by 1.
-2. Serialize the input value into `MessagePack Bytes`
-3. Create a `Binary IDL Object`, value is `MessagePack Bytes` and tag is `msgpack`.
+#### Copying Inputs/Outputs in the Console
+Allow users to copy the `Object` to the clipboard, as currently implemented.
 
 ## 4 Metrics & Dashboards
 
