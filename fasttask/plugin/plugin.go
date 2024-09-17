@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"strconv"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -44,6 +45,11 @@ const maxErrorMessageLength = 102400 // 100kb
 var (
 	statusUpdateNotFoundError = errors.New("StatusUpdateNotFound")
 	taskContextNotFoundError  = errors.New("TaskContextNotFound")
+
+	taskStartTimeTemplateVar       = tasklog.MustCreateRegex("taskStartTime")
+	taskStartTimeUnixMsTemplateVar = tasklog.MustCreateRegex("taskStartTimeUnixMs")
+	taskEndTimeTemplateVar         = tasklog.MustCreateRegex("taskEndTime")
+	taskEndTimeUnixMsTemplateVar   = tasklog.MustCreateRegex("taskEndTimeUnixMs")
 )
 
 type SubmissionPhase int
@@ -508,7 +514,7 @@ func (p *Plugin) getTaskInfo(ctx context.Context, tCtx core.TaskExecutionContext
 		return &taskInfo, nil
 	}
 
-	if len(pod.Status.ContainerStatuses) <= containerIndex {
+	if len(pod.Status.ContainerStatuses) <= containerIndex || pod.Status.ContainerStatuses[containerIndex].ContainerID == "" {
 		// no container id yet
 		return &taskInfo, nil
 	}
@@ -519,18 +525,31 @@ func (p *Plugin) getTaskInfo(ctx context.Context, tCtx core.TaskExecutionContext
 	}
 
 	in := tasklog.Input{
-		Namespace:            pod.Namespace,
-		PodName:              pod.Name,
-		PodUID:               string(pod.GetUID()),
-		ContainerName:        pod.Spec.Containers[containerIndex].Name,
-		ContainerID:          pod.Status.ContainerStatuses[containerIndex].ContainerID,
-		LogName:              " (worker)",
-		PodRFC3339StartTime:  start.Format(time.RFC3339),
-		PodRFC3339FinishTime: end.Format(time.RFC3339),
-		PodUnixStartTime:     start.Unix(),
-		PodUnixFinishTime:    end.Unix(),
-		HostName:             pod.Spec.Hostname,
-		TaskTemplate:         taskTemplate,
+		Namespace:     pod.Namespace,
+		PodName:       pod.Name,
+		PodUID:        string(pod.GetUID()),
+		ContainerName: pod.Spec.Containers[containerIndex].Name,
+		ContainerID:   pod.Status.ContainerStatuses[containerIndex].ContainerID,
+		HostName:      pod.Spec.Hostname,
+		TaskTemplate:  taskTemplate,
+		ExtraTemplateVars: []tasklog.TemplateVar{
+			{
+				Regex: taskStartTimeTemplateVar,
+				Value: start.Format(time.RFC3339),
+			},
+			{
+				Regex: taskStartTimeUnixMsTemplateVar,
+				Value: strconv.FormatInt(start.UnixMilli(), 10),
+			},
+			{
+				Regex: taskEndTimeTemplateVar,
+				Value: end.Format(time.RFC3339),
+			},
+			{
+				Regex: taskEndTimeUnixMsTemplateVar,
+				Value: strconv.FormatInt(end.UnixMilli(), 10),
+			},
+		},
 	}
 	logPlugin, err := logs.InitializeLogPlugins(&p.cfg.Logs)
 	if err != nil {

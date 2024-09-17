@@ -855,7 +855,7 @@ func TestGetTaskInfo(t *testing.T) {
 
 		require.Nil(t, err)
 		require.Len(t, taskInfo.Logs, 1)
-		assert.Equal(t, "Custom Logs (worker)", taskInfo.Logs[0].GetName())
+		assert.Equal(t, "Custom Logs", taskInfo.Logs[0].GetName())
 		assert.Equal(t, "http://foo.com/pod=namespace/pod-name", taskInfo.Logs[0].GetUri())
 	})
 
