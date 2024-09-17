@@ -448,11 +448,11 @@ my_dc.model_json_schema()
 ```
 
 ### FlyteCtl
+
 In FlyteCtl, we can construct input for the execution.
 
-We can construct a `Binary IDL Object` when we receive `SimpleType.STRUCT`.
+When we receive `SimpleType.STRUCT`, we can construct a `Binary IDL Object` using the following logic in `flyteidl/clients/go/coreutils/literals.go`:
 
-In `flyteidl/clients/go/coreutils/literals.go`:
 ```go
 if newT.Simple == core.SimpleType_STRUCT {
     if _, isValueStringType := v.(string); !isValueStringType {
@@ -463,7 +463,34 @@ if newT.Simple == core.SimpleType_STRUCT {
         strValue = string(byteValue)
     }
 }
-``` 
+```
+
+This is how users can create an execution by using a YAML file:
+```bash
+flytectl create execution --execFile ./flytectl/create_dataclass_task.yaml -p flytesnacks -d development
+```
+
+Example YAML file (`create_dataclass_task.yaml`):
+```yaml
+iamRoleARN: ""
+inputs:
+  input:
+    a: 1
+    b: 3.14
+    c: example_string
+    d:
+      "1": 100
+      "2": 200
+    e:
+      a: 1
+      b: 3.14
+envs: {}
+kubeServiceAcct: ""
+targetDomain: ""
+targetProject: ""
+task: dataclass_example.dataclass_task
+version: OSyTikiBTAkjBgrL5JVOVw
+```
 
 ### FlyteConsole
 #### Show input/output on FlyteConsole
