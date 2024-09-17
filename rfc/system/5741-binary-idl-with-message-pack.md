@@ -171,28 +171,24 @@ Notes:
 
 ##### JavaScript
 ```javascript
-import msgpack5 from 'msgpack5';
-
-// Create a MessagePack instance
-const msgpack = msgpack5();
+import { encode, decode } from '@msgpack/msgpack';
 
 // Example data to encode
 const data = { a: 1 };
 
 // Encode the data
-const encodedData = msgpack.encode(data);
+const encodedData = encode(data);
 
 // Print the encoded data
 console.log(encodedData); // <Buffer 81 a1 61 01>
 
 // Decode the data
-const decodedData = msgpack.decode(encodedData);
+const decodedData = decode(encodedData);
 
 // Print the decoded data
 console.log(decodedData); // { a: 1 }
 ```
 reference: https://github.com/msgpack/msgpack-javascript 
-
 
 ### FlyteIDL
 #### Literal Value
@@ -541,6 +537,25 @@ You can reference the relevant section of code here:
 [FlyteCopilot - Data Download](https://github.com/flyteorg/flyte/blob/7989209e15600b56fcf0f4c4a7c9af7bfeab6f3e/flytecopilot/data/download.go#L88-L95)
 
 ### FlyteConsole
+#### How users input into launch form?
+When FlyteConsole receives a literal type of `SimpleType.STRUCT`, the input method depends on the availability of a JSON schema:
+
+1. No JSON Schema provided:
+
+The input is expected as an `Object` (e.g., `{"a": 1}`).
+
+2. JSON Schema provided:
+
+Users can input values according to the expected type defined by the schema, and construct an appropriate `Object`.
+
+Note:
+
+1. For dataclass and Pydantic BaseModel, we will provide JSON Schema in their literal type, and construct the input form for them.
+
+#### How inputs/outputs are shown in the console?
+We should use `msgpack` to deserialize bytes to an `Object`, and show it in the Flyte Console.
+
+
 #### Show input/output on FlyteConsole
 
 1. Get Bytes from the Binary IDL Object.
@@ -580,7 +595,7 @@ We will use `msgpack` to do it.
 None.
 
 ## 8. Unresolved Questions
-
+### Conditional Branch
 Currently, our support for `DataClass/BaseModel/Dict[type, type]` within conditional branches is incomplete. At present, we only support comparisons of primitive types. However, there are two key challenges when attempting to handle these more complex types:
 
 1. **Primitive Type Comparison vs. Binary IDL Object:**
