@@ -530,6 +530,16 @@ task: dataclass_example.dataclass_task
 version: OSyTikiBTAkjBgrL5JVOVw
 ```
 
+### FlyteCopilot
+
+When we need to pass an attribute access value to a copilot task, we must modify the code to convert a Binary Literal value with the `msgpack` tag into a primitive value.
+
+(Currently, we will only support primitive values.)
+
+You can reference the relevant section of code here:
+
+[FlyteCopilot - Data Download](https://github.com/flyteorg/flyte/blob/7989209e15600b56fcf0f4c4a7c9af7bfeab6f3e/flytecopilot/data/download.go#L88-L95)
+
 ### FlyteConsole
 #### Show input/output on FlyteConsole
 
