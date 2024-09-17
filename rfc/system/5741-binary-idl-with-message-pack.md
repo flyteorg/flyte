@@ -570,8 +570,11 @@ None
 
 ## 6 Alternatives
 
-None, it's doable.
+MsgPack is a good choice because it's more smaller and faster than UTF-8 Encoded JSON String.
 
+You can see the performance comparison here: https://github.com/flyteorg/flyte/pull/5607#issuecomment-2333174325
+
+We will use `msgpack` to do it.
 
 ## 7 Potential Impact and Dependencies
 None.
@@ -589,7 +592,7 @@ Currently, our support for `DataClass/BaseModel/Dict[type, type]` within conditi
    - This can lead to inconsistencies in comparison logic. One potential workaround is to convert both types to strings for comparison. However, it is uncertain whether this approach is the best solution.
 
 ## 9 Conclusion
-MsgPack is a good choice because it's more smaller and faster than UTF-8 Encoded JSON String.
 
-You can see the performance comparison here: https://github.com/flyteorg/flyte/pull/5607#issuecomment-2333174325
-We will use `msgpack` to do it.
+1. Binary IDL with MessagePack Bytes provides a better representation for dataclasses, Pydantic BaseModels, and untyped dictionaries in Flyte.
+
+2. This approach ensures 100% accuracy of each attribute and enables attribute access.
