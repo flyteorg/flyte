@@ -42,10 +42,10 @@ Note:
 
 
 ### Literal Type
-Literal Type will be `Protobuf struct`.
+Literal Type will be `SimpleType.STRUCT`.
 `Json Schema` will be stored in `Literal Type's metadata`.
 
-1. Dataclass, Pydantic BaseModel and pure dict in python will all use `Protobuf Struct`.
+1. Dataclass, Pydantic BaseModel and pure dict in python will all use `SimpleType.STRUCT`.
 2. We will put `Json Schema` in Literal Type's `metadata` field, this will be used in flytekit remote api to construct dataclass/Pydantic BaseModel by `Json Schema`.
 3. We will use libraries written in golang to compare `Json Schema` to solve this issue: ["[BUG] Union types fail for e.g. two different dataclasses"](https://github.com/flyteorg/flyte/issues/5489).
 
@@ -455,7 +455,7 @@ my_dc.model_json_schema()
 ### FlyteCtl
 In FlyteCtl, we can construct input for the execution.
 
-We can construct a `Binary IDL Object` when we receive `Literal Type Struct`.
+We can construct a `Binary IDL Object` when we receive `SimpleType.STRUCT`.
 
 In `flyteidl/clients/go/coreutils/literals.go`:
 ```go
