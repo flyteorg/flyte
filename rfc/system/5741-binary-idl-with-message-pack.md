@@ -277,14 +277,15 @@ func MakeDefaultLiteralForType(typ *core.LiteralType) (*core.Literal, error) {
     }
 }
 // Use Message Pack as Default Tag for deserialization.
-func MakeBinaryLiteral(v []byte) *core.Literal {
+// "tag" will default be "msgpack"
+func MakeBinaryLiteral(v []byte, tag string) *core.Literal {
 	return &core.Literal{
 		Value: &core.Literal_Scalar{
 			Scalar: &core.Scalar{
 				Value: &core.Scalar_Binary{
 					Binary: &core.Binary{
 						Value: v,
-						Tag:   "msgpack",
+						Tag:   tag,
 					},
 				},
 			},
