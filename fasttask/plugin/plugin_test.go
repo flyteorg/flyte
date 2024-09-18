@@ -688,6 +688,8 @@ func TestHandleRunning(t *testing.T) {
 			Domain:  "domain",
 		},
 	})
+	taskExecutionID.OnGetUniqueNodeID().Return("task-id")
+	taskExecutionID.OnGetGeneratedName().Return("task-name")
 	taskMetadata.OnGetTaskExecutionID().Return(taskExecutionID)
 
 	for _, test := range tests {
@@ -843,6 +845,8 @@ func TestGetTaskInfo(t *testing.T) {
 			},
 		})
 		taskExecutionID.OnGetGeneratedNameWithMatch(mock.Anything, mock.Anything).Return("task-id", nil)
+		taskExecutionID.OnGetUniqueNodeID().Return("task-id")
+		taskExecutionID.OnGetGeneratedName().Return("task-name")
 		taskMetadata.OnGetTaskExecutionID().Return(taskExecutionID)
 		tCtx.OnTaskExecutionMetadata().Return(taskMetadata)
 
@@ -894,6 +898,8 @@ func TestGetTaskInfo(t *testing.T) {
 			},
 		})
 		taskExecutionID.OnGetGeneratedNameWithMatch(mock.Anything, mock.Anything).Return("task-id", nil)
+		taskExecutionID.OnGetUniqueNodeID().Return("task-id")
+		taskExecutionID.OnGetGeneratedName().Return("task-name")
 		taskMetadata.OnGetTaskExecutionID().Return(taskExecutionID)
 		tCtx.OnTaskExecutionMetadata().Return(taskMetadata)
 
@@ -938,6 +944,8 @@ func TestGetTaskInfo(t *testing.T) {
 			},
 		})
 		taskExecutionID.OnGetGeneratedNameWithMatch(mock.Anything, mock.Anything).Return("task-id", nil)
+		taskExecutionID.OnGetUniqueNodeID().Return("task-id")
+		taskExecutionID.OnGetGeneratedName().Return("task-name")
 		taskMetadata.OnGetTaskExecutionID().Return(taskExecutionID)
 		tCtx.OnTaskExecutionMetadata().Return(taskMetadata)
 

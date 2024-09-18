@@ -525,13 +525,14 @@ func (p *Plugin) getTaskInfo(ctx context.Context, tCtx core.TaskExecutionContext
 	}
 
 	in := tasklog.Input{
-		Namespace:     pod.Namespace,
-		PodName:       pod.Name,
-		PodUID:        string(pod.GetUID()),
-		ContainerName: pod.Spec.Containers[containerIndex].Name,
-		ContainerID:   pod.Status.ContainerStatuses[containerIndex].ContainerID,
-		HostName:      pod.Spec.Hostname,
-		TaskTemplate:  taskTemplate,
+		Namespace:       pod.Namespace,
+		PodName:         pod.Name,
+		PodUID:          string(pod.GetUID()),
+		ContainerName:   pod.Spec.Containers[containerIndex].Name,
+		ContainerID:     pod.Status.ContainerStatuses[containerIndex].ContainerID,
+		HostName:        pod.Spec.Hostname,
+		TaskExecutionID: tCtx.TaskExecutionMetadata().GetTaskExecutionID(),
+		TaskTemplate:    taskTemplate,
 		ExtraTemplateVars: []tasklog.TemplateVar{
 			{
 				Regex: taskStartTimeTemplateVar,
