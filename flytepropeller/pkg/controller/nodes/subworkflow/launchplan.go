@@ -229,3 +229,20 @@ func (l *launchPlanHandler) HandleAbort(ctx context.Context, nCtx interfaces.Nod
 	}
 	return l.launchPlan.Kill(ctx, childID, fmt.Sprintf("cascading abort as parent execution id [%s] aborted, reason [%s]", nCtx.ExecutionContext().GetName(), reason))
 }
+
+func (l *launchPlanHandler) Finalize(ctx context.Context, nCtx interfaces.NodeExecutionContext) error {
+	parentNodeExecutionID, err := getParentNodeExecutionID(nCtx)
+	if err != nil {
+		return err
+	}
+	childID, err := GetChildWorkflowExecutionIDForExecution(
+		parentNodeExecutionID,
+		nCtx,
+	)
+	if err != nil {
+		// THIS SHOULD NEVER HAPPEN
+		return err
+	}
+
+	return l.launchPlan.Finalize(ctx, childID)
+}

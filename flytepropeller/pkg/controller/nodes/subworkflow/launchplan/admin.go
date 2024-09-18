@@ -224,6 +224,10 @@ func (a *adminLaunchPlanExecutor) Initialize(ctx context.Context) error {
 	return a.cache.Start(ctx)
 }
 
+func (a *adminLaunchPlanExecutor) Finalize(ctx context.Context, executionID *core.WorkflowExecutionIdentifier) error {
+	return a.cache.DeleteDelayed(executionID.String())
+}
+
 func (a *adminLaunchPlanExecutor) syncItem(ctx context.Context, batch cache.Batch) (
 	resp []cache.ItemSyncResponse, err error) {
 	resp = make([]cache.ItemSyncResponse, 0, len(batch))

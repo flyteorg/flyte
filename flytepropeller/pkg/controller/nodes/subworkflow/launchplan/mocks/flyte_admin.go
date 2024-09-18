@@ -19,6 +19,38 @@ type FlyteAdmin struct {
 	mock.Mock
 }
 
+type FlyteAdmin_Finalize struct {
+	*mock.Call
+}
+
+func (_m FlyteAdmin_Finalize) Return(_a0 error) *FlyteAdmin_Finalize {
+	return &FlyteAdmin_Finalize{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *FlyteAdmin) OnFinalize(ctx context.Context, executionID *core.WorkflowExecutionIdentifier) *FlyteAdmin_Finalize {
+	c_call := _m.On("Finalize", ctx, executionID)
+	return &FlyteAdmin_Finalize{Call: c_call}
+}
+
+func (_m *FlyteAdmin) OnFinalizeMatch(matchers ...interface{}) *FlyteAdmin_Finalize {
+	c_call := _m.On("Finalize", matchers...)
+	return &FlyteAdmin_Finalize{Call: c_call}
+}
+
+// Finalize provides a mock function with given fields: ctx, executionID
+func (_m *FlyteAdmin) Finalize(ctx context.Context, executionID *core.WorkflowExecutionIdentifier) error {
+	ret := _m.Called(ctx, executionID)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, *core.WorkflowExecutionIdentifier) error); ok {
+		r0 = rf(ctx, executionID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 type FlyteAdmin_GetLaunchPlan struct {
 	*mock.Call
 }

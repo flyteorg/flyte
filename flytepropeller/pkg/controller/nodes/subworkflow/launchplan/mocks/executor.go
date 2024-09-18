@@ -19,6 +19,38 @@ type Executor struct {
 	mock.Mock
 }
 
+type Executor_Finalize struct {
+	*mock.Call
+}
+
+func (_m Executor_Finalize) Return(_a0 error) *Executor_Finalize {
+	return &Executor_Finalize{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *Executor) OnFinalize(ctx context.Context, executionID *core.WorkflowExecutionIdentifier) *Executor_Finalize {
+	c_call := _m.On("Finalize", ctx, executionID)
+	return &Executor_Finalize{Call: c_call}
+}
+
+func (_m *Executor) OnFinalizeMatch(matchers ...interface{}) *Executor_Finalize {
+	c_call := _m.On("Finalize", matchers...)
+	return &Executor_Finalize{Call: c_call}
+}
+
+// Finalize provides a mock function with given fields: ctx, executionID
+func (_m *Executor) Finalize(ctx context.Context, executionID *core.WorkflowExecutionIdentifier) error {
+	ret := _m.Called(ctx, executionID)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, *core.WorkflowExecutionIdentifier) error); ok {
+		r0 = rf(ctx, executionID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 type Executor_GetStatus struct {
 	*mock.Call
 }

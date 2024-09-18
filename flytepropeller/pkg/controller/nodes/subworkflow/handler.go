@@ -33,7 +33,7 @@ func newMetrics(scope promutils.Scope) metrics {
 }
 
 func (w *workflowNodeHandler) FinalizeRequired() bool {
-	return false
+	return true
 }
 
 func (w *workflowNodeHandler) Setup(_ context.Context, _ interfaces.SetupContext) error {
@@ -120,8 +120,12 @@ func (w *workflowNodeHandler) Abort(ctx context.Context, nCtx interfaces.NodeExe
 	return nil
 }
 
-func (w *workflowNodeHandler) Finalize(ctx context.Context, _ interfaces.NodeExecutionContext) error {
-	logger.Warnf(ctx, "Subworkflow finalize invoked. Nothing to be done")
+func (w *workflowNodeHandler) Finalize(ctx context.Context, nCtx interfaces.NodeExecutionContext) error {
+	logger.Warnf(ctx, "Subworkflow finalize invoked. Clearing up the cache")
+	wfNode := nCtx.Node().GetWorkflowNode()
+	if wfNode.GetLaunchPlanRefID() != nil {
+		return w.lpHandler.Finalize(ctx, nCtx)
+	}
 	return nil
 }
 
