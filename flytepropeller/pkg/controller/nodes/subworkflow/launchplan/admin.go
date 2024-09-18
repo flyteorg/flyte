@@ -85,7 +85,10 @@ func (a *adminLaunchPlanExecutor) handleLaunchError(ctx context.Context, isRecov
 		}
 
 		return stdErr.Wrapf(RemoteErrorAlreadyExists, err, "ExecID %s already exists", executionID.Name)
-	case codes.DataLoss, codes.DeadlineExceeded, codes.Internal, codes.Unknown, codes.Canceled:
+	case codes.DataLoss, codes.DeadlineExceeded, codes.Internal, codes.Unknown, codes.Canceled,
+		// In case the remote system is under heavy load, we should retry
+		codes.ResourceExhausted, codes.Unavailable:
+
 		return stdErr.Wrapf(RemoteErrorSystem, err, "failed to launch workflow [%s], system error", launchPlanRef.Name)
 	default:
 		return stdErr.Wrapf(RemoteErrorUser, err, "failed to launch workflow")
