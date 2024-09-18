@@ -1,87 +1,126 @@
 package config
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestIsSupportedSDKVersion(t *testing.T) {
-	t.Run("supported version", func(t *testing.T) {
-		config := LiteralOffloadingConfig{
-			SupportedSDKVersions: map[string]string{
-				"flytekit": "0.16.0",
+	ctx := context.Background()
+	tests := []struct {
+		name           string
+		config         LiteralOffloadingConfig
+		sdk            string
+		version        string
+		expectedResult bool
+	}{
+		{
+			name: "supported version",
+			config: LiteralOffloadingConfig{
+				SupportedSDKVersions: map[string]string{
+					"flytekit": "0.16.0",
+				},
 			},
-		}
-		assert.True(t, config.IsSupportedSDKVersion("flytekit", "0.16.0"))
-	})
+			sdk:            "flytekit",
+			version:        "0.16.0",
+			expectedResult: true,
+		},
+		{
+			name: "unsupported version",
+			config: LiteralOffloadingConfig{
+				SupportedSDKVersions: map[string]string{
+					"flytekit": "0.16.0",
+				},
+			},
+			sdk:            "flytekit",
+			version:        "0.15.0",
+			expectedResult: false,
+		},
+		{
+			name: "unsupported SDK",
+			config: LiteralOffloadingConfig{
+				SupportedSDKVersions: map[string]string{
+					"flytekit": "0.16.0",
+				},
+			},
+			sdk:            "unknown",
+			version:        "0.16.0",
+			expectedResult: false,
+		},
+		{
+			name: "invalid version",
+			config: LiteralOffloadingConfig{
+				SupportedSDKVersions: map[string]string{
+					"flytekit": "0.16.0",
+				},
+			},
+			sdk:            "flytekit",
+			version:        "invalid",
+			expectedResult: false,
+		},
+		{
+			name: "invalid constraint",
+			config: LiteralOffloadingConfig{
+				SupportedSDKVersions: map[string]string{
+					"flytekit": "invalid",
+				},
+			},
+			sdk:            "flytekit",
+			version:        "0.16.0",
+			expectedResult: false,
+		},
+		{
+			name: "supported dev version",
+			config: LiteralOffloadingConfig{
+				SupportedSDKVersions: map[string]string{
+					"flytekit": "1.13.4",
+				},
+			},
+			sdk:            "flytekit",
+			version:        "1.13.4.dev12+g990b450ea.d20240917",
+			expectedResult: true,
+		},
+		{
+			name: "supported beta version",
+			config: LiteralOffloadingConfig{
+				SupportedSDKVersions: map[string]string{
+					"flytekit": "1.13.4",
+				},
+			},
+			sdk:            "flytekit",
+			version:        "v1.13.6b0",
+			expectedResult: true,
+		},
+		{
+			name: "unsupported dev version",
+			config: LiteralOffloadingConfig{
+				SupportedSDKVersions: map[string]string{
+					"flytekit": "1.13.4",
+				},
+			},
+			sdk:            "flytekit",
+			version:        "1.13.3.dev12+g990b450ea.d20240917",
+			expectedResult: false,
+		},
+		{
+			name: "unsupported beta version",
+			config: LiteralOffloadingConfig{
+				SupportedSDKVersions: map[string]string{
+					"flytekit": "1.13.4",
+				},
+			},
+			sdk:            "flytekit",
+			version:        "v1.13.3b0",
+			expectedResult: false,
+		},
+	}
 
-	t.Run("unsupported version", func(t *testing.T) {
-		config := LiteralOffloadingConfig{
-			SupportedSDKVersions: map[string]string{
-				"flytekit": "0.16.0",
-			},
-		}
-		assert.False(t, config.IsSupportedSDKVersion("flytekit", "0.15.0"))
-	})
-
-	t.Run("unsupported SDK", func(t *testing.T) {
-		config := LiteralOffloadingConfig{
-			SupportedSDKVersions: map[string]string{
-				"flytekit": "0.16.0",
-			},
-		}
-		assert.False(t, config.IsSupportedSDKVersion("unknown", "0.16.0"))
-	})
-
-	t.Run("invalid version", func(t *testing.T) {
-		config := LiteralOffloadingConfig{
-			SupportedSDKVersions: map[string]string{
-				"flytekit": "0.16.0",
-			},
-		}
-		assert.False(t, config.IsSupportedSDKVersion("flytekit", "invalid"))
-	})
-
-	t.Run("invalid constraint", func(t *testing.T) {
-		config := LiteralOffloadingConfig{
-			SupportedSDKVersions: map[string]string{
-				"flytekit": "invalid",
-			},
-		}
-		assert.False(t, config.IsSupportedSDKVersion("flytekit", "0.16.0"))
-	})
-
-	t.Run("supported dev version", func(t *testing.T) {
-		config := LiteralOffloadingConfig{
-			SupportedSDKVersions: map[string]string{
-				"flytekit": "1.13.4",
-			},
-		}
-		assert.True(t, config.IsSupportedSDKVersion("flytekit", "1.13.4.dev12+g990b450ea.d20240917"))
-	})
-	t.Run("supported beta version", func(t *testing.T) {
-		config := LiteralOffloadingConfig{
-			SupportedSDKVersions: map[string]string{
-				"flytekit": "1.13.4",
-			},
-		}
-		assert.True(t, config.IsSupportedSDKVersion("flytekit", "v1.13.6b0"))
-	})
-	t.Run("unsupported dev version", func(t *testing.T) {
-		config := LiteralOffloadingConfig{
-			SupportedSDKVersions: map[string]string{
-				"flytekit": "1.13.4",
-			},
-		}
-		assert.False(t, config.IsSupportedSDKVersion("flytekit", "1.13.3.dev12+g990b450ea.d20240917"))
-	})
-	t.Run("unsupported beta version", func(t *testing.T) {
-		config := LiteralOffloadingConfig{
-			SupportedSDKVersions: map[string]string{
-				"flytekit": "1.13.4",
-			},
-		}
-		assert.False(t, config.IsSupportedSDKVersion("flytekit", "v1.13.3b0"))
-	})
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := tt.config.IsSupportedSDKVersion(ctx, tt.sdk, tt.version)
+			assert.Equal(t, tt.expectedResult, result)
+		})
+	}
 }

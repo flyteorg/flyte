@@ -191,24 +191,24 @@ type LiteralOffloadingConfig struct {
 }
 
 // IsSupportedSDKVersion returns true if the provided SDK and version are supported by the literal offloading config.
-func (l LiteralOffloadingConfig) IsSupportedSDKVersion(sdk string, versionString string) bool {
+func (l LiteralOffloadingConfig) IsSupportedSDKVersion(ctx context.Context, sdk string, versionString string) bool {
 	regexMatches := sanitizeProtoRegex.FindStringSubmatch(versionString)
 	if len(regexMatches) > 1 {
-		logger.Infof(context.TODO(), "original: %s, semVer: %s", versionString, regexMatches[1])
+		logger.Infof(ctx, "original: %s, semVer: %s", versionString, regexMatches[1])
 	} else {
-		logger.Warnf(context.TODO(), "no match found for: %s", versionString)
+		logger.Warnf(ctx, "no match found for: %s", versionString)
 		return false
 	}
 	version, err := semver.NewVersion(regexMatches[1])
 	if err != nil {
-		logger.Warnf(context.TODO(), "Failed to parse version %s", versionString)
+		logger.Warnf(ctx, "Failed to parse version %s", versionString)
 		return false
 	}
 	if leastSupportedVersion, ok := l.SupportedSDKVersions[sdk]; ok {
 		c, err := semver.NewConstraint(fmt.Sprintf(">= %s", leastSupportedVersion))
 		if err != nil {
 			// This should never happen
-			logger.Warnf(context.TODO(), "Failed to parse version constraint %s", leastSupportedVersion)
+			logger.Warnf(ctx, "Failed to parse version constraint %s", leastSupportedVersion)
 			return false
 		}
 		return c.Check(version)
