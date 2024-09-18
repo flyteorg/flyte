@@ -732,9 +732,6 @@ func (c *controller) reportNamespaceProvisioned(ctx context.Context, orgs sets.S
 	}
 }
 
-// TODO: Remove this when implementing COR-1531
-// This is a temporary solution to avoid update org status to provisioned when deleting namespaces
-// We are going to provision namespaces based on org status for serverless
 const (
 	ShouldReportNameSpaceProvisioned    = true
 	ShouldNotReportNameSpaceProvisioned = false
@@ -835,7 +832,8 @@ func (c *controller) Sync(ctx context.Context) error {
 	logger.Debugf(ctx, "Running an invocation of ClusterResource Sync")
 
 	// First handle ensuring k8s resources for active projects
-	projects, err := c.adminDataProvider.GetProjects(ctx)
+	clusterResourcePlugin := plugins.Get[plugin.ClusterResourcePlugin](c.pluginRegistry, plugins.PluginIDClusterResource)
+	projects, err := c.adminDataProvider.GetProjects(ctx, clusterResourcePlugin)
 	if err != nil {
 		return err
 	}
@@ -861,7 +859,7 @@ func (c *controller) Sync(ctx context.Context) error {
 
 	// Second, handle deleting k8s namespaces for archived projects
 	if c.config.ClusterResourceConfiguration().GetUnionProjectSyncConfig().CleanupNamespace {
-		archivedProjects, err := c.adminDataProvider.GetArchivedProjects(ctx)
+		archivedProjects, err := c.adminDataProvider.GetArchivedProjects(ctx, clusterResourcePlugin)
 		if err != nil {
 			logger.Warningf(ctx, "failed to get archived projects: %v", err)
 			return err
@@ -999,6 +997,6 @@ func NewClusterResourceControllerFromConfig(ctx context.Context, scope promutils
 		adminDataProvider = impl2.NewDatabaseAdminDataProvider(repo, configuration, resourceManager)
 	}
 
-	pluginRegistry.RegisterDefault(plugins.PluginIDClusterResource, plugin.NewNoopClusterResourcePlugin())
+	pluginRegistry.RegisterDefault(plugins.PluginIDClusterResource, plugin.NewDefaultClusterResourcePlugin())
 	return NewClusterResourceController(adminDataProvider, listTargetsProvider, scope, pluginRegistry), nil
 }
