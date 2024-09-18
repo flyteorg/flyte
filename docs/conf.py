@@ -33,7 +33,7 @@ sphinx.application.ExtensionError = sphinx.errors.ExtensionError
 # -- Project information -----------------------------------------------------
 
 project = "Flyte"
-copyright = "2024, Flyte Authors"
+copyright = "2024, Flyte authors"
 author = "Flyte"
 
 # The short X.Y version
@@ -254,8 +254,8 @@ latex_elements = {
 latex_documents = [
     (master_doc,
      "Flyte.tex",
-     "Flyte Documentation",
-     "Flyte Authors",
+     "Flyte documentation",
+     "Flyte authors",
      "manual"),
 ]
 
