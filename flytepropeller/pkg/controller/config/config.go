@@ -173,17 +173,17 @@ type Config struct {
 	CreateFlyteWorkflowCRD   bool                    `json:"create-flyteworkflow-crd" pflag:",Enable creation of the FlyteWorkflow CRD on startup"`
 	NodeExecutionWorkerCount int                     `json:"node-execution-worker-count" pflag:",Number of workers to evaluate node executions, currently only used for array nodes"`
 	ArrayNode                ArrayNodeConfig         `json:"array-node-config,omitempty" pflag:",Configuration for array nodes"`
-	LiteralOffloadingConfig  LiteralOffloadingConfig `json:"literalOffloadingConfig" pflag:",config used for literal offloading."`
+	LiteralOffloadingConfig  LiteralOffloadingConfig `json:"literal-offloading-config" pflag:",config used for literal offloading."`
 }
 
 type LiteralOffloadingConfig struct {
 	Enabled bool
 	// Maps flytekit and union SDK names to minimum supported version that can handle reading offloaded literals.
-	SupportedSDKVersions map[string]string
+	SupportedSDKVersions map[string]string `json:"supported-sdk-versions" pflag:",Maps flytekit and union SDK names to minimum supported version that can handle reading offloaded literals."`
 	// Default, 10Mbs. Determines the size of a literal at which to trigger offloading
-	MinSizeInMBForOffloading int64
+	MinSizeInMBForOffloading int64 `json:"min-size-in-mb-for-offloading" pflag:",Size of a literal at which to trigger offloading"`
 	// Fail fast threshold
-	MaxSizeInMBForOffloading int64
+	MaxSizeInMBForOffloading int64 `json:"max-size-in-mb-for-offloading" pflag:",Size of a literal at which to fail fast"`
 }
 
 // IsSupportedSDKVersion returns true if the provided SDK and version are supported by the literal offloading config.
