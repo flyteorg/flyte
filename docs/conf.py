@@ -282,10 +282,10 @@ texinfo_documents = [
     ),
 ]
 
-# Algolia docsearch credentials
-docsearch_app_id = "WLG0MZB58Q"
-docsearch_api_key = "28bf9bfd4a77a7d6b3ab7e98c671e781"
-docsearch_index_name = "flyte"
+# Algolia Docsearch credentials
+docsearch_app_id = os.getenv("DOCSEARCH_APP_ID")
+docsearch_api_key = os.getenv("DOCSEARCH_API_KEY")
+docsearch_index_name = os.getenv("DOCSEARCH_INDEX_NAME")
 
 # -- Extension configuration -------------------------------------------------
 # autosectionlabel_prefix_document = True
