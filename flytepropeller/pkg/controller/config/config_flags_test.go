@@ -967,13 +967,13 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_literalOffloadingConfig.Enabled", func(t *testing.T) {
+	t.Run("Test_literal-offloading-config.Enabled", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
 
-			cmdFlags.Set("literalOffloadingConfig.Enabled", testValue)
-			if vBool, err := cmdFlags.GetBool("literalOffloadingConfig.Enabled"); err == nil {
+			cmdFlags.Set("literal-offloading-config.Enabled", testValue)
+			if vBool, err := cmdFlags.GetBool("literal-offloading-config.Enabled"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.LiteralOffloadingConfig.Enabled)
 
 			} else {
@@ -981,13 +981,13 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_literalOffloadingConfig.SupportedSDKVersions", func(t *testing.T) {
+	t.Run("Test_literal-offloading-config.supported-sdk-versions", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "a=1,b=2"
 
-			cmdFlags.Set("literalOffloadingConfig.SupportedSDKVersions", testValue)
-			if vStringToString, err := cmdFlags.GetStringToString("literalOffloadingConfig.SupportedSDKVersions"); err == nil {
+			cmdFlags.Set("literal-offloading-config.supported-sdk-versions", testValue)
+			if vStringToString, err := cmdFlags.GetStringToString("literal-offloading-config.supported-sdk-versions"); err == nil {
 				testDecodeRaw_Config(t, vStringToString, &actual.LiteralOffloadingConfig.SupportedSDKVersions)
 
 			} else {
@@ -995,13 +995,13 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_literalOffloadingConfig.MinSizeInMBForOffloading", func(t *testing.T) {
+	t.Run("Test_literal-offloading-config.min-size-in-mb-for-offloading", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
 
-			cmdFlags.Set("literalOffloadingConfig.MinSizeInMBForOffloading", testValue)
-			if vInt64, err := cmdFlags.GetInt64("literalOffloadingConfig.MinSizeInMBForOffloading"); err == nil {
+			cmdFlags.Set("literal-offloading-config.min-size-in-mb-for-offloading", testValue)
+			if vInt64, err := cmdFlags.GetInt64("literal-offloading-config.min-size-in-mb-for-offloading"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt64), &actual.LiteralOffloadingConfig.MinSizeInMBForOffloading)
 
 			} else {
@@ -1009,13 +1009,13 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_literalOffloadingConfig.MaxSizeInMBForOffloading", func(t *testing.T) {
+	t.Run("Test_literal-offloading-config.max-size-in-mb-for-offloading", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
 
-			cmdFlags.Set("literalOffloadingConfig.MaxSizeInMBForOffloading", testValue)
-			if vInt64, err := cmdFlags.GetInt64("literalOffloadingConfig.MaxSizeInMBForOffloading"); err == nil {
+			cmdFlags.Set("literal-offloading-config.max-size-in-mb-for-offloading", testValue)
+			if vInt64, err := cmdFlags.GetInt64("literal-offloading-config.max-size-in-mb-for-offloading"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt64), &actual.LiteralOffloadingConfig.MaxSizeInMBForOffloading)
 
 			} else {
