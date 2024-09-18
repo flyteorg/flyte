@@ -14,6 +14,7 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/validators"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/common"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/errors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
@@ -41,6 +42,7 @@ var (
 // arrayNodeHandler is a handle implementation for processing array nodes
 type arrayNodeHandler struct {
 	eventConfig                 *config.EventConfig
+	literalOffloadingConfig     config.LiteralOffloadingConfig
 	gatherOutputsRequestChannel chan *gatherOutputsRequest
 	metrics                     metrics
 	nodeExecutionRequestChannel chan *nodeExecutionRequest
@@ -533,7 +535,6 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		// attempt best effort at initializing outputLiterals with output variable names. currently
 		// only TaskNode and WorkflowNode contain node interfaces.
 		outputLiterals := make(map[string]*idlcore.Literal)
-
 		switch arrayNode.GetSubNodeSpec().GetKind() {
 		case v1alpha1.NodeKindTask:
 			taskID := *arrayNode.GetSubNodeSpec().TaskRef
@@ -600,6 +601,18 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			return handler.UnknownTransition, fmt.Errorf("worker error(s) encountered: %s", workerErrorCollector.Summary(events.MaxErrorMessageLength))
 		}
 
+		// only offload literal if config is enabled for this feature.
+		if a.literalOffloadingConfig.Enabled {
+			for outputLiteralKey, outputLiteral := range outputLiterals {
+				// if the size of the output Literal is > threshold then we write the literal to the offloaded store and populate the literal with its zero value and update the offloaded url
+				// use the OffloadLargeLiteralKey to create  {OffloadLargeLiteralKey}_offloaded_metadata.pb file in the datastore.
+				// Update the url in the outputLiteral with the offloaded url and also update the size of the literal.
+				offloadedOutputFile := v1alpha1.GetOutputsLiteralMetadataFile(outputLiteralKey, nCtx.NodeStatus().GetOutputDir())
+				if err := common.OffloadLargeLiteral(ctx, nCtx.DataStore(), offloadedOutputFile, outputLiteral, a.literalOffloadingConfig); err != nil {
+					return handler.UnknownTransition, err
+				}
+			}
+		}
 		outputLiteralMap := &idlcore.LiteralMap{
 			Literals: outputLiterals,
 		}
@@ -702,7 +715,7 @@ func (a *arrayNodeHandler) Setup(_ context.Context, _ interfaces.SetupContext) e
 }
 
 // New initializes a new arrayNodeHandler
-func New(nodeExecutor interfaces.Node, eventConfig *config.EventConfig, scope promutils.Scope) (interfaces.NodeHandler, error) {
+func New(nodeExecutor interfaces.Node, eventConfig *config.EventConfig, literalOffloadingConfig config.LiteralOffloadingConfig, scope promutils.Scope) (interfaces.NodeHandler, error) {
 	// create k8s PluginState byte mocks to reuse instead of creating for each subNode evaluation
 	pluginStateBytesNotStarted, err := bytesFromK8sPluginState(k8s.PluginState{Phase: k8s.PluginPhaseNotStarted})
 	if err != nil {
@@ -729,6 +742,7 @@ func New(nodeExecutor interfaces.Node, eventConfig *config.EventConfig, scope pr
 	arrayScope := scope.NewSubScope("array")
 	return &arrayNodeHandler{
 		eventConfig:                 deepCopiedEventConfig,
+		literalOffloadingConfig:     literalOffloadingConfig,
 		gatherOutputsRequestChannel: make(chan *gatherOutputsRequest),
 		metrics:                     newMetrics(arrayScope),
 		nodeExecutionRequestChannel: make(chan *nodeExecutionRequest),

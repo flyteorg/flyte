@@ -255,7 +255,7 @@ func validateLiteralMap(inputMap *core.LiteralMap, fieldName string) error {
 			if name == "" {
 				return errors.NewFlyteAdminErrorf(codes.InvalidArgument, "missing key in %s", fieldName)
 			}
-			if fixedInput == nil || fixedInput.GetValue() == nil {
+			if fixedInput.GetValue() == nil && fixedInput.GetOffloadedMetadata() == nil {
 				return errors.NewFlyteAdminErrorf(codes.InvalidArgument, "missing valid literal in %s %s", fieldName, name)
 			}
 			if isDateTime(fixedInput) {

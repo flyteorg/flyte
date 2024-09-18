@@ -498,6 +498,7 @@ type nodeExecutor struct {
 	enqueueWorkflow                 v1alpha1.EnqueueWorkflow
 	eventConfig                     *config.EventConfig
 	executionEnvClient              pluginscore.ExecutionEnvClient
+	literalOffloadingConfig         config.LiteralOffloadingConfig
 	interruptibleFailureThreshold   int32
 	maxNodeRetriesForSystemFailures uint32
 	metrics                         *nodeMetrics
@@ -774,6 +775,11 @@ func (c *nodeExecutor) preExecute(ctx context.Context, dag executors.DAGStructur
 				if config.GetConfig().AcceleratedInputs.Enabled {
 					c.replaceRemotePathsForMap(ctx, nodeInputs)
 				}
+				p := common.CheckOffloadingCompat(ctx, nCtx, nodeInputs.Literals, node, c.literalOffloadingConfig)
+				if p != nil {
+					return *p, nil
+				}
+
 				inputsFile := v1alpha1.GetInputsFile(dataDir)
 				if err := c.store.WriteProtobuf(ctx, inputsFile, storage.Options{}, nodeInputs); err != nil {
 					c.metrics.InputsWriteFailure.Inc(ctx)
@@ -1483,7 +1489,7 @@ func (c *nodeExecutor) replaceRemotePrefix(ctx context.Context, s string) string
 
 func NewExecutor(ctx context.Context, nodeConfig config.NodeConfig, store *storage.DataStore, enQWorkflow v1alpha1.EnqueueWorkflow, eventSink events.EventSink,
 	workflowLauncher launchplan.Executor, launchPlanReader launchplan.Reader, defaultRawOutputPrefix storage.DataReference, defaultRawOutputSuffix []string, kubeClient executors.Client,
-	cacheClient catalog.Client, recoveryClient recovery.Client, eventConfig *config.EventConfig, clusterID string, signalClient service.SignalServiceClient,
+	cacheClient catalog.Client, recoveryClient recovery.Client, literalOffloadingConfig config.LiteralOffloadingConfig, eventConfig *config.EventConfig, clusterID string, signalClient service.SignalServiceClient,
 	nodeHandlerFactory interfaces.HandlerFactory, executionEnvClient pluginscore.ExecutionEnvClient, scope promutils.Scope) (interfaces.Node, error) {
 
 	// TODO we may want to make this configurable.
@@ -1538,6 +1544,7 @@ func NewExecutor(ctx context.Context, nodeConfig config.NodeConfig, store *stora
 		enqueueWorkflow:                 enQWorkflow,
 		eventConfig:                     eventConfig,
 		executionEnvClient:              executionEnvClient,
+		literalOffloadingConfig:         literalOffloadingConfig,
 		interruptibleFailureThreshold:   nodeConfig.InterruptibleFailureThreshold,
 		maxNodeRetriesForSystemFailures: uint32(nodeConfig.MaxNodeRetriesOnSystemFailures),
 		metrics:                         metrics,

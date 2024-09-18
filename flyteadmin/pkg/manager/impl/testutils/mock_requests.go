@@ -249,8 +249,30 @@ func GetExecutionRequest() admin.ExecutionCreateRequest {
 	}
 }
 
-func GetSampleWorkflowSpecForTest() admin.WorkflowSpec {
-	return admin.WorkflowSpec{
+func GetExecutionRequestWithOffloadedInputs(inputParam string, literalValue *core.Literal) *admin.ExecutionCreateRequest {
+	execReq := GetExecutionRequest()
+	execReq.Inputs = &core.LiteralMap{
+		Literals: map[string]*core.Literal{
+			"foo": {
+				Value: &core.Literal_OffloadedMetadata{
+					OffloadedMetadata: &core.LiteralOffloadedMetadata{
+						Uri:       "s3://bucket/key",
+						SizeBytes: 100,
+						InferredType: &core.LiteralType{
+							Type: &core.LiteralType_Simple{
+								Simple: core.SimpleType_STRING,
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	return &execReq
+}
+
+func GetSampleWorkflowSpecForTest() *admin.WorkflowSpec {
+	return &admin.WorkflowSpec{
 		Template: &core.WorkflowTemplate{
 			Interface: &core.TypedInterface{
 				Inputs: &core.VariableMap{

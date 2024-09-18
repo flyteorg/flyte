@@ -93,6 +93,7 @@ message Scalar {
 
 // A simple value. This supports any level of nesting (e.g. array of array of array of Blobs) as well as simple primitives.
 message Literal {
+    reserved 6, 7;
     oneof value {
         // A simple value.
         Scalar scalar = 1;
@@ -102,6 +103,10 @@ message Literal {
 
         // A map of strings to literals.
         LiteralMap map = 3;
+
+        // Offloaded literal metadata
+        // When you deserialize the offloaded metadata, it would be of Literal and its type would be defined by LiteralType stored in offloaded_metadata.
+        LiteralOffloadedMetadata offloaded_metadata = 8;
     }
 
     // A hash representing this literal.
@@ -111,6 +116,18 @@ message Literal {
 
     // Additional metadata for literals.
     map<string, string> metadata = 5;
+}
+
+// A message that contains the metadata of the offloaded data.
+message LiteralOffloadedMetadata {
+    // The location of the offloaded core.Literal.
+    string uri = 1;
+
+    // The size of the offloaded data.
+    uint64 size_bytes = 2;
+
+    // The inferred literal type of the offloaded data.
+    LiteralType inferred_type = 3;
 }
 
 // A collection of literals. This is a workaround since oneofs in proto messages cannot contain a repeated field.

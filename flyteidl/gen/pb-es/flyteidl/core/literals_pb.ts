@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
-import { Duration, Message, proto3, Struct, Timestamp } from "@bufbuild/protobuf";
+import { Duration, Message, proto3, protoInt64, Struct, Timestamp } from "@bufbuild/protobuf";
 import { BlobType, Error, LiteralType, OutputReference, SchemaType, StructuredDatasetType } from "./types_pb.js";
 
 /**
@@ -566,6 +566,15 @@ export class Literal extends Message<Literal> {
      */
     value: LiteralMap;
     case: "map";
+  } | {
+    /**
+     * Offloaded literal metadata
+     * When you deserialize the offloaded metadata, it would be of Literal and its type would be defined by LiteralType stored in offloaded_metadata.
+     *
+     * @generated from field: flyteidl.core.LiteralOffloadedMetadata offloaded_metadata = 8;
+     */
+    value: LiteralOffloadedMetadata;
+    case: "offloadedMetadata";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   /**
@@ -595,6 +604,7 @@ export class Literal extends Message<Literal> {
     { no: 1, name: "scalar", kind: "message", T: Scalar, oneof: "value" },
     { no: 2, name: "collection", kind: "message", T: LiteralCollection, oneof: "value" },
     { no: 3, name: "map", kind: "message", T: LiteralMap, oneof: "value" },
+    { no: 8, name: "offloaded_metadata", kind: "message", T: LiteralOffloadedMetadata, oneof: "value" },
     { no: 4, name: "hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 5, name: "metadata", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
   ]);
@@ -613,6 +623,63 @@ export class Literal extends Message<Literal> {
 
   static equals(a: Literal | PlainMessage<Literal> | undefined, b: Literal | PlainMessage<Literal> | undefined): boolean {
     return proto3.util.equals(Literal, a, b);
+  }
+}
+
+/**
+ * A message that contains the metadata of the offloaded data.
+ *
+ * @generated from message flyteidl.core.LiteralOffloadedMetadata
+ */
+export class LiteralOffloadedMetadata extends Message<LiteralOffloadedMetadata> {
+  /**
+   * The location of the offloaded core.Literal.
+   *
+   * @generated from field: string uri = 1;
+   */
+  uri = "";
+
+  /**
+   * The size of the offloaded data.
+   *
+   * @generated from field: uint64 size_bytes = 2;
+   */
+  sizeBytes = protoInt64.zero;
+
+  /**
+   * The inferred literal type of the offloaded data.
+   *
+   * @generated from field: flyteidl.core.LiteralType inferred_type = 3;
+   */
+  inferredType?: LiteralType;
+
+  constructor(data?: PartialMessage<LiteralOffloadedMetadata>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.core.LiteralOffloadedMetadata";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "uri", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "size_bytes", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 3, name: "inferred_type", kind: "message", T: LiteralType },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): LiteralOffloadedMetadata {
+    return new LiteralOffloadedMetadata().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): LiteralOffloadedMetadata {
+    return new LiteralOffloadedMetadata().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): LiteralOffloadedMetadata {
+    return new LiteralOffloadedMetadata().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: LiteralOffloadedMetadata | PlainMessage<LiteralOffloadedMetadata> | undefined, b: LiteralOffloadedMetadata | PlainMessage<LiteralOffloadedMetadata> | undefined): boolean {
+    return proto3.util.equals(LiteralOffloadedMetadata, a, b);
   }
 }
 
