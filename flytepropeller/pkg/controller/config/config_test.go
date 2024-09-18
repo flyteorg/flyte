@@ -51,4 +51,21 @@ func TestIsSupportedSDKVersion(t *testing.T) {
 		}
 		assert.False(t, config.IsSupportedSDKVersion("flytekit", "0.16.0"))
 	})
+
+	t.Run("supported dev version", func(t *testing.T) {
+		config := LiteralOffloadingConfig{
+			SupportedSDKVersions: map[string]string{
+				"flytekit": "1.13.4",
+			},
+		}
+		assert.True(t, config.IsSupportedSDKVersion("flytekit", "1.13.4.dev12+g990b450ea.d20240917"))
+	})
+	t.Run("supported beta version", func(t *testing.T) {
+		config := LiteralOffloadingConfig{
+			SupportedSDKVersions: map[string]string{
+				"flytekit": "1.13.4",
+			},
+		}
+		assert.True(t, config.IsSupportedSDKVersion("flytekit", "v1.13.6b0"))
+	})
 }
