@@ -542,21 +542,30 @@ When FlyteConsole receives a literal type of `SimpleType.STRUCT`, the input meth
 
 1. No JSON Schema provided:
 
-Input is expected as an `Object` (e.g., `{"a": 1}`).
+Input is expected as `a Javascript Object` (e.g., `{"a": 1}`).
 
 2. JSON Schema provided:
 
-Users can input values based on the schema's expected type and construct an appropriate `Object`.
+Users can input values based on the schema's expected type and construct an appropriate `Javascript Object`.
 
 Note:
 
 For `dataclass` and Pydantic `BaseModel`, a JSON schema will be provided in their literal type, and the input form will be constructed accordingly.
+
+##### What happens after the user enters data?
+
+Input values -> Javascript Object -> msgpack bytes -> Binary IDL With MessagePack Bytes
 
 #### Displaying Inputs/Outputs in the Console
 Use `msgpack` to deserialize bytes into an Object and display it in Flyte Console.
 
 #### Copying Inputs/Outputs in the Console
 Allow users to copy the `Object` to the clipboard, as currently implemented.
+
+#### Pasting and Copying from FlyteConsole
+Currently, we should support JSON pasting if the content is a JavaScript object. However, there's a question of how we might handle other formats like YAML or MsgPack bytes, especially if copied from a binary file.
+
+For now, focusing on supporting JSON pasting makes sense. However, adding support for YAML and MsgPack bytes could be valuable future enhancements.
 
 ## 4 Metrics & Dashboards
 
