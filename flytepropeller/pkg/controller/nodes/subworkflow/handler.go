@@ -124,7 +124,7 @@ func (w *workflowNodeHandler) Finalize(ctx context.Context, nCtx interfaces.Node
 	logger.Warnf(ctx, "Subworkflow finalize invoked. Clearing up the cache")
 	wfNode := nCtx.Node().GetWorkflowNode()
 	if wfNode.GetLaunchPlanRefID() != nil {
-		return w.lpHandler.Finalize(ctx, nCtx)
+		return w.lpHandler.HandleFinalize(ctx, nCtx)
 	}
 	return nil
 }

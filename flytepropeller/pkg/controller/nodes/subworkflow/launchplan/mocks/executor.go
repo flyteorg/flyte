@@ -19,26 +19,26 @@ type Executor struct {
 	mock.Mock
 }
 
-type Executor_Finalize struct {
+type Executor_ClearCache struct {
 	*mock.Call
 }
 
-func (_m Executor_Finalize) Return(_a0 error) *Executor_Finalize {
-	return &Executor_Finalize{Call: _m.Call.Return(_a0)}
+func (_m Executor_ClearCache) Return(_a0 error) *Executor_ClearCache {
+	return &Executor_ClearCache{Call: _m.Call.Return(_a0)}
 }
 
-func (_m *Executor) OnFinalize(ctx context.Context, executionID *core.WorkflowExecutionIdentifier) *Executor_Finalize {
-	c_call := _m.On("Finalize", ctx, executionID)
-	return &Executor_Finalize{Call: c_call}
+func (_m *Executor) OnClearCache(ctx context.Context, executionID *core.WorkflowExecutionIdentifier) *Executor_ClearCache {
+	c_call := _m.On("ClearCache", ctx, executionID)
+	return &Executor_ClearCache{Call: c_call}
 }
 
-func (_m *Executor) OnFinalizeMatch(matchers ...interface{}) *Executor_Finalize {
-	c_call := _m.On("Finalize", matchers...)
-	return &Executor_Finalize{Call: c_call}
+func (_m *Executor) OnClearCacheMatch(matchers ...interface{}) *Executor_ClearCache {
+	c_call := _m.On("ClearCache", matchers...)
+	return &Executor_ClearCache{Call: c_call}
 }
 
-// Finalize provides a mock function with given fields: ctx, executionID
-func (_m *Executor) Finalize(ctx context.Context, executionID *core.WorkflowExecutionIdentifier) error {
+// ClearCache provides a mock function with given fields: ctx, executionID
+func (_m *Executor) ClearCache(ctx context.Context, executionID *core.WorkflowExecutionIdentifier) error {
 	ret := _m.Called(ctx, executionID)
 
 	var r0 error

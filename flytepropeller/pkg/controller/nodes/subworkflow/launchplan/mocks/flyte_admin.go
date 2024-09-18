@@ -19,26 +19,26 @@ type FlyteAdmin struct {
 	mock.Mock
 }
 
-type FlyteAdmin_Finalize struct {
+type FlyteAdmin_ClearCache struct {
 	*mock.Call
 }
 
-func (_m FlyteAdmin_Finalize) Return(_a0 error) *FlyteAdmin_Finalize {
-	return &FlyteAdmin_Finalize{Call: _m.Call.Return(_a0)}
+func (_m FlyteAdmin_ClearCache) Return(_a0 error) *FlyteAdmin_ClearCache {
+	return &FlyteAdmin_ClearCache{Call: _m.Call.Return(_a0)}
 }
 
-func (_m *FlyteAdmin) OnFinalize(ctx context.Context, executionID *core.WorkflowExecutionIdentifier) *FlyteAdmin_Finalize {
-	c_call := _m.On("Finalize", ctx, executionID)
-	return &FlyteAdmin_Finalize{Call: c_call}
+func (_m *FlyteAdmin) OnClearCache(ctx context.Context, executionID *core.WorkflowExecutionIdentifier) *FlyteAdmin_ClearCache {
+	c_call := _m.On("ClearCache", ctx, executionID)
+	return &FlyteAdmin_ClearCache{Call: c_call}
 }
 
-func (_m *FlyteAdmin) OnFinalizeMatch(matchers ...interface{}) *FlyteAdmin_Finalize {
-	c_call := _m.On("Finalize", matchers...)
-	return &FlyteAdmin_Finalize{Call: c_call}
+func (_m *FlyteAdmin) OnClearCacheMatch(matchers ...interface{}) *FlyteAdmin_ClearCache {
+	c_call := _m.On("ClearCache", matchers...)
+	return &FlyteAdmin_ClearCache{Call: c_call}
 }
 
-// Finalize provides a mock function with given fields: ctx, executionID
-func (_m *FlyteAdmin) Finalize(ctx context.Context, executionID *core.WorkflowExecutionIdentifier) error {
+// ClearCache provides a mock function with given fields: ctx, executionID
+func (_m *FlyteAdmin) ClearCache(ctx context.Context, executionID *core.WorkflowExecutionIdentifier) error {
 	ret := _m.Called(ctx, executionID)
 
 	var r0 error

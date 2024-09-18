@@ -230,7 +230,7 @@ func (l *launchPlanHandler) HandleAbort(ctx context.Context, nCtx interfaces.Nod
 	return l.launchPlan.Kill(ctx, childID, fmt.Sprintf("cascading abort as parent execution id [%s] aborted, reason [%s]", nCtx.ExecutionContext().GetName(), reason))
 }
 
-func (l *launchPlanHandler) Finalize(ctx context.Context, nCtx interfaces.NodeExecutionContext) error {
+func (l *launchPlanHandler) HandleFinalize(ctx context.Context, nCtx interfaces.NodeExecutionContext) error {
 	parentNodeExecutionID, err := getParentNodeExecutionID(nCtx)
 	if err != nil {
 		return err
@@ -244,5 +244,5 @@ func (l *launchPlanHandler) Finalize(ctx context.Context, nCtx interfaces.NodeEx
 		return err
 	}
 
-	return l.launchPlan.Finalize(ctx, childID)
+	return l.launchPlan.ClearCache(ctx, childID)
 }
