@@ -136,6 +136,7 @@ var (
 	}
 
 	// This regex is used to sanitize semver versions passed to IsSupportedSDK checks for literal offloading feature.
+	// It matches against 1.13.3 in v1.13.3b0 (beta version) or 1.13.3 in 1.13.3.dev12+g990b450ea.d20240917(dev version)
 	sanitizeProtoRegex = regexp.MustCompile(`v?(\d+\.\d+\.\d+)`)
 )
 
