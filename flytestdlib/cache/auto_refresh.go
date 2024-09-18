@@ -198,9 +198,6 @@ func (w *autoRefresh) Delete(key interface{}) {
 func (w *autoRefresh) Get(id ItemID) (Item, error) {
 	if val, ok := w.lruMap.Get(id); ok {
 		w.metrics.CacheHit.Inc()
-		if fetchedItem, ok := val.(Item); ok && fetchedItem.IsTerminal() {
-			w.Delete(id)
-		}
 		return val.(Item), nil
 	}
 
@@ -213,9 +210,6 @@ func (w *autoRefresh) Get(id ItemID) (Item, error) {
 func (w *autoRefresh) GetOrCreate(id ItemID, item Item) (Item, error) {
 	if val, ok := w.lruMap.Get(id); ok {
 		w.metrics.CacheHit.Inc()
-		if fetchedItem, ok := val.(Item); ok && fetchedItem.IsTerminal() {
-			w.Delete(id)
-		}
 		return val.(Item), nil
 	}
 
