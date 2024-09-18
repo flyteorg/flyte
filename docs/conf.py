@@ -294,6 +294,7 @@ intersphinx_mapping = {
 }
 
 myst_enable_extensions = ["colon_fence"]
+myst_heading_anchors = 6
 
 # Sphinx-mermaid config
 mermaid_output_format = "raw"
