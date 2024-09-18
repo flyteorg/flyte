@@ -112,5 +112,9 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "node-execution-worker-count"), defaultConfig.NodeExecutionWorkerCount, "Number of workers to evaluate node executions,  currently only used for array nodes")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "array-node-config.event-version"), defaultConfig.ArrayNode.EventVersion, "ArrayNode eventing version. 0 => legacy (drop-in replacement for maptask),  1 => new")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "array-node-config.default-parallelism-behavior"), defaultConfig.ArrayNode.DefaultParallelismBehavior, "Default parallelism behavior for array nodes")
+	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "literalOffloadingConfig.Enabled"), defaultConfig.LiteralOffloadingConfig.Enabled, "")
+	cmdFlags.StringToString(fmt.Sprintf("%v%v", prefix, "literalOffloadingConfig.SupportedSDKVersions"), defaultConfig.LiteralOffloadingConfig.SupportedSDKVersions, "")
+	cmdFlags.Int64(fmt.Sprintf("%v%v", prefix, "literalOffloadingConfig.MinSizeInMBForOffloading"), defaultConfig.LiteralOffloadingConfig.MinSizeInMBForOffloading, "")
+	cmdFlags.Int64(fmt.Sprintf("%v%v", prefix, "literalOffloadingConfig.MaxSizeInMBForOffloading"), defaultConfig.LiteralOffloadingConfig.MaxSizeInMBForOffloading, "")
 	return cmdFlags
 }

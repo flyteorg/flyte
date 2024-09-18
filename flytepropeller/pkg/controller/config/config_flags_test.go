@@ -967,4 +967,60 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_literalOffloadingConfig.Enabled", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("literalOffloadingConfig.Enabled", testValue)
+			if vBool, err := cmdFlags.GetBool("literalOffloadingConfig.Enabled"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.LiteralOffloadingConfig.Enabled)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_literalOffloadingConfig.SupportedSDKVersions", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "a=1,b=2"
+
+			cmdFlags.Set("literalOffloadingConfig.SupportedSDKVersions", testValue)
+			if vStringToString, err := cmdFlags.GetStringToString("literalOffloadingConfig.SupportedSDKVersions"); err == nil {
+				testDecodeRaw_Config(t, vStringToString, &actual.LiteralOffloadingConfig.SupportedSDKVersions)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_literalOffloadingConfig.MinSizeInMBForOffloading", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("literalOffloadingConfig.MinSizeInMBForOffloading", testValue)
+			if vInt64, err := cmdFlags.GetInt64("literalOffloadingConfig.MinSizeInMBForOffloading"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt64), &actual.LiteralOffloadingConfig.MinSizeInMBForOffloading)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_literalOffloadingConfig.MaxSizeInMBForOffloading", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("literalOffloadingConfig.MaxSizeInMBForOffloading", testValue)
+			if vInt64, err := cmdFlags.GetInt64("literalOffloadingConfig.MaxSizeInMBForOffloading"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt64), &actual.LiteralOffloadingConfig.MaxSizeInMBForOffloading)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }
