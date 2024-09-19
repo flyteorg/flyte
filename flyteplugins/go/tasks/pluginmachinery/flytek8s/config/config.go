@@ -32,15 +32,15 @@ var (
 			"cluster-autoscaler.kubernetes.io/safe-to-evict": "false",
 		},
 		CoPilot: FlyteCoPilotConfig{
-			NamePrefix:             "flyte-copilot-",
-			Image:                  "cr.flyte.org/flyteorg/flytecopilot:v0.0.15",
-			DefaultInputDataPath:   "/var/flyte/inputs",
-			InputVolumeName:        "flyte-inputs",
-			DefaultOutputPath:      "/var/flyte/outputs",
-			OutputVolumeName:       "flyte-outputs",
-			CPU:                    "500m",
-			Memory:                 "128Mi",
-			AddSysPTraceCapability: true,
+			NamePrefix:           "flyte-copilot-",
+			Image:                "cr.flyte.org/flyteorg/flytecopilot:v0.0.15",
+			DefaultInputDataPath: "/var/flyte/inputs",
+			InputVolumeName:      "flyte-inputs",
+			DefaultOutputPath:    "/var/flyte/outputs",
+			OutputVolumeName:     "flyte-outputs",
+			CPU:                  "500m",
+			Memory:               "128Mi",
+			AddPTrace:            true,
 			StartTimeout: config2.Duration{
 				Duration: time.Second * 100,
 			},
@@ -240,7 +240,7 @@ type FlyteCoPilotConfig struct {
 	Memory  string `json:"memory" pflag:",Used to set memory for co-pilot containers"`
 	Storage string `json:"storage" pflag:",Default storage limit for individual inputs / outputs"`
 	// Co-Pilot Security Context Capabilities
-	AddSysPTraceCapability bool `json:"add-sys-ptrace-capability" pflag:",Used to enable SYS_PTRACE for co-pilot containers"`
+	AddPTrace bool `json:"add-ptrace" pflag:",Used to enable SYS_PTRACE for co-pilot containers"`
 }
 
 // GetK8sPluginConfig retrieves the current k8s plugin config or default.

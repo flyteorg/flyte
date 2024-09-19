@@ -172,7 +172,7 @@ func AddCoPilotToContainer(ctx context.Context, cfg config.FlyteCoPilotConfig, c
 	if c.SecurityContext.Capabilities == nil {
 		c.SecurityContext.Capabilities = &v1.Capabilities{}
 	}
-	if cfg.AddSysPTraceCapability {
+	if cfg.AddPTrace {
 		c.SecurityContext.Capabilities.Add = append(c.SecurityContext.Capabilities.Add, pTraceCapability)
 	}
 

@@ -40,9 +40,9 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 		StartTimeout: config2.Duration{
 			Duration: time.Second * 1,
 		},
-		CPU:                    "1024m",
-		Memory:                 "1024Mi",
-		AddSysPTraceCapability: true,
+		CPU:       "1024m",
+		Memory:    "1024Mi",
+		AddPTrace: true,
 	}
 
 	t.Run("happy", func(t *testing.T) {
@@ -56,7 +56,6 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 		assert.Equal(t, "/", c.WorkingDir)
 		assert.Equal(t, 2, len(c.Resources.Limits))
 		assert.Equal(t, 2, len(c.Resources.Requests))
-		assert.Contains(t, c.SecurityContext.Capabilities.Add, pTraceCapability)
 	})
 
 	t.Run("happy stow backend", func(t *testing.T) {
@@ -74,7 +73,6 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 		assert.Equal(t, "/", c.WorkingDir)
 		assert.Equal(t, 2, len(c.Resources.Limits))
 		assert.Equal(t, 2, len(c.Resources.Requests))
-		assert.Contains(t, c.SecurityContext.Capabilities.Add, pTraceCapability)
 	})
 
 	t.Run("happy-vols", func(t *testing.T) {
@@ -109,15 +107,6 @@ func TestFlyteCoPilotContainer(t *testing.T) {
 		_, err := FlyteCoPilotContainer("x", cfg, []string{"hello"}, v1.VolumeMount{Name: "X", MountPath: "/"})
 		assert.Error(t, err)
 		cfg.Memory = old
-	})
-
-	t.Run("no-sys-ptrace-add", func(t *testing.T) {
-		old := cfg.AddSysPTraceCapability
-		cfg.AddSysPTraceCapability = false
-		c, err := FlyteCoPilotContainer("x", cfg, []string{"hello"})
-		assert.NoError(t, err)
-		assert.NotContains(t, c.SecurityContext.Capabilities.Add, pTraceCapability)
-		cfg.AddSysPTraceCapability = old
 	})
 }
 
@@ -355,6 +344,7 @@ func TestAddCoPilotToContainer(t *testing.T) {
 		OutputVolumeName:     "out",
 		CPU:                  "1024m",
 		Memory:               "1024Mi",
+		AddPTrace:            true,
 	}
 
 	t.Run("dataload-config-nil", func(t *testing.T) {
@@ -373,6 +363,16 @@ func TestAddCoPilotToContainer(t *testing.T) {
 		assert.NoError(t, AddCoPilotToContainer(ctx, cfg, &c, nil, pilot))
 		assertContainerHasVolumeMounts(t, cfg, pilot, nil, &c)
 		assertContainerHasPTrace(t, &c)
+	})
+
+	t.Run("nil-iface-no-ptrace", func(t *testing.T) {
+		c := v1.Container{}
+		old := cfg.AddPTrace
+		cfg.AddPTrace = false
+		pilot := &core.DataLoadingConfig{Enabled: true}
+		assert.NoError(t, AddCoPilotToContainer(ctx, cfg, &c, nil, pilot))
+		assert.Nil(t, c.SecurityContext.Capabilities.Add)
+		cfg.AddPTrace = old
 	})
 
 	t.Run("happy-iface-empty-config", func(t *testing.T) {
