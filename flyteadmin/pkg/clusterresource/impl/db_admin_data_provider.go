@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/clusterresource/interfaces"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/clusterresource/plugin"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	managerInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
 	repositoryInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
@@ -79,11 +78,11 @@ func (p dbAdminProvider) getProjects(ctx context.Context, useActiveProjectsFilte
 	}, nil
 }
 
-func (p dbAdminProvider) GetProjects(ctx context.Context, clusterResourcePlugin plugin.ClusterResourcePlugin) (*admin.Projects, error) {
+func (p dbAdminProvider) GetProjects(ctx context.Context) (*admin.Projects, error) {
 	return p.getProjects(ctx, getActiveProjects)
 }
 
-func (p dbAdminProvider) GetArchivedProjects(ctx context.Context, clusterResourcePlugin plugin.ClusterResourcePlugin) (*admin.Projects, error) {
+func (p dbAdminProvider) GetArchivedProjects(ctx context.Context) (*admin.Projects, error) {
 	return p.getProjects(ctx, getArchivedProjects)
 }
 

@@ -2,14 +2,13 @@ package impl
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/clusterresource/interfaces"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/clusterresource/plugin"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 // Implementation of an interfaces.FlyteAdminDataProvider which fetches data using a flyteadmin service client
@@ -34,6 +33,11 @@ func (p serviceAdminProvider) GetClusterResourceAttributes(ctx context.Context, 
 	return nil, NewMissingEntityError("cluster resource attributes")
 }
 
+// We want both active and system generated projects
+var activeProjectsFilter = fmt.Sprintf("value_in(state,%d;%d)", admin.Project_ACTIVE, admin.Project_SYSTEM_GENERATED)
+
+var archivedProjectsFilter = fmt.Sprintf("eq(state,%d)", admin.Project_SYSTEM_ARCHIVED)
+
 var descUpdatedAtSortParam = admin.Sort{
 	Direction: admin.Sort_DESCENDING,
 	Key:       "updated_at",
@@ -41,25 +45,18 @@ var descUpdatedAtSortParam = admin.Sort{
 
 var descCreatedAtSortDBParam, _ = common.NewSortParameter(&descUpdatedAtSortParam, models.ProjectColumns)
 
-func (p serviceAdminProvider) getProjects(ctx context.Context, useActiveProjectsFilter bool, clusterResourcePlugin plugin.ClusterResourcePlugin) (*admin.Projects, error) {
+func (p serviceAdminProvider) getProjects(ctx context.Context, useActiveProjectsFilter bool) (*admin.Projects, error) {
 	projects := make([]*admin.Project, 0)
 	listReq := &admin.ProjectListRequest{
 		Limit: 100,
 		// Prefer to sync projects most newly updated to ensure their resources get modified first when other resources exist.
 		SortBy: &descUpdatedAtSortParam,
 	}
-	var filter string
-	var err error
 	if useActiveProjectsFilter {
-		filter, err = clusterResourcePlugin.GetProvisionNamespaceProjectFilter(ctx)
+		listReq.Filters = activeProjectsFilter
 	} else {
-		filter, err = clusterResourcePlugin.GetDeleteNamespaceProjectFilter(ctx)
+		listReq.Filters = archivedProjectsFilter
 	}
-	if err != nil {
-		return nil, err
-	}
-	listReq.Filters = filter
-	logger.Debugf(ctx, "Fetching projects with filter [%s]", filter)
 
 	// Iterate through all pages of projects
 	for {
@@ -78,12 +75,12 @@ func (p serviceAdminProvider) getProjects(ctx context.Context, useActiveProjects
 	}, nil
 }
 
-func (p serviceAdminProvider) GetProjects(ctx context.Context, clusterResourcePlugin plugin.ClusterResourcePlugin) (*admin.Projects, error) {
-	return p.getProjects(ctx, getActiveProjects, clusterResourcePlugin)
+func (p serviceAdminProvider) GetProjects(ctx context.Context) (*admin.Projects, error) {
+	return p.getProjects(ctx, getActiveProjects)
 }
 
-func (p serviceAdminProvider) GetArchivedProjects(ctx context.Context, clusterResourcePlugin plugin.ClusterResourcePlugin) (*admin.Projects, error) {
-	return p.getProjects(ctx, getArchivedProjects, clusterResourcePlugin)
+func (p serviceAdminProvider) GetArchivedProjects(ctx context.Context) (*admin.Projects, error) {
+	return p.getProjects(ctx, getArchivedProjects)
 }
 
 func NewAdminServiceDataProvider(

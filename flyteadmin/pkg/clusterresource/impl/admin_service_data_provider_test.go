@@ -9,7 +9,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/flyteorg/flyte/flyteadmin/pkg/clusterresource/plugin"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/mocks"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
@@ -87,8 +86,6 @@ func TestServiceGetClusterResourceAttributes(t *testing.T) {
 
 func TestServiceGetProjects(t *testing.T) {
 	ctx := context.TODO()
-	clusterResourcePlugin := plugin.NewDefaultClusterResourcePlugin()
-
 	t.Run("happy case", func(t *testing.T) {
 		mockAdmin := mocks.AdminServiceClient{}
 		mockAdmin.OnListProjectsMatch(ctx, mock.MatchedBy(func(req *admin.ProjectListRequest) bool {
@@ -107,7 +104,7 @@ func TestServiceGetProjects(t *testing.T) {
 		provider := serviceAdminProvider{
 			adminClient: &mockAdmin,
 		}
-		projects, err := provider.GetProjects(ctx, clusterResourcePlugin)
+		projects, err := provider.GetProjects(ctx)
 		assert.NoError(t, err)
 		assert.Len(t, projects.Projects, 2)
 	})
@@ -119,7 +116,7 @@ func TestServiceGetProjects(t *testing.T) {
 		provider := serviceAdminProvider{
 			adminClient: &mockAdmin,
 		}
-		_, err := provider.GetProjects(ctx, clusterResourcePlugin)
+		_, err := provider.GetProjects(ctx)
 		assert.EqualError(t, err, errFoo.Error())
 	})
 }

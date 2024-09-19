@@ -106,7 +106,7 @@ var resourceLimits = runtimeInterfaces.TaskResourceSet{
 	Memory: resource.MustParse("500Gi"),
 }
 
-var noopSelfServeServicePlugin = plugin.NewDefaultClusterResourcePlugin()
+var noopSelfServeServicePlugin = plugin.NewNoopClusterResourcePlugin()
 var noopPreExecutionValidationPlugin = executions.NewNoopPreExecutionValidationPlugin()
 
 func getDefaultPluginRegistry() *plugins.Registry {
