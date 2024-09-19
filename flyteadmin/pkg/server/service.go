@@ -23,6 +23,7 @@ import (
 	"google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/reflection"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/encoding/protojson"
 	"k8s.io/apimachinery/pkg/util/rand"
 
@@ -83,8 +84,13 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 	scope promutils.Scope, opts ...grpc.ServerOption) (*grpc.Server, error) {
 
 	logger.Infof(ctx, "Registering default middleware with blanket auth validation")
-	pluginRegistry.RegisterDefault(plugins.PluginIDUnaryServiceMiddleware, grpcmiddleware.ChainUnaryServer(
-		RequestIDInterceptor, auth.BlanketAuthorization, auth.ExecutionUserIdentifierInterceptor))
+	pluginRegistry.RegisterDefault(
+		plugins.PluginIDUnaryServiceMiddleware,
+		grpcmiddleware.ChainUnaryServer(
+			RequestIDInterceptor,
+			ErrorMessageTruncatorInterceptor,
+			auth.BlanketAuthorization,
+			auth.ExecutionUserIdentifierInterceptor))
 
 	if cfg.GrpcConfig.EnableGrpcLatencyMetrics {
 		logger.Debugf(ctx, "enabling grpc histogram metrics")
@@ -279,6 +285,28 @@ func newHTTPServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 // RequestIDInterceptor is a server interceptor that sets the request id on the context for any incoming calls.
 func RequestIDInterceptor(ctx context.Context, req interface{}, _ *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 	return handler(GetOrGenerateRequestIDForGRPC(ctx), req)
+}
+
+func ErrorMessageTruncatorInterceptor(ctx context.Context, req interface{}, _ *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+	response, err := handler(ctx, req)
+	if err != nil {
+		message := err.Error()
+		logger.Debugf(ctx, "Error message length = %d", len(message))
+		logger.Debugf(ctx, "Error message = %q", message)
+		if len(message) > common.MaxErrorResponseStatusBytes {
+			message = message[:common.MaxErrorResponseStatusBytes-3] + "..."
+			code := status.Code(err)
+
+			logger.Debugf(ctx, "Trimmed error message length = %d", len(message))
+			logger.Debugf(ctx, "Trimmed error message = %q", message)
+
+			err = status.Error(code, message)
+
+			logger.Debugf(ctx, "Error response: %v", response)
+		}
+	}
+
+	return response, err
 }
 
 // GetOrGenerateRequestIDForGRPC returns a context with request id set from the context or from grpc metadata if it exists,
