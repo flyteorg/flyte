@@ -37,11 +37,40 @@ func TestLiteralTypeForLiterals(t *testing.T) {
 		assert.Equal(t, core.SimpleType_BINARY.String(), lt.GetSimple().String())
 	})
 
-	t.Run("binary idl with messagepack", func(t *testing.T) {
+	t.Run("binary idl with messagepack input map[int]strings", func(t *testing.T) {
 		// Create a map[int]string and serialize it using MessagePack.
 		data := map[int]string{
-			1: "hello",
-			2: "world",
+			1:  "hello",
+			2:  "world",
+			-1: "foo",
+		}
+		// Serializing the map using MessagePack
+		serializedBinaryData, err := msgpack.Marshal(data)
+		if err != nil {
+			t.Fatalf("failed to serialize map: %v", err)
+		}
+		lv := &core.Literal{
+			Value: &core.Literal_Scalar{
+				Scalar: &core.Scalar{
+					Value: &core.Scalar_Binary{
+						Binary: &core.Binary{
+							Value: serializedBinaryData,
+							Tag:   "msgpack",
+						},
+					},
+				},
+			},
+		}
+		lt := LiteralTypeForLiteral(lv)
+		assert.Equal(t, core.SimpleType_STRUCT.String(), lt.GetSimple().String())
+	})
+
+	t.Run("binary idl with messagepack input map[float]strings", func(t *testing.T) {
+		// Create a map[float]string and serialize it using MessagePack.
+		data := map[float64]string{
+			1.0:  "hello",
+			5.0:  "world",
+			-1.0: "foo",
 		}
 		// Serializing the map using MessagePack
 		serializedBinaryData, err := msgpack.Marshal(data)
