@@ -1,0 +1,51 @@
+## Include files and folders
+
+# include folders
+recursive-include flytekit *
+recursive-include flytekit_scripts *
+
+# include specific files
+include README.md
+include flytekit/deck/html/template.html
+
+include CHANGELOG.md
+include LICENSE
+
+include MANIFEST.in
+include pyproject.toml
+include setup.py
+include setup.cfg
+
+
+## Exclude files and folders
+
+# exclude folders
+recursive-exclude tests *
+recursive-exclude docs *
+recursive-exclude boilerplate *
+recursive-exclude .github *
+recursive-exclude plugins *
+
+# exclude dist folder:
+#  - contains the generated *.tar.gz and .whl files.
+recursive-exclude dist *
+
+# exclude requirements files
+exclude requirements.*
+exclude requirements-*.*
+exclude doc-requirements.*
+exclude dev-requirements.*
+
+# exclude config files
+exclude .gitignore
+exclude .readthedocs.yaml
+exclude .pre-commit-config.yaml
+exclude codecov.yml
+
+# exclude other repository management files
+exclude Dockerfile.py*
+exclude Makefile
+exclude NOTICE
+exclude pull_request_template.md
+exclude CODEOWNERS
+exclude CODE_OF_CONDUCT.md
