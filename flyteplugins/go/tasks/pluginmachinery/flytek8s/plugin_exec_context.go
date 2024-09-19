@@ -31,6 +31,10 @@ func (to *pluginTaskOverrides) GetContainerImage() string {
 	return to.TaskOverrides.GetContainerImage()
 }
 
+func (to *pluginTaskOverrides) GetPodTemplate() string {
+	return to.TaskOverrides.GetPodTemplate()
+}
+
 type pluginTaskExecutionMetadata struct {
 	pluginsCore.TaskExecutionMetadata
 	interruptible *bool

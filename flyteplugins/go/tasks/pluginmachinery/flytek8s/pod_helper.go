@@ -428,10 +428,24 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 		ApplyContainerImageOverride(podSpec, tCtx.TaskExecutionMetadata().GetOverrides().GetContainerImage(), primaryContainerName)
 	}
 
+	// Override pod template if necessary
+	if len(tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate()) > 0 {
+		ApplyPodTemplateOverride()
+	}
+
 	return podSpec, objectMeta, nil
 }
 
 func ApplyContainerImageOverride(podSpec *v1.PodSpec, containerImage string, primaryContainerName string) {
+	for i, c := range podSpec.Containers {
+		if c.Name == primaryContainerName {
+			podSpec.Containers[i].Image = containerImage
+			return
+		}
+	}
+}
+
+func ApplyPodTemplateOverride(podSpec *v1.PodSpec, containerImage string, primaryContainerName string) {
 	for i, c := range podSpec.Containers {
 		if c.Name == primaryContainerName {
 			podSpec.Containers[i].Image = containerImage

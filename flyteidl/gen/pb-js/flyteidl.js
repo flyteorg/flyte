@@ -12482,6 +12482,7 @@
                  * @property {flyteidl.core.IResources|null} [resources] TaskNodeOverrides resources
                  * @property {flyteidl.core.IExtendedResources|null} [extendedResources] TaskNodeOverrides extendedResources
                  * @property {string|null} [containerImage] TaskNodeOverrides containerImage
+                 * @property {string|null} [podTemplate] TaskNodeOverrides podTemplate
                  */
     
                 /**
@@ -12524,6 +12525,14 @@
                 TaskNodeOverrides.prototype.containerImage = "";
     
                 /**
+                 * TaskNodeOverrides podTemplate.
+                 * @member {string} podTemplate
+                 * @memberof flyteidl.core.TaskNodeOverrides
+                 * @instance
+                 */
+                TaskNodeOverrides.prototype.podTemplate = "";
+    
+                /**
                  * Creates a new TaskNodeOverrides instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.core.TaskNodeOverrides
@@ -12553,6 +12562,8 @@
                         $root.flyteidl.core.ExtendedResources.encode(message.extendedResources, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
                     if (message.containerImage != null && message.hasOwnProperty("containerImage"))
                         writer.uint32(/* id 3, wireType 2 =*/26).string(message.containerImage);
+                    if (message.podTemplate != null && message.hasOwnProperty("podTemplate"))
+                        writer.uint32(/* id 4, wireType 2 =*/34).string(message.podTemplate);
                     return writer;
                 };
     
@@ -12582,6 +12593,9 @@
                             break;
                         case 3:
                             message.containerImage = reader.string();
+                            break;
+                        case 4:
+                            message.podTemplate = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -12615,6 +12629,9 @@
                     if (message.containerImage != null && message.hasOwnProperty("containerImage"))
                         if (!$util.isString(message.containerImage))
                             return "containerImage: string expected";
+                    if (message.podTemplate != null && message.hasOwnProperty("podTemplate"))
+                        if (!$util.isString(message.podTemplate))
+                            return "podTemplate: string expected";
                     return null;
                 };
     
