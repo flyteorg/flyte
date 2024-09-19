@@ -24,9 +24,6 @@ from sphinx.util import logging as sphinx_logging
 
 sys.path.insert(0, str(Path("../").resolve(strict=True)))
 sys.path.append(str(Path("./_ext").resolve(strict=True)))
-sys.path.append(str(Path("/Users/nikkieverett/projects/repos/flytekit")))
-
-# import flytekit
 
 sphinx.application.ExtensionError = sphinx.errors.ExtensionError
 
@@ -139,6 +136,7 @@ exclude_patterns = [
     "examples/**/*.py",
     "jupyter_execute/**",
     "README.md",
+    "**/README/md",
     "_projects/**",
     "_src/**",
     "examples/**",
@@ -154,7 +152,7 @@ exclude_patterns = [
     "api/flyteidl/tmp/**",
     "api/flyteidl/gen/**",
     "api/flyteidl/README.md",
-    "flytesnacks/sg_execution_times.rst"
+    "flytesnacks/sg_execution_times.rst",
 ]
 
 # -- Options for HTML output -------------------------------------------------
@@ -346,6 +344,7 @@ REPLACE_PATTERNS = {
 
 import_projects_config = {
     "clone_dir": "_projects",
+    "flytekit_api_dir": "_src/flytekit/",
     "source_regex_mapping": REPLACE_PATTERNS,
     "dev_build": bool(int(os.environ.get("MONODOCS_DEV_BUILD", 1))),
 }
@@ -386,6 +385,19 @@ import_projects = [
             ]
         ],
         "local": flytesnacks_local_path is not None,
+    },
+    {
+        "name": "flytekit",
+        "source": flytekit_local_path or "https://github.com/flyteorg/flytekit",
+        "docs_path": "docs/source",
+        "dest": "api/flytekit",
+        "cmd": [
+            ["mkdir", "-p", import_projects_config["flytekit_api_dir"]],
+            ["cp", "-R", f"{flytekit_path}/flytekit", import_projects_config["flytekit_api_dir"]],
+            ["cp", "-R", f"{flytekit_path}/plugins", import_projects_config["flytekit_api_dir"]],
+            ["cp", "-R", f"{flytekit_path}/tests", "./tests"],
+        ],
+        "local": flytekit_local_path is not None,
     },
     {
         "name": "flytectl",

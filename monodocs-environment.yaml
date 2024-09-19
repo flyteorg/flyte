@@ -5,17 +5,18 @@ dependencies:
   - python=3.9
   - pip
   - codespell
+  - furo
   - gitpython
   - ipython!=8.7.0
   - graphviz
   - jupytext
   - myst-nb
   - psycopg2-binary
-  - pydata-sphinx-theme
   - recommonmark
   - sphinx
   - sphinx-prompt
   - sphinx-click
+  - sphinx-autoapi
   - sphinx-copybutton
   - sphinx-issues
   - sphinx_fontawesome
@@ -58,9 +59,8 @@ dependencies:
   - openai                      # chatgpt
 
   - pip:
-    - flytekit>=1.13.1
+    - flytekit>=1.12.1b2
     - readthedocs-sphinx-ext
-    - sphinx-docsearch
     - sphinx-code-include
     - sphinxext-remoteliteralinclude
     - sphinx_markdown_tables
@@ -78,6 +78,8 @@ dependencies:
     - duckdb
     - aioboto3>=12.3.0                    # aws sagemaker inference
     - databricks-cli              # mlflow
+    - sphinx-docsearch
+    - pydata_sphinx_theme
 
 platforms:
   - linux-64

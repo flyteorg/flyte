@@ -5,7 +5,6 @@
 :hidden:
 
 flytekit/index
-pyflyte
 flytectl/index
 flyteidl/index
 ```
