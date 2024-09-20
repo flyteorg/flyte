@@ -1,6 +1,7 @@
 package nodes
 
 import (
+	"github.com/shamaton/msgpack/v2"
 	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -37,13 +38,20 @@ func resolveAttrPathInPromise(nodeID string, literal *core.Literal, bindAttrPath
 		}
 	}
 
-	// resolve dataclass
-	if currVal.GetScalar() != nil && currVal.GetScalar().GetGeneric() != nil {
-		st := currVal.GetScalar().GetGeneric()
-		// start from index "count"
-		currVal, err = resolveAttrPathInPbStruct(nodeID, st, bindAttrPath[count:])
-		if err != nil {
-			return nil, err
+	// resolve dataclass and Pydantic BaseModel
+	if scalar := currVal.GetScalar(); scalar != nil {
+		if binary := scalar.GetBinary(); binary != nil {
+			// Start from index "count"
+			currVal, err = resolveAttrPathInBinary(nodeID, binary, bindAttrPath[count:])
+			if err != nil {
+				return nil, err
+			}
+		} else if generic := scalar.GetGeneric(); generic != nil {
+			// Start from index "count"
+			currVal, err = resolveAttrPathInPbStruct(nodeID, generic, bindAttrPath[count:])
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 
@@ -82,6 +90,79 @@ func resolveAttrPathInPbStruct(nodeID string, st *structpb.Struct, bindAttrPath 
 	literal, err := convertInterfaceToLiteral(nodeID, currVal)
 
 	return literal, err
+}
+
+// resolveAttrPathInBinary resolves the binary idl object (e.g. dataclass, pydantic basemodel) with attribute path
+func resolveAttrPathInBinary(nodeID string, binaryIDL *core.Binary, bindAttrPath []*core.PromiseAttribute) (*core.
+	Literal,
+	error) {
+
+	binaryBytes := binaryIDL.GetValue()
+	serializationFormat := binaryIDL.GetTag()
+
+	var currVal interface{}
+	var tmpVal interface{}
+	var exist bool
+
+	if serializationFormat == "msgpack" {
+		err := msgpack.Unmarshal(binaryBytes, &currVal)
+		if err != nil {
+			return nil, err
+
+		}
+	} else {
+		return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID,
+			"Unsupported format '%v' found for literal value.\n"+
+				"Please ensure the serialization format is supported.", serializationFormat)
+	}
+
+	// Turn the current value to a map, so it can be resolved more easily
+	for _, attr := range bindAttrPath {
+		switch resolvedVal := currVal.(type) {
+		// map
+		case map[interface{}]interface{}:
+			tmpVal, exist = resolvedVal[attr.GetStringValue()]
+			if !exist {
+				return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID, "key [%v] does not exist in literal %v", attr.GetStringValue(), currVal)
+			}
+			currVal = tmpVal
+		// list
+		case []interface{}:
+			if int(attr.GetIntValue()) >= len(resolvedVal) {
+				return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID, "index [%v] is out of range of %v", attr.GetIntValue(), currVal)
+			}
+			currVal = resolvedVal[attr.GetIntValue()]
+		}
+	}
+
+	if serializationFormat == "msgpack" {
+		// Marshal the current value to MessagePack bytes
+		resolvedBinaryBytes, err := msgpack.Marshal(currVal)
+		if err != nil {
+			return nil, err
+		}
+		// Construct and return the binary-encoded literal
+		return constructResolvedBinary(resolvedBinaryBytes, serializationFormat), nil
+	}
+	// Unsupported serialization format
+	return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID,
+		"Unsupported format '%v' found for literal value.\n"+
+			"Please ensure the serialization format is supported.", serializationFormat)
+}
+
+func constructResolvedBinary(resolvedBinaryBytes []byte, serializationFormat string) *core.Literal {
+	return &core.Literal{
+		Value: &core.Literal_Scalar{
+			Scalar: &core.Scalar{
+				Value: &core.Scalar_Binary{
+					Binary: &core.Binary{
+						Value: resolvedBinaryBytes,
+						Tag:   serializationFormat,
+					},
+				},
+			},
+		},
+	}
 }
 
 // convertInterfaceToLiteral converts the protobuf struct (e.g. dataclass) to literal
@@ -128,7 +209,7 @@ func convertInterfaceToLiteral(nodeID string, obj interface{}) (*core.Literal, e
 	return literal, nil
 }
 
-// convertInterfaceToLiteralScalar converts the a single value to a literal scalar
+// convertInterfaceToLiteralScalar converts a single value to a literal scalar
 func convertInterfaceToLiteralScalar(nodeID string, obj interface{}) (*core.Literal_Scalar, error) {
 	value := &core.Primitive{}
 
