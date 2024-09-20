@@ -38,6 +38,22 @@ func TestFlyteURLsFromNodeExecutionID(t *testing.T) {
 		assert.Equal(t, "flyte://v1/fs/dev/abc/n0-dn0-n1/o", urls.GetOutputs())
 		assert.Equal(t, "", urls.GetDeck())
 	})
+
+	t.Run("with org", func(t *testing.T) {
+		ne := core.NodeExecutionIdentifier{
+			NodeId: "n0-dn0-n1",
+			ExecutionId: &core.WorkflowExecutionIdentifier{
+				Org:     "testOrg",
+				Project: "fs",
+				Domain:  "dev",
+				Name:    "abc",
+			},
+		}
+		urls := FlyteURLsFromNodeExecutionID(ne, false)
+		assert.Equal(t, "flyte://v1/org/testOrg/fs/dev/abc/n0-dn0-n1/i", urls.GetInputs())
+		assert.Equal(t, "flyte://v1/org/testOrg/fs/dev/abc/n0-dn0-n1/o", urls.GetOutputs())
+		assert.Equal(t, "", urls.GetDeck())
+	})
 }
 
 func TestFlyteURLsFromTaskExecutionID(t *testing.T) {
@@ -87,6 +103,32 @@ func TestFlyteURLsFromTaskExecutionID(t *testing.T) {
 		urls := FlyteURLsFromTaskExecutionID(te, false)
 		assert.Equal(t, "flyte://v1/fs/dev/abc/n0/0/i", urls.GetInputs())
 		assert.Equal(t, "flyte://v1/fs/dev/abc/n0/0/o", urls.GetOutputs())
+		assert.Equal(t, "", urls.GetDeck())
+	})
+
+	t.Run("with org", func(t *testing.T) {
+		te := core.TaskExecutionIdentifier{
+			TaskId: &core.Identifier{
+				Org:          "testOrg",
+				ResourceType: core.ResourceType_TASK,
+				Project:      "fs",
+				Domain:       "dev",
+				Name:         "abc",
+				Version:      "v1",
+			},
+			NodeExecutionId: &core.NodeExecutionIdentifier{
+				NodeId: "n0",
+				ExecutionId: &core.WorkflowExecutionIdentifier{
+					Org:     "testOrg",
+					Project: "fs",
+					Domain:  "dev",
+					Name:    "abc",
+				},
+			},
+		}
+		urls := FlyteURLsFromTaskExecutionID(te, false)
+		assert.Equal(t, "flyte://v1/org/testOrg/fs/dev/abc/n0/0/i", urls.GetInputs())
+		assert.Equal(t, "flyte://v1/org/testOrg/fs/dev/abc/n0/0/o", urls.GetOutputs())
 		assert.Equal(t, "", urls.GetDeck())
 	})
 }

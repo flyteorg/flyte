@@ -143,8 +143,15 @@ func ParseFlyteURLToExecution(flyteURL string) (ParsedExecution, error) {
 }
 
 func FlyteURLsFromNodeExecutionID(nodeExecutionID core.NodeExecutionIdentifier, deck bool) *admin.FlyteURLs {
-	base := fmt.Sprintf("flyte://v1/%s/%s/%s/%s", nodeExecutionID.ExecutionId.Project,
-		nodeExecutionID.ExecutionId.Domain, nodeExecutionID.ExecutionId.Name, nodeExecutionID.NodeId)
+	var base string
+	if len(nodeExecutionID.GetExecutionId().GetOrg()) > 0 {
+		base = fmt.Sprintf("flyte://v1/org/%s/%s/%s/%s/%s", nodeExecutionID.ExecutionId.Org,
+			nodeExecutionID.ExecutionId.Project, nodeExecutionID.ExecutionId.Domain, nodeExecutionID.ExecutionId.Name,
+			nodeExecutionID.NodeId)
+	} else {
+		base = fmt.Sprintf("flyte://v1/%s/%s/%s/%s", nodeExecutionID.ExecutionId.Project,
+			nodeExecutionID.ExecutionId.Domain, nodeExecutionID.ExecutionId.Name, nodeExecutionID.NodeId)
+	}
 
 	res := &admin.FlyteURLs{
 		Inputs:  fmt.Sprintf("%s/%s", base, ArtifactTypeI),
@@ -174,8 +181,15 @@ func FlyteURLKeyFromNodeExecutionIDRetry(nodeExecutionID core.NodeExecutionIdent
 }
 
 func FlyteURLsFromTaskExecutionID(taskExecutionID core.TaskExecutionIdentifier, deck bool) *admin.FlyteURLs {
-	base := fmt.Sprintf("flyte://v1/%s/%s/%s/%s/%s", taskExecutionID.NodeExecutionId.ExecutionId.Project,
-		taskExecutionID.NodeExecutionId.ExecutionId.Domain, taskExecutionID.NodeExecutionId.ExecutionId.Name, taskExecutionID.NodeExecutionId.NodeId, strconv.Itoa(int(taskExecutionID.RetryAttempt)))
+	var base string
+	if len(taskExecutionID.GetNodeExecutionId().GetExecutionId().GetOrg()) > 0 {
+		base = fmt.Sprintf("flyte://v1/org/%s/%s/%s/%s/%s/%s", taskExecutionID.NodeExecutionId.ExecutionId.Org,
+			taskExecutionID.NodeExecutionId.ExecutionId.Project, taskExecutionID.NodeExecutionId.ExecutionId.Domain,
+			taskExecutionID.NodeExecutionId.ExecutionId.Name, taskExecutionID.NodeExecutionId.NodeId, strconv.Itoa(int(taskExecutionID.RetryAttempt)))
+	} else {
+		base = fmt.Sprintf("flyte://v1/%s/%s/%s/%s/%s", taskExecutionID.NodeExecutionId.ExecutionId.Project,
+			taskExecutionID.NodeExecutionId.ExecutionId.Domain, taskExecutionID.NodeExecutionId.ExecutionId.Name, taskExecutionID.NodeExecutionId.NodeId, strconv.Itoa(int(taskExecutionID.RetryAttempt)))
+	}
 
 	res := &admin.FlyteURLs{
 		Inputs:  fmt.Sprintf("%s/%s", base, ArtifactTypeI),
