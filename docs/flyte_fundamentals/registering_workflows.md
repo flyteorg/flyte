@@ -72,7 +72,7 @@ run it with the supplied arguments. As you can see from the expected output, you
 can visit the link to the Flyte console to see the progress of your running
 execution.
 
-You may also run `run --remote --copy-all`, which is very similar to the above command. As the name suggests, this will copy the source tree rooted at the top-level `__init__.py` file. With this strategy, any modules discoverable on the `PYTHONPATH` will be importable.
+You may also run `run --remote --copy all`, which is very similar to the above command. As the name suggests, this will copy the source tree rooted at the top-level `__init__.py` file. With this strategy, any modules discoverable on the `PYTHONPATH` will be importable.
 
 ```{note}
 `pyflyte run` supports Flyte workflows that import any other user-defined modules that
@@ -259,6 +259,13 @@ metadata/configuration, it's more secure if they're private.
 
 Learn more about how to pull private image in the {ref}`User Guide <private_images>`.
 ```
+
+##### Relationship between ImageSpec and fast registration
+The `ImageSpec` construct available in flytekit also has a mechanism to copy files into the image being built. Its behavior depends on the type of registration used:
+* If fast register is used, then it's assumed that you don't also want to copy source files into the built image.
+* If fast register is not used (which is the default for `pyflyte package`, or if `pyflyte register --copy none` is specified), then it's assumed that you do want source files copied into the built image.
+
+If your `ImageSpec` constructor specifies a `source_root` and the `copy` argument is set to something other than `CopyFileDetection.NO_COPY`, then files will be copied regardless of fast registration status.
 
 #### Package your project with `pyflyte package`
 
