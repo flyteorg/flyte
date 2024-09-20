@@ -205,7 +205,9 @@ func GetOAuth2ClientConfig(ctx context.Context, options config.OpenIDOptions, pr
 		}
 	}
 
-	secret = strings.TrimSuffix(secret, "\n")
+	if strings.HasSuffix(secret, "\n") {
+		logger.Warn(ctx, "Client secret file contains a trailing newline. This may cause unexpected behavior.")
+	}
 
 	return oauth2.Config{
 		RedirectURL:  callbackRelativeURL.String(),
