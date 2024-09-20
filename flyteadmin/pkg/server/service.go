@@ -291,8 +291,6 @@ func ErrorMessageTruncatorInterceptor(ctx context.Context, req interface{}, _ *g
 	response, err := handler(ctx, req)
 	if err != nil {
 		message := err.Error()
-		logger.Debugf(ctx, "Error message length = %d", len(message))
-		logger.Debugf(ctx, "Error message = %q", message)
 		if len(message) > common.MaxErrorResponseStatusBytes {
 			message = message[:common.MaxErrorResponseStatusBytes-3] + "..."
 			code := status.Code(err)
