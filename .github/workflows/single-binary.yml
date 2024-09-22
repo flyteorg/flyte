@@ -94,7 +94,7 @@ jobs:
           file: Dockerfile
           outputs: type=docker,dest=docker/sandbox-bundled/images/tar/amd64/flyte-binary.tar
       - name: Upload single binary image
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: single-binary-image
           path: docker/sandbox-bundled/images/tar
@@ -133,7 +133,7 @@ jobs:
           echo "FLYTESNACKS_VERSION=${FLYTESNACKS_VERSION}" >> ${GITHUB_ENV}
       - name: Checkout
         uses: actions/checkout@v4
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: single-binary-image
           path: docker/sandbox-bundled/images/tar
@@ -175,7 +175,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install uv
-          uv pip install --system flytekit flytekitplugins-deck-standard flytekitplugins-envd "numpy<2.0.0" pyarrow
+          uv pip install --system flytekit flytekitplugins-deck-standard "numpy<2.0.0" pyarrow
           uv pip freeze
       - name: Checkout flytesnacks
         uses: actions/checkout@v4
@@ -207,7 +207,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: single-binary-image
           path: docker/sandbox-bundled/images/tar

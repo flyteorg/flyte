@@ -47,7 +47,7 @@ func generateWorkflowNameFromTask(taskName string) string {
 	return fmt.Sprintf(systemNamePrefix, taskName)
 }
 
-func generateBindings(outputs core.VariableMap, nodeID string) []*core.Binding {
+func generateBindings(outputs *core.VariableMap, nodeID string) []*core.Binding {
 	bindings := make([]*core.Binding, 0, len(outputs.Variables))
 	for key := range outputs.Variables {
 		binding := &core.Binding{
@@ -68,7 +68,7 @@ func generateBindings(outputs core.VariableMap, nodeID string) []*core.Binding {
 }
 
 func CreateOrGetWorkflowModel(
-	ctx context.Context, request admin.ExecutionCreateRequest, db repositoryInterfaces.Repository,
+	ctx context.Context, request *admin.ExecutionCreateRequest, db repositoryInterfaces.Repository,
 	workflowManager interfaces.WorkflowInterface, namedEntityManager interfaces.NamedEntityInterface, taskIdentifier *core.Identifier,
 	task *admin.Task) (*models.Workflow, error) {
 	workflowIdentifier := core.Identifier{
@@ -108,7 +108,7 @@ func CreateOrGetWorkflowModel(
 							Name:    generateNodeNameFromTask(taskIdentifier.Name),
 							Retries: retryStrategy,
 						},
-						Inputs: generateBindings(*task.Closure.CompiledTask.Template.Interface.Inputs, noInputNodeID),
+						Inputs: generateBindings(task.Closure.CompiledTask.Template.Interface.Inputs, noInputNodeID),
 						Target: &core.Node_TaskNode{
 							TaskNode: &core.TaskNode{
 								Reference: &core.TaskNode_ReferenceId{
@@ -119,11 +119,11 @@ func CreateOrGetWorkflowModel(
 					},
 				},
 
-				Outputs: generateBindings(*task.Closure.CompiledTask.Template.Interface.Outputs, generateNodeNameFromTask(taskIdentifier.Name)),
+				Outputs: generateBindings(task.Closure.CompiledTask.Template.Interface.Outputs, generateNodeNameFromTask(taskIdentifier.Name)),
 			},
 		}
 
-		_, err = workflowManager.CreateWorkflow(ctx, admin.WorkflowCreateRequest{
+		_, err = workflowManager.CreateWorkflow(ctx, &admin.WorkflowCreateRequest{
 			Id:   &workflowIdentifier,
 			Spec: &workflowSpec,
 		})
@@ -135,7 +135,7 @@ func CreateOrGetWorkflowModel(
 			}
 		}
 		// Now, set the newly created skeleton workflow to 'SYSTEM_GENERATED'.
-		_, err = namedEntityManager.UpdateNamedEntity(ctx, admin.NamedEntityUpdateRequest{
+		_, err = namedEntityManager.UpdateNamedEntity(ctx, &admin.NamedEntityUpdateRequest{
 			ResourceType: core.ResourceType_WORKFLOW,
 			Id: &admin.NamedEntityIdentifier{
 				Project: workflowIdentifier.Project,
@@ -169,7 +169,7 @@ func CreateOrGetLaunchPlan(ctx context.Context,
 	workflowInterface *core.TypedInterface, workflowID uint, spec *admin.ExecutionSpec) (*admin.LaunchPlan, error) {
 	var launchPlan *admin.LaunchPlan
 	var err error
-	launchPlanIdentifier := core.Identifier{
+	launchPlanIdentifier := &core.Identifier{
 		ResourceType: core.ResourceType_LAUNCH_PLAN,
 		Project:      taskIdentifier.Project,
 		Domain:       taskIdentifier.Domain,
@@ -183,8 +183,8 @@ func CreateOrGetLaunchPlan(ctx context.Context,
 		}
 
 		// Create launch plan.
-		generatedCreateLaunchPlanReq := admin.LaunchPlanCreateRequest{
-			Id: &launchPlanIdentifier,
+		generatedCreateLaunchPlanReq := &admin.LaunchPlanCreateRequest{
+			Id: launchPlanIdentifier,
 			Spec: &admin.LaunchPlanSpec{
 				WorkflowId: &core.Identifier{
 					ResourceType: core.ResourceType_WORKFLOW,
@@ -207,14 +207,14 @@ func CreateOrGetLaunchPlan(ctx context.Context,
 			return nil, err
 		}
 		transformedLaunchPlan := transformers.CreateLaunchPlan(generatedCreateLaunchPlanReq, workflowInterface.Outputs)
-		launchPlan = &transformedLaunchPlan
+		launchPlan = transformedLaunchPlan
 		launchPlanDigest, err := GetLaunchPlanDigest(ctx, launchPlan)
 		if err != nil {
 			logger.Errorf(ctx, "failed to compute launch plan digest for [%+v] with err: %v", launchPlan.Id, err)
 			return nil, err
 		}
 		launchPlanModel, err :=
-			transformers.CreateLaunchPlanModel(*launchPlan, workflowID, launchPlanDigest, admin.LaunchPlanState_INACTIVE)
+			transformers.CreateLaunchPlanModel(launchPlan, workflowID, launchPlanDigest, admin.LaunchPlanState_INACTIVE)
 		if err != nil {
 			logger.Errorf(ctx,
 				"Failed to transform launch plan model [%+v], and workflow outputs [%+v] with err: %v",

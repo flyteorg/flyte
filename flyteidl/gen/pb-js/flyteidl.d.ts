@@ -3455,6 +3455,9 @@ export namespace flyteidl {
             /** Literal map */
             map?: (flyteidl.core.ILiteralMap|null);
 
+            /** Literal offloadedMetadata */
+            offloadedMetadata?: (flyteidl.core.ILiteralOffloadedMetadata|null);
+
             /** Literal tuple */
             tuple?: (flyteidl.core.ILiteralTupleMap|null);
 
@@ -3463,12 +3466,6 @@ export namespace flyteidl {
 
             /** Literal metadata */
             metadata?: ({ [k: string]: string }|null);
-
-            /** Literal uri */
-            uri?: (string|null);
-
-            /** Literal sizeBytes */
-            sizeBytes?: (Long|null);
         }
 
         /** Represents a Literal. */
@@ -3489,6 +3486,9 @@ export namespace flyteidl {
             /** Literal map. */
             public map?: (flyteidl.core.ILiteralMap|null);
 
+            /** Literal offloadedMetadata. */
+            public offloadedMetadata?: (flyteidl.core.ILiteralOffloadedMetadata|null);
+
             /** Literal tuple. */
             public tuple?: (flyteidl.core.ILiteralTupleMap|null);
 
@@ -3498,14 +3498,8 @@ export namespace flyteidl {
             /** Literal metadata. */
             public metadata: { [k: string]: string };
 
-            /** Literal uri. */
-            public uri: string;
-
-            /** Literal sizeBytes. */
-            public sizeBytes: Long;
-
             /** Literal value. */
-            public value?: ("scalar"|"collection"|"map"|"tuple");
+            public value?: ("scalar"|"collection"|"map"|"offloadedMetadata"|"tuple");
 
             /**
              * Creates a new Literal instance using the specified properties.
@@ -3534,6 +3528,70 @@ export namespace flyteidl {
 
             /**
              * Verifies a Literal message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a LiteralOffloadedMetadata. */
+        interface ILiteralOffloadedMetadata {
+
+            /** LiteralOffloadedMetadata uri */
+            uri?: (string|null);
+
+            /** LiteralOffloadedMetadata sizeBytes */
+            sizeBytes?: (Long|null);
+
+            /** LiteralOffloadedMetadata inferredType */
+            inferredType?: (flyteidl.core.ILiteralType|null);
+        }
+
+        /** Represents a LiteralOffloadedMetadata. */
+        class LiteralOffloadedMetadata implements ILiteralOffloadedMetadata {
+
+            /**
+             * Constructs a new LiteralOffloadedMetadata.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.ILiteralOffloadedMetadata);
+
+            /** LiteralOffloadedMetadata uri. */
+            public uri: string;
+
+            /** LiteralOffloadedMetadata sizeBytes. */
+            public sizeBytes: Long;
+
+            /** LiteralOffloadedMetadata inferredType. */
+            public inferredType?: (flyteidl.core.ILiteralType|null);
+
+            /**
+             * Creates a new LiteralOffloadedMetadata instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns LiteralOffloadedMetadata instance
+             */
+            public static create(properties?: flyteidl.core.ILiteralOffloadedMetadata): flyteidl.core.LiteralOffloadedMetadata;
+
+            /**
+             * Encodes the specified LiteralOffloadedMetadata message. Does not implicitly {@link flyteidl.core.LiteralOffloadedMetadata.verify|verify} messages.
+             * @param message LiteralOffloadedMetadata message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.ILiteralOffloadedMetadata, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a LiteralOffloadedMetadata message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns LiteralOffloadedMetadata
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.LiteralOffloadedMetadata;
+
+            /**
+             * Verifies a LiteralOffloadedMetadata message.
              * @param message Plain object to verify
              * @returns `null` if valid, otherwise the reason why it is not
              */

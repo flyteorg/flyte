@@ -187,7 +187,7 @@ func TestValidateNodeExecutionEventRequest_Invalid(t *testing.T) {
 }
 
 func TestValidateNodeExecutionListRequest(t *testing.T) {
-	err := ValidateNodeExecutionListRequest(admin.NodeExecutionListRequest{
+	err := ValidateNodeExecutionListRequest(&admin.NodeExecutionListRequest{
 		WorkflowExecutionId: &testExecutionID,
 		Filters:             "foo",
 		Limit:               2,
@@ -196,19 +196,19 @@ func TestValidateNodeExecutionListRequest(t *testing.T) {
 }
 
 func TestValidateNodeExecutionListRequest_MissingFields(t *testing.T) {
-	err := ValidateNodeExecutionListRequest(admin.NodeExecutionListRequest{
+	err := ValidateNodeExecutionListRequest(&admin.NodeExecutionListRequest{
 		Limit: 2,
 	})
 	assert.EqualError(t, err, "missing execution_id")
 
-	err = ValidateNodeExecutionListRequest(admin.NodeExecutionListRequest{
+	err = ValidateNodeExecutionListRequest(&admin.NodeExecutionListRequest{
 		WorkflowExecutionId: &testExecutionID,
 	})
 	assert.EqualError(t, err, "invalid value for limit")
 }
 
 func TestValidateNodeExecutionForTaskListRequest(t *testing.T) {
-	err := ValidateNodeExecutionForTaskListRequest(admin.NodeExecutionForTaskListRequest{
+	err := ValidateNodeExecutionForTaskListRequest(&admin.NodeExecutionForTaskListRequest{
 		TaskExecutionId: &core.TaskExecutionIdentifier{
 			NodeExecutionId: &core.NodeExecutionIdentifier{
 				ExecutionId: &testExecutionID,
@@ -229,7 +229,7 @@ func TestValidateNodeExecutionForTaskListRequest(t *testing.T) {
 }
 
 func TestValidateNodeExecutionForTaskListRequest_MissingFields(t *testing.T) {
-	err := ValidateNodeExecutionForTaskListRequest(admin.NodeExecutionForTaskListRequest{
+	err := ValidateNodeExecutionForTaskListRequest(&admin.NodeExecutionForTaskListRequest{
 		TaskExecutionId: &core.TaskExecutionIdentifier{
 			NodeExecutionId: &core.NodeExecutionIdentifier{
 				ExecutionId: &testExecutionID,
@@ -246,7 +246,7 @@ func TestValidateNodeExecutionForTaskListRequest_MissingFields(t *testing.T) {
 	})
 	assert.EqualError(t, err, "invalid value for limit")
 
-	err = ValidateNodeExecutionForTaskListRequest(admin.NodeExecutionForTaskListRequest{
+	err = ValidateNodeExecutionForTaskListRequest(&admin.NodeExecutionForTaskListRequest{
 		TaskExecutionId: &core.TaskExecutionIdentifier{
 			NodeExecutionId: &core.NodeExecutionIdentifier{
 				ExecutionId: &testExecutionID,
@@ -263,7 +263,7 @@ func TestValidateNodeExecutionForTaskListRequest_MissingFields(t *testing.T) {
 	})
 	assert.EqualError(t, err, "missing node_id")
 
-	err = ValidateNodeExecutionForTaskListRequest(admin.NodeExecutionForTaskListRequest{
+	err = ValidateNodeExecutionForTaskListRequest(&admin.NodeExecutionForTaskListRequest{
 		TaskExecutionId: &core.TaskExecutionIdentifier{
 			NodeExecutionId: &core.NodeExecutionIdentifier{
 				ExecutionId: &testExecutionID,

@@ -6,15 +6,15 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
-type CreateNodeEventFunc func(ctx context.Context, request admin.NodeExecutionEventRequest) (
+type CreateNodeEventFunc func(ctx context.Context, request *admin.NodeExecutionEventRequest) (
 	*admin.NodeExecutionEventResponse, error)
-type GetNodeExecutionFunc func(ctx context.Context, request admin.NodeExecutionGetRequest) (*admin.NodeExecution, error)
+type GetNodeExecutionFunc func(ctx context.Context, request *admin.NodeExecutionGetRequest) (*admin.NodeExecution, error)
 type ListNodeExecutionsFunc func(
-	ctx context.Context, request admin.NodeExecutionListRequest) (*admin.NodeExecutionList, error)
-type ListNodeExecutionsForTaskFunc func(ctx context.Context, request admin.NodeExecutionForTaskListRequest) (
+	ctx context.Context, request *admin.NodeExecutionListRequest) (*admin.NodeExecutionList, error)
+type ListNodeExecutionsForTaskFunc func(ctx context.Context, request *admin.NodeExecutionForTaskListRequest) (
 	*admin.NodeExecutionList, error)
 type GetNodeExecutionDataFunc func(
-	ctx context.Context, request admin.NodeExecutionGetDataRequest) (*admin.NodeExecutionGetDataResponse, error)
+	ctx context.Context, request *admin.NodeExecutionGetDataRequest) (*admin.NodeExecutionGetDataResponse, error)
 
 type MockNodeExecutionManager struct {
 	createNodeEventFunc           CreateNodeEventFunc
@@ -30,7 +30,7 @@ func (m *MockNodeExecutionManager) SetCreateNodeEventCallback(createNodeEventFun
 
 func (m *MockNodeExecutionManager) CreateNodeEvent(
 	ctx context.Context,
-	request admin.NodeExecutionEventRequest) (*admin.NodeExecutionEventResponse, error) {
+	request *admin.NodeExecutionEventRequest) (*admin.NodeExecutionEventResponse, error) {
 	if m.createNodeEventFunc != nil {
 		return m.createNodeEventFunc(ctx, request)
 	}
@@ -42,7 +42,7 @@ func (m *MockNodeExecutionManager) SetGetNodeExecutionFunc(getNodeExecutionFunc 
 }
 
 func (m *MockNodeExecutionManager) GetNodeExecution(
-	ctx context.Context, request admin.NodeExecutionGetRequest) (*admin.NodeExecution, error) {
+	ctx context.Context, request *admin.NodeExecutionGetRequest) (*admin.NodeExecution, error) {
 	if m.getNodeExecutionFunc != nil {
 		return m.getNodeExecutionFunc(ctx, request)
 	}
@@ -54,7 +54,7 @@ func (m *MockNodeExecutionManager) SetListNodeExecutionsFunc(listNodeExecutionsF
 }
 
 func (m *MockNodeExecutionManager) ListNodeExecutions(
-	ctx context.Context, request admin.NodeExecutionListRequest) (*admin.NodeExecutionList, error) {
+	ctx context.Context, request *admin.NodeExecutionListRequest) (*admin.NodeExecutionList, error) {
 	if m.listNodeExecutionsFunc != nil {
 		return m.listNodeExecutionsFunc(ctx, request)
 	}
@@ -66,7 +66,7 @@ func (m *MockNodeExecutionManager) SetListNodeExecutionsForTaskFunc(listNodeExec
 }
 
 func (m *MockNodeExecutionManager) ListNodeExecutionsForTask(
-	ctx context.Context, request admin.NodeExecutionForTaskListRequest) (*admin.NodeExecutionList, error) {
+	ctx context.Context, request *admin.NodeExecutionForTaskListRequest) (*admin.NodeExecutionList, error) {
 	if m.listNodeExecutionsForTaskFunc != nil {
 		return m.listNodeExecutionsForTaskFunc(ctx, request)
 	}
@@ -78,13 +78,13 @@ func (m *MockNodeExecutionManager) SetGetNodeExecutionDataFunc(getNodeExecutionD
 }
 
 func (m *MockNodeExecutionManager) GetNodeExecutionData(
-	ctx context.Context, request admin.NodeExecutionGetDataRequest) (*admin.NodeExecutionGetDataResponse, error) {
+	ctx context.Context, request *admin.NodeExecutionGetDataRequest) (*admin.NodeExecutionGetDataResponse, error) {
 	if m.getNodeExecutionDataFunc != nil {
 		return m.getNodeExecutionDataFunc(ctx, request)
 	}
 	return nil, nil
 }
 
-func (m *MockNodeExecutionManager) GetDynamicNodeWorkflow(ctx context.Context, request admin.GetDynamicNodeWorkflowRequest) (*admin.DynamicNodeWorkflowResponse, error) {
+func (m *MockNodeExecutionManager) GetDynamicNodeWorkflow(ctx context.Context, request *admin.GetDynamicNodeWorkflowRequest) (*admin.DynamicNodeWorkflowResponse, error) {
 	return nil, nil
 }

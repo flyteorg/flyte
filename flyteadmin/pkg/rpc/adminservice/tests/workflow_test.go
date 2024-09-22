@@ -27,7 +27,7 @@ func TestCreateWorkflowHappyCase(t *testing.T) {
 	mockWorkflowManager := mocks.MockWorkflowManager{}
 	mockWorkflowManager.SetCreateCallback(
 		func(ctx context.Context,
-			request admin.WorkflowCreateRequest) (*admin.WorkflowCreateResponse, error) {
+			request *admin.WorkflowCreateRequest) (*admin.WorkflowCreateResponse, error) {
 			return &admin.WorkflowCreateResponse{}, nil
 		},
 	)
@@ -48,7 +48,7 @@ func TestCreateWorkflowError(t *testing.T) {
 	mockWorkflowManager := mocks.MockWorkflowManager{}
 	mockWorkflowManager.SetCreateCallback(
 		func(ctx context.Context,
-			request admin.WorkflowCreateRequest) (*admin.WorkflowCreateResponse, error) {
+			request *admin.WorkflowCreateRequest) (*admin.WorkflowCreateResponse, error) {
 			return nil, errors.GetMissingEntityError(core.ResourceType_WORKFLOW.String(), request.Id)
 		},
 	)

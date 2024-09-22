@@ -13,7 +13,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
-var taskIdentifier = core.Identifier{
+var taskIdentifier = &core.Identifier{
 	ResourceType: core.ResourceType_TASK,
 	Name:         "Name",
 	Domain:       "Domain",
@@ -27,7 +27,7 @@ func TestTaskHappyCase(t *testing.T) {
 	mockTaskManager := mocks.MockTaskManager{}
 	mockTaskManager.SetCreateCallback(
 		func(ctx context.Context,
-			request admin.TaskCreateRequest) (*admin.TaskCreateResponse, error) {
+			request *admin.TaskCreateRequest) (*admin.TaskCreateResponse, error) {
 			return &admin.TaskCreateResponse{}, nil
 		},
 	)
@@ -36,7 +36,7 @@ func TestTaskHappyCase(t *testing.T) {
 	})
 
 	resp, err := mockServer.CreateTask(ctx, &admin.TaskCreateRequest{
-		Id: &taskIdentifier,
+		Id: taskIdentifier,
 	})
 	assert.NotNil(t, resp)
 	assert.NoError(t, err)
@@ -48,7 +48,7 @@ func TestTaskError(t *testing.T) {
 	mockTaskManager := mocks.MockTaskManager{}
 	mockTaskManager.SetCreateCallback(
 		func(ctx context.Context,
-			request admin.TaskCreateRequest) (*admin.TaskCreateResponse, error) {
+			request *admin.TaskCreateRequest) (*admin.TaskCreateResponse, error) {
 			return nil, errors.GetMissingEntityError(core.ResourceType_TASK.String(), request.Id)
 		},
 	)
@@ -74,7 +74,7 @@ func TestListUniqueTaskIds(t *testing.T) {
 	ctx := context.Background()
 
 	mockTaskManager := mocks.MockTaskManager{}
-	mockTaskManager.SetListUniqueIdsFunc(func(ctx context.Context, request admin.NamedEntityIdentifierListRequest) (
+	mockTaskManager.SetListUniqueIdsFunc(func(ctx context.Context, request *admin.NamedEntityIdentifierListRequest) (
 		*admin.NamedEntityIdentifierList, error) {
 
 		assert.Equal(t, "staging", request.Domain)

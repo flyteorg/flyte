@@ -32,17 +32,17 @@ type DescriptionEntityManager struct {
 	metrics DescriptionEntityMetrics
 }
 
-func (d *DescriptionEntityManager) GetDescriptionEntity(ctx context.Context, request admin.ObjectGetRequest) (
+func (d *DescriptionEntityManager) GetDescriptionEntity(ctx context.Context, request *admin.ObjectGetRequest) (
 	*admin.DescriptionEntity, error) {
 	if err := validation.ValidateDescriptionEntityGetRequest(request); err != nil {
 		logger.Errorf(ctx, "invalid request [%+v]: %v", request, err)
 		return nil, err
 	}
 	ctx = contextutils.WithProjectDomain(ctx, request.Id.Project, request.Id.Domain)
-	return util.GetDescriptionEntity(ctx, d.db, *request.Id)
+	return util.GetDescriptionEntity(ctx, d.db, request.Id)
 }
 
-func (d *DescriptionEntityManager) ListDescriptionEntity(ctx context.Context, request admin.DescriptionEntityListRequest) (*admin.DescriptionEntityList, error) {
+func (d *DescriptionEntityManager) ListDescriptionEntity(ctx context.Context, request *admin.DescriptionEntityListRequest) (*admin.DescriptionEntityList, error) {
 	// Check required fields
 	if err := validation.ValidateDescriptionEntityListRequest(request); err != nil {
 		return nil, err

@@ -44,7 +44,14 @@ func literalTypeForScalar(scalar *core.Scalar) *core.LiteralType {
 
 		literalType = &core.LiteralType{Type: &core.LiteralType_Blob{Blob: scalar.GetBlob().GetMetadata().GetType()}}
 	case *core.Scalar_Binary:
-		literalType = &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_BINARY}}
+		// If the binary has a tag, treat it as a structured type (e.g., dict, dataclass, Pydantic BaseModel).
+		// Otherwise, treat it as raw binary data.
+		// Reference: https://github.com/flyteorg/flyte/blob/master/rfc/system/5741-binary-idl-with-message-pack.md
+		if len(v.Binary.Tag) > 0 {
+			literalType = &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRUCT}}
+		} else {
+			literalType = &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_BINARY}}
+		}
 	case *core.Scalar_Schema:
 		literalType = &core.LiteralType{
 			Type: &core.LiteralType_Schema{

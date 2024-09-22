@@ -139,7 +139,7 @@ func TestGetNodeExecution(t *testing.T) {
 	GlobalMock.NewMock().WithQuery(
 		`SELECT * FROM "node_executions" WHERE "node_executions"."execution_project" = $1 AND "node_executions"."execution_domain" = $2 AND "node_executions"."execution_name" = $3 AND "node_executions"."node_id" = $4 LIMIT 1`).WithReply(nodeExecutions)
 	output, err := nodeExecutionRepo.Get(context.Background(), interfaces.NodeExecutionResource{
-		NodeExecutionIdentifier: core.NodeExecutionIdentifier{
+		NodeExecutionIdentifier: &core.NodeExecutionIdentifier{
 			NodeId: "1",
 			ExecutionId: &core.WorkflowExecutionIdentifier{
 				Project: "execution_project",
@@ -160,7 +160,7 @@ func TestGetNodeExecutionErr(t *testing.T) {
 		GlobalMock.NewMock().WithError(gorm.ErrRecordNotFound)
 
 		_, err := nodeExecutionRepo.Get(context.Background(), interfaces.NodeExecutionResource{
-			NodeExecutionIdentifier: core.NodeExecutionIdentifier{
+			NodeExecutionIdentifier: &core.NodeExecutionIdentifier{
 				NodeId: "1",
 				ExecutionId: &core.WorkflowExecutionIdentifier{
 					Project: "execution_project",
@@ -176,7 +176,7 @@ func TestGetNodeExecutionErr(t *testing.T) {
 		GlobalMock.NewMock().WithError(gorm.ErrInvalidData)
 
 		_, err := nodeExecutionRepo.Get(context.Background(), interfaces.NodeExecutionResource{
-			NodeExecutionIdentifier: core.NodeExecutionIdentifier{
+			NodeExecutionIdentifier: &core.NodeExecutionIdentifier{
 				NodeId: "1",
 				ExecutionId: &core.WorkflowExecutionIdentifier{
 					Project: "execution_project",
@@ -362,7 +362,7 @@ func TestNodeExecutionExists(t *testing.T) {
 	GlobalMock.NewMock().WithQuery(
 		`SELECT "id" FROM "node_executions" WHERE "node_executions"."execution_project" = $1 AND "node_executions"."execution_domain" = $2 AND "node_executions"."execution_name" = $3 AND "node_executions"."node_id" = $4 LIMIT 1`).WithReply(nodeExecutions)
 	exists, err := nodeExecutionRepo.Exists(context.Background(), interfaces.NodeExecutionResource{
-		NodeExecutionIdentifier: core.NodeExecutionIdentifier{
+		NodeExecutionIdentifier: &core.NodeExecutionIdentifier{
 			NodeId: "1",
 			ExecutionId: &core.WorkflowExecutionIdentifier{
 				Project: "execution_project",

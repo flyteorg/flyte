@@ -415,8 +415,10 @@ pub struct BlobMetadata {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Binary {
+    /// Serialized data (MessagePack) for supported types like Dataclass, Pydantic BaseModel, and untyped dict.
     #[prost(bytes="vec", tag="1")]
     pub value: ::prost::alloc::vec::Vec<u8>,
+    /// The serialization format identifier (e.g., MessagePack). Consumers must define unique tags and validate them before deserialization.
     #[prost(string, tag="2")]
     pub tag: ::prost::alloc::string::String,
 }
@@ -504,13 +506,7 @@ pub struct Literal {
     /// Additional metadata for literals.
     #[prost(map="string, string", tag="5")]
     pub metadata: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
-    /// If this literal is offloaded, this field will contain metadata including the offload location.
-    #[prost(string, tag="6")]
-    pub uri: ::prost::alloc::string::String,
-    /// Includes information about the size of the literal.
-    #[prost(uint64, tag="7")]
-    pub size_bytes: u64,
-    #[prost(oneof="literal::Value", tags="1, 2, 3, 8")]
+    #[prost(oneof="literal::Value", tags="1, 2, 3, 8, 9")]
     pub value: ::core::option::Option<literal::Value>,
 }
 /// Nested message and enum types in `Literal`.
@@ -527,10 +523,28 @@ pub mod literal {
         /// A map of strings to literals.
         #[prost(message, tag="3")]
         Map(super::LiteralMap),
-        /// A field for tuple literal.
+        /// Offloaded literal metadata
+        /// When you deserialize the offloaded metadata, it would be of Literal and its type would be defined by LiteralType stored in offloaded_metadata.
         #[prost(message, tag="8")]
+        OffloadedMetadata(super::LiteralOffloadedMetadata),
+        /// A field for tuple literal.
+        #[prost(message, tag="9")]
         Tuple(super::LiteralTupleMap),
     }
+}
+/// A message that contains the metadata of the offloaded data.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct LiteralOffloadedMetadata {
+    /// The location of the offloaded core.Literal.
+    #[prost(string, tag="1")]
+    pub uri: ::prost::alloc::string::String,
+    /// The size of the offloaded data.
+    #[prost(uint64, tag="2")]
+    pub size_bytes: u64,
+    /// The inferred literal type of the offloaded data.
+    #[prost(message, optional, tag="3")]
+    pub inferred_type: ::core::option::Option<LiteralType>,
 }
 /// A collection of literals. This is a workaround since oneofs in proto messages cannot contain a repeated field.
 #[allow(clippy::derive_partial_eq_without_eq)]

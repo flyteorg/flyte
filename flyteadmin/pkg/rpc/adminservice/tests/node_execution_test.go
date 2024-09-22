@@ -30,7 +30,7 @@ func TestCreateNodeEvent(t *testing.T) {
 	phase := core.NodeExecution_RUNNING
 	mockNodeExecutionManager := mocks.MockNodeExecutionManager{}
 	mockNodeExecutionManager.SetCreateNodeEventCallback(
-		func(ctx context.Context, request admin.NodeExecutionEventRequest) (
+		func(ctx context.Context, request *admin.NodeExecutionEventRequest) (
 			*admin.NodeExecutionEventResponse, error) {
 			assert.Equal(t, requestID, request.RequestId)
 			assert.NotNil(t, request.Event)
@@ -55,7 +55,7 @@ func TestCreateNodeEvent(t *testing.T) {
 func TestCreateNodeEventErr(t *testing.T) {
 	mockNodeExecutionManager := mocks.MockNodeExecutionManager{}
 	mockNodeExecutionManager.SetCreateNodeEventCallback(
-		func(ctx context.Context, request admin.NodeExecutionEventRequest) (
+		func(ctx context.Context, request *admin.NodeExecutionEventRequest) (
 			*admin.NodeExecutionEventResponse, error) {
 			return nil, errors.New("expected error")
 		})
@@ -81,7 +81,7 @@ func TestGetNodeExecution(t *testing.T) {
 	mockNodeExecutionManager := mocks.MockNodeExecutionManager{}
 	mockNodeExecutionManager.SetGetNodeExecutionFunc(
 		func(ctx context.Context,
-			request admin.NodeExecutionGetRequest) (*admin.NodeExecution, error) {
+			request *admin.NodeExecutionGetRequest) (*admin.NodeExecution, error) {
 			assert.True(t, proto.Equal(&nodeExecutionID, request.Id))
 			return response, nil
 		},
@@ -101,7 +101,7 @@ func TestGetNodeExecutionError(t *testing.T) {
 	mockNodeExecutionManager := mocks.MockNodeExecutionManager{}
 	mockNodeExecutionManager.SetGetNodeExecutionFunc(
 		func(ctx context.Context,
-			request admin.NodeExecutionGetRequest) (*admin.NodeExecution, error) {
+			request *admin.NodeExecutionGetRequest) (*admin.NodeExecution, error) {
 			assert.True(t, proto.Equal(&nodeExecutionID, request.Id))
 			return nil, errors.New("expected error")
 		},
@@ -121,7 +121,7 @@ func TestGetNodeExecutionError(t *testing.T) {
 func TestListNodeExecutions(t *testing.T) {
 	mockNodeExecutionManager := mocks.MockNodeExecutionManager{}
 	filters := "encoded filters probably"
-	mockNodeExecutionManager.SetListNodeExecutionsFunc(func(ctx context.Context, request admin.NodeExecutionListRequest) (
+	mockNodeExecutionManager.SetListNodeExecutionsFunc(func(ctx context.Context, request *admin.NodeExecutionListRequest) (
 		*admin.NodeExecutionList, error) {
 		assert.Equal(t, filters, request.Filters)
 		assert.Equal(t, uint32(1), request.Limit)
@@ -150,7 +150,7 @@ func TestListNodeExecutions(t *testing.T) {
 
 func TestListNodeExecutionsError(t *testing.T) {
 	mockNodeExecutionManager := mocks.MockNodeExecutionManager{}
-	mockNodeExecutionManager.SetListNodeExecutionsFunc(func(ctx context.Context, request admin.NodeExecutionListRequest) (
+	mockNodeExecutionManager.SetListNodeExecutionsFunc(func(ctx context.Context, request *admin.NodeExecutionListRequest) (
 		*admin.NodeExecutionList, error) {
 		return nil, errors.New("expected error")
 	})
@@ -172,7 +172,7 @@ func TestListNodeExecutionsForTask(t *testing.T) {
 	mockNodeExecutionManager := mocks.MockNodeExecutionManager{}
 	filters := "encoded filters probably"
 	mockNodeExecutionManager.SetListNodeExecutionsForTaskFunc(
-		func(ctx context.Context, request admin.NodeExecutionForTaskListRequest) (
+		func(ctx context.Context, request *admin.NodeExecutionForTaskListRequest) (
 			*admin.NodeExecutionList, error) {
 			assert.Equal(t, filters, request.Filters)
 			assert.Equal(t, uint32(1), request.Limit)
@@ -202,7 +202,7 @@ func TestListNodeExecutionsForTask(t *testing.T) {
 func TestListNodeExecutionsForTaskError(t *testing.T) {
 	mockNodeExecutionManager := mocks.MockNodeExecutionManager{}
 	mockNodeExecutionManager.SetListNodeExecutionsForTaskFunc(
-		func(ctx context.Context, request admin.NodeExecutionForTaskListRequest) (
+		func(ctx context.Context, request *admin.NodeExecutionForTaskListRequest) (
 			*admin.NodeExecutionList, error) {
 			return nil, errors.New("expected error")
 		})
@@ -224,7 +224,7 @@ func TestGetNodeExecutionData(t *testing.T) {
 	mockNodeExecutionManager := mocks.MockNodeExecutionManager{}
 	mockNodeExecutionManager.SetGetNodeExecutionDataFunc(
 		func(ctx context.Context,
-			request admin.NodeExecutionGetDataRequest) (*admin.NodeExecutionGetDataResponse, error) {
+			request *admin.NodeExecutionGetDataRequest) (*admin.NodeExecutionGetDataResponse, error) {
 			assert.True(t, proto.Equal(&nodeExecutionID, request.Id))
 			return &admin.NodeExecutionGetDataResponse{
 				Inputs: &admin.UrlBlob{
