@@ -245,7 +245,7 @@ func validateBinding(w c.WorkflowBuilder, node c.Node, nodeParam string, binding
 				if expectedField, ok := expectedType.GetTupleType().GetFields()[k]; !ok {
 					errs.Collect(errors.NewFieldNotFoundErr(nodeID, nodeParam, expectedType.String(), k))
 				} else {
-					if fieldType, nodeIds, ok := validateBinding(w, nodeID, nodeParam, v, expectedField, errs.NewScope(), validateParamTypes); ok {
+					if fieldType, nodeIds, ok := validateBinding(w, node, nodeParam, v, expectedField, errs.NewScope(), validateParamTypes); ok {
 						allNodeIds = append(allNodeIds, nodeIds...)
 						fields[k] = fieldType
 					}

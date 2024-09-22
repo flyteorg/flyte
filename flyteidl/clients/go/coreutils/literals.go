@@ -466,8 +466,8 @@ func MakeLiteralTuple(name string, order []string, v map[string]interface{}) (*c
 
 	return &core.LiteralTupleMap{
 		TupleName: name,
-		Order: order,
-		Literals: literals,
+		Order:     order,
+		Literals:  literals,
 	}, nil
 
 }
