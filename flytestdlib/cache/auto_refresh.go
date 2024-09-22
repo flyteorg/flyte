@@ -3,7 +3,6 @@ package cache
 import (
 	"context"
 	"fmt"
-	"k8s.io/utils/clock"
 	"runtime/debug"
 	"sync"
 	"time"
@@ -11,6 +10,7 @@ import (
 	lru "github.com/hashicorp/golang-lru"
 	"github.com/prometheus/client_golang/prometheus"
 	"k8s.io/client-go/util/workqueue"
+	"k8s.io/utils/clock"
 
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/errors"
