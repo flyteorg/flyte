@@ -150,7 +150,7 @@ exclude_patterns = [
     "flytesnacks/README.md",
     "flytekit/**/README.md",
     "flytekit/_templates/**",
-    "flytectl/index.rst",
+    "api/flytectl/index.rst",
     "protos/boilerplate/**",
     "protos/tmp/**",
     "protos/gen/**",
@@ -334,7 +334,7 @@ PROTO_REF_REPLACE = r"\1/protos/docs"
 REPLACE_PATTERNS = {
 
     r"<flyte:deployment/index>": r"</deployment/index>",
-    r"<flytectl:index>": r"</flytectl/overview>",
+    r"<flytectl:index>": r"</api/flytectl/overview>",
     INTERSPHINX_REFS_PATTERN: INTERSPHINX_REFS_REPLACE,
     r"<auto_examples": r"<flytesnacks/examples",
     r"<protos/docs/core/core:taskmetadata>": r"<ref_flyteidl.core.TaskMetadata>",
@@ -421,7 +421,7 @@ import_projects = [
         "name": "flytectl",
         "source": "../flytectl",
         "docs_path": "docs/source",
-        "dest": "flytectl",
+        "dest": "api/flytectl",
         "local": True,
     },
     {
