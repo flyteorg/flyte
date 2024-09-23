@@ -97,17 +97,15 @@ extlinks = {
 
 # redirects
 redirects = {
-    "flytesnacks/deprecated_integrations": "../deprecated_integrations/index.html",
-    "flytesnacks/examples/bigquery_plugin/index": "../../../deprecated_integrations/bigquery_plugin/index.html",
-    "flytesnacks/examples/bigquery_plugin/bigquery_plugin_example": "../../../deprecated_integrations/bigquery_plugin/biquery_plugin_example.html",
-    "flytesnacks/examples/databricks_plugin/index": "../../../deprecated_integrations/databricks_plugin/index.html",
-    "flytesnacks/examples/databricks_plugin/databricks_plugin_example": "../../../deprecated_integrations/databricks_plugin/databricks_plugin_example.html",
-    "flytesnacks/examples/mmcloud_plugin/index": "../../../deprecated_integrations/mmcloud_plugin/index.html",
-    "flytesnacks/examples/mmcloud_plugin/mmcloud_plugin_example": "../../../deprecated_integrations/mmcloud_plugin/mmcloud_plugin_example.html",
-    "flytesnacks/examples/snowflake_plugin/index": "../../../deprecated_integrations/snowflake_plugin/index.html",
-    "flytesnacks/examples/snowflake_plugin/snowflake_plugin_example": "../../../deprecated_integrations/snowflake_plugin/snowflake_plugin_example.html",
+    "deprecated_integrations/index": "../../flytesnacks/deprecated_integrations/index.html",
     "deprecated_integrations/mmcloud_plugin/index": "../../flytesnacks/examples/mmcloud_agent/index.html",
-    "deprecated_integrations/mmcloud_plugin/mmcloud_plugin_example": "../../flytesnacks/examples/mmcloud_agent/index.html"
+    "deprecated_integrations/mmcloud_plugin/mmcloud_plugin_example": "../../flytesnacks/examples/mmcloud_agent/index.html",
+    "deprecated_integrations/bigquery_plugin/index": "../../flytesnacks/deprecated_integrations/bigquery_plugin/index.html",
+    "deprecated_integrations/bigquery_plugin/bigquery_plugin_example": "../../flytesnacks/deprecated_integrations/bigquery_plugin/bigquery_plugin_example.html",
+    "deprecated_integrations/databricks_plugin/index": "../../flytesnacks/deprecated_integrations/databricks_plugin/index.html",
+    "deprecated_integrations/databricks_plugin/databricks_plugin_example": "../../flytesnacks/deprecated_integrations/databricks_plugin/databricks_plugin_example.html",
+    "deprecated_integrations/snowflake_plugin/index": "../../flytesnacks/deprecated_integrations/snowflake_plugin/index.html",
+    "deprecated_integrations/snowflake_plugin/snowflake_plugin_example": "../../flytesnacks/deprecated_integrations/snowflake_plugin/snowflake_plugin_example.html",
 }
 
 
@@ -342,18 +340,18 @@ REPLACE_PATTERNS = {
     r"<flyte:deployment/index>": r"</deployment/index>",
     r"<flytectl:index>": r"</api/flytectl/overview>",
     INTERSPHINX_REFS_PATTERN: INTERSPHINX_REFS_REPLACE,
-    r"<auto_examples": r"<flytesnacks/examples",
+    r"</auto_examples": r"<flytesnacks/examples",
+    r"/auto_examples": r"/flytesnacks/examples",
     r"<protos/docs/core/core:taskmetadata>": r"<ref_flyteidl.core.TaskMetadata>",
     r"<protos/docs/core/core:tasktemplate>": r"<ref_flyteidl.core.TaskTemplate>",
     r"<flytesnacks/examples": r"</flytesnacks/examples",
-    r"<auto_examples/basics/index>": r"</flytesnacks/examples/basics/index>",
+    # r"</auto_examples/basics/index>": r"</flytesnacks/examples/basics/index>",
     r"<deploy-sandbox-local>": r"<deployment-deployment-sandbox>",
     r"<deployment/configuration/general:configurable resource types>": r"<deployment-configuration-general>",
     r"<_tags/DistributedComputing>": r"</_tags/DistributedComputing>",
     r"{ref}`bioinformatics <bioinformatics>`": r"bioinformatics",
     PROTO_REF_PATTERN: PROTO_REF_REPLACE,
-    r"/protos/docs/service/index": r"/protos/docs/service/service",
-    r"<weather_forecasting>": r"</flytesnacks/weather_forecasting>",
+    r"/protos/docs/service/index": r"/protos/docs/service/service"
 }
 
 # r"<environment_setup>": r"</flytesnacks/environment_setup>",
@@ -401,11 +399,7 @@ import_projects = [
                 "examples/development_lifecycle",
                 "examples/extending",
                 "examples/productionizing",
-                "examples/testing",
-                "examples/bigquery_plugin",
-                "examples/databricks_plugin",
-                "examples/mmcloud_plugin",
-                "examples/snowflake_plugin",
+                "examples/testing"
             ]
         ],
         "local": flytesnacks_local_path is not None,

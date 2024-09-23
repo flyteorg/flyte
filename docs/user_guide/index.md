@@ -22,11 +22,11 @@ and contributing samples easy. If this is your first time running these examples
 
 ```{tip}
 To learn about how to spin up and manage a Flyte cluster in the cloud, see the
-{doc}`Deployment Guides <flyte:deployment/index>`.
+{doc}`Deployment Guides <../deployment/index>`.
 ```
 
 ```{note}
-Want to contribute or update an example? Check out the {doc}`Contribution Guide <../flytesnacks/contribute>`.
+Want to contribute or update an example? Check out the {doc}`Contribution Guide <../community/contribute_docs>`.
 ```
 
 ## Table of contents

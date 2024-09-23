@@ -79,10 +79,10 @@ contribute its architecture and design. You can also access the
     and core use cases.
 * - {doc}`📖 User Guide <user_guide/index>`
   - A comprehensive view of Flyte's functionality for data and ML practitioners.
-* - {doc}`📚 Tutorials <flytesnacks/tutorials>`
+* - {doc}`📚 Tutorials <flytesnacks/tutorials/index>`
   - End-to-end examples of Flyte for data/feature engineering, machine learning,
     bioinformatics, and more.
-* - {doc}`🔌 Integrations <flytesnacks/integrations>`
+* - {doc}`🔌 Integrations <flytesnacks/integrations/index>`
   - Leverage a rich ecosystem of third-party tools and libraries to make your
     Flyte workflows even more effective.
 * - {ref}`🚀 Deployment Guide <deployment>`
@@ -135,22 +135,8 @@ Have questions or need support? The best way to reach us is through Slack:
 user_guide/index
 api/index
 reference_flyteidl
-flytesnacks/tutorials
-flytesnacks/integrations
-deprecated_integrations/index
+flytesnacks/tutorials/index
+flytesnacks/integrations/index
 deployment/index
-```
-
-```{toctree}
-:caption: Community
-:maxdepth: -1
-:name: roadmaptoc
-:hidden:
-
-Community Resources <community/index>
-community/contribute
-Contributing Examples <flytesnacks/contribute>
-community/roadmap
-Frequently Asked Questions <https://github.com/flyteorg/flyte/discussions/categories/q-a>
-community/troubleshoot
+community/index
 ```
