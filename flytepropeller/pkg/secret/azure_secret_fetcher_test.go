@@ -28,8 +28,7 @@ func Test_AzureSecretFetcher_GetSecretValue(t *testing.T) {
 	secretName := "test-secret"
 	validSecretIDFmt := "u__org__test-org__domain__test-domain__project__test-project__key__%s" // #nosec G101
 	validSecretID := fmt.Sprintf(validSecretIDFmt, secretName)
-	e, _ := EncodeAzureSecretName(validSecretID)
-	validEncodedSecretID := *e
+	validEncodedSecretID, _ := EncodeAzureSecretName(validSecretID)
 
 	sucessfulTests := []struct {
 		name        string

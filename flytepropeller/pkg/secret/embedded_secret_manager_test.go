@@ -27,9 +27,9 @@ func TestEmbeddedSecretManagerInjector_Inject(t *testing.T) {
 	secretIDKey := "secretID"
 	secretValue := "secretValue"
 
-	projectSecretID := fmt.Sprintf(SecretsStorageFormat, OrganizationLabel, DomainLabel, ProjectLabel, secretIDKey)
-	domainSecretID := fmt.Sprintf(SecretsStorageFormat, OrganizationLabel, DomainLabel, EmptySecretScope, secretIDKey)
-	orgSecretID := fmt.Sprintf(SecretsStorageFormat, OrganizationLabel, EmptySecretScope, EmptySecretScope, secretIDKey)
+	projectSecretID := fmt.Sprintf(secretsStorageFormat, OrganizationLabel, DomainLabel, ProjectLabel, secretIDKey)
+	domainSecretID := fmt.Sprintf(secretsStorageFormat, OrganizationLabel, DomainLabel, EmptySecretScope, secretIDKey)
+	orgSecretID := fmt.Sprintf(secretsStorageFormat, OrganizationLabel, EmptySecretScope, EmptySecretScope, secretIDKey)
 
 	gcpClient.On("AccessSecretVersion", ctx, &secretmanagerpb.AccessSecretVersionRequest{
 		Name: fmt.Sprintf(GCPSecretNameFormat, gcpProject, projectSecretID),

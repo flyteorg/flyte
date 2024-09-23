@@ -224,46 +224,89 @@ func TestAppendVolume(t *testing.T) {
 
 func Test_EncodeSecretName(t *testing.T) {
 	tests := []struct {
-		name string
-		arg  SecretNameComponents
-		want string
+		name       string
+		org        string
+		domain     string
+		project    string
+		secretName string
+		want       string
 	}{
 		{
-			name: "test name without domain nor project",
-			arg: SecretNameComponents{
-				Org:     testOrg,
-				Domain:  "",
-				Project: "",
-				Name:    testSecretName,
-			},
-			want: "u__org__test-org__domain____project____key__test-secret",
+			name:       "test name without domain nor project",
+			org:        testOrg,
+			domain:     "",
+			project:    "",
+			secretName: testSecretName,
+			want:       "u__org__test-org__domain____project____key__test-secret",
 		},
 		{
-			name: "test name without project",
-			arg: SecretNameComponents{
-				Org:     testOrg,
-				Domain:  testDomain,
-				Project: "",
-				Name:    testSecretName,
-			},
-			want: "u__org__test-org__domain__test-domain__project____key__test-secret",
+			name:       "test name without project",
+			org:        testOrg,
+			domain:     testDomain,
+			project:    "",
+			secretName: testSecretName,
+			want:       "u__org__test-org__domain__test-domain__project____key__test-secret",
 		},
 		{
-			name: "test name with project and domain",
-			arg: SecretNameComponents{
-				Org:     testOrg,
-				Domain:  testDomain,
-				Project: testProject,
-				Name:    testSecretName,
-			},
-			want: "u__org__test-org__domain__test-domain__project__test-project__key__test-secret",
+			name:       "test name with project and domain",
+			org:        testOrg,
+			domain:     testDomain,
+			project:    testProject,
+			secretName: testSecretName,
+			want:       "u__org__test-org__domain__test-domain__project__test-project__key__test-secret",
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := EncodeSecretName(tt.arg); got != tt.want {
+			if got := EncodeSecretName(tt.org, tt.domain, tt.project, tt.secretName); got != tt.want {
 				t.Errorf("EncodeSecretName() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_EncodeSecretNamePrefix(t *testing.T) {
+	tests := []struct {
+		name    string
+		org     string
+		domain  string
+		project string
+		want    string
+	}{
+		{
+			name:    "test with org, domain, and project",
+			org:     testOrg,
+			domain:  testDomain,
+			project: testProject,
+			want:    "u__org__test-org__domain__test-domain__project__test-project",
+		},
+		{
+			name:    "test with org, domain, but no project",
+			org:     testOrg,
+			domain:  testDomain,
+			project: "",
+			want:    "u__org__test-org__domain__test-domain",
+		},
+		{
+			name:    "test with org but no domain nor project",
+			org:     testOrg,
+			domain:  "",
+			project: "",
+			want:    "u__org__test-org",
+		},
+		{
+			name:    "test with no org, domain, nor project",
+			org:     "",
+			domain:  "",
+			project: "",
+			want:    "u__org__",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := EncodeSecretNamePrefix(tt.org, tt.domain, tt.project); got != tt.want {
+				t.Errorf("EncodeSecretNamePrefix() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -348,7 +391,7 @@ func Test_DecodeSecretName(t *testing.T) {
 
 	for _, arg := range notEnoughParts {
 		t.Run(fmt.Sprintf("test name with not enough parts: %s", arg), func(t *testing.T) {
-			expectedErr := fmt.Errorf("name %s has an invalid format: not enough parts", arg)
+			expectedErr := errors.New(secretNameInvalidNotEnoughPartsMsg)
 			if got, err := DecodeSecretName(arg); err == nil || errors.Is(err, expectedErr) {
 				t.Errorf("DecodeSecretName() = %v, %v; want error %v", got, err, expectedErr)
 			}
@@ -365,8 +408,9 @@ func Test_DecodeSecretName(t *testing.T) {
 
 	for _, arg := range unexpectedParts {
 		t.Run(fmt.Sprintf("test name with unexpected parts: %s", arg), func(t *testing.T) {
-			if got, err := DecodeSecretName(arg); err == nil || errors.Is(err, fmt.Errorf("name %s has an invalid format: unexpected parts", arg)) {
-				t.Errorf("DecodeSecretName() = %v, want error", got)
+			expectedErr := errors.New(secretNameInvalidUnexpectedPartsMsg)
+			if got, err := DecodeSecretName(arg); err == nil || errors.Is(err, expectedErr) {
+				t.Errorf("DecodeSecretName() = %v, %v; want error %v", got, err, expectedErr)
 			}
 		})
 	}
@@ -374,64 +418,63 @@ func Test_DecodeSecretName(t *testing.T) {
 
 func Test_EncodeDecodeSecretName_Bijectivity(t *testing.T) {
 	tests := []struct {
-		name string
-		arg  SecretNameComponents
+		name       string
+		org        string
+		domain     string
+		project    string
+		secretName string
+		arg        SecretNameComponents
 	}{
 		{
-			name: "test name without domain nor project",
-			arg: SecretNameComponents{
-				Org:     testOrg,
-				Domain:  "",
-				Project: "",
-				Name:    testSecretName,
-			},
+			name:       "test name without domain nor project",
+			org:        testOrg,
+			domain:     "",
+			project:    "",
+			secretName: testSecretName,
 		},
 		{
-			name: "test name without project",
-			arg: SecretNameComponents{
-				Org:     testOrg,
-				Domain:  testDomain,
-				Project: "",
-				Name:    testSecretName,
-			},
+			name:       "test name without project",
+			org:        testOrg,
+			domain:     testDomain,
+			project:    "",
+			secretName: testSecretName,
 		},
 		{
-			name: "test name with project and domain",
-			arg: SecretNameComponents{
-				Org:     testOrg,
-				Domain:  testDomain,
-				Project: testProject,
-				Name:    testSecretName,
-			},
+			name:       "test name with project and domain",
+			org:        testOrg,
+			domain:     testDomain,
+			project:    testProject,
+			secretName: testSecretName,
 		},
 		{
-			name: "test name with key that has underscores",
-			arg: SecretNameComponents{
-				Org:     testOrg,
-				Domain:  testDomain,
-				Project: testProject,
-				Name:    "test__secret",
-			},
+			name:       "test name with key that has underscores",
+			org:        testOrg,
+			domain:     testDomain,
+			project:    testProject,
+			secretName: "test__secret",
 		},
 		{
-			name: "test name with key that ends with underscores",
-			arg: SecretNameComponents{
-				Org:     testOrg,
-				Domain:  testDomain,
-				Project: testProject,
-				Name:    "test-secret__",
-			},
+			name:       "test name with key that ends with underscores",
+			org:        testOrg,
+			domain:     testDomain,
+			project:    testProject,
+			secretName: "test-secret__",
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			encoded := EncodeSecretName(tt.arg)
+			encoded := EncodeSecretName(tt.org, tt.domain, tt.project, tt.secretName)
 			decoded, err := DecodeSecretName(encoded)
 			if err != nil {
 				t.Errorf("DecodeSecretName() = %v, want nil", err)
 			}
-			if !reflect.DeepEqual(*decoded, tt.arg) {
+			if !reflect.DeepEqual(*decoded, SecretNameComponents{
+				Org:     tt.org,
+				Domain:  tt.domain,
+				Project: tt.project,
+				Name:    tt.secretName,
+			}) {
 				t.Errorf("DecodeSecretName() = %v, want %v", *decoded, tt.arg)
 			}
 		})

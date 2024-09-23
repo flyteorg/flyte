@@ -58,14 +58,14 @@ func Test_EncodeAzureSecretName(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := EncodeAzureSecretName(tt.decoded)
 			assert.NoError(t, err)
-			assert.Equal(t, tt.encoded, *got)
+			assert.Equal(t, tt.encoded, got)
 		})
 	}
 
 	t.Run("secret name is too long", func(t *testing.T) {
 		encodedPrefix, err := EncodeAzureSecretName(longSecretIDPrefix)
 		assert.NoError(t, err)
-		spaceRemaining := azureMaxSecretNameLength - len(*encodedPrefix)
+		spaceRemaining := azureMaxSecretNameLength - len(encodedPrefix)
 		maxLength := int(math.Floor(float64(spaceRemaining) * 5 / 8))
 
 		b := make([]byte, maxLength+1)
@@ -81,7 +81,7 @@ func Test_EncodeAzureSecretName(t *testing.T) {
 		assert.NoError(t, err)
 		upper, err := EncodeAzureSecretName(fmt.Sprintf(validSecretIDFmt, "TESTSECRET"))
 		assert.NoError(t, err)
-		assert.NotEqual(t, *lower, *upper)
+		assert.NotEqual(t, lower, upper)
 	})
 }
 
@@ -90,7 +90,7 @@ func Test_DecodeAzureSecretName(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := DecodeAzureSecretName(tt.encoded)
 			assert.NoError(t, err)
-			assert.Equal(t, tt.decoded, *got)
+			assert.Equal(t, tt.decoded, got)
 		})
 	}
 
@@ -131,9 +131,9 @@ func Test_EncodeDecodeAzureSecretName_Bijectivity(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			encoded, err := EncodeAzureSecretName(tt.decoded)
 			assert.NoError(t, err)
-			decoded, err := DecodeAzureSecretName(*encoded)
+			decoded, err := DecodeAzureSecretName(encoded)
 			assert.NoError(t, err)
-			assert.Equal(t, tt.decoded, *decoded)
+			assert.Equal(t, tt.decoded, decoded)
 		})
 	}
 }
@@ -161,9 +161,9 @@ func Test_StringToAzureSecret(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			res, err := StringToAzureSecret(tt.arg)
 			assert.NoError(t, err)
-			assert.Equal(t, fmt.Sprintf(`{"type":"STRING","value":"%v"}`, tt.arg), *res)
+			assert.Equal(t, fmt.Sprintf(`{"type":"STRING","value":"%v"}`, tt.arg), res)
 			// Test bijective property
-			decoded, err := AzureToUnionSecret(azsecrets.Secret{Value: res})
+			decoded, err := AzureToUnionSecret(azsecrets.Secret{Value: &res})
 			assert.NoError(t, err)
 			assert.Equal(t, tt.arg, decoded.StringValue)
 		})
@@ -194,9 +194,9 @@ func Test_BinaryToAzureSecret(t *testing.T) {
 			res, err := BinaryToAzureSecret(tt.arg)
 			assert.NoError(t, err)
 			encodedBinary := base64.StdEncoding.EncodeToString(tt.arg)
-			assert.Equal(t, fmt.Sprintf(`{"type":"BINARY","value":"%v"}`, encodedBinary), *res)
+			assert.Equal(t, fmt.Sprintf(`{"type":"BINARY","value":"%v"}`, encodedBinary), res)
 			// Test bijective property
-			decoded, err := AzureToUnionSecret(azsecrets.Secret{Value: res})
+			decoded, err := AzureToUnionSecret(azsecrets.Secret{Value: &res})
 			assert.NoError(t, err)
 			assert.Equal(t, tt.arg, decoded.BinaryValue)
 		})

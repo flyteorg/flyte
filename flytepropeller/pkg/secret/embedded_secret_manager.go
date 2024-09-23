@@ -71,15 +71,14 @@ func GetSecretID(secretKey string, source admin.AttributesSource, labels map[str
 		return "", err
 	}
 	if source == admin.AttributesSource_PROJECT_DOMAIN {
-		return fmt.Sprintf(SecretsStorageFormat, labels[OrganizationLabel], labels[DomainLabel], labels[ProjectLabel], secretKey), nil
+		return EncodeSecretName(labels[OrganizationLabel], labels[DomainLabel], labels[ProjectLabel], secretKey), nil
 	}
 
 	if source == admin.AttributesSource_DOMAIN {
-		return fmt.Sprintf(SecretsStorageFormat, labels[OrganizationLabel], labels[DomainLabel], EmptySecretScope, secretKey), nil
+		return EncodeSecretName(labels[OrganizationLabel], labels[DomainLabel], EmptySecretScope, secretKey), nil
 	}
 
-	orgScopedSecret := fmt.Sprintf(SecretsStorageFormat, labels[OrganizationLabel], EmptySecretScope, EmptySecretScope, secretKey)
-	return orgScopedSecret, nil
+	return EncodeSecretName(labels[OrganizationLabel], EmptySecretScope, EmptySecretScope, secretKey), nil
 }
 
 func validateRequiredFieldsExist(labels map[string]string) error {
@@ -102,7 +101,7 @@ func (i EmbeddedSecretManagerInjector) lookUpSecret(ctx context.Context, secret 
 		return nil, err
 	}
 	// Fetch project-domain scoped secret
-	projectDomainScopedSecret := fmt.Sprintf(SecretsStorageFormat, labels[OrganizationLabel], labels[DomainLabel], labels[ProjectLabel], secret.Key)
+	projectDomainScopedSecret := EncodeSecretName(labels[OrganizationLabel], labels[DomainLabel], labels[ProjectLabel], secret.Key)
 	secretValue, err := i.secretFetcher.GetSecretValue(ctx, projectDomainScopedSecret)
 	if err == nil {
 		return secretValue, nil
@@ -112,7 +111,7 @@ func (i EmbeddedSecretManagerInjector) lookUpSecret(ctx context.Context, secret 
 	}
 
 	// Fetch domain scoped secret
-	domainScopedSecret := fmt.Sprintf(SecretsStorageFormat, labels[OrganizationLabel], labels[DomainLabel], EmptySecretScope, secret.Key)
+	domainScopedSecret := EncodeSecretName(labels[OrganizationLabel], labels[DomainLabel], EmptySecretScope, secret.Key)
 	secretValue, err = i.secretFetcher.GetSecretValue(ctx, domainScopedSecret)
 	if err == nil {
 		return secretValue, nil
@@ -122,7 +121,7 @@ func (i EmbeddedSecretManagerInjector) lookUpSecret(ctx context.Context, secret 
 	}
 
 	// Fetch organization scoped secret
-	orgScopedSecret := fmt.Sprintf(SecretsStorageFormat, labels[OrganizationLabel], EmptySecretScope, EmptySecretScope, secret.Key)
+	orgScopedSecret := EncodeSecretName(labels[OrganizationLabel], EmptySecretScope, EmptySecretScope, secret.Key)
 	secretValue, err = i.secretFetcher.GetSecretValue(ctx, orgScopedSecret)
 	if err == nil {
 		return secretValue, err

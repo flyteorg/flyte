@@ -29,7 +29,7 @@ func (a AzureSecretFetcher) GetSecretValue(ctx context.Context, secretID string)
 		logger.Errorf(ctx, "Failed to encode secret name %v: %w", secretID, err)
 		return nil, stdlibErrors.Wrapf(ErrCodeSecretReadFailure, err, fmt.Sprintf(SecretReadFailureErrorFormat, secretID))
 	}
-	resp, err := a.client.GetSecret(ctx, *secretName, azureLatestVersion, nil)
+	resp, err := a.client.GetSecret(ctx, secretName, azureLatestVersion, nil)
 	if err != nil {
 		var notFound *azcore.ResponseError
 		if errors.As(err, &notFound) && notFound.StatusCode == http.StatusNotFound {

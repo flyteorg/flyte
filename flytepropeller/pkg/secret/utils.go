@@ -1,6 +1,7 @@
 package secret
 
 import (
+	"errors"
 	"fmt"
 	"path/filepath"
 	"strings"
@@ -14,17 +15,20 @@ import (
 )
 
 const (
-	SecretFieldSeparator              = "__"
-	ValueFormatter                    = "%s"
-	SecretsStorageUnionPrefix         = "u"
-	SecretsOrgDelimiter               = "org"
-	SecretsDomainDelimiter            = "domain"
-	SecretsProjectDelimiter           = "project"
-	SecretsKeyDelimiter               = "key"
-	SecretsStorageOrgPrefixFormat     = SecretsStorageUnionPrefix + SecretFieldSeparator + SecretsOrgDelimiter + SecretFieldSeparator + ValueFormatter
-	SecretsStorageDomainPrefixFormat  = SecretsStorageOrgPrefixFormat + SecretFieldSeparator + SecretsDomainDelimiter + SecretFieldSeparator + ValueFormatter
-	SecretsStorageProjectPrefixFormat = SecretsStorageDomainPrefixFormat + SecretFieldSeparator + SecretsProjectDelimiter + SecretFieldSeparator + ValueFormatter
-	SecretsStorageFormat              = SecretsStorageProjectPrefixFormat + SecretFieldSeparator + SecretsKeyDelimiter + SecretFieldSeparator + ValueFormatter
+	secretFieldSeparator              = "__"
+	valueFormatter                    = "%s"
+	secretsStorageUnionPrefix         = "u"
+	secretsOrgDelimiter               = "org"
+	secretsDomainDelimiter            = "domain"
+	secretsProjectDelimiter           = "project"
+	secretsKeyDelimiter               = "key"
+	secretsStorageOrgPrefixFormat     = secretsStorageUnionPrefix + secretFieldSeparator + secretsOrgDelimiter + secretFieldSeparator + valueFormatter
+	secretsStorageDomainPrefixFormat  = secretsStorageOrgPrefixFormat + secretFieldSeparator + secretsDomainDelimiter + secretFieldSeparator + valueFormatter
+	secretsStorageProjectPrefixFormat = secretsStorageDomainPrefixFormat + secretFieldSeparator + secretsProjectDelimiter + secretFieldSeparator + valueFormatter
+	secretsStorageFormat              = secretsStorageProjectPrefixFormat + secretFieldSeparator + secretsKeyDelimiter + secretFieldSeparator + valueFormatter
+
+	secretNameInvalidNotEnoughPartsMsg  = "secret name has an invalid format: not enough parts"
+	secretNameInvalidUnexpectedPartsMsg = "secret name has an invalid format: unexpected parts"
 )
 
 // If env var exists in the existing list of envVars then return the index for it or else return -1
@@ -192,27 +196,39 @@ type SecretNameComponents struct {
 	Name    string // Secret name
 }
 
-func EncodeSecretName(components SecretNameComponents) string {
-	return fmt.Sprintf(SecretsStorageFormat, components.Org, components.Domain, components.Project, components.Name)
+func EncodeSecretName(org, domain, project, name string) string {
+	return fmt.Sprintf(secretsStorageFormat, org, domain, project, name)
+}
+
+// EncodeSecretNamePrefix creates a prefix to search for in the secrets manager
+func EncodeSecretNamePrefix(org, domain, project string) string {
+	switch {
+	case project != "":
+		return fmt.Sprintf(secretsStorageProjectPrefixFormat, org, domain, project)
+	case domain != "":
+		return fmt.Sprintf(secretsStorageDomainPrefixFormat, org, domain)
+	default:
+		return fmt.Sprintf(secretsStorageOrgPrefixFormat, org)
+	}
 }
 
 func DecodeSecretName(encodedSecretName string) (*SecretNameComponents, error) {
-	parts := strings.Split(encodedSecretName, SecretFieldSeparator)
+	parts := strings.Split(encodedSecretName, secretFieldSeparator)
 
 	// We need at least 5 parts: u, org, <org>, domain, <secret-name>
 	if len(parts) < 9 {
-		return nil, fmt.Errorf("name %s has an invalid format: not enough parts", encodedSecretName)
+		return nil, errors.New(secretNameInvalidNotEnoughPartsMsg)
 	}
 
-	if parts[0] != SecretsStorageUnionPrefix || parts[1] != SecretsOrgDelimiter || parts[3] != SecretsDomainDelimiter || parts[5] != SecretsProjectDelimiter || parts[7] != SecretsKeyDelimiter {
-		return nil, fmt.Errorf("name %s has an invalid format: unexpected parts", encodedSecretName)
+	if parts[0] != secretsStorageUnionPrefix || parts[1] != secretsOrgDelimiter || parts[3] != secretsDomainDelimiter || parts[5] != secretsProjectDelimiter || parts[7] != secretsKeyDelimiter {
+		return nil, errors.New(secretNameInvalidUnexpectedPartsMsg)
 	}
 
 	result := &SecretNameComponents{
 		Org:     parts[2],
 		Domain:  parts[4],
 		Project: parts[6],
-		Name:    strings.Join(parts[8:], SecretFieldSeparator),
+		Name:    strings.Join(parts[8:], secretFieldSeparator),
 	}
 
 	return result, nil

@@ -17,6 +17,7 @@ const (
 	azureEncodingVersion              = 1
 	azureEscapeChar                   = "0" // unique single character to escape special characters
 	azureHyphenMarker                 = '1' // unique single character to escape hyphens
+	EmptyString                       = ""
 )
 
 // Custom base32 encoding without padding
@@ -33,10 +34,10 @@ var base32Encoding = base32.StdEncoding.WithPadding(base32.NoPadding)
 // - Uses base32 encoding for the name component
 //
 // Ref: https://azure.github.io/PSRule.Rules.Azure/en/rules/Azure.KeyVault.SecretName/
-func EncodeAzureSecretName(secretName string) (*string, error) {
+func EncodeAzureSecretName(secretName string) (string, error) {
 	components, err := DecodeSecretName(secretName)
 	if err != nil {
-		return nil, fmt.Errorf("unable to decode original secret name: %w", err)
+		return EmptyString, fmt.Errorf("unable to decode original secret name: %w", err)
 	}
 
 	encode := func(s string) string {
@@ -54,23 +55,23 @@ func EncodeAzureSecretName(secretName string) (*string, error) {
 	encoded := fmt.Sprint(azureEncodingVersion) + azureSecretNameComponentDelimiter + strings.Join(parts, azureSecretNameComponentDelimiter)
 
 	if len(encoded) > azureMaxSecretNameLength {
-		return nil, fmt.Errorf("encoded secret name with length %d exceeds maximum length: %d", len(encoded), azureMaxSecretNameLength)
+		return EmptyString, fmt.Errorf("encoded secret name with length %d exceeds maximum length: %d", len(encoded), azureMaxSecretNameLength)
 	}
 
-	return to.Ptr(encoded), nil
+	return encoded, nil
 }
 
 // Azure Key Vault specific decoding for secret names.
 // Reverses EncodeAzureSecretName.
-func DecodeAzureSecretName(encodedSecretName string) (*string, error) {
+func DecodeAzureSecretName(encodedSecretName string) (string, error) {
 	parts := strings.Split(encodedSecretName, azureSecretNameComponentDelimiter)
 	if len(parts) != 5 || parts[0] != fmt.Sprint(azureEncodingVersion) {
-		return nil, fmt.Errorf("invalid secret name format or version")
+		return EmptyString, fmt.Errorf("invalid secret name format or version")
 	}
 
 	nameBytes, err := base32Encoding.DecodeString(parts[4])
 	if err != nil {
-		return nil, fmt.Errorf("error decoding name component: %w", err)
+		return EmptyString, fmt.Errorf("error decoding name component: %w", err)
 	}
 
 	decode := func(s string) (*string, error) {
@@ -94,37 +95,30 @@ func DecodeAzureSecretName(encodedSecretName string) (*string, error) {
 
 	org, err := decode(parts[1])
 	if err != nil {
-		return nil, fmt.Errorf("error decoding org from stored secret %s: %w", encodedSecretName, err)
+		return EmptyString, fmt.Errorf("error decoding org from stored secret %s: %w", encodedSecretName, err)
 	}
 
 	domain, err := decode(parts[2])
 	if err != nil {
-		return nil, fmt.Errorf("error decoding domain from stored secret %s: %w", encodedSecretName, err)
+		return EmptyString, fmt.Errorf("error decoding domain from stored secret %s: %w", encodedSecretName, err)
 	}
 
 	project, err := decode(parts[3])
 	if err != nil {
-		return nil, fmt.Errorf("error decoding project from stored secret %s: %w", encodedSecretName, err)
-	}
-
-	components := SecretNameComponents{
-		Org:     *org,
-		Domain:  *domain,
-		Project: *project,
-		Name:    string(nameBytes),
+		return EmptyString, fmt.Errorf("error decoding project from stored secret %s: %w", encodedSecretName, err)
 	}
 
 	// Re-encode to Union naming format
-	return to.Ptr(EncodeSecretName(components)), nil
+	return EncodeSecretName(*org, *domain, *project, string(nameBytes)), nil
 }
 
 // Encodes a string value to appropriate Json format for Azure Key Vault storage
-func StringToAzureSecret(value string) (*string, error) {
+func StringToAzureSecret(value string) (string, error) {
 	return marshalAzureSecretValue(azureSecretValueTypeSTRING, value)
 }
 
 // Encodes a binary value to appropriate Json format for Azure Key Vault storage
-func BinaryToAzureSecret(value []byte) (*string, error) {
+func BinaryToAzureSecret(value []byte) (string, error) {
 	return marshalAzureSecretValue(azureSecretValueTypeBINARY, base64.StdEncoding.EncodeToString(value))
 }
 
@@ -175,13 +169,13 @@ type azureSecretValue struct {
 	Value string `json:"value"`
 }
 
-func marshalAzureSecretValue(t azureSecretValueType, value string) (*string, error) {
+func marshalAzureSecretValue(t azureSecretValueType, value string) (string, error) {
 	bytes, err := json.Marshal(azureSecretValue{
 		Type:  t,
 		Value: value,
 	})
 	if err != nil {
-		return nil, err
+		return EmptyString, err
 	}
-	return to.Ptr(string(bytes)), nil
+	return string(bytes), nil
 }
