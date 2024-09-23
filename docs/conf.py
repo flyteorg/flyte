@@ -63,6 +63,7 @@ extensions = [
     "sphinx.ext.extlinks",
     "sphinx-prompt",
     "sphinx_copybutton",
+    "sphinx_docsearch",
     "sphinxext.remoteliteralinclude",
     "sphinx_issues",
     "sphinx_click",
@@ -277,6 +278,11 @@ tags_create_tags = True
 tags_extension = ["md", "rst"]
 tags_page_title = "Tag"
 tags_overview_title = "Pages by Tags"
+
+# Algolia Docsearch credentials
+docsearch_app_id = os.getenv("DOCSEARCH_APP_ID")
+docsearch_api_key = os.getenv("DOCSEARCH_API_KEY")
+docsearch_index_name = os.getenv("DOCSEARCH_INDEX_NAME")
 
 # -- Options for intersphinx extension ---------------------------------------
 

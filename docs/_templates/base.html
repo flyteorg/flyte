@@ -79,11 +79,6 @@
     {% include "partials/_head_css_variables.html" with context %}
     {%- endblock theme_styles -%}
 
-    {%- block extra_styles -%}
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3" />
-    <link rel="preconnect" href="https://WLG0MZB58Q-dsn.algolia.net" crossorigin />
-    {%- endblock extra_styles -%}
-
     {%- endblock styles -%}
 
     {#- Custom front matter #}
@@ -132,11 +127,6 @@
     {% endfor -%}
     {%- endblock regular_scripts -%}
 
-    {# Theme-related JavaScript code #}
-    {%- block theme_scripts -%}
-    <script src="https://cdn.jsdelivr.net/npm/@docsearch/js@3"></script>
-    <script src="{{ pathto('_static/algolia-search.js', 1) }}"></script>
-    {%- endblock -%}
     {%- endblock scripts -%}
   </body>
 </html>
