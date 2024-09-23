@@ -147,7 +147,7 @@ Specify agent configuration
                 container: container
                 container_array: k8s-array
                 sidecar: sidecar
-                spark: agent-service
+                databricks: agent-service
               enabled-plugins:
                 - container
                 - sidecar
@@ -171,7 +171,7 @@ Specify agent configuration
               default-for-task-types:
                 - container: container
                 - container_array: k8s-array
-                - spark: agent-service
+                - databricks: agent-service
 
   .. group-tab:: Flyte core
 
@@ -192,7 +192,7 @@ Specify agent configuration
                 container: container
                 sidecar: sidecar
                 container_array: k8s-array
-                spark: agent-service
+                databricks: agent-service
 
 Add the Databricks access token
 -------------------------------
