@@ -74,7 +74,7 @@ contribute its architecture and design. You can also access the
 :header-rows: 0
 :widths: 20 30
 
-* - {doc}`🔤 Introduction to Flyte <introduction>`
+* - {doc}`🔤 Introduction to Flyte <user_guide/introduction>`
   - Get your first workflow running, learn about the Flyte development lifecycle
     and core use cases.
 * - {doc}`📖 User Guide <user_guide/index>`
@@ -132,62 +132,13 @@ Have questions or need support? The best way to reach us is through Slack:
 :maxdepth: 1
 :hidden:
 
-Introduction <introduction>
-Quickstart guide <quickstart_guide>
-Getting started with workflow development <getting_started_with_workflow_development/index>
-Flyte fundamentals <flyte_fundamentals/index>
-Flyte agents <flyte_agents/index>
-Core use cases <core_use_cases/index>
-```
-
-```{toctree}
-:maxdepth: 1
-:caption: Examples
-:name: examples-guides
-:hidden:
-
-User Guide <user_guide/index>
-Tutorials <flytesnacks/tutorials>
-Integrations <flytesnacks/integrations>
-Deprecated integrations <deprecated_integrations/index>
-```
-
-```{toctree}
-:caption: Cluster Deployment
-:maxdepth: -1
-:name: deploymenttoc
-:hidden:
-
-Getting Started <deployment/index>
-deployment/deployment/index
-deployment/plugins/index
-deployment/agents/index
-deployment/configuration/index
-deployment/configuration/generated/index
-deployment/security/index
-reference/swagger
-```
-
-```{toctree}
-:maxdepth: 1
-:caption: API Reference
-:name: apitoc
-:hidden:
-
+user_guide/index
 api/index
 reference_flyteidl
-```
-
-```{toctree}
-:maxdepth: 1
-:caption: Ecosystem
-:name: ecosystem
-:hidden:
-
-flytekit-java <https://github.com/spotify/flytekit-java>
-unionml <https://unionml.readthedocs.io/>
-pterodactyl <https://github.com/NotMatthewGriffin/pterodactyl>
-latch sdk <https://docs.latch.bio/>
+flytesnacks/tutorials
+flytesnacks/integrations
+deprecated_integrations/index
+deployment/index
 ```
 
 ```{toctree}
@@ -202,15 +153,4 @@ Contributing Examples <flytesnacks/contribute>
 community/roadmap
 Frequently Asked Questions <https://github.com/flyteorg/flyte/discussions/categories/q-a>
 community/troubleshoot
-```
-
-```{toctree}
-:caption: Glossary
-:maxdepth: -1
-:name: divedeeptoc
-:hidden:
-
-Main Concepts <concepts/basics>
-concepts/control_plane
-concepts/architecture
 ```

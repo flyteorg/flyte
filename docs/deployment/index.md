@@ -24,3 +24,16 @@ plugins, authentication, performance tuning, and maintaining Flyte as a producti
 * - {ref}`🔒 Security Overview <deployment-security-overview>`
   - Read for comments on security in Flyte.
 ```
+
+```{toctree}
+:maxdepth: -1
+:hidden:
+
+deployment/index
+plugins/index
+agents/index
+configuration/index
+configuration/generated/index
+security/index
+swagger
+```
