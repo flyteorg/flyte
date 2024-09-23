@@ -24,6 +24,8 @@ propeller:
   create-flyteworkflow-crd: true
   kube-config: $HOME/.flyte/sandbox/kubeconfig
   rawoutput-prefix: s3://my-s3-bucket/data
+  literal-offloading-config:
+    enabled: true
 
 server:
   kube-config: $HOME/.flyte/sandbox/kubeconfig

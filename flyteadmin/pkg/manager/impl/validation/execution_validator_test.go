@@ -105,6 +105,40 @@ func TestGetExecutionInputs(t *testing.T) {
 	assert.EqualValues(t, expectedMap, actualInputs)
 }
 
+func TestGetExecutionWithOffloadedInputs(t *testing.T) {
+	execLiteral := &core.Literal{
+		Value: &core.Literal_OffloadedMetadata{
+			OffloadedMetadata: &core.LiteralOffloadedMetadata{
+				Uri:       "s3://bucket/key",
+				SizeBytes: 100,
+				InferredType: &core.LiteralType{
+					Type: &core.LiteralType_Simple{
+						Simple: core.SimpleType_STRING,
+					},
+				},
+			},
+		},
+	}
+	executionRequest := testutils.GetExecutionRequestWithOffloadedInputs("foo", execLiteral)
+	lpRequest := testutils.GetLaunchPlanRequest()
+
+	actualInputs, err := CheckAndFetchInputsForExecution(
+		executionRequest.Inputs,
+		lpRequest.Spec.FixedInputs,
+		lpRequest.Spec.DefaultInputs,
+	)
+	expectedMap := core.LiteralMap{
+		Literals: map[string]*core.Literal{
+			"foo": execLiteral,
+			"bar": coreutils.MustMakeLiteral("bar-value"),
+		},
+	}
+	assert.Nil(t, err)
+	assert.NotNil(t, actualInputs)
+	assert.EqualValues(t, expectedMap.GetLiterals()["foo"], actualInputs.Literals["foo"])
+	assert.EqualValues(t, expectedMap.GetLiterals()["bar"], actualInputs.Literals["bar"])
+}
+
 func TestValidateExecInputsWrongType(t *testing.T) {
 	executionRequest := testutils.GetExecutionRequest()
 	lpRequest := testutils.GetLaunchPlanRequest()
