@@ -65,7 +65,6 @@ environment_setup
 quickstart_guide
 getting_started_with_workflow_development/index
 basics/index
-concepts/index
 flyte_fundamentals/index
 core_use_cases/index
 data_types_and_io/index
@@ -76,5 +75,27 @@ testing/index
 productionizing/index
 extending/index
 flyte_agents/index
-ecosystem
+```
+
+```{toctree}
+:maxdepth: -1
+:name: glossary
+:caption: Glossary
+:hidden:
+
+concepts/main_concepts/index
+concepts/control_plane/index
+concepts/component_architecture/index
+```
+
+```{toctree}
+:maxdepth: -1
+:name: ecosystem
+:caption: Ecosystem
+:hidden:
+
+flytekit-java <https://github.com/spotify/flytekit-java>
+unionml <https://unionml.readthedocs.io/>
+pterodactyl <https://github.com/NotMatthewGriffin/pterodactyl>
+latch sdk <https://docs.latch.bio/>
 ```
