@@ -30,7 +30,7 @@ sphinx.application.ExtensionError = sphinx.errors.ExtensionError
 # -- Project information -----------------------------------------------------
 
 project = "Flyte"
-copyright = "2022, Flyte Authors"
+copyright = "2024, Flyte authors"
 author = "Flyte"
 
 # The short X.Y version
@@ -166,7 +166,7 @@ exclude_patterns = [
 #
 html_favicon = "images/favicon-flyte-docs.png"
 html_logo = "images/favicon-flyte-docs.png"
-html_theme = "furo"
+html_theme = "pydata_sphinx_theme"
 html_title = "Flyte"
 
 templates_path = ["_templates"]
@@ -174,36 +174,42 @@ templates_path = ["_templates"]
 pygments_style = "tango"
 pygments_dark_style = "native"
 
-html_theme_options = {
-    "light_css_variables": {
-        "color-brand-primary": "#4300c9",
-        "color-brand-content": "#4300c9",
+html_context = {
+    "dir_to_title": {
+        "api": "API",
+        "cluster_deployment": "Cluster deployment",
+        "community": "Community",
+        "concepts": "Flyte concepts",
+        "ecosystem": "Ecosystem",
+        "integrations": "Integrations",
+        "tutorials": "Tutorials",
+        "user_guide": "User guide",
     },
-    "dark_css_variables": {
-        "color-brand-primary": "#9D68E4",
-        "color-brand-content": "#9D68E4",
-    },
-    # custom flyteorg furo theme options
-    # "github_repo": "flyte",
-    # "github_username": "flyteorg",
-    # "github_commit": "master",
-    # "docs_path": "rsts",  # path to documentation source
-    # "sphinx_gallery_src_dir": "cookbook",  # path to directory of sphinx gallery source files relative to repo root
-    # "sphinx_gallery_dest_dir": "auto",  # path to root directory containing auto-generated sphinx gallery examples
+    "github_user": "flyteorg",
+    "github_repo": "flyte",
+    "github_version": "master",
+    "doc_path": "docs",
 }
 
-# Theme options are theme-specific and customize the look and feel of a theme
-# further.  For a list of options available for each theme, see the
-# documentation.
-#
-# html_theme_options = {}
+html_theme_options = {
+    # custom flyteorg pydata theme options
+    "github_url": "https://github.com/flyteorg/flyte",
+    "icon_links": [
+        {
+            "name": "GitHub",
+            "url": "https://github.com/flyteorg/flyte",
+        }
+    ],
+    "use_edit_page_button": True,
+    "secondary_sidebar_items": ["page-toc", "edit-this-page"]
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ["_static"]
-html_css_files = ["custom.css", "flyte.css", "algolia.css"]
-html_js_files = ["custom.js"]
+# html_static_path = []
+# html_css_files = []
+# html_js_files = []
 
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.
@@ -213,7 +219,16 @@ html_js_files = ["custom.js"]
 # default: ``['localtoc.html', 'relations.html', 'sourcelink.html',
 # 'searchbox.html']``.
 #
-# html_sidebars = {"**": ["logo-text.html", "globaltoc.html", "localtoc.html", "searchbox.html"]}
+html_sidebars = {
+    "api/**": ["sidebar/custom"],
+    "cluster_deployment/**": ["sidebar/custom"],
+    "community/**": ["sidebar/custom"],
+    "concepts/**": ["sidebar/custom"],
+    "ecosystem/**": ["sidebar/custom"],
+    "flytesnacks/integrations/**": ["sidebar/integrations"],
+    "flytesnacks/tutorials/**": ["sidebar/tutorials"],
+    "user_guide/**": ["sidebar/custom"]
+}
 
 # -- Options for HTMLHelp output ---------------------------------------------
 
@@ -275,7 +290,7 @@ autosectionlabel_maxdepth = 2
 tags_create_tags = True
 tags_extension = ["md", "rst"]
 tags_page_title = "Tag"
-tags_overview_title = "Pages by Tags"
+tags_overview_title = "Pages by tags"
 
 # Algolia Docsearch credentials
 docsearch_app_id = os.getenv("DOCSEARCH_APP_ID")
