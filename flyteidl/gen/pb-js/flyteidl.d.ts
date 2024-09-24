@@ -18127,6 +18127,58 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of a SubNodeList. */
+        interface ISubNodeList {
+
+            /** SubNodeList subNodeIds */
+            subNodeIds?: (flyteidl.admin.ISubNodeIdAsList[]|null);
+        }
+
+        /** Represents a SubNodeList. */
+        class SubNodeList implements ISubNodeList {
+
+            /**
+             * Constructs a new SubNodeList.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.ISubNodeList);
+
+            /** SubNodeList subNodeIds. */
+            public subNodeIds: flyteidl.admin.ISubNodeIdAsList[];
+
+            /**
+             * Creates a new SubNodeList instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns SubNodeList instance
+             */
+            public static create(properties?: flyteidl.admin.ISubNodeList): flyteidl.admin.SubNodeList;
+
+            /**
+             * Encodes the specified SubNodeList message. Does not implicitly {@link flyteidl.admin.SubNodeList.verify|verify} messages.
+             * @param message SubNodeList message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.ISubNodeList, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a SubNodeList message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns SubNodeList
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.SubNodeList;
+
+            /**
+             * Verifies a SubNodeList message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a CreateLaunchPlanFromNodeRequest. */
         interface ICreateLaunchPlanFromNodeRequest {
 
@@ -18134,7 +18186,13 @@ export namespace flyteidl {
             launchPlanId?: (flyteidl.core.IIdentifier|null);
 
             /** CreateLaunchPlanFromNodeRequest subNodeIds */
-            subNodeIds?: (flyteidl.admin.ISubNodeIdAsList[]|null);
+            subNodeIds?: (flyteidl.admin.ISubNodeList|null);
+
+            /** CreateLaunchPlanFromNodeRequest subNodeSpec */
+            subNodeSpec?: (flyteidl.core.INode|null);
+
+            /** CreateLaunchPlanFromNodeRequest securityContext */
+            securityContext?: (flyteidl.core.ISecurityContext|null);
         }
 
         /** Represents a CreateLaunchPlanFromNodeRequest. */
@@ -18150,7 +18208,16 @@ export namespace flyteidl {
             public launchPlanId?: (flyteidl.core.IIdentifier|null);
 
             /** CreateLaunchPlanFromNodeRequest subNodeIds. */
-            public subNodeIds: flyteidl.admin.ISubNodeIdAsList[];
+            public subNodeIds?: (flyteidl.admin.ISubNodeList|null);
+
+            /** CreateLaunchPlanFromNodeRequest subNodeSpec. */
+            public subNodeSpec?: (flyteidl.core.INode|null);
+
+            /** CreateLaunchPlanFromNodeRequest securityContext. */
+            public securityContext?: (flyteidl.core.ISecurityContext|null);
+
+            /** CreateLaunchPlanFromNodeRequest subNodes. */
+            public subNodes?: ("subNodeIds"|"subNodeSpec");
 
             /**
              * Creates a new CreateLaunchPlanFromNodeRequest instance using the specified properties.

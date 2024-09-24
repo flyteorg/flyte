@@ -9,6 +9,7 @@ import "flyteidl/core/literals.proto";
 import "flyteidl/core/identifier.proto";
 import "flyteidl/core/interface.proto";
 import "flyteidl/core/security.proto";
+import "flyteidl/core/workflow.proto";
 import "flyteidl/admin/schedule.proto";
 import "flyteidl/admin/common.proto";
 import "google/protobuf/any.proto";
@@ -231,15 +232,28 @@ message SubNodeIdAsList {
     repeated string sub_node_id = 1;
 }
 
+message SubNodeList {
+    // List of sub node IDs to include in the execution
+    repeated SubNodeIdAsList sub_node_ids = 1;
+}
+
 // Request to create or fetch a launch plan to re-run a node
 message CreateLaunchPlanFromNodeRequest {
-    // ID of the launchplan that executed the workflow that contains the node to be re-run
+    // ID of the launch plan that executed the workflow that contains the node to be re-run
+    // or the core.Identifier values aside from name used to create a new workflow when using a node spec
     // +required
     core.Identifier launch_plan_id = 1;
 
-    // List of sub node IDs to include in the execution. Utilized for re-running a node(s) within a workflow.
     // +required
-    repeated SubNodeIdAsList sub_node_ids = 2;
+    oneof sub_nodes {
+        // List of sub node IDs to include in the execution. Utilized for re-running a node(s) within a workflow.
+        SubNodeList sub_node_ids = 2;
+        // Node spec to create a workflow from
+        core.Node sub_node_spec = 3;
+    }
+
+    // Indicates security context for permissions triggered with this launch plan
+    core.SecurityContext security_context = 4;
 }
 
 // The launch plan that was created for or that already existed from re-running node(s) within a workflow

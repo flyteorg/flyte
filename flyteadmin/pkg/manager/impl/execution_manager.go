@@ -90,6 +90,7 @@ type ExecutionManager struct {
 	notificationClient        notificationInterfaces.Publisher
 	urlData                   dataInterfaces.RemoteURLInterface
 	workflowManager           interfaces.WorkflowInterface
+	launchPlanManager         interfaces.LaunchPlanInterface
 	namedEntityManager        interfaces.NamedEntityInterface
 	resourceManager           interfaces.ResourceInterface
 	qualityOfServiceAllocator executions.QualityOfServiceAllocator
@@ -1144,6 +1145,101 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 
 	if request.Spec.LaunchPlan.ResourceType == core.ResourceType_TASK {
 		logger.Debugf(ctx, "Launching single task execution with [%+v]", request.Spec.LaunchPlan)
+		nodeId := request.GetSpec().GetMetadata().GetParentNodeExecution().GetNodeId()
+		executionId := request.GetSpec().GetMetadata().GetParentNodeExecution().GetExecutionId()
+		if nodeId != "" && executionId != nil {
+			subNodeIds, err := util.GetSubNodesFromParentNodeExecution(ctx, m.db, request.GetSpec().GetMetadata().GetParentNodeExecution())
+			if err != nil {
+				logger.Errorf(ctx, "failed to fetch sub nodes for the parent node: %v %s with err: %v", executionId, nodeId, err)
+				return nil, nil, nil, err
+			}
+
+			execution, err := m.GetExecution(ctx, admin.WorkflowExecutionGetRequest{
+				Id: executionId,
+			})
+			if err != nil {
+				logger.Errorf(ctx, "failed to fetch parent node's execution with err: %v", err)
+				return nil, nil, nil, err
+			}
+
+			launchPlanID := execution.GetSpec().GetLaunchPlan()
+			if launchPlanID == nil {
+				logger.Errorf(ctx, "Launch plan id is nil for the parent node execution: %v %s", executionId, nodeId)
+				return nil, nil, nil, errors.NewFlyteAdminErrorf(codes.Internal, "Parent node's launch plan id is nil")
+			}
+
+			parentNodeWorkflowIdentifier := execution.GetClosure().GetWorkflowId()
+			if parentNodeWorkflowIdentifier == nil {
+				logger.Errorf(ctx, "Workflow identifier is nil for the parent node: %v %s", executionId, nodeId)
+				return nil, nil, nil, errors.NewFlyteAdminErrorf(codes.Internal, "Parent node's workflow identifier is nil")
+			}
+
+			parentNodeWorkflow, err := util.GetWorkflow(ctx, m.db, m.storageClient, *parentNodeWorkflowIdentifier)
+			if err != nil {
+				logger.Errorf(ctx, "failed to fetch workflow of the parent node execution: %v %s with err: %v", executionId, nodeId, err)
+				return nil, nil, nil, err
+			}
+
+			subNode, err := util.GetSubNodeFromWorkflow(parentNodeWorkflow, subNodeIds)
+			// launchSingleTaskExecution if node is not an ArrayNode or cannot find node in the workflow
+			if err == nil && subNode.GetArrayNode() != nil {
+				// check if the fetched array node matches the task passed in
+				arrayNodeTaskId := subNode.GetArrayNode().GetNode().GetTaskNode().GetReferenceId()
+				if arrayNodeTaskId.GetName() != request.GetSpec().GetLaunchPlan().GetName() ||
+					arrayNodeTaskId.GetProject() != request.GetSpec().GetLaunchPlan().GetProject() ||
+					arrayNodeTaskId.GetDomain() != request.GetSpec().GetLaunchPlan().GetDomain() ||
+					arrayNodeTaskId.GetOrg() != request.GetSpec().GetLaunchPlan().GetOrg() {
+					return nil, nil, nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "Task spec does not match the node under the parent node execution id")
+				}
+
+				// if versions differ - check if the subNode is the same across versions
+				// Note: the launch form doesn't get updated across versions so the interfaces might differ and will error
+				if arrayNodeTaskId.GetVersion() != request.GetSpec().GetLaunchPlan().GetVersion() {
+					diffVersionWorkflowIdentifier := &core.Identifier{
+						Name:    parentNodeWorkflowIdentifier.GetName(),
+						Project: parentNodeWorkflowIdentifier.GetProject(),
+						Domain:  parentNodeWorkflowIdentifier.GetDomain(),
+						Org:     parentNodeWorkflowIdentifier.GetOrg(),
+						Version: request.GetSpec().GetLaunchPlan().GetVersion(),
+					}
+					diffVersionWorkflow, err := util.GetWorkflow(ctx, m.db, m.storageClient, *diffVersionWorkflowIdentifier)
+					if err != nil {
+						logger.Errorf(ctx, "failed to fetch workflow for different version %s of the execution for the parent node: %v %s with err: %v", request.GetSpec().GetLaunchPlan().GetVersion(), executionId, nodeId, err)
+						return nil, nil, nil, err
+					}
+					diffVersionSubNode, err := util.GetSubNodeFromWorkflow(diffVersionWorkflow, subNodeIds)
+					if err != nil {
+						logger.Errorf(ctx, "failed to fetch sub node for different version %s of the execution for the parent node: %v %s with err: %v", request.GetSpec().GetLaunchPlan().GetVersion(), executionId, nodeId, err)
+						return nil, nil, nil, err
+					}
+					diffVersionArrayNodeTaskId := diffVersionSubNode.GetArrayNode().GetNode().GetTaskNode().GetReferenceId()
+					if arrayNodeTaskId.GetName() != diffVersionArrayNodeTaskId.GetName() ||
+						arrayNodeTaskId.GetProject() != diffVersionArrayNodeTaskId.GetProject() ||
+						arrayNodeTaskId.GetDomain() != diffVersionArrayNodeTaskId.GetDomain() ||
+						arrayNodeTaskId.GetOrg() != diffVersionArrayNodeTaskId.GetOrg() {
+						return nil, nil, nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "Selected version does not match the node under the parent node execution id")
+					}
+
+					// this id is only utilized for its values and not fetching the launch plan, so it's fine if this doesn't exist
+					launchPlanID.Version = request.GetSpec().GetLaunchPlan().GetVersion()
+					subNode = diffVersionSubNode
+				}
+
+				createLaunchPlanResponse, err := m.launchPlanManager.CreateLaunchPlanFromNode(ctx, admin.CreateLaunchPlanFromNodeRequest{
+					SubNodes: &admin.CreateLaunchPlanFromNodeRequest_SubNodeSpec{
+						SubNodeSpec: subNode,
+					},
+					LaunchPlanId:    launchPlanID,
+					SecurityContext: execution.GetSpec().GetSecurityContext(),
+				})
+				if err != nil {
+					logger.Errorf(ctx, "failed to create launch plan from node spec for the parent node: %v %s with err: %v", executionId, nodeId, err)
+					return nil, nil, nil, err
+				}
+				request.Spec.LaunchPlan = createLaunchPlanResponse.GetLaunchPlan().GetId()
+				return m.launchExecution(ctx, request, requestedAt)
+			}
+		}
 		// When tasks can have defaults this will need to handle Artifacts as well.
 		return m.launchSingleTaskExecution(ctx, request, requestedAt)
 	}
@@ -2370,7 +2466,7 @@ func newExecutionSystemMetrics(scope promutils.Scope) executionSystemMetrics {
 func NewExecutionManager(db repositoryInterfaces.Repository, pluginRegistry *plugins.Registry, config runtimeInterfaces.Configuration,
 	storageClient *storage.DataStore, systemScope promutils.Scope, userScope promutils.Scope,
 	publisher notificationInterfaces.Publisher, urlData dataInterfaces.RemoteURLInterface,
-	workflowManager interfaces.WorkflowInterface, namedEntityManager interfaces.NamedEntityInterface,
+	workflowManager interfaces.WorkflowInterface, launchPlanManager interfaces.LaunchPlanInterface, namedEntityManager interfaces.NamedEntityInterface,
 	eventPublisher notificationInterfaces.Publisher, cloudEventPublisher cloudeventInterfaces.Publisher,
 	eventWriter eventWriter.WorkflowExecutionEventWriter, artifactRegistry *artifacts.ArtifactRegistry, resourceManager interfaces.ResourceInterface) interfaces.ExecutionInterface {
 
@@ -2398,6 +2494,7 @@ func NewExecutionManager(db repositoryInterfaces.Repository, pluginRegistry *plu
 		notificationClient:        publisher,
 		urlData:                   urlData,
 		workflowManager:           workflowManager,
+		launchPlanManager:         launchPlanManager,
 		namedEntityManager:        namedEntityManager,
 		resourceManager:           resourceManager,
 		qualityOfServiceAllocator: executions.NewQualityOfServiceAllocator(config, resourceManager),

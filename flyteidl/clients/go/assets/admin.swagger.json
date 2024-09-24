@@ -9240,15 +9240,19 @@
               "description": "Specific version of the resource."
             }
           },
-          "title": "ID of the launchplan that executed the workflow that contains the node to be re-run\n+required"
+          "title": "ID of the launch plan that executed the workflow that contains the node to be re-run\nor the core.Identifier values aside from name used to create a new workflow when using a node spec\n+required"
         },
         "sub_node_ids": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/adminSubNodeIdAsList"
-          },
-          "title": "List of sub node IDs to include in the execution. Utilized for re-running a node(s) within a workflow.\n+required"
+          "$ref": "#/definitions/adminSubNodeList",
+          "description": "List of sub node IDs to include in the execution. Utilized for re-running a node(s) within a workflow."
+        },
+        "sub_node_spec": {
+          "$ref": "#/definitions/coreNode",
+          "title": "Node spec to create a workflow from"
+        },
+        "security_context": {
+          "$ref": "#/definitions/coreSecurityContext",
+          "title": "Indicates security context for permissions triggered with this launch plan"
         }
       },
       "title": "Request to create or fetch a launch plan to re-run a node"
@@ -10448,15 +10452,19 @@
       "properties": {
         "launch_plan_id": {
           "$ref": "#/definitions/coreIdentifier",
-          "title": "ID of the launchplan that executed the workflow that contains the node to be re-run\n+required"
+          "title": "ID of the launch plan that executed the workflow that contains the node to be re-run\nor the core.Identifier values aside from name used to create a new workflow when using a node spec\n+required"
         },
         "sub_node_ids": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/adminSubNodeIdAsList"
-          },
-          "title": "List of sub node IDs to include in the execution. Utilized for re-running a node(s) within a workflow.\n+required"
+          "$ref": "#/definitions/adminSubNodeList",
+          "description": "List of sub node IDs to include in the execution. Utilized for re-running a node(s) within a workflow."
+        },
+        "sub_node_spec": {
+          "$ref": "#/definitions/coreNode",
+          "title": "Node spec to create a workflow from"
+        },
+        "security_context": {
+          "$ref": "#/definitions/coreSecurityContext",
+          "title": "Indicates security context for permissions triggered with this launch plan"
         }
       },
       "title": "Request to create or fetch a launch plan to re-run a node"
@@ -12105,6 +12113,19 @@
             "type": "string"
           },
           "title": "subNodeID for a node within a workflow. If more then one subMode ID is provided,\nthen it is assumed to be a subNode within a subWorkflow"
+        }
+      }
+    },
+    "adminSubNodeList": {
+      "type": "object",
+      "properties": {
+        "sub_node_ids": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/adminSubNodeIdAsList"
+          },
+          "title": "List of sub node IDs to include in the execution"
         }
       }
     },

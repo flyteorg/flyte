@@ -257,3 +257,74 @@ func TestValidateWorkflowExecutionIdentifier_Error(t *testing.T) {
 		Name:   "name",
 	}))
 }
+
+func TestValidateCreateLaunchPlanFromNodeRequest(t *testing.T) {
+	unsupportedNumberOfSubNodeIDs := admin.CreateLaunchPlanFromNodeRequest{
+		SubNodes: &admin.CreateLaunchPlanFromNodeRequest_SubNodeIds{
+			SubNodeIds: &admin.SubNodeList{
+				SubNodeIds: []*admin.SubNodeIdAsList{
+					{
+						SubNodeId: []string{"1", "2"},
+					},
+					{
+						SubNodeId: []string{"3", "4"},
+					},
+				},
+			},
+		},
+	}
+	err := ValidateCreateLaunchPlanFromNodeRequest(unsupportedNumberOfSubNodeIDs)
+	assert.EqualError(t, err, "relaunching multiple nodes is not supported")
+
+	emptyListSubNodeIDs := admin.CreateLaunchPlanFromNodeRequest{
+		SubNodes: &admin.CreateLaunchPlanFromNodeRequest_SubNodeIds{
+			SubNodeIds: &admin.SubNodeList{
+				SubNodeIds: []*admin.SubNodeIdAsList{},
+			},
+		},
+	}
+	err = ValidateCreateLaunchPlanFromNodeRequest(emptyListSubNodeIDs)
+	assert.EqualError(t, err, "subNodeIDs cannot be empty")
+
+	emptyListSubNodeSpecs := admin.CreateLaunchPlanFromNodeRequest{
+		SubNodes: &admin.CreateLaunchPlanFromNodeRequest_SubNodeSpec{},
+	}
+	err = ValidateCreateLaunchPlanFromNodeRequest(emptyListSubNodeSpecs)
+	assert.EqualError(t, err, "subNodeSpecs and subNodeIDs cannot be empty")
+
+	request := admin.CreateLaunchPlanFromNodeRequest{
+		SubNodes: &admin.CreateLaunchPlanFromNodeRequest_SubNodeIds{
+			SubNodeIds: &admin.SubNodeList{
+				SubNodeIds: []*admin.SubNodeIdAsList{
+					{
+						SubNodeId: []string{"1", "2"},
+					},
+				},
+			},
+		},
+		LaunchPlanId: &core.Identifier{
+			Project:      "project",
+			Domain:       "domain",
+			Name:         "name",
+			Version:      "version",
+			ResourceType: core.ResourceType_LAUNCH_PLAN,
+		},
+	}
+	err = ValidateCreateLaunchPlanFromNodeRequest(request)
+	assert.Nil(t, err)
+
+	request = admin.CreateLaunchPlanFromNodeRequest{
+		SubNodes: &admin.CreateLaunchPlanFromNodeRequest_SubNodeSpec{
+			SubNodeSpec: &core.Node{Id: "1"},
+		},
+		LaunchPlanId: &core.Identifier{
+			Project:      "project",
+			Domain:       "domain",
+			Name:         "name",
+			Version:      "version",
+			ResourceType: core.ResourceType_LAUNCH_PLAN,
+		},
+	}
+	err = ValidateCreateLaunchPlanFromNodeRequest(request)
+	assert.Nil(t, err)
+}

@@ -18,11 +18,11 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 const (
-	maxUniqueIDLength = 20
-	MB                = 1024 * 1024 // 1 MB in bytes (1 MiB)
+	MB = 1024 * 1024 // 1 MB in bytes (1 MiB)
 )
 
 // GenerateUniqueID is the UniqueId of a node is unique within a given workflow execution.
@@ -38,7 +38,7 @@ func GenerateUniqueID(parentInfo executors.ImmutableParentInfo, nodeID string) (
 		parentRetryAttempt = strconv.Itoa(int(parentInfo.CurrentAttempt()))
 	}
 
-	return encoding.FixedLengthUniqueIDForParts(maxUniqueIDLength, []string{parentUniqueID, parentRetryAttempt, nodeID})
+	return encoding.FixedLengthUniqueIDForParts(utils.MaxUniqueIDLength, []string{parentUniqueID, parentRetryAttempt, nodeID})
 }
 
 // CreateParentInfo creates a unique parent id, the unique id of parent is dependent on the unique id and the current

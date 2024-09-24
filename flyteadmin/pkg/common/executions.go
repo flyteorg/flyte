@@ -7,9 +7,10 @@ import (
 	"k8s.io/apimachinery/pkg/util/rand"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
-const ExecutionIDLength = 20
+const ExecutionIDLength = utils.MaxUniqueIDLength
 const ExecutionStringFormat = "a%s"
 
 /* #nosec */

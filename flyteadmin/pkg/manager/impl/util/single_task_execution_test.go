@@ -23,9 +23,13 @@ import (
 )
 
 func TestGenerateNodeNameFromTask(t *testing.T) {
-	assert.EqualValues(t, "foo-12345", generateNodeNameFromTask("foo@`!=+- 1,2$3(4)5"))
-	assert.EqualValues(t, "nametoadefinedtasksomewhereincodeveryverynestedcrazy",
-		generateNodeNameFromTask("app.long.path.name.to.a.defined.task.somewhere.in.code.very.very.nested.crazy"))
+	nodeID, err := generateNodeNameFromTask("foo@`!=+- 1,2$3(4)5")
+	assert.NoError(t, err)
+	assert.EqualValues(t, "foo-12345", nodeID)
+
+	nodeID, err = generateNodeNameFromTask("app.long.path.name.to.a.defined.task.somewhere.in.code.very.very.nested.crazy")
+	assert.NoError(t, err)
+	assert.EqualValues(t, "fch4xs5i", nodeID)
 }
 
 func TestGenerateWorkflowNameFromTask(t *testing.T) {
@@ -51,7 +55,7 @@ func TestGenerateWorkflowNameFromNode(t *testing.T) {
 					},
 				},
 			},
-			expectedName: ".flytegen.TaskId",
+			expectedName: ".flytegen.TaskId-node",
 		},
 		{
 			name: "ArrayNode",
@@ -72,7 +76,7 @@ func TestGenerateWorkflowNameFromNode(t *testing.T) {
 					},
 				},
 			},
-			expectedName: ".flytegen.subnode",
+			expectedName: ".flytegen.subnode-node",
 		},
 		{
 			name: "WorkflowNode",
@@ -341,7 +345,7 @@ func TestCreateOrGetWorkflowFromNode(t *testing.T) {
 					},
 				},
 			},
-			expectedName: ".flytegen.simple_task",
+			expectedName: ".flytegen.simple_task-node",
 			typedInterface: &core.TypedInterface{
 				Inputs: &core.VariableMap{
 					Variables: map[string]*core.Variable{
@@ -385,7 +389,7 @@ func TestCreateOrGetWorkflowFromNode(t *testing.T) {
 					},
 				},
 			},
-			expectedName: ".flytegen.subnodeID",
+			expectedName: ".flytegen.subnodeID-node",
 			typedInterface: &core.TypedInterface{
 				Inputs: &core.VariableMap{
 					Variables: map[string]*core.Variable{
@@ -507,7 +511,7 @@ func TestCreateOrGetWorkflowFromNode(t *testing.T) {
 				assert.True(t, proto.Equal(request.Id, &admin.NamedEntityIdentifier{
 					Project: wfIdentifier.Project,
 					Domain:  wfIdentifier.Domain,
-					Name:    wfIdentifier.Name,
+					Name:    tt.expectedName,
 					Org:     wfIdentifier.Org,
 				}), fmt.Sprintf("%+v", request.Id))
 				assert.True(t, proto.Equal(request.Metadata, &admin.NamedEntityMetadata{

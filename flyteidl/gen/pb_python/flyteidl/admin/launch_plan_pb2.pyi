@@ -4,6 +4,7 @@ from flyteidl.core import literals_pb2 as _literals_pb2
 from flyteidl.core import identifier_pb2 as _identifier_pb2
 from flyteidl.core import interface_pb2 as _interface_pb2
 from flyteidl.core import security_pb2 as _security_pb2
+from flyteidl.core import workflow_pb2 as _workflow_pb2
 from flyteidl.admin import schedule_pb2 as _schedule_pb2
 from flyteidl.admin import common_pb2 as _common_pb2
 from google.protobuf import any_pb2 as _any_pb2
@@ -164,13 +165,23 @@ class SubNodeIdAsList(_message.Message):
     sub_node_id: _containers.RepeatedScalarFieldContainer[str]
     def __init__(self, sub_node_id: _Optional[_Iterable[str]] = ...) -> None: ...
 
+class SubNodeList(_message.Message):
+    __slots__ = ["sub_node_ids"]
+    SUB_NODE_IDS_FIELD_NUMBER: _ClassVar[int]
+    sub_node_ids: _containers.RepeatedCompositeFieldContainer[SubNodeIdAsList]
+    def __init__(self, sub_node_ids: _Optional[_Iterable[_Union[SubNodeIdAsList, _Mapping]]] = ...) -> None: ...
+
 class CreateLaunchPlanFromNodeRequest(_message.Message):
-    __slots__ = ["launch_plan_id", "sub_node_ids"]
+    __slots__ = ["launch_plan_id", "sub_node_ids", "sub_node_spec", "security_context"]
     LAUNCH_PLAN_ID_FIELD_NUMBER: _ClassVar[int]
     SUB_NODE_IDS_FIELD_NUMBER: _ClassVar[int]
+    SUB_NODE_SPEC_FIELD_NUMBER: _ClassVar[int]
+    SECURITY_CONTEXT_FIELD_NUMBER: _ClassVar[int]
     launch_plan_id: _identifier_pb2.Identifier
-    sub_node_ids: _containers.RepeatedCompositeFieldContainer[SubNodeIdAsList]
-    def __init__(self, launch_plan_id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., sub_node_ids: _Optional[_Iterable[_Union[SubNodeIdAsList, _Mapping]]] = ...) -> None: ...
+    sub_node_ids: SubNodeList
+    sub_node_spec: _workflow_pb2.Node
+    security_context: _security_pb2.SecurityContext
+    def __init__(self, launch_plan_id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., sub_node_ids: _Optional[_Union[SubNodeList, _Mapping]] = ..., sub_node_spec: _Optional[_Union[_workflow_pb2.Node, _Mapping]] = ..., security_context: _Optional[_Union[_security_pb2.SecurityContext, _Mapping]] = ...) -> None: ...
 
 class CreateLaunchPlanFromNodeResponse(_message.Message):
     __slots__ = ["launch_plan"]

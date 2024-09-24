@@ -43954,6 +43954,126 @@
                 return SubNodeIdAsList;
             })();
     
+            admin.SubNodeList = (function() {
+    
+                /**
+                 * Properties of a SubNodeList.
+                 * @memberof flyteidl.admin
+                 * @interface ISubNodeList
+                 * @property {Array.<flyteidl.admin.ISubNodeIdAsList>|null} [subNodeIds] SubNodeList subNodeIds
+                 */
+    
+                /**
+                 * Constructs a new SubNodeList.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a SubNodeList.
+                 * @implements ISubNodeList
+                 * @constructor
+                 * @param {flyteidl.admin.ISubNodeList=} [properties] Properties to set
+                 */
+                function SubNodeList(properties) {
+                    this.subNodeIds = [];
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * SubNodeList subNodeIds.
+                 * @member {Array.<flyteidl.admin.ISubNodeIdAsList>} subNodeIds
+                 * @memberof flyteidl.admin.SubNodeList
+                 * @instance
+                 */
+                SubNodeList.prototype.subNodeIds = $util.emptyArray;
+    
+                /**
+                 * Creates a new SubNodeList instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.SubNodeList
+                 * @static
+                 * @param {flyteidl.admin.ISubNodeList=} [properties] Properties to set
+                 * @returns {flyteidl.admin.SubNodeList} SubNodeList instance
+                 */
+                SubNodeList.create = function create(properties) {
+                    return new SubNodeList(properties);
+                };
+    
+                /**
+                 * Encodes the specified SubNodeList message. Does not implicitly {@link flyteidl.admin.SubNodeList.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.SubNodeList
+                 * @static
+                 * @param {flyteidl.admin.ISubNodeList} message SubNodeList message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                SubNodeList.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.subNodeIds != null && message.subNodeIds.length)
+                        for (var i = 0; i < message.subNodeIds.length; ++i)
+                            $root.flyteidl.admin.SubNodeIdAsList.encode(message.subNodeIds[i], writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a SubNodeList message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.SubNodeList
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.SubNodeList} SubNodeList
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                SubNodeList.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.SubNodeList();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            if (!(message.subNodeIds && message.subNodeIds.length))
+                                message.subNodeIds = [];
+                            message.subNodeIds.push($root.flyteidl.admin.SubNodeIdAsList.decode(reader, reader.uint32()));
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a SubNodeList message.
+                 * @function verify
+                 * @memberof flyteidl.admin.SubNodeList
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                SubNodeList.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.subNodeIds != null && message.hasOwnProperty("subNodeIds")) {
+                        if (!Array.isArray(message.subNodeIds))
+                            return "subNodeIds: array expected";
+                        for (var i = 0; i < message.subNodeIds.length; ++i) {
+                            var error = $root.flyteidl.admin.SubNodeIdAsList.verify(message.subNodeIds[i]);
+                            if (error)
+                                return "subNodeIds." + error;
+                        }
+                    }
+                    return null;
+                };
+    
+                return SubNodeList;
+            })();
+    
             admin.CreateLaunchPlanFromNodeRequest = (function() {
     
                 /**
@@ -43961,7 +44081,9 @@
                  * @memberof flyteidl.admin
                  * @interface ICreateLaunchPlanFromNodeRequest
                  * @property {flyteidl.core.IIdentifier|null} [launchPlanId] CreateLaunchPlanFromNodeRequest launchPlanId
-                 * @property {Array.<flyteidl.admin.ISubNodeIdAsList>|null} [subNodeIds] CreateLaunchPlanFromNodeRequest subNodeIds
+                 * @property {flyteidl.admin.ISubNodeList|null} [subNodeIds] CreateLaunchPlanFromNodeRequest subNodeIds
+                 * @property {flyteidl.core.INode|null} [subNodeSpec] CreateLaunchPlanFromNodeRequest subNodeSpec
+                 * @property {flyteidl.core.ISecurityContext|null} [securityContext] CreateLaunchPlanFromNodeRequest securityContext
                  */
     
                 /**
@@ -43973,7 +44095,6 @@
                  * @param {flyteidl.admin.ICreateLaunchPlanFromNodeRequest=} [properties] Properties to set
                  */
                 function CreateLaunchPlanFromNodeRequest(properties) {
-                    this.subNodeIds = [];
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -43990,11 +44111,41 @@
     
                 /**
                  * CreateLaunchPlanFromNodeRequest subNodeIds.
-                 * @member {Array.<flyteidl.admin.ISubNodeIdAsList>} subNodeIds
+                 * @member {flyteidl.admin.ISubNodeList|null|undefined} subNodeIds
                  * @memberof flyteidl.admin.CreateLaunchPlanFromNodeRequest
                  * @instance
                  */
-                CreateLaunchPlanFromNodeRequest.prototype.subNodeIds = $util.emptyArray;
+                CreateLaunchPlanFromNodeRequest.prototype.subNodeIds = null;
+    
+                /**
+                 * CreateLaunchPlanFromNodeRequest subNodeSpec.
+                 * @member {flyteidl.core.INode|null|undefined} subNodeSpec
+                 * @memberof flyteidl.admin.CreateLaunchPlanFromNodeRequest
+                 * @instance
+                 */
+                CreateLaunchPlanFromNodeRequest.prototype.subNodeSpec = null;
+    
+                /**
+                 * CreateLaunchPlanFromNodeRequest securityContext.
+                 * @member {flyteidl.core.ISecurityContext|null|undefined} securityContext
+                 * @memberof flyteidl.admin.CreateLaunchPlanFromNodeRequest
+                 * @instance
+                 */
+                CreateLaunchPlanFromNodeRequest.prototype.securityContext = null;
+    
+                // OneOf field names bound to virtual getters and setters
+                var $oneOfFields;
+    
+                /**
+                 * CreateLaunchPlanFromNodeRequest subNodes.
+                 * @member {"subNodeIds"|"subNodeSpec"|undefined} subNodes
+                 * @memberof flyteidl.admin.CreateLaunchPlanFromNodeRequest
+                 * @instance
+                 */
+                Object.defineProperty(CreateLaunchPlanFromNodeRequest.prototype, "subNodes", {
+                    get: $util.oneOfGetter($oneOfFields = ["subNodeIds", "subNodeSpec"]),
+                    set: $util.oneOfSetter($oneOfFields)
+                });
     
                 /**
                  * Creates a new CreateLaunchPlanFromNodeRequest instance using the specified properties.
@@ -44022,9 +44173,12 @@
                         writer = $Writer.create();
                     if (message.launchPlanId != null && message.hasOwnProperty("launchPlanId"))
                         $root.flyteidl.core.Identifier.encode(message.launchPlanId, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-                    if (message.subNodeIds != null && message.subNodeIds.length)
-                        for (var i = 0; i < message.subNodeIds.length; ++i)
-                            $root.flyteidl.admin.SubNodeIdAsList.encode(message.subNodeIds[i], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    if (message.subNodeIds != null && message.hasOwnProperty("subNodeIds"))
+                        $root.flyteidl.admin.SubNodeList.encode(message.subNodeIds, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    if (message.subNodeSpec != null && message.hasOwnProperty("subNodeSpec"))
+                        $root.flyteidl.core.Node.encode(message.subNodeSpec, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                    if (message.securityContext != null && message.hasOwnProperty("securityContext"))
+                        $root.flyteidl.core.SecurityContext.encode(message.securityContext, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
                     return writer;
                 };
     
@@ -44050,9 +44204,13 @@
                             message.launchPlanId = $root.flyteidl.core.Identifier.decode(reader, reader.uint32());
                             break;
                         case 2:
-                            if (!(message.subNodeIds && message.subNodeIds.length))
-                                message.subNodeIds = [];
-                            message.subNodeIds.push($root.flyteidl.admin.SubNodeIdAsList.decode(reader, reader.uint32()));
+                            message.subNodeIds = $root.flyteidl.admin.SubNodeList.decode(reader, reader.uint32());
+                            break;
+                        case 3:
+                            message.subNodeSpec = $root.flyteidl.core.Node.decode(reader, reader.uint32());
+                            break;
+                        case 4:
+                            message.securityContext = $root.flyteidl.core.SecurityContext.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -44073,19 +44231,34 @@
                 CreateLaunchPlanFromNodeRequest.verify = function verify(message) {
                     if (typeof message !== "object" || message === null)
                         return "object expected";
+                    var properties = {};
                     if (message.launchPlanId != null && message.hasOwnProperty("launchPlanId")) {
                         var error = $root.flyteidl.core.Identifier.verify(message.launchPlanId);
                         if (error)
                             return "launchPlanId." + error;
                     }
                     if (message.subNodeIds != null && message.hasOwnProperty("subNodeIds")) {
-                        if (!Array.isArray(message.subNodeIds))
-                            return "subNodeIds: array expected";
-                        for (var i = 0; i < message.subNodeIds.length; ++i) {
-                            var error = $root.flyteidl.admin.SubNodeIdAsList.verify(message.subNodeIds[i]);
+                        properties.subNodes = 1;
+                        {
+                            var error = $root.flyteidl.admin.SubNodeList.verify(message.subNodeIds);
                             if (error)
                                 return "subNodeIds." + error;
                         }
+                    }
+                    if (message.subNodeSpec != null && message.hasOwnProperty("subNodeSpec")) {
+                        if (properties.subNodes === 1)
+                            return "subNodes: multiple values";
+                        properties.subNodes = 1;
+                        {
+                            var error = $root.flyteidl.core.Node.verify(message.subNodeSpec);
+                            if (error)
+                                return "subNodeSpec." + error;
+                        }
+                    }
+                    if (message.securityContext != null && message.hasOwnProperty("securityContext")) {
+                        var error = $root.flyteidl.core.SecurityContext.verify(message.securityContext);
+                        if (error)
+                            return "securityContext." + error;
                     }
                     return null;
                 };

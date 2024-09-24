@@ -1915,18 +1915,42 @@ pub struct SubNodeIdAsList {
     #[prost(string, repeated, tag="1")]
     pub sub_node_id: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
 }
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct SubNodeList {
+    /// List of sub node IDs to include in the execution
+    #[prost(message, repeated, tag="1")]
+    pub sub_node_ids: ::prost::alloc::vec::Vec<SubNodeIdAsList>,
+}
 /// Request to create or fetch a launch plan to re-run a node
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CreateLaunchPlanFromNodeRequest {
-    /// ID of the launchplan that executed the workflow that contains the node to be re-run
+    /// ID of the launch plan that executed the workflow that contains the node to be re-run
+    /// or the core.Identifier values aside from name used to create a new workflow when using a node spec
     /// +required
     #[prost(message, optional, tag="1")]
     pub launch_plan_id: ::core::option::Option<super::core::Identifier>,
-    /// List of sub node IDs to include in the execution. Utilized for re-running a node(s) within a workflow.
+    /// Indicates security context for permissions triggered with this launch plan
+    #[prost(message, optional, tag="4")]
+    pub security_context: ::core::option::Option<super::core::SecurityContext>,
     /// +required
-    #[prost(message, repeated, tag="2")]
-    pub sub_node_ids: ::prost::alloc::vec::Vec<SubNodeIdAsList>,
+    #[prost(oneof="create_launch_plan_from_node_request::SubNodes", tags="2, 3")]
+    pub sub_nodes: ::core::option::Option<create_launch_plan_from_node_request::SubNodes>,
+}
+/// Nested message and enum types in `CreateLaunchPlanFromNodeRequest`.
+pub mod create_launch_plan_from_node_request {
+    /// +required
+    #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum SubNodes {
+        /// List of sub node IDs to include in the execution. Utilized for re-running a node(s) within a workflow.
+        #[prost(message, tag="2")]
+        SubNodeIds(super::SubNodeList),
+        /// Node spec to create a workflow from
+        #[prost(message, tag="3")]
+        SubNodeSpec(super::super::core::Node),
+    }
 }
 /// The launch plan that was created for or that already existed from re-running node(s) within a workflow
 #[allow(clippy::derive_partial_eq_without_eq)]

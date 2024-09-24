@@ -13,6 +13,7 @@ import { SecurityContext } from "../core/security_pb.js";
 import { QualityOfService } from "../core/execution_pb.js";
 import { ExecutionEnvAssignment } from "../core/execution_envs_pb.js";
 import { Schedule } from "./schedule_pb.js";
+import { Node } from "../core/workflow_pb.js";
 
 /**
  * By default any launch plan regardless of state can be used to launch a workflow execution.
@@ -853,13 +854,53 @@ export class SubNodeIdAsList extends Message<SubNodeIdAsList> {
 }
 
 /**
+ * @generated from message flyteidl.admin.SubNodeList
+ */
+export class SubNodeList extends Message<SubNodeList> {
+  /**
+   * List of sub node IDs to include in the execution
+   *
+   * @generated from field: repeated flyteidl.admin.SubNodeIdAsList sub_node_ids = 1;
+   */
+  subNodeIds: SubNodeIdAsList[] = [];
+
+  constructor(data?: PartialMessage<SubNodeList>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.admin.SubNodeList";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "sub_node_ids", kind: "message", T: SubNodeIdAsList, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SubNodeList {
+    return new SubNodeList().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SubNodeList {
+    return new SubNodeList().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SubNodeList {
+    return new SubNodeList().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: SubNodeList | PlainMessage<SubNodeList> | undefined, b: SubNodeList | PlainMessage<SubNodeList> | undefined): boolean {
+    return proto3.util.equals(SubNodeList, a, b);
+  }
+}
+
+/**
  * Request to create or fetch a launch plan to re-run a node
  *
  * @generated from message flyteidl.admin.CreateLaunchPlanFromNodeRequest
  */
 export class CreateLaunchPlanFromNodeRequest extends Message<CreateLaunchPlanFromNodeRequest> {
   /**
-   * ID of the launchplan that executed the workflow that contains the node to be re-run
+   * ID of the launch plan that executed the workflow that contains the node to be re-run
+   * or the core.Identifier values aside from name used to create a new workflow when using a node spec
    * +required
    *
    * @generated from field: flyteidl.core.Identifier launch_plan_id = 1;
@@ -867,12 +908,34 @@ export class CreateLaunchPlanFromNodeRequest extends Message<CreateLaunchPlanFro
   launchPlanId?: Identifier;
 
   /**
-   * List of sub node IDs to include in the execution. Utilized for re-running a node(s) within a workflow.
    * +required
    *
-   * @generated from field: repeated flyteidl.admin.SubNodeIdAsList sub_node_ids = 2;
+   * @generated from oneof flyteidl.admin.CreateLaunchPlanFromNodeRequest.sub_nodes
    */
-  subNodeIds: SubNodeIdAsList[] = [];
+  subNodes: {
+    /**
+     * List of sub node IDs to include in the execution. Utilized for re-running a node(s) within a workflow.
+     *
+     * @generated from field: flyteidl.admin.SubNodeList sub_node_ids = 2;
+     */
+    value: SubNodeList;
+    case: "subNodeIds";
+  } | {
+    /**
+     * Node spec to create a workflow from
+     *
+     * @generated from field: flyteidl.core.Node sub_node_spec = 3;
+     */
+    value: Node;
+    case: "subNodeSpec";
+  } | { case: undefined; value?: undefined } = { case: undefined };
+
+  /**
+   * Indicates security context for permissions triggered with this launch plan
+   *
+   * @generated from field: flyteidl.core.SecurityContext security_context = 4;
+   */
+  securityContext?: SecurityContext;
 
   constructor(data?: PartialMessage<CreateLaunchPlanFromNodeRequest>) {
     super();
@@ -883,7 +946,9 @@ export class CreateLaunchPlanFromNodeRequest extends Message<CreateLaunchPlanFro
   static readonly typeName = "flyteidl.admin.CreateLaunchPlanFromNodeRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "launch_plan_id", kind: "message", T: Identifier },
-    { no: 2, name: "sub_node_ids", kind: "message", T: SubNodeIdAsList, repeated: true },
+    { no: 2, name: "sub_node_ids", kind: "message", T: SubNodeList, oneof: "sub_nodes" },
+    { no: 3, name: "sub_node_spec", kind: "message", T: Node, oneof: "sub_nodes" },
+    { no: 4, name: "security_context", kind: "message", T: SecurityContext },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateLaunchPlanFromNodeRequest {

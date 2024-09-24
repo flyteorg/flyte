@@ -170,7 +170,7 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 	pluginRegistry.RegisterDefault(plugins.PluginIDPreExecutionValidation, noopPreExecutionValidationPlugin)
 	executionManager := manager.NewExecutionManager(repo, pluginRegistry, configuration, dataStorageClient,
 		adminScope.NewSubScope("execution_manager"), adminScope.NewSubScope("user_execution_metrics"),
-		publisher, urlData, workflowManager, namedEntityManager, eventPublisher, cloudEventPublisher, executionEventWriter, artifactRegistry, resourceManager)
+		publisher, urlData, workflowManager, launchPlanManager, namedEntityManager, eventPublisher, cloudEventPublisher, executionEventWriter, artifactRegistry, resourceManager)
 	versionManager := manager.NewVersionManager()
 
 	scheduledWorkflowExecutor := workflowScheduler.GetWorkflowExecutor(executionManager, launchPlanManager)

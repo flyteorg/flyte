@@ -5,6 +5,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/golang/protobuf/proto"
 	"google.golang.org/grpc/codes"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
@@ -351,4 +352,118 @@ func MergeIntoExecConfig(workflowExecConfig admin.WorkflowExecutionConfig, spec 
 	}
 
 	return workflowExecConfig
+}
+
+func GetSubNodeFromWorkflow(originalWorkflow *admin.Workflow, subNodeId []string) (*core.Node, error) {
+	var checkSubWorkflow bool
+	var subWorkflowNodeIDs []string
+	if len(subNodeId) == 0 {
+		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "subNodeID is empty")
+	}
+	parentWfNodeID := subNodeId[0]
+	if len(subNodeId) > 1 {
+		checkSubWorkflow = true
+		subWorkflowNodeIDs = subNodeId[1:]
+	}
+
+	var foundNode bool
+	var subNode *core.Node
+	for _, node := range originalWorkflow.Closure.CompiledWorkflow.Primary.Template.Nodes {
+		if parentWfNodeID == node.Id {
+			foundNode = true
+			subNode = node
+			break
+		}
+	}
+	if !foundNode {
+		return nil, errors.NewFlyteAdminErrorf(codes.NotFound, "subNodeID '%s' not found in the workflow", subNodeId)
+	}
+	if checkSubWorkflow {
+		if subNode.GetWorkflowNode() == nil || subNode.GetWorkflowNode().GetSubWorkflowRef() == nil {
+			return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "subNodeID '%s' is not a WorkflowNode that launches a SubWorkflow", subNodeId)
+		}
+
+		subWorkflowMap := make(map[string]*core.CompiledWorkflow)
+		for _, wf := range originalWorkflow.Closure.CompiledWorkflow.SubWorkflows {
+			subWorkflowMap[wf.Template.Id.String()] = wf
+		}
+
+		var foundSubWorkflowNode bool
+		for _, subWorkflowNodeID := range subWorkflowNodeIDs {
+			currSubWorkflowID := subNode.GetWorkflowNode().GetSubWorkflowRef().String()
+			foundSubWorkflowNode = false
+			if wf, exists := subWorkflowMap[currSubWorkflowID]; exists {
+				for _, node := range wf.Template.Nodes {
+					if subWorkflowNodeID == node.Id {
+						subNode = node
+						foundSubWorkflowNode = true
+						break
+					}
+				}
+			} else {
+				return nil, errors.NewFlyteAdminErrorf(codes.NotFound, "subNodeID '%s' not found in the workflow's SubWorkflows", subNodeId)
+			}
+			if !foundSubWorkflowNode {
+				return nil, errors.NewFlyteAdminErrorf(codes.NotFound, "subNodeID '%s' not found in the workflow's SubWorkflows", subNodeId)
+			}
+		}
+	}
+	return subNode, nil
+}
+
+func GetSubNodesFromParentNodeExecution(ctx context.Context, db repoInterfaces.Repository, parentNodeExecutionID *core.NodeExecutionIdentifier) ([]string, error) {
+	var subNodeIds []string
+
+	nodeId := parentNodeExecutionID.GetNodeId()
+	executionId := parentNodeExecutionID.GetExecutionId()
+	if nodeId == "" || executionId == nil {
+		return subNodeIds, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "nodeId or executionId is empty")
+	}
+
+	// fetch subNodeIDs from the parent node execution
+	parentNodeExecutionModel, err := GetNodeExecutionModel(ctx, db, &core.NodeExecutionIdentifier{
+		ExecutionId: executionId,
+		NodeId:      nodeId,
+	})
+	if err != nil {
+		logger.Errorf(ctx, "failed to fetch node execution for the parent node: %v %s with err",
+			executionId, nodeId, err)
+		return subNodeIds, err
+	}
+
+	for {
+		var nodeExecutionMetadata admin.NodeExecutionMetaData
+		if len(parentNodeExecutionModel.NodeExecutionMetadata) > 0 {
+			if err := proto.Unmarshal(parentNodeExecutionModel.NodeExecutionMetadata, &nodeExecutionMetadata); err != nil {
+				return subNodeIds, errors.NewFlyteAdminErrorf(codes.Internal,
+					"failed to unmarshal node execution metadata with error: %+v", err)
+			}
+		}
+
+		subNodeIds = append(subNodeIds, nodeExecutionMetadata.SpecNodeId)
+
+		// retrieve the parent node
+		if parentNodeExecutionModel.ParentID == nil {
+			break
+		}
+
+		var nodeExecution models.NodeExecution
+		tx := db.GetGormDB().WithContext(ctx).Where(&models.NodeExecution{
+			BaseModel: models.BaseModel{
+				ID: *parentNodeExecutionModel.ParentID,
+			},
+		}).Take(&nodeExecution)
+
+		if tx.Error != nil {
+			return subNodeIds, errors.NewFlyteAdminErrorf(codes.Internal,
+				"failed to fetch parent node execution for the parent node: %v %s with error: %+v", executionId, nodeId, tx.Error)
+		}
+		parentNodeExecutionModel = &nodeExecution
+	}
+
+	for i, j := 0, len(subNodeIds)-1; i < j; i, j = i+1, j-1 {
+		subNodeIds[i], subNodeIds[j] = subNodeIds[j], subNodeIds[i]
+	}
+
+	return subNodeIds, nil
 }

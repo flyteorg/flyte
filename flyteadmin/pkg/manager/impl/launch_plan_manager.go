@@ -679,69 +679,33 @@ func (m *LaunchPlanManager) CreateLaunchPlanFromNode(
 		return nil, err
 	}
 
-	originalLaunchPlan, err := util.GetLaunchPlan(context.Background(), m.db, *request.LaunchPlanId)
-	if err != nil {
-		return nil, err
-	}
+	securityContext := request.GetSecurityContext()
 
-	workflowIdentifier := originalLaunchPlan.Spec.WorkflowId
-	originalWorkflow, err := util.GetWorkflow(ctx, m.db, m.storageClient, *workflowIdentifier)
-	if err != nil {
-		return nil, err
-	}
-
-	var checkSubWorkflow bool
-	var subWorkflowNodeIDs []string
-	parentWfNodeID := request.SubNodeIds[0].SubNodeId[0]
-	if len(request.SubNodeIds[0].SubNodeId) > 1 {
-		checkSubWorkflow = true
-		subWorkflowNodeIDs = request.SubNodeIds[0].SubNodeId[1:]
-	}
-
-	var foundNode bool
 	var subNode *core.Node
-	for _, node := range originalWorkflow.Closure.CompiledWorkflow.Primary.Template.Nodes {
-		if parentWfNodeID == node.Id {
-			foundNode = true
-			subNode = node
-			break
-		}
-	}
-	if !foundNode {
-		return nil, errors.NewFlyteAdminErrorf(codes.NotFound, "subNodeID '%s' not found in the workflow", request.SubNodeIds[0])
-	}
-	if checkSubWorkflow {
-		if subNode.GetWorkflowNode() == nil || subNode.GetWorkflowNode().GetSubWorkflowRef() == nil {
-			return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "subNodeID '%s' is not a WorkflowNode that launches a SubWorkflow", request.SubNodeIds[0])
+	if request.GetSubNodeIds() != nil {
+		subNodeID := request.GetSubNodeIds().GetSubNodeIds()[0].GetSubNodeId()
+		originalLaunchPlan, err := util.GetLaunchPlan(context.Background(), m.db, *request.GetLaunchPlanId())
+		if err != nil {
+			return nil, err
 		}
 
-		subWorkflowMap := make(map[string]*core.CompiledWorkflow)
-		for _, wf := range originalWorkflow.Closure.CompiledWorkflow.SubWorkflows {
-			subWorkflowMap[wf.Template.Id.String()] = wf
+		originalWorkflow, err := util.GetWorkflow(ctx, m.db, m.storageClient, *originalLaunchPlan.GetSpec().GetWorkflowId())
+		if err != nil {
+			return nil, err
+		}
+		subNode, err = util.GetSubNodeFromWorkflow(originalWorkflow, subNodeID)
+		if err != nil {
+			return nil, err
 		}
 
-		var foundSubWorkflowNode bool
-		for _, subWorkflowNodeID := range subWorkflowNodeIDs {
-			currSubWorkflowID := subNode.GetWorkflowNode().GetSubWorkflowRef().String()
-			foundSubWorkflowNode = false
-			if wf, exists := subWorkflowMap[currSubWorkflowID]; exists {
-				for _, node := range wf.Template.Nodes {
-					if subWorkflowNodeID == node.Id {
-						subNode = node
-						foundSubWorkflowNode = true
-						break
-					}
-				}
-			} else {
-				return nil, errors.NewFlyteAdminErrorf(codes.NotFound, "subNodeID '%s' not found in the workflow's SubWorkflows", request.SubNodeIds[0])
-			}
-			if !foundSubWorkflowNode {
-				return nil, errors.NewFlyteAdminErrorf(codes.NotFound, "subNodeID '%s' not found in the workflow's SubWorkflows", request.SubNodeIds[0])
-			}
+		if securityContext == nil {
+			securityContext = originalLaunchPlan.GetSpec().GetSecurityContext()
 		}
+	} else {
+		subNode = request.GetSubNodeSpec()
 	}
 
-	workflowModel, err := util.CreateOrGetWorkflowFromNode(ctx, subNode, m.db, m.workflowManager, m.namedEntityManager, workflowIdentifier)
+	workflowModel, err := util.CreateOrGetWorkflowFromNode(ctx, subNode, m.db, m.workflowManager, m.namedEntityManager, request.GetLaunchPlanId())
 	if err != nil {
 		return nil, err
 	}
@@ -751,8 +715,8 @@ func (m *LaunchPlanManager) CreateLaunchPlanFromNode(
 	}
 
 	launchPlan, err := util.CreateOrGetLaunchPlan(ctx, m.db, m.config, workflow.Id,
-		workflow.Closure.CompiledWorkflow.Primary.Template.Interface, workflowModel.ID,
-		originalLaunchPlan.Spec.AuthRole, originalLaunchPlan.Spec.SecurityContext, subNode)
+		workflow.GetClosure().GetCompiledWorkflow().GetPrimary().GetTemplate().GetInterface(), workflowModel.ID,
+		nil, securityContext, subNode)
 	if err != nil {
 		return nil, err
 	}

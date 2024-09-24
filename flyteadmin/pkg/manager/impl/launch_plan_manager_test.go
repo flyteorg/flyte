@@ -2004,8 +2004,14 @@ func TestCreateLaunchPlanFromNode(t *testing.T) {
 			request := testutils.GetLaunchPlanRequest()
 			createLaunchPlanFromNodeRequest := &admin.CreateLaunchPlanFromNodeRequest{
 				LaunchPlanId: request.Id,
-				SubNodeIds: []*admin.SubNodeIdAsList{
-					{SubNodeId: tt.subNodeID},
+				SubNodes: &admin.CreateLaunchPlanFromNodeRequest_SubNodeIds{
+					SubNodeIds: &admin.SubNodeList{
+						SubNodeIds: []*admin.SubNodeIdAsList{
+							{
+								SubNodeId: tt.subNodeID,
+							},
+						},
+					},
 				},
 			}
 
