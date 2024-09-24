@@ -70,7 +70,7 @@ class FlyteUserDashboard(object):
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr='avg((flyte:propeller:all:workflow:success_duration_ms{project=~"$project", domain=~"$domain", wf=~"$workflow"})/1000) by(quantile)',
+                            expr='(avg(flyte:propeller:all:workflow:success_duration_ms{project=~"$project", domain=~"$domain", wf=~"$workflow"}) by(quantile))/1000',
                             refId='A',
                         ),
                     ],
@@ -82,7 +82,7 @@ class FlyteUserDashboard(object):
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr='avg((flyte:propeller:all:workflow:failure_duration_ms{project=~"$project", domain=~"$domain", wf=~"$workflow"})/1000) by(quantile)',
+                            expr='(avg(flyte:propeller:all:workflow:failure_duration_ms{project=~"$project", domain=~"$domain", wf=~"$workflow"}) by(quantile))/1000',
                             refId='A',
                         ),
                     ],
@@ -156,19 +156,18 @@ class FlyteUserDashboard(object):
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr='(100 * max(container_memory_working_set_bytes * on(pod) group_left(label_task_name, label_node_id, label_workflow_name) kube_pod_labels{namespace="$project-$domain",label_workflow_name="$workflow"} * on(pod) group_left(phase) kube_pod_status_phase{phase="Running"}) by (namespace, pod, label_task_name, label_node_id, label_workflow_name) / max(cluster:namespace:pod_memory:active:kube_pod_container_resource_limits{container!=""} * on(pod) group_left(label_task_name, label_node_id, label_workflow_name) kube_pod_labels * on(pod) group_left(phase) kube_pod_status_phase{phase="Running"}) by (namespace, pod, label_task_name, label_node_id, label_workflow_name)) > 0 ',
+                            expr='(100 * (max(container_memory_working_set_bytes{container!=""} * on(pod) group_left(label_task_name, label_node_id, label_workflow_name) kube_pod_labels{namespace=~"$project-$domain",label_workflow_name=~"$workflow"} * on(pod) group_left(phase) kube_pod_status_phase{phase="Running"}) by (namespace, pod, label_task_name, label_node_id, label_workflow_name) / max(cluster:namespace:pod_memory:active:kube_pod_container_resource_limits{container!=""} * on(pod) group_left(label_task_name, label_node_id, label_workflow_name) kube_pod_labels * on(pod) group_left(phase) kube_pod_status_phase{phase="Running"}) by (namespace, pod, label_task_name, label_node_id, label_workflow_name))) > 0',
                             refId='A',
                         ),
-
                     ],
-                      showValue='true',
-                     ),
+                    showValue='true',
+                ),
                 BarChart(
                     title="CPU Usage per Task(%)",
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr='(max(container_cpu_usage_seconds_total * on(pod) group_left(label_task_name, label_node_id, label_workflow_name) kube_pod_labels{namespace=~"$project-$domain",label_workflow_name=~"$workflow"} * on(pod) group_left(phase) kube_pod_status_phase{phase="Running"}) by (namespace, pod, label_task_name, label_node_id, label_workflow_name) / max(cluster:namespace:pod_cpu:active:kube_pod_container_resource_limits * on(pod) group_left(label_task_name, label_node_id, label_workflow_name) kube_pod_labels * on(pod) group_left(phase) kube_pod_status_phase{phase="Running"}) by (namespace, pod, label_task_name, label_node_id, label_workflow_name)) > 0',
+                            expr='(100 * (sum(rate(container_cpu_usage_seconds_total{image!=""}[2m]) * on(pod) group_left(label_task_name, label_node_id, label_workflow_name) kube_pod_labels{namespace=~"$project-$domain",label_workflow_name=~"$workflow"} * on(pod) group_left(phase) kube_pod_status_phase{phase="Running"}) by (namespace, pod, label_task_name, label_node_id, label_workflow_name) / sum(cluster:namespace:pod_cpu:active:kube_pod_container_resource_limits{container!=""} * on(pod) group_left(label_task_name, label_node_id, label_workflow_name) kube_pod_labels * on(pod) group_left(phase) kube_pod_status_phase{phase="Running"}) by (namespace, pod, label_task_name, label_node_id, label_workflow_name))) > 0',
                             refId='A',
                         ),
                     ],
@@ -183,7 +182,7 @@ class FlyteUserDashboard(object):
             collapse=collapse,
             panels=[
                 Graph(
-                    title="User errors",
+                    title="User error rate",
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
@@ -194,7 +193,7 @@ class FlyteUserDashboard(object):
                     yAxes=single_y_axis(format=SHORT_FORMAT),
                 ),
                 Graph(
-                    title="System errors",
+                    title="System error rate",
                     dataSource=DATASOURCE,
                     targets=[
                         Target(

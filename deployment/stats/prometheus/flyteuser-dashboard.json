@@ -626,7 +626,7 @@
           "targets": [
             {
               "datasource": null,
-              "expr": "avg((flyte:propeller:all:workflow:success_duration_ms{project=~\"$project\", domain=~\"$domain\", wf=~\"$workflow\"})/1000) by(quantile)",
+              "expr": "(avg(flyte:propeller:all:workflow:success_duration_ms{project=~\"$project\", domain=~\"$domain\", wf=~\"$workflow\"}) by(quantile))/1000",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -634,7 +634,7 @@
               "intervalFactor": 2,
               "legendFormat": "",
               "metric": "",
-              "query": "avg((flyte:propeller:all:workflow:success_duration_ms{project=~\"$project\", domain=~\"$domain\", wf=~\"$workflow\"})/1000) by(quantile)",
+              "query": "(avg(flyte:propeller:all:workflow:success_duration_ms{project=~\"$project\", domain=~\"$domain\", wf=~\"$workflow\"}) by(quantile))/1000",
               "refId": "A",
               "step": 10,
               "target": ""
@@ -734,7 +734,7 @@
           "targets": [
             {
               "datasource": null,
-              "expr": "avg((flyte:propeller:all:workflow:failure_duration_ms{project=~\"$project\", domain=~\"$domain\", wf=~\"$workflow\"})/1000) by(quantile)",
+              "expr": "(avg(flyte:propeller:all:workflow:failure_duration_ms{project=~\"$project\", domain=~\"$domain\", wf=~\"$workflow\"}) by(quantile))/1000",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -742,7 +742,7 @@
               "intervalFactor": 2,
               "legendFormat": "",
               "metric": "",
-              "query": "avg((flyte:propeller:all:workflow:failure_duration_ms{project=~\"$project\", domain=~\"$domain\", wf=~\"$workflow\"})/1000) by(quantile)",
+              "query": "(avg(flyte:propeller:all:workflow:failure_duration_ms{project=~\"$project\", domain=~\"$domain\", wf=~\"$workflow\"}) by(quantile))/1000",
               "refId": "A",
               "step": 10,
               "target": ""
@@ -1270,7 +1270,7 @@
           "targets": [
             {
               "datasource": null,
-              "expr": "(100 * max(container_memory_working_set_bytes * on(pod) group_left(label_task_name, label_node_id, label_workflow_name) kube_pod_labels{namespace=\"$project-$domain\",label_workflow_name=\"$workflow\"} * on(pod) group_left(phase) kube_pod_status_phase{phase=\"Running\"}) by (namespace, pod, label_task_name, label_node_id, label_workflow_name) / max(cluster:namespace:pod_memory:active:kube_pod_container_resource_limits{container!=\"\"} * on(pod) group_left(label_task_name, label_node_id, label_workflow_name) kube_pod_labels * on(pod) group_left(phase) kube_pod_status_phase{phase=\"Running\"}) by (namespace, pod, label_task_name, label_node_id, label_workflow_name)) > 0 ",
+              "expr": "(100 * (max(container_memory_working_set_bytes{container!=\"\"} * on(pod) group_left(label_task_name, label_node_id, label_workflow_name) kube_pod_labels{namespace=~\"$project-$domain\",label_workflow_name=~\"$workflow\"} * on(pod) group_left(phase) kube_pod_status_phase{phase=\"Running\"}) by (namespace, pod, label_task_name, label_node_id, label_workflow_name) / max(cluster:namespace:pod_memory:active:kube_pod_container_resource_limits{container!=\"\"} * on(pod) group_left(label_task_name, label_node_id, label_workflow_name) kube_pod_labels * on(pod) group_left(phase) kube_pod_status_phase{phase=\"Running\"}) by (namespace, pod, label_task_name, label_node_id, label_workflow_name))) > 0",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -1278,7 +1278,7 @@
               "intervalFactor": 2,
               "legendFormat": "",
               "metric": "",
-              "query": "(100 * max(container_memory_working_set_bytes * on(pod) group_left(label_task_name, label_node_id, label_workflow_name) kube_pod_labels{namespace=\"$project-$domain\",label_workflow_name=\"$workflow\"} * on(pod) group_left(phase) kube_pod_status_phase{phase=\"Running\"}) by (namespace, pod, label_task_name, label_node_id, label_workflow_name) / max(cluster:namespace:pod_memory:active:kube_pod_container_resource_limits{container!=\"\"} * on(pod) group_left(label_task_name, label_node_id, label_workflow_name) kube_pod_labels * on(pod) group_left(phase) kube_pod_status_phase{phase=\"Running\"}) by (namespace, pod, label_task_name, label_node_id, label_workflow_name)) > 0 ",
+              "query": "(100 * (max(container_memory_working_set_bytes{container!=\"\"} * on(pod) group_left(label_task_name, label_node_id, label_workflow_name) kube_pod_labels{namespace=~\"$project-$domain\",label_workflow_name=~\"$workflow\"} * on(pod) group_left(phase) kube_pod_status_phase{phase=\"Running\"}) by (namespace, pod, label_task_name, label_node_id, label_workflow_name) / max(cluster:namespace:pod_memory:active:kube_pod_container_resource_limits{container!=\"\"} * on(pod) group_left(label_task_name, label_node_id, label_workflow_name) kube_pod_labels * on(pod) group_left(phase) kube_pod_status_phase{phase=\"Running\"}) by (namespace, pod, label_task_name, label_node_id, label_workflow_name))) > 0",
               "refId": "A",
               "step": 10,
               "target": ""
@@ -1372,7 +1372,7 @@
           "targets": [
             {
               "datasource": null,
-              "expr": "(max(container_cpu_usage_seconds_total * on(pod) group_left(label_task_name, label_node_id, label_workflow_name) kube_pod_labels{namespace=~\"$project-$domain\",label_workflow_name=~\"$workflow\"} * on(pod) group_left(phase) kube_pod_status_phase{phase=\"Running\"}) by (namespace, pod, label_task_name, label_node_id, label_workflow_name) / max(cluster:namespace:pod_cpu:active:kube_pod_container_resource_limits * on(pod) group_left(label_task_name, label_node_id, label_workflow_name) kube_pod_labels * on(pod) group_left(phase) kube_pod_status_phase{phase=\"Running\"}) by (namespace, pod, label_task_name, label_node_id, label_workflow_name)) > 0",
+              "expr": "(100 * (sum(rate(container_cpu_usage_seconds_total{image!=\"\"}[2m]) * on(pod) group_left(label_task_name, label_node_id, label_workflow_name) kube_pod_labels{namespace=~\"$project-$domain\",label_workflow_name=~\"$workflow\"} * on(pod) group_left(phase) kube_pod_status_phase{phase=\"Running\"}) by (namespace, pod, label_task_name, label_node_id, label_workflow_name) / sum(cluster:namespace:pod_cpu:active:kube_pod_container_resource_limits{container!=\"\"} * on(pod) group_left(label_task_name, label_node_id, label_workflow_name) kube_pod_labels * on(pod) group_left(phase) kube_pod_status_phase{phase=\"Running\"}) by (namespace, pod, label_task_name, label_node_id, label_workflow_name))) > 0",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -1380,7 +1380,7 @@
               "intervalFactor": 2,
               "legendFormat": "",
               "metric": "",
-              "query": "(max(container_cpu_usage_seconds_total * on(pod) group_left(label_task_name, label_node_id, label_workflow_name) kube_pod_labels{namespace=~\"$project-$domain\",label_workflow_name=~\"$workflow\"} * on(pod) group_left(phase) kube_pod_status_phase{phase=\"Running\"}) by (namespace, pod, label_task_name, label_node_id, label_workflow_name) / max(cluster:namespace:pod_cpu:active:kube_pod_container_resource_limits * on(pod) group_left(label_task_name, label_node_id, label_workflow_name) kube_pod_labels * on(pod) group_left(phase) kube_pod_status_phase{phase=\"Running\"}) by (namespace, pod, label_task_name, label_node_id, label_workflow_name)) > 0",
+              "query": "(100 * (sum(rate(container_cpu_usage_seconds_total{image!=\"\"}[2m]) * on(pod) group_left(label_task_name, label_node_id, label_workflow_name) kube_pod_labels{namespace=~\"$project-$domain\",label_workflow_name=~\"$workflow\"} * on(pod) group_left(phase) kube_pod_status_phase{phase=\"Running\"}) by (namespace, pod, label_task_name, label_node_id, label_workflow_name) / sum(cluster:namespace:pod_cpu:active:kube_pod_container_resource_limits{container!=\"\"} * on(pod) group_left(label_task_name, label_node_id, label_workflow_name) kube_pod_labels * on(pod) group_left(phase) kube_pod_status_phase{phase=\"Running\"}) by (namespace, pod, label_task_name, label_node_id, label_workflow_name))) > 0",
               "refId": "A",
               "step": 10,
               "target": ""
@@ -1490,7 +1490,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "User errors",
+          "title": "User error rate",
           "tooltip": {
             "msResolution": true,
             "shared": true,
@@ -1618,7 +1618,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "System errors",
+          "title": "System error rate",
           "tooltip": {
             "msResolution": true,
             "shared": true,
