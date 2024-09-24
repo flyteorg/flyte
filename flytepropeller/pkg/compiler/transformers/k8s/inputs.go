@@ -35,7 +35,13 @@ func validateInputs(nodeID common.NodeID, iface *core.TypedInterface, inputs cor
 			continue
 		}
 
-		inputType := validators.LiteralTypeForLiteral(inputVal)
+		var inputType *core.LiteralType
+		switch inputVal.GetValue().(type) {
+		case *core.Literal_OffloadedMetadata:
+			inputType = inputVal.GetOffloadedMetadata().GetInferredType()
+		default:
+			inputType = validators.LiteralTypeForLiteral(inputVal)
+		}
 		if inputType == nil {
 			errs.Collect(errors.NewIDLTypeNotFoundErr(nodeID))
 			continue

@@ -271,7 +271,7 @@ func GetDbFilters(spec FilterSpec, primaryEntity common.Entity) ([]common.Inline
 }
 
 func GetWorkflowExecutionIdentifierFilters(
-	ctx context.Context, workflowExecutionIdentifier core.WorkflowExecutionIdentifier) ([]common.InlineFilter, error) {
+	ctx context.Context, workflowExecutionIdentifier *core.WorkflowExecutionIdentifier) ([]common.InlineFilter, error) {
 	identifierFilters := make([]common.InlineFilter, 3)
 	identifierProjectFilter, err := GetSingleValueEqualityFilter(
 		common.Execution, shared.Project, workflowExecutionIdentifier.Project)
@@ -304,9 +304,9 @@ func GetWorkflowExecutionIdentifierFilters(
 
 // All inputs to this function must be validated.
 func GetNodeExecutionIdentifierFilters(
-	ctx context.Context, nodeExecutionIdentifier core.NodeExecutionIdentifier) ([]common.InlineFilter, error) {
+	ctx context.Context, nodeExecutionIdentifier *core.NodeExecutionIdentifier) ([]common.InlineFilter, error) {
 	workflowExecutionIdentifierFilters, err :=
-		GetWorkflowExecutionIdentifierFilters(ctx, *nodeExecutionIdentifier.ExecutionId)
+		GetWorkflowExecutionIdentifierFilters(ctx, nodeExecutionIdentifier.ExecutionId)
 	if err != nil {
 		return nil, err
 	}

@@ -52,7 +52,7 @@ func getWorkflowContext(ctx context.Context, identifier *core.Identifier) contex
 	return contextutils.WithWorkflowID(ctx, identifier.Name)
 }
 
-func (w *WorkflowManager) setDefaults(request admin.WorkflowCreateRequest) (admin.WorkflowCreateRequest, error) {
+func (w *WorkflowManager) setDefaults(request *admin.WorkflowCreateRequest) (*admin.WorkflowCreateRequest, error) {
 	// TODO: Also add environment and configuration defaults once those have been determined.
 	if request.Id == nil {
 		return request, errors.NewFlyteAdminError(codes.InvalidArgument, "missing identifier for WorkflowCreateRequest")
@@ -62,13 +62,13 @@ func (w *WorkflowManager) setDefaults(request admin.WorkflowCreateRequest) (admi
 }
 
 func (w *WorkflowManager) getCompiledWorkflow(
-	ctx context.Context, request admin.WorkflowCreateRequest) (admin.WorkflowClosure, error) {
+	ctx context.Context, request *admin.WorkflowCreateRequest) (*admin.WorkflowClosure, error) {
 	reqs, err := w.compiler.GetRequirements(request.Spec.Template, request.Spec.SubWorkflows)
 	if err != nil {
 		w.metrics.CompilationFailures.Inc()
 		logger.Errorf(ctx, "Failed to get workflow requirements for template [%+v] with err %v",
 			request.Spec.Template, err)
-		return admin.WorkflowClosure{}, err
+		return &admin.WorkflowClosure{}, err
 	}
 
 	var tasks = make([]*core.CompiledTask, len(reqs.GetRequiredTaskIds()))
@@ -77,7 +77,7 @@ func (w *WorkflowManager) getCompiledWorkflow(
 		if err != nil {
 			logger.Debugf(ctx, "Failed to get task with id [%+v] when compiling workflow with id [%+v] with err %v",
 				taskID, request.Id, err)
-			return admin.WorkflowClosure{}, err
+			return &admin.WorkflowClosure{}, err
 		}
 		tasks[idx] = task.Closure.CompiledTask
 	}
@@ -89,14 +89,14 @@ func (w *WorkflowManager) getCompiledWorkflow(
 		if err != nil {
 			logger.Debugf(ctx, "Failed to get launch plan with id [%+v] when compiling workflow with id [%+v] with err %v",
 				launchPlanID, request.Id, err)
-			return admin.WorkflowClosure{}, err
+			return &admin.WorkflowClosure{}, err
 		}
 		var launchPlanInterfaceProvider workflowengine.InterfaceProvider
 		launchPlanInterfaceProvider, err = workflowengine.NewLaunchPlanInterfaceProvider(launchPlanModel, launchPlanID)
 		if err != nil {
 			logger.Debugf(ctx, "Failed to create LaunchPlanInterfaceProvider for launch plan [%+v] with err %v",
 				launchPlanModel, err)
-			return admin.WorkflowClosure{}, err
+			return &admin.WorkflowClosure{}, err
 		}
 		launchPlans[idx] = launchPlanInterfaceProvider
 	}
@@ -105,14 +105,14 @@ func (w *WorkflowManager) getCompiledWorkflow(
 	if err != nil {
 		w.metrics.CompilationFailures.Inc()
 		logger.Debugf(ctx, "Failed to compile workflow with id [%+v] with err %v", request.Id, err)
-		return admin.WorkflowClosure{}, err
+		return &admin.WorkflowClosure{}, err
 	}
 	createdAt, err := ptypes.TimestampProto(time.Now())
 	if err != nil {
-		return admin.WorkflowClosure{}, errors.NewFlyteAdminErrorf(codes.Internal,
+		return &admin.WorkflowClosure{}, errors.NewFlyteAdminErrorf(codes.Internal,
 			"Failed to serialize CreatedAt: %v when saving compiled workflow %+v", err, request.Id)
 	}
-	return admin.WorkflowClosure{
+	return &admin.WorkflowClosure{
 		CompiledWorkflow: closure,
 		CreatedAt:        createdAt,
 	}, nil
@@ -132,7 +132,7 @@ func (w *WorkflowManager) createDataReference(
 
 func (w *WorkflowManager) CreateWorkflow(
 	ctx context.Context,
-	request admin.WorkflowCreateRequest) (*admin.WorkflowCreateResponse, error) {
+	request *admin.WorkflowCreateRequest) (*admin.WorkflowCreateResponse, error) {
 	if err := validation.ValidateWorkflow(ctx, request, w.db, w.config.ApplicationConfiguration()); err != nil {
 		return nil, err
 	}
@@ -150,7 +150,7 @@ func (w *WorkflowManager) CreateWorkflow(
 			"failed to compile workflow for [%+v] with err: %v", request.Id, err)
 	}
 	err = validation.ValidateCompiledWorkflow(
-		*request.Id, workflowClosure, w.config.RegistrationValidationConfiguration())
+		request.Id, workflowClosure, w.config.RegistrationValidationConfiguration())
 	if err != nil {
 		return nil, err
 	}
@@ -161,12 +161,12 @@ func (w *WorkflowManager) CreateWorkflow(
 	}
 
 	// Assert that a matching workflow doesn't already exist before uploading the workflow closure.
-	existingWorkflowModel, err := util.GetWorkflowModel(ctx, w.db, *request.Id)
+	existingWorkflowModel, err := util.GetWorkflowModel(ctx, w.db, request.Id)
 	// Check that no identical or conflicting workflows exist.
 	if err == nil {
 		// A workflow's structure is uniquely defined by its collection of nodes.
 		if bytes.Equal(workflowDigest, existingWorkflowModel.Digest) {
-			return nil, errors.NewWorkflowExistsIdenticalStructureError(ctx, &request)
+			return nil, errors.NewWorkflowExistsIdenticalStructureError(ctx, request)
 		}
 		existingWorkflow, transformerErr := transformers.FromWorkflowModel(existingWorkflowModel)
 		if transformerErr != nil {
@@ -174,7 +174,7 @@ func (w *WorkflowManager) CreateWorkflow(
 			return nil, transformerErr
 		}
 		// A workflow exists with different structure
-		return nil, errors.NewWorkflowExistsDifferentStructureError(ctx, &request, existingWorkflow.Closure.GetCompiledWorkflow(), workflowClosure.GetCompiledWorkflow())
+		return nil, errors.NewWorkflowExistsDifferentStructureError(ctx, request, existingWorkflow.Closure.GetCompiledWorkflow(), workflowClosure.GetCompiledWorkflow())
 	} else if flyteAdminError, ok := err.(errors.FlyteAdminError); !ok || flyteAdminError.Code() != codes.NotFound {
 		logger.Debugf(ctx, "Failed to get workflow for comparison in CreateWorkflow with ID [%+v] with err %v",
 			request.Id, err)
@@ -188,7 +188,7 @@ func (w *WorkflowManager) CreateWorkflow(
 		return nil, errors.NewFlyteAdminErrorf(codes.Internal,
 			"failed to construct data reference for workflow closure with id [%+v] and err %v", request.Id, err)
 	}
-	err = w.storageClient.WriteProtobuf(ctx, remoteClosureDataRef, defaultStorageOptions, &workflowClosure)
+	err = w.storageClient.WriteProtobuf(ctx, remoteClosureDataRef, defaultStorageOptions, workflowClosure)
 
 	if err != nil {
 		logger.Infof(ctx,
@@ -207,7 +207,7 @@ func (w *WorkflowManager) CreateWorkflow(
 			finalizedRequest, remoteClosureDataRef.String(), err)
 		return nil, err
 	}
-	descriptionModel, err := transformers.CreateDescriptionEntityModel(request.Spec.Description, *request.Id)
+	descriptionModel, err := transformers.CreateDescriptionEntityModel(request.Spec.Description, request.Id)
 	if err != nil {
 		logger.Errorf(ctx,
 			"Failed to transform description model [%+v] with err: %v", request.Spec.Description, err)
@@ -225,13 +225,13 @@ func (w *WorkflowManager) CreateWorkflow(
 	return &admin.WorkflowCreateResponse{}, nil
 }
 
-func (w *WorkflowManager) GetWorkflow(ctx context.Context, request admin.ObjectGetRequest) (*admin.Workflow, error) {
+func (w *WorkflowManager) GetWorkflow(ctx context.Context, request *admin.ObjectGetRequest) (*admin.Workflow, error) {
 	if err := validation.ValidateIdentifier(request.Id, common.Workflow); err != nil {
 		logger.Debugf(ctx, "invalid identifier [%+v]: %v", request.Id, err)
 		return nil, err
 	}
 	ctx = getWorkflowContext(ctx, request.Id)
-	workflow, err := util.GetWorkflow(ctx, w.db, w.storageClient, *request.Id)
+	workflow, err := util.GetWorkflow(ctx, w.db, w.storageClient, request.Id)
 	if err != nil {
 		logger.Infof(ctx, "Failed to get workflow with id [%+v] with err %v", request.Id, err)
 		return nil, err
@@ -241,7 +241,7 @@ func (w *WorkflowManager) GetWorkflow(ctx context.Context, request admin.ObjectG
 
 // ListWorkflows returns workflows *without* a populated workflow closure.
 func (w *WorkflowManager) ListWorkflows(
-	ctx context.Context, request admin.ResourceListRequest) (*admin.WorkflowList, error) {
+	ctx context.Context, request *admin.ResourceListRequest) (*admin.WorkflowList, error) {
 	// Check required fields
 	if err := validation.ValidateResourceListRequest(request); err != nil {
 		return nil, err
@@ -295,7 +295,7 @@ func (w *WorkflowManager) ListWorkflows(
 	}, nil
 }
 
-func (w *WorkflowManager) ListWorkflowIdentifiers(ctx context.Context, request admin.NamedEntityIdentifierListRequest) (
+func (w *WorkflowManager) ListWorkflowIdentifiers(ctx context.Context, request *admin.NamedEntityIdentifierListRequest) (
 	*admin.NamedEntityIdentifierList, error) {
 	if err := validation.ValidateNamedEntityIdentifierListRequest(request); err != nil {
 		logger.Debugf(ctx, "invalid request [%+v]: %v", request, err)

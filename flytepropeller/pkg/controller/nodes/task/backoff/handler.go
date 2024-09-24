@@ -195,8 +195,12 @@ func IsResourceQuotaExceeded(err error) bool {
 	return apiErrors.IsForbidden(err) && strings.Contains(err.Error(), "exceeded quota")
 }
 
+func IsEtcdError(err error) bool {
+	return apiErrors.IsForbidden(err) && strings.Contains(err.Error(), "etcdserver:")
+}
+
 func IsBackOffError(err error) bool {
-	return IsResourceQuotaExceeded(err) || apiErrors.IsTooManyRequests(err) || apiErrors.IsServerTimeout(err)
+	return IsResourceQuotaExceeded(err) || apiErrors.IsTooManyRequests(err) || apiErrors.IsServerTimeout(err) || IsEtcdError(err)
 }
 
 func GetComputeResourceAndQuantity(err error, resourceRegex *regexp.Regexp) v1.ResourceList {

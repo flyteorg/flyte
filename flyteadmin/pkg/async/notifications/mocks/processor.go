@@ -29,7 +29,7 @@ func (m *MockSubscriber) Stop() error {
 	return nil
 }
 
-type SendEmailFunc func(ctx context.Context, email admin.EmailMessage) error
+type SendEmailFunc func(ctx context.Context, email *admin.EmailMessage) error
 
 type MockEmailer struct {
 	sendEmailFunc SendEmailFunc
@@ -39,7 +39,7 @@ func (m *MockEmailer) SetSendEmailFunc(sendEmail SendEmailFunc) {
 	m.sendEmailFunc = sendEmail
 }
 
-func (m *MockEmailer) SendEmail(ctx context.Context, email admin.EmailMessage) error {
+func (m *MockEmailer) SendEmail(ctx context.Context, email *admin.EmailMessage) error {
 	if m.sendEmailFunc != nil {
 		return m.sendEmailFunc(ctx, email)
 	}

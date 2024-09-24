@@ -139,7 +139,7 @@ Specify agent configuration
           kubectl edit configmap flyte-sandbox-config -n flyte
 
         .. code-block:: yaml
-          :emphasize-lines: 7,12,16
+          :emphasize-lines: 7,12
 
           tasks:
             task-plugins:
@@ -147,23 +147,19 @@ Specify agent configuration
                 container: container
                 container_array: k8s-array
                 sidecar: sidecar
-                spark: agent-service
+                databricks: agent-service
               enabled-plugins:
                 - container
                 - sidecar
                 - k8s-array
                 - agent-service
-          plugins:
-            agent-service:
-              supportedTaskTypes:
-              - spark
 
       .. group-tab:: Helm chart
 
         Edit the relevant YAML file to specify the plugin.
 
         .. code-block:: yaml
-          :emphasize-lines: 7,11,15
+          :emphasize-lines: 7,11
 
           tasks:
             task-plugins:
@@ -175,18 +171,14 @@ Specify agent configuration
               default-for-task-types:
                 - container: container
                 - container_array: k8s-array
-                - spark: agent-service
-            plugins:
-              agent-service:
-                supportedTaskTypes:
-                - spark
+                - databricks: agent-service
 
   .. group-tab:: Flyte core
 
     Create a file named ``values-override.yaml`` and add the following config to it:
 
     .. code-block:: yaml
-      :emphasize-lines: 9,14-17
+      :emphasize-lines: 9
 
         enabled_plugins:
           tasks:
@@ -200,56 +192,32 @@ Specify agent configuration
                 container: container
                 sidecar: sidecar
                 container_array: k8s-array
-                spark: agent-service
-          plugins:
-            agent-service:
-              supportedTaskTypes:
-              - spark
+                databricks: agent-service
 
 Add the Databricks access token
 -------------------------------
 
 You have to set the Databricks token to the Flyte configuration.
 
-1. Install flyteagent pod using helm
+1. Install the flyteagent pod using helm
   
 .. code-block::
   
   helm repo add flyteorg https://flyteorg.github.io/flyte
   helm install flyteagent flyteorg/flyteagent --namespace flyte
 
-2. Get the base64 value of your Databricks token.
+2. Set Your Databricks Token as a Secret (Base64 Encoded):
 
-.. code-block::
+.. code-block:: bash
 
-  echo -n "<DATABRICKS_TOKEN>" | base64
+  SECRET_VALUE=$(echo -n "<DATABRICKS_TOKEN>" | base64) && \
+  kubectl patch secret flyteagent -n flyte --patch "{\"data\":{\"flyte_databricks_access_token\":\"$SECRET_VALUE\"}}"
 
-3. Edit the flyteagent secret
-  
-      .. code-block:: bash
-    
-        kubectl edit secret flyteagent -n flyte
-    
-      .. code-block:: yaml
-        :emphasize-lines: 3
+3. Restart development:
 
-        apiVersion: v1
-        data:
-          flyte_databricks_access_token: <BASE64_ENCODED_DATABRICKS_TOKEN>
-        kind: Secret
-        metadata:
-          annotations:
-            meta.helm.sh/release-name: flyteagent
-            meta.helm.sh/release-namespace: flyte
-          creationTimestamp: "2023-10-04T04:09:03Z"
-          labels:
-            app.kubernetes.io/managed-by: Helm
-          name: flyteagent
-          namespace: flyte
-          resourceVersion: "753"
-          uid: 5ac1e1b6-2a4c-4e26-9001-d4ba72c39e54
-        type: Opaque
+.. code-block:: bash
 
+  kubectl rollout restart deployment flyteagent -n flyte
 
 Upgrade the deployment
 ----------------------

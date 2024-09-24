@@ -42,7 +42,7 @@ func ValidateUnderlyingInterface(w c.WorkflowBuilder, node c.NodeBuilder, errs e
 	case *core.Node_TaskNode:
 		if node.GetTaskNode().GetReferenceId() == nil {
 			errs.Collect(errors.NewValueRequiredErr(node.GetId(), "TaskNode.ReferenceId"))
-		} else if task, taskOk := w.GetTask(*node.GetTaskNode().GetReferenceId()); taskOk {
+		} else if task, taskOk := w.GetTask(node.GetTaskNode().GetReferenceId()); taskOk {
 			iface = task.GetInterface()
 			if iface == nil {
 				// Default value for no interface is nil, initialize an empty interface
@@ -61,7 +61,7 @@ func ValidateUnderlyingInterface(w c.WorkflowBuilder, node c.NodeBuilder, errs e
 				errs.Collect(errors.NewValueRequiredErr(node.GetId(), "WorkflowNode.Interface"))
 			}
 		} else if node.GetWorkflowNode().GetLaunchplanRef() != nil {
-			if launchPlan, launchPlanOk := w.GetLaunchPlan(*node.GetWorkflowNode().GetLaunchplanRef()); launchPlanOk {
+			if launchPlan, launchPlanOk := w.GetLaunchPlan(node.GetWorkflowNode().GetLaunchplanRef()); launchPlanOk {
 				inputs := launchPlan.GetExpectedInputs()
 				if inputs == nil {
 					errs.Collect(errors.NewValueRequiredErr(node.GetId(), "WorkflowNode.ExpectedInputs"))
@@ -97,7 +97,7 @@ func ValidateUnderlyingInterface(w c.WorkflowBuilder, node c.NodeBuilder, errs e
 					fmt.Sprintf("%v", node.GetWorkflowNode().GetLaunchplanRef())))
 			}
 		} else if node.GetWorkflowNode().GetSubWorkflowRef() != nil {
-			if wf, wfOk := w.GetSubWorkflow(*node.GetWorkflowNode().GetSubWorkflowRef()); wfOk {
+			if wf, wfOk := w.GetSubWorkflow(node.GetWorkflowNode().GetSubWorkflowRef()); wfOk {
 				if wf.Template == nil {
 					errs.Collect(errors.NewValueRequiredErr(node.GetId(), "WorkflowNode.Template"))
 				} else {

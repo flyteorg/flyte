@@ -27,7 +27,7 @@ var acceptedReferenceLaunchTypes = map[core.ResourceType]interface{}{
 	core.ResourceType_TASK:        nil,
 }
 
-func ValidateExecutionRequest(ctx context.Context, request admin.ExecutionCreateRequest,
+func ValidateExecutionRequest(ctx context.Context, request *admin.ExecutionCreateRequest,
 	db repositoryInterfaces.Repository, config runtimeInterfaces.ApplicationConfiguration) error {
 	if err := ValidateEmptyStringField(request.Project, shared.Project); err != nil {
 		return err
@@ -101,7 +101,13 @@ func CheckAndFetchInputsForExecution(
 			}
 			executionInputMap[name] = expectedInput.GetDefault()
 		} else {
-			inputType := validators.LiteralTypeForLiteral(executionInputMap[name])
+			var inputType *core.LiteralType
+			switch executionInputMap[name].GetValue().(type) {
+			case *core.Literal_OffloadedMetadata:
+				inputType = executionInputMap[name].GetOffloadedMetadata().GetInferredType()
+			default:
+				inputType = validators.LiteralTypeForLiteral(executionInputMap[name])
+			}
 			if inputType == nil {
 				return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 					fmt.Sprintf(
@@ -147,7 +153,7 @@ func CheckValidExecutionID(executionID, fieldName string) error {
 	return nil
 }
 
-func ValidateCreateWorkflowEventRequest(request admin.WorkflowExecutionEventRequest, maxOutputSizeInBytes int64) error {
+func ValidateCreateWorkflowEventRequest(request *admin.WorkflowExecutionEventRequest, maxOutputSizeInBytes int64) error {
 	if request.Event == nil {
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 			"Workflow event handler was called without event")

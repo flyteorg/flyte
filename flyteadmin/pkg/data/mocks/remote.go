@@ -9,14 +9,14 @@ import (
 
 // Mock implementation of a RemoteURLInterface
 type MockRemoteURL struct {
-	GetCallback func(ctx context.Context, uri string) (admin.UrlBlob, error)
+	GetCallback func(ctx context.Context, uri string) (*admin.UrlBlob, error)
 }
 
-func (m *MockRemoteURL) Get(ctx context.Context, uri string) (admin.UrlBlob, error) {
+func (m *MockRemoteURL) Get(ctx context.Context, uri string) (*admin.UrlBlob, error) {
 	if m.GetCallback != nil {
 		return m.GetCallback(ctx, uri)
 	}
-	return admin.UrlBlob{}, nil
+	return &admin.UrlBlob{}, nil
 }
 
 func NewMockRemoteURL() interfaces.RemoteURLInterface {

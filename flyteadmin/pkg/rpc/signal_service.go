@@ -7,8 +7,6 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/prometheus/client_golang/prometheus"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 
 	manager "github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
@@ -91,13 +89,10 @@ func (s *SignalService) interceptPanic(ctx context.Context, request proto.Messag
 func (s *SignalService) GetOrCreateSignal(
 	ctx context.Context, request *admin.SignalGetOrCreateRequest) (*admin.Signal, error) {
 	defer s.interceptPanic(ctx, request)
-	if request == nil {
-		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
-	}
 	var response *admin.Signal
 	var err error
 	s.metrics.create.Time(func() {
-		response, err = s.signalManager.GetOrCreateSignal(ctx, *request)
+		response, err = s.signalManager.GetOrCreateSignal(ctx, request)
 	})
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &s.metrics.create)
@@ -109,13 +104,10 @@ func (s *SignalService) GetOrCreateSignal(
 func (s *SignalService) ListSignals(
 	ctx context.Context, request *admin.SignalListRequest) (*admin.SignalList, error) {
 	defer s.interceptPanic(ctx, request)
-	if request == nil {
-		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
-	}
 	var response *admin.SignalList
 	var err error
 	s.metrics.get.Time(func() {
-		response, err = s.signalManager.ListSignals(ctx, *request)
+		response, err = s.signalManager.ListSignals(ctx, request)
 	})
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &s.metrics.get)
@@ -127,13 +119,10 @@ func (s *SignalService) ListSignals(
 func (s *SignalService) SetSignal(
 	ctx context.Context, request *admin.SignalSetRequest) (*admin.SignalSetResponse, error) {
 	defer s.interceptPanic(ctx, request)
-	if request == nil {
-		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
-	}
 	var response *admin.SignalSetResponse
 	var err error
 	s.metrics.get.Time(func() {
-		response, err = s.signalManager.SetSignal(ctx, *request)
+		response, err = s.signalManager.SetSignal(ctx, request)
 	})
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &s.metrics.get)

@@ -29,7 +29,7 @@ var clusterReassignablePhases = sets.NewString(core.WorkflowExecution_UNDEFINED.
 
 // CreateExecutionModelInput encapsulates request parameters for calls to CreateExecutionModel.
 type CreateExecutionModelInput struct {
-	WorkflowExecutionID   core.WorkflowExecutionIdentifier
+	WorkflowExecutionID   *core.WorkflowExecutionIdentifier
 	RequestSpec           *admin.ExecutionSpec
 	LaunchPlanID          uint
 	WorkflowID            uint
@@ -207,7 +207,7 @@ func reassignCluster(ctx context.Context, cluster string, executionID *core.Work
 // Updates an existing model given a WorkflowExecution event.
 func UpdateExecutionModelState(
 	ctx context.Context,
-	execution *models.Execution, request admin.WorkflowExecutionEventRequest,
+	execution *models.Execution, request *admin.WorkflowExecutionEventRequest,
 	inlineEventDataPolicy interfaces.InlineEventDataPolicy, storageClient *storage.DataStore) error {
 	var executionClosure admin.ExecutionClosure
 	err := proto.Unmarshal(execution.Closure, &executionClosure)

@@ -41,25 +41,10 @@ flytectl demo start --dev
 pyflyte serve agent
 ```
 
-3. Update the config for the task handled by the agent in the single binary yaml file.
+3. (Optional) Update the timeout configuration for each request to the agent deployment in the single binary YAML file:
 ```bash
 cd flyte
 vim ./flyte-single-binary-local.yaml
-```
-
-```yaml
-:emphasize-lines: 9
-tasks:
-  task-plugins:
-    enabled-plugins:
-      - agent-service
-      - container
-      - sidecar
-      - K8S-ARRAY
-    default-for-task-types:
-      - sensor: agent-service
-      - container: container
-      - container_array: K8S-ARRAY
 ```
 ```yaml
 plugins:

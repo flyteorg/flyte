@@ -159,29 +159,15 @@ For flytekit versions `>v1.10.2`, use `pyflyte serve agent`.
 
 ### 4. Deploy Your Flyte agent
 
-1. Update the FlyteAgent deployment's [image](https://github.com/flyteorg/flyte/blob/master/charts/flyteagent/templates/agent/deployment.yaml#L35)
+Update the FlyteAgent deployment's [image](https://github.com/flyteorg/flyte/blob/master/charts/flyteagent/templates/agent/deployment.yaml#L35)
 
 ```bash
 kubectl set image deployment/flyteagent flyteagent=ghcr.io/flyteorg/flyteagent:latest
 ```
 
-2. Update the FlytePropeller configmap:
-
-```YAML
- tasks:
-   task-plugins:
-     enabled-plugins:
-       - agent-service
-     default-for-task-types:
-       - bigquery_query_job_task: agent-service
-       - custom_task: agent-service
-```
-
-3. Restart FlytePropeller:
-
-```
-kubectl rollout restart deployment flytepropeller -n flyte
-```
+:::{note}
+Please make sure your propeller's image version is >= 1.13.0 so that the propeller can automatically fetch the supported task types from your agent deployment.
+:::
 
 ### 5. Canary deployment
 
@@ -197,10 +183,6 @@ you can route particular task requests to designated agent services by adjusting
 ```yaml
  plugins:
    agent-service:
-     supportedTaskTypes:
-       - bigquery_query_job_task
-       - default_task
-       - custom_task
      # By default, all requests will be sent to the default agent.
      defaultAgent:
        endpoint: "dns:///flyteagent.flyte.svc.cluster.local:8000"
