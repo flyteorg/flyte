@@ -17,7 +17,10 @@ import (
 	"github.com/unionai/flyte/fasttask/plugin/pb"
 )
 
-var maxPendingOwnersPerQueue = 100
+const (
+	maxPendingOwnersPerQueue = 100
+	queueIdLabel             = "queue_id"
+)
 
 //go:generate mockery -all -case=underscore
 
@@ -70,8 +73,12 @@ type serviceMetrics struct {
 	taskNoWorkersAvailable  prometheus.Counter
 	taskNoCapacityAvailable prometheus.Counter
 	taskAssigned            prometheus.Counter
-	queues                  prometheus.Gauge
-	workers                 prometheus.Gauge
+	queues                  *prometheus.Desc
+	workers                 *prometheus.Desc
+	executions              *prometheus.Desc
+	executionsLimit         *prometheus.Desc
+	backlog                 *prometheus.Desc
+	backlogLimit            *prometheus.Desc
 }
 
 // newServiceMetrics creates a new serviceMetrics with the given scope.
@@ -80,8 +87,51 @@ func newServiceMetrics(scope promutils.Scope) serviceMetrics {
 		taskNoWorkersAvailable:  scope.MustNewCounter("task_no_workers_available", "Count of task assignment attempts with no workers available"),
 		taskNoCapacityAvailable: scope.MustNewCounter("task_no_capacity_available", "Count of task assignment attempts with no capacity available"),
 		taskAssigned:            scope.MustNewCounter("task_assigned", "Count of task assignments"),
-		queues:                  scope.MustNewGauge("queues", "Current number of queues"),
-		workers:                 scope.MustNewGauge("workers", "Current number of workers"),
+		queues:                  prometheus.NewDesc(scope.NewScopedMetricName("queues"), "Current number of queues", nil, nil),
+		workers:                 prometheus.NewDesc(scope.NewScopedMetricName("workers"), "Current number of workers per queue", []string{queueIdLabel}, nil),
+		executions:              prometheus.NewDesc(scope.NewScopedMetricName("executions"), "Current number of task executions per queue", []string{queueIdLabel}, nil),
+		executionsLimit:         prometheus.NewDesc(scope.NewScopedMetricName("executions_limit"), "Total executions limit per queue", []string{queueIdLabel}, nil),
+		backlog:                 prometheus.NewDesc(scope.NewScopedMetricName("backlog"), "Current number of backlogged tasks per queue", []string{queueIdLabel}, nil),
+		backlogLimit:            prometheus.NewDesc(scope.NewScopedMetricName("backlog_limit"), "Total backlog limit per queue", []string{queueIdLabel}, nil),
+	}
+}
+
+func (f *fastTaskServiceImpl) Describe(ch chan<- *prometheus.Desc) {
+	ch <- f.metrics.queues
+	ch <- f.metrics.workers
+	ch <- f.metrics.executions
+	ch <- f.metrics.executionsLimit
+	ch <- f.metrics.backlog
+	ch <- f.metrics.backlogLimit
+}
+
+// Collect emits snapshot metrics for the fasttask service. This is useful to periodically capture the state of queues and workers.
+func (f *fastTaskServiceImpl) Collect(ch chan<- prometheus.Metric) {
+	logger.Info(context.Background(), "Collecting fasttask service metrics")
+	f.queuesLock.RLock()
+	defer f.queuesLock.RUnlock()
+
+	ch <- prometheus.MustNewConstMetric(f.metrics.queues, prometheus.GaugeValue, float64(len(f.queues)))
+	for queueID, queue := range f.queues {
+		queue.lock.RLock()
+
+		executions := int32(0)
+		executionsLimit := int32(0)
+		backlog := int32(0)
+		backlogLimit := int32(0)
+		for _, worker := range queue.workers {
+			executions += worker.capacity.GetExecutionCount()
+			executionsLimit += worker.capacity.GetExecutionLimit()
+			backlog += worker.capacity.GetBacklogCount()
+			backlogLimit += worker.capacity.GetBacklogLimit()
+		}
+		ch <- prometheus.MustNewConstMetric(f.metrics.workers, prometheus.GaugeValue, float64(len(queue.workers)), queueID)
+		ch <- prometheus.MustNewConstMetric(f.metrics.executionsLimit, prometheus.GaugeValue, float64(executionsLimit), queueID)
+		ch <- prometheus.MustNewConstMetric(f.metrics.executions, prometheus.GaugeValue, float64(executions), queueID)
+		ch <- prometheus.MustNewConstMetric(f.metrics.backlog, prometheus.GaugeValue, float64(backlog), queueID)
+		ch <- prometheus.MustNewConstMetric(f.metrics.backlogLimit, prometheus.GaugeValue, float64(backlogLimit), queueID)
+
+		queue.lock.RUnlock()
 	}
 }
 
@@ -195,14 +245,12 @@ func (f *fastTaskServiceImpl) addWorkerToQueue(queueID string, worker *Worker) *
 			workers: make(map[string]*Worker),
 		}
 		f.queues[queueID] = queue
-		f.metrics.queues.Inc()
 	}
 
 	queue.lock.Lock()
 	defer queue.lock.Unlock()
 
 	queue.workers[worker.workerID] = worker
-	f.metrics.workers.Inc()
 	return queue
 }
 
@@ -220,10 +268,8 @@ func (f *fastTaskServiceImpl) removeWorkerFromQueue(queueID, workerID string) {
 	defer queue.lock.Unlock()
 
 	delete(queue.workers, workerID)
-	f.metrics.workers.Dec()
 	if len(queue.workers) == 0 {
 		delete(f.queues, queueID)
-		f.metrics.queues.Dec()
 	}
 }
 
@@ -426,10 +472,12 @@ func (f *fastTaskServiceImpl) Cleanup(ctx context.Context, taskID, queueID, work
 
 // newFastTaskService creates a new fastTaskServiceImpl.
 func newFastTaskService(enqueueOwner core.EnqueueOwner, scope promutils.Scope) *fastTaskServiceImpl {
-	return &fastTaskServiceImpl{
+	svc := &fastTaskServiceImpl{
 		enqueueOwner:      enqueueOwner,
 		queues:            make(map[string]*Queue),
 		pendingTaskOwners: make(map[string]map[string]types.NamespacedName),
 		metrics:           newServiceMetrics(scope),
 	}
+	prometheus.MustRegister(svc)
+	return svc
 }
