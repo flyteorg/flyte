@@ -43,6 +43,19 @@ message Resources {
     repeated ResourceEntry limits = 2;
 }
 
+// A customizable interface to convey podtemplate for a container. This can be interpreted differently for different
+// container engines.
+message Podtemplate {
+    //
+    string primary_container_name = 1;
+
+    map<string, string> labels = 2;
+
+    map<string, string> annotations = 3;
+
+    google.protobuf.Struct pod_spec = 4;
+}
+
 // Metadata associated with the GPU accelerator to allocate to a task. Contains
 // information about device type, and for multi-instance GPUs, the partition size to
 // use.

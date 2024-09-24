@@ -1261,6 +1261,21 @@ pub mod resources {
         }
     }
 }
+/// A customizable interface to convey podtemplate for a container. This can be interpreted differently for different
+/// container engines.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct Podtemplate {
+    ///
+    #[prost(string, tag="1")]
+    pub primary_container_name: ::prost::alloc::string::String,
+    #[prost(map="string, string", tag="2")]
+    pub labels: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
+    #[prost(map="string, string", tag="3")]
+    pub annotations: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
+    #[prost(message, optional, tag="4")]
+    pub pod_spec: ::core::option::Option<::prost_types::Struct>,
+}
 /// Metadata associated with the GPU accelerator to allocate to a task. Contains
 /// information about device type, and for multi-instance GPUs, the partition size to
 /// use.
@@ -2722,8 +2737,8 @@ pub struct TaskNodeOverrides {
     #[prost(string, tag="3")]
     pub container_image: ::prost::alloc::string::String,
     /// Overrides for podtemplate used by task pods.
-    #[prost(string, tag="4")]
-    pub pod_template: ::prost::alloc::string::String,
+    #[prost(message, optional, tag="4")]
+    pub podtemplate: ::core::option::Option<Podtemplate>,
 }
 /// A structure that uniquely identifies a launch plan in the system.
 #[allow(clippy::derive_partial_eq_without_eq)]

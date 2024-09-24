@@ -12482,7 +12482,7 @@
                  * @property {flyteidl.core.IResources|null} [resources] TaskNodeOverrides resources
                  * @property {flyteidl.core.IExtendedResources|null} [extendedResources] TaskNodeOverrides extendedResources
                  * @property {string|null} [containerImage] TaskNodeOverrides containerImage
-                 * @property {string|null} [podTemplate] TaskNodeOverrides podTemplate
+                 * @property {flyteidl.core.IPodtemplate|null} [podtemplate] TaskNodeOverrides podtemplate
                  */
     
                 /**
@@ -12525,12 +12525,12 @@
                 TaskNodeOverrides.prototype.containerImage = "";
     
                 /**
-                 * TaskNodeOverrides podTemplate.
-                 * @member {string} podTemplate
+                 * TaskNodeOverrides podtemplate.
+                 * @member {flyteidl.core.IPodtemplate|null|undefined} podtemplate
                  * @memberof flyteidl.core.TaskNodeOverrides
                  * @instance
                  */
-                TaskNodeOverrides.prototype.podTemplate = "";
+                TaskNodeOverrides.prototype.podtemplate = null;
     
                 /**
                  * Creates a new TaskNodeOverrides instance using the specified properties.
@@ -12562,8 +12562,8 @@
                         $root.flyteidl.core.ExtendedResources.encode(message.extendedResources, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
                     if (message.containerImage != null && message.hasOwnProperty("containerImage"))
                         writer.uint32(/* id 3, wireType 2 =*/26).string(message.containerImage);
-                    if (message.podTemplate != null && message.hasOwnProperty("podTemplate"))
-                        writer.uint32(/* id 4, wireType 2 =*/34).string(message.podTemplate);
+                    if (message.podtemplate != null && message.hasOwnProperty("podtemplate"))
+                        $root.flyteidl.core.Podtemplate.encode(message.podtemplate, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
                     return writer;
                 };
     
@@ -12595,7 +12595,7 @@
                             message.containerImage = reader.string();
                             break;
                         case 4:
-                            message.podTemplate = reader.string();
+                            message.podtemplate = $root.flyteidl.core.Podtemplate.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -12629,9 +12629,11 @@
                     if (message.containerImage != null && message.hasOwnProperty("containerImage"))
                         if (!$util.isString(message.containerImage))
                             return "containerImage: string expected";
-                    if (message.podTemplate != null && message.hasOwnProperty("podTemplate"))
-                        if (!$util.isString(message.podTemplate))
-                            return "podTemplate: string expected";
+                    if (message.podtemplate != null && message.hasOwnProperty("podtemplate")) {
+                        var error = $root.flyteidl.core.Podtemplate.verify(message.podtemplate);
+                        if (error)
+                            return "podtemplate." + error;
+                    }
                     return null;
                 };
     
@@ -14823,6 +14825,193 @@
                 })();
     
                 return Resources;
+            })();
+    
+            core.Podtemplate = (function() {
+    
+                /**
+                 * Properties of a Podtemplate.
+                 * @memberof flyteidl.core
+                 * @interface IPodtemplate
+                 * @property {string|null} [primaryContainerName] Podtemplate primaryContainerName
+                 * @property {Object.<string,string>|null} [labels] Podtemplate labels
+                 * @property {Object.<string,string>|null} [annotations] Podtemplate annotations
+                 * @property {google.protobuf.IStruct|null} [podSpec] Podtemplate podSpec
+                 */
+    
+                /**
+                 * Constructs a new Podtemplate.
+                 * @memberof flyteidl.core
+                 * @classdesc Represents a Podtemplate.
+                 * @implements IPodtemplate
+                 * @constructor
+                 * @param {flyteidl.core.IPodtemplate=} [properties] Properties to set
+                 */
+                function Podtemplate(properties) {
+                    this.labels = {};
+                    this.annotations = {};
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * Podtemplate primaryContainerName.
+                 * @member {string} primaryContainerName
+                 * @memberof flyteidl.core.Podtemplate
+                 * @instance
+                 */
+                Podtemplate.prototype.primaryContainerName = "";
+    
+                /**
+                 * Podtemplate labels.
+                 * @member {Object.<string,string>} labels
+                 * @memberof flyteidl.core.Podtemplate
+                 * @instance
+                 */
+                Podtemplate.prototype.labels = $util.emptyObject;
+    
+                /**
+                 * Podtemplate annotations.
+                 * @member {Object.<string,string>} annotations
+                 * @memberof flyteidl.core.Podtemplate
+                 * @instance
+                 */
+                Podtemplate.prototype.annotations = $util.emptyObject;
+    
+                /**
+                 * Podtemplate podSpec.
+                 * @member {google.protobuf.IStruct|null|undefined} podSpec
+                 * @memberof flyteidl.core.Podtemplate
+                 * @instance
+                 */
+                Podtemplate.prototype.podSpec = null;
+    
+                /**
+                 * Creates a new Podtemplate instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.core.Podtemplate
+                 * @static
+                 * @param {flyteidl.core.IPodtemplate=} [properties] Properties to set
+                 * @returns {flyteidl.core.Podtemplate} Podtemplate instance
+                 */
+                Podtemplate.create = function create(properties) {
+                    return new Podtemplate(properties);
+                };
+    
+                /**
+                 * Encodes the specified Podtemplate message. Does not implicitly {@link flyteidl.core.Podtemplate.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.core.Podtemplate
+                 * @static
+                 * @param {flyteidl.core.IPodtemplate} message Podtemplate message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                Podtemplate.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.primaryContainerName != null && message.hasOwnProperty("primaryContainerName"))
+                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.primaryContainerName);
+                    if (message.labels != null && message.hasOwnProperty("labels"))
+                        for (var keys = Object.keys(message.labels), i = 0; i < keys.length; ++i)
+                            writer.uint32(/* id 2, wireType 2 =*/18).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]).uint32(/* id 2, wireType 2 =*/18).string(message.labels[keys[i]]).ldelim();
+                    if (message.annotations != null && message.hasOwnProperty("annotations"))
+                        for (var keys = Object.keys(message.annotations), i = 0; i < keys.length; ++i)
+                            writer.uint32(/* id 3, wireType 2 =*/26).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]).uint32(/* id 2, wireType 2 =*/18).string(message.annotations[keys[i]]).ldelim();
+                    if (message.podSpec != null && message.hasOwnProperty("podSpec"))
+                        $root.google.protobuf.Struct.encode(message.podSpec, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a Podtemplate message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.core.Podtemplate
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.core.Podtemplate} Podtemplate
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                Podtemplate.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.Podtemplate(), key;
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.primaryContainerName = reader.string();
+                            break;
+                        case 2:
+                            reader.skip().pos++;
+                            if (message.labels === $util.emptyObject)
+                                message.labels = {};
+                            key = reader.string();
+                            reader.pos++;
+                            message.labels[key] = reader.string();
+                            break;
+                        case 3:
+                            reader.skip().pos++;
+                            if (message.annotations === $util.emptyObject)
+                                message.annotations = {};
+                            key = reader.string();
+                            reader.pos++;
+                            message.annotations[key] = reader.string();
+                            break;
+                        case 4:
+                            message.podSpec = $root.google.protobuf.Struct.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a Podtemplate message.
+                 * @function verify
+                 * @memberof flyteidl.core.Podtemplate
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                Podtemplate.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.primaryContainerName != null && message.hasOwnProperty("primaryContainerName"))
+                        if (!$util.isString(message.primaryContainerName))
+                            return "primaryContainerName: string expected";
+                    if (message.labels != null && message.hasOwnProperty("labels")) {
+                        if (!$util.isObject(message.labels))
+                            return "labels: object expected";
+                        var key = Object.keys(message.labels);
+                        for (var i = 0; i < key.length; ++i)
+                            if (!$util.isString(message.labels[key[i]]))
+                                return "labels: string{k:string} expected";
+                    }
+                    if (message.annotations != null && message.hasOwnProperty("annotations")) {
+                        if (!$util.isObject(message.annotations))
+                            return "annotations: object expected";
+                        var key = Object.keys(message.annotations);
+                        for (var i = 0; i < key.length; ++i)
+                            if (!$util.isString(message.annotations[key[i]]))
+                                return "annotations: string{k:string} expected";
+                    }
+                    if (message.podSpec != null && message.hasOwnProperty("podSpec")) {
+                        var error = $root.google.protobuf.Struct.verify(message.podSpec);
+                        if (error)
+                            return "podSpec." + error;
+                    }
+                    return null;
+                };
+    
+                return Podtemplate;
             })();
     
             core.GPUAccelerator = (function() {

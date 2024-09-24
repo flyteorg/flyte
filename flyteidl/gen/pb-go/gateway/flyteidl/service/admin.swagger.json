@@ -7782,6 +7782,30 @@
         }
       }
     },
+    "corePodtemplate": {
+      "type": "object",
+      "properties": {
+        "primary_container_name": {
+          "type": "string"
+        },
+        "labels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "annotations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "pod_spec": {
+          "type": "object"
+        }
+      },
+      "description": "A customizable interface to convey podtemplate for a container. This can be interpreted differently for different\ncontainer engines."
+    },
     "corePrimitive": {
       "type": "object",
       "properties": {
@@ -8291,8 +8315,8 @@
           "type": "string",
           "description": "Override for the image used by task pods."
         },
-        "pod_template": {
-          "type": "string",
+        "podtemplate": {
+          "$ref": "#/definitions/corePodtemplate",
           "description": "Overrides for podtemplate used by task pods."
         }
       },

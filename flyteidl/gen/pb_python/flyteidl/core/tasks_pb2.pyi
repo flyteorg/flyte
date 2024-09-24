@@ -41,6 +41,32 @@ class Resources(_message.Message):
     limits: _containers.RepeatedCompositeFieldContainer[Resources.ResourceEntry]
     def __init__(self, requests: _Optional[_Iterable[_Union[Resources.ResourceEntry, _Mapping]]] = ..., limits: _Optional[_Iterable[_Union[Resources.ResourceEntry, _Mapping]]] = ...) -> None: ...
 
+class Podtemplate(_message.Message):
+    __slots__ = ["primary_container_name", "labels", "annotations", "pod_spec"]
+    class LabelsEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
+    class AnnotationsEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
+    PRIMARY_CONTAINER_NAME_FIELD_NUMBER: _ClassVar[int]
+    LABELS_FIELD_NUMBER: _ClassVar[int]
+    ANNOTATIONS_FIELD_NUMBER: _ClassVar[int]
+    POD_SPEC_FIELD_NUMBER: _ClassVar[int]
+    primary_container_name: str
+    labels: _containers.ScalarMap[str, str]
+    annotations: _containers.ScalarMap[str, str]
+    pod_spec: _struct_pb2.Struct
+    def __init__(self, primary_container_name: _Optional[str] = ..., labels: _Optional[_Mapping[str, str]] = ..., annotations: _Optional[_Mapping[str, str]] = ..., pod_spec: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ...) -> None: ...
+
 class GPUAccelerator(_message.Message):
     __slots__ = ["device", "unpartitioned", "partition_size"]
     DEVICE_FIELD_NUMBER: _ClassVar[int]
