@@ -144,16 +144,10 @@ func checkAndFetchExpectedInputForLaunchPlan(
 			return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "unexpected fixed_input %s", name)
 		}
 		inputType := validators.LiteralTypeForLiteral(fixedInput)
-		if inputType == nil {
+		err := validators.ValidateLiteralType(inputType)
+		if err != nil {
 			return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
-				fmt.Sprintf(
-					"invalid %s input wrong type.\n"+
-						"Expected %s, but got %s.\n"+
-						"Suggested solution: Please update all of your Flyte images to the latest version and try"+
-						" again.",
-					name, value.GetType().String(), inputType,
-				),
-			)
+				fmt.Sprintf("Failed to validate literal type for %s with err: %s", name, err))
 		}
 		if !validators.AreTypesCastable(inputType, value.GetType()) {
 			return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument,

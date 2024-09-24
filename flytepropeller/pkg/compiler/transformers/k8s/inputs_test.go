@@ -29,7 +29,7 @@ func TestValidateInputs_IDLTypeNotFound(t *testing.T) {
 
 	inputs := core.LiteralMap{
 		Literals: map[string]*core.Literal{
-			"input1": &core.Literal{}, // This will cause LiteralTypeForLiteral to return nil
+			"input1": nil, // Set this to nil to trigger the nil case
 		},
 	}
 
@@ -50,6 +50,6 @@ func TestValidateInputs_IDLTypeNotFound(t *testing.T) {
 	}
 	assert.True(t, idlNotFound, "Expected IDLTypeNotFound error was not found in errors")
 
-	expectedErrMsg := "Code: IDLTypeNotFound, Node Id: test-node, Description: Input type IDL is not found, please update all of your Flyte images to the latest version and try again."
-	assert.Equal(t, expectedErrMsg, errMsg, "Error message does not match expected value")
+	expectedContainedErrorMsg := "Failed to validate literal type"
+	assert.Contains(t, errMsg, expectedContainedErrorMsg)
 }

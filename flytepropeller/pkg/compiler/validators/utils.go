@@ -251,9 +251,9 @@ func literalTypeForLiterals(literals []*core.Literal) *core.LiteralType {
 
 // ValidateLiteralType check if the literal type is valid, return error if the literal is invalid.
 func ValidateLiteralType(lt *core.LiteralType) error {
-	err := fmt.Errorf("got unknown literal: [%v].\n"+
-		"Suggested solution: Please update all your Flyte deployment images to the latest version and try again.", l)
 	if lt == nil {
+		err := fmt.Errorf("got unknown literal type: [%v].\n"+
+			"Suggested solution: Please update all your Flyte deployment images to the latest version and try again", lt)
 		return err
 	}
 	if lt.GetCollectionType() != nil {

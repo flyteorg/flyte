@@ -77,6 +77,12 @@ func ValidateSignalSetRequest(ctx context.Context, db repositoryInterfaces.Repos
 	if err != nil {
 		return err
 	}
+	err = propellervalidators.ValidateLiteralType(valueType)
+	if err != nil {
+		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
+			fmt.Sprintf("Failed to validate literal type for %s with err: %s", valueType, err))
+	}
+
 	if valueType == nil {
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 			fmt.Sprintf(

@@ -191,11 +191,13 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		}
 
 		size := -1
-		for _, variable := range literalMap.Literals {
+		for key, variable := range literalMap.Literals {
 			literalType := validators.LiteralTypeForLiteral(variable)
-			if literalType == nil {
+			err := validators.ValidateLiteralType(literalType)
+			if err != nil {
+				errMsg := fmt.Sprintf("Failed to validate literal type for %s with err: %s", key, err)
 				return handler.DoTransition(handler.TransitionTypeEphemeral,
-					handler.PhaseInfoFailure(idlcore.ExecutionError_USER, errors.IDLNotFoundErr, "Input is an invalid type, please update all of your Flyte images to the latest version and try again.", nil),
+					handler.PhaseInfoFailure(idlcore.ExecutionError_USER, errors.IDLNotFoundErr, errMsg, nil),
 				), nil
 			}
 			switch literalType.Type.(type) {

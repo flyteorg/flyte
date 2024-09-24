@@ -325,14 +325,10 @@ func TestValidateSignalUpdateRequest(t *testing.T) {
 		}
 
 		// Invoke the function and check for the expected error
-		err := ValidateSignalSetRequest(ctx, repo, request)
+		err := ValidateSignalSetRequest(ctx, repo, &request)
 		assert.NotNil(t, err)
 
 		// Expected error message
-		expectedErrorMsg := "Invalid signal value for 'scalar:{}'.\n" +
-			"Expected type: simple:1000, but received: <nil>.\n" +
-			"Suggested solution: Ensure all Flyte images are updated to the latest version and try again."
-		assert.Equal(t, expectedErrorMsg, err.Error())
-
+		assert.Contains(t, err.Error(), failedToValidateLiteralType)
 	})
 }

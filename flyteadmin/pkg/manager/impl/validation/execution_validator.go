@@ -108,16 +108,10 @@ func CheckAndFetchInputsForExecution(
 			default:
 				inputType = validators.LiteralTypeForLiteral(executionInputMap[name])
 			}
-			if inputType == nil {
+			err := validators.ValidateLiteralType(inputType)
+			if err != nil {
 				return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
-					fmt.Sprintf(
-						"invalid %s input wrong type.\n"+
-							"Expected %s, but got %s.\n"+
-							"Suggested solution: Please update all of your Flyte images to the latest version and try"+
-							" again.",
-						name, expectedInput.GetVar().GetType().String(), inputType,
-					),
-				)
+					fmt.Sprintf("Failed to validate literal type for %s with err: %s", name, err))
 			}
 			if !validators.AreTypesCastable(inputType, expectedInput.GetVar().GetType()) {
 				return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "invalid %s input wrong type. Expected %s, but got %s", name, expectedInput.GetVar().GetType(), inputType)

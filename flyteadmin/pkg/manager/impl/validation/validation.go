@@ -285,7 +285,8 @@ func validateParameterMap(inputMap *core.ParameterMap, fieldName string) error {
 				inputType := validators.LiteralTypeForLiteral(defaultValue)
 				err := validators.ValidateLiteralType(inputType)
 				if err != nil {
-					return errors.NewFlyteAdminErrorf(codes.InvalidArgument, fmt.Sprintf("Failed to validate literal type for %s in %s with err: %s", name, fieldName, err))
+					return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
+						fmt.Sprintf("Failed to validate literal type for %s with err: %s", name, err))
 				}
 
 				if !validators.AreTypesCastable(inputType, defaultInput.GetVar().GetType()) {

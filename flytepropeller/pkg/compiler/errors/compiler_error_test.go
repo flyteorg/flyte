@@ -33,7 +33,7 @@ func TestErrorCodes(t *testing.T) {
 		UnrecognizedValue:          NewUnrecognizedValueErr("", ""),
 		WorkflowBuildError:         NewWorkflowBuildError(errors.New("")),
 		NoNodesFound:               NewNoNodesFoundErr(""),
-		IDLTypeNotFoundError:       NewIDLTypeNotFoundErr(""),
+		IDLTypeNotFoundError:       NewIDLTypeNotFoundErr("", ""),
 	}
 
 	for key, value := range testCases {

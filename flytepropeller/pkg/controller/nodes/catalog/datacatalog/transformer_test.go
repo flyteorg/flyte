@@ -367,7 +367,7 @@ func TestGenerateTaskOutputsFromArtifact_IDLNotFound(t *testing.T) {
 
 	_, err := GenerateTaskOutputsFromArtifact(taskID, taskInterface, artifact)
 
-	expectedError := "IDL not found, please update all of your Flyte images to the latest version and try again"
+	expectedContainedErrorMsg := "failed to validate literal type"
 	assert.Error(t, err)
-	assert.Equal(t, expectedError, err.Error())
+	assert.Contains(t, err.Error(), expectedContainedErrorMsg)
 }

@@ -959,12 +959,12 @@ func TestHandle_InvalidLiteralType(t *testing.T) {
 
 	// Test cases
 	tests := []struct {
-		name                   string
-		inputLiteral           *idlcore.Literal
-		expectedTransitionType handler.TransitionType
-		expectedPhase          handler.EPhase
-		expectedErrorCode      string
-		expectedErrorMessage   string
+		name                      string
+		inputLiteral              *idlcore.Literal
+		expectedTransitionType    handler.TransitionType
+		expectedPhase             handler.EPhase
+		expectedErrorCode         string
+		expectedContainedErrorMsg string
 	}{
 		{
 			name: "InvalidLiteralType",
@@ -973,10 +973,10 @@ func TestHandle_InvalidLiteralType(t *testing.T) {
 					Scalar: &idlcore.Scalar{},
 				},
 			},
-			expectedTransitionType: handler.TransitionTypeEphemeral,
-			expectedPhase:          handler.EPhaseFailed,
-			expectedErrorCode:      errors.IDLNotFoundErr,
-			expectedErrorMessage:   "Input is an invalid type, please update all of your Flyte images to the latest version and try again.",
+			expectedTransitionType:    handler.TransitionTypeEphemeral,
+			expectedPhase:             handler.EPhaseFailed,
+			expectedErrorCode:         errors.IDLNotFoundErr,
+			expectedContainedErrorMsg: "Failed to validate literal type",
 		},
 	}
 
@@ -1001,7 +1001,7 @@ func TestHandle_InvalidLiteralType(t *testing.T) {
 			assert.Equal(t, test.expectedTransitionType, transition.Type())
 			assert.Equal(t, test.expectedPhase, transition.Info().GetPhase())
 			assert.Equal(t, test.expectedErrorCode, transition.Info().GetErr().Code)
-			assert.Equal(t, test.expectedErrorMessage, transition.Info().GetErr().Message)
+			assert.Contains(t, transition.Info().GetErr().Message, test.expectedContainedErrorMsg)
 		})
 	}
 }

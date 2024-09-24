@@ -271,8 +271,8 @@ func TestGetLpExpectedInvalidFixedInputWithUnknownIDL(t *testing.T) {
 
 	assert.NotNil(t, err)
 
-	expectedErrorMsg := "invalid foo input wrong type.\nExpected simple:1000, but got <nil>.\nSuggested solution: Please update all of your Flyte images to the latest version and try again."
-	assert.Equal(t, expectedErrorMsg, err.Error())
+	// Expected error message
+	assert.Contains(t, err.Error(), failedToValidateLiteralType)
 }
 
 func TestGetLpExpectedNoFixedInput(t *testing.T) {

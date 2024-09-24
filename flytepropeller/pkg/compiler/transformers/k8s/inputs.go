@@ -1,6 +1,8 @@
 package k8s
 
 import (
+	"fmt"
+
 	"k8s.io/apimachinery/pkg/util/sets"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -42,10 +44,14 @@ func validateInputs(nodeID common.NodeID, iface *core.TypedInterface, inputs cor
 		default:
 			inputType = validators.LiteralTypeForLiteral(inputVal)
 		}
-		if inputType == nil {
-			errs.Collect(errors.NewIDLTypeNotFoundErr(nodeID))
+
+		err := validators.ValidateLiteralType(inputType)
+		if err != nil {
+			errMsg := fmt.Sprintf("Failed to validate literal type for %s with err: %s", inputVar, err)
+			errs.Collect(errors.NewIDLTypeNotFoundErr(nodeID, errMsg))
 			continue
 		}
+
 		if !validators.AreTypesCastable(inputType, v.Type) {
 			errs.Collect(errors.NewMismatchingTypesErr(nodeID, inputVar, v.Type.String(), inputType.String()))
 			continue
