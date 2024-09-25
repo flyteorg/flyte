@@ -8,6 +8,8 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/errors"
 )
 
+const messagepack = "msgpack"
+
 // resolveAttrPathInPromise resolves the literal with attribute path
 // If the promise is chained with attributes (e.g. promise.a["b"][0]), then we need to resolve the promise
 func resolveAttrPathInPromise(nodeID string, literal *core.Literal, bindAttrPath []*core.PromiseAttribute) (*core.Literal, error) {
@@ -41,13 +43,11 @@ func resolveAttrPathInPromise(nodeID string, literal *core.Literal, bindAttrPath
 	// resolve dataclass and Pydantic BaseModel
 	if scalar := currVal.GetScalar(); scalar != nil {
 		if binary := scalar.GetBinary(); binary != nil {
-			// Start from index "count"
 			currVal, err = resolveAttrPathInBinary(nodeID, binary, bindAttrPath[count:])
 			if err != nil {
 				return nil, err
 			}
 		} else if generic := scalar.GetGeneric(); generic != nil {
-			// Start from index "count"
 			currVal, err = resolveAttrPathInPbStruct(nodeID, generic, bindAttrPath[count:])
 			if err != nil {
 				return nil, err
@@ -104,7 +104,7 @@ func resolveAttrPathInBinary(nodeID string, binaryIDL *core.Binary, bindAttrPath
 	var tmpVal interface{}
 	var exist bool
 
-	if serializationFormat == "msgpack" {
+	if serializationFormat == messagepack {
 		err := msgpack.Unmarshal(binaryBytes, &currVal)
 		if err != nil {
 			return nil, err
@@ -135,7 +135,7 @@ func resolveAttrPathInBinary(nodeID string, binaryIDL *core.Binary, bindAttrPath
 		}
 	}
 
-	if serializationFormat == "msgpack" {
+	if serializationFormat == messagepack {
 		// Marshal the current value to MessagePack bytes
 		resolvedBinaryBytes, err := msgpack.Marshal(currVal)
 		if err != nil {
