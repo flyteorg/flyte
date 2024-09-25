@@ -98,7 +98,7 @@ const (
 	FieldNotFoundError ErrorCode = "FieldNotFound"
 
 	// IDL not found when variable binding
-	IDLTypeNotFoundError ErrorCode = "IDLTypeNotFound"
+	InvalidLiteralTypeError ErrorCode = "InvalidLiteralType"
 )
 
 func NewBranchNodeNotSpecified(branchNodeID string) *CompileError {
@@ -221,9 +221,9 @@ func NewMismatchingVariablesErr(nodeID, fromVar, fromType, toVar, toType string)
 	)
 }
 
-func NewIDLTypeNotFoundErr(nodeID, errMsg string) *CompileError {
+func NewInvalidLiteralTypeErr(nodeID, errMsg string) *CompileError {
 	return newError(
-		IDLTypeNotFoundError,
+		InvalidLiteralTypeError,
 		errMsg,
 		nodeID,
 	)

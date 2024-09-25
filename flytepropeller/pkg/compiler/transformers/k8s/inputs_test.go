@@ -10,7 +10,7 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/errors"
 )
 
-func TestValidateInputs_IDLTypeNotFound(t *testing.T) {
+func TestValidateInputs_InvalidLiteralType(t *testing.T) {
 	nodeID := common.NodeID("test-node")
 
 	iface := &core.TypedInterface{
@@ -42,13 +42,13 @@ func TestValidateInputs_IDLTypeNotFound(t *testing.T) {
 	idlNotFound := false
 	var errMsg string
 	for _, err := range errs.Errors().List() {
-		if err.Code() == "IDLTypeNotFound" {
+		if err.Code() == "InvalidLiteralType" {
 			idlNotFound = true
 			errMsg = err.Error()
 			break
 		}
 	}
-	assert.True(t, idlNotFound, "Expected IDLTypeNotFound error was not found in errors")
+	assert.True(t, idlNotFound, "Expected InvalidLiteralType error was not found in errors")
 
 	expectedContainedErrorMsg := "Failed to validate literal type"
 	assert.Contains(t, errMsg, expectedContainedErrorMsg)
