@@ -165,6 +165,14 @@ pub struct UnionType {
     #[prost(message, repeated, tag="1")]
     pub variants: ::prost::alloc::vec::Vec<LiteralType>,
 }
+/// Enabled checking for offloaded literal type and getting the info about the store literal type.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct OffloadedType {
+    /// Type of actual literal stored at the offloaded location
+    #[prost(message, optional, boxed, tag="1")]
+    pub actual_literal_type: ::core::option::Option<::prost::alloc::boxed::Box<LiteralType>>,
+}
 /// Hints to improve type matching
 /// e.g. allows distinguishing output from custom type transformers
 /// even if the underlying IDL serialization matches.
@@ -205,7 +213,7 @@ pub struct LiteralType {
     /// Hints to improve type matching.
     #[prost(message, optional, tag="11")]
     pub structure: ::core::option::Option<TypeStructure>,
-    #[prost(oneof="literal_type::Type", tags="1, 2, 3, 4, 5, 7, 8, 10")]
+    #[prost(oneof="literal_type::Type", tags="1, 2, 3, 4, 5, 7, 8, 10, 12")]
     pub r#type: ::core::option::Option<literal_type::Type>,
 }
 /// Nested message and enum types in `LiteralType`.
@@ -237,6 +245,9 @@ pub mod literal_type {
         /// Defines an union type with pre-defined LiteralTypes.
         #[prost(message, tag="10")]
         UnionType(super::UnionType),
+        /// Defines the offload literal type which stores the info about the actual stored literal type.
+        #[prost(message, tag="12")]
+        OffloadedType(::prost::alloc::boxed::Box<super::OffloadedType>),
     }
 }
 /// A reference to an output produced by a node. The type can be retrieved -and validated- from

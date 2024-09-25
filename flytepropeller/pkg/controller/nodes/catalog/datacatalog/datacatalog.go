@@ -122,7 +122,7 @@ func (m *CatalogClient) Get(ctx context.Context, key catalog.Key) (catalog.Entry
 		logger.Debugf(ctx, "DataCatalog failed to get artifact by tag %+v, err: %+v", tag, err)
 		return catalog.Entry{}, err
 	}
-	logger.Debugf(ctx, "Artifact found %v from tag %v", artifact, tag)
+	logger.Debugf(ctx, "Artifact found %v from tag %v", artifact.GetId(), tag)
 
 	var relevantTag *datacatalog.Tag
 	if len(artifact.GetTags()) > 0 {

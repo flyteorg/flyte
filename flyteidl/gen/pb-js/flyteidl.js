@@ -5523,6 +5523,118 @@
                 return UnionType;
             })();
     
+            core.OffloadedType = (function() {
+    
+                /**
+                 * Properties of an OffloadedType.
+                 * @memberof flyteidl.core
+                 * @interface IOffloadedType
+                 * @property {flyteidl.core.ILiteralType|null} [actualLiteralType] OffloadedType actualLiteralType
+                 */
+    
+                /**
+                 * Constructs a new OffloadedType.
+                 * @memberof flyteidl.core
+                 * @classdesc Represents an OffloadedType.
+                 * @implements IOffloadedType
+                 * @constructor
+                 * @param {flyteidl.core.IOffloadedType=} [properties] Properties to set
+                 */
+                function OffloadedType(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * OffloadedType actualLiteralType.
+                 * @member {flyteidl.core.ILiteralType|null|undefined} actualLiteralType
+                 * @memberof flyteidl.core.OffloadedType
+                 * @instance
+                 */
+                OffloadedType.prototype.actualLiteralType = null;
+    
+                /**
+                 * Creates a new OffloadedType instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.core.OffloadedType
+                 * @static
+                 * @param {flyteidl.core.IOffloadedType=} [properties] Properties to set
+                 * @returns {flyteidl.core.OffloadedType} OffloadedType instance
+                 */
+                OffloadedType.create = function create(properties) {
+                    return new OffloadedType(properties);
+                };
+    
+                /**
+                 * Encodes the specified OffloadedType message. Does not implicitly {@link flyteidl.core.OffloadedType.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.core.OffloadedType
+                 * @static
+                 * @param {flyteidl.core.IOffloadedType} message OffloadedType message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                OffloadedType.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.actualLiteralType != null && message.hasOwnProperty("actualLiteralType"))
+                        $root.flyteidl.core.LiteralType.encode(message.actualLiteralType, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes an OffloadedType message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.core.OffloadedType
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.core.OffloadedType} OffloadedType
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                OffloadedType.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.OffloadedType();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.actualLiteralType = $root.flyteidl.core.LiteralType.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies an OffloadedType message.
+                 * @function verify
+                 * @memberof flyteidl.core.OffloadedType
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                OffloadedType.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.actualLiteralType != null && message.hasOwnProperty("actualLiteralType")) {
+                        var error = $root.flyteidl.core.LiteralType.verify(message.actualLiteralType);
+                        if (error)
+                            return "actualLiteralType." + error;
+                    }
+                    return null;
+                };
+    
+                return OffloadedType;
+            })();
+    
             core.TypeStructure = (function() {
     
                 /**
@@ -5792,6 +5904,7 @@
                  * @property {flyteidl.core.IEnumType|null} [enumType] LiteralType enumType
                  * @property {flyteidl.core.IStructuredDatasetType|null} [structuredDatasetType] LiteralType structuredDatasetType
                  * @property {flyteidl.core.IUnionType|null} [unionType] LiteralType unionType
+                 * @property {flyteidl.core.IOffloadedType|null} [offloadedType] LiteralType offloadedType
                  * @property {google.protobuf.IStruct|null} [metadata] LiteralType metadata
                  * @property {flyteidl.core.ITypeAnnotation|null} [annotation] LiteralType annotation
                  * @property {flyteidl.core.ITypeStructure|null} [structure] LiteralType structure
@@ -5877,6 +5990,14 @@
                 LiteralType.prototype.unionType = null;
     
                 /**
+                 * LiteralType offloadedType.
+                 * @member {flyteidl.core.IOffloadedType|null|undefined} offloadedType
+                 * @memberof flyteidl.core.LiteralType
+                 * @instance
+                 */
+                LiteralType.prototype.offloadedType = null;
+    
+                /**
                  * LiteralType metadata.
                  * @member {google.protobuf.IStruct|null|undefined} metadata
                  * @memberof flyteidl.core.LiteralType
@@ -5905,12 +6026,12 @@
     
                 /**
                  * LiteralType type.
-                 * @member {"simple"|"schema"|"collectionType"|"mapValueType"|"blob"|"enumType"|"structuredDatasetType"|"unionType"|undefined} type
+                 * @member {"simple"|"schema"|"collectionType"|"mapValueType"|"blob"|"enumType"|"structuredDatasetType"|"unionType"|"offloadedType"|undefined} type
                  * @memberof flyteidl.core.LiteralType
                  * @instance
                  */
                 Object.defineProperty(LiteralType.prototype, "type", {
-                    get: $util.oneOfGetter($oneOfFields = ["simple", "schema", "collectionType", "mapValueType", "blob", "enumType", "structuredDatasetType", "unionType"]),
+                    get: $util.oneOfGetter($oneOfFields = ["simple", "schema", "collectionType", "mapValueType", "blob", "enumType", "structuredDatasetType", "unionType", "offloadedType"]),
                     set: $util.oneOfSetter($oneOfFields)
                 });
     
@@ -5960,6 +6081,8 @@
                         $root.flyteidl.core.UnionType.encode(message.unionType, writer.uint32(/* id 10, wireType 2 =*/82).fork()).ldelim();
                     if (message.structure != null && message.hasOwnProperty("structure"))
                         $root.flyteidl.core.TypeStructure.encode(message.structure, writer.uint32(/* id 11, wireType 2 =*/90).fork()).ldelim();
+                    if (message.offloadedType != null && message.hasOwnProperty("offloadedType"))
+                        $root.flyteidl.core.OffloadedType.encode(message.offloadedType, writer.uint32(/* id 12, wireType 2 =*/98).fork()).ldelim();
                     return writer;
                 };
     
@@ -6004,6 +6127,9 @@
                             break;
                         case 10:
                             message.unionType = $root.flyteidl.core.UnionType.decode(reader, reader.uint32());
+                            break;
+                        case 12:
+                            message.offloadedType = $root.flyteidl.core.OffloadedType.decode(reader, reader.uint32());
                             break;
                         case 6:
                             message.metadata = $root.google.protobuf.Struct.decode(reader, reader.uint32());
@@ -6120,6 +6246,16 @@
                             var error = $root.flyteidl.core.UnionType.verify(message.unionType);
                             if (error)
                                 return "unionType." + error;
+                        }
+                    }
+                    if (message.offloadedType != null && message.hasOwnProperty("offloadedType")) {
+                        if (properties.type === 1)
+                            return "type: multiple values";
+                        properties.type = 1;
+                        {
+                            var error = $root.flyteidl.core.OffloadedType.verify(message.offloadedType);
+                            if (error)
+                                return "offloadedType." + error;
                         }
                     }
                     if (message.metadata != null && message.hasOwnProperty("metadata")) {

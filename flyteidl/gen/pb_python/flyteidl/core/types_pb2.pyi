@@ -102,6 +102,12 @@ class UnionType(_message.Message):
     variants: _containers.RepeatedCompositeFieldContainer[LiteralType]
     def __init__(self, variants: _Optional[_Iterable[_Union[LiteralType, _Mapping]]] = ...) -> None: ...
 
+class OffloadedType(_message.Message):
+    __slots__ = ["actual_literal_type"]
+    ACTUAL_LITERAL_TYPE_FIELD_NUMBER: _ClassVar[int]
+    actual_literal_type: LiteralType
+    def __init__(self, actual_literal_type: _Optional[_Union[LiteralType, _Mapping]] = ...) -> None: ...
+
 class TypeStructure(_message.Message):
     __slots__ = ["tag", "dataclass_type"]
     class DataclassTypeEntry(_message.Message):
@@ -124,7 +130,7 @@ class TypeAnnotation(_message.Message):
     def __init__(self, annotations: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ...) -> None: ...
 
 class LiteralType(_message.Message):
-    __slots__ = ["simple", "schema", "collection_type", "map_value_type", "blob", "enum_type", "structured_dataset_type", "union_type", "metadata", "annotation", "structure"]
+    __slots__ = ["simple", "schema", "collection_type", "map_value_type", "blob", "enum_type", "structured_dataset_type", "union_type", "offloaded_type", "metadata", "annotation", "structure"]
     SIMPLE_FIELD_NUMBER: _ClassVar[int]
     SCHEMA_FIELD_NUMBER: _ClassVar[int]
     COLLECTION_TYPE_FIELD_NUMBER: _ClassVar[int]
@@ -133,6 +139,7 @@ class LiteralType(_message.Message):
     ENUM_TYPE_FIELD_NUMBER: _ClassVar[int]
     STRUCTURED_DATASET_TYPE_FIELD_NUMBER: _ClassVar[int]
     UNION_TYPE_FIELD_NUMBER: _ClassVar[int]
+    OFFLOADED_TYPE_FIELD_NUMBER: _ClassVar[int]
     METADATA_FIELD_NUMBER: _ClassVar[int]
     ANNOTATION_FIELD_NUMBER: _ClassVar[int]
     STRUCTURE_FIELD_NUMBER: _ClassVar[int]
@@ -144,10 +151,11 @@ class LiteralType(_message.Message):
     enum_type: EnumType
     structured_dataset_type: StructuredDatasetType
     union_type: UnionType
+    offloaded_type: OffloadedType
     metadata: _struct_pb2.Struct
     annotation: TypeAnnotation
     structure: TypeStructure
-    def __init__(self, simple: _Optional[_Union[SimpleType, str]] = ..., schema: _Optional[_Union[SchemaType, _Mapping]] = ..., collection_type: _Optional[_Union[LiteralType, _Mapping]] = ..., map_value_type: _Optional[_Union[LiteralType, _Mapping]] = ..., blob: _Optional[_Union[BlobType, _Mapping]] = ..., enum_type: _Optional[_Union[EnumType, _Mapping]] = ..., structured_dataset_type: _Optional[_Union[StructuredDatasetType, _Mapping]] = ..., union_type: _Optional[_Union[UnionType, _Mapping]] = ..., metadata: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ..., annotation: _Optional[_Union[TypeAnnotation, _Mapping]] = ..., structure: _Optional[_Union[TypeStructure, _Mapping]] = ...) -> None: ...
+    def __init__(self, simple: _Optional[_Union[SimpleType, str]] = ..., schema: _Optional[_Union[SchemaType, _Mapping]] = ..., collection_type: _Optional[_Union[LiteralType, _Mapping]] = ..., map_value_type: _Optional[_Union[LiteralType, _Mapping]] = ..., blob: _Optional[_Union[BlobType, _Mapping]] = ..., enum_type: _Optional[_Union[EnumType, _Mapping]] = ..., structured_dataset_type: _Optional[_Union[StructuredDatasetType, _Mapping]] = ..., union_type: _Optional[_Union[UnionType, _Mapping]] = ..., offloaded_type: _Optional[_Union[OffloadedType, _Mapping]] = ..., metadata: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ..., annotation: _Optional[_Union[TypeAnnotation, _Mapping]] = ..., structure: _Optional[_Union[TypeStructure, _Mapping]] = ...) -> None: ...
 
 class OutputReference(_message.Message):
     __slots__ = ["node_id", "var", "attr_path"]

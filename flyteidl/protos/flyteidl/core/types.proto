@@ -108,6 +108,12 @@ message UnionType {
     repeated LiteralType variants = 1;
 }
 
+// Enabled checking for offloaded literal type and getting the info about the store literal type.
+message OffloadedType {
+    // Type of actual literal stored at the offloaded location
+    LiteralType actual_literal_type = 1;
+}
+
 // Hints to improve type matching
 // e.g. allows distinguishing output from custom type transformers
 // even if the underlying IDL serialization matches.
@@ -154,6 +160,9 @@ message LiteralType {
 
         // Defines an union type with pre-defined LiteralTypes.
         UnionType union_type = 10;
+
+        // Defines the offload literal type which stores the info about the actual stored literal type.
+        OffloadedType offloaded_type = 12;
     }
 
     // This field contains type metadata that is descriptive of the type, but is NOT considered in type-checking.  This might be used by

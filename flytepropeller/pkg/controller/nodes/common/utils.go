@@ -79,6 +79,24 @@ func GetTargetEntity(ctx context.Context, nCtx interfaces.NodeExecutionContext) 
 	return targetEntity
 }
 
+// ReadLargeLiteral reads the offloaded large literal needed by array node task
+func ReadLargeLiteral(ctx context.Context, datastore *storage.DataStore,
+	tobeRead *idlcore.Literal) error {
+	if tobeRead.GetOffloadedMetadata() == nil {
+		return fmt.Errorf("unsupported type for reading offloaded literal")
+	}
+	// read the offloaded literal
+	dataReference := tobeRead.GetOffloadedMetadata().GetUri()
+	size := tobeRead.GetOffloadedMetadata().GetSizeBytes()
+	if err := datastore.ReadProtobuf(ctx, storage.DataReference(dataReference), tobeRead); err != nil {
+		logger.Errorf(ctx, "Failed to  read the offloaded literal at location [%s] with error [%s]", dataReference, err)
+		return err
+	}
+
+	logger.Infof(ctx, "read offloaded literal at location [%s] with size [%s]", dataReference, size)
+	return nil
+}
+
 // OffloadLargeLiteral offloads the large literal if meets the threshold conditions
 func OffloadLargeLiteral(ctx context.Context, datastore *storage.DataStore, dataReference storage.DataReference,
 	toBeOffloaded *idlcore.Literal, literalOffloadingConfig config.LiteralOffloadingConfig) error {

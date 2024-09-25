@@ -2337,6 +2337,58 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of an OffloadedType. */
+        interface IOffloadedType {
+
+            /** OffloadedType actualLiteralType */
+            actualLiteralType?: (flyteidl.core.ILiteralType|null);
+        }
+
+        /** Represents an OffloadedType. */
+        class OffloadedType implements IOffloadedType {
+
+            /**
+             * Constructs a new OffloadedType.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.IOffloadedType);
+
+            /** OffloadedType actualLiteralType. */
+            public actualLiteralType?: (flyteidl.core.ILiteralType|null);
+
+            /**
+             * Creates a new OffloadedType instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns OffloadedType instance
+             */
+            public static create(properties?: flyteidl.core.IOffloadedType): flyteidl.core.OffloadedType;
+
+            /**
+             * Encodes the specified OffloadedType message. Does not implicitly {@link flyteidl.core.OffloadedType.verify|verify} messages.
+             * @param message OffloadedType message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.IOffloadedType, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an OffloadedType message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns OffloadedType
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.OffloadedType;
+
+            /**
+             * Verifies an OffloadedType message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a TypeStructure. */
         interface ITypeStructure {
 
@@ -2474,6 +2526,9 @@ export namespace flyteidl {
             /** LiteralType unionType */
             unionType?: (flyteidl.core.IUnionType|null);
 
+            /** LiteralType offloadedType */
+            offloadedType?: (flyteidl.core.IOffloadedType|null);
+
             /** LiteralType metadata */
             metadata?: (google.protobuf.IStruct|null);
 
@@ -2517,6 +2572,9 @@ export namespace flyteidl {
             /** LiteralType unionType. */
             public unionType?: (flyteidl.core.IUnionType|null);
 
+            /** LiteralType offloadedType. */
+            public offloadedType?: (flyteidl.core.IOffloadedType|null);
+
             /** LiteralType metadata. */
             public metadata?: (google.protobuf.IStruct|null);
 
@@ -2527,7 +2585,7 @@ export namespace flyteidl {
             public structure?: (flyteidl.core.ITypeStructure|null);
 
             /** LiteralType type. */
-            public type?: ("simple"|"schema"|"collectionType"|"mapValueType"|"blob"|"enumType"|"structuredDatasetType"|"unionType");
+            public type?: ("simple"|"schema"|"collectionType"|"mapValueType"|"blob"|"enumType"|"structuredDatasetType"|"unionType"|"offloadedType");
 
             /**
              * Creates a new LiteralType instance using the specified properties.

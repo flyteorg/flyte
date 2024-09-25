@@ -34,7 +34,7 @@ func validateInputs(nodeID common.NodeID, iface *core.TypedInterface, inputs cor
 			errs.Collect(errors.NewVariableNameNotFoundErr(nodeID, "", inputVar))
 			continue
 		}
-		
+
 		inputType := validators.LiteralTypeForLiteral(inputVal)
 		err := validators.ValidateLiteralType(inputType)
 		if err != nil {

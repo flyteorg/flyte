@@ -487,6 +487,47 @@ export class UnionType extends Message<UnionType> {
 }
 
 /**
+ * Enabled checking for offloaded literal type and getting the info about the store literal type.
+ *
+ * @generated from message flyteidl.core.OffloadedType
+ */
+export class OffloadedType extends Message<OffloadedType> {
+  /**
+   * Type of actual literal stored at the offloaded location
+   *
+   * @generated from field: flyteidl.core.LiteralType actual_literal_type = 1;
+   */
+  actualLiteralType?: LiteralType;
+
+  constructor(data?: PartialMessage<OffloadedType>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.core.OffloadedType";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "actual_literal_type", kind: "message", T: LiteralType },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): OffloadedType {
+    return new OffloadedType().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): OffloadedType {
+    return new OffloadedType().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): OffloadedType {
+    return new OffloadedType().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: OffloadedType | PlainMessage<OffloadedType> | undefined, b: OffloadedType | PlainMessage<OffloadedType> | undefined): boolean {
+    return proto3.util.equals(OffloadedType, a, b);
+  }
+}
+
+/**
  * Hints to improve type matching
  * e.g. allows distinguishing output from custom type transformers
  * even if the underlying IDL serialization matches.
@@ -655,6 +696,14 @@ export class LiteralType extends Message<LiteralType> {
      */
     value: UnionType;
     case: "unionType";
+  } | {
+    /**
+     * Defines the offload literal type which stores the info about the actual stored literal type.
+     *
+     * @generated from field: flyteidl.core.OffloadedType offloaded_type = 12;
+     */
+    value: OffloadedType;
+    case: "offloadedType";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   /**
@@ -696,6 +745,7 @@ export class LiteralType extends Message<LiteralType> {
     { no: 7, name: "enum_type", kind: "message", T: EnumType, oneof: "type" },
     { no: 8, name: "structured_dataset_type", kind: "message", T: StructuredDatasetType, oneof: "type" },
     { no: 10, name: "union_type", kind: "message", T: UnionType, oneof: "type" },
+    { no: 12, name: "offloaded_type", kind: "message", T: OffloadedType, oneof: "type" },
     { no: 6, name: "metadata", kind: "message", T: Struct },
     { no: 9, name: "annotation", kind: "message", T: TypeAnnotation },
     { no: 11, name: "structure", kind: "message", T: TypeStructure },

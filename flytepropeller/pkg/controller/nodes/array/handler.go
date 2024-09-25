@@ -3,9 +3,6 @@ package array
 import (
 	"context"
 	"fmt"
-	"math"
-	"strconv"
-
 	idlcore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
@@ -26,6 +23,8 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
+	"math"
+	"strconv"
 )
 
 var (
@@ -191,6 +190,8 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		}
 
 		size := -1
+
+		containsOffloadedLiteral := false
 		for key, variable := range literalMap.Literals {
 			literalType := validators.LiteralTypeForLiteral(variable)
 			err := validators.ValidateLiteralType(literalType)
@@ -212,6 +213,33 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 							fmt.Sprintf("input arrays have different lengths: expecting '%d' found '%d'", size, collectionLength), nil),
 					), nil
 				}
+			case *idlcore.LiteralType_OffloadedType:
+				containsOffloadedLiteral = true
+				err := common.ReadLargeLiteral(ctx, nCtx.DataStore(), variable)
+				if err != nil {
+					return handler.DoTransition(handler.TransitionTypeEphemeral,
+						handler.PhaseInfoFailure(idlcore.ExecutionError_SYSTEM, errors.RuntimeExecutionError, "couldn't read the offloaded literal", nil),
+					), nil
+				}
+
+				// variable would now be initialized to be full data
+				collectionLength := len(variable.GetCollection().Literals)
+
+				if size == -1 {
+					size = collectionLength
+				} else if size != collectionLength {
+					return handler.DoTransition(handler.TransitionTypeEphemeral,
+						handler.PhaseInfoFailure(idlcore.ExecutionError_USER, errors.InvalidArrayLength,
+							fmt.Sprintf("input arrays have different lengths: expecting '%d' found '%d'", size, collectionLength), nil),
+					), nil
+				}
+			}
+		}
+
+		if containsOffloadedLiteral {
+			inputFile := v1alpha1.GetInputsFile(nCtx.NodeStatus().GetDataDir())
+			if err := nCtx.DataStore().WriteProtobuf(ctx, inputFile, storage.Options{}, literalMap); err != nil {
+				return handler.UnknownTransition, err
 			}
 		}
 
