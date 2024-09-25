@@ -208,7 +208,7 @@ pyflyte build --remote image_spec.py wf
 ## Force push an image
 
 In some cases, you may want to force an image to rebuild, even if the image spec hasn’t changed.
-If you want to overwrite an existing image, you can pass the `FLYTE_FORCE_PUSH_IMAGE_SPEC=True` to `pyflyte` command.
+To overwrite an existing image, pass the `FLYTE_FORCE_PUSH_IMAGE_SPEC=True` to the `pyflyte` command.
 
 ```bash
 FLYTE_FORCE_PUSH_IMAGE_SPEC=True pyflyte run --remote image_spec.py wf
