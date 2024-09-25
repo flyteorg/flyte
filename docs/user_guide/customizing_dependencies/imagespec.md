@@ -8,7 +8,7 @@
 
 
 `ImageSpec` allows you to customize the container image for your Flyte tasks without a Dockerfile.
-downloaded packages from the PyPI and APT caches, thereby speeding up the entire build process.
+`ImageSpec` speeds up the build process by allowing you to reuse previously downloaded packages from the PyPI and APT caches.
 This efficient caching mechanism minimizes redundant downloads, reducing both the time and resources required to construct the container image.
 
 By default, the `ImageSpec` will be built using the `default` builder associated with Flytekit.
