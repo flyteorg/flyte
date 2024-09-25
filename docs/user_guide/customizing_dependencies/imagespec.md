@@ -6,7 +6,6 @@
 .. tags:: Containerization, Intermediate
 ```
 
-This guide demonstrates how to use the `ImageSpec` to customize the container image for your Flyte tasks.
 
 `ImageSpec` allows you to customize the container image for your Flyte tasks without a Dockerfile.
 This feature provides a flexible and user-friendly way to define the containerization process.
