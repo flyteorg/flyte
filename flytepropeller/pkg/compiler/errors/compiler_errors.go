@@ -221,10 +221,10 @@ func NewMismatchingVariablesErr(nodeID, fromVar, fromType, toVar, toType string)
 	)
 }
 
-func NewInvalidLiteralTypeErr(nodeID, errMsg string) *CompileError {
+func NewInvalidLiteralTypeErr(nodeID, inputVar string, err error) *CompileError {
 	return newError(
 		InvalidLiteralTypeError,
-		errMsg,
+		fmt.Sprintf("Failed to validate literal type for [%s] with err: %s", inputVar, err),
 		nodeID,
 	)
 }
