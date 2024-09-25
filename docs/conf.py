@@ -97,6 +97,7 @@ extlinks = {
 
 # redirects
 redirects = {
+    # concepts
     "concepts/admin": "../user_guide/concepts/control_plane/admin.html",
     "concepts/catalog": "../user_guide/concepts/main_concepts/catalog.html",
     "concepts/console": "../user_guide/concepts/control_plane/console.html",
@@ -118,10 +119,14 @@ redirects = {
     "concepts/versioning": "../user_guide/concepts/main_concepts/versioning.html",
     "concepts/workflow_lifecycle": "../user_guide/concepts/main_concepts/workflow_lifecycle.html",
     "concepts/workflows": "../user_guide/concepts/main_concepts/workflows.html",
+
+    # core use cases
     "core_use_cases/index": "../user_guide/core_use_cases/index.html",
     "core_use_cases/analytics": "../user_guide/core_use_cases/analytics.md",
     "core_use_cases/data_engineering": "../user_guide/core_use_cases/data_engineering.html",
     "core_use_cases/machine_learning": "../user_guide/core_use_cases/machine_learning.html",
+
+    # deprecated integrations
     "deprecated_integrations/index": "../../flytesnacks/deprecated_integrations/index.html",
     "deprecated_integrations/mmcloud_plugin/index": "../../flytesnacks/examples/mmcloud_agent/index.html",
     "deprecated_integrations/mmcloud_plugin/mmcloud_plugin_example": "../../flytesnacks/examples/mmcloud_agent/index.html",
@@ -131,6 +136,8 @@ redirects = {
     "deprecated_integrations/databricks_plugin/databricks_plugin_example": "../../flytesnacks/deprecated_integrations/databricks_plugin/databricks_plugin_example.html",
     "deprecated_integrations/snowflake_plugin/index": "../../flytesnacks/deprecated_integrations/snowflake_plugin/index.html",
     "deprecated_integrations/snowflake_plugin/snowflake_plugin_example": "../../flytesnacks/deprecated_integrations/snowflake_plugin/snowflake_plugin_example.html",
+
+    # flyte agents
     "flyte_agents/index": "../user_guide/flyte_agents/index.html",
     "flyte_agents/deploying_agents_to_the_flyte_sandbox": "../user_guide/flyte_agents/deploying_agents_to_the_flyte_sandbox.html",
     "flyte_agents/enabling_agents_in_your_flyte_deployment": "../user_guide/flyte_agents/enabling_agents_in_your_flyte_deployment.html",
@@ -138,6 +145,8 @@ redirects = {
     "flyte_agents/implementing_the_agent_metadata_service": "../user_guide/flyte_agents/implementing_the_agent_metadata_service.html",
     "flyte_agents/testing_agents_in_a_local_development_cluster": "../user_guide/flyte_agents/testing_agents_in_a_local_development_cluster.html",
     "flyte_agents/testing_agents_in_a_local_python_environment": "../user_guide/flyte_agents/testing_agents_in_a_local_python_environment.html",
+
+    # flyte fundamentals
     "flyte_fundamentals/index": "../user_guide/flyte_fundamentals/index.html",
     "flyte_fundamentals/extending_flyte": "../user_guide/flyte_fundamentals/extending_flyte.html",
     "flyte_fundamentals/optimizing_tasks": "../user_guide/flyte_fundamentals/optimizing_tasks.html",
@@ -145,14 +154,24 @@ redirects = {
     "flyte_fundamentals/running_and_scheduling_workflows": "../user_guide/flyte_fundamentals/running_and_scheduling_workflows.html",
     "flyte_fundamentals/tasks_workflows_and_launch_plans": "../user_guide/flyte_fundamentals/tasks_workflows_and_launch_plans.html",
     "flyte_fundamentals/visualizing_task_input_and_output": "../user_guide/flyte_fundamentals/visualizing_task_input_and_output.html",
+
+    # flytesnacks
+    "flytesnacks/contribute": "../community/contribute_docs.html",
+    "flytesnacks/integrations": "../flytesnacks/integrations/index.html",
+    "flytesnacks/tutorials": "../flytesnacks/tutorials.html",
+
+    # getting started with workflow development
     "getting_started_with_workflow_development/index": "../user_guide/getting_started_with_workflow_development/index.html",
     "getting_started_with_workflow_development/creating_a_flyte_project": "../user_guide/getting_started_with_workflow_development/creating_a_flyte_project.html",
     "getting_started_with_workflow_development/flyte_project_components": "../user_guide/getting_started_with_workflow_development/flyte_project_components.html",
     "getting_started_with_workflow_development/installing_development_tools": "../user_guide/getting_started_with_workflow_development/installing_development_tools.html",
     "getting_started_with_workflow_development/running_a_workflow_locally": "../user_guide/getting_started_with_workflow_development/running_a_workflow_locally.html",
+
+    # misc standalone pages
     "introduction": "../user_guide/introduction.html",
     "quickstart_guide": "../user_guide/quickstart_guide.html",
-    "flytesnacks/contribute": "../community/contribute_docs.html",
+
+    # flytectl
     "flytectl/docs_index": "../../api/flytectl/docs_index.html",
     "flytectl/overview": "../../api/flytectl/overview.html",
     "flytectl/gen/flytectl": "../../api/flytectl/gen/flytectl.html",
