@@ -17,7 +17,7 @@ func resolveAttrPathInPromise(nodeID string, literal *core.Literal, bindAttrPath
 	var tmpVal *core.Literal
 	var err error
 	var exist bool
-	count := 0
+	index := 0
 
 	for _, attr := range bindAttrPath {
 		switch currVal.GetValue().(type) {
@@ -27,13 +27,13 @@ func resolveAttrPathInPromise(nodeID string, literal *core.Literal, bindAttrPath
 				return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID, "key [%v] does not exist in literal %v", attr.GetStringValue(), currVal.GetMap().GetLiterals())
 			}
 			currVal = tmpVal
-			count++
+			index++
 		case *core.Literal_Collection:
 			if int(attr.GetIntValue()) >= len(currVal.GetCollection().GetLiterals()) {
 				return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID, "index [%v] is out of range of %v", attr.GetIntValue(), currVal.GetCollection().GetLiterals())
 			}
 			currVal = currVal.GetCollection().GetLiterals()[attr.GetIntValue()]
-			count++
+			index++
 		// scalar is always the leaf, so we can break here
 		case *core.Literal_Scalar:
 			break
@@ -43,12 +43,12 @@ func resolveAttrPathInPromise(nodeID string, literal *core.Literal, bindAttrPath
 	// resolve dataclass and Pydantic BaseModel
 	if scalar := currVal.GetScalar(); scalar != nil {
 		if binary := scalar.GetBinary(); binary != nil {
-			currVal, err = resolveAttrPathInBinary(nodeID, binary, bindAttrPath[count:])
+			currVal, err = resolveAttrPathInBinary(nodeID, binary, bindAttrPath[index:])
 			if err != nil {
 				return nil, err
 			}
 		} else if generic := scalar.GetGeneric(); generic != nil {
-			currVal, err = resolveAttrPathInPbStruct(nodeID, generic, bindAttrPath[count:])
+			currVal, err = resolveAttrPathInPbStruct(nodeID, generic, bindAttrPath[index:])
 			if err != nil {
 				return nil, err
 			}
