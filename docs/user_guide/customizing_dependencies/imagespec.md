@@ -32,7 +32,7 @@ Flytekit will build the image before registering the workflow and replace the im
 :::
 
 ## Install Python or APT packages
-You can specify python packages and apt packages in the `ImageSpec`.
+You can specify Python packages and APT packages in the `ImageSpec`.
 These specified packages will be added on top of the [default image](https://github.com/flyteorg/flytekit/blob/master/Dockerfile), which can be found in the Flytekit Dockerfile.
 More specifically, flytekit invokes [DefaultImages.default_image()](https://github.com/flyteorg/flytekit/blob/f2cfef0ec098d4ae8f042ab915b0b30d524092c6/flytekit/configuration/default_images.py#L26-L27) function.
 This function determines and returns the default image based on the Python version and flytekit version.
