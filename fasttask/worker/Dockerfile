@@ -31,7 +31,7 @@ COPY --from=build /dist /dist
 COPY --from=build /usr/local/bin/uv /usr/local/bin/uv
 
 RUN --mount=type=cache,sharing=locked,mode=0777,target=/root/.cache/uv \
-    uv pip install --system union /dist/$(ls /dist) \
+    uv pip install --system union kubernetes /dist/$(ls /dist) \
     && useradd -u 1000 flytekit \
     && chown flytekit: /root \
     && chown flytekit: /home

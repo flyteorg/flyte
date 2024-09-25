@@ -198,6 +198,7 @@ jobs:
   functional-tests:
     runs-on: ubuntu-latest
     needs: [build-sandbox-bundled-image, build-runtime-image]
+    timeout-minutes: 20
 
     steps:
       - uses: actions/checkout@v4

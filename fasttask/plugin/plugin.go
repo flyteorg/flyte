@@ -305,7 +305,37 @@ func (p *Plugin) trySubmitTask(ctx context.Context, tCtx core.TaskExecutionConte
 	}
 
 	taskContainer := taskTemplate.GetContainer()
-	if taskContainer == nil {
+	taskK8Pods := taskTemplate.GetK8SPod()
+
+	var args []string
+	if taskContainer != nil {
+		args = taskContainer.GetArgs()
+	} else if taskK8Pods != nil {
+		var podSpec = v1.PodSpec{}
+		err = utils.UnmarshalStructToObj(taskK8Pods.GetPodSpec(), &podSpec)
+		if err != nil {
+			return nil, core.PhaseInfoUndefined, flyteerrors.Errorf(flyteerrors.BadTaskSpecification, "unable to read pod template")
+		}
+
+		var primaryContainerName string
+		var ok bool
+		if primaryContainerName, ok = taskTemplate.GetConfig()[flytek8s.PrimaryContainerKey]; !ok {
+			return nil, core.PhaseInfoUndefined, flyteerrors.Errorf(flyteerrors.BadTaskSpecification, "failed to find environment")
+		}
+
+		foundContainer := false
+		for _, container := range podSpec.Containers {
+			if container.Name == primaryContainerName {
+				args = container.Args
+				foundContainer = true
+				break
+			}
+		}
+		if !foundContainer {
+			return nil, core.PhaseInfoUndefined, flyteerrors.Errorf(flyteerrors.BadTaskSpecification, "unable to find primary container")
+		}
+
+	} else {
 		return nil, core.PhaseInfoUndefined, flyteerrors.Errorf(flyteerrors.BadTaskSpecification, "unable to create container with no definition in TaskTemplate")
 	}
 
@@ -315,7 +345,7 @@ func (p *Plugin) trySubmitTask(ctx context.Context, tCtx core.TaskExecutionConte
 		OutputPath:       tCtx.OutputWriter(),
 		Task:             tCtx.TaskReader(),
 	}
-	command, err := template.Render(ctx, taskContainer.GetArgs(), templateParameters)
+	command, err := template.Render(ctx, args, templateParameters)
 	if err != nil {
 		return nil, core.PhaseInfoUndefined, err
 	}

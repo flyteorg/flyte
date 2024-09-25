@@ -85,6 +85,52 @@ func getBaseFasttaskTaskTemplate(t *testing.T) *idlcore.TaskTemplate {
 	}
 }
 
+func getBaseFasttaskTaskTemplateK8SPod(t *testing.T) *idlcore.TaskTemplate {
+	executionEnv := buildFasttaskEnvironment(t, &pb.FastTaskEnvironment{
+		QueueId: "foo",
+	}, nil)
+
+	executionEnvStruct := &_struct.Struct{}
+	err := utils.MarshalStruct(executionEnv, executionEnvStruct)
+	assert.Nil(t, err)
+
+	metadata := &idlcore.K8SObjectMetadata{
+		Labels: map[string]string{
+			"l": "a",
+		},
+		Annotations: map[string]string{
+			"a": "b",
+		},
+	}
+
+	podSpec := v1.PodSpec{
+		Containers: []v1.Container{
+			{
+				Name:    "primary",
+				Command: []string{""},
+				Args:    []string{},
+			},
+		},
+	}
+	podSpecStruct, err := utils.MarshalObjToStruct(podSpec)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return &idlcore.TaskTemplate{
+		Custom: executionEnvStruct,
+		Target: &idlcore.TaskTemplate_K8SPod{
+			K8SPod: &idlcore.K8SPod{
+				Metadata: metadata,
+				PodSpec:  podSpecStruct,
+			},
+		},
+		Config: map[string]string{
+			flytek8s.PrimaryContainerKey: "primary",
+		},
+	}
+}
+
 func TestFinalize(t *testing.T) {
 	ctx := context.TODO()
 	scope := promutils.NewTestScope()
@@ -435,9 +481,7 @@ func TestHandleNotYetStarted(t *testing.T) {
 	}
 
 	// initialize fasttask TaskTemplate
-	taskTemplate := getBaseFasttaskTaskTemplate(t)
-	taskReader := &coremocks.TaskReader{}
-	taskReader.OnReadMatch(mock.Anything).Return(taskTemplate, nil)
+	taskTemplateTests := []*idlcore.TaskTemplate{getBaseFasttaskTaskTemplate(t), getBaseFasttaskTaskTemplateK8SPod(t)}
 
 	// initialize static execution context attributes
 	inputReader := &iomocks.InputReader{}
@@ -468,71 +512,77 @@ func TestHandleNotYetStarted(t *testing.T) {
 	taskMetadata.OnGetTaskExecutionID().Return(taskExecutionID)
 
 	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			scope := promutils.NewTestScope()
+		for _, taskTemplate := range taskTemplateTests {
+			t.Run(test.name, func(t *testing.T) {
+				scope := promutils.NewTestScope()
 
-			// create TaskExecutionContext
-			tCtx := &coremocks.TaskExecutionContext{}
-			tCtx.OnInputReader().Return(inputReader)
-			tCtx.OnOutputWriter().Return(outputReader)
-			tCtx.OnTaskExecutionMetadata().Return(taskMetadata)
-			tCtx.OnTaskReader().Return(taskReader)
+				// initialize fasttask TaskTemplate
+				taskReader := &coremocks.TaskReader{}
+				taskReader.OnReadMatch(mock.Anything).Return(taskTemplate, nil)
 
-			executionEnvClient := &coremocks.ExecutionEnvClient{}
-			executionEnvClient.OnStatusMatch(ctx, mock.Anything).Return(test.executionEnvStatus, nil)
-			tCtx.OnGetExecutionEnvClient().Return(executionEnvClient)
+				// create TaskExecutionContext
+				tCtx := &coremocks.TaskExecutionContext{}
+				tCtx.OnInputReader().Return(inputReader)
+				tCtx.OnOutputWriter().Return(outputReader)
+				tCtx.OnTaskExecutionMetadata().Return(taskMetadata)
+				tCtx.OnTaskReader().Return(taskReader)
 
-			arrayNodeStateInput := &State{
-				SubmissionPhase: NotSubmitted,
-				LastUpdated:     test.lastUpdated,
-			}
-			pluginStateReader := &coremocks.PluginStateReader{}
-			pluginStateReader.On("Get", mock.Anything).Return(
-				func(v interface{}) uint8 {
-					*v.(*State) = *arrayNodeStateInput
-					return 0
-				},
-				nil,
-			)
-			tCtx.OnPluginStateReader().Return(pluginStateReader)
+				executionEnvClient := &coremocks.ExecutionEnvClient{}
+				executionEnvClient.OnStatusMatch(ctx, mock.Anything).Return(test.executionEnvStatus, nil)
+				tCtx.OnGetExecutionEnvClient().Return(executionEnvClient)
 
-			arrayNodeStateOutput := &State{}
-			pluginStateWriter := &coremocks.PluginStateWriter{}
-			pluginStateWriter.On("Put", mock.Anything, mock.Anything).Return(
-				func(stateVersion uint8, v interface{}) error {
-					*arrayNodeStateOutput = *v.(*State)
-					return nil
-				},
-			)
-			tCtx.OnPluginStateWriter().Return(pluginStateWriter)
+				arrayNodeStateInput := &State{
+					SubmissionPhase: NotSubmitted,
+					LastUpdated:     test.lastUpdated,
+				}
+				pluginStateReader := &coremocks.PluginStateReader{}
+				pluginStateReader.On("Get", mock.Anything).Return(
+					func(v interface{}) uint8 {
+						*v.(*State) = *arrayNodeStateInput
+						return 0
+					},
+					nil,
+				)
+				tCtx.OnPluginStateReader().Return(pluginStateReader)
 
-			// create FastTaskService mock
-			fastTaskService := &mocks.FastTaskService{}
-			fastTaskService.OnOfferOnQueue(ctx, "foo", "task-id", "namespace", "execution_id", []string{}).Return(test.workerID, nil)
+				arrayNodeStateOutput := &State{}
+				pluginStateWriter := &coremocks.PluginStateWriter{}
+				pluginStateWriter.On("Put", mock.Anything, mock.Anything).Return(
+					func(stateVersion uint8, v interface{}) error {
+						*arrayNodeStateOutput = *v.(*State)
+						return nil
+					},
+				)
+				tCtx.OnPluginStateWriter().Return(pluginStateWriter)
 
-			// initialize plugin
-			plugin := &Plugin{
-				fastTaskService: fastTaskService,
-				metrics:         newPluginMetrics(scope),
-			}
+				// create FastTaskService mock
+				fastTaskService := &mocks.FastTaskService{}
+				fastTaskService.OnOfferOnQueue(ctx, "foo", "task-id", "namespace", "execution_id", []string{}).Return(test.workerID, nil)
 
-			// call handle
-			transition, err := plugin.Handle(ctx, tCtx)
-			assert.Equal(t, test.expectedError, err)
-			assert.Equal(t, test.expectedPhase, transition.Info().Phase())
-			assert.Equal(t, test.expectedReason, transition.Info().Reason())
-			assert.Len(t, transition.Info().Info().Logs, 0)
+				// initialize plugin
+				plugin := &Plugin{
+					fastTaskService: fastTaskService,
+					metrics:         newPluginMetrics(scope),
+				}
 
-			require.Len(t, transition.Info().Info().ExternalResources, 1)
-			assignment := pb.FastTaskAssignment{}
-			require.NoError(t, utils.UnmarshalStruct(transition.Info().Info().ExternalResources[0].CustomInfo, &assignment))
-			assert.Equal(t, "foo", assignment.GetEnvironmentId())
-			assert.Equal(t, test.workerID, assignment.GetAssignedWorker())
+				// call handle
+				transition, err := plugin.Handle(ctx, tCtx)
+				assert.Equal(t, test.expectedError, err)
+				assert.Equal(t, test.expectedPhase, transition.Info().Phase())
+				assert.Equal(t, test.expectedReason, transition.Info().Reason())
+				assert.Len(t, transition.Info().Info().Logs, 0)
 
-			if len(test.workerID) > 0 {
-				assert.Equal(t, test.workerID, arrayNodeStateOutput.WorkerID)
-			}
-		})
+				require.Len(t, transition.Info().Info().ExternalResources, 1)
+				assignment := pb.FastTaskAssignment{}
+				require.NoError(t, utils.UnmarshalStruct(transition.Info().Info().ExternalResources[0].CustomInfo, &assignment))
+				assert.Equal(t, "foo", assignment.GetEnvironmentId())
+				assert.Equal(t, test.workerID, assignment.GetAssignedWorker())
+
+				if len(test.workerID) > 0 {
+					assert.Equal(t, test.workerID, arrayNodeStateOutput.WorkerID)
+				}
+			})
+		}
 	}
 }
 
