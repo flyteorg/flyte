@@ -19,6 +19,6 @@ func (_m *WorkflowExecutionEventWriter) Run() {
 }
 
 // Write provides a mock function with given fields: workflowExecutionEvent
-func (_m *WorkflowExecutionEventWriter) Write(workflowExecutionEvent admin.WorkflowExecutionEventRequest) {
+func (_m *WorkflowExecutionEventWriter) Write(workflowExecutionEvent *admin.WorkflowExecutionEventRequest) {
 	_m.Called(workflowExecutionEvent)
 }

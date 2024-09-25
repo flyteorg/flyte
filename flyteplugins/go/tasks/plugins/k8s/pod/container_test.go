@@ -49,6 +49,13 @@ func dummyContainerTaskTemplate(command []string, args []string) *core.TaskTempl
 func dummyContainerTaskTemplateWithPodSpec(command []string, args []string) *core.TaskTemplate {
 
 	podSpec := v1.PodSpec{
+		InitContainers: []v1.Container{
+			v1.Container{
+				Name:    "test-image",
+				Command: command,
+				Args:    args,
+			},
+		},
 		Containers: []v1.Container{
 			v1.Container{
 				Name:    "test-image",
@@ -174,24 +181,28 @@ func TestContainerTaskExecutor_BuildResource(t *testing.T) {
 		taskTemplate         *core.TaskTemplate
 		taskMetadata         pluginsCore.TaskExecutionMetadata
 		expectServiceAccount string
+		checkInitContainer   bool
 	}{
 		{
 			name:                 "BuildResource",
 			taskTemplate:         dummyContainerTaskTemplate(command, args),
 			taskMetadata:         dummyContainerTaskMetadata(containerResourceRequirements, nil, true, ""),
 			expectServiceAccount: serviceAccount,
+			checkInitContainer:   false,
 		},
 		{
 			name:                 "BuildResource_PodTemplate",
 			taskTemplate:         dummyContainerTaskTemplateWithPodSpec(command, args),
 			taskMetadata:         dummyContainerTaskMetadata(containerResourceRequirements, nil, true, ""),
 			expectServiceAccount: podTemplateServiceAccount,
+			checkInitContainer:   true,
 		},
 		{
 			name:                 "BuildResource_SecurityContext",
 			taskTemplate:         dummyContainerTaskTemplate(command, args),
 			taskMetadata:         dummyContainerTaskMetadata(containerResourceRequirements, nil, false, ""),
 			expectServiceAccount: securityContextServiceAccount,
+			checkInitContainer:   false,
 		},
 	}
 	for _, tc := range testCases {
@@ -212,6 +223,11 @@ func TestContainerTaskExecutor_BuildResource(t *testing.T) {
 
 			assert.Equal(t, command, j.Spec.Containers[0].Command)
 			assert.Equal(t, []string{"test-data-reference"}, j.Spec.Containers[0].Args)
+
+			if tc.checkInitContainer {
+				assert.Equal(t, command, j.Spec.InitContainers[0].Command)
+				assert.Equal(t, []string{"test-data-reference"}, j.Spec.InitContainers[0].Args)
+			}
 
 			assert.Equal(t, tc.expectServiceAccount, j.Spec.ServiceAccountName)
 		})

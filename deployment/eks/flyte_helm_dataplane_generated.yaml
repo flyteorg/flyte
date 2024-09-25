@@ -94,7 +94,7 @@ data:
     plugins:
       k8s:
         co-pilot:
-          image: cr.flyte.org/flyteorg/flytecopilot:v1.13.1-rc1
+          image: cr.flyte.org/flyteorg/flytecopilot:v1.13.1
           name: flyte-copilot-
           start-timeout: 30s
   core.yaml: | 
@@ -155,6 +155,7 @@ data:
         - sidecar
         - k8s-array
         - agent-service
+        - echo
   k8s.yaml: | 
     plugins:
       k8s:
@@ -176,9 +177,10 @@ data:
       limits:
         maxDownloadMBs: 10
   cache.yaml: |
-    cache:
-      max_size_mbs: 1024
-      target_gc_percent: 70
+    storage:
+      cache:
+        max_size_mbs: 1024
+        target_gc_percent: 70
   task_logs.yaml: | 
     plugins:
       logs:
@@ -428,7 +430,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "ea7955d463445fa62b4096a37caba7b9049bbbaf909a75ccb91c8bfbc35178b"
+        configChecksum: "16400bbf28ab823ca433a04379f00fecb11530c3c265dd1bdc3e30209ac6a6d"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "10254"
       labels: 
@@ -456,7 +458,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: "cr.flyte.org/flyteorg/flytepropeller:v1.13.1-rc1"
+        image: "cr.flyte.org/flyteorg/flytepropeller:v1.13.1"
         imagePullPolicy: "IfNotPresent"
         name: flytepropeller
         ports:
@@ -510,9 +512,9 @@ spec:
       labels:
         app: flyte-pod-webhook
         app.kubernetes.io/name: flyte-pod-webhook
-        app.kubernetes.io/version: v1.13.1-rc1
+        app.kubernetes.io/version: v1.13.1
       annotations:
-        configChecksum: "ea7955d463445fa62b4096a37caba7b9049bbbaf909a75ccb91c8bfbc35178b"
+        configChecksum: "16400bbf28ab823ca433a04379f00fecb11530c3c265dd1bdc3e30209ac6a6d"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "10254"
     spec:
@@ -526,7 +528,7 @@ spec:
       serviceAccountName: flyte-pod-webhook
       initContainers:
       - name: generate-secrets
-        image: "cr.flyte.org/flyteorg/flytepropeller:v1.13.1-rc1"
+        image: "cr.flyte.org/flyteorg/flytepropeller:v1.13.1"
         imagePullPolicy: "IfNotPresent"
         command:
           - flytepropeller
@@ -553,7 +555,7 @@ spec:
             mountPath: /etc/flyte/config
       containers:
         - name: webhook
-          image: "cr.flyte.org/flyteorg/flytepropeller:v1.13.1-rc1"
+          image: "cr.flyte.org/flyteorg/flytepropeller:v1.13.1"
           imagePullPolicy: "IfNotPresent"
           command:
             - flytepropeller

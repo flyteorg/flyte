@@ -8103,10 +8103,9 @@
                  * @property {flyteidl.core.IScalar|null} [scalar] Literal scalar
                  * @property {flyteidl.core.ILiteralCollection|null} [collection] Literal collection
                  * @property {flyteidl.core.ILiteralMap|null} [map] Literal map
+                 * @property {flyteidl.core.ILiteralOffloadedMetadata|null} [offloadedMetadata] Literal offloadedMetadata
                  * @property {string|null} [hash] Literal hash
                  * @property {Object.<string,string>|null} [metadata] Literal metadata
-                 * @property {string|null} [uri] Literal uri
-                 * @property {Long|null} [sizeBytes] Literal sizeBytes
                  */
     
                 /**
@@ -8150,6 +8149,14 @@
                 Literal.prototype.map = null;
     
                 /**
+                 * Literal offloadedMetadata.
+                 * @member {flyteidl.core.ILiteralOffloadedMetadata|null|undefined} offloadedMetadata
+                 * @memberof flyteidl.core.Literal
+                 * @instance
+                 */
+                Literal.prototype.offloadedMetadata = null;
+    
+                /**
                  * Literal hash.
                  * @member {string} hash
                  * @memberof flyteidl.core.Literal
@@ -8165,33 +8172,17 @@
                  */
                 Literal.prototype.metadata = $util.emptyObject;
     
-                /**
-                 * Literal uri.
-                 * @member {string} uri
-                 * @memberof flyteidl.core.Literal
-                 * @instance
-                 */
-                Literal.prototype.uri = "";
-    
-                /**
-                 * Literal sizeBytes.
-                 * @member {Long} sizeBytes
-                 * @memberof flyteidl.core.Literal
-                 * @instance
-                 */
-                Literal.prototype.sizeBytes = $util.Long ? $util.Long.fromBits(0,0,true) : 0;
-    
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
     
                 /**
                  * Literal value.
-                 * @member {"scalar"|"collection"|"map"|undefined} value
+                 * @member {"scalar"|"collection"|"map"|"offloadedMetadata"|undefined} value
                  * @memberof flyteidl.core.Literal
                  * @instance
                  */
                 Object.defineProperty(Literal.prototype, "value", {
-                    get: $util.oneOfGetter($oneOfFields = ["scalar", "collection", "map"]),
+                    get: $util.oneOfGetter($oneOfFields = ["scalar", "collection", "map", "offloadedMetadata"]),
                     set: $util.oneOfSetter($oneOfFields)
                 });
     
@@ -8230,10 +8221,8 @@
                     if (message.metadata != null && message.hasOwnProperty("metadata"))
                         for (var keys = Object.keys(message.metadata), i = 0; i < keys.length; ++i)
                             writer.uint32(/* id 5, wireType 2 =*/42).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]).uint32(/* id 2, wireType 2 =*/18).string(message.metadata[keys[i]]).ldelim();
-                    if (message.uri != null && message.hasOwnProperty("uri"))
-                        writer.uint32(/* id 6, wireType 2 =*/50).string(message.uri);
-                    if (message.sizeBytes != null && message.hasOwnProperty("sizeBytes"))
-                        writer.uint32(/* id 7, wireType 0 =*/56).uint64(message.sizeBytes);
+                    if (message.offloadedMetadata != null && message.hasOwnProperty("offloadedMetadata"))
+                        $root.flyteidl.core.LiteralOffloadedMetadata.encode(message.offloadedMetadata, writer.uint32(/* id 8, wireType 2 =*/66).fork()).ldelim();
                     return writer;
                 };
     
@@ -8264,6 +8253,9 @@
                         case 3:
                             message.map = $root.flyteidl.core.LiteralMap.decode(reader, reader.uint32());
                             break;
+                        case 8:
+                            message.offloadedMetadata = $root.flyteidl.core.LiteralOffloadedMetadata.decode(reader, reader.uint32());
+                            break;
                         case 4:
                             message.hash = reader.string();
                             break;
@@ -8274,12 +8266,6 @@
                             key = reader.string();
                             reader.pos++;
                             message.metadata[key] = reader.string();
-                            break;
-                        case 6:
-                            message.uri = reader.string();
-                            break;
-                        case 7:
-                            message.sizeBytes = reader.uint64();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -8329,6 +8315,16 @@
                                 return "map." + error;
                         }
                     }
+                    if (message.offloadedMetadata != null && message.hasOwnProperty("offloadedMetadata")) {
+                        if (properties.value === 1)
+                            return "value: multiple values";
+                        properties.value = 1;
+                        {
+                            var error = $root.flyteidl.core.LiteralOffloadedMetadata.verify(message.offloadedMetadata);
+                            if (error)
+                                return "offloadedMetadata." + error;
+                        }
+                    }
                     if (message.hash != null && message.hasOwnProperty("hash"))
                         if (!$util.isString(message.hash))
                             return "hash: string expected";
@@ -8340,16 +8336,156 @@
                             if (!$util.isString(message.metadata[key[i]]))
                                 return "metadata: string{k:string} expected";
                     }
+                    return null;
+                };
+    
+                return Literal;
+            })();
+    
+            core.LiteralOffloadedMetadata = (function() {
+    
+                /**
+                 * Properties of a LiteralOffloadedMetadata.
+                 * @memberof flyteidl.core
+                 * @interface ILiteralOffloadedMetadata
+                 * @property {string|null} [uri] LiteralOffloadedMetadata uri
+                 * @property {Long|null} [sizeBytes] LiteralOffloadedMetadata sizeBytes
+                 * @property {flyteidl.core.ILiteralType|null} [inferredType] LiteralOffloadedMetadata inferredType
+                 */
+    
+                /**
+                 * Constructs a new LiteralOffloadedMetadata.
+                 * @memberof flyteidl.core
+                 * @classdesc Represents a LiteralOffloadedMetadata.
+                 * @implements ILiteralOffloadedMetadata
+                 * @constructor
+                 * @param {flyteidl.core.ILiteralOffloadedMetadata=} [properties] Properties to set
+                 */
+                function LiteralOffloadedMetadata(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * LiteralOffloadedMetadata uri.
+                 * @member {string} uri
+                 * @memberof flyteidl.core.LiteralOffloadedMetadata
+                 * @instance
+                 */
+                LiteralOffloadedMetadata.prototype.uri = "";
+    
+                /**
+                 * LiteralOffloadedMetadata sizeBytes.
+                 * @member {Long} sizeBytes
+                 * @memberof flyteidl.core.LiteralOffloadedMetadata
+                 * @instance
+                 */
+                LiteralOffloadedMetadata.prototype.sizeBytes = $util.Long ? $util.Long.fromBits(0,0,true) : 0;
+    
+                /**
+                 * LiteralOffloadedMetadata inferredType.
+                 * @member {flyteidl.core.ILiteralType|null|undefined} inferredType
+                 * @memberof flyteidl.core.LiteralOffloadedMetadata
+                 * @instance
+                 */
+                LiteralOffloadedMetadata.prototype.inferredType = null;
+    
+                /**
+                 * Creates a new LiteralOffloadedMetadata instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.core.LiteralOffloadedMetadata
+                 * @static
+                 * @param {flyteidl.core.ILiteralOffloadedMetadata=} [properties] Properties to set
+                 * @returns {flyteidl.core.LiteralOffloadedMetadata} LiteralOffloadedMetadata instance
+                 */
+                LiteralOffloadedMetadata.create = function create(properties) {
+                    return new LiteralOffloadedMetadata(properties);
+                };
+    
+                /**
+                 * Encodes the specified LiteralOffloadedMetadata message. Does not implicitly {@link flyteidl.core.LiteralOffloadedMetadata.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.core.LiteralOffloadedMetadata
+                 * @static
+                 * @param {flyteidl.core.ILiteralOffloadedMetadata} message LiteralOffloadedMetadata message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                LiteralOffloadedMetadata.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.uri != null && message.hasOwnProperty("uri"))
+                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.uri);
+                    if (message.sizeBytes != null && message.hasOwnProperty("sizeBytes"))
+                        writer.uint32(/* id 2, wireType 0 =*/16).uint64(message.sizeBytes);
+                    if (message.inferredType != null && message.hasOwnProperty("inferredType"))
+                        $root.flyteidl.core.LiteralType.encode(message.inferredType, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a LiteralOffloadedMetadata message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.core.LiteralOffloadedMetadata
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.core.LiteralOffloadedMetadata} LiteralOffloadedMetadata
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                LiteralOffloadedMetadata.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.LiteralOffloadedMetadata();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.uri = reader.string();
+                            break;
+                        case 2:
+                            message.sizeBytes = reader.uint64();
+                            break;
+                        case 3:
+                            message.inferredType = $root.flyteidl.core.LiteralType.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a LiteralOffloadedMetadata message.
+                 * @function verify
+                 * @memberof flyteidl.core.LiteralOffloadedMetadata
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                LiteralOffloadedMetadata.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
                     if (message.uri != null && message.hasOwnProperty("uri"))
                         if (!$util.isString(message.uri))
                             return "uri: string expected";
                     if (message.sizeBytes != null && message.hasOwnProperty("sizeBytes"))
                         if (!$util.isInteger(message.sizeBytes) && !(message.sizeBytes && $util.isInteger(message.sizeBytes.low) && $util.isInteger(message.sizeBytes.high)))
                             return "sizeBytes: integer|Long expected";
+                    if (message.inferredType != null && message.hasOwnProperty("inferredType")) {
+                        var error = $root.flyteidl.core.LiteralType.verify(message.inferredType);
+                        if (error)
+                            return "inferredType." + error;
+                    }
                     return null;
                 };
     
-                return Literal;
+                return LiteralOffloadedMetadata;
             })();
     
             core.LiteralCollection = (function() {

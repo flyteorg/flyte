@@ -2,8 +2,6 @@ module github.com/flyteorg/flyte/flytectl
 
 go 1.22
 
-toolchain go1.22.0
-
 require (
 	github.com/apoorvam/goterminal v0.0.0-20180523175556-614d345c47e5
 	github.com/avast/retry-go v3.0.0+incompatible
@@ -21,7 +19,6 @@ require (
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
 	github.com/golang/protobuf v1.5.3
 	github.com/google/go-github/v42 v42.0.0
-	github.com/google/uuid v1.6.0
 	github.com/hashicorp/go-version v1.3.0
 	github.com/hexops/gotextdiff v1.0.3
 	github.com/kataras/tablewriter v0.0.0-20180708051242-e063d29b7c23
@@ -102,6 +99,7 @@ require (
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/google/s2a-go v0.1.7 // indirect
+	github.com/google/uuid v1.6.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.2 // indirect
 	github.com/googleapis/gax-go/v2 v2.12.0 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0 // indirect

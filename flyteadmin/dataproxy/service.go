@@ -161,7 +161,7 @@ func (s Service) CreateDownloadLink(ctx context.Context, req *service.CreateDown
 	// Lookup task, node, workflow execution
 	var nativeURL string
 	if nodeExecutionIDEnvelope, casted := req.GetSource().(*service.CreateDownloadLinkRequest_NodeExecutionId); casted {
-		node, err := s.nodeExecutionManager.GetNodeExecution(ctx, admin.NodeExecutionGetRequest{
+		node, err := s.nodeExecutionManager.GetNodeExecution(ctx, &admin.NodeExecutionGetRequest{
 			Id: nodeExecutionIDEnvelope.NodeExecutionId,
 		})
 
@@ -309,9 +309,9 @@ func (s Service) validateResolveArtifactRequest(req *service.GetDataRequest) err
 
 // GetCompleteTaskExecutionID returns the task execution identifier for the task execution with the Task ID filled in.
 // The one coming from the node execution doesn't have this as this is not data encapsulated in the flyte url.
-func (s Service) GetCompleteTaskExecutionID(ctx context.Context, taskExecID core.TaskExecutionIdentifier) (*core.TaskExecutionIdentifier, error) {
+func (s Service) GetCompleteTaskExecutionID(ctx context.Context, taskExecID *core.TaskExecutionIdentifier) (*core.TaskExecutionIdentifier, error) {
 
-	taskExecs, err := s.taskExecutionManager.ListTaskExecutions(ctx, admin.TaskExecutionListRequest{
+	taskExecs, err := s.taskExecutionManager.ListTaskExecutions(ctx, &admin.TaskExecutionListRequest{
 		NodeExecutionId: taskExecID.GetNodeExecutionId(),
 		Limit:           1,
 		Filters:         fmt.Sprintf("eq(retry_attempt,%s)", strconv.Itoa(int(taskExecID.RetryAttempt))),
@@ -326,9 +326,9 @@ func (s Service) GetCompleteTaskExecutionID(ctx context.Context, taskExecID core
 	return taskExec.Id, nil
 }
 
-func (s Service) GetTaskExecutionID(ctx context.Context, attempt int, nodeExecID core.NodeExecutionIdentifier) (*core.TaskExecutionIdentifier, error) {
-	taskExecs, err := s.taskExecutionManager.ListTaskExecutions(ctx, admin.TaskExecutionListRequest{
-		NodeExecutionId: &nodeExecID,
+func (s Service) GetTaskExecutionID(ctx context.Context, attempt int, nodeExecID *core.NodeExecutionIdentifier) (*core.TaskExecutionIdentifier, error) {
+	taskExecs, err := s.taskExecutionManager.ListTaskExecutions(ctx, &admin.TaskExecutionListRequest{
+		NodeExecutionId: nodeExecID,
 		Limit:           1,
 		Filters:         fmt.Sprintf("eq(retry_attempt,%s)", strconv.Itoa(attempt)),
 	})
@@ -342,11 +342,11 @@ func (s Service) GetTaskExecutionID(ctx context.Context, attempt int, nodeExecID
 	return taskExec.Id, nil
 }
 
-func (s Service) GetDataFromNodeExecution(ctx context.Context, nodeExecID core.NodeExecutionIdentifier, ioType common.ArtifactType, name string) (
+func (s Service) GetDataFromNodeExecution(ctx context.Context, nodeExecID *core.NodeExecutionIdentifier, ioType common.ArtifactType, name string) (
 	*service.GetDataResponse, error) {
 
-	resp, err := s.nodeExecutionManager.GetNodeExecutionData(ctx, admin.NodeExecutionGetDataRequest{
-		Id: &nodeExecID,
+	resp, err := s.nodeExecutionManager.GetNodeExecutionData(ctx, &admin.NodeExecutionGetDataRequest{
+		Id: nodeExecID,
 	})
 	if err != nil {
 		return nil, err
@@ -361,7 +361,7 @@ func (s Service) GetDataFromNodeExecution(ctx context.Context, nodeExecID core.N
 		// Assume deck, and create a download link request
 		dlRequest := service.CreateDownloadLinkRequest{
 			ArtifactType: service.ArtifactType_ARTIFACT_TYPE_DECK,
-			Source:       &service.CreateDownloadLinkRequest_NodeExecutionId{NodeExecutionId: &nodeExecID},
+			Source:       &service.CreateDownloadLinkRequest_NodeExecutionId{NodeExecutionId: nodeExecID},
 		}
 		resp, err := s.CreateDownloadLink(ctx, &dlRequest)
 		if err != nil {
@@ -391,12 +391,12 @@ func (s Service) GetDataFromNodeExecution(ctx context.Context, nodeExecID core.N
 	}, nil
 }
 
-func (s Service) GetDataFromTaskExecution(ctx context.Context, taskExecID core.TaskExecutionIdentifier, ioType common.ArtifactType, name string) (
+func (s Service) GetDataFromTaskExecution(ctx context.Context, taskExecID *core.TaskExecutionIdentifier, ioType common.ArtifactType, name string) (
 	*service.GetDataResponse, error) {
 
 	var lm *core.LiteralMap
-	reqT := admin.TaskExecutionGetDataRequest{
-		Id: &taskExecID,
+	reqT := &admin.TaskExecutionGetDataRequest{
+		Id: taskExecID,
 	}
 	resp, err := s.taskExecutionManager.GetTaskExecutionData(ctx, reqT)
 	if err != nil {
@@ -445,13 +445,13 @@ func (s Service) GetData(ctx context.Context, req *service.GetDataRequest) (
 	}
 
 	if execution.NodeExecID != nil {
-		return s.GetDataFromNodeExecution(ctx, *execution.NodeExecID, execution.IOType, execution.LiteralName)
+		return s.GetDataFromNodeExecution(ctx, execution.NodeExecID, execution.IOType, execution.LiteralName)
 	} else if execution.PartialTaskExecID != nil {
-		taskExecID, err := s.GetCompleteTaskExecutionID(ctx, *execution.PartialTaskExecID)
+		taskExecID, err := s.GetCompleteTaskExecutionID(ctx, execution.PartialTaskExecID)
 		if err != nil {
 			return nil, err
 		}
-		return s.GetDataFromTaskExecution(ctx, *taskExecID, execution.IOType, execution.LiteralName)
+		return s.GetDataFromTaskExecution(ctx, taskExecID, execution.IOType, execution.LiteralName)
 	}
 
 	return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "failed to parse get data request %v", req)

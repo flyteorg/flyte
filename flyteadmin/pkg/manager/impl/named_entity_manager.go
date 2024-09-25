@@ -42,7 +42,7 @@ type NamedEntityManager struct {
 	metrics NamedEntityMetrics
 }
 
-func (m *NamedEntityManager) UpdateNamedEntity(ctx context.Context, request admin.NamedEntityUpdateRequest) (
+func (m *NamedEntityManager) UpdateNamedEntity(ctx context.Context, request *admin.NamedEntityUpdateRequest) (
 	*admin.NamedEntityUpdateResponse, error) {
 	if err := validation.ValidateNamedEntityUpdateRequest(request); err != nil {
 		logger.Debugf(ctx, "invalid request [%+v]: %v", request, err)
@@ -51,12 +51,12 @@ func (m *NamedEntityManager) UpdateNamedEntity(ctx context.Context, request admi
 	ctx = contextutils.WithProjectDomain(ctx, request.Id.Project, request.Id.Domain)
 
 	// Ensure entity exists before trying to update it
-	_, err := util.GetNamedEntity(ctx, m.db, request.ResourceType, *request.Id)
+	_, err := util.GetNamedEntity(ctx, m.db, request.ResourceType, request.Id)
 	if err != nil {
 		return nil, err
 	}
 
-	metadataModel := transformers.CreateNamedEntityModel(&request)
+	metadataModel := transformers.CreateNamedEntityModel(request)
 	err = m.db.NamedEntityRepo().Update(ctx, metadataModel)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to update named_entity for [%+v] with err %v", request.Id, err)
@@ -65,14 +65,14 @@ func (m *NamedEntityManager) UpdateNamedEntity(ctx context.Context, request admi
 	return &admin.NamedEntityUpdateResponse{}, nil
 }
 
-func (m *NamedEntityManager) GetNamedEntity(ctx context.Context, request admin.NamedEntityGetRequest) (
+func (m *NamedEntityManager) GetNamedEntity(ctx context.Context, request *admin.NamedEntityGetRequest) (
 	*admin.NamedEntity, error) {
 	if err := validation.ValidateNamedEntityGetRequest(request); err != nil {
 		logger.Debugf(ctx, "invalid request [%+v]: %v", request, err)
 		return nil, err
 	}
 	ctx = contextutils.WithProjectDomain(ctx, request.Id.Project, request.Id.Domain)
-	return util.GetNamedEntity(ctx, m.db, request.ResourceType, *request.Id)
+	return util.GetNamedEntity(ctx, m.db, request.ResourceType, request.Id)
 }
 
 func (m *NamedEntityManager) getQueryFilters(referenceEntity core.ResourceType, requestFilters string) ([]common.InlineFilter, error) {
@@ -103,7 +103,7 @@ func (m *NamedEntityManager) getQueryFilters(referenceEntity core.ResourceType, 
 	return filters, nil
 }
 
-func (m *NamedEntityManager) ListNamedEntities(ctx context.Context, request admin.NamedEntityListRequest) (
+func (m *NamedEntityManager) ListNamedEntities(ctx context.Context, request *admin.NamedEntityListRequest) (
 	*admin.NamedEntityList, error) {
 	if err := validation.ValidateNamedEntityListRequest(request); err != nil {
 		logger.Debugf(ctx, "invalid request [%+v]: %v", request, err)

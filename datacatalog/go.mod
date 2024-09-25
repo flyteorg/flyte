@@ -2,8 +2,6 @@ module github.com/flyteorg/flyte/datacatalog
 
 go 1.22
 
-toolchain go1.22.1
-
 require (
 	github.com/Selvatico/go-mocket v1.0.7
 	github.com/flyteorg/flyte/flyteidl v0.0.0-00010101000000-000000000000

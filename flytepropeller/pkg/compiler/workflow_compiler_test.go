@@ -150,8 +150,8 @@ func TestCompileWorkflowWithFailureNode(t *testing.T) {
 	subWorkflows := make([]*core.WorkflowTemplate, 0)
 	reqs, err := GetRequirements(inputWorkflow, subWorkflows)
 	assert.Nil(t, err)
-	assert.True(t, proto.Equal(&reqs.taskIds[0], &[]common.Identifier{{Name: "cleanup"}, {Name: "task_123"}}[0]))
-	assert.True(t, proto.Equal(&reqs.taskIds[1], &[]common.Identifier{{Name: "cleanup"}, {Name: "task_123"}}[1]))
+	assert.True(t, proto.Equal(reqs.taskIds[0], []common.Identifier{{Name: "cleanup"}, {Name: "task_123"}}[0]))
+	assert.True(t, proto.Equal(reqs.taskIds[1], []common.Identifier{{Name: "cleanup"}, {Name: "task_123"}}[1]))
 
 	// Replace with logic to satisfy the requirements
 	workflows := make([]common.InterfaceProvider, 0)

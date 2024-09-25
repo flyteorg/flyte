@@ -94,7 +94,7 @@ func TestGetExecutionInputs(t *testing.T) {
 		lpRequest.Spec.FixedInputs,
 		lpRequest.Spec.DefaultInputs,
 	)
-	expectedMap := core.LiteralMap{
+	expectedMap := &core.LiteralMap{
 		Literals: map[string]*core.Literal{
 			"foo": coreutils.MustMakeLiteral("foo-value-1"),
 			"bar": coreutils.MustMakeLiteral("bar-value"),
@@ -102,7 +102,41 @@ func TestGetExecutionInputs(t *testing.T) {
 	}
 	assert.Nil(t, err)
 	assert.NotNil(t, actualInputs)
-	assert.EqualValues(t, expectedMap, *actualInputs)
+	assert.EqualValues(t, expectedMap, actualInputs)
+}
+
+func TestGetExecutionWithOffloadedInputs(t *testing.T) {
+	execLiteral := &core.Literal{
+		Value: &core.Literal_OffloadedMetadata{
+			OffloadedMetadata: &core.LiteralOffloadedMetadata{
+				Uri:       "s3://bucket/key",
+				SizeBytes: 100,
+				InferredType: &core.LiteralType{
+					Type: &core.LiteralType_Simple{
+						Simple: core.SimpleType_STRING,
+					},
+				},
+			},
+		},
+	}
+	executionRequest := testutils.GetExecutionRequestWithOffloadedInputs("foo", execLiteral)
+	lpRequest := testutils.GetLaunchPlanRequest()
+
+	actualInputs, err := CheckAndFetchInputsForExecution(
+		executionRequest.Inputs,
+		lpRequest.Spec.FixedInputs,
+		lpRequest.Spec.DefaultInputs,
+	)
+	expectedMap := core.LiteralMap{
+		Literals: map[string]*core.Literal{
+			"foo": execLiteral,
+			"bar": coreutils.MustMakeLiteral("bar-value"),
+		},
+	}
+	assert.Nil(t, err)
+	assert.NotNil(t, actualInputs)
+	assert.EqualValues(t, expectedMap.GetLiterals()["foo"], actualInputs.Literals["foo"])
+	assert.EqualValues(t, expectedMap.GetLiterals()["bar"], actualInputs.Literals["bar"])
 }
 
 func TestValidateExecInputsWrongType(t *testing.T) {
@@ -164,7 +198,7 @@ func TestValidateExecEmptyInputs(t *testing.T) {
 		lpRequest.Spec.FixedInputs,
 		lpRequest.Spec.DefaultInputs,
 	)
-	expectedMap := core.LiteralMap{
+	expectedMap := &core.LiteralMap{
 		Literals: map[string]*core.Literal{
 			"foo": coreutils.MustMakeLiteral("foo-value"),
 			"bar": coreutils.MustMakeLiteral("bar-value"),
@@ -172,7 +206,7 @@ func TestValidateExecEmptyInputs(t *testing.T) {
 	}
 	assert.Nil(t, err)
 	assert.NotNil(t, actualInputs)
-	assert.EqualValues(t, expectedMap, *actualInputs)
+	assert.EqualValues(t, expectedMap, actualInputs)
 }
 
 func TestValidExecutionId(t *testing.T) {
@@ -196,14 +230,14 @@ func TestValidExecutionIdInvalidChars(t *testing.T) {
 }
 
 func TestValidateCreateWorkflowEventRequest(t *testing.T) {
-	request := admin.WorkflowExecutionEventRequest{
+	request := &admin.WorkflowExecutionEventRequest{
 		RequestId: "1",
 	}
 	err := ValidateCreateWorkflowEventRequest(request, maxOutputSizeInBytes)
 	assert.NotNil(t, err)
 	assert.EqualError(t, err, "Workflow event handler was called without event")
 
-	request = admin.WorkflowExecutionEventRequest{
+	request = &admin.WorkflowExecutionEventRequest{
 		RequestId: "1",
 		Event: &event.WorkflowExecutionEvent{
 			Phase:        core.WorkflowExecution_FAILED,
