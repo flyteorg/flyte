@@ -20,7 +20,7 @@ the [default Docker image](https://ghcr.io/flyteorg/flytekit), to all tasks. To 
 use the `container_image` parameter available in the {py:func}`flytekit.task` decorator, and pass an
 `ImageSpec`.
 
-Before building the image, Flytekit checks the container registry first to see if the image already exists.
+Before building the image, Flytekit checks the container registry to see if the image already exists.
 If the image does not exist,
 flytekit will build the image before registering the workflow, and replace the image name in the task template with the newly built image name.
 
