@@ -19,9 +19,9 @@ The Flyte community as a self-governed and productive collective of individuals,
 
 - Create a `community` folder under `flytekit/plugins` and keep releasing the plugins in that folder as separate `pypi` packages.
 - Configure CI to only run tests on `plugins/community` when there are changes.
-- Keep releasing plugins alongside flytekit.
-- Update [CODEOWNERS](https://github.com/flyteorg/flytekit/blob/master/CODEOWNERS) for the `plugins/community` folder, enabling contributors to merge community plugins (it requires granting Write permissions to contributors on `flytekit`).
-- Explicitly mark them as community maintained in the import via `import flytekitplugins.contrib.x`
+- Keep releasing community plugins alongside flytekit, even if there are no changes.
+- Explicitly mark plugins as community maintained in the import via `import flytekitplugins.contrib.x`
+- Plugin authors are responsible for maintaining their plugins, and `flytekit` maintainers are responsible for final approvals and merging into the repo.
 
 ### Promotion process to official plugin
 
@@ -37,11 +37,10 @@ To consider it for promotion, a plugin must meet the following criteria:
 - Documented in flytekit's documentation
 
 
+
 ## 4 Drawbacks
 
-- There's a management overhead associated with this initiative:
-    - For every new plugin contributor, we may need to update `CODEOWNERS`
-    - CI configuration changes in flytekit (probably a one-time change) 
+- Potential overhead: CI configuration changes in flytekit (probably a one-time change) 
 
 ## 5 Alternatives
 
@@ -52,8 +51,8 @@ To consider it for promotion, a plugin must meet the following criteria:
 - `flytekit` plugins built into their own package
     -   Potentially heavier development process
 
-## 6 Open questions
+- Adding plugin authors as CODEOWNERS won't be considered due to a [Github permission model](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners) limitation:
 
-- Does this apply to Agents?
+>The people you choose as code owners must have write permissions for the repository. 
 
-
+Getting write permissions in `flytekit` via contributing plugins is not part of the [current Governance model](https://github.com/flyteorg/community/blob/main/GOVERNANCE.md#community-roles-and-path-to-maintainership) for flyte.
