@@ -13,7 +13,6 @@
 By default, the `ImageSpec` will be built using the `default` builder associated with Flytekit, but you can register your own builder.
 
 For example, [flytekitplugins-envd](https://github.com/flyteorg/flytekit/blob/c06ef30518dec2057e554fbed375dfa43b985c60/plugins/flytekit-envd/flytekitplugins/envd/image_builder.py#L25) is another image builder that uses envd to build the ImageSpec.
-This flexibility allows you to tailor the image-building process according to your specific needs and tool preferences.
 
 For every {py:class}`flytekit.PythonFunctionTask` task or a task decorated with the `@task` decorator,
 you can specify rules for binding container images. By default, flytekit binds a single container image, i.e.,
