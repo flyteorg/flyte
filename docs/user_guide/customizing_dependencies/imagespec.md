@@ -199,6 +199,7 @@ pyflyte run --remote --image image.yaml image_spec.py wf
 ```
 
 ## Build the image without registering the workflow
+
 If you only want to build the image without registering the workflow, you can use the `pyflyte build` command.
 
 ```
