@@ -8,7 +8,7 @@
 
 This guide demonstrates how to use the `ImageSpec` to customize the container image for your Flyte tasks.
 
-`ImageSpec` is a mechanism that allows you to specify how to build a container image without requiring a Dockerfile.
+`ImageSpec` allows you to customize the container image for your Flyte tasks without a Dockerfile.
 This feature provides a flexible and user-friendly way to define the containerization process.
 One of the significant advantages of using ImageSpec is its ability to optimize the image-building process by reusing previously
 downloaded packages from the PyPI and APT caches, thereby speeding up the entire build process.
