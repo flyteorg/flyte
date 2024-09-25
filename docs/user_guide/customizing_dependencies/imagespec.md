@@ -179,7 +179,8 @@ image_spec = ImageSpec(
 ```
 
 ## Define ImageSpec in a YAML File
-There is an option to override the container image by providing an ImageSpec YAML file to the  `pyflyte run` or `pyflyte register` command.
+
+You can override the container image by providing an ImageSpec YAML file to the  `pyflyte run` or `pyflyte register` command.
 This allows for greater flexibility in specifying a custom container image. For example:
 
 ```yaml
