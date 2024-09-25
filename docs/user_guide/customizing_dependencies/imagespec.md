@@ -22,7 +22,7 @@ use the `container_image` parameter available in the {py:func}`flytekit.task` de
 
 Before building the image, Flytekit checks the container registry to see if the image already exists.
 If the image does not exist,
-flytekit will build the image before registering the workflow, and replace the image name in the task template with the newly built image name.
+Flytekit will build the image before registering the workflow and replace the image name in the task template with the newly built image name.
 
 :::{admonition} Prerequisites
 :class: important
