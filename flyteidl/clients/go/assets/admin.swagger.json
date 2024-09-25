@@ -6661,10 +6661,12 @@
       "properties": {
         "value": {
           "type": "string",
-          "format": "byte"
+          "format": "byte",
+          "description": "Serialized data (MessagePack) for supported types like Dataclass, Pydantic BaseModel, and untyped dict."
         },
         "tag": {
-          "type": "string"
+          "type": "string",
+          "description": "The serialization format identifier (e.g., MessagePack). Consumers must define unique tags and validate them before deserialization."
         }
       },
       "description": "A simple byte array with a tag to help different parts of the system communicate about what is in the byte array.\nIt's strongly advisable that consumers of this type define a unique tag and validate the tag before parsing the data."
@@ -7418,6 +7420,10 @@
           "$ref": "#/definitions/coreLiteralMap",
           "description": "A map of strings to literals."
         },
+        "offloaded_metadata": {
+          "$ref": "#/definitions/coreLiteralOffloadedMetadata",
+          "description": "Offloaded literal metadata\nWhen you deserialize the offloaded metadata, it would be of Literal and its type would be defined by LiteralType stored in offloaded_metadata."
+        },
         "hash": {
           "type": "string",
           "title": "A hash representing this literal.\nThis is used for caching purposes. For more details refer to RFC 1893\n(https://github.com/flyteorg/flyte/blob/master/rfc/system/1893-caching-of-offloaded-objects.md)"
@@ -7428,15 +7434,6 @@
             "type": "string"
           },
           "description": "Additional metadata for literals."
-        },
-        "uri": {
-          "type": "string",
-          "description": "If this literal is offloaded, this field will contain metadata including the offload location."
-        },
-        "size_bytes": {
-          "type": "string",
-          "format": "uint64",
-          "description": "Includes information about the size of the literal."
         }
       },
       "description": "A simple value. This supports any level of nesting (e.g. array of array of array of Blobs) as well as simple primitives."
@@ -7465,6 +7462,25 @@
         }
       },
       "description": "A map of literals. This is a workaround since oneofs in proto messages cannot contain a repeated field."
+    },
+    "coreLiteralOffloadedMetadata": {
+      "type": "object",
+      "properties": {
+        "uri": {
+          "type": "string",
+          "description": "The location of the offloaded core.Literal."
+        },
+        "size_bytes": {
+          "type": "string",
+          "format": "uint64",
+          "description": "The size of the offloaded data."
+        },
+        "inferred_type": {
+          "$ref": "#/definitions/coreLiteralType",
+          "description": "The inferred literal type of the offloaded data."
+        }
+      },
+      "description": "A message that contains the metadata of the offloaded data."
     },
     "coreLiteralType": {
       "type": "object",
