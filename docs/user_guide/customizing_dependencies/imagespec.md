@@ -11,7 +11,6 @@
 `ImageSpec` speeds up the build process by allowing you to reuse previously downloaded packages from the PyPI and APT caches.
 
 By default, the `ImageSpec` will be built using the `default` builder associated with Flytekit, but you can register your own builder.
-However, you have the option to register your own builder, enabling you to build the image using alternative tools.
 
 For example, [flytekitplugins-envd](https://github.com/flyteorg/flytekit/blob/c06ef30518dec2057e554fbed375dfa43b985c60/plugins/flytekit-envd/flytekitplugins/envd/image_builder.py#L25) is another image builder that uses envd to build the ImageSpec.
 This flexibility allows you to tailor the image-building process according to your specific needs and tool preferences.
