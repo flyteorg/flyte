@@ -47,7 +47,7 @@ func validateInputs(nodeID common.NodeID, iface *core.TypedInterface, inputs cor
 
 		err := validators.ValidateLiteralType(inputType)
 		if err != nil {
-			errMsg := fmt.Sprintf("Failed to validate literal type for %s with err: %s", inputVar, err)
+			errMsg := fmt.Sprintf("Failed to validate literal type for [%s] with err: %s", inputVar, err)
 			errs.Collect(errors.NewIDLTypeNotFoundErr(nodeID, errMsg))
 			continue
 		}

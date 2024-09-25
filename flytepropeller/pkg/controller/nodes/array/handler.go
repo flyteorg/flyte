@@ -195,7 +195,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			literalType := validators.LiteralTypeForLiteral(variable)
 			err := validators.ValidateLiteralType(literalType)
 			if err != nil {
-				errMsg := fmt.Sprintf("Failed to validate literal type for %s with err: %s", key, err)
+				errMsg := fmt.Sprintf("Failed to validate literal type for [%s] with err: %s", key, err)
 				return handler.DoTransition(handler.TransitionTypeEphemeral,
 					handler.PhaseInfoFailure(idlcore.ExecutionError_USER, errors.IDLNotFoundErr, errMsg, nil),
 				), nil
