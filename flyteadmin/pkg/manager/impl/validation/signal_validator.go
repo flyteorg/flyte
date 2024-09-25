@@ -2,7 +2,6 @@ package validation
 
 import (
 	"context"
-	"fmt"
 
 	"google.golang.org/grpc/codes"
 
@@ -79,19 +78,7 @@ func ValidateSignalSetRequest(ctx context.Context, db repositoryInterfaces.Repos
 	}
 	err = propellervalidators.ValidateLiteralType(valueType)
 	if err != nil {
-		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
-			fmt.Sprintf("Failed to validate literal type for %s with err: %s", valueType, err))
-	}
-
-	if valueType == nil {
-		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
-			fmt.Sprintf(
-				"Invalid signal value for '%s'.\n"+
-					"Expected type: %s, but received: %s.\n"+
-					"Suggested solution: Ensure all Flyte images are updated to the latest version and try again.",
-				request.Value, lookupSignal.GetType().String(), valueType,
-			),
-		)
+		return errors.NewInvalidLiteralTypeError("", err)
 	}
 	if !propellervalidators.AreTypesCastable(lookupSignal.Type, valueType) {
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,

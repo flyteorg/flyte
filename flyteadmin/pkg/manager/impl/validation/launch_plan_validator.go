@@ -2,7 +2,6 @@ package validation
 
 import (
 	"context"
-	"fmt"
 
 	"google.golang.org/grpc/codes"
 
@@ -146,8 +145,7 @@ func checkAndFetchExpectedInputForLaunchPlan(
 		inputType := validators.LiteralTypeForLiteral(fixedInput)
 		err := validators.ValidateLiteralType(inputType)
 		if err != nil {
-			return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
-				fmt.Sprintf("Failed to validate literal type for %s with err: %s", name, err))
+			return nil, errors.NewInvalidLiteralTypeError(name, err)
 		}
 		if !validators.AreTypesCastable(inputType, value.GetType()) {
 			return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument,

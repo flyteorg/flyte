@@ -2,7 +2,6 @@ package validation
 
 import (
 	"context"
-	"fmt"
 	"regexp"
 	"strings"
 
@@ -110,8 +109,7 @@ func CheckAndFetchInputsForExecution(
 			}
 			err := validators.ValidateLiteralType(inputType)
 			if err != nil {
-				return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
-					fmt.Sprintf("Failed to validate literal type for %s with err: %s", name, err))
+				return nil, errors.NewInvalidLiteralTypeError(name, err)
 			}
 			if !validators.AreTypesCastable(inputType, expectedInput.GetVar().GetType()) {
 				return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "invalid %s input wrong type. Expected %s, but got %s", name, expectedInput.GetVar().GetType(), inputType)
