@@ -1,10 +1,22 @@
 package common
 
 import (
+	"fmt"
+
 	"github.com/samber/lo"
+	"k8s.io/apimachinery/pkg/util/rand"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
+
+const ExecutionIDLength = 20
+const ExecutionStringFormat = "a%s"
+
+/* #nosec */
+func GetExecutionName(seed int64) string {
+	rand.Seed(seed)
+	return fmt.Sprintf(ExecutionStringFormat, rand.String(ExecutionIDLength-1))
+}
 
 var terminalExecutionPhases = map[core.WorkflowExecution_Phase]bool{
 	core.WorkflowExecution_SUCCEEDED: true,

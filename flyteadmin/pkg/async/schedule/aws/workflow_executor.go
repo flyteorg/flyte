@@ -15,7 +15,7 @@ import (
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async"
 	scheduleInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/async/schedule/interfaces"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/common/naming"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
@@ -129,7 +129,7 @@ func generateExecutionName(launchPlan *admin.LaunchPlan, kickoffTime time.Time) 
 		Name:    launchPlan.Id.Name,
 	})
 	randomSeed := kickoffTime.UnixNano() + int64(hashedIdentifier)
-	return naming.GetExecutionName(randomSeed)
+	return common.GetExecutionName(randomSeed)
 }
 
 func (e *workflowExecutor) formulateExecutionCreateRequest(
@@ -207,6 +207,7 @@ func (e *workflowExecutor) run() error {
 			continue
 		}
 		executionRequest := e.formulateExecutionCreateRequest(launchPlan, scheduledWorkflowExecutionRequest.KickoffTime)
+
 		ctx = contextutils.WithWorkflowID(ctx, fmt.Sprintf(workflowIdentifierFmt, executionRequest.Project,
 			executionRequest.Domain, executionRequest.Name))
 		err = e.resolveKickoffTimeArg(scheduledWorkflowExecutionRequest, launchPlan, executionRequest)
