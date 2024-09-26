@@ -230,7 +230,7 @@ func (m *CatalogClient) createArtifact(ctx context.Context, key catalog.Key, dat
 	createArtifactRequest := &datacatalog.CreateArtifactRequest{Artifact: cachedArtifact}
 	_, err := m.client.CreateArtifact(ctx, createArtifactRequest)
 	if err != nil {
-		logger.Errorf(ctx, "Failed to create Artifact %+v, err: %v", cachedArtifact, err)
+		logger.Errorf(ctx, "Failed to create Artifact %+v, err: %v", cachedArtifact.Id, err)
 		return catalog.Status{}, err
 	}
 	logger.Debugf(ctx, "Created artifact: %v, with %v outputs from execution %+v", cachedArtifact.Id, len(artifactDataList), metadata)

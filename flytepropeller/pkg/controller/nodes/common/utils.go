@@ -2,7 +2,9 @@ package common
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
+
 	"strconv"
 
 	"github.com/golang/protobuf/proto"
@@ -17,6 +19,7 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/pbhash"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
@@ -125,6 +128,12 @@ func OffloadLargeLiteral(ctx context.Context, datastore *storage.DataStore, data
 		logger.Errorf(ctx, "Failed to offload literal at location [%s] with error [%s]", dataReference, err)
 		return err
 	}
+	// compute the hash of the literal
+	literalDigest, err := pbhash.ComputeHash(ctx, toBeOffloaded)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to compute hash for offloaded literal with error [%s]", err)
+		return err
+	}
 
 	// update the literal with the offloaded URI, size and inferred type
 	toBeOffloaded.Value = &idlcore.Literal_OffloadedMetadata{
@@ -133,6 +142,10 @@ func OffloadLargeLiteral(ctx context.Context, datastore *storage.DataStore, data
 			SizeBytes:    uint64(literalSizeBytes),
 			InferredType: inferredType,
 		},
+	}
+	if toBeOffloaded.GetHash() == "" {
+		// Set the hash or else respect what the user set in the literal
+		toBeOffloaded.Hash = base64.RawURLEncoding.EncodeToString(literalDigest)
 	}
 	logger.Infof(ctx, "Offloaded literal at location [%s] with size [%d] MB and inferred type [%s]", dataReference, literalSizeMB, inferredType)
 	return nil
