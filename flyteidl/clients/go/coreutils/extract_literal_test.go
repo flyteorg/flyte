@@ -200,6 +200,31 @@ func TestFetchLiteral(t *testing.T) {
 		assert.Equal(t, literalVal, extractedLiteralVal)
 	})
 
+	t.Run("Offloaded metadata", func(t *testing.T) {
+		literalVal := "s3://blah/blah/blah"
+		var literalType = &core.LiteralType{
+			Type: &core.LiteralType_OffloadedType{
+				OffloadedType: &core.OffloadedType{
+					ActualLiteralType: &core.LiteralType{
+						Type: &core.LiteralType_CollectionType{
+							CollectionType: &core.LiteralType{
+								Type: &core.LiteralType_Simple{
+									Simple: core.SimpleType_INTEGER,
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		lit, err := MakeLiteralForType(literalType, literalVal)
+
+		assert.NoError(t, err)
+		extractedLiteralVal, err := ExtractFromLiteral(lit)
+		assert.NoError(t, err)
+		assert.Equal(t, literalVal, extractedLiteralVal)
+	})
+
 	t.Run("Union", func(t *testing.T) {
 		literalVal := int64(1)
 		var literalType = &core.LiteralType{

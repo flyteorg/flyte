@@ -23,7 +23,6 @@ package coreutils
 
 import (
 	"fmt"
-
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
@@ -96,6 +95,10 @@ func ExtractFromLiteral(literal *core.Literal) (interface{}, error) {
 			}
 		}
 		return mapResult, nil
+	case *core.Literal_OffloadedMetadata:
+		// Return the URI of the offloaded metadata to be used when displaying in flytectl
+		return literalValue.OffloadedMetadata.Uri, nil
+
 	}
 	return nil, fmt.Errorf("unsupported literal type %T", literal)
 }
