@@ -11,7 +11,7 @@ The Flyte community as a self-governed and productive collective of individuals,
 
 ## 2 Motivation
 
-- With the current "in-tree" approach, plugins developed by the community land on the `flytekit` repo ([example](https://github.com/flyteorg/flytekit/pull/2537)). It results in Flyte maintainers having to take care of CI test failures due to plugin code or flytekit updates incompatible with plugin code, etc.
+- With the current "in-tree" approach, plugins developed by the community land in the `flytekit` repo ([example](https://github.com/flyteorg/flytekit/pull/2537)). It results in Flyte maintainers having to take care of CI test failures due to plugin code or flytekit updates incompatible with plugin code, etc. Flyte maintainers are also expected to provide support about and fix bugs in plugins integrating 3rd party libraries that they might have little knowledge off.
 
 - The goal is to agree on a process for contributors to follow when submitting new integrations in a "out-of-tree" way that clearly communicates that it is a community-contributed -and then- community-supported integration.
 
@@ -21,7 +21,7 @@ The Flyte community as a self-governed and productive collective of individuals,
 - Configure CI to only run tests on `plugins/community` when there are changes to a respective plugin.
 - Keep releasing community plugins alongside flytekit, even if there are no changes.
 - Explicitly mark plugins as community maintained in the import via `import flytekitplugins.contrib.x`
-- Plugin authors are responsible for maintaining their plugins, and `flytekit` maintainers are responsible for final approvals and merging into the repo.
+- Plugin authors are responsible for maintaining their plugins. In case there are PRs to change a community plugin, the plugin maintainers review the PR and give a non-binding approval. Once a community plugin maintainer has given a non-binding approval, a `flytekit` maintainer has to give a binding approval in order for the PR to be merged.
 
 This proposal includes agent plugins.
 ### Promotion process to official plugin
