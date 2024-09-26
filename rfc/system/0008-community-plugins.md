@@ -18,7 +18,7 @@ The Flyte community as a self-governed and productive collective of individuals,
 ## 3 Proposed Implementation
 
 - Create a `community` folder under `flytekit/plugins` and keep releasing the plugins in that folder as separate `pypi` packages.
-- Configure CI to only run tests on `plugins/community` when there are changes.
+- Configure CI to only run tests on `plugins/community` when there are changes to a respective plugin.
 - Keep releasing community plugins alongside flytekit, even if there are no changes.
 - Explicitly mark plugins as community maintained in the import via `import flytekitplugins.contrib.x`
 - Plugin authors are responsible for maintaining their plugins, and `flytekit` maintainers are responsible for final approvals and merging into the repo.
