@@ -3,6 +3,7 @@ package nodes
 import (
 	"github.com/shamaton/msgpack/v2"
 	"google.golang.org/protobuf/types/known/structpb"
+	"os"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/errors"
@@ -92,6 +93,23 @@ func resolveAttrPathInPbStruct(nodeID string, st *structpb.Struct, bindAttrPath 
 	return literal, err
 }
 
+func writeBytesToFile(filename string, data []byte) error {
+	// Create or truncate the file
+	file, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	// Write the bytes to the file
+	_, err = file.Write(data)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // resolveAttrPathInBinary resolves the binary idl object (e.g. dataclass, pydantic basemodel) with attribute path
 func resolveAttrPathInBinary(nodeID string, binaryIDL *core.Binary, bindAttrPath []*core.PromiseAttribute) (*core.
 	Literal,
@@ -137,6 +155,8 @@ func resolveAttrPathInBinary(nodeID string, binaryIDL *core.Binary, bindAttrPath
 
 	if serializationFormat == messagepack {
 		// Marshal the current value to MessagePack bytes
+		writeBytesToFile("/Users/future-outlier/code/dev/build/PR/JSON/Flyte-Console-support-MsgPack"+
+			"/golang_msgpack_bytes", binaryBytes)
 		resolvedBinaryBytes, err := msgpack.Marshal(currVal)
 		if err != nil {
 			return nil, err
