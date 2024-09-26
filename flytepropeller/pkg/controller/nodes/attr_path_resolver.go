@@ -1,15 +1,19 @@
 package nodes
 
 import (
+	"context"
+
 	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/common"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/errors"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 // resolveAttrPathInPromise resolves the literal with attribute path
 // If the promise is chained with attributes (e.g. promise.a["b"][0]), then we need to resolve the promise
-func resolveAttrPathInPromise(nodeID string, literal *core.Literal, bindAttrPath []*core.PromiseAttribute) (*core.Literal, error) {
+func resolveAttrPathInPromise(ctx context.Context, datastore *storage.DataStore, nodeID string, literal *core.Literal, bindAttrPath []*core.PromiseAttribute) (*core.Literal, error) {
 	var currVal *core.Literal = literal
 	var tmpVal *core.Literal
 	var err error
@@ -17,7 +21,16 @@ func resolveAttrPathInPromise(nodeID string, literal *core.Literal, bindAttrPath
 	count := 0
 
 	for _, attr := range bindAttrPath {
+		if currVal.GetOffloadedMetadata() != nil {
+			// currVal will be overwritten with the contents of the offloaded data which contains the actual large literal.
+			err := common.ReadLargeLiteral(ctx, datastore, currVal)
+			if err != nil {
+				return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID, "failed to read offloaded metadata for promise")
+			}
+		}
 		switch currVal.GetValue().(type) {
+		case *core.Literal_OffloadedMetadata:
+			return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID, "unexpect offloaded metadata type")
 		case *core.Literal_Map:
 			tmpVal, exist = currVal.GetMap().GetLiterals()[attr.GetStringValue()]
 			if !exist {
