@@ -115,7 +115,33 @@ func TestOffloadLargeLiteral(t *testing.T) {
 		assert.Equal(t, uint64(6), toBeOffloaded.GetOffloadedMetadata().GetSizeBytes())
 		assert.Equal(t, inferredType.GetSimple(), toBeOffloaded.GetOffloadedMetadata().InferredType.GetSimple())
 		assert.Equal(t, base64.RawURLEncoding.EncodeToString(expectedLiteralDigest), toBeOffloaded.Hash)
+	})
 
+	t.Run("offload successful with valid size and hash passed in", func(t *testing.T) {
+		ctx := context.Background()
+		datastore, _ := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
+		dataReference := storage.DataReference("foo/bar")
+		toBeOffloaded := &idlCore.Literal{
+			Value: &idlCore.Literal_Scalar{
+				Scalar: &idlCore.Scalar{
+					Value: &idlCore.Scalar_Primitive{
+						Primitive: &idlCore.Primitive{
+							Value: &idlCore.Primitive_Integer{
+								Integer: 1,
+							},
+						},
+					},
+				},
+			},
+			Hash: "hash",
+		}
+		literalOffloadingConfig := config.LiteralOffloadingConfig{
+			MinSizeInMBForOffloading: 0,
+			MaxSizeInMBForOffloading: 1,
+		}
+		err := OffloadLargeLiteral(ctx, datastore, dataReference, toBeOffloaded, literalOffloadingConfig)
+		assert.NoError(t, err)
+		assert.Equal(t, "hash", toBeOffloaded.Hash)
 	})
 
 	t.Run("offload fails with size larger than max", func(t *testing.T) {
