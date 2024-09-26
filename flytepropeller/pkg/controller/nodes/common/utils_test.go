@@ -2,6 +2,8 @@ package common
 
 import (
 	"context"
+	"encoding/base64"
+	"github.com/flyteorg/flyte/flytestdlib/pbhash"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -100,16 +102,19 @@ func TestOffloadLargeLiteral(t *testing.T) {
 				},
 			},
 		}
+		expectedLiteralDigest, err := pbhash.ComputeHash(ctx, toBeOffloaded)
+		assert.Nil(t, err)
 		literalOffloadingConfig := config.LiteralOffloadingConfig{
 			MinSizeInMBForOffloading: 0,
 			MaxSizeInMBForOffloading: 1,
 		}
 		inferredType := validators.LiteralTypeForLiteral(toBeOffloaded)
-		err := OffloadLargeLiteral(ctx, datastore, dataReference, toBeOffloaded, literalOffloadingConfig)
+		err = OffloadLargeLiteral(ctx, datastore, dataReference, toBeOffloaded, literalOffloadingConfig)
 		assert.NoError(t, err)
 		assert.Equal(t, "foo/bar", toBeOffloaded.GetOffloadedMetadata().GetUri())
 		assert.Equal(t, uint64(6), toBeOffloaded.GetOffloadedMetadata().GetSizeBytes())
 		assert.Equal(t, inferredType.GetSimple(), toBeOffloaded.GetOffloadedMetadata().InferredType.GetSimple())
+		assert.Equal(t, base64.RawURLEncoding.EncodeToString(expectedLiteralDigest), toBeOffloaded.Hash)
 
 	})
 
