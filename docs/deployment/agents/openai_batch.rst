@@ -65,38 +65,18 @@ Add the OpenAI API token
   helm repo add flyteorg https://flyteorg.github.io/flyte
   helm install flyteagent flyteorg/flyteagent --namespace flyte
 
-2. Get the base64 value of your OpenAI API token:
+2. Set Your OpenAI API Token as a Secret (Base64 Encoded):
 
-.. code-block::
+.. code-block:: bash
 
-  echo -n "<OPENAI_API_TOKEN>" | base64
+  SECRET_VALUE=$(echo -n "<OPENAI_API_TOKEN>" | base64) && \
+  kubectl patch secret flyteagent -n flyte --patch "{\"data\":{\"flyte_openai_api_key\":\"$SECRET_VALUE\"}}"
 
-3. Edit the flyteagent secret:
+3. Restart development:
 
-    .. code-block:: bash
+.. code-block:: bash
 
-      kubectl edit secret flyteagent -n flyte
-
-    .. code-block:: yaml
-      :emphasize-lines: 3
-
-      apiVersion: v1
-      data:
-        FLYTE_OPENAI_API_KEY: <BASE64_ENCODED_OPENAI_API_TOKEN>
-      kind: Secret
-      metadata:
-        annotations:
-          meta.helm.sh/release-name: flyteagent
-          meta.helm.sh/release-namespace: flyte
-        creationTimestamp: "2023-10-04T04:09:03Z"
-        labels:
-          app.kubernetes.io/managed-by: Helm
-        name: flyteagent
-        namespace: flyte
-        resourceVersion: "753"
-        uid: 5ac1e1b6-2a4c-4e26-9001-d4ba72c39e54
-      type: Opaque
-
+  kubectl rollout restart deployment flyteagent -n flyte
 
 Upgrade the Flyte Helm release
 ------------------------------
