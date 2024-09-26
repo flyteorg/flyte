@@ -28,7 +28,7 @@ This proposal includes agent plugins.
 
 An official plugin is one that is maintained by the core Flyte team and is made part of the official `flytekit` documentation.
 
-- Plugins maintainers or community members can propose the promotion of a plugin to official by creating an Issue on the `flytekit` repo.
+- Plugin maintainers or community members can propose the promotion of a plugin to official by creating an Issue on the `flytekit` repo.
 - The supermajority of the TSC must approve publicly before promoting a plugin.
 
 To consider it for promotion, a plugin must meet the following criteria:
