@@ -23,6 +23,7 @@ The Flyte community as a self-governed and productive collective of individuals,
 - Explicitly mark plugins as community maintained in the import via `import flytekitplugins.contrib.x`
 - Plugin authors are responsible for maintaining their plugins, and `flytekit` maintainers are responsible for final approvals and merging into the repo.
 
+This proposal includes agent plugins.
 ### Promotion process to official plugin
 
 An official plugin is one that is maintained by the core Flyte team and is made part of the official `flytekit` documentation.
