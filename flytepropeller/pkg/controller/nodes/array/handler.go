@@ -201,19 +201,9 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 					handler.PhaseInfoFailure(idlcore.ExecutionError_USER, errors.IDLNotFoundErr, errMsg, nil),
 				), nil
 			}
-			switch literalType.Type.(type) {
-			case *idlcore.LiteralType_CollectionType:
-				collectionLength := len(variable.GetCollection().Literals)
-
-				if size == -1 {
-					size = collectionLength
-				} else if size != collectionLength {
-					return handler.DoTransition(handler.TransitionTypeEphemeral,
-						handler.PhaseInfoFailure(idlcore.ExecutionError_USER, errors.InvalidArrayLength,
-							fmt.Sprintf("input arrays have different lengths: expecting '%d' found '%d'", size, collectionLength), nil),
-					), nil
-				}
-			case *idlcore.LiteralType_OffloadedType:
+			if variable.GetOffloadedMetadata() != nil {
+				// variable will be overwritten with the contents of the offloaded data which contains the actual large literal.
+				// We need this for the map task to be able to create the subNodeSpec
 				containsOffloadedLiteral = true
 				err := common.ReadLargeLiteral(ctx, nCtx.DataStore(), variable)
 				if err != nil {
@@ -221,10 +211,10 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 						handler.PhaseInfoFailure(idlcore.ExecutionError_SYSTEM, errors.RuntimeExecutionError, "couldn't read the offloaded literal", nil),
 					), nil
 				}
-
-				// variable would now be initialized to be full data
+			}
+			switch literalType.Type.(type) {
+			case *idlcore.LiteralType_CollectionType:
 				collectionLength := len(variable.GetCollection().Literals)
-
 				if size == -1 {
 					size = collectionLength
 				} else if size != collectionLength {
@@ -236,6 +226,9 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			}
 		}
 
+		// At this point if we find input to map task was an offloaded literal, then we overwrite the input file with the actual data
+		// This is due to the fact the flytekit downloads the entire data and each node indexes into the data to get the specific
+		// input that the node needs to work on.
 		if containsOffloadedLiteral {
 			inputFile := v1alpha1.GetInputsFile(nCtx.NodeStatus().GetDataDir())
 			if err := nCtx.DataStore().WriteProtobuf(ctx, inputFile, storage.Options{}, literalMap); err != nil {

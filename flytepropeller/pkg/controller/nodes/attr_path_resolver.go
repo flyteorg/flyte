@@ -30,7 +30,7 @@ func resolveAttrPathInPromise(ctx context.Context, datastore *storage.DataStore,
 		}
 		switch currVal.GetValue().(type) {
 		case *core.Literal_OffloadedMetadata:
-			return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID, "unexpect offloaded metadata type")
+			return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID, "unexpected offloaded metadata type")
 		case *core.Literal_Map:
 			tmpVal, exist = currVal.GetMap().GetLiterals()[attr.GetStringValue()]
 			if !exist {
