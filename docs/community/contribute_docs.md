@@ -9,37 +9,36 @@ practitioner, we welcome your contributions to the Flyte documentation!
 
 The Flyte documentation comprises the following types:
 
-* {ref}`User guide <userguide>` documentation: this is conceptual and procedural documentation about using Flyte features to accomplish tasks.
-* API documentation:
+* **{ref}`User guide <userguide>` documentation:** Conceptual and procedural documentation about using Flyte features to accomplish tasks.
+* **API documentation:**
   * {doc}`flytekit <../api/flytekit/docs_index>`
   * {doc}`flytectl <../api/flytectl/docs_index>`
   * {doc}`flyteidl <../reference_flyteidl>`
-* {ref}`Tutorials <tutorials>`: These are longer, more advanced guides that use multiple Flyte features to solve real-world problems. Tutorials are generally more complex examples that may require extra setup or that can only run on larger clusters.
-* {ref}`Integrations <integrations>`: These examples showcase how to use the Flyte plugins that integrate with the broader data and ML ecosystem.
-* {ref}`Deployment <deployment>` documentation.
+* **{ref}`Tutorials <tutorials>`:** Longer, more advanced guides that use multiple Flyte features to solve real-world problems. Some tutorials may require extra setup, while others can only run on larger clusters.
+* **{ref}`Integrations examples <integrations>`:** These examples showcase how to use the Flyte plugins that integrate with the broader data and machine learning ecosystem.
+* **{ref}`Deployment documentation <deployment>`:** Guidance on deploying and configuring the Flyte backend.
 
-## User guide documentation
+## Contributing to user guide and deployment documentation
 
-To update user guide documentation, edit the user guide files in the [flyte repository](https://github.com/flyteorg/flyte/tree/master/docs/user_guide).
+To update user guide or deployment documentation, edit the corresponding files in the [flyte repository](https://github.com/flyteorg/flyte/tree/master/docs/user_guide).
 
 ### Code in user guide documentation
 
-If you want to include tested, runnable example code in user guide documentation, add your code to the flytesnacks repo. Write your code in regular Python, with regular comments. These comments **will not** be extracted from the Python file and turned into user-facing documentation. You can use the `rli` ([remoteliteralinclude](https://github.com/wpilibsuite/sphinxext-remoteliteralinclude/blob/main/README.md)) directive to include snippets of code from your example Python file.
+If you want to include tested, runnable example code in user guide documentation, follow the steps below to add your code to the [flytesnacks repository](https://github.com/flyteorg/flytesnacks). Write your code in regular Python, with regular comments. These comments **will not** be extracted from the Python file and turned into user-facing documentation. You can use the `rli` ([remoteliteralinclude](https://github.com/wpilibsuite/sphinxext-remoteliteralinclude/blob/main/README.md)) directive to include snippets of code from your example Python file.
 
-## API documentation
+## Contributing to API documentation
 
-* flytekit: See the flytekit repository.
-* flytectl: See the docs in the flyte repository.
-* flyteidl: See the docs in the flyte repository.
+* **flytekit:** See the [flytekit repository](https://github.com/flyteorg/flytekit). Documentation consists of content in submodule `__init__.py` files, `rst` files, and docstrings in classes and methods.
+* **flytectl:** See the [flyte repository](https://github.com/flyteorg/flyte/tree/master/flytectl). Documentation consists of `rst` files in the `flytectl/docs` directory and comments in code files.
+* **flyteidl:** See the [flyte repository](https://github.com/flyteorg/flyte/tree/master/flyteidl).
 
-## Tutorials and integrations
+## Contributing tutorials and integrations examples
 
 The tutorials and integrations examples provide an easy way for the community to learn about the rich set of
 features that Flyte offers, and we are constantly improving them with your help!
 
-The first step to contributing an example is to open up a
-[documentation issue](https://github.com/flyteorg/flyte/issues/new?assignees=&labels=documentation%2Cuntriaged&template=docs_issue.yaml&title=%5BDocs%5D+)
-to articulate the kind of example you want to write. The Flyte maintainers will guide and help you figure out where your example would fit best.
+The first step to contributing a tutorial or integration example is to open a
+[documentation issue](https://github.com/flyteorg/flyte/issues/new?assignees=&labels=documentation%2Cuntriaged&template=docs_issue.yaml&title=%5BDocs%5D+) to describe the example you want to write. The Flyte maintainers will help you figure out where your tutorial or integration example would best fit.
 
 ### Creating a tutorial or integration example
 
