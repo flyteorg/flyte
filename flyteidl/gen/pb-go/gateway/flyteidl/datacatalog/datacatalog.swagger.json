@@ -260,10 +260,6 @@
           "$ref": "#/definitions/coreUnionType",
           "description": "Defines an union type with pre-defined LiteralTypes."
         },
-        "offloaded_type": {
-          "$ref": "#/definitions/coreOffloadedType",
-          "description": "Defines the offload literal type which stores the info about the actual stored literal type."
-        },
         "metadata": {
           "type": "object",
           "description": "This field contains type metadata that is descriptive of the type, but is NOT considered in type-checking.  This might be used by\nconsumers to identify special behavior or display extended information for the type."
@@ -278,16 +274,6 @@
         }
       },
       "description": "Defines a strong type to allow type checking between interfaces."
-    },
-    "coreOffloadedType": {
-      "type": "object",
-      "properties": {
-        "actual_literal_type": {
-          "$ref": "#/definitions/coreLiteralType",
-          "title": "Type of actual literal stored at the offloaded location"
-        }
-      },
-      "description": "Enabled checking for offloaded literal type and getting the info about the store literal type."
     },
     "corePrimitive": {
       "type": "object",

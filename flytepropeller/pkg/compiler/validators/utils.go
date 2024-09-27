@@ -285,13 +285,7 @@ func LiteralTypeForLiteral(l *core.Literal) *core.LiteralType {
 			},
 		}
 	case *core.Literal_OffloadedMetadata:
-		return &core.LiteralType{
-			Type: &core.LiteralType_OffloadedType{
-				OffloadedType: &core.OffloadedType{
-					ActualLiteralType: l.GetOffloadedMetadata().GetInferredType(),
-				},
-			},
-		}
+		return l.GetOffloadedMetadata().GetInferredType()
 	}
 	return nil
 }

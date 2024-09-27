@@ -3,7 +3,6 @@ package common
 import (
 	"context"
 	"encoding/base64"
-	"github.com/flyteorg/flyte/flytestdlib/pbhash"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -16,6 +15,7 @@ import (
 	executorMocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors/mocks"
 	nodeMocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces/mocks"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/flytestdlib/pbhash"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
@@ -82,6 +82,40 @@ func TestCreateParentInfoNil(t *testing.T) {
 
 func init() {
 	labeled.SetMetricKeys(contextutils.AppNameKey)
+}
+
+func TestReadLargeLiteral(t *testing.T) {
+	t.Run("read successful", func(t *testing.T) {
+		ctx := context.Background()
+		datastore, _ := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
+		dataReference := storage.DataReference("foo/bar")
+		toBeRead := &idlCore.Literal{
+			Value: &idlCore.Literal_Scalar{
+				Scalar: &idlCore.Scalar{
+					Value: &idlCore.Scalar_Primitive{
+						Primitive: &idlCore.Primitive{
+							Value: &idlCore.Primitive_Integer{
+								Integer: 1,
+							},
+						},
+					},
+				},
+			},
+		}
+		err := datastore.WriteProtobuf(ctx, dataReference, storage.Options{}, toBeRead)
+		assert.Nil(t, err)
+
+		offloadedLiteral := &idlCore.Literal{
+			Value: &idlCore.Literal_OffloadedMetadata{
+				OffloadedMetadata: &idlCore.LiteralOffloadedMetadata{
+					Uri: dataReference.String(),
+				},
+			},
+		}
+		err = ReadLargeLiteral(ctx, datastore, offloadedLiteral)
+		assert.Nil(t, err)
+		assert.Equal(t, int64(1), offloadedLiteral.GetScalar().GetPrimitive().GetInteger())
+	})
 }
 
 func TestOffloadLargeLiteral(t *testing.T) {

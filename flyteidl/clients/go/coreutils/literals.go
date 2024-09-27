@@ -636,14 +636,6 @@ func MakeLiteralForType(t *core.LiteralType, v interface{}) (*core.Literal, erro
 		if !found {
 			return nil, fmt.Errorf("incorrect union value [%s], supported values %+v", v, newT.UnionType.Variants)
 		}
-	case *core.LiteralType_OffloadedType:
-		// This is a special type that is used to represent a literal that is offloaded to a remote store.
-		// The value here is the URI of the offloaded data.
-		l.Value = &core.Literal_OffloadedMetadata{
-			OffloadedMetadata: &core.LiteralOffloadedMetadata{
-				Uri: fmt.Sprintf("%v", v),
-			},
-		}
 	default:
 		return nil, fmt.Errorf("unsupported type %s", t.String())
 	}

@@ -1354,10 +1354,6 @@
           "$ref": "#/definitions/coreUnionType",
           "description": "Defines an union type with pre-defined LiteralTypes."
         },
-        "offloaded_type": {
-          "$ref": "#/definitions/coreOffloadedType",
-          "description": "Defines the offload literal type which stores the info about the actual stored literal type."
-        },
         "metadata": {
           "type": "object",
           "description": "This field contains type metadata that is descriptive of the type, but is NOT considered in type-checking.  This might be used by\nconsumers to identify special behavior or display extended information for the type."
@@ -1432,16 +1428,6 @@
       ],
       "default": "CLIENT_CREDENTIALS",
       "description": "Type of the token requested.\n\n - CLIENT_CREDENTIALS: CLIENT_CREDENTIALS indicates a 2-legged OAuth token requested using client credentials."
-    },
-    "coreOffloadedType": {
-      "type": "object",
-      "properties": {
-        "actual_literal_type": {
-          "$ref": "#/definitions/coreLiteralType",
-          "title": "Type of actual literal stored at the offloaded location"
-        }
-      },
-      "description": "Enabled checking for offloaded literal type and getting the info about the store literal type."
     },
     "corePartitions": {
       "type": "object",

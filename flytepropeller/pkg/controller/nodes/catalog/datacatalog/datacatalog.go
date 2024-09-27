@@ -259,7 +259,7 @@ func (m *CatalogClient) createArtifact(ctx context.Context, key catalog.Key, dat
 		}
 	}
 
-	logger.Debugf(ctx, "Successfully created artifact %+v for key %+v, dataset %+v and execution %+v", cachedArtifact, key, datasetID, metadata)
+	logger.Debugf(ctx, "Successfully created artifact %+v for key %+v, dataset %+v and execution %+v", cachedArtifact.Id, key, datasetID, metadata)
 	return catalog.NewStatus(core.CatalogCacheStatus_CACHE_POPULATED, EventCatalogMetadata(datasetID, tag, nil)), nil
 }
 
