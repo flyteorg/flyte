@@ -87,8 +87,11 @@ func ReadLargeLiteral(ctx context.Context, datastore *storage.DataStore,
 	if tobeRead.GetOffloadedMetadata() == nil {
 		return fmt.Errorf("unsupported type for reading offloaded literal")
 	}
-	// read the offloaded literal
 	dataReference := tobeRead.GetOffloadedMetadata().GetUri()
+	if dataReference == "" {
+		return fmt.Errorf("uri is empty for offloaded literal")
+	}
+	// read the offloaded literal
 	size := tobeRead.GetOffloadedMetadata().GetSizeBytes()
 	if err := datastore.ReadProtobuf(ctx, storage.DataReference(dataReference), tobeRead); err != nil {
 		logger.Errorf(ctx, "Failed to  read the offloaded literal at location [%s] with error [%s]", dataReference, err)
@@ -127,13 +130,17 @@ func OffloadLargeLiteral(ctx context.Context, datastore *storage.DataStore, data
 		logger.Errorf(ctx, "Failed to offload literal at location [%s] with error [%s]", dataReference, err)
 		return err
 	}
-	// compute the hash of the literal
-	literalDigest, err := pbhash.ComputeHash(ctx, toBeOffloaded)
-	if err != nil {
-		logger.Errorf(ctx, "Failed to compute hash for offloaded literal with error [%s]", err)
-		return err
-	}
 
+	if toBeOffloaded.GetHash() == "" {
+		// compute the hash of the literal
+		literalDigest, err := pbhash.ComputeHash(ctx, toBeOffloaded)
+		if err != nil {
+			logger.Errorf(ctx, "Failed to compute hash for offloaded literal with error [%s]", err)
+			return err
+		}
+		// Set the hash or else respect what the user set in the literal
+		toBeOffloaded.Hash = base64.RawURLEncoding.EncodeToString(literalDigest)
+	}
 	// update the literal with the offloaded URI, size and inferred type
 	toBeOffloaded.Value = &idlcore.Literal_OffloadedMetadata{
 		OffloadedMetadata: &idlcore.LiteralOffloadedMetadata{
@@ -141,10 +148,6 @@ func OffloadLargeLiteral(ctx context.Context, datastore *storage.DataStore, data
 			SizeBytes:    uint64(literalSizeBytes),
 			InferredType: inferredType,
 		},
-	}
-	if toBeOffloaded.GetHash() == "" {
-		// Set the hash or else respect what the user set in the literal
-		toBeOffloaded.Hash = base64.RawURLEncoding.EncodeToString(literalDigest)
 	}
 	logger.Infof(ctx, "Offloaded literal at location [%s] with size [%d] MB and inferred type [%s]", dataReference, literalSizeMB, inferredType)
 	return nil
