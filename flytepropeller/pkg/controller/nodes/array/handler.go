@@ -192,7 +192,6 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 
 		size := -1
 
-		containsOffloadedLiteral := false
 		for key, variable := range literalMap.Literals {
 			literalType := validators.LiteralTypeForLiteral(variable)
 			err := validators.ValidateLiteralType(literalType)
@@ -205,7 +204,6 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			if variable.GetOffloadedMetadata() != nil {
 				// variable will be overwritten with the contents of the offloaded data which contains the actual large literal.
 				// We need this for the map task to be able to create the subNodeSpec
-				containsOffloadedLiteral = true
 				err := common.ReadLargeLiteral(ctx, nCtx.DataStore(), variable)
 				if err != nil {
 					return handler.DoTransition(handler.TransitionTypeEphemeral,
@@ -224,16 +222,6 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 							fmt.Sprintf("input arrays have different lengths: expecting '%d' found '%d'", size, collectionLength), nil),
 					), nil
 				}
-			}
-		}
-
-		// At this point if we find input to map task was an offloaded literal, then we overwrite the input file with the actual data
-		// This is due to the fact the flytekit downloads the entire data and each node indexes into the data to get the specific
-		// input that the node needs to work on.
-		if containsOffloadedLiteral {
-			inputFile := v1alpha1.GetInputsFile(nCtx.NodeStatus().GetDataDir())
-			if err := nCtx.DataStore().WriteProtobuf(ctx, inputFile, storage.Options{}, literalMap); err != nil {
-				return handler.UnknownTransition, err
 			}
 		}
 
