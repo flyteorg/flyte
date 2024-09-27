@@ -121,10 +121,10 @@ redirects = {
     "concepts/workflows": "../user_guide/concepts/main_concepts/workflows.html",
 
     # core use cases
-    "core_use_cases/index": "../user_guide/core_use_cases/index.html",
-    "core_use_cases/analytics": "../user_guide/core_use_cases/analytics.md",
-    "core_use_cases/data_engineering": "../user_guide/core_use_cases/data_engineering.html",
-    "core_use_cases/machine_learning": "../user_guide/core_use_cases/machine_learning.html",
+    "core_use_cases/index": "../flytesnacks/tutorials/index.html",
+    "core_use_cases/analytics": "../flytesnacks/tutorials/index.html",
+    "core_use_cases/data_engineering": "../flytesnacks/tutorials/index.html",
+    "core_use_cases/machine_learning": "../flytesnacks/tutorials/index.html",
 
     # deprecated integrations
     "deprecated_integrations/index": "../../flytesnacks/deprecated_integrations/index.html",

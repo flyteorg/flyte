@@ -61,12 +61,9 @@ Want to contribute or update an example? Check out the {doc}`Contribution Guide 
 :hidden:
 
 introduction
-environment_setup
 quickstart_guide
 getting_started_with_workflow_development/index
 basics/index
-flyte_fundamentals/index
-core_use_cases/index
 data_types_and_io/index
 advanced_composition/index
 customizing_dependencies/index
@@ -75,6 +72,8 @@ testing/index
 productionizing/index
 extending/index
 flyte_agents/index
+environment_setup
+flyte_fundamentals/index
 ```
 
 ```{toctree}
