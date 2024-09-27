@@ -113,7 +113,7 @@ Creates a profile report from a Pandas DataFrame.
 Renders DataFrame as an HTML table.
 This renderer doesn't necessitate plugin installation since it's accessible within the flytekit library.
 
-```{rli} `https://raw.githubusercontent.com/flyteorg/flytesnacks/b431ae399def3a749833fe81c2c291b016cf3213/examples/development_lifecycle/development_lifecycle/decks.py`
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/b431ae399def3a749833fe81c2c291b016cf3213/examples/development_lifecycle/development_lifecycle/decks.py
 :caption: development_lifecycle/decks.py
 :lines: 69-76
 ```
