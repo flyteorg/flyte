@@ -49,6 +49,21 @@ func LiteralToBinding(l *core.Literal) *core.BindingData {
 				},
 			},
 		}
+	case *core.Literal_Tuple:
+		x := make(map[string]*core.BindingData, len(l.GetTuple().Literals))
+		for key, val := range l.GetTuple().Literals {
+			x[key] = LiteralToBinding(val)
+		}
+
+		return &core.BindingData{
+			Value: &core.BindingData_Tuple{
+				Tuple: &core.BindingDataTupleMap{
+					TupleName: l.GetTuple().TupleName,
+					Order:     l.GetTuple().Order,
+					Bindings:  x,
+				},
+			},
+		}
 	}
 
 	return nil
@@ -1343,4 +1358,557 @@ func TestValidateBindings(t *testing.T) {
 			assert.NoError(t, compileErrors)
 		}
 	})
+
+	t.Run("Tuple", func(t *testing.T) {
+		wf := &mocks.WorkflowBuilder{}
+		n := &mocks.NodeBuilder{}
+		n.OnGetId().Return("node1")
+
+		tupleType := &core.LiteralType{
+			Type: &core.LiteralType_TupleType{
+				TupleType: &core.TupleType{
+					TupleName: "DefaultNamedTuple",
+					Order: []string{
+						"int", "str", "collection", "map", "tuple",
+					},
+					Fields: map[string]*core.LiteralType{
+						"int": {
+							Type: &core.LiteralType_Simple{
+								Simple: core.SimpleType_INTEGER,
+							},
+						},
+						"str": {
+							Type: &core.LiteralType_Simple{
+								Simple: core.SimpleType_STRING,
+							},
+						},
+						"collection": {
+							Type: &core.LiteralType_CollectionType{
+								CollectionType: &core.LiteralType{
+									Type: &core.LiteralType_Simple{
+										Simple: core.SimpleType_INTEGER,
+									},
+								},
+							},
+						},
+						"map": {
+							Type: &core.LiteralType_MapValueType{
+								MapValueType: &core.LiteralType{
+									Type: &core.LiteralType_Simple{
+										Simple: core.SimpleType_STRING,
+									},
+								},
+							},
+						},
+						"tuple": {
+							Type: &core.LiteralType_TupleType{
+								TupleType: &core.TupleType{
+									TupleName: "DefaultNamedTuple",
+									Order: []string{
+										"int",
+									},
+									Fields: map[string]*core.LiteralType{
+										"int": {
+											Type: &core.LiteralType_Simple{
+												Simple: core.SimpleType_INTEGER,
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+
+		bindings := []*core.Binding{
+			{
+				Var: "x",
+				Binding: LiteralToBinding(coreutils.MustMakeLiteralForType(
+					tupleType,
+					map[string]interface{}{
+						"int":        5,
+						"str":        "foo",
+						"collection": []interface{}{1, 2, 3},
+						"map": map[string]interface{}{
+							"key1": "value1",
+							"key2": "value2",
+						},
+						"tuple": map[string]interface{}{
+							"int": 5,
+						},
+					},
+				)),
+			},
+		}
+
+		vars := &core.VariableMap{
+			Variables: map[string]*core.Variable{
+				"x": {
+					Type: LiteralTypeForLiteral(coreutils.MustMakeLiteralForType(
+						tupleType,
+						map[string]interface{}{
+							"int":        5,
+							"str":        "foo",
+							"collection": []interface{}{1, 2, 3},
+							"map": map[string]interface{}{
+								"key1": "value1",
+								"key2": "value2",
+							},
+							"tuple": map[string]interface{}{
+								"int": 5,
+							},
+						},
+					)),
+				},
+			},
+		}
+
+		compileErrors := compilerErrors.NewCompileErrors()
+		_, ok := ValidateBindings(wf, n, bindings, vars, true, c.EdgeDirectionBidirectional, compileErrors)
+		assert.True(t, ok)
+		if compileErrors.HasErrors() {
+			assert.NoError(t, compileErrors)
+		}
+	})
+
+	t.Run("Tuple mismatch key", func(t *testing.T) {
+		wf := &mocks.WorkflowBuilder{}
+		n := &mocks.NodeBuilder{}
+		n.OnGetId().Return("node1")
+
+		bindings := []*core.Binding{
+			{
+				Var: "x",
+				Binding: LiteralToBinding(coreutils.MustMakeLiteralForType(
+					&core.LiteralType{
+						Type: &core.LiteralType_TupleType{
+							TupleType: &core.TupleType{
+								TupleName: "DefaultNamedTuple",
+								Order: []string{
+									"int_foo", "tuple",
+								},
+								Fields: map[string]*core.LiteralType{
+									"int_foo": {
+										Type: &core.LiteralType_Simple{
+											Simple: core.SimpleType_INTEGER,
+										},
+									},
+									"tuple": {
+										Type: &core.LiteralType_TupleType{
+											TupleType: &core.TupleType{
+												TupleName: "DefaultNamedTuple",
+												Order: []string{
+													"int",
+												},
+												Fields: map[string]*core.LiteralType{
+													"int": {
+														Type: &core.LiteralType_Simple{
+															Simple: core.SimpleType_INTEGER,
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+					map[string]interface{}{
+						"int_foo": 5,
+						"tuple": map[string]interface{}{
+							"int": 5,
+						},
+					},
+				)),
+			},
+		}
+
+		vars := &core.VariableMap{
+			Variables: map[string]*core.Variable{
+				"x": {
+					Type: LiteralTypeForLiteral(coreutils.MustMakeLiteralForType(
+						&core.LiteralType{
+							Type: &core.LiteralType_TupleType{
+								TupleType: &core.TupleType{
+									TupleName: "DefaultNamedTuple",
+									Order: []string{
+										"int_bar", "tuple",
+									},
+									Fields: map[string]*core.LiteralType{
+										"int_bar": {
+											Type: &core.LiteralType_Simple{
+												Simple: core.SimpleType_INTEGER,
+											},
+										},
+										"tuple": {
+											Type: &core.LiteralType_TupleType{
+												TupleType: &core.TupleType{
+													TupleName: "DefaultNamedTuple",
+													Order: []string{
+														"int",
+													},
+													Fields: map[string]*core.LiteralType{
+														"int": {
+															Type: &core.LiteralType_Simple{
+																Simple: core.SimpleType_INTEGER,
+															},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+						map[string]interface{}{
+							"int_bar": 5,
+							"tuple": map[string]interface{}{
+								"int": 5,
+							},
+						},
+					)),
+				},
+			},
+		}
+
+		compileErrors := compilerErrors.NewCompileErrors()
+		_, ok := ValidateBindings(wf, n, bindings, vars, true, c.EdgeDirectionBidirectional, compileErrors)
+		assert.False(t, ok)
+		assert.Equal(t, "MismatchingBindings", string(compileErrors.Errors().List()[0].Code()))
+	})
+
+	t.Run("Nested Tuple mismatch key", func(t *testing.T) {
+		wf := &mocks.WorkflowBuilder{}
+		n := &mocks.NodeBuilder{}
+		n.OnGetId().Return("node1")
+
+		bindings := []*core.Binding{
+			{
+				Var: "x",
+				Binding: LiteralToBinding(coreutils.MustMakeLiteralForType(
+					&core.LiteralType{
+						Type: &core.LiteralType_TupleType{
+							TupleType: &core.TupleType{
+								TupleName: "DefaultNamedTuple",
+								Order: []string{
+									"int", "tuple",
+								},
+								Fields: map[string]*core.LiteralType{
+									"int": {
+										Type: &core.LiteralType_Simple{
+											Simple: core.SimpleType_INTEGER,
+										},
+									},
+									"tuple": {
+										Type: &core.LiteralType_TupleType{
+											TupleType: &core.TupleType{
+												TupleName: "DefaultNamedTuple",
+												Order: []string{
+													"int_foo",
+												},
+												Fields: map[string]*core.LiteralType{
+													"int_foo": {
+														Type: &core.LiteralType_Simple{
+															Simple: core.SimpleType_INTEGER,
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+					map[string]interface{}{
+						"int": 5,
+						"tuple": map[string]interface{}{
+							"int_foo": 5,
+						},
+					},
+				)),
+			},
+		}
+
+		vars := &core.VariableMap{
+			Variables: map[string]*core.Variable{
+				"x": {
+					Type: LiteralTypeForLiteral(coreutils.MustMakeLiteralForType(
+						&core.LiteralType{
+							Type: &core.LiteralType_TupleType{
+								TupleType: &core.TupleType{
+									TupleName: "DefaultNamedTuple",
+									Order: []string{
+										"int", "tuple",
+									},
+									Fields: map[string]*core.LiteralType{
+										"int": {
+											Type: &core.LiteralType_Simple{
+												Simple: core.SimpleType_INTEGER,
+											},
+										},
+										"tuple": {
+											Type: &core.LiteralType_TupleType{
+												TupleType: &core.TupleType{
+													TupleName: "DefaultNamedTuple",
+													Order: []string{
+														"int_bar",
+													},
+													Fields: map[string]*core.LiteralType{
+														"int_bar": {
+															Type: &core.LiteralType_Simple{
+																Simple: core.SimpleType_INTEGER,
+															},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+						map[string]interface{}{
+							"int": 5,
+							"tuple": map[string]interface{}{
+								"int_bar": 5,
+							},
+						},
+					)),
+				},
+			},
+		}
+
+		compileErrors := compilerErrors.NewCompileErrors()
+		_, ok := ValidateBindings(wf, n, bindings, vars, true, c.EdgeDirectionBidirectional, compileErrors)
+		assert.False(t, ok)
+		assert.Equal(t, "MismatchingBindings", string(compileErrors.Errors().List()[0].Code()))
+	})
+
+	t.Run("Tuple mismatch number", func(t *testing.T) {
+		wf := &mocks.WorkflowBuilder{}
+		n := &mocks.NodeBuilder{}
+		n.OnGetId().Return("node1")
+
+		bindings := []*core.Binding{
+			{
+				Var: "x",
+				Binding: LiteralToBinding(coreutils.MustMakeLiteralForType(
+					&core.LiteralType{
+						Type: &core.LiteralType_TupleType{
+							TupleType: &core.TupleType{
+								TupleName: "DefaultNamedTuple",
+								Order: []string{
+									"int", "int2", "tuple",
+								},
+								Fields: map[string]*core.LiteralType{
+									"int": {
+										Type: &core.LiteralType_Simple{
+											Simple: core.SimpleType_INTEGER,
+										},
+									},
+									"int2": {
+										Type: &core.LiteralType_Simple{
+											Simple: core.SimpleType_INTEGER,
+										},
+									},
+									"tuple": {
+										Type: &core.LiteralType_TupleType{
+											TupleType: &core.TupleType{
+												TupleName: "DefaultNamedTuple",
+												Order: []string{
+													"int",
+												},
+												Fields: map[string]*core.LiteralType{
+													"int": {
+														Type: &core.LiteralType_Simple{
+															Simple: core.SimpleType_INTEGER,
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+					map[string]interface{}{
+						"int":  5,
+						"int2": 5,
+						"tuple": map[string]interface{}{
+							"int": 5,
+						},
+					},
+				)),
+			},
+		}
+
+		vars := &core.VariableMap{
+			Variables: map[string]*core.Variable{
+				"x": {
+					Type: LiteralTypeForLiteral(coreutils.MustMakeLiteralForType(
+						&core.LiteralType{
+							Type: &core.LiteralType_TupleType{
+								TupleType: &core.TupleType{
+									TupleName: "DefaultNamedTuple",
+									Order: []string{
+										"int", "tuple",
+									},
+									Fields: map[string]*core.LiteralType{
+										"int": {
+											Type: &core.LiteralType_Simple{
+												Simple: core.SimpleType_INTEGER,
+											},
+										},
+										"tuple": {
+											Type: &core.LiteralType_TupleType{
+												TupleType: &core.TupleType{
+													TupleName: "DefaultNamedTuple",
+													Order: []string{
+														"int",
+													},
+													Fields: map[string]*core.LiteralType{
+														"int": {
+															Type: &core.LiteralType_Simple{
+																Simple: core.SimpleType_INTEGER,
+															},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+						map[string]interface{}{
+							"int": 5,
+							"tuple": map[string]interface{}{
+								"int": 5,
+							},
+						},
+					)),
+				},
+			},
+		}
+
+		compileErrors := compilerErrors.NewCompileErrors()
+		_, ok := ValidateBindings(wf, n, bindings, vars, true, c.EdgeDirectionBidirectional, compileErrors)
+		assert.False(t, ok)
+		assert.Equal(t, "MismatchingBindings", string(compileErrors.Errors().List()[0].Code()))
+	})
+
+	t.Run("Tuple mismatch tuple type name", func(t *testing.T) {
+		wf := &mocks.WorkflowBuilder{}
+		n := &mocks.NodeBuilder{}
+		n.OnGetId().Return("node1")
+
+		bindings := []*core.Binding{
+			{
+				Var: "x",
+				Binding: LiteralToBinding(coreutils.MustMakeLiteralForType(
+					&core.LiteralType{
+						Type: &core.LiteralType_TupleType{
+							TupleType: &core.TupleType{
+								TupleName: "NamedTuple",
+								Order: []string{
+									"int", "tuple",
+								},
+								Fields: map[string]*core.LiteralType{
+									"int": {
+										Type: &core.LiteralType_Simple{
+											Simple: core.SimpleType_INTEGER,
+										},
+									},
+									"tuple": {
+										Type: &core.LiteralType_TupleType{
+											TupleType: &core.TupleType{
+												TupleName: "DefaultNamedTuple",
+												Order: []string{
+													"int",
+												},
+												Fields: map[string]*core.LiteralType{
+													"int": {
+														Type: &core.LiteralType_Simple{
+															Simple: core.SimpleType_INTEGER,
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+					map[string]interface{}{
+						"int": 5,
+						"tuple": map[string]interface{}{
+							"int": 5,
+						},
+					},
+				)),
+			},
+		}
+
+		vars := &core.VariableMap{
+			Variables: map[string]*core.Variable{
+				"x": {
+					Type: LiteralTypeForLiteral(coreutils.MustMakeLiteralForType(
+						&core.LiteralType{
+							Type: &core.LiteralType_TupleType{
+								TupleType: &core.TupleType{
+									TupleName: "DefaultNamedTuple",
+									Order: []string{
+										"int", "tuple",
+									},
+									Fields: map[string]*core.LiteralType{
+										"int": {
+											Type: &core.LiteralType_Simple{
+												Simple: core.SimpleType_INTEGER,
+											},
+										},
+										"tuple": {
+											Type: &core.LiteralType_TupleType{
+												TupleType: &core.TupleType{
+													TupleName: "DefaultNamedTuple",
+													Order: []string{
+														"int",
+													},
+													Fields: map[string]*core.LiteralType{
+														"int": {
+															Type: &core.LiteralType_Simple{
+																Simple: core.SimpleType_INTEGER,
+															},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+						map[string]interface{}{
+							"int": 5,
+							"tuple": map[string]interface{}{
+								"int": 5,
+							},
+						},
+					)),
+				},
+			},
+		}
+
+		compileErrors := compilerErrors.NewCompileErrors()
+		_, ok := ValidateBindings(wf, n, bindings, vars, true, c.EdgeDirectionBidirectional, compileErrors)
+		assert.False(t, ok)
+		assert.Equal(t, "MismatchingBindings", string(compileErrors.Errors().List()[0].Code()))
+	})
+
 }

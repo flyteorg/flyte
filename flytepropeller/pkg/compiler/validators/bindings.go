@@ -146,6 +146,19 @@ func validateBinding(w c.WorkflowBuilder, node c.Node, nodeParam string, binding
 						sourceType = sourceType.GetCollectionType()
 					} else if sourceType.GetMapValueType() != nil {
 						sourceType = sourceType.GetMapValueType()
+					} else if sourceType.GetTupleType() != nil {
+						var key string
+						if attr.GetStringValue() != "" {
+							key = attr.GetStringValue()
+						} else {
+							key = sourceType.GetTupleType().Order[attr.GetIntValue()]
+						}
+						sourceType, exist = sourceType.GetTupleType().GetFields()[key]
+						if !exist {
+							errs.Collect(errors.NewFieldNotFoundErr(nodeID, val.Promise.Var, sourceType.String(), key))
+							return nil, nil, !errs.HasErrors()
+						}
+
 					} else if sourceType.GetStructure() != nil && sourceType.GetStructure().GetDataclassType() != nil {
 						// This is for retrieving the literal type of an attribute in a dataclass or Pydantic BaseModel
 						tmpType, exist = sourceType.GetStructure().GetDataclassType()[attr.GetStringValue()]
@@ -199,6 +212,57 @@ func validateBinding(w c.WorkflowBuilder, node c.Node, nodeParam string, binding
 		}
 
 		return literalType, []c.NodeID{}, !errs.HasErrors()
+	case *flyte.BindingData_Tuple:
+		if val.Tuple == nil {
+			errs.Collect(errors.NewParameterNotBoundErr(nodeID, nodeParam))
+			return nil, nil, !errs.HasErrors()
+		}
+
+		if val.Tuple.TupleName != expectedType.GetTupleType().TupleName {
+			errs.Collect(errors.NewMismatchingBindingsErr(nodeID, nodeParam, expectedType.String(), val.Tuple.String()))
+			return nil, nil, !errs.HasErrors()
+		}
+
+		if len(val.Tuple.Order) != len(expectedType.GetTupleType().Order) {
+			errs.Collect(errors.NewMismatchingBindingsErr(nodeID, nodeParam, expectedType.String(), val.Tuple.String()))
+			return nil, nil, !errs.HasErrors()
+		}
+		for i, v := range val.Tuple.Order {
+			if v != expectedType.GetTupleType().Order[i] {
+				errs.Collect(errors.NewMismatchingBindingsErr(nodeID, nodeParam, expectedType.String(), val.Tuple.String()))
+				return nil, nil, !errs.HasErrors()
+			}
+		}
+
+		if expectedType.GetTupleType() != nil {
+			allNodeIds := make([]c.NodeID, 0, len(val.Tuple.GetBindings()))
+			fields := make(map[string]*flyte.LiteralType, len(val.Tuple.GetBindings()))
+			if len(val.Tuple.GetBindings()) != len(expectedType.GetTupleType().GetFields()) {
+				errs.Collect(errors.NewMismatchingBindingsErr(nodeID, nodeParam, expectedType.String(), val.Tuple.String()))
+				return nil, nil, !errs.HasErrors()
+			}
+			for k, v := range val.Tuple.GetBindings() {
+				if expectedField, ok := expectedType.GetTupleType().GetFields()[k]; !ok {
+					errs.Collect(errors.NewFieldNotFoundErr(nodeID, nodeParam, expectedType.String(), k))
+				} else {
+					if fieldType, nodeIds, ok := validateBinding(w, node, nodeParam, v, expectedField, errs.NewScope(), validateParamTypes); ok {
+						allNodeIds = append(allNodeIds, nodeIds...)
+						fields[k] = fieldType
+					}
+				}
+			}
+
+			return &flyte.LiteralType{
+				Type: &flyte.LiteralType_TupleType{
+					TupleType: &flyte.TupleType{
+						TupleName: expectedType.GetTupleType().GetTupleName(),
+						Order:     expectedType.GetTupleType().GetOrder(),
+						Fields:    fields,
+					},
+				},
+			}, allNodeIds, !errs.HasErrors()
+		}
+
 	default:
 		bindingType := ""
 		if val != nil {

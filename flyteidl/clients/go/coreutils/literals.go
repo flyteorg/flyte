@@ -321,6 +321,8 @@ func MakeDefaultLiteralForType(typ *core.LiteralType) (*core.Literal, error) {
 			},
 		}
 		return res, nil
+	case *core.LiteralType_TupleType:
+		return MakeLiteralForType(typ, nil)
 	}
 
 	return nil, fmt.Errorf("failed to convert to a known Literal. Input Type [%v] not supported", typ.String())
@@ -425,6 +427,15 @@ func MustMakeLiteral(v interface{}) *core.Literal {
 	return p
 }
 
+func MustMakeLiteralForType(t *core.LiteralType, v interface{}) *core.Literal {
+	p, err := MakeLiteralForType(t, v)
+	if err != nil {
+		panic(err)
+	}
+
+	return p
+}
+
 func MakeLiteralMap(v map[string]interface{}) (*core.LiteralMap, error) {
 
 	literals := make(map[string]*core.Literal, len(v))
@@ -440,6 +451,25 @@ func MakeLiteralMap(v map[string]interface{}) (*core.LiteralMap, error) {
 	return &core.LiteralMap{
 		Literals: literals,
 	}, nil
+}
+
+func MakeLiteralTuple(name string, order []string, v map[string]interface{}) (*core.LiteralTupleMap, error) {
+	literals := make(map[string]*core.Literal, len(v))
+	for key, val := range v {
+		l, err := MakeLiteral(val)
+		if err != nil {
+			return nil, err
+		}
+
+		literals[key] = l
+	}
+
+	return &core.LiteralTupleMap{
+		TupleName: name,
+		Order:     order,
+		Literals:  literals,
+	}, nil
+
 }
 
 func MakeLiteralForSchema(path storage.DataReference, columns []*core.SchemaType_SchemaColumn) *core.Literal {
@@ -636,6 +666,47 @@ func MakeLiteralForType(t *core.LiteralType, v interface{}) (*core.Literal, erro
 		if !found {
 			return nil, fmt.Errorf("incorrect union value [%s], supported values %+v", v, newT.UnionType.Variants)
 		}
+
+	case *core.LiteralType_TupleType:
+		// TO_DISCUSS: How to handle the tuple interface in Inputs field of flytectl?
+		//
+		// [Example usage]
+		// inputs:
+		//     tuple_data:
+		//         key1: "foo"
+		//         key2: 123
+
+		vMap, ok := v.(map[string]interface{})
+		if !ok {
+			return nil, errors.Errorf("Expected a map[string]interface{} for tuple type, got [%v]", v)
+		}
+		// check whether all the key provided by vMap is valid.
+		for key := range vMap {
+			if _, ok := t.GetTupleType().GetFields()[key]; !ok {
+				return nil, fmt.Errorf("key %s not found in tuple type", key)
+			}
+		}
+
+		literals := make(map[string]*core.Literal, len(vMap))
+		// iterate over the fields in the tuple type
+		for key, fieldType := range t.GetTupleType().GetFields() {
+			l, err := MakeLiteralForType(fieldType, vMap[key])
+			if err != nil {
+				return nil, err
+			}
+			literals[key] = l
+		}
+		l = &core.Literal{
+			Value: &core.Literal_Tuple{
+				Tuple: &core.LiteralTupleMap{
+					TupleName: t.GetTupleType().GetTupleName(),
+					Order:     t.GetTupleType().GetOrder(),
+					Literals:  literals,
+				},
+			},
+		}
+
+		return l, nil
 
 	default:
 		return nil, fmt.Errorf("unsupported type %s", t.String())

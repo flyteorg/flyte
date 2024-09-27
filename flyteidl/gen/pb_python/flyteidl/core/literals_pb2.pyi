@@ -104,7 +104,7 @@ class Scalar(_message.Message):
     def __init__(self, primitive: _Optional[_Union[Primitive, _Mapping]] = ..., blob: _Optional[_Union[Blob, _Mapping]] = ..., binary: _Optional[_Union[Binary, _Mapping]] = ..., schema: _Optional[_Union[Schema, _Mapping]] = ..., none_type: _Optional[_Union[Void, _Mapping]] = ..., error: _Optional[_Union[_types_pb2.Error, _Mapping]] = ..., generic: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ..., structured_dataset: _Optional[_Union[StructuredDataset, _Mapping]] = ..., union: _Optional[_Union[Union, _Mapping]] = ...) -> None: ...
 
 class Literal(_message.Message):
-    __slots__ = ["scalar", "collection", "map", "offloaded_metadata", "hash", "metadata"]
+    __slots__ = ["scalar", "collection", "map", "offloaded_metadata", "tuple", "hash", "metadata"]
     class MetadataEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -116,15 +116,17 @@ class Literal(_message.Message):
     COLLECTION_FIELD_NUMBER: _ClassVar[int]
     MAP_FIELD_NUMBER: _ClassVar[int]
     OFFLOADED_METADATA_FIELD_NUMBER: _ClassVar[int]
+    TUPLE_FIELD_NUMBER: _ClassVar[int]
     HASH_FIELD_NUMBER: _ClassVar[int]
     METADATA_FIELD_NUMBER: _ClassVar[int]
     scalar: Scalar
     collection: LiteralCollection
     map: LiteralMap
     offloaded_metadata: LiteralOffloadedMetadata
+    tuple: LiteralTupleMap
     hash: str
     metadata: _containers.ScalarMap[str, str]
-    def __init__(self, scalar: _Optional[_Union[Scalar, _Mapping]] = ..., collection: _Optional[_Union[LiteralCollection, _Mapping]] = ..., map: _Optional[_Union[LiteralMap, _Mapping]] = ..., offloaded_metadata: _Optional[_Union[LiteralOffloadedMetadata, _Mapping]] = ..., hash: _Optional[str] = ..., metadata: _Optional[_Mapping[str, str]] = ...) -> None: ...
+    def __init__(self, scalar: _Optional[_Union[Scalar, _Mapping]] = ..., collection: _Optional[_Union[LiteralCollection, _Mapping]] = ..., map: _Optional[_Union[LiteralMap, _Mapping]] = ..., offloaded_metadata: _Optional[_Union[LiteralOffloadedMetadata, _Mapping]] = ..., tuple: _Optional[_Union[LiteralTupleMap, _Mapping]] = ..., hash: _Optional[str] = ..., metadata: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class LiteralOffloadedMetadata(_message.Message):
     __slots__ = ["uri", "size_bytes", "inferred_type"]
@@ -155,6 +157,23 @@ class LiteralMap(_message.Message):
     literals: _containers.MessageMap[str, Literal]
     def __init__(self, literals: _Optional[_Mapping[str, Literal]] = ...) -> None: ...
 
+class LiteralTupleMap(_message.Message):
+    __slots__ = ["tuple_name", "order", "literals"]
+    class LiteralsEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: Literal
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[Literal, _Mapping]] = ...) -> None: ...
+    TUPLE_NAME_FIELD_NUMBER: _ClassVar[int]
+    ORDER_FIELD_NUMBER: _ClassVar[int]
+    LITERALS_FIELD_NUMBER: _ClassVar[int]
+    tuple_name: str
+    order: _containers.RepeatedScalarFieldContainer[str]
+    literals: _containers.MessageMap[str, Literal]
+    def __init__(self, tuple_name: _Optional[str] = ..., order: _Optional[_Iterable[str]] = ..., literals: _Optional[_Mapping[str, Literal]] = ...) -> None: ...
+
 class BindingDataCollection(_message.Message):
     __slots__ = ["bindings"]
     BINDINGS_FIELD_NUMBER: _ClassVar[int]
@@ -174,6 +193,23 @@ class BindingDataMap(_message.Message):
     bindings: _containers.MessageMap[str, BindingData]
     def __init__(self, bindings: _Optional[_Mapping[str, BindingData]] = ...) -> None: ...
 
+class BindingDataTupleMap(_message.Message):
+    __slots__ = ["tuple_name", "order", "bindings"]
+    class BindingsEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: BindingData
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[BindingData, _Mapping]] = ...) -> None: ...
+    TUPLE_NAME_FIELD_NUMBER: _ClassVar[int]
+    ORDER_FIELD_NUMBER: _ClassVar[int]
+    BINDINGS_FIELD_NUMBER: _ClassVar[int]
+    tuple_name: str
+    order: _containers.RepeatedScalarFieldContainer[str]
+    bindings: _containers.MessageMap[str, BindingData]
+    def __init__(self, tuple_name: _Optional[str] = ..., order: _Optional[_Iterable[str]] = ..., bindings: _Optional[_Mapping[str, BindingData]] = ...) -> None: ...
+
 class UnionInfo(_message.Message):
     __slots__ = ["targetType"]
     TARGETTYPE_FIELD_NUMBER: _ClassVar[int]
@@ -181,18 +217,20 @@ class UnionInfo(_message.Message):
     def __init__(self, targetType: _Optional[_Union[_types_pb2.LiteralType, _Mapping]] = ...) -> None: ...
 
 class BindingData(_message.Message):
-    __slots__ = ["scalar", "collection", "promise", "map", "union"]
+    __slots__ = ["scalar", "collection", "promise", "map", "tuple", "union"]
     SCALAR_FIELD_NUMBER: _ClassVar[int]
     COLLECTION_FIELD_NUMBER: _ClassVar[int]
     PROMISE_FIELD_NUMBER: _ClassVar[int]
     MAP_FIELD_NUMBER: _ClassVar[int]
+    TUPLE_FIELD_NUMBER: _ClassVar[int]
     UNION_FIELD_NUMBER: _ClassVar[int]
     scalar: Scalar
     collection: BindingDataCollection
     promise: _types_pb2.OutputReference
     map: BindingDataMap
+    tuple: BindingDataTupleMap
     union: UnionInfo
-    def __init__(self, scalar: _Optional[_Union[Scalar, _Mapping]] = ..., collection: _Optional[_Union[BindingDataCollection, _Mapping]] = ..., promise: _Optional[_Union[_types_pb2.OutputReference, _Mapping]] = ..., map: _Optional[_Union[BindingDataMap, _Mapping]] = ..., union: _Optional[_Union[UnionInfo, _Mapping]] = ...) -> None: ...
+    def __init__(self, scalar: _Optional[_Union[Scalar, _Mapping]] = ..., collection: _Optional[_Union[BindingDataCollection, _Mapping]] = ..., promise: _Optional[_Union[_types_pb2.OutputReference, _Mapping]] = ..., map: _Optional[_Union[BindingDataMap, _Mapping]] = ..., tuple: _Optional[_Union[BindingDataTupleMap, _Mapping]] = ..., union: _Optional[_Union[UnionInfo, _Mapping]] = ...) -> None: ...
 
 class Binding(_message.Message):
     __slots__ = ["var", "binding"]

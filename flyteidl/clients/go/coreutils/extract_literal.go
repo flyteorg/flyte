@@ -96,6 +96,17 @@ func ExtractFromLiteral(literal *core.Literal) (interface{}, error) {
 			}
 		}
 		return mapResult, nil
+	case *core.Literal_Tuple:
+		tupleValue := literalValue.Tuple.Literals
+		tupleResult := make(map[string]interface{}, len(tupleValue))
+		for key, val := range tupleValue {
+			if tupleElem, err := ExtractFromLiteral(val); err == nil {
+				tupleResult[key] = tupleElem
+			} else {
+				return nil, err
+			}
+		}
+		return tupleResult, nil
 	}
 	return nil, fmt.Errorf("unsupported literal type %T", literal)
 }

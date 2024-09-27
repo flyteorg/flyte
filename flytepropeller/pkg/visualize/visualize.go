@@ -39,6 +39,10 @@ func flatten(binding *core.BindingData, flatMap map[common.NodeID]sets.String) {
 		}
 
 		flatMap[binding.GetPromise().NodeId].Insert(binding.GetPromise().GetVar())
+	case *core.BindingData_Tuple:
+		for _, v := range binding.GetTuple().GetBindings() {
+			flatten(v, flatMap)
+		}
 	case *core.BindingData_Scalar:
 		if _, ok := flatMap[staticNodeID]; !ok {
 			flatMap[staticNodeID] = sets.NewString()

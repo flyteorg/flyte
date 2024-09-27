@@ -248,6 +248,58 @@ func TestStripTypeMetadata(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "tuple",
+			args: &core.LiteralType{
+				Type: &core.LiteralType_TupleType{
+					TupleType: &core.TupleType{
+						TupleName: "tuple",
+						Order:     []string{"a", "b"},
+						Fields: map[string]*core.LiteralType{
+							"a": {
+								Type: &core.LiteralType_Simple{
+									Simple: core.SimpleType_INTEGER,
+								},
+							},
+							"b": {
+								Type: &core.LiteralType_Simple{
+									Simple: core.SimpleType_STRING,
+								},
+								Metadata: &_struct.Struct{
+									Fields: map[string]*_struct.Value{
+										"foo": {
+											Kind: &_struct.Value_StringValue{
+												StringValue: "bar",
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			want: &core.LiteralType{
+				Type: &core.LiteralType_TupleType{
+					TupleType: &core.TupleType{
+						TupleName: "tuple",
+						Order:     []string{"a", "b"},
+						Fields: map[string]*core.LiteralType{
+							"a": {
+								Type: &core.LiteralType_Simple{
+									Simple: core.SimpleType_INTEGER,
+								},
+							},
+							"b": {
+								Type: &core.LiteralType_Simple{
+									Simple: core.SimpleType_STRING,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tt := range tests {

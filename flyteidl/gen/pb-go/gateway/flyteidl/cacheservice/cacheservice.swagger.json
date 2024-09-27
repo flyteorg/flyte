@@ -223,6 +223,10 @@
           "$ref": "#/definitions/coreLiteralOffloadedMetadata",
           "description": "Offloaded literal metadata\nWhen you deserialize the offloaded metadata, it would be of Literal and its type would be defined by LiteralType stored in offloaded_metadata."
         },
+        "tuple": {
+          "$ref": "#/definitions/coreLiteralTupleMap",
+          "description": "A field for tuple literal."
+        },
         "hash": {
           "type": "string",
           "title": "A hash representing this literal.\nThis is used for caching purposes. For more details refer to RFC 1893\n(https://github.com/flyteorg/flyte/blob/master/rfc/system/1893-caching-of-offloaded-objects.md)"
@@ -281,6 +285,30 @@
       },
       "description": "A message that contains the metadata of the offloaded data."
     },
+    "coreLiteralTupleMap": {
+      "type": "object",
+      "properties": {
+        "tuple_name": {
+          "type": "string",
+          "description": "The name of the NamedTuple. If it is original tuple, it would be empty string."
+        },
+        "order": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The order of each fields stored in the tuple."
+        },
+        "literals": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/coreLiteral"
+          },
+          "description": "A map of literals."
+        }
+      },
+      "description": "A collection of fields for tuple literal."
+    },
     "coreLiteralType": {
       "type": "object",
       "properties": {
@@ -315,6 +343,10 @@
         "union_type": {
           "$ref": "#/definitions/coreUnionType",
           "description": "Defines an union type with pre-defined LiteralTypes."
+        },
+        "tuple_type": {
+          "$ref": "#/definitions/coreTupleType",
+          "title": "Defines a named tuple type"
         },
         "metadata": {
           "type": "object",
@@ -479,6 +511,27 @@
           "description": "The serialized bytes of a third-party schema library like Arrow.\nThis is an optional field that will not be used for type checking."
         }
       }
+    },
+    "coreTupleType": {
+      "type": "object",
+      "properties": {
+        "tuple_name": {
+          "type": "string"
+        },
+        "order": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "fields": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/coreLiteralType"
+          }
+        }
+      },
+      "title": "Defines a named tuple type\nTODO: Add more docs"
     },
     "coreTypeAnnotation": {
       "type": "object",
