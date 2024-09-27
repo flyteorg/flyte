@@ -175,6 +175,26 @@ image_spec = ImageSpec(
 )
 ```
 
+## Copy additional files or directories
+You can specify files or directories to be copied into the container `/root`, allowing users to access the required files. The directory structure will match the relative path. Since Docker only supports relative paths, absolute paths and paths outside the current working directory (e.g., paths with "../") are not allowed.
+
+```py
+from flytekit.image_spec import ImageSpec
+from flytekit import task, workflow
+
+image_spec = ImageSpec(
+    name="image_with_copy",
+    registry="localhost:30000",
+    builder="default",
+    copy=["files/input.txt"],
+)
+
+@task(container_image=image_spec)
+def my_task() -> str:
+    with open("/root/files/input.txt", "r") as f:
+        return f.read()
+```
+
 ## Define ImageSpec in a YAML File
 
 You can override the container image by providing an ImageSpec YAML file to the  `pyflyte run` or `pyflyte register` command.
