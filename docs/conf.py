@@ -96,6 +96,10 @@ extlinks = {
 
 # redirects
 redirects = {
+    "core_use_cases/index": "../flytesnacks/tutorials.html",
+    "core_use_cases/analytics": "../flytesnacks/tutorials.html",
+    "core_use_cases/data_engineering": "../flytesnacks/tutorials.html",
+    "core_use_cases/machine_learning": "../flytesnacks/tutorials.html",
     "flytesnacks/deprecated_integrations": "../deprecated_integrations/index.html",
     "flytesnacks/examples/bigquery_plugin/index": "../../../deprecated_integrations/bigquery_plugin/index.html",
     "flytesnacks/examples/bigquery_plugin/bigquery_plugin_example": "../../../deprecated_integrations/bigquery_plugin/biquery_plugin_example.html",

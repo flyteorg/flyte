@@ -153,12 +153,3 @@ many more ways to customize Flyte tasks:
   - These tasks plugins require implementing a backend plugin to leverage
     external services like SageMaker, Snowflake, BigQuery, etc.
 ```
-
-## What's next?
-
-Congratulations! 🎉 You've just completed the Flyte Fundamentals tour.
-
-The final section in the getting started section of the docs will provide you
-with some {ref}`core use cases <getting_started_core_use_cases>` for implementing
-your first workflows, whether you're a data scientist, data analyst, data engineer,
-or machine learning engineer.

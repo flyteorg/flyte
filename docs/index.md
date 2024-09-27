@@ -75,8 +75,7 @@ contribute its architecture and design. You can also access the
 :widths: 20 30
 
 * - {doc}`🔤 Introduction to Flyte <introduction>`
-  - Get your first workflow running, learn about the Flyte development lifecycle
-    and core use cases.
+  - Get your first workflow running and learn about the Flyte development lifecycle.
 * - {doc}`📖 User Guide <user_guide/index>`
   - A comprehensive view of Flyte's functionality for data and ML practitioners.
 * - {doc}`📚 Tutorials <flytesnacks/tutorials>`
@@ -137,7 +136,6 @@ Quickstart guide <quickstart_guide>
 Getting started with workflow development <getting_started_with_workflow_development/index>
 Flyte fundamentals <flyte_fundamentals/index>
 Flyte agents <flyte_agents/index>
-Core use cases <core_use_cases/index>
 ```
 
 ```{toctree}
