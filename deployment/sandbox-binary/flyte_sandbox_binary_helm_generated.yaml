@@ -384,7 +384,7 @@ spec:
               done
       containers:
         - name: flyte
-          image: "cr.flyte.org/flyteorg/flyte-binary:latest"
+          image: "cr.flyte.org/flyteorg/flyte-binary-release:latest"
           imagePullPolicy: "IfNotPresent"
           args:
             - start
