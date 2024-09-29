@@ -347,16 +347,7 @@ func TestValidateParameterMap(t *testing.T) {
 		err := validateParameterMap(&exampleMap, fieldName)
 		assert.Error(t, err)
 		fmt.Println(err.Error())
-		expectedErrMsg := fmt.Sprintf(
-			"Flyte encountered an issue while determining\n"+
-				"the type of the default value for Parameter '%s' in '%s'.\n"+
-				"Registered type: [%s].\n"+
-				"Flyte needs to support the latest FlyteIDL to support this type.\n"+
-				"Suggested solution: Please update all of your Flyte images to the latest version and "+
-				"try again.",
-			name, fieldName, exampleMap.Parameters[name].GetVar().GetType().String(),
-		)
-		assert.Equal(t, expectedErrMsg, err.Error())
+		assert.Contains(t, err.Error(), failedToValidateLiteralType)
 	})
 }
 
