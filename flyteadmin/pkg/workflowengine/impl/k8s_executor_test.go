@@ -315,6 +315,7 @@ func TestAbort(t *testing.T) {
 }
 
 func TestAbort_Notfound(t *testing.T) {
+	mockEventWriter := &eventMock.WorkflowExecutionEventWriter{}
 	fakeFlyteWorkflow := FakeFlyteWorkflow{}
 	fakeFlyteWorkflow.deleteCallback = func(name string, options *v1.DeleteOptions) error {
 		return k8apierr.NewNotFound(schema.GroupResource{
@@ -327,8 +328,19 @@ func TestAbort_Notfound(t *testing.T) {
 		return &fakeFlyteWorkflow
 	}
 	executor := K8sWorkflowExecutor{
-		executionCluster: getFakeExecutionCluster(),
+		executionCluster:     getFakeExecutionCluster(),
+		executionEventWriter: mockEventWriter,
 	}
+
+	mockEventWriter.On("Write", mock.MatchedBy(func(req *admin.WorkflowExecutionEventRequest) bool {
+		return req.Event.ExecutionId.Project == execID.Project &&
+			req.Event.ExecutionId.Domain == execID.Domain &&
+			req.Event.ExecutionId.Name == execID.Name &&
+			req.Event.Phase == core.WorkflowExecution_ABORTED &&
+			req.Event.ProducerId == "k8s_executor" &&
+			req.Event.OutputResult.(*event.WorkflowExecutionEvent_Error).Error.Code == "ExecutionAborted" &&
+			req.Event.OutputResult.(*event.WorkflowExecutionEvent_Error).Error.Message == "Execution aborted"
+	})).Return(nil)
 	err := executor.Abort(context.TODO(), interfaces.AbortData{
 		Namespace:   namespace,
 		ExecutionID: execID,
