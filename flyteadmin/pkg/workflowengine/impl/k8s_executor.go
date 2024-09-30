@@ -3,17 +3,21 @@ package impl
 import (
 	"context"
 
-	"google.golang.org/grpc/codes"
-	k8_api_err "k8s.io/apimachinery/pkg/api/errors"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
+	eventsInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/async/events/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/executioncluster"
 	execClusterInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/executioncluster/interfaces"
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/workflowengine/interfaces"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	event "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/protobuf/types/known/timestamppb"
+	k8_api_err "k8s.io/apimachinery/pkg/api/errors"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 var deletePropagationBackground = v1.DeletePropagationBackground
@@ -23,10 +27,11 @@ const defaultIdentifier = "DefaultK8sExecutor"
 // K8sWorkflowExecutor directly creates and delete Flyte workflow execution CRD objects using the configured execution
 // cluster interface.
 type K8sWorkflowExecutor struct {
-	config           runtimeInterfaces.Configuration
-	executionCluster execClusterInterfaces.ClusterInterface
-	workflowBuilder  interfaces.FlyteWorkflowBuilder
-	storageClient    *storage.DataStore
+	config               runtimeInterfaces.Configuration
+	executionCluster     execClusterInterfaces.ClusterInterface
+	workflowBuilder      interfaces.FlyteWorkflowBuilder
+	storageClient        *storage.DataStore
+	executionEventWriter eventsInterfaces.WorkflowExecutionEventWriter
 }
 
 func (e K8sWorkflowExecutor) ID() string {
@@ -101,15 +106,35 @@ func (e K8sWorkflowExecutor) Abort(ctx context.Context, data interfaces.AbortDat
 	if err != nil && !k8_api_err.IsNotFound(err) {
 		return errors.NewFlyteAdminErrorf(codes.Internal, "failed to terminate execution: %v with err %v", data.ExecutionID, err)
 	}
+
+	e.executionEventWriter.Write(&admin.WorkflowExecutionEventRequest{
+		Event: &event.WorkflowExecutionEvent{
+			ExecutionId: &core.WorkflowExecutionIdentifier{
+				Project: data.ExecutionID.Project,
+				Domain:  data.ExecutionID.Domain,
+				Name:    data.ExecutionID.Name,
+			},
+			Phase:      core.WorkflowExecution_ABORTED,
+			ProducerId: "k8s_executor",
+			OccurredAt: timestamppb.Now(),
+			OutputResult: &event.WorkflowExecutionEvent_Error{
+				Error: &core.ExecutionError{
+					Code:    "ExecutionAborted",
+					Message: "Execution aborted",
+				},
+			},
+		},
+	})
 	return nil
 }
 
-func NewK8sWorkflowExecutor(config runtimeInterfaces.Configuration, executionCluster execClusterInterfaces.ClusterInterface, workflowBuilder interfaces.FlyteWorkflowBuilder, client *storage.DataStore) *K8sWorkflowExecutor {
+func NewK8sWorkflowExecutor(config runtimeInterfaces.Configuration, executionCluster execClusterInterfaces.ClusterInterface, workflowBuilder interfaces.FlyteWorkflowBuilder, client *storage.DataStore, executionEventWriter eventsInterfaces.WorkflowExecutionEventWriter) *K8sWorkflowExecutor {
 
 	return &K8sWorkflowExecutor{
-		config:           config,
-		executionCluster: executionCluster,
-		workflowBuilder:  workflowBuilder,
-		storageClient:    client,
+		config:               config,
+		executionCluster:     executionCluster,
+		workflowBuilder:      workflowBuilder,
+		storageClient:        client,
+		executionEventWriter: executionEventWriter,
 	}
 }
