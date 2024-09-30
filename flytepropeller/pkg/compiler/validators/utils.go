@@ -11,6 +11,8 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
+const messagepack = "msgpack"
+
 func containsBindingByVariableName(bindings []*core.Binding, name string) (found bool) {
 	for _, b := range bindings {
 		if b.Var == name {
@@ -47,7 +49,7 @@ func literalTypeForScalar(scalar *core.Scalar) *core.LiteralType {
 		// If the binary has a tag, treat it as a structured type (e.g., dict, dataclass, Pydantic BaseModel).
 		// Otherwise, treat it as raw binary data.
 		// Reference: https://github.com/flyteorg/flyte/blob/master/rfc/system/5741-binary-idl-with-message-pack.md
-		if len(v.Binary.Tag) > 0 {
+		if v.Binary.Tag == messagepack {
 			literalType = &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRUCT}}
 		} else {
 			literalType = &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_BINARY}}
