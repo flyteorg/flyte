@@ -94,6 +94,17 @@ func (e K8sWorkflowExecutor) Abort(ctx context.Context, data interfaces.AbortDat
 	if err != nil {
 		return errors.NewFlyteAdminErrorf(codes.Internal, err.Error())
 	}
+	// Check if the execution has been handled by FlytePropeller
+	crd, err := target.FlyteClient.FlyteworkflowV1alpha1().FlyteWorkflows(data.Namespace).Get(ctx, data.ExecutionID.GetName(), v1.GetOptions{})
+	if err != nil {
+		return errors.NewFlyteAdminErrorf(codes.Internal, err.Error())
+	}
+
+	if crd.Generation < 2 {
+		logger.Infof(ctx, "Execution [%v] hasn't been handled by FlytePropeller", data.ExecutionID)
+		return nil
+	}
+
 	err = target.FlyteClient.FlyteworkflowV1alpha1().FlyteWorkflows(data.Namespace).Delete(ctx, data.ExecutionID.GetName(), v1.DeleteOptions{
 		PropagationPolicy: &deletePropagationBackground,
 	})
