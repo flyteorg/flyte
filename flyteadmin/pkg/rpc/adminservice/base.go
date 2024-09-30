@@ -82,7 +82,7 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 	go func() {
 		executionEventWriter.Run()
 	}()
-	
+
 	workflowExecutor := workflowengineImpl.NewK8sWorkflowExecutor(configuration, execCluster, workflowBuilder, dataStorageClient, executionEventWriter)
 	logger.Info(ctx, "Successfully created a workflow executor engine")
 	pluginRegistry.RegisterDefault(plugins.PluginIDWorkflowExecutor, workflowExecutor)
