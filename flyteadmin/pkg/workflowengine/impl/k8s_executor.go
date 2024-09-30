@@ -107,7 +107,7 @@ func (e K8sWorkflowExecutor) Abort(ctx context.Context, data interfaces.AbortDat
 		return errors.NewFlyteAdminErrorf(codes.Internal, "failed to terminate execution: %v with err %v", data.ExecutionID, err)
 	}
 
-	e.executionEventWriter.Write(&admin.WorkflowExecutionEventRequest{
+	e.executionEventWriter.Write(admin.WorkflowExecutionEventRequest{
 		Event: &event.WorkflowExecutionEvent{
 			ExecutionId: &core.WorkflowExecutionIdentifier{
 				Project: data.ExecutionID.Project,
