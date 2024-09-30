@@ -34,9 +34,6 @@ If you want to include tested, runnable example code in user guide documentation
 
 ## Contributing tutorials and integrations examples
 
-The tutorials and integrations examples provide an easy way for the community to learn about the rich set of
-features that Flyte offers, and we are constantly improving them with your help!
-
 The first step to contributing a tutorial or integration example is to open a
 [documentation issue](https://github.com/flyteorg/flyte/issues/new?assignees=&labels=documentation%2Cuntriaged&template=docs_issue.yaml&title=%5BDocs%5D+) to describe the example you want to write. The Flyte maintainers will help you figure out where your tutorial or integration example would best fit.
 
@@ -47,8 +44,7 @@ Follow the {ref}`env_setup` guide to get your development environment ready.
 :::
 
 The `flytesnacks` repo examples live in the `examples` directory, where each
-subdirectory contains a self-contained example project that covers a particular
-feature, integration, or use case.
+subdirectory contains a self-contained example project that covers a particular tutorial or integration. There are also subdirectories that contain the code included in the user guide via the `rli` (remoteliteralinclude) directive.
 
 ```{code-block} bash
 examples
@@ -57,7 +53,7 @@ examples
 ├── athena_plugin
 ├── aws_batch_plugin
 ├── basics
-├── bigquery_plugin
+├── bigquery_agent
 ...
 ```
 
@@ -65,13 +61,11 @@ examples
 
 If you're adding a new example to an existing project, you can simply create a
 new `.py` file in the appropriate directory. For example, if you want to add a new
-example in the `examples/basics` project, simply do:
+example in the `examples/exploratory_data_analysis` project, simply do:
 
 ```{prompt} bash
-touch examples/basics/my_new_example.py
+touch examples/exploratory_data_analysis/my_new_example.py
 ```
-
-If you are creating a new user guide example, you can reference the code in the user guide documentation using the `rli` (remoteliteralinclude) directive.
 
 If you are creating a new integration or tutorial example, add the example to the `README.md` file of the
 example project as an entry in the `auto-examples-toc` directive:
@@ -82,6 +76,8 @@ example project as an entry in the `auto-examples-toc` directive:
 my_new_example
 ```
 ````
+
+If you are creating a new user guide example, you can reference the code in the user guide documentation using the `rli` (remoteliteralinclude) directive. You do not need to add the new example to the `README.md` file of the example project.
 
 #### Creating a new example project
 
@@ -116,8 +112,8 @@ examples/new_example_project
 ##### Tutorial or integration examples
 
 If you are writing a tutorial or integration example, write your example Python script in [percent format](https://jupytext.readthedocs.io/en/latest/formats.html#the-percent-format),
-which allows you to interleave python code and markdown in the same file. Each
-code cell should be delimited by `# %%`, and each markdown cell should be
+which allows you to interleave Python code and Markdown in the same file. Each
+code cell should be delimited by `# %%`, and each Markdown cell should be
 delimited with `# %% [markdown]`.
 
 ```{code-block} python
@@ -125,19 +121,19 @@ delimited with `# %% [markdown]`.
 print("Hello World!")
 
 # %% [markdown]
-# This is a markdown cell
+# This is a Markdown cell
 
 # %%
 print("This is another code cell")
 ```
 
-Markdown cells have access to sphinx directives through the
-[myst markdown](https://myst-parser.readthedocs.io/en/latest/) format,
-which is a flavor of markdown that makes it easier to write documentation while
-giving you the utilities of sphinx. `flytesnacks` uses the
+Markdown cells have access to Sphinx directives through the
+[MyST Markdown](https://myst-parser.readthedocs.io/en/latest/) format,
+which is a flavor of Markdown that makes it easier to write documentation while
+giving you the utilities of Sphinx. `flytesnacks` uses the
 [myst-nb](https://myst-nb.readthedocs.io/en/latest/) and
 [jupytext](https://github.com/mwouts/jupytext) packages to interpret the
-python files as rst-compatible files.
+Python files as rst-compatible files.
 
 #### Writing examples: explain what the code does
 
@@ -158,20 +154,19 @@ As you can see, `function` adds the two first arguments and multiplies the sum w
 argument. Can you think of a better name for this `function`?
 :::
 
-Explanations don't have to be this detailed for such a simple example, but you can imagine how this makes for a better
-reading experience for more complicated examples.
+Explanations don't have to be this detailed for such a simple example, but you can imagine how this makes for a better reading experience for more complicated examples.
 
 #### Creating examples in other formats
 
 Writing examples in `.py` files is preferred since they are easily tested and
 packaged, but `flytesnacks` also supports examples written in `.ipynb` and
-`.md` files in myst markdown format. This is useful in the following cases:
+`.md` files in MyST Markdown format. This is useful in the following cases:
 
-- `.ipynb`: When a `.py` example needs a companion jupyter notebook as a task, e.g.
+- `.ipynb`: When a `.py` example needs a companion Jupyter notebook as a task, e.g.
   to illustrate the use of {py:class}`~flytekitplugins.papermill.NotebookTask`s,
   or when an example is intended to be run from a notebook.
 - `.md`: When a piece of documentation doesn't require testable or packaged
-  flyte tasks/workflows, an example page can be written as a myst markdown file.
+  flyte tasks/workflows, an example page can be written as a MyST Markdown file.
 
 **Note:** If you want to add Markdown files to a user guide example project, add them to the [flyte repository](https://github.com/flyteorg/flyte/tree/master/docs/user_guide) instead.
 
@@ -179,12 +174,12 @@ packaged, but `flytesnacks` also supports examples written in `.ipynb` and
 
 The `README.md` file needs to capture the _what_, _why_, and _how_ of the example.
 
-- What is the integration about? Its features, etc.
-- Why do we need this integration? How is it going to benefit the Flyte users?
-- Showcase the uniqueness of the integration
-- How to install the plugin?
+- What is the tutorial or integration about? Its features, etc.
+- Why do we need this tutorial or integration? How is it going to benefit Flyte users?
+- Showcase the uniqueness of the tutorial or integration
+- Integration plugin installation steps
 
-Finally, **for tutorials and integrations only**, write a `auto-examples-toc` directive at the bottom of the file:
+Finally, **for tutorials and integrations only**, write an `auto-examples-toc` directive at the bottom of the file:
 
 ````{code-block}
 ```{auto-examples-toc}
@@ -194,7 +189,7 @@ example_03
 ```
 ````
 
-Where `example_01`, `example_02`, and `example_03` are the python module
+Where `example_01`, `example_02`, and `example_03` are the Python module
 names of the examples under the `new_example_project` directory. These can also
 be the names of the `.ipynb` or `.md` files (but without the file extension).
 
@@ -310,37 +305,35 @@ are configured as git hooks in `pre-commit`. Run `make fmt` to format your code.
 We use [codespell](https://github.com/codespell-project/codespell) to catch common misspellings. Run
 `make spellcheck` to spell-check the changes.
 
-### Update Documentation Pages
+### Update documentation pages
 
-The `docs/conf.py` contains the sphinx configuration for building the
+The `docs/conf.py` contains the Sphinx configuration for building the
 `flytesnacks` documentation.
 
-At build-time, the `flytesnacks` sphinx build system will convert all of the
-projects in the `examples` directory into `docs/auto_examples`, and will be
-available in the documentation.
+At build time, the `flytesnacks` Sphinx build system will convert the tutorials and integrations examples in the `examples` directory into `docs/auto_examples` and make them available in the documentation.
 
 ::::{important}
 
-The docs build system will convert the `README.md` files in each example
+The docs build system will convert the `README.md` files in each tutorials and example integration project
 project into a `index.md` file, so you can reference the root page of each
-example project, e.g., in myst markdown format, you can write a table-of-content
+example project, e.g., in MyST Markdown format, you can write a table-of-contents
 directive like so:
 
 :::{code-block}
 
 ```{toc}
-auto_examples/basics/index
+/auto_examples/bigquery_agent/index
 ```
 
 :::
 
 ::::
 
-If you've created a new example project, you'll need to add the `index` page
-in the table of contents in `docs/index.md` to make sure the project
+If you've created a new tutorial or integration example project, you'll need to add its `index` page
+to the table of contents in `docs/index.md` to make sure the project
 shows up in the documentation. Additonally, you'll need to update the appropriate
-`list-table` directive in `docs/userguide.md`, `docs/tutorials.md`, or
-`docs/integrations.md` so that it shows up in the respective section of the
+`list-table` directive in `docs/tutorials/index.md`, or
+`docs/integrations/index.md` so that it shows up in the respective section of the
 documentation.
 
 ### Build the documentation locally
@@ -360,9 +353,9 @@ Verify that the code and documentation look as expected:
 
 ### Create a pull request
 
-Create the pull request, then ensure that the docs are rendered correctly by clicking on the documentation check.
+Create the pull request in the flytesnacks repository, then ensure that the docs are rendered correctly by clicking on the documentation check.
 
-```{image} https://raw.githubusercontent.com/flyteorg/static-resources/main/common/test_docs_link.png
+```{image} https://github.com/user-attachments/assets/581330cc-c9ab-418d-a9ae-bb3c346603ba
 :alt: Docs link in a PR
 ```
 
