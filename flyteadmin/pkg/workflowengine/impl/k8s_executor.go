@@ -11,12 +11,12 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/workflowengine/interfaces"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	event "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/protobuf/types/known/timestamppb"
-	k8_api_err "k8s.io/apimachinery/pkg/api/errors"
+	k8apierr "k8s.io/apimachinery/pkg/api/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -82,7 +82,7 @@ func (e K8sWorkflowExecutor) Execute(ctx context.Context, data interfaces.Execut
 	}
 	_, err = targetCluster.FlyteClient.FlyteworkflowV1alpha1().FlyteWorkflows(data.Namespace).Create(ctx, flyteWf, v1.CreateOptions{})
 	if err != nil {
-		if !k8_api_err.IsAlreadyExists(err) {
+		if !k8apierr.IsAlreadyExists(err) {
 			logger.Debugf(context.TODO(), "Failed to create execution [%+v] in cluster: %s", data.ExecutionID, targetCluster.ID)
 			return interfaces.ExecutionResponse{}, errors.NewFlyteAdminErrorf(codes.Internal, "failed to create workflow in propeller %v", err)
 		}
@@ -103,11 +103,11 @@ func (e K8sWorkflowExecutor) Abort(ctx context.Context, data interfaces.AbortDat
 		PropagationPolicy: &deletePropagationBackground,
 	})
 	// An IsNotFound error indicates the resource is already deleted.
-	if err != nil && !k8_api_err.IsNotFound(err) {
+	if err != nil && !k8apierr.IsNotFound(err) {
 		return errors.NewFlyteAdminErrorf(codes.Internal, "failed to terminate execution: %v with err %v", data.ExecutionID, err)
 	}
 
-	e.executionEventWriter.Write(admin.WorkflowExecutionEventRequest{
+	e.executionEventWriter.Write(&admin.WorkflowExecutionEventRequest{
 		Event: &event.WorkflowExecutionEvent{
 			ExecutionId: &core.WorkflowExecutionIdentifier{
 				Project: data.ExecutionID.Project,
