@@ -359,9 +359,9 @@ func TestPropeller_Handle(t *testing.T) {
 	t.Run("abortedShouldBeFinalized", func(t *testing.T) {
 		assert.NoError(t, s.Create(ctx, &v1alpha1.FlyteWorkflow{
 			ObjectMeta: v1.ObjectMeta{
-				Name:              name,
-				Namespace:         namespace,
-				Finalizers:        []string{"f1"},
+				Name:        name,
+				Namespace:   namespace,
+				Finalizers:  []string{"f1"},
 				Annotations: map[string]string{AbortedWorkflowAnnotation: "true"},
 			},
 			WorkflowSpec: &v1alpha1.WorkflowSpec{
