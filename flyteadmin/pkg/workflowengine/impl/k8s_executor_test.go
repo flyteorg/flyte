@@ -31,11 +31,13 @@ import (
 var fakeFlyteWF = FakeFlyteWorkflowV1alpha1{}
 
 type createCallback func(*v1alpha1.FlyteWorkflow, v1.CreateOptions) (*v1alpha1.FlyteWorkflow, error)
-type deleteCallback func(name string, options *v1.DeleteOptions) error
+type getCallback func(string, v1.GetOptions) (*v1alpha1.FlyteWorkflow, error)
+type updateCallback func(*v1alpha1.FlyteWorkflow, v1.UpdateOptions) (*v1alpha1.FlyteWorkflow, error)
 type FakeFlyteWorkflow struct {
 	v1alpha12.FlyteWorkflowInterface
 	createCallback createCallback
-	deleteCallback deleteCallback
+	getCallback    getCallback
+	updateCallback updateCallback
 }
 
 func (b *FakeFlyteWorkflow) Create(ctx context.Context, wf *v1alpha1.FlyteWorkflow, opts v1.CreateOptions) (*v1alpha1.FlyteWorkflow, error) {
@@ -45,11 +47,18 @@ func (b *FakeFlyteWorkflow) Create(ctx context.Context, wf *v1alpha1.FlyteWorkfl
 	return nil, nil
 }
 
-func (b *FakeFlyteWorkflow) Delete(ctx context.Context, name string, options v1.DeleteOptions) error {
-	if b.deleteCallback != nil {
-		return b.deleteCallback(name, &options)
+func (b *FakeFlyteWorkflow) Get(ctx context.Context, name string, opts v1.GetOptions) (*v1alpha1.FlyteWorkflow, error) {
+	if b.getCallback != nil {
+		return b.getCallback(name, opts)
 	}
-	return nil
+	return nil, nil
+}
+
+func (b *FakeFlyteWorkflow) Update(ctx context.Context, w *v1alpha1.FlyteWorkflow, options v1.UpdateOptions) (*v1alpha1.FlyteWorkflow, error) {
+	if b.updateCallback != nil {
+		return b.updateCallback(w, options)
+	}
+	return nil, nil
 }
 
 type flyteWorkflowsCallback func(string) v1alpha12.FlyteWorkflowInterface
@@ -86,6 +95,9 @@ var execID = &core.WorkflowExecutionIdentifier{
 }
 
 var flyteWf = &v1alpha1.FlyteWorkflow{
+	ObjectMeta: v1.ObjectMeta{
+		Name: execID.Name,
+	},
 	ExecutionID: v1alpha1.ExecutionID{
 		WorkflowExecutionIdentifier: execID,
 	},
@@ -280,10 +292,12 @@ func TestExecute_MiscError(t *testing.T) {
 
 func TestAbort(t *testing.T) {
 	fakeFlyteWorkflow := FakeFlyteWorkflow{}
-	fakeFlyteWorkflow.deleteCallback = func(name string, options *v1.DeleteOptions) error {
-		assert.Equal(t, execID.Name, name)
-		assert.Equal(t, options.PropagationPolicy, &deletePropagationBackground)
-		return nil
+	fakeFlyteWorkflow.getCallback = func(name string, options v1.GetOptions) (*v1alpha1.FlyteWorkflow, error) {
+		return flyteWf, nil
+	}
+	fakeFlyteWorkflow.updateCallback = func(w *v1alpha1.FlyteWorkflow, options v1.UpdateOptions) (*v1alpha1.FlyteWorkflow, error) {
+		assert.Equal(t, execID.Name, w.GetName())
+		return nil, nil
 	}
 	fakeFlyteWF.flyteWorkflowsCallback = func(ns string) v1alpha12.FlyteWorkflowInterface {
 		assert.Equal(t, namespace, ns)
@@ -302,8 +316,8 @@ func TestAbort(t *testing.T) {
 
 func TestAbort_Notfound(t *testing.T) {
 	fakeFlyteWorkflow := FakeFlyteWorkflow{}
-	fakeFlyteWorkflow.deleteCallback = func(name string, options *v1.DeleteOptions) error {
-		return k8_api_err.NewNotFound(schema.GroupResource{
+	fakeFlyteWorkflow.getCallback = func(name string, options v1.GetOptions) (*v1alpha1.FlyteWorkflow, error) {
+		return nil, k8_api_err.NewNotFound(schema.GroupResource{
 			Group:    "foo",
 			Resource: "bar",
 		}, execID.Name)
@@ -325,8 +339,11 @@ func TestAbort_Notfound(t *testing.T) {
 
 func TestAbort_MiscError(t *testing.T) {
 	fakeFlyteWorkflow := FakeFlyteWorkflow{}
-	fakeFlyteWorkflow.deleteCallback = func(name string, options *v1.DeleteOptions) error {
-		return errors.New("call failed")
+	fakeFlyteWorkflow.getCallback = func(name string, options v1.GetOptions) (*v1alpha1.FlyteWorkflow, error) {
+		return flyteWf, nil
+	}
+	fakeFlyteWorkflow.updateCallback = func(w *v1alpha1.FlyteWorkflow, options v1.UpdateOptions) (*v1alpha1.FlyteWorkflow, error) {
+		return nil, errors.New("call failed")
 	}
 	fakeFlyteWF.flyteWorkflowsCallback = func(ns string) v1alpha12.FlyteWorkflowInterface {
 		assert.Equal(t, namespace, ns)

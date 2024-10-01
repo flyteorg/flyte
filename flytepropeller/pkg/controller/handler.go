@@ -42,6 +42,8 @@ type propellerMetrics struct {
 	RoundTime                labeled.StopWatch
 }
 
+const AbortedWorkflowAnnotation = "workflow-aborted"
+
 func newPropellerMetrics(scope promutils.Scope) *propellerMetrics {
 	roundScope := scope.NewSubScope("round")
 	return &propellerMetrics{
@@ -89,6 +91,10 @@ func SetDefinitionVersionIfEmpty(wf *v1alpha1.FlyteWorkflow, version v1alpha1.Wo
 	}
 }
 
+func IsAborted(w *v1alpha1.FlyteWorkflow) bool {
+	return w.GetObjectMeta().GetAnnotations()[AbortedWorkflowAnnotation] == "true"
+}
+
 // TryMutateWorkflow will try to mutate the workflow by traversing it and reconciling the desired and actual state.
 // The desired state here is the entire workflow is completed, actual state is each nodes current execution state.
 func (p *Propeller) TryMutateWorkflow(ctx context.Context, originalW *v1alpha1.FlyteWorkflow) (*v1alpha1.FlyteWorkflow, error) {
@@ -103,7 +109,8 @@ func (p *Propeller) TryMutateWorkflow(ctx context.Context, originalW *v1alpha1.F
 	ctx = contextutils.WithResourceVersion(ctx, mutableW.GetResourceVersion())
 
 	maxRetries := uint32(p.cfg.MaxWorkflowRetries)
-	if IsDeleted(mutableW) || (mutableW.Status.FailedAttempts > maxRetries) {
+
+	if IsAborted(mutableW) || (mutableW.Status.FailedAttempts > maxRetries) {
 		var err error
 		func() {
 			defer func() {
