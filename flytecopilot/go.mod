@@ -3,7 +3,7 @@ module github.com/flyteorg/flyte/flytecopilot
 go 1.22
 
 require (
-	github.com/aws/aws-sdk-go v1.44.2
+	github.com/aws/aws-sdk-go v1.47.11
 	github.com/flyteorg/flyte/flyteidl v0.0.0-00010101000000-000000000000
 	github.com/flyteorg/flyte/flytestdlib v0.0.0-00010101000000-000000000000
 	github.com/fsnotify/fsnotify v1.6.0

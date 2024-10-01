@@ -33,7 +33,7 @@ require (
 	github.com/NYTimes/gizmo v1.3.6 // indirect
 	github.com/Shopify/sarama v1.26.4 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20200428143746-21a406dcc535 // indirect
-	github.com/aws/aws-sdk-go v1.44.2 // indirect
+	github.com/aws/aws-sdk-go v1.47.11 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.2.0 // indirect
 	github.com/aws/aws-sdk-go-v2/config v1.0.0 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.0.0 // indirect
