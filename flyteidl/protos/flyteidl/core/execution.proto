@@ -73,6 +73,8 @@ message ExecutionError {
         SYSTEM = 2;
     }
     ErrorKind kind = 4;
+    // Worker that generated the error
+    string worker = 6;
 }
 
 // Log information for the task that is specific to a log sink

@@ -5748,6 +5748,9 @@ export namespace flyteidl {
 
             /** ExecutionError kind */
             kind?: (flyteidl.core.ExecutionError.ErrorKind|null);
+
+            /** ExecutionError worker */
+            worker?: (string|null);
         }
 
         /** Represents an ExecutionError. */
@@ -5770,6 +5773,9 @@ export namespace flyteidl {
 
             /** ExecutionError kind. */
             public kind: flyteidl.core.ExecutionError.ErrorKind;
+
+            /** ExecutionError worker. */
+            public worker: string;
 
             /**
              * Creates a new ExecutionError instance using the specified properties.
@@ -7555,6 +7561,12 @@ export namespace flyteidl {
 
             /** ContainerError origin */
             origin?: (flyteidl.core.ExecutionError.ErrorKind|null);
+
+            /** ContainerError timetsamp */
+            timetsamp?: (Long|null);
+
+            /** ContainerError worker */
+            worker?: (string|null);
         }
 
         /** Represents a ContainerError. */
@@ -7577,6 +7589,12 @@ export namespace flyteidl {
 
             /** ContainerError origin. */
             public origin: flyteidl.core.ExecutionError.ErrorKind;
+
+            /** ContainerError timetsamp. */
+            public timetsamp: Long;
+
+            /** ContainerError worker. */
+            public worker: string;
 
             /**
              * Creates a new ContainerError instance using the specified properties.

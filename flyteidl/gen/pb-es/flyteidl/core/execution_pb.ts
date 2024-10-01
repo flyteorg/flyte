@@ -341,6 +341,13 @@ export class ExecutionError extends Message<ExecutionError> {
    */
   kind = ExecutionError_ErrorKind.UNKNOWN;
 
+  /**
+   * Worker that generated the error
+   *
+   * @generated from field: string worker = 6;
+   */
+  worker = "";
+
   constructor(data?: PartialMessage<ExecutionError>) {
     super();
     proto3.util.initPartial(data, this);
@@ -353,6 +360,7 @@ export class ExecutionError extends Message<ExecutionError> {
     { no: 2, name: "message", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "error_uri", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "kind", kind: "enum", T: proto3.getEnumType(ExecutionError_ErrorKind) },
+    { no: 6, name: "worker", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExecutionError {

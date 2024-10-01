@@ -77,6 +77,7 @@ func errorDoc2ExecutionError(errorDoc *core.ErrorDocument, errorFilePath storage
 			Code:    errorDoc.Error.Code,
 			Message: errorDoc.Error.Message,
 			Kind:    errorDoc.Error.Origin,
+			Worker:  errorDoc.Error.Worker,
 		},
 	}
 
@@ -191,18 +192,10 @@ func (e *EarliestFileErrorRetriever) GetError(ctx context.Context) (io.Execution
 		}
 	}
 
-	extractTimestampFromErrorDoc := func(errorDoc *core.ErrorDocument) int64 {
-		// TODO: add optional timestamp to ErrorDocument
-		if errorDoc == nil {
-			panic("")
-		}
-		return 0
-	}
-
 	var earliestTimestamp int64 = math.MaxInt64
 	earliestExecutionError := io.ExecutionError{}
 	for _, errorFileAndDoc := range errorFileAndDocs {
-		timestamp := extractTimestampFromErrorDoc(errorFileAndDoc.errorDoc)
+		timestamp := errorFileAndDoc.errorDoc.Error.GetTimetsamp()
 		if earliestTimestamp >= timestamp {
 			earliestExecutionError = errorDoc2ExecutionError(errorFileAndDoc.errorDoc, errorFileAndDoc.errorFilePath)
 			earliestTimestamp = timestamp

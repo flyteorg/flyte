@@ -3,6 +3,7 @@ package ioutils
 import (
 	"context"
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -121,20 +122,21 @@ func TestReadOrigin(t *testing.T) {
 
 		store := &storageMocks.ComposedProtobufStore{}
 		store.OnReadProtobufMatch(mock.Anything, mock.Anything, mock.Anything).Run(func(args mock.Arguments) {
+			errorFilePath := args.Get(1).(storage.DataReference)
+			workerIdx := strings.Split(strings.Split(errorFilePath.String(), "-")[1], ".")[0]
 			errorDoc := &core.ErrorDocument{
 				Error: &core.ContainerError{
 					Code:    "red",
-					Message: "hi",
+					Message: fmt.Sprintf("hi-%s", workerIdx),
 					Kind:    core.ContainerError_NON_RECOVERABLE,
 					Origin:  core.ExecutionError_USER,
+					Worker:  fmt.Sprintf("worker-%s", workerIdx),
 				},
 			}
-			errorFilePath := args.Get(1)
 			incomingErrorDoc := args.Get(2)
 			assert.NotNil(t, incomingErrorDoc)
 			casted := incomingErrorDoc.(*core.ErrorDocument)
 			casted.Error = errorDoc.Error
-			casted.Error.Message = fmt.Sprintf("%s-%s", casted.Error.Message, errorFilePath)
 		}).Return(nil)
 
 		store.OnList(ctx, storage.DataReference("s3://errors/error"), 1000, storage.NewCursorAtStart()).Return(
@@ -169,7 +171,8 @@ func TestReadOrigin(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, core.ExecutionError_USER, executionError.Kind)
 		assert.Equal(t, "red", executionError.Code)
-		assert.Equal(t, "hi-error-2.pb", executionError.Message)
+		assert.Equal(t, "hi-2", executionError.Message)
+		assert.Equal(t, "worker-2", executionError.Worker)
 		assert.False(t, executionError.IsRecoverable)
 	})
 }

@@ -13823,6 +13823,7 @@
                  * @property {string|null} [message] ExecutionError message
                  * @property {string|null} [errorUri] ExecutionError errorUri
                  * @property {flyteidl.core.ExecutionError.ErrorKind|null} [kind] ExecutionError kind
+                 * @property {string|null} [worker] ExecutionError worker
                  */
     
                 /**
@@ -13873,6 +13874,14 @@
                 ExecutionError.prototype.kind = 0;
     
                 /**
+                 * ExecutionError worker.
+                 * @member {string} worker
+                 * @memberof flyteidl.core.ExecutionError
+                 * @instance
+                 */
+                ExecutionError.prototype.worker = "";
+    
+                /**
                  * Creates a new ExecutionError instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.core.ExecutionError
@@ -13904,6 +13913,8 @@
                         writer.uint32(/* id 3, wireType 2 =*/26).string(message.errorUri);
                     if (message.kind != null && message.hasOwnProperty("kind"))
                         writer.uint32(/* id 4, wireType 0 =*/32).int32(message.kind);
+                    if (message.worker != null && message.hasOwnProperty("worker"))
+                        writer.uint32(/* id 6, wireType 2 =*/50).string(message.worker);
                     return writer;
                 };
     
@@ -13936,6 +13947,9 @@
                             break;
                         case 4:
                             message.kind = reader.int32();
+                            break;
+                        case 6:
+                            message.worker = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -13974,6 +13988,9 @@
                         case 2:
                             break;
                         }
+                    if (message.worker != null && message.hasOwnProperty("worker"))
+                        if (!$util.isString(message.worker))
+                            return "worker: string expected";
                     return null;
                 };
     
@@ -18268,6 +18285,8 @@
                  * @property {string|null} [message] ContainerError message
                  * @property {flyteidl.core.ContainerError.Kind|null} [kind] ContainerError kind
                  * @property {flyteidl.core.ExecutionError.ErrorKind|null} [origin] ContainerError origin
+                 * @property {Long|null} [timetsamp] ContainerError timetsamp
+                 * @property {string|null} [worker] ContainerError worker
                  */
     
                 /**
@@ -18318,6 +18337,22 @@
                 ContainerError.prototype.origin = 0;
     
                 /**
+                 * ContainerError timetsamp.
+                 * @member {Long} timetsamp
+                 * @memberof flyteidl.core.ContainerError
+                 * @instance
+                 */
+                ContainerError.prototype.timetsamp = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
+    
+                /**
+                 * ContainerError worker.
+                 * @member {string} worker
+                 * @memberof flyteidl.core.ContainerError
+                 * @instance
+                 */
+                ContainerError.prototype.worker = "";
+    
+                /**
                  * Creates a new ContainerError instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.core.ContainerError
@@ -18349,6 +18384,10 @@
                         writer.uint32(/* id 3, wireType 0 =*/24).int32(message.kind);
                     if (message.origin != null && message.hasOwnProperty("origin"))
                         writer.uint32(/* id 4, wireType 0 =*/32).int32(message.origin);
+                    if (message.timetsamp != null && message.hasOwnProperty("timetsamp"))
+                        writer.uint32(/* id 5, wireType 0 =*/40).int64(message.timetsamp);
+                    if (message.worker != null && message.hasOwnProperty("worker"))
+                        writer.uint32(/* id 6, wireType 2 =*/50).string(message.worker);
                     return writer;
                 };
     
@@ -18381,6 +18420,12 @@
                             break;
                         case 4:
                             message.origin = reader.int32();
+                            break;
+                        case 5:
+                            message.timetsamp = reader.int64();
+                            break;
+                        case 6:
+                            message.worker = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -18424,6 +18469,12 @@
                         case 2:
                             break;
                         }
+                    if (message.timetsamp != null && message.hasOwnProperty("timetsamp"))
+                        if (!$util.isInteger(message.timetsamp) && !(message.timetsamp && $util.isInteger(message.timetsamp.low) && $util.isInteger(message.timetsamp.high)))
+                            return "timetsamp: integer|Long expected";
+                    if (message.worker != null && message.hasOwnProperty("worker"))
+                        if (!$util.isString(message.worker))
+                            return "worker: string expected";
                     return null;
                 };
     
