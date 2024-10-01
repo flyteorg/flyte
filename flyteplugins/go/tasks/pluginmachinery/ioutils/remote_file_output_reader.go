@@ -79,11 +79,7 @@ func errorDoc2ExecutionError(errorDoc *core.ErrorDocument, errorFilePath storage
 			Kind:    errorDoc.Error.Origin,
 		},
 	}
-
-	if errorDoc.Error.Kind == core.ContainerError_RECOVERABLE {
-		executionError.IsRecoverable = true
-	}
-
+	
 	if errorDoc.Error.Kind == core.ContainerError_RECOVERABLE {
 		executionError.IsRecoverable = true
 	}
