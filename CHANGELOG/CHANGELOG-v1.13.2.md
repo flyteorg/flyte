@@ -19,7 +19,7 @@
 * [flyteagent] Enable `agent-service` in every configuration  by @Future-Outlier in https://github.com/flyteorg/flyte/pull/5730
 * [Docs][flyteagent] Remove `agent-service` config in flyte agent documentation by @Future-Outlier in https://github.com/flyteorg/flyte/pull/5731
 * Fix flytectl returning the oldest workflow when using --latest flag by @RRap0so in https://github.com/flyteorg/flyte/pull/5716
-* Remove explict go toolchain versions by @ddl-ebrown in https://github.com/flyteorg/flyte/pull/5723
+* Remove explicit go toolchain versions by @ddl-ebrown in https://github.com/flyteorg/flyte/pull/5723
 * Add listing api to stow storage by @bgedik in https://github.com/flyteorg/flyte/pull/5741
 * Use latest upload/download-artifact action version by @Sovietaced in https://github.com/flyteorg/flyte/pull/5743
 * Introduced SMTP notification by @robert-ulbrich-mercedes-benz in https://github.com/flyteorg/flyte/pull/5535
