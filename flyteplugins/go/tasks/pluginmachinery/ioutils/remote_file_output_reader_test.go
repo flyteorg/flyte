@@ -140,6 +140,18 @@ func TestReadOrigin(t *testing.T) {
 		store.OnList(ctx, storage.DataReference("s3://errors/error"), 1000, storage.NewCursorAtStart()).Return(
 			[]storage.DataReference{"error-0.pb", "error-1.pb", "error-2.pb"}, storage.NewCursorAtEnd(), nil)
 
+		store.OnHead(ctx, storage.DataReference("error-0.pb")).Return(MemoryMetadata{
+			exists: true,
+		}, nil)
+
+		store.OnHead(ctx, storage.DataReference("error-1.pb")).Return(MemoryMetadata{
+			exists: true,
+		}, nil)
+
+		store.OnHead(ctx, storage.DataReference("error-2.pb")).Return(MemoryMetadata{
+			exists: true,
+		}, nil)
+
 		maxPayloadSize := int64(0)
 		r := NewRemoteFileOutputReaderWithErrorAggregationStrategy(
 			ctx,
