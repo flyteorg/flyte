@@ -357,7 +357,6 @@ func TestPropeller_Handle(t *testing.T) {
 	})
 
 	t.Run("abortedShouldBeFinalized", func(t *testing.T) {
-		n := v1.Now()
 		assert.NoError(t, s.Create(ctx, &v1alpha1.FlyteWorkflow{
 			ObjectMeta: v1.ObjectMeta{
 				Name:              name,

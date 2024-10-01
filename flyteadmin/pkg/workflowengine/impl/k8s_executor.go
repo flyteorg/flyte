@@ -16,8 +16,6 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
-var deletePropagationBackground = v1.DeletePropagationBackground
-
 const defaultIdentifier = "DefaultK8sExecutor"
 const AbortedWorkflowAnnotation = "workflow-aborted"
 
