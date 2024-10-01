@@ -92,7 +92,8 @@ func SetDefinitionVersionIfEmpty(wf *v1alpha1.FlyteWorkflow, version v1alpha1.Wo
 }
 
 func IsAborted(w *v1alpha1.FlyteWorkflow) bool {
-	return w.GetObjectMeta().GetAnnotations()[AbortedWorkflowAnnotation] == "true"
+	annotations := w.GetObjectMeta().GetAnnotations()
+	return annotations != nil && annotations[AbortedWorkflowAnnotation] == "true"
 }
 
 // TryMutateWorkflow will try to mutate the workflow by traversing it and reconciling the desired and actual state.
