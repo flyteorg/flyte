@@ -254,4 +254,5 @@ func TestPrepareFlyteWorkflow(t *testing.T) {
 			OutputLocationPrefix: "s3://bucket/key",
 		},
 	})
+	assert.Equal(t, flyteWorkflow.Finalizers, []string{"flyte-finalizer"})
 }
