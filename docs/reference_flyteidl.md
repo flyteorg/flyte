@@ -1,4 +1,4 @@
-# FlyteIDL API Reference
+# FlyteIDL API reference
 
 The protocol buffers defined here provide a high level specification of various
 entities in Flyte control plane and data plane. It provides detailed definitions

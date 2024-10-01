@@ -358,7 +358,7 @@ pygments_dark_style = "native"
 
 html_context = {
     "dir_to_title": {
-        "api": "API",
+        "api": "API reference",
         "cluster_deployment": "Cluster deployment",
         "community": "Community",
         "concepts": "Flyte concepts",
