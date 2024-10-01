@@ -3,6 +3,8 @@ package subworkflow
 import (
 	"context"
 	"fmt"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
+	"github.com/golang/protobuf/ptypes"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -227,5 +229,25 @@ func (l *launchPlanHandler) HandleAbort(ctx context.Context, nCtx interfaces.Nod
 		// THIS SHOULD NEVER HAPPEN
 		return err
 	}
-	return l.launchPlan.Kill(ctx, childID, fmt.Sprintf("cascading abort as parent execution id [%s] aborted, reason [%s]", nCtx.ExecutionContext().GetName(), reason))
+
+	err = l.launchPlan.Kill(ctx, childID, fmt.Sprintf("cascading abort as parent execution id [%s] aborted, reason [%s]", nCtx.ExecutionContext().GetName(), reason))
+	if err != nil {
+		return err
+	}
+	targetEntity := common.GetTargetEntity(ctx, nCtx)
+	err = nCtx.EventsRecorder().RecordNodeEvent(ctx, &event.NodeExecutionEvent{
+		Id:         nCtx.NodeExecutionMetadata().GetNodeExecutionID(),
+		Phase:      core.NodeExecution_ABORTED,
+		OccurredAt: ptypes.TimestampNow(),
+		OutputResult: &event.NodeExecutionEvent_Error{
+			Error: &core.ExecutionError{
+				Code:    "NodeAborted",
+				Message: reason,
+			},
+		},
+		ProducerId:   "", // TODOÑ What should this be? I don´t have cluster available
+		ReportedAt:   ptypes.TimestampNow(),
+		TargetEntity: targetEntity,
+	}, l.eventConfig)
+	return err
 }
