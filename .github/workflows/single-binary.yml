@@ -175,7 +175,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install uv
-          uv pip install --system flytekit flytekitplugins-deck-standard "numpy<2.0.0" pyarrow plotly
+          uv pip install --system flytekit flytekitplugins-deck-standard "numpy<2.0.0" pyarrow plotly pandas pygments ydata-profiling
           uv pip freeze
       - name: Checkout flytesnacks
         uses: actions/checkout@v4
