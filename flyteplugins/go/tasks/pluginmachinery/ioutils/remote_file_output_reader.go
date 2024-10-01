@@ -20,19 +20,19 @@ type ErrorRetriever interface {
 	GetError(ctx context.Context) (io.ExecutionError, error)
 }
 
-type BaseErrorRetriever struct {
+type baseErrorRetriever struct {
 	store          storage.ComposedProtobufStore
 	maxPayloadSize int64
 }
 
 type SingleFileErrorRetriever struct {
-	BaseErrorRetriever
+	baseErrorRetriever
 	errorFilePath storage.DataReference
 }
 
 func NewSingleFileErrorRetriever(errorFilePath storage.DataReference, store storage.ComposedProtobufStore, maxPayloadSize int64) *SingleFileErrorRetriever {
 	return &SingleFileErrorRetriever{
-		BaseErrorRetriever: BaseErrorRetriever{
+		baseErrorRetriever: baseErrorRetriever{
 			store:          store,
 			maxPayloadSize: maxPayloadSize,
 		},
@@ -40,7 +40,7 @@ func NewSingleFileErrorRetriever(errorFilePath storage.DataReference, store stor
 	}
 }
 
-func (b *BaseErrorRetriever) validatePayloadSize(metadata storage.Metadata) error {
+func (b *baseErrorRetriever) validatePayloadSize(metadata storage.Metadata) error {
 	if metadata.Exists() {
 		if metadata.Size() > b.maxPayloadSize {
 			return errors.Errorf("file is too large [%d] bytes, max allowed [%d] bytes", metadata.Size(), b.maxPayloadSize)
@@ -112,7 +112,7 @@ func (s *SingleFileErrorRetriever) GetError(ctx context.Context) (io.ExecutionEr
 }
 
 type EarliestFileErrorRetriever struct {
-	BaseErrorRetriever
+	baseErrorRetriever
 	errorDirPath           storage.DataReference
 	canonicalErrorFilename string
 }
@@ -217,7 +217,7 @@ func (e *EarliestFileErrorRetriever) GetError(ctx context.Context) (io.Execution
 
 func NewEarliestFileErrorRetriever(errorDirPath storage.DataReference, canonicalErrorFilename string, store storage.ComposedProtobufStore, maxPayloadSize int64) *EarliestFileErrorRetriever {
 	return &EarliestFileErrorRetriever{
-		BaseErrorRetriever: BaseErrorRetriever{
+		baseErrorRetriever: baseErrorRetriever{
 			store:          store,
 			maxPayloadSize: maxPayloadSize,
 		},
