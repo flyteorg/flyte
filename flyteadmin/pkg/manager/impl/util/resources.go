@@ -58,6 +58,10 @@ func GetCompleteTaskResourceRequirements(ctx context.Context, identifier *core.I
 // FromAdminProtoTaskResourceSpec parses the flyteidl `TaskResourceSpec` message into a `TaskResourceSet`.
 func FromAdminProtoTaskResourceSpec(ctx context.Context, spec *admin.TaskResourceSpec) runtimeInterfaces.TaskResourceSet {
 	result := runtimeInterfaces.TaskResourceSet{}
+	if spec == nil {
+		return result
+	}
+
 	if len(spec.Cpu) > 0 {
 		result.CPU = parseQuantityNoError(ctx, "project", "cpu", spec.Cpu)
 	}

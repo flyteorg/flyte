@@ -118,18 +118,25 @@ func TestGetTaskResources(t *testing.T) {
 }
 
 func TestFromAdminProtoTaskResourceSpec(t *testing.T) {
-	taskResourceSet := FromAdminProtoTaskResourceSpec(context.TODO(), &admin.TaskResourceSpec{
-		Cpu:              "1",
-		Memory:           "100",
-		EphemeralStorage: "300",
-		Gpu:              "2",
+	t.Run("empty", func(t *testing.T) {
+		taskResourceSet := FromAdminProtoTaskResourceSpec(context.TODO(), nil)
+		assert.EqualValues(t, runtimeInterfaces.TaskResourceSet{}, taskResourceSet)
 	})
-	assert.EqualValues(t, runtimeInterfaces.TaskResourceSet{
-		CPU:              resource.MustParse("1"),
-		Memory:           resource.MustParse("100"),
-		EphemeralStorage: resource.MustParse("300"),
-		GPU:              resource.MustParse("2"),
-	}, taskResourceSet)
+
+	t.Run("valid", func(t *testing.T) {
+		taskResourceSet := FromAdminProtoTaskResourceSpec(context.TODO(), &admin.TaskResourceSpec{
+			Cpu:              "1",
+			Memory:           "100",
+			EphemeralStorage: "300",
+			Gpu:              "2",
+		})
+		assert.EqualValues(t, runtimeInterfaces.TaskResourceSet{
+			CPU:              resource.MustParse("1"),
+			Memory:           resource.MustParse("100"),
+			EphemeralStorage: resource.MustParse("300"),
+			GPU:              resource.MustParse("2"),
+		}, taskResourceSet)
+	})
 }
 
 func TestGetTaskResourcesAsSet(t *testing.T) {
