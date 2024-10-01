@@ -79,7 +79,7 @@ func errorDoc2ExecutionError(errorDoc *core.ErrorDocument, errorFilePath storage
 			Kind:    errorDoc.Error.Origin,
 		},
 	}
-	
+
 	if errorDoc.Error.Kind == core.ContainerError_RECOVERABLE {
 		executionError.IsRecoverable = true
 	}
@@ -118,7 +118,7 @@ func (e *EarliestFileErrorRetriever) parseErrorFilename() (errorFilePathPrefix s
 	// to have name error<suffix>.pb
 	pieces := strings.Split(e.canonicalErrorFilename, ".")
 	if len(pieces) != 2 {
-		err = errors.Errorf("expected canoncal error filename to have a single ., got %d", len(pieces))
+		err = errors.Errorf("expected canonical error filename to have a single dot (.), got %d", len(pieces))
 		return
 	}
 	errorFilePrefix := pieces[0]
