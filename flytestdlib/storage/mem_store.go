@@ -9,13 +9,15 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"sync"
 )
 
 type rawFile = []byte
 
 type InMemoryStore struct {
 	copyImpl
-	cache map[DataReference]rawFile
+	cache   map[DataReference]rawFile
+	rwMutex sync.RWMutex
 }
 
 type MemoryMetadata struct {
@@ -42,6 +44,9 @@ func (m MemoryMetadata) ContentMD5() string {
 }
 
 func (s *InMemoryStore) Head(ctx context.Context, reference DataReference) (Metadata, error) {
+	s.rwMutex.RLock()
+	defer s.rwMutex.RUnlock()
+
 	data, found := s.cache[reference]
 	var hash [md5.Size]byte
 	if found {
@@ -59,6 +64,9 @@ func (s *InMemoryStore) List(ctx context.Context, reference DataReference, maxIt
 }
 
 func (s *InMemoryStore) ReadRaw(ctx context.Context, reference DataReference) (io.ReadCloser, error) {
+	s.rwMutex.RLock()
+	defer s.rwMutex.RUnlock()
+
 	if raw, found := s.cache[reference]; found {
 		return ioutil.NopCloser(bytes.NewReader(raw)), nil
 	}
@@ -68,6 +76,9 @@ func (s *InMemoryStore) ReadRaw(ctx context.Context, reference DataReference) (i
 
 // Delete removes the referenced data from the cache map.
 func (s *InMemoryStore) Delete(ctx context.Context, reference DataReference) error {
+	s.rwMutex.Lock()
+	defer s.rwMutex.Unlock()
+
 	if _, found := s.cache[reference]; !found {
 		return os.ErrNotExist
 	}
@@ -79,6 +90,8 @@ func (s *InMemoryStore) Delete(ctx context.Context, reference DataReference) err
 
 func (s *InMemoryStore) WriteRaw(ctx context.Context, reference DataReference, size int64, opts Options, raw io.Reader) (
 	err error) {
+	s.rwMutex.Lock()
+	defer s.rwMutex.Unlock()
 
 	rawBytes, err := ioutil.ReadAll(raw)
 	if err != nil {
@@ -90,6 +103,9 @@ func (s *InMemoryStore) WriteRaw(ctx context.Context, reference DataReference, s
 }
 
 func (s *InMemoryStore) Clear(ctx context.Context) error {
+	s.rwMutex.Lock()
+	defer s.rwMutex.Unlock()
+
 	s.cache = map[DataReference]rawFile{}
 	return nil
 }

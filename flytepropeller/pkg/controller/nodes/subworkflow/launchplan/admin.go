@@ -3,7 +3,6 @@ package launchplan
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/golang/protobuf/ptypes/wrappers"
 	"golang.org/x/time/rate"
@@ -15,6 +14,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	evtErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/transformers/k8s"
 	"github.com/flyteorg/flyte/flytestdlib/cache"
 	stdErr "github.com/flyteorg/flyte/flytestdlib/errors"
@@ -33,9 +33,10 @@ func IsWorkflowTerminated(p core.WorkflowExecution_Phase) bool {
 
 // Executor for Launchplans that executes on a remote FlyteAdmin service (if configured)
 type adminLaunchPlanExecutor struct {
-	adminClient service.AdminServiceClient
-	cache       cache.AutoRefresh
-	store       *storage.DataStore
+	adminClient     service.AdminServiceClient
+	cache           cache.AutoRefresh
+	store           *storage.DataStore
+	enqueueWorkflow v1alpha1.EnqueueWorkflow
 }
 
 type executionCacheItem struct {
@@ -43,6 +44,7 @@ type executionCacheItem struct {
 	ExecutionClosure *admin.ExecutionClosure
 	SyncError        error
 	ExecutionOutputs *core.LiteralMap
+	ParentWorkflowID v1alpha1.WorkflowID
 }
 
 func (e executionCacheItem) IsTerminal() bool {
@@ -79,8 +81,9 @@ func (a *adminLaunchPlanExecutor) handleLaunchError(ctx context.Context, isRecov
 	}
 }
 
-func (a *adminLaunchPlanExecutor) Launch(ctx context.Context, launchCtx LaunchContext,
-	executionID *core.WorkflowExecutionIdentifier, launchPlanRef *core.Identifier, inputs *core.LiteralMap) error {
+func (a *adminLaunchPlanExecutor) Launch(ctx context.Context, launchCtx LaunchContext, executionID *core.WorkflowExecutionIdentifier,
+	launchPlanRef *core.Identifier, inputs *core.LiteralMap, parentWorkflowID v1alpha1.WorkflowID) error {
+
 	var err error
 	if launchCtx.RecoveryExecution != nil {
 		_, err = a.adminClient.RecoverExecution(ctx, &admin.ExecutionRecoverRequest{
@@ -156,7 +159,7 @@ func (a *adminLaunchPlanExecutor) Launch(ctx context.Context, launchCtx LaunchCo
 		}
 	}
 
-	_, err = a.cache.GetOrCreate(executionID.String(), executionCacheItem{WorkflowExecutionIdentifier: *executionID})
+	_, err = a.cache.GetOrCreate(executionID.String(), executionCacheItem{WorkflowExecutionIdentifier: *executionID, ParentWorkflowID: parentWorkflowID})
 	if err != nil {
 		logger.Infof(ctx, "Failed to add ExecID [%v] to auto refresh cache", executionID)
 	}
@@ -263,6 +266,7 @@ func (a *adminLaunchPlanExecutor) syncItem(ctx context.Context, batch cache.Batc
 				Item: executionCacheItem{
 					WorkflowExecutionIdentifier: exec.WorkflowExecutionIdentifier,
 					SyncError:                   err,
+					ParentWorkflowID:            exec.ParentWorkflowID,
 				},
 				Action: cache.Update,
 			})
@@ -293,6 +297,7 @@ func (a *adminLaunchPlanExecutor) syncItem(ctx context.Context, batch cache.Batc
 						Item: executionCacheItem{
 							WorkflowExecutionIdentifier: exec.WorkflowExecutionIdentifier,
 							SyncError:                   err,
+							ParentWorkflowID:            exec.ParentWorkflowID,
 						},
 						Action: cache.Update,
 					})
@@ -312,23 +317,34 @@ func (a *adminLaunchPlanExecutor) syncItem(ctx context.Context, batch cache.Batc
 				WorkflowExecutionIdentifier: exec.WorkflowExecutionIdentifier,
 				ExecutionClosure:            res.Closure,
 				ExecutionOutputs:            outputs,
+				ParentWorkflowID:            exec.ParentWorkflowID,
 			},
 			Action: cache.Update,
 		})
+	}
+
+	// wait until all responses have been processed to enqueue parent workflows. if we do it
+	// prematurely, there is a chance the parent workflow evaluates before the cache is updated.
+	for _, itemSyncResponse := range resp {
+		exec := itemSyncResponse.Item.(executionCacheItem)
+		if exec.ExecutionClosure != nil && IsWorkflowTerminated(exec.ExecutionClosure.Phase) {
+			a.enqueueWorkflow(exec.ParentWorkflowID)
+		}
 	}
 
 	return resp, nil
 }
 
 func NewAdminLaunchPlanExecutor(_ context.Context, client service.AdminServiceClient,
-	syncPeriod time.Duration, cfg *AdminConfig, scope promutils.Scope, store *storage.DataStore) (FlyteAdmin, error) {
+	cfg *AdminConfig, scope promutils.Scope, store *storage.DataStore, enqueueWorkflow v1alpha1.EnqueueWorkflow) (FlyteAdmin, error) {
 	exec := &adminLaunchPlanExecutor{
-		adminClient: client,
-		store:       store,
+		adminClient:     client,
+		store:           store,
+		enqueueWorkflow: enqueueWorkflow,
 	}
 
 	rateLimiter := &workqueue.BucketRateLimiter{Limiter: rate.NewLimiter(rate.Limit(cfg.TPS), cfg.Burst)}
-	c, err := cache.NewAutoRefreshCache("admin-launcher", exec.syncItem, rateLimiter, syncPeriod, cfg.Workers, cfg.MaxCacheSize, scope)
+	c, err := cache.NewAutoRefreshCache("admin-launcher", exec.syncItem, rateLimiter, cfg.CacheResyncDuration.Duration, cfg.Workers, cfg.MaxCacheSize, scope)
 	if err != nil {
 		return nil, err
 	}

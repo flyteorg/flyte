@@ -2,11 +2,10 @@ package labeled
 
 import (
 	"context"
-	"strings"
 	"testing"
 	"time"
 
-	"github.com/prometheus/client_golang/prometheus/testutil"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
@@ -35,77 +34,73 @@ func TestLabeledStopWatch(t *testing.T) {
 		scope := promutils.NewScope("testscope_stopwatch")
 		s := NewStopWatch("s1", "some desc", time.Minute, scope)
 		assert.NotNil(t, s)
+		metricName := scope.CurrentScope() + "s1_m"
 
 		ctx := context.TODO()
 		const header = `
 			# HELP testscope_stopwatch:s1_m some desc
-			# TYPE testscope_stopwatch:s1_m summary
-		`
+			# TYPE testscope_stopwatch:s1_m summary`
 
 		w := s.Start(ctx)
 		w.Stop()
-		var expected = `
-			testscope_stopwatch:s1_m{domain="",project="",task="",wf="",quantile="0.5"} 0
-            testscope_stopwatch:s1_m{domain="",project="",task="",wf="",quantile="0.9"} 0
-            testscope_stopwatch:s1_m{domain="",project="",task="",wf="",quantile="0.99"} 0
-            testscope_stopwatch:s1_m_sum{domain="",project="",task="",wf=""} 0
-            testscope_stopwatch:s1_m_count{domain="",project="",task="",wf=""} 1
-		`
-		err := testutil.CollectAndCompare(s.StopWatchVec, strings.NewReader(header+expected))
-		assert.NoError(t, err)
+		expectedMetrics := map[string]any{
+			`testscope_stopwatch:s1_m{domain="",project="",task="",wf="",quantile="0.5"}`:  0.0,
+			`testscope_stopwatch:s1_m{domain="",project="",task="",wf="",quantile="0.9"}`:  0.0,
+			`testscope_stopwatch:s1_m{domain="",project="",task="",wf="",quantile="0.99"}`: 0.0,
+			`testscope_stopwatch:s1_m_sum{domain="",project="",task="",wf=""}`:             0.0,
+			`testscope_stopwatch:s1_m_count{domain="",project="",task="",wf=""}`:           1,
+		}
+		assertMetrics(t, s.StopWatchVec, metricName, header, expectedMetrics)
 
 		ctx = contextutils.WithProjectDomain(ctx, "project", "domain")
 		w = s.Start(ctx)
 		w.Stop()
-		expected = `
-			testscope_stopwatch:s1_m{domain="",project="",task="",wf="",quantile="0.5"} 0
-            testscope_stopwatch:s1_m{domain="",project="",task="",wf="",quantile="0.9"} 0
-            testscope_stopwatch:s1_m{domain="",project="",task="",wf="",quantile="0.99"} 0
-            testscope_stopwatch:s1_m_sum{domain="",project="",task="",wf=""} 0
-            testscope_stopwatch:s1_m_count{domain="",project="",task="",wf=""} 1
-			testscope_stopwatch:s1_m{domain="domain",project="project",task="",wf="",quantile="0.5"} 0
-            testscope_stopwatch:s1_m{domain="domain",project="project",task="",wf="",quantile="0.9"} 0
-            testscope_stopwatch:s1_m{domain="domain",project="project",task="",wf="",quantile="0.99"} 0
-            testscope_stopwatch:s1_m_sum{domain="domain",project="project",task="",wf=""} 0
-            testscope_stopwatch:s1_m_count{domain="domain",project="project",task="",wf=""} 1
-		`
-		err = testutil.CollectAndCompare(s.StopWatchVec, strings.NewReader(header+expected))
-		assert.NoError(t, err)
+		expectedMetrics = map[string]any{
+			`testscope_stopwatch:s1_m{domain="",project="",task="",wf="",quantile="0.5"}`:               0.0,
+			`testscope_stopwatch:s1_m{domain="",project="",task="",wf="",quantile="0.9"}`:               0.0,
+			`testscope_stopwatch:s1_m{domain="",project="",task="",wf="",quantile="0.99"}`:              0.0,
+			`testscope_stopwatch:s1_m_sum{domain="",project="",task="",wf=""}`:                          0.0,
+			`testscope_stopwatch:s1_m_count{domain="",project="",task="",wf=""}`:                        1,
+			`testscope_stopwatch:s1_m{domain="domain",project="project",task="",wf="",quantile="0.5"}`:  0.0,
+			`testscope_stopwatch:s1_m{domain="domain",project="project",task="",wf="",quantile="0.9"}`:  0.0,
+			`testscope_stopwatch:s1_m{domain="domain",project="project",task="",wf="",quantile="0.99"}`: 0.0,
+			`testscope_stopwatch:s1_m_sum{domain="domain",project="project",task="",wf=""}`:             0.0,
+			`testscope_stopwatch:s1_m_count{domain="domain",project="project",task="",wf=""}`:           1,
+		}
+		assertMetrics(t, s.StopWatchVec, metricName, header, expectedMetrics)
 
 		now := time.Now()
 		s.Observe(ctx, now, now.Add(time.Minute))
-		expected = `
-			testscope_stopwatch:s1_m{domain="",project="",task="",wf="",quantile="0.5"} 0
-            testscope_stopwatch:s1_m{domain="",project="",task="",wf="",quantile="0.9"} 0
-            testscope_stopwatch:s1_m{domain="",project="",task="",wf="",quantile="0.99"} 0
-            testscope_stopwatch:s1_m_sum{domain="",project="",task="",wf=""} 0
-            testscope_stopwatch:s1_m_count{domain="",project="",task="",wf=""} 1
-			testscope_stopwatch:s1_m{domain="domain",project="project",task="",wf="",quantile="0.5"} 0
-            testscope_stopwatch:s1_m{domain="domain",project="project",task="",wf="",quantile="0.9"} 1
-            testscope_stopwatch:s1_m{domain="domain",project="project",task="",wf="",quantile="0.99"} 1
-            testscope_stopwatch:s1_m_sum{domain="domain",project="project",task="",wf=""} 1
-            testscope_stopwatch:s1_m_count{domain="domain",project="project",task="",wf=""} 2
-		`
-		err = testutil.CollectAndCompare(s.StopWatchVec, strings.NewReader(header+expected))
-		assert.NoError(t, err)
+		expectedMetrics = map[string]any{
+			`testscope_stopwatch:s1_m{domain="",project="",task="",wf="",quantile="0.5"}`:               0.0,
+			`testscope_stopwatch:s1_m{domain="",project="",task="",wf="",quantile="0.9"}`:               0.0,
+			`testscope_stopwatch:s1_m{domain="",project="",task="",wf="",quantile="0.99"}`:              0.0,
+			`testscope_stopwatch:s1_m_sum{domain="",project="",task="",wf=""}`:                          0.0,
+			`testscope_stopwatch:s1_m_count{domain="",project="",task="",wf=""}`:                        1,
+			`testscope_stopwatch:s1_m{domain="domain",project="project",task="",wf="",quantile="0.5"}`:  0.0,
+			`testscope_stopwatch:s1_m{domain="domain",project="project",task="",wf="",quantile="0.9"}`:  1,
+			`testscope_stopwatch:s1_m{domain="domain",project="project",task="",wf="",quantile="0.99"}`: 1,
+			`testscope_stopwatch:s1_m_sum{domain="domain",project="project",task="",wf=""}`:             1.0,
+			`testscope_stopwatch:s1_m_count{domain="domain",project="project",task="",wf=""}`:           2,
+		}
+		assertMetrics(t, s.StopWatchVec, metricName, header, expectedMetrics)
 
 		s.Time(ctx, func() {
 			// Do nothing
 		})
-		expected = `
-			testscope_stopwatch:s1_m{domain="",project="",task="",wf="",quantile="0.5"} 0
-            testscope_stopwatch:s1_m{domain="",project="",task="",wf="",quantile="0.9"} 0
-            testscope_stopwatch:s1_m{domain="",project="",task="",wf="",quantile="0.99"} 0
-            testscope_stopwatch:s1_m_sum{domain="",project="",task="",wf=""} 0
-            testscope_stopwatch:s1_m_count{domain="",project="",task="",wf=""} 1
-			testscope_stopwatch:s1_m{domain="domain",project="project",task="",wf="",quantile="0.5"} 0
-            testscope_stopwatch:s1_m{domain="domain",project="project",task="",wf="",quantile="0.9"} 1
-            testscope_stopwatch:s1_m{domain="domain",project="project",task="",wf="",quantile="0.99"} 1
-            testscope_stopwatch:s1_m_sum{domain="domain",project="project",task="",wf=""} 1
-            testscope_stopwatch:s1_m_count{domain="domain",project="project",task="",wf=""} 3
-		`
-		err = testutil.CollectAndCompare(s.StopWatchVec, strings.NewReader(header+expected))
-		assert.NoError(t, err)
+		expectedMetrics = map[string]any{
+			`testscope_stopwatch:s1_m{domain="",project="",task="",wf="",quantile="0.5"}`:               0.0,
+			`testscope_stopwatch:s1_m{domain="",project="",task="",wf="",quantile="0.9"}`:               0.0,
+			`testscope_stopwatch:s1_m{domain="",project="",task="",wf="",quantile="0.99"}`:              0.0,
+			`testscope_stopwatch:s1_m_sum{domain="",project="",task="",wf=""}`:                          0.0,
+			`testscope_stopwatch:s1_m_count{domain="",project="",task="",wf=""}`:                        1,
+			`testscope_stopwatch:s1_m{domain="domain",project="project",task="",wf="",quantile="0.5"}`:  0.0,
+			`testscope_stopwatch:s1_m{domain="domain",project="project",task="",wf="",quantile="0.9"}`:  1,
+			`testscope_stopwatch:s1_m{domain="domain",project="project",task="",wf="",quantile="0.99"}`: 1,
+			`testscope_stopwatch:s1_m_sum{domain="domain",project="project",task="",wf=""}`:             1.0,
+			`testscope_stopwatch:s1_m_count{domain="domain",project="project",task="",wf=""}`:           3,
+		}
+		assertMetrics(t, s.StopWatchVec, metricName, header, expectedMetrics)
 	})
 
 	t.Run("Unlabeled", func(t *testing.T) {
@@ -114,23 +109,21 @@ func TestLabeledStopWatch(t *testing.T) {
 		assert.NotNil(t, s)
 
 		ctx := context.TODO()
-		/*const header = `
-			# HELP testscope_stopwatch:s2_m some desc
-			# TYPE testscope_stopwatch:s2_m summary
-		`*/
+		const header = `
+			# HELP testscope_stopwatch:s2_unlabeled_m some desc
+			# TYPE testscope_stopwatch:s2_unlabeled_m summary
+		`
 
 		w := s.Start(ctx)
 		w.Stop()
-		// promutils.StopWatch does not implement prometheus.Collector
-		/*var expected = `
-			testscope_stopwatch:s2_m{quantile="0.5"} 0
-			testscope_stopwatch:s2_m{quantile="0.9"} 0
-			testscope_stopwatch:s2_m{quantile="0.99"} 0
-			testscope_stopwatch:s2_m_sum 0
-			testscope_stopwatch:s2_m_count 1
-		`
-		err := testutil.CollectAndCompare(s.StopWatch, strings.NewReader(header+expected))
-		assert.NoError(t, err)*/
+		expectedMetrics := map[string]any{
+			`testscope_stopwatch:s2_unlabeled_m{quantile="0.5"}`:  0.0,
+			`testscope_stopwatch:s2_unlabeled_m{quantile="0.9"}`:  0.0,
+			`testscope_stopwatch:s2_unlabeled_m{quantile="0.99"}`: 0.0,
+			`testscope_stopwatch:s2_unlabeled_m_sum`:              0.0,
+			`testscope_stopwatch:s2_unlabeled_m_count`:            1,
+		}
+		assertMetrics(t, s.StopWatch.Observer.(prometheus.Summary), "testscope_stopwatch:s2_unlabeled_m", header, expectedMetrics)
 	})
 
 	t.Run("AdditionalLabels", func(t *testing.T) {
@@ -138,6 +131,7 @@ func TestLabeledStopWatch(t *testing.T) {
 		opts := AdditionalLabelsOption{Labels: []string{contextutils.ProjectKey.String(), contextutils.ExecIDKey.String()}}
 		s := NewStopWatch("s3", "some desc", time.Minute, scope, opts)
 		assert.NotNil(t, s)
+		metricName := scope.CurrentScope() + "s3_m"
 
 		ctx := context.TODO()
 		const header = `
@@ -147,55 +141,52 @@ func TestLabeledStopWatch(t *testing.T) {
 
 		w := s.Start(ctx)
 		w.Stop()
-		var expected = `
-			testscope_stopwatch:s3_m{domain="",exec_id="",project="",task="",wf="",quantile="0.5"} 0
-            testscope_stopwatch:s3_m{domain="",exec_id="",project="",task="",wf="",quantile="0.9"} 0
-            testscope_stopwatch:s3_m{domain="",exec_id="",project="",task="",wf="",quantile="0.99"} 0
-            testscope_stopwatch:s3_m_sum{domain="",exec_id="",project="",task="",wf=""} 0
-            testscope_stopwatch:s3_m_count{domain="",exec_id="",project="",task="",wf=""} 1
-		`
-		err := testutil.CollectAndCompare(s.StopWatchVec, strings.NewReader(header+expected))
-		assert.NoError(t, err)
+		expectedMetrics := map[string]any{
+			`testscope_stopwatch:s3_m{domain="",exec_id="",project="",task="",wf="",quantile="0.5"}`:  0.0,
+			`testscope_stopwatch:s3_m{domain="",exec_id="",project="",task="",wf="",quantile="0.9"}`:  0.0,
+			`testscope_stopwatch:s3_m{domain="",exec_id="",project="",task="",wf="",quantile="0.99"}`: 0.0,
+			`testscope_stopwatch:s3_m_sum{domain="",exec_id="",project="",task="",wf=""}`:             0.0,
+			`testscope_stopwatch:s3_m_count{domain="",exec_id="",project="",task="",wf=""}`:           1,
+		}
+		assertMetrics(t, s.StopWatchVec, metricName, header, expectedMetrics)
 
 		ctx = contextutils.WithProjectDomain(ctx, "project", "domain")
 		w = s.Start(ctx)
 		w.Stop()
-		expected = `
-			testscope_stopwatch:s3_m{domain="",exec_id="",project="",task="",wf="",quantile="0.5"} 0
-            testscope_stopwatch:s3_m{domain="",exec_id="",project="",task="",wf="",quantile="0.9"} 0
-            testscope_stopwatch:s3_m{domain="",exec_id="",project="",task="",wf="",quantile="0.99"} 0
-            testscope_stopwatch:s3_m_sum{domain="",exec_id="",project="",task="",wf=""} 0
-            testscope_stopwatch:s3_m_count{domain="",exec_id="",project="",task="",wf=""} 1
-			testscope_stopwatch:s3_m{domain="domain",exec_id="",project="project",task="",wf="",quantile="0.5"} 0
-            testscope_stopwatch:s3_m{domain="domain",exec_id="",project="project",task="",wf="",quantile="0.9"} 0
-            testscope_stopwatch:s3_m{domain="domain",exec_id="",project="project",task="",wf="",quantile="0.99"} 0
-            testscope_stopwatch:s3_m_sum{domain="domain",exec_id="",project="project",task="",wf=""} 0
-            testscope_stopwatch:s3_m_count{domain="domain",exec_id="",project="project",task="",wf=""} 1
-		`
-		err = testutil.CollectAndCompare(s.StopWatchVec, strings.NewReader(header+expected))
-		assert.NoError(t, err)
+		expectedMetrics = map[string]any{
+			`testscope_stopwatch:s3_m{domain="",exec_id="",project="",task="",wf="",quantile="0.5"}`:               0.0,
+			`testscope_stopwatch:s3_m{domain="",exec_id="",project="",task="",wf="",quantile="0.9"}`:               0.0,
+			`testscope_stopwatch:s3_m{domain="",exec_id="",project="",task="",wf="",quantile="0.99"}`:              0.0,
+			`testscope_stopwatch:s3_m_sum{domain="",exec_id="",project="",task="",wf=""}`:                          0.0,
+			`testscope_stopwatch:s3_m_count{domain="",exec_id="",project="",task="",wf=""}`:                        1,
+			`testscope_stopwatch:s3_m{domain="domain",exec_id="",project="project",task="",wf="",quantile="0.5"}`:  0.0,
+			`testscope_stopwatch:s3_m{domain="domain",exec_id="",project="project",task="",wf="",quantile="0.9"}`:  0.0,
+			`testscope_stopwatch:s3_m{domain="domain",exec_id="",project="project",task="",wf="",quantile="0.99"}`: 0.0,
+			`testscope_stopwatch:s3_m_sum{domain="domain",exec_id="",project="project",task="",wf=""}`:             0.0,
+			`testscope_stopwatch:s3_m_count{domain="domain",exec_id="",project="project",task="",wf=""}`:           1,
+		}
+		assertMetrics(t, s.StopWatchVec, metricName, header, expectedMetrics)
 
 		ctx = contextutils.WithExecutionID(ctx, "exec_id")
 		w = s.Start(ctx)
 		w.Stop()
-		expected = `
-			testscope_stopwatch:s3_m{domain="",exec_id="",project="",task="",wf="",quantile="0.5"} 0
-            testscope_stopwatch:s3_m{domain="",exec_id="",project="",task="",wf="",quantile="0.9"} 0
-            testscope_stopwatch:s3_m{domain="",exec_id="",project="",task="",wf="",quantile="0.99"} 0
-            testscope_stopwatch:s3_m_sum{domain="",exec_id="",project="",task="",wf=""} 0
-            testscope_stopwatch:s3_m_count{domain="",exec_id="",project="",task="",wf=""} 1
-			testscope_stopwatch:s3_m{domain="domain",exec_id="",project="project",task="",wf="",quantile="0.5"} 0
-            testscope_stopwatch:s3_m{domain="domain",exec_id="",project="project",task="",wf="",quantile="0.9"} 0
-            testscope_stopwatch:s3_m{domain="domain",exec_id="",project="project",task="",wf="",quantile="0.99"} 0
-            testscope_stopwatch:s3_m_sum{domain="domain",exec_id="",project="project",task="",wf=""} 0
-            testscope_stopwatch:s3_m_count{domain="domain",exec_id="",project="project",task="",wf=""} 1
-			testscope_stopwatch:s3_m{domain="domain",exec_id="exec_id",project="project",task="",wf="",quantile="0.5"} 0
-            testscope_stopwatch:s3_m{domain="domain",exec_id="exec_id",project="project",task="",wf="",quantile="0.9"} 0
-            testscope_stopwatch:s3_m{domain="domain",exec_id="exec_id",project="project",task="",wf="",quantile="0.99"} 0
-            testscope_stopwatch:s3_m_sum{domain="domain",exec_id="exec_id",project="project",task="",wf=""} 0
-            testscope_stopwatch:s3_m_count{domain="domain",exec_id="exec_id",project="project",task="",wf=""} 1
-		`
-		err = testutil.CollectAndCompare(s.StopWatchVec, strings.NewReader(header+expected))
-		assert.NoError(t, err)
+		expectedMetrics = map[string]any{
+			`testscope_stopwatch:s3_m{domain="",exec_id="",project="",task="",wf="",quantile="0.5"}`:                      0.0,
+			`testscope_stopwatch:s3_m{domain="",exec_id="",project="",task="",wf="",quantile="0.9"}`:                      0.0,
+			`testscope_stopwatch:s3_m{domain="",exec_id="",project="",task="",wf="",quantile="0.99"}`:                     0.0,
+			`testscope_stopwatch:s3_m_sum{domain="",exec_id="",project="",task="",wf=""}`:                                 0.0,
+			`testscope_stopwatch:s3_m_count{domain="",exec_id="",project="",task="",wf=""}`:                               1,
+			`testscope_stopwatch:s3_m{domain="domain",exec_id="",project="project",task="",wf="",quantile="0.5"}`:         0.0,
+			`testscope_stopwatch:s3_m{domain="domain",exec_id="",project="project",task="",wf="",quantile="0.9"}`:         0.0,
+			`testscope_stopwatch:s3_m{domain="domain",exec_id="",project="project",task="",wf="",quantile="0.99"}`:        0.0,
+			`testscope_stopwatch:s3_m_sum{domain="domain",exec_id="",project="project",task="",wf=""}`:                    0.0,
+			`testscope_stopwatch:s3_m_count{domain="domain",exec_id="",project="project",task="",wf=""}`:                  1,
+			`testscope_stopwatch:s3_m{domain="domain",exec_id="exec_id",project="project",task="",wf="",quantile="0.5"}`:  0.0,
+			`testscope_stopwatch:s3_m{domain="domain",exec_id="exec_id",project="project",task="",wf="",quantile="0.9"}`:  0.0,
+			`testscope_stopwatch:s3_m{domain="domain",exec_id="exec_id",project="project",task="",wf="",quantile="0.99"}`: 0.0,
+			`testscope_stopwatch:s3_m_sum{domain="domain",exec_id="exec_id",project="project",task="",wf=""}`:             0.0,
+			`testscope_stopwatch:s3_m_count{domain="domain",exec_id="exec_id",project="project",task="",wf=""}`:           1,
+		}
+		assertMetrics(t, s.StopWatchVec, metricName, header, expectedMetrics)
 	})
 }

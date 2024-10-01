@@ -86,6 +86,42 @@ func (s StopWatchVec) GetMetricWith(labels prometheus.Labels) (StopWatch, error)
 	}, nil
 }
 
+// HistogramStopWatch implements a stopwatch style interface that works with prometheus histogram
+// NOTE: Do not create a HistogramStopWatch object by hand, use a Scope to get a new instance of the StopWatch object
+type HistogramStopWatch struct {
+	StopWatch
+}
+
+// HistogramStopWatchVec implements a stopwatch style interface that works with prometheus histogram
+// NOTE: Do not create a HistogramStopWatchVec object by hand, use a Scope to get a new instance of the StopWatch object
+type HistogramStopWatchVec struct {
+	*prometheus.HistogramVec
+	outputScale time.Duration
+}
+
+// Gets a concrete StopWatch instance that can be used to start a timer and record observations.
+func (h HistogramStopWatchVec) WithLabelValues(values ...string) HistogramStopWatch {
+	return HistogramStopWatch{
+		StopWatch: StopWatch{
+			Observer:    h.HistogramVec.WithLabelValues(values...),
+			outputScale: h.outputScale,
+		},
+	}
+}
+
+func (h HistogramStopWatchVec) GetMetricWith(labels prometheus.Labels) (HistogramStopWatch, error) {
+	hVec, err := h.HistogramVec.GetMetricWith(labels)
+	if err != nil {
+		return HistogramStopWatch{}, err
+	}
+	return HistogramStopWatch{
+		StopWatch{
+			Observer:    hVec,
+			outputScale: h.outputScale,
+		},
+	}, nil
+}
+
 // Timer is a stoppable instance of a StopWatch or a Timer
 // A Timer can only be stopped. On stopping it will output the elapsed duration to prometheus
 type Timer struct {
@@ -102,7 +138,7 @@ func (s Timer) Stop() float64 {
 		s.timer.Observe(0)
 		return 0
 	}
-	scaled := float64(observed / outputScaleDuration)
+	scaled := float64(observed) / float64(outputScaleDuration)
 	s.timer.Observe(scaled)
 	return scaled
 }
@@ -112,6 +148,12 @@ type SummaryOptions struct {
 	// An Objectives defines the quantile rank estimates with their respective absolute errors.
 	// Refer to https://godoc.org/github.com/prometheus/client_golang/prometheus#SummaryOpts for details
 	Objectives map[float64]float64
+}
+
+// A HistogramOptions represent buckets to specify for a histogram vector when creating a new prometheus histogram
+type HistogramOptions struct {
+	// Buckets is a list of pre-determined buckets for the histogram
+	Buckets []float64
 }
 
 // A Scope represents a prefix in Prometheus. It is nestable, thus every metric that is published does not need to
@@ -154,6 +196,12 @@ type Scope interface {
 	NewHistogramVec(name, description string, labelNames ...string) (*prometheus.HistogramVec, error)
 	MustNewHistogramVec(name, description string, labelNames ...string) *prometheus.HistogramVec
 
+	// NewHistogramVecWithOptions creates new prometheus.HistogramVec metric with the prefix as the CurrentScope
+	// with a custom set of options, such as of buckets.
+	// Refer to https://prometheus.io/docs/concepts/metric_types/ for more information
+	NewHistogramVecWithOptions(name, description string, options HistogramOptions, labelNames ...string) (*prometheus.HistogramVec, error)
+	MustNewHistogramVecWithOptions(name, description string, options HistogramOptions, labelNames ...string) *prometheus.HistogramVec
+
 	// NewCounter creates new prometheus.Counter metric with the prefix as the CurrentScope
 	// Refer to https://prometheus.io/docs/concepts/metric_types/ for more information
 	// Important to note, counters are not like typical counters. These are ever increasing and cumulative.
@@ -181,6 +229,20 @@ type Scope interface {
 	// The metric name is auto-suffixed with the right scale. Refer to DurationToString to understand
 	NewStopWatchVec(name, description string, scale time.Duration, labelNames ...string) (*StopWatchVec, error)
 	MustNewStopWatchVec(name, description string, scale time.Duration, labelNames ...string) *StopWatchVec
+
+	// NewHistogramStopWatch is a custom wrapper to create a HistogramStopWatch object in the current Scope.
+	// Unlike a StopWatch, a HistogramStopWatch can be aggregated across instances. Quantiles are computed server side.
+	// See https://prometheus.io/docs/practices/histograms/#quantiles for tradeoffs.
+	// Scale is assumed to be seconds with buckets spanning 0.005s to 10s.
+	NewHistogramStopWatch(name, description string) (HistogramStopWatch, error)
+	MustNewHistogramStopWatch(name, description string) HistogramStopWatch
+
+	// NewHistogramStopWatchVec is a custom wrapper to create a HistogramStopWatchVec object in the current Scope.
+	// Unlike a StopWatchVec, a HistogramStopWatchVec can be aggregated across instances. Quantiles are computed server side.
+	// See https://prometheus.io/docs/practices/histograms/#quantiles for tradeoffs.
+	// Scale is assumed to be seconds with buckets spanning 0.005s to 10s.
+	NewHistogramStopWatchVec(name, description string, labelNames ...string) (*HistogramStopWatchVec, error)
+	MustNewHistogramStopWatchVec(name, description string, labelNames ...string) *HistogramStopWatchVec
 
 	// NewSubScope creates a new subScope in case nesting is desired for metrics. This is generally useful in creating
 	// Scoped and SubScoped metrics
@@ -311,6 +373,25 @@ func (m metricsScope) MustNewHistogramVec(name, description string, labelNames .
 	return h
 }
 
+func (m metricsScope) NewHistogramVecWithOptions(name, description string, options HistogramOptions, labelNames ...string) (*prometheus.HistogramVec, error) {
+	h := prometheus.NewHistogramVec(
+		prometheus.HistogramOpts{
+			Name:    m.NewScopedMetricName(name),
+			Help:    description,
+			Buckets: options.Buckets,
+		},
+		labelNames,
+	)
+
+	return h, prometheus.Register(h)
+}
+
+func (m metricsScope) MustNewHistogramVecWithOptions(name, description string, options HistogramOptions, labelNames ...string) *prometheus.HistogramVec {
+	h, err := m.NewHistogramVecWithOptions(name, description, options, labelNames...)
+	panicIfError(err)
+	return h
+}
+
 func (m metricsScope) NewCounter(name, description string) (prometheus.Counter, error) {
 	c := prometheus.NewCounter(
 		prometheus.CounterOpts{
@@ -386,6 +467,44 @@ func (m metricsScope) MustNewStopWatchVec(name, description string, scale time.D
 	s, err := m.NewStopWatchVec(name, description, scale, labelNames...)
 	panicIfError(err)
 	return s
+}
+
+func (m metricsScope) NewHistogramStopWatch(name, description string) (HistogramStopWatch, error) {
+	h, err := m.NewHistogram(name, description)
+	if err != nil {
+		return HistogramStopWatch{}, err
+	}
+
+	return HistogramStopWatch{
+		StopWatch: StopWatch{
+			Observer:    h,
+			outputScale: time.Second,
+		},
+	}, nil
+}
+
+func (m metricsScope) MustNewHistogramStopWatch(name, description string) HistogramStopWatch {
+	s, err := m.NewHistogramStopWatch(name, description)
+	panicIfError(err)
+	return s
+}
+
+func (m metricsScope) NewHistogramStopWatchVec(name, description string, labelNames ...string) (*HistogramStopWatchVec, error) {
+	h, err := m.NewHistogramVec(name, description, labelNames...)
+	if err != nil {
+		return &HistogramStopWatchVec{}, err
+	}
+
+	return &HistogramStopWatchVec{
+		HistogramVec: h,
+		outputScale:  time.Second,
+	}, nil
+}
+
+func (m metricsScope) MustNewHistogramStopWatchVec(name, description string, labelNames ...string) *HistogramStopWatchVec {
+	h, err := m.NewHistogramStopWatchVec(name, description, labelNames...)
+	panicIfError(err)
+	return h
 }
 
 func (m metricsScope) CurrentScope() string {

@@ -147,7 +147,7 @@ fi
 echo -e "\nSetting kubeconfig and kubectl context"
 
 export KUBECONFIG=$KUBECONFIG:"${K3D_KUBECONFIG_FILE_PATH}"
-kubectl config set-context $K3D_CLUSTER_NAME
+kubectl config set-context k3d-$K3D_CLUSTER_NAME
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 HELM_CHART="${DIR}/../charts/flyte-deps"

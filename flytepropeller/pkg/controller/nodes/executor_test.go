@@ -1723,6 +1723,7 @@ func TestNodeExecutor_FinalizeHandler(t *testing.T) {
 		assert.NoError(t, exec.FinalizeHandler(ctx, nil, nil, nl, n))
 	})
 }
+
 func TestNodeExecutionEventStartNode(t *testing.T) {
 	execID := &core.WorkflowExecutionIdentifier{
 		Name:    "e1",
@@ -1763,9 +1764,11 @@ func TestNodeExecutionEventStartNode(t *testing.T) {
 	ns.OnGetParentTaskID().Return(tID)
 	ns.OnGetOutputDirMatch(mock.Anything).Return("dummy://dummyOutUrl")
 	ns.OnGetDynamicNodeStatus().Return(&v1alpha1.DynamicNodeStatus{})
+
 	ev, err := ToNodeExecutionEvent(nID, p, "reference", ns, v1alpha1.EventVersion0, parentInfo, n, testClusterID, v1alpha1.DynamicNodePhaseNone, &config.EventConfig{
 		RawOutputPolicy: config.RawOutputPolicyReference,
 	}, subWfID)
+
 	assert.NoError(t, err)
 	assert.Equal(t, "start-node", ev.Id.NodeId)
 	assert.Equal(t, execID, ev.Id.ExecutionId)
@@ -1778,6 +1781,7 @@ func TestNodeExecutionEventStartNode(t *testing.T) {
 		ev.OutputResult.(*event.NodeExecutionEvent_OutputUri).OutputUri)
 	assert.Equal(t, ev.ProducerId, testClusterID)
 	assert.Equal(t, subWfID, ev.GetTargetEntity())
+	assert.Nil(t, ev.InputValue)
 }
 
 func TestNodeExecutionEventV0(t *testing.T) {
@@ -1821,6 +1825,7 @@ func TestNodeExecutionEventV0(t *testing.T) {
 	assert.Empty(t, ev.NodeName)
 	assert.Empty(t, ev.RetryGroup)
 	assert.Empty(t, ev.TargetEntity)
+	assert.Equal(t, "reference", ev.GetInputUri())
 }
 
 func TestNodeExecutionEventV1(t *testing.T) {
@@ -1859,9 +1864,11 @@ func TestNodeExecutionEventV1(t *testing.T) {
 	ns.OnGetPhase().Return(v1alpha1.NodePhaseNotYetStarted)
 	nl.OnGetNodeExecutionStatusMatch(mock.Anything, id).Return(ns)
 	ns.OnGetParentTaskID().Return(tID)
+
 	eventOpt, err := ToNodeExecutionEvent(nID, p, "reference", ns, v1alpha1.EventVersion1, parentInfo, n, testClusterID, v1alpha1.DynamicNodePhaseNone, &config.EventConfig{
 		RawOutputPolicy: config.RawOutputPolicyInline,
 	}, nil)
+
 	assert.NoError(t, err)
 	assert.Equal(t, "np1-2-n1", eventOpt.Id.NodeId)
 	assert.Equal(t, execID, eventOpt.Id.ExecutionId)
@@ -1875,6 +1882,7 @@ func TestNodeExecutionEventV1(t *testing.T) {
 	assert.Equal(t, "2", eventOpt.RetryGroup)
 	assert.True(t, proto.Equal(eventOpt.GetInputData(), inputs))
 	assert.Empty(t, eventOpt.TargetEntity)
+	assert.Equal(t, inputs, eventOpt.GetInputData())
 }
 
 func TestNodeExecutor_RecursiveNodeHandler_ParallelismLimit(t *testing.T) {

@@ -54,5 +54,6 @@ func (cfg AdminConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "burst"), defaultAdminConfig.Burst, "Maximum burst for throttle")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "cacheSize"), defaultAdminConfig.MaxCacheSize, "Maximum cache in terms of number of items stored.")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "workers"), defaultAdminConfig.Workers, "Number of parallel workers to work on the queue.")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "cache-resync-duration"), defaultAdminConfig.CacheResyncDuration.String(), "Frequency of re-syncing launchplans within the auto refresh cache.")
 	return cmdFlags
 }

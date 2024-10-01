@@ -9,6 +9,7 @@ import (
 	eventsv1 "k8s.io/api/events/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/client-go/tools/cache"
 )
 
 func TestEventWatcher_OnAdd(t *testing.T) {
@@ -137,6 +138,25 @@ func TestEventWatcher_OnDelete(t *testing.T) {
 			Regarding: corev1.ObjectReference{
 				Namespace: "ns3",
 				Name:      "name3",
+			},
+		})
+
+		v, _ := ew.objectCache.Load(types.NamespacedName{Namespace: "ns3", Name: "name3"})
+		assert.Nil(t, v)
+	})
+
+	t.Run("bad object type", func(t *testing.T) {
+		ew.OnDelete(cache.DeletedFinalStateUnknown{
+			Key: "key",
+			Obj: &eventsv1.Event{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "eventns3",
+					Name:      "eventname3",
+				},
+				Regarding: corev1.ObjectReference{
+					Namespace: "ns3",
+					Name:      "name3",
+				},
 			},
 		})
 

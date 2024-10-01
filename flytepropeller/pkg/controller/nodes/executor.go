@@ -1248,10 +1248,17 @@ func (c *nodeExecutor) handleQueuedOrRunningNode(ctx context.Context, nCtx inter
 
 		targetEntity := common.GetTargetEntity(ctx, nCtx)
 
-		nev, err := ToNodeExecutionEvent(nCtx.NodeExecutionMetadata().GetNodeExecutionID(),
-			p, nCtx.InputReader().GetInputPath().String(), nCtx.NodeStatus(), nCtx.ExecutionContext().GetEventVersion(),
-			nCtx.ExecutionContext().GetParentInfo(), nCtx.Node(), c.clusterID, nCtx.NodeStateReader().GetDynamicNodeState().Phase,
-			c.eventConfig, targetEntity)
+		nev, err := ToNodeExecutionEvent(
+			nCtx.NodeExecutionMetadata().GetNodeExecutionID(),
+			p,
+			nCtx.InputReader().GetInputPath().String(),
+			nCtx.NodeStatus(),
+			nCtx.ExecutionContext().GetEventVersion(),
+			nCtx.ExecutionContext().GetParentInfo(), nCtx.Node(),
+			c.clusterID,
+			nCtx.NodeStateReader().GetDynamicNodeState().Phase,
+			c.eventConfig,
+			targetEntity)
 		if err != nil {
 			return interfaces.NodeStatusUndefined, errors.Wrapf(errors.IllegalStateError, nCtx.NodeID(), err, "could not convert phase info to event")
 		}

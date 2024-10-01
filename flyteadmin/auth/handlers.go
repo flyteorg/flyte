@@ -301,23 +301,25 @@ func GetAuthenticationInterceptor(authCtx interfaces.AuthenticationContext) func
 		fromHTTP := metautils.ExtractIncoming(ctx).Get(FromHTTPKey)
 		isFromHTTP := fromHTTP == FromHTTPVal
 
-		identityContext, err := GRPCGetIdentityFromAccessToken(ctx, authCtx)
-		if err == nil {
+		identityContext, accessTokenErr := GRPCGetIdentityFromAccessToken(ctx, authCtx)
+		if accessTokenErr == nil {
 			return SetContextForIdentity(ctx, identityContext), nil
 		}
 
-		logger.Infof(ctx, "Failed to parse Access Token from context. Will attempt to find IDToken. Error: %v", err)
+		logger.Infof(ctx, "Failed to parse Access Token from context. Will attempt to find IDToken. Error: %v", accessTokenErr)
 
-		identityContext, err = GRPCGetIdentityFromIDToken(ctx, authCtx.Options().UserAuth.OpenID.ClientID,
+		identityContext, idTokenErr := GRPCGetIdentityFromIDToken(ctx, authCtx.Options().UserAuth.OpenID.ClientID,
 			authCtx.OidcProvider())
 
-		if err == nil {
+		if idTokenErr == nil {
 			return SetContextForIdentity(ctx, identityContext), nil
 		}
+		logger.Debugf(ctx, "Failed to parse ID Token from context. Error: %v", idTokenErr)
 
 		// Only enforcement logic is present. The default case is to let things through.
 		if (isFromHTTP && !authCtx.Options().DisableForHTTP) ||
 			(!isFromHTTP && !authCtx.Options().DisableForGrpc) {
+			err := fmt.Errorf("id token err: %w, access token err: %w", fmt.Errorf("access token err: %w", accessTokenErr), idTokenErr)
 			return ctx, status.Errorf(codes.Unauthenticated, "token parse error %s", err)
 		}
 

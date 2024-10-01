@@ -499,6 +499,11 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 			int64(1501),
 			storage.Options{},
 			mock.MatchedBy(func(rdr *bytes.Reader) bool { return true })).Return(errors.New("foo"))
+		composedPBStore.OnWriteProtobufMatch(
+			mock.MatchedBy(func(ctx context.Context) bool { return true }),
+			storage.DataReference("s3://my-s3-bucket/foo/bar/dynamic_compiled.pb"),
+			storage.Options{},
+			mock.MatchedBy(func(pb *core.CompiledWorkflowClosure) bool { return true })).Return(nil)
 
 		referenceConstructor := storageMocks.ReferenceConstructor{}
 		referenceConstructor.On("ConstructReference", mock.MatchedBy(func(ctx context.Context) bool { return true }), storage.DataReference("output-dir"), "futures.pb").Return(

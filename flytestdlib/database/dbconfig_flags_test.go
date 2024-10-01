@@ -169,6 +169,20 @@ func TestDbConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_postgres.readReplicaHost", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("postgres.readReplicaHost", testValue)
+			if vString, err := cmdFlags.GetString("postgres.readReplicaHost"); err == nil {
+				testDecodeJson_DbConfig(t, fmt.Sprintf("%v", vString), &actual.Postgres.ReadReplicaHost)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_postgres.port", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {

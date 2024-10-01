@@ -148,6 +148,10 @@ func TestWorkflowNodeHandler_StartNode_Launchplan(t *testing.T) {
 		Version:      "v",
 		ResourceType: core.ResourceType_LAUNCH_PLAN,
 	}
+	k8sWorkflowID := types.NamespacedName{
+		Namespace: "namespace",
+		Name:      "name",
+	}
 	mockWfNode := &mocks2.ExecutableWorkflowNode{}
 	mockWfNode.OnGetLaunchPlanRefID().Return(&v1alpha1.Identifier{
 		Identifier: lpID,
@@ -178,6 +182,7 @@ func TestWorkflowNodeHandler_StartNode_Launchplan(t *testing.T) {
 			}),
 			mock.MatchedBy(func(o *core.Identifier) bool { return lpID == o }),
 			mock.MatchedBy(func(o *core.LiteralMap) bool { return o.Literals == nil }),
+			mock.MatchedBy(func(o string) bool { return o == k8sWorkflowID.String() }),
 		).Return(nil)
 
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseUndefined, mockNode, mockNodeStatus)
@@ -203,6 +208,7 @@ func TestWorkflowNodeHandler_StartNode_Launchplan(t *testing.T) {
 			}),
 			mock.MatchedBy(func(o *core.Identifier) bool { return lpID == o }),
 			mock.MatchedBy(func(o *core.LiteralMap) bool { return o.Literals == nil }),
+			mock.MatchedBy(func(o string) bool { return o == k8sWorkflowID.String() }),
 		).Return(nil)
 
 		nCtx := createNodeContextV1(v1alpha1.WorkflowNodePhaseUndefined, mockNode, mockNodeStatus)
