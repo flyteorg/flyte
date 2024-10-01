@@ -359,7 +359,7 @@ pygments_dark_style = "native"
 html_context = {
     "dir_to_title": {
         "api": "API reference",
-        "cluster_deployment": "Cluster deployment",
+        "deployment": "Deployment guide",
         "community": "Community",
         "concepts": "Flyte concepts",
         "ecosystem": "Ecosystem",
@@ -404,7 +404,7 @@ html_theme_options = {
 #
 html_sidebars = {
     "api/**": ["sidebar/custom"],
-    "cluster_deployment/**": ["sidebar/custom"],
+    "deployment/**": ["sidebar/custom"],
     "community/**": ["sidebar/custom"],
     "concepts/**": ["sidebar/custom"],
     "ecosystem/**": ["sidebar/custom"],
