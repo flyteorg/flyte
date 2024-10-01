@@ -90,7 +90,7 @@ func errorDoc2ExecutionError(errorDoc *core.ErrorDocument, errorFilePath storage
 
 func (s *SingleFileErrorRetriever) GetError(ctx context.Context) (io.ExecutionError, error) {
 	errorDoc := &core.ErrorDocument{}
-	err := s.store.ReadProtobuf(ctx, storage.DataReference(s.errorFilePath), errorDoc)
+	err := s.store.ReadProtobuf(ctx, s.errorFilePath, errorDoc)
 	if err != nil {
 		if storage.IsNotFound(err) {
 			return io.ExecutionError{
