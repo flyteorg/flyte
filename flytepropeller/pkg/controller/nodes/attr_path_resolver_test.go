@@ -1,6 +1,7 @@
 package nodes
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -319,7 +320,7 @@ func TestResolveAttrPathIn(t *testing.T) {
 	}
 
 	for i, arg := range args {
-		resolved, err := resolveAttrPathInPromise("", arg.literal, arg.path)
+		resolved, err := resolveAttrPathInPromise(context.Background(), nil, "", arg.literal, arg.path)
 		if arg.hasError {
 			assert.Error(t, err, i)
 			assert.ErrorContains(t, err, errors.PromiseAttributeResolveError, i)
