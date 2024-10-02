@@ -260,8 +260,9 @@ func LiteralTypeForLiteral(l *core.Literal) *core.LiteralType {
 				MapValueType: literalTypeForLiterals(maps.Values(l.GetMap().Literals)),
 			},
 		}
+	case *core.Literal_OffloadedMetadata:
+		return l.GetOffloadedMetadata().GetInferredType()
 	}
-
 	return nil
 }
 

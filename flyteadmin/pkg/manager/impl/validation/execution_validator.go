@@ -97,13 +97,7 @@ func CheckAndFetchInputsForExecution(
 			}
 			executionInputMap[name] = expectedInput.GetDefault()
 		} else {
-			var inputType *core.LiteralType
-			switch executionInputMap[name].GetValue().(type) {
-			case *core.Literal_OffloadedMetadata:
-				inputType = executionInputMap[name].GetOffloadedMetadata().GetInferredType()
-			default:
-				inputType = validators.LiteralTypeForLiteral(executionInputMap[name])
-			}
+			inputType := validators.LiteralTypeForLiteral(executionInputMap[name])
 			if !validators.AreTypesCastable(inputType, expectedInput.GetVar().GetType()) {
 				return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "invalid %s input wrong type. Expected %s, but got %s", name, expectedInput.GetVar().GetType(), inputType)
 			}

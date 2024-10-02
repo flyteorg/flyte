@@ -35,13 +35,7 @@ func validateInputs(nodeID common.NodeID, iface *core.TypedInterface, inputs cor
 			continue
 		}
 
-		var inputType *core.LiteralType
-		switch inputVal.GetValue().(type) {
-		case *core.Literal_OffloadedMetadata:
-			inputType = inputVal.GetOffloadedMetadata().GetInferredType()
-		default:
-			inputType = validators.LiteralTypeForLiteral(inputVal)
-		}
+		inputType := validators.LiteralTypeForLiteral(inputVal)
 		if !validators.AreTypesCastable(inputType, v.Type) {
 			errs.Collect(errors.NewMismatchingTypesErr(nodeID, inputVar, v.Type.String(), inputType.String()))
 			continue
