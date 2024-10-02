@@ -1,6 +1,9 @@
 package controller
 
-import v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+import (
+	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+)
 
 const FinalizerKey = "flyte-finalizer"
 
@@ -18,6 +21,12 @@ func SetFinalizerIfEmpty(meta v1.Object, finalizer string) {
 // Check if the deletion timestamp is set, this is set automatically when an object is deleted
 func IsDeleted(meta v1.Object) bool {
 	return meta.GetDeletionTimestamp() != nil
+}
+
+// Check if the workflow is annotated as aborted
+func IsAborted(w *v1alpha1.FlyteWorkflow) bool {
+	annotations := w.GetObjectMeta().GetAnnotations()
+	return annotations != nil && annotations[AbortedWorkflowAnnotation] == "true"
 }
 
 // Reset all the finalizers on the object
