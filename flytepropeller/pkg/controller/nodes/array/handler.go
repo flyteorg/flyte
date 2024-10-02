@@ -233,6 +233,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		}
 
 		size := -1
+
 		for key, variable := range literalMap.Literals {
 			literalType := validators.LiteralTypeForLiteral(variable)
 			err := validators.ValidateLiteralType(literalType)
