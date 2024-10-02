@@ -1,4 +1,4 @@
-# Contributing documnetation
+# Contributing documentation
 
 ```{eval-rst}
 .. tags:: Contribute, Basic
@@ -331,7 +331,7 @@ directive like so:
 
 If you've created a new tutorial or integration example project, you'll need to add its `index` page
 to the table of contents in `docs/index.md` to make sure the project
-shows up in the documentation. Additonally, you'll need to update the appropriate
+shows up in the documentation. Additionally, you'll need to update the appropriate
 `list-table` directive in `docs/tutorials/index.md`, or
 `docs/integrations/index.md` so that it shows up in the respective section of the
 documentation.

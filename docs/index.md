@@ -78,7 +78,7 @@ contribute its architecture and design. You can also access the
   - Get your first workflow running, learn about the Flyte development lifecycle
     and core use cases.
 * - {doc}`📖 User Guide <user_guide/index>`
-  - A comprehensive view of Flyte's functionality for data and ML practitioners and a deep dive into all of Flyte's concepts, from tasks and workflows to the underyling Flyte scheduler.
+  - A comprehensive view of Flyte's functionality for data and ML practitioners and a deep dive into all of Flyte's concepts, from tasks and workflows to the underlying Flyte scheduler.
 * - {doc}`📚 Tutorials <flytesnacks/tutorials/index>`
   - End-to-end examples of Flyte for data/feature engineering, machine learning,
     bioinformatics, and more.
