@@ -523,6 +523,27 @@ func (t Handler) invokePlugin(ctx context.Context, p pluginCore.Plugin, tCtx *ta
 			&event.TaskNodeMetadata{
 				CheckpointUri: tCtx.ow.GetCheckpointPrefix().String(),
 			})
+	// s3://my-s3-bucket/metadata/propeller/flytesnacks-development-a5sj4d6vs9s8r2ltn6hr/n0/data/0/deck.html
+	case pluginCore.PhaseRunning:
+		var deckURI *storage.DataReference
+		if tCtx.ow.GetReader() != nil {
+			exists, err := tCtx.ow.GetReader().DeckExists(ctx)
+			if err != nil {
+				logger.Errorf(ctx, "Failed to check deck file existence. Error: %v", err)
+				return pluginTrns, regErrors.Wrapf(err, "failed to check existence of deck file")
+			} else if exists {
+				deckURIValue := tCtx.ow.GetDeckPath()
+				deckURI = &deckURIValue
+			}
+		}
+
+		deckURIValue := storage.DataReference("s3://my-s3-bucket/metadata/propeller/flytesnacks-development-a5sj4d6vs9s8r2ltn6hr/n0/data/0/deck.html")
+		deckURI = &deckURIValue
+
+		pluginTrns.ObserveSuccess(tCtx.ow.GetOutputPath(), deckURI,
+			&event.TaskNodeMetadata{
+				CheckpointUri: tCtx.ow.GetCheckpointPrefix().String(),
+			})
 	}
 
 	return pluginTrns, nil
