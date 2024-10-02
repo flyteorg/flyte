@@ -175,7 +175,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install uv
-          uv pip install --system git+https://github.com/flyteorg/flytekit.git@c20b9a2c971054d4d94517a8fd54dea9c9bced62 flytekitplugins-deck-standard==1.13.5 "numpy<2.0.0" pyarrow
+          uv pip install --system flytekit flytekitplugins-deck-standard "numpy<2.0.0" pyarrow
           uv pip freeze
       - name: Checkout flytesnacks
         uses: actions/checkout@v4
@@ -191,7 +191,7 @@ jobs:
                   register \
                   --project flytesnacks \
                   --domain development \
-                  --image cr.flyte.org/flyteorg/flytekit:py3.12-1.13.6 \
+                  --image cr.flyte.org/flyteorg/flytekit:py3.12-${flytekit_version} \
                   --version ${{ env.FLYTESNACKS_VERSION }} \
                   flytesnacks/$line;
           done < flytesnacks/flyte_tests.txt
