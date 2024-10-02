@@ -91,11 +91,6 @@ func SetDefinitionVersionIfEmpty(wf *v1alpha1.FlyteWorkflow, version v1alpha1.Wo
 	}
 }
 
-func IsAborted(w *v1alpha1.FlyteWorkflow) bool {
-	annotations := w.GetObjectMeta().GetAnnotations()
-	return annotations != nil && annotations[AbortedWorkflowAnnotation] == "true"
-}
-
 // TryMutateWorkflow will try to mutate the workflow by traversing it and reconciling the desired and actual state.
 // The desired state here is the entire workflow is completed, actual state is each nodes current execution state.
 func (p *Propeller) TryMutateWorkflow(ctx context.Context, originalW *v1alpha1.FlyteWorkflow) (*v1alpha1.FlyteWorkflow, error) {
@@ -111,7 +106,7 @@ func (p *Propeller) TryMutateWorkflow(ctx context.Context, originalW *v1alpha1.F
 
 	maxRetries := uint32(p.cfg.MaxWorkflowRetries)
 
-	if IsAborted(mutableW) || (mutableW.Status.FailedAttempts > maxRetries) {
+	if IsAborted(mutableW) || IsDeleted(mutableW) || (mutableW.Status.FailedAttempts > maxRetries) {
 		var err error
 		func() {
 			defer func() {
