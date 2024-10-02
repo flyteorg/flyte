@@ -288,6 +288,16 @@ redirects = {
     "flytectl/gen/flytectl_demo_teardown": "../../api/flytectl/gen/flytectl_demo_teardown",
     "flytectl/gen/flytectl_demo_exec": "../../api/flytectl/gen/flytectl_demo_exec",
     "flytectl/gen/flytectl_demo_reload": "../../api/flytectl/gen/flytectl_demo_reload",
+
+    # flyteidl
+    "reference_flyteidl": "../../api/flyteidl/docs_index.html",
+    "protos/docs/core/core": "../../api/flyteidl/docs/core/core.html",
+    "protos/docs/admin/admin": "../../api/flyteidl/docs/admin/admin.html",
+    "protos/docs/service/service": "../../api/flyteidl/docs/service/service.html",
+    "protos/docs/datacatalog/datacatalog": "../../api/flyteidl/docs/datacatalog/datacatalog.html",
+    "protos/docs/event/event": "../../api/flyteidl/docs/event/event.html",
+    "protos/docs/plugins/plugins": "../../api/flyteidl/docs/plugins/plugins.html",
+    "protos/README": "../../api/flyteidl/contributing.html",
 }
 
 
@@ -376,6 +386,9 @@ html_context = {
 html_theme_options = {
     # custom flyteorg pydata theme options
     "github_url": "https://github.com/flyteorg/flyte",
+    "logo": {
+        "text": "Flyte Docs",
+    },
     "icon_links": [
         {
             "name": "GitHub",
@@ -529,7 +542,7 @@ INTERSPHINX_REFS_REPLACE = r"\1"
 
 # Pattern for replacing all ref/doc labels that point to protos/docs with /protos/docs
 PROTO_REF_PATTERN = r"([:<])(protos/docs)"
-PROTO_REF_REPLACE = r"\1/protos/docs"
+PROTO_REF_REPLACE = r"\1/api/flyteidl/docs"
 
 # These patterns are used to replace values in source files that are imported
 # from other repos.
@@ -549,7 +562,7 @@ REPLACE_PATTERNS = {
     r"<_tags/DistributedComputing>": r"</_tags/DistributedComputing>",
     r"{ref}`bioinformatics <bioinformatics>`": r"bioinformatics",
     PROTO_REF_PATTERN: PROTO_REF_REPLACE,
-    r"/protos/docs/service/index": r"/protos/docs/service/service"
+    r"/protos/docs/service/index": r"/api/flyteidl/docs/service/service"
 }
 
 # r"<environment_setup>": r"</flytesnacks/environment_setup>",
@@ -626,8 +639,8 @@ import_projects = [
         "name": "flyteidl",
         "source": "../flyteidl",
         "docs_path": "protos",
-        "dest": "protos",  # to stay compatible with flyteidl docs path naming
-        "cmd": ["cp", "../flyteidl/README.md", "protos/README.md"],
+        "dest": "api/flyteidl",
+        # "cmd": ["cp", "../flyteidl/README.md", "api/flyteidl/docs/contributing.md"],
         "local": True,
     }
 ]

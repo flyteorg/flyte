@@ -102,7 +102,7 @@ Below are the API reference to the different components of Flyte:
   - Flyte's official Python SDK.
 * - {doc}`FlyteCTL <api/flytectl/docs_index>`
   - Flyte's command-line interface for interacting with a Flyte cluster.
-* - {doc}`FlyteIDL <reference_flyteidl>`
+* - {doc}`FlyteIDL <api/flyteidl/docs_index>`
   - Flyte's core specification language.
 ```
 
@@ -135,6 +135,5 @@ flytesnacks/tutorials/index
 flytesnacks/integrations/index
 deployment/index
 api/index
-reference_flyteidl
 community/index
 ```
