@@ -191,6 +191,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		}
 
 		size := -1
+
 		for key, variable := range literalMap.Literals {
 			literalType := validators.LiteralTypeForLiteral(variable)
 			err := validators.ValidateLiteralType(literalType)
@@ -200,10 +201,19 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 					handler.PhaseInfoFailure(idlcore.ExecutionError_USER, errors.IDLNotFoundErr, errMsg, nil),
 				), nil
 			}
+			if variable.GetOffloadedMetadata() != nil {
+				// variable will be overwritten with the contents of the offloaded data which contains the actual large literal.
+				// We need this for the map task to be able to create the subNodeSpec
+				err := common.ReadLargeLiteral(ctx, nCtx.DataStore(), variable)
+				if err != nil {
+					return handler.DoTransition(handler.TransitionTypeEphemeral,
+						handler.PhaseInfoFailure(idlcore.ExecutionError_SYSTEM, errors.RuntimeExecutionError, "couldn't read the offloaded literal", nil),
+					), nil
+				}
+			}
 			switch literalType.Type.(type) {
 			case *idlcore.LiteralType_CollectionType:
 				collectionLength := len(variable.GetCollection().Literals)
-
 				if size == -1 {
 					size = collectionLength
 				} else if size != collectionLength {
