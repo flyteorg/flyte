@@ -2383,6 +2383,11 @@ emailer (`interfaces.NotificationsEmailerConfig`_)
     apiKeyEnvVar: ""
     apiKeyFilePath: ""
     serviceName: ""
+    smtpPasswordSecretName: ""
+    smtpPort: ""
+    smtpServer: ""
+    smtpSkipTLSVerify: false
+    smtpUsername: ""
   sender: ""
   subject: ""
   
@@ -2420,6 +2425,11 @@ emailServerConfig (`interfaces.EmailServerConfig`_)
   apiKeyEnvVar: ""
   apiKeyFilePath: ""
   serviceName: ""
+  smtpPasswordSecretName: ""
+  smtpPort: ""
+  smtpServer: ""
+  smtpSkipTLSVerify: false
+  smtpUsername: ""
   
 
 subject (string)
@@ -2476,6 +2486,56 @@ apiKeyEnvVar (string)
   
 
 apiKeyFilePath (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+smtpServer (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+smtpPort (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+smtpSkipTLSVerify (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+smtpUsername (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+smtpPasswordSecretName (string)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 **Default Value**: 
@@ -3898,6 +3958,22 @@ Configuration for array nodes
   event-version: 0
   
 
+literal-offloading-config (`config.LiteralOffloadingConfig`_)
+------------------------------------------------------------------------------------------------------------------------
+
+config used for literal offloading.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  Enabled: false
+  max-size-in-mb-for-offloading: 1000
+  min-size-in-mb-for-offloading: 10
+  supported-sdk-versions:
+    FLYTE_SDK: 1.13.5
+  
+
 config.ArrayNodeConfig
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -4216,6 +4292,55 @@ Name (string)
 .. code-block:: yaml
 
   ""
+  
+
+config.LiteralOffloadingConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Enabled (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+supported-sdk-versions (map[string]string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Maps flytekit and union SDK names to minimum supported version that can handle reading offloaded literals.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  FLYTE_SDK: 1.13.5
+  
+
+min-size-in-mb-for-offloading (int64)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Size of a literal at which to trigger offloading
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "10"
+  
+
+max-size-in-mb-for-offloading (int64)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Size of a literal at which to fail fast
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "1000"
   
 
 config.NodeConfig
