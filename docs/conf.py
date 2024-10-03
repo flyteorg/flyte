@@ -288,6 +288,16 @@ redirects = {
     "flytectl/gen/flytectl_demo_teardown": "../../api/flytectl/gen/flytectl_demo_teardown",
     "flytectl/gen/flytectl_demo_exec": "../../api/flytectl/gen/flytectl_demo_exec",
     "flytectl/gen/flytectl_demo_reload": "../../api/flytectl/gen/flytectl_demo_reload",
+
+    # flyteidl
+    "reference_flyteidl": "../../api/flyteidl/docs_index.html",
+    "protos/docs/core/core": "../../api/flyteidl/docs/core/core.html",
+    "protos/docs/admin/admin": "../../api/flyteidl/docs/admin/admin.html",
+    "protos/docs/service/service": "../../api/flyteidl/docs/service/service.html",
+    "protos/docs/datacatalog/datacatalog": "../../api/flyteidl/docs/datacatalog/datacatalog.html",
+    "protos/docs/event/event": "../../api/flyteidl/docs/event/event.html",
+    "protos/docs/plugins/plugins": "../../api/flyteidl/docs/plugins/plugins.html",
+    "protos/README": "../../api/flyteidl/contributing.html",
 }
 
 
@@ -375,11 +385,31 @@ html_context = {
 
 html_theme_options = {
     # custom flyteorg pydata theme options
-    "github_url": "https://github.com/flyteorg/flyte",
+    # "github_url": "https://github.com/flyteorg/flyte",
+    "logo": {
+        "text": "Flyte",
+    },
+    "external_links": [
+        {"name": "Flyte", "url": "https://flyte.org"},
+    ],
     "icon_links": [
         {
             "name": "GitHub",
+            "icon": "fa-brands fa-github",
+            "type": "fontawesome",
             "url": "https://github.com/flyteorg/flyte",
+        },
+        {
+            "name": "Slack",
+            "url": "https://slack.flyte.org",
+            "icon": "fa-brands fa-slack",
+            "type": "fontawesome",
+        },
+        {
+            "name": "Flyte",
+            "url": "https://flyte.org",
+            "icon": "fa-solid fa-dragon",
+            "type": "fontawesome",
         }
     ],
     "use_edit_page_button": True,
@@ -390,9 +420,9 @@ html_theme_options = {
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-# html_static_path = []
-# html_css_files = []
-# html_js_files = []
+html_static_path = ["_static"]
+html_css_files = ["custom.css"]
+html_js_files = ["custom.js"]
 
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.
@@ -476,9 +506,9 @@ tags_page_title = "Tag"
 tags_overview_title = "Pages by tags"
 
 # Algolia Docsearch credentials
-docsearch_app_id = os.getenv("DOCSEARCH_APP_ID")
+docsearch_app_id = "WLG0MZB58Q"
 docsearch_api_key = os.getenv("DOCSEARCH_API_KEY")
-docsearch_index_name = os.getenv("DOCSEARCH_INDEX_NAME")
+docsearch_index_name = "flyte"
 
 # -- Options for intersphinx extension ---------------------------------------
 
@@ -529,7 +559,7 @@ INTERSPHINX_REFS_REPLACE = r"\1"
 
 # Pattern for replacing all ref/doc labels that point to protos/docs with /protos/docs
 PROTO_REF_PATTERN = r"([:<])(protos/docs)"
-PROTO_REF_REPLACE = r"\1/protos/docs"
+PROTO_REF_REPLACE = r"\1/api/flyteidl/docs"
 
 # These patterns are used to replace values in source files that are imported
 # from other repos.
@@ -549,7 +579,7 @@ REPLACE_PATTERNS = {
     r"<_tags/DistributedComputing>": r"</_tags/DistributedComputing>",
     r"{ref}`bioinformatics <bioinformatics>`": r"bioinformatics",
     PROTO_REF_PATTERN: PROTO_REF_REPLACE,
-    r"/protos/docs/service/index": r"/protos/docs/service/service"
+    r"/protos/docs/service/index": r"/api/flyteidl/docs/service/service"
 }
 
 # r"<environment_setup>": r"</flytesnacks/environment_setup>",
@@ -626,8 +656,7 @@ import_projects = [
         "name": "flyteidl",
         "source": "../flyteidl",
         "docs_path": "protos",
-        "dest": "protos",  # to stay compatible with flyteidl docs path naming
-        "cmd": ["cp", "../flyteidl/README.md", "protos/README.md"],
+        "dest": "api/flyteidl",
         "local": True,
     }
 ]
