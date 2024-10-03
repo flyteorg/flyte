@@ -819,7 +819,7 @@ func uploadFastRegisterArtifact(ctx context.Context, project, domain, sourceCode
 	}
 
 	if resp != nil && len(resp.SignedUrl) > 0 {
-		return storage.DataReference(resp.NativeUrl), DirectUpload(resp.SignedUrl, h, size, dataRefReaderCloser)
+		return storage.DataReference(resp.NativeUrl), DirectUpload(resp.SignedUrl, h, size, dataRefReaderCloser, resp.GetHeaders())
 	}
 
 	dataStore, err := getStorageClient(ctx)
@@ -846,7 +846,7 @@ func uploadFastRegisterArtifact(ctx context.Context, project, domain, sourceCode
 	return remotePath, nil
 }
 
-func DirectUpload(url string, contentMD5 []byte, size int64, data io.Reader) error {
+func DirectUpload(url string, contentMD5 []byte, size int64, data io.Reader, additionalHeaders map[string]string) error {
 	req, err := http.NewRequest(http.MethodPut, url, data)
 	if err != nil {
 		return err
@@ -855,6 +855,9 @@ func DirectUpload(url string, contentMD5 []byte, size int64, data io.Reader) err
 	req.ContentLength = size
 	req.Header.Set("Content-Length", strconv.FormatInt(size, 10))
 	req.Header.Set("Content-MD5", base64.StdEncoding.EncodeToString(contentMD5))
+	for k, v := range additionalHeaders {
+		req.Header.Set(k, v)
+	}
 
 	client := &http.Client{}
 	res, err := client.Do(req)
