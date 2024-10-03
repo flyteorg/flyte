@@ -31,11 +31,12 @@ import (
 )
 
 type launchPlanMetrics struct {
-	Scope                 promutils.Scope
-	FailedScheduleUpdates prometheus.Counter
-	FailedTriggerUpdates  prometheus.Counter
-	SpecSizeBytes         prometheus.Summary
-	ClosureSizeBytes      prometheus.Summary
+	Scope                       promutils.Scope
+	FailedScheduleUpdates       prometheus.Counter
+	FailedTriggerUpdates        prometheus.Counter
+	SpecSizeBytes               prometheus.Summary
+	ClosureSizeBytes            prometheus.Summary
+	MaxActiveLaunchPlansReached prometheus.Counter
 }
 
 type LaunchPlanManager struct {
@@ -373,7 +374,8 @@ func (m *LaunchPlanManager) enableLaunchPlan(ctx context.Context, request admin.
 			return nil, err
 		}
 		if !canActivateLaunchPlans {
-			logger.Debugf(ctx, "org '%s' plan is only allowed '%d' active launch plans, not allowing further activation for [%+v]",
+			m.metrics.MaxActiveLaunchPlansReached.Inc()
+			logger.Infof(ctx, "org '%s' plan is only allowed '%d' active launch plans, not allowing further activation for [%+v]",
 				userProperties.Org, userProperties.ActiveLaunchPlans, request.Id)
 			return nil, errors.NewFlyteAdminErrorf(
 				codes.ResourceExhausted,
@@ -744,6 +746,8 @@ func NewLaunchPlanManager(
 		FailedTriggerUpdates: scope.MustNewCounter("failed_trigger_updates", "count of failed attempts to activate/deactivate triggers"),
 		SpecSizeBytes:        scope.MustNewSummary("spec_size_bytes", "size in bytes of serialized launch plan spec"),
 		ClosureSizeBytes:     scope.MustNewSummary("closure_size_bytes", "size in bytes of serialized launch plan closure"),
+		MaxActiveLaunchPlansReached: scope.MustNewCounter("max_active_launch_plans_reached",
+			"count of times the maximum number of active launch plans was reached for a user org"),
 	}
 	return &LaunchPlanManager{
 		db:                 db,

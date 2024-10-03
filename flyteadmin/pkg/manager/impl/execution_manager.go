@@ -77,6 +77,7 @@ type executionUserMetrics struct {
 	WorkflowExecutionDurations   projectDomainScopedStopWatchMap
 	WorkflowExecutionInputBytes  prometheus.Summary
 	WorkflowExecutionOutputBytes prometheus.Summary
+	MaxActiveExecutionsReached   prometheus.Counter
 }
 
 type ExecutionManager struct {
@@ -1119,7 +1120,8 @@ func (m *ExecutionManager) validateActiveExecutions(ctx context.Context) error {
 		}
 	}
 	if activeExecutions > int64(userProperties.ActiveExecutions) {
-		logger.Debugf(ctx, "user org '%s' has '%d' active executions which exceeds their account limit '%d': blocking creation of additional executions",
+		m.userMetrics.MaxActiveExecutionsReached.Inc()
+		logger.Infof(ctx, "user org '%s' has '%d' active executions which exceeds their account limit '%d': blocking creation of additional executions",
 			userProperties.Org, activeExecutions, userProperties.ActiveExecutions)
 		return errors.NewFlyteAdminErrorf(codes.ResourceExhausted, "Your account only allows %d active executions at a time. Please wait for some of your existing executions to complete before starting new ones.", userProperties.ActiveExecutions)
 	}
@@ -2481,6 +2483,8 @@ func NewExecutionManager(db repositoryInterfaces.Repository, pluginRegistry *plu
 			"size in bytes of serialized execution inputs"),
 		WorkflowExecutionOutputBytes: userScope.MustNewSummary("output_size_bytes",
 			"size in bytes of serialized execution outputs"),
+		MaxActiveExecutionsReached: userScope.MustNewCounter("max_active_executions_reached",
+			"count of times the maximum number of active executions was reached for a user org"),
 	}
 
 	return &ExecutionManager{

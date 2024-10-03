@@ -6849,6 +6849,9 @@ func TestValidateActiveExecutions(t *testing.T) {
 		execManager := ExecutionManager{
 			pluginRegistry: r,
 			db:             repository,
+			userMetrics: executionUserMetrics{
+				MaxActiveExecutionsReached: mockScope.NewTestScope().MustNewCounter("max_active_executions_reached", "description"),
+			},
 		}
 
 		err := execManager.validateActiveExecutions(context.TODO())
