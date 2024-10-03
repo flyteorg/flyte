@@ -1,3 +1,5 @@
+(contribute_docs)=
+
 # Contributing documentation
 
 ```{eval-rst}
