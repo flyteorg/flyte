@@ -213,3 +213,8 @@ func NewInactiveProjectError(ctx context.Context, id string) FlyteAdminError {
 	}
 	return statusErr
 }
+
+func NewInvalidLiteralTypeError(name string, err error) FlyteAdminError {
+	return NewFlyteAdminErrorf(codes.InvalidArgument,
+		fmt.Sprintf("Failed to validate literal type for [%s] with err: %s", name, err))
+}
