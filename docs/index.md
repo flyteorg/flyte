@@ -1,54 +1,55 @@
 # Welcome to Flyte!
 
-```{eval-rst}
-.. raw:: html
+````{card} The highly scalable and flexible workflow orchestrator that unifies data, ML and analytics.
+:class-card: subtitle-and-badges
 
-   <p style="color: #808080; font-weight: 350; font-size: 25px; padding-top: 10px; padding-bottom: 10px;">
-   The highly scalable and flexible workflow orchestrator that unifies data, ML and analytics.
-   </p>
-
-.. image:: https://img.shields.io/badge/Graduate%20Project-Linux%20Foundation-purple?style=for-the-badge
-    :target: https://lfaidata.foundation/projects/flyte/
-    :alt: Linux Foundation
-
-.. image:: https://img.shields.io/github/stars/flyteorg/flyte?label=github&logo=github&style=for-the-badge
-   :target: https://github.com/flyteorg/flyte
-   :alt: GitHub Repo stars
-
-.. image:: https://img.shields.io/github/release/flyteorg/flyte.svg?style=for-the-badge&color=blue
-   :target: https://github.com/flyteorg/flyte/releases/latest
-   :alt: Flyte Release
-
-.. image:: https://img.shields.io/github/actions/workflow/status/flyteorg/flyte/tests.yml?label=tests&style=for-the-badge
-   :target: https://github.com/flyteorg/flyte/actions/workflows/tests.yml
-   :alt: GitHub Test Status
-
-.. image:: https://img.shields.io/github/actions/workflow/status/flyteorg/flyte/sandbox.yml?label=Sandbox%20docker%20image&style=for-the-badge
-   :target: https://github.com/flyteorg/flyte/actions/workflows/sandbox.yml
-   :alt: GitHub Sandbox Status
-
-.. image:: https://img.shields.io/github/milestones/closed/flyteorg/flyte?style=for-the-badge
-    :target: https://github.com/flyteorg/flyte/milestones?state=closed
-    :alt: Completed Milestones
-
-.. image:: https://img.shields.io/pypi/dm/flytekit?color=blue&label=flytekit%20downloads&style=for-the-badge&logo=pypi&logoColor=white
-   :target: https://github.com/flyteorg/flytekit
-   :alt: Flytekit Downloads
-
-.. image:: https://img.shields.io/badge/Slack-Chat-pink?style=for-the-badge&logo=slack
-    :target: https://slack.flyte.org
-    :alt: Flyte Slack
-
-.. image:: https://img.shields.io/badge/LICENSE-Apache2.0-ff69b4.svg?style=for-the-badge
-    :target: http://www.apache.org/licenses/LICENSE-2.0.html
-    :alt: License
-
-.. |br| raw:: html
-
-   <br>
-   <br>
-
+```{image} https://img.shields.io/badge/Graduate%20Project-Linux%20Foundation-purple?style=for-the-badge
+:target: https://lfaidata.foundation/projects/flyte/
+:alt: Linux Foundation
 ```
+
+```{image} https://img.shields.io/github/stars/flyteorg/flyte?label=github&logo=github&style=for-the-badge
+:target: https://github.com/flyteorg/flyte
+:alt: GitHub Repo stars
+```
+
+```{image} https://img.shields.io/github/release/flyteorg/flyte.svg?style=for-the-badge&color=blue
+:target: https://github.com/flyteorg/flyte/releases/latest
+:alt: Flyte Release
+```
+
+```{image} https://img.shields.io/github/actions/workflow/status/flyteorg/flyte/tests.yml?label=tests&style=for-the-badge
+:target: https://github.com/flyteorg/flyte/actions/workflows/tests.yml
+:alt: GitHub Test Status
+```
+
+```{image} https://img.shields.io/github/actions/workflow/status/flyteorg/flyte/sandbox.yml?label=Sandbox%20docker%20image&style=for-the-badge
+:target: https://github.com/flyteorg/flyte/actions/workflows/sandbox.yml
+:alt: GitHub Sandbox Status
+```
+
+```{image} https://img.shields.io/github/milestones/closed/flyteorg/flyte?style=for-the-badge
+:target: https://github.com/flyteorg/flyte/milestones?state=closed
+:alt: Completed Milestones
+```
+
+```{image} https://img.shields.io/pypi/dm/flytekit?color=blue&label=flytekit%20downloads&style=for-the-badge&logo=pypi&logoColor=white
+:target: https://github.com/flyteorg/flytekit
+:alt: Flytekit Downloads
+```
+
+```{image} https://img.shields.io/badge/Slack-Chat-pink?style=for-the-badge&logo=slack
+:target: https://slack.flyte.org
+:alt: Flyte Slack
+```
+
+```{image} https://img.shields.io/badge/LICENSE-Apache2.0-ff69b4.svg?style=for-the-badge
+:target: http://www.apache.org/licenses/LICENSE-2.0.html
+:alt: License
+```
+
+````
+
 
 [Flyte](https://github.com/flyteorg/flyte) is an open-source, Kubernetes-native
 workflow orchestrator implemented in [Go](https://go.dev/). It enables highly

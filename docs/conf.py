@@ -385,14 +385,31 @@ html_context = {
 
 html_theme_options = {
     # custom flyteorg pydata theme options
-    "github_url": "https://github.com/flyteorg/flyte",
+    # "github_url": "https://github.com/flyteorg/flyte",
     "logo": {
-        "text": "Flyte Docs",
+        "text": "Flyte",
     },
+    "external_links": [
+        {"name": "Flyte", "url": "https://flyte.org"},
+    ],
     "icon_links": [
         {
             "name": "GitHub",
+            "icon": "fa-brands fa-github",
+            "type": "fontawesome",
             "url": "https://github.com/flyteorg/flyte",
+        },
+        {
+            "name": "Slack",
+            "url": "https://slack.flyte.org",
+            "icon": "fa-brands fa-slack",
+            "type": "fontawesome",
+        },
+        {
+            "name": "Flyte",
+            "url": "https://flyte.org",
+            "icon": "fa-solid fa-dragon",
+            "type": "fontawesome",
         }
     ],
     "use_edit_page_button": True,
@@ -403,9 +420,9 @@ html_theme_options = {
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-# html_static_path = []
-# html_css_files = []
-# html_js_files = []
+html_static_path = ["_static"]
+html_css_files = ["custom.css"]
+html_js_files = ["custom.js"]
 
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.

@@ -2,6 +2,7 @@
 
 
 ::::{grid} 2
+:gutter: 2
 
 :::{grid-item-card} {octicon}`rocket` Flytekit SDK
 :link: flytekit/docs_index
