@@ -853,11 +853,11 @@ func DirectUpload(url string, contentMD5 []byte, size int64, data io.Reader, add
 	}
 
 	req.ContentLength = size
-	req.Header.Set("Content-Length", strconv.FormatInt(size, 10))
-	req.Header.Set("Content-MD5", base64.StdEncoding.EncodeToString(contentMD5))
 	for k, v := range additionalHeaders {
 		req.Header.Set(k, v)
 	}
+	req.Header.Set("Content-Length", strconv.FormatInt(size, 10))
+	req.Header.Set("Content-MD5", base64.StdEncoding.EncodeToString(contentMD5))
 
 	client := &http.Client{}
 	res, err := client.Do(req)
