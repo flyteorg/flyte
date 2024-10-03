@@ -11,7 +11,7 @@
 Flytekit is the main Python SDK for building workflows.
 :::
 
-:::{grid-item-card} {octicon}`workflow` Flytectl CLI
+:::{grid-item-card} {octicon}`terminal` Flytectl CLI
 :link: flytectl/docs_index
 :link-type: doc
 
