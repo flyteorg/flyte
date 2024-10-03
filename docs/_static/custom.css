@@ -16,8 +16,7 @@ html[data-theme=light], html[data-theme=dark] {
 }
 
 .navbar-brand img {
-    max-width: 2em;
-    width: auto;
+    height: 70%;
 }
 
 /*
