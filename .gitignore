@@ -33,6 +33,7 @@ docs/_tags/
 docs/api/flytectl
 docs/protos
 docs/api/flytekit
+docs/api/flyteidl
 docs/flytesnacks
 docs/examples
 docs/_src
