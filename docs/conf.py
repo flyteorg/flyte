@@ -476,9 +476,9 @@ tags_page_title = "Tag"
 tags_overview_title = "Pages by tags"
 
 # Algolia Docsearch credentials
-docsearch_app_id = os.getenv("DOCSEARCH_APP_ID")
+docsearch_app_id = "WLG0MZB58Q"
 docsearch_api_key = os.getenv("DOCSEARCH_API_KEY")
-docsearch_index_name = os.getenv("DOCSEARCH_INDEX_NAME")
+docsearch_index_name = "flyte"
 
 # -- Options for intersphinx extension ---------------------------------------
 
