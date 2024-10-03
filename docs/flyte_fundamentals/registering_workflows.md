@@ -41,7 +41,6 @@ The following diagram provides a summarized view of the different registration p
 
 ![](https://raw.githubusercontent.com/flyteorg/static-resources/main/flytesnacks/getting_started/flyte-registration-patterns.png)
 
-
 (getting_started_register_pyflyte_run)=
 
 ## Iterating on a single task or workflow
@@ -296,6 +295,15 @@ pyflyte --pkgs <dir1> --pkgs <dir2> package ...
 
 This is useful in cases where you want to register two different Flyte projects
 that you maintain in a single place.
+
+
+If you encounter a ``ModuleNotFoundError`` when packaging, ensure to include the correct source paths by using the `--source` option. For instance:
+
+```{prompt} bash $
+pyflyte --pkgs <dir1> package --source ./src -f
+```
+
+This addition helps in avoiding the module detection issue and ensures smooth registration and execution of tasks.
 
 ````
 
