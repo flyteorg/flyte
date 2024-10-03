@@ -640,7 +640,6 @@ import_projects = [
         "source": "../flyteidl",
         "docs_path": "protos",
         "dest": "api/flyteidl",
-        # "cmd": ["cp", "../flyteidl/README.md", "api/flyteidl/docs/contributing.md"],
         "local": True,
     }
 ]
