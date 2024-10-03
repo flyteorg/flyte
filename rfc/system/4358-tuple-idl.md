@@ -592,92 +592,147 @@ This transformer support three types of tuple, `typing.Tuple`, `tuple`, and `typ
 
 ##### Literal Value
 
+- `to_literal`:
+  - We can extract each field in the Literal from the NamedTuple and Tuple as follows:
+    - `tuple_name`:
+      - `NamedTuple`: The name of the NamedTuple.
+      - `Tuple`: An empty string.
+    - `order` & `literals`:
+      - `Tuple`: We first automatically generate names for each field (e.g., `t0`, `t1`, `t2`, etc.), then extract the order and literals map.
+      - `NamedTuple`: We use the field names directly to extract the order and literals map.
+  - Examples:
+    - `Tuple`: `Tuple[int, str]` -> `LiteralTupleMap(tuple_name="", order=["t0", "t1"], literals={"t0": 1, "t1": "foo"})`
+    - `NamedTuple`: `NamedTuple("NAME", ("K1", int), ("K2", str))` -> `LiteralTupleMap(tuple_name="NAME", order=["K1", "K2"], literals={"K1": 1, "K2": "foo"})`
+- `to_python_val`:
+  - Since we have the order of each field and the map of literals, we can easily convert the `LiteralTupleMap` to a `NamedTuple` or `Tuple`.
+  - The `tuple_name` and the field name in the `LiteralTupleMap` for `Tuple` is not necessary to recover the original tuple, so we can ignore them.
+
+##### Literal Type
+
+- `get_literal_type`:
+  - Similar to `to_literal`, we will first generate the `tuple_name` and the field names for `Tuple`. Then, we extract the order and the map of types for each field.
+  - Examples:
+    - `Tuple`: `Tuple[int, str]` -> `TupleType(tuple_name="", order=["t0", "t1"], fields={"t0": int, "t1": str})`
+    - `NamedTuple`: `NamedTuple("NAME", ("K1", int), ("K2", str))` -> `TupleType(tuple_name="NAME", order=["K1", "K2"], fields={"K1": int, "K2": str})`
+- `guess_python_type`:
+  - We use the `tuple_name` as the identifier for the NamedTuple and Tuple. If the `tuple_name` is empty, we will guess the type as `Tuple`. Otherwise, we will guess the type as `NamedTuple`.
+  - We can easily get the each field of the NamedTuple and Tuple via the `order` and the map of types.
+
+### Flytectl
+
+From Flytectl, we can construct the input of tuple for the execution.
+
+When we received `LiteralType_TupleType`, since the `tuple_name` and the `order` are already defined in type definition, we only need to provide the value of each tuple field (via the key-value pair of each field) in Flytectl for the registered task or workflow for further execution needs.
+
+For instance, if we want to create a tuple input `tuple_input` from flytectl, and the Literal_TupleType is as follows:
+
+```proto
+type: {
+    tuple_type: {
+        tuple_name: ""
+        order: ["t0", "t1"]
+        fields: {
+            key: "t0"
+            type: {
+                simple: STRING
+            }
+        }
+        fields: {
+            key: "t1"
+            type: {
+                simple: INTEGER
+            }
+        }
+    }
+}
+```
+
+Here is an example YAML file for the input of a task with a tuple type:
+
+```yaml
+iamRoleARN: ""
+inputs:
+  tuple_input:
+    key1: "foo"
+    key2: 123
+envs: {}
+```
+
+This will create a Literal for the tuple input as follows:
+
+```proto
+value: {
+    tuple: {
+        tuple_name: ""
+        order: ["t0", "t1"]
+        literals: {
+            key: "t0"
+            value: {
+                scalar: {
+                    primitive: {
+                        string_value: "foo"
+                    }
+                }
+            }
+        }
+        literals: {
+            key: "t1"
+            value: {
+                scalar: {
+                    primitive: {
+                        integer: 123
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
+### FlyteCopilot
+
+We need to support handling tuple literals for the FlyteCopilot.
+
 ### FlyteConsole
 
-The FlyteConsole will need to be updated to display the tuple type correctly.
+#### How users can input the tuple value in the console?
 
-### Other Discussion
+We need to provide a way to let users input the tuple value in the console. This could follow the same pattern as Flytectl described above.
 
-#### Should we support `Tuple[T1, ...]`?
+When we received `LiteralType_TupleType`, since the `tuple_name` and the `order` are already defined in type definition, we only need prompt the user to provide the value of each tuple field (via the key-value pair of each field) in the console for the registered task or workflow for further execution needs.
 
-- Flytekit example:
+#### Display Input/Output of Tuple in the Console
 
-  ```python
-  from typing import Tuple
+Distinguishing between `NamedTuple` and `Tuple` in the console is not necessary, as the `tuple_name` and the field names are not necessary to display to the user. We can simply reconstruct the tuple value from the `order` and the map of literals in Python format like `(1, "foo")`.
 
-  @task
-  def my_tuple_task() -> Tuple[int, ...], str:
-      return (1, 2, 3), "bar"
+#### Copying Inputs/Outputs in the Console
 
+Allow users to copy the input/output of the tuple to the clipboard in the console.
 
-  @task
-  def my_list_task() -> List[int], str:
-      return [1, 2, 3], "bar"
-  ```
+## 4 Metrics & Dashboards
 
-- There are three potential approaches to support this type:
+None
 
-  - Add a field `is_univariate` in `TupleType` and `TupleFieldType`.
+## 5 Drawbacks
 
-    ```proto
-    // types.proto
-    message TupleType {
-        string tuple_name = 1;
-        bool is_univariate = 2;
-        repeated TupleFieldType fields = 3;
-    }
+None
 
-    // literals.proto
-    message LiteralFieldCollection {
-        string tuple_name = 1;
-        bool is_univariate = 2;
-        repeated LiteralField fields = 1;
-    }
-    ```
+## 6 Alternatives
 
-  - Treat it as a list, given that the performance is quite similar to `List[T1]`. However, this approach may lead to confusion with `List[T1]`.
-  - Add a extra `LiteralType univariate_tuple_type` to `LiteralType` and `LiteralCollection univariate_tuple` to `Literal`.
+1. There are another possible structure for the `LiteralTupleMap` and `TupleType` in FlyteIDL as discussed above in [Other Considerations](#other-considerations).
+2. In Flytekit, we can separate the `NamedTuple` and `Tuple` into two different transformers, and this will make the code more readable and maintainable.
 
-    ```proto
-    // types.proto
-    message LiteralType {
-        oneof type {
-            // ...
-            TupleType tuple_type = 11;
-            LiteralType univariate_tuple_type = 12;
-        }
-        // ...
-    }
-
-    // literals.proto
-    message Literal {
-        oneof value {
-            // ...
-            // A tuple of literals.
-            LiteralFieldCollection tuple = 4;
-            LiteralCollection univariate_tuple = 5;
-        }
-        // ...
-    }
-    ```
-
-- If we support univariate tuple, we also need to discuss the casting between different types of NamedTuple & Tuple or casting between List and univariate tuple.
-
-## 4 Potential Impact and Dependencies
+## 7 Potential Impact and Dependencies
 
 - This feature will affect FlyteIDL, FlytePropeller, FlyteKit, Flytectl, and FlyteConsole.
 - It will enable the support of NamedTuple and Tuple in Flytekit, which are common types in Python.
 
-## 5 To Discuss Questions
+## 8 Unresolved Questions
 
-1. Should we check the names of each field and the tuple when casting between `NamedTuple` and `Tuple`?
-2. [Univariate Tuple](#should-we-support-tuplet1-): Should we support `Tuple[int, ...]`, given its similarity to `List[int]`? If so, how should we implement it?
-   - Add a field `is_univariate` in `TupleType` and `TupleFieldType`.
-   - Treat it as a list.
-   - Add a new `LiteralType univariate_tuple_type` to `LiteralType` and `LiteralCollection univariate_tuple` to `Literal`.
-3. [Literal of NamedTuple & Tuple](#literal-of-namedtuple--tuple): Is there any better way to store the literal of NamedTuple and Tuple? Is it necessary to keep names of the fields and tuple in both `Literal` and `LiteralType`?
-4. The specification of the new IDL for the Tuple Literal and LiteralType is open for further discussion.
+### Univariate Tuple
 
-## 6 Conclusion
+This approach still couldn't support univariate tuple like `Tuple[int, ...]`. We can ask users to use `List[int]` instead. If we want to support it, we could add a field `is_univariate` in `TupleType` and `TupleFieldType`, and treat it as a list, but this will make the implementation extremely complex.
 
-We need a new IDL for the Tuple Literal and LiteralType to support the usage of `NamedTuple` and `Tuple` in Flytekit.
+## 9 Conclusion
+
+This RFC proposes adding support for NamedTuple and Tuple in Flytekit. We introduce a new `LiteralTupleMap` and `TupleType` in FlyteIDL to store the literal and type of NamedTuple and Tuple. We also introduce a new `TupleTransformer` in FlyteKit to support NamedTuple and Tuple. This feature will enable the support of NamedTuple and Tuple in Flyte system.
