@@ -19,6 +19,38 @@ type FlyteAdmin struct {
 	mock.Mock
 }
 
+type FlyteAdmin_ClearCache struct {
+	*mock.Call
+}
+
+func (_m FlyteAdmin_ClearCache) Return(_a0 error) *FlyteAdmin_ClearCache {
+	return &FlyteAdmin_ClearCache{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *FlyteAdmin) OnClearCache(ctx context.Context, executionID *core.WorkflowExecutionIdentifier) *FlyteAdmin_ClearCache {
+	c_call := _m.On("ClearCache", ctx, executionID)
+	return &FlyteAdmin_ClearCache{Call: c_call}
+}
+
+func (_m *FlyteAdmin) OnClearCacheMatch(matchers ...interface{}) *FlyteAdmin_ClearCache {
+	c_call := _m.On("ClearCache", matchers...)
+	return &FlyteAdmin_ClearCache{Call: c_call}
+}
+
+// ClearCache provides a mock function with given fields: ctx, executionID
+func (_m *FlyteAdmin) ClearCache(ctx context.Context, executionID *core.WorkflowExecutionIdentifier) error {
+	ret := _m.Called(ctx, executionID)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, *core.WorkflowExecutionIdentifier) error); ok {
+		r0 = rf(ctx, executionID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 type FlyteAdmin_GetLaunchPlan struct {
 	*mock.Call
 }

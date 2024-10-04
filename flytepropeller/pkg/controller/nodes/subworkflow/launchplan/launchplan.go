@@ -46,6 +46,9 @@ type Executor interface {
 
 	// Initialize initializes Executor.
 	Initialize(ctx context.Context) error
+
+	// ClearCache clears the cache of the LaunchPlan execution
+	ClearCache(ctx context.Context, executionID *core.WorkflowExecutionIdentifier) error
 }
 
 type Reader interface {
