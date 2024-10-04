@@ -90,6 +90,8 @@ storage:
       access_key_id: minio
       secret_key: miniostorage
   container: my-s3-bucket
+  limits:
+    maxDownloadMBs: 1000
 
 task_resources:
   defaults:
