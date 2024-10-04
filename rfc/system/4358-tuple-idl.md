@@ -505,7 +505,7 @@ Therefore, we need to support both integer and string attribute paths for `tuple
    func resolveAttrPathInPromise(nodeID string, literal *core.Literal, bindAttrPath []*core.PromiseAttribute) (*core.Literal, error) {
        // ...
        for _, attr := range bindAttrPath {
-   	    switch currVal.GetValue().(type) {
+        switch currVal.GetValue().(type) {
            // ...
            case *core.Literal_Tuple:
                var key string
@@ -618,9 +618,182 @@ This transformer support three types of tuple, `typing.Tuple`, `tuple`, and `typ
   - We use the `tuple_name` as the identifier for the NamedTuple and Tuple. If the `tuple_name` is empty, we will guess the type as `Tuple`. Otherwise, we will guess the type as `NamedTuple`.
   - We can easily get the each field of the NamedTuple and Tuple via the `order` and the map of types.
 
-#### Supporting Attribute Paths for Tuple
+#### Supporting Indexing via Attribute Paths for Tuple and NamedTuple
 
-It is commonly used to access the value of each field in `NamedTuple` and `Tuple` by its name or index. We need to support both integer and string attribute paths for `NamedTuple` and `Tuple` in FlyteKit.
+It is commonly used to access the value of each field in `NamedTuple` and `Tuple` by its name or index. We need to support both integer and string attribute paths for `NamedTuple` and `Tuple` in FlyteKit. For instance:
+
+- `NamedTuple`
+
+  ```python
+  from typing import NamedTuple
+
+  class MyNamedTuple(NamedTuple):
+      key1: int
+      key2: str
+
+  @task
+  def my_task() -> MyNamedTuple:
+      return MyNamedTuple(1, "foo")
+
+  @workflow
+  def my_wf() -> tuple[int, str]:
+      a = my_task()
+
+      # We should be able to access the value of each field by its name or index.
+      # Access the value of each field by its name
+      int_result = a.key1
+      str_result = a.key2
+
+      # Access the value of each field by its index
+      int_result = a[0]
+      str_result = a[1]
+
+      return int_result, str_result
+  ```
+
+- `Tuple`
+
+  ```python
+  from typing import Tuple
+
+  @task
+  def my_task() -> Tuple[int, str]:
+      return 1, "foo"
+
+  @workflow
+  def my_wf() -> tuple[int, str]:
+      a = my_task()
+
+      # We should be able to access the value of each field by its index.
+      int_result = a[0]
+      str_result = a[1]
+
+      return int_result, str_result
+  ```
+
+We only need to update `resolve_attr_path_in_promise` in `flytekit/core/promise.py` following the same pattern as the `Dict` and `List`.
+
+#### Other Considerations in the Restriction of the Workflow
+
+Currently, when a task in Flytekit returns multiple outputs defined as a Tuple or NamedTuple, it is treated as a special Output type. This can make it inconvenient for further use. Moreover, Flytekit imposes several restrictive rules on workflows, such as:
+
+- Aggregating a group of Promise objects into a collection, map, or tuple is not supported as an input.
+- Iterating through a Promise object is not allowed, even if the output is expected to be iterable.
+
+These restrictions can be limiting, as they conflict with common patterns in Python. To enhance flexibility, we should consider supporting these use cases in Flytekit. Since these changes would significantly alter the Flytekit library, it is essential to review them thoroughly and seek feedback from the community.
+
+##### Supporting Tuple Transformer to Deal with Multiple Outputs
+
+Currently, when a task’s output is annotated as a Tuple or NamedTuple, Flytekit wraps it in a special Output type. This wrapping can complicate its use in downstream tasks. Consider the following example:
+
+```python
+@task
+def task1() -> Tuple[int, str]:
+    return 1, "foo"
+
+@task
+def task2(a: Tuple[int, str]) -> int:
+    return a[0]
+
+@workflow
+def my_wf() -> Tuple[int, str]:
+    o = task1()      # o = Output(o0=1, o1="foo")
+    task2(o)         # We should make Output compatible with Tuple
+```
+
+To address this, we can enhance the TupleTransformer to handle such outputs as a special case, making Output compatible with standard Tuple and NamedTuple types.
+
+##### Aggregate a Group of Promises into a Tuple input
+
+Currently, Flytekit does not support aggregating a group of Promise objects into a collection, map, or tuple as a single input. Consider the following example:
+
+```python
+def my_wf():
+    a, b = task_1()
+    task_2(inp=(a, b))               # Tuple or NamedTuple
+    task_3(inp=[a, b])               # List
+    task_4(inp={"a": a, "b": b})     # Dict
+    # ...
+```
+
+During workflow execution, downstream tasks receive inputs as separate Promise objects. Currently, we must pass each Promise individually to downstream tasks. To support aggregating Promise objects, we can modify the `translate_inputs_to_literals` function in `flytekit/core/promise.py` to combine promises into a single tuple:
+
+```python
+def translate_inputs_to_literals(
+    ctx: FlyteContext,
+    incoming_values: Dict[str, Any],
+    flyte_interface_types: Dict[str, _interface_models.Variable],
+    native_types: Dict[str, type],
+) -> Dict[str, _literals_models.Literal]:
+    # ...
+    for k, v in incoming_values.items():
+        # ...
+        if type(v) is Promise:
+            v = resolve_attr_path_in_promise(v)
+        if isinstance(v, tuple):
+            # This is used to reconstruct the tuple with multiple promises.
+            # We have to create new tuple since tuple is immutable.
+            new_v = []
+            for elem in v:
+                if type(elem) is Promise:
+                    new_v.append(resolve_attr_path_in_promise(elem))
+                else:
+                    new_v.append(elem)
+            if is_namedtuple(t):
+                v = type(v)(*new_v)
+            else:
+                v = tuple(new_v)
+        # we can also support list and dict here, but not the goal in this RFC.
+        # if isinstance(v, list): ...
+        # if isinstance(v, dict): ...
+        result[k] = TypeEngine.to_literal(ctx, v, t, var.type)
+    # ...
+```
+
+##### Iterating Through a Tuple Promise
+
+Flytekit currently does not support iterating through a Promise object, even when the expected output is iterable. For example:
+
+```python
+@task
+def tuple_task() -> Tuple[Tuple[int, str], int]:
+    return (1, "a"), 2
+
+@workflow
+def wf():
+    # These should be supported
+    t, s = tuple_task()
+    (a, b) = t
+
+    # Or alternatively
+    (a, b), s = tuple_task()
+```
+
+To enable iteration through Promise objects, we can update the `__iter__` method in the `Promise` class:
+
+```python
+class Promise:
+    # ...
+    def __iter__(self):
+        # If the promise is a tuple, we can iterate over it
+        if self._type and self._type.tuple_type:
+            # This section is for task & workflow definition so that we didn't have the value yet.
+            for i in range(len(self._type.tuple_type.order)):
+                yield self[i]
+        elif self.val and self.val.tuple:
+            # This section is for task & workflow execution so that we only have the value.
+            for i in range(len(self.val.tuple.literals)):
+                yield self[i]
+        # We can also support list and dict here, but not the goal in this RFC.
+        # elif self._type and self._type.list_type: ...
+        # elif self._type and self._type.map_type: ...
+        else:
+            raise ValueError(
+                f" {self.var} is a Promise. Promise objects are not iterable - can't range() over a promise."
+                " But you can use [index] or the alpha version of @eager workflows"
+            )
+    # ...
+```
 
 ### Flytectl
 
@@ -719,7 +892,7 @@ None
 
 ## 5 Drawbacks
 
-None
+The proposed changes in [Flytekit Other Considerations](#other-considerations-in-the-restriction-of-the-workflow) will modify the core workflow behavior in Flytekit. Consequently, we may also need to update the FlyteConsole to reflect these modifications, such as displaying data aggregation or supporting iteration in the workflow.
 
 ## 6 Alternatives
 
