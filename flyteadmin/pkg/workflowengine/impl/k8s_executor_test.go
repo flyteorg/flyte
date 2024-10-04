@@ -32,10 +32,14 @@ var fakeFlyteWF = FakeFlyteWorkflowV1alpha1{}
 
 type createCallback func(*v1alpha1.FlyteWorkflow, v1.CreateOptions) (*v1alpha1.FlyteWorkflow, error)
 type deleteCallback func(name string, options *v1.DeleteOptions) error
+type updateCallback func(*v1alpha1.FlyteWorkflow) (*v1alpha1.FlyteWorkflow, error)
+type getCallback func(name string, options v1.GetOptions) (*v1alpha1.FlyteWorkflow, error)
 type FakeFlyteWorkflow struct {
 	v1alpha12.FlyteWorkflowInterface
 	createCallback createCallback
 	deleteCallback deleteCallback
+	getCallback getCallback
+	updateCallback updateCallback
 }
 
 func (b *FakeFlyteWorkflow) Create(ctx context.Context, wf *v1alpha1.FlyteWorkflow, opts v1.CreateOptions) (*v1alpha1.FlyteWorkflow, error) {
@@ -50,6 +54,20 @@ func (b *FakeFlyteWorkflow) Delete(ctx context.Context, name string, options v1.
 		return b.deleteCallback(name, &options)
 	}
 	return nil
+}
+
+func (b *FakeFlyteWorkflow) Get(ctx context.Context, name string, options v1.GetOptions) (*v1alpha1.FlyteWorkflow, error) {
+	if b.getCallback != nil {
+		return b.getCallback(name, options)
+	}
+	return nil, nil
+}
+
+func (b *FakeFlyteWorkflow) Update(ctx context.Context, wf *v1alpha1.FlyteWorkflow, opts v1.UpdateOptions) (*v1alpha1.FlyteWorkflow, error) {
+	if b.updateCallback != nil {
+		return b.updateCallback(wf)
+	}
+	return nil, nil
 }
 
 type flyteWorkflowsCallback func(string) v1alpha12.FlyteWorkflowInterface
@@ -86,9 +104,10 @@ var execID = &core.WorkflowExecutionIdentifier{
 }
 
 var flyteWf = &v1alpha1.FlyteWorkflow{
-	ExecutionID: v1alpha1.ExecutionID{
-		WorkflowExecutionIdentifier: execID,
+	ObjectMeta:               v1.ObjectMeta{
+		Finalizers: []string{"mock-finalizer"},
 	},
+	ExecutionID:              v1alpha1.ExecutionID{WorkflowExecutionIdentifier: execID},
 }
 
 var testInputs = &core.LiteralMap{
@@ -278,8 +297,20 @@ func TestExecute_MiscError(t *testing.T) {
 	assert.EqualError(t, err, "failed to create workflow in propeller call failed")
 }
 
-func TestAbort(t *testing.T) {
+func TestAbort_ForceTrue(t *testing.T) {
 	fakeFlyteWorkflow := FakeFlyteWorkflow{}
+	fakeFlyteWorkflow.getCallback = func(name string, options v1.GetOptions) (*v1alpha1.FlyteWorkflow, error) {
+		assert.Equal(t, execID.Name, name)
+		return flyteWf, nil
+	}
+
+	fakeFlyteWorkflow.updateCallback = func(flyteWorkflow *v1alpha1.FlyteWorkflow) (*v1alpha1.FlyteWorkflow, error) {
+		assert.Equal(t, flyteWf, flyteWorkflow)
+		assert.Empty(t, flyteWorkflow.Finalizers)
+		return nil, nil
+	}
+
+
 	fakeFlyteWorkflow.deleteCallback = func(name string, options *v1.DeleteOptions) error {
 		assert.Equal(t, execID.Name, name)
 		assert.Equal(t, options.PropagationPolicy, &deletePropagationBackground)
@@ -296,14 +327,44 @@ func TestAbort(t *testing.T) {
 		Namespace:   namespace,
 		ExecutionID: execID,
 		Cluster:     clusterID,
+		Force: true,
 	})
 	assert.NoError(t, err)
 }
 
-func TestAbort_Notfound(t *testing.T) {
+func TestAbort_ForceFalse(t *testing.T) {
 	fakeFlyteWorkflow := FakeFlyteWorkflow{}
-	fakeFlyteWorkflow.deleteCallback = func(name string, options *v1.DeleteOptions) error {
-		return k8_api_err.NewNotFound(schema.GroupResource{
+	fakeFlyteWorkflow.getCallback = func(name string, options v1.GetOptions) (*v1alpha1.FlyteWorkflow, error) {
+		assert.Equal(t, execID.Name, name)
+		return flyteWf, nil
+	}
+
+	fakeFlyteWorkflow.updateCallback = func(flyteWorkflow *v1alpha1.FlyteWorkflow) (*v1alpha1.FlyteWorkflow, error) {
+		assert.Equal(t, flyteWf, flyteWorkflow)
+		assert.Equal(t, flyteWorkflow.ObjectMeta.Annotations[AbortedWorkflowAnnotation], "true")
+		return nil, nil
+	}
+
+	fakeFlyteWF.flyteWorkflowsCallback = func(ns string) v1alpha12.FlyteWorkflowInterface {
+		assert.Equal(t, namespace, ns)
+		return &fakeFlyteWorkflow
+	}
+	executor := K8sWorkflowExecutor{
+		executionCluster: getFakeExecutionCluster(),
+	}
+	err := executor.Abort(context.TODO(), interfaces.AbortData{
+		Namespace:   namespace,
+		ExecutionID: execID,
+		Cluster:     clusterID,
+ 	})
+	assert.NoError(t, err)
+}
+
+func TestAbort_NotfoundWhenGet(t *testing.T) {
+	fakeFlyteWorkflow := FakeFlyteWorkflow{}
+
+	fakeFlyteWorkflow.getCallback = func(name string, options v1.GetOptions) (*v1alpha1.FlyteWorkflow, error) {
+		return nil, k8_api_err.NewNotFound(schema.GroupResource{
 			Group:    "foo",
 			Resource: "bar",
 		}, execID.Name)
@@ -322,6 +383,76 @@ func TestAbort_Notfound(t *testing.T) {
 	})
 	assert.NoError(t, err)
 }
+
+func TestAbort_NotfoundWhenForceUpdate(t *testing.T) {
+	fakeFlyteWorkflow := FakeFlyteWorkflow{}
+
+	fakeFlyteWorkflow.getCallback = func(name string, options v1.GetOptions) (*v1alpha1.FlyteWorkflow, error) {
+		assert.Equal(t, execID.Name, name)
+		return flyteWf, nil
+	}
+
+	fakeFlyteWorkflow.updateCallback = func(flyteWorkflow *v1alpha1.FlyteWorkflow) (*v1alpha1.FlyteWorkflow, error) {
+		return nil, k8_api_err.NewNotFound(schema.GroupResource{
+			Group:    "foo",
+			Resource: "bar",
+		}, execID.Name)
+	}
+
+
+	fakeFlyteWF.flyteWorkflowsCallback = func(ns string) v1alpha12.FlyteWorkflowInterface {
+		assert.Equal(t, namespace, ns)
+		return &fakeFlyteWorkflow
+	}
+	executor := K8sWorkflowExecutor{
+		executionCluster: getFakeExecutionCluster(),
+	}
+	err := executor.Abort(context.TODO(), interfaces.AbortData{
+		Namespace:   namespace,
+		ExecutionID: execID,
+		Cluster:     clusterID,
+		Force: true,
+	})
+	assert.NoError(t, err)
+}
+
+func TestAbort_NotfoundWhenForceDelete(t *testing.T) {
+	fakeFlyteWorkflow := FakeFlyteWorkflow{}
+
+	fakeFlyteWorkflow.getCallback = func(name string, options v1.GetOptions) (*v1alpha1.FlyteWorkflow, error) {
+		assert.Equal(t, execID.Name, name)
+		return flyteWf, nil
+	}
+
+	fakeFlyteWorkflow.updateCallback = func(flyteWorkflow *v1alpha1.FlyteWorkflow) (*v1alpha1.FlyteWorkflow, error) {
+		assert.Equal(t, flyteWf, flyteWorkflow)
+		return nil, nil
+	}
+
+	fakeFlyteWorkflow.deleteCallback = func(name string, options *v1.DeleteOptions) error {
+		return k8_api_err.NewNotFound(schema.GroupResource{
+			Group:    "foo",
+			Resource: "bar",
+		}, execID.Name)
+	}
+
+
+	fakeFlyteWF.flyteWorkflowsCallback = func(ns string) v1alpha12.FlyteWorkflowInterface {
+		assert.Equal(t, namespace, ns)
+		return &fakeFlyteWorkflow
+	}
+	executor := K8sWorkflowExecutor{
+		executionCluster: getFakeExecutionCluster(),
+	}
+	err := executor.Abort(context.TODO(), interfaces.AbortData{
+		Namespace:   namespace,
+		ExecutionID: execID,
+		Cluster:     clusterID,
+		Force: true,
+	})
+	assert.NoError(t, err)
+}
+
 
 func TestAbort_MiscError(t *testing.T) {
 	fakeFlyteWorkflow := FakeFlyteWorkflow{}

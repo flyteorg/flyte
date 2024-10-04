@@ -1,6 +1,10 @@
 package controller
 
-import v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+import (
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+)
 
 const FinalizerKey = "flyte-finalizer"
 
@@ -33,4 +37,10 @@ func FinalizersIdentical(o1 v1.Object, o2 v1.Object) bool {
 // Check if any finalizer is set
 func HasFinalizer(meta v1.Object) bool {
 	return len(meta.GetFinalizers()) != 0
+}
+
+// Check if the workflow is annotated as aborted
+func IsAborted(w *v1alpha1.FlyteWorkflow) bool {
+	annotations := w.GetObjectMeta().GetAnnotations()
+	return annotations != nil && annotations[AbortedWorkflowAnnotation] == "true"
 }

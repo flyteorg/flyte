@@ -3450,6 +3450,7 @@ func TestTerminateExecution(t *testing.T) {
 			Domain:  "domain",
 			Name:    "name",
 		}, data.ExecutionID))
+		assert.True(t, data.Force)
 		return true
 	})).Return(nil)
 	mockExecutor.OnID().Return("customMockExecutor")
@@ -3467,6 +3468,69 @@ func TestTerminateExecution(t *testing.T) {
 			Name:    "name",
 		},
 		Cause: abortCause,
+	})
+
+	assert.Nil(t, err)
+	assert.NotNil(t, resp)
+}
+
+func TestForceTerminateExecution(t *testing.T) {
+	repository := repositoryMocks.NewMockRepository()
+	startTime := time.Now()
+	executionGetFunc := makeExecutionGetFunc(t, []byte{}, &startTime)
+	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(executionGetFunc)
+
+	abortCause := "abort cause"
+	updateExecutionFunc := func(
+		context context.Context, execution models.Execution) error {
+		assert.Equal(t, "project", execution.Project)
+		assert.Equal(t, "domain", execution.Domain)
+		assert.Equal(t, "name", execution.Name)
+		assert.Equal(t, uint(1), execution.LaunchPlanID)
+		assert.Equal(t, uint(2), execution.WorkflowID)
+		assert.Equal(t, core.WorkflowExecution_ABORTING.String(), execution.Phase)
+		assert.Equal(t, execution.ExecutionCreatedAt, execution.ExecutionUpdatedAt,
+			"an abort call should not change ExecutionUpdatedAt until a corresponding execution event is received")
+		assert.Equal(t, abortCause, execution.AbortCause)
+		assert.Equal(t, testCluster, execution.Cluster)
+
+		var unmarshaledClosure admin.ExecutionClosure
+		err := proto.Unmarshal(execution.Closure, &unmarshaledClosure)
+		assert.NoError(t, err)
+		assert.True(t, proto.Equal(&admin.AbortMetadata{
+			Cause:     abortCause,
+			Principal: principal,
+		}, unmarshaledClosure.GetAbortMetadata()))
+		return nil
+	}
+	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetUpdateCallback(updateExecutionFunc)
+
+	mockExecutor := workflowengineMocks.WorkflowExecutor{}
+	mockExecutor.OnAbortMatch(mock.Anything, mock.MatchedBy(func(data workflowengineInterfaces.AbortData) bool {
+		assert.True(t, proto.Equal(&core.WorkflowExecutionIdentifier{
+			Project: "project",
+			Domain:  "domain",
+			Name:    "name",
+		}, data.ExecutionID))
+		assert.True(t, data.Force)
+		return true
+	})).Return(nil)
+	mockExecutor.OnID().Return("customMockExecutor")
+	r := plugins.NewRegistry()
+	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
+	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
+
+	identity, err := auth.NewIdentityContext("", principal, "", time.Now(), sets.NewString(), nil, nil)
+	assert.NoError(t, err)
+	ctx := identity.WithContext(context.Background())
+	resp, err := execManager.TerminateExecution(ctx, &admin.ExecutionTerminateRequest{
+		Id: &core.WorkflowExecutionIdentifier{
+			Project: "project",
+			Domain:  "domain",
+			Name:    "name",
+		},
+		Cause: abortCause,
+		Force: true,
 	})
 
 	assert.Nil(t, err)

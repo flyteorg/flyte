@@ -42,6 +42,8 @@ type propellerMetrics struct {
 	RoundTime                labeled.StopWatch
 }
 
+const AbortedWorkflowAnnotation = "workflow-aborted"
+
 func newPropellerMetrics(scope promutils.Scope) *propellerMetrics {
 	roundScope := scope.NewSubScope("round")
 	return &propellerMetrics{
@@ -103,7 +105,7 @@ func (p *Propeller) TryMutateWorkflow(ctx context.Context, originalW *v1alpha1.F
 	ctx = contextutils.WithResourceVersion(ctx, mutableW.GetResourceVersion())
 
 	maxRetries := uint32(p.cfg.MaxWorkflowRetries)
-	if IsDeleted(mutableW) || (mutableW.Status.FailedAttempts > maxRetries) {
+	if IsAborted(mutableW) || IsDeleted(mutableW) || (mutableW.Status.FailedAttempts > maxRetries)  {
 		var err error
 		func() {
 			defer func() {
