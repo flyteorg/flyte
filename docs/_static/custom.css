@@ -55,7 +55,7 @@ class, which is only on the root page
     max-width: 75em;
 }
 
-/* aligh navbar items with the sidebar */
+/* align navbar items with the sidebar */
 .bd-header .navbar-header-items__start {
     width: 15%;
     min-width: 250px;
