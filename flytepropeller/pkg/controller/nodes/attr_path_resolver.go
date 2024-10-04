@@ -74,8 +74,8 @@ func resolveAttrPathInPromise(ctx context.Context, datastore *storage.DataStore,
 // resolveAttrPathInPbStruct resolves the protobuf struct (e.g. dataclass) with attribute path
 func resolveAttrPathInPbStruct(nodeID string, st *structpb.Struct, bindAttrPath []*core.PromiseAttribute) (*core.Literal, error) {
 
-	var currVal interface{}
-	var tmpVal interface{}
+	var currVal any
+	var tmpVal any
 	var exist bool
 
 	currVal = st.AsMap()
@@ -84,16 +84,18 @@ func resolveAttrPathInPbStruct(nodeID string, st *structpb.Struct, bindAttrPath 
 	for _, attr := range bindAttrPath {
 		switch resolvedVal := currVal.(type) {
 		// map
-		case map[string]interface{}:
+		case map[string]any:
 			tmpVal, exist = resolvedVal[attr.GetStringValue()]
 			if !exist {
 				return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID, "key [%v] does not exist in literal %v", attr.GetStringValue(), currVal)
 			}
 			currVal = tmpVal
 		// list
-		case []interface{}:
-			if int(attr.GetIntValue()) >= len(resolvedVal) {
-				return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID, "index [%v] is out of range of %v", attr.GetIntValue(), currVal)
+		case []any:
+			index := int(attr.GetIntValue())
+			if index < 0 || index >= len(resolvedVal) {
+				return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID,
+					"index [%v] is out of range of %v", index, resolvedVal)
 			}
 			currVal = resolvedVal[attr.GetIntValue()]
 		}
@@ -113,8 +115,8 @@ func resolveAttrPathInBinary(nodeID string, binaryIDL *core.Binary, bindAttrPath
 	binaryBytes := binaryIDL.GetValue()
 	serializationFormat := binaryIDL.GetTag()
 
-	var currVal interface{}
-	var tmpVal interface{}
+	var currVal any
+	var tmpVal any
 	var exist bool
 
 	if serializationFormat == messagepack {
@@ -133,18 +135,22 @@ func resolveAttrPathInBinary(nodeID string, binaryIDL *core.Binary, bindAttrPath
 	for _, attr := range bindAttrPath {
 		switch resolvedVal := currVal.(type) {
 		// map
-		case map[interface{}]interface{}:
+		case map[any]any:
 			tmpVal, exist = resolvedVal[attr.GetStringValue()]
 			if !exist {
 				return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID, "key [%v] does not exist in literal %v", attr.GetStringValue(), currVal)
 			}
 			currVal = tmpVal
 		// list
-		case []interface{}:
-			if int(attr.GetIntValue()) >= len(resolvedVal) {
-				return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID, "index [%v] is out of range of %v", attr.GetIntValue(), currVal)
+		case []any:
+			index := int(attr.GetIntValue())
+			if index < 0 || index >= len(resolvedVal) {
+				return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID,
+					"index [%v] is out of range of %v", index, resolvedVal)
 			}
 			currVal = resolvedVal[attr.GetIntValue()]
+		default:
+			return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID, "unexpected type [%T] for value %v", currVal, currVal)
 		}
 	}
 
