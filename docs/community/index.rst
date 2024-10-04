@@ -102,4 +102,12 @@ If you want to promote a product or service, go to the #shameless-promotion chan
 
 Messages that don't follow these rules will be deleted.
 
+.. toctree::
+    :maxdepth: 1
+    :hidden:
 
+    Contributing to Flyte <contribute>
+    Contributing documentation <contribute_docs.rst>
+    Roadmap <roadmap>
+    Frequently asked questions <https://github.com/flyteorg/flyte/discussions/categories/q-a>
+    Troubleshooting guide <troubleshoot>
