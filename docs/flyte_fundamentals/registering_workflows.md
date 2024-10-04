@@ -352,15 +352,6 @@ a {py:class}`~flytekit.remote.remote.FlyteRemote` object. You can learn more
 about how to do this {ref}`here <flytekit:design-control-plane>`.
 ```
 
-```{note}
-When using `pyflyte` to run jobs, the `k8sPod.dataConfig` section is automatically added to the task configuration. This section is crucial to ensure the task has access to the necessary input files.
-
-In earlier versions, some users experienced an issue where the `k8sPod.dataConfig` section was missing when registering workflows via `flytectl register files`. This omission resulted in tasks failing due to unavailable input files.
-
-**Resolution:**
-This issue has been addressed in a recent update, where the hydration of the `taskspec` now correctly includes the `dataConfig` for Kubernetes pods. So ensure you are using the latest versions of Flyte components where this fix has been implemented.
-```
-
 ## CI/CD with Flyte and GitHub Actions
 
 You can use any of the commands we learned in this guide to register, execute,
