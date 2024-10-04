@@ -607,7 +607,6 @@ spec:
           - /etc/flyte/config/*.yaml
           - migrate
           - seed-projects
-
           image: "cr.flyte.org/flyteorg/flyteadmin:v1.13.2"
           imagePullPolicy: "IfNotPresent"
           name: seed-projects
