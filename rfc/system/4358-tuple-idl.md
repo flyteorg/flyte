@@ -618,6 +618,10 @@ This transformer support three types of tuple, `typing.Tuple`, `tuple`, and `typ
   - We use the `tuple_name` as the identifier for the NamedTuple and Tuple. If the `tuple_name` is empty, we will guess the type as `Tuple`. Otherwise, we will guess the type as `NamedTuple`.
   - We can easily get the each field of the NamedTuple and Tuple via the `order` and the map of types.
 
+#### Supporting Attribute Paths for Tuple
+
+It is commonly used to access the value of each field in `NamedTuple` and `Tuple` by its name or index. We need to support both integer and string attribute paths for `NamedTuple` and `Tuple` in FlyteKit.
+
 ### Flytectl
 
 From Flytectl, we can construct the input of tuple for the execution.
@@ -720,7 +724,7 @@ None
 ## 6 Alternatives
 
 1. There are another possible structure for the `LiteralTupleMap` and `TupleType` in FlyteIDL as discussed above in [Other Considerations](#other-considerations).
-2. In Flytekit, we can separate the `NamedTuple` and `Tuple` into two different transformers, and this will make the code more readable and maintainable.
+2. In Flytekit, we can separate the `NamedTuple` and `Tuple` into two different transformers, and this will make the code more readable and maintainable. However, the main problem is that the NamedTuple is not a type in Python, it is a function that returns a type. Separating them will make the registries of the transformers more complex and harder to maintain.
 
 ## 7 Potential Impact and Dependencies
 
