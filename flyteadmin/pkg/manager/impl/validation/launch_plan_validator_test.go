@@ -231,6 +231,50 @@ func TestGetLpExpectedInvalidFixedInput(t *testing.T) {
 	assert.Nil(t, actualMap)
 }
 
+func TestGetLpExpectedInvalidFixedInputWithUnknownIDL(t *testing.T) {
+	unsupportedLiteral := &core.Literal{
+		Value: &core.Literal_Scalar{
+			Scalar: &core.Scalar{},
+		},
+	}
+	workflowVariableMap := &core.VariableMap{
+		Variables: map[string]*core.Variable{
+			"foo": {
+				Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: 1000}},
+			},
+		},
+	}
+	defaultInputs := &core.ParameterMap{
+		Parameters: map[string]*core.Parameter{
+			"foo": {
+				Var: &core.Variable{
+					// 1000 means an unsupported type
+					Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: 1000}},
+				},
+				Behavior: &core.Parameter_Default{
+					Default: unsupportedLiteral,
+				},
+			},
+		},
+	}
+	fixedInputs := &core.LiteralMap{
+		Literals: map[string]*core.Literal{
+			"foo": unsupportedLiteral, // This will lead to a nil inputType
+		},
+	}
+
+	_, err := checkAndFetchExpectedInputForLaunchPlan(
+		workflowVariableMap,
+		fixedInputs,
+		defaultInputs,
+	)
+
+	assert.NotNil(t, err)
+
+	// Expected error message
+	assert.Contains(t, err.Error(), failedToValidateLiteralType)
+}
+
 func TestGetLpExpectedNoFixedInput(t *testing.T) {
 	request := testutils.GetLaunchPlanRequest()
 	actualMap, err := checkAndFetchExpectedInputForLaunchPlan(

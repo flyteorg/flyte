@@ -636,7 +636,6 @@ func MakeLiteralForType(t *core.LiteralType, v interface{}) (*core.Literal, erro
 		if !found {
 			return nil, fmt.Errorf("incorrect union value [%s], supported values %+v", v, newT.UnionType.Variants)
 		}
-
 	default:
 		return nil, fmt.Errorf("unsupported type %s", t.String())
 	}
