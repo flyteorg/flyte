@@ -55,7 +55,7 @@ func TestLiteralTypeForLiterals(t *testing.T) {
 					Value: &core.Scalar_Binary{
 						Binary: &core.Binary{
 							Value: serializedBinaryData,
-							Tag:   messagepack,
+							Tag:   coreutils.MESSAGEPACK,
 						},
 					},
 				},
@@ -83,7 +83,7 @@ func TestLiteralTypeForLiterals(t *testing.T) {
 					Value: &core.Scalar_Binary{
 						Binary: &core.Binary{
 							Value: serializedBinaryData,
-							Tag:   messagepack,
+							Tag:   coreutils.MESSAGEPACK,
 						},
 					},
 				},

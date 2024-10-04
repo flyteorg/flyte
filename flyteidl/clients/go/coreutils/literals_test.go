@@ -488,7 +488,7 @@ func TestMakeLiteralForType(t *testing.T) {
 					Value: &core.Scalar_Binary{
 						Binary: &core.Binary{
 							Value: msgpackBytes,
-							Tag:   messagepack,
+							Tag:   MESSAGEPACK,
 						},
 					},
 				},

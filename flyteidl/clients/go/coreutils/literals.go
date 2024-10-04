@@ -19,7 +19,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
-const messagepack = "msgpack"
+const MESSAGEPACK = "msgpack"
 
 func MakePrimitive(v interface{}) (*core.Primitive, error) {
 	switch p := v.(type) {
@@ -146,7 +146,7 @@ func MakeBinaryLiteral(v []byte) *core.Literal {
 				Value: &core.Scalar_Binary{
 					Binary: &core.Binary{
 						Value: v,
-						Tag:   messagepack,
+						Tag:   MESSAGEPACK,
 					},
 				},
 			},
@@ -392,7 +392,7 @@ func MakeLiteralForSimpleType(t core.SimpleType, s string) (*core.Literal, error
 		scalar.Value = &core.Scalar_Binary{
 			Binary: &core.Binary{
 				Value: []byte(s),
-				Tag:   messagepack,
+				Tag:   MESSAGEPACK,
 			},
 		}
 	case core.SimpleType_ERROR:
@@ -585,7 +585,7 @@ func MakeLiteralForType(t *core.LiteralType, v interface{}) (*core.Literal, erro
 							Value: &core.Scalar_Binary{
 								Binary: &core.Binary{
 									Value: byteValue,
-									Tag:   messagepack,
+									Tag:   MESSAGEPACK,
 								},
 							},
 						},

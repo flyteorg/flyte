@@ -6,13 +6,12 @@ import (
 	"github.com/shamaton/msgpack/v2"
 	"google.golang.org/protobuf/types/known/structpb"
 
+	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/common"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/errors"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
-
-const messagepack = "msgpack"
 
 // resolveAttrPathInPromise resolves the literal with attribute path
 // If the promise is chained with attributes (e.g. promise.a["b"][0]), then we need to resolve the promise
@@ -119,11 +118,10 @@ func resolveAttrPathInBinary(nodeID string, binaryIDL *core.Binary, bindAttrPath
 	var tmpVal any
 	var exist bool
 
-	if serializationFormat == messagepack {
+	if serializationFormat == coreutils.MESSAGEPACK {
 		err := msgpack.Unmarshal(binaryBytes, &currVal)
 		if err != nil {
 			return nil, err
-
 		}
 	} else {
 		return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID,
