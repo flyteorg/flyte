@@ -136,14 +136,27 @@ func resolveAttrPathInBinary(nodeID string, binaryIDL *core.Binary, bindAttrPath
 		switch resolvedVal := currVal.(type) {
 		// map
 		case map[any]any:
-			tmpVal, exist = resolvedVal[attr.GetStringValue()]
+			// TODO: for cases like Dict[int, Any] in a dataclass, this will fail,
+			// will support it in the future when flytekit supports it
+			promise, ok := attr.GetValue().(*core.PromiseAttribute_StringValue)
+			if !ok {
+				return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID,
+					"unexpected attribute type [%T] for value %v", attr.GetValue(), attr.GetValue())
+			}
+			key := promise.StringValue
+			tmpVal, exist = resolvedVal[key]
 			if !exist {
 				return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID, "key [%v] does not exist in literal %v", attr.GetStringValue(), currVal)
 			}
 			currVal = tmpVal
 		// list
 		case []any:
-			index := int(attr.GetIntValue())
+			promise, ok := attr.GetValue().(*core.PromiseAttribute_IntValue)
+			if !ok {
+				return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID,
+					"unexpected attribute type [%T] for value %v", attr.GetValue(), attr.GetValue())
+			}
+			index := int(promise.IntValue) // convert to int64
 			if index < 0 || index >= len(resolvedVal) {
 				return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID,
 					"index [%v] is out of range of %v", index, resolvedVal)
@@ -154,19 +167,13 @@ func resolveAttrPathInBinary(nodeID string, binaryIDL *core.Binary, bindAttrPath
 		}
 	}
 
-	if serializationFormat == messagepack {
-		// Marshal the current value to MessagePack bytes
-		resolvedBinaryBytes, err := msgpack.Marshal(currVal)
-		if err != nil {
-			return nil, err
-		}
-		// Construct and return the binary-encoded literal
-		return constructResolvedBinary(resolvedBinaryBytes, serializationFormat), nil
+	// Marshal the current value to MessagePack bytes
+	resolvedBinaryBytes, err := msgpack.Marshal(currVal)
+	if err != nil {
+		return nil, err
 	}
-	// Unsupported serialization format
-	return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID,
-		"Unsupported format '%v' found for literal value.\n"+
-			"Please ensure the serialization format is supported.", serializationFormat)
+	// Construct and return the binary-encoded literal
+	return constructResolvedBinary(resolvedBinaryBytes, serializationFormat), nil
 }
 
 func constructResolvedBinary(resolvedBinaryBytes []byte, serializationFormat string) *core.Literal {
