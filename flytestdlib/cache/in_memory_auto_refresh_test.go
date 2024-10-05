@@ -8,10 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/require"
-
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"k8s.io/client-go/util/workqueue"
 	testingclock "k8s.io/utils/clock/testing"
 
@@ -165,7 +162,7 @@ func TestCacheFour(t *testing.T) {
 		// If the cache tries to enqueue the item, a panic will be thrown.
 		assert.Eventually(t, func() bool { return cache.enqueueCount.Load() > enqueueCount }, time.Second, time.Millisecond)
 		// Should not enqueue
-		require.Equal(t, syncCount, cache.syncCount.Load())
+		assert.Equal(t, syncCount, cache.syncCount.Load())
 
 		syncCount = cache.syncCount.Load()
 		enqueueCount = cache.enqueueCount.Load()
@@ -174,7 +171,7 @@ func TestCacheFour(t *testing.T) {
 		// If the cache tries to enqueue the item, a panic will be thrown.
 		assert.Eventually(t, func() bool { return cache.enqueueCount.Load() > enqueueCount }, time.Second, time.Millisecond)
 		// Should not enqueue
-		require.Equal(t, syncCount, cache.syncCount.Load())
+		assert.Equal(t, syncCount, cache.syncCount.Load())
 
 		cancel()
 	})
@@ -202,7 +199,7 @@ func TestCacheFour(t *testing.T) {
 		// If the cache tries to enqueue the item, a panic will be thrown.
 		assert.Eventually(t, func() bool { return cache.enqueueCount.Load() > enqueueCount }, time.Second, time.Millisecond)
 		// Should not enqueue
-		require.Equal(t, syncCount, cache.syncCount.Load())
+		assert.Equal(t, syncCount, cache.syncCount.Load())
 
 		err = cache.DeleteDelayed(itemID)
 		assert.NoError(t, err)
