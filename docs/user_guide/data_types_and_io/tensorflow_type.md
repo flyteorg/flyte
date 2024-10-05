@@ -8,6 +8,12 @@
 
 This document outlines the TensorFlow types available in Flyte, which facilitate the integration of TensorFlow models and datasets in Flyte workflows.
 
+### Import necessary libraries and modules
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/tensorflow_type.py
+:caption: data_types_and_io/tensorflow_type.py
+:lines: 1-7
+```
+
 ## Tensorflow Model
 Flyte supports the TensorFlow SavedModel format for serializing and deserializing `tf.keras.Model` instances. The `TensorFlowModelTransformer` is responsible for handling these transformations.
 
@@ -26,7 +32,7 @@ To clone and run the example code on this page, see the [Flytesnacks repo][flyte
 ```
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/tensorflow_type.py
 :caption: data_types_and_io/tensorflow_type.py
-:lines: 2-24
+:lines: 9-28
 ```
 
 ## TFRecord Files
@@ -43,7 +49,7 @@ The `TensorFlowRecordFileTransformer` enables you to work with single TFRecord f
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/tensorflow_type.py
 :caption: data_types_and_io/tensorflow_type.py
-:lines: 27-43
+:lines: 31-44
 ```
 
 ## TFRecord Directories
@@ -62,7 +68,7 @@ The `TensorFlowRecordsDirTransformer` allows you to work with directories of TFR
 #### Example
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/tensorflow_type.py
 :caption: data_types_and_io/tensorflow_type.py
-:lines: 46-65
+:lines: 47-61
 ```
 
 ## Configuration Class: `TFRecordDatasetConfig`
@@ -79,5 +85,5 @@ This configuration is crucial for optimizing the reading process of TFRecord dat
 #### Example
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/tensorflow_type.py
 :caption: data_types_and_io/tensorflow_type.py
-:lines: 67-86
+:lines: 64-78
 ```
