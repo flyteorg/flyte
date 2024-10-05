@@ -7,7 +7,6 @@ import (
 	"sync"
 	"time"
 
-
 	lru "github.com/hashicorp/golang-lru"
 	"github.com/prometheus/client_golang/prometheus"
 	"k8s.io/client-go/util/workqueue"
@@ -78,7 +77,7 @@ func defaultOptions() *Options {
 // Option for the KeyfuncProvider
 type Option func(*Options)
 
-// InMemoryAutoRefresh is an in-memory implementation of the AutoRefresh interaface. It is a thread-safe general
+// InMemoryAutoRefresh is an in-memory implementation of the AutoRefresh interface. It is a thread-safe general
 // purpose auto-refresh cache that watches for updates asynchronously for the keys after they are added to
 // the cache. An item can be inserted only once.
 //
