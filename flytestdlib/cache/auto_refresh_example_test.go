@@ -15,7 +15,7 @@ import (
 type ExampleItemStatus string
 
 const (
-	ExampleStatusNotStarted ExampleItemStatus = "Not-started"
+	ExampleStatusNotStarted ExampleItemStatus = "Not-enqueueLoopRunning"
 	ExampleStatusStarted    ExampleItemStatus = "Started"
 	ExampleStatusSucceeded  ExampleItemStatus = "Completed"
 )
