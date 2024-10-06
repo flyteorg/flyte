@@ -3,9 +3,9 @@ FROM --platform=${BUILDPLATFORM} mgoltzsche/podman:minimal AS builder
 
 ARG TARGETARCH
 ENV TARGETARCH "${TARGETARCH}"
-
+#current PWD is /build
 WORKDIR /build
-
+RUN ls -la
 COPY images/manifest.txt images/preload ./
 RUN --security=insecure ./preload manifest.txt
 
