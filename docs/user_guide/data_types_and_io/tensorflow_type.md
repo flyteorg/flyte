@@ -81,9 +81,3 @@ The `TFRecordDatasetConfig` class is a data structure used to configure the para
 - **name**: (Optional) Assigns a name to the operation for easier identification in the pipeline.
 
 This configuration is crucial for optimizing the reading process of TFRecord datasets, especially when dealing with large datasets or when specific performance tuning is required.
-
-#### Example
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/tensorflow_type.py
-:caption: data_types_and_io/tensorflow_type.py
-:lines: 64-78
-```
