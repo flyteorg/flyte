@@ -17,6 +17,7 @@ import (
 )
 
 var deletePropagationBackground = v1.DeletePropagationBackground
+
 const AbortedWorkflowAnnotation = "workflow-aborted"
 const defaultIdentifier = "DefaultK8sExecutor"
 
@@ -112,7 +113,7 @@ func (e K8sWorkflowExecutor) Abort(ctx context.Context, data interfaces.AbortDat
 		if w.Finalizers != nil || w.ObjectMeta.Finalizers != nil {
 			w.Finalizers = []string{}
 		}
-		
+
 		// Write the updated workflow
 		if _, err := target.FlyteClient.FlyteworkflowV1alpha1().FlyteWorkflows(data.Namespace).Update(ctx, w, v1.UpdateOptions{}); err != nil {
 			if k8_api_err.IsNotFound(err) {
@@ -121,14 +122,14 @@ func (e K8sWorkflowExecutor) Abort(ctx context.Context, data interfaces.AbortDat
 			}
 			return errors.NewFlyteAdminErrorf(codes.Internal, "failed to remove finalizer for execution [%+v] in cluster: %s with err %v", data.ExecutionID, target.ID, err)
 		}
-		
+
 		// Finally delete the workflow
 		if err := target.FlyteClient.FlyteworkflowV1alpha1().FlyteWorkflows(data.Namespace).Delete(ctx, data.ExecutionID.GetName(), v1.DeleteOptions{
 			PropagationPolicy: &deletePropagationBackground,
 		}); err != nil && !k8_api_err.IsNotFound(err) {
 			return errors.NewFlyteAdminErrorf(codes.Internal, "failed to terminate execution: %v with err %v", data.ExecutionID, err)
 		}
-		
+
 		return nil
 
 	}
@@ -138,7 +139,7 @@ func (e K8sWorkflowExecutor) Abort(ctx context.Context, data interfaces.AbortDat
 	}
 
 	w.ObjectMeta.Annotations[AbortedWorkflowAnnotation] = "true"
-	
+
 	_, err = target.FlyteClient.FlyteworkflowV1alpha1().FlyteWorkflows(data.Namespace).Update(ctx, w, v1.UpdateOptions{})
 
 	// An IsNotFound error indicates the resource is already deleted.

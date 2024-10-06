@@ -38,7 +38,7 @@ type FakeFlyteWorkflow struct {
 	v1alpha12.FlyteWorkflowInterface
 	createCallback createCallback
 	deleteCallback deleteCallback
-	getCallback getCallback
+	getCallback    getCallback
 	updateCallback updateCallback
 }
 
@@ -104,10 +104,10 @@ var execID = &core.WorkflowExecutionIdentifier{
 }
 
 var flyteWf = &v1alpha1.FlyteWorkflow{
-	ObjectMeta:               v1.ObjectMeta{
+	ObjectMeta: v1.ObjectMeta{
 		Finalizers: []string{"mock-finalizer"},
 	},
-	ExecutionID:              v1alpha1.ExecutionID{WorkflowExecutionIdentifier: execID},
+	ExecutionID: v1alpha1.ExecutionID{WorkflowExecutionIdentifier: execID},
 }
 
 var testInputs = &core.LiteralMap{
@@ -310,7 +310,6 @@ func TestAbort_ForceTrue(t *testing.T) {
 		return nil, nil
 	}
 
-
 	fakeFlyteWorkflow.deleteCallback = func(name string, options *v1.DeleteOptions) error {
 		assert.Equal(t, execID.Name, name)
 		assert.Equal(t, options.PropagationPolicy, &deletePropagationBackground)
@@ -327,7 +326,7 @@ func TestAbort_ForceTrue(t *testing.T) {
 		Namespace:   namespace,
 		ExecutionID: execID,
 		Cluster:     clusterID,
-		Force: true,
+		Force:       true,
 	})
 	assert.NoError(t, err)
 }
@@ -356,7 +355,7 @@ func TestAbort_ForceFalse(t *testing.T) {
 		Namespace:   namespace,
 		ExecutionID: execID,
 		Cluster:     clusterID,
- 	})
+	})
 	assert.NoError(t, err)
 }
 
@@ -399,7 +398,6 @@ func TestAbort_NotfoundWhenForceUpdate(t *testing.T) {
 		}, execID.Name)
 	}
 
-
 	fakeFlyteWF.flyteWorkflowsCallback = func(ns string) v1alpha12.FlyteWorkflowInterface {
 		assert.Equal(t, namespace, ns)
 		return &fakeFlyteWorkflow
@@ -411,7 +409,7 @@ func TestAbort_NotfoundWhenForceUpdate(t *testing.T) {
 		Namespace:   namespace,
 		ExecutionID: execID,
 		Cluster:     clusterID,
-		Force: true,
+		Force:       true,
 	})
 	assert.NoError(t, err)
 }
@@ -436,7 +434,6 @@ func TestAbort_NotfoundWhenForceDelete(t *testing.T) {
 		}, execID.Name)
 	}
 
-
 	fakeFlyteWF.flyteWorkflowsCallback = func(ns string) v1alpha12.FlyteWorkflowInterface {
 		assert.Equal(t, namespace, ns)
 		return &fakeFlyteWorkflow
@@ -448,16 +445,15 @@ func TestAbort_NotfoundWhenForceDelete(t *testing.T) {
 		Namespace:   namespace,
 		ExecutionID: execID,
 		Cluster:     clusterID,
-		Force: true,
+		Force:       true,
 	})
 	assert.NoError(t, err)
 }
 
-
 func TestAbort_MiscError(t *testing.T) {
 	fakeFlyteWorkflow := FakeFlyteWorkflow{}
-	fakeFlyteWorkflow.deleteCallback = func(name string, options *v1.DeleteOptions) error {
-		return errors.New("call failed")
+	fakeFlyteWorkflow.getCallback = func(name string, options v1.GetOptions) (*v1alpha1.FlyteWorkflow, error) {
+		return nil, errors.New("call failed")
 	}
 	fakeFlyteWF.flyteWorkflowsCallback = func(ns string) v1alpha12.FlyteWorkflowInterface {
 		assert.Equal(t, namespace, ns)

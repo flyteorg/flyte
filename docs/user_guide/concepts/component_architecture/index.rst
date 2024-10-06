@@ -117,5 +117,5 @@ Component Code References
     :name: component code architecture
     :hidden:
 
-    component_architecture/flytepropeller_architecture
-    component_architecture/native_scheduler_architecture
+    flytepropeller_architecture
+    native_scheduler_architecture

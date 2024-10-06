@@ -1741,7 +1741,7 @@ func (m *ExecutionManager) TerminateExecution(
 
 		ExecutionID: request.Id,
 		Cluster:     executionModel.Cluster,
-		Force: request.Force,
+		Force:       request.Force,
 	})
 	if err != nil {
 		m.systemMetrics.TerminateExecutionFailures.Inc()

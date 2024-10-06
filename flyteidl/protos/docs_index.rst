@@ -16,3 +16,4 @@ and documentation of all these entities.
 	docs/event/index
 	docs/plugins/index
 	docs/service/index
+	docs/contributing
