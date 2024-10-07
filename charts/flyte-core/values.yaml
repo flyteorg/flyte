@@ -945,6 +945,9 @@ external_events:
 # Cloud events are used to send events (unprocessed, as Admin see them) in cloud event format to
 # an SNS topic (or gcp equivalent)
 cloud_events:
+  # -- The name of the secret to use to alternatively load in cloud events configuration via a secret. Useful when the
+  # configuration contains secrets.
+  secretName: ""
   enable: false
   type: aws
   aws:
@@ -955,6 +958,33 @@ cloud_events:
     topicName: "arn:aws:sns:us-east-2:123456:123-my-topic"
     eventTypes:
       - all  # Or workflow, node, task. Or "*"
+  # -- Configuration for sending cloud events to Kafka
+  kafka:
+    # -- The version of Kafka
+    version: "3.7.0"
+    # -- The kafka brokers to talk to
+    brokers:
+      - mybroker:443
+    # -- SASL based authentication
+    saslConfig:
+      # -- Whether to use SASL authentication
+      enabled: false
+      # -- The kafka user
+      user: kafka
+      # -- The password for the kafka user
+      password: ""
+      # -- Whether the send the SASL handsahke first
+      handshake: true
+      # -- Which SASL mechanism to use. Defaults to PLAIN
+      mechanism: PLAIN
+    # -- Certificate based authentication
+    tlsConfig:
+      # -- Whether to use certificate based authentication or TLS
+      enabled: false
+      # -- Path to the client certificate
+      certPath: /etc/ssl/certs/kafka-client.crt
+      # -- Path to the client private key
+      keyPath: /etc/ssl/certs/kafka-client.key
 
 # -- Configuration for the Cluster resource manager component. This is an optional component, that enables automatic
 # cluster configuration. This is useful to set default quotas, manage namespaces etc that map to a project/domain

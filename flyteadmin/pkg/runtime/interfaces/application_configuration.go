@@ -1,6 +1,10 @@
 package interfaces
 
 import (
+	"context"
+	"crypto/tls"
+
+	"github.com/Shopify/sarama"
 	"github.com/golang/protobuf/ptypes/wrappers"
 	"golang.org/x/time/rate"
 
@@ -231,11 +235,75 @@ type GCPConfig struct {
 	ProjectID string `json:"projectId"`
 }
 
+// This section holds SASL config for Kafka
+type SASLConfig struct {
+	// Whether to use SASL
+	Enabled bool `json:"enabled"`
+	// The username
+	User string `json:"user"`
+	// The password
+	Password  string `json:"password"`
+	Handshake bool   `json:"handshake"`
+	// Which SASL Mechanism to use. Defaults to PLAIN
+	Mechanism sarama.SASLMechanism `json:"mechanism"`
+}
+
+// This section holds TLS config for Kafka clients
+type TLSConfig struct {
+	// Whether to use TLS
+	Enabled bool `json:"enabled"`
+	// Whether to skip certificate verification
+	InsecureSkipVerify bool `json:"insecureSkipVerify"`
+	// The location of the client certificate
+	CertPath string `json:"certPath"`
+	// The location of the client private key
+	KeyPath string `json:"keyPath"`
+}
+
+// This section holds configs for Kafka clients
 type KafkaConfig struct {
 	// The version of Kafka, e.g. 2.1.0, 0.8.2.0
 	Version string `json:"version"`
 	// kafka broker addresses
 	Brokers []string `json:"brokers"`
+	// sasl config
+	SASLConfig SASLConfig `json:"saslConfig"`
+	// tls config
+	TLSConfig TLSConfig `json:"tlsConfig"`
+}
+
+func (k KafkaConfig) UpdateSaramaConfig(ctx context.Context, s *sarama.Config) {
+	var err error
+	s.Version, err = sarama.ParseKafkaVersion(k.Version)
+	if err != nil {
+		panic(err)
+	}
+
+	if k.SASLConfig.Enabled {
+		s.Net.SASL.Enable = true
+		s.Net.SASL.User = k.SASLConfig.User
+		s.Net.SASL.Password = k.SASLConfig.Password
+		s.Net.SASL.Handshake = k.SASLConfig.Handshake
+
+		if k.SASLConfig.Mechanism == "" {
+			k.SASLConfig.Mechanism = sarama.SASLTypePlaintext
+		}
+		s.Net.SASL.Mechanism = k.SASLConfig.Mechanism
+	}
+
+	if k.TLSConfig.Enabled {
+		s.Net.TLS.Enable = true
+		s.Net.TLS.Config = &tls.Config{
+			InsecureSkipVerify: k.TLSConfig.InsecureSkipVerify,
+		}
+		if k.TLSConfig.KeyPath != "" && k.TLSConfig.CertPath != "" {
+			cert, err := tls.LoadX509KeyPair(k.TLSConfig.CertPath, k.TLSConfig.KeyPath)
+			if err != nil {
+				panic(err)
+			}
+			s.Net.TLS.Config.Certificates = []tls.Certificate{cert}
+		}
+	}
 }
 
 // This section holds configuration for the event scheduler used to schedule workflow executions.
