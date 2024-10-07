@@ -9,6 +9,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
+	"github.com/samber/lo"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -481,6 +482,15 @@ func FromExecutionModels(ctx context.Context, executionModels []models.Execution
 		}
 		executions[idx] = execution
 	}
+	lo.Map(executions, func(execution *admin.Execution, _ int) *admin.Execution {
+		if execution.GetSpec() != nil {
+			execution.Spec.Inputs = nil
+		}
+		if execution.GetClosure().GetResolvedSpec() != nil {
+			execution.Closure.ResolvedSpec.Inputs = nil
+		}
+		return execution
+	})
 	return executions, nil
 }
 

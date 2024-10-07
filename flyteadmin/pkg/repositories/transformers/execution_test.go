@@ -926,6 +926,10 @@ func TestFromExecutionModels(t *testing.T) {
 	executions, err := FromExecutionModels(context.TODO(), executionModels, DefaultExecutionTransformerOptions)
 	assert.Nil(t, err)
 	assert.Len(t, executions, 1)
+	expectedSpec := proto.Clone(spec).(*admin.ExecutionSpec)
+	expectedSpec.Inputs = nil
+	expectedClosure := proto.Clone(&closure).(*admin.ExecutionClosure)
+	expectedClosure.ResolvedSpec.Inputs = nil
 	assert.True(t, proto.Equal(&admin.Execution{
 		Id: &core.WorkflowExecutionIdentifier{
 			Project: "project",
@@ -933,8 +937,8 @@ func TestFromExecutionModels(t *testing.T) {
 			Name:    "name",
 			Org:     testOrg,
 		},
-		Spec:    spec,
-		Closure: &closure,
+		Spec:    expectedSpec,
+		Closure: expectedClosure,
 	}, executions[0]))
 }
 
