@@ -734,6 +734,15 @@ func (t *Handler) ValidateOutput(ctx context.Context, nodeID v1alpha1.NodeID, i 
 	}
 	ok, err := r.Exists(ctx)
 	if err != nil {
+		if regErrors.Is(err, ioutils.ErrRemoteFileExceedsMaxSize) {
+			return &io.ExecutionError{
+				ExecutionError: &core.ExecutionError{
+					Code:    "OutputSizeExceeded",
+					Message: fmt.Sprintf("Remote output size exceeds max, err: [%s]", err.Error()),
+				},
+				IsRecoverable: false,
+			}, nil
+		}
 		logger.Errorf(ctx, "Failed to check if the output file exists. Error: %s", err.Error())
 		return nil, err
 	}
