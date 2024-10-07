@@ -31,7 +31,7 @@ func (to *pluginTaskOverrides) GetContainerImage() string {
 	return to.TaskOverrides.GetContainerImage()
 }
 
-func (to *pluginTaskOverrides) GetPodTemplate() string {
+func (to *pluginTaskOverrides) GetPodTemplate() *core.PodTemplate {
 	return to.TaskOverrides.GetPodTemplate()
 }
 

@@ -318,7 +318,7 @@ message TaskNodeOverrides {
     string container_image = 3;
 
     // Overrides for podtemplate used by task pods.
-    Podtemplate podtemplate = 4;
+    PodTemplate podtemplate = 4;
 }
 
 // A structure that uniquely identifies a launch plan in the system.

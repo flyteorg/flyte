@@ -1581,7 +1581,7 @@ type TaskNodeOverrides struct {
 	// Override for the image used by task pods.
 	ContainerImage string `protobuf:"bytes,3,opt,name=container_image,json=containerImage,proto3" json:"container_image,omitempty"`
 	// Overrides for podtemplate used by task pods.
-	Podtemplate *Podtemplate `protobuf:"bytes,4,opt,name=podtemplate,proto3" json:"podtemplate,omitempty"`
+	Podtemplate *PodTemplate `protobuf:"bytes,4,opt,name=podtemplate,proto3" json:"podtemplate,omitempty"`
 }
 
 func (x *TaskNodeOverrides) Reset() {
@@ -1637,7 +1637,7 @@ func (x *TaskNodeOverrides) GetContainerImage() string {
 	return ""
 }
 
-func (x *TaskNodeOverrides) GetPodtemplate() *Podtemplate {
+func (x *TaskNodeOverrides) GetPodtemplate() *PodTemplate {
 	if x != nil {
 		return x.Podtemplate
 	}
@@ -1964,7 +1964,7 @@ var file_flyteidl_core_workflow_proto_rawDesc = []byte{
 	0x6e, 0x65, 0x72, 0x49, 0x6d, 0x61, 0x67, 0x65, 0x12, 0x3c, 0x0a, 0x0b, 0x70, 0x6f, 0x64, 0x74,
 	0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e,
 	0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x2e, 0x63, 0x6f, 0x72, 0x65, 0x2e, 0x50, 0x6f,
-	0x64, 0x74, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x52, 0x0b, 0x70, 0x6f, 0x64, 0x74, 0x65,
+	0x64, 0x54, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x52, 0x0b, 0x70, 0x6f, 0x64, 0x74, 0x65,
 	0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x22, 0xba, 0x01, 0x0a, 0x12, 0x4c, 0x61, 0x75, 0x6e, 0x63,
 	0x68, 0x50, 0x6c, 0x61, 0x6e, 0x54, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x12, 0x29, 0x0a,
 	0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x66, 0x6c, 0x79, 0x74,
@@ -2039,7 +2039,7 @@ var file_flyteidl_core_workflow_proto_goTypes = []interface{}{
 	(*TypedInterface)(nil),                // 29: flyteidl.core.TypedInterface
 	(*Resources)(nil),                     // 30: flyteidl.core.Resources
 	(*ExtendedResources)(nil),             // 31: flyteidl.core.ExtendedResources
-	(*Podtemplate)(nil),                   // 32: flyteidl.core.Podtemplate
+	(*PodTemplate)(nil),                   // 32: flyteidl.core.PodTemplate
 	(*LiteralMap)(nil),                    // 33: flyteidl.core.LiteralMap
 }
 var file_flyteidl_core_workflow_proto_depIdxs = []int32{
@@ -2083,7 +2083,7 @@ var file_flyteidl_core_workflow_proto_depIdxs = []int32{
 	16, // 37: flyteidl.core.WorkflowTemplate.metadata_defaults:type_name -> flyteidl.core.WorkflowMetadataDefaults
 	30, // 38: flyteidl.core.TaskNodeOverrides.resources:type_name -> flyteidl.core.Resources
 	31, // 39: flyteidl.core.TaskNodeOverrides.extended_resources:type_name -> flyteidl.core.ExtendedResources
-	32, // 40: flyteidl.core.TaskNodeOverrides.podtemplate:type_name -> flyteidl.core.Podtemplate
+	32, // 40: flyteidl.core.TaskNodeOverrides.podtemplate:type_name -> flyteidl.core.PodTemplate
 	23, // 41: flyteidl.core.LaunchPlanTemplate.id:type_name -> flyteidl.core.Identifier
 	29, // 42: flyteidl.core.LaunchPlanTemplate.interface:type_name -> flyteidl.core.TypedInterface
 	33, // 43: flyteidl.core.LaunchPlanTemplate.fixed_inputs:type_name -> flyteidl.core.LiteralMap

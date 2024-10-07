@@ -163,9 +163,9 @@ export class Resources_ResourceEntry extends Message<Resources_ResourceEntry> {
  * A customizable interface to convey podtemplate for a container. This can be interpreted differently for different
  * container engines.
  *
- * @generated from message flyteidl.core.Podtemplate
+ * @generated from message flyteidl.core.PodTemplate
  */
-export class Podtemplate extends Message<Podtemplate> {
+export class PodTemplate extends Message<PodTemplate> {
   /**
    * @generated from field: string primary_container_name = 1;
    */
@@ -177,6 +177,8 @@ export class Podtemplate extends Message<Podtemplate> {
   labels: { [key: string]: string } = {};
 
   /**
+   * Optional annotations to add to the pod definition.
+   *
    * @generated from field: map<string, string> annotations = 3;
    */
   annotations: { [key: string]: string } = {};
@@ -186,13 +188,13 @@ export class Podtemplate extends Message<Podtemplate> {
    */
   podSpec?: Struct;
 
-  constructor(data?: PartialMessage<Podtemplate>) {
+  constructor(data?: PartialMessage<PodTemplate>) {
     super();
     proto3.util.initPartial(data, this);
   }
 
   static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "flyteidl.core.Podtemplate";
+  static readonly typeName = "flyteidl.core.PodTemplate";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "primary_container_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "labels", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
@@ -200,20 +202,20 @@ export class Podtemplate extends Message<Podtemplate> {
     { no: 4, name: "pod_spec", kind: "message", T: Struct },
   ]);
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Podtemplate {
-    return new Podtemplate().fromBinary(bytes, options);
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): PodTemplate {
+    return new PodTemplate().fromBinary(bytes, options);
   }
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Podtemplate {
-    return new Podtemplate().fromJson(jsonValue, options);
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): PodTemplate {
+    return new PodTemplate().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Podtemplate {
-    return new Podtemplate().fromJsonString(jsonString, options);
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): PodTemplate {
+    return new PodTemplate().fromJsonString(jsonString, options);
   }
 
-  static equals(a: Podtemplate | PlainMessage<Podtemplate> | undefined, b: Podtemplate | PlainMessage<Podtemplate> | undefined): boolean {
-    return proto3.util.equals(Podtemplate, a, b);
+  static equals(a: PodTemplate | PlainMessage<PodTemplate> | undefined, b: PodTemplate | PlainMessage<PodTemplate> | undefined): boolean {
+    return proto3.util.equals(PodTemplate, a, b);
   }
 }
 

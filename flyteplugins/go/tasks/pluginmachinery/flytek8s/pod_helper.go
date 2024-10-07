@@ -429,8 +429,11 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 	}
 
 	// Override pod template if necessary
-	if len(tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate()) > 0 {
-		ApplyPodTemplateOverride()
+	if tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate() != nil {
+		podSpec, objectMeta, err = ApplyPodTemplateOverride(podSpec, objectMeta, tCtx.TaskExecutionMetadata().GetOverrides().GetPodTemplate())
+		if err != nil {
+			return nil, nil, err
+		}
 	}
 
 	return podSpec, objectMeta, nil
@@ -445,13 +448,24 @@ func ApplyContainerImageOverride(podSpec *v1.PodSpec, containerImage string, pri
 	}
 }
 
-func ApplyPodTemplateOverride(podSpec *v1.PodSpec, containerImage string, primaryContainerName string) {
-	for i, c := range podSpec.Containers {
-		if c.Name == primaryContainerName {
-			podSpec.Containers[i].Image = containerImage
-			return
-		}
+func ApplyPodTemplateOverride(podSpec *v1.PodSpec, objectMeta *metav1.ObjectMeta, podTemplate *core.PodTemplate) (*v1.PodSpec, *metav1.ObjectMeta, error) {
+	if len(podTemplate.Annotations) > 0 {
+		mergeMapInto(objectMeta.Annotations, podTemplate.Annotations)
 	}
+	if len(podTemplate.Labels) > 0 {
+		mergeMapInto(objectMeta.Labels, podTemplate.Labels)
+	}
+
+	var podspec_override *v1.PodSpec
+	err := utils.UnmarshalStructToObj(podTemplate.PodSpec, &podspec_override)
+	if err != nil {
+		return nil, nil, err
+	}
+	mergedPodSpec, err := mergePodSpecs(podSpec, podspec_override, podTemplate.PrimaryContainerName)
+	if err != nil {
+		return nil, nil, err
+	}
+	return mergedPodSpec, objectMeta, nil
 }
 
 // ToK8sPodSpec builds a PodSpec and ObjectMeta based on the definition passed by the TaskExecutionContext. This

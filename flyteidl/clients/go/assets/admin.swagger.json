@@ -7782,7 +7782,7 @@
         }
       }
     },
-    "corePodtemplate": {
+    "corePodTemplate": {
       "type": "object",
       "properties": {
         "primary_container_name": {
@@ -7798,7 +7798,8 @@
           "type": "object",
           "additionalProperties": {
             "type": "string"
-          }
+          },
+          "description": "Optional annotations to add to the pod definition."
         },
         "pod_spec": {
           "type": "object"
@@ -8316,7 +8317,7 @@
           "description": "Override for the image used by task pods."
         },
         "podtemplate": {
-          "$ref": "#/definitions/corePodtemplate",
+          "$ref": "#/definitions/corePodTemplate",
           "description": "Overrides for podtemplate used by task pods."
         }
       },

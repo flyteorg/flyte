@@ -216,8 +216,8 @@ class TaskNodeOverrides(_message.Message):
     resources: _tasks_pb2.Resources
     extended_resources: _tasks_pb2.ExtendedResources
     container_image: str
-    podtemplate: _tasks_pb2.Podtemplate
-    def __init__(self, resources: _Optional[_Union[_tasks_pb2.Resources, _Mapping]] = ..., extended_resources: _Optional[_Union[_tasks_pb2.ExtendedResources, _Mapping]] = ..., container_image: _Optional[str] = ..., podtemplate: _Optional[_Union[_tasks_pb2.Podtemplate, _Mapping]] = ...) -> None: ...
+    podtemplate: _tasks_pb2.PodTemplate
+    def __init__(self, resources: _Optional[_Union[_tasks_pb2.Resources, _Mapping]] = ..., extended_resources: _Optional[_Union[_tasks_pb2.ExtendedResources, _Mapping]] = ..., container_image: _Optional[str] = ..., podtemplate: _Optional[_Union[_tasks_pb2.PodTemplate, _Mapping]] = ...) -> None: ...
 
 class LaunchPlanTemplate(_message.Message):
     __slots__ = ["id", "interface", "fixed_inputs"]

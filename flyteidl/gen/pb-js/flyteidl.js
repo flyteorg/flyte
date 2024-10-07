@@ -12482,7 +12482,7 @@
                  * @property {flyteidl.core.IResources|null} [resources] TaskNodeOverrides resources
                  * @property {flyteidl.core.IExtendedResources|null} [extendedResources] TaskNodeOverrides extendedResources
                  * @property {string|null} [containerImage] TaskNodeOverrides containerImage
-                 * @property {flyteidl.core.IPodtemplate|null} [podtemplate] TaskNodeOverrides podtemplate
+                 * @property {flyteidl.core.IPodTemplate|null} [podtemplate] TaskNodeOverrides podtemplate
                  */
     
                 /**
@@ -12526,7 +12526,7 @@
     
                 /**
                  * TaskNodeOverrides podtemplate.
-                 * @member {flyteidl.core.IPodtemplate|null|undefined} podtemplate
+                 * @member {flyteidl.core.IPodTemplate|null|undefined} podtemplate
                  * @memberof flyteidl.core.TaskNodeOverrides
                  * @instance
                  */
@@ -12563,7 +12563,7 @@
                     if (message.containerImage != null && message.hasOwnProperty("containerImage"))
                         writer.uint32(/* id 3, wireType 2 =*/26).string(message.containerImage);
                     if (message.podtemplate != null && message.hasOwnProperty("podtemplate"))
-                        $root.flyteidl.core.Podtemplate.encode(message.podtemplate, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+                        $root.flyteidl.core.PodTemplate.encode(message.podtemplate, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
                     return writer;
                 };
     
@@ -12595,7 +12595,7 @@
                             message.containerImage = reader.string();
                             break;
                         case 4:
-                            message.podtemplate = $root.flyteidl.core.Podtemplate.decode(reader, reader.uint32());
+                            message.podtemplate = $root.flyteidl.core.PodTemplate.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -12630,7 +12630,7 @@
                         if (!$util.isString(message.containerImage))
                             return "containerImage: string expected";
                     if (message.podtemplate != null && message.hasOwnProperty("podtemplate")) {
-                        var error = $root.flyteidl.core.Podtemplate.verify(message.podtemplate);
+                        var error = $root.flyteidl.core.PodTemplate.verify(message.podtemplate);
                         if (error)
                             return "podtemplate." + error;
                     }
@@ -14827,27 +14827,27 @@
                 return Resources;
             })();
     
-            core.Podtemplate = (function() {
+            core.PodTemplate = (function() {
     
                 /**
-                 * Properties of a Podtemplate.
+                 * Properties of a PodTemplate.
                  * @memberof flyteidl.core
-                 * @interface IPodtemplate
-                 * @property {string|null} [primaryContainerName] Podtemplate primaryContainerName
-                 * @property {Object.<string,string>|null} [labels] Podtemplate labels
-                 * @property {Object.<string,string>|null} [annotations] Podtemplate annotations
-                 * @property {google.protobuf.IStruct|null} [podSpec] Podtemplate podSpec
+                 * @interface IPodTemplate
+                 * @property {string|null} [primaryContainerName] PodTemplate primaryContainerName
+                 * @property {Object.<string,string>|null} [labels] PodTemplate labels
+                 * @property {Object.<string,string>|null} [annotations] PodTemplate annotations
+                 * @property {google.protobuf.IStruct|null} [podSpec] PodTemplate podSpec
                  */
     
                 /**
-                 * Constructs a new Podtemplate.
+                 * Constructs a new PodTemplate.
                  * @memberof flyteidl.core
-                 * @classdesc Represents a Podtemplate.
-                 * @implements IPodtemplate
+                 * @classdesc Represents a PodTemplate.
+                 * @implements IPodTemplate
                  * @constructor
-                 * @param {flyteidl.core.IPodtemplate=} [properties] Properties to set
+                 * @param {flyteidl.core.IPodTemplate=} [properties] Properties to set
                  */
-                function Podtemplate(properties) {
+                function PodTemplate(properties) {
                     this.labels = {};
                     this.annotations = {};
                     if (properties)
@@ -14857,59 +14857,59 @@
                 }
     
                 /**
-                 * Podtemplate primaryContainerName.
+                 * PodTemplate primaryContainerName.
                  * @member {string} primaryContainerName
-                 * @memberof flyteidl.core.Podtemplate
+                 * @memberof flyteidl.core.PodTemplate
                  * @instance
                  */
-                Podtemplate.prototype.primaryContainerName = "";
+                PodTemplate.prototype.primaryContainerName = "";
     
                 /**
-                 * Podtemplate labels.
+                 * PodTemplate labels.
                  * @member {Object.<string,string>} labels
-                 * @memberof flyteidl.core.Podtemplate
+                 * @memberof flyteidl.core.PodTemplate
                  * @instance
                  */
-                Podtemplate.prototype.labels = $util.emptyObject;
+                PodTemplate.prototype.labels = $util.emptyObject;
     
                 /**
-                 * Podtemplate annotations.
+                 * PodTemplate annotations.
                  * @member {Object.<string,string>} annotations
-                 * @memberof flyteidl.core.Podtemplate
+                 * @memberof flyteidl.core.PodTemplate
                  * @instance
                  */
-                Podtemplate.prototype.annotations = $util.emptyObject;
+                PodTemplate.prototype.annotations = $util.emptyObject;
     
                 /**
-                 * Podtemplate podSpec.
+                 * PodTemplate podSpec.
                  * @member {google.protobuf.IStruct|null|undefined} podSpec
-                 * @memberof flyteidl.core.Podtemplate
+                 * @memberof flyteidl.core.PodTemplate
                  * @instance
                  */
-                Podtemplate.prototype.podSpec = null;
+                PodTemplate.prototype.podSpec = null;
     
                 /**
-                 * Creates a new Podtemplate instance using the specified properties.
+                 * Creates a new PodTemplate instance using the specified properties.
                  * @function create
-                 * @memberof flyteidl.core.Podtemplate
+                 * @memberof flyteidl.core.PodTemplate
                  * @static
-                 * @param {flyteidl.core.IPodtemplate=} [properties] Properties to set
-                 * @returns {flyteidl.core.Podtemplate} Podtemplate instance
+                 * @param {flyteidl.core.IPodTemplate=} [properties] Properties to set
+                 * @returns {flyteidl.core.PodTemplate} PodTemplate instance
                  */
-                Podtemplate.create = function create(properties) {
-                    return new Podtemplate(properties);
+                PodTemplate.create = function create(properties) {
+                    return new PodTemplate(properties);
                 };
     
                 /**
-                 * Encodes the specified Podtemplate message. Does not implicitly {@link flyteidl.core.Podtemplate.verify|verify} messages.
+                 * Encodes the specified PodTemplate message. Does not implicitly {@link flyteidl.core.PodTemplate.verify|verify} messages.
                  * @function encode
-                 * @memberof flyteidl.core.Podtemplate
+                 * @memberof flyteidl.core.PodTemplate
                  * @static
-                 * @param {flyteidl.core.IPodtemplate} message Podtemplate message or plain object to encode
+                 * @param {flyteidl.core.IPodTemplate} message PodTemplate message or plain object to encode
                  * @param {$protobuf.Writer} [writer] Writer to encode to
                  * @returns {$protobuf.Writer} Writer
                  */
-                Podtemplate.encode = function encode(message, writer) {
+                PodTemplate.encode = function encode(message, writer) {
                     if (!writer)
                         writer = $Writer.create();
                     if (message.primaryContainerName != null && message.hasOwnProperty("primaryContainerName"))
@@ -14926,20 +14926,20 @@
                 };
     
                 /**
-                 * Decodes a Podtemplate message from the specified reader or buffer.
+                 * Decodes a PodTemplate message from the specified reader or buffer.
                  * @function decode
-                 * @memberof flyteidl.core.Podtemplate
+                 * @memberof flyteidl.core.PodTemplate
                  * @static
                  * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
                  * @param {number} [length] Message length if known beforehand
-                 * @returns {flyteidl.core.Podtemplate} Podtemplate
+                 * @returns {flyteidl.core.PodTemplate} PodTemplate
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                Podtemplate.decode = function decode(reader, length) {
+                PodTemplate.decode = function decode(reader, length) {
                     if (!(reader instanceof $Reader))
                         reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.Podtemplate(), key;
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.PodTemplate(), key;
                     while (reader.pos < end) {
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
@@ -14974,14 +14974,14 @@
                 };
     
                 /**
-                 * Verifies a Podtemplate message.
+                 * Verifies a PodTemplate message.
                  * @function verify
-                 * @memberof flyteidl.core.Podtemplate
+                 * @memberof flyteidl.core.PodTemplate
                  * @static
                  * @param {Object.<string,*>} message Plain object to verify
                  * @returns {string|null} `null` if valid, otherwise the reason why it is not
                  */
-                Podtemplate.verify = function verify(message) {
+                PodTemplate.verify = function verify(message) {
                     if (typeof message !== "object" || message === null)
                         return "object expected";
                     if (message.primaryContainerName != null && message.hasOwnProperty("primaryContainerName"))
@@ -15011,7 +15011,7 @@
                     return null;
                 };
     
-                return Podtemplate;
+                return PodTemplate;
             })();
     
             core.GPUAccelerator = (function() {

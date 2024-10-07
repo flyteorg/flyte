@@ -462,19 +462,20 @@ func (x *Resources) GetLimits() []*Resources_ResourceEntry {
 
 // A customizable interface to convey podtemplate for a container. This can be interpreted differently for different
 // container engines.
-type Podtemplate struct {
+type PodTemplate struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
 	PrimaryContainerName string            `protobuf:"bytes,1,opt,name=primary_container_name,json=primaryContainerName,proto3" json:"primary_container_name,omitempty"`
 	Labels               map[string]string `protobuf:"bytes,2,rep,name=labels,proto3" json:"labels,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	Annotations          map[string]string `protobuf:"bytes,3,rep,name=annotations,proto3" json:"annotations,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	PodSpec              *structpb.Struct  `protobuf:"bytes,4,opt,name=pod_spec,json=podSpec,proto3" json:"pod_spec,omitempty"`
+	// Optional annotations to add to the pod definition.
+	Annotations map[string]string `protobuf:"bytes,3,rep,name=annotations,proto3" json:"annotations,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	PodSpec     *structpb.Struct  `protobuf:"bytes,4,opt,name=pod_spec,json=podSpec,proto3" json:"pod_spec,omitempty"`
 }
 
-func (x *Podtemplate) Reset() {
-	*x = Podtemplate{}
+func (x *PodTemplate) Reset() {
+	*x = PodTemplate{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_flyteidl_core_tasks_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -482,13 +483,13 @@ func (x *Podtemplate) Reset() {
 	}
 }
 
-func (x *Podtemplate) String() string {
+func (x *PodTemplate) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Podtemplate) ProtoMessage() {}
+func (*PodTemplate) ProtoMessage() {}
 
-func (x *Podtemplate) ProtoReflect() protoreflect.Message {
+func (x *PodTemplate) ProtoReflect() protoreflect.Message {
 	mi := &file_flyteidl_core_tasks_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -500,33 +501,33 @@ func (x *Podtemplate) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Podtemplate.ProtoReflect.Descriptor instead.
-func (*Podtemplate) Descriptor() ([]byte, []int) {
+// Deprecated: Use PodTemplate.ProtoReflect.Descriptor instead.
+func (*PodTemplate) Descriptor() ([]byte, []int) {
 	return file_flyteidl_core_tasks_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *Podtemplate) GetPrimaryContainerName() string {
+func (x *PodTemplate) GetPrimaryContainerName() string {
 	if x != nil {
 		return x.PrimaryContainerName
 	}
 	return ""
 }
 
-func (x *Podtemplate) GetLabels() map[string]string {
+func (x *PodTemplate) GetLabels() map[string]string {
 	if x != nil {
 		return x.Labels
 	}
 	return nil
 }
 
-func (x *Podtemplate) GetAnnotations() map[string]string {
+func (x *PodTemplate) GetAnnotations() map[string]string {
 	if x != nil {
 		return x.Annotations
 	}
 	return nil
 }
 
-func (x *Podtemplate) GetPodSpec() *structpb.Struct {
+func (x *PodTemplate) GetPodSpec() *structpb.Struct {
 	if x != nil {
 		return x.PodSpec
 	}
@@ -1739,18 +1740,18 @@ var file_flyteidl_core_tasks_proto_rawDesc = []byte{
 	0x03, 0x47, 0x50, 0x55, 0x10, 0x02, 0x12, 0x0a, 0x0a, 0x06, 0x4d, 0x45, 0x4d, 0x4f, 0x52, 0x59,
 	0x10, 0x03, 0x12, 0x0b, 0x0a, 0x07, 0x53, 0x54, 0x4f, 0x52, 0x41, 0x47, 0x45, 0x10, 0x04, 0x12,
 	0x15, 0x0a, 0x11, 0x45, 0x50, 0x48, 0x45, 0x4d, 0x45, 0x52, 0x41, 0x4c, 0x5f, 0x53, 0x54, 0x4f,
-	0x52, 0x41, 0x47, 0x45, 0x10, 0x05, 0x22, 0x81, 0x03, 0x0a, 0x0b, 0x50, 0x6f, 0x64, 0x74, 0x65,
+	0x52, 0x41, 0x47, 0x45, 0x10, 0x05, 0x22, 0x81, 0x03, 0x0a, 0x0b, 0x50, 0x6f, 0x64, 0x54, 0x65,
 	0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x12, 0x34, 0x0a, 0x16, 0x70, 0x72, 0x69, 0x6d, 0x61, 0x72,
 	0x79, 0x5f, 0x63, 0x6f, 0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65, 0x72, 0x5f, 0x6e, 0x61, 0x6d, 0x65,
 	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x14, 0x70, 0x72, 0x69, 0x6d, 0x61, 0x72, 0x79, 0x43,
 	0x6f, 0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65, 0x72, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x3e, 0x0a, 0x06,
 	0x6c, 0x61, 0x62, 0x65, 0x6c, 0x73, 0x18, 0x02, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x26, 0x2e, 0x66,
 	0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x2e, 0x63, 0x6f, 0x72, 0x65, 0x2e, 0x50, 0x6f, 0x64,
-	0x74, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x2e, 0x4c, 0x61, 0x62, 0x65, 0x6c, 0x73, 0x45,
+	0x54, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x2e, 0x4c, 0x61, 0x62, 0x65, 0x6c, 0x73, 0x45,
 	0x6e, 0x74, 0x72, 0x79, 0x52, 0x06, 0x6c, 0x61, 0x62, 0x65, 0x6c, 0x73, 0x12, 0x4d, 0x0a, 0x0b,
 	0x61, 0x6e, 0x6e, 0x6f, 0x74, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x18, 0x03, 0x20, 0x03, 0x28,
 	0x0b, 0x32, 0x2b, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x2e, 0x63, 0x6f, 0x72,
-	0x65, 0x2e, 0x50, 0x6f, 0x64, 0x74, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x2e, 0x41, 0x6e,
+	0x65, 0x2e, 0x50, 0x6f, 0x64, 0x54, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x2e, 0x41, 0x6e,
 	0x6e, 0x6f, 0x74, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x52, 0x0b,
 	0x61, 0x6e, 0x6e, 0x6f, 0x74, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x12, 0x32, 0x0a, 0x08, 0x70,
 	0x6f, 0x64, 0x5f, 0x73, 0x70, 0x65, 0x63, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x17, 0x2e,
@@ -2029,7 +2030,7 @@ var file_flyteidl_core_tasks_proto_goTypes = []interface{}{
 	(DataLoadingConfig_LiteralMapFormat)(0), // 5: flyteidl.core.DataLoadingConfig.LiteralMapFormat
 	(Sql_Dialect)(0),                        // 6: flyteidl.core.Sql.Dialect
 	(*Resources)(nil),                       // 7: flyteidl.core.Resources
-	(*Podtemplate)(nil),                     // 8: flyteidl.core.Podtemplate
+	(*PodTemplate)(nil),                     // 8: flyteidl.core.PodTemplate
 	(*GPUAccelerator)(nil),                  // 9: flyteidl.core.GPUAccelerator
 	(*ExtendedResources)(nil),               // 10: flyteidl.core.ExtendedResources
 	(*RuntimeMetadata)(nil),                 // 11: flyteidl.core.RuntimeMetadata
@@ -2043,8 +2044,8 @@ var file_flyteidl_core_tasks_proto_goTypes = []interface{}{
 	(*K8SObjectMetadata)(nil),               // 19: flyteidl.core.K8sObjectMetadata
 	(*Sql)(nil),                             // 20: flyteidl.core.Sql
 	(*Resources_ResourceEntry)(nil),         // 21: flyteidl.core.Resources.ResourceEntry
-	nil,                                     // 22: flyteidl.core.Podtemplate.LabelsEntry
-	nil,                                     // 23: flyteidl.core.Podtemplate.AnnotationsEntry
+	nil,                                     // 22: flyteidl.core.PodTemplate.LabelsEntry
+	nil,                                     // 23: flyteidl.core.PodTemplate.AnnotationsEntry
 	nil,                                     // 24: flyteidl.core.TaskMetadata.TagsEntry
 	nil,                                     // 25: flyteidl.core.TaskTemplate.ConfigEntry
 	nil,                                     // 26: flyteidl.core.K8sObjectMetadata.LabelsEntry
@@ -2060,9 +2061,9 @@ var file_flyteidl_core_tasks_proto_goTypes = []interface{}{
 var file_flyteidl_core_tasks_proto_depIdxs = []int32{
 	21, // 0: flyteidl.core.Resources.requests:type_name -> flyteidl.core.Resources.ResourceEntry
 	21, // 1: flyteidl.core.Resources.limits:type_name -> flyteidl.core.Resources.ResourceEntry
-	22, // 2: flyteidl.core.Podtemplate.labels:type_name -> flyteidl.core.Podtemplate.LabelsEntry
-	23, // 3: flyteidl.core.Podtemplate.annotations:type_name -> flyteidl.core.Podtemplate.AnnotationsEntry
-	28, // 4: flyteidl.core.Podtemplate.pod_spec:type_name -> google.protobuf.Struct
+	22, // 2: flyteidl.core.PodTemplate.labels:type_name -> flyteidl.core.PodTemplate.LabelsEntry
+	23, // 3: flyteidl.core.PodTemplate.annotations:type_name -> flyteidl.core.PodTemplate.AnnotationsEntry
+	28, // 4: flyteidl.core.PodTemplate.pod_spec:type_name -> google.protobuf.Struct
 	9,  // 5: flyteidl.core.ExtendedResources.gpu_accelerator:type_name -> flyteidl.core.GPUAccelerator
 	1,  // 6: flyteidl.core.RuntimeMetadata.type:type_name -> flyteidl.core.RuntimeMetadata.RuntimeType
 	11, // 7: flyteidl.core.TaskMetadata.runtime:type_name -> flyteidl.core.RuntimeMetadata
@@ -2126,7 +2127,7 @@ func file_flyteidl_core_tasks_proto_init() {
 			}
 		}
 		file_flyteidl_core_tasks_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Podtemplate); i {
+			switch v := v.(*PodTemplate); i {
 			case 0:
 				return &v.state
 			case 1:

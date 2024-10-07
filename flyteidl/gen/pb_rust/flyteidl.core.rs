@@ -1265,12 +1265,13 @@ pub mod resources {
 /// container engines.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct Podtemplate {
+pub struct PodTemplate {
     ///
     #[prost(string, tag="1")]
     pub primary_container_name: ::prost::alloc::string::String,
     #[prost(map="string, string", tag="2")]
     pub labels: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
+    /// Optional annotations to add to the pod definition.
     #[prost(map="string, string", tag="3")]
     pub annotations: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
     #[prost(message, optional, tag="4")]
@@ -2738,7 +2739,7 @@ pub struct TaskNodeOverrides {
     pub container_image: ::prost::alloc::string::String,
     /// Overrides for podtemplate used by task pods.
     #[prost(message, optional, tag="4")]
-    pub podtemplate: ::core::option::Option<Podtemplate>,
+    pub podtemplate: ::core::option::Option<PodTemplate>,
 }
 /// A structure that uniquely identifies a launch plan in the system.
 #[allow(clippy::derive_partial_eq_without_eq)]

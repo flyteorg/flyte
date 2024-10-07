@@ -5153,7 +5153,7 @@ export namespace flyteidl {
             containerImage?: (string|null);
 
             /** TaskNodeOverrides podtemplate */
-            podtemplate?: (flyteidl.core.IPodtemplate|null);
+            podtemplate?: (flyteidl.core.IPodTemplate|null);
         }
 
         /** Represents a TaskNodeOverrides. */
@@ -5175,7 +5175,7 @@ export namespace flyteidl {
             public containerImage: string;
 
             /** TaskNodeOverrides podtemplate. */
-            public podtemplate?: (flyteidl.core.IPodtemplate|null);
+            public podtemplate?: (flyteidl.core.IPodTemplate|null);
 
             /**
              * Creates a new TaskNodeOverrides instance using the specified properties.
@@ -6165,70 +6165,70 @@ export namespace flyteidl {
             }
         }
 
-        /** Properties of a Podtemplate. */
-        interface IPodtemplate {
+        /** Properties of a PodTemplate. */
+        interface IPodTemplate {
 
-            /** Podtemplate primaryContainerName */
+            /** PodTemplate primaryContainerName */
             primaryContainerName?: (string|null);
 
-            /** Podtemplate labels */
+            /** PodTemplate labels */
             labels?: ({ [k: string]: string }|null);
 
-            /** Podtemplate annotations */
+            /** PodTemplate annotations */
             annotations?: ({ [k: string]: string }|null);
 
-            /** Podtemplate podSpec */
+            /** PodTemplate podSpec */
             podSpec?: (google.protobuf.IStruct|null);
         }
 
-        /** Represents a Podtemplate. */
-        class Podtemplate implements IPodtemplate {
+        /** Represents a PodTemplate. */
+        class PodTemplate implements IPodTemplate {
 
             /**
-             * Constructs a new Podtemplate.
+             * Constructs a new PodTemplate.
              * @param [properties] Properties to set
              */
-            constructor(properties?: flyteidl.core.IPodtemplate);
+            constructor(properties?: flyteidl.core.IPodTemplate);
 
-            /** Podtemplate primaryContainerName. */
+            /** PodTemplate primaryContainerName. */
             public primaryContainerName: string;
 
-            /** Podtemplate labels. */
+            /** PodTemplate labels. */
             public labels: { [k: string]: string };
 
-            /** Podtemplate annotations. */
+            /** PodTemplate annotations. */
             public annotations: { [k: string]: string };
 
-            /** Podtemplate podSpec. */
+            /** PodTemplate podSpec. */
             public podSpec?: (google.protobuf.IStruct|null);
 
             /**
-             * Creates a new Podtemplate instance using the specified properties.
+             * Creates a new PodTemplate instance using the specified properties.
              * @param [properties] Properties to set
-             * @returns Podtemplate instance
+             * @returns PodTemplate instance
              */
-            public static create(properties?: flyteidl.core.IPodtemplate): flyteidl.core.Podtemplate;
+            public static create(properties?: flyteidl.core.IPodTemplate): flyteidl.core.PodTemplate;
 
             /**
-             * Encodes the specified Podtemplate message. Does not implicitly {@link flyteidl.core.Podtemplate.verify|verify} messages.
-             * @param message Podtemplate message or plain object to encode
+             * Encodes the specified PodTemplate message. Does not implicitly {@link flyteidl.core.PodTemplate.verify|verify} messages.
+             * @param message PodTemplate message or plain object to encode
              * @param [writer] Writer to encode to
              * @returns Writer
              */
-            public static encode(message: flyteidl.core.IPodtemplate, writer?: $protobuf.Writer): $protobuf.Writer;
+            public static encode(message: flyteidl.core.IPodTemplate, writer?: $protobuf.Writer): $protobuf.Writer;
 
             /**
-             * Decodes a Podtemplate message from the specified reader or buffer.
+             * Decodes a PodTemplate message from the specified reader or buffer.
              * @param reader Reader or buffer to decode from
              * @param [length] Message length if known beforehand
-             * @returns Podtemplate
+             * @returns PodTemplate
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.Podtemplate;
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.PodTemplate;
 
             /**
-             * Verifies a Podtemplate message.
+             * Verifies a PodTemplate message.
              * @param message Plain object to verify
              * @returns `null` if valid, otherwise the reason why it is not
              */

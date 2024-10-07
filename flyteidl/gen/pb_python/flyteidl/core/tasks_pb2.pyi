@@ -41,7 +41,7 @@ class Resources(_message.Message):
     limits: _containers.RepeatedCompositeFieldContainer[Resources.ResourceEntry]
     def __init__(self, requests: _Optional[_Iterable[_Union[Resources.ResourceEntry, _Mapping]]] = ..., limits: _Optional[_Iterable[_Union[Resources.ResourceEntry, _Mapping]]] = ...) -> None: ...
 
-class Podtemplate(_message.Message):
+class PodTemplate(_message.Message):
     __slots__ = ["primary_container_name", "labels", "annotations", "pod_spec"]
     class LabelsEntry(_message.Message):
         __slots__ = ["key", "value"]
