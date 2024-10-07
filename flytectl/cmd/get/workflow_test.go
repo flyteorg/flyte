@@ -174,9 +174,8 @@ func TestGetWorkflowFuncLatestWithTable(t *testing.T) {
 
 	getWorkflowSetup()
 	workflow.DefaultConfig.Latest = true
-	workflow.DefaultConfig.Filter = filters.Filters{}
 	config.GetConfig().Output = printer.OutputFormatTABLE.String()
-	s.FetcherExt.OnFetchWorkflowLatestVersionMatch(s.Ctx, "workflow1", projectValue, domainValue, filters.Filters{}).Return(workflow1, nil)
+	s.FetcherExt.OnFetchWorkflowLatestVersionMatch(s.Ctx, "workflow1", projectValue, domainValue).Return(workflow1, nil)
 	err := getWorkflowFunc(s.Ctx, argsWf, s.CmdCtx)
 	assert.Nil(t, err)
 	s.TearDownAndVerify(t, `

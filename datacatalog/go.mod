@@ -2,8 +2,6 @@ module github.com/flyteorg/flyte/datacatalog
 
 go 1.22
 
-toolchain go1.22.1
-
 require (
 	github.com/Selvatico/go-mocket v1.0.7
 	github.com/flyteorg/flyte/flyteidl v0.0.0-00010101000000-000000000000
@@ -36,7 +34,7 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/internal v1.10.0 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v1.4.0 // indirect
 	github.com/AzureAD/microsoft-authentication-library-for-go v1.2.2 // indirect
-	github.com/aws/aws-sdk-go v1.44.2 // indirect
+	github.com/aws/aws-sdk-go v1.47.11 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cenkalti/backoff/v4 v4.2.1 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect

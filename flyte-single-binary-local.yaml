@@ -24,6 +24,8 @@ propeller:
   create-flyteworkflow-crd: true
   kube-config: $HOME/.flyte/sandbox/kubeconfig
   rawoutput-prefix: s3://my-s3-bucket/data
+  literal-offloading-config:
+    enabled: true
 
 server:
   kube-config: $HOME/.flyte/sandbox/kubeconfig
@@ -88,6 +90,8 @@ storage:
       access_key_id: minio
       secret_key: miniostorage
   container: my-s3-bucket
+  limits:
+    maxDownloadMBs: 1000
 
 task_resources:
   defaults:
