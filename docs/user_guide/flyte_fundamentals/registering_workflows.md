@@ -41,6 +41,7 @@ The following diagram provides a summarized view of the different registration p
 
 ![](https://raw.githubusercontent.com/flyteorg/static-resources/main/flytesnacks/getting_started/flyte-registration-patterns.png)
 
+
 (getting_started_register_pyflyte_run)=
 
 ## Iterating on a single task or workflow
