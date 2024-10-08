@@ -7,11 +7,13 @@
 
 While the Flyte agent framework provides an efficient and productive way for users to develop Flyte plugins, all agents must currently be configured within the FlytePropeller configuration, with the config map mounted under `/etc/flyte/config`. 
 
-In an enterprise environment, different teams are responsible for developing custom agents and managing Flyte components like Propeller, Scheduler, Admin, and Console. These teams often have their own CI/CD pipelines to deploy custom agents. The centralized agent configuration process can lead to inefficiencies and errors, as the deployment of custom agents may fall out of sync with the centralized configuration or cause unnecessary operational cost. 
+In an enterprise environment, different teams are responsible for developing custom agents and managing Flyte components like Propeller, Scheduler, Admin, and Console. These teams often have their own CI/CD pipelines to deploy custom agents. The centralized agent configuration process can lead to inefficiencies and outage (real case[^1]), as the deployment of custom agents may fall out of sync with the centralized configuration or cause unnecessary operational cost.
+
+[^1]: The outage we have encountered at LinkedIn environment: The team developing custom agent roll out the agent cluster by cluster, but the propeller and custom agent configuration was "set up" somehow because they are out of sync. As a result, the propeller pods went in Crashloop causing a bunch of jobs un `UnKnown` state
 
 This RFC proposes support for decentralized custom agent configuration management, with benefits including:
 - **Separation of concerns**: Teams can *fully* independently manage their own custom agent configurations.
-- **Decentralized management**: Custom agents can be deployed and managed separately from core Flyte infrastructure.
+- **Decentralized management**: Custom agents can be deployed and managed independently from the core Flyte infrastructure, yet operate as a cohesive unit.
 - **Flexibility**: FlytePropeller can dynamically adapt to varying configurations without requiring centralized maintenance of all settings.
 
 ## 2. Motivation
@@ -19,8 +21,8 @@ This RFC proposes support for decentralized custom agent configuration managemen
 In enterprise environments, the team managing the core Flyte infrastructure is usually different from the teams developing custom agents/plugins. These teams operate with separate development cycles and CI/CD pipelines. For instance, a team writing its own custom agent would create its own service account, Docker image, and deploy it in a separate namespace with its own monitoring dashboard.
 
 However, the final step of deployment—updating the Propeller configuration—remains centralized. This leads to issues like:
-1. **Out-of-sync deployment**: When a custom agent endpoint needs to be updated, it requires coordination between teams for the deployment of both the agent and the Propeller configuration update, leading to potential mismatches.
-2. **Coordination overhead**: Misaligned rollouts could result in the Propeller being unable to reach the agent, potentially causing widespread issues across Flyte plugins.
+1. **Out-of-sync deployment**: When a custom agent endpoint needs to be updated, it requires coordination between teams for the deployment of both the agent and the Propeller configuration update, leading to potential mismatches and outage.
+2. **Coordination overhead**: Misaligned rollouts could result in the Propeller being unable to reach the agent, potentially causing blast radius of impact due to propeller is down.
 
 To address these challenges and fully enable the decentralized custom agent framework, this RFC proposes a decentralized approach to custom agent configuration management, allowing:
 - **Separation of concerns**: Teams can manage their own configurations independently.
@@ -82,10 +84,10 @@ After validation, valid ConfigMaps should be aggregated. The system must handle 
 
 ## 4. Metrics & Dashboards
 
-What key metrics should we measure? For example:
-- Are we tracking system latency when interacting with external systems?
-- How quickly are configurations applied?
-- Are agent failures detected and logged efficiently?
+There can be different metrics to track the custom agent configuration validation such as total request, validated cases and its latency. These [metrics](https://github.com/kubernetes-sigs/controller-runtime/blob/main/pkg/webhook/internal/metrics/metrics.go) are natively supported in controller framework such as controller-runtime
+
+Any failures in aggregation and pre-checks of the agent reachability should be properly logged. K8s events can be emitted as well. This enables the enterprise environment to aggregate the logs/events for troubleshooting. 
+
 
 ## 5. Drawbacks
 
@@ -96,51 +98,45 @@ Are there reasons not to proceed with this proposal?
 
 - Could decentralized management introduce more complexity than it solves?
 
+Instead of statically parse from the config files, the change is more or less to dynamically interact the K8s API to constructs the `Config` object
+
+
 
 ## 6. Alternatives
 
-What are other ways to achieve the same outcome?
-- Could the problem be solved through better coordination of centralized configuration?
-- Could existing infrastructure tools handle custom configurations better?
+The other alternative could have been specifying the configmap volume and mount the config map of custom agents in the propeller pod. And then the existing viper parsing might still work but with additional aggregation/merging capability
+
+```yaml
+spec:
+  containers:
+  - name: propeller-container
+    image: image
+    volumeMounts:
+    - name: config-volume
+      mountPath: /etc/config/flyte/custom-agents/custom-agent-configmap.yaml
+  volumes:
+  - name: config-volume
+    configMap:
+      name: custom-agent-configmap  # The name of the ConfigMap
+```
+However, this still requires the change in the centralized propeller `Deployment` yaml file change, which does not differ from the existing direct modification on the centralized propeller config map. The same issues will be existing. 
 
 ## 7. Potential Impact and Dependencies
 
-This change will affect various teams and systems:
-- What other systems or teams could be impacted by this proposal?
-- Could this be exploited by malicious actors, and if so, how can we mitigate that risk?
+The change requires the authentication and authorization to K8s API server.
+This is not a problem because 
+
+* using propeller or admin's service account is enough to authenticate with K8s API server
+* propeller or admins is in the controller plane and enterprise security approves (process authorized) the propeller/admin to CRUD ConfigMap objects. The deployment Helm template should be adding the role to CRUD ConfigMap. 
 
 ## 8. Unresolved Questions
 
-What parts of this proposal still need more thought or refinement? What questions remain unanswered?
+Not that I am aware of based on the discussion in #flyte-agents so far
 
 ## 9. Conclusion
 
 Flyte's agent framework has enabled teams to efficiently develop, test, and release custom agents. By supporting decentralized custom agent configuration management, we streamline deployment and operations while unlocking the full potential of Flyte’s decoupled architecture.
 
-## 10. RFC Process Guide (Remove this section when done)
-
-By writing an RFC, you're providing insight to your team on the direction you're taking. There may not always be a right or better decision, but we will likely learn from the process. By authoring this RFC, you're deciding where you want us to go and are looking for feedback on that direction.
-
-This document is:
-- A thinking exercise, a prototype in words.
-- A historical record, which may lose value over time.
-- A way to broadcast information.
-- A mechanism to build trust.
-- A tool to empower.
-- A communication channel.
-
-This document is *not*:
-- A request for permission.
-- The most up-to-date representation of any process or system.
-
-**Checklist:**
-- [ ] Copy template
-- [ ] Draft RFC (think of it as a wireframe)
-- [ ] Share as WIP with trusted colleagues for feedback
-- [ ] Send pull request when comfortable
-- [ ] Label accordingly
-- [ ] Assign reviewers
-- [ ] Merge PR
 
 **Recommendations:**
 - Tag RFC title with [WIP] if you're still ironing out details.
