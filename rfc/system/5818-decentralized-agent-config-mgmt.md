@@ -1,4 +1,4 @@
-# [WIP] Support Decentralized Custom Agent Configuration Management
+# Support Decentralized Custom Agent Configuration Management
 
 **Authors:**
 - @shuyingliang
@@ -104,7 +104,7 @@ Instead of statically parse from the config files, the change is more or less to
 
 ## 6. Alternatives
 
-The other alternative could have been specifying the configmap volume and mount the config map of custom agents in the propeller pod. And then the existing viper parsing might still work but with additional aggregation/merging capability
+An alternative approach could be to specify the ConfigMap as a volume and mount the custom agents' ConfigMap in the Propeller pod. This way, the existing Viper parsing might still work, along with additional aggregation and merging capabilities.
 
 ```yaml
 spec:
@@ -117,25 +117,26 @@ spec:
   volumes:
   - name: config-volume
     configMap:
-      name: custom-agent-configmap  # The name of the ConfigMap
+      name: custom-agent-configmap
 ```
-However, this still requires the change in the centralized propeller `Deployment` yaml file change, which does not differ from the existing direct modification on the centralized propeller config map. The same issues will be existing. 
+
+However, this still requires modifications to the centralized Propeller `Deployment` YAML file, which is similar to the current approach of directly updating the centralized Propeller ConfigMap. Thus, the same challenges will persist.
+
 
 ## 7. Potential Impact and Dependencies
 
-The change requires the authentication and authorization to K8s API server.
-This is not a problem because 
+This change requires authentication and authorization to the Kubernetes API server. However, this should not be an issue because:
 
-* using propeller or admin's service account is enough to authenticate with K8s API server
-* propeller or admins is in the controller plane and enterprise security approves (process authorized) the propeller/admin to CRUD ConfigMap objects. The deployment Helm template should be adding the role to CRUD ConfigMap. 
+* The Propeller or Admin's service account can authenticate with the Kubernetes API server.
+* The Propeller or Admin operates in the control plane, and enterprise security already authorizes these roles to perform CRUD operations on ConfigMap objects. The deployment Helm template should include a role with permissions to manage ConfigMaps.
 
 ## 8. Unresolved Questions
 
-Not that I am aware of based on the discussion in #flyte-agents so far
+None that I am aware of, based on the discussions in the `#flyte-agents` channel so far.
 
 ## 9. Conclusion
 
-Flyte's agent framework has enabled teams to efficiently develop, test, and release custom agents. By supporting decentralized custom agent configuration management, we streamline deployment and operations while unlocking the full potential of Flyte’s decoupled architecture.
+Flyte's agent framework has empowered teams to efficiently develop, test, and release custom agents. By supporting decentralized custom agent configuration management, we can streamline deployment and operations reliably while maximizing the benefits of Flyte’s decoupled architecture.
 
 
 **Recommendations:**
