@@ -283,4 +283,52 @@ func TestValidateSignalUpdateRequest(t *testing.T) {
 		utils.AssertEqualWithSanitizedRegex(t,
 			"requested signal value [scalar:{ primitive:{ boolean:false } } ] is not castable to existing signal type [[8 1]]", ValidateSignalSetRequest(ctx, repo, request).Error())
 	})
+
+	t.Run("UnknownIDLType", func(t *testing.T) {
+		ctx := context.TODO()
+
+		// Define an unsupported literal type with a simple type of 1000
+		unsupportedLiteralType := &core.LiteralType{
+			Type: &core.LiteralType_Simple{
+				Simple: 1000, // Using 1000 as an unsupported type
+			},
+		}
+		unsupportedLiteralTypeBytes, _ := proto.Marshal(unsupportedLiteralType)
+
+		// Mock the repository to return a signal with this unsupported type
+		repo := repositoryMocks.NewMockRepository()
+		repo.SignalRepo().(*repositoryMocks.SignalRepoInterface).
+			OnGetMatch(mock.Anything, mock.Anything).Return(
+			models.Signal{
+				Type: unsupportedLiteralTypeBytes, // Set the unsupported type
+			},
+			nil,
+		)
+
+		// Set up the unsupported literal that will trigger the nil valueType condition
+		unsupportedLiteral := &core.Literal{
+			Value: &core.Literal_Scalar{
+				Scalar: &core.Scalar{},
+			},
+		}
+
+		request := admin.SignalSetRequest{
+			Id: &core.SignalIdentifier{
+				ExecutionId: &core.WorkflowExecutionIdentifier{
+					Project: "project",
+					Domain:  "domain",
+					Name:    "name",
+				},
+				SignalId: "signal",
+			},
+			Value: unsupportedLiteral, // This will lead to valueType being nil
+		}
+
+		// Invoke the function and check for the expected error
+		err := ValidateSignalSetRequest(ctx, repo, &request)
+		assert.NotNil(t, err)
+
+		// Expected error message
+		assert.Contains(t, err.Error(), failedToValidateLiteralType)
+	})
 }

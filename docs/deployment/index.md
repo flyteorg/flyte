@@ -1,8 +1,8 @@
 (deployment)=
 
-# Deployment Guide
+# Deployment guide
 
-These *Deployment Guides* are primarily for platform and devops engineers to learn how to deploy and administer Flyte.
+These *Deployment guides* are primarily for platform and devops engineers to learn how to deploy and administer Flyte.
 
 The sections below walk through how to create a Flyte cluster and cover topics related to enabling and configuring
 plugins, authentication, performance tuning, and maintaining Flyte as a production-grade service.
@@ -23,4 +23,17 @@ plugins, authentication, performance tuning, and maintaining Flyte as a producti
   - Reference docs for configuration settings for Flyte's backend services.
 * - {ref}`🔒 Security Overview <deployment-security-overview>`
   - Read for comments on security in Flyte.
+```
+
+```{toctree}
+:maxdepth: -1
+:hidden:
+
+deployment/index
+plugins/index
+agents/index
+configuration/index
+configuration/generated/index
+security/index
+swagger
 ```
