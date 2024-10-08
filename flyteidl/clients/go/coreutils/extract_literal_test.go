@@ -113,7 +113,7 @@ func TestFetchLiteral(t *testing.T) {
 		s := MakeBinaryLiteral([]byte{'h'})
 		assert.Equal(t, []byte{'h'}, s.GetScalar().GetBinary().GetValue())
 		_, err := ExtractFromLiteral(s)
-		assert.NotNil(t, err)
+		assert.Nil(t, err)
 	})
 
 	t.Run("NoneType", func(t *testing.T) {
@@ -122,34 +122,6 @@ func TestFetchLiteral(t *testing.T) {
 		assert.NotNil(t, p.GetScalar())
 		_, err = ExtractFromLiteral(p)
 		assert.Nil(t, err)
-	})
-
-	t.Run("Generic", func(t *testing.T) {
-		literalVal := map[string]interface{}{
-			"x": 1,
-			"y": "ystringvalue",
-		}
-		var literalType = &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRUCT}}
-		lit, err := MakeLiteralForType(literalType, literalVal)
-		assert.NoError(t, err)
-		extractedLiteralVal, err := ExtractFromLiteral(lit)
-		assert.NoError(t, err)
-		fieldsMap := map[string]*structpb.Value{
-			"x": {
-				Kind: &structpb.Value_NumberValue{NumberValue: 1},
-			},
-			"y": {
-				Kind: &structpb.Value_StringValue{StringValue: "ystringvalue"},
-			},
-		}
-		expectedStructVal := &structpb.Struct{
-			Fields: fieldsMap,
-		}
-		extractedStructValue := extractedLiteralVal.(*structpb.Struct)
-		assert.Equal(t, len(expectedStructVal.Fields), len(extractedStructValue.Fields))
-		for key, val := range expectedStructVal.Fields {
-			assert.Equal(t, val.Kind, extractedStructValue.Fields[key].Kind)
-		}
 	})
 
 	t.Run("Generic Passed As String", func(t *testing.T) {

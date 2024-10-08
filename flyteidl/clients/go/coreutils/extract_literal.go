@@ -54,6 +54,8 @@ func ExtractFromLiteral(literal *core.Literal) (interface{}, error) {
 			default:
 				return nil, fmt.Errorf("unsupported literal scalar primitive type %T", scalarValue)
 			}
+		case *core.Scalar_Binary:
+			return scalarValue.Binary, nil
 		case *core.Scalar_Blob:
 			return scalarValue.Blob.Uri, nil
 		case *core.Scalar_Schema:
