@@ -1856,7 +1856,7 @@
           "type": "string",
           "description": "Override for the image used by task pods."
         },
-        "podtemplate": {
+        "pod_template": {
           "$ref": "#/definitions/corePodTemplate",
           "description": "Overrides for podtemplate used by task pods."
         }

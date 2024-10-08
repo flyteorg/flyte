@@ -5152,8 +5152,8 @@ export namespace flyteidl {
             /** TaskNodeOverrides containerImage */
             containerImage?: (string|null);
 
-            /** TaskNodeOverrides podtemplate */
-            podtemplate?: (flyteidl.core.IPodTemplate|null);
+            /** TaskNodeOverrides podTemplate */
+            podTemplate?: (flyteidl.core.IPodTemplate|null);
         }
 
         /** Represents a TaskNodeOverrides. */
@@ -5174,8 +5174,8 @@ export namespace flyteidl {
             /** TaskNodeOverrides containerImage. */
             public containerImage: string;
 
-            /** TaskNodeOverrides podtemplate. */
-            public podtemplate?: (flyteidl.core.IPodTemplate|null);
+            /** TaskNodeOverrides podTemplate. */
+            public podTemplate?: (flyteidl.core.IPodTemplate|null);
 
             /**
              * Creates a new TaskNodeOverrides instance using the specified properties.

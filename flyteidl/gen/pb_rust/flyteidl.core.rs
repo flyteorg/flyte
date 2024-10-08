@@ -2739,7 +2739,7 @@ pub struct TaskNodeOverrides {
     pub container_image: ::prost::alloc::string::String,
     /// Overrides for podtemplate used by task pods.
     #[prost(message, optional, tag="4")]
-    pub podtemplate: ::core::option::Option<PodTemplate>,
+    pub pod_template: ::core::option::Option<PodTemplate>,
 }
 /// A structure that uniquely identifies a launch plan in the system.
 #[allow(clippy::derive_partial_eq_without_eq)]

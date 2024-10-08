@@ -1171,9 +1171,9 @@ export class TaskNodeOverrides extends Message<TaskNodeOverrides> {
   /**
    * Overrides for podtemplate used by task pods.
    *
-   * @generated from field: flyteidl.core.PodTemplate podtemplate = 4;
+   * @generated from field: flyteidl.core.PodTemplate pod_template = 4;
    */
-  podtemplate?: PodTemplate;
+  podTemplate?: PodTemplate;
 
   constructor(data?: PartialMessage<TaskNodeOverrides>) {
     super();
@@ -1186,7 +1186,7 @@ export class TaskNodeOverrides extends Message<TaskNodeOverrides> {
     { no: 1, name: "resources", kind: "message", T: Resources },
     { no: 2, name: "extended_resources", kind: "message", T: ExtendedResources },
     { no: 3, name: "container_image", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "podtemplate", kind: "message", T: PodTemplate },
+    { no: 4, name: "pod_template", kind: "message", T: PodTemplate },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TaskNodeOverrides {

@@ -31,7 +31,7 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 	var resources *core.Resources
 	var extendedResources *v1alpha1.ExtendedResources
 	var containerImage string
-	var podtemplate *core.PodTemplate
+	var pod_template *core.PodTemplate
 	if n.GetTaskNode() != nil {
 		taskID := n.GetTaskNode().GetReferenceId().String()
 		// TODO: Use task index for quick lookup
@@ -62,8 +62,8 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 				containerImage = overrides.GetContainerImage()
 			}
 
-			if overrides.GetPodtemplate() != nil {
-				podtemplate = overrides.GetPodtemplate()
+			if overrides.GetPodTemplate() != nil {
+				pod_template = overrides.GetPodTemplate()
 			}
 		}
 	}
@@ -107,7 +107,7 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 		ActiveDeadline:    activeDeadline,
 		Interruptible:     interruptible,
 		ContainerImage:    containerImage,
-		PodTemplate:       podtemplate,
+		PodTemplate:       pod_template,
 	}
 
 	switch v := n.GetTarget().(type) {

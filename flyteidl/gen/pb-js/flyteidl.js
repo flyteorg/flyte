@@ -12482,7 +12482,7 @@
                  * @property {flyteidl.core.IResources|null} [resources] TaskNodeOverrides resources
                  * @property {flyteidl.core.IExtendedResources|null} [extendedResources] TaskNodeOverrides extendedResources
                  * @property {string|null} [containerImage] TaskNodeOverrides containerImage
-                 * @property {flyteidl.core.IPodTemplate|null} [podtemplate] TaskNodeOverrides podtemplate
+                 * @property {flyteidl.core.IPodTemplate|null} [podTemplate] TaskNodeOverrides podTemplate
                  */
     
                 /**
@@ -12525,12 +12525,12 @@
                 TaskNodeOverrides.prototype.containerImage = "";
     
                 /**
-                 * TaskNodeOverrides podtemplate.
-                 * @member {flyteidl.core.IPodTemplate|null|undefined} podtemplate
+                 * TaskNodeOverrides podTemplate.
+                 * @member {flyteidl.core.IPodTemplate|null|undefined} podTemplate
                  * @memberof flyteidl.core.TaskNodeOverrides
                  * @instance
                  */
-                TaskNodeOverrides.prototype.podtemplate = null;
+                TaskNodeOverrides.prototype.podTemplate = null;
     
                 /**
                  * Creates a new TaskNodeOverrides instance using the specified properties.
@@ -12562,8 +12562,8 @@
                         $root.flyteidl.core.ExtendedResources.encode(message.extendedResources, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
                     if (message.containerImage != null && message.hasOwnProperty("containerImage"))
                         writer.uint32(/* id 3, wireType 2 =*/26).string(message.containerImage);
-                    if (message.podtemplate != null && message.hasOwnProperty("podtemplate"))
-                        $root.flyteidl.core.PodTemplate.encode(message.podtemplate, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+                    if (message.podTemplate != null && message.hasOwnProperty("podTemplate"))
+                        $root.flyteidl.core.PodTemplate.encode(message.podTemplate, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
                     return writer;
                 };
     
@@ -12595,7 +12595,7 @@
                             message.containerImage = reader.string();
                             break;
                         case 4:
-                            message.podtemplate = $root.flyteidl.core.PodTemplate.decode(reader, reader.uint32());
+                            message.podTemplate = $root.flyteidl.core.PodTemplate.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -12629,10 +12629,10 @@
                     if (message.containerImage != null && message.hasOwnProperty("containerImage"))
                         if (!$util.isString(message.containerImage))
                             return "containerImage: string expected";
-                    if (message.podtemplate != null && message.hasOwnProperty("podtemplate")) {
-                        var error = $root.flyteidl.core.PodTemplate.verify(message.podtemplate);
+                    if (message.podTemplate != null && message.hasOwnProperty("podTemplate")) {
+                        var error = $root.flyteidl.core.PodTemplate.verify(message.podTemplate);
                         if (error)
-                            return "podtemplate." + error;
+                            return "podTemplate." + error;
                     }
                     return null;
                 };
