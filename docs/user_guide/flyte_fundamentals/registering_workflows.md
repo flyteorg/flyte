@@ -303,8 +303,6 @@ If you encounter a ``ModuleNotFoundError`` when packaging, use the `--source` op
 ```{prompt} bash $
 pyflyte --pkgs <dir1> package --source ./src -f
 ```
-
-This addition helps in avoiding the module detection issue and ensures smooth registration and execution of tasks.
 ````
 
 #### Register with `flytectl register`
