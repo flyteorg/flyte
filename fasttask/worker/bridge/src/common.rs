@@ -21,10 +21,14 @@ pub struct Executor {
 #[derive(Deserialize, Serialize)]
 pub struct Task {
     pub cmd: Vec<String>,
+    pub additional_distribution: Option<String>,
+    pub fast_register_dir: Option<String>,
 }
 
 #[derive(Deserialize, Serialize)]
 pub struct Response {
     pub phase: i32,
     pub reason: Option<String>,
+
+    pub executor_corrupt: bool,
 }

@@ -1,5 +1,6 @@
 use std::collections::{HashMap, HashSet};
 use std::future::Future;
+use std::hash::{DefaultHasher, Hash, Hasher};
 use std::pin::Pin;
 use std::sync::{Arc, Mutex, RwLock};
 use std::task::{Context, Poll, Waker};
@@ -19,7 +20,6 @@ use tokio::time::Interval;
 use tokio_util::codec::{Framed, LengthDelimitedCodec};
 use tonic::Request;
 use tracing::{debug, error, warn};
-use uuid::Uuid;
 
 struct AsyncBoolFuture {
     async_bool: Arc<Mutex<AsyncBool>>,
@@ -250,37 +250,58 @@ pub async fn run(args: BridgeArgs) -> Result<(), Box<dyn std::error::Error>> {
                 Some(Operation::Assign) => {
                     // parse and update command
                     let mut cmd_str = heartbeat_response.cmd.clone();
-                    let (mut fast_register_id_index, mut pyflyte_execute_index) = (None, None);
+                    let (
+                        mut pyflyte_execute_index,
+                        mut additional_distribution,
+                        mut fast_register_dir,
+                    ) = (None, None, None);
                     if cmd_str[0].eq("pyflyte-fast-execute") {
+                        let mut dest_dir_index = None;
                         for i in 0..cmd_str.len() {
                             match cmd_str[i] {
-                                ref x if x.eq("--dest-dir") => {
-                                    cmd_str[i + 1] = fast_register_dir_override.clone()
-                                }
+                                ref x if x.eq("--dest-dir") => dest_dir_index = Some(i + 1),
                                 ref x if x.eq("--additional-distribution") => {
-                                    fast_register_id_index = Some(i + 1)
+                                    additional_distribution = Some(cmd_str[i + 1].clone())
                                 }
                                 ref x if x.eq("pyflyte-execute") => pyflyte_execute_index = Some(i),
                                 _ => (),
                             }
                         }
+
+                        // hash `additional_distribution` (fast register unique id) to identify a
+                        // unique subdirectory to decompress the fast register file
+                        let mut h = DefaultHasher::new();
+                        additional_distribution.hash(&mut h);
+                        let dir = format!("{}/{}", fast_register_dir_override.clone(), h.finish());
+
+                        if let Err(e) = std::fs::create_dir_all(dir.clone()) {
+                            warn!("failed to create fast register subdir '{}'", dir);
+                            continue;
+                        }
+
+                        match dest_dir_index {
+                            Some(i) => cmd_str[i] = dir.clone(),
+                            None => {} // TODO @hamersaw - inject `--dest-dir fast_register_dir` into cmd_str
+                        }
+
+                        fast_register_dir = Some(dir);
                     }
 
-                    // if fast register file has already been processed we update to skip the
-                    // download and decompression steps
-                    let mut cmd_index = 0;
-                    if let (Some(i), Some(j)) = (fast_register_id_index, pyflyte_execute_index) {
-                        if fast_register_ids.contains(&cmd_str[i]) {
-                            cmd_index = j;
+                    // if the fast register file has already been processed we skip the download
+                    if let Some(ref additional_distribution_str) = additional_distribution {
+                        if fast_register_ids.contains(additional_distribution_str) {
+                            additional_distribution = None;
                         } else {
-                            fast_register_ids.insert(cmd_str[i].clone());
+                            fast_register_ids.insert(additional_distribution_str.clone());
                         }
                     }
 
-                    // copy cmd_str vec from cmd_index
-                    let cmd = cmd_str[cmd_index..].to_vec();
-                    //let mut cmd = tokio::process::Command::new(&cmd_str[cmd_index]);
-                    //cmd.args(&cmd_str[cmd_index+1..]);
+                    // strip `pyflyte-fast-execute` command if exists
+                    let cmd = if let Some(pyflyte_execute_index) = pyflyte_execute_index {
+                        cmd_str[pyflyte_execute_index..].to_vec()
+                    } else {
+                        cmd_str.clone()
+                    };
 
                     // execute command
                     let (task_id, namespace, workflow_id) = (
@@ -319,6 +340,8 @@ pub async fn run(args: BridgeArgs) -> Result<(), Box<dyn std::error::Error>> {
                             namespace,
                             workflow_id,
                             cmd,
+                            additional_distribution,
+                            fast_register_dir,
                             task_status_tx_clone,
                             task_status_report_interval_seconds,
                             last_ack_grace_period_seconds,

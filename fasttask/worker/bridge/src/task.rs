@@ -11,12 +11,19 @@ use futures::sink::SinkExt;
 use futures::stream::StreamExt;
 use tracing::{debug, info, warn};
 
+struct RunCommandResult {
+    build_new_executor: bool,
+    killed: bool,
+}
+
 pub async fn execute(
     task_contexts: Arc<RwLock<HashMap<String, TaskContext>>>,
     task_id: String,
     namespace: String,
     workflow_id: String,
     cmd: Vec<String>,
+    additional_distribution: Option<String>,
+    fast_register_dir: Option<String>,
     task_status_tx: Sender<TaskStatus>,
     task_status_report_interval_seconds: u64,
     last_ack_grace_period_seconds: u64,
@@ -91,6 +98,8 @@ pub async fn execute(
             &namespace,
             &workflow_id,
             cmd,
+            additional_distribution,
+            fast_register_dir,
             &task_status_tx,
             task_status_report_interval_seconds,
             last_ack_grace_period_seconds,
@@ -101,25 +110,26 @@ pub async fn execute(
         .await
         {
             Ok(result) => Ok(result),
-            Err(e) => Err(format!("failed to run command: {:?}", e)),
+            Err(e) => Err(format!("failed to run command '{}'", e)),
         };
 
         // if the executor is dropped the child process is automatically killed, so we either
         // re-enqueue the existing executor or indicate that a new instance should be created
-        match result {
-            Ok(true) => {
-                build_executor_tx.send(()).await?;
-                true
-            }
-            Ok(false) => {
-                executor_tx.send(executor).await?;
-                false
-            }
+        let run_command_result = match result {
+            Ok(run_command_result) => run_command_result,
             Err(e) => {
                 executor_tx.send(executor).await?;
                 return Err(e.into());
             }
+        };
+
+        if run_command_result.build_new_executor {
+            build_executor_tx.send(()).await?;
+        } else {
+            executor_tx.send(executor).await?;
         }
+
+        run_command_result.killed
     } else {
         true
     };
@@ -233,24 +243,33 @@ async fn run_command(
     namespace: &str,
     workflow_id: &str,
     cmd: Vec<String>,
+    additional_distribution: Option<String>,
+    fast_register_dir: Option<String>,
     task_status_tx: &Sender<TaskStatus>,
     task_status_report_interval_seconds: u64,
     last_ack_grace_period_seconds: u64,
     phase: &mut i32,
     reason: &mut String,
     executor: &mut Executor,
-) -> Result<bool, Box<dyn std::error::Error>> {
+) -> Result<RunCommandResult, Box<dyn std::error::Error>> {
     // execute command and monitor
     let task_start_ts = Instant::now();
 
-    let buf = bincode::serialize(&Task { cmd }).unwrap();
+    let buf = bincode::serialize(&Task {
+        cmd,
+        additional_distribution,
+        fast_register_dir,
+    })
+    .unwrap();
     executor.framed.send(buf.into()).await.unwrap();
 
     let mut interval =
         tokio::time::interval(Duration::from_secs(task_status_report_interval_seconds));
+
     loop {
         tokio::select! {
             result = executor.framed.next() => {
+                // executor returned a result for the task execution
                 info!("completed task_id {} in {}", task_id, task_start_ts.elapsed().as_millis());
                 let buf = result.unwrap().unwrap();
 
@@ -258,21 +277,31 @@ async fn run_command(
 
                 *phase = response.phase;
                 *reason = response.reason.unwrap_or("".to_string());
-                break;
+
+                return Ok(
+                    RunCommandResult{
+                        build_new_executor: response.executor_corrupt,
+                        killed: false,
+                    })
             },
             result = executor.child.wait() => {
+                // executor process completed
                 match result {
                     Ok(exit_status) => {
                         *phase = FAILED;
                         *reason = format!("process completed with exit status: '{}'", exit_status);
-                        return Ok(true);
                     },
                     Err(e) => {
                         *phase = FAILED;
                         *reason = format!("{}", e);
-                        return Ok(true);
                     },
                 }
+
+                return Ok(
+                    RunCommandResult{
+                        build_new_executor: true,
+                        killed: false,
+                    })
             },
             _ = interval.tick() => {
                 // if last_ack_timestamp > grace_period then kill tasks and delete from task_contexts
@@ -295,7 +324,11 @@ async fn run_command(
                     // to abort the process we attempt to kill, if this fails it will automatically
                     // be aborted when the instance is dropped.
                     let _ = executor.child.kill().await;
-                    return Ok(true);
+                    return Ok(
+                        RunCommandResult{
+                            build_new_executor: true,
+                            killed: false,
+                        })
                 }
 
                 // send task status
@@ -321,12 +354,14 @@ async fn run_command(
                 // to abort the process we attempt to kill, if this fails it will automatically
                 // be aborted when the instance is dropped
                 let _ = executor.child.kill().await;
-                return Ok(true);
+                return Ok(
+                    RunCommandResult{
+                        build_new_executor: true,
+                        killed: true,
+                    })
             },
         }
     }
-
-    Ok(false)
 }
 
 async fn wait_in_backlog(
