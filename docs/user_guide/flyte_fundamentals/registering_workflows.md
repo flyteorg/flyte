@@ -358,6 +358,34 @@ two GitHub actions that facilitates this:
   of Flyte packages, for example, the `.tgz` archives that are created by
   `pyflyte package`.
 
+### Some CI/CD best practices
+
+Several best practices are essential for ensuring smooth versioning, secure automation and image management. Tools like Docker, Helm and Github Actions help teams streamline their build, tagging, and release processes while maintaining security and scalability. 
+
+#### Approach for Building, Tagging and Versioning
+
+- Build pipelines currently register Flyte workflows on each commit. Determine the version of the build. For commits on feature branches, use `<branch-name>-<short-commit-hash>`. For commits on main branch, use `main-<short-commit-hash>`. For released (tagged) versions we usually use the version number.
+
+- Build, tag and push docker image based on the version from step (1).
+
+- Serialize and register the Flyte workflows based on the version from step (1) and the docker image from step (2). This step is dependent on the success of step (2). Depending on whether it’s a feature branch, etc. we’re adjusting the domain to register to accordingly.
+
+#### Best practices to follow
+
+- **GitHub Actions for Workflow Automation**: Leverage GitHub Actions to automate the release process, including critical parts such as generating git tags, Docker images, and releasing Helm and manifest files. Automating these workflows reduces manual errors and speeds up the deployment cycle.
+
+- **Docker for Image Management**:
+Use Docker to build, tag, and push images based on the version of the build. These Docker images are integral to the deployment pipeline, allowing Flyte workflows and other tasks to reference the correct image without manual work.
+
+- **Parallel Execution with Matrix Strategy**:
+To optimize performance and efficiency through parallel execution of tasks, employ a matrix strategy in GitHub Actions. This is used in the `publish-flyte-component-image` job.
+
+- **Secure Authentication with GitHub Secrets**:
+GitHub Secrets can be used to store sensitive data such as authentication tokens and credentials securely. This ensures that essential data is protected and not exposed in the codebase, safeguarding your automation processes.
+
+- **Helm and GoReleaser for Packaging and Releasing**:
+Use Helm for managing Kubernetes package releases and GoReleaser for automating the release of Go applications. These tools streamline the packaging and distribution processes, making the CI/CD pipeline more robust and manageable. These are used in the `helm-release` and `manifest-release` jobs.
+
 ## What's next?
 
 In this guide, you learned about the Flyte demo cluster, Flyte configuration, and
