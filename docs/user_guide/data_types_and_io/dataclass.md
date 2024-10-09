@@ -29,7 +29,7 @@ To begin, import the necessary dependencies:
 :lines: 1-9
 ```
 
-Build your custom image by ImageSpec:
+Build your custom image with ImageSpec:
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/cfb5ea3b0d0502ef7df1f2e14f4a0d9b78250b6a/examples/data_types_and_io/data_types_and_io/dataclass.py
 :caption: data_types_and_io/dataclass.py
 :lines: 16-19
