@@ -6,7 +6,7 @@ Executions
 
 .. tags:: Basic, Glossary
 
-**Executions** are instances of workflows, nodes or tasks created in the system as a result of a user-requested execution or a scheduled execution.
+**Executions** are instances of workflows, nodes or tasks created in the system as a result of a user-requested execution or a scheduled execution. Execution IDs are unique within a given project domain, ensuring that no two executions within the same domain can have the same ID.
 
 Typical Flow Using Flytectl
 ---------------------------
