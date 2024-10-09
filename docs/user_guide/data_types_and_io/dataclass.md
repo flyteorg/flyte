@@ -12,7 +12,7 @@ Flytekit uses the [Mashumaro library](https://github.com/Fatal1ty/mashumaro)
 to serialize and deserialize dataclasses.
 
 :::{important}
-If you're using Flytekit version below v1.11.1, your dataclass will need to add `from dataclasses_json import dataclass_json` and decorate with `@dataclass_json`.
+If you're using Flytekit version below v1.11.1, you will need to add `from dataclasses_json import dataclass_json` to your imports and decorate your dataclass with `@dataclass_json`.
 :::
 
 ```{note}
