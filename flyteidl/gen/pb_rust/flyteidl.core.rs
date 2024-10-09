@@ -2130,7 +2130,7 @@ pub struct ExecutionError {
     #[prost(enumeration="execution_error::ErrorKind", tag="4")]
     pub kind: i32,
     /// Worker that generated the error
-    #[prost(string, tag="6")]
+    #[prost(string, tag="5")]
     pub worker: ::prost::alloc::string::String,
 }
 /// Nested message and enum types in `ExecutionError`.

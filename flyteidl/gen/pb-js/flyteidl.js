@@ -13914,7 +13914,7 @@
                     if (message.kind != null && message.hasOwnProperty("kind"))
                         writer.uint32(/* id 4, wireType 0 =*/32).int32(message.kind);
                     if (message.worker != null && message.hasOwnProperty("worker"))
-                        writer.uint32(/* id 6, wireType 2 =*/50).string(message.worker);
+                        writer.uint32(/* id 5, wireType 2 =*/42).string(message.worker);
                     return writer;
                 };
     
@@ -13948,7 +13948,7 @@
                         case 4:
                             message.kind = reader.int32();
                             break;
-                        case 6:
+                        case 5:
                             message.worker = reader.string();
                             break;
                         default:

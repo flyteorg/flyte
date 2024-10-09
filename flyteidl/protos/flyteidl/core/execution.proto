@@ -74,7 +74,7 @@ message ExecutionError {
     }
     ErrorKind kind = 4;
     // Worker that generated the error
-    string worker = 6;
+    string worker = 5;
 }
 
 // Log information for the task that is specific to a log sink
