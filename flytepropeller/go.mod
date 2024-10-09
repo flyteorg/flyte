@@ -22,6 +22,7 @@ require (
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.16.0
+	github.com/shamaton/msgpack/v2 v2.2.2
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/pflag v1.0.5
@@ -55,7 +56,7 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v1.4.0 // indirect
 	github.com/AzureAD/microsoft-authentication-library-for-go v1.2.2 // indirect
 	github.com/GoogleCloudPlatform/spark-on-k8s-operator v0.0.0-20200723154620-6f35a1152625 // indirect
-	github.com/aws/aws-sdk-go v1.44.2 // indirect
+	github.com/aws/aws-sdk-go v1.47.11 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.2.0 // indirect
 	github.com/aws/aws-sdk-go-v2/config v1.0.0 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.0.0 // indirect
