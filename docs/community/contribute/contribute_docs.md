@@ -13,9 +13,9 @@ The Flyte documentation comprises the following types:
 
 * **{ref}`User guide <userguide>` documentation:** Conceptual and procedural documentation about using Flyte features to accomplish tasks.
 * **API documentation:**
-  * {doc}`flytekit <../api/flytekit/docs_index>`
-  * {doc}`flytectl <../api/flytectl/docs_index>`
-  * {doc}`flyteidl <../api/flyteidl/docs_index>`
+  * {doc}`flytekit <../../api/flytekit/docs_index>`
+  * {doc}`flytectl <../../api/flytectl/docs_index>`
+  * {doc}`flyteidl <../../api/flyteidl/docs_index>`
 * **{ref}`Tutorials <tutorials>`:** Longer, more advanced guides that use multiple Flyte features to solve real-world problems. Some tutorials may require extra setup, while others can only run on larger clusters.
 * **{ref}`Integrations examples <integrations>`:** These examples showcase how to use the Flyte plugins that integrate with the broader data and machine learning ecosystem.
 * **{ref}`Deployment documentation <deployment>`:** Guidance on deploying and configuring the Flyte backend.

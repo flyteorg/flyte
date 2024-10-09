@@ -30,7 +30,7 @@ Please join us on:
 Open Source Community Meeting 
 -----------------------------
 
-When: every other Tuesday, 9:00 AM Pacific Time.
+When: Every other Thursday, 11:00 AM Pacific Time.
 You're welcome to join and learn from other community members sharing their experiences with Flyte or any other technology from the AI ecosystem.
 Check out the event details and add it to your `calendar <https://www.addevent.com/event/EA7823958>`_, or just pop in! 
 

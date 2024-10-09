@@ -11,7 +11,7 @@ Please read our `Code of Conduct <https://lfprojects.org/policies/code-of-conduc
 
 Here are some guidelines for you to follow, which will make your first and follow-up contributions easier.
 
-TL;DR: Find the repo-specific contribution guidelines in the :ref:`Component Reference <component-reference>` section.
+TL;DR: Find the repo-specific contribution guidelines in the :ref:`Component Reference <component_reference>` section.
 
 💻 Becoming a contributor
 =========================
