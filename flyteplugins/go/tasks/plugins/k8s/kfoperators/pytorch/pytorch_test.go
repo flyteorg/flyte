@@ -712,7 +712,9 @@ func TestGetLogsElastic(t *testing.T) {
 
 func TestGetProperties(t *testing.T) {
 	pytorchResourceHandler := pytorchOperatorResourceHandler{}
-	expected := k8s.PluginProperties{}
+	expected := k8s.PluginProperties{
+		ErrorAggregationStrategy: k8s.EarliestErrorAggregationStrategy,
+	}
 	assert.Equal(t, expected, pytorchResourceHandler.GetProperties())
 }
 

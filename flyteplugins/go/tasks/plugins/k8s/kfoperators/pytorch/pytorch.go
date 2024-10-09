@@ -28,7 +28,9 @@ type pytorchOperatorResourceHandler struct {
 var _ k8s.Plugin = pytorchOperatorResourceHandler{}
 
 func (pytorchOperatorResourceHandler) GetProperties() k8s.PluginProperties {
-	return k8s.PluginProperties{}
+	return k8s.PluginProperties{
+		ErrorAggregationStrategy: k8s.EarliestErrorAggregationStrategy,
+	}
 }
 
 // Defines a func to create a query object (typically just object and type meta portions) that's used to query k8s
