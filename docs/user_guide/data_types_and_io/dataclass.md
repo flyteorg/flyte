@@ -16,7 +16,6 @@ If you're using Flytekit version below v1.11.1, your dataclass will need to deco
 inherit from Mashumaro's `DataClassJSONMixin`.
 
 If you're using Flytekit version less than v1.10, you'll need to add `from dataclasses_json import dataclass_json` to your imports  and decorate your dataclass with `@dataclass_json`.
-`from dataclasses_json import dataclass_json`
 :::
 
 ```{note}
