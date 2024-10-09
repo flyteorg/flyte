@@ -45,7 +45,7 @@ Our documentation contains a mix of Markdown and reStructuredText.
 
 User guide documentation and tutorials and integrations examples uses MyST Markdown. For more information, see the [MyST syntax documentation](https://mystmd.org/guide/syntax-overview). 
 
-### ReStructured text
+### reStructuredText
 
 Deployment and API docs mostly use reStructured Text. For more information, see the [reStructuredText documentation](https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html).
 
