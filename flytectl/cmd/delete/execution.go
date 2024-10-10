@@ -2,7 +2,6 @@ package delete
 
 import (
 	"context"
-
 	"github.com/flyteorg/flyte/flytectl/cmd/config"
 	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/execution"
 	cmdCore "github.com/flyteorg/flyte/flytectl/cmd/core"
@@ -21,6 +20,11 @@ Terminate a single execution with its name:
 ::
 
  flytectl delete execution c6a51x2l9e  -d development  -p flytesnacks
+
+Force an execution termination:
+::
+
+ flytectl delete execution ds3vgtgc4  -d development  -p flytesnacks -f true
 
 .. note::
     The terms execution/executions are interchangeable in these commands.
@@ -60,7 +64,7 @@ Usage
 `
 )
 
-func terminateExecutionFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
+func terminateExecutionFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext, force bool) error {
 	for i := 0; i < len(args); i++ {
 		name := args[i]
 		logger.Infof(ctx, "Terminating execution of %v execution ", name)
@@ -73,6 +77,7 @@ func terminateExecutionFunc(ctx context.Context, args []string, cmdCtx cmdCore.C
 					Domain:  config.GetConfig().Domain,
 					Name:    name,
 				},
+				Force: force,
 			})
 			if err != nil {
 				logger.Errorf(ctx, "Failed to terminate execution of %v execution due to %v ", name, err)

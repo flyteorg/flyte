@@ -1,6 +1,7 @@
 package delete
 
 import (
+	"context"
 	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/clusterresourceattribute"
 	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/execution"
 	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/executionclusterlabel"
@@ -19,7 +20,7 @@ const (
 Delete a resource; if an execution:
 ::
 
- flytectl delete execution kxd1i72850  -d development  -p flytesnacks
+ flytectl delete execution kxd1i72850  -d development  -p flytesnacks -f true
 `
 )
 
@@ -30,9 +31,18 @@ func RemoteDeleteCommand() *cobra.Command {
 		Short: deleteCmdShort,
 		Long:  deleteCmdLong,
 	}
+	var force bool
+	deleteCmd.PersistentFlags().BoolVarP(&force, "force", "f", false, "Force deletion without confirmation")
 	terminateResourcesFuncs := map[string]cmdcore.CommandEntry{
-		"execution": {CmdFunc: terminateExecutionFunc, Aliases: []string{"executions"}, Short: execCmdShort,
-			Long: execCmdLong, PFlagProvider: execution.DefaultExecDeleteConfig},
+		"execution": {
+			CmdFunc: func(ctx context.Context, args []string, cmdCtx cmdcore.CommandContext) error {
+				return terminateExecutionFunc(ctx, args, cmdCtx, force)
+			},
+			Aliases:       []string{"executions"},
+			Short:         execCmdShort,
+			Long:          execCmdLong,
+			PFlagProvider: execution.DefaultExecDeleteConfig,
+		},
 		"task-resource-attribute": {CmdFunc: deleteTaskResourceAttributes, Aliases: []string{"task-resource-attributes"},
 			Short: taskResourceAttributesShort,
 			Long:  taskResourceAttributesLong, PFlagProvider: taskresourceattribute.DefaultDelConfig, ProjectDomainNotRequired: true},
