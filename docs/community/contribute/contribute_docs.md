@@ -25,7 +25,11 @@ To update user guide or deployment documentation, edit the corresponding files i
 
 ### Code in user guide documentation
 
-If you want to include tested, runnable example code in user guide documentation, you will need to add your code to the examples directory of the [flytesnacks repository](https://github.com/flyteorg/flytesnacks). Write your code in regular Python, with regular comments. These comments **will not** be extracted from the Python file and turned into user-facing documentation. You can use the `rli` ([remoteliteralinclude](https://github.com/wpilibsuite/sphinxext-remoteliteralinclude/blob/main/README.md)) directive to include snippets of code from your example Python file.
+If you want to include tested, runnable example code in user guide documentation, you will need to add your code to the examples directory of the [flytesnacks repository](https://github.com/flyteorg/flytesnacks). Write your code in regular Python, with regular comments. You can use the `rli` ([remoteliteralinclude](https://github.com/wpilibsuite/sphinxext-remoteliteralinclude/blob/main/README.md)) directive to include snippets of code from your example Python file.
+
+```{important}
+Unlike the comments in tutorials and integrations examples Python files, the comments in user guide Python files in flytesnacks **will not** be transformed into Markdown and processed into HTML for the docs site. All prose documentation for the user guide is contained in the Flyte repo, in the `docs/user_guide` directory.
+```
 
 ## Contributing to API documentation
 
