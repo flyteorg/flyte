@@ -7562,8 +7562,8 @@ export namespace flyteidl {
             /** ContainerError origin */
             origin?: (flyteidl.core.ExecutionError.ErrorKind|null);
 
-            /** ContainerError timetsamp */
-            timetsamp?: (Long|null);
+            /** ContainerError timestamp */
+            timestamp?: (Long|null);
 
             /** ContainerError worker */
             worker?: (string|null);
@@ -7590,8 +7590,8 @@ export namespace flyteidl {
             /** ContainerError origin. */
             public origin: flyteidl.core.ExecutionError.ErrorKind;
 
-            /** ContainerError timetsamp. */
-            public timetsamp: Long;
+            /** ContainerError timestamp. */
+            public timestamp: Long;
 
             /** ContainerError worker. */
             public worker: string;

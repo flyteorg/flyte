@@ -7,7 +7,7 @@ from typing import ClassVar as _ClassVar, Mapping as _Mapping, Optional as _Opti
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class ContainerError(_message.Message):
-    __slots__ = ["code", "message", "kind", "origin", "timetsamp", "worker"]
+    __slots__ = ["code", "message", "kind", "origin", "timestamp", "worker"]
     class Kind(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
         NON_RECOVERABLE: _ClassVar[ContainerError.Kind]
@@ -18,15 +18,15 @@ class ContainerError(_message.Message):
     MESSAGE_FIELD_NUMBER: _ClassVar[int]
     KIND_FIELD_NUMBER: _ClassVar[int]
     ORIGIN_FIELD_NUMBER: _ClassVar[int]
-    TIMETSAMP_FIELD_NUMBER: _ClassVar[int]
+    TIMESTAMP_FIELD_NUMBER: _ClassVar[int]
     WORKER_FIELD_NUMBER: _ClassVar[int]
     code: str
     message: str
     kind: ContainerError.Kind
     origin: _execution_pb2.ExecutionError.ErrorKind
-    timetsamp: int
+    timestamp: int
     worker: str
-    def __init__(self, code: _Optional[str] = ..., message: _Optional[str] = ..., kind: _Optional[_Union[ContainerError.Kind, str]] = ..., origin: _Optional[_Union[_execution_pb2.ExecutionError.ErrorKind, str]] = ..., timetsamp: _Optional[int] = ..., worker: _Optional[str] = ...) -> None: ...
+    def __init__(self, code: _Optional[str] = ..., message: _Optional[str] = ..., kind: _Optional[_Union[ContainerError.Kind, str]] = ..., origin: _Optional[_Union[_execution_pb2.ExecutionError.ErrorKind, str]] = ..., timestamp: _Optional[int] = ..., worker: _Optional[str] = ...) -> None: ...
 
 class ErrorDocument(_message.Message):
     __slots__ = ["error"]

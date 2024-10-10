@@ -195,7 +195,7 @@ func (e *EarliestFileErrorRetriever) GetError(ctx context.Context) (io.Execution
 	var earliestTimestamp int64 = math.MaxInt64
 	earliestExecutionError := io.ExecutionError{}
 	for _, errorFileAndDoc := range errorFileAndDocs {
-		timestamp := errorFileAndDoc.errorDoc.Error.GetTimetsamp()
+		timestamp := errorFileAndDoc.errorDoc.Error.GetTimestamp()
 		if earliestTimestamp >= timestamp {
 			earliestExecutionError = errorDoc2ExecutionError(errorFileAndDoc.errorDoc, errorFileAndDoc.errorFilePath)
 			earliestTimestamp = timestamp

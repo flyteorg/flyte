@@ -3096,7 +3096,7 @@ pub struct ContainerError {
     pub origin: i32,
     /// Timestamp of the error
     #[prost(int64, tag="5")]
-    pub timetsamp: i64,
+    pub timestamp: i64,
     /// Worker that generated the error
     #[prost(string, tag="6")]
     pub worker: ::prost::alloc::string::String,
