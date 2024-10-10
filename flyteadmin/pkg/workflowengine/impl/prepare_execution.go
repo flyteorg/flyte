@@ -129,6 +129,9 @@ func PrepareFlyteWorkflow(data interfaces.ExecutionData, flyteWorkflow *v1alpha1
 	acceptAtWrapper := v1.NewTime(data.ExecutionParameters.AcceptedAt)
 	flyteWorkflow.AcceptedAt = &acceptAtWrapper
 
+	// Add finalizer
+	flyteWorkflow.Finalizers = append(flyteWorkflow.Finalizers, "flyte-finalizer")
+
 	// add permissions from auth and security context. Adding permissions from auth would be removed once all clients
 	// have migrated over to security context
 	addPermissions(data.ExecutionParameters.ExecutionConfig.SecurityContext,

@@ -7,7 +7,7 @@ require (
 	cloud.google.com/go/storage v1.36.0
 	github.com/NYTimes/gizmo v1.3.6
 	github.com/Selvatico/go-mocket v1.0.7
-	github.com/aws/aws-sdk-go v1.44.2
+	github.com/aws/aws-sdk-go v1.47.11
 	github.com/benbjohnson/clock v1.3.0
 	github.com/cloudevents/sdk-go/binding/format/protobuf/v2 v2.8.0
 	github.com/cloudevents/sdk-go/v2 v2.15.2
