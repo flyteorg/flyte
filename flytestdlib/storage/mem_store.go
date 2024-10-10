@@ -9,6 +9,9 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"strings"
+
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 type rawFile = []byte
@@ -55,7 +58,25 @@ func (s *InMemoryStore) Head(ctx context.Context, reference DataReference) (Meta
 }
 
 func (s *InMemoryStore) List(ctx context.Context, reference DataReference, maxItems int, cursor Cursor) ([]DataReference, Cursor, error) {
-	return nil, NewCursorAtEnd(), fmt.Errorf("Not implemented yet")
+	var items []DataReference
+	prefix := strings.TrimSuffix(string(reference), "/") + "/"
+
+	for ref := range s.cache {
+		if strings.HasPrefix(ref.String(), prefix) {
+			_, _, k, err := ref.Split()
+			if err != nil {
+				logger.Errorf(ctx, "failed to split reference [%s]", ref)
+				continue
+			}
+			items = append(items, DataReference(k))
+		}
+	}
+
+	if len(items) == 0 {
+		return nil, NewCursorAtEnd(), os.ErrNotExist
+	}
+
+	return items, NewCursorAtEnd(), nil
 }
 
 func (s *InMemoryStore) ReadRaw(ctx context.Context, reference DataReference) (io.ReadCloser, error) {
