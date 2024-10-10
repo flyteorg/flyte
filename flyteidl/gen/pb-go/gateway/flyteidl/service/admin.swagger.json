@@ -7153,6 +7153,10 @@
         },
         "kind": {
           "$ref": "#/definitions/ExecutionErrorErrorKind"
+        },
+        "worker": {
+          "type": "string",
+          "title": "Worker that generated the error"
         }
       },
       "description": "Represents the error message from the execution."

@@ -8,6 +8,7 @@ package storage
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"net/url"
 	"strings"
@@ -170,4 +171,8 @@ func (r DataReference) Split() (scheme, container, key string, err error) {
 
 func (r DataReference) String() string {
 	return string(r)
+}
+
+func NewDataReference(scheme string, container string, key string) DataReference {
+	return DataReference(fmt.Sprintf("%s://%s/%s", scheme, container, key))
 }

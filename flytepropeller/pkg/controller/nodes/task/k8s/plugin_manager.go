@@ -290,7 +290,9 @@ func (e *PluginManager) checkResourcePhase(ctx context.Context, tCtx pluginsCore
 		var opReader io.OutputReader
 		if pCtx.ow == nil {
 			logger.Infof(ctx, "Plugin [%s] returned no outputReader, assuming file based outputs", e.id)
-			opReader = ioutils.NewRemoteFileOutputReader(ctx, tCtx.DataStore(), tCtx.OutputWriter(), 0)
+			opReader = ioutils.NewRemoteFileOutputReaderWithErrorAggregationStrategy(
+				ctx, tCtx.DataStore(), tCtx.OutputWriter(), 0,
+				e.plugin.GetProperties().ErrorAggregationStrategy)
 		} else {
 			logger.Infof(ctx, "Plugin [%s] returned outputReader", e.id)
 			opReader = pCtx.ow.GetReader()

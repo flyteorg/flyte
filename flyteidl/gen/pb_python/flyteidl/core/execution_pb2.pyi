@@ -83,7 +83,7 @@ class TaskExecution(_message.Message):
     def __init__(self) -> None: ...
 
 class ExecutionError(_message.Message):
-    __slots__ = ["code", "message", "error_uri", "kind"]
+    __slots__ = ["code", "message", "error_uri", "kind", "worker"]
     class ErrorKind(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
         UNKNOWN: _ClassVar[ExecutionError.ErrorKind]
@@ -96,11 +96,13 @@ class ExecutionError(_message.Message):
     MESSAGE_FIELD_NUMBER: _ClassVar[int]
     ERROR_URI_FIELD_NUMBER: _ClassVar[int]
     KIND_FIELD_NUMBER: _ClassVar[int]
+    WORKER_FIELD_NUMBER: _ClassVar[int]
     code: str
     message: str
     error_uri: str
     kind: ExecutionError.ErrorKind
-    def __init__(self, code: _Optional[str] = ..., message: _Optional[str] = ..., error_uri: _Optional[str] = ..., kind: _Optional[_Union[ExecutionError.ErrorKind, str]] = ...) -> None: ...
+    worker: str
+    def __init__(self, code: _Optional[str] = ..., message: _Optional[str] = ..., error_uri: _Optional[str] = ..., kind: _Optional[_Union[ExecutionError.ErrorKind, str]] = ..., worker: _Optional[str] = ...) -> None: ...
 
 class TaskLog(_message.Message):
     __slots__ = ["uri", "name", "message_format", "ttl", "ShowWhilePending", "HideOnceFinished"]
