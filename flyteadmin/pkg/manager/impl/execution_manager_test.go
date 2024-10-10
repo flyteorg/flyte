@@ -3450,7 +3450,7 @@ func TestTerminateExecution(t *testing.T) {
 			Domain:  "domain",
 			Name:    "name",
 		}, data.ExecutionID))
-		assert.True(t, data.Force)
+		assert.False(t, data.Force)
 		return true
 	})).Return(nil)
 	mockExecutor.OnID().Return("customMockExecutor")
