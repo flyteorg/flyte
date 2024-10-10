@@ -1,136 +1,8 @@
-.. _contribute_Flyte:
+#################
+Contributing code
+#################
 
-#####################
-Contributing to Flyte
-#####################
-
-.. tags:: Contribute, Basic
-
-Thank you for taking the time to contribute to Flyte!
-Please read our `Code of Conduct <https://lfprojects.org/policies/code-of-conduct/>`__ before contributing to Flyte.
-
-Here are some guidelines for you to follow, which will make your first and follow-up contributions easier.
-
-TL;DR: Find the repo-specific contribution guidelines in the `Component Reference <#component-reference>`__ section.
-
-💻 Becoming a contributor
-=========================
-
-An issue tagged with `good first issue <https://github.com/flyteorg/flyte/labels/good%20first%20issue>`__ is the best place to start for first-time contributors.
-
-**Appetizer for every repo: Fork and clone the concerned repository. Create a new branch on your fork and make the required changes. Create a pull request once your work is ready for review.**
-
-.. note::
-    To open a pull request, refer to `GitHub's guide <https://guides.github.com/activities/forking/>`__ for detailed instructions.
-
-Example PR for your reference: `GitHub PR <https://github.com/flyteorg/flytepropeller/pull/242>`__.
-A couple of checks are introduced to help maintain the robustness of the project.
-
-#. To get through DCO, sign off on every commit (`Reference <https://github.com/src-d/guide/blob/master/developer-community/fix-DCO.md>`__)
-#. To improve code coverage, write unit tests to test your code
-#. Make sure all the tests pass. If you face any issues, please let us know
-
-On a side note, format your Go code with ``golangci-lint`` followed by ``goimports`` (use ``make lint`` and ``make goimports``), and Python code with ``black`` and ``isort`` (use ``make fmt``).
-If make targets are not available, you can manually format the code.
-Refer to `Effective Go <https://golang.org/doc/effective_go>`__, `Black <https://github.com/psf/black>`__, and `Isort <https://github.com/PyCQA/isort>`__ for full coding standards.
-
-As you become more involved with the project, you may be able to be added as a contributor to the repos you're working on,
-but there is a medium term effort to move all development to forks.
-
-📃 Documentation
-================
-
-Flyte uses Sphinx for documentation. ``protoc-gen-doc`` is used to generate the documentation from ``.proto`` files.
-
-Sphinx spans multiple repositories under `flyteorg <https://github.com/flyteorg>`__. It uses reStructured Text (rst) files to store the documentation content.
-For API- and code-related content, it extracts docstrings from the code files.
-
-To get started, refer to the `reStructuredText reference <https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html#rst-index>`__.
-
-For minor edits that don't require a local setup, you can edit the GitHub page in the documentation to propose improvements.
-
-Intersphinx
-***********
-
-`Intersphinx <https://www.sphinx-doc.org/en/master/usage/extensions/intersphinx.html>`__ can generate automatic links to the documentation of objects in other projects.
-
-To establish a reference to any other documentation from Flyte or within it, use Intersphinx.
-
-To do so, create an ``intersphinx_mapping`` in the ``conf.py`` file which should be present in the respective ``docs`` repository.
-For example, ``rsts`` is the docs repository for the ``flyte`` repo.
-
-For example:
-
-.. code-block:: python
-
-    intersphinx_mapping = {
-        "python": ("https://docs.python.org/3", None),
-        "flytekit": ("https://flyte.readthedocs.io/projects/flytekit/en/master/", None),
-    }
-
-The key refers to the name used to refer to the file (while referencing the documentation), and the URL denotes the precise location.
-
-Here is an example using ``:std:doc``:
-
-* Direct reference
-
-  .. code-block:: text
-
-      Task: :std:doc:`/api/flytekit/generated/flytekit.task`
-
-  Output:
-
-  Task: :std:doc:`/api/flytekit/generated/flytekit.task`
-
-* Custom name
-
-  .. code-block:: text
-
-      :std:doc:`Using custom words </api/flytekit/generated/flytekit.task>`
-
-  Output:
-
-  :std:doc:`Using custom words </api/flytekit/generated/flytekit.task>`
-
-|
-
-You can cross-reference multiple Python objects. Check out this `section <https://www.sphinx-doc.org/en/master/usage/restructuredtext/domains.html#cross-referencing-python-objects>`__ to learn more.
-
-|
-
-For instance, `task` decorator in flytekit uses the ``func`` role.
-
-.. code-block:: text
-
-    Link to flytekit code :py:func:`flytekit:flytekit.task`
-
-Output:
-
-Link to flytekit code :py:func:`flytekit:flytekit.task`
-
-|
-
-Here are a couple more examples.
-
-.. code-block:: text
-
-    :py:mod:`Module <python:typing>`
-    :py:class:`Class <python:typing.Type>`
-    :py:data:`Data <python:typing.Callable>`
-    :py:func:`Function <python:typing.cast>`
-    :py:meth:`Method <python:pprint.PrettyPrinter.format>`
-
-Output:
-
-:py:mod:`Module <python:typing>`
-
-:py:class:`Class <python:typing.Type>`
-
-:py:data:`Data <python:typing.Callable>`
-
-:py:func:`Function <python:typing.cast>`
-
-:py:meth:`Method <python:pprint.PrettyPrinter.format>`
+.. _component_reference:
 
 🧱 Component reference
 ======================
@@ -262,16 +134,6 @@ To build the Flyte docs locally you will need the following prerequisites:
     * - `Repo <https://github.com/flyteorg/flytestdlib>`__
     * - **Purpose**: Standard Library for Shared Components
     * - **Language**: Go
-
-``flytesnacks``
-***************
-
-.. list-table::
-
-    * - `Repo <https://github.com/flyteorg/flytesnacks>`__
-    * - **Purpose**: Examples, Tips, and Tricks to use Flytekit SDKs
-    * - **Language**: Python (In the future, Java examples will be added)
-    * - **Guidelines**: Refer to the `Flytesnacks Contribution Guide <https://docs.flyte.org/en/latest/flytesnacks/contribute.html>`__
 
 ``flytectl``
 ************
@@ -706,25 +568,3 @@ You can access this endpoint at:
    # replace with your specific task execution parameters
    http://localhost:30080/api/v1/task_executions/flytesnacks/development/fe92c0a8cbf684ad19a8/n0?limit=10000
 
-
-
-
-
-
-🐞 File an issue
-================
-
-We use `GitHub Issues <https://github.com/flyteorg/flyte/issues>`__ for issue tracking. The following issue types are available for filing an issue:
-
-* `Plugin Request <https://github.com/flyteorg/flyte/issues/new?assignees=&labels=untriaged%2Cplugins&template=backend-plugin-request.md&title=%5BPlugin%5D>`__
-* `Bug Report <https://github.com/flyteorg/flyte/issues/new?assignees=&labels=bug%2C+untriaged&template=bug_report.md&title=%5BBUG%5D+>`__
-* `Documentation Bug/Update Request <https://github.com/flyteorg/flyte/issues/new?assignees=&labels=documentation%2C+untriaged&template=docs_issue.md&title=%5BDocs%5D>`__
-* `Core Feature Request <https://github.com/flyteorg/flyte/issues/new?assignees=&labels=enhancement%2C+untriaged&template=feature_request.md&title=%5BCore+Feature%5D>`__
-* `Flytectl Feature Request <https://github.com/flyteorg/flyte/issues/new?assignees=&labels=enhancement%2C+untriaged%2C+flytectl&template=flytectl_issue.md&title=%5BFlytectl+Feature%5D>`__
-* `Housekeeping <https://github.com/flyteorg/flyte/issues/new?assignees=&labels=housekeeping&template=housekeeping_template.md&title=%5BHousekeeping%5D+>`__
-* `UI Feature Request <https://github.com/flyteorg/flyte/issues/new?assignees=&labels=enhancement%2C+untriaged%2C+ui&template=ui_feature_request.md&title=%5BUI+Feature%5D>`__
-
-If none of the above fit your requirements, file a `blank <https://github.com/flyteorg/flyte/issues/new>`__ issue.
-Also, add relevant labels to your issue. For example, if you are filing a Flytekit plugin request, add the ``flytekit`` label.
-
-For feedback at any point in the contribution process, feel free to reach out to us on `Slack <https://slack.flyte.org/>`__.

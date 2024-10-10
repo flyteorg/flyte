@@ -1,52 +1,14 @@
-(contribute_docs)=
-
-# Contributing documentation
-
-```{eval-rst}
-.. tags:: Contribute, Basic
-```
-
-Whether you're a novice or experienced software engineer, data scientist, or machine learning
-practitioner, we welcome your contributions to the Flyte documentation!
-
-The Flyte documentation comprises the following types:
-
-* **{ref}`User guide <userguide>` documentation:** Conceptual and procedural documentation about using Flyte features to accomplish tasks.
-* **API documentation:**
-  * {doc}`flytekit <../api/flytekit/docs_index>`
-  * {doc}`flytectl <../api/flytectl/docs_index>`
-  * {doc}`flyteidl <../api/flyteidl/docs_index>`
-* **{ref}`Tutorials <tutorials>`:** Longer, more advanced guides that use multiple Flyte features to solve real-world problems. Some tutorials may require extra setup, while others can only run on larger clusters.
-* **{ref}`Integrations examples <integrations>`:** These examples showcase how to use the Flyte plugins that integrate with the broader data and machine learning ecosystem.
-* **{ref}`Deployment documentation <deployment>`:** Guidance on deploying and configuring the Flyte backend.
-
-## Contributing to user guide and deployment documentation
-
-To update user guide or deployment documentation, edit the corresponding files in the [flyte repository](https://github.com/flyteorg/flyte/tree/master/docs/user_guide).
-
-### Code in user guide documentation
-
-If you want to include tested, runnable example code in user guide documentation, follow the steps below to add your code to the [flytesnacks repository](https://github.com/flyteorg/flytesnacks). Write your code in regular Python, with regular comments. These comments **will not** be extracted from the Python file and turned into user-facing documentation. You can use the `rli` ([remoteliteralinclude](https://github.com/wpilibsuite/sphinxext-remoteliteralinclude/blob/main/README.md)) directive to include snippets of code from your example Python file.
-
-## Contributing to API documentation
-
-* **flytekit:** See the [flytekit repository](https://github.com/flyteorg/flytekit). Documentation consists of content in submodule `__init__.py` files, `rst` files, and docstrings in classes and methods.
-* **flytectl:** See the [flyte repository](https://github.com/flyteorg/flyte/tree/master/flytectl). Documentation consists of `rst` files in the `flytectl/docs` directory and comments in code files.
-* **flyteidl:** See the [flyte repository](https://github.com/flyteorg/flyte/tree/master/flyteidl).
-
-## Contributing tutorials and integrations examples
+(contribute_examples)=
+# Contribute tutorials or integrations examples
 
 The first step to contributing a tutorial or integration example is to open a
 [documentation issue](https://github.com/flyteorg/flyte/issues/new?assignees=&labels=documentation%2Cuntriaged&template=docs_issue.yaml&title=%5BDocs%5D+) to describe the example you want to write. The Flyte maintainers will help you figure out where your tutorial or integration example would best fit.
-
-### Creating a tutorial or integration example
 
 :::{admonition} Prerequisites
 Follow the {ref}`env_setup` guide to get your development environment ready.
 :::
 
-The `flytesnacks` repo examples live in the `examples` directory, where each
-subdirectory contains a self-contained example project that covers a particular tutorial or integration. There are also subdirectories that contain the code included in the user guide via the `rli` (remoteliteralinclude) directive.
+The tutorials and integrations examples live in the `examples` directory of the [flytesnacks repo](https://github.com/flyteorg/flytesnacks), where each subdirectory contains a self-contained example project that covers a particular tutorial or integration. There are also subdirectories that contain the code included in the user guide via the `rli` (remoteliteralinclude) directive.
 
 ```{code-block} bash
 examples
@@ -59,7 +21,7 @@ examples
 ...
 ```
 
-#### Adding an example script to an existing project
+## Adding an example script to an existing project
 
 If you're adding a new example to an existing project, you can simply create a
 new `.py` file in the appropriate directory. For example, if you want to add a new
@@ -81,7 +43,7 @@ my_new_example
 
 If you are creating a new user guide example, you can reference the code in the user guide documentation using the `rli` (remoteliteralinclude) directive. You do not need to add the new example to the `README.md` file of the example project.
 
-#### Creating a new example project
+## Creating a new example project
 
 ````{important}
 If you're creating a new tutorial or integration example
@@ -91,7 +53,7 @@ new example project.
 In the `flytesnacks` root directory, run the following command to create an example project:
 
 ```{prompt} bash
-./scripts/create-example-project new_example_project
+./scripts/create-example-project.sh new_example_project
 ```
 
 This will create a new directory under `examples`:
@@ -103,15 +65,14 @@ examples/new_example_project
 ├── new_example_project
 │   ├── __init__.py
 │   └── example.py
-├── requirements.in
-└── requirements.txt
+└── requirements.in
 ```
 
 ````
 
-#### Creating Python examples
+## Creating Python examples
 
-##### Tutorial or integration examples
+### Tutorial or integration examples
 
 If you are writing a tutorial or integration example, write your example Python script in [percent format](https://jupytext.readthedocs.io/en/latest/formats.html#the-percent-format),
 which allows you to interleave Python code and Markdown in the same file. Each
@@ -137,7 +98,7 @@ giving you the utilities of Sphinx. `flytesnacks` uses the
 [jupytext](https://github.com/mwouts/jupytext) packages to interpret the
 Python files as rst-compatible files.
 
-#### Writing examples: explain what the code does
+## Writing examples: explain what the code does
 
 Following the [literate programming](https://en.wikipedia.org/wiki/Literate_programming) paradigm, make sure to
 interleave explanations in the `*.py` files containing the code example.
@@ -158,7 +119,7 @@ argument. Can you think of a better name for this `function`?
 
 Explanations don't have to be this detailed for such a simple example, but you can imagine how this makes for a better reading experience for more complicated examples.
 
-#### Creating examples in other formats
+## Creating examples in other formats
 
 Writing examples in `.py` files is preferred since they are easily tested and
 packaged, but `flytesnacks` also supports examples written in `.ipynb` and
@@ -170,9 +131,11 @@ packaged, but `flytesnacks` also supports examples written in `.ipynb` and
 - `.md`: When a piece of documentation doesn't require testable or packaged
   flyte tasks/workflows, an example page can be written as a MyST Markdown file.
 
-**Note:** If you want to add Markdown files to a user guide example project, add them to the [flyte repository](https://github.com/flyteorg/flyte/tree/master/docs/user_guide) instead.
+```{note}
+If you want to add Markdown files to a user guide example project, add them to the [flyte repository](https://github.com/flyteorg/flyte/tree/master/docs/user_guide) instead.
+```
 
-### Writing a README
+## Writing a README
 
 The `README.md` file needs to capture the _what_, _why_, and _how_ of the example.
 
@@ -199,13 +162,17 @@ be the names of the `.ipynb` or `.md` files (but without the file extension).
 Refer to any subdirectory in the `examples` directory
 :::
 
-### Test your code
+## Test your code
 
-If the example code can be run locally, just use `python <my_file>.py` to run it.
+If the example code can be run locally, you can use `pyflyte run` to test it:
 
-#### Testing on a cluster
+```{prompt} bash
+pyflyte run <python_file>.py <task_or_workflow_name> --<arg1> <arg1_value> --<arg2> <arg2_value> ...
+```
 
-Install {doc}`flytectl <flytectl:index>`, the commandline interface for flyte.
+### Testing on a cluster
+
+Install {doc}`flytectl <flytectl:index>`, the command line interface for flyte.
 
 :::{note}
 Learn more about installation and configuration of Flytectl [here](https://docs.flyte.org/en/latest/flytectl/docs_index.html).
@@ -219,39 +186,34 @@ flytectl demo start
 
 #### Testing the `basics` project examples on a local demo cluster
 
-In this example, we'll build the `basics` project:
+In this example, we'll build the `basics` project.
+
+Change to the basics directory:
 
 ```{prompt} bash
 # from flytesnacks root directory
 cd examples/basics
 ```
 
-Build the container:
+Build and push the container to the local Docker registry provided by the demo cluster:
 
 ```{prompt} bash
-docker build . --tag "basics:v1" -f Dockerfile
+docker build . --tag "localhost:30000/basics:v1" -f Dockerfile --push
 ```
 
-Package the examples by running:
+Run a workflow in the local demo cluster by specifying the `--image` flag
+and passing the `--remote` flag:
 
 ```{prompt} bash
-pyflyte --pkgs basics package --image basics:v1 -f
-```
-
-Register the examples by running
-
-```{prompt} bash
-flytectl register files \
-   -p flytesnacks \
-   -d development \
-   --archive flyte-package.tgz \
-   --version v1
+pyflyte run --remote \
+  --image localhost:30000/basics:v1 \
+  basics/hello_world.py hello_world_wf
 ```
 
 Visit `https://localhost:30081/console` to view the Flyte console, which consists
 of the examples present in the `flytesnacks/core` directory.
 
-#### Updating dependencies
+## Updating dependencies
 
 :::{admonition} Prerequisites
 Install [pip-tools](https://pypi.org/project/pip-tools/) in your development
@@ -263,32 +225,33 @@ pip install pip-tools
 
 :::
 
-If you've updated the dependencies of the project, update the `requirements.txt`
-file by running:
+If the project uses pinned dependencies in a `requirements.in` file, run the `pip-compile` command to create a new pinned `requirements.txt` file:
 
 ```{prompt} bash
 pip-compile requirements.in --upgrade --verbose --resolver=backtracking
 ```
 
-#### Rebuild the image
+## Rebuild the image
 
-If you've updated the source code or dependencies of the project, and rebuild
+If you've updated the source code or dependencies of the project, rebuild
 the image with:
 
 ```{prompt} bash
-docker build . --tag "basics:v2" -f core/Dockerfile
-pyflyte --pkgs basics package --image basics:v2 -f
-flytectl register files \
-    -p flytesnacks \
-    -d development \
-    --archive flyte-package.tgz \
-    --version v2
+docker build . --tag "localhost:30000/basics:v2" -f Dockerfile --push
+```
+
+Next, run the workflow again with the new image:
+
+```{prompt} bash
+pyflyte run --remote \
+  --image localhost:30000/basics:v2 \
+  basics/hello_world.py hello_world_wf
 ```
 
 Refer to {ref}`this guide <getting_started_package_register>`
-if the code in itself is updated and requirements.txt is the same.
+if the code itself is updated and requirements.txt is the same.
 
-### Pre-commit hooks
+## Pre-commit hooks
 
 We use [pre-commit](https://pre-commit.com/) to automate linting and code formatting on every commit.
 Configured hooks include [ruff](https://github.com/astral-sh/ruff) to ensure newlines are added to the end of files, and there is proper spacing in files.
@@ -297,7 +260,7 @@ We run all those hooks in CI, but if you want to run them locally on every commi
 installing the dev environment requirements. In case you want to disable `pre-commit` hooks locally, run
 `pre-commit uninstall`. More info [here](https://pre-commit.com/).
 
-#### Formatting
+### Formatting
 
 We use [ruff](https://github.com/astral-sh/ruff) to autoformat code. They
 are configured as git hooks in `pre-commit`. Run `make fmt` to format your code.
@@ -307,36 +270,40 @@ are configured as git hooks in `pre-commit`. Run `make fmt` to format your code.
 We use [codespell](https://github.com/codespell-project/codespell) to catch common misspellings. Run
 `make spellcheck` to spell-check the changes.
 
-### Update documentation pages
+## Update tutorials and integrations examples documentation pages
 
-The `docs/conf.py` contains the Sphinx configuration for building the
-`flytesnacks` documentation.
+The `docs/conf.py` file in the flytesnacks repository contains the Sphinx configuration for building the `flytesnacks` documentation.
 
 At build time, the `flytesnacks` Sphinx build system will convert the tutorials and integrations examples in the `examples` directory into `docs/auto_examples` and make them available in the documentation.
 
 ::::{important}
 
-The docs build system will convert the `README.md` files in each tutorials and example integration project
-project into a `index.md` file, so you can reference the root page of each
-example project, e.g., in MyST Markdown format, you can write a table-of-contents
-directive like so:
+The docs build system will convert the `README.md` files in each tutorial and example integration project into an `index.md` file, allowing you to reference the root page of each
+example project in MyST Markdown format.
+
+::::
+
+If you've created a new tutorial or integration example project, you'll need to add its `index` page
+to the table of contents in `docs/tutorials/index.md` or `docs/integrations/index.md` and update the appropriate `list-table` directive in the file to make sure the example shows up in the documentation:
 
 :::{code-block}
+
+```{list-table}
+:header-rows: 0
+:widths: 20 30
+
+* - {doc}`Airflow agent </auto_examples/airflow_agent/index>`
+  - Run Airflow jobs in your workflows with the Airflow agent.
+  ...
+```
+
+...
 
 ```{toc}
 /auto_examples/bigquery_agent/index
 ```
 
 :::
-
-::::
-
-If you've created a new tutorial or integration example project, you'll need to add its `index` page
-to the table of contents in `docs/index.md` to make sure the project
-shows up in the documentation. Additionally, you'll need to update the appropriate
-`list-table` directive in `docs/tutorials/index.md`, or
-`docs/integrations/index.md` so that it shows up in the respective section of the
-documentation.
 
 ### Build the documentation locally
 
@@ -355,10 +322,8 @@ Verify that the code and documentation look as expected:
 
 ### Create a pull request
 
-Create the pull request in the flytesnacks repository, then ensure that the docs are rendered correctly by clicking on the documentation check.
+Create the pull request in the flytesnacks repository, then ensure that the docs are rendered correctly by clicking on the documentation check:
 
 ```{image} https://github.com/user-attachments/assets/581330cc-c9ab-418d-a9ae-bb3c346603ba
 :alt: Docs link in a PR
 ```
-
-You can refer to [this PR](https://github.com/flyteorg/flytesnacks/pull/332) for the exact changes required.
