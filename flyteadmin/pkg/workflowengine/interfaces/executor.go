@@ -67,6 +67,8 @@ type AbortData struct {
 	ExecutionID *core.WorkflowExecutionIdentifier
 	// Cluster identifier where the execution was created
 	Cluster string
+	// Is force abort
+	Force bool
 }
 
 // WorkflowExecutor is a client interface used to create and delete Flyte workflow CRD objects.
