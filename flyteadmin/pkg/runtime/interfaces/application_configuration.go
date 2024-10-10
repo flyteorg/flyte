@@ -592,6 +592,13 @@ type Domain struct {
 
 type DomainsConfig = []Domain
 
+type Project struct {
+	Name        string `json:"name" pflag:",Flyte project name."`
+	Description string `json:"description" pflag:",Flyte project description."`
+}
+
+type ProjectsConfig = []Project
+
 // Defines the interface to return top-level config structs necessary to start up a flyteadmin application.
 type ApplicationConfiguration interface {
 	GetDbConfig() *database.DbConfig
@@ -599,6 +606,7 @@ type ApplicationConfiguration interface {
 	GetSchedulerConfig() *SchedulerConfig
 	GetRemoteDataConfig() *RemoteDataConfig
 	GetNotificationsConfig() *NotificationsConfig
+	GetProjectsConfig() *ProjectsConfig
 	GetDomainsConfig() *DomainsConfig
 	GetExternalEventsConfig() *ExternalEventsConfig
 	GetCloudEventsConfig() *CloudEventsConfig

@@ -82,6 +82,6 @@ migrate:
 
 .PHONY: seed_projects
 seed_projects:
-	go run cmd/main.go migrate seed-projects project admintests flytekit --server.kube-config ~/.kube/config  --config flyteadmin_config.yaml
+	go run cmd/main.go migrate seed-projects --server.kube-config ~/.kube/config  --config flyteadmin_config.yaml
 
 all: compile

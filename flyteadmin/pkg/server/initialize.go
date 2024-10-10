@@ -67,7 +67,7 @@ func Rollback(ctx context.Context) error {
 }
 
 // SeedProjects creates a set of given projects in the DB
-func SeedProjects(ctx context.Context, projects []string) error {
+func SeedProjects(ctx context.Context, projects []config.Project) error {
 	return withDB(ctx, func(db *gorm.DB) error {
 		if err := config.SeedProjects(db, projects); err != nil {
 			return fmt.Errorf("could not add projects to database with err: %v", err)

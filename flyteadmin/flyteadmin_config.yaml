@@ -181,6 +181,13 @@ task_type_whitelist:
       domain: production
   qubolespark:
     - project: my_queue_2
+projects:
+  - name: project
+    description: project description
+  - name: admintests
+    description: admintests description
+  - name: flytekit
+    description: flytekit description
 domains:
   - id: development
     name: development
