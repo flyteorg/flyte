@@ -356,13 +356,14 @@ func TestPropeller_Handle(t *testing.T) {
 		assert.True(t, abortCalled)
 	})
 
-	t.Run("abortedShouldBeFinalized", func(t *testing.T) {
+	t.Run("deletedShouldBeFinalized", func(t *testing.T) {
+		n := v1.Now()
 		assert.NoError(t, s.Create(ctx, &v1alpha1.FlyteWorkflow{
 			ObjectMeta: v1.ObjectMeta{
 				Name:              name,
 				Namespace:         namespace,
 				Finalizers:        []string{"f1"},
-				Annotations: map[string]string{AbortedWorkflowAnnotation: "true"},
+				DeletionTimestamp: &n,
 			},
 			WorkflowSpec: &v1alpha1.WorkflowSpec{
 				ID: "w1",
@@ -385,12 +386,13 @@ func TestPropeller_Handle(t *testing.T) {
 	})
 
 	t.Run("deletedButAbortFailed", func(t *testing.T) {
+		n := v1.Now()
 		assert.NoError(t, s.Create(ctx, &v1alpha1.FlyteWorkflow{
 			ObjectMeta: v1.ObjectMeta{
 				Name:              name,
 				Namespace:         namespace,
 				Finalizers:        []string{"f1"},
-				Annotations:       map[string]string{AbortedWorkflowAnnotation: "true"},
+				DeletionTimestamp: &n,
 			},
 			WorkflowSpec: &v1alpha1.WorkflowSpec{
 				ID: "w1",
