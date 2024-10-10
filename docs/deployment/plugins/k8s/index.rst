@@ -431,7 +431,20 @@ Specify plugin configuration
                             - kind: ServiceAccount
                               name: spark
                               namespace: "{{ namespace }}"
-
+                  rbac:
+                    create: true
+                    extraRules: 
+                    - apiGroups:
+                        - "ray.io"
+                      resources:
+                        - rayjobs
+                      verbs:
+                        - create
+                        - get
+                        - list
+                        - patch
+                        - update
+                        - delete
               2. (Optional) The Spark operator supports Kubernetes ResourceQuota enforcement. If you plan to use it,
                  set `per-Task resource requests <https://docs.flyte.org/en/latest/user_guide/productionizing/customizing_task_resources.html#customizing-task-resources>`__ that fit into the quota for each project-namespace. A Task without resource requests
                  or limits will be rejected by the K8s scheduler as described `in the Kubernetes docs <https://kubernetes.io/docs/concepts/policy/resource-quotas/>`__.
@@ -595,7 +608,20 @@ Specify plugin configuration
                             - kind: ServiceAccount
                               name: spark
                               namespace: "{{ namespace }}"
-
+                  rbac:
+                    create: true
+                    extraRules: 
+                    - apiGroups:
+                        - "ray.io"
+                      resources:
+                        - rayjobs
+                      verbs:
+                        - create
+                        - get
+                        - list
+                        - patch
+                        - update
+                        - delete
         .. group-tab:: flyte-core
 
           .. tabs::
@@ -687,7 +713,20 @@ Specify plugin configuration
                         - kind: ServiceAccount
                           name: spark
                           namespace: {{ namespace }}
-
+                  rbac:
+                    create: true
+                    extraRules: 
+                    - apiGroups:
+                        - "ray.io"
+                      resources:
+                        - rayjobs
+                      verbs:
+                        - create
+                        - get
+                        - list
+                        - patch
+                        - update
+                        - delete
                 sparkoperator:
                   enabled: true
                   plugin_config:
@@ -748,6 +787,20 @@ Specify plugin configuration
                           - development:
                               - gsa:
                                   value: "<GoogleServiceAccount-email>"
+                  rbac:
+                    create: true
+                    extraRules: 
+                    - apiGroups:
+                        - "ray.io"
+                      resources:
+                        - rayjobs
+                      verbs:
+                        - create
+                        - get
+                        - list
+                        - patch
+                        - update
+                        - delete
                       templates:
                         # -- Template for namespaces resources
                         - key: aa_namespace
