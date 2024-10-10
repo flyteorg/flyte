@@ -96,7 +96,6 @@ func (e K8sWorkflowExecutor) Abort(ctx context.Context, data interfaces.AbortDat
 		return errors.NewFlyteAdminErrorf(codes.Internal, err.Error())
 	}
 
-	// Fetch the workflow
 	w, err := target.FlyteClient.FlyteworkflowV1alpha1().FlyteWorkflows(data.Namespace).Get(ctx, data.ExecutionID.GetName(), v1.GetOptions{})
 	if err != nil && !k8_api_err.IsNotFound(err) {
 		return errors.NewFlyteAdminErrorf(codes.Internal, "failed to terminate execution: %v with err %v", data.ExecutionID, err)
@@ -123,24 +122,7 @@ func (e K8sWorkflowExecutor) Abort(ctx context.Context, data interfaces.AbortDat
 			return errors.NewFlyteAdminErrorf(codes.Internal, "failed to remove finalizer for execution [%+v] in cluster: %s with err %v", data.ExecutionID, target.ID, err)
 		}
 
-		// Finally delete the workflow
-		if err := target.FlyteClient.FlyteworkflowV1alpha1().FlyteWorkflows(data.Namespace).Delete(ctx, data.ExecutionID.GetName(), v1.DeleteOptions{
-			PropagationPolicy: &deletePropagationBackground,
-		}); err != nil && !k8_api_err.IsNotFound(err) {
-			return errors.NewFlyteAdminErrorf(codes.Internal, "failed to terminate execution: %v with err %v", data.ExecutionID, err)
-		}
-
-		return nil
-
 	}
-
-	if w.ObjectMeta.Annotations == nil {
-		w.ObjectMeta.Annotations = make(map[string]string)
-	}
-
-	w.ObjectMeta.Annotations[AbortedWorkflowAnnotation] = "true"
-
-	_, err = target.FlyteClient.FlyteworkflowV1alpha1().FlyteWorkflows(data.Namespace).Update(ctx, w, v1.UpdateOptions{})
 
 	// An IsNotFound error indicates the resource is already deleted.
 	if err != nil && !k8_api_err.IsNotFound(err) {
