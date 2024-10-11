@@ -2,6 +2,7 @@
 package coreutils
 
 import (
+	"encoding/json"
 	"fmt"
 	"math"
 	"reflect"
@@ -9,14 +10,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/ptypes"
 	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/pkg/errors"
-	"github.com/shamaton/msgpack/v2"
-
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 const MESSAGEPACK = "msgpack"
@@ -562,35 +561,12 @@ func MakeLiteralForType(t *core.LiteralType, v interface{}) (*core.Literal, erro
 			strValue = fmt.Sprintf("%.0f", math.Trunc(f))
 		}
 		if newT.Simple == core.SimpleType_STRUCT {
-			// If the type is a STRUCT, we expect the input to be a complex object
-			// like the following example:
-			// inputs:
-			//   dc:
-			//     a: 1
-			//     b: 3.14
-			//     c: "example_string"
-			// Instead of storing it directly as a structured value, we will serialize
-			// the input object using MsgPack and return it as a binary IDL object.
-
-			// If the value is not already a string (meaning it's not already serialized),
-			// proceed with serialization.
 			if _, isValueStringType := v.(string); !isValueStringType {
-				byteValue, err := msgpack.Marshal(v)
+				byteValue, err := json.Marshal(v)
 				if err != nil {
 					return nil, fmt.Errorf("unable to marshal to json string for struct value %v", v)
 				}
-				return &core.Literal{
-					Value: &core.Literal_Scalar{
-						Scalar: &core.Scalar{
-							Value: &core.Scalar_Binary{
-								Binary: &core.Binary{
-									Value: byteValue,
-									Tag:   MESSAGEPACK,
-								},
-							},
-						},
-					},
-				}, nil
+				strValue = string(byteValue)
 			}
 		}
 		lv, err := MakeLiteralForSimpleType(newT.Simple, strValue)
