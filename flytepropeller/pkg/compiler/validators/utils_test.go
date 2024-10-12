@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/golang/protobuf/proto"
+	"github.com/shamaton/msgpack/v2"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
@@ -14,6 +15,82 @@ func TestLiteralTypeForLiterals(t *testing.T) {
 	t.Run("empty", func(t *testing.T) {
 		lt := literalTypeForLiterals(nil)
 		assert.Equal(t, core.SimpleType_NONE.String(), lt.GetSimple().String())
+	})
+
+	t.Run("binary idl with raw binary data and no tag", func(t *testing.T) {
+		// Some arbitrary raw binary data
+		rawBinaryData := []byte{0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A}
+
+		lv := &core.Literal{
+			Value: &core.Literal_Scalar{
+				Scalar: &core.Scalar{
+					Value: &core.Scalar_Binary{
+						Binary: &core.Binary{
+							Value: rawBinaryData,
+							Tag:   "",
+						},
+					},
+				},
+			},
+		}
+		lt := LiteralTypeForLiteral(lv)
+		assert.Equal(t, core.SimpleType_BINARY.String(), lt.GetSimple().String())
+	})
+
+	t.Run("binary idl with messagepack input map[int]strings", func(t *testing.T) {
+		// Create a map[int]string and serialize it using MessagePack.
+		data := map[int]string{
+			1:  "hello",
+			2:  "world",
+			-1: "foo",
+		}
+		// Serializing the map using MessagePack
+		serializedBinaryData, err := msgpack.Marshal(data)
+		if err != nil {
+			t.Fatalf("failed to serialize map: %v", err)
+		}
+		lv := &core.Literal{
+			Value: &core.Literal_Scalar{
+				Scalar: &core.Scalar{
+					Value: &core.Scalar_Binary{
+						Binary: &core.Binary{
+							Value: serializedBinaryData,
+							Tag:   coreutils.MESSAGEPACK,
+						},
+					},
+				},
+			},
+		}
+		lt := LiteralTypeForLiteral(lv)
+		assert.Equal(t, core.SimpleType_STRUCT.String(), lt.GetSimple().String())
+	})
+
+	t.Run("binary idl with messagepack input map[float]strings", func(t *testing.T) {
+		// Create a map[float]string and serialize it using MessagePack.
+		data := map[float64]string{
+			1.0:  "hello",
+			5.0:  "world",
+			-1.0: "foo",
+		}
+		// Serializing the map using MessagePack
+		serializedBinaryData, err := msgpack.Marshal(data)
+		if err != nil {
+			t.Fatalf("failed to serialize map: %v", err)
+		}
+		lv := &core.Literal{
+			Value: &core.Literal_Scalar{
+				Scalar: &core.Scalar{
+					Value: &core.Scalar_Binary{
+						Binary: &core.Binary{
+							Value: serializedBinaryData,
+							Tag:   coreutils.MESSAGEPACK,
+						},
+					},
+				},
+			},
+		}
+		lt := LiteralTypeForLiteral(lv)
+		assert.Equal(t, core.SimpleType_STRUCT.String(), lt.GetSimple().String())
 	})
 
 	t.Run("homogeneous", func(t *testing.T) {
@@ -333,6 +410,47 @@ func TestLiteralTypeForLiterals(t *testing.T) {
 
 		lt := LiteralTypeForLiteral(literals)
 
+		assert.True(t, proto.Equal(expectedLt, lt))
+	})
+
+	t.Run("nested Lists with different types", func(t *testing.T) {
+		inferredType := &core.LiteralType{
+			Type: &core.LiteralType_CollectionType{
+				CollectionType: &core.LiteralType{
+					Type: &core.LiteralType_CollectionType{
+						CollectionType: &core.LiteralType{
+							Type: &core.LiteralType_UnionType{
+								UnionType: &core.UnionType{
+									Variants: []*core.LiteralType{
+										{
+											Type: &core.LiteralType_Simple{
+												Simple: core.SimpleType_INTEGER,
+											},
+										},
+										{
+											Type: &core.LiteralType_Simple{
+												Simple: core.SimpleType_STRING,
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		literals := &core.Literal{
+			Value: &core.Literal_OffloadedMetadata{
+				OffloadedMetadata: &core.LiteralOffloadedMetadata{
+					Uri:          "dummy/uri",
+					SizeBytes:    1000,
+					InferredType: inferredType,
+				},
+			},
+		}
+		expectedLt := inferredType
+		lt := LiteralTypeForLiteral(literals)
 		assert.True(t, proto.Equal(expectedLt, lt))
 	})
 
