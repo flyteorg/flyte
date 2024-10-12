@@ -183,14 +183,56 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_batchScheduler.parameters", func(t *testing.T) {
+	t.Run("Test_batchScheduler.default.Kueue.Priority", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
 
-			cmdFlags.Set("batchScheduler.parameters", testValue)
-			if vString, err := cmdFlags.GetString("batchScheduler.parameters"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.BatchScheduler.Parameters)
+			cmdFlags.Set("batchScheduler.default.Kueue.Priority", testValue)
+			if vString, err := cmdFlags.GetString("batchScheduler.default.Kueue.Priority"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.BatchScheduler.Default.KueueConfig.PriorityClassName)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_batchScheduler.default.Kueue.Queue", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("batchScheduler.default.Kueue.Queue", testValue)
+			if vString, err := cmdFlags.GetString("batchScheduler.default.Kueue.Queue"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.BatchScheduler.Default.KueueConfig.Queue)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_batchScheduler.default.Yunikorn.parameters", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("batchScheduler.default.Yunikorn.parameters", testValue)
+			if vString, err := cmdFlags.GetString("batchScheduler.default.Yunikorn.parameters"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.BatchScheduler.Default.YunikornConfig.Parameters)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_batchScheduler.default.Yunikorn.queue", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("batchScheduler.default.Yunikorn.queue", testValue)
+			if vString, err := cmdFlags.GetString("batchScheduler.default.Yunikorn.queue"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.BatchScheduler.Default.YunikornConfig.Queue)
 
 			} else {
 				assert.FailNow(t, err.Error())

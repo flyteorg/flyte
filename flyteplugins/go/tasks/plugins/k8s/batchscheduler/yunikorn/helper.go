@@ -2,12 +2,25 @@ package yunikorn
 
 import (
 	"encoding/json"
+
 	rayv1 "github.com/ray-project/kuberay/ray-operator/apis/ray/v1"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/batchscheduler/utils"
 )
 
-func MutateRayJob(parameters string, app *rayv1.RayJob) error {
+const (
+	Yunikorn            = "yunikorn"
+	AppID               = "yunikorn.apache.org/app-id"
+	Queue               = "yunikorn.apache.org/queue"
+	TaskGroupNameKey    = "yunikorn.apache.org/task-group-name"
+	TaskGroupsKey       = "yunikorn.apache.org/task-groups"
+	TaskGroupParameters = "yunikorn.apache.org/schedulingPolicyParameters"
+)
+
+func MutateRayJob(app *rayv1.RayJob) error {
 	appID := GenerateTaskGroupAppID()
 	rayjobSpec := &app.Spec
 	appSpec := rayjobSpec.RayClusterSpec
@@ -60,9 +73,28 @@ func MutateRayJob(parameters string, app *rayv1.RayJob) error {
 		return err
 	}
 	meta.Annotations[TaskGroupsKey] = string(info[:])
-	meta.Annotations[TaskGroupParameters] = parameters
 	meta.Annotations[AppID] = appID
 	return nil
+}
+
+func UpdateGangSchedulingParameters(parameters string, objectMeta *metav1.ObjectMeta) {
+	if len(parameters) == 0 {
+		return
+	}
+	utils.UpdateAnnotations(
+		map[string]string{TaskGroupParameters: parameters},
+		objectMeta,
+	)
+}
+
+func UpdateAnnotations(labels map[string]string, app *rayv1.RayJob) {
+	appSpec := app.Spec.RayClusterSpec
+	headSpec := appSpec.HeadGroupSpec
+	utils.UpdatePodTemplateAnnotatations(labels, &headSpec.Template)
+	for index := range appSpec.WorkerGroupSpecs {
+		worker := appSpec.WorkerGroupSpecs[index]
+		utils.UpdatePodTemplateAnnotatations(labels, &worker.Template)
+	}
 }
 
 func Allocation(containers []v1.Container) v1.ResourceList {
@@ -81,19 +113,19 @@ func Allocation(containers []v1.Container) v1.ResourceList {
 	return totalResources
 }
 
-func Add(a v1.ResourceList, b v1.ResourceList) v1.ResourceList {
-	result := a
-	for name, value := range a {
-		sum := &value
-		if value2, ok := b[name]; ok {
+func Add(left v1.ResourceList, right v1.ResourceList) v1.ResourceList {
+	result := left
+	for name, value := range left {
+		sum := value
+		if value2, ok := right[name]; ok {
 			sum.Add(value2)
-			result[name] = *sum
+			result[name] = sum
 		} else {
 			result[name] = value
 		}
 	}
-	for name, value := range b {
-		if _, ok := a[name]; !ok {
+	for name, value := range right {
+		if _, ok := left[name]; !ok {
 			result[name] = value
 		}
 	}

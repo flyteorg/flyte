@@ -43,11 +43,9 @@ func TestGenerateTaskGroupName(t *testing.T) {
 
 func TestGenerateTaskGroupAppID(t *testing.T) {
 	t.Run("Generate ray app ID", func(t *testing.T) {
-		for _, tt := range tests {
-			got := GenerateTaskGroupAppID()
-			if len(got) <= 0 {
-				t.Error("Ray app ID is empty")
-			} 
+		got := GenerateTaskGroupAppID()
+		if len(got) <= 0 {
+			t.Error("Ray app ID is empty")
 		}
 	})
 }

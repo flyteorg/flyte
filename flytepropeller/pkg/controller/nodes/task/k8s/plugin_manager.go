@@ -3,7 +3,6 @@ package k8s
 import (
 	"context"
 	"fmt"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/batchscheduler"
 	"time"
 
 	"golang.org/x/time/rate"
@@ -91,7 +90,6 @@ type PluginManager struct {
 	plugin          k8s.Plugin
 	resourceToWatch runtime.Object
 	kubeClient      pluginsCore.KubeClient
-	schedulerMgr    batchscheduler.SchedulerManager
 	metrics         PluginMetrics
 	// Per namespace-resource
 	backOffController    *backoff.Controller
@@ -199,17 +197,18 @@ func (e *PluginManager) launchResource(ctx context.Context, tCtx pluginsCore.Tas
 	if err != nil {
 		return pluginsCore.UnknownTransition, err
 	}
+	if p, ok := e.plugin.(k8s.YunikornScheduablePlugin); ok {
+		o, err = p.MutateResourceForYunikorn(ctx, o, tmpl)
+		if err != nil {
+			return pluginsCore.UnknownTransition, err
+		}
+		tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
+	}
 
 	e.addObjectMetadata(k8sTaskCtxMetadata, o, config.GetK8sPluginConfig())
 	logger.Infof(ctx, "Creating Object: Type:[%v], Object:[%v/%v]", o.GetObjectKind().GroupVersionKind(), o.GetNamespace(), o.GetName())
 
 	key := backoff.ComposeResourceKey(o)
-
-	err = e.schedulerMgr.Mutate(ctx, o)
-	if err != nil {
-		logger.Errorf(ctx, "Scheduler plugin failed to process object with error: %v", err)
-		return pluginsCore.Transition{}, err
-	}
 
 	pod, casted := o.(*v1.Pod)
 	if e.backOffController != nil && casted {
@@ -544,8 +543,6 @@ func NewPluginManager(ctx context.Context, iCtx pluginsCore.SetupContext, entry 
 		return nil, errors.Errorf(errors.PluginInitializationFailed, "Failed to initialize K8sResource Plugin, Kubeclient cannot be nil!")
 	}
 
-	schedulerMgr := batchscheduler.NewSchedulerManager(&config.GetK8sPluginConfig().BatchScheduler)
-
 	logger.Infof(ctx, "Initializing K8s plugin [%s]", entry.ID)
 	src := source.Kind(iCtx.KubeClient().GetCache(), entry.ResourceToWatch)
 
@@ -660,7 +657,6 @@ func NewPluginManager(ctx context.Context, iCtx pluginsCore.SetupContext, entry 
 		resourceToWatch:      entry.ResourceToWatch,
 		metrics:              newPluginMetrics(metricsScope),
 		kubeClient:           kubeClient,
-		schedulerMgr:         schedulerMgr,
 		resourceLevelMonitor: rm,
 		eventWatcher:         eventWatcher,
 	}, nil

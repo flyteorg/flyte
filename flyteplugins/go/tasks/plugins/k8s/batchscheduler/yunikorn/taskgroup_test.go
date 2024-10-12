@@ -4,9 +4,15 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 )
 
 func TestMarshal(t *testing.T) {
+	res := v1.ResourceList{
+		v1.ResourceCPU:    resource.MustParse("500m"),
+		v1.ResourceMemory: resource.MustParse("512Mi"),
+	}
 	t1 := TaskGroup{
 		Name:                      "tg1",
 		MinMember:                 int32(1),

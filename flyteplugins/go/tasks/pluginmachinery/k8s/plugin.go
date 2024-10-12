@@ -2,8 +2,10 @@ package k8s
 
 import (
 	"context"
+
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
@@ -185,4 +187,12 @@ func MaybeUpdatePhaseVersionFromPluginContext(phaseInfo *pluginsCore.PhaseInfo, 
 	}
 	MaybeUpdatePhaseVersion(phaseInfo, &pluginState)
 	return nil
+}
+
+type YunikornScheduablePlugin interface {
+	MutateResourceForYunikorn(ctx context.Context, object client.Object, taskTmpl *core.TaskTemplate) (client.Object, error)
+}
+
+type KueueScheduablePlugin interface {
+	MutateResourceForKueue(ctx context.Context, object client.Object, taskTmpl *core.TaskTemplate) (client.Object, error)
 }

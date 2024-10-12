@@ -1,21 +1,23 @@
 package batchscheduler
 
 type Config struct {
-	Scheduler  string `json:"scheduler,omitempty" pflag:", Specify batch scheduler to"`
-	Parameters string `json:"parameters,omitempty" pflag:", Specify static parameters"`
+	Scheduler string                      `json:"scheduler,omitempty" pflag:", Specify batch scheduler to"`
+	Default   SchedulingConfig            `json:"default,omitempty" pflag:", Specify default scheduling config which batch scheduler adopts"`
+	NameSpace map[string]SchedulingConfig `json:"Namespace,omitempty" pflag:"-, Specify namespace scheduling config"`
+	Domain    map[string]SchedulingConfig `json:"Domain,omitempty" pflag:"-, Specify domain scheduling config"`
 }
 
-func NewConfig() Config {
-	return Config{
-		Scheduler:  "",
-		Parameters: "",
-	}
+type SchedulingConfig struct {
+	KueueConfig    `json:"Kueue,omitempty" pflag:", Specify Kueue scheduling scheduling config"`
+	YunikornConfig `json:"Yunikorn,omitempty" pflag:", Yunikorn scheduling config"`
 }
 
-func (b *Config) GetScheduler() string {
-	return b.Scheduler
+type KueueConfig struct {
+	PriorityClassName string `json:"Priority,omitempty" pflag:", Kueue Prioty class"`
+	Queue             string `json:"Queue,omitempty" pflag:", Specify batch scheduler to"`
 }
 
-func (b *Config) GetParameters() string {
-	return b.Parameters
+type YunikornConfig struct {
+	Parameters string `json:"parameters,omitempty" pflag:", Specify gangscheduling policy"`
+	Queue      string `json:"queue,omitempty" pflag:", Specify leaf queue to submit to"`
 }
