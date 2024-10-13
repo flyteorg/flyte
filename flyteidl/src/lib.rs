@@ -411,23 +411,34 @@ pub mod _flyteidl_rust {
             Alias, ApproveCondition, ArrayNode, ArtifactId, ArtifactKey, ArtifactQuery,
             ArtifactTag, Binary, Binding, BindingData, BindingDataCollection, BindingDataMap, Blob,
             BlobMetadata, BlobType, BooleanExpression, BranchNode, CatalogArtifactTag,
-            CatalogMetadata, CompiledLaunchPlan, CompiledTask, CompiledWorkflow,
-            CompiledWorkflowClosure, ConnectionSet, Container, ContainerError, ContainerPort,
-            DataLoadingConfig, DynamicJobSpec, EnumType, Error, ErrorDocument, ExecutionEnv,
-            ExecutionEnvAssignment, ExecutionError, ExtendedResources, GateNode, GpuAccelerator,
-            Granularity, Identifier, Identity, IfBlock, IfElseBlock, InputBindingData, IoStrategy,
-            K8sObjectMetadata, K8sPod, KeyValuePair, LabelValue, Literal, LiteralCollection,
-            LiteralMap, LiteralType, Node, NodeExecutionIdentifier, NodeMetadata, OAuth2Client,
-            OAuth2TokenRequest, Operand, Operator, OutputReference, Parameter, ParameterMap,
-            Partitions, Primitive, PromiseAttribute, ResourceType, Resources, RetryStrategy,
-            RuntimeBinding, RuntimeMetadata, Scalar, SchemaType, Secret, SecurityContext,
-            SignalCondition, SignalIdentifier, SimpleType, SleepCondition, Sql, StructuredDataset,
-            StructuredDatasetMetadata, StructuredDatasetType, TaskExecutionIdentifier, TaskLog,
-            TaskMetadata, TaskNode, TaskNodeOverrides, TaskTemplate, TimePartition, TypeAnnotation,
-            TypeStructure, TypedInterface, Union, UnionInfo, UnionType, Variable, VariableMap,
-            Void, WorkflowExecution, WorkflowExecutionIdentifier, WorkflowMetadata,
-            WorkflowMetadataDefaults, WorkflowNode, WorkflowTemplate,
+            CatalogMetadata, ComparisonExpression, CompiledLaunchPlan, CompiledTask,
+            CompiledWorkflow, CompiledWorkflowClosure, ConnectionSet, Container, ContainerError,
+            ContainerPort, DataLoadingConfig, DynamicJobSpec, EnumType, Error, ErrorDocument,
+            ExecutionEnv, ExecutionEnvAssignment, ExecutionError, ExtendedResources, GateNode,
+            GpuAccelerator, Granularity, Identifier, Identity, IfBlock, IfElseBlock,
+            InputBindingData, IoStrategy, K8sObjectMetadata, K8sPod, KeyValuePair, LabelValue,
+            Literal, LiteralCollection, LiteralMap, LiteralType, Node, NodeExecutionIdentifier,
+            NodeMetadata, OAuth2Client, OAuth2TokenRequest, Operand, Operator, OutputReference,
+            Parameter, ParameterMap, Partitions, Primitive, PromiseAttribute, ResourceType,
+            Resources, RetryStrategy, RuntimeBinding, RuntimeMetadata, Scalar, SchemaType, Secret,
+            SecurityContext, SignalCondition, SignalIdentifier, SimpleType, SleepCondition, Sql,
+            StructuredDataset, StructuredDatasetMetadata, StructuredDatasetType,
+            TaskExecutionIdentifier, TaskLog, TaskMetadata, TaskNode, TaskNodeOverrides,
+            TaskTemplate, TimePartition, TypeAnnotation, TypeStructure, TypedInterface, Union,
+            UnionInfo, UnionType, Variable, VariableMap, Void, WorkflowExecution,
+            WorkflowExecutionIdentifier, WorkflowMetadata, WorkflowMetadataDefaults, WorkflowNode,
+            WorkflowTemplate,
         };
+    }
+    #[pymodule]
+    pub mod boolean_expression {
+        #[pymodule_export]
+        use crate::flyteidl::core::boolean_expression::Expr;
+    }
+    #[pymodule]
+    pub mod gpu_accelerator {
+        #[pymodule_export]
+        use crate::flyteidl::core::gpu_accelerator::PartitionSizeValue;
     }
     #[pymodule]
     pub mod artifact_query {
@@ -652,16 +663,16 @@ pub mod _flyteidl_rust {
             ObjectGetRequest, PagerDutyNotification, PluginOverride, Project,
             ProjectDomainAttributes, ProjectDomainAttributesGetRequest,
             ProjectDomainAttributesUpdateRequest, ProjectListRequest, ProjectRegisterRequest,
-            RawOutputDataConfig, ResourceListRequest, Schedule, Signal, SignalListRequest,
-            SignalSetRequest, SlackNotification, Sort, SourceCode, SystemMetadata, Task,
-            TaskClosure, TaskCreateRequest, TaskCreateResponse, TaskExecution,
-            TaskExecutionClosure, TaskExecutionGetDataRequest, TaskExecutionGetDataResponse,
-            TaskExecutionGetRequest, TaskExecutionList, TaskExecutionListRequest,
-            TaskExecutionMetadata, TaskSpec, UrlBlob, Workflow, WorkflowAttributes,
-            WorkflowAttributesGetRequest, WorkflowAttributesUpdateRequest, WorkflowClosure,
-            WorkflowCreateRequest, WorkflowCreateResponse, WorkflowExecutionGetDataRequest,
-            WorkflowExecutionGetDataResponse, WorkflowExecutionGetRequest, WorkflowList,
-            WorkflowNodeMetadata, WorkflowSpec,
+            RawOutputDataConfig, ResourceListRequest, Schedule, Signal, SignalList,
+            SignalListRequest, SignalSetRequest, SlackNotification, Sort, SourceCode,
+            SystemMetadata, Task, TaskClosure, TaskCreateRequest, TaskCreateResponse,
+            TaskExecution, TaskExecutionClosure, TaskExecutionGetDataRequest,
+            TaskExecutionGetDataResponse, TaskExecutionGetRequest, TaskExecutionList,
+            TaskExecutionListRequest, TaskExecutionMetadata, TaskSpec, UrlBlob, Workflow,
+            WorkflowAttributes, WorkflowAttributesGetRequest, WorkflowAttributesUpdateRequest,
+            WorkflowClosure, WorkflowCreateRequest, WorkflowCreateResponse,
+            WorkflowExecutionGetDataRequest, WorkflowExecutionGetDataResponse,
+            WorkflowExecutionGetRequest, WorkflowList, WorkflowNodeMetadata, WorkflowSpec,
         };
     }
     #[pymodule]
@@ -1022,7 +1033,7 @@ pub mod _flyteidl_rust {
             //     }
             // };
 
-            let mut interceptor: UnaryAuthInterceptor = UnaryAuthInterceptor {
+            let interceptor: UnaryAuthInterceptor = UnaryAuthInterceptor {
                 _access_token: access_token,
             };
 
@@ -1068,6 +1079,17 @@ pub mod _flyteidl_rust {
             let res = self
                 .runtime
                 .block_on(self.data_proxy_service.create_upload_location(req))?
+                .into_inner();
+            Ok(res)
+        }
+
+        pub fn get_data(
+            &mut self,
+            req: crate::flyteidl::service::GetDataRequest,
+        ) -> Result<crate::flyteidl::service::GetDataResponse, GRPCError> {
+            let res = self
+                .runtime
+                .block_on(self.data_proxy_service.get_data(req))?
                 .into_inner();
             Ok(res)
         }
