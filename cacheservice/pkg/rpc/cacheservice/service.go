@@ -8,6 +8,8 @@ import (
 	"runtime/debug"
 	"time"
 
+	grpcmiddleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	grpcprometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.opentelemetry.io/otel/propagation"
 	"google.golang.org/grpc"
@@ -92,7 +94,7 @@ func NewCacheServiceServer() *CacheService {
 	}
 }
 
-// Create and start the gRPC server
+// ServeInsecure creates and starts the gRPC server
 func ServeInsecure(ctx context.Context, cfg *config.Config) error {
 	grpcServer := newGRPCServer(ctx, cfg)
 
@@ -108,14 +110,19 @@ func ServeInsecure(ctx context.Context, cfg *config.Config) error {
 // Creates a new GRPC Server with all the configuration
 func newGRPCServer(_ context.Context, cfg *config.Config) *grpc.Server {
 	tracerProvider := otelutils.GetTracerProvider(otelutils.CacheServiceServerTracer)
-	grpcServer := grpc.NewServer(
-		grpc.UnaryInterceptor(
+	serverOpts := []grpc.ServerOption{
+		grpc.StreamInterceptor(grpcprometheus.StreamServerInterceptor),
+		grpc.UnaryInterceptor(grpcmiddleware.ChainUnaryServer(
+			grpcprometheus.UnaryServerInterceptor,
 			otelgrpc.UnaryServerInterceptor(
 				otelgrpc.WithTracerProvider(tracerProvider),
 				otelgrpc.WithPropagators(propagation.TraceContext{}),
 			),
-		),
-	)
+		)),
+	}
+	grpcServer := grpc.NewServer(serverOpts...)
+	grpcprometheus.Register(grpcServer)
+
 	cacheservice.RegisterCacheServiceServer(grpcServer, NewCacheServiceServer())
 
 	healthServer := health.NewServer()
@@ -147,8 +154,8 @@ func ServeHTTPHealthCheck(ctx context.Context, cfg *config.Config) error {
 	return server.ListenAndServe()
 }
 
-// Create and start the gRPC server and http healthcheck endpoint
-func Serve(ctx context.Context, cfg *config.Config) error {
+// ServeDummy creates and starts the gRPC dummy server and http healthcheck endpoint
+func ServeDummy(ctx context.Context, cfg *config.Config) error {
 	grpcServer := newGRPCDummyServer(ctx, cfg)
 
 	grpcListener, err := net.Listen("tcp", cfg.GetGrpcHostAddress())

@@ -9,6 +9,8 @@ require (
 	github.com/gofrs/uuid v4.2.0+incompatible
 	github.com/golang/glog v1.2.0
 	github.com/golang/protobuf v1.5.3
+	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
+	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.1-0.20210315223345-82c243799c99
 	github.com/jackc/pgconn v1.14.3
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/spf13/cobra v1.7.0

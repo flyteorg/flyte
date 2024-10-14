@@ -25,7 +25,7 @@ var serveDummyCmd = &cobra.Command{
 			}
 		}()
 
-		return cacheservice.Serve(ctx, cfg)
+		return cacheservice.ServeDummy(ctx, cfg)
 	},
 }
 

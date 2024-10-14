@@ -8,6 +8,8 @@ import (
 	"runtime/debug"
 	"time"
 
+	grpcmiddleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	grpcprometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.opentelemetry.io/otel/propagation"
 	"google.golang.org/grpc"
@@ -133,14 +135,19 @@ func ServeInsecure(ctx context.Context, cfg *config.Config) error {
 // Creates a new GRPC Server with all the configuration
 func newGRPCServer(_ context.Context, cfg *config.Config) *grpc.Server {
 	tracerProvider := otelutils.GetTracerProvider(otelutils.DataCatalogServerTracer)
-	grpcServer := grpc.NewServer(
-		grpc.UnaryInterceptor(
+	serverOpts := []grpc.ServerOption{
+		grpc.StreamInterceptor(grpcprometheus.StreamServerInterceptor),
+		grpc.UnaryInterceptor(grpcmiddleware.ChainUnaryServer(
+			grpcprometheus.UnaryServerInterceptor,
 			otelgrpc.UnaryServerInterceptor(
 				otelgrpc.WithTracerProvider(tracerProvider),
 				otelgrpc.WithPropagators(propagation.TraceContext{}),
 			),
-		),
-	)
+		)),
+	}
+	grpcServer := grpc.NewServer(serverOpts...)
+	grpcprometheus.Register(grpcServer)
+
 	catalog.RegisterDataCatalogServer(grpcServer, NewDataCatalogService())
 
 	healthServer := health.NewServer()
