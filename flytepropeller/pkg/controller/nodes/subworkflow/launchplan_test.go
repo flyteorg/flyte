@@ -311,6 +311,7 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
 				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
 			}),
+			mock.MatchedBy(func(o v1alpha1.ExecutableLaunchPlan) bool { return true }),
 		).Return(&admin.ExecutionClosure{
 			Phase: core.WorkflowExecution_RUNNING,
 		}, &core.LiteralMap{}, nil)
@@ -334,6 +335,7 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
 				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
 			}),
+			mock.MatchedBy(func(o v1alpha1.ExecutableLaunchPlan) bool { return true }),
 		).Return(&admin.ExecutionClosure{
 			Phase: core.WorkflowExecution_SUCCEEDED,
 		}, nil, nil)
@@ -369,6 +371,7 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
 				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
 			}),
+			mock.MatchedBy(func(o v1alpha1.ExecutableLaunchPlan) bool { return true }),
 		).Return(&admin.ExecutionClosure{
 			Phase: core.WorkflowExecution_SUCCEEDED,
 			OutputResult: &admin.ExecutionClosure_Outputs{
@@ -411,6 +414,7 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
 				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
 			}),
+			mock.MatchedBy(func(o v1alpha1.ExecutableLaunchPlan) bool { return true }),
 		).Return(&admin.ExecutionClosure{
 			Phase: core.WorkflowExecution_SUCCEEDED,
 			OutputResult: &admin.ExecutionClosure_Outputs{
@@ -448,6 +452,7 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
 				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
 			}),
+			mock.MatchedBy(func(o v1alpha1.ExecutableLaunchPlan) bool { return true }),
 		).Return(&admin.ExecutionClosure{
 			Phase: core.WorkflowExecution_FAILED,
 			OutputResult: &admin.ExecutionClosure_Error{
@@ -478,6 +483,7 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
 				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
 			}),
+			mock.MatchedBy(func(o v1alpha1.ExecutableLaunchPlan) bool { return true }),
 		).Return(&admin.ExecutionClosure{
 			Phase: core.WorkflowExecution_FAILED,
 		}, &core.LiteralMap{}, nil)
@@ -502,6 +508,7 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
 				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
 			}),
+			mock.MatchedBy(func(o v1alpha1.ExecutableLaunchPlan) bool { return true }),
 		).Return(&admin.ExecutionClosure{
 			Phase: core.WorkflowExecution_ABORTED,
 		}, &core.LiteralMap{}, nil)
@@ -526,6 +533,7 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
 				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
 			}),
+			mock.MatchedBy(func(o v1alpha1.ExecutableLaunchPlan) bool { return true }),
 		).Return(nil, &core.LiteralMap{}, errors.Wrapf(launchplan.RemoteErrorNotFound, fmt.Errorf("some error"), "not found"))
 
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
@@ -548,6 +556,7 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
 				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
 			}),
+			mock.MatchedBy(func(o v1alpha1.ExecutableLaunchPlan) bool { return true }),
 		).Return(nil, &core.LiteralMap{}, errors.Wrapf(launchplan.RemoteErrorSystem, fmt.Errorf("some error"), "not found"))
 
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
@@ -576,6 +585,7 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
 				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
 			}),
+			mock.MatchedBy(func(o v1alpha1.ExecutableLaunchPlan) bool { return true }),
 		).Return(&admin.ExecutionClosure{
 			Phase: core.WorkflowExecution_SUCCEEDED,
 			OutputResult: &admin.ExecutionClosure_Outputs{
@@ -610,6 +620,7 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
 				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
 			}),
+			mock.MatchedBy(func(o v1alpha1.ExecutableLaunchPlan) bool { return true }),
 		).Return(&admin.ExecutionClosure{
 			Phase: core.WorkflowExecution_SUCCEEDED,
 			OutputResult: &admin.ExecutionClosure_Outputs{

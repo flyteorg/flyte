@@ -253,6 +253,7 @@ func TestWorkflowNodeHandler_CheckNodeStatus(t *testing.T) {
 			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
 				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
 			}),
+			mock.MatchedBy(func(o v1alpha1.ExecutableLaunchPlan) bool { return true }),
 		).Return(&admin.ExecutionClosure{
 			Phase: core.WorkflowExecution_RUNNING,
 		}, &core.LiteralMap{}, nil)
@@ -274,6 +275,7 @@ func TestWorkflowNodeHandler_CheckNodeStatus(t *testing.T) {
 			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
 				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
 			}),
+			mock.MatchedBy(func(o v1alpha1.ExecutableLaunchPlan) bool { return true }),
 		).Return(&admin.ExecutionClosure{
 			Phase: core.WorkflowExecution_RUNNING,
 		}, &core.LiteralMap{}, nil)
