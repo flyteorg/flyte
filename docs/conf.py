@@ -157,7 +157,8 @@ redirects = {
     "flyte_fundamentals/visualizing_task_input_and_output": "../user_guide/flyte_fundamentals/visualizing_task_input_and_output.html",
 
     # flytesnacks
-    "flytesnacks/contribute": "../community/contribute_docs.html",
+    "flytesnacks/contribute": "../community/contribute/contribute_docs.html",
+    "community/contribute": "community/contribute/contribute_code.html",
     "flytesnacks/integrations": "../flytesnacks/integrations/index.html",
     "flytesnacks/tutorials": "../flytesnacks/tutorials.html",
 
