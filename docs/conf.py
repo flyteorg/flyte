@@ -385,10 +385,11 @@ html_context = {
     "doc_path": "docs",
 }
 
-json_url = "_static/switcher.json"
+json_url = "https://flyte--5846.org.readthedocs.build/en/5846/_static/switcher.json"
 version_match = os.environ.get("READTHEDOCS_VERSION")
 
 if not version_match:
+    json_url = "_static/switcher.json"
     version_match = "dev"
 
 html_theme_options = {
