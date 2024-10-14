@@ -207,7 +207,7 @@ func BuildFlyteWorkflow(wfClosure *core.CompiledWorkflowClosure, inputs *core.Li
 	if wf.GetMetadataDefaults() != nil {
 		interruptible = wf.GetMetadataDefaults().GetInterruptible()
 	}
-	
+
 	launchPlans := make([]*v1alpha1.LaunchPlanSpec, 0, len(wfClosure.LaunchPlans))
 	for _, launchPlan := range wfClosure.LaunchPlans {
 		launchPlans = append(launchPlans, &v1alpha1.LaunchPlanSpec{

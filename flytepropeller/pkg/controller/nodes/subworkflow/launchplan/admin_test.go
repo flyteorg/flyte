@@ -45,7 +45,6 @@ var (
 			},
 		},
 	}
-	parentWorkflowID = "parentwf"
 )
 
 func TestAdminLaunchPlanExecutor_GetStatus(t *testing.T) {
