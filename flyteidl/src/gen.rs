@@ -46,8 +46,8 @@ fn main() {
                 .collect::<Vec<_>>(),
             &[
                 "protos/",
-                "protos/google/api/", // Adjust this path to where you have the googleapis protos
-                "protos/protoc-gen-openapiv2/options/", // Adjust this path to where you have the grpc-gateway protos
+                "protos/google/api/", // The path to where the googleapis protos are
+                "protos/protoc-gen-openapiv2/options/", // The path to where the grpc-gateway protos are
             ],
         )
         .unwrap();
