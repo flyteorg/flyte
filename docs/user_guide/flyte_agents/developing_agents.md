@@ -15,7 +15,7 @@ If you need to create a new type of task, we recommend creating a new agent to r
 
 ```{note}
 
-We strongly encourage you to contribute your agent to the Flyte community. To do so, follow the steps in "[Contributing to Flyte](https://docs.flyte.org/en/latest/community/contribute.html)" to add your agent to [Flytekit](https://github.com/flyteorg/flytekit/tree/master/plugins) and [create an example](https://docs.flyte.org/en/latest/flytesnacks/contribute.html) of your agent for the [Integrations](https://docs.flyte.org/en/latest/flytesnacks/integrations.html) documentation. If you have any questions, reach out to us on [Slack](https://docs.flyte.org/en/latest/community/contribute.html#).
+We strongly encourage you to contribute your agent to the Flyte community. To do so, follow the steps in the [Flytekit contribution guide](https://docs.flyte.org/en/latest/api/flytekit/contributing.html) to add your agent to [Flytekit](https://github.com/flyteorg/flytekit/tree/master/plugins) and [create an example](https://docs.flyte.org/en/latest/flytesnacks/contribute.html) of your agent for the [Integrations](https://docs.flyte.org/en/latest/flytesnacks/integrations/index.html) documentation. If you have any questions, reach out to us on [Slack](https://docs.flyte.org/en/latest/community/contribute.html#).
 
 ```
 
