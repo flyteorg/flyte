@@ -386,7 +386,10 @@ html_context = {
 }
 
 json_url = "_static/switcher.json"
-version_match = "latest"
+version_match = os.environ.get("READTHEDOCS_VERSION")
+
+if not version_match:
+    version_match = "dev"
 
 html_theme_options = {
     # custom flyteorg pydata theme options

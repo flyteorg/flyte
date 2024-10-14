@@ -1,8 +1,17 @@
 [
     {
+        "name": "dev",
+        "version": "dev",
+        "url": "https://docs.flyte.org/en/latest/"
+    },
+    {
         "name": "latest",
         "version": "latest",
         "url": "https://docs.flyte.org/en/latest/"
+    },
+    {
+        "version": "v1.13.2",
+        "url": "https://docs.flyte.org/en/v1.13.2"
     },
     {
         "version": "v1.13.1",
