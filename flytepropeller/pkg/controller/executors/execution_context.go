@@ -12,6 +12,7 @@ type TaskDetailsGetter interface {
 
 type SubWorkflowGetter interface {
 	FindSubWorkflow(subID v1alpha1.WorkflowID) v1alpha1.ExecutableSubWorkflow
+	FindLaunchPlan(id v1alpha1.LaunchPlanRefID) v1alpha1.ExecutableLaunchPlan
 }
 
 type ImmutableExecutionContext interface {
