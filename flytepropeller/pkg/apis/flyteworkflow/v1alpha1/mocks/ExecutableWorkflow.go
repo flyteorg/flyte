@@ -20,6 +20,40 @@ type ExecutableWorkflow struct {
 	mock.Mock
 }
 
+type ExecutableWorkflow_FindLaunchPlan struct {
+	*mock.Call
+}
+
+func (_m ExecutableWorkflow_FindLaunchPlan) Return(_a0 v1alpha1.ExecutableLaunchPlan) *ExecutableWorkflow_FindLaunchPlan {
+	return &ExecutableWorkflow_FindLaunchPlan{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutableWorkflow) OnFindLaunchPlan(id v1alpha1.Identifier) *ExecutableWorkflow_FindLaunchPlan {
+	c_call := _m.On("FindLaunchPlan", id)
+	return &ExecutableWorkflow_FindLaunchPlan{Call: c_call}
+}
+
+func (_m *ExecutableWorkflow) OnFindLaunchPlanMatch(matchers ...interface{}) *ExecutableWorkflow_FindLaunchPlan {
+	c_call := _m.On("FindLaunchPlan", matchers...)
+	return &ExecutableWorkflow_FindLaunchPlan{Call: c_call}
+}
+
+// FindLaunchPlan provides a mock function with given fields: id
+func (_m *ExecutableWorkflow) FindLaunchPlan(id v1alpha1.Identifier) v1alpha1.ExecutableLaunchPlan {
+	ret := _m.Called(id)
+
+	var r0 v1alpha1.ExecutableLaunchPlan
+	if rf, ok := ret.Get(0).(func(v1alpha1.Identifier) v1alpha1.ExecutableLaunchPlan); ok {
+		r0 = rf(id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(v1alpha1.ExecutableLaunchPlan)
+		}
+	}
+
+	return r0
+}
+
 type ExecutableWorkflow_FindSubWorkflow struct {
 	*mock.Call
 }
@@ -416,6 +450,74 @@ func (_m *ExecutableWorkflow) GetID() string {
 		r0 = rf()
 	} else {
 		r0 = ret.Get(0).(string)
+	}
+
+	return r0
+}
+
+type ExecutableWorkflow_GetIdentifier struct {
+	*mock.Call
+}
+
+func (_m ExecutableWorkflow_GetIdentifier) Return(_a0 *core.Identifier) *ExecutableWorkflow_GetIdentifier {
+	return &ExecutableWorkflow_GetIdentifier{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutableWorkflow) OnGetIdentifier() *ExecutableWorkflow_GetIdentifier {
+	c_call := _m.On("GetIdentifier")
+	return &ExecutableWorkflow_GetIdentifier{Call: c_call}
+}
+
+func (_m *ExecutableWorkflow) OnGetIdentifierMatch(matchers ...interface{}) *ExecutableWorkflow_GetIdentifier {
+	c_call := _m.On("GetIdentifier", matchers...)
+	return &ExecutableWorkflow_GetIdentifier{Call: c_call}
+}
+
+// GetIdentifier provides a mock function with given fields:
+func (_m *ExecutableWorkflow) GetIdentifier() *core.Identifier {
+	ret := _m.Called()
+
+	var r0 *core.Identifier
+	if rf, ok := ret.Get(0).(func() *core.Identifier); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*core.Identifier)
+		}
+	}
+
+	return r0
+}
+
+type ExecutableWorkflow_GetInterface struct {
+	*mock.Call
+}
+
+func (_m ExecutableWorkflow_GetInterface) Return(_a0 *core.TypedInterface) *ExecutableWorkflow_GetInterface {
+	return &ExecutableWorkflow_GetInterface{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutableWorkflow) OnGetInterface() *ExecutableWorkflow_GetInterface {
+	c_call := _m.On("GetInterface")
+	return &ExecutableWorkflow_GetInterface{Call: c_call}
+}
+
+func (_m *ExecutableWorkflow) OnGetInterfaceMatch(matchers ...interface{}) *ExecutableWorkflow_GetInterface {
+	c_call := _m.On("GetInterface", matchers...)
+	return &ExecutableWorkflow_GetInterface{Call: c_call}
+}
+
+// GetInterface provides a mock function with given fields:
+func (_m *ExecutableWorkflow) GetInterface() *core.TypedInterface {
+	ret := _m.Called()
+
+	var r0 *core.TypedInterface
+	if rf, ok := ret.Get(0).(func() *core.TypedInterface); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*core.TypedInterface)
+		}
 	}
 
 	return r0
