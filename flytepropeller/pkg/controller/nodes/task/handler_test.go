@@ -4,15 +4,15 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"testing"
-
 	"github.com/golang/protobuf/proto"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	v1 "k8s.io/api/core/v1"
 	v12 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	k8sfake "k8s.io/client-go/kubernetes/fake"
+	"testing"
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
@@ -1269,4 +1269,42 @@ func TestNew(t *testing.T) {
 func init() {
 	labeled.SetMetricKeys(contextutils.ProjectKey, contextutils.DomainKey, contextutils.WorkflowIDKey,
 		contextutils.TaskIDKey)
+}
+
+func Test_task_Handle_ValidateOutputErr(t *testing.T) {
+	ctx := context.TODO()
+	nodeID := "n1"
+	execConfig := v1alpha1.ExecutionConfig{}
+
+	tk := &core.TaskTemplate{
+		Id:   &core.Identifier{ResourceType: core.ResourceType_TASK, Project: "proj", Domain: "dom", Version: "ver"},
+		Type: "test",
+		Interface: &core.TypedInterface{
+			Outputs: &core.VariableMap{
+				Variables: map[string]*core.Variable{
+					"x": {
+						Type: &core.LiteralType{
+							Type: &core.LiteralType_Simple{
+								Simple: core.SimpleType_BOOLEAN,
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	taskID := &core.Identifier{}
+	tr := &nodeMocks.TaskReader{}
+	tr.OnGetTaskID().Return(taskID)
+	tr.OnReadMatch(mock.Anything).Return(tk, nil)
+
+	expectedErr := errors.Wrapf(ioutils.ErrRemoteFileExceedsMaxSize, "test file size exceeded")
+	r := &ioMocks.OutputReader{}
+	r.OnIsError(ctx).Return(false, nil)
+	r.OnExists(ctx).Return(true, expectedErr)
+
+	h := Handler{}
+	result, err := h.ValidateOutput(ctx, nodeID, nil, r, nil, execConfig, tr)
+	assert.NoError(t, err)
+	assert.False(t, result.IsRecoverable)
 }
