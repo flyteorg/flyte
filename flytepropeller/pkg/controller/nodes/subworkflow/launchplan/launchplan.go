@@ -40,7 +40,7 @@ type Executor interface {
 	Launch(ctx context.Context, launchCtx LaunchContext, executionID *core.WorkflowExecutionIdentifier, launchPlan v1alpha1.ExecutableLaunchPlan, inputs *core.LiteralMap) error
 
 	// GetStatus retrieves status of a LaunchPlan execution
-	GetStatus(ctx context.Context, executionID *core.WorkflowExecutionIdentifier) (*admin.ExecutionClosure, *core.LiteralMap, error)
+	GetStatus(ctx context.Context, executionID *core.WorkflowExecutionIdentifier, launchPlan v1alpha1.ExecutableLaunchPlan) (*admin.ExecutionClosure, *core.LiteralMap, error)
 
 	// Kill a remote execution
 	Kill(ctx context.Context, executionID *core.WorkflowExecutionIdentifier, reason string) error
