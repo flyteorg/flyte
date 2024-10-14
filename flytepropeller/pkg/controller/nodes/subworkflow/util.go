@@ -18,6 +18,7 @@ func GetChildWorkflowExecutionID(nodeExecID *core.NodeExecutionIdentifier, attem
 	return &core.WorkflowExecutionIdentifier{
 		Project: nodeExecID.ExecutionId.Project,
 		Domain:  nodeExecID.ExecutionId.Domain,
+		Org:     nodeExecID.ExecutionId.Org,
 		Name:    name,
 	}, nil
 }
@@ -33,6 +34,7 @@ func GetChildWorkflowExecutionIDV2(nodeExecID *core.NodeExecutionIdentifier, att
 	return &core.WorkflowExecutionIdentifier{
 		Project: nodeExecID.ExecutionId.Project,
 		Domain:  nodeExecID.ExecutionId.Domain,
+		Org:     nodeExecID.ExecutionId.Org,
 		Name:    name,
 	}, nil
 }

@@ -153,6 +153,7 @@ func (a *adminLaunchPlanExecutor) Launch(ctx context.Context, launchCtx LaunchCo
 		Project: executionID.Project,
 		Domain:  executionID.Domain,
 		Name:    executionID.Name,
+		Org:     executionID.Org,
 		Inputs:  inputs,
 		Spec: &admin.ExecutionSpec{
 			LaunchPlan: launchPlan.GetId(),

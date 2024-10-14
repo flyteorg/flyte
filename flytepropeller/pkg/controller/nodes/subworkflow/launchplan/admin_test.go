@@ -57,6 +57,7 @@ var (
 		Name:    "n",
 		Domain:  "d",
 		Project: "p",
+		Org:     "o",
 	}
 	testURI = "s3://bla"
 )
@@ -71,6 +72,7 @@ func TestAdminLaunchPlanExecutor_GetStatus(t *testing.T) {
 		Name:    "n",
 		Domain:  "d",
 		Project: "p",
+		Org:     "o",
 	}
 
 	memStore, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
@@ -172,7 +174,7 @@ func TestAdminLaunchPlanExecutor_GetStatus(t *testing.T) {
 			OnCreateExecutionMatch(
 				ctx,
 				mock.MatchedBy(func(o *admin.ExecutionCreateRequest) bool {
-					return o.Project == id.Project && o.Domain == id.Domain && o.Name == id.Name && o.Spec.Inputs == nil
+					return o.Project == id.Project && o.Domain == id.Domain && o.Name == id.Name && o.Org == id.Org && o.Spec.Inputs == nil
 				}),
 			).
 			Return(nil, nil).
@@ -226,7 +228,7 @@ func TestAdminLaunchPlanExecutor_GetStatus(t *testing.T) {
 			OnCreateExecutionMatch(
 				ctx,
 				mock.MatchedBy(func(o *admin.ExecutionCreateRequest) bool {
-					return o.Project == id.Project && o.Domain == id.Domain && o.Name == id.Name && o.Spec.Inputs == nil
+					return o.Project == id.Project && o.Domain == id.Domain && o.Name == id.Name && o.Org == id.Org && o.Spec.Inputs == nil
 				}),
 			).
 			Return(nil, nil).
@@ -277,6 +279,7 @@ func TestAdminLaunchPlanExecutor_Launch(t *testing.T) {
 		Name:    "n",
 		Domain:  "d",
 		Project: "p",
+		Org:     "o",
 	}
 	memStore, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
 	assert.NoError(t, err)
@@ -290,7 +293,7 @@ func TestAdminLaunchPlanExecutor_Launch(t *testing.T) {
 			OnCreateExecutionMatch(
 				ctx,
 				mock.MatchedBy(func(o *admin.ExecutionCreateRequest) bool {
-					return o.Project == id.Project && o.Domain == id.Domain && o.Name == id.Name && o.Spec.Inputs == nil &&
+					return o.Project == id.Project && o.Domain == id.Domain && o.Name == id.Name && o.Org == id.Org && o.Spec.Inputs == nil &&
 						o.Spec.Metadata.Mode == admin.ExecutionMetadata_CHILD_WORKFLOW &&
 						reflect.DeepEqual(o.Spec.Labels.Values, map[string]string{
 							"foo":            "bar",
@@ -343,7 +346,7 @@ func TestAdminLaunchPlanExecutor_Launch(t *testing.T) {
 			OnRecoverExecutionMatch(
 				ctx,
 				mock.MatchedBy(func(o *admin.ExecutionRecoverRequest) bool {
-					return o.Id.Project == "p" && o.Id.Domain == "d" && o.Id.Name == "w" && o.Name == "n" &&
+					return o.Id.Project == "p" && o.Id.Domain == "d" && o.Id.Name == "w" && o.Id.Org == "o" && o.Name == "n" &&
 						proto.Equal(o.Metadata.ParentNodeExecution, parentNodeExecution)
 				}),
 			).
@@ -356,6 +359,7 @@ func TestAdminLaunchPlanExecutor_Launch(t *testing.T) {
 					Project: "p",
 					Domain:  "d",
 					Name:    "w",
+					Org:     "o",
 				},
 				ParentNodeExecution: parentNodeExecution,
 			},
@@ -388,7 +392,7 @@ func TestAdminLaunchPlanExecutor_Launch(t *testing.T) {
 			OnRecoverExecutionMatch(
 				ctx,
 				mock.MatchedBy(func(o *admin.ExecutionRecoverRequest) bool {
-					return o.Id.Project == "p" && o.Id.Domain == "d" && o.Id.Name == "w" && o.Name == "n" &&
+					return o.Id.Project == "p" && o.Id.Domain == "d" && o.Id.Name == "w" && o.Id.Org == "o" && o.Name == "n" &&
 						proto.Equal(o.Metadata.ParentNodeExecution, parentNodeExecution)
 				}),
 			).
@@ -401,7 +405,7 @@ func TestAdminLaunchPlanExecutor_Launch(t *testing.T) {
 				ctx,
 				mock.MatchedBy(func(o *admin.ExecutionCreateRequest) bool {
 					createCalled = true
-					return o.Project == "p" && o.Domain == "d" && o.Name == "n" && o.Spec.Inputs == nil &&
+					return o.Project == "p" && o.Domain == "d" && o.Name == "n" && o.Org == "o" && o.Spec.Inputs == nil &&
 						o.Spec.Metadata.Mode == admin.ExecutionMetadata_CHILD_WORKFLOW
 				}),
 			).
@@ -414,6 +418,7 @@ func TestAdminLaunchPlanExecutor_Launch(t *testing.T) {
 					Project: "p",
 					Domain:  "d",
 					Name:    "w",
+					Org:     "o",
 				},
 				ParentNodeExecution: parentNodeExecution,
 			},
@@ -448,6 +453,7 @@ func TestAdminLaunchPlanExecutor_Launch(t *testing.T) {
 						Project: "p",
 						Domain:  "d",
 						Name:    "w",
+						Org:     "o",
 					},
 				},
 			},
@@ -1027,7 +1033,7 @@ func (s *LPExecutorSuite) Test_watchExecutionStatusUpdates_SUCCEEDED() {
 		OnCreateExecutionMatch(
 			s.ctx,
 			mock.MatchedBy(func(o *admin.ExecutionCreateRequest) bool {
-				return o.Project == execID.Project && o.Domain == execID.Domain && o.Name == execID.Name && o.Spec.Inputs == nil
+				return o.Project == execID.Project && o.Domain == execID.Domain && o.Name == execID.Name && o.Org == execID.Org && o.Spec.Inputs == nil
 			}),
 		).
 		Return(nil, nil).
@@ -1079,7 +1085,7 @@ func (s *LPExecutorSuite) Test_watchExecutionStatusUpdates_RUNNING() {
 		OnCreateExecutionMatch(
 			s.ctx,
 			mock.MatchedBy(func(o *admin.ExecutionCreateRequest) bool {
-				return o.Project == execID.Project && o.Domain == execID.Domain && o.Name == execID.Name && o.Spec.Inputs == nil
+				return o.Project == execID.Project && o.Domain == execID.Domain && o.Name == execID.Name && o.Org == execID.Org && o.Spec.Inputs == nil
 			}),
 		).
 		Return(nil, nil).
@@ -1160,7 +1166,7 @@ func (s *LPExecutorSuite) Test_watchExecutionStatusUpdates_FetchExecutionDataErr
 		OnCreateExecutionMatch(
 			s.ctx,
 			mock.MatchedBy(func(o *admin.ExecutionCreateRequest) bool {
-				return o.Project == execID.Project && o.Domain == execID.Domain && o.Name == execID.Name && o.Spec.Inputs == nil
+				return o.Project == execID.Project && o.Domain == execID.Domain && o.Name == execID.Name && o.Org == execID.Org && o.Spec.Inputs == nil
 			}),
 		).
 		Return(nil, nil).
