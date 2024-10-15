@@ -75,7 +75,7 @@ import random
 
 @task(retries=3)
 def compute_mean(data: List[float]) -> float:
-    if random.random() < 0.05:
+    if random() < 0.05:
         raise FlyteRecoverableException("Something bad happened 🔥")
     return sum(data) / len(data)
 ```
