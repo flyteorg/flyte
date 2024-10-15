@@ -39,3 +39,5 @@ issues:
   exclude-rules:
     - path: pkg/workflowengine/impl/prepare_execution.go
       text: "copies lock"
+    - path: pkg/runtime/interfaces/application_configuration.go
+      text: "G402: TLS InsecureSkipVerify may be true."
