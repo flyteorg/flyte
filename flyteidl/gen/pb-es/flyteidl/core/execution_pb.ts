@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
-import { Duration, Message, proto3 } from "@bufbuild/protobuf";
+import { Duration, Message, proto3, protoInt64 } from "@bufbuild/protobuf";
 
 /**
  * Indicates various phases of Workflow Execution
@@ -342,9 +342,16 @@ export class ExecutionError extends Message<ExecutionError> {
   kind = ExecutionError_ErrorKind.UNKNOWN;
 
   /**
+   * Timestamp of the error
+   *
+   * @generated from field: int64 timestamp = 5;
+   */
+  timestamp = protoInt64.zero;
+
+  /**
    * Worker that generated the error
    *
-   * @generated from field: string worker = 5;
+   * @generated from field: string worker = 6;
    */
   worker = "";
 
@@ -360,7 +367,8 @@ export class ExecutionError extends Message<ExecutionError> {
     { no: 2, name: "message", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "error_uri", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "kind", kind: "enum", T: proto3.getEnumType(ExecutionError_ErrorKind) },
-    { no: 5, name: "worker", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "timestamp", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+    { no: 6, name: "worker", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExecutionError {

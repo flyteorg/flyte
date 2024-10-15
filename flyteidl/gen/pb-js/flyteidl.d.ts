@@ -5749,6 +5749,9 @@ export namespace flyteidl {
             /** ExecutionError kind */
             kind?: (flyteidl.core.ExecutionError.ErrorKind|null);
 
+            /** ExecutionError timestamp */
+            timestamp?: (Long|null);
+
             /** ExecutionError worker */
             worker?: (string|null);
         }
@@ -5773,6 +5776,9 @@ export namespace flyteidl {
 
             /** ExecutionError kind. */
             public kind: flyteidl.core.ExecutionError.ErrorKind;
+
+            /** ExecutionError timestamp. */
+            public timestamp: Long;
 
             /** ExecutionError worker. */
             public worker: string;

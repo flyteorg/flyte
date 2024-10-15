@@ -304,7 +304,10 @@ func writeOutput(ctx context.Context, taskCtx webapi.StatusContext) error {
 		return nil
 	}
 
-	outputReader := ioutils.NewRemoteFileOutputReader(ctx, taskCtx.DataStore(), taskCtx.OutputWriter(), 0)
+	outputReader, err := ioutils.NewRemoteFileOutputReader(ctx, taskCtx.DataStore(), taskCtx.OutputWriter(), 0)
+	if err != nil {
+		return err
+	}
 	return taskCtx.OutputWriter().Put(ctx, outputReader)
 }
 

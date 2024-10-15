@@ -7154,6 +7154,11 @@
         "kind": {
           "$ref": "#/definitions/ExecutionErrorErrorKind"
         },
+        "timestamp": {
+          "type": "string",
+          "format": "int64",
+          "title": "Timestamp of the error"
+        },
         "worker": {
           "type": "string",
           "title": "Worker that generated the error"

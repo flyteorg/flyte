@@ -13823,6 +13823,7 @@
                  * @property {string|null} [message] ExecutionError message
                  * @property {string|null} [errorUri] ExecutionError errorUri
                  * @property {flyteidl.core.ExecutionError.ErrorKind|null} [kind] ExecutionError kind
+                 * @property {Long|null} [timestamp] ExecutionError timestamp
                  * @property {string|null} [worker] ExecutionError worker
                  */
     
@@ -13874,6 +13875,14 @@
                 ExecutionError.prototype.kind = 0;
     
                 /**
+                 * ExecutionError timestamp.
+                 * @member {Long} timestamp
+                 * @memberof flyteidl.core.ExecutionError
+                 * @instance
+                 */
+                ExecutionError.prototype.timestamp = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
+    
+                /**
                  * ExecutionError worker.
                  * @member {string} worker
                  * @memberof flyteidl.core.ExecutionError
@@ -13913,8 +13922,10 @@
                         writer.uint32(/* id 3, wireType 2 =*/26).string(message.errorUri);
                     if (message.kind != null && message.hasOwnProperty("kind"))
                         writer.uint32(/* id 4, wireType 0 =*/32).int32(message.kind);
+                    if (message.timestamp != null && message.hasOwnProperty("timestamp"))
+                        writer.uint32(/* id 5, wireType 0 =*/40).int64(message.timestamp);
                     if (message.worker != null && message.hasOwnProperty("worker"))
-                        writer.uint32(/* id 5, wireType 2 =*/42).string(message.worker);
+                        writer.uint32(/* id 6, wireType 2 =*/50).string(message.worker);
                     return writer;
                 };
     
@@ -13949,6 +13960,9 @@
                             message.kind = reader.int32();
                             break;
                         case 5:
+                            message.timestamp = reader.int64();
+                            break;
+                        case 6:
                             message.worker = reader.string();
                             break;
                         default:
@@ -13988,6 +14002,9 @@
                         case 2:
                             break;
                         }
+                    if (message.timestamp != null && message.hasOwnProperty("timestamp"))
+                        if (!$util.isInteger(message.timestamp) && !(message.timestamp && $util.isInteger(message.timestamp.low) && $util.isInteger(message.timestamp.high)))
+                            return "timestamp: integer|Long expected";
                     if (message.worker != null && message.hasOwnProperty("worker"))
                         if (!$util.isString(message.worker))
                             return "worker: string expected";
