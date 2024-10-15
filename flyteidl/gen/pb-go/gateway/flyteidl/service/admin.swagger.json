@@ -7156,7 +7156,7 @@
         },
         "timestamp": {
           "type": "string",
-          "format": "int64",
+          "format": "date-time",
           "title": "Timestamp of the error"
         },
         "worker": {

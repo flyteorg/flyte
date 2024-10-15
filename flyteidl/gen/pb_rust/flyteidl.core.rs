@@ -2130,8 +2130,8 @@ pub struct ExecutionError {
     #[prost(enumeration="execution_error::ErrorKind", tag="4")]
     pub kind: i32,
     /// Timestamp of the error
-    #[prost(int64, tag="5")]
-    pub timestamp: i64,
+    #[prost(message, optional, tag="5")]
+    pub timestamp: ::core::option::Option<::prost_types::Timestamp>,
     /// Worker that generated the error
     #[prost(string, tag="6")]
     pub worker: ::prost::alloc::string::String,
@@ -3098,8 +3098,8 @@ pub struct ContainerError {
     #[prost(enumeration="execution_error::ErrorKind", tag="4")]
     pub origin: i32,
     /// Timestamp of the error
-    #[prost(int64, tag="5")]
-    pub timestamp: i64,
+    #[prost(message, optional, tag="5")]
+    pub timestamp: ::core::option::Option<::prost_types::Timestamp>,
     /// Worker that generated the error
     #[prost(string, tag="6")]
     pub worker: ::prost::alloc::string::String,

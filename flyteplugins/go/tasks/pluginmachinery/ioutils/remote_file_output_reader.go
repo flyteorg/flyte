@@ -3,9 +3,9 @@ package ioutils
 import (
 	"context"
 	"fmt"
-	"math"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/pkg/errors"
 
@@ -151,7 +151,7 @@ func (e *EarliestFileErrorRetriever) HasError(ctx context.Context) (bool, error)
 }
 
 func (e *EarliestFileErrorRetriever) GetError(ctx context.Context) (io.ExecutionError, error) {
-	var earliestTimestamp int64 = math.MaxInt64
+	var earliestTimestamp time.Time = time.Now()
 	earliestExecutionError := io.ExecutionError{}
 	const maxItems = 1000
 	cursor := storage.NewCursorAtStart()
@@ -171,8 +171,8 @@ func (e *EarliestFileErrorRetriever) GetError(ctx context.Context) (io.Execution
 			if err != nil {
 				return io.ExecutionError{}, errors.Wrapf(err, "failed to read error file @[%s]", errorFilePath.String())
 			}
-			timestamp := errorDoc.Error.GetTimestamp()
-			if earliestTimestamp >= timestamp {
+			timestamp := errorDoc.Error.GetTimestamp().AsTime()
+			if earliestTimestamp.After(timestamp) {
 				earliestExecutionError = errorDoc2ExecutionError(errorDoc, errorFilePath)
 				earliestTimestamp = timestamp
 			}

@@ -3,12 +3,15 @@ package ioutils
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"strings"
 	"testing"
+	"time"
 
 	regErrors "github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	pluginsIOMock "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
@@ -152,14 +155,16 @@ func TestReadOrigin(t *testing.T) {
 		store := &storageMocks.ComposedProtobufStore{}
 		store.OnReadProtobufMatch(mock.Anything, mock.Anything, mock.Anything).Run(func(args mock.Arguments) {
 			errorFilePath := args.Get(1).(storage.DataReference)
-			workerIdx := strings.Split(strings.Split(errorFilePath.String(), "-")[1], ".")[0]
+			workerIdx, err := strconv.Atoi(strings.Split(strings.Split(errorFilePath.String(), "-")[1], ".")[0])
+			assert.NoError(t, err)
 			errorDoc := &core.ErrorDocument{
 				Error: &core.ContainerError{
-					Code:    "red",
-					Message: fmt.Sprintf("hi-%s", workerIdx),
-					Kind:    core.ContainerError_NON_RECOVERABLE,
-					Origin:  core.ExecutionError_USER,
-					Worker:  fmt.Sprintf("worker-%s", workerIdx),
+					Code:      "red",
+					Message:   fmt.Sprintf("hi-%d", workerIdx),
+					Kind:      core.ContainerError_NON_RECOVERABLE,
+					Origin:    core.ExecutionError_USER,
+					Worker:    fmt.Sprintf("worker-%d", workerIdx),
+					Timestamp: timestamppb.New(time.Unix(int64(100+workerIdx%2), 0)),
 				},
 			}
 			incomingErrorDoc := args.Get(2)
@@ -201,8 +206,9 @@ func TestReadOrigin(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, core.ExecutionError_USER, executionError.Kind)
 		assert.Equal(t, "red", executionError.Code)
-		assert.Equal(t, "hi-2", executionError.Message)
-		assert.Equal(t, "worker-2", executionError.Worker)
+		assert.Equal(t, "hi-1", executionError.Message)
+		assert.Equal(t, "worker-1", executionError.Worker)
+		assert.Equal(t, timestamppb.New(time.Unix(101, 0)), executionError.Timestamp)
 		assert.False(t, executionError.IsRecoverable)
 	})
 }

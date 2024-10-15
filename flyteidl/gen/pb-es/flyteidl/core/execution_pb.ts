@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
-import { Duration, Message, proto3, protoInt64 } from "@bufbuild/protobuf";
+import { Duration, Message, proto3, Timestamp } from "@bufbuild/protobuf";
 
 /**
  * Indicates various phases of Workflow Execution
@@ -344,9 +344,9 @@ export class ExecutionError extends Message<ExecutionError> {
   /**
    * Timestamp of the error
    *
-   * @generated from field: int64 timestamp = 5;
+   * @generated from field: google.protobuf.Timestamp timestamp = 5;
    */
-  timestamp = protoInt64.zero;
+  timestamp?: Timestamp;
 
   /**
    * Worker that generated the error
@@ -367,7 +367,7 @@ export class ExecutionError extends Message<ExecutionError> {
     { no: 2, name: "message", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "error_uri", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "kind", kind: "enum", T: proto3.getEnumType(ExecutionError_ErrorKind) },
-    { no: 5, name: "timestamp", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+    { no: 5, name: "timestamp", kind: "message", T: Timestamp },
     { no: 6, name: "worker", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 

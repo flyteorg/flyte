@@ -13823,7 +13823,7 @@
                  * @property {string|null} [message] ExecutionError message
                  * @property {string|null} [errorUri] ExecutionError errorUri
                  * @property {flyteidl.core.ExecutionError.ErrorKind|null} [kind] ExecutionError kind
-                 * @property {Long|null} [timestamp] ExecutionError timestamp
+                 * @property {google.protobuf.ITimestamp|null} [timestamp] ExecutionError timestamp
                  * @property {string|null} [worker] ExecutionError worker
                  */
     
@@ -13876,11 +13876,11 @@
     
                 /**
                  * ExecutionError timestamp.
-                 * @member {Long} timestamp
+                 * @member {google.protobuf.ITimestamp|null|undefined} timestamp
                  * @memberof flyteidl.core.ExecutionError
                  * @instance
                  */
-                ExecutionError.prototype.timestamp = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
+                ExecutionError.prototype.timestamp = null;
     
                 /**
                  * ExecutionError worker.
@@ -13923,7 +13923,7 @@
                     if (message.kind != null && message.hasOwnProperty("kind"))
                         writer.uint32(/* id 4, wireType 0 =*/32).int32(message.kind);
                     if (message.timestamp != null && message.hasOwnProperty("timestamp"))
-                        writer.uint32(/* id 5, wireType 0 =*/40).int64(message.timestamp);
+                        $root.google.protobuf.Timestamp.encode(message.timestamp, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
                     if (message.worker != null && message.hasOwnProperty("worker"))
                         writer.uint32(/* id 6, wireType 2 =*/50).string(message.worker);
                     return writer;
@@ -13960,7 +13960,7 @@
                             message.kind = reader.int32();
                             break;
                         case 5:
-                            message.timestamp = reader.int64();
+                            message.timestamp = $root.google.protobuf.Timestamp.decode(reader, reader.uint32());
                             break;
                         case 6:
                             message.worker = reader.string();
@@ -14002,9 +14002,11 @@
                         case 2:
                             break;
                         }
-                    if (message.timestamp != null && message.hasOwnProperty("timestamp"))
-                        if (!$util.isInteger(message.timestamp) && !(message.timestamp && $util.isInteger(message.timestamp.low) && $util.isInteger(message.timestamp.high)))
-                            return "timestamp: integer|Long expected";
+                    if (message.timestamp != null && message.hasOwnProperty("timestamp")) {
+                        var error = $root.google.protobuf.Timestamp.verify(message.timestamp);
+                        if (error)
+                            return "timestamp." + error;
+                    }
                     if (message.worker != null && message.hasOwnProperty("worker"))
                         if (!$util.isString(message.worker))
                             return "worker: string expected";
@@ -18302,7 +18304,7 @@
                  * @property {string|null} [message] ContainerError message
                  * @property {flyteidl.core.ContainerError.Kind|null} [kind] ContainerError kind
                  * @property {flyteidl.core.ExecutionError.ErrorKind|null} [origin] ContainerError origin
-                 * @property {Long|null} [timestamp] ContainerError timestamp
+                 * @property {google.protobuf.ITimestamp|null} [timestamp] ContainerError timestamp
                  * @property {string|null} [worker] ContainerError worker
                  */
     
@@ -18355,11 +18357,11 @@
     
                 /**
                  * ContainerError timestamp.
-                 * @member {Long} timestamp
+                 * @member {google.protobuf.ITimestamp|null|undefined} timestamp
                  * @memberof flyteidl.core.ContainerError
                  * @instance
                  */
-                ContainerError.prototype.timestamp = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
+                ContainerError.prototype.timestamp = null;
     
                 /**
                  * ContainerError worker.
@@ -18402,7 +18404,7 @@
                     if (message.origin != null && message.hasOwnProperty("origin"))
                         writer.uint32(/* id 4, wireType 0 =*/32).int32(message.origin);
                     if (message.timestamp != null && message.hasOwnProperty("timestamp"))
-                        writer.uint32(/* id 5, wireType 0 =*/40).int64(message.timestamp);
+                        $root.google.protobuf.Timestamp.encode(message.timestamp, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
                     if (message.worker != null && message.hasOwnProperty("worker"))
                         writer.uint32(/* id 6, wireType 2 =*/50).string(message.worker);
                     return writer;
@@ -18439,7 +18441,7 @@
                             message.origin = reader.int32();
                             break;
                         case 5:
-                            message.timestamp = reader.int64();
+                            message.timestamp = $root.google.protobuf.Timestamp.decode(reader, reader.uint32());
                             break;
                         case 6:
                             message.worker = reader.string();
@@ -18486,9 +18488,11 @@
                         case 2:
                             break;
                         }
-                    if (message.timestamp != null && message.hasOwnProperty("timestamp"))
-                        if (!$util.isInteger(message.timestamp) && !(message.timestamp && $util.isInteger(message.timestamp.low) && $util.isInteger(message.timestamp.high)))
-                            return "timestamp: integer|Long expected";
+                    if (message.timestamp != null && message.hasOwnProperty("timestamp")) {
+                        var error = $root.google.protobuf.Timestamp.verify(message.timestamp);
+                        if (error)
+                            return "timestamp." + error;
+                    }
                     if (message.worker != null && message.hasOwnProperty("worker"))
                         if (!$util.isString(message.worker))
                             return "worker: string expected";

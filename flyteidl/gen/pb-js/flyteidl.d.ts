@@ -5750,7 +5750,7 @@ export namespace flyteidl {
             kind?: (flyteidl.core.ExecutionError.ErrorKind|null);
 
             /** ExecutionError timestamp */
-            timestamp?: (Long|null);
+            timestamp?: (google.protobuf.ITimestamp|null);
 
             /** ExecutionError worker */
             worker?: (string|null);
@@ -5778,7 +5778,7 @@ export namespace flyteidl {
             public kind: flyteidl.core.ExecutionError.ErrorKind;
 
             /** ExecutionError timestamp. */
-            public timestamp: Long;
+            public timestamp?: (google.protobuf.ITimestamp|null);
 
             /** ExecutionError worker. */
             public worker: string;
@@ -7569,7 +7569,7 @@ export namespace flyteidl {
             origin?: (flyteidl.core.ExecutionError.ErrorKind|null);
 
             /** ContainerError timestamp */
-            timestamp?: (Long|null);
+            timestamp?: (google.protobuf.ITimestamp|null);
 
             /** ContainerError worker */
             worker?: (string|null);
@@ -7597,7 +7597,7 @@ export namespace flyteidl {
             public origin: flyteidl.core.ExecutionError.ErrorKind;
 
             /** ContainerError timestamp. */
-            public timestamp: Long;
+            public timestamp?: (google.protobuf.ITimestamp|null);
 
             /** ContainerError worker. */
             public worker: string;

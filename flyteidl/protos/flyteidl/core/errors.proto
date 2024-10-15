@@ -5,6 +5,7 @@ package flyteidl.core;
 option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core";
 
 import "flyteidl/core/execution.proto";
+import "google/protobuf/timestamp.proto";
 
 // Error message to propagate detailed errors from container executions to the execution
 // engine.
@@ -27,7 +28,7 @@ message ContainerError {
     ExecutionError.ErrorKind origin = 4;
 
     // Timestamp of the error
-    int64 timestamp = 5;
+    google.protobuf.Timestamp timestamp = 5;
 
     // Worker that generated the error
     string worker = 6;

@@ -1,4 +1,5 @@
 from google.protobuf import duration_pb2 as _duration_pb2
+from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
@@ -102,9 +103,9 @@ class ExecutionError(_message.Message):
     message: str
     error_uri: str
     kind: ExecutionError.ErrorKind
-    timestamp: int
+    timestamp: _timestamp_pb2.Timestamp
     worker: str
-    def __init__(self, code: _Optional[str] = ..., message: _Optional[str] = ..., error_uri: _Optional[str] = ..., kind: _Optional[_Union[ExecutionError.ErrorKind, str]] = ..., timestamp: _Optional[int] = ..., worker: _Optional[str] = ...) -> None: ...
+    def __init__(self, code: _Optional[str] = ..., message: _Optional[str] = ..., error_uri: _Optional[str] = ..., kind: _Optional[_Union[ExecutionError.ErrorKind, str]] = ..., timestamp: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., worker: _Optional[str] = ...) -> None: ...
 
 class TaskLog(_message.Message):
     __slots__ = ["uri", "name", "message_format", "ttl", "ShowWhilePending", "HideOnceFinished"]
