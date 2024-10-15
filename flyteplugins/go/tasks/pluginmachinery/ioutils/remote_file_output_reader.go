@@ -32,6 +32,8 @@ type SingleFileErrorRetriever struct {
 
 const errorFileNotFoundErrorCode = "ErrorFileNotFound"
 
+var ErrRemoteFileExceedsMaxSize = errors.New("remote file exceeds max size")
+
 func NewSingleFileErrorRetriever(errorFilePath storage.DataReference, store storage.ComposedProtobufStore, maxPayloadSize int64) *SingleFileErrorRetriever {
 	return &SingleFileErrorRetriever{
 		baseErrorRetriever: baseErrorRetriever{
@@ -42,10 +44,12 @@ func NewSingleFileErrorRetriever(errorFilePath storage.DataReference, store stor
 	}
 }
 
-func (b *baseErrorRetriever) validatePayloadSize(metadata storage.Metadata) error {
+func (b *baseErrorRetriever) validatePayloadSize(filePath storage.DataReference, metadata storage.Metadata) error {
 	if metadata.Exists() {
 		if metadata.Size() > b.maxPayloadSize {
-			return errors.Errorf("file is too large [%d] bytes, max allowed [%d] bytes", metadata.Size(), b.maxPayloadSize)
+			return errors.Wrapf(ErrRemoteFileExceedsMaxSize,
+				"output file @[%s] is too large [%d] bytes, max allowed [%d] bytes",
+				filePath, metadata.Size(), b.maxPayloadSize)
 		}
 	}
 	return nil
@@ -56,9 +60,9 @@ func (s *SingleFileErrorRetriever) HasError(ctx context.Context) (bool, error) {
 	if err != nil {
 		return false, errors.Wrapf(err, "failed to read error file @[%s]", s.errorFilePath)
 	}
-	err = s.validatePayloadSize(metadata)
+	err = s.validatePayloadSize(s.errorFilePath, metadata)
 	if err != nil {
-		return false, errors.Wrapf(err, "error file @[%s] failed payload size validation", s.errorFilePath)
+		return false, err
 	}
 	return metadata.Exists(), nil
 }
@@ -135,9 +139,9 @@ func (e *EarliestFileErrorRetriever) HasError(ctx context.Context) (bool, error)
 				if err != nil {
 					return false, errors.Wrapf(err, "failed to read error file @[%s]", errorFilePath)
 				}
-				err = e.validatePayloadSize(metadata)
+				err = e.validatePayloadSize(errorFilePath, metadata)
 				if err != nil {
-					return false, errors.Wrapf(err, "error file @[%s] failed payload size validation", errorFilePath)
+					return false, err
 				}
 				hasError = true
 			}
@@ -234,7 +238,7 @@ func (r RemoteFileOutputReader) Exists(ctx context.Context) (bool, error) {
 	}
 	if md.Exists() {
 		if md.Size() > r.maxPayloadSize {
-			return false, errors.Errorf("output file @[%s] is too large [%d] bytes, max allowed [%d] bytes", r.outPath.GetOutputPath(), md.Size(), r.maxPayloadSize)
+			return false, errors.Wrapf(ErrRemoteFileExceedsMaxSize, "output file @[%s] is too large [%d] bytes, max allowed [%d] bytes", r.outPath.GetOutputPath(), md.Size(), r.maxPayloadSize)
 		}
 		return true, nil
 	}
