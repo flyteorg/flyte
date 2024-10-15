@@ -52,20 +52,30 @@ represents the cache key. Learn more in the {ref}`User Guide <cache-offloaded-ob
 
 ## Retries
 
-Flyte also allows you to automatically retry failing tasks in the case of
-system-level or catastrophic errors that may arise from issues that don't have
-anything to do with user-defined code, like network issues and data center
-outages.
+Flyte allows you to automatically retry failing tasks in the case of system-level or catastrophic errors that may arise from issues unrelated to user-defined code, such as network issues and data center outages.
 
-The following version of the `compute_mean` task simulates these kinds of
-errors by randomly throwing a `RuntimeError` 5% of the time:
+### Understanding Error Types
+
+Flyte differentiates between two types of errors:
+
+- **SYSTEM**: Errors that occur due to infrastructure failures, like hardware malfunctions or network connectivity issues.
+- **USER**: Errors that occur due to issues in the user-defined code, such as a value error or a failed assertion.
+
+
+### Configuring Retries
+
+- You can define the retry behavior using the `retries` attribute in the task decorator. This attribute primarily handles USER errors. 
+
+- For SYSTEM errors, configuration is managed at the platform level through the `max-node-retries-system-failures` setting in the FlytePropeller configuration.
+
+- The node-config key also has a `interruptible-failure-threshold` option, which defines the number of system-level retries that will be considered interruptible. So, by default you can allow 3 retries, but on the last one (i.e 2 for the failure threshold) do not label the Pod as interruptible. Refer this for more details:  [node-config key: Flyte Propeller Configuration](https://docs.flyte.org/en/latest/deployment/configuration/generated/flytepropeller_config.html#config-nodeconfig).
 
 ```{code-cell} ipython3
 import random
 
 @task(retries=3)
 def compute_mean(data: List[float]) -> float:
-    if random() < 0.05:
+    if random.random() < 0.05:
         raise FlyteRecoverableException("Something bad happened 🔥")
     return sum(data) / len(data)
 ```
@@ -74,6 +84,18 @@ def compute_mean(data: List[float]) -> float:
 Retries only take effect when running a task on a Flyte cluster. 
 See {ref}`Fault Tolerance <fault-tolerance>` for details on the types of errors that will be retried.
 ```
+
+
+### Interruptible Tasks and Map Tasks
+
+Tasks marked as interruptible can be preempted and retried without counting against the USER error budget. This is useful for tasks running on preemptible compute resources like spot instances.
+
+For map tasks, the interruptible behavior aligns with that of regular tasks. The `retries` field in the task annotation is not necessary for handling SYSTEM errors, as these are managed by the platform's configuration. Alternatively, the USER budget is set by defining retries in the task decorator.
+
+### Advanced Retry Policies
+
+Flyte also supports advanced retry policies that allow finer control over retry behavior, such as defining a threshold for interruptible failures. This means you can specify how many retries should be considered as interruptible before marking a task as non-interruptible. Refer this for details: [Flyte Propeller Configuration](https://docs.flyte.org/en/latest/deployment/configuration/generated/flytepropeller_config.html).
+
 
 ## Timeouts
 

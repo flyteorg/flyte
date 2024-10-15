@@ -47,14 +47,14 @@ def map_workflow_with_resource_overrides(data: list[int] = [10, 12, 11, 10, 13, 
     return map_task(detect_anomalies)(data_point=data).with_overrides(requests=Resources(mem="2Gi"))
 ```
 
-You can use {py:class}`~flytekit.TaskMetadata` to set attributes such as `cache`, `cache_version`, `interruptible` and `timeout`:
+You can use {py:class}`~flytekit.TaskMetadata` to set attributes such as `cache`, `cache_version`, `interruptible`, `retries` and `timeout`:
 ```python
 from flytekit import TaskMetadata
 
 
 @workflow
 def map_workflow_with_metadata(data: list[int] = [10, 12, 11, 10, 13, 12, 100, 11, 12, 10]) -> list[bool]:
-    return map_task(detect_anomalies, metadata=TaskMetadata(cache=True, cache_version="0.1"))(
+    return map_task(detect_anomalies, metadata=TaskMetadata(cache=True, cache_version="0.1", retries=1))(
         data_point=data
     )
 ```
