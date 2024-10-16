@@ -50,6 +50,9 @@ func TestParseClientSecretConfig(t *testing.T) {
 func TestDefaultConfig(t *testing.T) {
 	assert.Equal(t, len(DefaultConfig.AppAuth.SelfAuthServer.StaticClients), 3)
 	assert.Equal(t, DefaultConfig.AppAuth.SelfAuthServer.StaticClients["flyte-cli"].ID, "flyte-cli")
+
+	// oidc issuer config should only be used when baseUrl is mismatched
+	assert.Equal(t, DefaultConfig.UserAuth.OpenID.IssuerURL.String(), "")
 }
 
 func TestCompare(t *testing.T) {
