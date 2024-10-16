@@ -66,6 +66,9 @@ type PluginContext interface {
 
 	// Returns a reader that retrieves previously stored plugin internal state. the state itself is immutable
 	PluginStateReader() pluginsCore.PluginStateReader
+
+	// K8sReader returns a read-only k8s client that can fetch pod(s) for given node execution
+	K8sReader() client.Reader
 }
 
 // PluginState defines the state of a k8s plugin. This information must be maintained between propeller evaluations to

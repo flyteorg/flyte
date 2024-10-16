@@ -55,6 +55,7 @@ func TestInitializeExternalResources(t *testing.T) {
 	assert.Equal(t, subTaskCount, len(externalResources))
 	for i, externalResource := range externalResources {
 		assert.Equal(t, uint32(i), externalResource.Index)
+		assert.Nil(t, externalResource.LogContext)
 		assert.Equal(t, 0, len(externalResource.Logs))
 		assert.Equal(t, uint32(0), externalResource.RetryAttempt)
 		if i < cachedCount {

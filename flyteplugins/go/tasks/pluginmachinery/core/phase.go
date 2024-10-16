@@ -85,6 +85,8 @@ type ExternalResource struct {
 	Index uint32
 	// Log information for the external resource
 	Logs []*core.TaskLog
+	// Contains metadata required to identify logs related to this task execution
+	LogContext *core.LogContext
 	// The number of times this external resource has been attempted
 	RetryAttempt uint32
 	// Phase (if exists) associated with the external resource
@@ -101,6 +103,8 @@ type ReasonInfo struct {
 type TaskInfo struct {
 	// log information for the task execution
 	Logs []*core.TaskLog
+	// Contains metadata required to identify logs related to this task execution
+	LogContext *core.LogContext
 	// This value represents the time the status occurred at. If not provided, it will be defaulted to the time Flyte
 	// checked the task status.
 	OccurredAt *time.Time

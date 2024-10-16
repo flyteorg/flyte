@@ -195,6 +195,7 @@ func (e *externalResourcesEventRecorder) process(ctx context.Context, nCtx inter
 			ExternalId:   externalResourceID,
 			Index:        uint32(index),
 			Logs:         taskExecutionEvent.Logs,
+			LogContext:   taskExecutionEvent.LogContext,
 			RetryAttempt: retryAttempt,
 			Phase:        taskExecutionEvent.Phase,
 			CacheStatus:  cacheStatus,

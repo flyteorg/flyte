@@ -12,6 +12,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/structpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -854,6 +855,26 @@ func TestGetTaskInfo(t *testing.T) {
 		},
 	}
 
+	expectedLogCtx := &idlcore.LogContext{
+		Pods: []*idlcore.PodLogContext{
+			{
+				Namespace:            "namespace",
+				PodName:              "pod-name",
+				PrimaryContainerName: "pod-name",
+				Containers: []*idlcore.ContainerContext{
+					{
+						ContainerName: "pod-name",
+						Process: &idlcore.ContainerContext_ProcessContext{
+							ContainerStartTime: timestamppb.New(start),
+							ContainerEndTime:   timestamppb.New(now),
+						},
+					},
+				},
+			},
+		},
+		PrimaryPodName: "pod-name",
+	}
+
 	t.Run("available", func(t *testing.T) {
 		executionEnvClient := &coremocks.ExecutionEnvClient{}
 		executionEnvClient.OnStatusMatch(ctx, mock.Anything).Return(map[string]*v1.Pod{
@@ -911,6 +932,7 @@ func TestGetTaskInfo(t *testing.T) {
 		require.Len(t, taskInfo.Logs, 1)
 		assert.Equal(t, "Custom Logs", taskInfo.Logs[0].GetName())
 		assert.Equal(t, "http://foo.com/pod=namespace/pod-name", taskInfo.Logs[0].GetUri())
+		assert.Equal(t, expectedLogCtx, taskInfo.LogContext)
 	})
 
 	t.Run("mismatched container name", func(t *testing.T) {
@@ -957,6 +979,7 @@ func TestGetTaskInfo(t *testing.T) {
 
 		require.Nil(t, err)
 		require.Empty(t, taskInfo.Logs)
+		assert.Nil(t, taskInfo.LogContext)
 	})
 
 	t.Run("no container id", func(t *testing.T) {
@@ -1003,6 +1026,7 @@ func TestGetTaskInfo(t *testing.T) {
 
 		require.Nil(t, err)
 		require.Empty(t, taskInfo.Logs)
+		assert.Nil(t, taskInfo.LogContext)
 	})
 }
 

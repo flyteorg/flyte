@@ -26,6 +26,7 @@ import (
 	flytek8sConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	pluginIOMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
+	k8smocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/kfoperators/common"
 )
@@ -172,6 +173,63 @@ func dummyMPITaskContext(taskTemplate *core.TaskTemplate, resources *corev1.Reso
 	taskExecutionMetadata.OnGetConsoleURL().Return("")
 	taskCtx.OnTaskExecutionMetadata().Return(taskExecutionMetadata)
 	return taskCtx
+}
+
+func dummyMPIPluginContext(taskTemplate *core.TaskTemplate, resources *corev1.ResourceRequirements, extendedResources *core.ExtendedResources) *k8smocks.PluginContext {
+	pCtx := &k8smocks.PluginContext{}
+	inputReader := &pluginIOMocks.InputReader{}
+	inputReader.OnGetInputPrefixPath().Return("/input/prefix")
+	inputReader.OnGetInputPath().Return("/input")
+	inputReader.OnGetMatch(mock.Anything).Return(&core.LiteralMap{}, nil)
+	pCtx.OnInputReader().Return(inputReader)
+
+	outputReader := &pluginIOMocks.OutputWriter{}
+	outputReader.OnGetOutputPath().Return("/data/outputs.pb")
+	outputReader.OnGetOutputPrefixPath().Return("/data/")
+	outputReader.OnGetRawOutputPrefix().Return("")
+	outputReader.OnGetCheckpointPrefix().Return("/checkpoint")
+	outputReader.OnGetPreviousCheckpointsPrefix().Return("/prev")
+	pCtx.OnOutputWriter().Return(outputReader)
+
+	taskReader := &mocks.TaskReader{}
+	taskReader.OnReadMatch(mock.Anything).Return(taskTemplate, nil)
+	pCtx.OnTaskReader().Return(taskReader)
+
+	tID := &mocks.TaskExecutionID{}
+	tID.OnGetID().Return(core.TaskExecutionIdentifier{
+		NodeExecutionId: &core.NodeExecutionIdentifier{
+			ExecutionId: &core.WorkflowExecutionIdentifier{
+				Name:    "my_name",
+				Project: "my_project",
+				Domain:  "my_domain",
+			},
+		},
+	})
+	tID.OnGetGeneratedName().Return("some-acceptable-name")
+	tID.On("GetUniqueNodeID").Return("an-unique-id")
+
+	overrides := &mocks.TaskOverrides{}
+	overrides.OnGetResources().Return(resources)
+	overrides.OnGetExtendedResources().Return(extendedResources)
+	overrides.OnGetContainerImage().Return("")
+
+	taskExecutionMetadata := &mocks.TaskExecutionMetadata{}
+	taskExecutionMetadata.OnGetTaskExecutionID().Return(tID)
+	taskExecutionMetadata.OnGetNamespace().Return("test-namespace")
+	taskExecutionMetadata.OnGetAnnotations().Return(dummyAnnotations)
+	taskExecutionMetadata.OnGetLabels().Return(dummyLabels)
+	taskExecutionMetadata.OnGetOwnerReference().Return(v1.OwnerReference{
+		Kind: "node",
+		Name: "blah",
+	})
+	taskExecutionMetadata.OnIsInterruptible().Return(true)
+	taskExecutionMetadata.OnGetOverrides().Return(overrides)
+	taskExecutionMetadata.OnGetK8sServiceAccount().Return(serviceAccount)
+	taskExecutionMetadata.OnGetPlatformResources().Return(&corev1.ResourceRequirements{})
+	taskExecutionMetadata.OnGetEnvironmentVariables().Return(nil)
+	taskExecutionMetadata.OnGetConsoleURL().Return("")
+	pCtx.OnTaskExecutionMetadata().Return(taskExecutionMetadata)
+	return pCtx
 }
 
 func dummyMPIJobResource(mpiResourceHandler mpiOperatorResourceHandler,
@@ -491,32 +549,32 @@ func TestGetTaskPhase(t *testing.T) {
 		return dummyMPIJobResource(mpiResourceHandler, 2, 1, 1, conditionType)
 	}
 
-	taskCtx := dummyMPITaskContext(dummyMPITaskTemplate("", dummyMPICustomObj(2, 1, 1)), resourceRequirements, nil)
-	taskPhase, err := mpiResourceHandler.GetTaskPhase(ctx, taskCtx, dummyMPIJobResourceCreator(mpiOp.JobCreated))
+	pluginContext := dummyMPIPluginContext(dummyMPITaskTemplate("", dummyMPICustomObj(2, 1, 1)), resourceRequirements, nil)
+	taskPhase, err := mpiResourceHandler.GetTaskPhase(ctx, pluginContext, dummyMPIJobResourceCreator(mpiOp.JobCreated))
 	assert.NoError(t, err)
 	assert.Equal(t, pluginsCore.PhaseQueued, taskPhase.Phase())
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, err)
 
-	taskPhase, err = mpiResourceHandler.GetTaskPhase(ctx, taskCtx, dummyMPIJobResourceCreator(mpiOp.JobRunning))
+	taskPhase, err = mpiResourceHandler.GetTaskPhase(ctx, pluginContext, dummyMPIJobResourceCreator(mpiOp.JobRunning))
 	assert.NoError(t, err)
 	assert.Equal(t, pluginsCore.PhaseRunning, taskPhase.Phase())
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, err)
 
-	taskPhase, err = mpiResourceHandler.GetTaskPhase(ctx, taskCtx, dummyMPIJobResourceCreator(mpiOp.JobSucceeded))
+	taskPhase, err = mpiResourceHandler.GetTaskPhase(ctx, pluginContext, dummyMPIJobResourceCreator(mpiOp.JobSucceeded))
 	assert.NoError(t, err)
 	assert.Equal(t, pluginsCore.PhaseSuccess, taskPhase.Phase())
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, err)
 
-	taskPhase, err = mpiResourceHandler.GetTaskPhase(ctx, taskCtx, dummyMPIJobResourceCreator(mpiOp.JobFailed))
+	taskPhase, err = mpiResourceHandler.GetTaskPhase(ctx, pluginContext, dummyMPIJobResourceCreator(mpiOp.JobFailed))
 	assert.NoError(t, err)
 	assert.Equal(t, pluginsCore.PhaseRetryableFailure, taskPhase.Phase())
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, err)
 
-	taskPhase, err = mpiResourceHandler.GetTaskPhase(ctx, taskCtx, dummyMPIJobResourceCreator(mpiOp.JobRestarting))
+	taskPhase, err = mpiResourceHandler.GetTaskPhase(ctx, pluginContext, dummyMPIJobResourceCreator(mpiOp.JobRestarting))
 	assert.NoError(t, err)
 	assert.Equal(t, pluginsCore.PhaseRunning, taskPhase.Phase())
 	assert.NotNil(t, taskPhase.Info())
@@ -535,8 +593,10 @@ func TestGetLogs(t *testing.T) {
 
 	mpiResourceHandler := mpiOperatorResourceHandler{}
 	mpiJob := dummyMPIJobResource(mpiResourceHandler, workers, launcher, slots, mpiOp.JobRunning)
-	taskCtx := dummyMPITaskContext(dummyMPITaskTemplate("", dummyMPICustomObj(workers, launcher, slots)), resourceRequirements, nil)
-	jobLogs, err := common.GetLogs(taskCtx, common.MPITaskType, mpiJob.ObjectMeta, false, workers, launcher, 0, 0)
+	pluginContext := dummyMPIPluginContext(dummyMPITaskTemplate("", dummyMPICustomObj(workers, launcher, slots)), resourceRequirements, nil)
+
+	jobLogs, err := common.GetLogs(pluginContext, common.MPITaskType, mpiJob.ObjectMeta, false, workers, launcher, 0, 0)
+
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(jobLogs))
 	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-worker-0/pod?namespace=mpi-namespace", jobNamespace, jobName), jobLogs[0].Uri)

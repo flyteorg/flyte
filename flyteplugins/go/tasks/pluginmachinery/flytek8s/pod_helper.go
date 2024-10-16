@@ -9,6 +9,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/imdario/mergo"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -981,4 +982,59 @@ func GetReportedAt(pod *v1.Pod) metav1.Time {
 	}
 
 	return reportedAt
+}
+
+func GetPrimaryContainerName(pod *v1.Pod) string {
+	defaultContainer := pod.Annotations["kubectl.kubernetes.io/default-container"]
+	if defaultContainer != "" {
+		return defaultContainer
+	}
+	primaryContainer := pod.Annotations[PrimaryContainerKey]
+	if primaryContainer != "" {
+		return primaryContainer
+	}
+
+	for _, container := range pod.Spec.Containers {
+		if container.Name == pod.Name {
+			return container.Name
+		}
+	}
+
+	// default to just 1st container name
+	if len(pod.Spec.Containers) > 0 {
+		return pod.Spec.Containers[0].Name
+	}
+	return ""
+}
+
+func makeContainerContexts(statuses []v1.ContainerStatus) []*core.ContainerContext {
+	ctxs := make([]*core.ContainerContext, len(statuses))
+	for i, status := range statuses {
+		var startTime, endTime *timestamppb.Timestamp
+		if status.State.Running != nil {
+			startTime = timestamppb.New(status.State.Running.StartedAt.Time)
+		}
+		if status.State.Terminated != nil {
+			startTime = timestamppb.New(status.State.Terminated.StartedAt.Time)
+			endTime = timestamppb.New(status.State.Terminated.FinishedAt.Time)
+		}
+		ctxs[i] = &core.ContainerContext{
+			ContainerName: status.Name,
+			Process: &core.ContainerContext_ProcessContext{
+				ContainerStartTime: startTime,
+				ContainerEndTime:   endTime,
+			},
+		}
+	}
+	return ctxs
+}
+
+func BuildPodLogContext(pod *v1.Pod) *core.PodLogContext {
+	return &core.PodLogContext{
+		Namespace:            pod.Namespace,
+		PodName:              pod.Name,
+		PrimaryContainerName: GetPrimaryContainerName(pod),
+		Containers:           makeContainerContexts(pod.Status.ContainerStatuses),
+		InitContainers:       makeContainerContexts(pod.Status.InitContainerStatuses),
+	}
 }

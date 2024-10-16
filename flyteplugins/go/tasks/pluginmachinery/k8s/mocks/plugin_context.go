@@ -5,6 +5,7 @@ package mocks
 import (
 	core "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	io "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
+	client "sigs.k8s.io/controller-runtime/pkg/client"
 
 	mock "github.com/stretchr/testify/mock"
 
@@ -78,6 +79,40 @@ func (_m *PluginContext) InputReader() io.InputReader {
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(io.InputReader)
+		}
+	}
+
+	return r0
+}
+
+type PluginContext_K8sReader struct {
+	*mock.Call
+}
+
+func (_m PluginContext_K8sReader) Return(_a0 client.Reader) *PluginContext_K8sReader {
+	return &PluginContext_K8sReader{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *PluginContext) OnK8sReader() *PluginContext_K8sReader {
+	c_call := _m.On("K8sReader")
+	return &PluginContext_K8sReader{Call: c_call}
+}
+
+func (_m *PluginContext) OnK8sReaderMatch(matchers ...interface{}) *PluginContext_K8sReader {
+	c_call := _m.On("K8sReader", matchers...)
+	return &PluginContext_K8sReader{Call: c_call}
+}
+
+// K8sReader provides a mock function with given fields:
+func (_m *PluginContext) K8sReader() client.Reader {
+	ret := _m.Called()
+
+	var r0 client.Reader
+	if rf, ok := ret.Get(0).(func() client.Reader); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(client.Reader)
 		}
 	}
 

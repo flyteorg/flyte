@@ -23,6 +23,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	pluginIOMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
+	k8smocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 )
 
@@ -199,6 +200,60 @@ func dummyDaskTaskContext(taskTemplate *core.TaskTemplate, resources *v1.Resourc
 	taskExecutionMetadata.OnGetOverrides().Return(overrides)
 	taskCtx.On("TaskExecutionMetadata").Return(taskExecutionMetadata)
 	return taskCtx
+}
+
+func dummyDaskPluginContext(taskTemplate *core.TaskTemplate, resources *v1.ResourceRequirements, extendedResources *core.ExtendedResources, isInterruptible bool) *k8smocks.PluginContext {
+	pCtx := &k8smocks.PluginContext{}
+
+	inputReader := &pluginIOMocks.InputReader{}
+	inputReader.OnGetInputPrefixPath().Return("/input/prefix")
+	inputReader.OnGetInputPath().Return("/input")
+	inputReader.OnGetMatch(mock.Anything).Return(&core.LiteralMap{}, nil)
+	pCtx.OnInputReader().Return(inputReader)
+
+	outputReader := &pluginIOMocks.OutputWriter{}
+	outputReader.OnGetOutputPath().Return("/data/outputs.pb")
+	outputReader.OnGetOutputPrefixPath().Return("/data/")
+	outputReader.OnGetRawOutputPrefix().Return("")
+	outputReader.OnGetCheckpointPrefix().Return("/checkpoint")
+	outputReader.OnGetPreviousCheckpointsPrefix().Return("/prev")
+	pCtx.On("OutputWriter").Return(outputReader)
+
+	taskReader := &mocks.TaskReader{}
+	taskReader.OnReadMatch(mock.Anything).Return(taskTemplate, nil)
+	pCtx.OnTaskReader().Return(taskReader)
+
+	tID := &mocks.TaskExecutionID{}
+	tID.OnGetID().Return(core.TaskExecutionIdentifier{
+		NodeExecutionId: &core.NodeExecutionIdentifier{
+			ExecutionId: &core.WorkflowExecutionIdentifier{
+				Name:    "my_name",
+				Project: "my_project",
+				Domain:  "my_domain",
+			},
+		},
+	})
+	tID.On("GetGeneratedName").Return(testTaskID)
+	tID.On("GetUniqueNodeID").Return("an-unique-id")
+
+	taskExecutionMetadata := &mocks.TaskExecutionMetadata{}
+	taskExecutionMetadata.OnGetTaskExecutionID().Return(tID)
+	taskExecutionMetadata.OnGetAnnotations().Return(testAnnotations)
+	taskExecutionMetadata.OnGetLabels().Return(testLabels)
+	taskExecutionMetadata.OnGetPlatformResources().Return(&testPlatformResources)
+	taskExecutionMetadata.OnGetMaxAttempts().Return(uint32(1))
+	taskExecutionMetadata.OnIsInterruptible().Return(isInterruptible)
+	taskExecutionMetadata.OnGetEnvironmentVariables().Return(nil)
+	taskExecutionMetadata.OnGetK8sServiceAccount().Return(defaultServiceAccountName)
+	taskExecutionMetadata.OnGetNamespace().Return(defaultNamespace)
+	taskExecutionMetadata.OnGetConsoleURL().Return("")
+	overrides := &mocks.TaskOverrides{}
+	overrides.OnGetResources().Return(resources)
+	overrides.OnGetExtendedResources().Return(extendedResources)
+	overrides.OnGetContainerImage().Return("")
+	taskExecutionMetadata.OnGetOverrides().Return(overrides)
+	pCtx.On("TaskExecutionMetadata").Return(taskExecutionMetadata)
+	return pCtx
 }
 
 func TestBuildResourceDaskHappyPath(t *testing.T) {
@@ -694,47 +749,67 @@ func TestGetTaskPhaseDask(t *testing.T) {
 	ctx := context.TODO()
 
 	taskTemplate := dummyDaskTaskTemplate("", nil, "")
-	taskCtx := dummyDaskTaskContext(taskTemplate, &v1.ResourceRequirements{}, nil, false)
+	pluginContext := dummyDaskPluginContext(taskTemplate, &v1.ResourceRequirements{}, nil, false)
+	expectedLogCtx := &core.LogContext{
+		PrimaryPodName: "job-runner-pod-name",
+		Pods: []*core.PodLogContext{
+			{
+				PodName:              "job-runner-pod-name",
+				PrimaryContainerName: "job-runner",
+				Containers: []*core.ContainerContext{
+					{
+						ContainerName: "job-runner",
+					},
+				},
+			},
+		},
+	}
 
-	taskPhase, err := daskResourceHandler.GetTaskPhase(ctx, taskCtx, dummyDaskJob(""))
+	taskPhase, err := daskResourceHandler.GetTaskPhase(ctx, pluginContext, dummyDaskJob(""))
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Phase(), pluginsCore.PhaseInitializing)
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, taskPhase.Info().Logs)
+	assert.Nil(t, taskPhase.Info().LogContext)
 	assert.Nil(t, err)
 
-	taskPhase, err = daskResourceHandler.GetTaskPhase(ctx, taskCtx, dummyDaskJob(daskAPI.DaskJobCreated))
+	taskPhase, err = daskResourceHandler.GetTaskPhase(ctx, pluginContext, dummyDaskJob(daskAPI.DaskJobCreated))
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Phase(), pluginsCore.PhaseInitializing)
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, taskPhase.Info().Logs)
+	assert.Nil(t, taskPhase.Info().LogContext)
 	assert.Nil(t, err)
 
-	taskPhase, err = daskResourceHandler.GetTaskPhase(ctx, taskCtx, dummyDaskJob(daskAPI.DaskJobClusterCreated))
+	taskPhase, err = daskResourceHandler.GetTaskPhase(ctx, pluginContext, dummyDaskJob(daskAPI.DaskJobClusterCreated))
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Phase(), pluginsCore.PhaseInitializing)
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, taskPhase.Info().Logs)
+	assert.Nil(t, taskPhase.Info().LogContext)
 	assert.Nil(t, err)
 
-	taskPhase, err = daskResourceHandler.GetTaskPhase(ctx, taskCtx, dummyDaskJob(daskAPI.DaskJobRunning))
+	taskPhase, err = daskResourceHandler.GetTaskPhase(ctx, pluginContext, dummyDaskJob(daskAPI.DaskJobRunning))
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Phase(), pluginsCore.PhaseRunning)
 	assert.NotNil(t, taskPhase.Info())
 	assert.NotNil(t, taskPhase.Info().Logs)
+	assert.Equal(t, expectedLogCtx, taskPhase.Info().LogContext)
 	assert.Nil(t, err)
 
-	taskPhase, err = daskResourceHandler.GetTaskPhase(ctx, taskCtx, dummyDaskJob(daskAPI.DaskJobSuccessful))
+	taskPhase, err = daskResourceHandler.GetTaskPhase(ctx, pluginContext, dummyDaskJob(daskAPI.DaskJobSuccessful))
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Phase(), pluginsCore.PhaseSuccess)
 	assert.NotNil(t, taskPhase.Info())
 	assert.NotNil(t, taskPhase.Info().Logs)
+	assert.Equal(t, expectedLogCtx, taskPhase.Info().LogContext)
 	assert.Nil(t, err)
 
-	taskPhase, err = daskResourceHandler.GetTaskPhase(ctx, taskCtx, dummyDaskJob(daskAPI.DaskJobFailed))
+	taskPhase, err = daskResourceHandler.GetTaskPhase(ctx, pluginContext, dummyDaskJob(daskAPI.DaskJobFailed))
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Phase(), pluginsCore.PhaseRetryableFailure)
 	assert.NotNil(t, taskPhase.Info())
 	assert.NotNil(t, taskPhase.Info().Logs)
+	assert.Equal(t, expectedLogCtx, taskPhase.Info().LogContext)
 	assert.Nil(t, err)
 }

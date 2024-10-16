@@ -8,12 +8,14 @@ import (
 
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	pluginCatalog "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
 	pluginCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/encoding"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
@@ -100,14 +102,15 @@ func (t taskExecutionMetadata) GetExternalResourceAttributes() pluginCore.Extern
 
 type taskExecutionContext struct {
 	interfaces.NodeExecutionContext
-	tm  taskExecutionMetadata
-	rm  resourcemanager.TaskResourceManager
-	psm *pluginStateManager
-	tr  pluginCore.TaskReader
-	ow  *ioutils.BufferedOutputWriter
-	ber *bufferedEventRecorder
-	sm  pluginCore.SecretManager
-	c   pluginCatalog.AsyncClient
+	tm        taskExecutionMetadata
+	rm        resourcemanager.TaskResourceManager
+	psm       *pluginStateManager
+	tr        pluginCore.TaskReader
+	ow        *ioutils.BufferedOutputWriter
+	ber       *bufferedEventRecorder
+	sm        pluginCore.SecretManager
+	c         pluginCatalog.AsyncClient
+	k8sReader client.Reader
 }
 
 func (t *taskExecutionContext) TaskRefreshIndicator() pluginCore.SignalAsync {
@@ -136,6 +139,10 @@ func (t taskExecutionContext) ResourceManager() pluginCore.ResourceManager {
 
 func (t taskExecutionContext) PluginStateReader() pluginCore.PluginStateReader {
 	return t.psm
+}
+
+func (t taskExecutionContext) K8sReader() client.Reader {
+	return t.k8sReader
 }
 
 func (t *taskExecutionContext) TaskReader() pluginCore.TaskReader {
@@ -264,7 +271,10 @@ func ComputePreviousCheckpointPath(ctx context.Context, length int, nCtx interfa
 	return ioutils.ConstructCheckpointPath(nCtx.DataStore(), prevRawOutputPrefix.GetRawOutputPrefix()), nil
 }
 
-func (t *Handler) newTaskExecutionContext(ctx context.Context, nCtx interfaces.NodeExecutionContext, plugin pluginCore.Plugin) (*taskExecutionContext, error) {
+func (t *Handler) newTaskExecutionContext(ctx context.Context,
+	nCtx interfaces.NodeExecutionContext,
+	plugin pluginCore.Plugin,
+) (*taskExecutionContext, error) {
 	id := GetTaskExecutionIdentifier(nCtx)
 
 	currentNodeUniqueID := nCtx.NodeID()
@@ -313,28 +323,31 @@ func (t *Handler) newTaskExecutionContext(ctx context.Context, nCtx interfaces.N
 		return nil, err
 	}
 
+	tm := taskExecutionMetadata{
+		NodeExecutionMetadata: nCtx.NodeExecutionMetadata(),
+		taskExecID: taskExecutionID{
+			execName:     uniqueID,
+			id:           id,
+			uniqueNodeID: currentNodeUniqueID,
+		},
+		o:                                  nCtx.Node(),
+		maxAttempts:                        maxAttempts,
+		platformResources:                  convertTaskResourcesToRequirements(nCtx.ExecutionContext().GetExecutionConfig().TaskResources),
+		environmentVariables:               nCtx.ExecutionContext().GetExecutionConfig().EnvironmentVariables,
+		externalResourceResourceAttributes: convertExternalResourceAttribute(nCtx.ExecutionContext().GetExecutionConfig().ExternalResourceAttributes),
+	}
+
 	return &taskExecutionContext{
 		NodeExecutionContext: nCtx,
-		tm: taskExecutionMetadata{
-			NodeExecutionMetadata: nCtx.NodeExecutionMetadata(),
-			taskExecID: taskExecutionID{
-				execName:     uniqueID,
-				id:           id,
-				uniqueNodeID: currentNodeUniqueID,
-			},
-			o:                                  nCtx.Node(),
-			maxAttempts:                        maxAttempts,
-			platformResources:                  convertTaskResourcesToRequirements(nCtx.ExecutionContext().GetExecutionConfig().TaskResources),
-			environmentVariables:               nCtx.ExecutionContext().GetExecutionConfig().EnvironmentVariables,
-			externalResourceResourceAttributes: convertExternalResourceAttribute(nCtx.ExecutionContext().GetExecutionConfig().ExternalResourceAttributes),
-		},
+		tm:                   tm,
 		rm: resourcemanager.GetTaskResourceManager(
 			t.resourceManager, resourceNamespacePrefix, id),
-		psm: psm,
-		tr:  ioutils.NewLazyUploadingTaskReader(nCtx.TaskReader(), taskTemplatePath, nCtx.DataStore()),
-		ow:  ow,
-		ber: newBufferedEventRecorder(),
-		c:   t.asyncCatalog,
-		sm:  t.secretManager,
+		psm:       psm,
+		tr:        ioutils.NewLazyUploadingTaskReader(nCtx.TaskReader(), taskTemplatePath, nCtx.DataStore()),
+		ow:        ow,
+		ber:       newBufferedEventRecorder(),
+		c:         t.asyncCatalog,
+		sm:        t.secretManager,
+		k8sReader: flytek8s.NewNodeExecutionK8sReader(tm, t.kubeClient),
 	}, nil
 }

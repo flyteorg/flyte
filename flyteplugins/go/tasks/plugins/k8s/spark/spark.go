@@ -329,10 +329,34 @@ func getEventInfoForSpark(pluginContext k8s.PluginContext, sj *sparkOp.SparkAppl
 
 	sparkConfig := GetSparkConfig()
 	taskLogs := make([]*core.TaskLog, 0, 3)
+	var logCtx *core.LogContext
 	taskExecID := pluginContext.TaskExecutionMetadata().GetTaskExecutionID()
 
 	if !isQueued {
 		if sj.Status.DriverInfo.PodName != "" {
+			logCtx = &core.LogContext{
+				PrimaryPodName: sj.Status.DriverInfo.PodName,
+			}
+			logCtx.Pods = append(logCtx.Pods, &core.PodLogContext{
+				PodName:              sj.Status.DriverInfo.PodName,
+				PrimaryContainerName: "spark-kubernetes-driver",
+				Containers: []*core.ContainerContext{
+					{ContainerName: "spark-kubernetes-driver"},
+				},
+			})
+
+			for executorPodName, executorState := range sj.Status.ExecutorState {
+				if executorState != sparkOp.ExecutorPendingState && executorState != sparkOp.ExecutorUnknownState {
+					logCtx.Pods = append(logCtx.Pods, &core.PodLogContext{
+						PodName:              executorPodName,
+						PrimaryContainerName: "spark-kubernetes-executor",
+						Containers: []*core.ContainerContext{
+							{ContainerName: "spark-kubernetes-executor"},
+						},
+					})
+				}
+			}
+
 			p, err := logs.InitializeLogPlugins(&sparkConfig.LogConfig.Mixed)
 			if err != nil {
 				return nil, err
@@ -451,6 +475,7 @@ func getEventInfoForSpark(pluginContext k8s.PluginContext, sj *sparkOp.SparkAppl
 
 	return &pluginsCore.TaskInfo{
 		Logs:       taskLogs,
+		LogContext: logCtx,
 		CustomInfo: customInfo,
 	}, nil
 }

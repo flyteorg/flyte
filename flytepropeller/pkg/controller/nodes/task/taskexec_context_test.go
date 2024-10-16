@@ -21,7 +21,7 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	flyteMocks "github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1/mocks"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
-	mocks2 "github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors/mocks"
+	execMocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors/mocks"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
 	nodeMocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces/mocks"
@@ -93,7 +93,7 @@ func dummyNodeExecutionContext(t *testing.T, parentInfo executors.ImmutableParen
 	nCtx.OnEnqueueOwnerFunc().Return(nil)
 	nCtx.OnRawOutputSuffix().Return(make([]string, 0))
 
-	executionContext := &mocks2.ExecutionContext{}
+	executionContext := &execMocks.ExecutionContext{}
 	executionContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
 	executionContext.OnGetParentInfo().Return(parentInfo)
 	executionContext.OnGetEventVersion().Return(eventVersion)
@@ -135,6 +135,7 @@ func dummyHandler() *Handler {
 		catalog:         c,
 		secretManager:   secretmanager.NewFileEnvSecretManager(secretmanager.GetConfig()),
 		resourceManager: noopRm,
+		kubeClient:      execMocks.NewFakeKubeClient(),
 	}
 }
 
@@ -211,7 +212,7 @@ func TestHandler_newTaskExecutionContext(t *testing.T) {
 }
 
 func TestHandler_newTaskExecutionContext_taskExecutionID_WithParentInfo(t *testing.T) {
-	parentInfo := &mocks2.ImmutableParentInfo{}
+	parentInfo := &execMocks.ImmutableParentInfo{}
 	parentInfo.OnGetUniqueID().Return("n0")
 	parentInfo.OnCurrentAttempt().Return(uint32(2))
 

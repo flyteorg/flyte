@@ -1337,6 +1337,46 @@ func TestMergeExternalResource(t *testing.T) {
 			name: "update phase",
 		},
 		{
+			existing: &event.ExternalResourceInfo{
+				LogContext: &core.LogContext{
+					Pods: []*core.PodLogContext{
+						{
+							Namespace: "foo-ns",
+							PodName:   "foo",
+						},
+					},
+					PrimaryPodName: "foo",
+				},
+			},
+			latest: &event.ExternalResourceInfo{
+				LogContext: &core.LogContext{
+					Pods: []*core.PodLogContext{
+						{
+							Namespace: "bar-ns",
+							PodName:   "bar",
+						},
+					},
+					PrimaryPodName: "bar",
+				},
+			},
+			expected: &event.ExternalResourceInfo{
+				LogContext: &core.LogContext{
+					Pods: []*core.PodLogContext{
+						{
+							Namespace: "foo-ns",
+							PodName:   "foo",
+						},
+						{
+							Namespace: "bar-ns",
+							PodName:   "bar",
+						},
+					},
+					PrimaryPodName: "bar",
+				},
+			},
+			name: "update log context",
+		},
+		{
 			existing: &event.ExternalResourceInfo{},
 			latest: &event.ExternalResourceInfo{
 				ExternalId:  "foo",

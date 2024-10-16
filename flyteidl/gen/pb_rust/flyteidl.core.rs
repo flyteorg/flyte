@@ -2232,6 +2232,51 @@ pub mod task_log {
         }
     }
 }
+/// Contains metadata required to identify logs produces by a set of pods
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct LogContext {
+    #[prost(message, repeated, tag="1")]
+    pub pods: ::prost::alloc::vec::Vec<PodLogContext>,
+    #[prost(string, tag="2")]
+    pub primary_pod_name: ::prost::alloc::string::String,
+}
+/// Contains metadata required to identify logs produces by a single pod
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct PodLogContext {
+    #[prost(string, tag="1")]
+    pub namespace: ::prost::alloc::string::String,
+    #[prost(string, tag="2")]
+    pub pod_name: ::prost::alloc::string::String,
+    #[prost(message, repeated, tag="3")]
+    pub containers: ::prost::alloc::vec::Vec<ContainerContext>,
+    #[prost(string, tag="4")]
+    pub primary_container_name: ::prost::alloc::string::String,
+    #[prost(message, repeated, tag="5")]
+    pub init_containers: ::prost::alloc::vec::Vec<ContainerContext>,
+}
+/// Contains metadata required to identify logs produces by a single container
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ContainerContext {
+    #[prost(string, tag="1")]
+    pub container_name: ::prost::alloc::string::String,
+    #[prost(message, optional, tag="2")]
+    pub process: ::core::option::Option<container_context::ProcessContext>,
+}
+/// Nested message and enum types in `ContainerContext`.
+pub mod container_context {
+    /// Contains metadata required to identify logs produces by a single light-weight process that was run inside a container
+    #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, Copy, PartialEq, ::prost::Message)]
+    pub struct ProcessContext {
+        #[prost(message, optional, tag="1")]
+        pub container_start_time: ::core::option::Option<::prost_types::Timestamp>,
+        #[prost(message, optional, tag="2")]
+        pub container_end_time: ::core::option::Option<::prost_types::Timestamp>,
+    }
+}
 /// Represents customized execution run-time attributes.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, Copy, PartialEq, ::prost::Message)]

@@ -13,6 +13,7 @@ import (
 	"github.com/samber/lo"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/structpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -593,6 +594,26 @@ func (p *Plugin) getTaskInfo(ctx context.Context, tCtx core.TaskExecutionContext
 	}
 
 	taskInfo.Logs = logs.TaskLogs
+
+	taskInfo.LogContext = &idlcore.LogContext{
+		PrimaryPodName: pod.Name,
+		Pods: []*idlcore.PodLogContext{
+			{
+				Namespace:            pod.Namespace,
+				PodName:              pod.Name,
+				PrimaryContainerName: pod.Spec.Containers[containerIndex].Name,
+				Containers: []*idlcore.ContainerContext{
+					{
+						ContainerName: pod.Spec.Containers[containerIndex].Name,
+						Process: &idlcore.ContainerContext_ProcessContext{
+							ContainerStartTime: timestamppb.New(start),
+							ContainerEndTime:   timestamppb.New(end),
+						},
+					},
+				},
+			},
+		},
+	}
 	return &taskInfo, nil
 }
 

@@ -3,11 +3,13 @@ package k8s
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"golang.org/x/net/context"
 	structpb "google.golang.org/protobuf/types/known/structpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -166,6 +168,7 @@ func TestCheckSubTasksState(t *testing.T) {
 
 	fakeKubeClient := mocks.NewFakeKubeClient()
 	fakeKubeCache := mocks.NewFakeKubeCache()
+	containerStartTime := time.Now().Truncate(time.Second)
 
 	for i := 0; i < subtaskCount; i++ {
 		pod := flytek8s.BuildIdentityPod()
@@ -177,7 +180,9 @@ func TestCheckSubTasksState(t *testing.T) {
 		pod.Status.ContainerStatuses = []v1.ContainerStatus{
 			v1.ContainerStatus{
 				State: v1.ContainerState{
-					Running: &v1.ContainerStateRunning{},
+					Running: &v1.ContainerStateRunning{
+						StartedAt: metav1.Time{Time: containerStartTime},
+					},
 				},
 			},
 		}
@@ -441,10 +446,31 @@ func TestCheckSubTasksState(t *testing.T) {
 		assert.Equal(t, subtaskCount, len(externalResources))
 		for i := 0; i < subtaskCount; i++ {
 			externalResource := externalResources[i]
-			assert.Equal(t, fmt.Sprintf("notfound-%d", i), externalResource.ExternalID)
+			podName := fmt.Sprintf("notfound-%d", i)
+			assert.Equal(t, podName, externalResource.ExternalID)
 
 			logLinks := externalResource.Logs
+			expectedLogCtx := &core2.LogContext{
+				PrimaryPodName: podName,
+				Pods: []*core2.PodLogContext{
+					{
+						Namespace:            "a-n-b",
+						PodName:              podName,
+						PrimaryContainerName: "foo",
+						Containers: []*core2.ContainerContext{
+							{
+								ContainerName: "",
+								Process: &core2.ContainerContext_ProcessContext{
+									ContainerStartTime: timestamppb.New(containerStartTime),
+								},
+							},
+						},
+						InitContainers: make([]*core2.ContainerContext, 0),
+					},
+				},
+			}
 			assert.Equal(t, 2, len(logLinks))
+			assert.Equal(t, expectedLogCtx, externalResource.LogContext)
 			assert.Equal(t, fmt.Sprintf("Kubernetes Logs #0-%d", i), logLinks[0].Name)
 			assert.Equal(t, fmt.Sprintf("k8s/log/a-n-b/notfound-%d/pod?namespace=a-n-b", i), logLinks[0].Uri)
 			assert.Equal(t, fmt.Sprintf("Cloudwatch Logs #0-%d", i), logLinks[1].Name)

@@ -17,6 +17,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	k8smocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
 )
 
 func TestMain(m *testing.M) {
@@ -170,12 +171,12 @@ func TestGetLogs(t *testing.T) {
 	workers := int32(1)
 	launcher := int32(1)
 
-	taskCtx := dummyTaskContext()
+	pluginContext := dummyTaskContext()
 	mpiJobObjectMeta := meta_v1.ObjectMeta{
 		Name:      "test",
 		Namespace: "mpi-namespace",
 	}
-	jobLogs, err := GetLogs(taskCtx, MPITaskType, mpiJobObjectMeta, false, workers, launcher, 0, 0)
+	jobLogs, err := GetLogs(pluginContext, MPITaskType, mpiJobObjectMeta, false, workers, launcher, 0, 0)
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(jobLogs))
 	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-worker-0/pod?namespace=mpi-namespace", "mpi-namespace", "test"), jobLogs[0].Uri)
@@ -184,7 +185,7 @@ func TestGetLogs(t *testing.T) {
 		Name:      "test",
 		Namespace: "pytorch-namespace",
 	}
-	jobLogs, err = GetLogs(taskCtx, PytorchTaskType, pytorchJobObjectMeta, true, workers, launcher, 0, 0)
+	jobLogs, err = GetLogs(pluginContext, PytorchTaskType, pytorchJobObjectMeta, true, workers, launcher, 0, 0)
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(jobLogs))
 	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-master-0/pod?namespace=pytorch-namespace", "pytorch-namespace", "test"), jobLogs[0].Uri)
@@ -194,7 +195,7 @@ func TestGetLogs(t *testing.T) {
 		Name:      "test",
 		Namespace: "tensorflow-namespace",
 	}
-	jobLogs, err = GetLogs(taskCtx, TensorflowTaskType, tensorflowJobObjectMeta, false, workers, launcher, 1, 0)
+	jobLogs, err = GetLogs(pluginContext, TensorflowTaskType, tensorflowJobObjectMeta, false, workers, launcher, 1, 0)
 	assert.NoError(t, err)
 	assert.Equal(t, 3, len(jobLogs))
 	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-worker-0/pod?namespace=tensorflow-namespace", "tensorflow-namespace", "test"), jobLogs[0].Uri)
@@ -209,7 +210,7 @@ func TestGetLogsTemplateUri(t *testing.T) {
 		StackDriverTemplateURI: "https://console.cloud.google.com/logs/query;query=resource.labels.pod_name={{.podName}}&timestamp>{{.podRFC3339StartTime}}",
 	}))
 
-	taskCtx := dummyTaskContext()
+	pluginContext := dummyTaskContext()
 	pytorchJobObjectMeta := meta_v1.ObjectMeta{
 		Name: "test",
 		Namespace: "pytorch-" +
@@ -218,7 +219,7 @@ func TestGetLogsTemplateUri(t *testing.T) {
 			Time: time.Date(2022, time.January, 1, 12, 0, 0, 0, time.UTC),
 		},
 	}
-	jobLogs, err := GetLogs(taskCtx, PytorchTaskType, pytorchJobObjectMeta, true, 1, 0, 0, 0)
+	jobLogs, err := GetLogs(pluginContext, PytorchTaskType, pytorchJobObjectMeta, true, 1, 0, 0, 0)
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(jobLogs))
 	assert.Equal(t, fmt.Sprintf("https://console.cloud.google.com/logs/query;query=resource.labels.pod_name=%s-master-0&timestamp>%s", "test", "2022-01-01T12:00:00Z"), jobLogs[0].Uri)
@@ -297,8 +298,8 @@ func TestOverrideContainerSpecEmptyFields(t *testing.T) {
 	assert.Equal(t, []string{"pyflyte-execute", "--task-module", "tests.flytekit.unit.sdk.tasks.test_sidecar_tasks", "--task-name", "simple_sidecar_task", "--inputs", "{{.input}}", "--output-prefix", "{{.outputPrefix}}"}, podSpec.Containers[0].Args)
 }
 
-func dummyTaskContext() pluginsCore.TaskExecutionContext {
-	taskCtx := &mocks.TaskExecutionContext{}
+func dummyTaskContext() *k8smocks.PluginContext {
+	pCtx := &k8smocks.PluginContext{}
 
 	tID := &mocks.TaskExecutionID{}
 	tID.OnGetID().Return(core.TaskExecutionIdentifier{
@@ -323,6 +324,6 @@ func dummyTaskContext() pluginsCore.TaskExecutionContext {
 
 	taskExecutionMetadata := &mocks.TaskExecutionMetadata{}
 	taskExecutionMetadata.OnGetTaskExecutionID().Return(tID)
-	taskCtx.OnTaskExecutionMetadata().Return(taskExecutionMetadata)
-	return taskCtx
+	pCtx.OnTaskExecutionMetadata().Return(taskExecutionMetadata)
+	return pCtx
 }

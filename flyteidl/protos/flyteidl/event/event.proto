@@ -260,6 +260,9 @@ message TaskExecutionEvent {
     // but this event will not be reported until the pod is marked as completed. Extracting both of these timestamps
     // facilitates a more accurate portrayal of the evaluation time-series. 
     google.protobuf.Timestamp reported_at = 20;
+
+    // Contains metadata required to identify logs related to this task execution
+    core.LogContext log_context = 22;
 }
 
 // This message contains metadata about external resources produced or used by a specific task execution.
@@ -294,6 +297,9 @@ message ExternalResourceInfo {
 
     // Extensible field for custom, plugin-specific info
     google.protobuf.Struct custom_info = 8;
+
+    // Contains metadata required to identify logs related to this task execution
+    core.LogContext log_context = 9;
 }
 
 

@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
-import { Duration, Message, proto3 } from "@bufbuild/protobuf";
+import { Duration, Message, proto3, Timestamp } from "@bufbuild/protobuf";
 
 /**
  * Indicates various phases of Workflow Execution
@@ -483,6 +483,204 @@ proto3.util.setEnumType(TaskLog_MessageFormat, "flyteidl.core.TaskLog.MessageFor
   { no: 1, name: "CSV" },
   { no: 2, name: "JSON" },
 ]);
+
+/**
+ * Contains metadata required to identify logs produces by a set of pods
+ *
+ * @generated from message flyteidl.core.LogContext
+ */
+export class LogContext extends Message<LogContext> {
+  /**
+   * @generated from field: repeated flyteidl.core.PodLogContext pods = 1;
+   */
+  pods: PodLogContext[] = [];
+
+  /**
+   * @generated from field: string primary_pod_name = 2;
+   */
+  primaryPodName = "";
+
+  constructor(data?: PartialMessage<LogContext>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.core.LogContext";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "pods", kind: "message", T: PodLogContext, repeated: true },
+    { no: 2, name: "primary_pod_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): LogContext {
+    return new LogContext().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): LogContext {
+    return new LogContext().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): LogContext {
+    return new LogContext().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: LogContext | PlainMessage<LogContext> | undefined, b: LogContext | PlainMessage<LogContext> | undefined): boolean {
+    return proto3.util.equals(LogContext, a, b);
+  }
+}
+
+/**
+ * Contains metadata required to identify logs produces by a single pod
+ *
+ * @generated from message flyteidl.core.PodLogContext
+ */
+export class PodLogContext extends Message<PodLogContext> {
+  /**
+   * @generated from field: string namespace = 1;
+   */
+  namespace = "";
+
+  /**
+   * @generated from field: string pod_name = 2;
+   */
+  podName = "";
+
+  /**
+   * @generated from field: repeated flyteidl.core.ContainerContext containers = 3;
+   */
+  containers: ContainerContext[] = [];
+
+  /**
+   * @generated from field: string primary_container_name = 4;
+   */
+  primaryContainerName = "";
+
+  /**
+   * @generated from field: repeated flyteidl.core.ContainerContext init_containers = 5;
+   */
+  initContainers: ContainerContext[] = [];
+
+  constructor(data?: PartialMessage<PodLogContext>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.core.PodLogContext";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "namespace", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "pod_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "containers", kind: "message", T: ContainerContext, repeated: true },
+    { no: 4, name: "primary_container_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "init_containers", kind: "message", T: ContainerContext, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): PodLogContext {
+    return new PodLogContext().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): PodLogContext {
+    return new PodLogContext().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): PodLogContext {
+    return new PodLogContext().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: PodLogContext | PlainMessage<PodLogContext> | undefined, b: PodLogContext | PlainMessage<PodLogContext> | undefined): boolean {
+    return proto3.util.equals(PodLogContext, a, b);
+  }
+}
+
+/**
+ * Contains metadata required to identify logs produces by a single container
+ *
+ * @generated from message flyteidl.core.ContainerContext
+ */
+export class ContainerContext extends Message<ContainerContext> {
+  /**
+   * @generated from field: string container_name = 1;
+   */
+  containerName = "";
+
+  /**
+   * @generated from field: flyteidl.core.ContainerContext.ProcessContext process = 2;
+   */
+  process?: ContainerContext_ProcessContext;
+
+  constructor(data?: PartialMessage<ContainerContext>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.core.ContainerContext";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "container_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "process", kind: "message", T: ContainerContext_ProcessContext },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ContainerContext {
+    return new ContainerContext().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ContainerContext {
+    return new ContainerContext().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ContainerContext {
+    return new ContainerContext().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ContainerContext | PlainMessage<ContainerContext> | undefined, b: ContainerContext | PlainMessage<ContainerContext> | undefined): boolean {
+    return proto3.util.equals(ContainerContext, a, b);
+  }
+}
+
+/**
+ * Contains metadata required to identify logs produces by a single light-weight process that was run inside a container
+ *
+ * @generated from message flyteidl.core.ContainerContext.ProcessContext
+ */
+export class ContainerContext_ProcessContext extends Message<ContainerContext_ProcessContext> {
+  /**
+   * @generated from field: google.protobuf.Timestamp container_start_time = 1;
+   */
+  containerStartTime?: Timestamp;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp container_end_time = 2;
+   */
+  containerEndTime?: Timestamp;
+
+  constructor(data?: PartialMessage<ContainerContext_ProcessContext>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.core.ContainerContext.ProcessContext";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "container_start_time", kind: "message", T: Timestamp },
+    { no: 2, name: "container_end_time", kind: "message", T: Timestamp },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ContainerContext_ProcessContext {
+    return new ContainerContext_ProcessContext().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ContainerContext_ProcessContext {
+    return new ContainerContext_ProcessContext().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ContainerContext_ProcessContext {
+    return new ContainerContext_ProcessContext().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ContainerContext_ProcessContext | PlainMessage<ContainerContext_ProcessContext> | undefined, b: ContainerContext_ProcessContext | PlainMessage<ContainerContext_ProcessContext> | undefined): boolean {
+    return proto3.util.equals(ContainerContext_ProcessContext, a, b);
+  }
+}
 
 /**
  * Represents customized execution run-time attributes.

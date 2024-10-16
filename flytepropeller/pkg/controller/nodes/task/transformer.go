@@ -125,6 +125,7 @@ func ToTaskExecutionEvent(input ToTaskExecutionEventInputs) (*event.TaskExecutio
 				CacheStatus:  e.CacheStatus,
 				Index:        e.Index,
 				Logs:         e.Logs,
+				LogContext:   e.LogContext,
 				RetryAttempt: e.RetryAttempt,
 				Phase:        phase,
 				CustomInfo:   e.CustomInfo,
@@ -179,6 +180,7 @@ func ToTaskExecutionEvent(input ToTaskExecutionEventInputs) (*event.TaskExecutio
 
 	if input.Info.Info() != nil {
 		tev.Logs = input.Info.Info().Logs
+		tev.LogContext = input.Info.Info().LogContext
 		tev.CustomInfo = input.Info.Info().CustomInfo
 	}
 

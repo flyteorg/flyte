@@ -157,6 +157,7 @@ func CreateTaskExecutionModel(ctx context.Context, input CreateTaskExecutionMode
 		UpdatedAt:    reportedAt,
 		CreatedAt:    input.Request.Event.OccurredAt,
 		Logs:         input.Request.Event.Logs,
+		LogContext:   input.Request.Event.LogContext,
 		CustomInfo:   input.Request.Event.CustomInfo,
 		TaskType:     input.Request.Event.TaskType,
 		Metadata:     metadata,
@@ -257,6 +258,31 @@ func mergeLogs(existing, latest []*core.TaskLog) []*core.TaskLog {
 	return logs
 }
 
+func mergeLogContexts(existing, latest *core.LogContext) *core.LogContext {
+	if existing == nil {
+		return latest
+	}
+	if latest == nil {
+		return existing
+	}
+
+	latestSet := map[string]*core.PodLogContext{}
+	for _, logCtx := range latest.Pods {
+		latestSet[logCtx.PodName] = logCtx
+	}
+	pods := make([]*core.PodLogContext, 0, len(latest.Pods))
+	for _, existingLogCtx := range existing.Pods {
+		if _, ok := latestSet[existingLogCtx.PodName]; !ok {
+			pods = append(pods, existingLogCtx)
+		}
+	}
+	pods = append(pods, latest.Pods...)
+	return &core.LogContext{
+		Pods:           pods,
+		PrimaryPodName: latest.PrimaryPodName,
+	}
+}
+
 func mergeCustom(existing, latest *_struct.Struct) (*_struct.Struct, error) {
 	if existing == nil {
 		return latest, nil
@@ -314,6 +340,7 @@ func mergeExternalResource(existing, latest *event.ExternalResourceInfo) *event.
 		existing.CacheStatus = latest.CacheStatus
 	}
 	existing.Logs = mergeLogs(existing.Logs, latest.Logs)
+	existing.LogContext = mergeLogContexts(existing.LogContext, latest.LogContext)
 	if existing.GetTargetMetadata() == nil && latest.GetTargetMetadata() != nil {
 		existing.TargetMetadata = latest.GetTargetMetadata()
 	}
@@ -407,6 +434,7 @@ func UpdateTaskExecutionModel(ctx context.Context, request *admin.TaskExecutionE
 	}
 	taskExecutionClosure.UpdatedAt = reportedAt
 	taskExecutionClosure.Logs = mergeLogs(taskExecutionClosure.Logs, request.Event.Logs)
+	taskExecutionClosure.LogContext = mergeLogContexts(taskExecutionClosure.LogContext, request.Event.LogContext)
 	if len(request.Event.Reasons) > 0 {
 		for _, reason := range request.Event.Reasons {
 			taskExecutionClosure.Reasons = append(

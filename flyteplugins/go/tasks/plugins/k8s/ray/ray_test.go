@@ -9,10 +9,13 @@ import (
 	rayv1 "github.com/ray-project/kuberay/ray-operator/apis/ray/v1"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
+	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
@@ -23,7 +26,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	pluginIOMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
-	mocks2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
+	k8smocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 )
@@ -664,7 +667,7 @@ func TestInjectLogsSidecar(t *testing.T) {
 			foundPrimaryContainer := false
 			foundLogsSidecar := false
 			for _, cnt := range headPodSpec.Containers {
-				if cnt.Name == "ray-head" {
+				if cnt.Name == RayHeadContainerName {
 					foundPrimaryContainer = true
 					assert.EqualValues(
 						t,
@@ -687,8 +690,8 @@ func TestInjectLogsSidecar(t *testing.T) {
 	}
 }
 
-func newPluginContext() k8s.PluginContext {
-	plg := &mocks2.PluginContext{}
+func newPluginContext() *k8smocks.PluginContext {
+	plg := &k8smocks.PluginContext{}
 
 	taskExecID := &mocks.TaskExecutionID{}
 	taskExecID.OnGetID().Return(core.TaskExecutionIdentifier{
@@ -731,7 +734,7 @@ func init() {
 func TestGetTaskPhase(t *testing.T) {
 	ctx := context.Background()
 	rayJobResourceHandler := rayJobResourceHandler{}
-	pluginCtx := newPluginContext()
+	pluginCtx := rayPluginContext()
 
 	testCases := []struct {
 		rayJobPhase       rayv1.JobDeploymentStatus
@@ -745,25 +748,61 @@ func TestGetTaskPhase(t *testing.T) {
 		{rayv1.JobDeploymentStatusSuspended, pluginsCore.PhaseInitializing, false},
 	}
 
+	startTime := time.Date(2024, 0, 0, 0, 0, 0, 0, time.UTC)
+	endTime := startTime.Add(time.Hour)
+	podName, contName, initCont := "ray-clust-ray-head", "ray-head", "init"
+	logCtx := &core.LogContext{
+		PrimaryPodName: podName,
+		Pods: []*core.PodLogContext{
+			{
+				Namespace:            "ns",
+				PodName:              podName,
+				PrimaryContainerName: contName,
+				Containers: []*core.ContainerContext{
+					{
+						ContainerName: contName,
+						Process: &core.ContainerContext_ProcessContext{
+							ContainerStartTime: timestamppb.New(startTime),
+							ContainerEndTime:   timestamppb.New(endTime),
+						},
+					},
+				},
+				InitContainers: []*core.ContainerContext{
+					{
+						ContainerName: initCont,
+						Process: &core.ContainerContext_ProcessContext{
+							ContainerStartTime: timestamppb.New(startTime),
+							ContainerEndTime:   timestamppb.New(endTime),
+						},
+					},
+				},
+			},
+		},
+	}
 	for _, tc := range testCases {
 		t.Run("TestGetTaskPhase_"+string(tc.rayJobPhase), func(t *testing.T) {
-			rayObject := &rayv1.RayJob{}
-			rayObject.Status.JobDeploymentStatus = tc.rayJobPhase
 			startTime := metav1.NewTime(time.Now())
-			rayObject.Status.StartTime = &startTime
+			rayObject := &rayv1.RayJob{
+				Status: rayv1.RayJobStatus{
+					JobDeploymentStatus: tc.rayJobPhase,
+					RayClusterName:      "ray-clust",
+					StartTime:           &startTime,
+				},
+			}
 			phaseInfo, err := rayJobResourceHandler.GetTaskPhase(ctx, pluginCtx, rayObject)
 			if tc.expectedError {
 				assert.Error(t, err)
 			} else {
-				assert.Nil(t, err)
+				assert.NoError(t, err)
+				assert.Equal(t, tc.expectedCorePhase.String(), phaseInfo.Phase().String())
+				assert.Equal(t, logCtx, phaseInfo.Info().LogContext)
 			}
-			assert.Equal(t, tc.expectedCorePhase.String(), phaseInfo.Phase().String())
 		})
 	}
 }
 
 func TestGetEventInfo_LogTemplates(t *testing.T) {
-	pluginCtx := newPluginContext()
+	pluginCtx := rayPluginContext()
 	testCases := []struct {
 		name             string
 		rayJob           rayv1.RayJob
@@ -852,6 +891,7 @@ func TestGetEventInfo_LogTemplates(t *testing.T) {
 		tc := testCases[i]
 		t.Run(tc.name, func(t *testing.T) {
 			ti, err := getEventInfoForRayJob(
+				context.TODO(),
 				logs.LogConfig{Templates: []tasklog.TemplateLogPlugin{tc.logPlugin}},
 				pluginCtx,
 				&tc.rayJob,
@@ -863,7 +903,7 @@ func TestGetEventInfo_LogTemplates(t *testing.T) {
 }
 
 func TestGetEventInfo_LogTemplates_V1(t *testing.T) {
-	pluginCtx := newPluginContext()
+	pluginCtx := rayPluginContext()
 	testCases := []struct {
 		name             string
 		rayJob           rayv1.RayJob
@@ -952,6 +992,7 @@ func TestGetEventInfo_LogTemplates_V1(t *testing.T) {
 		tc := testCases[i]
 		t.Run(tc.name, func(t *testing.T) {
 			ti, err := getEventInfoForRayJob(
+				context.TODO(),
 				logs.LogConfig{Templates: []tasklog.TemplateLogPlugin{tc.logPlugin}},
 				pluginCtx,
 				&tc.rayJob,
@@ -963,7 +1004,7 @@ func TestGetEventInfo_LogTemplates_V1(t *testing.T) {
 }
 
 func TestGetEventInfo_DashboardURL(t *testing.T) {
-	pluginCtx := newPluginContext()
+	pluginCtx := rayPluginContext()
 	testCases := []struct {
 		name                 string
 		rayJob               rayv1.RayJob
@@ -1008,7 +1049,7 @@ func TestGetEventInfo_DashboardURL(t *testing.T) {
 		tc := testCases[i]
 		t.Run(tc.name, func(t *testing.T) {
 			assert.NoError(t, SetConfig(&Config{DashboardURLTemplate: &tc.dashboardURLTemplate}))
-			ti, err := getEventInfoForRayJob(logs.LogConfig{}, pluginCtx, &tc.rayJob)
+			ti, err := getEventInfoForRayJob(context.TODO(), logs.LogConfig{}, pluginCtx, &tc.rayJob)
 			assert.NoError(t, err)
 			assert.Equal(t, tc.expectedTaskLogs, ti.Logs)
 		})
@@ -1016,7 +1057,7 @@ func TestGetEventInfo_DashboardURL(t *testing.T) {
 }
 
 func TestGetEventInfo_DashboardURL_V1(t *testing.T) {
-	pluginCtx := newPluginContext()
+	pluginCtx := rayPluginContext()
 	testCases := []struct {
 		name                 string
 		rayJob               rayv1.RayJob
@@ -1061,7 +1102,7 @@ func TestGetEventInfo_DashboardURL_V1(t *testing.T) {
 		tc := testCases[i]
 		t.Run(tc.name, func(t *testing.T) {
 			assert.NoError(t, SetConfig(&Config{DashboardURLTemplate: &tc.dashboardURLTemplate}))
-			ti, err := getEventInfoForRayJob(logs.LogConfig{}, pluginCtx, &tc.rayJob)
+			ti, err := getEventInfoForRayJob(context.TODO(), logs.LogConfig{}, pluginCtx, &tc.rayJob)
 			assert.NoError(t, err)
 			assert.Equal(t, tc.expectedTaskLogs, ti.Logs)
 		})
@@ -1072,4 +1113,49 @@ func TestGetPropertiesRay(t *testing.T) {
 	rayJobResourceHandler := rayJobResourceHandler{}
 	expected := k8s.PluginProperties{}
 	assert.Equal(t, expected, rayJobResourceHandler.GetProperties())
+}
+
+func rayPluginContext() *k8smocks.PluginContext {
+	pluginCtx := newPluginContext()
+	startTime := time.Date(2024, 0, 0, 0, 0, 0, 0, time.UTC)
+	endTime := startTime.Add(time.Hour)
+	podName, contName, initCont := "ray-clust-ray-head", "ray-head", "init"
+	podList := []runtime.Object{
+		&corev1.Pod{
+			ObjectMeta: metav1.ObjectMeta{Namespace: "ns", Name: podName},
+			Spec: corev1.PodSpec{
+				Containers: []corev1.Container{
+					{Name: contName},
+				},
+			},
+			Status: corev1.PodStatus{
+				Phase: corev1.PodRunning,
+				ContainerStatuses: []corev1.ContainerStatus{
+					{
+						Name: contName,
+						State: corev1.ContainerState{
+							Terminated: &corev1.ContainerStateTerminated{
+								StartedAt:  metav1.Time{Time: startTime},
+								FinishedAt: metav1.Time{Time: endTime},
+							},
+						},
+					},
+				},
+				InitContainerStatuses: []corev1.ContainerStatus{
+					{
+						Name: initCont,
+						State: corev1.ContainerState{
+							Terminated: &corev1.ContainerStateTerminated{
+								StartedAt:  metav1.Time{Time: startTime},
+								FinishedAt: metav1.Time{Time: endTime},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	reader := fake.NewFakeClient(podList...)
+	pluginCtx.OnK8sReader().Return(reader)
+	return pluginCtx
 }

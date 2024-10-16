@@ -4,9 +4,11 @@ import (
 	"context"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -19,6 +21,7 @@ import (
 	flytek8sConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	pluginsIOMock "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
+	k8smocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 )
 
@@ -120,6 +123,7 @@ func dummyContainerTaskMetadata(resources *v1.ResourceRequirements, extendedReso
 		},
 	})
 	tID.On("GetGeneratedName").Return("my_project:my_domain:my_name")
+	tID.OnGetUniqueNodeID().Return("unique-node-id")
 	taskMetadata.On("GetTaskExecutionID").Return(tID)
 
 	to := &pluginsCoreMock.TaskOverrides{}
@@ -161,6 +165,36 @@ func dummyContainerTaskContext(taskTemplate *core.TaskTemplate, taskMetadata plu
 	taskCtx.OnPluginStateReader().Return(pluginStateReader)
 
 	return taskCtx
+}
+
+func dummyContainerPluginContext(taskTemplate *core.TaskTemplate, taskMetadata pluginsCore.TaskExecutionMetadata) *k8smocks.PluginContext {
+	pCtx := &k8smocks.PluginContext{}
+	inputReader := &pluginsIOMock.InputReader{}
+	inputReader.OnGetInputPrefixPath().Return("test-data-reference")
+	inputReader.OnGetInputPath().Return("test-data-reference")
+	inputReader.OnGetMatch(mock.Anything).Return(&core.LiteralMap{}, nil)
+	pCtx.OnInputReader().Return(inputReader)
+
+	outputReader := &pluginsIOMock.OutputWriter{}
+	outputReader.OnGetOutputPath().Return("/data/outputs.pb")
+	outputReader.OnGetOutputPrefixPath().Return("/data/")
+	outputReader.OnGetRawOutputPrefix().Return("")
+	outputReader.OnGetCheckpointPrefix().Return("/checkpoint")
+	outputReader.OnGetPreviousCheckpointsPrefix().Return("/prev")
+
+	pCtx.OnOutputWriter().Return(outputReader)
+
+	taskReader := &pluginsCoreMock.TaskReader{}
+	taskReader.OnReadMatch(mock.Anything).Return(taskTemplate, nil)
+	pCtx.OnTaskReader().Return(taskReader)
+
+	pCtx.OnTaskExecutionMetadata().Return(taskMetadata)
+
+	pluginStateReader := &pluginsCoreMock.PluginStateReader{}
+	pluginStateReader.OnGetMatch(mock.Anything).Return(0, nil)
+	pCtx.OnPluginStateReader().Return(pluginStateReader)
+
+	return pCtx
 }
 
 func TestContainerTaskExecutor_BuildIdentityResource(t *testing.T) {
@@ -404,43 +438,90 @@ func TestContainerTaskExecutor_BuildResource_ContainerImage(t *testing.T) {
 	}
 }
 
-func TestContainerTaskExecutor_GetTaskStatus(t *testing.T) {
+func TestContainerTaskExecutor_GetTaskPhase(t *testing.T) {
 	command := []string{"command"}
 	args := []string{"{{.Input}}"}
 	taskTemplate := dummyContainerTaskTemplate(command, args)
 	taskMetadata := dummyContainerTaskMetadata(containerResourceRequirements, nil, true, "")
-	taskCtx := dummyContainerTaskContext(taskTemplate, taskMetadata)
+	pluginContext := dummyContainerPluginContext(taskTemplate, taskMetadata)
 
 	j := &v1.Pod{
 		Status: v1.PodStatus{},
 	}
+	startTime := time.Now()
+	endTime := startTime.Add(time.Hour)
 
 	ctx := context.TODO()
 	t.Run("running", func(t *testing.T) {
 		j.Status.Phase = v1.PodRunning
+		j.Name = "exec-n0-0"
+		j.Namespace = "ns"
+		j.Spec.Containers = []v1.Container{{Name: "primary"}}
 		j.Status.ContainerStatuses = []v1.ContainerStatus{
 			{
+				Name: "primary",
 				State: v1.ContainerState{
-					Running: &v1.ContainerStateRunning{},
+					Running: &v1.ContainerStateRunning{
+						StartedAt: metav1.Time{Time: startTime},
+					},
+				},
+			},
+		}
+		j.Status.InitContainerStatuses = []v1.ContainerStatus{
+			{
+				Name: "init",
+				State: v1.ContainerState{
+					Terminated: &v1.ContainerStateTerminated{
+						StartedAt:  metav1.Time{Time: startTime},
+						FinishedAt: metav1.Time{Time: endTime},
+					},
+				},
+			},
+		}
+		logCtx := &core.LogContext{
+			PrimaryPodName: j.Name,
+			Pods: []*core.PodLogContext{
+				{
+					Namespace:            j.Namespace,
+					PodName:              j.Name,
+					PrimaryContainerName: "primary",
+					Containers: []*core.ContainerContext{
+						{
+							ContainerName: "primary",
+							Process: &core.ContainerContext_ProcessContext{
+								ContainerStartTime: timestamppb.New(startTime),
+							},
+						},
+					},
+					InitContainers: []*core.ContainerContext{
+						{
+							ContainerName: "init",
+							Process: &core.ContainerContext_ProcessContext{
+								ContainerStartTime: timestamppb.New(startTime),
+								ContainerEndTime:   timestamppb.New(endTime),
+							},
+						},
+					},
 				},
 			},
 		}
 
-		phaseInfo, err := DefaultPodPlugin.GetTaskPhase(ctx, taskCtx, j)
+		phaseInfo, err := DefaultPodPlugin.GetTaskPhase(ctx, pluginContext, j)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseRunning, phaseInfo.Phase())
+		assert.Equal(t, logCtx, phaseInfo.Info().LogContext)
 	})
 
 	t.Run("queued", func(t *testing.T) {
 		j.Status.Phase = v1.PodPending
-		phaseInfo, err := DefaultPodPlugin.GetTaskPhase(ctx, taskCtx, j)
+		phaseInfo, err := DefaultPodPlugin.GetTaskPhase(ctx, pluginContext, j)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseQueued, phaseInfo.Phase())
 	})
 
 	t.Run("failNoCondition", func(t *testing.T) {
 		j.Status.Phase = v1.PodFailed
-		phaseInfo, err := DefaultPodPlugin.GetTaskPhase(ctx, taskCtx, j)
+		phaseInfo, err := DefaultPodPlugin.GetTaskPhase(ctx, pluginContext, j)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
 		ec := phaseInfo.Err().GetCode()
@@ -456,7 +537,7 @@ func TestContainerTaskExecutor_GetTaskStatus(t *testing.T) {
 				Type: v1.PodReasonUnschedulable,
 			},
 		}
-		phaseInfo, err := DefaultPodPlugin.GetTaskPhase(ctx, taskCtx, j)
+		phaseInfo, err := DefaultPodPlugin.GetTaskPhase(ctx, pluginContext, j)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
 		ec := phaseInfo.Err().GetCode()
@@ -475,14 +556,14 @@ func TestContainerTaskExecutor_GetTaskStatus(t *testing.T) {
 			},
 		}
 
-		phaseInfo, err := DefaultPodPlugin.GetTaskPhase(ctx, taskCtx, j)
+		phaseInfo, err := DefaultPodPlugin.GetTaskPhase(ctx, pluginContext, j)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseSuccess, phaseInfo.Phase())
 	})
 
 	t.Run("success", func(t *testing.T) {
 		j.Status.Phase = v1.PodSucceeded
-		phaseInfo, err := DefaultPodPlugin.GetTaskPhase(ctx, taskCtx, j)
+		phaseInfo, err := DefaultPodPlugin.GetTaskPhase(ctx, pluginContext, j)
 		assert.NoError(t, err)
 		assert.NotNil(t, phaseInfo)
 		assert.Equal(t, pluginsCore.PhaseSuccess, phaseInfo.Phase())
@@ -499,7 +580,7 @@ func TestContainerTaskExecutor_GetTaskStatus_InvalidImageName(t *testing.T) {
 	args := []string{"{{.Input}}"}
 	taskTemplate := dummyContainerTaskTemplate(command, args)
 	taskMetadata := dummyContainerTaskMetadata(containerResourceRequirements, nil, true, "")
-	taskCtx := dummyContainerTaskContext(taskTemplate, taskMetadata)
+	pluginContext := dummyContainerPluginContext(taskTemplate, taskMetadata)
 
 	ctx := context.TODO()
 	reason := "InvalidImageName"
@@ -532,7 +613,7 @@ func TestContainerTaskExecutor_GetTaskStatus_InvalidImageName(t *testing.T) {
 
 	t.Run("failInvalidImageName", func(t *testing.T) {
 		pendingPod.Status.Phase = v1.PodPending
-		phaseInfo, err := DefaultPodPlugin.GetTaskPhase(ctx, taskCtx, pendingPod)
+		phaseInfo, err := DefaultPodPlugin.GetTaskPhase(ctx, pluginContext, pendingPod)
 		finalReason := fmt.Sprintf("|%s", reason)
 		finalMessage := fmt.Sprintf("|%s", message)
 		assert.NoError(t, err)

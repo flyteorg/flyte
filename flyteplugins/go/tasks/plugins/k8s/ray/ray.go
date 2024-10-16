@@ -40,6 +40,7 @@ const (
 	DashboardHost                      = "dashboard-host"
 	DisableUsageStatsStartParameter    = "disable-usage-stats"
 	DisableUsageStatsStartParameterVal = "true"
+	RayHeadContainerName               = "ray-head"
 )
 
 var logTemplateRegexes = struct {
@@ -322,7 +323,7 @@ func injectLogsSidecar(primaryContainer *v1.Container, podSpec *v1.PodSpec) {
 func buildHeadPodTemplate(primaryContainer *v1.Container, podSpec *v1.PodSpec, objectMeta *metav1.ObjectMeta, taskCtx pluginsCore.TaskExecutionContext) v1.PodTemplateSpec {
 	// Some configs are copy from  https://github.com/ray-project/kuberay/blob/b72e6bdcd9b8c77a9dc6b5da8560910f3a0c3ffd/apiserver/pkg/util/cluster.go#L97
 	// They should always be the same, so we could hard code here.
-	primaryContainer.Name = "ray-head"
+	primaryContainer.Name = RayHeadContainerName
 
 	envs := []v1.EnvVar{
 		{
@@ -497,7 +498,7 @@ func (rayJobResourceHandler) BuildIdentityResource(ctx context.Context, taskCtx 
 	}, nil
 }
 
-func getEventInfoForRayJob(logConfig logs.LogConfig, pluginContext k8s.PluginContext, rayJob *rayv1.RayJob) (*pluginsCore.TaskInfo, error) {
+func getEventInfoForRayJob(ctx context.Context, logConfig logs.LogConfig, pluginContext k8s.PluginContext, rayJob *rayv1.RayJob) (*pluginsCore.TaskInfo, error) {
 	logPlugin, err := logs.InitializeLogPlugins(&logConfig)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize log plugins. Error: %w", err)
@@ -550,12 +551,35 @@ func getEventInfoForRayJob(logConfig logs.LogConfig, pluginContext k8s.PluginCon
 		taskLogs = append(taskLogs, dashboardURLOutput.TaskLogs...)
 	}
 
-	return &pluginsCore.TaskInfo{Logs: taskLogs}, nil
+	podList := &v1.PodList{}
+	err = pluginContext.K8sReader().List(ctx, podList)
+	if err != nil {
+		return nil, fmt.Errorf("failed to list node execution pods. Error: %w", err)
+	}
+
+	return &pluginsCore.TaskInfo{
+		Logs:       taskLogs,
+		LogContext: logContextForPods(rayJob.Name, podList.Items),
+	}, nil
+}
+
+func logContextForPods(rayJobName string, pods []v1.Pod) *core.LogContext {
+	logCtx := &core.LogContext{
+		Pods: make([]*core.PodLogContext, len(pods)),
+	}
+	for i, pod := range pods {
+		p := pod
+		if strings.HasPrefix(p.Name, rayJobName) && flytek8s.GetPrimaryContainerName(&p) == RayHeadContainerName {
+			logCtx.PrimaryPodName = p.Name
+		}
+		logCtx.Pods[i] = flytek8s.BuildPodLogContext(&p)
+	}
+	return logCtx
 }
 
 func (plugin rayJobResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s.PluginContext, resource client.Object) (pluginsCore.PhaseInfo, error) {
 	rayJob := resource.(*rayv1.RayJob)
-	info, err := getEventInfoForRayJob(GetConfig().Logs, pluginContext, rayJob)
+	info, err := getEventInfoForRayJob(ctx, GetConfig().Logs, pluginContext, rayJob)
 	if err != nil {
 		return pluginsCore.PhaseInfoUndefined, err
 	}

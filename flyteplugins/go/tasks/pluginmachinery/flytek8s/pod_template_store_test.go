@@ -13,6 +13,10 @@ import (
 	"k8s.io/client-go/kubernetes/fake"
 )
 
+const (
+	namespace = "foo"
+)
+
 func TestPodTemplateStore(t *testing.T) {
 	ctx := context.TODO()
 
@@ -55,7 +59,7 @@ func TestPodTemplateStore(t *testing.T) {
 
 	// non-default namespace podTemplate does not exist
 	newNamespacePodTemplate := podTemplate.DeepCopy()
-	newNamespacePodTemplate.Namespace = "foo"
+	newNamespacePodTemplate.Namespace = namespace
 
 	nonDefaultNamespacePodTemplate := store.LoadOrDefault(newNamespacePodTemplate.Namespace, newNamespacePodTemplate.Name)
 	assert.NotNil(t, nonDefaultNamespacePodTemplate)
@@ -63,7 +67,7 @@ func TestPodTemplateStore(t *testing.T) {
 
 	// non-default name podTemplate does not exist
 	newNamePodTemplate := podTemplate.DeepCopy()
-	newNamePodTemplate.Name = "foo"
+	newNamePodTemplate.Name = namespace
 
 	nonDefaultNamePodTemplate := store.LoadOrDefault(newNamePodTemplate.Namespace, newNamePodTemplate.Name)
 	assert.Nil(t, nonDefaultNamePodTemplate)

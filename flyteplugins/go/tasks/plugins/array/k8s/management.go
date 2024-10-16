@@ -161,7 +161,7 @@ func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionCon
 
 		originalIdx := arrayCore.CalculateOriginalIndex(childIdx, newState.GetIndexesToCache())
 		systemFailures := currentState.SystemFailures.GetItem(childIdx)
-		stCtx, err := NewSubTaskExecutionContext(ctx, tCtx, taskTemplate, childIdx, originalIdx, retryAttempt, systemFailures)
+		stCtx, err := NewSubTaskExecutionContext(ctx, tCtx, taskTemplate, childIdx, originalIdx, retryAttempt, systemFailures, kubeClient)
 		if err != nil {
 			return currentState, externalResources, err
 		}
@@ -269,14 +269,17 @@ func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionCon
 
 		// process phaseInfo
 		var logLinks []*idlCore.TaskLog
+		var logContext *idlCore.LogContext
 		if phaseInfo.Info() != nil {
 			logLinks = phaseInfo.Info().Logs
+			logContext = phaseInfo.Info().LogContext
 		}
 
 		externalResources = append(externalResources, &core.ExternalResource{
 			ExternalID:   podName,
 			Index:        uint32(originalIdx),
 			Logs:         logLinks,
+			LogContext:   logContext,
 			RetryAttempt: uint32(retryAttempt),
 			Phase:        actualPhase,
 		})
@@ -372,7 +375,7 @@ func TerminateSubTasks(ctx context.Context, tCtx core.TaskExecutionContext, kube
 		}
 
 		originalIdx := arrayCore.CalculateOriginalIndex(childIdx, currentState.GetIndexesToCache())
-		stCtx, err := NewSubTaskExecutionContext(ctx, tCtx, taskTemplate, childIdx, originalIdx, retryAttempt, 0)
+		stCtx, err := NewSubTaskExecutionContext(ctx, tCtx, taskTemplate, childIdx, originalIdx, retryAttempt, 0, kubeClient)
 		if err != nil {
 			return currentState, externalResources, err
 		}

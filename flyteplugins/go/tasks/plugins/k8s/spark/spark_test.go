@@ -24,6 +24,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	pluginIOMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
+	k8smocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 )
 
@@ -96,8 +97,8 @@ func TestGetEventInfo(t *testing.T) {
 			},
 		},
 	}))
-	taskCtx := dummySparkTaskContext(dummySparkTaskTemplateContainer("blah-1", dummySparkConf), false)
-	info, err := getEventInfoForSpark(taskCtx, dummySparkApplication(sj.RunningState))
+	pluginContext := dummySparkPluginContext(dummySparkTaskTemplateContainer("blah-1", dummySparkConf), false)
+	info, err := getEventInfoForSpark(pluginContext, dummySparkApplication(sj.RunningState))
 	assert.NoError(t, err)
 	assert.Len(t, info.Logs, 6)
 	assert.Equal(t, "https://spark-ui.flyte", info.CustomInfo.Fields[sparkDriverUI].GetStringValue())
@@ -117,7 +118,7 @@ func TestGetEventInfo(t *testing.T) {
 
 	assert.Equal(t, expectedLinks, generatedLinks)
 
-	info, err = getEventInfoForSpark(taskCtx, dummySparkApplication(sj.SubmittedState))
+	info, err = getEventInfoForSpark(pluginContext, dummySparkApplication(sj.SubmittedState))
 	assert.NoError(t, err)
 	assert.Len(t, info.Logs, 1)
 	assert.Equal(t, "https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logStream:group=/kubernetes/flyte;prefix=var.log.containers.spark-app-name;streamFilter=typeLogStreamPrefix", info.Logs[0].Uri)
@@ -142,7 +143,7 @@ func TestGetEventInfo(t *testing.T) {
 		},
 	}))
 
-	info, err = getEventInfoForSpark(taskCtx, dummySparkApplication(sj.FailedState))
+	info, err = getEventInfoForSpark(pluginContext, dummySparkApplication(sj.FailedState))
 	assert.NoError(t, err)
 	assert.Len(t, info.Logs, 5)
 	assert.Equal(t, "spark-history.flyte/history/app-id", info.CustomInfo.Fields[sparkHistoryUI].GetStringValue())
@@ -164,67 +165,100 @@ func TestGetEventInfo(t *testing.T) {
 
 func TestGetTaskPhase(t *testing.T) {
 	sparkResourceHandler := sparkResourceHandler{}
+	expectedLogCtx := &core.LogContext{
+		PrimaryPodName: "spark-pod",
+		Pods: []*core.PodLogContext{
+			{
+				PodName:              "spark-pod",
+				PrimaryContainerName: "spark-kubernetes-driver",
+				Containers: []*core.ContainerContext{
+					{
+						ContainerName: "spark-kubernetes-driver",
+					},
+				},
+			},
+			{
+				PodName:              "exec-pod-2",
+				PrimaryContainerName: "spark-kubernetes-executor",
+				Containers: []*core.ContainerContext{
+					{
+						ContainerName: "spark-kubernetes-executor",
+					},
+				},
+			},
+		},
+	}
 
 	ctx := context.TODO()
-	taskCtx := dummySparkTaskContext(dummySparkTaskTemplateContainer("", dummySparkConf), false)
-	taskPhase, err := sparkResourceHandler.GetTaskPhase(ctx, taskCtx, dummySparkApplication(sj.NewState))
+	pluginCtx := dummySparkPluginContext(dummySparkTaskTemplateContainer("", dummySparkConf), false)
+	taskPhase, err := sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.NewState))
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Phase(), pluginsCore.PhaseQueued)
 	assert.NotNil(t, taskPhase.Info())
+	assert.Nil(t, taskPhase.Info().LogContext)
 	assert.Nil(t, err)
 
-	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, taskCtx, dummySparkApplication(sj.SubmittedState))
+	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.SubmittedState))
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Phase(), pluginsCore.PhaseInitializing)
 	assert.NotNil(t, taskPhase.Info())
+	assert.Nil(t, taskPhase.Info().LogContext)
 	assert.Nil(t, err)
 
-	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, taskCtx, dummySparkApplication(sj.RunningState))
+	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.RunningState))
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Phase(), pluginsCore.PhaseRunning)
 	assert.NotNil(t, taskPhase.Info())
+	assert.Equal(t, expectedLogCtx, taskPhase.Info().LogContext)
 	assert.Nil(t, err)
 
-	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, taskCtx, dummySparkApplication(sj.CompletedState))
+	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.CompletedState))
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Phase(), pluginsCore.PhaseSuccess)
 	assert.NotNil(t, taskPhase.Info())
+	assert.Equal(t, expectedLogCtx, taskPhase.Info().LogContext)
 	assert.Nil(t, err)
 
-	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, taskCtx, dummySparkApplication(sj.InvalidatingState))
+	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.InvalidatingState))
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Phase(), pluginsCore.PhaseRunning)
 	assert.NotNil(t, taskPhase.Info())
+	assert.Equal(t, expectedLogCtx, taskPhase.Info().LogContext)
 	assert.Nil(t, err)
 
-	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, taskCtx, dummySparkApplication(sj.FailingState))
+	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.FailingState))
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Phase(), pluginsCore.PhaseRunning)
 	assert.NotNil(t, taskPhase.Info())
+	assert.Equal(t, expectedLogCtx, taskPhase.Info().LogContext)
 	assert.Nil(t, err)
 
-	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, taskCtx, dummySparkApplication(sj.PendingRerunState))
+	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.PendingRerunState))
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Phase(), pluginsCore.PhaseRunning)
 	assert.NotNil(t, taskPhase.Info())
+	assert.Equal(t, expectedLogCtx, taskPhase.Info().LogContext)
 	assert.Nil(t, err)
 
-	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, taskCtx, dummySparkApplication(sj.SucceedingState))
+	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.SucceedingState))
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Phase(), pluginsCore.PhaseRunning)
 	assert.NotNil(t, taskPhase.Info())
+	assert.Equal(t, expectedLogCtx, taskPhase.Info().LogContext)
 	assert.Nil(t, err)
 
-	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, taskCtx, dummySparkApplication(sj.FailedSubmissionState))
+	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.FailedSubmissionState))
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Phase(), pluginsCore.PhaseRetryableFailure)
 	assert.NotNil(t, taskPhase.Info())
+	assert.Equal(t, expectedLogCtx, taskPhase.Info().LogContext)
 	assert.Nil(t, err)
 
-	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, taskCtx, dummySparkApplication(sj.FailedState))
+	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.FailedState))
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Phase(), pluginsCore.PhaseRetryableFailure)
 	assert.NotNil(t, taskPhase.Info())
+	assert.Equal(t, expectedLogCtx, taskPhase.Info().LogContext)
 	assert.Nil(t, err)
 }
 
@@ -245,6 +279,10 @@ func dummySparkApplication(state sj.ApplicationStateType) *sj.SparkApplication {
 				WebUIIngressAddress: sparkUIAddress,
 			},
 			ExecutionAttempts: 1,
+			ExecutorState: map[string]sparkOp.ExecutorState{
+				"exec-pod-1": sparkOp.ExecutorPendingState,
+				"exec-pod-2": sparkOp.ExecutorRunningState,
+			},
 		},
 	}
 }
@@ -408,6 +446,69 @@ func dummySparkTaskContext(taskTemplate *core.TaskTemplate, interruptible bool) 
 	taskExecutionMetadata.On("GetConsoleURL").Return("")
 	taskCtx.On("TaskExecutionMetadata").Return(taskExecutionMetadata)
 	return taskCtx
+}
+
+func dummySparkPluginContext(taskTemplate *core.TaskTemplate, interruptible bool) k8s.PluginContext {
+	pCtx := &k8smocks.PluginContext{}
+	inputReader := &pluginIOMocks.InputReader{}
+	inputReader.OnGetInputPrefixPath().Return("/input/prefix")
+	inputReader.OnGetInputPath().Return("/input")
+	inputReader.OnGetMatch(mock.Anything).Return(&core.LiteralMap{}, nil)
+	pCtx.OnInputReader().Return(inputReader)
+
+	outputReader := &pluginIOMocks.OutputWriter{}
+	outputReader.OnGetOutputPath().Return("/data/outputs.pb")
+	outputReader.OnGetOutputPrefixPath().Return("/data/")
+	outputReader.OnGetRawOutputPrefix().Return("")
+	outputReader.OnGetCheckpointPrefix().Return("/checkpoint")
+	outputReader.OnGetPreviousCheckpointsPrefix().Return("/prev")
+
+	pCtx.On("OutputWriter").Return(outputReader)
+
+	taskReader := &mocks.TaskReader{}
+	taskReader.OnReadMatch(mock.Anything).Return(taskTemplate, nil)
+	pCtx.OnTaskReader().Return(taskReader)
+
+	tID := &mocks.TaskExecutionID{}
+	tID.OnGetID().Return(core.TaskExecutionIdentifier{
+		NodeExecutionId: &core.NodeExecutionIdentifier{
+			ExecutionId: &core.WorkflowExecutionIdentifier{
+				Name:    "my_name",
+				Project: "my_project",
+				Domain:  "my_domain",
+			},
+		},
+	})
+	tID.On("GetGeneratedName").Return("some-acceptable-name")
+	tID.On("GetUniqueNodeID").Return("an-unique-id")
+
+	overrides := &mocks.TaskOverrides{}
+	overrides.On("GetResources").Return(&corev1.ResourceRequirements{})
+	// No support for GPUs, and consequently, ExtendedResources on Spark plugin.
+	overrides.On("GetExtendedResources").Return(nil)
+	overrides.OnGetContainerImage().Return("")
+
+	taskExecutionMetadata := &mocks.TaskExecutionMetadata{}
+	taskExecutionMetadata.On("GetTaskExecutionID").Return(tID)
+	taskExecutionMetadata.On("GetNamespace").Return("test-namespace")
+	taskExecutionMetadata.On("GetAnnotations").Return(map[string]string{"annotation-1": "val1"})
+	taskExecutionMetadata.On("GetLabels").Return(map[string]string{"label-1": "val1"})
+	taskExecutionMetadata.On("GetOwnerReference").Return(v1.OwnerReference{
+		Kind: "node",
+		Name: "blah",
+	})
+	taskExecutionMetadata.On("GetSecurityContext").Return(core.SecurityContext{
+		RunAs: &core.Identity{K8SServiceAccount: "new-val"},
+	})
+	taskExecutionMetadata.On("IsInterruptible").Return(interruptible)
+	taskExecutionMetadata.On("GetMaxAttempts").Return(uint32(1))
+	taskExecutionMetadata.On("GetEnvironmentVariables").Return(nil)
+	taskExecutionMetadata.On("GetPlatformResources").Return(nil)
+	taskExecutionMetadata.On("GetOverrides").Return(overrides)
+	taskExecutionMetadata.On("GetK8sServiceAccount").Return("new-val")
+	taskExecutionMetadata.On("GetConsoleURL").Return("")
+	pCtx.OnTaskExecutionMetadata().Return(taskExecutionMetadata)
+	return pCtx
 }
 
 func defaultPluginConfig() *config.K8sPluginConfig {

@@ -4,7 +4,10 @@ import (
 	"context"
 	"fmt"
 
+	"sigs.k8s.io/controller-runtime/pkg/client"
+
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
@@ -18,6 +21,7 @@ type pluginContext struct {
 	// Lazily creates a buffered outputWriter, overriding the input outputWriter.
 	ow             *ioutils.BufferedOutputWriter
 	k8sPluginState *k8s.PluginState
+	k8sReader      client.Reader
 }
 
 // Provides an output sync of type io.OutputWriter
@@ -56,10 +60,15 @@ func (p *pluginContext) PluginStateReader() pluginsCore.PluginStateReader {
 	}
 }
 
-func newPluginContext(tCtx pluginsCore.TaskExecutionContext, k8sPluginState *k8s.PluginState) *pluginContext {
+func (p *pluginContext) K8sReader() client.Reader {
+	return p.k8sReader
+}
+
+func newPluginContext(tCtx pluginsCore.TaskExecutionContext, k8sPluginState *k8s.PluginState, kubeClient pluginsCore.KubeClient) *pluginContext {
 	return &pluginContext{
 		TaskExecutionContext: tCtx,
 		ow:                   nil,
 		k8sPluginState:       k8sPluginState,
+		k8sReader:            flytek8s.NewNodeExecutionK8sReader(tCtx.TaskExecutionMetadata(), kubeClient),
 	}
 }

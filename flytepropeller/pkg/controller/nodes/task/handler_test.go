@@ -706,6 +706,7 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 				taskMetricsMap:  make(map[MetricKey]*taskMetrics),
 				eventConfig:     eventConfig,
 				agentService:    &pluginCore.AgentService{},
+				kubeClient:      mocks.NewFakeKubeClient(),
 			}
 			got, err := tk.Handle(context.TODO(), nCtx)
 			if (err != nil) != tt.want.wantErr {
@@ -893,6 +894,7 @@ func Test_task_Abort(t *testing.T) {
 				defaultPlugin:   m,
 				resourceManager: noopRm,
 				agentService:    &pluginCore.AgentService{},
+				kubeClient:      mocks.NewFakeKubeClient(),
 			}
 			nCtx := createNodeCtx(tt.args.ev)
 			if err := tk.Abort(context.TODO(), nCtx, "reason"); (err != nil) != tt.wantErr {
@@ -1056,6 +1058,7 @@ func Test_task_Abort_v1(t *testing.T) {
 				defaultPlugin:   m,
 				resourceManager: noopRm,
 				agentService:    &pluginCore.AgentService{},
+				kubeClient:      mocks.NewFakeKubeClient(),
 			}
 			nCtx := createNodeCtx(tt.args.ev)
 			if err := tk.Abort(context.TODO(), nCtx, "reason"); (err != nil) != tt.wantErr {

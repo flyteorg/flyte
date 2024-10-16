@@ -172,6 +172,7 @@ func (tensorflowOperatorResourceHandler) GetTaskPhase(_ context.Context, pluginC
 	statusDetails, _ := utils.MarshalObjToStruct(app.Status)
 	taskPhaseInfo := pluginsCore.TaskInfo{
 		Logs:       taskLogs,
+		LogContext: nil, // TODO populate log context
 		OccurredAt: &occurredAt,
 		CustomInfo: statusDetails,
 	}

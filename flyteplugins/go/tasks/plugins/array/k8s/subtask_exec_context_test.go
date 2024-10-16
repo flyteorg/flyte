@@ -9,6 +9,7 @@ import (
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
 	podPlugin "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/pod"
+	execMocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors/mocks"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
@@ -24,7 +25,7 @@ func TestSubTaskExecutionContext(t *testing.T) {
 	retryAttempt := uint64(1)
 	systemFailures := uint64(0)
 
-	stCtx, err := NewSubTaskExecutionContext(ctx, tCtx, taskTemplate, executionIndex, originalIndex, retryAttempt, systemFailures)
+	stCtx, err := NewSubTaskExecutionContext(ctx, tCtx, taskTemplate, executionIndex, originalIndex, retryAttempt, systemFailures, execMocks.NewFakeKubeClient())
 	assert.Nil(t, err)
 
 	assert.Equal(t, fmt.Sprintf("notfound-%d-%d", executionIndex, retryAttempt), stCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName())

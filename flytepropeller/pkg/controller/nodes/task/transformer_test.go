@@ -81,12 +81,19 @@ func TestToTaskExecutionEvent(t *testing.T) {
 		},
 	}
 
+	logCtx := &core.LogContext{PrimaryPodName: "test"}
 	tev, err := ToTaskExecutionEvent(ToTaskExecutionEventInputs{
 		TaskExecContext: tCtx,
 		InputReader:     in,
 		OutputWriter:    out,
 		Info: pluginCore.PhaseInfoWaitingForResourcesInfo(n, 0, "reason", &pluginCore.TaskInfo{
 			OccurredAt: &n,
+			LogContext: logCtx,
+			ExternalResources: []*pluginCore.ExternalResource{
+				{
+					LogContext: logCtx,
+				},
+			},
 		}),
 		NodeExecutionMetadata: &nodeExecutionMetadata,
 		ExecContext:           mockExecContext,
@@ -114,6 +121,10 @@ func TestToTaskExecutionEvent(t *testing.T) {
 	assert.Equal(t, generatedName, tev.Metadata.GeneratedName)
 	assert.EqualValues(t, resourcePoolInfo, tev.Metadata.ResourcePoolInfo)
 	assert.Equal(t, testClusterID, tev.ProducerId)
+	assert.Equal(t, logCtx, tev.LogContext)
+	if assert.Len(t, tev.GetMetadata().GetExternalResources(), 1) {
+		assert.Equal(t, logCtx, tev.GetMetadata().GetExternalResources()[0].LogContext)
+	}
 
 	l := []*core.TaskLog{
 		{Uri: "x", Name: "y", MessageFormat: core.TaskLog_JSON},

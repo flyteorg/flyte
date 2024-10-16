@@ -6,8 +6,11 @@ import (
 	"regexp"
 	"strconv"
 
+	"sigs.k8s.io/controller-runtime/pkg/client"
+
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
@@ -27,6 +30,7 @@ type SubTaskExecutionContext struct {
 	originalIndex    int
 	outputWriter     io.OutputWriter
 	subtaskReader    SubTaskReader
+	k8sReader        client.Reader
 }
 
 // InputReader overrides the base TaskExecutionContext to return a custom InputReader
@@ -67,9 +71,18 @@ func (s SubTaskExecutionContext) PluginStateReader() pluginsCore.PluginStateRead
 	return pluginStateReader{}
 }
 
+func (s SubTaskExecutionContext) K8sReader() client.Reader {
+	return s.k8sReader
+}
+
 // NewSubtaskExecutionContext constructs a SubTaskExecutionContext using the provided parameters
-func NewSubTaskExecutionContext(ctx context.Context, tCtx pluginsCore.TaskExecutionContext, taskTemplate *core.TaskTemplate,
-	executionIndex, originalIndex int, retryAttempt uint64, systemFailures uint64) (SubTaskExecutionContext, error) {
+func NewSubTaskExecutionContext(ctx context.Context,
+	tCtx pluginsCore.TaskExecutionContext,
+	taskTemplate *core.TaskTemplate,
+	executionIndex, originalIndex int,
+	retryAttempt, systemFailures uint64,
+	kubeClient pluginsCore.KubeClient,
+) (SubTaskExecutionContext, error) {
 
 	subTaskExecutionMetadata, err := NewSubTaskExecutionMetadata(tCtx.TaskExecutionMetadata(), taskTemplate, executionIndex, retryAttempt, systemFailures)
 	if err != nil {
@@ -126,6 +139,7 @@ func NewSubTaskExecutionContext(ctx context.Context, tCtx pluginsCore.TaskExecut
 		originalIndex:        originalIndex,
 		outputWriter:         outputWriter,
 		subtaskReader:        subtaskReader,
+		k8sReader:            flytek8s.NewNodeExecutionK8sReader(tCtx.TaskExecutionMetadata(), kubeClient),
 	}, nil
 }
 

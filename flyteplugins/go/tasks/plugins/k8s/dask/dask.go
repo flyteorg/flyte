@@ -12,6 +12,7 @@ import (
 	"k8s.io/client-go/kubernetes/scheme"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
@@ -311,6 +312,18 @@ func (p daskResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s
 			return pluginsCore.PhaseInfoUndefined, err
 		}
 		info.Logs = o.TaskLogs
+		info.LogContext = &core.LogContext{
+			PrimaryPodName: job.Status.JobRunnerPodName,
+			Pods: []*core.PodLogContext{
+				{
+					PodName:              job.Status.JobRunnerPodName,
+					PrimaryContainerName: "job-runner",
+					Containers: []*core.ContainerContext{
+						{ContainerName: "job-runner"},
+					},
+				},
+			},
+		}
 	}
 
 	switch status {

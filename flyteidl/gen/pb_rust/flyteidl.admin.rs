@@ -3552,6 +3552,9 @@ pub struct TaskExecutionClosure {
     /// as previously done, is much more valuable in visualizing and understanding historical evaluations.
     #[prost(message, repeated, tag="18")]
     pub reasons: ::prost::alloc::vec::Vec<Reason>,
+    /// Contains metadata required to identify logs related to this task execution
+    #[prost(message, optional, tag="19")]
+    pub log_context: ::core::option::Option<super::core::LogContext>,
     #[prost(oneof="task_execution_closure::OutputResult", tags="1, 2, 12")]
     pub output_result: ::core::option::Option<task_execution_closure::OutputResult>,
 }

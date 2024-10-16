@@ -8,6 +8,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	pluginserrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
@@ -179,6 +180,10 @@ func (plugin) GetTaskPhaseWithLogs(ctx context.Context, pluginContext k8s.Plugin
 			return pluginsCore.PhaseInfoUndefined, err
 		}
 		info.Logs = taskLogs
+		info.LogContext = &core.LogContext{
+			PrimaryPodName: pod.Name,
+			Pods:           []*core.PodLogContext{flytek8s.BuildPodLogContext(pod)},
+		}
 	}
 
 	phaseInfo, err := DemystifyPodStatus(pod, info)
@@ -204,6 +209,7 @@ func DemystifyPodStatus(pod *v1.Pod, info pluginsCore.TaskInfo) (pluginsCore.Pha
 	phaseInfo := pluginsCore.PhaseInfoUndefined
 	var err error
 
+	hasLogs := len(info.Logs) > 0 || len(info.LogContext.GetPods()) > 0
 	switch pod.Status.Phase {
 	case v1.PodSucceeded:
 		phaseInfo, err = flytek8s.DemystifySuccess(pod.Status, info)
@@ -235,7 +241,7 @@ func DemystifyPodStatus(pod *v1.Pod, info pluginsCore.TaskInfo) (pluginsCore.Pha
 			// to succeed to declare success. therefore, if the pod is not in one of the above states we
 			// fallback to declaring the task as 'running'.
 			phaseInfo = pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, &info)
-			if len(info.Logs) > 0 {
+			if hasLogs {
 				phaseInfo = phaseInfo.WithVersion(pluginsCore.DefaultPhaseVersion + 1)
 			}
 		} else {
@@ -251,7 +257,7 @@ func DemystifyPodStatus(pod *v1.Pod, info pluginsCore.TaskInfo) (pluginsCore.Pha
 						break
 					}
 				}
-			} else if phaseInfo.Phase() == pluginsCore.PhaseRunning && len(info.Logs) > 0 {
+			} else if phaseInfo.Phase() == pluginsCore.PhaseRunning && hasLogs {
 				phaseInfo = phaseInfo.WithVersion(pluginsCore.DefaultPhaseVersion + 1)
 			}
 		}

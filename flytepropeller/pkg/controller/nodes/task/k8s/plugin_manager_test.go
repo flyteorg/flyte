@@ -203,7 +203,14 @@ func getMockTaskExecutionMetadata() pluginsCore.TaskExecutionMetadata {
 
 	id := &pluginsCoreMock.TaskExecutionID{}
 	id.On("GetGeneratedName").Return("test")
-	id.On("GetID").Return(core.TaskExecutionIdentifier{})
+	id.On("GetID").Return(core.TaskExecutionIdentifier{
+		NodeExecutionId: &core.NodeExecutionIdentifier{
+			ExecutionId: &core.WorkflowExecutionIdentifier{
+				Name: "exec42",
+			},
+			NodeId: "n0",
+		},
+	})
 	taskExecutionMetadata.On("GetTaskExecutionID").Return(id)
 	return taskExecutionMetadata
 }
@@ -580,7 +587,7 @@ func TestPluginManager_Abort(t *testing.T) {
 	})
 }
 
-func TestPluginManager_Handle_CheckResourceStatus(t *testing.T) {
+func TestPluginManager_Handle_CheckResourcePhase(t *testing.T) {
 	ctx := context.TODO()
 	tm := getMockTaskExecutionMetadata()
 	res := &v1.Pod{

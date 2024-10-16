@@ -283,7 +283,7 @@ func (e *PluginManager) checkResourcePhase(ctx context.Context, tCtx pluginsCore
 		e.metrics.ResourceDeleted.Inc(ctx)
 	}
 
-	pCtx := newPluginContext(tCtx, k8sPluginState)
+	pCtx := newPluginContext(tCtx, k8sPluginState, e.kubeClient)
 	p, err := e.plugin.GetTaskPhase(ctx, pCtx, o)
 	if err != nil {
 		logger.Warnf(ctx, "failed to check status of resource in plugin [%s], with error: %s", e.GetID(), err.Error())
