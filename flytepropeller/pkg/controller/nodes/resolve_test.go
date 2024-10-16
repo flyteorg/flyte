@@ -134,6 +134,10 @@ func (d *dummyBaseWorkflow) FindSubWorkflow(subID v1alpha1.WorkflowID) v1alpha1.
 	return nil
 }
 
+func (d *dummyBaseWorkflow) FindLaunchPlan(refID v1alpha1.LaunchPlanRefID) v1alpha1.ExecutableLaunchPlan {
+	return nil
+}
+
 func (d *dummyBaseWorkflow) GetExecutionStatus() v1alpha1.ExecutableWorkflowStatus {
 	return nil
 }

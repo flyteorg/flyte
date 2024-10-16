@@ -5,6 +5,7 @@ import (
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 )
 
 //go:generate mockery -all -case=underscore
@@ -36,10 +37,10 @@ type LaunchContext struct {
 // Executor interface to be implemented by the remote system that can allow workflow launching capabilities
 type Executor interface {
 	// Launch start an execution of a launchplan
-	Launch(ctx context.Context, launchCtx LaunchContext, executionID *core.WorkflowExecutionIdentifier, launchPlanRef *core.Identifier, inputs *core.LiteralMap) error
+	Launch(ctx context.Context, launchCtx LaunchContext, executionID *core.WorkflowExecutionIdentifier, launchPlan v1alpha1.ExecutableLaunchPlan, inputs *core.LiteralMap) error
 
 	// GetStatus retrieves status of a LaunchPlan execution
-	GetStatus(ctx context.Context, executionID *core.WorkflowExecutionIdentifier) (*admin.ExecutionClosure, *core.LiteralMap, error)
+	GetStatus(ctx context.Context, executionID *core.WorkflowExecutionIdentifier, launchPlan v1alpha1.ExecutableLaunchPlan) (*admin.ExecutionClosure, *core.LiteralMap, error)
 
 	// Kill a remote execution
 	Kill(ctx context.Context, executionID *core.WorkflowExecutionIdentifier, reason string) error

@@ -336,6 +336,8 @@ func CompileWorkflow(primaryWf *core.WorkflowTemplate, subworkflows []*core.Work
 
 	compiledWf := &core.CompiledWorkflow{Template: wf}
 
+	compiledLaunchPlans := toCompiledLaunchPlans(launchPlans...)
+
 	gb := newWorkflowBuilder(compiledWf, wfIndex, c.NewTaskIndex(taskBuilders...), toInterfaceProviderMap(launchPlans))
 	// Terminate early if there are some required component not present.
 	if !gb.validateAllRequirements(errs.NewScope()) {
@@ -355,6 +357,7 @@ func CompileWorkflow(primaryWf *core.WorkflowTemplate, subworkflows []*core.Work
 			Primary:      coreWf,
 			Tasks:        compiledTasks,
 			SubWorkflows: compiledSubWorkflows,
+			LaunchPlans:  compiledLaunchPlans,
 		}, nil
 	}
 
