@@ -17,6 +17,9 @@ import (
 
 const (
 	flyteExecutionURL = "FLYTE_EXECUTION_URL"
+
+	FlyteInternalWorkerNameEnvVarKey        = "_F_WN"  // "FLYTE_INTERNAL_WORKER_NAME"
+	FlyteInternalDistErrorStrategyEnvVarKey = "_F_DES" // "FLYTE_INTERNAL_DIST_ERROR_STRATEGY"
 )
 
 func GetContextEnvVars(ownerCtx context.Context) []v1.EnvVar {

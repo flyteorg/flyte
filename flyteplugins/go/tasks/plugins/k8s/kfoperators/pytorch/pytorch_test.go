@@ -12,6 +12,7 @@ import (
 	kubeflowv1 "github.com/kubeflow/training-operator/pkg/apis/kubeflow.org/v1"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	apiv1 "k8s.io/api/core/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -23,6 +24,7 @@ import (
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	pluginsK8s "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	flytek8sConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	pluginIOMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
@@ -878,6 +880,26 @@ func TestBuildResourcePytorchV1(t *testing.T) {
 		assert.Nil(t, pytorchJob.Spec.RunPolicy.ActiveDeadlineSeconds)
 
 		assert.Nil(t, pytorchJob.Spec.ElasticPolicy)
+
+		// validate plugin specific environment variables
+		workerContainerEnv := pytorchJob.Spec.PyTorchReplicaSpecs[kubeflowv1.PyTorchJobReplicaTypeWorker].Template.Spec.Containers[0].Env
+		assert.Equal(t,
+			[]apiv1.EnvVar{
+				{
+					Name: pluginsK8s.FlyteInternalWorkerNameEnvVarKey,
+					ValueFrom: &apiv1.EnvVarSource{
+						FieldRef: &apiv1.ObjectFieldSelector{
+							FieldPath: "metadata.name",
+						},
+					},
+				},
+				{
+					Name:  pluginsK8s.FlyteInternalDistErrorStrategyEnvVarKey,
+					Value: "1",
+				},
+			},
+			workerContainerEnv[len(workerContainerEnv)-2:],
+		)
 	}
 }
 
