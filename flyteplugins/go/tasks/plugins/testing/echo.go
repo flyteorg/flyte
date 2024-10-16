@@ -155,7 +155,7 @@ func init() {
 					taskStartTimes: make(map[string]time.Time),
 				}, nil
 			},
-			IsDefault: true,
+			IsDefault: false,
 		},
 	)
 }
