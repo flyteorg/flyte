@@ -164,7 +164,7 @@ func TestReadOrigin(t *testing.T) {
 					Kind:      core.ContainerError_NON_RECOVERABLE,
 					Origin:    core.ExecutionError_USER,
 					Worker:    fmt.Sprintf("worker-%d", workerIdx),
-					Timestamp: timestamppb.New(time.Unix(int64(100+workerIdx%2), 0)),
+					Timestamp: timestamppb.New(time.Unix(int64(100-workerIdx%2), 0)),
 				},
 			}
 			incomingErrorDoc := args.Get(2)
@@ -208,7 +208,7 @@ func TestReadOrigin(t *testing.T) {
 		assert.Equal(t, "red", executionError.Code)
 		assert.Equal(t, "hi-1", executionError.Message)
 		assert.Equal(t, "worker-1", executionError.Worker)
-		assert.Equal(t, timestamppb.New(time.Unix(101, 0)), executionError.Timestamp)
+		assert.Equal(t, timestamppb.New(time.Unix(99, 0)), executionError.Timestamp)
 		assert.False(t, executionError.IsRecoverable)
 	})
 }
