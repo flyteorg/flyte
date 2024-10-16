@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"reflect"
-	"sync/atomic"
 	"testing"
 	"time"
 
@@ -102,11 +101,9 @@ func TestAdminLaunchPlanExecutor_GetStatus(t *testing.T) {
 				},
 			},
 		}
-		var synced atomic.Bool
 		mockClient.
 			OnGetExecutionMatch(mock.Anything, &admin.WorkflowExecutionGetRequest{Id: id}).
 			Run(func(args mock.Arguments) {
-				synced.Store(true)
 				done()
 			}).
 			Return(execution, nil).
@@ -135,8 +132,16 @@ func TestAdminLaunchPlanExecutor_GetStatus(t *testing.T) {
 		assert.Nil(t, st.Outputs)
 
 		// Allow for sync to be called
-		assert.Eventually(t, func() bool { return synced.Load() },
-			time.Second, time.Millisecond, "timeout waiting for GetExecution to be called")
+		assert.Eventually(t, func() bool {
+			st, err := exec.GetStatus(
+				ctx,
+				id,
+				launchPlanWithOutputs,
+				parentWorkflowID,
+			)
+			assert.NoError(t, err)
+			return execution.Closure.Phase == st.Phase
+		}, time.Second, time.Millisecond, "timeout waiting for GetExecution to return expected phase")
 
 		st, err = exec.GetStatus(
 			ctx,
@@ -179,11 +184,9 @@ func TestAdminLaunchPlanExecutor_GetStatus(t *testing.T) {
 			).
 			Return(nil, nil).
 			Once()
-		var synced atomic.Bool
 		mockClient.
 			OnGetExecutionMatch(mock.Anything, &admin.WorkflowExecutionGetRequest{Id: id}).
 			Run(func(args mock.Arguments) {
-				synced.Store(true)
 				done()
 			}).
 			Return(nil, status.Error(codes.NotFound, "")).
@@ -204,8 +207,10 @@ func TestAdminLaunchPlanExecutor_GetStatus(t *testing.T) {
 		assert.NoError(t, err)
 
 		// Allow for sync to be called
-		assert.Eventually(t, func() bool { return synced.Load() },
-			time.Second, time.Millisecond, "timeout waiting for GetExecution to be called")
+		assert.Eventually(t, func() bool {
+			_, err := exec.GetStatus(ctx, id, launchPlanWithOutputs, parentWorkflowID)
+			return IsNotFound(err)
+		}, time.Second, time.Millisecond, "timeout waiting for GetExecution to be called")
 
 		st, err := exec.GetStatus(ctx, id, launchPlanWithOutputs, parentWorkflowID)
 		assert.Error(t, err)
@@ -233,11 +238,9 @@ func TestAdminLaunchPlanExecutor_GetStatus(t *testing.T) {
 			).
 			Return(nil, nil).
 			Once()
-		var synced atomic.Bool
 		mockClient.
 			OnGetExecutionMatch(mock.Anything, &admin.WorkflowExecutionGetRequest{Id: id}).
 			Run(func(args mock.Arguments) {
-				synced.Store(true)
 				done()
 			}).
 			Return(nil, status.Error(codes.Canceled, "")).
@@ -258,8 +261,11 @@ func TestAdminLaunchPlanExecutor_GetStatus(t *testing.T) {
 		assert.NoError(t, err)
 
 		// Allow for sync to be called
-		assert.Eventually(t, func() bool { return synced.Load() },
-			time.Second, time.Millisecond, "timeout waiting for GetExecution to be called")
+		assert.Eventually(t, func() bool {
+			_, err := exec.GetStatus(ctx, id, launchPlanWithOutputs, parentWorkflowID)
+			stCode, ok := status.FromError(err)
+			return ok && stCode.Code() == codes.Canceled
+		}, time.Second, time.Millisecond, "timeout waiting for GetExecution to be called")
 
 		st, err := exec.GetStatus(ctx, id, launchPlanWithOutputs, parentWorkflowID)
 		assert.Error(t, err)
