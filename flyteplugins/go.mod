@@ -4,7 +4,7 @@ go 1.22
 
 require (
 	github.com/GoogleCloudPlatform/spark-on-k8s-operator v0.0.0-20200723154620-6f35a1152625
-	github.com/aws/aws-sdk-go v1.44.2
+	github.com/aws/aws-sdk-go v1.47.11
 	github.com/aws/aws-sdk-go-v2 v1.2.0
 	github.com/aws/aws-sdk-go-v2/config v1.0.0
 	github.com/aws/aws-sdk-go-v2/service/athena v1.0.0

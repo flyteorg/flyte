@@ -34,7 +34,7 @@ func GetScheduleName(ctx context.Context, s models.SchedulableEntity) string {
 
 // GetExecutionIdentifier returns UUID using the hashed value of the schedule identifier and the scheduledTime
 func GetExecutionIdentifier(ctx context.Context, identifier *core.Identifier, scheduledTime time.Time) (uuid.UUID, error) {
-	hashValue := HashScheduledTimeStamp(ctx, identifier, scheduledTime)
+	hashValue := hashScheduledTimeStamp(ctx, identifier, scheduledTime)
 	b := make([]byte, 16)
 	binary.LittleEndian.PutUint64(b, hashValue)
 	return uuid.FromBytes(b)
@@ -55,8 +55,8 @@ func hashIdentifier(ctx context.Context, identifier *core.Identifier) uint64 {
 	return h.Sum64()
 }
 
-// HashScheduledTimeStamp return the hash of the identifier and the scheduledTime
-func HashScheduledTimeStamp(ctx context.Context, identifier *core.Identifier, scheduledTime time.Time) uint64 {
+// hashScheduledTimeStamp return the hash of the identifier and the scheduledTime
+func hashScheduledTimeStamp(ctx context.Context, identifier *core.Identifier, scheduledTime time.Time) uint64 {
 	h := fnv.New64()
 	_, err := h.Write([]byte(fmt.Sprintf(executionIDInputsFormat,
 		identifier.Project, identifier.Domain, identifier.Name, identifier.Version, scheduledTime.Unix())))

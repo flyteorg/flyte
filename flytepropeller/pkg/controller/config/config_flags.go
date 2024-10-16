@@ -112,5 +112,9 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "node-execution-worker-count"), defaultConfig.NodeExecutionWorkerCount, "Number of workers to evaluate node executions,  currently only used for array nodes")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "array-node-config.event-version"), defaultConfig.ArrayNode.EventVersion, "ArrayNode eventing version. 0 => legacy (drop-in replacement for maptask),  1 => new")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "array-node-config.default-parallelism-behavior"), defaultConfig.ArrayNode.DefaultParallelismBehavior, "Default parallelism behavior for array nodes")
+	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "literal-offloading-config.Enabled"), defaultConfig.LiteralOffloadingConfig.Enabled, "")
+	cmdFlags.StringToString(fmt.Sprintf("%v%v", prefix, "literal-offloading-config.supported-sdk-versions"), defaultConfig.LiteralOffloadingConfig.SupportedSDKVersions, "Maps flytekit and union SDK names to minimum supported version that can handle reading offloaded literals.")
+	cmdFlags.Int64(fmt.Sprintf("%v%v", prefix, "literal-offloading-config.min-size-in-mb-for-offloading"), defaultConfig.LiteralOffloadingConfig.MinSizeInMBForOffloading, "Size of a literal at which to trigger offloading")
+	cmdFlags.Int64(fmt.Sprintf("%v%v", prefix, "literal-offloading-config.max-size-in-mb-for-offloading"), defaultConfig.LiteralOffloadingConfig.MaxSizeInMBForOffloading, "Size of a literal at which to fail fast")
 	return cmdFlags
 }

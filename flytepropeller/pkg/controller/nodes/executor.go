@@ -491,6 +491,7 @@ type nodeExecutor struct {
 	defaultExecutionDeadline        time.Duration
 	enqueueWorkflow                 v1alpha1.EnqueueWorkflow
 	eventConfig                     *config.EventConfig
+	literalOffloadingConfig         config.LiteralOffloadingConfig
 	interruptibleFailureThreshold   int32
 	maxNodeRetriesForSystemFailures uint32
 	metrics                         *nodeMetrics
@@ -764,6 +765,10 @@ func (c *nodeExecutor) preExecute(ctx context.Context, dag executors.DAGStructur
 			}
 
 			if nodeInputs != nil {
+				p := common.CheckOffloadingCompat(ctx, nCtx, nodeInputs.Literals, node, c.literalOffloadingConfig)
+				if p != nil {
+					return *p, nil
+				}
 				inputsFile := v1alpha1.GetInputsFile(dataDir)
 				if err := c.store.WriteProtobuf(ctx, inputsFile, storage.Options{}, nodeInputs); err != nil {
 					c.metrics.InputsWriteFailure.Inc(ctx)
@@ -1417,7 +1422,7 @@ func (c *nodeExecutor) HandleNode(ctx context.Context, dag executors.DAGStructur
 
 func NewExecutor(ctx context.Context, nodeConfig config.NodeConfig, store *storage.DataStore, enQWorkflow v1alpha1.EnqueueWorkflow, eventSink events.EventSink,
 	workflowLauncher launchplan.Executor, launchPlanReader launchplan.Reader, defaultRawOutputPrefix storage.DataReference, kubeClient executors.Client,
-	catalogClient catalog.Client, recoveryClient recovery.Client, eventConfig *config.EventConfig, clusterID string, signalClient service.SignalServiceClient,
+	catalogClient catalog.Client, recoveryClient recovery.Client, literalOffloadingConfig config.LiteralOffloadingConfig, eventConfig *config.EventConfig, clusterID string, signalClient service.SignalServiceClient,
 	nodeHandlerFactory interfaces.HandlerFactory, scope promutils.Scope) (interfaces.Node, error) {
 
 	// TODO we may want to make this configurable.
@@ -1469,6 +1474,7 @@ func NewExecutor(ctx context.Context, nodeConfig config.NodeConfig, store *stora
 		defaultExecutionDeadline:        nodeConfig.DefaultDeadlines.DefaultNodeExecutionDeadline.Duration,
 		enqueueWorkflow:                 enQWorkflow,
 		eventConfig:                     eventConfig,
+		literalOffloadingConfig:         literalOffloadingConfig,
 		interruptibleFailureThreshold:   nodeConfig.InterruptibleFailureThreshold,
 		maxNodeRetriesForSystemFailures: uint32(nodeConfig.MaxNodeRetriesOnSystemFailures),
 		metrics:                         metrics,

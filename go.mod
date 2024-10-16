@@ -29,10 +29,11 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v1.4.0 // indirect
 	github.com/AzureAD/microsoft-authentication-library-for-go v1.2.2 // indirect
 	github.com/GoogleCloudPlatform/spark-on-k8s-operator v0.0.0-20200723154620-6f35a1152625 // indirect
+	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/NYTimes/gizmo v1.3.6 // indirect
 	github.com/Shopify/sarama v1.26.4 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20200428143746-21a406dcc535 // indirect
-	github.com/aws/aws-sdk-go v1.44.2 // indirect
+	github.com/aws/aws-sdk-go v1.47.11 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.2.0 // indirect
 	github.com/aws/aws-sdk-go-v2/config v1.0.0 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.0.0 // indirect
@@ -165,6 +166,7 @@ require (
 	github.com/robfig/cron/v3 v3.0.0 // indirect
 	github.com/sendgrid/rest v2.6.9+incompatible // indirect
 	github.com/sendgrid/sendgrid-go v3.10.0+incompatible // indirect
+	github.com/shamaton/msgpack/v2 v2.2.2 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/spf13/afero v1.9.2 // indirect
 	github.com/spf13/cast v1.4.1 // indirect
@@ -178,7 +180,6 @@ require (
 	github.com/tidwall/pretty v1.2.0 // indirect
 	github.com/tidwall/sjson v1.2.5 // indirect
 	github.com/wI2L/jsondiff v0.5.0 // indirect
-	github.com/wolfeidau/humanhash v1.1.0 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.47.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.46.1 // indirect

@@ -1,49 +1,113 @@
-.getting-started-panels div.card-body {
-    padding: 0;
+html[data-theme=light], html[data-theme=dark] {
+    --pst-color-primary: #7652A2;
+    --pst-color-link: #7652A2;
+    --pst-color-link-hover: #7652A2;
 }
 
-.getting-started-panels a.btn-primary {
-    color: white !important;
-    background-color: var(--color-link);
-    border-color: var(--color-link);
+
+/* Styling for page layout */
+.bd-page-width {
+    max-width: 100%;
 }
 
-.getting-started-panels a.btn-outline-primary {
-    color: white !important;
-    background-color: var(--color-link);
-    opacity: 0.5;
-    border-color: var(--color-link);
+/* style the main title logo */
+.navbar-brand:hover, .navbar-brand:visited:hover {
+    text-decoration: none;
 }
 
-html .tabbed-set > label {
-    color: var(--color-foreground-border);
+.navbar-brand img {
+    height: 70%;
 }
 
-html .tabbed-set > input:checked + label {
-    border-color: var(--color-link);
-    color: var(--color-link);
+/*
+Center the main page content only when the sidebar has the .hide-on-wide
+class, which is only on the root page
+*/
+.bd-sidebar.hide-on-wide + main.bd-main .bd-content {
+    justify-content: center;
 }
 
-html .tabbed-set > label:hover {
-    color: var(--color-link);
+/* left sidebar nav width */
+.bd-sidebar-primary {
+    width: 15%;
+    min-width: 250px;
+    padding: 1rem;
 }
 
-html .tabbed-content {
-    box-shadow: 0 -.0625rem var(--color-background-border),0 .0625rem var(--color-background-border);
+/* make the scroll bar sleeker */
+.bd-sidebar::-webkit-scrollbar {
+    width: 3px;
+    height: 3px;
+    background: transparent;
 }
 
-table {
-    width: 100%;
+.bd-sidebar::-webkit-scrollbar-thumb {
+    background: var(--pst-color-border);
+}
+
+/* make sure page content fills up the page */
+.bd-main .bd-content {
+    justify-content: left;
+}
+
+.bd-main .bd-content .bd-article-container {
+    padding: 2.5rem;
+    max-width: 75em;
+}
+
+/* align navbar items with the sidebar */
+.bd-header .navbar-header-items__start {
+    width: 15%;
+    min-width: 250px;
+}
+
+/* styles for the main page subtitle and badges */
+div.sd-card.sd-shadow-sm.subtitle-and-badges {
+    border: none;
     box-shadow: none !important;
 }
 
-.sidebar-container, .toc-drawer {
-    width: 22em;
-    padding-right: 0;
+div.subtitle-and-badges .sd-card-body {
+    padding: 0;
 }
 
-@media (max-width: 82em) {
-    .toc-drawer {
-        right: -22em;
-    }
+div.subtitle-and-badges .sd-card-title {
+    color: #808080;
+    font-weight: 350 !important;
+    font-size: 25px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+div.subtitle-and-badges a {
+    text-decoration: none;
+}
+
+div.subtitle-and-badges a img {
+    margin: 2px 0;
+}
+
+/* update table hover color to neutral color */
+.table tbody tr:hover {
+    background-color: var(--pst-color-table-inner-border);
+}
+
+/* custom footer style */
+div.custom-footer {
+    text-align: center;
+    background-color: var(--pst-color-surface);
+    padding: 15px 0;
+    color: var(--pst-color-text-muted);
+}
+
+/* anchor link hover style */
+a:hover,
+nav.bd-links li>a:active,
+nav.bd-links li>a:hover,
+.bd-header ul.navbar-nav>li.nav-item>.nav-link:hover {
+    color: var(--pst-color-primary);
+}
+
+.bd-header ul.navbar-nav>li.nav-item>.nav-link:hover:before {
+    border-bottom: max(3px, .1875rem, .12em) solid var(--pst-color-primary);
 }

@@ -7,7 +7,7 @@ require (
 	cloud.google.com/go/storage v1.36.0
 	github.com/NYTimes/gizmo v1.3.6
 	github.com/Selvatico/go-mocket v1.0.7
-	github.com/aws/aws-sdk-go v1.44.2
+	github.com/aws/aws-sdk-go v1.47.11
 	github.com/benbjohnson/clock v1.3.0
 	github.com/cloudevents/sdk-go/binding/format/protobuf/v2 v2.8.0
 	github.com/cloudevents/sdk-go/v2 v2.15.2
@@ -48,9 +48,9 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.9.0
 	github.com/wI2L/jsondiff v0.5.0
-	github.com/wolfeidau/humanhash v1.1.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.47.0
 	go.opentelemetry.io/otel v1.24.0
+	golang.org/x/net v0.27.0
 	golang.org/x/oauth2 v0.16.0
 	golang.org/x/time v0.5.0
 	google.golang.org/api v0.155.0
@@ -81,6 +81,7 @@ require (
 	cloud.google.com/go/pubsub v1.34.0 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.7.0 // indirect
 	github.com/AzureAD/microsoft-authentication-library-for-go v1.2.2 // indirect
+	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20200428143746-21a406dcc535 // indirect
 	github.com/benlaurie/objecthash v0.0.0-20180202135721-d1e3d6079fc1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
@@ -189,7 +190,6 @@ require (
 	go.opentelemetry.io/proto/otlp v1.1.0 // indirect
 	golang.org/x/crypto v0.25.0 // indirect
 	golang.org/x/exp v0.0.0-20240325151524-a685a6edb6d8 // indirect
-	golang.org/x/net v0.27.0 // indirect
 	golang.org/x/sync v0.7.0 // indirect
 	golang.org/x/sys v0.22.0 // indirect
 	golang.org/x/term v0.22.0 // indirect

@@ -242,6 +242,16 @@ func TestMakeDefaultLiteralForType(t *testing.T) {
 		assert.NotNil(t, l.GetScalar().GetError())
 	})
 
+	t.Run("binary", func(t *testing.T) {
+		l, err := MakeDefaultLiteralForType(&core.LiteralType{Type: &core.LiteralType_Simple{
+			Simple: core.SimpleType_BINARY,
+		}})
+		assert.NoError(t, err)
+		assert.NotNil(t, l.GetScalar().GetBinary())
+		assert.NotNil(t, l.GetScalar().GetBinary().GetValue())
+		assert.NotNil(t, l.GetScalar().GetBinary().GetTag())
+	})
+
 	t.Run("struct", func(t *testing.T) {
 		l, err := MakeDefaultLiteralForType(&core.LiteralType{Type: &core.LiteralType_Simple{
 			Simple: core.SimpleType_STRUCT,
@@ -442,6 +452,34 @@ func TestMakeLiteralForType(t *testing.T) {
 		expectedVal, _ := ExtractFromLiteral(literalVal)
 		actualVal, _ := ExtractFromLiteral(val)
 		assert.Equal(t, expectedVal, actualVal)
+	})
+
+	t.Run("Generic", func(t *testing.T) {
+		literalVal := map[string]interface{}{
+			"x": 1,
+			"y": "ystringvalue",
+		}
+		var literalType = &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRUCT}}
+		lit, err := MakeLiteralForType(literalType, literalVal)
+		assert.NoError(t, err)
+		extractedLiteralVal, err := ExtractFromLiteral(lit)
+		assert.NoError(t, err)
+		fieldsMap := map[string]*structpb.Value{
+			"x": {
+				Kind: &structpb.Value_NumberValue{NumberValue: 1},
+			},
+			"y": {
+				Kind: &structpb.Value_StringValue{StringValue: "ystringvalue"},
+			},
+		}
+		expectedStructVal := &structpb.Struct{
+			Fields: fieldsMap,
+		}
+		extractedStructValue := extractedLiteralVal.(*structpb.Struct)
+		assert.Equal(t, len(expectedStructVal.Fields), len(extractedStructValue.Fields))
+		for key, val := range expectedStructVal.Fields {
+			assert.Equal(t, val.Kind, extractedStructValue.Fields[key].Kind)
+		}
 	})
 
 	t.Run("ArrayStrings", func(t *testing.T) {

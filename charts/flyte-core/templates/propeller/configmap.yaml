@@ -48,9 +48,10 @@ data:
 {{- end }}
   storage.yaml: | {{ tpl (include "storage" .) $ | nindent 4 }}
   cache.yaml: |
-    cache:
-      max_size_mbs: {{ .Values.flytepropeller.cacheSizeMbs }}
-      target_gc_percent: 70
+    storage:
+      cache:
+        max_size_mbs: {{ .Values.flytepropeller.cacheSizeMbs }}
+        target_gc_percent: 70
 {{- with .Values.configmap.task_logs }}
   task_logs.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
 {{- end }}

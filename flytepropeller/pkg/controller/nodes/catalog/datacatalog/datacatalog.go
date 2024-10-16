@@ -122,7 +122,7 @@ func (m *CatalogClient) Get(ctx context.Context, key catalog.Key) (catalog.Entry
 		logger.Debugf(ctx, "DataCatalog failed to get artifact by tag %+v, err: %+v", tag, err)
 		return catalog.Entry{}, err
 	}
-	logger.Debugf(ctx, "Artifact found %v from tag %v", artifact, tag)
+	logger.Debugf(ctx, "Artifact found %v from tag %v", artifact.GetId(), tag)
 
 	var relevantTag *datacatalog.Tag
 	if len(artifact.GetTags()) > 0 {
@@ -230,7 +230,7 @@ func (m *CatalogClient) createArtifact(ctx context.Context, key catalog.Key, dat
 	createArtifactRequest := &datacatalog.CreateArtifactRequest{Artifact: cachedArtifact}
 	_, err := m.client.CreateArtifact(ctx, createArtifactRequest)
 	if err != nil {
-		logger.Errorf(ctx, "Failed to create Artifact %+v, err: %v", cachedArtifact, err)
+		logger.Errorf(ctx, "Failed to create Artifact %+v, err: %v", cachedArtifact.Id, err)
 		return catalog.Status{}, err
 	}
 	logger.Debugf(ctx, "Created artifact: %v, with %v outputs from execution %+v", cachedArtifact.Id, len(artifactDataList), metadata)
@@ -259,7 +259,7 @@ func (m *CatalogClient) createArtifact(ctx context.Context, key catalog.Key, dat
 		}
 	}
 
-	logger.Debugf(ctx, "Successfully created artifact %+v for key %+v, dataset %+v and execution %+v", cachedArtifact, key, datasetID, metadata)
+	logger.Debugf(ctx, "Successfully created artifact %+v for key %+v, dataset %+v and execution %+v", cachedArtifact.Id, key, datasetID, metadata)
 	return catalog.NewStatus(core.CatalogCacheStatus_CACHE_POPULATED, EventCatalogMetadata(datasetID, tag, nil)), nil
 }
 

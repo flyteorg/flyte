@@ -17,6 +17,8 @@ type RemoteFileOutputReader struct {
 	maxPayloadSize int64
 }
 
+var ErrRemoteFileExceedsMaxSize = errors.New("remote file exceeds max size")
+
 func (r RemoteFileOutputReader) IsError(ctx context.Context) (bool, error) {
 	metadata, err := r.store.Head(ctx, r.outPath.GetErrorPath())
 	if err != nil {
@@ -81,7 +83,7 @@ func (r RemoteFileOutputReader) Exists(ctx context.Context) (bool, error) {
 	}
 	if md.Exists() {
 		if md.Size() > r.maxPayloadSize {
-			return false, errors.Errorf("output file @[%s] is too large [%d] bytes, max allowed [%d] bytes", r.outPath.GetOutputPath(), md.Size(), r.maxPayloadSize)
+			return false, errors.Wrapf(ErrRemoteFileExceedsMaxSize, "output file @[%s] is too large [%d] bytes, max allowed [%d] bytes", r.outPath.GetOutputPath(), md.Size(), r.maxPayloadSize)
 		}
 		return true, nil
 	}
