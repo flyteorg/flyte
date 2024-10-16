@@ -22,6 +22,7 @@ class MatchableResource(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     PLUGIN_OVERRIDE: _ClassVar[MatchableResource]
     WORKFLOW_EXECUTION_CONFIG: _ClassVar[MatchableResource]
     CLUSTER_ASSIGNMENT: _ClassVar[MatchableResource]
+    EXTERNAL_RESOURCE: _ClassVar[MatchableResource]
 TASK_RESOURCE: MatchableResource
 CLUSTER_RESOURCE: MatchableResource
 EXECUTION_QUEUE: MatchableResource
@@ -30,6 +31,7 @@ QUALITY_OF_SERVICE_SPECIFICATION: MatchableResource
 PLUGIN_OVERRIDE: MatchableResource
 WORKFLOW_EXECUTION_CONFIG: MatchableResource
 CLUSTER_ASSIGNMENT: MatchableResource
+EXTERNAL_RESOURCE: MatchableResource
 
 class TaskResourceSpec(_message.Message):
     __slots__ = ["cpu", "gpu", "memory", "storage", "ephemeral_storage"]
@@ -122,8 +124,21 @@ class WorkflowExecutionConfig(_message.Message):
     execution_env_assignments: _containers.RepeatedCompositeFieldContainer[_execution_envs_pb2.ExecutionEnvAssignment]
     def __init__(self, max_parallelism: _Optional[int] = ..., security_context: _Optional[_Union[_security_pb2.SecurityContext, _Mapping]] = ..., raw_output_data_config: _Optional[_Union[_common_pb2.RawOutputDataConfig, _Mapping]] = ..., labels: _Optional[_Union[_common_pb2.Labels, _Mapping]] = ..., annotations: _Optional[_Union[_common_pb2.Annotations, _Mapping]] = ..., interruptible: _Optional[_Union[_wrappers_pb2.BoolValue, _Mapping]] = ..., overwrite_cache: bool = ..., envs: _Optional[_Union[_common_pb2.Envs, _Mapping]] = ..., execution_env_assignments: _Optional[_Iterable[_Union[_execution_envs_pb2.ExecutionEnvAssignment, _Mapping]]] = ...) -> None: ...
 
+class ExternalResourceAttributes(_message.Message):
+    __slots__ = ["connections"]
+    class ConnectionsEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: _security_pb2.Connection
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[_security_pb2.Connection, _Mapping]] = ...) -> None: ...
+    CONNECTIONS_FIELD_NUMBER: _ClassVar[int]
+    connections: _containers.MessageMap[str, _security_pb2.Connection]
+    def __init__(self, connections: _Optional[_Mapping[str, _security_pb2.Connection]] = ...) -> None: ...
+
 class MatchingAttributes(_message.Message):
-    __slots__ = ["task_resource_attributes", "cluster_resource_attributes", "execution_queue_attributes", "execution_cluster_label", "quality_of_service", "plugin_overrides", "workflow_execution_config", "cluster_assignment"]
+    __slots__ = ["task_resource_attributes", "cluster_resource_attributes", "execution_queue_attributes", "execution_cluster_label", "quality_of_service", "plugin_overrides", "workflow_execution_config", "cluster_assignment", "external_resource_attributes"]
     TASK_RESOURCE_ATTRIBUTES_FIELD_NUMBER: _ClassVar[int]
     CLUSTER_RESOURCE_ATTRIBUTES_FIELD_NUMBER: _ClassVar[int]
     EXECUTION_QUEUE_ATTRIBUTES_FIELD_NUMBER: _ClassVar[int]
@@ -132,6 +147,7 @@ class MatchingAttributes(_message.Message):
     PLUGIN_OVERRIDES_FIELD_NUMBER: _ClassVar[int]
     WORKFLOW_EXECUTION_CONFIG_FIELD_NUMBER: _ClassVar[int]
     CLUSTER_ASSIGNMENT_FIELD_NUMBER: _ClassVar[int]
+    EXTERNAL_RESOURCE_ATTRIBUTES_FIELD_NUMBER: _ClassVar[int]
     task_resource_attributes: TaskResourceAttributes
     cluster_resource_attributes: ClusterResourceAttributes
     execution_queue_attributes: ExecutionQueueAttributes
@@ -140,7 +156,8 @@ class MatchingAttributes(_message.Message):
     plugin_overrides: PluginOverrides
     workflow_execution_config: WorkflowExecutionConfig
     cluster_assignment: _cluster_assignment_pb2.ClusterAssignment
-    def __init__(self, task_resource_attributes: _Optional[_Union[TaskResourceAttributes, _Mapping]] = ..., cluster_resource_attributes: _Optional[_Union[ClusterResourceAttributes, _Mapping]] = ..., execution_queue_attributes: _Optional[_Union[ExecutionQueueAttributes, _Mapping]] = ..., execution_cluster_label: _Optional[_Union[ExecutionClusterLabel, _Mapping]] = ..., quality_of_service: _Optional[_Union[_execution_pb2.QualityOfService, _Mapping]] = ..., plugin_overrides: _Optional[_Union[PluginOverrides, _Mapping]] = ..., workflow_execution_config: _Optional[_Union[WorkflowExecutionConfig, _Mapping]] = ..., cluster_assignment: _Optional[_Union[_cluster_assignment_pb2.ClusterAssignment, _Mapping]] = ...) -> None: ...
+    external_resource_attributes: ExternalResourceAttributes
+    def __init__(self, task_resource_attributes: _Optional[_Union[TaskResourceAttributes, _Mapping]] = ..., cluster_resource_attributes: _Optional[_Union[ClusterResourceAttributes, _Mapping]] = ..., execution_queue_attributes: _Optional[_Union[ExecutionQueueAttributes, _Mapping]] = ..., execution_cluster_label: _Optional[_Union[ExecutionClusterLabel, _Mapping]] = ..., quality_of_service: _Optional[_Union[_execution_pb2.QualityOfService, _Mapping]] = ..., plugin_overrides: _Optional[_Union[PluginOverrides, _Mapping]] = ..., workflow_execution_config: _Optional[_Union[WorkflowExecutionConfig, _Mapping]] = ..., cluster_assignment: _Optional[_Union[_cluster_assignment_pb2.ClusterAssignment, _Mapping]] = ..., external_resource_attributes: _Optional[_Union[ExternalResourceAttributes, _Mapping]] = ...) -> None: ...
 
 class MatchableAttributesConfiguration(_message.Message):
     __slots__ = ["attributes", "domain", "project", "workflow", "launch_plan", "org"]

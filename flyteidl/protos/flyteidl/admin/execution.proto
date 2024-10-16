@@ -338,6 +338,9 @@ message ExecutionSpec {
 
     // Execution environment assignments to be set for the execution.
     repeated core.ExecutionEnvAssignment execution_env_assignments = 26;
+
+    // The connection to use for the execution.
+    ExternalResourceAttributes external_resource_attributes = 27;
 }
 
 // Request to terminate an in-progress execution.  This action is irreversible.
