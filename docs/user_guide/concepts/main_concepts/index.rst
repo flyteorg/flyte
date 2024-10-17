@@ -1,7 +1,7 @@
 .. _divedeep:
 
 #############
-Concepts
+Main concepts
 #############
 
 .. toctree::

@@ -69,6 +69,9 @@ jobs:
       - name: Build the documentation
         working-directory: ${{ github.workspace }}/flyte
         shell: bash -el {0}
+        env:
+          # this is a fake key for algolia docsearch to make docs build process pass
+          DOCSEARCH_API_KEY: fake_docsearch_api_key
         run: |
           conda activate monodocs-env
           make docs

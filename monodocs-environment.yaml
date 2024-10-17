@@ -57,6 +57,8 @@ dependencies:
   - snowflake-connector-python  # snowflake
   - vaex-core                   # vaex
   - openai                      # chatgpt
+  - wandb                       # wandb
+  - neptune                     # neptune
 
   - pip:
     - flytekit>=1.12.1b2
@@ -76,8 +78,11 @@ dependencies:
     - whylabs-client              # whylogs
     - ray==2.6.3
     - duckdb
-    - aioboto3>=12.3.0                    # aws sagemaker inference
+    - aioboto3>=12.3.0            # aws sagemaker inference
     - databricks-cli              # mlflow
+    - sphinx-docsearch
+    - pydata_sphinx_theme
+    - perian                      # perian
 
 platforms:
   - linux-64
