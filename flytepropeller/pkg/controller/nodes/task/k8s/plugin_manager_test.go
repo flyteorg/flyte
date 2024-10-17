@@ -165,7 +165,7 @@ func (d *dummyOutputWriter) Put(ctx context.Context, reader io.OutputReader) err
 }
 
 func (d *dummyOutputWriter) GetErrorPath() storage.DataReference {
-	return ""
+	return "s3://errors/error.pb"
 }
 
 func getMockTaskContext(initPhase PluginPhase, wantPhase PluginPhase) pluginsCore.TaskExecutionContext {
