@@ -30,6 +30,7 @@ plugins, authentication, performance tuning, and maintaining Flyte as a producti
 :hidden:
 
 deployment/index
+core_concepts/index
 plugins/index
 agents/index
 configuration/index

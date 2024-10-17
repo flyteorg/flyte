@@ -39,7 +39,7 @@ manage your project's Python requirements.
 
 ````
 
-(getting_started_workflow_code)=
+(first_workflow_code)=
 
 ## `example.py` workflow code
 

@@ -13,4 +13,6 @@ to the {py:mod}`~flytekit.testing` module in the API reference.
 :hidden:
 
 mocking_tasks
+inspecting_executions
+debugging_executions
 ```

@@ -47,9 +47,9 @@ Want to contribute or update an example? Check out the {ref}`Contribution Guide 
   - Provide custom dependencies to run your Flyte entities.
 * - {doc}`🏡 Development Lifecycle <development_lifecycle/index>`
   - Develop and test locally on the demo cluster.
-* - {doc}`⚗️ Testing <testing/index>`
+* - {doc}`⚗️ Testing <development_lifecycle/testing_and_debugging/index>`
   - Test tasks and workflows with Flyte's testing utilities.
-* - {doc}`🚢 Productionizing <productionizing/index>`
+* - {doc}`🚢 Productionizing <development_lifecycle/productionizing/index>`
   - Ship and configure your machine learning pipelines on a production Flyte installation.
 * - {doc}`🏗 Extending <extending/index>`
   - Define custom plugins that aren't currently supported in the Flyte ecosystem.
@@ -62,29 +62,24 @@ Want to contribute or update an example? Check out the {ref}`Contribution Guide 
 
 introduction
 quickstart_guide
-getting_started_with_workflow_development/index
-basics/index
+first_workflow/index
+core_concepts/index
 data_types_and_io/index
-advanced_composition/index
-customizing_dependencies/index
 development_lifecycle/index
-testing/index
-productionizing/index
-extending/index
-flyte_agents/index
-environment_setup
-flyte_fundamentals/index
 ```
 
 ```{toctree}
 :maxdepth: -1
-:name: glossary
-:caption: Glossary
 :hidden:
+:caption: To be organized
 
-concepts/main_concepts/index
-concepts/control_plane/index
-concepts/component_architecture/index
+basics/index
+advanced_composition/index
+customizing_dependencies/index
+environment_setup
+flyte_fundamentals/index
+extending/index
+flyte_agents/index
 ```
 
 ```{toctree}
