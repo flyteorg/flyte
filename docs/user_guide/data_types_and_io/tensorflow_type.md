@@ -9,7 +9,7 @@
 This document outlines the TensorFlow types available in Flyte, which facilitate the integration of TensorFlow models and datasets in Flyte workflows.
 
 ### Import necessary libraries and modules
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/tensorflow_type.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/refs/heads/master/examples/data_types_and_io/data_types_and_io/tensorflow_type.py
 :caption: data_types_and_io/tensorflow_type.py
 :lines: 2-14
 ```
@@ -30,7 +30,7 @@ The `TensorFlowModelTransformer` allows you to save a TensorFlow model to a remo
 ```{note}
 To clone and run the example code on this page, see the [Flytesnacks repo][flytesnacks].
 ```
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/tensorflow_type.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/refs/heads/master/examples/data_types_and_io/data_types_and_io/tensorflow_type.py
 :caption: data_types_and_io/tensorflow_type.py
 :lines: 16-33
 ```
@@ -47,7 +47,7 @@ Flyte supports TFRecord files through the TFRecordFile type, which can handle se
 ### Usage
 The `TensorFlowRecordFileTransformer` enables you to work with single TFRecord files, making it easy to read and write data in TensorFlow's TFRecord format.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/tensorflow_type.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/refs/heads/master/examples/data_types_and_io/data_types_and_io/tensorflow_type.py
 :caption: data_types_and_io/tensorflow_type.py
 :lines: 35-45
 ```
@@ -66,7 +66,7 @@ Flyte supports directories containing multiple TFRecord files through the `TFRec
 The `TensorFlowRecordsDirTransformer` allows you to work with directories of TFRecord files, which is useful for handling large datasets that are split across multiple files.
 
 #### Example
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/tensorflow_type.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/refs/heads/master/examples/data_types_and_io/data_types_and_io/tensorflow_type.py
 :caption: data_types_and_io/tensorflow_type.py
 :lines: 47-57
 ```
