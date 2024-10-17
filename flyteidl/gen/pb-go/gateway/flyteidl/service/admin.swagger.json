@@ -7153,6 +7153,15 @@
         },
         "kind": {
           "$ref": "#/definitions/ExecutionErrorErrorKind"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Timestamp of the error"
+        },
+        "worker": {
+          "type": "string",
+          "title": "Worker that generated the error"
         }
       },
       "description": "Represents the error message from the execution."
