@@ -53,58 +53,72 @@ enum AttributesSource {
   ORG = 5;
 }
 
+// Metadata for an attribute.
+message AttributeMetadata {
+  // Whether the attribute is mutable.
+  AttributeIsMutable is_mutable = 1;
+}
+
+message AttributeIsMutable {
+  // Whether the attribute is mutable.
+  bool value = 1;
+
+  // Reason why the attribute is immutable.
+  string reason = 2;
+}
+
 message TaskResourceAttributesWithSource {
   AttributesSource source = 1;
   TaskResourceAttributes value = 2;
-  bool is_mutable = 3;
+  AttributeMetadata metadata = 3;
 }
 
 message ClusterResourceAttributesWithSource {
   AttributesSource source = 1;
   ClusterResourceAttributes value = 2;
-  bool is_mutable = 3;
+  AttributeMetadata metadata = 3;
 }
 
 message ExecutionQueueAttributesWithSource {
   AttributesSource source = 1;
   ExecutionQueueAttributes value = 2;
-  bool is_mutable = 3;
+  AttributeMetadata metadata = 3;
 }
 
 message ExecutionClusterLabelWithSource {
   AttributesSource source = 1;
   ExecutionClusterLabel value = 2;
-  bool is_mutable = 3;
+  AttributeMetadata metadata = 3;
 }
 
 message QualityOfServiceWithSource {
   AttributesSource source = 1;
   core.QualityOfService value = 2;
-  bool is_mutable = 3;
+  AttributeMetadata metadata = 3;
 }
 
 message PluginOverridesWithSource {
   AttributesSource source = 1;
   PluginOverrides value = 2;
-  bool is_mutable = 3;
+  AttributeMetadata metadata = 3;
 }
 
 message WorkflowExecutionConfigWithSource {
   AttributesSource source = 1;
   WorkflowExecutionConfig value = 2;
-  bool is_mutable = 3;
+  AttributeMetadata metadata = 3;
 }
 
 message ClusterAssignmentWithSource {
   AttributesSource source = 1;
   ClusterAssignment value = 2;
-  bool is_mutable = 3;
+  AttributeMetadata metadata = 3;
 }
 
 message ExternalResourceAttributesWithSource {
   AttributesSource source = 1;
   ExternalResourceAttributes value = 2;
-  bool is_mutable = 3;
+  AttributeMetadata metadata = 3;
 }
 
 // Configuration with source information.
@@ -154,6 +168,15 @@ message ConfigurationGetRequest {
   // Identifier of the configuration to get.
   // +required
   ConfigurationID id = 1;
+
+  // If true, exclude the configuration in the specified level and only get configurations in lower levels.
+  // For example, if the id is org-project-domain, and only_get_lower_level_configuration is true
+  // the configuration would be a merged configuration in the following priority order:
+  // 1. org-project
+  // 2. org
+  // 3. domain
+  // 4. global
+  bool only_get_lower_level_configuration = 2;
 }
 
 // Response of a configuration get request.

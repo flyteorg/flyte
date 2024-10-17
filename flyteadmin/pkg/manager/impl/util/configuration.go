@@ -93,101 +93,142 @@ func mergeConfigurations(current *admin.ConfigurationWithSource, incoming *admin
 	return current
 }
 
-func addConfigurationIsMutable(ctx context.Context, configuration *admin.ConfigurationWithSource, projectConfigurationPlugin plugin.ProjectConfigurationPlugin) (*admin.ConfigurationWithSource, error) {
+// Ensure that all attributes have metadata.
+func ensureAttributesMetadata(configuration *admin.ConfigurationWithSource) *admin.ConfigurationWithSource {
+	if configuration.TaskResourceAttributes.Metadata == nil {
+		configuration.TaskResourceAttributes.Metadata = &admin.AttributeMetadata{}
+	}
+	if configuration.ClusterResourceAttributes.Metadata == nil {
+		configuration.ClusterResourceAttributes.Metadata = &admin.AttributeMetadata{}
+	}
+	if configuration.ExecutionQueueAttributes.Metadata == nil {
+		configuration.ExecutionQueueAttributes.Metadata = &admin.AttributeMetadata{}
+	}
+	if configuration.ExecutionClusterLabel.Metadata == nil {
+		configuration.ExecutionClusterLabel.Metadata = &admin.AttributeMetadata{}
+	}
+	if configuration.QualityOfService.Metadata == nil {
+		configuration.QualityOfService.Metadata = &admin.AttributeMetadata{}
+	}
+	if configuration.PluginOverrides.Metadata == nil {
+		configuration.PluginOverrides.Metadata = &admin.AttributeMetadata{}
+	}
+	if configuration.WorkflowExecutionConfig.Metadata == nil {
+		configuration.WorkflowExecutionConfig.Metadata = &admin.AttributeMetadata{}
+	}
+	if configuration.ClusterAssignment.Metadata == nil {
+		configuration.ClusterAssignment.Metadata = &admin.AttributeMetadata{}
+	}
+	if configuration.ExternalResourceAttributes.Metadata == nil {
+		configuration.ExternalResourceAttributes.Metadata = &admin.AttributeMetadata{}
+	}
+	return configuration
+}
+
+func addConfigurationIsMutable(ctx context.Context, configuration *admin.ConfigurationWithSource, id *admin.ConfigurationID, projectConfigurationPlugin plugin.ProjectConfigurationPlugin) (*admin.ConfigurationWithSource, error) {
 	clusterAssignment := configuration.GetClusterAssignment().GetValue()
-	mutableAttributes, err := projectConfigurationPlugin.GetMutableAttributes(ctx, &plugin.GetMutableAttributesInput{ClusterAssignment: clusterAssignment})
+	attributeIsMutable, err := projectConfigurationPlugin.GetAttributeIsMutable(ctx, &plugin.GetAttributeIsMutable{
+		ClusterAssignment: clusterAssignment,
+		ConfigurationID:   id,
+	})
 	if err != nil {
 		return nil, err
 	}
 
-	configuration.TaskResourceAttributes.IsMutable = mutableAttributes.Has(admin.MatchableResource_TASK_RESOURCE)
-	configuration.ClusterResourceAttributes.IsMutable = mutableAttributes.Has(admin.MatchableResource_CLUSTER_RESOURCE)
-	configuration.ExecutionQueueAttributes.IsMutable = mutableAttributes.Has(admin.MatchableResource_EXECUTION_QUEUE)
-	configuration.ExecutionClusterLabel.IsMutable = mutableAttributes.Has(admin.MatchableResource_EXECUTION_CLUSTER_LABEL)
-	configuration.QualityOfService.IsMutable = mutableAttributes.Has(admin.MatchableResource_QUALITY_OF_SERVICE_SPECIFICATION)
-	configuration.PluginOverrides.IsMutable = mutableAttributes.Has(admin.MatchableResource_PLUGIN_OVERRIDE)
-	configuration.WorkflowExecutionConfig.IsMutable = mutableAttributes.Has(admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG)
-	configuration.ClusterAssignment.IsMutable = mutableAttributes.Has(admin.MatchableResource_CLUSTER_ASSIGNMENT)
-	configuration.ExternalResourceAttributes.IsMutable = mutableAttributes.Has(admin.MatchableResource_EXTERNAL_RESOURCE)
+	configuration.TaskResourceAttributes.Metadata.IsMutable = attributeIsMutable[admin.MatchableResource_TASK_RESOURCE]
+	configuration.ClusterResourceAttributes.Metadata.IsMutable = attributeIsMutable[admin.MatchableResource_CLUSTER_RESOURCE]
+	configuration.ExecutionQueueAttributes.Metadata.IsMutable = attributeIsMutable[admin.MatchableResource_EXECUTION_QUEUE]
+	configuration.ExecutionClusterLabel.Metadata.IsMutable = attributeIsMutable[admin.MatchableResource_EXECUTION_CLUSTER_LABEL]
+	configuration.QualityOfService.Metadata.IsMutable = attributeIsMutable[admin.MatchableResource_QUALITY_OF_SERVICE_SPECIFICATION]
+	configuration.PluginOverrides.Metadata.IsMutable = attributeIsMutable[admin.MatchableResource_PLUGIN_OVERRIDE]
+	configuration.WorkflowExecutionConfig.Metadata.IsMutable = attributeIsMutable[admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG]
+	configuration.ClusterAssignment.Metadata.IsMutable = attributeIsMutable[admin.MatchableResource_CLUSTER_ASSIGNMENT]
+	configuration.ExternalResourceAttributes.Metadata.IsMutable = attributeIsMutable[admin.MatchableResource_EXTERNAL_RESOURCE]
 	return configuration, nil
 }
 
-// GetConfigurationWithSource merges the configuration from higher level to lower level.
+func GetConfiguration(ctx context.Context, document *admin.ConfigurationDocument, id *admin.ConfigurationID, projectConfigurationPlugin plugin.ProjectConfigurationPlugin) (*admin.ConfigurationWithSource, error) {
+	return getConfigurationWithSourceAndMetadata(ctx, document, id, projectConfigurationPlugin, false)
+}
+
+func GetConfigurationOnlyLowerLevel(ctx context.Context, document *admin.ConfigurationDocument, id *admin.ConfigurationID, projectConfigurationPlugin plugin.ProjectConfigurationPlugin) (*admin.ConfigurationWithSource, error) {
+	return getConfigurationWithSourceAndMetadata(ctx, document, id, projectConfigurationPlugin, true)
+}
+
+// getConfigurationWithSourceAndMetadata merges the configuration from higher level to lower level.
 // The order of precedence is org-project-domain > org-project > org > domain > global.
 // This is because org-project-domain, org-project, and org are users' overrides,
 // while domain and global are defaults from the config map.
-func GetConfigurationWithSource(ctx context.Context, document *admin.ConfigurationDocument, id *admin.ConfigurationID, projectConfigurationPlugin plugin.ProjectConfigurationPlugin) (*admin.ConfigurationWithSource, error) {
-	var err error
-	// org-project-domain
-	projectDomainConfiguration := admin.Configuration{}
+// If onlyLowerLevel is true, the first match will be skipped
+// to get the configuration which excludes the specified level.
+func getConfigurationWithSourceAndMetadata(ctx context.Context, document *admin.ConfigurationDocument, id *admin.ConfigurationID, projectConfigurationPlugin plugin.ProjectConfigurationPlugin, onlyLowerLevel bool) (*admin.ConfigurationWithSource, error) {
+	var configurations []*admin.Configuration
+	var configurationLevels []admin.AttributesSource
+	matchFoundAtLevel := false
+	// Helper function to add configuration to the list
+	addConfiguration := func(configurationID *admin.ConfigurationID, configurationLevel admin.AttributesSource) error {
+		// Ensure matchFoundAtLevel is set to true before function returns
+		defer func() {
+			matchFoundAtLevel = true
+		}()
+		// If mode is onlyLowerLevel, we would like to skip the first match
+		if onlyLowerLevel && !matchFoundAtLevel {
+			return nil
+		}
+		configuration, err := GetConfigurationFromDocument(ctx, document, configurationID)
+		if err != nil {
+			return err
+		}
+		configurations = append(configurations, &configuration)
+		configurationLevels = append(configurationLevels, configurationLevel)
+		return nil
+	}
+
+	// Org-Project-Domain
 	if id.Project != "" && id.Domain != "" {
-		projectDomainConfiguration, err = GetConfigurationFromDocument(ctx, document, &admin.ConfigurationID{
+		if err := addConfiguration(&admin.ConfigurationID{
 			Org:     id.Org,
 			Project: id.Project,
 			Domain:  id.Domain,
-		})
-		if err != nil {
+		}, admin.AttributesSource_PROJECT_DOMAIN); err != nil {
 			return nil, err
 		}
 	}
-	// org-project
-	projectConfiguration := admin.Configuration{}
+	// Org-Project
 	if id.Project != "" {
-		projectConfiguration, err = GetConfigurationFromDocument(ctx, document, &admin.ConfigurationID{
+		if err := addConfiguration(&admin.ConfigurationID{
 			Org:     id.Org,
 			Project: id.Project,
-		})
-		if err != nil {
+		}, admin.AttributesSource_PROJECT); err != nil {
 			return nil, err
 		}
 	}
-	// org
-	orgConfiguration, err := GetConfigurationFromDocument(ctx, document, &admin.ConfigurationID{
+	// Org
+	if err := addConfiguration(&admin.ConfigurationID{
 		Org: id.Org,
-	})
-	if err != nil {
+	}, admin.AttributesSource_ORG); err != nil {
 		return nil, err
 	}
-	// domain
-	domainConfiguration := admin.Configuration{}
+	// Domain
 	if id.Domain != "" {
-		domainConfiguration, err = GetConfigurationFromDocument(ctx, document, &admin.ConfigurationID{
+		if err := addConfiguration(&admin.ConfigurationID{
 			Domain: id.Domain,
-		})
-		if err != nil {
+		}, admin.AttributesSource_DOMAIN); err != nil {
 			return nil, err
 		}
 	}
-	// global
-	globalConfiguration, err := GetConfigurationFromDocument(ctx, document, &GlobalConfigurationKey)
-	if err != nil {
+	// Global
+	if err := addConfiguration(&GlobalConfigurationKey, admin.AttributesSource_GLOBAL); err != nil {
 		return nil, err
 	}
 	// Merge configurations from higher level to lower level
-	configuration := addConfigurationSource(&projectDomainConfiguration, admin.AttributesSource_PROJECT_DOMAIN)
-	configuration = mergeConfigurations(configuration, addConfigurationSource(&projectConfiguration, admin.AttributesSource_PROJECT))
-	configuration = mergeConfigurations(configuration, addConfigurationSource(&orgConfiguration, admin.AttributesSource_ORG))
-	configuration = mergeConfigurations(configuration, addConfigurationSource(&domainConfiguration, admin.AttributesSource_DOMAIN))
-	configuration = mergeConfigurations(configuration, addConfigurationSource(&globalConfiguration, admin.AttributesSource_GLOBAL))
-
-	return addConfigurationIsMutable(ctx, configuration, projectConfigurationPlugin)
-}
-
-func GetDefaultConfigurationWithSource(ctx context.Context, document *admin.ConfigurationDocument, domain string, projectConfigurationPlugin plugin.ProjectConfigurationPlugin) (*admin.ConfigurationWithSource, error) {
-	domainConfiguration, err := GetConfigurationFromDocument(ctx, document, &admin.ConfigurationID{
-		Domain: domain,
-	})
-	if err != nil {
-		return nil, err
+	configuration := &admin.ConfigurationWithSource{}
+	for i, conf := range configurations {
+		source := configurationLevels[i]
+		configuration = mergeConfigurations(configuration, addConfigurationSource(conf, source))
 	}
-	globalConfiguration, err := GetConfigurationFromDocument(ctx, document, &GlobalConfigurationKey)
-	if err != nil {
-		return nil, err
-	}
-	configuration := addConfigurationSource(&domainConfiguration, admin.AttributesSource_DOMAIN)
-	configuration = mergeConfigurations(configuration, addConfigurationSource(&globalConfiguration, admin.AttributesSource_GLOBAL))
-
-	return addConfigurationIsMutable(ctx, configuration, projectConfigurationPlugin)
+	configuration = ensureAttributesMetadata(configuration)
+	return addConfigurationIsMutable(ctx, configuration, id, projectConfigurationPlugin)
 }
 
 func GetConfigurationFromDocument(ctx context.Context, document *admin.ConfigurationDocument, id *admin.ConfigurationID) (admin.Configuration, error) {

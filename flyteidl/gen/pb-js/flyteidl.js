@@ -31293,6 +31293,245 @@
                 return values;
             })();
     
+            admin.AttributeMetadata = (function() {
+    
+                /**
+                 * Properties of an AttributeMetadata.
+                 * @memberof flyteidl.admin
+                 * @interface IAttributeMetadata
+                 * @property {flyteidl.admin.IAttributeIsMutable|null} [isMutable] AttributeMetadata isMutable
+                 */
+    
+                /**
+                 * Constructs a new AttributeMetadata.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents an AttributeMetadata.
+                 * @implements IAttributeMetadata
+                 * @constructor
+                 * @param {flyteidl.admin.IAttributeMetadata=} [properties] Properties to set
+                 */
+                function AttributeMetadata(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * AttributeMetadata isMutable.
+                 * @member {flyteidl.admin.IAttributeIsMutable|null|undefined} isMutable
+                 * @memberof flyteidl.admin.AttributeMetadata
+                 * @instance
+                 */
+                AttributeMetadata.prototype.isMutable = null;
+    
+                /**
+                 * Creates a new AttributeMetadata instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.AttributeMetadata
+                 * @static
+                 * @param {flyteidl.admin.IAttributeMetadata=} [properties] Properties to set
+                 * @returns {flyteidl.admin.AttributeMetadata} AttributeMetadata instance
+                 */
+                AttributeMetadata.create = function create(properties) {
+                    return new AttributeMetadata(properties);
+                };
+    
+                /**
+                 * Encodes the specified AttributeMetadata message. Does not implicitly {@link flyteidl.admin.AttributeMetadata.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.AttributeMetadata
+                 * @static
+                 * @param {flyteidl.admin.IAttributeMetadata} message AttributeMetadata message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                AttributeMetadata.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.isMutable != null && message.hasOwnProperty("isMutable"))
+                        $root.flyteidl.admin.AttributeIsMutable.encode(message.isMutable, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes an AttributeMetadata message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.AttributeMetadata
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.AttributeMetadata} AttributeMetadata
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                AttributeMetadata.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.AttributeMetadata();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.isMutable = $root.flyteidl.admin.AttributeIsMutable.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies an AttributeMetadata message.
+                 * @function verify
+                 * @memberof flyteidl.admin.AttributeMetadata
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                AttributeMetadata.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.isMutable != null && message.hasOwnProperty("isMutable")) {
+                        var error = $root.flyteidl.admin.AttributeIsMutable.verify(message.isMutable);
+                        if (error)
+                            return "isMutable." + error;
+                    }
+                    return null;
+                };
+    
+                return AttributeMetadata;
+            })();
+    
+            admin.AttributeIsMutable = (function() {
+    
+                /**
+                 * Properties of an AttributeIsMutable.
+                 * @memberof flyteidl.admin
+                 * @interface IAttributeIsMutable
+                 * @property {boolean|null} [value] AttributeIsMutable value
+                 * @property {string|null} [reason] AttributeIsMutable reason
+                 */
+    
+                /**
+                 * Constructs a new AttributeIsMutable.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents an AttributeIsMutable.
+                 * @implements IAttributeIsMutable
+                 * @constructor
+                 * @param {flyteidl.admin.IAttributeIsMutable=} [properties] Properties to set
+                 */
+                function AttributeIsMutable(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * AttributeIsMutable value.
+                 * @member {boolean} value
+                 * @memberof flyteidl.admin.AttributeIsMutable
+                 * @instance
+                 */
+                AttributeIsMutable.prototype.value = false;
+    
+                /**
+                 * AttributeIsMutable reason.
+                 * @member {string} reason
+                 * @memberof flyteidl.admin.AttributeIsMutable
+                 * @instance
+                 */
+                AttributeIsMutable.prototype.reason = "";
+    
+                /**
+                 * Creates a new AttributeIsMutable instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.AttributeIsMutable
+                 * @static
+                 * @param {flyteidl.admin.IAttributeIsMutable=} [properties] Properties to set
+                 * @returns {flyteidl.admin.AttributeIsMutable} AttributeIsMutable instance
+                 */
+                AttributeIsMutable.create = function create(properties) {
+                    return new AttributeIsMutable(properties);
+                };
+    
+                /**
+                 * Encodes the specified AttributeIsMutable message. Does not implicitly {@link flyteidl.admin.AttributeIsMutable.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.AttributeIsMutable
+                 * @static
+                 * @param {flyteidl.admin.IAttributeIsMutable} message AttributeIsMutable message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                AttributeIsMutable.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.value != null && message.hasOwnProperty("value"))
+                        writer.uint32(/* id 1, wireType 0 =*/8).bool(message.value);
+                    if (message.reason != null && message.hasOwnProperty("reason"))
+                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.reason);
+                    return writer;
+                };
+    
+                /**
+                 * Decodes an AttributeIsMutable message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.AttributeIsMutable
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.AttributeIsMutable} AttributeIsMutable
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                AttributeIsMutable.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.AttributeIsMutable();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.value = reader.bool();
+                            break;
+                        case 2:
+                            message.reason = reader.string();
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies an AttributeIsMutable message.
+                 * @function verify
+                 * @memberof flyteidl.admin.AttributeIsMutable
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                AttributeIsMutable.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.value != null && message.hasOwnProperty("value"))
+                        if (typeof message.value !== "boolean")
+                            return "value: boolean expected";
+                    if (message.reason != null && message.hasOwnProperty("reason"))
+                        if (!$util.isString(message.reason))
+                            return "reason: string expected";
+                    return null;
+                };
+    
+                return AttributeIsMutable;
+            })();
+    
             admin.TaskResourceAttributesWithSource = (function() {
     
                 /**
@@ -31301,7 +31540,7 @@
                  * @interface ITaskResourceAttributesWithSource
                  * @property {flyteidl.admin.AttributesSource|null} [source] TaskResourceAttributesWithSource source
                  * @property {flyteidl.admin.ITaskResourceAttributes|null} [value] TaskResourceAttributesWithSource value
-                 * @property {boolean|null} [isMutable] TaskResourceAttributesWithSource isMutable
+                 * @property {flyteidl.admin.IAttributeMetadata|null} [metadata] TaskResourceAttributesWithSource metadata
                  */
     
                 /**
@@ -31336,12 +31575,12 @@
                 TaskResourceAttributesWithSource.prototype.value = null;
     
                 /**
-                 * TaskResourceAttributesWithSource isMutable.
-                 * @member {boolean} isMutable
+                 * TaskResourceAttributesWithSource metadata.
+                 * @member {flyteidl.admin.IAttributeMetadata|null|undefined} metadata
                  * @memberof flyteidl.admin.TaskResourceAttributesWithSource
                  * @instance
                  */
-                TaskResourceAttributesWithSource.prototype.isMutable = false;
+                TaskResourceAttributesWithSource.prototype.metadata = null;
     
                 /**
                  * Creates a new TaskResourceAttributesWithSource instance using the specified properties.
@@ -31371,8 +31610,8 @@
                         writer.uint32(/* id 1, wireType 0 =*/8).int32(message.source);
                     if (message.value != null && message.hasOwnProperty("value"))
                         $root.flyteidl.admin.TaskResourceAttributes.encode(message.value, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
-                    if (message.isMutable != null && message.hasOwnProperty("isMutable"))
-                        writer.uint32(/* id 3, wireType 0 =*/24).bool(message.isMutable);
+                    if (message.metadata != null && message.hasOwnProperty("metadata"))
+                        $root.flyteidl.admin.AttributeMetadata.encode(message.metadata, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
                     return writer;
                 };
     
@@ -31401,7 +31640,7 @@
                             message.value = $root.flyteidl.admin.TaskResourceAttributes.decode(reader, reader.uint32());
                             break;
                         case 3:
-                            message.isMutable = reader.bool();
+                            message.metadata = $root.flyteidl.admin.AttributeMetadata.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -31439,9 +31678,11 @@
                         if (error)
                             return "value." + error;
                     }
-                    if (message.isMutable != null && message.hasOwnProperty("isMutable"))
-                        if (typeof message.isMutable !== "boolean")
-                            return "isMutable: boolean expected";
+                    if (message.metadata != null && message.hasOwnProperty("metadata")) {
+                        var error = $root.flyteidl.admin.AttributeMetadata.verify(message.metadata);
+                        if (error)
+                            return "metadata." + error;
+                    }
                     return null;
                 };
     
@@ -31456,7 +31697,7 @@
                  * @interface IClusterResourceAttributesWithSource
                  * @property {flyteidl.admin.AttributesSource|null} [source] ClusterResourceAttributesWithSource source
                  * @property {flyteidl.admin.IClusterResourceAttributes|null} [value] ClusterResourceAttributesWithSource value
-                 * @property {boolean|null} [isMutable] ClusterResourceAttributesWithSource isMutable
+                 * @property {flyteidl.admin.IAttributeMetadata|null} [metadata] ClusterResourceAttributesWithSource metadata
                  */
     
                 /**
@@ -31491,12 +31732,12 @@
                 ClusterResourceAttributesWithSource.prototype.value = null;
     
                 /**
-                 * ClusterResourceAttributesWithSource isMutable.
-                 * @member {boolean} isMutable
+                 * ClusterResourceAttributesWithSource metadata.
+                 * @member {flyteidl.admin.IAttributeMetadata|null|undefined} metadata
                  * @memberof flyteidl.admin.ClusterResourceAttributesWithSource
                  * @instance
                  */
-                ClusterResourceAttributesWithSource.prototype.isMutable = false;
+                ClusterResourceAttributesWithSource.prototype.metadata = null;
     
                 /**
                  * Creates a new ClusterResourceAttributesWithSource instance using the specified properties.
@@ -31526,8 +31767,8 @@
                         writer.uint32(/* id 1, wireType 0 =*/8).int32(message.source);
                     if (message.value != null && message.hasOwnProperty("value"))
                         $root.flyteidl.admin.ClusterResourceAttributes.encode(message.value, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
-                    if (message.isMutable != null && message.hasOwnProperty("isMutable"))
-                        writer.uint32(/* id 3, wireType 0 =*/24).bool(message.isMutable);
+                    if (message.metadata != null && message.hasOwnProperty("metadata"))
+                        $root.flyteidl.admin.AttributeMetadata.encode(message.metadata, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
                     return writer;
                 };
     
@@ -31556,7 +31797,7 @@
                             message.value = $root.flyteidl.admin.ClusterResourceAttributes.decode(reader, reader.uint32());
                             break;
                         case 3:
-                            message.isMutable = reader.bool();
+                            message.metadata = $root.flyteidl.admin.AttributeMetadata.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -31594,9 +31835,11 @@
                         if (error)
                             return "value." + error;
                     }
-                    if (message.isMutable != null && message.hasOwnProperty("isMutable"))
-                        if (typeof message.isMutable !== "boolean")
-                            return "isMutable: boolean expected";
+                    if (message.metadata != null && message.hasOwnProperty("metadata")) {
+                        var error = $root.flyteidl.admin.AttributeMetadata.verify(message.metadata);
+                        if (error)
+                            return "metadata." + error;
+                    }
                     return null;
                 };
     
@@ -31611,7 +31854,7 @@
                  * @interface IExecutionQueueAttributesWithSource
                  * @property {flyteidl.admin.AttributesSource|null} [source] ExecutionQueueAttributesWithSource source
                  * @property {flyteidl.admin.IExecutionQueueAttributes|null} [value] ExecutionQueueAttributesWithSource value
-                 * @property {boolean|null} [isMutable] ExecutionQueueAttributesWithSource isMutable
+                 * @property {flyteidl.admin.IAttributeMetadata|null} [metadata] ExecutionQueueAttributesWithSource metadata
                  */
     
                 /**
@@ -31646,12 +31889,12 @@
                 ExecutionQueueAttributesWithSource.prototype.value = null;
     
                 /**
-                 * ExecutionQueueAttributesWithSource isMutable.
-                 * @member {boolean} isMutable
+                 * ExecutionQueueAttributesWithSource metadata.
+                 * @member {flyteidl.admin.IAttributeMetadata|null|undefined} metadata
                  * @memberof flyteidl.admin.ExecutionQueueAttributesWithSource
                  * @instance
                  */
-                ExecutionQueueAttributesWithSource.prototype.isMutable = false;
+                ExecutionQueueAttributesWithSource.prototype.metadata = null;
     
                 /**
                  * Creates a new ExecutionQueueAttributesWithSource instance using the specified properties.
@@ -31681,8 +31924,8 @@
                         writer.uint32(/* id 1, wireType 0 =*/8).int32(message.source);
                     if (message.value != null && message.hasOwnProperty("value"))
                         $root.flyteidl.admin.ExecutionQueueAttributes.encode(message.value, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
-                    if (message.isMutable != null && message.hasOwnProperty("isMutable"))
-                        writer.uint32(/* id 3, wireType 0 =*/24).bool(message.isMutable);
+                    if (message.metadata != null && message.hasOwnProperty("metadata"))
+                        $root.flyteidl.admin.AttributeMetadata.encode(message.metadata, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
                     return writer;
                 };
     
@@ -31711,7 +31954,7 @@
                             message.value = $root.flyteidl.admin.ExecutionQueueAttributes.decode(reader, reader.uint32());
                             break;
                         case 3:
-                            message.isMutable = reader.bool();
+                            message.metadata = $root.flyteidl.admin.AttributeMetadata.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -31749,9 +31992,11 @@
                         if (error)
                             return "value." + error;
                     }
-                    if (message.isMutable != null && message.hasOwnProperty("isMutable"))
-                        if (typeof message.isMutable !== "boolean")
-                            return "isMutable: boolean expected";
+                    if (message.metadata != null && message.hasOwnProperty("metadata")) {
+                        var error = $root.flyteidl.admin.AttributeMetadata.verify(message.metadata);
+                        if (error)
+                            return "metadata." + error;
+                    }
                     return null;
                 };
     
@@ -31766,7 +32011,7 @@
                  * @interface IExecutionClusterLabelWithSource
                  * @property {flyteidl.admin.AttributesSource|null} [source] ExecutionClusterLabelWithSource source
                  * @property {flyteidl.admin.IExecutionClusterLabel|null} [value] ExecutionClusterLabelWithSource value
-                 * @property {boolean|null} [isMutable] ExecutionClusterLabelWithSource isMutable
+                 * @property {flyteidl.admin.IAttributeMetadata|null} [metadata] ExecutionClusterLabelWithSource metadata
                  */
     
                 /**
@@ -31801,12 +32046,12 @@
                 ExecutionClusterLabelWithSource.prototype.value = null;
     
                 /**
-                 * ExecutionClusterLabelWithSource isMutable.
-                 * @member {boolean} isMutable
+                 * ExecutionClusterLabelWithSource metadata.
+                 * @member {flyteidl.admin.IAttributeMetadata|null|undefined} metadata
                  * @memberof flyteidl.admin.ExecutionClusterLabelWithSource
                  * @instance
                  */
-                ExecutionClusterLabelWithSource.prototype.isMutable = false;
+                ExecutionClusterLabelWithSource.prototype.metadata = null;
     
                 /**
                  * Creates a new ExecutionClusterLabelWithSource instance using the specified properties.
@@ -31836,8 +32081,8 @@
                         writer.uint32(/* id 1, wireType 0 =*/8).int32(message.source);
                     if (message.value != null && message.hasOwnProperty("value"))
                         $root.flyteidl.admin.ExecutionClusterLabel.encode(message.value, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
-                    if (message.isMutable != null && message.hasOwnProperty("isMutable"))
-                        writer.uint32(/* id 3, wireType 0 =*/24).bool(message.isMutable);
+                    if (message.metadata != null && message.hasOwnProperty("metadata"))
+                        $root.flyteidl.admin.AttributeMetadata.encode(message.metadata, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
                     return writer;
                 };
     
@@ -31866,7 +32111,7 @@
                             message.value = $root.flyteidl.admin.ExecutionClusterLabel.decode(reader, reader.uint32());
                             break;
                         case 3:
-                            message.isMutable = reader.bool();
+                            message.metadata = $root.flyteidl.admin.AttributeMetadata.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -31904,9 +32149,11 @@
                         if (error)
                             return "value." + error;
                     }
-                    if (message.isMutable != null && message.hasOwnProperty("isMutable"))
-                        if (typeof message.isMutable !== "boolean")
-                            return "isMutable: boolean expected";
+                    if (message.metadata != null && message.hasOwnProperty("metadata")) {
+                        var error = $root.flyteidl.admin.AttributeMetadata.verify(message.metadata);
+                        if (error)
+                            return "metadata." + error;
+                    }
                     return null;
                 };
     
@@ -31921,7 +32168,7 @@
                  * @interface IQualityOfServiceWithSource
                  * @property {flyteidl.admin.AttributesSource|null} [source] QualityOfServiceWithSource source
                  * @property {flyteidl.core.IQualityOfService|null} [value] QualityOfServiceWithSource value
-                 * @property {boolean|null} [isMutable] QualityOfServiceWithSource isMutable
+                 * @property {flyteidl.admin.IAttributeMetadata|null} [metadata] QualityOfServiceWithSource metadata
                  */
     
                 /**
@@ -31956,12 +32203,12 @@
                 QualityOfServiceWithSource.prototype.value = null;
     
                 /**
-                 * QualityOfServiceWithSource isMutable.
-                 * @member {boolean} isMutable
+                 * QualityOfServiceWithSource metadata.
+                 * @member {flyteidl.admin.IAttributeMetadata|null|undefined} metadata
                  * @memberof flyteidl.admin.QualityOfServiceWithSource
                  * @instance
                  */
-                QualityOfServiceWithSource.prototype.isMutable = false;
+                QualityOfServiceWithSource.prototype.metadata = null;
     
                 /**
                  * Creates a new QualityOfServiceWithSource instance using the specified properties.
@@ -31991,8 +32238,8 @@
                         writer.uint32(/* id 1, wireType 0 =*/8).int32(message.source);
                     if (message.value != null && message.hasOwnProperty("value"))
                         $root.flyteidl.core.QualityOfService.encode(message.value, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
-                    if (message.isMutable != null && message.hasOwnProperty("isMutable"))
-                        writer.uint32(/* id 3, wireType 0 =*/24).bool(message.isMutable);
+                    if (message.metadata != null && message.hasOwnProperty("metadata"))
+                        $root.flyteidl.admin.AttributeMetadata.encode(message.metadata, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
                     return writer;
                 };
     
@@ -32021,7 +32268,7 @@
                             message.value = $root.flyteidl.core.QualityOfService.decode(reader, reader.uint32());
                             break;
                         case 3:
-                            message.isMutable = reader.bool();
+                            message.metadata = $root.flyteidl.admin.AttributeMetadata.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -32059,9 +32306,11 @@
                         if (error)
                             return "value." + error;
                     }
-                    if (message.isMutable != null && message.hasOwnProperty("isMutable"))
-                        if (typeof message.isMutable !== "boolean")
-                            return "isMutable: boolean expected";
+                    if (message.metadata != null && message.hasOwnProperty("metadata")) {
+                        var error = $root.flyteidl.admin.AttributeMetadata.verify(message.metadata);
+                        if (error)
+                            return "metadata." + error;
+                    }
                     return null;
                 };
     
@@ -32076,7 +32325,7 @@
                  * @interface IPluginOverridesWithSource
                  * @property {flyteidl.admin.AttributesSource|null} [source] PluginOverridesWithSource source
                  * @property {flyteidl.admin.IPluginOverrides|null} [value] PluginOverridesWithSource value
-                 * @property {boolean|null} [isMutable] PluginOverridesWithSource isMutable
+                 * @property {flyteidl.admin.IAttributeMetadata|null} [metadata] PluginOverridesWithSource metadata
                  */
     
                 /**
@@ -32111,12 +32360,12 @@
                 PluginOverridesWithSource.prototype.value = null;
     
                 /**
-                 * PluginOverridesWithSource isMutable.
-                 * @member {boolean} isMutable
+                 * PluginOverridesWithSource metadata.
+                 * @member {flyteidl.admin.IAttributeMetadata|null|undefined} metadata
                  * @memberof flyteidl.admin.PluginOverridesWithSource
                  * @instance
                  */
-                PluginOverridesWithSource.prototype.isMutable = false;
+                PluginOverridesWithSource.prototype.metadata = null;
     
                 /**
                  * Creates a new PluginOverridesWithSource instance using the specified properties.
@@ -32146,8 +32395,8 @@
                         writer.uint32(/* id 1, wireType 0 =*/8).int32(message.source);
                     if (message.value != null && message.hasOwnProperty("value"))
                         $root.flyteidl.admin.PluginOverrides.encode(message.value, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
-                    if (message.isMutable != null && message.hasOwnProperty("isMutable"))
-                        writer.uint32(/* id 3, wireType 0 =*/24).bool(message.isMutable);
+                    if (message.metadata != null && message.hasOwnProperty("metadata"))
+                        $root.flyteidl.admin.AttributeMetadata.encode(message.metadata, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
                     return writer;
                 };
     
@@ -32176,7 +32425,7 @@
                             message.value = $root.flyteidl.admin.PluginOverrides.decode(reader, reader.uint32());
                             break;
                         case 3:
-                            message.isMutable = reader.bool();
+                            message.metadata = $root.flyteidl.admin.AttributeMetadata.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -32214,9 +32463,11 @@
                         if (error)
                             return "value." + error;
                     }
-                    if (message.isMutable != null && message.hasOwnProperty("isMutable"))
-                        if (typeof message.isMutable !== "boolean")
-                            return "isMutable: boolean expected";
+                    if (message.metadata != null && message.hasOwnProperty("metadata")) {
+                        var error = $root.flyteidl.admin.AttributeMetadata.verify(message.metadata);
+                        if (error)
+                            return "metadata." + error;
+                    }
                     return null;
                 };
     
@@ -32231,7 +32482,7 @@
                  * @interface IWorkflowExecutionConfigWithSource
                  * @property {flyteidl.admin.AttributesSource|null} [source] WorkflowExecutionConfigWithSource source
                  * @property {flyteidl.admin.IWorkflowExecutionConfig|null} [value] WorkflowExecutionConfigWithSource value
-                 * @property {boolean|null} [isMutable] WorkflowExecutionConfigWithSource isMutable
+                 * @property {flyteidl.admin.IAttributeMetadata|null} [metadata] WorkflowExecutionConfigWithSource metadata
                  */
     
                 /**
@@ -32266,12 +32517,12 @@
                 WorkflowExecutionConfigWithSource.prototype.value = null;
     
                 /**
-                 * WorkflowExecutionConfigWithSource isMutable.
-                 * @member {boolean} isMutable
+                 * WorkflowExecutionConfigWithSource metadata.
+                 * @member {flyteidl.admin.IAttributeMetadata|null|undefined} metadata
                  * @memberof flyteidl.admin.WorkflowExecutionConfigWithSource
                  * @instance
                  */
-                WorkflowExecutionConfigWithSource.prototype.isMutable = false;
+                WorkflowExecutionConfigWithSource.prototype.metadata = null;
     
                 /**
                  * Creates a new WorkflowExecutionConfigWithSource instance using the specified properties.
@@ -32301,8 +32552,8 @@
                         writer.uint32(/* id 1, wireType 0 =*/8).int32(message.source);
                     if (message.value != null && message.hasOwnProperty("value"))
                         $root.flyteidl.admin.WorkflowExecutionConfig.encode(message.value, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
-                    if (message.isMutable != null && message.hasOwnProperty("isMutable"))
-                        writer.uint32(/* id 3, wireType 0 =*/24).bool(message.isMutable);
+                    if (message.metadata != null && message.hasOwnProperty("metadata"))
+                        $root.flyteidl.admin.AttributeMetadata.encode(message.metadata, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
                     return writer;
                 };
     
@@ -32331,7 +32582,7 @@
                             message.value = $root.flyteidl.admin.WorkflowExecutionConfig.decode(reader, reader.uint32());
                             break;
                         case 3:
-                            message.isMutable = reader.bool();
+                            message.metadata = $root.flyteidl.admin.AttributeMetadata.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -32369,9 +32620,11 @@
                         if (error)
                             return "value." + error;
                     }
-                    if (message.isMutable != null && message.hasOwnProperty("isMutable"))
-                        if (typeof message.isMutable !== "boolean")
-                            return "isMutable: boolean expected";
+                    if (message.metadata != null && message.hasOwnProperty("metadata")) {
+                        var error = $root.flyteidl.admin.AttributeMetadata.verify(message.metadata);
+                        if (error)
+                            return "metadata." + error;
+                    }
                     return null;
                 };
     
@@ -32386,7 +32639,7 @@
                  * @interface IClusterAssignmentWithSource
                  * @property {flyteidl.admin.AttributesSource|null} [source] ClusterAssignmentWithSource source
                  * @property {flyteidl.admin.IClusterAssignment|null} [value] ClusterAssignmentWithSource value
-                 * @property {boolean|null} [isMutable] ClusterAssignmentWithSource isMutable
+                 * @property {flyteidl.admin.IAttributeMetadata|null} [metadata] ClusterAssignmentWithSource metadata
                  */
     
                 /**
@@ -32421,12 +32674,12 @@
                 ClusterAssignmentWithSource.prototype.value = null;
     
                 /**
-                 * ClusterAssignmentWithSource isMutable.
-                 * @member {boolean} isMutable
+                 * ClusterAssignmentWithSource metadata.
+                 * @member {flyteidl.admin.IAttributeMetadata|null|undefined} metadata
                  * @memberof flyteidl.admin.ClusterAssignmentWithSource
                  * @instance
                  */
-                ClusterAssignmentWithSource.prototype.isMutable = false;
+                ClusterAssignmentWithSource.prototype.metadata = null;
     
                 /**
                  * Creates a new ClusterAssignmentWithSource instance using the specified properties.
@@ -32456,8 +32709,8 @@
                         writer.uint32(/* id 1, wireType 0 =*/8).int32(message.source);
                     if (message.value != null && message.hasOwnProperty("value"))
                         $root.flyteidl.admin.ClusterAssignment.encode(message.value, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
-                    if (message.isMutable != null && message.hasOwnProperty("isMutable"))
-                        writer.uint32(/* id 3, wireType 0 =*/24).bool(message.isMutable);
+                    if (message.metadata != null && message.hasOwnProperty("metadata"))
+                        $root.flyteidl.admin.AttributeMetadata.encode(message.metadata, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
                     return writer;
                 };
     
@@ -32486,7 +32739,7 @@
                             message.value = $root.flyteidl.admin.ClusterAssignment.decode(reader, reader.uint32());
                             break;
                         case 3:
-                            message.isMutable = reader.bool();
+                            message.metadata = $root.flyteidl.admin.AttributeMetadata.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -32524,9 +32777,11 @@
                         if (error)
                             return "value." + error;
                     }
-                    if (message.isMutable != null && message.hasOwnProperty("isMutable"))
-                        if (typeof message.isMutable !== "boolean")
-                            return "isMutable: boolean expected";
+                    if (message.metadata != null && message.hasOwnProperty("metadata")) {
+                        var error = $root.flyteidl.admin.AttributeMetadata.verify(message.metadata);
+                        if (error)
+                            return "metadata." + error;
+                    }
                     return null;
                 };
     
@@ -32541,7 +32796,7 @@
                  * @interface IExternalResourceAttributesWithSource
                  * @property {flyteidl.admin.AttributesSource|null} [source] ExternalResourceAttributesWithSource source
                  * @property {flyteidl.admin.IExternalResourceAttributes|null} [value] ExternalResourceAttributesWithSource value
-                 * @property {boolean|null} [isMutable] ExternalResourceAttributesWithSource isMutable
+                 * @property {flyteidl.admin.IAttributeMetadata|null} [metadata] ExternalResourceAttributesWithSource metadata
                  */
     
                 /**
@@ -32576,12 +32831,12 @@
                 ExternalResourceAttributesWithSource.prototype.value = null;
     
                 /**
-                 * ExternalResourceAttributesWithSource isMutable.
-                 * @member {boolean} isMutable
+                 * ExternalResourceAttributesWithSource metadata.
+                 * @member {flyteidl.admin.IAttributeMetadata|null|undefined} metadata
                  * @memberof flyteidl.admin.ExternalResourceAttributesWithSource
                  * @instance
                  */
-                ExternalResourceAttributesWithSource.prototype.isMutable = false;
+                ExternalResourceAttributesWithSource.prototype.metadata = null;
     
                 /**
                  * Creates a new ExternalResourceAttributesWithSource instance using the specified properties.
@@ -32611,8 +32866,8 @@
                         writer.uint32(/* id 1, wireType 0 =*/8).int32(message.source);
                     if (message.value != null && message.hasOwnProperty("value"))
                         $root.flyteidl.admin.ExternalResourceAttributes.encode(message.value, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
-                    if (message.isMutable != null && message.hasOwnProperty("isMutable"))
-                        writer.uint32(/* id 3, wireType 0 =*/24).bool(message.isMutable);
+                    if (message.metadata != null && message.hasOwnProperty("metadata"))
+                        $root.flyteidl.admin.AttributeMetadata.encode(message.metadata, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
                     return writer;
                 };
     
@@ -32641,7 +32896,7 @@
                             message.value = $root.flyteidl.admin.ExternalResourceAttributes.decode(reader, reader.uint32());
                             break;
                         case 3:
-                            message.isMutable = reader.bool();
+                            message.metadata = $root.flyteidl.admin.AttributeMetadata.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -32679,9 +32934,11 @@
                         if (error)
                             return "value." + error;
                     }
-                    if (message.isMutable != null && message.hasOwnProperty("isMutable"))
-                        if (typeof message.isMutable !== "boolean")
-                            return "isMutable: boolean expected";
+                    if (message.metadata != null && message.hasOwnProperty("metadata")) {
+                        var error = $root.flyteidl.admin.AttributeMetadata.verify(message.metadata);
+                        if (error)
+                            return "metadata." + error;
+                    }
                     return null;
                 };
     
@@ -33223,6 +33480,7 @@
                  * @memberof flyteidl.admin
                  * @interface IConfigurationGetRequest
                  * @property {flyteidl.admin.IConfigurationID|null} [id] ConfigurationGetRequest id
+                 * @property {boolean|null} [onlyGetLowerLevelConfiguration] ConfigurationGetRequest onlyGetLowerLevelConfiguration
                  */
     
                 /**
@@ -33247,6 +33505,14 @@
                  * @instance
                  */
                 ConfigurationGetRequest.prototype.id = null;
+    
+                /**
+                 * ConfigurationGetRequest onlyGetLowerLevelConfiguration.
+                 * @member {boolean} onlyGetLowerLevelConfiguration
+                 * @memberof flyteidl.admin.ConfigurationGetRequest
+                 * @instance
+                 */
+                ConfigurationGetRequest.prototype.onlyGetLowerLevelConfiguration = false;
     
                 /**
                  * Creates a new ConfigurationGetRequest instance using the specified properties.
@@ -33274,6 +33540,8 @@
                         writer = $Writer.create();
                     if (message.id != null && message.hasOwnProperty("id"))
                         $root.flyteidl.admin.ConfigurationID.encode(message.id, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.onlyGetLowerLevelConfiguration != null && message.hasOwnProperty("onlyGetLowerLevelConfiguration"))
+                        writer.uint32(/* id 2, wireType 0 =*/16).bool(message.onlyGetLowerLevelConfiguration);
                     return writer;
                 };
     
@@ -33297,6 +33565,9 @@
                         switch (tag >>> 3) {
                         case 1:
                             message.id = $root.flyteidl.admin.ConfigurationID.decode(reader, reader.uint32());
+                            break;
+                        case 2:
+                            message.onlyGetLowerLevelConfiguration = reader.bool();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -33322,6 +33593,9 @@
                         if (error)
                             return "id." + error;
                     }
+                    if (message.onlyGetLowerLevelConfiguration != null && message.hasOwnProperty("onlyGetLowerLevelConfiguration"))
+                        if (typeof message.onlyGetLowerLevelConfiguration !== "boolean")
+                            return "onlyGetLowerLevelConfiguration: boolean expected";
                     return null;
                 };
     

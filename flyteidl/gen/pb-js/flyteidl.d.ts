@@ -12858,6 +12858,116 @@ export namespace flyteidl {
             ORG = 5
         }
 
+        /** Properties of an AttributeMetadata. */
+        interface IAttributeMetadata {
+
+            /** AttributeMetadata isMutable */
+            isMutable?: (flyteidl.admin.IAttributeIsMutable|null);
+        }
+
+        /** Represents an AttributeMetadata. */
+        class AttributeMetadata implements IAttributeMetadata {
+
+            /**
+             * Constructs a new AttributeMetadata.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IAttributeMetadata);
+
+            /** AttributeMetadata isMutable. */
+            public isMutable?: (flyteidl.admin.IAttributeIsMutable|null);
+
+            /**
+             * Creates a new AttributeMetadata instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns AttributeMetadata instance
+             */
+            public static create(properties?: flyteidl.admin.IAttributeMetadata): flyteidl.admin.AttributeMetadata;
+
+            /**
+             * Encodes the specified AttributeMetadata message. Does not implicitly {@link flyteidl.admin.AttributeMetadata.verify|verify} messages.
+             * @param message AttributeMetadata message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IAttributeMetadata, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an AttributeMetadata message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns AttributeMetadata
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.AttributeMetadata;
+
+            /**
+             * Verifies an AttributeMetadata message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of an AttributeIsMutable. */
+        interface IAttributeIsMutable {
+
+            /** AttributeIsMutable value */
+            value?: (boolean|null);
+
+            /** AttributeIsMutable reason */
+            reason?: (string|null);
+        }
+
+        /** Represents an AttributeIsMutable. */
+        class AttributeIsMutable implements IAttributeIsMutable {
+
+            /**
+             * Constructs a new AttributeIsMutable.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IAttributeIsMutable);
+
+            /** AttributeIsMutable value. */
+            public value: boolean;
+
+            /** AttributeIsMutable reason. */
+            public reason: string;
+
+            /**
+             * Creates a new AttributeIsMutable instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns AttributeIsMutable instance
+             */
+            public static create(properties?: flyteidl.admin.IAttributeIsMutable): flyteidl.admin.AttributeIsMutable;
+
+            /**
+             * Encodes the specified AttributeIsMutable message. Does not implicitly {@link flyteidl.admin.AttributeIsMutable.verify|verify} messages.
+             * @param message AttributeIsMutable message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IAttributeIsMutable, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an AttributeIsMutable message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns AttributeIsMutable
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.AttributeIsMutable;
+
+            /**
+             * Verifies an AttributeIsMutable message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a TaskResourceAttributesWithSource. */
         interface ITaskResourceAttributesWithSource {
 
@@ -12867,8 +12977,8 @@ export namespace flyteidl {
             /** TaskResourceAttributesWithSource value */
             value?: (flyteidl.admin.ITaskResourceAttributes|null);
 
-            /** TaskResourceAttributesWithSource isMutable */
-            isMutable?: (boolean|null);
+            /** TaskResourceAttributesWithSource metadata */
+            metadata?: (flyteidl.admin.IAttributeMetadata|null);
         }
 
         /** Represents a TaskResourceAttributesWithSource. */
@@ -12886,8 +12996,8 @@ export namespace flyteidl {
             /** TaskResourceAttributesWithSource value. */
             public value?: (flyteidl.admin.ITaskResourceAttributes|null);
 
-            /** TaskResourceAttributesWithSource isMutable. */
-            public isMutable: boolean;
+            /** TaskResourceAttributesWithSource metadata. */
+            public metadata?: (flyteidl.admin.IAttributeMetadata|null);
 
             /**
              * Creates a new TaskResourceAttributesWithSource instance using the specified properties.
@@ -12931,8 +13041,8 @@ export namespace flyteidl {
             /** ClusterResourceAttributesWithSource value */
             value?: (flyteidl.admin.IClusterResourceAttributes|null);
 
-            /** ClusterResourceAttributesWithSource isMutable */
-            isMutable?: (boolean|null);
+            /** ClusterResourceAttributesWithSource metadata */
+            metadata?: (flyteidl.admin.IAttributeMetadata|null);
         }
 
         /** Represents a ClusterResourceAttributesWithSource. */
@@ -12950,8 +13060,8 @@ export namespace flyteidl {
             /** ClusterResourceAttributesWithSource value. */
             public value?: (flyteidl.admin.IClusterResourceAttributes|null);
 
-            /** ClusterResourceAttributesWithSource isMutable. */
-            public isMutable: boolean;
+            /** ClusterResourceAttributesWithSource metadata. */
+            public metadata?: (flyteidl.admin.IAttributeMetadata|null);
 
             /**
              * Creates a new ClusterResourceAttributesWithSource instance using the specified properties.
@@ -12995,8 +13105,8 @@ export namespace flyteidl {
             /** ExecutionQueueAttributesWithSource value */
             value?: (flyteidl.admin.IExecutionQueueAttributes|null);
 
-            /** ExecutionQueueAttributesWithSource isMutable */
-            isMutable?: (boolean|null);
+            /** ExecutionQueueAttributesWithSource metadata */
+            metadata?: (flyteidl.admin.IAttributeMetadata|null);
         }
 
         /** Represents an ExecutionQueueAttributesWithSource. */
@@ -13014,8 +13124,8 @@ export namespace flyteidl {
             /** ExecutionQueueAttributesWithSource value. */
             public value?: (flyteidl.admin.IExecutionQueueAttributes|null);
 
-            /** ExecutionQueueAttributesWithSource isMutable. */
-            public isMutable: boolean;
+            /** ExecutionQueueAttributesWithSource metadata. */
+            public metadata?: (flyteidl.admin.IAttributeMetadata|null);
 
             /**
              * Creates a new ExecutionQueueAttributesWithSource instance using the specified properties.
@@ -13059,8 +13169,8 @@ export namespace flyteidl {
             /** ExecutionClusterLabelWithSource value */
             value?: (flyteidl.admin.IExecutionClusterLabel|null);
 
-            /** ExecutionClusterLabelWithSource isMutable */
-            isMutable?: (boolean|null);
+            /** ExecutionClusterLabelWithSource metadata */
+            metadata?: (flyteidl.admin.IAttributeMetadata|null);
         }
 
         /** Represents an ExecutionClusterLabelWithSource. */
@@ -13078,8 +13188,8 @@ export namespace flyteidl {
             /** ExecutionClusterLabelWithSource value. */
             public value?: (flyteidl.admin.IExecutionClusterLabel|null);
 
-            /** ExecutionClusterLabelWithSource isMutable. */
-            public isMutable: boolean;
+            /** ExecutionClusterLabelWithSource metadata. */
+            public metadata?: (flyteidl.admin.IAttributeMetadata|null);
 
             /**
              * Creates a new ExecutionClusterLabelWithSource instance using the specified properties.
@@ -13123,8 +13233,8 @@ export namespace flyteidl {
             /** QualityOfServiceWithSource value */
             value?: (flyteidl.core.IQualityOfService|null);
 
-            /** QualityOfServiceWithSource isMutable */
-            isMutable?: (boolean|null);
+            /** QualityOfServiceWithSource metadata */
+            metadata?: (flyteidl.admin.IAttributeMetadata|null);
         }
 
         /** Represents a QualityOfServiceWithSource. */
@@ -13142,8 +13252,8 @@ export namespace flyteidl {
             /** QualityOfServiceWithSource value. */
             public value?: (flyteidl.core.IQualityOfService|null);
 
-            /** QualityOfServiceWithSource isMutable. */
-            public isMutable: boolean;
+            /** QualityOfServiceWithSource metadata. */
+            public metadata?: (flyteidl.admin.IAttributeMetadata|null);
 
             /**
              * Creates a new QualityOfServiceWithSource instance using the specified properties.
@@ -13187,8 +13297,8 @@ export namespace flyteidl {
             /** PluginOverridesWithSource value */
             value?: (flyteidl.admin.IPluginOverrides|null);
 
-            /** PluginOverridesWithSource isMutable */
-            isMutable?: (boolean|null);
+            /** PluginOverridesWithSource metadata */
+            metadata?: (flyteidl.admin.IAttributeMetadata|null);
         }
 
         /** Represents a PluginOverridesWithSource. */
@@ -13206,8 +13316,8 @@ export namespace flyteidl {
             /** PluginOverridesWithSource value. */
             public value?: (flyteidl.admin.IPluginOverrides|null);
 
-            /** PluginOverridesWithSource isMutable. */
-            public isMutable: boolean;
+            /** PluginOverridesWithSource metadata. */
+            public metadata?: (flyteidl.admin.IAttributeMetadata|null);
 
             /**
              * Creates a new PluginOverridesWithSource instance using the specified properties.
@@ -13251,8 +13361,8 @@ export namespace flyteidl {
             /** WorkflowExecutionConfigWithSource value */
             value?: (flyteidl.admin.IWorkflowExecutionConfig|null);
 
-            /** WorkflowExecutionConfigWithSource isMutable */
-            isMutable?: (boolean|null);
+            /** WorkflowExecutionConfigWithSource metadata */
+            metadata?: (flyteidl.admin.IAttributeMetadata|null);
         }
 
         /** Represents a WorkflowExecutionConfigWithSource. */
@@ -13270,8 +13380,8 @@ export namespace flyteidl {
             /** WorkflowExecutionConfigWithSource value. */
             public value?: (flyteidl.admin.IWorkflowExecutionConfig|null);
 
-            /** WorkflowExecutionConfigWithSource isMutable. */
-            public isMutable: boolean;
+            /** WorkflowExecutionConfigWithSource metadata. */
+            public metadata?: (flyteidl.admin.IAttributeMetadata|null);
 
             /**
              * Creates a new WorkflowExecutionConfigWithSource instance using the specified properties.
@@ -13315,8 +13425,8 @@ export namespace flyteidl {
             /** ClusterAssignmentWithSource value */
             value?: (flyteidl.admin.IClusterAssignment|null);
 
-            /** ClusterAssignmentWithSource isMutable */
-            isMutable?: (boolean|null);
+            /** ClusterAssignmentWithSource metadata */
+            metadata?: (flyteidl.admin.IAttributeMetadata|null);
         }
 
         /** Represents a ClusterAssignmentWithSource. */
@@ -13334,8 +13444,8 @@ export namespace flyteidl {
             /** ClusterAssignmentWithSource value. */
             public value?: (flyteidl.admin.IClusterAssignment|null);
 
-            /** ClusterAssignmentWithSource isMutable. */
-            public isMutable: boolean;
+            /** ClusterAssignmentWithSource metadata. */
+            public metadata?: (flyteidl.admin.IAttributeMetadata|null);
 
             /**
              * Creates a new ClusterAssignmentWithSource instance using the specified properties.
@@ -13379,8 +13489,8 @@ export namespace flyteidl {
             /** ExternalResourceAttributesWithSource value */
             value?: (flyteidl.admin.IExternalResourceAttributes|null);
 
-            /** ExternalResourceAttributesWithSource isMutable */
-            isMutable?: (boolean|null);
+            /** ExternalResourceAttributesWithSource metadata */
+            metadata?: (flyteidl.admin.IAttributeMetadata|null);
         }
 
         /** Represents an ExternalResourceAttributesWithSource. */
@@ -13398,8 +13508,8 @@ export namespace flyteidl {
             /** ExternalResourceAttributesWithSource value. */
             public value?: (flyteidl.admin.IExternalResourceAttributes|null);
 
-            /** ExternalResourceAttributesWithSource isMutable. */
-            public isMutable: boolean;
+            /** ExternalResourceAttributesWithSource metadata. */
+            public metadata?: (flyteidl.admin.IAttributeMetadata|null);
 
             /**
              * Creates a new ExternalResourceAttributesWithSource instance using the specified properties.
@@ -13639,6 +13749,9 @@ export namespace flyteidl {
 
             /** ConfigurationGetRequest id */
             id?: (flyteidl.admin.IConfigurationID|null);
+
+            /** ConfigurationGetRequest onlyGetLowerLevelConfiguration */
+            onlyGetLowerLevelConfiguration?: (boolean|null);
         }
 
         /** Represents a ConfigurationGetRequest. */
@@ -13652,6 +13765,9 @@ export namespace flyteidl {
 
             /** ConfigurationGetRequest id. */
             public id?: (flyteidl.admin.IConfigurationID|null);
+
+            /** ConfigurationGetRequest onlyGetLowerLevelConfiguration. */
+            public onlyGetLowerLevelConfiguration: boolean;
 
             /**
              * Creates a new ConfigurationGetRequest instance using the specified properties.

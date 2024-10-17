@@ -935,15 +935,26 @@ service AdminService {
   // Fetch the entire unified attribute configuration.
   rpc GetConfiguration (flyteidl.admin.ConfigurationGetRequest) returns (flyteidl.admin.ConfigurationGetResponse) {
     option (google.api.http) = {
+      // project-domain
       get: "/api/v1/configuration/{id.project}/{id.domain}"
       additional_bindings {
         get: "/api/v1/org/configuration/{id.org}/{id.project}/{id.domain}"
       }
+      // project
+      // To allow FE split big changes into smaller ones, we keep the endpoint to use domain for now.
+      // We will change it back to {id.project} right after the FE is ready.
       additional_bindings {
         get: "/api/v1/configuration/{id.domain}"
       }
       additional_bindings {
         get: "/api/v1/org/configuration/{id.org}/{id.domain}"
+      }
+      // org
+      additional_bindings {
+        get: "/api/v1/configuration"
+      }
+      additional_bindings {
+        get: "/api/v1/org/configuration/{id.org}"
       }
     };
   }

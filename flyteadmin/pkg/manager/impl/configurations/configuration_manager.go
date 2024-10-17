@@ -4,6 +4,7 @@ import (
 	"context"
 	"sync"
 
+	"github.com/golang/protobuf/proto"
 	"google.golang.org/grpc/codes"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
@@ -88,69 +89,35 @@ func (m *ConfigurationManager) getActiveDocument(ctx context.Context, mode docum
 func (m *ConfigurationManager) GetConfiguration(
 	ctx context.Context, request admin.ConfigurationGetRequest) (
 	*admin.ConfigurationGetResponse, error) {
+	// Set the configuration ID if it is not set.
+	// This is because org can be empty and if it is empty, the ID will be nil.
+	if request.Id == nil {
+		request.Id = &admin.ConfigurationID{}
+	}
+
 	// Validate the request
 	if err := m.validator.ValidateGetRequest(ctx, request); err != nil {
 		return nil, err
 	}
-	if request.Id.Domain != "" && request.Id.Project == "" && request.Id.Workflow == "" {
-		logger.Debugf(ctx, "getting default configuration")
-		return m.getDefaultConfiguration(ctx, request)
-	}
-	logger.Debugf(ctx, "getting project domain configuration")
-	return m.getProjectDomainConfiguration(ctx, request)
-}
-
-func (m *ConfigurationManager) getProjectDomainConfiguration(
-	ctx context.Context, request admin.ConfigurationGetRequest) (
-	*admin.ConfigurationGetResponse, error) {
-	// Validate the request
-	if err := m.validator.ValidateProjectDomainGetRequest(ctx, request); err != nil {
-		return nil, err
-	}
-
 	// Get the active document
 	activeDocument, err := m.GetReadOnlyActiveDocument(ctx)
 	if err != nil {
 		return nil, err
 	}
-
-	// Get the configuration with source
-	configurationWithSource, err := util.GetConfigurationWithSource(ctx, &activeDocument, request.GetId(), plugins.Get[plugin.ProjectConfigurationPlugin](m.pluginRegistry, plugins.PluginIDProjectConfiguration))
+	// Get the configuration
+	var configuration *admin.ConfigurationWithSource
+	if request.GetOnlyGetLowerLevelConfiguration() {
+		configuration, err = util.GetConfigurationOnlyLowerLevel(ctx, &activeDocument, request.GetId(), plugins.Get[plugin.ProjectConfigurationPlugin](m.pluginRegistry, plugins.PluginIDProjectConfiguration))
+	} else {
+		configuration, err = util.GetConfiguration(ctx, &activeDocument, request.GetId(), plugins.Get[plugin.ProjectConfigurationPlugin](m.pluginRegistry, plugins.PluginIDProjectConfiguration))
+	}
 	if err != nil {
 		return nil, err
 	}
-
 	response := &admin.ConfigurationGetResponse{
 		Id:            request.GetId(),
 		Version:       activeDocument.GetVersion(),
-		Configuration: configurationWithSource,
-	}
-	return response, nil
-}
-
-func (m *ConfigurationManager) getDefaultConfiguration(
-	ctx context.Context, request admin.ConfigurationGetRequest) (
-	*admin.ConfigurationGetResponse, error) {
-	// Validate the request
-	if err := m.validator.ValidateDefaultGetRequest(ctx, request); err != nil {
-		return nil, err
-	}
-
-	// Get the active document
-	activeDocument, err := m.GetReadOnlyActiveDocument(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	defaultConfigurationWithSource, err := util.GetDefaultConfigurationWithSource(ctx, &activeDocument, request.GetId().GetDomain(), plugins.Get[plugin.ProjectConfigurationPlugin](m.pluginRegistry, plugins.PluginIDProjectConfiguration))
-	if err != nil {
-		return nil, err
-	}
-
-	response := &admin.ConfigurationGetResponse{
-		Id:            request.GetId(),
-		Version:       activeDocument.GetVersion(),
-		Configuration: defaultConfigurationWithSource,
+		Configuration: configuration,
 	}
 	return response, nil
 }
@@ -199,8 +166,8 @@ func (m *ConfigurationManager) UpdateConfiguration(
 		return nil, err
 	}
 
-	// Get the configuration with source
-	configurationWithSource, err := util.GetConfigurationWithSource(ctx, updatedDocument, request.GetId(), projectConfigurationPlugin)
+	// Get the configuration
+	configuration, err := util.GetConfiguration(ctx, updatedDocument, request.GetId(), projectConfigurationPlugin)
 	if err != nil {
 		return nil, err
 	}
@@ -208,7 +175,7 @@ func (m *ConfigurationManager) UpdateConfiguration(
 	return &admin.ConfigurationUpdateResponse{
 		Id:            request.GetId(),
 		Version:       metadata.Version,
-		Configuration: configurationWithSource,
+		Configuration: configuration,
 	}, nil
 }
 
@@ -308,43 +275,48 @@ func (m *ConfigurationManager) canEditAttributes(ctx context.Context, request ad
 	if err != nil {
 		return err
 	}
+
 	// If the new configuration contains cluster assignment, we should use that to determine mutability
 	clusterAssignment := currentConfiguration.GetClusterAssignment()
 	if request.Configuration.ClusterAssignment != nil {
 		clusterAssignment = request.Configuration.ClusterAssignment
 	}
-	mutableAttributes, err := projectConfigurationPlugin.GetMutableAttributes(ctx, &plugin.GetMutableAttributesInput{ClusterAssignment: clusterAssignment})
+	attributeIsMutable, err := projectConfigurationPlugin.GetAttributeIsMutable(ctx, &plugin.GetAttributeIsMutable{
+		ClusterAssignment: clusterAssignment,
+		ConfigurationID:   request.Id,
+	})
 	if err != nil {
 		return err
 	}
+
+	// Check if the configuration is editing non-mutable attributes
 	var notEditableAttributes []string
-	if !mutableAttributes.Has(admin.MatchableResource_TASK_RESOURCE) && request.Configuration.TaskResourceAttributes != nil {
+	if !attributeIsMutable[admin.MatchableResource_TASK_RESOURCE].GetValue() && !proto.Equal(request.GetConfiguration().GetTaskResourceAttributes(), currentConfiguration.GetTaskResourceAttributes()) {
 		notEditableAttributes = append(notEditableAttributes, admin.MatchableResource_name[int32(admin.MatchableResource_TASK_RESOURCE)])
 	}
-	if !mutableAttributes.Has(admin.MatchableResource_CLUSTER_RESOURCE) && request.Configuration.ClusterResourceAttributes != nil {
+	if !attributeIsMutable[admin.MatchableResource_CLUSTER_RESOURCE].GetValue() && !proto.Equal(request.GetConfiguration().GetClusterResourceAttributes(), currentConfiguration.GetClusterResourceAttributes()) {
 		notEditableAttributes = append(notEditableAttributes, admin.MatchableResource_name[int32(admin.MatchableResource_CLUSTER_RESOURCE)])
 	}
-	if !mutableAttributes.Has(admin.MatchableResource_EXECUTION_QUEUE) && request.Configuration.ExecutionQueueAttributes != nil {
+	if !attributeIsMutable[admin.MatchableResource_EXECUTION_QUEUE].GetValue() && !proto.Equal(request.GetConfiguration().GetExecutionQueueAttributes(), currentConfiguration.GetExecutionQueueAttributes()) {
 		notEditableAttributes = append(notEditableAttributes, admin.MatchableResource_name[int32(admin.MatchableResource_EXECUTION_QUEUE)])
 	}
-	if !mutableAttributes.Has(admin.MatchableResource_EXECUTION_CLUSTER_LABEL) && request.Configuration.ExecutionClusterLabel != nil {
+	if !attributeIsMutable[admin.MatchableResource_EXECUTION_CLUSTER_LABEL].GetValue() && !proto.Equal(request.GetConfiguration().GetExecutionClusterLabel(), currentConfiguration.GetExecutionClusterLabel()) {
 		notEditableAttributes = append(notEditableAttributes, admin.MatchableResource_name[int32(admin.MatchableResource_EXECUTION_CLUSTER_LABEL)])
 	}
-	if !mutableAttributes.Has(admin.MatchableResource_QUALITY_OF_SERVICE_SPECIFICATION) && request.Configuration.QualityOfService != nil {
+	if !attributeIsMutable[admin.MatchableResource_QUALITY_OF_SERVICE_SPECIFICATION].GetValue() && !proto.Equal(request.GetConfiguration().GetQualityOfService(), currentConfiguration.GetQualityOfService()) {
 		notEditableAttributes = append(notEditableAttributes, admin.MatchableResource_name[int32(admin.MatchableResource_QUALITY_OF_SERVICE_SPECIFICATION)])
 	}
-	if !mutableAttributes.Has(admin.MatchableResource_PLUGIN_OVERRIDE) && request.Configuration.PluginOverrides != nil {
+	if !attributeIsMutable[admin.MatchableResource_PLUGIN_OVERRIDE].GetValue() && !proto.Equal(request.GetConfiguration().GetPluginOverrides(), currentConfiguration.GetPluginOverrides()) {
 		notEditableAttributes = append(notEditableAttributes, admin.MatchableResource_name[int32(admin.MatchableResource_PLUGIN_OVERRIDE)])
 	}
-	if !mutableAttributes.Has(admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG) && request.Configuration.WorkflowExecutionConfig != nil {
+	if !attributeIsMutable[admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG].GetValue() && !proto.Equal(request.GetConfiguration().GetWorkflowExecutionConfig(), currentConfiguration.GetWorkflowExecutionConfig()) {
 		notEditableAttributes = append(notEditableAttributes, admin.MatchableResource_name[int32(admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG)])
 	}
-	if !mutableAttributes.Has(admin.MatchableResource_CLUSTER_ASSIGNMENT) && request.Configuration.ClusterAssignment != nil {
+	if !attributeIsMutable[admin.MatchableResource_CLUSTER_ASSIGNMENT].GetValue() && !proto.Equal(request.GetConfiguration().GetClusterAssignment(), currentConfiguration.GetClusterAssignment()) {
 		notEditableAttributes = append(notEditableAttributes, admin.MatchableResource_name[int32(admin.MatchableResource_CLUSTER_ASSIGNMENT)])
 	}
-	if !mutableAttributes.Has(admin.MatchableResource_EXTERNAL_RESOURCE) && request.Configuration.ExternalResourceAttributes != nil {
+	if !attributeIsMutable[admin.MatchableResource_EXTERNAL_RESOURCE].GetValue() && !proto.Equal(request.GetConfiguration().GetExternalResourceAttributes(), currentConfiguration.GetExternalResourceAttributes()) {
 		notEditableAttributes = append(notEditableAttributes, admin.MatchableResource_name[int32(admin.MatchableResource_EXTERNAL_RESOURCE)])
-
 	}
 	if len(notEditableAttributes) > 0 {
 		logger.Debugf(ctx, "Not editable attributes: %v", notEditableAttributes)

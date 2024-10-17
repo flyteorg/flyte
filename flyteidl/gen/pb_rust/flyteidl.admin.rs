@@ -1137,6 +1137,24 @@ pub struct ConfigurationId {
     #[prost(bool, tag="5")]
     pub global: bool,
 }
+/// Metadata for an attribute.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct AttributeMetadata {
+    /// Whether the attribute is mutable.
+    #[prost(message, optional, tag="1")]
+    pub is_mutable: ::core::option::Option<AttributeIsMutable>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct AttributeIsMutable {
+    /// Whether the attribute is mutable.
+    #[prost(bool, tag="1")]
+    pub value: bool,
+    /// Reason why the attribute is immutable.
+    #[prost(string, tag="2")]
+    pub reason: ::prost::alloc::string::String,
+}
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct TaskResourceAttributesWithSource {
@@ -1144,8 +1162,8 @@ pub struct TaskResourceAttributesWithSource {
     pub source: i32,
     #[prost(message, optional, tag="2")]
     pub value: ::core::option::Option<TaskResourceAttributes>,
-    #[prost(bool, tag="3")]
-    pub is_mutable: bool,
+    #[prost(message, optional, tag="3")]
+    pub metadata: ::core::option::Option<AttributeMetadata>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1154,8 +1172,8 @@ pub struct ClusterResourceAttributesWithSource {
     pub source: i32,
     #[prost(message, optional, tag="2")]
     pub value: ::core::option::Option<ClusterResourceAttributes>,
-    #[prost(bool, tag="3")]
-    pub is_mutable: bool,
+    #[prost(message, optional, tag="3")]
+    pub metadata: ::core::option::Option<AttributeMetadata>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1164,8 +1182,8 @@ pub struct ExecutionQueueAttributesWithSource {
     pub source: i32,
     #[prost(message, optional, tag="2")]
     pub value: ::core::option::Option<ExecutionQueueAttributes>,
-    #[prost(bool, tag="3")]
-    pub is_mutable: bool,
+    #[prost(message, optional, tag="3")]
+    pub metadata: ::core::option::Option<AttributeMetadata>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1174,18 +1192,18 @@ pub struct ExecutionClusterLabelWithSource {
     pub source: i32,
     #[prost(message, optional, tag="2")]
     pub value: ::core::option::Option<ExecutionClusterLabel>,
-    #[prost(bool, tag="3")]
-    pub is_mutable: bool,
+    #[prost(message, optional, tag="3")]
+    pub metadata: ::core::option::Option<AttributeMetadata>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, Copy, PartialEq, ::prost::Message)]
+#[derive(Clone, PartialEq, ::prost::Message)]
 pub struct QualityOfServiceWithSource {
     #[prost(enumeration="AttributesSource", tag="1")]
     pub source: i32,
     #[prost(message, optional, tag="2")]
     pub value: ::core::option::Option<super::core::QualityOfService>,
-    #[prost(bool, tag="3")]
-    pub is_mutable: bool,
+    #[prost(message, optional, tag="3")]
+    pub metadata: ::core::option::Option<AttributeMetadata>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1194,8 +1212,8 @@ pub struct PluginOverridesWithSource {
     pub source: i32,
     #[prost(message, optional, tag="2")]
     pub value: ::core::option::Option<PluginOverrides>,
-    #[prost(bool, tag="3")]
-    pub is_mutable: bool,
+    #[prost(message, optional, tag="3")]
+    pub metadata: ::core::option::Option<AttributeMetadata>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1204,8 +1222,8 @@ pub struct WorkflowExecutionConfigWithSource {
     pub source: i32,
     #[prost(message, optional, tag="2")]
     pub value: ::core::option::Option<WorkflowExecutionConfig>,
-    #[prost(bool, tag="3")]
-    pub is_mutable: bool,
+    #[prost(message, optional, tag="3")]
+    pub metadata: ::core::option::Option<AttributeMetadata>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1214,8 +1232,8 @@ pub struct ClusterAssignmentWithSource {
     pub source: i32,
     #[prost(message, optional, tag="2")]
     pub value: ::core::option::Option<ClusterAssignment>,
-    #[prost(bool, tag="3")]
-    pub is_mutable: bool,
+    #[prost(message, optional, tag="3")]
+    pub metadata: ::core::option::Option<AttributeMetadata>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1224,8 +1242,8 @@ pub struct ExternalResourceAttributesWithSource {
     pub source: i32,
     #[prost(message, optional, tag="2")]
     pub value: ::core::option::Option<ExternalResourceAttributes>,
-    #[prost(bool, tag="3")]
-    pub is_mutable: bool,
+    #[prost(message, optional, tag="3")]
+    pub metadata: ::core::option::Option<AttributeMetadata>,
 }
 /// Configuration with source information.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -1281,6 +1299,15 @@ pub struct ConfigurationGetRequest {
     /// +required
     #[prost(message, optional, tag="1")]
     pub id: ::core::option::Option<ConfigurationId>,
+    /// If true, exclude the configuration in the specified level and only get configurations in lower levels.
+    /// For example, if the id is org-project-domain, and only_get_lower_level_configuration is true
+    /// the configuration would be a merged configuration in the following priority order:
+    /// 1. org-project
+    /// 2. org
+    /// 3. domain
+    /// 4. global
+    #[prost(bool, tag="2")]
+    pub only_get_lower_level_configuration: bool,
 }
 /// Response of a configuration get request.
 #[allow(clippy::derive_partial_eq_without_eq)]

@@ -2,6 +2,7 @@ package configurations
 
 import (
 	"context"
+	"fmt"
 	"reflect"
 	"testing"
 
@@ -290,13 +291,41 @@ func TestGetConfiguration(t *testing.T) {
 		args.Get(2).(proto.Message).(*admin.ConfigurationDocument).Configurations = configurations
 	})
 	// Mock plugin
-	mockProjectConfigurationPlugin.SetGetMutableAttributesCallback(func(ctx context.Context, input *plugin.GetMutableAttributesInput) (sets.Set[admin.MatchableResource], error) {
-		return sets.New[admin.MatchableResource](
-			admin.MatchableResource_TASK_RESOURCE,
-			admin.MatchableResource_CLUSTER_RESOURCE,
-			admin.MatchableResource_EXECUTION_QUEUE,
-			admin.MatchableResource_EXECUTION_CLUSTER_LABEL,
-		), nil
+	mockProjectConfigurationPlugin.SetGetAttributeIsMutableCallback(func(ctx context.Context, input *plugin.GetAttributeIsMutable) (map[admin.MatchableResource]*admin.AttributeIsMutable, error) {
+		return map[admin.MatchableResource]*admin.AttributeIsMutable{
+			admin.MatchableResource_TASK_RESOURCE: {
+				Value: true,
+			},
+			admin.MatchableResource_CLUSTER_RESOURCE: {
+				Value: true,
+			},
+			admin.MatchableResource_EXECUTION_QUEUE: {
+				Value: true,
+			},
+			admin.MatchableResource_EXECUTION_CLUSTER_LABEL: {
+				Value: true,
+			},
+			admin.MatchableResource_QUALITY_OF_SERVICE_SPECIFICATION: {
+				Value:  false,
+				Reason: "Cannot be modified",
+			},
+			admin.MatchableResource_PLUGIN_OVERRIDE: {
+				Value:  false,
+				Reason: "Cannot be modified",
+			},
+			admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG: {
+				Value:  false,
+				Reason: "Cannot be modified",
+			},
+			admin.MatchableResource_CLUSTER_ASSIGNMENT: {
+				Value:  false,
+				Reason: "Cannot be modified",
+			},
+			admin.MatchableResource_EXTERNAL_RESOURCE: {
+				Value:  false,
+				Reason: "Cannot be modified",
+			},
+		}, nil
 	})
 
 	response, err := configurationManager.GetConfiguration(ctx, admin.ConfigurationGetRequest{
@@ -322,12 +351,20 @@ func TestGetConfiguration(t *testing.T) {
 						Gpu: "2",
 					},
 				},
-				IsMutable: true,
+				Metadata: &admin.AttributeMetadata{
+					IsMutable: &admin.AttributeIsMutable{
+						Value: true,
+					},
+				},
 			},
 			ClusterResourceAttributes: &admin.ClusterResourceAttributesWithSource{
-				Source:    admin.AttributesSource_GLOBAL,
-				Value:     nil,
-				IsMutable: true,
+				Source: admin.AttributesSource_GLOBAL,
+				Value:  nil,
+				Metadata: &admin.AttributeMetadata{
+					IsMutable: &admin.AttributeIsMutable{
+						Value: true,
+					},
+				},
 			},
 			ExecutionQueueAttributes: &admin.ExecutionQueueAttributesWithSource{
 				Source: admin.AttributesSource_GLOBAL,
@@ -336,215 +373,74 @@ func TestGetConfiguration(t *testing.T) {
 						"foo", "bar", "baz",
 					},
 				},
-				IsMutable: true,
+				Metadata: &admin.AttributeMetadata{
+					IsMutable: &admin.AttributeIsMutable{
+						Value: true,
+					},
+				},
 			},
 			ExecutionClusterLabel: &admin.ExecutionClusterLabelWithSource{
-				Source:    admin.AttributesSource_GLOBAL,
-				Value:     nil,
-				IsMutable: true,
+				Source: admin.AttributesSource_GLOBAL,
+				Value:  nil,
+				Metadata: &admin.AttributeMetadata{
+					IsMutable: &admin.AttributeIsMutable{
+						Value: true,
+					},
+				},
 			},
 			QualityOfService: &admin.QualityOfServiceWithSource{
-				Source:    admin.AttributesSource_GLOBAL,
-				Value:     nil,
-				IsMutable: false,
+				Source: admin.AttributesSource_GLOBAL,
+				Value:  nil,
+				Metadata: &admin.AttributeMetadata{
+					IsMutable: &admin.AttributeIsMutable{
+						Value:  false,
+						Reason: "Cannot be modified",
+					},
+				},
 			},
 			PluginOverrides: &admin.PluginOverridesWithSource{
-				Source:    admin.AttributesSource_GLOBAL,
-				Value:     nil,
-				IsMutable: false,
+				Source: admin.AttributesSource_GLOBAL,
+				Value:  nil,
+				Metadata: &admin.AttributeMetadata{
+					IsMutable: &admin.AttributeIsMutable{
+						Value:  false,
+						Reason: "Cannot be modified",
+					},
+				},
 			},
 			WorkflowExecutionConfig: &admin.WorkflowExecutionConfigWithSource{
 				Source: admin.AttributesSource_PROJECT,
 				Value: &admin.WorkflowExecutionConfig{
 					MaxParallelism: 1,
 				},
-				IsMutable: false,
+				Metadata: &admin.AttributeMetadata{
+					IsMutable: &admin.AttributeIsMutable{
+						Value:  false,
+						Reason: "Cannot be modified",
+					},
+				},
 			},
 			ClusterAssignment: &admin.ClusterAssignmentWithSource{
 				Source: admin.AttributesSource_ORG,
 				Value: &admin.ClusterAssignment{
 					ClusterPoolName: "cluster",
 				},
-				IsMutable: false,
-			},
-			ExternalResourceAttributes: &admin.ExternalResourceAttributesWithSource{
-				Source:    admin.AttributesSource_GLOBAL,
-				Value:     nil,
-				IsMutable: false,
-			},
-		},
-	}))
-}
-
-func TestGetDefaultConfiguration(t *testing.T) {
-	ctx := context.Background()
-	db := mocks.NewMockRepository()
-	mockConfig := &runtimeMocks.Configuration{}
-	mockPBStore := &storageMocks.ComposedProtobufStore{}
-	mockStorage := &storage.DataStore{
-		ComposedProtobufStore: mockPBStore,
-		ReferenceConstructor:  &storageMocks.ReferenceConstructor{},
-	}
-	mockProjectConfigurationPlugin := utilMocks.MockProjectConfigurationPlugin{}
-	pluginRegistry := plugins.NewRegistry()
-	pluginRegistry.RegisterDefault(plugins.PluginIDProjectConfiguration, &mockProjectConfigurationPlugin)
-	// Mock config
-	applicationConfig := &runtimeMocks.ApplicationConfiguration{}
-	applicationConfig.On("GetDomainsConfig").Return(&runtimeInterfaces.DomainsConfig{
-		runtimeInterfaces.Domain{
-			ID:   "domain",
-			Name: "domain",
-		},
-	})
-	mockConfig.On("ApplicationConfiguration").Return(applicationConfig)
-	configurationManager, err := NewConfigurationManager(ctx, db, mockConfig, mockStorage, pluginRegistry, ShouldNotBootstrapOrUpdateDefault)
-	assert.Nil(t, err)
-	// Mock repo
-	db.ConfigurationRepo().(*mocks.ConfigurationRepoInterface).On("GetActive", mock.Anything).Return(models.ConfigurationDocumentMetadata{
-		Version:          "v1",
-		DocumentLocation: s3Path,
-		Active:           true,
-	}, nil)
-	// Mock store
-	mockPBStore.On("ReadProtobuf", mock.Anything, mock.MatchedBy(func(reference storage.DataReference) bool {
-		return reference.String() == s3Path
-	}), mock.AnythingOfType("*admin.ConfigurationDocument")).Return(nil).Run(func(args mock.Arguments) {
-		args.Get(2).(proto.Message).(*admin.ConfigurationDocument).Version = "v1"
-		configurations := make(map[string]*admin.Configuration)
-		projectDomainKey, err := util.EncodeConfigurationDocumentKey(ctx, &admin.ConfigurationID{
-			Org:     "org",
-			Project: "project",
-			Domain:  "domain",
-		})
-		assert.Nil(t, err)
-		configurations[projectDomainKey] = &admin.Configuration{
-			TaskResourceAttributes: &admin.TaskResourceAttributes{
-				Defaults: &admin.TaskResourceSpec{
-					Cpu: "1",
-					Gpu: "2",
-				},
-			},
-		}
-		projectKey, err := util.EncodeConfigurationDocumentKey(ctx, &admin.ConfigurationID{
-			Org:     "org",
-			Project: "project",
-		})
-		assert.Nil(t, err)
-		configurations[projectKey] = &admin.Configuration{
-			TaskResourceAttributes: &admin.TaskResourceAttributes{
-				Defaults: &admin.TaskResourceSpec{
-					Cpu: "5",
-					Gpu: "6",
-				},
-			},
-			WorkflowExecutionConfig: &admin.WorkflowExecutionConfig{
-				MaxParallelism: 1,
-			},
-		}
-		domainKey, err := util.EncodeConfigurationDocumentKey(ctx, &admin.ConfigurationID{
-			Domain: "domain",
-		})
-		assert.Nil(t, err)
-		configurations[domainKey] = &admin.Configuration{
-			WorkflowExecutionConfig: &admin.WorkflowExecutionConfig{
-				MaxParallelism: 2,
-			},
-		}
-		globalKey, err := util.EncodeConfigurationDocumentKey(ctx, &util.GlobalConfigurationKey)
-		assert.Nil(t, err)
-		configurations[globalKey] = &admin.Configuration{
-			TaskResourceAttributes: &admin.TaskResourceAttributes{
-				Defaults: &admin.TaskResourceSpec{
-					Cpu: "7",
-					Gpu: "8",
-				},
-			},
-			ExecutionQueueAttributes: &admin.ExecutionQueueAttributes{
-				Tags: []string{
-					"foo", "bar", "baz",
-				},
-			},
-		}
-		args.Get(2).(proto.Message).(*admin.ConfigurationDocument).Configurations = configurations
-	})
-	// Mock plugin
-	mockProjectConfigurationPlugin.SetGetMutableAttributesCallback(func(ctx context.Context, input *plugin.GetMutableAttributesInput) (sets.Set[admin.MatchableResource], error) {
-		return sets.New[admin.MatchableResource](
-			admin.MatchableResource_TASK_RESOURCE,
-			admin.MatchableResource_CLUSTER_RESOURCE,
-			admin.MatchableResource_EXECUTION_QUEUE,
-			admin.MatchableResource_EXECUTION_CLUSTER_LABEL,
-		), nil
-	})
-
-	response, err := configurationManager.GetConfiguration(ctx, admin.ConfigurationGetRequest{
-		Id: &admin.ConfigurationID{
-			Domain: "domain",
-		},
-	})
-	assert.Nil(t, err)
-	db.ConfigurationRepo().(*mocks.ConfigurationRepoInterface).AssertExpectations(t)
-	applicationConfig.AssertExpectations(t)
-	mockPBStore.AssertExpectations(t)
-	assert.True(t, proto.Equal(response, &admin.ConfigurationGetResponse{
-		Id:      &admin.ConfigurationID{Domain: "domain"},
-		Version: "v1",
-		Configuration: &admin.ConfigurationWithSource{
-			TaskResourceAttributes: &admin.TaskResourceAttributesWithSource{
-				Source: admin.AttributesSource_GLOBAL,
-				Value: &admin.TaskResourceAttributes{
-					Defaults: &admin.TaskResourceSpec{
-						Cpu: "7",
-						Gpu: "8",
+				Metadata: &admin.AttributeMetadata{
+					IsMutable: &admin.AttributeIsMutable{
+						Value:  false,
+						Reason: "Cannot be modified",
 					},
 				},
-				IsMutable: true,
-			},
-			ClusterResourceAttributes: &admin.ClusterResourceAttributesWithSource{
-				Source:    admin.AttributesSource_GLOBAL,
-				Value:     nil,
-				IsMutable: true,
-			},
-			ExecutionQueueAttributes: &admin.ExecutionQueueAttributesWithSource{
-				Source: admin.AttributesSource_GLOBAL,
-				Value: &admin.ExecutionQueueAttributes{
-					Tags: []string{
-						"foo", "bar", "baz",
-					},
-				},
-				IsMutable: true,
-			},
-			ExecutionClusterLabel: &admin.ExecutionClusterLabelWithSource{
-				Source:    admin.AttributesSource_GLOBAL,
-				Value:     nil,
-				IsMutable: true,
-			},
-			QualityOfService: &admin.QualityOfServiceWithSource{
-				Source:    admin.AttributesSource_GLOBAL,
-				Value:     nil,
-				IsMutable: false,
-			},
-			PluginOverrides: &admin.PluginOverridesWithSource{
-				Source:    admin.AttributesSource_GLOBAL,
-				Value:     nil,
-				IsMutable: false,
-			},
-			WorkflowExecutionConfig: &admin.WorkflowExecutionConfigWithSource{
-				Source: admin.AttributesSource_DOMAIN,
-				Value: &admin.WorkflowExecutionConfig{
-					MaxParallelism: 2,
-				},
-				IsMutable: false,
-			},
-			ClusterAssignment: &admin.ClusterAssignmentWithSource{
-				Source:    admin.AttributesSource_GLOBAL,
-				Value:     nil,
-				IsMutable: false,
 			},
 			ExternalResourceAttributes: &admin.ExternalResourceAttributesWithSource{
-				Source:    admin.AttributesSource_GLOBAL,
-				Value:     nil,
-				IsMutable: false,
+				Source: admin.AttributesSource_GLOBAL,
+				Value:  nil,
+				Metadata: &admin.AttributeMetadata{
+					IsMutable: &admin.AttributeIsMutable{
+						Value:  false,
+						Reason: "Cannot be modified",
+					},
+				},
 			},
 		},
 	}))
@@ -652,13 +548,41 @@ func TestUpdateProjectDomainConfiguration(t *testing.T) {
 		return reference.String() == "s3://bucket/v2"
 	}), mock.Anything, mock.AnythingOfType("*admin.ConfigurationDocument")).Return(nil)
 	// Mock plugin
-	mockProjectConfigurationPlugin.SetGetMutableAttributesCallback(func(ctx context.Context, input *plugin.GetMutableAttributesInput) (sets.Set[admin.MatchableResource], error) {
-		return sets.New[admin.MatchableResource](
-			admin.MatchableResource_TASK_RESOURCE,
-			admin.MatchableResource_CLUSTER_RESOURCE,
-			admin.MatchableResource_EXECUTION_QUEUE,
-			admin.MatchableResource_EXECUTION_CLUSTER_LABEL,
-		), nil
+	mockProjectConfigurationPlugin.SetGetAttributeIsMutableCallback(func(ctx context.Context, input *plugin.GetAttributeIsMutable) (map[admin.MatchableResource]*admin.AttributeIsMutable, error) {
+		return map[admin.MatchableResource]*admin.AttributeIsMutable{
+			admin.MatchableResource_TASK_RESOURCE: {
+				Value: true,
+			},
+			admin.MatchableResource_CLUSTER_RESOURCE: {
+				Value: true,
+			},
+			admin.MatchableResource_EXECUTION_QUEUE: {
+				Value: true,
+			},
+			admin.MatchableResource_EXECUTION_CLUSTER_LABEL: {
+				Value: true,
+			},
+			admin.MatchableResource_QUALITY_OF_SERVICE_SPECIFICATION: {
+				Value:  false,
+				Reason: "Cannot be modified",
+			},
+			admin.MatchableResource_PLUGIN_OVERRIDE: {
+				Value:  false,
+				Reason: "Cannot be modified",
+			},
+			admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG: {
+				Value:  false,
+				Reason: "Cannot be modified",
+			},
+			admin.MatchableResource_CLUSTER_ASSIGNMENT: {
+				Value:  false,
+				Reason: "Cannot be modified",
+			},
+			admin.MatchableResource_EXTERNAL_RESOURCE: {
+				Value:  false,
+				Reason: "Cannot be modified",
+			},
+		}, nil
 	})
 
 	response, err := configurationManager.UpdateConfiguration(ctx, admin.ConfigurationUpdateRequest{
@@ -683,6 +607,7 @@ func TestUpdateProjectDomainConfiguration(t *testing.T) {
 	mockRefConstructor.AssertExpectations(t)
 	mockPBStore.AssertExpectations(t)
 
+	fmt.Printf("Response: %v\n", response)
 	assert.True(t, proto.Equal(response, &admin.ConfigurationUpdateResponse{
 		Id:      &admin.ConfigurationID{Org: "org", Project: "project", Domain: "domain"},
 		Version: "/2q3/pKW4h7lf1uExxhntIXaoI3dj0wL+JwEIrTIHUg=",
@@ -695,12 +620,20 @@ func TestUpdateProjectDomainConfiguration(t *testing.T) {
 						Gpu: "4",
 					},
 				},
-				IsMutable: true,
+				Metadata: &admin.AttributeMetadata{
+					IsMutable: &admin.AttributeIsMutable{
+						Value: true,
+					},
+				},
 			},
 			ClusterResourceAttributes: &admin.ClusterResourceAttributesWithSource{
-				Source:    admin.AttributesSource_GLOBAL,
-				Value:     nil,
-				IsMutable: true,
+				Source: admin.AttributesSource_GLOBAL,
+				Value:  nil,
+				Metadata: &admin.AttributeMetadata{
+					IsMutable: &admin.AttributeIsMutable{
+						Value: true,
+					},
+				},
 			},
 			ExecutionQueueAttributes: &admin.ExecutionQueueAttributesWithSource{
 				Source: admin.AttributesSource_GLOBAL,
@@ -709,39 +642,72 @@ func TestUpdateProjectDomainConfiguration(t *testing.T) {
 						"foo", "bar", "baz",
 					},
 				},
-				IsMutable: true,
+				Metadata: &admin.AttributeMetadata{
+					IsMutable: &admin.AttributeIsMutable{
+						Value: true,
+					},
+				},
 			},
 			ExecutionClusterLabel: &admin.ExecutionClusterLabelWithSource{
-				Source:    admin.AttributesSource_GLOBAL,
-				Value:     nil,
-				IsMutable: true,
+				Source: admin.AttributesSource_GLOBAL,
+				Value:  nil,
+				Metadata: &admin.AttributeMetadata{
+					IsMutable: &admin.AttributeIsMutable{
+						Value: true,
+					},
+				},
 			},
 			QualityOfService: &admin.QualityOfServiceWithSource{
-				Source:    admin.AttributesSource_GLOBAL,
-				Value:     nil,
-				IsMutable: false,
+				Source: admin.AttributesSource_GLOBAL,
+				Value:  nil,
+				Metadata: &admin.AttributeMetadata{
+					IsMutable: &admin.AttributeIsMutable{
+						Value:  false,
+						Reason: "Cannot be modified",
+					},
+				},
 			},
 			PluginOverrides: &admin.PluginOverridesWithSource{
-				Source:    admin.AttributesSource_GLOBAL,
-				Value:     nil,
-				IsMutable: false,
+				Source: admin.AttributesSource_GLOBAL,
+				Value:  nil,
+				Metadata: &admin.AttributeMetadata{
+					IsMutable: &admin.AttributeIsMutable{
+						Value:  false,
+						Reason: "Cannot be modified",
+					},
+				},
 			},
 			WorkflowExecutionConfig: &admin.WorkflowExecutionConfigWithSource{
 				Source: admin.AttributesSource_PROJECT,
 				Value: &admin.WorkflowExecutionConfig{
 					MaxParallelism: 1,
 				},
-				IsMutable: false,
+				Metadata: &admin.AttributeMetadata{
+					IsMutable: &admin.AttributeIsMutable{
+						Value:  false,
+						Reason: "Cannot be modified",
+					},
+				},
 			},
 			ClusterAssignment: &admin.ClusterAssignmentWithSource{
-				Source:    admin.AttributesSource_GLOBAL,
-				Value:     nil,
-				IsMutable: false,
+				Source: admin.AttributesSource_GLOBAL,
+				Value:  nil,
+				Metadata: &admin.AttributeMetadata{
+					IsMutable: &admin.AttributeIsMutable{
+						Value:  false,
+						Reason: "Cannot be modified",
+					},
+				},
 			},
 			ExternalResourceAttributes: &admin.ExternalResourceAttributesWithSource{
-				Source:    admin.AttributesSource_GLOBAL,
-				Value:     nil,
-				IsMutable: false,
+				Source: admin.AttributesSource_GLOBAL,
+				Value:  nil,
+				Metadata: &admin.AttributeMetadata{
+					IsMutable: &admin.AttributeIsMutable{
+						Value:  false,
+						Reason: "Cannot be modified",
+					},
+				},
 			},
 		},
 	}))
@@ -786,12 +752,42 @@ func TestUpdateProjectDomainConfiguration_UpdatingMutableAttributesError(t *test
 		args.Get(2).(proto.Message).(*admin.ConfigurationDocument).Configurations = configurations
 	})
 	// Mock plugin
-	mockProjectConfigurationPlugin.SetGetMutableAttributesCallback(func(ctx context.Context, input *plugin.GetMutableAttributesInput) (sets.Set[admin.MatchableResource], error) {
-		return sets.New[admin.MatchableResource](
-			admin.MatchableResource_CLUSTER_RESOURCE,
-			admin.MatchableResource_EXECUTION_QUEUE,
-			admin.MatchableResource_EXECUTION_CLUSTER_LABEL,
-		), nil
+	mockProjectConfigurationPlugin.SetGetAttributeIsMutableCallback(func(ctx context.Context, input *plugin.GetAttributeIsMutable) (map[admin.MatchableResource]*admin.AttributeIsMutable, error) {
+		return map[admin.MatchableResource]*admin.AttributeIsMutable{
+			admin.MatchableResource_TASK_RESOURCE: {
+				Value:  false,
+				Reason: "Cannot be modified",
+			},
+			admin.MatchableResource_CLUSTER_RESOURCE: {
+				Value: true,
+			},
+			admin.MatchableResource_EXECUTION_QUEUE: {
+				Value: true,
+			},
+			admin.MatchableResource_EXECUTION_CLUSTER_LABEL: {
+				Value: true,
+			},
+			admin.MatchableResource_QUALITY_OF_SERVICE_SPECIFICATION: {
+				Value:  false,
+				Reason: "Cannot be modified",
+			},
+			admin.MatchableResource_PLUGIN_OVERRIDE: {
+				Value:  false,
+				Reason: "Cannot be modified",
+			},
+			admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG: {
+				Value:  false,
+				Reason: "Cannot be modified",
+			},
+			admin.MatchableResource_CLUSTER_ASSIGNMENT: {
+				Value:  false,
+				Reason: "Cannot be modified",
+			},
+			admin.MatchableResource_EXTERNAL_RESOURCE: {
+				Value:  false,
+				Reason: "Cannot be modified",
+			},
+		}, nil
 	})
 
 	_, err = configurationManager.UpdateConfiguration(ctx, admin.ConfigurationUpdateRequest{
@@ -908,13 +904,41 @@ func TestUpdateOrgConfiguration(t *testing.T) {
 		return reference.String() == "s3://bucket/v2"
 	}), mock.Anything, mock.AnythingOfType("*admin.ConfigurationDocument")).Return(nil)
 	// Mock plugin
-	mockProjectConfigurationPlugin.SetGetMutableAttributesCallback(func(ctx context.Context, input *plugin.GetMutableAttributesInput) (sets.Set[admin.MatchableResource], error) {
-		return sets.New[admin.MatchableResource](
-			admin.MatchableResource_TASK_RESOURCE,
-			admin.MatchableResource_CLUSTER_RESOURCE,
-			admin.MatchableResource_EXECUTION_QUEUE,
-			admin.MatchableResource_EXECUTION_CLUSTER_LABEL,
-		), nil
+	mockProjectConfigurationPlugin.SetGetAttributeIsMutableCallback(func(ctx context.Context, input *plugin.GetAttributeIsMutable) (map[admin.MatchableResource]*admin.AttributeIsMutable, error) {
+		return map[admin.MatchableResource]*admin.AttributeIsMutable{
+			admin.MatchableResource_TASK_RESOURCE: {
+				Value: true,
+			},
+			admin.MatchableResource_CLUSTER_RESOURCE: {
+				Value: true,
+			},
+			admin.MatchableResource_EXECUTION_QUEUE: {
+				Value: true,
+			},
+			admin.MatchableResource_EXECUTION_CLUSTER_LABEL: {
+				Value: true,
+			},
+			admin.MatchableResource_QUALITY_OF_SERVICE_SPECIFICATION: {
+				Value:  false,
+				Reason: "Cannot be modified",
+			},
+			admin.MatchableResource_PLUGIN_OVERRIDE: {
+				Value:  false,
+				Reason: "Cannot be modified",
+			},
+			admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG: {
+				Value:  false,
+				Reason: "Cannot be modified",
+			},
+			admin.MatchableResource_CLUSTER_ASSIGNMENT: {
+				Value:  false,
+				Reason: "Cannot be modified",
+			},
+			admin.MatchableResource_EXTERNAL_RESOURCE: {
+				Value:  false,
+				Reason: "Cannot be modified",
+			},
+		}, nil
 	})
 
 	response, err := configurationManager.UpdateConfiguration(ctx, admin.ConfigurationUpdateRequest{
@@ -948,12 +972,20 @@ func TestUpdateOrgConfiguration(t *testing.T) {
 						Gpu: "6",
 					},
 				},
-				IsMutable: true,
+				Metadata: &admin.AttributeMetadata{
+					IsMutable: &admin.AttributeIsMutable{
+						Value: true,
+					},
+				},
 			},
 			ClusterResourceAttributes: &admin.ClusterResourceAttributesWithSource{
-				Source:    admin.AttributesSource_GLOBAL,
-				Value:     nil,
-				IsMutable: true,
+				Source: admin.AttributesSource_GLOBAL,
+				Value:  nil,
+				Metadata: &admin.AttributeMetadata{
+					IsMutable: &admin.AttributeIsMutable{
+						Value: true,
+					},
+				},
 			},
 			ExecutionQueueAttributes: &admin.ExecutionQueueAttributesWithSource{
 				Source: admin.AttributesSource_GLOBAL,
@@ -962,39 +994,72 @@ func TestUpdateOrgConfiguration(t *testing.T) {
 						"foo", "bar", "baz",
 					},
 				},
-				IsMutable: true,
+				Metadata: &admin.AttributeMetadata{
+					IsMutable: &admin.AttributeIsMutable{
+						Value: true,
+					},
+				},
 			},
 			ExecutionClusterLabel: &admin.ExecutionClusterLabelWithSource{
-				Source:    admin.AttributesSource_GLOBAL,
-				Value:     nil,
-				IsMutable: true,
+				Source: admin.AttributesSource_GLOBAL,
+				Value:  nil,
+				Metadata: &admin.AttributeMetadata{
+					IsMutable: &admin.AttributeIsMutable{
+						Value: true,
+					},
+				},
 			},
 			QualityOfService: &admin.QualityOfServiceWithSource{
-				Source:    admin.AttributesSource_GLOBAL,
-				Value:     nil,
-				IsMutable: false,
+				Source: admin.AttributesSource_GLOBAL,
+				Value:  nil,
+				Metadata: &admin.AttributeMetadata{
+					IsMutable: &admin.AttributeIsMutable{
+						Value:  false,
+						Reason: "Cannot be modified",
+					},
+				},
 			},
 			PluginOverrides: &admin.PluginOverridesWithSource{
-				Source:    admin.AttributesSource_GLOBAL,
-				Value:     nil,
-				IsMutable: false,
+				Source: admin.AttributesSource_GLOBAL,
+				Value:  nil,
+				Metadata: &admin.AttributeMetadata{
+					IsMutable: &admin.AttributeIsMutable{
+						Value:  false,
+						Reason: "Cannot be modified",
+					},
+				},
 			},
 			WorkflowExecutionConfig: &admin.WorkflowExecutionConfigWithSource{
 				Source: admin.AttributesSource_GLOBAL,
 				Value: &admin.WorkflowExecutionConfig{
 					MaxParallelism: 2,
 				},
-				IsMutable: false,
+				Metadata: &admin.AttributeMetadata{
+					IsMutable: &admin.AttributeIsMutable{
+						Value:  false,
+						Reason: "Cannot be modified",
+					},
+				},
 			},
 			ClusterAssignment: &admin.ClusterAssignmentWithSource{
-				Source:    admin.AttributesSource_GLOBAL,
-				Value:     nil,
-				IsMutable: false,
+				Source: admin.AttributesSource_GLOBAL,
+				Value:  nil,
+				Metadata: &admin.AttributeMetadata{
+					IsMutable: &admin.AttributeIsMutable{
+						Value:  false,
+						Reason: "Cannot be modified",
+					},
+				},
 			},
 			ExternalResourceAttributes: &admin.ExternalResourceAttributesWithSource{
-				Source:    admin.AttributesSource_GLOBAL,
-				Value:     nil,
-				IsMutable: false,
+				Source: admin.AttributesSource_GLOBAL,
+				Value:  nil,
+				Metadata: &admin.AttributeMetadata{
+					IsMutable: &admin.AttributeIsMutable{
+						Value:  false,
+						Reason: "Cannot be modified",
+					},
+				},
 			},
 		},
 	}))

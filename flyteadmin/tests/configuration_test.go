@@ -78,14 +78,22 @@ func TestConfiguration(t *testing.T) {
 
 	expectedConfiguration := currentConfiguration.Configuration
 	expectedConfiguration.TaskResourceAttributes = &admin.TaskResourceAttributesWithSource{
-		Source:    admin.AttributesSource_PROJECT_DOMAIN,
-		Value:     taskResourceAttributes,
-		IsMutable: true,
+		Source: admin.AttributesSource_PROJECT_DOMAIN,
+		Value:  taskResourceAttributes,
+		Metadata: &admin.AttributeMetadata{
+			IsMutable: &admin.AttributeIsMutable{
+				Value: true,
+			},
+		},
 	}
 	expectedConfiguration.ExecutionQueueAttributes = &admin.ExecutionQueueAttributesWithSource{
-		Source:    admin.AttributesSource_PROJECT_DOMAIN,
-		Value:     executionQueueAttributes,
-		IsMutable: true,
+		Source: admin.AttributesSource_PROJECT_DOMAIN,
+		Value:  executionQueueAttributes,
+		Metadata: &admin.AttributeMetadata{
+			IsMutable: &admin.AttributeIsMutable{
+				Value: true,
+			},
+		},
 	}
 	assert.True(t, proto.Equal(expectedConfiguration, updatedConfiguration.Configuration))
 }
@@ -107,13 +115,12 @@ func TestDefaultConfiguration(t *testing.T) {
 		Domain:  "development",
 	}
 	defaultConfiguration, err := client.GetConfiguration(ctx, &admin.ConfigurationGetRequest{
-		Id: &admin.ConfigurationID{
-			Domain: "development",
-		},
+		Id:                             configurationId,
+		OnlyGetLowerLevelConfiguration: true,
 	})
 	assert.Nil(t, err)
 	assert.NotNil(t, defaultConfiguration)
-	assert.Equal(t, "development", defaultConfiguration.Id.Domain)
+	assert.True(t, proto.Equal(configurationId, defaultConfiguration.Id))
 
 	currentConfiguration, err := client.GetConfiguration(ctx, &admin.ConfigurationGetRequest{
 		Id: configurationId,
@@ -135,9 +142,13 @@ func TestDefaultConfiguration(t *testing.T) {
 	assert.NotNil(t, updatedConfiguration)
 	assert.True(t, proto.Equal(configurationId, updatedConfiguration.Id))
 	defaultConfiguration.Configuration.TaskResourceAttributes = &admin.TaskResourceAttributesWithSource{
-		Source:    admin.AttributesSource_PROJECT_DOMAIN,
-		Value:     taskResourceAttributes,
-		IsMutable: true,
+		Source: admin.AttributesSource_PROJECT_DOMAIN,
+		Value:  taskResourceAttributes,
+		Metadata: &admin.AttributeMetadata{
+			IsMutable: &admin.AttributeIsMutable{
+				Value: true,
+			},
+		},
 	}
 	assert.True(t, proto.Equal(defaultConfiguration.Configuration, updatedConfiguration.Configuration))
 }
@@ -211,15 +222,23 @@ func TestConcurrentConfiguration(t *testing.T) {
 					expectedConfiguration := *(*defaultConfiguration).Configuration
 					if counter%2 == 0 {
 						expectedConfiguration.TaskResourceAttributes = &admin.TaskResourceAttributesWithSource{
-							Source:    admin.AttributesSource_PROJECT_DOMAIN,
-							Value:     taskResourceAttributes,
-							IsMutable: true,
+							Source: admin.AttributesSource_PROJECT_DOMAIN,
+							Value:  taskResourceAttributes,
+							Metadata: &admin.AttributeMetadata{
+								IsMutable: &admin.AttributeIsMutable{
+									Value: true,
+								},
+							},
 						}
 					} else {
 						expectedConfiguration.ExecutionQueueAttributes = &admin.ExecutionQueueAttributesWithSource{
-							Source:    admin.AttributesSource_PROJECT_DOMAIN,
-							Value:     executionQueueAttributes,
-							IsMutable: true,
+							Source: admin.AttributesSource_PROJECT_DOMAIN,
+							Value:  executionQueueAttributes,
+							Metadata: &admin.AttributeMetadata{
+								IsMutable: &admin.AttributeIsMutable{
+									Value: true,
+								},
+							},
 						}
 					}
 					assert.True(t, proto.Equal(&expectedConfiguration, updatedConfiguration.Configuration))
@@ -365,19 +384,31 @@ func TestUpdateConfiguration(t *testing.T) {
 
 	expectedConfiguration := currentConfiguration.Configuration
 	expectedConfiguration.TaskResourceAttributes = &admin.TaskResourceAttributesWithSource{
-		Source:    admin.AttributesSource_PROJECT_DOMAIN,
-		Value:     taskResourceAttributes,
-		IsMutable: true,
+		Source: admin.AttributesSource_PROJECT_DOMAIN,
+		Value:  taskResourceAttributes,
+		Metadata: &admin.AttributeMetadata{
+			IsMutable: &admin.AttributeIsMutable{
+				Value: true,
+			},
+		},
 	}
 	expectedConfiguration.ExecutionQueueAttributes = &admin.ExecutionQueueAttributesWithSource{
-		Source:    admin.AttributesSource_PROJECT,
-		Value:     executionQueueAttributes,
-		IsMutable: true,
+		Source: admin.AttributesSource_PROJECT,
+		Value:  executionQueueAttributes,
+		Metadata: &admin.AttributeMetadata{
+			IsMutable: &admin.AttributeIsMutable{
+				Value: true,
+			},
+		},
 	}
 	expectedConfiguration.WorkflowExecutionConfig = &admin.WorkflowExecutionConfigWithSource{
-		Source:    admin.AttributesSource_ORG,
-		Value:     workflowExecutionConfig,
-		IsMutable: true,
+		Source: admin.AttributesSource_ORG,
+		Value:  workflowExecutionConfig,
+		Metadata: &admin.AttributeMetadata{
+			IsMutable: &admin.AttributeIsMutable{
+				Value: true,
+			},
+		},
 	}
 	assert.True(t, proto.Equal(expectedConfiguration, updatedConfiguration.Configuration))
 }

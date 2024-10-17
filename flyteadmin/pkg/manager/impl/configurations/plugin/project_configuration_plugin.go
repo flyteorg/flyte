@@ -3,34 +3,33 @@ package plugin
 import (
 	"context"
 
-	"k8s.io/apimachinery/pkg/util/sets"
-
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
-type GetMutableAttributesInput struct {
+type GetAttributeIsMutable struct {
 	ClusterAssignment *admin.ClusterAssignment
+	ConfigurationID   *admin.ConfigurationID
 }
 
 type ProjectConfigurationPlugin interface {
-	GetMutableAttributes(ctx context.Context, input *GetMutableAttributesInput) (sets.Set[admin.MatchableResource], error)
+	GetAttributeIsMutable(ctx context.Context, input *GetAttributeIsMutable) (map[admin.MatchableResource]*admin.AttributeIsMutable, error)
 }
 
 type DefaultProjectConfigurationPlugin struct {
-	mutableAttributes sets.Set[admin.MatchableResource]
+	attributeIsMutable map[admin.MatchableResource]*admin.AttributeIsMutable
 }
 
-func (m *DefaultProjectConfigurationPlugin) GetMutableAttributes(ctx context.Context, input *GetMutableAttributesInput) (sets.Set[admin.MatchableResource], error) {
-	return m.mutableAttributes, nil
+func (m *DefaultProjectConfigurationPlugin) GetAttributeIsMutable(ctx context.Context, input *GetAttributeIsMutable) (map[admin.MatchableResource]*admin.AttributeIsMutable, error) {
+	return m.attributeIsMutable, nil
 }
 
 func NewDefaultProjectConfigurationPlugin() *DefaultProjectConfigurationPlugin {
 	// In OSS, all attributes are mutable
-	mutableAttributes := sets.Set[admin.MatchableResource]{}
+	attributeIsMutable := map[admin.MatchableResource]*admin.AttributeIsMutable{}
 	for _, v := range admin.MatchableResource_value {
-		mutableAttributes.Insert(admin.MatchableResource(v))
+		attributeIsMutable[admin.MatchableResource(v)] = &admin.AttributeIsMutable{Value: true}
 	}
 	return &DefaultProjectConfigurationPlugin{
-		mutableAttributes: mutableAttributes,
+		attributeIsMutable: attributeIsMutable,
 	}
 }

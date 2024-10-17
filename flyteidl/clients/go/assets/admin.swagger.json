@@ -309,6 +309,71 @@
       }
     },
     "/api/v1/configuration": {
+      "get": {
+        "summary": "Fetch the entire unified attribute configuration.",
+        "operationId": "AdminService_GetConfiguration5",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminConfigurationGetResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.org",
+            "description": "Name of the org the configuration belongs to.\n+optional",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "id.domain",
+            "description": "Name of the domain the configuration belongs to.\n+optional",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "id.project",
+            "description": "Name of the project the configuration belongs to.\n+optional",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "id.workflow",
+            "description": "Name of the workflow the configuration belongs to.\n+optional",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "id.global",
+            "description": "If it is a global configuration.\n+optional",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "only_get_lower_level_configuration",
+            "description": "If true, exclude the configuration in the specified level and only get configurations in lower levels.\nFor example, if the id is org-project-domain, and only_get_lower_level_configuration is true\nthe configuration would be a merged configuration in the following priority order:\n1. org-project\n2. org\n3. domain\n4. global",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      },
       "post": {
         "summary": "Update the entire unified attribute configuration.\nRequests will fail for stale values of version_to_update",
         "operationId": "AdminService_UpdateConfiguration5",
@@ -392,6 +457,13 @@
           {
             "name": "id.global",
             "description": "If it is a global configuration.\n+optional",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "only_get_lower_level_configuration",
+            "description": "If true, exclude the configuration in the specified level and only get configurations in lower levels.\nFor example, if the id is org-project-domain, and only_get_lower_level_configuration is true\nthe configuration would be a merged configuration in the following priority order:\n1. org-project\n2. org\n3. domain\n4. global",
             "in": "query",
             "required": false,
             "type": "boolean"
@@ -492,6 +564,13 @@
           {
             "name": "id.global",
             "description": "If it is a global configuration.\n+optional",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "only_get_lower_level_configuration",
+            "description": "If true, exclude the configuration in the specified level and only get configurations in lower levels.\nFor example, if the id is org-project-domain, and only_get_lower_level_configuration is true\nthe configuration would be a merged configuration in the following priority order:\n1. org-project\n2. org\n3. domain\n4. global",
             "in": "query",
             "required": false,
             "type": "boolean"
@@ -2937,6 +3016,71 @@
       }
     },
     "/api/v1/org/configuration/{id.org}": {
+      "get": {
+        "summary": "Fetch the entire unified attribute configuration.",
+        "operationId": "AdminService_GetConfiguration6",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminConfigurationGetResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.org",
+            "description": "Name of the org the configuration belongs to.\n+optional",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.domain",
+            "description": "Name of the domain the configuration belongs to.\n+optional",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "id.project",
+            "description": "Name of the project the configuration belongs to.\n+optional",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "id.workflow",
+            "description": "Name of the workflow the configuration belongs to.\n+optional",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "id.global",
+            "description": "If it is a global configuration.\n+optional",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "only_get_lower_level_configuration",
+            "description": "If true, exclude the configuration in the specified level and only get configurations in lower levels.\nFor example, if the id is org-project-domain, and only_get_lower_level_configuration is true\nthe configuration would be a merged configuration in the following priority order:\n1. org-project\n2. org\n3. domain\n4. global",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      },
       "post": {
         "summary": "Update the entire unified attribute configuration.\nRequests will fail for stale values of version_to_update",
         "operationId": "AdminService_UpdateConfiguration6",
@@ -3026,6 +3170,13 @@
           {
             "name": "id.global",
             "description": "If it is a global configuration.\n+optional",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "only_get_lower_level_configuration",
+            "description": "If true, exclude the configuration in the specified level and only get configurations in lower levels.\nFor example, if the id is org-project-domain, and only_get_lower_level_configuration is true\nthe configuration would be a merged configuration in the following priority order:\n1. org-project\n2. org\n3. domain\n4. global",
             "in": "query",
             "required": false,
             "type": "boolean"
@@ -3133,6 +3284,13 @@
           {
             "name": "id.global",
             "description": "If it is a global configuration.\n+optional",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "only_get_lower_level_configuration",
+            "description": "If true, exclude the configuration in the specified level and only get configurations in lower levels.\nFor example, if the id is org-project-domain, and only_get_lower_level_configuration is true\nthe configuration would be a merged configuration in the following priority order:\n1. org-project\n2. org\n3. domain\n4. global",
             "in": "query",
             "required": false,
             "type": "boolean"
@@ -10229,6 +10387,29 @@
       },
       "description": "Annotation values to be applied to an execution resource.\nIn the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined\nto specify how to merge annotations defined at registration and execution time."
     },
+    "adminAttributeIsMutable": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "boolean",
+          "description": "Whether the attribute is mutable."
+        },
+        "reason": {
+          "type": "string",
+          "description": "Reason why the attribute is immutable."
+        }
+      }
+    },
+    "adminAttributeMetadata": {
+      "type": "object",
+      "properties": {
+        "is_mutable": {
+          "$ref": "#/definitions/adminAttributeIsMutable",
+          "description": "Whether the attribute is mutable."
+        }
+      },
+      "description": "Metadata for an attribute."
+    },
     "adminAttributesSource": {
       "type": "string",
       "enum": [
@@ -10288,8 +10469,8 @@
         "value": {
           "$ref": "#/definitions/adminClusterAssignment"
         },
-        "is_mutable": {
-          "type": "boolean"
+        "metadata": {
+          "$ref": "#/definitions/adminAttributeMetadata"
         }
       }
     },
@@ -10314,8 +10495,8 @@
         "value": {
           "$ref": "#/definitions/adminClusterResourceAttributes"
         },
-        "is_mutable": {
-          "type": "boolean"
+        "metadata": {
+          "$ref": "#/definitions/adminAttributeMetadata"
         }
       }
     },
@@ -10749,8 +10930,8 @@
         "value": {
           "$ref": "#/definitions/adminExecutionClusterLabel"
         },
-        "is_mutable": {
-          "type": "boolean"
+        "metadata": {
+          "$ref": "#/definitions/adminAttributeMetadata"
         }
       }
     },
@@ -10917,8 +11098,8 @@
         "value": {
           "$ref": "#/definitions/adminExecutionQueueAttributes"
         },
-        "is_mutable": {
-          "type": "boolean"
+        "metadata": {
+          "$ref": "#/definitions/adminAttributeMetadata"
         }
       }
     },
@@ -11108,8 +11289,8 @@
         "value": {
           "$ref": "#/definitions/adminExternalResourceAttributes"
         },
-        "is_mutable": {
-          "type": "boolean"
+        "metadata": {
+          "$ref": "#/definitions/adminAttributeMetadata"
         }
       }
     },
@@ -11860,8 +12041,8 @@
         "value": {
           "$ref": "#/definitions/adminPluginOverrides"
         },
-        "is_mutable": {
-          "type": "boolean"
+        "metadata": {
+          "$ref": "#/definitions/adminAttributeMetadata"
         }
       }
     },
@@ -12016,8 +12197,8 @@
         "value": {
           "$ref": "#/definitions/coreQualityOfService"
         },
-        "is_mutable": {
-          "type": "boolean"
+        "metadata": {
+          "$ref": "#/definitions/adminAttributeMetadata"
         }
       }
     },
@@ -12376,8 +12557,8 @@
         "value": {
           "$ref": "#/definitions/adminTaskResourceAttributes"
         },
-        "is_mutable": {
-          "type": "boolean"
+        "metadata": {
+          "$ref": "#/definitions/adminAttributeMetadata"
         }
       }
     },
@@ -12583,8 +12764,8 @@
         "value": {
           "$ref": "#/definitions/adminWorkflowExecutionConfig"
         },
-        "is_mutable": {
-          "type": "boolean"
+        "metadata": {
+          "$ref": "#/definitions/adminAttributeMetadata"
         }
       }
     },

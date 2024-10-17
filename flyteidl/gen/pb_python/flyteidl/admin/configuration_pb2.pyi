@@ -37,95 +37,109 @@ class ConfigurationID(_message.Message):
     workflow: str
     def __init__(self, org: _Optional[str] = ..., domain: _Optional[str] = ..., project: _Optional[str] = ..., workflow: _Optional[str] = ..., **kwargs) -> None: ...
 
+class AttributeMetadata(_message.Message):
+    __slots__ = ["is_mutable"]
+    IS_MUTABLE_FIELD_NUMBER: _ClassVar[int]
+    is_mutable: AttributeIsMutable
+    def __init__(self, is_mutable: _Optional[_Union[AttributeIsMutable, _Mapping]] = ...) -> None: ...
+
+class AttributeIsMutable(_message.Message):
+    __slots__ = ["value", "reason"]
+    VALUE_FIELD_NUMBER: _ClassVar[int]
+    REASON_FIELD_NUMBER: _ClassVar[int]
+    value: bool
+    reason: str
+    def __init__(self, value: bool = ..., reason: _Optional[str] = ...) -> None: ...
+
 class TaskResourceAttributesWithSource(_message.Message):
-    __slots__ = ["source", "value", "is_mutable"]
+    __slots__ = ["source", "value", "metadata"]
     SOURCE_FIELD_NUMBER: _ClassVar[int]
     VALUE_FIELD_NUMBER: _ClassVar[int]
-    IS_MUTABLE_FIELD_NUMBER: _ClassVar[int]
+    METADATA_FIELD_NUMBER: _ClassVar[int]
     source: AttributesSource
     value: _matchable_resource_pb2.TaskResourceAttributes
-    is_mutable: bool
-    def __init__(self, source: _Optional[_Union[AttributesSource, str]] = ..., value: _Optional[_Union[_matchable_resource_pb2.TaskResourceAttributes, _Mapping]] = ..., is_mutable: bool = ...) -> None: ...
+    metadata: AttributeMetadata
+    def __init__(self, source: _Optional[_Union[AttributesSource, str]] = ..., value: _Optional[_Union[_matchable_resource_pb2.TaskResourceAttributes, _Mapping]] = ..., metadata: _Optional[_Union[AttributeMetadata, _Mapping]] = ...) -> None: ...
 
 class ClusterResourceAttributesWithSource(_message.Message):
-    __slots__ = ["source", "value", "is_mutable"]
+    __slots__ = ["source", "value", "metadata"]
     SOURCE_FIELD_NUMBER: _ClassVar[int]
     VALUE_FIELD_NUMBER: _ClassVar[int]
-    IS_MUTABLE_FIELD_NUMBER: _ClassVar[int]
+    METADATA_FIELD_NUMBER: _ClassVar[int]
     source: AttributesSource
     value: _matchable_resource_pb2.ClusterResourceAttributes
-    is_mutable: bool
-    def __init__(self, source: _Optional[_Union[AttributesSource, str]] = ..., value: _Optional[_Union[_matchable_resource_pb2.ClusterResourceAttributes, _Mapping]] = ..., is_mutable: bool = ...) -> None: ...
+    metadata: AttributeMetadata
+    def __init__(self, source: _Optional[_Union[AttributesSource, str]] = ..., value: _Optional[_Union[_matchable_resource_pb2.ClusterResourceAttributes, _Mapping]] = ..., metadata: _Optional[_Union[AttributeMetadata, _Mapping]] = ...) -> None: ...
 
 class ExecutionQueueAttributesWithSource(_message.Message):
-    __slots__ = ["source", "value", "is_mutable"]
+    __slots__ = ["source", "value", "metadata"]
     SOURCE_FIELD_NUMBER: _ClassVar[int]
     VALUE_FIELD_NUMBER: _ClassVar[int]
-    IS_MUTABLE_FIELD_NUMBER: _ClassVar[int]
+    METADATA_FIELD_NUMBER: _ClassVar[int]
     source: AttributesSource
     value: _matchable_resource_pb2.ExecutionQueueAttributes
-    is_mutable: bool
-    def __init__(self, source: _Optional[_Union[AttributesSource, str]] = ..., value: _Optional[_Union[_matchable_resource_pb2.ExecutionQueueAttributes, _Mapping]] = ..., is_mutable: bool = ...) -> None: ...
+    metadata: AttributeMetadata
+    def __init__(self, source: _Optional[_Union[AttributesSource, str]] = ..., value: _Optional[_Union[_matchable_resource_pb2.ExecutionQueueAttributes, _Mapping]] = ..., metadata: _Optional[_Union[AttributeMetadata, _Mapping]] = ...) -> None: ...
 
 class ExecutionClusterLabelWithSource(_message.Message):
-    __slots__ = ["source", "value", "is_mutable"]
+    __slots__ = ["source", "value", "metadata"]
     SOURCE_FIELD_NUMBER: _ClassVar[int]
     VALUE_FIELD_NUMBER: _ClassVar[int]
-    IS_MUTABLE_FIELD_NUMBER: _ClassVar[int]
+    METADATA_FIELD_NUMBER: _ClassVar[int]
     source: AttributesSource
     value: _matchable_resource_pb2.ExecutionClusterLabel
-    is_mutable: bool
-    def __init__(self, source: _Optional[_Union[AttributesSource, str]] = ..., value: _Optional[_Union[_matchable_resource_pb2.ExecutionClusterLabel, _Mapping]] = ..., is_mutable: bool = ...) -> None: ...
+    metadata: AttributeMetadata
+    def __init__(self, source: _Optional[_Union[AttributesSource, str]] = ..., value: _Optional[_Union[_matchable_resource_pb2.ExecutionClusterLabel, _Mapping]] = ..., metadata: _Optional[_Union[AttributeMetadata, _Mapping]] = ...) -> None: ...
 
 class QualityOfServiceWithSource(_message.Message):
-    __slots__ = ["source", "value", "is_mutable"]
+    __slots__ = ["source", "value", "metadata"]
     SOURCE_FIELD_NUMBER: _ClassVar[int]
     VALUE_FIELD_NUMBER: _ClassVar[int]
-    IS_MUTABLE_FIELD_NUMBER: _ClassVar[int]
+    METADATA_FIELD_NUMBER: _ClassVar[int]
     source: AttributesSource
     value: _execution_pb2.QualityOfService
-    is_mutable: bool
-    def __init__(self, source: _Optional[_Union[AttributesSource, str]] = ..., value: _Optional[_Union[_execution_pb2.QualityOfService, _Mapping]] = ..., is_mutable: bool = ...) -> None: ...
+    metadata: AttributeMetadata
+    def __init__(self, source: _Optional[_Union[AttributesSource, str]] = ..., value: _Optional[_Union[_execution_pb2.QualityOfService, _Mapping]] = ..., metadata: _Optional[_Union[AttributeMetadata, _Mapping]] = ...) -> None: ...
 
 class PluginOverridesWithSource(_message.Message):
-    __slots__ = ["source", "value", "is_mutable"]
+    __slots__ = ["source", "value", "metadata"]
     SOURCE_FIELD_NUMBER: _ClassVar[int]
     VALUE_FIELD_NUMBER: _ClassVar[int]
-    IS_MUTABLE_FIELD_NUMBER: _ClassVar[int]
+    METADATA_FIELD_NUMBER: _ClassVar[int]
     source: AttributesSource
     value: _matchable_resource_pb2.PluginOverrides
-    is_mutable: bool
-    def __init__(self, source: _Optional[_Union[AttributesSource, str]] = ..., value: _Optional[_Union[_matchable_resource_pb2.PluginOverrides, _Mapping]] = ..., is_mutable: bool = ...) -> None: ...
+    metadata: AttributeMetadata
+    def __init__(self, source: _Optional[_Union[AttributesSource, str]] = ..., value: _Optional[_Union[_matchable_resource_pb2.PluginOverrides, _Mapping]] = ..., metadata: _Optional[_Union[AttributeMetadata, _Mapping]] = ...) -> None: ...
 
 class WorkflowExecutionConfigWithSource(_message.Message):
-    __slots__ = ["source", "value", "is_mutable"]
+    __slots__ = ["source", "value", "metadata"]
     SOURCE_FIELD_NUMBER: _ClassVar[int]
     VALUE_FIELD_NUMBER: _ClassVar[int]
-    IS_MUTABLE_FIELD_NUMBER: _ClassVar[int]
+    METADATA_FIELD_NUMBER: _ClassVar[int]
     source: AttributesSource
     value: _matchable_resource_pb2.WorkflowExecutionConfig
-    is_mutable: bool
-    def __init__(self, source: _Optional[_Union[AttributesSource, str]] = ..., value: _Optional[_Union[_matchable_resource_pb2.WorkflowExecutionConfig, _Mapping]] = ..., is_mutable: bool = ...) -> None: ...
+    metadata: AttributeMetadata
+    def __init__(self, source: _Optional[_Union[AttributesSource, str]] = ..., value: _Optional[_Union[_matchable_resource_pb2.WorkflowExecutionConfig, _Mapping]] = ..., metadata: _Optional[_Union[AttributeMetadata, _Mapping]] = ...) -> None: ...
 
 class ClusterAssignmentWithSource(_message.Message):
-    __slots__ = ["source", "value", "is_mutable"]
+    __slots__ = ["source", "value", "metadata"]
     SOURCE_FIELD_NUMBER: _ClassVar[int]
     VALUE_FIELD_NUMBER: _ClassVar[int]
-    IS_MUTABLE_FIELD_NUMBER: _ClassVar[int]
+    METADATA_FIELD_NUMBER: _ClassVar[int]
     source: AttributesSource
     value: _cluster_assignment_pb2.ClusterAssignment
-    is_mutable: bool
-    def __init__(self, source: _Optional[_Union[AttributesSource, str]] = ..., value: _Optional[_Union[_cluster_assignment_pb2.ClusterAssignment, _Mapping]] = ..., is_mutable: bool = ...) -> None: ...
+    metadata: AttributeMetadata
+    def __init__(self, source: _Optional[_Union[AttributesSource, str]] = ..., value: _Optional[_Union[_cluster_assignment_pb2.ClusterAssignment, _Mapping]] = ..., metadata: _Optional[_Union[AttributeMetadata, _Mapping]] = ...) -> None: ...
 
 class ExternalResourceAttributesWithSource(_message.Message):
-    __slots__ = ["source", "value", "is_mutable"]
+    __slots__ = ["source", "value", "metadata"]
     SOURCE_FIELD_NUMBER: _ClassVar[int]
     VALUE_FIELD_NUMBER: _ClassVar[int]
-    IS_MUTABLE_FIELD_NUMBER: _ClassVar[int]
+    METADATA_FIELD_NUMBER: _ClassVar[int]
     source: AttributesSource
     value: _matchable_resource_pb2.ExternalResourceAttributes
-    is_mutable: bool
-    def __init__(self, source: _Optional[_Union[AttributesSource, str]] = ..., value: _Optional[_Union[_matchable_resource_pb2.ExternalResourceAttributes, _Mapping]] = ..., is_mutable: bool = ...) -> None: ...
+    metadata: AttributeMetadata
+    def __init__(self, source: _Optional[_Union[AttributesSource, str]] = ..., value: _Optional[_Union[_matchable_resource_pb2.ExternalResourceAttributes, _Mapping]] = ..., metadata: _Optional[_Union[AttributeMetadata, _Mapping]] = ...) -> None: ...
 
 class ConfigurationWithSource(_message.Message):
     __slots__ = ["task_resource_attributes", "cluster_resource_attributes", "execution_queue_attributes", "execution_cluster_label", "quality_of_service", "plugin_overrides", "workflow_execution_config", "cluster_assignment", "external_resource_attributes"]
@@ -172,10 +186,12 @@ class Configuration(_message.Message):
     def __init__(self, task_resource_attributes: _Optional[_Union[_matchable_resource_pb2.TaskResourceAttributes, _Mapping]] = ..., cluster_resource_attributes: _Optional[_Union[_matchable_resource_pb2.ClusterResourceAttributes, _Mapping]] = ..., execution_queue_attributes: _Optional[_Union[_matchable_resource_pb2.ExecutionQueueAttributes, _Mapping]] = ..., execution_cluster_label: _Optional[_Union[_matchable_resource_pb2.ExecutionClusterLabel, _Mapping]] = ..., quality_of_service: _Optional[_Union[_execution_pb2.QualityOfService, _Mapping]] = ..., plugin_overrides: _Optional[_Union[_matchable_resource_pb2.PluginOverrides, _Mapping]] = ..., workflow_execution_config: _Optional[_Union[_matchable_resource_pb2.WorkflowExecutionConfig, _Mapping]] = ..., cluster_assignment: _Optional[_Union[_cluster_assignment_pb2.ClusterAssignment, _Mapping]] = ..., external_resource_attributes: _Optional[_Union[_matchable_resource_pb2.ExternalResourceAttributes, _Mapping]] = ...) -> None: ...
 
 class ConfigurationGetRequest(_message.Message):
-    __slots__ = ["id"]
+    __slots__ = ["id", "only_get_lower_level_configuration"]
     ID_FIELD_NUMBER: _ClassVar[int]
+    ONLY_GET_LOWER_LEVEL_CONFIGURATION_FIELD_NUMBER: _ClassVar[int]
     id: ConfigurationID
-    def __init__(self, id: _Optional[_Union[ConfigurationID, _Mapping]] = ...) -> None: ...
+    only_get_lower_level_configuration: bool
+    def __init__(self, id: _Optional[_Union[ConfigurationID, _Mapping]] = ..., only_get_lower_level_configuration: bool = ...) -> None: ...
 
 class ConfigurationGetResponse(_message.Message):
     __slots__ = ["id", "version", "configuration"]

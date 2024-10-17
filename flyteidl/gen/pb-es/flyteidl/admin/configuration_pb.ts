@@ -146,6 +146,94 @@ export class ConfigurationID extends Message<ConfigurationID> {
 }
 
 /**
+ * Metadata for an attribute.
+ *
+ * @generated from message flyteidl.admin.AttributeMetadata
+ */
+export class AttributeMetadata extends Message<AttributeMetadata> {
+  /**
+   * Whether the attribute is mutable.
+   *
+   * @generated from field: flyteidl.admin.AttributeIsMutable is_mutable = 1;
+   */
+  isMutable?: AttributeIsMutable;
+
+  constructor(data?: PartialMessage<AttributeMetadata>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.admin.AttributeMetadata";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "is_mutable", kind: "message", T: AttributeIsMutable },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AttributeMetadata {
+    return new AttributeMetadata().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AttributeMetadata {
+    return new AttributeMetadata().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AttributeMetadata {
+    return new AttributeMetadata().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: AttributeMetadata | PlainMessage<AttributeMetadata> | undefined, b: AttributeMetadata | PlainMessage<AttributeMetadata> | undefined): boolean {
+    return proto3.util.equals(AttributeMetadata, a, b);
+  }
+}
+
+/**
+ * @generated from message flyteidl.admin.AttributeIsMutable
+ */
+export class AttributeIsMutable extends Message<AttributeIsMutable> {
+  /**
+   * Whether the attribute is mutable.
+   *
+   * @generated from field: bool value = 1;
+   */
+  value = false;
+
+  /**
+   * Reason why the attribute is immutable.
+   *
+   * @generated from field: string reason = 2;
+   */
+  reason = "";
+
+  constructor(data?: PartialMessage<AttributeIsMutable>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.admin.AttributeIsMutable";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "value", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 2, name: "reason", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AttributeIsMutable {
+    return new AttributeIsMutable().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AttributeIsMutable {
+    return new AttributeIsMutable().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AttributeIsMutable {
+    return new AttributeIsMutable().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: AttributeIsMutable | PlainMessage<AttributeIsMutable> | undefined, b: AttributeIsMutable | PlainMessage<AttributeIsMutable> | undefined): boolean {
+    return proto3.util.equals(AttributeIsMutable, a, b);
+  }
+}
+
+/**
  * @generated from message flyteidl.admin.TaskResourceAttributesWithSource
  */
 export class TaskResourceAttributesWithSource extends Message<TaskResourceAttributesWithSource> {
@@ -160,9 +248,9 @@ export class TaskResourceAttributesWithSource extends Message<TaskResourceAttrib
   value?: TaskResourceAttributes;
 
   /**
-   * @generated from field: bool is_mutable = 3;
+   * @generated from field: flyteidl.admin.AttributeMetadata metadata = 3;
    */
-  isMutable = false;
+  metadata?: AttributeMetadata;
 
   constructor(data?: PartialMessage<TaskResourceAttributesWithSource>) {
     super();
@@ -174,7 +262,7 @@ export class TaskResourceAttributesWithSource extends Message<TaskResourceAttrib
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "source", kind: "enum", T: proto3.getEnumType(AttributesSource) },
     { no: 2, name: "value", kind: "message", T: TaskResourceAttributes },
-    { no: 3, name: "is_mutable", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 3, name: "metadata", kind: "message", T: AttributeMetadata },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TaskResourceAttributesWithSource {
@@ -209,9 +297,9 @@ export class ClusterResourceAttributesWithSource extends Message<ClusterResource
   value?: ClusterResourceAttributes;
 
   /**
-   * @generated from field: bool is_mutable = 3;
+   * @generated from field: flyteidl.admin.AttributeMetadata metadata = 3;
    */
-  isMutable = false;
+  metadata?: AttributeMetadata;
 
   constructor(data?: PartialMessage<ClusterResourceAttributesWithSource>) {
     super();
@@ -223,7 +311,7 @@ export class ClusterResourceAttributesWithSource extends Message<ClusterResource
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "source", kind: "enum", T: proto3.getEnumType(AttributesSource) },
     { no: 2, name: "value", kind: "message", T: ClusterResourceAttributes },
-    { no: 3, name: "is_mutable", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 3, name: "metadata", kind: "message", T: AttributeMetadata },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ClusterResourceAttributesWithSource {
@@ -258,9 +346,9 @@ export class ExecutionQueueAttributesWithSource extends Message<ExecutionQueueAt
   value?: ExecutionQueueAttributes;
 
   /**
-   * @generated from field: bool is_mutable = 3;
+   * @generated from field: flyteidl.admin.AttributeMetadata metadata = 3;
    */
-  isMutable = false;
+  metadata?: AttributeMetadata;
 
   constructor(data?: PartialMessage<ExecutionQueueAttributesWithSource>) {
     super();
@@ -272,7 +360,7 @@ export class ExecutionQueueAttributesWithSource extends Message<ExecutionQueueAt
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "source", kind: "enum", T: proto3.getEnumType(AttributesSource) },
     { no: 2, name: "value", kind: "message", T: ExecutionQueueAttributes },
-    { no: 3, name: "is_mutable", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 3, name: "metadata", kind: "message", T: AttributeMetadata },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExecutionQueueAttributesWithSource {
@@ -307,9 +395,9 @@ export class ExecutionClusterLabelWithSource extends Message<ExecutionClusterLab
   value?: ExecutionClusterLabel;
 
   /**
-   * @generated from field: bool is_mutable = 3;
+   * @generated from field: flyteidl.admin.AttributeMetadata metadata = 3;
    */
-  isMutable = false;
+  metadata?: AttributeMetadata;
 
   constructor(data?: PartialMessage<ExecutionClusterLabelWithSource>) {
     super();
@@ -321,7 +409,7 @@ export class ExecutionClusterLabelWithSource extends Message<ExecutionClusterLab
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "source", kind: "enum", T: proto3.getEnumType(AttributesSource) },
     { no: 2, name: "value", kind: "message", T: ExecutionClusterLabel },
-    { no: 3, name: "is_mutable", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 3, name: "metadata", kind: "message", T: AttributeMetadata },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExecutionClusterLabelWithSource {
@@ -356,9 +444,9 @@ export class QualityOfServiceWithSource extends Message<QualityOfServiceWithSour
   value?: QualityOfService;
 
   /**
-   * @generated from field: bool is_mutable = 3;
+   * @generated from field: flyteidl.admin.AttributeMetadata metadata = 3;
    */
-  isMutable = false;
+  metadata?: AttributeMetadata;
 
   constructor(data?: PartialMessage<QualityOfServiceWithSource>) {
     super();
@@ -370,7 +458,7 @@ export class QualityOfServiceWithSource extends Message<QualityOfServiceWithSour
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "source", kind: "enum", T: proto3.getEnumType(AttributesSource) },
     { no: 2, name: "value", kind: "message", T: QualityOfService },
-    { no: 3, name: "is_mutable", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 3, name: "metadata", kind: "message", T: AttributeMetadata },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): QualityOfServiceWithSource {
@@ -405,9 +493,9 @@ export class PluginOverridesWithSource extends Message<PluginOverridesWithSource
   value?: PluginOverrides;
 
   /**
-   * @generated from field: bool is_mutable = 3;
+   * @generated from field: flyteidl.admin.AttributeMetadata metadata = 3;
    */
-  isMutable = false;
+  metadata?: AttributeMetadata;
 
   constructor(data?: PartialMessage<PluginOverridesWithSource>) {
     super();
@@ -419,7 +507,7 @@ export class PluginOverridesWithSource extends Message<PluginOverridesWithSource
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "source", kind: "enum", T: proto3.getEnumType(AttributesSource) },
     { no: 2, name: "value", kind: "message", T: PluginOverrides },
-    { no: 3, name: "is_mutable", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 3, name: "metadata", kind: "message", T: AttributeMetadata },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): PluginOverridesWithSource {
@@ -454,9 +542,9 @@ export class WorkflowExecutionConfigWithSource extends Message<WorkflowExecution
   value?: WorkflowExecutionConfig;
 
   /**
-   * @generated from field: bool is_mutable = 3;
+   * @generated from field: flyteidl.admin.AttributeMetadata metadata = 3;
    */
-  isMutable = false;
+  metadata?: AttributeMetadata;
 
   constructor(data?: PartialMessage<WorkflowExecutionConfigWithSource>) {
     super();
@@ -468,7 +556,7 @@ export class WorkflowExecutionConfigWithSource extends Message<WorkflowExecution
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "source", kind: "enum", T: proto3.getEnumType(AttributesSource) },
     { no: 2, name: "value", kind: "message", T: WorkflowExecutionConfig },
-    { no: 3, name: "is_mutable", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 3, name: "metadata", kind: "message", T: AttributeMetadata },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): WorkflowExecutionConfigWithSource {
@@ -503,9 +591,9 @@ export class ClusterAssignmentWithSource extends Message<ClusterAssignmentWithSo
   value?: ClusterAssignment;
 
   /**
-   * @generated from field: bool is_mutable = 3;
+   * @generated from field: flyteidl.admin.AttributeMetadata metadata = 3;
    */
-  isMutable = false;
+  metadata?: AttributeMetadata;
 
   constructor(data?: PartialMessage<ClusterAssignmentWithSource>) {
     super();
@@ -517,7 +605,7 @@ export class ClusterAssignmentWithSource extends Message<ClusterAssignmentWithSo
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "source", kind: "enum", T: proto3.getEnumType(AttributesSource) },
     { no: 2, name: "value", kind: "message", T: ClusterAssignment },
-    { no: 3, name: "is_mutable", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 3, name: "metadata", kind: "message", T: AttributeMetadata },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ClusterAssignmentWithSource {
@@ -552,9 +640,9 @@ export class ExternalResourceAttributesWithSource extends Message<ExternalResour
   value?: ExternalResourceAttributes;
 
   /**
-   * @generated from field: bool is_mutable = 3;
+   * @generated from field: flyteidl.admin.AttributeMetadata metadata = 3;
    */
-  isMutable = false;
+  metadata?: AttributeMetadata;
 
   constructor(data?: PartialMessage<ExternalResourceAttributesWithSource>) {
     super();
@@ -566,7 +654,7 @@ export class ExternalResourceAttributesWithSource extends Message<ExternalResour
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "source", kind: "enum", T: proto3.getEnumType(AttributesSource) },
     { no: 2, name: "value", kind: "message", T: ExternalResourceAttributes },
-    { no: 3, name: "is_mutable", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 3, name: "metadata", kind: "message", T: AttributeMetadata },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExternalResourceAttributesWithSource {
@@ -774,6 +862,19 @@ export class ConfigurationGetRequest extends Message<ConfigurationGetRequest> {
    */
   id?: ConfigurationID;
 
+  /**
+   * If true, exclude the configuration in the specified level and only get configurations in lower levels.
+   * For example, if the id is org-project-domain, and only_get_lower_level_configuration is true
+   * the configuration would be a merged configuration in the following priority order:
+   * 1. org-project
+   * 2. org
+   * 3. domain
+   * 4. global
+   *
+   * @generated from field: bool only_get_lower_level_configuration = 2;
+   */
+  onlyGetLowerLevelConfiguration = false;
+
   constructor(data?: PartialMessage<ConfigurationGetRequest>) {
     super();
     proto3.util.initPartial(data, this);
@@ -783,6 +884,7 @@ export class ConfigurationGetRequest extends Message<ConfigurationGetRequest> {
   static readonly typeName = "flyteidl.admin.ConfigurationGetRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "id", kind: "message", T: ConfigurationID },
+    { no: 2, name: "only_get_lower_level_configuration", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ConfigurationGetRequest {
