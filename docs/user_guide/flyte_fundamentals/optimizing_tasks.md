@@ -52,26 +52,26 @@ represents the cache key. Learn more in the {ref}`User Guide <cache-offloaded-ob
 
 ## Retries
 
-Flyte allows you to automatically retry failing tasks in the case of system-level or catastrophic errors that may arise from issues unrelated to user-defined code, such as network issues and data center outages.
+Flyte's robust retry mechanism enhances the reliability of distributed computing environments by effectively managing task failures. This section delves into the configuration and application of retries, ensuring you can maximize task resilience and efficiency.
 
-### Understanding Error Types
+### Understanding Retry Types
 
-Flyte differentiates between two types of errors:
+Flyte categorizes errors into two main types, each influencing the retry logic differently:
 
-- **SYSTEM**: Errors that occur due to infrastructure failures, like hardware malfunctions or network connectivity issues.
-- **USER**: Errors that occur due to issues in the user-defined code, such as a value error or a failed assertion.
+- **SYSTEM**: These errors arise from infrastructure-related failures, such as hardware malfunctions or network issues. They are typically transient and can often be resolved with a retry.
+- **USER**: These errors are due to issues in the user-defined code, like a value error or a logic mistake, which usually require code modifications to resolve.
+
 
 
 ### Configuring Retries
 
-- You can define the retry behavior using the `retries` attribute in the task decorator. This attribute primarily handles USER errors. 
+Retries in Flyte are configurable to address both USER and SYSTEM errors, allowing for tailored fault tolerance strategies:
 
-- For SYSTEM errors, configuration is managed at the platform level through the `max-node-retries-system-failures` setting in the FlytePropeller configuration.
-
-- The node-config key also has a `interruptible-failure-threshold` option, which defines the number of system-level retries that will be considered interruptible. So, by default you can allow 3 retries, but on the last one (i.e 2 for the failure threshold) do not label the Pod as interruptible. Refer this for more details:  [node-config key: Flyte Propeller Configuration](https://docs.flyte.org/en/latest/deployment/configuration/generated/flytepropeller_config.html#config-nodeconfig).
+- **User Errors**: Set the `retries` attribute in the task decorator to define how many times a task should retry after a USER error. This is straightforward and directly controlled in the task definition.
 
 ```{code-cell} ipython3
 import random
+from flytekit import task
 
 @task(retries=3)
 def compute_mean(data: List[float]) -> float:
@@ -80,10 +80,12 @@ def compute_mean(data: List[float]) -> float:
     return sum(data) / len(data)
 ```
 
-```{note}
-Retries only take effect when running a task on a Flyte cluster. 
-See {ref}`Fault Tolerance <fault-tolerance>` for details on the types of errors that will be retried.
-```
+
+- **System Errors**: Managed at the platform level through settings like `max-node-retries-system-failures` in the FlytePropeller configuration. This setting helps manage retries without requiring changes to the task code.
+
+  Additionally, the `interruptible-failure-threshold` option in the node-config key defines how many system-level retries are considered interruptible. This is particularly useful for tasks running on preemptible instances.
+
+  For more details, refer to the [Flyte Propeller Configuration](https://docs.flyte.org/en/latest/deployment/configuration/generated/flytepropeller_config.html#config-nodeconfig).
 
 
 ### Interruptible Tasks and Map Tasks
@@ -92,9 +94,13 @@ Tasks marked as interruptible can be preempted and retried without counting agai
 
 For map tasks, the interruptible behavior aligns with that of regular tasks. The `retries` field in the task annotation is not necessary for handling SYSTEM errors, as these are managed by the platform's configuration. Alternatively, the USER budget is set by defining retries in the task decorator.
 
+Map Tasks: The behavior of interruptible tasks extends seamlessly to map tasks. The platform's configuration manages SYSTEM errors, ensuring consistency across task types without additional task-level settings.
+
 ### Advanced Retry Policies
 
-Flyte also supports advanced retry policies that allow finer control over retry behavior, such as defining a threshold for interruptible failures. This means you can specify how many retries should be considered as interruptible before marking a task as non-interruptible. Refer this for details: [Flyte Propeller Configuration](https://docs.flyte.org/en/latest/deployment/configuration/generated/flytepropeller_config.html).
+Flyte supports advanced configurations that allow more granular control over retry behavior, such as specifying the number of retries that can be interruptible. This advanced setup helps in finely tuning the task executions based on the criticality and resource availability.
+
+For a deeper dive into configuring retries and understanding their impact, see the [Fault Tolerance](https://docs.flyte.org/en/latest/concepts/fault-tolerance.html) section in the Flyte documentation.
 
 
 ## Timeouts
