@@ -28,6 +28,8 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/batchscheduler/kueue"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/batchscheduler/yunikorn"
 )
 
 const (
@@ -119,9 +121,7 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 	podSpec.ServiceAccountName = cfg.ServiceAccount
 
 	headPodSpec := podSpec.DeepCopy()
-
 	rayjob, err := constructRayJob(taskCtx, rayJob, objectMeta, *podSpec, headPodSpec, headNodeRayStartParams, primaryContainerIdx, *primaryContainer)
-
 	return rayjob, err
 }
 
@@ -209,9 +209,9 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob plugins.Ra
 	submitterPodTemplate := buildSubmitterPodTemplate(headPodSpec, objectMeta, taskCtx)
 
 	// TODO: This is for backward compatibility. Remove this block once runtime_env is removed from ray proto.
-	var err error
 	var runtimeEnvYaml string
 	runtimeEnvYaml = rayJob.RuntimeEnvYaml
+	var err error
 	// If runtime_env exists but runtime_env_yaml does not, convert runtime_env to runtime_env_yaml
 	if rayJob.RuntimeEnv != "" && rayJob.RuntimeEnvYaml == "" {
 		runtimeEnvYaml, err = convertBase64RuntimeEnvToYaml(rayJob.RuntimeEnv)
@@ -551,6 +551,51 @@ func getEventInfoForRayJob(logConfig logs.LogConfig, pluginContext k8s.PluginCon
 	}
 
 	return &pluginsCore.TaskInfo{Logs: taskLogs}, nil
+}
+
+func (plugin rayJobResourceHandler) MutateResourceForYunikorn(ctx context.Context, object client.Object, taskTmpl *core.TaskTemplate) (client.Object, error) {
+	rayJob := object.(*rayv1.RayJob)
+	// Update gang scheduling annotations
+	if err := yunikorn.MutateRayJob(rayJob); err != nil {
+		return rayJob, err
+	}
+	// Update Yunikorn annotations
+	cfg := GetConfig().BatchScheduler.Default.YunikornConfig
+	id := taskTmpl.Id
+	annotations := make(map[string]string, 0)
+	queueName := fmt.Sprintf("root.%s.%s", id.Project, id.Domain)
+	if len(cfg.Queue) > 0 {
+		if cfg.Queue == "namespace" {
+			queueName = fmt.Sprintf("%s.%s", queueName, rayJob.ObjectMeta.Namespace)
+		} else {
+			queueName = fmt.Sprintf("%s.%s", queueName, cfg.Queue)
+		}
+	} else {
+		queueName = fmt.Sprintf("%s.%s", queueName, id.ResourceType)
+	}
+	annotations[yunikorn.Queue] = queueName
+	annotations[yunikorn.TaskGroupParameters] = cfg.Parameters
+	yunikorn.UpdateAnnotations(annotations, rayJob)
+	return rayJob, nil
+}
+
+func (plugin rayJobResourceHandler) MutateResourceForKueue(ctx context.Context, object client.Object, taskTmpl *core.TaskTemplate) (client.Object, error) {
+	rayJob := object.(*rayv1.RayJob)
+	cfg := GetConfig().BatchScheduler.Default.KueueConfig
+	id := taskTmpl.Id
+	queueName := fmt.Sprintf("%s.%s", id.Project, id.Domain)
+	if len(cfg.Queue) > 0 {
+		if cfg.Queue == "namespace" {
+			queueName = fmt.Sprintf("%s.%s", queueName, rayJob.ObjectMeta.Namespace)
+		} else {
+			queueName = fmt.Sprintf("%s.%s", queueName, cfg.Queue)
+		}
+	} else {
+		queueName = fmt.Sprintf("%s.%s", queueName, id.ResourceType)
+	}
+	rayJob.ObjectMeta.Labels[kueue.QueueName] = queueName
+	rayJob.ObjectMeta.Labels[kueue.PriorityClassName] = cfg.PriorityClassName
+	return object, nil
 }
 
 func (plugin rayJobResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s.PluginContext, resource client.Object) (pluginsCore.PhaseInfo, error) {

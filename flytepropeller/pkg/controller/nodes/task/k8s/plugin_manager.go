@@ -200,6 +200,13 @@ func (e *PluginManager) launchResource(ctx context.Context, tCtx pluginsCore.Tas
 	if err != nil {
 		return pluginsCore.UnknownTransition, err
 	}
+	if p, ok := e.plugin.(k8s.YunikornScheduablePlugin); ok {
+		o, err = p.MutateResourceForYunikorn(ctx, o, tmpl)
+		if err != nil {
+			return pluginsCore.UnknownTransition, err
+		}
+		tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
+	}
 
 	e.addObjectMetadata(k8sTaskCtxMetadata, o, config.GetK8sPluginConfig())
 	logger.Infof(ctx, "Creating Object: Type:[%v], Object:[%v/%v]", o.GetObjectKind().GroupVersionKind(), o.GetNamespace(), o.GetName())
