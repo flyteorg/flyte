@@ -68,7 +68,7 @@ The `TensorFlowRecordsDirTransformer` allows you to work with directories of TFR
 #### Example
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/refs/heads/master/examples/data_types_and_io/data_types_and_io/tensorflow_type.py
 :caption: data_types_and_io/tensorflow_type.py
-:lines: 47-57
+:lines: 47-56
 ```
 
 ## Configuration Class: `TFRecordDatasetConfig`
