@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	regErrors "github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
@@ -34,6 +35,32 @@ func (m MemoryMetadata) Exists() bool {
 
 func (m MemoryMetadata) Etag() string {
 	return m.etag
+}
+
+func TestExistsTooBig(t *testing.T) {
+	ctx := context.TODO()
+	opath := &pluginsIOMock.OutputFilePaths{}
+	opath.OnGetErrorPath().Return("")
+	deckPath := "some.file"
+	opath.OnGetOutputPath().Return(storage.DataReference(deckPath))
+
+	t.Run("too large", func(t *testing.T) {
+		store := &storageMocks.ComposedProtobufStore{}
+		store.OnHead(ctx, "some.file").Return(MemoryMetadata{
+			exists: true,
+			size:   2,
+		}, nil)
+
+		r := RemoteFileOutputReader{
+			outPath:        opath,
+			store:          store,
+			maxPayloadSize: 1,
+		}
+
+		_, err := r.Exists(ctx)
+		assert.Error(t, err)
+		assert.True(t, regErrors.Is(err, ErrRemoteFileExceedsMaxSize))
+	})
 }
 
 func TestReadOrigin(t *testing.T) {
