@@ -90,7 +90,7 @@ Chart for basic single Flyte executable deployment
 | deployment.genAdminAuthSecret.args | list | `[]` |  |
 | deployment.genAdminAuthSecret.command | list | `[]` |  |
 | deployment.image.pullPolicy | string | `"IfNotPresent"` |  |
-| deployment.image.repository | string | `"cr.flyte.org/flyteorg/flyte-binary"` |  |
+| deployment.image.repository | string | `"cr.flyte.org/flyteorg/flyte-binary-release"` |  |
 | deployment.image.tag | string | `"latest"` |  |
 | deployment.initContainers | list | `[]` |  |
 | deployment.labels | object | `{}` |  |
