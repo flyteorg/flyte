@@ -495,9 +495,17 @@ func (p *Plugin) monitorTask(ctx context.Context, tCtx core.TaskExecutionContext
 
 func (p *Plugin) getTaskInfo(ctx context.Context, tCtx core.TaskExecutionContext,
 	start, end time.Time, executionEnv *idlcore.ExecutionEnv, queueID, workerID string) (*core.TaskInfo, error) {
+
+	taskExecutionID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID()
+	executionEnvID := buildExecutionEnvID(taskExecutionID.GetTaskId(), executionEnv)
+
 	assignmentInfo := &pb.FastTaskAssignment{
-		EnvironmentId:  queueID,
-		AssignedWorker: workerID,
+		EnvironmentOrg:     executionEnvID.Org,
+		EnvironmentProject: executionEnvID.Project,
+		EnvironmentDomain:  executionEnvID.Domain,
+		EnvironmentName:    executionEnvID.Name,
+		EnvironmentVersion: executionEnvID.Version,
+		AssignedWorker:     workerID,
 	}
 	customInfo := structpb.Struct{}
 	err := utils.MarshalStruct(assignmentInfo, &customInfo)
@@ -516,8 +524,6 @@ func (p *Plugin) getTaskInfo(ctx context.Context, tCtx core.TaskExecutionContext
 		return &taskInfo, nil
 	}
 
-	taskExecutionID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID()
-	executionEnvID := buildExecutionEnvID(taskExecutionID.GetTaskId(), executionEnv)
 	statuses, err := tCtx.GetExecutionEnvClient().Status(ctx, executionEnvID)
 	if err != nil {
 		return nil, err

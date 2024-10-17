@@ -23,8 +23,15 @@ const (
 type HeartbeatResponse_Operation int32
 
 const (
-	HeartbeatResponse_ACK    HeartbeatResponse_Operation = 0
+	// Acknowledges that the worker replica is still processing the fasttask execution. This is
+	// useful for mitigating failure scenarios where multiple worker replicas may be assigned
+	// the same fasttask execution.
+	HeartbeatResponse_ACK HeartbeatResponse_Operation = 0
+	// Assigns the fasttask execution to this specific worker replica.
 	HeartbeatResponse_ASSIGN HeartbeatResponse_Operation = 1
+	// Delete the current execution. For active executions this will kill the child process and
+	// effectively abort the fasttask executions, for completed executions this acknowledges
+	// that a terminal phase has been successfully processed by the fasttask service.
 	HeartbeatResponse_DELETE HeartbeatResponse_Operation = 2
 )
 
@@ -69,16 +76,23 @@ func (HeartbeatResponse_Operation) EnumDescriptor() ([]byte, []int) {
 	return file_fasttask_proto_rawDescGZIP(), []int{3, 0}
 }
 
+// The current execution status of a specific fasttask execution.
 type TaskStatus struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	TaskId     string `protobuf:"bytes,1,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`
-	Namespace  string `protobuf:"bytes,2,opt,name=namespace,proto3" json:"namespace,omitempty"`
+	// The unique identifier for the fasttask execution instance.
+	TaskId string `protobuf:"bytes,1,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`
+	// The namespace for the fasttask execution.
+	Namespace string `protobuf:"bytes,2,opt,name=namespace,proto3" json:"namespace,omitempty"`
+	// The workflow identifier that triggered the fasttask execution.
 	WorkflowId string `protobuf:"bytes,3,opt,name=workflow_id,json=workflowId,proto3" json:"workflow_id,omitempty"`
-	Phase      int32  `protobuf:"varint,4,opt,name=phase,proto3" json:"phase,omitempty"`
-	Reason     string `protobuf:"bytes,5,opt,name=reason,proto3" json:"reason,omitempty"`
+	// The current phase of the fasttask execution.
+	Phase int32 `protobuf:"varint,4,opt,name=phase,proto3" json:"phase,omitempty"`
+	// A brief description to understand why this fasttask execution is in the specified phase.
+	// This is notably useful for explaining failure scenarios.
+	Reason string `protobuf:"bytes,5,opt,name=reason,proto3" json:"reason,omitempty"`
 }
 
 func (x *TaskStatus) Reset() {
@@ -148,15 +162,20 @@ func (x *TaskStatus) GetReason() string {
 	return ""
 }
 
+// The current execution capacity for a fasttask worker replia.
 type Capacity struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// The number of currently active fasttask executions.
 	ExecutionCount int32 `protobuf:"varint,1,opt,name=execution_count,json=executionCount,proto3" json:"execution_count,omitempty"`
+	// The total number of acceptable fasttask executions.
 	ExecutionLimit int32 `protobuf:"varint,2,opt,name=execution_limit,json=executionLimit,proto3" json:"execution_limit,omitempty"`
-	BacklogCount   int32 `protobuf:"varint,3,opt,name=backlog_count,json=backlogCount,proto3" json:"backlog_count,omitempty"`
-	BacklogLimit   int32 `protobuf:"varint,4,opt,name=backlog_limit,json=backlogLimit,proto3" json:"backlog_limit,omitempty"`
+	// The number of currently backlogged fasttask executions.
+	BacklogCount int32 `protobuf:"varint,3,opt,name=backlog_count,json=backlogCount,proto3" json:"backlog_count,omitempty"`
+	// The total number of acceptable backlogged fasttask executions.
+	BacklogLimit int32 `protobuf:"varint,4,opt,name=backlog_limit,json=backlogLimit,proto3" json:"backlog_limit,omitempty"`
 }
 
 func (x *Capacity) Reset() {
@@ -219,14 +238,20 @@ func (x *Capacity) GetBacklogLimit() int32 {
 	return 0
 }
 
+// Information sent from a fasttask worker replica to the fasttask service reporting the current
+// execution state including available capacity and status' of fasttask executions.
 type HeartbeatRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	WorkerId     string        `protobuf:"bytes,1,opt,name=worker_id,json=workerId,proto3" json:"worker_id,omitempty"`
-	QueueId      string        `protobuf:"bytes,2,opt,name=queue_id,json=queueId,proto3" json:"queue_id,omitempty"`
-	Capacity     *Capacity     `protobuf:"bytes,3,opt,name=capacity,proto3" json:"capacity,omitempty"`
+	// The unique identifier for this specific worker replica.
+	WorkerId string `protobuf:"bytes,1,opt,name=worker_id,json=workerId,proto3" json:"worker_id,omitempty"`
+	// The queue that this worker replica queries for fasttask executions.
+	QueueId string `protobuf:"bytes,2,opt,name=queue_id,json=queueId,proto3" json:"queue_id,omitempty"`
+	// The current capacity including active and backlogged execution assignments.
+	Capacity *Capacity `protobuf:"bytes,3,opt,name=capacity,proto3" json:"capacity,omitempty"`
+	// The status' of currently assigned fasttask executions.
 	TaskStatuses []*TaskStatus `protobuf:"bytes,4,rep,name=task_statuses,json=taskStatuses,proto3" json:"task_statuses,omitempty"`
 }
 
@@ -290,16 +315,23 @@ func (x *HeartbeatRequest) GetTaskStatuses() []*TaskStatus {
 	return nil
 }
 
+// Information sent from the fasttask service to a fasttask worker replica. This includes all
+// fasttask execution lifecycle management operations.
 type HeartbeatResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	TaskId     string                      `protobuf:"bytes,1,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`
-	Namespace  string                      `protobuf:"bytes,2,opt,name=namespace,proto3" json:"namespace,omitempty"`
-	WorkflowId string                      `protobuf:"bytes,3,opt,name=workflow_id,json=workflowId,proto3" json:"workflow_id,omitempty"`
-	Cmd        []string                    `protobuf:"bytes,4,rep,name=cmd,proto3" json:"cmd,omitempty"`
-	Operation  HeartbeatResponse_Operation `protobuf:"varint,5,opt,name=operation,proto3,enum=fasttask.HeartbeatResponse_Operation" json:"operation,omitempty"`
+	// The unique identifier for the fasttask execution instance.
+	TaskId string `protobuf:"bytes,1,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`
+	// The namespace for the fasttask execution.
+	Namespace string `protobuf:"bytes,2,opt,name=namespace,proto3" json:"namespace,omitempty"`
+	// The workflow identifier that triggered the fasttask execution.
+	WorkflowId string `protobuf:"bytes,3,opt,name=workflow_id,json=workflowId,proto3" json:"workflow_id,omitempty"`
+	// A string array representing the command to be evaluated for the fasttask execution.
+	Cmd []string `protobuf:"bytes,4,rep,name=cmd,proto3" json:"cmd,omitempty"`
+	// The operation to perform on this fasttask execution.
+	Operation HeartbeatResponse_Operation `protobuf:"varint,5,opt,name=operation,proto3,enum=fasttask.HeartbeatResponse_Operation" json:"operation,omitempty"`
 }
 
 func (x *HeartbeatResponse) Reset() {
@@ -369,11 +401,13 @@ func (x *HeartbeatResponse) GetOperation() HeartbeatResponse_Operation {
 	return HeartbeatResponse_ACK
 }
 
+// The metadata defining an active fasttask environment.
 type FastTaskEnvironment struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// The queue that replicas of the fasttask environment will query for task executions.
 	QueueId string `protobuf:"bytes,1,opt,name=queue_id,json=queueId,proto3" json:"queue_id,omitempty"`
 }
 
@@ -416,16 +450,30 @@ func (x *FastTaskEnvironment) GetQueueId() string {
 	return ""
 }
 
+// A definition of a fasttask environment.
 type FastTaskEnvironmentSpec struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	BacklogLength        int32  `protobuf:"varint,1,opt,name=backlog_length,json=backlogLength,proto3" json:"backlog_length,omitempty"`
-	Parallelism          int32  `protobuf:"varint,2,opt,name=parallelism,proto3" json:"parallelism,omitempty"`
-	PodTemplateSpec      []byte `protobuf:"bytes,3,opt,name=pod_template_spec,json=podTemplateSpec,proto3" json:"pod_template_spec,omitempty"`
+	// The number of items to keep in each replicas backlog. The backlog is used to effectively
+	// queue work on each replica so that it can begin executing another task immediately after
+	// the current one completes. This improves overall throughput at the cost of uneven
+	// distribution.
+	BacklogLength int32 `protobuf:"varint,1,opt,name=backlog_length,json=backlogLength,proto3" json:"backlog_length,omitempty"`
+	// The number of tasks that can be executed on a replica at the same time.
+	Parallelism int32 `protobuf:"varint,2,opt,name=parallelism,proto3" json:"parallelism,omitempty"`
+	// A byte serialized `PodTemplateSpec` that will be used to create replica Pods. If not
+	// provided Flyte will build a `PodTemplateSpec` using the `PodPlugin` as if this fasttask
+	// instance were executed in a singular Pod.
+	PodTemplateSpec []byte `protobuf:"bytes,3,opt,name=pod_template_spec,json=podTemplateSpec,proto3" json:"pod_template_spec,omitempty"`
+	// The name of the primary container in the defined `pod_template_spec`. If a
+	// `pod_template_spec` is not provided, this field is unnecessary.
 	PrimaryContainerName string `protobuf:"bytes,4,opt,name=primary_container_name,json=primaryContainerName,proto3" json:"primary_container_name,omitempty"`
-	ReplicaCount         int32  `protobuf:"varint,5,opt,name=replica_count,json=replicaCount,proto3" json:"replica_count,omitempty"`
+	// The number of replicas to initialize for this environment.
+	ReplicaCount int32 `protobuf:"varint,5,opt,name=replica_count,json=replicaCount,proto3" json:"replica_count,omitempty"`
+	// The criteria to determine how this environment should be deleted.
+	//
 	// Types that are assignable to TerminationCriteria:
 	//
 	//	*FastTaskEnvironmentSpec_TtlSeconds
@@ -518,20 +566,31 @@ type isFastTaskEnvironmentSpec_TerminationCriteria interface {
 }
 
 type FastTaskEnvironmentSpec_TtlSeconds struct {
+	// Indicates the minimum number of seconds after becoming idle (ie. no active task
+	// executions) that this environment will be GCed.
 	TtlSeconds int32 `protobuf:"varint,6,opt,name=ttl_seconds,json=ttlSeconds,proto3,oneof"`
 }
 
 func (*FastTaskEnvironmentSpec_TtlSeconds) isFastTaskEnvironmentSpec_TerminationCriteria() {}
 
+// Represents an fasttask worker replica assignment.
 type FastTaskAssignment struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Environment ID for this fast task
-	EnvironmentId string `protobuf:"bytes,1,opt,name=environment_id,json=environmentId,proto3" json:"environment_id,omitempty"`
-	// The assigned worker pod name for this fast task, if available
-	AssignedWorker string `protobuf:"bytes,2,opt,name=assigned_worker,json=assignedWorker,proto3" json:"assigned_worker,omitempty"`
+	// Environment organization for this fast task, if available.
+	EnvironmentOrg string `protobuf:"bytes,1,opt,name=environment_org,json=environmentOrg,proto3" json:"environment_org,omitempty"`
+	// Environment project for this fast task.
+	EnvironmentProject string `protobuf:"bytes,2,opt,name=environment_project,json=environmentProject,proto3" json:"environment_project,omitempty"`
+	// Environment domain for this fast task.
+	EnvironmentDomain string `protobuf:"bytes,3,opt,name=environment_domain,json=environmentDomain,proto3" json:"environment_domain,omitempty"`
+	// Environment name for this fast task.
+	EnvironmentName string `protobuf:"bytes,4,opt,name=environment_name,json=environmentName,proto3" json:"environment_name,omitempty"`
+	// Environment version for this fast task.
+	EnvironmentVersion string `protobuf:"bytes,5,opt,name=environment_version,json=environmentVersion,proto3" json:"environment_version,omitempty"`
+	// The assigned worker pod name for this fast task, if available.
+	AssignedWorker string `protobuf:"bytes,6,opt,name=assigned_worker,json=assignedWorker,proto3" json:"assigned_worker,omitempty"`
 }
 
 func (x *FastTaskAssignment) Reset() {
@@ -566,9 +625,37 @@ func (*FastTaskAssignment) Descriptor() ([]byte, []int) {
 	return file_fasttask_proto_rawDescGZIP(), []int{6}
 }
 
-func (x *FastTaskAssignment) GetEnvironmentId() string {
+func (x *FastTaskAssignment) GetEnvironmentOrg() string {
 	if x != nil {
-		return x.EnvironmentId
+		return x.EnvironmentOrg
+	}
+	return ""
+}
+
+func (x *FastTaskAssignment) GetEnvironmentProject() string {
+	if x != nil {
+		return x.EnvironmentProject
+	}
+	return ""
+}
+
+func (x *FastTaskAssignment) GetEnvironmentDomain() string {
+	if x != nil {
+		return x.EnvironmentDomain
+	}
+	return ""
+}
+
+func (x *FastTaskAssignment) GetEnvironmentName() string {
+	if x != nil {
+		return x.EnvironmentName
+	}
+	return ""
+}
+
+func (x *FastTaskAssignment) GetEnvironmentVersion() string {
+	if x != nil {
+		return x.EnvironmentVersion
 	}
 	return ""
 }
@@ -652,20 +739,32 @@ var file_fasttask_proto_rawDesc = []byte{
 	0x74, 0x12, 0x21, 0x0a, 0x0b, 0x74, 0x74, 0x6c, 0x5f, 0x73, 0x65, 0x63, 0x6f, 0x6e, 0x64, 0x73,
 	0x18, 0x06, 0x20, 0x01, 0x28, 0x05, 0x48, 0x00, 0x52, 0x0a, 0x74, 0x74, 0x6c, 0x53, 0x65, 0x63,
 	0x6f, 0x6e, 0x64, 0x73, 0x42, 0x16, 0x0a, 0x14, 0x74, 0x65, 0x72, 0x6d, 0x69, 0x6e, 0x61, 0x74,
-	0x69, 0x6f, 0x6e, 0x5f, 0x63, 0x72, 0x69, 0x74, 0x65, 0x72, 0x69, 0x61, 0x22, 0x64, 0x0a, 0x12,
-	0x46, 0x61, 0x73, 0x74, 0x54, 0x61, 0x73, 0x6b, 0x41, 0x73, 0x73, 0x69, 0x67, 0x6e, 0x6d, 0x65,
-	0x6e, 0x74, 0x12, 0x25, 0x0a, 0x0e, 0x65, 0x6e, 0x76, 0x69, 0x72, 0x6f, 0x6e, 0x6d, 0x65, 0x6e,
-	0x74, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0d, 0x65, 0x6e, 0x76, 0x69,
-	0x72, 0x6f, 0x6e, 0x6d, 0x65, 0x6e, 0x74, 0x49, 0x64, 0x12, 0x27, 0x0a, 0x0f, 0x61, 0x73, 0x73,
-	0x69, 0x67, 0x6e, 0x65, 0x64, 0x5f, 0x77, 0x6f, 0x72, 0x6b, 0x65, 0x72, 0x18, 0x02, 0x20, 0x01,
-	0x28, 0x09, 0x52, 0x0e, 0x61, 0x73, 0x73, 0x69, 0x67, 0x6e, 0x65, 0x64, 0x57, 0x6f, 0x72, 0x6b,
-	0x65, 0x72, 0x32, 0x54, 0x0a, 0x08, 0x46, 0x61, 0x73, 0x74, 0x54, 0x61, 0x73, 0x6b, 0x12, 0x48,
-	0x0a, 0x09, 0x48, 0x65, 0x61, 0x72, 0x74, 0x62, 0x65, 0x61, 0x74, 0x12, 0x1a, 0x2e, 0x66, 0x61,
-	0x73, 0x74, 0x74, 0x61, 0x73, 0x6b, 0x2e, 0x48, 0x65, 0x61, 0x72, 0x74, 0x62, 0x65, 0x61, 0x74,
-	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1b, 0x2e, 0x66, 0x61, 0x73, 0x74, 0x74, 0x61,
-	0x73, 0x6b, 0x2e, 0x48, 0x65, 0x61, 0x72, 0x74, 0x62, 0x65, 0x61, 0x74, 0x52, 0x65, 0x73, 0x70,
-	0x6f, 0x6e, 0x73, 0x65, 0x28, 0x01, 0x30, 0x01, 0x42, 0x05, 0x5a, 0x03, 0x70, 0x62, 0x2f, 0x62,
-	0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x69, 0x6f, 0x6e, 0x5f, 0x63, 0x72, 0x69, 0x74, 0x65, 0x72, 0x69, 0x61, 0x22, 0xa2, 0x02, 0x0a,
+	0x12, 0x46, 0x61, 0x73, 0x74, 0x54, 0x61, 0x73, 0x6b, 0x41, 0x73, 0x73, 0x69, 0x67, 0x6e, 0x6d,
+	0x65, 0x6e, 0x74, 0x12, 0x27, 0x0a, 0x0f, 0x65, 0x6e, 0x76, 0x69, 0x72, 0x6f, 0x6e, 0x6d, 0x65,
+	0x6e, 0x74, 0x5f, 0x6f, 0x72, 0x67, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0e, 0x65, 0x6e,
+	0x76, 0x69, 0x72, 0x6f, 0x6e, 0x6d, 0x65, 0x6e, 0x74, 0x4f, 0x72, 0x67, 0x12, 0x2f, 0x0a, 0x13,
+	0x65, 0x6e, 0x76, 0x69, 0x72, 0x6f, 0x6e, 0x6d, 0x65, 0x6e, 0x74, 0x5f, 0x70, 0x72, 0x6f, 0x6a,
+	0x65, 0x63, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x12, 0x65, 0x6e, 0x76, 0x69, 0x72,
+	0x6f, 0x6e, 0x6d, 0x65, 0x6e, 0x74, 0x50, 0x72, 0x6f, 0x6a, 0x65, 0x63, 0x74, 0x12, 0x2d, 0x0a,
+	0x12, 0x65, 0x6e, 0x76, 0x69, 0x72, 0x6f, 0x6e, 0x6d, 0x65, 0x6e, 0x74, 0x5f, 0x64, 0x6f, 0x6d,
+	0x61, 0x69, 0x6e, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x11, 0x65, 0x6e, 0x76, 0x69, 0x72,
+	0x6f, 0x6e, 0x6d, 0x65, 0x6e, 0x74, 0x44, 0x6f, 0x6d, 0x61, 0x69, 0x6e, 0x12, 0x29, 0x0a, 0x10,
+	0x65, 0x6e, 0x76, 0x69, 0x72, 0x6f, 0x6e, 0x6d, 0x65, 0x6e, 0x74, 0x5f, 0x6e, 0x61, 0x6d, 0x65,
+	0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0f, 0x65, 0x6e, 0x76, 0x69, 0x72, 0x6f, 0x6e, 0x6d,
+	0x65, 0x6e, 0x74, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x2f, 0x0a, 0x13, 0x65, 0x6e, 0x76, 0x69, 0x72,
+	0x6f, 0x6e, 0x6d, 0x65, 0x6e, 0x74, 0x5f, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x18, 0x05,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x12, 0x65, 0x6e, 0x76, 0x69, 0x72, 0x6f, 0x6e, 0x6d, 0x65, 0x6e,
+	0x74, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x27, 0x0a, 0x0f, 0x61, 0x73, 0x73, 0x69,
+	0x67, 0x6e, 0x65, 0x64, 0x5f, 0x77, 0x6f, 0x72, 0x6b, 0x65, 0x72, 0x18, 0x06, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x0e, 0x61, 0x73, 0x73, 0x69, 0x67, 0x6e, 0x65, 0x64, 0x57, 0x6f, 0x72, 0x6b, 0x65,
+	0x72, 0x32, 0x54, 0x0a, 0x08, 0x46, 0x61, 0x73, 0x74, 0x54, 0x61, 0x73, 0x6b, 0x12, 0x48, 0x0a,
+	0x09, 0x48, 0x65, 0x61, 0x72, 0x74, 0x62, 0x65, 0x61, 0x74, 0x12, 0x1a, 0x2e, 0x66, 0x61, 0x73,
+	0x74, 0x74, 0x61, 0x73, 0x6b, 0x2e, 0x48, 0x65, 0x61, 0x72, 0x74, 0x62, 0x65, 0x61, 0x74, 0x52,
+	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1b, 0x2e, 0x66, 0x61, 0x73, 0x74, 0x74, 0x61, 0x73,
+	0x6b, 0x2e, 0x48, 0x65, 0x61, 0x72, 0x74, 0x62, 0x65, 0x61, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x28, 0x01, 0x30, 0x01, 0x42, 0x05, 0x5a, 0x03, 0x70, 0x62, 0x2f, 0x62, 0x06,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (

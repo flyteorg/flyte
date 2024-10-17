@@ -576,7 +576,11 @@ func TestHandleNotYetStarted(t *testing.T) {
 				require.Len(t, transition.Info().Info().ExternalResources, 1)
 				assignment := pb.FastTaskAssignment{}
 				require.NoError(t, utils.UnmarshalStruct(transition.Info().Info().ExternalResources[0].CustomInfo, &assignment))
-				assert.Equal(t, "foo", assignment.GetEnvironmentId())
+				assert.Equal(t, "", assignment.GetEnvironmentOrg())
+				assert.Equal(t, "project", assignment.GetEnvironmentProject())
+				assert.Equal(t, "domain", assignment.GetEnvironmentDomain())
+				assert.Equal(t, "foo", assignment.GetEnvironmentName())
+				assert.Equal(t, "0", assignment.GetEnvironmentVersion())
 				assert.Equal(t, test.workerID, assignment.GetAssignedWorker())
 
 				if len(test.workerID) > 0 {
@@ -824,7 +828,11 @@ func TestHandleRunning(t *testing.T) {
 			require.Len(t, transition.Info().Info().ExternalResources, 1)
 			assignment := pb.FastTaskAssignment{}
 			require.NoError(t, utils.UnmarshalStruct(transition.Info().Info().ExternalResources[0].CustomInfo, &assignment))
-			assert.Equal(t, "foo", assignment.GetEnvironmentId())
+			assert.Equal(t, "", assignment.GetEnvironmentOrg())
+			assert.Equal(t, "project", assignment.GetEnvironmentProject())
+			assert.Equal(t, "domain", assignment.GetEnvironmentDomain())
+			assert.Equal(t, "foo", assignment.GetEnvironmentName())
+			assert.Equal(t, "0", assignment.GetEnvironmentVersion())
 			assert.Equal(t, "w0", assignment.GetAssignedWorker())
 		})
 	}

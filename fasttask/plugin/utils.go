@@ -73,6 +73,37 @@ func isPodNotFoundErr(err error) bool {
 	return k8serrors.IsNotFound(err) || k8serrors.IsGone(err)
 }
 
+// parseExecutionEnvID builds an `ExecutionEnvID` from the k8s labels provided.
+func parseExectionEnvID(labels map[string]string) (core.ExecutionEnvID, error) {
+	project, exists := labels[PROJECT_LABEL]
+	if !exists {
+		return core.ExecutionEnvID{}, fmt.Errorf("project label not found")
+	}
+
+	domain, exists := labels[DOMAIN_LABEL]
+	if !exists {
+		return core.ExecutionEnvID{}, fmt.Errorf("domain label not found")
+	}
+
+	name, exists := labels[EXECUTION_ENV_NAME]
+	if !exists {
+		return core.ExecutionEnvID{}, fmt.Errorf("execution environment name label not found")
+	}
+
+	version, exists := labels[EXECUTION_ENV_VERSION]
+	if !exists {
+		return core.ExecutionEnvID{}, fmt.Errorf("execution environment version label not found")
+	}
+
+	return core.ExecutionEnvID{
+		Org:     labels[ORGANIZATION_LABEL],
+		Project: project,
+		Domain:  domain,
+		Name:    name,
+		Version: version,
+	}, nil
+}
+
 // sanitizeEnvName sanitizes the environment name to be a valid k8s pod name. This means it converts
 // the name to lowercase, replaces all underscores with dashes, removes all non-alphanumeric or dash
 // characters, strips leading dashes, and truncates the name to be 63 characters with the appended

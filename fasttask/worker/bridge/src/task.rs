@@ -436,7 +436,7 @@ async fn wait_in_backlog(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use async_channel::{bounded, unbounded};
+    use async_channel::unbounded;
 
     #[tokio::test]
     async fn test_is_executable() {

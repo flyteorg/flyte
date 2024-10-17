@@ -28,6 +28,7 @@ jobs:
     needs: [lint]
     steps:
       - uses: actions/checkout@v4
+      - run: rustup update stable && rustup default stable
       - uses: actions/cache@v4
         with:
           path: |

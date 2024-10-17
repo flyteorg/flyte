@@ -4,40 +4,87 @@ package fasttask;
 
 option go_package = "pb/";
 
+// The current execution status of a specific fasttask execution.
 message TaskStatus {
+    // The unique identifier for the fasttask execution instance.
     string task_id = 1;
+
+    // The namespace for the fasttask execution.
     string namespace = 2;
+
+    // The workflow identifier that triggered the fasttask execution.
     string workflow_id = 3;
+
+    // The current phase of the fasttask execution.
     int32 phase = 4;
+
+    // A brief description to understand why this fasttask execution is in the specified phase.
+    // This is notably useful for explaining failure scenarios.
     string reason = 5;
 }
 
+// The current execution capacity for a fasttask worker replia.
 message Capacity {
+    // The number of currently active fasttask executions.
     int32 execution_count = 1;
+
+    // The total number of acceptable fasttask executions.
     int32 execution_limit = 2;
+
+    // The number of currently backlogged fasttask executions.
     int32 backlog_count = 3;
+
+    // The total number of acceptable backlogged fasttask executions.
     int32 backlog_limit = 4;
 }
 
+// Information sent from a fasttask worker replica to the fasttask service reporting the current
+// execution state including available capacity and status' of fasttask executions.
 message HeartbeatRequest {
+    // The unique identifier for this specific worker replica.
     string worker_id = 1;
+
+    // The queue that this worker replica queries for fasttask executions.
     string queue_id = 2;
+
+    // The current capacity including active and backlogged execution assignments.
     Capacity capacity = 3;
+
+    // The status' of currently assigned fasttask executions.
     repeated TaskStatus task_statuses = 4;
 }
 
+// Information sent from the fasttask service to a fasttask worker replica. This includes all
+// fasttask execution lifecycle management operations.
 message HeartbeatResponse {
+    // The unique identifier for the fasttask execution instance.
     string task_id = 1;
+
+    // The namespace for the fasttask execution.
     string namespace = 2;
+
+    // The workflow identifier that triggered the fasttask execution.
     string workflow_id = 3;
+
+    // A string array representing the command to be evaluated for the fasttask execution.
     repeated string cmd = 4;
 
     enum Operation {
+        // Acknowledges that the worker replica is still processing the fasttask execution. This is
+        // useful for mitigating failure scenarios where multiple worker replicas may be assigned
+        // the same fasttask execution.
         ACK = 0;
+
+        // Assigns the fasttask execution to this specific worker replica.
         ASSIGN = 1;
+
+        // Delete the current execution. For active executions this will kill the child process and
+        // effectively abort the fasttask executions, for completed executions this acknowledges
+        // that a terminal phase has been successfully processed by the fasttask service.
         DELETE = 2;
     }
 
+    // The operation to perform on this fasttask execution.
     Operation operation = 5;
 }
 
@@ -45,25 +92,60 @@ service FastTask {
     rpc Heartbeat(stream HeartbeatRequest) returns (stream HeartbeatResponse);
 }
 
+// The metadata defining an active fasttask environment.
 message FastTaskEnvironment {
+    // The queue that replicas of the fasttask environment will query for task executions.
     string queue_id = 1;
 }
 
+// A definition of a fasttask environment.
 message FastTaskEnvironmentSpec {
+    // The number of items to keep in each replicas backlog. The backlog is used to effectively
+    // queue work on each replica so that it can begin executing another task immediately after
+    // the current one completes. This improves overall throughput at the cost of uneven
+    // distribution.
     int32 backlog_length = 1;
+
+    // The number of tasks that can be executed on a replica at the same time. 
     int32 parallelism = 2;
+
+    // A byte serialized `PodTemplateSpec` that will be used to create replica Pods. If not
+    // provided Flyte will build a `PodTemplateSpec` using the `PodPlugin` as if this fasttask
+    // instance were executed in a singular Pod.
     bytes pod_template_spec = 3;
+
+    // The name of the primary container in the defined `pod_template_spec`. If a
+    // `pod_template_spec` is not provided, this field is unnecessary.
     string primary_container_name = 4;
+
+    // The number of replicas to initialize for this environment.
     int32 replica_count = 5;
+    
+    // The criteria to determine how this environment should be deleted.
     oneof termination_criteria {
+        // Indicates the minimum number of seconds after becoming idle (ie. no active task
+        // executions) that this environment will be GCed.
         int32 ttl_seconds = 6;
     }
 }
 
+// Represents an fasttask worker replica assignment.
 message FastTaskAssignment {
-    // Environment ID for this fast task
-    string environment_id = 1;
+    // Environment organization for this fast task, if available.
+    string environment_org = 1;
 
-    // The assigned worker pod name for this fast task, if available
-    string assigned_worker = 2;
+    // Environment project for this fast task.
+    string environment_project = 2;
+
+    // Environment domain for this fast task.
+    string environment_domain = 3;
+
+    // Environment name for this fast task.
+    string environment_name = 4;
+
+    // Environment version for this fast task.
+    string environment_version = 5;
+
+    // The assigned worker pod name for this fast task, if available.
+    string assigned_worker = 6;
 }

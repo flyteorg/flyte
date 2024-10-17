@@ -39,12 +39,13 @@ const (
 )
 
 const (
-	EXECUTION_ENV_ID   = "execution-env-id"
-	EXECUTION_ENV_TYPE = "execution-env-type"
-	TTL_SECONDS        = "ttl-seconds"
-	PROJECT_LABEL      = "project"
-	DOMAIN_LABEL       = "domain"
-	ORGANIZATION_LABEL = "organization"
+	EXECUTION_ENV_NAME    = "execution-env-name"
+	EXECUTION_ENV_TYPE    = "execution-env-type"
+	EXECUTION_ENV_VERSION = "execution-env-version"
+	TTL_SECONDS           = "ttl-seconds"
+	PROJECT_LABEL         = "project"
+	DOMAIN_LABEL          = "domain"
+	ORGANIZATION_LABEL    = "organization"
 )
 
 // builderMetrics is a collection of metrics for the InMemoryEnvBuilder.
@@ -188,7 +189,7 @@ func (i *InMemoryEnvBuilder) Create(ctx context.Context, executionEnvID core.Exe
 	// create replicas
 	for _, podName := range podNames {
 		logger.Debugf(ctx, "creating pod '%s' for environment '%s'", podName, executionEnvID)
-		if err := i.createPod(ctx, fastTaskEnvironmentSpec, executionEnvID.String(), podName); err != nil {
+		if err := i.createPod(ctx, fastTaskEnvironmentSpec, executionEnvID, podName); err != nil {
 			logger.Warnf(ctx, "failed to create pod '%s' for environment '%s' [%v]", podName, executionEnvID, err)
 			i.metrics.podCreationErrors.WithLabelValues(metricLabels...).Inc()
 		} else {
@@ -250,7 +251,9 @@ func (i *InMemoryEnvBuilder) Status(ctx context.Context, executionEnvID core.Exe
 
 // createPod creates a new pod for the given execution environment ID and pod name. The pod is
 // created using the given FastTaskEnvironmentSpec.
-func (i *InMemoryEnvBuilder) createPod(ctx context.Context, fastTaskEnvironmentSpec *pb.FastTaskEnvironmentSpec, executionEnvID, podName string) error {
+func (i *InMemoryEnvBuilder) createPod(ctx context.Context, fastTaskEnvironmentSpec *pb.FastTaskEnvironmentSpec,
+	executionEnvID core.ExecutionEnvID, podName string) error {
+
 	podTemplateSpec := &v1.PodTemplateSpec{}
 	if err := json.Unmarshal(fastTaskEnvironmentSpec.GetPodTemplateSpec(), podTemplateSpec); err != nil {
 		return flyteerrors.Errorf(flyteerrors.BadTaskSpecification,
@@ -284,7 +287,8 @@ func (i *InMemoryEnvBuilder) createPod(ctx context.Context, fastTaskEnvironmentS
 		objectMeta.Labels = make(map[string]string, 0)
 	}
 	objectMeta.Labels[EXECUTION_ENV_TYPE] = fastTaskType
-	objectMeta.Labels[EXECUTION_ENV_ID] = executionEnvID
+	objectMeta.Labels[EXECUTION_ENV_NAME] = executionEnvID.Name
+	objectMeta.Labels[EXECUTION_ENV_VERSION] = executionEnvID.Version
 	if objectMeta.Annotations == nil {
 		objectMeta.Annotations = make(map[string]string, 0)
 	}
@@ -311,7 +315,7 @@ func (i *InMemoryEnvBuilder) createPod(ctx context.Context, fastTaskEnvironmentS
 		"--backlog-length",
 		fmt.Sprintf("%d", fastTaskEnvironmentSpec.GetBacklogLength()),
 		"--queue-id",
-		executionEnvID,
+		executionEnvID.String(),
 		"--worker-id",
 		podName,
 		"--fasttask-url",
@@ -518,9 +522,11 @@ func (i *InMemoryEnvBuilder) repairEnvironments(ctx context.Context) error {
 	// attempt to repair replicas
 	for environmentID, environmentSpec := range environmentSpecs {
 		metricLabels := append(i.getMetricLabels(environmentID), "repair")
+		executionEnvID := i.environments[environmentID].executionEnvID
+
 		for _, podName := range environmentReplicas[environmentID] {
 			logger.Debugf(ctx, "creating pod '%s' for environment '%s'", podName, environmentID)
-			if err := i.createPod(ctx, &environmentSpec, environmentID, podName); err != nil {
+			if err := i.createPod(ctx, &environmentSpec, executionEnvID, podName); err != nil {
 				logger.Warnf(ctx, "failed to create pod '%s' for environment '%s' [%v]", podName, environmentID, err)
 				i.metrics.podCreationErrors.WithLabelValues(metricLabels...).Inc()
 			} else {
@@ -569,11 +575,13 @@ func (i *InMemoryEnvBuilder) detectOrphanedEnvironments(ctx context.Context, k8s
 	orphanedPods := make(map[string][]string, 0)
 	for _, pod := range podList.Items {
 		// check if environment already exists or pod is accounted for
-		environmentID, labelExists := pod.Labels[EXECUTION_ENV_ID]
-		if !labelExists {
+		executionEnvID, err := parseExectionEnvID(pod.GetLabels())
+		if err != nil {
+			logger.Warnf(ctx, "failed to parse ExecutionEnvID [%v]", err)
 			continue
 		}
 
+		environmentID := executionEnvID.String()
 		if environment, environmentExists := i.environments[environmentID]; environmentExists {
 			found := false
 			for _, replica := range environment.replicas {
@@ -632,7 +640,7 @@ func (i *InMemoryEnvBuilder) detectOrphanedEnvironments(ctx context.Context, k8s
 					},
 				},
 				state:          ORPHANED,
-				executionEnvID: core.ExecutionEnvID{Project: pod.GetLabels()[PROJECT_LABEL], Domain: pod.GetLabels()[DOMAIN_LABEL], Org: pod.GetLabels()[ORGANIZATION_LABEL], Name: environmentID},
+				executionEnvID: executionEnvID,
 			}
 
 			orphanedEnvironments[environmentID] = orphanedEnvironment

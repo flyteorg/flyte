@@ -177,10 +177,11 @@ func TestDetectOrphanedEnvironments(t *testing.T) {
 			ObjectMeta: metav1.ObjectMeta{
 				Name: "bar",
 				Labels: map[string]string{
-					EXECUTION_ENV_ID:   "foo",
-					PROJECT_LABEL:      "project",
-					DOMAIN_LABEL:       "domain",
-					ORGANIZATION_LABEL: "",
+					EXECUTION_ENV_NAME:    "foo",
+					EXECUTION_ENV_VERSION: "0",
+					PROJECT_LABEL:         "project",
+					DOMAIN_LABEL:          "domain",
+					ORGANIZATION_LABEL:    "",
 				},
 				Annotations: map[string]string{
 					TTL_SECONDS: "60",
@@ -191,10 +192,11 @@ func TestDetectOrphanedEnvironments(t *testing.T) {
 			ObjectMeta: metav1.ObjectMeta{
 				Name: "baz",
 				Labels: map[string]string{
-					EXECUTION_ENV_ID:   "foo",
-					PROJECT_LABEL:      "project",
-					DOMAIN_LABEL:       "domain",
-					ORGANIZATION_LABEL: "",
+					EXECUTION_ENV_NAME:    "foo",
+					EXECUTION_ENV_VERSION: "0",
+					PROJECT_LABEL:         "project",
+					DOMAIN_LABEL:          "domain",
+					ORGANIZATION_LABEL:    "",
 				},
 				Annotations: map[string]string{
 					TTL_SECONDS: "60",
@@ -213,7 +215,7 @@ func TestDetectOrphanedEnvironments(t *testing.T) {
 		{
 			name: "Noop",
 			environments: map[string]*environment{
-				"foo": &environment{
+				"project_domain_foo_0": &environment{
 					replicas: []string{"bar", "baz"},
 					state:    HEALTHY,
 				},
@@ -230,7 +232,7 @@ func TestDetectOrphanedEnvironments(t *testing.T) {
 		{
 			name: "ExistingOrphanedEnvironment",
 			environments: map[string]*environment{
-				"foo": &environment{
+				"project_domain_foo_0": &environment{
 					replicas: []string{"bar"},
 					state:    ORPHANED,
 				},
