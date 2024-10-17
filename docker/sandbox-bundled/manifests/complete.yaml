@@ -432,7 +432,8 @@ data:
         disableScheduler: false
         disabled: false
         seedProjects:
-        - flytesnacks
+        - description: flytesnacks project
+          name: flytesnacks
       dataCatalog:
         disabled: false
       propeller:

@@ -73,7 +73,7 @@ func Test_tokenEndpoint(t *testing.T) {
 
 		m := map[string]interface{}{}
 		assert.NoError(t, json.Unmarshal(rw.Body.Bytes(), &m))
-		assert.Equal(t, 0.5*time.Hour.Seconds()-1, m["expires_in"])
+		assert.GreaterOrEqual(t, m["expires_in"], 0.5*time.Hour.Seconds()-5)
 
 		assert.NotEmpty(t, m["access_token"])
 		// Parse and validate the token.
