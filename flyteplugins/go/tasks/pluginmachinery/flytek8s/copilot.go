@@ -201,14 +201,15 @@ func AddCoPilotToContainer(ctx context.Context, cfg config.FlyteCoPilotConfig, c
 	return nil
 }
 
-func AddCoPilotToPod(ctx context.Context, cfg config.FlyteCoPilotConfig, coPilotPod *v1.PodSpec, iFace *core.TypedInterface, taskExecMetadata core2.TaskExecutionMetadata, inputPaths io.InputFilePaths, outputPaths io.OutputFilePaths, pilot *core.DataLoadingConfig) error {
+func AddCoPilotToPod(ctx context.Context, cfg config.FlyteCoPilotConfig, coPilotPod *v1.PodSpec, iFace *core.TypedInterface, taskExecMetadata core2.TaskExecutionMetadata, inputPaths io.InputFilePaths, outputPaths io.OutputFilePaths, pilot *core.DataLoadingConfig) (string, error) {
 	if pilot == nil || !pilot.Enabled {
-		return nil
+		return "", nil
 	}
 
 	logger.Infof(ctx, "CoPilot Enabled for task [%s]", taskExecMetadata.GetTaskExecutionID().GetID().TaskId.Name)
 	shareProcessNamespaceEnabled := true
 	coPilotPod.ShareProcessNamespace = &shareProcessNamespaceEnabled
+	primaryInitContainerName := ""
 	if iFace != nil {
 		if iFace.Inputs != nil && len(iFace.Inputs.Variables) > 0 {
 			inPath := cfg.DefaultInputDataPath
@@ -231,13 +232,14 @@ func AddCoPilotToPod(ctx context.Context, cfg config.FlyteCoPilotConfig, coPilot
 			// Lets add the Inputs init container
 			args, err := DownloadCommandArgs(inputPaths.GetInputPath(), outputPaths.GetOutputPrefixPath(), inPath, format, iFace.Inputs)
 			if err != nil {
-				return err
+				return primaryInitContainerName, err
 			}
 			downloader, err := FlyteCoPilotContainer(flyteInitContainerName, cfg, args, inputsVolumeMount)
 			if err != nil {
-				return err
+				return primaryInitContainerName, err
 			}
 			coPilotPod.InitContainers = append(coPilotPod.InitContainers, downloader)
+			primaryInitContainerName = downloader.Name
 		}
 
 		if iFace.Outputs != nil && len(iFace.Outputs.Variables) > 0 {
@@ -260,15 +262,15 @@ func AddCoPilotToPod(ctx context.Context, cfg config.FlyteCoPilotConfig, coPilot
 			// Lets add the Inputs init container
 			args, err := SidecarCommandArgs(outPath, outputPaths.GetOutputPrefixPath(), outputPaths.GetRawOutputPrefix(), cfg.StartTimeout.Duration, iFace)
 			if err != nil {
-				return err
+				return primaryInitContainerName, err
 			}
 			sidecar, err := FlyteCoPilotContainer(flyteSidecarContainerName, cfg, args, outputsVolumeMount)
 			if err != nil {
-				return err
+				return primaryInitContainerName, err
 			}
 			coPilotPod.Containers = append(coPilotPod.Containers, sidecar)
 		}
 	}
 
-	return nil
+	return primaryInitContainerName, nil
 }

@@ -128,6 +128,9 @@ as the base container configuration for all primary containers. If both containe
 names exist in the default PodTemplate, Flyte first applies the default
 configuration, followed by the primary configuration.
 
+Note: Init containers can be configured with similar granularity using "default-init"
+and "primary-init" init container names.
+
 The ``containers`` field is required in each k8s PodSpec. If no default
 configuration is desired, specifying a container with a name other than "default"
 or "primary" (for example, "noop") is considered best practice. Since Flyte only
