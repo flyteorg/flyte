@@ -895,7 +895,7 @@ func TestBuildResourcePytorchV1(t *testing.T) {
 				},
 				{
 					Name:  pluginsK8s.FlyteInternalDistErrorStrategyEnvVarKey,
-					Value: "1",
+					Value: "Earliest",
 				},
 			},
 			workerContainerEnv[len(workerContainerEnv)-2:],

@@ -117,7 +117,7 @@ func (pytorchOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx
 			})
 			container.Env = append(container.Env, apiv1.EnvVar{
 				Name:  pluginsK8s.FlyteInternalDistErrorStrategyEnvVarKey,
-				Value: "1",
+				Value: k8s.EarliestErrorAggregationStrategy.String(),
 			})
 		}
 		updateEnvVars(&workerReplicaSpec.Template.Spec.Containers[0])

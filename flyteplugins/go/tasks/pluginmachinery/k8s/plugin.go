@@ -40,6 +40,17 @@ const (
 	EarliestErrorAggregationStrategy
 )
 
+func (e ErrorAggregationStrategy) String() string {
+	switch e {
+	case DefaultErrorAggregationStrategy:
+		return "Default"
+	case EarliestErrorAggregationStrategy:
+		return "Earliest"
+	default:
+		panic("Unknown enum value, cannot happen")
+	}
+}
+
 // System level properties that this Plugin supports
 type PluginProperties struct {
 	// Disables the inclusion of OwnerReferences in kubernetes resources that this plugin is responsible for.

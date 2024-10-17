@@ -99,13 +99,12 @@ func TestReadOrigin(t *testing.T) {
 		}, nil)
 
 		maxPayloadSize := int64(0)
-		r, err := NewRemoteFileOutputReader(
+		r := NewRemoteFileOutputReader(
 			ctx,
 			store,
 			opath,
 			maxPayloadSize,
 		)
-		assert.NoError(t, err)
 
 		ee, err := r.ReadError(ctx)
 		assert.NoError(t, err)
@@ -134,13 +133,12 @@ func TestReadOrigin(t *testing.T) {
 		}).Return(nil)
 
 		maxPayloadSize := int64(0)
-		r, err := NewRemoteFileOutputReader(
+		r := NewRemoteFileOutputReader(
 			ctx,
 			store,
 			opath,
 			maxPayloadSize,
 		)
-		assert.NoError(t, err)
 
 		ee, err := r.ReadError(ctx)
 		assert.NoError(t, err)

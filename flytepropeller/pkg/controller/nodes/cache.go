@@ -216,10 +216,7 @@ func (n *nodeExecutor) WriteCatalogCache(ctx context.Context, nCtx interfaces.No
 		catalogKey.Identifier.Domain, catalogKey.Identifier.Name, catalogKey.Identifier.Version)
 
 	outputPaths := ioutils.NewReadOnlyOutputFilePaths(ctx, nCtx.DataStore(), nCtx.NodeStatus().GetOutputDir())
-	outputReader, err := ioutils.NewRemoteFileOutputReader(ctx, nCtx.DataStore(), outputPaths, 0)
-	if err != nil {
-		return catalog.NewStatus(core.CatalogCacheStatus_CACHE_DISABLED, nil), errors.Wrapf(err, "failed to initialize the remote output file reader")
-	}
+	outputReader := ioutils.NewRemoteFileOutputReader(ctx, nCtx.DataStore(), outputPaths, 0)
 	metadata := catalog.Metadata{
 		TaskExecutionIdentifier: task.GetTaskExecutionIdentifier(nCtx),
 	}

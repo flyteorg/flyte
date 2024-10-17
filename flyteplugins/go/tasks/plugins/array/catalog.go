@@ -567,9 +567,5 @@ func ConstructOutputReader(ctx context.Context, dataStore *storage.DataStore, ou
 	// checkpoint paths are not computed here because this function is only called when writing
 	// existing cached outputs. if this functionality changes this will need to be revisited.
 	outputPath := ioutils.NewCheckpointRemoteFilePaths(ctx, dataStore, dataReference, ioutils.NewRawOutputPaths(ctx, outputSandbox), "")
-	reader, err := ioutils.NewRemoteFileOutputReader(ctx, dataStore, outputPath, int64(999999999))
-	if err != nil {
-		return nil, err
-	}
-	return reader, nil
+	return ioutils.NewRemoteFileOutputReader(ctx, dataStore, outputPath, int64(999999999)), nil
 }

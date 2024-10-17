@@ -99,10 +99,7 @@ func (f fakeRemoteWritePlugin) Handle(ctx context.Context, tCtx pluginCore.TaskE
 			o.Literals[k] = l
 		}
 		assert.NoError(f.t, tCtx.DataStore().WriteProtobuf(ctx, tCtx.OutputWriter().GetOutputPath(), storage.Options{}, o))
-		reader, err := ioutils.NewRemoteFileOutputReader(ctx, tCtx.DataStore(), tCtx.OutputWriter(), 0)
-		if err != nil {
-			return trns, err
-		}
+		reader := ioutils.NewRemoteFileOutputReader(ctx, tCtx.DataStore(), tCtx.OutputWriter(), 0)
 		assert.NoError(f.t, tCtx.OutputWriter().Put(ctx, reader))
 	}
 	return trns, err

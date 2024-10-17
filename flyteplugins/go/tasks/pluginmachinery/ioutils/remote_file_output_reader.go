@@ -15,7 +15,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
-type ErrorRetriever interface {
+type errorRetriever interface {
 	HasError(ctx context.Context) (bool, error)
 	GetError(ctx context.Context) (io.ExecutionError, error)
 }
@@ -25,7 +25,7 @@ type baseErrorRetriever struct {
 	maxPayloadSize int64
 }
 
-type SingleFileErrorRetriever struct {
+type singleFileErrorRetriever struct {
 	baseErrorRetriever
 	errorFilePath storage.DataReference
 }
@@ -34,8 +34,8 @@ const errorFileNotFoundErrorCode = "ErrorFileNotFound"
 
 var ErrRemoteFileExceedsMaxSize = errors.New("remote file exceeds max size")
 
-func NewSingleFileErrorRetriever(errorFilePath storage.DataReference, store storage.ComposedProtobufStore, maxPayloadSize int64) *SingleFileErrorRetriever {
-	return &SingleFileErrorRetriever{
+func newSingleFileErrorRetriever(errorFilePath storage.DataReference, store storage.ComposedProtobufStore, maxPayloadSize int64) *singleFileErrorRetriever {
+	return &singleFileErrorRetriever{
 		baseErrorRetriever: baseErrorRetriever{
 			store:          store,
 			maxPayloadSize: maxPayloadSize,
@@ -55,7 +55,7 @@ func (b *baseErrorRetriever) validatePayloadSize(filePath storage.DataReference,
 	return nil
 }
 
-func (s *SingleFileErrorRetriever) HasError(ctx context.Context) (bool, error) {
+func (s *singleFileErrorRetriever) HasError(ctx context.Context) (bool, error) {
 	metadata, err := s.store.Head(ctx, s.errorFilePath)
 	if err != nil {
 		return false, errors.Wrapf(err, "failed to read error file @[%s]", s.errorFilePath)
@@ -95,7 +95,7 @@ func errorDoc2ExecutionError(errorDoc *core.ErrorDocument, errorFilePath storage
 	return executionError
 }
 
-func (s *SingleFileErrorRetriever) GetError(ctx context.Context) (io.ExecutionError, error) {
+func (s *singleFileErrorRetriever) GetError(ctx context.Context) (io.ExecutionError, error) {
 	errorDoc := &core.ErrorDocument{}
 	err := s.store.ReadProtobuf(ctx, s.errorFilePath, errorDoc)
 	if err != nil {
@@ -115,14 +115,14 @@ func (s *SingleFileErrorRetriever) GetError(ctx context.Context) (io.ExecutionEr
 	return errorDoc2ExecutionError(errorDoc, s.errorFilePath), nil
 }
 
-type EarliestFileErrorRetriever struct {
+type earliestFileErrorRetriever struct {
 	baseErrorRetriever
 	errorDirPath        storage.DataReference
 	errorFilePathPrefix storage.DataReference
 	errorFileExtension  string
 }
 
-func (e *EarliestFileErrorRetriever) HasError(ctx context.Context) (bool, error) {
+func (e *earliestFileErrorRetriever) HasError(ctx context.Context) (bool, error) {
 	hasError := false
 	const maxItems = 1000
 	cursor := storage.NewCursorAtStart()
@@ -150,7 +150,7 @@ func (e *EarliestFileErrorRetriever) HasError(ctx context.Context) (bool, error)
 	return hasError, nil
 }
 
-func (e *EarliestFileErrorRetriever) GetError(ctx context.Context) (io.ExecutionError, error) {
+func (e *earliestFileErrorRetriever) GetError(ctx context.Context) (io.ExecutionError, error) {
 	var earliestTimestamp time.Time = time.Now()
 	earliestExecutionError := io.ExecutionError{}
 	const maxItems = 1000
@@ -181,7 +181,7 @@ func (e *EarliestFileErrorRetriever) GetError(ctx context.Context) (io.Execution
 	return earliestExecutionError, nil
 }
 
-func NewEarliestFileErrorRetriever(errorDirPath storage.DataReference, canonicalErrorFilename string, store storage.ComposedProtobufStore, maxPayloadSize int64) (*EarliestFileErrorRetriever, error) {
+func newEarliestFileErrorRetriever(errorDirPath storage.DataReference, canonicalErrorFilename string, store storage.ComposedProtobufStore, maxPayloadSize int64) (*earliestFileErrorRetriever, error) {
 	// If the canonical error file name is error.pb, we expect multiple error files
 	// to have name error<suffix>.pb
 	pieces := strings.Split(canonicalErrorFilename, ".")
@@ -193,7 +193,7 @@ func NewEarliestFileErrorRetriever(errorDirPath storage.DataReference, canonical
 	errorFilePathPrefix := storage.NewDataReference(scheme, container, filepath.Join(key, errorFilePrefix))
 	errorFileExtension := fmt.Sprintf(".%s", pieces[1])
 
-	return &EarliestFileErrorRetriever{
+	return &earliestFileErrorRetriever{
 		baseErrorRetriever: baseErrorRetriever{
 			store:          store,
 			maxPayloadSize: maxPayloadSize,
@@ -204,14 +204,17 @@ func NewEarliestFileErrorRetriever(errorDirPath storage.DataReference, canonical
 	}, nil
 }
 
-func NewErrorRetriever(errorAggregationStrategy k8s.ErrorAggregationStrategy, errorDirPath storage.DataReference, errorFilename string, store storage.ComposedProtobufStore, maxPayloadSize int64) (ErrorRetriever, error) {
+func newErrorRetriever(errorAggregationStrategy k8s.ErrorAggregationStrategy, errorDirPath storage.DataReference, errorFilename string, store storage.ComposedProtobufStore, maxPayloadSize int64) (errorRetriever, error) {
 	if errorAggregationStrategy == k8s.DefaultErrorAggregationStrategy {
-		scheme, container, key, _ := errorDirPath.Split()
+		scheme, container, key, err := errorDirPath.Split()
+		if err != nil {
+			return nil, errors.Wrapf(err, "invalid error dir path %s", errorDirPath)
+		}
 		errorFilePath := storage.NewDataReference(scheme, container, filepath.Join(key, errorFilename))
-		return NewSingleFileErrorRetriever(errorFilePath, store, maxPayloadSize), nil
+		return newSingleFileErrorRetriever(errorFilePath, store, maxPayloadSize), nil
 	}
 	if errorAggregationStrategy == k8s.EarliestErrorAggregationStrategy {
-		return NewEarliestFileErrorRetriever(errorDirPath, errorFilename, store, maxPayloadSize)
+		return newEarliestFileErrorRetriever(errorDirPath, errorFilename, store, maxPayloadSize)
 	}
 	return nil, errors.Errorf("unknown error aggregation strategy: %v", errorAggregationStrategy)
 }
@@ -220,7 +223,7 @@ type RemoteFileOutputReader struct {
 	outPath        io.OutputFilePaths
 	store          storage.ComposedProtobufStore
 	maxPayloadSize int64
-	errorRetriever ErrorRetriever
+	errorRetriever errorRetriever
 }
 
 func (r RemoteFileOutputReader) IsError(ctx context.Context) (bool, error) {
@@ -279,24 +282,36 @@ func (r RemoteFileOutputReader) DeckExists(ctx context.Context) (bool, error) {
 	return md.Exists(), nil
 }
 
-func NewRemoteFileOutputReader(context context.Context, store storage.ComposedProtobufStore, outPaths io.OutputFilePaths, maxDatasetSize int64) (*RemoteFileOutputReader, error) {
-	return NewRemoteFileOutputReaderWithErrorAggregationStrategy(context, store, outPaths, maxDatasetSize, k8s.DefaultErrorAggregationStrategy)
-}
-
-func NewRemoteFileOutputReaderWithErrorAggregationStrategy(_ context.Context, store storage.ComposedProtobufStore, outPaths io.OutputFilePaths, maxDatasetSize int64, errorAggregationStrategy k8s.ErrorAggregationStrategy) (*RemoteFileOutputReader, error) {
+func getMaxPayloadSize(maxDatasetSize int64) int64 {
 	// Note: even though the data store retrieval checks against GetLimitMegabytes, there might be external
 	// storage implementations, so we keep this check here as well.
 	maxPayloadSize := maxDatasetSize
 	if maxPayloadSize == 0 {
 		maxPayloadSize = storage.GetConfig().Limits.GetLimitMegabytes * 1024 * 1024
 	}
+	return maxPayloadSize
+}
+
+func NewRemoteFileOutputReader(context context.Context, store storage.ComposedProtobufStore, outPaths io.OutputFilePaths, maxDatasetSize int64) RemoteFileOutputReader {
+	maxPayloadSize := getMaxPayloadSize(maxDatasetSize)
+	errorRetriever := newSingleFileErrorRetriever(outPaths.GetErrorPath(), store, maxPayloadSize)
+	return RemoteFileOutputReader{
+		outPath:        outPaths,
+		store:          store,
+		maxPayloadSize: maxPayloadSize,
+		errorRetriever: errorRetriever,
+	}
+}
+
+func NewRemoteFileOutputReaderWithErrorAggregationStrategy(_ context.Context, store storage.ComposedProtobufStore, outPaths io.OutputFilePaths, maxDatasetSize int64, errorAggregationStrategy k8s.ErrorAggregationStrategy) (*RemoteFileOutputReader, error) {
+	maxPayloadSize := getMaxPayloadSize(maxDatasetSize)
 	scheme, container, key, err := outPaths.GetErrorPath().Split()
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to parse error path %s", outPaths.GetErrorPath())
 	}
 	errorFilename := filepath.Base(key)
 	errorDirPath := storage.NewDataReference(scheme, container, filepath.Dir(key))
-	errorRetriever, err := NewErrorRetriever(errorAggregationStrategy, errorDirPath, errorFilename, store, maxPayloadSize)
+	errorRetriever, err := newErrorRetriever(errorAggregationStrategy, errorDirPath, errorFilename, store, maxPayloadSize)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to create remote output reader with error aggregation strategy %v", errorAggregationStrategy)
 	}

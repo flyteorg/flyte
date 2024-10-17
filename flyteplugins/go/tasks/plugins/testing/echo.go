@@ -116,10 +116,7 @@ func copyInputsToOutputs(ctx context.Context, tCtx core.TaskExecutionContext) (c
 			return core.UnknownTransition, err
 		}
 
-		or, err := ioutils.NewRemoteFileOutputReader(ctx, tCtx.DataStore(), tCtx.OutputWriter(), 0)
-		if err != nil {
-			return core.UnknownTransition, err
-		}
+		or := ioutils.NewRemoteFileOutputReader(ctx, tCtx.DataStore(), tCtx.OutputWriter(), 0)
 		if err = tCtx.OutputWriter().Put(ctx, or); err != nil {
 			return core.UnknownTransition, err
 		}

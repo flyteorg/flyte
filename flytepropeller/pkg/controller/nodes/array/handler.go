@@ -503,15 +503,8 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 				// checkpoint paths are not computed here because this function is only called when writing
 				// existing cached outputs. if this functionality changes this will need to be revisited.
 				outputPaths := ioutils.NewCheckpointRemoteFilePaths(ctx, nCtx.DataStore(), subOutputDir, ioutils.NewRawOutputPaths(ctx, subDataDir), "")
-				reader, err := ioutils.NewRemoteFileOutputReader(ctx, nCtx.DataStore(), outputPaths, 0)
-				if err != nil {
-					gatherOutputsRequest.responseChannel <- struct {
-						literalMap map[string]*idlcore.Literal
-						error
-					}{nil, err}
-					continue
-				}
-				gatherOutputsRequest.reader = reader
+				reader := ioutils.NewRemoteFileOutputReader(ctx, nCtx.DataStore(), outputPaths, 0)
+				gatherOutputsRequest.reader = &reader
 				a.gatherOutputsRequestChannel <- gatherOutputsRequest
 			}
 
