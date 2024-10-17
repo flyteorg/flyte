@@ -22,6 +22,7 @@ import (
 	datacatalog "github.com/flyteorg/flyte/datacatalog/pkg/rpc/datacatalogservice"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/clusterresource"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
+	adminRepositoriesConfig "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/config"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/runtime"
 	adminServer "github.com/flyteorg/flyte/flyteadmin/pkg/server"
 	"github.com/flyteorg/flyte/flyteadmin/plugins"
@@ -71,11 +72,18 @@ func startAdmin(ctx context.Context, cfg Admin) error {
 	}
 
 	logger.Infof(ctx, "Seeding default projects...")
-	projects := []string{"flytesnacks"}
+	projects := []*adminRepositoriesConfig.SeedProject{{Name: "flytesnack"}}
 	if len(cfg.SeedProjects) != 0 {
 		projects = cfg.SeedProjects
 	}
-	logger.Infof(ctx, "Seeding default projects...", projects)
+
+	// Logging the project names
+	projectNames := []string{}
+	for _, project := range projects {
+		projectNames = append(projectNames, project.Name)
+	}
+	logger.Infof(ctx, "Seeding default projects...", projectNames)
+
 	if err := adminServer.SeedProjects(ctx, projects); err != nil {
 		return err
 	}
