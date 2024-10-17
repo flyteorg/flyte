@@ -42,8 +42,8 @@ message BlobMetadata {
 // A simple byte array with a tag to help different parts of the system communicate about what is in the byte array.
 // It's strongly advisable that consumers of this type define a unique tag and validate the tag before parsing the data.
 message Binary {
-    bytes value = 1;
-    string tag = 2;
+    bytes value = 1; // Serialized data (MessagePack) for supported types like Dataclass, Pydantic BaseModel, and untyped dict.
+    string tag = 2; // The serialization format identifier (e.g., MessagePack). Consumers must define unique tags and validate them before deserialization.
 }
 
 // A strongly typed schema that defines the interface of data retrieved from the underlying storage medium.

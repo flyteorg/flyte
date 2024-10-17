@@ -769,6 +769,9 @@ func TestValidateBindings(t *testing.T) {
 		_, ok := ValidateBindings(wf, n, bindings, vars, true, c.EdgeDirectionBidirectional, compileErrors)
 		assert.False(t, ok)
 		assert.Equal(t, "MismatchingTypes", string(compileErrors.Errors().List()[0].Code()))
+		assert.Contains(t, compileErrors.Errors().List()[0].Error(), "Code: MismatchingTypes, Node Id: node1, Description: Variable [x]")
+		assert.Contains(t, compileErrors.Errors().List()[0].Error(), "(type [union_type:{variants:{simple:INTEGER")
+		assert.Contains(t, compileErrors.Errors().List()[0].Error(), "doesn't match expected type")
 	})
 
 	t.Run("List of Int to List of Unions Binding", func(t *testing.T) {
@@ -1196,6 +1199,9 @@ func TestValidateBindings(t *testing.T) {
 		_, ok := ValidateBindings(wf, n, bindings, vars, true, c.EdgeDirectionBidirectional, compileErrors)
 		assert.False(t, ok)
 		assert.Equal(t, "MismatchingTypes", string(compileErrors.Errors().List()[0].Code()))
+		assert.Contains(t, compileErrors.Errors().List()[0].Error(), "Code: MismatchingTypes, Node Id: node1,")
+		assert.Contains(t, compileErrors.Errors().List()[0].Error(), "Variable [n2_out]")
+		assert.Contains(t, compileErrors.Errors().List()[0].Error(), "(type [simple:INTEGER])")
 	})
 
 	t.Run("Union Promise Union Literal", func(t *testing.T) {

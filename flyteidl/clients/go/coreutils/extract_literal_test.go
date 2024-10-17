@@ -113,7 +113,7 @@ func TestFetchLiteral(t *testing.T) {
 		s := MakeBinaryLiteral([]byte{'h'})
 		assert.Equal(t, []byte{'h'}, s.GetScalar().GetBinary().GetValue())
 		_, err := ExtractFromLiteral(s)
-		assert.NotNil(t, err)
+		assert.Nil(t, err)
 	})
 
 	t.Run("NoneType", func(t *testing.T) {

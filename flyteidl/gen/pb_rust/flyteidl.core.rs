@@ -400,8 +400,10 @@ pub struct BlobMetadata {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Binary {
+    /// Serialized data (MessagePack) for supported types like Dataclass, Pydantic BaseModel, and untyped dict.
     #[prost(bytes="vec", tag="1")]
     pub value: ::prost::alloc::vec::Vec<u8>,
+    /// The serialization format identifier (e.g., MessagePack). Consumers must define unique tags and validate them before deserialization.
     #[prost(string, tag="2")]
     pub tag: ::prost::alloc::string::String,
 }

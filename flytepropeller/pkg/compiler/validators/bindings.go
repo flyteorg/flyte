@@ -135,7 +135,7 @@ func validateBinding(w c.WorkflowBuilder, nodeID c.NodeID, nodeParam string, bin
 					} else if sourceType.GetMapValueType() != nil {
 						sourceType = sourceType.GetMapValueType()
 					} else if sourceType.GetStructure() != nil && sourceType.GetStructure().GetDataclassType() != nil {
-
+						// This is for retrieving the literal type of an attribute in a dataclass or Pydantic BaseModel
 						tmpType, exist = sourceType.GetStructure().GetDataclassType()[attr.GetStringValue()]
 
 						if !exist {

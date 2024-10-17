@@ -8,6 +8,7 @@ import (
 	"golang.org/x/exp/slices"
 	"k8s.io/apimachinery/pkg/util/sets"
 
+	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
@@ -44,7 +45,14 @@ func literalTypeForScalar(scalar *core.Scalar) *core.LiteralType {
 
 		literalType = &core.LiteralType{Type: &core.LiteralType_Blob{Blob: scalar.GetBlob().GetMetadata().GetType()}}
 	case *core.Scalar_Binary:
-		literalType = &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_BINARY}}
+		// If the binary has a tag, treat it as a structured type (e.g., dict, dataclass, Pydantic BaseModel).
+		// Otherwise, treat it as raw binary data.
+		// Reference: https://github.com/flyteorg/flyte/blob/master/rfc/system/5741-binary-idl-with-message-pack.md
+		if v.Binary.Tag == coreutils.MESSAGEPACK {
+			literalType = &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRUCT}}
+		} else {
+			literalType = &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_BINARY}}
+		}
 	case *core.Scalar_Schema:
 		literalType = &core.LiteralType{
 			Type: &core.LiteralType_Schema{

@@ -215,11 +215,15 @@ export class BlobMetadata extends Message<BlobMetadata> {
  */
 export class Binary extends Message<Binary> {
   /**
+   * Serialized data (MessagePack) for supported types like Dataclass, Pydantic BaseModel, and untyped dict.
+   *
    * @generated from field: bytes value = 1;
    */
   value = new Uint8Array(0);
 
   /**
+   * The serialization format identifier (e.g., MessagePack). Consumers must define unique tags and validate them before deserialization.
+   *
    * @generated from field: string tag = 2;
    */
   tag = "";
