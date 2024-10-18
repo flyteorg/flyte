@@ -237,8 +237,8 @@ When a workflow outputs a local file as a ``FlyteFile``, Flyte automatically upl
 
 First task output metadata:
 
-.. image:: https://github.com/flyteorg/static-resources/blob/ddec386ab74897e3c09d89fdaf305e77a2ecc52c/flyte/concepts/data_movement/flyte_data_movement_example_output.png
+.. image:: https://raw.githubusercontent.com/DenChenn/static-resources/ddec386ab74897e3c09d89fdaf305e77a2ecc52c/flyte/concepts/data_movement/flyte_data_movement_example_output.png
 
 Second task input metadata:
 
-.. image:: https://github.com/flyteorg/static-resources/blob/ddec386ab74897e3c09d89fdaf305e77a2ecc52c/flyte/concepts/data_movement/flyte_data_movement_example_input.png
+.. image:: https://raw.githubusercontent.com/DenChenn/static-resources/ddec386ab74897e3c09d89fdaf305e77a2ecc52c/flyte/concepts/data_movement/flyte_data_movement_example_input.png
