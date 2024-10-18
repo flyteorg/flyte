@@ -14,7 +14,7 @@ This document outlines the TensorFlow types available in Flyte, which facilitate
 :lines: 2-14
 ```
 
-## Tensorflow Model
+## Tensorflow model
 Flyte supports the TensorFlow SavedModel format for serializing and deserializing `tf.keras.Model` instances. The `TensorFlowModelTransformer` is responsible for handling these transformations.
 
 ### Transformer
@@ -35,7 +35,7 @@ To clone and run the example code on this page, see the [Flytesnacks repo][flyte
 :lines: 16-33
 ```
 
-## TFRecord Files
+## TFRecord files
 Flyte supports TFRecord files through the TFRecordFile type, which can handle serialized TensorFlow records. The TensorFlowRecordFileTransformer manages the conversion of TFRecord files to and from Flyte literals.
 
 ### Transformer
@@ -52,7 +52,7 @@ The `TensorFlowRecordFileTransformer` enables you to work with single TFRecord f
 :lines: 35-45
 ```
 
-## TFRecord Directories
+## TFRecord directories
 Flyte supports directories containing multiple TFRecord files through the `TFRecordsDirectory type`. The `TensorFlowRecordsDirTransformer` manages the conversion of TFRecord directories to and from Flyte literals.
 
 ### Transformer
@@ -71,10 +71,10 @@ The `TensorFlowRecordsDirTransformer` allows you to work with directories of TFR
 :lines: 47-56
 ```
 
-## Configuration Class: `TFRecordDatasetConfig`
+## Configuration class: `TFRecordDatasetConfig`
 The `TFRecordDatasetConfig` class is a data structure used to configure the parameters for creating a `tf.data.TFRecordDataset`, which allows for efficient reading of TFRecord files. This class uses the `DataClassJsonMixin` for easy JSON serialization.
 
-### Attributes:
+### Attributes
 - **compression_type**: (Optional) Specifies the compression method used for the TFRecord files. Possible values include an empty string (no compression), "ZLIB", or "GZIP".
 - **buffer_size**: (Optional) Defines the size of the read buffer in bytes. If not set, defaults will be used based on the local or remote file system.
 - **num_parallel_reads**: (Optional) Determines the number of files to read in parallel. A value greater than one outputs records in an interleaved order.
