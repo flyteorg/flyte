@@ -30,6 +30,27 @@ type PluginEntry struct {
 	CustomKubeClient func(ctx context.Context) (pluginsCore.KubeClient, error)
 }
 
+type ErrorAggregationStrategy int
+
+const (
+	// Single error file from a single container
+	DefaultErrorAggregationStrategy ErrorAggregationStrategy = iota
+
+	// Earliest error from potentially multiple error files
+	EarliestErrorAggregationStrategy
+)
+
+func (e ErrorAggregationStrategy) String() string {
+	switch e {
+	case DefaultErrorAggregationStrategy:
+		return "Default"
+	case EarliestErrorAggregationStrategy:
+		return "Earliest"
+	default:
+		panic("Unknown enum value, cannot happen")
+	}
+}
+
 // System level properties that this Plugin supports
 type PluginProperties struct {
 	// Disables the inclusion of OwnerReferences in kubernetes resources that this plugin is responsible for.
@@ -45,6 +66,8 @@ type PluginProperties struct {
 	// override that behavior unless the resource that gets created for this plugin does not consume resources (cluster's
 	// cpu/memory... etc. or external resources) once the plugin's Plugin.GetTaskPhase() returns a terminal phase.
 	DisableDeleteResourceOnFinalize bool
+	// Specifies how errors are aggregated
+	ErrorAggregationStrategy ErrorAggregationStrategy
 }
 
 // Special context passed in to plugins when checking task phase

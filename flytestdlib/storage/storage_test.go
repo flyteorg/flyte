@@ -11,6 +11,14 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
+func TestDataReference_New(t *testing.T) {
+	scheme := "s3"
+	container := "container"
+	key := "path/to/file"
+	dataReference := NewDataReference(scheme, container, key)
+	assert.Equal(t, DataReference("s3://container/path/to/file"), dataReference)
+}
+
 func TestDataReference_Split(t *testing.T) {
 	input := DataReference("s3://container/path/to/file")
 	scheme, container, key, err := input.Split()
