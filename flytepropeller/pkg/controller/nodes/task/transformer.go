@@ -127,6 +127,7 @@ func ToTaskExecutionEvent(input ToTaskExecutionEventInputs) (*event.TaskExecutio
 				Logs:         e.Logs,
 				RetryAttempt: e.RetryAttempt,
 				Phase:        phase,
+				CustomInfo:   e.CustomInfo,
 			}
 		}
 	}
