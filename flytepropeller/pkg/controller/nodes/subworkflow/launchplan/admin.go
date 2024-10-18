@@ -15,6 +15,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	evtErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/transformers/k8s"
 	"github.com/flyteorg/flyte/flytestdlib/cache"
 	stdErr "github.com/flyteorg/flyte/flytestdlib/errors"
@@ -41,6 +42,7 @@ type adminLaunchPlanExecutor struct {
 type executionCacheItem struct {
 	core.WorkflowExecutionIdentifier
 	ExecutionClosure *admin.ExecutionClosure
+	HasOutputs       bool
 	SyncError        error
 	ExecutionOutputs *core.LiteralMap
 }
@@ -79,8 +81,8 @@ func (a *adminLaunchPlanExecutor) handleLaunchError(ctx context.Context, isRecov
 	}
 }
 
-func (a *adminLaunchPlanExecutor) Launch(ctx context.Context, launchCtx LaunchContext,
-	executionID *core.WorkflowExecutionIdentifier, launchPlanRef *core.Identifier, inputs *core.LiteralMap) error {
+func (a *adminLaunchPlanExecutor) Launch(ctx context.Context, launchCtx LaunchContext, executionID *core.WorkflowExecutionIdentifier,
+	launchPlan v1alpha1.ExecutableLaunchPlan, inputs *core.LiteralMap) error {
 	var err error
 	if launchCtx.RecoveryExecution != nil {
 		_, err = a.adminClient.RecoverExecution(ctx, &admin.ExecutionRecoverRequest{
@@ -91,7 +93,7 @@ func (a *adminLaunchPlanExecutor) Launch(ctx context.Context, launchCtx LaunchCo
 			},
 		})
 		if err != nil {
-			launchErr := a.handleLaunchError(ctx, isRecovery, executionID, launchPlanRef, err)
+			launchErr := a.handleLaunchError(ctx, isRecovery, executionID, launchPlan.GetId(), err)
 			if launchErr != nil {
 				return launchErr
 			}
@@ -130,7 +132,7 @@ func (a *adminLaunchPlanExecutor) Launch(ctx context.Context, launchCtx LaunchCo
 		Name:    executionID.Name,
 		Inputs:  inputs,
 		Spec: &admin.ExecutionSpec{
-			LaunchPlan: launchPlanRef,
+			LaunchPlan: launchPlan.GetId(),
 			Metadata: &admin.ExecutionMetadata{
 				Mode:                admin.ExecutionMetadata_CHILD_WORKFLOW,
 				Nesting:             launchCtx.NestingLevel + 1,
@@ -150,13 +152,17 @@ func (a *adminLaunchPlanExecutor) Launch(ctx context.Context, launchCtx LaunchCo
 
 	_, err = a.adminClient.CreateExecution(ctx, req)
 	if err != nil {
-		launchErr := a.handleLaunchError(ctx, !isRecovery, executionID, launchPlanRef, err)
+		launchErr := a.handleLaunchError(ctx, !isRecovery, executionID, launchPlan.GetId(), err)
 		if launchErr != nil {
 			return launchErr
 		}
 	}
 
-	_, err = a.cache.GetOrCreate(executionID.String(), executionCacheItem{WorkflowExecutionIdentifier: *executionID})
+	hasOutputs := launchPlan.GetInterface() != nil && launchPlan.GetInterface().GetOutputs().GetVariables() != nil && len(launchPlan.GetInterface().GetOutputs().GetVariables()) > 0
+	_, err = a.cache.GetOrCreate(executionID.String(), executionCacheItem{
+		WorkflowExecutionIdentifier: *executionID,
+		HasOutputs:                  hasOutputs,
+	})
 	if err != nil {
 		logger.Infof(ctx, "Failed to add ExecID [%v] to auto refresh cache", executionID)
 	}
@@ -164,12 +170,18 @@ func (a *adminLaunchPlanExecutor) Launch(ctx context.Context, launchCtx LaunchCo
 	return nil
 }
 
-func (a *adminLaunchPlanExecutor) GetStatus(ctx context.Context, executionID *core.WorkflowExecutionIdentifier) (*admin.ExecutionClosure, *core.LiteralMap, error) {
+func (a *adminLaunchPlanExecutor) GetStatus(ctx context.Context, executionID *core.WorkflowExecutionIdentifier,
+	launchPlan v1alpha1.ExecutableLaunchPlan) (*admin.ExecutionClosure, *core.LiteralMap, error) {
+
 	if executionID == nil {
 		return nil, nil, fmt.Errorf("nil executionID")
 	}
 
-	obj, err := a.cache.GetOrCreate(executionID.String(), executionCacheItem{WorkflowExecutionIdentifier: *executionID})
+	hasOutputs := launchPlan.GetInterface() != nil && launchPlan.GetInterface().GetOutputs().GetVariables() != nil && len(launchPlan.GetInterface().GetOutputs().GetVariables()) > 0
+	obj, err := a.cache.GetOrCreate(executionID.String(), executionCacheItem{
+		WorkflowExecutionIdentifier: *executionID,
+		HasOutputs:                  hasOutputs,
+	})
 	if err != nil {
 		return nil, nil, err
 	}
@@ -263,6 +275,7 @@ func (a *adminLaunchPlanExecutor) syncItem(ctx context.Context, batch cache.Batc
 				Item: executionCacheItem{
 					WorkflowExecutionIdentifier: exec.WorkflowExecutionIdentifier,
 					SyncError:                   err,
+					HasOutputs:                  exec.HasOutputs,
 				},
 				Action: cache.Update,
 			})
@@ -270,38 +283,54 @@ func (a *adminLaunchPlanExecutor) syncItem(ctx context.Context, batch cache.Batc
 			continue
 		}
 
-		var outputs = &core.LiteralMap{}
 		// Retrieve potential outputs only when the workflow succeeded.
-		// TODO: We can optimize further by only retrieving the outputs when the workflow has output variables in the
-		// 	interface.
-		if res.GetClosure().GetPhase() == core.WorkflowExecution_SUCCEEDED {
+		var outputs = &core.LiteralMap{}
+		if res.GetClosure().GetPhase() == core.WorkflowExecution_SUCCEEDED && exec.HasOutputs {
 			execData, err := a.adminClient.GetExecutionData(ctx, &admin.WorkflowExecutionGetDataRequest{
 				Id: &exec.WorkflowExecutionIdentifier,
 			})
-			if err != nil || execData.GetFullOutputs() == nil || execData.GetFullOutputs().GetLiterals() == nil {
-				outputURI := res.GetClosure().GetOutputs().GetUri()
-				// attempt remote storage read on GetExecutionData failure
-				if outputURI != "" {
+
+			// detect both scenarios where we want to read the outputURI within propeller:
+			//  (1) gRPC ResourceExhausted code indicating the output literals were too large
+			//  (2) output literals were not sent. this can be either intended if flyteadmin only
+			//  stores the offloaded data or a consequence of flyteadmin failing to read the
+			//  outputURI because of read limit configuration values, for example `maxDownloadMBs`.
+			errorPreamble := ""
+			fetchOutputsFromURI := false
+			if err != nil && status.Code(err) == codes.ResourceExhausted {
+				errorPreamble = fmt.Sprintf("unable to retrieve output literals: [%v]", err)
+				fetchOutputsFromURI = true
+			} else if err == nil {
+				if execData.GetFullOutputs() != nil && execData.GetFullOutputs().GetLiterals() != nil {
+					outputs = execData.GetFullOutputs()
+				} else {
+					errorPreamble = "recveived empty output literals, if this is unexpected consult flyteadmin `GetExecutionData` size configuration"
+					fetchOutputsFromURI = true
+				}
+			}
+
+			if fetchOutputsFromURI {
+				if outputURI := res.GetClosure().GetOutputs().GetUri(); len(outputURI) > 0 {
 					err = a.store.ReadProtobuf(ctx, storage.DataReference(outputURI), outputs)
 					if err != nil {
-						logger.Errorf(ctx, "Failed to read outputs from URI [%s] with err: %v", outputURI, err)
+						logger.Errorf(ctx, "failed to read outputs from URI [%s] with err: %v", outputURI, err)
+						err = fmt.Errorf("%s %w", errorPreamble, err)
 					}
 				}
-				if err != nil {
-					resp = append(resp, cache.ItemSyncResponse{
-						ID: obj.GetID(),
-						Item: executionCacheItem{
-							WorkflowExecutionIdentifier: exec.WorkflowExecutionIdentifier,
-							SyncError:                   err,
-						},
-						Action: cache.Update,
-					})
+			}
 
-					continue
-				}
+			if err != nil {
+				resp = append(resp, cache.ItemSyncResponse{
+					ID: obj.GetID(),
+					Item: executionCacheItem{
+						WorkflowExecutionIdentifier: exec.WorkflowExecutionIdentifier,
+						SyncError:                   err,
+						HasOutputs:                  exec.HasOutputs,
+					},
+					Action: cache.Update,
+				})
 
-			} else {
-				outputs = execData.GetFullOutputs()
+				continue
 			}
 		}
 
