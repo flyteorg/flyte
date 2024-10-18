@@ -20,6 +20,14 @@ flyte-core-components:
     # seedProjects flyte projects to create by default
     seedProjects:
       - flytesnacks
+    # seedProjectsWithDetails flyte projects to create by default with description
+    # If there is an overlap between seedProjects and seedProjectsWithDetails, 
+    # the description provided in seedProjectsWithDetails will take precedence.
+    # For seedProjects without a corresponding description in seedProjectsWithDetails,
+    # a default description will be auto-generated for the project.
+    seedProjectsWithDetails:
+      - name: flytesnacks
+        description: Default project setup."
   # propeller Configuration to disable propeller or any of its components
   propeller:
     # disabled Disables flytepropeller
