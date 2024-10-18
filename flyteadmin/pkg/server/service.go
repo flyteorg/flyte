@@ -545,9 +545,19 @@ func serveGatewaySecure(ctx context.Context, pluginRegistry *plugins.Registry, c
 		panic(err)
 	}
 
+	handler := grpcHandlerFunc(grpcServer, httpServer)
+	if cfg.Security.AllowCors {
+		handler = handlers.CORS(
+			handlers.AllowCredentials(),
+			handlers.AllowedOrigins(cfg.Security.AllowedOrigins),
+			handlers.AllowedHeaders(append(defaultCorsHeaders, cfg.Security.AllowedHeaders...)),
+			handlers.AllowedMethods([]string{"GET", "POST", "DELETE", "HEAD", "PUT", "PATCH"}),
+		)(handler)
+	}
+
 	srv := &http.Server{
 		Addr:    cfg.GetHostAddress(),
-		Handler: grpcHandlerFunc(grpcServer, httpServer),
+		Handler: handler,
 		// #nosec G402
 		TLSConfig: &tls.Config{
 			Certificates: []tls.Certificate{*cert},
