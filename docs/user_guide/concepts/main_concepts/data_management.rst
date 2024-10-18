@@ -17,10 +17,9 @@ In Flyte, data is categorized into metadata and raw data to optimize data handli
 
 *Source code reference for auto-offloading value sizes limitation:*
 
-.. literalinclude:: https://raw.githubusercontent.com/flyteorg/flyte/6c4f8dbfc6d23a0cd7bf81480856e9ae1dfa1b27/flytepropeller/pkg/controller/config/config.go
-   :caption: flytepropeller/pkg/controller/config/config.go
-   :language: go
-   :lines: 184-192
+.. raw:: html
+
+   <a href="https://github.com/flyteorg/flyte/blob/6c4f8dbfc6d23a0cd7bf81480856e9ae1dfa1b27/flytepropeller/pkg/controller/config/config.go#L184-L192">View source code on GitHub</a>
 
 Data Flow and Security
 ~~~~~~~~~~~~~~~~~~~~~~
