@@ -146,7 +146,7 @@ func (e *earliestFileErrorReader) IsError(ctx context.Context) (bool, error) {
 }
 
 func (e *earliestFileErrorReader) ReadError(ctx context.Context) (io.ExecutionError, error) {
-	var earliestTimestamp time.Time = time.Now()
+	var earliestTimestamp *time.Time = nil
 	earliestExecutionError := io.ExecutionError{}
 	const maxItems = 1000
 	cursor := storage.NewCursorAtStart()
@@ -167,9 +167,9 @@ func (e *earliestFileErrorReader) ReadError(ctx context.Context) (io.ExecutionEr
 				return io.ExecutionError{}, errors.Wrapf(err, "failed to read error file @[%s]", errorFilePath.String())
 			}
 			timestamp := errorDoc.Error.GetTimestamp().AsTime()
-			if earliestTimestamp.After(timestamp) {
+			if earliestTimestamp == nil || earliestTimestamp.After(timestamp) {
 				earliestExecutionError = errorDoc2ExecutionError(errorDoc, errorFilePath)
-				earliestTimestamp = timestamp
+				earliestTimestamp = &timestamp
 			}
 		}
 	}
