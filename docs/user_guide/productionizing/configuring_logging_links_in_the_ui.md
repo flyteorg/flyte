@@ -58,11 +58,20 @@ task_logs:
   plugins:
     logs:
       templates:
-        - displayName: <name-to-show>
+        - displayName: AWS CloudWatch Logs
           templateUris:
-            - "https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logEventViewer:group=/flyte-production/kubernetes;stream=var.log.containers.{{.podName}}_{{.namespace}}_{{.containerName}}-{{.containerId}}.log"
-            - "https://some-other-source/home?region=us-east-1#logEventViewer:group=/flyte-production/kubernetes;stream=var.log.containers.{{.podName}}_{{.namespace}}_{{.containerName}}-{{.containerId}}.log"
-          messageFormat: 0 # this parameter is optional, but use 0 for "unknown", 1 for "csv", or 2 for "json"
+            - "https://console.aws.amazon.com/cloudwatch/home?region={{.region}}#logEventViewer:group={{.logGroup}};stream=var.log.containers.{{.podName}}_{{.namespace}}_{{.containerName}}-{{.containerId}}.log"
+          prerequisites:
+            - EKS Cluster enabled with CloudWatch Observability Add-on
+            - Ensure the pod emits logs to CloudWatch log streams
+        - displayName: GCP Stackdriver Logs
+          templateUris:
+            - "https://console.cloud.google.com/logs/viewer?project={{.gcpProject}}&resource=k8s_container&advancedFilter=resource.labels.pod_name={{.podName}}&resource.labels.container_name={{.containerName}}&resource.labels.namespace_id={{.namespace}}"
+        - displayName: Kubernetes Dashboard Logs
+          templateUris:
+            - "{{.kubernetesUrl}}/namespace/{{.namespace}}/pods/{{.podName}}/logs/{{.containerName}}"
+      messageFormat: 0  # Optional: 0 = "unknown", 1 = "csv", 2 = "json"
+
 ```
 
 :::{tip}
