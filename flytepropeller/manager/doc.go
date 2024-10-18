@@ -18,7 +18,7 @@ FlytePropeller Manager handles dynamic updates to both the k8s PodTemplate and s
 
 # Shard Strategies
 
-Flyte defines a variety of Shard Strategies for configuring how FlyteWorkflows are sharded. These options may include the shard type (ex. hash, project, or domain) along with the number of shards or the distribution of project / domain IDs over shards.
+Flyte defines a variety of Shard Strategies for configuring how FlyteWorkflows are sharded. These options may include the shard type (ex. Hash, Project, or Domain) along with the number of shards or the distribution of project / domain IDs over shards.
 
 Internally, FlyteWorkflow CRDs are initialized with k8s labels for project, domain, and a shard-key. The project and domain label values are associated with the environment of the registered workflow. The shard-key value is a range-bounded hash over various components of the FlyteWorkflow metadata, currently the keyspace range is defined as [0,32). A sharded Flyte deployment ensures deterministic FlyteWorkflow evaluations by setting disjoint k8s label selectors, based on the aforementioned labels, on each managed FlytePropeller instance. This ensures that only a single FlytePropeller instance is responsible for processing each FlyteWorkflow.
 
@@ -28,10 +28,10 @@ The Hash Shard Strategy, denoted by "type: hash" in the configuration below, use
 	manager:
 	  # pod and scanning configuration redacted
 	  shard:
-	    type: hash     # use the "hash" shard strategy
+	    type: Hash     # use the "hash" shard strategy
 	    shard-count: 4 # the total number of shards
 
-The Project and Domain Shard Strategies, denoted by "type: project" and "type: domain" respectively, use the FlyteWorkflow project and domain metadata to distributed FlyteWorkflows over managed FlytePropeller instances. These Shard Strategies are configured using a "per-shard-mapping" option, which is a list of ID lists. Each element in the "per-shard-mapping" list defines a new shard and the ID list assigns responsibility for the specified IDs to that shard. The assignment is performed using k8s label selectors, where each managed FlytePropeller instance includes FlyteWorkflows with the specified project or domain labels.
+The Project and Domain Shard Strategies, denoted by "type: Project" and "type: Domain" respectively, use the FlyteWorkflow project and domain metadata to distributed FlyteWorkflows over managed FlytePropeller instances. These Shard Strategies are configured using a "per-shard-mapping" option, which is a list of ID lists. Each element in the "per-shard-mapping" list defines a new shard and the ID list assigns responsibility for the specified IDs to that shard. The assignment is performed using k8s label selectors, where each managed FlytePropeller instance includes FlyteWorkflows with the specified project or domain labels.
 
 A shard configured as a single wildcard ID (i.e. "*") is responsible for all IDs that are not covered by other shards. Only a single shard may be configured with a wildcard ID and on that shard their must be only one ID, namely the wildcard. In this case, the managed FlytePropeller instance uses k8s label selectors to exclude FlyteWorkflows with project or domain IDs from other shards.
 
@@ -39,7 +39,7 @@ A shard configured as a single wildcard ID (i.e. "*") is responsible for all IDs
 	manager:
 	  # pod and scanning configuration redacted
 	  shard:
-	    type: project       # use the "project" shard strategy
+	    type: Project       # use the "Project" shard strategy
 	    per-shard-mapping:  # a list of per shard mappings - one shard is created for each element
 	      - ids:            # the list of ids to be managed by the first shard
 	        - flytesnacks
@@ -53,7 +53,7 @@ A shard configured as a single wildcard ID (i.e. "*") is responsible for all IDs
 	manager:
 	  # pod and scanning configuration redacted
 	  shard:
-	    type: domain        # use the "domain" shard strategy
+	    type: Domain        # use the "Domain" shard strategy
 	    per-shard-mapping:  # a list of per shard mappings - one shard is created for each element
 	      - ids:            # the list of ids to be managed by the first shard
 	        - production
