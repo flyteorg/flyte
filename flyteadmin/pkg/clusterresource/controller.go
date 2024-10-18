@@ -87,23 +87,23 @@ type Controller interface {
 }
 
 type controllerMetrics struct {
-	Scope                            promutils.Scope
-	SyncErrors                       prometheus.Counter
-	SyncStarted                      prometheus.Counter
-	SyncsCompleted                   prometheus.Counter
-	KubernetesResourcesCreated       prometheus.Counter
-	KubernetesResourcesCreateErrors  prometheus.Counter
-	KubernetesNamespaceDeleteErrors  prometheus.Counter
-	ResourcesAdded                   prometheus.Counter
-	NamespacesDeleted                prometheus.Counter
-	ResourceAddErrors                prometheus.Counter
-	TemplateReadErrors               prometheus.Counter
-	TemplateDecodeErrors             prometheus.Counter
-	AppliedTemplateExists            prometheus.Counter
-	TemplateUpdateErrors             prometheus.Counter
-	Panics                           prometheus.Counter
-	ReportNamespaceProvisioned       prometheus.Counter
-	ReportNamespaceProvisionedErrors prometheus.Counter
+	Scope                                   promutils.Scope
+	SyncErrors                              prometheus.Counter
+	SyncStarted                             prometheus.Counter
+	SyncsCompleted                          prometheus.Counter
+	KubernetesResourcesCreated              prometheus.Counter
+	KubernetesResourcesCreateErrors         prometheus.Counter
+	KubernetesNamespaceDeleteErrors         prometheus.Counter
+	ResourcesAdded                          prometheus.Counter
+	NamespacesDeleted                       prometheus.Counter
+	ResourceAddErrors                       prometheus.Counter
+	TemplateReadErrors                      prometheus.Counter
+	TemplateDecodeErrors                    prometheus.Counter
+	AppliedTemplateExists                   prometheus.Counter
+	TemplateUpdateErrors                    prometheus.Counter
+	Panics                                  prometheus.Counter
+	ReportClusterResourceStateUpdated       prometheus.Counter
+	ReportClusterResourceStateUpdatedErrors prometheus.Counter
 }
 
 type FileName = string
@@ -698,91 +698,57 @@ func (c *controller) newSyncNamespacer(templateValues templateValuesType, domain
 	}
 }
 
-// Report to self serve service that the namespaces have been provisioned
-func (c *controller) reportNamespaceProvisioned(ctx context.Context, orgs sets.Set[string]) {
+// Report to self serve service that the namespaces have been updated
+func (c *controller) reportClusterResourceStateUpdated(ctx context.Context, orgs sets.Set[string], state plugin.ClusterResourceState) {
 	clusterResourcePlugin := plugins.Get[plugin.ClusterResourcePlugin](c.pluginRegistry, plugins.PluginIDClusterResource)
 	if orgs.Has("") {
 		// TODO: Investigate why this is happening and remove this once the root cause is fixed
 		logger.Debugf(ctx, "orgs set contains empty string, removing it to avoid proto validation error")
 		orgs.Delete("")
 	}
-	// Report provisioned for orgs in batches
+	// Report cluster resource state updated for orgs in batches
 	orgsList := orgs.UnsortedList()
 	for i := 0; i < len(orgsList); i += reportNamespaceProvisionedBatchSize {
 		batchOrgs := orgsList[i:min(i+reportNamespaceProvisionedBatchSize, len(orgsList))]
-		logger.Debugf(ctx, "reporting provisioned for orgs [%v]", batchOrgs)
-		batchUpdateProvisionedRequest := &plugin.BatchUpdateProvisionedInput{
-			OrgsName: batchOrgs,
+		logger.Debugf(ctx, "reporting [%v] for orgs [%v]", state, batchOrgs)
+		batchUpdateProvisionedRequest := &plugin.BatchUpdateClusterResourceStateInput{
+			OrgsName:             batchOrgs,
+			ClusterName:          c.config.ClusterResourceConfiguration().GetClusterName(),
+			ClusterResourceState: state,
 		}
-		_, batchUpdateProvisionedErrors, err := clusterResourcePlugin.BatchUpdateProvisioned(ctx, batchUpdateProvisionedRequest)
+		_, batchUpdateProvisionedErrors, err := clusterResourcePlugin.BatchUpdateClusterResourceState(ctx, batchUpdateProvisionedRequest)
 		if err != nil {
-			c.metrics.ReportNamespaceProvisionedErrors.Inc()
-			logger.Errorf(ctx, "failed to report provisioned for orgs [%v] with err: %v", batchOrgs, err)
+			c.metrics.ReportClusterResourceStateUpdatedErrors.Inc()
+			logger.Errorf(ctx, "failed to report [%v] for orgs [%v] with err: %v", state, batchOrgs, err)
 			// we don't error out here, in order to not block other namespaces from being reported
 			continue
 		}
 		if len(batchUpdateProvisionedErrors) > 0 {
-			c.metrics.ReportNamespaceProvisionedErrors.Inc()
+			c.metrics.ReportClusterResourceStateUpdatedErrors.Inc()
 			for _, updateProvisionedError := range batchUpdateProvisionedErrors {
-				logger.Errorf(ctx, "failed to report provisioned for org [%s] with err: %s %v", updateProvisionedError.OrgName, updateProvisionedError.ErrorCode, updateProvisionedError.ErrorMessage)
+				logger.Errorf(ctx, "failed to report [%v] for org [%s] with err: %s %v", state, updateProvisionedError.OrgName, updateProvisionedError.ErrorCode, updateProvisionedError.ErrorMessage)
 			}
 			continue
 		}
-		c.metrics.ReportNamespaceProvisioned.Inc()
+		c.metrics.ReportClusterResourceStateUpdated.Inc()
 	}
 }
 
-// TODO: Remove this when implementing COR-1531
-// This is a temporary solution to avoid update org status to provisioned when deleting namespaces
-// We are going to provision namespaces based on org status for serverless
-const (
-	ShouldReportNameSpaceProvisioned    = true
-	ShouldNotReportNameSpaceProvisioned = false
-)
-
-// processProjects accepts a generic project processor and applies it to all projects in the input list,
-// optionally batching and parallelizing their processing for greater perf.
-func (c *controller) processProjects(ctx context.Context, stats ResourceSyncStats, projects []*admin.Project, processor syncNamespaceProcessor, reportNamespaceProvisioned bool) (ResourceSyncStats, error) {
-	if len(projects) == 0 {
-		// Nothing to do
-		return stats, nil
-	}
-	orgs := sets.Set[string]{}
-	if c.config.ClusterResourceConfiguration().GetUnionProjectSyncConfig().BatchSize == 0 {
-		logger.Debugf(ctx, "processing projects serially")
-		for _, project := range projects {
-			for _, domain := range project.Domains {
-				orgs.Insert(project.Org)
-				namespace := common.GetNamespaceName(c.config.NamespaceMappingConfiguration().GetNamespaceTemplate(), project.Org, project.Id, domain.Name)
-				newStats, err := processor(ctx, project, domain, namespace)
-				if err != nil {
-					return stats, err
-				}
-				stats.Add(newStats)
-				logger.Infof(ctx, "Completed cluster resource creation loop for namespace [%s] with stats: [%+v]", namespace, newStats)
-			}
-		}
-		if c.config.ClusterResourceConfiguration().IsSelfServe() && reportNamespaceProvisioned {
-			c.reportNamespaceProvisioned(ctx, orgs)
-		}
-		return stats, nil
-	}
-
-	logger.Debugf(ctx, "processing projects in parallel with batch size: %d", c.config.ClusterResourceConfiguration().GetUnionProjectSyncConfig().BatchSize)
-	statsEntries := make([]ResourceSyncStats, len(projects)*len(projects[0].Domains))
-
+func (c *controller) processProjectsInBatch(ctx context.Context, projects []*admin.Project, processor syncNamespaceProcessor) []ResourceSyncStats {
+	numberOfDomains := len(projects[0].Domains)
+	statsEntries := make([]ResourceSyncStats, len(projects)*numberOfDomains)
 	batchSize := c.config.ClusterResourceConfiguration().GetUnionProjectSyncConfig().BatchSize
 	for i := 0; i < len(projects); i += batchSize {
 		logger.Debugf(ctx, "processing projects batch {%d...%d}", i, i+batchSize)
 		processProjectsGroup, processProjectsCtx := errgroup.WithContext(ctx)
-		for _, project := range projects[i:min(i+batchSize, len(projects))] {
+		for projectIdx, project := range projects[i:min(i+batchSize, len(projects))] {
 			var lastFormattedNamespace NamespaceName
 			for domainIdx, domain := range project.Domains {
 				// redefine variables for loop closure
 				i := i
 				org := project.Org
-				orgs.Insert(org)
 				project := project
+				projectIdx := projectIdx
 				domain := domain
 				domainIdx := domainIdx
 				namespace := common.GetNamespaceName(c.config.NamespaceMappingConfiguration().GetNamespaceTemplate(), org, project.Id, domain.Id)
@@ -800,10 +766,9 @@ func (c *controller) processProjects(ctx context.Context, stats ResourceSyncStat
 						// we don't error out here, in order to not block other namespaces from being synced
 					} else {
 						c.metrics.ResourcesAdded.Inc()
-						statsEntries[i+domainIdx] = resourceStats
+						statsEntries[(i+projectIdx)*numberOfDomains+domainIdx] = resourceStats
 						logger.Debugf(ctx, "Completed cluster resource creation loop for namespace [%s] with stats: [%+v]", namespace, resourceStats)
 					}
-
 					return nil
 				})
 			}
@@ -814,8 +779,64 @@ func (c *controller) processProjects(ctx context.Context, stats ResourceSyncStat
 		}
 		logger.Debugf(ctx, "processed projects batch {%d...%d} when syncing namespaces", i, i+batchSize)
 	}
-	if c.config.ClusterResourceConfiguration().IsSelfServe() && reportNamespaceProvisioned {
-		c.reportNamespaceProvisioned(ctx, orgs)
+	return statsEntries
+}
+
+// processProjects accepts a generic project processor and applies it to all projects in the input list,
+// optionally batching and parallelizing their processing for greater perf.
+func (c *controller) processProjects(ctx context.Context, stats ResourceSyncStats, projects []*admin.Project, processor syncNamespaceProcessor) (ResourceSyncStats, error) {
+	if len(projects) == 0 {
+		// Nothing to do
+		return stats, nil
+	}
+	// resourceCreatedOrgs/resourceDeletedOrgs is used to track which orgs have had resources created/deleted
+	// This is only used in Serverless (self-serve) mode
+	resourceCreatedOrgs := sets.Set[string]{}
+	resourceDeletedOrgs := sets.Set[string]{}
+	if c.config.ClusterResourceConfiguration().GetUnionProjectSyncConfig().BatchSize == 0 {
+		logger.Debugf(ctx, "processing projects serially")
+		for _, project := range projects {
+			for _, domain := range project.Domains {
+				namespace := common.GetNamespaceName(c.config.NamespaceMappingConfiguration().GetNamespaceTemplate(), project.Org, project.Id, domain.Name)
+				newStats, err := processor(ctx, project, domain, namespace)
+				if err != nil {
+					return stats, err
+				}
+				stats.Add(newStats)
+				if newStats.Created > 0 {
+					resourceCreatedOrgs.Insert(project.Org)
+				}
+				if newStats.Deleted > 0 {
+					resourceDeletedOrgs.Insert(project.Org)
+				}
+				logger.Infof(ctx, "Completed cluster resource creation loop for namespace [%s] with stats: [%+v]", namespace, newStats)
+			}
+		}
+		if c.config.ClusterResourceConfiguration().IsSelfServe() {
+			c.reportClusterResourceStateUpdated(ctx, resourceCreatedOrgs, plugin.ClusterResourceStateProvisioned)
+			c.reportClusterResourceStateUpdated(ctx, resourceDeletedOrgs, plugin.ClusterResourceStateDeprovisioned)
+		}
+		return stats, nil
+	}
+
+	logger.Debugf(ctx, "processing projects in parallel with batch size: %d", c.config.ClusterResourceConfiguration().GetUnionProjectSyncConfig().BatchSize)
+	statsEntries := c.processProjectsInBatch(ctx, projects, processor)
+	// Collect orgs that have had resources created/deleted
+	numberOfDomains := len(projects[0].Domains)
+	for projectIdx, project := range projects {
+		for domainIdx := range project.Domains {
+			idx := projectIdx*numberOfDomains + domainIdx
+			if statsEntries[idx].Created > 0 {
+				resourceCreatedOrgs.Insert(project.Org)
+			}
+			if statsEntries[idx].Deleted > 0 {
+				resourceDeletedOrgs.Insert(project.Org)
+			}
+		}
+	}
+	if c.config.ClusterResourceConfiguration().IsSelfServe() {
+		c.reportClusterResourceStateUpdated(ctx, resourceCreatedOrgs, plugin.ClusterResourceStateProvisioned)
+		c.reportClusterResourceStateUpdated(ctx, resourceDeletedOrgs, plugin.ClusterResourceStateDeprovisioned)
 	}
 	statsSummary := lo.Reduce(statsEntries, func(existing ResourceSyncStats, item ResourceSyncStats, _ int) ResourceSyncStats {
 		existing.Add(item)
@@ -853,7 +874,7 @@ func (c *controller) Sync(ctx context.Context) error {
 
 	stats := ResourceSyncStats{}
 	syncNamespaceProcessorFunc := c.newSyncNamespacer(templateValues, domainTemplateValues)
-	stats, err = c.processProjects(ctx, stats, projects.GetProjects(), syncNamespaceProcessorFunc, ShouldReportNameSpaceProvisioned)
+	stats, err = c.processProjects(ctx, stats, projects.GetProjects(), syncNamespaceProcessorFunc)
 	if err != nil {
 		logger.Warningf(ctx, "Failed to process projects when syncing namespaces: %v", err)
 		return err
@@ -866,7 +887,7 @@ func (c *controller) Sync(ctx context.Context) error {
 			logger.Warningf(ctx, "failed to get archived projects: %v", err)
 			return err
 		}
-		stats, err = c.processProjects(ctx, stats, archivedProjects.GetProjects(), c.deleteNamespace, ShouldNotReportNameSpaceProvisioned)
+		stats, err = c.processProjects(ctx, stats, archivedProjects.GetProjects(), c.deleteNamespace)
 		if err != nil {
 			logger.Warningf(ctx, "Failed to process projects when deleting namespaces: %v", err)
 			return err
@@ -927,10 +948,10 @@ func newMetrics(scope promutils.Scope) controllerMetrics {
 				"file failed"),
 		Panics: scope.MustNewCounter("panics",
 			"overall count of panics encountered in primary ClusterResourceController loop"),
-		ReportNamespaceProvisioned: scope.MustNewCounter("report_namespace_provisioned",
-			"overall count of successful reports of namespace provisioned"),
-		ReportNamespaceProvisionedErrors: scope.MustNewCounter("report_namespace_provision_errors",
-			"overall count of errors encountered reporting namespace provisioned"),
+		ReportClusterResourceStateUpdated: scope.MustNewCounter("report_cluster_resource_state_updated",
+			"overall count of successful reports of cluster resource state updated"),
+		ReportClusterResourceStateUpdatedErrors: scope.MustNewCounter("report_cluster_resource_state_updated_errors",
+			"overall count of errors encountered reporting cluster resource state updated"),
 	}
 }
 

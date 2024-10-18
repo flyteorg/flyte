@@ -7,12 +7,14 @@ import (
 )
 
 type MockClusterResourceConfiguration struct {
-	TemplatePath         string
-	TemplateData         interfaces.TemplateData
-	RefreshInterval      time.Duration
-	CustomTemplateData   map[interfaces.DomainName]interfaces.TemplateData
-	StandaloneDeployment bool
-	SelfServe            bool
+	TemplatePath           string
+	TemplateData           interfaces.TemplateData
+	RefreshInterval        time.Duration
+	CustomTemplateData     map[interfaces.DomainName]interfaces.TemplateData
+	StandaloneDeployment   bool
+	SelfServe              bool
+	ClusterName            string
+	UnionProjectSyncConfig interfaces.UnionProjectSyncConfig
 }
 
 func (c MockClusterResourceConfiguration) GetTemplatePath() string {
@@ -39,11 +41,15 @@ func (c MockClusterResourceConfiguration) GetArchiveProjectConfig() interfaces.U
 }
 
 func (c MockClusterResourceConfiguration) GetUnionProjectSyncConfig() interfaces.UnionProjectSyncConfig {
-	return interfaces.UnionProjectSyncConfig{}
+	return c.UnionProjectSyncConfig
 }
 
 func (c MockClusterResourceConfiguration) IsSelfServe() bool {
 	return c.SelfServe
+}
+
+func (c MockClusterResourceConfiguration) GetClusterName() string {
+	return c.ClusterName
 }
 
 func NewMockClusterResourceConfiguration() interfaces.ClusterResourceConfiguration {

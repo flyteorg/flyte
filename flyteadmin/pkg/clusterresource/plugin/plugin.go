@@ -8,16 +8,25 @@ import (
 
 // ClusterResourcePlugin defines a subset of the Union Cloud service API that is used by the cluster resource controller
 type ClusterResourcePlugin interface {
-	BatchUpdateProvisioned(ctx context.Context, input *BatchUpdateProvisionedInput) (BatchUpdateProvisionedOutput, []BatchUpdateProvisionedError, error)
+	BatchUpdateClusterResourceState(ctx context.Context, input *BatchUpdateClusterResourceStateInput) (BatchUpdateClusterResourceStateOutput, []BatchUpdateClusterResourceStateError, error)
 }
 
-type BatchUpdateProvisionedInput struct {
-	OrgsName []string
+type ClusterResourceState int
+
+const (
+	ClusterResourceStateProvisioned ClusterResourceState = iota
+	ClusterResourceStateDeprovisioned
+)
+
+type BatchUpdateClusterResourceStateInput struct {
+	OrgsName             []string
+	ClusterName          string
+	ClusterResourceState ClusterResourceState
 }
 
-type BatchUpdateProvisionedOutput struct{}
+type BatchUpdateClusterResourceStateOutput struct{}
 
-type BatchUpdateProvisionedError struct {
+type BatchUpdateClusterResourceStateError struct {
 	OrgName      string
 	ErrorMessage string
 	ErrorCode    codes.Code
@@ -27,9 +36,9 @@ type BatchUpdateProvisionedError struct {
 type NoopClusterResourcePlugin struct {
 }
 
-// BatchUpdateProvisioned does nothing.
-func (n *NoopClusterResourcePlugin) BatchUpdateProvisioned(ctx context.Context, input *BatchUpdateProvisionedInput) (BatchUpdateProvisionedOutput, []BatchUpdateProvisionedError, error) {
-	return BatchUpdateProvisionedOutput{}, nil, nil
+// BatchUpdateClusterResourceState does nothing.
+func (n *NoopClusterResourcePlugin) BatchUpdateClusterResourceState(ctx context.Context, input *BatchUpdateClusterResourceStateInput) (BatchUpdateClusterResourceStateOutput, []BatchUpdateClusterResourceStateError, error) {
+	return BatchUpdateClusterResourceStateOutput{}, nil, nil
 }
 
 func NewNoopClusterResourcePlugin() *NoopClusterResourcePlugin {

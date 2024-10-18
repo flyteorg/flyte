@@ -53,6 +53,10 @@ func (p *ClusterResourceConfigurationProvider) IsSelfServe() bool {
 	return clusterResourceConfig.GetConfig().(*interfaces.ClusterResourceConfig).IsSelfServe
 }
 
+func (p *ClusterResourceConfigurationProvider) GetClusterName() string {
+	return clusterResourceConfig.GetConfig().(*interfaces.ClusterResourceConfig).ClusterName
+}
+
 func NewClusterResourceConfigurationProvider() interfaces.ClusterResourceConfiguration {
 	return &ClusterResourceConfigurationProvider{}
 }

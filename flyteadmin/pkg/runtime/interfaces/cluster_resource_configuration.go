@@ -51,6 +51,7 @@ type ClusterResourceConfig struct {
 	StandaloneDeployment   bool                        `json:"standaloneDeployment" pflag:", Whether the cluster resource sync is running in a standalone deployment and should call flyteadmin service endpoints"`
 	UnionProjectSyncConfig UnionProjectSyncConfig      `json:"unionProjectSyncConfig"`
 	IsSelfServe            bool                        `json:"isSelfServe" pflag:", Whether the tenant is a self-serve tenant"`
+	ClusterName            string                      `json:"clusterName" pflag:", The name of the cluster"`
 }
 
 type ClusterResourceConfiguration interface {
@@ -61,4 +62,5 @@ type ClusterResourceConfiguration interface {
 	IsStandaloneDeployment() bool
 	GetUnionProjectSyncConfig() UnionProjectSyncConfig
 	IsSelfServe() bool
+	GetClusterName() string
 }

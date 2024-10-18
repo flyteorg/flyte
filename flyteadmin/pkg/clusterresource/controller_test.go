@@ -5,6 +5,7 @@ import (
 	"crypto/md5" // #nosec
 	"io/ioutil"
 	"os"
+	"strconv"
 	"sync"
 	"testing"
 
@@ -19,6 +20,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	execClusterMocks "github.com/flyteorg/flyte/flyteadmin/pkg/executioncluster/mocks"
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
+	configurationMocks "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/mocks"
 	"github.com/flyteorg/flyte/flyteadmin/plugins"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
@@ -647,5 +649,50 @@ func Test_controller_createPatch(t *testing.T) {
 			assert.Equal(t, string(tt.want), string(got))
 			assert.Equal(t, string(tt.wantPatchType), string(gotPatchType))
 		})
+	}
+}
+
+// This test ensures the order of processing projects in batch
+// If you modify the order, remember to also update other parts of the code that rely on this order,
+// specifically the orgs collection right after the projects are processed
+func Test_Controller_ProcessProjectsInBatch_Order(t *testing.T) {
+	ctx := context.TODO()
+	mockConfig := configurationMocks.Configuration{}
+	mockConfig.OnClusterResourceConfiguration().Return(configurationMocks.MockClusterResourceConfiguration{
+		UnionProjectSyncConfig: runtimeInterfaces.UnionProjectSyncConfig{
+			BatchSize: 7,
+		},
+	})
+	mockNamespaceMappingConfiguration := &configurationMocks.NamespaceMappingConfiguration{}
+	mockNamespaceMappingConfiguration.OnGetNamespaceTemplate().Return("{{ project }}-{{ domain }}")
+	mockConfig.OnNamespaceMappingConfiguration().Return(mockNamespaceMappingConfiguration)
+	mockController := &controller{
+		config:  &mockConfig,
+		metrics: newMetrics(mockScope.NewTestScope()),
+	}
+
+	var projects []*admin.Project
+	for i := 0; i < 100; i++ {
+		projects = append(projects, &admin.Project{
+			Id:      strconv.Itoa(i),
+			Domains: []*admin.Domain{{Id: "0"}, {Id: "1"}},
+		})
+	}
+
+	processor := func(ctx context.Context, project *admin.Project, domain *admin.Domain, namespace NamespaceName) (ResourceSyncStats, error) {
+		projectId, err := strconv.Atoi(project.Id)
+		assert.Nil(t, err)
+		domainId, err := strconv.Atoi(domain.Id)
+		assert.Nil(t, err)
+		return ResourceSyncStats{
+			Created: projectId*10 + domainId,
+		}, nil
+	}
+
+	stats := mockController.processProjectsInBatch(ctx, projects, processor)
+	for i, stat := range stats {
+		projectId := i / 2
+		domainId := i % 2
+		assert.Equal(t, projectId*10+domainId, stat.Created)
 	}
 }
