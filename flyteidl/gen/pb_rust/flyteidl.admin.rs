@@ -1715,6 +1715,9 @@ pub struct ExecutionTerminateRequest {
     /// Optional reason for aborting.
     #[prost(string, tag="2")]
     pub cause: ::prost::alloc::string::String,
+    /// Optional force termination
+    #[prost(bool, tag="3")]
+    pub force: bool,
 }
 /// Purposefully empty, may be populated in the future.
 #[allow(clippy::derive_partial_eq_without_eq)]

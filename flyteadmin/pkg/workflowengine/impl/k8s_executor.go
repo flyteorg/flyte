@@ -18,6 +18,7 @@ import (
 
 var deletePropagationBackground = v1.DeletePropagationBackground
 
+const AbortedWorkflowAnnotation = "workflow-aborted"
 const defaultIdentifier = "DefaultK8sExecutor"
 
 // K8sWorkflowExecutor directly creates and delete Flyte workflow execution CRD objects using the configured execution
@@ -94,9 +95,35 @@ func (e K8sWorkflowExecutor) Abort(ctx context.Context, data interfaces.AbortDat
 	if err != nil {
 		return errors.NewFlyteAdminErrorf(codes.Internal, err.Error())
 	}
-	err = target.FlyteClient.FlyteworkflowV1alpha1().FlyteWorkflows(data.Namespace).Delete(ctx, data.ExecutionID.GetName(), v1.DeleteOptions{
-		PropagationPolicy: &deletePropagationBackground,
-	})
+
+	w, err := target.FlyteClient.FlyteworkflowV1alpha1().FlyteWorkflows(data.Namespace).Get(ctx, data.ExecutionID.GetName(), v1.GetOptions{})
+	if err != nil && !k8_api_err.IsNotFound(err) {
+		return errors.NewFlyteAdminErrorf(codes.Internal, "failed to terminate execution: %v with err %v", data.ExecutionID, err)
+
+	} else if k8_api_err.IsNotFound(err) {
+		logger.Infof(ctx, "Trying to abort an execution [%+v] that is not found in cluster: %s, skipping...", data.ExecutionID, target.ID)
+		return nil
+	}
+
+	if data.Force {
+		logger.Debugf(ctx, "Force deleting execution [%+v] in cluster: %s", data.ExecutionID, target.ID)
+
+		// Remove finalizers if any
+		if w.Finalizers != nil || w.ObjectMeta.Finalizers != nil {
+			w.Finalizers = []string{}
+		}
+
+		// Write the updated workflow
+		if _, err := target.FlyteClient.FlyteworkflowV1alpha1().FlyteWorkflows(data.Namespace).Update(ctx, w, v1.UpdateOptions{}); err != nil {
+			if k8_api_err.IsNotFound(err) {
+				logger.Debugf(ctx, "Trying to force delete an execution [%+v] that is not found in cluster: %s, skipping...", data.ExecutionID, target.ID)
+				return nil
+			}
+			return errors.NewFlyteAdminErrorf(codes.Internal, "failed to remove finalizer for execution [%+v] in cluster: %s with err %v", data.ExecutionID, target.ID, err)
+		}
+
+	}
+
 	// An IsNotFound error indicates the resource is already deleted.
 	if err != nil && !k8_api_err.IsNotFound(err) {
 		return errors.NewFlyteAdminErrorf(codes.Internal, "failed to terminate execution: %v with err %v", data.ExecutionID, err)
