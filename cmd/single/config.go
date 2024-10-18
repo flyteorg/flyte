@@ -1,6 +1,9 @@
 package single
 
-import "github.com/flyteorg/flyte/flytestdlib/config"
+import (
+	adminRepositoriesConfig "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/config"
+	"github.com/flyteorg/flyte/flytestdlib/config"
+)
 
 //go:generate pflags Config --default-var=DefaultConfig
 
@@ -21,10 +24,11 @@ type Propeller struct {
 }
 
 type Admin struct {
-	Disabled                      bool     `json:"disabled" pflag:",Disables flyteadmin in the single binary mode"`
-	DisableScheduler              bool     `json:"disableScheduler" pflag:",Disables Native scheduler in the single binary mode"`
-	DisableClusterResourceManager bool     `json:"disableClusterResourceManager" pflag:",Disables Cluster resource manager"`
-	SeedProjects                  []string `json:"seedProjects" pflag:",flyte projects to create by default."`
+	Disabled                      bool                                  `json:"disabled" pflag:",Disables flyteadmin in the single binary mode"`
+	DisableScheduler              bool                                  `json:"disableScheduler" pflag:",Disables Native scheduler in the single binary mode"`
+	DisableClusterResourceManager bool                                  `json:"disableClusterResourceManager" pflag:",Disables Cluster resource manager"`
+	SeedProjects                  []string                              `json:"seedProjects" pflag:",flyte projects to create by default."`
+	SeedProjectsWithDetails       []adminRepositoriesConfig.SeedProject `json:"seedProjectsWithDetails" pflag:",,Detailed configuration for Flyte projects to be created by default."`
 }
 
 type DataCatalog struct {
