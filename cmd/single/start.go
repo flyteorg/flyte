@@ -77,7 +77,7 @@ func startAdmin(ctx context.Context, cfg Admin) error {
 		projects = cfg.SeedProjects
 	}
 	seedProjects := adminRepositoriesConfig.MergeSeedProjectsWithUniqueNames(projects, cfg.SeedProjectsWithDetails)
-	logger.Infof(ctx, "Seeding default projects... %v", projects)
+	logger.Infof(ctx, "Seeding default projects... %v", seedProjects)
 	if err := adminServer.SeedProjects(ctx, seedProjects); err != nil {
 		return err
 	}
