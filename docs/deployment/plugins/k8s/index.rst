@@ -1036,38 +1036,43 @@ Wait for the upgrade to complete. You can check the status of the deployment pod
 
 Once all the components are up and running, go to the `examples section <https://docs.flyte.org/en/latest/flytesnacks/integrations.html#native-backend-plugins>`__ to learn more about how to use Flyte backend plugins.
 
-Troubleshooting MPI Operator Installation
------------------------------------------
+Troubleshooting Plugin Deployments 
+----------------------------------
 
-This section covers common issues encountered during the setup of the MPI operator for distributed training jobs on Flyte.
+.. tabs::
 
-**Worker Pods Failing to Start (Insufficient Resources)**
+  .. group-tab:: MPI
 
-MPI worker pods may fail to start or exhibit scheduling issues, leading to job timeouts or failures. This often occurs due to resource constraints (CPU, memory, or GPU) in the cluster.
+    This section covers common issues encountered during the setup of the MPI operator for distributed training jobs on Flyte.
 
-1. Adjust Resource Requests:
-Ensure that each worker pod has sufficient resources. You can adjust the resource requests in your task definition:
+    **Worker Pods Failing to Start (Insufficient Resources)**
 
-.. code-block:: bash
+    MPI worker pods may fail to start or exhibit scheduling issues, leading to job timeouts or failures. This often occurs due to resource constraints (CPU, memory, or GPU) in the cluster.
 
-      requests=Resources(cpu="<your_cpu_request>", mem="<your_mem_request>")
+    1. Adjust Resource Requests:
+    Ensure that each worker pod has sufficient resources. You can adjust the resource requests in your task definition:
 
-Modify the CPU and memory values according to your cluster's available resources. This helps prevent pod scheduling failures caused by resource constraints.
+    .. code-block:: bash
 
-2. Check Pod Logs for Errors:
-If the worker pods still fail to start, check the logs for any related errors:
+          requests=Resources(cpu="<your_cpu_request>", mem="<your_mem_request>")
 
-.. code-block:: bash
+    Modify the CPU and memory values according to your cluster's available resources. This helps prevent pod scheduling failures caused by resource constraints.
 
-      kubectl logs <pod-name> -n <namespace>
+    2. Check Pod Logs for Errors:
+    If the worker pods still fail to start, check the logs for any related errors:
 
-Look for resource allocation or worker communication errors.
+    .. code-block:: bash
 
-**Workflow Registration Method Errors (Timeouts or Deadlocks)**
+          kubectl logs <pod-name> -n <namespace>
 
-If your MPI workflow hangs or times out, it may be caused by an incorrect workflow registration method.
+    Look for resource allocation or worker communication errors.
 
-Troubleshooting Steps:
+    **Workflow Registration Method Errors (Timeouts or Deadlocks)**
 
-1. 1.	Verify Registration Method:
-When using a custom image, refer to the Flyte documentation on `Registering workflows <https://docs.flyte.org/en/latest/user_guide/flyte_fundamentals/registering_workflows.html#registration-patterns>`__ to ensure you're following the correct registration method.
+    If your MPI workflow hangs or times out, it may be caused by an incorrect workflow registration method.
+
+    Troubleshooting Steps:
+
+    1. Verify Registration Method:
+    When using a custom image, refer to the Flyte documentation on `Registering workflows <https://docs.flyte.org/en/latest/user_guide/flyte_fundamentals/registering_workflows.html#registration-patterns>`__ to ensure you're following the correct registration method.
+
