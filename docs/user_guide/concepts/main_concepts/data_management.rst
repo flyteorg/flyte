@@ -17,7 +17,7 @@ In Flyte, data is categorized into metadata and raw data to optimize data handli
 
 *Source code reference for auto-offloading value sizes limitation:*
 
-.. literalinclude:: ../../../../flytepropeller/pkg/controller/config/config.go
+.. literalinclude:: https://raw.githubusercontent.com/flyteorg/flyte/6c4f8dbfc6d23a0cd7bf81480856e9ae1dfa1b27/flytepropeller/pkg/controller/config/config.go
    :caption: flytepropeller/pkg/controller/config/config.go
    :language: go
    :lines: 184-192
@@ -63,7 +63,7 @@ data from the configured object-store paths. These paths are completely customiz
 * To override the ``RawOutput`` path (prefix in an object store like S3/GCS),
     you can specify an alternate location when invoking a Flyte execution, as shown in the following screenshot of the LaunchForm in FlyteConsole:
 
-  .. image:: https://github.com/flyteorg/static-resources/blob/ddec386ab74897e3c09d89fdaf305e77a2ecc52c/flyte/concepts/data_movement/launch_raw_output.png
+  .. image:: https://raw.githubusercontent.com/flyteorg/static-resources/9cb3d56d7f3b88622749b41ff7ad2d3ebce92726/flyte/concepts/data_movement/launch_raw_output.png
 
 * In the sandbox, the default Rawoutput-prefix is configured to be the root of the local bucket.
     Hence Flyte will write all the raw data (reference types like blob, file, df/schema/parquet, etc.) under a path defined by the execution.
@@ -152,13 +152,13 @@ We could use fast metadata stores to speed up data movement or exploit locality.
 Between Flytepropeller and Tasks
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. image:: https://github.com/flyteorg/static-resources/blob/ddec386ab74897e3c09d89fdaf305e77a2ecc52c/flyte/concepts/data_movement/flyte_data_movement.png
+.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/9cb3d56d7f3b88622749b41ff7ad2d3ebce92726/flyte/concepts/data_movement/flyte_data_movement.png
 
 
 Between Tasks
 ~~~~~~~~~~~~~
 
-.. image:: https://github.com/flyteorg/static-resources/blob/ddec386ab74897e3c09d89fdaf305e77a2ecc52c/flyte/concepts/data_movement/flyte_data_transfer.png
+.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/9cb3d56d7f3b88622749b41ff7ad2d3ebce92726/flyte/concepts/data_movement/flyte_data_transfer.png
 
 
 Bringing in Your Own Datastores for Raw Data
@@ -237,8 +237,8 @@ When a workflow outputs a local file as a ``FlyteFile``, Flyte automatically upl
 
 First task output metadata:
 
-.. image:: https://raw.githubusercontent.com/DenChenn/static-resources/ddec386ab74897e3c09d89fdaf305e77a2ecc52c/flyte/concepts/data_movement/flyte_data_movement_example_output.png
+.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/9cb3d56d7f3b88622749b41ff7ad2d3ebce92726/flyte/concepts/data_movement/flyte_data_movement_example_output.png
 
 Second task input metadata:
 
-.. image:: https://raw.githubusercontent.com/DenChenn/static-resources/ddec386ab74897e3c09d89fdaf305e77a2ecc52c/flyte/concepts/data_movement/flyte_data_movement_example_input.png
+.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/9cb3d56d7f3b88622749b41ff7ad2d3ebce92726/flyte/concepts/data_movement/flyte_data_movement_example_input.png
