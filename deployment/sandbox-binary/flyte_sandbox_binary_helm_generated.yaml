@@ -92,6 +92,9 @@ data:
         disabled: false
         seedProjects:
         - flytesnacks
+        seedProjectsWithDetails:
+        - name: flytesnacks
+          description: Default project setup
       dataCatalog:
         disabled: false
       propeller:
