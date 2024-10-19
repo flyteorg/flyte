@@ -21,7 +21,7 @@ flyte-core-components:
     seedProjects:
       - flytesnacks
     # seedProjectsWithDetails flyte projects to create by default with description
-    # If there is an overlap between seedProjects and seedProjectsWithDetails, 
+    # If there is an overlap between seedProjects and seedProjectsWithDetails,
     # the description provided in seedProjectsWithDetails will take precedence.
     # For seedProjects without a corresponding description in seedProjectsWithDetails,
     # a default description will be auto-generated for the project.

@@ -143,3 +143,107 @@ func TestMergeSeedProjectsWithUniqueNames(t *testing.T) {
 		})
 	}
 }
+
+func TestUniqueProjectsFromNames(t *testing.T) {
+	tests := []struct {
+		name  string
+		names []string
+		want  []SeedProject
+	}{
+		{
+			name:  "Empty input",
+			names: []string{},
+			want:  []SeedProject{},
+		},
+		{
+			name:  "Single name",
+			names: []string{"project1"},
+			want: []SeedProject{
+				{
+					Name:        "project1",
+					Description: "project1 description",
+				},
+			},
+		},
+		{
+			name:  "Multiple unique names",
+			names: []string{"project1", "project2", "project3"},
+			want: []SeedProject{
+				{
+					Name:        "project1",
+					Description: "project1 description",
+				},
+				{
+					Name:        "project2",
+					Description: "project2 description",
+				},
+				{
+					Name:        "project3",
+					Description: "project3 description",
+				},
+			},
+		},
+		{
+			name:  "Duplicate names",
+			names: []string{"project1", "project1", "project2", "project2", "project3"},
+			want: []SeedProject{
+				{
+					Name:        "project1",
+					Description: "project1 description",
+				},
+				{
+					Name:        "project2",
+					Description: "project2 description",
+				},
+				{
+					Name:        "project3",
+					Description: "project3 description",
+				},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := UniqueProjectsFromNames(tt.names)
+
+			if len(got) != len(tt.want) {
+				t.Errorf("length mismatch: got %d projects, want %d projects", len(got), len(tt.want))
+				return
+			}
+
+			gotMap := make(map[string]string)
+			for _, project := range got {
+				gotMap[project.Name] = project.Description
+			}
+			wantMap := make(map[string]string)
+			for _, project := range tt.want {
+				wantMap[project.Name] = project.Description
+			}
+
+			// Compare contents
+			for name, wantDesc := range wantMap {
+				if gotDesc, exists := gotMap[name]; !exists {
+					t.Errorf("missing project %q in result", name)
+				} else if gotDesc != wantDesc {
+					t.Errorf("project %q description mismatch: got %q, want %q", name, gotDesc, wantDesc)
+				}
+			}
+
+			for name := range gotMap {
+				if _, exists := wantMap[name]; !exists {
+					t.Errorf("unexpected project %q in result", name)
+				}
+			}
+
+			uniqueNames := make([]string, 0)
+			seen := make(map[string]bool)
+			for _, name := range tt.names {
+				if !seen[name] {
+					seen[name] = true
+					uniqueNames = append(uniqueNames, name)
+				}
+			}
+		})
+	}
+}
