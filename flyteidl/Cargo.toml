@@ -5,7 +5,7 @@ members = [
 
 [package]
 name = "flyteidl"
-version = "0.1.6"
+version = "0.1.7"
 edition = "2021"
 license-file = "LICENSE"
 homepage = "https://flyte.org"
@@ -46,6 +46,3 @@ url = "2.5.0"
 keyring = { version = "3.2.0", features = [ "vendored" ] }
 openssl = { version = "0.10.66", features = [ "vendored" ]  } 
 anyhow = "1.0.86"
-
-[build-dependencies]
-openssl-src = "=300.3.1"
