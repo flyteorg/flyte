@@ -977,22 +977,22 @@ pub mod _flyteidl_rust {
             let mut access_token: String = "".to_string();
             if !insecure {
                 let cert: Certificate = auth::auth::bootstrap_creds_from_server(&endpoint_uri);
-                let tls: ClientTlsConfig = ClientTlsConfig::new()
-                    .ca_certificate(cert)
-                    .domain_name((*endpoint).to_string());
+                // let tls: ClientTlsConfig = ClientTlsConfig::new()
+                //     .ca_certificate(cert)
+                //     .domain_name((*endpoint).to_string());
 
-                let channel = match rt.block_on(
-                    Channel::builder(endpoint_uri.clone())
-                        .tls_config(tls)
-                        .unwrap()
-                        .connect(),
-                ) {
-                    Ok(ch) => ch,
-                    Err(error) => panic!(
-                        "Failed at connecting to endpoint when constructing secured channel: {:?}",
-                        error
-                    ),
-                };
+                // let channel = match rt.block_on(
+                //     Channel::builder(endpoint_uri.clone())
+                //         .tls_config(tls)
+                //         .unwrap()
+                //         .connect(),
+                // ) {
+                //     Ok(ch) => ch,
+                //     Err(error) => panic!(
+                //         "Failed at connecting to endpoint when constructing secured channel: {:?}",
+                //         error
+                //     ),
+                // };
 
                 let mut oauth_client: auth::auth::OAuthClient = auth::auth::OAuthClient::new(
                     endpoint,

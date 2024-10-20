@@ -326,8 +326,10 @@ pub mod auth {
                 .oauth_client
                 .authorize_url(CsrfToken::new_random)
                 // Set the desired scopes.
-                .add_scope(Scope::new("all".to_string()))
-                .add_scope(Scope::new("offline".to_string()))
+                // .add_scope(Scope::new("offline_access".to_string()))
+                // .add_scope(Scope::new("offline".to_string()))
+                // .add_scope(Scope::new("all".to_string()))
+                // .add_scope(Scope::new("openid".to_string()))
                 // Set the PKCE code challenge.
                 .set_pkce_challenge(pkce_challenge)
                 .url();
