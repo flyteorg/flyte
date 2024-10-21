@@ -15,7 +15,7 @@ Refer to the raw protocol to understand how to leverage this.
 To clone and run the example code on this page, see the [Flytesnacks repo][flytesnacks].
 ```
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/customizing_dependencies/customizing_dependencies/raw_container.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/1f4256464615a788c40d95dfe36f120407a2826c/examples/customizing_dependencies/customizing_dependencies/raw_container.py
 :caption: customizing_dependencies/raw_container.py
 :lines: 1-6
 ```
@@ -33,7 +33,7 @@ output variables.
 
 [Cache](https://docs.flyte.org/en/latest/user_guide/development_lifecycle/caching.html) can be enabled in a `ContainerTask` as in a standard Flyte task, by configuring the cache settings in the `TaskMetadata` in the `metadata` parameter.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/customizing_dependencies/customizing_dependencies/raw_container.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/1f4256464615a788c40d95dfe36f120407a2826c/examples/customizing_dependencies/customizing_dependencies/raw_container.py
 :caption: customizing_dependencies/raw_container.py
 :lines: 16-118
 ```
@@ -41,7 +41,7 @@ output variables.
 As can be seen in this example, `ContainerTask`s can be interacted with like normal Python functions, whose inputs
 correspond to the declared input variables. All data returned by the tasks are consumed and logged by a Flyte task.
 
-```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/customizing_dependencies/customizing_dependencies/raw_container.py
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/1f4256464615a788c40d95dfe36f120407a2826c/examples/customizing_dependencies/customizing_dependencies/raw_container.py
 :caption: customizing_dependencies/raw_container.py
 :pyobject: wf
 ```
