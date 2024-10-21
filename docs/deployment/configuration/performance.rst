@@ -270,7 +270,7 @@ The hash shard Strategy, denoted by ``type: Hash`` in the configuration below, u
             type: Hash     # use the "hash" shard strategy
             shard-count: 4 # the total number of shards
  
-The project and domain shard strategies, denoted by ``type: project`` and ``type: domain`` respectively, use the Flyte workflow project and domain metadata to shard Flyte workflows. These shard strategies are configured using a ``per-shard-mapping`` option, which is a list of IDs. Each element in the ``per-shard-mapping`` list defines a new shard, and the ID list assigns responsibility for the specified IDs to that shard. A shard configured as a single wildcard ID (i.e. ``*``) is responsible for all IDs that are not covered by other shards. Only a single shard may be configured with a wildcard ID and, on that shard, there must be only one ID, namely the wildcard.
+The project and domain shard strategies, denoted by ``type: Project`` and ``type: Domain`` respectively, use the Flyte workflow project and domain metadata to shard Flyte workflows. These shard strategies are configured using a ``per-shard-mapping`` option, which is a list of IDs. Each element in the ``per-shard-mapping`` list defines a new shard, and the ID list assigns responsibility for the specified IDs to that shard. A shard configured as a single wildcard ID (i.e. ``*``) is responsible for all IDs that are not covered by other shards. Only a single shard may be configured with a wildcard ID and, on that shard, there must be only one ID, namely the wildcard.
 
 .. code-block:: yaml
 
@@ -281,7 +281,7 @@ The project and domain shard strategies, denoted by ``type: project`` and ``type
           # pod and scanning configuration redacted
           # ...
           shard:
-            type: project       # use the "project" shard strategy
+            type: Project       # use the "Project" shard strategy
             per-shard-mapping:  # a list of per shard mappings - one shard is created for each element
               - ids:            # the list of ids to be managed by the first shard
                 - flytesnacks
@@ -298,7 +298,7 @@ The project and domain shard strategies, denoted by ``type: project`` and ``type
           # pod and scanning configuration redacted
           # ...
           shard:
-            type: domain        # use the "domain" shard strategy
+            type: Domain        # use the "Domain" shard strategy
             per-shard-mapping:  # a list of per shard mappings - one shard is created for each element
               - ids:            # the list of ids to be managed by the first shard
                 - production
