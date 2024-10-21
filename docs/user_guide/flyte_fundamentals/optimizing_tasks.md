@@ -52,7 +52,7 @@ represents the cache key. Learn more in the {ref}`User Guide <cache-offloaded-ob
 
 ## Retries
 
-Flyte's robust retry mechanism enhances the reliability of distributed computing environments by effectively managing task failures. This section delves into the configuration and application of retries, ensuring you can maximize task resilience and efficiency.
+Flyte also allows you to automatically retry failing tasks in the case of system-level or catastrophic errors that may arise from issues that don’t have anything to do with user-defined code, like network issues and data center outages. This section delves into the configuration and application of retries.
 
 ### Understanding Retry Types
 
