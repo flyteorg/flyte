@@ -385,6 +385,13 @@ html_context = {
     "doc_path": "docs",
 }
 
+json_url = "https://flyte--5846.org.readthedocs.build/en/5846/_static/switcher.json"
+version_match = os.environ.get("READTHEDOCS_VERSION")
+
+if not version_match:
+    json_url = "_static/switcher.json"
+    version_match = "dev"
+
 html_theme_options = {
     # custom flyteorg pydata theme options
     # "github_url": "https://github.com/flyteorg/flyte",
@@ -415,8 +422,9 @@ html_theme_options = {
         }
     ],
     "use_edit_page_button": True,
-    "navbar_start": ["navbar-logo"],
+    "navbar_start": ["navbar-logo", "version-switcher"],
     "secondary_sidebar_items": ["page-toc", "edit-this-page"],
+    "switcher": {"json_url": json_url, "version_match": version_match}
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
