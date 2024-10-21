@@ -17,7 +17,7 @@ To clone and run the example code on this page, see the [Flytesnacks repo][flyte
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/customizing_dependencies/customizing_dependencies/raw_container.py
 :caption: customizing_dependencies/raw_container.py
-:lines: 1-5
+:lines: 1-6
 ```
 
 ## Container tasks
@@ -31,9 +31,11 @@ is `calculate_ellipse_area_shell`. This name has to be unique in the entire proj
 `inputs` and `outputs` specify the interface for the task; thus it should be an ordered dictionary of typed input and
 output variables.
 
+[Cache](https://docs.flyte.org/en/latest/user_guide/development_lifecycle/caching.html) can be enabled in a `ContainerTask` as in a standard Flyte task, by configuring the cache settings in the `TaskMetadata` in the `metadata` parameter.
+
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/customizing_dependencies/customizing_dependencies/raw_container.py
 :caption: customizing_dependencies/raw_container.py
-:lines: 15-112
+:lines: 16-118
 ```
 
 As can be seen in this example, `ContainerTask`s can be interacted with like normal Python functions, whose inputs
