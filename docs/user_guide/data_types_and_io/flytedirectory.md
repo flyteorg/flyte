@@ -86,4 +86,21 @@ You can run the workflow locally as follows:
 :lines: 94-114
 ```
 
+
+## Streaming support
+
+Flyte `1.5` introduced support for streaming `FlyteDirectory` types via the `fsspec` library.
+The `FlyteDirectory` streaming feature enables efficient streaming and handling of entire directories, simplifying operations involving multiple files.
+
+:::{note}
+This feature is marked as experimental. We'd love feedback on the API!
+:::
+
+Here is a simple example, you can accept a `FlyteDirectory` as an input, walk through it and copy the files to another `FlyteDirectory` one by one.
+
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/ddce0448141ea6d2cb148df52bf408874adb15ad/examples/data_types_and_io/data_types_and_io/file_streaming.py
+:caption: data_types_and_io/file_streaming.py
+:lines: 23-33
+```
+
 [flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/data_types_and_io/
