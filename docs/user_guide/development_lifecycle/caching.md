@@ -23,11 +23,11 @@ Let's watch a brief explanation of caching and a demo in this video, followed by
 
 In Flyte, input caching allows tasks to automatically cache the input data required for execution. This feature is particularly useful in scenarios where tasks may need to be re-executed, such as during retries due to failures or when manually triggered by users. By caching input data, Flyte optimizes workflow performance and resource usage, preventing unnecessary recomputation of task inputs.
 
-There are four parameters and one command-line flag related to caching.
-
 ### Output Caching
 
 Output caching in Flyte allows users to cache the results of tasks to avoid redundant computations. This feature is especially valuable for tasks that perform expensive or time-consuming operations where the results are unlikely to change frequently.
+
+There are four parameters and one command-line flag related to caching.
 
 ## Parameters
 
