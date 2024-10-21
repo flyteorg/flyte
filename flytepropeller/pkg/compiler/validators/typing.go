@@ -1,9 +1,14 @@
 package validators
 
 import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	jscmp "gitlab.com/yvesf/json-schema-compare"
 	"strings"
 
 	structpb "github.com/golang/protobuf/ptypes/struct"
+	"github.com/santhosh-tekuri/jsonschema"
 
 	flyte "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
@@ -14,6 +19,37 @@ type typeChecker interface {
 
 type trivialChecker struct {
 	literalType *flyte.LiteralType
+}
+
+func isSameTypeInJSON(sourceMetaData, targetMetaData *structpb.Struct) bool {
+	compiler := jsonschema.NewCompiler()
+
+	addSchemaToCompiler := func(name string, data *structpb.Struct) error {
+		schemaByte, err := json.Marshal(data.Fields)
+		if err != nil {
+			return fmt.Errorf("failed to marshal %s: %w", name, err)
+		}
+		return compiler.AddResource(name, bytes.NewReader(schemaByte))
+	}
+
+	if err := addSchemaToCompiler("source", sourceMetaData); err != nil {
+		return false
+	}
+	if err := addSchemaToCompiler("target", targetMetaData); err != nil {
+		return false
+	}
+
+	sourceSchema, err := compiler.Compile("source")
+	if err != nil {
+		return false
+	}
+	targetSchema, err := compiler.Compile("target")
+	if err != nil {
+		return false
+	}
+
+	cmprErrList := jscmp.Compare(sourceSchema, targetSchema)
+	return len(cmprErrList) == 1 && strings.Contains(cmprErrList[0].Error(), "FIXME additionalProperties not implemented")
 }
 
 // CastsFrom is a trivial type checker merely checks if types match exactly.
@@ -33,6 +69,17 @@ func (t trivialChecker) CastsFrom(upstreamType *flyte.LiteralType) bool {
 
 	if GetTagForType(upstreamType) != "" && GetTagForType(t.literalType) != GetTagForType(upstreamType) {
 		return false
+	}
+
+	if upstreamType.GetSimple() == flyte.SimpleType_STRUCT && t.literalType.GetSimple() == flyte.SimpleType_STRUCT {
+		upstreamMetaData := upstreamType.GetMetadata()
+		downstreamMetaData := t.literalType.GetMetadata()
+
+		if upstreamMetaData == nil || downstreamMetaData == nil {
+			return true
+		}
+
+		return isSameTypeInJSON(upstreamMetaData, downstreamMetaData)
 	}
 
 	// Ignore metadata when comparing types.
