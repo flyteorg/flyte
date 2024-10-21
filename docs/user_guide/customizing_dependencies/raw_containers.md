@@ -31,7 +31,7 @@ is `calculate_ellipse_area_shell`. This name has to be unique in the entire proj
 `inputs` and `outputs` specify the interface for the task; thus it should be an ordered dictionary of typed input and
 output variables.
 
-[Cache](https://docs.flyte.org/en/latest/user_guide/development_lifecycle/caching.html) can be enabled in a `ContainerTask` as in a standard Flyte task, by configuring the cache settings in the `TaskMetadata` in the `metadata` parameter.
+[Cache](https://docs.flyte.org/en/latest/user_guide/development_lifecycle/caching.html) can be enabled in a `ContainerTask` by configuring the cache settings in the `TaskMetadata` in the `metadata` parameter.
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/1f4256464615a788c40d95dfe36f120407a2826c/examples/customizing_dependencies/customizing_dependencies/raw_container.py
 :caption: customizing_dependencies/raw_container.py
