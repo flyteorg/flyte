@@ -1,4 +1,4 @@
-# [RFC] FlyteAdmin RBAC
+# [RFC] FlyteAdmin RBAC + Project/Domain Isolation
 
 **Authors:**
 
@@ -14,7 +14,7 @@ Support for authorization in Flyte Admin is minimal and may be unsuitable for pr
 supports blanket authorization which does not align with information security best practices like the  
 [principle of least privilege](https://en.wikipedia.org/wiki/Principle_of_least_privilege). Flyte's project and domain 
 concepts seem like strong constructs for supporting multi-tenancy but there are no mechanisms in place to prevent users 
-of one tenant from accidentally or maliciously maniuplating another tenant's executions, tasks, launch plans, etc.
+of one tenant from accidentally or maliciously manipulating another tenant's executions, tasks, launch plans, etc.
 
 At Stack AV we have solved this problem in our fork and are looking to contribute our work back after several requests 
 from the community. 
@@ -29,18 +29,18 @@ This proposal introduces an authorization interceptor that will be executed afte
 authorization interceptor will consult the auth or authorization config to understand how it should resolve roles from 
 the identity context along with what authorization policies are tied to the user's roles. If the user has an authorization 
 policy that permits the incoming request the project and domain level scope will be extracted from the authorization 
-policy and injected into the authorization context for use in the service layer. The request will hit the service layer which 
+policy and injected into the authorization context for use in the repository layer. The request will hit the service layer which 
 will make requests to the repository layer. The repository layer will leverage some utility functions to 1) authorize 
 whether resources can be created in a project/domain and 2) generate some SQL filters to be injected into queries that 
 read/update/delete resources. 
 
-Ultimately the authorization interceptor will provide RPC level authorization and the changes to the repository layer 
-will provide resource level authorization within the target RPC. 
+Ultimately the authorization interceptor will provide RPC level authorization and set context for later use. The changes to the repository layer 
+will provide resource level isolation within the target RPC. Below is a breakdown of the three primary components of the design. 
 
 #### Authorization Config 
-The authorization config will be used to configure the behavior of RBAC. The first thing it will need is a way to
+The authorization config will be used to configure the authorization behavior. The first thing it describe is a way to
 resolve roles from the user's identity context. Ideally this should be flexible enough to resolve a role from different
-elements of a token to support various use cases. 
+elements of a token to support various use cases (ie. standard and custom JWT claims). 
 
 ```yaml
 authorization:
@@ -48,7 +48,8 @@ authorization:
     - scopes # attempts to use token scopes as roles
     - claims # attempts to use token claim values as roles
     - userID # attempts to use the user ID as the role
-    
+  
+  # below is an example of what configuring custom claims might look like  
   claimRoleResolver: # claim based role resolution requires additional configuration
     - key: groups # this is the key to look for in the token claims
       type: list # this declares the structure of the value. parse value as comma separated string
@@ -60,14 +61,15 @@ The second part of the authorization will include exceptions. There are some RPC
 ```yaml
 authorization:
   methodBypassPatterns: # ideally these should be enabled by default
-    - "/grpc.health.v1.Health/.*"
-    - "/flyteidl.service.AuthMetadataService/.*"
+    - "/grpc.health.v1.Health/.*" # health checking for k8s
+    - "/flyteidl.service.AuthMetadataService/.*" # auth metadata used by other Flyte services
 ```
 
 The last part of the authorization will declare the authorization policies. The authorization policies will include the 
-name of the role and will include a list of permitting rules. Each rule includes a mandatory method pattern which is
+name of the role and will include a list of permitting rules. Each rule must specify an RPC pattern which is
 regex statement that matches the target gRPC method. Each rules includes optional project and domain isolation/filtering 
-fields. If these fields are not included it is implied that the rule applies to all projects and domains. 
+fields. If the project and domain fields are not included it is implied that the rule applies to all projects and domains.
+Below is an example authorization configuration with a variety of use cases of both RBAC and project and domain isolation/filtering.
 ```yaml
 authorization:
   policies: # policies is a list instead of a map since viper map keys are case insensitive
@@ -137,7 +139,7 @@ that the best (albeit challenging) way to do this is at the database layer for a
 * Filtering resources at the database is the most performant since the database engine is fast and ends up returning a smaller data set over the network
 * Filtering resources at the database plays nicely with logic to handle records that aren't found and does not leak data about which resources may or may not be present.
 
-My proposal is to have utility functions for two different workflows: 
+We propose to have utility functions for two different workflows: 
 1. Creating Resources
    * This is a dedicated utility function used in repository code to create resource since you cannot add a WHERE clause filter for records that don't exist yet :) 
    * ```go
@@ -179,23 +181,23 @@ Existing metrics should measure RPC response codes.
 
 ## 5 Drawbacks
 
-*Are there any reasons why we should not do this? Here we aim to evaluate risk and check ourselves.*
+This change will introduce additional complexity into Flyte Admin.
 
 ## 6 Alternatives
 
-*What are other ways of achieving the same outcome?*
+There was an alternative approach described in another [RFC](https://github.com/flyteorg/flyte/pull/5204) which did 
+authorization at the middleware layer but this approach is challenging since deriving the target project and domain 
+involves inspecting application payloads. 
 
 ## 7 Potential Impact and Dependencies
 
-*Here, we aim to be mindful of our environment and generate empathy towards others who may be impacted by our decisions.*
-
-- *What other systems or teams are affected by this proposal?*
-- *How could this be exploited by malicious attackers?*
+This feature is a net new feature that should be opt in so I don't think it will impact users unless they enable the feature. 
+I also don't see any new attack vectors this introduces since it strengthens security. 
 
 ## 8 Unresolved questions
 
-*What parts of the proposal are still being defined or not covered by this proposal?*
+None at this time
 
 ## 9 Conclusion
 
-*Here, we briefly outline why this is the right decision to make at this time and move forward!*
+TBA
