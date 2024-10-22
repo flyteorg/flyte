@@ -365,7 +365,7 @@ two GitHub actions that facilitates this:
   of Flyte packages, for example, the `.tgz` archives that are created by
   `pyflyte package`.
 
-## Some of the best practices for CI/CD
+## Best practices for CI/CD
 
 - **Using a consistent versioning strategy**: Use a consistent versioning strategy across different types of commits (feature branches, main, released versions) to ensure that versions are unique and identifiable.
 - **Use a combination of branch name and commit hash for versioning** : Using a combination of branch name and short commit hash (e.g. <branch-name>-<short-commit-hash>) provides a unique and descriptive version identifier for feature branches.
