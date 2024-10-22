@@ -336,8 +336,10 @@ func (p *Plugin) getAsyncAgentClient(ctx context.Context, agent *Deployment) (se
 
 func (p *Plugin) watchAgents(ctx context.Context, agentService *core.AgentService) {
 	go wait.Until(func() {
-		clientSet := getAgentClientSets(ctx)
-		agentRegistry := getAgentRegistry(ctx, clientSet)
+		childCtx, cancel := context.WithCancel(ctx)
+		defer cancel()
+		clientSet := getAgentClientSets(childCtx)
+		agentRegistry := getAgentRegistry(childCtx, clientSet)
 		p.setRegistry(agentRegistry)
 		agentService.SetSupportedTaskType(maps.Keys(agentRegistry))
 	}, p.cfg.PollInterval.Duration, ctx.Done())
