@@ -55,7 +55,7 @@ func TestLiteralTypeForLiterals(t *testing.T) {
 					Value: &core.Scalar_Binary{
 						Binary: &core.Binary{
 							Value: serializedBinaryData,
-							Tag:   "msgpack",
+							Tag:   coreutils.MESSAGEPACK,
 						},
 					},
 				},
@@ -83,7 +83,7 @@ func TestLiteralTypeForLiterals(t *testing.T) {
 					Value: &core.Scalar_Binary{
 						Binary: &core.Binary{
 							Value: serializedBinaryData,
-							Tag:   "msgpack",
+							Tag:   coreutils.MESSAGEPACK,
 						},
 					},
 				},
@@ -410,6 +410,47 @@ func TestLiteralTypeForLiterals(t *testing.T) {
 
 		lt := LiteralTypeForLiteral(literals)
 
+		assert.True(t, proto.Equal(expectedLt, lt))
+	})
+
+	t.Run("nested Lists with different types", func(t *testing.T) {
+		inferredType := &core.LiteralType{
+			Type: &core.LiteralType_CollectionType{
+				CollectionType: &core.LiteralType{
+					Type: &core.LiteralType_CollectionType{
+						CollectionType: &core.LiteralType{
+							Type: &core.LiteralType_UnionType{
+								UnionType: &core.UnionType{
+									Variants: []*core.LiteralType{
+										{
+											Type: &core.LiteralType_Simple{
+												Simple: core.SimpleType_INTEGER,
+											},
+										},
+										{
+											Type: &core.LiteralType_Simple{
+												Simple: core.SimpleType_STRING,
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		literals := &core.Literal{
+			Value: &core.Literal_OffloadedMetadata{
+				OffloadedMetadata: &core.LiteralOffloadedMetadata{
+					Uri:          "dummy/uri",
+					SizeBytes:    1000,
+					InferredType: inferredType,
+				},
+			},
+		}
+		expectedLt := inferredType
+		lt := LiteralTypeForLiteral(literals)
 		assert.True(t, proto.Equal(expectedLt, lt))
 	})
 

@@ -1,49 +1,69 @@
 package nodes
 
 import (
+	"context"
+
+	"github.com/shamaton/msgpack/v2"
 	"google.golang.org/protobuf/types/known/structpb"
 
+	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/common"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/errors"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 // resolveAttrPathInPromise resolves the literal with attribute path
 // If the promise is chained with attributes (e.g. promise.a["b"][0]), then we need to resolve the promise
-func resolveAttrPathInPromise(nodeID string, literal *core.Literal, bindAttrPath []*core.PromiseAttribute) (*core.Literal, error) {
+func resolveAttrPathInPromise(ctx context.Context, datastore *storage.DataStore, nodeID string, literal *core.Literal, bindAttrPath []*core.PromiseAttribute) (*core.Literal, error) {
 	var currVal *core.Literal = literal
 	var tmpVal *core.Literal
 	var err error
 	var exist bool
-	count := 0
+	index := 0
 
 	for _, attr := range bindAttrPath {
+		if currVal.GetOffloadedMetadata() != nil {
+			// currVal will be overwritten with the contents of the offloaded data which contains the actual large literal.
+			err := common.ReadLargeLiteral(ctx, datastore, currVal)
+			if err != nil {
+				return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID, "failed to read offloaded metadata for promise")
+			}
+		}
 		switch currVal.GetValue().(type) {
+		case *core.Literal_OffloadedMetadata:
+			return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID, "unexpected offloaded metadata type")
 		case *core.Literal_Map:
 			tmpVal, exist = currVal.GetMap().GetLiterals()[attr.GetStringValue()]
 			if !exist {
 				return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID, "key [%v] does not exist in literal %v", attr.GetStringValue(), currVal.GetMap().GetLiterals())
 			}
 			currVal = tmpVal
-			count++
+			index++
 		case *core.Literal_Collection:
 			if int(attr.GetIntValue()) >= len(currVal.GetCollection().GetLiterals()) {
 				return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID, "index [%v] is out of range of %v", attr.GetIntValue(), currVal.GetCollection().GetLiterals())
 			}
 			currVal = currVal.GetCollection().GetLiterals()[attr.GetIntValue()]
-			count++
+			index++
 		// scalar is always the leaf, so we can break here
 		case *core.Literal_Scalar:
 			break
 		}
 	}
 
-	// resolve dataclass
-	if currVal.GetScalar() != nil && currVal.GetScalar().GetGeneric() != nil {
-		st := currVal.GetScalar().GetGeneric()
-		// start from index "count"
-		currVal, err = resolveAttrPathInPbStruct(nodeID, st, bindAttrPath[count:])
-		if err != nil {
-			return nil, err
+	// resolve dataclass and Pydantic BaseModel
+	if scalar := currVal.GetScalar(); scalar != nil {
+		if binary := scalar.GetBinary(); binary != nil {
+			currVal, err = resolveAttrPathInBinary(nodeID, binary, bindAttrPath[index:])
+			if err != nil {
+				return nil, err
+			}
+		} else if generic := scalar.GetGeneric(); generic != nil {
+			currVal, err = resolveAttrPathInPbStruct(nodeID, generic, bindAttrPath[index:])
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 
@@ -53,8 +73,8 @@ func resolveAttrPathInPromise(nodeID string, literal *core.Literal, bindAttrPath
 // resolveAttrPathInPbStruct resolves the protobuf struct (e.g. dataclass) with attribute path
 func resolveAttrPathInPbStruct(nodeID string, st *structpb.Struct, bindAttrPath []*core.PromiseAttribute) (*core.Literal, error) {
 
-	var currVal interface{}
-	var tmpVal interface{}
+	var currVal any
+	var tmpVal any
 	var exist bool
 
 	currVal = st.AsMap()
@@ -63,16 +83,18 @@ func resolveAttrPathInPbStruct(nodeID string, st *structpb.Struct, bindAttrPath 
 	for _, attr := range bindAttrPath {
 		switch resolvedVal := currVal.(type) {
 		// map
-		case map[string]interface{}:
+		case map[string]any:
 			tmpVal, exist = resolvedVal[attr.GetStringValue()]
 			if !exist {
 				return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID, "key [%v] does not exist in literal %v", attr.GetStringValue(), currVal)
 			}
 			currVal = tmpVal
 		// list
-		case []interface{}:
-			if int(attr.GetIntValue()) >= len(resolvedVal) {
-				return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID, "index [%v] is out of range of %v", attr.GetIntValue(), currVal)
+		case []any:
+			index := int(attr.GetIntValue())
+			if index < 0 || index >= len(resolvedVal) {
+				return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID,
+					"index [%v] is out of range of %v", index, resolvedVal)
 			}
 			currVal = resolvedVal[attr.GetIntValue()]
 		}
@@ -82,6 +104,89 @@ func resolveAttrPathInPbStruct(nodeID string, st *structpb.Struct, bindAttrPath 
 	literal, err := convertInterfaceToLiteral(nodeID, currVal)
 
 	return literal, err
+}
+
+// resolveAttrPathInBinary resolves the binary idl object (e.g. dataclass, pydantic basemodel) with attribute path
+func resolveAttrPathInBinary(nodeID string, binaryIDL *core.Binary, bindAttrPath []*core.PromiseAttribute) (*core.
+	Literal,
+	error) {
+
+	binaryBytes := binaryIDL.GetValue()
+	serializationFormat := binaryIDL.GetTag()
+
+	var currVal any
+	var tmpVal any
+	var exist bool
+
+	if serializationFormat == coreutils.MESSAGEPACK {
+		err := msgpack.Unmarshal(binaryBytes, &currVal)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID,
+			"Unsupported format '%v' found for literal value.\n"+
+				"Please ensure the serialization format is supported.", serializationFormat)
+	}
+
+	// Turn the current value to a map, so it can be resolved more easily
+	for _, attr := range bindAttrPath {
+		switch resolvedVal := currVal.(type) {
+		// map
+		case map[any]any:
+			// TODO: for cases like Dict[int, Any] in a dataclass, this will fail,
+			// will support it in the future when flytekit supports it
+			promise, ok := attr.GetValue().(*core.PromiseAttribute_StringValue)
+			if !ok {
+				return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID,
+					"unexpected attribute type [%T] for value %v", attr.GetValue(), attr.GetValue())
+			}
+			key := promise.StringValue
+			tmpVal, exist = resolvedVal[key]
+			if !exist {
+				return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID, "key [%v] does not exist in literal %v", attr.GetStringValue(), currVal)
+			}
+			currVal = tmpVal
+		// list
+		case []any:
+			promise, ok := attr.GetValue().(*core.PromiseAttribute_IntValue)
+			if !ok {
+				return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID,
+					"unexpected attribute type [%T] for value %v", attr.GetValue(), attr.GetValue())
+			}
+			index := int(promise.IntValue) // convert to int64
+			if index < 0 || index >= len(resolvedVal) {
+				return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID,
+					"index [%v] is out of range of %v", index, resolvedVal)
+			}
+			currVal = resolvedVal[attr.GetIntValue()]
+		default:
+			return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID, "unexpected type [%T] for value %v", currVal, currVal)
+		}
+	}
+
+	// Marshal the current value to MessagePack bytes
+	resolvedBinaryBytes, err := msgpack.Marshal(currVal)
+	if err != nil {
+		return nil, err
+	}
+	// Construct and return the binary-encoded literal
+	return constructResolvedBinary(resolvedBinaryBytes, serializationFormat), nil
+}
+
+func constructResolvedBinary(resolvedBinaryBytes []byte, serializationFormat string) *core.Literal {
+	return &core.Literal{
+		Value: &core.Literal_Scalar{
+			Scalar: &core.Scalar{
+				Value: &core.Scalar_Binary{
+					Binary: &core.Binary{
+						Value: resolvedBinaryBytes,
+						Tag:   serializationFormat,
+					},
+				},
+			},
+		},
+	}
 }
 
 // convertInterfaceToLiteral converts the protobuf struct (e.g. dataclass) to literal
@@ -128,7 +233,7 @@ func convertInterfaceToLiteral(nodeID string, obj interface{}) (*core.Literal, e
 	return literal, nil
 }
 
-// convertInterfaceToLiteralScalar converts the a single value to a literal scalar
+// convertInterfaceToLiteralScalar converts a single value to a literal scalar
 func convertInterfaceToLiteralScalar(nodeID string, obj interface{}) (*core.Literal_Scalar, error) {
 	value := &core.Primitive{}
 

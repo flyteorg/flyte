@@ -2,6 +2,7 @@ package common
 
 import (
 	"context"
+	"encoding/base64"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -14,6 +15,7 @@ import (
 	executorMocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors/mocks"
 	nodeMocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces/mocks"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/flytestdlib/pbhash"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
@@ -82,6 +84,40 @@ func init() {
 	labeled.SetMetricKeys(contextutils.AppNameKey)
 }
 
+func TestReadLargeLiteral(t *testing.T) {
+	t.Run("read successful", func(t *testing.T) {
+		ctx := context.Background()
+		datastore, _ := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
+		dataReference := storage.DataReference("foo/bar")
+		toBeRead := &idlCore.Literal{
+			Value: &idlCore.Literal_Scalar{
+				Scalar: &idlCore.Scalar{
+					Value: &idlCore.Scalar_Primitive{
+						Primitive: &idlCore.Primitive{
+							Value: &idlCore.Primitive_Integer{
+								Integer: 1,
+							},
+						},
+					},
+				},
+			},
+		}
+		err := datastore.WriteProtobuf(ctx, dataReference, storage.Options{}, toBeRead)
+		assert.Nil(t, err)
+
+		offloadedLiteral := &idlCore.Literal{
+			Value: &idlCore.Literal_OffloadedMetadata{
+				OffloadedMetadata: &idlCore.LiteralOffloadedMetadata{
+					Uri: dataReference.String(),
+				},
+			},
+		}
+		err = ReadLargeLiteral(ctx, datastore, offloadedLiteral)
+		assert.Nil(t, err)
+		assert.Equal(t, int64(1), offloadedLiteral.GetScalar().GetPrimitive().GetInteger())
+	})
+}
+
 func TestOffloadLargeLiteral(t *testing.T) {
 	t.Run("offload successful with valid size", func(t *testing.T) {
 		ctx := context.Background()
@@ -100,17 +136,46 @@ func TestOffloadLargeLiteral(t *testing.T) {
 				},
 			},
 		}
+		expectedLiteralDigest, err := pbhash.ComputeHash(ctx, toBeOffloaded)
+		assert.Nil(t, err)
 		literalOffloadingConfig := config.LiteralOffloadingConfig{
 			MinSizeInMBForOffloading: 0,
 			MaxSizeInMBForOffloading: 1,
 		}
 		inferredType := validators.LiteralTypeForLiteral(toBeOffloaded)
-		err := OffloadLargeLiteral(ctx, datastore, dataReference, toBeOffloaded, literalOffloadingConfig)
+		err = OffloadLargeLiteral(ctx, datastore, dataReference, toBeOffloaded, literalOffloadingConfig)
 		assert.NoError(t, err)
 		assert.Equal(t, "foo/bar", toBeOffloaded.GetOffloadedMetadata().GetUri())
 		assert.Equal(t, uint64(6), toBeOffloaded.GetOffloadedMetadata().GetSizeBytes())
 		assert.Equal(t, inferredType.GetSimple(), toBeOffloaded.GetOffloadedMetadata().InferredType.GetSimple())
+		assert.Equal(t, base64.RawURLEncoding.EncodeToString(expectedLiteralDigest), toBeOffloaded.Hash)
+	})
 
+	t.Run("offload successful with valid size and hash passed in", func(t *testing.T) {
+		ctx := context.Background()
+		datastore, _ := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
+		dataReference := storage.DataReference("foo/bar")
+		toBeOffloaded := &idlCore.Literal{
+			Value: &idlCore.Literal_Scalar{
+				Scalar: &idlCore.Scalar{
+					Value: &idlCore.Scalar_Primitive{
+						Primitive: &idlCore.Primitive{
+							Value: &idlCore.Primitive_Integer{
+								Integer: 1,
+							},
+						},
+					},
+				},
+			},
+			Hash: "hash",
+		}
+		literalOffloadingConfig := config.LiteralOffloadingConfig{
+			MinSizeInMBForOffloading: 0,
+			MaxSizeInMBForOffloading: 1,
+		}
+		err := OffloadLargeLiteral(ctx, datastore, dataReference, toBeOffloaded, literalOffloadingConfig)
+		assert.NoError(t, err)
+		assert.Equal(t, "hash", toBeOffloaded.Hash)
 	})
 
 	t.Run("offload fails with size larger than max", func(t *testing.T) {

@@ -10,14 +10,15 @@ import (
 	"strings"
 	"time"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/ptypes"
 	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/pkg/errors"
-
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
+
+const MESSAGEPACK = "msgpack"
 
 func MakePrimitive(v interface{}) (*core.Primitive, error) {
 	switch p := v.(type) {
@@ -144,6 +145,7 @@ func MakeBinaryLiteral(v []byte) *core.Literal {
 				Value: &core.Scalar_Binary{
 					Binary: &core.Binary{
 						Value: v,
+						Tag:   MESSAGEPACK,
 					},
 				},
 			},
@@ -389,7 +391,7 @@ func MakeLiteralForSimpleType(t core.SimpleType, s string) (*core.Literal, error
 		scalar.Value = &core.Scalar_Binary{
 			Binary: &core.Binary{
 				Value: []byte(s),
-				// TODO Tag not supported at the moment
+				Tag:   MESSAGEPACK,
 			},
 		}
 	case core.SimpleType_ERROR:
@@ -636,7 +638,6 @@ func MakeLiteralForType(t *core.LiteralType, v interface{}) (*core.Literal, erro
 		if !found {
 			return nil, fmt.Errorf("incorrect union value [%s], supported values %+v", v, newT.UnionType.Variants)
 		}
-
 	default:
 		return nil, fmt.Errorf("unsupported type %s", t.String())
 	}
