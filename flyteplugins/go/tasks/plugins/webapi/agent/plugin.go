@@ -178,7 +178,7 @@ func (p *Plugin) ExecuteTaskSync(
 
 	// Client is done with sending
 	if err := stream.CloseSend(); err != nil {
-		logger.Errorf(ctx, "Failed to close stream with err %s", err.Error())
+		logger.Errorf(ctx, "failed to close stream with err %s", err.Error())
 		return nil, nil, err
 	}
 
