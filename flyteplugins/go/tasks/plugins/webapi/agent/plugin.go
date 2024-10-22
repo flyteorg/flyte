@@ -176,6 +176,12 @@ func (p *Plugin) ExecuteTaskSync(
 		return nil, nil, fmt.Errorf("failed to send inputsProto with error: %w", err)
 	}
 
+	// Client is done with sending
+	if err := stream.CloseSend(); err != nil {
+		logger.Errorf(ctx, "Failed to close stream with err %s", err.Error())
+		return nil, nil, err
+	}
+
 	in, err := stream.Recv()
 	if err != nil {
 		logger.Errorf(ctx, "Failed to write output with err %s", err.Error())
@@ -187,11 +193,6 @@ func (p *Plugin) ExecuteTaskSync(
 	// TODO: Read the streaming output from the agent, and merge it into the final output.
 	// For now, Propeller assumes that the output is always in the header.
 	resource := in.GetHeader().GetResource()
-
-	if err := stream.CloseSend(); err != nil {
-		logger.Errorf(ctx, "Failed to close stream with err %s", err.Error())
-		return nil, nil, err
-	}
 
 	return nil, ResourceWrapper{
 		Phase:      resource.Phase,
