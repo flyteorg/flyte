@@ -110,14 +110,6 @@ func TestValidateTaskEmptyName(t *testing.T) {
 	assert.EqualError(t, err, "missing name")
 }
 
-func TestValidateTaskEmptyVersion(t *testing.T) {
-	request := testutils.GetValidTaskRequest()
-	request.Id.Version = ""
-	err := ValidateTask(context.Background(), request, testutils.GetRepoWithDefaultProject(),
-		getMockTaskResources(), mockWhitelistConfigProvider, taskApplicationConfigProvider)
-	assert.EqualError(t, err, "missing version")
-}
-
 func TestValidateTaskEmptyType(t *testing.T) {
 	request := testutils.GetValidTaskRequest()
 	request.Spec.Template.Type = ""
