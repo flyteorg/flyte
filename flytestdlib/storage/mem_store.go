@@ -10,8 +10,6 @@ import (
 	"io/ioutil"
 	"os"
 	"strings"
-
-	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 type rawFile = []byte
@@ -63,12 +61,7 @@ func (s *InMemoryStore) List(ctx context.Context, reference DataReference, maxIt
 
 	for ref := range s.cache {
 		if strings.HasPrefix(ref.String(), prefix) {
-			_, _, k, err := ref.Split()
-			if err != nil {
-				logger.Errorf(ctx, "failed to split reference [%s]", ref)
-				continue
-			}
-			items = append(items, DataReference(k))
+			items = append(items, ref)
 		}
 	}
 

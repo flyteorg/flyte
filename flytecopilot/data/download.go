@@ -35,7 +35,7 @@ type Downloader struct {
 
 func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath string) (interface{}, error) {
 	blobRef := storage.DataReference(blob.Uri)
-	scheme, c, _, err := blobRef.Split()
+	scheme, _, _, err := blobRef.Split()
 	if err != nil {
 		return nil, errors.Wrapf(err, "Blob uri incorrectly formatted")
 	}
@@ -44,7 +44,7 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 		maxItems := 100
 		cursor := storage.NewCursorAtStart()
 		var items []storage.DataReference
-		var keys []string
+		var absPaths []string
 		for {
 			items, cursor, err = d.store.List(ctx, blobRef, maxItems, cursor)
 			if err != nil || len(items) == 0 {
@@ -52,7 +52,7 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 				return nil, err
 			}
 			for _, item := range items {
-				keys = append(keys, item.String())
+				absPaths = append(absPaths, item.String())
 			}
 			if storage.IsCursorEnd(cursor) {
 				break
@@ -62,8 +62,8 @@ func (d Downloader) handleBlob(ctx context.Context, blob *core.Blob, toPath stri
 		success := 0
 		var mu sync.Mutex
 		var wg sync.WaitGroup
-		for _, k := range keys {
-			absPath := fmt.Sprintf("%s://%s/%s", scheme, c, k)
+		for _, absPath := range absPaths {
+			absPath := absPath
 
 			wg.Add(1)
 			go func() {
