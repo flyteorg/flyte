@@ -151,7 +151,7 @@ async fn setup_python_env<'a>(
 
         // append `fast_register_dir` to sys path
         py.eval_bound(
-            &format!("sys.path.append(\"{}\")", fast_register_dir),
+            &format!("sys.path.insert(0, \"{}\")", fast_register_dir),
             None,
             Some(&locals),
         )?;
