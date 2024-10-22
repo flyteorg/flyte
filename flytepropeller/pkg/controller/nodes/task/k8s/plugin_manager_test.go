@@ -33,6 +33,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 type extendedFakeClient struct {
@@ -161,6 +162,10 @@ type dummyOutputWriter struct {
 func (d *dummyOutputWriter) Put(ctx context.Context, reader io.OutputReader) error {
 	d.r = reader
 	return nil
+}
+
+func (d *dummyOutputWriter) GetErrorPath() storage.DataReference {
+	return "s3://errors/error.pb"
 }
 
 func getMockTaskContext(initPhase PluginPhase, wantPhase PluginPhase) pluginsCore.TaskExecutionContext {
