@@ -49,20 +49,22 @@ func (r *TaskRepo) Create(ctx context.Context, input models.Task, descriptionEnt
 func (r *TaskRepo) Get(ctx context.Context, input interfaces.Identifier) (models.Task, error) {
 	var task models.Task
 	timer := r.metrics.GetDuration.Start()
-	query := r.db.WithContext(ctx).Where(&models.Task{
-		TaskKey: models.TaskKey{
-			Project: input.Project,
-			Domain:  input.Domain,
-			Name:    input.Name,
-		},
-	})
-
+	var tx *gorm.DB
 	if input.Version == "" {
-		query = query.Order("version DESC").Limit(1)
+		tx := r.db.WithContext(ctx).Limit(1)
+		tx = tx.Order("DESC")
+		tx.Find(&task)
 	} else {
-		query = query.Where("version = ?", input.Version)
+		tx = r.db.WithContext(ctx).Where(&models.Task{
+			TaskKey: models.TaskKey{
+				Project: input.Project,
+				Domain:  input.Domain,
+				Name:    input.Name,
+				Version: input.Version,
+			},
+		}).Take(&task)
 	}
-	tx := query.Take(&task)
+
 	timer.Stop()
 	if errors.Is(tx.Error, gorm.ErrRecordNotFound) {
 		return models.Task{}, flyteAdminDbErrors.GetMissingEntityError(core.ResourceType_TASK.String(), &core.Identifier{
