@@ -102,7 +102,13 @@ func (l *launchPlanHandler) StartLaunchPlan(ctx context.Context, nCtx interfaces
 			}
 		}
 	}
-	err = l.launchPlan.Launch(ctx, launchCtx, childID, nCtx.Node().GetWorkflowNode().GetLaunchPlanRefID().Identifier, nodeInputs)
+	launchPlanRefID := nCtx.Node().GetWorkflowNode().GetLaunchPlanRefID()
+	launchPlan := nCtx.ExecutionContext().FindLaunchPlan(*launchPlanRefID)
+	if launchPlan == nil {
+		return handler.DoTransition(handler.TransitionTypeEphemeral,
+			handler.PhaseInfoFailure(core.ExecutionError_SYSTEM, errors.BadSpecificationError, fmt.Sprintf("launch plan not found [%v]", launchPlanRefID), nil)), nil
+	}
+	err = l.launchPlan.Launch(ctx, launchCtx, childID, launchPlan, nodeInputs)
 	if err != nil {
 		if launchplan.IsAlreadyExists(err) {
 			logger.Infof(ctx, "Execution already exists [%s].", childID.Name)
@@ -153,7 +159,13 @@ func (l *launchPlanHandler) CheckLaunchPlanStatus(ctx context.Context, nCtx inte
 		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(core.ExecutionError_SYSTEM, errors.RuntimeExecutionError, "failed to create unique ID", nil)), nil
 	}
 
-	wfStatusClosure, outputs, err := l.launchPlan.GetStatus(ctx, childID)
+	launchPlanRefID := nCtx.Node().GetWorkflowNode().GetLaunchPlanRefID()
+	launchPlan := nCtx.ExecutionContext().FindLaunchPlan(*launchPlanRefID)
+	if launchPlan == nil {
+		return handler.DoTransition(handler.TransitionTypeEphemeral,
+			handler.PhaseInfoFailure(core.ExecutionError_SYSTEM, errors.BadSpecificationError, fmt.Sprintf("launch plan not found [%v]", launchPlanRefID), nil)), nil
+	}
+	wfStatusClosure, outputs, err := l.launchPlan.GetStatus(ctx, childID, launchPlan)
 	if err != nil {
 		if launchplan.IsNotFound(err) { // NotFound
 			errorCode, _ := errors.GetErrorCode(err)

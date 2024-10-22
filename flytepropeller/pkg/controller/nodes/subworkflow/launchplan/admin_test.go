@@ -25,6 +25,28 @@ import (
 	storageMocks "github.com/flyteorg/flyte/flytestdlib/storage/mocks"
 )
 
+var (
+	launchPlanWithOutputs = &core.LaunchPlanTemplate{
+		Id: &core.Identifier{},
+		Interface: &core.TypedInterface{
+			Inputs: &core.VariableMap{
+				Variables: map[string]*core.Variable{
+					"foo": {
+						Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING}},
+					},
+				},
+			},
+			Outputs: &core.VariableMap{
+				Variables: map[string]*core.Variable{
+					"bar": {
+						Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING}},
+					},
+				},
+			},
+		},
+	}
+)
+
 func TestAdminLaunchPlanExecutor_GetStatus(t *testing.T) {
 	ctx := context.TODO()
 	id := &core.WorkflowExecutionIdentifier{
@@ -46,9 +68,20 @@ func TestAdminLaunchPlanExecutor_GetStatus(t *testing.T) {
 			mock.MatchedBy(func(o *admin.WorkflowExecutionGetRequest) bool { return true }),
 		).Return(result, nil)
 		assert.NoError(t, err)
-		s, _, err := exec.GetStatus(ctx, id)
+		s, _, err := exec.GetStatus(
+			ctx,
+			id,
+			launchPlanWithOutputs,
+		)
 		assert.NoError(t, err)
 		assert.Equal(t, result, s)
+
+		item, err := exec.(*adminLaunchPlanExecutor).cache.Get(id.String())
+		assert.NoError(t, err)
+		assert.NotNil(t, item)
+		assert.IsType(t, executionCacheItem{}, item)
+		e := item.(executionCacheItem)
+		assert.True(t, e.HasOutputs)
 	})
 
 	t.Run("notFound", func(t *testing.T) {
@@ -83,7 +116,7 @@ func TestAdminLaunchPlanExecutor_GetStatus(t *testing.T) {
 				},
 			},
 			id,
-			&core.Identifier{},
+			launchPlanWithOutputs,
 			nil,
 		)
 		assert.NoError(t, err)
@@ -91,7 +124,7 @@ func TestAdminLaunchPlanExecutor_GetStatus(t *testing.T) {
 		// Allow for sync to be called
 		time.Sleep(time.Second)
 
-		s, _, err := exec.GetStatus(ctx, id)
+		s, _, err := exec.GetStatus(ctx, id, launchPlanWithOutputs)
 		assert.Error(t, err)
 		assert.Nil(t, s)
 		assert.True(t, IsNotFound(err))
@@ -129,7 +162,7 @@ func TestAdminLaunchPlanExecutor_GetStatus(t *testing.T) {
 				},
 			},
 			id,
-			&core.Identifier{},
+			launchPlanWithOutputs,
 			nil,
 		)
 		assert.NoError(t, err)
@@ -137,7 +170,7 @@ func TestAdminLaunchPlanExecutor_GetStatus(t *testing.T) {
 		// Allow for sync to be called
 		time.Sleep(time.Second)
 
-		s, _, err := exec.GetStatus(ctx, id)
+		s, _, err := exec.GetStatus(ctx, id, launchPlanWithOutputs)
 		assert.Error(t, err)
 		assert.Nil(t, s)
 		assert.False(t, IsNotFound(err))
@@ -184,7 +217,7 @@ func TestAdminLaunchPlanExecutor_Launch(t *testing.T) {
 				Labels: labels,
 			},
 			id,
-			&core.Identifier{},
+			launchPlanWithOutputs,
 			nil,
 		)
 		assert.NoError(t, err)
@@ -222,7 +255,7 @@ func TestAdminLaunchPlanExecutor_Launch(t *testing.T) {
 				ParentNodeExecution: parentNodeExecution,
 			},
 			id,
-			&core.Identifier{},
+			launchPlanWithOutputs,
 			nil,
 		)
 		assert.NoError(t, err)
@@ -271,7 +304,7 @@ func TestAdminLaunchPlanExecutor_Launch(t *testing.T) {
 				ParentNodeExecution: parentNodeExecution,
 			},
 			id,
-			&core.Identifier{},
+			launchPlanWithOutputs,
 			nil,
 		)
 		assert.NoError(t, err)
@@ -299,7 +332,7 @@ func TestAdminLaunchPlanExecutor_Launch(t *testing.T) {
 				},
 			},
 			id,
-			&core.Identifier{},
+			launchPlanWithOutputs,
 			nil,
 		)
 		assert.Error(t, err)
@@ -327,7 +360,7 @@ func TestAdminLaunchPlanExecutor_Launch(t *testing.T) {
 				},
 			},
 			id,
-			&core.Identifier{},
+			launchPlanWithOutputs,
 			nil,
 		)
 		assert.Error(t, err)
@@ -481,21 +514,21 @@ func TestAdminLaunchPlanExecutorScenarios(t *testing.T) {
 		{
 			name:                  "GetExecution-fails",
 			expectError:           true,
-			cacheItem:             executionCacheItem{},
+			cacheItem:             executionCacheItem{HasOutputs: true},
 			getExecutionError:     status.Error(codes.NotFound, ""),
 			expectedErrorContains: RemoteErrorNotFound,
 		},
 		{
 			name:                  "GetExecution-fails-system",
 			expectError:           true,
-			cacheItem:             executionCacheItem{},
+			cacheItem:             executionCacheItem{HasOutputs: true},
 			getExecutionError:     status.Error(codes.Internal, ""),
 			expectedErrorContains: RemoteErrorSystem,
 		},
 		{
 			name:            "GetExecutionData-succeeds",
 			expectSuccess:   true,
-			cacheItem:       executionCacheItem{},
+			cacheItem:       executionCacheItem{HasOutputs: true},
 			expectedOutputs: outputLiteral,
 			getExecutionDataResp: &admin.WorkflowExecutionGetDataResponse{
 				FullOutputs: outputLiteral,
@@ -504,9 +537,16 @@ func TestAdminLaunchPlanExecutorScenarios(t *testing.T) {
 			getExecutionResp:      mockExecutionRespWithOutputs,
 		},
 		{
+			name:             "GetExecutionData-no-outputs",
+			expectSuccess:    true,
+			cacheItem:        executionCacheItem{HasOutputs: false},
+			expectedOutputs:  &core.LiteralMap{},
+			getExecutionResp: mockExecutionRespWithoutOutputs,
+		},
+		{
 			name:                  "GetExecutionData-error-no-retry",
 			expectError:           true,
-			cacheItem:             executionCacheItem{},
+			cacheItem:             executionCacheItem{HasOutputs: true},
 			getExecutionDataError: status.Error(codes.NotFound, ""),
 			expectedErrorContains: codes.NotFound.String(),
 			getExecutionResp:      mockExecutionRespWithoutOutputs,
@@ -514,8 +554,8 @@ func TestAdminLaunchPlanExecutorScenarios(t *testing.T) {
 		{
 			name:                  "GetExecutionData-error-retry-fails",
 			expectError:           true,
-			cacheItem:             executionCacheItem{},
-			getExecutionDataError: status.Error(codes.NotFound, ""),
+			cacheItem:             executionCacheItem{HasOutputs: true},
+			getExecutionDataError: status.Error(codes.ResourceExhausted, ""),
 			storageReadError:      status.Error(codes.Internal, ""),
 			expectedErrorContains: codes.Internal.String(),
 			getExecutionResp:      mockExecutionRespWithOutputs,
@@ -523,7 +563,7 @@ func TestAdminLaunchPlanExecutorScenarios(t *testing.T) {
 		{
 			name:        "GetExecutionData-empty-retry-fails",
 			expectError: true,
-			cacheItem:   executionCacheItem{},
+			cacheItem:   executionCacheItem{HasOutputs: true},
 			getExecutionDataResp: &admin.WorkflowExecutionGetDataResponse{
 				FullOutputs: &core.LiteralMap{},
 			},
@@ -535,7 +575,7 @@ func TestAdminLaunchPlanExecutorScenarios(t *testing.T) {
 		{
 			name:          "GetExecutionData-empty-retry-succeeds",
 			expectSuccess: true,
-			cacheItem:     executionCacheItem{},
+			cacheItem:     executionCacheItem{HasOutputs: true},
 			getExecutionDataResp: &admin.WorkflowExecutionGetDataResponse{
 				FullOutputs: &core.LiteralMap{},
 			},

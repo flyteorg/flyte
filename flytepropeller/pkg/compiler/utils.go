@@ -78,3 +78,30 @@ func toCompiledWorkflows(wfs ...*core.WorkflowTemplate) []*core.CompiledWorkflow
 
 	return compiledSubWfs
 }
+
+func toCompiledLaunchPlans(launchPlans ...common.InterfaceProvider) []*core.CompiledLaunchPlan {
+	compiledLaunchPlans := make([]*core.CompiledLaunchPlan, 0, len(launchPlans))
+	for _, launchPlan := range launchPlans {
+		inputs := map[string]*core.Variable{}
+		if parameterMap := launchPlan.GetExpectedInputs(); parameterMap != nil {
+			for name, parameter := range parameterMap.Parameters {
+				inputs[name] = parameter.Var
+			}
+		}
+
+		compiledLaunchPlans = append(compiledLaunchPlans, &core.CompiledLaunchPlan{
+			Template: &core.LaunchPlanTemplate{
+				Id: launchPlan.GetID(),
+				Interface: &core.TypedInterface{
+					Inputs: &core.VariableMap{
+						Variables: inputs,
+					},
+					Outputs: launchPlan.GetExpectedOutputs(),
+				},
+				FixedInputs: launchPlan.GetFixedInputs(),
+			},
+		})
+	}
+
+	return compiledLaunchPlans
+}

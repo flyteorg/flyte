@@ -107,13 +107,6 @@ func buildFlyteWorkflowSpec(wf *core.CompiledWorkflow, tasks []*core.CompiledTas
 		})
 	}
 
-	var outputs *v1alpha1.OutputVarMap
-	if wf.Template.GetInterface() != nil {
-		outputs = &v1alpha1.OutputVarMap{VariableMap: wf.Template.GetInterface().Outputs}
-	} else {
-		outputs = &v1alpha1.OutputVarMap{VariableMap: &core.VariableMap{}}
-	}
-
 	failurePolicy := v1alpha1.WorkflowOnFailurePolicy(core.WorkflowMetadata_FAIL_IMMEDIATELY)
 	if wf.Template != nil && wf.Template.Metadata != nil {
 		failurePolicy = v1alpha1.WorkflowOnFailurePolicy(wf.Template.Metadata.OnFailure)
@@ -124,13 +117,18 @@ func buildFlyteWorkflowSpec(wf *core.CompiledWorkflow, tasks []*core.CompiledTas
 		ID:              WorkflowIDAsString(wf.Template.Id),
 		OnFailure:       failureN,
 		Nodes:           nodes,
-		Outputs:         outputs,
 		OutputBindings:  outputBindings,
 		OnFailurePolicy: failurePolicy,
 		Connections:     connections,
 		DeprecatedConnections: v1alpha1.DeprecatedConnections{
 			DownstreamEdges: connections.Downstream,
 			UpstreamEdges:   connections.Upstream,
+		},
+		Identifier: &v1alpha1.Identifier{
+			Identifier: wf.Template.Id,
+		},
+		Interface: &v1alpha1.TypedInterface{
+			TypedInterface: wf.Template.Interface,
 		},
 	}, nil
 }
@@ -210,6 +208,13 @@ func BuildFlyteWorkflow(wfClosure *core.CompiledWorkflowClosure, inputs *core.Li
 		interruptible = wf.GetMetadataDefaults().GetInterruptible()
 	}
 
+	launchPlans := make([]*v1alpha1.LaunchPlanSpec, 0, len(wfClosure.LaunchPlans))
+	for _, launchPlan := range wfClosure.LaunchPlans {
+		launchPlans = append(launchPlans, &v1alpha1.LaunchPlanSpec{
+			LaunchPlanTemplate: launchPlan.Template,
+		})
+	}
+
 	obj := &v1alpha1.FlyteWorkflow{
 		TypeMeta: v1.TypeMeta{
 			Kind:       v1alpha1.FlyteWorkflowKind,
@@ -224,6 +229,7 @@ func BuildFlyteWorkflow(wfClosure *core.CompiledWorkflowClosure, inputs *core.Li
 		SubWorkflows: subwfs,
 		Tasks:        buildTasks(tasks, errs.NewScope()),
 		NodeDefaults: v1alpha1.NodeDefaults{Interruptible: interruptible},
+		LaunchPlans:  launchPlans,
 	}
 
 	name, generatedName, label, project, domain, err := generateName(wf.GetId(), executionID)

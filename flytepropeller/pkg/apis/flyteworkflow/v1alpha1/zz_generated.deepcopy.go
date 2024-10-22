@@ -753,8 +753,8 @@ func (in *WorkflowSpec) DeepCopyInto(out *WorkflowSpec) {
 		*out = new(NodeSpec)
 		(*in).DeepCopyInto(*out)
 	}
-	if in.Outputs != nil {
-		in, out := &in.Outputs, &out.Outputs
+	if in.DeprecatedOutputs != nil {
+		in, out := &in.DeprecatedOutputs, &out.DeprecatedOutputs
 		*out = (*in).DeepCopy()
 	}
 	if in.OutputBindings != nil {

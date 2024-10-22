@@ -1,9 +1,12 @@
 package v1alpha1
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 
+	"github.com/golang/protobuf/jsonpb"
+	"github.com/golang/protobuf/proto"
 	"github.com/pkg/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -76,6 +79,10 @@ type FlyteWorkflow struct {
 	// portions of the CRD to an external data store to reduce CRD size. If this exists, FlytePropeller must retrieve
 	// and parse the static data prior to processing.
 	WorkflowClosureReference DataReference `json:"workflowClosureReference,omitempty"`
+
+	// LaunchPlans is a list of launch plans that are associated with this workflow. This is used to provide additional
+	// metadata to aid in launch plan orchestration.
+	LaunchPlans []*LaunchPlanSpec `json:"launchPlans,omitempty"`
 
 	// Flyteconsole url
 	ConsoleURL string `json:"consoleUrl,omitempty"`
@@ -194,6 +201,16 @@ func (in *FlyteWorkflow) GetRawOutputDataConfig() RawOutputDataConfig {
 	return in.RawOutputDataConfig
 }
 
+func (in *FlyteWorkflow) FindLaunchPlan(launchPlanRefID LaunchPlanRefID) ExecutableLaunchPlan {
+	for _, launchPlan := range in.LaunchPlans {
+		if proto.Equal(launchPlanRefID.Identifier, launchPlan.GetId()) {
+			return launchPlan
+		}
+	}
+
+	return nil
+}
+
 type Inputs struct {
 	*core.LiteralMap
 }
@@ -282,7 +299,8 @@ type WorkflowSpec struct {
 	OnFailure *NodeSpec `json:"onFailure,omitempty"`
 
 	// Defines the declaration of the outputs types and names this workflow is expected to generate.
-	Outputs *OutputVarMap `json:"outputs,omitempty"`
+	// deprecated: Please use Interface instead as it encapsulates both inputs and outputs.
+	DeprecatedOutputs *OutputVarMap `json:"outputs,omitempty"`
 
 	// Defines the data links used to construct the final outputs of the workflow. Bindings will typically
 	// refer to specific outputs of a subset of the nodes executed in the Workflow. When executing the end-node,
@@ -292,6 +310,12 @@ type WorkflowSpec struct {
 	// Defines the policy for handling failures whether it's to fail immediately, or let the nodes run
 	// to completion.
 	OnFailurePolicy WorkflowOnFailurePolicy `json:"onFailurePolicy,omitempty"`
+
+	// Identifier is a unique identifier for the workflow.
+	Identifier *Identifier `json:"identifier,omitempty"`
+
+	// Interface is the set of inputs and outputs that the workflow is expected to consume and produce.
+	Interface *TypedInterface `json:"interface,omitempty"`
 }
 
 func (in *WorkflowSpec) StartNode() ExecutableNode {
@@ -328,7 +352,15 @@ func (in *WorkflowSpec) GetOnFailurePolicy() WorkflowOnFailurePolicy {
 }
 
 func (in *WorkflowSpec) GetOutputs() *OutputVarMap {
-	return in.Outputs
+	if in.DeprecatedOutputs != nil {
+		return in.DeprecatedOutputs
+	}
+
+	if in.Interface == nil || in.Interface.Outputs == nil {
+		return &OutputVarMap{VariableMap: &core.VariableMap{}}
+	}
+
+	return &OutputVarMap{VariableMap: in.Interface.Outputs}
 }
 
 func (in *WorkflowSpec) GetNode(nodeID NodeID) (ExecutableNode, bool) {
@@ -368,10 +400,43 @@ func (in *WorkflowSpec) GetNodes() []NodeID {
 	return nodeIds
 }
 
+func (in *WorkflowSpec) GetInterface() *core.TypedInterface {
+	return in.Interface.TypedInterface
+}
+
+func (in *WorkflowSpec) GetIdentifier() *core.Identifier {
+	return in.Identifier.Identifier
+}
+
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 // FlyteWorkflowList is a list of FlyteWorkflow resources
 type FlyteWorkflowList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
 	Items           []FlyteWorkflow `json:"items"`
+}
+
+// LaunchPlanSpec is a collection of metadata associated with a launch plan. This includes a unique identifier and the
+// full set of input and output values.
+type LaunchPlanSpec struct {
+	*core.LaunchPlanTemplate
+}
+
+func (in *LaunchPlanSpec) DeepCopyInto(out *LaunchPlanSpec) {
+	*out = *in
+	// We do not manipulate the object, so its ok
+	// Once we figure out the autogenerate story we can replace this
+}
+
+func (in *LaunchPlanSpec) MarshalJSON() ([]byte, error) {
+	var buf bytes.Buffer
+	if err := marshaler.Marshal(&buf, in.LaunchPlanTemplate); err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
+}
+
+func (in *LaunchPlanSpec) UnmarshalJSON(b []byte) error {
+	in.LaunchPlanTemplate = &core.LaunchPlanTemplate{}
+	return jsonpb.Unmarshal(bytes.NewReader(b), in.LaunchPlanTemplate)
 }

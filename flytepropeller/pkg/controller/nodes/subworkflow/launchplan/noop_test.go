@@ -17,6 +17,8 @@ func TestFailFastWorkflowLauncher(t *testing.T) {
 			Project: "p",
 			Domain:  "d",
 			Name:    "n",
+		}, &core.LaunchPlanTemplate{
+			Id: &core.Identifier{},
 		})
 		assert.Nil(t, a)
 		assert.Error(t, err)
@@ -36,8 +38,9 @@ func TestFailFastWorkflowLauncher(t *testing.T) {
 			Project: "p",
 			Domain:  "d",
 			Name:    "n",
-		}, &core.Identifier{},
-			nil)
+		}, &core.LaunchPlanTemplate{
+			Id: &core.Identifier{},
+		}, nil)
 		assert.Error(t, err)
 	})
 

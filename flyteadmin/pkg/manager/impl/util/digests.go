@@ -40,7 +40,15 @@ func GetTaskDigest(ctx context.Context, task *core.CompiledTask) ([]byte, error)
 
 // Returns a unique digest for functionally equivalent compiled workflows
 func GetWorkflowDigest(ctx context.Context, workflowClosure *core.CompiledWorkflowClosure) ([]byte, error) {
-	workflowDigest, err := pbhash.ComputeHash(ctx, workflowClosure)
+	// using a CompiledWorkflowClosure where the LaunchPlans have been stripped to mitigate forced
+	// re-registration of all workflows that contain launchplans on the addition of subworkflow
+	// and launchplan caching support. this is not the proper fix, the correct approach is to
+	// include a compiler version in workflow version to ensure CompiledWorkflowClosures will
+	// seamlessly re-register upon compiler updates.
+	strippedWorkflowClosure := *workflowClosure
+	strippedWorkflowClosure.LaunchPlans = nil
+
+	workflowDigest, err := pbhash.ComputeHash(ctx, &strippedWorkflowClosure)
 	if err != nil {
 		logger.Warningf(ctx, "failed to hash workflow [%+v] to digest with err %v",
 			workflowClosure.Primary.Template.Id, err)

@@ -122,6 +122,7 @@ func createNodeContextWithVersion(phase v1alpha1.WorkflowNodePhase, n v1alpha1.E
 	ex.OnGetLabels().Return(nil)
 	ex.OnGetRawOutputDataConfig().Return(v1alpha1.RawOutputDataConfig{})
 	ex.OnGetDefinitionVersion().Return(v1alpha1.WorkflowDefinitionVersion1)
+	ex.OnFindLaunchPlanMatch(mock.Anything).Return(&core.LaunchPlanTemplate{})
 
 	nCtx.OnExecutionContext().Return(ex)
 
@@ -176,7 +177,7 @@ func TestWorkflowNodeHandler_StartNode_Launchplan(t *testing.T) {
 			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
 				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
 			}),
-			mock.MatchedBy(func(o *core.Identifier) bool { return lpID == o }),
+			mock.MatchedBy(func(o v1alpha1.ExecutableLaunchPlan) bool { return true }),
 			mock.MatchedBy(func(o *core.LiteralMap) bool { return o.Literals == nil }),
 		).Return(nil)
 
@@ -201,7 +202,7 @@ func TestWorkflowNodeHandler_StartNode_Launchplan(t *testing.T) {
 			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
 				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
 			}),
-			mock.MatchedBy(func(o *core.Identifier) bool { return lpID == o }),
+			mock.MatchedBy(func(o v1alpha1.ExecutableLaunchPlan) bool { return true }),
 			mock.MatchedBy(func(o *core.LiteralMap) bool { return o.Literals == nil }),
 		).Return(nil)
 
@@ -252,6 +253,7 @@ func TestWorkflowNodeHandler_CheckNodeStatus(t *testing.T) {
 			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
 				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
 			}),
+			mock.MatchedBy(func(o v1alpha1.ExecutableLaunchPlan) bool { return true }),
 		).Return(&admin.ExecutionClosure{
 			Phase: core.WorkflowExecution_RUNNING,
 		}, &core.LiteralMap{}, nil)
@@ -273,6 +275,7 @@ func TestWorkflowNodeHandler_CheckNodeStatus(t *testing.T) {
 			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
 				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
 			}),
+			mock.MatchedBy(func(o v1alpha1.ExecutableLaunchPlan) bool { return true }),
 		).Return(&admin.ExecutionClosure{
 			Phase: core.WorkflowExecution_RUNNING,
 		}, &core.LiteralMap{}, nil)
