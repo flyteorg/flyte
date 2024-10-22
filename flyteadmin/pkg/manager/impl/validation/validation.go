@@ -95,6 +95,23 @@ func ValidateIdentifierFieldsSet(id *core.Identifier) error {
 	return nil
 }
 
+// ValidateTaskIdentifierFieldsSet Validates that all required fields, except version, for a task identifier are present.
+func ValidateTaskIdentifierFieldsSet(id *core.Identifier) error {
+	if id == nil {
+		return shared.GetMissingArgumentError(shared.ID)
+	}
+	if err := ValidateEmptyStringField(id.Project, shared.Project); err != nil {
+		return err
+	}
+	if err := ValidateEmptyStringField(id.Domain, shared.Domain); err != nil {
+		return err
+	}
+	if err := ValidateEmptyStringField(id.Name, shared.Name); err != nil {
+		return err
+	}
+	return nil
+}
+
 // ValidateIdentifier Validates that all required fields for an identifier are present.
 func ValidateIdentifier(id *core.Identifier, expectedType common.Entity) error {
 	if id == nil {
@@ -104,6 +121,9 @@ func ValidateIdentifier(id *core.Identifier, expectedType common.Entity) error {
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 			"unexpected resource type %s for identifier [%+v], expected %s instead",
 			strings.ToLower(id.ResourceType.String()), id, strings.ToLower(entityToResourceType[expectedType].String()))
+	}
+	if id.ResourceType == core.ResourceType_TASK {
+		return ValidateTaskIdentifierFieldsSet(id)
 	}
 	return ValidateIdentifierFieldsSet(id)
 }
