@@ -100,3 +100,9 @@ task_resources:
   limits:
     cpu: 4
     memory: 4Gi
+
+flyte:
+  admin:
+    seedProjects:
+      - name: flytesnacks
+        description: Flytesnacks project

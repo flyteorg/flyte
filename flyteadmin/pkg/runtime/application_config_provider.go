@@ -12,6 +12,7 @@ const flyteAdmin = "flyteadmin"
 const scheduler = "scheduler"
 const remoteData = "remoteData"
 const notifications = "notifications"
+const projects = "projects"
 const domains = "domains"
 const externalEvents = "externalEvents"
 const cloudEvents = "cloudEvents"
@@ -63,6 +64,12 @@ var remoteDataConfig = config.MustRegisterSection(remoteData, &interfaces.Remote
 var notificationsConfig = config.MustRegisterSection(notifications, &interfaces.NotificationsConfig{
 	Type: common.Local,
 })
+var projectsConfig = config.MustRegisterSection(projects, &interfaces.ProjectsConfig{
+	{
+		Name:        "flytesnacks",
+		Description: "Flyte Snacks is a project for testing Flyte features.",
+	},
+})
 var domainsConfig = config.MustRegisterSection(domains, &interfaces.DomainsConfig{
 	{
 		ID:   "development",
@@ -106,6 +113,10 @@ func (p *ApplicationConfigurationProvider) GetRemoteDataConfig() *interfaces.Rem
 
 func (p *ApplicationConfigurationProvider) GetNotificationsConfig() *interfaces.NotificationsConfig {
 	return notificationsConfig.GetConfig().(*interfaces.NotificationsConfig)
+}
+
+func (p *ApplicationConfigurationProvider) GetProjectsConfig() *interfaces.ProjectsConfig {
+	return projectsConfig.GetConfig().(*interfaces.ProjectsConfig)
 }
 
 func (p *ApplicationConfigurationProvider) GetDomainsConfig() *interfaces.DomainsConfig {
