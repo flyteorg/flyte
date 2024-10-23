@@ -143,6 +143,18 @@ Max number of gRPC retries
   "4"
   
 
+maxMessageSizeBytes (int)
+------------------------------------------------------------------------------------------------------------------------
+
+The max size in bytes for incoming gRPC messages
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "0"
+  
+
 authType (uint8)
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -1751,6 +1763,7 @@ postgres (`database.PostgresConfig`_)
   password: postgres
   passwordPath: ""
   port: 30001
+  readReplicaHost: localhost
   username: postgres
   
 
@@ -1771,6 +1784,18 @@ host (string)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 The host name of the database server
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  localhost
+  
+
+readReplicaHost (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+The host name of the read replica database server
 
 **Default Value**: 
 
@@ -3956,6 +3981,7 @@ Configuration for array nodes
 
   default-parallelism-behavior: unlimited
   event-version: 0
+  use-map-plugin-logs: false
   
 
 literal-offloading-config (`config.LiteralOffloadingConfig`_)
@@ -3999,6 +4025,18 @@ Default parallelism behavior for array nodes
 .. code-block:: yaml
 
   unlimited
+  
+
+use-map-plugin-logs (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Override subNode log links with those configured for the map plugin logs
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
   
 
 config.CompositeQueueConfig
