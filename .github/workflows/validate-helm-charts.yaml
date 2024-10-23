@@ -4,6 +4,7 @@ on:
   pull_request:
     branches:
       - master
+      - 'release-v**'
     paths:
       - "charts/**"
       - "deployment/**"

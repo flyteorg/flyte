@@ -10,6 +10,7 @@ on:
     branches:
       - master
       - rc/*
+      - 'release-v**'
   workflow_dispatch:
 
 jobs:

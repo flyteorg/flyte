@@ -5,7 +5,11 @@ concurrency:
   cancel-in-progress: true
 
 on:
-  workflow_call:
+  pull_request:
+  push:
+    branches:
+      - master
+      - rc/*
   workflow_dispatch:
 
 permissions:
