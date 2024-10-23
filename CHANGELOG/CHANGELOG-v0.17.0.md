@@ -10,7 +10,7 @@
 1. Great Expectations Integration ([docs](https://docs.flyte.org/en/latest/flytesnacks/examples/greatexpectations_plugin/index.html)).
 1. Access to durable blob stores (AWS/GCS/etc) is now pluggable.
 1. Local task execution has been updated to also trigger the type engine.
-1. Tasks that have `cache=True` should now be cached when running locally as well ([docs](https://docs.flyte.org/en/latest/user_guide/development_lifecycle/caching.html#how-does-local-caching-work)).
+1. Tasks that have `cache=True` should now be cached when running locally as well. The updated documentation provides a comprehensive overview of input and output caching mechanisms in Flyte, which can be found [here](https://docs.flyte.org/en/latest/user_guide/development_lifecycle/caching.html).
 
 Please see the [flytekit release](https://github.com/flyteorg/flytekit/releases/tag/v0.22.0) for the full list and more details.
 
