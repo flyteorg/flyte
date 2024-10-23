@@ -2,12 +2,14 @@ package v1alpha1
 
 import (
 	"bytes"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"testing"
+
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/protobuf/types/known/durationpb"
-	"testing"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 func mockMarshalPbToBytes(msg proto.Message) ([]byte, error) {

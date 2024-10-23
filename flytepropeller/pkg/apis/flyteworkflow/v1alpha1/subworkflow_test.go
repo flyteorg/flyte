@@ -1,9 +1,11 @@
 package v1alpha1
 
 import (
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 func TestWorkflowNodeSpec_GetLaunchPlanRefID(t *testing.T) {
@@ -22,9 +24,9 @@ func TestWorkflowNodeSpec_GetLaunchPlanRefID(t *testing.T) {
 }
 
 func TestWorkflowNodeSpec_GetSubWorkflowRef(t *testing.T) {
-	workflowId := "TestWorkflowID"
+	workflowID := "TestWorkflowID"
 	wfNodeSpec := &WorkflowNodeSpec{
-		SubWorkflowReference: &workflowId,
+		SubWorkflowReference: &workflowID,
 	}
 
 	nilWfNodeSpec := &WorkflowNodeSpec{}

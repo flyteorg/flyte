@@ -1,9 +1,10 @@
 package v1alpha1
 
 import (
+	"testing"
+
 	"github.com/stretchr/testify/assert"
 	"k8s.io/apimachinery/pkg/runtime"
-	"testing"
 )
 
 func TestKind(t *testing.T) {
