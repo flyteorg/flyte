@@ -745,7 +745,8 @@ func TestGetTaskPhase(t *testing.T) {
 		{rayv1.JobDeploymentStatusRunning, pluginsCore.PhaseRunning, false},
 		{rayv1.JobDeploymentStatusComplete, pluginsCore.PhaseSuccess, false},
 		{rayv1.JobDeploymentStatusFailed, pluginsCore.PhasePermanentFailure, false},
-		{rayv1.JobDeploymentStatusSuspended, pluginsCore.PhaseInitializing, false},
+		{rayv1.JobDeploymentStatusSuspended, pluginsCore.PhaseQueued, false},
+		{rayv1.JobDeploymentStatusSuspending, pluginsCore.PhaseQueued, false},
 	}
 
 	startTime := time.Date(2024, 0, 0, 0, 0, 0, 0, time.UTC)
