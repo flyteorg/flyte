@@ -1756,7 +1756,7 @@ spec:
           value: minio
         - name: FLYTE_AWS_SECRET_ACCESS_KEY
           value: miniostorage
-        image: cr.flyte.org/flyteorg/flyteagent:1.13.10
+        image: cr.flyte.org/flyteorg/flyteagent:1.13.11
         imagePullPolicy: IfNotPresent
         name: flyteagent
         ports:
