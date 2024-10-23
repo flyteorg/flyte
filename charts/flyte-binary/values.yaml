@@ -27,7 +27,7 @@ flyte-core-components:
     # a default description will be auto-generated for the project.
     seedProjectsWithDetails:
       - name: flytesnacks
-        description: Default project setup."
+        description: Default project setup.
   # propeller Configuration to disable propeller or any of its components
   propeller:
     # disabled Disables flytepropeller

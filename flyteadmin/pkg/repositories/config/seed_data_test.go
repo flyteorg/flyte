@@ -1,6 +1,12 @@
 package config
 
-import "testing"
+import (
+	"testing"
+
+	mocket "github.com/Selvatico/go-mocket"
+	"github.com/stretchr/testify/assert"
+	"gorm.io/gorm"
+)
 
 func TestMergeSeedProjectsWithUniqueNames(t *testing.T) {
 	tests := []struct {
@@ -235,15 +241,50 @@ func TestUniqueProjectsFromNames(t *testing.T) {
 					t.Errorf("unexpected project %q in result", name)
 				}
 			}
-
-			uniqueNames := make([]string, 0)
-			seen := make(map[string]bool)
-			for _, name := range tt.names {
-				if !seen[name] {
-					seen[name] = true
-					uniqueNames = append(uniqueNames, name)
-				}
-			}
 		})
 	}
+}
+
+func TestSeedProjects(t *testing.T) {
+	gormDb := GetDbForTest(t)
+	defer mocket.Catcher.Reset()
+
+	mocket.Catcher.Reset()
+	mocket.Catcher.NewMock().WithQuery(`SELECT * FROM "projects"`).WithReply([]map[string]interface{}{})
+
+	projects := []SeedProject{
+		{
+			Name:        "Project 1",
+			Description: "New Description",
+		},
+	}
+
+	// Execute
+	err := SeedProjects(gormDb, projects)
+
+	// Assert
+	assert.NoError(t, err)
+}
+
+func TestSeedProjectsWithDuplicateKey(t *testing.T) {
+	gormDb := GetDbForTest(t)
+	defer mocket.Catcher.Reset()
+
+	// Mock the SELECT query for existence check
+	mocket.Catcher.Reset()
+	mocket.Catcher.NewMock().WithQuery(`INSERT INTO "projects"`).WithError(gorm.ErrDuplicatedKey)
+
+	projects := []SeedProject{
+		{
+			Name:        "Project 1",
+			Description: "New Description",
+		},
+	}
+
+	// Execute
+	err := SeedProjects(gormDb, projects)
+
+	// Assert
+	assert.Error(t, err)
+
 }
