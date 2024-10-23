@@ -132,7 +132,7 @@ As the implementation of this API extension could potentially lead to additional
 
 ## 5 Drawbacks
 
-The proposed cache eviction changes introduces a slight overhead in execution preparation in case an eviction has been requested since a reservation must be acquired and the stored data has to be removed from `datacatalog` and its underlying blob storage.
+The proposed cache eviction changes introduce a slight overhead in execution preparation in case an eviction has been requested since a reservation must be acquired and the stored data has to be removed from `datacatalog` and its underlying blob storage.
 Depending on the size of the cached outputs and the blob storage speed, this might induce increased scheduling times for tasks, although no performance impact should occur if no cache eviction is performed.
 In order to minimize the execution startup delay, cache eviction could be postponed until the task executed successfully, only requiring a quick check beforehand and ensuring the actual computation can start as soon as possible.
 
