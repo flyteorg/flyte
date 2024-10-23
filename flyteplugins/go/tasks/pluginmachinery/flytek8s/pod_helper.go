@@ -448,20 +448,22 @@ func ApplyContainerImageOverride(podSpec *v1.PodSpec, containerImage string, pri
 	}
 }
 
-func ApplyPodTemplateOverride(podSpec *v1.PodSpec, objectMeta *metav1.ObjectMeta, podTemplate *core.PodTemplate) (*v1.PodSpec, *metav1.ObjectMeta, error) {
-	if len(podTemplate.Annotations) > 0 {
-		mergeMapInto(objectMeta.Annotations, podTemplate.Annotations)
+func ApplyPodTemplateOverride(podSpec *v1.PodSpec, objectMeta *metav1.ObjectMeta, podtemplate *core.PodTemplate) (*v1.PodSpec, *metav1.ObjectMeta, error) {
+	if podtemplate.Annotations != nil {
+		mergeMapInto(podtemplate.Annotations, objectMeta.Annotations)
 	}
-	if len(podTemplate.Labels) > 0 {
-		mergeMapInto(objectMeta.Labels, podTemplate.Labels)
+	if podtemplate.Labels != nil {
+		mergeMapInto(podtemplate.Labels, objectMeta.Labels)
 	}
-
 	var podspec_override *v1.PodSpec
-	err := utils.UnmarshalStructToObj(podTemplate.PodSpec, &podspec_override)
+	err := utils.UnmarshalStructToObj(podtemplate.PodSpec, &podspec_override)
 	if err != nil {
 		return nil, nil, err
 	}
-	mergedPodSpec, err := mergePodSpecs(podSpec, podspec_override, podTemplate.PrimaryContainerName)
+	if podspec_override.Containers == nil {
+		return podSpec, objectMeta, nil
+	}
+	mergedPodSpec, err := mergePodSpecs(podSpec, podspec_override, podtemplate.PrimaryContainerName)
 	if err != nil {
 		return nil, nil, err
 	}
