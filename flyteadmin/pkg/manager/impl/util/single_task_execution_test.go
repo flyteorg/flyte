@@ -55,7 +55,7 @@ func TestGenerateWorkflowNameFromNode(t *testing.T) {
 					},
 				},
 			},
-			expectedName: ".flytegen.TaskId-node",
+			expectedName: ".flytegen.TaskId",
 		},
 		{
 			name: "ArrayNode",
@@ -76,7 +76,7 @@ func TestGenerateWorkflowNameFromNode(t *testing.T) {
 					},
 				},
 			},
-			expectedName: ".flytegen.subnode-node",
+			expectedName: ".flytegen.subnode",
 		},
 		{
 			name: "WorkflowNode",
@@ -304,7 +304,7 @@ func TestCreateOrGetLaunchPlan(t *testing.T) {
 		},
 	}
 	launchPlan, err := CreateOrGetLaunchPlan(
-		context.Background(), repository, config, taskIdentifier, workflowInterface, workflowID, spec.AuthRole, spec.SecurityContext, nil)
+		context.Background(), repository, config, taskIdentifier, workflowInterface, workflowID, spec.AuthRole, spec.SecurityContext)
 	assert.NoError(t, err)
 	assert.True(t, proto.Equal(&core.Identifier{
 		ResourceType: core.ResourceType_LAUNCH_PLAN,
@@ -327,9 +327,11 @@ func TestCreateOrGetWorkflowFromNode(t *testing.T) {
 		Version:      "12345",
 		Org:          "org",
 	}
+	workflowName := "wf_name"
 	tests := []struct {
 		name           string
 		node           *core.Node
+		workflowName   string
 		expectedName   string
 		expectError    bool
 		typedInterface *core.TypedInterface
@@ -337,6 +339,10 @@ func TestCreateOrGetWorkflowFromNode(t *testing.T) {
 		{
 			name: "TaskNode",
 			node: &core.Node{
+				Id: "node_id",
+				Metadata: &core.NodeMetadata{
+					Name: "simple_task",
+				},
 				Target: &core.Node_TaskNode{
 					TaskNode: &core.TaskNode{
 						Reference: &core.TaskNode_ReferenceId{
@@ -345,7 +351,49 @@ func TestCreateOrGetWorkflowFromNode(t *testing.T) {
 					},
 				},
 			},
-			expectedName: ".flytegen.simple_task-node",
+			expectedName: ".flytegen.simple_task",
+			typedInterface: &core.TypedInterface{
+				Inputs: &core.VariableMap{
+					Variables: map[string]*core.Variable{
+						"a": {
+							Type: &core.LiteralType{
+								Type: &core.LiteralType_Simple{
+									Simple: core.SimpleType_INTEGER,
+								},
+							},
+						},
+					},
+				},
+				Outputs: &core.VariableMap{
+					Variables: map[string]*core.Variable{
+						"b": {
+							Type: &core.LiteralType{
+								Type: &core.LiteralType_Simple{
+									Simple: core.SimpleType_INTEGER,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "TaskNode - set name",
+			node: &core.Node{
+				Id: "node_id",
+				Metadata: &core.NodeMetadata{
+					Name: "simple_task",
+				},
+				Target: &core.Node_TaskNode{
+					TaskNode: &core.TaskNode{
+						Reference: &core.TaskNode_ReferenceId{
+							ReferenceId: &core.Identifier{Name: "simple_task"},
+						},
+					},
+				},
+			},
+			workflowName: workflowName,
+			expectedName: fmt.Sprintf(systemNamePrefix, workflowName),
 			typedInterface: &core.TypedInterface{
 				Inputs: &core.VariableMap{
 					Variables: map[string]*core.Variable{
@@ -374,6 +422,10 @@ func TestCreateOrGetWorkflowFromNode(t *testing.T) {
 		{
 			name: "ArrayNode with TaskNode",
 			node: &core.Node{
+				Id: "node_id",
+				Metadata: &core.NodeMetadata{
+					Name: "simple_task",
+				},
 				Target: &core.Node_ArrayNode{
 					ArrayNode: &core.ArrayNode{
 						Node: &core.Node{
@@ -389,7 +441,7 @@ func TestCreateOrGetWorkflowFromNode(t *testing.T) {
 					},
 				},
 			},
-			expectedName: ".flytegen.subnodeID-node",
+			expectedName: ".flytegen.subnodeID",
 			typedInterface: &core.TypedInterface{
 				Inputs: &core.VariableMap{
 					Variables: map[string]*core.Variable{
@@ -503,6 +555,10 @@ func TestCreateOrGetWorkflowFromNode(t *testing.T) {
 					Org:          wfIdentifier.Org,
 				}), fmt.Sprintf("%+v", request.Id))
 				assert.True(t, proto.Equal(tt.typedInterface, request.Spec.Template.Interface))
+				nodes := request.GetSpec().GetTemplate().GetNodes()
+				assert.Equal(t, 1, len(nodes))
+				node := nodes[0]
+				assert.Equal(t, tt.node, node)
 				return &admin.WorkflowCreateResponse{}, nil
 			})
 			mockNamedEntityManager := managerMocks.NamedEntityManager{}
@@ -520,7 +576,7 @@ func TestCreateOrGetWorkflowFromNode(t *testing.T) {
 				return &admin.NamedEntityUpdateResponse{}, nil
 			}
 
-			workflowModel, err := CreateOrGetWorkflowFromNode(context.Background(), tt.node, repository, &mockWorkflowManager, &mockNamedEntityManager, wfIdentifier)
+			workflowModel, err := CreateOrGetWorkflowFromNode(context.Background(), tt.node, repository, &mockWorkflowManager, &mockNamedEntityManager, wfIdentifier, tt.workflowName)
 			if tt.expectError {
 				assert.NotNil(t, err)
 			} else {

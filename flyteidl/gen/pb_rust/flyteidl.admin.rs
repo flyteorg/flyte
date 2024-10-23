@@ -1961,6 +1961,9 @@ pub struct CreateLaunchPlanFromNodeRequest {
     /// Indicates security context for permissions triggered with this launch plan
     #[prost(message, optional, tag="4")]
     pub security_context: ::core::option::Option<super::core::SecurityContext>,
+    /// Optional name for the workflow & launch plan to be created. If not provided, a name will be generated.
+    #[prost(string, tag="5")]
+    pub name: ::prost::alloc::string::String,
     /// +required
     #[prost(oneof="create_launch_plan_from_node_request::SubNodes", tags="2, 3")]
     pub sub_nodes: ::core::option::Option<create_launch_plan_from_node_request::SubNodes>,

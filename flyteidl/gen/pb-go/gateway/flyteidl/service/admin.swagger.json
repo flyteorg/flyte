@@ -9411,6 +9411,10 @@
         "security_context": {
           "$ref": "#/definitions/coreSecurityContext",
           "title": "Indicates security context for permissions triggered with this launch plan"
+        },
+        "name": {
+          "type": "string",
+          "description": "Optional name for the workflow \u0026 launch plan to be created. If not provided, a name will be generated."
         }
       },
       "title": "Request to create or fetch a launch plan to re-run a node"
@@ -10664,6 +10668,10 @@
         "security_context": {
           "$ref": "#/definitions/coreSecurityContext",
           "title": "Indicates security context for permissions triggered with this launch plan"
+        },
+        "name": {
+          "type": "string",
+          "description": "Optional name for the workflow \u0026 launch plan to be created. If not provided, a name will be generated."
         }
       },
       "title": "Request to create or fetch a launch plan to re-run a node"

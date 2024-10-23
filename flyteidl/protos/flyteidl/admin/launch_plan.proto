@@ -254,6 +254,9 @@ message CreateLaunchPlanFromNodeRequest {
 
     // Indicates security context for permissions triggered with this launch plan
     core.SecurityContext security_context = 4;
+
+    // Optional name for the workflow & launch plan to be created. If not provided, a name will be generated.
+    string name = 5;
 }
 
 // The launch plan that was created for or that already existed from re-running node(s) within a workflow

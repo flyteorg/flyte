@@ -707,7 +707,7 @@ func (m *LaunchPlanManager) CreateLaunchPlanFromNode(
 		subNode = request.GetSubNodeSpec()
 	}
 
-	workflowModel, err := util.CreateOrGetWorkflowFromNode(ctx, subNode, m.db, m.workflowManager, m.namedEntityManager, request.GetLaunchPlanId())
+	workflowModel, err := util.CreateOrGetWorkflowFromNode(ctx, subNode, m.db, m.workflowManager, m.namedEntityManager, request.GetLaunchPlanId(), request.GetName())
 	if err != nil {
 		return nil, err
 	}
@@ -718,7 +718,7 @@ func (m *LaunchPlanManager) CreateLaunchPlanFromNode(
 
 	launchPlan, err := util.CreateOrGetLaunchPlan(ctx, m.db, m.config, workflow.Id,
 		workflow.GetClosure().GetCompiledWorkflow().GetPrimary().GetTemplate().GetInterface(), workflowModel.ID,
-		nil, securityContext, subNode)
+		nil, securityContext)
 	if err != nil {
 		return nil, err
 	}

@@ -172,16 +172,18 @@ class SubNodeList(_message.Message):
     def __init__(self, sub_node_ids: _Optional[_Iterable[_Union[SubNodeIdAsList, _Mapping]]] = ...) -> None: ...
 
 class CreateLaunchPlanFromNodeRequest(_message.Message):
-    __slots__ = ["launch_plan_id", "sub_node_ids", "sub_node_spec", "security_context"]
+    __slots__ = ["launch_plan_id", "sub_node_ids", "sub_node_spec", "security_context", "name"]
     LAUNCH_PLAN_ID_FIELD_NUMBER: _ClassVar[int]
     SUB_NODE_IDS_FIELD_NUMBER: _ClassVar[int]
     SUB_NODE_SPEC_FIELD_NUMBER: _ClassVar[int]
     SECURITY_CONTEXT_FIELD_NUMBER: _ClassVar[int]
+    NAME_FIELD_NUMBER: _ClassVar[int]
     launch_plan_id: _identifier_pb2.Identifier
     sub_node_ids: SubNodeList
     sub_node_spec: _workflow_pb2.Node
     security_context: _security_pb2.SecurityContext
-    def __init__(self, launch_plan_id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., sub_node_ids: _Optional[_Union[SubNodeList, _Mapping]] = ..., sub_node_spec: _Optional[_Union[_workflow_pb2.Node, _Mapping]] = ..., security_context: _Optional[_Union[_security_pb2.SecurityContext, _Mapping]] = ...) -> None: ...
+    name: str
+    def __init__(self, launch_plan_id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., sub_node_ids: _Optional[_Union[SubNodeList, _Mapping]] = ..., sub_node_spec: _Optional[_Union[_workflow_pb2.Node, _Mapping]] = ..., security_context: _Optional[_Union[_security_pb2.SecurityContext, _Mapping]] = ..., name: _Optional[str] = ...) -> None: ...
 
 class CreateLaunchPlanFromNodeResponse(_message.Message):
     __slots__ = ["launch_plan"]

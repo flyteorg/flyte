@@ -44991,6 +44991,7 @@
                  * @property {flyteidl.admin.ISubNodeList|null} [subNodeIds] CreateLaunchPlanFromNodeRequest subNodeIds
                  * @property {flyteidl.core.INode|null} [subNodeSpec] CreateLaunchPlanFromNodeRequest subNodeSpec
                  * @property {flyteidl.core.ISecurityContext|null} [securityContext] CreateLaunchPlanFromNodeRequest securityContext
+                 * @property {string|null} [name] CreateLaunchPlanFromNodeRequest name
                  */
     
                 /**
@@ -45040,6 +45041,14 @@
                  */
                 CreateLaunchPlanFromNodeRequest.prototype.securityContext = null;
     
+                /**
+                 * CreateLaunchPlanFromNodeRequest name.
+                 * @member {string} name
+                 * @memberof flyteidl.admin.CreateLaunchPlanFromNodeRequest
+                 * @instance
+                 */
+                CreateLaunchPlanFromNodeRequest.prototype.name = "";
+    
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
     
@@ -45086,6 +45095,8 @@
                         $root.flyteidl.core.Node.encode(message.subNodeSpec, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
                     if (message.securityContext != null && message.hasOwnProperty("securityContext"))
                         $root.flyteidl.core.SecurityContext.encode(message.securityContext, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+                    if (message.name != null && message.hasOwnProperty("name"))
+                        writer.uint32(/* id 5, wireType 2 =*/42).string(message.name);
                     return writer;
                 };
     
@@ -45118,6 +45129,9 @@
                             break;
                         case 4:
                             message.securityContext = $root.flyteidl.core.SecurityContext.decode(reader, reader.uint32());
+                            break;
+                        case 5:
+                            message.name = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -45167,6 +45181,9 @@
                         if (error)
                             return "securityContext." + error;
                     }
+                    if (message.name != null && message.hasOwnProperty("name"))
+                        if (!$util.isString(message.name))
+                            return "name: string expected";
                     return null;
                 };
     

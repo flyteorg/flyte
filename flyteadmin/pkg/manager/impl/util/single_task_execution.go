@@ -73,10 +73,10 @@ func generateWorkflowNameFromNode(node *core.Node) (string, error) {
 	case *core.Node_TaskNode:
 		// TODO need node_id + is_downstream to generate unique workflow name if running downstream nodes
 		taskNodeWrapper := node.Target.(*core.Node_TaskNode)
-		return generateWorkflowNameFromTask(taskNodeWrapper.TaskNode.Reference.(*core.TaskNode_ReferenceId).ReferenceId.Name) + "-node", nil
+		return generateWorkflowNameFromTask(taskNodeWrapper.TaskNode.Reference.(*core.TaskNode_ReferenceId).ReferenceId.Name), nil
 	case *core.Node_ArrayNode:
 		arrayNodeWrapper := node.Target.(*core.Node_ArrayNode)
-		return generateWorkflowNameFromTask(arrayNodeWrapper.ArrayNode.Node.Id) + "-node", nil
+		return generateWorkflowNameFromTask(arrayNodeWrapper.ArrayNode.Node.Id), nil
 	}
 	return "", errors.NewFlyteAdminErrorf(codes.InvalidArgument, "Only Task and Array Nodes are supported for relaunching")
 }
@@ -201,23 +201,18 @@ func CreateOrGetWorkflowModel(
 
 func CreateOrGetLaunchPlan(ctx context.Context,
 	db repositoryInterfaces.Repository, config runtimeInterfaces.Configuration, identifier *core.Identifier,
-	workflowInterface *core.TypedInterface, workflowID uint, authRole *admin.AuthRole, securityContext *core.SecurityContext,
-	subNode *core.Node) (*admin.LaunchPlan, error) {
+	workflowInterface *core.TypedInterface, workflowID uint, authRole *admin.AuthRole, securityContext *core.SecurityContext) (*admin.LaunchPlan, error) {
 	var launchPlan *admin.LaunchPlan
 	var err error
 	launchPlanIdentifier := core.Identifier{
 		ResourceType: core.ResourceType_LAUNCH_PLAN,
+		Name:         identifier.Name,
 		Org:          identifier.Org,
 		Project:      identifier.Project,
 		Domain:       identifier.Domain,
 		Version:      identifier.Version,
 	}
-	if subNode != nil {
-		launchPlanIdentifier.Name, err = generateWorkflowNameFromNode(subNode)
-		if err != nil {
-			return nil, err
-		}
-	} else {
+	if identifier.GetResourceType() == core.ResourceType_TASK {
 		launchPlanIdentifier.Name = generateWorkflowNameFromTask(identifier.Name)
 	}
 	launchPlan, err = GetLaunchPlan(ctx, db, launchPlanIdentifier)
@@ -279,11 +274,16 @@ func CreateOrGetLaunchPlan(ctx context.Context,
 func CreateOrGetWorkflowFromNode(
 	ctx context.Context, subNode *core.Node, db repositoryInterfaces.Repository,
 	workflowManager interfaces.WorkflowInterface, namedEntityManager interfaces.NamedEntityInterface,
-	identifier *core.Identifier) (*models.Workflow, error) {
+	identifier *core.Identifier, name string) (*models.Workflow, error) {
 
-	name, err := generateWorkflowNameFromNode(subNode)
-	if err != nil {
-		return nil, err
+	if name == "" {
+		var err error
+		name, err = generateWorkflowNameFromNode(subNode)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		name = fmt.Sprintf(systemNamePrefix, name)
 	}
 
 	workflowIdentifier := &core.Identifier{
@@ -310,7 +310,7 @@ func CreateOrGetWorkflowFromNode(
 
 		var wfInterface *core.TypedInterface
 		var wfOutputs []*core.Binding
-		var nodes []*core.Node
+		subNode.UpstreamNodeIds = []string{}
 		switch subNode.Target.(type) {
 		case *core.Node_TaskNode:
 			taskNodeWrapper := subNode.Target.(*core.Node_TaskNode)
@@ -320,28 +320,8 @@ func CreateOrGetWorkflowFromNode(
 				return nil, err
 			}
 			wfInterface = task.Closure.CompiledTask.Template.Interface
-			nodeID, err := generateNodeNameFromTask(task.Id.Name)
-			if err != nil {
-				return nil, err
-			}
-			wfOutputs = generateBindings(*task.Closure.CompiledTask.Template.Interface.Outputs, nodeID)
-			nodes = []*core.Node{
-				{
-					Id: nodeID,
-					Metadata: &core.NodeMetadata{
-						Name:    nodeID,
-						Retries: &defaultRetryStrategy,
-					},
-					Inputs: generateBindings(*task.Closure.CompiledTask.Template.Interface.Inputs, noInputNodeID),
-					Target: &core.Node_TaskNode{
-						TaskNode: &core.TaskNode{
-							Reference: &core.TaskNode_ReferenceId{
-								ReferenceId: task.Id,
-							},
-						},
-					},
-				},
-			}
+			wfOutputs = generateBindings(*task.Closure.CompiledTask.Template.Interface.Outputs, subNode.GetId())
+			subNode.Inputs = generateBindings(*task.Closure.CompiledTask.Template.Interface.Inputs, noInputNodeID)
 		case *core.Node_ArrayNode:
 			arrayNodeWrapper := subNode.Target.(*core.Node_ArrayNode)
 			arrayNode := arrayNodeWrapper.ArrayNode.Node
@@ -355,36 +335,8 @@ func CreateOrGetWorkflowFromNode(
 				}
 				taskInterface := task.Closure.CompiledTask.Template.Interface
 				wfInterface = taskInterface
-				nodeID, err := generateNodeNameFromTask(task.Id.Name)
-				if err != nil {
-					return nil, err
-				}
-				wfOutputs = generateBindings(*taskInterface.Outputs, nodeID)
-				nodes = []*core.Node{
-					{
-						Id: nodeID,
-						Metadata: &core.NodeMetadata{
-							Name:    nodeID,
-							Retries: &defaultRetryStrategy,
-						},
-						Inputs: generateBindings(*taskInterface.Inputs, noInputNodeID),
-						Target: &core.Node_ArrayNode{
-							ArrayNode: &core.ArrayNode{
-								Node: &core.Node{
-									Target: &core.Node_TaskNode{
-										TaskNode: &core.TaskNode{
-											Reference: &core.TaskNode_ReferenceId{
-												ReferenceId: task.Id,
-											},
-										},
-									},
-								},
-								ParallelismOption: arrayNode.GetArrayNode().GetParallelismOption(),
-								SuccessCriteria:   arrayNode.GetArrayNode().GetSuccessCriteria(),
-							},
-						},
-					},
-				}
+				wfOutputs = generateBindings(*taskInterface.Outputs, subNode.GetId())
+				subNode.Inputs = generateBindings(*task.Closure.CompiledTask.Template.Interface.Inputs, noInputNodeID)
 			case *core.Node_WorkflowNode:
 				// TODO - pvditt implement as part of mapping over launch plan PRs
 				return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "Only Task and Workflow Nodes are supported for Array Nodes")
@@ -399,7 +351,7 @@ func CreateOrGetWorkflowFromNode(
 			Template: &core.WorkflowTemplate{
 				Id:        workflowIdentifier,
 				Interface: wfInterface,
-				Nodes:     nodes,
+				Nodes:     []*core.Node{subNode},
 				Outputs:   wfOutputs,
 			},
 		}

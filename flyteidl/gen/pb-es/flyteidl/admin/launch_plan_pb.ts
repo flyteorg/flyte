@@ -937,6 +937,13 @@ export class CreateLaunchPlanFromNodeRequest extends Message<CreateLaunchPlanFro
    */
   securityContext?: SecurityContext;
 
+  /**
+   * Optional name for the workflow & launch plan to be created. If not provided, a name will be generated.
+   *
+   * @generated from field: string name = 5;
+   */
+  name = "";
+
   constructor(data?: PartialMessage<CreateLaunchPlanFromNodeRequest>) {
     super();
     proto3.util.initPartial(data, this);
@@ -949,6 +956,7 @@ export class CreateLaunchPlanFromNodeRequest extends Message<CreateLaunchPlanFro
     { no: 2, name: "sub_node_ids", kind: "message", T: SubNodeList, oneof: "sub_nodes" },
     { no: 3, name: "sub_node_spec", kind: "message", T: Node, oneof: "sub_nodes" },
     { no: 4, name: "security_context", kind: "message", T: SecurityContext },
+    { no: 5, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateLaunchPlanFromNodeRequest {

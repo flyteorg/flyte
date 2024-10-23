@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/benbjohnson/clock"
@@ -550,7 +551,7 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 
 	launchPlan, err := util.CreateOrGetLaunchPlan(ctx, m.db, m.config, taskIdentifier,
 		workflow.Closure.CompiledWorkflow.Primary.Template.Interface, workflowModel.ID,
-		request.Spec.AuthRole, request.Spec.SecurityContext, nil)
+		request.Spec.AuthRole, request.Spec.SecurityContext)
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -1231,6 +1232,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 					SubNodes: &admin.CreateLaunchPlanFromNodeRequest_SubNodeSpec{
 						SubNodeSpec: subNode,
 					},
+					Name:            executionId.GetName() + "-" + strings.Join(subNodeIds, "-"),
 					LaunchPlanId:    launchPlanID,
 					SecurityContext: execution.GetSpec().GetSecurityContext(),
 				})

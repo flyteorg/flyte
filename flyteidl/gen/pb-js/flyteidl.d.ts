@@ -18574,6 +18574,9 @@ export namespace flyteidl {
 
             /** CreateLaunchPlanFromNodeRequest securityContext */
             securityContext?: (flyteidl.core.ISecurityContext|null);
+
+            /** CreateLaunchPlanFromNodeRequest name */
+            name?: (string|null);
         }
 
         /** Represents a CreateLaunchPlanFromNodeRequest. */
@@ -18596,6 +18599,9 @@ export namespace flyteidl {
 
             /** CreateLaunchPlanFromNodeRequest securityContext. */
             public securityContext?: (flyteidl.core.ISecurityContext|null);
+
+            /** CreateLaunchPlanFromNodeRequest name. */
+            public name: string;
 
             /** CreateLaunchPlanFromNodeRequest subNodes. */
             public subNodes?: ("subNodeIds"|"subNodeSpec");
