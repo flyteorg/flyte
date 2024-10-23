@@ -43,7 +43,7 @@ Also, note that you can manually trigger cache invalidation per execution using 
 When enabled, Flyte ensures that a single instance of the task is run before any other instances that would otherwise run concurrently.
 This allows the initial instance to cache its result and lets the later instances reuse the resulting cached outputs.
 Cache serialization is disabled by default.
-* `cache_ignore_input_vars` (`Tuple[str, ...]`): Input values that Flyte should ignore when deciding if a task’s result can be reused. By default, no input variables are ignored. This parameter only applies to task serialization.
+* `cache_ignore_input_vars` (`Tuple[str, ...]`): Input variables that Flyte should ignore when deciding if a task’s result can be reused (hash calculation). By default, no input variables are ignored. This parameter only applies to task serialization.
 
 Task caching parameters can be specified at task definition time within `@task` decorator or at task invocation time using `with_overrides` method.
 
@@ -135,7 +135,7 @@ Task executions can be cached across different versions of the task because a ch
 
 ### How does local caching work?
 
-Flyte uses a tool called [diskcache](https://github.com/grantjenks/python-diskcache) package, specifically [diskcache.Cache](http://www.grantjenks.com/docs/diskcache/tutorial.html#cache), to save task results locally on your computer so they don’t need to be recomputed if the same task is run again. The results of local task executions are stored under `~/.flyte/local-cache/` and cache keys are composed of **Cache Version**, **Task Signature**, and **Task Input Values**.
+Flyte uses a tool called [diskcache](https://github.com/grantjenks/python-diskcache), specifically [diskcache.Cache](http://www.grantjenks.com/docs/diskcache/tutorial.html#cache), to save task results so they don’t need to be recomputed if the same task is executed again, a technique known as ``memoization``. The results of local task executions are stored under `~/.flyte/local-cache/` and cache keys are composed of **Cache Version**, **Task Signature**, and **Task Input Values**.
 
 Similar to the remote case, a local cache entry for a task will be invalidated if either the `cache_version` or the task signature is modified. In addition, the local cache can also be emptied by running the following command: `pyflyte local-cache clear`, which essentially obliterates the contents of the `~/.flyte/local-cache/` directory.
 To disable the local cache, you can set the `local.cache_enabled` config option (e.g. by setting the environment variable `FLYTE_LOCAL_CACHE_ENABLED=False`).
@@ -181,4 +181,3 @@ Here's a complete example of the feature:
 ```
 
 [flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/development_lifecycle/
-
