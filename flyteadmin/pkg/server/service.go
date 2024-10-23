@@ -12,7 +12,6 @@ import (
 	"github.com/gorilla/handlers"
 	grpcmiddleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpcauth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
-	grpcrecovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	grpcprometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/pkg/errors"
@@ -111,7 +110,6 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 		chainedUnaryInterceptors = grpcmiddleware.ChainUnaryServer(
 			// recovery interceptor should always be first in order to handle any panics in the middleware or server
 			recoveryInterceptor.UnaryServerInterceptor(),
-			grpcrecovery.UnaryServerInterceptor(),
 			grpcprometheus.UnaryServerInterceptor,
 			otelUnaryServerInterceptor,
 			auth.GetAuthenticationCustomMetadataInterceptor(authCtx),
@@ -136,7 +134,6 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 	)
 
 	serverOpts := []grpc.ServerOption{
-		// recovery interceptor should always be first in order to handle any panics in the middleware or server
 		grpc.StreamInterceptor(chainedStreamInterceptors),
 		grpc.UnaryInterceptor(chainedUnaryInterceptors),
 	}
