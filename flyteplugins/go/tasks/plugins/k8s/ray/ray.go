@@ -576,6 +576,8 @@ func (plugin rayJobResourceHandler) GetTaskPhase(ctx context.Context, pluginCont
 		phaseInfo, err = pluginsCore.PhaseInfoSuccess(info), nil
 	case rayv1.JobDeploymentStatusSuspended:
 		phaseInfo, err = pluginsCore.PhaseInfoQueuedWithTaskInfo(time.Now(), pluginsCore.DefaultPhaseVersion, "Suspended", info), nil
+	case rayv1.JobDeploymentStatusSuspending:
+		phaseInfo, err = pluginsCore.PhaseInfoQueuedWithTaskInfo(time.Now(), pluginsCore.DefaultPhaseVersion, "Suspending", info), nil
 	case rayv1.JobDeploymentStatusFailed:
 		failInfo := fmt.Sprintf("Failed to run Ray job %s with error: [%s] %s", rayJob.Name, rayJob.Status.Reason, rayJob.Status.Message)
 		phaseInfo, err = pluginsCore.PhaseInfoFailure(flyteerr.TaskFailedWithError, failInfo, info), nil
