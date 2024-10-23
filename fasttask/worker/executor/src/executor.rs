@@ -26,13 +26,67 @@ pub async fn run(py: Python<'_>, args: ExecutorArgs) -> Result<(), Box<dyn std::
     let _fast_task = PyModule::from_code_bound(
         py,
         r#"
-import sys
+def _get_loaded_user_modules():
+    # Returns modules that are user defined
+    import sys
+    import os
+    import site
 
-def set_modules(x):
-    sys.modules = x
+    builtin_names = set(sys.builtin_module_names)
+    site_packages = site.getsitepackages()
+    site_packages_set = set(site_packages)
+    lib_directory = os.path.join(sys.prefix, "lib")
+    bin_directory = os.path.dirname(sys.executable)
+
+    all_modules = sys.modules.copy()
+
+    outputs = []
+    for name, mod in all_modules.items():
+        if name in builtin_names:
+            continue
+
+        try:
+            mod_file = mod.__file__
+        except:
+            continue
+
+        if not isinstance(mod_file, str):
+            continue
+
+        try:
+            if os.path.commonpath([mod_file] + site_packages) in site_packages_set:
+                continue
+
+            if os.path.commonpath([mod_file, lib_directory]) == lib_directory:
+                continue
+
+            if os.path.commonpath([mod_file, bin_directory]) == bin_directory:
+                continue
+
+        except ValueError:
+            # This means that the files are not in the same drive, which means the
+            # mod_file are not in any of the directories
+            pass
+
+        outputs.append(name)
+
+    return outputs
+
+def reset_env():
+    # Unload modules that are user defined and resets Launchplan cache
+    import sys
+
+    current_modules = _get_loaded_user_modules()
+    for name in current_modules:
+        del sys.modules[name]
+
+    from flytekit import LaunchPlan
+
+    if hasattr(LaunchPlan, "CACHE"):
+        LaunchPlan.CACHE = {}
     "#,
-        "fast_task.py",
-        "fast_task",
+        "_union_fast_task.py",
+        "_union_fast_task",
     )?;
     let _os = PyModule::import_bound(py, "os").unwrap();
 
@@ -56,7 +110,7 @@ def set_modules(x):
         debug!("executor {} received work: {:?}", args.id, task.cmd);
 
         // python env setup
-        let sys_modules = match setup_python_env(
+        if let Err(e) = setup_python_env(
             py,
             _fast_registration.clone(),
             _os.clone(),
@@ -65,12 +119,9 @@ def set_modules(x):
         )
         .await
         {
-            Ok(sys_modules) => sys_modules,
-            Err(e) => {
-                error!("executor '{}' failed to setup python env: {}", args.id, e);
-                break;
-            }
-        };
+            error!("executor '{}' failed to setup python env: {}", args.id, e);
+            break;
+        }
 
         // run python command
         let cmd = task
@@ -93,7 +144,6 @@ def set_modules(x):
             _fast_task.clone(),
             _os.clone(),
             &task.fast_register_dir,
-            sys_modules,
             cwd.clone(),
         )
         .await
@@ -137,7 +187,7 @@ async fn setup_python_env<'a>(
     _os: Bound<'a, PyModule>,
     fast_register_dir: &Option<String>,
     additional_distribution: &Option<String>,
-) -> Result<Bound<'a, PyAny>, PyErr> {
+) -> Result<(), PyErr> {
     let locals = [("sys", py.import_bound("sys")?)].into_py_dict_bound(py);
 
     if let Some(ref fast_register_dir) = fast_register_dir {
@@ -160,8 +210,7 @@ async fn setup_python_env<'a>(
         _os.call_method1("chdir", (fast_register_dir,))?;
     }
 
-    // return current system modules
-    py.eval_bound("sys.modules.copy()", None, Some(&locals))
+    Ok(())
 }
 
 async fn cleanup_python_env<'a>(
@@ -169,7 +218,6 @@ async fn cleanup_python_env<'a>(
     _fast_task: Bound<'a, PyModule>,
     _os: Bound<'a, PyModule>,
     fast_register_dir: &Option<String>,
-    sys_modules: Bound<'_, PyAny>,
     cwd: Bound<'_, PyAny>,
 ) -> Result<(), PyErr> {
     let locals = [("sys", py.import_bound("sys")?)].into_py_dict_bound(py);
@@ -186,8 +234,8 @@ async fn cleanup_python_env<'a>(
     // update workdir to original;
     _os.call_method1("chdir", (cwd,))?;
 
-    // reset to original system modules
-    _fast_task.call_method1("set_modules", (sys_modules,))?;
+    // reset to environment
+    _fast_task.call_method0("reset_env")?;
 
     Ok(())
 }
