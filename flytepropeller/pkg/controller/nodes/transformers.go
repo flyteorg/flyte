@@ -76,7 +76,8 @@ func ToNodeExecEventPhase(p handler.EPhase) core.NodeExecution_Phase {
 	}
 }
 
-func ToNodeExecutionEvent(nodeExecID *core.NodeExecutionIdentifier,
+func ToNodeExecutionEvent(
+	nodeExecID *core.NodeExecutionIdentifier,
 	info handler.PhaseInfo,
 	inputPath string,
 	status v1alpha1.ExecutableNodeStatus,
@@ -109,9 +110,11 @@ func ToNodeExecutionEvent(nodeExecID *core.NodeExecutionIdentifier,
 		dynamicChain = true
 	}
 
+	eInfo := info.GetInfo()
 	var nev *event.NodeExecutionEvent
-	// Start node is special case where the Inputs and Outputs are the same and hence here we copy the Output file
+	// Start node is special case where the Outputs are the same and hence here we copy the Output file
 	// into the OutputResult and in admin we copy it over into input as well.
+	// Start node doesn't have inputs.
 	if nodeExecID.NodeId == v1alpha1.StartNodeID {
 		outputsFile := v1alpha1.GetOutputsFile(status.GetOutputDir())
 		nev = &event.NodeExecutionEvent{
@@ -139,6 +142,17 @@ func ToNodeExecutionEvent(nodeExecID *core.NodeExecutionIdentifier,
 			TargetEntity:     targetEntity,
 			IsInDynamicChain: dynamicChain,
 		}
+		if eventConfig.RawOutputPolicy == config.RawOutputPolicyInline {
+			if eInfo != nil {
+				nev.InputValue = &event.NodeExecutionEvent_InputData{
+					InputData: eInfo.Inputs,
+				}
+			}
+		} else {
+			nev.InputValue = &event.NodeExecutionEvent_InputUri{
+				InputUri: inputPath,
+			}
+		}
 	}
 
 	if eventVersion == v1alpha1.EventVersion0 && status.GetParentTaskID() != nil {
@@ -163,7 +177,6 @@ func ToNodeExecutionEvent(nodeExecID *core.NodeExecutionIdentifier,
 		nev.NodeName = node.GetName()
 	}
 
-	eInfo := info.GetInfo()
 	if eInfo != nil {
 		if eInfo.WorkflowNodeInfo != nil {
 			v := ToNodeExecWorkflowNodeMetadata(eInfo.WorkflowNodeInfo)
@@ -199,17 +212,6 @@ func ToNodeExecutionEvent(nodeExecID *core.NodeExecutionIdentifier,
 		nev.IsDynamic = true
 		if nev.GetTaskNodeMetadata() != nil && nev.GetTaskNodeMetadata().DynamicWorkflow != nil {
 			nev.IsParent = true
-		}
-	}
-	if eventConfig.RawOutputPolicy == config.RawOutputPolicyInline {
-		if eInfo != nil {
-			nev.InputValue = &event.NodeExecutionEvent_InputData{
-				InputData: eInfo.Inputs,
-			}
-		}
-	} else {
-		nev.InputValue = &event.NodeExecutionEvent_InputUri{
-			InputUri: inputPath,
 		}
 	}
 
