@@ -14,11 +14,5 @@ jobs:
         with:
           comment_summary_in_pr: on-failure
           # Licenses need to come from https://spdx.org/licenses/
-          deny-licenses:
-            - GPL-1.0-only
-            - GPL-1.0-or-later
-            - GPL-2.0-only
-            - GPL-2.0-or-later
-            - GPL-3.0-only
-            - GPL-3.0-or-later
+          deny-licenses: GPL-1.0-only, GPL-1.0-or-later, GPL-2.0-only, GPL-2.0-or-later, GPL-3.0-only, GPL-3.0-or-later
 
