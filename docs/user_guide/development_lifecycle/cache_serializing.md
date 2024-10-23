@@ -43,4 +43,6 @@ The first execution of a serializable cached task will successfully acquire the 
 
 Flyte handles task execution failures using a timeout on the reservation. If the task currently holding the reservation fails to extend it before it times out, another task may acquire the reservation and begin executing the task.
 
+Flyte uses a tool called [diskcache](https://github.com/grantjenks/python-diskcache), specifically [diskcache.Cache](http://www.grantjenks.com/docs/diskcache/tutorial.html#cache), to save task results so they don’t need to be recomputed if the same task is executed again, a technique known as ``memoization``. The results of local task executions are stored under `~/.flyte/local-cache/` and cache keys are composed of **Cache Version**, **Task Signature**, and **Task Input Values**.
+
 [flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/development_lifecycle/
