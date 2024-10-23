@@ -55,6 +55,7 @@ func (cfg DbConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "maxOpenConnections"), defaultConfig.MaxOpenConnections, "maxOpenConnections sets the maximum number of open connections to the database.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "connMaxLifeTime"), defaultConfig.ConnMaxLifeTime.String(), "sets the maximum amount of time a connection may be reused")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "postgres.host"), defaultConfig.Postgres.Host, "The host name of the database server")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "postgres.readReplicaHost"), defaultConfig.Postgres.ReadReplicaHost, "The host name of the read replica database server")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "postgres.port"), defaultConfig.Postgres.Port, "The port name of the database server")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "postgres.dbname"), defaultConfig.Postgres.DbName, "The database name")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "postgres.username"), defaultConfig.Postgres.User, "The database user who is connecting to the server.")

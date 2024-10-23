@@ -352,7 +352,7 @@ func serveGatewayInsecure(ctx context.Context, pluginRegistry *plugins.Registry,
 		var oauth2Provider interfaces.OAuth2Provider
 		var oauth2ResourceServer interfaces.OAuth2ResourceServer
 		if authCfg.AppAuth.AuthServerType == authConfig.AuthorizationServerTypeSelf {
-			oauth2Provider, err = authzserver.NewProvider(ctx, authCfg.AppAuth.SelfAuthServer, sm)
+			oauth2Provider, err = authzserver.NewProvider(ctx, authCfg.AppAuth.SelfAuthServer, sm, scope.NewSubScope("auth_provider"))
 			if err != nil {
 				logger.Errorf(ctx, "Error creating authorization server %s", err)
 				return err
@@ -463,7 +463,7 @@ func serveGatewaySecure(ctx context.Context, pluginRegistry *plugins.Registry, c
 		var oauth2Provider interfaces.OAuth2Provider
 		var oauth2ResourceServer interfaces.OAuth2ResourceServer
 		if authCfg.AppAuth.AuthServerType == authConfig.AuthorizationServerTypeSelf {
-			oauth2Provider, err = authzserver.NewProvider(ctx, authCfg.AppAuth.SelfAuthServer, sm)
+			oauth2Provider, err = authzserver.NewProvider(ctx, authCfg.AppAuth.SelfAuthServer, sm, scope.NewSubScope("auth_provider"))
 			if err != nil {
 				logger.Errorf(ctx, "Error creating authorization server %s", err)
 				return err
@@ -516,9 +516,19 @@ func serveGatewaySecure(ctx context.Context, pluginRegistry *plugins.Registry, c
 		panic(err)
 	}
 
+	handler := grpcHandlerFunc(grpcServer, httpServer)
+	if cfg.Security.AllowCors {
+		handler = handlers.CORS(
+			handlers.AllowCredentials(),
+			handlers.AllowedOrigins(cfg.Security.AllowedOrigins),
+			handlers.AllowedHeaders(append(defaultCorsHeaders, cfg.Security.AllowedHeaders...)),
+			handlers.AllowedMethods([]string{"GET", "POST", "DELETE", "HEAD", "PUT", "PATCH"}),
+		)(handler)
+	}
+
 	srv := &http.Server{
 		Addr:    cfg.GetHostAddress(),
-		Handler: grpcHandlerFunc(grpcServer, httpServer),
+		Handler: handler,
 		// #nosec G402
 		TLSConfig: &tls.Config{
 			Certificates: []tls.Certificate{*cert},

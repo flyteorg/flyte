@@ -80,6 +80,10 @@ func GetAdditionalAdminClientConfigOptions(cfg *Config) []grpc.DialOption {
 	// ever has those endpoints
 	opts = append(opts, grpc.WithChainUnaryInterceptor(grpcPrometheus.UnaryClientInterceptor, retryInterceptor))
 
+	if cfg.MaxMessageSizeBytes > 0 {
+		opts = append(opts, grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(cfg.MaxMessageSizeBytes)))
+	}
+
 	return opts
 }
 
