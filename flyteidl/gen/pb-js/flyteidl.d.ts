@@ -5151,6 +5151,9 @@ export namespace flyteidl {
 
             /** TaskNodeOverrides containerImage */
             containerImage?: (string|null);
+
+            /** TaskNodeOverrides podTemplate */
+            podTemplate?: (flyteidl.core.IPodTemplate|null);
         }
 
         /** Represents a TaskNodeOverrides. */
@@ -5170,6 +5173,9 @@ export namespace flyteidl {
 
             /** TaskNodeOverrides containerImage. */
             public containerImage: string;
+
+            /** TaskNodeOverrides podTemplate. */
+            public podTemplate?: (flyteidl.core.IPodTemplate|null);
 
             /**
              * Creates a new TaskNodeOverrides instance using the specified properties.
@@ -6157,6 +6163,76 @@ export namespace flyteidl {
                  */
                 public static verify(message: { [k: string]: any }): (string|null);
             }
+        }
+
+        /** Properties of a PodTemplate. */
+        interface IPodTemplate {
+
+            /** PodTemplate primaryContainerName */
+            primaryContainerName?: (string|null);
+
+            /** PodTemplate labels */
+            labels?: ({ [k: string]: string }|null);
+
+            /** PodTemplate annotations */
+            annotations?: ({ [k: string]: string }|null);
+
+            /** PodTemplate podSpec */
+            podSpec?: (google.protobuf.IStruct|null);
+        }
+
+        /** Represents a PodTemplate. */
+        class PodTemplate implements IPodTemplate {
+
+            /**
+             * Constructs a new PodTemplate.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.IPodTemplate);
+
+            /** PodTemplate primaryContainerName. */
+            public primaryContainerName: string;
+
+            /** PodTemplate labels. */
+            public labels: { [k: string]: string };
+
+            /** PodTemplate annotations. */
+            public annotations: { [k: string]: string };
+
+            /** PodTemplate podSpec. */
+            public podSpec?: (google.protobuf.IStruct|null);
+
+            /**
+             * Creates a new PodTemplate instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns PodTemplate instance
+             */
+            public static create(properties?: flyteidl.core.IPodTemplate): flyteidl.core.PodTemplate;
+
+            /**
+             * Encodes the specified PodTemplate message. Does not implicitly {@link flyteidl.core.PodTemplate.verify|verify} messages.
+             * @param message PodTemplate message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.IPodTemplate, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a PodTemplate message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns PodTemplate
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.PodTemplate;
+
+            /**
+             * Verifies a PodTemplate message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
         }
 
         /** Properties of a GPUAccelerator. */

@@ -11,7 +11,7 @@ import { Identifier } from "./identifier_pb.js";
 import { Binding, LiteralMap, RetryStrategy } from "./literals_pb.js";
 import { QualityOfService } from "./execution_pb.js";
 import { TypedInterface } from "./interface_pb.js";
-import { ExtendedResources, Resources } from "./tasks_pb.js";
+import { ExtendedResources, PodTemplate, Resources } from "./tasks_pb.js";
 
 /**
  * Defines a condition and the execution unit that should be executed if the condition is satisfied.
@@ -1168,6 +1168,13 @@ export class TaskNodeOverrides extends Message<TaskNodeOverrides> {
    */
   containerImage = "";
 
+  /**
+   * Overrides for podtemplate used by task pods.
+   *
+   * @generated from field: flyteidl.core.PodTemplate pod_template = 4;
+   */
+  podTemplate?: PodTemplate;
+
   constructor(data?: PartialMessage<TaskNodeOverrides>) {
     super();
     proto3.util.initPartial(data, this);
@@ -1179,6 +1186,7 @@ export class TaskNodeOverrides extends Message<TaskNodeOverrides> {
     { no: 1, name: "resources", kind: "message", T: Resources },
     { no: 2, name: "extended_resources", kind: "message", T: ExtendedResources },
     { no: 3, name: "container_image", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "pod_template", kind: "message", T: PodTemplate },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TaskNodeOverrides {

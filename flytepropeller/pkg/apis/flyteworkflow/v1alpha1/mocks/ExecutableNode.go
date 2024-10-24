@@ -452,6 +452,40 @@ func (_m *ExecutableNode) GetOutputAlias() []v1alpha1.Alias {
 	return r0
 }
 
+type ExecutableNode_GetPodTemplate struct {
+	*mock.Call
+}
+
+func (_m ExecutableNode_GetPodTemplate) Return(_a0 *core.PodTemplate) *ExecutableNode_GetPodTemplate {
+	return &ExecutableNode_GetPodTemplate{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutableNode) OnGetPodTemplate() *ExecutableNode_GetPodTemplate {
+	c_call := _m.On("GetPodTemplate")
+	return &ExecutableNode_GetPodTemplate{Call: c_call}
+}
+
+func (_m *ExecutableNode) OnGetPodTemplateMatch(matchers ...interface{}) *ExecutableNode_GetPodTemplate {
+	c_call := _m.On("GetPodTemplate", matchers...)
+	return &ExecutableNode_GetPodTemplate{Call: c_call}
+}
+
+// GetPodTemplate provides a mock function with given fields:
+func (_m *ExecutableNode) GetPodTemplate() *core.PodTemplate {
+	ret := _m.Called()
+
+	var r0 *core.PodTemplate
+	if rf, ok := ret.Get(0).(func() *core.PodTemplate); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*core.PodTemplate)
+		}
+	}
+
+	return r0
+}
+
 type ExecutableNode_GetResources struct {
 	*mock.Call
 }
