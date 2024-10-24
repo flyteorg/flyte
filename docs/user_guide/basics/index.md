@@ -18,6 +18,7 @@ hello_world
 tasks
 workflows
 launch_plans
+flyte_type_system
 imperative_workflows
 documenting_workflows
 shell_tasks
