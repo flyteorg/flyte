@@ -1,13 +1,15 @@
 (attribute_access)=
 
-# Accessing attributes
+# Accessing attributes in workflows
 
 ```{eval-rst}
 .. tags:: Basic
 ```
 
-You can directly access attributes on output promises for lists, dicts, dataclasses and combinations of these types in Flyte. This functionality facilitates the direct passing of output attributes within workflows,
-enhancing the convenience of working with complex data structures.
+You can directly access attributes on output promises for lists, dicts, dataclasses and combinations of these types in Flyte.
+Note that while this functionality may appear to be the normal behavior of Python, code in `@workflow` functions is not actually Python, but rather a Python-like DSL that is compiled by Flyte.
+Consequently, accessing attributes in this manner is, in fact, a specially implemented feature.
+This functionality facilitates the direct passing of output attributes within workflows, enhancing the convenience of working with complex data structures.
 
 ```{note}
 To clone and run the example code on this page, see the [Flytesnacks repo][flytesnacks].
