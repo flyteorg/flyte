@@ -34766,6 +34766,7 @@
                  * @interface IExecutionTerminateRequest
                  * @property {flyteidl.core.IWorkflowExecutionIdentifier|null} [id] ExecutionTerminateRequest id
                  * @property {string|null} [cause] ExecutionTerminateRequest cause
+                 * @property {boolean|null} [force] ExecutionTerminateRequest force
                  */
     
                 /**
@@ -34800,6 +34801,14 @@
                 ExecutionTerminateRequest.prototype.cause = "";
     
                 /**
+                 * ExecutionTerminateRequest force.
+                 * @member {boolean} force
+                 * @memberof flyteidl.admin.ExecutionTerminateRequest
+                 * @instance
+                 */
+                ExecutionTerminateRequest.prototype.force = false;
+    
+                /**
                  * Creates a new ExecutionTerminateRequest instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.ExecutionTerminateRequest
@@ -34827,6 +34836,8 @@
                         $root.flyteidl.core.WorkflowExecutionIdentifier.encode(message.id, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
                     if (message.cause != null && message.hasOwnProperty("cause"))
                         writer.uint32(/* id 2, wireType 2 =*/18).string(message.cause);
+                    if (message.force != null && message.hasOwnProperty("force"))
+                        writer.uint32(/* id 3, wireType 0 =*/24).bool(message.force);
                     return writer;
                 };
     
@@ -34853,6 +34864,9 @@
                             break;
                         case 2:
                             message.cause = reader.string();
+                            break;
+                        case 3:
+                            message.force = reader.bool();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -34881,6 +34895,9 @@
                     if (message.cause != null && message.hasOwnProperty("cause"))
                         if (!$util.isString(message.cause))
                             return "cause: string expected";
+                    if (message.force != null && message.hasOwnProperty("force"))
+                        if (typeof message.force !== "boolean")
+                            return "force: boolean expected";
                     return null;
                 };
     

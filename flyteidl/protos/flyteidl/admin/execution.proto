@@ -351,6 +351,9 @@ message ExecutionTerminateRequest {
 
     // Optional reason for aborting.
     string cause = 2;
+
+    // Optional force termination
+    bool force = 3;
 }
 
 message ExecutionTerminateResponse {
