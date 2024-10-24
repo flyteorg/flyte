@@ -28,39 +28,45 @@ pub async fn run(py: Python<'_>, args: ExecutorArgs) -> Result<(), Box<dyn std::
         r#"
 def _get_loaded_user_modules():
     # Returns modules that are user defined
-    import sys
     import os
     import site
+    import sys
 
     builtin_names = set(sys.builtin_module_names)
-    site_packages = site.getsitepackages()
-    site_packages_set = set(site_packages)
-    lib_directory = os.path.join(sys.prefix, "lib")
-    bin_directory = os.path.dirname(sys.executable)
 
-    all_modules = sys.modules.copy()
-
+    non_user_directories = site.getsitepackages() + [
+        site.getusersitepackages(),
+        os.path.join(sys.prefix, "lib"),
+        os.path.join(sys.base_prefix, "lib"),
+        os.path.dirname(sys.executable),
+    ]
     outputs = []
-    for name, mod in all_modules.items():
+
+    all_modules = list(sys.modules)
+
+    for name in all_modules:
         if name in builtin_names:
             continue
 
         try:
+            mod = sys.modules[name]
+        except KeyError:
+            continue
+
+        try:
             mod_file = mod.__file__
-        except:
+        except Exception:
             continue
 
         if not isinstance(mod_file, str):
             continue
 
         try:
-            if os.path.commonpath([mod_file] + site_packages) in site_packages_set:
-                continue
-
-            if os.path.commonpath([mod_file, lib_directory]) == lib_directory:
-                continue
-
-            if os.path.commonpath([mod_file, bin_directory]) == bin_directory:
+            is_non_user = any(
+                os.path.commonpath([mod_file, non_user_directory]) == non_user_directory
+                for non_user_directory in non_user_directories
+            )
+            if is_non_user:
                 continue
 
         except ValueError:
@@ -75,10 +81,11 @@ def _get_loaded_user_modules():
 def reset_env():
     # Unload modules that are user defined and resets Launchplan cache
     import sys
-
-    current_modules = _get_loaded_user_modules()
-    for name in current_modules:
-        del sys.modules[name]
+    from contextlib import suppress
+    user_modules = _get_loaded_user_modules()
+    for name in user_modules:
+        with suppress(KeyError):
+            del sys.modules[name]
 
     from flytekit import LaunchPlan
 
