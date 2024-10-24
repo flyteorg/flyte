@@ -35,6 +35,8 @@ type ExecutionConfig struct {
 	OverwriteCache bool
 	// Defines a map of environment variable name / value pairs that are applied to all tasks.
 	EnvironmentVariables map[string]string
+	// Defines a list of connections config that used to connect to the external services.
+	ExternalResourceAttribute ExternalResourceAttributes
 }
 
 type TaskPluginOverride struct {
@@ -58,4 +60,18 @@ type TaskResources struct {
 	Requests TaskResourceSpec
 	// A hard limit, a task cannot consume resources greater than the limit specifies.
 	Limits TaskResourceSpec
+}
+
+type Connection struct {
+	// Defines a map of secrets that are used to connect to the external services.
+	// The key is the name of the secret, such as openai_api_key, databricks_access_token, etc.
+	// The value is the name of the k8s or aws secret.
+	Secrets map[string]string
+	// Defines a map of configs that are used to connect to the external services, such as organization_id, workspace_id, etc.
+	Configs map[string]string
+}
+
+type ExternalResourceAttributes struct {
+	// Defines a map of connections that are used to connect to the external services.
+	Connections map[string]Connection
 }
