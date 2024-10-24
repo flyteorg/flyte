@@ -70,24 +70,27 @@ For more details wide range of data types that Flyte supports, refer [here](http
 
 The Flyte type system should be used whenever you define tasks and workflows, as it provides the following benefits:
 
-	•	Input and Output Validation: By specifying types, Flyte ensures that the correct data is passed into and out of tasks. This minimizes runtime errors caused by unexpected data formats.
-	•	Improved Debugging: Since Flyte raises errors when there is a type mismatch, debugging becomes easier, as you know exactly where things went wrong.
-	•	Seamless Data Flow: By explicitly declaring types, Flyte can efficiently serialize and deserialize data, allowing it to move between tasks without manual intervention.
+•	Input and Output Validation: By specifying types, Flyte ensures that the correct data is passed into and out of tasks. This minimizes runtime errors caused by unexpected data formats.
+•	Improved Debugging: Since Flyte raises errors when there is a type mismatch, debugging becomes easier, as you know exactly where things went wrong.
+•	Seamless Data Flow: By explicitly declaring types, Flyte can efficiently serialize and deserialize data, allowing it to move between tasks without manual intervention.
 
 ### How the Type Engine Works:
 
 Flyte’s type engine is responsible for validating and transforming data based on the specified types. Here’s a quick look at the process:
 
-	•	Type Inference: When you define a task, Flyte uses the type hints provided in Python function signatures to infer the expected input and output types.
-	•	Type Checking: During execution, Flyte checks that the data being passed to a task matches the declared types. If there’s a mismatch, the type engine will raise an error.
-	•	Serialization/Deserialization: For complex types like files or datasets, Flyte automatically serializes the data (stores it in an appropriate format) and deserializes it (retrieves it) when needed by subsequent tasks.
+•	Type Inference: When you define a task, Flyte uses the type hints provided in Python function signatures to infer the expected input and output types.
+
+•	Type Checking: During execution, Flyte checks that the data being passed to a task matches the declared types. If there’s a mismatch, the type engine will raise an error.
+
+•	Serialization/Deserialization: For complex types like files or datasets, Flyte automatically serializes the data (stores it in an appropriate format) and deserializes it (retrieves it) when needed by subsequent tasks.
 
 ### Limitations of the Flyte Type System:
 
 While Flyte’s type system is robust, there are a few limitations to be aware of:
 
-	•	Unsupported Types: Some Python objects, such as custom classes or types that Flyte cannot serialize, might not work directly within the type system. You may need to implement custom type transformers for complex types.
-	•	Dynamic Types: Flyte works best with statically typed data. If your data types are dynamically determined at runtime, you may run into issues or need to handle type enforcement manually.
+•	Unsupported Types: Some Python objects, such as custom classes or types that Flyte cannot serialize, might not work directly within the type system. You may need to implement custom type transformers for complex types.
+
+•	Dynamic Types: Flyte works best with statically typed data. If your data types are dynamically determined at runtime, you may run into issues or need to handle type enforcement manually.
 
 ## Data Passing in Workflows
 
