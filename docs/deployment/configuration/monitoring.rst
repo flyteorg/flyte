@@ -87,13 +87,13 @@ Flyte Backend is written in Golang and exposes stats using Prometheus. The stats
 
 Both ``flyteadmin`` and ``flytepropeller`` are instrumented to expose metrics. To visualize these metrics, Flyte provides three Grafana dashboards, each with a different focus:
 
-- **User-facing dashboard**: it can be used to investigate performance and characteristics of workflows and tasks executions. It's published under ID `22146 <https://grafana.com/grafana/dashboards/22146-flyte-user-dashboard-via-prometheus/>`__ in the Grafana marketplace.
+- **User-facing dashboard**: it can be used to investigate performance and characteristics of workflow and task executions. It's published under ID `22146 <https://grafana.com/grafana/dashboards/22146-flyte-user-dashboard-via-prometheus/>`__ in the Grafana marketplace.
 
 - **System Dashboards**: Dashboards that are useful for the system maintainer to investigate the status and performance of their Flyte deployments. These are further divided into:
         - Data plane (``flytepropeller``): `21719 <https://grafana.com/grafana/dashboards/21719-flyte-propeller-dashboard-via-prometheus/>`__: execution engine status and performance.
         - Control plane (``flyteadmin``): `21720 <https://grafana.com/grafana/dashboards/21720-flyteadmin-dashboard-via-prometheus/>`__: API-level monitoring.
 
-The corresponding JSON files for each dashboard are also located in the ``flyte`` repository at ``deployment/stats/prometheus``.
+The corresponding JSON files for each dashboard are also located in the ``flyte`` repository at `deployment/stats/prometheus <https://github.com/flyteorg/flyte/tree/master/deployment/stats/prometheus>`__.
 
 .. note::
 
