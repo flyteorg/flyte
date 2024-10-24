@@ -23,12 +23,12 @@ func (_m Processor_Process) Return(_a0 workqueue.WorkStatus, _a1 error) *Process
 }
 
 func (_m *Processor) OnProcess(ctx context.Context, workItem workqueue.WorkItem) *Processor_Process {
-	c_call := _m.On("Process", ctx, workItem)
+	c_call := _m.On("Mutate", ctx, workItem)
 	return &Processor_Process{Call: c_call}
 }
 
 func (_m *Processor) OnProcessMatch(matchers ...interface{}) *Processor_Process {
-	c_call := _m.On("Process", matchers...)
+	c_call := _m.On("Mutate", matchers...)
 	return &Processor_Process{Call: c_call}
 }
 
