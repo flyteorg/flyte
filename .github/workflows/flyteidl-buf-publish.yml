@@ -6,6 +6,7 @@ on:
       - artifacts-shell-2
       - artifacts
       - master
+      - 'release-v**'
     paths:
       - 'flyteidl/**'
 jobs:
