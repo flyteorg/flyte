@@ -975,8 +975,8 @@ func TestHandle_InvalidLiteralType(t *testing.T) {
 			},
 			expectedTransitionType:    handler.TransitionTypeEphemeral,
 			expectedPhase:             handler.EPhaseFailed,
-			expectedErrorCode:         errors.IDLNotFoundErr,
-			expectedContainedErrorMsg: "Failed to validate literal type",
+			expectedErrorCode:         errors.InvalidArrayLength,
+			expectedContainedErrorMsg: "no input array provided",
 		},
 	}
 

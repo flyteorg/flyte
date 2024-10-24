@@ -10,7 +10,6 @@ import (
 	idlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1/mocks"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/validators"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	executorMocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors/mocks"
 	nodeMocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces/mocks"
@@ -142,8 +141,16 @@ func TestOffloadLargeLiteral(t *testing.T) {
 			MinSizeInMBForOffloading: 0,
 			MaxSizeInMBForOffloading: 1,
 		}
-		inferredType := validators.LiteralTypeForLiteral(toBeOffloaded)
-		err = OffloadLargeLiteral(ctx, datastore, dataReference, toBeOffloaded, literalOffloadingConfig)
+		inferredType := &idlCore.LiteralType{
+			Type: &idlCore.LiteralType_CollectionType{
+				CollectionType: &idlCore.LiteralType{
+					Type: &idlCore.LiteralType_Simple{
+						Simple: idlCore.SimpleType_INTEGER,
+					},
+				},
+			},
+		}
+		err = OffloadLargeLiteral(ctx, datastore, dataReference, toBeOffloaded, inferredType, literalOffloadingConfig)
 		assert.NoError(t, err)
 		assert.Equal(t, "foo/bar", toBeOffloaded.GetOffloadedMetadata().GetUri())
 		assert.Equal(t, uint64(6), toBeOffloaded.GetOffloadedMetadata().GetSizeBytes())
@@ -173,7 +180,16 @@ func TestOffloadLargeLiteral(t *testing.T) {
 			MinSizeInMBForOffloading: 0,
 			MaxSizeInMBForOffloading: 1,
 		}
-		err := OffloadLargeLiteral(ctx, datastore, dataReference, toBeOffloaded, literalOffloadingConfig)
+		inferredType := &idlCore.LiteralType{
+			Type: &idlCore.LiteralType_CollectionType{
+				CollectionType: &idlCore.LiteralType{
+					Type: &idlCore.LiteralType_Simple{
+						Simple: idlCore.SimpleType_INTEGER,
+					},
+				},
+			},
+		}
+		err := OffloadLargeLiteral(ctx, datastore, dataReference, toBeOffloaded, inferredType, literalOffloadingConfig)
 		assert.NoError(t, err)
 		assert.Equal(t, "hash", toBeOffloaded.Hash)
 	})
@@ -199,7 +215,16 @@ func TestOffloadLargeLiteral(t *testing.T) {
 			MinSizeInMBForOffloading: 0,
 			MaxSizeInMBForOffloading: 0,
 		}
-		err := OffloadLargeLiteral(ctx, datastore, dataReference, toBeOffloaded, literalOffloadingConfig)
+		inferredType := &idlCore.LiteralType{
+			Type: &idlCore.LiteralType_CollectionType{
+				CollectionType: &idlCore.LiteralType{
+					Type: &idlCore.LiteralType_Simple{
+						Simple: idlCore.SimpleType_INTEGER,
+					},
+				},
+			},
+		}
+		err := OffloadLargeLiteral(ctx, datastore, dataReference, toBeOffloaded, inferredType, literalOffloadingConfig)
 		assert.Error(t, err)
 	})
 
@@ -224,7 +249,16 @@ func TestOffloadLargeLiteral(t *testing.T) {
 			MinSizeInMBForOffloading: 2,
 			MaxSizeInMBForOffloading: 3,
 		}
-		err := OffloadLargeLiteral(ctx, datastore, dataReference, toBeOffloaded, literalOffloadingConfig)
+		inferredType := &idlCore.LiteralType{
+			Type: &idlCore.LiteralType_CollectionType{
+				CollectionType: &idlCore.LiteralType{
+					Type: &idlCore.LiteralType_Simple{
+						Simple: idlCore.SimpleType_INTEGER,
+					},
+				},
+			},
+		}
+		err := OffloadLargeLiteral(ctx, datastore, dataReference, toBeOffloaded, inferredType, literalOffloadingConfig)
 		assert.NoError(t, err)
 		assert.Nil(t, toBeOffloaded.GetOffloadedMetadata())
 	})

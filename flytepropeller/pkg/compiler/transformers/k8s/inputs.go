@@ -35,14 +35,8 @@ func validateInputs(nodeID common.NodeID, iface *core.TypedInterface, inputs cor
 			continue
 		}
 
-		inputType := validators.LiteralTypeForLiteral(inputVal)
-		err := validators.ValidateLiteralType(inputType)
-		if err != nil {
-			errs.Collect(errors.NewInvalidLiteralTypeErr(nodeID, inputVar, err))
-			continue
-		}
-		if !validators.AreTypesCastable(inputType, v.Type) {
-			errs.Collect(errors.NewMismatchingTypesErr(nodeID, inputVar, v.Type.String(), inputType.String()))
+		if !validators.IsInstance(inputVal, v.Type) {
+			errs.Collect(errors.NewMismatchingInstanceErr(nodeID, inputVar, v.Type.String(), inputVal.String()))
 			continue
 		}
 

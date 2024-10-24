@@ -281,16 +281,10 @@ func validateParameterMap(inputMap *core.ParameterMap, fieldName string) error {
 			}
 			defaultValue := defaultInput.GetDefault()
 			if defaultValue != nil {
-				inputType := validators.LiteralTypeForLiteral(defaultValue)
-				err := validators.ValidateLiteralType(inputType)
-				if err != nil {
-					return errors.NewInvalidLiteralTypeError(name, err)
-				}
-
-				if !validators.AreTypesCastable(inputType, defaultInput.GetVar().GetType()) {
+				if !validators.IsInstance(defaultValue, defaultInput.GetVar().GetType()) {
 					return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
-						"Type mismatch for Parameter %s in %s has type %s, expected %s", name, fieldName,
-						defaultInput.GetVar().GetType().String(), inputType.String())
+						"Invalid default value for variable %s in %s - expected type %s, but got literal %s",
+						name, fieldName, defaultInput.GetVar().GetType(), defaultValue)
 				}
 
 				if defaultInput.GetVar().GetType().GetSimple() == core.SimpleType_DATETIME {

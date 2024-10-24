@@ -3,7 +3,6 @@ package validators
 import (
 	"testing"
 
-	"github.com/golang/protobuf/proto"
 	"github.com/shamaton/msgpack/v2"
 	"github.com/stretchr/testify/assert"
 
@@ -13,8 +12,11 @@ import (
 
 func TestLiteralTypeForLiterals(t *testing.T) {
 	t.Run("empty", func(t *testing.T) {
-		lt := literalTypeForLiterals(nil)
-		assert.Equal(t, core.SimpleType_NONE.String(), lt.GetSimple().String())
+		assert.True(t, IsInstance(nil, &core.LiteralType{
+			Type: &core.LiteralType_Simple{
+				Simple: core.SimpleType_NONE,
+			},
+		}))
 	})
 
 	t.Run("binary idl with raw binary data and no tag", func(t *testing.T) {
@@ -33,8 +35,11 @@ func TestLiteralTypeForLiterals(t *testing.T) {
 				},
 			},
 		}
-		lt := LiteralTypeForLiteral(lv)
-		assert.Equal(t, core.SimpleType_BINARY.String(), lt.GetSimple().String())
+		assert.True(t, IsInstance(lv, &core.LiteralType{
+			Type: &core.LiteralType_Simple{
+				Simple: core.SimpleType_BINARY,
+			},
+		}))
 	})
 
 	t.Run("binary idl with messagepack input map[int]strings", func(t *testing.T) {
@@ -61,8 +66,11 @@ func TestLiteralTypeForLiterals(t *testing.T) {
 				},
 			},
 		}
-		lt := LiteralTypeForLiteral(lv)
-		assert.Equal(t, core.SimpleType_STRUCT.String(), lt.GetSimple().String())
+		assert.True(t, IsInstance(lv, &core.LiteralType{
+			Type: &core.LiteralType_Simple{
+				Simple: core.SimpleType_STRUCT,
+			},
+		}))
 	})
 
 	t.Run("binary idl with messagepack input map[float]strings", func(t *testing.T) {
@@ -89,45 +97,11 @@ func TestLiteralTypeForLiterals(t *testing.T) {
 				},
 			},
 		}
-		lt := LiteralTypeForLiteral(lv)
-		assert.Equal(t, core.SimpleType_STRUCT.String(), lt.GetSimple().String())
-	})
-
-	t.Run("homogeneous", func(t *testing.T) {
-		lt := literalTypeForLiterals([]*core.Literal{
-			coreutils.MustMakeLiteral(5),
-			coreutils.MustMakeLiteral(0),
-			coreutils.MustMakeLiteral(5),
-		})
-
-		assert.Equal(t, core.SimpleType_INTEGER.String(), lt.GetSimple().String())
-	})
-
-	t.Run("non-homogenous", func(t *testing.T) {
-		lt := literalTypeForLiterals([]*core.Literal{
-			coreutils.MustMakeLiteral("hello"),
-			coreutils.MustMakeLiteral(5),
-			coreutils.MustMakeLiteral("world"),
-			coreutils.MustMakeLiteral(0),
-			coreutils.MustMakeLiteral(2),
-		})
-
-		assert.Len(t, lt.GetUnionType().Variants, 2)
-		assert.Equal(t, core.SimpleType_INTEGER.String(), lt.GetUnionType().Variants[0].GetSimple().String())
-		assert.Equal(t, core.SimpleType_STRING.String(), lt.GetUnionType().Variants[1].GetSimple().String())
-	})
-
-	t.Run("non-homogenous ensure ordering", func(t *testing.T) {
-		lt := literalTypeForLiterals([]*core.Literal{
-			coreutils.MustMakeLiteral(5),
-			coreutils.MustMakeLiteral("world"),
-			coreutils.MustMakeLiteral(0),
-			coreutils.MustMakeLiteral(2),
-		})
-
-		assert.Len(t, lt.GetUnionType().Variants, 2)
-		assert.Equal(t, core.SimpleType_INTEGER.String(), lt.GetUnionType().Variants[0].GetSimple().String())
-		assert.Equal(t, core.SimpleType_STRING.String(), lt.GetUnionType().Variants[1].GetSimple().String())
+		assert.True(t, IsInstance(lv, &core.LiteralType{
+			Type: &core.LiteralType_Simple{
+				Simple: core.SimpleType_STRUCT,
+			},
+		}))
 	})
 
 	t.Run("list with mixed types", func(t *testing.T) {
@@ -196,8 +170,6 @@ func TestLiteralTypeForLiterals(t *testing.T) {
 			},
 		}
 
-		lt := LiteralTypeForLiteral(literals)
-
 		expectedLt := &core.LiteralType{
 			Type: &core.LiteralType_CollectionType{
 				CollectionType: &core.LiteralType{
@@ -237,7 +209,7 @@ func TestLiteralTypeForLiterals(t *testing.T) {
 			},
 		}
 
-		assert.True(t, proto.Equal(expectedLt, lt))
+		assert.True(t, IsInstance(literals, expectedLt))
 	})
 
 	t.Run("nested lists with empty list", func(t *testing.T) {
@@ -276,8 +248,6 @@ func TestLiteralTypeForLiterals(t *testing.T) {
 			},
 		}
 
-		lt := LiteralTypeForLiteral(literals)
-
 		expectedLt := &core.LiteralType{
 			Type: &core.LiteralType_CollectionType{
 				CollectionType: &core.LiteralType{
@@ -292,7 +262,7 @@ func TestLiteralTypeForLiterals(t *testing.T) {
 			},
 		}
 
-		assert.True(t, proto.Equal(expectedLt, lt))
+		assert.True(t, IsInstance(literals, expectedLt))
 	})
 
 	t.Run("nested Lists with different types", func(t *testing.T) {
@@ -374,9 +344,7 @@ func TestLiteralTypeForLiterals(t *testing.T) {
 			},
 		}
 
-		lt := LiteralTypeForLiteral(literals)
-
-		assert.True(t, proto.Equal(expectedLt, lt))
+		assert.True(t, IsInstance(literals, expectedLt))
 	})
 
 	t.Run("empty nested listed", func(t *testing.T) {
@@ -408,9 +376,7 @@ func TestLiteralTypeForLiterals(t *testing.T) {
 			},
 		}
 
-		lt := LiteralTypeForLiteral(literals)
-
-		assert.True(t, proto.Equal(expectedLt, lt))
+		assert.True(t, IsInstance(literals, expectedLt))
 	})
 
 	t.Run("nested Lists with different types", func(t *testing.T) {
@@ -450,8 +416,7 @@ func TestLiteralTypeForLiterals(t *testing.T) {
 			},
 		}
 		expectedLt := inferredType
-		lt := LiteralTypeForLiteral(literals)
-		assert.True(t, proto.Equal(expectedLt, lt))
+		assert.True(t, IsInstance(literals, expectedLt))
 	})
 
 }
