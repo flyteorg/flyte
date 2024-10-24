@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware/util/metautils"
 
@@ -149,7 +150,21 @@ func GetPublicURL(ctx context.Context, req *http.Request, cfg *config.Config) *u
 }
 
 func isAuthorizedRedirectURL(url *url.URL, authorizedURL *url.URL) bool {
-	return url.Hostname() == authorizedURL.Hostname() && url.Port() == authorizedURL.Port() && url.Scheme == authorizedURL.Scheme
+	if url == nil || authorizedURL == nil {
+		return false
+	}
+	if url.Scheme != authorizedURL.Scheme || url.Port() != authorizedURL.Port() {
+		return false
+	}
+	// Allow wildcard subdomains (only one level deep)
+	if strings.HasPrefix(authorizedURL.Hostname(), "*.") {
+		urlParts := strings.SplitN(url.Hostname(), ".", 2)
+		if len(urlParts) < 2 {
+			return false
+		}
+		return urlParts[1] == authorizedURL.Hostname()[2:]
+	}
+	return url.Hostname() == authorizedURL.Hostname()
 }
 
 func GetRedirectURLAllowed(ctx context.Context, urlRedirectParam string, cfg *config.Config) bool {

@@ -84,16 +84,35 @@ func TestGetRedirectURLAllowed(t *testing.T) {
 	cfg := &config.Config{
 		AuthorizedURIs: []flytestdconfig.URL{
 			{URL: *config.MustParseURL("https://example.com")},
+			{URL: *config.MustParseURL("https://*.example2.com")},
 			{URL: *config.MustParseURL("http://localhost:3008")},
 		},
 	}
 	t.Run("authorized url", func(t *testing.T) {
 		assert.True(t, GetRedirectURLAllowed(ctx, "https://example.com", cfg))
 	})
+	t.Run("unauthorized url with non-matching scheme", func(t *testing.T) {
+		assert.False(t, GetRedirectURLAllowed(ctx, "http://example.com", cfg))
+	})
 	t.Run("authorized localhost url", func(t *testing.T) {
 		assert.True(t, GetRedirectURLAllowed(ctx, "http://localhost:3008", cfg))
 	})
+	t.Run("unauthorized url with non-matching port", func(t *testing.T) {
+		assert.False(t, GetRedirectURLAllowed(ctx, "http://localhost:3009", cfg))
+	})
 	t.Run("unauthorized url", func(t *testing.T) {
 		assert.False(t, GetRedirectURLAllowed(ctx, "https://flyte.com", cfg))
+	})
+	t.Run("authorized subdomain url", func(t *testing.T) {
+		assert.True(t, GetRedirectURLAllowed(ctx, "https://subdomain.example2.com", cfg))
+	})
+	t.Run("unauthorized prefixed url", func(t *testing.T) {
+		assert.False(t, GetRedirectURLAllowed(ctx, "https://prefixedexample2.com", cfg))
+	})
+	t.Run("unauthorized url with nested subdomain", func(t *testing.T) {
+		assert.False(t, GetRedirectURLAllowed(ctx, "https://nested.subdomain.example2.com", cfg))
+	})
+	t.Run("unauthorized url without subdomain", func(t *testing.T) {
+		assert.False(t, GetRedirectURLAllowed(ctx, "https://example2.com", cfg))
 	})
 }
