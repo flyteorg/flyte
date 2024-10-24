@@ -13,7 +13,6 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/events"
 	eventsErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/validators"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/common"
@@ -192,15 +191,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 
 		size := -1
 
-		for key, variable := range literalMap.Literals {
-			literalType := validators.LiteralTypeForLiteral(variable)
-			err := validators.ValidateLiteralType(literalType)
-			if err != nil {
-				errMsg := fmt.Sprintf("Failed to validate literal type for [%s] with err: %s", key, err)
-				return handler.DoTransition(handler.TransitionTypeEphemeral,
-					handler.PhaseInfoFailure(idlcore.ExecutionError_USER, errors.IDLNotFoundErr, errMsg, nil),
-				), nil
-			}
+		for _, variable := range literalMap.Literals {
 			if variable.GetOffloadedMetadata() != nil {
 				// variable will be overwritten with the contents of the offloaded data which contains the actual large literal.
 				// We need this for the map task to be able to create the subNodeSpec
@@ -211,8 +202,8 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 					), nil
 				}
 			}
-			switch literalType.Type.(type) {
-			case *idlcore.LiteralType_CollectionType:
+			switch variable.GetValue().(type) {
+			case *idlcore.Literal_Collection:
 				collectionLength := len(variable.GetCollection().Literals)
 				if size == -1 {
 					size = collectionLength
@@ -455,6 +446,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		)), nil
 	case v1alpha1.ArrayNodePhaseSucceeding:
 		gatherOutputsRequests := make([]*gatherOutputsRequest, 0, len(arrayNodeState.SubNodePhases.GetItems()))
+		outputLiteralTypes := make(map[string]*idlcore.LiteralType)
 		for i, nodePhaseUint64 := range arrayNodeState.SubNodePhases.GetItems() {
 			nodePhase := v1alpha1.NodePhase(nodePhaseUint64)
 			gatherOutputsRequest := &gatherOutputsRequest{
@@ -481,6 +473,12 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 				if task.CoreTask() != nil && task.CoreTask().Interface != nil && task.CoreTask().Interface.Outputs != nil {
 					for name := range task.CoreTask().Interface.Outputs.Variables {
 						outputLiterals[name] = nilLiteral
+						// Extract the literal type from the task interface
+						outputLiteralTypes[name] = &idlcore.LiteralType{
+							Type: &idlcore.LiteralType_CollectionType{
+								CollectionType: task.CoreTask().Interface.Outputs.Variables[name].GetType(),
+							},
+						}
 					}
 				}
 
@@ -571,7 +569,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 				// use the OffloadLargeLiteralKey to create  {OffloadLargeLiteralKey}_offloaded_metadata.pb file in the datastore.
 				// Update the url in the outputLiteral with the offloaded url and also update the size of the literal.
 				offloadedOutputFile := v1alpha1.GetOutputsLiteralMetadataFile(outputLiteralKey, nCtx.NodeStatus().GetOutputDir())
-				if err := common.OffloadLargeLiteral(ctx, nCtx.DataStore(), offloadedOutputFile, outputLiteral, a.literalOffloadingConfig); err != nil {
+				if err := common.OffloadLargeLiteral(ctx, nCtx.DataStore(), offloadedOutputFile, outputLiteral, outputLiteralTypes[outputLiteralKey], a.literalOffloadingConfig); err != nil {
 					return handler.UnknownTransition, err
 				}
 			}

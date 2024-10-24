@@ -3,7 +3,6 @@ package validators
 import (
 	"testing"
 
-	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
@@ -103,7 +102,11 @@ func TestValidateBindings(t *testing.T) {
 		vars := &core.VariableMap{
 			Variables: map[string]*core.Variable{
 				"x": {
-					Type: LiteralTypeForLiteral(coreutils.MustMakeLiteral(5)),
+					Type: &core.LiteralType{
+						Type: &core.LiteralType_Simple{
+							Simple: core.SimpleType_INTEGER,
+						},
+					},
 				},
 			},
 		}
@@ -132,7 +135,15 @@ func TestValidateBindings(t *testing.T) {
 		vars := &core.VariableMap{
 			Variables: map[string]*core.Variable{
 				"x": {
-					Type: LiteralTypeForLiteral(coreutils.MustMakeLiteral([]interface{}{5})),
+					Type: &core.LiteralType{
+						Type: &core.LiteralType_CollectionType{
+							CollectionType: &core.LiteralType{
+								Type: &core.LiteralType_Simple{
+									Simple: core.SimpleType_INTEGER,
+								},
+							},
+						},
+					},
 				},
 			},
 		}
@@ -227,10 +238,15 @@ func TestValidateBindings(t *testing.T) {
 		vars := &core.VariableMap{
 			Variables: map[string]*core.Variable{
 				"x": {
-					Type: LiteralTypeForLiteral(coreutils.MustMakeLiteral(
-						map[string]interface{}{
-							"xy": 5,
-						})),
+					Type: &core.LiteralType{
+						Type: &core.LiteralType_MapValueType{
+							MapValueType: &core.LiteralType{
+								Type: &core.LiteralType_Simple{
+									Simple: core.SimpleType_INTEGER,
+								},
+							},
+						},
+					},
 				},
 			},
 		}
@@ -267,7 +283,11 @@ func TestValidateBindings(t *testing.T) {
 			Outputs: &core.VariableMap{
 				Variables: map[string]*core.Variable{
 					"n2_out": {
-						Type: LiteralTypeForLiteral(coreutils.MustMakeLiteral(2)),
+						Type: &core.LiteralType{
+							Type: &core.LiteralType_Simple{
+								Simple: core.SimpleType_INTEGER,
+							},
+						},
 					},
 				},
 			},
@@ -294,7 +314,11 @@ func TestValidateBindings(t *testing.T) {
 		vars := &core.VariableMap{
 			Variables: map[string]*core.Variable{
 				"x": {
-					Type: LiteralTypeForLiteral(coreutils.MustMakeLiteral(5)),
+					Type: &core.LiteralType{
+						Type: &core.LiteralType_Simple{
+							Simple: core.SimpleType_INTEGER,
+						},
+					},
 				},
 			},
 		}
@@ -333,7 +357,20 @@ func TestValidateBindings(t *testing.T) {
 			Outputs: &core.VariableMap{
 				Variables: map[string]*core.Variable{
 					"n2_out": {
-						Type: LiteralTypeForLiteral(coreutils.MustMakeLiteral(map[string]interface{}{"x": []interface{}{1, 3, 4}})),
+						//Type: LiteralTypeForLiteral(coreutils.MustMakeLiteral(map[string]interface{}{"x": []interface{}{1, 3, 4}})),
+						Type: &core.LiteralType{
+							Type: &core.LiteralType_MapValueType{
+								MapValueType: &core.LiteralType{
+									Type: &core.LiteralType_CollectionType{
+										CollectionType: &core.LiteralType{
+											Type: &core.LiteralType_Simple{
+												Simple: core.SimpleType_INTEGER,
+											},
+										},
+									},
+								},
+							},
+						},
 					},
 				},
 			},
@@ -368,7 +405,11 @@ func TestValidateBindings(t *testing.T) {
 		vars := &core.VariableMap{
 			Variables: map[string]*core.Variable{
 				"x": {
-					Type: LiteralTypeForLiteral(coreutils.MustMakeLiteral(1)),
+					Type: &core.LiteralType{
+						Type: &core.LiteralType_Simple{
+							Simple: core.SimpleType_INTEGER,
+						},
+					},
 				},
 			},
 		}
@@ -400,10 +441,19 @@ func TestValidateBindings(t *testing.T) {
 		n2.OnGetId().Return("node2")
 		n2.OnGetMetadata().Return(&core.NodeMetadata{Name: "node2"})
 		n2.OnGetOutputAliases().Return(nil)
-		literalType := LiteralTypeForLiteral(coreutils.MustMakeLiteral(&structpb.Struct{}))
+		literalType := &core.LiteralType{
+			Type: &core.LiteralType_Simple{
+				Simple: core.SimpleType_STRUCT,
+			},
+		}
 		literalType.Structure = &core.TypeStructure{}
-		literalType.Structure.DataclassType = map[string]*core.LiteralType{"x": LiteralTypeForLiteral(coreutils.MustMakeLiteral(1))}
-
+		literalType.Structure.DataclassType = map[string]*core.LiteralType{
+			"x": &core.LiteralType{
+				Type: &core.LiteralType_Simple{
+					Simple: core.SimpleType_INTEGER,
+				},
+			},
+		}
 		n2.OnGetInterface().Return(&core.TypedInterface{
 			Inputs: &core.VariableMap{
 				Variables: map[string]*core.Variable{},
@@ -446,7 +496,11 @@ func TestValidateBindings(t *testing.T) {
 		vars := &core.VariableMap{
 			Variables: map[string]*core.Variable{
 				"x": {
-					Type: LiteralTypeForLiteral(coreutils.MustMakeLiteral(1)),
+					Type: &core.LiteralType{
+						Type: &core.LiteralType_Simple{
+							Simple: core.SimpleType_INTEGER,
+						},
+					},
 				},
 			},
 		}
@@ -481,7 +535,11 @@ func TestValidateBindings(t *testing.T) {
 			Outputs: &core.VariableMap{
 				Variables: map[string]*core.Variable{
 					"n2_out": {
-						Type: LiteralTypeForLiteral(coreutils.MustMakeLiteral(2)),
+						Type: &core.LiteralType{
+							Type: &core.LiteralType_Simple{
+								Simple: core.SimpleType_INTEGER,
+							},
+						},
 					},
 				},
 			},
@@ -503,7 +561,11 @@ func TestValidateBindings(t *testing.T) {
 		vars := &core.VariableMap{
 			Variables: map[string]*core.Variable{
 				"x": {
-					Type: LiteralTypeForLiteral(coreutils.MustMakeLiteral(5)),
+					Type: &core.LiteralType{
+						Type: &core.LiteralType_Simple{
+							Simple: core.SimpleType_INTEGER,
+						},
+					},
 				},
 			},
 		}
@@ -1066,7 +1128,11 @@ func TestValidateBindings(t *testing.T) {
 			Outputs: &core.VariableMap{
 				Variables: map[string]*core.Variable{
 					"n2_out": {
-						Type: LiteralTypeForLiteral(coreutils.MustMakeLiteral(2)),
+						Type: &core.LiteralType{
+							Type: &core.LiteralType_Simple{
+								Simple: core.SimpleType_INTEGER,
+							},
+						},
 					},
 				},
 			},
@@ -1149,7 +1215,11 @@ func TestValidateBindings(t *testing.T) {
 			Outputs: &core.VariableMap{
 				Variables: map[string]*core.Variable{
 					"n2_out": {
-						Type: LiteralTypeForLiteral(coreutils.MustMakeLiteral(2)),
+						Type: &core.LiteralType{
+							Type: &core.LiteralType_Simple{
+								Simple: core.SimpleType_INTEGER,
+							},
+						},
 					},
 				},
 			},
@@ -1239,25 +1309,20 @@ func TestValidateBindings(t *testing.T) {
 			Outputs: &core.VariableMap{
 				Variables: map[string]*core.Variable{
 					"n2_out": {
-						Type: LiteralTypeForLiteral(&core.Literal{
-							Value: &core.Literal_Scalar{
-								Scalar: &core.Scalar{
-									Value: &core.Scalar_Union{
-										Union: &core.Union{
-											Value: coreutils.MustMakeLiteral(5),
-											Type: &core.LiteralType{
-												Type: &core.LiteralType_Simple{
-													Simple: core.SimpleType_INTEGER,
-												},
-												Structure: &core.TypeStructure{
-													Tag: "int1",
-												},
+						Type: &core.LiteralType{
+							Type: &core.LiteralType_UnionType{
+								UnionType: &core.UnionType{
+									Variants: []*core.LiteralType{
+										{
+											Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER},
+											Structure: &core.TypeStructure{
+												Tag: "int1",
 											},
 										},
 									},
 								},
 							},
-						}),
+						},
 					},
 				},
 			},

@@ -17,8 +17,6 @@ import (
 
 var execConfig = testutils.GetApplicationConfigWithDefaultDomains()
 
-const failedToValidateLiteralType = "Failed to validate literal type"
-
 func TestValidateExecEmptyProject(t *testing.T) {
 	request := testutils.GetExecutionRequest()
 	request.Project = ""
@@ -154,7 +152,7 @@ func TestValidateExecInputsWrongType(t *testing.T) {
 		lpRequest.Spec.FixedInputs,
 		lpRequest.Spec.DefaultInputs,
 	)
-	utils.AssertEqualWithSanitizedRegex(t, "invalid foo input wrong type. Expected simple:STRING, but got simple:INTEGER", err.Error())
+	utils.AssertEqualWithSanitizedRegex(t, "invalid foo input wrong type. Expected simple:STRING, but got literal scalar: {primitive:{integer:1}}", err.Error())
 }
 
 func TestValidateExecInputsExtraInputs(t *testing.T) {
@@ -244,7 +242,7 @@ func TestValidateExecUnknownIDLInputs(t *testing.T) {
 	assert.NotNil(t, err)
 
 	// Expected error message
-	assert.Contains(t, err.Error(), failedToValidateLiteralType)
+	assert.Contains(t, err.Error(), "invalid foo input wrong type. Expected simple:1000, but got literal scalar:{}")
 }
 
 func TestValidExecutionId(t *testing.T) {

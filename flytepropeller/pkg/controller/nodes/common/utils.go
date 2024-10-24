@@ -12,7 +12,6 @@ import (
 	idlcore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/encoding"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/validators"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
@@ -104,7 +103,7 @@ func ReadLargeLiteral(ctx context.Context, datastore *storage.DataStore,
 
 // OffloadLargeLiteral offloads the large literal if meets the threshold conditions
 func OffloadLargeLiteral(ctx context.Context, datastore *storage.DataStore, dataReference storage.DataReference,
-	toBeOffloaded *idlcore.Literal, literalOffloadingConfig config.LiteralOffloadingConfig) error {
+	toBeOffloaded *idlcore.Literal, inferredType *idlcore.LiteralType, literalOffloadingConfig config.LiteralOffloadingConfig) error {
 	literalSizeBytes := int64(proto.Size(toBeOffloaded))
 	literalSizeMB := literalSizeBytes / MB
 	// check if the literal is large
@@ -118,7 +117,6 @@ func OffloadLargeLiteral(ctx context.Context, datastore *storage.DataStore, data
 		return nil
 	}
 
-	inferredType := validators.LiteralTypeForLiteral(toBeOffloaded)
 	if inferredType == nil {
 		errString := "Failed to determine literal type for offloaded literal"
 		logger.Errorf(ctx, errString)

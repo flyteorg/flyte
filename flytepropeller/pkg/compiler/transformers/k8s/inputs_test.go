@@ -19,7 +19,7 @@ func TestValidateInputs_InvalidLiteralType(t *testing.T) {
 				"input1": {
 					Type: &core.LiteralType{
 						Type: &core.LiteralType_Simple{
-							Simple: 1000,
+							Simple: core.SimpleType_INTEGER,
 						},
 					},
 				},
@@ -42,7 +42,7 @@ func TestValidateInputs_InvalidLiteralType(t *testing.T) {
 	idlNotFound := false
 	var errMsg string
 	for _, err := range errs.Errors().List() {
-		if err.Code() == "InvalidLiteralType" {
+		if err.Code() == "MismatchingTypes" {
 			idlNotFound = true
 			errMsg = err.Error()
 			break
@@ -50,6 +50,6 @@ func TestValidateInputs_InvalidLiteralType(t *testing.T) {
 	}
 	assert.True(t, idlNotFound, "Expected InvalidLiteralType error was not found in errors")
 
-	expectedContainedErrorMsg := "Failed to validate literal type"
+	expectedContainedErrorMsg := "Variable [input1] expected to be of type "
 	assert.Contains(t, errMsg, expectedContainedErrorMsg)
 }

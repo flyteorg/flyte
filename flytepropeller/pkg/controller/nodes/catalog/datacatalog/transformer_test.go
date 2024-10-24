@@ -360,14 +360,14 @@ func TestGenerateTaskOutputsFromArtifact_IDLNotFound(t *testing.T) {
 		Data: []*datacatalog.ArtifactData{
 			{
 				Name:  "output1",
-				Value: &core.Literal{}, // This will cause LiteralTypeForLiteral to return nil
+				Value: &core.Literal{},
 			},
 		},
 	}
 
 	_, err := GenerateTaskOutputsFromArtifact(taskID, taskInterface, artifact)
 
-	expectedContainedErrorMsg := "failed to validate literal type"
+	expectedContainedErrorMsg := "unexpected artifactData: [output1] val: [] does not match any task output type"
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), expectedContainedErrorMsg)
 }
