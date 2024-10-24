@@ -28,6 +28,8 @@
     <img src="https://img.shields.io/badge/X-000000.svg?style=for-the-badge&logo=X&logoColor=white" height=30px/></a>
   <a href="https://slack.flyte.org" alt="Twitter, formerly X logo label">
     <img src="https://img.shields.io/badge/Slack-Chat-pink?style=for-the-badge&logo=slack" alt="Flyte Slack label" /></a>
+  <a href="https://gurubase.io/g/flyte" alt="Flyte Guru on Gurubase.io">
+    <img src="https://img.shields.io/badge/Gurubase-Ask%20Flyte%20Guru-006BFF?style=for-the-badge" alt="Flyte Guru label" /></a>
 </p>
 
 Flyte is an open-source orchestrator that facilitates building production-grade data and ML pipelines. It is built for scalability and reproducibility, leveraging Kubernetes as its underlying platform. With Flyte, user teams can construct pipelines using the Python SDK, and seamlessly deploy them on both cloud and on-premises environments, enabling distributed processing and efficient resource utilization.
