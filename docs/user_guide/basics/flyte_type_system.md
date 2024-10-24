@@ -14,8 +14,8 @@ Flyte supports a wide range of types, including primitive types, collections, an
 
 Supported Types:
 
-	1. Primitive Types:
-	    -	int, float, bool, str: Basic data types commonly used in Python functions.
+1. Primitive Types:
+	-	int, float, bool, str: Basic data types commonly used in Python functions.
 
 		```{rli} # Define a task to add two integers
 			@task
@@ -30,9 +30,9 @@ Supported Types:
 		:lines: 1
 		```
 
-	2. Collections:
-	    -	List[T]: Represents a list of items where each item is of type T.
-	    -	Dict[K, V]: Represents a dictionary where keys are of type K and values are of type V.
+2. Collections:
+	-	List[T]: Represents a list of items where each item is of type T.
+	-	Dict[K, V]: Represents a dictionary where keys are of type K and values are of type V.
 
 		```{rli} 
 			@task
@@ -50,10 +50,10 @@ Supported Types:
 		:lines: 1
 		```
 
-	3. Custom Types:
-	    -	FlyteFile: For handling file inputs and outputs.
-	    -	FlyteSchema: Used for handling structured data (like tables or dataframes).
-	    -	StructuredDataset: Used for handling data in formats like Pandas or Spark DataFrames.
+3. Custom Types:
+	-	FlyteFile: For handling file inputs and outputs.
+	-	FlyteSchema: Used for handling structured data (like tables or dataframes).
+	-	StructuredDataset: Used for handling data in formats like Pandas or Spark DataFrames.
 
 		```{rli} 
 			@task
@@ -63,6 +63,8 @@ Supported Types:
 		:caption: basics/task.py
 		:lines: 1
 		```
+
+For more details wide range of data types that Flyte supports, refer [here](https://docs.flyte.org/en/latest/user_guide/data_types_and_io/index.html). 
 
 ### When to Use the Type System
 
@@ -95,24 +97,4 @@ Data passing refers to how Flyte handles the flow of data between tasks and work
 
 At a high level, data passing between Flyte tasks and workflows can be thought of as a pipeline. Each task produces outputs, which are passed as inputs to the next task in the sequence. However, Flyte handles data passing in a way that ensures separation between the control plane (which manages workflow execution) and the data plane (where raw data is stored).
 
-There are two primary types of data in Flyte:
-
-	1.	Metadata: Information about the data, such as the structure of the data (e.g., data types, paths to data storage).
-	2.	Raw Data: The actual data itself (e.g., a Pandas DataFrame, a file in cloud storage).
-
-### How Data is Handled in Workflow Execution
-
-In-Memory vs. Persistent Data
-
-	•	In-Memory Data: For small data (like int, float, bool, etc.), Flyte can pass data directly between tasks in memory.
-	•	Persistent Data: For larger data (like files, datasets, or dataframes), Flyte does not pass the actual data between tasks. Instead, the data is stored in a persistent storage location (e.g., S3), and a reference (URI) to that data is passed between tasks.
-
-Execution Context and Storage:
-
-	•	When a task completes, Flyte checks the outputs and serializes the data. If the data is large, it is stored in cloud storage, and a reference to the location is passed to the next task.
-	•	The next task retrieves the data using the URI and deserializes it back into its original form. This ensures that large data sets are not passed through memory, which could cause performance bottlenecks.
-
-Error Handling During Data Passing:
-
-	•	Flyte automatically handles errors related to data passing. If the output of one task doesn’t match the expected input type of the next task, Flyte raises an error, preventing invalid data from propagating through the workflow.
-
+For understanding more about how Flyte handles data, Kindly refer [here](https://docs.flyte.org/en/latest/user_guide/concepts/main_concepts/data_management.html#divedeep-data-management).
