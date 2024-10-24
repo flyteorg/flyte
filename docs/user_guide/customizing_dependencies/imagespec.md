@@ -218,3 +218,11 @@ You can also force push an image in the Python code by calling the `force_push()
 image = ImageSpec(registry="ghcr.io/flyteorg", packages=["pandas"]).force_push()
 ```
 [flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/customizing_dependencies/
+
+## Getting source files into ImageSpec
+Typically, getting source code files into a task's image at run time on a live Flyte backend is done through the fast registration mechanism.
+
+However, if your `ImageSpec` constructor specifies a `source_root` and the `copy` argument is set to something other than `CopyFileDetection.NO_COPY`, then files will be copied regardless of fast registration status.
+If the `source_root` and `copy` fields to an `ImageSpec` are left blank, then whether or not your source files are copied into the built `ImageSpec` image depends on whether or not you use fast registration. Please see [registering workflows](https://docs.flyte.org/en/latest/flyte_fundamentals/registering_workflows.html#containerizing-your-project) for the full explanation.
+
+Since files are sometimes copied into the built image, the tag that is published for an ImageSpec will change based on whether fast register is enabled, and the contents of any files copied.

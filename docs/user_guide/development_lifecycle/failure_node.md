@@ -5,6 +5,11 @@
  .. tags:: FailureNode, Intermediate
 ```
 
+:::{warning}
+This feature is only available starting in Flyte 1.10.7.
+:::
+
+
 The failure node feature enables you to designate a specific node to execute in the event of a failure within your workflow.
 
 For example, a workflow involves creating a cluster at the beginning, followed by the execution of tasks, and concludes with the deletion of the cluster once all tasks are completed. However, if any task within the workflow encounters an error, flyte will abort the entire workflow and won’t delete the cluster. This poses a challenge if you still need to clean up the cluster even in a task failure.

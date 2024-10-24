@@ -6,6 +6,8 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
+//go:generate mockery -name ResourceInterface -output=../mocks -case=underscore
+
 // ResourceInterface manages project, domain and workflow -specific attributes.
 type ResourceInterface interface {
 	ListAll(ctx context.Context, request *admin.ListMatchableAttributesRequest) (

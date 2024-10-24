@@ -90,4 +90,20 @@ You can enable type validation if you have the [python-magic](https://pypi.org/p
 Currently, type validation is only supported on the `Mac OS` and `Linux` platforms.
 :::
 
+## Streaming support
+
+Flyte `1.5` introduced support for streaming `FlyteFile` types via the `fsspec` library. 
+This integration enables efficient, on-demand access to remote files, eliminating the need for fully downloading them to local storage.
+
+:::{note}
+This feature is marked as experimental. We'd love feedback on the API!
+:::
+
+Here is a simple example of removing some columns from a CSV file and writing the result to a new file:
+
+```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/ddce0448141ea6d2cb148df52bf408874adb15ad/examples/data_types_and_io/data_types_and_io/file_streaming.py 
+:caption: data_types_and_io/file_streaming.py
+:lines: 8-20
+```
+
 [flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/data_types_and_io/
