@@ -68,6 +68,8 @@ func NewSecureCookie(cookieName, value string, hashKey, blockKey []byte, domain 
 		Value:    encoded,
 		Domain:   domain,
 		SameSite: sameSiteMode,
+		HttpOnly: true,
+		Secure:   true,
 	}, nil
 }
 
@@ -126,6 +128,7 @@ func NewCsrfCookie() http.Cookie {
 		Value:    csrfStateToken,
 		SameSite: http.SameSiteLaxMode,
 		HttpOnly: true,
+		Secure:   true,
 	}
 }
 
