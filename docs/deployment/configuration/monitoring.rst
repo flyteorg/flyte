@@ -112,32 +112,32 @@ Once the prerequisites are in place, follow the instructions in this section to 
 
    .. group-tab:: flyte-core
 
-Save the following in a ``flyte-monitoring-overrides.yaml`` file and run a ``helm upgrade`` operation pointing to that ``--values`` file:
+      Save the following in a ``flyte-monitoring-overrides.yaml`` file and run a ``helm upgrade`` operation pointing to that ``--values`` file:
 
-     .. code-block:: yaml
+      .. code-block:: yaml
 
-        flyteadmin:
-          serviceMonitor:
-          enabled: true
-          labels:
-            release: kube-prometheus-stack #This is particular to the kube-prometheus-stacl
-          selectorLabels:
-            - app.kubernetes.io/name: flyteadmin
-        flytepropeller:
-          serviceMonitor:
-            enabled: true
-            labels:
-              release: kube-prometheus-stack
-            selectorLabels:
-              - app.kubernetes.io/name: flytepropeller
-          service:
-            enabled: true
+         flyteadmin:
+           serviceMonitor:
+           enabled: true
+           labels:
+             release: kube-prometheus-stack #This is particular to the kube-prometheus-stacl
+           selectorLabels:
+             - app.kubernetes.io/name: flyteadmin
+         flytepropeller:
+           serviceMonitor:
+             enabled: true
+             labels:
+               release: kube-prometheus-stack
+             selectorLabels:
+               - app.kubernetes.io/name: flytepropeller
+           service:
+             enabled: true
 
-The above configuration enables the ``serviceMonitor`` that Prometheus can then use to automatically discover services and scrape metrics from them.
+        The above configuration enables the ``serviceMonitor`` that Prometheus can then use to automatically discover services and scrape metrics from them.
 
    .. group-tab:: flyte-binary
 
-Save the following in a ``flyte-monitoring-overrides.yaml`` file and run a ``helm upgrade`` operation pointing to that ``--values`` file:
+      Save the following in a ``flyte-monitoring-overrides.yaml`` file and run a ``helm upgrade`` operation pointing to that ``--values`` file:
 
       .. code-block:: yaml
 
@@ -157,7 +157,7 @@ Save the following in a ``flyte-monitoring-overrides.yaml`` file and run a ``hel
              protocol: TCP
              port: 10254
 
-   The above configuration enables the ``serviceMonitor`` that Prometheus can then use to automatically discover services and scrape metrics from them.
+         The above configuration enables the ``serviceMonitor`` that Prometheus can then use to automatically discover services and scrape metrics from them.
        
 .. note::
 
