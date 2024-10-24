@@ -367,31 +367,18 @@ two GitHub actions that facilitates this:
 
 ### Some CI/CD best practices
 
-Several best practices are essential for ensuring smooth versioning, secure automation and image management. Tools like Docker, Helm and Github Actions help teams streamline their build, tagging, and release processes while maintaining security and scalability. 
+In case Flyte workflows are registered on each commit in your build pipelines, you can consider the following recommendations and approach:
 
-#### Approach for Building, Tagging and Versioning
+- **Versioning Strategy** : Determining the version of the build for different types of commits makes them consistent and identifiable. For commits on feature branches, use `<branch-name>-<short-commit-hash>` and for the ones on main branches, use `main-<short-commit-hash>`. Use version numbers for the released (tagged) versions.
 
-- Build pipelines currently register Flyte workflows on each commit. Determine the version of the build. For commits on feature branches, use `<branch-name>-<short-commit-hash>`. For commits on main branch, use `main-<short-commit-hash>`. For released (tagged) versions we usually use the version number.
+- **Container Image Management** : With Docker or any other CRI-compliant engine, build and push images to maintain traceability and consistency across environments.
 
-- Build, tag and push docker image based on the version from step (1).
+- **Workflow Serialization and Registration** : Workflows should be serialized and registered based on the versioning of the build and the container image. Depending on whether the build is for a feature branch or main, the registration domain should be adjusted accordingly.
 
-- Serialize and register the Flyte workflows based on the version from step (1) and the docker image from step (2). This step is dependent on the success of step (2). Depending on whether it’s a feature branch, etc. we’re adjusting the domain to register to accordingly.
+- **Container Image Specification** : When managing multiple images across tasks within a Flyte workflow, use the `--image` flag during registration to specify which image to use. This avoids hardcoding the image within the task definition, promoting reusability and flexibility in workflows.
 
-#### Best practices to follow
+- **Helm and GoReleaser for Packaging and Releasing**: Use Helm for managing Kubernetes package releases and GoReleaser for automating the release of Go applications. These tools streamline the packaging and distribution processes, making the CI/CD pipeline more robust and manageable. These are used in the `helm-release` and `manifest-release` jobs. 
 
-- **GitHub Actions for Workflow Automation**: Leverage GitHub Actions to automate the release process, including critical parts such as generating git tags, Docker images, and releasing Helm and manifest files. Automating these workflows reduces manual errors and speeds up the deployment cycle.
-
-- **Docker for Image Management**:
-Use Docker to build, tag, and push images based on the version of the build. These Docker images are integral to the deployment pipeline, allowing Flyte workflows and other tasks to reference the correct image without manual work.
-
-- **Parallel Execution with Matrix Strategy**:
-To optimize performance and efficiency through parallel execution of tasks, employ a matrix strategy in GitHub Actions. This is used in the `publish-flyte-component-image` job.
-
-- **Secure Authentication with GitHub Secrets**:
-GitHub Secrets can be used to store sensitive data such as authentication tokens and credentials securely. This ensures that essential data is protected and not exposed in the codebase, safeguarding your automation processes.
-
-- **Helm and GoReleaser for Packaging and Releasing**:
-Use Helm for managing Kubernetes package releases and GoReleaser for automating the release of Go applications. These tools streamline the packaging and distribution processes, making the CI/CD pipeline more robust and manageable. These are used in the `helm-release` and `manifest-release` jobs.
 
 ## What's next?
 
