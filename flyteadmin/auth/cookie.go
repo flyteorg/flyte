@@ -128,6 +128,7 @@ func NewCsrfCookie() http.Cookie {
 		Value:    csrfStateToken,
 		SameSite: http.SameSiteLaxMode,
 		HttpOnly: true,
+		Secure:   true,
 	}
 }
 

@@ -218,6 +218,7 @@ func (c *CookieManager) getLogoutCookie(name string) *http.Cookie {
 		Domain:   c.domain,
 		MaxAge:   0,
 		HttpOnly: true,
+		Secure: true,
 		Expires:  time.Now().Add(-1 * time.Hour),
 	}
 }
