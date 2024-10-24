@@ -75,20 +75,40 @@ The generated spec file can be modified to change the envs values, as shown belo
     task: core.control_flow.merge_sort.merge
     version: "v2"
 
-4. Run the execution by passing the generated YAML file.
+4. [Optional] Update the TargetExecutionCluster, if needed.
+The generated spec file can be modified to change the TargetExecutionCluster values, as shown below:
+
+.. code-block:: yaml
+
+    iamRoleARN: ""
+    inputs:
+    sorted_list1:
+    - 0
+    sorted_list2:
+    - 0
+    envs:
+      foo: bar
+    kubeServiceAcct: ""
+    targetDomain: ""
+    targetProject: ""
+	targetExecutionCluster: ""
+    task: core.control_flow.merge_sort.merge
+    version: "v2"
+
+5. Run the execution by passing the generated YAML file.
 The file can then be passed through the command line.
 It is worth noting that the source's and target's project and domain can be different.
 ::
 
 	flytectl create execution --execFile execution_spec.yaml -p flytesnacks -d staging --targetProject flytesnacks
 
-5. To relaunch an execution, pass the current execution ID as follows:
+6. To relaunch an execution, pass the current execution ID as follows:
 
 ::
 
  flytectl create execution --relaunch ffb31066a0f8b4d52b77 -p flytesnacks -d development
 
-6. To recover an execution, i.e., recreate it from the last known failure point for previously-run workflow execution, run:
+7. To recover an execution, i.e., recreate it from the last known failure point for previously-run workflow execution, run:
 
 ::
 
@@ -96,7 +116,7 @@ It is worth noting that the source's and target's project and domain can be diff
 
 See :ref:`ref_flyteidl.admin.ExecutionRecoverRequest` for more details.
 
-7. You can create executions idempotently by naming them. This is also a way to *name* an execution for discovery. Note,
+8. You can create executions idempotently by naming them. This is also a way to *name* an execution for discovery. Note,
 an execution id has to be unique within a project domain. So if the *name* matches an existing execution an already exists exceptioj
 will be raised.
 
@@ -104,7 +124,7 @@ will be raised.
 
    flytectl create execution --recover ffb31066a0f8b4d52b77 -p flytesnacks -d development custom_name
 
-8. Generic/Struct/Dataclass/JSON types are supported for execution in a similar manner.
+9. Generic/Struct/Dataclass/JSON types are supported for execution in a similar manner.
 The following is an example of how generic data can be specified while creating the execution.
 
 ::
@@ -124,7 +144,7 @@ The generated file would look similar to this. Here, empty values have been dump
     task: core.type_system.custom_objects.add
     version: v3
 
-9. Modified file with struct data populated for 'x' and 'y' parameters for the task "core.type_system.custom_objects.add":
+10. Modified file with struct data populated for 'x' and 'y' parameters for the task "core.type_system.custom_objects.add":
 
 ::
 
@@ -148,7 +168,7 @@ The generated file would look similar to this. Here, empty values have been dump
   task: core.type_system.custom_objects.add
   version: v3
 
-10. If you have configured a plugin that implements github.com/flyteorg/flyteadmin/pkg/workflowengine/interfaces/WorkflowExecutor 
+11. If you have configured a plugin that implements github.com/flyteorg/flyteadmin/pkg/workflowengine/interfaces/WorkflowExecutor 
    that supports cluster pools, then when creating a new execution, you can assign it to a specific cluster pool:
 
 ::
@@ -165,20 +185,21 @@ Options
 
 ::
 
-      --clusterPool string       specify which cluster pool to assign execution to.
-      --dryRun                   execute command without making any modifications.
-      --execFile string          file for the execution params. If not specified defaults to <<workflow/task>_name>.execution_spec.yaml
-  -h, --help                     help for execution
-      --iamRoleARN string        iam role ARN AuthRole for launching execution.
-      --kubeServiceAcct string   kubernetes service account AuthRole for launching execution.
-      --overwriteCache           skip cached results when performing execution, causing all outputs to be re-calculated and stored data to be overwritten. Does not work for recovered executions.
-      --recover string           execution id to be recreated from the last known failure point.
-      --relaunch string          execution id to be relaunched.
-      --targetDomain string      project where execution needs to be created. If not specified configured domain would be used.
-      --targetProject string     project where execution needs to be created. If not specified configured project would be used.
-      --task string              
-      --version string           specify version of execution workflow/task.
-      --workflow string          
+      --clusterPool string              specify which cluster pool to assign execution to.
+      --dryRun                          execute command without making any modifications.
+      --execFile string                 file for the execution params. If not specified defaults to <<workflow/task>_name>.execution_spec.yaml
+  -h, --help                            help for execution
+      --iamRoleARN string               iam role ARN AuthRole for launching execution.
+      --kubeServiceAcct string          kubernetes service account AuthRole for launching execution.
+      --overwriteCache                  skip cached results when performing execution, causing all outputs to be re-calculated and stored data to be overwritten. Does not work for recovered executions.
+      --recover string                  execution id to be recreated from the last known failure point.
+      --relaunch string                 execution id to be relaunched.
+      --targetDomain string             domain where execution needs to be created. If not specified configured domain would be used.
+      --targetExecutionCluster string   cluster where execution needs to be created. If not specific the default would be used.
+      --targetProject string            project where execution needs to be created. If not specified configured project would be used.
+      --task string                     
+      --version string                  specify version of execution workflow/task.
+      --workflow string                 
 
 Options inherited from parent commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -203,10 +224,12 @@ Options inherited from parent commands
       --admin.insecure                               Use insecure connection.
       --admin.insecureSkipVerify                     InsecureSkipVerify controls whether a client verifies the server's certificate chain and host name. Caution : shouldn't be use for production usecases'
       --admin.maxBackoffDelay string                 Max delay for grpc backoff (default "8s")
+      --admin.maxMessageSizeBytes int                The max size in bytes for incoming gRPC messages
       --admin.maxRetries int                         Max number of gRPC retries (default 4)
       --admin.perRetryTimeout string                 gRPC per retry timeout (default "15s")
       --admin.pkceConfig.refreshTime string          grace period from the token expiry after which it would refresh the token. (default "5m0s")
       --admin.pkceConfig.timeout string              Amount of time the browser session would be active for authentication from client app. (default "2m0s")
+      --admin.proxyCommand strings                   Command for external proxy-authorization token generation
       --admin.scopes strings                         List of scopes to request
       --admin.tokenRefreshWindow string              Max duration between token refresh attempt and token expiry. (default "0s")
       --admin.tokenUrl string                        OPTIONAL: Your IdP's token endpoint. It'll be discovered from flyte admin's OAuth Metadata endpoint if not provided.
@@ -227,10 +250,17 @@ Options inherited from parent commands
       --files.outputLocationPrefix string            Custom output location prefix for offloaded types (files/schemas).
       --files.sourceUploadPath string                Deprecated: Update flyte admin to avoid having to configure storage access from flytectl.
       --files.version string                         Version of the entity to be registered with flyte which are un-versioned after serialization.
+  -i, --interactive                                  Set this flag to use an interactive CLI
       --logger.formatter.type string                 Sets logging format type. (default "json")
       --logger.level int                             Sets the minimum logging level. (default 3)
       --logger.mute                                  Mutes all logs regardless of severity. Intended for benchmarks/tests only.
       --logger.show-source                           Includes source code location in logs.
+      --otel.file.filename string                    Filename to store exported telemetry traces (default "/tmp/trace.txt")
+      --otel.jaeger.endpoint string                  Endpoint for the jaeger telemetry trace ingestor (default "http://localhost:14268/api/traces")
+      --otel.otlpgrpc.endpoint string                Endpoint for the OTLP telemetry trace collector (default "http://localhost:4317")
+      --otel.otlphttp.endpoint string                Endpoint for the OTLP telemetry trace collector (default "http://localhost:4318/v1/traces")
+      --otel.sampler.parentSampler string            Sets the parent sampler to use for the tracer (default "always")
+      --otel.type string                             Sets the type of exporter to configure [noop/file/jaeger/otlpgrpc/otlphttp]. (default "noop")
   -o, --output string                                Specifies the output type - supported formats [TABLE JSON YAML DOT DOTURL]. NOTE: dot, doturl are only supported for Workflow (default "TABLE")
   -p, --project string                               Specifies the Flyte project.
       --storage.cache.max_size_mbs int               Maximum size of the cache where the Blob store data is cached in-memory. If not specified or set to 0,  cache is not used

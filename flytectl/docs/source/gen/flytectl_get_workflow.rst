@@ -121,10 +121,12 @@ Options inherited from parent commands
       --admin.insecure                               Use insecure connection.
       --admin.insecureSkipVerify                     InsecureSkipVerify controls whether a client verifies the server's certificate chain and host name. Caution : shouldn't be use for production usecases'
       --admin.maxBackoffDelay string                 Max delay for grpc backoff (default "8s")
+      --admin.maxMessageSizeBytes int                The max size in bytes for incoming gRPC messages
       --admin.maxRetries int                         Max number of gRPC retries (default 4)
       --admin.perRetryTimeout string                 gRPC per retry timeout (default "15s")
       --admin.pkceConfig.refreshTime string          grace period from the token expiry after which it would refresh the token. (default "5m0s")
       --admin.pkceConfig.timeout string              Amount of time the browser session would be active for authentication from client app. (default "2m0s")
+      --admin.proxyCommand strings                   Command for external proxy-authorization token generation
       --admin.scopes strings                         List of scopes to request
       --admin.tokenRefreshWindow string              Max duration between token refresh attempt and token expiry. (default "0s")
       --admin.tokenUrl string                        OPTIONAL: Your IdP's token endpoint. It'll be discovered from flyte admin's OAuth Metadata endpoint if not provided.
@@ -145,10 +147,17 @@ Options inherited from parent commands
       --files.outputLocationPrefix string            Custom output location prefix for offloaded types (files/schemas).
       --files.sourceUploadPath string                Deprecated: Update flyte admin to avoid having to configure storage access from flytectl.
       --files.version string                         Version of the entity to be registered with flyte which are un-versioned after serialization.
+  -i, --interactive                                  Set this flag to use an interactive CLI
       --logger.formatter.type string                 Sets logging format type. (default "json")
       --logger.level int                             Sets the minimum logging level. (default 3)
       --logger.mute                                  Mutes all logs regardless of severity. Intended for benchmarks/tests only.
       --logger.show-source                           Includes source code location in logs.
+      --otel.file.filename string                    Filename to store exported telemetry traces (default "/tmp/trace.txt")
+      --otel.jaeger.endpoint string                  Endpoint for the jaeger telemetry trace ingestor (default "http://localhost:14268/api/traces")
+      --otel.otlpgrpc.endpoint string                Endpoint for the OTLP telemetry trace collector (default "http://localhost:4317")
+      --otel.otlphttp.endpoint string                Endpoint for the OTLP telemetry trace collector (default "http://localhost:4318/v1/traces")
+      --otel.sampler.parentSampler string            Sets the parent sampler to use for the tracer (default "always")
+      --otel.type string                             Sets the type of exporter to configure [noop/file/jaeger/otlpgrpc/otlphttp]. (default "noop")
   -o, --output string                                Specifies the output type - supported formats [TABLE JSON YAML DOT DOTURL]. NOTE: dot, doturl are only supported for Workflow (default "TABLE")
   -p, --project string                               Specifies the Flyte project.
       --storage.cache.max_size_mbs int               Maximum size of the cache where the Blob store data is cached in-memory. If not specified or set to 0,  cache is not used
