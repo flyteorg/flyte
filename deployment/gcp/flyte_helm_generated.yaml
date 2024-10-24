@@ -206,6 +206,9 @@ data:
       enable-multicontainer: false
       limits:
         maxDownloadMBs: 10
+      cache:
+        max_size_mbs: 0
+        target_gc_percent: 70
   task_resource_defaults.yaml: | 
     task_resources:
       defaults:
@@ -408,6 +411,9 @@ data:
       enable-multicontainer: false
       limits:
         maxDownloadMBs: 10
+      cache:
+        max_size_mbs: 0
+        target_gc_percent: 70
 ---
 # Source: flyte-core/templates/flytescheduler/configmap.yaml
 apiVersion: v1
@@ -559,10 +565,8 @@ data:
       enable-multicontainer: false
       limits:
         maxDownloadMBs: 10
-  cache.yaml: |
-    storage:
       cache:
-        max_size_mbs: 1024
+        max_size_mbs: 0
         target_gc_percent: 70
   task_logs.yaml: | 
     plugins:
@@ -911,7 +915,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "0705f122f2535babec96a6083827c3e6d27e6e9b0e460b4d07292c858079ac7"
+        configChecksum: "20a517901c6b6f01f47e968fa15ca51f6d9522e728ecace8b48553eb428cde6"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -1231,7 +1235,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "905a2a911a85dbf8d4f1dc3be24b9c4fd7bb46481db0e174274d6aea6129b4c"
+        configChecksum: "537b12b49584e5eb9da85bbf0d8d8d21d8edce0560b0b53f595485f2cdb1cb6"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte
@@ -1333,7 +1337,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "0705f122f2535babec96a6083827c3e6d27e6e9b0e460b4d07292c858079ac7"
+        configChecksum: "20a517901c6b6f01f47e968fa15ca51f6d9522e728ecace8b48553eb428cde6"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte
@@ -1432,7 +1436,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "0056f7638fe13bd9187bfaf4011fde4cfbecd13c152ba443bba7fe25ca4777a"
+        configChecksum: "8562f7f608d4936e13f6ad70c18c7c095068e742243e7f380f89694d2182110"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "10254"
       labels: 
@@ -1515,7 +1519,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v1.13.2
       annotations:
-        configChecksum: "0056f7638fe13bd9187bfaf4011fde4cfbecd13c152ba443bba7fe25ca4777a"
+        configChecksum: "8562f7f608d4936e13f6ad70c18c7c095068e742243e7f380f89694d2182110"
         prometheus.io/path: "/metrics"
         prometheus.io/port: "10254"
     spec:
