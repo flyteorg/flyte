@@ -51,8 +51,8 @@ func (r *TaskRepo) Get(ctx context.Context, input interfaces.Identifier) (models
 	timer := r.metrics.GetDuration.Start()
 	var tx *gorm.DB
 	if input.Version == "" {
-		tx := r.db.WithContext(ctx).Where("project = ? AND domain = ? AND name = ?", input.Project, input.Domain, input.Name).Limit(1)
-		tx = tx.Order("version DESC")
+		tx = r.db.WithContext(ctx).Where(`"tasks"."project" = ? AND "tasks"."domain" = ? AND "tasks"."name" = ?`, input.Project, input.Domain, input.Name).Limit(1)
+		tx = tx.Order(`"tasks"."version" DESC`)
 		tx.Find(&task)
 	} else {
 		tx = r.db.WithContext(ctx).Where(&models.Task{

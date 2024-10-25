@@ -85,7 +85,7 @@ func TestGetTask(t *testing.T) {
 	GlobalMock.Logging = true
 
 	GlobalMock.NewMock().WithQuery(
-		`SELECT * FROM "tasks" WHERE project = $1 AND domain = $2 AND name = $3 ORDER BY version DESC LIMIT 1`).
+		`SELECT * FROM "tasks" WHERE "tasks"."project" = $1 AND "tasks"."domain" = $2 AND "tasks"."name" = $3 ORDER BY "tasks"."version" DESC LIMIT 1`).
 		WithReply(tasks)
 	output, err = taskRepo.Get(context.Background(), interfaces.Identifier{
 		Project: project,
@@ -98,8 +98,8 @@ func TestGetTask(t *testing.T) {
 	assert.Equal(t, project, output.Project)
 	assert.Equal(t, domain, output.Domain)
 	assert.Equal(t, name, output.Name)
-	assert.Equal(t, "v2", output.Version)
-	assert.Equal(t, []byte{3, 4}, output.Closure)
+	assert.Equal(t, version, output.Version)
+	assert.Equal(t, []byte{1, 2}, output.Closure)
 	assert.Equal(t, pythonTestTaskType, output.Type)
 }
 
