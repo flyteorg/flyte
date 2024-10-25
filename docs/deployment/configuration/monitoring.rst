@@ -90,8 +90,8 @@ Both ``flyteadmin`` and ``flytepropeller`` are instrumented to expose metrics. T
 - **User-facing dashboard**: it can be used to investigate performance and characteristics of workflow and task executions. It's published under ID `22146 <https://grafana.com/grafana/dashboards/22146-flyte-user-dashboard-via-prometheus/>`__ in the Grafana marketplace.
 
 - **System Dashboards**: Dashboards that are useful for the system maintainer to investigate the status and performance of their Flyte deployments. These are further divided into:
-        - Data plane (``flytepropeller``): `21719 <https://grafana.com/grafana/dashboards/21719-flyte-propeller-dashboard-via-prometheus/>`__: execution engine status and performance.
-        - Control plane (``flyteadmin``): `21720 <https://grafana.com/grafana/dashboards/21720-flyteadmin-dashboard-via-prometheus/>`__: API-level monitoring.
+        - Data plane (``flytepropeller``) - `21719 <https://grafana.com/grafana/dashboards/21719-flyte-propeller-dashboard-via-prometheus/>`__: execution engine status and performance.
+        - Control plane (``flyteadmin``) - `21720 <https://grafana.com/grafana/dashboards/21720-flyteadmin-dashboard-via-prometheus/>`__: API-level monitoring.
 
 The corresponding JSON files for each dashboard are also located in the ``flyte`` repository at `deployment/stats/prometheus <https://github.com/flyteorg/flyte/tree/master/deployment/stats/prometheus>`__.
 
@@ -133,7 +133,7 @@ Once the prerequisites are in place, follow the instructions in this section to 
            service:
              enabled: true
 
-        The above configuration enables the ``serviceMonitor`` that Prometheus can then use to automatically discover services and scrape metrics from them.
+      The above configuration enables the ``serviceMonitor`` that Prometheus can then use to automatically discover services and scrape metrics from them.
 
    .. group-tab:: flyte-binary
 
@@ -157,7 +157,7 @@ Once the prerequisites are in place, follow the instructions in this section to 
              protocol: TCP
              port: 10254
 
-         The above configuration enables the ``serviceMonitor`` that Prometheus can then use to automatically discover services and scrape metrics from them.
+      The above configuration enables the ``serviceMonitor`` that Prometheus can then use to automatically discover services and scrape metrics from them.
        
 .. note::
 
