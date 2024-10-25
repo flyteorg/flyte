@@ -1220,11 +1220,11 @@ spec:
         helm.sh/chart: flyte-core-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
-      securityContext:
-        runAsNonRoot: true
+      securityContext: 
         fsGroup: 1001
+        fsGroupChangePolicy: OnRootMismatch
+        runAsNonRoot: true
         runAsUser: 1001
-        fsGroupChangePolicy: "OnRootMismatch"
         seLinuxOptions:
           type: spc_t
       initContainers:

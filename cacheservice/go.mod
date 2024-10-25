@@ -6,6 +6,7 @@ require (
 	github.com/Selvatico/go-mocket v1.0.7
 	github.com/aws/aws-sdk-go-v2/config v1.26.6
 	github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue v1.12.17
+	github.com/flyteorg/flyte/flyteadmin v0.0.0-00010101000000-000000000000
 	github.com/flyteorg/flyte/flyteidl v0.0.0-00010101000000-000000000000
 	github.com/flyteorg/flyte/flytestdlib v0.0.0-00010101000000-000000000000
 	github.com/go-redis/redis/v8 v8.11.5
@@ -22,7 +23,7 @@ require (
 	go.opentelemetry.io/otel v1.29.0
 	google.golang.org/grpc v1.67.1
 	gorm.io/driver/postgres v1.5.3
-	gorm.io/gorm v1.25.4
+	gorm.io/gorm v1.25.5
 )
 
 require (
@@ -54,27 +55,28 @@ require (
 	github.com/jackc/puddle/v2 v2.2.1 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
-	github.com/mattn/go-sqlite3 v1.14.17 // indirect
-	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.46.1 // indirect
+	github.com/mattn/go-sqlite3 v2.0.3+incompatible // indirect
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.47.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.24.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.24.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.24.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.1.0 // indirect
 	golang.org/x/sync v0.8.0 // indirect
 	gorm.io/driver/sqlite v1.5.4 // indirect
+	k8s.io/component-base v0.28.4 // indirect
 )
 
 require (
 	cloud.google.com/go v0.112.0 // indirect
 	cloud.google.com/go/compute/metadata v0.5.0 // indirect
-	cloud.google.com/go/iam v1.1.5 // indirect
+	cloud.google.com/go/iam v1.1.6 // indirect
 	cloud.google.com/go/storage v1.36.0 // indirect
-	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.11.1 // indirect
-	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.6.0 // indirect
-	github.com/Azure/azure-sdk-for-go/sdk/internal v1.8.0 // indirect
-	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v1.1.0 // indirect
+	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.14.0 // indirect
+	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.7.0 // indirect
+	github.com/Azure/azure-sdk-for-go/sdk/internal v1.10.0 // indirect
+	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v1.2.0 // indirect
 	github.com/AzureAD/microsoft-authentication-library-for-go v1.2.2 // indirect
-	github.com/aws/aws-sdk-go v1.44.2 // indirect
+	github.com/aws/aws-sdk-go v1.46.2 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.24.1
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.27.1
 	github.com/beorn7/perks v1.0.1 // indirect
@@ -87,7 +89,7 @@ require (
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/flyteorg/stow v0.3.10 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
-	github.com/ghodss/yaml v1.0.0 // indirect
+	github.com/ghodss/yaml v1.0.1-0.20220118164431-d8423dcdf344 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-openapi/jsonpointer v0.19.6 // indirect
@@ -108,10 +110,10 @@ require (
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/kylelemons/godebug v1.1.0 // indirect
-	github.com/magiconair/properties v1.8.6 // indirect
+	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-colorable v0.1.12 // indirect
-	github.com/mattn/go-isatty v0.0.14 // indirect
+	github.com/mattn/go-isatty v0.0.16 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
@@ -146,8 +148,8 @@ require (
 	golang.org/x/term v0.23.0 // indirect
 	golang.org/x/text v0.17.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
-	google.golang.org/api v0.155.0 // indirect
-	google.golang.org/genproto v0.0.0-20240123012728-ef4313101c80 // indirect
+	google.golang.org/api v0.160.0 // indirect
+	google.golang.org/genproto v0.0.0-20240205150955-31a09d347014 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20240814211410-ddb44dafa142 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240814211410-ddb44dafa142 // indirect
 	google.golang.org/protobuf v1.34.2
@@ -155,13 +157,13 @@ require (
 	gopkg.in/ini.v1 v1.66.4 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	k8s.io/api v0.28.2 // indirect
-	k8s.io/apimachinery v0.28.2 // indirect
-	k8s.io/client-go v0.28.1 // indirect
+	k8s.io/api v0.28.4 // indirect
+	k8s.io/apimachinery v0.28.4 // indirect
+	k8s.io/client-go v1.5.2 // indirect
 	k8s.io/klog/v2 v2.100.1 // indirect
 	k8s.io/kube-openapi v0.0.0-20230717233707-2695361300d9 // indirect
 	k8s.io/utils v0.0.0-20230406110748-d93618cff8a2 // indirect
-	sigs.k8s.io/controller-runtime v0.0.0-00010101000000-000000000000 // indirect
+	sigs.k8s.io/controller-runtime v0.16.3 // indirect
 	sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.2.3 // indirect
 	sigs.k8s.io/yaml v1.3.0 // indirect
@@ -174,6 +176,7 @@ replace (
 	github.com/flyteorg/flyte/flyteplugins => ../flyteplugins
 	github.com/flyteorg/flyte/flytepropeller => ../flytepropeller
 	github.com/flyteorg/flyte/flytestdlib => ../flytestdlib
+	github.com/unionai/flyte/fasttask/plugin => ../fasttask/plugin
 	k8s.io/api => k8s.io/api v0.28.2
 	k8s.io/apimachinery => k8s.io/apimachinery v0.28.2
 	k8s.io/client-go => k8s.io/client-go v0.28.2

@@ -18,13 +18,9 @@ spec:
         {{- end }}
       labels: {{ include "cacheservice.podLabels" . | nindent 8 }}
     spec:
-      securityContext:
-        runAsNonRoot: true
-        fsGroup: 1001
-        runAsUser: 1001
-        fsGroupChangePolicy: "OnRootMismatch"
-        seLinuxOptions:
-          type: spc_t
+      {{- with .Values.cacheservice.securityContext }}
+      securityContext: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
       {{- if .Values.cacheservice.priorityClassName }}
       priorityClassName: {{ .Values.cacheservice.priorityClassName }}
       {{- end }}

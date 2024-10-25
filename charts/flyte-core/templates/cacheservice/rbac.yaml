@@ -1,6 +1,5 @@
-
----
 {{- if .Values.cacheservice.enabled }}
+---
 {{- if .Values.cacheservice.serviceAccount.create }}
 apiVersion: v1
 kind: ServiceAccount

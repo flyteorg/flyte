@@ -8,12 +8,15 @@ import (
 	"github.com/flyteorg/flyte/cacheservice/pkg/config"
 	"github.com/flyteorg/flyte/cacheservice/pkg/rpc/cacheservice"
 	"github.com/flyteorg/flyte/cacheservice/pkg/runtime"
+	"github.com/flyteorg/flyte/flyteadmin/plugins"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/flytestdlib/profutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 )
+
+var pluginRegistryStore = plugins.NewAtomicRegistry(plugins.NewRegistry())
 
 var serveCmd = &cobra.Command{
 	Use:   "serve",
@@ -40,8 +43,7 @@ var serveCmd = &cobra.Command{
 			}
 		}()
 
-		// Set Keys
-		labeled.SetMetricKeys(contextutils.AppNameKey, contextutils.ProjectKey, contextutils.DomainKey)
+		labeled.SetMetricKeys(contextutils.AppNameKey)
 
 		// register otel tracer providers
 		for _, serviceName := range []string{otelutils.CacheServiceGormTracer, otelutils.CacheServiceServerTracer} {
@@ -51,7 +53,7 @@ var serveCmd = &cobra.Command{
 			}
 		}
 
-		return cacheservice.ServeInsecure(ctx, cfg)
+		return cacheservice.ServeInsecure(ctx, pluginRegistryStore.Load(), cfg)
 	},
 }
 

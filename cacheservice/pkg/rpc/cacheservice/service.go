@@ -22,6 +22,7 @@ import (
 	"github.com/flyteorg/flyte/cacheservice/pkg/manager/interfaces"
 	"github.com/flyteorg/flyte/cacheservice/pkg/repositories"
 	"github.com/flyteorg/flyte/cacheservice/pkg/runtime"
+	"github.com/flyteorg/flyte/flyteadmin/plugins"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/cacheservice"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
@@ -95,31 +96,43 @@ func NewCacheServiceServer() *CacheService {
 }
 
 // ServeInsecure creates and starts the gRPC server
-func ServeInsecure(ctx context.Context, cfg *config.Config) error {
-	grpcServer := newGRPCServer(ctx, cfg)
-
+func ServeInsecure(ctx context.Context, pluginRegistry *plugins.Registry, cfg *config.Config) error {
 	grpcListener, err := net.Listen("tcp", cfg.GetGrpcHostAddress())
 	if err != nil {
 		return err
 	}
+
+	grpcServer := newGRPCServer(ctx, pluginRegistry, cfg)
 
 	logger.Infof(ctx, "Serving CacheService Insecure on port %v", config.GetConfig().GetGrpcHostAddress())
 	return grpcServer.Serve(grpcListener)
 }
 
 // Creates a new GRPC Server with all the configuration
-func newGRPCServer(_ context.Context, cfg *config.Config) *grpc.Server {
+func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *config.Config) *grpc.Server {
 	tracerProvider := otelutils.GetTracerProvider(otelutils.CacheServiceServerTracer)
+
+	otelUnaryServerInterceptor := otelgrpc.UnaryServerInterceptor(
+		otelgrpc.WithTracerProvider(tracerProvider),
+		otelgrpc.WithPropagators(propagation.TraceContext{}),
+	)
+
+	interceptors := []grpc.UnaryServerInterceptor{
+		grpcprometheus.UnaryServerInterceptor,
+		otelUnaryServerInterceptor,
+	}
+	middlewareInterceptors := plugins.Get[grpc.UnaryServerInterceptor](pluginRegistry, plugins.PluginIDUnaryServiceMiddleware)
+	if middlewareInterceptors != nil {
+		logger.Infof(ctx, "Creating gRPC server with interceptors")
+		interceptors = append(interceptors, middlewareInterceptors)
+	}
+	chainedUnaryInterceptors := grpcmiddleware.ChainUnaryServer(interceptors...)
+
 	serverOpts := []grpc.ServerOption{
 		grpc.StreamInterceptor(grpcprometheus.StreamServerInterceptor),
-		grpc.UnaryInterceptor(grpcmiddleware.ChainUnaryServer(
-			grpcprometheus.UnaryServerInterceptor,
-			otelgrpc.UnaryServerInterceptor(
-				otelgrpc.WithTracerProvider(tracerProvider),
-				otelgrpc.WithPropagators(propagation.TraceContext{}),
-			),
-		)),
+		grpc.UnaryInterceptor(chainedUnaryInterceptors),
 	}
+
 	grpcServer := grpc.NewServer(serverOpts...)
 	grpcprometheus.Register(grpcServer)
 

@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
+	"github.com/flyteorg/flyte/flyteadmin/plugins"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/config/viper"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
@@ -39,7 +40,8 @@ func init() {
 	}
 }
 
-func Execute() error {
+func Execute(pluginRegistry *plugins.Registry) error {
+	pluginRegistryStore.Store(pluginRegistry)
 	if err := RootCmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)

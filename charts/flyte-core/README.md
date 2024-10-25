@@ -72,6 +72,7 @@ helm install gateway bitnami/contour -n flyte
 | cacheservice.priorityClassName | string | `""` | Sets priorityClassName for cacheservice pod(s). |
 | cacheservice.replicaCount | int | `1` | Replicas count for Cacheservice deployment |
 | cacheservice.resources | object | `{"limits":{"cpu":"500m","ephemeral-storage":"100Mi","memory":"500Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"50Mi"}}` | Default resources requests and limits for Cacheservice deployment |
+| cacheservice.securityContext | object | `{"fsGroup":1001,"fsGroupChangePolicy":"OnRootMismatch","runAsNonRoot":true,"runAsUser":1001,"seLinuxOptions":{"type":"spc_t"}}` | Sets securityContext for cacheservice pod(s). |
 | cacheservice.service | object | `{"annotations":{"projectcontour.io/upstream-protocol.h2c":"grpc"},"type":"NodePort"}` | Service settings for Cacheservice |
 | cacheservice.serviceAccount | object | `{"annotations":{},"create":true,"imagePullSecrets":[]}` | Configuration for service accounts for Cacheservice |
 | cacheservice.serviceAccount.annotations | object | `{}` | Annotations for ServiceAccount attached to Cacheservice pods |

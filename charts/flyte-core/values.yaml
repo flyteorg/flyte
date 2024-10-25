@@ -333,6 +333,14 @@ cacheservice:
   extraArgs: {}
   # -- Sets priorityClassName for cacheservice pod(s).
   priorityClassName: ""
+  # -- Sets securityContext for cacheservice pod(s).
+  securityContext:
+    runAsNonRoot: true
+    fsGroup: 1001
+    runAsUser: 1001
+    fsGroupChangePolicy: "OnRootMismatch"
+    seLinuxOptions:
+      type: spc_t
 
 #
 # FLYTE_AGENT SETTINGS

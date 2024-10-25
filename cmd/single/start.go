@@ -61,7 +61,8 @@ func startCacheService(ctx context.Context, _ CacheService) error {
 	}
 
 	cacheCfg := cacheserviceConfig.GetConfig()
-	return cacheservice.ServeInsecure(ctx, cacheCfg)
+	pluginRegistry := plugins.NewAtomicRegistry(plugins.NewRegistry())
+	return cacheservice.ServeInsecure(ctx, pluginRegistry.Load(), cacheCfg)
 }
 
 func startClusterResourceController(ctx context.Context, pluginRegistry *plugins.Registry) error {
