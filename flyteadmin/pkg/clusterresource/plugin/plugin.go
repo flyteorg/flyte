@@ -7,6 +7,8 @@ import (
 )
 
 // ClusterResourcePlugin defines a subset of the Union Cloud service API that is used by the cluster resource controller
+//
+//go:generate mockery -name ClusterResourcePlugin -output=./mocks -case=underscore
 type ClusterResourcePlugin interface {
 	BatchUpdateClusterResourceState(ctx context.Context, input *BatchUpdateClusterResourceStateInput) (BatchUpdateClusterResourceStateOutput, []BatchUpdateClusterResourceStateError, error)
 }

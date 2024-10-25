@@ -15,8 +15,11 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/apimachinery/pkg/util/sets"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/clusterresource/mocks"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/clusterresource/plugin"
+	pluginMocks "github.com/flyteorg/flyte/flyteadmin/pkg/clusterresource/plugin/mocks"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	execClusterMocks "github.com/flyteorg/flyte/flyteadmin/pkg/executioncluster/mocks"
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
@@ -694,5 +697,62 @@ func Test_Controller_ProcessProjectsInBatch_Order(t *testing.T) {
 		projectId := i / 2
 		domainId := i % 2
 		assert.Equal(t, projectId*10+domainId, stat.Created)
+	}
+}
+
+func Test_Controller_ReportClusterResourceStateUpdated(t *testing.T) {
+	ctx := context.TODO()
+	mockConfig := configurationMocks.Configuration{}
+	mockConfig.OnClusterResourceConfiguration().Return(configurationMocks.MockClusterResourceConfiguration{
+		ClusterName: "test-cluster",
+	})
+	mockPlugin := pluginMocks.ClusterResourcePlugin{}
+	pluginRegistry := plugins.NewRegistry()
+	pluginRegistry.RegisterDefault(plugins.PluginIDClusterResource, &mockPlugin)
+	mockController := &controller{
+		config:                          &mockConfig,
+		metrics:                         newMetrics(mockScope.NewTestScope()),
+		pluginRegistry:                  pluginRegistry,
+		clusterResourceStateReportCache: sync.Map{},
+	}
+
+	testOrgs := sets.Set[string]{}
+	for i := 0; i < 6; i++ {
+		testOrgs.Insert(strconv.Itoa(i))
+	}
+
+	// Mock cache
+	mockController.clusterResourceStateReportCache.Store("0", plugin.ClusterResourceStateProvisioned)
+	mockController.clusterResourceStateReportCache.Store("1", plugin.ClusterResourceStateProvisioned)
+	mockController.clusterResourceStateReportCache.Store("2", plugin.ClusterResourceStateDeprovisioned)
+	mockController.clusterResourceStateReportCache.Store("3", plugin.ClusterResourceStateDeprovisioned)
+
+	// Mock plugin
+	mockPlugin.On("BatchUpdateClusterResourceState", ctx, mock.Anything).Return(plugin.BatchUpdateClusterResourceStateOutput{}, []plugin.BatchUpdateClusterResourceStateError{
+		{
+			OrgName: "3",
+		},
+		{
+			OrgName: "5",
+		},
+	}, nil)
+
+	mockController.reportClusterResourceStateUpdated(ctx, testOrgs, plugin.ClusterResourceStateProvisioned)
+	expectedCache := map[string]plugin.ClusterResourceState{
+		"0": plugin.ClusterResourceStateProvisioned,
+		"1": plugin.ClusterResourceStateProvisioned,
+		"2": plugin.ClusterResourceStateProvisioned,
+		"4": plugin.ClusterResourceStateProvisioned,
+	}
+	for i := 0; i < 6; i++ {
+		testOrg := strconv.Itoa(i)
+		if value, ok := expectedCache[testOrg]; ok {
+			value2, ok2 := mockController.clusterResourceStateReportCache.Load(testOrg)
+			assert.True(t, ok2)
+			assert.Equal(t, value, value2)
+		} else {
+			_, ok2 := mockController.clusterResourceStateReportCache.Load(testOrg)
+			assert.False(t, ok2)
+		}
 	}
 }
