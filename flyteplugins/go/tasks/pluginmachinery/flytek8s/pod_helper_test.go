@@ -1934,6 +1934,14 @@ func TestMergeWithBasePodTemplate(t *testing.T) {
 				Name: "bar",
 			},
 		},
+		InitContainers: []v1.Container{
+			v1.Container{
+				Name: "foo-init",
+			},
+			v1.Container{
+				Name: "foo-bar",
+			},
+		},
 	}
 
 	objectMeta := metav1.ObjectMeta{
@@ -1954,7 +1962,7 @@ func TestMergeWithBasePodTemplate(t *testing.T) {
 		tCtx.OnTaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, ""))
 		tCtx.OnTaskReader().Return(taskReader)
 
-		resultPodSpec, resultObjectMeta, err := MergeWithBasePodTemplate(context.TODO(), tCtx, &podSpec, &objectMeta, "foo")
+		resultPodSpec, resultObjectMeta, err := MergeWithBasePodTemplate(context.TODO(), tCtx, &podSpec, &objectMeta, "foo", "foo-init")
 		assert.Nil(t, err)
 		assert.True(t, reflect.DeepEqual(podSpec, *resultPodSpec))
 		assert.True(t, reflect.DeepEqual(objectMeta, *resultObjectMeta))
@@ -1964,6 +1972,11 @@ func TestMergeWithBasePodTemplate(t *testing.T) {
 		primaryContainerTemplate := v1.Container{
 			Name:                   primaryContainerTemplateName,
 			TerminationMessagePath: "/dev/primary-termination-log",
+		}
+
+		primaryInitContainerTemplate := v1.Container{
+			Name:                   primaryInitContainerTemplateName,
+			TerminationMessagePath: "/dev/primary-init-termination-log",
 		}
 
 		podTemplate := v1.PodTemplate{
@@ -1981,6 +1994,9 @@ func TestMergeWithBasePodTemplate(t *testing.T) {
 				Spec: v1.PodSpec{
 					Containers: []v1.Container{
 						primaryContainerTemplate,
+					},
+					InitContainers: []v1.Container{
+						primaryInitContainerTemplate,
 					},
 				},
 			},
@@ -2008,13 +2024,16 @@ func TestMergeWithBasePodTemplate(t *testing.T) {
 		tCtx.OnTaskExecutionMetadata().Return(dummyTaskExecutionMetadata(&v1.ResourceRequirements{}, nil, ""))
 		tCtx.OnTaskReader().Return(taskReader)
 
-		resultPodSpec, resultObjectMeta, err := MergeWithBasePodTemplate(context.TODO(), tCtx, &podSpec, &objectMeta, "foo")
+		resultPodSpec, resultObjectMeta, err := MergeWithBasePodTemplate(context.TODO(), tCtx, &podSpec, &objectMeta, "foo", "foo-init")
 		assert.Nil(t, err)
 
 		// test that template podSpec is merged
 		primaryContainer := resultPodSpec.Containers[0]
 		assert.Equal(t, podSpec.Containers[0].Name, primaryContainer.Name)
 		assert.Equal(t, primaryContainerTemplate.TerminationMessagePath, primaryContainer.TerminationMessagePath)
+		primaryInitContainer := resultPodSpec.InitContainers[0]
+		assert.Equal(t, podSpec.InitContainers[0].Name, primaryInitContainer.Name)
+		assert.Equal(t, primaryInitContainerTemplate.TerminationMessagePath, primaryInitContainer.TerminationMessagePath)
 
 		// test that template object metadata is copied
 		assert.Contains(t, resultObjectMeta.Labels, "fooKey")
@@ -2027,13 +2046,13 @@ func TestMergeWithBasePodTemplate(t *testing.T) {
 func TestMergePodSpecs(t *testing.T) {
 	var priority int32 = 1
 
-	podSpec1, _ := mergePodSpecs(nil, nil, "foo")
+	podSpec1, _ := mergePodSpecs(nil, nil, "foo", "foo-init")
 	assert.Nil(t, podSpec1)
 
-	podSpec2, _ := mergePodSpecs(&v1.PodSpec{}, nil, "foo")
+	podSpec2, _ := mergePodSpecs(&v1.PodSpec{}, nil, "foo", "foo-init")
 	assert.Nil(t, podSpec2)
 
-	podSpec3, _ := mergePodSpecs(nil, &v1.PodSpec{}, "foo")
+	podSpec3, _ := mergePodSpecs(nil, &v1.PodSpec{}, "foo", "foo-init")
 	assert.Nil(t, podSpec3)
 
 	podSpec := v1.PodSpec{
@@ -2049,6 +2068,20 @@ func TestMergePodSpecs(t *testing.T) {
 			},
 			v1.Container{
 				Name: "bar",
+			},
+		},
+		InitContainers: []v1.Container{
+			v1.Container{
+				Name: "primary-init",
+				VolumeMounts: []v1.VolumeMount{
+					{
+						Name:      "nccl",
+						MountPath: "abc",
+					},
+				},
+			},
+			v1.Container{
+				Name: "bar-init",
 			},
 		},
 		NodeSelector: map[string]string{
@@ -2076,10 +2109,24 @@ func TestMergePodSpecs(t *testing.T) {
 		TerminationMessagePath: "/dev/primary-termination-log",
 	}
 
+	defaultInitContainerTemplate := v1.Container{
+		Name:                   defaultInitContainerTemplateName,
+		TerminationMessagePath: "/dev/default-init-termination-log",
+	}
+
+	primaryInitContainerTemplate := v1.Container{
+		Name:                   primaryInitContainerTemplateName,
+		TerminationMessagePath: "/dev/primary-init-termination-log",
+	}
+
 	podTemplateSpec := v1.PodSpec{
 		Containers: []v1.Container{
 			defaultContainerTemplate,
 			primaryContainerTemplate,
+		},
+		InitContainers: []v1.Container{
+			defaultInitContainerTemplate,
+			primaryInitContainerTemplate,
 		},
 		HostNetwork: true,
 		NodeSelector: map[string]string{
@@ -2093,7 +2140,7 @@ func TestMergePodSpecs(t *testing.T) {
 		},
 	}
 
-	mergedPodSpec, err := mergePodSpecs(&podTemplateSpec, &podSpec, "primary")
+	mergedPodSpec, err := mergePodSpecs(&podTemplateSpec, &podSpec, "primary", "primary-init")
 	assert.Nil(t, err)
 
 	// validate a PodTemplate-only field
@@ -2117,6 +2164,17 @@ func TestMergePodSpecs(t *testing.T) {
 	defaultContainer := mergedPodSpec.Containers[1]
 	assert.Equal(t, podSpec.Containers[1].Name, defaultContainer.Name)
 	assert.Equal(t, defaultContainerTemplate.TerminationMessagePath, defaultContainer.TerminationMessagePath)
+
+	// validate primary init container
+	primaryInitContainer := mergedPodSpec.InitContainers[0]
+	assert.Equal(t, podSpec.InitContainers[0].Name, primaryInitContainer.Name)
+	assert.Equal(t, primaryInitContainerTemplate.TerminationMessagePath, primaryInitContainer.TerminationMessagePath)
+	assert.Equal(t, 1, len(primaryInitContainer.VolumeMounts))
+
+	// validate default init container
+	defaultInitContainer := mergedPodSpec.InitContainers[1]
+	assert.Equal(t, podSpec.InitContainers[1].Name, defaultInitContainer.Name)
+	assert.Equal(t, defaultInitContainerTemplate.TerminationMessagePath, defaultInitContainer.TerminationMessagePath)
 }
 
 func TestAddFlyteCustomizationsToContainer_SetConsoleUrl(t *testing.T) {
