@@ -145,20 +145,22 @@ class GetTaskResponse(_message.Message):
     def __init__(self, resource: _Optional[_Union[Resource, _Mapping]] = ...) -> None: ...
 
 class Resource(_message.Message):
-    __slots__ = ["state", "outputs", "message", "log_links", "phase", "custom_info"]
+    __slots__ = ["state", "outputs", "message", "log_links", "phase", "custom_info", "agent_error"]
     STATE_FIELD_NUMBER: _ClassVar[int]
     OUTPUTS_FIELD_NUMBER: _ClassVar[int]
     MESSAGE_FIELD_NUMBER: _ClassVar[int]
     LOG_LINKS_FIELD_NUMBER: _ClassVar[int]
     PHASE_FIELD_NUMBER: _ClassVar[int]
     CUSTOM_INFO_FIELD_NUMBER: _ClassVar[int]
+    AGENT_ERROR_FIELD_NUMBER: _ClassVar[int]
     state: State
     outputs: _literals_pb2.LiteralMap
     message: str
     log_links: _containers.RepeatedCompositeFieldContainer[_execution_pb2.TaskLog]
     phase: _execution_pb2.TaskExecution.Phase
     custom_info: _struct_pb2.Struct
-    def __init__(self, state: _Optional[_Union[State, str]] = ..., outputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., message: _Optional[str] = ..., log_links: _Optional[_Iterable[_Union[_execution_pb2.TaskLog, _Mapping]]] = ..., phase: _Optional[_Union[_execution_pb2.TaskExecution.Phase, str]] = ..., custom_info: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ...) -> None: ...
+    agent_error: AgentError
+    def __init__(self, state: _Optional[_Union[State, str]] = ..., outputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., message: _Optional[str] = ..., log_links: _Optional[_Iterable[_Union[_execution_pb2.TaskLog, _Mapping]]] = ..., phase: _Optional[_Union[_execution_pb2.TaskExecution.Phase, str]] = ..., custom_info: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ..., agent_error: _Optional[_Union[AgentError, _Mapping]] = ...) -> None: ...
 
 class DeleteTaskRequest(_message.Message):
     __slots__ = ["task_type", "resource_meta", "task_category"]
@@ -273,3 +275,21 @@ class GetTaskLogsResponse(_message.Message):
     header: GetTaskLogsResponseHeader
     body: GetTaskLogsResponseBody
     def __init__(self, header: _Optional[_Union[GetTaskLogsResponseHeader, _Mapping]] = ..., body: _Optional[_Union[GetTaskLogsResponseBody, _Mapping]] = ...) -> None: ...
+
+class AgentError(_message.Message):
+    __slots__ = ["code", "message", "kind", "origin"]
+    class Kind(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+        __slots__ = []
+        NON_RECOVERABLE: _ClassVar[AgentError.Kind]
+        RECOVERABLE: _ClassVar[AgentError.Kind]
+    NON_RECOVERABLE: AgentError.Kind
+    RECOVERABLE: AgentError.Kind
+    CODE_FIELD_NUMBER: _ClassVar[int]
+    MESSAGE_FIELD_NUMBER: _ClassVar[int]
+    KIND_FIELD_NUMBER: _ClassVar[int]
+    ORIGIN_FIELD_NUMBER: _ClassVar[int]
+    code: str
+    message: str
+    kind: AgentError.Kind
+    origin: _execution_pb2.ExecutionError.ErrorKind
+    def __init__(self, code: _Optional[str] = ..., message: _Optional[str] = ..., kind: _Optional[_Union[AgentError.Kind, str]] = ..., origin: _Optional[_Union[_execution_pb2.ExecutionError.ErrorKind, str]] = ...) -> None: ...
