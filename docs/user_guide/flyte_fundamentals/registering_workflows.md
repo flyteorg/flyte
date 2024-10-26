@@ -377,8 +377,6 @@ In case Flyte workflows are registered on each commit in your build pipelines, y
 
 - **Container Image Specification** : When managing multiple images across tasks within a Flyte workflow, use the `--image` flag during registration to specify which image to use. This avoids hardcoding the image within the task definition, promoting reusability and flexibility in workflows.
 
-- **Helm and GoReleaser for Packaging and Releasing**: Use Helm for managing Kubernetes package releases and GoReleaser for automating the release of Go applications. These tools streamline the packaging and distribution processes, making the CI/CD pipeline more robust and manageable. These are used in the `helm-release` and `manifest-release` jobs. 
-
 
 ## What's next?
 
