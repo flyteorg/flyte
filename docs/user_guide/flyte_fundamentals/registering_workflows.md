@@ -371,8 +371,6 @@ In case Flyte workflows are registered on each commit in your build pipelines, y
 
 - **Versioning Strategy** : Determining the version of the build for different types of commits makes them consistent and identifiable. For commits on feature branches, use `<branch-name>-<short-commit-hash>` and for the ones on main branches, use `main-<short-commit-hash>`. Use version numbers for the released (tagged) versions.
 
-- **Container Image Management** : With Docker or any other CRI-compliant engine, build and push images to maintain traceability and consistency across environments.
-
 - **Workflow Serialization and Registration** : Workflows should be serialized and registered based on the versioning of the build and the container image. Depending on whether the build is for a feature branch or main, the registration domain should be adjusted accordingly. For more context, please visit the [Registering workflows](https://docs.flyte.org/en/latest/user_guide/flyte_fundamentals/registering_workflows.html) page.
 
 - **Container Image Specification** : When managing multiple images across tasks within a Flyte workflow, use the `--image` flag during registration to specify which image to use. This avoids hardcoding the image within the task definition, promoting reusability and flexibility in workflows.
