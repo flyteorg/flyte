@@ -186,20 +186,19 @@ The first task reads a file from the object store, shuffles the data, saves to l
 
 .. code-block:: python
 
-    @task()
-    def task_remove_column(input_file: FlyteFile, column_name: str) -> FlyteFile:
+    @task(container_image=basic_image, cache=True, cache_version="1.0")
+    def task_read_and_shuffle_file(input_file: FlyteFile) -> FlyteFile:
         """
-        Reads the input file as a DataFrame, removes a specified column, and outputs it as a new file.
+        Reads the input file as a DataFrame, shuffles the rows, and writes the shuffled DataFrame to a new file.
         """
         input_file.download()
         df = pd.read_csv(input_file.path)
 
-        # remove column
-        if column_name in df.columns:
-            df = df.drop(columns=[column_name])
+        # Shuffle the DataFrame rows
+        shuffled_df = df.sample(frac=1).reset_index(drop=True)
 
-        output_file_path = "data_finished.csv"
-        df.to_csv(output_file_path, index=False)
+        output_file_path = "data_shuffle.csv"
+        shuffled_df.to_csv(output_file_path, index=False)
 
         return FlyteFile(output_file_path)
        ...
