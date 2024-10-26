@@ -115,6 +115,38 @@ def task2() -> int:
 ## Install CUDA in the image
 There are few ways to install CUDA in the image.
 
+### Use cuda and cudnn parameters in `ImageSpec`.
+Specifying CUDA and cuDNN versions in ImageSpec.
+```python
+from flytekit import task, workflow
+from flytekit.image_spec import ImageSpec
+
+new_flytekit = "git+https://github.com/flyteorg/flytekit@8c7c43ad310ec74b4e8c06c2b4604b6cb9692f86"
+image_spec = ImageSpec(
+  base_image="ubuntu20.04",
+  packages=[new_flytekit], 
+  cuda="11.2.2", 
+  cudnn="8",
+  registry="pingsutw",
+  apt_packages=["git"], 
+  python_version="3.9",
+)
+```
+
+### Use requirements.txt File in `ImageSpec`.
+Including dependencies from a requirements.txt file using the requirements parameter.
+```python
+from flytekit import task, workflow, ImageSpec
+
+new_flytekit = "git+https://github.com/flyteorg/flytekit@01f2d63221467face8d35ed0af5308bbb3e66eaa"
+image = ImageSpec(
+  registry="pingsutw", 
+  packages=["pandas", new_flytekit], 
+  apt_packages=["git"], 
+  requirements="requirement.txt"
+)
+```
+
 ### Use Nvidia docker image
 CUDA is pre-installed in the Nvidia docker image. You can specify the base image in the `ImageSpec`.
 ```python
