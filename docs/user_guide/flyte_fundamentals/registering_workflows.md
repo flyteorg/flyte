@@ -366,13 +366,47 @@ two GitHub actions that facilitates this:
   `pyflyte package`.
 
 ## Best practices for CI/CD
-
+In case your development process registers Flyte workflows on each commit, consider the following recommendations
 - **Using a consistent versioning strategy**: Use a consistent versioning strategy across different types of commits (feature branches, main, released versions) to ensure that versions are unique and identifiable.
 - **Use a combination of branch name and commit hash for versioning** : Using a combination of branch name and short commit hash (e.g. <branch-name>-<short-commit-hash>) provides a unique and descriptive version identifier for feature branches.
 - **Employ a standard naming scheme for the main and released versions** : This will provide uniformity and clarity. For example, main-<short-commit-hash> for the main version and <version-number> for the released versions.
-- **Automate the process of deployment and build** : The consistent and dependable building and pushing of the Docker image and the registration of the Flyte processes are guaranteed by automating the build and deployment process.
+- **Automate the process of deployment and build** : The consistent and dependable building and pushing of the Docker image and the registration of the Flyte processes are guaranteed by automating the build and deployment process.For example, you can use a GitHub Actions workflow to automate the build and deployment process.
+```
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Build and push Docker image
+        run: |
+          docker build -t my-image .
+          docker tag my-image:latest my-image:v1.0
+          docker push my-image:v1.0
+      - name: Register Flyte workflow
+        run: |
+          flyte register --image my-image:v1.0 --version v1.0
+
+```
 - **Adapt the registration domain to the commit type** : Workflows are registered in the appropriate environment when the registration domain is modified according to the kind of commit (feature branch, main, or released version).
-- **Adopt a uniform strategy for registration and serialization** : Flyte workflows are serialized and registered using a defined process, which guarantees consistent and dependable workflow registration.
+- **Adopt a uniform strategy for registration and serialization** : Flyte workflows are serialized and registered using a defined process, which guarantees consistent and dependable workflow registration.For example, you can use the flyte register command to register workflows, and use a consistent naming convention for workflow versions.
+```
+import flyte
+
+# Define a function to register a workflow
+def register_workflow(workflow_name, version):
+    flyte.register('dev', workflow_name, version)
+
+# Register a workflow
+register_workflow('my-workflow', 'v1.0')
+```
 
 ## What's next?
 
