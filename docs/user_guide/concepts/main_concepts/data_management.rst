@@ -186,7 +186,7 @@ The first task reads a file from the object store, shuffles the data, saves to l
 
 .. code-block:: python
 
-    @task(container_image=basic_image, cache=True, cache_version="1.0")
+    @task()
     def task_read_and_shuffle_file(input_file: FlyteFile) -> FlyteFile:
         """
         Reads the input file as a DataFrame, shuffles the rows, and writes the shuffled DataFrame to a new file.
