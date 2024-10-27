@@ -47,7 +47,13 @@ queueconfig:
 ```
 
 // TODO how this yaml maps yunikorn configuration 
-// TODO how this yaml maps kueue CRD
+ResourceFlavor allocate resource based on labels which indicates thant category resource allocatiom by org label is available.
+So a clusterQueue including multiple resources is a total acessaible resource for a org.  
+| clusterQueue | localQueue |
+| --- | --- |
+| Org | ray、spark、default |
+A tenant can submit org task to queue such org.ray, org.spark and org.default to trace what job types are submitable. 
+
 
 A SchedulerConfigManager maintains config from mentioned yaml.
 It patch labels or annotations of k8s resources after they pass rules in config.
