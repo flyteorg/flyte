@@ -190,7 +190,7 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob plugins.Ra
 	}
 
 	serviceAccountName := flytek8s.GetServiceAccountNameFromTaskExecutionMetadata(taskCtx.TaskExecutionMetadata())
-	if len(serviceAccountName) == 0 {
+	if len(serviceAccountName) == 0 || cfg.ServiceAccount != "" {
 		serviceAccountName = cfg.ServiceAccount
 	}
 
