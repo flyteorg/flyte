@@ -10,7 +10,6 @@ import (
 	c "github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/errors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/typing"
-	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 func validateBinding(w c.WorkflowBuilder, node c.Node, nodeParam string, binding *flyte.BindingData,
@@ -132,7 +131,7 @@ func validateBinding(w c.WorkflowBuilder, node c.Node, nodeParam string, binding
 				// If the variable has an index. We expect param to be a collection.
 				if v.Index != nil {
 					if cType := param.GetType().GetCollectionType(); cType == nil {
-						errs.Collect(errors.NewMismatchingVariablesErr(nodeID, outputVar, utils.LiteralTypeToStr(param.Type), inputVar, utils.LiteralTypeToStr(expectedType)))
+						errs.Collect(errors.NewMismatchingVariablesErr(nodeID, outputVar, c.LiteralTypeToStr(param.Type), inputVar, c.LiteralTypeToStr(expectedType)))
 					} else {
 						sourceType = cType
 					}
@@ -165,7 +164,7 @@ func validateBinding(w c.WorkflowBuilder, node c.Node, nodeParam string, binding
 					return param.GetType(), []c.NodeID{val.Promise.NodeId}, true
 				}
 
-				errs.Collect(errors.NewMismatchingVariablesErr(node.GetId(), outputVar, utils.LiteralTypeToStr(sourceType), inputVar, utils.LiteralTypeToStr(expectedType)))
+				errs.Collect(errors.NewMismatchingVariablesErr(node.GetId(), outputVar, c.LiteralTypeToStr(sourceType), inputVar, c.LiteralTypeToStr(expectedType)))
 				return nil, nil, !errs.HasErrors()
 			}
 		}
@@ -181,7 +180,7 @@ func validateBinding(w c.WorkflowBuilder, node c.Node, nodeParam string, binding
 		if literalType == nil {
 			errs.Collect(errors.NewUnrecognizedValueErr(nodeID, reflect.TypeOf(val.Scalar.GetValue()).String()))
 		} else if validateParamTypes && !AreTypesCastable(literalType, expectedType) {
-			errs.Collect(errors.NewMismatchingTypesErr(nodeID, nodeParam, utils.LiteralTypeToStr(literalType), utils.LiteralTypeToStr(expectedType)))
+			errs.Collect(errors.NewMismatchingTypesErr(nodeID, nodeParam, c.LiteralTypeToStr(literalType), c.LiteralTypeToStr(expectedType)))
 		}
 
 		if expectedType.GetEnumType() != nil {

@@ -9,7 +9,6 @@ require (
 	github.com/ernesto-jimenez/gogen v0.0.0-20180125220232-d7d4131e6607
 	github.com/fatih/color v1.13.0
 	github.com/fatih/structtag v1.2.0
-	github.com/flyteorg/flyte/flyteidl v0.0.0-00010101000000-000000000000
 	github.com/flyteorg/stow v0.3.10
 	github.com/fsnotify/fsnotify v1.6.0
 	github.com/ghodss/yaml v1.0.0
@@ -154,7 +153,6 @@ require (
 replace (
 	github.com/flyteorg/flyte/datacatalog => ../datacatalog
 	github.com/flyteorg/flyte/flyteadmin => ../flyteadmin
-	github.com/flyteorg/flyte/flyteidl => ../flyteidl
 	github.com/flyteorg/flyte/flyteplugins => ../flyteplugins
 	github.com/flyteorg/flyte/flytepropeller => ../flytepropeller
 	github.com/flyteorg/flyte/flytestdlib => ../flytestdlib

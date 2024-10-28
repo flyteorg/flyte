@@ -7,7 +7,6 @@ require (
 	github.com/flyteorg/flyte/flyteadmin v0.0.0-00010101000000-000000000000
 	github.com/flyteorg/flyte/flytepropeller v0.0.0-00010101000000-000000000000
 	github.com/flyteorg/flyte/flytestdlib v0.0.0-00010101000000-000000000000
-	github.com/flyteorg/flytectl v0.0.0-00010101000000-000000000000
 	github.com/golang/glog v1.2.0
 	github.com/prometheus/client_golang v1.20.5
 	github.com/spf13/cobra v1.7.0
@@ -25,7 +24,7 @@ require (
 	cloud.google.com/go/storage v1.36.0 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.13.0 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.7.0 // indirect
-	github.com/Azure/azure-sdk-for-go/sdk/internal v1.10.0 // indirect
+	github.com/Azure/azure-sdk--forgo/sdk/internal v1.10.0 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v1.4.0 // indirect
 	github.com/Azure/go-ansiterm v0.0.0-20210617225240-d185dfc1b5a1 // indirect
 	github.com/AzureAD/microsoft-authentication-library-for-go v1.2.2 // indirect
@@ -291,7 +290,6 @@ replace (
 	github.com/flyteorg/flyte/flyteplugins => ./flyteplugins
 	github.com/flyteorg/flyte/flytepropeller => ./flytepropeller
 	github.com/flyteorg/flyte/flytestdlib => ./flytestdlib
-	github.com/flyteorg/flytectl => ./flytectl
 	github.com/google/gnostic-models => github.com/google/gnostic-models v0.6.8
 	github.com/robfig/cron/v3 => github.com/unionai/cron/v3 v3.0.2-0.20220915080349-5790c370e63a
 	k8s.io/api => k8s.io/api v0.28.2

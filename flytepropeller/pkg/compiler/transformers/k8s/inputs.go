@@ -7,7 +7,6 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/errors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/validators"
-	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 func validateInputs(nodeID common.NodeID, iface *core.TypedInterface, inputs core.LiteralMap, errs errors.CompileErrors) (ok bool) {
@@ -43,7 +42,7 @@ func validateInputs(nodeID common.NodeID, iface *core.TypedInterface, inputs cor
 			continue
 		}
 		if !validators.AreTypesCastable(inputType, v.Type) {
-			errs.Collect(errors.NewMismatchingTypesErr(nodeID, inputVar, utils.LiteralTypeToStr(v.Type), utils.LiteralTypeToStr(inputType)))
+			errs.Collect(errors.NewMismatchingTypesErr(nodeID, inputVar, common.LiteralTypeToStr(v.Type), common.LiteralTypeToStr(inputType)))
 			continue
 		}
 
