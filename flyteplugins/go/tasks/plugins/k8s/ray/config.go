@@ -22,11 +22,11 @@ var (
 		IncludeDashboard:         true,
 		DashboardHost:            "0.0.0.0",
 		EnableUsageStats:         false,
-		ServiceAccount:           "default",
+		ServiceAccount:           "",
 		Defaults: DefaultConfig{
 			HeadNode: NodeConfig{
 				StartParameters: map[string]string{
-					// Disable usage reporting by default: https://docs.ray.io/en/latest/cluster/usage-stats.html
+					// Disable usage reporting by default: https://docs.ray.io/en/latest/cluster/deusage-stats.html
 					DisableUsageStatsStartParameter: "true",
 				},
 				IPAddress: "$MY_POD_IP",
