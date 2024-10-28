@@ -49,7 +49,6 @@ require (
 
 require (
 	cloud.google.com/go v0.112.0 // indirect
-	cloud.google.com/go/compute v1.23.3 // indirect
 	cloud.google.com/go/compute/metadata v0.3.0 // indirect
 	cloud.google.com/go/iam v1.1.5 // indirect
 	cloud.google.com/go/storage v1.36.0 // indirect
@@ -141,7 +140,6 @@ require (
 	github.com/prometheus/procfs v0.15.1 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
-	github.com/shamaton/msgpack/v2 v2.2.2 // indirect
 	github.com/spf13/afero v1.9.2 // indirect
 	github.com/spf13/cast v1.4.1 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
@@ -169,7 +167,6 @@ require (
 	golang.org/x/term v0.22.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
 	google.golang.org/api v0.155.0 // indirect
-	google.golang.org/appengine v1.6.8 // indirect
 	google.golang.org/genproto v0.0.0-20240123012728-ef4313101c80 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20240123012728-ef4313101c80 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240123012728-ef4313101c80 // indirect

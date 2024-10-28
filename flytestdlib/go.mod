@@ -21,7 +21,7 @@ require (
 	github.com/magiconair/properties v1.8.6
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/pkg/errors v0.9.1
-	github.com/prometheus/client_golang v1.19.1
+	github.com/prometheus/client_golang v1.19.1-0.20240620110541-bccd68204bf4
 	github.com/prometheus/common v0.53.0
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/cobra v1.7.0
@@ -99,6 +99,7 @@ require (
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
+	github.com/klauspost/compress v1.17.8 // indirect
 	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-colorable v0.1.12 // indirect
