@@ -1,4 +1,5 @@
-FROM alpine:3.13.5 AS base
+FROM alpine:latest AS base
+
 
 # Install dependencies
 RUN apk add --no-cache openssl
