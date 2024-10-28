@@ -2,6 +2,7 @@ package validators
 
 import (
 	"fmt"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 	"reflect"
 
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -131,7 +132,7 @@ func validateBinding(w c.WorkflowBuilder, node c.Node, nodeParam string, binding
 				// If the variable has an index. We expect param to be a collection.
 				if v.Index != nil {
 					if cType := param.GetType().GetCollectionType(); cType == nil {
-						errs.Collect(errors.NewMismatchingVariablesErr(nodeID, outputVar, param.Type.String(), inputVar, expectedType.String()))
+						errs.Collect(errors.NewMismatchingVariablesErr(nodeID, outputVar, utils.LiteralTypeToStr(param.Type), inputVar, utils.LiteralTypeToStr(expectedType)))
 					} else {
 						sourceType = cType
 					}
@@ -164,7 +165,7 @@ func validateBinding(w c.WorkflowBuilder, node c.Node, nodeParam string, binding
 					return param.GetType(), []c.NodeID{val.Promise.NodeId}, true
 				}
 
-				errs.Collect(errors.NewMismatchingVariablesErr(node.GetId(), outputVar, sourceType.String(), inputVar, expectedType.String()))
+				errs.Collect(errors.NewMismatchingVariablesErr(node.GetId(), outputVar, utils.LiteralTypeToStr(sourceType), inputVar, utils.LiteralTypeToStr(expectedType)))
 				return nil, nil, !errs.HasErrors()
 			}
 		}
@@ -180,7 +181,7 @@ func validateBinding(w c.WorkflowBuilder, node c.Node, nodeParam string, binding
 		if literalType == nil {
 			errs.Collect(errors.NewUnrecognizedValueErr(nodeID, reflect.TypeOf(val.Scalar.GetValue()).String()))
 		} else if validateParamTypes && !AreTypesCastable(literalType, expectedType) {
-			errs.Collect(errors.NewMismatchingTypesErr(nodeID, nodeParam, literalType.String(), expectedType.String()))
+			errs.Collect(errors.NewMismatchingTypesErr(nodeID, nodeParam, utils.LiteralTypeToStr(literalType), utils.LiteralTypeToStr(expectedType)))
 		}
 
 		if expectedType.GetEnumType() != nil {

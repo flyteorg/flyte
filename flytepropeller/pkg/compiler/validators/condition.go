@@ -2,6 +2,7 @@ package validators
 
 import (
 	"fmt"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 
 	flyte "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	c "github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
@@ -44,7 +45,7 @@ func ValidateBooleanExpression(w c.WorkflowBuilder, node c.NodeBuilder, expr *fl
 			if op1Valid && op2Valid && op1Type != nil && op2Type != nil {
 				if op1Type.String() != op2Type.String() {
 					errs.Collect(errors.NewMismatchingTypesErr(node.GetId(), "RightValue",
-						op1Type.String(), op2Type.String()))
+						utils.LiteralTypeToStr(op1Type), utils.LiteralTypeToStr(op2Type)))
 				}
 			}
 		} else if expr.GetConjunction() != nil {

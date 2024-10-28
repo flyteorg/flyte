@@ -4,6 +4,7 @@ import (
 	flyte "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	c "github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/errors"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 func validateOutputVar(n c.NodeBuilder, paramName string, errs errors.CompileErrors) (
@@ -40,7 +41,7 @@ func validateInputVar(n c.NodeBuilder, paramName string, requireParamType bool, 
 func validateVarType(nodeID c.NodeID, paramName string, param *flyte.Variable,
 	expectedType *flyte.LiteralType, errs errors.CompileErrors) (ok bool) {
 	if param.GetType().String() != expectedType.String() {
-		errs.Collect(errors.NewMismatchingTypesErr(nodeID, paramName, param.GetType().String(), expectedType.String()))
+		errs.Collect(errors.NewMismatchingTypesErr(nodeID, paramName, utils.LiteralTypeToStr(param.GetType()), utils.LiteralTypeToStr(expectedType)))
 	}
 
 	return !errs.HasErrors()
