@@ -2,8 +2,9 @@ package validators
 
 import (
 	"fmt"
-	"github.com/flyteorg/flyte/flytestdlib/utils"
 	"reflect"
+
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 
 	"k8s.io/apimachinery/pkg/util/sets"
 

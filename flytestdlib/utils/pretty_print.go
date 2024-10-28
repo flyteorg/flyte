@@ -2,8 +2,9 @@ package utils
 
 import (
 	"fmt"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"strings"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 func LiteralTypeToStr(lt *core.LiteralType) string {
