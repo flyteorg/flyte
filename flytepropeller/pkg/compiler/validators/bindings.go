@@ -4,14 +4,13 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/flyteorg/flyte/flytestdlib/utils"
-
 	"k8s.io/apimachinery/pkg/util/sets"
 
 	flyte "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	c "github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/errors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/typing"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 func validateBinding(w c.WorkflowBuilder, node c.Node, nodeParam string, binding *flyte.BindingData,
