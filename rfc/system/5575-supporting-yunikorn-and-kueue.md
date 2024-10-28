@@ -46,7 +46,11 @@ queueconfig:
       namespaces: "*"
 ```
 
-// TODO how this yaml maps yunikorn configuration 
+Mentioned configuration indicates what queues exist for an org.
+Hierachy queues will be like following.
+root.org1.ray、root.org1.spark and root.org1.default allowing summission from ns1 and ns1 namespace.
+root.org2."CRDs" and root.org2.default allowing summission from any namespaces.
+
 ResourceFlavor allocate resource based on labels which indicates thant category resource allocatiom by org label is available.
 So a clusterQueue including multiple resources is a total acessaible resource for a org.  
 | clusterQueue | localQueue |
@@ -82,7 +86,7 @@ In the other hand, results of these examples are "org1-ray" and "org1-ns1" when 
 
 ## 5 Drawbacks
 
-This appoarch doens't provide a way to keep consistent between the accuate resource quato of each each group and  configuration in scheduler.
+This appoarch doens't provide a way to keep consistent between the accuate resource quato of groups and configuration in scheduler.
 
 ## 6 Alternatives
 
@@ -99,6 +103,7 @@ In the other hand, Kueue currently doesn't support Spark CRD.
 | Kubeflow | x | v |
 
 ## 8 Unresolved questions
+
 
 ## 9 Conclusion
 
