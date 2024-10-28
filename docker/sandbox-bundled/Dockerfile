@@ -1,7 +1,9 @@
 # syntax=docker/dockerfile:1.4-labs
+
 FROM --platform=${BUILDPLATFORM} mgoltzsche/podman:minimal AS builder
 
-ARG TARGETARCH
+# Set architecture with a default fallback
+ARG TARGETARCH=amd64
 ENV TARGETARCH "${TARGETARCH}"
 
 WORKDIR /build
@@ -18,6 +20,8 @@ ENV GOARCH "${TARGETARCH}"
 ENV GOOS linux
 
 WORKDIR /flyteorg/build
+
+# Separate dependency caching step for go modules
 COPY bootstrap/go.mod bootstrap/go.sum ./
 RUN go mod download
 COPY bootstrap/ ./
@@ -37,12 +41,10 @@ COPY images/tar/${TARGETARCH}/ /var/lib/rancher/k3s/agent/images/
 COPY manifests/ /var/lib/rancher/k3s/server/manifests-staging/
 COPY bin/ /bin/
 
-# Install bootstrap
 COPY --from=bootstrap /flyteorg/build/dist/flyte-sandbox-bootstrap /bin/
 
 VOLUME /var/lib/flyte/storage
 
-# Set environment variable for picking up additional CA certificates
 ENV SSL_CERT_DIR /var/lib/flyte/config/ca-certificates
 
 ENTRYPOINT [ "/bin/k3d-entrypoint.sh" ]
