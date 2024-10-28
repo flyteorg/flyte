@@ -88,6 +88,16 @@ This appoarch doens't provide a way to keep consistent between the accuate resou
 
 ## 7 Potential Impact and Dependencies
 
+Flyte support spark, ray and kubeflow CRD including pytorch and tfjobs.
+Spark and Ray operator have been support Yunikorn gang scheduling after taskgroup calculation is implemented in these operators.
+Taskgroup caclucation implementation in pods aspect in flyte or kubeflow is required for supporting kubeflow CRDs.
+In the other hand, Kueue currently doesn't support Spark CRD.
+| Operator | Yunikorn | Kueue |
+| --- | --- | --- |
+| Spark | v | x |
+| Ray | v | v |
+| Kubeflow | x | v |
+
 ## 8 Unresolved questions
 
 ## 9 Conclusion
