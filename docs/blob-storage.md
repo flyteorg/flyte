@@ -16,4 +16,4 @@ Flyte’s interaction with blob storage occurs through several key components an
 5. Customization and Flexibility:
    - Since Flyte supports a variety of environments, customizing storage access patterns may involve configuring the FlyteAdmin service and plugins. This ensures compatibility across clouds and storage systems beyond the defaults.
 
-These components come together to ensure data flows securely and efficiently between Flyte services and storage endpoints. For a deeper dive, including the internal logic of FlyteAdmin and details about `pyflyte`, you can explore Flyte’s official documentation on [FlyteAdmin API interaction](https://docs.flyte.org/en/latest/concepts/data_management.html) and the command-line reference for `pyflyte` and `flytectl` commands【8】【9】.
+These components come together to ensure data flows securely and efficiently between Flyte services and storage endpoints. For a deeper dive, including the internal logic of FlyteAdmin and details about `pyflyte`, you can explore Flyte’s official documentation on [FlyteAdmin API interaction](https://docs.flyte.org/en/latest/concepts/data_management.html).
