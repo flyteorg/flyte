@@ -64,13 +64,35 @@ A SchedulerConfigManager maintains config from mentioned yaml.
 It patches labels or annotations on k8s resources after they pass rules specified in the configuration.
 
 ```go
+type SchedulerHelper interface {
+  Patch(obj client.object) (error, string)
+  GangScheduling(string) error
+}
+
+type PodLabels struct {
+  PodName string
+  labels map[string]string
+  annotations map[string]string
+}
+```
+Creat a scheduler helper according to the queueconfig.scheduler.
+Its basic responsibility validate whether submitted application is accepted. 
+When a Yunikorn scheduler helper created, it will create applicationID、queue name and preemption labels .
+in the other hand, a Kueue scheduler helper constructs labels including localQueueName, preemption.
+
+```go
 func (e *PluginManager) launchResource(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (pluginsCore.Transition, error) {
   o, err := e.plugin.BuildResource(ctx, k8sTaskCtx)
 	if err != nil {
 		return pluginsCore.UnknownTransition, err
 	}
-  if err := e.SchedulerConfigManager.Patch(o); err != nil {
-    return pluginsCore.UnknownTransition, err
+  if 
+  if err, jobtype := e.SchedulerHelper.Patch(o); err == nil {
+    if e.SchedulerHelper.GangScheduling(jobtype, o); err != nil {
+       return pluginsCore.UnknownTransition, err
+    }
+  } else {
+     return pluginsCore.UnknownTransition, err
   }
 }
 ```
