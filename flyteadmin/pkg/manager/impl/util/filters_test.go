@@ -179,7 +179,7 @@ func TestGetWorkflowExecutionIdentifierFilters(t *testing.T) {
 			Project: "ex project",
 			Domain:  "ex domain",
 			Name:    "ex name",
-		})
+		}, common.Execution)
 	assert.Nil(t, err)
 
 	assert.Len(t, identifierFilters, 4)
@@ -215,32 +215,32 @@ func TestGetNodeExecutionIdentifierFilters(t *testing.T) {
 				Name:    "ex name",
 			},
 			NodeId: "nodey",
-		})
+		}, common.TaskExecution)
 	assert.Nil(t, err)
 
 	assert.Len(t, identifierFilters, 5)
 
-	assert.Equal(t, common.Execution, identifierFilters[0].GetEntity())
+	assert.Equal(t, common.TaskExecution, identifierFilters[0].GetEntity())
 	queryExpr, _ := identifierFilters[0].GetGormQueryExpr()
 	assert.Equal(t, "ex org", queryExpr.Args)
 	assert.Equal(t, "execution_org = ?", queryExpr.Query)
 
-	assert.Equal(t, common.Execution, identifierFilters[1].GetEntity())
+	assert.Equal(t, common.TaskExecution, identifierFilters[1].GetEntity())
 	queryExpr, _ = identifierFilters[1].GetGormQueryExpr()
 	assert.Equal(t, "ex project", queryExpr.Args)
 	assert.Equal(t, "execution_project = ?", queryExpr.Query)
 
-	assert.Equal(t, common.Execution, identifierFilters[2].GetEntity())
+	assert.Equal(t, common.TaskExecution, identifierFilters[2].GetEntity())
 	queryExpr, _ = identifierFilters[2].GetGormQueryExpr()
 	assert.Equal(t, "ex domain", queryExpr.Args)
 	assert.Equal(t, "execution_domain = ?", queryExpr.Query)
 
-	assert.Equal(t, common.Execution, identifierFilters[3].GetEntity())
+	assert.Equal(t, common.TaskExecution, identifierFilters[3].GetEntity())
 	queryExpr, _ = identifierFilters[3].GetGormQueryExpr()
 	assert.Equal(t, "ex name", queryExpr.Args)
 	assert.Equal(t, "execution_name = ?", queryExpr.Query)
 
-	assert.Equal(t, common.NodeExecution, identifierFilters[4].GetEntity())
+	assert.Equal(t, common.TaskExecution, identifierFilters[4].GetEntity())
 	queryExpr, _ = identifierFilters[4].GetGormQueryExpr()
 	assert.Equal(t, "nodey", queryExpr.Args)
 	assert.Equal(t, "node_id = ?", queryExpr.Query)

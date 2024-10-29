@@ -787,22 +787,22 @@ func TestListNodeExecutionsLevelZero(t *testing.T) {
 			assert.Equal(t, 2, input.Offset)
 			assert.Len(t, input.InlineFilters, 4)
 
-			assert.Equal(t, common.Execution, input.InlineFilters[0].GetEntity())
+			assert.Equal(t, common.NodeExecution, input.InlineFilters[0].GetEntity())
 			queryExpr, _ := input.InlineFilters[0].GetGormQueryExpr()
 			assert.Equal(t, "org", queryExpr.Args)
 			assert.Equal(t, "execution_org = ?", queryExpr.Query)
 
-			assert.Equal(t, common.Execution, input.InlineFilters[1].GetEntity())
+			assert.Equal(t, common.NodeExecution, input.InlineFilters[1].GetEntity())
 			queryExpr, _ = input.InlineFilters[1].GetGormQueryExpr()
 			assert.Equal(t, "project", queryExpr.Args)
 			assert.Equal(t, "execution_project = ?", queryExpr.Query)
 
-			assert.Equal(t, common.Execution, input.InlineFilters[2].GetEntity())
+			assert.Equal(t, common.NodeExecution, input.InlineFilters[2].GetEntity())
 			queryExpr, _ = input.InlineFilters[2].GetGormQueryExpr()
 			assert.Equal(t, "domain", queryExpr.Args)
 			assert.Equal(t, "execution_domain = ?", queryExpr.Query)
 
-			assert.Equal(t, common.Execution, input.InlineFilters[3].GetEntity())
+			assert.Equal(t, common.NodeExecution, input.InlineFilters[3].GetEntity())
 			queryExpr, _ = input.InlineFilters[3].GetGormQueryExpr()
 			assert.Equal(t, "name", queryExpr.Args)
 			assert.Equal(t, "execution_name = ?", queryExpr.Query)
@@ -813,6 +813,10 @@ func TestListNodeExecutionsLevelZero(t *testing.T) {
 				"parent_id":                nil,
 				"parent_task_execution_id": nil,
 			}, filter)
+
+			assert.EqualValues(t, input.JoinTableEntities, map[common.Entity]bool{
+				common.NodeExecution: true,
+			})
 
 			assert.Equal(t, "execution_domain asc", input.SortParameter.GetGormOrderExpr())
 			return interfaces.NodeExecutionCollectionOutput{
@@ -917,22 +921,22 @@ func TestListNodeExecutionsWithParent(t *testing.T) {
 			assert.Equal(t, 2, input.Offset)
 			assert.Len(t, input.InlineFilters, 5)
 
-			assert.Equal(t, common.Execution, input.InlineFilters[0].GetEntity())
+			assert.Equal(t, common.NodeExecution, input.InlineFilters[0].GetEntity())
 			queryExpr, _ := input.InlineFilters[0].GetGormQueryExpr()
 			assert.Equal(t, "org", queryExpr.Args)
 			assert.Equal(t, "execution_org = ?", queryExpr.Query)
 
-			assert.Equal(t, common.Execution, input.InlineFilters[1].GetEntity())
+			assert.Equal(t, common.NodeExecution, input.InlineFilters[1].GetEntity())
 			queryExpr, _ = input.InlineFilters[1].GetGormQueryExpr()
 			assert.Equal(t, "project", queryExpr.Args)
 			assert.Equal(t, "execution_project = ?", queryExpr.Query)
 
-			assert.Equal(t, common.Execution, input.InlineFilters[2].GetEntity())
+			assert.Equal(t, common.NodeExecution, input.InlineFilters[2].GetEntity())
 			queryExpr, _ = input.InlineFilters[2].GetGormQueryExpr()
 			assert.Equal(t, "domain", queryExpr.Args)
 			assert.Equal(t, "execution_domain = ?", queryExpr.Query)
 
-			assert.Equal(t, common.Execution, input.InlineFilters[3].GetEntity())
+			assert.Equal(t, common.NodeExecution, input.InlineFilters[3].GetEntity())
 			queryExpr, _ = input.InlineFilters[3].GetGormQueryExpr()
 			assert.Equal(t, "name", queryExpr.Args)
 			assert.Equal(t, "execution_name = ?", queryExpr.Query)
@@ -982,6 +986,139 @@ func TestListNodeExecutionsWithParent(t *testing.T) {
 		UniqueParentId: "parent_1",
 	})
 	assert.Nil(t, err)
+	assert.Len(t, nodeExecutions.NodeExecutions, 1)
+	assert.True(t, proto.Equal(&admin.NodeExecution{
+		Id: &core.NodeExecutionIdentifier{
+			NodeId: "node id",
+			ExecutionId: &core.WorkflowExecutionIdentifier{
+				Org:     org,
+				Project: "project",
+				Domain:  "domain",
+				Name:    "name",
+			},
+		},
+		InputUri: "input uri",
+		Closure:  &expectedClosure,
+		Metadata: &expectedMetadata,
+	}, nodeExecutions.NodeExecutions[0]))
+	assert.Equal(t, "3", nodeExecutions.Token)
+}
+
+func TestListNodeExecutions_WithJoinTableFilter(t *testing.T) {
+	repository := repositoryMocks.NewMockRepository()
+	expectedClosure := admin.NodeExecutionClosure{
+		Phase: core.NodeExecution_SUCCEEDED,
+	}
+	expectedMetadata := admin.NodeExecutionMetaData{
+		SpecNodeId: "spec_node_id",
+		RetryGroup: "retry_group",
+	}
+	metadataBytes, _ := proto.Marshal(&expectedMetadata)
+	closureBytes, _ := proto.Marshal(&expectedClosure)
+
+	repository.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).SetListCallback(
+		func(ctx context.Context, input interfaces.ListResourceInput) (
+			interfaces.NodeExecutionCollectionOutput, error) {
+			assert.Equal(t, 1, input.Limit)
+			assert.Equal(t, 2, input.Offset)
+			assert.Len(t, input.InlineFilters, 5)
+
+			assert.Equal(t, common.NodeExecution, input.InlineFilters[0].GetEntity())
+			queryExpr, _ := input.InlineFilters[0].GetGormQueryExpr()
+			assert.Equal(t, "org", queryExpr.Args)
+			assert.Equal(t, "execution_org = ?", queryExpr.Query)
+
+			assert.Equal(t, common.NodeExecution, input.InlineFilters[1].GetEntity())
+			queryExpr, _ = input.InlineFilters[1].GetGormQueryExpr()
+			assert.Equal(t, "project", queryExpr.Args)
+			assert.Equal(t, "execution_project = ?", queryExpr.Query)
+
+			assert.Equal(t, common.NodeExecution, input.InlineFilters[2].GetEntity())
+			queryExpr, _ = input.InlineFilters[2].GetGormQueryExpr()
+			assert.Equal(t, "domain", queryExpr.Args)
+			assert.Equal(t, "execution_domain = ?", queryExpr.Query)
+
+			assert.Equal(t, common.NodeExecution, input.InlineFilters[3].GetEntity())
+			queryExpr, _ = input.InlineFilters[3].GetGormQueryExpr()
+			assert.Equal(t, "name", queryExpr.Args)
+			assert.Equal(t, "execution_name = ?", queryExpr.Query)
+
+			assert.Equal(t, common.Execution, input.InlineFilters[4].GetEntity())
+			queryExpr, _ = input.InlineFilters[4].GetGormQueryExpr()
+			assert.Equal(t, "SUCCEEDED", queryExpr.Args)
+			assert.Equal(t, "phase = ?", queryExpr.Query)
+
+			assert.Len(t, input.MapFilters, 1)
+			filter := input.MapFilters[0].GetFilter()
+			assert.Equal(t, map[string]interface{}{
+				"parent_id":                nil,
+				"parent_task_execution_id": nil,
+			}, filter)
+
+			assert.EqualValues(t, input.JoinTableEntities, map[common.Entity]bool{
+				common.NodeExecution: true,
+				common.Execution:     true,
+			})
+
+			assert.Equal(t, "execution_domain asc", input.SortParameter.GetGormOrderExpr())
+			return interfaces.NodeExecutionCollectionOutput{
+				NodeExecutions: []models.NodeExecution{
+					{
+						NodeExecutionKey: models.NodeExecutionKey{
+							NodeID: "node id",
+							ExecutionKey: models.ExecutionKey{
+								Org:     org,
+								Project: "project",
+								Domain:  "domain",
+								Name:    "name",
+							},
+						},
+						Phase:                 core.NodeExecution_SUCCEEDED.String(),
+						InputURI:              "input uri",
+						StartedAt:             &occurredAt,
+						Closure:               closureBytes,
+						NodeExecutionMetadata: metadataBytes,
+					},
+				},
+			}, nil
+		})
+	repository.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).SetGetWithChildrenCallback(
+		func(
+			ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
+			return models.NodeExecution{
+				NodeExecutionKey: models.NodeExecutionKey{
+					NodeID: "node id",
+					ExecutionKey: models.ExecutionKey{
+						Org:     org,
+						Project: "project",
+						Domain:  "domain",
+						Name:    "name",
+					},
+				},
+				Phase:                 core.NodeExecution_SUCCEEDED.String(),
+				InputURI:              "input uri",
+				StartedAt:             &occurredAt,
+				Closure:               closureBytes,
+				NodeExecutionMetadata: metadataBytes,
+			}, nil
+		})
+	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{}, nil)
+	nodeExecutions, err := nodeExecManager.ListNodeExecutions(context.Background(), admin.NodeExecutionListRequest{
+		WorkflowExecutionId: &core.WorkflowExecutionIdentifier{
+			Org:     org,
+			Project: "project",
+			Domain:  "domain",
+			Name:    "name",
+		},
+		Limit: 1,
+		Token: "2",
+		SortBy: &admin.Sort{
+			Direction: admin.Sort_ASCENDING,
+			Key:       "execution_domain",
+		},
+		Filters: "eq(execution.phase, SUCCEEDED)",
+	})
+	assert.NoError(t, err)
 	assert.Len(t, nodeExecutions.NodeExecutions, 1)
 	assert.True(t, proto.Equal(&admin.NodeExecution{
 		Id: &core.NodeExecutionIdentifier{
@@ -1142,22 +1279,22 @@ func TestListNodeExecutionsForTask(t *testing.T) {
 			assert.Equal(t, 2, input.Offset)
 			assert.Len(t, input.InlineFilters, 5)
 
-			assert.Equal(t, common.Execution, input.InlineFilters[0].GetEntity())
+			assert.Equal(t, common.NodeExecution, input.InlineFilters[0].GetEntity())
 			queryExpr, _ := input.InlineFilters[0].GetGormQueryExpr()
 			assert.Equal(t, "org", queryExpr.Args)
 			assert.Equal(t, "execution_org = ?", queryExpr.Query)
 
-			assert.Equal(t, common.Execution, input.InlineFilters[1].GetEntity())
+			assert.Equal(t, common.NodeExecution, input.InlineFilters[1].GetEntity())
 			queryExpr, _ = input.InlineFilters[1].GetGormQueryExpr()
 			assert.Equal(t, "project", queryExpr.Args)
 			assert.Equal(t, "execution_project = ?", queryExpr.Query)
 
-			assert.Equal(t, common.Execution, input.InlineFilters[2].GetEntity())
+			assert.Equal(t, common.NodeExecution, input.InlineFilters[2].GetEntity())
 			queryExpr, _ = input.InlineFilters[2].GetGormQueryExpr()
 			assert.Equal(t, "domain", queryExpr.Args)
 			assert.Equal(t, "execution_domain = ?", queryExpr.Query)
 
-			assert.Equal(t, common.Execution, input.InlineFilters[3].GetEntity())
+			assert.Equal(t, common.NodeExecution, input.InlineFilters[3].GetEntity())
 			queryExpr, _ = input.InlineFilters[3].GetGormQueryExpr()
 			assert.Equal(t, "name", queryExpr.Args)
 			assert.Equal(t, "execution_name = ?", queryExpr.Query)

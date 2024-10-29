@@ -97,6 +97,13 @@ var executionIdentifierFields = map[string]bool{
 	"name":    true,
 }
 
+// Entities that have special case handling for execution identifier fields.
+var executionIdentifierEntities = map[Entity]bool{
+	Execution:     true,
+	NodeExecution: true,
+	TaskExecution: true,
+}
+
 var entityMetadataFields = map[string]bool{
 	"description": true,
 	"state":       true,
@@ -254,7 +261,7 @@ func (f *inlineFilterImpl) GetGormJoinTableQueryExpr(tableName string) (GormQuer
 
 func customizeField(field string, entity Entity) string {
 	// Execution identifier fields have to be customized because we differ from convention in those column names.
-	if entity == Execution && executionIdentifierFields[field] {
+	if executionIdentifierEntities[entity] && executionIdentifierFields[field] {
 		return fmt.Sprintf("execution_%s", field)
 	}
 	// admin_tag table has been migrated to an execution_tag table, so we need to customize the field name.

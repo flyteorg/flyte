@@ -53,25 +53,26 @@ var entityToTableName = map[common.Entity]string{
 }
 
 var innerJoinExecToNodeExec = fmt.Sprintf(
-	"INNER JOIN %s ON %s.execution_project = %s.execution_project AND "+
-		"%s.execution_domain = %s.execution_domain AND %s.execution_name = %s.execution_name AND %s.execution_org = %s.execution_org",
-	executionTableName, nodeExecutionTableName, executionTableName, nodeExecutionTableName, executionTableName,
-	nodeExecutionTableName, executionTableName, nodeExecutionTableName, executionTableName)
+	"INNER JOIN %[1]s ON %[2]s.execution_project = %[1]s.execution_project AND "+
+		"%[2]s.execution_domain = %[1]s.execution_domain AND %[2]s.execution_name = %[1]s.execution_name AND %[2]s.execution_org = %[1]s.execution_org",
+	executionTableName, nodeExecutionTableName)
+
+var innerJoinExecToTaskExec = fmt.Sprintf(
+	"INNER JOIN %[1]s ON %[2]s.execution_project = %[1]s.execution_project AND "+
+		"%[2]s.execution_domain = %[1]s.execution_domain AND %[2]s.execution_name = %[1]s.execution_name AND %[2]s.execution_org = %[1]s.execution_org",
+	executionTableName, taskExecutionTableName)
 
 var innerJoinNodeExecToTaskExec = fmt.Sprintf(
-	"INNER JOIN %s ON %s.node_id = %s.node_id AND %s.execution_project = %s.execution_project AND "+
-		"%s.execution_domain = %s.execution_domain AND %s.execution_name = %s.execution_name AND %s.execution_org = %s.execution_org",
-	nodeExecutionTableName, taskExecutionTableName, nodeExecutionTableName, taskExecutionTableName,
-	nodeExecutionTableName, taskExecutionTableName, nodeExecutionTableName, taskExecutionTableName,
-	nodeExecutionTableName, taskExecutionTableName, nodeExecutionTableName)
+	"INNER JOIN %[1]s ON %s.node_id = %[1]s.node_id AND %[2]s.execution_project = %[1]s.execution_project AND "+
+		"%[2]s.execution_domain = %[1]s.execution_domain AND %[2]s.execution_name = %[1]s.execution_name AND %[2]s.execution_org = %[1]s.execution_org",
+	nodeExecutionTableName, taskExecutionTableName)
 
 // Because dynamic tasks do NOT necessarily register static task definitions, we use a left join to not exclude
 // dynamic tasks from list queries.
 var leftJoinTaskToTaskExec = fmt.Sprintf(
-	"LEFT JOIN %s ON %s.project = %s.project AND %s.domain = %s.domain AND %s.name = %s.name AND "+
-		"%s.version = %s.version AND %s.org = %s.org",
-	taskTableName, taskExecutionTableName, taskTableName, taskExecutionTableName, taskTableName,
-	taskExecutionTableName, taskTableName, taskExecutionTableName, taskTableName, taskExecutionTableName, taskTableName)
+	"LEFT JOIN  %[1]s ON  %[2]s.project =  %[1]s.project AND  %[2]s.domain = %[1]s.domain AND  %[2]s.name = %[1]s.name AND "+
+		" %[2]s.version =  %[1]s.version AND  %[2]s.org =  %[1]s.org",
+	taskTableName, taskExecutionTableName)
 
 // Validates there are no missing but required parameters in ListResourceInput
 func ValidateListInput(input interfaces.ListResourceInput) adminErrors.FlyteAdminError {
