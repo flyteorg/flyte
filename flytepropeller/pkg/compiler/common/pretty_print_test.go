@@ -1,8 +1,9 @@
 package common
 
 import (
-	"google.golang.org/protobuf/types/known/structpb"
 	"testing"
+
+	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/stretchr/testify/assert"
 
