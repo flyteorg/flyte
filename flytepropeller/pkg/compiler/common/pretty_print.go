@@ -17,7 +17,7 @@ func LiteralTypeToStr(lt *core.LiteralType) string {
 			structure += fmt.Sprintf("dataclass_type:{key:%v value:{%v}, ", k, LiteralTypeToStr(v))
 		}
 		structure = strings.TrimSuffix(structure, ", ")
-		return fmt.Sprintf("Simple: STRUCT structure{%v}", structure)
+		return fmt.Sprintf("simple: STRUCT structure{%v}", structure)
 	}
 	return lt.String()
 }
