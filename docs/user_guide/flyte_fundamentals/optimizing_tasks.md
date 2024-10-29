@@ -273,6 +273,47 @@ the resources that you need. In this case, that need is distributed
 training, but Flyte also provides integrations for {ref}`Spark <plugins-spark-k8s>`,
 {ref}`Ray <kube-ray-op>`, {ref}`MPI <kf-mpi-op>`, {ref}`Snowflake <snowflake_agent>`, and more.
 
+## Retries and Spot Instances
+
+When running tasks on spot/interruptible instances, it's important to understand how retries work:
+
+```python
+from flytekit import task
+
+@task(
+    retries=3,               # User retry budget
+    interruptible=True       # Enables running on spot instances
+)
+def my_task() -> None:
+    ...
+```
+
+### Default Retry Behavior
+- Spot instance preemptions count against the system retry budget (not user retries)
+- The last system retry automatically runs on a non-preemptible instance
+- User retries (specified in `@task` decorator) are only used for application errors
+
+### Simplified Retry Behavior
+Flyte also offers a simplified retry model where both system and user retries count towards a single budget:
+
+```python
+@task(
+    retries=5,               # Total retry budget for both system and user errors
+    interruptible=True
+)
+def my_task() -> None:
+    ...
+```
+
+To enable this behavior:
+1. Set `configmap.core.propeller.node-config.ignore-retry-cause=true` in platform config
+2. Define total retry budget in task decorator
+3. Last retries automatically run on non-spot instances
+
+Choose the retry model that best fits your use case:
+- Default: Separate budgets for system vs user errors
+- Simplified: Single retry budget with guaranteed completion 
+
 Even though Flyte itself is a powerful compute engine and orchestrator for
 data engineering, machine learning, and analytics, perhaps you have existing
 code that leverages other platforms. Flyte recognizes the pain of migrating code,

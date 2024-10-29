@@ -123,3 +123,36 @@ Caching/Memoization
 
 Flyte supports memoization of task outputs to ensure that identical invocations of a task are not executed repeatedly, thereby saving compute resources and execution time. For example, if you wish to run the same piece of code multiple times, you can reuse the output instead of re-computing it.
 For more information on memoization, refer to the :std:doc:`/user_guide/development_lifecycle/caching`.
+
+### Retries and Spot Instances
+
+Tasks can define a retry strategy to handle different types of failures:
+
+1. **System Retries**: Used for infrastructure-level failures outside of user control:
+   - Spot instance preemptions
+   - Network issues
+   - Service unavailability
+   - Hardware failures
+   
+   *Important*: When running on spot/interruptible instances, preemptions count against the system retry budget, not the user retry budget. The last retry attempt automatically runs on a non-preemptible instance to ensure task completion.
+
+2. **User Retries**: Specified in the `@task` decorator (via `retries` parameter), used for:
+   - Application-level errors
+   - Invalid input handling
+   - Business logic failures
+
+```python
+@task(retries=3)  # Sets user retry budget to 3
+def my_task() -> None:
+    ...
+```
+
+### Alternative Retry Behavior
+
+Starting with RFC 3902, Flyte offers a simplified retry behavior where both system and user retries count towards a single retry budget defined in the task decorator. To enable this:
+
+1. Set `configmap.core.propeller.node-config.ignore-retry-cause` to `true` in helm values
+2. Define retries in the task decorator to set the total retry budget
+3. The last retries will automatically run on non-spot instances
+
+This provides a simpler, more predictable retry behavior while maintaining reliability. 
