@@ -6,21 +6,22 @@
 
 ## 1 Executive Summary
 
-Providing k8s resource management, gang scheduling and preemption for flyte apllications by 3rd software including Apache Yunikorn and Kueue.
+Providing kubernetes (k8s) resource management, gang scheduling and preemption for flyte applications by third-party software, including Apache Yunikorn and Kueue.
 
 ## 2 Motivation
 
-Flyte support multi-tenant and many k8s plugins.
+Flyte support multi-tenancy and various k8s plugins.
 
 Kueue and Yunikorn support gang scheduling and preemption.
-Gang scheduling gurantees some avialable k8s crd services including spark, ray service with sufficient resource and preemption make sure high priority task execute immediately.
+Gang scheduling guarantees the availability of certain K8s crd services, such as Spark, Ray, with sufficient resource and preemption make sure high priority task execute immediately.
 
-Flyte doesn't maintain a resource management for multi-tenant which Yunikorn can solve it with hierarchy resource queues.
+Flyte doesn't provide resource management for multi-tenancy, which hierarchical resource queues of Yunikorn can solve.
 
 ## 3 Proposed Implementation
 
 ```yaml
 queueconfig:
+  scheduler: yunikorn
   general:
   - org: org1
     users: "*" 
@@ -47,20 +48,20 @@ queueconfig:
 ```
 
 Mentioned configuration indicates what queues exist for an org.
-Hierachy queues will be like following.
-root.org1.ray、root.org1.spark and root.org1.default allowing summission from ns1 and ns1 namespace.
-root.org2."CRDs" and root.org2.default allowing summission from any namespaces.
+Hierarchucak queues will be structured as follows.
+root.org1.ray、root.org1.spark and root.org1.default allowing submissions from ns1 and ns2 namespace.
+root.org2."CRDs" and root.org2.default allowing submissions from any namespaces.
 
-ResourceFlavor allocate resource based on labels which indicates thant category resource allocatiom by org label is available.
-So a clusterQueue including multiple resources is a total acessaible resource for a org.  
+ResourceFlavor allocates resource based on labels which indicates that category-based resource allocation by organization label is available.
+Thus, a clusterQueue including multiple resources represents the total acessaible resource for an organization.  
 | clusterQueue | localQueue |
 | --- | --- |
 | Org | ray、spark、default |
-A tenant can submit org task to queue such org.ray, org.spark and org.default to trace what job types are submitable. 
+A tenant can submit organization-specific tasks to queues such as org.ray, org.spark and org.default to track which job types are submittable. 
 
 
 A SchedulerConfigManager maintains config from mentioned yaml.
-It patch labels or annotations of k8s resources after they pass rules in config.
+It patches labels or annotations on k8s resources after they pass rules specified in the configuration.
 
 ```go
 func (e *PluginManager) launchResource(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (pluginsCore.Transition, error) {
@@ -68,33 +69,33 @@ func (e *PluginManager) launchResource(ctx context.Context, tCtx pluginsCore.Tas
 	if err != nil {
 		return pluginsCore.UnknownTransition, err
 	}
-  if err := e.SchedulerConfigManager.Label(0); err != nil {
+  if err := e.SchedulerConfigManager.Patch(o); err != nil {
     return pluginsCore.UnknownTransition, err
   }
 }
 ```
 When batchscheduler in flyte is yunikorn, some examples are like following.
-For exmaple, this appoarch submit a Rayjob owned by user1 in org1 to "root.org1.ray".
+For example, this appoarch submits a Ray job owned by user1 in org1 to "root.org1.ray".
 A spark application in ns1 submitted by user4 in org1 is in "root.org1.ns1".
 In the other hand, results of these examples are "org1-ray" and "org1-ns1" when adopting Kueue.
 
 ## 4 Metrics & Dashboards
 
-1. Yunikorn scheduler add applications to a specific queue based on thier user info, queue name for any application type.
-2. Yunikorn and Kueue provides gang scheduling based annotations For Ray and spark.
-3. Preemption behavior meets user-defined configuration in yunikorn.
+1. The Yunikorn scheduler add applications to a specific queue based on their user info, queue name for any application type.
+2. Yunikorn and Kueue provide gang scheduling through annotations For Ray and spark.
+3. Preemption behavior aligns with user-defined configuration in yunikorn.
 
 ## 5 Drawbacks
 
-This appoarch doens't provide a way to keep consistent between the accuate resource quato of groups and configuration in scheduler.
+This appoarch doesn't offer a way to maintain consistency between the accuate resource quotas of groups and the configuration in scheduler.
 
 ## 6 Alternatives
 
 ## 7 Potential Impact and Dependencies
 
-Flyte support spark, ray and kubeflow CRD including pytorch and tfjobs.
-Spark and Ray operator have been support Yunikorn gang scheduling after taskgroup calculation is implemented in these operators.
-Taskgroup caclucation implementation in pods aspect in flyte or kubeflow is required for supporting kubeflow CRDs.
+Flyte support Spark, Ray and Kubeflow CRDs including Pytorch and TFjobs.
+The Spark and Ray operators have supported Yunikorn gang scheduling since task group calculation were implemented in these operators.
+Taskgroup calculation implementation in pods aspect in flyte or kubeflow is required for supporting kubeflow CRDs.
 In the other hand, Kueue currently doesn't support Spark CRD.
 | Operator | Yunikorn | Kueue |
 | --- | --- | --- |
@@ -107,9 +108,9 @@ In the other hand, Kueue currently doesn't support Spark CRD.
 
 ## 9 Conclusion
 
-Yunikorn and Kueue support gang scheduling to run all neccesary pods at same time when required resource are available.
-Yunikorn provide preemption which calculate the priority of application based on its priority class an priority score of the queue where it submitted in order to trigger high-prioirty or emergency application immediately. 
-Yunikorn hierachy queue includes grarateed resources setting and acls.
+Yunikorn and Kueue support gang scheduling allowing all necassary pods to run sumultaneously when required resource are available.
+Yunikorn provides preemption calculating the priority of applications based on thier priority class and priority score of the queue where they are submitted, in order to trigger high-prioirty or emergency application immediately. 
+Yunikorn's hierarchical queue includes grarateed resources settings and ACLs.
 
 ## 10 RFC Process Guide, remove this section when done
 
