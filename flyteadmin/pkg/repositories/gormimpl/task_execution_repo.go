@@ -3,6 +3,7 @@ package gormimpl
 import (
 	"context"
 	"errors"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 
 	"gorm.io/gorm"
 
@@ -97,13 +98,20 @@ func (r *TaskExecutionRepo) List(ctx context.Context, input interfaces.ListResou
 	var taskExecutions []models.TaskExecution
 	tx := r.db.WithContext(ctx).Limit(input.Limit).Offset(input.Offset).Preload("ChildNodeExecution")
 
-	// And add three join conditions (joining multiple tables is fine even we only filter on a subset of table attributes).
-	// We are joining on task -> taskExec -> NodeExec -> Exec.
-	// NOTE: the order in which the joins are called below are important because postgres will only know about certain
-	// tables as they are joined. So we should do it in the order specified above.
-	tx = tx.Joins(leftJoinTaskToTaskExec)
-	tx = tx.Joins(innerJoinNodeExecToTaskExec)
-	tx = tx.Joins(innerJoinExecToNodeExec)
+	// And add three join conditions
+	// We enable joining on
+	// - task x task exec
+	// - node exec x task exec
+	// - exec x task exec
+	if input.JoinTableEntities[common.Task] {
+		tx = tx.Joins(leftJoinTaskToTaskExec)
+	}
+	if input.JoinTableEntities[common.NodeExecution] {
+		tx = tx.Joins(innerJoinNodeExecToTaskExec)
+	}
+	if input.JoinTableEntities[common.Execution] {
+		tx = tx.Joins(innerJoinExecToTaskExec)
+	}
 
 	// Apply filters
 	tx, err := applyScopedFilters(tx, input.InlineFilters, input.MapFilters)
@@ -132,13 +140,20 @@ func (r *TaskExecutionRepo) Count(ctx context.Context, input interfaces.CountRes
 	var err error
 	tx := r.db.WithContext(ctx).Model(&models.TaskExecution{})
 
-	// Add three join conditions (joining multiple tables is fine even we only filter on a subset of table attributes).
-	// We are joining on task -> taskExec -> NodeExec -> Exec.
-	// NOTE: the order in which the joins are called below are important because postgres will only know about certain
-	// tables as they are joined. So we should do it in the order specified above.
-	tx = tx.Joins(leftJoinTaskToTaskExec)
-	tx = tx.Joins(innerJoinNodeExecToTaskExec)
-	tx = tx.Joins(innerJoinExecToNodeExec)
+	// And add three join conditions
+	// We enable joining on
+	// - task x task exec
+	// - node exec x task exec
+	// - exec x task exec
+	if input.JoinTableEntities[common.Task] {
+		tx = tx.Joins(leftJoinTaskToTaskExec)
+	}
+	if input.JoinTableEntities[common.NodeExecution] {
+		tx = tx.Joins(innerJoinNodeExecToTaskExec)
+	}
+	if input.JoinTableEntities[common.Execution] {
+		tx = tx.Joins(innerJoinExecToTaskExec)
+	}
 
 	// Apply filters
 	tx, err = applyScopedFilters(tx, input.InlineFilters, input.MapFilters)
