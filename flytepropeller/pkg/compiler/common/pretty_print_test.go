@@ -3,9 +3,8 @@ package common
 import (
 	"testing"
 
-	"google.golang.org/protobuf/types/known/structpb"
-
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
