@@ -145,7 +145,7 @@ gate node, which will be used as an input to the `invalid_report` task.
 ## Sending inputs to `wait_for_input` and `approve` nodes
 
 Assuming that you've registered the above workflows on a Flyte cluster that's
-been started with {ref}`flytectl demo start <getting_started_running_workflow_local_cluster>`,
+been started with `flytectl demo start`,
 there are two ways of using `wait_for_input` and `approve` nodes:
 
 ### Using the Flyte UI

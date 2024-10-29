@@ -5,7 +5,7 @@ The first step to contributing a tutorial or integration example is to open a
 [documentation issue](https://github.com/flyteorg/flyte/issues/new?assignees=&labels=documentation%2Cuntriaged&template=docs_issue.yaml&title=%5BDocs%5D+) to describe the example you want to write. The Flyte maintainers will help you figure out where your tutorial or integration example would best fit.
 
 :::{admonition} Prerequisites
-Follow the {ref}`env_setup` guide to get your development environment ready.
+Follow the {ref}`first_workflow` guide to get your development environment ready.
 :::
 
 The tutorials and integrations examples live in the `examples` directory of the [flytesnacks repo](https://github.com/flyteorg/flytesnacks), where each subdirectory contains a self-contained example project that covers a particular tutorial or integration. There are also subdirectories that contain the code included in the user guide via the `rli` (remoteliteralinclude) directive.

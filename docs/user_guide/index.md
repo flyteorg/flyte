@@ -1,85 +1,21 @@
----
-:next-page: environment_setup
-:next-page-title: Environment Setup
-:prev-page: getting_started/analytics
-:prev-page-title: Analytics
----
-
 (userguide)=
-
 # User guide
-
-If this is your first time using Flyte, check out the {doc}`Getting Started <index>` guide.
-
-This _User guide_, the {ref}`Tutorials <tutorials>` and the {ref}`Integrations <integrations>` examples cover all of
-the key features of Flyte for data analytics, data science and machine learning practitioners, organized by topic. Each
-section below introduces a core feature of Flyte and how you can use it to address specific use cases. Code for all
-of the examples can be found in the [flytesnacks repo](https://github.com/flyteorg/flytesnacks).
-
-It comes with a specific environment to make running, documenting
-and contributing samples easy. If this is your first time running these examples, follow the
-{doc}`environment setup guide <environment_setup>` to get started.
-
-```{tip}
-To learn about how to spin up and manage a Flyte cluster in the cloud, see the
-{doc}`Deployment Guides <../deployment/index>`.
-```
-
-```{note}
-Want to contribute or update an example? Check out the {ref}`Contribution Guide <contribute_docs>`.
-```
-
-## Table of contents
-
-```{list-table}
-:header-rows: 0
-:widths: 20 30
-
-* - {doc}`🌳 Environment Setup <environment_setup>`
-  - Set up a development environment to run the examples in the user guide.
-* - {doc}`🔤 Basics <basics/index>`
-  - Learn about tasks, workflows, launch plans, caching and managing files and directories.
-* - {doc}`⌨️ Data Types and IO <data_types_and_io/index>`
-  - Improve pipeline robustness with Flyte's portable and extensible type system.
-* - {doc}`🔮 Advanced Composition <advanced_composition/index>`
-  - Implement conditionals, nested and dynamic workflows, map tasks and even recursion!
-* - {doc}`🧩 Customizing Dependencies <customizing_dependencies/index>`
-  - Provide custom dependencies to run your Flyte entities.
-* - {doc}`🏡 Development Lifecycle <development_lifecycle/index>`
-  - Develop and test locally on the demo cluster.
-* - {doc}`⚗️ Testing <development_lifecycle/testing_and_debugging/index>`
-  - Test tasks and workflows with Flyte's testing utilities.
-* - {doc}`🚢 Productionizing <development_lifecycle/productionizing/index>`
-  - Ship and configure your machine learning pipelines on a production Flyte installation.
-* - {doc}`🏗 Extending <extending/index>`
-  - Define custom plugins that aren't currently supported in the Flyte ecosystem.
-```
 
 ```{toctree}
 :maxdepth: -1
 :name: user_guide_toc
 :hidden:
 
-introduction
 quickstart_guide
 first_workflow/index
 core_concepts/index
-data_types_and_io/index
-development_lifecycle/index
-```
-
-```{toctree}
-:maxdepth: -1
-:hidden:
-:caption: To be organized
-
-basics/index
+development_cycle/index
+data_types_and_input_output/index
 advanced_composition/index
 customizing_dependencies/index
-environment_setup
-flyte_fundamentals/index
-extending/index
+extending_flyte/index
 flyte_agents/index
+placeholder_refs
 ```
 
 ```{toctree}

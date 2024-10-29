@@ -149,7 +149,7 @@ Entities
 The :std:ref:`admin service definition <ref_flyteidl/service/admin.proto>` defines REST operations for the entities that
 FlyteAdmin administers.
 
-As a refresher, the primary :ref:`entities <divedeep>` across Flyte maps to FlyteAdmin entities.
+As a refresher, the primary :ref:`entities <user_plane_concepts>` across Flyte maps to FlyteAdmin entities.
 
 Static entities
 +++++++++++++++

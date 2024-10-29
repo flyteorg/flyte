@@ -73,7 +73,7 @@ There are three different paths for deploying a Flyte cluster:
      - ✅
    * - :ref:`Multiple Clusters <deployment-deployment-multicluster>`
      - For large-scale deployments that require multiple K8s clusters. Flyte's control
-       plane (:ref:`FlyteAdmin <divedeep-admin>`, :ref:`FlyteConsole <ui>`, and :ref:`DataCatalog <divedeep-catalog>`)
+       plane (:ref:`FlyteAdmin <divedeep-admin>`, :ref:`FlyteConsole <flyte_ui>`, and :ref:`DataCatalog <divedeep-catalog>`)
        is separated from Flyte's execution engine, :ref:`FlytePropeller <flytepropeller-architecture>`, which runs
        typically once per compute cluster.
      - ✅
