@@ -196,10 +196,6 @@ spec:
                 name: flyte-admin-base-config
             - configMap:
                 name: flyte-admin-clusters-config
-            {{- if .Values.cloud_events.secretName }}
-            - secret:
-                name: {{ .Values.cloud_events.secretName }}
-            {{- end }}
         name: clusters-config-volume
       {{- if .Values.cluster_resource_manager.enabled }}
       - configMap:

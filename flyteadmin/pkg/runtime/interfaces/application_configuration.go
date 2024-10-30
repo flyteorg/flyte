@@ -3,6 +3,9 @@ package interfaces
 import (
 	"context"
 	"crypto/tls"
+	"fmt"
+	"os"
+	"strings"
 
 	"github.com/Shopify/sarama"
 	"github.com/golang/protobuf/ptypes/wrappers"
@@ -242,8 +245,9 @@ type SASLConfig struct {
 	// The username
 	User string `json:"user"`
 	// The password
-	Password  string `json:"password"`
-	Handshake bool   `json:"handshake"`
+	Password     string `json:"password"`
+	PasswordPath string `json:"passwordPath"`
+	Handshake    bool   `json:"handshake"`
 	// Which SASL Mechanism to use. Defaults to PLAIN
 	Mechanism sarama.SASLMechanism `json:"mechanism"`
 }
@@ -282,7 +286,20 @@ func (k KafkaConfig) UpdateSaramaConfig(ctx context.Context, s *sarama.Config) {
 	if k.SASLConfig.Enabled {
 		s.Net.SASL.Enable = true
 		s.Net.SASL.User = k.SASLConfig.User
-		s.Net.SASL.Password = k.SASLConfig.Password
+
+		if len(k.SASLConfig.PasswordPath) > 0 {
+			if _, err := os.Stat(k.SASLConfig.PasswordPath); os.IsNotExist(err) {
+				panic(fmt.Sprintf("missing kafka password at the specified path [%s]", k.SASLConfig.PasswordPath))
+			}
+			passwordVal, err := os.ReadFile(k.SASLConfig.PasswordPath)
+			if err != nil {
+				panic(fmt.Sprintf("failed to kafka password from path [%s] with err: %v", k.SASLConfig.PasswordPath, err))
+			}
+
+			s.Net.SASL.Password = strings.TrimSpace(string(passwordVal))
+		} else {
+			s.Net.SASL.Password = k.SASLConfig.Password
+		}
 		s.Net.SASL.Handshake = k.SASLConfig.Handshake
 
 		if k.SASLConfig.Mechanism == "" {

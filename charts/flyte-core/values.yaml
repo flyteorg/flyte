@@ -945,19 +945,20 @@ external_events:
 # Cloud events are used to send events (unprocessed, as Admin see them) in cloud event format to
 # an SNS topic (or gcp equivalent)
 cloud_events:
-  # -- The name of the secret to use to alternatively load in cloud events configuration via a secret. Useful when the
-  # configuration contains secrets.
-  secretName: ""
   enable: false
-  type: aws
-  aws:
-    region: us-east-2
   eventsPublisher:
     # Make sure this is not a fifo queue. Admin does not yet support
     # writing to fifo sns topics.
     topicName: "arn:aws:sns:us-east-2:123456:123-my-topic"
     eventTypes:
       - all  # Or workflow, node, task. Or "*"
+  type: aws
+  # -- Configuration for sending cloud events to AWS SNS
+  aws:
+    region: us-east-2
+  # -- Configuration for sending cloud events to GCP Pub Sub
+  gcp:
+    region: us-east1
   # -- Configuration for sending cloud events to Kafka
   kafka:
     # -- The version of Kafka
@@ -973,6 +974,8 @@ cloud_events:
       user: kafka
       # -- The password for the kafka user
       password: ""
+      # -- Optional mount path of file containing the kafka password.
+      passwordPath: ""
       # -- Whether the send the SASL handsahke first
       handshake: true
       # -- Which SASL mechanism to use. Defaults to PLAIN

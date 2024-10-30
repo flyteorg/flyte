@@ -79,7 +79,7 @@ data:
     externalEvents: {{ tpl (toYaml .) $ | nindent 6 }}
 {{- end }}
 {{- end }}
-{{- if and .Values.cloud_events.enable (not .Values.cloud_events.secretName) }}
+{{- if .Values.cloud_events.enable }}
 {{- with .Values.cloud_events }}
   cloud_events.yaml: |
     cloudEvents: {{ tpl (toYaml .) $ | nindent 6 }}
