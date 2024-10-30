@@ -62,9 +62,7 @@ task_logs:
           cloudwatch-enabled: true
           cloudwatch-template-uri: "https://console.aws.amazon.com/cloudwatch/home?region=<MY_AWS_REGION>#logsV2:log-groups/log-group/$252Faws$252Fcontainerinsights$252F<MY_EKS_CLUSTER_NAME>$252Fapplication$3FlogStreamNameFilter$3Dvar.log.containers.{{`{{.podName}}`}}_{{`{{.namespace}}`}}_{{`{{.containerName}}`}}" 
             - "https://console.aws.amazon.com/cloudwatch/home?region={{.region}}#logEventViewer:group={{.logGroup}};stream=var.log.containers.{{.podName}}_{{.namespace}}_{{.containerName}}-{{.containerId}}.log"
-          prerequisites:
-            - EKS Cluster enabled with CloudWatch Observability Add-on
-            - Ensure the pod emits logs to CloudWatch log streams
+          
         - displayName: GCP Stackdriver Logs
           templateUris:
             - "https://console.cloud.google.com/logs/viewer?project={{.gcpProject}}&resource=k8s_container&advancedFilter=resource.labels.pod_name={{.podName}}&resource.labels.container_name={{.containerName}}&resource.labels.namespace_id={{.namespace}}"
@@ -74,6 +72,11 @@ task_logs:
       messageFormat: 0  # Optional: 0 = "unknown", 1 = "csv", 2 = "json"
 
 ```
+
+:::{Notes}
+prerequisites:
+            - EKS Cluster enabled with CloudWatch Observability Add-on
+            - Ensure the pod emits logs to CloudWatch log streams
 
 :::{tip}
 Since helm chart uses the same templating syntax for args (like `{{ }}`), compiling the chart results in helm replacing Flyte log link templates as well. To avoid this, you can use escaped templating for Flyte logs in the helm chart.
