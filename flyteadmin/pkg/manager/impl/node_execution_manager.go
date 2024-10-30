@@ -407,11 +407,16 @@ func (m *NodeExecutionManager) listNodeExecutions(
 		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 			"invalid pagination token %s for ListNodeExecutions", requestToken)
 	}
+	joinTableEntities := make(map[common.Entity]bool)
+	for _, filter := range filters {
+		joinTableEntities[filter.GetEntity()] = true
+	}
 	listInput := repoInterfaces.ListResourceInput{
-		Limit:         int(limit),
-		Offset:        offset,
-		InlineFilters: filters,
-		SortParameter: sortParameter,
+		Limit:             int(limit),
+		Offset:            offset,
+		InlineFilters:     filters,
+		SortParameter:     sortParameter,
+		JoinTableEntities: joinTableEntities,
 	}
 
 	listInput.MapFilters = mapFilters
@@ -445,7 +450,7 @@ func (m *NodeExecutionManager) ListNodeExecutions(
 	}
 	ctx = getExecutionContext(ctx, request.WorkflowExecutionId)
 
-	identifierFilters, err := util.GetWorkflowExecutionIdentifierFilters(ctx, request.WorkflowExecutionId)
+	identifierFilters, err := util.GetWorkflowExecutionIdentifierFilters(ctx, request.WorkflowExecutionId, common.NodeExecution)
 	if err != nil {
 		return nil, err
 	}
@@ -483,7 +488,7 @@ func (m *NodeExecutionManager) ListNodeExecutionsForTask(
 	}
 	ctx = getTaskExecutionContext(ctx, request.TaskExecutionId)
 	identifierFilters, err := util.GetWorkflowExecutionIdentifierFilters(
-		ctx, request.TaskExecutionId.NodeExecutionId.ExecutionId)
+		ctx, request.TaskExecutionId.NodeExecutionId.ExecutionId, common.NodeExecution)
 	if err != nil {
 		return nil, err
 	}
