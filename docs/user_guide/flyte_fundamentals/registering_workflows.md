@@ -295,7 +295,7 @@ entities compiled as protobuf files that you can register with multiple Flyte
 clusters.
 
 ````{note}
-Like `pyflyte register`, can also specify multiple workflow directories, like:
+You can specify multiple workflow directories using the following command:
 
 ```{prompt} bash $
 pyflyte --pkgs <dir1> --pkgs <dir2> package ...
