@@ -58,7 +58,8 @@ task_logs:
   plugins:
     logs:
       cloudwatch-enabled: true
-      cloudwatch-template-uri: "https://console.aws.amazon.com/cloudwatch/home?region=<MY_AWS_REGION>#logsV2:log-groups/log-group/$252Faws$252Fcontainerinsights$252F<MY_EKS_CLUSTER_NAME>$252Fapplication$3FlogStreamNameFilter$3Dvar.log.containers.{{`{{.podName}}`}}_{{`{{.namespace}}`}}_{{`{{.containerName}}`}}" 
+      cloudwatch-template-uri:
+            -"https://console.aws.amazon.com/cloudwatch/home?region=<MY_AWS_REGION>#logsV2:log-groups/log-group/$252Faws$252Fcontainerinsights$252F<MY_EKS_CLUSTER_NAME>$252Fapplication$3FlogStreamNameFilter$3Dvar.log.containers.{{`{{.podName}}`}}_{{`{{.namespace}}`}}_{{`{{.containerName}}`}}" 
             - "https://console.aws.amazon.com/cloudwatch/home?region={{.region}}#logEventViewer:group={{.logGroup}};stream=var.log.containers.{{.podName}}_{{.namespace}}_{{.containerName}}-{{.containerId}}.log"
       messageFormat: 0  # Optional: 0 = "unknown", 1 = "csv", 2 = "json"
 
