@@ -57,18 +57,9 @@ The parameterization engine uses Golangs native templating format and hence uses
 task_logs:
   plugins:
     logs:
-      templates:
-        - displayName: AWS CloudWatch Logs
-          cloudwatch-enabled: true
-          cloudwatch-template-uri: "https://console.aws.amazon.com/cloudwatch/home?region=<MY_AWS_REGION>#logsV2:log-groups/log-group/$252Faws$252Fcontainerinsights$252F<MY_EKS_CLUSTER_NAME>$252Fapplication$3FlogStreamNameFilter$3Dvar.log.containers.{{`{{.podName}}`}}_{{`{{.namespace}}`}}_{{`{{.containerName}}`}}" 
+      cloudwatch-enabled: true
+      cloudwatch-template-uri: "https://console.aws.amazon.com/cloudwatch/home?region=<MY_AWS_REGION>#logsV2:log-groups/log-group/$252Faws$252Fcontainerinsights$252F<MY_EKS_CLUSTER_NAME>$252Fapplication$3FlogStreamNameFilter$3Dvar.log.containers.{{`{{.podName}}`}}_{{`{{.namespace}}`}}_{{`{{.containerName}}`}}" 
             - "https://console.aws.amazon.com/cloudwatch/home?region={{.region}}#logEventViewer:group={{.logGroup}};stream=var.log.containers.{{.podName}}_{{.namespace}}_{{.containerName}}-{{.containerId}}.log"
-          
-        - displayName: GCP Stackdriver Logs
-          templateUris:
-            - "https://console.cloud.google.com/logs/viewer?project={{.gcpProject}}&resource=k8s_container&advancedFilter=resource.labels.pod_name={{.podName}}&resource.labels.container_name={{.containerName}}&resource.labels.namespace_id={{.namespace}}"
-        - displayName: Kubernetes Dashboard Logs
-          templateUris:
-            - "{{.kubernetesUrl}}/namespace/{{.namespace}}/pods/{{.podName}}/logs/{{.containerName}}"
       messageFormat: 0  # Optional: 0 = "unknown", 1 = "csv", 2 = "json"
 
 ```
