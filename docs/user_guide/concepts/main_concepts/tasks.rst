@@ -149,7 +149,7 @@ def my_task() -> None:
 
 ### Alternative Retry Behavior
 
-Starting with RFC 3902, Flyte offers a simplified retry behavior where both system and user retries count towards a single retry budget defined in the task decorator. To enable this:
+Starting with  from 1.10.0, Flyte offers a simplified retry behavior where both system and user retries count towards a single retry budget defined in the task decorator. To enable this:
 
 1. Set `configmap.core.propeller.node-config.ignore-retry-cause` to `true` in helm values
 2. Define retries in the task decorator to set the total retry budget
