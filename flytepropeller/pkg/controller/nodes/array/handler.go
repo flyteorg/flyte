@@ -241,6 +241,38 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 						}
 						// TODO: PREVENT DECODED DATA IS NOT A COLLECTION TYPE
 						collectionLength := len(currVal.([]interface{}))
+						collectionLiteral := &idlcore.Literal{
+							Value: &idlcore.Literal_Collection{
+								Collection: &idlcore.LiteralCollection{
+									Literals: []*idlcore.Literal{},
+								},
+							},
+						}
+
+						for _, item := range currVal.([]interface{}) {
+							resolvedBinaryBytes, err := msgpack.Marshal(item)
+							if err != nil {
+								return handler.DoTransition(handler.TransitionTypeEphemeral,
+									handler.PhaseInfoFailure(idlcore.ExecutionError_SYSTEM, errors.RuntimeExecutionError,
+										"failed to encode msgpack binary data", nil),
+								), nil
+							}
+
+							collectionLiteral.GetCollection().Literals = append(collectionLiteral.GetCollection().Literals,
+								&idlcore.Literal{
+									Value: &idlcore.Literal_Scalar{
+										Scalar: &idlcore.Scalar{
+											Value: &idlcore.Scalar_Binary{
+												Binary: &idlcore.Binary{
+													Value: resolvedBinaryBytes,
+													Tag:   coreutils.MESSAGEPACK,
+												},
+											},
+										},
+									}})
+						}
+						literalMap.Literals[key] = collectionLiteral
+
 						if size == -1 {
 							size = collectionLength
 							// construct a collection literal
@@ -249,13 +281,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 							//	return handler.UnknownTransition, err
 							//}
 							//
-							//newLiteralMap.Literals[key] = &idlcore.Literal{
-							//	Value: &idlcore.Literal_Collection{
-							//		Collection: &idlcore.LiteralCollection{
-							//			Literals: []*idlcore.Literal{},
-							//		},
-							//	},
-							//}
+
 						} else if size != collectionLength {
 							return handler.DoTransition(handler.TransitionTypeEphemeral,
 								handler.PhaseInfoFailure(idlcore.ExecutionError_USER, errors.InvalidArrayLength,
