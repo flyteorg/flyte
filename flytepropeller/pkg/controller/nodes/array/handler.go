@@ -3,6 +3,8 @@ package array
 import (
 	"context"
 	"fmt"
+	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
+	"github.com/shamaton/msgpack/v2"
 	"math"
 	"strconv"
 
@@ -221,6 +223,47 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 						handler.PhaseInfoFailure(idlcore.ExecutionError_USER, errors.InvalidArrayLength,
 							fmt.Sprintf("input arrays have different lengths: expecting '%d' found '%d'", size, collectionLength), nil),
 					), nil
+				}
+			default:
+				// todo: check if is simple struct or not
+				// not sure should check or not
+				if variable.GetScalar().GetBinary() != nil {
+					binaryData := variable.GetScalar().GetBinary()
+					if binaryData.GetTag() == coreutils.MESSAGEPACK {
+						var currVal any
+						err := msgpack.Unmarshal(binaryData.GetValue(), &currVal)
+
+						if err != nil {
+							return handler.DoTransition(handler.TransitionTypeEphemeral,
+								handler.PhaseInfoFailure(idlcore.ExecutionError_SYSTEM, errors.RuntimeExecutionError,
+									"failed to decode msgpack binary data", nil),
+							), nil
+						}
+						// TODO: PREVENT DECODED DATA IS NOT A COLLECTION TYPE
+						collectionLength := len(currVal.([]interface{}))
+						if size == -1 {
+							size = collectionLength
+							// construct a collection literal
+							//newLiteralMap, err := nCtx.InputReader().Get(ctx)
+							//if err != nil {
+							//	return handler.UnknownTransition, err
+							//}
+							//
+							//newLiteralMap.Literals[key] = &idlcore.Literal{
+							//	Value: &idlcore.Literal_Collection{
+							//		Collection: &idlcore.LiteralCollection{
+							//			Literals: []*idlcore.Literal{},
+							//		},
+							//	},
+							//}
+						} else if size != collectionLength {
+							return handler.DoTransition(handler.TransitionTypeEphemeral,
+								handler.PhaseInfoFailure(idlcore.ExecutionError_USER, errors.InvalidArrayLength,
+									fmt.Sprintf("input arrays have different lengths: expecting '%d' found '%d'", size, collectionLength), nil),
+							), nil
+						}
+					}
+
 				}
 			}
 		}
