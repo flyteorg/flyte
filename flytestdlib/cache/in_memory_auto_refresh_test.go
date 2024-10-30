@@ -95,6 +95,40 @@ func TestCacheFour(t *testing.T) {
 			assert.NoError(t, err)
 		}
 
+		// Cache should be processing
+		assert.NotEmpty(t, cache.processing)
+
+		assert.EventuallyWithT(t, func(c *assert.CollectT) {
+			// trigger periodic sync
+			fakeClock.Step(testResyncPeriod)
+
+			for i := 1; i <= 10; i++ {
+				item, err := cache.Get(fmt.Sprintf("%d", i))
+				assert.NoError(c, err)
+				assert.Equal(c, 10, item.(fakeCacheItem).val)
+			}
+		}, 3*time.Second, time.Millisecond)
+		cancel()
+	})
+
+	t.Run("disable sync on create", func(t *testing.T) {
+		cache, err := NewInMemoryAutoRefresh("fake1", syncFakeItem, rateLimiter, testResyncPeriod, 10, 10, promutils.NewTestScope(), WithClock(fakeClock), WithSyncOnCreate(false))
+		assert.NoError(t, err)
+
+		ctx, cancel := context.WithCancel(context.Background())
+		assert.NoError(t, cache.Start(ctx))
+
+		// Create ten items in the cache
+		for i := 1; i <= 10; i++ {
+			_, err := cache.GetOrCreate(fmt.Sprintf("%d", i), fakeCacheItem{
+				val: 0,
+			})
+			assert.NoError(t, err)
+		}
+
+		// Validate that none are processing since they aren't synced on creation
+		assert.Empty(t, cache.processing)
+
 		assert.EventuallyWithT(t, func(c *assert.CollectT) {
 			// trigger periodic sync
 			fakeClock.Step(testResyncPeriod)
