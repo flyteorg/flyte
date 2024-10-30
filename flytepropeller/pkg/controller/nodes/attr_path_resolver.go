@@ -46,8 +46,7 @@ func resolveAttrPathInPromise(ctx context.Context, datastore *storage.DataStore,
 			}
 			currVal = currVal.GetCollection().GetLiterals()[attr.GetIntValue()]
 			index++
-		// scalar is always the leaf, so we can break here
-		case *core.Literal_Scalar:
+		default:
 			break
 		}
 	}
@@ -107,9 +106,7 @@ func resolveAttrPathInPbStruct(nodeID string, st *structpb.Struct, bindAttrPath 
 }
 
 // resolveAttrPathInBinary resolves the binary idl object (e.g. dataclass, pydantic basemodel) with attribute path
-func resolveAttrPathInBinary(nodeID string, binaryIDL *core.Binary, bindAttrPath []*core.PromiseAttribute) (*core.
-	Literal,
-	error) {
+func resolveAttrPathInBinary(nodeID string, binaryIDL *core.Binary, bindAttrPath []*core.PromiseAttribute) (*core.Literal, error) {
 
 	binaryBytes := binaryIDL.GetValue()
 	serializationFormat := binaryIDL.GetTag()
@@ -163,6 +160,27 @@ func resolveAttrPathInBinary(nodeID string, binaryIDL *core.Binary, bindAttrPath
 		default:
 			return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID, "unexpected type [%T] for value %v", currVal, currVal)
 		}
+	}
+
+	// if currVal is list, convert it to literal collection
+	// This is for map task handling
+	if collection, ok := currVal.([]any); ok {
+		literals := make([]*core.Literal, len(collection))
+		for i, v := range collection {
+			resolvedBinaryBytes, err := msgpack.Marshal(v)
+			if err != nil {
+				return nil, err
+			}
+			literals[i] = constructResolvedBinary(resolvedBinaryBytes, serializationFormat)
+		}
+
+		return &core.Literal{
+			Value: &core.Literal_Collection{
+				Collection: &core.LiteralCollection{
+					Literals: literals,
+				},
+			},
+		}, nil
 	}
 
 	// Marshal the current value to MessagePack bytes
