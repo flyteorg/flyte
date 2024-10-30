@@ -162,8 +162,9 @@ func resolveAttrPathInBinary(nodeID string, binaryIDL *core.Binary, bindAttrPath
 		}
 	}
 
-	// if currVal is list, convert it to literal collection
-	// This is for map task handling
+	// In arrayNodeHandler, the resolved value should be a literal collection.
+	// If the current value is already a collection, convert it to a literal collection.
+	// This conversion does not affect how Flytekit processes the resolved value.
 	if collection, ok := currVal.([]any); ok {
 		literals := make([]*core.Literal, len(collection))
 		for i, v := range collection {
