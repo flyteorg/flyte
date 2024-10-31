@@ -159,24 +159,6 @@ Between Tasks
 
 .. image:: https://raw.githubusercontent.com/flyteorg/static-resources/9cb3d56d7f3b88622749b41ff7ad2d3ebce92726/flyte/concepts/data_movement/flyte_data_transfer.png
 
-
-Bringing in Your Own Datastores for Raw Data
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Flytekit has a pluggable data persistence layer.
-This is driven by PROTOCOL.
-For example, it is theoretically possible to use S3 ``s3://`` for metadata and GCS ``gcs://`` for raw data. It is also possible to create your own protocol ``my_fs://``, to change how data is stored and accessed.
-But for Metadata, the data should be accessible to Flyte control plane.
-
-Data persistence is also pluggable. By default, it supports all major blob stores and uses an interface defined in Flytestdlib.
-
-Deleting Raw Data in Your Own Datastores
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Flyte does not offer a direct function to delete raw data stored in external datastores like ``S3`` or ``GCS``. However, you can manage deletion by configuring a lifecycle policy within your datastore service.
-
-If caching is enabled in your Flyte ``task``, ensure that the ``max-cache-age`` is set to be shorter than the lifecycle policy in your datastore to prevent potential data inconsistency issues.
-
 Practical Example
 ~~~~~~~~~~~~~~~~~
 
@@ -247,3 +229,20 @@ First task output metadata:
 Second task input metadata:
 
 .. image:: https://raw.githubusercontent.com/flyteorg/static-resources/9cb3d56d7f3b88622749b41ff7ad2d3ebce92726/flyte/concepts/data_movement/flyte_data_movement_example_input.png
+
+Bringing in Your Own Datastores for Raw Data
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Flytekit has a pluggable data persistence layer.
+This is driven by PROTOCOL.
+For example, it is theoretically possible to use S3 ``s3://`` for metadata and GCS ``gcs://`` for raw data. It is also possible to create your own protocol ``my_fs://``, to change how data is stored and accessed.
+But for Metadata, the data should be accessible to Flyte control plane.
+
+Data persistence is also pluggable. By default, it supports all major blob stores and uses an interface defined in Flytestdlib.
+
+Deleting Raw Data in Your Own Datastores
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Flyte does not offer a direct function to delete raw data stored in external datastores like ``S3`` or ``GCS``. However, you can manage deletion by configuring a lifecycle policy within your datastore service.
+
+If caching is enabled in your Flyte ``task``, ensure that the ``max-cache-age`` is set to be shorter than the lifecycle policy in your datastore to prevent potential data inconsistency issues.
