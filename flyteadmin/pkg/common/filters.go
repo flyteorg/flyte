@@ -22,6 +22,7 @@ type GormQueryExpr struct {
 // Complete set of filters available for database queries.
 const (
 	Contains FilterExpression = iota
+	NotContains
 	GreaterThan
 	GreaterThanOrEqual
 	LessThan
@@ -37,6 +38,8 @@ const (
 	joinArgsFormat          = "%s.%s"
 	containsQuery           = "%s LIKE ?"
 	containsArgs            = "%%%s%%"
+	notContainsQuery        = "%s NOT LIKE ?"
+	notContainsArgs         = "%%%s%%"
 	greaterThanQuery        = "%s > ?"
 	greaterThanOrEqualQuery = "%s >= ?"
 	lessThanQuery           = "%s < ?"
@@ -50,6 +53,7 @@ const (
 // Set of available filters which exclusively accept a single argument value.
 var singleValueFilters = map[FilterExpression]bool{
 	Contains:           true,
+	NotContains:        true,
 	GreaterThan:        true,
 	GreaterThanOrEqual: true,
 	LessThan:           true,
@@ -68,6 +72,7 @@ const EqualExpression = "eq"
 
 var filterNameMappings = map[string]FilterExpression{
 	"contains":      Contains,
+	"not_contains":  NotContains,
 	"gt":            GreaterThan,
 	"gte":           GreaterThanOrEqual,
 	"lt":            LessThan,
@@ -80,6 +85,7 @@ var filterNameMappings = map[string]FilterExpression{
 
 var filterQueryMappings = map[FilterExpression]string{
 	Contains:           containsQuery,
+	NotContains:        notContainsQuery,
 	GreaterThan:        greaterThanQuery,
 	GreaterThanOrEqual: greaterThanOrEqualQuery,
 	LessThan:           lessThanQuery,
@@ -110,6 +116,8 @@ func getFilterExpressionName(expression FilterExpression) string {
 	switch expression {
 	case Contains:
 		return "contains"
+	case NotContains:
+		return "not contains"
 	case GreaterThan:
 		return "greater than"
 	case GreaterThanOrEqual:
@@ -200,6 +208,13 @@ func (f *inlineFilterImpl) getGormQueryExpr(formattedField string) (GormQueryExp
 			Query: fmt.Sprintf(containsQuery, formattedField),
 			// args renders to something like: "%value%"
 			Args: fmt.Sprintf(containsArgs, f.value),
+		}, nil
+	case NotContains:
+		return GormQueryExpr{
+			// WHERE field LIKE %value%
+			Query: fmt.Sprintf(notContainsQuery, formattedField),
+			// args renders to something like: "%value%"
+			Args: fmt.Sprintf(notContainsArgs, f.value),
 		}, nil
 	case GreaterThan:
 		return GormQueryExpr{
