@@ -1,6 +1,7 @@
 package configutil
 
 import (
+	"io"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -20,7 +21,7 @@ func TestSetupConfig(t *testing.T) {
 	}
 	err = SetupConfig(file.Name(), AdminConfigTemplate, templateValue)
 	assert.NoError(t, err)
-	configBytes, err := ioutil.ReadAll(file)
+	configBytes, err := io.ReadAll(file)
 	assert.NoError(t, err)
 	expected := `admin:
   # For GRPC endpoints you might want to use dns:///flyte.myexample.com
@@ -62,7 +63,7 @@ console:
 	}
 	err = SetupConfig(file.Name(), AdminConfigTemplate, templateValue)
 	assert.NoError(t, err)
-	configBytes, err = ioutil.ReadAll(file)
+	configBytes, err = io.ReadAll(file)
 	assert.NoError(t, err)
 	expected = `admin:
   # For GRPC endpoints you might want to use dns:///flyte.myexample.com
@@ -82,8 +83,8 @@ func TestConfigCleanup(t *testing.T) {
 	if os.IsNotExist(err) {
 		_ = os.MkdirAll(f.FilePathJoin(f.UserHomeDir(), ".flyte"), 0755)
 	}
-	_ = ioutil.WriteFile(FlytectlConfig, []byte("string"), 0600)
-	_ = ioutil.WriteFile(Kubeconfig, []byte("string"), 0600)
+	_ = os.WriteFile(FlytectlConfig, []byte("string"), 0600)
+	_ = os.WriteFile(Kubeconfig, []byte("string"), 0600)
 
 	err = ConfigCleanup()
 	assert.Nil(t, err)
