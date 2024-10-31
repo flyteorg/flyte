@@ -211,7 +211,7 @@ func (f *inlineFilterImpl) getGormQueryExpr(formattedField string) (GormQueryExp
 		}, nil
 	case NotContains:
 		return GormQueryExpr{
-			// WHERE field LIKE %value%
+			// WHERE field NOT LIKE %value%
 			Query: fmt.Sprintf(notContainsQuery, formattedField),
 			// args renders to something like: "%value%"
 			Args: fmt.Sprintf(notContainsArgs, f.value),
