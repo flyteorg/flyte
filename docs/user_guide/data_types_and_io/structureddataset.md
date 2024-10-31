@@ -39,7 +39,7 @@ To begin, import the dependencies for the example:
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/structured_dataset.py
 :caption: data_types_and_io/structured_dataset.py
-:lines: 1-18
+:lines: 1-19
 ```
 
 Define a task that returns a Pandas DataFrame.
@@ -68,7 +68,7 @@ First, initialize column types you want to extract from the `StructuredDataset`.
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/structured_dataset.py
 :caption: data_types_and_io/structured_dataset.py
-:lines: 30-31
+:lines: 31-32
 ```
 
 Define a task that opens a structured dataset by calling `all()`.
@@ -78,7 +78,7 @@ For instance, you can use ``pa.Table`` to convert the Pandas DataFrame to a PyAr
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/structured_dataset.py
 :caption: data_types_and_io/structured_dataset.py
-:lines: 41-51
+:lines: 42-52
 ```
 
 The code may result in runtime failures if the columns do not match.
@@ -91,7 +91,7 @@ and enable the CSV serialization by annotating the structured dataset with the C
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/structured_dataset.py
 :caption: data_types_and_io/structured_dataset.py
-:lines: 57-71
+:lines: 58-72
 ```
 
 ## Storage driver and location
@@ -230,14 +230,14 @@ and the byte format, which in this case is `PARQUET`.
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/structured_dataset.py
 :caption: data_types_and_io/structured_dataset.py
-:lines: 127-129
+:lines: 128-130
 ```
 
 You can now use `numpy.ndarray` to deserialize the parquet file to NumPy and serialize a task's output (NumPy array) to a parquet file.
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/structured_dataset.py
 :caption: data_types_and_io/structured_dataset.py
-:lines: 134-149
+:lines: 135-148
 ```
 
 :::{note}
@@ -248,7 +248,7 @@ You can run the code locally as follows:
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/structured_dataset.py
 :caption: data_types_and_io/structured_dataset.py
-:lines: 153-157
+:lines: 152-156
 ```
 
 ### The nested typed columns
@@ -261,7 +261,7 @@ Nested field StructuredDataset should be run when flytekit version > 1.11.0.
 
 ```{rli} https://raw.githubusercontent.com/flyteorg/flytesnacks/69dbe4840031a85d79d9ded25f80397c6834752d/examples/data_types_and_io/data_types_and_io/structured_dataset.py
 :caption: data_types_and_io/structured_dataset.py
-:lines: 159-270
+:lines: 158-285
 ```
 
 [flytesnacks]: https://github.com/flyteorg/flytesnacks/tree/master/examples/data_types_and_io/

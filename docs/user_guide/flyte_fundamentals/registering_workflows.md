@@ -295,7 +295,7 @@ entities compiled as protobuf files that you can register with multiple Flyte
 clusters.
 
 ````{note}
-Like `pyflyte register`, can also specify multiple workflow directories, like:
+You can specify multiple workflow directories using the following command:
 
 ```{prompt} bash $
 pyflyte --pkgs <dir1> --pkgs <dir2> package ...
@@ -364,6 +364,17 @@ two GitHub actions that facilitates this:
   This action uses `flytectl register` under the hood to handle registration
   of Flyte packages, for example, the `.tgz` archives that are created by
   `pyflyte package`.
+
+### Some CI/CD best practices
+
+In case Flyte workflows are registered on each commit in your build pipelines, you can consider the following recommendations and approach:
+
+- **Versioning Strategy** : Determining the version of the build for different types of commits makes them consistent and identifiable. For commits on feature branches, use `<branch-name>-<short-commit-hash>` and for the ones on main branches, use `main-<short-commit-hash>`. Use version numbers for the released (tagged) versions.
+
+- **Workflow Serialization and Registration** : Workflows should be serialized and registered based on the versioning of the build and the container image. Depending on whether the build is for a feature branch or main, the registration domain should be adjusted accordingly. For more context, please visit the [Registering workflows](https://docs.flyte.org/en/latest/user_guide/flyte_fundamentals/registering_workflows.html) page.
+
+- **Container Image Specification** : When managing multiple images across tasks within a Flyte workflow, use the `--image` flag during registration to specify which image to use. This avoids hardcoding the image within the task definition, promoting reusability and flexibility in workflows.
+
 
 ## What's next?
 
