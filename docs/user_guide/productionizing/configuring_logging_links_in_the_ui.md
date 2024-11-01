@@ -65,7 +65,7 @@ task_logs:
 
 ```
 
-:::{Notes}
+.. note::
 prerequisites:
             - EKS Cluster enabled with CloudWatch Observability Add-on
             - Ensure the pod emits logs to CloudWatch log streams
