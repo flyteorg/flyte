@@ -5,6 +5,7 @@ import (
 
 	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/stretchr/testify/assert"
+	structpb2 "google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
@@ -555,6 +556,418 @@ func TestMapCasting(t *testing.T) {
 			},
 		)
 		assert.True(t, castable, "castable from Struct to struct")
+	})
+
+	t.Run("dataclass cast to same dataclass with draft 2020-12 (one level)", func(t *testing.T) {
+		/*
+			@dataclass
+			class A:
+				a: int
+		*/
+		castable := AreTypesCastable(
+			&core.LiteralType{
+				Type: &core.LiteralType_Simple{
+					Simple: core.SimpleType_STRUCT,
+				},
+				Metadata: &structpb.Struct{
+					Fields: map[string]*structpb2.Value{
+						"required": &structpb.Value{
+							Kind: &structpb.Value_ListValue{
+								ListValue: &structpb.ListValue{
+									Values: []*structpb.Value{{Kind: &structpb.Value_StringValue{StringValue: "a"}}},
+								},
+							},
+						},
+						"title": &structpb.Value{
+							Kind: &structpb.Value_StringValue{StringValue: "A"},
+						},
+						"properties": &structpb.Value{
+							Kind: &structpb.Value_StructValue{
+								StructValue: &structpb.Struct{
+									Fields: map[string]*structpb.Value{
+										"a": {
+											Kind: &structpb.Value_StructValue{
+												StructValue: &structpb.Struct{
+													Fields: map[string]*structpb.Value{
+														"type": {
+															Kind: &structpb.Value_StringValue{StringValue: "integer"},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+						"type": {
+							Kind: &structpb.Value_StringValue{StringValue: "object"},
+						},
+						"AdditionalProperties": {
+							Kind: &structpb.Value_BoolValue{BoolValue: false},
+						},
+					},
+				},
+			},
+			&core.LiteralType{
+				Type: &core.LiteralType_Simple{
+					Simple: core.SimpleType_STRUCT,
+				},
+				Metadata: &structpb.Struct{
+					Fields: map[string]*structpb2.Value{
+						"required": &structpb.Value{
+							Kind: &structpb.Value_ListValue{
+								ListValue: &structpb.ListValue{
+									Values: []*structpb.Value{{Kind: &structpb.Value_StringValue{StringValue: "a"}}},
+								},
+							},
+						},
+						"title": &structpb.Value{
+							Kind: &structpb.Value_StringValue{StringValue: "A"},
+						},
+						"properties": &structpb.Value{
+							Kind: &structpb.Value_StructValue{
+								StructValue: &structpb.Struct{
+									Fields: map[string]*structpb.Value{
+										"a": {
+											Kind: &structpb.Value_StructValue{
+												StructValue: &structpb.Struct{
+													Fields: map[string]*structpb.Value{
+														"type": {
+															Kind: &structpb.Value_StringValue{StringValue: "integer"},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+						"type": {
+							Kind: &structpb.Value_StringValue{StringValue: "object"},
+						},
+						"AdditionalProperties": {
+							Kind: &structpb.Value_BoolValue{BoolValue: false},
+						},
+					},
+				},
+			},
+		)
+		assert.True(t, castable, "dataclass castable with one level properties")
+	})
+
+	t.Run("dataclass cast to dataclass with draft 2020-12 (two level)", func(t *testing.T) {
+		/*
+			@dataclass
+			class A:
+				a: int
+
+			@dataclass
+			class B:
+			 	b: A
+		*/
+
+		castable := AreTypesCastable(
+			&core.LiteralType{
+				Type: &core.LiteralType_Simple{
+					Simple: core.SimpleType_STRUCT,
+				},
+				Metadata: &structpb.Struct{
+					Fields: map[string]*structpb2.Value{
+						"required": &structpb.Value{
+							Kind: &structpb.Value_ListValue{
+								ListValue: &structpb.ListValue{
+									Values: []*structpb.Value{{Kind: &structpb.Value_StringValue{StringValue: "b"}}},
+								},
+							},
+						},
+						"title": &structpb.Value{
+							Kind: &structpb.Value_StringValue{StringValue: "B"},
+						},
+						"properties": &structpb.Value{
+							Kind: &structpb.Value_StructValue{
+								StructValue: &structpb.Struct{
+									Fields: map[string]*structpb.Value{
+										"b": {
+											Kind: &structpb.Value_StructValue{
+												StructValue: &structpb.Struct{
+													Fields: map[string]*structpb.Value{
+														"required": {
+															Kind: &structpb.Value_ListValue{
+																ListValue: &structpb.ListValue{
+																	Values: []*structpb.Value{{Kind: &structpb.Value_StringValue{StringValue: "a"}}},
+																},
+															},
+														},
+														"title": {
+															Kind: &structpb.Value_StringValue{StringValue: "A"},
+														},
+														"properties": {
+															Kind: &structpb.Value_StructValue{
+																StructValue: &structpb.Struct{
+																	Fields: map[string]*structpb.Value{
+																		"a": {
+																			Kind: &structpb.Value_StructValue{
+																				StructValue: &structpb.Struct{
+																					Fields: map[string]*structpb.Value{
+																						"type": {
+																							Kind: &structpb.Value_StringValue{StringValue: "integer"},
+																						},
+																					},
+																				},
+																			},
+																		},
+																	},
+																},
+															},
+														},
+														"type": {
+															Kind: &structpb.Value_StringValue{StringValue: "object"},
+														},
+														"AdditionalProperties": {
+															Kind: &structpb.Value_BoolValue{BoolValue: false},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+						"type": {
+							Kind: &structpb.Value_StringValue{StringValue: "object"},
+						},
+						"AdditionalProperties": {
+							Kind: &structpb.Value_BoolValue{BoolValue: false},
+						},
+					},
+				},
+			},
+			&core.LiteralType{
+				Type: &core.LiteralType_Simple{
+					Simple: core.SimpleType_STRUCT,
+				},
+				Metadata: &structpb.Struct{
+					Fields: map[string]*structpb2.Value{
+						"required": &structpb.Value{
+							Kind: &structpb.Value_ListValue{
+								ListValue: &structpb.ListValue{
+									Values: []*structpb.Value{{Kind: &structpb.Value_StringValue{StringValue: "b"}}},
+								},
+							},
+						},
+						"title": &structpb.Value{
+							Kind: &structpb.Value_StringValue{StringValue: "B"},
+						},
+						"properties": &structpb.Value{
+							Kind: &structpb.Value_StructValue{
+								StructValue: &structpb.Struct{
+									Fields: map[string]*structpb.Value{
+										"b": {
+											Kind: &structpb.Value_StructValue{
+												StructValue: &structpb.Struct{
+													Fields: map[string]*structpb.Value{
+														"required": {
+															Kind: &structpb.Value_ListValue{
+																ListValue: &structpb.ListValue{
+																	Values: []*structpb.Value{{Kind: &structpb.Value_StringValue{StringValue: "a"}}},
+																},
+															},
+														},
+														"title": {
+															Kind: &structpb.Value_StringValue{StringValue: "A"},
+														},
+														"properties": {
+															Kind: &structpb.Value_StructValue{
+																StructValue: &structpb.Struct{
+																	Fields: map[string]*structpb.Value{
+																		"a": {
+																			Kind: &structpb.Value_StructValue{
+																				StructValue: &structpb.Struct{
+																					Fields: map[string]*structpb.Value{
+																						"type": {
+																							Kind: &structpb.Value_StringValue{StringValue: "integer"},
+																						},
+																					},
+																				},
+																			},
+																		},
+																	},
+																},
+															},
+														},
+														"type": {
+															Kind: &structpb.Value_StringValue{StringValue: "object"},
+														},
+														"AdditionalProperties": {
+															Kind: &structpb.Value_BoolValue{BoolValue: false},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+						"type": {
+							Kind: &structpb.Value_StringValue{StringValue: "object"},
+						},
+						"AdditionalProperties": {
+							Kind: &structpb.Value_BoolValue{BoolValue: false},
+						},
+					},
+				},
+			},
+		)
+		assert.True(t, castable, "dataclass castable with two level properties")
+	})
+
+	t.Run("dataclass cast to superset dataclass with draft 2020-12 (one level)", func(t *testing.T) {
+		/*
+			@dataclass
+			class A:
+				a: int
+
+			@dataclass
+			class A:
+				a: int
+				b: Optional[str]
+		*/
+		castable := AreTypesCastable(
+			&core.LiteralType{
+				Type: &core.LiteralType_Simple{
+					Simple: core.SimpleType_STRUCT,
+				},
+				Metadata: &structpb.Struct{
+					Fields: map[string]*structpb2.Value{
+						"required": &structpb.Value{
+							Kind: &structpb.Value_ListValue{
+								ListValue: &structpb.ListValue{
+									Values: []*structpb.Value{{Kind: &structpb.Value_StringValue{StringValue: "a"}}},
+								},
+							},
+						},
+						"title": &structpb.Value{
+							Kind: &structpb.Value_StringValue{StringValue: "A"},
+						},
+						"properties": &structpb.Value{
+							Kind: &structpb.Value_StructValue{
+								StructValue: &structpb.Struct{
+									Fields: map[string]*structpb.Value{
+										"a": {
+											Kind: &structpb.Value_StructValue{
+												StructValue: &structpb.Struct{
+													Fields: map[string]*structpb.Value{
+														"type": {
+															Kind: &structpb.Value_StringValue{StringValue: "integer"},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+						"type": {
+							Kind: &structpb.Value_StringValue{StringValue: "object"},
+						},
+						"AdditionalProperties": {
+							Kind: &structpb.Value_BoolValue{BoolValue: false},
+						},
+					},
+				},
+			},
+			&core.LiteralType{
+				Type: &core.LiteralType_Simple{
+					Simple: core.SimpleType_STRUCT,
+				},
+				Metadata: &structpb.Struct{
+					Fields: map[string]*structpb2.Value{
+						"required": &structpb.Value{
+							Kind: &structpb.Value_ListValue{
+								ListValue: &structpb.ListValue{
+									Values: []*structpb.Value{{Kind: &structpb.Value_StringValue{StringValue: "a"}}},
+								},
+							},
+						},
+						"title": &structpb.Value{
+							Kind: &structpb.Value_StringValue{StringValue: "A"},
+						},
+						"properties": &structpb.Value{
+							Kind: &structpb.Value_StructValue{
+								StructValue: &structpb.Struct{
+									Fields: map[string]*structpb.Value{
+										"a": {
+											Kind: &structpb.Value_StructValue{
+												StructValue: &structpb.Struct{
+													Fields: map[string]*structpb.Value{
+														"type": {
+															Kind: &structpb.Value_StringValue{StringValue: "integer"},
+														},
+													},
+												},
+											},
+										},
+										"b": {
+											Kind: &structpb.Value_StructValue{
+												StructValue: &structpb.Struct{
+													Fields: map[string]*structpb.Value{
+														"default": {
+															Kind: &structpb.Value_NullValue{},
+														},
+														"anyOf": {
+															Kind: &structpb.Value_ListValue{
+																ListValue: &structpb.ListValue{
+																	Values: []*structpb.Value{
+																		{
+																			Kind: &structpb.Value_StructValue{
+																				StructValue: &structpb.Struct{
+																					Fields: map[string]*structpb.Value{
+																						"type": {
+																							Kind: &structpb.Value_StringValue{StringValue: "string"},
+																						},
+																					},
+																				},
+																			},
+																		},
+																		{
+																			Kind: &structpb.Value_StructValue{
+																				StructValue: &structpb.Struct{
+																					Fields: map[string]*structpb.Value{
+																						"type": {
+																							Kind: &structpb.Value_StringValue{StringValue: "null"},
+																						},
+																					},
+																				},
+																			},
+																		},
+																	},
+																},
+															},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+						"type": {
+							Kind: &structpb.Value_StringValue{StringValue: "object"},
+						},
+						"AdditionalProperties": {
+							Kind: &structpb.Value_BoolValue{BoolValue: false},
+						},
+					},
+				},
+			},
+		)
+		assert.True(t, castable, "dataclass castable to superset with one level properties")
 	})
 
 	t.Run("MismatchedMapNestLevels_Scalar", func(t *testing.T) {
