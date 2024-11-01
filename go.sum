@@ -1198,7 +1198,6 @@ github.com/russross/blackfriday/v2 v2.0.1/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQD
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
 github.com/samber/lo v1.47.0 h1:z7RynLwP5nbyRscyvcD043DWYoOcYRv3mV8lBeqOCLc=
 github.com/samber/lo v1.47.0/go.mod h1:RmDH9Ct32Qy3gduHQuKJ3gW1fMHAnE/fAzQuf6He5cU=
-github.com/santhosh-tekuri/jsonschema v1.2.4 h1:hNhW8e7t+H1vgY+1QeEQpveR6D4+OwKPXCfD2aieJis=
 github.com/santhosh-tekuri/jsonschema v1.2.4/go.mod h1:TEAUOeZSmIxTTuHatJzrvARHiuO9LYd+cIxzgEHCQI4=
 github.com/santhosh-tekuri/jsonschema/v2 v2.1.0/go.mod h1:yzJzKUGV4RbWqWIBBP4wSOBqavX5saE02yirLS0OTyg=
 github.com/satori/go.uuid v1.2.0/go.mod h1:dA0hQrYB0VpLJoorglMZABFdXlWrHn1NEOzdhQKdks0=
@@ -1360,8 +1359,6 @@ github.com/yuin/goldmark v1.3.5/go.mod h1:mwnBkeHKe2W/ZEtQ+71ViKU8L12m81fl3OWwC1
 github.com/yuin/goldmark v1.4.13/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5taEt/CY=
 github.com/zenazn/goji v0.9.0/go.mod h1:7S9M489iMyHBNxwZnk9/EHS098H4/F6TATF2mIxtB1Q=
 github.com/ziutek/mymysql v1.5.4/go.mod h1:LMSpPZ6DbqWFxNCHW77HeMg9I646SAhApZ/wKdgO/C0=
-gitlab.com/yvesf/json-schema-compare v0.0.0-20190604192943-a900c04201f7 h1:BAkxmYRc1ZPl6Gap4HWqwPT8yLZMrgaAwx12Ft408sg=
-gitlab.com/yvesf/json-schema-compare v0.0.0-20190604192943-a900c04201f7/go.mod h1:X40Z1OU8o1oiXWzBmkuYOaruzYGv60l0AxGiB0E9keI=
 go.elastic.co/apm v1.8.0/go.mod h1:tCw6CkOJgkWnzEthFN9HUP1uL3Gjc/Ur6m7gRPLaoH0=
 go.elastic.co/apm/module/apmhttp v1.8.0/go.mod h1:9LPFlEON51/lRbnWDfqAWErihIiAFDUMfMV27YjoWQ8=
 go.elastic.co/apm/module/apmot v1.8.0/go.mod h1:Q5Xzabte8G/fkvDjr1jlDuOSUt9hkVWNZEHh6ZNaTjI=

@@ -1,16 +1,12 @@
 package validators
 
 import (
-	"bytes"
 	"encoding/json"
-	"fmt"
-	jscmp "gitlab.com/yvesf/json-schema-compare"
 	"strings"
 
-	structpb "github.com/golang/protobuf/ptypes/struct"
-	"github.com/santhosh-tekuri/jsonschema"
-
 	flyte "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	structpb "github.com/golang/protobuf/ptypes/struct"
+	"github.com/wI2L/jsondiff"
 )
 
 type typeChecker interface {
@@ -21,35 +17,59 @@ type trivialChecker struct {
 	literalType *flyte.LiteralType
 }
 
-func isSameTypeInJSON(sourceMetaData, targetMetaData *structpb.Struct) bool {
-	compiler := jsonschema.NewCompiler()
+func isSuperTypeInJSON(sourceMetaData, targetMetaData *structpb.Struct) bool {
+	// Since there are lots of field differences between draft-07 and draft 2020-12,
+	// we only support json schema with 2020-12 draft, which is generated here: https://github.com/flyteorg/flytekit/blob/ff2d0da686c82266db4dbf764a009896cf062349/flytekit/core/type_engine.py#L630-L639
+	_, upstreamIsDraft7 := sourceMetaData.Fields["$schema"]
+	_, downstreamIsDraft7 := targetMetaData.Fields["$schema"]
 
-	addSchemaToCompiler := func(name string, data *structpb.Struct) error {
-		schemaByte, err := json.Marshal(data.Fields)
-		if err != nil {
-			return fmt.Errorf("failed to marshal %s: %w", name, err)
+	if upstreamIsDraft7 || downstreamIsDraft7 {
+		return false
+	}
+
+	copySourceSchema := make(map[string]interface{})
+	copyTargetSchema := make(map[string]interface{})
+
+	for k, v := range sourceMetaData.Fields {
+		copySourceSchema[k] = v
+	}
+
+	for k, v := range targetMetaData.Fields {
+		copyTargetSchema[k] = v
+	}
+
+	srcSchemaBytes, _ := json.Marshal(copySourceSchema)
+	tgtSchemaBytes, _ := json.Marshal(copyTargetSchema)
+
+	patch, _ := jsondiff.CompareJSON(srcSchemaBytes, tgtSchemaBytes)
+	for _, p := range patch {
+		if p.Type != jsondiff.OperationAdd {
+			return false
+		} else if strings.Contains(p.Path, "required") {
+			return false
 		}
-		return compiler.AddResource(name, bytes.NewReader(schemaByte))
 	}
+	return true
+}
 
-	if err := addSchemaToCompiler("source", sourceMetaData); err != nil {
-		return false
-	}
-	if err := addSchemaToCompiler("target", targetMetaData); err != nil {
-		return false
-	}
+func isSameTypeInJSON(sourceMetaData, targetMetaData *structpb.Struct) bool {
+	// Since there are lots of field differences between draft-07 and draft 2020-12,
+	// we only support json schema with 2020-12 draft, which is generated here: https://github.com/flyteorg/flytekit/blob/ff2d0da686c82266db4dbf764a009896cf062349/flytekit/core/type_engine.py#L630-L639
+	_, upstreamIsDraft7 := sourceMetaData.Fields["$schema"]
+	_, downstreamIsDraft7 := targetMetaData.Fields["$schema"]
 
-	sourceSchema, err := compiler.Compile("source")
-	if err != nil {
-		return false
-	}
-	targetSchema, err := compiler.Compile("target")
-	if err != nil {
+	if upstreamIsDraft7 != downstreamIsDraft7 {
 		return false
 	}
 
-	cmprErrList := jscmp.Compare(sourceSchema, targetSchema)
-	return len(cmprErrList) == 1 && strings.Contains(cmprErrList[0].Error(), "FIXME additionalProperties not implemented")
+	sourceSchema := sourceMetaData.Fields
+	targetSchema := targetMetaData.Fields
+
+	srcSchemaBytes, _ := json.Marshal(sourceSchema)
+	tgtSchemaBytes, _ := json.Marshal(targetSchema)
+
+	patch, _ := jsondiff.CompareJSON(srcSchemaBytes, tgtSchemaBytes)
+	return len(patch) == 0
 }
 
 // CastsFrom is a trivial type checker merely checks if types match exactly.
@@ -79,7 +99,7 @@ func (t trivialChecker) CastsFrom(upstreamType *flyte.LiteralType) bool {
 			return true
 		}
 
-		return isSameTypeInJSON(upstreamMetaData, downstreamMetaData)
+		return isSameTypeInJSON(upstreamMetaData, downstreamMetaData) || isSuperTypeInJSON(upstreamMetaData, downstreamMetaData)
 	}
 
 	// Ignore metadata when comparing types.
