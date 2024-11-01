@@ -42,7 +42,7 @@ func validateInputs(nodeID common.NodeID, iface *core.TypedInterface, inputs cor
 			continue
 		}
 		if !validators.AreTypesCastable(inputType, v.Type) {
-			errs.Collect(errors.NewMismatchingTypesErr(nodeID, inputVar, v.Type.String(), inputType.String()))
+			errs.Collect(errors.NewMismatchingTypesErr(nodeID, inputVar, common.LiteralTypeToStr(v.Type), common.LiteralTypeToStr(inputType)))
 			continue
 		}
 
