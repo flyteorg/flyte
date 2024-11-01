@@ -4,12 +4,15 @@ import (
 	"bytes"
 	"context"
 	"crypto/md5" // #nosec
+	"fmt"
 	"net/url"
 	"testing"
 	"time"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/durationpb"
 
 	commonMocks "github.com/flyteorg/flyte/flyteadmin/pkg/common/mocks"
@@ -157,6 +160,15 @@ func TestCreateUploadLocationMore(t *testing.T) {
 	})
 }
 
+type testMetadata struct {
+	storage.Metadata
+	exists bool
+}
+
+func (t testMetadata) Exists() bool {
+	return t.exists
+}
+
 func TestCreateDownloadLink(t *testing.T) {
 	dataStore := commonMocks.GetMockStorageClient()
 	nodeExecutionManager := &mocks.MockNodeExecutionManager{}
@@ -179,7 +191,11 @@ func TestCreateDownloadLink(t *testing.T) {
 		assert.Error(t, err)
 	})
 
-	t.Run("valid config", func(t *testing.T) {
+	t.Run("item not found", func(t *testing.T) {
+		dataStore.ComposedProtobufStore.(*commonMocks.TestDataStore).HeadCb = func(ctx context.Context, ref storage.DataReference) (storage.Metadata, error) {
+			return testMetadata{exists: false}, nil
+		}
+
 		_, err = s.CreateDownloadLink(context.Background(), &service.CreateDownloadLinkRequest{
 			ArtifactType: service.ArtifactType_ARTIFACT_TYPE_DECK,
 			Source: &service.CreateDownloadLinkRequest_NodeExecutionId{
@@ -187,10 +203,53 @@ func TestCreateDownloadLink(t *testing.T) {
 			},
 			ExpiresIn: durationpb.New(time.Hour),
 		})
+
+		st, ok := status.FromError(err)
+		assert.True(t, ok)
+		assert.Equal(t, codes.NotFound, st.Code())
+		assert.Equal(t, "object not found", st.Message())
+	})
+
+	t.Run("valid config", func(t *testing.T) {
+		dataStore.ComposedProtobufStore.(*commonMocks.TestDataStore).HeadCb = func(ctx context.Context, ref storage.DataReference) (storage.Metadata, error) {
+			return testMetadata{exists: true}, nil
+		}
+
+		_, err = s.CreateDownloadLink(context.Background(), &service.CreateDownloadLinkRequest{
+			ArtifactType: service.ArtifactType_ARTIFACT_TYPE_DECK,
+			Source: &service.CreateDownloadLinkRequest_NodeExecutionId{
+				NodeExecutionId: &core.NodeExecutionIdentifier{},
+			},
+			ExpiresIn: durationpb.New(time.Hour),
+		})
+
 		assert.NoError(t, err)
 	})
 
+	t.Run("head failed", func(t *testing.T) {
+		dataStore.ComposedProtobufStore.(*commonMocks.TestDataStore).HeadCb = func(ctx context.Context, ref storage.DataReference) (storage.Metadata, error) {
+			return testMetadata{}, fmt.Errorf("head fail")
+		}
+
+		_, err = s.CreateDownloadLink(context.Background(), &service.CreateDownloadLinkRequest{
+			ArtifactType: service.ArtifactType_ARTIFACT_TYPE_DECK,
+			Source: &service.CreateDownloadLinkRequest_NodeExecutionId{
+				NodeExecutionId: &core.NodeExecutionIdentifier{},
+			},
+			ExpiresIn: durationpb.New(time.Hour),
+		})
+
+		st, ok := status.FromError(err)
+		assert.True(t, ok)
+		assert.Equal(t, codes.Internal, st.Code())
+		assert.Equal(t, "failed to head object before signing url. Error: head fail", st.Message())
+	})
+
 	t.Run("use default ExpiresIn", func(t *testing.T) {
+		dataStore.ComposedProtobufStore.(*commonMocks.TestDataStore).HeadCb = func(ctx context.Context, ref storage.DataReference) (storage.Metadata, error) {
+			return testMetadata{exists: true}, nil
+		}
+
 		_, err = s.CreateDownloadLink(context.Background(), &service.CreateDownloadLinkRequest{
 			ArtifactType: service.ArtifactType_ARTIFACT_TYPE_DECK,
 			Source: &service.CreateDownloadLinkRequest_NodeExecutionId{
@@ -420,5 +479,25 @@ func TestService_Error(t *testing.T) {
 		}
 		_, err := s.GetTaskExecutionID(context.Background(), 0, nodeExecID)
 		assert.Error(t, err, "no task executions")
+	})
+}
+
+func TestCreateStorageLocation(t *testing.T) {
+	ctx := context.TODO()
+	dataStore := commonMocks.GetMockStorageClient()
+	expectedStoragePath := storage.DataReference("s3://bucket/prefix/foo/bar/baz")
+	t.Run("no empty parts", func(t *testing.T) {
+		storagePath, err := createStorageLocation(ctx, dataStore, config.DataProxyUploadConfig{
+			StoragePrefix: "prefix",
+		}, "foo", "bar", "baz")
+		assert.NoError(t, err)
+		assert.Equal(t, expectedStoragePath, storagePath)
+	})
+	t.Run("with empty parts", func(t *testing.T) {
+		storagePath, err := createStorageLocation(ctx, dataStore, config.DataProxyUploadConfig{
+			StoragePrefix: "prefix",
+		}, "foo", "bar", "", "baz")
+		assert.NoError(t, err)
+		assert.Equal(t, expectedStoragePath, storagePath)
 	})
 }

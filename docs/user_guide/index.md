@@ -26,7 +26,7 @@ To learn about how to spin up and manage a Flyte cluster in the cloud, see the
 ```
 
 ```{note}
-Want to contribute or update an example? Check out the {doc}`Contribution Guide <../community/contribute_docs>`.
+Want to contribute or update an example? Check out the {ref}`Contribution Guide <contribute_docs>`.
 ```
 
 ## Table of contents

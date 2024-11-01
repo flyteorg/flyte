@@ -207,7 +207,7 @@ func getNodeExecutionContext(ctx context.Context, identifier *core.NodeExecution
 func (c *CloudEventWrappedPublisher) getLatestTaskExecutions(ctx context.Context, nodeExecutionID *core.NodeExecutionIdentifier) (*admin.TaskExecution, error) {
 	ctx = getNodeExecutionContext(ctx, nodeExecutionID)
 
-	identifierFilters, err := util.GetNodeExecutionIdentifierFilters(ctx, nodeExecutionID)
+	identifierFilters, err := util.GetNodeExecutionIdentifierFilters(ctx, nodeExecutionID, common.TaskExecution)
 	if err != nil {
 		return nil, err
 	}

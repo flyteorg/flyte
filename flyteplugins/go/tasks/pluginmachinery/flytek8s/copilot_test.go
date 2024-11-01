@@ -533,7 +533,9 @@ func TestAddCoPilotToPod(t *testing.T) {
 			InputPath:  "in",
 			OutputPath: "out",
 		}
-		assert.NoError(t, AddCoPilotToPod(ctx, cfg, &pod, iface, taskMetadata, inputPaths, opath, pilot))
+		primaryInitContainerName, err := AddCoPilotToPod(ctx, cfg, &pod, iface, taskMetadata, inputPaths, opath, pilot)
+		assert.NoError(t, err)
+		assert.Equal(t, "test-downloader", primaryInitContainerName)
 		assertPodHasSNPS(t, &pod)
 		assertPodHasCoPilot(t, cfg, pilot, iface, &pod)
 	})
@@ -545,7 +547,9 @@ func TestAddCoPilotToPod(t *testing.T) {
 			InputPath:  "in",
 			OutputPath: "out",
 		}
-		assert.NoError(t, AddCoPilotToPod(ctx, cfg, &pod, nil, taskMetadata, inputPaths, opath, pilot))
+		primaryInitContainerName, err := AddCoPilotToPod(ctx, cfg, &pod, nil, taskMetadata, inputPaths, opath, pilot)
+		assert.NoError(t, err)
+		assert.Empty(t, primaryInitContainerName)
 		assertPodHasSNPS(t, &pod)
 		assertPodHasCoPilot(t, cfg, pilot, nil, &pod)
 	})
@@ -565,7 +569,9 @@ func TestAddCoPilotToPod(t *testing.T) {
 			InputPath:  "in",
 			OutputPath: "out",
 		}
-		assert.NoError(t, AddCoPilotToPod(ctx, cfg, &pod, iface, taskMetadata, inputPaths, opath, pilot))
+		primaryInitContainerName, err := AddCoPilotToPod(ctx, cfg, &pod, iface, taskMetadata, inputPaths, opath, pilot)
+		assert.NoError(t, err)
+		assert.Equal(t, "test-downloader", primaryInitContainerName)
 		assertPodHasSNPS(t, &pod)
 		assertPodHasCoPilot(t, cfg, pilot, iface, &pod)
 	})
@@ -584,7 +590,9 @@ func TestAddCoPilotToPod(t *testing.T) {
 			InputPath:  "in",
 			OutputPath: "out",
 		}
-		assert.NoError(t, AddCoPilotToPod(ctx, cfg, &pod, iface, taskMetadata, inputPaths, opath, pilot))
+		primaryInitContainerName, err := AddCoPilotToPod(ctx, cfg, &pod, iface, taskMetadata, inputPaths, opath, pilot)
+		assert.NoError(t, err)
+		assert.Empty(t, primaryInitContainerName)
 		assertPodHasSNPS(t, &pod)
 		assertPodHasCoPilot(t, cfg, pilot, iface, &pod)
 	})
@@ -603,11 +611,15 @@ func TestAddCoPilotToPod(t *testing.T) {
 			InputPath:  "in",
 			OutputPath: "out",
 		}
-		assert.NoError(t, AddCoPilotToPod(ctx, cfg, &pod, iface, taskMetadata, inputPaths, opath, pilot))
+		primaryInitContainerName, err := AddCoPilotToPod(ctx, cfg, &pod, iface, taskMetadata, inputPaths, opath, pilot)
+		assert.NoError(t, err)
+		assert.Empty(t, primaryInitContainerName)
 		assert.Len(t, pod.Volumes, 0)
 	})
 
 	t.Run("nil", func(t *testing.T) {
-		assert.NoError(t, AddCoPilotToPod(ctx, cfg, nil, nil, taskMetadata, inputPaths, opath, nil))
+		primaryInitContainerName, err := AddCoPilotToPod(ctx, cfg, nil, nil, taskMetadata, inputPaths, opath, nil)
+		assert.NoError(t, err)
+		assert.Empty(t, primaryInitContainerName)
 	})
 }

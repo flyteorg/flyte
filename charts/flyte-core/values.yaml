@@ -319,7 +319,6 @@ flytepropeller:
       cpu: 10m
       ephemeral-storage: 50Mi
       memory: 100Mi
-  cacheSizeMbs: 0
   # -- Error reporting
   terminationMessagePolicy: FallbackToLogsOnError
   # -- Default regex string for searching configuration files
@@ -610,6 +609,9 @@ storage:
   # -- default limits being applied to storage config
   limits:
     maxDownloadMBs: 10
+  cache:
+    maxSizeMBs: 0
+    targetGCPercent: 70
 
 # Database configuration
 db:
@@ -944,15 +946,48 @@ external_events:
 # an SNS topic (or gcp equivalent)
 cloud_events:
   enable: false
-  type: aws
-  aws:
-    region: us-east-2
   eventsPublisher:
     # Make sure this is not a fifo queue. Admin does not yet support
     # writing to fifo sns topics.
     topicName: "arn:aws:sns:us-east-2:123456:123-my-topic"
     eventTypes:
       - all  # Or workflow, node, task. Or "*"
+  type: aws
+  # -- Configuration for sending cloud events to AWS SNS
+  aws:
+    region: us-east-2
+  # -- Configuration for sending cloud events to GCP Pub Sub
+  gcp:
+    region: us-east1
+  # -- Configuration for sending cloud events to Kafka
+  kafka:
+    # -- The version of Kafka
+    version: "3.7.0"
+    # -- The kafka brokers to talk to
+    brokers:
+      - mybroker:443
+    # -- SASL based authentication
+    saslConfig:
+      # -- Whether to use SASL authentication
+      enabled: false
+      # -- The kafka user
+      user: kafka
+      # -- The password for the kafka user
+      password: ""
+      # -- Optional mount path of file containing the kafka password.
+      passwordPath: ""
+      # -- Whether the send the SASL handsahke first
+      handshake: true
+      # -- Which SASL mechanism to use. Defaults to PLAIN
+      mechanism: PLAIN
+    # -- Certificate based authentication
+    tlsConfig:
+      # -- Whether to use certificate based authentication or TLS
+      enabled: false
+      # -- Path to the client certificate
+      certPath: /etc/ssl/certs/kafka-client.crt
+      # -- Path to the client private key
+      keyPath: /etc/ssl/certs/kafka-client.key
 
 # -- Configuration for the Cluster resource manager component. This is an optional component, that enables automatic
 # cluster configuration. This is useful to set default quotas, manage namespaces etc that map to a project/domain

@@ -40,6 +40,7 @@ import (
 	nodemocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces/mocks"
 	recoveryMocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/recovery/mocks"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
+	taskconfig "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/fakeplugins"
 	wfErrors "github.com/flyteorg/flyte/flytepropeller/pkg/controller/workflow/errors"
 	execStats "github.com/flyteorg/flyte/flytepropeller/pkg/controller/workflowstore"
@@ -227,6 +228,15 @@ func createTaskExecutorErrorInCheck(t assert.TestingT) pluginCore.PluginEntry {
 func TestWorkflowExecutor_HandleFlyteWorkflow_Error(t *testing.T) {
 	ctx := context.Background()
 	scope := testScope.NewSubScope("12")
+
+	taskConfig := taskconfig.GetConfig()
+	taskConfig.TaskPlugins.DefaultForTaskTypes = map[string]string{
+		"python-task":   "pod",
+		"container":     "pod",
+		"raw-container": "pod",
+		"sidecar":       "pod",
+	}
+
 	store := createInmemoryDataStore(t, scope.NewSubScope("data_store"))
 	recorder := StdOutEventRecorder()
 	_, err := events.ConstructEventSink(ctx, &events.Config{Type: events.EventSinkLog}, scope.NewSubScope("event_sink"))
