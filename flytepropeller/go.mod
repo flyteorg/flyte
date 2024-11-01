@@ -20,7 +20,6 @@ require (
 	github.com/imdario/mergo v0.3.13
 	github.com/magiconair/properties v1.8.6
 	github.com/mitchellh/mapstructure v1.5.0
-	github.com/nsf/jsondiff v0.0.0-20230430225905-43f6cf3098c1
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.19.1
 	github.com/shamaton/msgpack/v2 v2.2.2
