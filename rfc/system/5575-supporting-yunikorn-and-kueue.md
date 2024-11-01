@@ -27,29 +27,24 @@ queueconfig:
     users: "*" 
     acl:
       - jobs: "ray,dask"
-        users: "user1,user2"
         priorityclass: priority-ray
         gangscheduling: "placeholderTimeoutInSeconds=60 gangSchedulingStyle=hard"
       - jobs: "spark"
-        users: "user1,user3"
         priorityclass: priority-spark
         gangscheduling: "placeholderTimeoutInSeconds=30 gangSchedulingStyle=hard"
     namespace:
-      namespaces: "ns1|ns2"
       priorityclass: priority-default
   - org: org2
     users: "user4, user5"
     acl:
       - jobs: "*"
-        users: "*"
-    namespace:
-      namespaces: "*"
 ```
 
 Mentioned configuration indicates what queues exist for an org.
-Hierarchucak queues will be structured as follows.
-root.org1.ray、root.org1.spark and root.org1.default allowing submissions from ns1 and ns2 namespace.
-root.org2."CRDs" and root.org2.default allowing submissions from any namespaces.
+Hierarchical queues will be structured as follows.
+root.org1.ray、root.org1.spark, root.org1.default and root.org2."CRDs".
+
+ray and spark linked to priority class setting ` yunikorn.apache.org/allow-preemption` with `false` recommand Yunikorn do its best to prevent applications from preemption.
 
 ResourceFlavor allocates resource based on labels which indicates that category-based resource allocation by organization label is available.
 Thus, a clusterQueue including multiple resources represents the total acessaible resource for an organization.  
