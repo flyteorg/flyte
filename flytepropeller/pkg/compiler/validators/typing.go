@@ -4,9 +4,10 @@ import (
 	"encoding/json"
 	"strings"
 
-	flyte "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/wI2L/jsondiff"
+
+	flyte "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 type typeChecker interface {
