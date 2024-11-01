@@ -25,19 +25,18 @@ queueconfig:
   general:
   - org: org1
     users: "*" 
-    priorityclass: priority-default
     acl:
       - jobs: "ray,dask"
         users: "user1,user2"
         priorityclass: priority-ray
-        gangscheduling: true
+        gangscheduling: "placeholderTimeoutInSeconds=60 gangSchedulingStyle=hard"
       - jobs: "spark"
         users: "user1,user3"
         priorityclass: priority-spark
-        gangscheduling: true
+        gangscheduling: "placeholderTimeoutInSeconds=30 gangSchedulingStyle=hard"
     namespace:
-      default: "ns1"
       namespaces: "ns1|ns2"
+      priorityclass: priority-default
   - org: org2
     users: "user4, user5"
     acl:
@@ -64,21 +63,38 @@ A SchedulerConfigManager maintains config from mentioned yaml.
 It patches labels or annotations on k8s resources after they pass rules specified in the configuration.
 
 ```go
-type SchedulerHelper interface {
-  Patch(obj client.object) (error, string)
-  GangScheduling(string) error
+type YunikornScheduablePlugin interface {
+	MutateResourceForYunikorn(ctx context.Context, object client.Object, taskTmpl *core.TaskTemplate) (client.Object, error)
+  GetLabels(id core.Identifier) map[string]string
 }
 
-type PodLabels struct {
-  PodName string
-  labels map[string]string
-  annotations map[string]string
+type KueueScheduablePlugin interface {
+	MutateResourceForKueue(ctx context.Context, object client.Object, taskTmpl *core.TaskTemplate) (client.Object, error)
+  GetLabels(id core.Identifier) map[string]string
+}
+
+func (h *YunikornScheduablePlugin) MutateResourceForYunikorn(ctx context.Context, object client.Object, taskTmpl *core.TaskTemplate) (client.Object, error) error {
+  rayJob := object.(*rayv1.RayJob)
+  // TODO
+}
+
+func (h *YunikornScheduablePlugin) GetLabels(id core.Identifier) map[string]string {
+  // 1.UserInfo
+  // 2.QueueName
+  // 3.ApplicationID
+}
+
+func PatchPodSpec(target *v1.PodSpec, labels map[string]string) error {
+  // Get Metaobject from target
+  // Add label is the specific label doesn't exist
 }
 ```
-Creat a scheduler helper according to the queueconfig.scheduler.
+
+
+Creat a scheduler plugin according to the queueconfig.scheduler.
 Its basic responsibility validate whether submitted application is accepted. 
-When a Yunikorn scheduler helper created, it will create applicationID、queue name and preemption labels .
-in the other hand, a Kueue scheduler helper constructs labels including localQueueName, preemption.
+When a Yunikorn scheduler plugin created, it will create applicationID、queue name and preemption labels .
+in the other hand, a Kueue scheduler plugin constructs labels including localQueueName, preemption.
 
 ```go
 func (e *PluginManager) launchResource(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (pluginsCore.Transition, error) {
@@ -86,10 +102,8 @@ func (e *PluginManager) launchResource(ctx context.Context, tCtx pluginsCore.Tas
 	if err != nil {
 		return pluginsCore.UnknownTransition, err
 	}
-  if 
-  if err, jobtype := e.SchedulerHelper.Patch(o); err == nil {
-    if e.SchedulerHelper.GangScheduling(jobtype, o); err != nil {
-       return pluginsCore.UnknownTransition, err
+  if o, err = e.SchedulerPlugin.MutateResourceForKueue(o); err == nil {
+      return pluginsCore.UnknownTransition, err
     }
   } else {
      return pluginsCore.UnknownTransition, err
