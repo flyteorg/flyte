@@ -115,3 +115,7 @@ func applyScopedFilters(tx *gorm.DB, inlineFilters []common.InlineFilter, mapFil
 	}
 	return tx, nil
 }
+
+func getIdFilter(id uint) (query string, args interface{}) {
+	return fmt.Sprintf("%s = ?", ID), id
+}
