@@ -25,6 +25,48 @@ type singleFileErrorReader struct {
 	errorFilePath storage.DataReference
 }
 
+type earliestFileErrorReader struct {
+	baseErrorReader
+	errorDirPath        storage.DataReference
+	errorFilePathPrefix storage.DataReference
+	errorFileExtension  string
+}
+
+/*
+   We have a 'single file error reader' and 'earliest file error reader' as two
+   different strategies for reading task error files.
+
+   Single file error reader is used to check for a single error.pb file uploaded
+   by a task, and is the default strategy. Earliest file error reader is used to check for
+   multiple error-<uuid>.pb files and pick the one that has the earliest error timestamp.
+   It is used when a distributed task requests earliest timestamp error aggregation
+   strategy. To support backward compatibility, the earliest file error reader also handles
+   cases when there is a single error.pb file uploaded by the task. The earliest file
+   error reader is currently used for the PyTorch plugin.
+
+   A few notes:
+
+   - While the earliest file error reader handles the single error file scenario as well,
+   it is not set as the default, because its implementation depends on doing a listing operation
+   on remote storage. We do not want the listing overhead to be paid for the more common case of 
+   having a single error file.
+   - Under the multiple error aggregation scenario, it is possible that the error aggregation
+   is performed before all the errors are reported. For PyTorch plugin specifically, the
+   the training operator will mark the job as 'done' when it detects one of the pods as failing.
+   Once Propeller detects this, it will perform the error aggregation. There is a rare scenario
+   where the pod that has the earliest error gets delayed in uploading its error file to
+   remote storage, and the pod that has a later error ends up completing first. If the
+   training operator's detection of job completion and Propeller's error aggregation happen so
+   fast that the pod with the earliest error has not yet uploaded it's error to remote storage, 
+   we may end up reporting the wrong error. This is highly unlikely in practice. The implementation 
+   we have here is significantly better than the prior behavior of reporting the latest written
+   error.pb file (as there was a race condition on overwriting error files), which is almost always
+   not the earliest error.
+   - The training operator does not have any error aggregation strategy implemented. PyTorch
+   distributed itself aggregates errors from the trainers running under the same elastic agent,
+   and reports the earliest error. The aggregation we perform here extends that to across pods.
+*/
+
 const errorFileNotFoundErrorCode = "ErrorFileNotFound"
 
 var ErrRemoteFileExceedsMaxSize = errors.New("remote file exceeds max size")
@@ -108,13 +150,6 @@ func (s *singleFileErrorReader) ReadError(ctx context.Context) (io.ExecutionErro
 	}
 
 	return errorDoc2ExecutionError(errorDoc, s.errorFilePath), nil
-}
-
-type earliestFileErrorReader struct {
-	baseErrorReader
-	errorDirPath        storage.DataReference
-	errorFilePathPrefix storage.DataReference
-	errorFileExtension  string
 }
 
 func (e *earliestFileErrorReader) IsError(ctx context.Context) (bool, error) {
