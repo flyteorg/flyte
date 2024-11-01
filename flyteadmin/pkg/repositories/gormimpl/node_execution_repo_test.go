@@ -65,7 +65,7 @@ func TestUpdateNodeExecution(t *testing.T) {
 	GlobalMock := mocket.Catcher.Reset()
 	// Only match on queries that append the name filter
 	nodeExecutionQuery := GlobalMock.NewMock()
-	nodeExecutionQuery.WithQuery(`UPDATE "node_executions" SET "id"=$1,"updated_at"=$2,"execution_project"=$3,"execution_domain"=$4,"execution_name"=$5,"node_id"=$6,"phase"=$7,"input_uri"=$8,"closure"=$9,"started_at"=$10,"node_execution_created_at"=$11,"node_execution_updated_at"=$12,"duration"=$13 WHERE "execution_org" = $14 AND "execution_project" = $15 AND "execution_domain" = $16 AND "execution_name" = $17 AND "node_id" = $18`)
+	nodeExecutionQuery.WithQuery(`UPDATE "node_executions" SET "id"=$1,"updated_at"=$2,"execution_project"=$3,"execution_domain"=$4,"execution_name"=$5,"node_id"=$6,"phase"=$7,"input_uri"=$8,"closure"=$9,"started_at"=$10,"node_execution_created_at"=$11,"node_execution_updated_at"=$12,"duration"=$13 WHERE id = $14`)
 	err := nodeExecutionRepo.Update(context.Background(),
 		&models.NodeExecution{
 			BaseModel: models.BaseModel{ID: 1},

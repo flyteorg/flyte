@@ -110,7 +110,7 @@ func (r *ExecutionRepo) Get(ctx context.Context, input interfaces.Identifier) (m
 
 func (r *ExecutionRepo) Update(ctx context.Context, execution models.Execution) error {
 	timer := r.metrics.UpdateDuration.Start()
-	tx := r.db.WithContext(ctx).Model(&execution).Where(getExecutionOrgFilter(execution.Org)).Updates(execution)
+	tx := r.db.WithContext(ctx).Model(&models.Execution{}).Where(getIdFilter(execution.ID)).Updates(execution)
 	timer.Stop()
 	if err := tx.Error; err != nil {
 		return r.errorTransformer.ToFlyteAdminError(err)

@@ -130,3 +130,7 @@ func getOrgFilter(org string) map[string]interface{} {
 func getExecutionOrgFilter(executionOrg string) map[string]interface{} {
 	return map[string]interface{}{executionOrgColumn: executionOrg}
 }
+
+func getIdFilter(id uint) (query string, args interface{}) {
+	return fmt.Sprintf("%s = ?", ID), id
+}

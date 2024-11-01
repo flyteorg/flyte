@@ -82,7 +82,7 @@ func (r *TaskExecutionRepo) Get(ctx context.Context, input interfaces.GetTaskExe
 
 func (r *TaskExecutionRepo) Update(ctx context.Context, execution models.TaskExecution) error {
 	timer := r.metrics.UpdateDuration.Start()
-	tx := r.db.WithContext(ctx).WithContext(ctx).Where(getOrgFilter(execution.Org)).Where(getExecutionOrgFilter(execution.ExecutionKey.Org)).
+	tx := r.db.WithContext(ctx).WithContext(ctx).Model(&models.TaskExecution{}).Where(getIdFilter(execution.ID)).
 		Updates(&execution) // TODO @hmaersaw - need to add WithContext to all db calls to link otel spans
 	timer.Stop()
 
