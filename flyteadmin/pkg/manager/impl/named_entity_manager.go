@@ -108,8 +108,8 @@ func (m *NamedEntityManager) ListNamedEntities(ctx context.Context, request *adm
 	ctx = contextutils.WithProjectDomain(ctx, request.Project, request.Domain)
 
 	if len(request.Filters) == 0 {
-		// Add implicit active filters ordinarily added by database.
-		request.Filters = fmt.Sprintf("not_contains(name,%s)", ".flytegen")
+		// Add implicit filter to exclude system generated workflows
+		request.Filters = fmt.Sprintf("not_like(name,%s)", ".flytegen%")
 	}
 	// HACK: In order to filter by state (if requested) - we need to amend the filter to use COALESCE
 	// e.g. eq(state, 1) becomes 'WHERE (COALESCE(state, 0) = '1')' since not every NamedEntity necessarily
