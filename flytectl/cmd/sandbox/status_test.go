@@ -15,6 +15,7 @@ func TestSandboxStatus(t *testing.T) {
 	t.Run("Sandbox status with zero result", func(t *testing.T) {
 		mockDocker := &mocks.Docker{}
 		s := testutils.Setup()
+		defer s.TearDown()
 		mockDocker.OnContainerList(s.Ctx, container.ListOptions{All: true}).Return([]types.Container{}, nil)
 		docker.Client = mockDocker
 		err := sandboxClusterStatus(s.Ctx, []string{}, s.CmdCtx)
@@ -22,6 +23,7 @@ func TestSandboxStatus(t *testing.T) {
 	})
 	t.Run("Sandbox status with running sandbox", func(t *testing.T) {
 		s := testutils.Setup()
+		defer s.TearDown()
 		ctx := s.Ctx
 		mockDocker := &mocks.Docker{}
 		mockDocker.OnContainerList(ctx, container.ListOptions{All: true}).Return([]types.Container{

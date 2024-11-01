@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/flyteorg/flyte/flytectl/cmd/config"
+	"github.com/flyteorg/flyte/flytectl/cmd/testutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/stretchr/testify/assert"
@@ -32,7 +33,9 @@ func terminateExecutionSetup() {
 }
 
 func TestTerminateExecutionFunc(t *testing.T) {
-	s := setup()
+	s := testutils.Setup()
+	defer s.TearDown()
+
 	terminateExecutionSetup()
 	terminateExecResponse := &admin.ExecutionTerminateResponse{}
 	s.MockAdminClient.OnTerminateExecutionMatch(s.Ctx, terminateExecRequests[0]).Return(terminateExecResponse, nil)
@@ -45,7 +48,9 @@ func TestTerminateExecutionFunc(t *testing.T) {
 }
 
 func TestTerminateExecutionFuncWithError(t *testing.T) {
-	s := setup()
+	s := testutils.Setup()
+	defer s.TearDown()
+
 	terminateExecutionSetup()
 	terminateExecResponse := &admin.ExecutionTerminateResponse{}
 	s.MockAdminClient.OnTerminateExecutionMatch(s.Ctx, terminateExecRequests[0]).Return(nil, errors.New("failed to terminate"))
@@ -58,7 +63,9 @@ func TestTerminateExecutionFuncWithError(t *testing.T) {
 }
 
 func TestTerminateExecutionFuncWithPartialSuccess(t *testing.T) {
-	s := setup()
+	s := testutils.Setup()
+	defer s.TearDown()
+
 	terminateExecutionSetup()
 	terminateExecResponse := &admin.ExecutionTerminateResponse{}
 	s.MockAdminClient.OnTerminateExecutionMatch(s.Ctx, terminateExecRequests[0]).Return(terminateExecResponse, nil)

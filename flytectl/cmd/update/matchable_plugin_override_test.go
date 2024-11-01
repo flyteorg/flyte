@@ -401,6 +401,8 @@ func testWorkflowPluginOverrideUpdateWithMockSetup(
 	asserter func(s *testutils.TestStruct, err error),
 ) {
 	s := testutils.Setup()
+	defer s.TearDown()
+
 	pluginoverride.DefaultUpdateConfig = &pluginoverride.AttrUpdateConfig{}
 	target := newTestWorkflowPluginOverride()
 
@@ -472,6 +474,8 @@ func testProjectPluginOverrideUpdateWithMockSetup(
 	asserter func(s *testutils.TestStruct, err error),
 ) {
 	s := testutils.Setup()
+	defer s.TearDown()
+
 	pluginoverride.DefaultUpdateConfig = &pluginoverride.AttrUpdateConfig{}
 	target := newTestProjectPluginOverride()
 
@@ -541,6 +545,8 @@ func testProjectDomainPluginOverrideUpdateWithMockSetup(
 	asserter func(s *testutils.TestStruct, err error),
 ) {
 	s := testutils.Setup()
+	defer s.TearDown()
+
 	pluginoverride.DefaultUpdateConfig = &pluginoverride.AttrUpdateConfig{}
 	target := newTestProjectDomainPluginOverride()
 

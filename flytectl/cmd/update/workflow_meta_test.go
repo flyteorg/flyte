@@ -179,6 +179,8 @@ func TestWorkflowMetadataUpdateFailsWhenAdminClientFails(t *testing.T) {
 
 func TestWorkflowMetadataUpdateRequiresWorkflowName(t *testing.T) {
 	s := testutils.Setup()
+	defer s.TearDown()
+
 	config := &NamedEntityConfig{}
 
 	err := getUpdateWorkflowFunc(config)(s.Ctx, nil, s.CmdCtx)

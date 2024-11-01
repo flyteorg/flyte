@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/flyteorg/flyte/flytectl/cmd/config"
+	"github.com/flyteorg/flyte/flytectl/cmd/testutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/stretchr/testify/assert"
@@ -45,7 +46,7 @@ func createExecutionUtilSetup() {
 }
 
 func TestCreateExecutionForRelaunch(t *testing.T) {
-	s := setup()
+	s := testutils.Setup()
 	defer s.TearDown()
 
 	createExecutionUtilSetup()
@@ -55,7 +56,7 @@ func TestCreateExecutionForRelaunch(t *testing.T) {
 }
 
 func TestCreateExecutionForRelaunchNotFound(t *testing.T) {
-	s := setup()
+	s := testutils.Setup()
 	defer s.TearDown()
 
 	createExecutionUtilSetup()
@@ -67,7 +68,7 @@ func TestCreateExecutionForRelaunchNotFound(t *testing.T) {
 }
 
 func TestCreateExecutionForRecovery(t *testing.T) {
-	s := setup()
+	s := testutils.Setup()
 	defer s.TearDown()
 
 	createExecutionUtilSetup()
@@ -77,7 +78,7 @@ func TestCreateExecutionForRecovery(t *testing.T) {
 }
 
 func TestCreateExecutionForRecoveryNotFound(t *testing.T) {
-	s := setup()
+	s := testutils.Setup()
 	defer s.TearDown()
 
 	createExecutionUtilSetup()
@@ -89,7 +90,7 @@ func TestCreateExecutionForRecoveryNotFound(t *testing.T) {
 
 func TestCreateExecutionRequestForWorkflow(t *testing.T) {
 	t.Run("successful", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup()
 		defer s.TearDown()
 
 		createExecutionUtilSetup()
@@ -100,7 +101,7 @@ func TestCreateExecutionRequestForWorkflow(t *testing.T) {
 		assert.NotNil(t, execCreateRequest)
 	})
 	t.Run("successful with envs", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup()
 		defer s.TearDown()
 
 		createExecutionUtilSetup()
@@ -114,7 +115,7 @@ func TestCreateExecutionRequestForWorkflow(t *testing.T) {
 		assert.NotNil(t, execCreateRequest)
 	})
 	t.Run("successful with empty envs", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup()
 		defer s.TearDown()
 
 		createExecutionUtilSetup()
@@ -128,7 +129,7 @@ func TestCreateExecutionRequestForWorkflow(t *testing.T) {
 		assert.NotNil(t, execCreateRequest)
 	})
 	t.Run("successful with execution Cluster label and envs", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup()
 		defer s.TearDown()
 
 		createExecutionUtilSetup()
@@ -144,7 +145,7 @@ func TestCreateExecutionRequestForWorkflow(t *testing.T) {
 		assert.Equal(t, "cluster", execCreateRequest.Spec.ExecutionClusterLabel.Value)
 	})
 	t.Run("failed literal conversion", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup()
 		defer s.TearDown()
 
 		createExecutionUtilSetup()
@@ -162,7 +163,7 @@ func TestCreateExecutionRequestForWorkflow(t *testing.T) {
 		assert.Equal(t, fmt.Errorf("parameter [nilparam] has nil Variable"), err)
 	})
 	t.Run("failed fetch", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup()
 		defer s.TearDown()
 
 		createExecutionUtilSetup()
@@ -173,7 +174,7 @@ func TestCreateExecutionRequestForWorkflow(t *testing.T) {
 		assert.Equal(t, err, errors.New("failed"))
 	})
 	t.Run("with security context", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup()
 		defer s.TearDown()
 
 		createExecutionUtilSetup()
@@ -190,7 +191,7 @@ func TestCreateExecutionRequestForWorkflow(t *testing.T) {
 
 func TestCreateExecutionRequestForTask(t *testing.T) {
 	t.Run("successful", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup()
 		defer s.TearDown()
 
 		createExecutionUtilSetup()
@@ -205,7 +206,7 @@ func TestCreateExecutionRequestForTask(t *testing.T) {
 		assert.NotNil(t, execCreateRequest)
 	})
 	t.Run("successful with envs", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup()
 		defer s.TearDown()
 
 		createExecutionUtilSetup()
@@ -223,7 +224,7 @@ func TestCreateExecutionRequestForTask(t *testing.T) {
 		assert.NotNil(t, execCreateRequest)
 	})
 	t.Run("successful with empty envs", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup()
 		defer s.TearDown()
 
 		createExecutionUtilSetup()
@@ -241,7 +242,7 @@ func TestCreateExecutionRequestForTask(t *testing.T) {
 		assert.NotNil(t, execCreateRequest)
 	})
 	t.Run("failed literal conversion", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup()
 		defer s.TearDown()
 
 		createExecutionUtilSetup()
@@ -267,7 +268,7 @@ func TestCreateExecutionRequestForTask(t *testing.T) {
 		assert.Equal(t, fmt.Errorf("variable [nilvar] has nil type"), err)
 	})
 	t.Run("failed fetch", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup()
 		defer s.TearDown()
 
 		createExecutionUtilSetup()
@@ -278,7 +279,7 @@ func TestCreateExecutionRequestForTask(t *testing.T) {
 		assert.Equal(t, err, errors.New("failed"))
 	})
 	t.Run("with security context", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup()
 		defer s.TearDown()
 
 		createExecutionUtilSetup()
@@ -316,7 +317,7 @@ func Test_resolveOverrides(t *testing.T) {
 }
 
 func TestCreateExecutionForRelaunchOverwritingCache(t *testing.T) {
-	s := setup()
+	s := testutils.Setup()
 	defer s.TearDown()
 
 	createExecutionUtilSetup()

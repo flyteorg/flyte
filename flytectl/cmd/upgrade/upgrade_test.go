@@ -105,6 +105,8 @@ func TestSelfUpgrade(t *testing.T) {
 	goos = platformutil.Linux
 	t.Run("Successful upgrade", func(t *testing.T) {
 		s := testutils.Setup()
+		defer s.TearDown()
+
 		stdlibversion.Build = ""
 		stdlibversion.BuildTime = ""
 		stdlibversion.Version = version
@@ -119,6 +121,8 @@ func TestSelfUpgradeError(t *testing.T) {
 	goos = platformutil.Linux
 	t.Run("Successful upgrade", func(t *testing.T) {
 		s := testutils.Setup()
+		defer s.TearDown()
+
 		stdlibversion.Build = ""
 		stdlibversion.BuildTime = ""
 		stdlibversion.Version = "v"
@@ -134,6 +138,8 @@ func TestSelfUpgradeRollback(t *testing.T) {
 	goos = platformutil.Linux
 	t.Run("Successful rollback", func(t *testing.T) {
 		s := testutils.Setup()
+		defer s.TearDown()
+
 		var args = []string{rollBackSubCommand}
 		stdlibversion.Build = ""
 		stdlibversion.BuildTime = ""
@@ -143,6 +149,8 @@ func TestSelfUpgradeRollback(t *testing.T) {
 
 	t.Run("Successful rollback failed", func(t *testing.T) {
 		s := testutils.Setup()
+		defer s.TearDown()
+
 		var args = []string{rollBackSubCommand}
 		stdlibversion.Build = ""
 		stdlibversion.BuildTime = ""
@@ -152,6 +160,8 @@ func TestSelfUpgradeRollback(t *testing.T) {
 
 	t.Run("Successful rollback for windows", func(t *testing.T) {
 		s := testutils.Setup()
+		defer s.TearDown()
+
 		var args = []string{rollBackSubCommand}
 		stdlibversion.Build = ""
 		stdlibversion.BuildTime = ""
@@ -162,6 +172,8 @@ func TestSelfUpgradeRollback(t *testing.T) {
 
 	t.Run("Successful rollback for windows", func(t *testing.T) {
 		s := testutils.Setup()
+		defer s.TearDown()
+
 		var args = []string{rollBackSubCommand}
 		stdlibversion.Build = ""
 		stdlibversion.BuildTime = ""

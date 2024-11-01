@@ -401,6 +401,8 @@ func testWorkflowTaskResourceAttributeUpdateWithMockSetup(
 	asserter func(s *testutils.TestStruct, err error),
 ) {
 	s := testutils.Setup()
+	defer s.TearDown()
+
 	taskresourceattribute.DefaultUpdateConfig = &taskresourceattribute.AttrUpdateConfig{}
 	target := newTestWorkflowTaskResourceAttribute()
 
@@ -465,6 +467,8 @@ func testProjectTaskResourceAttributeUpdateWithMockSetup(
 	asserter func(s *testutils.TestStruct, err error),
 ) {
 	s := testutils.Setup()
+	defer s.TearDown()
+
 	taskresourceattribute.DefaultUpdateConfig = &taskresourceattribute.AttrUpdateConfig{}
 	target := newTestProjectTaskResourceAttribute()
 
@@ -527,6 +531,8 @@ func testProjectDomainTaskResourceAttributeUpdateWithMockSetup(
 	asserter func(s *testutils.TestStruct, err error),
 ) {
 	s := testutils.Setup()
+	defer s.TearDown()
+
 	taskresourceattribute.DefaultUpdateConfig = &taskresourceattribute.AttrUpdateConfig{}
 	target := newTestProjectDomainTaskResourceAttribute()
 

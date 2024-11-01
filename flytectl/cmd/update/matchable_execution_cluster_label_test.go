@@ -401,6 +401,8 @@ func testWorkflowExecutionClusterLabelUpdateWithMockSetup(
 	asserter func(s *testutils.TestStruct, err error),
 ) {
 	s := testutils.Setup()
+	defer s.TearDown()
+
 	executionclusterlabel.DefaultUpdateConfig = &executionclusterlabel.AttrUpdateConfig{}
 	target := newTestWorkflowExecutionClusterLabel()
 
@@ -462,6 +464,8 @@ func testProjectExecutionClusterLabelUpdateWithMockSetup(
 	asserter func(s *testutils.TestStruct, err error),
 ) {
 	s := testutils.Setup()
+	defer s.TearDown()
+
 	executionclusterlabel.DefaultUpdateConfig = &executionclusterlabel.AttrUpdateConfig{}
 	target := newTestProjectExecutionClusterLabel()
 
@@ -521,6 +525,8 @@ func testProjectDomainExecutionClusterLabelUpdateWithMockSetup(
 	asserter func(s *testutils.TestStruct, err error),
 ) {
 	s := testutils.Setup()
+	defer s.TearDown()
+
 	executionclusterlabel.DefaultUpdateConfig = &executionclusterlabel.AttrUpdateConfig{}
 	target := newTestProjectDomainExecutionClusterLabel()
 

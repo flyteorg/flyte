@@ -535,6 +535,8 @@ func testProjectDomainClusterResourceAttributeUpdateWithMockSetup(
 	asserter func(s *testutils.TestStruct, err error),
 ) {
 	s := testutils.Setup()
+	defer s.TearDown()
+
 	clusterresourceattribute.DefaultUpdateConfig = &clusterresourceattribute.AttrUpdateConfig{}
 	target := newTestProjectDomainClusterResourceAttribute()
 

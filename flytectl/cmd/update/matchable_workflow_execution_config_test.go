@@ -401,6 +401,8 @@ func testWorkflowExecutionConfigUpdateWithMockSetup(
 	asserter func(s *testutils.TestStruct, err error),
 ) {
 	s := testutils.Setup()
+	defer s.TearDown()
+
 	workflowexecutionconfig.DefaultUpdateConfig = &workflowexecutionconfig.AttrUpdateConfig{}
 	target := newTestWorkflowExecutionConfig()
 
@@ -469,6 +471,8 @@ func testProjectWorkflowExecutionConfigUpdateWithMockSetup(
 	asserter func(s *testutils.TestStruct, err error),
 ) {
 	s := testutils.Setup()
+	defer s.TearDown()
+
 	workflowexecutionconfig.DefaultUpdateConfig = &workflowexecutionconfig.AttrUpdateConfig{}
 	target := newTestProjectWorkflowExecutionConfig()
 
@@ -535,6 +539,8 @@ func testProjectDomainWorkflowExecutionConfigUpdateWithMockSetup(
 	asserter func(s *testutils.TestStruct, err error),
 ) {
 	s := testutils.Setup()
+	defer s.TearDown()
+
 	workflowexecutionconfig.DefaultUpdateConfig = &workflowexecutionconfig.AttrUpdateConfig{}
 	target := newTestProjectDomainWorkflowExecutionConfig()
 

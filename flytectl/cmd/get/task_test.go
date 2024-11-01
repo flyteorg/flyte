@@ -170,7 +170,7 @@ func getTaskSetup() {
 
 func TestGetTaskFuncWithError(t *testing.T) {
 	t.Run("failure fetch latest", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup()
 		defer s.TearDown()
 
 		getTaskSetup()
@@ -184,7 +184,7 @@ func TestGetTaskFuncWithError(t *testing.T) {
 	})
 
 	t.Run("failure fetching version ", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup()
 		defer s.TearDown()
 
 		getTaskSetup()
@@ -198,7 +198,7 @@ func TestGetTaskFuncWithError(t *testing.T) {
 	})
 
 	t.Run("failure fetching all version ", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup()
 		defer s.TearDown()
 
 		getTaskSetup()
@@ -211,7 +211,7 @@ func TestGetTaskFuncWithError(t *testing.T) {
 	})
 
 	t.Run("failure fetching ", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup()
 		defer s.TearDown()
 
 		getLaunchPlanSetup()
@@ -225,7 +225,7 @@ func TestGetTaskFuncWithError(t *testing.T) {
 	})
 
 	t.Run("failure fetching list task", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup()
 		defer s.TearDown()
 
 		getLaunchPlanSetup()

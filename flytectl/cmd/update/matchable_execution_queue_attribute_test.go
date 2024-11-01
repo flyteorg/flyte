@@ -401,6 +401,8 @@ func testWorkflowExecutionQueueAttributeUpdateWithMockSetup(
 	asserter func(s *testutils.TestStruct, err error),
 ) {
 	s := testutils.Setup()
+	defer s.TearDown()
+
 	executionqueueattribute.DefaultUpdateConfig = &executionqueueattribute.AttrUpdateConfig{}
 	target := newTestWorkflowExecutionQueueAttribute()
 
@@ -533,6 +535,8 @@ func testProjectDomainExecutionQueueAttributeUpdateWithMockSetup(
 	asserter func(s *testutils.TestStruct, err error),
 ) {
 	s := testutils.Setup()
+	defer s.TearDown()
+
 	executionqueueattribute.DefaultUpdateConfig = &executionqueueattribute.AttrUpdateConfig{}
 	target := newTestProjectDomainExecutionQueueAttribute()
 

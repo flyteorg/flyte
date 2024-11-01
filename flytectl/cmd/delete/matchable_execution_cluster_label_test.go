@@ -6,6 +6,7 @@ import (
 
 	"github.com/flyteorg/flyte/flytectl/cmd/config"
 	"github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/executionclusterlabel"
+	"github.com/flyteorg/flyte/flytectl/cmd/testutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -18,7 +19,9 @@ func deleteExecutionClusterLabelSetup() {
 
 func TestDeleteExecutionClusterLabels(t *testing.T) {
 	t.Run("successful project domain attribute deletion commandline", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup()
+		defer s.TearDown()
+
 		deleteExecutionClusterLabelSetup()
 		// Empty attribute file
 		executionclusterlabel.DefaultDelConfig.AttrFile = ""
@@ -31,7 +34,9 @@ func TestDeleteExecutionClusterLabels(t *testing.T) {
 			s.Ctx, config.GetConfig().Project, config.GetConfig().Domain, admin.MatchableResource_EXECUTION_CLUSTER_LABEL)
 	})
 	t.Run("failed project domain attribute deletion", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup()
+		defer s.TearDown()
+
 		deleteExecutionClusterLabelSetup()
 		// No args implying project domain attribute deletion
 		s.DeleterExt.OnDeleteProjectDomainAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
@@ -43,7 +48,9 @@ func TestDeleteExecutionClusterLabels(t *testing.T) {
 			s.Ctx, config.GetConfig().Project, config.GetConfig().Domain, admin.MatchableResource_EXECUTION_CLUSTER_LABEL)
 	})
 	t.Run("successful project domain attribute deletion file", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup()
+		defer s.TearDown()
+
 		deleteExecutionClusterLabelSetup()
 		// Empty attribute file
 		executionclusterlabel.DefaultDelConfig.AttrFile = "testdata/valid_project_domain_execution_cluster_label.yaml"
@@ -56,7 +63,9 @@ func TestDeleteExecutionClusterLabels(t *testing.T) {
 			s.Ctx, "flytesnacks", "development", admin.MatchableResource_EXECUTION_CLUSTER_LABEL)
 	})
 	t.Run("successful workflow attribute deletion", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup()
+		defer s.TearDown()
+
 		deleteExecutionClusterLabelSetup()
 		// Empty attribute file
 		executionclusterlabel.DefaultDelConfig.AttrFile = ""
@@ -70,7 +79,9 @@ func TestDeleteExecutionClusterLabels(t *testing.T) {
 			admin.MatchableResource_EXECUTION_CLUSTER_LABEL)
 	})
 	t.Run("failed workflow attribute deletion", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup()
+		defer s.TearDown()
+
 		deleteExecutionClusterLabelSetup()
 		// Empty attribute file
 		executionclusterlabel.DefaultDelConfig.AttrFile = ""
@@ -85,7 +96,9 @@ func TestDeleteExecutionClusterLabels(t *testing.T) {
 			admin.MatchableResource_EXECUTION_CLUSTER_LABEL)
 	})
 	t.Run("successful workflow attribute deletion file", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup()
+		defer s.TearDown()
+
 		deleteExecutionClusterLabelSetup()
 		// Empty attribute file
 		executionclusterlabel.DefaultDelConfig.AttrFile = "testdata/valid_workflow_execution_cluster_label.yaml"
@@ -99,7 +112,9 @@ func TestDeleteExecutionClusterLabels(t *testing.T) {
 			admin.MatchableResource_EXECUTION_CLUSTER_LABEL)
 	})
 	t.Run("workflow attribute deletion non existent file", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup()
+		defer s.TearDown()
+
 		deleteExecutionClusterLabelSetup()
 		// Empty attribute file
 		executionclusterlabel.DefaultDelConfig.AttrFile = testDataNonExistentFile
@@ -113,7 +128,9 @@ func TestDeleteExecutionClusterLabels(t *testing.T) {
 			admin.MatchableResource_EXECUTION_CLUSTER_LABEL)
 	})
 	t.Run("attribute deletion invalid file", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup()
+		defer s.TearDown()
+
 		deleteExecutionClusterLabelSetup()
 		// Empty attribute file
 		executionclusterlabel.DefaultDelConfig.AttrFile = testDataInvalidAttrFile

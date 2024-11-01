@@ -93,7 +93,7 @@ func getWorkflowSetup() {
 
 func TestGetWorkflowFuncWithError(t *testing.T) {
 	t.Run("failure fetch latest", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup()
 		defer s.TearDown()
 
 		getWorkflowSetup()
@@ -105,7 +105,7 @@ func TestGetWorkflowFuncWithError(t *testing.T) {
 	})
 
 	t.Run("failure fetching version ", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup()
 		defer s.TearDown()
 
 		getWorkflowSetup()
@@ -118,7 +118,7 @@ func TestGetWorkflowFuncWithError(t *testing.T) {
 	})
 
 	t.Run("failure fetching all version ", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup()
 		defer s.TearDown()
 
 		getWorkflowSetup()
@@ -143,7 +143,7 @@ func TestGetWorkflowFuncWithError(t *testing.T) {
 	})
 
 	t.Run("fetching all workflow success", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup()
 		defer s.TearDown()
 
 		getWorkflowSetup()
@@ -155,7 +155,7 @@ func TestGetWorkflowFuncWithError(t *testing.T) {
 	})
 
 	t.Run("fetching all workflow error", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup()
 		defer s.TearDown()
 
 		getWorkflowSetup()

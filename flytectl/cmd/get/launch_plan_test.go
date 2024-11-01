@@ -215,7 +215,7 @@ func getLaunchPlanSetup() {
 
 func TestGetLaunchPlanFuncWithError(t *testing.T) {
 	t.Run("failure fetch latest", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup()
 		defer s.TearDown()
 		getLaunchPlanSetup()
 		mockFetcher := new(mocks.AdminFetcherExtInterface)
@@ -228,7 +228,7 @@ func TestGetLaunchPlanFuncWithError(t *testing.T) {
 	})
 
 	t.Run("failure fetching version ", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup()
 		defer s.TearDown()
 		getLaunchPlanSetup()
 		mockFetcher := new(mocks.AdminFetcherExtInterface)
@@ -241,7 +241,7 @@ func TestGetLaunchPlanFuncWithError(t *testing.T) {
 	})
 
 	t.Run("failure fetching all version ", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup()
 		defer s.TearDown()
 		getLaunchPlanSetup()
 		launchplan.DefaultConfig.Filter = filters.Filters{}
@@ -254,7 +254,7 @@ func TestGetLaunchPlanFuncWithError(t *testing.T) {
 	})
 
 	t.Run("failure fetching ", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup()
 		defer s.TearDown()
 		getLaunchPlanSetup()
 		s.FetcherExt.OnFetchAllVerOfLP(s.Ctx, "launchplan1", "dummyProject", "dummyDomain", filters.Filters{}).Return(nil, fmt.Errorf("error fetching all version"))
@@ -266,7 +266,7 @@ func TestGetLaunchPlanFuncWithError(t *testing.T) {
 	})
 
 	t.Run("failure fetching list", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup()
 		defer s.TearDown()
 		getLaunchPlanSetup()
 		argsLp = []string{}
@@ -278,7 +278,7 @@ func TestGetLaunchPlanFuncWithError(t *testing.T) {
 }
 
 func TestGetLaunchPlanFunc(t *testing.T) {
-	s := setup()
+	s := testutils.Setup()
 	defer s.TearDown()
 	getLaunchPlanSetup()
 	s.FetcherExt.OnFetchAllVerOfLPMatch(mock.Anything, mock.Anything, "dummyProject", "dummyDomain", filters.Filters{}).Return(launchPlanListResponse.LaunchPlans, nil)
@@ -289,7 +289,7 @@ func TestGetLaunchPlanFunc(t *testing.T) {
 }
 
 func TestGetLaunchPlanFuncLatest(t *testing.T) {
-	s := setup()
+	s := testutils.Setup()
 	defer s.TearDown()
 	getLaunchPlanSetup()
 	launchplan.DefaultConfig.Latest = true
@@ -314,7 +314,7 @@ func TestGetLaunchPlanWithVersion(t *testing.T) {
 
 func TestGetLaunchPlans(t *testing.T) {
 	t.Run("no workflow filter", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup()
 		defer s.TearDown()
 		getLaunchPlanSetup()
 		s.FetcherExt.OnFetchAllVerOfLP(s.Ctx, "", "dummyProject", "dummyDomain", filters.Filters{}).Return(launchPlanListResponse.LaunchPlans, nil)
@@ -324,7 +324,7 @@ func TestGetLaunchPlans(t *testing.T) {
 		s.TearDownAndVerify(t, `[{"id": {"name": "launchplan1","version": "v2"},"spec": {"workflowId": {"name": "workflow2"},"defaultInputs": {"parameters": {"generic": {"var": {"type": {"simple": "STRUCT"},"description": "generic"},"default": {"scalar": {"generic": {"foo": "foo"}}}},"numbers": {"var": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "short desc"}},"numbers_count": {"var": {"type": {"simple": "INTEGER"},"description": "long description will be truncated in table"}},"run_local_at_count": {"var": {"type": {"simple": "INTEGER"},"description": "run_local_at_count"},"default": {"scalar": {"primitive": {"integer": "10"}}}}}}},"closure": {"expectedInputs": {"parameters": {"generic": {"var": {"type": {"simple": "STRUCT"},"description": "generic"},"default": {"scalar": {"generic": {"foo": "foo"}}}},"numbers": {"var": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "short desc"}},"numbers_count": {"var": {"type": {"simple": "INTEGER"},"description": "long description will be truncated in table"}},"run_local_at_count": {"var": {"type": {"simple": "INTEGER"},"description": "run_local_at_count"},"default": {"scalar": {"primitive": {"integer": "10"}}}}}},"createdAt": "1970-01-01T00:00:01Z"}},{"id": {"name": "launchplan1","version": "v1"},"spec": {"workflowId": {"name": "workflow1"},"defaultInputs": {"parameters": {"generic": {"var": {"type": {"simple": "STRUCT"},"description": "generic"},"default": {"scalar": {"generic": {"foo": "foo"}}}},"numbers": {"var": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "short desc"}},"numbers_count": {"var": {"type": {"simple": "INTEGER"},"description": "long description will be truncated in table"}},"run_local_at_count": {"var": {"type": {"simple": "INTEGER"},"description": "run_local_at_count"},"default": {"scalar": {"primitive": {"integer": "10"}}}}}}},"closure": {"expectedInputs": {"parameters": {"generic": {"var": {"type": {"simple": "STRUCT"},"description": "generic"},"default": {"scalar": {"generic": {"foo": "foo"}}}},"numbers": {"var": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "short desc"}},"numbers_count": {"var": {"type": {"simple": "INTEGER"},"description": "long description will be truncated in table"}},"run_local_at_count": {"var": {"type": {"simple": "INTEGER"},"description": "run_local_at_count"},"default": {"scalar": {"primitive": {"integer": "10"}}}}}},"createdAt": "1970-01-01T00:00:00Z"}}]`)
 	})
 	t.Run("workflow filter", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup()
 		defer s.TearDown()
 		getLaunchPlanSetup()
 		s.FetcherExt.OnFetchAllVerOfLP(s.Ctx, "", "dummyProject", "dummyDomain", filters.Filters{
@@ -337,7 +337,7 @@ func TestGetLaunchPlans(t *testing.T) {
 		s.TearDownAndVerify(t, `[{"id": {"name": "launchplan1","version": "v2"},"spec": {"workflowId": {"name": "workflow2"},"defaultInputs": {"parameters": {"generic": {"var": {"type": {"simple": "STRUCT"},"description": "generic"},"default": {"scalar": {"generic": {"foo": "foo"}}}},"numbers": {"var": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "short desc"}},"numbers_count": {"var": {"type": {"simple": "INTEGER"},"description": "long description will be truncated in table"}},"run_local_at_count": {"var": {"type": {"simple": "INTEGER"},"description": "run_local_at_count"},"default": {"scalar": {"primitive": {"integer": "10"}}}}}}},"closure": {"expectedInputs": {"parameters": {"generic": {"var": {"type": {"simple": "STRUCT"},"description": "generic"},"default": {"scalar": {"generic": {"foo": "foo"}}}},"numbers": {"var": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "short desc"}},"numbers_count": {"var": {"type": {"simple": "INTEGER"},"description": "long description will be truncated in table"}},"run_local_at_count": {"var": {"type": {"simple": "INTEGER"},"description": "run_local_at_count"},"default": {"scalar": {"primitive": {"integer": "10"}}}}}},"createdAt": "1970-01-01T00:00:01Z"}},{"id": {"name": "launchplan1","version": "v1"},"spec": {"workflowId": {"name": "workflow1"},"defaultInputs": {"parameters": {"generic": {"var": {"type": {"simple": "STRUCT"},"description": "generic"},"default": {"scalar": {"generic": {"foo": "foo"}}}},"numbers": {"var": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "short desc"}},"numbers_count": {"var": {"type": {"simple": "INTEGER"},"description": "long description will be truncated in table"}},"run_local_at_count": {"var": {"type": {"simple": "INTEGER"},"description": "run_local_at_count"},"default": {"scalar": {"primitive": {"integer": "10"}}}}}}},"closure": {"expectedInputs": {"parameters": {"generic": {"var": {"type": {"simple": "STRUCT"},"description": "generic"},"default": {"scalar": {"generic": {"foo": "foo"}}}},"numbers": {"var": {"type": {"collectionType": {"simple": "INTEGER"}},"description": "short desc"}},"numbers_count": {"var": {"type": {"simple": "INTEGER"},"description": "long description will be truncated in table"}},"run_local_at_count": {"var": {"type": {"simple": "INTEGER"},"description": "run_local_at_count"},"default": {"scalar": {"primitive": {"integer": "10"}}}}}},"createdAt": "1970-01-01T00:00:00Z"}}]`)
 	})
 	t.Run("workflow filter error", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup()
 		defer s.TearDown()
 		getLaunchPlanSetup()
 		argsLp = []string{}

@@ -226,6 +226,8 @@ func testProjectUpdateWithMockSetup(
 	asserter func(s *testutils.TestStruct, err error),
 ) {
 	s := testutils.Setup()
+	defer s.TearDown()
+
 	target := newTestProject()
 
 	if mockSetup != nil {

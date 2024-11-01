@@ -22,7 +22,7 @@ type createSuite struct {
 }
 
 func (s *createSuite) SetupTest() {
-	s.TestStruct = setup()
+	s.TestStruct = testutils.Setup()
 
 	// TODO: migrate to new command context from testutils
 	s.CmdCtx = cmdCore.NewCommandContext(s.MockClient, s.MockOutStream)

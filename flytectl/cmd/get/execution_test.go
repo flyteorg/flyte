@@ -29,7 +29,7 @@ func getExecutionSetup() {
 
 func TestListExecutionFunc(t *testing.T) {
 	getExecutionSetup()
-	s := setup()
+	s := testutils.Setup()
 	defer s.TearDown()
 
 	executionResponse := &admin.Execution{
@@ -92,7 +92,7 @@ func TestListExecutionFuncWithError(t *testing.T) {
 			Phase: core.WorkflowExecution_SUCCEEDED,
 		},
 	}
-	s := setup()
+	s := testutils.Setup()
 	defer s.TearDown()
 
 	s.FetcherExt.OnListExecutionMatch(s.Ctx, mock.Anything, mock.Anything, mock.Anything).Return(nil, errors.New("executions NotFound"))
@@ -129,7 +129,7 @@ func TestGetExecutionFunc(t *testing.T) {
 		},
 	}
 	args := []string{executionNameValue}
-	s := setup()
+	s := testutils.Setup()
 	defer s.TearDown()
 
 	s.FetcherExt.OnFetchExecutionMatch(s.Ctx, mock.Anything, mock.Anything, mock.Anything).Return(executionResponse, nil)
