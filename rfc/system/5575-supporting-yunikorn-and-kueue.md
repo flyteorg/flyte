@@ -147,39 +147,3 @@ In the other hand, Kueue currently doesn't support Spark CRD.
 Yunikorn and Kueue support gang scheduling allowing all necassary pods to run sumultaneously when required resource are available.
 Yunikorn provides preemption calculating the priority of applications based on thier priority class and priority score of the queue where they are submitted, in order to trigger high-prioirty or emergency application immediately. 
 Yunikorn's hierarchical queue includes grarateed resources settings and ACLs.
-
-## 10 RFC Process Guide, remove this section when done
-
-*By writing an RFC, you're giving insight to your team on the direction you're taking. There may not be a right or better decision in many cases, but we will likely learn from it. By authoring, you're making a decision on where you want us to go and are looking for feedback on this direction from your team members, but ultimately the decision is yours.*
-
-This document is a:
-
-- thinking exercise, prototype with words.
-- historical record, its value may decrease over time.
-- way to broadcast information.
-- mechanism to build trust.
-- tool to empower.
-- communication channel.
-
-This document is not:
-
-- a request for permission.
-- the most up to date representation of any process or system
-
-**Checklist:**
-
-- [ ]  Copy template
-- [ ]  Draft RFC (think of it as a wireframe)
-- [ ]  Share as WIP with folks you trust to gut-check
-- [ ]  Send pull request when comfortable
-- [ ]  Label accordingly
-- [ ]  Assign reviewers
-- [ ]  Merge PR
-
-**Recommendations**
-
-- Tag RFC title with [WIP] if you're still ironing out details.
-- Tag RFC title with [Newbie] if you're trying out something experimental or you're not entirely convinced of what you're proposing.
-- Tag RFC title with [RR] if you'd like to schedule a review request to discuss the RFC.
-- If there are areas that you're not convinced on, tag people who you consider may know about this and ask for their input.
-- If you have doubts, ask on [#feature-discussions](https://slack.com/app_redirect?channel=CPQ3ZFQ84&team=TN89P6GGK) for help moving something forward.
