@@ -48,7 +48,7 @@ type earliestFileErrorReader struct {
 
    - While the earliest file error reader handles the single error file scenario as well,
    it is not set as the default, because its implementation depends on doing a listing operation
-   on remote storage. We do not want the listing overhead to be paid for the more common case of 
+   on remote storage. We do not want the listing overhead to be paid for the more common case of
    having a single error file.
    - Under the multiple error aggregation scenario, it is possible that the error aggregation
    is performed before all the errors are reported. For PyTorch plugin specifically, the
@@ -57,8 +57,8 @@ type earliestFileErrorReader struct {
    where the pod that has the earliest error gets delayed in uploading its error file to
    remote storage, and the pod that has a later error ends up completing first. If the
    training operator's detection of job completion and Propeller's error aggregation happen so
-   fast that the pod with the earliest error has not yet uploaded it's error to remote storage, 
-   we may end up reporting the wrong error. This is highly unlikely in practice. The implementation 
+   fast that the pod with the earliest error has not yet uploaded it's error to remote storage,
+   we may end up reporting the wrong error. This is highly unlikely in practice. The implementation
    we have here is significantly better than the prior behavior of reporting the latest written
    error.pb file (as there was a race condition on overwriting error files), which is almost always
    not the earliest error.

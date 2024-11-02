@@ -209,4 +209,55 @@ func TestReadOrigin(t *testing.T) {
 		assert.Equal(t, timestamppb.New(time.Unix(99, 0)), executionError.Timestamp)
 		assert.False(t, executionError.IsRecoverable)
 	})
+
+	t.Run("multi-user-error-backward-compat", func(t *testing.T) {
+		outputPaths := &pluginsIOMock.OutputFilePaths{}
+		outputPaths.OnGetErrorPath().Return("s3://errors/error.pb")
+
+		store := &storageMocks.ComposedProtobufStore{}
+		store.OnReadProtobufMatch(mock.Anything, mock.Anything, mock.Anything).Run(func(args mock.Arguments) {
+			errorDoc := &core.ErrorDocument{
+				Error: &core.ContainerError{
+					Code:    "red",
+					Message: "hi",
+					Kind:    core.ContainerError_NON_RECOVERABLE,
+					Origin:  core.ExecutionError_USER,
+				},
+			}
+			incomingErrorDoc := args.Get(2)
+			assert.NotNil(t, incomingErrorDoc)
+			casted := incomingErrorDoc.(*core.ErrorDocument)
+			casted.Error = errorDoc.Error
+		}).Return(nil)
+
+		store.OnList(ctx, storage.DataReference("s3://errors/error"), 1000, storage.NewCursorAtStart()).Return(
+			[]storage.DataReference{"error.pb"}, storage.NewCursorAtEnd(), nil)
+
+		store.OnHead(ctx, storage.DataReference("error.pb")).Return(MemoryMetadata{
+			exists: true,
+		}, nil)
+
+		maxPayloadSize := int64(0)
+		r, err := NewRemoteFileOutputReaderWithErrorAggregationStrategy(
+			ctx,
+			store,
+			outputPaths,
+			maxPayloadSize,
+			k8s.EarliestErrorAggregationStrategy,
+		)
+		assert.NoError(t, err)
+
+		hasError, err := r.IsError(ctx)
+		assert.NoError(t, err)
+		assert.True(t, hasError)
+
+		executionError, err := r.ReadError(ctx)
+		assert.NoError(t, err)
+		assert.Equal(t, core.ExecutionError_USER, executionError.Kind)
+		assert.Equal(t, "red", executionError.Code)
+		assert.Equal(t, "hi", executionError.Message)
+		assert.Equal(t, "", executionError.Worker)
+		assert.Nil(t, executionError.Timestamp)
+		assert.False(t, executionError.IsRecoverable)
+	})
 }
