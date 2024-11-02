@@ -25,24 +25,24 @@ queueconfig:
   general:
   - org: org1
     users: "*" 
-    acl:
-      - jobs: "ray,dask"
+    jobs:
+      - type: "ray"
         priorityclass: priority-ray
         gangscheduling: "placeholderTimeoutInSeconds=60 gangSchedulingStyle=hard"
-      - jobs: "spark"
+      - type: "spark"
         priorityclass: priority-spark
         gangscheduling: "placeholderTimeoutInSeconds=30 gangSchedulingStyle=hard"
-    namespace:
+    default:
       priorityclass: priority-default
   - org: org2
     users: "user4, user5"
-    acl:
+    jobs:
       - jobs: "*"
 ```
 
 Mentioned configuration indicates what queues exist for an org.
 Hierarchical queues will be structured as follows.
-root.org1.ray、root.org1.spark, root.org1.default and root.org2."CRDs".
+root.org1.ray、root.org1.spark and root.org1.default".
 
 ray and spark linked to priority class setting ` yunikorn.apache.org/allow-preemption` with `false` recommand Yunikorn do its best to prevent applications from preemption.
 
