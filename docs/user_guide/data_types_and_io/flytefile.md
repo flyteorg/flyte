@@ -8,9 +8,9 @@
 
 Files are one of the most fundamental entities that users of Python work with,
 and they are fully supported by Flyte. In the IDL, they are known as
-[Blob](https://github.com/flyteorg/flyteidl/blob/master/protos/flyteidl/core/literals.proto#L33)
+[Blob](https://github.com/flyteorg/flyte/blob/master/flyteidl/protos/flyteidl/core/literals.proto#L33)
 literals which are backed by the
-[blob type](https://github.com/flyteorg/flyteidl/blob/master/protos/flyteidl/core/types.proto#L47).
+[blob type](https://github.com/flyteorg/flyte/blob/master/flyteidl/protos/flyteidl/core/types.proto#L73)
 
 Let's assume our mission here is pretty simple. We download a few CSV file
 links, read them with the python built-in {py:class}`csv.DictReader` function,
