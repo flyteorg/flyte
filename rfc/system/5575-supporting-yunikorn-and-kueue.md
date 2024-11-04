@@ -22,29 +22,16 @@ Flyte doesn't provide resource management for multi-tenancy, which hierarchical 
 ```yaml
 queueconfig:
   scheduler: yunikorn
-  general:
-  - org: org1
-    users: "*" 
-    jobs:
-      - type: "ray"
-        priorityclass: priority-ray
-        gangscheduling: "placeholderTimeoutInSeconds=60 gangSchedulingStyle=hard"
-      - type: "spark"
-        priorityclass: priority-spark
-        gangscheduling: "placeholderTimeoutInSeconds=30 gangSchedulingStyle=hard"
-    default:
-      priorityclass: priority-default
-  - org: org2
-    users: "user4, user5"
-    jobs:
-      - jobs: "*"
+  jobs:
+    - type: "ray"
+      gangscheduling: "placeholderTimeoutInSeconds=60 gangSchedulingStyle=hard"
+    - type: "spark"
+      gangscheduling: "placeholderTimeoutInSeconds=30 gangSchedulingStyle=hard"
 ```
 
 Mentioned configuration indicates what queues exist for an org.
 Hierarchical queues will be structured as follows.
 root.org1.ray、root.org1.spark and root.org1.default".
-
-ray and spark linked to priority class setting ` yunikorn.apache.org/allow-preemption` with `false` recommand Yunikorn do its best to prevent applications from preemption.
 
 ResourceFlavor allocates resource based on labels which indicates that category-based resource allocation by organization label is available.
 Thus, a clusterQueue including multiple resources represents the total acessaible resource for an organization.  
@@ -88,7 +75,7 @@ func PatchPodSpec(target *v1.PodSpec, labels map[string]string) error {
 
 Creat a scheduler plugin according to the queueconfig.scheduler.
 Its basic responsibility validate whether submitted application is accepted. 
-When a Yunikorn scheduler plugin created, it will create applicationID、queue name and preemption labels .
+When a Yunikorn scheduler plugin created, it will create applicationID and queue name.
 in the other hand, a Kueue scheduler plugin constructs labels including localQueueName, preemption.
 
 ```go
