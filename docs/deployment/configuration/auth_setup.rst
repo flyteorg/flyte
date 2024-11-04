@@ -17,13 +17,16 @@ The following diagram summarizes the components and their interactions as part o
 
 In summary, there are two main resources required for a complete auth flow in Flyte:
 
-**An identity layer**
+**Identity Layer**
 
-Using an implementation of the `Open ID Connect (OIDC) specification <https://openid.net/specs/openid-connect-core-1_0.html>`__, it enables clients to verify the identity of the end user based on the authentication performed by an Authorization Server. For this flow to work, you must first register Flyte as a new client (app) to the Identity Provider (IdP).
+The `OpenID Connect (OIDC) protocol <https://openid.net/specs/openid-connect-core-1_0.html>`__ allows clients (such as Flyte) to confirm the identity of a user, based on authentication done by an Authorization Server. To enable this, you first need to register Flyte as an app (client) with your chosen Identity Provider (IdP).
 
 **An authorization server**
 
-As defined by IETF's `RFC #6749 <https://datatracker.ietf.org/doc/html/rfc6749>`__, the authorization server's role is to issue *access tokens to the client after successfully authenticating the resource owner and obtaining authorization*. In this context, the *resource owner* is the end user of Flyte; and the *client* is the tool or component that intends to interact with ``flyteadmin`` : ``flytepropeller``, ``flyteconsole`` or any of the CLI tools.
+As defined by IETF's `RFC #6749 <https://datatracker.ietf.org/doc/html/rfc6749>`__ , the authorization server’s job is to issue access tokens to clients after verifying the user (resource owner) and getting their consent. In this setup:
+
+   1. The user of Flyte, is the *resource owner*.
+   2. The *client* is the tool or component that intends to interact with ``flyteadmin`` : ``flytepropeller``, ``flyteconsole`` or any of the CLI tools like ``flytectl``.
 
 There are two supported options to use an authorization server in Flyte:
 
@@ -122,29 +125,60 @@ browser.
 
    .. group-tab:: Microsoft Entra ID (Azure AD)
 
-       1. From the Azure homepage go to **Azure Active Directory**
-       2. From the **Ovierview** page, take note of the **Tenant ID**
-       3. Go to **App registrations**
-       4. Create a **New registration**
-       5. Give it a descriptive name
-       6. For the **Supported account types** select the option that matches your organization's security policy
-       7. In the **Redirect URI** section select:
+       Microsoft Entra ID (Azure AD) Setup
 
-          - **Web** platform
-          - Add ``http://localhost:30081/callback`` for sandbox or ``https://<your deployment url>/callback`` for other Flyte deployment types
+    1. In the Azure portal, open Microsoft Entra ID from the left-hand menu.
+    2. From the Overview section, navigate to App registrations > + New registration.
+        - Under Supported account types, select the option based on your organization's needs.
+    3. Configure Redirect URIs
+        - In the Redirect URI section:
+            - Choose Web from the platform dropdown.
+            - Enter the following URIs based on your environment:
+                - Sandbox: http://localhost:30081/callback
+                - Production: https://<your-deployment-URL>/callback
+    4. Obtain Tenant and Client Information
+        - After registration, go to the app's Overview page.
+        - Take note of the Application (client) ID and Directory (tenant) ID—you’ll need these in your Flyte configuration.
 
-       9. Click on **Register**
-       10. Once created, click on the registered app and go to the **Certificates and secrets** section
-       11. Go to **Client secrets** and create a **New client secret**
-       12. Enter a description and an expiration policy
-       13. Take note of the secret **Value** as it will be used in the Helm chart
+    5. Create a Client Secret
+        - From the Certificates & Secrets tab, click + New client secret.
+        - Add a Description and set an Expiration period (e.g., 6 months or 12 months).
+        - Click Add and copy the Value of the client secret— it will be used in the helm values.
 
-       For further reference, check out the official `Azure AD Docs <https://docs.microsoft.com/en-us/power-apps/maker/portals/configure/configure-openid-settings>`__ on how to configure the IdP for OpenIDConnect.
+    6. If the Flyte deployment will be dealing with user data, set API permissions:
+        - Navigate to API Permissions > + Add a permission.
+        - Select Microsoft Graph > Delegated permissions, and add the following permissions:
+            ``email``
+            ``openid``
+            ``profile``
+            ``offline_access``
+            ``User.Read``
+
+    7. Expose an API (for Custom Scopes)
+        - In the Expose an API tab:
+            - Click + Add a scope, and set the Scope name (e.g., access_flyte).
+            - Provide a Consent description and enable Admin consent required and Save.
+        - Then, click + Add a client application and enter the Client ID of your Flyte application.
+
+    8. Configure Mobile/Desktop Flow (for flytectl)
+        - Go to the Authentication tab, and click + Add a platform.
+        - Select Mobile and desktop applications.
+        - Add following URI: ``http://localhost:53593/callback``
+        - Scroll down to Advanced settings and enable Allow public client flows.
+
+    9. Update Flyte Configuration
+       - Use the following values in your Flyte Helm chart or configuration files:
+           - Client ID: <client-id>
+           - Client Secret: <client-secret>
+           - Tenant ID: <tenant-id>
+           - Redirect URI: https://<your-deployment-URL>/callback
+
+   For further reference, check out the official `Azure AD Docs <https://docs.microsoft.com/en-us/power-apps/maker/portals/configure/configure-openid-settings>`__ on how to configure the IdP for OpenIDConnect.
 
        .. note::
 
          Make sure the app is registered without `additional claims <https://docs.microsoft.com/en-us/power-apps/maker/portals/configure/configure-openid-settings#configure-additional-claims>`__.
-         The OpenIDConnect authentication will not work otherwise, please refer to this `GitHub Issue <https://github.com/coreos/go-oidc/issues/215>`__ and `Azure AD Docs <https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-protocols-oidc#sample-response>`__ for more information.
+         **The OpenIDConnect authentication will not work otherwise**, please refer to this `GitHub Issue <https://github.com/coreos/go-oidc/issues/215>`__ and `Azure AD Docs <https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-protocols-oidc#sample-response>`__ for more information.
 
 
 Apply OIDC Configuration
@@ -254,11 +288,11 @@ Apply OIDC Configuration
                httpPort: 8088
                grpc:
                  port: 8089
-             security:
-               secure: false
-               useAuth: true
-               allowCors: true
-               allowedOrigins:
+                security:
+                  secure: false
+                  useAuth: true
+                  allowCors: true
+                  allowedOrigins:
           # Accepting all domains for Sandbox installation
                  - "*"
                allowedHeaders:
@@ -357,34 +391,34 @@ Apply OIDC Configuration
              clientSecret: "<your-random-password>"
              clientId: flytepropeller
 
+8. Save and exit your editor.
+
+9. Upgrade your Helm release with the new configuration:
+
+.. prompt:: bash $
+
+   helm upgrade <release-name> flyteorg/flyte-binary -n <your-namespace> --values <your-values-file>.yaml
+
+10. Verify that the `flytepropeller`, `flytescheduler` and `flyteadmin` Pods are restarted and running:
+
+.. prompt:: bash $
+
+    kubectl get pods -n flyte
+
+11. For flytectl/pyflyte, make sure that your local config file (``$HOME/.flyte/config.yaml``) includes the following option:
+
+.. code-block:: yaml
+
+   admin:
+     ...
+     authType: Pkce #change from the default `clientCred` to enable client auth without using shared secrets
+     ...
+
 .. note::
 
    For `multi-cluster deployments <https://docs.flyte.org/en/latest/deployment/deployment/multicluster.html>`__,
    you must add this Secret definition block to the `values-dataplane.yaml` file.
    If you are not running `flytepropeller` in the control plane cluster, you do not need to create this secret there.
-
-      8. Save and exit your editor.
-
-      9. Upgrade your Helm release with the new configuration:
-
-      .. prompt:: bash $
-
-         helm upgrade <release-name> flyteorg/flyte-binary -n <your-namespace> --values <your-values-file>.yaml
-
-      10. Verify that the `flytepropeller`, `flytescheduler` and `flyteadmin` Pods are restarted and running:
-
-      .. prompt:: bash $
-
-          kubectl get pods -n flyte
-
-      11. For flytectl/pyflyte, make sure that your local config file (``$HOME/.flyte/config.yaml``) includes the following option:
-
-      .. code-block:: yaml
-
-         admin:
-           ...
-           authType: Pkce #change from the default `clientCred` to enable client auth without using shared secrets
-           ...
 
 .. note::
 
