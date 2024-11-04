@@ -754,8 +754,16 @@ func (c *nodeExecutor) preExecute(ctx context.Context, dag executors.DAGStructur
 			dataDir := nodeStatus.GetDataDir()
 			t := c.metrics.NodeInputGatherLatency.Start(ctx)
 			defer t.Stop()
-			// Can execute
 			var err error
+			taskTemplate, err := nCtx.TaskReader().Read(ctx)
+			if err != nil {
+				c.metrics.ResolutionFailure.Inc(ctx)
+				logger.Warningf(ctx, "Failed to read task template for Node. Error [%v]", err)
+				return handler.PhaseInfoFailure(core.ExecutionError_SYSTEM, "TaskTemplateReadFailure", err.Error(), nil), nil
+			}
+			inputsInterface := taskTemplate.Interface.Inputs
+			inputsInterface["abc"].Type
+			// Can execute
 			nodeInputs, err = Resolve(ctx, c.outputResolver, nCtx.ContextualNodeLookup(), node.GetID(), node.GetInputBindings())
 			// TODO we need to handle retryable, network errors here!!
 			if err != nil {

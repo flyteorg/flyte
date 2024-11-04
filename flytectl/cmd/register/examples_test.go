@@ -8,8 +8,7 @@ import (
 )
 
 func TestRegisterExamplesFunc(t *testing.T) {
-	s := testutils.Setup()
-	defer s.TearDown()
+	s := testutils.Setup(t)
 
 	registerFilesSetup()
 	args := []string{""}
@@ -17,8 +16,7 @@ func TestRegisterExamplesFunc(t *testing.T) {
 	assert.NotNil(t, err)
 }
 func TestRegisterExamplesFuncErr(t *testing.T) {
-	s := testutils.Setup()
-	defer s.TearDown()
+	s := testutils.Setup(t)
 
 	registerFilesSetup()
 	flytesnacks = "testingsnacks"

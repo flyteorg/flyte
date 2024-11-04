@@ -170,8 +170,7 @@ func getTaskSetup() {
 
 func TestGetTaskFuncWithError(t *testing.T) {
 	t.Run("failure fetch latest", func(t *testing.T) {
-		s := testutils.Setup()
-		defer s.TearDown()
+		s := testutils.Setup(t)
 
 		getTaskSetup()
 		mockFetcher := new(mocks.AdminFetcherExtInterface)
@@ -184,8 +183,7 @@ func TestGetTaskFuncWithError(t *testing.T) {
 	})
 
 	t.Run("failure fetching version ", func(t *testing.T) {
-		s := testutils.Setup()
-		defer s.TearDown()
+		s := testutils.Setup(t)
 
 		getTaskSetup()
 		mockFetcher := new(mocks.AdminFetcherExtInterface)
@@ -198,8 +196,7 @@ func TestGetTaskFuncWithError(t *testing.T) {
 	})
 
 	t.Run("failure fetching all version ", func(t *testing.T) {
-		s := testutils.Setup()
-		defer s.TearDown()
+		s := testutils.Setup(t)
 
 		getTaskSetup()
 		mockFetcher := new(mocks.AdminFetcherExtInterface)
@@ -211,8 +208,7 @@ func TestGetTaskFuncWithError(t *testing.T) {
 	})
 
 	t.Run("failure fetching ", func(t *testing.T) {
-		s := testutils.Setup()
-		defer s.TearDown()
+		s := testutils.Setup(t)
 
 		getLaunchPlanSetup()
 		s.MockAdminClient.OnListTasksMatch(s.Ctx, resourceListRequestTask).Return(nil, fmt.Errorf("error fetching all version"))
@@ -225,8 +221,7 @@ func TestGetTaskFuncWithError(t *testing.T) {
 	})
 
 	t.Run("failure fetching list task", func(t *testing.T) {
-		s := testutils.Setup()
-		defer s.TearDown()
+		s := testutils.Setup(t)
 
 		getLaunchPlanSetup()
 		taskConfig.DefaultConfig.Filter = filters.Filters{}
@@ -242,8 +237,7 @@ func TestGetTaskFuncWithError(t *testing.T) {
 }
 
 func TestGetTaskFunc(t *testing.T) {
-	s := testutils.Setup()
-	defer s.TearDown()
+	s := testutils.Setup(t)
 
 	getTaskSetup()
 	taskConfig.DefaultConfig.Filter = filters.Filters{}
@@ -329,8 +323,7 @@ func TestGetTaskFunc(t *testing.T) {
 }
 
 func TestGetTaskFuncWithTable(t *testing.T) {
-	s := testutils.Setup()
-	defer s.TearDown()
+	s := testutils.Setup(t)
 
 	getTaskSetup()
 	taskConfig.DefaultConfig.Filter = filters.Filters{}
@@ -355,8 +348,7 @@ func TestGetTaskFuncWithTable(t *testing.T) {
 }
 
 func TestGetTaskFuncLatest(t *testing.T) {
-	s := testutils.Setup()
-	defer s.TearDown()
+	s := testutils.Setup(t)
 
 	getTaskSetup()
 	taskConfig.DefaultConfig.Filter = filters.Filters{}
@@ -406,8 +398,7 @@ func TestGetTaskFuncLatest(t *testing.T) {
 }
 
 func TestGetTaskWithVersion(t *testing.T) {
-	s := testutils.Setup()
-	defer s.TearDown()
+	s := testutils.Setup(t)
 
 	getTaskSetup()
 	taskConfig.DefaultConfig.Filter = filters.Filters{}
@@ -458,8 +449,7 @@ func TestGetTaskWithVersion(t *testing.T) {
 }
 
 func TestGetTasks(t *testing.T) {
-	s := testutils.Setup()
-	defer s.TearDown()
+	s := testutils.Setup(t)
 
 	getTaskSetup()
 	taskConfig.DefaultConfig.Filter = filters.Filters{}
@@ -473,8 +463,7 @@ func TestGetTasks(t *testing.T) {
 }
 
 func TestGetTasksFilters(t *testing.T) {
-	s := testutils.Setup()
-	defer s.TearDown()
+	s := testutils.Setup(t)
 
 	getTaskSetup()
 	taskConfig.DefaultConfig.Filter = filters.Filters{
@@ -498,8 +487,7 @@ func TestGetTasksFilters(t *testing.T) {
 }
 
 func TestGetTaskWithExecFile(t *testing.T) {
-	s := testutils.Setup()
-	defer s.TearDown()
+	s := testutils.Setup(t)
 
 	getTaskSetup()
 	s.MockAdminClient.OnListTasksMatch(s.Ctx, resourceListRequestTask).Return(taskListResponse, nil)

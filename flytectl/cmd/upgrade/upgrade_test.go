@@ -104,8 +104,7 @@ func TestSelfUpgrade(t *testing.T) {
 	github.FlytectlReleaseConfig.OverrideExecutable = tempExt
 	goos = platformutil.Linux
 	t.Run("Successful upgrade", func(t *testing.T) {
-		s := testutils.Setup()
-		defer s.TearDown()
+		s := testutils.Setup(t)
 
 		stdlibversion.Build = ""
 		stdlibversion.BuildTime = ""
@@ -120,8 +119,7 @@ func TestSelfUpgradeError(t *testing.T) {
 	github.FlytectlReleaseConfig.OverrideExecutable = tempExt
 	goos = platformutil.Linux
 	t.Run("Successful upgrade", func(t *testing.T) {
-		s := testutils.Setup()
-		defer s.TearDown()
+		s := testutils.Setup(t)
 
 		stdlibversion.Build = ""
 		stdlibversion.BuildTime = ""
@@ -137,8 +135,7 @@ func TestSelfUpgradeRollback(t *testing.T) {
 	github.FlytectlReleaseConfig.OverrideExecutable = tempExt
 	goos = platformutil.Linux
 	t.Run("Successful rollback", func(t *testing.T) {
-		s := testutils.Setup()
-		defer s.TearDown()
+		s := testutils.Setup(t)
 
 		var args = []string{rollBackSubCommand}
 		stdlibversion.Build = ""
@@ -148,8 +145,7 @@ func TestSelfUpgradeRollback(t *testing.T) {
 	})
 
 	t.Run("Successful rollback failed", func(t *testing.T) {
-		s := testutils.Setup()
-		defer s.TearDown()
+		s := testutils.Setup(t)
 
 		var args = []string{rollBackSubCommand}
 		stdlibversion.Build = ""
@@ -159,8 +155,7 @@ func TestSelfUpgradeRollback(t *testing.T) {
 	})
 
 	t.Run("Successful rollback for windows", func(t *testing.T) {
-		s := testutils.Setup()
-		defer s.TearDown()
+		s := testutils.Setup(t)
 
 		var args = []string{rollBackSubCommand}
 		stdlibversion.Build = ""
@@ -171,8 +166,7 @@ func TestSelfUpgradeRollback(t *testing.T) {
 	})
 
 	t.Run("Successful rollback for windows", func(t *testing.T) {
-		s := testutils.Setup()
-		defer s.TearDown()
+		s := testutils.Setup(t)
 
 		var args = []string{rollBackSubCommand}
 		stdlibversion.Build = ""

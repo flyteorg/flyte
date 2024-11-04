@@ -33,8 +33,7 @@ func terminateExecutionSetup() {
 }
 
 func TestTerminateExecutionFunc(t *testing.T) {
-	s := testutils.Setup()
-	defer s.TearDown()
+	s := testutils.Setup(t)
 
 	terminateExecutionSetup()
 	terminateExecResponse := &admin.ExecutionTerminateResponse{}
@@ -48,8 +47,7 @@ func TestTerminateExecutionFunc(t *testing.T) {
 }
 
 func TestTerminateExecutionFuncWithError(t *testing.T) {
-	s := testutils.Setup()
-	defer s.TearDown()
+	s := testutils.Setup(t)
 
 	terminateExecutionSetup()
 	terminateExecResponse := &admin.ExecutionTerminateResponse{}
@@ -63,8 +61,7 @@ func TestTerminateExecutionFuncWithError(t *testing.T) {
 }
 
 func TestTerminateExecutionFuncWithPartialSuccess(t *testing.T) {
-	s := testutils.Setup()
-	defer s.TearDown()
+	s := testutils.Setup(t)
 
 	terminateExecutionSetup()
 	terminateExecResponse := &admin.ExecutionTerminateResponse{}

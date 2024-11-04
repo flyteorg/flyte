@@ -93,8 +93,7 @@ func getWorkflowSetup() {
 
 func TestGetWorkflowFuncWithError(t *testing.T) {
 	t.Run("failure fetch latest", func(t *testing.T) {
-		s := testutils.Setup()
-		defer s.TearDown()
+		s := testutils.Setup(t)
 
 		getWorkflowSetup()
 		mockFetcher := new(mocks.AdminFetcherExtInterface)
@@ -105,8 +104,7 @@ func TestGetWorkflowFuncWithError(t *testing.T) {
 	})
 
 	t.Run("failure fetching version ", func(t *testing.T) {
-		s := testutils.Setup()
-		defer s.TearDown()
+		s := testutils.Setup(t)
 
 		getWorkflowSetup()
 		mockFetcher := new(mocks.AdminFetcherExtInterface)
@@ -118,8 +116,7 @@ func TestGetWorkflowFuncWithError(t *testing.T) {
 	})
 
 	t.Run("failure fetching all version ", func(t *testing.T) {
-		s := testutils.Setup()
-		defer s.TearDown()
+		s := testutils.Setup(t)
 
 		getWorkflowSetup()
 		mockFetcher := new(mocks.AdminFetcherExtInterface)
@@ -130,8 +127,7 @@ func TestGetWorkflowFuncWithError(t *testing.T) {
 	})
 
 	t.Run("failure fetching ", func(t *testing.T) {
-		s := testutils.Setup()
-		defer s.TearDown()
+		s := testutils.Setup(t)
 
 		getWorkflowSetup()
 		workflow.DefaultConfig.Latest = true
@@ -143,8 +139,7 @@ func TestGetWorkflowFuncWithError(t *testing.T) {
 	})
 
 	t.Run("fetching all workflow success", func(t *testing.T) {
-		s := testutils.Setup()
-		defer s.TearDown()
+		s := testutils.Setup(t)
 
 		getWorkflowSetup()
 		var args []string
@@ -155,8 +150,7 @@ func TestGetWorkflowFuncWithError(t *testing.T) {
 	})
 
 	t.Run("fetching all workflow error", func(t *testing.T) {
-		s := testutils.Setup()
-		defer s.TearDown()
+		s := testutils.Setup(t)
 
 		getWorkflowSetup()
 		var args []string
@@ -169,8 +163,7 @@ func TestGetWorkflowFuncWithError(t *testing.T) {
 }
 
 func TestGetWorkflowFuncLatestWithTable(t *testing.T) {
-	s := testutils.Setup()
-	defer s.TearDown()
+	s := testutils.Setup(t)
 
 	getWorkflowSetup()
 	workflow.DefaultConfig.Latest = true
@@ -189,8 +182,7 @@ func TestGetWorkflowFuncLatestWithTable(t *testing.T) {
 }
 
 func TestListWorkflowFuncWithTable(t *testing.T) {
-	s := testutils.Setup()
-	defer s.TearDown()
+	s := testutils.Setup(t)
 
 	getWorkflowSetup()
 	workflow.DefaultConfig.Filter = filters.Filters{}

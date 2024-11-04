@@ -29,8 +29,7 @@ func TestCompileCommand(t *testing.T) {
 	// compiling via cobra command
 	compileCfg := config.DefaultCompileConfig
 	compileCfg.File = "testdata/valid-package.tgz"
-	s := testutils.Setup()
-	defer s.TearDown()
+	s := testutils.Setup(t)
 	compileCmd := CreateCompileCommand()["compile"]
 	err := compileCmd.CmdFunc(context.Background(), []string{}, s.CmdCtx)
 	assert.Nil(t, err, "compiling via cmd returns err")

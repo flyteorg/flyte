@@ -19,8 +19,7 @@ func deleteExecutionQueueAttributeSetup() {
 
 func TestDeleteExecutionQueueAttributes(t *testing.T) {
 	t.Run("successful project domain attribute deletion commandline", func(t *testing.T) {
-		s := testutils.Setup()
-		defer s.TearDown()
+		s := testutils.Setup(t)
 
 		deleteExecutionQueueAttributeSetup()
 		// Empty attribute file
@@ -34,8 +33,7 @@ func TestDeleteExecutionQueueAttributes(t *testing.T) {
 			s.Ctx, config.GetConfig().Project, config.GetConfig().Domain, admin.MatchableResource_EXECUTION_QUEUE)
 	})
 	t.Run("failed project domain attribute deletion", func(t *testing.T) {
-		s := testutils.Setup()
-		defer s.TearDown()
+		s := testutils.Setup(t)
 
 		deleteTaskResourceAttributeSetup()
 		// No args implying project domain attribute deletion
@@ -48,8 +46,7 @@ func TestDeleteExecutionQueueAttributes(t *testing.T) {
 			s.Ctx, config.GetConfig().Project, config.GetConfig().Domain, admin.MatchableResource_EXECUTION_QUEUE)
 	})
 	t.Run("successful project domain attribute deletion file", func(t *testing.T) {
-		s := testutils.Setup()
-		defer s.TearDown()
+		s := testutils.Setup(t)
 
 		deleteTaskResourceAttributeSetup()
 		// Empty attribute file
@@ -63,8 +60,7 @@ func TestDeleteExecutionQueueAttributes(t *testing.T) {
 			s.Ctx, "flytesnacks", "development", admin.MatchableResource_EXECUTION_QUEUE)
 	})
 	t.Run("successful workflow attribute deletion", func(t *testing.T) {
-		s := testutils.Setup()
-		defer s.TearDown()
+		s := testutils.Setup(t)
 
 		deleteTaskResourceAttributeSetup()
 		// Empty attribute file
@@ -79,8 +75,7 @@ func TestDeleteExecutionQueueAttributes(t *testing.T) {
 			admin.MatchableResource_EXECUTION_QUEUE)
 	})
 	t.Run("failed workflow attribute deletion", func(t *testing.T) {
-		s := testutils.Setup()
-		defer s.TearDown()
+		s := testutils.Setup(t)
 
 		deleteTaskResourceAttributeSetup()
 		// Empty attribute file
@@ -96,8 +91,7 @@ func TestDeleteExecutionQueueAttributes(t *testing.T) {
 			admin.MatchableResource_EXECUTION_QUEUE)
 	})
 	t.Run("successful workflow attribute deletion file", func(t *testing.T) {
-		s := testutils.Setup()
-		defer s.TearDown()
+		s := testutils.Setup(t)
 
 		deleteTaskResourceAttributeSetup()
 		// Empty attribute file
@@ -112,8 +106,7 @@ func TestDeleteExecutionQueueAttributes(t *testing.T) {
 			admin.MatchableResource_EXECUTION_QUEUE)
 	})
 	t.Run("workflow attribute deletion non existent file", func(t *testing.T) {
-		s := testutils.Setup()
-		defer s.TearDown()
+		s := testutils.Setup(t)
 
 		deleteTaskResourceAttributeSetup()
 		// Empty attribute file
@@ -128,8 +121,7 @@ func TestDeleteExecutionQueueAttributes(t *testing.T) {
 			admin.MatchableResource_EXECUTION_QUEUE)
 	})
 	t.Run("attribute deletion invalid file", func(t *testing.T) {
-		s := testutils.Setup()
-		defer s.TearDown()
+		s := testutils.Setup(t)
 
 		deleteTaskResourceAttributeSetup()
 		// Empty attribute file

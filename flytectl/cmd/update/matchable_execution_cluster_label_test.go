@@ -20,6 +20,7 @@ const (
 
 func TestExecutionClusterLabelUpdateRequiresAttributeFile(t *testing.T) {
 	testWorkflowExecutionClusterLabelUpdate(
+		t,
 		/* setup */ nil,
 		/* assert */ func(s *testutils.TestStruct, err error) {
 			assert.ErrorContains(t, err, "attrFile is mandatory")
@@ -29,6 +30,7 @@ func TestExecutionClusterLabelUpdateRequiresAttributeFile(t *testing.T) {
 
 func TestExecutionClusterLabelUpdateFailsWhenAttributeFileDoesNotExist(t *testing.T) {
 	testWorkflowExecutionClusterLabelUpdate(
+		t,
 		/* setup */ func(s *testutils.TestStruct, config *executionclusterlabel.AttrUpdateConfig, target *admin.WorkflowAttributes) {
 			config.AttrFile = testDataNonExistentFile
 			config.Force = true
@@ -42,6 +44,7 @@ func TestExecutionClusterLabelUpdateFailsWhenAttributeFileDoesNotExist(t *testin
 
 func TestExecutionClusterLabelUpdateFailsWhenAttributeFileIsMalformed(t *testing.T) {
 	testWorkflowExecutionClusterLabelUpdate(
+		t,
 		/* setup */ func(s *testutils.TestStruct, config *executionclusterlabel.AttrUpdateConfig, target *admin.WorkflowAttributes) {
 			config.AttrFile = testDataInvalidAttrFile
 			config.Force = true
@@ -56,6 +59,7 @@ func TestExecutionClusterLabelUpdateFailsWhenAttributeFileIsMalformed(t *testing
 func TestExecutionClusterLabelUpdateHappyPath(t *testing.T) {
 	t.Run("workflow", func(t *testing.T) {
 		testWorkflowExecutionClusterLabelUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *executionclusterlabel.AttrUpdateConfig, target *admin.WorkflowAttributes) {
 				config.AttrFile = validWorkflowExecutionClusterLabelFilePath
 				config.Force = true
@@ -69,6 +73,7 @@ func TestExecutionClusterLabelUpdateHappyPath(t *testing.T) {
 
 	t.Run("domain", func(t *testing.T) {
 		testProjectDomainExecutionClusterLabelUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *executionclusterlabel.AttrUpdateConfig, target *admin.ProjectDomainAttributes) {
 				config.AttrFile = validProjectDomainExecutionClusterLabelFilePath
 				config.Force = true
@@ -82,6 +87,7 @@ func TestExecutionClusterLabelUpdateHappyPath(t *testing.T) {
 
 	t.Run("project", func(t *testing.T) {
 		testProjectExecutionClusterLabelUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *executionclusterlabel.AttrUpdateConfig, target *admin.ProjectAttributes) {
 				config.AttrFile = validProjectExecutionClusterLabelFilePath
 				config.Force = true
@@ -97,6 +103,7 @@ func TestExecutionClusterLabelUpdateHappyPath(t *testing.T) {
 func TestExecutionClusterLabelUpdateFailsWithoutForceFlag(t *testing.T) {
 	t.Run("workflow", func(t *testing.T) {
 		testWorkflowExecutionClusterLabelUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *executionclusterlabel.AttrUpdateConfig, target *admin.WorkflowAttributes) {
 				config.AttrFile = validWorkflowExecutionClusterLabelFilePath
 				config.Force = false
@@ -109,6 +116,7 @@ func TestExecutionClusterLabelUpdateFailsWithoutForceFlag(t *testing.T) {
 
 	t.Run("domain", func(t *testing.T) {
 		testProjectDomainExecutionClusterLabelUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *executionclusterlabel.AttrUpdateConfig, target *admin.ProjectDomainAttributes) {
 				config.AttrFile = validProjectDomainExecutionClusterLabelFilePath
 				config.Force = false
@@ -121,6 +129,7 @@ func TestExecutionClusterLabelUpdateFailsWithoutForceFlag(t *testing.T) {
 
 	t.Run("project", func(t *testing.T) {
 		testProjectExecutionClusterLabelUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *executionclusterlabel.AttrUpdateConfig, target *admin.ProjectAttributes) {
 				config.AttrFile = validProjectExecutionClusterLabelFilePath
 				config.Force = false
@@ -135,6 +144,7 @@ func TestExecutionClusterLabelUpdateFailsWithoutForceFlag(t *testing.T) {
 func TestExecutionClusterLabelUpdateDoesNothingWithDryRunFlag(t *testing.T) {
 	t.Run("workflow", func(t *testing.T) {
 		testWorkflowExecutionClusterLabelUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *executionclusterlabel.AttrUpdateConfig, target *admin.WorkflowAttributes) {
 				config.AttrFile = validWorkflowExecutionClusterLabelFilePath
 				config.DryRun = true
@@ -147,6 +157,7 @@ func TestExecutionClusterLabelUpdateDoesNothingWithDryRunFlag(t *testing.T) {
 
 	t.Run("domain", func(t *testing.T) {
 		testProjectDomainExecutionClusterLabelUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *executionclusterlabel.AttrUpdateConfig, target *admin.ProjectDomainAttributes) {
 				config.AttrFile = validProjectDomainExecutionClusterLabelFilePath
 				config.DryRun = true
@@ -159,6 +170,7 @@ func TestExecutionClusterLabelUpdateDoesNothingWithDryRunFlag(t *testing.T) {
 
 	t.Run("project", func(t *testing.T) {
 		testProjectExecutionClusterLabelUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *executionclusterlabel.AttrUpdateConfig, target *admin.ProjectAttributes) {
 				config.AttrFile = validProjectExecutionClusterLabelFilePath
 				config.DryRun = true
@@ -173,6 +185,7 @@ func TestExecutionClusterLabelUpdateDoesNothingWithDryRunFlag(t *testing.T) {
 func TestExecutionClusterLabelUpdateIgnoresForceFlagWithDryRun(t *testing.T) {
 	t.Run("workflow without --force", func(t *testing.T) {
 		testWorkflowExecutionClusterLabelUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *executionclusterlabel.AttrUpdateConfig, target *admin.WorkflowAttributes) {
 				config.AttrFile = validWorkflowExecutionClusterLabelFilePath
 				config.Force = false
@@ -186,6 +199,7 @@ func TestExecutionClusterLabelUpdateIgnoresForceFlagWithDryRun(t *testing.T) {
 
 	t.Run("workflow with --force", func(t *testing.T) {
 		testWorkflowExecutionClusterLabelUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *executionclusterlabel.AttrUpdateConfig, target *admin.WorkflowAttributes) {
 				config.AttrFile = validWorkflowExecutionClusterLabelFilePath
 				config.Force = true
@@ -199,6 +213,7 @@ func TestExecutionClusterLabelUpdateIgnoresForceFlagWithDryRun(t *testing.T) {
 
 	t.Run("domain without --force", func(t *testing.T) {
 		testProjectDomainExecutionClusterLabelUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *executionclusterlabel.AttrUpdateConfig, target *admin.ProjectDomainAttributes) {
 				config.AttrFile = validProjectDomainExecutionClusterLabelFilePath
 				config.Force = false
@@ -212,6 +227,7 @@ func TestExecutionClusterLabelUpdateIgnoresForceFlagWithDryRun(t *testing.T) {
 
 	t.Run("domain with --force", func(t *testing.T) {
 		testProjectDomainExecutionClusterLabelUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *executionclusterlabel.AttrUpdateConfig, target *admin.ProjectDomainAttributes) {
 				config.AttrFile = validProjectDomainExecutionClusterLabelFilePath
 				config.Force = true
@@ -225,6 +241,7 @@ func TestExecutionClusterLabelUpdateIgnoresForceFlagWithDryRun(t *testing.T) {
 
 	t.Run("project without --force", func(t *testing.T) {
 		testProjectExecutionClusterLabelUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *executionclusterlabel.AttrUpdateConfig, target *admin.ProjectAttributes) {
 				config.AttrFile = validProjectExecutionClusterLabelFilePath
 				config.Force = false
@@ -238,6 +255,7 @@ func TestExecutionClusterLabelUpdateIgnoresForceFlagWithDryRun(t *testing.T) {
 
 	t.Run("project with --force", func(t *testing.T) {
 		testProjectExecutionClusterLabelUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *executionclusterlabel.AttrUpdateConfig, target *admin.ProjectAttributes) {
 				config.AttrFile = validProjectExecutionClusterLabelFilePath
 				config.Force = true
@@ -253,6 +271,7 @@ func TestExecutionClusterLabelUpdateIgnoresForceFlagWithDryRun(t *testing.T) {
 func TestExecutionClusterLabelUpdateSucceedsWhenAttributesDoNotExist(t *testing.T) {
 	t.Run("workflow", func(t *testing.T) {
 		testWorkflowExecutionClusterLabelUpdateWithMockSetup(
+			t,
 			/* mockSetup */ func(s *testutils.TestStruct, target *admin.WorkflowAttributes) {
 				s.FetcherExt.
 					OnFetchWorkflowAttributesMatch(s.Ctx, target.Project, target.Domain, target.Workflow, admin.MatchableResource_EXECUTION_CLUSTER_LABEL).
@@ -274,6 +293,7 @@ func TestExecutionClusterLabelUpdateSucceedsWhenAttributesDoNotExist(t *testing.
 
 	t.Run("domain", func(t *testing.T) {
 		testProjectDomainExecutionClusterLabelUpdateWithMockSetup(
+			t,
 			/* mockSetup */ func(s *testutils.TestStruct, target *admin.ProjectDomainAttributes) {
 				s.FetcherExt.
 					OnFetchProjectDomainAttributesMatch(s.Ctx, target.Project, target.Domain, admin.MatchableResource_EXECUTION_CLUSTER_LABEL).
@@ -295,6 +315,7 @@ func TestExecutionClusterLabelUpdateSucceedsWhenAttributesDoNotExist(t *testing.
 
 	t.Run("project", func(t *testing.T) {
 		testProjectExecutionClusterLabelUpdateWithMockSetup(
+			t,
 			/* mockSetup */ func(s *testutils.TestStruct, target *admin.ProjectAttributes) {
 				s.FetcherExt.
 					OnFetchProjectAttributesMatch(s.Ctx, target.Project, admin.MatchableResource_EXECUTION_CLUSTER_LABEL).
@@ -318,6 +339,7 @@ func TestExecutionClusterLabelUpdateSucceedsWhenAttributesDoNotExist(t *testing.
 func TestExecutionClusterLabelUpdateFailsWhenAdminClientFails(t *testing.T) {
 	t.Run("workflow", func(t *testing.T) {
 		testWorkflowExecutionClusterLabelUpdateWithMockSetup(
+			t,
 			/* mockSetup */ func(s *testutils.TestStruct, target *admin.WorkflowAttributes) {
 				s.FetcherExt.
 					OnFetchWorkflowAttributesMatch(s.Ctx, target.Project, target.Domain, target.Workflow, admin.MatchableResource_EXECUTION_CLUSTER_LABEL).
@@ -338,6 +360,7 @@ func TestExecutionClusterLabelUpdateFailsWhenAdminClientFails(t *testing.T) {
 
 	t.Run("domain", func(t *testing.T) {
 		testProjectDomainExecutionClusterLabelUpdateWithMockSetup(
+			t,
 			/* mockSetup */ func(s *testutils.TestStruct, target *admin.ProjectDomainAttributes) {
 				s.FetcherExt.
 					OnFetchProjectDomainAttributesMatch(s.Ctx, target.Project, target.Domain, admin.MatchableResource_EXECUTION_CLUSTER_LABEL).
@@ -358,6 +381,7 @@ func TestExecutionClusterLabelUpdateFailsWhenAdminClientFails(t *testing.T) {
 
 	t.Run("project", func(t *testing.T) {
 		testProjectExecutionClusterLabelUpdateWithMockSetup(
+			t,
 			/* mockSetup */ func(s *testutils.TestStruct, target *admin.ProjectAttributes) {
 				s.FetcherExt.
 					OnFetchProjectAttributesMatch(s.Ctx, target.Project, admin.MatchableResource_EXECUTION_CLUSTER_LABEL).
@@ -378,10 +402,12 @@ func TestExecutionClusterLabelUpdateFailsWhenAdminClientFails(t *testing.T) {
 }
 
 func testWorkflowExecutionClusterLabelUpdate(
+	t *testing.T,
 	setup func(s *testutils.TestStruct, config *executionclusterlabel.AttrUpdateConfig, target *admin.WorkflowAttributes),
 	asserter func(s *testutils.TestStruct, err error),
 ) {
 	testWorkflowExecutionClusterLabelUpdateWithMockSetup(
+		t,
 		/* mockSetup */ func(s *testutils.TestStruct, target *admin.WorkflowAttributes) {
 			s.FetcherExt.
 				OnFetchWorkflowAttributesMatch(s.Ctx, target.Project, target.Domain, target.Workflow, admin.MatchableResource_EXECUTION_CLUSTER_LABEL).
@@ -396,12 +422,12 @@ func testWorkflowExecutionClusterLabelUpdate(
 }
 
 func testWorkflowExecutionClusterLabelUpdateWithMockSetup(
+	t *testing.T,
 	mockSetup func(s *testutils.TestStruct, target *admin.WorkflowAttributes),
 	setup func(s *testutils.TestStruct, config *executionclusterlabel.AttrUpdateConfig, target *admin.WorkflowAttributes),
 	asserter func(s *testutils.TestStruct, err error),
 ) {
-	s := testutils.Setup()
-	defer s.TearDown()
+	s := testutils.Setup(t)
 
 	executionclusterlabel.DefaultUpdateConfig = &executionclusterlabel.AttrUpdateConfig{}
 	target := newTestWorkflowExecutionClusterLabel()
@@ -441,10 +467,12 @@ func newTestWorkflowExecutionClusterLabel() *admin.WorkflowAttributes {
 }
 
 func testProjectExecutionClusterLabelUpdate(
+	t *testing.T,
 	setup func(s *testutils.TestStruct, config *executionclusterlabel.AttrUpdateConfig, target *admin.ProjectAttributes),
 	asserter func(s *testutils.TestStruct, err error),
 ) {
 	testProjectExecutionClusterLabelUpdateWithMockSetup(
+		t,
 		/* mockSetup */ func(s *testutils.TestStruct, target *admin.ProjectAttributes) {
 			s.FetcherExt.
 				OnFetchProjectAttributesMatch(s.Ctx, target.Project, admin.MatchableResource_EXECUTION_CLUSTER_LABEL).
@@ -459,12 +487,12 @@ func testProjectExecutionClusterLabelUpdate(
 }
 
 func testProjectExecutionClusterLabelUpdateWithMockSetup(
+	t *testing.T,
 	mockSetup func(s *testutils.TestStruct, target *admin.ProjectAttributes),
 	setup func(s *testutils.TestStruct, config *executionclusterlabel.AttrUpdateConfig, target *admin.ProjectAttributes),
 	asserter func(s *testutils.TestStruct, err error),
 ) {
-	s := testutils.Setup()
-	defer s.TearDown()
+	s := testutils.Setup(t)
 
 	executionclusterlabel.DefaultUpdateConfig = &executionclusterlabel.AttrUpdateConfig{}
 	target := newTestProjectExecutionClusterLabel()
@@ -502,10 +530,12 @@ func newTestProjectExecutionClusterLabel() *admin.ProjectAttributes {
 }
 
 func testProjectDomainExecutionClusterLabelUpdate(
+	t *testing.T,
 	setup func(s *testutils.TestStruct, config *executionclusterlabel.AttrUpdateConfig, target *admin.ProjectDomainAttributes),
 	asserter func(s *testutils.TestStruct, err error),
 ) {
 	testProjectDomainExecutionClusterLabelUpdateWithMockSetup(
+		t,
 		/* mockSetup */ func(s *testutils.TestStruct, target *admin.ProjectDomainAttributes) {
 			s.FetcherExt.
 				OnFetchProjectDomainAttributesMatch(s.Ctx, target.Project, target.Domain, admin.MatchableResource_EXECUTION_CLUSTER_LABEL).
@@ -520,12 +550,12 @@ func testProjectDomainExecutionClusterLabelUpdate(
 }
 
 func testProjectDomainExecutionClusterLabelUpdateWithMockSetup(
+	t *testing.T,
 	mockSetup func(s *testutils.TestStruct, target *admin.ProjectDomainAttributes),
 	setup func(s *testutils.TestStruct, config *executionclusterlabel.AttrUpdateConfig, target *admin.ProjectDomainAttributes),
 	asserter func(s *testutils.TestStruct, err error),
 ) {
-	s := testutils.Setup()
-	defer s.TearDown()
+	s := testutils.Setup(t)
 
 	executionclusterlabel.DefaultUpdateConfig = &executionclusterlabel.AttrUpdateConfig{}
 	target := newTestProjectDomainExecutionClusterLabel()
