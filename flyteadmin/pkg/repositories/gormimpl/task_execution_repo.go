@@ -81,7 +81,7 @@ func (r *TaskExecutionRepo) Get(ctx context.Context, input interfaces.GetTaskExe
 
 func (r *TaskExecutionRepo) Update(ctx context.Context, execution models.TaskExecution) error {
 	timer := r.metrics.UpdateDuration.Start()
-	tx := r.db.WithContext(ctx).Model(&models.TaskExecution{}).Where(getIdFilter(execution.ID)).
+	tx := r.db.WithContext(ctx).Model(&models.TaskExecution{}).Where(getIDFilter(execution.ID)).
 		Updates(&execution)
 	timer.Stop()
 
