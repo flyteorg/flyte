@@ -6,6 +6,7 @@ import (
 
 	"github.com/flyteorg/flyte/flytectl/cmd/config"
 	rconfig "github.com/flyteorg/flyte/flytectl/cmd/config/subcommand/register"
+	"github.com/flyteorg/flyte/flytectl/cmd/testutils"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/mocks"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
@@ -22,7 +23,8 @@ const (
 
 func TestRegisterFromFiles(t *testing.T) {
 	t.Run("Valid registration", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup(t)
+
 		registerFilesSetup()
 		rconfig.DefaultFilesConfig.Archive = true
 		args := []string{"testdata/valid-parent-folder-register.tar"}
@@ -34,7 +36,8 @@ func TestRegisterFromFiles(t *testing.T) {
 		assert.Nil(t, err)
 	})
 	t.Run("Valid fast registration", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup(t)
+
 		testScope := promutils.NewTestScope()
 		labeled.SetMetricKeys(contextutils.AppNameKey, contextutils.ProjectKey, contextutils.DomainKey)
 		registerFilesSetup()
@@ -59,7 +62,8 @@ func TestRegisterFromFiles(t *testing.T) {
 		assert.Nil(t, err)
 	})
 	t.Run("Register a workflow with a failure node", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup(t)
+
 		testScope := promutils.NewTestScope()
 		labeled.SetMetricKeys(contextutils.AppNameKey, contextutils.ProjectKey, contextutils.DomainKey)
 		registerFilesSetup()
@@ -84,7 +88,8 @@ func TestRegisterFromFiles(t *testing.T) {
 		assert.Nil(t, err)
 	})
 	t.Run("Failed fast registration while uploading the codebase", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup(t)
+
 		registerFilesSetup()
 		testScope := promutils.NewTestScope()
 		labeled.SetMetricKeys(contextutils.AppNameKey, contextutils.ProjectKey, contextutils.DomainKey)
@@ -105,7 +110,8 @@ func TestRegisterFromFiles(t *testing.T) {
 		assert.Nil(t, err)
 	})
 	t.Run("Failed registration because of invalid files", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup(t)
+
 		registerFilesSetup()
 		testScope := promutils.NewTestScope()
 		labeled.SetMetricKeys(contextutils.AppNameKey, contextutils.ProjectKey, contextutils.DomainKey)
@@ -125,7 +131,8 @@ func TestRegisterFromFiles(t *testing.T) {
 		assert.NotNil(t, err)
 	})
 	t.Run("Failure registration of fast serialize", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup(t)
+
 		registerFilesSetup()
 		testScope := promutils.NewTestScope()
 		labeled.SetMetricKeys(contextutils.AppNameKey, contextutils.ProjectKey, contextutils.DomainKey)
@@ -148,7 +155,8 @@ func TestRegisterFromFiles(t *testing.T) {
 		assert.Equal(t, fmt.Errorf("failed"), err)
 	})
 	t.Run("Failure registration of fast serialize continue on error", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup(t)
+
 		registerFilesSetup()
 		testScope := promutils.NewTestScope()
 		labeled.SetMetricKeys(contextutils.AppNameKey, contextutils.ProjectKey, contextutils.DomainKey)
@@ -172,7 +180,8 @@ func TestRegisterFromFiles(t *testing.T) {
 		assert.Equal(t, fmt.Errorf("failed"), err)
 	})
 	t.Run("Valid registration of fast serialize", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup(t)
+
 		registerFilesSetup()
 		testScope := promutils.NewTestScope()
 		labeled.SetMetricKeys(contextutils.AppNameKey, contextutils.ProjectKey, contextutils.DomainKey)
@@ -196,7 +205,8 @@ func TestRegisterFromFiles(t *testing.T) {
 	})
 
 	t.Run("Registration with proto files ", func(t *testing.T) {
-		s := setup()
+		s := testutils.Setup(t)
+
 		registerFilesSetup()
 		testScope := promutils.NewTestScope()
 		labeled.SetMetricKeys(contextutils.AppNameKey, contextutils.ProjectKey, contextutils.DomainKey)

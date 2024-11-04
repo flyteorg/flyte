@@ -16,6 +16,7 @@ import (
 
 func TestLaunchPlanCanBeActivated(t *testing.T) {
 	testLaunchPlanUpdate(
+		t,
 		/* setup */ func(s *testutils.TestStruct, config *launchplan.UpdateConfig, launchplan *admin.LaunchPlan) {
 			launchplan.Closure.State = admin.LaunchPlanState_INACTIVE
 			config.Activate = true
@@ -34,6 +35,7 @@ func TestLaunchPlanCanBeActivated(t *testing.T) {
 
 func TestLaunchPlanCanBeArchived(t *testing.T) {
 	testLaunchPlanUpdate(
+		t,
 		/* setup */ func(s *testutils.TestStruct, config *launchplan.UpdateConfig, launchplan *admin.LaunchPlan) {
 			launchplan.Closure.State = admin.LaunchPlanState_ACTIVE
 			config.Archive = true
@@ -52,6 +54,7 @@ func TestLaunchPlanCanBeArchived(t *testing.T) {
 
 func TestLaunchPlanCanBeDeactivated(t *testing.T) {
 	testLaunchPlanUpdate(
+		t,
 		/* setup */ func(s *testutils.TestStruct, config *launchplan.UpdateConfig, launchplan *admin.LaunchPlan) {
 			launchplan.Closure.State = admin.LaunchPlanState_ACTIVE
 			config.Deactivate = true
@@ -70,6 +73,7 @@ func TestLaunchPlanCanBeDeactivated(t *testing.T) {
 
 func TestLaunchPlanCannotBeActivatedAndDeactivatedAtTheSameTime(t *testing.T) {
 	testLaunchPlanUpdate(
+		t,
 		/* setup */ func(s *testutils.TestStruct, config *launchplan.UpdateConfig, launchplan *admin.LaunchPlan) {
 			config.Activate = true
 			config.Deactivate = true
@@ -82,6 +86,7 @@ func TestLaunchPlanCannotBeActivatedAndDeactivatedAtTheSameTime(t *testing.T) {
 
 func TestLaunchPlanUpdateDoesNothingWhenThereAreNoChanges(t *testing.T) {
 	testLaunchPlanUpdate(
+		t,
 		/* setup */ func(s *testutils.TestStruct, config *launchplan.UpdateConfig, launchplan *admin.LaunchPlan) {
 			launchplan.Closure.State = admin.LaunchPlanState_ACTIVE
 			config.Activate = true
@@ -95,6 +100,7 @@ func TestLaunchPlanUpdateDoesNothingWhenThereAreNoChanges(t *testing.T) {
 
 func TestLaunchPlanUpdateWithoutForceFlagFails(t *testing.T) {
 	testLaunchPlanUpdate(
+		t,
 		/* setup */ func(s *testutils.TestStruct, config *launchplan.UpdateConfig, launchplan *admin.LaunchPlan) {
 			launchplan.Closure.State = admin.LaunchPlanState_INACTIVE
 			config.Activate = true
@@ -108,6 +114,7 @@ func TestLaunchPlanUpdateWithoutForceFlagFails(t *testing.T) {
 
 func TestLaunchPlanUpdateDoesNothingWithDryRunFlag(t *testing.T) {
 	testLaunchPlanUpdate(
+		t,
 		/* setup */ func(s *testutils.TestStruct, config *launchplan.UpdateConfig, launchplan *admin.LaunchPlan) {
 			launchplan.Closure.State = admin.LaunchPlanState_INACTIVE
 			config.Activate = true
@@ -122,6 +129,7 @@ func TestLaunchPlanUpdateDoesNothingWithDryRunFlag(t *testing.T) {
 func TestForceFlagIsIgnoredWithDryRunDuringLaunchPlanUpdate(t *testing.T) {
 	t.Run("without --force", func(t *testing.T) {
 		testLaunchPlanUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *launchplan.UpdateConfig, launchplan *admin.LaunchPlan) {
 				launchplan.Closure.State = admin.LaunchPlanState_INACTIVE
 				config.Activate = true
@@ -137,6 +145,7 @@ func TestForceFlagIsIgnoredWithDryRunDuringLaunchPlanUpdate(t *testing.T) {
 
 	t.Run("with --force", func(t *testing.T) {
 		testLaunchPlanUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *launchplan.UpdateConfig, launchplan *admin.LaunchPlan) {
 				launchplan.Closure.State = admin.LaunchPlanState_INACTIVE
 				config.Activate = true
@@ -153,6 +162,7 @@ func TestForceFlagIsIgnoredWithDryRunDuringLaunchPlanUpdate(t *testing.T) {
 
 func TestLaunchPlanUpdateFailsWhenLaunchPlanDoesNotExist(t *testing.T) {
 	testLaunchPlanUpdateWithMockSetup(
+		t,
 		/* mockSetup */ func(s *testutils.TestStruct, launchplan *admin.LaunchPlan) {
 			s.MockAdminClient.
 				OnGetLaunchPlanMatch(
@@ -173,6 +183,7 @@ func TestLaunchPlanUpdateFailsWhenLaunchPlanDoesNotExist(t *testing.T) {
 
 func TestLaunchPlanUpdateFailsWhenAdminClientFails(t *testing.T) {
 	testLaunchPlanUpdateWithMockSetup(
+		t,
 		/* mockSetup */ func(s *testutils.TestStruct, launchplan *admin.LaunchPlan) {
 			s.MockAdminClient.
 				OnGetLaunchPlanMatch(
@@ -196,8 +207,7 @@ func TestLaunchPlanUpdateFailsWhenAdminClientFails(t *testing.T) {
 }
 
 func TestLaunchPlanUpdateRequiresLaunchPlanName(t *testing.T) {
-	s := testutils.Setup()
-	defer s.TearDown()
+	s := testutils.Setup(t)
 
 	launchplan.UConfig = &launchplan.UpdateConfig{}
 
@@ -211,8 +221,7 @@ func TestLaunchPlanUpdateRequiresLaunchPlanName(t *testing.T) {
 }
 
 func TestLaunchPlanUpdateRequiresLaunchPlanVersion(t *testing.T) {
-	s := testutils.Setup()
-	defer s.TearDown()
+	s := testutils.Setup(t)
 
 	launchplan.UConfig = &launchplan.UpdateConfig{}
 
@@ -226,10 +235,12 @@ func TestLaunchPlanUpdateRequiresLaunchPlanVersion(t *testing.T) {
 }
 
 func testLaunchPlanUpdate(
+	t *testing.T,
 	setup func(s *testutils.TestStruct, config *launchplan.UpdateConfig, launchplan *admin.LaunchPlan),
 	asserter func(s *testutils.TestStruct, err error),
 ) {
 	testLaunchPlanUpdateWithMockSetup(
+		t,
 		/* mockSetup */ func(s *testutils.TestStruct, launchplan *admin.LaunchPlan) {
 			s.MockAdminClient.
 				OnGetLaunchPlanMatch(
@@ -246,12 +257,12 @@ func testLaunchPlanUpdate(
 }
 
 func testLaunchPlanUpdateWithMockSetup(
+	t *testing.T,
 	mockSetup func(s *testutils.TestStruct, launchplan *admin.LaunchPlan),
 	setup func(s *testutils.TestStruct, config *launchplan.UpdateConfig, launchplan *admin.LaunchPlan),
 	asserter func(s *testutils.TestStruct, err error),
 ) {
-	s := testutils.Setup()
-	defer s.TearDown()
+	s := testutils.Setup(t)
 
 	target := newTestLaunchPlan()
 
@@ -262,7 +273,6 @@ func testLaunchPlanUpdateWithMockSetup(
 	launchplan.UConfig = &launchplan.UpdateConfig{}
 	if setup != nil {
 		setup(&s, launchplan.UConfig, target)
-		defer s.TearDown()
 	}
 
 	args := []string{target.Id.Name}

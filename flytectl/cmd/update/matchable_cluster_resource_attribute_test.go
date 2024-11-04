@@ -20,6 +20,7 @@ const (
 
 func TestClusterResourceAttributeUpdateRequiresAttributeFile(t *testing.T) {
 	testWorkflowClusterResourceAttributeUpdate(
+		t,
 		/* setup */ nil,
 		/* assert */ func(s *testutils.TestStruct, err error) {
 			assert.ErrorContains(t, err, "attrFile is mandatory")
@@ -29,6 +30,7 @@ func TestClusterResourceAttributeUpdateRequiresAttributeFile(t *testing.T) {
 
 func TestClusterResourceAttributeUpdateFailsWhenAttributeFileDoesNotExist(t *testing.T) {
 	testWorkflowClusterResourceAttributeUpdate(
+		t,
 		/* setup */ func(s *testutils.TestStruct, config *clusterresourceattribute.AttrUpdateConfig, target *admin.WorkflowAttributes) {
 			config.AttrFile = testDataNonExistentFile
 			config.Force = true
@@ -42,6 +44,7 @@ func TestClusterResourceAttributeUpdateFailsWhenAttributeFileDoesNotExist(t *tes
 
 func TestClusterResourceAttributeUpdateFailsWhenAttributeFileIsMalformed(t *testing.T) {
 	testWorkflowClusterResourceAttributeUpdate(
+		t,
 		/* setup */ func(s *testutils.TestStruct, config *clusterresourceattribute.AttrUpdateConfig, target *admin.WorkflowAttributes) {
 			config.AttrFile = testDataInvalidAttrFile
 			config.Force = true
@@ -56,6 +59,7 @@ func TestClusterResourceAttributeUpdateFailsWhenAttributeFileIsMalformed(t *test
 func TestClusterResourceAttributeUpdateHappyPath(t *testing.T) {
 	t.Run("workflow", func(t *testing.T) {
 		testWorkflowClusterResourceAttributeUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *clusterresourceattribute.AttrUpdateConfig, target *admin.WorkflowAttributes) {
 				config.AttrFile = validWorkflowClusterResourceAttributesFilePath
 				config.Force = true
@@ -69,6 +73,7 @@ func TestClusterResourceAttributeUpdateHappyPath(t *testing.T) {
 
 	t.Run("domain", func(t *testing.T) {
 		testProjectDomainClusterResourceAttributeUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *clusterresourceattribute.AttrUpdateConfig, target *admin.ProjectDomainAttributes) {
 				config.AttrFile = validProjectDomainClusterResourceAttributesFilePath
 				config.Force = true
@@ -82,6 +87,7 @@ func TestClusterResourceAttributeUpdateHappyPath(t *testing.T) {
 
 	t.Run("project", func(t *testing.T) {
 		testProjectClusterResourceAttributeUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *clusterresourceattribute.AttrUpdateConfig, target *admin.ProjectAttributes) {
 				config.AttrFile = validProjectClusterResourceAttributesFilePath
 				config.Force = true
@@ -97,6 +103,7 @@ func TestClusterResourceAttributeUpdateHappyPath(t *testing.T) {
 func TestClusterResourceAttributeUpdateFailsWithoutForceFlag(t *testing.T) {
 	t.Run("workflow", func(t *testing.T) {
 		testWorkflowClusterResourceAttributeUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *clusterresourceattribute.AttrUpdateConfig, target *admin.WorkflowAttributes) {
 				config.AttrFile = validWorkflowClusterResourceAttributesFilePath
 				config.Force = false
@@ -109,6 +116,7 @@ func TestClusterResourceAttributeUpdateFailsWithoutForceFlag(t *testing.T) {
 
 	t.Run("domain", func(t *testing.T) {
 		testProjectDomainClusterResourceAttributeUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *clusterresourceattribute.AttrUpdateConfig, target *admin.ProjectDomainAttributes) {
 				config.AttrFile = validProjectDomainClusterResourceAttributesFilePath
 				config.Force = false
@@ -121,6 +129,7 @@ func TestClusterResourceAttributeUpdateFailsWithoutForceFlag(t *testing.T) {
 
 	t.Run("project", func(t *testing.T) {
 		testProjectClusterResourceAttributeUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *clusterresourceattribute.AttrUpdateConfig, target *admin.ProjectAttributes) {
 				config.AttrFile = validProjectClusterResourceAttributesFilePath
 				config.Force = false
@@ -135,6 +144,7 @@ func TestClusterResourceAttributeUpdateFailsWithoutForceFlag(t *testing.T) {
 func TestClusterResourceAttributeUpdateDoesNothingWithDryRunFlag(t *testing.T) {
 	t.Run("workflow", func(t *testing.T) {
 		testWorkflowClusterResourceAttributeUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *clusterresourceattribute.AttrUpdateConfig, target *admin.WorkflowAttributes) {
 				config.AttrFile = validWorkflowClusterResourceAttributesFilePath
 				config.DryRun = true
@@ -147,6 +157,7 @@ func TestClusterResourceAttributeUpdateDoesNothingWithDryRunFlag(t *testing.T) {
 
 	t.Run("domain", func(t *testing.T) {
 		testProjectDomainClusterResourceAttributeUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *clusterresourceattribute.AttrUpdateConfig, target *admin.ProjectDomainAttributes) {
 				config.AttrFile = validProjectDomainClusterResourceAttributesFilePath
 				config.DryRun = true
@@ -159,6 +170,7 @@ func TestClusterResourceAttributeUpdateDoesNothingWithDryRunFlag(t *testing.T) {
 
 	t.Run("project", func(t *testing.T) {
 		testProjectClusterResourceAttributeUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *clusterresourceattribute.AttrUpdateConfig, target *admin.ProjectAttributes) {
 				config.AttrFile = validProjectClusterResourceAttributesFilePath
 				config.DryRun = true
@@ -173,6 +185,7 @@ func TestClusterResourceAttributeUpdateDoesNothingWithDryRunFlag(t *testing.T) {
 func TestClusterResourceAttributeUpdateIgnoresForceFlagWithDryRun(t *testing.T) {
 	t.Run("workflow without --force", func(t *testing.T) {
 		testWorkflowClusterResourceAttributeUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *clusterresourceattribute.AttrUpdateConfig, target *admin.WorkflowAttributes) {
 				config.AttrFile = validWorkflowClusterResourceAttributesFilePath
 				config.Force = false
@@ -186,6 +199,7 @@ func TestClusterResourceAttributeUpdateIgnoresForceFlagWithDryRun(t *testing.T) 
 
 	t.Run("workflow with --force", func(t *testing.T) {
 		testWorkflowClusterResourceAttributeUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *clusterresourceattribute.AttrUpdateConfig, target *admin.WorkflowAttributes) {
 				config.AttrFile = validWorkflowClusterResourceAttributesFilePath
 				config.Force = true
@@ -199,6 +213,7 @@ func TestClusterResourceAttributeUpdateIgnoresForceFlagWithDryRun(t *testing.T) 
 
 	t.Run("domain without --force", func(t *testing.T) {
 		testProjectDomainClusterResourceAttributeUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *clusterresourceattribute.AttrUpdateConfig, target *admin.ProjectDomainAttributes) {
 				config.AttrFile = validProjectDomainClusterResourceAttributesFilePath
 				config.Force = false
@@ -212,6 +227,7 @@ func TestClusterResourceAttributeUpdateIgnoresForceFlagWithDryRun(t *testing.T) 
 
 	t.Run("domain with --force", func(t *testing.T) {
 		testProjectDomainClusterResourceAttributeUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *clusterresourceattribute.AttrUpdateConfig, target *admin.ProjectDomainAttributes) {
 				config.AttrFile = validProjectDomainClusterResourceAttributesFilePath
 				config.Force = true
@@ -225,6 +241,7 @@ func TestClusterResourceAttributeUpdateIgnoresForceFlagWithDryRun(t *testing.T) 
 
 	t.Run("project without --force", func(t *testing.T) {
 		testProjectClusterResourceAttributeUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *clusterresourceattribute.AttrUpdateConfig, target *admin.ProjectAttributes) {
 				config.AttrFile = validProjectClusterResourceAttributesFilePath
 				config.Force = false
@@ -238,6 +255,7 @@ func TestClusterResourceAttributeUpdateIgnoresForceFlagWithDryRun(t *testing.T) 
 
 	t.Run("project with --force", func(t *testing.T) {
 		testProjectClusterResourceAttributeUpdate(
+			t,
 			/* setup */ func(s *testutils.TestStruct, config *clusterresourceattribute.AttrUpdateConfig, target *admin.ProjectAttributes) {
 				config.AttrFile = validProjectClusterResourceAttributesFilePath
 				config.Force = true
@@ -253,6 +271,7 @@ func TestClusterResourceAttributeUpdateIgnoresForceFlagWithDryRun(t *testing.T) 
 func TestClusterResourceAttributeUpdateSucceedsWhenAttributesDoNotExist(t *testing.T) {
 	t.Run("workflow", func(t *testing.T) {
 		testWorkflowClusterResourceAttributeUpdateWithMockSetup(
+			t,
 			/* mockSetup */ func(s *testutils.TestStruct, target *admin.WorkflowAttributes) {
 				s.FetcherExt.
 					OnFetchWorkflowAttributesMatch(s.Ctx, target.Project, target.Domain, target.Workflow, admin.MatchableResource_CLUSTER_RESOURCE).
@@ -274,6 +293,7 @@ func TestClusterResourceAttributeUpdateSucceedsWhenAttributesDoNotExist(t *testi
 
 	t.Run("domain", func(t *testing.T) {
 		testProjectDomainClusterResourceAttributeUpdateWithMockSetup(
+			t,
 			/* mockSetup */ func(s *testutils.TestStruct, target *admin.ProjectDomainAttributes) {
 				s.FetcherExt.
 					OnFetchProjectDomainAttributesMatch(s.Ctx, target.Project, target.Domain, admin.MatchableResource_CLUSTER_RESOURCE).
@@ -295,6 +315,7 @@ func TestClusterResourceAttributeUpdateSucceedsWhenAttributesDoNotExist(t *testi
 
 	t.Run("project", func(t *testing.T) {
 		testProjectClusterResourceAttributeUpdateWithMockSetup(
+			t,
 			/* mockSetup */ func(s *testutils.TestStruct, target *admin.ProjectAttributes) {
 				s.FetcherExt.
 					OnFetchProjectAttributesMatch(s.Ctx, target.Project, admin.MatchableResource_CLUSTER_RESOURCE).
@@ -318,6 +339,7 @@ func TestClusterResourceAttributeUpdateSucceedsWhenAttributesDoNotExist(t *testi
 func TestClusterResourceAttributeUpdateFailsWhenAdminClientFails(t *testing.T) {
 	t.Run("workflow", func(t *testing.T) {
 		testWorkflowClusterResourceAttributeUpdateWithMockSetup(
+			t,
 			/* mockSetup */ func(s *testutils.TestStruct, target *admin.WorkflowAttributes) {
 				s.FetcherExt.
 					OnFetchWorkflowAttributesMatch(s.Ctx, target.Project, target.Domain, target.Workflow, admin.MatchableResource_CLUSTER_RESOURCE).
@@ -338,6 +360,7 @@ func TestClusterResourceAttributeUpdateFailsWhenAdminClientFails(t *testing.T) {
 
 	t.Run("domain", func(t *testing.T) {
 		testProjectDomainClusterResourceAttributeUpdateWithMockSetup(
+			t,
 			/* mockSetup */ func(s *testutils.TestStruct, target *admin.ProjectDomainAttributes) {
 				s.FetcherExt.
 					OnFetchProjectDomainAttributesMatch(s.Ctx, target.Project, target.Domain, admin.MatchableResource_CLUSTER_RESOURCE).
@@ -358,6 +381,7 @@ func TestClusterResourceAttributeUpdateFailsWhenAdminClientFails(t *testing.T) {
 
 	t.Run("project", func(t *testing.T) {
 		testProjectClusterResourceAttributeUpdateWithMockSetup(
+			t,
 			/* mockSetup */ func(s *testutils.TestStruct, target *admin.ProjectAttributes) {
 				s.FetcherExt.
 					OnFetchProjectAttributesMatch(s.Ctx, target.Project, admin.MatchableResource_CLUSTER_RESOURCE).
@@ -378,10 +402,12 @@ func TestClusterResourceAttributeUpdateFailsWhenAdminClientFails(t *testing.T) {
 }
 
 func testWorkflowClusterResourceAttributeUpdate(
+	t *testing.T,
 	setup func(s *testutils.TestStruct, config *clusterresourceattribute.AttrUpdateConfig, target *admin.WorkflowAttributes),
 	asserter func(s *testutils.TestStruct, err error),
 ) {
 	testWorkflowClusterResourceAttributeUpdateWithMockSetup(
+		t,
 		/* mockSetup */ func(s *testutils.TestStruct, target *admin.WorkflowAttributes) {
 			s.FetcherExt.
 				OnFetchWorkflowAttributesMatch(s.Ctx, target.Project, target.Domain, target.Workflow, admin.MatchableResource_CLUSTER_RESOURCE).
@@ -396,12 +422,12 @@ func testWorkflowClusterResourceAttributeUpdate(
 }
 
 func testWorkflowClusterResourceAttributeUpdateWithMockSetup(
+	t *testing.T,
 	mockSetup func(s *testutils.TestStruct, target *admin.WorkflowAttributes),
 	setup func(s *testutils.TestStruct, config *clusterresourceattribute.AttrUpdateConfig, target *admin.WorkflowAttributes),
 	asserter func(s *testutils.TestStruct, err error),
 ) {
-	s := testutils.Setup()
-	defer s.TearDown()
+	s := testutils.Setup(t)
 
 	clusterresourceattribute.DefaultUpdateConfig = &clusterresourceattribute.AttrUpdateConfig{}
 	target := newTestWorkflowClusterResourceAttribute()
@@ -412,7 +438,6 @@ func testWorkflowClusterResourceAttributeUpdateWithMockSetup(
 
 	if setup != nil {
 		setup(&s, clusterresourceattribute.DefaultUpdateConfig, target)
-		defer s.TearDown()
 	}
 
 	err := updateClusterResourceAttributesFunc(s.Ctx, nil, s.CmdCtx)
@@ -446,10 +471,12 @@ func newTestWorkflowClusterResourceAttribute() *admin.WorkflowAttributes {
 }
 
 func testProjectClusterResourceAttributeUpdate(
+	t *testing.T,
 	setup func(s *testutils.TestStruct, config *clusterresourceattribute.AttrUpdateConfig, target *admin.ProjectAttributes),
 	asserter func(s *testutils.TestStruct, err error),
 ) {
 	testProjectClusterResourceAttributeUpdateWithMockSetup(
+		t,
 		/* mockSetup */ func(s *testutils.TestStruct, target *admin.ProjectAttributes) {
 			s.FetcherExt.
 				OnFetchProjectAttributesMatch(s.Ctx, target.Project, admin.MatchableResource_CLUSTER_RESOURCE).
@@ -464,12 +491,12 @@ func testProjectClusterResourceAttributeUpdate(
 }
 
 func testProjectClusterResourceAttributeUpdateWithMockSetup(
+	t *testing.T,
 	mockSetup func(s *testutils.TestStruct, target *admin.ProjectAttributes),
 	setup func(s *testutils.TestStruct, config *clusterresourceattribute.AttrUpdateConfig, target *admin.ProjectAttributes),
 	asserter func(s *testutils.TestStruct, err error),
 ) {
-	s := testutils.Setup()
-	defer s.TearDown()
+	s := testutils.Setup(t)
 
 	clusterresourceattribute.DefaultUpdateConfig = &clusterresourceattribute.AttrUpdateConfig{}
 	target := newTestProjectClusterResourceAttribute()
@@ -480,7 +507,6 @@ func testProjectClusterResourceAttributeUpdateWithMockSetup(
 
 	if setup != nil {
 		setup(&s, clusterresourceattribute.DefaultUpdateConfig, target)
-		defer s.TearDown()
 	}
 
 	err := updateClusterResourceAttributesFunc(s.Ctx, nil, s.CmdCtx)
@@ -512,10 +538,12 @@ func newTestProjectClusterResourceAttribute() *admin.ProjectAttributes {
 }
 
 func testProjectDomainClusterResourceAttributeUpdate(
+	t *testing.T,
 	setup func(s *testutils.TestStruct, config *clusterresourceattribute.AttrUpdateConfig, target *admin.ProjectDomainAttributes),
 	asserter func(s *testutils.TestStruct, err error),
 ) {
 	testProjectDomainClusterResourceAttributeUpdateWithMockSetup(
+		t,
 		/* mockSetup */ func(s *testutils.TestStruct, target *admin.ProjectDomainAttributes) {
 			s.FetcherExt.
 				OnFetchProjectDomainAttributesMatch(s.Ctx, target.Project, target.Domain, admin.MatchableResource_CLUSTER_RESOURCE).
@@ -530,11 +558,13 @@ func testProjectDomainClusterResourceAttributeUpdate(
 }
 
 func testProjectDomainClusterResourceAttributeUpdateWithMockSetup(
+	t *testing.T,
 	mockSetup func(s *testutils.TestStruct, target *admin.ProjectDomainAttributes),
 	setup func(s *testutils.TestStruct, config *clusterresourceattribute.AttrUpdateConfig, target *admin.ProjectDomainAttributes),
 	asserter func(s *testutils.TestStruct, err error),
 ) {
-	s := testutils.Setup()
+	s := testutils.Setup(t)
+
 	clusterresourceattribute.DefaultUpdateConfig = &clusterresourceattribute.AttrUpdateConfig{}
 	target := newTestProjectDomainClusterResourceAttribute()
 
@@ -544,7 +574,6 @@ func testProjectDomainClusterResourceAttributeUpdateWithMockSetup(
 
 	if setup != nil {
 		setup(&s, clusterresourceattribute.DefaultUpdateConfig, target)
-		defer s.TearDown()
 	}
 
 	err := updateClusterResourceAttributesFunc(s.Ctx, nil, s.CmdCtx)
