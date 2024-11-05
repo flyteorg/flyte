@@ -29,16 +29,16 @@ queueconfig:
       gangscheduling: "placeholderTimeoutInSeconds=30 gangSchedulingStyle=hard"
 ```
 
-Mentioned configuration indicates what queues exist for an org.
+Mentioned configuration indicates what queues exist for an organization.
 Hierarchical queues will be structured as follows.
-root.org1.ray、root.org1.spark and root.org1.default".
+root.organization1.ray、root.organization1.spark and root.organization1.default".
 
 ResourceFlavor allocates resource based on labels which indicates that category-based resource allocation by organization label is available.
 Thus, a clusterQueue including multiple resources represents the total acessaible resource for an organization.  
 | clusterQueue | localQueue |
 | --- | --- |
-| Org | ray、spark、default |
-A tenant can submit organization-specific tasks to queues such as org.ray, org.spark and org.default to track which job types are submittable. 
+| <organization name> | ray、spark、default |
+A tenant can submit organization-specific tasks to queues such as organization.ray, organization.spark and organization.default to track which job types are submittable. 
 
 
 A SchedulerConfigManager maintains config from mentioned yaml.
@@ -93,9 +93,9 @@ func (e *PluginManager) launchResource(ctx context.Context, tCtx pluginsCore.Tas
 }
 ```
 When batchscheduler in flyte is yunikorn, some examples are like following.
-For example, this appoarch submits a Ray job owned by user1 in org1 to "root.org1.ray".
-A spark application in ns1 submitted by user4 in org1 is in "root.org1.ns1".
-In the other hand, results of these examples are "org1-ray" and "org1-ns1" when adopting Kueue.
+For example, this appoarch submits a Ray job owned by user1 in organization1 to "root.organization1.ray".
+A spark application in ns1 submitted by user4 in organization1 is in "root.organization1.ns1".
+In the other hand, results of these examples are "organization1-ray" and "organization1-ns1" when adopting Kueue.
 
 ## 4 Metrics & Dashboards
 
@@ -127,5 +127,5 @@ In the other hand, Kueue currently doesn't support Spark CRD.
 ## 9 Conclusion
 
 Yunikorn and Kueue support gang scheduling allowing all necassary pods to run sumultaneously when required resource are available.
-Yunikorn provides preemption calculating the priority of applications based on thier priority class and priority score of the queue where they are submitted, in order to trigger high-prioirty or emergency application immediately. 
+Yunikorn provides preemption calculating the priority of applications based on their priority class and priority score of the queue where they are submitted, in order to trigger high-prioirty or emergency application immediately. 
 Yunikorn's hierarchical queue includes grarateed resources settings and ACLs.
