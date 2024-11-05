@@ -31,7 +31,14 @@ func GetLogsForContainerInPod(ctx context.Context, logPlugin tasklog.Plugin, tas
 
 	containerID := v1.ContainerStatus{}.ContainerID
 	if uint32(len(pod.Status.ContainerStatuses)) <= index {
-		logger.Errorf(ctx, "containerStatus IndexOutOfBound, requested [%d], but total containerStatuses [%d] in pod phase [%v]", index, len(pod.Status.ContainerStatuses), pod.Status.Phase)
+		msg := fmt.Sprintf("containerStatus IndexOutOfBound, requested [%d], but total containerStatuses [%d] in pod phase [%v]", index, len(pod.Status.ContainerStatuses), pod.Status.Phase)
+		if pod.Status.Phase == v1.PodPending {
+			// If the pod is pending, the container status may not be available yet. Log as debug.
+			logger.Debugf(ctx, msg)
+		} else {
+			// In other phases, this is unexpected. Log as error.
+			logger.Errorf(ctx, msg)
+		}
 	} else {
 		containerID = pod.Status.ContainerStatuses[index].ContainerID
 	}
