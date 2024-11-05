@@ -129,7 +129,7 @@ func (q qualityOfServiceAllocator) GetQualityOfService(ctx context.Context, inpu
 				return QualityOfServiceSpec{}, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 					"Invalid custom quality of service set in workflow [%v], failed to parse duration [%v] with: %v",
 					workflowIdentifier,
-					input.ExecutionCreateRequest.Spec.QualityOfService.GetSpec().QueueingBudget, err)
+					input.Workflow.Closure.CompiledWorkflow.Primary.Template.Metadata.QualityOfService.GetSpec().QueueingBudget, err)
 			}
 			return QualityOfServiceSpec{
 				QueuingBudget: duration,
